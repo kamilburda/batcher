@@ -24,7 +24,7 @@ from batcher.gui import main as gui_main
 
 PLUGINS_DIRPATH = os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath()))
 
-TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_SUBDIRPATH, 'tests', 'test_images')
+TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_DIRPATH, 'tests', 'test_images')
 TEST_IMAGES_FILEPATH = os.path.join(
   TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
 

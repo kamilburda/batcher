@@ -9,13 +9,13 @@ import inspect
 UTILS_DIRPATH = os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
-PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
-PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_SUBDIRPATH, 'pygimplib')
+PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
+PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   UTILS_DIRPATH,
   PLUGINS_DIRPATH,
-  PLUGIN_SUBDIRPATH,
+  PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
 from batcher import pygimplib as pg

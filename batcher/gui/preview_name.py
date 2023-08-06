@@ -92,10 +92,8 @@ class NamePreview(preview_base_.Preview):
     self._row_select_interactive = True
     self._initial_scroll_to_selection = True
     
-    self._icon_image_filepath = os.path.join(
-      pg.config.PLUGIN_SUBDIRPATH, 'images', 'icon_image.png')
-    self._icon_tag_filepath = os.path.join(
-      pg.config.PLUGIN_SUBDIRPATH, 'images', 'icon_tag.png')
+    self._icon_image_filepath = os.path.join(pg.config.PLUGIN_DIRPATH, 'images', 'icon_image.png')
+    self._icon_tag_filepath = os.path.join(pg.config.PLUGIN_DIRPATH, 'images', 'icon_tag.png')
     
     self._init_gui()
   

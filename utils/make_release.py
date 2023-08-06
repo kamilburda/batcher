@@ -22,13 +22,13 @@ UTILS_DIRPATH = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentf
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
 
-PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
-PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_SUBDIRPATH, 'pygimplib')
+PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
+PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   UTILS_DIRPATH,
   PLUGINS_DIRPATH,
-  PLUGIN_SUBDIRPATH,
+  PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
 from batcher import pygimplib as pg
@@ -46,8 +46,8 @@ GITHUB_PAGE_BRANCH = 'gh-pages'
 
 VERSION_STRING_FORMAT = 'major.minor[.patch[-prerelease[.patch]]]'
 
-PLUGIN_CONFIG_FILEPATH = os.path.join(PLUGIN_SUBDIRPATH, 'config.py')
-PLUGIN_CONFIG_DEV_FILEPATH = os.path.join(PLUGIN_SUBDIRPATH, 'config_dev.py')
+PLUGIN_CONFIG_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config.py')
+PLUGIN_CONFIG_DEV_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config_dev.py')
 CHANGELOG_FILEPATH = os.path.join(PLUGINS_DIRPATH, 'CHANGELOG.md')
 
 INSTALLERS_OUTPUT_DIRPATH = make_installers.OUTPUT_DIRPATH_DEFAULT

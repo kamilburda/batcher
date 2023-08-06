@@ -125,7 +125,7 @@ def _init_config():
   
   def _get_domain_name(root_plugin_dirpath):
     if root_plugin_dirpath is None:
-      return 'gimp20-python'
+      return 'gimp30-python'
     else:
       return 'gimp-plugin-' + config.PLUGIN_NAME.replace('_', '-')
   
@@ -151,8 +151,7 @@ def _init_config():
   config.PLUGIN_TITLE = lambda: config.PLUGIN_NAME
   config.PLUGIN_VERSION = '1.0'
   
-  config.LOCALE_DIRPATH = (
-    lambda: os.path.join(config.PLUGINS_DIRPATH, config.PLUGIN_NAME, 'locale'))
+  config.LOCALE_DIRPATH = lambda: os.path.join(config.PLUGIN_DIRPATH, 'locale')
   config.DOMAIN_NAME = lambda: _get_domain_name(root_plugin_dirpath)
   
   config.BUG_REPORT_URL_LIST = []

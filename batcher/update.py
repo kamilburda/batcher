@@ -618,29 +618,27 @@ def _remove_obsolete_pygimplib_files_3_3_2():
 
 
 def _remove_obsolete_plugin_files_3_3_2():
-  plugin_subdirectory_dirpath = pg.config.PLUGIN_SUBDIRPATH
-  
-  gui_package_dirpath = os.path.join(plugin_subdirectory_dirpath, 'gui')
+  gui_package_dirpath = os.path.join(pg.config.PLUGIN_DIRPATH, 'gui')
   for filename in os.listdir(gui_package_dirpath):
     filepath = os.path.join(gui_package_dirpath, filename)
     
     if filename.startswith('gui_'):
       _try_remove_file(filepath)
   
-  _try_remove_file(os.path.join(plugin_subdirectory_dirpath, 'operations.py'))
-  _try_remove_file(os.path.join(plugin_subdirectory_dirpath, 'operations.pyc'))
-  _try_remove_file(os.path.join(plugin_subdirectory_dirpath, 'gui', 'operations.py'))
-  _try_remove_file(os.path.join(plugin_subdirectory_dirpath, 'gui', 'operations.pyc'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'operations.py'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'operations.pyc'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'gui', 'operations.py'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'gui', 'operations.pyc'))
 
 
 def _update_to_3_3_5(settings, sources, *args, **kwargs):
-  _try_remove_file(os.path.join(pg.config.PLUGIN_SUBDIRPATH, 'settings_plugin.py'))
-  _try_remove_file(os.path.join(pg.config.PLUGIN_SUBDIRPATH, 'settings_plugin.pyc'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'settings_plugin.py'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'settings_plugin.pyc'))
 
 
 def _update_to_4_0(settings, sources, are_procedures_loaded=True, are_constraints_loaded=True):
-  _try_remove_file(os.path.join(pg.config.PLUGIN_SUBDIRPATH, 'exportlayers.py'))
-  _try_remove_file(os.path.join(pg.config.PLUGIN_SUBDIRPATH, 'exportlayers.pyc'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'exportlayers.py'))
+  _try_remove_file(os.path.join(pg.config.PLUGIN_DIRPATH, 'exportlayers.pyc'))
   _try_remove_file(os.path.join(pg.PYGIMPLIB_DIRPATH, 'executor.py'))
   _try_remove_file(os.path.join(pg.PYGIMPLIB_DIRPATH, 'executor.pyc'))
   
