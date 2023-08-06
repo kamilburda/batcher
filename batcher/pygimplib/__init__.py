@@ -29,7 +29,7 @@ if _gimp_dependent_modules_imported:
   _gui_messages.set_gui_excepthook(title=None, app_name=None)
 
 
-import __builtin__
+import builtins
 import collections
 import gettext
 
@@ -201,10 +201,10 @@ def _init_config_builtin(config):
 
 def _init_config_from_file():
   orig_builtin_c = None
-  if hasattr(__builtin__, 'c'):
-    orig_builtin_c = __builtin__.c
+  if hasattr(builtins, 'c'):
+    orig_builtin_c = builtins.c
   
-  __builtin__.c = config
+  builtins.c = config
   
   try:
     # Prefer a development version of config if it exists. This is handy if you
@@ -218,9 +218,9 @@ def _init_config_from_file():
       pass
   
   if orig_builtin_c is None:
-    del __builtin__.c
+    del builtins.c
   else:
-    __builtin__.c = orig_builtin_c
+    builtins.c = orig_builtin_c
 
 
 def _init_config_builtin_delayed(config):

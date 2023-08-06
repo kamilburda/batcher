@@ -11,7 +11,7 @@ This module should not be used directly. Use the `gui` package as the contents
 of this module are included in the package.
 """
 
-import __builtin__
+import builtins
 import functools
 import sys
 import traceback
@@ -99,14 +99,14 @@ def display_alert_message(
     If `False`, focus on the box with details if `details` is not `None`,
     otherwise let the message dialog determine the focus widget.
   """
-  if not ('_' in __builtin__.__dict__ or '_' in globals()):
+  if not ('_' in builtins.__dict__ or '_' in globals()):
     # This is a placeholder function until `gettext` is properly initialized.
     def _(str_):
       return str_
   else:
     # This is necessary since defining a local variable/function, even inside a
     # condition, obscures a global variable/function of the same name.
-    _ = __builtin__.__dict__.get('_', None) or globals()['_']
+    _ = builtins.__dict__.get('_', None) or globals()['_']
   
   if app_name is None:
     app_name = _('Plug-in')
