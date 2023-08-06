@@ -14,7 +14,7 @@ c.PLUGINS_LOG_DIRPATHS.insert(0, c.PLUGIN_DIRPATH)
 c.LOG_MODE = 'exceptions'
 
 c.PLUGIN_TITLE = lambda: _('Export Layers')
-c.PLUGIN_VERSION = '4.0'
+c.PLUGIN_VERSION = '0.0.0'
 c.PLUGIN_VERSION_RELEASE_DATE = 'August 06, 2023'
 c.AUTHOR_NAME = 'Kamil Burda'
 c.COPYRIGHT_YEARS = '2013-2023'
