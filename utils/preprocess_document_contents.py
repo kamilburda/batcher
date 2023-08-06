@@ -37,11 +37,11 @@ The following tags can be specified in the documents:
   
   Examples:
   `{% include-config 'PLUGIN_NAME' %}` will insert a pygimplib configuration
-  entry titled `'PLUGIN_NAME'`, e.g. 'export_layers'.
+  entry titled `'PLUGIN_NAME'`, e.g. 'batcher'.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 import future.utils
 

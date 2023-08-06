@@ -25,7 +25,7 @@ UTILS_DIRPATH = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentf
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
 
-PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'export_layers')
+PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_SUBDIRPATH, 'pygimplib')
 
 sys.path.extend([
@@ -34,7 +34,7 @@ sys.path.extend([
   PLUGIN_SUBDIRPATH,
   PYGIMPLIB_DIRPATH])
 
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import argparse

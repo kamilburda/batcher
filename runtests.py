@@ -26,7 +26,7 @@ current_module_dirpath = os.path.dirname(inspect.getfile(inspect.currentframe())
 if current_module_dirpath not in sys.path:
   sys.path.append(current_module_dirpath)
 
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import importlib

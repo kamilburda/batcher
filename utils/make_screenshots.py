@@ -6,7 +6,7 @@ documentation purposes.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import os
@@ -19,11 +19,11 @@ import gtk
 import gimp
 from gimp import pdb
 
-from export_layers import actions
-from export_layers import builtin_constraints
-from export_layers import builtin_procedures
-from export_layers import settings_main
-from export_layers.gui import main as gui_main
+from batcher import actions
+from batcher import builtin_constraints
+from batcher import builtin_procedures
+from batcher import settings_main
+from batcher.gui import main as gui_main
 
 
 PLUGINS_DIRPATH = os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath()))

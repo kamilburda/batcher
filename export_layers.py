@@ -18,17 +18,17 @@ if current_module_dirpath not in sys.path:
 os.environ['LIBOVERLAY_SCROLLBAR'] = '0'
 
 
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import gimpenums
 
-from export_layers import batcher as batcher_
-from export_layers import exceptions
-from export_layers import settings_main
-from export_layers import update
-from export_layers import utils as utils_
-from export_layers.gui import main as gui_main
+from batcher import core
+from batcher import exceptions
+from batcher import settings_main
+from batcher import update
+from batcher import utils as utils_
+from batcher.gui import main as gui_main
 
 
 SETTINGS = settings_main.create_settings()
@@ -160,7 +160,7 @@ def _run_export_layers_repeat_interactive(layer_tree):
 
 
 def _run_plugin_noninteractive(run_mode, layer_tree):
-  batcher = batcher_.Batcher(
+  batcher = core.Batcher(
     run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
   
   try:

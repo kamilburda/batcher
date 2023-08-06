@@ -9,7 +9,7 @@ because any previous updates to such files are discarded.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import io

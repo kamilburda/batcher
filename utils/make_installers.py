@@ -12,7 +12,7 @@ import inspect
 UTILS_DIRPATH = os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
-PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'export_layers')
+PLUGIN_SUBDIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_SUBDIRPATH, 'pygimplib')
 
 sys.path.extend([
@@ -21,7 +21,7 @@ sys.path.extend([
   PLUGIN_SUBDIRPATH,
   PYGIMPLIB_DIRPATH])
 
-from export_layers import pygimplib as pg
+from batcher import pygimplib as pg
 from future.builtins import *
 
 import argparse
@@ -37,7 +37,7 @@ import zipfile
 import git
 import pathspec
 
-from export_layers.pygimplib import _path_dirs
+from batcher.pygimplib import _path_dirs
 
 from utils import create_user_docs
 from utils import process_local_docs
