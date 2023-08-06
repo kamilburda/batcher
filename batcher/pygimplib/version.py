@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Management of version numbers (particularly incrementing)."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import re
 

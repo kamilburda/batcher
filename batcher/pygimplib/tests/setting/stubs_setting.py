@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Stubs primarily to be used in the `test_setting` module."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 from ...setting import presenter as presenter_
 from ...setting import settings as settings_

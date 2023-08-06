@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Widget containing a text label that can be optionally edited."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import pygtk
 pygtk.require('2.0')

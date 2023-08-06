@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """List of built-in and several third-party file formats supported by GIMP.
 
 Each element of the list is a tuple:
@@ -12,9 +10,6 @@ The file save procedure can be used for multiple purposes, such as:
   (`pdb.gimp_file_save()`, which invokes the correct file save procedure based
   on the file extension of the filename).
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import gimp
 from gimp import pdb

@@ -1,18 +1,7 @@
-# -*- coding: utf-8 -*-
-
 """Logging-related classes."""
 
 # NOTE: In order to allow logging errors as early as possible (before plug-in
-# initialization):
-# * we are breaking the 'all imports at the beginning of module' convention
-#   for some modules,
-# * the `future` library is not imported in case some modules in the library are
-#   not available in the installed Python distribution and would thus cause an
-#   `ImportError` to be raised.
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-str = unicode
+# initialization), we are breaking the 'all imports at the beginning of module' convention.
 
 import datetime
 import io

@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Built-in procedure to export a given item as an image."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 import os

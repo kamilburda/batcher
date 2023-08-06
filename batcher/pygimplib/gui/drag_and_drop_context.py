@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Class providing drag-and-drop capability to any GTK widget."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import pygtk
 pygtk.require('2.0')

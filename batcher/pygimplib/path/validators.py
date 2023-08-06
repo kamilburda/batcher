@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Validation of file paths, directory paths and file extensions."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import abc
 import os
@@ -39,7 +33,7 @@ class FileValidatorErrorStatuses(object):
   ) = list(range(7))
 
 
-class StringValidator(future.utils.with_metaclass(abc.ABCMeta, object)):
+class StringValidator(metaclass=abc.ABCMeta):
   """
   This class is an interface to validate strings.
   

@@ -1,9 +1,6 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Creating a new plug-in release."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import collections
 import distutils.util
@@ -35,7 +32,6 @@ sys.path.extend([
   PYGIMPLIB_DIRPATH])
 
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import argparse
 
@@ -43,12 +39,6 @@ import git
 
 from utils import make_installers
 from utils import preprocess_document_contents
-
-
-# HACK: This fixes GitPython throwing errors when the `str` type from the
-# `future` library is not accepted as a string when GitPython calls
-# subprocesses.
-str = unicode
 
 
 GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')

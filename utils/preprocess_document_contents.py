@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Pre-processing of documents (HTML pages, plain text files), replacing lines
 containing a Liquid-style tag and its arguments with the corresponding content.
@@ -39,11 +38,7 @@ The following tags can be specified in the documents:
   `{% include-config 'PLUGIN_NAME' %}` will insert a pygimplib configuration
   entry titled `'PLUGIN_NAME'`, e.g. 'batcher'.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from batcher import pygimplib as pg
-from future.builtins import *
-import future.utils
 
 import abc
 import io
@@ -162,7 +157,7 @@ class DocumentNotFoundError(Exception):
   pass
 
 
-class CustomLiquidTag(future.utils.with_metaclass(abc.ABCMeta, object)):
+class CustomLiquidTag(metaclass=abc.ABCMeta):
   
   def __init__(self, source_filepath, matching_regex):
     self.source_filepath = source_filepath

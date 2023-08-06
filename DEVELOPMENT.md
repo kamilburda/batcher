@@ -173,7 +173,6 @@ Exceptions:
 
 Do not use wildcard imports.
 Exceptions:
-* `from future.builtins import *` to help improve Python 3 compatibility,
 * internal modules whose public elements should be used directly through a package.
   These modules must define `__all__` to list all public elements to be imported.
 
@@ -234,14 +233,6 @@ Exceptions:
 * iterating over objects of unhashable types (e.g. `gimp.Layer`).
 
 
-### Python 3 Compatibility
-
-Strive to make Python 2 code as compatible as possible with Python 3.
-* At the beginning of each module, import the `__future__` statements and the `future.builtins` package from the `future` library.
-* Use constructs compatible with both Python 2 and 3 as described in the [`future` library documentation](http://python-future.org/compatible_idioms.html), with the following exceptions:
-  * do not wrap strings in `str` or `bytes` to avoid making the code difficult to maintain.
-
-
 ### Unicode
 
 Use Unicode strings internally.
@@ -259,7 +250,7 @@ Encode/decode Unicode strings when accessing the following external libraries:
 ### GTK
 
 Always use `GObject` types (for `gtk.TreeView` columns, `__gsignals__`, etc.) instead of Python types if such `GObject` types exist.
-For example, use `GObject.TYPE_STRING` instead of `bytes` for `gtk.TreeView` columns of string type (`bytes` apparently cannot be used due to the usage of the `future` library).
+For example, use `GObject.TYPE_STRING` instead of `bytes` for `gtk.TreeView` columns of string type.
 
 If it is necessary to get the dimensions or the relative position of a widget not yet realized, connect to the `"size-allocate"` signal and continue processing in the connected event handler.
 Do not use `gtk.main_iteration()` (which forces the GUI to update) for this purpose as it introduces flickering in the GUI.

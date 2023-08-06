@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Exceptions used in `setting.sources` and `setting.persistor` modules."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import traceback as traceback_
 

@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Running automated tests.
 
@@ -15,8 +14,6 @@ pdb.plug_in_run_tests(<directory path to the plug-in under test>)
 To repeat the tests, simply call the procedure again.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import inspect
 import os
 import sys
@@ -27,7 +24,6 @@ if current_module_dirpath not in sys.path:
   sys.path.append(current_module_dirpath)
 
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import importlib
 import io

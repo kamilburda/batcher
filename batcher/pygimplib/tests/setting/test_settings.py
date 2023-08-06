@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Tests for the `setting.setting` and `setting.presenter` modules."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import unittest
 

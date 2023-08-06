@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Functions to invoke other functions in various ways, e.g. with a timeout."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import os
 

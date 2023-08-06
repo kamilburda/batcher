@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Stubs primarily to be used in the `test_group_` module."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 from ...setting import group as group_
 

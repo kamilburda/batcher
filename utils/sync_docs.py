@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Propagating changes in "raw" documentation to the files comprising the
 end-user documentation.
@@ -7,10 +6,7 @@ end-user documentation.
 Care must be taken to select only files that should not be updated manually,
 because any previous updates to such files are discarded.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import io
 import os

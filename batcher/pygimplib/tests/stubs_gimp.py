@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Stubs for GIMP objects, classes, etc. usable in automated tests."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import itertools
 import pickle

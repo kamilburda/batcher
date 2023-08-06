@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Functions to modify strings or file paths to make them unique."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import os
 

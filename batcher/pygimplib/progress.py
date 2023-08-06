@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Interface for updating the progress of the work done so far."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 
 class ProgressUpdater(object):

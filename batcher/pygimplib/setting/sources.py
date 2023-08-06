@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Loading and saving settings."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import abc
 import ast
@@ -47,7 +41,7 @@ __all__ = [
 ]
 
 
-class Source(future.utils.with_metaclass(abc.ABCMeta, object)):
+class Source(metaclass=abc.ABCMeta):
   """Abstract class for reading and writing settings to a source.
   
   Attributes:

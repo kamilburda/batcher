@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Creation and management of plug-in actions - procedures and constraints.
 
 Most functions take a setting group containing actions as its first argument.
@@ -56,9 +54,6 @@ These events include:
 * `'after-clear-actions'` - invoked when calling `clear()` after clearing
   actions.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import gimpenums
 

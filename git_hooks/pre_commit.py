@@ -1,11 +1,8 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Git hook for updating and staging of end-user documentation files when "raw"
 documentation files have been changed.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import inspect
 import os

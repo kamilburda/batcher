@@ -1,11 +1,7 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Generating user documentation from GitHub Pages files."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import io
 import os

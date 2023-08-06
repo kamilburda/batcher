@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import inspect
 import os
-import sys
-import traceback
 
 PYGIMPLIB_DIRPATH = os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 
@@ -34,28 +28,6 @@ if _gimp_dependent_modules_imported:
   
   _gui_messages.set_gui_excepthook(title=None, app_name=None)
 
-
-def _setup_import_of_external_lib_modules(dirpath):
-  """
-  Add directory paths containing external libraries for pygimplib to `sys.path`
-  so that modules from these external libraries can be imported as system
-  modules (i.e. without using absolute or explicit relative imports).
-  
-  Modules with the same name that are already installed system-wide override the
-  external library modules from `pygimplib`.
-  """
-  for filename in os.listdir(dirpath):
-    external_libs_dirpath = os.path.join(dirpath, filename)
-    if os.path.isdir(external_libs_dirpath) and external_libs_dirpath not in sys.path:
-      sys.path.append(external_libs_dirpath)
-
-
-_setup_import_of_external_lib_modules(os.path.join(PYGIMPLIB_DIRPATH, '_lib'))
-
-
-from future.builtins import (
-  ascii, bytes, chr, dict, filter, hex, input, int, list, map, next, object,
-  oct, open, pow, range, round, str, super, zip)
 
 import __builtin__
 import collections

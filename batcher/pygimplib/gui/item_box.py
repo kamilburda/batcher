@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-
 """Widget holding an array of GUI elements.
 
 The widget is used as the default GUI for `setting.ArraySetting` instances.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 import contextlib

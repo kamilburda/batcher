@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-
 """Additional functions dealing with GIMP objects (images, layers, etc.) not
 defined in the GIMP procedural database (PDB) or the GIMP Python API.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import os
 import contextlib

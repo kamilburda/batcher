@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-
 """Wrapper of `setting.sources` module to allow easy loading/saving using
 multiple setting sources.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 

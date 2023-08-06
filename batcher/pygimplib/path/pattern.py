@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-
 """Class providing a string template to substitute fields and their arguments.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 import inspect

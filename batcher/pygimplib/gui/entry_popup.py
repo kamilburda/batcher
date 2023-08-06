@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Custom popup usable for GTK text entries."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import pygtk
 pygtk.require('2.0')

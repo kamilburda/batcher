@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Managing items of a GIMP image (e.g. layers) in a tree-like structure."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import abc
 import collections
@@ -30,8 +24,7 @@ See `ItemTree.__getitem__()` for more information.
 """
 
 
-@future.utils.python_2_unicode_compatible
-class ItemTree(future.utils.with_metaclass(abc.ABCMeta, object)):
+class ItemTree(metaclass=abc.ABCMeta):
   """Interface to store `gimp.Item` objects in a tree-like structure.
   
   Use one of the subclasses for items of a certain type:
@@ -350,7 +343,6 @@ class VectorTree(ItemTree):
     return image.vectors
 
 
-@future.utils.python_2_unicode_compatible
 class Item(object):
   """Wrapper for a `gimp.Item` object containing additional attributes.
   

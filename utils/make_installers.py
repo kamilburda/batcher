@@ -1,9 +1,6 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Creating installers for releases from the plug-in source."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 import sys
@@ -22,7 +19,6 @@ sys.path.extend([
   PYGIMPLIB_DIRPATH])
 
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import argparse
 import collections

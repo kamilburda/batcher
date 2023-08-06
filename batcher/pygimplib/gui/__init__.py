@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Helper functions and classes for managing GUI elements in plug-ins."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 from .cell_renderers import *
 from .drag_and_drop_context import *

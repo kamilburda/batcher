@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Batch-processing layers and exporting layers as separate images."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 import functools

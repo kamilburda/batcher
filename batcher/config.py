@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-
 """Plug-in configuration.
 
 Use `c` to access, create or modify configuration entries.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
 

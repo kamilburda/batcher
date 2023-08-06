@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-
 """Class to generate GIMP PDB parameters out of settings and parse GIMP
 procedure arguments to assign them as values to settings.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 from . import group as group_
 from . import settings as settings_

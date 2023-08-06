@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Class interconnecting preview widgets for item names and images."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 from batcher import pygimplib as pg
 

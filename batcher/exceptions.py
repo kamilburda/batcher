@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Custom exception classes related to batch processing or export."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 
 class BatcherError(Exception):
@@ -34,7 +28,6 @@ class InvalidPdbProcedureError(BatcherError):
   pass
 
 
-@future.utils.python_2_unicode_compatible
 class ExportError(BatcherError):
   
   def __init__(self, message='', item_name=None, file_extension=None):

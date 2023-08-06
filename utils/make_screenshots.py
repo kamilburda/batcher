@@ -1,13 +1,9 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Automatic taking and processing screenshots of the plug-in dialog for
 documentation purposes.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import os
 import time

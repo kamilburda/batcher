@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Class that groups settings for easier setting creation and management."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import collections
 import inspect
@@ -61,10 +55,7 @@ def create_groups(setting_dict):
   return group
 
 
-@future.utils.python_2_unicode_compatible
-class Group(
-    future.utils.with_metaclass(
-      meta_.GroupMeta, utils_.SettingParentMixin, utils_.SettingEventsMixin)):
+class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta_.GroupMeta):
   """
   This class:
   * allows to create a group of related settings (`Setting` objects),

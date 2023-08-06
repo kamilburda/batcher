@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-
 """Widget for placeholder GIMP objects (images, layers) such as "Current layer".
 
 During processing, these placeholders are replaced with real objects.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import gimpui
 

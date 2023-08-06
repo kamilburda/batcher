@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import inspect
 import os
@@ -19,7 +16,6 @@ os.environ['LIBOVERLAY_SCROLLBAR'] = '0'
 
 
 from batcher import pygimplib as pg
-from future.builtins import *
 
 import gimpenums
 

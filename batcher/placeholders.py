@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Placeholder objects replaced with real GIMP objects when calling GIMP PDB
 procedures during batch processing.
 
@@ -17,9 +15,6 @@ The following placeholder objects are defined:
 * `PLACEHOLDERS['foreground_layer']` - The layer positioned immediately before
   the currently processed layer.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import collections
 

@@ -1,13 +1,10 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Git hook for automatic formatting of commit messages (header and body).
 
 The hook also prevents a commit from proceeding if some formatting conventions
 are violated (e.g. too long commit header).
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import inspect
 import sys

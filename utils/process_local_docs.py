@@ -1,12 +1,9 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Processing of HTML files from a Jekyll-generated page so that they can be
 used without running the Jekyll server (e.g. included in release packages as
 user documentation).
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import collections
 import io

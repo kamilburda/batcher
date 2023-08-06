@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-
 """Tests for the `itemtree` module.
 
 Because the public interface to test is identical for all `ItemTree` subclasses,
 it is sufficient to test `itemtree` using one of the subclasses. `LayerTree`
 was chosen for this purpose.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
 
 import unittest
 

@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Handling of conflicting files - overwrite, skip, etc."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import abc
 import os
@@ -12,7 +6,7 @@ import os
 from . import path as pgpath
 
 
-class OverwriteChooser(future.utils.with_metaclass(abc.ABCMeta, object)):
+class OverwriteChooser(metaclass=abc.ABCMeta):
   """
   This class is an interface to indicate how to handle existing files.
   
@@ -62,8 +56,7 @@ class NoninteractiveOverwriteChooser(OverwriteChooser):
     return self._overwrite_mode
 
 
-class InteractiveOverwriteChooser(
-        future.utils.with_metaclass(abc.ABCMeta, OverwriteChooser)):
+class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
   """
   This class is an interface for interactive overwrite choosers, requiring
   the user choose the overwrite mode.

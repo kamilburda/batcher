@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-
 """Classes to keep settings and their associated GUI elements in sync."""
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-from future.builtins import *
-import future.utils
 
 import abc
 
@@ -28,7 +22,7 @@ class SettingValueSynchronizer(object):
     self.apply_gui_value_to_setting = pgutils.empty_func
 
 
-class Presenter(future.utils.with_metaclass(meta_.PresenterMeta, object)):
+class Presenter(metaclass=meta_.PresenterMeta):
   """Wrapper of a GUI element (widget, dialog, etc.) for settings.
   
   Various GUI elements have different attributes or methods to access their

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Widgets and functions to display GUI messages (particularly error messages),
 imported before the rest of pygimplib is initialized.
 
@@ -12,15 +10,6 @@ This module contains:
 This module should not be used directly. Use the `gui` package as the contents
 of this module are included in the package.
 """
-
-# NOTE: In order to allow logging errors as early as possible (before plug-in
-# initialization), the `future` library is not imported in case some modules in
-# the library are not available in the installed Python distribution and would
-# thus cause an `ImportError` to be raised.
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-str = unicode
 
 import __builtin__
 import functools
