@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Git hook for updating and staging of end-user documentation files when "raw"
 documentation files have been changed.

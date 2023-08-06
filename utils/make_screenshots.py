@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Automatic taking and processing screenshots of the plug-in dialog for
 documentation purposes.

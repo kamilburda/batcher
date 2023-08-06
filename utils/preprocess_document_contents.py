@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Pre-processing of documents (HTML pages, plain text files), replacing lines
 containing a Liquid-style tag and its arguments with the corresponding content.

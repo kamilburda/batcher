@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Processing of HTML files from a Jekyll-generated page so that they can be
 used without running the Jekyll server (e.g. included in release packages as

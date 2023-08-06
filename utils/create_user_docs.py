@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Generating user documentation from GitHub Pages files."""
 from batcher import pygimplib as pg

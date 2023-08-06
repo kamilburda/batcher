@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Propagating changes in "raw" documentation to the files comprising the
 end-user documentation.

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 """Git hook for automatic formatting of commit messages (header and body).
 
