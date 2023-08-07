@@ -1,10 +1,5 @@
 # Batcher
 
-Batcher is an upcoming [GIMP](https://www.gimp.org/) plug-in for batch processing and exporting of layers.
+Batcher is an upcoming plug-in for batch processing and exporting of layers for [GIMP](https://www.gimp.org/) 2.99.
 
-Batcher requires GIMP 2.99.16 or newer.
-
-License
--------
-
-Batcher is licensed under the [BSD 3-Clause](LICENSE) license.
+This is a work-in-progress plug-in that is currently not usable.
