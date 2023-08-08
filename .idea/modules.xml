@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/gimp-batcher.iml" filepath="$PROJECT_DIR$/.idea/gimp-batcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/batcher.iml" filepath="$PROJECT_DIR$/.idea/batcher.iml" />
     </modules>
   </component>
 </project>
