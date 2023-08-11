@@ -69,8 +69,6 @@ See [User Documentation](#User-Documentation) for more information.
 To set up the development environment on Windows, use a virtual machine with a Linux distribution like Ubuntu.
 
 For Windows 10 users, a viable alternative is to use the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
-You will also need to install an X server such as [Xming](https://sourceforge.net/projects/xming/).
-To enable X server on the shell, run `export DISPLAY=:0` before running GIMP or any Export Layers script requiring non-interactive invocation of GIMP.
 
 
 ## Creating a Release <a name="Creating-a-Release"></a>
