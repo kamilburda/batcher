@@ -174,6 +174,9 @@ class Version(object):
     
     * `InvalidVersionFormatError` - `version_str` has invalid format.
     """
+    if not isinstance(version_str, str):
+      raise TypeError('version string must be a string type')
+
     ver = Version()
     cls._fill_version_components(ver, version_str)
     return ver
