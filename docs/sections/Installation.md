@@ -65,22 +65,3 @@ macOS
 
        export_layers.py
        export_layers
-
-
-Upgrading to 3.3 and above
---------------------------
-
-Due to significant changes in version 3.3, make sure you first perform complete reinstall when upgrading from an earlier version:
-
-1. Still using the old version, run Export Layers, select `Settings → Show More Settings`, check `Remove procedures and constraints` and reset settings by pressing the `Reset Settings` button.
-2. Close Export Layers.
-3. Close GIMP.
-4. Remove the `export_layers.py` file and the `export_layers` folder from the installation folder.
-   If you used 3.0-RC1, remove the `pygimplib` folder as well.
-5. In the folder above `plug-ins`, open `parasiterc` in a text editor and remove the entire line beginning with `(parasite "plug_in_export_layers"`.
-6. Run GIMP without Export Layers installed (so that GIMP "forgets" about the plug-in).
-7. Install the new version.
-
-You can still upgrade to the newest version if you did not perform steps 5 and 6.
-A warning dialog will ask you to reset the settings.
-However, calling `pdb.plug_in_export_layers` from the command line will probably result in an execution error due to the mismatch of arguments.
