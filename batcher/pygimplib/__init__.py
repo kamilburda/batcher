@@ -1,7 +1,7 @@
 import inspect
 import os
 
-PYGIMPLIB_DIRPATH = os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe())))
+PYGIMPLIB_DIRPATH = os.path.dirname(os.path.abspath(__file__))
 
 try:
   import gimp

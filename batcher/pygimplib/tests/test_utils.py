@@ -1,4 +1,4 @@
-import inspect
+import os
 import unittest
 
 from .. import utils as pgutils
@@ -80,4 +80,4 @@ class TestGetCurrentModuleFilepath(unittest.TestCase):
   def test_get_current_module_filepath(self):
     self.assertEqual(
       pgutils.get_current_module_filepath(),
-      inspect.getfile(inspect.currentframe()))
+      os.path.abspath(__file__))
