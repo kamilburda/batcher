@@ -1,11 +1,9 @@
-Export Layers - Translations
-============================
+# Export Layers - Translations
 
 If you want to provide translations for Export Layers, it is recommended to use a translation tool such as [Poedit](https://poedit.net) for easier usage.
 
 
-How do I translate the plug-in?
--------------------------------
+## How do I translate the plug-in?
 
 First, make sure you use the `gimp-export-layers.pot` file for the latest plug-in version.
 Either use the .pot file in the `export_layers/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/gimp-export-layers/blob/main/export_layers/locale/gimp-export-layers.pot).
@@ -95,8 +93,7 @@ If you spotted some translation errors in the .po file or the plug-in is updated
      Once you update the translated string, make sure to remove the `, fuzzy` comment, otherwise the string will show up untranslated in the plug-in.
 
 
-OK, I have finished the translation. What next?
---------------------------------------------------
+## OK, I have finished the translation. What next?
 
 You may want to test your translation first to make sure it works correctly, as described in the next section.
 
@@ -111,8 +108,7 @@ You can do so by submitting your translated .po file as follows:
   If you're updating your translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
 
 
-How can I test my translation?
-------------------------------
+## How can I test my translation?
 
 First, make sure Export Layers is installed in the folder for GIMP plug-ins.
 You then need to generate an .mo file from the translated .po file.

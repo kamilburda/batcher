@@ -1,5 +1,4 @@
-Developing Export Layers
-========================
+# Developing Export Layers
 
 * [Development Setup](#Development-Setup)
 * [Creating a Release](#Creating-a-Release)
@@ -8,15 +7,13 @@ Developing Export Layers
 * [Writing Documentation](#Writing-Documentation)
 
 
-Glossary
---------
+## Glossary
 
 * Element = module, class, function or variable
 * PDB = GIMP procedural database
 
 
-Development Setup <a name="Development-Setup"></a>
------------------
+## Development Setup <a name="Development-Setup"></a>
 
 This section explains how to set up development environment for Export Layers.
 
@@ -76,16 +73,14 @@ You will also need to install an X server such as [Xming](https://sourceforge.ne
 To enable X server on the shell, run `export DISPLAY=:0` before running GIMP or any Export Layers script requiring non-interactive invocation of GIMP.
 
 
-Creating a Release <a name="Creating-a-Release"></a>
-------------------
+## Creating a Release <a name="Creating-a-Release"></a>
 
 Run `utils/make_installers.sh` to create installer(s).
 Use the `-i` option to specify platform(s) for which to create installers.
 The installers will be created in the `installers/output` directory.
 
 
-Coding Conventions <a name="Coding-Conventions"></a>
-------------------
+## Coding Conventions <a name="Coding-Conventions"></a>
 
 For Python modules, stick to PEP 8 unless overridden below.
 Additional conventions complementing aforementioned conventions are specified below.
@@ -253,8 +248,7 @@ If it is necessary to get the dimensions or the relative position of a widget no
 Do not use `gtk.main_iteration()` (which forces the GUI to update) for this purpose as it introduces flickering in the GUI.
 
 
-Writing Commit Messages <a name="Writing-Commit-Messages"></a>
------------------------
+## Writing Commit Messages <a name="Writing-Commit-Messages"></a>
 
 This section explains how to write good commit messages.
 The conventions are based on the following guidelines:
@@ -310,8 +304,7 @@ The usage of leading verbs in the message header are not restricted, except for 
 * Correct - corrections of typos, grammar errors
 
 
-Writing Documentation <a name="Writing-Documentation"></a>
----------------------
+## Writing Documentation <a name="Writing-Documentation"></a>
 
 ### API Documentation
 
