@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import inspect
+"""Main plug-in file."""
+
 import os
 import sys
 
