@@ -4,17 +4,6 @@ import inspect
 import os
 import sys
 
-
-# Allow importing modules in directories in the 'plug-ins' directory.
-current_module_dirpath = os.path.dirname(inspect.getfile(inspect.currentframe()))
-if current_module_dirpath not in sys.path:
-  sys.path.append(current_module_dirpath)
-
-# Disable overlay scrollbar (notably used in Ubuntu) to be consistent with the
-# Export menu.
-os.environ['LIBOVERLAY_SCROLLBAR'] = '0'
-
-
 from batcher import pygimplib as pg
 
 import gimpenums
