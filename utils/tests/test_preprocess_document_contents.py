@@ -87,7 +87,7 @@ menu entries.""",
       """If the crashes occur to you, try reinstalling GIMP."""],
   }
   
-  _TEST_FILE_INTRO = """Export Layers is a [GIMP](https://www.gimp.org/)
+  _TEST_FILE_INTRO = """Batcher is a [GIMP](https://www.gimp.org/)
 plug-in that exports layers as separate images."""
   
   _TEST_FILE_CONTENTS = """{}

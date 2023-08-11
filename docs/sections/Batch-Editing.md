@@ -2,12 +2,12 @@ Batch Editing
 -------------
 
 Need to edit layers directly in the image without exporting them?
-Export Layers allows you to do just that.
+Batcher allows you to do just that.
 Simply press the `Settings` button and select `Batch Editing`.
 
 The dialog now only displays the procedures and constraints applied to layers:
 
-![Dialog of Export Layers with batch editing enabled](../images/screenshot_dialog_batch_editing.png)
+![Dialog of Batcher with batch editing enabled](../images/screenshot_dialog_batch_editing.png)
 
 Export-related settings such as filename pattern, file extension and output folder are hidden as they are not applicable for batch editing.
 

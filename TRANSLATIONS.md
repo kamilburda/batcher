@@ -1,12 +1,12 @@
-# Export Layers - Translations
+# Batcher - Translations
 
-If you want to provide translations for Export Layers, it is recommended to use a translation tool such as [Poedit](https://poedit.net) for easier usage.
+If you want to provide translations for Batcher, it is recommended to use a translation tool such as [Poedit](https://poedit.net) for easier usage.
 
 
 ## How do I translate the plug-in?
 
-First, make sure you use the `gimp-export-layers.pot` file for the latest plug-in version.
-Either use the .pot file in the `export_layers/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/gimp-export-layers/blob/main/export_layers/locale/gimp-export-layers.pot).
+First, make sure you use the `batcher.pot` file for the latest plug-in version.
+Either use the .pot file in the `batcher/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/batcher/blob/main/batcher/locale/batcher.pot).
 
 
 ### Poedit
@@ -18,7 +18,7 @@ The following steps apply if you want to use Poedit.
 
 To create a new translation for your language:
 
-1. Open Poedit, select `File → New from POT/PO file...` and select the `gimp-export-layers.pot` file in the `export_layers/locale` folder.
+1. Open Poedit, select `File → New from POT/PO file...` and select the `batcher.pot` file in the `batcher/locale` folder.
 2. Set the language of the translation.
 3. Translate the strings (by filling in the `Translation` text field for each string).
 4. If desired, go to `Catalog → Properties...` and edit the translation file properties.
@@ -30,7 +30,7 @@ To create a new translation for your language:
 
 If you spotted some translation errors in your .po file or the plug-in was updated since the last translation was made, you may need to update the translation:
 
-1. Open your .po file, select `Catalog → Update from POT file...` and select the `gimp-export-layers.pot` file for the latest plug-in version.
+1. Open your .po file, select `Catalog → Update from POT file...` and select the `batcher.pot` file for the latest plug-in version.
 2. Update the translated strings.
    Make sure to check for:
    * new strings,
@@ -54,10 +54,10 @@ To create a new translation for your language:
    
        sudo apt-get install gettext
    
-2. Find the .pot file in the `export_layers/locale` folder.
+2. Find the .pot file in the `batcher/locale` folder.
 3. Open up terminal and run
    
-       cd [folder where you extracted the package]/export_layers/locale
+       cd [folder where you extracted the package]/batcher/locale
        ./generate_po.sh [path to .pot file] [language]
    
    A .po file is generated in the same folder as the current working directory.
@@ -79,7 +79,7 @@ If you spotted some translation errors in the .po file or the plug-in is updated
 
 1. Run the following commands:
    
-       cd [folder where you extracted the package]/export_layers/locale
+       cd [folder where you extracted the package]/batcher/locale
        ./update_po.sh [path to .po file] [path to .pot file]
    
    The old .po file is preserved and has the `.po.old` file extension.
@@ -100,17 +100,17 @@ You may want to test your translation first to make sure it works correctly, as 
 You may also want share your translation with the rest of the world.
 You can do so by submitting your translated .po file as follows:
 
-1. Open a git pull request for the [plug-in repository](https://github.com/kamilburda/gimp-export-layers).
+1. Open a git pull request for the [plug-in repository](https://github.com/kamilburda/batcher).
 2. Create a commit titled `Add [full language name] translation ([language])` (e.g. `Add French translation (fr_FR)`) that adds the translated .po file to the following path:
   
-      [repository root]/export_layers/locale/[language]/LC_MESSAGES/gimp-export-layers.po
+      [repository root]/batcher/locale/[language]/LC_MESSAGES/batcher.po
   
   If you're updating your translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
 
 
 ## How can I test my translation?
 
-First, make sure Export Layers is installed in the folder for GIMP plug-ins.
+First, make sure Batcher is installed in the folder for GIMP plug-ins.
 You then need to generate an .mo file from the translated .po file.
 
 
@@ -121,7 +121,7 @@ You then need to generate an .mo file from the translated .po file.
 Poedit automatically generates the .mo file when you save your .po file.
 Move and rename the .mo file to
 
-    [GIMP plug-ins folder]/export_layers/locale/[language]/LC_MESSAGES/gimp-export-layers.mo
+    [GIMP plug-ins folder]/batcher/locale/[language]/LC_MESSAGES/batcher.mo
    
 where `[language]` is the language in which you translated the plug-in.
 `[language]` is a part of the .po file, e.g. for a file named `fr_FR.po`, the language is `fr_FR`.
@@ -130,7 +130,7 @@ where `[language]` is the language in which you translated the plug-in.
 
 Generate the .mo file as follows:
    
-    cd [GIMP plug-ins folder]/export_layers/locale
+    cd [GIMP plug-ins folder]/batcher/locale
     ./generate_mo.sh [path to .po file] [language]
 
 

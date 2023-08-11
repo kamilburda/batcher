@@ -1,7 +1,7 @@
 Getting Started with Customization
 ----------------------------------
 
-Beyond the basic features, Export Layers allows you to:
+Beyond the basic features, Batcher allows you to:
 * customize the layer name,
 * apply additional *procedures* before the export (insert background, scale down, ...),
 * selecting which layers to process by applying *constraints* (only visible layers, ...),
@@ -9,7 +9,7 @@ Beyond the basic features, Export Layers allows you to:
 
 To enable customization, press the `Settings` button and select `Show More Settings`.
 
-![Dialog of Export Layers with additional customization](../images/screenshot_dialog_customizing_export.png)
+![Dialog of Batcher with additional customization](../images/screenshot_dialog_customizing_export.png)
 
 You may adjust the height of the bottom pane by dragging the separator above the procedures and constraints.
 
@@ -78,7 +78,7 @@ Yes, you may insert any GIMP filter as a procedure:
 
 **I want to save the image as a multi-page PDF file.**
 
-While multi-page PDF export is already possible in GIMP without any third-party plug-ins, Export Layers allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
+While multi-page PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
 
 1. Add the "Export" procedure.
 2. Adjust the output folder as needed. The folder explorer in the main dialog will be ignored.
@@ -484,7 +484,7 @@ Tagged layers are indicated with a tag icon in the preview.
 Adding or removing tags modifies the current image.
 Save the image to keep the tags permanently.
 
-By default, Export Layers provides `Background` and `Foreground` tags.
+By default, Batcher provides `Background` and `Foreground` tags.
 To add custom tags, right-click anywhere on the preview, select `Add New Tag...` and name your new tag.
 The new tag will be immediately added to the currently selected layer(s).
 

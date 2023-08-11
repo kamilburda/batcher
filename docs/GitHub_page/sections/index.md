@@ -23,7 +23,7 @@ See [Batch Editing](Batch-Editing.html).
 
 ### Having trouble?
 
-See the [known issues](Known-Issues.html) or feel free to [report other issues or ask questions](https://github.com/kamilburda/gimp-export-layers/issues).
+See the [known issues](Known-Issues.html) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
 
 
 ### Want to translate {% include-config 'PLUGIN_TITLE' %} into your language?

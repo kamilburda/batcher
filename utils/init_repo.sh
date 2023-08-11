@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script initializes the Export Layers git repository.
+# This script initializes the Batcher git repository.
 
 orig_cwd="$(pwd)"
 
@@ -84,9 +84,9 @@ else
   exit 1
 fi
 
-plugin_main_repo_dirname='gimp-export-layers'
+plugin_main_repo_dirname='batcher'
 plugin_page_branch_name='gh-pages'
-repo_url='https://github.com/kamilburda/gimp-export-layers.git'
+repo_url='https://github.com/kamilburda/batcher.git'
 repo_dirpath="$gimp_local_dirpath"'/'"$plugin_main_repo_dirname"
 
 gimprc_filename='gimprc'

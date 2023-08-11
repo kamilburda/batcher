@@ -1,13 +1,11 @@
-Platforms
----------
+# Platforms
 
 * Windows
 * Linux
 * macOS
 
 
-Export Layers
--------------
+# Main Dialog
 
 Interactive
 * load settings from GIMP shelf and config file
@@ -40,15 +38,14 @@ Plug-in versions and clean start
 * new user - version 3.3+
 
 
-Export Layers (repeat)
-----------------------
+# Main Dialog - the " (repeat)" version
 
 Interactive
 * load settings from GIMP shelf and config file
 * first run
-  * display "Export Layers" dialog
+  * display the main dialog
 * subsequent runs
-  * display "Export Layers (repeat)" dialog
+  * display the " (repeat)" dialog
 
 Non-interactive
 * same as Run-with-last-vals
@@ -58,8 +55,7 @@ Run-with-last-vals
 * save settings to GIMP shelf after export
 
 
-Settings
---------
+# Settings
 
 Basic settings
 * Output directory
@@ -111,8 +107,7 @@ Preview
   * dragging panes properly scales/downsizes image without artifacts
 
 
-Unicode support
----------------
+# Unicode support
 
 Review conformance to Unicode practices defined in the coding conventions.
 

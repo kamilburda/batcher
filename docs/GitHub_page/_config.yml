@@ -1,9 +1,9 @@
 # Site settings
-title: Export Layers
+title: Batcher
 description: "GIMP plug-in that exports layers as separate images"
-baseurl: "/gimp-export-layers"
+baseurl: "/batcher"
 url: "https://kamilburda.github.io"
-repository: "kamilburda/gimp-export-layers"
+repository: "kamilburda/batcher"
 github_username: "{% include-config 'AUTHOR_NAME' %}"
 copyright_years: "{% include-config 'COPYRIGHT_YEARS' %}"
 

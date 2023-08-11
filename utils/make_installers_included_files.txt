@@ -4,8 +4,7 @@
 !*
 
 # Include files
-/export_layers/
-/export_layers.py
+/batcher/
 
 # Ignore files
 !*.pyc
@@ -17,8 +16,8 @@
 !.runtests.py
 !.git/
 !.settings/
-!/export_layers/locale/generate_pot.sh
-!/export_layers/tests/
-!/export_layers/pygimplib/tests/
-!/export_layers/pygimplib/_lib/mock/
-!/export_layers/config_dev.py
+!/batcher/locale/generate_pot.sh
+!/batcher/tests/
+!/batcher/pygimplib/tests/
+!/batcher/pygimplib/_lib/mock/
+!/batcher/config_dev.py

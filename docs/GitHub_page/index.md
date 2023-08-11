@@ -16,7 +16,7 @@ See [Customizing Export](sections/Customizing-Export.html).
 
 ### Having trouble?
 
-See the [known issues](sections/Known-Issues.html) or feel free to [report other issues or ask questions](https://github.com/kamilburda/gimp-export-layers/issues).
+See the [known issues](sections/Known-Issues.html) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
 
 
 ### Want to translate {% include-config 'PLUGIN_TITLE' %} into your language?

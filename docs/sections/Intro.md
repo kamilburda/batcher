@@ -1,4 +1,4 @@
-Export Layers is a [GIMP](https://www.gimp.org/) plug-in that exports layers as separate images.
+Batcher is a [GIMP](https://www.gimp.org/) plug-in that exports layers as separate images.
 
 Features
 --------

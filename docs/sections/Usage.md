@@ -25,7 +25,7 @@ The dropdown list displays available file formats alongside their associated fil
 If a file format contains multiple file extensions, the first is selected by default, but you may also choose from the other extensions (by clicking or pressing Tab).
 
 For now, the dropdown only contains a fixed list of file formats provided by GIMP and some recognized third-party plug-ins.
-However, you may still enter a file extension not in the list in case you use a file format plug-in not recognized by Export Layers.
+However, you may still enter a file extension not in the list in case you use a file format plug-in not recognized by Batcher.
 
 
 Preview
@@ -69,11 +69,11 @@ If you find yourself in the need of customizing layer names, applying additional
 Running Export Without Dialog (Non-Interactively)
 -------------------------------------------------
 
-It is also possible to run Export Layers without the plug-in, allowing you to automate the export.
+It is also possible to run Batcher without the interactive dialog, allowing you to automate the export.
 
 The `plug-in-export-layers` procedure can run the export with default or last used settings.
 In the latter case, the settings are loaded if they were saved before (via `Settings → Save Settings`).
 
 The `plug-in-export-layers-repeat` procedure always uses the last used settings.
 
-The `plug-in-export-layers-with-config` procedure allows you to run Export Layers using the specified settings file obtained via `Settings → Export Settings...` in the plug-in dialog.
+The `plug-in-export-layers-with-config` procedure allows you to run Batcher using the specified settings file obtained via `Settings → Export Settings...` in the plug-in dialog.

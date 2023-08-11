@@ -10,10 +10,7 @@ Windows
 
 1. Make sure you have GIMP installed with support for Python scripting.
 2. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`.
-3. Extract the following files and folders to one of the folders identified in step 2:
-
-       export_layers.py
-       export_layers
+3. Extract the `batcher` folder to one of the folders identified in the previous step.
 
 
 Linux
@@ -24,10 +21,7 @@ Linux
 The easier way to install any Python-based GIMP plug-in is to use a GIMP installation bundled in Flatpak (which can be downloaded from the [official GIMP page](https://www.gimp.org/downloads/)) or AppImage.
 
 1. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`.
-2. Extract the following files and folders to one of the folders identified in the previous step:
-
-       export_layers.py
-       export_layers
+2. Extract the `batcher` folder to one of the folders identified in the previous step.
 
 
 ### If GIMP is installed via package manager
@@ -40,10 +34,7 @@ This is the less recommended way of installing plug-ins as of recently as certai
 	 This varies across distributions.
 	 For instance, on Arch Linux, you must install the `python2-gimp` package.
 3. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`.
-4. Extract the following files and folders to one of the folders identified in the previous step:
-
-       export_layers.py
-       export_layers
+4. Extract the `batcher` folder to one of the folders identified in the previous step.
 
 To check if GIMP recognizes your Python 2.7 installation, open GIMP and run `Filters → Python-Fu → Console`.
 The console must display `Python 2.7` or later from the 2.7.x series.
@@ -61,7 +52,4 @@ macOS
 
 1. Make sure you have Python 2.7 installed.
 2. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`.
-3. Extract the following files and folders to one of the folders identified in the previous step:
-
-       export_layers.py
-       export_layers
+3. Extract the `batcher` folder to one of the folders identified in the previous step.

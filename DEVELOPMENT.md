@@ -1,4 +1,4 @@
-# Developing Export Layers
+# Developing Batcher
 
 * [Development Setup](#Development-Setup)
 * [Creating a Release](#Creating-a-Release)
@@ -15,7 +15,7 @@
 
 ## Development Setup <a name="Development-Setup"></a>
 
-This section explains how to set up development environment for Export Layers.
+This section explains how to set up development environment for Batcher.
 
 A Linux distribution is recommended as the environment contains several bash scripts.
 For Windows, see [Development Setup on Windows](#Development-Setup-on-Windows) for options.
@@ -27,12 +27,12 @@ If you cannot run the script, perform manual setup as per the instructions below
 
 ### Setting up Repositories
 
-Clone the main branch of the repository to a directory named e.g. `gimp-export-layers` inside the directory for local GIMP plug-ins - `.gimp-2.8` for GIMP 2.8, `.config/GIMP/[version]` for later GIMP versions such as 2.10.
+Clone the main branch of the repository to a directory named e.g. `batcher` inside the directory for local GIMP plug-ins - `.gimp-2.8` for GIMP 2.8, `.config/GIMP/[version]` for later GIMP versions such as 2.10.
 
 To make GIMP recognize the new directory as a directory containing GIMP plug-ins, open up GIMP, go to `Edit → Preferences → Folders → Plug-ins` and add the new directory to the list.
 GIMP needs to be restarted for changes to take effect.
 
-Clone the `gh-pages` branch (acting as the [GitHub page for Export Layers](https://kamilburda.github.io/gimp-export-layers/)) to `docs/gh-pages`.
+Clone the `gh-pages` branch (acting as the [GitHub page for Batcher](https://kamilburda.github.io/batcher/)) to `docs/gh-pages`.
 Several scripts depend on this directory location.
 
 Some scripts require that the GitHub page be run locally.
