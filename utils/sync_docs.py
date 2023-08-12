@@ -15,7 +15,7 @@ import shutil
 from utils import preprocess_document_contents
 
 
-MODULE_DIRPATH = os.path.dirname(pg.utils.get_current_module_filepath())
+MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))
 PLUGINS_DIRPATH = os.path.dirname(MODULE_DIRPATH)
 
 PATHS_TO_PREPROCESS_FILEPATH = os.path.join(

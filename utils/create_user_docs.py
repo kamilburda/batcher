@@ -15,7 +15,7 @@ import yaml
 from utils import process_local_docs
 
 
-MODULE_DIRPATH = os.path.dirname(pg.utils.get_current_module_filepath())
+MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))
 
 FILE_ENCODING = 'utf-8'
 

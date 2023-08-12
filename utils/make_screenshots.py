@@ -22,7 +22,8 @@ from batcher import settings_main
 from batcher.gui import main as gui_main
 
 
-PLUGINS_DIRPATH = os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath()))
+PLUGINS_DIRPATH = os.path.abspath(
+  os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
 
 TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_DIRPATH, 'tests', 'test_images')
 TEST_IMAGES_FILEPATH = os.path.join(

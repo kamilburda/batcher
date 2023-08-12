@@ -6,7 +6,7 @@ import os
 import sys
 import inspect
 
-UTILS_DIRPATH = os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe())))
+UTILS_DIRPATH = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
 PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
