@@ -114,9 +114,6 @@ def print_error_message_and_exit(message, exit_status=1):
   sys.exit(exit_status)
 
 
-#===============================================================================
-
-
 def main():
   process_commit_messages(sys.argv[1])
 

@@ -11,7 +11,7 @@ import sys
 import git
 
 GIT_HOOKS_DIRPATH = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
-REPOSITORY_ROOT_DIRPATH = os.path.dirname(GIT_HOOKS_DIRPATH)
+REPOSITORY_ROOT_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
 
 sys.path.append(REPOSITORY_ROOT_DIRPATH)
 
@@ -31,9 +31,6 @@ def filepath_matches_gitignore(repo, filepath):
     return False
   else:
     return True
-
-
-#===============================================================================
 
 
 def main():
