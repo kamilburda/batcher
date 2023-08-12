@@ -11,11 +11,7 @@
 !*.pyo
 !*.log
 !.git*
-!.project
-!.pydevproject
-!.runtests.py
 !.git/
-!.settings/
 !/batcher/locale/generate_pot.sh
 !/batcher/tests/
 !/batcher/pygimplib/tests/

@@ -59,10 +59,7 @@ fi
 sudo gem install bundler
 
 python_modules='pathspec
-pathlib
 requests
-simplejson
-mock
 parameterized
 psutil
 pyyaml
