@@ -19,7 +19,7 @@ import os
 import sys
 
 # Allow importing modules in directories in the 'plug-ins' directory.
-current_module_dirpath = os.path.dirname(inspect.getfile(inspect.currentframe()))
+current_module_dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 if current_module_dirpath not in sys.path:
   sys.path.append(current_module_dirpath)
 

@@ -18,7 +18,7 @@ import sys
 import time
 import traceback
 
-UTILS_DIRPATH = os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe())))
+UTILS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
 
