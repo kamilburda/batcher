@@ -3,6 +3,7 @@
 #################
 
 *.log
+*.pyi
 batcher/config_dev.py
 batcher/tests/test_images/temp_output/
 batcher/tests/test_images/incorrect_results/
