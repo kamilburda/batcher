@@ -5,6 +5,7 @@ import ast
 import collections
 import io
 import os
+import traceback
 import types
 
 try:
@@ -706,8 +707,8 @@ class PickleFileSource(Source):
           if len(split) == 2:
             source_name, contents = split
             all_data[source_name] = contents
-    except Exception as e:
-      raise SourceReadError(str(e))
+    except Exception:
+      raise SourceReadError(traceback.format_exc())
     else:
       return all_data
   
@@ -720,20 +721,20 @@ class PickleFileSource(Source):
       with io.open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         for source_name, contents in all_data.items():
           f.write(source_name + self._SOURCE_NAME_CONTENTS_SEPARATOR + contents + '\n')
-    except Exception as e:
-      raise SourceWriteError(str(e))
+    except Exception:
+      raise SourceWriteError(traceback.format_exc())
   
   def _get_settings_from_pickled_data(self, contents):
     try:
       return pickle.loads(ast.literal_eval(contents))
-    except Exception as e:
-      raise SourceInvalidFormatError(str(e))
+    except Exception:
+      raise SourceInvalidFormatError(traceback.format_exc())
   
   def _pickle_settings(self, settings):
     try:
       return repr(pickle.dumps(settings))
-    except Exception as e:
-      raise SourceInvalidFormatError(str(e))
+    except Exception:
+      raise SourceInvalidFormatError(traceback.format_exc())
 
 
 class JsonFileSource(Source):
@@ -811,8 +812,8 @@ class JsonFileSource(Source):
     try:
       with io.open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         all_data = json.load(f)
-    except Exception as e:
-      raise SourceReadError(str(e))
+    except Exception:
+      raise SourceReadError(traceback.format_exc())
     else:
       return all_data
   
@@ -826,5 +827,5 @@ class JsonFileSource(Source):
         # Workaround for Python 2 code to properly handle Unicode strings
         raw_data = json.dumps(all_data, f, sort_keys=False, indent=4, separators=(',', ': '))
         f.write(unicode(raw_data))
-    except Exception as e:
-      raise SourceWriteError(str(e))
+    except Exception:
+      raise SourceWriteError(traceback.format_exc())
