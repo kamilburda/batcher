@@ -16,6 +16,9 @@
         <list>
           <option value="_" />
           <option value="N_" />
+          <option value="batcher.config.c" />
+          <option value="batcher.config_dev.c" />
+          <option value="builtins.c" />
         </list>
       </option>
     </inspection_tool>
