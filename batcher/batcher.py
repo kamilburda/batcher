@@ -5,16 +5,16 @@
 import os
 import sys
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 import gimpenums
 
-from batcher import core
-from batcher import exceptions
-from batcher import settings_main
-from batcher import update
-from batcher import utils as utils_
-from batcher.gui import main as gui_main
+import core
+import exceptions
+import settings_main
+import update
+import utils as utils_
+from gui import main as gui_main
 
 
 SETTINGS = settings_main.create_settings()
