@@ -1,12 +1,16 @@
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import collections.abc
+import functools
 import sys
 
 import gi
 
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
+from gi.repository import GLib
 from gi.repository import GObject
 
 
@@ -26,6 +30,7 @@ def register_procedure(
       attribution: Optional[Tuple[str, str, str]] = None,
       auxiliary_arguments: Optional[List[Union[Dict, str]]] = None,
       run_data: Optional[List] = None,
+      init_ui: bool = True,
       additional_init: Optional[Callable] = None,
 ):
   # noinspection PyUnresolvedReferences
@@ -81,6 +86,10 @@ def register_procedure(
       See `Gimp.add_aux_argument_from_property`_ for more information about
       auxiliary arguments.
     run_data: Custom parameters passed to ``procedure`` as its last argument.
+      ``procedure`` should only contain the run data as its last argument if
+      ``run_data`` is not ``None``.
+    init_ui: If ``True``, user interface is initialized via `GimpUi.init`_.
+      See `GimpUi.init`_ for more information.
     additional_init: Function allowing customization of procedure registration.
       The function accepts a single argument - a ``Gimp.Procedure`` instance
       corresponding to the registered procedure.
@@ -124,6 +133,8 @@ def register_procedure(
       https://developer.gimp.org/api/3.0/libgimp/class.PlugIn.html
   .. _Gimp.Procedure
       https://developer.gimp.org/api/3.0/libgimp/class.Procedure.html
+  .. _GimpUi.init
+      https://developer.gimp.org/api/3.0/libgimpui/func.init.html
   .. _Gimp.Procedure.set_argument_sync
       https://developer.gimp.org/api/3.0/libgimp/method.Procedure.set_argument_sync.html
   .. _GObject.Property
@@ -145,6 +156,7 @@ def register_procedure(
   proc_dict['attribution'] = attribution
   proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
   proc_dict['run_data'] = run_data
+  proc_dict['init_ui'] = init_ui
   proc_dict['additional_init'] = additional_init
 
 
@@ -253,7 +265,7 @@ def _do_create_procedure(plugin_instance, proc_name):
     plugin_instance,
     proc_name,
     Gimp.PDBProcType.PLUGIN,
-    _run,
+    _get_procedure_wrapper(proc_dict['procedure'], proc_dict['init_ui']),
     proc_dict['run_data'])
 
   if proc_dict['arguments'] is not None:
@@ -305,5 +317,45 @@ def _disable_locale(plugin_instance, name):
   return False
 
 
-def _run(*args):
-  raise NotImplementedError
+def _get_procedure_wrapper(func, init_ui):
+  @functools.wraps(func)
+  def func_wrapper(procedure, args, run_data):
+    run_mode = args.index(0)
+
+    config = procedure.create_config()
+    config.begin_run(None, run_mode, args)
+    config.get_values(args)
+
+    if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
+      GimpUi.init(procedure.get_name())
+
+    func_args = [procedure, run_mode, config]
+    if run_data is not None:
+      func_args.append(run_data)
+
+    return_values = func(*func_args)
+
+    if return_values is None:
+      return_values = []
+    elif not isinstance(return_values, tuple):
+      return_values = [return_values]
+    else:
+      return_values = list(return_values)
+
+    if not return_values or not isinstance(return_values[0], Gimp.PDBStatusType):
+      exit_status = Gimp.PDBStatusType.SUCCESS
+    else:
+      exit_status = return_values.pop(0)
+
+    config.end_run(exit_status)
+
+    formatted_return_values = procedure.new_return_values(exit_status, GLib.Error())
+    if formatted_return_values.length() > 1:
+      for i in reversed(range(1, formatted_return_values.length())):
+        if i - 1 < len(return_values):
+          formatted_return_values.remove(i)
+          formatted_return_values.insert(i, return_values[i - 1])
+
+    return formatted_return_values
+
+  return func_wrapper
