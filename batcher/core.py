@@ -793,9 +793,6 @@ class Batcher(object):
       self._current_image = self._image_copy
       
       pdb.gimp_image_undo_freeze(self._current_image)
-      
-      if pg.config.DEBUG_IMAGE_PROCESSING:
-        self._display_id = pdb.gimp_display_new(self._current_image)
     else:
       self._current_image = self._input_image
       pdb.gimp_image_undo_group_start(self._current_image)
@@ -812,9 +809,6 @@ class Batcher(object):
       self._copy_non_modifying_parasites(self._current_image, self._input_image)
       
       pdb.gimp_image_undo_thaw(self._current_image)
-      
-      if pg.config.DEBUG_IMAGE_PROCESSING:
-        pdb.gimp_display_delete(self._display_id)
       
       if not self._keep_image_copy or exception_occurred:
         pg.pdbutils.try_delete_image(self._current_image)

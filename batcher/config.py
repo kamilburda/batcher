@@ -22,6 +22,3 @@ c.REPOSITORY_URL = 'https://github.com/kamilburda/batcher'
 c.BUG_REPORT_URL_LIST = [
   ('GitHub', 'https://github.com/kamilburda/batcher/issues')
 ]
-
-# If True, display each step of image/layer editing in GIMP.
-c.DEBUG_IMAGE_PROCESSING = False
