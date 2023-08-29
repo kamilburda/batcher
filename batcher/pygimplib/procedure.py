@@ -1,3 +1,5 @@
+"""Wrappers to simplify registering and running functions as GIMP procedures.
+"""
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import collections.abc

@@ -1,3 +1,4 @@
+"""Class for creating plug-in-wide configuration."""
 import builtins
 import os
 

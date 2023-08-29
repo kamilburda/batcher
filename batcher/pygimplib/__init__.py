@@ -1,3 +1,4 @@
+"""Library initialization."""
 import builtins
 import inspect
 import os
