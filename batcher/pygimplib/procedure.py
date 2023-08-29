@@ -10,7 +10,6 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 
-_PROCEDURE_FUNCTIONS = []
 _PROCEDURE_NAMES_AND_DATA = {}
 _PLUGIN_PROPERTIES = {}
 _USE_LOCALE = False
@@ -131,12 +130,11 @@ def register_procedure(
   .. _Gimp.add_aux_argument_from_property
       https://developer.gimp.org/api/3.0/libgimp/method.Procedure.add_aux_argument_from_property.html
   """
-  _PROCEDURE_FUNCTIONS.append(procedure)
-
   proc_name = procedure.__name__.replace('_', '-')
   _PROCEDURE_NAMES_AND_DATA[proc_name] = {}
 
   proc_dict = _PROCEDURE_NAMES_AND_DATA[proc_name]
+  proc_dict['procedure'] = procedure
   proc_dict['arguments'] = _parse_and_check_parameters(arguments)
   proc_dict['return_values'] = _parse_and_check_parameters(return_values)
   proc_dict['menu_label'] = menu_label

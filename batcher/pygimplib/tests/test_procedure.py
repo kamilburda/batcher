@@ -23,7 +23,6 @@ def sample_procedure_2(*args, **kwargs):
 class TestProcedure(unittest.TestCase):
 
   def setUp(self):
-    pgprocedure._PROCEDURE_FUNCTIONS = []
     pgprocedure._PROCEDURE_NAMES_AND_DATA = {}
     pgprocedure._PLUGIN_PROPERTIES = {}
 
