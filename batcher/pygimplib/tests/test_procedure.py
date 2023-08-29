@@ -32,14 +32,14 @@ class TestProcedure(unittest.TestCase):
     pgprocedure.register_procedure(
       sample_procedure,
       arguments=[
-        dict(name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-        dict(name='output_directory', type=str, default='some_dir', nick='Output directory'),
+        dict(name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+        dict(name='output-directory', type=str, default='some_dir', nick='Output directory'),
       ],
       return_values=[
-        dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
+        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
       ],
       auxiliary_arguments=[
-        dict(name='config_only_arg', type=str, default='', nick='Config-only argument')
+        dict(name='config-only-arg', type=str, default='', nick='Config-only argument')
       ],
       menu_label='Sample Procedure',
       menu_path='<Image>/Filters',
@@ -150,22 +150,22 @@ class TestProcedure(unittest.TestCase):
     pgprocedure.register_procedure(
       sample_procedure,
       arguments=[
-        dict(name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-        dict(name='output_directory', type=str, default='some_dir', nick='Output directory'),
+        dict(name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+        dict(name='output-directory', type=str, default='some_dir', nick='Output directory'),
       ],
       return_values=[
-        dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
+        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
       ],
     )
 
     pgprocedure.register_procedure(
       sample_procedure_2,
       arguments=[
-        'run_mode',
-        dict(name='output_directory_2', type=str, default='some_dir_2', nick='Output directory 2'),
+        'run-mode',
+        dict(name='output-directory-2', type=str, default='some_dir_2', nick='Output directory 2'),
       ],
       return_values=[
-        dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
+        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
       ],
     )
 
@@ -210,7 +210,7 @@ class TestProcedure(unittest.TestCase):
         sample_procedure,
         arguments=[
           dict(
-            name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-          'output_directory',
+            name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+          'output-directory',
         ],
       )
