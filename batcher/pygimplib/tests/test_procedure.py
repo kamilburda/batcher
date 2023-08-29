@@ -20,15 +20,16 @@ def sample_procedure_2(*args, **kwargs):
 
 
 @mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp.Procedure.new')
-class TestRegisterProcedure(unittest.TestCase):
+class TestProcedure(unittest.TestCase):
 
   def setUp(self):
     pgprocedure._PROCEDURE_FUNCTIONS = []
     pgprocedure._PROCEDURE_NAMES_AND_DATA = {}
+    pgprocedure._PLUGIN_PROPERTIES = {}
 
     pgprocedure.set_use_locale(False)
 
-  def test_register_single_procedure(self, mock_gimp_procedure, *mocks):
+  def test_register_single_procedure(self, mock_gimp_procedure):
     pgprocedure.register_procedure(
       sample_procedure,
       arguments=[
@@ -107,6 +108,10 @@ class TestRegisterProcedure(unittest.TestCase):
     self.assertEqual(plugin_class.config_only_arg.nick, 'Config-only argument')
     self.assertEqual(plugin.config_only_arg, '')
 
+  def test_create_procedure_no_matching_name(self, mock_gimp_procedure):
+    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
+    self.assertIsNone(plugin.do_create_procedure('nonexistent-procedure'))
+
   def test_register_procedure_with_locale(self, *mocks):
     pgprocedure.set_use_locale(True)
     pgprocedure.register_procedure(sample_procedure)
@@ -115,7 +120,7 @@ class TestRegisterProcedure(unittest.TestCase):
 
     self.assertFalse(hasattr(plugin, 'do_set_i18n'))
 
-  def test_register_procedure_with_multiple_menu_paths(self, mock_gimp_procedure, *mocks):
+  def test_register_procedure_with_multiple_menu_paths(self, mock_gimp_procedure):
     pgprocedure.register_procedure(
       sample_procedure,
       menu_path=['<Image>/Filters', '<Image>/Colors'],
@@ -129,7 +134,7 @@ class TestRegisterProcedure(unittest.TestCase):
       [(('<Image>/Filters',),), (('<Image>/Colors',),)],
     )
 
-  def test_register_procedure_with_documentation_of_3_elements(self, mock_gimp_procedure, *mocks):
+  def test_register_procedure_with_documentation_of_3_elements(self, mock_gimp_procedure):
     pgprocedure.register_procedure(
       sample_procedure,
       documentation=(
@@ -141,3 +146,72 @@ class TestRegisterProcedure(unittest.TestCase):
 
     mock_gimp_procedure.return_value.set_documentation.assert_called_once_with(
       'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc')
+
+  def test_register_multiple_procedures(self, mock_gimp_procedure):
+    pgprocedure.register_procedure(
+      sample_procedure,
+      arguments=[
+        dict(name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+        dict(name='output_directory', type=str, default='some_dir', nick='Output directory'),
+      ],
+      return_values=[
+        dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
+      ],
+    )
+
+    pgprocedure.register_procedure(
+      sample_procedure_2,
+      arguments=[
+        'run_mode',
+        dict(name='output_directory_2', type=str, default='some_dir_2', nick='Output directory 2'),
+      ],
+      return_values=[
+        dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
+      ],
+    )
+
+    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
+    plugin.do_create_procedure('sample-procedure')
+    plugin.do_create_procedure('sample-procedure-2')
+
+    self.assertEqual(
+      [call.args[1] for call in mock_gimp_procedure.call_args_list],
+      ['sample-procedure', 'sample-procedure-2'])
+
+    plugin_class = type(plugin)
+
+    self.assertIsInstance(plugin_class.run_mode, GObject.Property)
+    self.assertEqual(plugin_class.run_mode.nick, 'Run mode')
+    self.assertEqual(plugin.run_mode, Gimp.RunMode.INTERACTIVE)
+
+    self.assertIsInstance(plugin_class.output_directory, GObject.Property)
+    self.assertEqual(plugin_class.output_directory.nick, 'Output directory')
+    self.assertEqual(plugin.output_directory, 'some_dir')
+
+    self.assertIsInstance(plugin_class.output_directory_2, GObject.Property)
+    self.assertEqual(plugin_class.output_directory_2.nick, 'Output directory 2')
+    self.assertEqual(plugin.output_directory_2, 'some_dir_2')
+
+    self.assertIsInstance(plugin_class.num_layers, GObject.Property)
+    self.assertEqual(plugin_class.num_layers.nick, 'Number of processed layers')
+    self.assertEqual(plugin.num_layers, 0)
+
+  def test_register_procedure_raises_error_if_dict_is_missing_name(self, *mocks):
+    with self.assertRaises(ValueError):
+      pgprocedure.register_procedure(
+        sample_procedure,
+        arguments=[
+          dict(type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+        ],
+      )
+
+  def test_register_procedure_raises_error_if_as_string_has_no_corresponding_dict(self, *mocks):
+    with self.assertRaises(ValueError):
+      pgprocedure.register_procedure(
+        sample_procedure,
+        arguments=[
+          dict(
+            name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+          'output_directory',
+        ],
+      )
