@@ -41,7 +41,7 @@ SCREENSHOT_DIALOG_BATCH_EDITING_FILENAME = 'screenshot_dialog_batch_editing.png'
 
 
 def take_screenshots(gui, dialog, settings):
-  pg.path.make_dirs(OUTPUT_DIRPATH)
+  os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
   
   settings['gui/current_directory'].set_value(OUTPUT_DIRPATH)
   settings['gui/show_more_settings'].set_value(False)

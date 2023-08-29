@@ -33,8 +33,6 @@ import zipfile
 import git
 import pathspec
 
-from batcher.pygimplib import _path_dirs
-
 from utils import create_user_docs
 from utils import process_local_docs
 
@@ -60,7 +58,7 @@ def make_installers(
       force_if_dirty=False,
       installers=None,
       generate_docs=True):
-  _path_dirs.make_dirs(installer_dirpath)
+  os.makedirs(installer_dirpath, exist_ok=True)
   
   temp_repo_files_dirpath = tempfile.mkdtemp()
   
@@ -108,7 +106,7 @@ def _create_temp_dirpath(temp_dirpath):
   elif os.path.isfile(temp_dirpath):
     os.remove(temp_dirpath)
     
-  _path_dirs.make_dirs(temp_dirpath)
+  os.makedirs(temp_dirpath, exist_ok=True)
 
 
 def _prepare_repo_files_for_packaging(
@@ -148,7 +146,7 @@ def _move_files_with_filters_to_temporary_location(
     dest_filepath = os.path.join(
       dirpath_with_original_files_with_git_filters, relative_filepath)
     
-    _path_dirs.make_dirs(os.path.dirname(dest_filepath))
+    os.makedirs(os.path.dirname(dest_filepath), exist_ok=True)
     shutil.copy2(src_filepath, dest_filepath)
     os.remove(src_filepath)
 
@@ -201,7 +199,7 @@ def _compile_translation_files(source_dirpath):
       if (os.path.isfile(os.path.join(root_dirpath, filename))
           and filename.endswith('.po')):
         po_file = os.path.join(root_dirpath, filename)
-        language = _path_dirs.split_path(root_dirpath)[-2]
+        language = pathlib.Path(root_dirpath).parts[-2]
         subprocess.call(['./generate_mo.sh', po_file, language])
   
   os.chdir(orig_cwd)
@@ -211,7 +209,7 @@ def _copy_files_to_temp_filepaths(filepaths, temp_filepaths):
   for src_filepath, temp_filepath in zip(filepaths, temp_filepaths):
     dirpath = os.path.dirname(temp_filepath)
     if not os.path.exists(dirpath):
-      _path_dirs.make_dirs(dirpath)
+      os.makedirs(dirpath, exist_ok=True)
     shutil.copy2(src_filepath, temp_filepath)
 
 

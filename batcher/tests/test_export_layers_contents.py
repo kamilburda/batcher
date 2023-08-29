@@ -189,7 +189,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def _save_incorrect_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):
     incorrect_layers_dirpath = os.path.join(INCORRECT_RESULTS_DIRPATH, test_case_name)
-    pg.path.make_dirs(incorrect_layers_dirpath)
+    os.makedirs(incorrect_layers_dirpath, exist_ok=True)
     
     self._copy_incorrect_layer(
       layer, settings, self.output_dirpath, incorrect_layers_dirpath, '_actual')

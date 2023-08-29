@@ -9,8 +9,6 @@ import os
 import sys
 import traceback
 
-from . import _path_dirs
-
 
 _LOG_MODES = ('none', 'exceptions', 'files', 'gimp_console')
 
@@ -101,7 +99,7 @@ def create_log_file(log_dirpaths, log_filename, mode='a'):
   
   for log_dirpath in log_dirpaths:
     try:
-      _path_dirs.make_dirs(log_dirpath)
+      os.makedirs(log_dirpath, exist_ok=True)
     except OSError:
       continue
     

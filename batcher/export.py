@@ -316,7 +316,7 @@ def _get_item_filepath(item, dirpath):
 
 def _make_dirs(item, dirpath, default_file_extension):
   try:
-    pg.path.make_dirs(dirpath)
+    os.makedirs(dirpath, exist_ok=True)
   except OSError as e:
     try:
       message = e.args[1]

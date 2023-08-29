@@ -2,9 +2,8 @@
 
 import abc
 import os
+import pathlib
 import re
-
-from .. import _path_dirs
 
 __all__ = [
   'FileValidatorErrorStatuses',
@@ -223,7 +222,7 @@ class FilepathValidator(StringValidator):
         status_messages.append(
           cls._get_status(FileValidatorErrorStatuses.DRIVE_HAS_INVALID_CHARS))
     
-    path_components = _path_dirs.split_path(path)
+    path_components = pathlib.Path(path).parts
     for path_component in path_components:
       if re.search(cls._INVALID_CHARS_PATTERN, path_component):
         statuses.add(FileValidatorErrorStatuses.HAS_INVALID_CHARS)
@@ -264,7 +263,7 @@ class FilepathValidator(StringValidator):
     if drive:
       drive = re.sub(cls._INVALID_CHARS_PATTERN_WITHOUT_DRIVE, '', drive)
     
-    path_components = _path_dirs.split_path(path)
+    path_components = pathlib.Path(path).parts
     for i in range(len(path_components)):
       path_component = re.sub(cls._INVALID_CHARS_PATTERN, '', path_components[i])
       path_component = path_component.strip(' ').rstrip('.')
