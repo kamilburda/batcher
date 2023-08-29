@@ -1,6 +1,13 @@
 import builtins
 import os
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
+from . import logging
+from . import setting
+
 
 class _Config:
 
@@ -25,7 +32,7 @@ class _Config:
     return name in self._config
 
 
-def create_config(pygimplib_dirpath, gimp_dependent_modules_available):
+def create_config(pygimplib_dirpath, root_plugin_dirpath):
   """Creates plug-in configuration.
 
   The configuration object contains plug-in-wide variables such as plug-in
@@ -37,13 +44,13 @@ def create_config(pygimplib_dirpath, gimp_dependent_modules_available):
   """
   config = _Config()
 
-  _init_config_initial(config, pygimplib_dirpath, gimp_dependent_modules_available)
+  _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath)
 
-  _init_config_logging(config, gimp_dependent_modules_available)
+  _init_config_logging(config)
 
   _init_config_from_file(config)
 
-  _init_config_per_procedure(config, gimp_dependent_modules_available)
+  _init_config_per_procedure(config)
 
   return config
 
@@ -77,21 +84,16 @@ def _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath):
   config.LOG_MODE = 'exceptions'
 
 
-def _init_config_logging(config, gimp_dependent_modules_available):
+def _init_config_logging(config):
   config.PLUGINS_LOG_DIRPATHS = []
   config.PLUGINS_LOG_DIRPATHS.append(config.DEFAULT_LOGS_DIRPATH)
 
-  if gimp_dependent_modules_available:
-    import gi
-    gi.require_version('Gimp', '3.0')
-    from gi.repository import Gimp
-
-    plugins_dirpath_alternate = Gimp.directory()
-    if plugins_dirpath_alternate != config.DEFAULT_LOGS_DIRPATH:
-      # Add the GIMP directory in the user directory as another log path in
-      # case the plug-in was installed system-wide and there is no permission to
-      # create log files there.
-      config.PLUGINS_LOG_DIRPATHS.append(plugins_dirpath_alternate)
+  plugins_dirpath_alternate = Gimp.directory()
+  if plugins_dirpath_alternate != config.DEFAULT_LOGS_DIRPATH:
+    # Add the GIMP directory in the user directory as another log path in
+    # case the plug-in was installed system-wide and there is no permission to
+    # create log files there.
+    config.PLUGINS_LOG_DIRPATHS.append(plugins_dirpath_alternate)
 
   config.PLUGINS_LOG_STDOUT_DIRPATH = config.DEFAULT_LOGS_DIRPATH
   config.PLUGINS_LOG_STDERR_DIRPATH = config.DEFAULT_LOGS_DIRPATH
@@ -126,22 +128,17 @@ def _init_config_from_file(config):
     builtins.c = orig_builtin_c
 
 
-def _init_config_per_procedure(config, gimp_dependent_modules_available):
-  if gimp_dependent_modules_available:
-    from . import setting
+def _init_config_per_procedure(config):
+  config.SOURCE_NAME = config.PLUGIN_NAME
+  config.SESSION_SOURCE = setting.GimpShelfSource(config.SOURCE_NAME)
+  config.PERSISTENT_SOURCE = setting.GimpParasiteSource(config.SOURCE_NAME)
 
-    config.SOURCE_NAME = config.PLUGIN_NAME
-    config.SESSION_SOURCE = setting.GimpShelfSource(config.SOURCE_NAME)
-    config.PERSISTENT_SOURCE = setting.GimpParasiteSource(config.SOURCE_NAME)
+  setting.persistor.Persistor.set_default_setting_sources({
+    'session': config.SESSION_SOURCE,
+    'persistent': config.PERSISTENT_SOURCE,
+  })
 
-    setting.persistor.Persistor.set_default_setting_sources({
-      'session': config.SESSION_SOURCE,
-      'persistent': config.PERSISTENT_SOURCE,
-    })
-
-  if gimp_dependent_modules_available or config.LOG_MODE != 'gimp_console':
-    from . import logging
-
+  if config.LOG_MODE != 'gimp_console':
     logging.log_output(
       config.LOG_MODE, config.PLUGINS_LOG_DIRPATHS,
       config.PLUGINS_LOG_STDOUT_FILENAME, config.PLUGINS_LOG_STDERR_FILENAME,
