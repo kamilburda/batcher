@@ -25,7 +25,6 @@ def register_procedure(
       documentation: Optional[Union[Tuple[str, str], Tuple[str, str, str]]] = None,
       attribution: Optional[Tuple[str, str, str]] = None,
       auxiliary_arguments: Optional[List[Union[Dict, str]]] = None,
-      argument_sync: Optional[Gimp.ArgumentSync] = None,
       run_data: Optional[List] = None,
       additional_init: Optional[Callable] = None,
 ):
@@ -81,11 +80,13 @@ def register_procedure(
       the list.
       See `Gimp.add_aux_argument_from_property`_ for more information about
       auxiliary arguments.
-    argument_sync: See `Gimp.Procedure.set_argument_sync`_.
     run_data: Custom parameters passed to ``procedure`` as its last argument.
     additional_init: Function allowing customization of procedure registration.
       The function accepts a single argument - a ``Gimp.Procedure`` instance
       corresponding to the registered procedure.
+      You can use this function to call registration-related functions not
+      available via this function, e.g. `Gimp.Procedure.set_argument_sync`_
+      on individual procedure arguments.
 
   Example:
 
@@ -143,7 +144,6 @@ def register_procedure(
   proc_dict['documentation'] = documentation
   proc_dict['attribution'] = attribution
   proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
-  proc_dict['argument_sync'] = argument_sync
   proc_dict['run_data'] = run_data
   proc_dict['additional_init'] = additional_init
 
@@ -294,9 +294,6 @@ def _do_create_procedure(plugin_instance, proc_name):
 
   if proc_dict['attribution'] is not None:
     procedure.set_attribution(*proc_dict['attribution'])
-
-  if proc_dict['argument_sync'] is not None:
-    procedure.set_argument_sync(proc_dict['argument_sync'])
 
   if proc_dict['additional_init'] is not None:
     proc_dict['additional_init'](procedure)

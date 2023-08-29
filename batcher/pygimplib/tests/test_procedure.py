@@ -46,7 +46,6 @@ class TestProcedure(unittest.TestCase):
       image_types='*',
       documentation=('A sample procedure.', 'This is a procedure for testing purposes.'),
       attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2023'),
-      argument_sync=Gimp.ArgumentSync.NONE,
       additional_init=lambda proc: proc.set_sensitivity_mask(0),
     )
 
@@ -84,7 +83,6 @@ class TestProcedure(unittest.TestCase):
       'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-procedure')
     mock_procedure_object.set_attribution.assert_called_once_with(
       'Jane Doe, John Doe', 'Jane Doe, John Doe', '2023')
-    mock_procedure_object.set_argument_sync.assert_called_once_with(Gimp.ArgumentSync.NONE)
     mock_procedure_object.set_sensitivity_mask.assert_called_once_with(0)
 
     self.assertTrue(hasattr(plugin, 'do_set_i18n'))
