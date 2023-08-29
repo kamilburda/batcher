@@ -33,7 +33,7 @@ class TestRegisterProcedure(unittest.TestCase):
       sample_procedure,
       arguments=[
         dict(name='run_mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-        dict(name='output_directory', type=str, default='', nick='Output directory'),
+        dict(name='output_directory', type=str, default='some_dir', nick='Output directory'),
       ],
       return_values=[
         dict(name='num_layers', type=int, default=0, nick='Number of processed layers'),
@@ -97,7 +97,7 @@ class TestRegisterProcedure(unittest.TestCase):
 
     self.assertIsInstance(plugin_class.output_directory, GObject.Property)
     self.assertEqual(plugin_class.output_directory.nick, 'Output directory')
-    self.assertEqual(plugin.output_directory, '')
+    self.assertEqual(plugin.output_directory, 'some_dir')
 
     self.assertIsInstance(plugin_class.num_layers, GObject.Property)
     self.assertEqual(plugin_class.num_layers.nick, 'Number of processed layers')

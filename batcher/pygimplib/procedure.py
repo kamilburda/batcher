@@ -30,6 +30,99 @@ def register_procedure(
       run_data: Optional[List] = None,
       additional_init: Optional[Callable] = None,
 ):
+  # noinspection PyUnresolvedReferences
+  """Registers a function as a GIMP procedure.
+
+  The installed procedure can then be accessed via the GIMP procedural
+  database (PDB) and, optionally, from the GIMP user interface.
+
+  The function name is used as the procedure name as found in the GIMP PDB,
+  with ``_`` characters replaced with ``-``.
+
+  This is a wrapper for the `Gimp.PlugIn`_ class to simplify the registration of
+  plug-ins and their procedures.
+
+  The description of parameters is provided below. For more detailed information
+  about the parameters, consult the `Gimp.Procedure`_ class (namely functions
+  starting with ``add_`` or ``set__``).
+
+  Args:
+    procedure: The function to register.
+    arguments: List of arguments (procedure parameters).
+      Each list element must either be a dictionary or a string.
+      The dictionary must contain the ``'name'`` key representing the argument
+      name and optionally other keys corresponding to the parameter names for
+      `GObject.Property`_.
+    return_values: List of return values.
+      See ``arguments`` for more information about the contentsn and format of
+      the list.
+    menu_label: Name of the menu entry in the GIMP user interface.
+    menu_path: Path of the menu entry in the GIMP user interface.
+      This can be a single string or a list of strings if you want your
+      procedure to be accessible from mutliple menu paths in GIMP.
+    image_types: Image types to which the procedure applies.
+    documentation: Procedure documentation.
+      This is either a tuple of (short description, help) strings or
+      (short description, help, help ID) strings.
+      The help is a detailed description of the procedure.
+      The help ID is set automatically if omitted, it is not required to
+      specify it explicitly.
+    attribution: Plug-in authors, copyright notice and date.
+      This is a tuple of (authors, copyright notice, date) strings.
+    auxiliary_arguments: List of auxiliary arguments.
+      See ``arguments`` for more information about the contentsn and format of
+      the list.
+      See `Gimp.add_aux_argument_from_property`_ for more information about
+      auxiliary arguments.
+    argument_sync: See `Gimp.Procedure.set_argument_sync`_.
+    run_data: Custom parameters passed to ``procedure`` as its last argument.
+    additional_init: Function allowing customization of procedure registration.
+      The function accepts a single argument - a ``Gimp.Procedure`` instance
+      corresponding to the registered procedure.
+
+  Example:
+
+    >>> import pygimplib as pg
+    >>> pg.register_procedure(
+    ...   plug_in_awesome_filter,
+    ...   arguments=[
+    ...     dict(name='run_mode',
+    ...          type=Gimp.RunMode,
+    ...          default=Gimp.RunMode.INTERACTIVE,
+    ...          nick='Run mode',
+    ...          blurb='The run mode'),
+    ...     dict(name='output_directory',
+    ...          type=str,
+    ...          default='some_dir',
+    ...          nick='Output directory',
+    ...          blurb='Output _directory'),
+    ...   ],
+    ...   return_values=[
+    ...     dict(name='num_layers',
+    ...          type=int,
+    ...          default=0,
+    ...          nick='Number of processed layers',
+    ...          blurb='Number of processed layers'),
+    ...   ],
+    ...   menu_label='Awesome Filter',
+    ...   menu_path='<Image>/Filters',
+    ...   image_types='*',
+    ...   documentation=('An awesome filter.',
+    ...                  'Applies a mind-blowing filter to each layer.'),
+    ...   attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2023'),
+    ... )
+
+  .. _Gimp.PlugIn
+      https://developer.gimp.org/api/3.0/libgimp/class.PlugIn.html
+  .. _Gimp.Procedure
+      https://developer.gimp.org/api/3.0/libgimp/class.Procedure.html
+  .. _Gimp.Procedure.set_argument_sync
+      https://developer.gimp.org/api/3.0/libgimp/method.Procedure.set_argument_sync.html
+  .. _GObject.Property
+      https://pygobject.readthedocs.io/en/latest/guide/api/properties.html#GObject.Property
+  .. _Gimp.add_aux_argument_from_property
+      https://developer.gimp.org/api/3.0/libgimp/method.Procedure.add_aux_argument_from_property.html
+  """
   _PROCEDURE_FUNCTIONS.append(procedure)
 
   proc_name = procedure.__name__.replace('_', '-')
@@ -102,15 +195,10 @@ def set_use_locale(enabled):
 
 
 def main():
-  # `GObject.property` objects must be specified when defining a `Gimp.PlugIn`
-  # subclass, they cannot be added later as this will result in errors
-  # (probably because the parent class of `Gimp.PlugIn`, `GObject.GObject`, has
-  # a metaclass that performs property initialization upon class definition, not
-  # object instantiation).
-  # Therefore, the custom `Gimp.PlugIn` subclass must be created dynamically
-  # where it is possible to pass a dictionary of class attributes, including
-  # `GObject.property` objects.
+  """Initializes and runs the plug-in.
 
+  Call this function at the very end of your main plug-in script.
+  """
   # noinspection PyPep8Naming
   PyPlugIn = _create_plugin_class()
 
@@ -121,6 +209,14 @@ def main():
 def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
   class_dict = {}
 
+  # `GObject.property` objects must be specified when defining a `Gimp.PlugIn`
+  # subclass, they cannot be added later as this will result in errors
+  # (probably because the parent class of `Gimp.PlugIn`, `GObject.GObject`, has
+  # a metaclass that performs property initialization upon class definition, not
+  # object instantiation).
+  # Therefore, the custom `Gimp.PlugIn` subclass must be created dynamically
+  # where it is possible to pass a dictionary of class attributes, including
+  # `GObject.property` objects.
   for name, gobject_property in _PLUGIN_PROPERTIES.items():
     class_dict[name.replace('-', '_')] = gobject_property
 

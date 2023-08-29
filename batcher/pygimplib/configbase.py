@@ -1,5 +1,4 @@
 import builtins
-import inspect
 import os
 
 
@@ -49,10 +48,8 @@ def create_config(pygimplib_dirpath, gimp_dependent_modules_available):
   return config
 
 
-def _init_config_initial(config, pygimplib_dirpath, gimp_dependent_modules_available):
+def _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath):
   config.PYGIMPLIB_DIRPATH = pygimplib_dirpath
-
-  root_plugin_dirpath = _get_root_plugin_dirpath()
 
   if root_plugin_dirpath is not None:
     config._DEFAULT_PLUGIN_NAME = os.path.basename(root_plugin_dirpath)
@@ -77,19 +74,7 @@ def _init_config_initial(config, pygimplib_dirpath, gimp_dependent_modules_avail
 
   config.BUG_REPORT_URL_LIST = []
 
-  if gimp_dependent_modules_available:
-    config.LOG_MODE = 'exceptions'
-  else:
-    config.LOG_MODE = 'none'
-
-
-def _get_root_plugin_dirpath():
-  frame_stack = inspect.stack()
-
-  if frame_stack:
-    return os.path.dirname(os.path.abspath(frame_stack[-1][1]))
-  else:
-    return None
+  config.LOG_MODE = 'exceptions'
 
 
 def _init_config_logging(config, gimp_dependent_modules_available):
