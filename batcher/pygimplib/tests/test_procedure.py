@@ -212,3 +212,8 @@ class TestProcedure(unittest.TestCase):
           'output-directory',
         ],
       )
+
+  def test_register_procedure_raises_error_if_registering_already_registered_proc(self, *mocks):
+    pgprocedure.register_procedure(sample_procedure)
+    with self.assertRaises(ValueError):
+      pgprocedure.register_procedure(sample_procedure)

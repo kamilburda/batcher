@@ -143,6 +143,10 @@ def register_procedure(
       https://developer.gimp.org/api/3.0/libgimp/method.Procedure.add_aux_argument_from_property.html
   """
   proc_name = procedure.__name__.replace('_', '-')
+
+  if proc_name in _PROCEDURE_NAMES_AND_DATA:
+    raise ValueError(f'procedure "{proc_name}" is already registered')
+
   _PROCEDURE_NAMES_AND_DATA[proc_name] = {}
 
   proc_dict = _PROCEDURE_NAMES_AND_DATA[proc_name]
