@@ -53,6 +53,14 @@ def register_procedure(
       The dictionary must contain the ``'name'`` key representing the argument
       name and optionally other keys corresponding to the parameter names for
       `GObject.Property`_.
+      If the list element is a string, it must be the name of an argument
+      already registered in a previous call to `register_procedure` (that is, a
+      string can only be specified if a dictionary containing the same name was
+      already specified). This allows reusing arguments for multiple plug-in
+      procedures without the need to duplicate the entire dictionary for each
+      procedure.
+      Underscores in names (``_``) are automatically replaced with hyphens
+      (``-``).
     return_values: List of return values.
       See ``arguments`` for more information about the contentsn and format of
       the list.
@@ -147,7 +155,7 @@ def _parse_and_check_parameters(parameters):
     return None
 
   if not isinstance(parameters, collections.abc.Iterable) or isinstance(parameters, str):
-    raise TypeError('Arguments, return values and auxiliary arguments must be a list-like iterable')
+    raise TypeError('Arguments and return values must be specified as a list-like iterable')
 
   processed_parameters = {}
 
@@ -155,9 +163,8 @@ def _parse_and_check_parameters(parameters):
     if isinstance(param, dict):
       if 'name' not in param:
         raise ValueError(
-          ('Dictionary describing a parameter (argument, return value or auxiliary argument)'
-           ' must also contain the "name" key representing the parameter name as registered'
-           ' in GIMP'))
+          ('Dictionary describing an argument or a return value must also contain'
+           ' the "name" key representing the parameter name as registered in GIMP'))
 
       name = param.pop('name').replace('_', '-')
       if name not in _PLUGIN_PROPERTIES:
@@ -169,12 +176,13 @@ def _parse_and_check_parameters(parameters):
 
       if name not in _PLUGIN_PROPERTIES:
         raise ValueError(
-          ('You can only specify parameter name if a dictionary containing the name'
-           ' was already specified before'))
+          ('You can only specify the name of an argument or a return value if a dictionary'
+           ' containing the name was already specified before'))
 
       processed_parameters[name] = _PLUGIN_PROPERTIES[name]
     else:
-      raise TypeError('Parameters must only contain dictionaries or strings')
+      raise TypeError(
+        'Only dictionaries and strings are allowed when specifying an argument or a return value')
 
   return processed_parameters
 
