@@ -8,7 +8,7 @@ from . import constants as pgconstants
 GIMP_ITEM_PATH_SEPARATOR = '/'
 
 
-class EmptyContext(object):
+class EmptyContext:
   """
   This class provides an empty context manager that can be used in `with`
   statements in place of a real context manager if a condition is not met:
