@@ -14,7 +14,8 @@ from batcher import export as export_
 # Despite being unused, `settings_custom` must be imported so that the custom
 # setting and GUI classes defined there are properly registered (via metaclasses
 # in `pg.setting.meta`).
-from batcher import settings_custom  # @UnusedImport
+# noinspection PyUnresolvedReferences
+from batcher import settings_custom
 from batcher.gui import settings_gui
 
 

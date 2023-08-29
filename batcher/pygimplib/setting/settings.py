@@ -20,7 +20,8 @@ from . import persistor as persistor_
 from . import presenter as presenter_
 # Despite being unused, `presenters_gtk` must be imported so that the GUI
 # classes defined there are properly registered and `SettingGuiTypes` is filled.
-from . import presenters_gtk  # @UnusedImport
+# noinspection PyUnresolvedReferences
+from . import presenters_gtk
 from . import utils as utils_
 
 

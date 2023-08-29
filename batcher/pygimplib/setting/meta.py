@@ -87,7 +87,7 @@ class SettingMeta(type):
     (`TypeError` is raised on `__init__()`).
   """
   
-  def __new__(mcls, name, bases, namespace):  # @NoSelf
+  def __new__(mcls, name, bases, namespace):
     _handle_abstract_attribute(namespace)
     
     _set_init_wrapper(mcls, namespace)
@@ -136,7 +136,7 @@ class GroupMeta(type):
     persisting the group with the arguments it was instantiated with.
   """
   
-  def __new__(mcls, name, bases, namespace):  # @NoSelf
+  def __new__(mcls, name, bases, namespace):
     _set_init_wrapper(mcls, namespace)
     
     cls = super(GroupMeta, mcls).__new__(mcls, name, bases, namespace)
@@ -178,7 +178,7 @@ class PresenterMeta(type):
     initialized (`TypeError` is raised on `__init__()`).
   """
   
-  def __new__(mcls, name, bases, namespace):  # @NoSelf
+  def __new__(mcls, name, bases, namespace):
     _handle_abstract_attribute(namespace)
     
     _set_init_wrapper(mcls, namespace)
