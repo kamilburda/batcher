@@ -55,7 +55,9 @@ These events include:
   actions.
 """
 
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
 
@@ -565,7 +567,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure):
         placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP[pdb_param_type])
     
     if index == 0 and processed_pdb_param_name == 'run-mode':
-      arguments_dict['default_value'] = gimpenums.RUN_NONINTERACTIVE
+      arguments_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
     
     action_dict['arguments'].append(arguments_dict)
   

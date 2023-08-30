@@ -1,11 +1,13 @@
-import mock
 import unittest
+import unittest.mock as mock
 
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
 
+from batcher.pygimplib import pdb
 from batcher.pygimplib.tests import stubs_gimp
 
 from batcher import actions as actions_
@@ -19,7 +21,7 @@ class TestBatcherInitialActions(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    cls.image = pdb.gimp_image_new(1, 1, gimpenums.RGB)
+    cls.image = pdb.gimp_image_new(1, 1, Gimp.ImageBaseType.RGB)
   
   @classmethod
   def tearDownClass(cls):

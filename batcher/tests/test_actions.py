@@ -1,10 +1,12 @@
 import collections
 import unittest
+import unittest.mock as mock
 
-import mock
 import parameterized
 
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
 

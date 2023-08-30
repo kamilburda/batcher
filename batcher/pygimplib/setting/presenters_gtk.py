@@ -3,12 +3,13 @@
 import inspect
 import sys
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-import gimp
-import gimpui
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from .. import gui as pggui
 from .. import utils as pgutils

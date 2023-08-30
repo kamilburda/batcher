@@ -1,7 +1,7 @@
 """Class modifying `gtk.Entry` instances to expand/shrink in width dynamically.
 """
 
-import pango
+from gi.repository import Pango
 
 __all__ = [
   'EntryExpander',
@@ -29,7 +29,7 @@ class EntryExpander:
     self._maximum_width = -1
     self._entry.set_width_chars(self._minimum_width_chars)
     
-    self._pango_layout = pango.Layout(self._entry.get_pango_context())
+    self._pango_layout = Pango.Layout.new(self._entry.get_pango_context())
     
     self._entry.connect('changed', self._on_entry_changed)
     self._entry.connect('size-allocate', self._on_entry_size_allocate)

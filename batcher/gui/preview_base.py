@@ -1,11 +1,11 @@
 """Base class for preview widgets."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 
-class Preview(gtk.VBox):
+class Preview(Gtk.Box):
   
   def __init__(self):
     super().__init__(homogeneous=False)

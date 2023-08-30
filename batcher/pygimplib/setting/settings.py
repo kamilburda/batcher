@@ -5,14 +5,14 @@ import copy
 import inspect
 import sys
 
-import gimp
-from gimp import pdb
-import gimpcolor
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from .. import path as pgpath
 from .. import pdbutils as pgpdbutils
 from .. import utils as pgutils
+from ..pypdb import pdb
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -29,66 +29,69 @@ SettingGuiTypes = meta_.SettingGuiTypes
 
 
 PDB_TYPES_TO_SETTING_TYPES_MAP = {
-  gimpenums.PDB_INT32: 'int',
-  gimpenums.PDB_INT16: 'int',
-  gimpenums.PDB_INT8: 'int',
-  gimpenums.PDB_FLOAT: 'float',
-  gimpenums.PDB_STRING: 'string',
-  
-  gimpenums.PDB_IMAGE: 'image',
-  gimpenums.PDB_ITEM: 'item',
-  gimpenums.PDB_DRAWABLE: 'drawable',
-  gimpenums.PDB_LAYER: 'layer',
-  gimpenums.PDB_CHANNEL: 'channel',
-  gimpenums.PDB_SELECTION: 'selection',
-  gimpenums.PDB_VECTORS: 'vectors',
-  
-  gimpenums.PDB_COLOR: 'color',
-  gimpenums.PDB_PARASITE: 'parasite',
-  gimpenums.PDB_DISPLAY: 'display',
-  gimpenums.PDB_STATUS: 'pdb_status',
-  
-  gimpenums.PDB_INT32ARRAY: {'type': 'array', 'element_type': 'int'},
-  gimpenums.PDB_INT16ARRAY: {'type': 'array', 'element_type': 'int'},
-  gimpenums.PDB_INT8ARRAY: {'type': 'array', 'element_type': 'int'},
-  gimpenums.PDB_FLOATARRAY: {'type': 'array', 'element_type': 'float'},
-  gimpenums.PDB_STRINGARRAY: {'type': 'array', 'element_type': 'string'},
-  gimpenums.PDB_COLORARRAY: {'type': 'array', 'element_type': 'color'},
+  # FIXME: These are temporarily commented until a proper port to GIMP 3 API is done.
+  # gimpenums.PDB_INT32: 'int',
+  # gimpenums.PDB_INT16: 'int',
+  # gimpenums.PDB_INT8: 'int',
+  # gimpenums.PDB_FLOAT: 'float',
+  # gimpenums.PDB_STRING: 'string',
+  #
+  # gimpenums.PDB_IMAGE: 'image',
+  # gimpenums.PDB_ITEM: 'item',
+  # gimpenums.PDB_DRAWABLE: 'drawable',
+  # gimpenums.PDB_LAYER: 'layer',
+  # gimpenums.PDB_CHANNEL: 'channel',
+  # gimpenums.PDB_SELECTION: 'selection',
+  # gimpenums.PDB_VECTORS: 'vectors',
+  #
+  # gimpenums.PDB_COLOR: 'color',
+  # gimpenums.PDB_PARASITE: 'parasite',
+  # gimpenums.PDB_DISPLAY: 'display',
+  # gimpenums.PDB_STATUS: 'pdb_status',
+  #
+  # gimpenums.PDB_INT32ARRAY: {'type': 'array', 'element_type': 'int'},
+  # gimpenums.PDB_INT16ARRAY: {'type': 'array', 'element_type': 'int'},
+  # gimpenums.PDB_INT8ARRAY: {'type': 'array', 'element_type': 'int'},
+  # gimpenums.PDB_FLOATARRAY: {'type': 'array', 'element_type': 'float'},
+  # gimpenums.PDB_STRINGARRAY: {'type': 'array', 'element_type': 'string'},
+  # gimpenums.PDB_COLORARRAY: {'type': 'array', 'element_type': 'color'},
 }
 
 
 class SettingPdbTypes:
-  int32 = gimpenums.PDB_INT32
-  int16 = gimpenums.PDB_INT16
-  int8 = gimpenums.PDB_INT8
-  int = int32
-  float = gimpenums.PDB_FLOAT
-  string = gimpenums.PDB_STRING
-  
-  image = gimpenums.PDB_IMAGE
-  item = gimpenums.PDB_ITEM
-  drawable = gimpenums.PDB_DRAWABLE
-  layer = gimpenums.PDB_LAYER
-  channel = gimpenums.PDB_CHANNEL
-  selection = gimpenums.PDB_SELECTION
-  vectors = gimpenums.PDB_VECTORS
-  path = vectors
-  
-  color = gimpenums.PDB_COLOR
-  parasite = gimpenums.PDB_PARASITE
-  display = gimpenums.PDB_DISPLAY
-  pdb_status = gimpenums.PDB_STATUS
-  
-  array_int32 = gimpenums.PDB_INT32ARRAY
-  array_int16 = gimpenums.PDB_INT16ARRAY
-  array_int8 = gimpenums.PDB_INT8ARRAY
-  array_int = array_int32
-  array_float = gimpenums.PDB_FLOATARRAY
-  array_string = gimpenums.PDB_STRINGARRAY
-  array_color = gimpenums.PDB_COLORARRAY
-  
-  none = None
-  automatic = 'automatic'
+  pass
+  # FIXME: These are temporarily commented until a proper port to GIMP 3 API is done.
+  # int32 = gimpenums.PDB_INT32
+  # int16 = gimpenums.PDB_INT16
+  # int8 = gimpenums.PDB_INT8
+  # int = int32
+  # float = gimpenums.PDB_FLOAT
+  # string = gimpenums.PDB_STRING
+  #
+  # image = gimpenums.PDB_IMAGE
+  # item = gimpenums.PDB_ITEM
+  # drawable = gimpenums.PDB_DRAWABLE
+  # layer = gimpenums.PDB_LAYER
+  # channel = gimpenums.PDB_CHANNEL
+  # selection = gimpenums.PDB_SELECTION
+  # vectors = gimpenums.PDB_VECTORS
+  # path = vectors
+  #
+  # color = gimpenums.PDB_COLOR
+  # parasite = gimpenums.PDB_PARASITE
+  # display = gimpenums.PDB_DISPLAY
+  # pdb_status = gimpenums.PDB_STATUS
+  #
+  # array_int32 = gimpenums.PDB_INT32ARRAY
+  # array_int16 = gimpenums.PDB_INT16ARRAY
+  # array_int8 = gimpenums.PDB_INT8ARRAY
+  # array_int = array_int32
+  # array_float = gimpenums.PDB_FLOATARRAY
+  # array_string = gimpenums.PDB_STRINGARRAY
+  # array_color = gimpenums.PDB_COLORARRAY
+  #
+  # none = None
+  # automatic = 'automatic'
 
 
 class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta_.SettingMeta):
@@ -2002,12 +2005,13 @@ class ArraySetting(Setting):
   _DEFAULT_DEFAULT_VALUE = ()
   
   _ARRAY_PDB_TYPES = {
-    gimpenums.PDB_INT32: gimpenums.PDB_INT32ARRAY,
-    gimpenums.PDB_INT16: gimpenums.PDB_INT16ARRAY,
-    gimpenums.PDB_INT8: gimpenums.PDB_INT8ARRAY,
-    gimpenums.PDB_FLOAT: gimpenums.PDB_FLOATARRAY,
-    gimpenums.PDB_STRING: gimpenums.PDB_STRINGARRAY,
-    gimpenums.PDB_COLOR: gimpenums.PDB_COLORARRAY,
+    # FIXME: These are temporarily commented until a proper port to GIMP 3 API is done.
+    # gimpenums.PDB_INT32: gimpenums.PDB_INT32ARRAY,
+    # gimpenums.PDB_INT16: gimpenums.PDB_INT16ARRAY,
+    # gimpenums.PDB_INT8: gimpenums.PDB_INT8ARRAY,
+    # gimpenums.PDB_FLOAT: gimpenums.PDB_FLOATARRAY,
+    # gimpenums.PDB_STRING: gimpenums.PDB_STRINGARRAY,
+    # gimpenums.PDB_COLOR: gimpenums.PDB_COLORARRAY,
   }
   
   def __init__(self, name, element_type, min_size=0, max_size=None, **kwargs):

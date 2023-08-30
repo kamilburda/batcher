@@ -1,44 +1,44 @@
 """Custom GTK cell renderers."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 __all__ = [
   'CellRendererTextList',
 ]
 
 
-class CellRendererTextList(gtk.CellRendererText):
+class CellRendererTextList(Gtk.CellRendererText):
   """
   This is a custom text-based cell renderer that can accept a list of strings.
   """
   
   __gproperties__ = {
     b'text-list': (
-      gobject.TYPE_PYOBJECT,
+      GObject.TYPE_PYOBJECT,
       b'list of strings',
       'List of strings to render',
-      gobject.PARAM_READWRITE
+      GObject.PARAM_READWRITE
     ),
     b'markup-list': (
-      gobject.TYPE_PYOBJECT,
+      GObject.TYPE_PYOBJECT,
       b'list of strings in markup',
       'List of strings with markup to render',
-      gobject.PARAM_WRITABLE
+      GObject.PARAM_WRITABLE
     ),
     b'text-list-separator': (
-      gobject.TYPE_STRING,
+      GObject.TYPE_STRING,
       b'separator for list of strings',
       'Text separator for the list of strings ("text-list" and "markup-list" properties)',
       ', ',     # Default value
-      gobject.PARAM_READWRITE
+      GObject.PARAM_READWRITE
     ),
   }
   
   def __init__(self):
-    gtk.CellRendererText.__init__(self)
+    super().__init__()
     
     self.text_list = None
     self.markup_list = None
@@ -92,4 +92,4 @@ class CellRendererTextList(gtk.CellRendererText):
     return property_name.replace('-', '_')
 
 
-gobject.type_register(CellRendererTextList)
+GObject.type_register(CellRendererTextList)

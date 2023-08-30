@@ -1,9 +1,9 @@
 """Miscellaneous utility functions related to GTK widgets."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import pango
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
 __all__ = [
   'get_toplevel_window',

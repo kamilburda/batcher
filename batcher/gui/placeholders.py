@@ -3,7 +3,9 @@
 During processing, these placeholders are replaced with real objects.
 """
 
-import gimpui
+import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from batcher import pygimplib as pg
 

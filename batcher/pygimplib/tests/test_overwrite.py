@@ -1,6 +1,5 @@
 import unittest
-
-import mock
+import unittest.mock as mock
 
 from .. import overwrite as pgoverwrite
 from .. import utils as pgutils

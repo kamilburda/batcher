@@ -4,14 +4,15 @@ import collections
 import os
 import traceback
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-
-from gimp import pdb
+import gi
+from gi.repository import GObject
+from gi.repository import GdkPixbuf
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 from batcher import exceptions
 from batcher import utils as utils_
@@ -48,9 +49,9 @@ class NamePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    b'preview-selection-changed': (gobject.SIGNAL_RUN_FIRST, None, ()),
-    b'preview-updated': (gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT,)),
-    b'preview-tags-changed': (gobject.SIGNAL_RUN_FIRST, None, ()),
+    b'preview-selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+    b'preview-updated': (GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    b'preview-tags-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
   }
   
   _ADD_TAG_POPUP_HBOX_SPACING = 5
@@ -63,12 +64,12 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ITEM_NAME,
     _COLUMN_ITEM_ID,
     _COLUMN_ITEM_TYPE) = (
-    [0, gtk.gdk.Pixbuf],
-    [1, gobject.TYPE_BOOLEAN],
-    [2, gobject.TYPE_BOOLEAN],
-    [3, gobject.TYPE_STRING],
-    [4, gobject.TYPE_INT],
-    [5, gobject.TYPE_INT])
+    [0, GdkPixbuf.Pixbuf],
+    [1, GObject.TYPE_BOOLEAN],
+    [2, GObject.TYPE_BOOLEAN],
+    [3, GObject.TYPE_STRING],
+    [4, GObject.TYPE_INT],
+    [5, GObject.TYPE_INT])
   
   def __init__(
         self,
@@ -743,4 +744,4 @@ class NamePreview(preview_base_.Preview):
           self._tree_view.scroll_to_cell(first_selected_item_path, None, True, 0.5, 0.0)
 
 
-gobject.type_register(NamePreview)
+GObject.type_register(NamePreview)

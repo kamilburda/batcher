@@ -3,10 +3,9 @@ import os
 import shutil
 import unittest
 
-import gimp
-from gimp import pdb
-
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 from batcher import actions
 from batcher import core
@@ -41,11 +40,13 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     
     if os.path.exists(INCORRECT_RESULTS_DIRPATH):
       shutil.rmtree(INCORRECT_RESULTS_DIRPATH)
-    
+
+    gimp_version = '-'.join([
+      str(version_number_part) for version_number_part in pg.utils.get_gimp_version_as_tuple()[:2]
+    ])
+
     version_specific_expected_results_dirpath = (
-      DEFAULT_EXPECTED_RESULTS_DIRPATH
-      + '_'
-      + '-'.join([str(version_number_part) for version_number_part in gimp.version[:2]]))
+      DEFAULT_EXPECTED_RESULTS_DIRPATH + '_' + gimp_version)
     
     if os.path.isdir(version_specific_expected_results_dirpath):
       cls.expected_results_root_dirpath = version_specific_expected_results_dirpath

@@ -1,16 +1,16 @@
 """Widget containing a text label that can be optionally edited."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 __all__ = [
   'EditableLabel',
 ]
 
 
-class EditableLabel(gtk.VBox):
+class EditableLabel(Gtk.Box):
   """
   This class is a GTK widget that displays a label and an edit button to allow
   editing the label. Pressing `Enter` or focusing out of the editable text entry
@@ -23,7 +23,7 @@ class EditableLabel(gtk.VBox):
   
   _LABEL_EDIT_BUTTON_SPACING = 4
   
-  __gsignals__ = {b'changed': (gobject.SIGNAL_RUN_FIRST, None, ())}
+  __gsignals__ = {b'changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
   
   def __init__(self, text=None, **kwargs):
     super().__init__(self, **kwargs)
@@ -78,4 +78,4 @@ class EditableLabel(gtk.VBox):
     self.emit('changed')
 
 
-gobject.type_register(EditableLabel)
+GObject.type_register(EditableLabel)

@@ -3,11 +3,11 @@
 Enhanced features include undo/redo history and a customizable popup.
 """
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-import pango
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
 from .. import fileformats as pgfileformats
 from .. import path as pgpath
@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-class ExtendedEntry(gtk.Entry):
+class ExtendedEntry(Gtk.Entry):
   """
   This class is a subclass of `gtk.Entry` with additional capabilities:
   
@@ -190,7 +190,7 @@ class FilenamePatternEntry(ExtendedEntry):
       0, 1, 2, 3)
   
   _COLUMN_TYPES = [
-    gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_STRING]
+    GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_STRING]
   
   def __init__(self, suggested_items, *args, **kwargs):
     """
@@ -470,7 +470,7 @@ class FileExtensionEntry(ExtendedEntry):
   
   _COLUMNS = [_COLUMN_DESCRIPTION, _COLUMN_EXTENSIONS] = (0, 1)
   # [string, list of strings]
-  _COLUMN_TYPES = [gobject.TYPE_STRING, gobject.TYPE_PYOBJECT]
+  _COLUMN_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT]
   
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -799,6 +799,6 @@ class FileExtensionEntry(ExtendedEntry):
     return text_pixel_rects
 
 
-gobject.type_register(ExtendedEntry)
-gobject.type_register(FilenamePatternEntry)
-gobject.type_register(FileExtensionEntry)
+GObject.type_register(ExtendedEntry)
+GObject.type_register(FilenamePatternEntry)
+GObject.type_register(FileExtensionEntry)

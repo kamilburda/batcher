@@ -1,10 +1,11 @@
 import pickle
 
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 import unittest
-
-import mock
+import unittest.mock as mock
 
 from batcher import pygimplib as pg
 

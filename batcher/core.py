@@ -5,8 +5,7 @@ import functools
 import inspect
 import traceback
 
-import gimp
-from gimp import pdb
+from gi.repository import GLib
 
 from batcher import pygimplib as pg
 
@@ -16,6 +15,7 @@ from batcher import builtin_procedures
 from batcher import exceptions
 from batcher import export as export_
 from batcher import placeholders
+from batcher.pygimplib import pdb
 
 
 _BATCHER_ARG_POSITION_IN_ACTIONS = 0
@@ -68,7 +68,7 @@ class Batcher:
         procedures,
         constraints,
         edit_mode=False,
-        output_directory=gimp.user_directory(1),  # `Documents` directory
+        output_directory=GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         layer_filename_pattern='',
         file_extension='png',
         overwrite_mode=pg.overwrite.OverwriteModes.SKIP,

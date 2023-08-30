@@ -7,7 +7,9 @@ import sys
 
 import pygimplib as pg
 
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 import core
 import exceptions

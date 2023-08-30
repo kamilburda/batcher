@@ -5,14 +5,10 @@ it is sufficient to test `itemtree` using one of the subclasses. `LayerTree`
 was chosen for this purpose.
 """
 
+import pickle
+
 import unittest
-
-try:
-  import cPickle as pickle
-except ImportError:
-  import pickle
-
-import mock
+import unittest.mock as mock
 
 from . import stubs_gimp
 from . import utils_itemtree

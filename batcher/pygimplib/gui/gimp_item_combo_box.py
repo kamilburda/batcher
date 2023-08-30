@@ -2,13 +2,14 @@
 
 import collections
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-
-import gimp
-import gimpui
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from .. import utils as pgutils
 
@@ -17,7 +18,7 @@ __all__ = [
 ]
 
 
-class GimpItemComboBox(gtk.VBox):
+class GimpItemComboBox(Gtk.Box):
   """
   This class defines a GTK widget for `gimp.Item` objects acting as an
   abstraction over GIMP objects - layers, channels and vectors.
@@ -33,7 +34,7 @@ class GimpItemComboBox(gtk.VBox):
     * `selected_item` - The currently selected `gimp.Item` object.
   """
   
-  __gsignals__ = {b'changed': (gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT,))}
+  __gsignals__ = {b'changed': (GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,))}
   
   _GimpItemComboBox = collections.namedtuple(
     '_GimpItemComboBox',
@@ -128,4 +129,4 @@ class GimpItemComboBox(gtk.VBox):
     self.emit('changed', self.get_active_item())
 
 
-gobject.type_register(GimpItemComboBox)
+GObject.type_register(GimpItemComboBox)

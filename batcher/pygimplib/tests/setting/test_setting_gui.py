@@ -4,18 +4,15 @@ The GUI also exercises 'setting value changed' events connected to the GUI
 elements.
 """
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-
-import gimp
-from gimp import pdb
-import gimpcolor
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from ... import gui as pggui
 from ... import utils as pgutils
-
+from ...pypdb import pdb
 from ...setting import settings as settings_
 
 

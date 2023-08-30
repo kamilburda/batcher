@@ -2,9 +2,9 @@
 
 import collections
 
-from gimp import pdb
-
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 
 def is_layer(item):

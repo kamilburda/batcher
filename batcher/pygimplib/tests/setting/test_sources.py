@@ -1,7 +1,6 @@
 import io
 import unittest
-
-import mock
+import unittest.mock as mock
 
 from ... import utils as pgutils
 

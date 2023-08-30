@@ -12,18 +12,21 @@ except ImportError:
 else:
   _webbrowser_module_found = True
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-import pango
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
-import gimp
-from gimp import pdb
-import gimpenums
-import gimpui
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 from batcher import actions
 from batcher import core

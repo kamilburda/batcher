@@ -1,8 +1,8 @@
 """Class providing drag-and-drop capability to any GTK widget."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 __all__ = [
   'DragAndDropContext',

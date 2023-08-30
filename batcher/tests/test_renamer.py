@@ -1,6 +1,6 @@
 import unittest
+import unittest.mock as mock
 
-import mock
 import parameterized
 
 from batcher import pygimplib as pg

@@ -2,8 +2,10 @@
 
 import collections
 
-import gimp
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GLib
 
 from batcher import pygimplib as pg
 
@@ -43,9 +45,9 @@ def create_settings():
       'name': 'run_mode',
       'default_value': 'non_interactive',
       'items': [
-        ('interactive', 'RUN-INTERACTIVE', gimpenums.RUN_INTERACTIVE),
-        ('non_interactive', 'RUN-NONINTERACTIVE', gimpenums.RUN_NONINTERACTIVE),
-        ('run_with_last_vals', 'RUN-WITH-LAST-VALS', gimpenums.RUN_WITH_LAST_VALS)],
+        ('interactive', 'RUN-INTERACTIVE', Gimp.RunMode.INTERACTIVE),
+        ('non_interactive', 'RUN-NONINTERACTIVE', Gimp.RunMode.NONINTERACTIVE),
+        ('run_with_last_vals', 'RUN-WITH-LAST-VALS', Gimp.RunMode.WITH_LAST_VALS)],
       'display_name': _('The run mode'),
     },
     {
@@ -74,7 +76,7 @@ def create_settings():
     {
       'type': 'string',
       'name': 'output_directory',
-      'default_value': gimp.user_directory(1),  # `Documents` directory
+      'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       'display_name': _('Output directory'),
       'gui_type': None,
       'tags': ['ignore_reset'],

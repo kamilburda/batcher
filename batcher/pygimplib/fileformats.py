@@ -11,8 +11,8 @@ The file save procedure can be used for multiple purposes, such as:
   on the file extension of the filename).
 """
 
-import gimp
-from gimp import pdb
+from .pypdb import pdb
+from . import utils
 
 
 def get_default_save_procedure():
@@ -98,12 +98,12 @@ file_formats = _create_file_formats([
   {'description': 'ASCII art',
    'file_extensions': ['txt', 'ansi', 'text'],
    'save_procedure_name': 'file-aa-save',
-   'versions': lambda: gimp.version < (2, 9)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() < (2, 9)},
   {'description': 'AutoDesk FLIC animation',
    'file_extensions': ['fli', 'flc']},
   {'description': 'AVIF',
    'file_extensions': ['avif'],
-   'versions': lambda: gimp.version >= (2, 10, 22)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 22)},
   {'description': 'bzip archive',
    'file_extensions': ['xcf.bz2', 'xcfbz2']},
   {'description': 'C source code',
@@ -134,7 +134,7 @@ file_formats = _create_file_formats([
    'file_extensions': ['xcf.gz', 'xcfgz']},
   {'description': 'HEIF/HEIC',
    'file_extensions': ['heic', 'heif'],
-   'versions': lambda: gimp.version >= (2, 10, 2)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 2)},
   {'description': 'HTML table',
    'file_extensions': ['html', 'htm']},
   {'description': 'JPEG image',
@@ -142,7 +142,7 @@ file_formats = _create_file_formats([
   {'description': 'JPEG XL image',
    'file_extensions': ['jxl'],
    'url': 'https://github.com/libjxl/libjxl',
-   'versions': lambda: gimp.version >= (2, 10, 32)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 32)},
   {'description': 'JPEG XR image',
    'file_extensions': ['jxr'],
    'save_procedure_name': 'file-jxr-save',
@@ -151,7 +151,7 @@ file_formats = _create_file_formats([
    'file_extensions': ['json'],
    'save_procedure_func': (
      lambda run_mode, *args: pdb.file_metadata_json_save(*args, run_mode=run_mode)),
-   'versions': lambda: gimp.version >= (2, 10),
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
    'url': 'https://github.com/kamilburda/gimp-metadata-export'},
   {'description': 'KISS CEL',
    'file_extensions': ['cel']},
@@ -163,12 +163,12 @@ file_formats = _create_file_formats([
    'file_extensions': ['ora']},
   {'description': 'OpenEXR image',
    'file_extensions': ['exr'],
-   'versions': lambda: gimp.version >= (2, 10)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
   {'description': 'PBM image',
    'file_extensions': ['pbm']},
   {'description': 'PFM image',
    'file_extensions': ['pfm'],
-   'versions': lambda: gimp.version >= (2, 10)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
   {'description': 'PGM image',
    'file_extensions': ['pgm']},
   {'description': 'Photoshop image',
@@ -191,7 +191,7 @@ file_formats = _create_file_formats([
    'file_extensions': ['ppm']},
   {'description': 'Radiance RGBE',
    'file_extensions': ['hdr'],
-   'versions': lambda: gimp.version >= (2, 10)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
   {'description': 'Raw image data',
    'file_extensions': ['data', 'raw'],
    'save_procedure_func': (
@@ -215,7 +215,7 @@ file_formats = _create_file_formats([
   {'description': 'X11 Mouse Cursor',
    'save_procedure_name': 'file-xmc-save',
    'file_extensions': ['xmc'],
-   'versions': lambda: gimp.version < (2, 9)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() < (2, 9)},
   {'description': 'X BitMap image',
    'file_extensions': ['xbm', 'bitmap']},
   {'description': 'X PixMap image',
@@ -226,16 +226,16 @@ file_formats = _create_file_formats([
    'file_extensions': ['xml'],
    'save_procedure_func': (
      lambda run_mode, *args: pdb.file_metadata_xml_save(*args, run_mode=run_mode)),
-   'versions': lambda: gimp.version >= (2, 10),
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
    'url': 'https://github.com/kamilburda/gimp-metadata-export'},
   {'description': 'xz archive',
    'file_extensions': ['xcf.xz', 'xcfxz'],
-   'versions': lambda: gimp.version >= (2, 10)},
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
   {'description': 'YAML metadata',
    'file_extensions': ['yaml'],
    'save_procedure_func': (
      lambda run_mode, *args: pdb.file_metadata_yaml_save(*args, run_mode=run_mode)),
-   'versions': lambda: gimp.version >= (2, 10),
+   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
    'url': 'https://github.com/kamilburda/gimp-metadata-export'},
   {'description': 'ZSoft PCX image',
    'file_extensions': ['pcx', 'pcc']},

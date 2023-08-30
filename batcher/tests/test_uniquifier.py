@@ -1,7 +1,6 @@
 import collections
 import unittest
-
-import mock
+import unittest.mock as mock
 
 from batcher import pygimplib as pg
 

@@ -2,7 +2,7 @@
 
 import collections
 
-import gimp
+from gi.repository import GLib
 
 from batcher import pygimplib as pg
 
@@ -95,7 +95,7 @@ def create_gui_settings():
       # Needs to be string type to avoid strict directory validation.
       'type': 'string',
       'name': 'current_directory',
-      'default_value': gimp.user_directory(1),  # `Documents` directory
+      'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       'gui_type': None,
       'tags': ['ignore_load'],
       'setting_sources': ['session'],

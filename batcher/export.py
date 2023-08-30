@@ -3,15 +3,17 @@
 import collections
 import os
 
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GLib
 
 from batcher import pygimplib as pg
 
 from batcher import exceptions
 from batcher import renamer as renamer_
 from batcher import uniquifier
+from batcher.pygimplib import pdb
 
 
 class ExportModes:
@@ -25,7 +27,7 @@ class ExportModes:
 
 def export(
       batcher,
-      output_directory=gimp.user_directory(1),  # `Documents` directory
+      output_directory=GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       file_extension='png',
       export_mode=ExportModes.EACH_LAYER,
       single_image_filename_pattern=None,

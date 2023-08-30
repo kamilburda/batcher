@@ -1,11 +1,12 @@
 """Tests for the `setting.setting` and `setting.presenter` modules."""
 
 import unittest
+import unittest.mock as mock
 
-import gimpcolor
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
-import mock
 import parameterized
 
 from ... import utils as pgutils

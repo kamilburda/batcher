@@ -2,13 +2,15 @@
 
 import collections
 
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GLib
 
 from batcher import background_foreground
 from batcher import export as export_
 from batcher import renamer as renamer_
+from batcher.pygimplib import pdb
 
 
 NAME_ONLY_TAG = 'name'
@@ -150,7 +152,7 @@ _BUILTIN_PROCEDURES_LIST = [
       {
         'type': 'directory',
         'name': 'output_directory',
-        'default_value': gimp.user_directory(1),  # `Documents` directory
+        'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         'display_name': _('Output folder'),
         'gui_type': 'folder_chooser_button',
       },
@@ -254,9 +256,9 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'merge_type',
         'default_value': 'expand_as_necessary',
         'items': [
-          ('expand_as_necessary', _('Expand as necessary'), gimpenums.EXPAND_AS_NECESSARY),
-          ('clip_to_image', _('Clip to image'), gimpenums.CLIP_TO_IMAGE),
-          ('clip_to_bottom_layer', _('Clip to bottom layer'), gimpenums.CLIP_TO_BOTTOM_LAYER),
+          ('expand_as_necessary', _('Expand as necessary'), Gimp.MergeType.EXPAND_AS_NECESSARY),
+          ('clip_to_image', _('Clip to image'), Gimp.MergeType.CLIP_TO_IMAGE),
+          ('clip_to_bottom_layer', _('Clip to bottom layer'), Gimp.MergeType.CLIP_TO_BOTTOM_LAYER),
         ],
         'display_name': _('Merge type'),
       },
@@ -272,9 +274,9 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'merge_type',
         'default_value': 'expand_as_necessary',
         'items': [
-          ('expand_as_necessary', _('Expand as necessary'), gimpenums.EXPAND_AS_NECESSARY),
-          ('clip_to_image', _('Clip to image'), gimpenums.CLIP_TO_IMAGE),
-          ('clip_to_bottom_layer', _('Clip to bottom layer'), gimpenums.CLIP_TO_BOTTOM_LAYER),
+          ('expand_as_necessary', _('Expand as necessary'), Gimp.MergeType.EXPAND_AS_NECESSARY),
+          ('clip_to_image', _('Clip to image'), Gimp.MergeType.CLIP_TO_IMAGE),
+          ('clip_to_bottom_layer', _('Clip to bottom layer'), Gimp.MergeType.CLIP_TO_BOTTOM_LAYER),
         ],
         'display_name': _('Merge type'),
       },

@@ -6,10 +6,10 @@ The widget is used as the default GUI for `setting.ArraySetting` instances.
 import collections
 import contextlib
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from .. import utils as pgutils
 
@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class ItemBox(gtk.ScrolledWindow):
+class ItemBox(Gtk.ScrolledWindow):
   """
   This base class defines a scrollable box holding a vertical list of items.
   Each item is an instance of `ItemBoxItem` class or one of its subclasses.
@@ -248,8 +248,8 @@ class ArrayBox(ItemBox):
   """
   
   __gsignals__ = {
-    b'array-box-changed': (gobject.SIGNAL_RUN_FIRST, None, ()),
-    b'array-box-item-changed': (gobject.SIGNAL_RUN_FIRST, None, ())}
+    b'array-box-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+    b'array-box-item-changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
   
   _SIZE_HBOX_SPACING = 6
   
@@ -580,4 +580,4 @@ class _ActionLocker:
     return self._tokens[key] == 0
 
 
-gobject.type_register(ArrayBox)
+GObject.type_register(ArrayBox)

@@ -1,12 +1,12 @@
 import collections
 
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import unittest
+import unittest.mock as mock
 
-import mock
 import parameterized
 
 from batcher import pygimplib as pg

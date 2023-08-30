@@ -18,7 +18,9 @@ The following placeholder objects are defined:
 
 import collections
 
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
 
@@ -129,8 +131,9 @@ class PlaceholderItemSetting(PlaceholderSetting):
 
 
 PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP = {
-  gimpenums.PDB_IMAGE: 'placeholder_image',
-  gimpenums.PDB_ITEM: 'placeholder_item',
-  gimpenums.PDB_DRAWABLE: 'placeholder_drawable',
-  gimpenums.PDB_LAYER: 'placeholder_layer',
+  # FIXME: These are temporarily commented until a proper port to GIMP 3 API is done.
+  # gimpenums.PDB_IMAGE: 'placeholder_image',
+  # gimpenums.PDB_ITEM: 'placeholder_item',
+  # gimpenums.PDB_DRAWABLE: 'placeholder_drawable',
+  # gimpenums.PDB_LAYER: 'placeholder_layer',
 }

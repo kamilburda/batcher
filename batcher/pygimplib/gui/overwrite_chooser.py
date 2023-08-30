@@ -2,12 +2,12 @@
 
 import os
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-
-import gimpui
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from .. import overwrite as pgoverwrite
 

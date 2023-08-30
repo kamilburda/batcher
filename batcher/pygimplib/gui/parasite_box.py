@@ -1,11 +1,11 @@
 """Widget for `gimp.Parasite` instances."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-
-import gimp
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from .. import utils as pgutils
 
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class ParasiteBox(gtk.HBox):
+class ParasiteBox(Gtk.Box):
   """
   This is a subclass of `gtk.VBox` to edit `gimp.Parasite` instances
   interactively.
@@ -24,7 +24,7 @@ class ParasiteBox(gtk.HBox):
   * `'parasite-changed'` - The parasite was modified by the user.
   """
   
-  __gsignals__ = {b'parasite-changed': (gobject.SIGNAL_RUN_FIRST, None, ())}
+  __gsignals__ = {b'parasite-changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
   
   _HBOX_SPACING = 5
   _VBOX_SPACING = 3
@@ -116,4 +116,4 @@ class ParasiteBox(gtk.HBox):
       self.emit('parasite-changed')
 
 
-gobject.type_register(ParasiteBox)
+GObject.type_register(ParasiteBox)

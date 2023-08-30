@@ -1,15 +1,18 @@
 """Widgets to interactively edit actions (procedures/constraints)."""
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-import pango
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
-from gimp import pdb
-import gimpui
+import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 from batcher import actions as actions_
 from batcher.gui import messages as messages_
@@ -52,11 +55,11 @@ class ActionBox(pg.gui.ItemBox):
   
   __gsignals__ = {
     b'action-box-item-added': (
-      gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT,)),
+      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     b'action-box-item-reordered': (
-      gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT, gobject.TYPE_INT)),
+      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_INT)),
     b'action-box-item-removed': (
-      gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT,)),
+      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
   _ADD_BUTTON_HBOX_SPACING = 6
@@ -444,7 +447,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
 
 
-class _ActionEditDialog(gimpui.Dialog):
+class _ActionEditDialog(GimpUi.Dialog):
   
   _DIALOG_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 8
@@ -479,7 +482,7 @@ class _ActionEditDialog(gimpui.Dialog):
     self._label_procedure_name.label.set_use_markup(True)
     self._label_procedure_name.label.set_ellipsize(pango.ELLIPSIZE_END)
     self._label_procedure_name.label.set_markup(
-      '<b>{}</b>'.format(gobject.markup_escape_text(action['display_name'].value)))
+      '<b>{}</b>'.format(GObject.markup_escape_text(action['display_name'].value)))
     self._label_procedure_name.connect(
       'changed', self._on_label_procedure_name_changed, action)
     
@@ -570,7 +573,7 @@ class _ActionEditDialog(gimpui.Dialog):
     action['display_name'].set_value(editable_label.label.get_text())
     
     editable_label.label.set_markup(
-      '<b>{}</b>'.format(gobject.markup_escape_text(editable_label.label.get_text())))
+      '<b>{}</b>'.format(GObject.markup_escape_text(editable_label.label.get_text())))
   
   def _on_action_edit_dialog_response(self, dialog, response_id, action):
     for child in list(self._table_action_arguments.get_children()):
@@ -595,7 +598,7 @@ class _ActionEditDialog(gimpui.Dialog):
     label.set_use_markup(True)
     label.set_markup(
       '<span font_size="small">{}</span>'.format(
-        gobject.markup_escape_text(_('Cannot modify this parameter'))))
+        GObject.markup_escape_text(_('Cannot modify this parameter'))))
     
     hbox.pack_start(label, expand=False, fill=False)
     

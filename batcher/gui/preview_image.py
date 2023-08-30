@@ -4,17 +4,19 @@ import array
 import time
 import traceback
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-import pango
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 from batcher import actions
 from batcher import builtin_constraints
@@ -47,7 +49,7 @@ class ImagePreview(preview_base_.Preview):
   
   __gsignals__ = {
     b'preview-updated': (
-      gobject.SIGNAL_RUN_FIRST, None, (gobject.TYPE_PYOBJECT, gobject.TYPE_FLOAT)),
+      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_FLOAT)),
   }
   
   _MANUAL_UPDATE_LOCK = '_manual_update'
@@ -558,7 +560,7 @@ class ImagePreview(preview_base_.Preview):
   
   def _set_item_name_label(self, item_name):
     self._label_item_name.set_markup(
-      '<i>{}</i>'.format(gobject.markup_escape_text(pg.utils.safe_encode_gtk(item_name))))
+      '<i>{}</i>'.format(GObject.markup_escape_text(pg.utils.safe_encode_gtk(item_name))))
   
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)
@@ -648,4 +650,4 @@ class ImagePreview(preview_base_.Preview):
       array.array(b'B', preview_data).tostring())
 
 
-gobject.type_register(ImagePreview)
+GObject.type_register(ImagePreview)

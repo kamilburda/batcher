@@ -3,8 +3,6 @@
 import itertools
 import pickle
 
-import gimp
-
 from .. import utils as pgutils
 
 
@@ -232,8 +230,6 @@ class GimpModuleStub(ParasiteFunctionsStubMixin, ShelfFunctionsStubMixin):
   Channel = ChannelStub
   Vectors = VectorsStub
   Display = DisplayStub
-  
-  error = gimp.error
   
   def __init__(self):
     ParasiteFunctionsStubMixin.__init__(self)

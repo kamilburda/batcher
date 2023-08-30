@@ -4,12 +4,8 @@ import abc
 import ast
 import collections
 import os
+import pickle
 import traceback
-
-try:
-  import cPickle as pickle
-except ImportError:
-  import pickle
 
 try:
   import json
@@ -18,9 +14,9 @@ except ImportError:
 else:
   _json_module_found = True
 
-import gimp
-import gimpenums
-import gimpshelf
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from .. import constants as pgconstants
 from .. import utils as pgutils

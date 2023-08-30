@@ -2,17 +2,14 @@
 
 import abc
 import collections
+import pickle
 
-try:
-  import cPickle as pickle
-except ImportError:
-  import pickle
-
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from . import objectfilter as pgobjectfilter
+from .pypdb import pdb
 from . import utils as pgutils
 
 

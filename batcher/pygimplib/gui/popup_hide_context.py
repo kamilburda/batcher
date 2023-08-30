@@ -1,6 +1,6 @@
 """Class simplifying hiding a popup window based on user actions."""
 
-import gobject
+from gi.repository import GObject
 
 from . import utils as utils_
 

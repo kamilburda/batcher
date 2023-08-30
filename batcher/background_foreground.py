@@ -1,12 +1,14 @@
 """Background and foreground layer insertion and manipulation."""
 
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import exceptions
 
 from batcher import pygimplib as pg
+
+from batcher.pygimplib import pdb
 
 
 def insert_background_layer(batcher, tag):
@@ -98,7 +100,7 @@ def _remove_locks_from_layer(layer):
     pdb.gimp_layer_set_lock_alpha(layer, False)
 
 
-def merge_background(batcher, merge_type=gimpenums.EXPAND_AS_NECESSARY):
+def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
   _merge_tagged_layer(
     batcher,
     merge_type,
@@ -106,7 +108,7 @@ def merge_background(batcher, merge_type=gimpenums.EXPAND_AS_NECESSARY):
     'current_item')
 
 
-def merge_foreground(batcher, merge_type=gimpenums.EXPAND_AS_NECESSARY):
+def merge_foreground(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
   _merge_tagged_layer(
     batcher,
     merge_type,

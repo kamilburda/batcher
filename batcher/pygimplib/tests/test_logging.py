@@ -1,6 +1,6 @@
 import unittest
-
 import unittest.mock as mock
+
 import parameterized
 
 from .. import logging as pglogging

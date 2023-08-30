@@ -2,18 +2,20 @@
 
 import os
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-import gobject
-import pango
+import gi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
-import gimp
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from batcher import pygimplib as pg
 
 
-class MessageLabel(gtk.HBox):
+class MessageLabel(Gtk.Box):
   """
   This class defines a widget to display a label, and optionally additional
   information in a popup below the label. The popup is also available if the
@@ -54,7 +56,7 @@ class MessageLabel(gtk.HBox):
     for widget in wigets_to_exclude_from_hiding_popup_with_button_press:
       self._popup_hide_context.exclude_widget_from_hiding_with_button_press(widget)
   
-  def set_text(self, text, message_type=gtk.MESSAGE_ERROR, clear_delay=None):
+  def set_text(self, text, message_type=Gtk.MessageType.ERROR, clear_delay=None):
     """
     Set the `text` of the label. The text is displayed in bold style.
     
@@ -191,4 +193,4 @@ class MessageLabel(gtk.HBox):
       and not (os.name == 'nt' and ((2, 10, 0) <= gimp.version < (2, 10, 6))))
 
 
-gobject.type_register(MessageLabel)
+GObject.type_register(MessageLabel)
