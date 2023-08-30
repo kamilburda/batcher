@@ -1,5 +1,4 @@
 """Management of version numbers (particularly incrementing)."""
-
 import re
 
 
@@ -85,15 +84,15 @@ class Version:
     specified, `1` will be assigned (e.g. `3.3` becomes `3.3.1`).
     
     If the `prerelease` string is not `None` and non-empty, append the
-    pre-release to the version. For example, `3.3` with `'major'` compoment and
-    `'alpha'` as the pre-release string becomes `4.0-alpha`.
+    prerelease to the version. For example, `3.3` with `'major'` compoment and
+    `'alpha'` as the prerelease string becomes `4.0-alpha`.
     
-    If the version already has the same pre-release, append a number to the
-    pre-release (e.g. `4.0-alpha` becomes `4.0-alpha.2`).
+    If the version already has the same prerelease, append a number to the
+    prerelease (e.g. `4.0-alpha` becomes `4.0-alpha.2`).
     
-    If the version already has a different pre-release (lexically earlier than
-    `prerelease`), replace the existing pre-release with `prerelease` (e.g.
-    `4.0-alpha` with the `'beta'` pre-release becomes `4.0-beta`).
+    If the version already has a different prerelease (lexically earlier than
+    `prerelease`), replace the existing prerelease with `prerelease` (e.g.
+    `4.0-alpha` with the `'beta'` prerelease becomes `4.0-beta`).
     
     Raises:
     
@@ -151,6 +150,8 @@ class Version:
       increment_component_func = increment_minor
     elif component_to_increment == 'patch':
       increment_component_func = increment_patch
+    else:
+      raise ValueError('increment can only be one of "major", "minor" or "patch"')
     
     if prerelease is None:
       increment_component_func()
