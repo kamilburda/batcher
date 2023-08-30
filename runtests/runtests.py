@@ -19,6 +19,8 @@ To run tests in GIMP:
 
 To repeat the tests, simply call the procedure again.
 """
+from typing import List, Optional
+
 import importlib
 import inspect
 import os
@@ -39,7 +41,10 @@ if PLUGIN_DIRPATH not in sys.path:
 from batcher import pygimplib as pg
 
 
-def plug_in_run_tests(procedure, run_mode, config):
+def plug_in_run_tests(
+      procedure: Gimp.Procedure,
+      run_mode: Gimp.RunMode,
+      config: Gimp.ProcedureConfig):
   run_tests(
     config.get_property('dirpath'),
     config.get_property('prefix'),
@@ -50,11 +55,11 @@ def plug_in_run_tests(procedure, run_mode, config):
 
 
 def run_tests(
-      dirpath,
-      test_module_name_prefix='test_',
-      modules=None,
-      ignored_modules=None,
-      output_stream='stderr'):
+      dirpath: str,
+      test_module_name_prefix: str = 'test_',
+      modules: Optional[List[str]] = None,
+      ignored_modules: Optional[List[str]] = None,
+      output_stream: str = 'stderr'):
   """Runs all modules containing tests located in the specified directory path.
 
   Modules containing tests are considered those that contain the
