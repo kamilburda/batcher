@@ -257,7 +257,7 @@ def display_message(
       message_type,
       title=None,
       parent=None,
-      buttons=gtk.BUTTONS_OK,
+      buttons=Gtk.ButtonsType.OK,
       message_in_text_view=False,
       button_response_id_to_focus=None,
       message_markup=False):
