@@ -6,7 +6,6 @@ user documentation).
 """
 
 import collections
-import io
 import os
 import pathlib
 import re
@@ -265,8 +264,8 @@ def write_to_html_file(html_tree, html_file):
 def get_html_parser(html_filepath):
   parser = LocalJekyllHTMLParser()
   
-  with io.open(html_filepath, 'r', encoding=FILE_ENCODING) as html_file:
-    parser.feed(html_file.read())
+  with open(html_filepath, 'r', encoding=FILE_ENCODING) as f:
+    parser.feed(f.read())
   
   parser.close()
   
@@ -277,8 +276,8 @@ def init_page_config(page_config_filepath):
   global PAGE_CONFIG
   
   if PAGE_CONFIG is None:
-    with io.open(page_config_filepath, 'r', encoding=FILE_ENCODING) as page_config_file:
-      PAGE_CONFIG = yaml.load(page_config_file.read())
+    with open(page_config_filepath, 'r', encoding=FILE_ENCODING) as f:
+      PAGE_CONFIG = yaml.load(f.read())
 
 
 def modify_url_attributes_in_file(
@@ -292,8 +291,8 @@ def modify_url_attributes_in_file(
   
   modify_url_attributes(parser.tree, get_new_url_attribute_value_func)
   
-  with io.open(output_html_filepath, 'wb') as toplevel_html_file:
-    write_to_html_file(parser.tree, toplevel_html_file)
+  with open(output_html_filepath, 'wb') as f:
+    write_to_html_file(parser.tree, f)
 
 
 #===============================================================================
@@ -312,8 +311,8 @@ def main(site_dirpath, page_config_filepath):
     rename_paths_in_url_attributes(
       RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
     
-    with io.open(html_filepath, 'wb') as html_file:
-      write_to_html_file(parser.tree, html_file)
+    with open(html_filepath, 'wb') as f:
+      write_to_html_file(parser.tree, f)
   
   reorganize_files(site_dirpath)
 

@@ -4,7 +4,6 @@
 # initialization), we are breaking the 'all imports at the beginning of module' convention.
 
 import datetime
-import io
 import os
 import sys
 import traceback
@@ -104,7 +103,7 @@ def create_log_file(log_dirpaths, log_filename, mode='a'):
       continue
     
     try:
-      log_file = io.open(os.path.join(log_dirpath, log_filename), mode, encoding='utf-8')
+      log_file = open(os.path.join(log_dirpath, log_filename), mode, encoding='utf-8')
     except IOError:
       continue
     else:

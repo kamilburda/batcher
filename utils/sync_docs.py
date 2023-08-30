@@ -8,7 +8,6 @@ because any previous updates to such files are discarded.
 """
 from batcher import pygimplib as pg
 
-import io
 import os
 import shutil
 
@@ -58,8 +57,8 @@ def get_filepaths(file_list_filepath):
     processed_path = os.path.join(path_root, processed_path)
     return processed_path
   
-  with io.open(file_list_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as file_:
-    lines = file_.readlines()
+  with open(file_list_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    lines = f.readlines()
   
   lines = [line.strip() for line in lines if line.strip()]
   

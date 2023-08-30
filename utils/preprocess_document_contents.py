@@ -41,7 +41,6 @@ The following tags can be specified in the documents:
 from batcher import pygimplib as pg
 
 import abc
-import io
 import os
 import re
 import sys
@@ -55,8 +54,8 @@ def preprocess_contents(source_and_dest_filepaths):
           source_filepath))
       continue
     
-    with io.open(source_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as file_:
-      source_file_contents = file_.read()
+    with open(source_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+      source_file_contents = f.read()
     
     preprocessed_contents = source_file_contents
     
@@ -68,8 +67,8 @@ def preprocess_contents(source_and_dest_filepaths):
       except DocumentNotFoundError as e:
         print(str(e))
     
-    with io.open(dest_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as file_:
-      file_.writelines(preprocessed_contents)
+    with open(dest_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+      f.writelines(preprocessed_contents)
 
 
 def _preprocess_contents(source_filepath, tag, file_contents):
@@ -204,8 +203,8 @@ class IncludeSectionTag(CustomLiquidTag):
         'Document path "{}" inside "{}" does not exist or is not a file'.format(
           document_filepath, self.source_filepath))
     
-    with io.open(document_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as document:
-      document_contents = document.read()
+    with open(document_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+      document_contents = f.read()
       if section_name:
         section_header, section_contents = find_section(document_contents, section_name)
       elif not section_name and self.optional_args['no-header']:

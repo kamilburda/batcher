@@ -26,7 +26,6 @@ if current_module_dirpath not in sys.path:
 from batcher import pygimplib as pg
 
 import importlib
-import io
 import pkgutil
 import unittest
 
@@ -98,7 +97,7 @@ def _get_output_stream(stream_or_filepath):
   if hasattr(sys, stream_or_filepath):
     return _Stream(getattr(sys, stream_or_filepath))
   else:
-    return io.open(stream_or_filepath, 'wb')
+    return open(stream_or_filepath, 'wb')
   
 
 class _Stream(object):

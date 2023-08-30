@@ -168,9 +168,10 @@ def _restore_repo_files(
 
 def _get_path_specs_with_git_filters_from_gitattributes(repository_dirpath):
   path_specs = []
+  gitattributes_filepath = os.path.join(repository_dirpath, '.gitattributes')
   
-  with io.open(os.path.join(repository_dirpath, '.gitattributes')) as gitattributes_file:
-    for line in gitattributes_file:
+  with open(gitattributes_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    for line in f:
       match = re.search(r'\s*(.*?)\s+filter=', line)
       if match:
         path_specs.append(match.group(1))
@@ -179,9 +180,9 @@ def _get_path_specs_with_git_filters_from_gitattributes(repository_dirpath):
 
 
 def _get_filtered_filepaths(dirpath, pattern_filepath):
-  with io.open(pattern_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as file_:
+  with open(pattern_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
     spec_obj = pathspec.PathSpec.from_lines(
-      pathspec.patterns.gitwildmatch.GitWildMatchPattern, file_)
+      pathspec.patterns.gitwildmatch.GitWildMatchPattern, f)
   
   return [os.path.join(dirpath, match) for match in spec_obj.match_tree(dirpath)]
 

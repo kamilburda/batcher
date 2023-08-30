@@ -3,7 +3,6 @@
 import abc
 import ast
 import collections
-import io
 import os
 import traceback
 import types
@@ -701,7 +700,7 @@ class PickleFileSource(Source):
     all_data = collections.OrderedDict()
     
     try:
-      with io.open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         for line in f:
           split = line.split(self._SOURCE_NAME_CONTENTS_SEPARATOR, 1)
           if len(split) == 2:
@@ -718,7 +717,7 @@ class PickleFileSource(Source):
     `all_data` is a dictionary of (source name, contents) pairs.
     """
     try:
-      with io.open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         for source_name, contents in all_data.items():
           f.write(source_name + self._SOURCE_NAME_CONTENTS_SEPARATOR + contents + '\n')
     except Exception:
@@ -810,7 +809,7 @@ class JsonFileSource(Source):
     all_data = collections.OrderedDict()
     
     try:
-      with io.open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         all_data = json.load(f)
     except Exception:
       raise SourceReadError(traceback.format_exc())
@@ -823,7 +822,7 @@ class JsonFileSource(Source):
     `all_data` is a dictionary of (source name, contents) pairs.
     """
     try:
-      with io.open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         # Workaround for Python 2 code to properly handle Unicode strings
         raw_data = json.dumps(all_data, f, sort_keys=False, indent=4, separators=(',', ': '))
         f.write(unicode(raw_data))

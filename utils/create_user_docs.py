@@ -3,7 +3,6 @@
 """Generating user documentation from GitHub Pages files."""
 from batcher import pygimplib as pg
 
-import io
 import os
 import shutil
 import sys
@@ -31,8 +30,8 @@ def run_github_page_locally(github_page_dirpath):
   
   page_config_filepath = os.path.join(github_page_dirpath, PAGE_CONFIG_FILENAME)
   
-  with io.open(page_config_filepath, 'r', encoding=FILE_ENCODING) as page_config_file:
-    page_config = yaml.load(page_config_file.read())
+  with open(page_config_filepath, 'r', encoding=FILE_ENCODING) as f:
+    page_config = yaml.load(f.read())
   
   page_ready = False
   

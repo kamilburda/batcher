@@ -6,7 +6,6 @@ import collections
 import distutils.util
 import getpass
 import inspect
-import io
 import json
 import os
 import re
@@ -194,8 +193,8 @@ def _prompt_to_proceed():
 
 
 def _get_release_notes_and_modify_changelog_first_header(release_metadata):
-  with io.open(CHANGELOG_FILEPATH, 'r', encoding=pg.TEXT_FILE_ENCODING) as file_:
-    changelog_contents = file_.read()
+  with open(CHANGELOG_FILEPATH, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    changelog_contents = f.read()
   
   header_raw, release_notes = (
     preprocess_document_contents.find_section(changelog_contents))
@@ -229,8 +228,8 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
         changelog_contents,
         count=1)
   
-    with io.open(CHANGELOG_FILEPATH, 'w', encoding=pg.TEXT_FILE_ENCODING) as file_:
-      file_.write(changelog_contents)
+    with open(CHANGELOG_FILEPATH, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+      f.write(changelog_contents)
 
 
 def _update_version_and_release_date_in_config(release_metadata, plugin_config_filepath):
@@ -247,9 +246,8 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
   if release_metadata.dry_run:
     return
   
-  with io.open(
-         plugin_config_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as config_file:
-    lines = config_file.readlines()
+  with open(plugin_config_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    lines = f.readlines()
   
   def get_entry_pattern(entry):
     return r'^(c\.' + re.escape(entry) + " = )'(.*)'$"
@@ -270,9 +268,8 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
     _print_error_and_exit('Error: missing the following entries in file "{}": {}'.format(
       plugin_config_filepath, ', '.join(entries_to_find)))
   
-  with io.open(
-         plugin_config_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as config_file:
-    config_file.writelines(lines)
+  with open(plugin_config_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+    f.writelines(lines)
 
 
 def _generate_translation_file(release_metadata):
@@ -420,8 +417,8 @@ def _upload_installers_to_github(release_metadata, upload_url, access_token_head
       else:
         continue
       
-      with io.open(os.path.join(root_dirpath, filename), 'rb') as file_:
-        file_contents = file_.read()
+      with open(os.path.join(root_dirpath, filename), 'rb') as f:
+        file_contents = f.read()
       
       headers = dict(access_token_header)
       headers['Content-Type'] = FILE_EXTENSIONS_AND_MIME_TYPES[file_extension]

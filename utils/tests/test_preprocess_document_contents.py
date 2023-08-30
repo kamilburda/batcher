@@ -161,7 +161,7 @@ plug-in that exports layers as separate images."""
      + '\n' + ' '.join(_TEST_SECTION_CONTENTS['known_issues'][1:3])],
   ])
   @mock.patch('preprocess_document_contents.os.path.isfile')
-  @mock.patch('preprocess_document_contents.io.open')
+  @mock.patch('builtins.open')
   def test_include_section(
         self,
         test_case_name,
