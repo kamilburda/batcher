@@ -5,9 +5,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 
-_gimp_pdb = Gimp.get_pdb()
-
-
 class _PyPDB:
 
   def __init__(self):
@@ -53,7 +50,7 @@ class _PyPDB:
 
   @staticmethod
   def _procedure_exists(proc_name):
-    return _gimp_pdb.procedure_exists(proc_name)
+    return Gimp.get_pdb().procedure_exists(proc_name)
 
 
 class PyPDBProcedure:
@@ -62,7 +59,7 @@ class PyPDBProcedure:
     self._pdb_wrapper = pdb_wrapper
     self._name = proc_name
 
-    self._info = _gimp_pdb.lookup_procedure(self._name)
+    self._info = Gimp.get_pdb().lookup_procedure(self._name)
     self._has_run_mode = self._get_has_run_mode()
 
   @property
@@ -89,11 +86,11 @@ class PyPDBProcedure:
         config: Optional[Gimp.ProcedureConfig] = None):
     if config is None:
       if self._has_run_mode:
-        result = _gimp_pdb.run_procedure(self._name, [run_mode, *args])
+        result = Gimp.get_pdb().run_procedure(self._name, [run_mode, *args])
       else:
-        result = _gimp_pdb.run_procedure(self._name, args)
+        result = Gimp.get_pdb().run_procedure(self._name, args)
     else:
-      result = _gimp_pdb.run_procedure_config(self._name, config)
+      result = Gimp.get_pdb().run_procedure_config(self._name, config)
 
     if result is None:
       return None
