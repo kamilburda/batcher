@@ -1,4 +1,7 @@
 """Class for creating plug-in-wide configuration."""
+
+from typing import Optional
+
 import builtins
 import os
 
@@ -33,7 +36,7 @@ class _Config:
     return name in self._config
 
 
-def create_config(pygimplib_dirpath, root_plugin_dirpath):
+def create_config(pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]) -> _Config:
   """Creates plug-in configuration.
 
   The configuration object contains plug-in-wide variables such as plug-in
@@ -56,7 +59,8 @@ def create_config(pygimplib_dirpath, root_plugin_dirpath):
   return config
 
 
-def _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath):
+def _init_config_initial(
+      config: _Config, pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]):
   config.PYGIMPLIB_DIRPATH = pygimplib_dirpath
 
   if root_plugin_dirpath is not None:
@@ -85,7 +89,7 @@ def _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath):
   config.LOG_MODE = 'exceptions'
 
 
-def _init_config_logging(config):
+def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_DIRPATHS = []
   config.PLUGINS_LOG_DIRPATHS.append(config.DEFAULT_LOGS_DIRPATH)
 
@@ -105,7 +109,7 @@ def _init_config_logging(config):
   config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS = 50
 
 
-def _init_config_from_file(config):
+def _init_config_from_file(config: _Config):
   orig_builtin_c = None
   if hasattr(builtins, 'c'):
     orig_builtin_c = builtins.c
@@ -129,7 +133,7 @@ def _init_config_from_file(config):
     builtins.c = orig_builtin_c
 
 
-def _init_config_per_procedure(config):
+def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
   config.SESSION_SOURCE = setting.GimpShelfSource(config.SOURCE_NAME)
   config.PERSISTENT_SOURCE = setting.GimpParasiteSource(config.SOURCE_NAME)
