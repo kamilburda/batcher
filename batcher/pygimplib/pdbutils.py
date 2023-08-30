@@ -5,9 +5,9 @@ defined in the GIMP procedural database (PDB) or the GIMP Python API.
 import os
 import contextlib
 
-import gimp
-from gimp import pdb
-import gimpenums
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 from . import invocation as pginvocation
 from . import utils as pgutils
@@ -566,7 +566,7 @@ def merge_layer_group(layer_group):
 
 
 @contextlib.contextmanager
-def redirect_messages(message_handler=gimpenums.ERROR_CONSOLE):
+def redirect_messages(message_handler=Gimp.MessageHandlerType.ERROR_CONSOLE):
   """
   Temporarily redirect GIMP messages to the specified message handler.
   
@@ -604,7 +604,7 @@ class GimpMessageFile(object):
   
   def __init__(
         self,
-        message_handler=gimpenums.ERROR_CONSOLE,
+        message_handler=Gimp.MessageHandlerType.ERROR_CONSOLE,
         message_prefix=None,
         message_delay_milliseconds=0):
     self._message_handler = message_handler

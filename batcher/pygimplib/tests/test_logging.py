@@ -1,8 +1,6 @@
-import io
-import sys
 import unittest
 
-import mock
+import unittest.mock as mock
 import parameterized
 
 from .. import logging as pglogging

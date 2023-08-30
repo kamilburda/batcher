@@ -1,13 +1,11 @@
 """Logging-related classes."""
 
-# NOTE: In order to allow logging errors as early as possible (before plug-in
-# initialization), we are breaking the 'all imports at the beginning of module' convention.
-
 import datetime
 import os
 import sys
 import traceback
 
+from . import pdbutils as pgpdbutils
 
 _LOG_MODES = ('none', 'exceptions', 'files', 'gimp_console')
 
@@ -72,8 +70,6 @@ def log_output(
     if stderr_file is not None:
       sys.stderr = SimpleLogger(stderr_file, log_header_title)
   elif log_mode == 'gimp_console':
-    from . import pdbutils as pgpdbutils
-    
     sys.stdout = pgpdbutils.GimpMessageFile(
       message_delay_milliseconds=gimp_console_message_delay_milliseconds)
     sys.stderr = pgpdbutils.GimpMessageFile(
@@ -151,8 +147,7 @@ def _redirect_exception_output_to_file(log_dirpaths, log_filename, log_header_ti
   def log_exception(exc_type, exc_value, exc_traceback):
     global _exception_logger
     
-    _exception_logger.write(
-      ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+    _exception_logger.write(''.join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
   
   sys.excepthook = create_file_upon_exception_and_log_exception
 

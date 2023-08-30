@@ -2,8 +2,10 @@
 
 import os
 
-import gimp
-import gobject
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GObject
 
 
 _timer_ids = {}
