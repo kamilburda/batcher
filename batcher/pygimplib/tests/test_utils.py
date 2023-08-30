@@ -1,30 +1,27 @@
 import os
 import unittest
+import unittest.mock as mock
 
 from .. import utils as pgutils
 
-from .setting import stubs_setting
-
 
 class TestReprifyObject(unittest.TestCase):
-  
-  def test_reprify_object_without_name(self):
-    s = stubs_setting.StubSetting('file_extension')
+
+  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
+  def test_reprify_object_without_name(self, mock_id):
+    object_ = object()
     
     self.assertEqual(
-      pgutils.reprify_object(s),
-      '<{}.tests.setting.stubs_setting.StubSetting object at {}>'.format(
-        pgutils.get_pygimplib_module_path(),
-        hex(id(s)).rstrip('L')))
-  
-  def test_reprify_object_with_name(self):
-    s = stubs_setting.StubSetting('file_extension')
-    
+      pgutils.reprify_object(object_),
+      f'<builtins.object object at 0x0000002023b009130>')
+
+  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
+  def test_reprify_object_with_name(self, mock_id):
+    object_ = object()
+
     self.assertEqual(
-      pgutils.reprify_object(s, 'file_extension'),
-      '<{}.tests.setting.stubs_setting.StubSetting "file_extension" at {}>'.format(
-        pgutils.get_pygimplib_module_path(),
-        hex(id(s)).rstrip('L')))
+      pgutils.reprify_object(object_, 'some_object'),
+      f'<builtins.object "some_object" at 0x0000002023b009130>')
 
 
 class TestGetModuleRoot(unittest.TestCase):
@@ -69,7 +66,7 @@ class TestGetModuleRoot(unittest.TestCase):
     self.assertEqual(
       pgutils.get_module_root('batcher.pygimplib.tests.test_utils', ''),
       'batcher.pygimplib.tests.test_utils')
-    
+
     self.assertEqual(
       pgutils.get_module_root('batcher.pygimplib.tests.test_utils', '.'),
       'batcher.pygimplib.tests.test_utils')
@@ -81,3 +78,17 @@ class TestGetCurrentModuleFilepath(unittest.TestCase):
     self.assertEqual(
       pgutils.get_current_module_filepath(),
       os.path.abspath(__file__))
+
+
+class TestCreateOnlyProperty(unittest.TestCase):
+
+  def test_create_read_only_property(self):
+    obj = type('SomeClass', (), {})()
+
+    pgutils.create_read_only_property(obj, 'some_property', 'some_value')
+
+    self.assertEqual(obj._some_property, 'some_value')
+    self.assertEqual(obj.some_property, 'some_value')
+
+    with self.assertRaises(AttributeError):
+      obj.some_property = 'new_value'

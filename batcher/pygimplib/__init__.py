@@ -60,7 +60,7 @@ builtins._ = _
 # from . import pdbutils
 # from . import progress
 # from . import setting
-# from . import utils
+from . import utils
 # from . import version
 
 from .constants import *
@@ -85,7 +85,7 @@ __all__ = [
   # 'pdbutils',
   # 'progress',
   # 'setting',
-  # 'utils',
+  'utils',
   # 'version',
   # Global elements imported to or defined in this module
   'GIMP_CHARACTER_ENCODING',

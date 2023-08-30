@@ -6,9 +6,11 @@ import os
 import contextlib
 
 import gi
+
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from . import constants as pgconstants
 from . import invocation as pginvocation
 from . import utils as pgutils
 
@@ -147,7 +149,7 @@ def get_item_from_image_and_item_path(image, item_class_name, item_path):
   are 'Hands' (immediate parent) and 'Body (parent of 'Hands'), then the item
   path is 'Body/Hands/Left'.
   """
-  item_path_components = item_path.split(pgutils.GIMP_ITEM_PATH_SEPARATOR)
+  item_path_components = item_path.split(pgconstants.GIMP_ITEM_PATH_SEPARATOR)
   
   if len(item_path_components) < 1:
     return None
@@ -217,7 +219,7 @@ def get_item_as_path(item, include_image=True):
   item_class_name = pgutils.safe_decode(type(item).__name__, 'utf-8')
   
   parents = _get_item_parents(item)
-  item_path = pgutils.GIMP_ITEM_PATH_SEPARATOR.join(
+  item_path = pgconstants.GIMP_ITEM_PATH_SEPARATOR.join(
     pgutils.safe_decode_gimp(parent_or_item.name) for parent_or_item in parents + [item])
   
   item_as_path.extend([item_class_name, item_path])

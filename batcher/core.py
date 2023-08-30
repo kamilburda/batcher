@@ -668,7 +668,7 @@ class Batcher:
       self._progress_updater = pg.progress.ProgressUpdater(None)
     
     if self._export_context_manager is None:
-      self._export_context_manager = pg.utils.EmptyContext
+      self._export_context_manager = pg.utils.empty_context
     
     if self._export_context_manager_args is None:
       self._export_context_manager_args = ()
