@@ -5,7 +5,7 @@ import contextlib
 import itertools
 
 
-class ObjectFilter(object):
+class ObjectFilter:
   """Class containing a list of rules determining whether an object matches
   given rules.
   

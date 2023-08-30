@@ -55,7 +55,7 @@ def _set_attributes_on_init(func):
   return func_wrapper
 
 
-class Batcher(object):
+class Batcher:
   """Class for batch-processing layers in the specified image with a sequence of
   actions (resize, rename, export, ...).
   """

@@ -158,7 +158,7 @@ def handle_overwrite(filepath, overwrite_chooser, position=None):
     return OverwriteModes.DO_NOTHING, filepath
 
 
-class OverwriteModes(object):
+class OverwriteModes:
   """
   This class defines common overwrite modes for convenience.
   

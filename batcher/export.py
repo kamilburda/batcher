@@ -14,7 +14,7 @@ from batcher import renamer as renamer_
 from batcher import uniquifier
 
 
-class ExportModes(object):
+class ExportModes:
   
   EXPORT_MODES = (
     EACH_LAYER,
@@ -412,7 +412,7 @@ def _refresh_image(image):
     pdb.gimp_image_remove_layer(image, layer)
 
 
-class _FileExtension(object):
+class _FileExtension:
   """
   This class defines additional properties for a file extension.
   
@@ -430,7 +430,7 @@ class _FileExtension(object):
     self.processed_count = 0
 
 
-class _FileExtensionProperties(object):
+class _FileExtensionProperties:
   """Mapping of file extensions from `pygimplib.fileformats.file_formats` to
   `_FileExtension` instances.
   
@@ -451,7 +451,7 @@ class _FileExtensionProperties(object):
     return self._properties[key.lower()]
 
 
-class ExportStatuses(object):
+class ExportStatuses:
   EXPORT_STATUSES = (
     NOT_EXPORTED_YET, EXPORT_SUCCESSFUL, FORCE_INTERACTIVE, USE_DEFAULT_FILE_EXTENSION
   ) = (0, 1, 2, 3)

@@ -208,7 +208,7 @@ def _setup_output_directory_changed(settings, current_image):
 #===============================================================================
 
 
-class ExportLayersDialog(object):
+class ExportLayersDialog:
   
   _DIALOG_SIZE = (900, 610)
   _DIALOG_BORDER_WIDTH = 5
@@ -1202,7 +1202,7 @@ class ExportLayersDialog(object):
       return False
 
 
-class ExportLayersRepeatDialog(object):
+class ExportLayersRepeatDialog:
   
   _BORDER_WIDTH = 8
   _HBOX_HORIZONTAL_SPACING = 8

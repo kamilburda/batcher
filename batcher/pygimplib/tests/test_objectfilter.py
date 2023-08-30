@@ -3,7 +3,7 @@ import unittest
 from .. import objectfilter as pgobjectfilter
 
 
-class FilterableObject(object):
+class FilterableObject:
   
   def __init__(self, object_id, name, is_empty=False, colors=None):
     self.object_id = object_id
@@ -12,7 +12,7 @@ class FilterableObject(object):
     self.colors = colors if colors is not None else set()
 
 
-class FilterRules(object):
+class FilterRules:
   
   @staticmethod
   def has_uppercase_letters(obj):

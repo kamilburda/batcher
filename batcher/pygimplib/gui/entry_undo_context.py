@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class EntryUndoContext(object):
+class EntryUndoContext:
   """
   This class adds undo/redo capabilities to a `gtk.Entry` object.
   

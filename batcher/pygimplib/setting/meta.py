@@ -9,7 +9,7 @@ import types
 from .. import utils as pgutils
 
 
-class _TypeMap(object):
+class _TypeMap:
   
   def __init__(self, description=None):
     self._description = description

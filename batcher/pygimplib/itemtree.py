@@ -343,7 +343,7 @@ class VectorTree(ItemTree):
     return image.vectors
 
 
-class Item(object):
+class Item:
   """Wrapper for a `gimp.Item` object containing additional attributes.
   
   Note that the attributes will not be up to date if changes were made to the

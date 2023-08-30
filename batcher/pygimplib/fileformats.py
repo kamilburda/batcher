@@ -53,7 +53,7 @@ def _create_file_formats_dict(file_formats):
   return file_formats_dict
 
 
-class _FileFormat(object):
+class _FileFormat:
   
   def __init__(
         self, description, file_extensions, save_procedure_name=None,

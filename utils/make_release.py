@@ -456,7 +456,7 @@ def _print_error(message):
   print(message, file=sys.stderr)
 
 
-class _ReleaseMetadata(object):
+class _ReleaseMetadata:
   
   def __init__(self, repo, gh_pages_repo, **kwargs):
     self._repo = repo

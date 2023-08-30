@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-class EntryExpander(object):
+class EntryExpander:
   """
   This class enables the specified `gtk.Entry` to have a flexible width, bounded
   by the specified minimum and maximum number of characters (width in

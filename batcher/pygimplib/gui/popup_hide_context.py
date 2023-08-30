@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class PopupHideContext(object):
+class PopupHideContext:
   """
   This class provides a simplified interface for connecting events to hide the
   specified popup window. If the user presses a button outside the popup or

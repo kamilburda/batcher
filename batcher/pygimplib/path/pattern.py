@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class StringPattern(object):
+class StringPattern:
   """
   This class provides string substitution based on fields and their arguments.
   

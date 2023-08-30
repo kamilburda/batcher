@@ -19,7 +19,7 @@ def N_(str_):
   return str_
 
 
-class FileValidatorErrorStatuses(object):
+class FileValidatorErrorStatuses:
   
   ERROR_STATUSES = (
     IS_EMPTY,

@@ -5,7 +5,7 @@ import inspect
 import itertools
 
 
-class Invoker(object):
+class Invoker:
   """Class to invoke (call) a sequence of functions or nested instances,
   hereinafter "actions".
   
@@ -716,7 +716,7 @@ class Invoker(object):
       raise ValueError('action with ID {} is not in group "{}"'.format(action_id, group))
 
 
-class _ActionItem(object):
+class _ActionItem:
   
   def __init__(self, action, action_id, groups, action_type, action_function, run_generator):
     self.action = action

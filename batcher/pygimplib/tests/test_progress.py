@@ -3,7 +3,7 @@ import unittest
 from .. import progress as pgprogress
 
 
-class ProgressBarStub(object):
+class ProgressBarStub:
   
   def __init__(self):
     self.text = ''

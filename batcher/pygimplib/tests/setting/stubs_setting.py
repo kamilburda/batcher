@@ -4,7 +4,7 @@ from ...setting import presenter as presenter_
 from ...setting import settings as settings_
 
 
-class GuiWidgetStub(object):
+class GuiWidgetStub:
   
   def __init__(self, value):
     self.value = value

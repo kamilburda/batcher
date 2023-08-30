@@ -307,7 +307,7 @@ class TestStringPattern(unittest.TestCase):
   ])
   def test_generate_with_fields_with_bound_method(
         self, test_case_name_suffix, pattern, expected_output):
-    class _Field(object):
+    class _Field:
       
       def get_field_value(self, field, arg1=1, arg2=2):
         return '{}{}'.format(arg1, arg2)

@@ -124,7 +124,7 @@ class ItemBox(gtk.ScrolledWindow):
     return self._items.index(item)
 
 
-class ItemBoxItem(object):
+class ItemBoxItem:
   
   _HBOX_BUTTONS_SPACING = 3
   _HBOX_SPACING = 3
@@ -553,7 +553,7 @@ class _ArrayBoxItem(ItemBoxItem):
     return self._label
 
 
-class _ActionLocker(object):
+class _ActionLocker:
   
   def __init__(self):
     self._tokens = collections.defaultdict(int)

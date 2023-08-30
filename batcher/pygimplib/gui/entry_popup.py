@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class EntryPopup(object):
+class EntryPopup:
   
   # Implementation of the popup is loosely based on the implementation of
   # `gtk.EntryCompletion`:

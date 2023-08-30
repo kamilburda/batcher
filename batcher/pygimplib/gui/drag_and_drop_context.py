@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class DragAndDropContext(object):
+class DragAndDropContext:
   """
   This class adds drag-and-drop capability to the specified GTK widget.
   """

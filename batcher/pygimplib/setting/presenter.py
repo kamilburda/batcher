@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class SettingValueSynchronizer(object):
+class SettingValueSynchronizer:
   """Helper class allowing `Setting` and `Presenter` instance to keep their
   values in sync.
   """

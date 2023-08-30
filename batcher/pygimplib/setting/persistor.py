@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class Persistor(object):
+class Persistor:
   """Loading and saving settings for multiple settings sources at once.
   
   Settings sources are `setting.sources.Source` instances.

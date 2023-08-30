@@ -25,7 +25,7 @@ SETTING_PATH_SEPARATOR = '/'
 SETTING_ATTRIBUTE_SEPARATOR = '.'
 
 
-class SettingParentMixin(object):
+class SettingParentMixin:
   """
   This mixin provides `Setting` and `Group` instances with a parent reference,
   allowing settings and groups to form a tree-like structure.
@@ -58,7 +58,7 @@ class SettingParentMixin(object):
     setting._parent = self
 
 
-class SettingEventsMixin(object):
+class SettingEventsMixin:
   """
   This mixin provides `Setting` and `Group` instances with the capability of
   setting up and invoking events.

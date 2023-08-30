@@ -7,7 +7,7 @@ from batcher import builtin_procedures
 from batcher import exceptions
 
 
-class PreviewsController(object):
+class PreviewsController:
   
   _DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS = 50
   _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500

@@ -3,7 +3,7 @@
 import re
 
 
-class Version(object):
+class Version:
   
   def __init__(
         self, major=None, minor=None, patch=None, prerelease=None, prerelease_patch=None):

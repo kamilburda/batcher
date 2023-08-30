@@ -9,7 +9,7 @@ import gimp
 from batcher import pygimplib as pg
 
 
-class ItemProgressIndicator(object):
+class ItemProgressIndicator:
   """
   This class controls a single progress bar to indicate the number of processed
   items and the status of the currently processed item.

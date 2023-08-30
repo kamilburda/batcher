@@ -584,7 +584,7 @@ def redirect_messages(message_handler=Gimp.MessageHandlerType.ERROR_CONSOLE):
     pdb.gimp_message_set_handler(orig_message_handler)
 
 
-class GimpMessageFile(object):
+class GimpMessageFile:
   """
   This class provides a file-like way to write output as GIMP messages.
   

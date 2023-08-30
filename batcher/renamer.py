@@ -13,7 +13,7 @@ from batcher import pygimplib as pg
 from batcher import actions
 
 
-class ItemRenamer(object):
+class ItemRenamer:
   
   def __init__(self, pattern, fields_raw=None):
     self._filename_pattern = pg.path.StringPattern(
@@ -79,7 +79,7 @@ def _get_formatted_examples(examples_lines):
   return '\n'.join(['<b>{}</b>'.format(_('Examples'))] + formatted_examples_lines)
 
 
-class Field(object):
+class Field:
   
   def __init__(
         self,

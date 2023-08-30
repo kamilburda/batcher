@@ -58,7 +58,7 @@ PDB_TYPES_TO_SETTING_TYPES_MAP = {
 }
 
 
-class SettingPdbTypes(object):
+class SettingPdbTypes:
   int32 = gimpenums.PDB_INT32
   int16 = gimpenums.PDB_INT16
   int8 = gimpenums.PDB_INT8

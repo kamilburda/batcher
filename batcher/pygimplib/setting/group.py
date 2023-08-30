@@ -697,7 +697,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     return group_dict
 
 
-class GroupWalkCallbacks(object):
+class GroupWalkCallbacks:
   """
   This class defines callbacks called during `Group.walk()`. By default, the
   callbacks do nothing.

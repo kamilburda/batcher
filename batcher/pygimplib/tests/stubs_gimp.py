@@ -8,7 +8,7 @@ import gimp
 from .. import utils as pgutils
 
 
-class PdbStub(object):
+class PdbStub:
   
   def __init__(self):
     self._attr_name = b''
@@ -58,7 +58,7 @@ class PdbStub(object):
     image.filename = filename
 
 
-class PdbProcedureStub(object):
+class PdbProcedureStub:
   
   def __init__(
         self,
@@ -93,7 +93,7 @@ class PdbProcedureStub(object):
     return len(self.return_vals)
 
 
-class ParasiteStub(object):
+class ParasiteStub:
   
   def __init__(self, name, flags, data):
     self.name = name
@@ -101,7 +101,7 @@ class ParasiteStub(object):
     self.data = data
 
 
-class ParasiteFunctionsStubMixin(object):
+class ParasiteFunctionsStubMixin:
   
   def __init__(self):
     self._parasites = {}
@@ -123,7 +123,7 @@ class ParasiteFunctionsStubMixin(object):
       del self._parasites[parasite_name]
 
 
-class ShelfFunctionsStubMixin(object):
+class ShelfFunctionsStubMixin:
   
   def __init__(self):
     self.shelf_data = {}
@@ -240,7 +240,7 @@ class GimpModuleStub(ParasiteFunctionsStubMixin, ShelfFunctionsStubMixin):
     ShelfFunctionsStubMixin.__init__(self)
 
 
-class ShelfStub(object):
+class ShelfStub:
   
   def __init__(self, shelf=None):
     # Passing explicit shelf data allows connecting this instance with the

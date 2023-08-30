@@ -26,7 +26,7 @@ from batcher import background_foreground
 from batcher.gui import placeholders as gui_placeholders
 
 
-class _GimpObjectPlaceholder(object):
+class _GimpObjectPlaceholder:
   
   def __init__(self, display_name, replacement_func):
     self._display_name = display_name

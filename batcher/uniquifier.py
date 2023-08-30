@@ -4,7 +4,7 @@
 from batcher import pygimplib as pg
 
 
-class ItemUniquifier(object):
+class ItemUniquifier:
   """Class renaming `pygimplib.ItemTree.Item` instances to be unique under the
   same parent.
   """

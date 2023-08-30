@@ -953,7 +953,7 @@ class TestGimpParasiteSource(unittest.TestCase):
     self.assertTrue(self.source.has_data())
 
 
-class _FileSourceTests(object):
+class _FileSourceTests:
   
   def __init__(self, source_name, filepath, source_class):
     self._source_name = source_name

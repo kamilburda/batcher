@@ -1,7 +1,7 @@
 """Interface for updating the progress of the work done so far."""
 
 
-class ProgressUpdater(object):
+class ProgressUpdater:
   """
   This class wraps the behavior of a progress bar used in GUIs.
   
