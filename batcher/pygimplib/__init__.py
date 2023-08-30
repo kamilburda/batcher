@@ -20,7 +20,7 @@ ROOT_PLUGIN_DIRPATH = _get_root_plugin_dirpath()
 from . import logging
 
 # FIXME: Duplicate logging instead of redirecting it.
-#   This is not practical in case of e.g. running tests from the IDE or
+#   The latter is not practical in case of e.g. running tests from the IDE or
 #   test-running the plug-in while expecting error messages in the GIMP
 #   console.
 # # Enable logging as early as possible to capture any unexpected errors (such
