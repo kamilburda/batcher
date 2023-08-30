@@ -1095,7 +1095,7 @@ class _FileSourceTests:
     return string_io
 
 
-@mock.patch('builtins.open')
+@mock.patch(pgutils.get_pygimplib_module_path() + '.setting.sources.open')
 @mock.patch(
   pgutils.get_pygimplib_module_path() + '.setting.sources.os.path.isfile',
   return_value=False)
@@ -1114,7 +1114,7 @@ class TestPickleFileSource(unittest.TestCase, _FileSourceTests):
     self.settings = stubs_group.create_test_settings()
 
 
-@mock.patch('builtins.open')
+@mock.patch(pgutils.get_pygimplib_module_path() + '.setting.sources.open')
 @mock.patch(
   pgutils.get_pygimplib_module_path() + '.setting.sources.os.path.isfile',
   return_value=False)
