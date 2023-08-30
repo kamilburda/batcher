@@ -48,56 +48,56 @@ builtins._ = _
 #
 # _gui_messages.set_gui_excepthook(title=None, app_name=None)
 
-from . import configbase
-from . import fileformats
-from . import gui
-from . import invocation
-from . import invoker
-from . import itemtree
-from . import objectfilter
-from . import overwrite
-from . import path
-from . import pdbutils
-from . import progress
-from . import setting
-from . import utils
-from . import version
+# from . import configbase
+# from . import fileformats
+# from . import gui
+# from . import invocation
+# from . import invoker
+# from . import itemtree
+# from . import objectfilter
+# from . import overwrite
+# from . import path
+# from . import pdbutils
+# from . import progress
+# from . import setting
+# from . import utils
+# from . import version
 
 from .constants import *
 from .procedure import main
 from .procedure import register_procedure
 from .procedure import set_use_locale
 from .pypdb import pdb
-from .setting import SettingGuiTypes
-from .setting import SettingTypes
+# from .setting import SettingGuiTypes
+# from .setting import SettingTypes
 
 __all__ = [
   # Modules
-  'fileformats',
-  'gui',
-  'invocation',
-  'invoker',
-  'itemtree',
-  'logging',
-  'objectfilter',
-  'overwrite',
-  'path',
-  'pdbutils',
-  'progress',
-  'setting',
-  'utils',
-  'version',
+  # 'fileformats',
+  # 'gui',
+  # 'invocation',
+  # 'invoker',
+  # 'itemtree',
+  # 'logging',
+  # 'objectfilter',
+  # 'overwrite',
+  # 'path',
+  # 'pdbutils',
+  # 'progress',
+  # 'setting',
+  # 'utils',
+  # 'version',
   # Global elements imported to or defined in this module
   'GIMP_CHARACTER_ENCODING',
   'TEXT_FILE_ENCODING',
-  'config',
+  # 'config',
   'main',
   'pdb',
   'register_procedure',
   'set_use_locale',
-  'SettingGuiTypes',
-  'SettingTypes',
+  # 'SettingGuiTypes',
+  # 'SettingTypes',
 ]
 
 
-config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)
+# config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)
