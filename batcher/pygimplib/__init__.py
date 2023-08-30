@@ -19,14 +19,18 @@ ROOT_PLUGIN_DIRPATH = _get_root_plugin_dirpath()
 
 from . import logging
 
-# Enable logging as early as possible to capture any unexpected errors (such
-# as missing modules) before pygimplib is fully initialized.
-logging.log_output(
-  log_mode='exceptions',
-  log_dirpaths=[os.path.dirname(PYGIMPLIB_DIRPATH), PYGIMPLIB_DIRPATH],
-  log_stdout_filename=None,
-  log_stderr_filename='error.log',
-  log_header_title='pygimplib')
+# FIXME: Duplicate logging instead of redirecting it.
+#   This is not practical in case of e.g. running tests from the IDE or
+#   test-running the plug-in while expecting error messages in the GIMP
+#   console.
+# # Enable logging as early as possible to capture any unexpected errors (such
+# # as missing modules) before pygimplib is fully initialized.
+# logging.log_output(
+#   log_mode='exceptions',
+#   log_dirpaths=[os.path.dirname(PYGIMPLIB_DIRPATH), PYGIMPLIB_DIRPATH],
+#   log_stdout_filename=None,
+#   log_stderr_filename='error.log',
+#   log_header_title='pygimplib')
 
 
 from gi.repository import GLib
