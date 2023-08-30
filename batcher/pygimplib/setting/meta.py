@@ -105,7 +105,7 @@ class SettingMeta(type):
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
         raise TypeError('cannot initialize abstract setting class "{}"'.format(
-          self.__class__.__name__))
+          type(self).__name__))
       
       # This check prevents a parent class' `__init__()` from overriding the
       # contents of `_dict_on_init`, which may have different arguments.
@@ -119,7 +119,7 @@ class SettingMeta(type):
         if inspect.getargspec(orig_init)[1] is not None:
           raise TypeError(
             ('__init__ in Setting subclasses cannot accept variable positional arguments'
-             ' (found in "{}")').format(self.__class__.__name__))
+             ' (found in "{}")').format(type(self).__name__))
       
       orig_init(self, *args, **kwargs)
     
@@ -196,7 +196,7 @@ class PresenterMeta(type):
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
         raise TypeError('cannot initialize abstract presenter class "{}"'.format(
-          self.__class__.__name__))
+          type(self).__name__))
       
       orig_init(self, *args, **kwargs)
     

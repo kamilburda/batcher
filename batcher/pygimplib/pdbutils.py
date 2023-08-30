@@ -214,7 +214,7 @@ def get_item_as_path(item, include_image=True):
     else:
       return None
   
-  item_class_name = pgutils.safe_decode(item.__class__.__name__, 'utf-8')
+  item_class_name = pgutils.safe_decode(type(item).__name__, 'utf-8')
   
   parents = _get_item_parents(item)
   item_path = pgutils.GIMP_ITEM_PATH_SEPARATOR.join(

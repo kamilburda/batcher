@@ -650,7 +650,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     settings_dict.update({
       'name': self.name,
       'value': self._value_to_raw(self.value, source_type),
-      'type': pgutils.safe_decode(SettingTypes[self.__class__], 'utf-8'),
+      'type': pgutils.safe_decode(SettingTypes[type(self)], 'utf-8'),
     })
     
     return settings_dict
@@ -2094,7 +2094,7 @@ class ArraySetting(Setting):
         settings_dict[key] = self._reference_element._value_to_raw(val, source_type)
       elif key == 'element_type':
         settings_dict[key] = pgutils.safe_decode(
-          SettingTypes[self._reference_element.__class__], 'utf-8')
+          SettingTypes[self.type(_reference_element)], 'utf-8')
     
     return settings_dict
   

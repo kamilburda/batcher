@@ -137,7 +137,7 @@ def create_read_only_property(obj, name, value):
   """
   setattr(obj, '_' + name, value)
   setattr(
-    obj.__class__,
+    type(obj),
     name,
     property(fget=lambda obj, name=name: getattr(obj, '_' + name)))
 
