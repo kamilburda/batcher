@@ -216,8 +216,7 @@ def _handle_abstract_attribute(namespace):
 
 
 def _register_type_and_aliases(namespace, cls, type_name, type_map, base_class_name):
-  processed_type_name = pgutils.safe_decode(type_name, 'utf-8')
-  human_readable_name = _get_human_readable_class_name(processed_type_name, base_class_name)
+  human_readable_name = _get_human_readable_class_name(type_name, base_class_name)
   
   if human_readable_name not in type_map._name_to_type_map:
     if not namespace['_ABSTRACT']:

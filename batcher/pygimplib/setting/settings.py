@@ -179,7 +179,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   valid setting type.
   """
   
-  DEFAULT_VALUE = type(b'DefaultValue', (), {})()
+  DEFAULT_VALUE = type('DefaultValue', (), {})()
   
   _ABSTRACT = True
   
@@ -1999,7 +1999,7 @@ class ArraySetting(Setting):
     than `max_size` elements.
   """
   
-  ELEMENT_DEFAULT_VALUE = type(b'DefaultElementValue', (), {})()
+  ELEMENT_DEFAULT_VALUE = type('DefaultElementValue', (), {})()
   
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.array_box]
   _DEFAULT_DEFAULT_VALUE = ()

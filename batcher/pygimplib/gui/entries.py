@@ -101,7 +101,7 @@ class ExtendedEntry(Gtk.Entry):
     if not self._has_placeholder_text_assigned:
       return super().get_text()
     else:
-      return b''
+      return ''
   
   def _do_assign_text(self, text, enable_undo=False):
     """
@@ -141,7 +141,7 @@ class ExtendedEntry(Gtk.Entry):
     if self._has_placeholder_text_assigned:
       self._has_placeholder_text_assigned = False
       self._modify_font_for_placeholder_text(gtk.STATE_NORMAL, pango.STYLE_NORMAL)
-      self._do_assign_text(b'')
+      self._do_assign_text('')
       self._popup.save_last_value()
   
   def _modify_font_for_placeholder_text(self, state_for_color, style):

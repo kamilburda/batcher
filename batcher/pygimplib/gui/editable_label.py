@@ -23,7 +23,7 @@ class EditableLabel(Gtk.Box):
   
   _LABEL_EDIT_BUTTON_SPACING = 4
   
-  __gsignals__ = {b'changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
+  __gsignals__ = {'changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
   
   def __init__(self, text=None, **kwargs):
     super().__init__(self, **kwargs)

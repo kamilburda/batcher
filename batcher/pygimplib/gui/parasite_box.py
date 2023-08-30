@@ -24,7 +24,7 @@ class ParasiteBox(Gtk.Box):
   * `'parasite-changed'` - The parasite was modified by the user.
   """
   
-  __gsignals__ = {b'parasite-changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
+  __gsignals__ = {'parasite-changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
   
   _HBOX_SPACING = 5
   _VBOX_SPACING = 3

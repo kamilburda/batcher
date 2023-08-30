@@ -54,11 +54,11 @@ class ActionBox(pg.gui.ItemBox):
   """
   
   __gsignals__ = {
-    b'action-box-item-added': (
+    'action-box-item-added': (
       GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
-    b'action-box-item-reordered': (
+    'action-box-item-reordered': (
       GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_INT)),
-    b'action-box-item-removed': (
+    'action-box-item-removed': (
       GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   

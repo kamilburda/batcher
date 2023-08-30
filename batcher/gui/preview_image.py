@@ -48,7 +48,7 @@ class ImagePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    b'preview-updated': (
+    'preview-updated': (
       GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_FLOAT)),
   }
   
@@ -647,7 +647,7 @@ class ImagePreview(preview_base_.Preview):
     return (
       actual_preview_width,
       actual_preview_height,
-      array.array(b'B', preview_data).tostring())
+      array.array('B', preview_data).tostring())
 
 
 GObject.type_register(ImagePreview)

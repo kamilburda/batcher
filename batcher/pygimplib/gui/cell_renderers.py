@@ -16,21 +16,21 @@ class CellRendererTextList(Gtk.CellRendererText):
   """
   
   __gproperties__ = {
-    b'text-list': (
+    'text-list': (
       GObject.TYPE_PYOBJECT,
-      b'list of strings',
+      'list of strings',
       'List of strings to render',
       GObject.PARAM_READWRITE
     ),
-    b'markup-list': (
+    'markup-list': (
       GObject.TYPE_PYOBJECT,
-      b'list of strings in markup',
+      'list of strings in markup',
       'List of strings with markup to render',
       GObject.PARAM_WRITABLE
     ),
-    b'text-list-separator': (
+    'text-list-separator': (
       GObject.TYPE_STRING,
-      b'separator for list of strings',
+      'separator for list of strings',
       'Text separator for the list of strings ("text-list" and "markup-list" properties)',
       ', ',     # Default value
       GObject.PARAM_READWRITE

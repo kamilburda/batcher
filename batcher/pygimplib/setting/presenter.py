@@ -258,7 +258,7 @@ class NullPresenter(Presenter):
   
   # Make `NullPresenter` pretend to update GUI automatically.
   _VALUE_CHANGED_SIGNAL = 'null_signal'
-  _NULL_GUI_ELEMENT = type(b'NullGuiElement', (), {})()
+  _NULL_GUI_ELEMENT = type('NullGuiElement', (), {})()
   
   def __init__(self, setting, element, *args, **kwargs):
     """

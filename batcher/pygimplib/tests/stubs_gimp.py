@@ -9,7 +9,7 @@ from .. import utils as pgutils
 class PdbStub:
   
   def __init__(self):
-    self._attr_name = b''
+    self._attr_name = ''
   
   def __getattr__(self, name):
     self._attr_name = name
@@ -155,7 +155,7 @@ class ImageStub(ParasiteFunctionsStubMixin):
     self.image_type = None
     self.layers = []
     self.filename = pgutils.safe_encode_gimp(filename)
-    self.uri = b''
+    self.uri = ''
     self.valid = True
 
 
@@ -250,7 +250,7 @@ class ShelfStub:
     self.shelf[key] = pickle.dumps(value)
   
   def __delitem__(self, key):
-    self.shelf[key] = b''
+    self.shelf[key] = ''
   
   def has_key(self, key):
     return key in self.shelf

@@ -556,7 +556,7 @@ class Batcher:
       args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
       
       if self._has_run_mode_param(function):
-        kwargs = {b'run_mode': args[0]}
+        kwargs = {'run_mode': args[0]}
         args = args[1:]
     
     return args, kwargs

@@ -123,7 +123,7 @@ class TestSetting(unittest.TestCase):
     setting = stubs_setting.StubRegistrableToPdbSetting('file_extension', default_value='png')
     self.assertEqual(
       setting.get_pdb_param(),
-      [(settings_.SettingPdbTypes.string, b'file-extension', b'File extension')])
+      [(settings_.SettingPdbTypes.string, 'file-extension', 'File extension')])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
     self.assertEqual(self.setting.get_pdb_param(), None)
@@ -1723,14 +1723,14 @@ class TestArraySetting(unittest.TestCase):
     ('default_length_name_and_description',
      None,
      None,
-     b'coordinates-length',
-     b'Number of elements in "coordinates"'),
+     'coordinates-length',
+     'Number of elements in "coordinates"'),
     
     ('custom_length_name_and_description',
      'num-axes-coordinates',
      'The number of axes for coordinates',
-     b'num-axes-coordinates',
-     b'The number of axes for coordinates'),
+     'num-axes-coordinates',
+     'The number of axes for coordinates'),
   ])
   def test_get_pdb_param_for_registrable_setting(
         self,
@@ -1742,7 +1742,7 @@ class TestArraySetting(unittest.TestCase):
     self.assertEqual(
       self.setting.get_pdb_param(length_name, length_description),
       [(settings_.SettingPdbTypes.int, expected_length_name, expected_length_description),
-       (settings_.SettingPdbTypes.array_float, b'coordinates', b'Coordinates')])
+       (settings_.SettingPdbTypes.array_float, 'coordinates', 'Coordinates')])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
     setting = settings_.ArraySetting(

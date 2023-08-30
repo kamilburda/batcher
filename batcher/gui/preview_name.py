@@ -49,9 +49,9 @@ class NamePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    b'preview-selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-    b'preview-updated': (GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
-    b'preview-tags-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+    'preview-selection-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
+    'preview-updated': (GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-tags-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
   }
   
   _ADD_TAG_POPUP_HBOX_SPACING = 5
@@ -218,7 +218,7 @@ class NamePreview(preview_base_.Preview):
     
     self._init_tags_menu()
     
-    column = gtk.TreeViewColumn(b'')
+    column = gtk.TreeViewColumn('')
     
     cell_renderer_icon_item = gtk.CellRendererPixbuf()
     column.pack_start(cell_renderer_icon_item, expand=False)
