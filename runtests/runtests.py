@@ -6,30 +6,47 @@ By default, all modules starting with the `'test_'` prefix will be run.
 
 To run tests in GIMP:
 
-* Open up the Python-Fu console (Filters -> Python-Fu -> Console).
-* Run the following commands (you can copy-paste the lines to the console):
-
-pdb.plug_in_run_tests(<directory path to the plug-in under test>)
+1. Open up the Python-Fu console (Filters -> Python-Fu -> Console).
+2. Choose ``Browse...`` and find the ``'plug-in-run-tests'`` procedure.
+3. Hit ``Apply``. The procedure call is copied to the console with placeholder
+   arguments.
+4. Adjust the arguments as needed. The run mode does not matter as the procedure
+   is always non-interactive. Make sure to wrap the ``modules`` and
+  ``ignored-modules`` arguments in
+  ``GObject.Value(GObject.TYPE_STRV, [<module names...>])``, otherwise the
+  procedure fails with an error.
+5. Run the command.
 
 To repeat the tests, simply call the procedure again.
 """
-
+import importlib
 import inspect
 import os
+import pkgutil
 import sys
+import unittest
 
-# Allow importing modules in directories in the 'plug-ins' directory.
-current_module_dirpath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-if current_module_dirpath not in sys.path:
-  sys.path.append(current_module_dirpath)
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GObject
+
+PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(
+  inspect.getfile(inspect.currentframe()))))
+if PLUGIN_DIRPATH not in sys.path:
+  sys.path.append(PLUGIN_DIRPATH)
 
 from batcher import pygimplib as pg
 
-import importlib
-import pkgutil
-import unittest
 
-import gimpenums
+def plug_in_run_tests(procedure, run_mode, config):
+  run_tests(
+    config.get_property('dirpath'),
+    config.get_property('prefix'),
+    config.get_property('modules'),
+    config.get_property('ignored-modules'),
+    config.get_property('output-stream'),
+  )
 
 
 def run_tests(
@@ -38,52 +55,53 @@ def run_tests(
       modules=None,
       ignored_modules=None,
       output_stream='stderr'):
-  """
-  Run all modules containing tests located in the specified directory path.
-  The names of the test modules start with the specified prefix.
+  """Runs all modules containing tests located in the specified directory path.
+
+  Modules containing tests are considered those that contain the
+  ``test_module_name_prefix`` prefix.
+
+  ``ignored_modules`` is a list of prefixes matching test modules or packages
+  to ignore.
   
-  `ignored_modules` is a list of prefixes matching test modules or packages to
-  ignore.
+  If ``modules`` is ``None`` or empty, all modules are included, except those
+  specified in ``ignored_modules``. If ``modules`` is not ``None``,
+  only modules matching the prefixes specified in ``modules`` are included.
+  ``ignored_modules`` can be used to exclude submodules in ``modules``.
   
-  If `modules` is `None` or empty, include all modules, except those specified
-  in `ignored_modules`. If `modules` is not `None`, include only modules
-  matching the prefixes specified in `modules`. `ignored_modules` can be used to
-  exclude submodules in `modules`.
-  
-  `output_stream` is the name of the stream to print the output to - `'stdout'`,
-  `'stderr'` or a file path. Defaults to `'stderr'`.
+  ``output_stream`` is the name of the stream to print the output to -
+  ``'stdout'``, ``'stderr'`` or a file path.
   """
   module_names = []
   
+  if not modules:
+    modules = []
+
   if not ignored_modules:
     ignored_modules = []
   
   if not modules:
     should_append = (
-      lambda module_name: (
-        not any(
-          module_name.startswith(ignored_module) for ignored_module in ignored_modules)))
+      lambda name: not any(name.startswith(ignored_module) for ignored_module in ignored_modules))
   else:
     should_append = (
-      lambda module_name: (
-        any(module_name.startswith(module) for module in modules)
-        and not any(
-          module_name.startswith(ignored_module) for ignored_module in ignored_modules)))
-  
+      lambda name: (
+        any(name.startswith(module) for module in modules)
+        and not any(name.startswith(ignored_module) for ignored_module in ignored_modules)))
+
   for importer, module_name, is_package in pkgutil.walk_packages(path=[dirpath]):
     if should_append(module_name):
       if is_package:
         sys.path.append(importer.path)
-      
+
       module_names.append(module_name)
-  
+
   stream = _get_output_stream(output_stream)
-  
+
   for module_name in module_names:
     if module_name.split('.')[-1].startswith(test_module_name_prefix):
       module = importlib.import_module(module_name)
       run_test(module, stream=stream)
-  
+
   stream.close()
 
 
@@ -97,10 +115,10 @@ def _get_output_stream(stream_or_filepath):
   if hasattr(sys, stream_or_filepath):
     return _Stream(getattr(sys, stream_or_filepath))
   else:
-    return open(stream_or_filepath, 'wb')
+    return open(stream_or_filepath, 'w')
   
 
-class _Stream(object):
+class _Stream:
   
   def __init__(self, stream):
     self.stream = stream
@@ -116,57 +134,48 @@ class _Stream(object):
     pass
 
 
-SETTINGS = pg.setting.Group('settings')
-SETTINGS.add([
-  {
-    'type': 'options',
-    'name': 'run_mode',
-    'default_value': 'non_interactive',
-    'items': [
-      ('interactive', 'RUN-INTERACTIVE', gimpenums.RUN_INTERACTIVE),
-      ('non_interactive', 'RUN-NONINTERACTIVE', gimpenums.RUN_NONINTERACTIVE),
-      ('run_with_last_vals', 'RUN-WITH-LAST-VALS', gimpenums.RUN_WITH_LAST_VALS)],
-    'display_name': 'The run mode',
-    'tags': ['ignore_load', 'ignore_save'],
-  },
-  {
-    'type': 'string',
-    'name': 'dirpath',
-    'description': 'Directory path containing test modules',
-  },
-  {
-    'type': 'string',
-    'name': 'prefix',
-    'description': 'Prefix of test modules',
-  },
-  {
-    'type': 'array',
-    'name': 'modules',
-    'element_type': 'string',
-    'description': 'Modules to include',
-  },
-  {
-    'type': 'array',
-    'name': 'ignored_modules',
-    'element_type': 'string',
-    'description': 'Modules to ignore',
-  },
-  {
-    'type': 'string',
-    'name': 'output_stream',
-    'description': 'Output stream',
-  },
-])
-
-
-@pg.procedure(
-  blurb='Run automated tests in the specified directory path.',
-  parameters=[SETTINGS],
+pg.register_procedure(
+  plug_in_run_tests,
+  arguments=[
+    dict(
+      name='run-mode',
+      type=Gimp.RunMode,
+      default=Gimp.RunMode.NONINTERACTIVE,
+      nick='Run mode',
+      blurb='The run mode'),
+    dict(
+      name='dirpath',
+      type=str,
+      default=PLUGIN_DIRPATH,
+      nick='_Directory',
+      blurb='Directory path containing test modules'),
+    dict(
+      name='prefix',
+      type=str,
+      default='test_',
+      nick='_Prefix of test modules',
+      blurb='Prefix of test modules'),
+    dict(
+      name='modules',
+      type=GObject.TYPE_STRV,
+      default=[],
+      nick='Modules to _include',
+      blurb='Modules to include'),
+    dict(
+      name='ignored_modules',
+      type=GObject.TYPE_STRV,
+      default=[],
+      nick='Modules to i_gnore',
+      blurb='Modules to ignore'),
+    dict(
+      name='output_stream',
+      type=str,
+      default='stderr',
+      nick='_Output stream',
+      blurb='Output stream or file path to write output to'),
+  ],
+  documentation=('Runs automated tests in the specified directory path', ''),
 )
-def plug_in_run_tests(run_mode, *args):
-  processed_args = list(pg.setting.iter_args([run_mode] + list(args), SETTINGS))
-  run_tests(*processed_args[1:])
 
 
-if __name__ == '__main__':
-  pg.main()
+pg.main()

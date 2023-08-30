@@ -1,12 +1,12 @@
 import os
 
-plugin_dirpath = os.path.join(Gimp.directory(), 'batcher', 'batcher')
+plugin_dirpath = os.path.join(Gimp.directory(), 'batcher')
 
-pdb.plug_in_run_tests(plugin_dirpath, 'test_', 2, ('batcher', 'utils'), 2, ('batcher.tests.test_batcher_contents', 'batcher.tests.test_update_contents'), os.path.join(plugin_dirpath, 'test_output.log'))
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'utils']), GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_batcher_contents', 'batcher.tests.test_update_contents']), os.path.join(plugin_dirpath, 'test_output.log')])
 
-pdb.plug_in_run_tests(plugin_dirpath, 'test_', 1, ('batcher.tests.test_update_contents',), 0, (), os.path.join(plugin_dirpath, 'test_output.log'))
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_update_contents']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(plugin_dirpath, 'test_output.log')])
 
-pdb.plug_in_run_tests(plugin_dirpath, 'test_', 1, ('batcher.tests.test_batcher_contents',), 0, (), os.path.join(plugin_dirpath, 'test_output.log'))
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_batcher_contents']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(plugin_dirpath, 'test_output.log')])
 
 
 import importlib
