@@ -5,7 +5,6 @@ import ast
 import collections
 import os
 import traceback
-import types
 
 try:
   import cPickle as pickle
@@ -448,7 +447,7 @@ class Source(metaclass=abc.ABCMeta):
   
   def _check_if_is_list(self, list_):
     if (not isinstance(list_, collections.Iterable)
-        or isinstance(list_, types.StringTypes)
+        or isinstance(list_, str)
         or isinstance(list_, dict)):
       raise SourceInvalidFormatError(
         'Error while parsing data from a source: Not a list: {}'.format(

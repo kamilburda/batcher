@@ -4,7 +4,6 @@ import collections
 import copy
 import inspect
 import sys
-import types
 
 import gimp
 from gimp import pdb
@@ -631,7 +630,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     settings_dict = {}
     
     for key, val in self._dict_on_init.items():
-      if key == 'gui_type' and val is not None and not isinstance(val, types.StringTypes):
+      if key == 'gui_type' and val is not None and not isinstance(val, str):
         try:
           gui_type_name = SettingGuiTypes[val]
         except TypeError:
@@ -675,7 +674,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     differently.
     """
     if (isinstance(value, collections.Iterable)
-        and not isinstance(value, types.StringTypes)):
+        and not isinstance(value, str)):
       return copy.copy(value)
     else:
       return value
@@ -1317,7 +1316,7 @@ class ImageSetting(Setting):
     
     if isinstance(raw_value, int):
       value = pgpdbutils.find_image_by_id(raw_value)
-    elif isinstance(raw_value, types.StringTypes):
+    elif isinstance(raw_value, str):
       value = pgpdbutils.find_image_by_filepath(raw_value)
     
     return value
@@ -1852,7 +1851,7 @@ class BrushSetting(Setting):
         self._MAX_NUM_TUPLE_ELEMENTS))
   
   def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, types.StringTypes):
+    if isinstance(raw_value, str):
       return (raw_value,)
     elif isinstance(raw_value, list):
       return tuple(raw_value)
@@ -2223,7 +2222,7 @@ class ArraySetting(Setting):
   
   def _raw_to_value(self, raw_value_array):
     if (isinstance(raw_value_array, collections.Iterable)
-        and not isinstance(raw_value_array, types.StringTypes)):
+        and not isinstance(raw_value_array, str)):
       return tuple(
         self._reference_element._raw_to_value(raw_value)
         for raw_value in raw_value_array)
@@ -2238,7 +2237,7 @@ class ArraySetting(Setting):
   
   def _validate(self, value_array):
     if (not isinstance(value_array, collections.Iterable)
-        or isinstance(value_array, types.StringTypes)):
+        or isinstance(value_array, str)):
       raise SettingValueError(
         utils_.value_to_str_prefix(value_array) + self.error_messages['invalid_value'])
     
@@ -2486,7 +2485,7 @@ def _process_type(type_or_name, type_map, error_message):
   except TypeError:
     raise TypeError(error_message)
   
-  if isinstance(type_or_name, types.StringTypes):
+  if isinstance(type_or_name, str):
     return type_map[type_or_name]
   else:
     return type_or_name

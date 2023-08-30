@@ -4,7 +4,6 @@ import collections
 import functools
 import inspect
 import re
-import types
 
 from .. import utils as pgutils
 
@@ -18,7 +17,7 @@ class _TypeMap:
     self._type_to_names_map = collections.defaultdict(list)
   
   def __getitem__(self, type_or_name):
-    if isinstance(type_or_name, types.StringTypes):
+    if isinstance(type_or_name, str):
       try:
         return self._name_to_type_map[type_or_name]
       except KeyError:
@@ -44,7 +43,7 @@ class _TypeMap:
         return names[0]
   
   def __contains__(self, key):
-    if isinstance(key, types.StringTypes):
+    if isinstance(key, str):
       return key in self._name_to_type_map
     else:
       return key in self._type_to_names_map

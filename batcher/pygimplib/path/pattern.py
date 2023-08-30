@@ -4,7 +4,6 @@
 import collections
 import inspect
 import re
-import types
 
 __all__ = [
   'StringPattern',
@@ -349,7 +348,7 @@ class StringPattern:
   
   @staticmethod
   def _is_field(pattern_part):
-    return not isinstance(pattern_part, types.StringTypes)
+    return not isinstance(pattern_part, str)
   
   def _process_field(self, field, additional_args):
     field_func = self._fields[self._parsed_fields_and_matching_regexes[field[0]]]

@@ -2,7 +2,6 @@
 
 import collections
 import os
-import types
 
 import gimp
 
@@ -63,7 +62,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
       value = collections.defaultdict(set)
       
       for key, items in raw_value.items():
-        if isinstance(key, types.StringTypes):
+        if isinstance(key, str):
           image = pg.pdbutils.find_image_by_filepath(key)
         else:
           image = pg.pdbutils.find_image_by_id(key)
@@ -73,7 +72,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         
         image_id = image.ID
         
-        if not isinstance(items, collections.Iterable) or isinstance(items, types.StringTypes):
+        if not isinstance(items, collections.Iterable) or isinstance(items, str):
           raise TypeError('expected a list-like, found {}'.format(items))
         
         processed_items = set()
