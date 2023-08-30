@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """Creating a new plug-in release."""
-
+import argparse
 import collections
 import distutils.util
 import getpass
@@ -17,6 +17,8 @@ import sys
 import time
 import traceback
 
+import git
+
 UTILS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
@@ -31,10 +33,6 @@ sys.path.extend([
   PYGIMPLIB_DIRPATH])
 
 from batcher import pygimplib as pg
-
-import argparse
-
-import git
 
 from utils import make_installers
 from utils import preprocess_document_contents
@@ -57,6 +55,11 @@ FILE_EXTENSIONS_AND_MIME_TYPES = {
 }
 
 PROMPT_NO_EXIT_STATUS = 2
+
+
+def main():
+  parsed_args = parse_args(sys.argv[1:])
+  make_release(**dict(parsed_args.__dict__))
 
 
 def make_release(**kwargs):
@@ -574,11 +577,6 @@ def parse_args(args):
     dest='interactive')
   
   return parser.parse_args(args)
-
-
-def main():
-  parsed_args = parse_args(sys.argv[1:])
-  make_release(**dict(parsed_args.__dict__))
 
 
 if __name__ == '__main__':

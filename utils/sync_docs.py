@@ -6,10 +6,10 @@ end-user documentation.
 Care must be taken to select only files that should not be updated manually,
 because any previous updates to such files are discarded.
 """
-from batcher import pygimplib as pg
-
 import os
 import shutil
+
+from batcher import pygimplib as pg
 
 from utils import preprocess_document_contents
 
@@ -21,6 +21,10 @@ PATHS_TO_PREPROCESS_FILEPATH = os.path.join(
   MODULE_DIRPATH, 'sync_docs_files_to_preprocess.txt')
 PATHS_TO_COPY_FILEPATH = os.path.join(
   MODULE_DIRPATH, 'sync_docs_files_to_copy.txt')
+
+
+def main():
+  sync_files(get_filepaths(PATHS_TO_PREPROCESS_FILEPATH), get_filepaths(PATHS_TO_COPY_FILEPATH))
 
 
 def sync_files(filepaths_to_preprocess, filepaths_to_copy):
@@ -85,14 +89,6 @@ def get_filepaths(file_list_filepath):
       continue
   
   return paths_to_sync
-
-
-#===============================================================================
-
-
-def main():
-  sync_files(
-    get_filepaths(PATHS_TO_PREPROCESS_FILEPATH), get_filepaths(PATHS_TO_COPY_FILEPATH))
 
 
 if __name__ == '__main__':

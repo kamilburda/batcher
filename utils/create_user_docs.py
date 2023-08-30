@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 """Generating user documentation from GitHub Pages files."""
-from batcher import pygimplib as pg
-
 import os
 import shutil
 import sys
@@ -10,6 +8,8 @@ import sys
 import psutil
 import requests
 import yaml
+
+from batcher import pygimplib as pg
 
 from utils import process_local_docs
 
@@ -22,6 +22,11 @@ PAGE_CONFIG_FILENAME = '_config.yml'
 SITE_DIRNAME = '_site'
 JEKYLL_SERVER_LOCALHOST_IP = '127.0.0.1'
 JEKYLL_SERVER_PORT = '4000'
+
+
+def main(github_page_dirpath, output_dirpath):
+  run_github_page_locally(github_page_dirpath)
+  _process_local_docs(github_page_dirpath, output_dirpath)
 
 
 def run_github_page_locally(github_page_dirpath):
@@ -69,14 +74,6 @@ def copy_directory(source_dirpath, dest_dirpath):
       shutil.copy2(
         os.path.join(source_dirpath, name),
         os.path.join(dest_dirpath, name))
-
-
-#===============================================================================
-
-
-def main(github_page_dirpath, output_dirpath):
-  run_github_page_locally(github_page_dirpath)
-  _process_local_docs(github_page_dirpath, output_dirpath)
 
 
 if __name__ == '__main__':

@@ -3,17 +3,17 @@
 """Automatic taking and processing screenshots of the plug-in dialog for
 documentation purposes.
 """
-from batcher import pygimplib as pg
-
 import os
 import time
 
-import pygtk
-pygtk.require('2.0')
-import gtk
+import gi
+from gi.repository import GLib
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gdk
+from gi.repository import Gtk
 
-import gimp
-from gimp import pdb
+from batcher import pygimplib as pg
+from batcher.pygimplib import pdb
 
 from batcher import actions
 from batcher import builtin_constraints
@@ -26,18 +26,30 @@ PLUGINS_DIRPATH = os.path.abspath(
   os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
 
 TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_DIRPATH, 'tests', 'test_images')
-TEST_IMAGES_FILEPATH = os.path.join(
-  TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
+TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
 
-if gimp.user_directory(4):
-  OUTPUT_DIRPATH = os.path.join(gimp.user_directory(4), 'Loading Screens', 'Components')
-else:
-  OUTPUT_DIRPATH = os.path.join(gimp.directory, 'Loading Screens', 'Components')
+OUTPUT_DIRPATH = os.path.join(
+  GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_BASIC_USAGE_FILENAME = 'screenshot_dialog_basic_usage.png'
 SCREENSHOT_DIALOG_CUSTOMIZING_EXPORT_FILENAME = 'screenshot_dialog_customizing_export.png'
 SCREENSHOT_DIALOG_BATCH_EDITING_FILENAME = 'screenshot_dialog_batch_editing.png'
+
+
+def main(settings=None):
+  if not settings:
+    settings = settings_main.create_settings()
+
+  image = pdb.gimp_file_load(TEST_IMAGES_FILEPATH, os.path.basename(TEST_IMAGES_FILEPATH))
+
+  layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
+
+  settings['special/image'].set_value(image)
+
+  gui_main.ExportLayersDialog(layer_tree, settings, run_gui_func=take_screenshots)
+
+  pdb.gimp_image_delete(image)
 
 
 def take_screenshots(gui, dialog, settings):
@@ -48,16 +60,16 @@ def take_screenshots(gui, dialog, settings):
   
   decoration_offsets = move_dialog_to_corner(dialog, settings)
   
-  gui.name_preview.set_selected_items(set([
-    gui.name_preview.batcher.item_tree['main-background'].raw.ID]))
+  gui.name_preview.set_selected_items(
+    {gui.name_preview.batcher.item_tree['main-background'].raw.ID})
   
-  while gtk.events_pending():
-    gtk.main_iteration()
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
   dialog.set_focus(None)
   
-  while gtk.events_pending():
-    gtk.main_iteration()
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
@@ -84,16 +96,16 @@ def take_screenshots(gui, dialog, settings):
     settings['main/constraints'],
     builtin_constraints.BUILTIN_CONSTRAINTS['without_tags'])
   
-  while gtk.events_pending():
-    gtk.main_iteration()
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
-  gui.name_preview.set_selected_items(set([
-    gui.name_preview.batcher.item_tree['bottom-frame'].raw.ID]))
+  gui.name_preview.set_selected_items(
+    {gui.name_preview.batcher.item_tree['bottom-frame'].raw.ID})
   
   dialog.set_focus(None)
   
-  while gtk.events_pending():
-    gtk.main_iteration()
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
@@ -106,8 +118,8 @@ def take_screenshots(gui, dialog, settings):
   
   settings['main/edit_mode'].set_value(True)
   
-  while gtk.events_pending():
-    gtk.main_iteration()
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
@@ -117,7 +129,7 @@ def take_screenshots(gui, dialog, settings):
     gui,
   )
   
-  gtk.main_quit()
+  Gtk.main_quit()
   
 
 def take_and_process_screenshot(
@@ -162,9 +174,9 @@ def take_screenshot():
 
 def move_dialog_to_corner(dialog, settings):
   settings['gui/size/dialog_position'].set_value((0, 0))
-  dialog.set_gravity(gtk.gdk.GRAVITY_STATIC)
+  dialog.set_gravity(Gdk.Gravity.STATIC)
   decoration_offset_x, decoration_offset_y = dialog.get_position()
-  dialog.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+  dialog.set_gravity(Gdk.Gravity.NORTH_WEST)
   settings['gui/size/dialog_position'].set_value((-decoration_offset_x, 0))
   
   return decoration_offset_x, decoration_offset_y
@@ -181,21 +193,3 @@ def crop_to_dialog(image, settings, decoration_offsets):
     0)
   
   pdb.plug_in_autocrop(image, image.active_layer)
-
-
-#===============================================================================
-
-
-def main(settings=None):
-  if not settings:
-    settings = settings_main.create_settings()
-  
-  image = pdb.gimp_file_load(TEST_IMAGES_FILEPATH, os.path.basename(TEST_IMAGES_FILEPATH))
-  
-  layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
-  
-  settings['special/image'].set_value(image)
-  
-  gui_main.ExportLayersDialog(layer_tree, settings, run_gui_func=take_screenshots)
-  
-  pdb.gimp_image_delete(image)

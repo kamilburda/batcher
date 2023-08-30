@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 """Creating installers for releases from the plug-in source."""
-
 import os
 import sys
 import inspect
@@ -18,11 +17,8 @@ sys.path.extend([
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
-from batcher import pygimplib as pg
-
 import argparse
 import collections
-import io
 import pathlib
 import re
 import shutil
@@ -32,6 +28,8 @@ import zipfile
 
 import git
 import pathspec
+
+from batcher import pygimplib as pg
 
 from utils import create_user_docs
 from utils import process_local_docs
@@ -50,6 +48,42 @@ GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')
 
 README_RELATIVE_FILEPATH = os.path.join('docs', 'sections', 'index.html')
 README_RELATIVE_OUTPUT_FILEPATH = os.path.join('Readme.html')
+
+
+def main():
+  parser = argparse.ArgumentParser(description='Create installers for the GIMP plug-in.')
+  parser.add_argument(
+    '-d',
+    '--dest-dir',
+    default=OUTPUT_DIRPATH_DEFAULT,
+    help='destination directory of the created installers',
+    metavar='DIRECTORY',
+    dest='installer_dirpath')
+  parser.add_argument(
+    '-f',
+    '--force',
+    action='store_true',
+    default=False,
+    help='make installers even if the repository contains local changes',
+    dest='force_if_dirty')
+  parser.add_argument(
+    '-i',
+    '--installers',
+    nargs='*',
+    default=['zip'],
+    choices=['zip', 'all'],
+    help='installers to create',
+    dest='installers')
+  parser.add_argument(
+    '-n',
+    '--no-docs',
+    action='store_false',
+    default=True,
+    help='do not generate documentation',
+    dest='generate_docs')
+
+  parsed_args = parser.parse_args(sys.argv[1:])
+  make_installers(**dict(parsed_args.__dict__))
 
 
 def make_installers(
@@ -305,45 +339,6 @@ def _create_toplevel_readme_for_zip_archive(readme_filepath):
     os.path.join(GITHUB_PAGE_DIRPATH, create_user_docs.PAGE_CONFIG_FILENAME))
   
   return toplevel_readme_filepath
-
-
-#===============================================================================
-
-
-def main():
-  parser = argparse.ArgumentParser(description='Create installers for the GIMP plug-in.')
-  parser.add_argument(
-    '-d',
-    '--dest-dir',
-    default=OUTPUT_DIRPATH_DEFAULT,
-    help='destination directory of the created installers',
-    metavar='DIRECTORY',
-    dest='installer_dirpath')
-  parser.add_argument(
-    '-f',
-    '--force',
-    action='store_true',
-    default=False,
-    help='make installers even if the repository contains local changes',
-    dest='force_if_dirty')
-  parser.add_argument(
-    '-i',
-    '--installers',
-    nargs='*',
-    default=['zip'],
-    choices=['zip', 'all'],
-    help='installers to create',
-    dest='installers')
-  parser.add_argument(
-    '-n',
-    '--no-docs',
-    action='store_false',
-    default=True,
-    help='do not generate documentation',
-    dest='generate_docs')
-  
-  parsed_args = parser.parse_args(sys.argv[1:])
-  make_installers(**dict(parsed_args.__dict__))
 
 
 if __name__ == '__main__':

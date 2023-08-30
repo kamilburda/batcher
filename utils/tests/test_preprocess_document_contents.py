@@ -1,9 +1,9 @@
-from batcher import pygimplib as pg
-
 import unittest
+import unittest.mock as mock
 
-import mock
 import parameterized
+
+from batcher import pygimplib as pg
 
 from utils import preprocess_document_contents
 

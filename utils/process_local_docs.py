@@ -4,7 +4,6 @@
 used without running the Jekyll server (e.g. included in release packages as
 user documentation).
 """
-
 import collections
 import os
 import pathlib
@@ -12,11 +11,8 @@ import re
 import shutil
 import sys
 
-import HTMLParser
-try:
-  import xml.etree.cElementTree as ElementTree
-except ImportError:
-  import xml.etree.ElementTree as ElementTree
+import html.parser
+import xml.etree.ElementTree as ElementTree
 
 import yaml
 
@@ -42,10 +38,10 @@ RELATIVE_PATHS_TO_MOVE = collections.OrderedDict([
 HTML_DOCTYPE_DECLARATION = '<!DOCTYPE html>'
 INDEX_HTML = 'index.html'
 
-HTML_VOID_ELEMENTS = set([
+HTML_VOID_ELEMENTS = {
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link',
-  'menuitem', 'meta', 'param', 'source', 'track', 'wbr'
-])
+  'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
+}
 
 HTML_ELEMENTS_WITH_URLS = collections.OrderedDict([
   ('a', ['href']),
@@ -80,10 +76,30 @@ PAGE_CONFIG_FILENAME = '_config.yml'
 PAGE_CONFIG = None
 
 
-class LocalJekyllHTMLParser(HTMLParser.HTMLParser):
+def main(site_dirpath, page_config_filepath):
+  init_page_config(page_config_filepath)
+
+  remove_redundant_files(site_dirpath)
+
+  for html_filepath in get_html_filepaths(site_dirpath):
+    parser = get_html_parser(html_filepath)
+    html_relative_filepath = os.path.relpath(html_filepath, site_dirpath)
+
+    remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
+    rename_paths_in_url_attributes(
+      RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
+
+    with open(html_filepath, 'wb') as f:
+      write_to_html_file(parser.tree, f)
+
+  reorganize_files(site_dirpath)
+
+
+class LocalJekyllHTMLParser(html.parser.HTMLParser):
   
   def __init__(self):
-    HTMLParser.HTMLParser.__init__(self)
+    super().__init__()
+
     self.tree_builder = ElementTree.TreeBuilder()
     self.tree = None
   
@@ -103,7 +119,8 @@ class LocalJekyllHTMLParser(HTMLParser.HTMLParser):
     self.tree_builder.data(data)
 
   def close(self):
-    HTMLParser.HTMLParser.close(self)
+    super().close()
+
     self.tree = ElementTree.ElementTree(self.tree_builder.close())
 
 
@@ -293,28 +310,6 @@ def modify_url_attributes_in_file(
   
   with open(output_html_filepath, 'wb') as f:
     write_to_html_file(parser.tree, f)
-
-
-#===============================================================================
-
-
-def main(site_dirpath, page_config_filepath):
-  init_page_config(page_config_filepath)
-  
-  remove_redundant_files(site_dirpath)
-  
-  for html_filepath in get_html_filepaths(site_dirpath):
-    parser = get_html_parser(html_filepath)
-    html_relative_filepath = os.path.relpath(html_filepath, site_dirpath)
-    
-    remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
-    rename_paths_in_url_attributes(
-      RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
-    
-    with open(html_filepath, 'wb') as f:
-      write_to_html_file(parser.tree, f)
-  
-  reorganize_files(site_dirpath)
 
 
 if __name__ == '__main__':

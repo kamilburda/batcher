@@ -38,12 +38,16 @@ The following tags can be specified in the documents:
   `{% include-config 'PLUGIN_NAME' %}` will insert a pygimplib configuration
   entry titled `'PLUGIN_NAME'`, e.g. 'batcher'.
 """
-from batcher import pygimplib as pg
-
 import abc
 import os
 import re
 import sys
+
+from batcher import pygimplib as pg
+
+
+def main(source_and_dest_filepaths):
+  preprocess_contents(source_and_dest_filepaths)
 
 
 def preprocess_contents(source_and_dest_filepaths):
@@ -369,12 +373,6 @@ _TAG_MATCHING_REGEXES = {
   'include-section': r'( *)(\{% include-section (.*?) %\})',
   'include-config': r'(\{% include-config (.*?) %\})',
 }
-
-#===============================================================================
-
-
-def main(source_and_dest_filepaths):
-  preprocess_contents(source_and_dest_filepaths)
 
 
 if __name__ == '__main__':
