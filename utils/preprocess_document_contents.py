@@ -38,6 +38,7 @@ The following tags can be specified in the documents:
   `{% include-config 'PLUGIN_NAME' %}` will insert a pygimplib configuration
   entry titled `'PLUGIN_NAME'`, e.g. 'batcher'.
 """
+
 import abc
 import os
 import re

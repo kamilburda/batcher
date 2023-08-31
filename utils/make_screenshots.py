@@ -3,6 +3,7 @@
 """Automatic taking and processing screenshots of the plug-in dialog for
 documentation purposes.
 """
+
 import os
 import time
 

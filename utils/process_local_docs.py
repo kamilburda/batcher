@@ -4,6 +4,7 @@
 used without running the Jekyll server (e.g. included in release packages as
 user documentation).
 """
+
 import collections
 import os
 import pathlib

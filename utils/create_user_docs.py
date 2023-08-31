@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """Generating user documentation from GitHub Pages files."""
+
 import os
 import shutil
 import sys

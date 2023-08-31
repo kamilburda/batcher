@@ -19,6 +19,7 @@ To run tests in GIMP:
 
 To repeat the tests, simply call the procedure again.
 """
+
 from typing import List, Optional
 
 import importlib

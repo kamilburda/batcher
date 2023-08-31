@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """Creating installers for releases from the plug-in source."""
+
 import os
 import sys
 import inspect

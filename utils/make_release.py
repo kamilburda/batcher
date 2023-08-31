@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """Creating a new plug-in release."""
+
 import argparse
 import collections
 import distutils.util

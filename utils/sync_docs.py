@@ -6,6 +6,7 @@ end-user documentation.
 Care must be taken to select only files that should not be updated manually,
 because any previous updates to such files are discarded.
 """
+
 import os
 import shutil
 

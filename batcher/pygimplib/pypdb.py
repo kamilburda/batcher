@@ -1,3 +1,5 @@
+"""Wrapper of ``Gimp.get_pdb()`` to simplify invoking GIMP PDB procedures."""
+
 from typing import Optional
 
 import gi
