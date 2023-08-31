@@ -7,7 +7,7 @@ from gi.repository import Gtk
 from .. import progress as pgprogress
 
 __all__ = [
-  "GtkProgressUpdater",
+  'GtkProgressUpdater',
 ]
 
 
