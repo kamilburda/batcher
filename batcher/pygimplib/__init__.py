@@ -58,7 +58,7 @@ builtins._ = _
 # from . import overwrite
 # from . import path
 # from . import pdbutils
-# from . import progress
+from . import progress
 # from . import setting
 from . import utils
 
@@ -82,7 +82,7 @@ __all__ = [
   # 'overwrite',
   # 'path',
   # 'pdbutils',
-  # 'progress',
+  'progress',
   # 'setting',
   'utils',
   # Global elements imported to or defined in this module
