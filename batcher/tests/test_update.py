@@ -174,7 +174,7 @@ class TestHandleUpdate(unittest.TestCase):
   ])
   def test_handle_update(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         previous_version_str,
         current_version_str,
         invoked_handlers):
@@ -211,7 +211,7 @@ class TestReplaceFieldArgumentsInPattern(unittest.TestCase):
      '[layer name, %e]_[001]_[tags, _, (%t)]'],
   ])
   def test_replace_field_arguments_in_pattern(
-        self, test_case_name_suffix, fields_and_replacements, pattern, expected_output):
+        self, test_case_suffix, fields_and_replacements, pattern, expected_output):
     self.assertEqual(
       update.replace_field_arguments_in_pattern(pattern, fields_and_replacements),
       expected_output)
@@ -227,7 +227,7 @@ class TestReplaceFieldArgumentsInPattern(unittest.TestCase):
      '[layer path, -, %c, %e]_[layer path, _, (%c), %e]_[tags, _, (%t)]'],
   ])
   def test_replace_field_arguments_in_pattern_with_lists(
-        self, test_case_name_suffix, fields_and_replacements, pattern, expected_output):
+        self, test_case_suffix, fields_and_replacements, pattern, expected_output):
     self.assertEqual(
       update.replace_field_arguments_in_pattern(pattern, fields_and_replacements, as_lists=True),
       expected_output)

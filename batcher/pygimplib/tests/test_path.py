@@ -23,7 +23,7 @@ class TestUniquifyString(unittest.TestCase):
      'one (1)', ['one (1)', 'one (2)', 'three'], 'one (1) (1)'),
   ])
   def test_uniquify_string(
-        self, test_case_name_suffix, str_, existing_strings, expected_str):
+        self, test_case_suffix, str_, existing_strings, expected_str):
     self.assertEqual(pgpath.uniquify_string(str_, existing_strings), expected_str)
   
   @parameterized.parameterized.expand([
@@ -37,7 +37,7 @@ class TestUniquifyString(unittest.TestCase):
      'one (1).png', ['one (1).png', 'two', 'three'], 'one (1) (1).png'),
   ])
   def test_uniquify_string_with_custom_position(
-        self, test_case_name_suffix, str_, existing_strings, expected_str):
+        self, test_case_suffix, str_, existing_strings, expected_str):
     self.assertEqual(
       pgpath.uniquify_string(str_, existing_strings, len(str_) - len('.png')),
       expected_str)
@@ -84,7 +84,7 @@ class TestStringPattern(unittest.TestCase):
     ('string_containing_field_delimiters', '[image]', '[image]'),
   ])
   def test_generate_without_fields(
-        self, test_case_name_suffix, pattern, expected_output):
+        self, test_case_suffix, pattern, expected_output):
     self.assertEqual(pgpath.StringPattern(pattern).substitute(), expected_output)
   
   @parameterized.parameterized.expand([
@@ -217,7 +217,7 @@ class TestStringPattern(unittest.TestCase):
      [('field', _get_field_value)], 'img_[field[]', 'img_[field[]'),
   ])
   def test_generate_with_fields(
-        self, test_case_name_suffix, fields, pattern, expected_output):
+        self, test_case_suffix, fields, pattern, expected_output):
     self.assertEqual(pgpath.StringPattern(pattern, fields).substitute(), expected_output)
   
   @parameterized.parameterized.expand([
@@ -234,7 +234,7 @@ class TestStringPattern(unittest.TestCase):
      [('field', _get_field_value)], 'img_[field]', 'img_12'),
   ])
   def test_generate_multiple_times_yields_same_field(
-        self, test_case_name_suffix, fields, pattern, expected_output):
+        self, test_case_suffix, fields, pattern, expected_output):
     string_pattern = pgpath.StringPattern(pattern, fields)
     num_repeats = 3
     
@@ -272,7 +272,7 @@ class TestStringPattern(unittest.TestCase):
      ['img_1', 'img_2', 'img_3']),
   ])
   def test_generate_with_field_as_regex(
-        self, test_case_name_suffix, fields, pattern, expected_outputs):
+        self, test_case_suffix, fields, pattern, expected_outputs):
     generators = []
     processed_fields = []
     
@@ -292,7 +292,7 @@ class TestStringPattern(unittest.TestCase):
     ('multiple_fields', 'img_[field]_[field]', ['img_1_2', 'img_3_4', 'img_5_6']),
   ])
   def test_generate_with_field_generator(
-        self, test_case_name_suffix, pattern, expected_outputs):
+        self, test_case_suffix, pattern, expected_outputs):
     field_value_generator = _generate_number()
     fields = [('field', lambda field: next(field_value_generator))]
     
@@ -306,7 +306,7 @@ class TestStringPattern(unittest.TestCase):
     ('with_no_args', 'img_[field]', 'img_12'),
   ])
   def test_generate_with_fields_with_bound_method(
-        self, test_case_name_suffix, pattern, expected_output):
+        self, test_case_suffix, pattern, expected_output):
     class _Field:
       
       def get_field_value(self, field, arg1=1, arg2=2):
@@ -364,7 +364,7 @@ class TestStringPattern(unittest.TestCase):
     ('negative_position_returns_none', '[layer name]', -1, None),
   ])
   def test_get_field_at_position(
-        self, test_case_name_suffix, pattern, position, expected_output):
+        self, test_case_suffix, pattern, position, expected_output):
     self.assertEqual(
       pgpath.StringPattern.get_field_at_position(pattern, position), expected_output)
   
@@ -379,7 +379,7 @@ class TestStringPattern(unittest.TestCase):
      'img_[field, 3, 4]_layer_[field2].png'),
   ])
   def test_reconstruct_pattern(
-        self, test_case_name_suffix, pattern_parts, expected_str):
+        self, test_case_suffix, pattern_parts, expected_str):
     self.assertEqual(
       pgpath.StringPattern.reconstruct_pattern(pattern_parts), expected_str)
   
@@ -403,7 +403,7 @@ class TestGetFileExtension(unittest.TestCase):
     ('multiple_periods_with_recognized_extension', 'main-background.xcf.bz2', 'xcf.bz2'),
     ('multiple_periods_with_unrecognized_extension', 'main-background.aaa.bbb', 'bbb'),
   ])
-  def test_get_file_extension(self, test_case_name_suffix, str_, expected_output):
+  def test_get_file_extension(self, test_case_suffix, str_, expected_output):
     self.assertEqual(pgpath.get_file_extension(str_), expected_output)
 
 
@@ -433,7 +433,7 @@ class TestGetFilenameWithNewFileExtension(unittest.TestCase):
   ])
   def test_get_filename_with_new_file_extension(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         str_,
         new_file_extension,
         expected_output,
@@ -476,7 +476,7 @@ class TestFilenameValidator(unittest.TestCase):
     ('', 'NUL.txt', False),
     ('', 'NUL (1)', True),
   ])
-  def test_is_valid(self, test_case_name_suffix, str_, expected_is_valid):
+  def test_is_valid(self, test_case_suffix, str_, expected_is_valid):
     if expected_is_valid:
       self.assertTrue(pgpath.FilenameValidator.is_valid(str_)[0])
     else:
@@ -493,7 +493,7 @@ class TestFilenameValidator(unittest.TestCase):
     ('', 'NUL', 'NUL (1)'),
     ('', 'NUL.txt', 'NUL (1).txt'),
   ])
-  def test_validate(self, test_case_name_suffix, str_, expected_output):
+  def test_validate(self, test_case_suffix, str_, expected_output):
     self.assertEqual(pgpath.FilenameValidator.validate(str_), expected_output)
   
 
@@ -526,7 +526,7 @@ class TestFilepathValidator(unittest.TestCase):
     ('', ['C:' + os.sep + 'two', 'three'], False, 'posix'),
   ])
   def test_is_valid(
-        self, test_case_name_suffix, path_components, expected_is_valid, os_name=None):
+        self, test_case_suffix, path_components, expected_is_valid, os_name=None):
     if os_name is not None and os.name != os_name:
       return
     
@@ -613,7 +613,7 @@ class TestFilepathValidator(unittest.TestCase):
   ])
   def test_validate(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         path_components,
         expected_path_components,
         os_name=None):
@@ -638,7 +638,7 @@ class TestFileExtensionValidator(unittest.TestCase):
     ('', ' jpg ', False),
     ('', 'jpg.', False),
   ])
-  def test_is_valid(self, test_case_name_suffix, str_, expected_is_valid):
+  def test_is_valid(self, test_case_suffix, str_, expected_is_valid):
     if expected_is_valid:
       self.assertTrue(pgpath.FileExtensionValidator.is_valid(str_)[0])
     else:
@@ -653,5 +653,5 @@ class TestFileExtensionValidator(unittest.TestCase):
     ('', '', ''),
     ('', 'one/two\x09\x7f\\:|', 'onetwo'),
   ])
-  def test_validate(self, test_case_name_suffix, str_, expected_output):
+  def test_validate(self, test_case_suffix, str_, expected_output):
     self.assertEqual(pgpath.FileExtensionValidator.validate(str_), expected_output)

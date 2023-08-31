@@ -12,7 +12,7 @@ class TestPlaceHolderSetting(unittest.TestCase):
     ('image_placeholder', placeholders.PlaceholderImageSetting, ['current_image']),
   ])
   def test_get_allowed_placeholder_names(
-        self, test_case_name_suffix, placeholder_setting_type, expected_result):
+        self, test_case_suffix, placeholder_setting_type, expected_result):
     self.assertListEqual(
       placeholder_setting_type.get_allowed_placeholder_names(), expected_result)
   
@@ -21,5 +21,5 @@ class TestPlaceHolderSetting(unittest.TestCase):
     ('image_placeholder', placeholders.PlaceholderImageSetting, 1),
   ])
   def test_get_allowed_placeholders(
-        self, test_case_name_suffix, placeholder_setting_type, expected_length):
+        self, test_case_suffix, placeholder_setting_type, expected_length):
     self.assertEqual(len(placeholder_setting_type.get_allowed_placeholders()), expected_length)

@@ -29,7 +29,7 @@ class TestCreateLogFile(unittest.TestCase):
   @mock.patch(pgutils.get_pygimplib_module_path() + '.logging.open')
   def test_create_log_file(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         io_open_side_effect,
         makedirs_side_effect,
         expected_result,

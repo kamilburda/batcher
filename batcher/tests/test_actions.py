@@ -107,7 +107,7 @@ class TestCreateActions(unittest.TestCase):
   ])
   def test_create_initial_actions_are_added(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         name,
         test_actions_list,
         initial_action_name,
@@ -201,7 +201,7 @@ class TestManageActions(unittest.TestCase):
      ['autocrop', 'autocrop'],),
   ])
   def test_add_invokes_after_add_action_event(
-        self, test_case_name_suffix, action_names_to_add):
+        self, test_case_suffix, action_names_to_add):
     invoked_event_args = []
     
     def on_after_add_action(actions, action, orig_action_dict):
@@ -242,7 +242,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_get_index(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action_name,
         expected_position):
     for action_dict in self.test_procedures.values():
@@ -288,7 +288,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_reorder(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action_name,
         new_position,
         expected_ordered_action_names):
@@ -321,7 +321,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_remove(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action_names_to_add,
         names_to_remove,
         names_to_keep):
@@ -430,7 +430,7 @@ class TestWalkActions(unittest.TestCase):
   ])
   def test_walk(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action_type,
         setting_name,
         expected_setting_paths):
@@ -465,7 +465,7 @@ class TestWalkActions(unittest.TestCase):
   ])
   def test_walk_after_reordering(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         actions_to_reorder,
         expected_setting_paths):
     for action_dict in self.test_procedures.values():
@@ -496,7 +496,7 @@ class TestLoadSaveActions(unittest.TestCase):
     ('with_explicit_clearing', True),
   ])
   def test_save_load_actions(
-        self, test_case_name_suffix, remove_before_load,
+        self, test_case_suffix, remove_before_load,
         mock_gimp_module, mock_session_source):
     for action_dict in self.test_procedures.values():
       actions_.add(self.procedures, action_dict)

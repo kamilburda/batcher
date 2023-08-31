@@ -313,7 +313,7 @@ class TestGroup(unittest.TestCase):
   ])
   def test_get_value(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         setting_name_or_path,
         default_value,
         expected_value):
@@ -399,7 +399,7 @@ class TestGroup(unittest.TestCase):
      -2,
      ['flatten', 'file_extension', 'overwrite_mode']),
   ])
-  def test_reorder(self, test_case_name_suffix, setting_name, new_position, expected_names):
+  def test_reorder(self, test_case_suffix, setting_name, new_position, expected_names):
     self.settings.reorder(setting_name, new_position)
     
     expected_list = [self.settings[name] for name in expected_names]

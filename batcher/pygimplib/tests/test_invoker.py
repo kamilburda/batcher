@@ -95,7 +95,7 @@ class TestInvoker(InvokerTestCase):
      ['main', 'additional']
      ),
   ])
-  def test_add(self, test_case_name_suffix, groups, list_actions_groups):
+  def test_add(self, test_case_suffix, groups, list_actions_groups):
     test_list = []
     
     self.invoker.add(append_test, groups, args=[test_list])
@@ -626,7 +626,7 @@ class TestInvokerInvokeActions(InvokerTestCase):
   ])
   def test_invoke_single_action(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action,
         add_args,
         invoke_args,
@@ -822,7 +822,7 @@ class TestInvokerInvokeForeachActions(InvokerTestCase):
   ])
   def test_invoke_single_foreach(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action,
         foreach_action,
         actions_args,
@@ -861,7 +861,7 @@ class TestInvokerInvokeForeachActions(InvokerTestCase):
   ])
   def test_invoke_multiple_foreachs(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         action,
         foreach_actions,
         actions_args,

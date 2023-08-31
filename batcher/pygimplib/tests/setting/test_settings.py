@@ -1187,7 +1187,7 @@ class TestBrushSetting(unittest.TestCase):
     ('four_elements', ('Clipboard', 50.0, 10.0, -1), ('Clipboard', 50.0, 10.0, -1)),
   ])
   def test_set_value_with_tuple_valid_length(
-        self, test_case_name_suffix, value, expected_value):
+        self, test_case_suffix, value, expected_value):
     self.setting.set_value(value)
     self.assertEqual(self.setting.value, expected_value)
   
@@ -1304,7 +1304,7 @@ class TestCreateArraySetting(unittest.TestCase):
     ('default_value_is_not_empty', (1.0, 5.0, 10.0)),
   ])
   def test_create_invalid_element_default_value_raises_error(
-        self, test_case_name_suffix, default_value):
+        self, test_case_suffix, default_value):
     with self.assertRaises(settings_.SettingDefaultValueError):
       settings_.ArraySetting(
         'coordinates',
@@ -1326,7 +1326,7 @@ class TestCreateArraySetting(unittest.TestCase):
      settings_.SettingPdbTypes.none),
   ])
   def test_create_with_pdb_type(
-        self, test_case_name_suffix,
+        self, test_case_suffix,
         pdb_type, element_type, expected_pdb_type,
         value_set_func=None, value_save_func=None):
     setting = settings_.ArraySetting(
@@ -1438,7 +1438,7 @@ class TestArraySetting(unittest.TestCase):
     ('with_tuple', (20.0, 50.0, 40.0), (20.0, 50.0, 40.0)),
     ('with_list', [20.0, 50.0, 40.0], (20.0, 50.0, 40.0)),
   ])
-  def test_set_value(self, test_case_name_suffix, input_value, expected_value):
+  def test_set_value(self, test_case_suffix, input_value, expected_value):
     self.setting.set_value(input_value)
     
     self.assertEqual(self.setting.value, expected_value)
@@ -1468,7 +1468,7 @@ class TestArraySetting(unittest.TestCase):
     ('all_are_invalid', (200.0, 200.0, 200.0)),
   ])
   def test_set_value_validates_each_element_value_individually(
-        self, test_case_name_suffix, input_value):
+        self, test_case_suffix, input_value):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(input_value)
   
@@ -1541,7 +1541,7 @@ class TestArraySetting(unittest.TestCase):
     ('last_with_negative_index', -1, 10.0),
     ('second_to_last_with_negative_index', -2, 5.0),
   ])
-  def test_getitem(self, test_case_name_suffix, index, expected_value):
+  def test_getitem(self, test_case_suffix, index, expected_value):
     self.assertEqual(self.setting[index].value, expected_value)
   
   @parameterized.parameterized.expand([
@@ -1552,7 +1552,7 @@ class TestArraySetting(unittest.TestCase):
     ('negative_last_to_middle', -1, -3, [10.0, 5.0], -1),
   ])
   def test_getitem_slice(
-        self, test_case_name_suffix, index_begin, index_end, expected_value, step=None):
+        self, test_case_suffix, index_begin, index_end, expected_value, step=None):
     self.assertEqual(
       [element.value for element in self.setting[index_begin:index_end:step]],
       expected_value)
@@ -1561,7 +1561,7 @@ class TestArraySetting(unittest.TestCase):
     ('one_more_than_length', 3),
     ('more_than_length', 5),
   ])
-  def test_getitem_out_of_bounds_raises_error(self, test_case_name_suffix, index):
+  def test_getitem_out_of_bounds_raises_error(self, test_case_suffix, index):
     with self.assertRaises(IndexError):
       self.setting[index]
   
@@ -1572,7 +1572,7 @@ class TestArraySetting(unittest.TestCase):
     ('two_elements', [1, 1]),
     ('all_elements', [0, 0, 0]),
   ])
-  def test_delitem(self, test_case_name_suffix, indexes_to_delete):
+  def test_delitem(self, test_case_suffix, indexes_to_delete):
     orig_len = len(self.setting)
     
     for index in indexes_to_delete:
@@ -1584,7 +1584,7 @@ class TestArraySetting(unittest.TestCase):
     ('one_more_than_length', 3),
     ('more_than_length', 5),
   ])
-  def test_delitem_out_of_bounds_raises_error(self, test_case_name_suffix, index):
+  def test_delitem_out_of_bounds_raises_error(self, test_case_suffix, index):
     with self.assertRaises(IndexError):
       self.setting[index]
   
@@ -1605,7 +1605,7 @@ class TestArraySetting(unittest.TestCase):
      1, 40.0, 1, 40.0),
   ])
   def test_add_element(
-        self, test_case_name_suffix, index, value, insertion_index, expected_value):
+        self, test_case_suffix, index, value, insertion_index, expected_value):
     element = self.setting.add_element(index, value=value)
     self.assertEqual(len(self.setting), 4)
     self.assertIs(self.setting[insertion_index], element)
@@ -1633,7 +1633,7 @@ class TestArraySetting(unittest.TestCase):
     ('middle_to_middle_negative_position', 1, -2, [1.0, 5.0, 10.0]),
   ])
   def test_reorder_element(
-        self, test_case_name_suffix, index, new_index, expected_values):
+        self, test_case_suffix, index, new_index, expected_values):
     self.setting.reorder_element(index, new_index)
     self.assertEqual(
       [element.value for element in self.setting[:]],
@@ -1681,7 +1681,7 @@ class TestArraySetting(unittest.TestCase):
      1, settings_.ArraySetting.ELEMENT_DEFAULT_VALUE, 1, 0.0),
   ])
   def test_before_add_element_event(
-        self, test_case_name_suffix, index, value, expected_index, expected_value):
+        self, test_case_suffix, index, value, expected_index, expected_value):
     event_args = []
     
     def _on_before_add_element(array_setting, index, value):
@@ -1707,7 +1707,7 @@ class TestArraySetting(unittest.TestCase):
      -1, settings_.ArraySetting.ELEMENT_DEFAULT_VALUE, -2, 0.0),
   ])
   def test_after_add_element_event(
-        self, test_case_name_suffix, index, value, expected_index, expected_value):
+        self, test_case_suffix, index, value, expected_index, expected_value):
     event_args = []
     
     def _on_after_add_element(array_setting, insertion_index, value):
@@ -1734,7 +1734,7 @@ class TestArraySetting(unittest.TestCase):
   ])
   def test_get_pdb_param_for_registrable_setting(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         length_name,
         length_description,
         expected_length_name,
@@ -1768,7 +1768,7 @@ class TestArraySettingCreateWithSize(unittest.TestCase):
   ])
   def test_create_with_size(
         self,
-        test_case_name_suffix,
+        test_case_suffix,
         min_size,
         max_size,
         expected_min_size,
@@ -1791,7 +1791,7 @@ class TestArraySettingCreateWithSize(unittest.TestCase):
     ('min_size_greater_than_default_value_length', 4, None),
   ])
   def test_create_raises_error_on_invalid_size(
-        self, test_case_name_suffix, min_size, max_size):
+        self, test_case_suffix, min_size, max_size):
     with self.assertRaises(settings_.SettingDefaultValueError):
       settings_.ArraySetting(
         'coordinates',
@@ -1826,7 +1826,7 @@ class TestArraySettingSize(unittest.TestCase):
     ('value_length_less_than_min_size', (1.0,)),
     ('value_length_greater_than_max_size', (1.0, 5.0, 10.0, 30.0, 70.0)),
   ])
-  def test_set_value_invalid_size_raises_error(self, test_case_name_suffix, value):
+  def test_set_value_invalid_size_raises_error(self, test_case_suffix, value):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(value)
   

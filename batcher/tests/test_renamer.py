@@ -28,7 +28,7 @@ class TestNumberField(unittest.TestCase):
      999, 3, ['999', '1000', '1001']),
   ])
   def test_generate_number(
-        self, test_case_name_suffix, initial_number, padding, expected_outputs):
+        self, test_case_suffix, initial_number, padding, expected_outputs):
     number_generator = renamer_.NumberField.generate_number(initial_number, padding)
     outputs = [next(number_generator) for unused_ in range(len(expected_outputs))]
     
@@ -183,7 +183,7 @@ class TestRenameWithNumberField(unittest.TestCase):
      image003_007
      """),
   ])
-  def test_rename(self, test_case_name_suffix, pattern, expected_layer_names_str):
+  def test_rename(self, test_case_suffix, pattern, expected_layer_names_str):
     layer_tree = pg.itemtree.LayerTree(self.image)
     layer_tree.filter.add(lambda item: item.type == pg.itemtree.TYPE_ITEM)
     
