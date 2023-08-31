@@ -17,10 +17,8 @@
 
 This section explains how to set up development environment for Batcher.
 
-A Linux distribution is recommended as the environment contains several bash scripts.
-For users of Windows 10 and above, a Unix-like environment is recommended, such as the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install).
-
-The easiest to get set up is to download and run the [bash script](utils/init_repo.sh) that automatically installs any required dependencies and sets up the environment.
+If you are using a Linux-based environment, the easiest to get set up is to download and run the [bash script](utils/init_repo.sh) that automatically installs any required dependencies and sets up the environment.
+Users of Windows 10 and above may use e.g. the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) to run the script.
 
 If you cannot run the script, perform manual setup as per the instructions below.
 
