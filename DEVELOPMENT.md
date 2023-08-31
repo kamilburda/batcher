@@ -136,6 +136,7 @@ Import modules at the beginning of a module.
 
 Avoid importing individual objects, classes or functions.
 Notable exceptions:
+* types from the `typing` and `collections.abc` modules
 * `pdb` object in `pygimplib`
 
 Do not use wildcard imports.

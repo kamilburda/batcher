@@ -1,9 +1,8 @@
 """Class for creating plug-in-wide configuration."""
 
-from typing import Optional
-
 import builtins
 import os
+from typing import Optional
 
 import gi
 gi.require_version('Gimp', '3.0')

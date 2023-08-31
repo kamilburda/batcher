@@ -1,9 +1,8 @@
 """Utility functions and classes."""
 
-from typing import Callable, Optional, Tuple
-
 import contextlib
 import inspect
+from typing import Callable, Optional, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')

@@ -1,11 +1,10 @@
 """Wrappers to simplify registering and running functions as GIMP procedures.
 """
 
-from typing import Callable, Dict, List, Optional, Tuple, Union
-
-import collections.abc
+from collections.abc import Iterable
 import functools
 import sys
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import gi
 
@@ -171,7 +170,7 @@ def _parse_and_check_parameters(parameters):
   if parameters is None:
     return None
 
-  if not isinstance(parameters, collections.abc.Iterable) or isinstance(parameters, str):
+  if not isinstance(parameters, Iterable) or isinstance(parameters, str):
     raise TypeError('Arguments and return values must be specified as a list-like iterable')
 
   processed_parameters = {}
@@ -294,7 +293,7 @@ def _do_create_procedure(plugin_instance, proc_name):
   if menu_path is not None:
     if isinstance(menu_path, str):
       procedure.add_menu_path(menu_path)
-    elif isinstance(menu_path, collections.abc.Iterable):
+    elif isinstance(menu_path, Iterable):
       for path in menu_path:
         procedure.add_menu_path(path)
     else:

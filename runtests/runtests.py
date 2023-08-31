@@ -20,14 +20,13 @@ To run tests in GIMP:
 To repeat the tests, simply call the procedure again.
 """
 
-from typing import List, Optional
-
 import importlib
 import inspect
 import os
 import pkgutil
 import sys
 import unittest
+from typing import List, Optional
 
 import gi
 gi.require_version('Gimp', '3.0')
