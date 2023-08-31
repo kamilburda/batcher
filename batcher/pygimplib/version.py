@@ -1,12 +1,22 @@
 """Management of version numbers (particularly incrementing)."""
 
+from __future__ import annotations
+
+from typing import Optional
+
 import re
 
 
 class Version:
-  
+  """Class for holding and incrementing a version."""
+
   def __init__(
-        self, major=None, minor=None, patch=None, prerelease=None, prerelease_patch=None):
+        self,
+        major: Optional[int] = None,
+        minor: Optional[int] = None,
+        patch: Optional[int] = None,
+        prerelease: Optional[str] = None,
+        prerelease_patch: Optional[int] = None):
     self.major = major
     self.minor = minor
     self.patch = patch
@@ -14,23 +24,23 @@ class Version:
     self.prerelease_patch = prerelease_patch
   
   def __str__(self):
-    version_str = '{}.{}'.format(self.major, self.minor)
+    version_str = [f'{self.major}.{self.minor}']
     
     if self.patch is not None:
-      version_str += '.{}'.format(self.patch)
+      version_str.append(f'.{self.patch}')
     
     if self.prerelease is not None:
-      version_str += '-{}'.format(self.prerelease)
+      version_str.append(f'-{self.prerelease}')
       if self.prerelease_patch is not None:
-        version_str += '.{}'.format(self.prerelease_patch)
+        version_str.append(f'.{self.prerelease_patch}')
     
-    return version_str
+    return ''.join(version_str)
   
   def __repr__(self):
-    return '{}({}, {}, {}, {}, {})'.format(
-      type(self).__name__, self.major, self.minor, self.patch,
-      '"' + self.prerelease + '"' if self.prerelease is not None else self.prerelease,
-      self.prerelease_patch)
+    class_ = type(self).__qualname__
+    prerelease = f'"{self.prerelease}"' if self.prerelease is not None else self.prerelease
+    return (
+      f'{class_}({self.major}, {self.minor}, {self.patch}, {prerelease}, {self.prerelease_patch})')
   
   def __lt__(self, other_version):
     this_version_main_components = self._get_main_components_tuple(self)
@@ -75,45 +85,43 @@ class Version:
   def __ge__(self, other_version):
     return not self.__lt__(other_version)
   
-  def increment(self, component_to_increment, prerelease=None):
-    """
-    Increment the version as per `component_to_increment` and `prerelease`.
+  def increment(self, component_to_increment: str, prerelease: Optional[str] = None):
+    """Increments the version.
     
-    `component_to_increment` can be `'major'`, `'minor'` or `'patch'`. Given the
-    format `X.Y.Z`, `'major'` increments `X`, `'minor'` increments `Y` and
-    `'patch'` increments `Z`. If `patch` attribute is `None` and `'patch'` is
-    specified, `1` will be assigned (e.g. `3.3` becomes `3.3.1`).
+    ``component_to_increment`` can be ``'major'``, ``'minor'`` or
+    ``'patch'``. Given the format ``X.Y.Z``, ``'major'`` increments ``X``,
+    ``'minor'`` increments ``Y`` and ``'patch'`` increments ``Z``. If the
+    ``patch`` attribute is ``None`` and ``'patch'`` is specified, ``'1'``
+    will be assigned (e.g. ``'3.3'`` becomes ``'3.3.1'``).
     
-    If the `prerelease` string is not `None` and non-empty, append the
-    prerelease to the version. For example, `3.3` with `'major'` compoment and
-    `'alpha'` as the prerelease string becomes `4.0-alpha`.
+    If the ``prerelease`` string is not ``None`` and non-empty,
+    the pre-release is appended. For example, ``'3.3'`` with ``'major'``
+    component and ``'alpha'`` as the pre-release string becomes ``'4.0-alpha'``.
     
-    If the version already has the same prerelease, append a number to the
-    prerelease (e.g. `4.0-alpha` becomes `4.0-alpha.2`).
+    If the version already has the same pre-release, a number to the
+    pre-release is appended (e.g. ``'4.0-alpha'`` becomes ``'4.0-alpha.2'``).
     
-    If the version already has a different prerelease (lexically earlier than
-    `prerelease`), replace the existing prerelease with `prerelease` (e.g.
-    `4.0-alpha` with the `'beta'` prerelease becomes `4.0-beta`).
+    If the version already has a different pre-release (lexically earlier than
+    ``prerelease``), replace the existing pre-release with ``prerelease`` (e.g.
+    ``'4.0-alpha'`` with the ``'beta'`` pre-release becomes ``'4.0-beta'``).
     
     Raises:
-    
-    * `ValueError`:
-      
-      * Invalid value for `component_to_increment`.
-      * The specified `prerelease` contains non-alphanumeric characters or is
-        lexically earlier than the existing `prerelease` attribute.
+      ValueError:
+        * Value of ``component_to_increment`` is not valid.
+        * The specified ``prerelease`` contains non-alphanumeric characters or
+          is lexically earlier than the existing ``prerelease`` attribute.
     """
     if component_to_increment not in ['major', 'minor', 'patch']:
-      raise ValueError('invalid version component "{}"'.format(component_to_increment))
+      raise ValueError(f'invalid version component "{component_to_increment}"')
     
     if prerelease:
       if not re.search(r'^[a-zA-Z0-9]+$', prerelease):
-        raise ValueError('invalid pre-release format "{}"'.format(prerelease))
+        raise ValueError(f'invalid pre-release format "{prerelease}"')
       
-      if prerelease < self.prerelease:
+      if self.prerelease is not None and prerelease < self.prerelease:
         raise ValueError(
-          'the specified pre-release "{}" is lexically earlier than'
-          ' the existing pre-release "{}"'.format(prerelease, self.prerelease))
+          f'the specified pre-release "{prerelease}" is lexically earlier than'
+          f' the existing pre-release "{self.prerelease}"')
     
     if not prerelease:
       prerelease = None
@@ -168,13 +176,12 @@ class Version:
           set_new_prerelease()
   
   @classmethod
-  def parse(cls, version_str):
-    """
-    Parse the `version_str` string and return a `Version` instance.
+  def parse(cls, version_str: str) -> Version:
+    """Parses the specified string and returns a ``Version`` instance.
     
     Raises:
-    
-    * `InvalidVersionFormatError` - `version_str` has invalid format.
+      InvalidVersionFormatError: ``version_str`` does not have a valid format.
+      TypeError: ``version_str`` is not a string.
     """
     if not isinstance(version_str, str):
       raise TypeError('version string must be a string type')

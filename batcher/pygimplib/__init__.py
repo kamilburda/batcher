@@ -61,7 +61,7 @@ builtins._ = _
 # from . import progress
 # from . import setting
 from . import utils
-# from . import version
+from . import version
 
 from .constants import *
 from .procedure import main
@@ -86,7 +86,7 @@ __all__ = [
   # 'progress',
   # 'setting',
   'utils',
-  # 'version',
+  'version',
   # Global elements imported to or defined in this module
   'GIMP_CHARACTER_ENCODING',
   'TEXT_FILE_ENCODING',
