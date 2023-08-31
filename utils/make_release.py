@@ -35,6 +35,8 @@ sys.path.extend([
 
 from batcher import pygimplib as pg
 
+from batcher import version as version_
+
 from utils import make_installers
 from utils import preprocess_document_contents
 
@@ -160,8 +162,8 @@ def _check_if_tag_with_new_version_already_exists(release_metadata):
 
 def _get_next_version(release_metadata):
   try:
-    ver = pg.version.Version.parse(release_metadata.current_version)
-  except pg.version.InvalidVersionFormatError:
+    ver = version_.Version.parse(release_metadata.current_version)
+  except version_.InvalidVersionFormatError:
     _print_error_and_exit(
       'Version string "{}" has invalid format; valid format: {}'.format(
         release_metadata.current_version, VERSION_STRING_FORMAT))

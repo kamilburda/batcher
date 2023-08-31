@@ -9,6 +9,7 @@ from gi.repository import Gtk
 from batcher import pygimplib as pg
 
 from batcher import utils as utils_
+from batcher import version as version_
 from batcher.gui import messages
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, ABORT = 0, 1, 2, 3, 4
@@ -57,7 +58,7 @@ def update(settings, handle_invalid='ask_to_clear', sources=None):
     utils_.save_plugin_version(settings, sources)
     return FRESH_START, ''
 
-  current_version = pg.version.Version.parse(pg.config.PLUGIN_VERSION)
+  current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
 
   previous_version, load_status, load_message = _load_previous_version(settings)
 
@@ -97,8 +98,8 @@ def _load_previous_version(settings):
   load_result = settings['main/plugin_version'].load()
 
   try:
-    previous_version = pg.version.Version.parse(settings['main/plugin_version'].value)
-  except (pg.version.InvalidVersionFormatError, TypeError):
+    previous_version = version_.Version.parse(settings['main/plugin_version'].value)
+  except (version_.InvalidVersionFormatError, TypeError):
     previous_version = None
     load_status = pg.setting.Persistor.FAIL
     load_message = ''
@@ -125,7 +126,7 @@ def handle_update(
     source.clear()
 
   for version_str, update_handler in update_handlers.items():
-    if previous_version < pg.version.Version.parse(version_str) <= current_version:
+    if previous_version < version_.Version.parse(version_str) <= current_version:
       update_handler(settings, sources)
 
   settings.save(sources)

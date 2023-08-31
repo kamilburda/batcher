@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from .. import version as pgversion
+from batcher import version as version_
 
 
 class TestVersion(unittest.TestCase):
@@ -17,11 +17,11 @@ class TestVersion(unittest.TestCase):
     ['major_minor_patch_prerelease_patch', '3.3.1-alpha.2', (3, 3, 1, 'alpha', 2)],
   ])
   def test_parse_version_string(self, test_case_suffix, version_str, expected_values):
-    ver = pgversion.Version.parse(version_str)
+    ver = version_.Version.parse(version_str)
     self.assertTupleEqual(
       (ver.major, ver.minor, ver.patch, ver.prerelease, ver.prerelease_patch),
       expected_values)
-  
+
   @parameterized.parameterized.expand([
     ['redundant_hyphens', '3.3-alpha-beta'],
     ['invalid_main_components', '3#3'],
@@ -37,9 +37,9 @@ class TestVersion(unittest.TestCase):
     ['one_prerelease_patch', '3.3-alpha.1'],
   ])
   def test_parse_version_string_invalid_format_raises_error(self, test_case_suffix, version_str):
-    with self.assertRaises(pgversion.InvalidVersionFormatError):
-      pgversion.Version.parse(version_str)
-  
+    with self.assertRaises(version_.InvalidVersionFormatError):
+      version_.Version.parse(version_str)
+
   @parameterized.parameterized.expand([
     ['major_minor', (3, 3, None, None, None), '3.3'],
     ['major_minor_patch', (3, 3, 1, None, None), '3.3.1'],
@@ -48,15 +48,15 @@ class TestVersion(unittest.TestCase):
     ['major_minor_patch_prerelease_patch', (3, 3, 1, 'alpha', 2), '3.3.1-alpha.2'],
   ])
   def test_str(self, test_case_suffix, version_values, expected_str):
-    self.assertEqual(str(pgversion.Version(*version_values)), expected_str)
-  
+    self.assertEqual(str(version_.Version(*version_values)), expected_str)
+
   @parameterized.parameterized.expand([
     ['major_minor', (3, 3, None, None, None), 'Version(3, 3, None, None, None)'],
     ['major_minor_patch_prerelease_patch', (3, 3, 1, 'alpha', 2), 'Version(3, 3, 1, "alpha", 2)'],
   ])
   def test_repr(self, test_case_suffix, version_values, expected_str):
-    self.assertEqual(repr(pgversion.Version(*version_values)), expected_str)
-  
+    self.assertEqual(repr(version_.Version(*version_values)), expected_str)
+
   @parameterized.parameterized.expand([
     ['major', (3, 3, None, None, None), 'major', '4.0'],
     ['major_with_patch', (3, 3, 1, None, None), 'major', '4.0'],
@@ -75,10 +75,10 @@ class TestVersion(unittest.TestCase):
     ['patch_with_patch_prerelease_patch', (3, 3, 1, 'alpha', 2), 'patch', '3.3.2'],
   ])
   def test_increment(self, test_case_suffix, version_values, component_to_increment, expected_str):
-    ver = pgversion.Version(*version_values)
+    ver = version_.Version(*version_values)
     ver.increment(component_to_increment)
     self.assertEqual(str(ver), expected_str)
-  
+
   @parameterized.parameterized.expand([
     ['new_major', (3, 3, 1, None, None), 'major', 'alpha', '4.0-alpha'],
     ['new_minor', (3, 3, 1, None, None), 'minor', 'alpha', '3.4-alpha'],
@@ -99,10 +99,10 @@ class TestVersion(unittest.TestCase):
   ])
   def test_increment_with_prerelease(
         self, test_case_suffix, version_values, component_to_increment, prerelease, expected_str):
-    ver = pgversion.Version(*version_values)
+    ver = version_.Version(*version_values)
     ver.increment(component_to_increment, prerelease)
     self.assertEqual(str(ver), expected_str)
-  
+
   @parameterized.parameterized.expand([
     ['invalid_main_component', (3, 3, 1, None, None), 'invalid', None],
     ['invalid_prerelease_format', (3, 3, 1, None, None), 'patch', 'al#pha'],
@@ -112,10 +112,10 @@ class TestVersion(unittest.TestCase):
   ])
   def test_increment_invalid_parameters_raise_error(
         self, test_case_suffix, version_values, component_to_increment, prerelease):
-    ver = pgversion.Version(*version_values)
+    ver = version_.Version(*version_values)
     with self.assertRaises(ValueError):
       ver.increment(component_to_increment, prerelease)
-  
+
   @parameterized.parameterized.expand([
     ['first_is_less', '3.3', '3.4', True],
     ['first_is_greater', '3.3', '3.2', False],
@@ -133,14 +133,14 @@ class TestVersion(unittest.TestCase):
     ['prerelease_patch_digits_compared_as_number', '3.3-alpha.2', '3.3-alpha.10', True],
   ])
   def test_less_than(self, test_case_suffix, ver1_str, ver2_str, result):
-    ver1 = pgversion.Version.parse(ver1_str)
-    ver2 = pgversion.Version.parse(ver2_str)
-    
+    ver1 = version_.Version.parse(ver1_str)
+    ver2 = version_.Version.parse(ver2_str)
+
     if result:
       self.assertTrue(ver1 < ver2)
     else:
       self.assertFalse(ver1 < ver2)
-  
+
   @parameterized.parameterized.expand([
     ['equal', '3.3', '3.3', True],
     ['not_equal', '3.3', '3.4', False],
@@ -152,8 +152,8 @@ class TestVersion(unittest.TestCase):
     ['not_equal_prerelease_patch', '3.3-alpha.2', '3.3-alpha.3', False],
   ])
   def test_equal(self, test_case_suffix, ver1_str, ver2_str, result):
-    ver1 = pgversion.Version.parse(ver1_str)
-    ver2 = pgversion.Version.parse(ver2_str)
+    ver1 = version_.Version.parse(ver1_str)
+    ver2 = version_.Version.parse(ver2_str)
     
     if result:
       self.assertEqual(ver1, ver2)

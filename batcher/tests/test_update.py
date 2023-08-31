@@ -14,6 +14,7 @@ from batcher import pygimplib as pg
 from batcher.pygimplib.tests import stubs_gimp
 
 from batcher import update
+from batcher import version as version_
 
 
 @mock.patch(
@@ -182,8 +183,8 @@ class TestHandleUpdate(unittest.TestCase):
       self.settings,
       {},
       self.update_handlers,
-      pg.version.Version.parse(previous_version_str),
-      pg.version.Version.parse(current_version_str),
+      version_.Version.parse(previous_version_str),
+      version_.Version.parse(current_version_str),
       False,
       False)
     
