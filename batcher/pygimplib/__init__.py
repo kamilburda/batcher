@@ -52,7 +52,7 @@ builtins._ = _
 # from . import fileformats
 # from . import gui
 # from . import invocation
-# from . import invoker
+from . import invoker
 # from . import itemtree
 from . import objectfilter
 from . import overwrite
@@ -75,7 +75,7 @@ __all__ = [
   # 'fileformats',
   # 'gui',
   # 'invocation',
-  # 'invoker',
+  'invoker',
   # 'itemtree',
   # 'logging',
   'objectfilter',

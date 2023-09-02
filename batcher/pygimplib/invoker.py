@@ -1,8 +1,12 @@
 """Managing and invoking a list of functions sequentially."""
 
+from __future__ import annotations
+
 import collections
+from collections.abc import Iterable
 import inspect
 import itertools
+from typing import Callable, Dict, List, Optional, Union
 
 
 class Invoker:
@@ -15,7 +19,7 @@ class Invoker:
   * grouping actions and invoking only actions in specified groups,
   * adding actions to be invoked before or after each action, hereinafter
     "for-each actions",
-  * adding another `Invoker` instance as an action (i.e. nesting the current
+  * adding another ``Invoker`` instance as an action (i.e. nesting the current
     instance inside another instance).
   """
   
@@ -25,10 +29,10 @@ class Invoker:
   
   def __init__(self):
     # key: action group; value: list of `_ActionItem` instances
-    self._actions = collections.OrderedDict()
+    self._actions = {}
     
     # key: action group; value: list of `_ActionItem` instances
-    self._foreach_actions = collections.OrderedDict()
+    self._foreach_actions = {}
     
     # key: action group; value: dict of (action function: count) pairs
     self._action_functions = collections.defaultdict(lambda: collections.defaultdict(int))
@@ -44,39 +48,40 @@ class Invoker:
   
   def add(
         self,
-        action,
-        groups=None,
-        args=None,
-        kwargs=None,
-        foreach=False,
-        ignore_if_exists=False,
-        position=None,
-        run_generator=True):
+        action: Union[Callable, Invoker],
+        groups: Union[None, str, List[str]] = None,
+        args: Optional[Iterable] = None,
+        kwargs: Optional[Dict] = None,
+        foreach: bool = False,
+        ignore_if_exists: bool = False,
+        position: Optional[int] = None,
+        run_generator: bool = True,
+  ) -> Optional[int]:
     """Adds an action to be invoked by `invoke()`.
-    
+
     The ID of the newly added action is returned.
     
     An action can be:
-    * a function, in which case optional arguments (`args`, a list or tuple) and
-      keyword arguments (`kwargs`, a dict) can be specified,
+    * a function, in which case optional arguments (``args``) and
+      keyword arguments (``kwargs``) can be specified,
     * another `Invoker` instance.
     
     To control which actions are invoked, you may want to group them.
     
-    If `groups` is `None` or `'default'`, the action is added to a default
-    group appropriately named `'default'`.
+    If ```groups``` is ``None`` or ``'default'``, the action is added to a
+    default group appropriately named ``'default'``.
     
-    If `groups` is a list of group names (strings), the action is added to
+    If ```groups``` is a list of group names (strings), the action is added to
     the specified groups. Groups are created automatically if they previously
     did not exist.
     
-    If `groups` is `'all'`, the action is added to all existing groups. The
-    action will not be added to the default group if it does not exist.
+    If ```groups``` is ``'all'``, the action is added to all existing groups.
+    The action will not be added to the default group if it does not exist.
     
     By default, the action is added at the end of the list of actions in the
-    specified group(s). Pass an integer to the `position` parameter to customize
-    the insertion position. A negative value represents an n-th to last
-    position.
+    specified group(s). Pass an integer to the ``position`` parameter to
+    customize the insertion position. A negative value represents an n-th to
+    last position.
     
     Action as a function can also be a generator function or return a generator.
     This allows customizing which parts of the code of the function are called
@@ -88,29 +93,29 @@ class Invoker:
           args, kwargs = yield
           print('baz')
     
-    prints `'bar'` the first time the function is called and `'baz'` all
+    prints ``'bar'`` the first time the function is called and ``'baz'`` all
     subsequent times. This allows to e.g. initialize objects to an initial state
     in the first part and then use that state in subsequent invocations of this
     function, effectively eliminating the need for global variables for the same
     purpose.
     
-    The generator must contain at least one `yield` statement. If you pass
+    The generator must contain at least one ``yield`` statement. If you pass
     arguments and want to use the arguments in the function, the yield statement
-    must be in the form `args, kwargs = yield`.
+    must be in the form ``args, kwargs = yield``.
     
     To make sure the generator can be called an arbitrary number of times, place
-    a `yield` statement in an infinite loop. To limit the number of calls,
+    a ``yield`` statement in an infinite loop. To limit the number of calls,
     simply do not use an infinite loop. In such a case, the action is
     permanently removed for the group(s) `invoke()` was called for once no more
     yield statements are encountered.
     
     To prevent activating generators and to treat generator functions as regular
-    functions, set `run_generator` to `False`.
+    functions, set ``run_generator`` to ``False``.
     
-    If `foreach` is `True` and the action is a function, the action is
+    If ``foreach`` is ``True`` and the action is a function, the action is
     treated as a "for-each" action. By default, a for-each action is
     invoked after each regular action (function or `Invoker` instance). To
-    customize this behavior, use the `yield` statement in the for-each action
+    customize this behavior, use the ``yield`` statement in the for-each action
     to specify where it is desired to invoke each action.
     For example:
     
@@ -119,9 +124,9 @@ class Invoker:
         yield
         print('baz')
     
-    first prints `'bar'`, then invokes the action and finally prints
-    `'baz'`. Multiple `yield` statements can be specified to invoke the wrapped
-    action multiple times.
+    first prints ``'bar'``, then invokes the action and finally prints
+    ``'baz'``. Multiple ``yield`` statements can be specified to invoke the
+    wrapped action multiple times.
     
     If multiple for-each actions are added, they are invoked in the order
     they were added by this method. For example:
@@ -136,8 +141,8 @@ class Invoker:
         yield
         print('baz2')
     
-    will print `'bar1'`, `'bar2'`, then invoke the action (only once), and
-    then print `'baz1'` and `'baz2'`.
+    will print ``'bar1'``, ``'bar2'``, then invoke the action (only once), and
+    then print ``'baz1'`` and ``'baz2'``.
     
     To make an `Invoker` instance behave as a for-each action, wrap
     the instance in a function as shown above. For example:
@@ -145,11 +150,11 @@ class Invoker:
       def invoke_before_each_action():
         invoker.invoke()
         yield
-    
-    If `ignore_if_exists` is `True`, do not add the action if the same
-    function or `Invoker` instance is already added in at least one of
-    the specified groups and return `None`. Note that the same function with
-    different arguments is still treated as one function.
+
+    If ``ignore_if_exists`` is ``True``, the action is not added if the same
+    function or `Invoker` instance is already added in at least one of the
+    specified groups. In this case, ``None`` is returned. Note that the same
+    function with different arguments is still treated as one function.
     """
     if ignore_if_exists and self.contains(action, groups, foreach):
       return None
@@ -179,58 +184,58 @@ class Invoker:
   
   def invoke(
         self,
-        groups=None,
-        additional_args=None,
-        additional_kwargs=None,
-        additional_args_position=None):
+        groups: Union[None, str, List[str]] = None,
+        additional_args: Optional[Iterable] = None,
+        additional_kwargs: Optional[Dict] = None,
+        additional_args_position: Optional[int] = None):
     """Invokes actions.
     
-    If `groups` is `None` or `'default'`, invoke actions in the default
-    group.
+    If ``groups`` is ``None`` or ``'default'``, actions in the default group
+    are invoked.
     
-    If `groups` is a list of group names (strings), invoke actions in the
+    If ``groups`` is a list of group names (strings), invoke actions in the
     specified groups.
     
-    If `groups` is `'all'`, invoke actions in all existing groups.
+    If ``groups`` is ``'all'``, actions in all existing groups are invoked.
     
-    If any of the `groups` do not exist, raise `ValueError`.
+    If any of the ``groups`` do not exist, ``ValueError`` is raised.
     
-    If `action` is an `Invoker` instance, the instance will invoke
+    If ``action`` is an `Invoker` instance, the instance will invoke
     actions in the specified groups.
     
     Additional arguments and keyword arguments to all actions in the group
-    are given by `additional_args` and `additional_kwargs`, respectively.
-    If some keyword arguments appear in both the `kwargs` parameter in `add()`
-    and in `additional_kwargs`, values from the latter override the values in
+    are given by ``additional_args`` and ``additional_kwargs``, respectively.
+    If some keyword arguments appear in both the ``kwargs`` parameter in `add()`
+    and in ``additional_kwargs``, values from the latter override the values in
     the former.
     
-    `additional_args` are appended to the argument list by default. Specify
-    `additional_args_position` as an integer to change the insertion position of
-    `additional_args`. `additional_args_position` also applies to nested
-    `Invoker` instances.
+    ``additional_args`` are appended to the argument list by default. Specify
+    ``additional_args_position`` as an integer to change the insertion
+    position of ``additional_args``. ``additional_args_position`` also
+    applies to nested `Invoker` instances.
     """
     
-    def _invoke_action(item, group):
-      action, action_args, action_kwargs = item.action
+    def _invoke_action(item_, group_):
+      action, action_args, action_kwargs = item_.action
       args = _get_args(action_args)
       kwargs = dict(action_kwargs, **additional_kwargs)
       
       result = action(*args, **kwargs)
       
       if inspect.isgenerator(result):
-        item.is_generator = True
+        item_.is_generator = True
       
-      if not (item.is_generator and item.run_generator):
+      if not (item_.is_generator and item_.run_generator):
         return result
       else:
-        if group not in item.generators_per_group:
-          item.generators_per_group[group] = result
-          return next(item.generators_per_group[group])
+        if group_ not in item_.generators_per_group:
+          item_.generators_per_group[group_] = result
+          return next(item_.generators_per_group[group_])
         else:
           try:
-            return item.generators_per_group[group].send([args, kwargs])
+            return item_.generators_per_group[group_].send([args, kwargs])
           except StopIteration:
-            item.should_be_removed_from_group = True
+            item_.should_be_removed_from_group = True
     
     def _prepare_foreach_action(action, action_args, action_kwargs):
       args = _get_args(action_args)
@@ -245,20 +250,20 @@ class Invoker:
         args[additional_args_position:additional_args_position] = additional_args
         return tuple(args)
     
-    def _invoke_action_with_foreach_actions(item, group):
+    def _invoke_action_with_foreach_actions(item_, group_):
       action_generators = [
         _prepare_foreach_action(*foreach_item.action)
-        for foreach_item in self._foreach_actions[group]]
+        for foreach_item in self._foreach_actions[group_]]
       
       _invoke_foreach_actions_once(action_generators)
       
       while action_generators:
-        result_from_action = _invoke_action(item, group)
+        result_from_action = _invoke_action(item_, group_)
         _invoke_foreach_actions_once(action_generators, result_from_action)
         
-        if item.should_be_removed_from_group:
-          self.remove(item.action_id, [group])
-          item.should_be_removed_from_group = False
+        if item_.should_be_removed_from_group:
+          self.remove(item_.action_id, [group_])
+          item_.should_be_removed_from_group = False
           return
     
     def _invoke_foreach_actions_once(action_generators, result_from_action=None):
@@ -272,9 +277,9 @@ class Invoker:
       
       for action_generator_to_remove in action_generators_to_remove:
         action_generators.remove(action_generator_to_remove)
-    
-    def _invoke_invoker(invoker, group):
-      invoker.invoke([group], additional_args, additional_kwargs, additional_args_position)
+
+    def _invoke_invoker(invoker, group_):
+      invoker.invoke([group_], additional_args, additional_kwargs, additional_args_position)
     
     additional_args = additional_args if additional_args is not None else ()
     additional_kwargs = additional_kwargs if additional_kwargs is not None else {}
@@ -303,20 +308,24 @@ class Invoker:
         else:
           _invoke_invoker(item.action, group)
   
-  def add_to_groups(self, action_id, groups=None, position=None):
-    """
-    Add an existing action specified by its ID to the specified groups. For
-    more information about the `groups` parameter, see `add()`.
+  def add_to_groups(
+        self,
+        action_id: int,
+        groups: Union[None, str, List[str]] = None,
+        position: Optional[int] = None):
+    """Adds an existing action specified by its ID to the specified groups.
+
+    For more information about the ``groups`` parameter, see `add()`.
     
     If the action was already added to one of the specified groups, it will
     not be added again (call `add()` for that purpose).
     
     By default, the action is added at the end of the list of actions in the
-    specified group(s). Pass an integer to the `position` parameter to customize
-    the insertion position. A negative value represents an n-th-to-last
-    position.
+    specified group(s). Pass an integer to the ``position`` parameter to
+    customize the insertion position. A negative value represents an
+    n-th-to-last position.
     
-    If the action ID is not valid, raise `ValueError`.
+    If the action ID is not valid, ``ValueError`` is raised.
     """
     self._check_action_id_is_valid(action_id)
     
@@ -324,14 +333,19 @@ class Invoker:
       if group not in self._action_items[action_id].groups:
         self._add_action_to_group(self._action_items[action_id], group, position)
   
-  def contains(self, action, groups=None, foreach=False):
-    """
-    Return `True` if the specified action exists, `False` otherwise.
-    `action` can be a function or `Invoker` instance.
+  def contains(
+        self,
+        action: Union[Callable, Invoker],
+        groups: Union[None, str, List[str]] = None,
+        foreach: bool = False,
+  ) -> bool:
+    """Returns ``True`` if the specified action exists, ``False`` otherwise.
+
+    ``action`` can be a function or `Invoker` instance.
     
-    For information about the `groups` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_action()`.
     
-    If `foreach` is `True`, treat the action as a for-each action.
+    If ``foreach`` is ``True``, the action is treated as a for-each action.
     """
     action_functions = self._get_action_lists_and_functions(
       self._get_action_type(action, foreach))[1]
@@ -342,14 +356,19 @@ class Invoker:
     
     return False
   
-  def find(self, action, groups=None, foreach=False):
-    """
-    Return action IDs matching the specified action. `action` can be a
-    function or `Invoker` instance.
+  def find(
+        self,
+        action: Union[Callable, Invoker],
+        groups: Union[None, str, List[str]] = None,
+        foreach: bool = False,
+  ) -> List[int]:
+    """Returns action IDs matching the specified action.
+
+    ``action`` can be a function or `Invoker` instance.
     
-    For information about the `groups` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_action()`.
     
-    If `foreach` is `True`, treat the action as a for-each action.
+    If ``foreach`` is ``True``, the action is treated as a for-each action.
     """
     action_type = self._get_action_type(action, foreach)
     action_lists = self._get_action_lists_and_functions(action_type)[0]
@@ -369,37 +388,40 @@ class Invoker:
     
     return found_action_ids
   
-  def has_action(self, action_id, groups=None):
-    """
-    Return `True` if the specified ID (returned from `add()`) belongs to an
-    existing action in at least one of the specified groups.
+  def has_action(self, action_id: int, groups: Union[None, str, List[str]] = None) -> bool:
+    """Returns ``True`` if an action exists in at least one of the specified
+    groups, ``False`` otherwise.
+
+    The action is specified by its ID returned from `add()`.
     
-    `group` can have one of the following values:
-      * `None` or `'default'` - the default group,
-      * list of group names (strings) - specific groups,
-      * `'all'` - all existing groups.
+    ``groups`` can have one of the following values:
+     * ``None`` or ``'default'`` - the default group,
+     * list of group names (strings) - specific groups,
+     * ``'all'`` - all existing groups.
     """
     return (
       action_id in self._action_items
       and any(group in self._action_items[action_id].groups
               for group in self._process_groups_arg(groups)))
   
-  def get_action(self, action_id):
-    """
-    Return action specified by its ID. If the ID is not valid, return `None`.
+  def get_action(self, action_id: int) -> Union[Callable, Invoker, None]:
+    """Returns an action specified by its ID.
+
+    If the ID is not valid, ``None`` is returned.
     """
     if action_id in self._action_items:
       return self._action_items[action_id].action
     else:
       return None
   
-  def get_position(self, action_id, group=None):
-    """
-    Return the position of the action specified by its ID in the specified
-    group. If `group` is `None` or `'default'`, use the default group.
+  def get_position(self, action_id: int, group: Union[None, str, List[str]] = None) -> int:
+    """Returns the position of the action specified by its ID in the specified
+    group.
+
+    If ``group`` is ``None`` or ``'default'``, use the default group.
     
-    If the ID is not valid or the action is not in the group, raise
-    `ValueError`.
+    If the ID is not valid or the action is not in the group, ``ValueError`` is
+    raised.
     """
     if group is None:
       group = 'default'
@@ -409,15 +431,20 @@ class Invoker:
     
     action_item = self._action_items[action_id]
     action_lists, unused_ = self._get_action_lists_and_functions(action_item.action_type)
+
     return action_lists[group].index(action_item)
   
-  def list_actions(self, group=None, foreach=False):
-    """
-    Return all actions, along with their arguments and keyword arguments, for
-    the specified group in the order they would be invoked. If the group does
-    not exist, return `None`.
-    
-    If `foreach` is `True`, return for-each actions instead.
+  def list_actions(
+        self, group: Optional[str] = None, foreach: bool = False,
+  ) -> Optional[List[Union[Callable, Invoker]]]:
+    """Returns all actions for the specified group in the order they would be
+    invoked.
+
+    Actions are returned along with their arguments and keyword arguments.
+
+    If the group does not exist, ``None`` is returned.
+
+    If ``foreach`` is ``True``, for-each actions are returned instead.
     """
     if group is None:
       group = 'default'
@@ -432,12 +459,11 @@ class Invoker:
     else:
       return None
   
-  def list_groups(self, include_empty_groups=True):
-    """
-    Return a list of all groups in the invoker.
+  def list_groups(self, include_empty_groups: bool = True) -> List[str]:
+    """Returns a list of all groups in the invoker.
     
-    If `include_empty_groups` is `False`, do not include groups with no
-    actions.
+    If ``include_empty_groups`` is ``False``, groups with no actions are not
+    included.
     """
     if include_empty_groups:
       return list(self._actions)
@@ -449,21 +475,21 @@ class Invoker:
       
       return [group for group in self._actions if _is_group_non_empty(group)]
   
-  def reorder(self, action_id, position, group=None):
+  def reorder(self, action_id: int, position: int, group: Optional[str] = None):
     """Change the order in which an action is invoked.
     
     The action is specified by its ID (as returned by `add()`).
     
-    If `group` is `None` or `'default'`, use the default group.
+    If ``group`` is ``None`` or ``'default'``, the default group is used.
     
     A position of 0 moves the action to the beginning.
     Negative numbers move the action to the n-th to last position, i.e. -1
     for the last position, -2 for the second to last position, etc.
     
-    Raises `ValueError` if:
-      * action ID is invalid
-      * group does not exist
-      * action is not in the group
+    ``ValueError`` is raised if:
+    * ``action_id`` is not valid
+    * ``group`` does not exist
+    * the action having ``action_id`` is not in ``group``
     """
     if group is None:
       group = 'default'
@@ -482,20 +508,23 @@ class Invoker:
     
     action_lists[group].insert(position, action_item)
   
-  def remove(self, action_id, groups=None, ignore_if_not_exists=False):
-    """
-    Remove the action specified by its ID from the specified groups.
+  def remove(
+        self,
+        action_id: int,
+        groups: Union[None, str, List[str]] = None,
+        ignore_if_not_exists: bool = False):
+    """Removes an action specified by its ID from the specified groups.
     
-    For information about the `groups` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_action()`.
     
-    For existing groups where the action is not added, do nothing.
+    For existing groups where the action is not added, nothing is removed.
     
-    If `ignore_if_not_exists` is `True`, do not raise `ValueError` if
-    `action_id` does not match any added action.
+    If ``ignore_if_not_exists`` is ``True``, ``ValueError`` is not raised if
+    ``action_id`` does not match any added action.
     
-    Raises `ValueError` if:
-      * action ID is invalid and `ignore_if_not_exists` is `False`
-      * at least one of the specified groups does not exist
+    ``ValueError`` is raised if:
+    * ``action_id`` is invalid and ``ignore_if_not_exists`` is ``False``
+    * at least one of the specified groups does not exist
     """
     if ignore_if_not_exists:
       if action_id not in self._action_items:
@@ -514,14 +543,13 @@ class Invoker:
         if action_id not in self._action_items:
           break
   
-  def remove_groups(self, groups):
-    """
-    Remove the specified groups and their actions (including for-each
+  def remove_groups(self, groups: Union[None, str, List[str]] = None):
+    """Removes the specified groups and their actions (including for-each
     actions).
     
-    For information about the `groups` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_action()`.
     
-    Non-existent groups in `groups` are ignored.
+    Non-existent groups in ``groups`` are ignored.
     """
     processed_groups = [
       group for group in self._process_groups_arg(groups)
@@ -698,22 +726,22 @@ class Invoker:
       return self._actions, self._invokers
     else:
       raise ValueError(
-        'invalid action type {}; must be one of {}'.format(action_type, self._ACTION_TYPES))
+        f'invalid action type {action_type}; must be one of {self._ACTION_TYPES}')
   
   def _check_action_id_is_valid(self, action_id):
     if action_id not in self._action_items:
-      raise ValueError('action with ID {} does not exist'.format(action_id))
+      raise ValueError(f'action with ID {action_id} does not exist')
   
   def _check_group_exists(self, group, groups=None):
     if groups is None:
       groups = self.list_groups()
     
     if group not in groups:
-      raise ValueError('group "{}" does not exist'.format(group))
+      raise ValueError(f'group "{group}" does not exist')
   
   def _check_action_in_group(self, action_id, group):
     if group not in self._action_items[action_id].groups:
-      raise ValueError('action with ID {} is not in group "{}"'.format(action_id, group))
+      raise ValueError(f'action with ID {action_id} is not in group "{group}"')
 
 
 class _ActionItem:
