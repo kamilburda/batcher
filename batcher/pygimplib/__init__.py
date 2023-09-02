@@ -77,7 +77,7 @@ __all__ = [
   # 'invocation',
   'invoker',
   # 'itemtree',
-  # 'logging',
+  'logging',
   'objectfilter',
   'overwrite',
   # 'path',
