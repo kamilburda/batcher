@@ -1,6 +1,7 @@
 """Custom setting classes specific to the plug-in."""
 
 import collections
+from collections.abc import Iterable
 import os
 
 import gi
@@ -74,7 +75,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         
         image_id = image.ID
         
-        if not isinstance(items, collections.Iterable) or isinstance(items, str):
+        if not isinstance(items, Iterable) or isinstance(items, str):
           raise TypeError('expected a list-like, found {}'.format(items))
         
         processed_items = set()

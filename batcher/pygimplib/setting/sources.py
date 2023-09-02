@@ -3,6 +3,7 @@
 import abc
 import ast
 import collections
+from collections.abc import Iterable
 import os
 import pickle
 import traceback
@@ -442,7 +443,7 @@ class Source(metaclass=abc.ABCMeta):
     return None, None
   
   def _check_if_is_list(self, list_):
-    if (not isinstance(list_, collections.Iterable)
+    if (not isinstance(list_, Iterable)
         or isinstance(list_, str)
         or isinstance(list_, dict)):
       raise SourceInvalidFormatError(

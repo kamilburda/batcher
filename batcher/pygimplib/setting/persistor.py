@@ -3,6 +3,7 @@ multiple setting sources.
 """
 
 import collections
+from collections.abc import Iterable
 
 from . import _sources_errors
 
@@ -317,7 +318,7 @@ class Persistor:
           # Causes `Persistor.load()` or `Persistor.save()` to return `FAIL`
           return []
         else:
-          if isinstance(source, collections.Iterable):
+          if isinstance(source, Iterable):
             for item in source:
               processed_setting_sources[key].append(item)
           else:
@@ -327,7 +328,7 @@ class Persistor:
         if key not in processed_setting_sources:
           processed_setting_sources[key] = []
         
-        if isinstance(source, collections.Iterable):
+        if isinstance(source, Iterable):
           for item in source:
             processed_setting_sources[key].append(item)
         else:
@@ -339,7 +340,7 @@ class Persistor:
   def _list_settings(settings_or_groups, **walk_kwargs):
     settings = []
     for setting_or_group in settings_or_groups:
-      if isinstance(setting_or_group, collections.Iterable):
+      if isinstance(setting_or_group, Iterable):
         group = setting_or_group
         settings.append(group)
         settings.extend(list(group.walk(**walk_kwargs)))

@@ -51,7 +51,7 @@ builtins._ = _
 # from . import configbase
 # from . import fileformats
 # from . import gui
-# from . import invocation
+from . import invocation
 from . import invoker
 # from . import itemtree
 from . import objectfilter
@@ -74,7 +74,7 @@ __all__ = [
   # Modules
   # 'fileformats',
   # 'gui',
-  # 'invocation',
+  'invocation',
   'invoker',
   # 'itemtree',
   'logging',

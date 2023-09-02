@@ -1,5 +1,7 @@
 """Class interconnecting preview widgets for item names and images."""
 
+from gi.repository import GLib
+
 from batcher import pygimplib as pg
 
 from batcher import builtin_constraints
@@ -299,8 +301,7 @@ class PreviewsController:
     preview.add_function_at_update(preview.set_sensitive, True)
     # In case the image preview gets resized, the update would be canceled,
     # hence update always.
-    pg.invocation.timeout_add(
-      self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS, preview.update)
+    GLib.timeout_add(self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS, preview.update)
     preview_sensitive_setting.set_value(True)
   
   def _disable_preview_on_paned_drag(

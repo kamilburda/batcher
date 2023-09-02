@@ -1,6 +1,7 @@
 """Main API to create plug-in settings and their associated GUI elements."""
 
 import collections
+from collections.abc import Iterable
 import copy
 import inspect
 import sys
@@ -676,7 +677,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     Override this method in subclasses in case copying must be handled
     differently.
     """
-    if (isinstance(value, collections.Iterable)
+    if (isinstance(value, Iterable)
         and not isinstance(value, str)):
       return copy.copy(value)
     else:
@@ -2225,7 +2226,7 @@ class ArraySetting(Setting):
       'Cannot add any more elements - at most {} elements are allowed.')
   
   def _raw_to_value(self, raw_value_array):
-    if (isinstance(raw_value_array, collections.Iterable)
+    if (isinstance(raw_value_array, Iterable)
         and not isinstance(raw_value_array, str)):
       return tuple(
         self._reference_element._raw_to_value(raw_value)
@@ -2240,7 +2241,7 @@ class ArraySetting(Setting):
       for value in value_array]
   
   def _validate(self, value_array):
-    if (not isinstance(value_array, collections.Iterable)
+    if (not isinstance(value_array, Iterable)
         or isinstance(value_array, str)):
       raise SettingValueError(
         utils_.value_to_str_prefix(value_array) + self.error_messages['invalid_value'])
