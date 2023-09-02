@@ -70,6 +70,7 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_getitem_does_not_exist_raises_error(self):
     with self.assertRaises(KeyError):
+      # noinspection PyStatementEffect
       self.filter[42]
   
   def test_len(self):
@@ -97,6 +98,7 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_add_invalid_type_raises_error(self):
     with self.assertRaises(TypeError):
+      # noinspection PyTypeChecker
       self.filter.add('invalid_type')
   
   def test_remove_no_criteria_raises_error(self):
@@ -288,10 +290,10 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_match_with_nested_filter_simple(self):
     # filter - MATCH_ALL
-      # * rule
-      # * filter - MATCH_ANY
-        # * rule
-        # * rule
+    # * rule
+    # * filter - MATCH_ANY
+    #   * rule
+    #   * rule
     
     obj_properties_filter_id = self.filter.add(pgobjectfilter.ObjectFilter(
       self.filter.MATCH_ANY, name='obj_properties'))
@@ -314,12 +316,12 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_match_with_nested_filter_nested(self):
     # filter - MATCH_ALL
-      # * rule
-      # * filter - MATCH_ANY
-        # * rule
-        # * filter - MATCH_ALL
-          # * rule
-          # * rule
+    # * rule
+    # * filter - MATCH_ANY
+    #   * rule
+    #     * filter - MATCH_ALL
+    #       * rule
+    #       * rule
     
     self.filter.add(FilterRules.is_object_id_even)
     obj_properties_filter_id = self.filter.add(pgobjectfilter.ObjectFilter(

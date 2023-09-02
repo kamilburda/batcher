@@ -54,7 +54,7 @@ builtins._ = _
 # from . import invocation
 # from . import invoker
 # from . import itemtree
-# from . import objectfilter
+from . import objectfilter
 from . import overwrite
 # from . import path
 # from . import pdbutils
@@ -78,7 +78,7 @@ __all__ = [
   # 'invoker',
   # 'itemtree',
   # 'logging',
-  # 'objectfilter',
+  'objectfilter',
   'overwrite',
   # 'path',
   # 'pdbutils',
