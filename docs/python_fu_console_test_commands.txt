@@ -15,8 +15,8 @@ import sys
 plugin_dirpath = os.path.join(Gimp.directory(), 'batcher', 'batcher')
 sys.path.append(plugin_dirpath)
 sys.path.append(os.path.join(plugin_dirpath, 'pygimplib'))
-import batcher.pygimplib as pg
-from batcher.pygimplib.tests.setting import test_setting_gui
+import pygimplib as pg
+from pygimplib.tests.setting import test_setting_gui
 
 
 importlib.reload(test_setting_gui)
