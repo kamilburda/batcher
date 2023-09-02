@@ -335,8 +335,10 @@ class ObjectFilter:
       return matching_rule_ids[count:]
   
   def list_rules(self):
-    """Returns a dictionary of (rule ID, rule) pairs."""
-    # Return a copy to prevent modifying the original.
+    """Returns a dictionary of (rule ID, rule) pairs.
+
+    A copy is returned to prevent modifying the original dictionary.
+    """
     return collections.OrderedDict(self._rules)
   
   def reset(self):
