@@ -104,7 +104,7 @@ class SettingMeta(type):
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
         raise TypeError('cannot initialize abstract setting class "{}"'.format(
-          type(self).__name__))
+          type(self).__qualname__))
       
       # This check prevents a parent class' `__init__()` from overriding the
       # contents of `_dict_on_init`, which may have different arguments.
@@ -118,7 +118,7 @@ class SettingMeta(type):
         if inspect.getargspec(orig_init)[1] is not None:
           raise TypeError(
             ('__init__ in Setting subclasses cannot accept variable positional arguments'
-             ' (found in "{}")').format(type(self).__name__))
+             ' (found in "{}")').format(type(self).__qualname__))
       
       orig_init(self, *args, **kwargs)
     
@@ -195,7 +195,7 @@ class PresenterMeta(type):
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
         raise TypeError('cannot initialize abstract presenter class "{}"'.format(
-          type(self).__name__))
+          type(self).__qualname__))
       
       orig_init(self, *args, **kwargs)
     
@@ -236,7 +236,7 @@ def _register_type_and_aliases(namespace, cls, type_name, type_map, base_class_n
   else:
     raise TypeError(
       'Setting subclass with the name "{}" already exists ({})'.format(
-        cls.__name__, type_map._name_to_type_map[human_readable_name]))
+        cls.__qualname__, type_map._name_to_type_map[human_readable_name]))
 
 
 def _get_human_readable_class_name(name, suffix_to_strip=None):

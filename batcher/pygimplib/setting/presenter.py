@@ -105,7 +105,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
         raise ValueError(
           'cannot instantiate class "{}": attribute "element" is None'
           ' and this class does not support the creation of a GUI element'.format(
-            type(self).__name__))
+            type(self).__qualname__))
     
     if old_presenter is not None:
       self._copy_state(old_presenter)
@@ -167,7 +167,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
     """
     if enabled and self._VALUE_CHANGED_SIGNAL is None:
       raise ValueError(
-        'class "{}" does not support automatic GUI update'.format(type(self).__name__))
+        'class "{}" does not support automatic GUI update'.format(type(self).__qualname__))
     
     if enabled:
       self._value_changed_signal = self._VALUE_CHANGED_SIGNAL

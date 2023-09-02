@@ -480,7 +480,7 @@ class _ReleaseMetadata:
       if hasattr(self, name):
         raise TypeError(
           ('keyword argument "{}" already exists in class {}; to prevent name clashes,'
-           ' rename conflicting script options').format(name, type(self).__name__))
+           ' rename conflicting script options').format(name, type(self).__qualname__))
       
       pg.utils.create_read_only_property(self, name, value)
   

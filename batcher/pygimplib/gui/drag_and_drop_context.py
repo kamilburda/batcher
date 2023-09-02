@@ -71,7 +71,7 @@ class DragAndDropContext:
     widget.connect('drag-failed', self._on_widget_drag_failed)
   
   def _get_unique_drag_type(self):
-    return str('{}_{}'.format(type(self).__name__, id(self)))
+    return str('{}_{}'.format(type(self).__qualname__, id(self)))
   
   def _on_widget_drag_data_get(
         self,

@@ -338,7 +338,7 @@ class StringPattern:
     if argspec.keywords:
       raise ValueError(
         '{}: field functions with variable keyword arguments (**kwargs)'
-        ' are not supported'.format(field_func.__name__))
+        ' are not supported'.format(field_func.__qualname__))
     
     return True
   
