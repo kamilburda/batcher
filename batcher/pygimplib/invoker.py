@@ -638,7 +638,7 @@ class Invoker:
     self._invokers[group][invoker] += 1
   
   def _get_action_id(self):
-    return self._action_id_counter.next()
+    return next(self._action_id_counter)
   
   def _set_action_item(
         self,

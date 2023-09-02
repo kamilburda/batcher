@@ -146,7 +146,7 @@ class ImageStub(ParasiteFunctionsStubMixin):
     self.name = pgutils.safe_encode_gimp(name)
     
     if ID is None:
-      self.ID = self._image_id_counter.next()
+      self.ID = next(self._image_id_counter)
     else:
       self.ID = ID
     
@@ -169,7 +169,7 @@ class ItemStub(ParasiteFunctionsStubMixin):
     self.name = pgutils.safe_encode_gimp(name)
     
     if ID is None:
-      self.ID = self._item_id_counter.next()
+      self.ID = next(self._item_id_counter)
     else:
       self.ID = ID
     

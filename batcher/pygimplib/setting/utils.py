@@ -118,7 +118,7 @@ class SettingEventsMixin:
     if not callable(event_handler):
       raise TypeError('not a function')
     
-    event_id = self._event_handler_id_counter.next()
+    event_id = next(self._event_handler_id_counter)
     self._event_handlers[event_type][event_id] = [
       event_handler, event_handler_args, event_handler_kwargs, True]
     self._event_handler_ids_and_types[event_id] = event_type
