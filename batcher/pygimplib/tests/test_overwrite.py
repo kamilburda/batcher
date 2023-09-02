@@ -8,10 +8,9 @@ from .. import utils as pgutils
 class InteractiveOverwriteChooserStub(pgoverwrite.InteractiveOverwriteChooser):
   
   def __init__(self, values_and_display_names, default_value, default_response):
-    super().__init__(
-      values_and_display_names, default_value, default_response)
+    super().__init__(values_and_display_names, default_value, default_response)
     
-    self._values = [value for value, unused_ in self.values_and_display_names]
+    self._values = list(self.values_and_display_names)
   
   def _choose(self, filepath):
     if self._overwrite_mode not in self._values:
@@ -28,17 +27,19 @@ class TestInteractiveOverwriteChooser(unittest.TestCase):
   _OVERWRITE_MODES = SKIP, REPLACE, RENAME_NEW, RENAME_EXISTING = (0, 1, 2, 3)
   
   def setUp(self):
-    self.values_and_display_names = [
-      (self.SKIP, 'Skip'), (self.REPLACE, 'Replace'),
-      (self.RENAME_NEW, 'Rename new'), (self.RENAME_EXISTING, 'Rename existing')]
-    self.default_value = self.REPLACE
+    self.values_and_display_names = {
+      self.SKIP: 'Skip',
+      self.REPLACE: 'Replace',
+      self.RENAME_NEW: 'Rename new',
+      self.RENAME_EXISTING: 'Rename existing',
+    }
     self.default_response = self.SKIP
     self.overwrite_chooser = InteractiveOverwriteChooserStub(
-      self.values_and_display_names, self.default_value, self.default_response)
+      self.values_and_display_names, self.REPLACE, self.default_response)
   
   def test_choose_overwrite_default_value(self):
     self.overwrite_chooser.choose()
-    self.assertEqual(self.overwrite_chooser.overwrite_mode, self.default_value)
+    self.assertEqual(self.overwrite_chooser.overwrite_mode, self.REPLACE)
 
   def test_choose_overwrite(self):
     for mode in self._OVERWRITE_MODES:

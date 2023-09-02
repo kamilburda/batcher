@@ -1,176 +1,188 @@
-"""Handling of conflicting files - overwrite, skip, etc."""
+"""Handling of existing files by the user - overwrite, skip, etc."""
 
 import abc
 import os
+from typing import Dict, Optional, Tuple
 
 from . import path as pgpath
 
 
 class OverwriteChooser(metaclass=abc.ABCMeta):
+  """Interface to indicate how to handle existing files.
+
+  For example, if the user attempts to save a file to a path that already
+  exists, subclasses of this class can be used to provide options to the user on
+  how to handle the existing file (e.g. skip, overwrite or rename the existing
+  file).
   """
-  This class is an interface to indicate how to handle existing files.
+
+  def __init__(self, overwrite_mode: int):
+    """Initializes the instance with a default overwrite mode."""
+    super().__init__()
+
+    self._overwrite_mode = overwrite_mode
   
-  Attributes:
-  
-  * `overwrite_mode` (read-only) - Overwrite mode chosen by the user.
-  """
-  
-  @abc.abstractmethod
-  def overwrite_mode(self):
-    pass
-  
-  @abc.abstractmethod
-  def choose(self, filepath=None):
+  @property
+  def overwrite_mode(self) -> int:
+    """The overwrite mode chosen by the user.
+
+    By default, this is set to the value provided during object instantiation.
     """
-    Return a value indicating how to handle the conflicting file
-    by letting the user choose the value.
+    return self._overwrite_mode
+  
+  @abc.abstractmethod
+  def choose(self, filepath: Optional[str] = None) -> int:
+    """Returns a value indicating how to handle the conflicting file.
+
+    The user is assumed to choose one of the possible overwrite modes. The
+    overwrite modes and the implementation of handling conflicting files are
+    left to the developer using the return value provided by this method.
     
-    The actual overwrite modes (possible values one of which the user chooses)
-    and the implementation of handling conflicting files are left to the
-    programmer using the return value provided by this method.
-    
-    Parameters:
-    
-    * `filepath` - File path that conflicts with an existing file. This class
-      uses the file path to simply display it to the user. Defaults to `None`.
+    ``filepath`` is a file path that points to an existing file. This class uses
+    the file path to simply display it to the user.
     """
     pass
 
 
 class NoninteractiveOverwriteChooser(OverwriteChooser):
+  """Class that simply stores an overwrite mode specified upon instantiation.
+
+  The overwrite mode cannot be modified after instantiation.
+
+  This class is suitable to be used in a non-interactive environment, i.e. with
+  no user interaction.
   """
-  This class simply stores overwrite mode specified upon the object
-  instantiation. The object is suitable to use in a non-interactive environment,
-  i.e. with no user interaction.
-  """
   
-  def __init__(self, overwrite_mode):
-    super().__init__()
-    self._overwrite_mode = overwrite_mode
-  
-  @property
-  def overwrite_mode(self):
-    return self._overwrite_mode
-  
-  def choose(self, filepath=None):
+  def choose(self, filepath: Optional[str] = None) -> int:
     return self._overwrite_mode
 
 
 class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
-  """
-  This class is an interface for interactive overwrite choosers, requiring
-  the user choose the overwrite mode.
-  
-  Additional attributes:
-  
-  * `values_and_display_names` - List of (value, display name) tuples which
-    define overwrite modes and their human-readable names.
-  
-  * `default_value` - Default value. Must be one of the values in the
-    `values_and_display_names` list.
-  
-  * `default_response` - Default value to return if the user made a choice that
-    returns a value not in `values_and_display_names`. `default_response` does
-    not have to be any of the values in `values_and_display_names`.
-  
-  * `is_apply_to_all` (read-only) - Whether the user-made choice applies to the
-    current file (`False`) or to the current and all subsequent files (`True`).
+  """Abstract class for choosing an overwrite mode interactively.
   """
   
-  def __init__(self, values_and_display_names, default_value, default_response):
-    super().__init__()
+  def __init__(
+        self,
+        values_and_display_names: Dict[int, str],
+        default_value: int,
+        default_response: int,
+  ):
+    super().__init__(default_value)
     
     self.values_and_display_names = values_and_display_names
-    self._values = [value for value, unused_ in self.values_and_display_names]
+    """Dictionary of (value, display name) pairs which define overwrite modes
+    and their human-readable names.
+    """
+
+    self._values = list(self.values_and_display_names)
     
     if default_value not in self._values:
       raise ValueError(
-        'invalid default value "{}"; must be one of the following: {}'.format(
-          default_value, self._values))
-    
-    self.default_value = default_value
-    self.default_response = default_response
+        f'invalid default mode "{default_value}"; must be one of the following: {self._values}')
 
-    self._overwrite_mode = self.default_value
-    self._is_apply_to_all = False
-  
+    self.default_response = default_response
+    """Default overwrite mode to return if the user made a choice that
+    returns a value not in ``values_and_display_names``. ``default_response``
+    does not have to be any of the values in ``values_and_display_names``.
+    """
+
+    self._apply_to_all = False
+
   @property
-  def overwrite_mode(self):
-    return self._overwrite_mode
+  def apply_to_all(self) -> bool:
+    """If ``True``, the user's choice applies to the current and all subsequent
+    files. If ``False``, the user's choice applies to current file only.
+    """
+    return self._apply_to_all
   
-  @property
-  def is_apply_to_all(self):
-    return self._is_apply_to_all
-  
-  def choose(self, filepath=None):
-    if self._overwrite_mode is None or not self._is_apply_to_all:
+  def choose(self, filepath: Optional[str] = None) -> int:
+    if self._overwrite_mode is None or not self._apply_to_all:
       return self._choose(filepath)
     else:
       return self._overwrite_mode
   
   @abc.abstractmethod
-  def _choose(self, filepath):
-    """
-    Let the user choose the overwrite mode and return it.
+  def _choose(self, filepath: str):
+    """Allows the user to choose the overwrite mode and return it.
     
-    If the choice results in a value that is not in `values_and_display_names`,
-    return `default_response`.
+    If the choice results in a value that is not in
+    ``values_and_display_names``, ``default_response``, must be returned.
     """
     pass
 
 
-def handle_overwrite(filepath, overwrite_chooser, position=None):
-  """
-  If a file with the specified file path exists, handle the file path conflict
-  via `overwrite_chooser` (an `OverwriteChooser` instance).
-  `filepath` indicates a file path for a new file to be saved.
-  
-  `overwrite_chooser` should support all overwrite modes specified in
-  `OverwriteModes`. `RENAME_NEW` mode renames `filepath`.
-  `RENAME_EXISTING` renames the existing file in the file system.
-  
-  If the overwrite mode indicates that the file path should be renamed and
-  `position` is not `None`, the `position` specifies where in the file path to
-  insert a unique substring (`' (number)'`). By default, the substring is
-  inserted at the end of the file path to be renamed.
-  
+def handle_overwrite(
+      filepath: str, overwrite_chooser: OverwriteChooser, position: Optional[int] = None
+) -> Tuple[int, str]:
+  """Resolves how to handle an existing file path.
+
+  ``overwrite_chooser`` is presented to the user to let them choose the
+  overwrite mode. The ``overwrite_chooser`` instance must support overwrite
+  modes specified in `OverwriteModes`. See `OverwriteModes` for information
+  about the possible values and their meanings.
+
+  If ``filepath`` does not exist, there is no need to perform any action, hence
+  `OverwriteModes.DO_NOTHING` is returned.
+
+  If the chosen overwrite mode is `OverwriteModes.RENAME_NEW` or
+  `OverwriteModes.RENAME_EXISTING`, the new or existing file path is made
+  unique, respectively. A unique substring is appended to the end of the file
+  name. The position of the substring can be customized via ``position`` (for
+  example, to place the substring before the file extension).
+
   Returns:
-  
-    * the overwrite mode as returned by `overwrite_chooser`, which the caller
-      of this function can further use (especially `SKIP` or `CANCEL` values),
-    
-    * the file path passed as the argument, modified if `RENAME_NEW` mode is
-      returned.
+    A tuple of (chosen overwrite mode, file path).
+
+    The overwrite mode is returned by ``overwrite_chooser``, which the caller
+    of this function can further use (especially `OverwriteModes.SKIP` or
+    `OverwriteModes.CANCEL`).
+
+    The returned file path is identical to the one passed as the argument,
+    unless the `OverwriteModes.RENAME_NEW` mode is chosen, in which case a
+    modified file path is returned.
   """
   if os.path.exists(filepath):
     overwrite_chooser.choose(filepath=os.path.abspath(filepath))
-    
+
     if overwrite_chooser.overwrite_mode in (
          OverwriteModes.RENAME_NEW, OverwriteModes.RENAME_EXISTING):
-      uniq_filepath = pgpath.uniquify_filepath(filepath, position)
+      processed_filepath = pgpath.uniquify_filepath(filepath, position)
       if overwrite_chooser.overwrite_mode == OverwriteModes.RENAME_NEW:
-        filepath = uniq_filepath
+        filepath = processed_filepath
       else:
-        os.rename(filepath, uniq_filepath)
-  
+        os.rename(filepath, processed_filepath)
+
     return overwrite_chooser.overwrite_mode, filepath
   else:
     return OverwriteModes.DO_NOTHING, filepath
 
 
 class OverwriteModes:
+  """Overwrite modes used by ``handle_overwrite`` and recommended to be handled
+  by custom ``OverwriteChooser`` subclasses.
   """
-  This class defines common overwrite modes for convenience.
-  
-  `SKIP` should be used if a file path already exists and no action should be
-  taken.
-  
-  `DO_NOTHING` should be used if a file path does not exist and no action should
-  be taken.
-  
-  `CANCEL` should be used if the user terminated the overwrite chooser (e.g.
-  closed the overwrite dialog when an interactive chooser is used).
+  REPLACE = 0
+  """Indicates to overwrite an existing file with new contents."""
+
+  SKIP = 1
+  """Indicates to avoid overwriting an existing file."""
+
+  RENAME_NEW = 2
+  """Indicates to rename the file path whose contents are about to be written
+  to the file system.
   """
-  
-  OVERWRITE_MODES = REPLACE, SKIP, RENAME_NEW, RENAME_EXISTING, CANCEL, DO_NOTHING = (
-    0, 1, 2, 3, 4, 5)
+
+  RENAME_EXISTING = 3
+  """Indicates to rename the existing file path in the file system."""
+
+  CANCEL = 4
+  """This value should be used if the user terminated the overwrite chooser,
+  for example by closing a dialog if an interactive overwrite chooser is used.
+  """
+
+  DO_NOTHING = 5
+  """This value should if there is no need to display an overwrite chooser, i.e.
+  if a file path does not exist and no action should be taken.
+  """
+
+  OVERWRITE_MODES = REPLACE, SKIP, RENAME_NEW, RENAME_EXISTING, CANCEL, DO_NOTHING

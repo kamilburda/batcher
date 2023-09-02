@@ -1,9 +1,10 @@
-"""Dialog prompt for handling conflicting files (overwrite, skip, etc.)."""
+"""Dialog prompt for handling existing files (overwrite, skip, etc.)."""
 
 import os
+from typing import Dict, Optional
 
 import gi
-from gi.repository import GObject
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 gi.require_version('GimpUi', '3.0')
@@ -17,10 +18,8 @@ __all__ = [
 
 
 class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
-  """
-  This class is used to display a GTK dialog prompt in an interactive
-  environment when a file about to be saved has the same name as an already
-  existing file.
+  """Class displaying a `Gtk.Dialog` prompting the user to choose how to handle
+  already existing files.
   """
   
   _DIALOG_BORDER_WIDTH = 8
@@ -30,12 +29,11 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
   
   def __init__(
         self,
-        values_and_display_names,
-        default_value,
-        default_response,
-        title='',
-        parent=None):
-    
+        values_and_display_names: Dict[int, str],
+        default_value: int,
+        default_response: int,
+        title: str = '',
+        parent: Optional[Gtk.Window] = None):
     super().__init__(values_and_display_names, default_value, default_response)
     
     self._title = title
@@ -44,42 +42,43 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     self._init_gui()
   
   def _init_gui(self):
-    self._dialog = gimpui.Dialog(
+    self._dialog = GimpUi.Dialog(
       title='',
       role=None,
       parent=self._parent,
-      flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+      flags=Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT)
     self._dialog.set_transient_for(self._parent)
     self._dialog.set_title(self._title)
     self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._dialog.set_resizable(False)
     
-    self._dialog_icon = gtk.Image()
-    self._dialog_icon.set_from_stock(gtk.STOCK_DIALOG_QUESTION, gtk.ICON_SIZE_DIALOG)
+    self._dialog_icon = Gtk.Image()
+    self._dialog_icon.set_from_icon_name(GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
     
-    self._dialog_text = gtk.Label('')
-    self._dialog_text.set_line_wrap(True)
-    self._dialog_text.set_use_markup(True)
+    self._dialog_label = Gtk.Label()
+    self._dialog_label.set_line_wrap(True)
+    self._dialog_label.set_use_markup(True)
     
-    self._dialog_text_event_box = gtk.EventBox()
-    self._dialog_text_event_box.add(self._dialog_text)
+    self._dialog_label_event_box = Gtk.EventBox()
+    self._dialog_label_event_box.add(self._dialog_label)
     
-    self._hbox_dialog_contents = gtk.HBox(homogeneous=False)
-    self._hbox_dialog_contents.set_spacing(self._DIALOG_HBOX_CONTENTS_SPACING)
-    self._hbox_dialog_contents.pack_start(self._dialog_icon, expand=False, fill=False)
+    self._hbox_dialog_contents = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      homogeneous=False,
+      spacing=self._DIALOG_HBOX_CONTENTS_SPACING)
+    self._hbox_dialog_contents.pack_start(self._dialog_icon, False, False, 0)
     self._hbox_dialog_contents.pack_start(
-      self._dialog_text_event_box, expand=False, fill=False)
+      self._dialog_label_event_box, False, False, 0)
     
-    self._checkbutton_apply_to_all = gtk.CheckButton(
-      label=_('_Apply action to all files'))
+    self._checkbutton_apply_to_all = Gtk.CheckButton(label=_('_Apply action to all files'))
     self._checkbutton_apply_to_all.set_use_underline(True)
     
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
-    self._dialog.vbox.pack_start(self._hbox_dialog_contents, expand=False, fill=False)
-    self._dialog.vbox.pack_start(self._checkbutton_apply_to_all, expand=False, fill=False)
+    self._dialog.vbox.pack_start(self._hbox_dialog_contents, False, False, 0)
+    self._dialog.vbox.pack_start(self._checkbutton_apply_to_all, False, False, 0)
     
     self._buttons = {}
-    for value, display_name in self.values_and_display_names:
+    for value, display_name in self.values_and_display_names.items():
       self._buttons[value] = self._dialog.add_button(display_name, value)
     
     self._dialog.action_area.set_spacing(self._DIALOG_ACTION_AREA_SPACING)
@@ -88,10 +87,10 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
       'toggled', self._on_checkbutton_apply_to_all_toggled)
     
     self._is_dialog_text_allocated_size = False
-    self._dialog_text_event_box.connect(
+    self._dialog_label_event_box.connect(
       'size-allocate', self._on_dialog_text_event_box_size_allocate)
     
-    self._dialog.set_focus(self._buttons[self.default_value])
+    self._dialog.set_focus(self._buttons[self.overwrite_mode])
   
   def _choose(self, filepath):
     if filepath is not None:
@@ -107,9 +106,8 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     
     text_choose += _('What would you like to do?')
     
-    self._dialog_text.set_markup(
-      '<span font_size="large"><b>{}</b></span>'.format(
-        gobject.markup_escape_text(text_choose)))
+    self._dialog_label.set_markup(
+      '<span font_size="large"><b>{}</b></span>'.format(GLib.markup_escape_text(text_choose)))
     
     self._dialog.show_all()
     
@@ -123,7 +121,7 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     return self._overwrite_mode
   
   def _on_checkbutton_apply_to_all_toggled(self, checkbutton):
-    self._is_apply_to_all = self._checkbutton_apply_to_all.get_active()
+    self._apply_to_all = self._checkbutton_apply_to_all.get_active()
   
   def _on_dialog_text_event_box_size_allocate(self, dialog_text_event_box, allocation):
     if not self._is_dialog_text_allocated_size:
@@ -132,5 +130,5 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
       # Make sure the label uses as much width as possible in the dialog.
       dialog_text_allocation = dialog_text_event_box.get_allocation()
       dialog_vbox_allocation = self._dialog.vbox.get_allocation()
-      self._dialog_text.set_property(
+      self._dialog_label.set_property(
         'width-request', dialog_vbox_allocation.width - dialog_text_allocation.x)

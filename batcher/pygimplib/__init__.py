@@ -55,7 +55,7 @@ builtins._ = _
 # from . import invoker
 # from . import itemtree
 # from . import objectfilter
-# from . import overwrite
+from . import overwrite
 # from . import path
 # from . import pdbutils
 from . import progress
@@ -79,7 +79,7 @@ __all__ = [
   # 'itemtree',
   # 'logging',
   # 'objectfilter',
-  # 'overwrite',
+  'overwrite',
   # 'path',
   # 'pdbutils',
   'progress',
