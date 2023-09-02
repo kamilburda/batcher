@@ -560,7 +560,7 @@ class ImagePreview(preview_base_.Preview):
   
   def _set_item_name_label(self, item_name):
     self._label_item_name.set_markup(
-      '<i>{}</i>'.format(GObject.markup_escape_text(pg.utils.safe_encode_gtk(item_name))))
+      '<i>{}</i>'.format(GLib.markup_escape_text(pg.utils.safe_encode_gtk(item_name))))
   
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)

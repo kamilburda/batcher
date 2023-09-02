@@ -61,7 +61,7 @@ def display_reset_prompt(parent=None, more_settings_shown=False):
   dialog.set_title(pg.config.PLUGIN_TITLE)
   
   dialog.set_markup(
-    gobject.markup_escape_text(_('Are you sure you want to reset settings?')))
+    GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
   
   if more_settings_shown:
     checkbutton_reset_actions = gtk.CheckButton(
@@ -366,7 +366,7 @@ class ExportLayersDialog:
     self._file_extension_label = gtk.Label()
     self._file_extension_label.set_markup(
       '<b>{}:</b>'.format(
-        gobject.markup_escape_text(self._settings['main/file_extension'].display_name)))
+        GLib.markup_escape_text(self._settings['main/file_extension'].display_name)))
     self._file_extension_label.set_alignment(0.0, 0.5)
     
     self._file_extension_entry = pg.gui.FileExtensionEntry(
@@ -375,7 +375,7 @@ class ExportLayersDialog:
     self._file_extension_entry.set_activates_default(True)
     
     self._save_as_label = gtk.Label()
-    self._save_as_label.set_markup('<b>{}:</b>'.format(gobject.markup_escape_text(_('Save as'))))
+    self._save_as_label.set_markup('<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
     self._save_as_label.set_alignment(0.0, 0.5)
     
     self._dot_label = gtk.Label('.')

@@ -482,7 +482,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._label_procedure_name.label.set_use_markup(True)
     self._label_procedure_name.label.set_ellipsize(pango.ELLIPSIZE_END)
     self._label_procedure_name.label.set_markup(
-      '<b>{}</b>'.format(GObject.markup_escape_text(action['display_name'].value)))
+      '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
     self._label_procedure_name.connect(
       'changed', self._on_label_procedure_name_changed, action)
     
@@ -573,7 +573,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     action['display_name'].set_value(editable_label.label.get_text())
     
     editable_label.label.set_markup(
-      '<b>{}</b>'.format(GObject.markup_escape_text(editable_label.label.get_text())))
+      '<b>{}</b>'.format(GLib.markup_escape_text(editable_label.label.get_text())))
   
   def _on_action_edit_dialog_response(self, dialog, response_id, action):
     for child in list(self._table_action_arguments.get_children()):
@@ -598,7 +598,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     label.set_use_markup(True)
     label.set_markup(
       '<span font_size="small">{}</span>'.format(
-        GObject.markup_escape_text(_('Cannot modify this parameter'))))
+        GLib.markup_escape_text(_('Cannot modify this parameter'))))
     
     hbox.pack_start(label, expand=False, fill=False)
     

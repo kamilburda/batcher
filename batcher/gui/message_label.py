@@ -88,7 +88,7 @@ class MessageLabel(Gtk.Box):
     self._clear_delay = clear_delay
     
     self._label_message.set_markup(
-      '<b>{}</b>'.format(gobject.markup_escape_text(pg.utils.safe_encode_gtk(self._label_text))))
+      '<b>{}</b>'.format(GLib.markup_escape_text(pg.utils.safe_encode_gtk(self._label_text))))
     
     if message_type == gtk.MESSAGE_ERROR:
       self._timeout_remove_strict(self._clear_delay, self.set_text)

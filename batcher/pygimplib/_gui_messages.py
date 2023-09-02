@@ -117,7 +117,7 @@ def display_alert_message(
   if message_secondary_markup is None:
     message_secondary_markup = _(
       '{0} encountered an unexpected error and has to close. Sorry about that!').format(
-        gobject.markup_escape_text(app_name))
+        GLib.markup_escape_text(app_name))
   
   if report_description is None:
     report_description = _(
@@ -294,7 +294,7 @@ def display_message(
     dialog.set_title(title)
   
   if not message_markup:
-    processed_message = gobject.markup_escape_text(message)
+    processed_message = GLib.markup_escape_text(message)
   else:
     processed_message = message
   
