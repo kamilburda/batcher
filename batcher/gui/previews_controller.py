@@ -85,7 +85,7 @@ class PreviewsController:
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove_strict(self._image_preview.update)
+        pg.invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
     
     self._paned_outside_previews_previous_position = current_position
@@ -125,7 +125,7 @@ class PreviewsController:
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove_strict(self._image_preview.update)
+        pg.invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
     
     self._paned_between_previews_previous_position = current_position
@@ -285,8 +285,8 @@ class PreviewsController:
   
   def _on_toplevel_notify_is_active(self, toplevel, property_spec):
     if toplevel.is_active():
-      pg.invocation.timeout_remove_strict(self._name_preview.update)
-      pg.invocation.timeout_remove_strict(self._image_preview.update)
+      pg.invocation.timeout_remove(self._name_preview.update)
+      pg.invocation.timeout_remove(self._image_preview.update)
       
       self._name_preview.update(reset_items=True)
       

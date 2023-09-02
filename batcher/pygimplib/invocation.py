@@ -1,60 +1,65 @@
 """Functions to invoke other functions in various ways, e.g. with a timeout."""
 
-import os
+from collections.abc import Iterable
+from typing import Callable, Dict
 
 import gi
 gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-from gi.repository import GObject
+from gi.repository import GLib
 
 
 _timer_ids = {}
 
 
-def timeout_add(interval, callback, *callback_args):
-  """
-  This is a thin wrapper of `gobject.timeout_add()` that 'fixes' the function
-  failing to work on Windows on GIMP 2.10 by setting the interval to zero.
-  """
-  if os.name == 'nt' and ((2, 10, 0) <= gimp.version < (2, 10, 6)):
-    return gobject.timeout_add(0, callback, *callback_args)
-  else:
-    return gobject.timeout_add(interval, callback, *callback_args)
+def timeout_add_strict(
+      interval: int, callback: Callable, *callback_args: Iterable, **callback_kwargs: Dict,
+) -> int:
+  """Wrapper of `GLib.timeout_add()` that cancels the callback if this function
+  is called again with the same callback before the timeout.
 
+  Otherwise, this function has the same behavior as `GLib.timeout_add()`.
+  Different callbacks before the timeout are invoked normally.
 
-def timeout_add_strict(interval, callback, *callback_args, **callback_kwargs):
-  """
-  This is a wrapper for `gobject.timeout_add()`, which calls the specified
-  callback at regular intervals (in milliseconds).
-  
-  Additionally, if the same callback is called again before the timeout, the
-  first invocation will be canceled. If different functions are called before
-  the timeout, they will all be invoked normally.
+  The same callback with different arguments is still treated as the same
+  callback.
   
   This function also supports keyword arguments to the callback.
+
+  Args:
+    interval: Timeout interval in milliseconds.
+    callback: The callable to invoke with a delay.
+    callback_args: Positional arguments to ``callback``.
+    callback_kwargs: Keyword arguments to ``callback``.
+
+  Returns:
+    ID as returned by `GLib.timeout_add()`. The ID can be used by, for example,
+    `GLib.source_remove()` to cancel invoking the callback. The invocation can
+    also be canceled via `timeout_remove()` by specifying the ``callback``
+    instead of the ID.
   """
   global _timer_ids
   
-  def _callback_wrapper(callback_args, callback_kwargs):
-    retval = callback(*callback_args, **callback_kwargs)
+  def _callback_wrapper(args, kwargs):
+    retval = callback(*args, **kwargs)
     if callback in _timer_ids:
       del _timer_ids[callback]
     
     return retval
   
-  timeout_remove_strict(callback)
+  timeout_remove(callback)
   
-  _timer_ids[callback] = timeout_add(
+  _timer_ids[callback] = GLib.timeout_add(
     interval, _callback_wrapper, callback_args, callback_kwargs)
   
   return _timer_ids[callback]
 
 
-def timeout_remove_strict(callback):
-  """
-  Remove a callback scheduled by `timeout_add_strict()`. If no such callback
-  exists, do nothing.
+def timeout_remove(callback: Callable):
+  """Removes a callback scheduled by `timeout_add_strict()`.
+
+  If no such callback exists or the callback was already invoked, nothing is
+  performed.
   """
   if callback in _timer_ids:
-    gobject.source_remove(_timer_ids[callback])
+    GLib.source_remove(_timer_ids[callback])
     del _timer_ids[callback]

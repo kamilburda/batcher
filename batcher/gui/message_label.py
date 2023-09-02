@@ -91,7 +91,7 @@ class MessageLabel(Gtk.Box):
       '<b>{}</b>'.format(GLib.markup_escape_text(pg.utils.safe_encode_gtk(self._label_text))))
     
     if message_type == gtk.MESSAGE_ERROR:
-      self._timeout_remove_strict(self._clear_delay, self.set_text)
+      self._timeout_remove(self._clear_delay, self.set_text)
     else:
       self._timeout_add_strict(self._clear_delay, self.set_text, None)
   
@@ -170,7 +170,7 @@ class MessageLabel(Gtk.Box):
     self._popup_more.set_screen(self._button_more.get_screen())
     
     if self._message_type != gtk.MESSAGE_ERROR:
-      self._timeout_remove_strict(self._clear_delay, self.set_text)
+      self._timeout_remove(self._clear_delay, self.set_text)
   
   def _on_popup_more_hide(self, popup):
     self._popup_hide_context.disconnect_button_press_events_for_hiding()
@@ -182,9 +182,9 @@ class MessageLabel(Gtk.Box):
     if self._should_clear_text_after_delay(delay):
       pg.invocation.timeout_add_strict(delay, func, None, *args, **kwargs)
   
-  def _timeout_remove_strict(self, delay, func):
+  def _timeout_remove(self, delay, func):
     if self._should_clear_text_after_delay(delay):
-      pg.invocation.timeout_remove_strict(func)
+      pg.invocation.timeout_remove(func)
   
   def _should_clear_text_after_delay(self, clear_delay):
     return (

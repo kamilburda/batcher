@@ -634,7 +634,7 @@ class GimpMessageFile:
       self._message_buffer += data
       pginvocation.timeout_add_strict(self._message_delay_milliseconds, self.flush)
     else:
-      pginvocation.timeout_remove_strict(self.flush)
+      pginvocation.timeout_remove(self.flush)
       self.flush()
   
   def flush(self):
