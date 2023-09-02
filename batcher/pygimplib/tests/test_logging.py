@@ -41,7 +41,7 @@ class TestCreateLogFile(unittest.TestCase):
     
     mock_io_open.side_effect = io_open_side_effect
     mock_makedirs.side_effect = makedirs_side_effect
-        
+
     log_file = pglogging.create_log_file(log_dirpaths, log_filename)
     
     self.assertEqual(log_file, expected_result)
