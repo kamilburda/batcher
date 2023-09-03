@@ -266,7 +266,7 @@ def _export_item(
     
     export_status = _export_item_once_wrapper(
       batcher,
-      _get_export_func(file_extension),
+      pg.fileformats.get_save_procedure(file_extension),
       _get_run_mode(batcher, file_extension, file_extension_properties),
       image,
       raw_item,
@@ -278,7 +278,7 @@ def _export_item(
     if export_status == ExportStatuses.FORCE_INTERACTIVE:
       export_status = _export_item_once_wrapper(
         batcher,
-        _get_export_func(file_extension),
+        pg.fileformats.get_save_procedure(file_extension),
         gimpenums.RUN_INTERACTIVE,
         image,
         raw_item,
@@ -349,10 +349,6 @@ def _get_run_mode(batcher, file_extension, file_extension_properties):
     return gimpenums.RUN_WITH_LAST_VALS
   else:
     return batcher.initial_run_mode
-
-
-def _get_export_func(file_extension):
-  return pg.fileformats.get_save_procedure(file_extension)
 
 
 def _export_item_once(
