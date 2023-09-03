@@ -12,10 +12,11 @@ from typing import Callable, Optional, Tuple
 
 import gi
 from gi.repository import GLib
-gi.require_version('GimpUi', '3.0')
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
