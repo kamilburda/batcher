@@ -42,7 +42,9 @@ class _PyPDB:
     return self._get_proc_by_name(proc_name)
 
   def __contains__(self, name):
-    return self._procedure_exists(name)
+    proc_name = name.replace('_', '-')
+
+    return self._procedure_exists(proc_name)
 
   def _get_proc_by_name(self, proc_name):
     if proc_name not in self._proc_cache:
