@@ -43,22 +43,26 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
   
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
-      title='',
+      title=self._title,
       role=None,
       parent=self._parent,
-      flags=Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT)
-    self._dialog.set_transient_for(self._parent)
-    self._dialog.set_title(self._title)
-    self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
-    self._dialog.set_resizable(False)
+      modal=True,
+      destroy_with_parent=True,
+      transient_for=self._parent,
+      border_width=self._DIALOG_BORDER_WIDTH,
+      resizable=False,
+    )
     
-    self._dialog_icon = Gtk.Image()
-    self._dialog_icon.set_from_icon_name(GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
+    self._dialog_icon = Gtk.Image(
+      icon_name=GimpUi.ICON_DIALOG_QUESTION,
+      icon_size=Gtk.IconSize.DIALOG,
+    )
     
-    self._dialog_label = Gtk.Label()
-    self._dialog_label.set_line_wrap(True)
-    self._dialog_label.set_use_markup(True)
-    
+    self._dialog_label = Gtk.Label(
+      wrap=True,
+      use_markup=True,
+    )
+
     self._dialog_label_event_box = Gtk.EventBox()
     self._dialog_label_event_box.add(self._dialog_label)
     
@@ -70,8 +74,10 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     self._hbox_dialog_contents.pack_start(
       self._dialog_label_event_box, False, False, 0)
     
-    self._checkbutton_apply_to_all = Gtk.CheckButton(label=_('_Apply action to all files'))
-    self._checkbutton_apply_to_all.set_use_underline(True)
+    self._checkbutton_apply_to_all = Gtk.CheckButton(
+      label=_('_Apply action to all files'),
+      use_underline=True,
+    )
     
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.pack_start(self._hbox_dialog_contents, False, False, 0)
