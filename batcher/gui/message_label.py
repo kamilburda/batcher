@@ -118,7 +118,7 @@ class MessageLabel(Gtk.Box):
     self._button_more.set_no_show_all(True)
     
     self._text_view_more = gtk.TextView()
-    self._text_view_more.set_wrap_mode(gtk.WRAP_WORD)
+    self._text_view_more.set_wrap_mode(Gtk.WrapMode.WORD)
     self._text_view_more.set_left_margin(self._TEXT_VIEW_MARGIN)
     self._text_view_more.set_right_margin(self._TEXT_VIEW_MARGIN)
     self._text_view_more.set_editable(False)
