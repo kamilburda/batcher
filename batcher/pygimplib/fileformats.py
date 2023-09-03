@@ -1,29 +1,52 @@
 """List of built-in and several third-party file formats supported by GIMP.
 
-Each element of the list is a tuple:
+Each file format contains at least a name and a list of file extensions.
 
-  (file format description, file extensions, (optional) file save procedure)
-
-The file save procedure can be used for multiple purposes, such as:
-* checking that the corresponding file format plug-in is installed,
-* using that save procedure instead of the default save procedure
-  (`pdb.gimp_file_save()`, which invokes the correct file save procedure based
-  on the file extension of the filename).
+The list can be used for:
+* listing all known and supported file formats in GUI
+* checking that the corresponding file format plug-in is installed
 """
 
+from collections.abc import Iterable
+from typing import Callable, List, Union
+
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import Gio
+
 from .pypdb import pdb
-from . import utils
 
 
-def get_default_save_procedure():
+def get_default_save_procedure() -> Callable:
+  """Returns the `Gimp.file_save()` procedure with a more convenient interface.
+
+  The differences from `Gimp.file_save()` include:
+  * A single layer (drawable) can also be passed instead of always a list.
+  * The file path is specified as a string instead of a `Gio.File` instance.
+  """
   return _save_image_default
 
 
-def get_save_procedure(file_extension):
-  """
-  Return the file save procedure for the given file extension. If the file
-  extension is invalid or does not have a specific save procedure defined,
-  return the default save procedure (as returned by
+def _save_image_default(
+      run_mode: Gimp.RunMode,
+      image: Gimp.Image,
+      layer_or_layers: Union[Gimp.Layer, List[Gimp.Layer]],
+      filepath: str,
+):
+  if not isinstance(layer_or_layers, Iterable):
+    layers = [layer_or_layers]
+  else:
+    layers = layer_or_layers
+
+  Gimp.file_save(run_mode, image, layers, Gio.file_new_for_path(filepath))
+
+
+def get_save_procedure(file_extension: str) -> Callable:
+  """Returns the file save procedure for the given file extension.
+
+  If the file extension is not valid or does not have a specific save
+  procedure defined, the default save procedure is returned (as returned by
   `get_default_save_procedure()`).
   """
   if file_extension in file_formats_dict:
@@ -34,30 +57,31 @@ def get_save_procedure(file_extension):
   return get_default_save_procedure()
 
 
-def _save_image_default(run_mode, image, layer, filepath, raw_filepath):
-  pdb.gimp_file_save(image, layer, filepath, raw_filepath, run_mode=run_mode)
-
-
 def _create_file_formats(file_formats_params):
   return [_FileFormat(**params) for params in file_formats_params]
 
 
-def _create_file_formats_dict(file_formats):
-  file_formats_dict = {}
+def _create_file_formats_dict(file_formats_):
+  file_formats_dict_ = {}
   
-  for file_format in file_formats:
+  for file_format in file_formats_:
     for file_extension in file_format.file_extensions:
-      if file_extension not in file_formats_dict and file_format.version_check_func():
-        file_formats_dict[file_extension] = file_format
+      if file_extension not in file_formats_dict_ and file_format.version_check_func():
+        file_formats_dict_[file_extension] = file_format
   
-  return file_formats_dict
+  return file_formats_dict_
 
 
 class _FileFormat:
   
   def __init__(
-        self, description, file_extensions, save_procedure_name=None,
-        save_procedure_func=None, save_procedure_func_args=None, versions=None,
+        self,
+        description,
+        file_extensions,
+        save_procedure_name=None,
+        save_procedure_func=None,
+        save_procedure_func_args=None,
+        versions=None,
         **kwargs):
     self.description = description
     self.file_extensions = file_extensions
@@ -86,37 +110,31 @@ class _FileFormat:
     return bool(self.save_procedure_name)
   
   def is_installed(self):
-    return (
-      self.is_builtin()
-      or (self.is_third_party()
-          and pdb.gimp_procedural_db_proc_exists(self.save_procedure_name)))
+    return self.is_builtin() or (self.is_third_party() and self.save_procedure_name in pdb)
 
 
 file_formats = _create_file_formats([
   {'description': 'Alias Pix image',
    'file_extensions': ['pix', 'matte', 'mask', 'alpha', 'als']},
+  {'description': 'Apple Icon Image',
+   'file_extensions': ['icns']},
   {'description': 'ASCII art',
-   'file_extensions': ['txt', 'ansi', 'text'],
-   'save_procedure_name': 'file-aa-save',
-   'versions': lambda: utils.get_gimp_version_as_tuple() < (2, 9)},
+   'file_extensions': ['txt', 'ansi', 'text']},
   {'description': 'AutoDesk FLIC animation',
    'file_extensions': ['fli', 'flc']},
-  {'description': 'AVIF',
-   'file_extensions': ['avif'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 22)},
   {'description': 'bzip archive',
    'file_extensions': ['xcf.bz2', 'xcfbz2']},
   {'description': 'C source code',
    'file_extensions': ['c']},
   {'description': 'C source code header',
    'file_extensions': ['h']},
-  {'description': 'Colored XHTML',
+  {'description': 'Colored XHTML text',
    'file_extensions': ['xhtml']},
   {'description': 'DDS image',
    'file_extensions': ['dds']},
   {'description': 'DICOM image',
    'file_extensions': ['dcm', 'dicom']},
-  {'description': 'Encapsulated PostScript image',
+  {'description': 'Encapsulated PostScript',
    'file_extensions': ['eps']},
   {'description': 'Flexible Image Transport System',
    'file_extensions': ['fit', 'fits']},
@@ -132,55 +150,42 @@ file_formats = _create_file_formats([
    'file_extensions': ['xcf']},
   {'description': 'gzip archive',
    'file_extensions': ['xcf.gz', 'xcfgz']},
+  {'description': 'HEIF/AVIF',
+   'file_extensions': ['avif']},
   {'description': 'HEIF/HEIC',
-   'file_extensions': ['heic', 'heif'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 2)},
+   'file_extensions': ['heif', 'heic']},
   {'description': 'HTML table',
    'file_extensions': ['html', 'htm']},
   {'description': 'JPEG image',
    'file_extensions': ['jpg', 'jpeg', 'jpe']},
   {'description': 'JPEG XL image',
-   'file_extensions': ['jxl'],
-   'url': 'https://github.com/libjxl/libjxl',
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10, 32)},
-  {'description': 'JPEG XR image',
-   'file_extensions': ['jxr'],
-   'save_procedure_name': 'file-jxr-save',
-   'url': 'https://github.com/chausner/gimp-jxr'},
-  {'description': 'JSON metadata',
-   'file_extensions': ['json'],
-   'save_procedure_func': (
-     lambda run_mode, *args: pdb.file_metadata_json_save(*args, run_mode=run_mode)),
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
-   'url': 'https://github.com/kamilburda/gimp-metadata-export'},
+   'file_extensions': ['jxl']},
   {'description': 'KISS CEL',
    'file_extensions': ['cel']},
+  {'description': 'Microsoft Windows animated cursor',
+   'file_extensions': ['ani']},
+  {'description': 'Microsoft Windows cursor',
+   'file_extensions': ['cur']},
   {'description': 'Microsoft Windows icon',
    'file_extensions': ['ico']},
   {'description': 'MNG animation',
    'file_extensions': ['mng']},
+  {'description': 'OpenEXR image',
+   'file_extensions': ['exr']},
   {'description': 'OpenRaster',
    'file_extensions': ['ora']},
-  {'description': 'OpenEXR image',
-   'file_extensions': ['exr'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
+  {'description': 'PAM image',
+   'file_extensions': ['pam']},
   {'description': 'PBM image',
    'file_extensions': ['pbm']},
   {'description': 'PFM image',
-   'file_extensions': ['pfm'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
+   'file_extensions': ['pfm']},
   {'description': 'PGM image',
    'file_extensions': ['pgm']},
   {'description': 'Photoshop image',
    'file_extensions': ['psd']},
   {'description': 'PNG image',
    'file_extensions': ['png']},
-  {'description': 'APNG image',
-   'file_extensions': ['apng'],
-   'save_procedure_name': 'file-apng-save-defaults',
-   'save_procedure_func': (
-     lambda run_mode, *args: pdb.file_apng_save_defaults(*args, run_mode=run_mode)),
-   'url': 'https://sourceforge.net/projects/gimp-apng/'},
   {'description': 'PNM image',
    'file_extensions': ['pnm']},
   {'description': 'Portable Document Format',
@@ -189,56 +194,42 @@ file_formats = _create_file_formats([
    'file_extensions': ['ps']},
   {'description': 'PPM image',
    'file_extensions': ['ppm']},
+  {'description': 'Quite OK Image',
+   'file_extensions': ['qoi']},
   {'description': 'Radiance RGBE',
-   'file_extensions': ['hdr'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
+   'file_extensions': ['hdr']},
   {'description': 'Raw image data',
-   'file_extensions': ['data', 'raw'],
-   'save_procedure_func': (
-     lambda run_mode, *args: pdb.file_raw_save(*args, run_mode=run_mode))},
+   'file_extensions': ['data', 'raw']},
   {'description': 'Silicon Graphics IRIS image',
    'file_extensions': ['sgi', 'rgb', 'rgba', 'bw', 'icon']},
   {'description': 'SUN Rasterfile image',
-   'file_extensions': ['im1', 'im8', 'im24', 'im32', 'rs', 'ras']},
+   'file_extensions': ['im1', 'im8', 'im24', 'im32', 'rs', 'ras', 'sun']},
   {'description': 'TarGA image',
    'file_extensions': ['tga']},
-  {'description': 'TIFF image',
+  {'description': 'TIFF image or BigTIFF image',
    'file_extensions': ['tif', 'tiff']},
-  {'description': 'Valve Texture Format',
-   'file_extensions': ['vtf'],
-   'save_procedure_name': 'file-vtf-save',
-   'url': 'https://github.com/Artfunkel/gimp-vtf'},
   {'description': 'WebP image',
    'file_extensions': ['webp']},
   {'description': 'Windows BMP image',
    'file_extensions': ['bmp']},
   {'description': 'X11 Mouse Cursor',
-   'save_procedure_name': 'file-xmc-save',
-   'file_extensions': ['xmc'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() < (2, 9)},
+   'file_extensions': ['xmc']},
   {'description': 'X BitMap image',
    'file_extensions': ['xbm', 'bitmap']},
   {'description': 'X PixMap image',
    'file_extensions': ['xpm']},
   {'description': 'X window dump',
    'file_extensions': ['xwd']},
-  {'description': 'XML metadata',
-   'file_extensions': ['xml'],
-   'save_procedure_func': (
-     lambda run_mode, *args: pdb.file_metadata_xml_save(*args, run_mode=run_mode)),
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
-   'url': 'https://github.com/kamilburda/gimp-metadata-export'},
   {'description': 'xz archive',
-   'file_extensions': ['xcf.xz', 'xcfxz'],
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10)},
-  {'description': 'YAML metadata',
-   'file_extensions': ['yaml'],
-   'save_procedure_func': (
-     lambda run_mode, *args: pdb.file_metadata_yaml_save(*args, run_mode=run_mode)),
-   'versions': lambda: utils.get_gimp_version_as_tuple() >= (2, 10),
-   'url': 'https://github.com/kamilburda/gimp-metadata-export'},
+   'file_extensions': ['xcf.xz', 'xcfxz']},
   {'description': 'ZSoft PCX image',
    'file_extensions': ['pcx', 'pcc']},
 ])
+"""List of `_FileFormat` instances."""
 
 file_formats_dict = _create_file_formats_dict(file_formats)
+"""Dictionary of (file extension, `_FileFormat` instance) pairs.
+
+Only `_FileFormat` instances compatible with the version of the currently 
+running GIMP instance are included.
+"""

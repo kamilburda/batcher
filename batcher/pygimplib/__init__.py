@@ -49,7 +49,7 @@ builtins._ = _
 # _gui_messages.set_gui_excepthook(title=None, app_name=None)
 
 # from . import configbase
-# from . import fileformats
+from . import fileformats
 # from . import gui
 from . import invocation
 from . import invoker
@@ -72,7 +72,7 @@ from .pypdb import pdb
 
 __all__ = [
   # Modules
-  # 'fileformats',
+  'fileformats',
   # 'gui',
   'invocation',
   'invoker',
