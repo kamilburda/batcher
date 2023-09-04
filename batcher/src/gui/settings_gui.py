@@ -4,7 +4,7 @@ import collections
 
 from gi.repository import GLib
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 def create_gui_settings():

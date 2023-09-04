@@ -2,12 +2,11 @@ import collections
 import unittest
 import unittest.mock as mock
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
+from pygimplib.tests import utils_itemtree
 
-from batcher.pygimplib.tests import stubs_gimp
-from batcher.pygimplib.tests import utils_itemtree
-
-from batcher import uniquifier
+from src import uniquifier
 
 
 class TestUniquify(unittest.TestCase):

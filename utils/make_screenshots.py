@@ -16,11 +16,11 @@ from gi.repository import Gtk
 from batcher import pygimplib as pg
 from batcher.pygimplib import pdb
 
-from batcher import actions
-from batcher import builtin_constraints
-from batcher import builtin_procedures
-from batcher import settings_main
-from batcher.gui import main as gui_main
+from batcher.src import actions
+from batcher.src import builtin_constraints
+from batcher.src import builtin_procedures
+from batcher.src import settings_main
+from batcher.src.gui import main as gui_main
 
 
 PLUGINS_DIRPATH = os.path.abspath(

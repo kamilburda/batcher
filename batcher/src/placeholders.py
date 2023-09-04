@@ -22,10 +22,10 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import background_foreground
-from batcher.gui import placeholders as gui_placeholders
+from src import background_foreground
+from src.gui import placeholders as gui_placeholders
 
 
 class _GimpObjectPlaceholder:

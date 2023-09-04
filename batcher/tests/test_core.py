@@ -5,16 +5,15 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
+from pygimplib.tests import stubs_gimp
 
-from batcher.pygimplib import pdb
-from batcher.pygimplib.tests import stubs_gimp
-
-from batcher import actions as actions_
-from batcher import core
-from batcher import builtin_procedures
-from batcher import settings_main
-from batcher import utils as utils_
+from src import actions as actions_
+from src import core
+from src import builtin_procedures
+from src import settings_main
+from src import utils as utils_
 
 
 class TestBatcherInitialActions(unittest.TestCase):

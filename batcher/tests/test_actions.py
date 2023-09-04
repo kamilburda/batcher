@@ -8,11 +8,10 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
 
-from batcher.pygimplib.tests import stubs_gimp
-
-from batcher import actions as actions_
+from src import actions as actions_
 
 
 test_procedures = [

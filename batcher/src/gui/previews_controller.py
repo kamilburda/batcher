@@ -2,11 +2,11 @@
 
 from gi.repository import GLib
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import builtin_constraints
-from batcher import builtin_procedures
-from batcher import exceptions
+from src import builtin_constraints
+from src import builtin_procedures
+from src import exceptions
 
 
 class PreviewsController:

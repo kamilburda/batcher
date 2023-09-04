@@ -14,17 +14,16 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher.pygimplib import pdb
+from src import actions
+from src import builtin_constraints
+from src import exceptions
+from src import utils as utils_
 
-from batcher import actions
-from batcher import builtin_constraints
-from batcher import exceptions
-from batcher import utils as utils_
-
-from batcher.gui import messages as messages_
-from batcher.gui import preview_base as preview_base_
+from src.gui import messages as messages_
+from src.gui import preview_base as preview_base_
 
 
 class ImagePreview(preview_base_.Preview):

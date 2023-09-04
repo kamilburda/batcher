@@ -6,7 +6,7 @@ from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 class ItemProgressIndicator:

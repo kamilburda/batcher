@@ -35,7 +35,7 @@ sys.path.extend([
 
 from batcher import pygimplib as pg
 
-from batcher import version as version_
+from batcher.src import version as version_
 
 from utils import make_installers
 from utils import preprocess_document_contents

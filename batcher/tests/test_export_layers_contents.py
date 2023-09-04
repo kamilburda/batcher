@@ -3,16 +3,15 @@ import os
 import shutil
 import unittest
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher.pygimplib import pdb
-
-from batcher import actions
-from batcher import core
-from batcher import builtin_procedures
-from batcher import exceptions
-from batcher import settings_main
-from batcher import utils as utils_
+from src import actions
+from src import core
+from src import builtin_procedures
+from src import exceptions
+from src import settings_main
+from src import utils as utils_
 
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(pg.utils.get_current_module_filepath())

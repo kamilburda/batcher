@@ -6,11 +6,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import utils as utils_
-from batcher import version as version_
-from batcher.gui import messages
+from src import utils as utils_
+from src import version as version_
+from src.gui import messages
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, ABORT = 0, 1, 2, 3, 4
 

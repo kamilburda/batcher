@@ -11,12 +11,12 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import core
-import exceptions
-import settings_main
-import update
-import utils as utils_
-from gui import main as gui_main
+from src import core
+from src import exceptions
+from src import settings_main
+from src import update
+from src import utils as utils_
+from src.gui import main as gui_main
 
 
 SETTINGS = settings_main.create_settings()

@@ -4,11 +4,10 @@ import os
 import unittest
 import unittest.mock as mock
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
 
-from batcher.pygimplib.tests import stubs_gimp
-
-from batcher import settings_custom
+from src import settings_custom
 
 
 def _get_images_and_items():

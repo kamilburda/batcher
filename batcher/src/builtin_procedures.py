@@ -7,10 +7,11 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
 
-from batcher import background_foreground
-from batcher import export as export_
-from batcher import renamer as renamer_
-from batcher.pygimplib import pdb
+from pygimplib import pdb
+
+from src import background_foreground
+from src import export as export_
+from src import renamer as renamer_
 
 
 NAME_ONLY_TAG = 'name'

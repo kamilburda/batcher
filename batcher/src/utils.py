@@ -1,6 +1,6 @@
 """Utility functions used in other modules."""
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 def get_settings_for_batcher(main_settings):

@@ -7,7 +7,7 @@ import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 class GimpObjectPlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):

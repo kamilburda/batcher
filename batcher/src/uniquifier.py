@@ -1,7 +1,7 @@
 """Making item names in `pygimplib.itemtree.ItemTree` unique.
 """
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 class ItemUniquifier:

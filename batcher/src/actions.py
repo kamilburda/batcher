@@ -59,9 +59,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import placeholders
+from src import placeholders
 
 
 BUILTIN_TAGS = {

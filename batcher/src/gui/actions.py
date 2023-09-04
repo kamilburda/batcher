@@ -10,12 +10,11 @@ import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher.pygimplib import pdb
-
-from batcher import actions as actions_
-from batcher.gui import messages as messages_
+from src import actions as actions_
+from src.gui import messages as messages_
 
 
 class ActionBox(pg.gui.ItemBox):

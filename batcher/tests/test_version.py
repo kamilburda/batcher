@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from batcher import version as version_
+from src import version as version_
 
 
 class TestVersion(unittest.TestCase):

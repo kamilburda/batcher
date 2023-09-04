@@ -8,12 +8,12 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher import exceptions
-from batcher import renamer as renamer_
-from batcher import uniquifier
-from batcher.pygimplib import pdb
+from src import exceptions
+from src import renamer as renamer_
+from src import uniquifier
 
 
 class ExportModes:

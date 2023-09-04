@@ -9,12 +9,11 @@ import unittest.mock as mock
 
 import parameterized
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
 
-from batcher.pygimplib.tests import stubs_gimp
-
-from batcher import update
-from batcher import version as version_
+from src import update
+from src import version as version_
 
 
 @mock.patch(

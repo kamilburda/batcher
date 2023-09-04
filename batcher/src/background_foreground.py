@@ -4,11 +4,10 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import exceptions
+from src import exceptions
 
-from batcher import pygimplib as pg
-
-from batcher.pygimplib import pdb
+import pygimplib as pg
+from pygimplib import pdb
 
 
 def insert_background_layer(batcher, tag):
@@ -202,7 +201,7 @@ def _get_adjacent_layer(
 def _get_previous_enabled_procedures(batcher, current_action, action_orig_name_to_match):
   # HACK: This avoids a circular import. To resolve this, one possible way is to
   # refactor `actions` to turn actions into classes.
-  from batcher import actions
+  from src import actions
   
   previous_enabled_procedures = []
   

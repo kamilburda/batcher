@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from batcher import placeholders
+from src import placeholders
 
 
 class TestPlaceHolderSetting(unittest.TestCase):

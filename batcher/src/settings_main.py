@@ -7,18 +7,18 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import actions
-from batcher import builtin_constraints
-from batcher import builtin_procedures
-from batcher import export as export_
+from src import actions
+from src import builtin_constraints
+from src import builtin_procedures
+from src import export as export_
 # Despite being unused, `settings_custom` must be imported so that the custom
 # setting and GUI classes defined there are properly registered (via metaclasses
 # in `pg.setting.meta`).
 # noinspection PyUnresolvedReferences
-from batcher import settings_custom
-from batcher.gui import settings_gui
+from src import settings_custom
+from src.gui import settings_gui
 
 
 def create_settings():

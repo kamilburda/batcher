@@ -3,12 +3,11 @@ import unittest.mock as mock
 
 import parameterized
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
+from pygimplib.tests import utils_itemtree
 
-from batcher.pygimplib.tests import stubs_gimp
-from batcher.pygimplib.tests import utils_itemtree
-
-from batcher import renamer as renamer_
+from src import renamer as renamer_
 
 
 class TestNumberField(unittest.TestCase):

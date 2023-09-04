@@ -7,14 +7,13 @@ from gi.repository import Gimp
 import unittest
 import unittest.mock as mock
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
 
-from batcher.pygimplib.tests import stubs_gimp
-
-from batcher import actions as actions_
-from batcher import export as export_
-from batcher import settings_main
-from batcher import update
+from src import actions as actions_
+from src import export as export_
+from src import settings_main
+from src import update
 
 
 ORIG_SETTINGS = settings_main.create_settings()

@@ -8,9 +8,9 @@ import datetime
 import re
 import string
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
-from batcher import actions
+from src import actions
 
 
 class ItemRenamer:

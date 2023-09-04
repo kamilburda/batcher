@@ -10,14 +10,13 @@ from gi.repository import GdkPixbuf
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher.pygimplib import pdb
-
-from batcher import exceptions
-from batcher import utils as utils_
-from batcher.gui import messages as messages_
-from batcher.gui import preview_base as preview_base_
+from src import exceptions
+from src import utils as utils_
+from src.gui import messages as messages_
+from src.gui import preview_base as preview_base_
 
 
 class NamePreview(preview_base_.Preview):

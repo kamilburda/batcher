@@ -12,7 +12,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from batcher import pygimplib as pg
+import pygimplib as pg
 
 
 class MessageLabel(Gtk.Box):

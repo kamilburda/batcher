@@ -24,26 +24,25 @@ from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
-from batcher import pygimplib as pg
+import pygimplib as pg
+from pygimplib import pdb
 
-from batcher.pygimplib import pdb
+from src import actions
+from src import core
+from src import builtin_constraints
+from src import builtin_procedures
+from src import exceptions
+from src import renamer as renamer_
+from src import update
+from src import utils as utils_
 
-from batcher import actions
-from batcher import core
-from batcher import builtin_constraints
-from batcher import builtin_procedures
-from batcher import exceptions
-from batcher import renamer as renamer_
-from batcher import update
-from batcher import utils as utils_
-
-from batcher.gui import actions as actions_
-from batcher.gui import message_label as message_label_
-from batcher.gui import messages as messages_
-from batcher.gui import preview_image as preview_image_
-from batcher.gui import preview_name as preview_name_
-from batcher.gui import previews_controller as previews_controller_
-from batcher.gui import progress as progress_
+from src.gui import actions as actions_
+from src.gui import message_label as message_label_
+from src.gui import messages as messages_
+from src.gui import preview_image as preview_image_
+from src.gui import preview_name as preview_name_
+from src.gui import previews_controller as previews_controller_
+from src.gui import progress as progress_
 
 if hasattr(pg.setting.sources, 'json'):
   _json_module_found = True
