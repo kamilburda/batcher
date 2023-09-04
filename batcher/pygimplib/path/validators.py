@@ -263,7 +263,7 @@ class FilepathValidator(StringValidator):
     if drive:
       drive = re.sub(cls._INVALID_CHARS_PATTERN_WITHOUT_DRIVE, '', drive)
     
-    path_components = pathlib.Path(path).parts
+    path_components = list(pathlib.Path(path).parts)
     for i in range(len(path_components)):
       path_component = re.sub(cls._INVALID_CHARS_PATTERN, '', path_components[i])
       path_component = path_component.strip(' ').rstrip('.')
