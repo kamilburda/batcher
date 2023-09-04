@@ -20,15 +20,15 @@ import traceback
 
 import git
 
-UTILS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
+PLUGINS_DIRPATH = os.path.dirname(DEV_DIRPATH)
 
 PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
-  UTILS_DIRPATH,
+  DEV_DIRPATH,
   PLUGINS_DIRPATH,
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
@@ -37,8 +37,8 @@ from batcher import pygimplib as pg
 
 from batcher.src import version as version_
 
-from utils import make_installers
-from utils import preprocess_document_contents
+from dev import make_installers
+from dev import preprocess_document_contents
 
 
 GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')

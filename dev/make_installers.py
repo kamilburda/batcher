@@ -6,14 +6,14 @@ import os
 import sys
 import inspect
 
-UTILS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-PLUGINS_DIRPATH = os.path.dirname(UTILS_DIRPATH)
+PLUGINS_DIRPATH = os.path.dirname(DEV_DIRPATH)
 PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
-  UTILS_DIRPATH,
+  DEV_DIRPATH,
   PLUGINS_DIRPATH,
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
@@ -32,8 +32,8 @@ import pathspec
 
 from batcher import pygimplib as pg
 
-from utils import create_user_docs
-from utils import process_local_docs
+from dev import create_user_docs
+from dev import process_local_docs
 
 pg.config.LOG_MODE = 'none'
 
@@ -43,7 +43,7 @@ INSTALLERS_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'installers')
 TEMP_INPUT_DIRPATH = os.path.join(INSTALLERS_DIRPATH, 'temp_input')
 OUTPUT_DIRPATH_DEFAULT = os.path.join(INSTALLERS_DIRPATH, 'output')
 
-INCLUDE_LIST_FILEPATH = os.path.join(UTILS_DIRPATH, 'make_installers_included_files.txt')
+INCLUDE_LIST_FILEPATH = os.path.join(DEV_DIRPATH, 'make_installers_included_files.txt')
 
 GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')
 

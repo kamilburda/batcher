@@ -2,7 +2,7 @@ import os
 
 plugin_dirpath = os.path.join(Gimp.directory(), 'batcher')
 
-Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'utils']), GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_batcher_contents', 'batcher.tests.test_update_contents']), os.path.join(plugin_dirpath, 'test_output.log')])
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'dev']), GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_batcher_contents', 'batcher.tests.test_update_contents']), os.path.join(plugin_dirpath, 'test_output.log')])
 
 Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.tests.test_update_contents']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(plugin_dirpath, 'test_output.log')])
 
@@ -27,7 +27,7 @@ importlib.reload(test_setting_gui)
 test_setting_gui.test_array_settings_and_gui()
 
 
-sys.path.append(os.path.join(plugin_dirpath, 'utils'))
+sys.path.append(os.path.join(plugin_dirpath, 'dev'))
 import make_screenshots
 import preprocess_document_contents
 import sync_docs

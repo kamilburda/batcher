@@ -6,7 +6,7 @@ import sys
 plugins_dirpath = os.path.join(Gimp.directory(), 'batcher')
 sys.path.append(plugins_dirpath)
 sys.path.append(os.path.join(plugin_dirpath, 'batcher'))
-sys.path.append(os.path.join(plugin_dirpath, 'utils'))
+sys.path.append(os.path.join(plugin_dirpath, 'dev'))
 
 import make_screenshots
 

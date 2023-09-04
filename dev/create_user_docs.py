@@ -12,7 +12,7 @@ import yaml
 
 from batcher import pygimplib as pg
 
-from utils import process_local_docs
+from dev import process_local_docs
 
 
 MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))

@@ -12,7 +12,7 @@ import shutil
 
 from batcher import pygimplib as pg
 
-from utils import preprocess_document_contents
+from dev import preprocess_document_contents
 
 
 MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))

@@ -5,7 +5,7 @@ import parameterized
 
 from batcher import pygimplib as pg
 
-from utils import preprocess_document_contents
+from dev import preprocess_document_contents
 
 
 class TestParseArgs(unittest.TestCase):
