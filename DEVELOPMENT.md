@@ -74,6 +74,14 @@ The installers will be created in the `installers/output` directory.
 For Python modules, follow PEP 8 conventions unless specified otherwise below.
 
 
+### Organizing modules
+
+Plug-in-related Python modules must be placed under the `batcher/src` directory.
+This avoids a problem where Python attempts to import modules from the top-level module (`batcher.py`) rather than the package with the same name (`batcher`).
+
+Development-related modules (such as documentation generation) must be placed under the `utils` directory.
+
+
 ### Line length
 
 The maximum line length is:
