@@ -340,7 +340,7 @@ def display_message(
       scrolled_window.add(text_view)
       
       vbox = dialog.get_message_area()
-      vbox.pack_end(scrolled_window, expand=True, fill=True)
+      vbox.pack_end(scrolled_window, True, True, 0)
     else:
       dialog.format_secondary_markup(messages[1])
   else:
