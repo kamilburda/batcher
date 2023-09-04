@@ -44,9 +44,9 @@ def _(message):
 # strings are translated.
 builtins._ = _
 
-from . import _gui_messages
-
-_gui_messages.set_gui_excepthook(title=None, app_name=None)
+# from . import _gui_messages
+#
+# _gui_messages.set_gui_excepthook(title=None, app_name=None)
 
 # from . import configbase
 from . import fileformats
