@@ -57,7 +57,7 @@ from . import invoker
 from . import objectfilter
 from . import overwrite
 from . import path
-# from . import pdbutils
+from . import pdbutils
 from . import progress
 # from . import setting
 from . import utils
@@ -80,8 +80,8 @@ __all__ = [
   'logging',
   'objectfilter',
   'overwrite',
-  # 'path',
-  # 'pdbutils',
+  'path',
+  'pdbutils',
   'progress',
   # 'setting',
   'utils',

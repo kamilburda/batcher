@@ -1,5 +1,5 @@
 """Additional functions dealing with GIMP objects (images, layers, etc.) not
-defined in the GIMP procedural database (PDB) or the GIMP Python API.
+available in the GIMP procedural database (PDB) or the GIMP API.
 """
 
 import os
@@ -12,13 +12,13 @@ from gi.repository import Gimp
 from . import constants as pgconstants
 from . import invocation as pginvocation
 from . import utils as pgutils
+from .pypdb import pdb
 
 
 @contextlib.contextmanager
-def undo_group(image):
-  """
-  Wrap the enclosing block of code into one GIMP undo group for the specified
-  image.
+def undo_group(image: Gimp.Image) -> contextlib.AbstractContextManager:
+  """Wraps the enclosing block of code into one GIMP undo group for the
+  specified image.
   
   Use this function as a context manager:
     
@@ -56,7 +56,7 @@ def create_image_from_metadata(image_to_copy_metadata_from):
   pdb.gimp_image_set_resolution(new_image, *pdb.gimp_image_get_resolution(image))
   pdb.gimp_image_set_unit(new_image, pdb.gimp_image_get_unit(image))
   
-  if image.base_type == gimpenums.INDEXED:
+  if image.get_base_type() == Gimp.ImageBaseType.INDEXED:
     pdb.gimp_image_set_colormap(new_image, *pdb.gimp_image_get_colormap(image))
   
   # Copy image parasites
@@ -72,11 +72,10 @@ def create_image_from_metadata(image_to_copy_metadata_from):
     pdb.gimp_image_set_filename(new_image, image.filename)
   else:
     pdb.gimp_image_set_filename(new_image, image.name)
-  
-  if gimp.version >= (2, 10):
-    image_string_metadata = pdb.gimp_image_get_metadata(image)
-    if image_string_metadata:
-      pdb.gimp_image_set_metadata(new_image, image_string_metadata)
+
+  image_string_metadata = pdb.gimp_image_get_metadata(image)
+  if image_string_metadata:
+    pdb.gimp_image_set_metadata(new_image, image_string_metadata)
   
   return new_image
 
