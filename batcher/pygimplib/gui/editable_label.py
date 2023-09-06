@@ -41,8 +41,8 @@ class EditableLabel(Gtk.Box):
     
     self._hbox = gtk.HBox(homogeneous=False)
     self._hbox.set_spacing(self._LABEL_EDIT_BUTTON_SPACING)
-    self._hbox.pack_start(self._label, expand=True, fill=True)
-    self._hbox.pack_start(self._button_edit, expand=False, fill=False)
+    self._hbox.pack_start(self._label, True, True, 0)
+    self._hbox.pack_start(self._button_edit, False, False, 0)
     
     self._entry = gtk.Entry()
     self._entry.show_all()
@@ -50,8 +50,8 @@ class EditableLabel(Gtk.Box):
     
     self._entry.hide()
     
-    self.pack_start(self._hbox, expand=False, fill=False)
-    self.pack_start(self._entry, expand=False, fill=False)
+    self.pack_start(self._hbox, False, False, 0)
+    self.pack_start(self._entry, False, False, 0)
     
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
     self._entry.connect('activate', self._on_entry_finished_editing)

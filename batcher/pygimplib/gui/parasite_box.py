@@ -63,30 +63,30 @@ class ParasiteBox(Gtk.Box):
     
     self._vbox_name = gtk.VBox()
     self._vbox_name.set_spacing(self._VBOX_SPACING)
-    self._vbox_name.pack_start(self._vbox_name_label, expand=False, fill=False)
-    self._vbox_name.pack_start(self._parasite_name_entry, expand=False, fill=False)
+    self._vbox_name.pack_start(self._vbox_name_label, False, False, 0)
+    self._vbox_name.pack_start(self._parasite_name_entry, False, False, 0)
     
     self._vbox_flags_label = gtk.Label(pgutils.safe_encode_gtk(_('Flags')))
     self._vbox_flags_label.set_alignment(0.0, 0.5)
     
     self._vbox_flags = gtk.VBox()
     self._vbox_flags.set_spacing(self._VBOX_SPACING)
-    self._vbox_flags.pack_start(self._vbox_flags_label, expand=False, fill=False)
+    self._vbox_flags.pack_start(self._vbox_flags_label, False, False, 0)
     self._vbox_flags.pack_start(
-      self._parasite_flags_spin_button, expand=False, fill=False)
+      self._parasite_flags_spin_button, False, False, 0)
     
     self._vbox_data_label = gtk.Label(pgutils.safe_encode_gtk(_('Data')))
     self._vbox_data_label.set_alignment(0.0, 0.5)
     
     self._vbox_data = gtk.VBox()
     self._vbox_data.set_spacing(self._VBOX_SPACING)
-    self._vbox_data.pack_start(self._vbox_data_label, expand=False, fill=False)
-    self._vbox_data.pack_start(self._parasite_data_entry, expand=False, fill=False)
+    self._vbox_data.pack_start(self._vbox_data_label, False, False, 0)
+    self._vbox_data.pack_start(self._parasite_data_entry, False, False, 0)
     
     self.set_spacing(self._HBOX_SPACING)
-    self.pack_start(self._vbox_name, expand=False, fill=False)
-    self.pack_start(self._vbox_flags, expand=False, fill=False)
-    self.pack_start(self._vbox_data, expand=False, fill=False)
+    self.pack_start(self._vbox_name, False, False, 0)
+    self.pack_start(self._vbox_flags, False, False, 0)
+    self.pack_start(self._vbox_data, False, False, 0)
     
     self._set_values(parasite)
     self._connect_changed_events()

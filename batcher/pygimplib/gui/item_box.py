@@ -44,7 +44,7 @@ class ItemBox(Gtk.ScrolledWindow):
     
     self._vbox = gtk.VBox(homogeneous=False)
     self._vbox.set_spacing(self.VBOX_SPACING)
-    self._vbox.pack_start(self._vbox_items, expand=False, fill=False)
+    self._vbox.pack_start(self._vbox_items, False, False, 0)
     
     self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     self.add_with_viewport(self._vbox)
@@ -55,7 +55,7 @@ class ItemBox(Gtk.ScrolledWindow):
     return self._items
   
   def add_item(self, item):
-    self._vbox_items.pack_start(item.widget, expand=False, fill=False)
+    self._vbox_items.pack_start(item.widget, False, False, 0)
     
     item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
     item.widget.connect('key-press-event', self._on_item_widget_key_press_event, item)
@@ -147,9 +147,9 @@ class ItemBoxItem:
     self._event_box_buttons = gtk.EventBox()
     self._event_box_buttons.add(self._hbox_buttons)
     
-    self._hbox.pack_start(self._event_box_indicator_buttons, expand=False, fill=False)
-    self._hbox.pack_start(self._item_widget, expand=True, fill=True)
-    self._hbox.pack_start(self._event_box_buttons, expand=False, fill=False)
+    self._hbox.pack_start(self._event_box_indicator_buttons, False, False, 0)
+    self._hbox.pack_start(self._item_widget, True, True, 0)
+    self._hbox.pack_start(self._event_box_buttons, False, False, 0)
     
     self._event_box = gtk.EventBox()
     self._event_box.add(self._hbox)
@@ -199,7 +199,7 @@ class ItemBoxItem:
     button_icon = gtk.image_new_from_pixbuf(button.render_icon(icon, gtk.ICON_SIZE_MENU))
     button.add(button_icon)
     
-    hbox.pack_start(button, expand=False, fill=False)
+    hbox.pack_start(button, False, False, 0)
     if position is not None:
       hbox.reorder_child(button, position)
     
@@ -326,10 +326,10 @@ class ArrayBox(ItemBox):
     
     self._size_hbox = gtk.HBox()
     self._size_hbox.set_spacing(self._SIZE_HBOX_SPACING)
-    self._size_hbox.pack_start(self._size_spin_button_label, expand=False, fill=False)
-    self._size_hbox.pack_start(self._size_spin_button, expand=False, fill=False)
+    self._size_hbox.pack_start(self._size_spin_button_label, False, False, 0)
+    self._size_hbox.pack_start(self._size_spin_button, False, False, 0)
     
-    self._vbox.pack_start(self._size_hbox, expand=False, fill=False)
+    self._vbox.pack_start(self._size_hbox, False, False, 0)
     self._vbox.reorder_child(self._size_hbox, 0)
     
     self._size_spin_button.connect(
@@ -545,7 +545,7 @@ class _ArrayBoxItem(ItemBoxItem):
     self._label = gtk.Label()
     self._label.show()
     
-    self._hbox.pack_start(self._label, expand=False, fill=False)
+    self._hbox.pack_start(self._label, False, False, 0)
     self._hbox.reorder_child(self._label, 0)
   
   @property

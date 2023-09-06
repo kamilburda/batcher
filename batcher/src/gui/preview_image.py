@@ -271,8 +271,8 @@ class ImagePreview(preview_base_.Preview):
     self._button_refresh.set_no_show_all(True)
     
     self._hbox_buttons = gtk.HBox()
-    self._hbox_buttons.pack_start(self._button_menu, expand=False, fill=False)
-    self._hbox_buttons.pack_start(self._button_refresh, expand=False, fill=False)
+    self._hbox_buttons.pack_start(self._button_menu, False, False, 0)
+    self._hbox_buttons.pack_start(self._button_refresh, False, False, 0)
     
     self._preview_image = gtk.Image()
     self._preview_image.set_no_show_all(True)
@@ -291,11 +291,11 @@ class ImagePreview(preview_base_.Preview):
     self.set_spacing(self._WIDGET_SPACING)
     self.set_border_width(self._BORDER_WIDTH)
     
-    self.pack_start(self._hbox_buttons, expand=False, fill=False)
-    self.pack_start(self._preview_image, expand=True, fill=True)
-    self.pack_start(self._placeholder_image, expand=True, fill=True)
-    self.pack_start(self._folder_image, expand=True, fill=True)
-    self.pack_start(self._label_item_name, expand=False, fill=False)
+    self.pack_start(self._hbox_buttons, False, False, 0)
+    self.pack_start(self._preview_image, True, True, 0)
+    self.pack_start(self._placeholder_image, True, True, 0)
+    self.pack_start(self._folder_image, True, True, 0)
+    self.pack_start(self._label_item_name, False, False, 0)
     
     self._placeholder_image_size = gtk.icon_size_lookup(
       self._placeholder_image.get_property('icon-size'))

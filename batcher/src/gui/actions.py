@@ -141,11 +141,11 @@ class ActionBox(pg.gui.ItemBox):
       button_hbox = gtk.HBox()
       button_hbox.set_spacing(self._ADD_BUTTON_HBOX_SPACING)
       button_hbox.pack_start(
-        gtk.image_new_from_stock(gtk.STOCK_ADD, gtk.ICON_SIZE_MENU), expand=False, fill=False)
+        gtk.image_new_from_stock(gtk.STOCK_ADD, gtk.ICON_SIZE_MENU), False, False, 0)
       
       label_add = gtk.Label(pg.utils.safe_encode_gtk(self._add_action_text))
       label_add.set_use_underline(True)
-      button_hbox.pack_start(label_add, expand=False, fill=False)
+      button_hbox.pack_start(label_add, False, False, 0)
       
       self._button_add.add(button_hbox)
     else:
@@ -154,7 +154,7 @@ class ActionBox(pg.gui.ItemBox):
     self._button_add.set_relief(gtk.RELIEF_NONE)
     self._button_add.connect('clicked', self._on_button_add_clicked)
     
-    self._vbox.pack_start(self._button_add, expand=False, fill=False)
+    self._vbox.pack_start(self._button_add, False, False, 0)
     
     self._actions_menu = gtk.Menu()
     self._init_actions_menu_popup()
@@ -474,7 +474,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     self._button_reset = gtk.Button()
     self._button_reset.set_label(_('_Reset'))
-    self.action_area.pack_start(self._button_reset, expand=False, fill=False)
+    self.action_area.pack_start(self._button_reset, False, False, 0)
     self.action_area.set_child_secondary(self._button_reset, True)
     
     self._label_procedure_name = pg.gui.EditableLabel()
@@ -502,10 +502,10 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._vbox_more_options.set_spacing(self._MORE_OPTIONS_SPACING)
     self._vbox_more_options.set_border_width(self._MORE_OPTIONS_BORDER_WIDTH)
     self._vbox_more_options.pack_start(
-      action['enabled_for_previews'].gui.element, expand=False, fill=False)
+      action['enabled_for_previews'].gui.element, False, False, 0)
     if 'also_apply_to_parent_folders' in action:
       self._vbox_more_options.pack_start(
-        action['also_apply_to_parent_folders'].gui.element, expand=False, fill=False)
+        action['also_apply_to_parent_folders'].gui.element, False, False, 0)
     
     action['more_options_expanded'].gui.element.add(self._vbox_more_options)
     
@@ -514,13 +514,13 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._vbox = gtk.VBox()
     self._vbox.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._vbox.set_spacing(self._DIALOG_VBOX_SPACING)
-    self._vbox.pack_start(self._label_procedure_name, expand=False, fill=False)
+    self._vbox.pack_start(self._label_procedure_name, False, False, 0)
     if self._label_procedure_description is not None:
-      self._vbox.pack_start(self._label_procedure_description, expand=False, fill=False)
-    self._vbox.pack_start(self._table_action_arguments, expand=True, fill=True)
-    self._vbox.pack_start(action['more_options_expanded'].gui.element, expand=False, fill=False)
+      self._vbox.pack_start(self._label_procedure_description, False, False, 0)
+    self._vbox.pack_start(self._table_action_arguments, True, True, 0)
+    self._vbox.pack_start(action['more_options_expanded'].gui.element, False, False, 0)
     
-    self.vbox.pack_start(self._vbox, expand=False, fill=False)
+    self.vbox.pack_start(self._vbox, False, False, 0)
     
     self._set_arguments(action, pdb_procedure)
     
@@ -590,8 +590,9 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     hbox.pack_start(
       gtk.image_new_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_BUTTON),
-      expand=False,
-      fill=False)
+      False,
+      False,
+      0)
     
     label = gtk.Label()
     label.set_use_markup(True)
@@ -599,6 +600,6 @@ class _ActionEditDialog(GimpUi.Dialog):
       '<span font_size="small">{}</span>'.format(
         GLib.markup_escape_text(_('Cannot modify this parameter'))))
     
-    hbox.pack_start(label, expand=False, fill=False)
+    hbox.pack_start(label, False, False, 0)
     
     return hbox

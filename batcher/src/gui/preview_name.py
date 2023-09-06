@@ -220,18 +220,18 @@ class NamePreview(preview_base_.Preview):
     column = gtk.TreeViewColumn('')
     
     cell_renderer_icon_item = gtk.CellRendererPixbuf()
-    column.pack_start(cell_renderer_icon_item, expand=False)
+    column.pack_start(cell_renderer_icon_item, False, False, 0)
     column.set_attributes(cell_renderer_icon_item, pixbuf=self._COLUMN_ICON_ITEM[0])
     
     cell_renderer_icon_tag = gtk.CellRendererPixbuf()
     cell_renderer_icon_tag.set_property('pixbuf', self._icons['tag'])
-    column.pack_start(cell_renderer_icon_tag, expand=False)
+    column.pack_start(cell_renderer_icon_tag, False, False, 0)
     column.set_attributes(
       cell_renderer_icon_tag,
       visible=self._COLUMN_ICON_TAG_VISIBLE[0])
     
     cell_renderer_item_name = gtk.CellRendererText()
-    column.pack_start(cell_renderer_item_name, expand=False)
+    column.pack_start(cell_renderer_item_name, False, False, 0)
     column.set_attributes(
       cell_renderer_item_name,
       text=self._COLUMN_ITEM_NAME[0],
@@ -243,7 +243,7 @@ class NamePreview(preview_base_.Preview):
     self._scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     self._scrolled_window.add(self._tree_view)
     
-    self.pack_start(self._scrolled_window)
+    self.pack_start(self._scrolled_window, False, False, 0)
     
     self._tree_view.connect('row-collapsed', self._on_tree_view_row_collapsed)
     self._tree_view.connect('row-expanded', self._on_tree_view_row_expanded)
@@ -450,8 +450,8 @@ class NamePreview(preview_base_.Preview):
     
     hbox = gtk.HBox()
     hbox.set_spacing(self._ADD_TAG_POPUP_HBOX_SPACING)
-    hbox.pack_start(label_tag_name, expand=False, fill=False)
-    hbox.pack_start(entry_add_tag, expand=False, fill=False)
+    hbox.pack_start(label_tag_name, False, False, 0)
+    hbox.pack_start(entry_add_tag, False, False, 0)
     hbox.set_border_width(self._ADD_TAG_POPUP_BORDER_WIDTH)
     
     frame = gtk.Frame()

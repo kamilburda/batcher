@@ -67,7 +67,7 @@ def display_reset_prompt(parent=None, more_settings_shown=False):
       label=_('Remove procedures and constraints'), use_underline=False)
     checkbutton_reset_actions.set_active(True)
     
-    dialog.vbox.pack_start(checkbutton_reset_actions, expand=False, fill=False)
+    dialog.vbox.pack_start(checkbutton_reset_actions, False, False, 0)
   
   dialog.set_focus(dialog.get_widget_for_response(gtk.RESPONSE_NO))
   
@@ -335,10 +335,10 @@ class ExportLayersDialog:
     self._vbox_folder_chooser.set_spacing(self._DIALOG_VBOX_SPACING)
     self._vbox_folder_chooser.pack_start(
       self._folder_chooser_label,
-      expand=False,
-      fill=False,
-      padding=self._SAVE_IN_FOLDER_LABEL_PADDING)
-    self._vbox_folder_chooser.pack_start(self._folder_chooser)
+      False,
+      False,
+      self._SAVE_IN_FOLDER_LABEL_PADDING)
+    self._vbox_folder_chooser.pack_start(self._folder_chooser, False, False, 0)
     
     self._init_gui_previews()
     
@@ -348,15 +348,15 @@ class ExportLayersDialog:
     
     self._hbox_preview_label = gtk.HBox()
     self._hbox_preview_label.set_border_width(self._PREVIEW_LABEL_BORDER_WIDTH)
-    self._hbox_preview_label.pack_start(self._preview_label)
+    self._hbox_preview_label.pack_start(self._preview_label, False, False, 0)
     
     self._vpaned_previews = gtk.VPaned()
     self._vpaned_previews.pack1(self._name_preview, resize=True, shrink=True)
     self._vpaned_previews.pack2(self._image_preview, resize=True, shrink=True)
     
     self._vbox_previews = gtk.VBox()
-    self._vbox_previews.pack_start(self._hbox_preview_label, expand=False, fill=False)
-    self._vbox_previews.pack_start(self._vpaned_previews, expand=True, fill=True)
+    self._vbox_previews.pack_start(self._hbox_preview_label, False, False, 0)
+    self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
     
     self._frame_previews = gtk.Frame()
     self._frame_previews.set_shadow_type(gtk.SHADOW_ETCHED_OUT)
@@ -390,28 +390,28 @@ class ExportLayersDialog:
     self._label_message = message_label_.MessageLabel()
     
     self._hbox_export_name_labels = gtk.HBox(homogeneous=False)
-    self._hbox_export_name_labels.pack_start(self._file_extension_label, expand=False, fill=False)
-    self._hbox_export_name_labels.pack_start(self._save_as_label, expand=False, fill=False)
+    self._hbox_export_name_labels.pack_start(self._file_extension_label, False, False, 0)
+    self._hbox_export_name_labels.pack_start(self._save_as_label, False, False, 0)
     
     self._hbox_export_name_entries = gtk.HBox(homogeneous=False)
     self._hbox_export_name_entries.set_spacing(self._HBOX_EXPORT_NAME_ENTRIES_SPACING)
     self._hbox_export_name_entries.pack_start(
-      self._filename_pattern_entry, expand=False, fill=False)
-    self._hbox_export_name_entries.pack_start(self._dot_label, expand=False, fill=False)
-    self._hbox_export_name_entries.pack_start(self._file_extension_entry, expand=False, fill=False)
+      self._filename_pattern_entry, False, False, 0)
+    self._hbox_export_name_entries.pack_start(self._dot_label, False, False, 0)
+    self._hbox_export_name_entries.pack_start(self._file_extension_entry, False, False, 0)
     
     self._hbox_export_name = gtk.HBox(homogeneous=False)
     self._hbox_export_name.set_spacing(self._HBOX_EXPORT_LABELS_NAME_SPACING)
-    self._hbox_export_name.pack_start(self._hbox_export_name_labels, expand=False, fill=False)
-    self._hbox_export_name.pack_start(self._hbox_export_name_entries, expand=False, fill=False)
+    self._hbox_export_name.pack_start(self._hbox_export_name_labels, False, False, 0)
+    self._hbox_export_name.pack_start(self._hbox_export_name_entries, False, False, 0)
     
     self._hbox_export_name_and_message = gtk.HBox(homogeneous=False)
     self._hbox_export_name_and_message.set_spacing(
       self._HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING)
     self._hbox_export_name_and_message.set_border_width(
       self._HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH)
-    self._hbox_export_name_and_message.pack_start(self._hbox_export_name, expand=False, fill=False)
-    self._hbox_export_name_and_message.pack_start(self._label_message, expand=True, fill=True)
+    self._hbox_export_name_and_message.pack_start(self._hbox_export_name, False, False, 0)
+    self._hbox_export_name_and_message.pack_start(self._label_message, True, True, 0)
     
     self._box_procedures = actions_.ActionBox(
       self._settings['main/procedures'],
@@ -430,22 +430,22 @@ class ExportLayersDialog:
     self._hbox_actions = gtk.HBox(homogeneous=True)
     self._hbox_actions.set_spacing(self._MORE_SETTINGS_HORIZONTAL_SPACING)
     self._hbox_actions.set_border_width(self._MORE_SETTINGS_BORDER_WIDTH)
-    self._hbox_actions.pack_start(self._box_procedures, expand=True, fill=True)
-    self._hbox_actions.pack_start(self._box_constraints, expand=True, fill=True)
+    self._hbox_actions.pack_start(self._box_procedures, True, True, 0)
+    self._hbox_actions.pack_start(self._box_constraints, True, True, 0)
     
     self._label_message_for_edit_mode = message_label_.MessageLabel()
     
     self._vbox_actions_and_message_for_edit_mode = gtk.VBox(homogeneous=False)
     self._vbox_actions_and_message_for_edit_mode.pack_start(
-      self._hbox_actions, expand=True, fill=True)
+      self._hbox_actions, True, True, 0)
     self._vbox_actions_and_message_for_edit_mode.pack_start(
-      self._label_message_for_edit_mode, expand=False, fill=False)
+      self._label_message_for_edit_mode, False, False, 0)
     
     self._vbox_chooser_and_settings = gtk.VBox()
     self._vbox_chooser_and_settings.set_spacing(self._DIALOG_VBOX_SPACING)
-    self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, expand=True, fill=True)
+    self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, True, True, 0)
     self._vbox_chooser_and_settings.pack_start(
-      self._hbox_export_name_and_message, expand=False, fill=False)
+      self._hbox_export_name_and_message, False, False, 0)
     
     self._vpaned_chooser_and_actions = gtk.VPaned()
     self._vpaned_chooser_and_actions.pack1(
@@ -476,9 +476,9 @@ class ExportLayersDialog:
     self._label_button_settings.set_use_underline(True)
     
     self._hbox_button_settings = gtk.HBox()
-    self._hbox_button_settings.pack_start(self._label_button_settings, expand=True, fill=True)
+    self._hbox_button_settings.pack_start(self._label_button_settings, True, True, 0)
     self._hbox_button_settings.pack_start(
-      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), expand=False, fill=False)
+      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), False, False, 0)
     
     self._button_settings = gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
@@ -499,14 +499,14 @@ class ExportLayersDialog:
     self._menu_settings.append(self._menu_item_export_settings)
     self._menu_settings.show_all()
     
-    self._dialog.action_area.pack_end(self._button_stop, expand=False, fill=False)
-    self._dialog.action_area.pack_start(self._button_settings, expand=False, fill=False)
+    self._dialog.action_area.pack_end(self._button_stop, False, False, 0)
+    self._dialog.action_area.pack_start(self._button_settings, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_settings, True)
     
     if _webbrowser_module_found:
       self._button_help = gtk.Button()
       self._button_help.set_label(_('_Help'))
-      self._dialog.action_area.pack_start(self._button_help, expand=False, fill=False)
+      self._dialog.action_area.pack_start(self._button_help, False, False, 0)
       self._dialog.action_area.set_child_secondary(self._button_help, True)
     
     self._progress_bar = gtk.ProgressBar()
@@ -514,12 +514,12 @@ class ExportLayersDialog:
     self._progress_bar.set_no_show_all(True)
     
     self._hbox_contents = gtk.HBox()
-    self._hbox_contents.pack_start(self._hpaned_settings_and_previews, expand=True, fill=True)
+    self._hbox_contents.pack_start(self._hpaned_settings_and_previews, True, True, 0)
     self._hbox_contents.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
     
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
-    self._dialog.vbox.pack_start(self._hbox_contents, expand=True, fill=True)
-    self._dialog.vbox.pack_end(self._progress_bar, expand=False, fill=False)
+    self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
+    self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
     
     # Move the action area above the progress bar.
     self._dialog.vbox.reorder_child(self._dialog.action_area, -1)
@@ -754,7 +754,7 @@ class ExportLayersDialog:
       check_button_load_size_settings = gtk.CheckButton(_('Import size-related settings'))
       check_button_load_size_settings.set_border_width(
         self._IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH)
-      file_dialog.vbox.pack_start(check_button_load_size_settings, expand=False, fill=False)
+      file_dialog.vbox.pack_start(check_button_load_size_settings, False, False, 0)
     else:
       check_button_load_size_settings = None
     
@@ -1237,17 +1237,17 @@ class ExportLayersRepeatDialog:
     self._button_stop.set_label(_('_Stop'))
     
     self._buttonbox = gtk.HButtonBox()
-    self._buttonbox.pack_start(self._button_stop, expand=False, fill=False)
+    self._buttonbox.pack_start(self._button_stop, False, False, 0)
     
     self._progress_bar = gtk.ProgressBar()
     self._progress_bar.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
     
     self._hbox_action_area = gtk.HBox(homogeneous=False)
     self._hbox_action_area.set_spacing(self._HBOX_HORIZONTAL_SPACING)
-    self._hbox_action_area.pack_start(self._progress_bar, expand=True, fill=True)
-    self._hbox_action_area.pack_end(self._buttonbox, expand=False, fill=False)
+    self._hbox_action_area.pack_start(self._progress_bar, True, True, 0)
+    self._hbox_action_area.pack_end(self._buttonbox, False, False, 0)
     
-    self._dialog.vbox.pack_end(self._hbox_action_area, expand=False, fill=False)
+    self._dialog.vbox.pack_end(self._hbox_action_area, False, False, 0)
     
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)

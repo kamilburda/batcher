@@ -276,7 +276,7 @@ class FilenamePatternEntry(ExtendedEntry):
     
     self._field_tooltip_hbox = gtk.HBox(homogeneous=False)
     self._field_tooltip_hbox.pack_start(
-      self._field_tooltip_text, expand=False, fill=False)
+      self._field_tooltip_text, False, False, 0)
     
     self._field_tooltip_frame = gtk.Frame()
     self._field_tooltip_frame.set_shadow_type(gtk.SHADOW_ETCHED_IN)

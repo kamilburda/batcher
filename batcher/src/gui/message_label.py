@@ -106,9 +106,9 @@ class MessageLabel(Gtk.Box):
     self._hbox_button_more = gtk.HBox()
     self._hbox_button_more.set_spacing(self._MORE_BUTTON_LABEL_AND_ARROW_SPACING)
     self._hbox_button_more.pack_start(
-      self._label_button_more, expand=True, fill=True)
+      self._label_button_more, True, True, 0)
     self._hbox_button_more.pack_start(
-      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), expand=False, fill=False)
+      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), False, False, 0)
     
     self._button_more = gtk.Button()
     self._button_more.set_relief(gtk.RELIEF_NONE)
@@ -137,8 +137,8 @@ class MessageLabel(Gtk.Box):
     self._popup_more.hide()
     
     self.set_spacing(self._MESSAGE_AND_MORE_BUTTON_SPACING)
-    self.pack_start(self._label_message, expand=True, fill=True)
-    self.pack_start(self._button_more, expand=False, fill=False)
+    self.pack_start(self._label_message, True, True, 0)
+    self.pack_start(self._button_more, False, False, 0)
   
   def _on_label_message_size_allocate(self, label, allocation):
     if ((pg.gui.get_label_full_text_width(self._label_message)

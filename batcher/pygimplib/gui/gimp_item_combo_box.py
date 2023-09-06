@@ -73,7 +73,7 @@ class GimpItemComboBox(Gtk.Box):
     
     self._item_types_combo_box = gtk.combo_box_new_text()
     
-    self.pack_start(self._item_types_combo_box, expand=True, fill=True)
+    self.pack_start(self._item_types_combo_box, True, True, 0)
     
     for combo_box in self._item_combo_boxes:
       combo_box.widget.show_all()
@@ -82,7 +82,7 @@ class GimpItemComboBox(Gtk.Box):
       
       self._item_types_combo_box.append_text(pgutils.safe_encode_gtk(combo_box.name))
       
-      self.pack_start(combo_box.widget, expand=True, fill=True)
+      self.pack_start(combo_box.widget, True, True, 0)
       
       combo_box.widget.connect('changed', self._on_combo_box_changed)
     
