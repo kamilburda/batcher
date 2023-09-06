@@ -149,7 +149,7 @@ def safe_encode_gimp(str_: Optional[str]) -> bytes:
 
   If ``str_`` is ``None``, an empty ``bytes`` literal is returned.
   """
-  return safe_encode(str_, pgconstants.GIMP_CHARACTER_ENCODING)
+  return safe_encode(str_, pgconstants.GIMP_ENCODING)
 
 
 def safe_decode(bytes_: Optional[bytes], encoding: str) -> str:
@@ -168,4 +168,4 @@ def safe_decode_gimp(bytes_: Optional[bytes]) -> str:
 
   If the ``bytes_`` is ``None``, an empty string is returned.
   """
-  return safe_decode(bytes_, pgconstants.GIMP_CHARACTER_ENCODING)
+  return safe_decode(bytes_, pgconstants.GIMP_ENCODING)

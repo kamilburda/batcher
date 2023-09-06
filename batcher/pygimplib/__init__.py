@@ -86,7 +86,7 @@ __all__ = [
   # 'setting',
   'utils',
   # Global elements imported to or defined in this module
-  'GIMP_CHARACTER_ENCODING',
+  'GIMP_ENCODING',
   'TEXT_FILE_ENCODING',
   # 'config',
   'main',
