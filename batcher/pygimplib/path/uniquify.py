@@ -1,6 +1,8 @@
 """Functions to modify strings or file paths to make them unique."""
 
+from collections.abc import Iterable
 import os
+from typing import Callable, Generator, Optional
 
 __all__ = [
   'uniquify_string',
@@ -9,22 +11,16 @@ __all__ = [
 ]
 
 
-def uniquify_string(str_, existing_strings, position=None, generator=None):
-  """
-  If string `str_` is in the `existing_strings` list, return a unique string
-  by inserting a substring that makes `str_` unique. Otherwise, return original
-  `str_`.
-  
-  Parameters:
-  
-  * `str_` - String to uniquify.
-  
-  * `existing_strings` - List of strings to compare against `str_`.
-  
-  * `position` - See the `position` parameter in `uniquify_string_generic()` for
-    more information.
-  
-  * `generator` - See the `generator` parameter in `uniquify_string_generic()`.
+def uniquify_string(
+      str_: str,
+      existing_strings: Iterable[str],
+      position: Optional[int] = None,
+      generator: Optional[Generator[str, None, None]] = None,
+) -> str:
+  """Modifies `str_` if needed to be unique among all ``existing_strings``.
+
+  For more information on the ``position`` and ``generator`` parameters, see
+  ``uniquify_string_generic()``.
   """
   return uniquify_string_generic(
     str_,
@@ -33,18 +29,16 @@ def uniquify_string(str_, existing_strings, position=None, generator=None):
     generator)
   
 
-def uniquify_filepath(filepath, position=None, generator=None):
-  """
-  If a file at the specified path already exists, return a unique file path.
-  
-  Parameters:
-  
-  * `filepath` - File path to uniquify.
-  
-  * `position` - See the `position` parameter in `uniquify_string_generic()` for
-    more information.
-  
-  * `generator` - See the `generator` parameter in `uniquify_string_generic()`.
+def uniquify_filepath(
+      filepath: str,
+      position: Optional[int] = None,
+      generator: Optional[Generator[str, None, None]] = None,
+) -> str:
+  """Modifies the specified file path to be unique if a file with the same path
+  already exists.
+
+  For more information on the ``position`` and ``generator`` parameters, see
+  ``uniquify_string_generic()``.
   """
   return uniquify_string_generic(
     filepath,
@@ -53,53 +47,60 @@ def uniquify_filepath(filepath, position=None, generator=None):
     generator)
 
 
-def uniquify_string_generic(str_, is_unique_func, position=None, generator=None):
-  """
-  If string `str_` is not unique according to `is_unique_func`, return a unique
-  string by inserting a substring that makes `str_` unique. Otherwise, return
-  original `str_`.
+def uniquify_string_generic(
+      str_: str,
+      is_unique_func: Callable[[str], bool],
+      position: Optional[int] = None,
+      generator: Optional[Generator[str, None, None]] = None,
+) -> str:
+  """Modifies ``str_`` to be unique if ``is_unique_func`` for the given string
+  returns ``False``.
+
+  If the string must be made unique, a substring is inserted according to
+  ``generator`` at the given ``position``. Otherwise, ``str_`` is returned
+  unmodified.
   
-  Parameters:
-  
-  * `str_` - String to uniquify.
-  
-  * `is_unique_func` - Function that returns `True` if `str_` is unique, `False`
-    otherwise. `is_unique_func` must contain `str_` as its only parameter.
-  
-  * `position` - Position (index) where the substring is inserted.
-    If the position is `None`, insert the substring at the end of `str_` (i.e.
-    append it).
-  
-  * `generator` - A generator object that generates a unique substring in each
-    iteration. If `None`, the generator yields default strings - " (1)", " (2)",
-    etc.
+  Args:
+    str_:
+      The string to make unique.
+    is_unique_func:
+      A function that returns ``True`` if ``str_`` is unique, ``False``
+      otherwise. ``is_unique_func`` must accept a string as its only parameter
+      and return a boolean.
+    position:
+      Position (index) where the substring is inserted.
+      If ``position`` is ``None``, the substring is inserted at the end of
+      ``str_``.
+    generator:
+      A generator object that generates a unique substring in each iteration.
+      If ``None``, the generator yields default strings - ``' (1)'``,
+      ``' (2)'``, and so on.
     
     An example of a custom generator:
 
       def _generate_unique_copy_string():
-        substr = " - copy"
+        substr = ' - copy'
         yield substr
         
-        substr = " - another copy"
+        substr = ' - another copy'
         yield substr
          
         i = 2
         while True:
-          yield "{} {}".format(substr, i)
+          yield f'{substr} {i}'
           i += 1
     
-    This generator yields " - copy", " - another copy", " - another copy 2",
-    etc.
+    This custom generator yields ``' - copy'``, ``' - another copy'``,
+    ``' - another copy 2'``, and so on.
   """
   
-  def _get_uniquified_string(generator):
-    return '{}{}{}'.format(
-      str_[0:position], next(generator), str_[position:])
+  def _get_uniquified_string(gen):
+    return f'{str_[0:position]}{next(gen)}{str_[position:]}'
 
   def _generate_unique_number():
     i = 1
     while True:
-      yield ' ({})'.format(i)
+      yield f' ({i})'
       i += 1
   
   if is_unique_func(str_):

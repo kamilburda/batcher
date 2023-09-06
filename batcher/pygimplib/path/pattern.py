@@ -1,9 +1,9 @@
-"""Class providing a string template to substitute fields and their arguments.
-"""
+"""String template to substitute fields and their arguments."""
 
-import collections
+from collections.abc import Iterable
 import inspect
 import re
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 __all__ = [
   'StringPattern',
@@ -11,28 +11,18 @@ __all__ = [
 
 
 class StringPattern:
-  """
-  This class provides string substitution based on fields and their arguments.
+  """Class providing string substitution based on fields and their arguments.
   
-  Fields are enclosed in square brackets (such as `"[field]"`). Field arguments
-  are separated by commas (`","`). The number of arguments depends on the
-  substitution function in the `fields` dictionary passed to `__init__`.
+  Fields are enclosed in square brackets (such as ``'[field]'``). Field
+  arguments are separated by commas (``','``). The number of arguments
+  depends on the substitution function in the `fields` dictionary passed to
+  ``__init__``.
   
   To insert literal commas in field arguments, enclose the arguments in square
   brackets. To insert square brackets in field arguments, enclose the arguments
   in square brackets and double the square brackets (the ones inside the
   argument, not the enclosing ones). If the last argument is enclosed in square
   brackets, insert a comma after the argument.
-  
-  Attributes:
-  
-  * `pattern` - The original string pattern.
-  
-  * `pattern_parts` - Parts of `pattern` split into strings (parts of the
-    pattern not containing the field) and fields (tuples describing the field).
-  
-  * `parsed_fields_and_matching_regexes` - Dictionary of
-    `(parsed field, first matching field regular expression)` pairs.
   
   Examples:
   
@@ -45,50 +35,60 @@ class StringPattern:
   * "[date, [[[%Y,%m,%d]]] ]" -> "[2016,07,16]", ...
   """
   
-  def __init__(self, pattern, fields=None):
-    """
-    Parameters:
-    
-    * `pattern` - String containing fields to substitute.
-    
-    * `fields` - List of `(field regex, function)` tuples. `field regex` matches
-      the fields in the pattern and `function` substitutes the field with the
-      value returned by the function. The function must always specify at least
-      one argument - the field to be substituted.
-      
-      Any unmatched fields will be silently ignored.
-      
-      Fields in the pattern are enclosed in square brackets (`"[field]"`). To
-      insert literal square brackets, double the characters (`"[["`, `"]]"`).
-      
-      If `fields` is `None`, no fields in the pattern will be substituted.
+  def __init__(self, pattern: str, fields: Optional[Iterable[Tuple[str, Callable]]] = None):
+    """Initializes the string pattern instance.
+
+    Args:
+      pattern:
+        String containing fields to substitute.
+      fields:
+        List of ``(field regex, function)`` tuples. ``field regex`` matches
+        the fields in the pattern and ``function`` substitutes the field with
+        the value returned by the function. The function must always specify
+        at least one argument - the field to be substituted.
+
+        Any unmatched fields will be silently ignored.
+
+        Fields in the pattern are enclosed in square brackets (``[field]``).
+        To insert literal square brackets, double the characters (``'[['`,
+        `']]'``).
+
+        If ``fields`` is ``None``, no fields in the pattern will be substituted.
     """
     self._pattern = pattern
-    self._fields = collections.OrderedDict(fields if fields is not None else [])
+    self._fields = dict(fields if fields is not None else [])
     
     self._pattern_parts, unused_, self._parsed_fields_and_matching_regexes = (
       self.parse_pattern(self._pattern, self._fields))
   
   @property
-  def pattern(self):
+  def pattern(self) -> str:
+    """The original string pattern."""
     return self._pattern
   
   @property
-  def pattern_parts(self):
+  def pattern_parts(self) -> List[Union[Tuple[str, List[str]], str]]:
+    """Parts of the ``pattern`` property split into strings and fields.
+
+    Strings represent parts of the pattern not containing any field. Fields
+    are represented as tuples.
+    """
     return self._pattern_parts
   
   @property
-  def parsed_fields_and_matching_regexes(self):
+  def parsed_fields_and_matching_regexes(self) -> Dict[str, str]:
+    """Dictionary of ``(parsed field, first matching field regular expression)``
+    pairs."""
     return self._parsed_fields_and_matching_regexes
   
-  def substitute(self, *additional_args):
-    """
-    Substitute fields in the string pattern. Return the processed string.
+  def substitute(self, *additional_args) -> str:
+    """Substitutes fields in the string pattern and returns the processed
+    string.
     
     If any substitution function raises an exception, the original string
     pattern is returned.
     
-    You may pass additional arguments if `fields` contains functions expecting
+    You may pass additional arguments if ``fields`` contains functions expecting
     more arguments outside the parsed arguments. These arguments are prepended
     to each function.
     """
@@ -102,10 +102,9 @@ class StringPattern:
     return ''.join(pattern_parts)
   
   @classmethod
-  def get_field_at_position(cls, pattern, position):
-    """
-    If the pattern contains a field at the given character position (starting
-    from 0), return the field name, otherwise return `None`.
+  def get_field_at_position(cls, pattern: str, position: int) -> Optional[str]:
+    """Returns a field name if the pattern contains a field at the given
+    character position (starting from 0), ``None`` otherwise.
     """
     unused_, parsed_fields, unused_ = cls.parse_pattern(pattern, fields=None)
     
@@ -117,15 +116,15 @@ class StringPattern:
     return None
   
   @classmethod
-  def reconstruct_pattern(cls, pattern_parts):
-    """
-    Reconstruct a string pattern given the parsed `pattern_parts` returned from
-    the `pattern_parts` attribute of a `StringPattern` instance.
+  def reconstruct_pattern(cls, pattern_parts: Iterable[List[str]]) -> str:
+    """Returns a reconstructed string pattern from parsed pattern parts.
+
+    The parsed ``pattern_parts`` can be returned from the ``pattern_parts``
+    attribute of a ``StringPattern`` instance.
     
     Raises:
-    
-    * `ValueError` - A list as an element of `pattern_parts` representing a
-      field is empty.
+      ValueError:
+        A list as an element of ``pattern_parts`` representing a field is empty.
     """
     processed_pattern_parts = []
     
@@ -134,8 +133,7 @@ class StringPattern:
         processed_pattern_parts.append(part)
       else:
         if not part:
-          raise ValueError(
-            'lists representing fields must always contain at least one element')
+          raise ValueError('lists representing fields must always contain at least one element')
         
         field_components = [part[0]]
         
@@ -147,11 +145,18 @@ class StringPattern:
     return ''.join(processed_pattern_parts)
   
   @staticmethod
-  def get_first_matching_field_regex(parsed_field_str, field_regexes):
-    """
-    Given the field `parsed_field_str` and the list of field regular
-    expressions, return the first matching field regular expression. Return
-    `None` if there is no match.
+  def get_first_matching_field_regex(
+        parsed_field_str: str, field_regexes: Iterable[str],
+  ) -> Optional[str]:
+    """Returns the first matching field regular expression.
+
+    Args:
+      parsed_field_str:
+        A parsed field.
+      field_regexes:
+        A list of field regular expressions.
+
+    If there is no match, ``None`` is returned.
     """
     return next(
       (field_regex for field_regex in field_regexes
@@ -159,30 +164,36 @@ class StringPattern:
       None)
   
   @classmethod
-  def parse_pattern(cls, pattern, fields=None):
+  def parse_pattern(
+        cls, pattern: str, fields: Optional[Dict[str, Callable]] = None,
+  ) -> Tuple[
+        List[Union[List[str], str]],
+        List[List],
+        Dict[str, str]]:
     """Parses the given string pattern.
     
-    Optionally, only the specified fields will be parsed. `fields` is a
+    Optionally, only the specified fields will be parsed. ``fields`` is a
     dictionary containing (field regex, function) pairs.
-    
-    The following tuple is returned:
-    * List of parts forming the pattern. The list contains substrings outside
-      fields and parsed fields (the second tuple item).
-    * List of parsed fields. Each parsed field contains the following elements:
-      field name, list of field arguments, the entire field as a string, tuple
-      of (field start position in `pattern`, field end position in `pattern`).
-    * List of parsed fields and matching field regexes, if `fields` is not
-      `None`.
+
+    Returns:
+      A tuple consisting of the following elements:
+      * List of parts forming the pattern. The list contains substrings outside
+        fields and parsed fields (the second tuple item).
+      * List of parsed fields. Each parsed field contains the following
+        elements: field name, list of field arguments, the entire field as a
+        string, tuple of (field start position in ``pattern``, field end
+        position in ``pattern``).
+      * List of parsed fields and matching field regexes, if ``fields`` is not
+        ``None``.
     """
     index = 0
     start_of_field_index = 0
     last_constant_substring_index = 0
     field_depth = 0
     
-    # item: pair of (field regex, field arguments) or string
+    # item: a pair of (field regex, field arguments) or string
     pattern_parts = []
-    # item: (field regex, field arguments, raw field string,
-    #        (field start index, field end index))
+    # item: (field regex, field arguments, raw field string, (field start index, field end index))
     parsed_fields = []
     # key: parsed field
     # value: matching field regex
@@ -250,7 +261,7 @@ class StringPattern:
         
         if (fields is None
             or (matching_field_regex is not None
-                and cls._is_field_valid(parsed_field, matching_field_regex, fields))):
+                and cls._is_field_valid(matching_field_regex, fields))):
           pattern_parts.append(parsed_field)
           parsed_fields.append(parsed_field)
           parsed_fields_and_matching_regexes[parsed_field[0]] = matching_field_regex
@@ -266,11 +277,11 @@ class StringPattern:
     return pattern_parts, parsed_fields, parsed_fields_and_matching_regexes
   
   @classmethod
-  def parse_field(cls, field_str):
+  def parse_field(cls, field_str: str) -> Tuple[str, List[str]]:
     """Parses the given field as a string.
     
-    `field_str` must be specified without `[` and `]` at the beginning and end,
-    respectively.
+    ``field_str`` must be specified without ``[`` and ``]`` at the beginning
+    and end, respectively.
     
     A tuple of (field name, list of field arguments) is returned.
     """
@@ -289,9 +300,9 @@ class StringPattern:
     index = 0
     field_args = []
     
-    def _process_field_args(field_args):
+    def _process_field_args(args):
       processed_field_args = []
-      for field_arg in field_args:
+      for field_arg in args:
         processed_arg = field_arg.strip()
         if not processed_arg:
           continue
@@ -330,15 +341,15 @@ class StringPattern:
     return field_name, _process_field_args(field_args)
   
   @classmethod
-  def _is_field_valid(cls, parsed_field, field_regex, fields):
+  def _is_field_valid(cls, field_regex, fields):
     field_func = fields[field_regex]
     
-    argspec = inspect.getargspec(field_func)
+    argspec = inspect.getfullargspec(field_func)
     
-    if argspec.keywords:
+    if argspec.varkw:
       raise ValueError(
-        '{}: field functions with variable keyword arguments (**kwargs)'
-        ' are not supported'.format(field_func.__qualname__))
+        f'{field_func.__qualname__}: field functions with variable keyword arguments (**kwargs)'
+        ' are not supported')
     
     return True
   
@@ -353,7 +364,8 @@ class StringPattern:
   def _process_field(self, field, additional_args):
     field_func = self._fields[self._parsed_fields_and_matching_regexes[field[0]]]
     field_func_args = list(additional_args) + [field[0]] + list(field[1])
-    
+
+    # noinspection PyBroadException
     try:
       return_value = field_func(*field_func_args)
     except Exception:

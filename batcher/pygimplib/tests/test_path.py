@@ -44,19 +44,19 @@ class TestUniquifyString(unittest.TestCase):
 
 
 def _get_field_value(field, arg1=1, arg2=2):
-  return '{}{}'.format(arg1, arg2)
+  return f'{arg1}{arg2}'
 
 
 def _get_field_value_with_required_args(field, arg1, arg2, arg3):
-  return '{}{}{}'.format(arg1, arg2, arg3)
+  return f'{arg1}{arg2}{arg3}'
 
 
 def _get_field_value_with_varargs(field, arg1, *args):
-  return '{}_{}'.format(arg1, '-'.join(args))
+  return f'{arg1}_{"-".join(args)}'
 
 
 def _get_field_value_with_kwargs(field, arg1=1, arg2=2, **kwargs):
-  return '{}_{}'.format(arg1, '-'.join(kwargs.values()))
+  return f'{arg1}_{"-".join(kwargs.values())}'
 
 
 def _get_field_value_raising_exception(field, arg1=1, arg2=2):
@@ -279,8 +279,7 @@ class TestStringPattern(unittest.TestCase):
     for field_regex, generator_func in fields:
       generator = generator_func()
       generators.append(generator)
-      processed_fields.append(
-        (field_regex, lambda field, generator=generator: next(generator)))
+      processed_fields.append((field_regex, lambda field, gen=generator: next(gen)))
     
     string_pattern = pgpath.StringPattern(pattern, processed_fields)
     outputs = [string_pattern.substitute() for unused_ in range(len(expected_outputs))]
@@ -310,7 +309,7 @@ class TestStringPattern(unittest.TestCase):
     class _Field:
       
       def get_field_value(self, field, arg1=1, arg2=2):
-        return '{}{}'.format(arg1, arg2)
+        return f'{arg1}{arg2}'
     
     string_pattern = pgpath.StringPattern(pattern, [('field', _Field().get_field_value)])
     self.assertEqual(string_pattern.substitute(), expected_output)
@@ -506,11 +505,11 @@ class TestFilepathValidator(unittest.TestCase):
   
   @parameterized.parameterized.expand([
     ('', [
-      'zero', '0n3', 'two', ',o_O_;-()' + os.sep + os.sep + os.sep, 'three.jpg' + os.sep],
+      'zero', '0n3', 'two', f',o_O_;-(){os.sep}{os.sep}{os.sep}', f'three.jpg{os.sep}'],
      True),
     ('', ['one', 'two', '\x09\x7f', ':|'], False),
     ('', ['one', ':two', 'three'], False),
-    ('', ['C:|' + os.sep + 'two', 'three'], False),
+    ('', [f'C:|{os.sep}two', 'three'], False),
     ('', [' one', 'two', 'three '], False),
     ('', ['one', ' two', 'three'], True),
     ('', ['one', 'two ', 'three'], False),
@@ -522,8 +521,8 @@ class TestFilepathValidator(unittest.TestCase):
     ('', ['one', 'NUL', 'three'], False),
     ('', ['one', 'NUL (1)', 'three'], True),
     ('', [''], False),
-    ('', ['C:' + os.sep + 'two', 'three'], True, 'nt'),
-    ('', ['C:' + os.sep + 'two', 'three'], False, 'posix'),
+    ('', [f'C:{os.sep}two', 'three'], True, 'nt'),
+    ('', [f'C:{os.sep}two', 'three'], False, 'posix'),
   ])
   def test_is_valid(
         self, test_case_suffix, path_components, expected_is_valid, os_name=None):
@@ -542,7 +541,7 @@ class TestFilepathValidator(unittest.TestCase):
      ['one', 'two', 'three'],
      ['one', 'two', 'three']),
     ('',
-     ['zero', '0n3', 'two', ',o_O_;-()' + os.sep + os.sep + os.sep, 'three.jpg' + os.sep],
+     ['zero', '0n3', 'two', f',o_O_;-(){os.sep}{os.sep}{os.sep}', f'three.jpg{os.sep}'],
      ['zero', '0n3', 'two', ',o_O_;-()', 'three.jpg']),
     ('',
      ['one', 'two\x09\x7f', 'three:|'],
@@ -587,27 +586,27 @@ class TestFilepathValidator(unittest.TestCase):
      ['|'],
      ['.']),
     ('',
-     ['C:' + os.sep + 'two', 'three'],
-     ['C:' + os.sep + 'two', 'three'],
+     [f'C:{os.sep}two', 'three'],
+     [f'C:{os.sep}two', 'three'],
      'nt'),
     ('',
-     ['C:|one' + os.sep + 'two', 'three'],
+     [f'C:|one{os.sep}two', 'three'],
      ['C:', 'one', 'two', 'three'],
      'nt'),
     ('',
-     ['C:|' + os.sep + 'two', 'three'],
+     [f'C:|{os.sep}two', 'three'],
      ['C:', 'two', 'three'],
      'nt'),
     ('',
-     ['C:' + os.sep + 'two', 'three'],
-     ['C' + os.sep + 'two', 'three'],
+     [f'C:{os.sep}two', 'three'],
+     [f'C{os.sep}two', 'three'],
      'posix'),
     ('',
-     ['C:|one' + os.sep + 'two', 'three'],
+     [f'C:|one{os.sep}two', 'three'],
      ['Cone', 'two', 'three'],
      'posix'),
     ('',
-     ['C:|' + os.sep + 'two', 'three'],
+     [f'C:|{os.sep}two', 'three'],
      ['C', 'two', 'three'],
      'posix'),
   ])

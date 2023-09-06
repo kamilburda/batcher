@@ -4,6 +4,7 @@ import abc
 import os
 import pathlib
 import re
+from typing import List, Tuple
 
 __all__ = [
   'FileValidatorErrorStatuses',
@@ -33,65 +34,52 @@ class FileValidatorErrorStatuses:
 
 
 class StringValidator(metaclass=abc.ABCMeta):
-  """
-  This class is an interface to validate strings.
+  """Interface to validate strings.
   
-  This class does not specify what strings are valid (whether they contain
+  This class does not specify which strings are valid (i.e. whether they contain
   invalid characters, substrings, etc.). This should be handled by subclasses.
   """
   
   ERROR_STATUSES_MESSAGES = {}
   
   @classmethod
-  def is_valid(cls, string_to_check):
-    """
-    Check if the specified string is valid.
+  def is_valid(cls, string_to_check: str) -> Tuple[bool, List[Tuple[int, str]]]:
+    """Checks if the specified string is valid.
     
     Returns:
-      
-      * `is_valid` - `True` if the string is valid, `False` otherwise.
-      
-      * `status_messages` - If the string is invalid, `status_messages` is
-        a list of (status code, status message) tuples describing why the string
-        is invalid. Otherwise it is an empty list.
+      A tuple of two elements:
+        * ``True`` if the string is valid, ``False`` otherwise.
+        * ``status_messages`` - If the string is invalid, ``status_messages`` is
+          a list of (status code, status message) tuples describing why the string
+          is invalid. Otherwise, it is an empty list.
     """
     pass
   
   @classmethod
-  def validate(cls, string_to_validate):
-    """
-    Modify the specified string to make it valid.
-    """
+  def validate(cls, string_to_validate: str) -> str:
+    """Modifies the specified string to make it valid."""
     pass
   
   @classmethod
   def _get_status(cls, status):
-    return (status, _(cls.ERROR_STATUSES_MESSAGES[status]))
+    return status, _(cls.ERROR_STATUSES_MESSAGES[status])
 
 
 class FilenameValidator(StringValidator):
-  
-  r"""
-  This class is used to validate filenames (i.e. basenames).
+  r"""Class for validating file names (basenames).
   
   In this class, filenames are considered valid if they:
-    
     * do not contain control characters with ordinal numbers 0-31 and 127-159
-    
     * do not contain the following special characters:
-      
+
         <>:"/\|?*
-    
+
     * do not start or end with spaces
-    
     * do not end with one or more periods
-    
     * do not have invalid names according to the naming conventions for the
       Windows platform:
-      
       http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29
-    
-    * are not empty or `None`
+    * are not empty or ``None``
   """
   
   _INVALID_CHARS_PATTERN = r'[\x00-\x1f\x7f-\x9f<>:"\\/|?*]'
@@ -115,12 +103,7 @@ class FilenameValidator(StringValidator):
       '"{}" is a reserved name that cannot be used in filenames.\n')}
   
   @classmethod
-  def is_valid(cls, filename):
-    """
-    Check whether the specified filename is valid.
-    
-    See the class description for details about when the filename is valid.
-    """
+  def is_valid(cls, filename: str) -> Tuple[bool, List[Tuple[int, str]]]:
     if not filename or filename is None:
       return False, [cls._get_status(FileValidatorErrorStatuses.IS_EMPTY)]
     
@@ -147,14 +130,14 @@ class FilenameValidator(StringValidator):
     return is_valid, status_messages
   
   @classmethod
-  def validate(cls, filename):
-    """
-    Validate the specified filename by removing invalid characters.
+  def validate(cls, filename: str) -> str:
+    """Validates the specified filename by removing invalid characters.
     
     If the filename is one of the reserved names for the Windows platform,
-    append `' (1)'` to the filename (before the file extension if it has one).
+    ``' (1)'`` is appended to the filename (before the file extension if it
+    has one).
     
-    If the filename is truncated to an empty string, return `'Untitled'`.
+    If the filename is truncated to an empty string, ``'Untitled'`` is returned.
     """
     filename = re.sub(cls._INVALID_CHARS_PATTERN, '', filename).strip(' ').rstrip('.')
     
@@ -162,7 +145,7 @@ class FilenameValidator(StringValidator):
     # For reserved names, the comparison must be case-insensitive (because
     # Windows has case-insensitive filenames).
     if root.upper() in cls._INVALID_NAMES:
-      filename = root + ' (1)' + ext
+      filename = f'{root} (1){ext}'
     
     if not filename:
       filename = _('Untitled')
@@ -171,23 +154,21 @@ class FilenameValidator(StringValidator):
 
 
 class FilepathValidator(StringValidator):
-  """
-  This class is used to validate file paths (relative or absolute).
+  r"""Class for validating file paths (relative or absolute).
   
-  The same validation rules that apply to filenames in the `FilenameValidator`
-  class apply to file paths in this class, with the following exceptions:
-    
-    * `/` and `\` characters are allowed
-    
-    * `:` character is allowed to appear at the root level only (as a part of a
-      drive letter, e.g. `'C:\'`)
+  The same validation rules that apply to file names in the
+  ``FilenameValidator`` class apply to file paths in this class, with the
+  following exceptions:
+    * ``'/'`` and ``'\'`` characters are allowed
+    * ``':'`` character is allowed to appear at the root level only as part of a
+      drive letter, e.g. ``'C:\'``
   """
-  
+
   _INVALID_CHARS = r'\x00-\x1f\x7f-\x9f<>"|?*'
   _VALID_DRIVE_CHARS = r':'
   
-  _INVALID_CHARS_PATTERN_WITHOUT_DRIVE = '[' + _INVALID_CHARS + ']'
-  _INVALID_CHARS_PATTERN = '[' + _INVALID_CHARS + _VALID_DRIVE_CHARS + ']'
+  _INVALID_CHARS_PATTERN_WITHOUT_DRIVE = f'[{_INVALID_CHARS}]'
+  _INVALID_CHARS_PATTERN = f'[{_INVALID_CHARS}{_VALID_DRIVE_CHARS}]'
   
   _INVALID_NAMES = FilenameValidator._INVALID_NAMES
   
@@ -270,7 +251,7 @@ class FilepathValidator(StringValidator):
       
       root, ext = os.path.splitext(path_component)
       if root.upper() in cls._INVALID_NAMES:
-        path_component = root + ' (1)' + ext
+        path_component = f'{root} (1){ext}'
       
       path_components[i] = path_component
     
@@ -282,12 +263,11 @@ class FilepathValidator(StringValidator):
 
 
 class DirpathValidator(FilepathValidator):
-  """
-  This class is used to validate directory paths (relative or absolute).
+  """Class used for validating directory paths (relative or absolute).
   
-  The same validation rules that apply to file paths in the `FilepathValidator`
-  class apply to directory paths in this class, with the following additions:
-  
+  The same validation rules that apply to file paths in the
+  ``FilepathValidator`` class apply to directory paths in this class,
+  with the following additions:
     * the specified path must be a directory path
   """
   
@@ -319,18 +299,14 @@ class DirpathValidator(FilepathValidator):
   
 
 class FileExtensionValidator(StringValidator):
-  
-  r"""
-  This class is used to validate file extensions.
+  r"""Class use for validating file extensions.
   
   In this class, file extensions are considered valid if they:
-    
     * do not contain control characters with ordinal numbers 0-31 and 127-159
-    
     * do not contain the following special characters:
-      
+
         <>:"/\|?*
-    
+
     * do not end with spaces or periods
   """
   

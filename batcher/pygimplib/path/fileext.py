@@ -9,13 +9,13 @@ __all__ = [
 ]
 
 
-def get_file_extension(filename):
-  """Returns the file extension from `filename`.
+def get_file_extension(filename: str) -> str:
+  """Returns the file extension from ``filename``.
   
-  If `filename` has no file extension, return an empty string.
+  If ``filename`` has no file extension, return an empty string.
   
-  If `filename` has multiple periods, it is checked against
-  `fileformats.file_formats_dict` for a matching file extension containing
+  If ``filename`` has multiple periods, it is checked against
+  ``fileformats.file_formats_dict`` for a matching file extension containing
   periods. If there is no such extension, return the substring after the last
   period.
   """
@@ -37,14 +37,15 @@ def get_file_extension(filename):
 
 
 def get_filename_with_new_file_extension(
-      filename, file_extension, keep_extra_trailing_periods=False):
+      filename: str, file_extension: str, keep_extra_trailing_periods: bool = False,
+) -> str:
   """Returns a new filename with the specified new file extension.
   
-  To remove the file extension from `filename`, pass an empty string, `None`, or
-  a period ('.').
+  To remove the file extension from ``filename``, pass an empty string,
+  ``None``, or a period (``'.'``).
   
-  If `keep_extra_trailing_periods` is `True`, do not remove duplicate periods
-  before the file extension.
+  If ``keep_extra_trailing_periods`` is ``True``, do not remove duplicate
+  periods before the file extension.
   """
   filename_extension = get_file_extension(filename)
   
@@ -67,7 +68,7 @@ def get_filename_with_new_file_extension(
   return new_filename
 
 
-def get_filename_root(filename):
+def get_filename_root(filename: str) -> str:
   """Returns the filename without its file extension."""
   file_extension = get_file_extension(filename)
   if file_extension:

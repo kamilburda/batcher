@@ -56,7 +56,7 @@ from . import invoker
 # from . import itemtree
 from . import objectfilter
 from . import overwrite
-# from . import path
+from . import path
 # from . import pdbutils
 from . import progress
 # from . import setting
