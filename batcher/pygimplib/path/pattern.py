@@ -35,17 +35,22 @@ class StringPattern:
   * "[date, [[[%Y,%m,%d]]] ]" -> "[2016,07,16]", ...
   """
   
-  def __init__(self, pattern: str, fields: Optional[Iterable[Tuple[str, Callable]]] = None):
+  def __init__(
+        self,
+        pattern: str,
+        fields: Optional[Union[Iterable[Tuple[str, Callable]], Dict[str, Callable]]] = None,
+  ):
     """Initializes the string pattern instance.
 
     Args:
       pattern:
         String containing fields to substitute.
       fields:
-        List of ``(field regex, function)`` tuples. ``field regex`` matches
-        the fields in the pattern and ``function`` substitutes the field with
-        the value returned by the function. The function must always specify
-        at least one argument - the field to be substituted.
+        List-like of ``(field regex, function)`` tuples or a dictionary of
+        ``(field regex, function)`` pairs. ``field regex`` matches the fields
+        in the pattern and ``function`` substitutes the field with the value
+        returned by the function. The function must always specify at least
+        one argument - the field to be substituted.
 
         Any unmatched fields will be silently ignored.
 
@@ -56,7 +61,7 @@ class StringPattern:
         If ``fields`` is ``None``, no fields in the pattern will be substituted.
     """
     self._pattern = pattern
-    self._fields = dict(fields if fields is not None else [])
+    self._fields = dict(fields) if fields is not None else {}
     
     self._pattern_parts, unused_, self._parsed_fields_and_matching_regexes = (
       self.parse_pattern(self._pattern, self._fields))
