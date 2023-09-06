@@ -314,18 +314,18 @@ def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
   image = batcher.current_image
   
   fields = {
-    'iw': image.width,
-    'ih': image.height,
+    'iw': image.get_width(),
+    'ih': image.get_height(),
   }
   
   layer_fields = {}
   
   if measure == '%px':
     layer_fields = {
-      'w': item.raw.width,
-      'h': item.raw.height,
-      'x': item.raw.offsets[0],
-      'y': item.raw.offsets[1],
+      'w': item.raw.get_width(),
+      'h': item.raw.get_height(),
+      'x': item.raw.get_offsets()[1],
+      'y': item.raw.get_offsets()[2],
     }
   elif measure.startswith('%pc'):
     match = re.match(r'^' + re.escape('%pc') + r'([0-9]*)$', measure)
@@ -337,10 +337,10 @@ def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
         round_digits = 2
       
       layer_fields = {
-        'w': round(item.raw.width / image.width, round_digits),
-        'h': round(item.raw.height / image.height, round_digits),
-        'x': round(item.raw.offsets[0] / image.width, round_digits),
-        'y': round(item.raw.offsets[1] / image.height, round_digits),
+        'w': round(item.raw.get_width() / image.get_width(), round_digits),
+        'h': round(item.raw.get_height() / image.get_height(), round_digits),
+        'x': round(item.raw.get_offsets()[1] / image.get_width(), round_digits),
+        'y': round(item.raw.get_offsets()[2] / image.get_height(), round_digits),
       }
   
   fields.update(layer_fields)

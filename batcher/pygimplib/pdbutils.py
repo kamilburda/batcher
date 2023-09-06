@@ -32,15 +32,13 @@ def undo_group(image):
     pdb.gimp_image_undo_group_end(image)
 
 
-def is_layer_inside_image(image, layer):
-  """
-  Return `True` if the layer is inside the image canvas (partially or
-  completely). Return `False` if the layer is completely outside the image
-  canvas.
+def is_layer_inside_image(image: Gimp.Image, layer: Gimp.Layer) -> bool:
+  """Returns ``True`` if the layer is partially or completely inside the image
+  canvas, ``False`` otherwise.
   """
   return (
-    -image.width < layer.offsets[0] < image.width
-    and -image.height < layer.offsets[1] < image.height)
+    -image.get_width() < layer.get_offsets()[1] < image.get_width()
+    and -image.get_height() < layer.get_offsets()[2] < image.get_height())
 
 
 def create_image_from_metadata(image_to_copy_metadata_from):
@@ -53,7 +51,7 @@ def create_image_from_metadata(image_to_copy_metadata_from):
   """
   image = image_to_copy_metadata_from
   
-  new_image = pdb.gimp_image_new(image.width, image.height, image.base_type)
+  new_image = pdb.gimp_image_new(image.get_width(), image.get_height(), image.base_type)
   
   pdb.gimp_image_set_resolution(new_image, *pdb.gimp_image_get_resolution(image))
   pdb.gimp_image_set_unit(new_image, pdb.gimp_image_get_unit(image))
@@ -492,8 +490,8 @@ def compare_layers(
     pdb.gimp_layer_flatten(layer)
   
   all_layers_have_same_size = (
-    all(layers[0].width == layer.width for layer in layers[1:])
-    and all(layers[0].height == layer.height for layer in layers[1:]))
+    all(layers[0].get_width() == layer.get_width() for layer in layers[1:])
+    and all(layers[0].get_height() == layer.get_height() for layer in layers[1:]))
   if not all_layers_have_same_size:
     return False
   

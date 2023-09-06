@@ -309,8 +309,8 @@ class ImagePreview(preview_base_.Preview):
   
   def _get_in_memory_preview(self, raw_item):
     self._preview_width, self._preview_height = self._get_preview_size(
-      raw_item.width, raw_item.height)
-    self._preview_scaling_factor = self._preview_width / raw_item.width
+      raw_item.get_width(), raw_item.get_height())
+    self._preview_scaling_factor = self._preview_width / raw_item.get_width()
     
     image_preview, error = self._get_image_preview()
     
@@ -331,7 +331,7 @@ class ImagePreview(preview_base_.Preview):
     
     # Recompute the size as the item may have been resized during processing.
     self._preview_width, self._preview_height = self._get_preview_size(
-      raw_item_preview.width, raw_item_preview.height)
+      raw_item_preview.get_width(), raw_item_preview.get_height())
     
     self._preview_width, self._preview_height, preview_data = self._get_preview_data(
       raw_item_preview, self._preview_width, self._preview_height)
@@ -407,8 +407,8 @@ class ImagePreview(preview_base_.Preview):
     
     pdb.gimp_image_resize(
       image,
-      max(1, int(round(image.width * self._preview_scaling_factor))),
-      max(1, int(round(image.height * self._preview_scaling_factor))),
+      max(1, int(round(image.get_width() * self._preview_scaling_factor))),
+      max(1, int(round(image.get_height() * self._preview_scaling_factor))),
       0,
       0)
     
@@ -427,10 +427,10 @@ class ImagePreview(preview_base_.Preview):
     
     pdb.gimp_item_transform_scale(
       raw_item,
-      raw_item.offsets[0] * self._preview_scaling_factor,
-      raw_item.offsets[1] * self._preview_scaling_factor,
-      (raw_item.offsets[0] + raw_item.width) * self._preview_scaling_factor,
-      (raw_item.offsets[1] + raw_item.height) * self._preview_scaling_factor)
+      raw_item.get_offsets()[1] * self._preview_scaling_factor,
+      raw_item.get_offsets()[2] * self._preview_scaling_factor,
+      (raw_item.get_offsets()[1] + raw_item.get_width()) * self._preview_scaling_factor,
+      (raw_item.get_offsets()[2] + raw_item.get_height()) * self._preview_scaling_factor)
   
   def _resize_item_for_batcher(self, batcher, item=None, raw_item=None):
     pdb.gimp_layer_resize_to_image_size(batcher.current_raw_item)

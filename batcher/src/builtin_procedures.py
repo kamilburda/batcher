@@ -138,8 +138,9 @@ def resize_to_layer_size(batcher):
   image = batcher.current_image
   layer = batcher.current_raw_item
   
-  layer_offset_x, layer_offset_y = layer.offsets
-  pdb.gimp_image_resize(image, layer.width, layer.height, -layer_offset_x, -layer_offset_y)
+  layer_offset_x, layer_offset_y = layer.get_offsets()[1:]
+  pdb.gimp_image_resize(
+    image, layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
 
 
 _BUILTIN_PROCEDURES_LIST = [
