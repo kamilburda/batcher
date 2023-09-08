@@ -304,7 +304,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self.assertListEqual(update.gimpshelf.shelf[pg.config.SOURCE_NAME], expected_data)
     
     self.assertListEqual(
-      pickle.loads(update.gimp.parasite_find(pg.config.SOURCE_NAME).data), expected_data)
+      pickle.loads(update.gimp.get_parasite(pg.config.SOURCE_NAME).get_data()), expected_data)
   
   def test_partial_data_in_session_source_only(self, *mocks):
     update.gimp.set_data(pg.config.SOURCE_NAME, DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY)

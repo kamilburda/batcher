@@ -41,32 +41,27 @@ def is_layer_inside_image(image: Gimp.Image, layer: Gimp.Layer) -> bool:
     and -image.get_height() < layer.get_offsets()[2] < image.get_height())
 
 
-def create_image_from_metadata(image_to_copy_metadata_from):
-  """
-  Create a new image with metadata (dimensions, base type, parasites, etc.)
-  copied from `image_to_copy_metadata_from`.
+def create_image_from_metadata(image: Gimp.Image) -> Gimp.Image:
+  """Creates a new image with metadata (dimensions, base type, parasites, etc.)
+  copied from the original image.
   
   Layers, channels or paths are not copied. For a full image copy, use
-  `pdb.gimp_image_duplicate()`.
+  ``'gimp-image-duplicate'`` procedure.
   """
-  image = image_to_copy_metadata_from
+  new_image = pdb.gimp_image_new(image.get_width(), image.get_height(), image.get_base_type())
   
-  new_image = pdb.gimp_image_new(image.get_width(), image.get_height(), image.base_type)
-  
-  pdb.gimp_image_set_resolution(new_image, *pdb.gimp_image_get_resolution(image))
+  new_image.set_resolution(*image.get_resolution()[1:])
   pdb.gimp_image_set_unit(new_image, pdb.gimp_image_get_unit(image))
   
   if image.get_base_type() == Gimp.ImageBaseType.INDEXED:
-    pdb.gimp_image_set_colormap(new_image, *pdb.gimp_image_get_colormap(image))
+    new_image.set_colormap(*image.get_colormap())
   
   # Copy image parasites
-  unused_, parasite_names = pdb.gimp_image_get_parasite_list(image)
+  parasite_names = image.get_parasite_list()
   for name in parasite_names:
-    parasite = image.parasite_find(name)
-    # `pdb.gimp_image_parasite_attach` fails for some reason - use
-    # `gimp.Image.parasite_attach` instead.
+    parasite = image.get_parasite(name)
     new_image.parasite_attach(
-      gimp.Parasite(parasite.name, parasite.flags, parasite.data))
+      Gimp.Parasite.new(parasite.get_name(), parasite.get_flags(), parasite.get_data()))
   
   if image.filename is not None:
     pdb.gimp_image_set_filename(new_image, image.filename)

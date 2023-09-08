@@ -595,21 +595,21 @@ class GimpParasiteSource(Source):
     self._parasite_filepath = os.path.join(gimp.directory, 'parasiterc')
   
   def clear(self):
-    if gimp.parasite_find(self.source_name) is None:
+    if gimp.get_parasite(self.source_name) is None:
       return
     
     gimp.parasite_detach(self.source_name)
   
   def has_data(self):
-    return gimp.parasite_find(self.source_name) is not None
+    return gimp.get_parasite(self.source_name) is not None
   
   def read_data_from_source(self):
-    parasite = gimp.parasite_find(self.source_name)
+    parasite = gimp.get_parasite(self.source_name)
     if parasite is None:
       return None
     
     try:
-      data = pickle.loads(parasite.data)
+      data = pickle.loads(parasite.get_data())
     except Exception:
       raise SourceInvalidFormatError(
         _('Settings for this plug-in stored in "{}" may be corrupt.'

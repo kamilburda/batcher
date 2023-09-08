@@ -47,7 +47,7 @@ class ParasiteBox(Gtk.Box):
     
     self._parasite_flags_spin_button = gtk.SpinButton(
       gtk.Adjustment(
-        value=parasite.flags,
+        value=parasite.get_flags(),
         lower=0,
         upper=2**32,
         step_incr=1,
@@ -100,9 +100,9 @@ class ParasiteBox(Gtk.Box):
   def _set_values(self, parasite):
     self._should_invoke_parasite_changed_signal = False
     
-    self._parasite_name_entry.set_text(pgutils.safe_encode_gtk(parasite.name))
-    self._parasite_flags_spin_button.set_value(parasite.flags)
-    self._parasite_data_entry.set_text(pgutils.safe_encode_gtk(parasite.data))
+    self._parasite_name_entry.set_text(pgutils.safe_encode_gtk(parasite.get_name()))
+    self._parasite_flags_spin_button.set_value(parasite.get_flags())
+    self._parasite_data_entry.set_text(pgutils.safe_encode_gtk(parasite.get_data()))
     
     self._should_invoke_parasite_changed_signal = True
   

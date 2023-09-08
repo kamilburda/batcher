@@ -1096,9 +1096,9 @@ class TestParasiteSetting(unittest.TestCase):
   def test_create_with_default_default_value(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    self.assertEqual(setting.value.name, 'parasite')
-    self.assertEqual(setting.value.flags, 0)
-    self.assertEqual(setting.value.data, '')
+    self.assertEqual(setting.value.get_name(), 'parasite')
+    self.assertEqual(setting.value.get_flags(), 0)
+    self.assertEqual(setting.value.get_data(), '')
   
   def test_set_value_by_object(self):
     setting = settings_.ParasiteSetting('parasite')
@@ -1114,9 +1114,9 @@ class TestParasiteSetting(unittest.TestCase):
     
     setting.set_value(['parasite_stub', 1, 'data'])
     
-    self.assertEqual(setting.value.name, 'parasite_stub')
-    self.assertEqual(setting.value.flags, 1)
-    self.assertEqual(setting.value.data, 'data')
+    self.assertEqual(setting.value.get_name(), 'parasite_stub')
+    self.assertEqual(setting.value.get_flags(), 1)
+    self.assertEqual(setting.value.get_data(), 'data')
   
   def test_to_dict(self):
     setting = settings_.ParasiteSetting('parasite')

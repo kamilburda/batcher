@@ -321,7 +321,7 @@ class ImagePreview(preview_base_.Preview):
       pg.pdbutils.try_delete_image(image_preview)
       return None, error
     
-    if image_preview.base_type != gimpenums.RGB:
+    if image_preview.get_base_type() != gimpenums.RGB:
       pdb.gimp_image_convert_rgb(image_preview)
     
     raw_item_preview = image_preview.layers[0]

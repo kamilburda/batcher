@@ -283,9 +283,9 @@ def _on_reset_button_clicked(button, settings):
 def _set_setting_value_label(setting, setting_value_label):
   if isinstance(setting, settings_.ParasiteSetting):
     setting_value_str = pgutils.safe_encode_gtk('"{}", {}, "{}"'.format(
-      setting.value.name,
-      setting.value.flags,
-      setting.value.data))
+      setting.value.get_name(),
+      setting.value.get_flags(),
+      setting.value.get_data()))
   else:
     setting_value_str = pgutils.safe_encode_gtk(str(setting.value))
   

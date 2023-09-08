@@ -828,13 +828,13 @@ class Batcher:
   
   @staticmethod
   def _copy_non_modifying_parasites(src_image, dest_image):
-    unused_, parasite_names = pdb.gimp_image_get_parasite_list(src_image)
+    parasite_names = src_image.get_parasite_list()
     for parasite_name in parasite_names:
-      if dest_image.parasite_find(parasite_name) is None:
-        parasite = src_image.parasite_find(parasite_name)
+      if dest_image.get_parasite(parasite_name) is None:
+        parasite = src_image.get_parasite(parasite_name)
         # Do not attach persistent or undoable parasites to avoid modifying
         # `dest_image`.
-        if parasite.flags == 0:
+        if parasite.get_flags() == 0:
           dest_image.parasite_attach(parasite)
   
   def _process_items(self):

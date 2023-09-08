@@ -930,8 +930,8 @@ class TestGimpParasiteSource(unittest.TestCase):
     self.source.write([self.settings])
     
     # Simulate formatting error
-    parasite = sources_.gimp.parasite_find(self.source_name)
-    parasite.data = parasite.data[:-1]
+    parasite = sources_.gimp.get_parasite(self.source_name)
+    parasite.set_data(parasite.get_data()[:-1])
     sources_.gimp.parasite_attach(parasite)
     
     with self.assertRaises(sources_.SourceInvalidFormatError):

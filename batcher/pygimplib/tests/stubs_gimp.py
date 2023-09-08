@@ -104,7 +104,7 @@ class ParasiteFunctionsStubMixin:
   def __init__(self):
     self._parasites = {}
   
-  def parasite_find(self, name):
+  def get_parasite(self, name):
     if name in self._parasites:
       return self._parasites[name]
     else:
@@ -114,7 +114,7 @@ class ParasiteFunctionsStubMixin:
     return list(self._parasites)
   
   def parasite_attach(self, parasite):
-    self._parasites[parasite.name] = parasite
+    self._parasites[parasite.get_name()] = parasite
   
   def parasite_detach(self, parasite_name):
     if parasite_name in self._parasites:

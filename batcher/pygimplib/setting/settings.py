@@ -1667,7 +1667,7 @@ class ParasiteSetting(Setting):
       return raw_value
   
   def _value_to_raw(self, value, source_type):
-    return [value.name, value.flags, value.data]
+    return [value.get_name(), value.get_flags(), value.get_data()]
   
   def _validate(self, parasite):
     if not isinstance(parasite, gimp.Parasite):

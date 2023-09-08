@@ -570,10 +570,10 @@ def get_tags_from_raw_item(raw_item, source_name, item_type=None):
   `tags_source_name` is the name of the persistent source (parasite) to obtain
   tags from.
   """
-  parasite = raw_item.parasite_find(_get_effective_tags_source_name(source_name, item_type))
+  parasite = raw_item.get_parasite(_get_effective_tags_source_name(source_name, item_type))
   if parasite:
     try:
-      tags = pickle.loads(parasite.data)
+      tags = pickle.loads(parasite.get_data())
     except Exception:
       tags = set()
     
