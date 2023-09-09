@@ -792,10 +792,10 @@ class Batcher:
       self._image_copy = pg.pdbutils.duplicate_image_without_contents(self._input_image)
       self._current_image = self._image_copy
       
-      pdb.gimp_image_undo_freeze(self._current_image)
+      self._current_image.undo_freeze()
     else:
       self._current_image = self._input_image
-      pdb.gimp_image_undo_group_start(self._current_image)
+      self._current_image.undo_group_start()
     
     self._orig_active_layer = self._current_image.active_layer
   
@@ -808,14 +808,14 @@ class Batcher:
     if not self._edit_mode or self._is_preview:
       self._copy_non_modifying_parasites(self._current_image, self._input_image)
       
-      pdb.gimp_image_undo_thaw(self._current_image)
+      self._current_image.undo_thaw()
       
       if not self._keep_image_copy or exception_occurred:
         pg.pdbutils.try_delete_image(self._current_image)
     else:
       if pdb.gimp_item_is_valid(self._orig_active_layer):
         self._current_image.active_layer = self._orig_active_layer
-      pdb.gimp_image_undo_group_end(self._current_image)
+      self._current_image.undo_group_end()
       pdb.gimp_displays_flush()
     
     pdb.gimp_context_pop()

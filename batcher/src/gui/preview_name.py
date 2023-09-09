@@ -388,7 +388,7 @@ class NamePreview(preview_base_.Preview):
   
   def _on_tags_menu_item_toggled(self, tags_menu_item, tag):
     if self._toggle_tag_interactive:
-      pdb.gimp_image_undo_group_start(self._batcher.input_image)
+      self._batcher.input_image.undo_group_start()
       
       for item_key in self._get_keys_from_current_selection():
         item = self._batcher.item_tree[item_key]
@@ -398,7 +398,7 @@ class NamePreview(preview_base_.Preview):
         else:
           item.remove_tag(tag)
       
-      pdb.gimp_image_undo_group_end(self._batcher.input_image)
+      self._batcher.input_image.undo_group_end()
       
       # Modifying just one item could result in renaming other items
       # differently, hence update the whole preview.

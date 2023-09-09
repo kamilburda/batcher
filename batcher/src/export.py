@@ -46,14 +46,14 @@ def export(
   
   if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
     multi_layer_image = pg.pdbutils.duplicate_image_without_contents(batcher.input_image)
-    pdb.gimp_image_undo_freeze(multi_layer_image)
+    multi_layer_image.undo_freeze()
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [multi_layer_image])
   else:
     multi_layer_image = None
   
   if batcher.edit_mode and batcher.process_export:
     image_copy = pg.pdbutils.duplicate_image_without_contents(batcher.input_image)
-    pdb.gimp_image_undo_freeze(image_copy)
+    image_copy.undo_freeze()
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [image_copy])
   else:
     image_copy = batcher.current_image
