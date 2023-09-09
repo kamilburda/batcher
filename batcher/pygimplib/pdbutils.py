@@ -33,15 +33,6 @@ def undo_group(image: Gimp.Image) -> contextlib.AbstractContextManager:
     image.undo_group_end()
 
 
-def is_layer_inside_image(image: Gimp.Image, layer: Gimp.Layer) -> bool:
-  """Returns ``True`` if the layer is partially or completely inside the image
-  canvas, ``False`` otherwise.
-  """
-  return (
-    -image.get_width() < layer.get_offsets()[1] < image.get_width()
-    and -image.get_height() < layer.get_offsets()[2] < image.get_height())
-
-
 def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
   """Duplicates an image without layers, channels or vectors (keeping only
   metadata such as dimensions, base type, parasites and more).
@@ -261,39 +252,6 @@ def _get_item_parents(item):
     current_parent = current_parent.get_parent()
   
   return parents
-
-
-def remove_all_layers(image):
-  """
-  Remove all layers from the specified image.
-  """
-  for layer in image.layers:
-    pdb.gimp_image_remove_layer(image, layer)
-
-
-def remove_all_channels(image):
-  """
-  Remove all layers from the specified image.
-  """
-  for channel in image.channels:
-    pdb.gimp_image_remove_channel(image, channel)
-
-
-def remove_all_paths(image):
-  """
-  Remove all paths (vectors) from the specified image.
-  """
-  for path in image.vectors:
-    pdb.gimp_image_remove_vectors(image, path)
-
-
-def remove_all_items(image):
-  """
-  Remove all items (layers, channels, paths) from the specified image.
-  """
-  remove_all_layers(image)
-  remove_all_channels(image)
-  remove_all_paths(image)
 
 
 def try_delete_image(image):
