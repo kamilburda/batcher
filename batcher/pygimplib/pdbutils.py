@@ -4,6 +4,7 @@ available in the GIMP procedural database (PDB) or the GIMP API.
 
 import os
 import contextlib
+from typing import List, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -123,33 +124,29 @@ def _copy_image_grid(image, new_image):
   new_image.grid_set_style(image.grid_get_style())
 
 
-def find_images_by_filepath(image_filepath):
+def find_images_by_filepath(image_filepath: str) -> List[Gimp.Image]:
   """Returns a list of currently opened images in GIMP matching the given file
   path.
-  
-  Images are returned as `gimp.Image` instances.
-  
-  Matching is performed via the `gimp.Image.filename` attribute.
+
+  File path matching is performed via ``Gimp.Image.get_file()``.
   """
   return [
-    image for image in gimp.image_list()
-    if pgutils.safe_decode_gimp(image.filename) == image_filepath
+    image for image in Gimp.list_images()
+    if image.get_file() and image.get_file().get_path() == image_filepath
   ]
 
 
-def find_image_by_filepath(image_filepath, index=0):
+def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Image, None]:
   """Returns the currently opened image in GIMP matching the given file path.
   
-  If no match is found, `None` is returned.
+  If no match is found, ``None`` is returned.
   
-  The image is returned as `gimp.Image` instance.
-  
-  Matching is performed via the `gimp.Image.filename` attribute.
+  File path matching is performed via ``Gimp.Image.get_file()``.
   
   For multiple matches, the first matching image is returned by default. There
   may be multiple opened images from the same file path, but there is no way to
   tell which image is the one the user desires to work with. To adjust which
-  image to return, pass a custom `index` value indicating the position to
+  image to return, pass a custom ``index`` value indicating the position to
   return. If the index is out of bounds, the highest possible index is returned
   given a positive value and the lowest possible index given a negative value.
   """
@@ -165,21 +162,6 @@ def find_image_by_filepath(image_filepath, index=0):
     image = None
   
   return image
-
-
-def find_image_by_id(image_id):
-  """Returns a currently opened image in GIMP matching the given ID.
-  
-  If no match is found, `None` is returned.
-  
-  The image is returned as `gimp.Image` instance.
-  
-  Matching is performed via the `gimp.Image.ID` attribute.
-  """
-  if hasattr(gimp, '_id2image'):
-    return gimp._id2image(image_id)
-  else:
-    return next((image for image in gimp.image_list() if image.ID == image_id), None)
 
 
 def get_item_from_image_and_item_path(image, item_class_name, item_path):
@@ -255,8 +237,8 @@ def get_item_as_path(item, include_image=True):
   item_as_path = []
   
   if include_image:
-    if item.image is not None and item.image.filename is not None:
-      item_as_path.append(item.image.filename)
+    if item.image is not None and item.image.get_file() is not None:
+      item_as_path.append(item.image.get_file().get_path())
     else:
       return None
   

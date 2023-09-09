@@ -154,7 +154,7 @@ class ImageStub(ParasiteFunctionsStubMixin):
     self.height = 0
     self.image_type = None
     self.layers = []
-    self.filename = pgutils.safe_encode_gimp(filename)
+    self.filename = filename
     self.uri = ''
     self.valid = True
 

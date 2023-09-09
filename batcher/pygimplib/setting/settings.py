@@ -1319,7 +1319,7 @@ class ImageSetting(Setting):
     value = raw_value
     
     if isinstance(raw_value, int):
-      value = pgpdbutils.find_image_by_id(raw_value)
+      value = Gimp.Image.get_by_id(raw_value)
     elif isinstance(raw_value, str):
       value = pgpdbutils.find_image_by_filepath(raw_value)
     
@@ -1331,8 +1331,8 @@ class ImageSetting(Setting):
     if source_type == 'session':
       raw_value = value.ID
     else:
-      if value is not None and value.filename is not None:
-        raw_value = pgutils.safe_decode_gimp(value.filename)
+      if value is not None and value.get_file() is not None:
+        raw_value = value.get_file().get_path()
       else:
         raw_value = None
     

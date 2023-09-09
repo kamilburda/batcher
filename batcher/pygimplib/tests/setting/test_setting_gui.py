@@ -301,7 +301,7 @@ def _check_setting_gui_interface(setting):
 
 
 def _create_test_image():
-  image = pdb.gimp_image_new(100, 100, gimpenums.RGB)
+  image = Gimp.Image.new(100, 100, Gimp.ImageBaseType.RGB)
   
   layers = [
     pdb.gimp_layer_new(

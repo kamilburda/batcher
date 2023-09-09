@@ -20,7 +20,7 @@ class TestBatcherInitialActions(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    cls.image = pdb.gimp_image_new(1, 1, Gimp.ImageBaseType.RGB)
+    cls.image = Gimp.Image.new(1, 1, Gimp.ImageBaseType.RGB)
   
   @classmethod
   def tearDownClass(cls):

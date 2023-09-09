@@ -188,8 +188,8 @@ def _update_directory(setting, current_image, current_image_dirpath):
     setting.set_value(current_image_dirpath)
     return True
   
-  if current_image.filename is not None:
-    setting.set_value(os.path.dirname(pg.utils.safe_decode_gimp(current_image.filename)))
+  if current_image.get_file() is not None:
+    setting.set_value(os.path.dirname(current_image.get_file().get_path()))
     return True
   
   return False

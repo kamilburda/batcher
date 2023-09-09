@@ -724,12 +724,12 @@ class TestImageSetting(unittest.TestCase):
   def setUp(self):
     self.pdb = stubs_gimp.PdbStub()
     
-    self.image = self.pdb.gimp_image_new(2, 2, gimpenums.RGB)
+    self.image = self.pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
     
     self.setting = settings_.ImageSetting('image', default_value=self.image)
   
   def test_set_value_with_object(self):
-    image = self.pdb.gimp_image_new(2, 2, gimpenums.RGB)
+    image = self.pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
     
     self.setting.set_value(image)
     
@@ -868,7 +868,7 @@ class TestGimpItemSetting(unittest.TestCase):
   def setUp(self):
     pdb = stubs_gimp.PdbStub()
     
-    self.image = pdb.gimp_image_new(2, 2, gimpenums.RGB)
+    self.image = pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
     
     self.parent_of_parent = stubs_gimp.LayerGroupStub(name='group1')
     

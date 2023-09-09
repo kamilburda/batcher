@@ -68,7 +68,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         if isinstance(key, str):
           image = pg.pdbutils.find_image_by_filepath(key)
         else:
-          image = pg.pdbutils.find_image_by_id(key)
+          image = Gimp.Image.get_by_id(key)
         
         if image is None:
           continue
@@ -127,13 +127,13 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
           item_id if isinstance(item_id, int) else list(item_id) for item_id in item_ids)
     else:
       for image_id, item_ids in value.items():
-        image = pg.pdbutils.find_image_by_id(image_id)
+        image = Gimp.Image.get_by_id(image_id)
         
-        if image is None or image.filename is None:
+        if image is None or image.get_file() is None:
           continue
         
-        image_filepath = pg.utils.safe_decode_gimp(image.filename)
-        
+        image_filepath = image.get_file().get_path()
+
         raw_value[image_filepath] = []
         
         for item_id in item_ids:
@@ -228,7 +228,7 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
         self._value[image.ID] = self._get_image_import_dirpath(image)
   
   def _get_image_import_dirpath(self, image):
-    if image.filename is not None:
-      return os.path.dirname(pg.utils.safe_decode_gimp(image.filename))
+    if image.get_file() is not None:
+      return os.path.dirname(image.get_file().get_path())
     else:
       return None
