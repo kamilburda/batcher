@@ -164,16 +164,18 @@ def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Im
   return image
 
 
-def get_item_from_image_and_item_path(image, item_class_name, item_path):
-  """Returns a `gimp.Item` given the image, item class name and item path.
+def get_item_from_image_and_item_path(
+      image: Gimp.Image, item_class_name: str, item_path: str,
+) -> Union[Gimp.Item, None]:
+  """Returns a ``gimp.Item`` given the image, item class name and item path.
   
-  The item class name corresponds to one of the GIMP item classes, e.g.
-  `'Layer'` or `'Channel'`.
+  ``item_class_name`` corresponds to one of the GIMP item classes, e.g.
+  ``'Layer'`` or ``'Channel'``.
   
-  The item path consists of the item name and all of its parent layer groups,
-  separated by '/'. For example, if the item name is 'Left' its parent groups
-  are 'Hands' (immediate parent) and 'Body (parent of 'Hands'), then the item
-  path is 'Body/Hands/Left'.
+  ``item_path`` consists of the item name and all of its parent layer groups,
+  separated by ``'/'``. For example, if the item name is``' 'Left''`` its
+  parent groups are ``'Hands'`` (immediate parent) and ``'Body'`` (parent of
+  ``'Hands'``), then the item path is ``'Body/Hands/Left'``.
   """
   item_path_components = item_path.split(pgconstants.GIMP_ITEM_PATH_SEPARATOR)
   
@@ -191,7 +193,7 @@ def get_item_from_image_and_item_path(image, item_class_name, item_path):
   parent = matching_image_child
   matching_item = None
   for parent_or_item_name in item_path_components[1:]:
-    matching_item = _find_item_by_name_in_children(parent_or_item_name, parent.children)
+    matching_item = _find_item_by_name_in_children(parent_or_item_name, parent.list_children())
     
     if matching_item is None:
       return None
@@ -203,33 +205,33 @@ def get_item_from_image_and_item_path(image, item_class_name, item_path):
 
 def _find_item_by_name_in_children(item_name, children):
   for child in children:
-    if child.name == item_name:
+    if child.get_name() == item_name:
       return child
   
   return None
 
 
 def _get_children_from_image(image, item_class_name):
-  item_type = getattr(gimp, item_class_name)
+  item_type = getattr(Gimp, item_class_name, None)
   
-  if item_type in (gimp.Layer, gimp.GroupLayer):
-    return image.layers
-  elif item_type == gimp.Channel:
-    return image.channels
-  elif item_type == gimp.Vectors:
-    return image.vectors
+  if item_type == Gimp.Layer:
+    return image.list_layers()
+  elif item_type == Gimp.Channel:
+    return image.list_channels()
+  elif item_type == Gimp.Vectors:
+    return image.list_vectors()
   else:
     raise TypeError(
-      ('invalid item type "{}"'
-       '; must be Layer, GroupLayer, Channel or Vectors').format(item_class_name))
+      f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
 
 
-def get_item_as_path(item, include_image=True):
-  """Returns item as a list of [item class name, item path] or [image file path,
-  item class name, item path].
+def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[str], None]:
+  """Returns a ``Gimp.Item`` instance as a list of
+  ``[item class name, item path]`` or
+  ``[image file path, item class name, item path]``.
   
   Item class name and item path are described in
-  `get_item_from_image_and_item_path()`.
+  ``get_item_from_image_and_item_path()``.
   """
   if item is None:
     return None
@@ -237,28 +239,26 @@ def get_item_as_path(item, include_image=True):
   item_as_path = []
   
   if include_image:
-    if item.image is not None and item.image.get_file() is not None:
-      item_as_path.append(item.image.get_file().get_path())
+    if item.get_image() is not None and item.get_image().get_file() is not None:
+      item_as_path.append(item.get_image().get_file().get_path())
     else:
       return None
-  
-  item_class_name = pgutils.safe_decode(type(item).__name__, 'utf-8')
-  
+
   parents = _get_item_parents(item)
   item_path = pgconstants.GIMP_ITEM_PATH_SEPARATOR.join(
-    pgutils.safe_decode_gimp(parent_or_item.name) for parent_or_item in parents + [item])
+    parent_or_item.get_name() for parent_or_item in parents + [item])
   
-  item_as_path.extend([item_class_name, item_path])
+  item_as_path.extend([type(item).__name__, item_path])
   
   return item_as_path
 
 
 def _get_item_parents(item):
   parents = []
-  current_parent = item.parent
+  current_parent = item.get_parent()
   while current_parent is not None:
     parents.insert(0, current_parent)
-    current_parent = current_parent.parent
+    current_parent = current_parent.get_parent()
   
   return parents
 
