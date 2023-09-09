@@ -45,14 +45,14 @@ def export(
     renamer_for_image = None
   
   if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
-    multi_layer_image = pg.pdbutils.create_image_from_metadata(batcher.input_image)
+    multi_layer_image = pg.pdbutils.duplicate_image_without_contents(batcher.input_image)
     pdb.gimp_image_undo_freeze(multi_layer_image)
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [multi_layer_image])
   else:
     multi_layer_image = None
   
   if batcher.edit_mode and batcher.process_export:
-    image_copy = pg.pdbutils.create_image_from_metadata(batcher.input_image)
+    image_copy = pg.pdbutils.duplicate_image_without_contents(batcher.input_image)
     pdb.gimp_image_undo_freeze(image_copy)
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [image_copy])
   else:

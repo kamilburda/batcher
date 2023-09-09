@@ -789,7 +789,7 @@ class Batcher:
     pdb.gimp_context_push()
     
     if not self._edit_mode or self._is_preview:
-      self._image_copy = pg.pdbutils.create_image_from_metadata(self._input_image)
+      self._image_copy = pg.pdbutils.duplicate_image_without_contents(self._input_image)
       self._current_image = self._image_copy
       
       pdb.gimp_image_undo_freeze(self._current_image)

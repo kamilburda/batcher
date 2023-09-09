@@ -25,11 +25,11 @@ def undo_group(image: Gimp.Image) -> contextlib.AbstractContextManager:
     with undo_group(image):
       # do stuff
   """
-  pdb.gimp_image_undo_group_start(image)
+  image.undo_group_start()
   try:
     yield
   finally:
-    pdb.gimp_image_undo_group_end(image)
+    image.undo_group_end()
 
 
 def is_layer_inside_image(image: Gimp.Image, layer: Gimp.Layer) -> bool:
@@ -41,38 +41,86 @@ def is_layer_inside_image(image: Gimp.Image, layer: Gimp.Layer) -> bool:
     and -image.get_height() < layer.get_offsets()[2] < image.get_height())
 
 
-def create_image_from_metadata(image: Gimp.Image) -> Gimp.Image:
-  """Creates a new image with metadata (dimensions, base type, parasites, etc.)
-  copied from the original image.
+def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
+  """Duplicates an image without layers, channels or vectors (keeping only
+  metadata such as dimensions, base type, parasites and more).
   
-  Layers, channels or paths are not copied. For a full image copy, use
-  ``'gimp-image-duplicate'`` procedure.
+  For a full image copy, use the ``'gimp-image-duplicate'`` procedure.
   """
-  new_image = pdb.gimp_image_new(image.get_width(), image.get_height(), image.get_base_type())
-  
+  # The code is taken from:
+  # https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/core/gimpimage-duplicate.c
+  new_image = Gimp.Image.new_with_precision(
+    image.get_width(), image.get_height(), image.get_base_type(), image.get_precision())
+
+  new_image.undo_disable()
+
+  image_file = image.get_file()
+  if image_file is not None:
+    new_image.set_file(image_file)
+
   new_image.set_resolution(*image.get_resolution()[1:])
   pdb.gimp_image_set_unit(new_image, pdb.gimp_image_get_unit(image))
-  
+
+  _copy_image_parasites(image, new_image)
+
+  color_profile = image.get_color_profile()
+  if color_profile is not None:
+    new_image.set_color_profile(color_profile)
+
   if image.get_base_type() == Gimp.ImageBaseType.INDEXED:
     new_image.set_colormap(*image.get_colormap())
-  
-  # Copy image parasites
-  parasite_names = image.get_parasite_list()
-  for name in parasite_names:
-    parasite = image.get_parasite(name)
+
+  _copy_image_guides(image, new_image)
+
+  _copy_image_sample_points(image, new_image)
+
+  _copy_image_grid(image, new_image)
+
+  image_metadata = image.get_metadata()
+  if image_metadata is not None:
+    new_image.set_metadata(image_metadata)
+
+  new_image.undo_enable()
+
+  return new_image
+
+
+def _copy_image_parasites(image, new_image):
+  for parasite_name in image.get_parasite_list():
+    parasite = image.get_parasite(parasite_name)
     new_image.parasite_attach(
       Gimp.Parasite.new(parasite.get_name(), parasite.get_flags(), parasite.get_data()))
-  
-  if image.filename is not None:
-    pdb.gimp_image_set_filename(new_image, image.filename)
-  else:
-    pdb.gimp_image_set_filename(new_image, image.name)
 
-  image_string_metadata = pdb.gimp_image_get_metadata(image)
-  if image_string_metadata:
-    pdb.gimp_image_set_metadata(new_image, image_string_metadata)
-  
-  return new_image
+
+def _copy_image_guides(image, new_image):
+  current_guide = image.find_next_guide(0)
+
+  while current_guide != 0:
+    orientation = image.get_guide_orientation(current_guide)
+    position = image.get_guide_position(current_guide)
+
+    if orientation == Gimp.OrientationType.HORIZONTAL:
+      new_image.add_hguide(position)
+    elif orientation == Gimp.OrientationType.VERTICAL:
+      new_image.add_vguide(position)
+
+    current_guide = image.find_next_guide(current_guide)
+
+
+def _copy_image_sample_points(image, new_image):
+  current_sample_point = image.find_next_sample_point(0)
+
+  while current_sample_point != 0:
+    new_image.add_sample_point(*image.get_sample_point_position(current_sample_point))
+    current_sample_point = image.find_next_sample_point(current_sample_point)
+
+
+def _copy_image_grid(image, new_image):
+  new_image.grid_set_background_color(image.grid_get_background_color()[1])
+  new_image.grid_set_foreground_color(image.grid_get_foreground_color()[1])
+  new_image.grid_set_offset(*image.grid_get_offset()[1:])
+  new_image.grid_set_spacing(*image.grid_get_spacing()[1:])
+  new_image.grid_set_style(image.grid_get_style())
 
 
 def find_images_by_filepath(image_filepath):
