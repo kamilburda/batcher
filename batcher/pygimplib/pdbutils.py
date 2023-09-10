@@ -2,13 +2,15 @@
 available in the GIMP procedural database (PDB) or the GIMP API.
 """
 
-import os
+from collections.abc import Iterable
 import contextlib
-from typing import List, Union
+import os
+from typing import List, Optional, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 from . import constants as pgconstants
 from . import invocation as pginvocation
@@ -254,110 +256,112 @@ def _get_item_parents(item):
   return parents
 
 
-def try_delete_image(image):
-  """
-  Delete the specified image. If the image does not exist, do not raise any
-  exception.
-  """
-  if pdb.gimp_image_is_valid(image):
-    pdb.gimp_image_delete(image)
+def try_delete_image(image: Gimp.Image):
+  """Deletes the specified image if it exists and is valid."""
+  if image.is_valid():
+    image.delete()
 
 
-#===============================================================================
+def load_layer(
+      filepath: str,
+      image: Gimp.Image,
+      strip_file_extension: bool = False,
+) -> Gimp.Layer:
+  """Loads an image as a layer given its file path to an existing image.
 
+  This is a wrapper for ``Gimp.file_load_layer`` with additional parameters.
+  The loaded layer is also inserted at the end of the image.
 
-def load_layer(filepath, image, strip_file_extension=False, layer_to_load_index=0):
+  The layer name corresponds to the file name (base name of the file path).
+  If ``strip_file_extension`` is ``True``, the file extension from the layer
+  name is removed.
+
+  If the file contains multiple layers, you may customize the index of the
+  desired layer to load (``layer_to_load_index``). Only top-level layers are
+  supported (i.e. not layers inside layer groups). If the index is greater
+  than the number of layers in the loaded image or is negative, the last
+  layer is loaded.
   """
-  Load an image as a layer given its file path to an existing `image`. Return
-  the layer.
-  
-  The layer is loaded at the end of the image.
-  
-  Layers names are basenames of the corresponding files. If
-  `strip_file_extension` is `True`, remove the file extension from layer names.
-  
-  If the file contains multiple layers, specify the index of the desired layer
-  to load. Only top-level layers are supported (i.e. not layers inside layer
-  groups). If the index is greater than the number of layers in the loaded
-  image or is negative, load and return the last layer.
-  """
-  loaded_image = pdb.gimp_file_load(filepath, os.path.basename(filepath))
-  
-  if layer_to_load_index >= len(image.layers) or layer_to_load_index < 0:
-    layer_to_load_index = -1
-  
-  layer = pdb.gimp_layer_new_from_drawable(
-    loaded_image.layers[layer_to_load_index], image)
-  layer.name = os.path.basename(filepath)
+  layer = Gimp.file_load_layer(
+    Gimp.RunMode.NONINTERACTIVE, image, Gio.file_new_for_path(filepath))
+
+  layer_name = os.path.basename(filepath)
   if strip_file_extension:
-    layer.name = os.path.splitext(layer.name)[0]
-  
-  pdb.gimp_image_insert_layer(image, layer, None, len(image.layers))
-  
-  pdb.gimp_image_delete(loaded_image)
-  
+    layer_name = os.path.splitext(layer_name)[0]
+  layer.set_name(layer_name)
+
+  image.insert_layer(layer, None, len(image.list_layers()))
+
   return layer
 
 
-def load_layers(filepaths, image=None, strip_file_extension=False):
-  """
-  Load multiple layers to one image. Return the image.
+def load_layers(
+      filepaths: Iterable[str],
+      image: Optional[Gimp.Image] = None,
+      strip_file_extension: bool = False,
+) -> Gimp.Image:
+  """Loads multiple layers to one image and returns the image.
   
   The layers are loaded at the end of the image.
   
-  If `image` is `None`, create a new image. If `image` is not `None`, load the
-  layers to the specified image.
+  If ``image`` is ``None``, a new image is created. If ``image`` is not
+  ``None``, the layers are loaded to the specified image.
   
-  Layers names are basenames of the corresponding files. If
-  `strip_file_extension` is `True`, remove the file extension from layer names.
+  The layer names correspond to the file names (base names of the file paths).
+  If ``strip_file_extension`` is ``True``, file extensions from the layer
+  names are removed.
   """
   create_new_image = image is None
+
   if create_new_image:
-    image = gimp.Image(1, 1)
+    image = Gimp.Image.new(1, 1, Gimp.ImageBaseType.RGB)
   
   for filepath in filepaths:
     load_layer(filepath, image, strip_file_extension)
   
   if create_new_image:
-    pdb.gimp_image_resize_to_layers(image)
+    image.resize_to_layers()
   
   return image
 
 
 def copy_and_paste_layer(
-    layer, image, parent=None, position=0, remove_lock_attributes=False,
-    set_visible=False, merge_group=False,
-):
+      layer,
+      image,
+      parent=None,
+      position=0,
+      remove_lock_attributes=False,
+      set_visible=False,
+      merge_group=False,
+) -> Gimp.Layer:
+  """Copies the specified layer into the specified image and returns the layer
+  copy.
+  
+  If ``parent`` is ``None``, the layer is inserted in the main stack (outside
+  any layer group).
+  
+  If ``remove_lock_attributes`` is ``True``, all lock-related attributes are
+  removed (lock position, alpha channel, etc.) for the layer copy.
+  
+  If ``set_visible`` is ``True``, the layer's visible state is set to ``True``.
+  
+  If ``merge_group`` is ``True`` and the layer is a group, the group is
+  merged into a single layer.
   """
-  Copy the specified layer into the specified image, parent layer group and
-  position in the group. Return the copied layer.
-  
-  If `parent` is `None`, insert the layer in the main stack (outside of any
-  layer group).
-  
-  If `remove_lock_attributes` is `True`, remove all lock-related attributes
-  (lock position, alpha channel, etc.) for the layer copy.
-  
-  If `set_visible` is `True`, set the layer's visible state to `True`.
-  
-  If `merge_group` is `True` and the layer is a group, merge the group into a
-  single layer.
-  """
-  layer_copy = pdb.gimp_layer_new_from_drawable(layer, image)
-  pdb.gimp_image_insert_layer(image, layer_copy, parent, position)
+  layer_copy = Gimp.Layer.new_from_drawable(layer, image)
+  image.insert_layer(layer_copy, parent, position)
   
   if remove_lock_attributes:
-    pdb.gimp_item_set_lock_content(layer_copy, False)
-    if not isinstance(layer_copy, gimp.GroupLayer):
-      if gimp.version >= (2, 10):
-        pdb.gimp_item_set_lock_position(layer_copy, False)
-      pdb.gimp_layer_set_lock_alpha(layer_copy, False)
+    layer_copy.set_lock_content(False)
+    layer_copy.set_lock_position(False)
+    layer_copy.set_lock_visibility(False)
+    layer_copy.set_lock_alpha(False)
   
   if set_visible:
-    pdb.gimp_item_set_visible(layer_copy, True)
+    layer_copy.set_visible(True)
   
-  if merge_group and pdb.gimp_item_is_group(layer_copy):
-    layer_copy = merge_layer_group(layer_copy)
+  if merge_group and layer_copy.is_group():
+    layer_copy = image.merge_layer_group(layer_copy)
   
   return layer_copy
 
@@ -404,7 +408,7 @@ def compare_layers(
   def _process_layers(image, layer_group, apply_layer_attributes, apply_layer_masks):
     for layer in layer_group.children:
       if pdb.gimp_item_is_group(layer):
-        layer = merge_layer_group(layer)
+        layer = image.merge_layer_group(layer)
       else:
         if layer.opacity != 100.0 or layer.mode != gimpenums.NORMAL_MODE:
           if apply_layer_attributes:
@@ -455,7 +459,7 @@ def compare_layers(
     temp_group = pdb.gimp_layer_group_new(image)
     pdb.gimp_image_insert_layer(image, temp_group, parent_group, 0)
     pdb.gimp_image_reorder_item(image, layer, temp_group, 0)
-    layer = merge_layer_group(temp_group)
+    layer = image.merge_layer_group(temp_group)
     
     return layer
   
