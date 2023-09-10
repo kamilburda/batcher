@@ -176,12 +176,14 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def _compare_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):
-    if not pg.pdbutils.compare_layers([layer, expected_layer]):
+    comparison_result = pg.pdbutils.compare_layers([layer, expected_layer])
+
+    if not comparison_result:
       self._save_incorrect_layers(
         layer, expected_layer, settings, test_case_name, expected_results_dirpath)
     
     self.assertEqual(
-      pg.pdbutils.compare_layers([layer, expected_layer]),
+      comparison_result,
       True,
       msg=('Layers are not identical:\nprocessed layer: {}\nexpected layer: {}'.format(
         layer.name, expected_layer.name)))
