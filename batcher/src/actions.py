@@ -60,6 +60,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 import pygimplib as pg
+from pygimplib.pypdb import pdb
 
 from src import placeholders
 
@@ -185,13 +186,13 @@ def _set_up_action_after_loading(actions):
     actions.invoke_event('after-add-action', action, None)
 
 
-def add(actions, action_dict_or_function):
+def add(actions, action_dict_or_pdb_proc_name):
   """
   Add an action to the `actions` setting group.
   
   `action_dict_or_function` can be one of the following:
   * a dictionary - see `create()` for required and accepted fields.
-  * a PDB procedure.
+  * a PDB procedure name.
   
   Objects of other types passed to `action_dict_or_function` raise
   `TypeError`.
@@ -201,15 +202,14 @@ def add(actions, action_dict_or_function):
   for the first action, `'rename_2'` and `'Rename (2)'` for the second
   action, and so on).
   """
-  if isinstance(action_dict_or_function, dict):
-    action_dict = dict(action_dict_or_function)
+  if isinstance(action_dict_or_pdb_proc_name, dict):
+    action_dict = dict(action_dict_or_pdb_proc_name)
   else:
-    if pg.pdbutils.is_pdb_procedure(action_dict_or_function):
-      action_dict = get_action_dict_for_pdb_procedure(action_dict_or_function)
+    if action_dict_or_pdb_proc_name in pdb:
+      action_dict = get_action_dict_for_pdb_procedure(action_dict_or_pdb_proc_name)
     else:
       raise TypeError(
-        '"{}" is not a valid object - pass a dict or a PDB procedure'.format(
-          action_dict_or_function))
+        f'"{action_dict_or_pdb_proc_name}" is not a valid PDB procedure name')
   
   _check_required_fields(action_dict)
   
@@ -507,7 +507,7 @@ def _get_array_length_and_array_settings(action):
   return array_length_and_array_settings
 
 
-def get_action_dict_for_pdb_procedure(pdb_procedure):
+def get_action_dict_for_pdb_procedure(pdb_procedure_name):
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added to a setting group for actions via `add()`.
   
@@ -526,26 +526,26 @@ def get_action_dict_for_pdb_procedure(pdb_procedure):
       i += 1
   
   action_dict = {
-    'name': pg.utils.safe_decode_gimp(pdb_procedure.proc_name),
-    'function': pg.utils.safe_decode_gimp(pdb_procedure.proc_name),
+    'name': pdb_procedure_name,
+    'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
-    'display_name': pg.utils.safe_decode_gimp(pdb_procedure.proc_name),
+    'display_name': pdb_procedure_name,
     'display_options_on_create': True,
   }
   
   pdb_procedure_argument_names = []
+
+  pdb_procedure = pdb[pdb_procedure_name].info
   
-  for index, (pdb_param_type, pdb_param_name, unused_) in enumerate(pdb_procedure.params):
-    processed_pdb_param_name = pg.utils.safe_decode_gimp(pdb_param_name)
-    
+  for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
     try:
-      setting_type = pg.setting.PDB_TYPES_TO_SETTING_TYPES_MAP[pdb_param_type]
+      setting_type = pg.setting.PDB_TYPES_TO_SETTING_TYPES_MAP[proc_arg.value_type]
     except KeyError:
-      raise UnsupportedPdbProcedureError(action_dict['name'], pdb_param_type)
+      raise UnsupportedPdbProcedureError(action_dict['name'], proc_arg.value_type)
     
     unique_pdb_param_name = pg.path.uniquify_string(
-      processed_pdb_param_name,
+      proc_arg.name,
       pdb_procedure_argument_names,
       generator=_generate_unique_pdb_procedure_argument_name())
     
@@ -554,19 +554,19 @@ def get_action_dict_for_pdb_procedure(pdb_procedure):
     if isinstance(setting_type, dict):
       arguments_dict = dict(setting_type)
       arguments_dict['name'] = unique_pdb_param_name
-      arguments_dict['display_name'] = processed_pdb_param_name
+      arguments_dict['display_name'] = proc_arg.name
     else:
       arguments_dict = {
         'type': setting_type,
         'name': unique_pdb_param_name,
-        'display_name': processed_pdb_param_name,
+        'display_name': proc_arg.name,
       }
     
-    if pdb_param_type in placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP:
+    if proc_arg.value_type in placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP:
       arguments_dict['type'] = (
-        placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP[pdb_param_type])
+        placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP[proc_arg.value_type])
     
-    if index == 0 and processed_pdb_param_name == 'run-mode':
+    if index == 0 and proc_arg.name == 'run-mode':
       arguments_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
     
     action_dict['arguments'].append(arguments_dict)
