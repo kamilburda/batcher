@@ -256,9 +256,6 @@ class ExportLayersDialog:
         self._settings['main/overwrite_mode'].items['replace']),
       item_tree=self._initial_layer_tree)
     
-    if gimp.version[:2] == (2, 8):
-      pg.pdbutils.suppress_gimp_progress()
-    
     self._init_settings()
     
     self._init_gui_elements()

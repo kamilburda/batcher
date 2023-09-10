@@ -575,45 +575,6 @@ class GimpMessageFile:
       pdb.gimp_message_set_handler(self._orig_message_handler)
 
 
-#===============================================================================
-
-
-_dummy_progress_callback = None
-
-
-def suppress_gimp_progress():
-  """
-  Prevent the default progress bar in GIMP from updating by installing a dummy
-  progress callback. Subsequent calls to this function without a matching call
-  to `unsuppress_gimp_progress()` have no effect.
-  """
-  global _dummy_progress_callback
-  
-  if _dummy_progress_callback:
-    return
-  
-  _dummy_progress_callback = gimp.progress_install(
-    pgutils.empty_func, pgutils.empty_func, pgutils.empty_func, pgutils.empty_func)
-
-
-def unsuppress_gimp_progress():
-  """
-  Undo suppression of the default progress bar in GIMP caused by calling
-  `suppress_gimp_progress()`. Calling this function before calling
-  `suppress_gimp_progress()` has no effect.
-  """
-  global _dummy_progress_callback
-  
-  if not _dummy_progress_callback:
-    return
-  
-  gimp.progress_uninstall(_dummy_progress_callback)
-  _dummy_progress_callback = None
-
-
-#===============================================================================
-
-
 def is_pdb_procedure(function):
   """
   Return `True` if the given function is a PDB procedure, `False` otherwise.
