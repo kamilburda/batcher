@@ -5,6 +5,7 @@ from typing import Optional
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 
 class _PyPDB:
@@ -65,6 +66,8 @@ class PyPDBProcedure:
 
     self._info = Gimp.get_pdb().lookup_procedure(self._name)
     self._has_run_mode = self._get_has_run_mode()
+    
+    self._arg_types = [arg.value_type for arg in self._info.get_arguments()]
 
   @property
   def name(self):
@@ -89,10 +92,8 @@ class PyPDBProcedure:
         run_mode: Gimp.RunMode = Gimp.RunMode.NONINTERACTIVE,
         config: Optional[Gimp.ProcedureConfig] = None):
     if config is None:
-      if self._has_run_mode:
-        result = Gimp.get_pdb().run_procedure(self._name, [run_mode, *args])
-      else:
-        result = Gimp.get_pdb().run_procedure(self._name, args)
+      processed_args = self._process_args(args, run_mode)
+      result = Gimp.get_pdb().run_procedure(self._name, processed_args)
     else:
       result = Gimp.get_pdb().run_procedure_config(self._name, config)
 
@@ -126,6 +127,22 @@ class PyPDBProcedure:
       return issubclass(proc_arg_info[0].value_type.pytype, Gimp.RunMode)
     else:
       return False
+  
+  def _process_args(self, args, run_mode):
+    processed_args = []
+    arg_types = self._arg_types
+    
+    if self._has_run_mode:
+      processed_args.append(GObject.Value(Gimp.RunMode, run_mode))
+      arg_types = self._arg_types[1:]
+    
+    for arg, arg_type in zip(args, arg_types):
+      if arg_type is not None:
+        processed_args.append(GObject.Value(arg_type, arg))
+      else:
+        processed_args.append(arg)
+    
+    return processed_args
 
 
 pdb = _PyPDB()
