@@ -606,8 +606,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     if self.can_be_registered_to_pdb():
       return [(
         self.pdb_type,
-        pgutils.safe_encode_gimp(self.pdb_name),
-        pgutils.safe_encode_gimp(self.description))]
+        self.pdb_name,
+        self.description)]
     else:
       return None
   
@@ -1280,12 +1280,6 @@ class StringSetting(Setting):
   _ALLOWED_PDB_TYPES = [SettingPdbTypes.string]
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.entry]
   _DEFAULT_DEFAULT_VALUE = ''
-  
-  def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, bytes):
-      return pgutils.safe_decode_gimp(raw_value)
-    else:
-      return raw_value
 
 
 class ImageSetting(Setting):
@@ -2192,20 +2186,14 @@ class ArraySetting(Setting):
       if length_name is None:
         length_name = '{}-length'.format(self.name)
       
-      if not isinstance(length_name, bytes):
-        length_name = pgutils.safe_encode_gimp(length_name)
-      
       if length_description is None:
         length_description = _('Number of elements in "{}"').format(self.name)
-      
-      if not isinstance(length_description, bytes):
-        length_description = pgutils.safe_encode_gimp(length_description)
       
       return [
         (SettingPdbTypes.int32, length_name, length_description),
         (self.pdb_type,
-         pgutils.safe_encode_gimp(self.name),
-         pgutils.safe_encode_gimp(self.description))
+         self.name,
+         self.description)
       ]
     else:
       return None

@@ -578,7 +578,7 @@ class GimpShelfSource(Source):
     gimpshelf.shelf[self._get_key()] = data
   
   def _get_key(self):
-    return pgutils.safe_encode_gimp(self.source_name)
+    return self.source_name
 
 
 class GimpParasiteSource(Source):

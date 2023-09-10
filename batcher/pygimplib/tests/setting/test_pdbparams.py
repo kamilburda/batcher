@@ -29,10 +29,8 @@ class TestCreateParams(unittest.TestCase):
     
     self.assertTrue(len(param), 3)
     self.assertEqual(param[0], settings_.SettingPdbTypes.string)
-    self.assertEqual(
-      param[1], pgutils.safe_encode_gimp('file-extension'))
-    self.assertEqual(
-      param[2], pgutils.safe_encode_gimp('File extension'))
+    self.assertEqual(param[1], 'file-extension')
+    self.assertEqual(param[2], 'File extension')
   
   def test_create_params_invalid_argument(self):
     with self.assertRaises(TypeError):
@@ -47,8 +45,8 @@ class TestCreateParams(unittest.TestCase):
     self.assertEqual(
       params[0],
       (self.file_ext_setting.pdb_type,
-       pgutils.safe_encode_gimp(self.file_ext_setting.pdb_name),
-       pgutils.safe_encode_gimp(self.file_ext_setting.description)))
+       self.file_ext_setting.pdb_name,
+       self.file_ext_setting.description))
     
     # Array length parameter
     self.assertEqual(params[1][0], settings_.SettingPdbTypes.int32)
@@ -56,15 +54,13 @@ class TestCreateParams(unittest.TestCase):
     self.assertEqual(
       params[2],
       (self.coordinates_setting.pdb_type,
-       pgutils.safe_encode_gimp(self.coordinates_setting.pdb_name),
-       pgutils.safe_encode_gimp(self.coordinates_setting.description)))
+       self.coordinates_setting.pdb_name,
+       self.coordinates_setting.description))
     
     for param, setting in zip(params[3:], self.settings.walk()):
       self.assertEqual(
         param,
-        (setting.pdb_type,
-         pgutils.safe_encode_gimp(setting.pdb_name),
-         pgutils.safe_encode_gimp(setting.description)))
+        (setting.pdb_type, setting.pdb_name, setting.description))
   
   def test_create_params_with_unregistrable_setting(self):
     params = pdbparams_.create_params(self.unregistrable_setting)

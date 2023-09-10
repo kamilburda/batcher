@@ -143,7 +143,7 @@ class ImageStub(ParasiteFunctionsStubMixin):
   def __init__(self, name=None, ID=None, filename=None):
     super().__init__()
     
-    self.name = pgutils.safe_encode_gimp(name)
+    self.name = name
     
     if ID is None:
       self.ID = next(self._image_id_counter)
@@ -166,7 +166,7 @@ class ItemStub(ParasiteFunctionsStubMixin):
   def __init__(self, name=None, ID=None, visible=True, image=None, parent=None):
     super().__init__()
     
-    self.name = pgutils.safe_encode_gimp(name)
+    self.name = name
     
     if ID is None:
       self.ID = next(self._item_id_counter)

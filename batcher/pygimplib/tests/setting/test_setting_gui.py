@@ -330,7 +330,7 @@ def _create_test_image():
 
 def _display_message_on_setting_value_error(exc_type, exc_value, exc_traceback):
   if issubclass(exc_type, settings_.SettingValueError):
-    gimp.message(pgutils.safe_encode_gimp(str(exc_value)))
+    gimp.message(str(exc_value))
     return True
   else:
     return False

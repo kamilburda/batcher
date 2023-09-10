@@ -475,7 +475,7 @@ class Batcher:
         raise exceptions.ActionError(message, action, None, None)
     elif action['origin'].is_item('gimp_pdb'):
       if pdb.gimp_procedural_db_proc_exists(action['function'].value):
-        function = pdb[pg.utils.safe_encode_gimp(action['function'].value)]
+        function = pdb[action['function'].value]
       else:
         if action['enabled'].value:
           message = 'PDB procedure "{}" not found'.format(action['function'].value)

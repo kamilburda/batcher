@@ -410,7 +410,7 @@ class Item:
     self._prev_item = prev_item
     self._next_item = next_item
     
-    self.name = pgutils.safe_decode_gimp(raw_item.name)
+    self.name = raw_item.name
     
     self._tags_source_name = _get_effective_tags_source_name(
       tags_source_name if tags_source_name else 'tags', self._type)

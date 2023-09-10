@@ -278,7 +278,7 @@ class ActionBox(pg.gui.ItemBox):
     if response_id == gtk.RESPONSE_OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
-        pdb_procedure = pdb[pg.utils.safe_encode_gimp(procedure_name)]
+        pdb_procedure = pdb[procedure_name]
         
         try:
           pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(pdb_procedure)
@@ -337,7 +337,7 @@ class ActionBox(pg.gui.ItemBox):
       return
     
     if item.action['origin'].is_item('gimp_pdb'):
-      pdb_procedure = pdb[pg.utils.safe_encode_gimp(item.action['function'].value)]
+      pdb_procedure = pdb[item.action['function'].value]
     else:
       pdb_procedure = None
     

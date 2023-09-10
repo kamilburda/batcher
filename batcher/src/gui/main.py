@@ -182,9 +182,6 @@ def _update_directory(setting, current_image, current_image_dirpath):
   If update was performed, return `True`, otherwise return `False`.
   """
   if current_image_dirpath is not None:
-    if isinstance(current_image_dirpath, bytes):
-      current_image_dirpath = pg.utils.safe_decode_gimp(current_image_dirpath)
-    
     setting.set_value(current_image_dirpath)
     return True
   

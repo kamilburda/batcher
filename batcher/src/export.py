@@ -361,8 +361,8 @@ def _export_item_once(
       run_mode,
       image,
       raw_item,
-      pg.utils.safe_encode_gimp(output_filepath),
-      pg.utils.safe_encode_gimp(os.path.basename(output_filepath)))
+      output_filepath,
+      os.path.basename(output_filepath))
   except RuntimeError as e:
     # HACK: Examining the exception message seems to be the only way to determine
     # some specific cases of export failure.
