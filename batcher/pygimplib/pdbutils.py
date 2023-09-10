@@ -14,7 +14,6 @@ from gi.repository import Gio
 
 from . import constants as pgconstants
 from . import invocation as pginvocation
-from . import utils as pgutils
 from .pypdb import pdb
 
 
@@ -529,8 +528,8 @@ class GimpMessageFile:
       message_prefix:
         If not ``None``, prepend this string to each message.
       message_delay_milliseconds:
-        Delay in milliseconds before displaying the output. This is useful to 
-        aggregate multiple messages into one in order to avoid printing an 
+        Delay in milliseconds before displaying the output. This is useful to
+        aggregate multiple messages into one in order to avoid printing an
         excessive number of message headers.
     """
     self._message_handler = message_handler
