@@ -490,62 +490,65 @@ def compare_layers(
 
 
 @contextlib.contextmanager
-def redirect_messages(message_handler=Gimp.MessageHandlerType.ERROR_CONSOLE):
-  """
-  Temporarily redirect GIMP messages to the specified message handler.
+def redirect_messages(
+      message_handler: Gimp.MessageHandlerType = Gimp.MessageHandlerType.MESSAGE_BOX
+) -> contextlib.AbstractContextManager:
+  """Temporarily redirects GIMP messages to the specified message handler.
   
   Use this function as a context manager:
     
     with redirect_messages():
       # do stuff
   """
-  orig_message_handler = pdb.gimp_message_get_handler()
-  pdb.gimp_message_set_handler(message_handler)
+  orig_message_handler_type = Gimp.message_get_handler()
+  Gimp.message_set_handler(message_handler)
   
   try:
     yield
   finally:
-    pdb.gimp_message_set_handler(orig_message_handler)
+    Gimp.message_set_handler(orig_message_handler_type)
 
 
 class GimpMessageFile:
-  """
-  This class provides a file-like way to write output as GIMP messages.
+  """Class providing a file-like way to write output as GIMP messages.
   
   You can use this class to redirect output or error output to the GIMP console.
-  
-  Parameters:
-  
-  * `message_handler` - Handler to which messages are output. Possible values
-    are the same as for `pdb.gimp_message_get_handler()`.
-  
-  * `message_prefix` - If not `None`, prepend this string to each message.
-  
-  * `message_delay_milliseconds` - Delay in milliseconds before displaying the
-    output. This is useful to aggregate multiple messages into one in order to
-    avoid printing an excessive number of message headers.
   """
   
   def __init__(
         self,
-        message_handler=Gimp.MessageHandlerType.ERROR_CONSOLE,
-        message_prefix=None,
-        message_delay_milliseconds=0):
+        message_handler: Gimp.MessageHandlerType = Gimp.MessageHandlerType.ERROR_CONSOLE,
+        message_prefix: Optional[str] = None,
+        message_delay_milliseconds: int = 0):
+    """Initializes the instance.
+    
+    Args:
+      message_handler:
+        Handler to which messages are output. Possible values are the same as
+        for ``Gimp.message_get_handler()``.
+      message_prefix:
+        If not ``None``, prepend this string to each message.
+      message_delay_milliseconds:
+        Delay in milliseconds before displaying the output. This is useful to 
+        aggregate multiple messages into one in order to avoid printing an 
+        excessive number of message headers.
+    """
     self._message_handler = message_handler
     self._message_prefix = str(message_prefix) if message_prefix is not None else ''
     self._message_delay_milliseconds = message_delay_milliseconds
     
     self._buffer_size = 4096
     
-    self._orig_message_handler = None
+    self._orig_message_handler_type = None
     
     self._message_buffer = self._message_prefix
   
   def write(self, data):
-    # Message handler cannot be set upon instantiation, because the PDB may not
-    # have been initialized yet.
-    self._orig_message_handler = pdb.gimp_message_get_handler()
-    pdb.gimp_message_set_handler(self._message_handler)
+    # Message handler cannot be set upon instantiation as this method may be
+    # called during GIMP initialization when the GIMP API is not fully
+    # initialized yet.
+    self._orig_message_handler_type = Gimp.message_get_handler()
+    Gimp.message_set_handler(self._message_handler)
     
     self._write(data)
     
@@ -560,19 +563,9 @@ class GimpMessageFile:
       self.flush()
   
   def flush(self):
-    gimp.message(pgutils.safe_encode_gimp(self._message_buffer))
+    Gimp.message(self._message_buffer)
     self._message_buffer = self._message_prefix
   
   def close(self):
-    if self._orig_message_handler is not None:
-      pdb.gimp_message_set_handler(self._orig_message_handler)
-
-
-def is_pdb_procedure(function):
-  """
-  Return `True` if the given function is a PDB procedure, `False` otherwise.
-  """
-  return (
-    hasattr(function, 'proc_name')
-    and hasattr(function, 'params')
-    and callable(function))
+    if self._orig_message_handler_type is not None:
+      Gimp.message_set_handler(self._orig_message_handler_type)
