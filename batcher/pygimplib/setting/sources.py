@@ -607,9 +607,10 @@ class GimpParasiteSource(Source):
     parasite = gimp.get_parasite(self.source_name)
     if parasite is None:
       return None
-    
+
+    parasite_data = pgutils.signed_bytes_to_bytes(parasite.get_data())
     try:
-      data = pickle.loads(pgutils.signed_bytes_to_bytes(parasite.get_data()))
+      data = pickle.loads(parasite_data)
     except Exception:
       raise SourceInvalidFormatError(
         _('Settings for this plug-in stored in "{}" may be corrupt.'
