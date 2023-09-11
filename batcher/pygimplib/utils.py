@@ -2,13 +2,12 @@
 
 import contextlib
 import inspect
+import struct
 from typing import Callable, Optional, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-
-from . import constants as pgconstants
 
 
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
@@ -78,7 +77,7 @@ def reprify_object(object_, name: Optional[str] = None) -> str:
 
   return '<{} {} at {}>'.format(
     object_type_path,
-    '"{}"'.format(name) if name is not None else 'object',
+    f'"{name}"' if name is not None else 'object',
     f'{object_id:#0{32 - len(hex(object_id))}x}',
   )
 
@@ -131,3 +130,25 @@ def create_read_only_property(obj, name: str, value):
     type(obj),
     name,
     property(fget=lambda obj_, name_=name: getattr(obj_, '_' + name_)))
+
+
+def bytes_to_signed_bytes(data: bytes) -> Tuple[int, ...]:
+  """Coverts a ``bytes`` object to a sequence of signed byte values (values from
+  -128 to 127).
+
+  This function is useful when pickling data to be stored as data for
+  ``Gimp.Parasite`` instances as GIMP parasites do not accept data with byte
+  values from 128 to 255.
+  """
+  return struct.unpack(f'>{len(data)}b', data)
+
+
+def signed_bytes_to_bytes(data: Tuple[int, ...]) -> bytes:
+  """Coverts a sequence of signed byte values (values from -128 to 127) to
+  ``bytes``.
+
+  This function is useful when unpickling data from ``Gimp.Parasite``
+  instances as GIMP parasites do not accept data with byte values from 128 to
+  255.
+  """
+  return struct.pack(f'>{len(data)}b', *data)

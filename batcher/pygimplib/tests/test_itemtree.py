@@ -359,7 +359,10 @@ class TestItem(unittest.TestCase):
     
     layer = stubs_gimp.LayerStub('layer')
     layer.parasite_attach(
-      stubs_gimp.ParasiteStub(item_tags_source_name, 0, pickle.dumps(set(['background']))))
+      stubs_gimp.ParasiteStub(
+        item_tags_source_name,
+        0,
+        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
     
     item = pgitemtree.Item(layer, self.ITEM, tags_source_name=item_tags_source_name)
     self.assertIn('background', item.tags)
@@ -386,7 +389,10 @@ class TestItem(unittest.TestCase):
     
     layer = stubs_gimp.LayerStub('layer')
     layer.parasite_attach(
-      stubs_gimp.ParasiteStub(folder_tags_source_name, 0, pickle.dumps(set(['background']))))
+      stubs_gimp.ParasiteStub(
+        folder_tags_source_name,
+        0,
+        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
     
     item = pgitemtree.Item(layer, self.FOLDER, tags_source_name=item_tags_source_name)
     self.assertEqual(item.tags_source_name, folder_tags_source_name)
@@ -401,7 +407,10 @@ class TestItem(unittest.TestCase):
     
     layer = stubs_gimp.LayerStub('layer')
     layer.parasite_attach(
-      stubs_gimp.ParasiteStub(item_tags_source_name, 0, pickle.dumps(set(['background']))))
+      stubs_gimp.ParasiteStub(
+        item_tags_source_name,
+        0,
+        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
     
     item = pgitemtree.Item(layer, self.FOLDER, tags_source_name=item_tags_source_name)
     self.assertEqual(item.tags_source_name, folder_tags_source_name)

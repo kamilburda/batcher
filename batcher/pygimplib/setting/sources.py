@@ -609,7 +609,7 @@ class GimpParasiteSource(Source):
       return None
     
     try:
-      data = pickle.loads(parasite.get_data())
+      data = pickle.loads(pgutils.signed_bytes_to_bytes(parasite.get_data()))
     except Exception:
       raise SourceInvalidFormatError(
         _('Settings for this plug-in stored in "{}" may be corrupt.'
@@ -621,7 +621,10 @@ class GimpParasiteSource(Source):
   
   def write_data_to_source(self, data):
     gimp.parasite_attach(
-      gimp.Parasite(self.source_name, gimpenums.PARASITE_PERSISTENT, pickle.dumps(data)))
+      gimp.Parasite(
+        self.source_name,
+        gimpenums.PARASITE_PERSISTENT,
+        pgutils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
 class PickleFileSource(Source):
