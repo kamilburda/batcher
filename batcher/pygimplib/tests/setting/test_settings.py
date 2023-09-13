@@ -754,9 +754,9 @@ class TestImageSetting(unittest.TestCase):
       self.setting.set_value('file_path')
       
       self.assertEqual(self.setting.value, None)
-  
+
   def test_set_value_with_id(self):
-    self.image.ID = 2
+    self.image.id_ = 2
     
     with mock.patch(
           pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
@@ -767,7 +767,7 @@ class TestImageSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, self.image)
   
   def test_set_value_with_invalid_id(self):
-    self.image.ID = 2
+    self.image.id_ = 2
     
     with mock.patch(
           pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
@@ -842,7 +842,7 @@ class TestImageSetting(unittest.TestCase):
       })
   
   def test_to_dict_with_session_source_type(self):
-    self.image.ID = 2
+    self.image.id_ = 2
     
     self.assertDictEqual(
       self.setting.to_dict(source_type='session'),
@@ -1019,7 +1019,7 @@ class TestGimpItemSetting(unittest.TestCase):
       })
   
   def test_to_dict_via_item_id(self):
-    self.layer.ID = 2
+    self.layer.id_ = 2
     
     self.assertDictEqual(
       self.setting.to_dict(source_type='session'),

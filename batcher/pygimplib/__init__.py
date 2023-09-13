@@ -53,7 +53,7 @@ from . import fileformats
 # from . import gui
 from . import invocation
 from . import invoker
-# from . import itemtree
+from . import itemtree
 from . import objectfilter
 from . import overwrite
 from . import path
@@ -76,7 +76,7 @@ __all__ = [
   # 'gui',
   'invocation',
   'invoker',
-  # 'itemtree',
+  'itemtree',
   'logging',
   'objectfilter',
   'overwrite',

@@ -3,8 +3,6 @@
 import itertools
 import pickle
 
-from .. import utils as pgutils
-
 
 class PdbStub:
   
@@ -140,15 +138,15 @@ class ImageStub(ParasiteFunctionsStubMixin):
   
   _image_id_counter = itertools.count(start=1)
   
-  def __init__(self, name=None, ID=None, filename=None):
+  def __init__(self, name=None, id_=None, filename=None):
     super().__init__()
     
     self.name = name
     
-    if ID is None:
-      self.ID = next(self._image_id_counter)
+    if id_ is None:
+      self.id_ = next(self._image_id_counter)
     else:
-      self.ID = ID
+      self.id_ = id_
     
     self.width = 0
     self.height = 0
@@ -163,15 +161,15 @@ class ItemStub(ParasiteFunctionsStubMixin):
   
   _item_id_counter = itertools.count(start=1)
   
-  def __init__(self, name=None, ID=None, visible=True, image=None, parent=None):
+  def __init__(self, name=None, id_=None, visible=True, image=None, parent=None):
     super().__init__()
     
     self.name = name
     
-    if ID is None:
-      self.ID = next(self._item_id_counter)
+    if id_ is None:
+      self.id_ = next(self._item_id_counter)
     else:
-      self.ID = ID
+      self.id_ = id_
     
     self.width = 0
     self.height = 0
@@ -216,7 +214,9 @@ class VectorsStub(ItemStub):
 class DisplayStub(ParasiteFunctionsStubMixin):
   
   def __init__(self, id_=None):
-    self.ID = id_
+    super().__init__()
+
+    self.id_ = id_
 
 
 class GimpModuleStub(ParasiteFunctionsStubMixin, ShelfFunctionsStubMixin):

@@ -1,9 +1,9 @@
-"""Utility functions for the `test_itemtree` module."""
+"""Utility functions for the ``test_itemtree`` module."""
 
 from . import stubs_gimp
 
 
-def parse_layers(tree_string):
+def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
   """Parses layer names from a given string and returns an image stub containing
   layer stubs.
   
