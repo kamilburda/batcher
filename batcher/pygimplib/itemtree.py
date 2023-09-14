@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from collections.abc import Iterable, Iterator
 import pickle
-from typing import Generator, List, Optional, Set, Union
+from typing import Generator, List, Optional, Set, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -383,7 +383,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     return self._name
   
-  def __getitem__(self, id_or_name: Union[int, str]) -> Item:
+  def __getitem__(self, id_or_name: Union[int, str, Tuple[Union[int, str], str]]) -> Item:
     """Returns an `Item` object by its ID or original name.
 
     An item's ID is the return value of ``Item.raw.get_id()``. An item's
@@ -399,7 +399,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     except KeyError:
       return self._itemtree_names[id_or_name]
   
-  def __contains__(self, id_or_name: Union[int, str]) -> bool:
+  def __contains__(self, id_or_name: Union[int, str, Tuple[Union[int, str], str]]) -> bool:
     """Returns ``True`` if an `Item` object is in the item tree, regardless of
     filters, ``False`` otherwise.
     
