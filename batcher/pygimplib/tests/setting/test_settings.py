@@ -714,16 +714,10 @@ class TestStringSetting(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.settings.pdb', new=stubs_gimp.PdbStub())
-@mock.patch(
   pgutils.get_pygimplib_module_path() + '.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
 class TestImageSetting(unittest.TestCase):
-  
-  @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.settings.pdb', new=stubs_gimp.PdbStub())
+
   def setUp(self):
-    self.pdb = stubs_gimp.PdbStub()
-    
     self.image = self.pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
     
     self.setting = settings_.ImageSetting('image', default_value=self.image)
@@ -855,8 +849,6 @@ class TestImageSetting(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.settings.pdb', new=stubs_gimp.PdbStub())
-@mock.patch(
   pgutils.get_pygimplib_module_path() + '.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
   pgutils.get_pygimplib_module_path() + '.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
@@ -866,8 +858,6 @@ class TestGimpItemSetting(unittest.TestCase):
     pass
   
   def setUp(self):
-    pdb = stubs_gimp.PdbStub()
-    
     self.image = pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
     
     self.parent_of_parent = stubs_gimp.LayerGroupStub(name='group1')
@@ -945,20 +935,22 @@ class TestGimpItemSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, None)
   
   def test_set_value_with_list_with_id(self):
+    # FIXME: Remove the mock if possible, the ItemStub class stores item:ID mapping internally.
     with mock.patch(
           pgutils.get_pygimplib_module_path()
-          + '.tests.stubs_gimp.ItemStub.from_id') as from_id_function:
-      from_id_function.return_value = self.layer
+          + '.tests.stubs_gimp.ItemStub.get_by_id') as get_by_id_function:
+      get_by_id_function.return_value = self.layer
       
       self.setting.set_value(2)
     
     self.assertEqual(self.setting.value, self.layer)
   
   def test_set_value_with_list_with_invalid_id(self):
+    # FIXME: Remove the mock if possible, the ItemStub class stores item:ID mapping internally.
     with mock.patch(
           pgutils.get_pygimplib_module_path()
-          + '.tests.stubs_gimp.ItemStub.from_id') as from_id_function:
-      from_id_function.return_value = None
+          + '.tests.stubs_gimp.ItemStub.get_by_id') as get_by_id_function:
+      get_by_id_function.return_value = None
     
       self.setting.set_value(2)
     
@@ -1071,8 +1063,6 @@ class TestColorSetting(unittest.TestCase):
       setting.to_dict(), {'name': 'color', 'value': [5, 2, 8, 4], 'type': 'color'})
 
 
-@mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.settings.pdb', new=stubs_gimp.PdbStub())
 class TestDisplaySetting(unittest.TestCase):
   
   def test_to_dict(self):

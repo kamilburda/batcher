@@ -1369,7 +1369,7 @@ class GimpItemSetting(Setting):
           ('lists as values for GIMP item settings must contain'
            ' exactly 3 elements (has {})').format(len(raw_value)))
     elif isinstance(raw_value, int):
-      value = gimp.Item.from_id(raw_value)
+      value = Gimp.Item.get_by_id(raw_value)
     
     return value
   

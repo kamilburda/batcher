@@ -88,7 +88,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
                 ' (has {})'.format(len(item)))
             
             if isinstance(item[0], int):  # (item ID, item type)
-              item_object = gimp.Item.from_id(item[0])
+              item_object = Gimp.Item.get_by_id(item[0])
               if item_object is not None:
                 processed_items.add(tuple(item))
             else:
@@ -108,7 +108,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
                 else:
                   processed_items.add((item_object.ID, item_type))
           else:
-            item_object = gimp.Item.from_id(item)
+            item_object = Gimp.Item.get_by_id(item)
             if item_object is not None:
               processed_items.add(item)
         
@@ -143,10 +143,10 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
                 'list-likes representing items must contain exactly 2 elements'
                 ' (has {})'.format(len(item_id)))
             
-            item = gimp.Item.from_id(item_id[0])
+            item = Gimp.Item.get_by_id(item_id[0])
             item_type = item_id[1]
           else:
-            item = gimp.Item.from_id(item_id)
+            item = Gimp.Item.get_by_id(item_id)
             item_type = None
           
           if item is None:

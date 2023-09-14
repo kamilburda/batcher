@@ -1,8 +1,8 @@
 """Tests for the `itemtree` module.
 
-Because the public interface to test is identical for all `ItemTree` subclasses,
-it is sufficient to test `itemtree` using one of the subclasses. `LayerTree`
-was chosen for this purpose.
+Because the public interface to test is identical for all `ItemTree`
+subclasses, it is sufficient to test the `itemtree` module using one of the
+subclasses. The `LayerTree` class was chosen for this purpose.
 """
 
 import pickle
@@ -16,20 +16,8 @@ from .. import itemtree as pgitemtree
 from .. import utils as pgutils
 
 
-@mock.patch(
-  pgutils.get_pygimplib_module_path() + '.itemtree.pdb',
-  new=stubs_gimp.PdbStub())
-@mock.patch(
-  pgutils.get_pygimplib_module_path() + '.itemtree.gimp.GroupLayer',
-  new=stubs_gimp.LayerGroupStub)
 class TestLayerTree(unittest.TestCase):
 
-  @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.itemtree.pdb',
-    new=stubs_gimp.PdbStub())
-  @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.itemtree.gimp.GroupLayer',
-    new=stubs_gimp.LayerGroupStub)
   def setUp(self):
     items_string = """
       Corners {
@@ -238,12 +226,8 @@ class TestLayerTree(unittest.TestCase):
       self.item_tree['top-left-corner'])
 
 
-@mock.patch(
-  pgutils.get_pygimplib_module_path() + '.itemtree.pdb', new=stubs_gimp.PdbStub())
 class TestItem(unittest.TestCase):
-  
-  @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.itemtree.pdb', new=stubs_gimp.PdbStub())
+
   def setUp(self):
     self.ITEM = pgitemtree.TYPE_ITEM
     self.GROUP = pgitemtree.TYPE_GROUP

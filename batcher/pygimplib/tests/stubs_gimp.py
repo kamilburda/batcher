@@ -1,92 +1,8 @@
 """Stubs for GIMP objects, classes, etc. usable in automated tests."""
 
 import itertools
-import pickle
 
-
-class PdbStub:
-  
-  def __init__(self):
-    self._attr_name = ''
-  
-  def __getattr__(self, name):
-    self._attr_name = name
-    return self._call
-  
-  def _call(self, *args):
-    return self._attr_name
-  
-  @staticmethod
-  def gimp_image_new(width, height, image_type):
-    image = ImageStub()
-    image.width = width
-    image.height = height
-    image.image_type = image_type
-    image.filename = None
-    
-    return image
-  
-  @staticmethod
-  def gimp_image_delete(image):
-    image.valid = False
-  
-  @staticmethod
-  def gimp_image_is_valid(image):
-    if image is not None:
-      return image.valid
-    else:
-      return False
-  
-  @staticmethod
-  def gimp_item_is_group(item):
-    return isinstance(item, LayerGroupStub)
-  
-  @staticmethod
-  def gimp_item_set_visible(item, visible):
-    item.visible = visible
-  
-  @staticmethod
-  def gimp_item_get_children(item):
-    return len(item.children), item.children
-  
-  @staticmethod
-  def gimp_image_set_filename(image, filename):
-    image.filename = filename
-
-
-class PdbProcedureStub:
-  
-  def __init__(
-        self,
-        name,
-        type_,
-        params,
-        return_vals=None,
-        author='',
-        blurb='',
-        help_='',
-        copyright_='',
-        date=''):
-    self.proc_name = name
-    self.proc_type = type_
-    self.params = params
-    self.return_vals = return_vals if return_vals is not None else ()
-    self.proc_author = author
-    self.proc_blurb = blurb
-    self.proc_help = help_
-    self.proc_copyright = copyright_
-    self.proc_date = date
-  
-  def __call__(self, *args, **kwargs):
-    pass
-  
-  @property
-  def nparams(self):
-    return len(self.params)
-  
-  @property
-  def nreturn_vals(self):
-    return len(self.return_vals)
+from gi.repository import Gio
 
 
 class ParasiteStub:
@@ -95,6 +11,15 @@ class ParasiteStub:
     self.name = name
     self.flags = flags
     self.data = data
+
+  def get_name(self):
+    return self.name
+
+  def get_flags(self):
+    return self.flags
+
+  def get_data(self):
+    return self.data
 
 
 class ParasiteFunctionsStubMixin:
@@ -108,37 +33,24 @@ class ParasiteFunctionsStubMixin:
     else:
       return None
   
-  def parasite_list(self):
+  def get_parasite_list(self):
     return list(self._parasites)
   
-  def parasite_attach(self, parasite):
+  def attach_parasite(self, parasite):
     self._parasites[parasite.get_name()] = parasite
   
-  def parasite_detach(self, parasite_name):
+  def detach_parasite(self, parasite_name):
     if parasite_name in self._parasites:
       del self._parasites[parasite_name]
 
 
-class ShelfFunctionsStubMixin:
-  
-  def __init__(self):
-    self.shelf_data = {}
-  
-  def get_data(self, name):
-    if name in self.shelf_data:
-      return self.shelf_data[name]
-    else:
-      raise gimp.error('no data for id')
-  
-  def set_data(self, name, data):
-    self.shelf_data[name] = data
-
-
 class ImageStub(ParasiteFunctionsStubMixin):
-  
+
   _image_id_counter = itertools.count(start=1)
-  
-  def __init__(self, name=None, id_=None, filename=None):
+
+  _images_and_ids = {}
+
+  def __init__(self, name=None, id_=None, filepath=None):
     super().__init__()
     
     self.name = name
@@ -147,19 +59,58 @@ class ImageStub(ParasiteFunctionsStubMixin):
       self.id_ = next(self._image_id_counter)
     else:
       self.id_ = id_
-    
+
+    self._images_and_ids[self.id_] = self
+
     self.width = 0
     self.height = 0
-    self.image_type = None
+    self.base_type = None
     self.layers = []
-    self.filename = filename
-    self.uri = ''
+
+    if filepath is not None:
+      self._file = Gio.file_new_for_path(filepath)
+    else:
+      self._file = None
+
     self.valid = True
+
+  @classmethod
+  def get_by_id(cls, id_):
+    return cls._images_and_ids[id_]
+
+  def get_name(self):
+    return self.name
+
+  def get_id(self):
+    return self.id_
+
+  def get_width(self):
+    return self.width
+
+  def get_height(self):
+    return self.height
+
+  def get_base_type(self):
+    return self.base_type
+
+  def list_layers(self):
+    return self.layers
+
+  def get_file(self):
+    return self._file
+
+  def set_file(self, value):
+    self._file = value
+
+  def is_valid(self):
+    return self.valid
 
 
 class ItemStub(ParasiteFunctionsStubMixin):
   
   _item_id_counter = itertools.count(start=1)
+
+  _items_and_ids = {}
   
   def __init__(self, name=None, id_=None, visible=True, image=None, parent=None):
     super().__init__()
@@ -170,37 +121,55 @@ class ItemStub(ParasiteFunctionsStubMixin):
       self.id_ = next(self._item_id_counter)
     else:
       self.id_ = id_
+
+    self._items_and_ids[self.id_] = self
     
     self.width = 0
     self.height = 0
-    self.valid = True
     self.visible = visible
     self.offsets = (0, 0)
     self.image = image
     self.children = []
     self.parent = parent
-  
+    self.valid = True
+
   @classmethod
-  def from_id(cls, id_):
-    return None
+  def get_by_id(cls, id_):
+    return cls._items_and_ids[id_]
+
+  def get_name(self):
+    return self.name
+
+  def get_id(self):
+    return self.id_
+
+  def get_width(self):
+    return self.width
+
+  def get_height(self):
+    return self.height
+
+  def get_visible(self):
+    return self.visible
+
+  def get_offsets(self):
+    return (True, *self.offsets)
+
+  def get_image(self):
+    return self.image
+
+  def list_children(self):
+    return self.children
+
+  def get_parent(self):
+    return self.parent
+
+  def is_valid(self):
+    return self.valid
 
 
 class LayerStub(ItemStub):
   pass
-
-
-class LayerGroupStub(LayerStub):
-  
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-  
-  @property
-  def layers(self):
-    return self.children
-  
-  @layers.setter
-  def layers(self, val):
-    self.children = val
 
 
 class ChannelStub(ItemStub):
@@ -219,38 +188,12 @@ class DisplayStub(ParasiteFunctionsStubMixin):
     self.id_ = id_
 
 
-class GimpModuleStub(ParasiteFunctionsStubMixin, ShelfFunctionsStubMixin):
-  
-  pdb = PdbStub
+class GimpModuleStub(ParasiteFunctionsStubMixin):
+
   Parasite = ParasiteStub
   Image = ImageStub
   Item = ItemStub
   Layer = LayerStub
-  GroupLayer = LayerGroupStub
   Channel = ChannelStub
   Vectors = VectorsStub
   Display = DisplayStub
-  
-  def __init__(self):
-    ParasiteFunctionsStubMixin.__init__(self)
-    ShelfFunctionsStubMixin.__init__(self)
-
-
-class ShelfStub:
-  
-  def __init__(self, shelf=None):
-    # Passing explicit shelf data allows connecting this instance with the
-    # shelf data from `GimpModuleStub`.
-    self.shelf = shelf if shelf is not None else {}
-  
-  def __getitem__(self, key):
-    return pickle.loads(self.shelf[key])
-  
-  def __setitem__(self, key, value):
-    self.shelf[key] = pickle.dumps(value)
-  
-  def __delitem__(self, key):
-    self.shelf[key] = ''
-  
-  def has_key(self, key):
-    return key in self.shelf

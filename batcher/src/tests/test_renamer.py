@@ -34,20 +34,8 @@ class TestNumberField(unittest.TestCase):
     self.assertListEqual(outputs, expected_outputs)
 
 
-@mock.patch(
-  pg.utils.get_pygimplib_module_path() + '.itemtree.pdb',
-  new=stubs_gimp.PdbStub())
-@mock.patch(
-  pg.utils.get_pygimplib_module_path() + '.itemtree.gimp.GroupLayer',
-  new=stubs_gimp.LayerGroupStub)
 class TestRenameWithNumberField(unittest.TestCase):
-  
-  @mock.patch(
-    pg.utils.get_pygimplib_module_path() + '.itemtree.pdb',
-    new=stubs_gimp.PdbStub())
-  @mock.patch(
-    pg.utils.get_pygimplib_module_path() + '.itemtree.gimp.GroupLayer',
-    new=stubs_gimp.LayerGroupStub)
+
   def setUp(self):
     layers_string = """
       foreground

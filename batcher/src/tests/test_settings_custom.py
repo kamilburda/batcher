@@ -64,7 +64,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
       
         self.setting.set_value(
           {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
@@ -111,7 +111,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
         
         with self.assertRaises(ValueError):
           self.setting.set_value(
@@ -124,7 +124,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
         
         with self.assertRaises(TypeError):
           self.setting.set_value(
@@ -137,7 +137,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
     
         self.setting.set_value(
           {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
@@ -157,13 +157,13 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
         
         self.setting.set_value(
           {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
         
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = [
+        temp_mock_gimp_item_module.get_by_id.side_effect = [
           item for item in items if item is not None]
         
         expected_dict = {
@@ -200,13 +200,13 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       with mock.patch(
             pg.utils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = items
+        temp_mock_gimp_item_module.get_by_id.side_effect = items
         
         self.setting.set_value(
           {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
         
         temp_mock_gimp_module._id2image.side_effect = images
-        temp_mock_gimp_item_module.from_id.side_effect = [
+        temp_mock_gimp_item_module.get_by_id.side_effect = [
           item for item in items if item is not None]
         
         expected_dict = {
