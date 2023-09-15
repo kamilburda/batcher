@@ -1093,7 +1093,7 @@ class TestParasiteSetting(unittest.TestCase):
   def test_set_value_by_object(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    parasite = stubs_gimp.ParasiteStub('parasite_stub', 1, 'data')
+    parasite = Gimp.Parasite.new('parasite_stub', 1, 'data')
     
     setting.set_value(parasite)
     
@@ -1111,7 +1111,7 @@ class TestParasiteSetting(unittest.TestCase):
   def test_to_dict(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    parasite = stubs_gimp.ParasiteStub('parasite_stub', 1, 'data')
+    parasite = Gimp.Parasite.new('parasite_stub', 1, 'data')
     
     setting.set_value(parasite)
     

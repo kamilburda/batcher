@@ -26,8 +26,12 @@ def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
     layer = None
     
     if current_symbol.endswith(' {'):
-      layer = stubs_gimp.LayerStub(current_symbol.rstrip(' {'))
-      current_parent.children.append(layer)
+      layer = stubs_gimp.LayerStub(current_symbol.rstrip(' {'), is_group=True)
+      if isinstance(current_parent, stubs_gimp.ImageStub):
+        current_parent.layers.append(layer)
+      else:
+        current_parent.children.append(layer)
+
       current_parent = layer
       parents.append(current_parent)
     elif current_symbol == '}':
@@ -35,7 +39,10 @@ def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
       current_parent = parents[-1]
     else:
       layer = stubs_gimp.LayerStub(current_symbol)
-      current_parent.children.append(layer)
+      if isinstance(current_parent, stubs_gimp.ImageStub):
+        current_parent.layers.append(layer)
+      else:
+        current_parent.children.append(layer)
     
     if layer is not None:
       layer.parent = current_parent

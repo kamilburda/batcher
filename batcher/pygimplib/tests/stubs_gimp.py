@@ -112,7 +112,7 @@ class ItemStub(ParasiteFunctionsStubMixin):
 
   _items_and_ids = {}
   
-  def __init__(self, name=None, id_=None, visible=True, image=None, parent=None):
+  def __init__(self, name=None, id_=None, visible=True, image=None, parent=None, is_group=False):
     super().__init__()
     
     self.name = name
@@ -123,7 +123,8 @@ class ItemStub(ParasiteFunctionsStubMixin):
       self.id_ = id_
 
     self._items_and_ids[self.id_] = self
-    
+
+    self._is_group = is_group
     self.width = 0
     self.height = 0
     self.visible = visible
@@ -142,6 +143,9 @@ class ItemStub(ParasiteFunctionsStubMixin):
 
   def get_id(self):
     return self.id_
+
+  def is_group(self):
+    return self._is_group
 
   def get_width(self):
     return self.width
