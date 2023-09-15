@@ -563,8 +563,8 @@ class ItemTree(metaclass=abc.ABCMeta):
       item_list.append(item)
       
       if item.type == TYPE_FOLDER:
-        self._itemtree[(item.raw.get_id(), FOLDER_KEY)] = item
-        self._itemtree_names[(item.orig_name, FOLDER_KEY)] = item
+        self._itemtree[item.raw.get_id(), FOLDER_KEY] = item
+        self._itemtree_names[item.orig_name, FOLDER_KEY] = item
         
         parents_for_child = list(item.parents)
         parents_for_child.append(item)
