@@ -2,24 +2,10 @@
 
 import itertools
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import Gio
-
-
-class ParasiteStub:
-  
-  def __init__(self, name, flags, data):
-    self.name = name
-    self.flags = flags
-    self.data = data
-
-  def get_name(self):
-    return self.name
-
-  def get_flags(self):
-    return self.flags
-
-  def get_data(self):
-    return self.data
 
 
 class ParasiteFunctionsStubMixin:
@@ -194,7 +180,7 @@ class DisplayStub(ParasiteFunctionsStubMixin):
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
 
-  Parasite = ParasiteStub
+  Parasite = Gimp.Parasite
   Image = ImageStub
   Item = ItemStub
   Layer = LayerStub
