@@ -239,7 +239,7 @@ class TestItem(unittest.TestCase):
     self.FOLDER = pgitemtree.TYPE_FOLDER
 
     # noinspection PyTypeChecker
-    self.item = pgitemtree.Item(stubs_gimp.LayerStub('main-background.jpg'), self.ITEM)
+    self.item = pgitemtree.Item(stubs_gimp.Layer('main-background.jpg'), self.ITEM)
   
   def test_str(self):
     self.assertEqual(str(self.item), '<Item "main-background.jpg">')
@@ -337,7 +337,7 @@ class TestItem(unittest.TestCase):
   def test_initial_tags(self):
     item_tags_source_name = 'test'
     
-    layer = stubs_gimp.LayerStub('layer')
+    layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(
       Gimp.Parasite.new(
         item_tags_source_name,
@@ -351,7 +351,7 @@ class TestItem(unittest.TestCase):
   def test_initial_tags_with_invalid_data(self):
     item_tags_source_name = 'test'
     
-    layer = stubs_gimp.LayerStub('layer')
+    layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(
       Gimp.Parasite.new(item_tags_source_name, 0, b'invalid_data'))
 
@@ -363,7 +363,7 @@ class TestItem(unittest.TestCase):
     item_tags_source_name = 'test'
     folder_tags_source_name = item_tags_source_name + '_' + pgitemtree.FOLDER_KEY
     
-    layer = stubs_gimp.LayerStub('layer')
+    layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(
       Gimp.Parasite.new(
         folder_tags_source_name,
@@ -379,7 +379,7 @@ class TestItem(unittest.TestCase):
     item_tags_source_name = 'test'
     folder_tags_source_name = item_tags_source_name + '_' + pgitemtree.FOLDER_KEY
     
-    layer = stubs_gimp.LayerStub('layer')
+    layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(
       Gimp.Parasite.new(
         item_tags_source_name,

@@ -3,7 +3,7 @@
 from . import stubs_gimp
 
 
-def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
+def parse_layers(tree_string: str) -> stubs_gimp.Image:
   """Parses layer names from a given string and returns an image stub containing
   layer stubs.
   
@@ -11,7 +11,7 @@ def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
   on a separate line). Leading or trailing spaces in each line in the string are
   truncated.
   """
-  image = stubs_gimp.ImageStub()
+  image = stubs_gimp.Image()
   
   tree_string = tree_string.strip()
   lines = tree_string.splitlines(False)
@@ -26,8 +26,8 @@ def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
     layer = None
     
     if current_symbol.endswith(' {'):
-      layer = stubs_gimp.LayerStub(current_symbol.rstrip(' {'), is_group=True)
-      if isinstance(current_parent, stubs_gimp.ImageStub):
+      layer = stubs_gimp.Layer(current_symbol.rstrip(' {'), is_group=True)
+      if isinstance(current_parent, stubs_gimp.Image):
         current_parent.layers.append(layer)
       else:
         current_parent.children.append(layer)
@@ -38,8 +38,8 @@ def parse_layers(tree_string: str) -> stubs_gimp.ImageStub:
       parents.pop()
       current_parent = parents[-1]
     else:
-      layer = stubs_gimp.LayerStub(current_symbol)
-      if isinstance(current_parent, stubs_gimp.ImageStub):
+      layer = stubs_gimp.Layer(current_symbol)
+      if isinstance(current_parent, stubs_gimp.Image):
         current_parent.layers.append(layer)
       else:
         current_parent.children.append(layer)

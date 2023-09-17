@@ -30,7 +30,7 @@ class ParasiteFunctionsStubMixin:
       del self._parasites[parasite_name]
 
 
-class ImageStub(ParasiteFunctionsStubMixin):
+class Image(ParasiteFunctionsStubMixin):
 
   _image_id_counter = itertools.count(start=1)
 
@@ -92,7 +92,7 @@ class ImageStub(ParasiteFunctionsStubMixin):
     return self.valid
 
 
-class ItemStub(ParasiteFunctionsStubMixin):
+class Item(ParasiteFunctionsStubMixin):
   
   _item_id_counter = itertools.count(start=1)
 
@@ -158,19 +158,19 @@ class ItemStub(ParasiteFunctionsStubMixin):
     return self.valid
 
 
-class LayerStub(ItemStub):
+class Layer(Item):
   pass
 
 
-class ChannelStub(ItemStub):
+class Channel(Item):
   pass
 
 
-class VectorsStub(ItemStub):
+class Vectors(Item):
   pass
 
 
-class DisplayStub(ParasiteFunctionsStubMixin):
+class Display(ParasiteFunctionsStubMixin):
   
   def __init__(self, id_=None):
     super().__init__()
@@ -181,9 +181,9 @@ class DisplayStub(ParasiteFunctionsStubMixin):
 class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   Parasite = Gimp.Parasite
-  Image = ImageStub
-  Item = ItemStub
-  Layer = LayerStub
-  Channel = ChannelStub
-  Vectors = VectorsStub
-  Display = DisplayStub
+  Image = Image
+  Item = Item
+  Layer = Layer
+  Channel = Channel
+  Vectors = Vectors
+  Display = Display

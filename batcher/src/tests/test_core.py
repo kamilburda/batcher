@@ -146,8 +146,8 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       progress_updater=mock.MagicMock())
     
     invoker = pg.invoker.Invoker()
-    image = stubs_gimp.ImageStub()
-    layer = stubs_gimp.LayerStub()
+    image = stubs_gimp.Image()
+    layer = stubs_gimp.Layer()
     
     batcher._invoker = invoker
     batcher._current_image = image

@@ -11,16 +11,16 @@ from src import settings_custom
 
 
 def _get_images_and_items():
-  image_1 = stubs_gimp.ImageStub(id_=1, filename='filename_1')
-  image_2 = stubs_gimp.ImageStub(id_=2, filename='filename_2')
+  image_1 = stubs_gimp.Image(id_=1, filename='filename_1')
+  image_2 = stubs_gimp.Image(id_=2, filename='filename_2')
   
   images = [image_1, image_2]
   
   item_4 = stubs_gimp.LayerGroupStub(name='item_4', id_=4, image=image_1)
-  item_1 = stubs_gimp.LayerStub(name='item_1', id_=1, image=image_1)
-  item_3 = stubs_gimp.LayerStub(name='item_3', id_=3, image=image_1, parent=item_4)
+  item_1 = stubs_gimp.Layer(name='item_1', id_=1, image=image_1)
+  item_3 = stubs_gimp.Layer(name='item_3', id_=3, image=image_1, parent=item_4)
   item_7 = stubs_gimp.LayerGroupStub(name='item_7', id_=7, image=image_2)
-  item_5 = stubs_gimp.LayerStub(name='item_5', id_=5, image=image_2, parent=item_7)
+  item_5 = stubs_gimp.Layer(name='item_5', id_=5, image=image_2, parent=item_7)
   
   image_1.layers = [item_1, item_4]
   item_4.children = [item_3]
@@ -171,11 +171,11 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
           'type': 'images_and_gimp_items',
           'value': {
             'filename_1': [
-              ['LayerStub', 'item_1'],
-              ['LayerStub', 'item_4/item_3'],
+              ['Layer', 'item_1'],
+              ['Layer', 'item_4/item_3'],
               ['LayerGroupStub', 'item_4', 'folder']],
             'filename_2': [
-              ['LayerStub', 'item_7/item_5'],
+              ['Layer', 'item_7/item_5'],
               ['LayerGroupStub', 'item_7', 'folder']],
           },
         }
@@ -214,8 +214,8 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
           'type': 'images_and_gimp_items',
           'value': {
             'filename_1': [
-              ['LayerStub', 'item_1'],
-              ['LayerStub', 'item_4/item_3'],
+              ['Layer', 'item_1'],
+              ['Layer', 'item_4/item_3'],
               ['LayerGroupStub', 'item_4', 'folder']],
           },
         }
@@ -259,7 +259,7 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
   
   @staticmethod
   def _create_image(image_id, filepath):
-    image = stubs_gimp.ImageStub()
+    image = stubs_gimp.Image()
     image.id_ = image_id
     image.filename = filepath
     return image
