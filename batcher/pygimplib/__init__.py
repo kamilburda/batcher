@@ -73,7 +73,7 @@ from .pypdb import pdb
 __all__ = [
   # Modules
   'fileformats',
-  # 'gui',
+  'gui',
   'invocation',
   'invoker',
   'itemtree',

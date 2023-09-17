@@ -1,6 +1,10 @@
 """Miscellaneous utility functions related to GTK widgets."""
 
+from typing import Union
+
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -10,79 +14,50 @@ __all__ = [
   'label_fits_text',
   'get_label_full_text_width',
   'menu_popup_below_widget',
-  'get_position_below_widget',
 ]
 
 
-def get_toplevel_window(widget):
-  """
-  Return the toplevel window (`gtk.Window`) for the specified widget
-  (`gtk.Widget`). If the widget has no toplevel window, return None.
+def get_toplevel_window(widget: Gtk.Widget) -> Union[Gtk.Window, None]:
+  """Return the toplevel `gtk.Window` for the specified widget, or ``None`` if
+  the widget has no such window.
   """
   toplevel_widget = widget.get_toplevel()
-  if toplevel_widget.flags() & gtk.TOPLEVEL:
+  if isinstance(toplevel_widget, Gtk.Window):
     return toplevel_widget
   else:
     return None
 
 
-def label_fits_text(label, use_markup=True):
-  """
-  If the `label` is wide enough to display the entire text, return `True`,
-  otherwise `False`. If `use_markup` is `True`, treat the label text as
-  marked-up text.
+def label_fits_text(label: Gtk.Label, use_markup: bool = True) -> bool:
+  """Returns ``True`` if the specified `Gtk.Label` is wide enough to display the
+  entire text, ``False`` otherwise.
+
+  If ``use_markup`` is ``True``, the label text is treated as marked-up text.
   """
   return (label.get_layout().get_pixel_size()[0]
           >= get_label_full_text_width(label, use_markup))
 
 
-def get_label_full_text_width(label, use_markup=True):
+def get_label_full_text_width(label: Gtk.Label, use_markup: bool = True) -> int:
+  """Returns the pixel width of the label text.
+
+  If ``use_markup`` is ``True``, the label text is treated as marked-up text.
   """
-  Return the pixel width of the label text. If `use_markup` is `True`, treat the
-  label text as marked-up text.
-  """
-  full_text_layout = pango.Layout(label.get_pango_context())
+  full_text_layout = Pango.Layout.new(label.get_pango_context())
   
   if use_markup:
-    full_text_layout.set_markup_with_accel(label.get_label(), '_')
+    full_text_layout.set_markup_with_accel(label.get_label(), -1, '_')
   else:
     full_text_layout.set_text(label.get_text())
   
   return full_text_layout.get_pixel_size()[0]
 
 
-def menu_popup_below_widget(
-      menu,
-      widget,
-      parent_menu_shell=None,
-      parent_menu_item=None,
-      button=0,
-      activate_time=0):
-  """
-  Display popup of the specified menu below the specified widget. If the widget
-  has no associated top-level window, display the popup on the cursor position.
-  """
-  position_below_widget = get_position_below_widget(widget)
-  
-  if position_below_widget is not None:
-    menu.popup(
-      parent_menu_shell,
-      parent_menu_item,
-      lambda menu_: (position_below_widget[0], position_below_widget[1], True),
-      button,
-      activate_time)
-  else:
-    menu.popup(parent_menu_shell, parent_menu_item, None, button, activate_time)
-
-
-def get_position_below_widget(widget):
-  toplevel_window = get_toplevel_window(widget)
-  
-  if toplevel_window is not None:
-    toplevel_window_position = toplevel_window.get_window().get_origin()
-    widget_allocation = widget.get_allocation()
-    return (
-      toplevel_window_position[0] + widget_allocation.x,
-      toplevel_window_position[1] + widget_allocation.y + widget_allocation.height)
-  else:
-    return None
+def menu_popup_below_widget(menu: Gtk.Menu, widget: Gtk.Widget):
+  """Displays a `Gtk.Menu` popup below the specified `Gtk.Widget`."""
+  menu.popup_at_widget(
+    widget,
+    Gdk.Gravity.SOUTH,
+    Gdk.Gravity.NORTH,
+    None,
+  )
