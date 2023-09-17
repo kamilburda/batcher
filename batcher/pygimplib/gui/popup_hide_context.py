@@ -1,6 +1,11 @@
 """Class simplifying hiding a popup window based on user actions."""
 
+from typing import Callable, Optional
+
+import gi
 from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from . import utils as utils_
 
@@ -10,22 +15,29 @@ __all__ = [
 
 
 class PopupHideContext:
-  """
-  This class provides a simplified interface for connecting events to hide the
-  specified popup window. If the user presses a button outside the popup or
-  focuses out of the widget that spawned the popup, the popup is hidden.
+  """Class providing a simplified interface for connecting events to hide a
+  popup window.
+
+  If a user presses a button outside the popup or focuses out of the widget
+  that spawned the popup, the popup is hidden.
   """
   
-  def __init__(self, popup_to_hide, popup_owner_widget, hide_callback=None):
-    """
-    Parameters:
-    
-    * `popup_to_hide` - A `gtk.Window` instance representing a popup to hide.
-    
-    * `popup_owner_widget` - A `gtk.Widget` instance that spawned the popup.
-    
-    * `hide_callback` - A function to hide the popup. If `None`,
-      `popup_to_hide.hide()` is used to hide the popup.
+  def __init__(
+        self,
+        popup_to_hide: Gtk.Window,
+        popup_owner_widget: Gtk.Widget,
+        hide_callback: Optional[Callable] = None,
+  ):
+    """Initializes the context.
+
+    Args:
+      popup_to_hide:
+        A `gtk.Window` instance representing a popup to hide.
+      popup_owner_widget:
+        A `gtk.Widget` instance that spawned the popup.
+      hide_callback:
+        A function to hide the popup.
+        If ``None``, ``popup_to_hide.hide()`` is used to hide the popup.
     """
     self._popup_to_hide = popup_to_hide
     self._popup_owner_widget = popup_owner_widget
@@ -41,7 +53,7 @@ class PopupHideContext:
       'focus-out-event', self._on_popup_owner_widget_focus_out_event)
   
   def connect_button_press_events_for_hiding(self):
-    self._button_press_emission_hook_id = gobject.add_emission_hook(
+    self._button_press_emission_hook_id = GObject.add_emission_hook(
       self._popup_owner_widget,
       'button-press-event',
       self._on_emission_hook_button_press_event)
@@ -57,7 +69,7 @@ class PopupHideContext:
   
   def disconnect_button_press_events_for_hiding(self):
     if self._button_press_emission_hook_id is not None:
-      gobject.remove_emission_hook(
+      GObject.remove_emission_hook(
         self._popup_owner_widget,
         'button-press-event',
         self._button_press_emission_hook_id)
