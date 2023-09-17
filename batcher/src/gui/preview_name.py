@@ -378,7 +378,7 @@ class NamePreview(preview_base_.Preview):
       self._toggle_tag_interactive = True
       
       if len(item_keys) >= 1:
-        self._tags_menu.popup(None, None, None, event.button, event.time)
+        self._tags_menu.popup_at_pointer(None)
         
         toplevel_window = pg.gui.get_toplevel_window(self)
         if toplevel_window is not None:

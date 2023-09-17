@@ -233,7 +233,7 @@ class ActionBox(pg.gui.ItemBox):
     self._actions_menu.show_all()
   
   def _on_button_add_clicked(self, button):
-    self._actions_menu.popup(None, None, None, 0, 0)
+    self._actions_menu.popup_at_pointer(None)
   
   def _add_action_to_menu_popup(self, action_dict):
     menu_item = gtk.MenuItem(

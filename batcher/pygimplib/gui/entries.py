@@ -228,7 +228,7 @@ class FilenamePatternEntry(ExtendedEntry):
     
     self._last_field_with_tooltip = ''
     
-    self._pango_layout = pango.Layout(self.get_pango_context())
+    self._pango_layout = Pango.Layout.new(self.get_pango_context())
     
     self._popup = entry_popup_.EntryPopup(self, self._COLUMN_TYPES, suggested_items)
     self._popup.filter_rows_func = self._filter_suggested_items
@@ -533,7 +533,7 @@ class FileExtensionEntry(ExtendedEntry):
   def _on_after_tree_view_realize(self, tree_view):
     self._extensions_separator_text_pixel_size = self._get_text_pixel_size(
       self._cell_renderer_extensions.get_property('text-list-separator'),
-      pango.Layout(self._popup.tree_view.get_pango_context()))
+      Pango.Layout.new(self._popup.tree_view.get_pango_context()))
     
     self._fill_extensions_text_pixel_rects()
     
@@ -542,7 +542,7 @@ class FileExtensionEntry(ExtendedEntry):
       for column in self._COLUMNS]
   
   def _fill_extensions_text_pixel_rects(self):
-    pango_layout = pango.Layout(self._popup.tree_view.get_pango_context())
+    pango_layout = Pango.Layout.new(self._popup.tree_view.get_pango_context())
     
     for file_format in self._popup.rows:
       file_extensions = file_format[1]
