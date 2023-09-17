@@ -48,7 +48,7 @@ class ImagePreview(preview_base_.Preview):
   
   __gsignals__ = {
     'preview-updated': (
-      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_FLOAT)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_FLOAT)),
   }
   
   _MANUAL_UPDATE_LOCK = '_manual_update'

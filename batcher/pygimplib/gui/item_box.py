@@ -248,8 +248,8 @@ class ArrayBox(ItemBox):
   """
   
   __gsignals__ = {
-    'array-box-changed': (GObject.SIGNAL_RUN_FIRST, None, ()),
-    'array-box-item-changed': (GObject.SIGNAL_RUN_FIRST, None, ())}
+    'array-box-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    'array-box-item-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
   
   _SIZE_HBOX_SPACING = 6
   

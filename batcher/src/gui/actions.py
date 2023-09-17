@@ -54,11 +54,11 @@ class ActionBox(pg.gui.ItemBox):
   
   __gsignals__ = {
     'action-box-item-added': (
-      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'action-box-item-reordered': (
-      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_INT)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_INT)),
     'action-box-item-removed': (
-      GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
   _ADD_BUTTON_HBOX_SPACING = 6

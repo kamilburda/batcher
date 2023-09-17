@@ -34,7 +34,7 @@ class GimpItemComboBox(Gtk.Box):
     * `selected_item` - The currently selected `gimp.Item` object.
   """
   
-  __gsignals__ = {'changed': (GObject.SIGNAL_RUN_FIRST, None, (GObject.TYPE_PYOBJECT,))}
+  __gsignals__ = {'changed': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,))}
   
   _GimpItemComboBox = collections.namedtuple(
     '_GimpItemComboBox',
