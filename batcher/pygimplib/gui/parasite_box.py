@@ -8,7 +8,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 
-from .. import constants as pgconstants
 from .. import utils as pgutils
 
 __all__ = [
@@ -18,7 +17,13 @@ __all__ = [
 
 class ParasiteBox(Gtk.Box):
   """Subclass of `Gtk.Box` to edit `Gimp.Parasite` instances interactively.
-  
+
+  The class allows adjusting the following `Gimp.Parasite` attributes: name,
+  flags and data. In the text box provided by this class, the data attribute is
+  treated as a sequence of characters having ordinal value between 0-255. Any
+  Unicode characters entered by the user having ordinal value of 256 or higher
+  will be removed when calling ``get_parasite()``.
+
   Signals:
     parasite-changed: The parasite was modified by the user.
   """
@@ -36,9 +41,17 @@ class ParasiteBox(Gtk.Box):
     self._init_gui(parasite)
 
   def get_parasite(self) -> Gimp.Parasite:
+    """Returns a `Gimp.Parasite` instance based on the values in the parasite
+    box.
+
+    Any characters with ordinal value of 256 or higher are removed.
+    """
     return Gimp.Parasite.new(*self._get_values())
   
   def set_parasite(self, parasite: Gimp.Parasite):
+    """Fills the parasite box with attributes from the specified `Gimp.Parasite`
+    instance.
+    """
     self._set_values(parasite)
 
   def _init_gui(self, parasite):
@@ -115,7 +128,10 @@ class ParasiteBox(Gtk.Box):
     return (
       self._parasite_name_entry.get_text(),
       self._parasite_flags_spin_button.get_value_as_int(),
-      pgutils.bytes_to_signed_bytes(self._string_to_bytes(self._parasite_data_entry.get_text())))
+      pgutils.bytes_to_signed_bytes(
+        self._string_to_bytes(
+          self._remove_non_ascii_chars(
+            self._parasite_data_entry.get_text()))))
   
   def _set_values(self, parasite):
     self._should_invoke_parasite_changed_signal = False
@@ -131,19 +147,23 @@ class ParasiteBox(Gtk.Box):
     self._parasite_name_entry.connect('changed', self._on_parasite_changed)
     self._parasite_flags_spin_button.connect('value-changed', self._on_parasite_changed)
     self._parasite_data_entry.connect('changed', self._on_parasite_changed)
-  
+
   def _on_parasite_changed(self, widget, *args, **kwargs):
     if self._should_invoke_parasite_changed_signal:
       self.emit('parasite-changed')
 
   @staticmethod
+  def _remove_non_ascii_chars(str_):
+    return ''.join([i for i in str_ if ord(i) <= 255])
+
+  @staticmethod
   def _string_to_bytes(str_):
-    # We use the same encoding as used in GTK widgets.
-    return str_.encode(pgconstants.GTK_ENCODING, errors='ignore')
+    return bytes([ord(c) for c in str_])
 
   @staticmethod
   def _bytes_to_string(bytes_):
-    return bytes_.decode(pgconstants.GTK_ENCODING, errors='ignore')
+    # Removes the `b'` prefix and `'` suffix
+    return repr(bytes_)[2:-1]
 
 
 GObject.type_register(ParasiteBox)
