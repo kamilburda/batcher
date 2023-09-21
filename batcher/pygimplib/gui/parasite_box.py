@@ -22,7 +22,7 @@ class ParasiteBox(Gtk.Box):
   flags and data. In the text box provided by this class, the data attribute is
   treated as a sequence of characters having ordinal value between 0-255. Any
   Unicode characters entered by the user having ordinal value of 256 or higher
-  will be removed when calling ``get_parasite()``.
+  will be ignored when calling ``get_parasite()``.
 
   Signals:
     parasite-changed: The parasite was modified by the user.
@@ -44,7 +44,7 @@ class ParasiteBox(Gtk.Box):
     """Returns a `Gimp.Parasite` instance based on the values in the parasite
     box.
 
-    Any characters with ordinal value of 256 or higher are removed.
+    Any characters with ordinal value of 256 or higher are ignored.
     """
     return Gimp.Parasite.new(*self._get_values())
   
