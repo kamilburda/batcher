@@ -1,6 +1,11 @@
 """Class providing drag-and-drop capability to any GTK widget."""
 
+from collections.abc import Iterable
+from typing import Callable, Optional
+
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -10,9 +15,7 @@ __all__ = [
 
 
 class DragAndDropContext:
-  """
-  This class adds drag-and-drop capability to the specified GTK widget.
-  """
+  """Class adding drag-and-drop capability to a `Gtk.Widget`."""
   
   def __init__(self):
     self._drag_type = self._get_unique_drag_type()
@@ -20,28 +23,32 @@ class DragAndDropContext:
   
   def setup_drag(
         self,
-        widget,
-        get_drag_data_func,
-        drag_data_receive_func,
-        get_drag_data_args=None,
-        drag_data_receive_args=None,
-        scrolled_window=None):
-    """
-    Enable dragging for the specified `widget`.
-    
-    `get_drag_data_func` is a function that returns data as a string describing
-    the dragged widget.
-    
-    `drag_data_receive_func` is a function that processes the data returned by
-    `get_drag_data_func`.
-    
-    `get_drag_data_args` and `drag_data_receive_args` are optional arguments for
-    `get_drag_data_func` and `drag_data_receive_func`, respectively.
-    
-    The displayed `widget` is used as the drag icon. If the item box is wrapped
-    in a scrolled window, specify the `scrolled_window` instance so that the
-    default drag icon is assigned if `widget` is partially hidden inside the
-    scrolled window.
+        widget: Gtk.Widget,
+        get_drag_data_func: Callable,
+        drag_data_receive_func: Callable,
+        get_drag_data_args: Optional[Iterable] = None,
+        drag_data_receive_args: Optional[Iterable] = None,
+        scrolled_window: Optional[Gtk.ScrolledWindow] = None):
+    """Enables dragging for the specified `Gtk.widget` instance.
+
+    The displayed ``widget`` is used as the drag icon.
+
+    Args:
+      widget:
+        Widget to enable dragging for.
+      get_drag_data_func:
+        Function returning data as a string describing the dragged widget.
+      drag_data_receive_func:
+        Function processing the data returned by ``get_drag_data_func``.
+      get_drag_data_args:
+        Optional positional arguments for ``get_drag_data_func``.
+      drag_data_receive_args:
+        Optional positional arguments for ``drag_data_receive_func``.
+      scrolled_window:
+        If ``widget`` is wrapped inside a `Gtk.ScrolledWindow`, you may
+        specify this scrolled window instance so that a default GTK drag icon
+        is assigned if ``widget`` is partially hidden inside the scrolled
+        window.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -55,7 +62,9 @@ class DragAndDropContext:
       get_drag_data_func,
       get_drag_data_args)
     widget.drag_source_set(
-      gtk.gdk.BUTTON1_MASK, [(self._drag_type, 0, 0)], gtk.gdk.ACTION_MOVE)
+      Gdk.ModifierType.BUTTON1_MASK,
+      [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
+      Gdk.DragAction.MOVE)
     
     widget.connect(
       'drag-data-received',
@@ -63,18 +72,19 @@ class DragAndDropContext:
       drag_data_receive_func,
       *drag_data_receive_args)
     widget.drag_dest_set(
-      gtk.DEST_DEFAULT_ALL, [(self._drag_type, 0, 0)], gtk.gdk.ACTION_MOVE)
+      Gtk.DestDefaults.ALL,
+      [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
+      Gdk.DragAction.MOVE)
     
-    widget.connect(
-      'drag-begin', self._on_widget_drag_begin, scrolled_window)
+    widget.connect('drag-begin', self._on_widget_drag_begin, scrolled_window)
     widget.connect('drag-motion', self._on_widget_drag_motion)
     widget.connect('drag-failed', self._on_widget_drag_failed)
   
   def _get_unique_drag_type(self):
-    return str('{}_{}'.format(type(self).__qualname__, id(self)))
+    return f'{type(self).__qualname__}_{id(self)}'
   
+  @staticmethod
   def _on_widget_drag_data_get(
-        self,
         widget,
         drag_context,
         selection_data,
@@ -84,8 +94,8 @@ class DragAndDropContext:
         get_drag_data_args):
     selection_data.set(selection_data.target, 8, get_drag_data_func(*get_drag_data_args))
   
+  @staticmethod
   def _on_widget_drag_data_received(
-        self,
         widget,
         drag_context,
         drop_x,
@@ -100,10 +110,9 @@ class DragAndDropContext:
   def _on_widget_drag_begin(self, widget, drag_context, scrolled_window):
     drag_icon_pixbuf = self._get_drag_icon_pixbuf(widget, scrolled_window)
     if drag_icon_pixbuf is not None:
-      drag_context.set_icon_pixbuf(drag_icon_pixbuf, 0, 0)
+      widget.drag_source_set_icon_pixbuf(drag_icon_pixbuf, 0, 0)
   
-  def _on_widget_drag_motion(
-        self, widget, drag_context, drop_x, drop_y, timestamp):
+  def _on_widget_drag_motion(self, widget, drag_context, drop_x, drop_y, timestamp):
     self._last_widget_dest_drag = widget
   
   def _on_widget_drag_failed(self, widget, drag_context, result):
@@ -122,23 +131,13 @@ class DragAndDropContext:
     
     self._setup_widget_to_add_border_to_drag_icon(widget)
     
-    while gtk.events_pending():
-      gtk.main_iteration()
+    while Gtk.events_pending():
+      Gtk.main_iteration()
     
     widget_allocation = widget.get_allocation()
-    
-    pixbuf = gtk.gdk.Pixbuf(
-      gtk.gdk.COLORSPACE_RGB,
-      False,
-      8,
-      widget_allocation.width,
-      widget_allocation.height)
-    
-    drag_icon_pixbuf = pixbuf.get_from_drawable(
+
+    drag_icon_pixbuf = Gdk.pixbuf_get_from_window(
       widget.get_window(),
-      widget.get_colormap(),
-      0,
-      0,
       0,
       0,
       widget_allocation.width,
@@ -149,8 +148,7 @@ class DragAndDropContext:
     return drag_icon_pixbuf
   
   @staticmethod
-  def _are_items_partially_hidden_because_of_visible_horizontal_scrollbar(
-        scrolled_window):
+  def _are_items_partially_hidden_because_of_visible_horizontal_scrollbar(scrolled_window):
     return (
       scrolled_window.get_hscrollbar() is not None
       and scrolled_window.get_hscrollbar().get_mapped())
