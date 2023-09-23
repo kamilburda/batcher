@@ -141,7 +141,7 @@ class ActionBox(pg.gui.ItemBox):
       button_hbox = gtk.HBox()
       button_hbox.set_spacing(self._ADD_BUTTON_HBOX_SPACING)
       button_hbox.pack_start(
-        gtk.image_new_from_stock(gtk.STOCK_ADD, gtk.ICON_SIZE_MENU), False, False, 0)
+        Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, gtk.ICON_SIZE_MENU), False, False, 0)
       
       label_add = gtk.Label(pg.utils.safe_encode_gtk(self._add_action_text))
       label_add.set_use_underline(True)
@@ -149,7 +149,9 @@ class ActionBox(pg.gui.ItemBox):
       
       self._button_add.add(button_hbox)
     else:
-      self._button_add = gtk.Button(stock=gtk.STOCK_ADD)
+      self._button_add = Gtk.Button.new()
+      self._button_add.set_image(
+        Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.BUTTON))
     
     self._button_add.set_relief(gtk.RELIEF_NONE)
     self._button_add.connect('clicked', self._on_button_add_clicked)
@@ -392,9 +394,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     
     self._action = action
 
-    self._button_edit = self._setup_item_button(gtk.STOCK_EDIT, position=0)
+    self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
 
-    self._button_warning = self._setup_item_indicator_button(gtk.STOCK_DIALOG_WARNING, position=0)
+    self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
     self._display_warning_message_event_id = None
@@ -587,7 +589,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     hbox.set_spacing(self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING_BETWEEN_ELEMENTS)
     
     hbox.pack_start(
-      gtk.image_new_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_BUTTON),
+      Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_WARNING, Gtk.IconSize.BUTTON),
       False,
       False,
       0)

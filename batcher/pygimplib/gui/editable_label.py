@@ -1,6 +1,8 @@
 """Widget containing a text label that can be optionally edited."""
 
 import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -32,12 +34,11 @@ class EditableLabel(Gtk.Box):
     self._label.set_alignment(0.0, 0.5)
     self._label.show_all()
     self._label.set_no_show_all(True)
-    
-    self._button_edit = gtk.Button()
+
+    self._button_edit = Gtk.Button.new()
+    self._button_edit.set_image(
+      Gtk.Image.new_from_icon_name(GimpUi.ICON_EDIT, Gtk.IconSize.BUTTON))
     self._button_edit.set_relief(gtk.RELIEF_NONE)
-    self._button_edit_icon = gtk.image_new_from_pixbuf(
-      self._button_edit.render_icon(gtk.STOCK_EDIT, gtk.ICON_SIZE_MENU))
-    self._button_edit.add(self._button_edit_icon)
     
     self._hbox = gtk.HBox(homogeneous=False)
     self._hbox.set_spacing(self._LABEL_EDIT_BUTTON_SPACING)

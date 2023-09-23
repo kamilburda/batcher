@@ -8,10 +8,12 @@ import contextlib
 from typing import Optional
 
 import gi
-from gi.repository import GObject
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GLib
+from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -173,7 +175,7 @@ class ItemBoxItem:
     
     self._has_hbox_buttons_focus = False
 
-    self._button_remove = self._setup_item_button(Gtk.STOCK_CLOSE)
+    self._button_remove = self._setup_item_button(GimpUi.ICON_WINDOW_CLOSE)
     
     self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
     self._event_box.connect('leave-notify-event', self._on_event_box_leave_notify_event)
@@ -212,8 +214,7 @@ class ItemBoxItem:
   @staticmethod
   def _setup_button(icon_name, position, hbox):
     button = Gtk.Button.new()
-    button.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU))
-
+    button.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON))
     button.set_relief(Gtk.ReliefStyle.NONE)
     
     hbox.pack_start(button, False, False, 0)

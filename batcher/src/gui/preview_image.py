@@ -5,6 +5,8 @@ import time
 import traceback
 
 import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -261,11 +263,11 @@ class ImagePreview(preview_base_.Preview):
     self._menu_settings.append(self._menu_item_update_automatically)
     self._menu_settings.show_all()
     
-    self._button_refresh = gtk.Button()
+    self._button_refresh = Gtk.Button.new()
+    self._button_refresh.set_image(
+      Gtk.Image.new_from_icon_name('view-refresh', Gtk.IconSize.BUTTON))
     self._button_refresh.set_tooltip_text(_('Update Preview'))
     self._button_refresh.set_relief(gtk.RELIEF_NONE)
-    self._button_refresh.add(gtk.image_new_from_pixbuf(
-      self._button_refresh.render_icon(gtk.STOCK_REFRESH, gtk.ICON_SIZE_MENU)))
     self._button_refresh.show_all()
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)
@@ -277,12 +279,11 @@ class ImagePreview(preview_base_.Preview):
     self._preview_image = gtk.Image()
     self._preview_image.set_no_show_all(True)
     
-    self._placeholder_image = gtk.Image()
-    self._placeholder_image.set_from_stock(gtk.STOCK_DIALOG_QUESTION, gtk.ICON_SIZE_DIALOG)
+    self._placeholder_image = Gtk.Image.new_from_icon_name(
+      GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
     self._placeholder_image.set_no_show_all(True)
     
-    self._folder_image = gtk.Image()
-    self._folder_image.set_from_stock(gtk.STOCK_DIRECTORY, gtk.ICON_SIZE_DIALOG)
+    self._folder_image = Gtk.Image.new_from_icon_name('folder', Gtk.IconSize.DIALOG)
     self._folder_image.set_no_show_all(True)
     
     self._label_item_name = gtk.Label()

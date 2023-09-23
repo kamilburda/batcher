@@ -227,9 +227,8 @@ def _get_report_link_buttons_and_copy_icon(report_uri_list, report_description, 
       relief=Gtk.ReliefStyle.NONE,
       tooltip_text=_('Copy details to clipboard'),
     )
-    button_copy_to_clipboard.add(
-      Gtk.Image(pixbuf=button_copy_to_clipboard.render_icon(
-        GimpUi.ICON_EDIT_COPY, Gtk.IconSize.MENU)))
+    button_copy_to_clipboard.set_image(
+      Gtk.Image.new_from_icon_name(GimpUi.ICON_EDIT_COPY, Gtk.IconSize.BUTTON))
     button_copy_to_clipboard.connect(
       'clicked',
       _set_clipboard_text,
