@@ -92,7 +92,7 @@ class DragAndDropContext:
         timestamp,
         get_drag_data_func,
         get_drag_data_args):
-    selection_data.set(selection_data.target, 8, get_drag_data_func(*get_drag_data_args))
+    selection_data.set(selection_data.get_target(), 8, get_drag_data_func(*get_drag_data_args))
   
   @staticmethod
   def _on_widget_drag_data_received(
@@ -105,12 +105,12 @@ class DragAndDropContext:
         timestamp,
         drag_data_receive_func,
         *drag_data_receive_args):
-    drag_data_receive_func(selection_data.data, *drag_data_receive_args)
+    drag_data_receive_func(selection_data.get_data(), *drag_data_receive_args)
   
   def _on_widget_drag_begin(self, widget, drag_context, scrolled_window):
     drag_icon_pixbuf = self._get_drag_icon_pixbuf(widget, scrolled_window)
     if drag_icon_pixbuf is not None:
-      widget.drag_source_set_icon_pixbuf(drag_icon_pixbuf, 0, 0)
+      widget.drag_source_set_icon_pixbuf(drag_icon_pixbuf)
   
   def _on_widget_drag_motion(self, widget, drag_context, drop_x, drop_y, timestamp):
     self._last_widget_dest_drag = widget
