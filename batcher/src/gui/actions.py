@@ -391,12 +391,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self.action_edit_dialog = None
     
     self._action = action
-    
-    self._button_edit = gtk.Button()
-    self._setup_item_button(self._button_edit, gtk.STOCK_EDIT, position=0)
-    
-    self._button_warning = gtk.Button()
-    self._setup_item_indicator_button(self._button_warning, gtk.STOCK_DIALOG_WARNING, position=0)
+
+    self._button_edit = self._setup_item_button(gtk.STOCK_EDIT, position=0)
+
+    self._button_warning = self._setup_item_indicator_button(gtk.STOCK_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
     self._display_warning_message_event_id = None

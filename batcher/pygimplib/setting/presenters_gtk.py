@@ -412,8 +412,8 @@ class DisplaySpinButtonPresenter(GtkPresenter):
         value=display_id,
         lower=0,
         upper=2**32,
-        step_incr=1,
-        page_incr=10,
+        step_increment=1,
+        page_increment=10,
       ),
       digits=0)
     
@@ -766,8 +766,8 @@ def _create_spin_button(setting, digits=0):
       value=setting.value,
       lower=min_value,
       upper=max_value,
-      step_incr=1,
-      page_incr=10,
+      step_increment=1,
+      page_increment=10,
     ),
     digits=digits)
   

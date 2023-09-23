@@ -101,7 +101,7 @@ def test_settings_and_gui(setting_items):
   
   scrolled_window = gtk.ScrolledWindow()
   scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-  scrolled_window.add_with_viewport(table)
+  scrolled_window.add(table)
   scrolled_window.get_child().set_shadow_type(gtk.SHADOW_NONE)
   
   dialog.vbox.pack_start(scrolled_window, True, True, 0)
