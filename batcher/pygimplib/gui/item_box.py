@@ -5,9 +5,13 @@ The widget is used as the default GUI for `setting.ArraySetting` instances.
 
 import collections
 import contextlib
+from typing import Optional
 
 import gi
 from gi.repository import GObject
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -23,32 +27,38 @@ __all__ = [
 
 
 class ItemBox(Gtk.ScrolledWindow):
-  """
-  This base class defines a scrollable box holding a vertical list of items.
-  Each item is an instance of `ItemBoxItem` class or one of its subclasses.
+  """Base class for a scrollable box holding a vertical list of items.
+
+  Each item is an instance of the `ItemBoxItem` class or one of its subclasses.
   """
   
   ITEM_SPACING = 4
   VBOX_SPACING = 4
   
-  def __init__(self, item_spacing=ITEM_SPACING, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+  def __init__(self, item_spacing: int = ITEM_SPACING, **kwargs):
+    super().__init__(**kwargs)
     
     self._item_spacing = item_spacing
     
     self._drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
     self._items = []
     
-    self._vbox_items = gtk.VBox(homogeneous=False)
-    self._vbox_items.set_spacing(self._item_spacing)
+    self._vbox_items = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      homogeneous=False,
+      spacing=self._item_spacing,
+    )
     
-    self._vbox = gtk.VBox(homogeneous=False)
-    self._vbox.set_spacing(self.VBOX_SPACING)
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      homogeneous=False,
+      spacing=self.VBOX_SPACING,
+    )
     self._vbox.pack_start(self._vbox_items, False, False, 0)
     
-    self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    self.add_with_viewport(self._vbox)
-    self.get_child().set_shadow_type(gtk.SHADOW_NONE)
+    self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    self.add(self._vbox)
+    self.get_child().set_shadow_type(Gtk.ShadowType.NONE)
   
   @property
   def items(self):
@@ -101,21 +111,19 @@ class ItemBox(Gtk.ScrolledWindow):
       self)
   
   def _get_drag_data(self, dragged_item):
-    return str(self._items.index(dragged_item))
+    return bytes([self._items.index(dragged_item)])
   
-  def _on_drag_data_received(self, dragged_item_index_str, destination_item):
-    dragged_item = self._items[int(dragged_item_index_str)]
+  def _on_drag_data_received(self, dragged_item_index_as_bytes, destination_item):
+    dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
   
   def _on_item_widget_key_press_event(self, widget, event, item):
-    if event.state & gtk.gdk.MOD1_MASK:     # Alt key
-      key_name = gtk.gdk.keyval_name(event.keyval)
+    if event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
+      key_name = Gdk.keyval_name(event.keyval)
       if key_name in ['Up', 'KP_Up']:
-        self.reorder_item(
-          item, self._get_item_position(item) - 1)
+        self.reorder_item(item, self._get_item_position(item) - 1)
       elif key_name in ['Down', 'KP_Down']:
-        self.reorder_item(
-          item, self._get_item_position(item) + 1)
+        self.reorder_item(item, self._get_item_position(item) + 1)
   
   def _on_item_button_remove_clicked(self, button, item):
     self.remove_item(item)
@@ -132,32 +140,40 @@ class ItemBoxItem:
   def __init__(self, item_widget):
     self._item_widget = item_widget
     
-    self._hbox = gtk.HBox(homogeneous=False)
-    self._hbox.set_spacing(self._HBOX_SPACING)
+    self._hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      homogeneous=False,
+      spacing=self._HBOX_SPACING,
+    )
     
-    self._hbox_indicator_buttons = gtk.HBox(homogeneous=False)
-    self._hbox_indicator_buttons.set_spacing(self._HBOX_BUTTONS_SPACING)
+    self._hbox_indicator_buttons = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      homogeneous=False,
+      spacing=self._HBOX_BUTTONS_SPACING,
+    )
     
-    self._event_box_indicator_buttons = gtk.EventBox()
+    self._event_box_indicator_buttons = Gtk.EventBox()
     self._event_box_indicator_buttons.add(self._hbox_indicator_buttons)
     
-    self._hbox_buttons = gtk.HBox(homogeneous=False)
-    self._hbox_buttons.set_spacing(self._HBOX_BUTTONS_SPACING)
+    self._hbox_buttons = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      homogeneous=False,
+      spacing=self._HBOX_BUTTONS_SPACING,
+    )
     
-    self._event_box_buttons = gtk.EventBox()
+    self._event_box_buttons = Gtk.EventBox()
     self._event_box_buttons.add(self._hbox_buttons)
     
     self._hbox.pack_start(self._event_box_indicator_buttons, False, False, 0)
     self._hbox.pack_start(self._item_widget, True, True, 0)
     self._hbox.pack_start(self._event_box_buttons, False, False, 0)
     
-    self._event_box = gtk.EventBox()
+    self._event_box = Gtk.EventBox()
     self._event_box.add(self._hbox)
     
     self._has_hbox_buttons_focus = False
-    
-    self._button_remove = gtk.Button()
-    self._setup_item_button(self._button_remove, gtk.STOCK_CLOSE)
+
+    self._button_remove = self._setup_item_button(Gtk.STOCK_CLOSE)
     
     self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
     self._event_box.connect('leave-notify-event', self._on_event_box_leave_notify_event)
@@ -187,30 +203,33 @@ class ItemBoxItem:
   def remove_item_widget(self):
     self._hbox.remove(self._item_widget)
   
-  def _setup_item_button(self, button, icon, position=None):
-    self._setup_button(button, icon, position, self._hbox_buttons)
+  def _setup_item_button(self, icon_name, position=None):
+    return self._setup_button(icon_name, position, self._hbox_buttons)
   
-  def _setup_item_indicator_button(self, button, icon, position=None):
-    self._setup_button(button, icon, position, self._hbox_indicator_buttons)
+  def _setup_item_indicator_button(self, icon_name, position=None):
+    return self._setup_button(icon_name, position, self._hbox_indicator_buttons)
   
-  def _setup_button(self, button, icon, position, hbox):
-    button.set_relief(gtk.RELIEF_NONE)
-    
-    button_icon = gtk.image_new_from_pixbuf(button.render_icon(icon, gtk.ICON_SIZE_MENU))
-    button.add(button_icon)
+  @staticmethod
+  def _setup_button(icon_name, position, hbox):
+    button = Gtk.Button.new()
+    button.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU))
+
+    button.set_relief(Gtk.ReliefStyle.NONE)
     
     hbox.pack_start(button, False, False, 0)
     if position is not None:
       hbox.reorder_child(button, position)
-    
+
     button.show_all()
+
+    return button
   
   def _on_event_box_enter_notify_event(self, event_box, event):
-    if event.detail != gtk.gdk.NOTIFY_INFERIOR:
+    if event.detail != Gdk.NotifyType.INFERIOR:
       self._hbox_buttons.show()
   
   def _on_event_box_leave_notify_event(self, event_box, event):
-    if event.detail != gtk.gdk.NOTIFY_INFERIOR:
+    if event.detail != Gdk.NotifyType.INFERIOR:
       self._hbox_buttons.hide()
   
   def _on_event_box_size_allocate(self, event_box, allocation):
@@ -236,70 +255,79 @@ class ItemBoxItem:
 
 
 class ArrayBox(ItemBox):
-  """
-  This class can be used to edit `setting.ArraySetting` instances interactively.
+  """Class suitable for interactively editing arrays of values.
+
+  This class can be used to edit, for example, `setting.ArraySetting`
+  instances interactively.
   
   Signals:
-  
-  * `'array-box-changed'` - An item was added, reordered or removed by the user.
-  * `'array-box-item-changed'` - The contents of an item was modified by the
-    user. Currently, this signal is not invoked in this widget and can only be
-    invoked explicitly by calling `ArrayBox.emit('array-box-item-changed')`.
+    array-box-changed:
+      An item was added, reordered or removed by the user.
+    array-box-item-changed:
+      The contents of an item were modified by the user. Currently,
+      this signal is not invoked in this widget and can only be invoked
+      explicitly by calling ``ArrayBox.emit('array-box-item-changed')``.
   """
   
   __gsignals__ = {
     'array-box-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'array-box-item-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
   
-  _SIZE_HBOX_SPACING = 6
-  
   def __init__(
         self,
         new_item_default_value,
-        min_size=0,
-        max_size=None,
-        item_spacing=ItemBox.ITEM_SPACING,
-        max_width=None,
-        max_height=None,
-        *args,
+        min_size: int = 0,
+        max_size: Optional[int] = None,
+        item_spacing: int = ItemBox.ITEM_SPACING,
         **kwargs):
+    """Initializes an `ArrayBox` instance.
+
+    Args:
+      new_item_default_value:
+        Default value for new items
+      min_size:
+        Minimum number of elements.
+      max_size:
+        maximum number of elements. If ``None``, the number of elements is
+        unlimited.
+      item_spacing:
+        Vertical spacing in pixels between items.
+      **kwargs:
+        Additional keyword arguments that can be passed to the
+        `Gtk.ScrolledWindow()` constructor.
     """
-    Parameters:
-    
-    * `new_item_default_value` - default value for new items.
-    
-    * `min_size` - minimum number of elements.
-    
-    * `max_size` - maximum number of elements. If `None`, the number of elements
-      is unlimited.
-    
-    * `item_spacing` - vertical spacing in pixels between items.
-    
-    * `max_width` - maximum width of the array box before the horizontal
-      scrollbar is displayed. The array box will resize automatically until the
-      maximum width is reached. If `max_width` is `None`, the width is fixed
-      to whatever width is provided by `gtk.ScrolledWindow`. If `max_width` is
-      zero or negative, the width is unlimited.
-    
-    * `max_height` - maximum height of the array box before the vertical
-      scrollbar is displayed. For more information, see `max_width`.
-    """
-    super().__init__(item_spacing=item_spacing, *args, **kwargs)
+    super().__init__(item_spacing=item_spacing, **kwargs)
     
     self._new_item_default_value = new_item_default_value
     self._min_size = min_size if min_size >= 0 else 0
     
     if max_size is None:
-      self._max_size = 2**32
+      self._max_size = GLib.MAXINT
     else:
       self._max_size = max_size if max_size >= min_size else min_size
     
-    self.max_width = max_width
-    self.max_height = max_height
-    
     self.on_add_item = pgutils.empty_func
+    """Callback that creates a `Gtk.Widget` when calling `add_item`.
+    
+    The callback must accept two arguments - value for the new widget and
+    index (position starting from 0) at which the new widget will be inserted.
+    
+    The callback must return a single argument - the new `Gtk.Widget` instance.
+    """
+
     self.on_reorder_item = pgutils.empty_func
+    """Callback triggered when calling `reorder_item`.
+    
+    The callback must accept two arguments - original and new index (position
+    starting from 0).
+    """
+
     self.on_remove_item = pgutils.empty_func
+    """Callback triggered when calling `remove_item`.
+    
+    The callback must accept one argument - the index (position starting from 0)
+    of the removed item.
+    """
     
     self._items_total_width = None
     self._items_total_height = None
@@ -309,54 +337,44 @@ class ArrayBox(ItemBox):
     self._init_gui()
   
   def _init_gui(self):
-    self._size_spin_button = gtk.SpinButton(
-      gtk.Adjustment(
+    self._size_spin_button = Gtk.SpinButton(
+      adjustment=Gtk.Adjustment(
         value=0,
         lower=self._min_size,
         upper=self._max_size,
-        step_incr=1,
-        page_incr=10,
+        step_increment=1,
+        page_increment=10,
       ),
-      digits=0)
-    
-    self._size_spin_button.set_numeric(True)
-    self._size_spin_button.set_value(0)
-    
-    self._size_spin_button_label = gtk.Label(_('Size'))
-    
-    self._size_hbox = gtk.HBox()
-    self._size_hbox.set_spacing(self._SIZE_HBOX_SPACING)
-    self._size_hbox.pack_start(self._size_spin_button_label, False, False, 0)
-    self._size_hbox.pack_start(self._size_spin_button, False, False, 0)
-    
-    self._vbox.pack_start(self._size_hbox, False, False, 0)
-    self._vbox.reorder_child(self._size_hbox, 0)
-    
-    self._size_spin_button.connect(
-      'value-changed', self._on_size_spin_button_value_changed)
-  
+      digits=0,
+      numeric=True,
+    )
+
+    self._vbox.pack_start(self._size_spin_button, False, False, 0)
+    self._vbox.reorder_child(self._size_spin_button, 0)
+
+    separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
+    self._vbox.pack_start(separator, False, False, 0)
+    self._vbox.reorder_child(separator, 1)
+
+    self._size_spin_button.connect('value-changed', self._on_size_spin_button_value_changed)
+
   def add_item(self, item_value=None, index=None):
     if item_value is None:
       item_value = self._new_item_default_value
     
     item_widget = self.on_add_item(item_value, index)
     
-    item = _ArrayBoxItem(item_widget)
+    item = ItemBoxItem(item_widget)
     
     super().add_item(item)
-    
-    item.widget.connect('size-allocate', self._on_item_widget_size_allocate, item)
-    
-    if index is None:
-      item.label.set_label(self._get_item_name(len(self._items)))
-    
+
     if index is not None:
       with self._locker.lock_temp('emit_array_box_changed_on_reorder'):
         self.reorder_item(item, index)
     
     if self._locker.is_unlocked('update_spin_button'):
       with self._locker.lock_temp('emit_size_spin_button_value_changed'):
-        self._size_spin_button.spin(gtk.SPIN_STEP_FORWARD, increment=1)
+        self._size_spin_button.spin(Gtk.SpinType.STEP_FORWARD, increment=1)
     
     return item
   
@@ -365,8 +383,6 @@ class ArrayBox(ItemBox):
     processed_new_position = super().reorder_item(item, new_position)
     
     self.on_reorder_item(orig_position, processed_new_position)
-    
-    self._rename_item_names(min(orig_position, processed_new_position))
     
     if self._locker.is_unlocked('emit_array_box_changed_on_reorder'):
       self.emit('array-box-changed')
@@ -378,7 +394,7 @@ class ArrayBox(ItemBox):
     
     if self._locker.is_unlocked('update_spin_button'):
       with self._locker.lock_temp('emit_size_spin_button_value_changed'):
-        self._size_spin_button.spin(gtk.SPIN_STEP_BACKWARD, increment=1)
+        self._size_spin_button.spin(Gtk.SpinType.STEP_BACKWARD, increment=1)
     
     item_position = self._get_item_position(item)
     
@@ -389,8 +405,6 @@ class ArrayBox(ItemBox):
       del self._items_allocations[item]
     
     self.on_remove_item(item_position)
-    
-    self._rename_item_names(item_position)
   
   def set_values(self, values):
     self._locker.lock('emit_size_spin_button_value_changed')
@@ -453,104 +467,14 @@ class ArrayBox(ItemBox):
     should_emit_signal = (
       len(self._items) > self._min_size
       or self._locker.is_locked('prevent_removal_below_min_size'))
-    
+
+    # noinspection PyProtectedMember
     super()._on_item_button_remove_clicked(button, item)
     
     if should_emit_signal:
       self.emit('array-box-changed')
     
     self._locker.unlock('emit_size_spin_button_value_changed')
-  
-  def _on_item_widget_size_allocate(self, item_widget, allocation, item):
-    if item in self._items_allocations:
-      self._update_width(allocation.width - self._items_allocations[item].width)
-      self._update_height(allocation.height - self._items_allocations[item].height)
-    else:
-      self._update_width(allocation.width)
-      self._update_height(allocation.height + self._item_spacing)
-    
-    self._items_allocations[item] = allocation
-  
-  def _update_width(self, width_diff):
-    if self._items_total_width is None:
-      self._items_total_width = self.get_allocation().width
-    
-    if width_diff != 0:
-      self._update_dimension(
-        width_diff,
-        self._items_total_width,
-        self.max_width,
-        'width-request')
-      
-      self._items_total_width = self._items_total_width + width_diff
-  
-  def _update_height(self, height_diff):
-    if self._items_total_height is None:
-      self._items_total_height = self.get_allocation().height
-    
-    if height_diff != 0:
-      self._update_dimension(
-        height_diff,
-        self._items_total_height,
-        self.max_height,
-        'height-request')
-      
-      self._items_total_height = self._items_total_height + height_diff
-  
-  def _update_dimension(
-        self,
-        size_diff,
-        total_size,
-        max_visible_size,
-        dimension_request_property):
-    if max_visible_size is None:
-      is_max_visible_size_unlimited = True
-    else:
-      is_max_visible_size_unlimited = max_visible_size <= 0
-    
-    if not is_max_visible_size_unlimited:
-      visible_size = min(total_size, max_visible_size)
-    else:
-      visible_size = total_size
-    
-    if (is_max_visible_size_unlimited
-        or (visible_size + size_diff <= max_visible_size
-            and total_size < max_visible_size)):
-      new_size = visible_size + size_diff
-    elif total_size >= max_visible_size and size_diff < 0:
-      if total_size + size_diff < max_visible_size:
-        new_size = total_size + size_diff
-      else:
-        new_size = max_visible_size
-    else:
-      new_size = max_visible_size
-    
-    if max_visible_size is not None:
-      self.set_property(dimension_request_property, new_size)
-  
-  def _rename_item_names(self, start_index):
-    for index, item in enumerate(self._items[start_index:]):
-      item.label.set_label(self._get_item_name(index + 1 + start_index))
-  
-  @staticmethod
-  def _get_item_name(index):
-    return _('Element') + ' ' + str(index)
-
-
-class _ArrayBoxItem(ItemBoxItem):
-  
-  def __init__(self, item_widget):
-    super().__init__(item_widget)
-    
-    self._label = gtk.Label()
-    self._label.show()
-    
-    self._hbox.pack_start(self._label, False, False, 0)
-    self._hbox.reorder_child(self._label, 0)
-  
-  @property
-  def label(self):
-    return self._label
 
 
 class _ActionLocker:
