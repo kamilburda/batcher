@@ -1,6 +1,9 @@
 """Class modifying `gtk.Entry` instances to expand/shrink in width dynamically.
 """
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from gi.repository import Pango
 
 __all__ = [
@@ -9,21 +12,21 @@ __all__ = [
 
 
 class EntryExpander:
-  """
-  This class enables the specified `gtk.Entry` to have a flexible width, bounded
-  by the specified minimum and maximum number of characters (width in
-  characters).
+  """Class allowing the specified `gtk.Entry` instance to have a flexible width.
+
+  The width is bounded by the specified minimum and maximum number of
+  characters.
   """
   
-  def __init__(self, entry, minimum_width_chars, maximum_width_chars):
+  def __init__(self, entry: Gtk.Entry, minimum_width_chars: int, maximum_width_chars: int):
     self._entry = entry
     self._minimum_width_chars = minimum_width_chars
     self._maximum_width_chars = maximum_width_chars
     
     if self._minimum_width_chars > self._maximum_width_chars:
       raise ValueError(
-        'minimum width in characters ({0}) cannot be greater than maximum ({1})'.format(
-          self._minimum_width_chars, self._maximum_width_chars))
+        (f'minimum width in characters ({self._minimum_width_chars})'
+         f' cannot be greater than maximum ({self._maximum_width_chars})'))
     
     self._minimum_width = -1
     self._maximum_width = -1
@@ -42,14 +45,13 @@ class EntryExpander:
     if self._minimum_width == -1:
       self._minimum_width = self._entry.get_allocation().width
       self._maximum_width = (
-        int((self._minimum_width / self._minimum_width_chars)
-            * self._maximum_width_chars)
+        int((self._minimum_width / self._minimum_width_chars) * self._maximum_width_chars)
         + 1)
     
     self._update_entry_width()
   
   def _update_entry_width(self):
-    self._pango_layout.set_text(self._entry.get_text())
+    self._pango_layout.set_text(self._entry.get_text(), -1)
     
     offset_pixel_width = (
       (self._entry.get_layout_offsets()[0] + self._entry.get_property('scroll-offset'))
