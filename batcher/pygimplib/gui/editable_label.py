@@ -1,5 +1,7 @@
 """Widget containing a text label that can be optionally edited."""
 
+from typing import Optional
+
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
@@ -13,39 +15,43 @@ __all__ = [
 
 
 class EditableLabel(Gtk.Box):
-  """
-  This class is a GTK widget that displays a label and an edit button to allow
-  editing the label. Pressing `Enter` or focusing out of the editable text entry
+  """Class that displays a label and an edit button to allow editing the label.
+
+  Pressing the ``Enter`` key or focusing out of the editable text entry
   displays the label again.
   
   Signals:
-  
-  * `'changed'` - The user finished editing the label text.
+    changed: The user finished editing the label text.
   """
   
   _LABEL_EDIT_BUTTON_SPACING = 4
   
   __gsignals__ = {'changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
   
-  def __init__(self, text=None, **kwargs):
+  def __init__(self, text: Optional[str] = None, **kwargs):
     super().__init__(self, **kwargs)
     
-    self._label = gtk.Label(text)
-    self._label.set_alignment(0.0, 0.5)
+    self._label = Gtk.Label(
+      label=text,
+      xalign=0.0,
+      yalign=0.5,
+    )
     self._label.show_all()
     self._label.set_no_show_all(True)
 
-    self._button_edit = Gtk.Button.new()
+    self._button_edit = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
     self._button_edit.set_image(
       Gtk.Image.new_from_icon_name(GimpUi.ICON_EDIT, Gtk.IconSize.BUTTON))
-    self._button_edit.set_relief(gtk.RELIEF_NONE)
     
-    self._hbox = gtk.HBox(homogeneous=False)
-    self._hbox.set_spacing(self._LABEL_EDIT_BUTTON_SPACING)
+    self._hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      homogeneous=False,
+      spacing=self._LABEL_EDIT_BUTTON_SPACING,
+    )
     self._hbox.pack_start(self._label, True, True, 0)
     self._hbox.pack_start(self._button_edit, False, False, 0)
     
-    self._entry = gtk.Entry()
+    self._entry = Gtk.Entry()
     self._entry.show_all()
     self._entry.set_no_show_all(True)
     
