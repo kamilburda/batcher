@@ -215,7 +215,7 @@ class ItemBoxItem:
   
   @staticmethod
   def _setup_button(icon_name, position, hbox):
-    button = Gtk.Button.new()
+    button = Gtk.Button()
     button.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON))
     button.set_relief(Gtk.ReliefStyle.NONE)
     

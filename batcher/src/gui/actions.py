@@ -149,7 +149,7 @@ class ActionBox(pg.gui.ItemBox):
       
       self._button_add.add(button_hbox)
     else:
-      self._button_add = Gtk.Button.new()
+      self._button_add = Gtk.Button()
       self._button_add.set_image(
         Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.BUTTON))
     

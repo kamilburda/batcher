@@ -263,7 +263,7 @@ class ImagePreview(preview_base_.Preview):
     self._menu_settings.append(self._menu_item_update_automatically)
     self._menu_settings.show_all()
     
-    self._button_refresh = Gtk.Button.new()
+    self._button_refresh = Gtk.Button()
     self._button_refresh.set_image(
       Gtk.Image.new_from_icon_name('view-refresh', Gtk.IconSize.BUTTON))
     self._button_refresh.set_tooltip_text(_('Update Preview'))
