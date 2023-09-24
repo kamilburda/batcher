@@ -11,29 +11,27 @@ __all__ = [
 
 
 class CellRendererTextList(Gtk.CellRendererText):
-  """
-  This is a custom text-based cell renderer that can accept a list of strings.
-  """
+  """Custom text-based cell renderer that can accept a list of strings."""
   
   __gproperties__ = {
     'text-list': (
       GObject.TYPE_PYOBJECT,
       'list of strings',
       'List of strings to render',
-      GObject.PARAM_READWRITE
+      GObject.PARAM_READWRITE,
     ),
     'markup-list': (
       GObject.TYPE_PYOBJECT,
       'list of strings in markup',
       'List of strings with markup to render',
-      GObject.PARAM_WRITABLE
+      GObject.PARAM_WRITABLE,
     ),
     'text-list-separator': (
       GObject.TYPE_STRING,
       'separator for list of strings',
       'Text separator for the list of strings ("text-list" and "markup-list" properties)',
       ', ',     # Default value
-      GObject.PARAM_READWRITE
+      GObject.PARAM_READWRITE,
     ),
   }
   
@@ -49,7 +47,7 @@ class CellRendererTextList(Gtk.CellRendererText):
     if hasattr(self, attr_name):
       return getattr(self, attr_name)
     else:
-      return gtk.CellRendererText.get_property(self, property_.name)
+      return Gtk.CellRendererText.get_property(self, property_.name)
   
   def do_set_property(self, property_, value):
     attr_name = self._property_name_to_attr(property_.name)
@@ -63,17 +61,16 @@ class CellRendererTextList(Gtk.CellRendererText):
       self._evaluate_text_property(property_.name)
   
   def _evaluate_text_property(self, property_name):
-    """
-    Change the 'text' or 'markup' property according to the value of
-    'text-list', 'markup-list' and 'text-list-separator' properties.
+    """Changes the ``'text'`` or ``'markup'`` property according to the value of
+    ``'text-list'``, ``'markup-list'`` and ``'text-list-separator'`` properties.
     """
     def _set_text():
       new_text = self.text_list_separator.join(self.text_list)
-      gtk.CellRendererText.set_property(self, 'text', new_text)
+      Gtk.CellRendererText.set_property(self, 'text', new_text)
     
     def _set_markup():
       new_text = self.text_list_separator.join(self.markup_list)
-      gtk.CellRendererText.set_property(self, 'markup', new_text)
+      Gtk.CellRendererText.set_property(self, 'markup', new_text)
     
     if property_name == 'text-list':
       _set_text()
