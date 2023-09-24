@@ -1,8 +1,11 @@
 """Undo context for GTK text entries."""
 
 import collections
+from typing import List, Tuple
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -12,23 +15,20 @@ __all__ = [
 
 
 class EntryUndoContext:
-  """
-  This class adds undo/redo capabilities to a `gtk.Entry` object.
+  """Class adding undo/redo capabilities to a `gtk.Entry` instance."""
   
-  Attributes:
-  
-  * `undo_enabled` - If `True`, add user actions (insert text, delete text) to
-    the undo history.
-  """
-  
-  _ActionData = collections.namedtuple('_ActionData', ['action_type', 'position', 'text'])
+  _ActionData = collections.namedtuple(
+    '_ActionData', ['action_type', 'position', 'text'])
   
   _ACTION_TYPES = ['insert', 'delete']
   
-  def __init__(self, entry):
+  def __init__(self, entry: Gtk.Entry):
     self._entry = entry
     
     self.undo_enabled = True
+    """If ``True``, user actions (insert text, delete text) are added to the
+    undo history.
+    """
     
     self._undo_stack = []
     self._redo_stack = []
@@ -72,29 +72,30 @@ class EntryUndoContext:
           last_action_data.position + len(last_action_data.text)),
         'delete': lambda last_action_data: last_action_data.position})
   
-  def undo_push(self, undo_push_list):
-    """
-    Manually add changes to the undo history. The changes are treated as one
-    undo group (i.e. a single `undo()` call will undo all specified changes at
-    once).
+  def undo_push(self, undo_push_list: List[Tuple[str, int, str]]):
+    """Manually adds changes to the undo history.
+
+    The changes are treated as one undo group (i.e. a single ``undo()`` call
+    will undo all specified changes at once).
     
     If there are pending changes not yet added to the undo history, they are
-    added first (as a separate undo group), and then the changes specified in
+    added first (as a separate undo group), followed by the changes specified in
     this method.
     
     Calling this method completely removes the redo history.
     
-    Parameters:
-    
-    * `undo_push_list` - List of `(action_type, position, text)` tuples to add
-      as one undo action. `action_type` can be 'insert' for text insertion or
-      'delete' for text deletion (other values raise `ValueError`). `position`
-      is the starting entry cursor position of the changed text. `text` is the
-      changed text.
+    Args:
+      undo_push_list:
+        List of ``(action_type, position, text)`` tuples to add as one undo
+        action. ``action_type`` can be ``'insert'`` for text insertion or
+        ``'delete'`` for text deletion (other values raise ``ValueError``).
+        ``position`` is the starting entry cursor position of the changed
+        text. ``text`` is the changed text.
     
     Raises:
-    
-    * `ValueError` - invalid `action_type`.
+      ValueError:
+        The action type as the first element of the ``undo_push_list`` tuple
+        is not valid.
     """
     self._redo_stack = []
     
@@ -102,15 +103,15 @@ class EntryUndoContext:
     
     for action_type, position, text in undo_push_list:
       if action_type not in self._ACTION_TYPES:
-        raise ValueError('invalid action type "{0}"'.format(action_type))
+        raise ValueError(f'invalid action type "{action_type}"')
       self._last_action_group.append(self._ActionData(action_type, position, text))
     
     self._undo_stack_push()
   
-  def can_undo(self):
+  def can_undo(self) -> bool:
     return bool(self._undo_stack)
   
-  def can_redo(self):
+  def can_redo(self) -> bool:
     return bool(self._redo_stack)
   
   def _on_entry_insert_text(self, entry, new_text, new_text_length, position):
@@ -130,8 +131,8 @@ class EntryUndoContext:
       self._undo_stack_push()
   
   def _on_entry_key_press_event(self, entry, event):
-    if (event.state & gtk.accelerator_get_default_mod_mask()) == gtk.gdk.CONTROL_MASK:
-      key_name = gtk.gdk.keyval_name(gtk.gdk.keyval_to_lower(event.keyval))
+    if (event.state & Gtk.accelerator_get_default_mod_mask()) == Gdk.ModifierType.CONTROL_MASK:
+      key_name = Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval))
       if key_name == 'z':
         self.undo()
         return True
