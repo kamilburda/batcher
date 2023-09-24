@@ -3,6 +3,8 @@
 The widget is used as the default GUI for `setting.ArraySetting` instances.
 """
 
+from __future__ import annotations
+
 import collections
 import contextlib
 from typing import Optional
@@ -66,7 +68,7 @@ class ItemBox(Gtk.ScrolledWindow):
   def items(self):
     return self._items
   
-  def add_item(self, item):
+  def add_item(self, item: ItemBoxItem) -> ItemBoxItem:
     self._vbox_items.pack_start(item.widget, False, False, 0)
     
     item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
@@ -78,7 +80,7 @@ class ItemBox(Gtk.ScrolledWindow):
     
     return item
   
-  def reorder_item(self, item, position):
+  def reorder_item(self, item: ItemBoxItem, position: int) -> int:
     new_position = min(max(position, 0), len(self._items) - 1)
     
     self._items.pop(self._get_item_position(item))
@@ -88,7 +90,7 @@ class ItemBox(Gtk.ScrolledWindow):
     
     return new_position
   
-  def remove_item(self, item):
+  def remove_item(self, item: ItemBoxItem):
     item_position = self._get_item_position(item)
     if item_position < len(self._items) - 1:
       next_item_position = item_position + 1
@@ -139,7 +141,7 @@ class ItemBoxItem:
   _HBOX_BUTTONS_SPACING = 3
   _HBOX_SPACING = 3
   
-  def __init__(self, item_widget):
+  def __init__(self, item_widget: Gtk.Widget):
     self._item_widget = item_widget
     
     self._hbox = Gtk.Box(
@@ -191,15 +193,15 @@ class ItemBoxItem:
     self._hbox_indicator_buttons.set_no_show_all(True)
   
   @property
-  def widget(self):
+  def widget(self) -> Gtk.EventBox:
     return self._event_box
   
   @property
-  def item_widget(self):
+  def item_widget(self) -> Gtk.Widget:
     return self._item_widget
   
   @property
-  def button_remove(self):
+  def button_remove(self) -> Gtk.Button:
     return self._button_remove
   
   def remove_item_widget(self):
@@ -359,7 +361,7 @@ class ArrayBox(ItemBox):
 
     self._size_spin_button.connect('value-changed', self._on_size_spin_button_value_changed)
 
-  def add_item(self, item_value=None, index=None):
+  def add_item(self, item_value=None, index: Optional[int] = None):
     if item_value is None:
       item_value = self._new_item_default_value
     
@@ -379,7 +381,7 @@ class ArrayBox(ItemBox):
     
     return item
   
-  def reorder_item(self, item, new_position):
+  def reorder_item(self, item: ItemBoxItem, new_position: int):
     orig_position = self._get_item_position(item)
     processed_new_position = super().reorder_item(item, new_position)
     
@@ -388,7 +390,7 @@ class ArrayBox(ItemBox):
     if self._locker.is_unlocked('emit_array_box_changed_on_reorder'):
       self.emit('array-box-changed')
   
-  def remove_item(self, item):
+  def remove_item(self, item: ItemBoxItem):
     if (self._locker.is_unlocked('prevent_removal_below_min_size')
         and len(self._items) == self._min_size):
       return
@@ -484,24 +486,24 @@ class _ActionLocker:
     self._tokens = collections.defaultdict(int)
   
   @contextlib.contextmanager
-  def lock_temp(self, key):
+  def lock_temp(self, key: str) -> contextlib.AbstractContextManager:
     self.lock(key)
     try:
       yield
     finally:
       self.unlock(key)
   
-  def lock(self, key):
+  def lock(self, key: str):
     self._tokens[key] += 1
   
-  def unlock(self, key):
+  def unlock(self, key: str):
     if self._tokens[key] > 0:
       self._tokens[key] -= 1
   
-  def is_locked(self, key):
+  def is_locked(self, key: str) -> bool:
     return self._tokens[key] > 0
   
-  def is_unlocked(self, key):
+  def is_unlocked(self, key: str) -> bool:
     return self._tokens[key] == 0
 
 

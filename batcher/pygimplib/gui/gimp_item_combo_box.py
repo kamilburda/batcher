@@ -1,6 +1,7 @@
 """Combo box widget for `gimp.Item` objects."""
 
 import collections
+from typing import Optional
 
 import gi
 from gi.repository import GObject
@@ -90,13 +91,13 @@ class GimpItemComboBox(Gtk.Box):
     
     self._item_types_combo_box.set_active(0)
   
-  def get_active_item(self):
+  def get_active_item(self) -> Optional[Gimp.Item]:
     if self._displayed_item_combo_box is not None:
       return self._displayed_item_combo_box.get_active_item_func()
     else:
       return None
 
-  def set_active_item(self, item):
+  def set_active_item(self, item: Gimp.Item):
     matching_index = 0
 
     for index, combo_box in enumerate(self._item_combo_boxes):
