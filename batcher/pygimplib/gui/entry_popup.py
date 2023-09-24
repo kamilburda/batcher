@@ -254,7 +254,7 @@ class EntryPopup:
     self._scrolled_window.add(self._tree_view)
     
     # HACK: Make sure the height of the tree view can be set properly. Source:
-    # https://github.com/GNOME/gtk/blob/gtk-2-24/gtk/gtkentrycompletion.c#L472
+    # https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/gtkentrycompletion.c#L573
     self._scrolled_window.get_vscrollbar().set_size_request(-1, 0)
     
     # `Gtk.WindowType.POPUP` prevents the popup from stealing focus from the text entry.
