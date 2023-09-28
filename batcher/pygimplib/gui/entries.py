@@ -749,6 +749,7 @@ class FileExtensionEntry(ExtendedEntry):
 
     style_context = self._popup.tree_view.get_style_context()
 
+    # FIXME: Remove deprecation
     bg_color = self._color_to_string(
       style_context.get_background_color(Gtk.StateFlags.SELECTED))
     fg_color = self._color_to_string(
