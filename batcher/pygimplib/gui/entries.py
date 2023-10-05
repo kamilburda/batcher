@@ -275,7 +275,6 @@ class FilenamePatternEntry(ExtendedEntry):
       type=Gtk.WindowType.POPUP,
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
-      name='gtk-tooltips',  # This copies the style of GTK tooltips
     )
     
     self._field_tooltip_text = Gtk.Label(
