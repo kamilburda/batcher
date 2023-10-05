@@ -725,14 +725,6 @@ class NamePreview(preview_base_.Preview):
     
     self._row_select_interactive = True
   
-  def _set_cursor(self, previous_cursor=None):
-    self._row_select_interactive = False
-    
-    if previous_cursor is not None and self._tree_model.get_iter(previous_cursor) is not None:
-      self._tree_view.set_cursor(previous_cursor)
-    
-    self._row_select_interactive = True
-  
   def _set_initial_scroll_to_selection(self):
     if self._selected_items:
       tree_iter = self._tree_iters[self._selected_items[0]]
