@@ -429,8 +429,8 @@ class NamePreview(preview_base_.Preview):
       if self._tags_menu_relative_position is not None:
         window_absolute_position = window.get_window().get_origin()
         popup.move(
-          window_absolute_position[0] + self._tags_menu_relative_position[0],
-          window_absolute_position[1] + self._tags_menu_relative_position[1])
+          window_absolute_position.x + self._tags_menu_relative_position[0],
+          window_absolute_position.y + self._tags_menu_relative_position[1])
         
         self._tags_menu_relative_position = None
     
