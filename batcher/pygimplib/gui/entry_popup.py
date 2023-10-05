@@ -168,11 +168,11 @@ class EntryPopup:
       self._rows_filtered.emit('row-changed', row_path, self._rows_filtered.get_iter(row_path))
   
   def select_row(self, row_num: int):
-    self._tree_view.set_cursor((row_num,))
+    self._tree_view.set_cursor(Gtk.TreePath.new_from_indices([row_num]))
   
   def unselect(self):
     # Select an invalid row so that `get_cursor` returns None on the next call.
-    self.tree_view.set_cursor((len(self._rows_filtered),))
+    self.tree_view.set_cursor(Gtk.TreePath.new_from_indices([len(self._rows_filtered)]))
     self.tree_view.get_selection().unselect_all()
   
   def assign_from_selected_row(self):
@@ -298,16 +298,16 @@ class EntryPopup:
       toplevel_window_position = toplevel_window.get_window().get_origin()
       widget_allocation = widget.get_allocation()
       return (
-        toplevel_window_position[0] + widget_allocation.x,
-        toplevel_window_position[1] + widget_allocation.y + widget_allocation.height)
+        toplevel_window_position.x + widget_allocation.x,
+        toplevel_window_position.y + widget_allocation.y + widget_allocation.height)
     else:
       return None
 
-  def _filter_rows(self, rows, row_iter):
+  def _filter_rows(self, rows, row_iter, data):
     if self._clear_filter:
       return True
     else:
-      return self._filter_rows_func(rows, row_iter)
+      return self._filter_rows_func(rows, row_iter, data)
   
   def _on_entry_key_press_event(self, entry, event):
     key_name = Gdk.keyval_name(event.keyval)

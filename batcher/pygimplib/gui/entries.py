@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-class ExtendedEntry(Gtk.Entry):
+class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   """Subclass of `Gtk.Entry` with additional capabilities.
 
   Additional features include:
@@ -117,7 +117,7 @@ class ExtendedEntry(Gtk.Entry):
       self._popup.trigger_popup = False
     if not enable_undo:
       self._undo_context.undo_enabled = False
-    
+
     self.set_text(text)
     
     if not enable_undo:
@@ -141,7 +141,8 @@ class ExtendedEntry(Gtk.Entry):
       self._has_placeholder_text_assigned = False
       self._modify_font_for_placeholder_text(Gtk.StateFlags.NORMAL, Pango.Style.NORMAL)
       self._do_assign_text('')
-      self._popup.save_last_value()
+      if self._popup is not None:
+        self._popup.save_last_value()
   
   def _modify_font_for_placeholder_text(self, state_for_color, style):
     font_description = self.get_pango_context().get_font_description()
@@ -203,8 +204,8 @@ class FilenamePatternEntry(ExtendedEntry):
         argument replaces the ``placeholder_text`` parameter from
         `ExtendedEntry.__init__()`.
       **kwargs:
-        Additional keyword arguments that can be passed to the parent class
-        constructor.
+        Additional keyword arguments that can be passed to the parent class'
+        `__init__()` method.
     """
     self._default_item_value = default_item
     
@@ -361,15 +362,15 @@ class FilenamePatternEntry(ExtendedEntry):
         self._pango_layout.get_pixel_size()[0] + self.get_layout_offsets()[0],
         max(self.get_allocation().width - window.get_allocation().width, 0))
       
-      x = entry_absolute_position[0] + x_offset
+      x = entry_absolute_position.x + x_offset
     else:
-      x = entry_absolute_position[0]
+      x = entry_absolute_position.x
     
     if not place_above:
-      y = entry_absolute_position[1] + self.get_allocation().height
+      y = entry_absolute_position.y + self.get_allocation().height
     else:
-      y = entry_absolute_position[1] - window.get_allocation().height
-    
+      y = entry_absolute_position.y - window.get_allocation().height
+
     window.move(x, y)
   
   def _on_filename_pattern_entry_changed(self, entry):
@@ -379,7 +380,7 @@ class FilenamePatternEntry(ExtendedEntry):
   def _on_filename_pattern_entry_focus_out_event(self, entry, event):
     self._hide_field_tooltip()
   
-  def _filter_suggested_items(self, suggested_items, row_iter):
+  def _filter_suggested_items(self, suggested_items, row_iter, data=None):
     item = suggested_items[row_iter][self._COLUMN_ITEMS_TO_INSERT]
     current_text = self.get_text()
     
@@ -477,6 +478,13 @@ class FileExtensionEntry(ExtendedEntry):
   _COLUMN_TYPES = [GObject.TYPE_STRING, GObject.TYPE_STRV]
   
   def __init__(self, **kwargs):
+    """Initializes a `FileExtensionEntry` instance.
+
+    Args:
+      **kwargs:
+        Additional keyword arguments that can be passed to the parent class'
+        `__init__()` method.
+    """
     super().__init__(**kwargs)
     
     self._tree_view_columns_rects = []
@@ -486,7 +494,8 @@ class FileExtensionEntry(ExtendedEntry):
     
     self._highlighted_extension_row = None
     self._highlighted_extension_index = None
-    self._highlighted_extension = None
+    self._highlighted_extension = ''
+    self._is_modifying_highlight = False
     
     self._extensions_separator_text_pixel_size = None
     self._extensions_text_pixel_rects = []
@@ -509,7 +518,7 @@ class FileExtensionEntry(ExtendedEntry):
       'motion-notify-event', self._on_tree_view_motion_notify_event)
     self._popup.tree_view.connect_after('realize', self._on_after_tree_view_realize)
     self._popup.tree_view.get_selection().connect('changed', self._on_tree_selection_changed)
-  
+
   @property
   def popup(self) -> entry_popup_.EntryPopup:
     """`entry_popup.EntryPopup` instance serving as the popup."""
@@ -543,7 +552,8 @@ class FileExtensionEntry(ExtendedEntry):
     self._fill_extensions_text_pixel_rects()
     
     self._tree_view_columns_rects = [
-      self._popup.tree_view.get_cell_area((0,), self._popup.tree_view.get_column(column))
+      self._popup.tree_view.get_cell_area(
+        Gtk.TreePath.new_from_indices([0]), self._popup.tree_view.get_column(column))
       for column in self._COLUMNS]
   
   def _fill_extensions_text_pixel_rects(self):
@@ -578,12 +588,15 @@ class FileExtensionEntry(ExtendedEntry):
   def _on_tree_selection_changed(self, tree_selection):
     self._unhighlight_extension()
   
-  def _filter_file_formats(self, file_formats, row_iter):
+  def _filter_file_formats(self, file_formats, row_iter, data=None):
     return self._entry_text_matches_row(self.get_text(), file_formats, row_iter)
   
   def _entry_text_matches_row(self, entry_text, file_formats, row_iter, full_match=False):
+    if self._is_modifying_highlight:
+      return True
+
     extensions = file_formats[row_iter][self._COLUMN_EXTENSIONS]
-    
+
     if full_match:
       return any(entry_text.lower() == extension.lower() for extension in extensions)
     else:
@@ -691,7 +704,7 @@ class FileExtensionEntry(ExtendedEntry):
   def _highlight_extension_at_pos(self, x, y):
     is_in_extensions_column = x >= self._tree_view_columns_rects[self._COLUMN_EXTENSIONS].x
     if not is_in_extensions_column:
-      if self._highlighted_extension is not None:
+      if self._highlighted_extension:
         self._unhighlight_extension()
       return
     
@@ -743,22 +756,27 @@ class FileExtensionEntry(ExtendedEntry):
       self._popup.refresh_row(selected_row_path)
   
   def _do_highlight_extension(self):
-    extensions = self._popup.rows[self._highlighted_extension_row][self._COLUMN_EXTENSIONS]
+    self._is_modifying_highlight = True
+
+    highlighted_row = self._highlighted_extension_row
+    highlighted_extension_index = self._highlighted_extension_index
+    extensions = self._popup.rows[highlighted_row][self._COLUMN_EXTENSIONS]
     
-    self._highlighted_extension = extensions[self._highlighted_extension_index]
+    self._highlighted_extension = extensions[highlighted_extension_index]
 
     style_context = self._popup.tree_view.get_style_context()
-
     # FIXME: Remove deprecation
-    bg_color = self._color_to_string(
-      style_context.get_background_color(Gtk.StateFlags.SELECTED))
-    fg_color = self._color_to_string(
-      style_context.get_color(Gtk.StateFlags.SELECTED))
-    
-    extensions[self._highlighted_extension_index] = (
+    bg_color = self._color_to_string(style_context.get_background_color(Gtk.StateFlags.NORMAL))
+    fg_color = self._color_to_string(style_context.get_color(Gtk.StateFlags.NORMAL))
+
+    extensions[highlighted_extension_index] = (
       (f'<span background="{bg_color}" foreground="{fg_color}">'
-       f'{extensions[self._highlighted_extension_index]}'
+       f'{extensions[highlighted_extension_index]}'
        '</span>'))
+
+    self._popup.rows[highlighted_row][self._COLUMN_EXTENSIONS] = extensions
+
+    self._is_modifying_highlight = False
 
   @staticmethod
   def _color_to_string(color):
@@ -773,7 +791,8 @@ class FileExtensionEntry(ExtendedEntry):
     self._do_unhighlight_extension()
     
     if self._highlighted_extension_row is not None:
-      self._popup.refresh_row((self._highlighted_extension_row,), is_path_filtered=False)
+      self._popup.refresh_row(
+        Gtk.TreePath.new_from_indices([self._highlighted_extension_row]), is_path_filtered=False)
     
     self._highlighted_extension_row = None
     self._highlighted_extension_index = None
@@ -782,9 +801,14 @@ class FileExtensionEntry(ExtendedEntry):
     if (self._highlighted_extension_row is not None
         and self._highlighted_extension_index is not None):
       extensions = self._popup.rows[self._highlighted_extension_row][self._COLUMN_EXTENSIONS]
-      if self._highlighted_extension is not None:
+      if self._highlighted_extension:
+        self._is_modifying_highlight = True
+
         extensions[self._highlighted_extension_index] = self._highlighted_extension
-        self._highlighted_extension = None
+        self._popup.rows[self._highlighted_extension_row][self._COLUMN_EXTENSIONS] = extensions
+
+        self._is_modifying_highlight = False
+        self._highlighted_extension = ''
 
   @staticmethod
   def _get_file_formats(file_formats):

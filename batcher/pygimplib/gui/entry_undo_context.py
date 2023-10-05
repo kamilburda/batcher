@@ -117,6 +117,8 @@ class EntryUndoContext:
   def _on_entry_insert_text(self, entry, new_text, new_text_length, position):
     if self.undo_enabled and new_text:
       self._on_entry_action(entry.get_position(), new_text, 'insert')
+
+    return entry.get_position() + len(new_text)
    
   def _on_entry_delete_text(self, entry, start, end):
     if self.undo_enabled:
@@ -139,6 +141,8 @@ class EntryUndoContext:
       elif key_name == 'y':
         self.redo()
         return True
+
+    return False
   
   def _on_entry_action(self, position, text, action_type):
     self._redo_stack = []

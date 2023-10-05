@@ -15,13 +15,13 @@ class CellRendererTextList(Gtk.CellRendererText):
   
   __gproperties__ = {
     'text-list': (
-      GObject.TYPE_PYOBJECT,
+      GObject.TYPE_STRV,
       'list of strings',
       'List of strings to render',
       GObject.PARAM_READWRITE,
     ),
     'markup-list': (
-      GObject.TYPE_PYOBJECT,
+      GObject.TYPE_STRV,
       'list of strings in markup',
       'List of strings with markup to render',
       GObject.PARAM_WRITABLE,
@@ -38,8 +38,8 @@ class CellRendererTextList(Gtk.CellRendererText):
   def __init__(self):
     super().__init__()
     
-    self.text_list = None
-    self.markup_list = None
+    self.text_list = []
+    self.markup_list = []
     self.text_list_separator = ', '
   
   def do_get_property(self, property_):
@@ -74,14 +74,14 @@ class CellRendererTextList(Gtk.CellRendererText):
     
     if property_name == 'text-list':
       _set_text()
-      self.markup_list = None
+      self.markup_list = []
     elif property_name == 'markup-list':
       _set_markup()
-      self.text_list = None
+      self.text_list = []
     elif property_name == 'text-list-separator':
-      if self.text_list is not None:
+      if self.text_list:
         _set_text()
-      elif self.markup_list is not None:
+      elif self.markup_list:
         _set_markup()
   
   @staticmethod
