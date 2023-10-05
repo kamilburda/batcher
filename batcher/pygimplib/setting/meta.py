@@ -5,8 +5,6 @@ import functools
 import inspect
 import re
 
-from .. import utils as pgutils
-
 
 class _TypeMap:
   
@@ -58,9 +56,9 @@ class _TypeMap:
     return name in self._name_to_type_map
   
   def _get_error_message(self, value):
-    error_message = 'unrecognized type "{}"'.format(value)
+    error_message = f'unrecognized type "{value}"'
     if self._description:
-      error_message += '; are you sure this is a {}?'.format(self._description)
+      error_message += f'; are you sure this is a {self._description}?'
     
     return error_message
 
@@ -106,8 +104,7 @@ class SettingMeta(type):
     @functools.wraps(orig_init)
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
-        raise TypeError('cannot initialize abstract setting class "{}"'.format(
-          type(self).__qualname__))
+        raise TypeError(f'cannot initialize abstract setting class "{type(self).__qualname__}"')
       
       # This check prevents a parent class' `__init__()` from overriding the
       # contents of `_dict_on_init`, which may have different arguments.
@@ -121,7 +118,7 @@ class SettingMeta(type):
         if inspect.getargspec(orig_init)[1] is not None:
           raise TypeError(
             ('__init__ in Setting subclasses cannot accept variable positional arguments'
-             ' (found in "{}")').format(type(self).__qualname__))
+             f' (found in "{type(self).__qualname__}")'))
       
       orig_init(self, *args, **kwargs)
     
@@ -197,14 +194,14 @@ class PresenterMeta(type):
     @functools.wraps(orig_init)
     def init_wrapper(self, *args, **kwargs):
       if getattr(self, '_ABSTRACT', False):
-        raise TypeError('cannot initialize abstract presenter class "{}"'.format(
-          type(self).__qualname__))
+        raise TypeError(f'cannot initialize abstract presenter class "{type(self).__qualname__}"')
       
       orig_init(self, *args, **kwargs)
     
     return init_wrapper
 
 
+# noinspection PyProtectedMember
 def _set_init_wrapper(mcls, namespace):
   # Only wrap `__init__` if the (sub)class defines or overrides it.
   # Otherwise, the argument list of `__init__` for a subclass would be
@@ -218,6 +215,7 @@ def _handle_abstract_attribute(namespace):
     namespace['_ABSTRACT'] = False
 
 
+# noinspection PyProtectedMember
 def _register_type_and_aliases(namespace, cls, type_name, type_map, base_class_name):
   human_readable_name = _get_human_readable_class_name(type_name, base_class_name)
   
@@ -232,14 +230,13 @@ def _register_type_and_aliases(namespace, cls, type_name, type_map, base_class_n
             type_map._name_to_type_map[alias] = cls
           else:
             raise TypeError(
-              'alias "{}" matches a {} class name or is already specified'.format(
-                alias, base_class_name))
+              f'alias "{alias}" matches a {base_class_name} class name or is already specified')
           
           type_map._type_to_names_map[cls].append(alias)
   else:
     raise TypeError(
-      'Setting subclass with the name "{}" already exists ({})'.format(
-        cls.__qualname__, type_map._name_to_type_map[human_readable_name]))
+      (f'Setting subclass with the name "{cls.__qualname__}"'
+       f' already exists ({type_map._name_to_type_map[human_readable_name]})'))
 
 
 def _get_human_readable_class_name(name, suffix_to_strip=None):
