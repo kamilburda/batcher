@@ -1569,7 +1569,7 @@ class ColorSetting(Setting):
   _ALLOWED_PDB_TYPES = [SettingPdbTypes.color]
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.color_button]
   # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: gimpcolor.RGB(0, 0, 0)
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
   
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid color.')
@@ -1584,7 +1584,7 @@ class ColorSetting(Setting):
     return [int(value.r * 255), int(value.g * 255), int(value.b * 255), int(value.a * 255)]
   
   def _validate(self, color):
-    if not isinstance(color, gimpcolor.RGB):
+    if not isinstance(color, Gimp.RGB):
       raise SettingValueError(
         utils_.value_to_str_prefix(color) + self.error_messages['invalid_value'])
 
