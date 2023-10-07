@@ -6,7 +6,7 @@ from .editable_label import *
 from .entries import *
 from .entry_expander import *
 from .entry_popup import *
-from .entry_undo_context import *
+from .entry_undo import *
 from .gimp_item_combo_box import *
 from .item_box import *
 from .overwrite_chooser import *

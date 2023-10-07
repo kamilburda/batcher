@@ -1,4 +1,4 @@
-"""Undo context for GTK text entries."""
+"""Undo/redo capability for `Gtk.Entry` instances."""
 
 import collections
 from typing import List, Tuple
@@ -10,11 +10,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 __all__ = [
-  'EntryUndoContext',
+  'EntryUndoMixin',
 ]
 
 
-class EntryUndoContext:
+class EntryUndoMixin:
   """Class adding undo/redo capabilities to a `gtk.Entry` instance."""
   
   _ActionData = collections.namedtuple(

@@ -18,7 +18,7 @@ from .. import path as pgpath
 from . import cell_renderers as cell_renderers_
 from . import entry_expander as entry_expander_
 from . import entry_popup as entry_popup_
-from . import entry_undo_context as entry_undo_context_
+from . import entry_undo as entry_undo_
 
 __all__ = [
   'ExtendedEntry',
@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_context_.EntryUndoContext):
+class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_.EntryUndoMixin):
   """Subclass of `Gtk.Entry` with additional capabilities.
 
   Additional features include:
@@ -60,7 +60,7 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_context_.EntryUndoContex
         constructor.
     """
     Gtk.Entry.__init__(self, **kwargs)
-    entry_undo_context_.EntryUndoContext.__init__(self)
+    entry_undo_.EntryUndoMixin.__init__(self)
 
     self._minimum_width_chars = minimum_width_chars
     self._maximum_width_chars = maximum_width_chars
