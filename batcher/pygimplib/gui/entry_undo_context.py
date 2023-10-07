@@ -22,9 +22,7 @@ class EntryUndoContext:
   
   _ACTION_TYPES = ['insert', 'delete']
   
-  def __init__(self, entry: Gtk.Entry):
-    self._entry = entry
-    
+  def __init__(self):
     self.undo_enabled = True
     """If ``True``, user actions (insert text, delete text) are added to the
     undo history.
@@ -37,20 +35,34 @@ class EntryUndoContext:
     self._last_action_type = None
     
     self._cursor_changed_by_action = False
-    
-    self._entry.connect('insert-text', self._on_entry_insert_text)
-    self._entry.connect('delete-text', self._on_entry_delete_text)
-    self._entry.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
-    self._entry.connect('key-press-event', self._on_entry_key_press_event)
-  
+
+    self.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
+    self.connect('key-press-event', self._on_entry_key_press_event)
+
+  def do_insert_text(self, new_text, new_text_length, position):
+    if self.undo_enabled and new_text:
+      self._on_entry_action(self.get_position(), new_text, 'insert')
+
+    self.get_buffer().insert_text(position, new_text, new_text_length)
+
+    return position + new_text_length
+
+  def do_delete_text(self, start_pos, end_pos):
+    if self.undo_enabled:
+      text_to_delete = self.get_text()[start_pos:end_pos]
+      if text_to_delete:
+        self._on_entry_action(start_pos, text_to_delete, 'delete')
+
+    self.get_buffer().delete_text(start_pos, end_pos)
+
   def undo(self):
     self._undo_redo(
       self._undo_stack,
       self._redo_stack,
       action_handlers={
-        'insert': lambda action_data: self._entry.delete_text(
+        'insert': lambda action_data: self.delete_text(
           action_data.position, action_data.position + len(action_data.text)),
-        'delete': lambda action_data: self._entry.insert_text(
+        'delete': lambda action_data: self.insert_text(
           action_data.text, action_data.position)},
       action_handlers_get_cursor_position={
         'insert': lambda last_action_data: last_action_data.position,
@@ -63,9 +75,9 @@ class EntryUndoContext:
       self._redo_stack,
       self._undo_stack,
       action_handlers={
-        'insert': lambda action_data: self._entry.insert_text(
+        'insert': lambda action_data: self.insert_text(
           action_data.text, action_data.position),
-        'delete': lambda action_data: self._entry.delete_text(
+        'delete': lambda action_data: self.delete_text(
           action_data.position, action_data.position + len(action_data.text))},
       action_handlers_get_cursor_position={
         'insert': lambda last_action_data: (
@@ -113,18 +125,6 @@ class EntryUndoContext:
   
   def can_redo(self) -> bool:
     return bool(self._redo_stack)
-  
-  def _on_entry_insert_text(self, entry, new_text, new_text_length, position):
-    if self.undo_enabled and new_text:
-      self._on_entry_action(entry.get_position(), new_text, 'insert')
-
-    return entry.get_position() + len(new_text)
-   
-  def _on_entry_delete_text(self, entry, start, end):
-    if self.undo_enabled:
-      text_to_delete = entry.get_text()[start:end]
-      if text_to_delete:
-        self._on_entry_action(start, text_to_delete, 'delete')
   
   def _on_entry_notify_cursor_position(self, entry, property_spec):
     if self._cursor_changed_by_action:
@@ -181,7 +181,7 @@ class EntryUndoContext:
     for action in action_list:
       action_handlers[action.action_type](action)
     
-    self._entry.set_position(
+    self.set_position(
       action_handlers_get_cursor_position[action_list[-1].action_type](action_list[-1]))
     
     self.undo_enabled = True

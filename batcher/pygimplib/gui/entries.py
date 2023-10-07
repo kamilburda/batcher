@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-class ExtendedEntry(Gtk.Entry, Gtk.Editable):
+class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_context_.EntryUndoContext):
   """Subclass of `Gtk.Entry` with additional capabilities.
 
   Additional features include:
@@ -59,13 +59,13 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
         Additional keyword arguments that can be passed to the `Gtk.Entry()`
         constructor.
     """
-    super().__init__(**kwargs)
+    Gtk.Entry.__init__(self, **kwargs)
+    entry_undo_context_.EntryUndoContext.__init__(self)
 
     self._minimum_width_chars = minimum_width_chars
     self._maximum_width_chars = maximum_width_chars
     self._placeholder_text = placeholder_text
 
-    self._undo_context = entry_undo_context_.EntryUndoContext(self)
     self._popup = None
     self._expander = entry_expander_.EntryExpander(
       self, self._minimum_width_chars, self._maximum_width_chars)
@@ -75,13 +75,6 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     self.connect('focus-in-event', self._on_extended_entry_focus_in_event)
     self.connect('focus-out-event', self._on_extended_entry_focus_out_event)
     self.connect_after('realize', self._on_after_extended_entry_realize)
-  
-  @property
-  def undo_context(self) -> entry_undo_context_.EntryUndoContext:
-    """`entry_undo_context.EntryUndoContext` instance to handle undo/redo
-    actions.
-    """
-    return self._undo_context
   
   def assign_text(self, text: str, enable_undo: bool = False):
     """Replaces the current contents of the entry with the specified text.
@@ -116,12 +109,12 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     if self._popup is not None:
       self._popup.trigger_popup = False
     if not enable_undo:
-      self._undo_context.undo_enabled = False
+      self.undo_enabled = False
 
     self.set_text(text)
     
     if not enable_undo:
-      self._undo_context.undo_enabled = True
+      self.undo_enabled = True
     if self._popup is not None:
       self._popup.trigger_popup = True
   
@@ -225,8 +218,7 @@ class FilenamePatternEntry(ExtendedEntry):
         suggested_items[suggested_item_values.index(self._default_item_value)][0])
     
     super().__init__(**kwargs)
-    
-    self._cursor_position = 0
+
     self._cursor_position_before_assigning_from_row = None
     self._reset_cursor_position_before_assigning_from_row = True
     
@@ -247,14 +239,12 @@ class FilenamePatternEntry(ExtendedEntry):
     self._create_field_tooltip()
     
     self._add_columns()
-    
-    self.connect('insert-text', self._on_filename_pattern_entry_insert_text)
-    self.connect('delete-text', self._on_filename_pattern_entry_delete_text)
+
     self.connect(
       'notify::cursor-position', self._on_filename_pattern_entry_notify_cursor_position)
     self.connect('changed', self._on_filename_pattern_entry_changed)
     self.connect('focus-out-event', self._on_filename_pattern_entry_focus_out_event)
-  
+
   @property
   def popup(self) -> entry_popup_.EntryPopup:
     """`entry_popup.EntryPopup` instance serving as the popup."""
@@ -304,16 +294,8 @@ class FilenamePatternEntry(ExtendedEntry):
       ),
     )
   
-  def _on_filename_pattern_entry_insert_text(self, entry, new_text, new_text_length, position):
-    self._cursor_position = self.get_position() + len(new_text)
-  
-  def _on_filename_pattern_entry_delete_text(self, entry, start_pos, end_pos):
-    self._cursor_position = start_pos
-  
   def _on_filename_pattern_entry_notify_cursor_position(self, entry, property_spec):
-    self._cursor_position = self.get_position()
-    
-    field = pgpath.StringPattern.get_field_at_position(self.get_text(), self._cursor_position)
+    field = pgpath.StringPattern.get_field_at_position(self.get_text(), self.get_position())
     
     if field is None:
       self._hide_field_tooltip()
@@ -354,7 +336,7 @@ class FilenamePatternEntry(ExtendedEntry):
     entry_absolute_position = self.get_window().get_origin()
     
     if move_with_text_cursor:
-      text_up_to_cursor_position = self.get_text()[:self._cursor_position]
+      text_up_to_cursor_position = self.get_text()[:self.get_position()]
       self._pango_layout.set_text(text_up_to_cursor_position)
       
       x_offset = min(
@@ -381,17 +363,20 @@ class FilenamePatternEntry(ExtendedEntry):
   
   def _filter_suggested_items(self, suggested_items, row_iter, data=None):
     item = suggested_items[row_iter][self._COLUMN_ITEMS_TO_INSERT]
+
     current_text = self.get_text()
+    current_position = self.get_position()
     
-    if (0 < self._cursor_position <= len(current_text)
-        and current_text[self._cursor_position - 1] == '[' and item and item[0] != '['):
+    if (0 < current_position <= len(current_text)
+        and current_text[current_position - 1] == '[' and item and item[0] != '['):
       return False
     else:
       return True
   
   def _on_assign_from_selected_row(self, tree_model, selected_tree_iter):
     if self._cursor_position_before_assigning_from_row is None:
-      self._cursor_position_before_assigning_from_row = self._cursor_position
+      self._cursor_position_before_assigning_from_row = self.get_position()
+
     cursor_position = self._cursor_position_before_assigning_from_row
     
     suggested_item = str(tree_model[selected_tree_iter][self._COLUMN_ITEMS_TO_INSERT])
@@ -406,7 +391,7 @@ class FilenamePatternEntry(ExtendedEntry):
        + last_assigned_entry_text[cursor_position:]))
     
     self.set_position(cursor_position + len(suggested_item))
-    self._cursor_position = self.get_position()
+
     self._cursor_position_before_assigning_from_row = cursor_position
     
     return cursor_position, suggested_item
@@ -417,20 +402,19 @@ class FilenamePatternEntry(ExtendedEntry):
     self._reset_cursor_position_before_assigning_from_row = True
     
     if self._cursor_position_before_assigning_from_row is not None:
-      self._cursor_position = self._cursor_position_before_assigning_from_row
-    self.set_position(self._cursor_position)
+      self.set_position(self._cursor_position_before_assigning_from_row)
     self._cursor_position_before_assigning_from_row = None
   
   def _on_entry_changed_condition(self):
     current_text = self.get_text()
+    current_position = self.get_position()
 
     if current_text:
-      if len(current_text) > 1 and len(current_text) >= self._cursor_position:
+      if len(current_text) > 1 and len(current_text) >= current_position:
         return (
-          current_text[self._cursor_position - 1] == '['
-          and current_text[self._cursor_position - 2] != '['
-          and not pgpath.StringPattern.get_field_at_position(
-            current_text, self._cursor_position - 1))
+          current_text[current_position - 1] == '['
+          and current_text[current_position - 2] != '['
+          and not pgpath.StringPattern.get_field_at_position(current_text, current_position - 1))
       else:
         return current_text[0] == '['
     else:
@@ -441,7 +425,7 @@ class FilenamePatternEntry(ExtendedEntry):
     
     position, text = self._popup.assign_from_selected_row()
     if position is not None and text:
-      self.undo_context.undo_push([('insert', position, text)])
+      self.undo_push([('insert', position, text)])
   
   def _on_entry_key_press(self, key_name, tree_path, stop_event_propagation):
     if key_name in ['Return', 'KP_Enter', 'Escape']:
@@ -461,7 +445,7 @@ class FilenamePatternEntry(ExtendedEntry):
       undo_push_list.append(('insert', position, text))
     
     if undo_push_list:
-      self.undo_context.undo_push(undo_push_list)
+      self.undo_push(undo_push_list)
 
 
 class FileExtensionEntry(ExtendedEntry):
@@ -659,7 +643,7 @@ class FileExtensionEntry(ExtendedEntry):
       undo_push_list.append(('insert', position, text))
     
     if undo_push_list:
-      self.undo_context.undo_push(undo_push_list)
+      self.undo_push(undo_push_list)
   
   def _highlight_extension_next(self, selected_row_path):
     def _select_next_extension(highlighted_extension_index, len_extensions):
