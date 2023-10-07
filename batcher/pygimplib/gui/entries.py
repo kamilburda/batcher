@@ -747,28 +747,11 @@ class FileExtensionEntry(ExtendedEntry):
     
     self._highlighted_extension = extensions[highlighted_extension_index]
 
-    style_context = self._popup.tree_view.get_style_context()
-    # FIXME: Remove deprecation
-    bg_color = self._color_to_string(style_context.get_background_color(Gtk.StateFlags.NORMAL))
-    fg_color = self._color_to_string(style_context.get_color(Gtk.StateFlags.NORMAL))
-
-    extensions[highlighted_extension_index] = (
-      (f'<span background="{bg_color}" foreground="{fg_color}">'
-       f'{extensions[highlighted_extension_index]}'
-       '</span>'))
+    extensions[highlighted_extension_index] = f'<b>{extensions[highlighted_extension_index]}</b>'
 
     self._popup.rows[highlighted_row][self._COLUMN_EXTENSIONS] = extensions
 
     self._is_modifying_highlight = False
-
-  @staticmethod
-  def _color_to_string(color):
-    return (
-      '#'
-      f'{int(color.red * 255):X}'
-      f'{int(color.green * 255):X}'
-      f'{int(color.blue * 255):X}'
-      f'{int(color.alpha * 255):X}')
 
   def _unhighlight_extension(self):
     self._do_unhighlight_extension()
