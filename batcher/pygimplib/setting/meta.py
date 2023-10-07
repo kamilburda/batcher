@@ -11,7 +11,7 @@ class _TypeMap:
   def __init__(self, description=None):
     self._description = description
     
-    self._name_to_type_map = collections.OrderedDict()
+    self._name_to_type_map = {}
     self._type_to_names_map = collections.defaultdict(list)
   
   def __getitem__(self, type_or_name):
@@ -74,17 +74,17 @@ class SettingMeta(type):
   """Metaclass for the `setting.Setting` class and its subclasses.
   
   The metaclass is responsible for the following:
-  
-  * Creating a mapping of `Setting` subclasses and human-readable names for
-    easier specification of the `'type'` field when creating settings via
-    `setting.Group.add()`.
-  
+
+  * Creating a mapping of `setting.Setting` subclasses and human-readable
+    names for easier specification of the `'type'` field when creating settings
+    via `setting.Group.add()`.
+
   * Tracking names and values of arguments passed to instantiation of a setting.
-    The names and values are then passed to `Setting.to_dict()` to allow
+    The names and values are then passed to `setting.Setting.to_dict()` to allow
     persisting the setting with the arguments it was instantiated with.
-  
-  * Ensuring that `Setting` classes documented as abstract cannot be initialized
-    (`TypeError` is raised on `__init__()`).
+
+  * Ensuring that `setting.Setting` classes documented as abstract cannot be
+    initialized (`TypeError` is raised on `setting.Setting.__init__()`).
   """
   
   def __new__(mcls, name, bases, namespace):
@@ -92,7 +92,7 @@ class SettingMeta(type):
     
     _set_init_wrapper(mcls, namespace)
     
-    cls = super(SettingMeta, mcls).__new__(mcls, name, bases, namespace)
+    cls = super().__new__(mcls, name, bases, namespace)
     
     _register_type_and_aliases(namespace, cls, name, SettingTypes, 'Setting')
     
@@ -109,16 +109,19 @@ class SettingMeta(type):
       # This check prevents a parent class' `__init__()` from overriding the
       # contents of `_dict_on_init`, which may have different arguments.
       if not hasattr(self, '_dict_on_init'):
-        self._dict_on_init = dict(kwargs)
-        # Exclude `self` as the first argument
-        arg_names = inspect.getargspec(orig_init)[0][1:]
-        for arg_name, arg in zip(arg_names, args):
-          self._dict_on_init[arg_name] = arg
-        
-        if inspect.getargspec(orig_init)[1] is not None:
+        if inspect.getfullargspec(orig_init).varargs is not None:
           raise TypeError(
             ('__init__ in Setting subclasses cannot accept variable positional arguments'
              f' (found in "{type(self).__qualname__}")'))
+
+        self._dict_on_init = {}
+
+        # Exclude `self` as the first argument
+        arg_names = inspect.getfullargspec(orig_init).args[1:]
+        for arg_name, arg in zip(arg_names, args):
+          self._dict_on_init[arg_name] = arg
+
+        self._dict_on_init.update(kwargs)
       
       orig_init(self, *args, **kwargs)
     
@@ -131,7 +134,7 @@ class GroupMeta(type):
   The metaclass is responsible for the following:
   
   * Tracking names and values of arguments passed to instantiation of a group.
-    The names and values are then passed to `Group.to_dict()` to allow
+    The names and values are then passed to `setting.Group.to_dict()` to allow
     persisting the group with the arguments it was instantiated with.
   """
   
@@ -150,14 +153,17 @@ class GroupMeta(type):
       # This check prevents a parent class' `__init__()` from overriding the
       # contents of `_dict_on_init`, which may have different arguments.
       if not hasattr(self, '_dict_on_init'):
-        self._dict_on_init = dict(kwargs)
+        if inspect.getfullargspec(orig_init).varargs is not None:
+          raise TypeError('Group.__init__() cannot accept variable positional arguments')
+
+        self._dict_on_init = {}
+
         # Exclude `self` as the first argument
-        arg_names = inspect.getargspec(orig_init)[0][1:]
+        arg_names = inspect.getfullargspec(orig_init).args[1:]
         for arg_name, arg in zip(arg_names, args):
           self._dict_on_init[arg_name] = arg
-        
-        if inspect.getargspec(orig_init)[1] is not None:
-          raise TypeError('Group.__init__() cannot accept variable positional arguments')
+
+        self._dict_on_init.update(kwargs)
       
       orig_init(self, *args, **kwargs)
     
@@ -169,11 +175,11 @@ class PresenterMeta(type):
   
   The metaclass is responsible for the following:
   
-  * Creating a mapping of `Presenter` subclasses and human-readable names for
-    easier specification of the `'gui_type'` field when creating settings via
-    `setting.Group.add()`.
+  * Creating a mapping of `setting.Presenter` subclasses and human-readable
+    names for easier specification of the ``gui_type`` field when creating
+    settings via `setting.Group.add()`.
   
-  * Ensuring that `Presenter` classes documented as abstract cannot be
+  * Ensuring that `setting.Presenter` classes documented as abstract cannot be
     initialized (`TypeError` is raised on `__init__()`).
   """
   
