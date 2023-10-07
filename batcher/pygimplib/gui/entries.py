@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_.EntryUndoMixin):
+class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   """Subclass of `Gtk.Entry` with additional capabilities.
 
   Additional features include:
@@ -60,12 +60,12 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_.EntryUndoMixin):
         constructor.
     """
     Gtk.Entry.__init__(self, **kwargs)
-    entry_undo_.EntryUndoMixin.__init__(self)
 
     self._minimum_width_chars = minimum_width_chars
     self._maximum_width_chars = maximum_width_chars
     self._placeholder_text = placeholder_text
 
+    self._undo_context = entry_undo_.EntryUndoContext(self)
     self._popup = None
     self._expander = entry_expander_.EntryExpander(
       self, self._minimum_width_chars, self._maximum_width_chars)
@@ -75,7 +75,26 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_.EntryUndoMixin):
     self.connect('focus-in-event', self._on_extended_entry_focus_in_event)
     self.connect('focus-out-event', self._on_extended_entry_focus_out_event)
     self.connect_after('realize', self._on_after_extended_entry_realize)
-  
+
+  @property
+  def undo_context(self) -> entry_undo_.EntryUndoContext:
+    """`entry_undo_context.EntryUndoContext` instance to handle undo/redo
+    actions.
+    """
+    return self._undo_context
+
+  # HACK: Instead of connecting an 'insert-text' signal handler, we override the
+  # `Gtk.Editable.do_insert_text` virtual method to avoid warnings related to
+  # 'insert-text'.
+  # More information: https://stackoverflow.com/a/38831655
+  def do_insert_text(self, new_text, new_text_length, position):
+    return self.undo_context.handle_insert_text(new_text, new_text_length, position)
+
+  # For consistency with `do_insert_text`, we also override
+  # `Gtk.Editable.do_delete_text` instead of connecting a 'delete-text' handler.
+  def do_delete_text(self, start_pos, end_pos):
+    self.undo_context.handle_delete_text(start_pos, end_pos)
+
   def assign_text(self, text: str, enable_undo: bool = False):
     """Replaces the current contents of the entry with the specified text.
     
@@ -109,12 +128,12 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable, entry_undo_.EntryUndoMixin):
     if self._popup is not None:
       self._popup.trigger_popup = False
     if not enable_undo:
-      self.undo_enabled = False
+      self.undo_context.undo_enabled = False
 
     self.set_text(text)
     
     if not enable_undo:
-      self.undo_enabled = True
+      self.undo_context.undo_enabled = True
     if self._popup is not None:
       self._popup.trigger_popup = True
   
@@ -425,7 +444,7 @@ class FilenamePatternEntry(ExtendedEntry):
     
     position, text = self._popup.assign_from_selected_row()
     if position is not None and text:
-      self.undo_push([('insert', position, text)])
+      self.undo_context.undo_push([('insert', position, text)])
   
   def _on_entry_key_press(self, key_name, tree_path, stop_event_propagation):
     if key_name in ['Return', 'KP_Enter', 'Escape']:
@@ -445,7 +464,7 @@ class FilenamePatternEntry(ExtendedEntry):
       undo_push_list.append(('insert', position, text))
     
     if undo_push_list:
-      self.undo_push(undo_push_list)
+      self.undo_context.undo_push(undo_push_list)
 
 
 class FileExtensionEntry(ExtendedEntry):
@@ -643,7 +662,7 @@ class FileExtensionEntry(ExtendedEntry):
       undo_push_list.append(('insert', position, text))
     
     if undo_push_list:
-      self.undo_push(undo_push_list)
+      self.undo_context.undo_push(undo_push_list)
   
   def _highlight_extension_next(self, selected_row_path):
     def _select_next_extension(highlighted_extension_index, len_extensions):

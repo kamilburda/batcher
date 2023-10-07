@@ -10,19 +10,21 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 __all__ = [
-  'EntryUndoMixin',
+  'EntryUndoContext',
 ]
 
 
-class EntryUndoMixin:
-  """Mixin adding undo/redo capabilities to a `Gtk.Entry` instance."""
+class EntryUndoContext:
+  """Class adding undo/redo capabilities to a `Gtk.Entry` instance."""
   
   _ActionData = collections.namedtuple(
     '_ActionData', ['action_type', 'position', 'text'])
   
   _ACTION_TYPES = ['insert', 'delete']
-  
-  def __init__(self):
+
+  def __init__(self, entry: Gtk.Entry):
+    self._entry = entry
+
     self.undo_enabled = True
     """If ``True``, user actions (insert text, delete text) are added to the
     undo history.
@@ -36,33 +38,33 @@ class EntryUndoMixin:
     
     self._cursor_changed_by_action = False
 
-    self.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
-    self.connect('key-press-event', self._on_entry_key_press_event)
+    self._entry.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
+    self._entry.connect('key-press-event', self._on_entry_key_press_event)
 
-  def do_insert_text(self, new_text, new_text_length, position):
+  def handle_insert_text(self, new_text, new_text_length, position):
     if self.undo_enabled and new_text:
-      self._on_entry_action(self.get_position(), new_text, 'insert')
+      self._on_entry_action(self._entry.get_position(), new_text, 'insert')
 
-    self.get_buffer().insert_text(position, new_text, new_text_length)
+    self._entry.get_buffer().insert_text(position, new_text, new_text_length)
 
     return position + new_text_length
 
-  def do_delete_text(self, start_pos, end_pos):
+  def handle_delete_text(self, start_pos, end_pos):
     if self.undo_enabled:
-      text_to_delete = self.get_text()[start_pos:end_pos]
+      text_to_delete = self._entry.get_text()[start_pos:end_pos]
       if text_to_delete:
         self._on_entry_action(start_pos, text_to_delete, 'delete')
 
-    self.get_buffer().delete_text(start_pos, end_pos)
+    self._entry.get_buffer().delete_text(start_pos, end_pos - start_pos)
 
   def undo(self):
     self._undo_redo(
       self._undo_stack,
       self._redo_stack,
       action_handlers={
-        'insert': lambda action_data: self.delete_text(
+        'insert': lambda action_data: self._entry.delete_text(
           action_data.position, action_data.position + len(action_data.text)),
-        'delete': lambda action_data: self.insert_text(
+        'delete': lambda action_data: self._entry.insert_text(
           action_data.text, action_data.position)},
       action_handlers_get_cursor_position={
         'insert': lambda last_action_data: last_action_data.position,
@@ -75,9 +77,9 @@ class EntryUndoMixin:
       self._redo_stack,
       self._undo_stack,
       action_handlers={
-        'insert': lambda action_data: self.insert_text(
+        'insert': lambda action_data: self._entry.insert_text(
           action_data.text, action_data.position),
-        'delete': lambda action_data: self.delete_text(
+        'delete': lambda action_data: self._entry.delete_text(
           action_data.position, action_data.position + len(action_data.text))},
       action_handlers_get_cursor_position={
         'insert': lambda last_action_data: (
@@ -181,7 +183,7 @@ class EntryUndoMixin:
     for action in action_list:
       action_handlers[action.action_type](action)
     
-    self.set_position(
+    self._entry.set_position(
       action_handlers_get_cursor_position[action_list[-1].action_type](action_list[-1]))
     
     self.undo_enabled = True
