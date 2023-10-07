@@ -15,7 +15,7 @@ __all__ = [
 
 
 class EntryUndoMixin:
-  """Class adding undo/redo capabilities to a `gtk.Entry` instance."""
+  """Mixin adding undo/redo capabilities to a `Gtk.Entry` instance."""
   
   _ActionData = collections.namedtuple(
     '_ActionData', ['action_type', 'position', 'text'])
