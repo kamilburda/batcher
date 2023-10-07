@@ -60,9 +60,7 @@ class EntryPopup:
     self._show_popup_first_time = True
     
     self._clear_filter = False
-    
-    self._tree_view_width = None
-    
+
     self._init_gui(column_types, rows)
     
     self._popup_hide_context = popup_hide_context_.PopupHideContext(
@@ -132,10 +130,6 @@ class EntryPopup:
     
     The height of the tree view is updated according to the number of rows.
     If the number of rows is 0, the entire popup is hidden.
-    
-    The initial width of the tree view is determined based on the items
-    displayed in the tree view. For subsequent calls of this function,
-    the width of the tree view will remain the same.
     """
     columns = self._tree_view.get_columns()
     if columns:
@@ -146,16 +140,8 @@ class EntryPopup:
     vertical_spacing = self._tree_view.style_get_property('vertical-separator')
     row_height = cell_height + vertical_spacing
     num_visible_rows = min(num_rows, self._max_num_visible_rows)
-    
-    if self._tree_view_width is None:
-      self._tree_view_width = self._tree_view.get_allocation().width
-      if num_rows > self._max_num_visible_rows:
-        vscrollbar_width = int(
-          self._scrolled_window.get_hadjustment().get_upper()
-          - self._scrolled_window.get_hadjustment().get_page_size())
-        self._tree_view_width += vscrollbar_width * 2
-    
-    self._tree_view.set_size_request(self._tree_view_width, row_height * num_visible_rows)
+
+    self._tree_view.set_size_request(-1, row_height * num_visible_rows)
     
     if num_rows == 0:
       self.hide()
@@ -250,6 +236,10 @@ class EntryPopup:
       hscrollbar_policy=Gtk.PolicyType.NEVER,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       shadow_type=Gtk.ShadowType.ETCHED_IN,
+      max_content_width=self._width,
+      max_content_height=self._height,
+      propagate_natural_width=True,
+      propagate_natural_height=True,
     )
     self._scrolled_window.add(self._tree_view)
     
