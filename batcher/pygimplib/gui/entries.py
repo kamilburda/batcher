@@ -87,12 +87,12 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   # `Gtk.Editable.do_insert_text` virtual method to avoid warnings related to
   # 'insert-text'.
   # More information: https://stackoverflow.com/a/38831655
-  def do_insert_text(self, new_text, new_text_length, position):
+  def do_insert_text(self, new_text: str, new_text_length: int, position: int) -> int:
     return self.undo_context.handle_insert_text(new_text, new_text_length, position)
 
   # For consistency with `do_insert_text`, we also override
   # `Gtk.Editable.do_delete_text` instead of connecting a 'delete-text' handler.
-  def do_delete_text(self, start_pos, end_pos):
+  def do_delete_text(self, start_pos: int, end_pos: int):
     self.undo_context.handle_delete_text(start_pos, end_pos)
 
   def assign_text(self, text: str, enable_undo: bool = False):
