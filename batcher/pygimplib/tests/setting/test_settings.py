@@ -661,7 +661,7 @@ class TestEnumSetting(unittest.TestCase):
   
   def test_get_item_display_names_and_values(self):
     self.assertEqual(
-      self.setting.get_item_display_names_and_values(), ['Skip', 0, 'Replace', 1])
+      self.setting.get_item_display_names_and_values(), [('Skip', 0), ('Replace', 1)])
   
   def test_is_value_empty(self):
     setting = settings_.EnumSetting(

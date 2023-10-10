@@ -9,6 +9,7 @@ import sys
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 from .. import path as pgpath
 from .. import pdbutils as pgpdbutils
@@ -62,37 +63,37 @@ PDB_TYPES_TO_SETTING_TYPES_MAP = {
 class SettingPdbTypes:
   pass
   # FIXME: These are temporarily commented until a proper port to GIMP 3 API is done.
-  # int32 = gimpenums.PDB_INT32
-  # int16 = gimpenums.PDB_INT16
-  # int8 = gimpenums.PDB_INT8
-  # int = int32
-  # float = gimpenums.PDB_FLOAT
-  # string = gimpenums.PDB_STRING
-  #
-  # image = gimpenums.PDB_IMAGE
-  # item = gimpenums.PDB_ITEM
-  # drawable = gimpenums.PDB_DRAWABLE
-  # layer = gimpenums.PDB_LAYER
-  # channel = gimpenums.PDB_CHANNEL
-  # selection = gimpenums.PDB_SELECTION
-  # vectors = gimpenums.PDB_VECTORS
-  # path = vectors
-  #
-  # color = gimpenums.PDB_COLOR
-  # parasite = gimpenums.PDB_PARASITE
-  # display = gimpenums.PDB_DISPLAY
-  # pdb_status = gimpenums.PDB_STATUS
-  #
-  # array_int32 = gimpenums.PDB_INT32ARRAY
-  # array_int16 = gimpenums.PDB_INT16ARRAY
-  # array_int8 = gimpenums.PDB_INT8ARRAY
-  # array_int = array_int32
-  # array_float = gimpenums.PDB_FLOATARRAY
-  # array_string = gimpenums.PDB_STRINGARRAY
-  # array_color = gimpenums.PDB_COLORARRAY
-  #
-  # none = None
-  # automatic = 'automatic'
+  int32 = GObject.TYPE_INT
+  int16 = GObject.TYPE_INT
+  int8 = GObject.TYPE_CHAR
+  int = GObject.TYPE_INT
+  float = GObject.TYPE_FLOAT
+  string = GObject.TYPE_STRING
+
+  image = Gimp.Image
+  item = Gimp.Item
+  drawable = Gimp.Drawable
+  layer = Gimp.Layer
+  channel = Gimp.Channel
+  selection = Gimp.Selection
+  vectors = Gimp.Vectors
+  path = vectors
+
+  color = Gimp.RGB
+  parasite = Gimp.Parasite
+  display = Gimp.Display
+  pdb_status = Gimp.PDBStatusType
+
+  array_int32 = GObject.TYPE_PYOBJECT
+  array_int16 = GObject.TYPE_PYOBJECT
+  array_int8 = GObject.TYPE_PYOBJECT
+  array_int = GObject.TYPE_PYOBJECT
+  array_float = GObject.TYPE_PYOBJECT
+  array_string = GObject.TYPE_PYOBJECT
+  array_color = GObject.TYPE_PYOBJECT
+
+  none = None
+  automatic = 'automatic'
 
 
 class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta_.SettingMeta):
