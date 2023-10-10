@@ -142,7 +142,7 @@ def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Im
 def get_item_from_image_and_item_path(
       image: Gimp.Image, item_class_name: str, item_path: str,
 ) -> Union[Gimp.Item, None]:
-  """Returns a ``gimp.Item`` given the image, item class name and item path.
+  """Returns a ``Gimp.Item`` given the image, item class name and item path.
   
   ``item_class_name`` corresponds to one of the GIMP item classes, e.g.
   ``'Layer'`` or ``'Channel'``.

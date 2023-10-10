@@ -105,18 +105,18 @@ class Batcher:
   def initial_run_mode(self):
     """The run mode to use for the first layer.
     
-    For subsequent layers, `gimpenums.RUN_WITH_LAST_VALS` is used.
+    For subsequent layers, `Gimp.RunMode.WITH_LAST_VALS` is used.
     This usually has effect when exporting layers - if `initial_run_mode` is
-    `gimpenums.RUN_INTERACTIVE`, a native file format GUI is displayed for the
+    `Gimp.RunMode.INTERACTIVE`, a native file format GUI is displayed for the
     first layer and the same settings are then applied to subsequent layers.
     If the file format in which the layer is exported to cannot handle
-    `gimpenums.RUN_WITH_LAST_VALS`, `gimpenums.RUN_INTERACTIVE` is forced.
+    `Gimp.RunMode.WITH_LAST_VALS`, `Gimp.RunMode.INTERACTIVE` is forced.
     """
     return self._initial_run_mode
   
   @property
   def input_image(self):
-    """Input `gimp.Image` to process layers for."""
+    """Input `Gimp.Image` to process layers for."""
     return self._input_image
   
   @property
@@ -249,7 +249,7 @@ class Batcher:
   
   @property
   def current_raw_item(self):
-    """Raw item (`gimp.Layer`) currently being processed."""
+    """Raw item (`Gimp.Layer`) currently being processed."""
     return self._current_raw_item
   
   @current_raw_item.setter
@@ -268,7 +268,7 @@ class Batcher:
   
   @property
   def current_image(self):
-    """The current `gimp.Image` containing layer(s) being processed.
+    """The current `Gimp.Image` containing layer(s) being processed.
     
     If `edit_mode` is `True`, this is equivalent to `input_image`.
     

@@ -21,7 +21,7 @@ __all__ = [
 class EntryPopup:
   
   # Implementation of the popup is loosely based on the implementation of
-  # `gtk.EntryCompletion`:
+  # `Gtk.EntryCompletion`:
   # https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/gtkentrycompletion.c
   
   _BUTTON_MOUSE_LEFT = 1

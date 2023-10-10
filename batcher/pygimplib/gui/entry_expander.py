@@ -1,4 +1,4 @@
-"""Class modifying `gtk.Entry` instances to expand/shrink in width dynamically.
+"""Class modifying `Gtk.Entry` instances to expand/shrink in width dynamically.
 """
 
 import gi
@@ -12,7 +12,7 @@ __all__ = [
 
 
 class EntryExpander:
-  """Class allowing the specified `gtk.Entry` instance to have a flexible width.
+  """Class allowing the specified `Gtk.Entry` instance to have a flexible width.
 
   The width is bounded by the specified minimum and maximum number of
   characters.

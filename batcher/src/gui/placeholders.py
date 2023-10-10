@@ -13,7 +13,7 @@ import pygimplib as pg
 class GimpObjectPlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
   """
   This class is a `setting.presenter.Presenter` subclass for
-  `gimpui.IntComboBox` elements used for `placeholders.PlaceholderSetting`.
+  `GimpUi.IntComboBox` elements used for `placeholders.PlaceholderSetting`.
   
   Value: `placeholders.PlaceholderSetting` instance selected in the combo box.
   """

@@ -65,7 +65,7 @@ class MessageLabel(Gtk.Box):
     the full text when clicked. Only the first line is displayed in the label.
     
     If `clear_delay` is not `None` and `message_type` is not
-    `gtk.MESSAGE_ERROR`, make the message automatically disappear after the
+    `Gtk.MessageType.ERROR`, make the message automatically disappear after the
     specified delay in milliseconds. The timer is stopped if the popup is
     displayed and restarted if the popup gets hidden.
     """

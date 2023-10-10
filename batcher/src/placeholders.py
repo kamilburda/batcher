@@ -7,7 +7,7 @@ The following placeholder objects are defined:
 
 * `PLACEHOLDERS['current_layer']` - The layer currently being processed in the
   current image. This placeholder is used for PDB procedures containing
-  `gimp.Layer`, `gimp.Drawable` or `gimp.Item` parameters.
+  `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item` parameters.
 
 * `PLACEHOLDERS['background_layer']` - The layer positioned immediately after
   the currently processed layer.

@@ -53,7 +53,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       cls.expected_results_root_dirpath = DEFAULT_EXPECTED_RESULTS_DIRPATH
     
     # key: path to directory containing expected results
-    # value: gimp.Image instance
+    # value: Gimp.Image instance
     cls.expected_images = {}
   
   @classmethod
@@ -232,7 +232,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def _load_layers(layer_filepaths):
     """
     Load layers from specified file paths into a new image. Return the image and
-    a dict with (layer name: gimp.Layer instance) pairs.
+    a dict with (layer name: Gimp.Layer instance) pairs.
     """
     image = pg.pdbutils.load_layers(
       layer_filepaths, image=None, strip_file_extension=True)

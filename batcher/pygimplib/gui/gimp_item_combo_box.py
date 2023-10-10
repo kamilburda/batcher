@@ -1,4 +1,4 @@
-"""Combo box widget for `gimp.Item` objects."""
+"""Combo box widget for `Gimp.Item` objects."""
 
 import collections
 from typing import Optional

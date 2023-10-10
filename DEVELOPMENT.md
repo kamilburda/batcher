@@ -203,7 +203,7 @@ Use `@staticmethod` for methods not using instance or class variables and logica
 Do not use `keys()` when iterating over dictionary keys.
 Exceptions:
 * improving clarity (e.g. when passing keys as a parameter to a function),
-* iterating over objects of unhashable types (e.g. `gimp.Layer`).
+* iterating over objects of unhashable types (e.g. `Gimp.Layer`).
 
 
 ### Unicode
@@ -220,7 +220,7 @@ Encode/decode Unicode strings when accessing the following external libraries:
 
 ### GTK, GObject
 
-Always use `GObject` types (for `gtk.TreeView` columns, `__gsignals__`, etc.) instead of Python types if such `GObject` types exist.
+Always use `GObject` types (for `Gtk.TreeView` columns, `__gsignals__`, etc.) instead of Python types if such `GObject` types exist.
 For example, use `GObject.TYPE_STRING` instead of `str` for `Gtk.TreeView` columns of string type.
 
 If it is necessary to get the dimensions or the relative position of a widget not yet realized, connect to the `"size-allocate"` signal and continue processing in the connected event handler.

@@ -62,7 +62,7 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 
 Yes, you may insert any GIMP filter as a procedure:
 1. Select `Add Procedure...` → `Add Custom Procedure...`
-2. Find `gimp-brightness-contrast` in the procedure browser and select `Add`.
+2. Find `gimp-drawable-brightness-contrast` in the procedure browser and select `Add`.
 3. Adjust the parameters as desired.
 4. Select `OK` to add the procedure.
 

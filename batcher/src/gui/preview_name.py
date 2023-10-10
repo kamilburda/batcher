@@ -92,7 +92,7 @@ class NamePreview(preview_base_.Preview):
     self.is_filtering = False
     
     # key: ID of `Item.raw` or (ID of `Item.raw`, 'folder') instance
-    # value: `gtk.TreeIter` instance
+    # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(pg.utils.return_none_func)
     
     self._row_expand_collapse_interactive = True

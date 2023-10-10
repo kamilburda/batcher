@@ -18,7 +18,7 @@ __all__ = [
 
 
 def get_toplevel_window(widget: Gtk.Widget) -> Union[Gtk.Window, None]:
-  """Return the toplevel `gtk.Window` for the specified widget, or ``None`` if
+  """Return the toplevel `Gtk.Window` for the specified widget, or ``None`` if
   the widget has no such window.
   """
   toplevel_widget = widget.get_toplevel()
