@@ -91,13 +91,21 @@ class GimpItemComboBox(Gtk.Box):
     
     self._item_types_combo_box.set_active(0)
   
-  def get_active_item(self) -> Optional[Gimp.Item]:
+  def get_active(self) -> Optional[int]:
     if self._displayed_item_combo_box is not None:
       return self._displayed_item_combo_box.get_active_item_func()
     else:
       return None
 
-  def set_active_item(self, item: Gimp.Item):
+  def set_active(self, item_id: int):
+    if not Gimp.Item.id_is_valid(item_id):
+      return
+
+    item = Gimp.Item.get_by_id(item_id)
+
+    if item is None:
+      return
+
     matching_index = 0
 
     for index, combo_box in enumerate(self._item_combo_boxes):
@@ -107,17 +115,17 @@ class GimpItemComboBox(Gtk.Box):
         break
     else:
       matching_combo_box = None
-    
+
     if matching_combo_box is None:
       raise TypeError(
         'argument must be one of the following types: {}'.format(
           ', '.join(str(combo_box.gimp_item_type) for combo_box in self._item_combo_boxes)))
-    
-    matching_combo_box.set_active_item_func(item)
+
+    matching_combo_box.set_active_item_func(item_id)
     self._item_types_combo_box.set_active(matching_index)
   
   def _on_combo_box_changed(self, *args, **kwargs):
-    self.emit('changed', self.get_active_item())
+    self.emit('changed', self.get_active())
   
   def _on_item_types_combo_box_changed(self, combo_box):
     if self._displayed_item_combo_box is not None:
@@ -128,7 +136,7 @@ class GimpItemComboBox(Gtk.Box):
     
     self._displayed_item_combo_box = self._item_combo_boxes[index]
     
-    self.emit('changed', self.get_active_item())
+    self.emit('changed', self.get_active())
 
 
 GObject.type_register(GimpItemComboBox)
