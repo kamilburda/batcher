@@ -284,7 +284,7 @@ class NullPresenter(Presenter):
     self._sensitive = True
     self._visible = True
     
-    Presenter.__init__(self, setting, self._NULL_GUI_ELEMENT, *args, **kwargs)
+    super().__init__(setting, self._NULL_GUI_ELEMENT, *args, **kwargs)
   
   def get_sensitive(self):
     return self._sensitive
