@@ -126,7 +126,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   `Setting.set_value()` must accept one of the types specified above, in
   addition to a type supported by a particular subclass. For example,
   `ImageSetting.set_value()` must support passing a string (representing the
-  image file path) or an ID (assigned by GIMP) beside a `gimp.Image` instance.
+  image file path) or an ID (assigned by GIMP) beside a `Gimp.Image` instance.
   
   The `GenericSetting` class can store a value of an arbitrary type. Use this
   subclass sparingly as it lacks the additional features available for other
@@ -270,10 +270,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._allow_empty_values = allow_empty_values
     self._empty_values = list(self._EMPTY_VALUES)
     
-    self._display_name = utils_.get_processed_display_name(
-      display_name, self._name)
-    self._description = utils_.get_processed_description(
-      description, self._display_name)
+    self._display_name = utils_.get_processed_display_name(display_name, self._name)
+    self._description = utils_.get_processed_description(description, self._display_name)
     
     self._pdb_type = self._get_pdb_type(pdb_type)
     self._pdb_name = utils_.get_pdb_name(self._name)
@@ -281,8 +279,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._setting_sources = setting_sources
     
     self._setting_value_synchronizer = presenter_.SettingValueSynchronizer()
-    self._setting_value_synchronizer.apply_gui_value_to_setting = (
-      self._apply_gui_value_to_setting)
+    self._setting_value_synchronizer.apply_gui_value_to_setting = self._apply_gui_value_to_setting
     
     self._gui_type = self._get_gui_type(gui_type)
     self._gui = presenter_.NullPresenter(
@@ -1080,7 +1077,7 @@ class EnumSetting(Setting):
   _ALIASES = ['enumerated', 'options']
   
   _ALLOWED_PDB_TYPES = [SettingPdbTypes.int32, SettingPdbTypes.int16, SettingPdbTypes.int8]
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.combo_box]
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.enum_combo_box, SettingGuiTypes.combo_box]
   _DEFAULT_DEFAULT_VALUE = lambda self: next((name for name in self._items), None)
   
   def __init__(self, name, items, empty_value=None, **kwargs):
@@ -1185,11 +1182,10 @@ class EnumSetting(Setting):
     self.set_value(self.items[item_name])
   
   def get_item_display_names_and_values(self):
-    """Returns a list of (item display name, item value) pairs."""
+    """Returns a list of (item display name, item value) tuples."""
     display_names_and_values = []
-    for item_name, item_value in zip(
-          self._items_display_names.values(), self._items.values()):
-      display_names_and_values.extend((item_name, item_value))
+    for item_name, item_value in zip(self._items_display_names.values(), self._items.values()):
+      display_names_and_values.append((item_name, item_value))
     return display_names_and_values
   
   def _resolve_default_value(self, default_value):
@@ -1283,7 +1279,7 @@ class StringSetting(Setting):
 
 
 class ImageSetting(Setting):
-  """Class for settings holding `gimp.Image` objects.
+  """Class for settings holding `Gimp.Image` objects.
   
   This class accepts as a value a file path to the image or image ID.
   If calling `to_dict(source_type='session')`, image ID is returned for `value`
@@ -1348,7 +1344,7 @@ class GimpItemSetting(Setting):
   
   * a tuple (item type, item ID). Item ID is are assigned by GIMP.
   
-  * a `gimp.Item` instance.
+  * a `Gimp.Item` instance.
   
   If calling `to_dict(source_type='session')`, a tuple (item type, item ID) is
   returned for `value` and `default_value`.
@@ -1395,7 +1391,7 @@ class GimpItemSetting(Setting):
 
 
 class ItemSetting(GimpItemSetting):
-  """Class for settings holding `gimp.Item` objects.
+  """Class for settings holding `Gimp.Item` objects.
   
   Allowed GIMP PDB types:
   
@@ -1422,7 +1418,7 @@ class ItemSetting(GimpItemSetting):
 
 
 class DrawableSetting(GimpItemSetting):
-  """Class for settings holding `gimp.Drawable` objects.
+  """Class for settings holding `Gimp.Drawable` objects.
   
   Allowed GIMP PDB types:
   
@@ -1449,7 +1445,7 @@ class DrawableSetting(GimpItemSetting):
 
 
 class LayerSetting(GimpItemSetting):
-  """Class for settings holding `gimp.Layer` or `gimp.GroupLayer` objects.
+  """Class for settings holding `Gimp.Layer` or `Gimp.GroupLayer` objects.
   
   Allowed GIMP PDB types:
   
@@ -1476,7 +1472,7 @@ class LayerSetting(GimpItemSetting):
 
 
 class ChannelSetting(GimpItemSetting):
-  """Class for settings holding `gimp.Channel` objects.
+  """Class for settings holding `Gimp.Channel` objects.
   
   Allowed GIMP PDB types:
   
@@ -1505,7 +1501,7 @@ class ChannelSetting(GimpItemSetting):
 class SelectionSetting(ChannelSetting):
   """Class for settings holding the current selection.
   
-  A selection in GIMP is internally represented as a `gimp.Channel` object.
+  A selection in GIMP is internally represented as a `Gimp.Channel` object.
   Unlike `ChannelSetting`, this setting does not support GUI (there is no need
   for GUI).
   
@@ -1523,7 +1519,7 @@ class SelectionSetting(ChannelSetting):
 
 
 class VectorsSetting(GimpItemSetting):
-  """Class for settings holding `gimp.Vectors` objects.
+  """Class for settings holding `Gimp.Vectors` objects.
   
   Allowed GIMP PDB types:
   
@@ -1553,13 +1549,13 @@ class VectorsSetting(GimpItemSetting):
 
 
 class ColorSetting(Setting):
-  """Class for settings holding `gimpcolor.RGB` objects.
+  """Class for settings holding `Gimp.RGB` objects.
   
   Allowed GIMP PDB types:
   
   * `SettingPdbTypes.color`
   
-  Default value: `gimpcolor.RGB` instance with color `(0, 0, 0)`.
+  Default value: `Gimp.RGB` instance with color `(0, 0, 0)`.
   
   Error messages:
   
@@ -1590,9 +1586,9 @@ class ColorSetting(Setting):
 
 
 class DisplaySetting(Setting):
-  """Class for settings holding `gimp.Display` objects.
+  """Class for settings holding `Gimp.Display` objects.
   
-  `gimp.Display` objects cannot be loaded or saved. Therefore, `to_dict()`
+  `Gimp.Display` objects cannot be loaded or saved. Therefore, `to_dict()`
   returns a dictionary whose `'value'` and `'default_value'` keys are `None`.
   
   Allowed GIMP PDB types:
@@ -1619,7 +1615,7 @@ class DisplaySetting(Setting):
     self.error_messages['invalid_value'] = _('Invalid display.')
   
   def _value_to_raw(self, value, source_type):
-    # There is no way to restore `gimp.Display` objects, therefore return `None`.
+    # There is no way to restore `Gimp.Display` objects, therefore return `None`.
     return None
   
   def _validate(self, display):
@@ -1629,18 +1625,18 @@ class DisplaySetting(Setting):
 
 
 class ParasiteSetting(Setting):
-  """Class for settings holding `gimp.Parasite` objects.
+  """Class for settings holding `Gimp.Parasite` objects.
   
   Allowed GIMP PDB types:
   
   * `SettingPdbTypes.parasite`
   
-  Default value: `gimp.Parasite` instance whose name is equal to the setting
+  Default value: `Gimp.Parasite` instance whose name is equal to the setting
   name, all flags are disabled (i.e. equal to 0) and data are empty (`''`).
   
   Error messages:
   
-  * `'invalid_value'` - The value is not a `gimp.Parasite` instance.
+  * `'invalid_value'` - The value is not a `Gimp.Parasite` instance.
   """
   
   _ALLOWED_PDB_TYPES = [SettingPdbTypes.parasite]
