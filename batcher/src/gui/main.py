@@ -255,7 +255,7 @@ class ExportLayersDialog:
     
     self._init_settings()
     
-    self._init_gui_elements()
+    self._init_gui()
     self._assign_gui_to_settings()
     self._connect_events()
     
@@ -310,7 +310,7 @@ class ExportLayersDialog:
     if self._settings['main/constraints'] in result.settings_not_loaded:
       actions.clear(self._settings['main/constraints'], add_initial_actions=True)
   
-  def _init_gui_elements(self):
+  def _init_gui(self):
     self._dialog = gimpui.Dialog(title=pg.config.PLUGIN_TITLE, role=pg.config.PLUGIN_NAME)
     self._dialog.set_transient()
     self._dialog.set_default_size(*self._DIALOG_SIZE)

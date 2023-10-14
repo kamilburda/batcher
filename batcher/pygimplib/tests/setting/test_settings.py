@@ -271,14 +271,14 @@ class TestSettingGui(unittest.TestCase):
       'flatten', default_value=False, gui_type=stubs_setting.CheckButtonStubPresenter)
     setting.set_gui()
     self.assertIs(type(setting.gui), stubs_setting.CheckButtonStubPresenter)
-    self.assertIs(type(setting.gui.element), stubs_setting.CheckButtonStub)
+    self.assertIs(type(setting.gui.widget), stubs_setting.CheckButtonStub)
   
   def test_setting_different_gui_type(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten', default_value=False, gui_type=stubs_setting.StubPresenter)
     setting.set_gui()
     self.assertIs(type(setting.gui), stubs_setting.StubPresenter)
-    self.assertIs(type(setting.gui.element), stubs_setting.GuiWidgetStub)
+    self.assertIs(type(setting.gui.widget), stubs_setting.GuiWidgetStub)
   
   def test_setting_invalid_gui_type_raise_error(self):
     with self.assertRaises(ValueError):
@@ -292,29 +292,29 @@ class TestSettingGui(unittest.TestCase):
     setting.set_gui()
     self.assertIs(type(setting.gui), presenter_.NullPresenter)
   
-  def test_set_gui_gui_type_is_specified_gui_element_is_none_raise_error(self):
+  def test_set_gui_gui_type_is_specified_widget_is_none_raise_error(self):
     setting = stubs_setting.StubWithGuiSetting('flatten', default_value=False)
     with self.assertRaises(ValueError):
       setting.set_gui(gui_type=stubs_setting.CheckButtonStubPresenter)
   
-  def test_set_gui_gui_type_is_none_gui_element_is_specified_raise_error(self):
+  def test_set_gui_gui_type_is_none_widget_is_specified_raise_error(self):
     setting = stubs_setting.StubWithGuiSetting('flatten', default_value=False)
     with self.assertRaises(ValueError):
-      setting.set_gui(gui_element=stubs_setting.GuiWidgetStub)
+      setting.set_gui(widget=stubs_setting.GuiWidgetStub)
   
   def test_set_gui_manual_gui_type(self):
     setting = stubs_setting.StubWithGuiSetting('flatten', default_value=False)
     setting.set_gui(
       gui_type=stubs_setting.YesNoToggleButtonStubPresenter,
-      gui_element=stubs_setting.GuiWidgetStub(None))
+      widget=stubs_setting.GuiWidgetStub(None))
     self.assertIs(type(setting.gui), stubs_setting.YesNoToggleButtonStubPresenter)
-    self.assertIs(type(setting.gui.element), stubs_setting.GuiWidgetStub)
+    self.assertIs(type(setting.gui.widget), stubs_setting.GuiWidgetStub)
   
-  def test_set_gui_gui_element_is_none_presenter_has_no_wrapper_raise_error(self):
+  def test_set_widget_is_none_presenter_has_no_wrapper_raise_error(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten',
       default_value=False,
-      gui_type=stubs_setting.StubWithoutGuiElementCreationPresenter)
+      gui_type=stubs_setting.StubWithoutGuiWidgetCreationPresenter)
     with self.assertRaises(ValueError):
       setting.set_gui()
   

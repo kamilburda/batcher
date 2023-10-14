@@ -13,14 +13,14 @@ import pygimplib as pg
 class GimpObjectPlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
   """
   This class is a `setting.presenter.Presenter` subclass for
-  `GimpUi.IntComboBox` elements used for `placeholders.PlaceholderSetting`.
+  `GimpUi.IntComboBox` widget used for `placeholders.PlaceholderSetting`.
   
   Value: `placeholders.PlaceholderSetting` instance selected in the combo box.
   """
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_gui_element(self, setting):
+  def _create_widget(self, setting):
     placeholder_names_and_values = []
     
     for index, placeholder in enumerate(setting.get_allowed_placeholders()):
@@ -30,7 +30,7 @@ class GimpObjectPlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
     return gimpui.IntComboBox(tuple(placeholder_names_and_values))
   
   def _get_value(self):
-    return self._setting.get_allowed_placeholder_names()[self._element.get_active()]
+    return self._setting.get_allowed_placeholder_names()[self._widget.get_active()]
   
   def _set_value(self, value):
-    self._element.set_active(self._setting.get_allowed_placeholder_names().index(value))
+    self._widget.set_active(self._setting.get_allowed_placeholder_names().index(value))

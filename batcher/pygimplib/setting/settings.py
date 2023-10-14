@@ -1,4 +1,4 @@
-"""Main API to create plug-in settings and their associated GUI elements."""
+"""Main API to create plug-in settings and their associated GUI widgets."""
 
 import collections
 from collections.abc import Iterable
@@ -101,7 +101,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   A `Setting` allows you to:
   * store and use setting values as variables in the main logic of plug-ins,
-  * create and manage a GUI element tied to the setting,
+  * create and manage a GUI widget tied to the setting,
   * load and save setting values,
   * connect to events offered in the setting to trigger changes in your
     application code.
@@ -225,7 +225,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       defined for that subclass, the setting cannot be registered (`None` is
       assigned).
     
-    * `gui_type` - Type of GUI element to be created by `set_gui()`. See the
+    * `gui_type` - Type of GUI widget to be created by `set_gui()`. See the
       `GUI_TYPES` mapping for available GUI types. The GUI types are limited for
       each subclass. The list of accepted GUI types per subclass can be obtained
       by calling `get_allowed_gui_types()`. Specifying an invalid type causes
@@ -331,9 +331,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   @property
   def gui(self):
-    """The setting GUI element.
+    """The setting GUI widget.
     
-    This is a `setting.Presenter` instance wrapping a native GUI element.
+    This is a `setting.Presenter` instance wrapping a native widget.
     
     With `gui`, you may modify GUI-specific attributes such as visibility or
     sensitivity.
@@ -441,9 +441,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     Before the assignment, the value is validated. If the value is invalid,
     `SettingValueError` is raised.
     
-    The value of the GUI element is also updated. Even if the setting has no GUI
-    element assigned, the value is recorded. Once a GUI element is assigned to
-    the setting, the recorded value is copied over to the GUI element.
+    The value of the GUI widget is also updated. Even if the setting has no
+    widget assigned, the value is recorded. Once a widget is assigned to
+    the setting, the recorded value is copied over to the widget.
     
     The following event handlers are invoked:
     * `'before-set-value'` - before assigning the value,
@@ -500,17 +500,17 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def set_gui(
         self,
         gui_type='automatic',
-        gui_element=None,
+        widget=None,
         auto_update_gui_to_setting=True):
-    """Creates a new GUI object (`setting.Presenter` instance) for this setting
-    or removes the GUI.
+    """Creates a new `setting.Presenter` instance (object holding a GUI widget)
+    for this setting or removes the GUI.
     
     The state of the previous GUI object is copied to the new GUI object (such
     as its value, visibility and sensitivity).
     
     Parameters:
     
-    * `gui_type` - `Presenter` type to wrap `gui_element` around.
+    * `gui_type` - `Presenter` type to wrap `widget` around.
       
       When calling this method, `gui_type` does not have to be one of the
       allowed GUI types specified in the setting.
@@ -518,26 +518,26 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       If `gui_type` is `'automatic'`, a GUI object of the type specified in the
       `gui_type` parameter in `__init__()` is created.
       
-      To specify an existing GUI element, pass a specific `gui_type` and the
-      GUI element in `gui_element`. This is useful if you wish to use the GUI
-      element for multiple settings or for other purposes outside this setting.
+      To specify an existing GUI widget, pass a specific `gui_type` and the
+      widget in `widget`. This is useful if you wish to use the GUI widget
+      for multiple settings or for other purposes outside this setting.
       
       If `gui_type` is `None`, remove the GUI and disconnect any events the GUI
       had. The state of the old GUI is still preserved.
     
-    * `gui_element` - A GUI element (wrapped in a `Presenter` instance).
+    * `widget` - A GUI widget (wrapped in a `Presenter` instance).
     
-      If `gui_type` is `'automatic'`, `gui_element` is ignored.
-      If `gui_type` is not `'automatic'` and `gui_element` is `None`,
+      If `gui_type` is `'automatic'`, `widget` is ignored.
+      If `gui_type` is not `'automatic'` and `widget` is `None`,
       `ValueError` is raised.
     
     * `auto_update_gui_to_setting` - See `auto_update_gui_to_setting` parameter
       in `__init__()`.
     """
-    if gui_type != 'automatic' and gui_element is None:
-      raise ValueError('gui_element cannot be None if gui_type is automatic')
-    if gui_type == 'automatic' and gui_element is not None:
-      raise ValueError('gui_type cannot be automatic if gui_element is not None')
+    if gui_type != 'automatic' and widget is None:
+      raise ValueError('widget cannot be None if gui_type is automatic')
+    if gui_type == 'automatic' and widget is not None:
+      raise ValueError('gui_type cannot be automatic if widget is not None')
     
     self.invoke_event('before-set-gui')
     
@@ -552,7 +552,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self._gui = processed_gui_type(
       self,
-      gui_element,
+      widget,
       setting_value_synchronizer=self._setting_value_synchronizer,
       old_presenter=self._gui,
       auto_update_gui_to_setting=auto_update_gui_to_setting)
@@ -2314,10 +2314,10 @@ class ArraySetting(Setting):
 class ContainerSetting(Setting):
   """Abstract class for settings representing container types.
   
-  Container settings can hold elements of arbitrary type, but cannot be
-  registered to the GIMP PDB and do not have a GUI element. Use `ArraySetting`
-  if you need to pass the elements to a GIMP PDB procedure and allow adjusting
-  the element values via GUI.
+  Container settings can hold items of arbitrary type, but cannot be
+  registered to the GIMP PDB and do not have a GUI widget. Use `ArraySetting`
+  if you need to pass the items to a GIMP PDB procedure and allow adjusting
+  the item values via GUI.
   
   If you intend to save container settings to a setting source, make sure each
   item is of one of the types specified in the description of `to_dict()`.

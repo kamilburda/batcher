@@ -558,18 +558,18 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
   
   def _next(self):
     """
-    Return the next element when iterating the settings. Used by `walk()`.
+    Return the next item when iterating the settings. Used by `walk()`.
     """
     if self._settings_iterator is None:
       self._settings_iterator = iter(self._setting_list)
     
     try:
-      next_element = next(self._settings_iterator)
+      next_item = next(self._settings_iterator)
     except StopIteration:
       self._settings_iterator = None
       raise StopIteration
     else:
-      return next_element
+      return next_item
   
   def reset(self):
     """
@@ -640,7 +640,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
   
   def apply_gui_values_to_settings(self):
     """
-    Apply GUI element values, entered by the user, to settings.
+    Apply GUI widget values, entered by the user, to settings.
     Ignore settings with the `'ignore_apply_gui_value_to_setting'` tag.
     
     This method will not have any effect on settings with automatic

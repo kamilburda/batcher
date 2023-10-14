@@ -15,12 +15,12 @@ from src import renamer as renamer_
 
 class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
-  `pygimplib.gui.FilenamePatternEntry` elements.
+  `pygimplib.gui.FilenamePatternEntry` widgets.
   
   Value: Text in the entry.
   """
   
-  def _create_gui_element(self, setting):
+  def _create_widget(self, setting):
     return pg.gui.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
 
 

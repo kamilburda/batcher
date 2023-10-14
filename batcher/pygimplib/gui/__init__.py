@@ -1,4 +1,4 @@
-"""Helper functions and classes for managing GUI elements in plug-ins."""
+"""Helper functions and classes for managing GUI widgets in plug-ins."""
 
 from .cell_renderers import *
 from .drag_and_drop_context import *

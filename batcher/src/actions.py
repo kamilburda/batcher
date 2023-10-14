@@ -465,7 +465,7 @@ def _set_up_action_post_creation(action):
 def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
   setting_display_name.set_gui(
     gui_type='check_button_label',
-    gui_element=setting_enabled.gui.element)
+    widget=setting_enabled.gui.widget)
 
 
 def _connect_events_to_sync_array_and_array_length_arguments(action):

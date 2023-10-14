@@ -164,7 +164,7 @@ class ActionBox(pg.gui.ItemBox):
   def _add_item_from_action(self, action):
     self._init_action_item_gui(action)
     
-    item = _ActionBoxItem(action, action['enabled'].gui.element)
+    item = _ActionBoxItem(action, action['enabled'].gui.widget)
     
     super().add_item(item)
     
@@ -180,14 +180,14 @@ class ActionBox(pg.gui.ItemBox):
     # HACK: Prevent displaying horizontal scrollbar by ellipsizing labels. To
     # make ellipsizing work properly, the label width must be set explicitly.
     if isinstance(action['enabled'].gui, pg.setting.SettingGuiTypes.check_button):
-      action['enabled'].gui.element.set_property('width-request', 1)
-      action['enabled'].gui.element.get_child().set_ellipsize(pango.ELLIPSIZE_END)
-      action['enabled'].gui.element.get_child().set_max_width_chars(
+      action['enabled'].gui.widget.set_property('width-request', 1)
+      action['enabled'].gui.widget.get_child().set_ellipsize(pango.ELLIPSIZE_END)
+      action['enabled'].gui.widget.get_child().set_max_width_chars(
         self._ACTION_ENABLED_LABEL_MAX_CHAR_WIDTH)
-      action['enabled'].gui.element.get_child().connect(
+      action['enabled'].gui.widget.get_child().connect(
         'size-allocate',
         self._on_action_item_gui_label_size_allocate,
-        action['enabled'].gui.element)
+        action['enabled'].gui.widget)
   
   def _on_action_item_gui_label_size_allocate(self, item_gui_label, allocation, item_gui):
     if pg.gui.label_fits_text(item_gui_label):
@@ -457,7 +457,7 @@ class _ActionEditDialog(GimpUi.Dialog):
   _ARRAY_PARAMETER_GUI_WIDTH = 300
   _ARRAY_PARAMETER_GUI_MAX_HEIGHT = 150
   
-  _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING_BETWEEN_ELEMENTS = 5
+  _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING = 5
   
   _MORE_OPTIONS_SPACING = 4
   _MORE_OPTIONS_BORDER_WIDTH = 4
@@ -502,12 +502,12 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._vbox_more_options.set_spacing(self._MORE_OPTIONS_SPACING)
     self._vbox_more_options.set_border_width(self._MORE_OPTIONS_BORDER_WIDTH)
     self._vbox_more_options.pack_start(
-      action['enabled_for_previews'].gui.element, False, False, 0)
+      action['enabled_for_previews'].gui.widget, False, False, 0)
     if 'also_apply_to_parent_folders' in action:
       self._vbox_more_options.pack_start(
-        action['also_apply_to_parent_folders'].gui.element, False, False, 0)
+        action['also_apply_to_parent_folders'].gui.widget, False, False, 0)
     
-    action['more_options_expanded'].gui.element.add(self._vbox_more_options)
+    action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
     
     # Put widgets in a custom `VBox` because the action area would otherwise
     # have excessively thick borders for some reason.
@@ -518,7 +518,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     if self._label_procedure_description is not None:
       self._vbox.pack_start(self._label_procedure_description, False, False, 0)
     self._vbox.pack_start(self._table_action_arguments, True, True, 0)
-    self._vbox.pack_start(action['more_options_expanded'].gui.element, False, False, 0)
+    self._vbox.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
     
     self.vbox.pack_start(self._vbox, False, False, 0)
     
@@ -551,19 +551,19 @@ class _ActionEditDialog(GimpUi.Dialog):
       
       self._table_action_arguments.attach(label, 0, 1, i, i + 1)
       
-      gui_element_to_attach = setting.gui.element
+      widget_to_attach = setting.gui.widget
       
       if not isinstance(setting.gui, pg.setting.SettingGuiTypes.null):
         if isinstance(setting, pg.setting.ArraySetting):
           if setting.element_type.get_allowed_gui_types():
-            setting.gui.element.set_property('width-request', self._ARRAY_PARAMETER_GUI_WIDTH)
-            setting.gui.element.max_height = self._ARRAY_PARAMETER_GUI_MAX_HEIGHT
+            setting.gui.widget.set_property('width-request', self._ARRAY_PARAMETER_GUI_WIDTH)
+            setting.gui.widget.max_height = self._ARRAY_PARAMETER_GUI_MAX_HEIGHT
           else:
-            gui_element_to_attach = self._create_placeholder_widget()
+            widget_to_attach = self._create_placeholder_widget()
       else:
-        gui_element_to_attach = self._create_placeholder_widget()
+        widget_to_attach = self._create_placeholder_widget()
       
-      self._table_action_arguments.attach(gui_element_to_attach, 1, 2, i, i + 1)
+      self._table_action_arguments.attach(widget_to_attach, 1, 2, i, i + 1)
   
   def _on_button_reset_clicked(self, button, action):
     action['arguments'].reset()
@@ -581,12 +581,12 @@ class _ActionEditDialog(GimpUi.Dialog):
     for child in list(self._vbox_more_options.get_children()):
       self._vbox_more_options.remove(child)
     
-    action['more_options_expanded'].gui.element.remove(self._vbox_more_options)
-    self._vbox.remove(action['more_options_expanded'].gui.element)
+    action['more_options_expanded'].gui.widget.remove(self._vbox_more_options)
+    self._vbox.remove(action['more_options_expanded'].gui.widget)
   
   def _create_placeholder_widget(self):
     hbox = gtk.HBox()
-    hbox.set_spacing(self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING_BETWEEN_ELEMENTS)
+    hbox.set_spacing(self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING)
     
     hbox.pack_start(
       Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_WARNING, Gtk.IconSize.BUTTON),

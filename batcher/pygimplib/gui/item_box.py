@@ -1,4 +1,4 @@
-"""Widget holding an array of GUI elements.
+"""Widget holding an array of GUI widgets.
 
 The widget is used as the default GUI for `setting.ArraySetting` instances.
 """
@@ -289,10 +289,9 @@ class ArrayBox(ItemBox):
       new_item_default_value:
         Default value for new items
       min_size:
-        Minimum number of elements.
+        Minimum number of items.
       max_size:
-        maximum number of elements. If ``None``, the number of elements is
-        unlimited.
+        Maximum number of items. If ``None``, the number of items is unlimited.
       item_spacing:
         Vertical spacing in pixels between items.
       **kwargs:
@@ -452,12 +451,12 @@ class ArrayBox(ItemBox):
       new_size = size_spin_button.get_value_as_int()
       
       if new_size > len(self._items):
-        num_elements_to_add = new_size - len(self._items)
-        for unused_ in range(num_elements_to_add):
+        num_items_to_add = new_size - len(self._items)
+        for unused_ in range(num_items_to_add):
           self.add_item()
       elif new_size < len(self._items):
-        num_elements_to_remove = len(self._items) - new_size
-        for unused_ in range(num_elements_to_remove):
+        num_items_to_remove = len(self._items) - new_size
+        for unused_ in range(num_items_to_remove):
           self.remove_item(self._items[-1])
       
       self.emit('array-box-changed')

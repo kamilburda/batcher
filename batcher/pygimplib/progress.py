@@ -19,7 +19,7 @@ class ProgressUpdater:
     self.progress_bar = progress_bar
     """Progress bar.
     
-    This is usually a GUI element representing a progress bar.
+    This is usually a GUI widget representing a progress bar.
     """
 
     self.num_total_tasks = num_total_tasks

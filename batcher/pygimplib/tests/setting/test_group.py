@@ -713,13 +713,13 @@ class TestGroupGui(unittest.TestCase):
       type(self.settings['file_extension'].gui),
       stubs_setting.CheckButtonStubPresenter)
     self.assertIs(
-      type(self.settings['file_extension'].gui.element),
+      type(self.settings['file_extension'].gui.widget),
       stubs_setting.CheckButtonStub)
     self.assertIs(
       type(self.settings['flatten'].gui),
       stubs_setting.CheckButtonStubPresenter)
     self.assertIs(
-      type(self.settings['flatten'].gui.element),
+      type(self.settings['flatten'].gui.widget),
       stubs_setting.CheckButtonStub)
 
   def test_initialize_gui_ignores_specified_settings(self):
@@ -742,16 +742,16 @@ class TestGroupGui(unittest.TestCase):
     self.assertIs(
       type(self.settings['file_extension'].gui), stubs_setting.StubPresenter)
     self.assertIs(
-      type(self.settings['file_extension'].gui.element),
+      type(self.settings['file_extension'].gui.widget),
       stubs_setting.GuiWidgetStub)
     # The expected value is 'bmp', not 'png', since the setting value overrides
-    # the initial GUI element value.
+    # the initial GUI widget value.
     self.assertEqual(file_extension_widget.value, 'bmp')
     self.assertIs(
       type(self.settings['flatten'].gui),
       stubs_setting.CheckButtonStubPresenter)
     self.assertIs(
-      type(self.settings['flatten'].gui.element),
+      type(self.settings['flatten'].gui.widget),
       stubs_setting.CheckButtonStub)
   
   def test_apply_gui_values_to_settings(self):

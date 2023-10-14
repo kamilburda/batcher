@@ -35,31 +35,31 @@ class CheckButtonStub(GuiWidgetStub):
 class StubPresenter(presenter_.Presenter):
   
   def get_sensitive(self):
-    return self._element.sensitive
+    return self._widget.sensitive
   
   def set_sensitive(self, sensitive):
-    self._element.sensitive = sensitive
+    self._widget.sensitive = sensitive
 
   def get_visible(self):
-    return self._element.visible
+    return self._widget.visible
   
   def set_visible(self, visible):
-    self._element.visible = visible
+    self._widget.visible = visible
   
-  def _create_gui_element(self, setting):
+  def _create_widget(self, setting):
     return GuiWidgetStub(setting.value)
   
   def _get_value(self):
-    return self._element.value
+    return self._widget.value
   
   def _set_value(self, value):
-    self._element.value = value
+    self._widget.value = value
   
   def _connect_value_changed_event(self):
-    self._element.connect(self._VALUE_CHANGED_SIGNAL, self._on_value_changed)
+    self._widget.connect(self._VALUE_CHANGED_SIGNAL, self._on_value_changed)
   
   def _disconnect_value_changed_event(self):
-    self._element.disconnect()
+    self._widget.disconnect()
 
 
 class StubWithValueChangedSignalPresenter(StubPresenter):
@@ -67,15 +67,15 @@ class StubWithValueChangedSignalPresenter(StubPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
 
 
-class StubWithoutGuiElementCreationPresenter(StubPresenter):
+class StubWithoutGuiWidgetCreationPresenter(StubPresenter):
   
-  def _create_gui_element(self, setting):
+  def _create_widget(self, setting):
     return None
 
 
 class CheckButtonStubPresenter(StubPresenter):
   
-  def _create_gui_element(self, setting):
+  def _create_widget(self, setting):
     return CheckButtonStub(setting.value)
 
 
@@ -112,7 +112,7 @@ class StubWithGuiSetting(StubSetting):
     CheckButtonStubPresenter,
     StubPresenter,
     StubWithValueChangedSignalPresenter,
-    StubWithoutGuiElementCreationPresenter]
+    StubWithoutGuiWidgetCreationPresenter]
 
 
 def on_file_extension_changed(file_extension, flatten):
