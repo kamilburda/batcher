@@ -2089,7 +2089,7 @@ class ArraySetting(Setting):
         settings_dict[key] = self._reference_element._value_to_raw(val, source_type)
       elif key == 'element_type':
         settings_dict[key] = pgutils.safe_decode(
-          SettingTypes[self.type(_reference_element)], 'utf-8')
+          SettingTypes[type(self._reference_element)], 'utf-8')
     
     return settings_dict
   
