@@ -622,7 +622,7 @@ class GimpParasiteSource(Source):
   
   def write_data_to_source(self, data):
     gimp.parasite_attach(
-      gimp.Parasite(
+      Gimp.Parasite.new(
         self.source_name,
         gimpenums.PARASITE_PERSISTENT,
         pgutils.bytes_to_signed_bytes(pickle.dumps(data))))

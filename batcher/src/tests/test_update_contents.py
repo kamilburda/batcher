@@ -320,7 +320,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   
   def test_partial_data_in_persistent_source_only(self, *mocks):
     update.gimp.parasite_attach(
-      update.gimp.Parasite(
+      update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME,
         gimpenums.PARASITE_PERSISTENT,
         DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY))
@@ -333,7 +333,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   
   def test_partial_data_in_session_and_persistent_source(self, *mocks):
     update.gimp.parasite_attach(
-      update.gimp.Parasite(
+      update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME,
         gimpenums.PARASITE_PERSISTENT,
         DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY))
@@ -355,7 +355,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   
   def test_full_data_in_persistent_source_only(self, *mocks):
     update.gimp.parasite_attach(
-      update.gimp.Parasite(
+      update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
     status, unused_ = update.update(self.settings)
@@ -367,7 +367,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   def test_full_data_in_session_and_persistent_source(self, *mocks):
     update.gimp.set_data(pg.config.SOURCE_NAME, SESSION_DATA_3_3_1)
     update.gimp.parasite_attach(
-      update.gimp.Parasite(
+      update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
     status, unused_ = update.update(self.settings)

@@ -1643,7 +1643,7 @@ class ParasiteSetting(Setting):
   _ALLOWED_PDB_TYPES = [SettingPdbTypes.parasite]
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.parasite_box]
   # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: gimp.Parasite(self.name, 0, '')
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Parasite.new(self.name, 0, b'')
   
   def _copy_value(self, value):
     return value
@@ -1653,7 +1653,7 @@ class ParasiteSetting(Setting):
   
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
-      return gimp.Parasite(*raw_value)
+      return Gimp.Parasite.new(*raw_value)
     else:
       return raw_value
   
@@ -1661,7 +1661,7 @@ class ParasiteSetting(Setting):
     return [value.get_name(), value.get_flags(), value.get_data()]
   
   def _validate(self, parasite):
-    if not isinstance(parasite, gimp.Parasite):
+    if not isinstance(parasite, Gimp.Parasite):
       raise SettingValueError(
         utils_.value_to_str_prefix(parasite) + self.error_messages['invalid_value'])
 
