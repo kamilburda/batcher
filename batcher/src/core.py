@@ -28,7 +28,7 @@ def _set_attributes_on_init(func):
   def func_wrapper(self, *args, **kwargs):
     setattr(self, '_orig_{}'.format(func.__name__), func)
     
-    argspec = inspect.getargspec(func)
+    argspec = inspect.getfullargspec(func)
     
     arg_names = argspec.args[:len(argspec.args) - len(argspec.defaults)]
     try:
@@ -610,7 +610,7 @@ class Batcher:
   
   def _get_args_for_constraint_func(self, func, args):
     try:
-      batcher_arg_position = inspect.getargspec(func).args.index('batcher')
+      batcher_arg_position = inspect.getfullargspec(func).args.index('batcher')
     except ValueError:
       batcher_arg_position = None
     
@@ -649,7 +649,7 @@ class Batcher:
     return _handle_exceptions
   
   def _init_attributes(self, **kwargs):
-    init_argspec_names = set(inspect.getargspec(self._orig___init__).args)
+    init_argspec_names = set(inspect.getfullargspec(self._orig___init__).args)
     init_argspec_names.discard('self')
     
     for name, value in kwargs.items():

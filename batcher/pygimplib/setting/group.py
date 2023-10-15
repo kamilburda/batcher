@@ -355,7 +355,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     return [arg_name for arg_name in required_arg_names if arg_name not in setting_data]
   
   def _get_required_argument_names(self, func):
-    arg_spec = inspect.getargspec(func)
+    arg_spec = inspect.getfullargspec(func)
     arg_default_values = arg_spec[3] if arg_spec[3] is not None else []
     num_required_args = len(arg_spec[0]) - len(arg_default_values)
     
