@@ -2,7 +2,7 @@
 
 import collections
 import itertools
-from typing import Callable, List, Union
+from typing import Callable, List, Optional, Union
 
 __all__ = [
   'SETTING_PATH_SEPARATOR',
@@ -226,7 +226,10 @@ def value_to_str_prefix(value) -> str:
     return ''
 
 
-def get_processed_display_name(setting_display_name: str, setting_name: str) -> str:
+def get_processed_display_name(
+      setting_display_name: Optional[str],
+      setting_name: str,
+) -> str:
   """Returns ``setting_display_name`` if not ``None``, otherwise returns a
   string as returned by `generate_display_name()` using ``setting_name``.
   """
@@ -243,7 +246,10 @@ def generate_display_name(setting_name: str) -> str:
   return setting_name.replace('_', ' ').capitalize()
 
 
-def get_processed_description(setting_description: str, setting_display_name: str) -> str:
+def get_processed_description(
+      setting_description: Optional[str],
+      setting_display_name: str,
+) -> str:
   """Returns ``setting_description`` if not ``None``, otherwise returns a
   string as returned by `generate_description()` using ``setting_display_name``.
   """
