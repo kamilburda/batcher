@@ -57,7 +57,9 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
   """
   
   _ALLOWED_PDB_TYPES = []
+
   _ALLOWED_GUI_TYPES = []
+
   _DEFAULT_DEFAULT_VALUE = lambda self: collections.defaultdict(set)
   
   def _raw_to_value(self, raw_value):

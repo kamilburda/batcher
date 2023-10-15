@@ -64,10 +64,7 @@ class _TypeMap:
 
 
 SettingTypes = _TypeMap(description='setting type')
-"""Class whose attributes are mapped to `setting.Setting` subclasses."""
-
 SettingGuiTypes = _TypeMap(description='setting GUI type')
-"""Class whose attributes are mapped to `setting.Presenter` subclasses."""
 
 
 class SettingMeta(type):

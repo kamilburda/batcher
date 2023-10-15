@@ -1315,7 +1315,7 @@ class TestCreateArraySetting(unittest.TestCase):
     ('registration_is_disabled_explicitly',
      None,
      'float',
-     settings_.SettingPdbTypes.none),
+     None),
   ])
   def test_create_with_pdb_type(
         self, test_case_suffix,
@@ -1339,7 +1339,7 @@ class TestCreateArraySetting(unittest.TestCase):
       element_value_set=lambda value: value,
       element_value_save=lambda value: value)
     
-    self.assertEqual(setting.pdb_type, settings_.SettingPdbTypes.none)
+    self.assertEqual(setting.pdb_type, None)
   
   def test_create_with_explicit_valid_element_pdb_type(self):
     setting = settings_.ArraySetting(

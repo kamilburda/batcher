@@ -190,10 +190,6 @@ def _get_basic_settings():
       'type': 'display',
       'default_value': gimp.Display(image),
     },
-    {
-      'name': 'pdb_status',
-      'type': 'pdb_status',
-    },
     
     {
       'name': 'file_extension',

@@ -1,5 +1,7 @@
 """Stubs primarily to be used in the `test_setting` module."""
 
+from gi.repository import GObject
+
 from ...setting import presenter as presenter_
 from ...setting import settings as settings_
 
@@ -103,7 +105,7 @@ class StubWithCallableDefaultDefaultValueSetting(StubSetting):
 
 class StubRegistrableToPdbSetting(StubSetting):
 
-  _ALLOWED_PDB_TYPES = [settings_.SettingPdbTypes.string]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
 
 class StubWithGuiSetting(StubSetting):
