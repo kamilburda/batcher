@@ -510,9 +510,9 @@ class NamePreview(preview_base_.Preview):
   
   def _get_key(self, item):
     if item.type != pg.itemtree.TYPE_FOLDER:
-      return item.raw.ID
+      return item.raw.get_id()
     else:
-      return (item.raw.ID, pg.itemtree.FOLDER_KEY)
+      return item.raw.get_id(), pg.itemtree.FOLDER_KEY
   
   def _get_key_from_tree_iter(self, tree_iter):
     item_id = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_ID[0])
@@ -521,7 +521,7 @@ class NamePreview(preview_base_.Preview):
     if item_type != pg.itemtree.TYPE_FOLDER:
       return item_id
     else:
-      return (item_id, pg.itemtree.FOLDER_KEY)
+      return item_id, pg.itemtree.FOLDER_KEY
   
   def _get_items_to_process(self):
     if self.is_filtering:
@@ -601,7 +601,7 @@ class NamePreview(preview_base_.Preview):
        bool(item.tags),
        True,
        pg.utils.safe_encode_gtk(item.name),
-       item.raw.ID,
+       item.raw.get_id(),
        item.type])
     
     self._tree_iters[self._get_key(item)] = tree_iter

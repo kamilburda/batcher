@@ -163,12 +163,12 @@ class PreviewsController:
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_layers_collapsed_state'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image.ID]))
+      lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image.get_id()]))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
     self._settings['main/selected_layers'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_selected_items(setting.value[self._image.ID]))
+      lambda setting: self._name_preview.set_selected_items(setting.value[self._image.get_id()]))
   
   def _connect_setting_after_reset_displayed_items_in_image_preview(self):
     def _clear_image_preview(setting):
@@ -311,7 +311,7 @@ class PreviewsController:
     preview_sensitive_setting.set_value(False)
   
   def _set_initial_selection_and_update_image_preview(self):
-    setting_value = self._settings['gui/image_preview_displayed_layers'].value[self._image.ID]
+    setting_value = self._settings['gui/image_preview_displayed_layers'].value[self._image.get_id()]
     
     if not setting_value:
       raw_item_id_to_display = None
@@ -319,9 +319,9 @@ class PreviewsController:
       raw_item_id_to_display = list(setting_value)[0]
     
     if (raw_item_id_to_display is None
-        and not self._settings['main/selected_layers'].value[self._image.ID]
+        and not self._settings['main/selected_layers'].value[self._image.get_id()]
         and self._image.active_layer is not None):
-      raw_item_id_to_display = self._image.active_layer.ID
+      raw_item_id_to_display = self._image.active_layer.get_id()
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items([raw_item_id_to_display])
     else:
@@ -332,14 +332,14 @@ class PreviewsController:
   
   def _update_selected_items(self):
     selected_items_dict = self._settings['main/selected_layers'].value
-    selected_items_dict[self._image.ID] = self._name_preview.selected_items
+    selected_items_dict[self._image.get_id()] = self._name_preview.selected_items
     self._settings['main/selected_layers'].set_value(selected_items_dict)
   
   def _update_image_preview(self):
     item_from_cursor = self._name_preview.get_item_from_cursor()
     if item_from_cursor is not None:
       if (self._image_preview.item is None
-          or item_from_cursor.raw.ID != self._image_preview.item.raw.ID
+          or item_from_cursor.raw.get_id() != self._image_preview.item.raw.get_id()
           or item_from_cursor.type != self._image_preview.item.type):
         self._image_preview.item = item_from_cursor
         self._image_preview.update()

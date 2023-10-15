@@ -75,7 +75,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         if image is None:
           continue
         
-        image_id = image.ID
+        image_id = image.get_id()
         
         if not isinstance(items, Iterable) or isinstance(items, str):
           raise TypeError('expected a list-like, found {}'.format(items))
@@ -106,9 +106,9 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
               
               if item_object is not None:
                 if item_type is None:
-                  processed_items.add(item_object.ID)
+                  processed_items.add(item_object.get_id())
                 else:
-                  processed_items.add((item_object.ID, item_type))
+                  processed_items.add((item_object.get_id(), item_type))
           else:
             item_object = Gimp.Item.get_by_id(item)
             if item_object is not None:
@@ -191,7 +191,7 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
   @property
   def value(self):
     # Return a copy to prevent modifying the dictionary indirectly by assigning
-    # to individual items (`setting.value[image.ID] = dirpath`).
+    # to individual items (`setting.value[image.get_id()] = dirpath`).
     return dict(self._value)
   
   def update_image_ids_and_dirpaths(self):
@@ -215,7 +215,7 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
   
   def _get_currently_opened_images(self):
     current_images = gimp.image_list()
-    current_image_ids = set([image.ID for image in current_images])
+    current_image_ids = set([image.get_id() for image in current_images])
     
     return current_images, current_image_ids
   
@@ -226,8 +226,8 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
   
   def _add_new_opened_images(self, current_images):
     for image in current_images:
-      if image.ID not in self._value:
-        self._value[image.ID] = self._get_image_import_dirpath(image)
+      if image.get_id() not in self._value:
+        self._value[image.get_id()] = self._get_image_import_dirpath(image)
   
   def _get_image_import_dirpath(self, image):
     if image.get_file() is not None:

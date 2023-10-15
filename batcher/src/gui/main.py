@@ -128,12 +128,12 @@ def _set_settings(func):
       self._settings['main/output_directory'].set_value(
         self._settings['gui/current_directory'].value)
       
-      self._settings['main/selected_layers'].value[self._image.ID] = (
+      self._settings['main/selected_layers'].value[self._image.get_id()] = (
         self._name_preview.selected_items)
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.ID] = (
+      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.get_id()] = (
         self._name_preview.collapsed_items)
-      self._settings['gui/image_preview_displayed_layers'].value[self._image.ID] = (
-        [self._image_preview.item.raw.ID] if self._image_preview.item is not None else [])
+      self._settings['gui/image_preview_displayed_layers'].value[self._image.get_id()] = (
+        [self._image_preview.item.raw.get_id()] if self._image_preview.item is not None else [])
     except pg.setting.SettingValueError as e:
       self._display_inline_message(str(e), gtk.MESSAGE_ERROR, e.setting)
       return
@@ -166,7 +166,7 @@ def _setup_image_ids_and_directories_and_initial_directory(
   update_performed = _update_directory(
     current_directory_setting,
     current_image,
-    settings['gui/image_ids_and_directories'].value[current_image.ID])
+    settings['gui/image_ids_and_directories'].value[current_image.get_id()])
   
   if not update_performed:
     current_directory_setting.set_value(settings['main/output_directory'].value)
@@ -201,7 +201,7 @@ def _setup_output_directory_changed(settings, current_image):
     'value-changed',
     on_output_directory_changed,
     settings['gui/image_ids_and_directories'],
-    current_image.ID)
+    current_image.get_id())
 
 
 #===============================================================================
@@ -620,8 +620,8 @@ class ExportLayersDialog:
       self._batcher_for_previews,
       self._settings,
       self._initial_layer_tree,
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.ID],
-      self._settings['main/selected_layers'].value[self._image.ID],
+      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.get_id()],
+      self._settings['main/selected_layers'].value[self._image.get_id()],
       'selected_in_preview',
       self._settings['main/available_tags'])
     
@@ -882,7 +882,7 @@ class ExportLayersDialog:
       self._name_preview.update()
   
   def _on_dialog_notify_is_active(self, dialog, property_spec):
-    if not pdb.gimp_image_is_valid(self._image):
+    if not self._image.is_valid():
       gtk.main_quit()
       return
     
@@ -1016,7 +1016,7 @@ class ExportLayersDialog:
       messages_.display_processing_failure_message(e, parent=self._dialog)
       should_quit = False
     except Exception as e:
-      if pdb.gimp_image_is_valid(self._image):
+      if self._image.is_valid():
         raise
       else:
         messages_.display_invalid_image_failure_message(parent=self._dialog)
@@ -1271,7 +1271,7 @@ class ExportLayersRepeatDialog:
     except exceptions.BatcherError as e:
       messages_.display_processing_failure_message(e, parent=self._dialog)
     except Exception as e:
-      if pdb.gimp_image_is_valid(self._image):
+      if self._image.is_valid():
         raise
       else:
         messages_.display_invalid_image_failure_message(parent=self._dialog)

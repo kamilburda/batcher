@@ -174,8 +174,8 @@ class ImagePreview(preview_base_.Preview):
     if raw_item_id is None:
       if (self.item is not None
           and self._batcher.item_tree is not None
-          and self.item.raw.ID in self._batcher.item_tree):
-        raw_item_id = self.item.raw.ID
+          and self.item.raw.get_id() in self._batcher.item_tree):
+        raw_item_id = self.item.raw.get_id()
         should_update = True
       else:
         should_update = False
@@ -315,7 +315,7 @@ class ImagePreview(preview_base_.Preview):
     
     image_preview, error = self._get_image_preview()
     
-    if image_preview is None or not pdb.gimp_image_is_valid(image_preview):
+    if image_preview is None or not image_preview.is_valid():
       return None, error
     
     if not image_preview.layers:
@@ -360,7 +360,7 @@ class ImagePreview(preview_base_.Preview):
     only_selected_item_constraint_id = self._batcher.add_constraint(
       builtin_constraints.is_item_in_selected_items,
       groups=[actions.DEFAULT_CONSTRAINTS_GROUP],
-      args=[[self.item.raw.ID]])
+      args=[[self.item.raw.get_id()]])
     
     error = None
     

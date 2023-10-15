@@ -176,7 +176,7 @@ class NumberField(Field):
     
     if reset_numbering_on_parent:
       parent_item = item.parent if item.parent is not None else None
-      parent_id = parent_item.raw.ID if parent_item is not None else None
+      parent_id = parent_item.raw.get_id() if parent_item is not None else None
     else:
       parent_item = None
       parent_id = None
