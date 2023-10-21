@@ -4,7 +4,7 @@ from collections.abc import Iterable
 import copy
 import inspect
 import sys
-from typing import Callable, Dict, List, Optional, Set, Union, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -183,7 +183,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
         setting_sources: Union[Dict, List, None] = None,
-        error_messages: Optional[Dict[str, str]] = None,
+        error_messages: Optional[Dict[Any, str]] = None,
         tags: Optional[Iterable[str]] = None,
   ):
     """Initializes a new setting.
@@ -374,7 +374,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return self._setting_sources
   
   @property
-  def error_messages(self) -> Dict[str, str]:
+  def error_messages(self) -> Dict[Any, str]:
     """A dictionary of error messages.
     
     The dictionary contains (message name, message contents) pairs which can
@@ -1359,20 +1359,17 @@ class ImageSetting(Setting):
 
 
 class GimpItemSetting(Setting):
-  """Abstract class for settings storing GIMP items - layers, channels, etc.
+  """Abstract class for settings storing GIMP items - layers, channels, vectors.
   
   This class accepts as a value one of the following:
-  
   * a tuple (image file path, item type, item path) where item type is the name
-    of the item's GIMP class (e.g. `Layer`).
-  
+    of the item's GIMP class (e.g. ``'Layer'``).
   * a tuple (item type, item ID). Item ID is are assigned by GIMP.
-  
   * a `Gimp.Item` instance.
   
-  If calling `to_dict(source_type='session')`, a tuple (item type, item ID) is
+  If calling ``to_dict(source_type='session')``, a tuple (item type, item ID) is
   returned for `value` and `default_value`.
-  If calling `to_dict()` with any other value for `source_type`, a tuple
+  If calling `to_dict()` with any other value for ``source_type``, a tuple
   (image file path, item type, item path) is returned.
   """
   
@@ -1387,7 +1384,7 @@ class GimpItemSetting(Setting):
       else:
         raise ValueError(
           ('lists as values for GIMP item settings must contain'
-           ' exactly 3 elements (has {})').format(len(raw_value)))
+           f' exactly 3 elements (has {len(raw_value)})'))
     elif isinstance(raw_value, int):
       value = Gimp.Item.get_by_id(raw_value)
     
@@ -1399,15 +1396,17 @@ class GimpItemSetting(Setting):
     else:
       return pgpdbutils.get_item_as_path(value)
   
-  def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
+  @staticmethod
+  def _get_item_from_image_and_item_path(image_filepath, item_type_name, item_path):
     image = pgpdbutils.find_image_by_filepath(image_filepath)
-    
+
     if image is None:
       return None
     
     return pgpdbutils.get_item_from_image_and_item_path(image, item_type_name, item_path)
   
-  def _get_item_as_id(self, item):
+  @staticmethod
+  def _get_item_as_id(item):
     if item is not None:
       return item.get_id()
     else:
@@ -1415,15 +1414,13 @@ class GimpItemSetting(Setting):
 
 
 class ItemSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Item` objects.
+  """Class for settings holding `Gimp.Item` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Item`
   
   Error messages:
-  
-  * ``'invalid_value'``: The item assigned is invalid.
+  * ``'invalid_value'``: The item assigned is not valid.
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Item]
@@ -1437,21 +1434,19 @@ class ItemSetting(GimpItemSetting):
     self.error_messages['invalid_value'] = _('Invalid item.')
   
   def _validate(self, item):
-    if item is not None and not isinstance(item, gimp.Item):
+    if item is not None and not isinstance(item, Gimp.Item):
       raise SettingValueError(
         utils_.value_to_str_prefix(item) + self.error_messages['invalid_value'])
 
 
 class DrawableSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Drawable` objects.
+  """Class for settings holding `Gimp.Drawable` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Drawable`
   
   Error messages:
-  
-  * ``'invalid_value'``: The drawable assigned is invalid.
+  * ``'invalid_value'``: The drawable assigned is not valid.
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Drawable]
@@ -1460,26 +1455,24 @@ class DrawableSetting(GimpItemSetting):
   
   def _copy_value(self, value):
     return value
-    
+
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid drawable.')
   
   def _validate(self, drawable):
-    if drawable is not None and not pdb.gimp_item_is_drawable(drawable):
+    if drawable is not None and not drawable.is_drawable():
       raise SettingValueError(
         utils_.value_to_str_prefix(drawable) + self.error_messages['invalid_value'])
 
 
 class LayerSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Layer` or `Gimp.GroupLayer` objects.
+  """Class for settings holding `Gimp.Layer` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Layer`
   
   Error messages:
-  
-  * ``'invalid_value'``: The layer assigned is invalid.
+  * ``'invalid_value'``: The layer assigned is not valid.
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Layer]
@@ -1493,21 +1486,19 @@ class LayerSetting(GimpItemSetting):
     self.error_messages['invalid_value'] = _('Invalid layer.')
   
   def _validate(self, layer):
-    if layer is not None and not pdb.gimp_item_is_layer(layer):
+    if layer is not None and not layer.is_layer():
       raise SettingValueError(
         utils_.value_to_str_prefix(layer) + self.error_messages['invalid_value'])
 
 
 class ChannelSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Channel` objects.
+  """Class for settings holding `Gimp.Channel` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Channel`
 
   Error messages:
-  
-  * ``'invalid_value'``: The channel assigned is invalid.
+  * ``'invalid_value'``: The channel assigned is not valid.
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Channel]
@@ -1521,7 +1512,7 @@ class ChannelSetting(GimpItemSetting):
     self.error_messages['invalid_value'] = _('Invalid channel.')
   
   def _validate(self, channel):
-    if channel is not None and not pdb.gimp_item_is_channel(channel):
+    if channel is not None and not channel.is_channel():
       raise SettingValueError(
         utils_.value_to_str_prefix(channel) + self.error_messages['invalid_value'])
 
@@ -1529,17 +1520,15 @@ class ChannelSetting(GimpItemSetting):
 class SelectionSetting(ChannelSetting):
   """Class for settings holding the current selection.
   
-  A selection in GIMP is internally represented as a `Gimp.Channel` object.
+  A selection in GIMP is internally represented as a `Gimp.Channel` instance.
   Unlike `ChannelSetting`, this setting does not support GUI (there is no need
   for GUI).
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Selection`
   
   Error messages:
-  
-  * ``'invalid_value'``: The channel assigned is invalid.
+  * ``'invalid_value'``: The channel assigned is not valid.
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Selection]
@@ -1548,15 +1537,13 @@ class SelectionSetting(ChannelSetting):
 
 
 class VectorsSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Vectors` objects.
+  """Class for settings holding `Gimp.Vectors` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Vectors`
   
   Error messages:
-  
-  * ``'invalid_value'``: The vectors instance assigned is invalid.
+  * ``'invalid_value'``: The vectors instance assigned is not valid.
   """
   
   _ALIASES = ['path']
@@ -1572,23 +1559,21 @@ class VectorsSetting(GimpItemSetting):
     self.error_messages['invalid_value'] = _('Invalid vectors.')
   
   def _validate(self, vectors):
-    if vectors is not None and not pdb.gimp_item_is_vectors(vectors):
+    if vectors is not None and not vectors.is_vectors():
       raise SettingValueError(
         utils_.value_to_str_prefix(vectors) + self.error_messages['invalid_value'])
 
 
 class ColorSetting(Setting):
-  """Class for settings holding `Gimp.RGB` objects.
+  """Class for settings holding `Gimp.RGB` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.RGB`
   
-  Default value: `Gimp.RGB` instance with color `(0, 0, 0)`.
+  Default value: `Gimp.RGB` instance with color `(0, 0, 0)` and alpha set to 0.
   
   Error messages:
-  
-  * ``'invalid_value'``: The color assigned is invalid.
+  * ``'invalid_value'``: The color assigned is not valid.
   """
 
   _ALIASES = ['rgb', 'RGB']
@@ -1605,7 +1590,15 @@ class ColorSetting(Setting):
   
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
-      return gimpcolor.RGB(*raw_value)
+      color = Gimp.RGB()
+
+      if len(raw_value) >= 3:
+        color.set(*(item / 255 for item in raw_value[:3]))
+
+      if len(raw_value) >= 4:
+        color.set_alpha(raw_value[3] / 255)
+
+      return color
     else:
       return raw_value
   
@@ -1619,21 +1612,19 @@ class ColorSetting(Setting):
 
 
 class DisplaySetting(Setting):
-  """Class for settings holding `Gimp.Display` objects.
+  """Class for settings holding `Gimp.Display` instances.
   
-  `Gimp.Display` objects cannot be loaded or saved. Therefore, `to_dict()`
-  returns a dictionary whose ``'value'`` and ``'default_value'`` keys are ``None``.
+  `Gimp.Display` instances cannot be loaded or saved. Therefore, `to_dict()`
+  returns a dictionary whose ``'value'`` and ``'default_value'`` keys are
+  ``None``.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Display`
   
   Error messages:
-  
-  * ``'invalid_value'``: The display assigned is invalid.
+  * ``'invalid_value'``: The display assigned is not valid.
   
   Empty values:
-  
   * ``None``
   """
   
@@ -1650,27 +1641,25 @@ class DisplaySetting(Setting):
     self.error_messages['invalid_value'] = _('Invalid display.')
   
   def _value_to_raw(self, value, source_type):
-    # There is no way to restore `Gimp.Display` objects, therefore return ``None``.
+    # There is no way to restore `Gimp.Display` objects, hence return ``None``.
     return None
   
   def _validate(self, display):
-    if not pdb.gimp_display_is_valid(display):
+    if not display.is_valid():
       raise SettingValueError(
         utils_.value_to_str_prefix(display) + self.error_messages['invalid_value'])
 
 
 class ParasiteSetting(Setting):
-  """Class for settings holding `Gimp.Parasite` objects.
+  """Class for settings holding `Gimp.Parasite` instances.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Parasite`
   
-  Default value: `Gimp.Parasite` instance whose name is equal to the setting
-  name, all flags are disabled (i.e. equal to 0) and data are empty (``''``).
+  Default value: `Gimp.Parasite` instance with name equal to the setting
+  name, no flags and empty data (``''``).
   
   Error messages:
-  
   * ``'invalid_value'``: The value is not a `Gimp.Parasite` instance.
   """
   
@@ -1710,25 +1699,25 @@ class ValidatableStringSetting(StringSetting):
   subclass is called.
   
   Error messages:
-  
-  This class contains empty messages for error statuses from the specified
-  `path.StringValidator` subclass. Normally, if the value (string) assigned is
-  invalid, status messages returned from `is_valid()` are used. If desired, you
-  may fill the error messages with custom messages which override the status
-  messages from the method. See `path.FileValidatorErrorStatuses` for available
-  error statuses.
+    This class contains empty messages for error statuses from the specified
+    `path.StringValidator` subclass. Normally, if the value (string) assigned
+    is invalid, status messages returned from `is_valid()` are used. If
+    desired, you may fill the error messages with custom messages which
+    override the status messages from the method. See
+    `path.FileValidatorErrorStatuses` for available error statuses.
   """
   
   _ABSTRACT = True
   
-  def __init__(self, name, string_validator, **kwargs):
-    """Additional parameters:
+  def __init__(self, name: str, string_validator_class: Type[pgpath.StringValidator], **kwargs):
+    """Initializes a `ValidatableStringSetting` instance.
     
-    string_validator:
-      `path.StringValidator` subclass used to validate the
-      value assigned to this object.
+    Args:
+      string_validator_class:
+        `path.StringValidator` subclass used to validate the value assigned to
+        this object.
     """
-    self._string_validator = string_validator
+    self._string_validator = string_validator_class
     
     super().__init__(name, **kwargs)
   
@@ -1758,7 +1747,6 @@ class FileExtensionSetting(ValidatableStringSetting):
   file extension is valid.
   
   Empty values:
-  
   * ``''``
   """
   
@@ -1793,7 +1781,6 @@ class DirpathSetting(ValidatableStringSetting):
   directory path is valid.
   
   Empty values:
-  
   * ``None``
   * ``''``
   """
@@ -1811,153 +1798,198 @@ class DirpathSetting(ValidatableStringSetting):
     super().__init__(name, pgpath.DirpathValidator, **kwargs)
 
 
-class BrushSetting(Setting):
+class ResourceSetting(Setting):
+  """Abstract class for settings storing `Gimp.Resource` instances (brushes,
+  fonts, etc.).
+
+  Default value: ``None``
+
+  Empty values:
+  * ``None``
+
+  Error messages:
+  * ``'invalid_value'``: The resource is not valid.
+  """
+
+  _ABSTRACT = True
+
+  _DEFAULT_DEFAULT_VALUE = None
+
+  _EMPTY_VALUES = [None]
+
+  def __init__(self, name, resource_type: Union[GObject.GType, gi.types.GObjectMeta], **kwargs):
+    self._resource_type = resource_type
+
+    super().__init__(name, **kwargs)
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid resource.')
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, dict):
+      raw_value_copy = dict(raw_value)
+
+      name = raw_value_copy.pop('name', None)
+
+      if name is None:
+        return None
+
+      resource = self._resource_type.get_by_name(name)
+
+      if resource is None:
+        return None
+
+      for key, value in raw_value_copy.items():
+        set_property_func = getattr(resource, f'set_{key}', None)
+        if set_property_func is not None:
+          set_property_func(value)
+      else:
+        return None
+    else:
+      return raw_value
+
+  def _value_to_raw(self, resource, source_type):
+    return {
+      'name': resource.get_name(),
+    }
+
+  def _validate(self, resource):
+    if not resource.is_valid():
+      raise SettingValueError(
+        utils_.value_to_str_prefix(resource) + self.error_messages['invalid_value'])
+
+
+class BrushSetting(ResourceSetting):
   """Class for settings storing brushes.
   
-  Each brush is represented by a tuple
-  `(brush name: string, opacity: float, spacing: int, layer mode: int)`.
-  
-  When instantiating the setting or calling `set_value`, brush name may be
-  passed without being wrapped in a tuple that gets then converted to a tuple of
-  one element containing the brush name.
-  
   Allowed GIMP PDB types:
-  
   * `Gimp.Brush`
-  
-  Default value: `()`
-  
+
+  Default value: ``None``
+
   Empty values:
-  
-  * `()`
-  
-  Error messages:
-  
-  * ``'invalid_value'``: Invalid number of tuple elements.
+  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Brush]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.brush_select_button]
 
-  _DEFAULT_DEFAULT_VALUE = ()
-
-  _EMPTY_VALUES = [()]
-  
-  _MAX_NUM_TUPLE_ELEMENTS = 4
+  def __init__(self, name, **kwargs):
+    super().__init__(name, Gimp.Brush, **kwargs)
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _(
-      'Invalid number of tuple elements (must be at most {}).'.format(
-        self._MAX_NUM_TUPLE_ELEMENTS))
+    self.error_messages['invalid_value'] = _('Invalid brush.')
   
-  def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, str):
-      return (raw_value,)
-    elif isinstance(raw_value, list):
-      return tuple(raw_value)
-    else:
-      return raw_value
-  
-  def _value_to_raw(self, value, source_type):
-    return list(value)
-  
-  def _validate(self, brush_tuple):
-    if len(brush_tuple) > self._MAX_NUM_TUPLE_ELEMENTS:
-      raise SettingValueError(
-        utils_.value_to_str_prefix(brush_tuple) + self.error_messages['invalid_value'])
+  def _value_to_raw(self, resource, source_type):
+    return {
+      'name': resource.get_name(),
+      'angle': resource.get_angle(),
+      'aspect_ratio': resource.get_aspect_ratio(),
+      'hardness': resource.get_hardness(),
+      'radius': resource.get_radius(),
+      'shape': resource.get_shape(),
+      'spacing': resource.get_spacing(),
+      'spikes': resource.get_spikes(),
+    }
 
 
 class FontSetting(Setting):
-  """Class for settings storing fonts as strings.
+  """Class for settings storing fonts.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Font`
   
-  Default value: ``''``
-  
+  Default value: ``None``
+
   Empty values:
-  
-  * ``''``
+  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Font]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.font_select_button]
 
-  _DEFAULT_DEFAULT_VALUE = ''
+  def __init__(self, name, **kwargs):
+    super().__init__(name, Gimp.Font, **kwargs)
 
-  _EMPTY_VALUES = ['']
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid font.')
 
 
 class GradientSetting(Setting):
-  """Class for settings storing gradients as strings.
+  """Class for settings storing gradients.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Gradient`
   
-  Default value: ``''``
-  
+  Default value: ``None``
+
   Empty values:
-  
-  * ``''``
+  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Gradient]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.gradient_select_button]
 
-  _DEFAULT_DEFAULT_VALUE = ''
+  def __init__(self, name, **kwargs):
+    super().__init__(name, Gimp.Gradient, **kwargs)
 
-  _EMPTY_VALUES = ['']
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid gradient.')
 
 
 class PaletteSetting(Setting):
-  """Class for settings storing color palettes as strings.
+  """Class for settings storing color palettes.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Palette`
   
-  Default value: ``''``
-  
+  Default value: ``None``
+
   Empty values:
-  
-  * ``''``
+  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Palette]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.palette_select_button]
 
-  _DEFAULT_DEFAULT_VALUE = ''
+  def __init__(self, name, **kwargs):
+    super().__init__(name, Gimp.Palette, **kwargs)
 
-  _EMPTY_VALUES = ['']
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid palette.')
+
+  def _value_to_raw(self, resource, source_type):
+    return {
+      'name': resource.get_name(),
+      'columns': resource.get_columns(),
+    }
 
 
 class PatternSetting(Setting):
-  """Class for settings storing patterns as strings.
+  """Class for settings storing patterns.
   
   Allowed GIMP PDB types:
-  
   * `Gimp.Pattern`
   
-  Default value: ``''``
-  
+  Default value: ``None``
+
   Empty values:
-  
-  * ``''``
+  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Pattern]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.pattern_select_button]
 
-  _DEFAULT_DEFAULT_VALUE = ''
+  def __init__(self, name, **kwargs):
+    super().__init__(name, Gimp.Pattern, **kwargs)
 
-  _EMPTY_VALUES = ['']
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid pattern.')
 
 
 class ArraySetting(Setting):
@@ -1987,28 +2019,20 @@ class ArraySetting(Setting):
   in `Setting.__init__()` as one normally would.
 
   Allowed GIMP PDB types:
-
   TODO
   
   Default value: `()`
   
   Error messages:
-  
   * ``'invalid_value'``: The value is not a tuple or an iterable container.
-  
   * ``'negative_min_size'``: `min_size` is negative.
-  
   * ``'min_size_greater_than_max_size'``: `min_size` is greater than `max_size`.
-  
   * ``'min_size_greater_than_value_length'``: `min_size` is greater than the
     length of the value.
-  
   * ``'max_size_less_than_value_length'``: `max_size` is less than the length of
     the value.
-  
   * ``'delete_below_min_size'``: deleting an element causes the array to have
     fewer than `min_size` elements.
-  
   * ``'add_above_max_size'``: adding an element causes the array to have more
     than `max_size` elements.
   """
@@ -2020,10 +2044,10 @@ class ArraySetting(Setting):
   _DEFAULT_DEFAULT_VALUE = ()
 
   _ARRAY_PDB_TYPES = {
-    'int': Gimp.Int32Array,
-    'float': Gimp.FloatArray,
-    'color': Gimp.RGBArray,
-    'string': GObject.TYPE_STRV,
+    IntSetting: (GObject.TYPE_INT, Gimp.Int32Array),
+    FloatSetting: (GObject.TYPE_FLOAT, Gimp.FloatArray),
+    ColorSetting: (Gimp.RGB, Gimp.RGBArray),
+    StringSetting: (GObject.TYPE_STRING, GObject.TYPE_STRV),
   }
   
   def __init__(self, name, element_type, min_size=0, max_size=None, **kwargs):
