@@ -518,94 +518,71 @@ class FolderChooserButtonPresenter(GtkPresenter):
     self._widget.set_filename(dirpath if dirpath is not None else '')
 
 
-class BrushSelectButtonPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `GimpUi.BrushSelectButton` widgets.
-  
-  Value: A `Gimp.Brush` instance.
+class GimpResourceSelectButtonPresenter(GtkPresenter):
+  """Abstract `setting.Presenter` subclass for widgets allowing to select and
+  modify a `Gimp.Resource` instance via a specialized button.
   """
+
+  _ABSTRACT = True
   
   _VALUE_CHANGED_SIGNAL = 'resource-set'
-  
-  def _create_widget(self, setting):
-    return GimpUi.BrushSelectButton.new(setting.display_name, setting.value)
-  
+
   def _get_value(self):
     return self._widget.get_resource()
   
   def _set_value(self, value):
-    self._widget.set_resource(value)
+    if value is not None:
+      self._widget.set_resource(value)
 
 
-class FontSelectButtonPresenter(GtkPresenter):
+class BrushSelectButtonPresenter(GimpResourceSelectButtonPresenter):
+  """`setting.Presenter` subclass for `GimpUi.BrushSelectButton` widgets.
+
+  Value: A `Gimp.Brush` instance.
+  """
+
+  def _create_widget(self, setting):
+    return GimpUi.BrushSelectButton.new(setting.display_name, setting.value)
+
+
+class FontSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   """`setting.Presenter` subclass for `GimpUi.FontSelectButton` widgets.
   
   Value: A `Gimp.Font` instance.
   """
   
-  _VALUE_CHANGED_SIGNAL = 'resource-set'
-  
   def _create_widget(self, setting):
     return GimpUi.FontSelectButton.new(setting.display_name, setting.value)
-  
-  def _get_value(self):
-    return self._widget.get_resource()
-  
-  def _set_value(self, value):
-    self._widget.set_resource(value)
 
 
-class GradientSelectButtonPresenter(GtkPresenter):
+class GradientSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   """`setting.Presenter` subclass for `GimpUi.GradientSelectButton` widgets.
   
   Value: A `Gimp.Gradient` instance.
   """
   
-  _VALUE_CHANGED_SIGNAL = 'resource-set'
-  
   def _create_widget(self, setting):
     return GimpUi.GradientSelectButton.new(setting.display_name, setting.value)
-  
-  def _get_value(self):
-    return self._widget.get_resource()
-  
-  def _set_value(self, value):
-    self._widget.set_resource(value)
 
 
-class PaletteSelectButtonPresenter(GtkPresenter):
+class PaletteSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   """`setting.Presenter` subclass for `GimpUi.PaletteSelectButton` widgets.
   
   Value: A `Gimp.Palette` instance.
   """
   
-  _VALUE_CHANGED_SIGNAL = 'resource-set'
-  
   def _create_widget(self, setting):
     return GimpUi.PaletteSelectButton.new(setting.display_name, setting.value)
-  
-  def _get_value(self):
-    return self._widget.get_resource()
-  
-  def _set_value(self, value):
-    self._widget.set_resource(value)
 
 
-class PatternSelectButtonPresenter(GtkPresenter):
+class PatternSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   """`setting.Presenter` subclass for `GimpUi.PatternSelectButton` widgets.
   
   Value: String representing a pattern.
   """
   
-  _VALUE_CHANGED_SIGNAL = 'resource-set'
-  
   def _create_widget(self, setting):
     return GimpUi.PatternSelectButton.new(setting.display_name, setting.value)
-  
-  def _get_value(self):
-    return self._widget.get_resource()
-  
-  def _set_value(self, value):
-    self._widget.set_resource(value)
 
 
 class ArrayBoxPresenter(GtkPresenter):
