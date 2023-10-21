@@ -1798,7 +1798,7 @@ class DirpathSetting(ValidatableStringSetting):
     super().__init__(name, pgpath.DirpathValidator, **kwargs)
 
 
-class ResourceSetting(Setting):
+class GimpResourceSetting(Setting):
   """Abstract class for settings storing `Gimp.Resource` instances (brushes,
   fonts, etc.).
 
@@ -1864,7 +1864,7 @@ class ResourceSetting(Setting):
         utils_.value_to_str_prefix(resource) + self.error_messages['invalid_value'])
 
 
-class BrushSetting(ResourceSetting):
+class BrushSetting(GimpResourceSetting):
   """Class for settings storing brushes.
   
   Allowed GIMP PDB types:
@@ -1899,7 +1899,7 @@ class BrushSetting(ResourceSetting):
     }
 
 
-class FontSetting(Setting):
+class FontSetting(GimpResourceSetting):
   """Class for settings storing fonts.
   
   Allowed GIMP PDB types:
@@ -1922,7 +1922,7 @@ class FontSetting(Setting):
     self.error_messages['invalid_value'] = _('Invalid font.')
 
 
-class GradientSetting(Setting):
+class GradientSetting(GimpResourceSetting):
   """Class for settings storing gradients.
   
   Allowed GIMP PDB types:
@@ -1945,7 +1945,7 @@ class GradientSetting(Setting):
     self.error_messages['invalid_value'] = _('Invalid gradient.')
 
 
-class PaletteSetting(Setting):
+class PaletteSetting(GimpResourceSetting):
   """Class for settings storing color palettes.
   
   Allowed GIMP PDB types:
@@ -1974,7 +1974,7 @@ class PaletteSetting(Setting):
     }
 
 
-class PatternSetting(Setting):
+class PatternSetting(GimpResourceSetting):
   """Class for settings storing patterns.
   
   Allowed GIMP PDB types:
