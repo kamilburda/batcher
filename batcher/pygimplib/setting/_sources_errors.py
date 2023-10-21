@@ -15,7 +15,10 @@ class SourceError(Exception):
   
   def __init__(self, message=''):
     super().__init__(message)
-    
+
+    if not hasattr(self, 'message'):
+      self.message = message
+
     self.traceback = traceback_.format_exc()
   
   def __str__(self):
