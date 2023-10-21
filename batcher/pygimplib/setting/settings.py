@@ -405,7 +405,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return list(cls._ALLOWED_PDB_TYPES)
   
   @classmethod
-  def get_allowed_gui_types(cls) -> List[presenter_.Presenter]:
+  def get_allowed_gui_types(cls) -> List[Type[presenter_.Presenter]]:
     """Returns the list of allowed GUI types for this setting type."""
     return [process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
   
@@ -489,7 +489,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   def set_gui(
         self,
-        gui_type: Union[presenter_.Presenter, str, None] = 'automatic',
+        gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         widget=None,
         auto_update_gui_to_setting: bool = True,
   ):
