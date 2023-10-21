@@ -2411,8 +2411,8 @@ class ContainerSetting(Setting):
   the item values via GUI.
   
   If you intend to save container settings to a setting source, make sure each
-  item is of one of the types specified in the description of `to_dict()`.
-  Otherwise, saving may fail.
+  item is of one of the types specified in the description of
+  `Setting.to_dict()`. Otherwise, saving may fail.
   
   Optionally, when assigning, the value can be nullable (``None``) instead of
   always a container.
@@ -2424,18 +2424,19 @@ class ContainerSetting(Setting):
 
   _ALLOWED_GUI_TYPES = []
   
-  def __init__(self, name, nullable=False, **kwargs):
-    """Additional parameters:
-    
-    nullable:
-      See the `nullable` property.
+  def __init__(self, name: str, nullable: bool = False, **kwargs):
+    """Initializes a `ContainerSetting` instance.
+
+    Args:
+      nullable:
+        See the `nullable` property.
     """
     super().__init__(name, **kwargs)
     
     self._nullable = nullable
   
   @property
-  def nullable(self):
+  def nullable(self) -> bool:
     """If ``True``, ``None`` is treated as a valid value when calling `set_value()`.
     """
     return self._nullable
@@ -2451,7 +2452,7 @@ class ContainerSetting(Setting):
 
 
 class ListSetting(ContainerSetting):
-  """Class for settings representing lists (mutable sequence of elements)."""
+  """Class for settings representing lists (mutable sequences of elements)."""
   
   _DEFAULT_DEFAULT_VALUE = []
   
@@ -2463,7 +2464,8 @@ class ListSetting(ContainerSetting):
 
 
 class TupleSetting(ContainerSetting):
-  """Class for settings representing tuples (immutable sequence of elements)."""
+  """Class for settings representing tuples (immutable sequences of elements).
+  """
   
   _DEFAULT_DEFAULT_VALUE = ()
   
@@ -2478,7 +2480,7 @@ class TupleSetting(ContainerSetting):
 
 
 class SetSetting(ContainerSetting):
-  """Class for settings representing sets (mutable unordered collection of
+  """Class for settings representing sets (mutable unordered collections of
   elements).
   """
   
@@ -2495,8 +2497,8 @@ class SetSetting(ContainerSetting):
 
 
 class DictSetting(ContainerSetting):
-  """Class for settings representing dictionaries (unordered collection of
-  key-value pairs).
+  """Class for settings representing dictionaries (collections of key-value
+  pairs).
   """
   
   _ALIASES = ['dictionary', 'map']
@@ -2512,54 +2514,57 @@ class DictSetting(ContainerSetting):
 
 class SettingValueError(Exception):
   """Exception class raised when assigning an invalid value to a `Setting`
-  object.
+  instance.
   """
   
-  def __init__(self, *args, **kwargs):
-    for kwarg in ['setting', 'settings', 'messages']:
-      setattr(self, kwarg, kwargs.pop(kwarg, None))
+  def __init__(self, message, setting=None, settings=None, messages=None):
+    self.setting = setting
+    self.settings = settings
+    self.messages = messages
     
-    super().__init__(*args, **kwargs)
+    super().__init__(message)
 
 
 class SettingDefaultValueError(SettingValueError):
   """Exception class raised when the default value specified during the
-  `Setting` object initialization is invalid.
+  `Setting` instance initialization is invalid.
   """
   
   pass
 
 
-def process_setting_type(setting_type_or_name):
-  """Returns a `setting.Setting` class based on the input type or name.
+def process_setting_type(setting_type_or_name: Union[Type[Setting], str]) -> Type[Setting]:
+  """Returns a `Setting` class based on the input type or name.
   
-  `setting_type_or_name` can be a `setting.Setting` class or a string
-  representing the class name or one of its aliases in `setting.SettingTypes`.
+  ``setting_type_or_name`` can be a `Setting` class or a string
+  representing the class name or one of its aliases in `SettingTypes`.
   
-  `ValueError` is raised if `setting_type_or_name` is not valid.
+  `ValueError` is raised if ``setting_type_or_name`` is not valid.
   """
   return _process_type(
     setting_type_or_name,
     SettingTypes,
-    ('setting type "{}" is not recognized; refer to'
+    (f'setting type "{setting_type_or_name}" is not recognized; refer to'
      ' pygimplib.setting.SettingTypes for the supported setting types and their'
-     ' aliases').format(setting_type_or_name))
+     ' aliases'))
 
 
-def process_setting_gui_type(setting_gui_type_or_name):
+def process_setting_gui_type(
+      setting_gui_type_or_name: Union[Type[presenter_.Presenter], str],
+) -> Type[presenter_.Presenter]:
   """Returns a `setting.Presenter` class based on the input type or name.
   
-  `setting_gui_type_or_name` can be a `setting.Presenter` class or a string
-  representing the class name or one of its aliases in `setting.GUI_TYPES`.
+  ``setting_gui_type_or_name`` can be a `setting.Presenter` class or a string
+  representing the class name or one of its aliases in `SettingGuiTypes`.
   
-  `ValueError` is raised if `setting_gui_type_or_name` is not valid.
+  `ValueError` is raised if ``setting_gui_type_or_name`` is not valid.
   """
   return _process_type(
     setting_gui_type_or_name,
     SettingGuiTypes,
-    ('setting GUI type "{}" is not recognized; refer to'
+    (f'setting GUI type "{setting_gui_type_or_name}" is not recognized; refer to'
      ' pygimplib.setting.SettingGuiTypes for the supported setting GUI types'
-     ' and their aliases').format(setting_gui_type_or_name))
+     ' and their aliases'))
 
 
 def _process_type(type_or_name, type_map, error_message):
