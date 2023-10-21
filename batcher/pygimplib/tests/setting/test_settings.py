@@ -1919,7 +1919,7 @@ class TestSettingTypeFunctions(unittest.TestCase):
   
   def test_process_setting_type_with_invalid_name(self):
     with self.assertRaises(TypeError):
-      self.assertEqual(settings_.process_setting_type('invalid_type'))
+      settings_.process_setting_type('invalid_type')
   
   def test_process_setting_type_with_invalid_type(self):
     with self.assertRaises(TypeError):
@@ -1939,7 +1939,7 @@ class TestSettingGuiTypeFunctions(unittest.TestCase):
   
   def test_process_setting_gui_type_with_invalid_name(self):
     with self.assertRaises(TypeError):
-      self.assertEqual(settings_.process_setting_gui_type('invalid_type'))
+      settings_.process_setting_gui_type('invalid_type')
   
   def test_process_setting_gui_type_with_invalid_type(self):
     with self.assertRaises(TypeError):
