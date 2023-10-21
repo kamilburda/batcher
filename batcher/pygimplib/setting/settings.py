@@ -7,6 +7,7 @@ import sys
 from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 
 import gi
+from gi import types as gi_types
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
@@ -14,7 +15,6 @@ from gi.repository import GObject
 from .. import path as pgpath
 from .. import pdbutils as pgpdbutils
 from .. import utils as pgutils
-from ..pypdb import pdb
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -177,7 +177,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         display_name: Optional[str] = None,
         description: Optional[str] = None,
         pdb_type: Union[
-          GObject.GObject, gi.types.GObjectMeta, GObject.GType, str, None,
+          GObject.GObject, gi_types.GObjectMeta, GObject.GType, str, None,
         ] = 'automatic',
         gui_type: Union[presenter_.Presenter, str, None] = 'automatic',
         allow_empty_values: bool = False,
@@ -1817,7 +1817,12 @@ class ResourceSetting(Setting):
 
   _EMPTY_VALUES = [None]
 
-  def __init__(self, name, resource_type: Union[GObject.GType, gi.types.GObjectMeta], **kwargs):
+  def __init__(
+        self,
+        name: str,
+        resource_type: Union[GObject.GType, gi_types.GObjectMeta],
+        **kwargs,
+  ):
     self._resource_type = resource_type
 
     super().__init__(name, **kwargs)
@@ -2005,6 +2010,11 @@ class ArraySetting(Setting):
   However, only specific array types can be registered to the GIMP PDB or have
   their own GUI. For registrable array types, see the allowed GIMP PDB types
   below.
+
+  If the ``element_type`` specified during instantiation has a matching GObject
+  type (e.g. `Gimp.FloatArray` for float arrays), then the array setting can
+  be registered to the GIMP PDB. To disable registration, pass ``pdb_type=None``
+  in `Setting.__init__()` as one normally would.
   
   Validation of setting values is performed for each element individually.
   
@@ -2012,11 +2022,26 @@ class ArraySetting(Setting):
   storing a collection of values of the same type. For more fine-grained control
   (collection of values of different type, different GUI, etc.), use
   `setting.Group` instead.
-  
-  If the `element_type` specified during instantiation has a matching GObject
-  type (e.g. `Gimp.FloatArray` for float arrays), then the array setting can
-  be registered to the GIMP PDB. To disable registration, pass ``pdb_type=None``
-  in `Setting.__init__()` as one normally would.
+
+  The following additional event types are invoked in `ArraySetting` instances:
+
+  * ``'before-add-element'``: Invoked when calling `add_element()` immediately
+    before adding an array element.
+
+  * ``'after-add-element'``: Invoked when calling `add_element()` immediately
+    after adding an array element.
+
+  * ``'before-reorder-element'``: Invoked when calling `reorder_element()`
+    immediately before reordering an array element.
+
+  * ``'after-reorder-element'``: Invoked when calling `reorder_element()`
+    immediately after reordering an array element.
+
+  * ``'before-delete-element'``: Invoked when calling `remove_element()` or
+    `__delitem__()` immediately before removing an array element.
+
+  * ``'after-delete-element'``: Invoked when calling `remove_element()` or
+    `__delitem__()` immediately after removing an array element.
 
   Allowed GIMP PDB types:
   TODO
@@ -2050,28 +2075,45 @@ class ArraySetting(Setting):
     StringSetting: (GObject.TYPE_STRING, GObject.TYPE_STRV),
   }
   
-  def __init__(self, name, element_type, min_size=0, max_size=None, **kwargs):
-    """Additional parameters include all parameters that would be passed to the
-    setting class this array is composed of (i.e. array elements).
-    
-    These parameters must be prefixed with ``'element_'`` (e.g.
-    `element_default_value`). Required parameters for the basic setting classes
-    include:
-    * `element_type`: setting type (or name thereof) of each array element.
-      Passing `ArraySetting` is also possible, allowing to create
-      multidimensional arrays. Note that in that case, required parameters for
-      elements of each subsequent dimension must be specified and must have an
-      extra ``'element_'`` prefix. For example, for the second dimension of a 2D
-      array, `element_element_type` must also be specified.
-    * all other required parameters as per individual setting classes.
-    
-    All parameters prefixed with ``'element_'`` will be created in the array
-    setting as read-only properties. `element_default_value` will always be
-    created.
-    
-    Array-specific additional parameters:
-    * `min_size`: minimum array size.
-    * `max_size`: maximum array size (``None`` means the size is unlimited).
+  def __init__(
+        self,
+        name: str,
+        element_type: Union[str, Type[Setting]],
+        min_size: Optional[int] = 0,
+        max_size: Optional[int] = None,
+        **kwargs,
+  ):
+    """Initializes an `ArraySetting` instance.
+
+    All parameters prefixed with ``'element_'`` (see ``**kwargs below``) will
+    be created in the array setting as read-only properties.
+    ``element_default_value`` will always be created.
+
+    Args:
+      name:
+        See ``name`` in `Setting.__init__()`.
+      element_type:
+        A `Setting` subclass or the name of a `Setting` subclass determining
+        the type of each array element.
+
+        Passing `ArraySetting` is also possible, allowing to create
+        multidimensional arrays. Note that in that case, required parameters
+        for elements of each subsequent dimension must be specified and must
+        have an extra ``'element_'`` prefix. For example, for the second
+        dimension of a 2D array, `element_element_type` must also be specified.
+      min_size:
+        Minimum array size. If ``None``, the minimum size will be 0.
+      max_size:
+        Maximum array size. If ``None``, there is no upper limit on the array
+        size.
+      **kwargs:
+        Additional keyword arguments for `Setting.__init__()`, plus all
+        parameters that would be passed to the `Setting` class defined by
+        ``element_type``. The arguments for the latter must be prefixed with
+        ``element_`` - for example, for arrays containing integers (i.e.
+        ``element_type`` is ``IntSetting``), you can optionally pass
+        ``element_min_value=<value>`` to set minimum value for all integer
+        array elements.
     """
     self._element_type = process_setting_type(element_type)
     self._min_size = min_size if min_size is not None else 0
@@ -2106,17 +2148,17 @@ class ArraySetting(Setting):
     return self._value
   
   @property
-  def element_type(self):
+  def element_type(self) -> Type[Setting]:
     """Setting type of array elements."""
     return self._element_type
   
   @property
-  def min_size(self):
+  def min_size(self) -> int:
     """The minimum array size."""
     return self._min_size
   
   @property
-  def max_size(self):
+  def max_size(self) -> Union[int, None]:
     """The maximum array size.
     
     If ``None``, the array size is unlimited.
@@ -2132,19 +2174,18 @@ class ArraySetting(Setting):
       if key == 'element_default_value':
         settings_dict[key] = self._reference_element._value_to_raw(val, source_type)
       elif key == 'element_type':
-        settings_dict[key] = pgutils.safe_decode(
-          SettingTypes[type(self._reference_element)], 'utf-8')
+        settings_dict[key] = SettingTypes[type(self._reference_element)]
     
     return settings_dict
   
-  def __getitem__(self, index):
+  def __getitem__(self, index: int):
+    """Returns an array element at the specified index."""
     return self._elements[index]
   
-  def __delitem__(self, index):
-    """Removes array element at the specified index."""
+  def __delitem__(self, index: int):
+    """Removes an array element at the specified index."""
     if len(self._elements) == self._min_size:
-      raise SettingValueError(
-        self.error_messages['delete_below_min_size'].format(self._min_size))
+      raise SettingValueError(self.error_messages['delete_below_min_size'].format(self._min_size))
     
     self.invoke_event('before-delete-element', index)
     
@@ -2152,21 +2193,21 @@ class ArraySetting(Setting):
     
     self.invoke_event('after-delete-element')
   
-  def __len__(self):
+  def __len__(self) -> int:
     """Returns the number of elements of the array."""
     return len(self._elements)
   
-  def add_element(self, index=None, value=ELEMENT_DEFAULT_VALUE):
+  def add_element(self, index: Optional[int] = None, value=ELEMENT_DEFAULT_VALUE) -> Setting:
     """Adds a new element with the specified value at the specified index
     (starting from 0).
     
-    If `index` is ``None``, the value is appended. If `value` is
-    `ELEMENT_DEFAULT_VALUE`, the default value of the underlying element is
-    used.
+    If ``index`` is ``None``, the value is appended at the end of the array.
+
+    If ``value`` is `ELEMENT_DEFAULT_VALUE`, the default value of the
+    underlying `element_type` is used.
     """
     if len(self._elements) == self._max_size:
-      raise SettingValueError(
-        self.error_messages['add_above_max_size'].format(self._max_size))
+      raise SettingValueError(self.error_messages['add_above_max_size'].format(self._max_size))
     
     if isinstance(value, type(self.ELEMENT_DEFAULT_VALUE)):
       value = self._reference_element.default_value
@@ -2186,9 +2227,11 @@ class ArraySetting(Setting):
     
     return element
   
-  def reorder_element(self, index, new_index):
-    """Changes the order of an array element at `index` to a new position
-    specified by `new_index`. Both indexes start from 0.
+  def reorder_element(self, index: int, new_index: int):
+    """Changes the order of an array element at ``index`` to a new position
+    specified by ``new_index``.
+
+    Both indexes start from 0.
     """
     self.invoke_event('before-reorder-element', index)
     
@@ -2201,31 +2244,33 @@ class ArraySetting(Setting):
     
     self.invoke_event('after-reorder-element', index, new_index)
   
-  def remove_element(self, index):
+  def remove_element(self, index: int):
     """Removes an element at the specified index.
     
     This method is an alias to `__delitem__`.
     """
     self.__delitem__(index)
   
-  def get_elements(self):
+  def get_elements(self) -> List[Setting]:
     """Returns a list of array elements in this setting."""
     return list(self._elements)
   
-  def get_pdb_param(self, length_name=None, length_description=None):
+  def get_pdb_param(
+        self, length_name: Optional[str] = None, length_description: Optional[str] = None,
+  ) -> Union[List[Tuple[GObject.GType, str, str]], None]:
     """Returns a list of two tuples, describing the length of the array and the
     array itself, as GIMP PDB parameters - PDB type, name and description.
     
     If the underlying `element_type` does not support any PDB type, ``None`` is
     returned.
     
-    To customize the name and description of the length parameter, pass
-    `length_name` and `length_description`, respectively. Passing ``None`` creates
-    the name and description automatically.
+    To customize the name and description of the length parameter,
+    pass ``length_name`` and ``length_description``, respectively. Passing
+    ``None`` creates the name and/or the description automatically.
     """
     if self.can_be_registered_to_pdb():
       if length_name is None:
-        length_name = '{}-length'.format(self.name)
+        length_name = f'{self.name}-length'
       
       if length_description is None:
         length_description = _('Number of elements in "{}"').format(self.name)
@@ -2255,8 +2300,7 @@ class ArraySetting(Setting):
       'Cannot add any more elements - at most {} elements are allowed.')
   
   def _raw_to_value(self, raw_value_array):
-    if (isinstance(raw_value_array, Iterable)
-        and not isinstance(raw_value_array, str)):
+    if isinstance(raw_value_array, Iterable) and not isinstance(raw_value_array, str):
       return tuple(
         self._reference_element._raw_to_value(raw_value)
         for raw_value in raw_value_array)
@@ -2270,11 +2314,13 @@ class ArraySetting(Setting):
       for value in value_array]
   
   def _validate(self, value_array):
-    if (not isinstance(value_array, Iterable)
-        or isinstance(value_array, str)):
+    if not isinstance(value_array, Iterable) or isinstance(value_array, str):
       raise SettingValueError(
         utils_.value_to_str_prefix(value_array) + self.error_messages['invalid_value'])
-    
+
+    if not hasattr(value_array, '__len__'):
+      value_array = list(value_array)
+
     if self._min_size < 0:
       raise SettingValueError(
         self.error_messages['negative_min_size'].format(self._min_size))
@@ -2333,7 +2379,8 @@ class ArraySetting(Setting):
   
   def _create_reference_element(self):
     """Creates a reference element to access and validate the element default
-    value."""
+    value.
+    """
     # Rely on the underlying element setting type to perform validation of the
     # default value.
     return self._element_type(name='element', **dict(self._element_kwargs, gui_type=None))
