@@ -1,9 +1,10 @@
 """Creation and management of plug-in actions - procedures and constraints.
 
-Most functions take a setting group containing actions as its first argument.
+Most functions take a `pygimplib.setting.Group` instance containing actions
+as its first argument.
 
-Many functions define events invoked on the setting group containing actions.
-These events include:
+Many functions define events invoked on the `pygimplib.setting.Group`
+containing actions. These events include:
 
 * `'before-add-action'` - invoked when:
   * calling `add()` before adding an action,
@@ -80,17 +81,19 @@ _ACTIONS_AND_INITIAL_ACTION_DICTS = {}
 
 
 def create(name, initial_actions=None):
-  """Creates a `setting.Group` instance containing actions.
+  """Creates a `pygimplib.setting.Group` instance containing actions.
+
+  Each action is a nested `pygimplib.setting.Group` instance.
   
   Parameters:
-  * `name` - name of the `setting.Group` instance.
+  * `name` - name of the `pygimplib.setting.Group` instance.
   * `initial_actions` - list of dictionaries describing actions to be
     added by default. Calling `clear()` will reset the actions returned by
     this function to the initial actions. By default, no initial actions
     are added.
   
-  Each created action in the returned group is a `setting.Group` instance. Each
-  action contains the following settings or child groups:
+  Each created action in the returned group is a `pygimplib.setting.Group`
+  instance. Each action contains the following settings or child groups:
   * `'function'` - Name of the function to call. If `'origin'` is `'builtin'`,
     then the function is an empty string and the function must be replaced
     during processing with a function object. This allows the function to be
@@ -99,8 +102,8 @@ def create(name, initial_actions=None):
     directly in the plug-in. If `'gimp_pdb'`, the function is taken from the
     GIMP PDB. The origin affects how the function is modified (wrapped) during
     processing in the `batcher` module.
-  * `'arguments'` - Arguments to `'function'` as a `setting.Group` instance
-    containing arguments as separate `Setting` instances.
+  * `'arguments'` - Arguments to `'function'` as a `pygimplib.setting.Group`
+    instance containing arguments as separate `Setting` instances.
   * `'enabled'` - Whether the action should be applied or not.
   * `'display_name'` - The display name (human-readable name) of the action.
   * `'action_group'` - List of groups the action belongs to, used in
@@ -109,8 +112,8 @@ def create(name, initial_actions=None):
     same `'name'` field (see below) was previously added, the name of the new
     action is made unique to allow lookup of both actions. Otherwise,
     `'orig_name'` is equal to `'name'`.
-  * `'tags'` - Additional tags added to each action (the `setting.Group`
-    instance).
+  * `'tags'` - Additional tags added to each action (the
+    `pygimplib.setting.Group` instance).
   * `'more_options_expanded'` - If `True`, display additional options for an
     action when editing the action interactively.
   * `'enabled_for_previews'` - If `True`, this indicates that the action can be
@@ -188,7 +191,7 @@ def _set_up_action_after_loading(actions):
 
 def add(actions, action_dict_or_pdb_proc_name):
   """
-  Add an action to the `actions` setting group.
+  Add an action to `actions` as a `pygimplib.setting.Group` instance.
   
   `action_dict_or_function` can be one of the following:
   * a dictionary - see `create()` for required and accepted fields.
@@ -509,14 +512,14 @@ def _get_array_length_and_array_settings(action):
 
 def get_action_dict_for_pdb_procedure(pdb_procedure_name):
   """Returns a dictionary representing the specified GIMP PDB procedure that can
-  be added to a setting group for actions via `add()`.
+  be added as an action via `add()`.
   
   The `'function'` field contains the PDB procedure name.
   
   If the procedure contains arguments with the same name, each subsequent
   identical name is made unique (since arguments are internally represented as
   `pygimplib.setting.Setting` instances, whose names must be unique within a
-  setting group).
+  `pygimplib.setting.Group` instance).
   """
   
   def _generate_unique_pdb_procedure_argument_name():
@@ -650,15 +653,14 @@ def clear(actions, add_initial_actions=True):
 
 def walk(actions, action_type=None, setting_name=None):
   """
-  Walk (iterate over) a setting group containing actions.
+  Walk (iterate over) a `pygimplib.setting.Group` instance containing actions.
   
   The value of `action_type` determines what types of actions to iterate
   over. If `action_type` is `None`, iterate over all actions. For allowed
   action types, see `create()`. Invalid values for `action_type` raise
   `ValueError`.
   
-  If `setting_name` is `None`, iterate over each setting group representing the
-  entire action.
+  If `setting_name` is `None`, iterate over each action.
   
   If `setting_name` is not `None`, iterate over each setting or subgroup inside
   each action. For example, `'enabled'` yields the `'enabled'` setting for

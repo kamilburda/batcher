@@ -284,7 +284,7 @@ def get_setting_path(
   default ``separator``).
 
   If ``relative_path_group`` is a `setting.Group`, it is used to make the
-  setting path relative to this group. If the path of the setting group to
+  setting path relative to this group. If the path of the group to
   the topmost parent does not match, the full path is returned.
   
   If ``relative_path_group`` is ``'root'`` and the setting has at least one

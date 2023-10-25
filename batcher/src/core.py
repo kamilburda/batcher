@@ -128,12 +128,12 @@ class Batcher:
   
   @property
   def procedures(self):
-    """`setting.Group` instance containing procedures."""
+    """`pygimplib.setting.Group` instance containing procedures."""
     return self._procedures
   
   @property
   def constraints(self):
-    """`setting.Group` instance containing constraints.."""
+    """`pygimplib.setting.Group` instance containing constraints.."""
     return self._constraints
   
   @property

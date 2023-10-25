@@ -477,7 +477,7 @@ class Source(metaclass=abc.ABCMeta):
     if 'settings' not in setting_dict:
       raise SourceInvalidFormatError(
         ('Error while parsing data from a source: "settings" key not found in dictionary'
-         ' representing setting group "{}"').format(setting_path))
+         ' representing group "{}"').format(setting_path))
   
   def _check_if_is_setting(self, setting, setting_path):
     if not isinstance(setting, settings_.Setting):

@@ -287,7 +287,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def name(self) -> str:
     """A string that identifies the setting.
     
-    The name must be unique within a setting group (`setting.Group` instance).
+    The name must be unique within a `setting.Group` instance.
     """
     return self._name
   
@@ -416,7 +416,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return pgutils.reprify_object(self, self.name)
   
   def get_path(self, relative_path_group: Union['setting.Group', str, None] = None) -> str:
-    """Returns the full path of a setting.
+    """Returns the full path of this setting.
 
     This is a wrapper method for `setting.utils.get_setting_path()`. Consult
     the method for more information.
