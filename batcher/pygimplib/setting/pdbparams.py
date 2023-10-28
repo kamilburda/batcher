@@ -2,6 +2,9 @@
 procedure arguments to assign them as values to settings.
 """
 
+from collections.abc import Iterable
+from typing import Any, Dict, Generator, List, Tuple, Union
+
 from . import group as group_
 from . import settings as settings_
 
@@ -12,10 +15,14 @@ __all__ = [
 ]
 
 
-def create_params(*settings_or_groups):
-  """
-  Return a list of GIMP PDB parameters from the specified `Setting` or `Group`
-  instances.
+def create_params(
+      *settings_or_groups: Union[settings_.Setting, group_.Group],
+) -> List[Dict[str, Any]]:
+  """Returns a list of GIMP PDB parameters from the specified `setting.Setting`
+  and `setting.Group` instances.
+
+  A PDB parameter is represented as a dictionary of ``(parameter name, value)``
+  pairs.
   """
   settings = _list_settings(settings_or_groups)
   
@@ -28,16 +35,17 @@ def create_params(*settings_or_groups):
   return params
 
 
-def iter_args(args, settings):
-  """
-  Iterate over arguments (`args`) passed to a GIMP PDB procedure.
-  
-  `settings` is a list of `Setting` instances that may modify the iteration. For
-  example, if an argument is matched by a setting of type `ArraySetting`, the
-  array argument causes the preceding argument to be skipped. The preceding
-  argument is the array length and does not need to exist as a separate setting
-  because the length can be obtained from the array itself in Python.
-  
+def iter_args(args: Union[List, Tuple], settings: Union[List, Tuple]) -> Generator[Any, None, None]:
+  """Iterates over arguments passed to a GIMP PDB procedure, skipping redundant
+  arguments.
+
+  ``settings`` is a list of `setting.Setting` instances that may modify the
+  iteration. For example, if an argument is matched by a setting of type
+  `setting.ArraySetting`, the array argument causes the preceding argument to
+  be skipped. The preceding argument is the array length and does not need to
+  exist as a separate setting because the length can be obtained from the
+  array itself in Python.
+
   If there are more settings than non-skipped arguments, the remaining settings
   will be ignored.
   """
@@ -56,13 +64,18 @@ def iter_args(args, settings):
       yield args[arg_index]
 
 
-def list_param_values(settings_or_groups, ignore_run_mode=True):
-  """
-  Return a list of values of settings registrable to PDB.
+def list_param_values(
+      settings_or_groups: Iterable[settings_.Setting, group_.Group], ignore_run_mode: bool = True,
+) -> List:
+  """Returns a list of setting values (`setting.Setting.value` properties)
+  registrable to PDB.
+
+  A setting can be registered if `setting.Setting.can_be_registered_to_pdb()`
+  returns ``True``.
   
-  If `ignore_run_mode` is `True`, ignore setting(s) named `'run_mode'`. This
-  makes it possible to call PDB functions with the setting values without
-  manually omitting the `'run_mode'` setting.
+  If ``ignore_run_mode`` is ``True``, setting(s) named ``'run_mode'`` are
+  ignored. This makes it possible to call PDB functions with the setting
+  values without manually omitting the ``'run_mode'`` setting.
   """
   settings = _list_settings(settings_or_groups)
   
@@ -84,7 +97,6 @@ def _list_settings(settings_or_groups):
       settings.extend(setting_or_group.walk())
     else:
       raise TypeError(
-        '{} is not an object of type {} or {}'.format(
-          setting_or_group, settings_.Setting, group_.Group))
+        f'{setting_or_group} is not an instance of type {settings_.Setting} or {group_.Group}')
   
   return settings

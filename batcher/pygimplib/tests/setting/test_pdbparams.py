@@ -1,7 +1,5 @@
 import unittest
 
-from ... import utils as pgutils
-
 from ...setting import pdbparams as pdbparams_
 from ...setting import settings as settings_
 
