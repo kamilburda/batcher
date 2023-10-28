@@ -579,6 +579,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def can_be_registered_to_pdb(self) -> bool:
     """Returns ``True`` if the setting can be registered as a GIMP PDB
     parameter, ``False`` otherwise.
+
+    This method returns ``True`` if the `pdb_type` property is not ``None``,
+    i.e. the setting has a valid PDB type assigned.
     """
     return self._pdb_type is not None
   
