@@ -2,13 +2,14 @@
 
 import abc
 import ast
-import collections
 from collections.abc import Iterable
 import os
 import pickle
 import traceback
+from typing import List, Union
 
 try:
+  # noinspection PyUnresolvedReferences
   import json
 except ImportError:
   _json_module_found = False
@@ -38,68 +39,69 @@ __all__ = [
 
 
 class Source(metaclass=abc.ABCMeta):
-  """Abstract class for reading and writing settings to a source.
-  
-  Attributes:
-  
-  * `source_name` - A unique identifier to distinguish entries from different
-    GIMP plug-ins or procedures.
-  
-  * `source_type` - If `'persistent'`, this indicates that the setting source
-    should store settings permanently. If `'session'`, this indicates that the
-    source should store settings within a single GIMP session (i.e. until the
-    currently running GIMP instance is closed).
-  """
+  """Abstract class for reading and writing settings to a source."""
   
   _IGNORE_LOAD_TAG = 'ignore_load'
   _IGNORE_SAVE_TAG = 'ignore_save'
   
   _MAX_LENGTH_OF_OBJECT_AS_STRING_ON_ERROR_OUTPUT = 512
   
-  def __init__(self, source_name, source_type):
+  def __init__(self, source_name: str, source_type: str):
     self.source_name = source_name
+    """A unique identifier to distinguish sources from different GIMP plug-ins
+    or procedures within a GIMP plug-in."""
+
     self.source_type = source_type
+    """String indicating how settings should be stored.
+    
+    If ``'persistent'``, this indicates that the setting source should store 
+    settings permanently. If ``'session'``, this indicates that the source 
+    should store settings within a single GIMP session (i.e. until the 
+    currently running GIMP instance is closed).
+    """
     
     self._settings_not_loaded = []
   
   @property
-  def settings_not_loaded(self):
-    """List of all settings and groups that were not found in the data or their
-    `setting_source` attribute is not `None` and does does not contain
-    `source_type`.
+  def settings_not_loaded(self) -> List[Union[settings_.Setting, group_.Group]]:
+    """List of all `setting.Setting` and `setting.Group` instances that were not
+    loaded.
+
+    "Not loaded" means that such settings or groups were not found in the
+    loaded data or their ``setting_sources`` attribute is not ``None`` and does
+    not contain `source_type`.
+
+    This property is reset on each call to `read()`.
     """
     return list(self._settings_not_loaded)
   
-  def read(self, settings_or_groups):
-    """Reads setting attributes from data and assigns them to existing settings
-    specified in the `settings_or_groups` iterable, or creates settings within
-    groups specified in `settings_or_groups`.
+  def read(self, settings_or_groups: Iterable[Union[settings_.Setting, group_.Group]]):
+    """Assigns setting attributes from the source to the specified settings and
+    creates any settings missing within the specified groups.
     
-    If a setting value from the source is invalid, the setting will be reset to
-    its default value.
+    If a setting value from the source is not valid, the setting will be reset
+    to its default value.
     
     All settings that were not loaded in the source will be stored in the
     `settings_not_loaded` property. This property is reset on each call to
     `read()`.
     
-    The following criteria determine whether a setting specified in
-    `setting_or_groups` is not loaded:
+    The following criteria determine whether a setting or group specified in
+    ``setting_or_groups`` is not loaded:
     
-    * The setting is not found in the source.
-    
-    * The setting or any of its parent groups contains 'ignore_load' in its
-      `tags` attribute.
-    
-    * The setting does not contain `source_type` in its `setting_sources`
+    * The setting/group is not found in the source.
+    * The setting/group or any of its parent groups contains ``'ignore_load'``
+      in its ``tags`` attribute.
+    * The setting does not contain `source_type` in its ``setting_sources``
       attribute.
     
     Raises:
-    
-    * `SourceNotFoundError` - Could not find the source having the `source_name`
-      attribute as its name.
-    
-    * `SourceInvalidFormatError` - Existing data in the source have an invalid
-      format. This could happen if the source was edited manually.
+      SourceNotFoundError:
+        Could not find the source having the `source_name` attribute as its
+        name.
+      SourceInvalidFormatError:
+        Existing data in the source have an invalid format. This could happen if
+        the source was edited manually.
     """
     data = self.read_data_from_source()
     if data is None:
@@ -131,11 +133,13 @@ class Source(metaclass=abc.ABCMeta):
         self._settings_not_loaded.append(setting_or_group)
   
   def _create_data_dict(self, data):
-    # Creates a (setting/group path, dict/list representing the setting/group) mapping.
-    # The entries in the mapping are listed in the depth-first order.
-    data_dict = collections.OrderedDict()
-    data_dict[None] = data
-    
+    """Creates a (setting/group path, dict/list representing the setting/group)
+    mapping.
+
+    The items in the mapping are listed in the depth-first order.
+    """
+    data_dict = {None: data}
+
     current_list_and_parents = []
     
     self._check_if_is_list(data)
@@ -196,13 +200,16 @@ class Source(metaclass=abc.ABCMeta):
           ('Error while parsing data from a source: every dictionary must always contain'
            ' either "value" or "settings" key'))
   
-  def _get_matching_dicts_for_group_path(self, data_dict, group_path):
-    return collections.OrderedDict(
-      (path, dict_) for path, dict_ in data_dict.items()
-      if path is not None and path.startswith(group_path) and path != group_path)
+  @staticmethod
+  def _get_matching_dicts_for_group_path(data_dict, group_path):
+    return {
+      path: dict_
+      for path, dict_ in data_dict.items()
+      if path is not None and path.startswith(group_path) and path != group_path
+    }
   
   def _get_matching_children(self, group, group_path, matching_dicts, prefixes_to_ignore):
-    matching_children = collections.OrderedDict()
+    matching_children = {}
     
     for child in group.walk(include_groups=True):
       child_path = child.get_path()
@@ -228,7 +235,7 @@ class Source(metaclass=abc.ABCMeta):
     return matching_children
   
   def _filter_matching_dicts(self, matching_dicts, matching_children, prefixes_to_ignore):
-    filtered_matching_dicts = collections.OrderedDict()
+    filtered_matching_dicts = {}
     
     for path, dict_ in matching_dicts.items():
       if self._IGNORE_LOAD_TAG in dict_.get('tags', []) and path not in matching_children:
@@ -277,7 +284,7 @@ class Source(metaclass=abc.ABCMeta):
     parent_path = path.rsplit(utils_.SETTING_PATH_SEPARATOR, 1)[0]
     
     # If the assertion fails for some reason, then `matching_dicts` does not
-    # contain children in depth-first order or children of ignored parents are
+    # contain children in depth-first order, or children of ignored parents are
     # not ignored.
     assert parent_path in matching_children
     
@@ -295,11 +302,12 @@ class Source(metaclass=abc.ABCMeta):
     
     matching_children[child_setting.get_path()] = child_setting
   
-  def _add_group_to_parent_group(self, dict_, path, matching_children):
+  @staticmethod
+  def _add_group_to_parent_group(dict_, path, matching_children):
     parent_path = path.rsplit(utils_.SETTING_PATH_SEPARATOR, 1)[0]
     
     # If the assertion fails for some reason, then `matching_dicts` does not
-    # contain children in depth-first order or children of ignored parents are
+    # contain children in depth-first order, or children of ignored parents are
     # not ignored.
     assert parent_path in matching_children
     
@@ -314,26 +322,24 @@ class Source(metaclass=abc.ABCMeta):
     
     matching_children[child_group.get_path()] = child_group
   
-  def write(self, settings_or_groups):
-    """Writes data representing settings specified in the `settings_or_groups`
-    iterable.
+  def write(self, settings_or_groups: Iterable[Union[settings_.Setting, group_.Group]]):
+    """Writes attributes of the specified settings and groups to the source.
+
+    Settings or groups present in the source but not specified in
+    ``settings_or_groups`` are kept intact.
     
-    Settings in the source but not specified in `settings_or_groups` are kept
-    intact.
+    Some settings or groups may not be saved. The following criteria
+    determine whether a setting is not saved:
     
-    Some settings may not be saved. The following criteria determine whether a
-    setting is not saved:
-    
-    * The setting or any of its parent groups contains 'ignore_save' in its
-      `tags` attribute.
-    
-    * The setting does not contain `source_type` in its `setting_sources`
+    * The setting/group or any of its parent groups contains ``'ignore_save'``
+      in its ``tags`` attribute.
+    * The setting does not contain `source_type` in its ``setting_sources``
       attribute.
     
     Raises:
-    
-    * `SourceInvalidFormatError` - Existing data in the source have an invalid
-      format. This could happen if the source was edited manually.
+      SourceInvalidFormatError:
+        Existing data in the source have an invalid format. This could happen if
+        the source was edited manually.
     """
     data = self.read_data_from_source()
     if data is None:
@@ -345,26 +351,31 @@ class Source(metaclass=abc.ABCMeta):
   
   def _update_data(self, settings_or_groups, data):
     for setting_or_group in settings_or_groups:
-      # Create all parent groups if they do not exist.
-      # `current_list` at the end of the loop will hold the immediate parent of
-      # `setting_or_group`.
-      current_list = data
-      for parent in setting_or_group.parents:
-        parent_dict = self._find_dict(current_list, parent)[0]
-        
-        if parent_dict is None:
-          parent_dict = dict(settings=[], **parent.to_dict())
-          current_list.append(parent_dict)
-        
-        current_list = parent_dict['settings']
-      
+      immediate_parent_of_setting_or_group = self._create_all_parent_groups_if_they_do_not_exist(
+        setting_or_group, data)
+
       if isinstance(setting_or_group, settings_.Setting):
-        self._setting_to_data(current_list, setting_or_group)
+        self._setting_to_data(immediate_parent_of_setting_or_group, setting_or_group)
       elif isinstance(setting_or_group, group_.Group):
-        self._group_to_data(current_list, setting_or_group)
+        self._group_to_data(immediate_parent_of_setting_or_group, setting_or_group)
       else:
         raise TypeError('settings_or_groups must contain only Setting or Group instances')
-  
+
+  def _create_all_parent_groups_if_they_do_not_exist(self, setting_or_group, data):
+    current_list = data
+    for parent in setting_or_group.parents:
+      parent_dict = self._find_dict(current_list, parent)[0]
+
+      if parent_dict is None:
+        parent_dict = dict(settings=[], **parent.to_dict())
+        current_list.append(parent_dict)
+
+      current_list = parent_dict['settings']
+
+    immediate_parent_of_setting_or_group = current_list
+
+    return immediate_parent_of_setting_or_group
+
   def _setting_to_data(self, group_list, setting):
     if not self._should_setting_be_saved(setting):
       return
@@ -443,20 +454,17 @@ class Source(metaclass=abc.ABCMeta):
     return None, None
   
   def _check_if_is_list(self, list_):
-    if (not isinstance(list_, Iterable)
-        or isinstance(list_, str)
-        or isinstance(list_, dict)):
+    if not isinstance(list_, Iterable) or isinstance(list_, str) or isinstance(list_, dict):
       raise SourceInvalidFormatError(
-        'Error while parsing data from a source: Not a list: {}'.format(
-          self._truncate_str(list_)))
+        f'Error while parsing data from a source: Not a list: {self._truncate_str(list_)}')
   
   def _check_if_is_dict(self, dict_):
     if not isinstance(dict_, dict):
       raise SourceInvalidFormatError(
-        'Error while parsing data from a source: Not a dictionary: {}'.format(
-          self._truncate_str(dict_)))
-  
-  def _check_if_dict_has_required_keys(self, dict_):
+        f'Error while parsing data from a source: Not a dictionary: {self._truncate_str(dict_)}')
+
+  @staticmethod
+  def _check_if_dict_has_required_keys(dict_):
     if 'name' not in dict_:
       raise SourceInvalidFormatError(
         'Error while parsing data from a source: every dictionary must always contain "name" key')
@@ -467,27 +475,31 @@ class Source(metaclass=abc.ABCMeta):
         ('Error while parsing data from a source: every dictionary must always contain'
          ' either "value" or "settings" key'))
   
-  def _check_if_setting_dict_has_value(self, setting_dict, setting_path):
+  @staticmethod
+  def _check_if_setting_dict_has_value(setting_dict, setting_path):
     if 'value' not in setting_dict:
       raise SourceInvalidFormatError(
         ('Error while parsing data from a source: "value" key not found in dictionary'
-         ' representing setting "{}"').format(setting_path))
+         f' representing setting "{setting_path}"'))
   
-  def _check_if_setting_dict_has_settings(self, setting_dict, setting_path):
+  @staticmethod
+  def _check_if_setting_dict_has_settings(setting_dict, setting_path):
     if 'settings' not in setting_dict:
       raise SourceInvalidFormatError(
         ('Error while parsing data from a source: "settings" key not found in dictionary'
-         ' representing group "{}"').format(setting_path))
+         f' representing group "{setting_path}"'))
   
-  def _check_if_is_setting(self, setting, setting_path):
+  @staticmethod
+  def _check_if_is_setting(setting, setting_path):
     if not isinstance(setting, settings_.Setting):
       raise SourceInvalidFormatError(
-        'expected a Setting instance, found Group instead: "{}"'.format(setting_path))
+        f'expected a Setting instance, found Group instead: "{setting_path}"')
   
-  def _check_if_is_group(self, group, group_path):
+  @staticmethod
+  def _check_if_is_group(group, group_path):
     if not isinstance(group, group_.Group):
       raise SourceInvalidFormatError(
-        'expected a Group instance, found Setting instead: "{}"'.format(group_path))
+        f'expected a Group instance, found Setting instead: "{group_path}"')
   
   @staticmethod
   def _truncate_str(obj, max_length=_MAX_LENGTH_OF_OBJECT_AS_STRING_ON_ERROR_OUTPUT):
@@ -510,7 +522,7 @@ class Source(metaclass=abc.ABCMeta):
   
   @abc.abstractmethod
   def has_data(self):
-    """Returns `True` if the source contains data, `False` otherwise."""
+    """Returns ``True`` if the source contains data, ``False`` otherwise."""
     pass
   
   @abc.abstractmethod
@@ -521,11 +533,11 @@ class Source(metaclass=abc.ABCMeta):
     assigns values to existing settings or creates settings dynamically from the
     data.
     
-    If the source does not exist, `None` is returned.
+    If the source does not exist, ``None`` is returned.
     
     Raises:
-    
-    * `SourceInvalidFormatError` - Data could not be read due to being corrupt.
+      SourceInvalidFormatError:
+        Data could not be read due to being corrupt.
     """
     pass
   
@@ -537,8 +549,8 @@ class Source(metaclass=abc.ABCMeta):
     Settings not specified thus will be removed.
     
     Usually you do not need to call this method. Use `write()` instead which
-    creates an appropriate persistent representation of the settings that can
-    later be loaded via `read()`.
+    creates an appropriate representation of the settings that can later be
+    loaded via `read()`.
     """
     pass
 
@@ -682,7 +694,7 @@ class PickleFileSource(Source):
     
     all_data = self.read_all_data()
     if all_data is None:
-      all_data = collections.OrderedDict([(self.source_name, raw_data)])
+      all_data = {self.source_name: raw_data}
     else:
       all_data[self.source_name] = raw_data
     
@@ -697,7 +709,7 @@ class PickleFileSource(Source):
     if not os.path.isfile(self._filepath):
       return None
     
-    all_data = collections.OrderedDict()
+    all_data = {}
     
     try:
       with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
@@ -791,7 +803,7 @@ class JsonFileSource(Source):
   def write_data_to_source(self, data):
     all_data = self.read_all_data()
     if all_data is None:
-      all_data = collections.OrderedDict([(self.source_name, data)])
+      all_data = {self.source_name: data}
     else:
       all_data[self.source_name] = data
     
@@ -806,7 +818,7 @@ class JsonFileSource(Source):
     if not os.path.isfile(self._filepath):
       return None
     
-    all_data = collections.OrderedDict()
+    all_data = {}
     
     try:
       with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
