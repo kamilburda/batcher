@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import os
 import pickle
 import traceback
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 try:
   # noinspection PyUnresolvedReferences
@@ -579,29 +579,30 @@ class GimpSessionSource(Source):
 
 
 class GimpParasiteSource(Source):
-  """Class reading and writing settings to the ``parasiterc`` file maintained by
-  GIMP.
-  
-  This class is useful as a persistent source (i.e. permanent storage) of
-  settings.
+  """Class reading and writing settings to a persistent source.
+
+  A persistent source stores settings permanently, i.e. the settings are
+  retained after ending a GIMP session.
+
+  The ``parasiterc`` file maintained by GIMP is used as the persistent source.
   """
   
-  def __init__(self, source_name, source_type='persistent'):
+  def __init__(self, source_name: str, source_type: str = 'persistent'):
     super().__init__(source_name, source_type)
     
-    self._parasite_filepath = os.path.join(gimp.directory, 'parasiterc')
+    self._parasite_filepath = os.path.join(Gimp.directory(), 'parasiterc')
   
   def clear(self):
-    if gimp.get_parasite(self.source_name) is None:
+    if Gimp.get_parasite(self.source_name) is None:
       return
     
-    gimp.parasite_detach(self.source_name)
+    Gimp.detach_parasite(self.source_name)
   
   def has_data(self):
-    return gimp.get_parasite(self.source_name) is not None
+    return Gimp.get_parasite(self.source_name) is not None
   
   def read_data_from_source(self):
-    parasite = gimp.get_parasite(self.source_name)
+    parasite = Gimp.get_parasite(self.source_name)
     if parasite is None:
       return None
 
@@ -618,10 +619,10 @@ class GimpParasiteSource(Source):
     return data
   
   def write_data_to_source(self, data):
-    gimp.parasite_attach(
+    Gimp.attach_parasite(
       Gimp.Parasite.new(
         self.source_name,
-        gimpenums.PARASITE_PERSISTENT,
+        Gimp.PARASITE_PERSISTENT,
         pgutils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
@@ -636,13 +637,14 @@ class PickleFileSource(Source):
   
   _SOURCE_NAME_CONTENTS_SEPARATOR = ' '
   
-  def __init__(self, source_name, filepath, source_type='persistent'):
+  def __init__(self, source_name: str, filepath: str, source_type: str = 'persistent'):
     super().__init__(source_name, source_type)
     
     self._filepath = filepath
   
   @property
-  def filepath(self):
+  def filepath(self) -> str:
+    """Path to the file containing saved settings."""
     return self._filepath
   
   def clear(self):
@@ -652,12 +654,12 @@ class PickleFileSource(Source):
       
       self.write_all_data(all_data)
   
-  def has_data(self):
-    """Returns `True` if the source contains data and the data have a valid
-    format, `'invalid_format'` if the source contains some data, but the data
-    have an invalid format, and `False` otherwise.
+  def has_data(self) -> Union[bool, str]:
+    """Returns ``True`` if the source contains data and the data have a valid
+    format, ``'invalid_format'`` if the source contains some data, but the data
+    do not have a valid format, and ``False`` otherwise.
     
-    `'invalid_format'` represents an ambiguous value since there is no way to
+    ``'invalid_format'`` represents an ambiguous value since there is no way to
     determine if there are data under `source_name` or not.
     """
     try:
@@ -685,11 +687,14 @@ class PickleFileSource(Source):
     
     self.write_all_data(all_data)
   
-  def read_all_data(self):
+  def read_all_data(self) -> Union[Dict[str, Any], None]:
     """Reads the contents of the entire file into a dictionary of
     (source name, contents) pairs.
     
     The dictionary also contains contents from other source names if they exist.
+
+    If the `filepath` property does not point to a valid file, ``None`` is
+    returned.
     """
     if not os.path.isfile(self._filepath):
       return None
@@ -708,25 +713,27 @@ class PickleFileSource(Source):
     else:
       return all_data
   
-  def write_all_data(self, all_data):
-    """Writes `all_data` into the file, overwriting the entire file contents.
+  def write_all_data(self, all_data: Dict[str, Any]):
+    """Writes ``all_data`` into the file, overwriting the entire file contents.
     
-    `all_data` is a dictionary of (source name, contents) pairs.
+    ``all_data`` is a dictionary of (source name, contents) pairs.
     """
     try:
       with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         for source_name, contents in all_data.items():
-          f.write(source_name + self._SOURCE_NAME_CONTENTS_SEPARATOR + contents + '\n')
+          f.write(''.join([source_name, self._SOURCE_NAME_CONTENTS_SEPARATOR, contents, '\n']))
     except Exception:
       raise SourceWriteError(traceback.format_exc())
   
-  def _get_settings_from_pickled_data(self, contents):
+  @staticmethod
+  def _get_settings_from_pickled_data(contents):
     try:
       return pickle.loads(ast.literal_eval(contents))
     except Exception:
       raise SourceInvalidFormatError(traceback.format_exc())
   
-  def _pickle_settings(self, settings):
+  @staticmethod
+  def _pickle_settings(settings):
     try:
       return repr(pickle.dumps(settings))
     except Exception:
@@ -744,7 +751,7 @@ class JsonFileSource(Source):
   easy to modify by hand.
   """
   
-  def __init__(self, source_name, filepath, source_type='persistent'):
+  def __init__(self, source_name: str, filepath: str, source_type: str = 'persistent'):
     if not _json_module_found:
       raise RuntimeError('"json" module not found')
     
@@ -754,6 +761,7 @@ class JsonFileSource(Source):
   
   @property
   def filepath(self):
+    """Path to the file containing saved settings."""
     return self._filepath
   
   def clear(self):
@@ -762,13 +770,13 @@ class JsonFileSource(Source):
       del all_data[self.source_name]
       
       self.write_all_data(all_data)
-  
-  def has_data(self):
-    """Returns `True` if the source contains data and the data have a valid
-    format, `'invalid_format'` if the source contains some data, but the data
-    have an invalid format, and `False` otherwise.
-    
-    `'invalid_format'` represents an ambiguous value since there is no way to
+
+  def has_data(self) -> Union[bool, str]:
+    """Returns ``True`` if the source contains data and the data have a valid
+    format, ``'invalid_format'`` if the source contains some data, but the data
+    do not have a valid format, and ``False`` otherwise.
+
+    ``'invalid_format'`` represents an ambiguous value since there is no way to
     determine if there are data under `source_name` or not.
     """
     try:
@@ -794,11 +802,14 @@ class JsonFileSource(Source):
     
     self.write_all_data(all_data)
   
-  def read_all_data(self):
+  def read_all_data(self) -> Union[Dict[str, Any], None]:
     """Reads the contents of the entire file into a dictionary of
     (source name, contents) pairs.
-    
+
     The dictionary also contains contents from other source names if they exist.
+
+    If the `filepath` property does not point to a valid file, ``None`` is
+    returned.
     """
     if not os.path.isfile(self._filepath):
       return None
@@ -813,15 +824,13 @@ class JsonFileSource(Source):
     else:
       return all_data
   
-  def write_all_data(self, all_data):
-    """Writes `all_data` into the file, overwriting the entire file contents.
-    
-    `all_data` is a dictionary of (source name, contents) pairs.
+  def write_all_data(self, all_data: Dict[str, Any]):
+    """Writes ``all_data`` into the file, overwriting the entire file contents.
+
+    ``all_data`` is a dictionary of (source name, contents) pairs.
     """
     try:
       with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
-        # Workaround for Python 2 code to properly handle Unicode strings
-        raw_data = json.dumps(all_data, f, sort_keys=False, indent=4, separators=(',', ': '))
-        f.write(unicode(raw_data))
+        json.dump(all_data, f, indent=4)
     except Exception:
       raise SourceWriteError(traceback.format_exc())
