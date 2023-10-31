@@ -32,6 +32,7 @@ from ._sources_errors import *
 __all__ = [
   'Source',
   'GimpParasiteSource',
+  'GimpSessionSource',
   'PickleFileSource',
   'JsonFileSource',
 ]
