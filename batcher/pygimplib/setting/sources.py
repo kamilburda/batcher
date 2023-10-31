@@ -31,7 +31,6 @@ from ._sources_errors import *
 
 __all__ = [
   'Source',
-  'GimpShelfSource',
   'GimpParasiteSource',
   'PickleFileSource',
   'JsonFileSource',
@@ -126,7 +125,7 @@ class Source(metaclass=abc.ABCMeta):
           self._update_setting(setting_or_group, setting_dict)
         elif isinstance(setting_or_group, group_.Group):
           self._check_if_setting_dict_has_settings(setting_dict, setting_path)
-          self._update_group(setting_or_group, setting_dict, setting_path, data_dict)
+          self._update_group(setting_or_group, setting_path, data_dict)
         else:
           raise TypeError('settings_or_groups must contain only Setting or Group instances')
       else:
@@ -168,7 +167,7 @@ class Source(metaclass=abc.ABCMeta):
     
     return data_dict
   
-  def _update_group(self, group, group_dict, group_path, data_dict):
+  def _update_group(self, group, group_path, data_dict):
     if not self._should_group_be_loaded(group):
       return
     
@@ -555,46 +554,31 @@ class Source(metaclass=abc.ABCMeta):
     pass
 
 
-class GimpShelfSource(Source):
-  """Class for reading and writing settings to the GIMP shelf.
-  
-  This class is appropriate to maintain settings within a single GIMP session
-  as the GIMP shelf is reset when closing GIMP.
+# FIXME: Fix session source. For the fime being, the session source reads and
+#  writes nothing.
+class GimpSessionSource(Source):
+  """Class for reading and writing settings to a source that persists within a
+  single GIMP session.
   """
-  
-  def __init__(self, source_name, source_type='session'):
+
+  def __init__(self, source_name: str, source_type: str = 'session'):
     super().__init__(source_name, source_type)
   
   def clear(self):
-    gimpshelf.shelf[self._get_key()] = None
+    return
   
   def has_data(self):
-    try:
-      data = gimp.get_data(self._get_key())
-    except Exception:
-      return False
-    else:
-      return bool(data)
+    return False
   
   def read_data_from_source(self):
-    try:
-      return gimpshelf.shelf[self._get_key()]
-    except KeyError:
-      return None
-    except Exception:
-      raise SourceInvalidFormatError(
-        _('Settings for this plug-in may be corrupt.\n'
-          'To fix this, save the settings again or reset them.'))
+    return
   
   def write_data_to_source(self, data):
-    gimpshelf.shelf[self._get_key()] = data
-  
-  def _get_key(self):
-    return self.source_name
+    return
 
 
 class GimpParasiteSource(Source):
-  """Class reading and writing settings to the `parasiterc` file maintained by
+  """Class reading and writing settings to the ``parasiterc`` file maintained by
   GIMP.
   
   This class is useful as a persistent source (i.e. permanent storage) of

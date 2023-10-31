@@ -10,6 +10,7 @@ from ...setting import sources as sources_
 
 from .. import stubs_gimp
 from . import stubs_group
+from . import stubs_sources
 
 
 def _test_settings_for_read_write():
@@ -195,31 +196,11 @@ def _test_data_for_read_write():
   ]
 
 
-class _StubSource(sources_.Source):
-  
-  def __init__(self, source_name, source_type):
-    super().__init__(source_name, source_type)
-    
-    self.data = []
-  
-  def clear(self):
-    pass
-  
-  def has_data(self):
-    return False
-  
-  def read_data_from_source(self):
-    return self.data
-  
-  def write_data_to_source(self, data):
-    pass
-
-
 class TestSourceRead(unittest.TestCase):
 
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = _StubSource(self.source_name, 'persistent')
+    self.source = stubs_sources.StubSource(self.source_name, 'persistent')
     
     self.settings = _test_settings_for_read_write()
     
@@ -631,7 +612,7 @@ class TestSourceWrite(unittest.TestCase):
   
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = _StubSource(self.source_name, 'persistent')
+    self.source = stubs_sources.StubSource(self.source_name, 'persistent')
     
     self.settings = _test_settings_for_read_write()
     
@@ -847,22 +828,16 @@ class TestSourceWrite(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.gimpshelf.shelf',
-  new_callable=stubs_gimp.ShelfStub)
-@mock.patch(
   pgutils.get_pygimplib_module_path() + '.setting.sources.gimp',
   new_callable=stubs_gimp.GimpModuleStub)
-class TestGimpShelfSource(unittest.TestCase):
-  
-  @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.sources.gimpshelf.shelf',
-    new=stubs_gimp.ShelfStub())
+class TestGimpSessionSource(unittest.TestCase):
+
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = sources_.GimpShelfSource(self.source_name)
+    self.source = sources_.GimpSessionSource(self.source_name)
     self.settings = stubs_group.create_test_settings()
   
-  def test_write_read(self, *mocks):
+  def test_write_read(self, mock_gimp_module):
     self.settings['file_extension'].set_value('png')
     self.settings['flatten'].set_value(True)
     
@@ -876,20 +851,18 @@ class TestGimpShelfSource(unittest.TestCase):
     self.assertEqual(self.settings['file_extension'].value, 'png')
     self.assertEqual(self.settings['flatten'].value, True)
   
-  def test_clear(self, *mocks):
+  def test_clear(self, mock_gimp_module):
     self.source.write([self.settings])
     self.source.clear()
     
     with self.assertRaises(sources_.SourceNotFoundError):
       self.source.read([self.settings])
   
-  def test_has_data_with_no_data(self, mock_gimp_module, mock_session_source):
-    mock_session_source.shelf = mock_gimp_module.shelf_data
+  def test_has_data_with_no_data(self, mock_gimp_module):
     
     self.assertFalse(self.source.has_data())
   
-  def test_has_data_with_data(self, mock_gimp_module, mock_session_source):
-    mock_session_source.shelf = mock_gimp_module.shelf_data
+  def test_has_data_with_data(self, mock_gimp_module):
     
     self.source.write([self.settings['file_extension']])
     self.assertTrue(self.source.has_data())

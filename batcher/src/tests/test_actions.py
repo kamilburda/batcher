@@ -479,9 +479,6 @@ class TestWalkActions(unittest.TestCase):
 
 
 @mock.patch(
-  pg.utils.get_pygimplib_module_path() + '.setting.sources.gimpshelf.shelf',
-  new_callable=stubs_gimp.ShelfStub)
-@mock.patch(
   pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestLoadSaveActions(unittest.TestCase):
@@ -494,9 +491,7 @@ class TestLoadSaveActions(unittest.TestCase):
     ('', False),
     ('with_explicit_clearing', True),
   ])
-  def test_save_load_actions(
-        self, test_case_suffix, remove_before_load,
-        mock_gimp_module, mock_session_source):
+  def test_save_load_actions(self, test_case_suffix, remove_before_load, mock_gimp_module):
     for action_dict in self.test_procedures.values():
       actions_.add(self.procedures, action_dict)
     
@@ -531,8 +526,7 @@ class TestLoadSaveActions(unittest.TestCase):
     self.assertEqual(self.procedures['autocrop/arguments/offset_x'].value, 20)
     self.assertEqual(self.procedures['autocrop/arguments/offset_y'].value, 10)
   
-  def test_save_load_actions_preserves_uniquified_names_after_load(
-        self, mock_gimp_module, mock_session_source):
+  def test_save_load_actions_preserves_uniquified_names_after_load(self, mock_gimp_module):
     input_names = ['autocrop', 'autocrop', 'autocrop_background', 'autocrop_foreground']
     expected_names = ['autocrop', 'autocrop_2', 'autocrop_background', 'autocrop_foreground']
     
@@ -548,7 +542,7 @@ class TestLoadSaveActions(unittest.TestCase):
     self.assertEqual(len(self.procedures), len(input_names))
     self.assertListEqual(expected_names, [child.name for child in self.procedures])
   
-  def test_load_with_no_saved_actions(self, mock_gimp_module, mock_session_source):
+  def test_load_with_no_saved_actions(self, mock_gimp_module):
     procedures = actions_.create('procedures', [self.test_procedures['autocrop']])
     
     for action_name in ['autocrop_background', 'autocrop_foreground']:
@@ -558,7 +552,7 @@ class TestLoadSaveActions(unittest.TestCase):
     
     self.assertEqual(len(procedures), 0)
   
-  def test_load_initial_actions(self, mock_gimp_module, mock_session_source):
+  def test_load_initial_actions(self, mock_gimp_module):
     procedures = actions_.create('procedures', [self.test_procedures['autocrop']])
     
     procedures.save()
@@ -567,7 +561,7 @@ class TestLoadSaveActions(unittest.TestCase):
     self.assertEqual(len(procedures), 1)
     self.assertIn('autocrop', procedures)
   
-  def test_load_overrides_initial_actions(self, mock_gimp_module, mock_session_source):
+  def test_load_overrides_initial_actions(self, mock_gimp_module):
     procedures = actions_.create('procedures', [self.test_procedures['autocrop']])
     
     for action_name in ['autocrop_background', 'autocrop_foreground']:
@@ -583,8 +577,7 @@ class TestLoadSaveActions(unittest.TestCase):
     self.assertIn('autocrop_background', procedures)
     self.assertIn('autocrop_foreground', procedures)
   
-  def test_load_triggers_after_add_action_events(
-        self, mock_gimp_module, mock_session_source):
+  def test_load_triggers_after_add_action_events(self, mock_gimp_module):
     procedures = actions_.create('procedures')
     
     for action_name in ['autocrop_background', 'autocrop_foreground']:
@@ -653,14 +646,11 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['arguments/num-save-options'].value, 1)
     del action['arguments/save-options'][-1]
     self.assertEqual(action['arguments/num-save-options'].value, 0)
-  
-  @mock.patch(
-    pg.utils.get_pygimplib_module_path() + '.setting.sources.gimpshelf.shelf',
-    new_callable=stubs_gimp.ShelfStub)
+
   @mock.patch(
     pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp',
     new_callable=stubs_gimp.GimpModuleStub)
-  def test_load_save_pdb_procedure_as_action(self, mock_gimp_module, mock_session_source):
+  def test_load_save_pdb_procedure_as_action(self, mock_gimp_module):
     action = actions_.add(self.procedures, self.procedure_stub)
     
     action['enabled'].set_value(False)
