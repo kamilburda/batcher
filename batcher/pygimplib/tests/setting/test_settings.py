@@ -1147,21 +1147,6 @@ class TestFileExtensionSetting(unittest.TestCase):
       self.assertEqual(str(e), 'my custom message')
 
 
-class TestDirpathSetting(unittest.TestCase):
-  
-  def setUp(self):
-    self.setting = settings_.DirpathSetting('output_directory', default_value='/some_dir')
-  
-  def test_default_value_as_bytes_convert_to_unicode(self):
-    setting = settings_.DirpathSetting(
-      'output_directory', default_value=b'/some_dir/p\xc5\x88g')
-    self.assertIsInstance(setting.value, str)
-  
-  def test_set_value_as_bytes_convert_to_unicode(self):
-    self.setting.set_value(b'/some_dir/p\xc5\x88g')
-    self.assertIsInstance(self.setting.value, str)
-
-
 class TestBrushSetting(unittest.TestCase):
   
   def setUp(self):
