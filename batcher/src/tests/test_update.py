@@ -17,7 +17,7 @@ from src import version as version_
 
 
 @mock.patch(
-  pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp',
+  pg.utils.get_pygimplib_module_path() + '.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch(
   'batcher.update.gimp',

@@ -479,7 +479,7 @@ class TestWalkActions(unittest.TestCase):
 
 
 @mock.patch(
-  pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp',
+  pg.utils.get_pygimplib_module_path() + '.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestLoadSaveActions(unittest.TestCase):
   
@@ -648,7 +648,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['arguments/num-save-options'].value, 0)
 
   @mock.patch(
-    pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp',
+    pg.utils.get_pygimplib_module_path() + '.setting.sources.Gimp',
     new_callable=stubs_gimp.GimpModuleStub)
   def test_load_save_pdb_procedure_as_action(self, mock_gimp_module):
     action = actions_.add(self.procedures, self.procedure_stub)

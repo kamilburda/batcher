@@ -828,7 +828,7 @@ class TestSourceWrite(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.gimp',
+  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpSessionSource(unittest.TestCase):
 
@@ -869,12 +869,12 @@ class TestGimpSessionSource(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.gimp',
+  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpParasiteSource(unittest.TestCase):
   
   @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.sources.gimp.directory',
+    pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp.directory',
     new='gimp_directory')
   def setUp(self):
     self.source_name = 'test_settings'
@@ -903,9 +903,9 @@ class TestGimpParasiteSource(unittest.TestCase):
     self.source.write([self.settings])
     
     # Simulate formatting error
-    parasite = sources_.gimp.get_parasite(self.source_name)
+    parasite = sources_.Gimp.get_parasite(self.source_name)
     parasite.set_data(parasite.get_data()[:-1])
-    sources_.gimp.parasite_attach(parasite)
+    sources_.Gimp.attach_parasite(parasite)
     
     with self.assertRaises(sources_.SourceInvalidFormatError):
       self.source.read([self.settings])

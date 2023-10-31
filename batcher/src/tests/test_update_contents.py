@@ -245,7 +245,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self.gimp_module = stubs_gimp.GimpModuleStub()
     
     self.sources_gimp_patcher = mock.patch(
-      pg.utils.get_pygimplib_module_path() + '.setting.sources.gimp', new=self.gimp_module)
+      pg.utils.get_pygimplib_module_path() + '.setting.sources.Gimp', new=self.gimp_module)
     self.mock_sources_gimp = self.sources_gimp_patcher.start()
 
     self.update_gimp_patcher = mock.patch('batcher.update.gimp', new=self.gimp_module)
@@ -294,7 +294,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self.assertListEqual(
       pickle.loads(
         pg.utils.signed_bytes_to_bytes(
-          update.gimp.get_parasite(pg.config.SOURCE_NAME).get_data())),
+          update.Gimp.get_parasite(pg.config.SOURCE_NAME).get_data())),
       expected_data)
 
   # FIXME: Fix session source
@@ -308,7 +308,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   #   self._test_update_for_partial_data(is_selected_layers_nonempty=False)
   
   def test_partial_data_in_persistent_source_only(self, *mocks):
-    update.gimp.parasite_attach(
+    update.Gimp.attach_parasite(
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME,
         gimpenums.PARASITE_PERSISTENT,
@@ -321,7 +321,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self._test_update_for_partial_data(is_selected_layers_nonempty=False)
   
   def test_partial_data_in_session_and_persistent_source(self, *mocks):
-    update.gimp.parasite_attach(
+    update.Gimp.attach_parasite(
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME,
         gimpenums.PARASITE_PERSISTENT,
@@ -343,7 +343,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self._test_update_for_full_data(is_selected_layers_nonempty=True)
   
   def test_full_data_in_persistent_source_only(self, *mocks):
-    update.gimp.parasite_attach(
+    update.Gimp.attach_parasite(
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
@@ -355,7 +355,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   
   def test_full_data_in_session_and_persistent_source(self, *mocks):
     update.gimp.set_data(pg.config.SOURCE_NAME, SESSION_DATA_3_3_1)
-    update.gimp.parasite_attach(
+    update.Gimp.attach_parasite(
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
