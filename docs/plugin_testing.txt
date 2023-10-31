@@ -26,7 +26,6 @@ Run-with-last-vals
 
 Layer names and filenames
 * valid and invalid characters in filenames and directory names
-* Unicode characters
 
 Image types
 * RGB
