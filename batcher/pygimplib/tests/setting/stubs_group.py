@@ -10,7 +10,7 @@ def create_test_settings():
       'type': 'file_extension',
       'name': 'file_extension',
       'default_value': 'bmp',
-      'display_name': 'File extension'
+      'display_name': 'File extension',
     },
     {
       'type': 'boolean',
@@ -28,7 +28,7 @@ def create_test_settings():
                 ('rename_existing', 'Rename existing file')],
       'error_messages': {
         'invalid_value': (
-          'Invalid value. Something went wrong on our end... we are so sorry!')}
+          'Invalid value. Something went wrong on our end... we are so sorry!')},
     },
   ])
   
@@ -42,7 +42,7 @@ def create_test_settings_hierarchical():
       'type': 'file_extension',
       'name': 'file_extension',
       'default_value': 'bmp',
-      'display_name': 'File extension'
+      'display_name': 'File extension',
     },
   ])
   
@@ -145,5 +145,5 @@ def create_test_data_with_specific_setting_sources():
           ],
         },
       ],
-    }
+    },
   ]
