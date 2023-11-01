@@ -187,10 +187,7 @@ class MessageLabel(Gtk.Box):
       pg.invocation.timeout_remove(func)
   
   def _should_clear_text_after_delay(self, clear_delay):
-    return (
-      clear_delay is not None
-      and clear_delay > 0
-      and not (os.name == 'nt' and ((2, 10, 0) <= gimp.version < (2, 10, 6))))
+    return clear_delay is not None and clear_delay > 0
 
 
 GObject.type_register(MessageLabel)
