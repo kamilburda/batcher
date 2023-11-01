@@ -585,20 +585,30 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     """
     return self._pdb_type is not None
   
-  def get_pdb_param(self) -> Union[List[Tuple[GObject.GType, str, str]], None]:
-    """Returns a list of tuples, each tuple containing data describing the
-    setting as a GIMP PDB parameter - type, name and description.
+  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
+    """Returns a list of dictionaries representing GIMP PDB parameters for the
+    setting.
+
+    The dictionary can be passed as keyword arguments when creating a
+    `GObject.Property` instance used for registering PDB parameters for a
+    GIMP plug-in.
+
+    Most `Setting` subclasses return a list of only one dictionary, meaning the
+    setting is represented by one PDB parameter. Most notably, `ArraySetting`
+    returns two parameters, the first being the array length and the other being
+    the array contents.
     
     If the setting does not support any PDB type, ``None`` is returned.
-    
-    Most `Setting` subclasses return a list of only one tuple, meaning the
-    setting is represented by one PDB parameter.
     """
     if self.can_be_registered_to_pdb():
-      return [(
-        self.pdb_type,
-        self.pdb_name,
-        self.description)]
+      return [
+        dict(
+          name=self.pdb_name,
+          type=self.pdb_type,
+          default=self.default_value,
+          nick=self.display_name,
+          blurb=self.description,
+        )]
     else:
       return None
   
@@ -636,9 +646,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         settings_dict['gui_type'] = gui_type_name
       elif key == 'pdb_type':
         if isinstance(val, GObject.GType):
-          settings_dict['pdb_type'] = val.value_type.name
+          settings_dict['pdb_type'] = val.name
         elif hasattr(val, '__gtype__'):
-          settings_dict['pdb_type'] = val.__gtype__.value_type.name
+          settings_dict['pdb_type'] = val.__gtype__.name
         elif isinstance(val, str) or val is None:
           settings_dict['pdb_type'] = val
         else:
