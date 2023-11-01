@@ -7,7 +7,6 @@ import sys
 from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 
 import gi
-from gi import types as gi_types
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
@@ -177,7 +176,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         display_name: Optional[str] = None,
         description: Optional[str] = None,
         pdb_type: Union[
-          GObject.GObject, gi_types.GObjectMeta, GObject.GType, str, None,
+          GObject.GObject, Type[GObject.GObject], GObject.GType, str, None,
         ] = 'automatic',
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         allow_empty_values: bool = False,
@@ -1833,7 +1832,7 @@ class GimpResourceSetting(Setting):
   def __init__(
         self,
         name: str,
-        resource_type: Union[GObject.GType, gi_types.GObjectMeta],
+        resource_type: Union[GObject.GType, Type[GObject.GObject]],
         **kwargs,
   ):
     self._resource_type = resource_type
