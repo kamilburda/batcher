@@ -1057,10 +1057,6 @@ class BoolSetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = False
   
-  @property
-  def description(self):
-    return f'{self._description}?'
-  
   def _assign_value(self, value):
     self._value = bool(value)
 

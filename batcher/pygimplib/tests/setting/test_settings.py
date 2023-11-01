@@ -544,13 +544,6 @@ class TestGenericSetting(unittest.TestCase):
         value_save='not_a_callable')
 
 
-class TestBoolSetting(unittest.TestCase):
-  
-  def test_description_from_display_name(self):
-    setting = settings_.BoolSetting('flatten', default_value=False, display_name='_Flatten')
-    self.assertEqual(setting.description, 'Flatten?')
-
-
 class TestIntSetting(unittest.TestCase):
   
   def setUp(self):
