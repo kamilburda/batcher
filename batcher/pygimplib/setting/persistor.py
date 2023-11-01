@@ -7,7 +7,6 @@ from collections.abc import Iterable
 from typing import Dict, List, Union
 
 from . import _sources_errors
-from . import sources as sources_
 
 __all__ = [
   'Persistor',
@@ -29,7 +28,9 @@ class Persistor:
   _DEFAULT_SETTING_SOURCES = {}
   
   @classmethod
-  def get_default_setting_sources(cls) -> Dict[str, Union[sources_.Source, List[sources_.Source]]]:
+  def get_default_setting_sources(
+        cls,
+  ) -> Dict[str, Union['setting.Source', List['setting.Source']]]:
     """Returns a dictionary containing default setting sources.
 
     The returned dictionary is a copy of an internally stored dictionary to
@@ -41,7 +42,8 @@ class Persistor:
     return dict(cls._DEFAULT_SETTING_SOURCES)
   
   @classmethod
-  def set_default_setting_sources(cls, sources: Dict[str, sources_.Source, List[sources_.Source]]):
+  def set_default_setting_sources(
+        cls, sources: Dict[str, Union['setting.Source', List['setting.Source']]]):
     """Sets the dictionary of setting sources to use in methods of this class if
     no other setting sources in these methods are specified.
     
@@ -69,7 +71,7 @@ class Persistor:
         cls,
         settings_or_groups: Iterable[Union['setting.Setting', 'setting.Group']],
         setting_sources: Union[
-          Dict[str, Union[sources_.Source, List[sources_.Source]]],
+          Dict[str, Union['setting.Source', List['setting.Source']]],
           List[str],
           None,
         ] = None,
@@ -185,7 +187,7 @@ class Persistor:
         cls,
         settings_or_groups: Iterable[Union['setting.Setting', 'setting.Group']],
         setting_sources: Union[
-          Dict[str, Union[sources_.Source, List[sources_.Source]]],
+          Dict[str, Union['setting.Source', List['setting.Source']]],
           List[str],
           None,
         ] = None,
@@ -262,7 +264,7 @@ class Persistor:
   def clear(
         cls,
         setting_sources: Union[
-          Dict[str, Union[sources_.Source, List[sources_.Source]]],
+          Dict[str, Union['setting.Source', List['setting.Source']]],
           List[str],
           None,
         ] = None
