@@ -1,3 +1,5 @@
+"""Stubs primarily to be used in the `test_sources` module."""
+
 from ...setting import sources as sources_
 
 
