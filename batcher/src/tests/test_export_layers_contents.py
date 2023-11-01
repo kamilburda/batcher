@@ -45,7 +45,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     ])
 
     version_specific_expected_results_dirpath = (
-      DEFAULT_EXPECTED_RESULTS_DIRPATH + '_' + gimp_version)
+      f'{DEFAULT_EXPECTED_RESULTS_DIRPATH}_{gimp_version}')
     
     if os.path.isdir(version_specific_expected_results_dirpath):
       cls.expected_results_root_dirpath = version_specific_expected_results_dirpath

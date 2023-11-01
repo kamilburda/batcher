@@ -125,11 +125,11 @@ def create_read_only_property(obj, name: str, value):
 
   The private attribute holds the ``value`` and the property returns this value.
   """
-  setattr(obj, '_' + name, value)
+  setattr(obj, f'_{name}', value)
   setattr(
     type(obj),
     name,
-    property(fget=lambda obj_, name_=name: getattr(obj_, '_' + name_)))
+    property(fget=lambda obj_, name_=name: getattr(obj_, f'_{name_}')))
 
 
 def bytes_to_signed_bytes(data: bytes) -> Tuple[int, ...]:

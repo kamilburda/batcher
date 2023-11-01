@@ -25,8 +25,8 @@ class TestCreateLogFile(unittest.TestCase):
     ('invalid_file',
      IOError(), [None, None], None, 2),
   ])
-  @mock.patch(pgutils.get_pygimplib_module_path() + '.logging.os.makedirs')
-  @mock.patch(pgutils.get_pygimplib_module_path() + '.logging.open')
+  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.logging.os.makedirs')
+  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.logging.open')
   def test_create_log_file(
         self,
         test_case_suffix,

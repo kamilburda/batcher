@@ -320,7 +320,7 @@ class ExportLayersDialog:
     pg.gui.set_gui_excepthook_parent(self._dialog)
     
     self._folder_chooser_label = gtk.Label()
-    self._folder_chooser_label.set_markup('<b>' + _('Save in folder:') + '</b>')
+    self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
     self._folder_chooser_label.set_alignment(0.0, 0.5)
     
     self._folder_chooser = gtk.FileChooserWidget(action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
@@ -337,7 +337,7 @@ class ExportLayersDialog:
     self._init_gui_previews()
     
     self._preview_label = gtk.Label()
-    self._preview_label.set_markup('<b>' + _('Preview') + '</b>')
+    self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
     self._preview_label.set_alignment(0.0, 0.5)
     
     self._hbox_preview_label = gtk.HBox()
@@ -769,7 +769,7 @@ class ExportLayersDialog:
     
     filter_pickle = gtk.FileFilter()
     filter_pickle.set_name(_('Pickle file ({})').format(pickle_file_ext))
-    filter_pickle.add_pattern('*' + pickle_file_ext)
+    filter_pickle.add_pattern(f'*{pickle_file_ext}')
     file_dialog.add_filter(filter_pickle)
     
     filter_any = gtk.FileFilter()

@@ -184,7 +184,7 @@ def _process_item_name(
       current_file_extension, default_file_extension, force_default_file_extension):
   if not force_default_file_extension:
     if current_file_extension == default_file_extension:
-      item.name += '.' + default_file_extension
+      item.name += f'.{default_file_extension}'
     else:
       item.name = pg.path.get_filename_with_new_file_extension(
         item.name, current_file_extension, keep_extra_trailing_periods=True)
@@ -242,7 +242,7 @@ def _validate_name(item):
 
 
 def _get_unique_substring_position(str_, file_extension):
-  return len(str_) - len('.' + file_extension)
+  return len(str_) - len(f'.{file_extension}')
 
 
 def _export_item(

@@ -100,7 +100,7 @@ class StubSetting(settings_.Setting):
 
 class StubWithCallableDefaultDefaultValueSetting(StubSetting):
   
-  _DEFAULT_DEFAULT_VALUE = lambda self: '_' + self._name
+  _DEFAULT_DEFAULT_VALUE = lambda self: f'_{self._name}'
 
 
 class StubRegistrableToPdbSetting(StubSetting):

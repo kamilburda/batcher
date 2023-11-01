@@ -361,7 +361,7 @@ class TestItem(unittest.TestCase):
 
   def test_initial_tags_for_item_as_folder(self):
     item_tags_source_name = 'test'
-    folder_tags_source_name = item_tags_source_name + '_' + pgitemtree.FOLDER_KEY
+    folder_tags_source_name = f'{item_tags_source_name}_{pgitemtree.FOLDER_KEY}'
     
     layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(
@@ -377,7 +377,7 @@ class TestItem(unittest.TestCase):
 
   def test_initial_tags_for_item_as_folder_unrecognized_source_name(self):
     item_tags_source_name = 'test'
-    folder_tags_source_name = item_tags_source_name + '_' + pgitemtree.FOLDER_KEY
+    folder_tags_source_name = f'{item_tags_source_name}_{pgitemtree.FOLDER_KEY}'
     
     layer = stubs_gimp.Layer('layer')
     layer.attach_parasite(

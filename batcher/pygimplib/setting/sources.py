@@ -505,7 +505,7 @@ class Source(metaclass=abc.ABCMeta):
   def _truncate_str(obj, max_length=_MAX_LENGTH_OF_OBJECT_AS_STRING_ON_ERROR_OUTPUT):
     str_ = str(obj)
     if len(str_) > max_length:
-      str_ = str_[:max_length] + '... (truncated)'
+      str_ = f'{str_[:max_length]}... (truncated)'
     
     return str_
   

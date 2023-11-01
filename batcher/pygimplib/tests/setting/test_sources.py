@@ -828,7 +828,7 @@ class TestSourceWrite(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpSessionSource(unittest.TestCase):
 
@@ -869,12 +869,12 @@ class TestGimpSessionSource(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpParasiteSource(unittest.TestCase):
   
   @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp.directory',
+    f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp.directory',
     new='gimp_directory')
   def setUp(self):
     self.source_name = 'test_settings'
@@ -1068,9 +1068,9 @@ class _FileSourceTests:
     return string_io
 
 
-@mock.patch(pgutils.get_pygimplib_module_path() + '.setting.sources.open')
+@mock.patch(f'{pgutils.get_pygimplib_module_path()}.setting.sources.open')
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.os.path.isfile',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.os.path.isfile',
   return_value=False)
 class TestPickleFileSource(unittest.TestCase, _FileSourceTests):
   
@@ -1087,9 +1087,9 @@ class TestPickleFileSource(unittest.TestCase, _FileSourceTests):
     self.settings = stubs_group.create_test_settings()
 
 
-@mock.patch(pgutils.get_pygimplib_module_path() + '.setting.sources.open')
+@mock.patch(f'{pgutils.get_pygimplib_module_path()}.setting.sources.open')
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.os.path.isfile',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.os.path.isfile',
   return_value=False)
 class TestJsonFileSource(unittest.TestCase, _FileSourceTests):
   

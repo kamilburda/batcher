@@ -16,7 +16,7 @@ from . import stubs_sources
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestPersistor(unittest.TestCase):
   
@@ -29,7 +29,7 @@ class TestPersistor(unittest.TestCase):
     persistor_.Persistor.set_default_setting_sources(cls.orig_default_setting_sources)
 
   @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp.directory',
+    f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp.directory',
     new='gimp_directory')
   def setUp(self):
     self.settings = stubs_group.create_test_settings()
@@ -435,7 +435,7 @@ class TestPersistor(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp',
+  f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
 class TestLoadSaveFromSettingsAndGroups(unittest.TestCase):
   
@@ -448,7 +448,7 @@ class TestLoadSaveFromSettingsAndGroups(unittest.TestCase):
     persistor_.Persistor.set_default_setting_sources(cls.orig_default_setting_sources)
 
   @mock.patch(
-    pgutils.get_pygimplib_module_path() + '.setting.sources.Gimp.directory',
+    f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp.directory',
     new='gimp_directory')
   def setUp(self):
     self.settings = stubs_group.create_test_settings_with_specific_setting_sources()

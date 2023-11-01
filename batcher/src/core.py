@@ -654,7 +654,7 @@ class Batcher:
     
     for name, value in kwargs.items():
       if name in init_argspec_names:
-        setattr(self, '_' + name, value)
+        setattr(self, f'_{name}', value)
       else:
         raise ValueError(
           'invalid argument "{}" encountered; must be one of {}'.format(

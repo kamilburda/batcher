@@ -1050,7 +1050,7 @@ class BoolSetting(Setting):
   
   @property
   def description(self):
-    return self._description + '?'
+    return f'{self._description}?'
   
   def _assign_value(self, value):
     self._value = bool(value)
@@ -2135,7 +2135,7 @@ class ArraySetting(Setting):
         self._element_kwargs['default_value'])
     
     for key, value in self._element_kwargs.items():
-      pgutils.create_read_only_property(self, 'element_' + key, value)
+      pgutils.create_read_only_property(self, f'element_{key}', value)
     
     self._elements = []
     

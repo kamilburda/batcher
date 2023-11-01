@@ -245,7 +245,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     self.gimp_module = stubs_gimp.GimpModuleStub()
     
     self.sources_gimp_patcher = mock.patch(
-      pg.utils.get_pygimplib_module_path() + '.setting.sources.Gimp', new=self.gimp_module)
+      f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp', new=self.gimp_module)
     self.mock_sources_gimp = self.sources_gimp_patcher.start()
 
     self.update_gimp_patcher = mock.patch('batcher.update.gimp', new=self.gimp_module)
@@ -430,7 +430,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
           for argument_dict in setting_value:
             argument_name = argument_dict['name']
             argument_value = argument_dict['value']
-            self.assertEqual(action['arguments/' + argument_name].value, argument_value)
+            self.assertEqual(action[f'arguments/{argument_name}'].value, argument_value)
         else:
           self.assertEqual(action[setting_name].value, setting_value)
     

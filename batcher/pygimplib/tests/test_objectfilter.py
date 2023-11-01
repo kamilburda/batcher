@@ -27,7 +27,7 @@ class FilterRules:
     if not case_sensitive:
       obj.name = obj.name.lower()
     
-    return obj.name.endswith('.' + file_extension)
+    return obj.name.endswith(f'.{file_extension}')
   
   @staticmethod
   def is_empty(obj):
