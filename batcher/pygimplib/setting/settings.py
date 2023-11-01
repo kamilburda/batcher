@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import path as pgpath
@@ -927,28 +928,75 @@ class NumericSetting(Setting):
   
   Raises:
     SettingValueError:
-      If the min_value` property is not ``None`` and the value assigned is
-      less than `min_value`, or if the `max_value` property is not ``None``
-      and the value assigned is greater than `max_value`.
+      Raised if one of the following conditions is met:
+
+        * the `min_value` property is not ``None`` and the value assigned is
+          less than `min_value`,
+
+        * the `pdb_min_value` property is not ``None`` and the value assigned is
+          less than `pdb_min_value`,
+
+        * the `max_value` property is not ``None`` and the value assigned is
+          greater than `max_value`,
+
+        * the `pdb_max_value` property is not ``None`` and the value assigned is
+          greater than `pdb_max_value`.
   
   Error messages:
     * ``'below_min'``: The value assigned is less than `min_value`.
+    * ``'below_pdb_min'``: The value assigned is less than `pdb_min_value`.
     * ``'above_max'``: The value assigned is greater than `max_value`.
+    * ``'above_pdb_max'``: The value assigned is greater than `pdb_max_value`.
   """
   
   _ABSTRACT = True
+
+  _PDB_TYPES_AND_MINIMUM_VALUES = {
+    GObject.TYPE_INT: GLib.MININT,
+    GObject.TYPE_UINT: 0,
+    GObject.TYPE_INT64: GLib.MININT64,
+    GObject.TYPE_UINT64: 0,
+    GObject.TYPE_LONG: GLib.MINLONG,
+    GObject.TYPE_ULONG: 0,
+    GObject.TYPE_DOUBLE: -GLib.MAXDOUBLE,
+    GObject.TYPE_FLOAT: -GLib.MAXFLOAT,
+  }
+  """Mapping of PDB types to minimum values allowed for each type.
+  
+  For example, the minimum value allowed for type `GObject.TYPE_INT` would be
+  `GLib.MININT`.
+  """
+
+  _PDB_TYPES_AND_MAXIMUM_VALUES = {
+    GObject.TYPE_INT: GLib.MAXINT,
+    GObject.TYPE_UINT: GLib.MAXUINT,
+    GObject.TYPE_INT64: GLib.MAXINT64,
+    GObject.TYPE_UINT64: GLib.MAXUINT64,
+    GObject.TYPE_LONG: GLib.MAXLONG,
+    GObject.TYPE_ULONG: GLib.MAXULONG,
+    GObject.TYPE_DOUBLE: GLib.MAXDOUBLE,
+    GObject.TYPE_FLOAT: GLib.MAXFLOAT,
+  }
+  """Mapping of PDB types to maximum values allowed for each type.
+  
+  For example, the maximum value allowed for type `GObject.TYPE_INT` would be
+  `GLib.MAXINT`.
+  """
   
   def __init__(self, name: str, min_value=None, max_value=None, **kwargs):
     self._min_value = min_value
     self._max_value = max_value
-    
+
+    # We need to define these attributes before the parent's `__init__()` as
+    # some methods require these attributes to be defined during `__init__()`.
+    pdb_type = super()._get_pdb_type(
+      kwargs.get('pdb_type', inspect.signature(Setting.__init__).parameters['pdb_type'].default))
+    self._pdb_min_value = self._PDB_TYPES_AND_MINIMUM_VALUES.get(pdb_type, None)
+    self._pdb_max_value = self._PDB_TYPES_AND_MAXIMUM_VALUES.get(pdb_type, None)
+
+    self._check_min_and_max_values_against_pdb_min_and_max_values()
+
     super().__init__(name, **kwargs)
-  
-  def _init_error_messages(self):
-    self.error_messages['below_min'] = (
-      _('Value cannot be less than {}.').format(self._min_value))
-    self.error_messages['above_max'] = (
-      _('Value cannot be greater than {}.').format(self._max_value))
   
   @property
   def min_value(self) -> Union[int, float, None]:
@@ -962,15 +1010,93 @@ class NumericSetting(Setting):
   def max_value(self) -> Union[int, float, None]:
     """Maximum allowed numeric value.
     
-    If ``None``, no checks for a maximum value are performed
+    If ``None``, no checks for a maximum value are performed.
     """
     return self._max_value
+
+  @property
+  def pdb_min_value(self) -> Union[int, float, None]:
+    """Minimum numeric value as allowed by the `pdb_type`.
+
+    This property represents the lowest possible value this setting can have
+    given the `pdb_type`. `min_value` thus cannot be lower than this value.
+
+    If ``None``, no checks for a minimum value are performed.
+    """
+    return self._pdb_min_value
+
+  @property
+  def pdb_max_value(self) -> Union[int, float, None]:
+    """Maximum numeric value as allowed by the `pdb_type`.
+
+    This property represents the highest possible value this setting can have
+    given the `pdb_type`. `max_value` thus cannot be greater than this value.
+
+    If ``None``, no checks for a maximum value are performed.
+    """
+    return self._pdb_max_value
+
+  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
+    """Returns a list of dictionaries representing GIMP PDB parameters for the
+    setting.
+
+    In addition to items provided by `Setting.get_pdb_param()`, this method adds
+    ``'minimum'`` and ``'maximum'`` if the `min_value` and `max_value` property
+    is not ``None``, respectively.
+    """
+    pdb_params = super().get_pdb_param()
+
+    if pdb_params is not None:
+      if self.min_value is not None:
+        pdb_params[0]['minimum'] = self.min_value
+
+      if self.max_value is not None:
+        pdb_params[0]['maximum'] = self.max_value
+
+      return pdb_params
+    else:
+      return None
+
+  def _init_error_messages(self):
+    self.error_messages['below_min'] = (
+      _('Value cannot be less than {}.').format(self.min_value))
+
+    self.error_messages['below_pdb_min'] = (
+      _('Value cannot be less than {}.').format(self.pdb_min_value))
+
+    self.error_messages['above_max'] = (
+      _('Value cannot be greater than {}.').format(self.max_value))
+
+    self.error_messages['above_pdb_max'] = (
+      _('Value cannot be greater than {}.').format(self.pdb_max_value))
   
   def _validate(self, value):
-    if self._min_value is not None and value < self._min_value:
+    if self.min_value is not None and value < self.min_value:
       raise SettingValueError(utils_.value_to_str_prefix(value) + self.error_messages['below_min'])
-    if self._max_value is not None and value > self._max_value:
+
+    if self.pdb_min_value is not None and value < self.pdb_min_value:
+      raise SettingValueError(
+        utils_.value_to_str_prefix(value) + self.error_messages['below_pdb_min'])
+
+    if self.max_value is not None and value > self.max_value:
       raise SettingValueError(utils_.value_to_str_prefix(value) + self.error_messages['above_max'])
+
+    if self.pdb_max_value is not None and value > self.pdb_max_value:
+      raise SettingValueError(
+        utils_.value_to_str_prefix(value) + self.error_messages['above_pdb_max'])
+
+  def _check_min_and_max_values_against_pdb_min_and_max_values(self):
+    if (self.min_value is not None
+        and self.pdb_min_value is not None
+        and self.min_value < self.pdb_min_value):
+      raise ValueError(
+        f'minimum value {self.min_value} cannot be less than {self.pdb_min_value}')
+
+    if (self.max_value is not None
+        and self.pdb_max_value is not None
+        and self.max_value > self.pdb_max_value):
+      raise ValueError(
+        f'maximum value {self.max_value} cannot be greater than {self.pdb_max_value}')
 
 
 class IntSetting(NumericSetting):

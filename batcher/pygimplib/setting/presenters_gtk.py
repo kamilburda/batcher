@@ -730,11 +730,15 @@ class PanedPositionPresenter(GtkPresenter):
 def _create_spin_button(setting, digits=0):
   if hasattr(setting, 'min_value') and setting.min_value is not None:
     min_value = setting.min_value
+  elif hasattr(setting, 'pdb_min_value') and setting.pdb_min_value is not None:
+    min_value = setting.pdb_min_value
   else:
     min_value = GLib.MININT
   
   if hasattr(setting, 'max_value') and setting.max_value is not None:
     max_value = setting.max_value
+  elif hasattr(setting, 'pdb_max_value') and setting.pdb_max_value is not None:
+    max_value = setting.pdb_max_value
   else:
     max_value = GLib.MAXINT
   

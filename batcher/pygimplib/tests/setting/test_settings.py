@@ -6,6 +6,7 @@ import unittest.mock as mock
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GLib
 from gi.repository import GObject
 
 import parameterized
@@ -557,12 +558,19 @@ class TestBoolSetting(unittest.TestCase):
 class TestIntSetting(unittest.TestCase):
   
   def setUp(self):
-    self.setting = settings_.IntSetting(
-      'count', default_value=0, min_value=0, max_value=100)
+    self.setting = settings_.IntSetting('count', default_value=0, min_value=0, max_value=100)
   
-  def test_value_is_below_min(self):
+  def test_value_is_below_min_raises_error(self):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(-5)
+
+  def test_value_is_below_pdb_min_raises_error(self):
+    with self.assertRaises(settings_.SettingValueError):
+      settings_.IntSetting('count').set_value(GLib.MININT - 1)
+
+  def test_min_value_is_below_pdb_min_raises_error(self):
+    with self.assertRaises(ValueError):
+      settings_.IntSetting('count', min_value=GLib.MININT - 1)
   
   def test_min_value_does_not_raise_error(self):
     try:
@@ -570,15 +578,61 @@ class TestIntSetting(unittest.TestCase):
     except settings_.SettingValueError:
       self.fail('SettingValueError should not be raised')
   
-  def test_value_is_above_max(self):
+  def test_value_is_above_max_raises_error(self):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(200)
+
+  def test_value_is_above_pdb_max_raises_error(self):
+    with self.assertRaises(settings_.SettingValueError):
+      settings_.IntSetting('count').set_value(GLib.MAXINT + 1)
+
+  def test_max_value_is_above_pdb_max_raises_error(self):
+    with self.assertRaises(ValueError):
+      settings_.IntSetting('count', max_value=GLib.MAXINT + 1)
   
   def test_max_value_does_not_raise_error(self):
     try:
       self.setting.set_value(100)
     except settings_.SettingValueError:
       self.fail('SettingValueError should not be raised')
+
+  def test_get_pdb_param(self):
+    self.assertEqual(
+      self.setting.get_pdb_param(),
+      [
+        dict(
+          name='count',
+          type=GObject.TYPE_INT,
+          default=0,
+          minimum=0,
+          maximum=100,
+          nick='Count',
+          blurb='Count',
+        )])
+
+  def test_get_pdb_param_no_min_or_max_value(self):
+    self.assertEqual(
+      settings_.IntSetting('count').get_pdb_param(),
+      [
+        dict(
+          name='count',
+          type=GObject.TYPE_INT,
+          default=0,
+          nick='Count',
+          blurb='Count',
+        )])
+
+  def test_to_dict(self):
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'count',
+        'type': 'int',
+        'value': 0,
+        'default_value': 0,
+        'min_value': 0,
+        'max_value': 100,
+      })
 
 
 class TestFloatSetting(unittest.TestCase):
@@ -587,7 +641,7 @@ class TestFloatSetting(unittest.TestCase):
     self.setting = settings_.FloatSetting(
       'clip_percent', default_value=0.0, min_value=0.0, max_value=100.0)
   
-  def test_value_below_min(self):
+  def test_value_below_min_raises_error(self):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(-5.0)
   
@@ -597,7 +651,7 @@ class TestFloatSetting(unittest.TestCase):
     except settings_.SettingValueError:
       self.fail('SettingValueError should not be raised')
   
-  def test_value_above_max(self):
+  def test_value_above_max_raises_error(self):
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(200.0)
   
