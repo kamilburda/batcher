@@ -983,8 +983,6 @@ class IntSetting(NumericSetting):
   * `GObject.TYPE_UINT64`
   * `GObject.TYPE_LONG`
   * `GObject.TYPE_ULONG`
-  * `GObject.TYPE_CHAR`
-  * `GObject.TYPE_UCHAR`
   
   Default value: 0
   """
