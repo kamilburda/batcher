@@ -2,6 +2,8 @@ import unittest
 
 import parameterized
 
+from gi.repository import GObject
+
 from ...setting import group as group_
 from ...setting import presenter as presenter_
 from ...setting import settings as settings_
@@ -131,17 +133,16 @@ class TestGroupAddFromDict(unittest.TestCase):
       {
        'type': 'boolean',
        'name': 'use_layer_size',
-       'pdb_type': settings_.SettingPdbTypes.int16
+       'pdb_type': GObject.TYPE_UINT64,
       }
     ])
     
     self.assertEqual(settings['flatten'].pdb_type, None)
-    self.assertEqual(
-      settings['use_layer_size'].pdb_type, settings_.SettingPdbTypes.int16)
+    self.assertEqual(settings['use_layer_size'].pdb_type, GObject.TYPE_UINT64)
   
   def test_add_with_group_level_attributes_overridden_by_child_group_attributes(self):
     additional_settings = group_.Group(
-      name='additional', setting_attributes={'pdb_type': settings_.SettingPdbTypes.int16})
+      name='additional', setting_attributes={'pdb_type': GObject.TYPE_UINT64})
     additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
     
     settings = group_.Group(
@@ -152,14 +153,13 @@ class TestGroupAddFromDict(unittest.TestCase):
     ])
     
     self.assertEqual(settings['flatten'].pdb_type, None)
-    self.assertEqual(
-      settings['additional/use_layer_size'].pdb_type, settings_.SettingPdbTypes.int16)
+    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_UINT64)
     self.assertEqual(settings['flatten'].display_name, 'Setting name')
     self.assertEqual(settings['additional/use_layer_size'].display_name, 'Use layer size')
   
   def test_add_with_top_group_attributes_applied_recursively(self):
     settings = group_.Group(
-      name='main', setting_attributes={'pdb_type': settings_.SettingPdbTypes.int16})
+      name='main', setting_attributes={'pdb_type': GObject.TYPE_UINT64})
     
     additional_settings = group_.Group(name='additional')
     
@@ -170,14 +170,13 @@ class TestGroupAddFromDict(unittest.TestCase):
     
     additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
     
-    self.assertEqual(settings['flatten'].pdb_type, settings_.SettingPdbTypes.int16)
-    self.assertEqual(
-      settings['additional/use_layer_size'].pdb_type, settings_.SettingPdbTypes.int16)
+    self.assertEqual(settings['flatten'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_UINT64)
   
   def test_add_with_top_group_attributes_not_applied_recursively_if_disabled(self):
     settings = group_.Group(
       name='main',
-      setting_attributes={'pdb_type': settings_.SettingPdbTypes.int16},
+      setting_attributes={'pdb_type': GObject.TYPE_UINT64},
       recurse_setting_attributes=False)
     
     additional_settings = group_.Group(name='additional')
@@ -189,9 +188,8 @@ class TestGroupAddFromDict(unittest.TestCase):
     
     additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
     
-    self.assertEqual(settings['flatten'].pdb_type, settings_.SettingPdbTypes.int16)
-    self.assertEqual(
-      settings['additional/use_layer_size'].pdb_type, settings_.SettingPdbTypes.int32)
+    self.assertEqual(settings['flatten'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_INT)
 
 
 class TestGroupCreateGroupsFromDict(unittest.TestCase):
@@ -679,7 +677,7 @@ class TestGroupHierarchical(unittest.TestCase):
       walked_settings.append(setting.name)
     
     def _append_setting_name_and_end_group_walk_indicator(setting):
-      walked_settings.append(setting.name + '_end')
+      walked_settings.append(f'{setting.name}_end')
     
     walk_callbacks = group_.GroupWalkCallbacks()
     walk_callbacks.on_visit_setting = _append_setting_name

@@ -1,5 +1,8 @@
 """Stubs primarily to be used in the `test_setting` module."""
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import GObject
 
 from ...setting import presenter as presenter_
@@ -100,12 +103,12 @@ class StubSetting(settings_.Setting):
 
 class StubWithCallableDefaultDefaultValueSetting(StubSetting):
   
-  _DEFAULT_DEFAULT_VALUE = lambda self: f'_{self._name}'
+  _DEFAULT_DEFAULT_VALUE = lambda self: f'_{self.name}'
 
 
 class StubRegistrableToPdbSetting(StubSetting):
 
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, Gimp.RunMode]
 
 
 class StubWithGuiSetting(StubSetting):

@@ -1,5 +1,7 @@
 import unittest
 
+from gi.repository import GObject
+
 from ...setting import pdbparams as pdbparams_
 from ...setting import settings as settings_
 
@@ -26,7 +28,7 @@ class TestCreateParams(unittest.TestCase):
     param = params[0]
     
     self.assertTrue(len(param), 3)
-    self.assertEqual(param[0], settings_.SettingPdbTypes.string)
+    self.assertEqual(param[0], GObject.TYPE_STRING)
     self.assertEqual(param[1], 'file-extension')
     self.assertEqual(param[2], 'File extension')
   
@@ -47,7 +49,7 @@ class TestCreateParams(unittest.TestCase):
        self.file_ext_setting.description))
     
     # Array length parameter
-    self.assertEqual(params[1][0], settings_.SettingPdbTypes.int32)
+    self.assertEqual(params[1][0], GObject.TYPE_INT)
     
     self.assertEqual(
       params[2],
