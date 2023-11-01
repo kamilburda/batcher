@@ -179,7 +179,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         pdb_type: Union[
           GObject.GObject, gi_types.GObjectMeta, GObject.GType, str, None,
         ] = 'automatic',
-        gui_type: Union[presenter_.Presenter, str, None] = 'automatic',
+        gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
         setting_sources: Union[Dict, List, None] = None,
