@@ -10,7 +10,6 @@ __all__ = [
   'SettingParentMixin',
   'SettingEventsMixin',
   'get_pdb_name',
-  'get_setting_name',
   'value_to_str_prefix',
   'get_processed_display_name',
   'generate_display_name',
@@ -201,17 +200,10 @@ class SettingEventsMixin:
 
 
 def get_pdb_name(setting_name: str) -> str:
-  """Return a setting name suitable for the description of the setting in the
+  """Returns a setting name suitable for the description of the setting in the
   GIMP Procedural Database (PDB).
   """
   return setting_name.replace('_', '-')
-
-
-def get_setting_name(pdb_name: str) -> str:
-  """Return a setting name based on the specified name from the GIMP Procedural
-  Database (PDB).
-  """
-  return pdb_name.replace('-', '_')
 
 
 def value_to_str_prefix(value) -> str:
