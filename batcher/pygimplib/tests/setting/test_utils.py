@@ -40,8 +40,7 @@ def _create_test_settings_for_path():
 class TestSettingParentMixin(unittest.TestCase):
   
   def setUp(self):
-    self.setting, self.advanced_settings, self.main_settings = (
-      _create_test_settings_for_path())
+    self.setting, self.advanced_settings, self.main_settings = _create_test_settings_for_path()
   
   def test_get_parent_empty(self):
     setting = stubs_setting.StubSetting('file_extension')
@@ -265,9 +264,6 @@ class TestSettingPath(unittest.TestCase):
     self.assertEqual(
       utils_.get_setting_path(self.main_settings, 'root'), 'main')
   
-  def _test_get_path_with_relative_path(
-        self, setting, relative_path_group, expected_path):
+  def _test_get_path_with_relative_path(self, setting, relative_path_group, expected_path):
     self.assertEqual(
-      utils_.get_setting_path(
-        setting, relative_path_group=relative_path_group),
-      expected_path)
+      utils_.get_setting_path(setting, relative_path_group=relative_path_group), expected_path)
