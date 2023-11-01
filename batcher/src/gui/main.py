@@ -42,7 +42,6 @@ from src.gui import messages as messages_
 from src.gui import preview_image as preview_image_
 from src.gui import preview_name as preview_name_
 from src.gui import previews_controller as previews_controller_
-from src.gui import progress as progress_
 
 if hasattr(pg.setting.sources, 'json'):
   _json_module_found = True
@@ -992,11 +991,6 @@ class ExportLayersDialog:
     self._setup_gui_before_batch_run()
     self._batcher, overwrite_chooser, progress_updater = self._setup_batcher()
     
-    item_progress_indicator = progress_.ItemProgressIndicator(
-      self._progress_bar, progress_updater)
-    item_progress_indicator.install_progress_for_status(
-      self._progress_set_value_and_show_dialog)
-    
     should_quit = True
     self._name_preview.lock_update(True, lock_update_key)
     self._image_preview.lock_update(True, lock_update_key)
@@ -1031,7 +1025,6 @@ class ExportLayersDialog:
         messages_.display_message(
           _('No layers were exported.'), gtk.MESSAGE_INFO, parent=self._dialog)
     finally:
-      item_progress_indicator.uninstall_progress_for_status()
       self._name_preview.lock_update(False, lock_update_key)
       self._image_preview.lock_update(False, lock_update_key)
       
@@ -1248,9 +1241,6 @@ class ExportLayersRepeatDialog:
   
   def run_batcher(self):
     progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
-    item_progress_indicator = progress_.ItemProgressIndicator(
-      self._progress_bar, progress_updater)
-    item_progress_indicator.install_progress_for_status()
     
     self._batcher = core.Batcher(
       gimpenums.RUN_WITH_LAST_VALS,
@@ -1279,8 +1269,6 @@ class ExportLayersRepeatDialog:
       if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
         messages_.display_message(
           _('No layers were exported.'), gtk.MESSAGE_INFO, parent=self._dialog)
-    finally:
-      item_progress_indicator.uninstall_progress_for_status()
   
   def show(self):
     self._dialog.vbox.show_all()
