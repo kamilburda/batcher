@@ -544,6 +544,16 @@ class TestGenericSetting(unittest.TestCase):
         value_save='not_a_callable')
 
 
+class TestBoolSetting(unittest.TestCase):
+
+  def test_set_value_value_is_converted_to_bool(self):
+    setting = settings_.BoolSetting('flatten', default_value=False)
+
+    setting.set_value(['nonempty_list'])
+
+    self.assertEqual(setting.value, True)
+
+
 class TestIntSetting(unittest.TestCase):
   
   def setUp(self):
