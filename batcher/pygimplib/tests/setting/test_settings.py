@@ -6,6 +6,7 @@ import unittest.mock as mock
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 import parameterized
 
@@ -68,10 +69,6 @@ class TestSetting(unittest.TestCase):
     
     self.assertEqual(setting.value, '')
   
-  def test_value_direct_assignment_not_allowed(self):
-    with self.assertRaises(AttributeError):
-      self.setting.value = 'jpg'
-  
   def test_get_generated_display_name(self):
     self.assertEqual(self.setting.display_name, 'File extension')
   
@@ -104,26 +101,56 @@ class TestSetting(unittest.TestCase):
     self.assertNotEqual(
       setting.error_messages['invalid_value'],
       setting_with_custom_error_messages.error_messages['invalid_value'])
+
+  def test_pdb_type_automatic_is_not_registrable(self):
+    self.assertEqual(self.setting.pdb_type, None)
+    self.assertFalse(self.setting.can_be_registered_to_pdb())
   
   def test_pdb_type_automatic_is_registrable(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
-      'file_extension', default_value='png', pdb_type=settings_.SettingPdbTypes.string)
-    
+    setting = stubs_setting.StubRegistrableToPdbSetting('file_extension', default_value='png')
+
+    self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
     self.assertTrue(setting.can_be_registered_to_pdb())
-  
-  def test_pdb_type_automatic_is_not_registrable(self):
-    self.assertFalse(self.setting.can_be_registered_to_pdb())
+
+  def test_pdb_type_as_none(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type=None)
+
+    self.assertEqual(setting.pdb_type, None)
+    self.assertFalse(setting.can_be_registered_to_pdb())
+
+  def test_pdb_type_as_object(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type=Gimp.RunMode)
+
+    self.assertEqual(setting.pdb_type, Gimp.RunMode)
+    self.assertTrue(setting.can_be_registered_to_pdb())
+
+  def test_pdb_type_as_gobject_name(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type='gchararray')
+
+    self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
+    self.assertTrue(setting.can_be_registered_to_pdb())
   
   def test_invalid_pdb_type(self):
     with self.assertRaises(ValueError):
-      stubs_setting.StubSetting(
-        'file_extension', default_value='png', pdb_type=settings_.SettingPdbTypes.string)
+      stubs_setting.StubRegistrableToPdbSetting(
+        'file_extension', default_value='png', pdb_type=GObject.TYPE_INT)
   
   def test_get_pdb_param_for_registrable_setting(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting('file_extension', default_value='png')
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', display_name='_Run mode')
     self.assertEqual(
       setting.get_pdb_param(),
-      [(settings_.SettingPdbTypes.string, 'file-extension', 'File extension')])
+      [
+        dict(
+          name='file-extension',
+          type=GObject.TYPE_STRING,
+          default='png',
+          nick='_Run mode',
+          blurb='Run mode',
+        )])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
     self.assertEqual(self.setting.get_pdb_param(), None)
@@ -185,7 +212,7 @@ class TestSetting(unittest.TestCase):
       })
   
   def test_to_dict_with_tags(self):
-    tags = set(['ignore_reset', 'ignore_load'])
+    tags = {'ignore_reset', 'ignore_load'}
     expected_tags = list(tags)
     
     setting = stubs_setting.StubSetting(
@@ -199,6 +226,34 @@ class TestSetting(unittest.TestCase):
         'type': 'stub',
         'default_value': 'png',
         'tags': expected_tags,
+      })
+
+  def test_to_dict_with_pdb_type_as_gtype(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type=GObject.TYPE_STRING)
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'file_extension',
+        'value': 'png',
+        'type': 'stub_registrable_to_pdb',
+        'default_value': 'png',
+        'pdb_type': 'gchararray',
+      })
+
+  def test_to_dict_with_pdb_type_as_gobject_class(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type=Gimp.RunMode)
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'file_extension',
+        'value': 'png',
+        'type': 'stub_registrable_to_pdb',
+        'default_value': 'png',
+        'pdb_type': 'GimpRunMode',
       })
 
 
@@ -337,7 +392,8 @@ class TestSettingGui(unittest.TestCase):
       stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     
     flatten = settings_.BoolSetting('flatten', default_value=False)
-    self.setting.connect_event('value-changed', stubs_setting.on_file_extension_changed, flatten)
+    self.setting.connect_event(
+      'value-changed', stubs_setting.on_file_extension_changed, flatten)
     
     self.widget.set_value('jpg')
     self.assertEqual(self.setting.value, 'jpg')
@@ -350,10 +406,9 @@ class TestSettingGui(unittest.TestCase):
     self.setting.reset()
     self.assertEqual(self.widget.value, 'png')
   
-  def test_update_setting_value_manually_for_automatically_updated_settings_when_reset_to_disallowed_empty_value(self):
+  def test_update_setting_value_raise_error_when_reset_to_disallowed_empty_value(self):
     setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
-    setting.set_gui(
-      stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
+    setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     setting.set_value('jpg')
     setting.reset()
     
@@ -373,8 +428,7 @@ class TestSettingGui(unittest.TestCase):
   
   def test_automatic_gui_update_enabled_is_true(self):
     setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
-    setting.set_gui(
-      stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
+    setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     self.assertTrue(setting.gui.gui_update_enabled)
     
     self.widget.set_value('png')
@@ -383,8 +437,7 @@ class TestSettingGui(unittest.TestCase):
   def test_automatic_gui_update_enabled_is_false(self):
     setting = stubs_setting.StubWithGuiSetting(
       'file_extension', default_value='', auto_update_gui_to_setting=False)
-    setting.set_gui(
-      stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
+    setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     self.assertFalse(setting.gui.gui_update_enabled)
     
     self.widget.set_value('png')
@@ -403,8 +456,7 @@ class TestSettingGui(unittest.TestCase):
   def test_automatic_gui_update_after_being_disabled(self):
     setting = stubs_setting.StubWithGuiSetting(
       'file_extension', default_value='', auto_update_gui_to_setting=False)
-    setting.set_gui(
-      stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
+    setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     setting.gui.auto_update_gui_to_setting(True)
     
     self.widget.set_value('png')
@@ -418,9 +470,6 @@ class TestSettingGui(unittest.TestCase):
     
     with self.assertRaises(ValueError):
       setting.gui.auto_update_gui_to_setting(True)
-
-
-#===============================================================================
 
 
 class TestGenericSetting(unittest.TestCase):
@@ -449,8 +498,8 @@ class TestGenericSetting(unittest.TestCase):
   def test_value_functions_with_two_parameters(self):
     setting = settings_.GenericSetting(
       'selected_layers',
-      value_set=lambda value, setting: tuple(setting.name + '_' + str(item) for item in value),
-      value_save=lambda value, setting: list(value))
+      value_set=lambda value, setting_: tuple(f'{setting_.name}_{str(item)}' for item in value),
+      value_save=lambda value, setting_: list(value))
     
     setting.set_value([4, 6, 2])
     
@@ -473,6 +522,7 @@ class TestGenericSetting(unittest.TestCase):
   
   def test_value_set_not_being_callable_raises_error(self):
     with self.assertRaises(TypeError):
+      # noinspection PyTypeChecker
       settings_.GenericSetting(
         'selected_layers',
         value_set='not_a_callable',
@@ -487,6 +537,7 @@ class TestGenericSetting(unittest.TestCase):
   
   def test_value_save_not_being_callable_raises_error(self):
     with self.assertRaises(TypeError):
+      # noinspection PyTypeChecker
       settings_.GenericSetting(
         'selected_layers',
         value_set=lambda value, setting: tuple(value),
@@ -576,7 +627,8 @@ class TestCreateEnumSetting(unittest.TestCase):
   def test_inconsistent_number_of_elements_raises_error(self):
     with self.assertRaises(ValueError):
       settings_.EnumSetting(
-        'overwrite_mode', [('skip', 'Skip', 4), ('replace', 'Replace')], default_value='replace')
+        'overwrite_mode',
+        [('skip', 'Skip', 4), ('replace', 'Replace')], default_value='replace')
     
   def test_same_explicit_item_value_multiple_times_raises_error(self):
     with self.assertRaises(ValueError):
@@ -698,23 +750,8 @@ class TestEnumSetting(unittest.TestCase):
       })
 
 
-class TestStringSetting(unittest.TestCase):
-  
-  def test_to_dict_bytes_is_converted_to_str(self):
-    setting = settings_.StringSetting('file_extension', default_value=b'png')
-    
-    self.assertEqual(
-      setting.to_dict(),
-      {
-        'name': 'file_extension',
-        'value': 'png',
-        'type': 'string',
-        'default_value': 'png',
-      })
-
-
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
 class TestImageSetting(unittest.TestCase):
 
   def setUp(self):
@@ -733,7 +770,7 @@ class TestImageSetting(unittest.TestCase):
     self.pdb.gimp_image_set_filename(self.image, 'file_path')
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
     
       self.setting.set_value('file_path')
@@ -742,7 +779,7 @@ class TestImageSetting(unittest.TestCase):
   
   def test_set_value_with_non_matching_file_path(self):
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = []
       
       self.setting.set_value('file_path')
@@ -753,7 +790,7 @@ class TestImageSetting(unittest.TestCase):
     self.image.id_ = 2
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module._id2image.return_value = self.image
       
       self.setting.set_value(2)
@@ -764,7 +801,7 @@ class TestImageSetting(unittest.TestCase):
     self.image.id_ = 2
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module._id2image.return_value = None
       
       self.setting.set_value(3)
@@ -785,7 +822,7 @@ class TestImageSetting(unittest.TestCase):
     self.pdb.gimp_image_set_filename(self.image, 'file_path')
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
       
       setting = settings_.ImageSetting('image', default_value='file_path')
@@ -849,9 +886,9 @@ class TestImageSetting(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
 class TestGimpItemSetting(unittest.TestCase):
   
   class StubItemSetting(settings_.GimpItemSetting):
@@ -884,7 +921,7 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list(self):
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
@@ -896,7 +933,7 @@ class TestGimpItemSetting(unittest.TestCase):
     self.image.layers = [self.layer]
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'layer'])
@@ -909,7 +946,7 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_image_returns_none(self):
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = []
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
@@ -918,7 +955,7 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_layer_returns_none(self):
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/some_other_layer'])
@@ -927,7 +964,7 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_parent_returns_none(self):
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.pdbutils.gimp') as temp_mock_gimp_module:
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.image_list.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/some_other_group2/layer'])
@@ -938,8 +975,8 @@ class TestGimpItemSetting(unittest.TestCase):
     # FIXME: Remove the mock if possible, the stubs_gimp.Item class stores item:ID
     #  mapping internally.
     with mock.patch(
-          pgutils.get_pygimplib_module_path()
-          + '.tests.stubs_gimp.Item.get_by_id') as get_by_id_function:
+          f'{pgutils.get_pygimplib_module_path()}.tests.stubs_gimp.Item.get_by_id'
+    ) as get_by_id_function:
       get_by_id_function.return_value = self.layer
       
       self.setting.set_value(2)
@@ -950,8 +987,8 @@ class TestGimpItemSetting(unittest.TestCase):
     # FIXME: Remove the mock if possible, the stubs_gimp.Item class stores item:ID
     #  mapping internally.
     with mock.patch(
-          pgutils.get_pygimplib_module_path()
-          + '.tests.stubs_gimp.Item.get_by_id') as get_by_id_function:
+          f'{pgutils.get_pygimplib_module_path()}.tests.stubs_gimp.Item.get_by_id'
+    ) as get_by_id_function:
       get_by_id_function.return_value = None
     
       self.setting.set_value(2)
@@ -1072,7 +1109,7 @@ class TestDisplaySetting(unittest.TestCase):
     display = stubs_gimp.Display(id_=1)
     
     with mock.patch(
-          pgutils.get_pygimplib_module_path() + '.setting.settings.pdb') as temp_mock_pdb:
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb') as temp_mock_pdb:
       temp_mock_pdb.gimp_display_is_valid.return_value = True
       
       setting.set_value(display)
@@ -1082,7 +1119,7 @@ class TestDisplaySetting(unittest.TestCase):
 
 
 @mock.patch(
-  pgutils.get_pygimplib_module_path() + '.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
 class TestParasiteSetting(unittest.TestCase):
   
   def test_create_with_default_default_value(self):
@@ -1293,9 +1330,9 @@ class TestCreateArraySetting(unittest.TestCase):
   
   @parameterized.parameterized.expand([
     ('element_pdb_type_is_registrable',
-     settings_.SettingPdbTypes.automatic,
+     'automatic',
      'float',
-     settings_.SettingPdbTypes.array_float),
+     Gimp.FloatArray),
     
     ('registration_is_disabled_explicitly',
      None,
@@ -1332,9 +1369,9 @@ class TestCreateArraySetting(unittest.TestCase):
       default_value=(1, 5, 10),
       element_type='integer',
       element_default_value=0,
-      element_pdb_type=settings_.SettingPdbTypes.int16)
+      element_pdb_type=GObject.TYPE_INT)
     
-    self.assertEqual(setting.pdb_type, settings_.SettingPdbTypes.array_int16)
+    self.assertEqual(setting.pdb_type, Gimp.Int32Array)
   
   def test_create_with_invalid_element_pdb_type(self):
     with self.assertRaises(ValueError):
@@ -1343,7 +1380,7 @@ class TestCreateArraySetting(unittest.TestCase):
         default_value=(1.0, 5.0, 10.0),
         element_type='float',
         element_default_value=0.0,
-        element_pdb_type=settings_.SettingPdbTypes.int16)
+        element_pdb_type=GObject.TYPE_UINT64)
   
   def test_create_multidimensional_array(self):
     values = ((1.0, 5.0, 10.0), (2.0, 15.0, 25.0), (-5.0, 10.0, 40.0))
@@ -1718,8 +1755,8 @@ class TestArraySetting(unittest.TestCase):
         expected_length_description):
     self.assertEqual(
       self.setting.get_pdb_param(length_name, length_description),
-      [(settings_.SettingPdbTypes.int, expected_length_name, expected_length_description),
-       (settings_.SettingPdbTypes.array_float, 'coordinates', 'Coordinates')])
+      [(GObject.TYPE_INT, expected_length_name, expected_length_description),
+       (Gimp.FloatArray, 'coordinates', 'Coordinates')])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
     setting = settings_.ArraySetting(
