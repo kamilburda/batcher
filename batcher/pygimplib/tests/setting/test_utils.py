@@ -67,6 +67,7 @@ class TestSettingEventsMixin(unittest.TestCase):
   
   def test_connect_event_argument_is_not_callable(self):
     with self.assertRaises(TypeError):
+      # noinspection PyTypeChecker
       self.file_extension.connect_event('test-event', None)
   
   def test_events_are_unique_for_one_instance_and_across_instances(self):
