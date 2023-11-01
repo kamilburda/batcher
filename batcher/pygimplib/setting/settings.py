@@ -966,17 +966,6 @@ class NumericSetting(Setting):
     """
     return self._max_value
   
-  @property
-  def description(self) -> str:
-    if self._min_value is not None and self._max_value is None:
-      return f'{self._pdb_name} >= {self._min_value}'
-    elif self._min_value is None and self._max_value is not None:
-      return f'{self._pdb_name} <= {self._max_value}'
-    elif self._min_value is not None and self._max_value is not None:
-      return f'{self._min_value} <= {self._pdb_name} <= {self._max_value}'
-    else:
-      return self._display_name
-  
   def _validate(self, value):
     if self._min_value is not None and value < self._min_value:
       raise SettingValueError(utils_.value_to_str_prefix(value) + self.error_messages['below_min'])
