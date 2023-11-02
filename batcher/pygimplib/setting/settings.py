@@ -1213,7 +1213,7 @@ class ChoiceSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.enum_combo_box]
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.combo_box]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: next((name for name in self._items), None)
   
