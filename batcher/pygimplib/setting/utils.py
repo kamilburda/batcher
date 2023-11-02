@@ -206,14 +206,20 @@ def get_pdb_name(setting_name: str) -> str:
   return setting_name.replace('_', '-')
 
 
-def value_to_str_prefix(value) -> str:
+def value_to_str_prefix(value, quote=True, return_empty=True) -> str:
   """Returns a string representing setting value, useful as a prefix to an error
   message.
-  
-  If ``value`` is empty or ``None``, an empty string is returned.
+
+  If ``quote`` is ``True``, wrap ``value`` around double quotes.
+
+  If ``return_empty`` is ``True`` and ``value`` is empty or ``None``, an empty
+  string is returned.
   """
-  if value:
-    return f'"{value}": '
+  if value or not return_empty:
+    if quote:
+      return f'"{value}": '
+    else:
+      return f'{value}: '
   else:
     return ''
 
