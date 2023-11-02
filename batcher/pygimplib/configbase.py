@@ -142,8 +142,12 @@ def _init_config_per_procedure(config: _Config):
     'persistent': config.PERSISTENT_SOURCE,
   })
 
-  if config.LOG_MODE != 'gimp_console':
-    logging.log_output(
-      config.LOG_MODE, config.PLUGINS_LOG_DIRPATHS,
-      config.PLUGINS_LOG_STDOUT_FILENAME, config.PLUGINS_LOG_STDERR_FILENAME,
-      config.PLUGIN_TITLE, config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS)
+  # FIXME: Duplicate logging instead of redirecting it.
+  #   The latter is not practical in case of e.g. running tests from the IDE or
+  #   test-running the plug-in while expecting error messages in the GIMP
+  #   console.
+  # if config.LOG_MODE != 'gimp_console':
+  #   logging.log_output(
+  #     config.LOG_MODE, config.PLUGINS_LOG_DIRPATHS,
+  #     config.PLUGINS_LOG_STDOUT_FILENAME, config.PLUGINS_LOG_STDERR_FILENAME,
+  #     config.PLUGIN_TITLE, config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS)
