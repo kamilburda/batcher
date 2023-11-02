@@ -4,6 +4,8 @@ import unittest
 import unittest.mock as mock
 
 import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
@@ -660,6 +662,113 @@ class TestFloatSetting(unittest.TestCase):
       self.setting.set_value(100.0)
     except settings_.SettingValueError:
       self.fail('SettingValueError should not be raised')
+
+
+class TestCreateEnumSetting(unittest.TestCase):
+
+  def test_with_default_default_value(self):
+    setting = settings_.EnumSetting('precision', Gimp.Precision)
+
+    self.assertEqual(setting.default_value, next(iter(Gimp.Precision.__enum_values__.values())))
+    self.assertEqual(setting.enum_type, Gimp.Precision)
+    self.assertEqual(setting.pdb_type, Gimp.Precision)
+
+  def test_with_custom_default_value(self):
+    setting = settings_.EnumSetting(
+      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_GAMMA)
+
+    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_GAMMA)
+
+  def test_with_custom_default_value_as_int(self):
+    setting = settings_.EnumSetting('precision', Gimp.Precision, default_value=750)
+
+    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_GAMMA)
+
+  def test_with_enum_type_as_string(self):
+    setting = settings_.EnumSetting(
+      'distance_metric', 'gi.repository.Gegl.DistanceMetric',
+      default_value=Gegl.DistanceMetric.EUCLIDEAN,
+    )
+
+    self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
+    self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
+
+  def test_string_enum_type_has_invalid_format_raises_error(self):
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting('distance_metric', 'gi')
+
+  def test_string_enum_type_is_not_a_class_raises_error(self):
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting('distance_metric', 'gi.repository.Gegl')
+
+  def test_string_enum_type_is_not_a_genum_subclass_raises_error(self):
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting('distance_metric', 'gi.repository.Gimp.PDB')
+
+  def test_invalid_default_value_raises_error(self):
+    with self.assertRaises(settings_.SettingValueError):
+      settings_.EnumSetting('distance_metric', Gimp.Precision, default_value=0)
+
+  def test_pdb_type_is_ignored(self):
+    setting = settings_.EnumSetting(
+      'precision', Gimp.Precision,
+      default_value=Gimp.Precision.DOUBLE_GAMMA, pdb_type=None)
+
+    self.assertEqual(setting.enum_type, Gimp.Precision)
+    self.assertEqual(setting.pdb_type, Gimp.Precision)
+
+
+class TestEnumSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = settings_.EnumSetting(
+      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_GAMMA)
+
+  def test_get_pdb_param_with_default_default_value(self):
+    setting = settings_.EnumSetting('precision', Gimp.Precision)
+
+    self.assertEqual(
+      setting.get_pdb_param(),
+      [
+        dict(
+          name='precision',
+          type=Gimp.Precision,
+          default=next(iter(Gimp.Precision.__enum_values__.values())),
+          nick='Precision',
+          blurb='Precision',
+        )])
+
+  def test_get_pdb_param_with_custom_default_value(self):
+    self.assertEqual(
+      self.setting.get_pdb_param(),
+      [
+        dict(
+          name='precision',
+          type=Gimp.Precision,
+          default=Gimp.Precision.DOUBLE_GAMMA,
+          nick='Precision',
+          blurb='Precision',
+        )])
+
+  def test_to_dict(self):
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'precision',
+        'value': 750,
+        'type': 'enum',
+        'enum_type': 'gi.repository.Gimp.Precision',
+        'default_value': 750,
+      })
+
+  def test_set_value_with_int(self):
+    self.setting.set_value(100)
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+
+  def test_set_value_with_enum_instance(self):
+    self.setting.set_value(Gimp.Precision.U8_LINEAR)
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
 
 
 class TestCreateChoiceSetting(unittest.TestCase):

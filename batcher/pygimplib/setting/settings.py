@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 import copy
+import importlib
 import inspect
 import sys
 from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
@@ -1176,6 +1177,114 @@ class BoolSetting(Setting):
   
   def _assign_value(self, value):
     self._value = bool(value)
+
+
+class EnumSetting(Setting):
+  """Class for settings wrapping an enumerated type (`GObject.GEnum` subclass).
+
+  Allowed GIMP PDB types:
+  * any `GObject.GEnum` subclass (e.g. `Gimp.RunMode`)
+
+  Default value: The first item defined for the specified `GObject.GEnum`
+    subclass (e.g. `Gimp.RunMode.INTERACTIVE`).
+  """
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.enum_combo_box]
+
+  # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self.enum_type.__enum_values__.values()), 0)
+
+  def __init__(
+        self,
+        name: str,
+        enum_type: Union[Type[GObject.GEnum], str],
+        **kwargs,
+  ):
+    """Initializes an `EnumSetting` instance.
+
+    If ``pdb_type`` is specified as a keyword argument, it is ignored and
+    always set to ``enum_type``.
+
+    Args:
+      name:
+        Setting name. See the `name` property for more information.
+      enum_type:
+        Enumerated type as a `GObject.GEnum` subclass or a string representing
+        the module path plus name of a `GObject.GEnum` subclass, e.g.
+        ``'gi.repository.Gimp.RunMode'`` for `Gimp.RunMode`.
+      **kwargs:
+        Additional keyword arguments that can be passed to the parent class'
+        `__init__()`.
+    """
+    self._enum_type = self._process_enum_type(enum_type)
+
+    kwargs['pdb_type'] = self._enum_type
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def enum_type(self) -> Type[GObject.GEnum]:
+    """`GObject.GEnum` subclass whose values are used as setting values."""
+    return self._enum_type
+
+  def to_dict(self, *args, **kwargs):
+    settings_dict = super().to_dict(*args, **kwargs)
+
+    settings_dict['enum_type'] = f'{self.enum_type.__module__}.{self.enum_type.__name__}'
+
+    return settings_dict
+
+  def _assign_value(self, value):
+    self._value = self.enum_type(value)
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, int) and raw_value in self.enum_type.__enum_values__:
+      return self.enum_type(raw_value)
+    else:
+      return raw_value
+
+  def _value_to_raw(self, value, source_type):
+    return int(value)
+
+  def _validate(self, value):
+    try:
+      self.enum_type(value)
+    except ValueError:
+      raise SettingValueError(
+        utils_.value_to_str_prefix(value, return_empty=False)
+        + self.error_messages['invalid_value'])
+
+    if isinstance(value, GObject.GEnum) and not isinstance(value, self.enum_type):
+      raise SettingValueError(
+        utils_.value_to_str_prefix(type(value)) + self.error_messages['invalid_type'])
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid value.')
+    self.error_messages['invalid_type'] = _('Enumerated value has an invalid type.')
+
+  def _get_pdb_type(self, pdb_type):
+    return self._enum_type
+
+  @staticmethod
+  def _process_enum_type(enum_type):
+    if isinstance(enum_type, str):
+      module_path, unused_, enum_class_name = enum_type.rpartition('.')
+
+      if not module_path or not enum_class_name:
+        raise TypeError(f'"{enum_type}" is not a valid GObject.GEnum type')
+
+      module_with_enum = importlib.import_module(module_path)
+      processed_enum_type = getattr(module_with_enum, enum_class_name)
+    else:
+      processed_enum_type = enum_type
+
+    if not inspect.isclass(processed_enum_type):
+      raise TypeError(f'{processed_enum_type} is not a class')
+
+    if not issubclass(processed_enum_type, GObject.GEnum):
+      raise TypeError(f'{processed_enum_type} is not a subclass of GObject.GEnum')
+
+    return processed_enum_type
 
 
 class ChoiceSetting(Setting):

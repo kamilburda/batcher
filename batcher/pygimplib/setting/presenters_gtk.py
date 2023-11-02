@@ -14,7 +14,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from .. import gui as pggui
-from .. import utils as pgutils
 
 from . import presenter as presenter_
 
@@ -206,11 +205,11 @@ class EnumComboBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting):
-    combo_box = GimpUi.EnumComboBox.new_with_model(GimpUi.EnumStore.new(setting.get_enum_type()))
+    combo_box = GimpUi.EnumComboBox.new_with_model(GimpUi.EnumStore.new(setting.enum_type))
 
     # If the default value is not valid, `set_active` returns `False`,
     # but otherwise does not result in errors.
-    combo_box.set_active(setting.default_value)
+    combo_box.set_active(int(setting.default_value))
 
     return combo_box
 
