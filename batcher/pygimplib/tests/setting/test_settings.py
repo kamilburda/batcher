@@ -662,19 +662,19 @@ class TestFloatSetting(unittest.TestCase):
       self.fail('SettingValueError should not be raised')
 
 
-class TestCreateEnumSetting(unittest.TestCase):
+class TestCreateChoiceSetting(unittest.TestCase):
   
   def test_default_default_value_is_first_item(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
     self.assertEqual(setting.default_value, setting.items['skip'])
   
   def test_no_items_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting('overwrite_mode', [])
+      settings_.ChoiceSetting('overwrite_mode', [])
   
   def test_explicit_item_values(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('skip', 'Skip', 5), ('replace', 'Replace', 6)],
       default_value='replace')
@@ -683,38 +683,40 @@ class TestCreateEnumSetting(unittest.TestCase):
   
   def test_inconsistent_number_of_elements_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting(
+      settings_.ChoiceSetting(
         'overwrite_mode',
         [('skip', 'Skip', 4), ('replace', 'Replace')], default_value='replace')
     
   def test_same_explicit_item_value_multiple_times_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting(
+      settings_.ChoiceSetting(
         'overwrite_mode', [('skip', 'Skip', 4), ('replace', 'Replace', 4)])
   
   def test_invalid_default_value_raises_error(self):
     with self.assertRaises(settings_.SettingDefaultValueError):
-      settings_.EnumSetting(
+      settings_.ChoiceSetting(
         'overwrite_mode',
         [('skip', 'Skip'), ('replace', 'Replace')],
         default_value='invalid_default_value')
   
   def test_too_many_elements_in_items_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting(
+      # noinspection PyTypeChecker
+      settings_.ChoiceSetting(
         'overwrite_mode', [('skip', 'Skip', 1, 1), ('replace', 'Replace', 1, 1)])
   
   def test_too_few_elements_in_items_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting('overwrite_mode', [('skip'), ('replace')])
+      # noinspection PyTypeChecker
+      settings_.ChoiceSetting('overwrite_mode', [('skip',), ('replace',)])
   
   def test_no_empty_value(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
     self.assertEqual(setting.empty_value, None)
   
   def test_valid_empty_value(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('choose', 'Choose your mode'), ('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
@@ -722,7 +724,7 @@ class TestCreateEnumSetting(unittest.TestCase):
     self.assertEqual(setting.empty_value, setting.items['choose'])
   
   def test_empty_value_is_equal_to_default_default_value(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('choose', 'Choose your mode'), ('skip', 'Skip'), ('replace', 'Replace')],
       empty_value='choose')
@@ -732,16 +734,16 @@ class TestCreateEnumSetting(unittest.TestCase):
   
   def test_invalid_empty_value_raises_error(self):
     with self.assertRaises(ValueError):
-      settings_.EnumSetting(
+      settings_.ChoiceSetting(
         'overwrite_mode',
         [('skip', 'Skip'), ('replace', 'Replace')],
         empty_value='invalid_value')
   
 
-class TestEnumSetting(unittest.TestCase):
+class TestChoiceSetting(unittest.TestCase):
   
   def setUp(self):
-    self.setting = settings_.EnumSetting(
+    self.setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
@@ -755,13 +757,14 @@ class TestEnumSetting(unittest.TestCase):
   
   def test_get_invalid_item(self):
     with self.assertRaises(KeyError):
-      unused_ = self.setting.items['invalid_item']
+      # noinspection PyStatementEffect
+      self.setting.items['invalid_item']
   
   def test_description(self):
     self.assertEqual(self.setting.description, 'Overwrite mode { Skip (0), Replace (1) }')
   
   def test_description_with_mnemonics_from_item_display_names(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('skip', '_Skip'), ('replace', '_Replace')],
       display_name='_Overwrite mode',
@@ -773,7 +776,7 @@ class TestEnumSetting(unittest.TestCase):
       self.setting.get_item_display_names_and_values(), [('Skip', 0), ('Replace', 1)])
   
   def test_is_value_empty(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('choose', '-Choose Your Mode-'), ('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
@@ -785,7 +788,7 @@ class TestEnumSetting(unittest.TestCase):
     self.assertTrue(setting.is_value_empty())
   
   def test_set_empty_value_not_allowed(self):
-    setting = settings_.EnumSetting(
+    setting = settings_.ChoiceSetting(
       'overwrite_mode',
       [('choose', '-Choose Your Mode-'), ('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
@@ -800,7 +803,7 @@ class TestEnumSetting(unittest.TestCase):
       {
         'name': 'overwrite_mode',
         'value': 1,
-        'type': 'enum',
+        'type': 'choice',
         'default_value': 'replace',
         'items': [['skip', 'Skip'], ['replace', 'Replace']],
         'display_name': 'Overwrite mode',

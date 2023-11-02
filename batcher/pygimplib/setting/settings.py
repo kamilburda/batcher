@@ -149,7 +149,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   considered invalid when used as default values. However, empty values will be
   treated as invalid when assigning one of such values to the setting after
   instantiation. Examples of empty values include "Choose an item" for
-  `EnumSetting` instances. Empty values are useful when users must choose a
+  `ChoiceSetting` instances. Empty values are useful when users must choose a
   different value, yet no valid value is a good candidate for a default value.
   
   If you need to create a custom `Setting` subclass and your plug-in is
@@ -1172,15 +1172,15 @@ class BoolSetting(Setting):
     self._value = bool(value)
 
 
-class EnumSetting(Setting):
+class ChoiceSetting(Setting):
   """Class for settings with a limited number of values, accessed by their
   associated names.
   
   Allowed GIMP PDB types:
-  * any `GObject.GEnum` subclass (e.g. `Gimp.RunMode`).
+  * `GObject.TYPE_INT`
   
   Default value: Name of the first item passed to the ``items`` parameter in
-  `EnumSetting.__init__()`.
+  `ChoiceSetting.__init__()`.
   
   To access an item value:
 
@@ -1209,10 +1209,9 @@ class EnumSetting(Setting):
       ``items`` parameter in `__init__()`).
   """
   
-  _ALIASES = ['enumerated', 'options']
+  _ALIASES = ['options']
 
-  # FIXME: `GObject.GEnum` types must be handled in a special way
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT, GObject.TYPE_UINT]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.enum_combo_box]
 
@@ -1225,7 +1224,7 @@ class EnumSetting(Setting):
         empty_value: Optional[str] = None,
         **kwargs,
   ):
-    """Initializes an `EnumSetting` instance.
+    """Initializes a `ChoiceSetting` instance.
 
     Args:
       items:
@@ -1239,11 +1238,10 @@ class EnumSetting(Setting):
         See the `empty_value` property.
       default_value:
         Default item name (identifier). Unlike other `Setting` subclasses,
-        `EnumSetting` accepts a valid item name for the ``default_value``
+        `ChoiceSetting` accepts a valid item name for the ``default_value``
         parameter instead of a numeric value.
     """
-    self._items, self._items_display_names, self._item_values = (
-      self._create_item_attributes(items))
+    self._items, self._items_display_names, self._item_values = self._create_item_attributes(items)
     
     # This member gets overridden during parent class instantiation, but can
     # still be accessible before the instantiation if need be.
