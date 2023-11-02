@@ -96,7 +96,11 @@ class Presenter(metaclass=meta_.PresenterMeta):
     """
     self._setting = setting
     self._widget = widget
-    self._setting_value_synchronizer = setting_value_synchronizer
+
+    if setting_value_synchronizer is not None:
+      self._setting_value_synchronizer = setting_value_synchronizer
+    else:
+      self._setting_value_synchronizer = SettingValueSynchronizer()
     
     if auto_update_gui_to_setting:
       self._value_changed_signal = self._VALUE_CHANGED_SIGNAL
