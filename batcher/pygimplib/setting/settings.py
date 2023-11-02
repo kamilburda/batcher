@@ -1072,18 +1072,24 @@ class NumericSetting(Setting):
   
   def _validate(self, value):
     if self.min_value is not None and value < self.min_value:
-      raise SettingValueError(utils_.value_to_str_prefix(value) + self.error_messages['below_min'])
+      raise SettingValueError(
+        utils_.value_to_str_prefix(value, quote=False, return_empty=False)
+        + self.error_messages['below_min'])
 
     if self.pdb_min_value is not None and value < self.pdb_min_value:
       raise SettingValueError(
-        utils_.value_to_str_prefix(value) + self.error_messages['below_pdb_min'])
+        utils_.value_to_str_prefix(value, quote=False, return_empty=False)
+        + self.error_messages['below_pdb_min'])
 
     if self.max_value is not None and value > self.max_value:
-      raise SettingValueError(utils_.value_to_str_prefix(value) + self.error_messages['above_max'])
+      raise SettingValueError(
+        utils_.value_to_str_prefix(value, quote=False, return_empty=False)
+        + self.error_messages['above_max'])
 
     if self.pdb_max_value is not None and value > self.pdb_max_value:
       raise SettingValueError(
-        utils_.value_to_str_prefix(value) + self.error_messages['above_pdb_max'])
+        utils_.value_to_str_prefix(value, quote=False, return_empty=False)
+        + self.error_messages['above_pdb_max'])
 
   def _check_min_and_max_values_against_pdb_min_and_max_values(self):
     if (self.min_value is not None
