@@ -1062,9 +1062,9 @@ class TestImageSetting(unittest.TestCase):
 
 
 @mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestGimpItemSetting(unittest.TestCase):
   
   class StubItemSetting(settings_.GimpItemSetting):
@@ -1097,8 +1097,8 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list(self):
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
     
@@ -1109,8 +1109,8 @@ class TestGimpItemSetting(unittest.TestCase):
     self.image.layers = [self.layer]
     
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'layer'])
     
@@ -1122,8 +1122,8 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_image_returns_none(self):
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = []
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = []
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
     
@@ -1131,8 +1131,8 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_layer_returns_none(self):
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/some_other_layer'])
     
@@ -1140,8 +1140,8 @@ class TestGimpItemSetting(unittest.TestCase):
   
   def test_set_value_with_list_no_matching_parent_returns_none(self):
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
       
       self.setting.set_value(['image_filepath', 'Layer', 'group1/some_other_group2/layer'])
     
@@ -1295,7 +1295,7 @@ class TestDisplaySetting(unittest.TestCase):
 
 
 @mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.settings.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestParasiteSetting(unittest.TestCase):
   
   def test_create_with_default_default_value(self):
