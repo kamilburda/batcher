@@ -49,6 +49,22 @@ class GtkPresenter(presenter_.Presenter):
     self._event_handler_id = None
 
 
+class GimpUiIntComboBoxPresenter(GtkPresenter):
+  """Abstract `setting.Presenter` subclass for widget classes inheriting from
+  `GimpUi.IntComboBox` .
+
+  These classes have a modified ``connect()`` method with different interface
+  and the signal handler being triggered even when setting the initial value,
+  which is undesired.
+  """
+
+  _ABSTRACT = True
+
+  def _connect_value_changed_event(self):
+    self._event_handler_id = Gtk.ComboBox.connect(
+      self._widget, self._VALUE_CHANGED_SIGNAL, self._on_value_changed)
+
+
 class IntSpinButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.SpinButton` widgets.
   
@@ -196,7 +212,7 @@ class ComboBoxPresenter(GtkPresenter):
     self._widget.set_active(value)
 
 
-class EnumComboBoxPresenter(GtkPresenter):
+class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.EnumComboBox` widgets.
 
   Value: Item selected in the enum combo box.
@@ -238,7 +254,7 @@ class EntryPresenter(GtkPresenter):
     self._widget.set_position(-1)
 
 
-class ImageComboBoxPresenter(GtkPresenter):
+class ImageComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.ImageComboBox` widgets.
   
   Value: `Gimp.Image` selected in the combo box, or ``None`` if there is no
@@ -286,7 +302,7 @@ class ItemComboBoxPresenter(GtkPresenter):
       self._widget.set_active(value.get_id())
 
 
-class DrawableComboBoxPresenter(GtkPresenter):
+class DrawableComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.DrawableComboBox` widgets.
   
   Value: `Gimp.Drawable` selected in the combo box, or ``None`` if there is no
@@ -310,7 +326,7 @@ class DrawableComboBoxPresenter(GtkPresenter):
       self._widget.set_active(value.get_id())
 
 
-class LayerComboBoxPresenter(GtkPresenter):
+class LayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets.
   
   Value: `Gimp.Layer` selected in the combo box, or ``None`` if there is no
@@ -334,7 +350,7 @@ class LayerComboBoxPresenter(GtkPresenter):
       self._widget.set_active(value.get_id())
 
 
-class ChannelComboBoxPresenter(GtkPresenter):
+class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.ChannelComboBox` widgets.
   
   Value: `Gimp.Channel` selected in the combo box, or ``None`` if there is no
@@ -358,7 +374,7 @@ class ChannelComboBoxPresenter(GtkPresenter):
       self._widget.set_active(value.get_id())
 
 
-class VectorsComboBoxPresenter(GtkPresenter):
+class VectorsComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.VectorsComboBox` widgets.
   
   Value: `Gimp.Vectors` selected in the combo box, or ``None`` if there are no
