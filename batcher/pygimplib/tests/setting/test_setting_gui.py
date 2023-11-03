@@ -305,10 +305,14 @@ def _create_test_image():
     pdb.gimp_layer_new(
       image, 10, 10, gimpenums.RGBA_IMAGE, 'Layer 2', 50.0, gimpenums.DISSOLVE_MODE),
   ]
+
+  color1 = Gimp.RGB()
+  color2 = Gimp.RGB()
+  color2.set(1.0, 0, 0)
   
   channels = [
-    pdb.gimp_channel_new(image, 100, 100, 'Channel 1', 100.0, gimpcolor.RGB(0, 0, 0)),
-    pdb.gimp_channel_new(image, 100, 100, 'Channel 2', 50.0, gimpcolor.RGB(1, 0, 0)),
+    pdb.gimp_channel_new(image, 100, 100, 'Channel 1', 100.0, color1),
+    pdb.gimp_channel_new(image, 100, 100, 'Channel 2', 50.0, color2),
   ]
   
   vectors_list = [

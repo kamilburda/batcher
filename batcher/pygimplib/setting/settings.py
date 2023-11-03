@@ -1634,7 +1634,7 @@ class GimpItemSetting(Setting):
 
     if image is None:
       return None
-    
+
     return pgpdbutils.get_item_from_image_and_item_path(image, item_type_name, item_path)
   
   @staticmethod
@@ -1825,17 +1825,17 @@ class ColorSetting(Setting):
       color = Gimp.RGB()
 
       if len(raw_value) >= 3:
-        color.set(*(item / 255 for item in raw_value[:3]))
+        color.set(*raw_value[:3])
 
       if len(raw_value) >= 4:
-        color.set_alpha(raw_value[3] / 255)
+        color.set_alpha(raw_value[3])
 
       return color
     else:
       return raw_value
   
   def _value_to_raw(self, value, source_type):
-    return [int(value.r * 255), int(value.g * 255), int(value.b * 255), int(value.a * 255)]
+    return [value.r, value.g, value.b, value.a]
   
   def _validate(self, color):
     if not isinstance(color, Gimp.RGB):
