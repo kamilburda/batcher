@@ -1339,7 +1339,7 @@ class TestParasiteSetting(unittest.TestCase):
     self.assertEqual(setting.value.get_name(), 'parasite')
     self.assertEqual(setting.value.get_flags(), 0)
     self.assertEqual(setting.value.get_data(), [])
-  
+
   def test_set_value_by_object(self):
     setting = settings_.ParasiteSetting('parasite')
     
@@ -1395,53 +1395,166 @@ class TestFileExtensionSetting(unittest.TestCase):
       self.assertEqual(str(e), 'my custom message')
 
 
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestBrushSetting(unittest.TestCase):
-  
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new=stubs_gimp.GimpModuleStub())
   def setUp(self):
-    self.setting = settings_.BrushSetting('brush', default_value=('', -1, -1, -1))
+    self.setting = settings_.BrushSetting('brush')
+    self.brush = stubs_gimp.Brush(name='Star')
+
+  def test_create_with_default_default_value(self):
+    self.assertIsNone(self.setting.value)
+
+  def test_create_with_custom_default_value(self):
+    self.setting = settings_.BrushSetting('brush', default_value=self.brush)
+
+    self.assertEqual(self.setting.value, self.brush)
+
+  def test_set_value_with_object(self):
+    brush = stubs_gimp.Brush()
+
+    self.setting.set_value(brush)
+
+    self.assertEqual(self.setting.value, brush)
+
+  def test_set_value_with_dict(self):
+    self.setting.set_value(
+      {
+        'name': 'Star',
+        'angle': 2.0,
+        'aspect_ratio': 2.5,
+        'hardness': 1.0,
+        'radius': 25.0,
+        'shape': 2,
+        'spacing': 50,
+        'spikes': 5,
+      }
+    )
+
+    self.assertIsInstance(self.setting.value, stubs_gimp.Brush)
+
+    brush = self.setting.value
+    self.assertEqual(brush.get_name(), 'Star')
+    self.assertEqual(brush.get_angle().angle, 2.0)
+    self.assertEqual(brush.get_aspect_ratio().aspect_ratio, 2.5)
+    self.assertEqual(brush.get_hardness().hardness, 1.0)
+    self.assertEqual(brush.get_radius().radius, 25.0)
+    self.assertEqual(brush.get_shape().shape, 2)
+    self.assertEqual(brush.get_spacing(), 50)
+    self.assertEqual(brush.get_spikes().spikes, 5)
   
-  def test_init_with_brush_name_only(self):
-    setting = settings_.BrushSetting('brush', default_value='Clipboard')
-    
-    self.assertEqual(setting.value, ('Clipboard',))
-    self.assertEqual(setting.default_value, ('Clipboard',))
-  
-  @parameterized.parameterized.expand([
-    ('one_element', ('Clipboard',), ('Clipboard',)),
-    ('two_elements', ('Clipboard', 50.0), ('Clipboard', 50.0)),
-    ('four_elements', ('Clipboard', 50.0, 10.0, -1), ('Clipboard', 50.0, 10.0, -1)),
-  ])
-  def test_set_value_with_tuple_valid_length(
-        self, test_case_suffix, value, expected_value):
-    self.setting.set_value(value)
-    self.assertEqual(self.setting.value, expected_value)
-  
-  def test_set_value_with_tuple_invalid_length(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(('', -1, -1, -1, -1))
-  
-  def test_set_value_converts_brush_name_to_tuple(self):
-    self.setting.set_value('Clipboard')
-    self.assertEqual(self.setting.value, ('Clipboard',))
-  
-  def test_set_value_converts_list_to_tuple(self):
-    self.setting.set_value(['Clipboard', 50.0, 10.0, -1])
-    self.assertEqual(self.setting.value, ('Clipboard', 50.0, 10.0, -1))
-  
-  def test_to_dict(self):
-    self.setting.set_value(('Clipboard', 50.0, 10.0, -1))
-    
+  def test_to_dict_with_default_value(self):
     self.assertDictEqual(
       self.setting.to_dict(),
       {
         'name': 'brush',
-        'value': ['Clipboard', 50.0, 10.0, -1],
         'type': 'brush',
-        'default_value': ['', -1, -1, -1],
+        'value': None,
+      })
+
+  def test_to_dict(self):
+    self.setting.set_value(
+      {
+        'name': 'Star',
+        'angle': 2.0,
+        'aspect_ratio': 2.5,
+        'hardness': 1.0,
+        'radius': 25.0,
+        'shape': 2,
+        'spacing': 50,
+        'spikes': 5,
+      }
+    )
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'brush',
+        'type': 'brush',
+        'value': {
+          'name': 'Star',
+          'angle': 2.0,
+          'aspect_ratio': 2.5,
+          'hardness': 1.0,
+          'radius': 25.0,
+          'shape': 2,
+          'spacing': 50,
+          'spikes': 5,
+        }
       })
 
 
-#===============================================================================
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+class TestPaletteSetting(unittest.TestCase):
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new=stubs_gimp.GimpModuleStub())
+  def setUp(self):
+    self.setting = settings_.PaletteSetting('palette')
+    self.palette = stubs_gimp.Palette(name='Standard')
+
+  def test_create_with_default_default_value(self):
+    self.assertIsNone(self.setting.value)
+
+  def test_create_with_custom_default_value(self):
+    self.setting = settings_.PaletteSetting('palette', default_value=self.palette)
+
+    self.assertEqual(self.setting.value, self.palette)
+
+  def test_set_value_with_object(self):
+    palette = stubs_gimp.Palette()
+
+    self.setting.set_value(palette)
+
+    self.assertEqual(self.setting.value, palette)
+
+  def test_set_value_with_dict(self):
+    self.setting.set_value(
+      {
+        'name': 'Standard',
+        'columns': 3,
+      }
+    )
+
+    self.assertIsInstance(self.setting.value, stubs_gimp.Palette)
+
+    palette = self.setting.value
+    self.assertEqual(palette.get_name(), 'Standard')
+    self.assertEqual(palette.get_columns(), 3)
+
+  def test_to_dict_with_default_value(self):
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'palette',
+        'type': 'palette',
+        'value': None,
+      })
+
+  def test_to_dict(self):
+    self.setting.set_value(
+      {
+        'name': 'Standard',
+        'columns': 3,
+      }
+    )
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'palette',
+        'type': 'palette',
+        'value': {
+          'name': 'Standard',
+          'columns': 3,
+        }
+      })
 
 
 class TestCreateArraySetting(unittest.TestCase):

@@ -1,11 +1,17 @@
 """Stubs for GIMP objects, classes, etc. usable in automated tests."""
 
+import collections
 import itertools
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
+
+
+def _get_result_tuple_type(arg_name) -> collections.namedtuple:
+  return collections.namedtuple(
+    f'ResultTuple_{arg_name}', ['success', arg_name])
 
 
 class ParasiteFunctionsStubMixin:
@@ -173,7 +179,7 @@ class Vectors(Item):
   pass
 
 
-class Display(ParasiteFunctionsStubMixin):
+class Display:
 
   _display_id_counter = itertools.count(start=1)
 
@@ -202,13 +208,137 @@ class Display(ParasiteFunctionsStubMixin):
     return self.valid
 
 
+class Resource:
+
+  _resources = {}
+
+  def __init__(self, name=None):
+    self.name = name
+
+    if name is not None:
+      self._resources[name] = self
+
+    self.valid = True
+
+  @classmethod
+  def get_by_name(cls, name):
+    return cls._resources[name]
+
+  def get_name(self):
+    return self.name
+
+  def is_valid(self):
+    return self.valid
+
+
+class Brush(Resource):
+
+  def __init__(
+        self,
+        name=None,
+        angle=None,
+        aspect_ratio=None,
+        hardness=None,
+        radius=None,
+        shape=None,
+        spacing=None,
+        spikes=None,
+  ):
+    super().__init__(name=name)
+
+    self.angle = angle
+    self.aspect_ratio = aspect_ratio
+    self.hardness = hardness
+    self.radius = radius
+    self.shape = shape
+    self.spacing = spacing
+    self.spikes = spikes
+
+  def get_angle(self):
+    return _get_result_tuple_type('angle')(True, self.angle)
+
+  def get_aspect_ratio(self):
+    return _get_result_tuple_type('aspect_ratio')(True, self.aspect_ratio)
+
+  def get_hardness(self):
+    return _get_result_tuple_type('hardness')(True, self.hardness)
+
+  def get_radius(self):
+    return _get_result_tuple_type('radius')(True, self.radius)
+
+  def get_shape(self):
+    return _get_result_tuple_type('shape')(True, self.shape)
+
+  def get_spacing(self):
+    return self.spacing
+
+  def get_spikes(self):
+    return _get_result_tuple_type('spikes')(True, self.spikes)
+
+  def set_angle(self, value):
+    self.angle = value
+
+  def set_aspect_ratio(self, value):
+    self.aspect_ratio = value
+
+  def set_hardness(self, value):
+    self.hardness = value
+
+  def set_radius(self, value):
+    self.radius = value
+
+  def set_shape(self, value):
+    self.shape = Gimp.BrushGeneratedShape(value)
+
+  def set_spacing(self, value):
+    self.spacing = value
+
+  def set_spikes(self, value):
+    self.spikes = value
+
+
+class Font(Resource):
+  pass
+
+
+class Gradient(Resource):
+  pass
+
+
+class Palette(Resource):
+
+  def __init__(self, name=None, columns=None):
+    super().__init__(name=name)
+
+    self.columns = columns
+
+  def get_columns(self):
+    return self.columns
+
+  def set_columns(self, value):
+    self.columns = value
+
+
+class Pattern(Resource):
+  pass
+
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   Parasite = Gimp.Parasite
+
   Image = Image
+
   Item = Item
   Layer = Layer
   Channel = Channel
   Vectors = Vectors
+
   Display = Display
+
+  Resource = Resource
+  Brush = Brush
+  Font = Font
+  Gradient = Gradient
+  Palette = Palette
+  Pattern = Pattern
