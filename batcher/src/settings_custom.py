@@ -214,7 +214,7 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
     self._value[image_id] = dirpath
   
   def _get_currently_opened_images(self):
-    current_images = gimp.image_list()
+    current_images = Gimp.list_images()
     current_image_ids = set([image.get_id() for image in current_images])
     
     return current_images, current_image_ids
