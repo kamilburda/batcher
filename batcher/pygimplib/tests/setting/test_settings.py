@@ -1071,17 +1071,17 @@ class TestGimpItemSetting(unittest.TestCase):
     pass
   
   def setUp(self):
-    self.image = pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
+    self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
+    self.image.set_file(Gio.file_new_for_path('image_filepath'))
     
-    self.parent_of_parent = stubs_gimp.LayerGroupStub(name='group1')
+    self.parent_of_parent = stubs_gimp.Layer(name='group1', is_group=True)
     
-    self.parent = stubs_gimp.LayerGroupStub(name='group2')
+    self.parent = stubs_gimp.Layer(name='group2', is_group=True)
     self.parent.parent = self.parent_of_parent
     
     self.layer = stubs_gimp.Layer(name='layer')
     self.layer.parent = self.parent
     self.layer.image = self.image
-    self.layer.image.filename = 'image_filepath'
     
     self.image.layers = [self.parent_of_parent]
     self.parent_of_parent.children = [self.parent]
@@ -1099,8 +1099,8 @@ class TestGimpItemSetting(unittest.TestCase):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.return_value = [self.image]
-      
-      self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
+
+      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
     
     self.assertEqual(self.setting.value, self.layer)
   
@@ -1112,7 +1112,7 @@ class TestGimpItemSetting(unittest.TestCase):
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.return_value = [self.image]
       
-      self.setting.set_value(['image_filepath', 'Layer', 'layer'])
+      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'layer'])
     
     self.assertEqual(self.setting.value, self.layer)
   
@@ -1125,7 +1125,7 @@ class TestGimpItemSetting(unittest.TestCase):
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.return_value = []
       
-      self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/layer'])
+      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
     
     self.assertEqual(self.setting.value, None)
   
@@ -1134,7 +1134,8 @@ class TestGimpItemSetting(unittest.TestCase):
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.return_value = [self.image]
       
-      self.setting.set_value(['image_filepath', 'Layer', 'group1/group2/some_other_layer'])
+      self.setting.set_value(
+        [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/some_other_layer'])
     
     self.assertEqual(self.setting.value, None)
   
@@ -1143,29 +1144,26 @@ class TestGimpItemSetting(unittest.TestCase):
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.return_value = [self.image]
       
-      self.setting.set_value(['image_filepath', 'Layer', 'group1/some_other_group2/layer'])
+      self.setting.set_value(
+        [os.path.abspath('image_filepath'), 'Layer', 'group1/some_other_group2/layer'])
     
     self.assertEqual(self.setting.value, None)
   
   def test_set_value_with_list_with_id(self):
-    # FIXME: Remove the mock if possible, the stubs_gimp.Item class stores item:ID
-    #  mapping internally.
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.tests.stubs_gimp.Item.get_by_id'
-    ) as get_by_id_function:
-      get_by_id_function.return_value = self.layer
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
+    ) as temp_mock_gimp_module:
+      temp_mock_gimp_module.Item.get_by_id.return_value = self.layer
       
       self.setting.set_value(2)
     
     self.assertEqual(self.setting.value, self.layer)
   
   def test_set_value_with_list_with_invalid_id(self):
-    # FIXME: Remove the mock if possible, the stubs_gimp.Item class stores item:ID
-    #  mapping internally.
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.tests.stubs_gimp.Item.get_by_id'
-    ) as get_by_id_function:
-      get_by_id_function.return_value = None
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
+    ) as temp_mock_gimp_module:
+      temp_mock_gimp_module.Item.get_by_id.return_value = None
     
       self.setting.set_value(2)
     
@@ -1176,9 +1174,9 @@ class TestGimpItemSetting(unittest.TestCase):
       self.setting.to_dict(),
       {
         'name': 'item',
-        'value': ['image_filepath', 'Layer', 'group1/group2/layer'],
+        'value': [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'],
         'type': 'stub_item',
-        'default_value': ['image_filepath', 'Layer', 'group1/group2/layer'],
+        'default_value': [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'],
       })
   
   def test_to_dict_value_is_none(self):
@@ -1202,8 +1200,8 @@ class TestGimpItemSetting(unittest.TestCase):
       })
   
   def test_to_dict_without_image_filename(self):
-    self.image.filename = None
-    
+    self.image.set_file(None)
+
     self.assertDictEqual(
       self.setting.to_dict(),
       {
@@ -1220,9 +1218,9 @@ class TestGimpItemSetting(unittest.TestCase):
       self.setting.to_dict(),
       {
         'name': 'item',
-        'value': ['image_filepath', 'Layer', 'layer'],
+        'value': [os.path.abspath('image_filepath'), 'Layer', 'layer'],
         'type': 'stub_item',
-        'default_value': ['image_filepath', 'Layer', 'layer'],
+        'default_value': [os.path.abspath('image_filepath'), 'Layer', 'layer'],
       })
   
   def test_to_dict_via_item_id(self):
