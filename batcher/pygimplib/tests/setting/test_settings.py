@@ -1,5 +1,6 @@
 """Tests for the `setting.setting` and `setting.presenter` modules."""
 
+import os
 import unittest
 import unittest.mock as mock
 
@@ -9,6 +10,7 @@ from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
+from gi.repository import Gio
 from gi.repository import GObject
 
 import parameterized
@@ -920,62 +922,68 @@ class TestChoiceSetting(unittest.TestCase):
 
 
 @mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp', new=stubs_gimp.GimpModuleStub())
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestImageSetting(unittest.TestCase):
 
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
-    self.image = self.pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
+    self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
     self.setting = settings_.ImageSetting('image', default_value=self.image)
   
   def test_set_value_with_object(self):
-    image = self.pdb.gimp_image_new(2, 2, Gimp.ImageBaseType.RGB)
+    image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
     self.setting.set_value(image)
     
     self.assertEqual(self.setting.value, image)
   
   def test_set_value_with_file_path(self):
-    self.pdb.gimp_image_set_filename(self.image, 'file_path')
+    self.image.set_file(Gio.file_new_for_path('file_path'))
     
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
-    
-      self.setting.set_value('file_path')
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
+
+      self.setting.set_value(os.path.abspath('file_path'))
     
     self.assertEqual(self.setting.value, self.image)
   
   def test_set_value_with_non_matching_file_path(self):
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = []
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = []
       
-      self.setting.set_value('file_path')
-      
-      self.assertEqual(self.setting.value, None)
+      self.setting.set_value(os.path.abspath('file_path'))
+
+    self.assertEqual(self.setting.value, None)
 
   def test_set_value_with_id(self):
     self.image.id_ = 2
-    
+
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module._id2image.return_value = self.image
-      
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.Image.get_by_id.return_value = self.image
+
       self.setting.set_value(2)
     
     self.assertEqual(self.setting.value, self.image)
   
   def test_set_value_with_invalid_id(self):
     self.image.id_ = 2
-    
+
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module._id2image.return_value = None
-      
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.Image.get_by_id.return_value = None
+
       self.setting.set_value(3)
-      
-      self.assertEqual(self.setting.value, None)
+
+    self.assertEqual(self.setting.value, None)
   
   def test_set_value_with_none(self):
     self.setting.set_value(None)
@@ -983,18 +991,19 @@ class TestImageSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, None)
   
   def test_set_value_invalid_image_raises_error(self):
-    self.pdb.gimp_image_delete(self.image)
+    self.image.valid = False
+
     with self.assertRaises(settings_.SettingValueError):
       self.setting.set_value(self.image)
   
   def test_default_value_with_raw_type(self):
-    self.pdb.gimp_image_set_filename(self.image, 'file_path')
+    self.image.set_file(Gio.file_new_for_path('file_path'))
     
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pdbutils.gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.image_list.return_value = [self.image]
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
       
-      setting = settings_.ImageSetting('image', default_value='file_path')
+      setting = settings_.ImageSetting('image', default_value=os.path.abspath('file_path'))
     
     self.assertEqual(setting.default_value, self.image)
   
@@ -1006,22 +1015,20 @@ class TestImageSetting(unittest.TestCase):
         'SettingDefaultValueError should not be raised - default value is an empty value')
   
   def test_to_dict(self):
-    self.pdb.gimp_image_set_filename(self.image, 'file_path')
+    self.image.set_file(Gio.file_new_for_path('file_path'))
     
     self.assertDictEqual(
       self.setting.to_dict(),
       {
         'name': 'image',
-        'value': 'file_path',
+        'value': os.path.abspath('file_path'),
         'type': 'image',
-        'default_value': 'file_path',
+        'default_value': os.path.abspath('file_path'),
       })
-  
-  def test_to_dict_if_image_is_none(self):
-    setting = settings_.ImageSetting('image', default_value=None)
-    
+
+  def test_to_dict_with_missing_filename(self):
     self.assertDictEqual(
-      setting.to_dict(),
+      self.setting.to_dict(),
       {
         'name': 'image',
         'value': None,
@@ -1029,11 +1036,11 @@ class TestImageSetting(unittest.TestCase):
         'default_value': None,
       })
   
-  def test_to_dict_with_missing_filename(self):
-    self.pdb.gimp_image_set_filename(self.image, None)
+  def test_to_dict_if_image_is_none(self):
+    setting = settings_.ImageSetting('image', default_value=None)
     
     self.assertDictEqual(
-      self.setting.to_dict(),
+      setting.to_dict(),
       {
         'name': 'image',
         'value': None,

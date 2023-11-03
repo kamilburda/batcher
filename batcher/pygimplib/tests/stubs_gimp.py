@@ -36,7 +36,7 @@ class Image(ParasiteFunctionsStubMixin):
 
   _images_and_ids = {}
 
-  def __init__(self, name=None, id_=None, filepath=None):
+  def __init__(self, name=None, id_=None, filepath=None, width=0, height=0, base_type=None):
     super().__init__()
     
     self.name = name
@@ -48,9 +48,9 @@ class Image(ParasiteFunctionsStubMixin):
 
     self._images_and_ids[self.id_] = self
 
-    self.width = 0
-    self.height = 0
-    self.base_type = None
+    self.width = width
+    self.height = height
+    self.base_type = base_type
     self.layers = []
 
     if filepath is not None:
@@ -62,7 +62,10 @@ class Image(ParasiteFunctionsStubMixin):
 
   @classmethod
   def get_by_id(cls, id_):
-    return cls._images_and_ids[id_]
+    try:
+      return cls._images_and_ids[id_]
+    except KeyError:
+      return None
 
   def get_name(self):
     return self.name
