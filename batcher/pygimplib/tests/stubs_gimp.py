@@ -174,11 +174,33 @@ class Vectors(Item):
 
 
 class Display(ParasiteFunctionsStubMixin):
+
+  _display_id_counter = itertools.count(start=1)
+
+  _displays_and_ids = {}
   
   def __init__(self, id_=None):
     super().__init__()
 
-    self.id_ = id_
+    if id_ is None:
+      self.id_ = next(self._display_id_counter)
+    else:
+      self.id_ = id_
+
+    self._displays_and_ids[self.id_] = self
+
+    self.valid = True
+
+  @classmethod
+  def get_by_id(cls, id_):
+    return cls._displays_and_ids[id_]
+
+  def get_id(self):
+    return self.id_
+
+  def is_valid(self):
+    return self.valid
+
 
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):

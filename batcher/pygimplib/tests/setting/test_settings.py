@@ -1302,20 +1302,31 @@ class TestColorSetting(unittest.TestCase):
     )
 
 
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestDisplaySetting(unittest.TestCase):
-  
+
+  def setUp(self):
+    self.setting = settings_.DisplaySetting('display')
+    self.display = stubs_gimp.Display(id_=2)
+
+  def test_set_value_with_display_id(self):
+    self.setting.set_value(2)
+
+    self.assertEqual(self.setting.value, self.display)
+
   def test_to_dict(self):
-    setting = settings_.DisplaySetting('display')
-    display = stubs_gimp.Display(id_=1)
-    
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb') as temp_mock_pdb:
-      temp_mock_pdb.gimp_display_is_valid.return_value = True
-      
-      setting.set_value(display)
-    
+    self.setting.set_value(self.display)
+
     self.assertDictEqual(
-      setting.to_dict(), {'name': 'display', 'value': None, 'type': 'display'})
+      self.setting.to_dict(), {'name': 'display', 'value': None, 'type': 'display'})
+
+  def test_to_dict_with_session_source_type(self):
+    self.setting.set_value(self.display)
+
+    self.assertDictEqual(
+      self.setting.to_dict(source_type='session'),
+      {'name': 'display', 'value': 2, 'type': 'display'})
 
 
 @mock.patch(

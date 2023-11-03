@@ -1871,11 +1871,21 @@ class DisplaySetting(Setting):
   
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid display.')
-  
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, int):
+      return Gimp.Display.get_by_id(raw_value)
+    else:
+      return raw_value
+
   def _value_to_raw(self, value, source_type):
-    # There is no way to restore `Gimp.Display` objects, hence return ``None``.
-    return None
-  
+    if source_type == 'session':
+      return value.get_id()
+    else:
+      # There is no way to recover `Gimp.Display` objects from a persistent
+      # source, hence return ``None``.
+      return None
+
   def _validate(self, display):
     if not display.is_valid():
       raise SettingValueError(
