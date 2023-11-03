@@ -2090,15 +2090,18 @@ class GimpResourceSetting(Setting):
         set_property_func = getattr(resource, f'set_{key}', None)
         if set_property_func is not None:
           set_property_func(value)
-      else:
-        return None
+
+      return resource
     else:
       return raw_value
 
   def _value_to_raw(self, resource, source_type):
-    return {
-      'name': resource.get_name(),
-    }
+    if resource is not None:
+      return {
+        'name': resource.get_name(),
+      }
+    else:
+      return None
 
   def _validate(self, resource):
     if not resource.is_valid():
@@ -2129,16 +2132,19 @@ class BrushSetting(GimpResourceSetting):
     self.error_messages['invalid_value'] = _('Invalid brush.')
   
   def _value_to_raw(self, resource, source_type):
-    return {
-      'name': resource.get_name(),
-      'angle': resource.get_angle(),
-      'aspect_ratio': resource.get_aspect_ratio(),
-      'hardness': resource.get_hardness(),
-      'radius': resource.get_radius(),
-      'shape': resource.get_shape(),
-      'spacing': resource.get_spacing(),
-      'spikes': resource.get_spikes(),
-    }
+    if resource is not None:
+      return {
+        'name': resource.get_name(),
+        'angle': resource.get_angle().angle,
+        'aspect_ratio': resource.get_aspect_ratio().aspect_ratio,
+        'hardness': resource.get_hardness().hardness,
+        'radius': resource.get_radius().radius,
+        'shape': int(resource.get_shape().shape),
+        'spacing': resource.get_spacing(),
+        'spikes': resource.get_spikes().spikes,
+      }
+    else:
+      return None
 
 
 class FontSetting(GimpResourceSetting):
@@ -2210,10 +2216,13 @@ class PaletteSetting(GimpResourceSetting):
     self.error_messages['invalid_value'] = _('Invalid palette.')
 
   def _value_to_raw(self, resource, source_type):
-    return {
-      'name': resource.get_name(),
-      'columns': resource.get_columns(),
-    }
+    if resource is not None:
+      return {
+        'name': resource.get_name(),
+        'columns': resource.get_columns(),
+      }
+    else:
+      return None
 
 
 class PatternSetting(GimpResourceSetting):
