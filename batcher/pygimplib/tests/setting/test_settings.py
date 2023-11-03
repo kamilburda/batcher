@@ -1338,12 +1338,12 @@ class TestParasiteSetting(unittest.TestCase):
     
     self.assertEqual(setting.value.get_name(), 'parasite')
     self.assertEqual(setting.value.get_flags(), 0)
-    self.assertEqual(setting.value.get_data(), '')
+    self.assertEqual(setting.value.get_data(), [])
   
   def test_set_value_by_object(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    parasite = Gimp.Parasite.new('parasite_stub', 1, 'data')
+    parasite = Gimp.Parasite.new('parasite_stub', 1, b'data')
     
     setting.set_value(parasite)
     
@@ -1352,22 +1352,22 @@ class TestParasiteSetting(unittest.TestCase):
   def test_set_value_by_list(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    setting.set_value(['parasite_stub', 1, 'data'])
+    setting.set_value(['parasite_stub', 1, b'data'])
     
     self.assertEqual(setting.value.get_name(), 'parasite_stub')
     self.assertEqual(setting.value.get_flags(), 1)
-    self.assertEqual(setting.value.get_data(), 'data')
+    self.assertEqual(setting.value.get_data(), list(b'data'))
   
   def test_to_dict(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    parasite = Gimp.Parasite.new('parasite_stub', 1, 'data')
+    parasite = Gimp.Parasite.new('parasite_stub', 1, b'data')
     
     setting.set_value(parasite)
     
     self.assertDictEqual(
       setting.to_dict(),
-      {'name': 'parasite', 'value': ['parasite_stub', 1, 'data'], 'type': 'parasite'})
+      {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
 
 
 class TestFileExtensionSetting(unittest.TestCase):
