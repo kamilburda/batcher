@@ -11,15 +11,15 @@ from src import settings_custom
 
 
 def _get_images_and_items():
-  image_1 = stubs_gimp.Image(id_=1, filename='filename_1')
-  image_2 = stubs_gimp.Image(id_=2, filename='filename_2')
+  image_1 = stubs_gimp.Image(id_=1, filepath='filename_1')
+  image_2 = stubs_gimp.Image(id_=2, filepath='filename_2')
   
   images = [image_1, image_2]
   
-  item_4 = stubs_gimp.LayerGroupStub(name='item_4', id_=4, image=image_1)
+  item_4 = stubs_gimp.Layer(name='item_4', id_=4, image=image_1, is_group=True)
   item_1 = stubs_gimp.Layer(name='item_1', id_=1, image=image_1)
   item_3 = stubs_gimp.Layer(name='item_3', id_=3, image=image_1, parent=item_4)
-  item_7 = stubs_gimp.LayerGroupStub(name='item_7', id_=7, image=image_2)
+  item_7 = stubs_gimp.Layer(name='item_7', id_=7, image=image_2, is_group=True)
   item_5 = stubs_gimp.Layer(name='item_5', id_=5, image=image_2, parent=item_7)
   
   image_1.layers = [item_1, item_4]
@@ -193,8 +193,8 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   
   def test_to_dict_with_image_without_filepaths(self):
     images, items = _get_images_and_items_with_ids()
-    
-    images[1].filename = None
+
+    images[1].set_file(None)
     
     with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
@@ -254,22 +254,15 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
   
   def _create_image_list(self, image_ids_and_filepaths):
     return [
-      self._create_image(image_id, filepath)
+      stubs_gimp.Image(id_=image_id, filepath=filepath)
       for image_id, filepath in image_ids_and_filepaths]
-  
-  @staticmethod
-  def _create_image(image_id, filepath):
-    image = stubs_gimp.Image()
-    image.id_ = image_id
-    image.filename = filepath
-    return image
-  
+
   @staticmethod
   def _create_image_ids_and_directories(image_list):
     image_ids_and_directories = {}
     for image in image_list:
       image_ids_and_directories[image.id_] = (
-        os.path.dirname(image.filename) if image.filename is not None else None)
+        os.path.dirname(image.get_file().get_path()) if image.get_file() is not None else None)
     return image_ids_and_directories
   
   def test_update_image_ids_and_dirpaths_add_new_images(self):
