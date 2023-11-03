@@ -123,8 +123,8 @@ class TestGroupAddFromDict(unittest.TestCase):
       }
     ])
     
-    self.assertEqual(settings['flatten'].pdb_type, None)
-    self.assertEqual(settings['use_layer_size'].pdb_type, None)
+    self.assertIsNone(settings['flatten'].pdb_type)
+    self.assertIsNone(settings['use_layer_size'].pdb_type)
   
   def test_add_with_group_level_attributes_overridden_by_setting_attributes(self):
     settings = group_.Group(name='main', setting_attributes={'pdb_type': None})
@@ -137,7 +137,7 @@ class TestGroupAddFromDict(unittest.TestCase):
       }
     ])
     
-    self.assertEqual(settings['flatten'].pdb_type, None)
+    self.assertIsNone(settings['flatten'].pdb_type)
     self.assertEqual(settings['use_layer_size'].pdb_type, GObject.TYPE_UINT64)
   
   def test_add_with_group_level_attributes_overridden_by_child_group_attributes(self):
@@ -152,7 +152,7 @@ class TestGroupAddFromDict(unittest.TestCase):
       additional_settings
     ])
     
-    self.assertEqual(settings['flatten'].pdb_type, None)
+    self.assertIsNone(settings['flatten'].pdb_type)
     self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_UINT64)
     self.assertEqual(settings['flatten'].display_name, 'Setting name')
     self.assertEqual(settings['additional/use_layer_size'].display_name, 'Use layer size')

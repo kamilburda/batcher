@@ -108,7 +108,7 @@ class TestSetting(unittest.TestCase):
       setting_with_custom_error_messages.error_messages['invalid_value'])
 
   def test_pdb_type_automatic_is_not_registrable(self):
-    self.assertEqual(self.setting.pdb_type, None)
+    self.assertIsNone(self.setting.pdb_type)
     self.assertFalse(self.setting.can_be_registered_to_pdb())
   
   def test_pdb_type_automatic_is_registrable(self):
@@ -121,7 +121,7 @@ class TestSetting(unittest.TestCase):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type=None)
 
-    self.assertEqual(setting.pdb_type, None)
+    self.assertIsNone(setting.pdb_type)
     self.assertFalse(setting.can_be_registered_to_pdb())
 
   def test_pdb_type_as_object(self):
@@ -158,7 +158,7 @@ class TestSetting(unittest.TestCase):
         )])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
-    self.assertEqual(self.setting.get_pdb_param(), None)
+    self.assertIsNone(self.setting.get_pdb_param())
   
   def test_reset(self):
     self.setting.set_value('jpg')
@@ -824,7 +824,7 @@ class TestCreateChoiceSetting(unittest.TestCase):
   def test_no_empty_value(self):
     setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
-    self.assertEqual(setting.empty_value, None)
+    self.assertIsNone(setting.empty_value)
   
   def test_valid_empty_value(self):
     setting = settings_.ChoiceSetting(
@@ -961,7 +961,7 @@ class TestImageSetting(unittest.TestCase):
       
       self.setting.set_value(os.path.abspath('file_path'))
 
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
 
   def test_set_value_with_id(self):
     self.image.id_ = 2
@@ -983,12 +983,12 @@ class TestImageSetting(unittest.TestCase):
 
       self.setting.set_value(3)
 
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_set_value_with_none(self):
     self.setting.set_value(None)
     
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_set_value_invalid_image_raises_error(self):
     self.image.valid = False
@@ -1127,7 +1127,7 @@ class TestGimpItemSetting(unittest.TestCase):
       
       self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
     
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_layer_returns_none(self):
     with mock.patch(
@@ -1137,7 +1137,7 @@ class TestGimpItemSetting(unittest.TestCase):
       self.setting.set_value(
         [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/some_other_layer'])
     
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_parent_returns_none(self):
     with mock.patch(
@@ -1147,7 +1147,7 @@ class TestGimpItemSetting(unittest.TestCase):
       self.setting.set_value(
         [os.path.abspath('image_filepath'), 'Layer', 'group1/some_other_group2/layer'])
     
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_with_id(self):
     with mock.patch(
@@ -1167,7 +1167,7 @@ class TestGimpItemSetting(unittest.TestCase):
     
       self.setting.set_value(2)
     
-    self.assertEqual(self.setting.value, None)
+    self.assertIsNone(self.setting.value)
   
   def test_to_dict(self):
     self.assertDictEqual(
@@ -1572,7 +1572,7 @@ class TestCreateArraySetting(unittest.TestCase):
       element_value_set=lambda value: value,
       element_value_save=lambda value: value)
     
-    self.assertEqual(setting.pdb_type, None)
+    self.assertIsNone(setting.pdb_type)
   
   def test_create_with_explicit_valid_element_pdb_type(self):
     setting = settings_.ArraySetting(
@@ -1846,7 +1846,7 @@ class TestArraySetting(unittest.TestCase):
       element_value_save=lambda value: value)
     
     setting.add_element(value=None)
-    self.assertEqual(setting[-1].value, None)
+    self.assertIsNone(setting[-1].value)
   
   @parameterized.parameterized.expand([
     ('middle_to_first', 1, 0, [5.0, 1.0, 10.0]),
@@ -1978,7 +1978,7 @@ class TestArraySetting(unittest.TestCase):
       element_value_set=lambda value: value,
       element_value_save=lambda value: value)
     
-    self.assertEqual(setting.get_pdb_param(), None)
+    self.assertIsNone(setting.get_pdb_param())
 
 
 class TestArraySettingCreateWithSize(unittest.TestCase):

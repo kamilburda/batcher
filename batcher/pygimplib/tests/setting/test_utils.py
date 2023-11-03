@@ -45,12 +45,12 @@ class TestSettingParentMixin(unittest.TestCase):
   def test_get_parent_empty(self):
     setting = stubs_setting.StubSetting('file_extension')
     
-    self.assertEqual(setting.parent, None)
+    self.assertIsNone(setting.parent)
   
   def test_get_parent(self):
     self.assertEqual(self.setting.parent, self.advanced_settings)
     self.assertEqual(self.advanced_settings.parent, self.main_settings)
-    self.assertEqual(self.main_settings.parent, None)
+    self.assertIsNone(self.main_settings.parent)
   
   def test_get_parents(self):
     self.assertEqual(self.setting.parents, [self.main_settings, self.advanced_settings])
