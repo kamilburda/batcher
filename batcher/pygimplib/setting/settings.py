@@ -2624,21 +2624,23 @@ class ArraySetting(Setting):
     self._reference_element.reset()
   
   def _assign_value(self, value_array):
-    elements = []
+    self._elements.clear()
+
     exceptions = []
     exception_occurred = False
-    
+
     for value in value_array:
       try:
-        elements.append(self._create_element(value))
+        element = self._create_element(value)
       except SettingValueError as e:
         exceptions.append(e)
         exception_occurred = True
-    
+      else:
+        self._elements.append(element)
+
     if exception_occurred:
       raise SettingValueError('\n'.join([str(e) for e in exceptions]))
-    
-    self._elements = elements
+
     self._value = self._get_element_values()
   
   def _apply_gui_value_to_setting(self, value):
