@@ -124,7 +124,7 @@ class TestSetting(unittest.TestCase):
     self.assertIsNone(setting.pdb_type)
     self.assertFalse(setting.can_be_registered_to_pdb())
 
-  def test_pdb_type_as_object(self):
+  def test_pdb_type_as_gobject_subclass(self):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode)
 
@@ -2234,7 +2234,7 @@ class TestContainerSettings(unittest.TestCase):
       setting.to_dict(), {'name': 'setting', 'value': [1, 4, 'five'], 'type': 'tuple'})
   
   def test_set_value_for_set_setting(self):
-    expected_value = set([1, 4, 'five'])
+    expected_value = {1, 4, 'five'}
     
     setting = settings_.SetSetting('setting')
     
@@ -2245,7 +2245,7 @@ class TestContainerSettings(unittest.TestCase):
     self.assertSetEqual(setting.value, expected_value)
   
   def test_to_dict_for_set_setting(self):
-    expected_value = set([1, 4, 'five'])
+    expected_value = {1, 4, 'five'}
     
     setting = settings_.SetSetting('setting')
 
@@ -2269,7 +2269,8 @@ class TestSettingTypeFunctions(unittest.TestCase):
   
   def test_process_setting_type_with_invalid_type(self):
     with self.assertRaises(TypeError):
-      self.assertEqual(settings_.process_setting_type(object()))
+      # noinspection PyTypeChecker
+      settings_.process_setting_type(object())
 
 
 class TestSettingGuiTypeFunctions(unittest.TestCase):
@@ -2289,4 +2290,5 @@ class TestSettingGuiTypeFunctions(unittest.TestCase):
   
   def test_process_setting_gui_type_with_invalid_type(self):
     with self.assertRaises(TypeError):
-      self.assertEqual(settings_.process_setting_gui_type(object()))
+      # noinspection PyTypeChecker
+      settings_.process_setting_gui_type(object())
