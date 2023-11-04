@@ -2263,7 +2263,10 @@ class ArraySetting(Setting):
   If the ``element_type`` specified during instantiation has a matching GObject
   type (e.g. `Gimp.FloatArray` for float arrays), then the array setting can
   be registered to the GIMP PDB. To disable registration, pass ``pdb_type=None``
-  in `Setting.__init__()` as one normally would.
+  in `Setting.__init__()` as one normally would. The PDB type of individual
+  elements cannot be customized as it appears that the GIMP API provides a fixed
+  element type for each array type (e.g. `GObject.TYPE_DOUBLE` for
+  `Gimp.FloatArray`).
   
   Validation of setting values is performed for each element individually.
   
@@ -2293,7 +2296,11 @@ class ArraySetting(Setting):
     `__delitem__()` immediately after removing an array element.
 
   Allowed GIMP PDB types:
-  TODO
+  * `Gimp.Int32Array`
+  * `Gimp.FloatArray`
+  * `Gimp.RGBArray`
+  * `Gimp.ObjectArray`
+  * `GObject.TYPE_STRV` (string array)
   
   Default value: `()`
   
@@ -2317,11 +2324,18 @@ class ArraySetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = ()
 
+  _ARRAY_PDB_TYPES: Dict[
+    Type[Setting],
+    Tuple[
+      Union[Type[GObject.GObject], GObject.GType],
+      Union[Type[GObject.GObject], GObject.GType],
+    ]
+  ]
   _ARRAY_PDB_TYPES = {
-    IntSetting: (GObject.TYPE_INT, Gimp.Int32Array),
-    FloatSetting: (GObject.TYPE_FLOAT, Gimp.FloatArray),
-    ColorSetting: (Gimp.RGB, Gimp.RGBArray),
-    StringSetting: (GObject.TYPE_STRING, GObject.TYPE_STRV),
+    IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
+    FloatSetting: (Gimp.FloatArray, GObject.TYPE_DOUBLE),
+    ColorSetting: (Gimp.RGBArray, Gimp.RGB),
+    StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
   
   def __init__(
@@ -2360,9 +2374,12 @@ class ArraySetting(Setting):
         parameters that would be passed to the `Setting` class defined by
         ``element_type``. The arguments for the latter must be prefixed with
         ``element_`` - for example, for arrays containing integers (i.e.
-        ``element_type`` is ``IntSetting``), you can optionally pass
-        ``element_min_value=<value>`` to set minimum value for all integer
+        ``element_type`` is ``'int'``), you can optionally pass
+        ``element_min_value=<value>`` to set the minimum value for all integer
         array elements.
+        If ``element_pdb_type`` is specified, it will be ignored as each array
+        type has one allowed PDB type for individual elements (e.g.
+        `GObject.TYPE_DOUBLE` for `Gimp.FloatArray`).
     """
     self._element_type = process_setting_type(element_type)
     self._min_size = min_size if min_size is not None else 0
@@ -2371,6 +2388,11 @@ class ArraySetting(Setting):
     self._element_kwargs = {
       key[len('element_'):]: value for key, value in kwargs.items()
       if key.startswith('element_')}
+
+    if 'pdb_type' in self._element_kwargs:
+      # Enforce a pre-set value for `element_pdb_type` as it appears that the
+      # GIMP API allows only one type per array type.
+      self._element_kwargs['pdb_type'] = self._get_default_element_pdb_type()
     
     self._reference_element = self._create_reference_element()
     
@@ -2379,7 +2401,7 @@ class ArraySetting(Setting):
     else:
       self._element_kwargs['default_value'] = self._reference_element._raw_to_value(
         self._element_kwargs['default_value'])
-    
+
     for key, value in self._element_kwargs.items():
       pgutils.create_read_only_property(self, f'element_{key}', value)
     
@@ -2506,29 +2528,40 @@ class ArraySetting(Setting):
   
   def get_pdb_param(
         self, length_name: Optional[str] = None, length_description: Optional[str] = None,
-  ) -> Union[List[Tuple[GObject.GType, str, str]], None]:
-    """Returns a list of two tuples, describing the length of the array and the
-    array itself, as GIMP PDB parameters - PDB type, name and description.
-    
-    If the underlying `element_type` does not support any PDB type, ``None`` is
-    returned.
-    
+  ) -> Union[List[Dict[str, Any]], None]:
+    """Returns a list of two dictionaries representing GIMP PDB parameters, the
+    first being the array length and the second the array itself.
+
+    If `element_type` does not support any PDB type, ``None`` is returned.
+
     To customize the name and description of the length parameter,
     pass ``length_name`` and ``length_description``, respectively. Passing
     ``None`` creates the name and/or the description automatically.
+
+    For more information, see `Setting.get_pdb_param()`.
     """
     if self.can_be_registered_to_pdb():
       if length_name is None:
-        length_name = f'{self.name}-length'
+        length_name = f'{self.pdb_name}-length'
       
       if length_description is None:
-        length_description = _('Number of elements in "{}"').format(self.name)
-      
+        length_description = _('Number of elements in "{}"').format(self.pdb_name)
+
       return [
-        (GObject.TYPE_INT, length_name, length_description),
-        (self.pdb_type,
-         self.name,
-         self.description)
+        dict(
+          name=length_name,
+          type=GObject.TYPE_INT,
+          default=len(self.default_value),
+          nick=length_description,
+          blurb=length_description,
+        ),
+        dict(
+          name=self.pdb_name,
+          type=self.pdb_type,
+          default=self.default_value,
+          nick=self.display_name,
+          blurb=self.description,
+        ),
       ]
     else:
       return None
@@ -2618,13 +2651,16 @@ class ArraySetting(Setting):
     return self._get_element_values()
   
   def _get_default_pdb_type(self):
-    if hasattr(self, '_element_pdb_type'):
-      if self._element_pdb_type in self._ARRAY_PDB_TYPES:
-        return self._ARRAY_PDB_TYPES[self._element_pdb_type]
-    elif self._element_type._ALLOWED_PDB_TYPES:
-      return self._ARRAY_PDB_TYPES[self._element_type._ALLOWED_PDB_TYPES[0]]
-    
-    return None
+    if self.element_type in self._ARRAY_PDB_TYPES:
+      return self._ARRAY_PDB_TYPES[self.element_type][0]
+    else:
+      return None
+
+  def _get_default_element_pdb_type(self):
+    if self.element_type in self._ARRAY_PDB_TYPES:
+      return self._ARRAY_PDB_TYPES[self.element_type][1]
+    else:
+      return None
   
   def _create_reference_element(self):
     """Creates a reference element to access and validate the element default

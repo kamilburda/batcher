@@ -1569,6 +1569,7 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertEqual(setting.name, 'coordinates')
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
+    self.assertEqual(setting.pdb_type, Gimp.FloatArray)
     self.assertEqual(setting.element_type, settings_.FloatSetting)
     self.assertEqual(setting.element_default_value, 0.0)
   
@@ -1654,19 +1655,16 @@ class TestCreateArraySetting(unittest.TestCase):
   
   @parameterized.parameterized.expand([
     ('element_pdb_type_is_registrable',
-     'automatic',
      'float',
+     'automatic',
      Gimp.FloatArray),
     
     ('registration_is_disabled_explicitly',
-     None,
      'float',
+     None,
      None),
   ])
-  def test_create_with_pdb_type(
-        self, test_case_suffix,
-        pdb_type, element_type, expected_pdb_type,
-        value_set_func=None, value_save_func=None):
+  def test_create_with_pdb_type(self, test_case_suffix, element_type, pdb_type, expected_pdb_type):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
@@ -1676,7 +1674,7 @@ class TestCreateArraySetting(unittest.TestCase):
     
     self.assertEqual(setting.pdb_type, expected_pdb_type)
   
-  def test_create_with_pdb_type_element_pdb_type_is_not_registrable(self):
+  def test_create_with_nonregistrable_type(self):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
@@ -1696,15 +1694,17 @@ class TestCreateArraySetting(unittest.TestCase):
       element_pdb_type=GObject.TYPE_INT)
     
     self.assertEqual(setting.pdb_type, Gimp.Int32Array)
+    self.assertEqual(setting.element_pdb_type, GObject.TYPE_INT)
   
-  def test_create_with_invalid_element_pdb_type(self):
-    with self.assertRaises(ValueError):
-      settings_.ArraySetting(
-        'coordinates',
-        default_value=(1.0, 5.0, 10.0),
-        element_type='float',
-        element_default_value=0.0,
-        element_pdb_type=GObject.TYPE_UINT64)
+  def test_create_invalid_element_pdb_type_is_changed_to_correct_type(self):
+    setting = settings_.ArraySetting(
+      'coordinates',
+      default_value=(1.0, 5.0, 10.0),
+      element_type='float',
+      element_default_value=0.0,
+      element_pdb_type=GObject.TYPE_UINT64)
+
+    self.assertEqual(setting.element_pdb_type, GObject.TYPE_DOUBLE)
   
   def test_create_multidimensional_array(self):
     values = ((1.0, 5.0, 10.0), (2.0, 15.0, 25.0), (-5.0, 10.0, 40.0))
@@ -2079,8 +2079,22 @@ class TestArraySetting(unittest.TestCase):
         expected_length_description):
     self.assertEqual(
       self.setting.get_pdb_param(length_name, length_description),
-      [(GObject.TYPE_INT, expected_length_name, expected_length_description),
-       (Gimp.FloatArray, 'coordinates', 'Coordinates')])
+      [
+        dict(
+          name=expected_length_name,
+          type=GObject.TYPE_INT,
+          default=3,
+          nick=expected_length_description,
+          blurb=expected_length_description,
+        ),
+        dict(
+          name='coordinates',
+          type=Gimp.FloatArray,
+          default=(1.0, 5.0, 10.0),
+          nick='Coordinates',
+          blurb='Coordinates',
+        ),
+      ])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):
     setting = settings_.ArraySetting(
