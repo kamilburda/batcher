@@ -177,9 +177,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         default_value=DEFAULT_VALUE,
         display_name: Optional[str] = None,
         description: Optional[str] = None,
-        pdb_type: Union[
-          GObject.GObject, Type[GObject.GObject], GObject.GType, str, None,
-        ] = 'automatic',
+        pdb_type: Union[Type[GObject.GObject], GObject.GType, str, None] = 'automatic',
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
@@ -204,9 +202,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         See the `description` property.
       pdb_type:
         A `GObject.GType` instance (e.g. `GObject.TYPE_INT` representing
-        integers), an instance or subclass of `GObject.GObject` (e.g.
-        `Gimp.Image`), a string as the name of a GObject type (e.g.
-        ``'gint'``, ``'GimpImage'``), ``None`` or ``'automatic'``. If set to
+        integers), a subclass of `GObject.GObject` (e.g. `Gimp.Image`),
+        a string as the name of a GObject type (e.g. ``'gint'``,
+        ``'GimpImage'``), ``None`` or ``'automatic'``. If set to
         ``'automatic'``, the first GIMP PDB type in the list of allowed PDB
         types for a particular `Setting` subclass is chosen. If no allowed
         PDB types are defined for that subclass, the setting cannot be
