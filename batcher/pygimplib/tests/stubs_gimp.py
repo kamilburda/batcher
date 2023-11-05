@@ -236,13 +236,13 @@ class Brush(Resource):
   def __init__(
         self,
         name=None,
-        angle=None,
-        aspect_ratio=None,
-        hardness=None,
-        radius=None,
-        shape=None,
-        spacing=None,
-        spikes=None,
+        angle=0.0,
+        aspect_ratio=0.0,
+        hardness=0.0,
+        radius=0.0,
+        shape=0,
+        spacing=0,
+        spikes=0,
   ):
     super().__init__(name=name)
 
@@ -307,7 +307,7 @@ class Gradient(Resource):
 
 class Palette(Resource):
 
-  def __init__(self, name=None, columns=None):
+  def __init__(self, name=None, columns=0):
     super().__init__(name=name)
 
     self.columns = columns
