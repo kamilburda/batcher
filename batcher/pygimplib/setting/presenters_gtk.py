@@ -73,7 +73,7 @@ class IntSpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return _create_spin_button(setting)
   
   def _get_value(self):
@@ -91,8 +91,8 @@ class FloatSpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting):
-    return _create_spin_button(setting, digits=1)
+  def _create_widget(self, setting, digits=1):
+    return _create_spin_button(setting, digits=digits)
   
   def _get_value(self):
     return self._widget.get_value()
@@ -109,7 +109,7 @@ class CheckButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'clicked'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.CheckButton(label=setting.display_name, use_underline=False)
   
   def _get_value(self):
@@ -126,7 +126,7 @@ class CheckButtonNoTextPresenter(CheckButtonPresenter):
   Value: Checked state of the check button (checked/unchecked).
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.CheckButton(label=None, use_underline=False)
 
 
@@ -152,7 +152,7 @@ class CheckMenuItemPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'toggled'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.CheckMenuItem(label=setting.display_name)
   
   def _get_value(self):
@@ -170,7 +170,7 @@ class ExpanderPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'notify::expanded'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.Expander(label=setting.display_name, use_underline=True)
   
   def _get_value(self):
@@ -191,7 +191,7 @@ class ComboBoxPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_INT)
 
     for label, value in setting.get_item_display_names_and_values():
@@ -220,7 +220,7 @@ class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
 
   _VALUE_CHANGED_SIGNAL = 'changed'
 
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     combo_box = GimpUi.EnumComboBox.new_with_model(GimpUi.EnumStore.new(setting.enum_type))
 
     # If the default value is not valid, `set_active` returns `False`,
@@ -242,7 +242,7 @@ class EntryPresenter(GtkPresenter):
   Value: Text in the entry.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.Entry()
   
   def _get_value(self):
@@ -263,7 +263,7 @@ class ImageComboBoxPresenter(GimpUiIntComboBoxPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.ImageComboBox.new()
   
   def _get_value(self):
@@ -287,7 +287,7 @@ class ItemComboBoxPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return pggui.GimpItemComboBox()
   
   def _get_value(self):
@@ -311,7 +311,7 @@ class DrawableComboBoxPresenter(GimpUiIntComboBoxPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.DrawableComboBox.new()
   
   def _get_value(self):
@@ -335,7 +335,7 @@ class LayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new()
   
   def _get_value(self):
@@ -359,7 +359,7 @@ class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.ChannelComboBox.new()
   
   def _get_value(self):
@@ -383,7 +383,7 @@ class VectorsComboBoxPresenter(GimpUiIntComboBoxPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.VectorsComboBox.new()
   
   def _get_value(self):
@@ -406,9 +406,9 @@ class ColorButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'color-changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, width=100, height=20):
     return GimpUi.ColorButton.new(
-      setting.display_name, 100, 20, setting.value, GimpUi.ColorAreaType.SMALL_CHECKS)
+      setting.display_name, width, height, setting.value, GimpUi.ColorAreaType.SMALL_CHECKS)
   
   def _get_value(self):
     return self._widget.get_color()
@@ -425,7 +425,7 @@ class ParasiteBoxPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'parasite-changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return pggui.ParasiteBox(setting.value)
   
   def _get_value(self):
@@ -444,7 +444,7 @@ class DisplaySpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=setting.value.get_id() if setting.value is not None else 0,
@@ -485,7 +485,7 @@ class FileExtensionEntryPresenter(ExtendedEntryPresenter):
   Value: Text in the entry.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return pggui.FileExtensionEntry()
 
 
@@ -499,7 +499,7 @@ class FolderChooserWidgetPresenter(GtkPresenter):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
   
   def _get_value(self):
@@ -516,7 +516,7 @@ class FolderChooserButtonPresenter(GtkPresenter):
   Value: Current folder.
   """
 
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     button = Gtk.FileChooserButton(
       title=setting.display_name,
       action=Gtk.FileChooserAction.SELECT_FOLDER,
@@ -557,7 +557,7 @@ class BrushSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   Value: A `Gimp.Brush` instance.
   """
 
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.BrushSelectButton.new(setting.display_name, setting.value)
 
 
@@ -567,7 +567,7 @@ class FontSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   Value: A `Gimp.Font` instance.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.FontSelectButton.new(setting.display_name, setting.value)
 
 
@@ -577,7 +577,7 @@ class GradientSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   Value: A `Gimp.Gradient` instance.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.GradientSelectButton.new(setting.display_name, setting.value)
 
 
@@ -587,7 +587,7 @@ class PaletteSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   Value: A `Gimp.Palette` instance.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.PaletteSelectButton.new(setting.display_name, setting.value)
 
 
@@ -597,7 +597,7 @@ class PatternSelectButtonPresenter(GimpResourceSelectButtonPresenter):
   Value: String representing a pattern.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GimpUi.PatternSelectButton.new(setting.display_name, setting.value)
 
 
@@ -635,7 +635,7 @@ class ArrayBoxPresenter(GtkPresenter):
     self._widget.disconnect(self._item_changed_event_handler_id)
     self._item_changed_event_handler_id = None
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, width=300, max_height=150):
     def _add_existing_element(array_element_value, index):
       return self._add_array_element(setting[index], array_box)
     
@@ -651,7 +651,12 @@ class ArrayBoxPresenter(GtkPresenter):
       del setting[position]
     
     array_box = pggui.ArrayBox(
-      setting.element_default_value, setting.min_size, setting.max_size)
+      setting.element_default_value,
+      setting.min_size,
+      setting.max_size,
+      width_request=width,
+      max_content_height=max_height,
+    )
     
     array_box.on_add_item = _add_existing_element
     

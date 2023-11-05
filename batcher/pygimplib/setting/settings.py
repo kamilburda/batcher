@@ -179,6 +179,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         description: Optional[str] = None,
         pdb_type: Union[Type[GObject.GObject], GObject.GType, str, None] = 'automatic',
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
+        gui_type_kwargs: Optional[Dict] = None,
         allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
         setting_sources: Union[Dict, List, None] = None,
@@ -220,6 +221,10 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         types for that subclass, no widget is created for this setting.
 
         If ``gui_type`` is ``None``, no widget is created for this setting.
+      gui_type_kwargs:
+        Keyword arguments for instantiating a particular GUI widget. See the
+        `setting.Presenter._create_widget()` method in particular
+        `setting.Presenter` subclasses for available keyword arguments.
       allow_empty_values:
         If ``False`` and an empty value is passed to `set_value()`, then the
         value is considered invalid. Otherwise, the value is considered valid.
@@ -266,11 +271,15 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._setting_value_synchronizer.apply_gui_value_to_setting = self._apply_gui_value_to_setting
     
     self._gui_type = self._get_gui_type(gui_type)
+    self._gui_type_kwargs = gui_type_kwargs
+
     self._gui = presenter_.NullPresenter(
       self,
       None,
       self._setting_value_synchronizer,
-      auto_update_gui_to_setting=auto_update_gui_to_setting)
+      auto_update_gui_to_setting=auto_update_gui_to_setting,
+      create_widget_kwargs=self._gui_type_kwargs,
+    )
     
     self._error_messages = {}
     self._init_error_messages()
@@ -504,6 +513,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         widget=None,
         auto_update_gui_to_setting: bool = True,
+        gui_type_kwargs: Optional[Dict] = None,
   ):
     """Creates a new `setting.Presenter` instance (holding a GUI widget) for
     this setting or removes the GUI.
@@ -535,6 +545,10 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         `ValueError` is raised.
       auto_update_gui_to_setting:
         See the ``auto_update_gui_to_setting`` parameter in `__init__()`.
+      gui_type_kwargs:
+        Keyword arguments for instantiating a particular `setting.Presenter`
+        subclass. If ``None``, the ``gui_type_kwargs`` parameter specified in
+        `__init__()` is used instead.
     """
     if gui_type != 'automatic' and widget is None:
       raise ValueError('widget cannot be None if gui_type is "automatic"')
@@ -551,13 +565,18 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       self._gui.auto_update_gui_to_setting(False)
     else:
       processed_gui_type = process_setting_gui_type(gui_type)
-    
+
+    if gui_type_kwargs is None:
+      gui_type_kwargs = self._gui_type_kwargs
+
     self._gui = processed_gui_type(
       self,
       widget,
       setting_value_synchronizer=self._setting_value_synchronizer,
       old_presenter=self._gui,
-      auto_update_gui_to_setting=auto_update_gui_to_setting)
+      auto_update_gui_to_setting=auto_update_gui_to_setting,
+      create_widget_kwargs=gui_type_kwargs,
+    )
     
     self.invoke_event('after-set-gui')
   

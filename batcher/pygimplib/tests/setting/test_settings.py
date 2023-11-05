@@ -373,13 +373,25 @@ class TestSettingGui(unittest.TestCase):
     self.assertIs(type(setting.gui), stubs_setting.YesNoToggleButtonStubPresenter)
     self.assertIs(type(setting.gui.widget), stubs_setting.GuiWidgetStub)
   
-  def test_set_widget_is_none_presenter_has_no_wrapper_raise_error(self):
+  def test_set_gui_widget_is_none_presenter_has_no_wrapper_raise_error(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten',
       default_value=False,
       gui_type=stubs_setting.StubWithoutGuiWidgetCreationPresenter)
     with self.assertRaises(ValueError):
       setting.set_gui()
+
+  def test_create_gui_with_gui_type_kwargs_on_init(self):
+    setting = stubs_setting.StubWithGuiSetting(
+      'flatten',
+      default_value=False,
+      gui_type=stubs_setting.StubWithCustomKwargsInCreateWidgetPresenter,
+      gui_type_kwargs=dict(width=200, height=15))
+
+    setting.set_gui()
+
+    self.assertEqual(setting.gui.widget.width, 200)
+    self.assertEqual(setting.gui.widget.height, 15)
   
   def test_update_setting_value_manually(self):
     self.setting.set_gui(stubs_setting.StubPresenter, self.widget)

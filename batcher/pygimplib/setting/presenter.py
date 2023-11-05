@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Optional
+from typing import Dict, Optional
 
 from .. import utils as pgutils
 
@@ -62,7 +62,9 @@ class Presenter(metaclass=meta_.PresenterMeta):
         widget=None,
         setting_value_synchronizer: Optional[SettingValueSynchronizer] = None,
         old_presenter: Presenter = None,
-        auto_update_gui_to_setting: bool = True):
+        auto_update_gui_to_setting: bool = True,
+        create_widget_kwargs: Optional[Dict] = None,
+  ):
     """Initializes a `Presenter` instance.
 
     You should not instantiate a `Presenter` class directly. A `Presenter`
@@ -93,6 +95,10 @@ class Presenter(metaclass=meta_.PresenterMeta):
 
           * ``old_presenter`` is not ``None`` and the automatic
             GUI-to-setting update was disabled in that presenter.
+      create_widget_kwargs:
+        Keyword arguments used when creating ``widget``. See the
+        `setting.Presenter._create_widget()` method in particular
+        `setting.Presenter` subclasses for available keyword arguments.
     """
     self._setting = setting
     self._widget = widget
@@ -108,10 +114,13 @@ class Presenter(metaclass=meta_.PresenterMeta):
       self._value_changed_signal = None
     
     self._setting_value_synchronizer.apply_setting_value_to_gui = self._apply_setting_value_to_gui
-    
+
+    if create_widget_kwargs is None:
+      create_widget_kwargs = {}
+
     if self._widget is None:
-      self._widget = self._create_widget(setting)
-      
+      self._widget = self._create_widget(setting, **create_widget_kwargs)
+
       if self._widget is None:
         raise ValueError(
           (f'cannot instantiate class "{type(self).__qualname__}": attribute "widget" is None'
@@ -121,7 +130,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
       self._copy_state(old_presenter)
     else:
       self._setting_value_synchronizer.apply_setting_value_to_gui(self._setting.value)
-    
+
     if self._value_changed_signal is not None:
       self._connect_value_changed_event()
   
@@ -190,7 +199,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
       self._value_changed_signal = None
       self._disconnect_value_changed_event()
   
-  def _create_widget(self, setting: 'setting.Setting'):
+  def _create_widget(self, setting: 'setting.Setting', **kwargs):
     """Instantiates and returns a new GUI widget using the attributes in the
     specified `setting.Setting` instance (e.g. display name as GUI label).
     

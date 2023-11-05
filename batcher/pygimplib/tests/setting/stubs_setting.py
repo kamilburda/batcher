@@ -11,10 +11,13 @@ from ...setting import settings as settings_
 
 class GuiWidgetStub:
   
-  def __init__(self, value):
+  def __init__(self, value, width=100, height=20):
     self.value = value
     self.sensitive = True
     self.visible = True
+
+    self.width = width
+    self.height = height
     
     self._signal = None
     self._event_handler = None
@@ -51,7 +54,7 @@ class StubPresenter(presenter_.Presenter):
   def set_visible(self, visible):
     self._widget.visible = visible
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return GuiWidgetStub(setting.value)
   
   def _get_value(self):
@@ -67,20 +70,26 @@ class StubPresenter(presenter_.Presenter):
     self._widget.disconnect()
 
 
-class StubWithValueChangedSignalPresenter(StubPresenter):
+class StubWithCustomKwargsInCreateWidgetPresenter(StubPresenter):
   
+  def _create_widget(self, setting, width=100, height=20, **kwargs):
+    return GuiWidgetStub(setting.value, width=width, height=height)
+
+
+class StubWithValueChangedSignalPresenter(StubPresenter):
+
   _VALUE_CHANGED_SIGNAL = 'changed'
 
 
 class StubWithoutGuiWidgetCreationPresenter(StubPresenter):
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return None
 
 
 class CheckButtonStubPresenter(StubPresenter):
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return CheckButtonStub(setting.value)
 
 
@@ -116,8 +125,10 @@ class StubWithGuiSetting(StubSetting):
   _ALLOWED_GUI_TYPES = [
     CheckButtonStubPresenter,
     StubPresenter,
+    StubWithCustomKwargsInCreateWidgetPresenter,
     StubWithValueChangedSignalPresenter,
-    StubWithoutGuiWidgetCreationPresenter]
+    StubWithoutGuiWidgetCreationPresenter,
+  ]
 
 
 def on_file_extension_changed(file_extension, flatten):

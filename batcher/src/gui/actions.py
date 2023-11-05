@@ -454,9 +454,6 @@ class _ActionEditDialog(GimpUi.Dialog):
   _TABLE_ROW_SPACING = 4
   _TABLE_COLUMN_SPACING = 8
   
-  _ARRAY_PARAMETER_GUI_WIDTH = 300
-  _ARRAY_PARAMETER_GUI_MAX_HEIGHT = 150
-  
   _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING = 5
   
   _MORE_OPTIONS_SPACING = 4
@@ -555,10 +552,7 @@ class _ActionEditDialog(GimpUi.Dialog):
       
       if not isinstance(setting.gui, pg.setting.SettingGuiTypes.null):
         if isinstance(setting, pg.setting.ArraySetting):
-          if setting.element_type.get_allowed_gui_types():
-            setting.gui.widget.set_property('width-request', self._ARRAY_PARAMETER_GUI_WIDTH)
-            setting.gui.widget.max_height = self._ARRAY_PARAMETER_GUI_MAX_HEIGHT
-          else:
+          if not setting.element_type.get_allowed_gui_types():
             widget_to_attach = self._create_placeholder_widget()
       else:
         widget_to_attach = self._create_placeholder_widget()
