@@ -2556,7 +2556,7 @@ class ArraySetting(Setting):
     self.__delitem__(index)
   
   def get_elements(self) -> List[Setting]:
-    """Returns a list of array elements in this setting."""
+    """Returns a list of array elements as `Setting` instances."""
     return list(self._elements)
   
   def get_pdb_param(
