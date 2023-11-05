@@ -1898,7 +1898,7 @@ class DisplaySetting(Setting):
       return None
 
   def _validate(self, display):
-    if not display.is_valid():
+    if display is not None and not display.is_valid():
       raise SettingValueError(
         utils_.value_to_str_prefix(display) + self.error_messages['invalid_value'])
 

@@ -447,7 +447,7 @@ class DisplaySpinButtonPresenter(GtkPresenter):
   def _create_widget(self, setting):
     return Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
-        value=setting.value.get_id(),
+        value=setting.value.get_id() if setting.value is not None else 0,
         lower=0,
         upper=GLib.MAXINT,
         step_increment=1,
@@ -461,7 +461,8 @@ class DisplaySpinButtonPresenter(GtkPresenter):
     return Gimp.Display.get_by_id(self._widget.get_value_as_int())
   
   def _set_value(self, value):
-    self._widget.set_value(value.get_id())
+    if value is not None:
+      self._widget.set_value(value.get_id())
 
 
 class ExtendedEntryPresenter(GtkPresenter):
