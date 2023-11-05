@@ -2312,8 +2312,10 @@ class ArraySetting(Setting):
   * `Gimp.Int32Array`
   * `Gimp.FloatArray`
   * `Gimp.RGBArray`
-  * `Gimp.ObjectArray`
   * `GObject.TYPE_STRV` (string array)
+  * `Gimp.ObjectArray` - any type inheriting from `GObject.GObject`, including
+    GIMP objects (e.g. images, layers, channels, vectors, brushes, patterns) or
+    e.g. `Gio.File`.
   
   Default value: `()`
   
@@ -2337,20 +2339,20 @@ class ArraySetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = ()
 
-  _ARRAY_PDB_TYPES: Dict[
+  _NATIVE_ARRAY_PDB_TYPES: Dict[
     Type[Setting],
     Tuple[
       Union[Type[GObject.GObject], GObject.GType],
       Union[Type[GObject.GObject], GObject.GType],
     ]
   ]
-  _ARRAY_PDB_TYPES = {
+  _NATIVE_ARRAY_PDB_TYPES = {
     IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
     FloatSetting: (Gimp.FloatArray, GObject.TYPE_DOUBLE),
     ColorSetting: (Gimp.RGBArray, Gimp.RGB),
     StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
-  
+
   def __init__(
         self,
         name: str,
@@ -2408,7 +2410,7 @@ class ArraySetting(Setting):
       self._element_kwargs['pdb_type'] = self._get_default_element_pdb_type()
     
     self._reference_element = self._create_reference_element()
-    
+
     if 'default_value' not in self._element_kwargs:
       self._element_kwargs['default_value'] = self._reference_element.default_value
     else:
@@ -2686,14 +2688,18 @@ class ArraySetting(Setting):
     return self._array_as_tuple()
   
   def _get_default_pdb_type(self):
-    if self.element_type in self._ARRAY_PDB_TYPES:
-      return self._ARRAY_PDB_TYPES[self.element_type][0]
+    if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
+      return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0]
+    elif self._is_element_pdb_type_gobject_type():
+      return Gimp.ObjectArray
     else:
       return None
 
   def _get_default_element_pdb_type(self):
-    if self.element_type in self._ARRAY_PDB_TYPES:
-      return self._ARRAY_PDB_TYPES[self.element_type][1]
+    if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
+      return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][1]
+    elif self._is_element_pdb_type_gobject_type():
+      return self._reference_element.pdb_type
     else:
       return None
   
@@ -2723,21 +2729,30 @@ class ArraySetting(Setting):
 
   def _array_as_pdb_compatible_type(self, values):
     if self.element_type == IntSetting:
-      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      array = GObject.Value(self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0])
       Gimp.value_set_int32_array(array, values)
       return array.get_boxed()
     elif self.element_type == FloatSetting:
-      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      array = GObject.Value(self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0])
       Gimp.value_set_float_array(array, values)
       return array.get_boxed()
     elif self.element_type == ColorSetting:
-      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      array = GObject.Value(self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0])
       Gimp.value_set_rgb_array(array, values)
       return array.get_boxed()
     elif self.element_type == StringSetting:
       return values
+    elif self._is_element_pdb_type_gobject_type():
+      array = GObject.Value(Gimp.ObjectArray)
+      Gimp.value_set_object_array(array, self._reference_element.pdb_type, values)
+      return array.get_boxed()
     else:
       return values
+
+  def _is_element_pdb_type_gobject_type(self):
+    return (
+      self._reference_element.can_be_registered_to_pdb()
+      and issubclass(self._reference_element.pdb_type, GObject.GObject))
 
 
 class ContainerSetting(Setting):

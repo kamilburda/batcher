@@ -7,6 +7,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
+from gi.repository import GObject
 
 
 def _get_result_tuple_type(arg_name) -> collections.namedtuple:
@@ -36,14 +37,15 @@ class ParasiteFunctionsStubMixin:
       del self._parasites[parasite_name]
 
 
-class Image(ParasiteFunctionsStubMixin):
+class Image(GObject.GObject, ParasiteFunctionsStubMixin):
 
   _image_id_counter = itertools.count(start=1)
 
   _images_and_ids = {}
 
   def __init__(self, name=None, id_=None, filepath=None, width=0, height=0, base_type=None):
-    super().__init__()
+    GObject.GObject.__init__(self)
+    ParasiteFunctionsStubMixin.__init__(self)
     
     self.name = name
     
@@ -101,14 +103,15 @@ class Image(ParasiteFunctionsStubMixin):
     return self.valid
 
 
-class Item(ParasiteFunctionsStubMixin):
+class Item(GObject.GObject, ParasiteFunctionsStubMixin):
   
   _item_id_counter = itertools.count(start=1)
 
   _items_and_ids = {}
   
   def __init__(self, name=None, id_=None, visible=True, image=None, parent=None, is_group=False):
-    super().__init__()
+    GObject.GObject.__init__(self)
+    ParasiteFunctionsStubMixin.__init__(self)
     
     self.name = name
     
@@ -168,18 +171,27 @@ class Item(ParasiteFunctionsStubMixin):
 
 
 class Layer(Item):
-  pass
+
+  def is_layer(self):
+    return True
+
+  def is_drawable(self):
+    return True
 
 
 class Channel(Item):
-  pass
+
+  def is_channel(self):
+    return True
 
 
 class Vectors(Item):
-  pass
+
+  def is_vectors(self):
+    return True
 
 
-class Display:
+class Display(GObject.GObject):
 
   _display_id_counter = itertools.count(start=1)
 
@@ -208,11 +220,13 @@ class Display:
     return self.valid
 
 
-class Resource:
+class Resource(GObject.GObject):
 
   _resources = {}
 
   def __init__(self, name=None):
+    super().__init__()
+    
     self.name = name
 
     if name is not None:
@@ -323,6 +337,10 @@ class Pattern(Resource):
   pass
 
 
+class ObjectArray:
+  pass
+
+
 class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   Parasite = Gimp.Parasite
@@ -342,3 +360,5 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Gradient = Gradient
   Palette = Palette
   Pattern = Pattern
+
+  ObjectArray = ObjectArray

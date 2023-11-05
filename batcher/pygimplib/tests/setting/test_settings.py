@@ -1649,20 +1649,35 @@ class TestCreateArraySetting(unittest.TestCase):
         element_max_value=100.0)
   
   @parameterized.parameterized.expand([
-    ('element_pdb_type_is_registrable',
+    ('native_array_type_as_element_pdb_type_is_registrable',
      'float',
+     (1.0, 5.0, 10.0),
      'automatic',
      Gimp.FloatArray),
-    
-    ('registration_is_disabled_explicitly',
+
+    ('native_array_type_registration_is_disabled_explicitly',
      'float',
+     (1.0, 5.0, 10.0),
+     None,
+     None),
+
+    ('gimp_object_as_element_pdb_type_is_registrable',
+     'brush',
+     (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
+     'automatic',
+     Gimp.ObjectArray),
+
+    ('gimp_object_registration_is_disabled_explicitly',
+     'brush',
+     (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
      None,
      None),
   ])
-  def test_create_with_pdb_type(self, test_case_suffix, element_type, pdb_type, expected_pdb_type):
+  def test_create_with_pdb_type(
+        self, test_case_suffix, element_type, default_value, pdb_type, expected_pdb_type):
     setting = settings_.ArraySetting(
       'coordinates',
-      default_value=(1.0, 5.0, 10.0),
+      default_value=default_value,
       pdb_type=pdb_type,
       element_type=element_type)
     
@@ -1734,6 +1749,51 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertEqual(setting.value, ((),))
     setting[0].add_element()
     self.assertEqual(setting.value, ((0.0,),))
+
+  @parameterized.parameterized.expand([
+    ('int',
+     'int',
+     (1, 5, 10),
+     Gimp.Int32Array),
+
+    ('float',
+     'float',
+     (1.0, 5.0, 10.0),
+     Gimp.FloatArray),
+
+    ('color',
+     'color',
+     (Gimp.RGB(), Gimp.RGB(), Gimp.RGB()),
+     Gimp.RGBArray),
+
+    ('image',
+     'image',
+     (stubs_gimp.Image(), stubs_gimp.Image(), stubs_gimp.Image()),
+     Gimp.ObjectArray),
+
+    ('layer',
+     'layer',
+     (stubs_gimp.Layer(), stubs_gimp.Layer(), stubs_gimp.Layer()),
+     Gimp.ObjectArray),
+
+    ('brush',
+     'brush',
+     (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
+     Gimp.ObjectArray),
+  ])
+  def test_value_for_pdb_select_types(self, test_case_suffix, element_type, value, expected_type):
+    setting = settings_.ArraySetting('array', element_type=element_type)
+
+    setting.set_value(value)
+
+    self.assertIsInstance(setting.value_for_pdb, expected_type)
+
+  def test_value_for_pdb_for_string_array(self):
+    setting = settings_.ArraySetting('array', element_type='string')
+
+    setting.set_value(['1', '5', '10'])
+
+    self.assertEqual(setting.value_for_pdb, ('1', '5', '10'))
 
 
 class TestArraySetting(unittest.TestCase):
