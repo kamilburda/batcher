@@ -278,7 +278,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       None,
       self._setting_value_synchronizer,
       auto_update_gui_to_setting=auto_update_gui_to_setting,
-      create_widget_kwargs=self._gui_type_kwargs,
     )
     
     self._error_messages = {}
