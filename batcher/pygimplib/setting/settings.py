@@ -2115,7 +2115,7 @@ class GimpResourceSetting(Setting):
       return None
 
   def _validate(self, resource):
-    if not resource.is_valid():
+    if resource is not None and not resource.is_valid():
       raise SettingValueError(
         utils_.value_to_str_prefix(resource) + self.error_messages['invalid_value'])
 
