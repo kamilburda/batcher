@@ -33,6 +33,9 @@ class TestSetting(unittest.TestCase):
   
   def test_str(self):
     self.assertEqual(str(self.setting), '<StubSetting "file_extension">')
+
+  def test_value_for_pdb_is_equal_to_value(self):
+    self.assertEqual(self.setting.value_for_pdb, self.setting.value)
   
   def test_invalid_setting_name(self):
     with self.assertRaises(ValueError):
@@ -1570,12 +1573,11 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.pdb_type, Gimp.FloatArray)
     self.assertEqual(setting.element_type, settings_.FloatSetting)
+
+    self.assertIsInstance(setting.value_for_pdb, Gimp.FloatArray)
   
-  def test_create_with_empty_tuple(self):
-    setting = settings_.ArraySetting(
-      'coordinates',
-      default_value=(),
-      element_type='float')
+  def test_create_with_default_default_value(self):
+    setting = settings_.ArraySetting('coordinates', element_type='float')
     
     self.assertEqual(setting.default_value, ())
     self.assertEqual(setting.value, ())
@@ -1675,6 +1677,7 @@ class TestCreateArraySetting(unittest.TestCase):
       element_value_save=lambda value: value)
     
     self.assertIsNone(setting.pdb_type)
+    self.assertFalse(setting.can_be_registered_to_pdb())
   
   def test_create_with_explicit_valid_element_pdb_type(self):
     setting = settings_.ArraySetting(
@@ -1895,6 +1898,7 @@ class TestArraySetting(unittest.TestCase):
   ])
   def test_getitem_out_of_bounds_raises_error(self, test_case_suffix, index):
     with self.assertRaises(IndexError):
+      # noinspection PyStatementEffect
       self.setting[index]
   
   @parameterized.parameterized.expand([
@@ -1918,6 +1922,7 @@ class TestArraySetting(unittest.TestCase):
   ])
   def test_delitem_out_of_bounds_raises_error(self, test_case_suffix, index):
     with self.assertRaises(IndexError):
+      # noinspection PyStatementEffect
       self.setting[index]
   
   @parameterized.parameterized.expand([
