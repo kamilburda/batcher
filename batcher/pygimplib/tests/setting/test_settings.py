@@ -2142,14 +2142,14 @@ class TestArraySetting(unittest.TestCase):
         dict(
           name=expected_length_name,
           type=GObject.TYPE_INT,
-          default=3,
+          default=0,
+          minimum=0,
           nick=expected_length_description,
           blurb=expected_length_description,
         ),
         dict(
           name='coordinates',
           type=Gimp.FloatArray,
-          default=(1.0, 5.0, 10.0),
           nick='Coordinates',
           blurb='Coordinates',
         ),

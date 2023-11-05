@@ -2586,14 +2586,14 @@ class ArraySetting(Setting):
         dict(
           name=length_name,
           type=GObject.TYPE_INT,
-          default=len(self.default_value),
+          default=0,
+          minimum=0,
           nick=length_description,
           blurb=length_description,
         ),
         dict(
           name=self.pdb_name,
           type=self.pdb_type,
-          default=self.default_value,
           nick=self.display_name,
           blurb=self.description,
         ),
