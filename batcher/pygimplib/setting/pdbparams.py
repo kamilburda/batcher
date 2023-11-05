@@ -85,7 +85,7 @@ def list_param_values(
         del settings[i]
         break
   
-  return [setting.value for setting in settings if setting.can_be_registered_to_pdb()]
+  return [setting.value_for_pdb for setting in settings if setting.can_be_registered_to_pdb()]
 
 
 def _list_settings(settings_or_groups):

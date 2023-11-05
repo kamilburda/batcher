@@ -299,6 +299,19 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     `value` is initially set to the `default_value` property.
     """
     return self._value
+
+  @property
+  def value_for_pdb(self):
+    """The setting value in a format appropriate to be used as a PDB procedure
+    argument.
+
+    `value_for_pdb` is identical to `value` for almost all `Setting` subclasses.
+
+    Values for some `Setting` types, such as array types, must be converted to a
+    type compatible with the GIMP PDB, e.g. a list of float values to
+    `Gimp.FloatArray` for an `ArraySetting` instance.
+    """
+    return self._value
   
   @property
   def default_value(self):
@@ -2410,14 +2423,34 @@ class ArraySetting(Setting):
     array_kwargs = {key: value for key, value in kwargs.items() if not key.startswith('element_')}
     
     super().__init__(name, **array_kwargs)
-  
+
   @property
   def value(self):
+    """The array (setting value) as a tuple."""
     # This ensures that this property is always up-to-date no matter what events
     # are connected to individual elements.
-    self._value = self._get_element_values()
+    self._value = self._array_as_tuple()
     return self._value
-  
+
+  @property
+  def value_for_pdb(self):
+    """The array (setting value) in a format appropriate to be used as a PDB
+    procedure argument.
+
+    Certain array types as GIMP PDB procedure parameters (such as
+    `Gimp.FloatArray`) cannot accept a Python list/tuple and must be
+    converted to the appropriate GObject-compatible type. The `value`
+    property ensures that the array is converted to a GObject-compatible type.
+
+    To access the array as a Python-like structure, use the `value` property
+    returning the array values as a tuple. If you need to work directly with
+    array elements as `Setting` instances, use `get_elements()`.
+    """
+    # This ensures that this property is always up-to-date no matter what events
+    # are connected to individual elements.
+    self._value = self._array_as_tuple()
+    return self._array_as_pdb_compatible_type(self._value)
+
   @property
   def element_type(self) -> Type[Setting]:
     """Setting type of array elements."""
@@ -2641,7 +2674,7 @@ class ArraySetting(Setting):
     if exception_occurred:
       raise SettingValueError('\n'.join([str(e) for e in exceptions]))
 
-    self._value = self._get_element_values()
+    self._value = self._array_as_tuple()
   
   def _apply_gui_value_to_setting(self, value):
     # No assignment takes place to prevent breaking the sync between the array
@@ -2650,7 +2683,7 @@ class ArraySetting(Setting):
   
   def _copy_value(self, value):
     self._elements = [self._create_element(element_value) for element_value in value]
-    return self._get_element_values()
+    return self._array_as_tuple()
   
   def _get_default_pdb_type(self):
     if self.element_type in self._ARRAY_PDB_TYPES:
@@ -2685,8 +2718,26 @@ class ArraySetting(Setting):
     
     return setting
   
-  def _get_element_values(self):
+  def _array_as_tuple(self):
     return tuple(setting.value for setting in self._elements)
+
+  def _array_as_pdb_compatible_type(self, values):
+    if self.element_type == IntSetting:
+      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      Gimp.value_set_int32_array(array, values)
+      return array.get_boxed()
+    elif self.element_type == FloatSetting:
+      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      Gimp.value_set_float_array(array, values)
+      return array.get_boxed()
+    elif self.element_type == ColorSetting:
+      array = GObject.Value(self._ARRAY_PDB_TYPES[self.element_type][0])
+      Gimp.value_set_rgb_array(array, values)
+      return array.get_boxed()
+    elif self.element_type == StringSetting:
+      return values
+    else:
+      return values
 
 
 class ContainerSetting(Setting):

@@ -549,7 +549,7 @@ class Batcher:
       self._current_constraint = action
   
   def _get_action_args_and_kwargs(self, action, action_args, function):
-    args = self._get_replaced_args(action_args)
+    args = self._get_replaced_args(action_args, action['origin'].is_item('gimp_pdb'))
     kwargs = {}
     
     if action['origin'].is_item('gimp_pdb'):
@@ -561,7 +561,7 @@ class Batcher:
     
     return args, kwargs
   
-  def _get_replaced_args(self, action_arguments):
+  def _get_replaced_args(self, action_arguments, is_function_pdb_procedure):
     """Returns a list of action arguments, replacing any placeholder values with
     real values."""
     replaced_args = []
@@ -570,7 +570,10 @@ class Batcher:
       if isinstance(argument, placeholders.PlaceholderSetting):
         replaced_args.append(placeholders.get_replaced_arg(argument.value, self))
       elif isinstance(argument, pg.setting.Setting):
-        replaced_args.append(argument.value)
+        if is_function_pdb_procedure:
+          replaced_args.append(argument.value_for_pdb)
+        else:
+          replaced_args.append(argument.value)
       else:
         # Other arguments inserted within `Batcher`
         replaced_args.append(argument)
