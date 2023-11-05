@@ -1563,22 +1563,19 @@ class TestCreateArraySetting(unittest.TestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
-      element_default_value=0.0)
+      element_type='float')
     
     self.assertEqual(setting.name, 'coordinates')
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.pdb_type, Gimp.FloatArray)
     self.assertEqual(setting.element_type, settings_.FloatSetting)
-    self.assertEqual(setting.element_default_value, 0.0)
   
   def test_create_with_empty_tuple(self):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(),
-      element_type='float',
-      element_default_value=0.0)
+      element_type='float')
     
     self.assertEqual(setting.default_value, ())
     self.assertEqual(setting.value, ())
@@ -1593,8 +1590,7 @@ class TestCreateArraySetting(unittest.TestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=[1.0, 5.0, 10.0],
-      element_type='float',
-      element_default_value=0.0)
+      element_type='float')
     
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
@@ -1604,7 +1600,6 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       element_type='float',
-      element_default_value=0.0,
       element_min_value=-100.0,
       element_max_value=100.0)
     
@@ -1621,7 +1616,6 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       element_type='float',
-      element_default_value=0.0,
       element_min_value=-100.0,
       element_max_value=100.0,
       element_display_name='Coordinate')
@@ -1634,7 +1628,6 @@ class TestCreateArraySetting(unittest.TestCase):
         'coordinates',
         default_value=(-200.0, 200.0),
         element_type='float',
-        element_default_value=0.0,
         element_min_value=-100.0,
         element_max_value=100.0)
   
@@ -1669,8 +1662,7 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       pdb_type=pdb_type,
-      element_type=element_type,
-      element_default_value=0.0)
+      element_type=element_type)
     
     self.assertEqual(setting.pdb_type, expected_pdb_type)
   
@@ -1679,7 +1671,6 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       element_type='generic',
-      element_default_value=0.0,
       element_value_set=lambda value: value,
       element_value_save=lambda value: value)
     
@@ -1690,7 +1681,6 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1, 5, 10),
       element_type='integer',
-      element_default_value=0,
       element_pdb_type=GObject.TYPE_INT)
     
     self.assertEqual(setting.pdb_type, Gimp.Int32Array)
@@ -1701,7 +1691,6 @@ class TestCreateArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       element_type='float',
-      element_default_value=0.0,
       element_pdb_type=GObject.TYPE_UINT64)
 
     self.assertEqual(setting.element_pdb_type, GObject.TYPE_DOUBLE)
@@ -1751,7 +1740,6 @@ class TestArraySetting(unittest.TestCase):
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
       element_type='float',
-      element_default_value=0.0,
       element_min_value=-100.0,
       element_max_value=100.0)
   
@@ -1782,17 +1770,19 @@ class TestArraySetting(unittest.TestCase):
     self.assertEqual(self.setting.value, expected_value)
     for i, expected_element_value in enumerate(expected_value):
       self.assertEqual(self.setting[i].value, expected_element_value)
-  
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new=stubs_gimp.GimpModuleStub())
   def test_set_value_with_list_of_type_having_custom_set_value(self):
-    setting = settings_.ArraySetting(
-      'coordinates',
-      default_value=(),
-      element_type='brush',
-      element_default_value=())
+    palette = stubs_gimp.Palette(name='Standard')
+    palette2 = stubs_gimp.Palette(name='Standard2')
+
+    setting = settings_.ArraySetting('palettes', element_type='palette')
     
-    setting.set_value(['Clipboard', 'Clipboard2'])
+    setting.set_value([{'name': 'Standard'}, {'name': 'Standard2'}])
     
-    self.assertEqual(setting.value, (('Clipboard',), ('Clipboard2',)))
+    self.assertEqual(setting.value, (palette, palette2))
   
   def test_set_value_validates_if_value_is_iterable(self):
     with self.assertRaises(settings_.SettingValueError):
@@ -1825,29 +1815,33 @@ class TestArraySetting(unittest.TestCase):
         'type': 'array',
         'default_value': [1.0, 5.0, 10.0],
         'element_type': 'float',
-        'element_default_value': 0.0,
         'element_max_value': 100.0,
         'element_min_value': -100.0,
       })
-  
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new=stubs_gimp.GimpModuleStub())
   def test_to_dict_with_type_having_custom_to_dict(self):
-    setting = settings_.ArraySetting(
-      'coordinates',
-      default_value=(),
-      element_type='brush',
-      element_default_value=())
-    
-    setting.set_value(['Clipboard', 'Clipboard2'])
+    # While we do not use these objects, the `name`s are registered so they can
+    # be looked up via the `Palette.get_by_name()` class method.
+    palette = stubs_gimp.Palette(name='Standard')
+    palette2 = stubs_gimp.Palette(name='Standard2')
+
+    setting = settings_.ArraySetting('palettes', element_type='palette')
+
+    setting.set_value([{'name': 'Standard'}, {'name': 'Standard2'}])
     
     self.assertDictEqual(
       setting.to_dict(),
       {
-        'name': 'coordinates',
-        'value': [['Clipboard'], ['Clipboard2']],
+        'name': 'palettes',
+        'value': [
+          {'name': 'Standard', 'columns': 0},
+          {'name': 'Standard2', 'columns': 0},
+        ],
         'type': 'array',
-        'default_value': [],
-        'element_type': 'brush',
-        'element_default_value': [],
+        'element_type': 'palette',
       })
   
   def test_to_dict_with_element_type_as_class(self):
