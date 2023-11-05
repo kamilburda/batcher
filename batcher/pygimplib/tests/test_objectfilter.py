@@ -60,13 +60,13 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_getitem(self):
     rule = self.filter.add(FilterRules.has_uppercase_letters)
-    self.assertEquals(self.filter[rule.id], rule)
+    self.assertEqual(self.filter[rule.id], rule)
   
   def test_getitem_nested_filter(self):
     nested_filter = pgobjectfilter.ObjectFilter(name='item_types')
     nested_filter_id = self.filter.add(nested_filter)
     
-    self.assertEquals(self.filter[nested_filter_id], nested_filter)
+    self.assertEqual(self.filter[nested_filter_id], nested_filter)
   
   def test_getitem_does_not_exist_raises_error(self):
     with self.assertRaises(KeyError):
@@ -81,8 +81,8 @@ class TestObjectFilter(unittest.TestCase):
     nested_filter.add(FilterRules.has_red_color)
     self.filter.add(nested_filter)
     
-    self.assertEquals(len(self.filter), 2)
-    self.assertEquals(len(nested_filter), 3)
+    self.assertEqual(len(self.filter), 2)
+    self.assertEqual(len(nested_filter), 3)
   
   def test_add_with_the_same_callable(self):
     rule = self.filter.add(FilterRules.has_uppercase_letters)
