@@ -520,9 +520,6 @@ class FolderChooserWidgetPresenter(GtkPresenter):
   
   Value: Current folder.
   """
-  
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
 
   def _create_widget(self, setting, **kwargs):
     return Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
