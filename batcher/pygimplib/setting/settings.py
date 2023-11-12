@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 
@@ -2065,6 +2066,38 @@ class DirpathSetting(ValidatableStringSetting):
   
   def __init__(self, name, **kwargs):
     super().__init__(name, pgpath.DirpathValidator, **kwargs)
+
+
+class FileSetting(Setting):
+  """Class for settings storing files or directories as `Gio.File` instances
+  (``GFile`` type).
+
+  Default value:
+    A `Gio.File` instance with no path (`Gio.File.get_path()` returns ``None``).
+  """
+
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_path('')
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_file_entry]
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid file.')
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, str):
+      return Gio.file_new_for_path(raw_value)
+    elif raw_value is None:
+      return Gio.file_new_for_path('')
+    else:
+      return raw_value
+
+  def _value_to_raw(self, value, source_type):
+    return value.get_path()
+
+  def _validate(self, file_):
+    if not isinstance(file_, Gio.File):
+      raise SettingValueError(
+        utils_.value_to_str_prefix(file_) + self.error_messages['invalid_value'])
 
 
 class GimpResourceSetting(Setting):

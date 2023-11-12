@@ -1410,6 +1410,40 @@ class TestFileExtensionSetting(unittest.TestCase):
       self.assertEqual(str(e), 'my custom message')
 
 
+class TestFileSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = settings_.FileSetting('file')
+
+  def test_with_default_default_value(self):
+    self.assertIsInstance(self.setting.value, Gio.File)
+    self.assertIsNone(self.setting.value.get_path())
+
+  def test_set_value_with_string(self):
+    cwd = os.getcwd()
+    self.setting.set_value(cwd)
+
+    self.assertEqual(self.setting.value.get_path(), cwd)
+
+  def test_set_value_with_none(self):
+    self.setting.set_value(None)
+
+    self.assertIsInstance(self.setting.value, Gio.File)
+    self.assertIsNone(self.setting.value.get_path())
+
+  def test_to_dict(self):
+    cwd = os.getcwd()
+    self.setting.set_value(cwd)
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'file',
+        'value': cwd,
+        'type': 'file',
+      })
+
+
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestBrushSetting(unittest.TestCase):

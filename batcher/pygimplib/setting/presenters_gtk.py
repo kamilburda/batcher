@@ -1,6 +1,7 @@
 """`setting.Presenter` subclasses for GTK GUI widgets."""
 
 import inspect
+import os.path
 import sys
 
 import gi
@@ -8,6 +9,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
@@ -487,6 +489,29 @@ class FileExtensionEntryPresenter(ExtendedEntryPresenter):
   
   def _create_widget(self, setting, **kwargs):
     return pggui.FileExtensionEntry()
+
+
+class GFileEntryPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.Entry` widgets used to store file or
+  folder paths returning a `Gio.File` instance on output.
+
+  Value: Current file or folder path as a `Gio.File` instance.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    widget = Gtk.Entry(text=setting.value.get_path())
+    widget.set_position(-1)
+
+    return widget
+
+  def _get_value(self):
+    return Gio.file_new_for_path(self._widget.get_text())
+
+  def _set_value(self, value):
+    self._widget.set_text(
+      value.get_path() if value is not None and value.get_path() is not None else '')
+    # Place the cursor at the end of the text entry.
+    self._widget.set_position(-1)
 
 
 class FolderChooserWidgetPresenter(GtkPresenter):
