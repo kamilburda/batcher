@@ -147,7 +147,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_options_on_create': True,
     'arguments': [
       {
-        'type': 'directory',
+        'type': 'dirpath',
         'name': 'output_directory',
         'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         'display_name': _('Output folder'),

@@ -198,7 +198,7 @@ def _get_basic_settings():
     },
     {
       'name': 'directory',
-      'type': 'directory',
+      'type': 'dirpath',
     },
     
     {

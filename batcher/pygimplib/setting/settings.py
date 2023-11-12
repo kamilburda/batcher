@@ -2056,8 +2056,6 @@ class DirpathSetting(ValidatableStringSetting):
   * ``''``
   """
   
-  _ALIASES = ['directory']
-  
   _ALLOWED_GUI_TYPES = [
     SettingGuiTypes.folder_chooser_widget,
     SettingGuiTypes.folder_chooser_button,
