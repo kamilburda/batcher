@@ -2345,6 +2345,22 @@ class PatternSetting(GimpResourceSetting):
     self.error_messages['invalid_value'] = _('Invalid pattern.')
 
 
+class UnitSetting(IntSetting):
+  """Class for integer settings representing IDs of `Gimp.Unit` instances.
+
+  Allowed GIMP PDB types:
+  * `Gimp.Unit`
+
+  Default value: 0
+  """
+
+  _ALLOWED_PDB_TYPES = [Gimp.Unit]
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.int_spin_button]
+
+  _DEFAULT_DEFAULT_VALUE = 0
+
+
 class ArraySetting(Setting):
   """Class for settings storing arrays of the specified type.
   
