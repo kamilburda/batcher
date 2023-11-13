@@ -2100,6 +2100,43 @@ class FileSetting(Setting):
         utils_.value_to_str_prefix(file_) + self.error_messages['invalid_value'])
 
 
+class BytesSetting(Setting):
+  """Class for settings storing byte sequences as `GLib.Bytes` (``GBytes``)
+  instances.
+
+  Default value:
+    An empty `GLib.Bytes` instance (`GLib.Bytes.get_data()` returns ``None``).
+  """
+
+  _DEFAULT_DEFAULT_VALUE = GLib.Bytes.new()
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_bytes_entry]
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid byte sequence.')
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, str):
+      return GLib.Bytes.new(pgutils.escaped_string_to_bytes(raw_value, remove_overflow=True))
+    elif isinstance(raw_value, bytes):
+      return GLib.Bytes.new(raw_value)
+    elif isinstance(raw_value, list):  # Presumably list of valid integers
+      try:
+        return GLib.Bytes.new(raw_value)
+      except (TypeError, ValueError, OverflowError):
+        return GLib.Bytes.new()
+    else:
+      return raw_value
+
+  def _value_to_raw(self, value, source_type):
+    return list(value.get_data())
+
+  def _validate(self, file_):
+    if not isinstance(file_, GLib.Bytes):
+      raise SettingValueError(
+        utils_.value_to_str_prefix(file_) + self.error_messages['invalid_value'])
+
+
 class GimpResourceSetting(Setting):
   """Abstract class for settings storing `Gimp.Resource` instances (brushes,
   fonts, etc.).

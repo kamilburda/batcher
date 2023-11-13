@@ -1,5 +1,6 @@
 """Utility functions and classes."""
 
+import ast
 import contextlib
 import inspect
 import struct
@@ -152,3 +153,62 @@ def signed_bytes_to_bytes(data: Tuple[int, ...]) -> bytes:
   255.
   """
   return struct.pack(f'>{len(data)}b', *data)
+
+
+def escaped_string_to_bytes(str_: str, remove_overflow: bool = False) -> bytes:
+  """Converts the input string with escaped characters to a byte sequence.
+
+  Any characters after "unescaping" in the input string with an ordinal number
+  higher than 255 will cause an overflow error to be raised. You can pass
+  ``remove_overflow=True`` to remove such characters.
+
+  The input string is meant to contain escape sequences such as ``'\\x7f'`` for
+  special characters rather than the corresponding unescaped characters.
+  If the input string contains certain unescaped characters (such as the NUL
+  character), they are internally escaped to make sure that the whole string is
+  unescaped without errors.
+  """
+  processed_str = (
+    str_.replace('\x00', '\\x00')  # NUL character
+    .replace('\x0a', '\\x0a')  # LF character
+    .replace('\x0d', '\\x0d')  # CR character
+    .replace('"', '\\x22')  # `"` is used to enclose strings in `ast.literal_eval()`
+  )
+
+  processed_str = ast.literal_eval(f'"{processed_str}"')
+  return string_to_bytes(processed_str, remove_overflow=remove_overflow)
+
+
+def string_to_bytes(str_: str, remove_overflow: bool = False) -> bytes:
+  """Converts the input string to a byte sequence.
+
+  Any characters in the input string with an ordinal number higher than 255 will
+  cause an overflow error to be raised. You can pass ``remove_overflow=True`` to
+  remove such characters.
+  """
+  if remove_overflow:
+    str_processed = ''.join([i for i in str_ if ord(i) <= 255])
+  else:
+    str_processed = str_
+
+  return bytes(ord(c) for c in str_processed)
+
+
+def bytes_to_escaped_string(bytes_: bytes) -> str:
+  """Converts the input byte sequence to a string with escaped special character
+  sequences.
+
+  For example, a byte sequence ``b'Test\x00\x7f\xffdata'`` will be converted to
+  ``'Test\\x00\\x7f\\xffdata'``.
+  """
+  # Removes the `b'` prefix and the `'` suffix
+  return repr(bytes_)[2:-1]
+
+
+def bytes_to_string(bytes_: bytes) -> str:
+  """Converts the input byte sequence to a string.
+
+  For example, a byte sequence ``b'Test\x00\x7f\xffdata'`` will be converted to
+  ``'Test\x00\x7f\xffdata'``.
+  """
+  return bytes_.decode('ansi')

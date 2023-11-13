@@ -1444,6 +1444,52 @@ class TestFileSetting(unittest.TestCase):
       })
 
 
+class TestBytesSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = settings_.BytesSetting('bytes')
+
+  def test_with_default_default_value(self):
+    self.assertIsInstance(self.setting.value, GLib.Bytes)
+    self.assertEqual(self.setting.value.get_data(), b'')
+
+  def test_set_value_with_gbytes(self):
+    self.setting.set_value(GLib.Bytes.new(b'Test\x00\x7f\xffdata'))
+
+    self.assertEqual(self.setting.value.get_data(), b'Test\x00\x7f\xffdata')
+
+  def test_set_value_with_string(self):
+    self.setting.set_value('Test\x00\x7f\xffdata')
+
+    self.assertEqual(self.setting.value.get_data(), b'Test\x00\x7f\xffdata')
+
+  def test_set_value_with_bytes(self):
+    self.setting.set_value(b'Test\x00\x7f\xffdata')
+
+    self.assertEqual(self.setting.value.get_data(), b'Test\x00\x7f\xffdata')
+
+  def test_set_value_with_list(self):
+    self.setting.set_value(list(b'Test\x00\x7f\xffdata'))
+
+    self.assertEqual(self.setting.value.get_data(), b'Test\x00\x7f\xffdata')
+
+  def test_set_value_with_list_invalid_values_return_empty_bytes(self):
+    self.setting.set_value([72, 280])
+
+    self.assertEqual(self.setting.value.get_data(), b'')
+
+  def test_to_dict(self):
+    self.setting.set_value(b'Test\x00\x7f\xffdata')
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'bytes',
+        'value': list(b'Test\x00\x7f\xffdata'),
+        'type': 'bytes',
+      })
+
+
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestBrushSetting(unittest.TestCase):

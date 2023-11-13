@@ -16,6 +16,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from .. import gui as pggui
+from .. import utils as pgutils
 
 from . import presenter as presenter_
 
@@ -510,6 +511,29 @@ class GFileEntryPresenter(GtkPresenter):
   def _set_value(self, value):
     self._widget.set_text(
       value.get_path() if value is not None and value.get_path() is not None else '')
+    # Place the cursor at the end of the text entry.
+    self._widget.set_position(-1)
+
+
+class GBytesEntryPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.Entry` widgets used to store raw
+  bytes.
+
+  Value: Raw bytes as a `GLib.Bytes` instance.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    widget = Gtk.Entry(text=pgutils.bytes_to_escaped_string(setting.value.get_data()))
+    widget.set_position(-1)
+
+    return widget
+
+  def _get_value(self):
+    return GLib.Bytes.new(
+      pgutils.escaped_string_to_bytes(self._widget.get_text(), remove_overflow=True))
+
+  def _set_value(self, value):
+    self._widget.set_text(pgutils.bytes_to_escaped_string(value.get_data()))
     # Place the cursor at the end of the text entry.
     self._widget.set_position(-1)
 

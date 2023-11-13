@@ -92,3 +92,60 @@ class TestCreateOnlyProperty(unittest.TestCase):
 
     with self.assertRaises(AttributeError):
       obj.some_property = 'new_value'
+
+
+class TestBytesRelatedFunctions(unittest.TestCase):
+
+  def test_bytes_to_signed_bytes(self):
+    self.assertEqual(
+      pgutils.bytes_to_signed_bytes(b'Test\x00\x7f\xffdata'),
+      (84, 101, 115, 116, 0, 127, -1, 100, 97, 116, 97),
+    )
+
+  def test_signed_bytes_to_bytes(self):
+    self.assertEqual(
+      pgutils.signed_bytes_to_bytes((84, 101, 115, 116, 0, 127, -1, 100, 97, 116, 97)),
+      b'Test\x00\x7f\xffdata',
+    )
+
+  def test_string_to_bytes(self):
+    self.assertEqual(
+      pgutils.string_to_bytes('Test\x00\x7f\xffdata'),
+      b'Test\x00\x7f\xffdata',
+    )
+
+  def test_string_to_bytes_with_remove_overflow(self):
+    self.assertEqual(
+      pgutils.string_to_bytes('Test\x00\x7f\xff\u0400data', remove_overflow=True),
+      b'Test\x00\x7f\xffdata',
+    )
+
+  def test_escaped_string_to_bytes(self):
+    self.assertEqual(
+      pgutils.escaped_string_to_bytes('Test\\x00\\x7f\\xffdata'),
+      b'Test\x00\x7f\xffdata',
+    )
+
+  def test_escaped_string_to_bytes_unescaped_special_characters_are_removed_or_processed(self):
+    self.assertEqual(
+      pgutils.escaped_string_to_bytes('Test\x00\x0a\x0d"\\x7f\\xffdata'),
+      b'Test\x00\x0a\x0d"\x7f\xffdata',
+    )
+
+  def test_escaped_string_to_bytes_with_remove_overflow(self):
+    self.assertEqual(
+      pgutils.escaped_string_to_bytes('Test\\x00\\x7f\\xff\\u0400data', remove_overflow=True),
+      b'Test\x00\x7f\xffdata',
+    )
+
+  def test_bytes_to_string(self):
+    self.assertEqual(
+      pgutils.bytes_to_string(b'Test\x00\x7f\xffdata'),
+      'Test\x00\x7f\xffdata',
+    )
+
+  def test_bytes_to_escaped_string(self):
+    self.assertEqual(
+      pgutils.bytes_to_escaped_string(b'Test\x00\x7f\xffdata'),
+      'Test\\x00\\x7f\\xffdata',
+    )

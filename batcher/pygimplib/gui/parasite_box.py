@@ -129,9 +129,7 @@ class ParasiteBox(Gtk.Box):
       self._parasite_name_entry.get_text(),
       self._parasite_flags_spin_button.get_value_as_int(),
       pgutils.bytes_to_signed_bytes(
-        self._string_to_bytes(
-          self._remove_non_ascii_chars(
-            self._parasite_data_entry.get_text()))))
+        pgutils.string_to_bytes(self._parasite_data_entry.get_text(), remove_overflow=True)))
   
   def _set_values(self, parasite):
     self._should_invoke_parasite_changed_signal = False
@@ -139,7 +137,7 @@ class ParasiteBox(Gtk.Box):
     self._parasite_name_entry.set_text(parasite.get_name())
     self._parasite_flags_spin_button.set_value(parasite.get_flags())
     self._parasite_data_entry.set_text(
-      self._bytes_to_string(pgutils.signed_bytes_to_bytes(parasite.get_data())))
+      pgutils.bytes_to_string(pgutils.signed_bytes_to_bytes(parasite.get_data())))
     
     self._should_invoke_parasite_changed_signal = True
   
@@ -151,19 +149,6 @@ class ParasiteBox(Gtk.Box):
   def _on_parasite_changed(self, widget, *args, **kwargs):
     if self._should_invoke_parasite_changed_signal:
       self.emit('parasite-changed')
-
-  @staticmethod
-  def _remove_non_ascii_chars(str_):
-    return ''.join([i for i in str_ if ord(i) <= 255])
-
-  @staticmethod
-  def _string_to_bytes(str_):
-    return bytes([ord(c) for c in str_])
-
-  @staticmethod
-  def _bytes_to_string(bytes_):
-    # Removes the `b'` prefix and `'` suffix
-    return repr(bytes_)[2:-1]
 
 
 GObject.type_register(ParasiteBox)
