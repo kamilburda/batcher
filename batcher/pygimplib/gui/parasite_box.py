@@ -129,7 +129,8 @@ class ParasiteBox(Gtk.Box):
       self._parasite_name_entry.get_text(),
       self._parasite_flags_spin_button.get_value_as_int(),
       pgutils.bytes_to_signed_bytes(
-        pgutils.string_to_bytes(self._parasite_data_entry.get_text(), remove_overflow=True)))
+        pgutils.escaped_string_to_bytes(
+          self._parasite_data_entry.get_text(), remove_overflow=True)))
   
   def _set_values(self, parasite):
     self._should_invoke_parasite_changed_signal = False
@@ -137,7 +138,7 @@ class ParasiteBox(Gtk.Box):
     self._parasite_name_entry.set_text(parasite.get_name())
     self._parasite_flags_spin_button.set_value(parasite.get_flags())
     self._parasite_data_entry.set_text(
-      pgutils.bytes_to_string(pgutils.signed_bytes_to_bytes(parasite.get_data())))
+      pgutils.bytes_to_escaped_string(pgutils.signed_bytes_to_bytes(parasite.get_data())))
     
     self._should_invoke_parasite_changed_signal = True
   
