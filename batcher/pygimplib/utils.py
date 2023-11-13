@@ -175,8 +175,12 @@ def escaped_string_to_bytes(str_: str, remove_overflow: bool = False) -> bytes:
     .replace('"', '\\x22')  # `"` is used to enclose strings in `ast.literal_eval()`
   )
 
-  processed_str = ast.literal_eval(f'"{processed_str}"')
-  return string_to_bytes(processed_str, remove_overflow=remove_overflow)
+  try:
+    processed_str = ast.literal_eval(f'"{processed_str}"')
+  except Exception:
+    return b''
+  else:
+    return string_to_bytes(processed_str, remove_overflow=remove_overflow)
 
 
 def string_to_bytes(str_: str, remove_overflow: bool = False) -> bytes:
