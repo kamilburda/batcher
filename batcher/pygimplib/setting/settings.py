@@ -1753,6 +1753,32 @@ class LayerSetting(GimpItemSetting):
         utils_.value_to_str_prefix(layer) + self.error_messages['invalid_value'])
 
 
+class TextLayerSetting(GimpItemSetting):
+  """Class for settings holding `Gimp.TextLayer` instances.
+
+  Allowed GIMP PDB types:
+  * `Gimp.TextLayer`
+
+  Error messages:
+  * ``'invalid_value'``: The text layer assigned is not valid.
+  """
+
+  _ALLOWED_PDB_TYPES = [Gimp.TextLayer]
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.text_layer_combo_box]
+
+  def _copy_value(self, value):
+    return value
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid text layer.')
+
+  def _validate(self, layer):
+    if layer is not None and not layer.is_text_layer():
+      raise SettingValueError(
+        utils_.value_to_str_prefix(layer) + self.error_messages['invalid_value'])
+
+
 class ChannelSetting(GimpItemSetting):
   """Class for settings holding `Gimp.Channel` instances.
   

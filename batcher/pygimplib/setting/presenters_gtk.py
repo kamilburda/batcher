@@ -353,6 +353,29 @@ class LayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
+class TextLayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
+  """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+  the choices to `Gimp.TextLayer` instances.
+
+  Value: `Gimp.TextLayer` selected in the combo box, or ``None`` if there is no
+  text layer available.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    return GimpUi.LayerComboBox.new(lambda image, item: item.is_text_layer())
+
+  def _get_value(self):
+    return Gimp.TextLayer.get_by_id(self._widget.get_active().value)
+
+  def _set_value(self, value):
+    """Sets a `Gimp.TextLayer` instance to be selected in the combo box.
+
+    Passing ``None`` has no effect.
+    """
+    if value is not None:
+      self._widget.set_active(value.get_id())
+
+
 class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.ChannelComboBox` widgets.
   
