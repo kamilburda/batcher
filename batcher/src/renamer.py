@@ -249,7 +249,7 @@ def _get_layer_path(
   path_components = [parent.name for parent in item.parents]
   path_components += [_get_layer_name(batcher, item, field_value, file_extension_strip_mode)]
   
-  return separator.join([wrapper.format(path_component) for path_component in path_components])
+  return separator.join(wrapper.format(path_component) for path_component in path_components)
 
 
 def _get_tags(batcher, item, field_value, *args):
@@ -303,7 +303,7 @@ def _get_tags(batcher, item, field_value, *args):
       else:
         _insert_specified_tags(args)
   
-  return tag_separator.join([tag_wrapper.format(tag) for tag in tags_to_insert])
+  return tag_separator.join(tag_wrapper.format(tag) for tag in tags_to_insert)
 
 
 def _get_current_date(batcher, item, field_value, date_format='%Y-%m-%d'):

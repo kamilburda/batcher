@@ -191,7 +191,7 @@ def string_to_bytes(str_: str, remove_overflow: bool = False) -> bytes:
   remove such characters.
   """
   if remove_overflow:
-    str_processed = ''.join([i for i in str_ if ord(i) <= 255])
+    str_processed = ''.join(i for i in str_ if ord(i) <= 255)
   else:
     str_processed = str_
 

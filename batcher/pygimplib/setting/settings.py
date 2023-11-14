@@ -2082,7 +2082,7 @@ class ValidatableStringSetting(StringSetting):
       
       raise SettingValueError(
         utils_.value_to_str_prefix(string_)
-        + '\n'.join([message for message in new_status_messages]))
+        + '\n'.join(message for message in new_status_messages))
 
 
 class FileExtensionSetting(ValidatableStringSetting):
@@ -2849,7 +2849,7 @@ class ArraySetting(Setting):
         self._elements.append(element)
 
     if exception_occurred:
-      raise SettingValueError('\n'.join([str(e) for e in exceptions]))
+      raise SettingValueError('\n'.join(str(e) for e in exceptions))
 
     self._value = self._array_as_tuple()
   

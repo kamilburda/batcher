@@ -40,9 +40,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     if os.path.exists(INCORRECT_RESULTS_DIRPATH):
       shutil.rmtree(INCORRECT_RESULTS_DIRPATH)
 
-    gimp_version = '-'.join([
+    gimp_version = '-'.join(
       str(version_number_part) for version_number_part in pg.utils.get_gimp_version_as_tuple()[:2]
-    ])
+    )
 
     version_specific_expected_results_dirpath = (
       f'{DEFAULT_EXPECTED_RESULTS_DIRPATH}_{gimp_version}')

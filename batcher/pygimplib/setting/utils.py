@@ -289,7 +289,7 @@ def get_setting_path(
   parent, the topmost parent is omitted.
   """
   def _get_setting_path(path_components):
-    return separator.join([setting_.name for setting_ in path_components])
+    return separator.join(setting_.name for setting_ in path_components)
   
   if relative_path_group == 'root':
     if setting.parents:
