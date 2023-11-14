@@ -15,6 +15,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import path as pgpath
+from ..pypdb import pdb
 from .. import pdbutils as pgpdbutils
 from .. import utils as pgutils
 
@@ -1654,21 +1655,22 @@ class GimpItemSetting(Setting):
   
   def _value_to_raw(self, value, source_type):
     if source_type == 'session':
-      return self._get_item_as_id(value)
+      return self._item_to_id(value)
     else:
-      return pgpdbutils.get_item_as_path(value)
-  
-  @staticmethod
-  def _get_item_from_image_and_item_path(image_filepath, item_type_name, item_path):
+      return self._item_to_path(value)
+
+  def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
     image = pgpdbutils.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None
 
     return pgpdbutils.get_item_from_image_and_item_path(image, item_type_name, item_path)
-  
-  @staticmethod
-  def _get_item_as_id(item):
+
+  def _item_to_path(self, item):
+    return pgpdbutils.get_item_as_path(item)
+
+  def _item_to_id(self, item):
     if item is not None:
       return item.get_id()
     else:
@@ -1777,6 +1779,51 @@ class TextLayerSetting(GimpItemSetting):
     if layer is not None and not layer.is_text_layer():
       raise SettingValueError(
         utils_.value_to_str_prefix(layer) + self.error_messages['invalid_value'])
+
+
+class LayerMaskSetting(GimpItemSetting):
+  """Class for settings holding `Gimp.LayerMask` instances.
+
+  When serializing to a persistent source, the setting value as returned by
+  `Setting.to_dict()` corresponds to the layer path the layer mask is attached
+  to.
+
+  Allowed GIMP PDB types:
+  * `Gimp.LayerMask`
+
+  Error messages:
+  * ``'invalid_value'``: The layer mask assigned is not valid.
+  """
+
+  _ALLOWED_PDB_TYPES = [Gimp.LayerMask]
+
+  _ALLOWED_GUI_TYPES = [SettingGuiTypes.layer_mask_combo_box]
+
+  def _copy_value(self, value):
+    return value
+
+  def _init_error_messages(self):
+    self.error_messages['invalid_value'] = _('Invalid layer mask.')
+
+  def _validate(self, drawable):
+    if drawable is not None and not drawable.is_layer_mask():
+      raise SettingValueError(
+        utils_.value_to_str_prefix(drawable) + self.error_messages['invalid_value'])
+
+  def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
+    layer = super()._get_item_from_image_and_item_path(image_filepath, item_type_name, item_path)
+
+    if layer is not None:
+      return layer.get_mask()
+    else:
+      return None
+
+  def _item_to_path(self, item):
+    layer = pdb.gimp_layer_from_mask(item)
+    if layer is not None:
+      return super()._item_to_path(layer)
+    else:
+      return None
 
 
 class ChannelSetting(GimpItemSetting):

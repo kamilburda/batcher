@@ -145,6 +145,21 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
   def is_group(self):
     return self._is_group
 
+  def is_layer(self):
+    return False
+
+  def is_layer_mask(self):
+    return False
+
+  def is_drawable(self):
+    return False
+
+  def is_channel(self):
+    return False
+
+  def is_vectors(self):
+    return False
+
   def get_width(self):
     return self.width
 
@@ -172,10 +187,24 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
 class Layer(Item):
 
+  def __init__(self, mask=None, **kwargs):
+    super().__init__(**kwargs)
+
+    self.mask = mask
+
   def is_layer(self):
     return True
 
   def is_drawable(self):
+    return True
+
+  def get_mask(self):
+    return self.mask
+
+
+class LayerMask(Item):
+
+  def is_layer_mask(self):
     return True
 
 
@@ -349,6 +378,7 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   Item = Item
   Layer = Layer
+  LayerMask = LayerMask
   Channel = Channel
   Vectors = Vectors
 

@@ -1164,7 +1164,7 @@ class TestGimpItemSetting(unittest.TestCase):
     
     self.assertIsNone(self.setting.value)
   
-  def test_set_value_with_list_with_id(self):
+  def test_set_value_with_id(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
     ) as temp_mock_gimp_module:
@@ -1174,7 +1174,7 @@ class TestGimpItemSetting(unittest.TestCase):
     
     self.assertEqual(self.setting.value, self.layer)
   
-  def test_set_value_with_list_with_invalid_id(self):
+  def test_set_value_with_invalid_id(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
     ) as temp_mock_gimp_module:
@@ -1248,6 +1248,86 @@ class TestGimpItemSetting(unittest.TestCase):
         'value': 2,
         'type': 'stub_item',
         'default_value': 2,
+      })
+
+
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb', new=mock.MagicMock())
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+class TestLayerMaskSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = settings_.LayerMaskSetting('mask')
+
+    self.mask = stubs_gimp.LayerMask(name='mask')
+
+    self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
+    self.image.set_file(Gio.file_new_for_path('image_filepath'))
+
+    self.parent = stubs_gimp.Layer(name='group', is_group=True)
+
+    self.layer = stubs_gimp.Layer(name='layer', mask=self.mask)
+    self.layer.parent = self.parent
+    self.layer.image = self.image
+
+    self.image.layers = [self.parent]
+    self.parent.children = [self.layer]
+
+  def test_set_value_from_layer_mask(self):
+    self.setting.set_value(self.mask)
+    self.assertEqual(self.setting.value, self.mask)
+
+  def test_set_value_with_id(self):
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
+    ) as temp_mock_gimp_module:
+      temp_mock_gimp_module.Item.get_by_id.return_value = self.mask
+
+      self.setting.set_value(2)
+
+    self.assertEqual(self.setting.value, self.mask)
+
+  def test_set_value_with_list_containing_layer_path(self):
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.return_value = [self.image]
+
+      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group/layer'])
+
+    self.assertEqual(self.setting.value, self.mask)
+
+  def test_to_dict(self):
+    self.setting.set_value(self.mask)
+
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb.gimp_layer_from_mask'
+    ) as temp_mock_pdb_func:
+      temp_mock_pdb_func.return_value = self.layer
+
+      setting_dict = self.setting.to_dict()
+
+    self.assertDictEqual(
+      setting_dict,
+      {
+        'name': 'mask',
+        'value': [os.path.abspath('image_filepath'), 'Layer', 'group/layer'],
+        'type': 'layer_mask',
+      })
+
+  def test_to_dict_with_session_source_type(self):
+    self.setting.set_value(self.mask)
+
+    setting_dict = self.setting.to_dict(source_type='session')
+
+    self.assertDictEqual(
+      setting_dict,
+      {
+        'name': 'mask',
+        'value': self.mask.get_id(),
+        'type': 'layer_mask',
       })
 
 

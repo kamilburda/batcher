@@ -16,6 +16,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from .. import gui as pggui
+from ..pypdb import pdb
 from .. import utils as pgutils
 
 from . import presenter as presenter_
@@ -374,6 +375,38 @@ class TextLayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
     """
     if value is not None:
       self._widget.set_active(value.get_id())
+
+
+class LayerMaskComboBoxPresenter(GimpUiIntComboBoxPresenter):
+  """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+  the choices to `Gimp.Layer` instances having a layer mask.
+
+  Value: `Gimp.LayerMask` from a `Gimp.Layer` selected in the combo box, or
+  ``None`` if there is no layer with a mask available.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    return GimpUi.LayerComboBox.new(
+      lambda image, item: item.is_layer() and item.get_mask() is not None)
+
+  def _get_value(self):
+    layer = Gimp.Layer.get_by_id(self._widget.get_active().value)
+
+    if layer is not None:
+      return layer.get_mask()
+    else:
+      return None
+
+  def _set_value(self, value):
+    """Sets a `Gimp.Layer` instance having the specified `Gimp.LayerMask` to be
+    selected in the combo box.
+
+    Passing ``None`` has no effect.
+    """
+    if value is not None and value.is_layer_mask():
+      layer = pdb.gimp_layer_from_mask(value)
+      if layer is not None:
+        self._widget.set_active(layer.get_id())
 
 
 class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
