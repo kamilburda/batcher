@@ -2145,11 +2145,16 @@ class FileSetting(Setting):
   """Class for settings storing files or directories as `Gio.File` instances
   (``GFile`` type).
 
+  Allowed GIMP PDB types:
+  * `Gio.File`
+
   Default value:
     A `Gio.File` instance with no path (`Gio.File.get_path()` returns ``None``).
   """
 
   _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_path('')
+
+  _ALLOWED_PDB_TYPES = [Gio.File]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_file_entry]
 
@@ -2177,11 +2182,16 @@ class BytesSetting(Setting):
   """Class for settings storing byte sequences as `GLib.Bytes` (``GBytes``)
   instances.
 
+  Allowed GIMP PDB types:
+  * `GLib.Bytes`
+
   Default value:
     An empty `GLib.Bytes` instance (`GLib.Bytes.get_data()` returns ``None``).
   """
 
   _DEFAULT_DEFAULT_VALUE = GLib.Bytes.new()
+
+  _ALLOWED_PDB_TYPES = [GLib.Bytes]
 
   _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_bytes_entry]
 
