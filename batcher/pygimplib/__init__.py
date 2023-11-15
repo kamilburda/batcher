@@ -67,8 +67,8 @@ from .procedure import main
 from .procedure import register_procedure
 from .procedure import set_use_locale
 from .pypdb import pdb
-from .setting import SettingGuiTypes
-from .setting import SettingTypes
+from .setting import SETTING_GUI_TYPES
+from .setting import SETTING_TYPES
 
 __all__ = [
   # Modules
@@ -93,8 +93,8 @@ __all__ = [
   'pdb',
   'register_procedure',
   'set_use_locale',
-  'SettingGuiTypes',
-  'SettingTypes',
+  'SETTING_GUI_TYPES',
+  'SETTING_TYPES',
 ]
 
 

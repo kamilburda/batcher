@@ -590,28 +590,28 @@ class ExportLayersDialog:
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui({
       'main/file_extension': [
-        pg.setting.SettingGuiTypes.extended_entry, self._file_extension_entry],
+        pg.setting.SETTING_GUI_TYPES.extended_entry, self._file_extension_entry],
       'main/layer_filename_pattern': [
-        pg.setting.SettingGuiTypes.extended_entry, self._filename_pattern_entry],
+        pg.setting.SETTING_GUI_TYPES.extended_entry, self._filename_pattern_entry],
       'main/edit_mode': [
-        pg.setting.SettingGuiTypes.check_menu_item, self._menu_item_edit_mode],
+        pg.setting.SETTING_GUI_TYPES.check_menu_item, self._menu_item_edit_mode],
       'gui/show_more_settings': [
-        pg.setting.SettingGuiTypes.check_menu_item, self._menu_item_show_more_settings],
+        pg.setting.SETTING_GUI_TYPES.check_menu_item, self._menu_item_show_more_settings],
       'gui/image_preview_automatic_update': [
-        pg.setting.SettingGuiTypes.check_menu_item,
+        pg.setting.SETTING_GUI_TYPES.check_menu_item,
         self._image_preview.menu_item_update_automatically],
       'gui/size/dialog_position': [
-        pg.setting.SettingGuiTypes.window_position, self._dialog],
+        pg.setting.SETTING_GUI_TYPES.window_position, self._dialog],
       'gui/size/dialog_size': [
-        pg.setting.SettingGuiTypes.window_size, self._dialog],
+        pg.setting.SETTING_GUI_TYPES.window_size, self._dialog],
       'gui/size/paned_outside_previews_position': [
-        pg.setting.SettingGuiTypes.paned_position, self._hpaned_settings_and_previews],
+        pg.setting.SETTING_GUI_TYPES.paned_position, self._hpaned_settings_and_previews],
       'gui/size/paned_between_previews_position': [
-        pg.setting.SettingGuiTypes.paned_position, self._vpaned_previews],
+        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_previews],
       'gui/size/settings_vpane_position': [
-        pg.setting.SettingGuiTypes.paned_position, self._vpaned_chooser_and_actions],
+        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_chooser_and_actions],
       'gui/current_directory': [
-        pg.setting.SettingGuiTypes.folder_chooser_widget, self._folder_chooser],
+        pg.setting.SETTING_GUI_TYPES.folder_chooser_widget, self._folder_chooser],
     })
   
   def _init_gui_previews(self):

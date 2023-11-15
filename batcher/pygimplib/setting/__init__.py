@@ -1,6 +1,7 @@
 """API for plug-in settings."""
 
 from .group import *
+from .meta import *
 from .pdbparams import *
 from .persistor import *
 from .presenter import *

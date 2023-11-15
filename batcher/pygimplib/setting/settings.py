@@ -23,27 +23,10 @@ from . import meta as meta_
 from . import persistor as persistor_
 from . import presenter as presenter_
 # Despite being unused, `presenters_gtk` must be imported so that the GUI
-# classes defined there are properly registered and `SettingGuiTypes` is filled.
+# classes defined there are properly registered and `SETTING_GUI_TYPES` is filled.
 # noinspection PyUnresolvedReferences
 from . import presenters_gtk
 from . import utils as utils_
-
-
-SettingTypes = meta_.SettingTypes
-"""Class whose attributes are mapped to `setting.Setting` subclasses.
-
-The attribute names are a more human-readable alternative to `setting.Setting`
-subclass names and are used as strings when saving or loading setting data from
-a persistent source.
-"""
-
-SettingGuiTypes = meta_.SettingGuiTypes
-"""Class whose attributes are mapped to `setting.Presenter` subclasses.
-
-The attribute names are a more human-readable alternative to `setting.Presenter`
-subclass names and are used as strings when saving or loading setting data from
-a persistent source.
-"""
 
 
 # FIXME: Rework this
@@ -73,6 +56,8 @@ PDB_TYPES_TO_SETTING_TYPES_MAP = {
   # gimpenums.PDB_STRINGARRAY: {'type': 'array', 'element_type': 'string'},
   # gimpenums.PDB_COLORARRAY: {'type': 'array', 'element_type': 'color'},
 }
+_SETTING_TYPES = meta_.SETTING_TYPES
+_SETTING_GUI_TYPES = meta_.SETTING_GUI_TYPES
 
 
 class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta_.SettingMeta):
@@ -669,7 +654,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     for key, val in self._dict_on_init.items():
       if key == 'gui_type' and val is not None and not isinstance(val, str):
         try:
-          gui_type_name = SettingGuiTypes[val]
+          gui_type_name = _SETTING_GUI_TYPES[val]
         except TypeError:
           raise TypeError(
             (f'"gui_type" does not have a valid value: "{val}";'
@@ -695,7 +680,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     settings_dict.update({
       'name': self.name,
       'value': self._value_to_raw(self.value, source_type),
-      'type': SettingTypes[type(self)],
+      'type': _SETTING_TYPES[type(self)],
     })
     
     return settings_dict
@@ -1162,7 +1147,7 @@ class IntSetting(NumericSetting):
     GObject.TYPE_ULONG,
   ]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.int_spin_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0
 
@@ -1179,7 +1164,7 @@ class FloatSetting(NumericSetting):
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_DOUBLE, GObject.TYPE_FLOAT]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.float_spin_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.float_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0.0
 
@@ -1198,10 +1183,10 @@ class BoolSetting(Setting):
   _ALLOWED_PDB_TYPES = [GObject.TYPE_BOOLEAN]
 
   _ALLOWED_GUI_TYPES = [
-    SettingGuiTypes.check_button,
-    SettingGuiTypes.check_button_no_text,
-    SettingGuiTypes.check_menu_item,
-    SettingGuiTypes.expander,
+    _SETTING_GUI_TYPES.check_button,
+    _SETTING_GUI_TYPES.check_button_no_text,
+    _SETTING_GUI_TYPES.check_menu_item,
+    _SETTING_GUI_TYPES.expander,
   ]
 
   _DEFAULT_DEFAULT_VALUE = False
@@ -1220,7 +1205,7 @@ class EnumSetting(Setting):
     subclass (e.g. `Gimp.RunMode.INTERACTIVE`).
   """
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.enum_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.enum_combo_box]
 
   # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
   _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self.enum_type.__enum_values__.values()), 0)
@@ -1359,7 +1344,7 @@ class ChoiceSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.combo_box]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: next((name for name in self._items), None)
   
@@ -1561,7 +1546,7 @@ class StringSetting(Setting):
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.entry]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.entry]
 
   _DEFAULT_DEFAULT_VALUE = ''
 
@@ -1584,7 +1569,7 @@ class ImageSetting(Setting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Image]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.image_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.image_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1689,7 +1674,7 @@ class ItemSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Item]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.item_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.item_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1715,7 +1700,7 @@ class DrawableSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Drawable]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.drawable_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.drawable_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1741,7 +1726,7 @@ class LayerSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Layer]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.layer_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1767,7 +1752,7 @@ class TextLayerSetting(GimpItemSetting):
 
   _ALLOWED_PDB_TYPES = [Gimp.TextLayer]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.text_layer_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.text_layer_combo_box]
 
   def _copy_value(self, value):
     return value
@@ -1797,7 +1782,7 @@ class LayerMaskSetting(GimpItemSetting):
 
   _ALLOWED_PDB_TYPES = [Gimp.LayerMask]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.layer_mask_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_mask_combo_box]
 
   def _copy_value(self, value):
     return value
@@ -1838,7 +1823,7 @@ class ChannelSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Channel]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.channel_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.channel_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1885,7 +1870,7 @@ class VectorsSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Vectors]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.vectors_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.vectors_combo_box]
   
   def _copy_value(self, value):
     return value
@@ -1915,7 +1900,7 @@ class ColorSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [Gimp.RGB]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.color_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
@@ -1965,7 +1950,7 @@ class DisplaySetting(Setting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Display]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.display_spin_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.display_spin_button]
 
   _EMPTY_VALUES = [None]
   
@@ -2010,7 +1995,7 @@ class ParasiteSetting(Setting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Parasite]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.parasite_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_box]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Parasite.new(self.name, 0, b'')
@@ -2096,8 +2081,8 @@ class FileExtensionSetting(ValidatableStringSetting):
   """
   
   _ALLOWED_GUI_TYPES = [
-    SettingGuiTypes.entry,
-    SettingGuiTypes.file_extension_entry,
+    _SETTING_GUI_TYPES.entry,
+    _SETTING_GUI_TYPES.file_extension_entry,
   ]
 
   _EMPTY_VALUES = ['']
@@ -2131,8 +2116,8 @@ class DirpathSetting(ValidatableStringSetting):
   """
   
   _ALLOWED_GUI_TYPES = [
-    SettingGuiTypes.folder_chooser_widget,
-    SettingGuiTypes.folder_chooser_button,
+    _SETTING_GUI_TYPES.folder_chooser_widget,
+    _SETTING_GUI_TYPES.folder_chooser_button,
   ]
 
   _EMPTY_VALUES = [None, '']
@@ -2156,7 +2141,7 @@ class FileSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [Gio.File]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_file_entry]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_file_entry]
 
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid file.')
@@ -2193,7 +2178,7 @@ class BytesSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GLib.Bytes]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.g_bytes_entry]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_bytes_entry]
 
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid byte sequence.')
@@ -2303,7 +2288,7 @@ class BrushSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Brush]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.brush_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.brush_select_button]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Brush, **kwargs)
@@ -2341,7 +2326,7 @@ class FontSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Font]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.font_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.font_select_button]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Font, **kwargs)
@@ -2364,7 +2349,7 @@ class GradientSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Gradient]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.gradient_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.gradient_select_button]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Gradient, **kwargs)
@@ -2387,7 +2372,7 @@ class PaletteSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Palette]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.palette_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.palette_select_button]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Palette, **kwargs)
@@ -2419,7 +2404,7 @@ class PatternSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Pattern]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.pattern_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.pattern_select_button]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Pattern, **kwargs)
@@ -2439,7 +2424,7 @@ class UnitSetting(IntSetting):
 
   _ALLOWED_PDB_TYPES = [Gimp.Unit]
 
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.int_spin_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0
 
@@ -2520,7 +2505,7 @@ class ArraySetting(Setting):
   
   ELEMENT_DEFAULT_VALUE = type('DefaultElementValue', (), {})()
   
-  _ALLOWED_GUI_TYPES = [SettingGuiTypes.array_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.array_box]
 
   _DEFAULT_DEFAULT_VALUE = ()
 
@@ -2665,7 +2650,7 @@ class ArraySetting(Setting):
       if key == 'element_default_value':
         settings_dict[key] = self._reference_element._value_to_raw(val, source_type)
       elif key == 'element_type':
-        settings_dict[key] = SettingTypes[type(self._reference_element)]
+        settings_dict[key] = _SETTING_TYPES[type(self._reference_element)]
     
     return settings_dict
   
@@ -3075,15 +3060,15 @@ def process_setting_type(setting_type_or_name: Union[Type[Setting], str]) -> Typ
   """Returns a `Setting` class based on the input type or name.
   
   ``setting_type_or_name`` can be a `Setting` class or a string
-  representing the class name or one of its aliases in `SettingTypes`.
+  representing the class name or one of its aliases in `setting.SETTING_TYPES`.
   
   `ValueError` is raised if ``setting_type_or_name`` is not valid.
   """
   return _process_type(
     setting_type_or_name,
-    SettingTypes,
+    _SETTING_TYPES,
     (f'setting type "{setting_type_or_name}" is not recognized; refer to'
-     ' pygimplib.setting.SettingTypes for the supported setting types and their'
+     ' pygimplib.setting.SETTING_TYPES for the supported setting types and their'
      ' aliases'))
 
 
@@ -3093,15 +3078,16 @@ def process_setting_gui_type(
   """Returns a `setting.Presenter` class based on the input type or name.
   
   ``setting_gui_type_or_name`` can be a `setting.Presenter` class or a string
-  representing the class name or one of its aliases in `SettingGuiTypes`.
+  representing the class name or one of its aliases in
+  `setting.SETTING_GUI_TYPES`.
   
   `ValueError` is raised if ``setting_gui_type_or_name`` is not valid.
   """
   return _process_type(
     setting_gui_type_or_name,
-    SettingGuiTypes,
+    _SETTING_GUI_TYPES,
     (f'setting GUI type "{setting_gui_type_or_name}" is not recognized; refer to'
-     ' pygimplib.setting.SettingGuiTypes for the supported setting GUI types'
+     ' pygimplib.setting.SETTING_GUI_TYPES for the supported setting GUI types'
      ' and their aliases'))
 
 
@@ -3118,8 +3104,6 @@ def _process_type(type_or_name, type_map, error_message):
 
 
 __all__ = [
-  'SettingTypes',
-  'SettingGuiTypes',
   'PDB_TYPES_TO_SETTING_TYPES_MAP',
   'SettingValueError',
   'SettingDefaultValueError',

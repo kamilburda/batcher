@@ -28,8 +28,8 @@ class FilenamePatternSetting(pg.setting.StringSetting):
   
   _ALLOWED_GUI_TYPES = [
     FilenamePatternEntryPresenter,
-    pg.SettingGuiTypes.extended_entry,
-    pg.SettingGuiTypes.entry,
+    pg.SETTING_GUI_TYPES.extended_entry,
+    pg.SETTING_GUI_TYPES.entry,
   ]
   
   def _assign_value(self, value):

@@ -54,6 +54,21 @@ class _TypeMap:
   
   def __hasattr__(self, name):
     return name in self._name_to_type_map
+
+  def __iter__(self):
+    return self.keys()
+
+  def keys(self):
+    for name in self._name_to_type_map:
+      yield name
+
+  def values(self):
+    for type_ in self._name_to_type_map.values():
+      yield type_
+
+  def items(self):
+    for name, type_ in self._name_to_type_map.items():
+      yield name, type_
   
   def _get_error_message(self, value):
     error_message = f'unrecognized type "{value}"'
@@ -63,8 +78,23 @@ class _TypeMap:
     return error_message
 
 
-SettingTypes = _TypeMap(description='setting type')
-SettingGuiTypes = _TypeMap(description='setting GUI type')
+SETTING_TYPES = _TypeMap(description='setting type')
+"""Class whose attributes are mapped to `setting.Setting` subclasses.
+
+The attribute names are a more human-readable alternative to `setting.Setting`
+subclass names and are used as strings when saving or loading setting data from
+a persistent source.
+"""
+
+SETTING_GUI_TYPES = _TypeMap(description='setting GUI type')
+"""Class whose attributes are mapped to `setting.Presenter` subclasses.
+
+The attribute names are a more human-readable alternative to `setting.Presenter`
+subclass names and are used as strings when saving or loading setting data from
+a persistent source.
+"""
+
+PDB_AND_SETTING_TYPES = collections.defaultdict(list)
 
 
 class SettingMeta(type):
@@ -91,7 +121,7 @@ class SettingMeta(type):
     
     cls = super().__new__(mcls, name, bases, namespace)
     
-    _register_type_and_aliases(namespace, cls, name, SettingTypes, 'Setting')
+    _register_type_and_aliases(namespace, cls, name, SETTING_TYPES, 'Setting')
     
     return cls
   
@@ -187,7 +217,7 @@ class PresenterMeta(type):
     
     cls = super(PresenterMeta, mcls).__new__(mcls, name, bases, namespace)
     
-    _register_type_and_aliases(namespace, cls, name, SettingGuiTypes, 'Presenter')
+    _register_type_and_aliases(namespace, cls, name, SETTING_GUI_TYPES, 'Presenter')
     
     return cls
   
