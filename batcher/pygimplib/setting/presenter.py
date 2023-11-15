@@ -112,7 +112,9 @@ class Presenter(metaclass=meta_.PresenterMeta):
       self._value_changed_signal = self._VALUE_CHANGED_SIGNAL
     else:
       self._value_changed_signal = None
-    
+
+    self._ignore_on_value_changed = False
+
     self._setting_value_synchronizer.apply_setting_value_to_gui = self._apply_setting_value_to_gui
 
     if create_widget_kwargs is None:
@@ -262,13 +264,18 @@ class Presenter(metaclass=meta_.PresenterMeta):
     
     The event is triggered when the user changes the value of the GUI widget.
     """
-    self._update_setting_value()
+    if not self._ignore_on_value_changed:
+      self._update_setting_value()
   
   def _apply_setting_value_to_gui(self, value):
     """Assigns the setting value to the GUI widget. Used by the setting when
     its `set_value()` method is called.
     """
+    self._ignore_on_value_changed = True
+
     self._set_value(value)
+
+    self._ignore_on_value_changed = False
 
 
 class NullPresenter(Presenter):
