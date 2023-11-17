@@ -7,6 +7,7 @@ from gi.repository import GObject
 from ...setting import group as group_
 from ...setting import presenter as presenter_
 from ...setting import settings as settings_
+from ...setting import utils as utils_
 
 from . import stubs_setting
 from . import stubs_group
@@ -39,7 +40,8 @@ class TestGroupAttributes(unittest.TestCase):
   
   def test_get_non_existent_setting_name(self):
     with self.assertRaises(KeyError):
-      unused_ = self.settings['invalid_name']
+      # noinspection PyStatementEffect
+      self.settings['invalid_name']
 
 
 class TestGroupAddWithSettingDict(unittest.TestCase):
@@ -47,9 +49,10 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
   def setUp(self):
     self.settings = group_.Group('main')
     self.setting_dict = {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'use_layer_size',
-      'default_value': False}
+      'default_value': False,
+    }
   
   def test_add(self):
     self.settings.add([self.setting_dict])
@@ -84,7 +87,7 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
       self.settings.add([self.setting_dict])
   
   def test_add_with_path_separator(self):
-    self.setting_dict['name'] = 'use/layer/size'
+    self.setting_dict['name'] = utils_.SETTING_PATH_SEPARATOR.join(['use', 'layer', 'size'])
     
     with self.assertRaises(ValueError):
       self.settings.add([self.setting_dict])
@@ -104,8 +107,7 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
     
     self.assertIn('use_layer_size', special_settings)
     self.assertIn('use_layer_size', main_settings)
-    self.assertNotEqual(
-      special_settings['use_layer_size'], main_settings['use_layer_size'])
+    self.assertNotEqual(special_settings['use_layer_size'], main_settings['use_layer_size'])
 
 
 class TestGroupAddFromDict(unittest.TestCase):
@@ -114,11 +116,11 @@ class TestGroupAddFromDict(unittest.TestCase):
     settings = group_.Group(name='main', setting_attributes={'pdb_type': None})
     settings.add([
       {
-       'type': 'boolean',
+       'type': 'bool',
        'name': 'flatten',
       },
       {
-       'type': 'boolean',
+       'type': 'bool',
        'name': 'use_layer_size',
       }
     ])
@@ -129,33 +131,33 @@ class TestGroupAddFromDict(unittest.TestCase):
   def test_add_with_group_level_attributes_overridden_by_setting_attributes(self):
     settings = group_.Group(name='main', setting_attributes={'pdb_type': None})
     settings.add([
-      {'type': 'boolean', 'name': 'flatten'},
+      {'type': 'bool', 'name': 'flatten'},
       {
-       'type': 'boolean',
-       'name': 'use_layer_size',
+       'type': 'int',
+       'name': 'drawables',
        'pdb_type': GObject.TYPE_UINT64,
       }
     ])
     
     self.assertIsNone(settings['flatten'].pdb_type)
-    self.assertEqual(settings['use_layer_size'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['drawables'].pdb_type, GObject.TYPE_UINT64)
   
   def test_add_with_group_level_attributes_overridden_by_child_group_attributes(self):
     additional_settings = group_.Group(
       name='additional', setting_attributes={'pdb_type': GObject.TYPE_UINT64})
-    additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
+    additional_settings.add([{'type': 'int', 'name': 'drawables'}])
     
     settings = group_.Group(
       name='main', setting_attributes={'pdb_type': None, 'display_name': 'Setting name'})
     settings.add([
-      {'type': 'boolean', 'name': 'flatten'},
-      additional_settings
+      {'type': 'bool', 'name': 'flatten'},
+      additional_settings,
     ])
     
     self.assertIsNone(settings['flatten'].pdb_type)
-    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_UINT64)
     self.assertEqual(settings['flatten'].display_name, 'Setting name')
-    self.assertEqual(settings['additional/use_layer_size'].display_name, 'Use layer size')
+    self.assertEqual(settings['additional/drawables'].display_name, 'Drawables')
   
   def test_add_with_top_group_attributes_applied_recursively(self):
     settings = group_.Group(
@@ -164,14 +166,14 @@ class TestGroupAddFromDict(unittest.TestCase):
     additional_settings = group_.Group(name='additional')
     
     settings.add([
-      {'type': 'boolean', 'name': 'flatten'},
+      {'type': 'int', 'name': 'images'},
       additional_settings
     ])
     
-    additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
+    additional_settings.add([{'type': 'int', 'name': 'drawables'}])
     
-    self.assertEqual(settings['flatten'].pdb_type, GObject.TYPE_UINT64)
-    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['images'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_UINT64)
   
   def test_add_with_top_group_attributes_not_applied_recursively_if_disabled(self):
     settings = group_.Group(
@@ -182,14 +184,14 @@ class TestGroupAddFromDict(unittest.TestCase):
     additional_settings = group_.Group(name='additional')
     
     settings.add([
-      {'type': 'boolean', 'name': 'flatten'},
+      {'type': 'int', 'name': 'images'},
       additional_settings,
     ])
     
-    additional_settings.add([{'type': 'boolean', 'name': 'use_layer_size'}])
+    additional_settings.add([{'type': 'int', 'name': 'drawables'}])
     
-    self.assertEqual(settings['flatten'].pdb_type, GObject.TYPE_UINT64)
-    self.assertEqual(settings['additional/use_layer_size'].pdb_type, GObject.TYPE_INT)
+    self.assertEqual(settings['images'].pdb_type, GObject.TYPE_UINT64)
+    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_INT)
 
 
 class TestGroupCreateGroupsFromDict(unittest.TestCase):
@@ -243,9 +245,10 @@ class TestGroup(unittest.TestCase):
     self.settings = stubs_group.create_test_settings()
     
     self.first_plugin_run_setting_dict = {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'first_plugin_run',
-      'default_value': False}
+      'default_value': False,
+    }
     
     self.special_settings = group_.Group('special')
     self.special_settings.add([self.first_plugin_run_setting_dict])
@@ -259,8 +262,7 @@ class TestGroup(unittest.TestCase):
     
     self.assertIn('first_plugin_run', self.settings)
     self.assertIn('first_plugin_run', self.special_settings)
-    self.assertEqual(
-      self.settings['first_plugin_run'], self.special_settings['first_plugin_run'])
+    self.assertEqual(self.settings['first_plugin_run'], self.special_settings['first_plugin_run'])
   
   def test_add_group(self):
     self.settings.add([self.special_settings])
@@ -315,8 +317,7 @@ class TestGroup(unittest.TestCase):
         setting_name_or_path,
         default_value,
         expected_value):
-    self.assertEqual(
-      self.settings.get_value(setting_name_or_path, default_value), expected_value)
+    self.assertEqual(self.settings.get_value(setting_name_or_path, default_value), expected_value)
   
   def test_get_attributes(self):
     setting_attributes_and_values = self.settings.get_attributes([
@@ -330,10 +331,8 @@ class TestGroup(unittest.TestCase):
       setting_attributes_and_values['file_extension.display_name'], 'File extension')
   
   def test_get_attributes_getter_properties_only(self):
-    setting_attributes_and_values = self.settings.get_attributes([
-      'file_extension.name'])
-    self.assertEqual(
-      setting_attributes_and_values['file_extension.name'], 'file_extension')
+    setting_attributes_and_values = self.settings.get_attributes(['file_extension.name'])
+    self.assertEqual(setting_attributes_and_values['file_extension.name'], 'file_extension')
   
   def test_get_attributes_nonexistent_attribute(self):
     with self.assertRaises(AttributeError):
@@ -416,7 +415,7 @@ class TestGroup(unittest.TestCase):
   def test_reorder_does_not_affect_order_outside_current_group(self):
     settings = stubs_group.create_test_settings_hierarchical()
     
-    settings['main'].add([{'name': 'enabled', 'type': 'boolean'}])
+    settings['main'].add([{'name': 'enabled', 'type': 'bool'}])
     
     settings['advanced'].reorder('flatten', 1)
     
@@ -529,7 +528,8 @@ class TestGroupHierarchical(unittest.TestCase):
     
   def test_get_setting_via_paths_invalid_group(self):
     with self.assertRaises(KeyError):
-      unused_ = self.settings['advanced/invalid_group/file_extension_strip_mode']
+      # noinspection PyStatementEffect
+      self.settings['advanced/invalid_group/file_extension_strip_mode']
   
   def test_get_values_returns_paths(self):
     setting_names_and_values = self.settings.get_values()
@@ -634,7 +634,7 @@ class TestGroupHierarchical(unittest.TestCase):
   def test_walk_with_callbacks(self):
     walked_settings, walk_callbacks = self._get_test_data_for_walking_group()
     
-    for unused_ in self.settings.walk(include_groups=True, walk_callbacks=walk_callbacks):
+    for _unused in self.settings.walk(include_groups=True, walk_callbacks=walk_callbacks):
       pass
     
     self.assertEqual(
@@ -648,7 +648,7 @@ class TestGroupHierarchical(unittest.TestCase):
     
     walked_settings, walk_callbacks = self._get_test_data_for_walking_group()
     
-    for unused_ in self.settings.walk(
+    for _unused in self.settings.walk(
           include_setting_func=lambda setting: 'ignore_reset' not in setting.tags,
           include_groups=True,
           walk_callbacks=walk_callbacks):
@@ -661,7 +661,7 @@ class TestGroupHierarchical(unittest.TestCase):
     
     walked_settings, walk_callbacks = self._get_test_data_for_walking_group()
     
-    for unused_ in self.settings.walk(include_groups=True, walk_callbacks=walk_callbacks):
+    for _unused in self.settings.walk(include_groups=True, walk_callbacks=walk_callbacks):
       pass
     
     self.assertEqual(
