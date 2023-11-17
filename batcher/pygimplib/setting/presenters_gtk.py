@@ -560,7 +560,10 @@ class GFileEntryPresenter(GtkPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
-    widget = Gtk.Entry(text=setting.value.get_path())
+    value = setting.value
+
+    widget = Gtk.Entry(
+      text=value.get_path() if value is not None and value.get_path() is not None else '')
     widget.set_position(-1)
 
     return widget
