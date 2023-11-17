@@ -1255,8 +1255,6 @@ class TestGimpItemSetting(unittest.TestCase):
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb', new=mock.MagicMock())
-@mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestLayerMaskSetting(unittest.TestCase):
 
@@ -1304,9 +1302,9 @@ class TestLayerMaskSetting(unittest.TestCase):
     self.setting.set_value(self.mask)
 
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.pdb.gimp_layer_from_mask'
-    ) as temp_mock_pdb_func:
-      temp_mock_pdb_func.return_value = self.layer
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
+    ) as temp_mock_gimp_module:
+      temp_mock_gimp_module.Layer.from_mask.return_value = self.layer
 
       setting_dict = self.setting.to_dict()
 

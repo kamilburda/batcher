@@ -15,7 +15,6 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import path as pgpath
-from ..pypdb import pdb
 from .. import pdbutils as pgpdbutils
 from .. import utils as pgutils
 
@@ -1777,7 +1776,10 @@ class LayerMaskSetting(GimpItemSetting):
       return None
 
   def _item_to_path(self, item):
-    layer = pdb.gimp_layer_from_mask(item)
+    if item is None:
+      return None
+
+    layer = Gimp.Layer.from_mask(item)
     if layer is not None:
       return super()._item_to_path(layer)
     else:
