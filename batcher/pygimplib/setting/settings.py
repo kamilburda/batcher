@@ -2897,6 +2897,7 @@ class ArraySetting(Setting):
   def _is_element_pdb_type_gobject_type(self):
     return (
       self._reference_element.can_be_registered_to_pdb()
+      and inspect.isclass(self._reference_element.pdb_type)
       and issubclass(self._reference_element.pdb_type, GObject.GObject))
 
 
