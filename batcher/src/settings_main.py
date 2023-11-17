@@ -41,7 +41,7 @@ def create_settings():
   
   settings['special'].add([
     {
-      'type': 'options',
+      'type': 'choice',
       'name': 'run_mode',
       'default_value': 'non_interactive',
       'items': [
@@ -57,7 +57,7 @@ def create_settings():
       'display_name': _('Image'),
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'first_plugin_run',
       'default_value': True,
       'pdb_type': None,
@@ -97,7 +97,7 @@ def create_settings():
       'pdb_type': None,
     },
     {
-      'type': 'options',
+      'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
       'items': [
@@ -116,7 +116,7 @@ def create_settings():
       'gui_type': None,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'edit_mode',
       'default_value': False,
       'pdb_type': None,

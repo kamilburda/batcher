@@ -162,7 +162,7 @@ _BUILTIN_PROCEDURES_LIST = [
         'adjust_value': True,
       },
       {
-        'type': 'options',
+        'type': 'choice',
         'name': 'export_mode',
         'default_value': 'each_layer',
         'items': [
@@ -184,21 +184,21 @@ _BUILTIN_PROCEDURES_LIST = [
         'gui_type': 'filename_pattern_entry',
       },
       {
-        'type': 'boolean',
+        'type': 'bool',
         'name': 'use_file_extension_in_item_name',
         'default_value': False,
         'display_name': _('Use file extension in layer name'),
         'gui_type': 'check_button_no_text',
       },
       {
-        'type': 'boolean',
+        'type': 'bool',
         'name': 'convert_file_extension_to_lowercase',
         'default_value': False,
         'display_name': _('Convert file extension to lowercase'),
         'gui_type': 'check_button_no_text',
       },
       {
-        'type': 'boolean',
+        'type': 'bool',
         'name': 'preserve_layer_name_after_export',
         'default_value': False,
         'display_name': _('Preserve layer name after export'),
@@ -249,7 +249,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Merge background'),
     'arguments': [
       {
-        'type': 'options',
+        'type': 'choice',
         'name': 'merge_type',
         'default_value': 'expand_as_necessary',
         'items': [
@@ -267,7 +267,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Merge foreground'),
     'arguments': [
       {
-        'type': 'options',
+        'type': 'choice',
         'name': 'merge_type',
         'default_value': 'expand_as_necessary',
         'items': [
@@ -294,14 +294,14 @@ _BUILTIN_PROCEDURES_LIST = [
         'gui_type': 'filename_pattern_entry',
       },
       {
-        'type': 'boolean',
+        'type': 'bool',
         'name': 'rename_layers',
         'default_value': True,
         'display_name': _('Rename layers'),
         'gui_type': 'check_button_no_text',
       },
       {
-        'type': 'boolean',
+        'type': 'bool',
         'name': 'rename_folders',
         'default_value': False,
         'display_name': _('Rename folders'),

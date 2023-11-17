@@ -790,7 +790,7 @@ class TestSourceWrite(unittest.TestCase):
         'settings': [
           {
             'name': 'enabled',
-            'type': 'boolean',
+            'type': 'bool',
           },
         ],
       })

@@ -335,7 +335,7 @@ def _create_action(
       'gui_type': None,
     },
     {
-      'type': 'options',
+      'type': 'choice',
       'name': 'origin',
       'default_value': origin,
       'items': [
@@ -345,7 +345,7 @@ def _create_action(
     },
     arguments_group,
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'enabled',
       'default_value': enabled,
     },
@@ -370,20 +370,20 @@ def _create_action(
       'gui_type': None,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'more_options_expanded',
       'default_value': more_options_expanded,
       'display_name': _('_More options'),
       'gui_type': 'expander',
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'enabled_for_previews',
       'default_value': enabled_for_previews,
       'display_name': _('Enable for previews'),
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'display_options_on_create',
       'default_value': display_options_on_create,
       'gui_type': None,
@@ -444,7 +444,7 @@ def _create_constraint(
   
   constraint.add([
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'also_apply_to_parent_folders',
       'default_value': also_apply_to_parent_folders,
       'display_name': _('Also apply to parent folders'),

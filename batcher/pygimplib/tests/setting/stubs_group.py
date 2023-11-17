@@ -13,13 +13,13 @@ def create_test_settings():
       'display_name': 'File extension',
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'flatten',
       'default_value': False,
       'display_name': 'Flatten',
     },
     {
-      'type': 'options',
+      'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
       'items': [('replace', 'Replace'),
@@ -49,13 +49,13 @@ def create_test_settings_hierarchical():
   advanced_settings = group_.Group('advanced')
   advanced_settings.add([
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'flatten',
       'default_value': False,
       'display_name': 'Flatten',
     },
     {
-      'type': 'options',
+      'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
       'items': [('replace', 'Replace'),
@@ -89,14 +89,14 @@ def create_test_settings_with_specific_setting_sources():
   
   advanced_settings.add([
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'flatten',
       'default_value': False,
       'setting_sources': ['persistent', 'session'],
       'tags': ['ignore_load', 'ignore_save'],
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'use_layer_size',
       'default_value': False,
     },
@@ -130,14 +130,14 @@ def create_test_data_with_specific_setting_sources():
           'setting_attributes': {'setting_sources': ['session']},
           'settings': [
             {
-              'type': 'boolean',
+              'type': 'bool',
               'name': 'flatten',
               'value': False,
               'setting_sources': ['persistent', 'session'],
               'tags': ['ignore_load', 'ignore_save'],
             },
             {
-              'type': 'boolean',
+              'type': 'bool',
               'name': 'use_layer_size',
               'value': False,
               'setting_sources': ['session'],

@@ -184,7 +184,7 @@ def _get_array_settings():
      'name': 'array_of_booleans',
      'type': 'array',
      'default_value': (True, False, True),
-     'element_type': 'boolean',
+     'element_type': 'bool',
      'element_default_value': True,
      'min_size': 3,
      'max_size': 10,

@@ -46,30 +46,30 @@ def create_gui_settings():
   
   gui_settings.add([
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'show_more_settings',
       'default_value': False,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'name_preview_sensitive',
       'default_value': True,
       'gui_type': None,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'image_preview_sensitive',
       'default_value': True,
       'gui_type': None,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'image_preview_automatic_update',
       'default_value': True,
       'gui_type': None,
     },
     {
-      'type': 'boolean',
+      'type': 'bool',
       'name': 'image_preview_automatic_update_if_below_maximum_duration',
       'default_value': True,
       'gui_type': None,
