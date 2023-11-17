@@ -29,33 +29,6 @@ from . import presenters_gtk
 from . import utils as utils_
 
 
-# FIXME: Rework this
-PDB_TYPES_TO_SETTING_TYPES_MAP = {
-  # gimpenums.PDB_INT32: 'int',
-  # gimpenums.PDB_INT16: 'int',
-  # gimpenums.PDB_INT8: 'int',
-  # gimpenums.PDB_FLOAT: 'float',
-  # gimpenums.PDB_STRING: 'string',
-  #
-  # gimpenums.PDB_IMAGE: 'image',
-  # gimpenums.PDB_ITEM: 'item',
-  # gimpenums.PDB_DRAWABLE: 'drawable',
-  # gimpenums.PDB_LAYER: 'layer',
-  # gimpenums.PDB_CHANNEL: 'channel',
-  # gimpenums.PDB_SELECTION: 'selection',
-  # gimpenums.PDB_VECTORS: 'vectors',
-  #
-  # gimpenums.PDB_COLOR: 'color',
-  # gimpenums.PDB_PARASITE: 'parasite',
-  # gimpenums.PDB_DISPLAY: 'display',
-  #
-  # gimpenums.PDB_INT32ARRAY: {'type': 'array', 'element_type': 'int'},
-  # gimpenums.PDB_INT16ARRAY: {'type': 'array', 'element_type': 'int'},
-  # gimpenums.PDB_INT8ARRAY: {'type': 'array', 'element_type': 'int'},
-  # gimpenums.PDB_FLOATARRAY: {'type': 'array', 'element_type': 'float'},
-  # gimpenums.PDB_STRINGARRAY: {'type': 'array', 'element_type': 'string'},
-  # gimpenums.PDB_COLORARRAY: {'type': 'array', 'element_type': 'color'},
-}
 _SETTING_TYPES = meta_.SETTING_TYPES
 _SETTING_GUI_TYPES = meta_.SETTING_GUI_TYPES
 
@@ -3035,6 +3008,76 @@ class DictSetting(ContainerSetting):
       return raw_value
 
 
+def get_setting_type_from_gobject_type(
+      gobject_type: GObject.GType,
+      pdb_param_info: Optional[GObject.ParamSpec] = None,
+) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
+  """Given a GIMP PDB parameter type, returns the corresponding `Setting`
+  subclass.
+
+  Along with a `Setting` subclass, keyword arguments passable to its
+  ``__init__()`` method are returned (some of which are positional arguments
+  such as ``enum_type`` for `EnumSetting`).
+
+  If ``gobject_type`` does not match any `setting.Setting` subclass, ``None`` is
+  returned.
+
+  Args:
+    gobject_type:
+      `GObject.GType` instance representing a GIMP PDB parameter.
+    pdb_param_info:
+      Object representing GIMP PDB parameter information, obtainable via
+      `Gimp.Procedure.get_arguments()`.
+
+  Returns:
+    Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
+    passed to ``__init__()`` for the returned `setting.Setting` subclass), or
+    ``None`` if there is no matching `setting.Setting` subclass for
+    ``gobject_type``.
+  """
+  if gobject_type in meta_.GOBJECT_TYPES_AND_SETTING_TYPES:
+    # If multiple GObject types map to the same `Setting` subclass, use the
+    # `Setting` subclass registered (i.e. declared) the earliest.
+    setting_type = meta_.GOBJECT_TYPES_AND_SETTING_TYPES[gobject_type][0]
+
+    # Explicitly pass `gobject_type` as a `pdb_type` so that e.g. an `IntSetting`
+    # instance can have its minimum and maximum values properly adjusted.
+    return setting_type, dict(pdb_type=gobject_type)
+
+  if hasattr(gobject_type, 'parent') and gobject_type.parent == GObject.GEnum.__gtype__:
+    return EnumSetting, dict(enum_type=gobject_type)
+
+  if gobject_type in _ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES:
+    return _ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES[gobject_type]
+
+  if gobject_type == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
+    # HACK: Rely on the parameter name to infer the correct underlying object type.
+    if pdb_param_info.name == 'images':
+      return ArraySetting, dict(element_type=ImageSetting)
+    elif pdb_param_info.name == 'drawables':
+      return ArraySetting, dict(element_type=DrawableSetting)
+    elif pdb_param_info.name == 'layers':
+      return ArraySetting, dict(element_type=LayerSetting)
+    elif pdb_param_info.name == 'channels':
+      return ArraySetting, dict(element_type=ChannelSetting)
+    elif pdb_param_info.name == 'vectors':
+      return ArraySetting, dict(element_type=VectorsSetting)
+    elif pdb_param_info.name == 'children':
+      return ArraySetting, dict(element_type=ItemSetting)
+    else:
+      return None
+
+  return None
+
+
+_ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES = {
+  Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
+  Gimp.FloatArray.__gtype__: (ArraySetting, dict(element_type=FloatSetting)),
+  Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=ColorSetting)),
+  GObject.TYPE_STRV: (ArraySetting, dict(element_type=StringSetting)),
+}
+
+
 class SettingValueError(Exception):
   """Exception class raised when assigning an invalid value to a `Setting`
   instance.
@@ -3104,7 +3147,7 @@ def _process_type(type_or_name, type_map, error_message):
 
 
 __all__ = [
-  'PDB_TYPES_TO_SETTING_TYPES_MAP',
+  'get_setting_type_from_gobject_type',
   'SettingValueError',
   'SettingDefaultValueError',
   'process_setting_type',

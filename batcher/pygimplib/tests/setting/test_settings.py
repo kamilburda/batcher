@@ -1,5 +1,6 @@
 """Tests for the `setting.setting` and `setting.presenter` modules."""
 
+import collections
 import os
 import unittest
 import unittest.mock as mock
@@ -2498,6 +2499,45 @@ class TestContainerSettings(unittest.TestCase):
     
     self.assertDictEqual(
       setting.to_dict(), {'name': 'setting', 'value': list(expected_value), 'type': 'set'})
+
+
+class TestGetSettingTypeFromGobjectType(unittest.TestCase):
+
+  def test_int_setting(self):
+    self.assertEqual(
+      settings_.get_setting_type_from_gobject_type(GObject.TYPE_INT, None),
+      (settings_.IntSetting, dict(pdb_type=GObject.TYPE_INT)),
+    )
+
+  def test_uint_setting(self):
+    self.assertEqual(
+      settings_.get_setting_type_from_gobject_type(GObject.TYPE_UINT, None),
+      (settings_.IntSetting, dict(pdb_type=GObject.TYPE_UINT)),
+    )
+
+  def test_enum(self):
+    self.assertEqual(
+      settings_.get_setting_type_from_gobject_type(Gimp.ImageType.__gtype__, None),
+      (settings_.EnumSetting, dict(enum_type=Gimp.ImageType.__gtype__)),
+    )
+
+  def test_builtin_array(self):
+    self.assertEqual(
+      settings_.get_setting_type_from_gobject_type(Gimp.FloatArray.__gtype__, None),
+      (settings_.ArraySetting, dict(element_type=settings_.FloatSetting)),
+    )
+
+  def test_object_array(self):
+    param_spec = collections.namedtuple('ParamSpecStub', ['name'])('drawables')
+
+    # noinspection PyTypeChecker
+    self.assertEqual(
+      settings_.get_setting_type_from_gobject_type(Gimp.ObjectArray.__gtype__, param_spec),
+      (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
+    )
+
+  def test_unrecognized_gobject_type_returns_none(self):
+    self.assertIsNone(settings_.get_setting_type_from_gobject_type(Gimp.Procedure, None))
 
 
 class TestSettingTypeFunctions(unittest.TestCase):

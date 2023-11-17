@@ -542,28 +542,26 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name):
   pdb_procedure = pdb[pdb_procedure_name].info
   
   for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
-    try:
-      setting_type = pg.setting.PDB_TYPES_TO_SETTING_TYPES_MAP[proc_arg.value_type]
-    except KeyError:
+    retval = pg.setting.get_setting_type_from_gobject_type(proc_arg.value_type, proc_arg)
+
+    if retval is None:
       raise UnsupportedPdbProcedureError(action_dict['name'], proc_arg.value_type)
-    
+
+    setting_type, setting_type_init_kwargs = retval
+
     unique_pdb_param_name = pg.path.uniquify_string(
       proc_arg.name,
       pdb_procedure_argument_names,
       generator=_generate_unique_pdb_procedure_argument_name())
     
     pdb_procedure_argument_names.append(unique_pdb_param_name)
-    
-    if isinstance(setting_type, dict):
-      arguments_dict = dict(setting_type)
-      arguments_dict['name'] = unique_pdb_param_name
-      arguments_dict['display_name'] = proc_arg.name
-    else:
-      arguments_dict = {
-        'type': setting_type,
-        'name': unique_pdb_param_name,
-        'display_name': proc_arg.name,
-      }
+
+    arguments_dict = {
+      'type': setting_type,
+      'name': unique_pdb_param_name,
+      'display_name': proc_arg.name,
+      **setting_type_init_kwargs,
+    }
     
     if proc_arg.value_type in placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP:
       arguments_dict['type'] = (
