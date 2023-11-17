@@ -18,23 +18,44 @@ def _get_result_tuple_type(arg_name) -> collections.namedtuple:
 class ParasiteFunctionsStubMixin:
   
   def __init__(self):
-    self._parasites = {}
+    self.parasites = {}
   
   def get_parasite(self, name):
-    if name in self._parasites:
-      return self._parasites[name]
+    if name in self.parasites:
+      return self.parasites[name]
     else:
       return None
   
   def get_parasite_list(self):
-    return list(self._parasites)
+    return list(self.parasites)
   
   def attach_parasite(self, parasite):
-    self._parasites[parasite.get_name()] = parasite
+    self.parasites[parasite.get_name()] = parasite
   
   def detach_parasite(self, parasite_name):
-    if parasite_name in self._parasites:
-      del self._parasites[parasite_name]
+    if parasite_name in self.parasites:
+      del self.parasites[parasite_name]
+
+
+class Parasite(GObject.GObject):
+
+  def __init__(self, name, flags, data):
+    self.name = name
+    self.flags = flags
+    self.data = data
+
+  @classmethod
+  def new(cls, name, flags, data):
+    return Parasite(name, flags, data)
+
+  def get_name(self):
+    return self.name
+
+  def get_flags(self):
+    return self.flags
+
+  def get_data(self):
+    return self.data
 
 
 class Image(GObject.GObject, ParasiteFunctionsStubMixin):
@@ -372,7 +393,7 @@ class ObjectArray:
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
 
-  Parasite = Gimp.Parasite
+  Parasite = Parasite
 
   Image = Image
 
@@ -392,3 +413,5 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Pattern = Pattern
 
   ObjectArray = ObjectArray
+
+  PARASITE_PERSISTENT = Gimp.PARASITE_PERSISTENT
