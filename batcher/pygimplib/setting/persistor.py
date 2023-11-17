@@ -4,7 +4,7 @@ multiple setting sources.
 
 import collections
 from collections.abc import Iterable
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from . import _sources_errors
 
@@ -43,7 +43,7 @@ class Persistor:
   
   @classmethod
   def set_default_setting_sources(
-        cls, sources: Dict[str, Union['setting.Source', List['setting.Source']]]):
+        cls, sources: Optional[Dict[str, Union['setting.Source', List['setting.Source']]]]):
     """Sets the dictionary of setting sources to use in methods of this class if
     no other setting sources in these methods are specified.
     
@@ -57,6 +57,8 @@ class Persistor:
     will be considered and other sources will be ignored. This is useful if you
     need to e.g. save settings to a different file while still ignoring settings
     not containing ``'persistent'``.
+
+    If ``sources`` is ``None``, there will be no default setting sources.
     """
     if sources is None:
       sources = {}
