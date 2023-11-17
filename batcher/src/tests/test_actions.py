@@ -161,7 +161,7 @@ class TestManageActions(unittest.TestCase):
   
   def test_add_existing_name_is_uniquified(self):
     added_actions = [
-      actions_.add(self.procedures, self.autocrop_dict) for unused_ in range(3)]
+      actions_.add(self.procedures, self.autocrop_dict) for _unused in range(3)]
     
     orig_name = 'autocrop'
     expected_names = ['autocrop', 'autocrop_2', 'autocrop_3']

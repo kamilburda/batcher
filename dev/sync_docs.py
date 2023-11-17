@@ -50,7 +50,7 @@ def get_filepaths(file_list_filepath):
   def _list_filepaths(dirpath):
     listed_filepaths = []
     
-    for root_dirpath, unused_, filepaths in os.walk(dirpath):
+    for root_dirpath, _unused, filepaths in os.walk(dirpath):
       for filepath in filepaths:
         listed_filepaths.append(os.path.normpath(os.path.join(root_dirpath, filepath)))
         

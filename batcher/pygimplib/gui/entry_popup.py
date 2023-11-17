@@ -318,7 +318,7 @@ class EntryPopup:
       return True
     
     if self.is_shown():
-      tree_path, unused_ = self._tree_view.get_cursor()
+      tree_path, _unused = self._tree_view.get_cursor()
       stop_event_propagation = True
       
       if key_name in ['Up', 'KP_Up']:

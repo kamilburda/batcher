@@ -1256,7 +1256,7 @@ class EnumSetting(Setting):
   @staticmethod
   def _process_enum_type(enum_type):
     if isinstance(enum_type, str):
-      module_path, unused_, enum_class_name = enum_type.rpartition('.')
+      module_path, _unused, enum_class_name = enum_type.rpartition('.')
 
       if not module_path or not enum_class_name:
         raise TypeError(f'"{enum_type}" is not a valid GObject.GEnum type')

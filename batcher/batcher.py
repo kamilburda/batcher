@@ -37,7 +37,7 @@ def plug_in_export_layers(run_mode, image, *args):
   
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
-  status, unused_ = update.update(
+  status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == gimpenums.RUN_INTERACTIVE else 'clear')
   if status == update.ABORT:
     return
@@ -65,7 +65,7 @@ def plug_in_export_layers(run_mode, image, *args):
 def plug_in_export_layers_repeat(run_mode, image):
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
-  status, unused_ = update.update(
+  status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == gimpenums.RUN_INTERACTIVE else 'clear')
   if status == update.ABORT:
     return
@@ -109,7 +109,7 @@ def plug_in_export_layers_with_config(run_mode, image, config_filepath):
   setting_source = setting_source_class(
     pg.config.SOURCE_NAME, config_filepath, source_type='persistent')
   
-  status, unused_ = update.update(
+  status, _unused = update.update(
     SETTINGS, handle_invalid='abort', sources={'persistent': setting_source})
   if status == update.ABORT:
     sys.exit(1)

@@ -955,7 +955,7 @@ class ExportLayersDialog:
   
   @_set_settings
   def _on_export_settings_activate(self, menu_item):
-    filepath, file_format, unused_ = self._get_setting_filepath(action='export')
+    filepath, file_format, _unused = self._get_setting_filepath(action='export')
     
     if filepath is not None:
       export_successful = self._save_settings(filepath, file_format)

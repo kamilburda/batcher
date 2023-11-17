@@ -641,7 +641,7 @@ class ImagePreview(preview_base_.Preview):
   
   @staticmethod
   def _get_preview_data(raw_item, preview_width, preview_height):
-    actual_preview_width, actual_preview_height, unused_, unused_, preview_data = (
+    actual_preview_width, actual_preview_height, _unused, _unused, preview_data = (
       pdb.gimp_drawable_thumbnail(raw_item, preview_width, preview_height))
     
     return (

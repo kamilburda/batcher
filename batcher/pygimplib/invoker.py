@@ -430,7 +430,7 @@ class Invoker:
     self._check_action_in_group(action_id, group)
     
     action_item = self._action_items[action_id]
-    action_lists, unused_ = self._get_action_lists_and_functions(action_item.action_type)
+    action_lists, _unused = self._get_action_lists_and_functions(action_item.action_type)
 
     return action_lists[group].index(action_item)
   
@@ -499,7 +499,7 @@ class Invoker:
     self._check_action_in_group(action_id, group)
     
     action_item = self._action_items[action_id]
-    action_lists, unused_ = self._get_action_lists_and_functions(action_item.action_type)
+    action_lists, _unused = self._get_action_lists_and_functions(action_item.action_type)
     
     action_lists[group].pop(action_lists[group].index(action_item))
     

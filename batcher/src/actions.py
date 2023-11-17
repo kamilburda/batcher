@@ -493,7 +493,7 @@ def _hide_gui_for_run_mode_and_array_length_arguments(action):
   if first_argument is not None and first_argument.display_name == 'run-mode':
     first_argument.gui.set_visible(False)
   
-  for length_setting, unused_ in _get_array_length_and_array_settings(action):
+  for length_setting, _unused in _get_array_length_and_array_settings(action):
     length_setting.gui.set_visible(False)
 
 

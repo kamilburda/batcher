@@ -43,7 +43,7 @@ def _get_images_and_items_with_ids():
 
 
 def _get_images_and_items_with_paths():
-  images, unused_ = _get_images_and_items()
+  images, _unused = _get_images_and_items()
   
   images = [[images[0]], [images[1]], []]
   

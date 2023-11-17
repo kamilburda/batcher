@@ -198,7 +198,7 @@ class NamePreview(preview_base_.Preview):
             for item_key in self._get_keys_from_current_selection()]
   
   def get_item_from_cursor(self):
-    tree_path, unused_ = self._tree_view.get_cursor()
+    tree_path, _unused = self._tree_view.get_cursor()
     if tree_path is not None:
       item_key = self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
       return self._batcher.item_tree[item_key]
@@ -503,7 +503,7 @@ class NamePreview(preview_base_.Preview):
         self.update()
   
   def _get_keys_from_current_selection(self):
-    unused_, tree_paths = self._tree_view.get_selection().get_selected_rows()
+    _unused, tree_paths = self._tree_view.get_selection().get_selected_rows()
     return [
       self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
       for tree_path in tree_paths]

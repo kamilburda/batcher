@@ -630,7 +630,7 @@ class FileExtensionEntry(ExtendedEntry):
     if key_name in ['Tab', 'KP_Tab', 'ISO_Left_Tab']:
       # Tree paths can sometimes point at the first row even though no row is
       # selected, hence the `tree_iter` usage.
-      unused_, tree_iter = self._popup.tree_view.get_selection().get_selected()
+      _unused, tree_iter = self._popup.tree_view.get_selection().get_selected()
       
       if tree_iter is not None:
         if key_name in ['Tab', 'KP_Tab']:

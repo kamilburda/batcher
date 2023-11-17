@@ -238,7 +238,7 @@ class TestStringPattern(unittest.TestCase):
     string_pattern = pgpath.StringPattern(pattern, fields)
     num_repeats = 3
     
-    outputs = [string_pattern.substitute() for unused_ in range(num_repeats)]
+    outputs = [string_pattern.substitute() for _unused in range(num_repeats)]
     
     self.assertListEqual(outputs, [expected_output] * num_repeats)
   
@@ -282,7 +282,7 @@ class TestStringPattern(unittest.TestCase):
       processed_fields.append((field_regex, lambda field, gen=generator: next(gen)))
     
     string_pattern = pgpath.StringPattern(pattern, processed_fields)
-    outputs = [string_pattern.substitute() for unused_ in range(len(expected_outputs))]
+    outputs = [string_pattern.substitute() for _unused in range(len(expected_outputs))]
     
     self.assertEqual(outputs, expected_outputs)
   
@@ -296,7 +296,7 @@ class TestStringPattern(unittest.TestCase):
     fields = [('field', lambda field: next(field_value_generator))]
     
     string_pattern = pgpath.StringPattern(pattern, fields)
-    outputs = [string_pattern.substitute() for unused_ in range(len(expected_outputs))]
+    outputs = [string_pattern.substitute() for _unused in range(len(expected_outputs))]
     
     self.assertListEqual(outputs, expected_outputs)
   

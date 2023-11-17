@@ -134,7 +134,7 @@ def export(
             current_file_extension, default_file_extension, force_default_file_extension=True)
         
         if batcher.process_export:
-          overwrite_mode, unused_ = _export_item(
+          overwrite_mode, _unused = _export_item(
             batcher, item_to_process, image_to_process, raw_item_to_process,
             output_directory, default_file_extension, file_extension_properties)
       

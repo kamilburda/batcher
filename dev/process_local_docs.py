@@ -142,7 +142,7 @@ def find_all_html_elements_recursive(html_tree, match):
 def get_html_filepaths(site_dirpath):
   html_filepaths = []
   
-  for root, unused_, filenames in os.walk(site_dirpath):
+  for root, _unused, filenames in os.walk(site_dirpath):
     for filename in filenames:
       if filename.endswith('.html'):
         html_filepaths.append(os.path.join(root, filename))

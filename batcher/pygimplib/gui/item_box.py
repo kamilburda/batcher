@@ -102,7 +102,7 @@ class ItemBox(Gtk.ScrolledWindow):
     self._items.remove(item)
   
   def clear(self):
-    for unused_ in range(len(self._items)):
+    for _unused in range(len(self._items)):
       self.remove_item(self._items[0])
   
   def _setup_drag(self, item):
@@ -452,11 +452,11 @@ class ArrayBox(ItemBox):
       
       if new_size > len(self._items):
         num_items_to_add = new_size - len(self._items)
-        for unused_ in range(num_items_to_add):
+        for _unused in range(num_items_to_add):
           self.add_item()
       elif new_size < len(self._items):
         num_items_to_remove = len(self._items) - new_size
-        for unused_ in range(num_items_to_remove):
+        for _unused in range(num_items_to_remove):
           self.remove_item(self._items[-1])
       
       self.emit('array-box-changed')

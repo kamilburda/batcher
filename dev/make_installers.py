@@ -230,7 +230,7 @@ def _compile_translation_files(source_dirpath):
   orig_cwd = os.getcwdu()
   os.chdir(source_dirpath)
   
-  for root_dirpath, unused_, filenames in os.walk(source_dirpath):
+  for root_dirpath, _unused, filenames in os.walk(source_dirpath):
     for filename in filenames:
       if (os.path.isfile(os.path.join(root_dirpath, filename))
           and filename.endswith('.po')):

@@ -161,7 +161,7 @@ class Persistor:
     statuses_per_source = {}
     messages_per_source = {}
     
-    for unused_, sources in setting_sources.items():
+    for _unused, sources in setting_sources.items():
       for source in sources:
         try:
           source.read(settings_not_loaded)
@@ -247,7 +247,7 @@ class Persistor:
     statuses_per_source = {}
     messages_per_source = {}
     
-    for unused_, sources in setting_sources.items():
+    for _unused, sources in setting_sources.items():
       for source in sources:
         try:
           source.write(settings_or_groups)

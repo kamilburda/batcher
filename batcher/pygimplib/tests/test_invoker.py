@@ -32,14 +32,14 @@ def append_to_list_via_generator(list_, arg):
   list_.append(1)
   
   while True:
-    (list_, arg), unused_ = yield
+    (list_, arg), _unused = yield
     list_.append(arg)
 
 
 def append_to_list_via_generator_finite(list_, arg):
   list_.append(1)
   
-  (list_, arg), unused_ = yield
+  (list_, arg), _unused = yield
   list_.append(arg)
 
 

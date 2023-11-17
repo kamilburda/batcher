@@ -273,7 +273,7 @@ def test_add_all_pdb_procedures_as_actions():
   """
   procedures = actions.create('all_pdb_procedures')
   
-  unused_, procedure_names = pdb.gimp_procedural_db_query('', '', '', '', '', '', '')
+  _unused, procedure_names = pdb.gimp_procedural_db_query('', '', '', '', '', '', '')
   
   for procedure_name in procedure_names:
     actions.add(procedures, pdb[procedure_name])

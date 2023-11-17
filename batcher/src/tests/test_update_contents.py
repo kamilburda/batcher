@@ -265,7 +265,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
     pg.config.PLUGIN_VERSION = self.orig_version_in_config
   
   def test_no_data_in_sources_saves_plugin_version_only(self, *mocks):
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.FRESH_START)
     self.assertEqual(self.settings['main/plugin_version'].value, pg.config.PLUGIN_VERSION)
@@ -301,7 +301,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   # def test_partial_data_in_session_source_only(self, *mocks):
   #   update.gimp.set_data(pg.config.SOURCE_NAME, DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY)
   #
-  #   status, unused_ = update.update(self.settings)
+  #   status, _unused = update.update(self.settings)
   #
   #   self.assertEqual(status, update.UPDATE)
   #
@@ -314,7 +314,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
         gimpenums.PARASITE_PERSISTENT,
         DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY))
     
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     
@@ -327,7 +327,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
         gimpenums.PARASITE_PERSISTENT,
         DATA_3_3_1_PLUGIN_VERSION_AND_TAGS_ONLY))
     
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     
@@ -336,7 +336,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
   def test_full_data_in_session_source_only(self, *mocks):
     update.gimp.set_data(pg.config.SOURCE_NAME, SESSION_DATA_3_3_1)
     
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     
@@ -347,7 +347,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     
@@ -359,7 +359,7 @@ class TestUpdateFrom331To34(unittest.TestCase):
       update.Gimp.Parasite.new(
         pg.config.SOURCE_NAME, gimpenums.PARASITE_PERSISTENT, PERSISTENT_DATA_3_3_1))
     
-    status, unused_ = update.update(self.settings)
+    status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     

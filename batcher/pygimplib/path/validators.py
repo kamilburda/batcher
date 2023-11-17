@@ -121,7 +121,7 @@ class FilenameValidator(StringValidator):
       status_messages.append(
         cls._get_status(FileValidatorErrorStatuses.HAS_TRAILING_PERIOD))
     
-    root, unused_ = os.path.splitext(filename)
+    root, _unused = os.path.splitext(filename)
     if root.upper() in cls._INVALID_NAMES:
       status_messages.append(
         cls._get_status(FileValidatorErrorStatuses.HAS_INVALID_NAMES))
@@ -212,7 +212,7 @@ class FilepathValidator(StringValidator):
       if path_component.endswith('.'):
         statuses.add(FileValidatorErrorStatuses.HAS_TRAILING_PERIOD)
       
-      root, unused_ = os.path.splitext(path_component)
+      root, _unused = os.path.splitext(path_component)
       if root.upper() in cls._INVALID_NAMES:
         statuses.add(FileValidatorErrorStatuses.HAS_INVALID_NAMES)
         invalid_names_status_message += (

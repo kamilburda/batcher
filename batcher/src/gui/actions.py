@@ -221,7 +221,7 @@ class ActionBox(pg.gui.ItemBox):
     super().remove_item(item)
   
   def _clear(self):
-    for unused_ in range(len(self._items)):
+    for _unused in range(len(self._items)):
       self._remove_item(self._items[0])
   
   def _init_actions_menu_popup(self):

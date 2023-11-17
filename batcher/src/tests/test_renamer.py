@@ -29,7 +29,7 @@ class TestNumberField(unittest.TestCase):
   def test_generate_number(
         self, test_case_suffix, initial_number, padding, expected_outputs):
     number_generator = renamer_.NumberField.generate_number(initial_number, padding)
-    outputs = [next(number_generator) for unused_ in range(len(expected_outputs))]
+    outputs = [next(number_generator) for _unused in range(len(expected_outputs))]
     
     self.assertListEqual(outputs, expected_outputs)
 

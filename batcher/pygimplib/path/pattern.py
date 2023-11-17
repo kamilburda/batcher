@@ -63,7 +63,7 @@ class StringPattern:
     self._pattern = pattern
     self._fields = dict(fields) if fields is not None else {}
     
-    self._pattern_parts, unused_, self._parsed_fields_and_matching_regexes = (
+    self._pattern_parts, _unused, self._parsed_fields_and_matching_regexes = (
       self.parse_pattern(self._pattern, self._fields))
   
   @property
@@ -111,7 +111,7 @@ class StringPattern:
     """Returns a field name if the pattern contains a field at the given
     character position (starting from 0), ``None`` otherwise.
     """
-    unused_, parsed_fields, unused_ = cls.parse_pattern(pattern, fields=None)
+    _unused, parsed_fields, _unused = cls.parse_pattern(pattern, fields=None)
     
     for parsed_field in parsed_fields:
       indices = parsed_field[3]

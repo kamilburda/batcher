@@ -413,9 +413,9 @@ def _create_github_release(release_metadata):
 
 
 def _upload_installers_to_github(release_metadata, upload_url, access_token_header):
-  for root_dirpath, unused_, files in os.walk(INSTALLERS_OUTPUT_DIRPATH):
+  for root_dirpath, _unused, files in os.walk(INSTALLERS_OUTPUT_DIRPATH):
     for filename in files:
-      unused_, file_extension = os.path.splitext(filename)
+      _unused, file_extension = os.path.splitext(filename)
       if file_extension:
         file_extension = file_extension[1:]
         if file_extension not in FILE_EXTENSIONS_AND_MIME_TYPES:
