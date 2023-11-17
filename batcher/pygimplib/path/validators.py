@@ -288,7 +288,10 @@ class DirpathValidator(FilepathValidator):
   
   @classmethod
   def is_valid(cls, dirpath):
-    unused_, status_messages = super().is_valid(dirpath)
+    is_valid, status_messages = super().is_valid(dirpath)
+
+    if not is_valid:
+      return is_valid, status_messages
     
     if os.path.exists(dirpath) and not os.path.isdir(dirpath):
       status_messages.append(
