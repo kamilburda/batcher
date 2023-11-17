@@ -354,7 +354,7 @@ class ActionBox(pg.gui.ItemBox):
     dialog.destroy()
     
     if response_id == gtk.RESPONSE_OK:
-      item.action['arguments'].apply_gui_values_to_settings()
+      item.action['arguments'].apply_gui_values_to_settings(force=True)
       item.action['enabled'].set_value(True)
     else:
       self.remove_item(item)
@@ -366,7 +366,7 @@ class ActionBox(pg.gui.ItemBox):
     dialog.destroy()
     
     if response_id == gtk.RESPONSE_OK:
-      item.action['arguments'].apply_gui_values_to_settings()
+      item.action['arguments'].apply_gui_values_to_settings(force=True)
     else:
       item.action.set_values(action_values_before_dialog)
     

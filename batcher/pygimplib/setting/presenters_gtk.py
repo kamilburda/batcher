@@ -719,11 +719,11 @@ class ArrayBoxPresenter(GtkPresenter):
     
     super().__init__(*args, **kwargs)
   
-  def update_setting_value(self):
-    super().update_setting_value()
+  def update_setting_value(self, force=False):
+    super().update_setting_value(force=force)
     
     for array_element in self._setting.get_elements():
-      array_element.gui.update_setting_value()
+      array_element.gui.update_setting_value(force=force)
   
   def _connect_value_changed_event(self):
     super()._connect_value_changed_event()

@@ -173,16 +173,20 @@ class Presenter(metaclass=meta_.PresenterMeta):
     """Sets the visible state of `Presenter.widget`."""
     pass
   
-  def update_setting_value(self):
+  def update_setting_value(self, force: bool = False):
     """Manually assigns the GUI widget value, entered by the user, to the
     setting value.
-    
-    This method will not have any effect if this object updates its setting
-    value automatically.
+
+    If ``force`` is ``False``, this method will have no effect if this object
+    updates its setting value automatically. Otherwise, the setting value
+    will be updated regardless of whether the automatic GUI-to-setting update
+    is enabled or not. Passing ``force=True`` is useful if the widget is
+    internally assigned a valid value on instantiation while the setting
+    retains its own value.
     """
     # The `is_value_empty` check makes sure that settings with empty values
     # which are not allowed will be properly invalidated.
-    if self._value_changed_signal is None or self._setting.is_value_empty():
+    if self._value_changed_signal is None or self._setting.is_value_empty() or force:
       self._update_setting_value()
   
   def auto_update_gui_to_setting(self, enabled: bool):
@@ -318,7 +322,7 @@ class NullPresenter(Presenter):
   def set_visible(self, visible):
     self._visible = visible
   
-  def update_setting_value(self):
+  def update_setting_value(self, force=False):
     pass
   
   def _get_value(self):

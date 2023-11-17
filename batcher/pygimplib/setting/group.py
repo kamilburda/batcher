@@ -609,14 +609,18 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
         set_gui_args = custom_gui[setting.get_path('root')]
         setting.set_gui(*set_gui_args)
   
-  def apply_gui_values_to_settings(self):
+  def apply_gui_values_to_settings(self, force: bool = False):
     """Applies GUI widget values, entered by the user, to settings.
 
     Child settings with the ``'ignore_apply_gui_value_to_setting'`` tag are
     ignored.
     
-    This method will have no effect on settings with automatic GUI-to-setting
-    value updating.
+    If ``force`` is ``False``, this method will have no effect on settings
+    with automatic GUI-to-setting value updating. Otherwise, each setting
+    will be updated regardless of whether the automatic GUI-to-setting update
+    is enabled or not. Passing ``force=True`` is useful if some GUI widgets
+    are internally assigned a valid value on instantiation while the
+    corresponding settings retain their own value.
 
     If one or more values in the GUI widget(s) are not valid,
     `setting.SettingValueError` is raised. The exception message contains
