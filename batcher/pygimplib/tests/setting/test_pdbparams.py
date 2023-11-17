@@ -1,5 +1,8 @@
 import unittest
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import GObject
 
 from ...setting import pdbparams as pdbparams_
@@ -26,41 +29,69 @@ class TestCreateParams(unittest.TestCase):
   def test_create_params_single_param(self):
     params = pdbparams_.create_params(self.file_ext_setting)
     param = params[0]
-    
-    self.assertTrue(len(param), 3)
-    self.assertEqual(param[0], GObject.TYPE_STRING)
-    self.assertEqual(param[1], 'file-extension')
-    self.assertEqual(param[2], 'File extension')
-  
-  def test_create_params_invalid_argument(self):
-    with self.assertRaises(TypeError):
-      pdbparams_.create_params([self.file_ext_setting])
+
+    self.assertEqual(len(params), 1)
+    self.assertDictEqual(
+      param,
+      dict(
+        name='file-extension',
+        type=GObject.TYPE_STRING,
+        default='png',
+        nick='File extension',
+        blurb='File extension',
+      ))
   
   def test_create_multiple_params(self):
     params = pdbparams_.create_params(
       self.file_ext_setting, self.coordinates_setting, self.settings)
     
-    self.assertTrue(len(params), 3 + len(self.settings))
+    self.assertEqual(len(params), 6)
     
-    self.assertEqual(
+    self.assertDictEqual(
       params[0],
-      (self.file_ext_setting.pdb_type,
-       self.file_ext_setting.pdb_name,
-       self.file_ext_setting.description))
-    
-    # Array length parameter
-    self.assertEqual(params[1][0], GObject.TYPE_INT)
+      dict(
+        name='file-extension',
+        type=GObject.TYPE_STRING,
+        default='png',
+        nick='File extension',
+        blurb='File extension',
+      ))
+
+    self.assertDictEqual(
+      params[1],
+      dict(
+        name='num-coordinates',
+        type=GObject.TYPE_INT,
+        default=0,
+        minimum=0,
+        nick='Number of elements in "coordinates"',
+        blurb='Number of elements in "coordinates"',
+      ))
     
     self.assertEqual(
       params[2],
-      (self.coordinates_setting.pdb_type,
-       self.coordinates_setting.pdb_name,
-       self.coordinates_setting.description))
+      dict(
+        name='coordinates',
+        type=Gimp.FloatArray,
+        nick='Coordinates',
+        blurb='Coordinates',
+      ))
     
     for param, setting in zip(params[3:], self.settings.walk()):
-      self.assertEqual(
+      self.assertDictEqual(
         param,
-        (setting.pdb_type, setting.pdb_name, setting.description))
+        dict(
+          name=setting.pdb_name,
+          type=setting.pdb_type,
+          default=setting.default_value,
+          nick=setting.display_name,
+          blurb=setting.description,
+        ))
+
+  def test_create_params_invalid_argument(self):
+    with self.assertRaises(TypeError):
+      # noinspection PyTypeChecker
+      pdbparams_.create_params([self.file_ext_setting])
   
   def test_create_params_with_unregistrable_setting(self):
     params = pdbparams_.create_params(self.unregistrable_setting)
