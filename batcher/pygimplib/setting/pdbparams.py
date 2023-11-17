@@ -35,7 +35,9 @@ def create_params(
   return params
 
 
-def iter_args(args: Union[List, Tuple], settings: Union[List, Tuple]) -> Generator[Any, None, None]:
+def iter_args(
+      args: Union[List, Tuple], settings: Union[List, Tuple]
+) -> Generator[Any, None, None]:
   """Iterates over arguments passed to a GIMP PDB procedure, skipping redundant
   arguments.
 
