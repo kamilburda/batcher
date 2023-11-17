@@ -2726,7 +2726,7 @@ class ArraySetting(Setting):
     """
     if self.can_be_registered_to_pdb():
       if length_name is None:
-        length_name = f'{self.pdb_name}-length'
+        length_name = f'num-{self.pdb_name}'
       
       if length_description is None:
         length_description = _('Number of elements in "{}"').format(self.pdb_name)
