@@ -589,7 +589,7 @@ class GimpParasiteSource(Source):
   
   def __init__(self, source_name: str, source_type: str = 'persistent'):
     super().__init__(source_name, source_type)
-    
+
     self._parasite_filepath = os.path.join(Gimp.directory(), 'parasiterc')
   
   def clear(self):
