@@ -362,6 +362,8 @@ class TextLayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
   text layer available.
   """
 
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new(lambda image, item: item.is_text_layer())
 
@@ -384,6 +386,8 @@ class LayerMaskComboBoxPresenter(GimpUiIntComboBoxPresenter):
   Value: `Gimp.LayerMask` from a `Gimp.Layer` selected in the combo box, or
   ``None`` if there is no layer with a mask available.
   """
+
+  _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new(
