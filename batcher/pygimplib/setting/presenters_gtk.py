@@ -612,7 +612,12 @@ class FolderChooserWidgetPresenter(GtkPresenter):
     return Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
   
   def _get_value(self):
-    return self._widget.get_current_folder()
+    folder = self._widget.get_current_folder()
+
+    if folder is not None:
+      return folder
+    else:
+      return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
   
   def _set_value(self, dirpath):
     self._widget.set_current_folder(dirpath if dirpath is not None else '')
@@ -637,7 +642,12 @@ class FolderChooserButtonPresenter(GtkPresenter):
     return button
   
   def _get_value(self):
-    return self._widget.get_filename()
+    folder = self._widget.get_filename()
+
+    if folder is not None:
+      return folder
+    else:
+      return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
   
   def _set_value(self, dirpath):
     self._widget.set_filename(dirpath if dirpath is not None else '')

@@ -2084,6 +2084,8 @@ class DirpathSetting(ValidatableStringSetting):
   
   The `path.DirpathValidator` subclass is used to determine whether the
   directory path is valid.
+
+  Default value: `Documents` directory in the user's home directory.
   
   Empty values:
   * ``None``
@@ -2094,6 +2096,8 @@ class DirpathSetting(ValidatableStringSetting):
     _SETTING_GUI_TYPES.folder_chooser_widget,
     _SETTING_GUI_TYPES.folder_chooser_button,
   ]
+
+  _DEFAULT_DEFAULT_VALUE = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
 
   _EMPTY_VALUES = [None, '']
   
