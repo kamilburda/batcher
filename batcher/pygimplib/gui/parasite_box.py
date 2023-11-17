@@ -8,6 +8,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 
+from ..setting import settings as pgsettings
 from .. import utils as pgutils
 
 __all__ = [
@@ -125,8 +126,10 @@ class ParasiteBox(Gtk.Box):
     self._connect_changed_events()
   
   def _get_values(self):
+    parasite_name = self._parasite_name_entry.get_text()
+
     return (
-      self._parasite_name_entry.get_text(),
+      parasite_name if parasite_name else pgsettings.ParasiteSetting.DEFAULT_PARASITE_NAME,
       self._parasite_flags_spin_button.get_value_as_int(),
       pgutils.bytes_to_signed_bytes(
         pgutils.escaped_string_to_bytes(

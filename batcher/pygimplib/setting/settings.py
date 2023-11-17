@@ -1967,14 +1967,20 @@ class ParasiteSetting(Setting):
   Error messages:
   * ``'invalid_value'``: The value is not a `Gimp.Parasite` instance.
   """
+
+  DEFAULT_PARASITE_NAME = 'parasite'
+  """Default parasite name in case it is empty. The parasite name cannot be
+  empty as that will lead to an error on instantiation.
+  """
   
   _ALLOWED_PDB_TYPES = [Gimp.Parasite]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_box]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Parasite.new(self.name, 0, b'')
-  
+  _DEFAULT_DEFAULT_VALUE = (
+    lambda self: Gimp.Parasite.new(self.name if self.name else self.DEFAULT_PARASITE_NAME, 0, b''))
+
   def _copy_value(self, value):
     return value
   
