@@ -20,11 +20,8 @@ from pygimplib.tests.setting import test_setting_gui
 
 
 importlib.reload(test_setting_gui)
+builtins._ = lambda s: s
 test_setting_gui.test_basic_settings_and_gui()
-
-
-importlib.reload(test_setting_gui)
-test_setting_gui.test_array_settings_and_gui()
 
 
 sys.path.append(os.path.join(plugin_dirpath, 'dev'))
