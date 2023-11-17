@@ -20,7 +20,7 @@ class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPrese
   Value: Text in the entry.
   """
   
-  def _create_widget(self, setting):
+  def _create_widget(self, setting, **kwargs):
     return pg.gui.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
 
 

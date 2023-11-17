@@ -95,7 +95,7 @@ class FloatSpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting, digits=1):
+  def _create_widget(self, setting, digits=1, **kwargs):
     return _create_spin_button(setting, digits=digits)
   
   def _get_value(self):
