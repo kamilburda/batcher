@@ -5,7 +5,7 @@ import datetime
 import os
 import sys
 import traceback
-from typing import IO
+from typing import IO, Optional
 
 from . import constants
 from . import pdbutils as pgpdbutils
@@ -18,16 +18,20 @@ _exception_logger = None
 def log_output(
       log_mode: str,
       log_dirpaths: Iterable[str],
-      log_stdout_filename: str,
-      log_stderr_filename: str,
+      log_stdout_filename: Optional[str] = None,
+      log_stderr_filename: Optional[str] = None,
       log_header_title: str = '',
       gimp_console_message_delay_milliseconds: int = 0):
-  """Enables logging of output.
-  
+  """Redirects output to files or the GIMP console.
+
+  Logging is reset on each call to this function. For example, if ``log_mode``
+  was ``'files'`` and ``log_mode`` in the current call is ``'none'``, the log
+  files are closed, and ``stdout`` and ``stderr`` are restored.
+
   Args:
     log_mode:
       The log mode. Possible values:
-      * ``'none'`` - Do not log anything.
+      * ``'none'`` - No action is performed, i.e. the output is not redirected.
       * ``'exceptions'`` - Only log exceptions to the error log file.
       * ``'files'`` - Redirect standard output and error to log files.
       * ``'gimp_console'`` - Redirect standard output and error to the GIMP
@@ -38,10 +42,12 @@ def log_output(
       ``'gimp_console'`` mode, this parameter has no effect.
     log_stdout_filename:
       File name of the log file to write standard output to. Applies to the
-      ``'files'`` mode only.
+      ``'files'`` mode only. This parameter must not be ``None`` if ``log_mode``
+      is ``'files'``.
     log_stderr_filename:
       File name of the log file to write error output to. Applies to the
-      ``'exceptions'`` and ``'files'`` modes only.
+      ``'exceptions'`` and ``'files'`` modes only. This parameter must not be
+      ``None`` if ``log_mode`` is ``'files'`` or ``'exceptions'``.
     log_header_title:
       Optional title in the log header, written before the first output to
       the log files. Applies to the ``'exceptions'`` and ``'files'`` modes only.
