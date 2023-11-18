@@ -26,7 +26,7 @@ def parse_layers(tree_string: str) -> stubs_gimp.Image:
     layer = None
     
     if current_symbol.endswith(' {'):
-      layer = stubs_gimp.Layer(current_symbol.rstrip(' {'), is_group=True)
+      layer = stubs_gimp.Layer(name=current_symbol.rstrip(' {'), is_group=True)
       if isinstance(current_parent, stubs_gimp.Image):
         current_parent.layers.append(layer)
       else:
@@ -38,7 +38,7 @@ def parse_layers(tree_string: str) -> stubs_gimp.Image:
       parents.pop()
       current_parent = parents[-1]
     else:
-      layer = stubs_gimp.Layer(current_symbol)
+      layer = stubs_gimp.Layer(name=current_symbol)
       if isinstance(current_parent, stubs_gimp.Image):
         current_parent.layers.append(layer)
       else:

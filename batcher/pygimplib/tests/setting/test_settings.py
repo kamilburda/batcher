@@ -1436,9 +1436,9 @@ class TestParasiteSetting(unittest.TestCase):
 
   def test_set_value_by_object(self):
     setting = settings_.ParasiteSetting('parasite')
-    
-    parasite = Gimp.Parasite.new('parasite_stub', 1, b'data')
-    
+
+    parasite = stubs_gimp.Parasite.new('parasite_stub', 1, b'data')
+
     setting.set_value(parasite)
     
     self.assertEqual(setting.value, parasite)
@@ -1455,7 +1455,7 @@ class TestParasiteSetting(unittest.TestCase):
   def test_to_dict(self):
     setting = settings_.ParasiteSetting('parasite')
     
-    parasite = Gimp.Parasite.new('parasite_stub', 1, b'data')
+    parasite = stubs_gimp.Parasite.new('parasite_stub', 1, b'data')
     
     setting.set_value(parasite)
     
@@ -2291,7 +2291,7 @@ class TestArraySetting(unittest.TestCase):
     ('default_length_name_and_description',
      None,
      None,
-     'coordinates-length',
+     'num-coordinates',
      'Number of elements in "coordinates"'),
     
     ('custom_length_name_and_description',

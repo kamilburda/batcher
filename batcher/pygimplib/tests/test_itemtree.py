@@ -239,7 +239,7 @@ class TestItem(unittest.TestCase):
     self.FOLDER = pgitemtree.TYPE_FOLDER
 
     # noinspection PyTypeChecker
-    self.item = pgitemtree.Item(stubs_gimp.Layer('main-background.jpg'), self.ITEM)
+    self.item = pgitemtree.Item(stubs_gimp.Layer(name='main-background.jpg'), self.ITEM)
   
   def test_str(self):
     self.assertEqual(str(self.item), '<Item "main-background.jpg">')

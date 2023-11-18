@@ -55,7 +55,7 @@ class Parasite(GObject.GObject):
     return self.flags
 
   def get_data(self):
-    return self.data
+    return list(self.data)
 
 
 class Image(GObject.GObject, ParasiteFunctionsStubMixin):
