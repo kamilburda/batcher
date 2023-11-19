@@ -66,7 +66,7 @@ class TestAddActionFromSettings(unittest.TestCase):
   
   def setUp(self):
     self.batcher = core.Batcher(
-      initial_run_mode=0,
+      initial_run_mode=Gimp.RunMode.INTERACTIVE,
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
@@ -138,7 +138,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
   
   def test_get_replaced_args(self):
     batcher = core.Batcher(
-      initial_run_mode=0,
+      initial_run_mode=Gimp.RunMode.INTERACTIVE,
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
@@ -163,9 +163,10 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       'action_groups': ['basic'],
       'arguments': [
         {
-          'type': 'int',
+          'type': 'enum',
           'name': 'run_mode',
-          'default_value': 0,
+          'enum_type': Gimp.RunMode,
+          'default_value': Gimp.RunMode.INTERACTIVE,
         },
         {
           'type': 'placeholder_image',
