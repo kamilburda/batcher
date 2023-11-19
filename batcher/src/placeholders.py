@@ -16,8 +16,6 @@ The following placeholder objects are defined:
   the currently processed layer.
 """
 
-import collections
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -50,14 +48,14 @@ def _get_current_layer(batcher):
   return batcher.current_raw_item
 
 
-_PLACEHOLDERS = collections.OrderedDict([
-  ('current_image', _GimpObjectPlaceholder(_('Current Image'), _get_current_image)),
-  ('current_layer', _GimpObjectPlaceholder(_('Current Layer'), _get_current_layer)),
-  ('background_layer',
-   _GimpObjectPlaceholder(_('Background Layer'), background_foreground.get_background_layer)),
-  ('foreground_layer',
-   _GimpObjectPlaceholder(_('Foreground Layer'), background_foreground.get_foreground_layer)),
-])
+_PLACEHOLDERS = {
+  'current_image': _GimpObjectPlaceholder(_('Current Image'), _get_current_image),
+  'current_layer': _GimpObjectPlaceholder(_('Current Layer'), _get_current_layer),
+  'background_layer': _GimpObjectPlaceholder(
+    _('Background Layer'), background_foreground.get_background_layer),
+  'foreground_layer': _GimpObjectPlaceholder(
+    _('Foreground Layer'), background_foreground.get_foreground_layer),
+}
 
 
 def get_replaced_arg(arg, batcher):

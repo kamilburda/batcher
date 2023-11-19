@@ -497,4 +497,4 @@ _FIELDS_LIST = [
   },
 ]
 
-FIELDS = collections.OrderedDict([(field['regex'], field) for field in _FIELDS_LIST])
+FIELDS = {field['regex']: field for field in _FIELDS_LIST}

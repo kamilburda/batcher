@@ -29,12 +29,12 @@ FILENAMES_TO_REMOVE = [
   'dev',
 ]
 
-RELATIVE_PATHS_TO_MOVE = collections.OrderedDict([
-  ('favicon.ico', 'docs/favicon.ico'),
-  ('assets', 'docs/assets'),
-  ('images', 'docs/images'),
-  ('sections', 'docs/sections'),
-])
+RELATIVE_PATHS_TO_MOVE = {
+  'favicon.ico': 'docs/favicon.ico',
+  'assets': 'docs/assets',
+  'images': 'docs/images',
+  'sections': 'docs/sections',
+}
 
 HTML_DOCTYPE_DECLARATION = '<!DOCTYPE html>'
 INDEX_HTML = 'index.html'
@@ -105,7 +105,7 @@ class LocalJekyllHTMLParser(html.parser.HTMLParser):
     self.tree = None
   
   def handle_starttag(self, tag, attributes):
-    self.tree_builder.start(tag, collections.OrderedDict(attributes))
+    self.tree_builder.start(tag, dict(attributes))
     if tag in HTML_VOID_ELEMENTS:
       self.tree_builder.end(tag)
   
@@ -113,7 +113,7 @@ class LocalJekyllHTMLParser(html.parser.HTMLParser):
     self.tree_builder.end(tag)
   
   def handle_startendtag(self, tag, attributes):
-    self.tree_builder.start(tag, collections.OrderedDict(attributes))
+    self.tree_builder.start(tag, dict(attributes))
     self.tree_builder.end(tag)
 
   def handle_data(self, data):

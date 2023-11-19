@@ -273,11 +273,11 @@ def _create_installers(
   if installers is None:
     installers = []
   
-  installers = list(collections.OrderedDict.fromkeys(installers))
+  installers = list(dict.fromkeys(installers))
   
-  installer_funcs = collections.OrderedDict([
-    ('zip', _create_zip_archive),
-  ])
+  installer_funcs = {
+    'zip': _create_zip_archive,
+  }
   
   if 'all' in installers:
     installer_funcs_to_invoke = list(installer_funcs.values())

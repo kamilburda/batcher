@@ -151,11 +151,11 @@ class TestUpdate(unittest.TestCase):
 class TestHandleUpdate(unittest.TestCase):
   
   def setUp(self):
-    self.update_handlers = collections.OrderedDict([
-      ('3.3.1', lambda *args, **kwargs: self._invoked_handlers.append('3.3.1')),
-      ('3.4', lambda *args, **kwargs: self._invoked_handlers.append('3.4')),
-      ('3.5', lambda *args, **kwargs: self._invoked_handlers.append('3.5')),
-    ])
+    self.update_handlers = {
+      '3.3.1': lambda *args, **kwargs: self._invoked_handlers.append('3.3.1'),
+      '3.4': lambda *args, **kwargs: self._invoked_handlers.append('3.4'),
+      '3.5': lambda *args, **kwargs: self._invoked_handlers.append('3.5'),
+    }
     
     self._invoked_handlers = []
     

@@ -1,4 +1,3 @@
-import collections
 import unittest
 import unittest.mock as mock
 
@@ -70,9 +69,9 @@ test_constraints = [
 
 
 def get_action_data(actions_list):
-  return collections.OrderedDict(
-    (action_dict['name'], dict(action_dict))
-    for action_dict in actions_list)
+  return {
+    action_dict['name']: dict(action_dict)
+    for action_dict in actions_list}
 
 
 class TestCreateActions(unittest.TestCase):

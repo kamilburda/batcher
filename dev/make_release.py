@@ -3,7 +3,6 @@
 """Creating a new plug-in release."""
 
 import argparse
-import collections
 import distutils.util
 import getpass
 import inspect
@@ -242,9 +241,9 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
   pg.config.PLUGIN_VERSION = release_metadata.new_version
   pg.config.PLUGIN_VERSION_RELEASE_DATE = release_metadata.new_version_release_date
   
-  entries_to_modify = collections.OrderedDict([
-    ('PLUGIN_VERSION', release_metadata.new_version),
-    ('PLUGIN_VERSION_RELEASE_DATE', release_metadata.new_version_release_date)])
+  entries_to_modify = {
+    'PLUGIN_VERSION': release_metadata.new_version,
+    'PLUGIN_VERSION_RELEASE_DATE': release_metadata.new_version_release_date}
   
   print('Modifying the following entries in file "{}": {}'.format(
     plugin_config_filepath, ', '.join(entries_to_modify)))
