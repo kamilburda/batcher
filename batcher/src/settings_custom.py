@@ -16,22 +16,22 @@ from src import renamer as renamer_
 class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
   `pygimplib.gui.FilenamePatternEntry` widgets.
-  
+
   Value: Text in the entry.
   """
-  
+
   def _create_widget(self, setting, **kwargs):
     return pg.gui.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
 
 
 class FilenamePatternSetting(pg.setting.StringSetting):
-  
+
   _ALLOWED_GUI_TYPES = [
     FilenamePatternEntryPresenter,
     pg.SETTING_GUI_TYPES.extended_entry,
     pg.SETTING_GUI_TYPES.entry,
   ]
-  
+
   def _assign_value(self, value):
     if not value:
       self._value = self._default_value
@@ -40,18 +40,20 @@ class FilenamePatternSetting(pg.setting.StringSetting):
 
 
 class ImagesAndGimpItemsSetting(pg.setting.Setting):
-  """Class for settings representing a mapping of (GIMP image ID, GIMP item IDs)
-  pairs.
+  """Class for settings representing a mapping of
+  ``(GIMP image ID, GIMP item IDs)`` pairs.
   
   The mapping is implemented as `collections.defaultdict(set)`.
   
-  A GIMP item ID can be represented as an integer or an (ID, FOLDER_KEY) tuple,
-  where `FOLDER_KEY` is a string literal defined in `pygimplib.itemtree`.
+  A GIMP item ID can be represented as an integer or an ``(ID, FOLDER_KEY)``
+  tuple, where ``FOLDER_KEY`` is a string literal defined in
+  `pygimplib.itemtree`.
   
   When storing this setting to a persistent source, images are stored as file
-  paths and items are stored as (item class name, item path) or (item class
-  name, item path, FOLDER_KEY) tuples. Item class name and item path are
-  described in `pygimplib.pdbutils.get_item_from_image_and_item_path()`.
+  paths and items are stored as ``(item class name, item path)`` or ``(item
+  class name, item path, FOLDER_KEY)`` tuples. ``Item class name`` and ``item
+  path`` are described in
+  `pygimplib.pdbutils.get_item_from_image_and_item_path()`.
   
   Default value: `collections.defaultdict(set)`
   """
@@ -78,7 +80,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         image_id = image.get_id()
         
         if not isinstance(items, Iterable) or isinstance(items, str):
-          raise TypeError('expected a list-like, found {}'.format(items))
+          raise TypeError(f'expected a list-like, found {items}')
         
         processed_items = set()
         
@@ -87,7 +89,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
             if len(item) not in [2, 3]:
               raise ValueError(
                 'list-likes representing items must contain exactly 2 or 3 elements'
-                ' (has {})'.format(len(item)))
+                f' (has {len(item)})')
             
             if isinstance(item[0], int):  # (item ID, item type)
               item_object = Gimp.Item.get_by_id(item[0])
@@ -143,7 +145,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
             if len(item_id) != 2:
               raise ValueError(
                 'list-likes representing items must contain exactly 2 elements'
-                ' (has {})'.format(len(item_id)))
+                f' (has {len(item_id)})')
             
             item = Gimp.Item.get_by_id(item_id[0])
             item_type = item_id[1]
@@ -177,13 +179,13 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
   """Class for settings the list of currently opened images and their import
   directory paths.
   
-  The setting value is a dictionary of (image ID, import directory path) pairs.
-  The import directory path is `None` if the image does not have any.
+  The setting value is a dictionary of ``(image ID, import directory path)``
+  pairs. The import directory path is ``None`` if the image does not have any.
   
   This setting cannot be registered to the PDB as no corresponding PDB type
   exists.
   
-  Default value: `{}`
+  Default value: ``{}``
   """
   
   _DEFAULT_DEFAULT_VALUE = {}
@@ -213,7 +215,8 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
     
     self._value[image_id] = dirpath
   
-  def _get_currently_opened_images(self):
+  @staticmethod
+  def _get_currently_opened_images():
     current_images = Gimp.list_images()
     current_image_ids = set([image.get_id() for image in current_images])
     
@@ -229,7 +232,8 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
       if image.get_id() not in self._value:
         self._value[image.get_id()] = self._get_image_import_dirpath(image)
   
-  def _get_image_import_dirpath(self, image):
+  @staticmethod
+  def _get_image_import_dirpath(image):
     if image.get_file() is not None:
       return os.path.dirname(image.get_file().get_path())
     else:

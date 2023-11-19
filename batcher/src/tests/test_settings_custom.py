@@ -7,7 +7,7 @@ import unittest.mock as mock
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-from src import settings_custom
+import batcher.src.settings_custom as settings_custom
 
 
 def _get_images_and_items():
@@ -51,7 +51,7 @@ def _get_images_and_items_with_paths():
 
 
 class TestImagesAndGimpItemsSetting(unittest.TestCase):
-  
+
   def setUp(self):
     self.setting = settings_custom.ImagesAndGimpItemsSetting('selected_layers')
     
@@ -60,18 +60,16 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_from_ids(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
-      
-        self.setting.set_value(
-          {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+
+      self.setting.set_value(
+        {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
     
     expected_value = collections.defaultdict(set)
-    expected_value[1] = set([1, 3, (4, 'folder')])
-    expected_value[2] = set([5, (7, 'folder')])
+    expected_value[1] = {1, 3, (4, 'folder')}
+    expected_value[2] = {5, (7, 'folder')}
     
     self.assertEqual(self.setting.value, expected_value)
 
@@ -82,154 +80,165 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
           f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.list_images.side_effect = images
       temp_mock_gimp_module.Layer = stubs_gimp.GimpModuleStub.Layer
-      temp_mock_gimp_module.GroupLayer = stubs_gimp.GimpModuleStub.GroupLayer
     
       self.setting.set_value(
-        {'filename_1': [
+        {os.path.abspath('filename_1'): [
           ('Layer', 'item_1'),
           ('Layer', 'item_4/item_3'),
-          ('GroupLayer', 'item_4', 'folder')],
-         'filename_2': [
+          ('Layer', 'item_4', 'folder')],
+         os.path.abspath('filename_2'): [
           ('Layer', 'item_7/item_5'),
-          ('GroupLayer', 'item_6', 'folder'),
-          ('GroupLayer', 'item_7', 'folder'),
+          ('Layer', 'item_6', 'folder'),
+          ('Layer', 'item_7', 'folder'),
           ('Layer', 'item_8')],
-         'filename_3': [
+         os.path.abspath('filename_3'): [
            ('Layer', 'item_9'),
            ('Layer', 'item_10')]})
     
     expected_value = collections.defaultdict(set)
-    expected_value[1] = set([1, 3, (4, 'folder')])
-    expected_value[2] = set([5, (7, 'folder')])
+    expected_value[1] = {1, 3, (4, 'folder')}
+    expected_value[2] = {5, (7, 'folder')}
     
     self.assertEqual(self.setting.value, expected_value)
   
   def test_set_value_invalid_list_length_raises_error(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
-        
-        with self.assertRaises(ValueError):
-          self.setting.set_value(
-            {1: [1, 3, (4, 'folder', 'extra_item_1', 'extra_item_2')]})
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+
+      with self.assertRaises(ValueError):
+        self.setting.set_value(
+          {1: [1, 3, (4, 'folder', 'extra_item_1', 'extra_item_2')]})
   
   def test_set_value_invalid_collection_type_for_items_raises_error(self):
     images, items = _get_images_and_items_with_ids()
-    
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
+
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
         
-        with self.assertRaises(TypeError):
-          self.setting.set_value(
-            {1: object()})
+      with self.assertRaises(TypeError):
+        self.setting.set_value(
+          {1: object()})
   
   def test_to_dict_with_ids(self):
     images, items = _get_images_and_items_with_ids()
+
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
     
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
-    
-        self.setting.set_value(
-          {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
-        
-        self.assertDictEqual(
-          self.setting.to_dict(source_type='session'),
-          {
-            'name': 'selected_layers',
-            'type': 'images_and_gimp_items',
-            'value': {1: [1, 3, [4, 'folder']], 2: [5, [7, 'folder']]},
-          })
+      self.setting.set_value(
+        {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
+
+      setting_dict = self.setting.to_dict(source_type='session')
+
+      self.assertEqual(setting_dict['name'], 'selected_layers')
+      self.assertEqual(setting_dict['type'], 'images_and_gimp_items')
+      self.assertEqual(list(setting_dict['value']), [1, 2])
+      # We need to compare 'value' field element by element since unordered sets
+      # are converted to lists, and we cannot guarantee stable order in sets.
+      self.assertSetEqual(
+        set(tuple(item) if isinstance(item, list) else item for item in setting_dict['value'][1]),
+        {1, 3, (4, 'folder')})
+      self.assertSetEqual(
+        set(tuple(item) if isinstance(item, list) else item for item in setting_dict['value'][2]),
+        {5, (7, 'folder')})
   
   def test_to_dict_with_paths(self):
     images, items = _get_images_and_items_with_ids()
-    
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
-        
-        self.setting.set_value(
-          {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
-        
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = [
-          item for item in items if item is not None]
-        
-        expected_dict = {
-          'name': 'selected_layers',
-          'type': 'images_and_gimp_items',
-          'value': {
-            'filename_1': [
-              ['Layer', 'item_1'],
-              ['Layer', 'item_4/item_3'],
-              ['LayerGroupStub', 'item_4', 'folder']],
-            'filename_2': [
-              ['Layer', 'item_7/item_5'],
-              ['LayerGroupStub', 'item_7', 'folder']],
-          },
-        }
-        
-        actual_dict = self.setting.to_dict()
-        
-        # We need to compare 'value' field element by element since unordered sets
-        # are converted to lists and we cannot guarantee stable order in sets.
-        self.assertEqual(actual_dict['name'], expected_dict['name'])
-        self.assertEqual(actual_dict['type'], expected_dict['type'])
-        for key in expected_dict['value']:
-          self.assertIn(key, actual_dict['value'])
-          for item in expected_dict['value'][key]:
-            self.assertIn(item, actual_dict['value'][key])
+
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+
+      self.setting.set_value(
+        {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
+
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = (
+        self._get_properly_ordered_side_effect_items(items))
+
+      expected_dict = {
+        'name': 'selected_layers',
+        'type': 'images_and_gimp_items',
+        'value': {
+          os.path.abspath('filename_1'): [
+            ['Layer', 'item_1'],
+            ['Layer', 'item_4/item_3'],
+            ['Layer', 'item_4', 'folder']],
+          os.path.abspath('filename_2'): [
+            ['Layer', 'item_7/item_5'],
+            ['Layer', 'item_7', 'folder']],
+        },
+      }
+
+      actual_dict = self.setting.to_dict()
+
+      self.assertEqual(actual_dict['name'], expected_dict['name'])
+      self.assertEqual(actual_dict['type'], expected_dict['type'])
+      # We need to compare 'value' field element by element since unordered sets
+      # are converted to lists, and we cannot guarantee stable order in sets.
+      for key in expected_dict['value']:
+        self.assertIn(key, actual_dict['value'])
+        for item in expected_dict['value'][key]:
+          self.assertIn(item, actual_dict['value'][key])
   
   def test_to_dict_with_image_without_filepaths(self):
     images, items = _get_images_and_items_with_ids()
 
     images[1].set_file(None)
     
-    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
-      with mock.patch(
-            f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = items
-        
-        self.setting.set_value(
-          {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
-        
-        temp_mock_gimp_module.Image.get_by_id.side_effect = images
-        temp_mock_gimp_item_module.get_by_id.side_effect = [
-          item for item in items if item is not None]
-        
-        expected_dict = {
-          'name': 'selected_layers',
-          'type': 'images_and_gimp_items',
-          'value': {
-            'filename_1': [
-              ['Layer', 'item_1'],
-              ['Layer', 'item_4/item_3'],
-              ['LayerGroupStub', 'item_4', 'folder']],
-          },
-        }
-        
-        actual_dict = self.setting.to_dict()
-        
-        # We need to compare 'value' field element by element since unordered sets
-        # are converted to lists and we cannot guarantee stable order in sets.
-        self.assertEqual(actual_dict['name'], expected_dict['name'])
-        self.assertEqual(actual_dict['type'], expected_dict['type'])
-        for key in expected_dict['value']:
-          self.assertIn(key, actual_dict['value'])
-          for item in expected_dict['value'][key]:
-            self.assertIn(item, actual_dict['value'][key])
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
+
+      self.setting.set_value(
+        {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
+
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = (
+        self._get_properly_ordered_side_effect_items(items))
+
+      expected_dict = {
+        'name': 'selected_layers',
+        'type': 'images_and_gimp_items',
+        'value': {
+          os.path.abspath('filename_1'): [
+            ['Layer', 'item_1'],
+            ['Layer', 'item_4/item_3'],
+            ['Layer', 'item_4', 'folder']],
+        },
+      }
+
+      actual_dict = self.setting.to_dict()
+
+      self.assertEqual(actual_dict['name'], expected_dict['name'])
+      self.assertEqual(actual_dict['type'], expected_dict['type'])
+      # We need to compare 'value' field element by element since unordered sets
+      # are converted to lists, and we cannot guarantee stable order in sets.
+      for key in expected_dict['value']:
+        self.assertIn(key, actual_dict['value'])
+        for item in expected_dict['value'][key]:
+          self.assertIn(item, actual_dict['value'][key])
+
+  def _get_properly_ordered_side_effect_items(self, items):
+    # We need to set up the items in the correct order since the setting
+    # stores the items as sets, which are unordered.
+    item_ids_and_items = {item.get_id(): item for item in items if item is not None}
+    flattened_raw_items = [
+      item for item_list in self.setting.value.values() for item in item_list]
+
+    reordered_items = []
+    for item in flattened_raw_items:
+      if isinstance(item, (tuple, list)):
+        reordered_items.append(item_ids_and_items[item[0]])
+      else:
+        reordered_items.append(item_ids_and_items[item])
+
+    return reordered_items
 
 
 class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
@@ -252,7 +261,8 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
     # be called on it.
     return self.image_list
   
-  def _create_image_list(self, image_ids_and_filepaths):
+  @staticmethod
+  def _create_image_list(image_ids_and_filepaths):
     return [
       stubs_gimp.Image(id_=image_id, filepath=filepath)
       for image_id, filepath in image_ids_and_filepaths]
@@ -269,9 +279,7 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
     self.image_list.extend(
       self._create_image_list([(5, '/test/new_image.png'), (6, None)]))
     
-    with mock.patch(
-           f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp.list_images',
-           new=self.get_image_list):
+    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
       self.setting.update_image_ids_and_dirpaths()
     
     self.assertEqual(
@@ -279,10 +287,8 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
   
   def test_update_image_ids_and_dirpaths_remove_closed_images(self):
     self.image_list.pop(1)
-    
-    with mock.patch(
-           f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp.list_images',
-           new=self.get_image_list):
+
+    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
       self.setting.update_image_ids_and_dirpaths()
     
     self.assertEqual(
