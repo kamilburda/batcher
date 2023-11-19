@@ -562,20 +562,26 @@ class GimpSessionSource(Source):
   single GIMP session.
   """
 
+  _SESSION_DATA = {}
+
   def __init__(self, source_name: str, source_type: str = 'session'):
     super().__init__(source_name, source_type)
   
   def clear(self):
-    return
+    if self.source_name in self._SESSION_DATA:
+      del self._SESSION_DATA[self.source_name]
   
   def has_data(self):
-    return False
+    return self.source_name in self._SESSION_DATA and self._SESSION_DATA[self.source_name]
   
   def read_data_from_source(self):
-    return
+    if self.source_name in self._SESSION_DATA:
+      return self._SESSION_DATA[self.source_name]
+    else:
+      return None
   
   def write_data_to_source(self, data):
-    return
+    self._SESSION_DATA[self.source_name] = data
 
 
 class GimpParasiteSource(Source):
