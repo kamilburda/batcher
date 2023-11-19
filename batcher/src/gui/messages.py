@@ -1,6 +1,7 @@
 """Functions to display message dialogs."""
 
 import traceback
+from typing import Optional, Tuple, Union
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -12,13 +13,14 @@ from src import exceptions
 
 
 def display_message(
-      message,
-      message_type,
-      parent=None,
-      buttons=gtk.BUTTONS_OK,
-      message_in_text_view=False,
-      button_response_id_to_focus=None,
-      message_markup=False):
+      message: str,
+      message_type: Gtk.MessageType = Gtk.MessageType.ERROR,
+      parent: Optional[Gtk.Window] = None,
+      buttons: Gtk.ButtonsType = Gtk.ButtonsType.OK,
+      message_in_text_view: bool = False,
+      button_response_id_to_focus: int = None,
+      message_markup: bool = False,
+):
   return pg.gui.display_message(
     message,
     message_type,
@@ -31,8 +33,13 @@ def display_message(
 
 
 def display_failure_message(
-      main_message, failure_message, details, parent=None, report_description=None,
-      display_details_initially=False):
+      main_message: str,
+      failure_message: str,
+      details: str,
+      parent: Optional[Gtk.Window] = None,
+      report_description: Optional[str] = None,
+      display_details_initially: bool = False,
+):
   if report_description is None:
     report_description = _(
       'If you believe this is an error in the plug-in, you can help fix it'
@@ -42,7 +49,7 @@ def display_failure_message(
     title=pg.config.PLUGIN_TITLE,
     app_name=pg.config.PLUGIN_TITLE,
     parent=parent,
-    message_type=gtk.MESSAGE_WARNING,
+    message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,
     message_secondary_markup=failure_message,
     details=details,
@@ -52,7 +59,10 @@ def display_failure_message(
     focus_on_button=True)
 
 
-def display_processing_failure_message(exception, parent=None):
+def display_processing_failure_message(
+      exception: Exception,
+      parent: Optional[Gtk.Window] = None,
+):
   display_failure_message(
     _('There was a problem during processing:'),
     failure_message=str(exception),
@@ -60,7 +70,7 @@ def display_processing_failure_message(exception, parent=None):
     parent=parent)
 
 
-def display_invalid_image_failure_message(parent=None):
+def display_invalid_image_failure_message(parent: Optional[Gtk.Window] = None):
   display_failure_message(
     _('There was a problem during processing.'
       ' Do not close the image during processing,'
@@ -70,7 +80,11 @@ def display_invalid_image_failure_message(parent=None):
     parent=parent)
 
 
-def display_import_export_settings_failure_message(main_message, details, parent=None):
+def display_import_export_settings_failure_message(
+      main_message: str,
+      details: str,
+      parent: Optional[Gtk.Window] = None,
+):
   display_failure_message(
     main_message,
     failure_message='',
@@ -81,7 +95,10 @@ def display_import_export_settings_failure_message(main_message, details, parent
       ' by sending a report with the file and the text in the details to one of the sites below'))
 
 
-def get_failing_action_message(action_and_item_or_action_error):
+def get_failing_action_message(
+      action_and_item_or_action_error: Union[
+        Tuple[pg.setting.Group, pg.itemtree.Item], exceptions.ActionError],
+):
   if isinstance(action_and_item_or_action_error, exceptions.ActionError):
     action, item = action_and_item_or_action_error.action, action_and_item_or_action_error.item
   else:
@@ -89,18 +106,24 @@ def get_failing_action_message(action_and_item_or_action_error):
   
   if 'procedure' not in action.tags and 'constraint' not in action.tags:
     raise ValueError('an action must have the "procedure" or "constraint" tag')
-  
+
+  message_template = None
+
   if item is not None:
     if 'procedure' in action.tags:
       message_template = _('Failed to apply procedure "{}" on "{}" because:')
     elif 'constraint' in action.tags:
       message_template = _('Failed to apply constraint "{}" on "{}" because:')
-  
-    return message_template.format(action['display_name'].value, item.orig_name)
+
+    if message_template is not None:
+      return message_template.format(action['display_name'].value, item.orig_name)
   else:
     if 'procedure' in action.tags:
       message_template = _('Failed to apply procedure "{}" because:')
     elif 'constraint' in action.tags:
       message_template = _('Failed to apply constraint "{}" because:')
-    
-    return message_template.format(action['display_name'].value)
+
+    if message_template is not None:
+      return message_template.format(action['display_name'].value)
+
+  return action['display_name'].value
