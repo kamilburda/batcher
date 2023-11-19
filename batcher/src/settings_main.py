@@ -41,13 +41,10 @@ def create_settings():
   
   settings['special'].add([
     {
-      'type': 'choice',
+      'type': 'enum',
       'name': 'run_mode',
-      'default_value': 'non_interactive',
-      'items': [
-        ('interactive', 'RUN-INTERACTIVE', Gimp.RunMode.INTERACTIVE),
-        ('non_interactive', 'RUN-NONINTERACTIVE', Gimp.RunMode.NONINTERACTIVE),
-        ('run_with_last_vals', 'RUN-WITH-LAST-VALS', Gimp.RunMode.WITH_LAST_VALS)],
+      'enum_type': Gimp.RunMode,
+      'default_value': Gimp.RunMode.NONINTERACTIVE,
       'display_name': _('The run mode'),
     },
     {
