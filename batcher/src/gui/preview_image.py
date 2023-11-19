@@ -428,10 +428,10 @@ class ImagePreview(preview_base_.Preview):
     
     pdb.gimp_item_transform_scale(
       raw_item,
-      raw_item.get_offsets()[1] * self._preview_scaling_factor,
-      raw_item.get_offsets()[2] * self._preview_scaling_factor,
-      (raw_item.get_offsets()[1] + raw_item.get_width()) * self._preview_scaling_factor,
-      (raw_item.get_offsets()[2] + raw_item.get_height()) * self._preview_scaling_factor)
+      raw_item.get_offsets().offset_x * self._preview_scaling_factor,
+      raw_item.get_offsets().offset_y * self._preview_scaling_factor,
+      (raw_item.get_offsets().offset_x + raw_item.get_width()) * self._preview_scaling_factor,
+      (raw_item.get_offsets().offset_y + raw_item.get_height()) * self._preview_scaling_factor)
   
   def _resize_item_for_batcher(self, batcher, item=None, raw_item=None):
     pdb.gimp_layer_resize_to_image_size(batcher.current_raw_item)
