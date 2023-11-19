@@ -1,5 +1,7 @@
 """Custom exception classes related to batch processing or export."""
 
+from typing import Optional
+
 
 class BatcherError(Exception):
   pass
@@ -30,7 +32,12 @@ class InvalidPdbProcedureError(BatcherError):
 
 class ExportError(BatcherError):
   
-  def __init__(self, message='', item_name=None, file_extension=None):
+  def __init__(
+        self,
+        message: str = '',
+        item_name: Optional[str] = None,
+        file_extension: Optional[str] = None,
+  ):
     super().__init__()
     
     self._message = message
@@ -41,9 +48,9 @@ class ExportError(BatcherError):
     str_ = self._message
     
     if self.item_name:
-      str_ += '\n' + _('Layer:') + ' ' + self.item_name
+      str_ += '\n{} {}'.format(_('Layer:'), self.item_name)
     if self.file_extension:
-      str_ += '\n' + _('File extension:') + ' ' + self.file_extension
+      str_ += '\n{} {}'.format(_('File extension:'), self.file_extension)
     
     return str_
 
