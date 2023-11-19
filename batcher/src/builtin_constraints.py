@@ -1,9 +1,6 @@
 """Built-in plug-in constraints."""
 
-import collections
-
 import pygimplib as pg
-from pygimplib import pdb
 
 
 def is_layer(item):
@@ -11,7 +8,7 @@ def is_layer(item):
 
 
 def is_nonempty_group(item):
-  return item.type == pg.itemtree.TYPE_GROUP and pdb.gimp_item_get_children(item.raw)[1]
+  return item.type == pg.itemtree.TYPE_GROUP and item.raw.list_children()
 
 
 def has_matching_file_extension(item, file_extension):
@@ -31,7 +28,7 @@ def is_top_level(item):
 
 
 def is_visible(item):
-  return item.raw.visible
+  return item.raw.get_visible()
 
 
 def has_tags(item, tags=None):
@@ -133,8 +130,8 @@ _BUILTIN_CONSTRAINTS_LIST = [
 # function names and paths may change when refactoring or adding/modifying features.
 # The 'function' setting is set to an empty value as the function can be inferred
 # via the action's 'orig_name' setting.
-BUILTIN_CONSTRAINTS = collections.OrderedDict()
-BUILTIN_CONSTRAINTS_FUNCTIONS = collections.OrderedDict()
+BUILTIN_CONSTRAINTS = {}
+BUILTIN_CONSTRAINTS_FUNCTIONS = {}
 
 for action_dict in _BUILTIN_CONSTRAINTS_LIST:
   function = action_dict['function']
