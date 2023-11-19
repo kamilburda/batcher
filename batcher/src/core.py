@@ -4,7 +4,11 @@ import collections
 import functools
 import inspect
 import traceback
+from typing import List
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import GLib
 
 import pygimplib as pg
@@ -243,17 +247,17 @@ class Batcher:
     return self._export_context_manager_kwargs
   
   @property
-  def current_item(self):
+  def current_item(self) -> pg.itemtree.Item:
     """A `pygimplib.itemtree.Item` instance currently being processed."""
     return self._current_item
   
   @property
-  def current_raw_item(self):
+  def current_raw_item(self) -> Gimp.Layer:
     """Raw item (`Gimp.Layer`) currently being processed."""
     return self._current_raw_item
   
   @current_raw_item.setter
-  def current_raw_item(self, value):
+  def current_raw_item(self, value: Gimp.Layer):
     self._current_raw_item = value
   
   @property
@@ -267,7 +271,7 @@ class Batcher:
     return self._current_constraint
   
   @property
-  def current_image(self):
+  def current_image(self) -> Gimp.Image:
     """The current `Gimp.Image` containing layer(s) being processed.
     
     If `edit_mode` is `True`, this is equivalent to `input_image`.
@@ -278,7 +282,7 @@ class Batcher:
     return self._current_image
   
   @property
-  def exported_raw_items(self):
+  def exported_raw_items(self) -> List[Gimp.Layer]:
     """List of layers that were successfully exported.
     
     Does not include layers skipped by the user (when files with the same names
