@@ -14,6 +14,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
+from gi.repository import GObject
 
 from .pypdb import pdb
 
@@ -32,14 +33,24 @@ def _save_image_default(
       run_mode: Gimp.RunMode,
       image: Gimp.Image,
       layer_or_layers: Union[Gimp.Layer, List[Gimp.Layer]],
-      filepath: str,
+      filepath: Union[str, Gio.File],
 ):
   if not isinstance(layer_or_layers, Iterable):
     layers = [layer_or_layers]
   else:
     layers = layer_or_layers
 
-  Gimp.file_save(run_mode, image, layers, Gio.file_new_for_path(filepath))
+  if not isinstance(filepath, Gio.File):
+    image_file = Gio.file_new_for_path(filepath)
+  else:
+    image_file = filepath
+
+  layer_array = GObject.Value(Gimp.ObjectArray)
+  Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
+
+  pdb.gimp_file_save(run_mode, image, len(layers), layer_array.get_boxed(), image_file)
+
+  return pdb.last_status
 
 
 def get_save_procedure(file_extension: str) -> Callable:
