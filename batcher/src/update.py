@@ -1,6 +1,7 @@
 """Updating the plug-in to the latest version."""
 
 import os
+from typing import Dict, List, Optional, Tuple, Union
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -15,24 +16,28 @@ from src.gui import messages
 _UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, ABORT = 0, 1, 2, 3, 4
 
 
-def update(settings, handle_invalid='ask_to_clear', sources=None):
+def update(
+      settings: pg.setting.Group,
+      handle_invalid: str = 'ask_to_clear',
+      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
+) -> Tuple[int, str]:
   """Updates settings and setting sources to the latest version of the plug-in.
   
   This includes renaming settings or replacing obsolete actions.
   
-  `handle_invalid` is a string indicating how to handle a failed update:
+  ``handle_invalid`` is a string indicating how to handle a failed update:
     
-    * `'ask_to_clear'` - a message is displayed asking the user whether to clear
-      settings. If the user chose to clear the settings, `CLEAR_SETTINGS` is
-      returned, `ABORT` otherwise.
+    * ``'ask_to_clear'`` - a message is displayed asking the user whether to
+      clear settings. If the user chose to clear the settings, `CLEAR_SETTINGS`
+      is returned, `ABORT` otherwise.
     
-    * `'clear'` - settings will be cleared unconditionally and `CLEAR_SETTINGS`
-      is returned.
+    * ``'clear'`` - settings will be cleared unconditionally and
+      `CLEAR_SETTINGS` is returned.
     
     * any other value - no action is taken and `ABORT` is returned.
   
-  If `sources` is `None`, default setting sources are updated. Otherwise,
-  `sources` must be a dictionary of (key, source) pairs.
+  If ``sources`` is ``None``, default setting sources are updated. Otherwise,
+  ``sources`` must be a dictionary of (key, source) pairs.
   
   Two values are returned - status and an accompanying message.
   
@@ -66,6 +71,8 @@ def update(settings, handle_invalid='ask_to_clear', sources=None):
     if previous_version == current_version:
       return NO_ACTION, load_message
     else:
+      settings['main/plugin_version'].reset()
+
       handle_update(
         settings,
         sources,
@@ -122,6 +129,9 @@ def handle_update(
       update_handlers,
       previous_version,
       current_version):
+  if not update_handlers:
+    return
+
   for source in sources.values():
     source.clear()
 

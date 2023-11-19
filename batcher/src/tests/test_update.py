@@ -19,11 +19,8 @@ from src import version as version_
 @mock.patch(
   f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp',
   new_callable=stubs_gimp.GimpModuleStub)
-@mock.patch(
-  'batcher.update.gimp',
-  new_callable=stubs_gimp.GimpModuleStub)
-@mock.patch('batcher.update.handle_update')
-@mock.patch('batcher.gui.messages.display_message')
+@mock.patch('batcher.src.tests.test_update.update.handle_update')
+@mock.patch('batcher.src.update.messages.display_message')
 class TestUpdate(unittest.TestCase):
   
   def setUp(self):
@@ -37,15 +34,14 @@ class TestUpdate(unittest.TestCase):
       ]
     })
     
-    self.current_version = '3.3'
-    self.new_version = '3.4'
-    self.old_incompatible_version = '0.1'
+    self.previous_version = '0.1.0'
+    self.current_version = '1.0.0'
     
     self.settings['main'].add([
       {
         'type': 'string',
         'name': 'plugin_version',
-        'default_value': self.new_version,
+        'default_value': self.current_version,
         'pdb_type': None,
         'gui_type': None,
       },
@@ -57,45 +53,55 @@ class TestUpdate(unittest.TestCase):
         'gui_type': None,
       },
     ])
+
+    pg.setting.GimpSessionSource._SESSION_DATA = {}
   
-  def test_fresh_start_stores_new_version(self, *mocks):
+  def test_fresh_start_stores_current_version(self, *mocks):
     self.assertFalse(pg.setting.Persistor.get_default_setting_sources()['persistent'].has_data())
-    
+
     status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.FRESH_START)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
     
     load_result = self.settings['main/plugin_version'].load()
-    
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
+
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
     self.assertEqual(load_result.status, pg.setting.Persistor.SUCCESS)
-  
-  def test_minimum_version_or_later_is_overwritten_by_new_version(self, *mocks):
-    self.settings['main/plugin_version'].set_value(self.current_version)
+
+  @mock.patch('batcher.src.update.version_.Version.parse')
+  @mock.patch('batcher.src.tests.test_update.update._load_previous_version')
+  def test_minimum_version_or_later_is_overwritten_by_current_version(
+        self, mock_load_previous_version, mock_version_parse, *mocks):
+    mock_load_previous_version.return_value = (
+      self.previous_version, pg.setting.Persistor.SUCCESS, '')
+    mock_version_parse.return_value = self.current_version
+
+    self.settings['main/plugin_version'].set_value(self.previous_version)
     self.settings['main/plugin_version'].save()
     
     status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
   
   def test_persistent_source_has_data_but_not_version_clears_setting_sources(
         self, mock_display_message, *other_mocks):
-    mock_display_message.return_value = gtk.RESPONSE_YES
+    mock_display_message.return_value = Gtk.ResponseType.YES
     
     self.settings['main/test_setting'].save()
     
     status, _unused = update.update(self.settings)
     
     self.assertEqual(status, update.CLEAR_SETTINGS)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
-  
-  def test_less_than_minimum_version_clears_setting_sources(
-        self, mock_display_message, *other_mocks):
-    mock_display_message.return_value = gtk.RESPONSE_YES
-    
-    self.settings['main/plugin_version'].set_value(self.old_incompatible_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
+
+  @mock.patch('batcher.src.tests.test_update.update._load_previous_version')
+  def test_clear_setting_sources_when_failing_to_obtain_previous_version(
+        self, mock_load_previous_version, mock_display_message, *other_mocks):
+    mock_load_previous_version.return_value = (None, pg.setting.Persistor.FAIL, '')
+    mock_display_message.return_value = Gtk.ResponseType.YES
+
     self.settings['main'].save()
     
     status, _unused = update.update(self.settings)
@@ -103,14 +109,16 @@ class TestUpdate(unittest.TestCase):
     load_result = self.settings['main/test_setting'].load()
     
     self.assertEqual(status, update.CLEAR_SETTINGS)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
     self.assertEqual(load_result.status, pg.setting.Persistor.PARTIAL_SUCCESS)
     self.assertTrue(bool(load_result.settings_not_loaded))
-  
-  def test_ask_to_clear_positive_response(self, mock_display_message, *other_mocks):
-    mock_display_message.return_value = gtk.RESPONSE_YES
-    
-    self.settings['main/plugin_version'].set_value(self.old_incompatible_version)
+
+  @mock.patch('batcher.src.tests.test_update.update._load_previous_version')
+  def test_ask_to_clear_positive_response_when_failing_to_obtain_previous_version(
+        self, mock_load_previous_version, mock_display_message, *other_mocks):
+    mock_load_previous_version.return_value = (None, pg.setting.Persistor.FAIL, '')
+    mock_display_message.return_value = Gtk.ResponseType.YES
+
     self.settings['main'].save()
     
     status, _unused = update.update(self.settings, 'ask_to_clear')
@@ -118,22 +126,25 @@ class TestUpdate(unittest.TestCase):
     load_result = self.settings['main/test_setting'].load()
     
     self.assertEqual(status, update.CLEAR_SETTINGS)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.new_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
     self.assertEqual(load_result.status, pg.setting.Persistor.PARTIAL_SUCCESS)
     self.assertTrue(bool(load_result.settings_not_loaded))
-  
-  def test_ask_to_clear_negative_response(self, mock_display_message, *other_mocks):
-    mock_display_message.return_value = gtk.RESPONSE_NO
-    
-    self.settings['main/plugin_version'].set_value(self.old_incompatible_version)
+
+  @mock.patch('batcher.src.tests.test_update.update._load_previous_version')
+  def test_ask_to_clear_negative_response_when_failing_to_obtain_previous_version(
+        self, mock_load_previous_version, mock_display_message, *other_mocks):
+    mock_load_previous_version.return_value = (None, pg.setting.Persistor.FAIL, '')
+    mock_display_message.return_value = Gtk.ResponseType.NO
+
+    self.settings['main/plugin_version'].set_value('invalid_version')
     self.settings['main'].save()
-    
+
     status, _unused = update.update(self.settings, 'ask_to_clear')
-    
+
     load_result = self.settings['main/test_setting'].load()
-    
+
     self.assertEqual(status, update.ABORT)
-    self.assertEqual(self.settings['main/plugin_version'].value, self.old_incompatible_version)
+    self.assertEqual(self.settings['main/plugin_version'].value, 'invalid_version')
     self.assertEqual(load_result.status, pg.setting.Persistor.SUCCESS)
 
 
@@ -178,50 +189,6 @@ class TestHandleUpdate(unittest.TestCase):
       self.update_handlers,
       version_.Version.parse(previous_version_str),
       version_.Version.parse(current_version_str),
-      False,
-      False)
+    )
     
     self.assertEqual(self._invoked_handlers, invoked_handlers)
-
-
-class TestReplaceFieldArgumentsInPattern(unittest.TestCase):
-  
-  @parameterized.parameterized.expand([
-    ['single_argument_per_field',
-     [['layer name', r'keep extension', r'%e'], ['tags', r'\$\$', r'%t']],
-     '[layer name, keep extension]_[layer name]_[tags, _, ($$)]',
-     '[layer name, %e]_[layer name]_[tags, _, (%t)]'],
-    
-    ['multiple_arguments_per_field',
-     [['layer name', r'keep extension', r'%e'],
-      ['layer name', r'lowercase', r'%l'],
-      ['tags', r'\$\$', r'%t']],
-     '[layer name, lowercase, keep extension]_[layer name]_[tags, _, ($$)]',
-     '[layer name, %l, %e]_[layer name]_[tags, _, (%t)]'],
-    
-    ['unspecified_fields_remain_unmodified',
-     [['layer name', r'keep extension', r'%e'], ['tags', r'\$\$', r'%t']],
-     '[layer name, keep extension]_[001]_[tags, _, ($$)]',
-     '[layer name, %e]_[001]_[tags, _, (%t)]'],
-  ])
-  def test_replace_field_arguments_in_pattern(
-        self, test_case_suffix, fields_and_replacements, pattern, expected_output):
-    self.assertEqual(
-      update.replace_field_arguments_in_pattern(pattern, fields_and_replacements),
-      expected_output)
-  
-  @parameterized.parameterized.expand([
-    ['multiple_arguments_per_field',
-     [
-       ['layer path', [r'(.*)', r'(.*)'], [r'\1', r'\1', '%e']],
-       ['layer path', [r'(.*)'], [r'\1', '%c', '%e']],
-       ['layer path', [], ['-', '%c', '%e']],
-     ],
-     '[layer path]_[layer path, _, (%c)]_[tags, _, (%t)]',
-     '[layer path, -, %c, %e]_[layer path, _, (%c), %e]_[tags, _, (%t)]'],
-  ])
-  def test_replace_field_arguments_in_pattern_with_lists(
-        self, test_case_suffix, fields_and_replacements, pattern, expected_output):
-    self.assertEqual(
-      update.replace_field_arguments_in_pattern(pattern, fields_and_replacements, as_lists=True),
-      expected_output)
