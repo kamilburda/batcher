@@ -7,6 +7,7 @@ import collections
 import datetime
 import re
 import string
+from typing import Any, Callable, Dict, Generator, List, Optional
 
 import pygimplib as pg
 
@@ -15,12 +16,12 @@ from src import actions
 
 class ItemRenamer:
   
-  def __init__(self, pattern, fields_raw=None):
+  def __init__(self, pattern: str, fields_raw: Optional[List[Dict[str, Any]]] = None):
     self._filename_pattern = pg.path.StringPattern(
       pattern=pattern,
       fields=_get_fields_and_substitute_funcs(_init_fields(fields_raw)))
   
-  def rename(self, batcher, item=None):
+  def rename(self, batcher: 'src.core.Batcher', item: Optional[pg.itemtree.Item] = None):
     if item is None:
       item = batcher.current_item
     
@@ -54,8 +55,7 @@ def get_field_descriptions(fields):
   
   for field in fields.values():
     if isinstance(field, Field):
-      descriptions.append(
-        (field.display_name, field.str_to_insert, field.regex, str(field)))
+      descriptions.append((field.display_name, field.str_to_insert, field.regex, str(field)))
     else:
       descriptions.append(
         (field['display_name'], field['str_to_insert'], field['regex'],
@@ -83,42 +83,42 @@ class Field:
   
   def __init__(
         self,
-        regex,
-        substitute_func,
-        display_name,
-        str_to_insert,
-        examples_lines):
+        regex: str,
+        substitute_func: Callable,
+        display_name: str,
+        str_to_insert: str,
+        examples_lines: List[List[str]]):
     self._regex = regex
     self._substitute_func = substitute_func
     self._display_name = display_name
     self._str_to_insert = str_to_insert
     self._examples_lines = examples_lines
   
-  def __str__(self):
+  def __str__(self) -> str:
     return self.examples
   
   @property
-  def regex(self):
+  def regex(self) -> str:
     return self._regex
   
   @property
-  def substitute_func(self):
+  def substitute_func(self) -> Callable:
     return self._substitute_func
   
   @property
-  def display_name(self):
+  def display_name(self) -> str:
     return self._display_name
   
   @property
-  def str_to_insert(self):
+  def str_to_insert(self) -> str:
     return self._str_to_insert
   
   @property
-  def examples_lines(self):
+  def examples_lines(self) -> List[List[str]]:
     return self._examples_lines
   
   @property
-  def examples(self):
+  def examples(self) -> str:
     return _get_formatted_examples(self._examples_lines)
 
 
@@ -126,10 +126,10 @@ class NumberField(Field):
   
   def __init__(
         self,
-        regex,
-        display_name,
-        str_to_insert,
-        examples_lines):
+        regex: str,
+        display_name: str,
+        str_to_insert: str,
+        examples_lines: List[List[str]]):
     super().__init__(
       regex,
       self._get_number,
@@ -143,7 +143,9 @@ class NumberField(Field):
     self._global_number_generators = collections.defaultdict(dict)
   
   @staticmethod
-  def generate_number(initial_number, padding, ascending=True):
+  def generate_number(
+        initial_number: int, padding: int, ascending: bool = True
+  ) -> Generator[str, None, None]:
     i = initial_number
     if ascending:
       increment = 1
@@ -223,8 +225,8 @@ def _get_layer_name(batcher, item, field_value, file_extension_strip_mode=''):
 
 
 def _get_image_name(batcher, item, field_value, keep_extension_str=''):
-  if batcher.current_image is not None and batcher.current_image.name is not None:
-    image_name = batcher.current_image.name
+  if batcher.current_image is not None and batcher.current_image.get_name() is not None:
+    image_name = batcher.current_image.get_name()
   else:
     image_name = _('Untitled')
   
@@ -271,7 +273,7 @@ def _get_tags(batcher, item, field_value, *args):
     for tag in item.tags:
       _insert_tag(tag)
     
-    tags_to_insert.sort(key=lambda tag: tag.lower())
+    tags_to_insert.sort(key=lambda tag_: tag_.lower())
   
   def _insert_specified_tags(tags):
     for tag in tags:
@@ -324,8 +326,8 @@ def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
     layer_fields = {
       'w': item.raw.get_width(),
       'h': item.raw.get_height(),
-      'x': item.raw.get_offsets()[1],
-      'y': item.raw.get_offsets()[2],
+      'x': item.raw.get_offsets().offset_x,
+      'y': item.raw.get_offsets().offset_y,
     }
   elif measure.startswith('%pc'):
     match = re.match(r'^' + re.escape('%pc') + r'([0-9]*)$', measure)
@@ -339,8 +341,8 @@ def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
       layer_fields = {
         'w': round(item.raw.get_width() / image.get_width(), round_digits),
         'h': round(item.raw.get_height() / image.get_height(), round_digits),
-        'x': round(item.raw.get_offsets()[1] / image.get_width(), round_digits),
-        'y': round(item.raw.get_offsets()[2] / image.get_height(), round_digits),
+        'x': round(item.raw.get_offsets().offset_x / image.get_width(), round_digits),
+        'y': round(item.raw.get_offsets().offset_y / image.get_height(), round_digits),
       }
   
   fields.update(layer_fields)

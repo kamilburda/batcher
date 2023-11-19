@@ -4,7 +4,6 @@ import unittest.mock as mock
 import parameterized
 
 import pygimplib as pg
-from pygimplib.tests import stubs_gimp
 from pygimplib.tests import utils_itemtree
 
 from src import renamer as renamer_
@@ -26,8 +25,7 @@ class TestNumberField(unittest.TestCase):
     ('incrementing_number_to_more_digits_than_padding',
      999, 3, ['999', '1000', '1001']),
   ])
-  def test_generate_number(
-        self, test_case_suffix, initial_number, padding, expected_outputs):
+  def test_generate_number(self, test_case_suffix, initial_number, padding, expected_outputs):
     number_generator = renamer_.NumberField.generate_number(initial_number, padding)
     outputs = [next(number_generator) for _unused in range(len(expected_outputs))]
     
@@ -172,7 +170,7 @@ class TestRenameWithNumberField(unittest.TestCase):
   ])
   def test_rename(self, test_case_suffix, pattern, expected_layer_names_str):
     layer_tree = pg.itemtree.LayerTree(self.image)
-    layer_tree.filter.add(lambda item: item.type == pg.itemtree.TYPE_ITEM)
+    layer_tree.filter.add(lambda item_: item_.type == pg.itemtree.TYPE_ITEM)
     
     batcher_mock = mock.Mock()
     batcher_mock.item_tree = layer_tree
