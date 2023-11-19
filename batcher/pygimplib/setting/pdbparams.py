@@ -5,6 +5,10 @@ procedure arguments to assign them as values to settings.
 from collections.abc import Iterable
 from typing import Any, Dict, Generator, List, Tuple, Union
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 from . import group as group_
 from . import settings as settings_
 
@@ -83,7 +87,7 @@ def list_param_values(
   
   if ignore_run_mode:
     for i, setting in enumerate(settings):
-      if setting.name == 'run_mode':
+      if isinstance(setting, settings_.EnumSetting) and setting.enum_type == Gimp.RunMode:
         del settings[i]
         break
   
