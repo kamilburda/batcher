@@ -2,6 +2,7 @@
 
 import collections
 import os
+from typing import Generator, Optional
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -26,19 +27,20 @@ class ExportModes:
 
 
 def export(
-      batcher,
-      output_directory=GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
-      file_extension='png',
-      export_mode=ExportModes.EACH_LAYER,
-      single_image_filename_pattern=None,
-      use_file_extension_in_item_name=False,
-      convert_file_extension_to_lowercase=False,
-      preserve_layer_name_after_export=False):
+      batcher: 'src.core.Batcher',
+      output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
+      file_extension: str = 'png',
+      export_mode: int = ExportModes.EACH_LAYER,
+      single_image_filename_pattern: Optional[str] = None,
+      use_file_extension_in_item_name: bool = False,
+      convert_file_extension_to_lowercase: bool = False,
+      preserve_layer_name_after_export: bool = False,
+) -> Generator[None, None, None]:
   item_uniquifier = uniquifier.ItemUniquifier()
   file_extension_properties = _FileExtensionProperties()
   processed_parent_names = set()
   default_file_extension = file_extension
-  
+
   if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_filename_pattern is not None:
     renamer_for_image = renamer_.ItemRenamer(single_image_filename_pattern)
   else:
@@ -116,27 +118,43 @@ def export(
       
       _process_parent_folder_names(item_to_process, item_uniquifier, processed_parent_names)
       _process_item_name(
-        batcher, item_to_process, item_uniquifier,
-        current_file_extension, default_file_extension, force_default_file_extension=False)
+        item_to_process,
+        item_uniquifier,
+        current_file_extension,
+        default_file_extension,
+        force_default_file_extension=False)
     
     if batcher.process_export:
       if export_mode == ExportModes.EACH_LAYER:
         raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
       
       overwrite_mode, export_status = _export_item(
-        batcher, item_to_process, image_to_process, raw_item_to_process,
-        output_directory, default_file_extension, file_extension_properties)
+        batcher,
+        item_to_process,
+        image_to_process,
+        raw_item_to_process,
+        output_directory,
+        default_file_extension,
+        file_extension_properties)
       
       if export_status == ExportStatuses.USE_DEFAULT_FILE_EXTENSION:
         if batcher.process_names:
           _process_item_name(
-            batcher, item_to_process, item_uniquifier,
-            current_file_extension, default_file_extension, force_default_file_extension=True)
+            item_to_process,
+            item_uniquifier,
+            current_file_extension,
+            default_file_extension,
+            force_default_file_extension=True)
         
         if batcher.process_export:
           overwrite_mode, _unused = _export_item(
-            batcher, item_to_process, image_to_process, raw_item_to_process,
-            output_directory, default_file_extension, file_extension_properties)
+            batcher,
+            item_to_process,
+            image_to_process,
+            raw_item_to_process,
+            output_directory,
+            default_file_extension,
+            file_extension_properties)
       
       if overwrite_mode != pg.overwrite.OverwriteModes.SKIP:
         file_extension_properties[
@@ -180,8 +198,12 @@ def _process_parent_folder_names(item, item_uniquifier, processed_parent_names):
 
 
 def _process_item_name(
-      batcher, item, item_uniquifier,
-      current_file_extension, default_file_extension, force_default_file_extension):
+      item,
+      item_uniquifier,
+      current_file_extension,
+      default_file_extension,
+      force_default_file_extension,
+):
   if not force_default_file_extension:
     if current_file_extension == default_file_extension:
       item.name += f'.{default_file_extension}'
@@ -216,13 +238,13 @@ def _merge_and_resize_image(batcher, image, raw_item):
   * multi-layer images, with each layer containing background or foreground
     which are originally separate layers.
   """
-  raw_item_name = raw_item.name
+  raw_item_name = raw_item.get_name()
   
-  raw_item_merged = pdb.gimp_image_merge_visible_layers(image, gimpenums.EXPAND_AS_NECESSARY)
-  pdb.gimp_layer_resize_to_image_size(raw_item_merged)
+  raw_item_merged = image.merge_visible_layers(Gimp.MergeType.EXPAND_AS_NECESSARY)
+  raw_item_merged.resize_to_image_size()
   
-  raw_item_merged.name = raw_item_name
-  image.active_layer = raw_item_merged
+  raw_item_merged.set_name(raw_item_name)
+  image.set_selected_layers([raw_item_merged])
   
   if not batcher.edit_mode:
     batcher.current_raw_item = raw_item_merged
@@ -232,10 +254,11 @@ def _merge_and_resize_image(batcher, image, raw_item):
 
 def _copy_layer(raw_item, dest_image, item):
   raw_item_copy = pg.pdbutils.copy_and_paste_layer(
-    raw_item, dest_image, None, len(dest_image.layers), True, True, True)
-  pdb.gimp_item_set_name(raw_item_copy, item.name)
+    raw_item, dest_image, None, len(dest_image.list_layers()), True, True, True)
+  raw_item_copy.set_name(item.name)
   
   return raw_item_copy
+
 
 def _validate_name(item):
   item.name = pg.path.FilenameValidator.validate(item.name)
@@ -246,8 +269,14 @@ def _get_unique_substring_position(str_, file_extension):
 
 
 def _export_item(
-      batcher, item, image, raw_item,
-      output_directory, default_file_extension, file_extension_properties):
+      batcher,
+      item,
+      image,
+      raw_item,
+      output_directory,
+      default_file_extension,
+      file_extension_properties,
+):
   output_filepath = _get_item_filepath(item, output_directory)
   file_extension = pg.path.get_file_extension(item.name)
   export_status = ExportStatuses.NOT_EXPORTED_YET
@@ -255,7 +284,8 @@ def _export_item(
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
   overwrite_mode, output_filepath = pg.overwrite.handle_overwrite(
-    output_filepath, batcher.overwrite_chooser,
+    output_filepath,
+    batcher.overwrite_chooser,
     _get_unique_substring_position(output_filepath, file_extension))
   
   if overwrite_mode == pg.overwrite.OverwriteModes.CANCEL:
@@ -279,7 +309,7 @@ def _export_item(
       export_status = _export_item_once_wrapper(
         batcher,
         pg.fileformats.get_save_procedure(file_extension),
-        gimpenums.RUN_INTERACTIVE,
+        Gimp.RunMode.INTERACTIVE,
         image,
         raw_item,
         output_filepath,
@@ -298,7 +328,7 @@ def _get_item_filepath(item, dirpath):
     
     <directory path>/<item path components>/<item name>
   
-  If the directory path is not an absolute path or is `None`, the
+  If the directory path is not an absolute path or is ``None``, the
   current working directory is prepended.
   
   Item path components consist of parents' item names, starting with the
@@ -321,9 +351,9 @@ def _make_dirs(item, dirpath, default_file_extension):
     os.makedirs(dirpath, exist_ok=True)
   except OSError as e:
     try:
-      message = e.args[1]
+      message = e.strerror
       if e.filename is not None:
-        message += ': "{}"'.format(e.filename)
+        message += f': "{e.filename}"'
     except (IndexError, AttributeError):
       message = str(e)
     
@@ -331,14 +361,29 @@ def _make_dirs(item, dirpath, default_file_extension):
 
 
 def _export_item_once_wrapper(
-      batcher, export_func, run_mode, image, raw_item, output_filepath, file_extension,
-      default_file_extension, file_extension_properties):
+      batcher,
+      export_func,
+      run_mode,
+      image,
+      raw_item,
+      output_filepath,
+      file_extension,
+      default_file_extension,
+      file_extension_properties,
+):
   with batcher.export_context_manager(
          run_mode, image, raw_item, output_filepath,
          *batcher.export_context_manager_args, **batcher.export_context_manager_kwargs):
     export_status = _export_item_once(
-      batcher, export_func, run_mode, image, raw_item, output_filepath, file_extension,
-      default_file_extension, file_extension_properties)
+      batcher,
+      export_func,
+      run_mode,
+      image,
+      raw_item,
+      output_filepath,
+      file_extension,
+      default_file_extension,
+      file_extension_properties)
   
   return export_status
 
@@ -346,58 +391,54 @@ def _export_item_once_wrapper(
 def _get_run_mode(batcher, file_extension, file_extension_properties):
   file_extension_property = file_extension_properties[file_extension]
   if file_extension_property.is_valid and file_extension_property.processed_count > 0:
-    return gimpenums.RUN_WITH_LAST_VALS
+    return Gimp.RunMode.WITH_LAST_VALS
   else:
     return batcher.initial_run_mode
 
 
 def _export_item_once(
-      batcher, export_func, run_mode, image, raw_item, output_filepath, file_extension,
-      default_file_extension, file_extension_properties):
-  export_status = ExportStatuses.NOT_EXPORTED_YET
-  
-  try:
-    export_func(
+      batcher,
+      export_func,
       run_mode,
       image,
       raw_item,
       output_filepath,
-      os.path.basename(output_filepath))
-  except RuntimeError as e:
-    # HACK: Examining the exception message seems to be the only way to determine
-    # some specific cases of export failure.
-    if _was_export_canceled_by_user(str(e)):
-      raise exceptions.BatcherCancelError(str(e))
-    elif _should_export_again_with_interactive_run_mode(str(e), run_mode):
-      export_status = ExportStatuses.FORCE_INTERACTIVE
-    elif _should_export_again_with_default_file_extension(file_extension, default_file_extension):
-      file_extension_properties[file_extension].is_valid = False
-      export_status = ExportStatuses.USE_DEFAULT_FILE_EXTENSION
+      file_extension,
+      default_file_extension,
+      file_extension_properties,
+):
+  def _raise_export_error():
+    raise exceptions.ExportError(pdb.last_error, raw_item.get_name(), default_file_extension)
+
+  export_func(
+    run_mode,
+    image,
+    raw_item,
+    output_filepath,
+    os.path.basename(output_filepath))
+
+  if pdb.last_status == Gimp.PDBStatusType.SUCCESS:
+    return ExportStatuses.EXPORT_SUCCESSFUL
+  elif pdb.last_status == Gimp.PDBStatusType.CANCEL:
+    raise exceptions.BatcherCancelError('cancelled')
+  elif pdb.last_status == Gimp.PDBStatusType.CALLING_ERROR:
+    if run_mode != Gimp.RunMode.INTERACTIVE:
+      return ExportStatuses.FORCE_INTERACTIVE
     else:
-      raise exceptions.ExportError(str(e), raw_item.name, default_file_extension)
+      _raise_export_error()
+  elif pdb.last_status == Gimp.PDBStatusType.EXECUTION_ERROR:
+    if file_extension != default_file_extension:
+      file_extension_properties[file_extension].is_valid = False
+      return ExportStatuses.USE_DEFAULT_FILE_EXTENSION
+    else:
+      _raise_export_error()
   else:
-    export_status = ExportStatuses.EXPORT_SUCCESSFUL
-  
-  return export_status
-
-
-def _was_export_canceled_by_user(exception_message):
-  return any(message in exception_message.lower() for message in ['cancelled', 'canceled'])
-
-
-def _should_export_again_with_interactive_run_mode(exception_message, current_run_mode):
-  return (
-    'calling error' in exception_message.lower()
-    and current_run_mode in [gimpenums.RUN_WITH_LAST_VALS, gimpenums.RUN_NONINTERACTIVE])
-
-
-def _should_export_again_with_default_file_extension(file_extension, default_file_extension):
-  return file_extension != default_file_extension
+    _raise_export_error()
 
 
 def _sync_raw_item_name(batcher, item_to_process):
   if batcher.current_item == item_to_process and batcher.process_names and not batcher.is_preview:
-    batcher.current_raw_item.name = batcher.current_item.name
+    batcher.current_raw_item.set_name(batcher.current_item.name)
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):
@@ -406,26 +447,20 @@ def _refresh_image_copy_for_edit_mode(batcher, image_copy):
 
 
 def _refresh_image(image):
-  for layer in image.layers:
-    pdb.gimp_image_remove_layer(image, layer)
+  for layer in image.list_layers():
+    image.remove_layer(layer)
 
 
 class _FileExtension:
-  """
-  This class defines additional properties for a file extension.
-  
-  Attributes:
-  
-  * `is_valid` - If `True`, file extension is valid and can be used in filenames
-    for file export procedures.
-  
-  * `processed_count` - Number of items with the specific file extension that
-    have already been exported.
-  """
+  """Class holding properties for a file extension."""
   
   def __init__(self):
     self.is_valid = True
+    """If ``True``, the file extension is valid and can be used in filenames
+    for file export procedures.
+    """
     self.processed_count = 0
+    """Number of items with the file extension that have been exported."""
 
 
 class _FileExtensionProperties:
