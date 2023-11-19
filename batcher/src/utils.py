@@ -1,9 +1,11 @@
 """Utility functions used in other modules."""
 
+from typing import Any, Dict, List, Optional, Union
+
 import pygimplib as pg
 
 
-def get_settings_for_batcher(main_settings):
+def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
   return {
     'procedures': main_settings['procedures'],
     'constraints': main_settings['constraints'],
@@ -15,7 +17,10 @@ def get_settings_for_batcher(main_settings):
   }
 
 
-def clear_setting_sources(settings, sources=None):
+def clear_setting_sources(
+      settings: pg.setting.Group,
+      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
+):
   if sources is None:
     sources = pg.setting.Persistor.get_default_setting_sources()
   
@@ -24,6 +29,9 @@ def clear_setting_sources(settings, sources=None):
   save_plugin_version(settings, sources)
 
 
-def save_plugin_version(settings, sources):
+def save_plugin_version(
+      settings: pg.setting.Group,
+      sources: Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]],
+):
   settings['main/plugin_version'].reset()
   settings['main/plugin_version'].save(sources)
