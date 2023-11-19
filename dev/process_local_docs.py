@@ -5,7 +5,6 @@ used without running the Jekyll server (e.g. included in release packages as
 user documentation).
 """
 
-import collections
 import os
 import pathlib
 import re
@@ -44,34 +43,34 @@ HTML_VOID_ELEMENTS = {
   'menuitem', 'meta', 'param', 'source', 'track', 'wbr',
 }
 
-HTML_ELEMENTS_WITH_URLS = collections.OrderedDict([
-  ('a', ['href']),
-  ('applet', ['codebase']),
-  ('area', ['href']),
-  ('base', ['href']),
-  ('blockquote', ['cite']),
-  ('body', ['background']),
-  ('del', ['cite']),
-  ('form', ['action']),
-  ('frame', ['longdesc', 'src']),
-  ('head', ['profile']),
-  ('iframe', ['longdesc', 'src']),
-  ('img', ['longdesc', 'src', 'usemap']),
-  ('input', ['src', 'usemap']),
-  ('ins', ['cite']),
-  ('link', ['href']),
-  ('object', ['classid', 'codebase', 'data', 'usemap']),
-  ('q', ['cite']),
-  ('script', ['src']),
-  ('audio', ['src']),
-  ('button', ['formaction']),
-  ('command', ['icon']),
-  ('embed', ['src']),
-  ('html', ['manifest']),
-  ('input', ['formaction']),
-  ('source', ['src']),
-  ('video', ['poster', 'src']),
-])
+HTML_ELEMENTS_WITH_URLS = {
+  'a': ['href'],
+  'applet': ['codebase'],
+  'area': ['href'],
+  'base': ['href'],
+  'blockquote': ['cite'],
+  'body': ['background'],
+  'del': ['cite'],
+  'form': ['action'],
+  'frame': ['longdesc', 'src'],
+  'head': ['profile'],
+  'iframe': ['longdesc', 'src'],
+  'img': ['longdesc', 'src', 'usemap'],
+  'input': ['src', 'usemap', 'formaction'],
+  'ins': ['cite'],
+  'link': ['href'],
+  'object': ['classid', 'codebase', 'data', 'usemap'],
+  'q': ['cite'],
+  'script': ['src'],
+  'audio': ['src'],
+  'button': ['formaction'],
+  'command': ['icon'],
+  'embed': ['src'],
+  'html': ['manifest'],
+  'source': ['src'],
+  'track': ['src'],
+  'video': ['poster', 'src'],
+}
 
 PAGE_CONFIG_FILENAME = '_config.yml'
 PAGE_CONFIG = None
