@@ -1,13 +1,9 @@
 """Built-in plug-in procedures."""
 
-import collections
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
-
-from pygimplib import pdb
 
 from src import background_foreground
 from src import export as export_
@@ -17,81 +13,95 @@ from src import renamer as renamer_
 NAME_ONLY_TAG = 'name'
 
 
-def set_active_and_current_layer(batcher):
-  if pdb.gimp_item_is_valid(batcher.current_raw_item):
-    batcher.current_image.active_layer = batcher.current_raw_item
+def set_selected_and_current_layer(batcher):
+  # If an image has no layers, there is nothing we do here. An exception may
+  # be raised if a procedure requires at least one layer. An empty image
+  # could occur e.g. if all layers were removed by the previous procedures.
+
+  if batcher.current_raw_item.is_valid():
+    batcher.current_image.set_selected_layers([batcher.current_raw_item])
   else:
-    if pdb.gimp_item_is_valid(batcher.current_image.active_layer):
-      # The active layer may have been set by the procedure.
-      batcher.current_raw_item = batcher.current_image.active_layer
-    else:
-      if len(batcher.current_image.layers) > 0:
-        # We cannot make a good guess of what layer is the "right" one, so we
-        # resort to taking the first.
-        first_layer = batcher.current_image.layers[0]
-        batcher.current_raw_item = first_layer
-        batcher.current_image.active_layer = first_layer
+    selected_layers = batcher.current_image.list_selected_layers()
+
+    if selected_layers:
+      # There is no way to know which layer is the "right" one, so we resort to
+      # taking the first.
+      selected_layer = selected_layers[0]
+
+      if selected_layer.is_valid():
+        # The selected layer(s) may have been set by the procedure.
+        batcher.current_raw_item = selected_layer
       else:
-        # There is nothing we can do. An exception may be raised if a procedure
-        # requires an active layer/at least one layer. An empty image could
-        # occur e.g. if all layers were removed by the previous procedures.
-        pass
+        current_image_layers = batcher.current_image.list_layers()
+        if current_image_layers:
+          # There is no way to know which layer is the "right" one, so we resort
+          # to taking the first.
+          batcher.current_raw_item = current_image_layers[0]
+          batcher.current_image.set_selected_layers([current_image_layers[0]])
 
 
-def set_active_and_current_layer_after_action(batcher):
+def set_selected_and_current_layer_after_action(batcher):
   action_applied = yield
   
   if action_applied or action_applied is None:
-    set_active_and_current_layer(batcher)
+    set_selected_and_current_layer(batcher)
 
 
 def sync_item_name_and_raw_item_name(batcher):
   yield
   
   if batcher.process_names and not batcher.is_preview:
-    batcher.current_item.name = batcher.current_raw_item.name
+    batcher.current_item.name = batcher.current_raw_item.get_name()
 
 
 def preserve_locks_between_actions(batcher):
-  # We assume `edit_mode` is True, we can therefore safely use `Item.raw`
+  # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`
   # instead of `current_raw_item`. We need to use `Item.raw` for parents as
   # well.
   item = batcher.current_item
-  is_item_group = isinstance(item.raw, gimp.GroupLayer)
   locks_content = {}
-  
+  locks_visibility = {}
+
   for item_or_parent in [item] + item.parents:
-    if pdb.gimp_item_is_valid(item_or_parent.raw):
-      locks_content[item_or_parent] = pdb.gimp_item_get_lock_content(item_or_parent.raw)
-  
-  if not is_item_group and pdb.gimp_item_is_valid(item.raw):
-    lock_position = pdb.gimp_item_get_lock_position(item.raw)
-    lock_alpha = pdb.gimp_layer_get_lock_alpha(item.raw)
+    if item_or_parent.raw.is_valid():
+      locks_content[item_or_parent] = item_or_parent.raw.get_lock_content()
+      locks_visibility[item_or_parent] = item_or_parent.raw.get_lock_visibility()
+
+  if item.raw.is_valid():
+    lock_position = item.raw.get_lock_position()
+    lock_alpha = item.raw.get_lock_alpha()
   else:
     lock_position = None
     lock_alpha = None
-  
+
   for item_or_parent, lock_content in locks_content.items():
     if lock_content:
-      pdb.gimp_item_set_lock_content(item_or_parent.raw, False)
-  
-  if not is_item_group:
-    if lock_position:
-      pdb.gimp_item_set_lock_position(item.raw, False)
-    if lock_alpha:
-      pdb.gimp_layer_set_lock_alpha(item.raw, False)
-  
+      item_or_parent.raw.set_lock_content(False)
+
+  for item_or_parent, lock_visibility in locks_visibility.items():
+    if lock_visibility:
+      item_or_parent.raw.set_lock_visibility(False)
+
+  if lock_position:
+    item.raw.set_lock_position(False)
+  if lock_alpha:
+    item.raw.set_lock_alpha(False)
+
   yield
-  
+
   for item_or_parent, lock_content in locks_content.items():
-    if lock_content and pdb.gimp_item_is_valid(item_or_parent.raw):
-      pdb.gimp_item_set_lock_content(item_or_parent.raw, lock_content)
-  
-  if not is_item_group and pdb.gimp_item_is_valid(item.raw):
+    if lock_content and item_or_parent.raw.is_valid():
+      item_or_parent.raw.set_lock_content(lock_content)
+
+  for item_or_parent, lock_visibility in locks_visibility.items():
+    if lock_visibility and item_or_parent.raw.is_valid():
+      item_or_parent.raw.set_lock_visibility(lock_visibility)
+
+  if item.raw.is_valid():
     if lock_position:
-      pdb.gimp_item_set_lock_position(item.raw, lock_position)
+      item.raw.set_lock_position(lock_position)
     if lock_alpha:
-      pdb.gimp_layer_set_lock_alpha(item.raw, lock_alpha)
+      item.raw.set_lock_alpha(lock_alpha)
 
 
 def remove_folder_hierarchy_from_item(batcher):
@@ -102,11 +112,11 @@ def remove_folder_hierarchy_from_item(batcher):
 
 
 def inherit_transparency_from_layer_groups(batcher):
-  new_layer_opacity = batcher.current_raw_item.opacity / 100.0
+  new_layer_opacity = batcher.current_raw_item.get_opacity() / 100.0
   for parent in batcher.current_item.parents:
-    new_layer_opacity = new_layer_opacity * (parent.raw.opacity / 100.0)
+    new_layer_opacity = new_layer_opacity * (parent.raw.get_opacity() / 100.0)
   
-  batcher.current_raw_item.opacity = new_layer_opacity * 100.0
+  batcher.current_raw_item.set_opacity(new_layer_opacity * 100.0)
 
 
 def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
@@ -124,7 +134,7 @@ def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
           renamed_parents.add(parent)
     
     if batcher.process_names and not batcher.is_preview:
-      batcher.current_raw_item.name = batcher.current_item.name
+      batcher.current_raw_item.set_name(batcher.current_item.name)
     
     yield
 
@@ -134,8 +144,7 @@ def resize_to_layer_size(batcher):
   layer = batcher.current_raw_item
   
   layer_offset_x, layer_offset_y = layer.get_offsets()[1:]
-  pdb.gimp_image_resize(
-    image, layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
+  image.resize(layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
 
 
 _BUILTIN_PROCEDURES_LIST = [
@@ -249,14 +258,10 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Merge background'),
     'arguments': [
       {
-        'type': 'choice',
+        'type': 'enum',
         'name': 'merge_type',
-        'default_value': 'expand_as_necessary',
-        'items': [
-          ('expand_as_necessary', _('Expand as necessary'), Gimp.MergeType.EXPAND_AS_NECESSARY),
-          ('clip_to_image', _('Clip to image'), Gimp.MergeType.CLIP_TO_IMAGE),
-          ('clip_to_bottom_layer', _('Clip to bottom layer'), Gimp.MergeType.CLIP_TO_BOTTOM_LAYER),
-        ],
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
         'display_name': _('Merge type'),
       },
     ],
@@ -267,14 +272,10 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Merge foreground'),
     'arguments': [
       {
-        'type': 'choice',
+        'type': 'enum',
         'name': 'merge_type',
-        'default_value': 'expand_as_necessary',
-        'items': [
-          ('expand_as_necessary', _('Expand as necessary'), Gimp.MergeType.EXPAND_AS_NECESSARY),
-          ('clip_to_image', _('Clip to image'), Gimp.MergeType.CLIP_TO_IMAGE),
-          ('clip_to_bottom_layer', _('Clip to bottom layer'), Gimp.MergeType.CLIP_TO_BOTTOM_LAYER),
-        ],
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
         'display_name': _('Merge type'),
       },
     ],
@@ -321,8 +322,8 @@ _BUILTIN_PROCEDURES_LIST = [
 # function names and paths may change when refactoring or adding/modifying features.
 # The 'function' setting is set to an empty value as the function can be inferred
 # via the action's 'orig_name' setting.
-BUILTIN_PROCEDURES = collections.OrderedDict()
-BUILTIN_PROCEDURES_FUNCTIONS = collections.OrderedDict()
+BUILTIN_PROCEDURES = {}
+BUILTIN_PROCEDURES_FUNCTIONS = {}
 
 for action_dict in _BUILTIN_PROCEDURES_LIST:
   function = action_dict['function']
