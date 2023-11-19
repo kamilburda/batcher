@@ -913,7 +913,7 @@ class Batcher:
         raw_item, self._current_image, None, len(self._current_image.layers), True, True, True)
       
       self._current_raw_item = raw_item_copy
-      self._current_raw_item.name = raw_item.name
+      self._current_raw_item.set_name(raw_item.get_name())
     
     if self._edit_mode and not self._is_preview and pdb.gimp_item_is_group(raw_item):
       # Layer groups must be copied and inserted as layers as some procedures
@@ -924,7 +924,7 @@ class Batcher:
         True, True, True)
       
       self._current_raw_item = raw_item_copy
-      self._current_raw_item.name = raw_item.name
+      self._current_raw_item.set_name(raw_item.get_name())
     
     self._invoker.invoke(
       ['before_process_item'],
