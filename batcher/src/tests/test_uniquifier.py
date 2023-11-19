@@ -1,9 +1,6 @@
-import collections
 import unittest
-import unittest.mock as mock
 
 import pygimplib as pg
-from pygimplib.tests import stubs_gimp
 from pygimplib.tests import utils_itemtree
 
 from src import uniquifier
@@ -46,35 +43,32 @@ class TestUniquify(unittest.TestCase):
     self.item_tree = pg.itemtree.LayerTree(image)
 
   def test_uniquify(self):
-    uniquified_names = collections.OrderedDict([
-      (('Corners', 'folder'), ['Corners']),
-      ('Corners', ['Corners (1)']),
-      ('top-left-corner', ['Corners', 'top-left-corner']),
-      ('top-right-corner', ['Corners', 'top-right-corner']),
-      (('top-left-corner:', 'folder'), ['Corners', 'top-left-corner (1)']),
-      (('top-left-corner::', 'folder'), ['Corners', 'top-left-corner (2)']),
-      ('top-left-corner::', ['Corners', 'top-left-corner (3)']),
-      ('bottom-right-corner',
-       ['Corners', 'top-left-corner (2)', 'bottom-right-corner']),
-      ('bottom-right-corner:',
-       ['Corners', 'top-left-corner (2)', 'bottom-right-corner (1)']),
-      ('bottom-left-corner',
-       ['Corners', 'top-left-corner (2)', 'bottom-left-corner']),
-      (('Corners:', 'folder'), ['Corners (2)']),
-      ('Corners:', ['Corners (3)']),
-      ('top-left-corner:::', ['Corners (2)', 'top-left-corner']),
-      (('Frames', 'folder'), ['Frames']),
-      ('Frames', ['Frames (1)']),
-      ('top-frame', ['Frames', 'top-frame']),
-      ('main-background.jpg', ['main-background.jpg']),
-      ('main-background.jpg:', ['main-background.jpg (1)']),
-      ('Corners::', ['Corners (4)']),
-      ('top-left-corner::::', ['top-left-corner']),
-      (('main-background.jpg::', 'folder'), ['main-background.jpg (2)']),
-      ('main-background.jpg::', ['main-background.jpg (3)']),
-      ('alt-frames', ['main-background.jpg (2)', 'alt-frames']),
-      ('alt-corners', ['main-background.jpg (2)', 'alt-corners']),
-    ])
+    uniquified_names = {
+      ('Corners', 'folder'): ['Corners'],
+      'Corners': ['Corners (1)'],
+      'top-left-corner': ['Corners', 'top-left-corner'],
+      'top-right-corner': ['Corners', 'top-right-corner'],
+      ('top-left-corner:', 'folder'): ['Corners', 'top-left-corner (1)'],
+      ('top-left-corner::', 'folder'): ['Corners', 'top-left-corner (2)'],
+      'top-left-corner::': ['Corners', 'top-left-corner (3)'],
+      'bottom-right-corner': ['Corners', 'top-left-corner (2)', 'bottom-right-corner'],
+      'bottom-right-corner:': ['Corners', 'top-left-corner (2)', 'bottom-right-corner (1)'],
+      'bottom-left-corner': ['Corners', 'top-left-corner (2)', 'bottom-left-corner'],
+      ('Corners:', 'folder'): ['Corners (2)'],
+      'Corners:': ['Corners (3)'],
+      'top-left-corner:::': ['Corners (2)', 'top-left-corner'],
+      ('Frames', 'folder'): ['Frames'],
+      'Frames': ['Frames (1)'],
+      'top-frame': ['Frames', 'top-frame'],
+      'main-background.jpg': ['main-background.jpg'],
+      'main-background.jpg:': ['main-background.jpg (1)'],
+      'Corners::': ['Corners (4)'],
+      'top-left-corner::::': ['top-left-corner'],
+      ('main-background.jpg::', 'folder'): ['main-background.jpg (2)'],
+      'main-background.jpg::': ['main-background.jpg (3)'],
+      'alt-frames': ['main-background.jpg (2)', 'alt-frames'],
+      'alt-corners': ['main-background.jpg (2)', 'alt-corners'],
+    }
     
     for item in self.item_tree.iter():
       self._preprocess_name(item)
@@ -89,12 +83,12 @@ class TestUniquify(unittest.TestCase):
         position = len(str_)
       return position
     
-    names_to_uniquify = collections.OrderedDict([
-      ('main-background.jpg', ['main-background.jpg']),
-      ('main-background.jpg:', ['main-background (1).jpg']),
-      (('main-background.jpg::', 'folder'), ['main-background.jpg (1)']),
-      ('main-background.jpg::', ['main-background (2).jpg']),
-    ])
+    names_to_uniquify = {
+      'main-background.jpg': ['main-background.jpg'],
+      'main-background.jpg:': ['main-background (1).jpg'],
+      ('main-background.jpg::', 'folder'): ['main-background.jpg (1)'],
+      'main-background.jpg::': ['main-background (2).jpg'],
+    }
     
     for item_name in names_to_uniquify:
       item = self.item_tree[item_name]
@@ -108,12 +102,12 @@ class TestUniquify(unittest.TestCase):
     self._compare_uniquified_names(self.item_tree, names_to_uniquify)
 
   def test_uniquify_does_not_modify_already_passed_items(self):
-    names_to_uniquify = collections.OrderedDict([
-      ('main-background.jpg', ['main-background.jpg']),
-      ('main-background.jpg:', ['main-background.jpg (1)']),
-      (('main-background.jpg::', 'folder'), ['main-background.jpg (2)']),
-      ('main-background.jpg::', ['main-background.jpg (3)']),
-    ])
+    names_to_uniquify = {
+      'main-background.jpg': ['main-background.jpg'],
+      'main-background.jpg:': ['main-background.jpg (1)'],
+      ('main-background.jpg::', 'folder'): ['main-background.jpg (2)'],
+      'main-background.jpg::': ['main-background.jpg (3)'],
+    }
     
     for item_name in names_to_uniquify:
       item = self.item_tree[item_name]
@@ -128,10 +122,10 @@ class TestUniquify(unittest.TestCase):
     self._compare_uniquified_names(self.item_tree, names_to_uniquify)
 
   def test_reset(self):
-    names_to_uniquify = collections.OrderedDict([
-      ('main-background.jpg', ['main-background.jpg']),
-      ('main-background.jpg:', ['main-background.jpg (1)']),
-    ])
+    names_to_uniquify = {
+      'main-background.jpg': ['main-background.jpg'],
+      'main-background.jpg:': ['main-background.jpg (1)'],
+    }
     
     for item_name in names_to_uniquify:
       item = self.item_tree[item_name]
@@ -157,12 +151,12 @@ class TestUniquify(unittest.TestCase):
       self.assertEqual(
         actual_path_components,
         expected_path_components,
-        'parents: "{}": "{}" != "{}"'.format(
-          key, actual_path_components, expected_path_components))
+        f'parents: "{key}": "{actual_path_components}" != "{expected_path_components}"')
+
       self.assertEqual(
         item_tree[key].name,
         name,
-        'item name: "{}": "{}" != "{}"'.format(key, item_tree[key].name, name))
+        f'item name: "{key}": "{item_tree[key].name}" != "{name}"')
   
   @staticmethod
   def _preprocess_name(item):

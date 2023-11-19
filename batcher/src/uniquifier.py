@@ -1,5 +1,6 @@
-"""Making item names in `pygimplib.itemtree.ItemTree` unique.
-"""
+"""Making item names in `pygimplib.itemtree.ItemTree` unique."""
+
+from typing import Generator, Optional
 
 import pygimplib as pg
 
@@ -9,35 +10,35 @@ class ItemUniquifier:
   same parent.
   """
   
-  def __init__(self, generator=None):
+  def __init__(self, generator: Optional[Generator[str, None, None]] = None):
     self.generator = generator
     
-    # key: `Item` instance (parent) or None (item tree root)
+    # key: `Item` instance (parent) or `None` (item tree root)
     # value: set of `Item` instances
     self._uniquified_items = {}
     
-    # key: `Item` instance (parent) or None (item tree root)
+    # key: `Item` instance (parent) or `None` (item tree root)
     # value: set of `Item.name` strings
     self._uniquified_item_names = {}
   
-  def uniquify(self, item, position=None):
+  def uniquify(self, item: pg.itemtree.Item, position: Optional[int] = None):
     """Renames the `Item` instance by making it unique among all other `Item`
     instances under the same parent `Item`.
     
-    To achieve uniquification, a substring in the form of `' (<number>)'` is
-    inserted at the end of the item names.
+    To achieve uniquification, a substring in the form of ``' (<number>)'`` is
+    appended to the item name.
     
     Calling the method with the same `Item` instance will have no effect as
     that instance will be marked as visited. Call `reset()` to clear cache of
     items that were passed to this function.
     
-    Parameters:
-    
-    * `item` - `Item` instance whose `name` attribute will be uniquified.
-    
-    * `position` - Position (index) where a unique substring is inserted into
-      the item's name. If `None`, insert the substring at the end of the name
-      (i.e. append it).
+    Args:
+      item:
+        `Item` instance whose ``name`` attribute will be uniquified.
+      position:
+        Position (index) where a unique substring is inserted into the item's
+        name. If ``None``, the substring is inserted at the end of the name
+        (i.e. appended).
     """
     parent = item.parent
     
