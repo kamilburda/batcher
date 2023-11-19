@@ -117,7 +117,7 @@ class TestAddActionFromSettings(unittest.TestCase):
         self, pdb_procedure, expected_arg_names_and_values, expected_kwargs):
     procedure = actions_.add(self.procedures, pdb_procedure)
     
-    with mock.patch('batcher.batcher.pdb') as pdb_mock:
+    with mock.patch('batcher.src.batcher.pdb') as pdb_mock:
       pdb_mock.__getitem__.return_value = pdb_procedure
       
       self.batcher._add_action_from_settings(procedure)

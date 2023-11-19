@@ -60,7 +60,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_from_ids(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
@@ -107,7 +107,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_invalid_list_length_raises_error(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
@@ -120,7 +120,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_invalid_collection_type_for_items_raises_error(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
@@ -133,7 +133,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_to_dict_with_ids(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
@@ -153,7 +153,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_to_dict_with_paths(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
@@ -196,7 +196,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
     images[1].set_file(None)
     
-    with mock.patch('batcher.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
+    with mock.patch('batcher.src.settings_custom.gimp.Item') as temp_mock_gimp_item_module:
       with mock.patch(
             f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
         temp_mock_gimp_module.Image.get_by_id.side_effect = images
