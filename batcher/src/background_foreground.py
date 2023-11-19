@@ -7,7 +7,6 @@ from gi.repository import Gimp
 from src import exceptions
 
 import pygimplib as pg
-from pygimplib import pdb
 
 
 def insert_background_layer(batcher, tag):
@@ -25,11 +24,11 @@ def _insert_tagged_layer(batcher, tag, insert_mode):
   merged_tagged_layer = None
   orig_merged_tagged_layer = None
   
-  def _cleanup_tagged_layers(batcher):
-    if orig_merged_tagged_layer is not None and pdb.gimp_item_is_valid(orig_merged_tagged_layer):
-      pdb.gimp_item_delete(orig_merged_tagged_layer)
+  def _cleanup_tagged_layers(batcher_):
+    if orig_merged_tagged_layer is not None and orig_merged_tagged_layer.is_valid():
+      orig_merged_tagged_layer.delete()
     
-    batcher.invoker.remove(cleanup_tagged_layers_action_id, ['cleanup_contents'])
+    batcher_.invoker.remove(cleanup_tagged_layers_action_id, ['cleanup_contents'])
   
   # We use`Invoker.add` instead of `batcher.add_procedure` since the latter
   # would add the function only at the start of processing and we already are in
@@ -39,9 +38,9 @@ def _insert_tagged_layer(batcher, tag, insert_mode):
   
   while True:
     image = batcher.current_image
-    current_parent = batcher.current_raw_item.parent
+    current_parent = batcher.current_raw_item.get_parent()
     
-    position = pdb.gimp_image_get_item_position(image, batcher.current_raw_item)
+    position = image.get_item_position(batcher.current_raw_item)
     if insert_mode == 'after':
       position += 1
     
@@ -51,51 +50,62 @@ def _insert_tagged_layer(batcher, tag, insert_mode):
     
     if orig_merged_tagged_layer is None:
       merged_tagged_layer = _insert_merged_tagged_layer(
-        batcher, image, tagged_items, tag, current_parent, position)
-      
-      orig_merged_tagged_layer = pdb.gimp_layer_copy(merged_tagged_layer, True)
-      _remove_locks_from_layer(orig_merged_tagged_layer)
+        batcher, image, tagged_items, current_parent, position)
+
+      if merged_tagged_layer is not None:
+        orig_merged_tagged_layer = _copy_layer(merged_tagged_layer)
+        _remove_locks_from_layer(orig_merged_tagged_layer)
     else:
-      merged_tagged_layer = pdb.gimp_layer_copy(orig_merged_tagged_layer, True)
+      merged_tagged_layer = _copy_layer(orig_merged_tagged_layer)
       _remove_locks_from_layer(merged_tagged_layer)
-      pdb.gimp_image_insert_layer(image, merged_tagged_layer, current_parent, position)
+      image.insert_layer(merged_tagged_layer, current_parent, position)
     
     yield
 
 
-def _insert_merged_tagged_layer(batcher, image, tagged_items, tag, parent, position):
+def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
   first_tagged_layer_position = position
   
   for i, item in enumerate(tagged_items):
     layer_copy = pg.pdbutils.copy_and_paste_layer(
       item.raw, image, parent, first_tagged_layer_position + i, True, True, True)
-    layer_copy.visible = True
+    layer_copy.set_visible(True)
     
     batcher.invoker.invoke(
       ['before_process_item_contents'], [batcher, batcher.current_item, layer_copy])
 
   if parent is None:
-    children = image.layers
+    children = image.list_layers()
   else:
-    children = parent.children
-  
+    children = parent.list_children()
+
+  merged_tagged_layer = None
+
   if len(tagged_items) == 1:
     merged_tagged_layer = children[first_tagged_layer_position]
   else:
     second_to_last_tagged_layer_position = first_tagged_layer_position + len(tagged_items) - 2
     
     for i in range(second_to_last_tagged_layer_position, first_tagged_layer_position - 1, -1):
-      merged_tagged_layer = pdb.gimp_image_merge_down(
-        image, children[i], gimpenums.EXPAND_AS_NECESSARY)
+      merged_tagged_layer = image.merge_down(children[i], Gimp.MergeType.EXPAND_AS_NECESSARY)
   
   return merged_tagged_layer
 
 
 def _remove_locks_from_layer(layer):
-  pdb.gimp_item_set_lock_content(layer, False)
-  if not isinstance(layer, gimp.GroupLayer):
-    pdb.gimp_item_set_lock_position(layer, False)
-    pdb.gimp_layer_set_lock_alpha(layer, False)
+  layer.set_lock_alpha(False)
+  layer.set_lock_content(False)
+  layer.set_lock_position(False)
+  layer.set_lock_visibility(False)
+
+
+def _copy_layer(layer, add_alpha=True):
+  layer_copy = layer.copy()
+
+  if add_alpha and not layer_copy.has_alpha() and not layer_copy.is_group():
+    layer_copy.add_alpha()
+
+  return layer_copy
 
 
 def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
@@ -118,8 +128,8 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
   tagged_layer = get_tagged_layer_func(batcher)
   
   if tagged_layer is not None:
-    name = batcher.current_raw_item.name
-    visible = pdb.gimp_item_get_visible(batcher.current_raw_item)
+    name = batcher.current_raw_item.get_name()
+    visible = batcher.current_raw_item.get_visible()
     orig_tags = _get_tags(batcher.current_raw_item)
     
     if layer_to_merge_down_str == 'current_item':
@@ -129,15 +139,14 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
     else:
       raise ValueError('invalid value for "layer_to_merge_down_str"')
     
-    pdb.gimp_item_set_visible(batcher.current_raw_item, True)
+    batcher.current_raw_item.set_visible(True)
     
-    merged_layer = pdb.gimp_image_merge_down(
-      batcher.current_image, layer_to_merge_down, merge_type)
-    merged_layer.name = name
+    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
+    merged_layer.set_name(name)
     
     batcher.current_raw_item = merged_layer
     
-    pdb.gimp_item_set_visible(batcher.current_raw_item, visible)
+    batcher.current_raw_item.set_visible(visible)
     _set_tags(batcher.current_raw_item, orig_tags)
     # We do not expect layer groups as folders to be merged since the plug-in
     # manipulates regular layers only (a layer group is merged into a single
@@ -164,20 +173,24 @@ def get_foreground_layer(batcher):
 
 
 def _get_adjacent_layer(
-      batcher, position_cond_func, adjacent_position_increment,
-      insert_tagged_layers_procedure_name, skip_message):
+      batcher,
+      position_cond_func,
+      adjacent_position_increment,
+      insert_tagged_layers_procedure_name,
+      skip_message,
+):
   raw_item = batcher.current_raw_item
-  if raw_item.parent is None:
-    children = batcher.current_image.layers
+  if raw_item.get_parent() is None:
+    children = batcher.current_image.list_layers()
   else:
-    children = raw_item.parent.children
+    children = raw_item.parent.list_children()
   
   adjacent_layer = None
   
   num_layers = len(children)
   
   if num_layers > 1:
-    position = pdb.gimp_image_get_item_position(batcher.current_image, batcher.current_raw_item)
+    position = batcher.current_image.get_item_position(batcher.current_raw_item)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
       tags = [
@@ -189,9 +202,9 @@ def _get_adjacent_layer(
         adjacent_layer = next_layer
   
   if adjacent_layer is not None:
-    # This is necessary for some procedures relying on the active layer, e.g.
+    # This is necessary for some procedures relying on selected layers, e.g.
     # `plug-in-autocrop-layer`.
-    batcher.current_image.active_layer = adjacent_layer
+    batcher.current_image.set_selected_layers([adjacent_layer])
     return adjacent_layer
   else:
     raise exceptions.SkipAction(skip_message)
