@@ -562,10 +562,11 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name):
       'display_name': proc_arg.name,
       **setting_type_init_kwargs,
     }
-    
-    if proc_arg.value_type in placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP:
-      arguments_dict['type'] = (
-        placeholders.PDB_TYPES_TO_PLACEHOLDER_SETTING_TYPES_MAP[proc_arg.value_type])
+
+    placeholder_type_name = placeholders.get_placeholder_type_name_from_pdb_type(proc_arg.value_type)
+
+    if placeholder_type_name is not None:
+      arguments_dict['type'] = placeholder_type_name
 
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
       arguments_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE

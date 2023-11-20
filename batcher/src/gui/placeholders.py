@@ -4,33 +4,42 @@ During processing, these placeholders are replaced with real objects.
 """
 
 import gi
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import pygimplib as pg
 
 
-class GimpObjectPlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
-  """
-  This class is a `setting.presenter.Presenter` subclass for
-  `GimpUi.IntComboBox` widget used for `placeholders.PlaceholderSetting`.
+class PlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
+  """`pygimplib.setting.presenter.Presenter` subclass for `Gtk.ComboBoxText`
+  representing `placeholders.Placeholder` instances.
   
-  Value: `placeholders.PlaceholderSetting` instance selected in the combo box.
+  Value: `placeholders.Placeholder` instance selected in the combo box.
   """
   
   _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def __init__(self, *args, **kwargs):
+    self._indexes_and_placeholder_names = {}
+    self._placeholder_names_and_indexes = {}
+
+    super().__init__(*args, **kwargs)
   
-  def _create_widget(self, setting):
-    placeholder_names_and_values = []
-    
+  def _create_widget(self, setting, **kwargs):
+    combo_box = Gtk.ComboBoxText.new()
+
     for index, placeholder in enumerate(setting.get_allowed_placeholders()):
-      placeholder_names_and_values.extend(
-        (pg.utils.safe_encode_gtk(placeholder.display_name), index))
-    
-    return gimpui.IntComboBox(tuple(placeholder_names_and_values))
+      self._indexes_and_placeholder_names[index] = placeholder.name
+      self._placeholder_names_and_indexes[placeholder.name] = index
+
+      combo_box.append_text(placeholder.display_name)
+
+    combo_box.set_active(self._placeholder_names_and_indexes[setting.default_value])
+
+    return combo_box
   
   def _get_value(self):
-    return self._setting.get_allowed_placeholder_names()[self._widget.get_active()]
+    return self._indexes_and_placeholder_names[self._widget.get_active()]
   
   def _set_value(self, value):
-    self._widget.set_active(self._setting.get_allowed_placeholder_names().index(value))
+    self._widget.set_active(self._placeholder_names_and_indexes[value])

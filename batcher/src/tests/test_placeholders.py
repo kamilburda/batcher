@@ -1,11 +1,56 @@
 import unittest
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GObject
+
 import parameterized
 
 from src import placeholders
 
 
-class TestPlaceHolderSetting(unittest.TestCase):
+class _BatcherStub:
+
+  def __init__(self, current_image=None, current_raw_item=None):
+    self.current_image = current_image
+    self.current_raw_item = current_raw_item
+
+
+class TestGetReplacedArg(unittest.TestCase):
+
+  def test_arg_matching_placeholder(self):
+    batcher = _BatcherStub(current_image='image')
+
+    self.assertEqual(placeholders.get_replaced_arg('current_image', batcher), 'image')
+
+  def test_arg_not_matching_placeholder(self):
+    batcher = _BatcherStub(current_image='image')
+
+    with self.assertRaises(ValueError):
+      placeholders.get_replaced_arg('invalid_placeholder', batcher)
+
+
+class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
+
+  def test_with_gobject_subclass(self):
+    self.assertEqual(
+      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.Image),
+      'placeholder_image')
+
+  def test_with_gtype(self):
+    self.assertEqual(
+      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.Image.__gtype__),
+      'placeholder_image')
+
+  def test_with_non_matching_gtype(self):
+    self.assertIsNone(placeholders.get_placeholder_type_name_from_pdb_type(GObject.GObject))
+
+  def test_with_invalid_object_type(self):
+    self.assertIsNone(placeholders.get_placeholder_type_name_from_pdb_type(object))
+
+
+class TestPlaceholderSetting(unittest.TestCase):
   
   @parameterized.parameterized.expand([
     ('placeholder', placeholders.PlaceholderSetting, []),
