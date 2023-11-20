@@ -6,14 +6,14 @@ as its first argument.
 Many functions define events invoked on the `pygimplib.setting.Group`
 containing actions. These events include:
 
-* `'before-add-action'` - invoked when:
+* ``'before-add-action'`` - invoked when:
   * calling `add()` before adding an action,
   * calling `clear()` before resetting actions (due to initial actions
     being added back).
   
   Arguments: action dictionary to be added
 
-* `'after-add-action'` - invoked when:
+* ``'after-add-action'`` - invoked when:
   * calling `add()` after adding an action,
   * calling `setting.Group.load()` or `setting.Persistor.load()` after loading
     an action (loading an action counts as adding).
@@ -24,35 +24,35 @@ containing actions. These events include:
   
   * created action,
   
-  * original action dictionary (same as in `'before-add-action'`). When this
+  * original action dictionary (same as in ``'before-add-action'``). When this
     event is triggered in `setting.Group.load()` or `setting.Persistor.load()`,
     this argument is `None` as there is no way to obtain the original
     dictionary.
 
-* `'before-reorder-action'` - invoked when calling `reorder()` before
+* ``'before-reorder-action'`` - invoked when calling `reorder()` before
   reordering an action.
   
   Arguments: action, position before reordering
 
-* `'after-reorder-action'` - invoked when calling `reorder()` after reordering
+* ``'after-reorder-action'`` - invoked when calling `reorder()` after reordering
   an action.
   
   Arguments: action, position before reordering, new position
 
-* `'before-remove-action'` - invoked when calling `remove()` before removing an
-  action.
+* ``'before-remove-action'`` - invoked when calling `remove()` before removing
+  an action.
   
   Arguments: action to be removed
 
-* `'after-remove-action'` - invoked when calling `remove()` after removing an
+* ``'after-remove-action'`` - invoked when calling `remove()` after removing an
   action.
   
   Arguments: name of the removed action
 
-* `'before-clear-actions'` - invoked when calling `clear()` before clearing
+* ``'before-clear-actions'`` - invoked when calling `clear()` before clearing
   actions.
 
-* `'after-clear-actions'` - invoked when calling `clear()` after clearing
+* ``'after-clear-actions'`` - invoked when calling `clear()` after clearing
   actions.
 """
 
@@ -94,62 +94,62 @@ def create(name, initial_actions=None):
   
   Each created action in the returned group is a `pygimplib.setting.Group`
   instance. Each action contains the following settings or child groups:
-  * `'function'` - Name of the function to call. If `'origin'` is `'builtin'`,
+  * ``'function'`` - Name of the function to call. If ``'origin'`` is ``'builtin'``,
     then the function is an empty string and the function must be replaced
     during processing with a function object. This allows the function to be
     saved to a persistent setting source.
-  * `'origin'` - Type of the function. If `'builtin'`, the function is defined
-    directly in the plug-in. If `'gimp_pdb'`, the function is taken from the
+  * ``'origin'`` - Type of the function. If ``'builtin'``, the function is defined
+    directly in the plug-in. If ``'gimp_pdb'``, the function is taken from the
     GIMP PDB. The origin affects how the function is modified (wrapped) during
     processing in the `batcher` module.
-  * `'arguments'` - Arguments to `'function'` as a `pygimplib.setting.Group`
+  * ``'arguments'`` - Arguments to ``'function'`` as a `pygimplib.setting.Group`
     instance containing arguments as separate `Setting` instances.
-  * `'enabled'` - Whether the action should be applied or not.
-  * `'display_name'` - The display name (human-readable name) of the action.
-  * `'action_group'` - List of groups the action belongs to, used in
+  * ``'enabled'`` - Whether the action should be applied or not.
+  * ``'display_name'`` - The display name (human-readable name) of the action.
+  * ``'action_group'`` - List of groups the action belongs to, used in
     `pygimplib.invoker.Invoker` and `batcher.Batcher`.
-  * `'orig_name'` - The original name of the action. If an action with the
-    same `'name'` field (see below) was previously added, the name of the new
+  * ``'orig_name'`` - The original name of the action. If an action with the
+    same ``'name'`` field (see below) was previously added, the name of the new
     action is made unique to allow lookup of both actions. Otherwise,
-    `'orig_name'` is equal to `'name'`.
-  * `'tags'` - Additional tags added to each action (the
+    ``'orig_name'`` is equal to ``'name'``.
+  * ``'tags'`` - Additional tags added to each action (the
     `pygimplib.setting.Group` instance).
-  * `'more_options_expanded'` - If `True`, display additional options for an
+  * ``'more_options_expanded'`` - If `True`, display additional options for an
     action when editing the action interactively.
-  * `'enabled_for_previews'` - If `True`, this indicates that the action can be
+  * ``'enabled_for_previews'`` - If `True`, this indicates that the action can be
     applied in the preview.
-  * `'display_options_on_create'` - If `True`, display action edit dialog upon
+  * ``'display_options_on_create'`` - If `True`, display action edit dialog upon
     adding an action interactively.
   
   Each dictionary in the `initial_actions` list may contain the following
   fields:
-  * `'name'` - This field is required. This is the `name` attribute of the
+  * ``'name'`` - This field is required. This is the `name` attribute of the
     created action.
-  * `'type'` - Action type. See below for details.
-  * `'function'`
-  * `'origin'`
-  * `'arguments'` - Specified as list of dictionaries defining settings. Each
+  * ``'type'`` - Action type. See below for details.
+  * ``'function'``
+  * ``'origin'``
+  * ``'arguments'`` - Specified as list of dictionaries defining settings. Each
     dictionary must contain required attributes and can contain optional
     attributes as stated in `setting.Group.add()`.
-  * `'enabled'`
-  * `'display_name'`
-  * `'action_group'`
-  * `'tags'`
-  * `'more_options_expanded'`
-  * `'enabled_for_previews'`
-  * `'display_options_on_create'`
+  * ``'enabled'``
+  * ``'display_name'``
+  * ``'action_group'``
+  * ``'tags'``
+  * ``'more_options_expanded'``
+  * ``'enabled_for_previews'``
+  * ``'display_options_on_create'``
   
-  Depending on the specified `'type'`, the dictionary may contain additional
+  Depending on the specified ``'type'``, the dictionary may contain additional
   fields and `create` may generate additional settings.
   
-  Allowed values for `'type'`:
-  * `'procedure'` (default) - Represents a procedure. `'action_group'`
+  Allowed values for ``'type'``:
+  * ``'procedure'`` (default) - Represents a procedure. ``'action_group'``
     defaults to `DEFAULT_PROCEDURES_GROUP` if not defined.
-  * `'constraint'` - Represents a constraint. `'action_group'` defaults to
+  * ``'constraint'`` - Represents a constraint. ``'action_group'`` defaults to
     `DEFAULT_CONSTRAINTS_GROUP` if not defined.
   
-  Additional allowed fields for type `'constraint'` include:
-  * `'also_apply_to_parent_folders'` - If `True`, apply the constraint to parent
+  Additional allowed fields for type ``'constraint'`` include:
+  * ``'also_apply_to_parent_folders'`` - If `True`, apply the constraint to parent
     groups (folders) as well. The constraint is then satisfied only if the item
     and all of its parents satisfy the constraint.
   
@@ -157,7 +157,7 @@ def create(name, initial_actions=None):
   created, using the field name as the setting name.
   
   Raises:
-  * `ValueError` - invalid `'type'` or missing required fields in
+  * `ValueError` - invalid ``'type'`` or missing required fields in
     `initial_actions`.
   """
   actions = pg.setting.Group(
@@ -201,8 +201,8 @@ def add(actions, action_dict_or_pdb_proc_name):
   `TypeError`.
   
   The same action can be added multiple times. Each action will be
-  assigned a unique name and display name (e.g. `'rename'` and `'Rename'`
-  for the first action, `'rename_2'` and `'Rename (2)'` for the second
+  assigned a unique name and display name (e.g. ``'rename'`` and ``'Rename'``
+  for the first action, ``'rename_2'`` and ``'Rename (2)'`` for the second
   action, and so on).
   """
   if isinstance(action_dict_or_pdb_proc_name, dict):
@@ -514,7 +514,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name):
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added as an action via `add()`.
   
-  The `'function'` field contains the PDB procedure name.
+  The ``'function'`` field contains the PDB procedure name.
   
   If the procedure contains arguments with the same name, each subsequent
   identical name is made unique (since arguments are internally represented as
@@ -662,7 +662,7 @@ def walk(actions, action_type=None, setting_name=None):
   If `setting_name` is `None`, iterate over each action.
   
   If `setting_name` is not `None`, iterate over each setting or subgroup inside
-  each action. For example, `'enabled'` yields the `'enabled'` setting for
+  each action. For example, ``'enabled'`` yields the ``'enabled'`` setting for
   each action. For the list of possible names of settings and subgroups, see
   `create()`.
   """
