@@ -1182,10 +1182,19 @@ class EnumSetting(Setting):
   # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
   _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self.enum_type.__enum_values__.values()), 0)
 
+  _SUPPORTED_MODULES_WITH_ENUMS = {
+    'Gimp': 'gi.repository.Gimp',
+    'Gegl': 'gi.repository.Gegl',
+    'GimpUi': 'gi.repository.GimpUi',
+    'GObject': 'gi.repository.GObject',
+    'GLib': 'gi.repository.GLib',
+    'Gio': 'gi.repository.Gio',
+  }
+
   def __init__(
         self,
         name: str,
-        enum_type: Union[Type[GObject.GEnum], str],
+        enum_type: Union[Type[GObject.GEnum], GObject.GType, str],
         **kwargs,
   ):
     """Initializes an `EnumSetting` instance.
@@ -1218,7 +1227,7 @@ class EnumSetting(Setting):
   def to_dict(self, *args, **kwargs):
     settings_dict = super().to_dict(*args, **kwargs)
 
-    settings_dict['enum_type'] = f'{self.enum_type.__module__}.{self.enum_type.__name__}'
+    settings_dict['enum_type'] = self.enum_type.__gtype__.name
 
     return settings_dict
 
@@ -1253,18 +1262,20 @@ class EnumSetting(Setting):
   def _get_pdb_type(self, pdb_type):
     return self._enum_type
 
-  @staticmethod
-  def _process_enum_type(enum_type):
-    if isinstance(enum_type, str):
-      module_path, _unused, enum_class_name = enum_type.rpartition('.')
+  def _process_enum_type(self, enum_type):
+    if isinstance(enum_type, GObject.GType):
+      processed_enum_type = enum_type.name
+    else:
+      processed_enum_type = enum_type
+
+    if isinstance(processed_enum_type, str):
+      module_path, enum_class_name = self._get_enum_type_from_string(processed_enum_type)
 
       if not module_path or not enum_class_name:
-        raise TypeError(f'"{enum_type}" is not a valid GObject.GEnum type')
+        raise TypeError(f'"{processed_enum_type}" is not a valid GObject.GEnum type')
 
       module_with_enum = importlib.import_module(module_path)
       processed_enum_type = getattr(module_with_enum, enum_class_name)
-    else:
-      processed_enum_type = enum_type
 
     if not inspect.isclass(processed_enum_type):
       raise TypeError(f'{processed_enum_type} is not a class')
@@ -1273,6 +1284,15 @@ class EnumSetting(Setting):
       raise TypeError(f'{processed_enum_type} is not a subclass of GObject.GEnum')
 
     return processed_enum_type
+
+  def _get_enum_type_from_string(self, enum_type_str):
+    # HACK: We parse the `GType` name to obtain the `GEnum` instance. Is there
+    #  a more elegant way?
+    for module_name, module_path in self._SUPPORTED_MODULES_WITH_ENUMS.items():
+      if enum_type_str.startswith(module_name):
+        return module_path, enum_type_str[len(module_name):]
+
+    return None, None
 
 
 class ChoiceSetting(Setting):

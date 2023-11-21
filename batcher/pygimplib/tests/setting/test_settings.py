@@ -704,9 +704,17 @@ class TestCreateEnumSetting(unittest.TestCase):
 
   def test_with_enum_type_as_string(self):
     setting = settings_.EnumSetting(
-      'distance_metric', 'gi.repository.Gegl.DistanceMetric',
-      default_value=Gegl.DistanceMetric.EUCLIDEAN,
-    )
+      'distance_metric', 'GeglDistanceMetric', default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
+    self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
+
+  def test_with_enum_type_as_gobject_type(self):
+    setting = settings_.EnumSetting(
+      'distance_metric',
+      Gegl.DistanceMetric.__gtype__,
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
 
     self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
     self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
@@ -716,13 +724,17 @@ class TestCreateEnumSetting(unittest.TestCase):
     with self.assertRaises(TypeError):
       settings_.EnumSetting('distance_metric', 'gi')
 
+  def test_string_enum_type_is_empty_raises_error(self):
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting('distance_metric', 'Gegl')
+
   def test_string_enum_type_is_not_a_class_raises_error(self):
     with self.assertRaises(TypeError):
-      settings_.EnumSetting('distance_metric', 'gi.repository.Gegl')
+      settings_.EnumSetting('distance_metric', object())
 
   def test_string_enum_type_is_not_a_genum_subclass_raises_error(self):
     with self.assertRaises(TypeError):
-      settings_.EnumSetting('distance_metric', 'gi.repository.Gimp.PDB')
+      settings_.EnumSetting('distance_metric', 'GimpPDB')
 
   def test_invalid_default_value_raises_error(self):
     with self.assertRaises(settings_.SettingValueError):
@@ -776,7 +788,7 @@ class TestEnumSetting(unittest.TestCase):
         'name': 'precision',
         'value': 750,
         'type': 'enum',
-        'enum_type': 'gi.repository.Gimp.Precision',
+        'enum_type': 'GimpPrecision',
         'default_value': 750,
       })
 
