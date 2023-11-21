@@ -15,6 +15,83 @@ def _get_result_tuple_type(arg_name) -> collections.namedtuple:
     f'ResultTuple_{arg_name}', ['success', arg_name])
 
 
+class PdbStub:
+
+  _PROCEDURES = {}
+
+  @classmethod
+  def add_procedure(cls, proc):
+    """Adds a fake PDB procedure."""
+    cls._PROCEDURES[proc.get_name()] = proc
+
+  @classmethod
+  def clear_procedures(cls):
+    cls._PROCEDURES = {}
+
+  @classmethod
+  def procedure_exists(cls, proc_name):
+    return proc_name in cls._PROCEDURES
+
+  @classmethod
+  def lookup_procedure(cls, proc_name):
+    return cls._PROCEDURES.get(proc_name, None)
+
+  @classmethod
+  def run_procedure(cls, proc_name, args):
+    cls._PROCEDURES[proc_name].function(args)
+
+
+class PdbProcedureStub:
+
+  def __init__(
+        self,
+        name,
+        proc_type=Gimp.PDBProcType.PLUGIN,
+        function=None,
+        arguments_spec=None,
+        return_vals_spec=None,
+        blurb='',
+  ):
+    self.function = function
+
+    self._name = name
+    self._proc_type = proc_type
+    self._blurb = blurb
+
+    if arguments_spec is None:
+      arguments_spec = []
+
+    self._arguments_spec = [GParamStub(**kwargs) for kwargs in arguments_spec]
+
+    if return_vals_spec is None:
+      return_vals_spec = []
+
+    self._return_vals_spec = [GParamStub(**kwargs) for kwargs in return_vals_spec]
+
+  def get_name(self):
+    return self._name
+
+  def get_proc_type(self):
+    return self._proc_type
+
+  def get_blurb(self):
+    return self._blurb
+
+  def get_arguments(self):
+    return self._arguments_spec
+
+  def get_return_values(self):
+    return self._return_vals_spec
+
+
+class GParamStub:
+
+  def __init__(self, value_type, name, blurb=''):
+    self.value_type = value_type
+    self.name = name
+    self.blurb = blurb
+
+
 class ParasiteFunctionsStubMixin:
   
   def __init__(self):
@@ -414,4 +491,13 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   ObjectArray = ObjectArray
 
+  RunMode = Gimp.RunMode
+  PDBStatusType = Gimp.PDBStatusType
+
   PARASITE_PERSISTENT = Gimp.PARASITE_PERSISTENT
+
+  _PDB_INSTANCE = PdbStub()
+
+  @classmethod
+  def get_pdb(cls):
+    return cls._PDB_INSTANCE

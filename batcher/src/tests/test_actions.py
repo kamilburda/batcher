@@ -6,6 +6,7 @@ import parameterized
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
@@ -139,6 +140,10 @@ class TestCreateActions(unittest.TestCase):
       actions_.create('procedures', [initial_action_dict])
 
 
+@mock.patch(
+  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+  return_value=pg.tests.stubs_gimp.PdbStub,
+)
 class TestManageActions(unittest.TestCase):
   
   def setUp(self):
@@ -148,17 +153,17 @@ class TestManageActions(unittest.TestCase):
     
     self.expected_dict = dict({'orig_name': 'autocrop'}, **self.autocrop_dict)
   
-  def test_add(self):
+  def test_add(self, mock_get_pdb):
     action = actions_.add(self.procedures, self.autocrop_dict)
     
     self.assertEqual(len(self.procedures), 1)
     self.assertEqual(action, self.procedures['autocrop'])
   
-  def test_add_passing_invalid_object_raises_error(self):
+  def test_add_passing_invalid_object_raises_error(self, mock_get_pdb):
     with self.assertRaises(TypeError):
       actions_.add(self.procedures, 'invalid_object')
   
-  def test_add_existing_name_is_uniquified(self):
+  def test_add_existing_name_is_uniquified(self, mock_get_pdb):
     added_actions = [
       actions_.add(self.procedures, self.autocrop_dict) for _unused in range(3)]
     
@@ -176,7 +181,7 @@ class TestManageActions(unittest.TestCase):
     
     self.assertEqual(len(self.procedures), 3)
   
-  def test_add_invokes_before_add_action_event(self):
+  def test_add_invokes_before_add_action_event(self, mock_get_pdb):
     invoked_event_args = []
     
     def on_before_add_action(actions, action_dict):
@@ -199,7 +204,7 @@ class TestManageActions(unittest.TestCase):
      ['autocrop', 'autocrop'],),
   ])
   def test_add_invokes_after_add_action_event(
-        self, test_case_suffix, action_names_to_add):
+        self, mock_get_pdb, test_case_suffix, action_names_to_add):
     invoked_event_args = []
     
     def on_after_add_action(actions, action, orig_action_dict):
@@ -215,7 +220,7 @@ class TestManageActions(unittest.TestCase):
       self.assertDictEqual(invoked_event_args[-1][2], self.autocrop_dict)
       self.assertIsNot(invoked_event_args[-1][2], self.autocrop_dict)
   
-  def test_add_modifying_added_action_modifies_nothing_else(self):
+  def test_add_modifying_added_action_modifies_nothing_else(self, mock_get_pdb):
     action = actions_.add(self.procedures, self.autocrop_dict)
     action['enabled'].set_value(False)
     action['arguments/offset_x'].set_value(20)
@@ -240,6 +245,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_get_index(
         self,
+        mock_get_pdb,
         test_case_suffix,
         action_name,
         expected_position):
@@ -286,6 +292,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_reorder(
         self,
+        mock_get_pdb,
         test_case_suffix,
         action_name,
         new_position,
@@ -297,7 +304,7 @@ class TestManageActions(unittest.TestCase):
     
     self.assertEqual([action.name for action in self.procedures], expected_ordered_action_names)
   
-  def test_reorder_nonexisting_action_name(self):
+  def test_reorder_nonexisting_action_name(self, mock_get_pdb):
     with self.assertRaises(ValueError):
       actions_.reorder(self.procedures, 'invalid_action', 0)
   
@@ -319,6 +326,7 @@ class TestManageActions(unittest.TestCase):
   ])
   def test_remove(
         self,
+        mock_get_pdb,
         test_case_suffix,
         action_names_to_add,
         names_to_remove,
@@ -336,11 +344,11 @@ class TestManageActions(unittest.TestCase):
     
     self.assertEqual(len(self.procedures), len(names_to_keep))
   
-  def test_remove_nonexisting_action_name(self):
+  def test_remove_nonexisting_action_name(self, mock_get_pdb):
     with self.assertRaises(ValueError):
       actions_.remove(self.procedures, 'invalid_action')
   
-  def test_clear(self):
+  def test_clear(self, mock_get_pdb):
     for action_dict in self.test_procedures.values():
       actions_.add(self.procedures, action_dict)
     
@@ -349,7 +357,7 @@ class TestManageActions(unittest.TestCase):
     self.assertFalse(self.procedures)
     self.assertTrue(self.test_procedures)
   
-  def test_clear_resets_to_initial_actions(self):
+  def test_clear_resets_to_initial_actions(self, mock_get_pdb):
     procedures = actions_.create('procedures', [self.autocrop_dict])
     
     actions_.add(procedures, self.test_procedures['autocrop_background'])
@@ -359,7 +367,7 @@ class TestManageActions(unittest.TestCase):
     self.assertIn('autocrop', procedures)
     self.assertNotIn('autocrop_background', procedures)
   
-  def test_clear_triggers_events(self):
+  def test_clear_triggers_events(self, mock_get_pdb):
     procedures = actions_.create('procedures', [self.autocrop_dict])
     
     for action_name in ['autocrop_background', 'autocrop_foreground']:
@@ -485,6 +493,8 @@ class TestLoadSaveActions(unittest.TestCase):
   def setUp(self):
     self.test_procedures = get_action_data(test_procedures)
     self.procedures = actions_.create('procedures')
+
+    pg.setting.GimpSessionSource._SESSION_DATA = {}
   
   @parameterized.parameterized.expand([
     ('', False),
@@ -598,23 +608,32 @@ class TestLoadSaveActions(unittest.TestCase):
     self.assertIsNone(after_add_action_list[1][1])
 
 
+@mock.patch(
+  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+  return_value=pg.tests.stubs_gimp.PdbStub,
+)
 class TestManagePdbProceduresAsActions(unittest.TestCase):
   
   def setUp(self):
     self.procedures = actions_.create('procedures')
+
+    self.procedure_name = 'file-png-save'
+
     self.procedure_stub = stubs_gimp.PdbProcedureStub(
-      name='file-png-save',
-      type_=gimpenums.PLUGIN,
-      params=(
-        (gimpenums.PDB_INT32, 'run-mode', 'The run mode'),
-        (gimpenums.PDB_INT32, 'num-save-options', 'Number of save options'),
-        (gimpenums.PDB_INT32ARRAY, 'save-options', 'Save options'),
-        (gimpenums.PDB_STRING, 'filename', 'Filename to save the image in')),
-      return_vals=None,
+      name=self.procedure_name,
+      proc_type=Gimp.PDBProcType.PLUGIN,
+      arguments_spec=[
+        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(value_type=GObject.TYPE_INT, name='num-save-options', blurb='Number of save options'),
+        dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
+        dict(
+          value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
+
+    stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
   
-  def test_add_pdb_procedure(self):
-    action = actions_.add(self.procedures, self.procedure_stub)
+  def test_add_pdb_procedure(self, mock_get_pdb):
+    action = actions_.add(self.procedures, self.procedure_name)
     
     self.assertIn('file-png-save', self.procedures)
     
@@ -622,19 +641,19 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['function'].value, 'file-png-save')
     self.assertTrue(action['origin'].is_item('gimp_pdb'))
     self.assertEqual(action['enabled'].value, True)
-    self.assertEqual(action['display_name'].value, self.procedure_stub.proc_name)
+    self.assertEqual(action['display_name'].value, self.procedure_stub.get_name())
     self.assertEqual(action['action_groups'].value, [actions_.DEFAULT_PROCEDURES_GROUP])
     
     self.assertEqual(action['arguments/run-mode'].gui.get_visible(), False)
     self.assertEqual(action['arguments/num-save-options'].gui.get_visible(), False)
     
-    self.assertEqual(action['arguments/run-mode'].value, gimpenums.RUN_NONINTERACTIVE)
+    self.assertEqual(action['arguments/run-mode'].value, Gimp.RunMode.NONINTERACTIVE)
     self.assertEqual(action['arguments/num-save-options'].value, 0)
     self.assertEqual(action['arguments/save-options'].value, ())
     self.assertEqual(action['arguments/filename'].value, '')
   
-  def test_add_pdb_procedure_array_length_setting_is_updated_automatically(self):
-    action = actions_.add(self.procedures, self.procedure_stub)
+  def test_add_pdb_procedure_array_length_setting_is_updated_automatically(self, mock_get_pdb):
+    action = actions_.add(self.procedures, self.procedure_name)
     
     action['arguments/save-options'].add_element()
     self.assertEqual(action['arguments/num-save-options'].value, 1)
@@ -649,8 +668,8 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
   @mock.patch(
     f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp',
     new_callable=stubs_gimp.GimpModuleStub)
-  def test_load_save_pdb_procedure_as_action(self, mock_gimp_module):
-    action = actions_.add(self.procedures, self.procedure_stub)
+  def test_load_save_pdb_procedure_as_action(self, mock_gimp_module, mock_get_pdb):
+    action = actions_.add(self.procedures, self.procedure_name)
     
     action['enabled'].set_value(False)
     action['arguments/filename'].set_value('image.png')
@@ -665,27 +684,41 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['arguments/filename'].value, 'image.png')
 
 
+@mock.patch(
+  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+  return_value=pg.tests.stubs_gimp.PdbStub,
+)
 class TestGetActionDictAsPdbProcedure(unittest.TestCase):
-  
-  def setUp(self):
-    self.procedure_stub = stubs_gimp.PdbProcedureStub(
-      name='file-png-save',
-      type_=gimpenums.PLUGIN,
-      params=(
-        (gimpenums.PDB_INT32, 'run-mode', 'The run mode'),
-        (gimpenums.PDB_INT32, 'num-save-options', 'Number of save options'),
-        (gimpenums.PDB_INT32ARRAY, 'save-options', 'Save options'),
-        (gimpenums.PDB_STRING, 'filename', 'Filename to save the image in')),
-      return_vals=None,
+
+  @mock.patch(
+    f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+    return_value=pg.tests.stubs_gimp.PdbStub,
+  )
+  def setUp(self, mock_get_pdb):
+    self.procedure_name = 'file-png-save'
+
+    self.procedure_stub_kwargs = dict(
+      name=self.procedure_name,
+      arguments_spec=[
+        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(value_type=GObject.TYPE_INT, name='num-save-options', blurb='Number of save options'),
+        dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
+        dict(
+          value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
+
+    actions_.pdb.remove_from_cache(self.procedure_name)
   
-  def test_with_non_unique_param_names(self):
-    self.procedure_stub.params = tuple(
-      list(self.procedure_stub.params)
-      + [(gimpenums.PDB_INT32ARRAY, 'save-options', 'More save options'),
-         (gimpenums.PDB_STRING, 'filename', 'Another filename')])
-    
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_stub)
+  def test_with_non_unique_param_names(self, mock_get_pdb):
+    self.procedure_stub_kwargs['arguments_spec'].extend([
+      dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='More save options'),
+      dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
+    ])
+
+    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
+
+    action_dict = actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
     
     self.assertListEqual(
       [argument_dict['name'] for argument_dict in action_dict['arguments']],
@@ -696,35 +729,35 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
        'save-options-2',
        'filename-2'])
   
-  def test_unsupported_pdb_param_type(self):
-    self.procedure_stub.params = tuple(
-      list(self.procedure_stub.params)
-      + [('unsupported', 'param-with-unsupported-type', '')])
-    
+  def test_unsupported_pdb_param_type(self, mock_get_pdb):
+    self.procedure_stub_kwargs['arguments_spec'].extend([
+      dict(value_type='unsupported', name='param-with-unsupported-type', blurb=''),
+    ])
+
+    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
+
     with self.assertRaises(actions_.UnsupportedPdbProcedureError):
-      actions_.get_action_dict_for_pdb_procedure(self.procedure_stub)
+      actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
   
-  def test_default_run_mode_is_noninteractive(self):
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_stub)
-    self.assertEqual(
-      action_dict['arguments'][0]['default_value'], gimpenums.RUN_NONINTERACTIVE)
+  def test_default_run_mode_is_noninteractive(self, mock_get_pdb):
+    self.procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
+
+    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
+
+    self.assertEqual(action_dict['arguments'][0]['default_value'], Gimp.RunMode.NONINTERACTIVE)
   
-  def test_run_mode_as_not_first_parameter(self):
-    self.procedure_stub.params = tuple(
-      [(gimpenums.PDB_INT32, 'dummy-param', 'Dummy parameter')]
-      + list(self.procedure_stub.params))
+  def test_gimp_object_types_are_replaced_with_placeholders(self, mock_get_pdb):
+    self.procedure_stub_kwargs['arguments_spec'].extend([
+      dict(value_type=Gimp.Image.__gtype__, name='image', blurb='The image'),
+      dict(value_type=Gimp.Layer.__gtype__, name='layer', blurb='The layer to process'),
+    ])
+
+    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
     
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_stub)
-    self.assertNotIn('default_value', action_dict['arguments'][0])
-    self.assertNotIn('default_value', action_dict['arguments'][1])
-  
-  def test_gimp_object_types_are_replaced_with_placeholders(self):
-    self.procedure_stub.params = tuple(
-      list(self.procedure_stub.params)
-      + [(gimpenums.PDB_IMAGE, 'image', 'The image'),
-         (gimpenums.PDB_LAYER, 'layer', 'The layer to process')])
-    
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_stub)
+    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
     
     self.assertEqual(action_dict['arguments'][-2]['type'], 'placeholder_image')
     self.assertEqual(action_dict['arguments'][-1]['type'], 'placeholder_layer')
