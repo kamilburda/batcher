@@ -1869,7 +1869,7 @@ class TestCreateArraySetting(unittest.TestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1, 5, 10),
-      element_type='integer',
+      element_type='int',
       element_pdb_type=GObject.TYPE_INT)
     
     self.assertEqual(setting.pdb_type, Gimp.Int32Array)

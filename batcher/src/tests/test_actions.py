@@ -23,12 +23,12 @@ test_procedures = [
     'action_groups': ['basic'],
     'arguments': [
       {
-        'type': 'integer',
+        'type': 'int',
         'name': 'offset_x',
         'default_value': 0,
       },
       {
-        'type': 'integer',
+        'type': 'int',
         'name': 'offset_y',
         'default_value': 0,
       },

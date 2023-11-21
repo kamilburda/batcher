@@ -514,7 +514,7 @@ class TestGroupHierarchical(unittest.TestCase):
     expert_settings = group_.Group('expert')
     expert_settings.add([
         {
-         'type': 'integer',
+         'type': 'int',
          'name': 'file_extension_strip_mode',
          'default_value': 0
         }
