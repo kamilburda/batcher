@@ -47,6 +47,21 @@ class _PyPDB:
 
     return self._procedure_exists(proc_name)
 
+  def remove_from_cache(self, name):
+    """Removes a `PyPDBProcedure` instance matching ``name`` from the internal
+    cache.
+
+    This method is only ever useful for testing purposes.
+
+    No action is taken if there is no procedure matching ``name`` in the cache.
+    """
+    proc_name = name.replace('_', '-')
+
+    try:
+      del self._proc_cache[proc_name]
+    except KeyError:
+      pass
+
   def _get_proc_by_name(self, proc_name):
     if proc_name not in self._proc_cache:
       self._proc_cache[proc_name] = PyPDBProcedure(self, proc_name)
