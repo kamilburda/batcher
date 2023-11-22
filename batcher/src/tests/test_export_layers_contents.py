@@ -26,7 +26,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    pdb.gimp_context_push()
+    Gimp.context_push()
     
     cls.test_image_filepath = os.path.join(
       TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
@@ -62,7 +62,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     for image in cls.expected_images.values():
       pdb.gimp_image_delete(image)
     
-    pdb.gimp_context_pop()
+    Gimp.context_pop()
     pdb.gimp_progress_end()
   
   def setUp(self):
