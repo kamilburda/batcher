@@ -138,7 +138,7 @@ class PyPDBProcedure:
 
   def _get_has_run_mode(self):
     proc_arg_info = self._info.get_arguments()
-    if proc_arg_info and proc_arg_info[0].value_type:
+    if proc_arg_info:
       return proc_arg_info[0].value_type == Gimp.RunMode.__gtype__
     else:
       return False
