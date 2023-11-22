@@ -64,7 +64,7 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
 def _copy_image_parasites(image, new_image):
   for parasite_name in image.get_parasite_list():
     parasite = image.get_parasite(parasite_name)
-    new_image.parasite_attach(
+    new_image.attach_parasite(
       Gimp.Parasite.new(parasite.get_name(), parasite.get_flags(), parasite.get_data()))
 
 
