@@ -1,18 +1,18 @@
 import os
 
-plugin_dirpath = os.path.join(Gimp.directory(), 'batcher')
+root_dirpath = os.path.join(Gimp.directory(), 'batcher')
 
-Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'dev']), GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), os.path.join(plugin_dirpath, 'test_output.log')])
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, root_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'dev']), GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), os.path.join(root_dirpath, 'test_output.log')])
 
-Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, plugin_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(plugin_dirpath, 'test_output.log')])
+Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, root_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(root_dirpath, 'test_output.log')])
 
 
 import importlib
 import os
 import sys
-plugin_dirpath = os.path.join(Gimp.directory(), 'batcher', 'batcher')
-sys.path.append(plugin_dirpath)
-sys.path.append(os.path.join(plugin_dirpath, 'pygimplib'))
+root_dirpath = os.path.join(Gimp.directory(), 'batcher')
+sys.path.append(os.path.join(root_dirpath, 'batcher'))
+sys.path.append(os.path.join(root_dirpath, 'batcher', 'pygimplib'))
 import pygimplib as pg
 from pygimplib.tests.setting import test_setting_gui
 
@@ -22,7 +22,7 @@ builtins._ = lambda s: s
 test_setting_gui.test_basic_settings_and_gui()
 
 
-sys.path.append(os.path.join(plugin_dirpath, 'dev'))
+sys.path.append(os.path.join(root_dirpath, 'dev'))
 import make_screenshots
 import preprocess_document_contents
 import sync_docs
@@ -34,4 +34,4 @@ importlib.reload(make_screenshots); make_screenshots.main()
 importlib.reload(sync_docs); sync_docs.main()
 
 
-importlib.reload(preprocess_document_contents); preprocess_document_contents.main([(os.path.join(plugin_dirpath, 'docs', 'README_raw.md'), os.path.join(plugin_dirpath, 'README.md'))])
+importlib.reload(preprocess_document_contents); preprocess_document_contents.main([(os.path.join(root_dirpath, 'docs', 'README_raw.md'), os.path.join(root_dirpath, 'README.md'))])
