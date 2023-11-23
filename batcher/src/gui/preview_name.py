@@ -240,7 +240,7 @@ class NamePreview(preview_base_.Preview):
     self._tree_view.append_column(column)
     
     self._scrolled_window = gtk.ScrolledWindow()
-    self._scrolled_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    self._scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     self._scrolled_window.add(self._tree_view)
     
     self.pack_start(self._scrolled_window, False, False, 0)

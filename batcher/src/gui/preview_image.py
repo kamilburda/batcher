@@ -252,8 +252,8 @@ class ImagePreview(preview_base_.Preview):
   
   def _init_gui(self):
     self._button_menu = gtk.Button()
-    self._button_menu.set_relief(gtk.RELIEF_NONE)
-    self._button_menu.add(gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN))
+    self._button_menu.set_relief(Gtk.ReliefStyle.NONE)
+    self._button_menu.add(gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN))
     
     self._menu_item_update_automatically = gtk.CheckMenuItem(
       _('Update Preview Automatically'))
@@ -267,7 +267,7 @@ class ImagePreview(preview_base_.Preview):
     self._button_refresh.set_image(
       Gtk.Image.new_from_icon_name('view-refresh', Gtk.IconSize.BUTTON))
     self._button_refresh.set_tooltip_text(_('Update Preview'))
-    self._button_refresh.set_relief(gtk.RELIEF_NONE)
+    self._button_refresh.set_relief(Gtk.ReliefStyle.NONE)
     self._button_refresh.show_all()
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)

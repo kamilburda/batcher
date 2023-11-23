@@ -134,7 +134,7 @@ def _set_settings(func):
       self._settings['gui/image_preview_displayed_layers'].value[self._image.get_id()] = (
         [self._image_preview.item.raw.get_id()] if self._image_preview.item is not None else [])
     except pg.setting.SettingValueError as e:
-      self._display_inline_message(str(e), gtk.MESSAGE_ERROR, e.setting)
+      self._display_inline_message(str(e), Gtk.MessageType.ERROR, e.setting)
       return
     else:
       func(self, *args, **kwargs)
@@ -471,7 +471,7 @@ class ExportLayersDialog:
     self._hbox_button_settings = gtk.HBox()
     self._hbox_button_settings.pack_start(self._label_button_settings, True, True, 0)
     self._hbox_button_settings.pack_start(
-      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), False, False, 0)
+      gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN), False, False, 0)
     
     self._button_settings = gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
@@ -815,7 +815,7 @@ class ExportLayersDialog:
       pg.invocation.timeout_add_strict(
         self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
         self._name_preview.set_sensitive, False)
-      self._display_inline_message(str(e), gtk.MESSAGE_ERROR, setting)
+      self._display_inline_message(str(e), Gtk.MessageType.ERROR, setting)
       self._name_preview.lock_update(True, name_preview_lock_update_key)
     else:
       self._name_preview.lock_update(False, name_preview_lock_update_key)
@@ -1172,7 +1172,7 @@ class ExportLayersDialog:
       for box_item in action_box.items:
         box_item.close_edit_dialog()
   
-  def _display_inline_message(self, text, message_type=gtk.MESSAGE_ERROR, setting=None):
+  def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting
     
     if self._settings['main/edit_mode'].value:
@@ -1185,7 +1185,7 @@ class ExportLayersDialog:
   def _display_inline_message_on_setting_value_error(
         self, exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, pg.setting.SettingValueError):
-      self._display_inline_message(str(exc_value), gtk.MESSAGE_ERROR)
+      self._display_inline_message(str(exc_value), Gtk.MessageType.ERROR)
       return True
     else:
       return False

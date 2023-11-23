@@ -153,7 +153,7 @@ class ActionBox(pg.gui.ItemBox):
       self._button_add.set_image(
         Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.BUTTON))
     
-    self._button_add.set_relief(gtk.RELIEF_NONE)
+    self._button_add.set_relief(Gtk.ReliefStyle.NONE)
     self._button_add.connect('clicked', self._on_button_add_clicked)
     
     self._vbox.pack_start(self._button_add, False, False, 0)
@@ -181,7 +181,7 @@ class ActionBox(pg.gui.ItemBox):
     # make ellipsizing work properly, the label width must be set explicitly.
     if isinstance(action['enabled'].gui, pg.setting.SETTING_GUI_TYPES.check_button):
       action['enabled'].gui.widget.set_property('width-request', 1)
-      action['enabled'].gui.widget.get_child().set_ellipsize(pango.ELLIPSIZE_END)
+      action['enabled'].gui.widget.get_child().set_ellipsize(Pango.EllipsizeMode.END)
       action['enabled'].gui.widget.get_child().set_max_width_chars(
         self._ACTION_ENABLED_LABEL_MAX_CHAR_WIDTH)
       action['enabled'].gui.widget.get_child().connect(
@@ -476,7 +476,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     self._label_procedure_name = pg.gui.EditableLabel()
     self._label_procedure_name.label.set_use_markup(True)
-    self._label_procedure_name.label.set_ellipsize(pango.ELLIPSIZE_END)
+    self._label_procedure_name.label.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_procedure_name.label.set_markup(
       '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
     self._label_procedure_name.connect(
