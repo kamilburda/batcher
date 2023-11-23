@@ -952,6 +952,8 @@ class NumericSetting(Setting):
     GObject.TYPE_UINT64: 0,
     GObject.TYPE_LONG: GLib.MINLONG,
     GObject.TYPE_ULONG: 0,
+    GObject.TYPE_CHAR: GLib.MININT8,
+    GObject.TYPE_UCHAR: 0,
     GObject.TYPE_DOUBLE: -GLib.MAXDOUBLE,
     GObject.TYPE_FLOAT: -GLib.MAXFLOAT,
   }
@@ -968,6 +970,8 @@ class NumericSetting(Setting):
     GObject.TYPE_UINT64: GLib.MAXUINT64,
     GObject.TYPE_LONG: GLib.MAXLONG,
     GObject.TYPE_ULONG: GLib.MAXULONG,
+    GObject.TYPE_CHAR: GLib.MAXINT8,
+    GObject.TYPE_UCHAR: GLib.MAXUINT8,
     GObject.TYPE_DOUBLE: GLib.MAXDOUBLE,
     GObject.TYPE_FLOAT: GLib.MAXFLOAT,
   }
@@ -1109,6 +1113,8 @@ class IntSetting(NumericSetting):
   * `GObject.TYPE_UINT64`
   * `GObject.TYPE_LONG`
   * `GObject.TYPE_ULONG`
+  * `GObject.TYPE_CHAR`
+  * `GObject.TYPE_UCHAR`
   
   Default value: 0
   """
@@ -1122,6 +1128,8 @@ class IntSetting(NumericSetting):
     GObject.TYPE_UINT64,
     GObject.TYPE_LONG,
     GObject.TYPE_ULONG,
+    GObject.TYPE_CHAR,
+    GObject.TYPE_UCHAR,
   ]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
