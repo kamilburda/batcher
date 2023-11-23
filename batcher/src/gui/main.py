@@ -314,7 +314,7 @@ class ExportLayersDialog:
     self._dialog.set_transient()
     self._dialog.set_default_size(*self._DIALOG_SIZE)
     self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
-    self._dialog.set_default_response(gtk.RESPONSE_CANCEL)
+    self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
     
     pg.gui.set_gui_excepthook_parent(self._dialog)
     
@@ -452,15 +452,13 @@ class ExportLayersDialog:
     self._hpaned_settings_and_previews.pack2(
       self._frame_previews, resize=True, shrink=True)
     
-    self._button_run = self._dialog.add_button(_('_Export'), gtk.RESPONSE_OK)
+    self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
     self._button_run.set_flags(gtk.CAN_DEFAULT)
     self._button_run.hide()
     
-    self._button_close = self._dialog.add_button(_('_Cancel'), gtk.RESPONSE_CANCEL)
+    self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
     self._button_close.hide()
-    
-    self._dialog.set_alternative_button_order([gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL])
-    
+
     self._button_stop = gtk.Button()
     self._button_stop.set_label(_('_Stop'))
     self._button_stop.set_no_show_all(True)
@@ -738,11 +736,9 @@ class ExportLayersDialog:
     file_dialog.set_do_overwrite_confirmation(True)
     
     file_dialog.add_buttons(
-      button_ok, gtk.RESPONSE_OK,
-      gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-    
-    file_dialog.set_alternative_button_order([gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL])
-    
+      button_ok, Gtk.ResponseType.OK,
+      Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+
     if action == 'import':
       check_button_load_size_settings = gtk.CheckButton(_('Import size-related settings'))
       check_button_load_size_settings.set_border_width(
@@ -780,7 +776,7 @@ class ExportLayersDialog:
     
     response_id = file_dialog.run()
     
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == Gtk.ResponseType.OK:
       filepath = pg.utils.safe_decode_gtk(file_dialog.get_filename())
       
       file_ext = os.path.splitext(filepath)[1]

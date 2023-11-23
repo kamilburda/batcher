@@ -253,7 +253,7 @@ class NamePreview(preview_base_.Preview):
   def _init_icons(self):
     self._icons = {}
     self._icons['folder'] = self._tree_view.render_icon(
-      gtk.STOCK_DIRECTORY, gtk.ICON_SIZE_MENU)
+      gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU)
     self._icons['item'] = gtk.gdk.pixbuf_new_from_file_at_size(
       self._icon_image_filepath, -1, self._icons['folder'].props.height)
     self._icons['tag'] = gtk.gdk.pixbuf_new_from_file_at_size(
@@ -285,7 +285,7 @@ class NamePreview(preview_base_.Preview):
     self._tags_menu = gtk.Menu()
     self._tags_remove_submenu = gtk.Menu()
     
-    self._tags_menu.append(gtk.SeparatorMenuItem())
+    self._tags_menu.append(Gtk.SeparatorMenuItem())
     
     self._menu_item_add_tag = gtk.MenuItem(_('Add New Tag...'))
     self._menu_item_add_tag.connect('activate', self._on_menu_item_add_tag_activate)
