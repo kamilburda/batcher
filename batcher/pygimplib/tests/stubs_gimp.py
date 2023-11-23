@@ -200,6 +200,9 @@ class Image(GObject.GObject, ParasiteFunctionsStubMixin):
   def is_valid(self):
     return self.valid
 
+  def delete(self):
+    pass
+
 
 class Item(GObject.GObject, ParasiteFunctionsStubMixin):
   

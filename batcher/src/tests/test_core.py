@@ -4,9 +4,9 @@ import unittest.mock as mock
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 import pygimplib as pg
-from pygimplib import pdb
 from pygimplib.tests import stubs_gimp
 
 from src import actions as actions_
@@ -20,11 +20,11 @@ class TestBatcherInitialActions(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    cls.image = Gimp.Image.new(1, 1, Gimp.ImageBaseType.RGB)
+    cls.image = stubs_gimp.Image(width=1, height=1, base_type=Gimp.ImageBaseType.RGB)
   
   @classmethod
   def tearDownClass(cls):
-    pdb.gimp_image_delete(cls.image)
+    cls.image.delete()
   
   def test_add_procedure_added_procedure_is_first_in_action_list(self):
     settings = settings_main.create_settings()
@@ -45,7 +45,10 @@ class TestBatcherInitialActions(unittest.TestCase):
     batcher.add_procedure(pg.utils.empty_func, [actions_.DEFAULT_PROCEDURES_GROUP])
     
     batcher.run(
-      is_preview=True, process_contents=False, process_names=False, process_export=False,
+      is_preview=True,
+      process_contents=False,
+      process_names=False,
+      process_export=False,
       **utils_.get_settings_for_batcher(settings['main']))
     
     added_action_items = batcher.invoker.list_actions(group=actions_.DEFAULT_PROCEDURES_GROUP)
@@ -62,6 +65,10 @@ class TestBatcherInitialActions(unittest.TestCase):
     self.assertEqual(actions_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
 
 
+@mock.patch(
+  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+  return_value=pg.tests.stubs_gimp.PdbStub,
+)
 class TestAddActionFromSettings(unittest.TestCase):
   
   def setUp(self):
@@ -78,18 +85,21 @@ class TestAddActionFromSettings(unittest.TestCase):
     self.batcher._invoker = self.invoker
     
     self.procedures = actions_.create('procedures')
-    
-    self.procedure_stub = stubs_gimp.PdbProcedureStub(
-      name='file-png-save',
-      type_=gimpenums.PLUGIN,
-      params=(
-        (gimpenums.PDB_INT32, 'run-mode', 'The run mode'),
-        (gimpenums.PDB_INT32ARRAY, 'save-options', 'Save options'),
-        (gimpenums.PDB_STRING, 'filename', 'Filename to save the image in')),
-      return_vals=None,
+
+    self.procedure_name = 'file-png-save'
+
+    self.procedure_stub_kwargs = dict(
+      name=self.procedure_name,
+      arguments_spec=[
+        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
+        dict(
+          value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
+
+    actions_.pdb.remove_from_cache(self.procedure_name)
   
-  def test_add_action_from_settings(self):
+  def test_add_action_from_settings(self, mock_get_pdb):
     procedure = actions_.add(
       self.procedures, builtin_procedures.BUILTIN_PROCEDURES['insert_background_layers'])
     
@@ -104,23 +114,26 @@ class TestAddActionFromSettings(unittest.TestCase):
       + [builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS['insert_background_layers']])
     self.assertEqual(added_action_items[0][2], {})
   
-  def test_add_pdb_proc_as_action_without_run_mode(self):
-    self.procedure_stub.params = self.procedure_stub.params[1:]
-    self._test_add_pdb_proc_as_action(
-      self.procedure_stub, [('save-options', ()), ('filename', '')], {})
+  def test_add_pdb_proc_as_action_without_run_mode(self, mock_get_pdb):
+    self.procedure_stub_kwargs['arguments_spec'] = self.procedure_stub_kwargs['arguments_spec'][1:]
+
+    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(procedure_stub)
+
+    self._test_add_pdb_proc_as_action(procedure_stub, [('save-options', ()), ('filename', '')], {})
   
-  def test_add_pdb_proc_as_action_with_run_mode(self):
+  def test_add_pdb_proc_as_action_with_run_mode(self, mock_get_pdb):
+    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(procedure_stub)
+
     self._test_add_pdb_proc_as_action(
-      self.procedure_stub, [('run-mode', 0), ('save-options', ()), ('filename', '')], {})
+      procedure_stub, [('run-mode', 0), ('save-options', ()), ('filename', '')], {})
   
   def _test_add_pdb_proc_as_action(
         self, pdb_procedure, expected_arg_names_and_values, expected_kwargs):
-    procedure = actions_.add(self.procedures, pdb_procedure)
-    
-    with mock.patch('batcher.src.batcher.pdb') as pdb_mock:
-      pdb_mock.__getitem__.return_value = pdb_procedure
-      
-      self.batcher._add_action_from_settings(procedure)
+    procedure = actions_.add(self.procedures, pdb_procedure.get_name())
+
+    self.batcher._add_action_from_settings(procedure)
     
     added_action_items = self.invoker.list_actions(group=actions_.DEFAULT_PROCEDURES_GROUP)
     
@@ -130,7 +143,7 @@ class TestAddActionFromSettings(unittest.TestCase):
     
     self.assertEqual(len(added_action_items), 1)
     self.assertEqual(added_action_item_names_and_values, added_action_item_names_and_values)
-    self.assertEqual(added_action_items[0][1][-1], pdb_procedure)
+    self.assertEqual(added_action_items[0][1][-1], pg.pdb[pdb_procedure.get_name()])
     self.assertDictEqual(added_action_items[0][2], expected_kwargs)
 
 
@@ -196,6 +209,6 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       ],
     })
     
-    replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'])
+    replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'], False)
     
     self.assertListEqual(replaced_args, [0, image, layer, 10, 50, 'current_image'])
