@@ -267,25 +267,22 @@ def _handle_abstract_attribute(namespace):
 # noinspection PyProtectedMember
 def _register_type_and_aliases(namespace, cls, type_name, type_map, base_class_name):
   human_readable_name = _get_human_readable_class_name(type_name, base_class_name)
-  
-  if human_readable_name not in type_map._name_to_type_map:
-    if not namespace['_ABSTRACT']:
-      type_map._name_to_type_map[human_readable_name] = cls
-      type_map._type_to_names_map[cls].append(human_readable_name)
-      
-      if '_ALIASES' in namespace:
-        for alias in namespace['_ALIASES']:
-          if alias not in type_map._name_to_type_map:
-            type_map._name_to_type_map[alias] = cls
-          else:
-            raise TypeError(
-              f'alias "{alias}" matches a {base_class_name} class name or is already specified')
-          
-          type_map._type_to_names_map[cls].append(alias)
-  else:
-    raise TypeError(
-      (f'Setting subclass with the name "{cls.__qualname__}"'
-       f' already exists ({type_map._name_to_type_map[human_readable_name]})'))
+
+  if not namespace['_ABSTRACT']:
+    # If there are multiple classes resolving to the same name, the last one
+    # takes precedence.
+    type_map._name_to_type_map[human_readable_name] = cls
+    type_map._type_to_names_map[cls].append(human_readable_name)
+
+    if '_ALIASES' in namespace:
+      for alias in namespace['_ALIASES']:
+        if alias not in type_map._name_to_type_map:
+          type_map._name_to_type_map[alias] = cls
+        else:
+          raise TypeError(
+            f'alias "{alias}" matches a {base_class_name} class name or is already specified')
+
+        type_map._type_to_names_map[cls].append(alias)
 
 
 def _get_human_readable_class_name(name, suffix_to_strip=None):
