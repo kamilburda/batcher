@@ -414,8 +414,7 @@ def _export_item_once(
     run_mode,
     image,
     raw_item,
-    output_filepath,
-    os.path.basename(output_filepath))
+    output_filepath)
 
   if pdb.last_status == Gimp.PDBStatusType.SUCCESS:
     return ExportStatuses.EXPORT_SUCCESSFUL
