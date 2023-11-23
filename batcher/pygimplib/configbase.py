@@ -8,8 +8,8 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from . import logging
-from . import setting
+from . import logging as pglogging
+from . import setting as pgsetting
 
 
 class _Config:
@@ -22,7 +22,7 @@ class _Config:
 
   def __getattr__(self, name):
     if name not in self._config:
-      raise AttributeError('configuration entry "{}" not found'.format(name))
+      raise AttributeError(f'configuration entry "{name}" not found')
 
     attr = self._config[name]
 
@@ -119,10 +119,10 @@ def _init_config_from_file(config: _Config):
     # Prefer a development version of config if it exists. This is handy if you
     # need to keep a clean config in the remote repository and a local config
     # for development purposes.
-    from .. import config_dev as plugin_config
+    from config import config_dev as plugin_config
   except ImportError:
     try:
-      from .. import config as plugin_config
+      from config import config as plugin_config
     except ImportError:
       pass
 
@@ -134,10 +134,10 @@ def _init_config_from_file(config: _Config):
 
 def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
-  config.SESSION_SOURCE = setting.GimpSessionSource(config.SOURCE_NAME)
-  config.PERSISTENT_SOURCE = setting.GimpParasiteSource(config.SOURCE_NAME)
+  config.SESSION_SOURCE = pgsetting.GimpSessionSource(config.SOURCE_NAME)
+  config.PERSISTENT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
 
-  setting.persistor.Persistor.set_default_setting_sources({
+  pgsetting.persistor.Persistor.set_default_setting_sources({
     'session': config.SESSION_SOURCE,
     'persistent': config.PERSISTENT_SOURCE,
   })
@@ -147,7 +147,7 @@ def _init_config_per_procedure(config: _Config):
   #   test-running the plug-in while expecting error messages in the GIMP
   #   console.
   # if config.LOG_MODE != 'gimp_console':
-  #   logging.log_output(
+  #   pglogging.log_output(
   #     config.LOG_MODE, config.PLUGINS_LOG_DIRPATHS,
   #     config.PLUGINS_LOG_STDOUT_FILENAME, config.PLUGINS_LOG_STDERR_FILENAME,
   #     config.PLUGIN_TITLE, config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS)
