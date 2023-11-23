@@ -12,7 +12,7 @@ _timer_ids = {}
 
 
 def timeout_add_strict(
-      interval: int, callback: Callable, *callback_args: Iterable, **callback_kwargs: Dict,
+      interval: int, callback: Callable, *callback_args, **callback_kwargs,
 ) -> int:
   """Wrapper of `GLib.timeout_add()` that cancels the callback if this function
   is called again with the same callback before the timeout.
