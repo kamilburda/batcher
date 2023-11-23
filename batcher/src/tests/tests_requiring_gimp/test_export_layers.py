@@ -1,21 +1,26 @@
+"""Test cases for exporting layers. Requires GIMP to be running."""
+
 import inspect
 import os
 import shutil
 import unittest
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import Gio
+
 import pygimplib as pg
-from pygimplib import pdb
 
 from src import actions
 from src import core
 from src import builtin_procedures
-from src import exceptions
 from src import settings_main
 from src import utils as utils_
 
 
-_CURRENT_MODULE_DIRPATH = os.path.dirname(pg.utils.get_current_module_filepath())
-TEST_IMAGES_DIRPATH = os.path.join(_CURRENT_MODULE_DIRPATH, 'test_images')
+_CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
+TEST_IMAGES_DIRPATH = os.path.join(os.path.dirname(_CURRENT_MODULE_DIRPATH), 'test_images')
 
 DEFAULT_EXPECTED_RESULTS_DIRPATH = os.path.join(TEST_IMAGES_DIRPATH, 'expected_results')
 OUTPUT_DIRPATH = os.path.join(TEST_IMAGES_DIRPATH, 'temp_output')
@@ -28,8 +33,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def setUpClass(cls):
     Gimp.context_push()
     
-    cls.test_image_filepath = os.path.join(
-      TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
+    cls.test_image_filepath = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
     cls.test_image = cls._load_image()
     
     cls.output_dirpath = OUTPUT_DIRPATH
@@ -53,24 +57,23 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       cls.expected_results_root_dirpath = DEFAULT_EXPECTED_RESULTS_DIRPATH
     
     # key: path to directory containing expected results
-    # value: Gimp.Image instance
+    # value: `Gimp.Image` instance
     cls.expected_images = {}
   
   @classmethod
   def tearDownClass(cls):
-    pdb.gimp_image_delete(cls.test_image)
+    cls.test_image.delete()
     for image in cls.expected_images.values():
-      pdb.gimp_image_delete(image)
+      image.delete()
     
     Gimp.context_pop()
-    pdb.gimp_progress_end()
   
   def setUp(self):
     self.image_with_results = None
   
   def tearDown(self):
     if self.image_with_results is not None:
-      pdb.gimp_image_delete(self.image_with_results)
+      self.image_with_results.delete()
     
     if os.path.exists(self.output_dirpath):
       shutil.rmtree(self.output_dirpath)
@@ -123,8 +126,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         self._load_layers_from_dirpath(expected_results_dirpath))
     else:
       expected_layers = {
-        layer.name: layer
-        for layer in self.expected_images[expected_results_dirpath].layers}
+        layer.get_name(): layer
+        for layer in self.expected_images[expected_results_dirpath].list_layers()}
     
     self._export(settings, procedure_names_to_add, procedure_names_to_remove)
     
@@ -138,7 +141,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       test_case_name = inspect.stack()[1][-3]
       self._compare_layers(
         layer,
-        expected_layers[layer.name],
+        expected_layers[layer.get_name()],
         settings,
         test_case_name,
         expected_results_dirpath)
@@ -185,8 +188,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     self.assertEqual(
       comparison_result,
       True,
-      msg=('Layers are not identical:\nprocessed layer: {}\nexpected layer: {}'.format(
-        layer.name, expected_layer.name)))
+      msg=(
+        'Layers are not identical:'
+        f'\nprocessed layer: {layer.get_name()}\nexpected layer: {expected_layer.get_name()}'))
   
   def _save_incorrect_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):
@@ -205,10 +209,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   @staticmethod
   def _copy_incorrect_layer(
         layer, settings, layer_dirpath, incorrect_layers_dirpath, filename_suffix):
-    layer_input_filename = '{}.{}'.format(
-      layer.name, settings['main/file_extension'].value)
-    layer_output_filename = '{}{}.{}'.format(
-      layer.name, filename_suffix, settings['main/file_extension'].value)
+    layer_input_filename = f'{layer.get_name()}.{settings["main/file_extension"].value}'
+    layer_output_filename = (
+      f'{layer.get_name()}{filename_suffix}.{settings["main/file_extension"].value}')
     
     shutil.copy(
       os.path.join(layer_dirpath, layer_input_filename),
@@ -216,12 +219,12 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   @classmethod
   def _load_image(cls):
-    return pdb.gimp_file_load(
-      cls.test_image_filepath, os.path.basename(cls.test_image_filepath))
+    return Gimp.file_load(
+      Gimp.RunMode.NONINTERACTIVE, Gio.file_new_for_path(cls.test_image_filepath))
   
   @classmethod
   def _reload_image(cls):
-    pdb.gimp_image_delete(cls.test_image)
+    cls.test_image.delete()
     cls.test_image = cls._load_image()
   
   @classmethod
@@ -236,7 +239,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     """
     image = pg.pdbutils.load_layers(
       layer_filepaths, image=None, strip_file_extension=True)
-    return image, {layer.name: layer for layer in image.layers}
+    return image, {layer.get_name(): layer for layer in image.list_layers()}
   
   @staticmethod
   def _list_layer_filepaths(layers_dirpath):
@@ -248,32 +251,3 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         layer_filepaths.append(path)
     
     return layer_filepaths
-
-
-#===============================================================================
-
-
-def test_export_for_all_file_formats(batcher, settings, output_dirpath, file_extension):
-  for file_format in pg.fileformats.file_formats:
-    for file_extension in file_format.file_extensions:
-      try:
-        batcher.run(
-          output_directory=os.path.join(output_dirpath, file_extension),
-          file_extension=file_extension,
-          **utils_.get_settings_for_batcher(settings['main']))
-      except exceptions.ExportError:
-        # Do not stop if one file format causes an error.
-        continue
-
-
-def test_add_all_pdb_procedures_as_actions():
-  """
-  Add all PDB procedures as actions to check if all setting types are
-  properly supported.
-  """
-  procedures = actions.create('all_pdb_procedures')
-  
-  _unused, procedure_names = pdb.gimp_procedural_db_query('', '', '', '', '', '', '')
-  
-  for procedure_name in procedure_names:
-    actions.add(procedures, pdb[procedure_name])
