@@ -1,14 +1,17 @@
 """Widgets to interactively edit actions (procedures/constraints)."""
 
-import gi
-from gi.repository import GObject
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import Pango
+from __future__ import annotations
+
+from typing import Any, Dict, Optional, Union
 
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -18,38 +21,44 @@ from src.gui import messages as messages_
 
 
 class ActionBox(pg.gui.ItemBox):
-  """
-  This class defines a scrollable box that allows the user to add, edit and
-  remove actions interactively. Each action has an associated widget
-  (item) displayed in the box.
-  
+  """A scrollable vertical box that allows the user to add, edit and remove
+  actions interactively.
+
+  An action represents a procedure or constraint that can be applied to a
+  GIMP item (image, layer, ...). Actions can be created via the `src.actions`
+  module.
+
+  Actions are applied starting from the top (i.e. actions ordered higher take
+  precedence).
+
   The box connects events to the passed actions that keeps the actions and
-  the box in sync. For example, when adding an action via `actions.add()`,
+  the box in sync. For example, when adding an action via `src.actions.add()`,
   the item for the action is automatically added to the box. Conversely, when
   calling `add_item()` from this class, both the action and the item are
   added to the actions and the GUI, respectively.
   
   Signals:
   
-  * `'action-box-item-added'` - An item was added via `add_item()`.
+  * ``'action-box-item-added'`` - An item (action) was added via `add_item()`.
     
     Arguments:
     
-    * `item` - The added item.
+    * The added item.
     
-  * `'action-box-item-reordered'` - An item was reordered via
+  * ``'action-box-item-reordered'`` - An item (action) was reordered via
     `reorder_item()`.
     
     Arguments:
     
-    * `item` - The reordered item.
-    * `new_position` - The new position of the reordered item (starting from 0).
+    * The reordered item.
+    * The new position of the reordered item (starting from 0).
     
-  * `'action-box-item-removed'` - An item was removed via `remove_item()`.
+  * ``'action-box-item-removed'`` - An item (action) was removed via
+    `remove_item()`.
     
     Arguments:
     
-    * `item` - The removed item.
+    * The removed item.
   """
   
   __gsignals__ = {
@@ -67,20 +76,18 @@ class ActionBox(pg.gui.ItemBox):
   
   def __init__(
         self,
-        actions,
-        builtin_actions=None,
-        add_action_text=None,
-        edit_action_text=None,
-        allow_custom_actions=True,
-        add_custom_action_text=None,
-        item_spacing=pg.gui.ItemBox.ITEM_SPACING,
-        *args,
+        actions: pg.setting.Group,
+        builtin_actions: Optional[Dict[str, Any]] = None,
+        add_action_text: Optional[str] = None,
+        edit_action_text: Optional[str] = None,
+        allow_custom_actions: bool = True,
+        add_custom_action_text: Optional[str] = None,
+        item_spacing: int = pg.gui.ItemBox.ITEM_SPACING,
         **kwargs):
-    super().__init__(item_spacing=item_spacing, *args, **kwargs)
+    super().__init__(item_spacing=item_spacing, **kwargs)
     
     self._actions = actions
-    self._builtin_actions = (
-      builtin_actions if builtin_actions is not None else {})
+    self._builtin_actions = builtin_actions if builtin_actions is not None else {}
     self._add_action_text = add_action_text
     self._edit_action_text = edit_action_text
     self._allow_custom_actions = allow_custom_actions
@@ -92,23 +99,25 @@ class ActionBox(pg.gui.ItemBox):
     
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
-      lambda actions, action, orig_action_dict: self._add_item_from_action(action))
+      lambda _actions, action, orig_action_dict: self._add_item_from_action(action))
     
     self._after_reorder_action_event_id = self._actions.connect_event(
       'after-reorder-action',
-      lambda actions, action, current_position, new_position: (
+      lambda _actions, action, current_position, new_position: (
         self._reorder_action(action, new_position)))
     
     self._before_remove_action_event_id = self._actions.connect_event(
       'before-remove-action',
-      lambda actions, action: self._remove_action(action))
+      lambda _actions, action: self._remove_action(action))
     
     self._before_clear_actions_event_id = self._actions.connect_event(
-      'before-clear-actions', lambda actions: self._clear())
+      'before-clear-actions', lambda _actions: self._clear())
   
-  def add_item(self, action_dict_or_function):
+  def add_item(
+        self, action_dict_or_pdb_proc_name: Union[Dict[str, Any], str],
+  ) -> _ActionBoxItem:
     self._actions.set_event_enabled(self._after_add_action_event_id, False)
-    action = actions_.add(self._actions, action_dict_or_function)
+    action = actions_.add(self._actions, action_dict_or_pdb_proc_name)
     self._actions.set_event_enabled(self._after_add_action_event_id, True)
     
     item = self._add_item_from_action(action)
@@ -136,29 +145,32 @@ class ActionBox(pg.gui.ItemBox):
     self.emit('action-box-item-removed', item)
   
   def _init_gui(self):
+    self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
+
     if self._add_action_text is not None:
-      self._button_add = gtk.Button()
-      button_hbox = gtk.HBox()
-      button_hbox.set_spacing(self._ADD_BUTTON_HBOX_SPACING)
+      button_hbox = Gtk.Box(
+        orientation=Gtk.Orientation.HORIZONTAL,
+        spacing=self._ADD_BUTTON_HBOX_SPACING,
+      )
       button_hbox.pack_start(
-        Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, gtk.ICON_SIZE_MENU), False, False, 0)
+        Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.MENU), False, False, 0)
       
-      label_add = gtk.Label(pg.utils.safe_encode_gtk(self._add_action_text))
-      label_add.set_use_underline(True)
+      label_add = Gtk.Label(
+        label=self._add_action_text,
+        use_underline=True,
+      )
       button_hbox.pack_start(label_add, False, False, 0)
-      
+
       self._button_add.add(button_hbox)
     else:
-      self._button_add = Gtk.Button()
       self._button_add.set_image(
         Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.BUTTON))
-    
-    self._button_add.set_relief(Gtk.ReliefStyle.NONE)
+
     self._button_add.connect('clicked', self._on_button_add_clicked)
     
     self._vbox.pack_start(self._button_add, False, False, 0)
     
-    self._actions_menu = gtk.Menu()
+    self._actions_menu = Gtk.Menu()
     self._init_actions_menu_popup()
   
   def _add_item_from_action(self, action):
@@ -189,7 +201,8 @@ class ActionBox(pg.gui.ItemBox):
         self._on_action_item_gui_label_size_allocate,
         action['enabled'].gui.widget)
   
-  def _on_action_item_gui_label_size_allocate(self, item_gui_label, allocation, item_gui):
+  @staticmethod
+  def _on_action_item_gui_label_size_allocate(item_gui_label, allocation, item_gui):
     if pg.gui.label_fits_text(item_gui_label):
       item_gui.set_tooltip_text(None)
     else:
@@ -200,7 +213,7 @@ class ActionBox(pg.gui.ItemBox):
     if item is not None:
       self._reorder_item(item, new_position)
     else:
-      raise ValueError('action "{}" does not match any item in "{}"'.format(action.name, self))
+      raise ValueError(f'action "{action.name}" does not match any item in "{self}"')
   
   def _reorder_item(self, item, new_position):
     return super().reorder_item(item, new_position)
@@ -211,8 +224,7 @@ class ActionBox(pg.gui.ItemBox):
     if item is not None:
       self._remove_item(item)
     else:
-      raise ValueError('action "{}" does not match any item in "{}"'.format(
-        action.get_path(), self))
+      raise ValueError(f'action "{action.get_path()}" does not match any item in "{self}"')
   
   def _remove_item(self, item):
     if self._get_item_position(item) == len(self._items) - 1:
@@ -229,7 +241,7 @@ class ActionBox(pg.gui.ItemBox):
       self._add_action_to_menu_popup(action_dict)
     
     if self._allow_custom_actions:
-      self._actions_menu.append(gtk.SeparatorMenuItem())
+      self._actions_menu.append(Gtk.SeparatorMenuItem())
       self._add_add_custom_action_to_menu_popup()
     
     self._actions_menu.show_all()
@@ -238,9 +250,7 @@ class ActionBox(pg.gui.ItemBox):
     self._actions_menu.popup_at_pointer(None)
   
   def _add_action_to_menu_popup(self, action_dict):
-    menu_item = gtk.MenuItem(
-      label=pg.utils.safe_encode_gtk(action_dict['display_name']),
-      use_underline=False)
+    menu_item = Gtk.MenuItem(label=action_dict['display_name'], use_underline=False)
     menu_item.connect('activate', self._on_actions_menu_item_activate, action_dict)
     self._actions_menu.append(menu_item)
   
@@ -251,7 +261,7 @@ class ActionBox(pg.gui.ItemBox):
       self._display_action_edit_dialog(item)
   
   def _add_add_custom_action_to_menu_popup(self):
-    menu_item = gtk.MenuItem(label=self._add_custom_action_text, use_underline=False)
+    menu_item = Gtk.MenuItem(label=self._add_custom_action_text, use_underline=False)
     menu_item.connect('activate', self._on_add_custom_action_menu_item_activate)
     self._actions_menu.append(menu_item)
   
@@ -262,13 +272,15 @@ class ActionBox(pg.gui.ItemBox):
       self._pdb_procedure_browser_dialog = self._create_pdb_procedure_browser_dialog()
   
   def _create_pdb_procedure_browser_dialog(self):
-    dialog = gimpui.ProcBrowserDialog(
-      _('Procedure Browser'),
+    dialog = GimpUi.ProcBrowserDialog(
+      title=_('Procedure Browser'),
       role=pg.config.PLUGIN_NAME,
-      buttons=(gtk.STOCK_ADD, gtk.RESPONSE_OK, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+    )
+
+    dialog.add_buttons(
+      Gtk.STOCK_ADD, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
     
-    dialog.set_default_response(gtk.RESPONSE_OK)
-    dialog.set_alternative_button_order((gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL))
+    dialog.set_default_response(Gtk.ResponseType.OK)
     
     dialog.connect('response', self._on_pdb_procedure_browser_dialog_response)
     
@@ -277,13 +289,11 @@ class ActionBox(pg.gui.ItemBox):
     return dialog
   
   def _on_pdb_procedure_browser_dialog_response(self, dialog, response_id):
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == Gtk.ResponseType.OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
-        pdb_procedure = pdb[procedure_name]
-        
         try:
-          pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(pdb_procedure)
+          pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(procedure_name)
         except actions_.UnsupportedPdbProcedureError as e:
           messages_.display_failure_message(
             main_message=_(
@@ -300,12 +310,12 @@ class ActionBox(pg.gui.ItemBox):
           
           dialog.hide()
           return
-        
+
         pdb_proc_action_dict['enabled'] = False
         
         item = self.add_item(pdb_proc_action_dict)
         
-        self._display_action_edit_dialog(item, pdb_procedure)
+        self._display_action_edit_dialog(item, pdb[procedure_name])
     
     dialog.hide()
   
@@ -349,11 +359,10 @@ class ActionBox(pg.gui.ItemBox):
     
     self._display_action_edit_dialog(item, pdb_procedure, action_values_before_dialog)
   
-  def _on_action_edit_dialog_for_new_action_response(
-        self, dialog, response_id, item):
+  def _on_action_edit_dialog_for_new_action_response(self, dialog, response_id, item):
     dialog.destroy()
     
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == Gtk.ResponseType.OK:
       item.action['arguments'].apply_gui_values_to_settings(force=True)
       item.action['enabled'].set_value(True)
     else:
@@ -361,26 +370,26 @@ class ActionBox(pg.gui.ItemBox):
     
     item.action_edit_dialog = None
   
+  @staticmethod
   def _on_action_edit_dialog_for_existing_action_response(
-        self, dialog, response_id, item, action_values_before_dialog):
+        dialog, response_id, item, action_values_before_dialog):
     dialog.destroy()
     
-    if response_id == gtk.RESPONSE_OK:
+    if response_id == Gtk.ResponseType.OK:
       item.action['arguments'].apply_gui_values_to_settings(force=True)
     else:
       item.action.set_values(action_values_before_dialog)
     
     item.action_edit_dialog = None
   
-  def _on_item_button_remove_clicked_remove_action_edit_dialog(
-        self, button_remove, item):
+  @staticmethod
+  def _on_item_button_remove_clicked_remove_action_edit_dialog(button_remove, item):
     if item.is_being_edited():
-      item.action_edit_dialog.response(gtk.RESPONSE_CANCEL)
+      item.action_edit_dialog.response(Gtk.ResponseType.CANCEL)
   
   def _get_action_edit_dialog_title(self, item):
     if self._edit_action_text is not None:
-      return '{}: {}'.format(
-        self._edit_action_text, item.action['display_name'].value)
+      return f'{self._edit_action_text}: {item.action["display_name"].value}'
     else:
       return None
 
@@ -396,7 +405,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
     self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
 
-    self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
+    self._button_warning = self._setup_item_indicator_button(
+      GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
     self._display_warning_message_event_id = None
@@ -414,7 +424,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   
   def close_edit_dialog(self):
     if self.action_edit_dialog is not None:
-      self.action_edit_dialog.response(gtk.RESPONSE_CANCEL)
+      self.action_edit_dialog.response(Gtk.ResponseType.CANCEL)
   
   def set_tooltip(self, text):
     self.widget.set_tooltip_text(text)
@@ -442,7 +452,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
         self._button_warning.disconnect(self._display_warning_message_event_id)
         self._display_warning_message_event_id = None
   
-  def _on_button_warning_clicked(self, button, main_message, short_message, full_message, parent):
+  @staticmethod
+  def _on_button_warning_clicked(button, main_message, short_message, full_message, parent):
     messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
 
 
@@ -451,8 +462,8 @@ class _ActionEditDialog(GimpUi.Dialog):
   _DIALOG_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 8
   
-  _TABLE_ROW_SPACING = 4
-  _TABLE_COLUMN_SPACING = 8
+  _GRID_ROW_SPACING = 4
+  _GRID_COLUMN_SPACING = 8
   
   _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING = 5
   
@@ -465,12 +476,10 @@ class _ActionEditDialog(GimpUi.Dialog):
     self.set_transient()
     self.set_resizable(False)
     
-    self._button_ok = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
-    self._button_cancel = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-    self.set_alternative_button_order([gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL])
+    self._button_ok = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
+    self._button_cancel = self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
     
-    self._button_reset = gtk.Button()
-    self._button_reset.set_label(_('_Reset'))
+    self._button_reset = Gtk.Button(label=_('_Reset'))
     self.action_area.pack_start(self._button_reset, False, False, 0)
     self.action_area.set_child_secondary(self._button_reset, True)
     
@@ -479,9 +488,8 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._label_procedure_name.label.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_procedure_name.label.set_markup(
       '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
-    self._label_procedure_name.connect(
-      'changed', self._on_label_procedure_name_changed, action)
-    
+    self._label_procedure_name.connect('changed', self._on_label_procedure_name_changed, action)
+
     self._label_procedure_description = None
     
     if action['description'].value:
@@ -489,15 +497,18 @@ class _ActionEditDialog(GimpUi.Dialog):
         action['description'].value)
     elif pdb_procedure is not None:
       self._label_procedure_description = self._create_label_description(
-        pdb_procedure.proc_blurb, pdb_procedure.proc_help)
+        pdb_procedure.info.get_blurb(), pdb_procedure.info.get_help())
     
-    self._table_action_arguments = gtk.Table(homogeneous=False)
-    self._table_action_arguments.set_row_spacings(self._TABLE_ROW_SPACING)
-    self._table_action_arguments.set_col_spacings(self._TABLE_COLUMN_SPACING)
+    self._grid_action_arguments = Gtk.Grid(
+      row_spacing=self._GRID_ROW_SPACING,
+      column_spacing=self._GRID_COLUMN_SPACING,
+    )
     
-    self._vbox_more_options = gtk.VBox()
-    self._vbox_more_options.set_spacing(self._MORE_OPTIONS_SPACING)
-    self._vbox_more_options.set_border_width(self._MORE_OPTIONS_BORDER_WIDTH)
+    self._vbox_more_options = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._MORE_OPTIONS_SPACING,
+      border_width=self._MORE_OPTIONS_BORDER_WIDTH,
+    )
     self._vbox_more_options.pack_start(
       action['enabled_for_previews'].gui.widget, False, False, 0)
     if 'also_apply_to_parent_folders' in action:
@@ -506,15 +517,17 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
     
-    # Put widgets in a custom `VBox` because the action area would otherwise
+    # Put widgets in a custom `Box` because the action area would otherwise
     # have excessively thick borders for some reason.
-    self._vbox = gtk.VBox()
-    self._vbox.set_border_width(self._DIALOG_BORDER_WIDTH)
-    self._vbox.set_spacing(self._DIALOG_VBOX_SPACING)
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._DIALOG_VBOX_SPACING,
+      border_width=self._DIALOG_BORDER_WIDTH,
+    )
     self._vbox.pack_start(self._label_procedure_name, False, False, 0)
     if self._label_procedure_description is not None:
       self._vbox.pack_start(self._label_procedure_description, False, False, 0)
-    self._vbox.pack_start(self._table_action_arguments, True, True, 0)
+    self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
     self._vbox.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
     
     self.vbox.pack_start(self._vbox, False, False, 0)
@@ -526,11 +539,14 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
     self.connect('response', self._on_action_edit_dialog_response, action)
   
-  def _create_label_description(self, summary, full_description=None):
-    label_description = gtk.Label()
-    label_description.set_line_wrap(True)
-    label_description.set_alignment(0.0, 0.5)
-    label_description.set_label(summary)
+  @staticmethod
+  def _create_label_description(summary, full_description=None):
+    label_description = Gtk.Label(
+      label=summary,
+      line_wrap=True,
+      xalign=0.0,
+      yalign=0.5,
+    )
     if full_description:
       label_description.set_tooltip_text(full_description)
     
@@ -541,12 +557,16 @@ class _ActionEditDialog(GimpUi.Dialog):
       if not setting.gui.get_visible():
         continue
       
-      label = gtk.Label(setting.display_name)
-      label.set_alignment(0.0, 0.5)
+      label = Gtk.Label(
+        label=setting.display_name,
+        xalign=0.0,
+        yalign=0.5,
+      )
+
       if pdb_procedure is not None:
-        label.set_tooltip_text(pdb_procedure.params[i][2])
+        label.set_tooltip_text(pdb_procedure.info.get_arguments()[i].blurb)
       
-      self._table_action_arguments.attach(label, 0, 1, i, i + 1)
+      self._grid_action_arguments.attach(label, 0, i, 1, 1)
       
       widget_to_attach = setting.gui.widget
       
@@ -557,20 +577,22 @@ class _ActionEditDialog(GimpUi.Dialog):
       else:
         widget_to_attach = self._create_placeholder_widget()
       
-      self._table_action_arguments.attach(widget_to_attach, 1, 2, i, i + 1)
+      self._grid_action_arguments.attach(widget_to_attach, 1, i, 1, 1)
   
-  def _on_button_reset_clicked(self, button, action):
+  @staticmethod
+  def _on_button_reset_clicked(button, action):
     action['arguments'].reset()
   
-  def _on_label_procedure_name_changed(self, editable_label, action):
+  @staticmethod
+  def _on_label_procedure_name_changed(editable_label, action):
     action['display_name'].set_value(editable_label.label.get_text())
     
     editable_label.label.set_markup(
       '<b>{}</b>'.format(GLib.markup_escape_text(editable_label.label.get_text())))
   
   def _on_action_edit_dialog_response(self, dialog, response_id, action):
-    for child in list(self._table_action_arguments.get_children()):
-      self._table_action_arguments.remove(child)
+    for child in list(self._grid_action_arguments.get_children()):
+      self._grid_action_arguments.remove(child)
     
     for child in list(self._vbox_more_options.get_children()):
       self._vbox_more_options.remove(child)
@@ -579,8 +601,10 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._vbox.remove(action['more_options_expanded'].gui.widget)
   
   def _create_placeholder_widget(self):
-    hbox = gtk.HBox()
-    hbox.set_spacing(self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING)
+    hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING,
+    )
     
     hbox.pack_start(
       Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_WARNING, Gtk.IconSize.BUTTON),
@@ -588,8 +612,9 @@ class _ActionEditDialog(GimpUi.Dialog):
       False,
       0)
     
-    label = gtk.Label()
-    label.set_use_markup(True)
+    label = Gtk.Label(
+      use_markup=True
+    )
     label.set_markup(
       '<span font_size="small">{}</span>'.format(
         GLib.markup_escape_text(_('Cannot modify this parameter'))))
