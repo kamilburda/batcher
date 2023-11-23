@@ -75,6 +75,11 @@ class PlaceholderSetting(pg.setting.Setting):
    
   _ALLOWED_GUI_TYPES = [gui_placeholders.PlaceholdersComboBoxPresenter]
   _ALLOWED_PLACEHOLDERS = []
+
+  def _get_pdb_type(self, pdb_type):
+    # Avoid errors when creating placeholder settings. Placeholders cannot be
+    # registered to the PDB anyway.
+    return None
   
   @classmethod
   def get_allowed_placeholder_names(cls) -> List[str]:
