@@ -1,25 +1,25 @@
 """Widget for displaying inline messages."""
 
-import os
+from typing import Optional
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
+from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-
 import pygimplib as pg
 
 
 class MessageLabel(Gtk.Box):
-  """
-  This class defines a widget to display a label, and optionally additional
-  information in a popup below the label. The popup is also available if the
-  label text does not fit the width of the parent widget.
+  """A widget to display a label, and optionally additional information in a
+  popup below the label.
+
+  The popup is also available if the label text does not fit the width of the
+  parent widget.
   """
   
   _MESSAGE_AND_MORE_BUTTON_SPACING = 2
@@ -48,24 +48,29 @@ class MessageLabel(Gtk.Box):
     self._popup_more.connect('show', self._on_popup_more_show)
     self._popup_more.connect('hide', self._on_popup_more_hide)
     
-    wigets_to_exclude_from_hiding_popup_with_button_press = [
+    widgets_to_exclude_from_hiding_popup_with_button_press = [
       self._popup_more,
       self._scrolled_window_more.get_hscrollbar(),
       self._scrolled_window_more.get_vscrollbar()]
     
-    for widget in wigets_to_exclude_from_hiding_popup_with_button_press:
+    for widget in widgets_to_exclude_from_hiding_popup_with_button_press:
       self._popup_hide_context.exclude_widget_from_hiding_with_button_press(widget)
   
-  def set_text(self, text, message_type=Gtk.MessageType.ERROR, clear_delay=None):
-    """
-    Set the `text` of the label. The text is displayed in bold style.
+  def set_text(
+        self,
+        text: str,
+        message_type: Gtk.MessageType = Gtk.MessageType.ERROR,
+        clear_delay: Optional[int] = None,
+  ):
+    """Sets the text of the label. The text is displayed in bold style.
     
     If the text is too wide to fit the label or the text has multiple lines,
-    ellipsize the label and display a button that displays a popup containing
-    the full text when clicked. Only the first line is displayed in the label.
+    the label is ellipsized and a button is displayed that displays a popup
+    containing the full text when clicked. Only the first line is displayed
+    in the label.
     
-    If `clear_delay` is not `None` and `message_type` is not
-    `Gtk.MessageType.ERROR`, make the message automatically disappear after the
+    If ``clear_delay`` is not ``None`` and ``message_type`` is not
+    `Gtk.MessageType.ERROR`, the message automatically disappears after the
     specified delay in milliseconds. The timer is stopped if the popup is
     displayed and restarted if the popup gets hidden.
     """
@@ -87,62 +92,74 @@ class MessageLabel(Gtk.Box):
     self._message_type = message_type
     self._clear_delay = clear_delay
     
-    self._label_message.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(pg.utils.safe_encode_gtk(self._label_text))))
+    self._label_message.set_markup(f'<b>{GLib.markup_escape_text(self._label_text)}</b>')
     
-    if message_type == gtk.MESSAGE_ERROR:
+    if message_type == Gtk.MessageType.ERROR:
       self._timeout_remove(self._clear_delay, self.set_text)
     else:
       self._timeout_add_strict(self._clear_delay, self.set_text, None)
   
   def _init_gui(self):
-    self._label_message = gtk.Label()
-    self._label_message.set_alignment(0.0, 0.5)
-    self._label_message.set_ellipsize(pango.ELLIPSIZE_END)
+    self._label_message = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+      ellipsize=Pango.EllipsizeMode.END,
+    )
     
-    self._label_button_more = gtk.Label(_('_More'))
-    self._label_button_more.set_use_underline(True)
+    self._label_button_more = Gtk.Label(
+      text=_('_More'),
+      use_underline=True,
+    )
     
-    self._hbox_button_more = gtk.HBox()
-    self._hbox_button_more.set_spacing(self._MORE_BUTTON_LABEL_AND_ARROW_SPACING)
-    self._hbox_button_more.pack_start(
-      self._label_button_more, True, True, 0)
-    self._hbox_button_more.pack_start(
-      gtk.Arrow(gtk.ARROW_DOWN, gtk.SHADOW_IN), False, False, 0)
+    self._hbox_button_more = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._MORE_BUTTON_LABEL_AND_ARROW_SPACING,
+    )
+    self._hbox_button_more.pack_start(self._label_button_more, True, True, 0)
+
+    arrow = Gtk.Arrow(
+      arrow_type=Gtk.ArrowType.DOWN,
+      shadow_type=Gtk.ShadowType.IN,
+    )
+    self._hbox_button_more.pack_start(arrow, False, False, 0)
     
-    self._button_more = gtk.Button()
-    self._button_more.set_relief(gtk.RELIEF_NONE)
+    self._button_more = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
     self._button_more.add(self._hbox_button_more)
     self._button_more.show_all()
     self._button_more.hide()
     self._button_more.set_no_show_all(True)
     
-    self._text_view_more = gtk.TextView()
-    self._text_view_more.set_wrap_mode(Gtk.WrapMode.WORD)
-    self._text_view_more.set_left_margin(self._TEXT_VIEW_MARGIN)
-    self._text_view_more.set_right_margin(self._TEXT_VIEW_MARGIN)
-    self._text_view_more.set_editable(False)
+    self._text_view_more = Gtk.TextView(
+      wrap_mode=Gtk.WrapMode.WORD,
+      left_margin=self._TEXT_VIEW_MARGIN,
+      right_margin=self._TEXT_VIEW_MARGIN,
+      editable=False,
+    )
     
-    self._scrolled_window_more = gtk.ScrolledWindow()
-    self._scrolled_window_more.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_NEVER)
-    self._scrolled_window_more.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+    self._scrolled_window_more = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      vscrollbar_policy=Gtk.PolicyType.NEVER,
+      shadow_type=Gtk.ShadowType.ETCHED_IN,
+    )
     self._scrolled_window_more.add(self._text_view_more)
     
-    self._popup_more = gtk.Window(type=gtk.WINDOW_POPUP)
-    self._popup_more.set_resizable(False)
-    self._popup_more.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_TOOLTIP)
-    self._popup_more.set_property('width-request', self._POPUP_WIDTH)
+    self._popup_more = Gtk.Window(
+      type=Gtk.WindowType.POPUP,
+      resizable=False,
+      type_hint=Gdk.WindowTypeHint.TOOLTIP,
+      width_request=self._POPUP_WIDTH,
+    )
     self._popup_more.add(self._scrolled_window_more)
     self._popup_more.show_all()
     self._popup_more.hide()
     
     self.set_spacing(self._MESSAGE_AND_MORE_BUTTON_SPACING)
+
     self.pack_start(self._label_message, True, True, 0)
     self.pack_start(self._button_more, False, False, 0)
   
   def _on_label_message_size_allocate(self, label, allocation):
-    if ((pg.gui.get_label_full_text_width(self._label_message)
-         > self.get_allocation().width)
+    if ((pg.gui.get_label_full_text_width(self._label_message) > self.get_allocation().width)
         or len(self._popup_text_lines) >= 1):
       self._button_more.show()
     else:
@@ -156,10 +173,8 @@ class MessageLabel(Gtk.Box):
       lines.insert(0, self._label_text)
     
     text = '\n'.join(lines).strip()
-    
-    text_buffer = gtk.TextBuffer()
-    text_buffer.set_text(pg.utils.safe_encode_gtk(text))
-    self._text_view_more.set_buffer(text_buffer)
+
+    self._text_view_more.set_buffer(Gtk.TextBuffer(text=text))
     
     self._popup_more.move(*pg.gui.get_position_below_widget(self))
     self._popup_more.show()
@@ -169,13 +184,13 @@ class MessageLabel(Gtk.Box):
     
     self._popup_more.set_screen(self._button_more.get_screen())
     
-    if self._message_type != gtk.MESSAGE_ERROR:
+    if self._message_type != Gtk.MessageType.ERROR:
       self._timeout_remove(self._clear_delay, self.set_text)
   
   def _on_popup_more_hide(self, popup):
     self._popup_hide_context.disconnect_button_press_events_for_hiding()
     
-    if self._message_type != gtk.MESSAGE_ERROR:
+    if self._message_type != Gtk.MessageType.ERROR:
       self._timeout_add_strict(self._clear_delay, self.set_text, None)
   
   def _timeout_add_strict(self, delay, func, *args, **kwargs):
@@ -186,7 +201,8 @@ class MessageLabel(Gtk.Box):
     if self._should_clear_text_after_delay(delay):
       pg.invocation.timeout_remove(func)
   
-  def _should_clear_text_after_delay(self, clear_delay):
+  @staticmethod
+  def _should_clear_text_after_delay(clear_delay):
     return clear_delay is not None and clear_delay > 0
 
 
