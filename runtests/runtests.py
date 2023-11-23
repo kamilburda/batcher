@@ -41,6 +41,13 @@ if PLUGIN_DIRPATH not in sys.path:
 from batcher import pygimplib as pg
 
 
+_CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
+_ROOT_DIRPATH = os.path.join(os.path.dirname(_CURRENT_MODULE_DIRPATH), 'batcher')
+
+if _ROOT_DIRPATH not in sys.path:
+  sys.path.append(_ROOT_DIRPATH)
+
+
 def plug_in_run_tests(
       procedure: Gimp.Procedure,
       run_mode: Gimp.RunMode,
