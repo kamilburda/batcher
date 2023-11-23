@@ -97,17 +97,18 @@ subclass names and are used as strings when saving or loading setting data
 from a persistent source.
 """
 
-GOBJECT_TYPES_AND_SETTING_TYPES = collections.defaultdict(list)
+GTYPES_AND_SETTING_TYPES = collections.defaultdict(list)
 """Mapping of `GObject.GType` instances, representing GIMP POB argument types,
 to `setting.Setting` subclasses.
 
 This mapping is automatically generated from `setting.Setting` subclasses based
 on their allowed PDB types.
 
-Be aware that this mapping is incomplete - for example, it does not contain
-enumerated types (GObject types derived from `GObject.GEnum`) or array types
-(e.g. `Gimp.FloatArray`). If you need to obtain a setting type for all supported
-GObject types, use `get_setting_type_from_gobject_type()`.
+Be aware that this mapping is incomplete - for example, it does not contain 
+enumerated types (`GObject.GType` instances derived from `GObject.GEnum`) or 
+array types (e.g. `Gimp.FloatArray`). If you need to obtain a setting type 
+for all supported `GObject.GType` instances, use
+`get_setting_type_from_gtype()`.
 """
 
 
@@ -137,7 +138,7 @@ class SettingMeta(type):
     
     _register_type_and_aliases(namespace, cls, name, SETTING_TYPES, 'Setting')
 
-    _update_gobject_types(namespace, cls, GOBJECT_TYPES_AND_SETTING_TYPES)
+    _update_gtypes(namespace, cls, GTYPES_AND_SETTING_TYPES)
     
     return cls
   
@@ -298,16 +299,16 @@ def _get_human_readable_class_name(name, suffix_to_strip=None):
   return processed_name
 
 
-def _update_gobject_types(namespace, cls, gobject_and_setting_types):
+def _update_gtypes(namespace, cls, gtypes_and_setting_types):
   if '_ALLOWED_PDB_TYPES' in namespace:
     for pdb_type in namespace['_ALLOWED_PDB_TYPES']:
       if isinstance(pdb_type, GObject.GType):
-        gobject_type = pdb_type
+        gtype = pdb_type
       elif hasattr(pdb_type, '__gtype__'):
-        gobject_type = pdb_type.__gtype__
+        gtype = pdb_type.__gtype__
       else:
         raise TypeError(
           f'PDB type "{pdb_type}" for Setting subclass {cls} is not valid,'
-          ' it must be a GObject.GObject subclass or a GType instance')
+          ' it must be a GObject.GObject subclass or a GObject.GType instance')
 
-      gobject_and_setting_types[gobject_type].append(cls)
+      gtypes_and_setting_types[gtype].append(cls)

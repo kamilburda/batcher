@@ -147,7 +147,7 @@ def get_replaced_arg(arg, batcher: 'src.core.Batcher'):
 
 
 def get_placeholder_type_name_from_pdb_type(
-      pdb_type: Union[Type[GObject.GObject], GObject.GType],
+      pdb_type: Union[GObject.GType, Type[GObject.GObject]],
 ) -> Union[str, None]:
   """Returns the name of a `pygimplib.setting.Setting` subclass representing a
   placeholder from the given GIMP PDB parameter type.
@@ -162,13 +162,13 @@ def get_placeholder_type_name_from_pdb_type(
     representing a placeholder if ``pdb_type`` matches an identifier, or
     ``None`` otherwise.
   """
-  gobject_type = pdb_type
+  gtype = pdb_type
 
   if hasattr(pdb_type, '__gtype__'):
-    gobject_type = pdb_type.__gtype__
+    gtype = pdb_type.__gtype__
 
   try:
-    return _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES[gobject_type]
+    return _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES[gtype]
   except (KeyError, TypeError):
     return None
 

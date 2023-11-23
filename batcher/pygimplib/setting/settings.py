@@ -136,7 +136,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         default_value=DEFAULT_VALUE,
         display_name: Optional[str] = None,
         description: Optional[str] = None,
-        pdb_type: Union[Type[GObject.GObject], GObject.GType, str, None] = 'automatic',
+        pdb_type: Union[GObject.GType, Type[GObject.GObject], str, None] = 'automatic',
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         gui_type_kwargs: Optional[Dict] = None,
         allow_empty_values: bool = False,
@@ -163,7 +163,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       pdb_type:
         A `GObject.GType` instance (e.g. `GObject.TYPE_INT` representing
         integers), a subclass of `GObject.GObject` (e.g. `Gimp.Image`),
-        a string as the name of a GObject type (e.g. ``'gint'``,
+        a string as the name of a `GObject.GType` (e.g. ``'gint'``,
         ``'GimpImage'``), ``None`` or ``'automatic'``. If set to
         ``'automatic'``, the first GIMP PDB type in the list of allowed PDB
         types for a particular `Setting` subclass is chosen. If no allowed
@@ -2864,7 +2864,7 @@ class ArraySetting(Setting):
   def _get_default_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0]
-    elif self._is_element_pdb_type_gobject_type():
+    elif self._is_element_pdb_type_gtype():
       return Gimp.ObjectArray.__gtype__
     else:
       return None
@@ -2872,7 +2872,7 @@ class ArraySetting(Setting):
   def _get_default_element_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][1]
-    elif self._is_element_pdb_type_gobject_type():
+    elif self._is_element_pdb_type_gtype():
       return self._reference_element.pdb_type
     else:
       return None
@@ -2916,14 +2916,14 @@ class ArraySetting(Setting):
       return array.get_boxed()
     elif self.element_type == StringSetting:
       return values
-    elif self._is_element_pdb_type_gobject_type():
+    elif self._is_element_pdb_type_gtype():
       array = GObject.Value(Gimp.ObjectArray)
       Gimp.value_set_object_array(array, self._reference_element.pdb_type, values)
       return array.get_boxed()
     else:
       return values
 
-  def _is_element_pdb_type_gobject_type(self):
+  def _is_element_pdb_type_gtype(self):
     return (
       self._reference_element.can_be_registered_to_pdb()
       and isinstance(self._reference_element.pdb_type, GObject.GType))
@@ -3039,8 +3039,8 @@ class DictSetting(ContainerSetting):
       return raw_value
 
 
-def get_setting_type_from_gobject_type(
-      gobject_type: GObject.GType,
+def get_setting_type_from_gtype(
+      gtype: GObject.GType,
       pdb_param_info: Optional[GObject.ParamSpec] = None,
 ) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
   """Given a GIMP PDB parameter type, returns the corresponding `Setting`
@@ -3050,11 +3050,11 @@ def get_setting_type_from_gobject_type(
   ``__init__()`` method are returned (some of which are positional arguments
   such as ``enum_type`` for `EnumSetting`).
 
-  If ``gobject_type`` does not match any `setting.Setting` subclass, ``None`` is
+  If ``gtype`` does not match any `setting.Setting` subclass, ``None`` is
   returned.
 
   Args:
-    gobject_type:
+    gtype:
       `GObject.GType` instance representing a GIMP PDB parameter.
     pdb_param_info:
       Object representing GIMP PDB parameter information, obtainable via
@@ -3063,25 +3063,24 @@ def get_setting_type_from_gobject_type(
   Returns:
     Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
     passed to ``__init__()`` for the returned `setting.Setting` subclass), or
-    ``None`` if there is no matching `setting.Setting` subclass for
-    ``gobject_type``.
+    ``None`` if there is no matching `setting.Setting` subclass for ``gtype``.
   """
-  if gobject_type in meta_.GOBJECT_TYPES_AND_SETTING_TYPES:
-    # If multiple GObject types map to the same `Setting` subclass, use the
+  if gtype in meta_.GTYPES_AND_SETTING_TYPES:
+    # If multiple `GType`s map to the same `Setting` subclass, use the
     # `Setting` subclass registered (i.e. declared) the earliest.
-    setting_type = meta_.GOBJECT_TYPES_AND_SETTING_TYPES[gobject_type][0]
+    setting_type = meta_.GTYPES_AND_SETTING_TYPES[gtype][0]
 
-    # Explicitly pass `gobject_type` as a `pdb_type` so that e.g. an `IntSetting`
+    # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
     # instance can have its minimum and maximum values properly adjusted.
-    return setting_type, dict(pdb_type=gobject_type)
+    return setting_type, dict(pdb_type=gtype)
 
-  if hasattr(gobject_type, 'parent') and gobject_type.parent == GObject.GEnum.__gtype__:
-    return EnumSetting, dict(enum_type=gobject_type)
+  if hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
+    return EnumSetting, dict(enum_type=gtype)
 
-  if gobject_type in _ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES:
-    return _ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES[gobject_type]
+  if gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
+    return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
 
-  if gobject_type == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
+  if gtype == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
     # HACK: Rely on the parameter name to infer the correct underlying object type.
     if pdb_param_info.name == 'images':
       return ArraySetting, dict(element_type=ImageSetting)
@@ -3101,7 +3100,7 @@ def get_setting_type_from_gobject_type(
   return None
 
 
-_ARRAY_GOBJECT_TYPES_TO_SETTING_TYPES = {
+_ARRAY_GTYPES_TO_SETTING_TYPES = {
   Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
   Gimp.FloatArray.__gtype__: (ArraySetting, dict(element_type=FloatSetting)),
   Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=ColorSetting)),
@@ -3178,7 +3177,7 @@ def _process_type(type_or_name, type_map, error_message):
 
 
 __all__ = [
-  'get_setting_type_from_gobject_type',
+  'get_setting_type_from_gtype',
   'SettingValueError',
   'SettingDefaultValueError',
   'process_setting_type',

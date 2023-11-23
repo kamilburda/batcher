@@ -135,14 +135,14 @@ class TestSetting(unittest.TestCase):
     self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
     self.assertTrue(setting.can_be_registered_to_pdb())
 
-  def test_pdb_type_as_gobject_type(self):
+  def test_pdb_type_as_gtype(self):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode.__gtype__)
 
     self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
     self.assertTrue(setting.can_be_registered_to_pdb())
 
-  def test_pdb_type_as_gobject_name(self):
+  def test_pdb_type_as_gtype_name(self):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type='gchararray')
 
@@ -258,7 +258,7 @@ class TestSetting(unittest.TestCase):
         'pdb_type': 'gchararray',
       })
 
-  def test_to_dict_with_pdb_type_as_gobject_class(self):
+  def test_to_dict_with_pdb_type_as_gobject_subclass(self):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode)
 
@@ -717,7 +717,7 @@ class TestCreateEnumSetting(unittest.TestCase):
     self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
     self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
 
-  def test_with_enum_type_as_gobject_type(self):
+  def test_with_enum_type_as_gtype(self):
     setting = settings_.EnumSetting(
       'distance_metric',
       Gegl.DistanceMetric.__gtype__,
@@ -2521,25 +2521,25 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
 
   def test_int_setting(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gobject_type(GObject.TYPE_INT, None),
+      settings_.get_setting_type_from_gtype(GObject.TYPE_INT, None),
       (settings_.IntSetting, dict(pdb_type=GObject.TYPE_INT)),
     )
 
   def test_uint_setting(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gobject_type(GObject.TYPE_UINT, None),
+      settings_.get_setting_type_from_gtype(GObject.TYPE_UINT, None),
       (settings_.IntSetting, dict(pdb_type=GObject.TYPE_UINT)),
     )
 
   def test_enum(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gobject_type(Gimp.ImageType.__gtype__, None),
+      settings_.get_setting_type_from_gtype(Gimp.ImageType.__gtype__, None),
       (settings_.EnumSetting, dict(enum_type=Gimp.ImageType.__gtype__)),
     )
 
   def test_builtin_array(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gobject_type(Gimp.FloatArray.__gtype__, None),
+      settings_.get_setting_type_from_gtype(Gimp.FloatArray.__gtype__, None),
       (settings_.ArraySetting, dict(element_type=settings_.FloatSetting)),
     )
 
@@ -2548,12 +2548,12 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
 
     # noinspection PyTypeChecker
     self.assertEqual(
-      settings_.get_setting_type_from_gobject_type(Gimp.ObjectArray.__gtype__, param_spec),
+      settings_.get_setting_type_from_gtype(Gimp.ObjectArray.__gtype__, param_spec),
       (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
     )
 
-  def test_unrecognized_gobject_type_returns_none(self):
-    self.assertIsNone(settings_.get_setting_type_from_gobject_type(Gimp.Procedure, None))
+  def test_unrecognized_gtype_returns_none(self):
+    self.assertIsNone(settings_.get_setting_type_from_gtype(Gimp.Procedure, None))
 
 
 class TestSettingTypeFunctions(unittest.TestCase):

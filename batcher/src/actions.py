@@ -581,7 +581,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
   pdb_procedure = pdb[pdb_procedure_name].info
   
   for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
-    retval = pg.setting.get_setting_type_from_gobject_type(proc_arg.value_type, proc_arg)
+    retval = pg.setting.get_setting_type_from_gtype(proc_arg.value_type, proc_arg)
 
     if retval is None:
       raise UnsupportedPdbProcedureError(action_dict['name'], proc_arg.value_type)
