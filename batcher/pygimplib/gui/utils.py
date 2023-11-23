@@ -1,6 +1,6 @@
 """Miscellaneous utility functions related to GTK widgets."""
 
-from typing import Union
+from typing import Tuple, Union
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -14,6 +14,7 @@ __all__ = [
   'label_fits_text',
   'get_label_full_text_width',
   'menu_popup_below_widget',
+  'get_position_below_widget',
 ]
 
 
@@ -61,3 +62,21 @@ def menu_popup_below_widget(menu: Gtk.Menu, widget: Gtk.Widget):
     Gdk.Gravity.NORTH,
     None,
   )
+
+
+def get_position_below_widget(widget: Gtk.Widget) -> Union[Tuple, None]:
+  """Returns x and y coordinates of the lower left corner for ``widget``
+  relative to the widget's top-level window.
+
+  If the widget has no top-level window associated, ``None`` is returned.
+  """
+  toplevel_window = get_toplevel_window(widget)
+
+  if toplevel_window is not None:
+    toplevel_window_position = toplevel_window.get_window().get_origin()
+    widget_allocation = widget.get_allocation()
+    return (
+      toplevel_window_position.x + widget_allocation.x,
+      toplevel_window_position.y + widget_allocation.y + widget_allocation.height)
+  else:
+    return None

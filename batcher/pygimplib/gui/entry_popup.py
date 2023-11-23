@@ -276,22 +276,9 @@ class EntryPopup:
       self._popup_hide_context.exclude_widget_from_hiding_with_button_press(widget)
   
   def _update_position(self):
-    position = self._get_position_below_widget(self._entry)
+    position = utils_.get_position_below_widget(self._entry)
     if position is not None:
       self._popup.move(*position)
-
-  @staticmethod
-  def _get_position_below_widget(widget):
-    toplevel_window = utils_.get_toplevel_window(widget)
-
-    if toplevel_window is not None:
-      toplevel_window_position = toplevel_window.get_window().get_origin()
-      widget_allocation = widget.get_allocation()
-      return (
-        toplevel_window_position.x + widget_allocation.x,
-        toplevel_window_position.y + widget_allocation.y + widget_allocation.height)
-    else:
-      return None
 
   def _filter_rows(self, rows, row_iter, data):
     if self._clear_filter:
