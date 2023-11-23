@@ -48,7 +48,7 @@ def _save_image_default(
   layer_array = GObject.Value(Gimp.ObjectArray)
   Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
 
-  pdb.gimp_file_save(run_mode, image, len(layers), layer_array.get_boxed(), image_file)
+  pdb.gimp_file_save(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode)
 
   return pdb.last_status
 
