@@ -117,7 +117,7 @@ class StubWithCallableDefaultDefaultValueSetting(StubSetting):
 
 class StubRegistrableToPdbSetting(StubSetting):
 
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, Gimp.RunMode]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, Gimp.RunMode.__gtype__]
 
 
 class StubWithGuiSetting(StubSetting):

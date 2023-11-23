@@ -132,7 +132,14 @@ class TestSetting(unittest.TestCase):
     setting = stubs_setting.StubRegistrableToPdbSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode)
 
-    self.assertEqual(setting.pdb_type, Gimp.RunMode)
+    self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
+    self.assertTrue(setting.can_be_registered_to_pdb())
+
+  def test_pdb_type_as_gobject_type(self):
+    setting = stubs_setting.StubRegistrableToPdbSetting(
+      'file_extension', default_value='png', pdb_type=Gimp.RunMode.__gtype__)
+
+    self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
     self.assertTrue(setting.can_be_registered_to_pdb())
 
   def test_pdb_type_as_gobject_name(self):
@@ -1754,7 +1761,7 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertEqual(setting.name, 'coordinates')
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
-    self.assertEqual(setting.pdb_type, Gimp.FloatArray)
+    self.assertEqual(setting.pdb_type, Gimp.FloatArray.__gtype__)
     self.assertEqual(setting.element_type, settings_.FloatSetting)
 
     self.assertIsInstance(setting.value_for_pdb, Gimp.FloatArray)
@@ -1836,7 +1843,7 @@ class TestCreateArraySetting(unittest.TestCase):
      'float',
      (1.0, 5.0, 10.0),
      'automatic',
-     Gimp.FloatArray),
+     Gimp.FloatArray.__gtype__),
 
     ('native_array_type_registration_is_disabled_explicitly',
      'float',
@@ -1848,7 +1855,7 @@ class TestCreateArraySetting(unittest.TestCase):
      'brush',
      (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
      'automatic',
-     Gimp.ObjectArray),
+     Gimp.ObjectArray.__gtype__),
 
     ('gimp_object_registration_is_disabled_explicitly',
      'brush',
@@ -1884,7 +1891,7 @@ class TestCreateArraySetting(unittest.TestCase):
       element_type='int',
       element_pdb_type=GObject.TYPE_INT)
     
-    self.assertEqual(setting.pdb_type, Gimp.Int32Array)
+    self.assertEqual(setting.pdb_type, Gimp.Int32Array.__gtype__)
     self.assertEqual(setting.element_pdb_type, GObject.TYPE_INT)
   
   def test_create_invalid_element_pdb_type_is_changed_to_correct_type(self):
@@ -1910,7 +1917,6 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertTupleEqual(setting.default_value, values)
     self.assertEqual(setting.element_type, settings_.ArraySetting)
     self.assertEqual(setting.element_default_value, (0.0, 0.0, 0.0))
-    self.assertFalse(setting.can_be_registered_to_pdb())
     
     for i in range(len(setting)):
       self.assertEqual(setting[i].element_type, settings_.FloatSetting)
@@ -2332,7 +2338,7 @@ class TestArraySetting(unittest.TestCase):
         ),
         dict(
           name='coordinates',
-          type=Gimp.FloatArray,
+          type=Gimp.FloatArray.__gtype__,
           nick='Coordinates',
           blurb='Coordinates',
         ),

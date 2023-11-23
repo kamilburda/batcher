@@ -468,7 +468,8 @@ class Pattern(Resource):
 
 
 class ObjectArray:
-  pass
+
+  __gtype__ = Gimp.ObjectArray.__gtype__
 
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
