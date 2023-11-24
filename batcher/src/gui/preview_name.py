@@ -1,17 +1,21 @@
 """Preview widget displaying the names of items to be batch-processed."""
 
+from collections.abc import Iterable
+from typing import Set
+
 import collections
 import os
 import traceback
 
 import gi
-from gi.repository import GObject
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 import pygimplib as pg
-from pygimplib import pdb
 
 from src import exceptions
 from src import utils as utils_
@@ -27,23 +31,20 @@ class NamePreview(preview_base_.Preview):
   * toggling "filter mode" - unselected items are not sensitive.
   * assigning tags to items.
   
-  Attributes:
-  
-  * `is_filtering` - If enabled, unselected items are not sensitive.
-  
   Signals:
   
-  * `'preview-selection-changed'` - The selection in the preview was modified
+  * ``'preview-selection-changed'`` - The selection in the preview was modified
     by the user or by calling `set_selected_items()`.
-  * `'preview-updated'` - The preview was updated by calling `update()`. This
+  * ``'preview-updated'`` - The preview was updated by calling `update()`. This
     signal is not emitted if the update is locked.
     
     Arguments:
     
-    * `error` - If `None`, the preview was updated successfully. Otherwise,
-      this is an `Exception` object describing the error that occurred during
+    * error: If ``None``, the preview was updated successfully. Otherwise,
+      this is an `Exception` instance describing the error that occurred during
       the update.
-  * `'preview-tags-changed'` - An existing tag was added to or removed from an
+
+  * ``'preview-tags-changed'`` - An existing tag was added to or removed from an
     item.
   """
   
@@ -90,6 +91,7 @@ class NamePreview(preview_base_.Preview):
     self._available_tags_setting = available_tags_setting
     
     self.is_filtering = False
+    """If ``True``, unselected items are not sensitive."""
     
     # key: ID of `Item.raw` or (ID of `Item.raw`, 'folder') instance
     # value: `Gtk.TreeIter` instance
@@ -122,18 +124,18 @@ class NamePreview(preview_base_.Preview):
   def selected_items(self):
     return self._selected_items
   
-  def update(self, reset_items=False, update_existing_contents_only=False):
+  def update(self, reset_items: bool = False, update_existing_contents_only: bool = False):
     """Updates the preview (add/remove item, move item to a different parent
     item group, etc.).
     
-    If `reset_items` is `True`, perform full update - add new items, remove
-    non-existent items, etc. Note that setting this to `True` may introduce a
-    performance penalty for hundreds of items.
+    If ``reset_items`` is ``True``, full update is perform - new items are
+    added, non-existent items are removed, etc. Note that setting this to
+    ``True`` may introduce a performance penalty for hundreds of items.
     
-    If `update_existing_contents_only` is `True`, only update the contents of
-    the existing items. Note that the items will not be reparented,
-    expanded/collapsed or added/removed even if they need to be. This option is
-    useful if you know the item structure will be preserved.
+    If ``update_existing_contents_only`` is ``True``, only the contents of
+    the existing items are updated. Note that the items will not be
+    reparented, expanded/collapsed or added/removed even if they need to be.
+    This option is useful if you know the item structure will be preserved.
     
     If an exception was captured during the update, the method is terminated
     prematurely. It is the responsibility of the caller to handle the error
@@ -170,26 +172,20 @@ class NamePreview(preview_base_.Preview):
     self.emit('preview-updated', None)
   
   def clear(self):
-    """
-    Clear the entire preview.
-    """
+    """Clears the entire preview."""
     self._clearing_preview = True
     self._tree_model.clear()
     self._tree_iters.clear()
     self._clearing_preview = False
   
-  def set_collapsed_items(self, collapsed_items):
-    """
-    Set the collapsed state of items in the preview.
-    """
+  def set_collapsed_items(self, collapsed_items: Set):
+    """Sets the collapsed state of items in the preview."""
     self._collapsed_items = collapsed_items
     self._set_expanded_items()
   
-  def set_selected_items(self, selected_items):
-    """
-    Set the selection of items in the preview.
-    """
-    self._selected_items = selected_items
+  def set_selected_items(self, selected_items: Iterable):
+    """Sets the selection of items in the preview."""
+    self._selected_items = list(selected_items)
     self._set_selection()
     self.emit('preview-selection-changed')
   
@@ -206,32 +202,34 @@ class NamePreview(preview_base_.Preview):
       return None
   
   def _init_gui(self):
-    self._tree_model = gtk.TreeStore(*[column[1] for column in self._COLUMNS])
+    self._tree_model = Gtk.TreeStore(*[column[1] for column in self._COLUMNS])
     
-    self._tree_view = gtk.TreeView(model=self._tree_model)
-    self._tree_view.set_headers_visible(False)
-    self._tree_view.set_enable_search(False)
-    self._tree_view.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+    self._tree_view = Gtk.TreeView(
+      model=self._tree_model,
+      headers_visible=False,
+      enable_search=False,
+    )
+    self._tree_view.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
     
     self._init_icons()
     
     self._init_tags_menu()
     
-    column = gtk.TreeViewColumn('')
+    column = Gtk.TreeViewColumn()
     
-    cell_renderer_icon_item = gtk.CellRendererPixbuf()
-    column.pack_start(cell_renderer_icon_item, False, False, 0)
+    cell_renderer_icon_item = Gtk.CellRendererPixbuf()
+    column.pack_start(cell_renderer_icon_item, False)
     column.set_attributes(cell_renderer_icon_item, pixbuf=self._COLUMN_ICON_ITEM[0])
     
-    cell_renderer_icon_tag = gtk.CellRendererPixbuf()
+    cell_renderer_icon_tag = Gtk.CellRendererPixbuf()
     cell_renderer_icon_tag.set_property('pixbuf', self._icons['tag'])
-    column.pack_start(cell_renderer_icon_tag, False, False, 0)
+    column.pack_start(cell_renderer_icon_tag, False)
     column.set_attributes(
       cell_renderer_icon_tag,
       visible=self._COLUMN_ICON_TAG_VISIBLE[0])
     
-    cell_renderer_item_name = gtk.CellRendererText()
-    column.pack_start(cell_renderer_item_name, False, False, 0)
+    cell_renderer_item_name = Gtk.CellRendererText()
+    column.pack_start(cell_renderer_item_name, False)
     column.set_attributes(
       cell_renderer_item_name,
       text=self._COLUMN_ITEM_NAME[0],
@@ -239,8 +237,10 @@ class NamePreview(preview_base_.Preview):
     
     self._tree_view.append_column(column)
     
-    self._scrolled_window = gtk.ScrolledWindow()
-    self._scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    self._scrolled_window = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+    )
     self._scrolled_window.add(self._tree_view)
     
     self.pack_start(self._scrolled_window, False, False, 0)
@@ -252,11 +252,11 @@ class NamePreview(preview_base_.Preview):
   
   def _init_icons(self):
     self._icons = {}
-    self._icons['folder'] = self._tree_view.render_icon(
-      gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU)
-    self._icons['item'] = gtk.gdk.pixbuf_new_from_file_at_size(
+    self._icons['folder'] = self._tree_view.render_icon_pixbuf(
+      Gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU)
+    self._icons['item'] = GdkPixbuf.Pixbuf.new_from_file_at_size(
       self._icon_image_filepath, -1, self._icons['folder'].props.height)
-    self._icons['tag'] = gtk.gdk.pixbuf_new_from_file_at_size(
+    self._icons['tag'] = GdkPixbuf.Pixbuf.new_from_file_at_size(
       self._icon_tag_filepath, -1, self._icons['folder'].props.height)
     
     self._icons['group'] = self._icons['item'].copy()
@@ -273,8 +273,16 @@ class NamePreview(preview_base_.Preview):
     
     self._icons['folder'].composite(
       self._icons['group'],
-      x_offset, y_offset, width, height, x_offset, y_offset,
-      scaling_factor, scaling_factor, gtk.gdk.INTERP_BILINEAR, 255)
+      x_offset,
+      y_offset,
+      width,
+      height,
+      x_offset,
+      y_offset,
+      scaling_factor,
+      scaling_factor,
+      GdkPixbuf.InterpType.BILINEAR,
+      255)
   
   def _init_tags_menu(self):
     self._tags_menu_items = {}
@@ -282,16 +290,16 @@ class NamePreview(preview_base_.Preview):
     
     self._tags_menu_relative_position = None
     
-    self._tags_menu = gtk.Menu()
-    self._tags_remove_submenu = gtk.Menu()
+    self._tags_menu = Gtk.Menu()
+    self._tags_remove_submenu = Gtk.Menu()
     
     self._tags_menu.append(Gtk.SeparatorMenuItem())
     
-    self._menu_item_add_tag = gtk.MenuItem(_('Add New Tag...'))
+    self._menu_item_add_tag = Gtk.MenuItem(label=_('Add New Tag...'))
     self._menu_item_add_tag.connect('activate', self._on_menu_item_add_tag_activate)
     self._tags_menu.append(self._menu_item_add_tag)
     
-    self._menu_item_remove_tag = gtk.MenuItem(_('Remove Tag'))
+    self._menu_item_remove_tag = Gtk.MenuItem(label=_('Remove Tag'))
     self._menu_item_remove_tag.set_submenu(self._tags_remove_submenu)
     self._tags_menu.append(self._menu_item_remove_tag)
     
@@ -330,14 +338,14 @@ class NamePreview(preview_base_.Preview):
   
   def _sort_tags_menu_items(self):
     for new_tag_position, tag in (
-          enumerate(sorted(self._tags_menu_items, key=lambda tag: tag.lower()))):
+          enumerate(sorted(self._tags_menu_items, key=lambda tag_: tag_.lower()))):
       self._tags_menu.reorder_child(self._tags_menu_items[tag], new_tag_position)
       if tag in self._tags_remove_submenu_items:
         self._tags_remove_submenu.reorder_child(
           self._tags_remove_submenu_items[tag], new_tag_position)
   
   def _add_tag_menu_item(self, tag, tag_display_name):
-    self._tags_menu_items[tag] = gtk.CheckMenuItem(tag_display_name)
+    self._tags_menu_items[tag] = Gtk.CheckMenuItem(label=tag_display_name)
     self._tags_menu_items[tag].connect('toggled', self._on_tags_menu_item_toggled, tag)
     self._tags_menu_items[tag].show()
     self._tags_menu.prepend(self._tags_menu_items[tag])
@@ -345,14 +353,14 @@ class NamePreview(preview_base_.Preview):
     return self._tags_menu_items[tag]
   
   def _add_remove_tag_menu_item(self, tag, tag_display_name):
-    self._tags_remove_submenu_items[tag] = gtk.MenuItem(tag_display_name)
+    self._tags_remove_submenu_items[tag] = Gtk.MenuItem(label=tag_display_name)
     self._tags_remove_submenu_items[tag].connect(
       'activate', self._on_tags_remove_submenu_item_activate, tag)
     self._tags_remove_submenu_items[tag].show()
     self._tags_remove_submenu.prepend(self._tags_remove_submenu_items[tag])
   
   def _on_tree_view_right_button_press_event(self, tree_view, event):
-    if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+    if event.type == Gdk.EventType.BUTTON_PRESS and event.button.button == 3:
       item_keys = []
       stop_event_propagation = False
       
@@ -411,7 +419,7 @@ class NamePreview(preview_base_.Preview):
       popup.destroy()
     
     def _on_popup_key_press_event(popup, event):
-      key_name = gtk.gdk.keyval_name(event.keyval)
+      key_name = Gdk.keyval_name(event.keyval)
       if key_name in ['Return', 'KP_Enter']:
         entry_text = entry_add_tag.get_text()
         if entry_text and entry_text not in self._tags_menu_items:
@@ -433,10 +441,12 @@ class NamePreview(preview_base_.Preview):
           window_absolute_position.y + self._tags_menu_relative_position[1])
         
         self._tags_menu_relative_position = None
-    
-    popup_add_tag = gtk.Window(gtk.WINDOW_TOPLEVEL)
-    popup_add_tag.set_decorated(False)
-    popup_add_tag.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_POPUP_MENU)
+
+    popup_add_tag = Gtk.Window(
+      type=Gtk.WindowType.TOPLEVEL,
+      type_hint=Gdk.WindowTypeHint.POPUP_MENU,
+      decorated=False,
+    )
     
     toplevel = pg.gui.get_toplevel_window(self)
     if toplevel is not None:
@@ -444,17 +454,19 @@ class NamePreview(preview_base_.Preview):
     
     _set_popup_position(popup_add_tag, toplevel)
     
-    label_tag_name = gtk.Label(_('Tag Name:'))
+    label_tag_name = Gtk.Label(label=_('Tag Name:'))
     
-    entry_add_tag = gtk.Entry()
-    
-    hbox = gtk.HBox()
-    hbox.set_spacing(self._ADD_TAG_POPUP_HBOX_SPACING)
+    entry_add_tag = Gtk.Entry()
+
+    hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._ADD_TAG_POPUP_HBOX_SPACING,
+      border_width=self._ADD_TAG_POPUP_BORDER_WIDTH,
+    )
     hbox.pack_start(label_tag_name, False, False, 0)
     hbox.pack_start(entry_add_tag, False, False, 0)
-    hbox.set_border_width(self._ADD_TAG_POPUP_BORDER_WIDTH)
     
-    frame = gtk.Frame()
+    frame = Gtk.Frame()
     frame.add(hbox)
     
     popup_add_tag.add(frame)
@@ -472,8 +484,7 @@ class NamePreview(preview_base_.Preview):
     del self._tags_remove_submenu_items[tag]
     del self._available_tags_setting.value[tag]
     
-    self._menu_item_remove_tag.set_sensitive(
-      bool(self._tags_remove_submenu.get_children()))
+    self._menu_item_remove_tag.set_sensitive(bool(self._tags_remove_submenu.get_children()))
     
     self._available_tags_setting.save()
   
@@ -508,7 +519,8 @@ class NamePreview(preview_base_.Preview):
       self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
       for tree_path in tree_paths]
   
-  def _get_key(self, item):
+  @staticmethod
+  def _get_key(item):
     if item.type != pg.itemtree.TYPE_FOLDER:
       return item.raw.get_id()
     else:
@@ -600,7 +612,7 @@ class NamePreview(preview_base_.Preview):
       [self._get_icon_from_item(item),
        bool(item.tags),
        True,
-       pg.utils.safe_encode_gtk(item.name),
+       item.name,
        item.raw.get_id(),
        item.type])
     
@@ -616,7 +628,7 @@ class NamePreview(preview_base_.Preview):
       self._COLUMN_ITEM_NAME_SENSITIVE[0],
       True,
       self._COLUMN_ITEM_NAME[0],
-      pg.utils.safe_encode_gtk(item.name))
+      item.name)
   
   def _insert_parent_items(self, item, inserted_parents):
     for parent in item.parents:
@@ -674,10 +686,9 @@ class NamePreview(preview_base_.Preview):
       return None
   
   def _set_expanded_items(self, tree_path=None):
-    """
-    Set the expanded state of items in the tree view.
+    """Sets the expanded state of items in the tree view.
     
-    If `tree_path` is specified, set the states only for the child elements in
+    If ``tree_path`` is specified, set the states only for the child elements in
     the tree path, otherwise set the states in the whole tree view.
     """
     self._row_expand_collapse_interactive = False
