@@ -1,12 +1,16 @@
 """Preview widget displaying a scaled-down image to be processed."""
 
+from typing import List, Optional, Union
+
 import array
 import time
 import traceback
 
 import gi
+from gi.repository import GdkPixbuf
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -29,21 +33,20 @@ from src.gui import preview_base as preview_base_
 
 
 class ImagePreview(preview_base_.Preview):
-  """
-  This class defines a widget displaying a preview of an image to be processed,
-  including its name.
+  """Widget displaying a preview of an image to be processed, including its
+  name.
   
   Signals:
   
-  * `'preview-updated'` - The preview was updated by calling `update()`. This
+  * ``'preview-updated'`` - The preview was updated by calling `update()`. This
     signal is not emitted if the update is locked.
     
     Arguments:
     
-    * `error` - If `None`, the preview was updated successfully. Otherwise,
-      this is an `Exception` object describing the error that occurred during
+    * error: If ``None``, the preview was updated successfully. Otherwise,
+      this is an `Exception` instance describing the error that occurred during
       the update.
-    * `update_duration_seconds` - Duration of the update in seconds as a float.
+    * update_duration_seconds: Duration of the update in seconds as a float.
       The duration only considers the update of the image contents (i.e. does
       not consider the duration of updating the label of the image name).
   """
@@ -71,7 +74,7 @@ class ImagePreview(preview_base_.Preview):
     self._previous_preview_pixbuf_width = None
     self._previous_preview_pixbuf_height = None
     
-    self.draw_checkboard_alpha_background = True
+    self.draw_checkerboard_alpha_background = True
     
     self._is_updating = False
     self._is_preview_image_allocated_size = False
@@ -88,9 +91,9 @@ class ImagePreview(preview_base_.Preview):
     self.prepare_image_for_rendering()
     
     self._init_gui()
-    
-    self._preview_alpha_check_color_first, self._preview_alpha_check_color_second = (
-      int(hex(shade)[2:] * 4, 16) for shade in gimp.checks_get_shades(gimp.check_type()))
+
+    self._preview_alpha_check_color_first = Gimp.check_custom_color1()
+    self._preview_alpha_check_color_second = Gimp.check_custom_color2()
     
     self.connect('size-allocate', self._on_size_allocate)
     self._preview_image.connect('size-allocate', self._on_preview_image_size_allocate)
@@ -124,11 +127,11 @@ class ImagePreview(preview_base_.Preview):
     if self.item is None:
       return
     
-    if not pdb.gimp_item_is_valid(self.item.raw):
+    if not self.item.raw.is_valid():
       self.clear()
       return
     
-    self._placeholder_image.hide()
+    self._placeholder_icon.hide()
     
     if self.item.type != pg.itemtree.TYPE_FOLDER:
       self._is_updating = True
@@ -149,20 +152,20 @@ class ImagePreview(preview_base_.Preview):
     self._preview_image.clear()
     self._preview_image.hide()
     self._folder_image.hide()
-    self._show_placeholder_image(use_item_name)
+    self._show_placeholder_icon(use_item_name)
   
-  def resize(self, update_when_larger_than_image_size=False):
-    """
-    Resize the preview if the widget is smaller than the previewed image so that
-    the image fits the widget.
+  def resize(self):
+    """Resizes the preview if the widget is smaller than the previewed image so
+    that the image fits the widget.
     """
     if not self._is_updating and self._preview_image.get_mapped():
       self._resize_preview(self._preview_image.get_allocation(), self._preview_pixbuf)
   
-  def is_larger_than_image(self):
-    """
-    Return `True` if the preview widget is larger than the image. If no image is
-    previewed, return `False`.
+  def is_larger_than_image(self) -> bool:
+    """Returns ``True`` if the preview widget is larger than the image.
+
+    ``False`` is returned if the preview widget is smaller than the image or no
+    image is previewed.
     """
     allocation = self._preview_image.get_allocation()
     return (
@@ -170,7 +173,7 @@ class ImagePreview(preview_base_.Preview):
       and allocation.width > self._preview_pixbuf.get_width()
       and allocation.height > self._preview_pixbuf.get_height())
   
-  def update_item(self, raw_item_id=None):
+  def update_item(self, raw_item_id: Optional[int] = None):
     if raw_item_id is None:
       if (self.item is not None
           and self._batcher.item_tree is not None
@@ -189,7 +192,10 @@ class ImagePreview(preview_base_.Preview):
         self._set_item_name_label(self.item.name)
   
   def prepare_image_for_rendering(
-        self, resize_image_action_groups=None, scale_item_action_groups=None):
+        self,
+        resize_image_action_groups: Union[str, List[str], None] = None,
+        scale_item_action_groups: Union[str, List[str], None] = None,
+  ):
     """Adds procedures that prepare an image for rendering in the preview.
     
     Specifically, the image to be previewed is resized, scaled and later merged
@@ -228,7 +234,7 @@ class ImagePreview(preview_base_.Preview):
       self._resize_item_for_batcher, ['after_process_item_contents'], ignore_if_exists=True)
   
   def _set_contents(self):
-    # Sanity check in case `item` changes before `'size-allocate'` is emitted.
+    # Sanity check in case `item` changes before 'size-allocate' is emitted.
     if self.item is None:
       return
     
@@ -251,62 +257,65 @@ class ImagePreview(preview_base_.Preview):
     self.emit('preview-updated', error, update_duration_seconds)
   
   def _init_gui(self):
-    self._button_menu = gtk.Button()
-    self._button_menu.set_relief(Gtk.ReliefStyle.NONE)
-    self._button_menu.add(gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN))
+    self._button_menu = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
+
+    arrow = Gtk.Arrow(
+      arrow_type=Gtk.ArrowType.DOWN,
+      shadow_type=Gtk.ShadowType.IN,
+    )
+    self._button_menu.add(arrow)
     
-    self._menu_item_update_automatically = gtk.CheckMenuItem(
-      _('Update Preview Automatically'))
-    self._menu_item_update_automatically.set_active(True)
+    self._menu_item_update_automatically = Gtk.CheckMenuItem(
+      label=_('Update Preview Automatically'),
+      active=True,
+    )
     
-    self._menu_settings = gtk.Menu()
+    self._menu_settings = Gtk.Menu()
     self._menu_settings.append(self._menu_item_update_automatically)
     self._menu_settings.show_all()
     
-    self._button_refresh = Gtk.Button()
+    self._button_refresh = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
     self._button_refresh.set_image(
       Gtk.Image.new_from_icon_name('view-refresh', Gtk.IconSize.BUTTON))
     self._button_refresh.set_tooltip_text(_('Update Preview'))
-    self._button_refresh.set_relief(Gtk.ReliefStyle.NONE)
     self._button_refresh.show_all()
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)
     
-    self._hbox_buttons = gtk.HBox()
+    self._hbox_buttons = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     self._hbox_buttons.pack_start(self._button_menu, False, False, 0)
     self._hbox_buttons.pack_start(self._button_refresh, False, False, 0)
     
-    self._preview_image = gtk.Image()
+    self._preview_image = Gtk.Image()
     self._preview_image.set_no_show_all(True)
     
-    self._placeholder_image = Gtk.Image.new_from_icon_name(
+    self._placeholder_icon = Gtk.Image.new_from_icon_name(
       GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
-    self._placeholder_image.set_no_show_all(True)
+    self._placeholder_icon.set_no_show_all(True)
     
     self._folder_image = Gtk.Image.new_from_icon_name('folder', Gtk.IconSize.DIALOG)
     self._folder_image.set_no_show_all(True)
     
-    self._label_item_name = gtk.Label()
-    self._label_item_name.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
+    self._label_item_name = Gtk.Label(ellipsize=Pango.EllipsizeMode.MIDDLE)
     
     self.set_spacing(self._WIDGET_SPACING)
     self.set_border_width(self._BORDER_WIDTH)
     
     self.pack_start(self._hbox_buttons, False, False, 0)
     self.pack_start(self._preview_image, True, True, 0)
-    self.pack_start(self._placeholder_image, True, True, 0)
+    self.pack_start(self._placeholder_icon, True, True, 0)
     self.pack_start(self._folder_image, True, True, 0)
     self.pack_start(self._label_item_name, False, False, 0)
     
-    self._placeholder_image_size = gtk.icon_size_lookup(
-      self._placeholder_image.get_property('icon-size'))
-    self._folder_image_size = gtk.icon_size_lookup(
+    self._placeholder_icon_size = Gtk.icon_size_lookup(
+      self._placeholder_icon.get_property('icon-size'))
+    self._folder_icon_size = Gtk.icon_size_lookup(
       self._folder_image.get_property('icon-size'))
     
-    self._current_placeholder_image = self._placeholder_image
-    self._current_placeholder_image_size = self._placeholder_image_size
-        
-    self._show_placeholder_image()
+    self._current_placeholder_icon = self._placeholder_icon
+    self._current_placeholder_icon_size = self._placeholder_icon_size
+
+    self._show_placeholder_icon()
   
   def _get_in_memory_preview(self, raw_item):
     self._preview_width, self._preview_height = self._get_preview_size(
@@ -317,30 +326,32 @@ class ImagePreview(preview_base_.Preview):
     
     if image_preview is None or not image_preview.is_valid():
       return None, error
-    
-    if not image_preview.layers:
+
+    image_layers = image_preview.list_layers()
+
+    if not image_layers:
       pg.pdbutils.try_delete_image(image_preview)
       return None, error
     
-    if image_preview.get_base_type() != gimpenums.RGB:
-      pdb.gimp_image_convert_rgb(image_preview)
+    if image_preview.get_base_type() != Gimp.ImageBaseType.RGB:
+      image_preview.convert_rgb()
     
-    raw_item_preview = image_preview.layers[0]
+    raw_item_preview = image_layers[0]
     
-    if raw_item_preview.mask is not None:
-      raw_item_preview.remove_mask(gimpenums.MASK_APPLY)
+    if raw_item_preview.get_mask() is not None:
+      raw_item_preview.remove_mask(Gimp.MaskApplyMode.APPLY)
     
     # Recompute the size as the item may have been resized during processing.
     self._preview_width, self._preview_height = self._get_preview_size(
       raw_item_preview.get_width(), raw_item_preview.get_height())
-    
+
     self._preview_width, self._preview_height, preview_data = self._get_preview_data(
       raw_item_preview, self._preview_width, self._preview_height)
-    
+
     raw_item_preview_pixbuf = self._get_preview_pixbuf(
       raw_item_preview, self._preview_width, self._preview_height, preview_data)
     
-    pdb.gimp_image_delete(image_preview)
+    image_preview.delete()
     
     return raw_item_preview_pixbuf, error
   
@@ -363,6 +374,7 @@ class ImagePreview(preview_base_.Preview):
       args=[[self.item.raw.get_id()]])
     
     error = None
+    image_preview = None
     
     try:
       image_preview = self._batcher.run(
@@ -383,7 +395,6 @@ class ImagePreview(preview_base_.Preview):
         parent=pg.gui.get_toplevel_window(self))
       
       error = e
-      image_preview = None
     except Exception as e:
       messages_.display_failure_message(
         _('There was a problem with updating the image preview:'),
@@ -392,7 +403,6 @@ class ImagePreview(preview_base_.Preview):
         parent=pg.gui.get_toplevel_window(self))
       
       error = e
-      image_preview = None
     
     self._batcher.remove_action(
       only_selected_item_constraint_id, [actions.DEFAULT_CONSTRAINTS_GROUP])
@@ -406,60 +416,60 @@ class ImagePreview(preview_base_.Preview):
   def _resize_image_for_batcher(self, batcher, *args, **kwargs):
     image = batcher.current_image
     
-    pdb.gimp_image_resize(
-      image,
+    image.resize(
       max(1, int(round(image.get_width() * self._preview_scaling_factor))),
       max(1, int(round(image.get_height() * self._preview_scaling_factor))),
       0,
       0)
     
-    pdb.gimp_context_set_interpolation(gimpenums.INTERPOLATION_LINEAR)
+    Gimp.context_set_interpolation(Gimp.InterpolationType.LINEAR)
   
-  def _merge_items_for_batcher(self, batcher, item=None, raw_item=None):
-    raw_item_merged = pdb.gimp_image_merge_visible_layers(
-      batcher.current_image, gimpenums.EXPAND_AS_NECESSARY)
+  @staticmethod
+  def _merge_items_for_batcher(batcher, item=None, raw_item=None):
+    raw_item_merged = batcher.current_image.merge_visible_layers(
+      Gimp.MergeType.EXPAND_AS_NECESSARY)
     
-    batcher.current_image.active_layer = raw_item_merged
+    batcher.current_image.set_selected_layers([raw_item_merged])
     batcher.current_raw_item = raw_item_merged
     
   def _scale_item_for_batcher(self, batcher, item=None, raw_item=None):
-    if raw_item is None or not pdb.gimp_item_is_valid(raw_item):
+    if raw_item is None or not raw_item.is_valid():
       raw_item = batcher.current_raw_item
     
-    pdb.gimp_item_transform_scale(
-      raw_item,
+    raw_item.transform_scale(
       raw_item.get_offsets().offset_x * self._preview_scaling_factor,
       raw_item.get_offsets().offset_y * self._preview_scaling_factor,
       (raw_item.get_offsets().offset_x + raw_item.get_width()) * self._preview_scaling_factor,
       (raw_item.get_offsets().offset_y + raw_item.get_height()) * self._preview_scaling_factor)
   
-  def _resize_item_for_batcher(self, batcher, item=None, raw_item=None):
-    pdb.gimp_layer_resize_to_image_size(batcher.current_raw_item)
+  @staticmethod
+  def _resize_item_for_batcher(batcher, item=None, raw_item=None):
+    batcher.current_raw_item.resize_to_image_size()
   
   def _get_preview_pixbuf(self, raw_item, preview_width, preview_height, preview_data):
     # The following code is largely based on the implementation of
     # `gimp_pixbuf_from_data` from:
     # https://github.com/GNOME/gimp/blob/gimp-2-8/libgimp/gimppixbuf.c
-    raw_item_preview_pixbuf = gtk.gdk.pixbuf_new_from_data(
+    raw_item_preview_pixbuf = GdkPixbuf.Pixbuf.new_from_data(
       preview_data,
-      gtk.gdk.COLORSPACE_RGB,
-      raw_item.has_alpha,
+      GdkPixbuf.Colorspace.RGB,
+      raw_item.has_alpha(),
       8,
       preview_width,
       preview_height,
-      preview_width * raw_item.bpp)
-    
+      preview_width * raw_item.get_bpp())
+
     self._preview_pixbuf = raw_item_preview_pixbuf
-    
-    if raw_item.has_alpha:
+
+    if raw_item.has_alpha():
       raw_item_preview_pixbuf = self._add_alpha_background_to_pixbuf(
         raw_item_preview_pixbuf,
-        raw_item.opacity,
-        self.draw_checkboard_alpha_background,
+        raw_item.get_opacity(),
+        self.draw_checkerboard_alpha_background,
         self._PREVIEW_ALPHA_CHECK_SIZE,
         self._preview_alpha_check_color_first,
         self._preview_alpha_check_color_second)
-    
+
     return raw_item_preview_pixbuf
   
   def _get_preview_size(self, width, height):
@@ -505,12 +515,12 @@ class ImagePreview(preview_base_.Preview):
       return
     
     scaled_preview_pixbuf = preview_pixbuf.scale_simple(
-      scaled_preview_width, scaled_preview_height, gtk.gdk.INTERP_BILINEAR)
-    
+      scaled_preview_width, scaled_preview_height, GdkPixbuf.InterpType.BILINEAR)
+
     scaled_preview_pixbuf = self._add_alpha_background_to_pixbuf(
       scaled_preview_pixbuf,
       100,
-      self.draw_checkboard_alpha_background,
+      self.draw_checkerboard_alpha_background,
       self._PREVIEW_ALPHA_CHECK_SIZE,
       self._preview_alpha_check_color_first,
       self._preview_alpha_check_color_second)
@@ -532,35 +542,34 @@ class ImagePreview(preview_base_.Preview):
         - self._WIDGET_SPACING
         - self._BORDER_WIDTH * 2)
       
-      if (preview_widget_allocated_width < self._current_placeholder_image_size[0]
-          or preview_widget_allocated_height < self._current_placeholder_image_size[1]):
-        self._current_placeholder_image.hide()
+      if (preview_widget_allocated_width < self._current_placeholder_icon_size.width
+          or preview_widget_allocated_height < self._current_placeholder_icon_size.height):
+        self._current_placeholder_icon.hide()
       else:
-        self._current_placeholder_image.show()
+        self._current_placeholder_icon.show()
   
   def _on_preview_image_size_allocate(self, image, allocation):
     if not self._is_preview_image_allocated_size:
       self._set_contents()
       self._is_preview_image_allocated_size = True
   
-  def _show_placeholder_image(self, use_item_name=False):
-    self._current_placeholder_image = self._placeholder_image
-    self._current_placeholder_image_size = self._placeholder_image_size
+  def _show_placeholder_icon(self, use_item_name=False):
+    self._current_placeholder_icon = self._placeholder_icon
+    self._current_placeholder_icon_size = self._placeholder_icon_size
     
-    self._placeholder_image.show()
+    self._placeholder_icon.show()
     
     if not use_item_name:
       self._set_item_name_label(_('No selection'))
   
   def _show_folder_image(self):
-    self._current_placeholder_image = self._folder_image
-    self._current_placeholder_image_size = self._folder_image_size
+    self._current_placeholder_icon = self._folder_image
+    self._current_placeholder_icon_size = self._folder_icon_size
     
     self._folder_image.show()
   
   def _set_item_name_label(self, item_name):
-    self._label_item_name.set_markup(
-      '<i>{}</i>'.format(GLib.markup_escape_text(pg.utils.safe_encode_gtk(item_name))))
+    self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
   
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)
@@ -586,13 +595,21 @@ class ImagePreview(preview_base_.Preview):
   def _add_alpha_background_to_pixbuf(
         pixbuf,
         opacity,
-        use_checkboard_background=False,
-        check_size=None,
-        check_color_first=None,
-        check_color_second=None):
-    if use_checkboard_background:
-      pixbuf_with_alpha_background = gtk.gdk.Pixbuf(
-        gtk.gdk.COLORSPACE_RGB,
+        use_checkerboard_background,
+        check_size,
+        check_color_first,
+        check_color_second):
+    if use_checkerboard_background:
+      if isinstance(check_color_first, Gimp.RGB):
+        # All color channels have the same value since the checkerboard is grayscale.
+        processed_check_color_first = int(check_color_first.r * 255)
+        processed_check_color_second = int(check_color_second.r * 255)
+      else:
+        processed_check_color_first = check_color_first
+        processed_check_color_second = check_color_second
+
+      pixbuf_with_alpha_background = GdkPixbuf.Pixbuf.new(
+        GdkPixbuf.Colorspace.RGB,
         False,
         8,
         pixbuf.get_width(),
@@ -608,16 +625,16 @@ class ImagePreview(preview_base_.Preview):
         0,
         1.0,
         1.0,
-        gtk.gdk.INTERP_NEAREST,
+        GdkPixbuf.InterpType.NEAREST,
         int(round((opacity / 100.0) * 255)),
         0,
         0,
         check_size,
-        check_color_first,
-        check_color_second)
+        processed_check_color_first,
+        processed_check_color_second)
     else:
-      pixbuf_with_alpha_background = gtk.gdk.Pixbuf(
-        gtk.gdk.COLORSPACE_RGB,
+      pixbuf_with_alpha_background = GdkPixbuf.Pixbuf.new(
+        GdkPixbuf.Colorspace.RGB,
         True,
         8,
         pixbuf.get_width(),
@@ -634,20 +651,20 @@ class ImagePreview(preview_base_.Preview):
         0,
         1.0,
         1.0,
-        gtk.gdk.INTERP_NEAREST,
+        GdkPixbuf.InterpType.NEAREST,
         int(round((opacity / 100.0) * 255)))
     
     return pixbuf_with_alpha_background
-  
+
   @staticmethod
   def _get_preview_data(raw_item, preview_width, preview_height):
     actual_preview_width, actual_preview_height, _unused, _unused, preview_data = (
-      pdb.gimp_drawable_thumbnail(raw_item, preview_width, preview_height))
-    
+      raw_item.get_thumbnail(preview_width, preview_height, Gimp.PixbufTransparency.SMALL_CHECKS))
+
     return (
       actual_preview_width,
       actual_preview_height,
-      array.array('B', preview_data).tostring())
+      array.array('B', preview_data).tobytes())
 
 
 GObject.type_register(ImagePreview)
