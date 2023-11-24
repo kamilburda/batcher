@@ -2,7 +2,6 @@
 
 from typing import List, Optional, Union
 
-import array
 import time
 import traceback
 
@@ -21,7 +20,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 import pygimplib as pg
-from pygimplib import pdb
 
 from src import actions
 from src import builtin_constraints
