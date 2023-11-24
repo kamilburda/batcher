@@ -345,11 +345,8 @@ class ImagePreview(preview_base_.Preview):
     self._preview_width, self._preview_height = self._get_preview_size(
       raw_item_preview.get_width(), raw_item_preview.get_height())
 
-    self._preview_width, self._preview_height, preview_data = self._get_preview_data(
-      raw_item_preview, self._preview_width, self._preview_height)
-
     raw_item_preview_pixbuf = self._get_preview_pixbuf(
-      raw_item_preview, self._preview_width, self._preview_height, preview_data)
+      raw_item_preview, self._preview_width, self._preview_height)
     
     image_preview.delete()
     
@@ -446,31 +443,10 @@ class ImagePreview(preview_base_.Preview):
   def _resize_item_for_batcher(batcher, item=None, raw_item=None):
     batcher.current_raw_item.resize_to_image_size()
   
-  def _get_preview_pixbuf(self, raw_item, preview_width, preview_height, preview_data):
-    # The following code is largely based on the implementation of
-    # `gimp_pixbuf_from_data` from:
-    # https://github.com/GNOME/gimp/blob/gimp-2-8/libgimp/gimppixbuf.c
-    raw_item_preview_pixbuf = GdkPixbuf.Pixbuf.new_from_data(
-      preview_data,
-      GdkPixbuf.Colorspace.RGB,
-      raw_item.has_alpha(),
-      8,
-      preview_width,
-      preview_height,
-      preview_width * raw_item.get_bpp())
-
-    self._preview_pixbuf = raw_item_preview_pixbuf
-
-    if raw_item.has_alpha():
-      raw_item_preview_pixbuf = self._add_alpha_background_to_pixbuf(
-        raw_item_preview_pixbuf,
-        raw_item.get_opacity(),
-        self.draw_checkerboard_alpha_background,
-        self._PREVIEW_ALPHA_CHECK_SIZE,
-        self._preview_alpha_check_color_first,
-        self._preview_alpha_check_color_second)
-
-    return raw_item_preview_pixbuf
+  @staticmethod
+  def _get_preview_pixbuf(raw_item, preview_width, preview_height):
+    return raw_item.get_thumbnail(
+      preview_width, preview_height, Gimp.PixbufTransparency.SMALL_CHECKS)
   
   def _get_preview_size(self, width, height):
     preview_widget_allocation = self._preview_image.get_allocation()
@@ -516,14 +492,6 @@ class ImagePreview(preview_base_.Preview):
     
     scaled_preview_pixbuf = preview_pixbuf.scale_simple(
       scaled_preview_width, scaled_preview_height, GdkPixbuf.InterpType.BILINEAR)
-
-    scaled_preview_pixbuf = self._add_alpha_background_to_pixbuf(
-      scaled_preview_pixbuf,
-      100,
-      self.draw_checkerboard_alpha_background,
-      self._PREVIEW_ALPHA_CHECK_SIZE,
-      self._preview_alpha_check_color_first,
-      self._preview_alpha_check_color_second)
     
     self._preview_image.set_from_pixbuf(scaled_preview_pixbuf)
     self.queue_draw()
@@ -590,81 +558,6 @@ class ImagePreview(preview_base_.Preview):
       self.lock_update(True, self._MANUAL_UPDATE_LOCK)
     else:
       self.update()
-  
-  @staticmethod
-  def _add_alpha_background_to_pixbuf(
-        pixbuf,
-        opacity,
-        use_checkerboard_background,
-        check_size,
-        check_color_first,
-        check_color_second):
-    if use_checkerboard_background:
-      if isinstance(check_color_first, Gimp.RGB):
-        # All color channels have the same value since the checkerboard is grayscale.
-        processed_check_color_first = int(check_color_first.r * 255)
-        processed_check_color_second = int(check_color_second.r * 255)
-      else:
-        processed_check_color_first = check_color_first
-        processed_check_color_second = check_color_second
-
-      pixbuf_with_alpha_background = GdkPixbuf.Pixbuf.new(
-        GdkPixbuf.Colorspace.RGB,
-        False,
-        8,
-        pixbuf.get_width(),
-        pixbuf.get_height())
-      
-      pixbuf.composite_color(
-        pixbuf_with_alpha_background,
-        0,
-        0,
-        pixbuf.get_width(),
-        pixbuf.get_height(),
-        0,
-        0,
-        1.0,
-        1.0,
-        GdkPixbuf.InterpType.NEAREST,
-        int(round((opacity / 100.0) * 255)),
-        0,
-        0,
-        check_size,
-        processed_check_color_first,
-        processed_check_color_second)
-    else:
-      pixbuf_with_alpha_background = GdkPixbuf.Pixbuf.new(
-        GdkPixbuf.Colorspace.RGB,
-        True,
-        8,
-        pixbuf.get_width(),
-        pixbuf.get_height())
-      pixbuf_with_alpha_background.fill(0xffffff00)
-      
-      pixbuf.composite(
-        pixbuf_with_alpha_background,
-        0,
-        0,
-        pixbuf.get_width(),
-        pixbuf.get_height(),
-        0,
-        0,
-        1.0,
-        1.0,
-        GdkPixbuf.InterpType.NEAREST,
-        int(round((opacity / 100.0) * 255)))
-    
-    return pixbuf_with_alpha_background
-
-  @staticmethod
-  def _get_preview_data(raw_item, preview_width, preview_height):
-    actual_preview_width, actual_preview_height, _unused, _unused, preview_data = (
-      raw_item.get_thumbnail(preview_width, preview_height, Gimp.PixbufTransparency.SMALL_CHECKS))
-
-    return (
-      actual_preview_width,
-      actual_preview_height,
-      array.array('B', preview_data).tobytes())
 
 
 GObject.type_register(ImagePreview)
