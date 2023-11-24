@@ -131,17 +131,17 @@ class PreviewsController:
     self._paned_between_previews_previous_position = current_position
   
   def _connect_actions_changed(self, actions_):
-    def _on_after_add_action(actions_, action, *args, **kwargs):
+    def _on_after_add_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
         self._update_previews_on_setting_change(action['enabled'])
       action['enabled'].connect_event(
         'value-changed', self._update_previews_on_setting_change)
     
-    def _on_after_reorder_action(actions_, action, *args, **kwargs):
+    def _on_after_reorder_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
         self._update_previews_on_setting_change(action['enabled'])
     
-    def _on_before_remove_action(actions_, action, *args, **kwargs):
+    def _on_before_remove_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
         # Changing the enabled state triggers the 'value-changed' event and thus
         # properly keeps the previews in sync after action removal.
@@ -317,11 +317,14 @@ class PreviewsController:
       raw_item_id_to_display = None
     else:
       raw_item_id_to_display = list(setting_value)[0]
-    
+
+    selected_layers_in_image = self._image.list_selected_layers()
+
     if (raw_item_id_to_display is None
         and not self._settings['main/selected_layers'].value[self._image.get_id()]
-        and self._image.active_layer is not None):
-      raw_item_id_to_display = self._image.active_layer.get_id()
+        and selected_layers_in_image):
+      # Use the first selected layer for preview
+      raw_item_id_to_display = selected_layers_in_image[0].get_id()
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items([raw_item_id_to_display])
     else:
