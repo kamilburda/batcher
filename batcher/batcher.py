@@ -38,13 +38,13 @@ def plug_in_export_layers(run_mode, image, *args):
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
   status, _unused = update.update(
-    SETTINGS, 'ask_to_clear' if run_mode == gimpenums.RUN_INTERACTIVE else 'clear')
+    SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
   if status == update.ABORT:
     return
   
-  if run_mode == gimpenums.RUN_INTERACTIVE:
+  if run_mode == Gimp.RunMode.INTERACTIVE:
     _run_export_layers_interactive(layer_tree)
-  elif run_mode == gimpenums.RUN_WITH_LAST_VALS:
+  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     _run_with_last_vals(layer_tree)
   else:
     _run_noninteractive(layer_tree, args)
@@ -66,11 +66,11 @@ def plug_in_export_layers_repeat(run_mode, image):
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
   status, _unused = update.update(
-    SETTINGS, 'ask_to_clear' if run_mode == gimpenums.RUN_INTERACTIVE else 'clear')
+    SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
   if status == update.ABORT:
     return
   
-  if run_mode == gimpenums.RUN_INTERACTIVE:
+  if run_mode == Gimp.RunMode.INTERACTIVE:
     SETTINGS['special/first_plugin_run'].load()
     if SETTINGS['special/first_plugin_run'].value:
       _run_export_layers_interactive(layer_tree)
@@ -119,7 +119,7 @@ def plug_in_export_layers_with_config(run_mode, image, config_filepath):
        pg.setting.Persistor.SUCCESS, pg.setting.Persistor.PARTIAL_SUCCESS]:
     sys.exit(1)
   
-  _run_plugin_noninteractive(gimpenums.RUN_NONINTERACTIVE, layer_tree)
+  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
 
 
 def _run_noninteractive(layer_tree, args):
@@ -130,13 +130,13 @@ def _run_noninteractive(layer_tree, args):
   for setting, arg in zip(main_settings, pg.setting.iter_args(args, main_settings)):
     setting.set_value(arg)
   
-  _run_plugin_noninteractive(gimpenums.RUN_NONINTERACTIVE, layer_tree)
+  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
 
 
 def _run_with_last_vals(layer_tree):
   SETTINGS['main'].load()
   
-  _run_plugin_noninteractive(gimpenums.RUN_WITH_LAST_VALS, layer_tree)
+  _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree)
 
 
 def _run_export_layers_interactive(layer_tree):
