@@ -5,27 +5,19 @@ import functools
 import os
 import traceback
 
-try:
-  import webbrowser
-except ImportError:
-  _webbrowser_module_found = False
-else:
-  _webbrowser_module_found = True
-
 import gi
-from gi.repository import GObject
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import Pango
-
-import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import Pango
 
 import pygimplib as pg
-from pygimplib import pdb
 
 from src import actions
 from src import core
@@ -50,53 +42,64 @@ else:
 
 
 def display_reset_prompt(parent=None, more_settings_shown=False):
-  dialog = gtk.MessageDialog(
+  dialog = Gtk.MessageDialog(
     parent=parent,
-    type=gtk.MESSAGE_WARNING,
-    flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-    buttons=gtk.BUTTONS_YES_NO)
+    message_type=Gtk.MessageType.WARNING,
+    modal=True,
+    destroy_with_parent=True,
+    buttons=Gtk.ButtonsType.YES_NO)
   dialog.set_transient_for(parent)
   dialog.set_title(pg.config.PLUGIN_TITLE)
   
-  dialog.set_markup(
-    GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
+  dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
   
   if more_settings_shown:
-    checkbutton_reset_actions = gtk.CheckButton(
-      label=_('Remove procedures and constraints'), use_underline=False)
-    checkbutton_reset_actions.set_active(True)
+    checkbutton_reset_actions = Gtk.CheckButton(
+      label=_('Remove procedures and constraints'),
+      use_underline=False,
+      active=True,
+    )
     
     dialog.vbox.pack_start(checkbutton_reset_actions, False, False, 0)
+  else:
+    checkbutton_reset_actions = None
   
-  dialog.set_focus(dialog.get_widget_for_response(gtk.RESPONSE_NO))
+  dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
   
   dialog.show_all()
   response_id = dialog.run()
   dialog.destroy()
-  
-  clear_actions = checkbutton_reset_actions.get_active() if more_settings_shown else False
+
+  if checkbutton_reset_actions is not None:
+    clear_actions = checkbutton_reset_actions.get_active()
+  else:
+    clear_actions = False
   
   return response_id, clear_actions
 
 
 @contextlib.contextmanager
 def handle_gui_in_export(run_mode, image, layer, output_filepath, window):
-  should_manipulate_window = run_mode == gimpenums.RUN_INTERACTIVE
+  should_manipulate_window = run_mode == Gimp.RunMode.INTERACTIVE
   
   if should_manipulate_window:
     window_position = window.get_position()
     window.hide()
-  while gtk.events_pending():
-    gtk.main_iteration()
+  else:
+    window_position = None
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
   
   try:
     yield
   finally:
-    if should_manipulate_window:
+    if window_position is not None:
       window.move(*window_position)
       window.show()
-    while gtk.events_pending():
-      gtk.main_iteration()
+
+    while Gtk.events_pending():
+      Gtk.main_iteration()
 
 
 def stop_batcher(batcher):
@@ -108,10 +111,10 @@ def stop_batcher(batcher):
 
 
 def _set_settings(func):
-  """
-  This is a decorator for `Group.apply_gui_values_to_settings()` that prevents
-  the decorated function from being invoked if there are invalid setting
-  values. For the invalid values, an error message is displayed.
+  """Decorator for `Group.apply_gui_values_to_settings()` that prevents the
+  decorated function from being invoked if there are invalid setting values.
+
+  For the invalid values, an error message is displayed.
   
   This decorator is meant to be used in the `ExportLayersDialog` class.
   """
@@ -144,21 +147,22 @@ def _set_settings(func):
 
 def _setup_image_ids_and_directories_and_initial_directory(
       settings, current_directory_setting, current_image):
-  """
-  Set up the initial directory path for the current image according to the
-  following priority list:
+  """Sets up the initial directory path for the current image.
+
+  The path is set according to the following priority list:
   
     1. Last export directory path of the current image
     2. Import directory path of the current image
     3. Last export directory path of any image (i.e. the current value of
-       `'main/output_directory'`)
-    4. The default directory path (default value) for `'main/output_directory'`
+       ``'main/output_directory'``)
+    4. The default directory path (default value) for
+       ``'main/output_directory'``
   
   Notes:
   
-    Directory 3. is set upon loading `'main/output_directory'` from a persistent
-    source.
-    Directory 4. is set upon the instantiation of `'main/output_directory'`.
+    Directory 3. is set upon loading ``'main/output_directory'`` from a
+    persistent source.
+    Directory 4. is set upon the instantiation of ``'main/output_directory'``.
   """
   settings['gui/image_ids_and_directories'].update_image_ids_and_dirpaths()
   
@@ -172,13 +176,14 @@ def _setup_image_ids_and_directories_and_initial_directory(
 
 
 def _update_directory(setting, current_image, current_image_dirpath):
-  """
-  Set the directory path to the setting according to the priority list below:
+  """Sets the directory path to the ``setting``.
+
+  The path is set according to the following priority list:
   
-  1. `current_image_dirpath` if not `None`
-  2. `current_image` - import path of the current image if not `None`
+  1. ``current_image_dirpath`` if not ``None``
+  2. ``current_image`` - import path of the current image if not ``None``
   
-  If update was performed, return `True`, otherwise return `False`.
+  If update was performed, ``True`` is returned, ``False`` otherwise.
   """
   if current_image_dirpath is not None:
     setting.set_value(current_image_dirpath)
@@ -201,9 +206,6 @@ def _setup_output_directory_changed(settings, current_image):
     on_output_directory_changed,
     settings['gui/image_ids_and_directories'],
     current_image.get_id())
-
-
-#===============================================================================
 
 
 class ExportLayersDialog:
@@ -244,7 +246,7 @@ class ExportLayersDialog:
     self._message_setting = None
     self._batcher = None
     self._batcher_for_previews = core.Batcher(
-      gimpenums.RUN_NONINTERACTIVE,
+      Gimp.RunMode.NONINTERACTIVE,
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
@@ -266,7 +268,7 @@ class ExportLayersDialog:
       self._display_inline_message_on_setting_value_error)
     
     if not run_gui_func:
-      gtk.main()
+      Gtk.main()
     else:
       run_gui_func(self, self._dialog, self._settings)
   
@@ -290,7 +292,7 @@ class ExportLayersDialog:
     load_messages = '\n\n'.join(
       message for message in load_result.messages_per_source.values() if message)
     if pg.setting.Persistor.FAIL in load_result.statuses_per_source.values():
-      messages_.display_message(load_messages, gtk.MESSAGE_WARNING)
+      messages_.display_message(load_messages, Gtk.MessageType.WARNING)
     
     _setup_image_ids_and_directories_and_initial_directory(
       self._settings, self._settings['gui/current_directory'], self._image)
@@ -310,22 +312,27 @@ class ExportLayersDialog:
       actions.clear(self._settings['main/constraints'], add_initial_actions=True)
   
   def _init_gui(self):
-    self._dialog = gimpui.Dialog(title=pg.config.PLUGIN_TITLE, role=pg.config.PLUGIN_NAME)
-    self._dialog.set_transient()
+    self._dialog = GimpUi.Dialog(title=pg.config.PLUGIN_TITLE, role=pg.config.PLUGIN_NAME)
     self._dialog.set_default_size(*self._DIALOG_SIZE)
     self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
-    
+
+    GimpUi.window_set_transient(self._dialog)
+
     pg.gui.set_gui_excepthook_parent(self._dialog)
     
-    self._folder_chooser_label = gtk.Label()
+    self._folder_chooser_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
     self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
-    self._folder_chooser_label.set_alignment(0.0, 0.5)
     
-    self._folder_chooser = gtk.FileChooserWidget(action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+    self._folder_chooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
     
-    self._vbox_folder_chooser = gtk.VBox(homogeneous=False)
-    self._vbox_folder_chooser.set_spacing(self._DIALOG_VBOX_SPACING)
+    self._vbox_folder_chooser = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._DIALOG_VBOX_SPACING,
+    )
     self._vbox_folder_chooser.pack_start(
       self._folder_chooser_label,
       False,
@@ -335,43 +342,55 @@ class ExportLayersDialog:
     
     self._init_gui_previews()
     
-    self._preview_label = gtk.Label()
+    self._preview_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
     self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
-    self._preview_label.set_alignment(0.0, 0.5)
     
-    self._hbox_preview_label = gtk.HBox()
-    self._hbox_preview_label.set_border_width(self._PREVIEW_LABEL_BORDER_WIDTH)
+    self._hbox_preview_label = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      border_width=self._PREVIEW_LABEL_BORDER_WIDTH,
+    )
     self._hbox_preview_label.pack_start(self._preview_label, False, False, 0)
     
-    self._vpaned_previews = gtk.VPaned()
-    self._vpaned_previews.pack1(self._name_preview, resize=True, shrink=True)
-    self._vpaned_previews.pack2(self._image_preview, resize=True, shrink=True)
+    self._vpaned_previews = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL)
+    self._vpaned_previews.pack1(self._name_preview, True, True)
+    self._vpaned_previews.pack2(self._image_preview, True, True)
     
-    self._vbox_previews = gtk.VBox()
+    self._vbox_previews = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+    )
     self._vbox_previews.pack_start(self._hbox_preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
     
-    self._frame_previews = gtk.Frame()
-    self._frame_previews.set_shadow_type(gtk.SHADOW_ETCHED_OUT)
+    self._frame_previews = Gtk.Frame(shadow_type=Gtk.ShadowType.ETCHED_OUT)
     self._frame_previews.add(self._vbox_previews)
     
-    self._file_extension_label = gtk.Label()
+    self._file_extension_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
     self._file_extension_label.set_markup(
       '<b>{}:</b>'.format(
         GLib.markup_escape_text(self._settings['main/file_extension'].display_name)))
-    self._file_extension_label.set_alignment(0.0, 0.5)
     
     self._file_extension_entry = pg.gui.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
       maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS)
     self._file_extension_entry.set_activates_default(True)
     
-    self._save_as_label = gtk.Label()
+    self._save_as_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
     self._save_as_label.set_markup('<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
-    self._save_as_label.set_alignment(0.0, 0.5)
     
-    self._dot_label = gtk.Label('.')
-    self._dot_label.set_alignment(0.0, 1.0)
+    self._dot_label = Gtk.Label(
+      label='.',
+      xalign=0.0,
+      yalign=1.0,
+    )
     
     self._filename_pattern_entry = pg.gui.FilenamePatternEntry(
       renamer_.get_field_descriptions(renamer_.FIELDS),
@@ -382,27 +401,32 @@ class ExportLayersDialog:
     
     self._label_message = message_label_.MessageLabel()
     
-    self._hbox_export_name_labels = gtk.HBox(homogeneous=False)
+    self._hbox_export_name_labels = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+    )
     self._hbox_export_name_labels.pack_start(self._file_extension_label, False, False, 0)
     self._hbox_export_name_labels.pack_start(self._save_as_label, False, False, 0)
     
-    self._hbox_export_name_entries = gtk.HBox(homogeneous=False)
-    self._hbox_export_name_entries.set_spacing(self._HBOX_EXPORT_NAME_ENTRIES_SPACING)
-    self._hbox_export_name_entries.pack_start(
-      self._filename_pattern_entry, False, False, 0)
+    self._hbox_export_name_entries = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
+    )
+    self._hbox_export_name_entries.pack_start(self._filename_pattern_entry, False, False, 0)
     self._hbox_export_name_entries.pack_start(self._dot_label, False, False, 0)
     self._hbox_export_name_entries.pack_start(self._file_extension_entry, False, False, 0)
     
-    self._hbox_export_name = gtk.HBox(homogeneous=False)
-    self._hbox_export_name.set_spacing(self._HBOX_EXPORT_LABELS_NAME_SPACING)
+    self._hbox_export_name = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_EXPORT_LABELS_NAME_SPACING,
+    )
     self._hbox_export_name.pack_start(self._hbox_export_name_labels, False, False, 0)
     self._hbox_export_name.pack_start(self._hbox_export_name_entries, False, False, 0)
     
-    self._hbox_export_name_and_message = gtk.HBox(homogeneous=False)
-    self._hbox_export_name_and_message.set_spacing(
-      self._HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING)
-    self._hbox_export_name_and_message.set_border_width(
-      self._HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH)
+    self._hbox_export_name_and_message = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING,
+      border_width=self._HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH,
+    )
     self._hbox_export_name_and_message.pack_start(self._hbox_export_name, False, False, 0)
     self._hbox_export_name_and_message.pack_start(self._label_message, True, True, 0)
     
@@ -420,68 +444,75 @@ class ExportLayersDialog:
       _('Edit Constraint'),
       allow_custom_actions=False)
     
-    self._hbox_actions = gtk.HBox(homogeneous=True)
-    self._hbox_actions.set_spacing(self._MORE_SETTINGS_HORIZONTAL_SPACING)
-    self._hbox_actions.set_border_width(self._MORE_SETTINGS_BORDER_WIDTH)
+    self._hbox_actions = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._MORE_SETTINGS_HORIZONTAL_SPACING,
+      border_width=self._MORE_SETTINGS_BORDER_WIDTH,
+    )
     self._hbox_actions.pack_start(self._box_procedures, True, True, 0)
     self._hbox_actions.pack_start(self._box_constraints, True, True, 0)
     
     self._label_message_for_edit_mode = message_label_.MessageLabel()
     
-    self._vbox_actions_and_message_for_edit_mode = gtk.VBox(homogeneous=False)
+    self._vbox_actions_and_message_for_edit_mode = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+    )
     self._vbox_actions_and_message_for_edit_mode.pack_start(
       self._hbox_actions, True, True, 0)
     self._vbox_actions_and_message_for_edit_mode.pack_start(
       self._label_message_for_edit_mode, False, False, 0)
     
-    self._vbox_chooser_and_settings = gtk.VBox()
-    self._vbox_chooser_and_settings.set_spacing(self._DIALOG_VBOX_SPACING)
+    self._vbox_chooser_and_settings = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._DIALOG_VBOX_SPACING,
+    )
     self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, True, True, 0)
-    self._vbox_chooser_and_settings.pack_start(
-      self._hbox_export_name_and_message, False, False, 0)
+    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name_and_message, False, False, 0)
     
-    self._vpaned_chooser_and_actions = gtk.VPaned()
-    self._vpaned_chooser_and_actions.pack1(
-      self._vbox_chooser_and_settings, resize=True, shrink=False)
+    self._vpaned_chooser_and_actions = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL)
+    self._vpaned_chooser_and_actions.pack1(self._vbox_chooser_and_settings, True, False)
     self._vpaned_chooser_and_actions.pack2(
-      self._vbox_actions_and_message_for_edit_mode, resize=False, shrink=True)
+      self._vbox_actions_and_message_for_edit_mode, False, True)
     
-    self._hpaned_settings_and_previews = gtk.HPaned()
-    self._hpaned_settings_and_previews.pack1(
-      self._vpaned_chooser_and_actions, resize=True, shrink=False)
-    self._hpaned_settings_and_previews.pack2(
-      self._frame_previews, resize=True, shrink=True)
+    self._hpaned_settings_and_previews = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+    self._hpaned_settings_and_previews.pack1(self._vpaned_chooser_and_actions, True, False)
+    self._hpaned_settings_and_previews.pack2(self._frame_previews, True, True)
     
     self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
-    self._button_run.set_flags(gtk.CAN_DEFAULT)
+    self._button_run.set_can_default(True)
     self._button_run.hide()
     
     self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
     self._button_close.hide()
 
-    self._button_stop = gtk.Button()
-    self._button_stop.set_label(_('_Stop'))
+    self._button_stop = Gtk.Button(label=_('_Stop'))
     self._button_stop.set_no_show_all(True)
     
-    self._label_button_settings = gtk.Label(_('_Settings'))
-    self._label_button_settings.set_use_underline(True)
-    
-    self._hbox_button_settings = gtk.HBox()
+    self._label_button_settings = Gtk.Label(
+      label=_('_Settings'),
+      use_underline=True,
+    )
+
+    self._hbox_button_settings = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+    )
     self._hbox_button_settings.pack_start(self._label_button_settings, True, True, 0)
     self._hbox_button_settings.pack_start(
-      gtk.Arrow(Gtk.ArrowType.DOWN, Gtk.ShadowType.IN), False, False, 0)
-    
-    self._button_settings = gtk.Button()
+      Gtk.Arrow(arrow_type=Gtk.ArrowType.DOWN, shadow_type=Gtk.ShadowType.IN),
+      False,
+      False,
+      0)
+    self._button_settings = Gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
     
-    self._menu_item_show_more_settings = gtk.CheckMenuItem(_('Show More Settings'))
-    self._menu_item_edit_mode = gtk.CheckMenuItem(_('Batch Editing'))
-    self._menu_item_save_settings = gtk.MenuItem(_('Save Settings'))
-    self._menu_item_reset_settings = gtk.MenuItem(_('Reset settings'))
-    self._menu_item_import_settings = gtk.MenuItem(_('Import Settings...'))
-    self._menu_item_export_settings = gtk.MenuItem(_('Export Settings...'))
+    self._menu_item_show_more_settings = Gtk.CheckMenuItem(label=_('Show More Settings'))
+    self._menu_item_edit_mode = Gtk.CheckMenuItem(label=_('Batch Editing'))
+    self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
+    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
+    self._menu_item_import_settings = Gtk.MenuItem(label=_('Import Settings...'))
+    self._menu_item_export_settings = Gtk.MenuItem(label=_('Export Settings...'))
     
-    self._menu_settings = gtk.Menu()
+    self._menu_settings = Gtk.Menu()
     self._menu_settings.append(self._menu_item_show_more_settings)
     self._menu_settings.append(self._menu_item_edit_mode)
     self._menu_settings.append(self._menu_item_save_settings)
@@ -493,20 +524,30 @@ class ExportLayersDialog:
     self._dialog.action_area.pack_end(self._button_stop, False, False, 0)
     self._dialog.action_area.pack_start(self._button_settings, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_settings, True)
+
+    self._button_help = Gtk.LinkButton(
+      uri=(
+        pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
+        else pg.config.DOCS_URL),
+      label=_('_Help'),
+    )
+    # Make the button appear like a regular button
+    self._button_help.get_style_context().remove_class('link')
+    self._button_help.unset_state_flags(Gtk.StateFlags.LINK)
+
+    self._dialog.action_area.pack_start(self._button_help, False, False, 0)
+    self._dialog.action_area.set_child_secondary(self._button_help, True)
     
-    if _webbrowser_module_found:
-      self._button_help = gtk.Button()
-      self._button_help.set_label(_('_Help'))
-      self._dialog.action_area.pack_start(self._button_help, False, False, 0)
-      self._dialog.action_area.set_child_secondary(self._button_help, True)
-    
-    self._progress_bar = gtk.ProgressBar()
-    self._progress_bar.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
+    self._progress_bar = Gtk.ProgressBar(
+      ellipsize=Pango.EllipsizeMode.MIDDLE,
+    )
     self._progress_bar.set_no_show_all(True)
     
-    self._hbox_contents = gtk.HBox()
+    self._hbox_contents = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      border_width=self._DIALOG_CONTENTS_BORDER_WIDTH,
+    )
     self._hbox_contents.pack_start(self._hpaned_settings_and_previews, True, True, 0)
-    self._hbox_contents.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
     
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
@@ -522,9 +563,10 @@ class ExportLayersDialog:
     self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
     self._button_close.connect('clicked', self._on_button_close_clicked)
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
-    
-    if _webbrowser_module_found:
-      self._button_help.connect('clicked', self._on_button_help_clicked)
+
+    # Make sure the link button retains the style of a regular button when clicked.
+    self._button_help.connect('clicked', lambda button, *args: button.unset_state_flags(
+      Gtk.StateFlags.VISITED | Gtk.StateFlags.LINK))
     
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
     self._menu_item_show_more_settings.connect(
@@ -569,8 +611,8 @@ class ExportLayersDialog:
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
   
   def _finish_init_and_show(self):
-    while gtk.events_pending():
-      gtk.main_iteration()
+    while Gtk.events_pending():
+      Gtk.main_iteration()
     
     self._dialog.vbox.show_all()
     self._show_hide_more_settings()
@@ -622,8 +664,7 @@ class ExportLayersDialog:
       'selected_in_preview',
       self._settings['main/available_tags'])
     
-    self._image_preview = preview_image_.ImagePreview(
-      self._batcher_for_previews, self._settings)
+    self._image_preview = preview_image_.ImagePreview(self._batcher_for_previews, self._settings)
     
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, self._image)
@@ -711,38 +752,39 @@ class ExportLayersDialog:
   def _save_settings_to_default_location(self):
     save_successful = self._save_settings()
     if save_successful:
-      self._display_inline_message(_('Settings successfully saved.'), gtk.MESSAGE_INFO)
+      self._display_inline_message(_('Settings successfully saved.'), Gtk.MessageType.INFO)
   
   def _reset_settings(self):
     self._settings.reset()
   
   def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
     if action == 'import':
-      dialog_action = gtk.FILE_CHOOSER_ACTION_OPEN
-      button_ok = gtk.STOCK_OPEN
+      dialog_action = Gtk.FileChooserAction.OPEN
+      button_ok = Gtk.STOCK_OPEN
       title = _('Import Settings')
     elif action == 'export':
-      dialog_action = gtk.FILE_CHOOSER_ACTION_SAVE
-      button_ok = gtk.STOCK_SAVE
+      dialog_action = Gtk.FileChooserAction.SAVE
+      button_ok = Gtk.STOCK_SAVE
       title = _('Export Settings')
     else:
       raise ValueError('invalid action; valid values: "import", "export"')
     
-    file_dialog = gtk.FileChooserDialog(
+    file_dialog = Gtk.FileChooserDialog(
       title=title,
       parent=self._dialog,
-      action=dialog_action)
-    
-    file_dialog.set_do_overwrite_confirmation(True)
+      action=dialog_action,
+      do_overwrite_confirmation=True,
+    )
     
     file_dialog.add_buttons(
       button_ok, Gtk.ResponseType.OK,
       Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
 
     if action == 'import':
-      check_button_load_size_settings = gtk.CheckButton(_('Import size-related settings'))
-      check_button_load_size_settings.set_border_width(
-        self._IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH)
+      check_button_load_size_settings = Gtk.CheckButton(
+        label=_('Import size-related settings'),
+        border_width=self._IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH,
+      )
       file_dialog.vbox.pack_start(check_button_load_size_settings, False, False, 0)
     else:
       check_button_load_size_settings = None
@@ -751,7 +793,7 @@ class ExportLayersDialog:
     pickle_file_ext = '.pkl'
     
     if _json_module_found:
-      filter_json = gtk.FileFilter()
+      filter_json = Gtk.FileFilter()
       filter_json.set_name(_('JSON file ({})').format(json_file_ext))
       filter_json.add_mime_type('application/json')
       file_dialog.add_filter(filter_json)
@@ -762,12 +804,12 @@ class ExportLayersDialog:
       default_file_ext = pickle_file_ext
       default_file_format = pickle_file_ext[1:]
     
-    filter_pickle = gtk.FileFilter()
+    filter_pickle = Gtk.FileFilter()
     filter_pickle.set_name(_('Pickle file ({})').format(pickle_file_ext))
     filter_pickle.add_pattern(f'*{pickle_file_ext}')
     file_dialog.add_filter(filter_pickle)
     
-    filter_any = gtk.FileFilter()
+    filter_any = Gtk.FileFilter()
     filter_any.set_name(_('Any file'))
     filter_any.add_pattern('*')
     file_dialog.add_filter(filter_any)
@@ -777,7 +819,7 @@ class ExportLayersDialog:
     response_id = file_dialog.run()
     
     if response_id == Gtk.ResponseType.OK:
-      filepath = pg.utils.safe_decode_gtk(file_dialog.get_filename())
+      filepath = file_dialog.get_filename() if file_dialog.get_filename() is not None else ''
       
       file_ext = os.path.splitext(filepath)[1]
       if add_file_extension_if_missing and not file_ext:
@@ -825,7 +867,8 @@ class ExportLayersDialog:
         self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
         self._name_preview.update)
   
-  def _on_file_extension_entry_focus_out_event(self, entry, event, setting):
+  @staticmethod
+  def _on_file_extension_entry_focus_out_event(entry, event, setting):
     setting.apply_to_gui()
   
   def _on_box_procedures_item_added(self, box_procedures, item):
@@ -878,7 +921,7 @@ class ExportLayersDialog:
   
   def _on_dialog_notify_is_active(self, dialog, property_spec):
     if not self._image.is_valid():
-      gtk.main_quit()
+      Gtk.main_quit()
       return
     
     if self._initial_layer_tree is not None:
@@ -888,8 +931,7 @@ class ExportLayersDialog:
   def _on_image_preview_updated(self, preview, error, update_duration_seconds):
     self._display_warnings_and_tooltips_for_actions()
     
-    if (self._settings[
-         'gui/image_preview_automatic_update_if_below_maximum_duration'].value
+    if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
         and (update_duration_seconds
              >= self._MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS)):
       self._settings['gui/image_preview_automatic_update'].set_value(False)
@@ -899,7 +941,7 @@ class ExportLayersDialog:
           _('Disabling automatic preview update.'),
           _('The preview takes too long to update.'
             ' You may turn automatic updates back on from the menu above the previewed image.')),
-        gtk.MESSAGE_INFO)
+        Gtk.MessageType.INFO)
   
   def _on_name_preview_updated(self, preview, error):
     self._display_warnings_and_tooltips_for_actions(clear_previous=False)
@@ -920,13 +962,13 @@ class ExportLayersDialog:
       clear_previous=clear_previous)
   
   def _on_dialog_key_press_event(self, dialog, event):
-    if gtk.gdk.keyval_name(event.keyval) == 'Escape':
+    if Gdk.keyval_name(event.keyval) == 'Escape':
       stopped = stop_batcher(self._batcher)
       return stopped
     
     # Ctrl + S is pressed
-    if ((event.state & gtk.accelerator_get_default_mod_mask()) == gtk.gdk.CONTROL_MASK
-        and gtk.gdk.keyval_name(gtk.gdk.keyval_to_lower(event.keyval)) == 's'):
+    if ((event.state & Gtk.accelerator_get_default_mod_mask()) == Gdk.ModifierType.CONTROL_MASK
+        and Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)) == 's'):
       self._save_settings_to_default_location()
       return True
     
@@ -947,7 +989,7 @@ class ExportLayersDialog:
       self._save_settings()
       
       if import_successful:
-        self._display_inline_message(_('Settings successfully imported.'), gtk.MESSAGE_INFO)
+        self._display_inline_message(_('Settings successfully imported.'), Gtk.MessageType.INFO)
   
   @_set_settings
   def _on_export_settings_activate(self, menu_item):
@@ -956,14 +998,14 @@ class ExportLayersDialog:
     if filepath is not None:
       export_successful = self._save_settings(filepath, file_format)
       if export_successful:
-        self._display_inline_message(_('Settings successfully exported.'), gtk.MESSAGE_INFO)
+        self._display_inline_message(_('Settings successfully exported.'), Gtk.MessageType.INFO)
   
   def _on_reset_settings_activate(self, menu_item):
     response_id, clear_actions = display_reset_prompt(
       parent=self._dialog,
       more_settings_shown=self._settings['gui/show_more_settings'].value)
     
-    if response_id == gtk.RESPONSE_YES:
+    if response_id == Gtk.ResponseType.YES:
       if clear_actions:
         actions.clear(self._settings['main/procedures'])
         actions.clear(self._settings['main/constraints'])
@@ -980,7 +1022,7 @@ class ExportLayersDialog:
         self._settings['main/procedures'].tags.remove('ignore_reset')
         self._settings['main/constraints'].tags.remove('ignore_reset')
       
-      self._display_inline_message(_('Settings reset.'), gtk.MESSAGE_INFO)
+      self._display_inline_message(_('Settings reset.'), Gtk.MessageType.INFO)
   
   @_set_settings
   def _on_button_run_clicked(self, button, lock_update_key):
@@ -1019,7 +1061,7 @@ class ExportLayersDialog:
       
       if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
         messages_.display_message(
-          _('No layers were exported.'), gtk.MESSAGE_INFO, parent=self._dialog)
+          _('No layers were exported.'), Gtk.MessageType.INFO, parent=self._dialog)
     finally:
       self._name_preview.lock_update(False, lock_update_key)
       self._image_preview.lock_update(False, lock_update_key)
@@ -1039,7 +1081,7 @@ class ExportLayersDialog:
     self._settings['gui'].save(['session'])
     
     if should_quit:
-      gtk.main_quit()
+      Gtk.main_quit()
     else:
       self._restore_gui_after_batch_run()
       progress_updater.reset()
@@ -1064,7 +1106,7 @@ class ExportLayersDialog:
     progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
     
     batcher = core.Batcher(
-      gimpenums.RUN_INTERACTIVE,
+      Gimp.RunMode.INTERACTIVE,
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
@@ -1076,7 +1118,7 @@ class ExportLayersDialog:
     return batcher, overwrite_chooser, progress_updater
   
   def _get_overwrite_dialog_items(self):
-    return list(zip(
+    return dict(zip(
       self._settings['main/overwrite_mode'].items.values(),
       self._settings['main/overwrite_mode'].items_display_names.values()))
   
@@ -1109,27 +1151,22 @@ class ExportLayersDialog:
     if not self._dialog.get_mapped():
       self._dialog.show()
     
-    while gtk.events_pending():
-      gtk.main_iteration()
+    while Gtk.events_pending():
+      Gtk.main_iteration()
   
-  def _on_dialog_delete_event(self, dialog, event):
-    gtk.main_quit()
+  @staticmethod
+  def _on_dialog_delete_event(dialog, event):
+    Gtk.main_quit()
   
-  def _on_button_close_clicked(self, button):
-    gtk.main_quit()
+  @staticmethod
+  def _on_button_close_clicked(button):
+    Gtk.main_quit()
   
   def _on_button_stop_clicked(self, button):
     stop_batcher(self._batcher)
   
-  def _on_button_help_clicked(self, button):
-    if os.path.isfile(pg.config.LOCAL_DOCS_PATH):
-      docs_url = pg.config.LOCAL_DOCS_PATH
-    else:
-      docs_url = pg.config.DOCS_URL
-    
-    webbrowser.open_new_tab(docs_url)
-  
-  def _set_action_skipped_tooltips(self, action_box, skipped_actions, message, clear_previous=True):
+  @staticmethod
+  def _set_action_skipped_tooltips(action_box, skipped_actions, message, clear_previous=True):
     for box_item in action_box.items:
       if not box_item.has_warning():
         if box_item.action.name in skipped_actions:
@@ -1206,27 +1243,30 @@ class ExportLayersRepeatDialog:
     
     pg.gui.set_gui_excepthook_parent(self._dialog)
     
-    gtk.main_iteration()
+    Gtk.main_iteration()
     self.show()
     self.run_batcher()
   
   def _init_gui(self):
-    self._dialog = gimpui.Dialog(title=pg.config.PLUGIN_TITLE, role=None)
-    self._dialog.set_transient()
+    self._dialog = GimpUi.Dialog(title=pg.config.PLUGIN_TITLE, role=None)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
+
+    GimpUi.window_set_transient(self._dialog)
     
-    self._button_stop = gtk.Button()
-    self._button_stop.set_label(_('_Stop'))
+    self._button_stop = Gtk.Button(label=_('_Stop'))
     
-    self._buttonbox = gtk.HButtonBox()
+    self._buttonbox = Gtk.ButtonBox(orientation=Gtk.Orientation.HORIZONTAL)
     self._buttonbox.pack_start(self._button_stop, False, False, 0)
     
-    self._progress_bar = gtk.ProgressBar()
-    self._progress_bar.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
+    self._progress_bar = Gtk.ProgressBar(
+      ellipsize=Pango.EllipsizeMode.MIDDLE,
+    )
     
-    self._hbox_action_area = gtk.HBox(homogeneous=False)
-    self._hbox_action_area.set_spacing(self._HBOX_HORIZONTAL_SPACING)
+    self._hbox_action_area = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_HORIZONTAL_SPACING,
+    )
     self._hbox_action_area.pack_start(self._progress_bar, True, True, 0)
     self._hbox_action_area.pack_end(self._buttonbox, False, False, 0)
     
@@ -1239,7 +1279,7 @@ class ExportLayersRepeatDialog:
     progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
     
     self._batcher = core.Batcher(
-      gimpenums.RUN_WITH_LAST_VALS,
+      Gimp.RunMode.WITH_LAST_VALS,
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
@@ -1256,7 +1296,7 @@ class ExportLayersRepeatDialog:
       pass
     except exceptions.BatcherError as e:
       messages_.display_processing_failure_message(e, parent=self._dialog)
-    except Exception as e:
+    except Exception:
       if self._image.is_valid():
         raise
       else:
@@ -1264,7 +1304,7 @@ class ExportLayersRepeatDialog:
     else:
       if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
         messages_.display_message(
-          _('No layers were exported.'), gtk.MESSAGE_INFO, parent=self._dialog)
+          _('No layers were exported.'), Gtk.MessageType.INFO, parent=self._dialog)
   
   def show(self):
     self._dialog.vbox.show_all()
