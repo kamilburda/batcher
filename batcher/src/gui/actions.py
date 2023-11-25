@@ -473,7 +473,8 @@ class _ActionEditDialog(GimpUi.Dialog):
   def __init__(self, action, pdb_procedure, *args, **kwargs):
     super().__init__(*args, **kwargs)
     
-    self.set_transient()
+    GimpUi.window_set_transient(self)
+
     self.set_resizable(False)
     
     self._button_ok = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
