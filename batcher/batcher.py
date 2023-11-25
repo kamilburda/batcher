@@ -22,15 +22,6 @@ from src.gui import main as gui_main
 SETTINGS = settings_main.create_settings()
 
 
-@pg.procedure(
-  blurb=_('Export layers as separate images'),
-  author=pg.config.AUTHOR_NAME,
-  copyright_notice=pg.config.AUTHOR_NAME,
-  date=pg.config.COPYRIGHT_YEARS,
-  menu_name=_('E_xport Layers...'),
-  menu_path='<Image>/File/Export',
-  parameters=[SETTINGS['special'], SETTINGS['main']]
-)
 def plug_in_export_layers(run_mode, image, *args):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
@@ -50,18 +41,6 @@ def plug_in_export_layers(run_mode, image, *args):
     _run_noninteractive(layer_tree, args)
 
 
-@pg.procedure(
-  blurb=_('Run "{}" with the last values specified').format(pg.config.PLUGIN_TITLE),
-  description=_(
-    'If the plug-in is run for the first time (i.e. no last values exist),'
-    ' default values will be used.'),
-  author=pg.config.AUTHOR_NAME,
-  copyright_notice=pg.config.AUTHOR_NAME,
-  date=pg.config.COPYRIGHT_YEARS,
-  menu_name=_('E_xport Layers (repeat)'),
-  menu_path='<Image>/File/Export',
-  parameters=[SETTINGS['special']]
-)
 def plug_in_export_layers_repeat(run_mode, image):
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
@@ -80,21 +59,6 @@ def plug_in_export_layers_repeat(run_mode, image):
     _run_with_last_vals(layer_tree)
 
 
-@pg.procedure(
-  blurb=_('Run "{}" with the specified configuration file').format(pg.config.PLUGIN_TITLE),
-  description=_(
-    'The configuration file can be obtained by exporting settings'
-    " in the plug-in's interactive dialog."
-    ' This procedure will fail if the specified configuration file does not exist'
-    ' or is not valid.'),
-  author=pg.config.AUTHOR_NAME,
-  copyright_notice=pg.config.AUTHOR_NAME,
-  date=pg.config.COPYRIGHT_YEARS,
-  parameters=[
-    SETTINGS['special/run_mode'],
-    SETTINGS['special/image'],
-    pg.setting.StringSetting(name='config_filepath', display_name=_('Path to configuration file'))]
-)
 def plug_in_export_layers_with_config(run_mode, image, config_filepath):
   if not config_filepath or not os.path.isfile(config_filepath):
     sys.exit(1)
@@ -157,5 +121,45 @@ def _run_plugin_noninteractive(run_mode, layer_tree):
     pass
 
 
-if __name__ == '__main__':
-  pg.main()
+pg.register_procedure(
+  plug_in_export_layers,
+  arguments=pg.setting.create_params(SETTINGS['special'], SETTINGS['main']),
+  menu_label=_('E_xport Layers...'),
+  menu_path='<Image>/File/Export',
+  documentation=(_('Export layers as separate images'), ''),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_export_layers_repeat,
+  arguments=pg.setting.create_params(SETTINGS['special']),
+  menu_label=_('E_xport Layers (repeat)'),
+  menu_path='<Image>/File/Export',
+  documentation=(
+    _('Run "{}" with the last values specified').format(pg.config.PLUGIN_TITLE),
+    _('If the plug-in is run for the first time (i.e. no last values exist),'
+      ' default values will be used.'),
+  ),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_export_layers_with_config,
+  arguments=pg.setting.create_params(
+    SETTINGS['special/run_mode'],
+    SETTINGS['special/image'],
+    pg.setting.StringSetting(name='config_filepath', display_name=_('Path to configuration file')),
+  ),
+  documentation=(
+    _('Run "{}" with the specified configuration file').format(pg.config.PLUGIN_TITLE),
+    _('The configuration file can be obtained by exporting settings'
+      " in the plug-in's interactive dialog."
+      ' This procedure will fail if the specified configuration file does not exist'
+      ' or is not valid.')
+  ),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+pg.main()
