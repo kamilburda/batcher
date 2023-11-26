@@ -30,7 +30,7 @@ def create_settings():
         # from the other settings.
         'name': 'special',
         'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-        'setting_attributes': {'gui_type': None},
+        'setting_attributes': {'pdb_type': None, 'gui_type': None},
       },
       {
         'name': 'main',
@@ -44,20 +44,15 @@ def create_settings():
       'type': 'enum',
       'name': 'run_mode',
       'enum_type': Gimp.RunMode,
-      'default_value': Gimp.RunMode.NONINTERACTIVE,
-      'display_name': _('The run mode'),
     },
     {
       'type': 'image',
       'name': 'image',
-      'default_value': None,
-      'display_name': _('Image'),
     },
     {
       'type': 'bool',
       'name': 'first_plugin_run',
       'default_value': True,
-      'pdb_type': None,
       'setting_sources': ['session'],
     },
   ])

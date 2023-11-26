@@ -22,7 +22,7 @@ from src.gui import main as gui_main
 SETTINGS = settings_main.create_settings()
 
 
-def plug_in_export_layers(run_mode, image, *args):
+def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, *args):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
   
@@ -41,7 +41,10 @@ def plug_in_export_layers(run_mode, image, *args):
     _run_noninteractive(layer_tree, args)
 
 
-def plug_in_export_layers_repeat(run_mode, image):
+def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _drawables):
+  SETTINGS['special/run_mode'].set_value(run_mode)
+  SETTINGS['special/image'].set_value(image)
+
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
   
   status, _unused = update.update(
@@ -59,7 +62,11 @@ def plug_in_export_layers_repeat(run_mode, image):
     _run_with_last_vals(layer_tree)
 
 
-def plug_in_export_layers_with_config(run_mode, image, config_filepath):
+def plug_in_export_layers_with_config(
+      _procedure, run_mode, image, _n_drawables, _drawables, config_filepath):
+  SETTINGS['special/run_mode'].set_value(run_mode)
+  SETTINGS['special/image'].set_value(image)
+
   if not config_filepath or not os.path.isfile(config_filepath):
     sys.exit(1)
   
@@ -123,7 +130,7 @@ def _run_plugin_noninteractive(run_mode, layer_tree):
 
 pg.register_procedure(
   plug_in_export_layers,
-  arguments=pg.setting.create_params(SETTINGS['special'], SETTINGS['main']),
+  arguments=pg.setting.create_params(SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
   documentation=(_('Export layers as separate images'), ''),
@@ -133,7 +140,6 @@ pg.register_procedure(
 
 pg.register_procedure(
   plug_in_export_layers_repeat,
-  arguments=pg.setting.create_params(SETTINGS['special']),
   menu_label=_('E_xport Layers (repeat)'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
   documentation=(
@@ -148,8 +154,6 @@ pg.register_procedure(
 pg.register_procedure(
   plug_in_export_layers_with_config,
   arguments=pg.setting.create_params(
-    SETTINGS['special/run_mode'],
-    SETTINGS['special/image'],
     pg.setting.StringSetting(name='config_filepath', display_name=_('Path to configuration file')),
   ),
   documentation=(
