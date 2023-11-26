@@ -202,6 +202,8 @@ class NamePreview(preview_base_.Preview):
       return None
   
   def _init_gui(self):
+    self.set_orientation(Gtk.Orientation.VERTICAL)
+
     self._tree_model = Gtk.TreeStore(*[column[1] for column in self._COLUMNS])
     
     self._tree_view = Gtk.TreeView(
@@ -243,7 +245,7 @@ class NamePreview(preview_base_.Preview):
     )
     self._scrolled_window.add(self._tree_view)
     
-    self.pack_start(self._scrolled_window, False, False, 0)
+    self.pack_start(self._scrolled_window, True, True, 0)
     
     self._tree_view.connect('row-collapsed', self._on_tree_view_row_collapsed)
     self._tree_view.connect('row-expanded', self._on_tree_view_row_expanded)

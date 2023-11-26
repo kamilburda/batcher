@@ -338,7 +338,7 @@ class ExportLayersDialog:
       False,
       False,
       self._SAVE_IN_FOLDER_LABEL_PADDING)
-    self._vbox_folder_chooser.pack_start(self._folder_chooser, False, False, 0)
+    self._vbox_folder_chooser.pack_start(self._folder_chooser, True, True, 0)
     
     self._init_gui_previews()
     
@@ -530,6 +530,7 @@ class ExportLayersDialog:
         pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
         else pg.config.DOCS_URL),
       label=_('_Help'),
+      use_underline=True,
     )
     # Make the button appear like a regular button
     self._button_help.get_style_context().remove_class('link')

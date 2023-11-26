@@ -480,7 +480,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._button_ok = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
     self._button_cancel = self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
     
-    self._button_reset = Gtk.Button(label=_('_Reset'))
+    self._button_reset = Gtk.Button(label=_('_Reset'), use_underline=True)
     self.action_area.pack_start(self._button_reset, False, False, 0)
     self.action_area.set_child_secondary(self._button_reset, True)
     
@@ -544,7 +544,7 @@ class _ActionEditDialog(GimpUi.Dialog):
   def _create_label_description(summary, full_description=None):
     label_description = Gtk.Label(
       label=summary,
-      line_wrap=True,
+      wrap=True,
       xalign=0.0,
       yalign=0.5,
     )

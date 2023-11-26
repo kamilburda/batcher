@@ -255,6 +255,8 @@ class ImagePreview(preview_base_.Preview):
     self.emit('preview-updated', error, update_duration_seconds)
   
   def _init_gui(self):
+    self.set_orientation(Gtk.Orientation.VERTICAL)
+
     self._button_menu = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
 
     arrow = Gtk.Arrow(

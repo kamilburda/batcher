@@ -107,7 +107,7 @@ class MessageLabel(Gtk.Box):
     )
     
     self._label_button_more = Gtk.Label(
-      text=_('_More'),
+      label=_('_More'),
       use_underline=True,
     )
     
