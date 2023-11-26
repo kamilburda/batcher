@@ -137,7 +137,7 @@ pg.register_procedure(
   menu_label=_('E_xport Layers (repeat)'),
   menu_path='<Image>/File/Batch',
   documentation=(
-    _('Run "{}" with the last values specified').format(pg.config.PLUGIN_TITLE),
+    _('Export layers as separate images instantly'),
     _('If the plug-in is run for the first time (i.e. no last values exist),'
       ' default values will be used.'),
   ),
@@ -153,7 +153,7 @@ pg.register_procedure(
     pg.setting.StringSetting(name='config_filepath', display_name=_('Path to configuration file')),
   ),
   documentation=(
-    _('Run "{}" with the specified configuration file').format(pg.config.PLUGIN_TITLE),
+    _('Export layers with the specified configuration file'),
     _('The configuration file can be obtained by exporting settings'
       " in the plug-in's interactive dialog."
       ' This procedure will fail if the specified configuration file does not exist'
