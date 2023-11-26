@@ -125,7 +125,7 @@ pg.register_procedure(
   plug_in_export_layers,
   arguments=pg.setting.create_params(SETTINGS['special'], SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
-  menu_path='<Image>/File/Batch',
+  menu_path='<Image>/File/{}'.format(_('Batch')),
   documentation=(_('Export layers as separate images'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
@@ -135,7 +135,7 @@ pg.register_procedure(
   plug_in_export_layers_repeat,
   arguments=pg.setting.create_params(SETTINGS['special']),
   menu_label=_('E_xport Layers (repeat)'),
-  menu_path='<Image>/File/Batch',
+  menu_path='<Image>/File/{}'.format(_('Batch')),
   documentation=(
     _('Export layers as separate images instantly'),
     _('If the plug-in is run for the first time (i.e. no last values exist),'
