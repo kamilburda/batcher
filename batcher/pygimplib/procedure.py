@@ -23,6 +23,7 @@ _USE_LOCALE = False
 
 def register_procedure(
       procedure: Callable,
+      procedure_type: Gimp.Procedure = Gimp.ImageProcedure,
       arguments: Optional[List[Union[Dict, str]]] = None,
       return_values: Optional[List[Union[Dict, str]]] = None,
       menu_label: Optional[str] = None,
@@ -53,6 +54,12 @@ def register_procedure(
 
   Args:
     procedure: The function to register.
+    procedure_type:
+      Type of procedure to create. Can be `Gimp.Procedure` or any of its
+      subclasses, depending on the intended usage of the GIMP procedure to be
+      registered. If ``procedure_type`` is `Gimp.ImageProcedure`, several PDB
+      arguments will be pre-filled (see the documentation for
+      `Gimp.ImageProcedure` for more information).
     arguments: List of arguments (procedure parameters).
       Each list element must either be a dictionary or a string.
       The dictionary must contain the ``'name'`` key representing the argument
@@ -153,6 +160,7 @@ def register_procedure(
 
   proc_dict = _PROCEDURE_NAMES_AND_DATA[proc_name]
   proc_dict['procedure'] = procedure
+  proc_dict['procedure_type'] = procedure_type
   proc_dict['arguments'] = _parse_and_check_parameters(arguments)
   proc_dict['return_values'] = _parse_and_check_parameters(return_values)
   proc_dict['menu_label'] = menu_label
@@ -267,11 +275,12 @@ def _do_create_procedure(plugin_instance, proc_name):
   else:
     return None
 
-  procedure = Gimp.Procedure.new(
+  procedure = proc_dict['procedure_type'].new(
     plugin_instance,
     proc_name,
     Gimp.PDBProcType.PLUGIN,
-    _get_procedure_wrapper(proc_dict['procedure'], proc_dict['init_ui']),
+    _get_procedure_wrapper(
+      proc_dict['procedure'], proc_dict['procedure_type'], proc_dict['init_ui']),
     proc_dict['run_data'])
 
   if proc_dict['arguments'] is not None:
@@ -323,10 +332,16 @@ def _disable_locale(plugin_instance, name):
   return False
 
 
-def _get_procedure_wrapper(func, init_ui):
+def _get_procedure_wrapper(func, procedure_type, init_ui):
   @functools.wraps(func)
-  def func_wrapper(procedure, args, run_data):
-    run_mode = args.index(0)
+  def func_wrapper(procedure, *procedure_args):
+    if procedure_type == Gimp.ImageProcedure:
+      run_mode, image, n_drawables, drawables, args, run_data = procedure_args
+    else:
+      run_mode, args, run_data = procedure_args
+      image = None
+      n_drawables = 0
+      drawables = None
 
     config = procedure.create_config()
     config.begin_run(None, run_mode, args)
@@ -335,7 +350,11 @@ def _get_procedure_wrapper(func, init_ui):
     if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
       GimpUi.init(procedure.get_name())
 
-    func_args = [procedure, run_mode, config]
+    if procedure_type == Gimp.ImageProcedure:
+      func_args = [procedure, run_mode, image, n_drawables, drawables, config]
+    else:
+      func_args = [procedure, run_mode, config]
+
     if run_data is not None:
       func_args.append(run_data)
 
