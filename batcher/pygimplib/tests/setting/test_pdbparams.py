@@ -72,7 +72,7 @@ class TestCreateParams(unittest.TestCase):
       params[2],
       dict(
         name='coordinates',
-        type=Gimp.FloatArray.__gtype__,
+        type=Gimp.FloatArray,
         nick='Coordinates',
         blurb='Coordinates',
       ))

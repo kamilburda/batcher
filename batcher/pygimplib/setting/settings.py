@@ -220,7 +220,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self._display_name = utils_.get_processed_display_name(display_name, self._name)
     self._description = utils_.get_processed_description(description, self._display_name)
-    
+
     self._pdb_type = self._get_pdb_type(pdb_type)
     self._pdb_name = utils_.get_pdb_name(self._name)
     
@@ -327,7 +327,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return self._description
   
   @property
-  def pdb_type(self) -> Union[GObject.GType, None]:
+  def pdb_type(self) -> Union[GObject.GType, Type[GObject.GObject], None]:
     """GIMP PDB parameter type.
     
     Use this property when registering the setting as a plug-in parameter to the
@@ -377,11 +377,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     methods in the `setting` package.
     """
     return self._tags
-  
-  @classmethod
-  def get_allowed_pdb_types(cls) -> List[GObject.GType]:
-    """Returns the list of allowed PDB types for this setting type."""
-    return list(cls._ALLOWED_PDB_TYPES)
   
   @classmethod
   def get_allowed_gui_types(cls) -> List[Type[presenter_.Presenter]]:
@@ -782,10 +777,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     if processed_pdb_type is None:
       return None
 
-    if hasattr(processed_pdb_type, '__gtype__'):
-      processed_pdb_type = processed_pdb_type.__gtype__
-
-    if processed_pdb_type in self._ALLOWED_PDB_TYPES:
+    if self._is_pdb_type_allowed(processed_pdb_type):
       return processed_pdb_type
     else:
       raise ValueError(
@@ -797,7 +789,19 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       return self._ALLOWED_PDB_TYPES[0]
     else:
       return None
-  
+
+  def _is_pdb_type_allowed(self, pdb_type):
+    allowed_gtypes = [
+      allowed_type.__gtype__ if hasattr(allowed_type, '__gtype__') else allowed_type
+      for allowed_type in self._ALLOWED_PDB_TYPES]
+
+    if hasattr(pdb_type, '__gtype__'):
+      gtype = pdb_type.__gtype__
+    else:
+      gtype = pdb_type
+
+    return gtype in allowed_gtypes
+
   def _get_gui_type(self, gui_type):
     gui_type_to_return = None
     
@@ -1572,7 +1576,7 @@ class ImageSetting(Setting):
   * ``'invalid_value'``: The image assigned is invalid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Image.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Image]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.image_combo_box]
   
@@ -1677,7 +1681,7 @@ class ItemSetting(GimpItemSetting):
   * ``'invalid_value'``: The item assigned is not valid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Item.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Item]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.item_combo_box]
   
@@ -1703,7 +1707,7 @@ class DrawableSetting(GimpItemSetting):
   * ``'invalid_value'``: The drawable assigned is not valid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Drawable.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Drawable]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.drawable_combo_box]
   
@@ -1729,7 +1733,7 @@ class LayerSetting(GimpItemSetting):
   * ``'invalid_value'``: The layer assigned is not valid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Layer.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Layer]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_combo_box]
   
@@ -1755,7 +1759,7 @@ class TextLayerSetting(GimpItemSetting):
   * ``'invalid_value'``: The text layer assigned is not valid.
   """
 
-  _ALLOWED_PDB_TYPES = [Gimp.TextLayer.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.TextLayer]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.text_layer_combo_box]
 
@@ -1785,7 +1789,7 @@ class LayerMaskSetting(GimpItemSetting):
   * ``'invalid_value'``: The layer mask assigned is not valid.
   """
 
-  _ALLOWED_PDB_TYPES = [Gimp.LayerMask.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.LayerMask]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_mask_combo_box]
 
@@ -1829,7 +1833,7 @@ class ChannelSetting(GimpItemSetting):
   * ``'invalid_value'``: The channel assigned is not valid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Channel.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Channel]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.channel_combo_box]
   
@@ -1859,7 +1863,7 @@ class SelectionSetting(ChannelSetting):
   * ``'invalid_value'``: The channel assigned is not valid.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Selection.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Selection]
 
   _ALLOWED_GUI_TYPES = []
 
@@ -1876,7 +1880,7 @@ class VectorsSetting(GimpItemSetting):
   
   _ALIASES = ['path']
   
-  _ALLOWED_PDB_TYPES = [Gimp.Vectors.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Vectors]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.vectors_combo_box]
   
@@ -1906,7 +1910,7 @@ class ColorSetting(Setting):
 
   _ALIASES = ['rgb', 'RGB']
 
-  _ALLOWED_PDB_TYPES = [Gimp.RGB.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.RGB]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
 
@@ -1956,7 +1960,7 @@ class DisplaySetting(Setting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Display.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Display]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.display_spin_button]
 
@@ -2006,7 +2010,7 @@ class ParasiteSetting(Setting):
   empty as that will lead to an error on instantiation.
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Parasite.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Parasite]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_box]
 
@@ -2157,7 +2161,7 @@ class FileSetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_path('')
 
-  _ALLOWED_PDB_TYPES = [Gio.File.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gio.File]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_file_entry]
 
@@ -2194,7 +2198,7 @@ class BytesSetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = GLib.Bytes.new()
 
-  _ALLOWED_PDB_TYPES = [GLib.Bytes.__gtype__]
+  _ALLOWED_PDB_TYPES = [GLib.Bytes]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_bytes_entry]
 
@@ -2304,7 +2308,7 @@ class BrushSetting(GimpResourceSetting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Brush.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Brush]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.brush_select_button]
 
@@ -2342,7 +2346,7 @@ class FontSetting(GimpResourceSetting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Font.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Font]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.font_select_button]
 
@@ -2365,7 +2369,7 @@ class GradientSetting(GimpResourceSetting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Gradient.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Gradient]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.gradient_select_button]
 
@@ -2388,7 +2392,7 @@ class PaletteSetting(GimpResourceSetting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Palette.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Palette]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.palette_select_button]
 
@@ -2420,7 +2424,7 @@ class PatternSetting(GimpResourceSetting):
   * ``None``
   """
   
-  _ALLOWED_PDB_TYPES = [Gimp.Pattern.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Pattern]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.pattern_select_button]
 
@@ -2440,7 +2444,7 @@ class UnitSetting(IntSetting):
   Default value: 0
   """
 
-  _ALLOWED_PDB_TYPES = [Gimp.Unit.__gtype__]
+  _ALLOWED_PDB_TYPES = [Gimp.Unit]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
@@ -2529,9 +2533,9 @@ class ArraySetting(Setting):
 
   _NATIVE_ARRAY_PDB_TYPES: Dict[Type[Setting], Tuple[GObject.GType, GObject.GType]]
   _NATIVE_ARRAY_PDB_TYPES = {
-    IntSetting: (Gimp.Int32Array.__gtype__, GObject.TYPE_INT),
-    FloatSetting: (Gimp.FloatArray.__gtype__, GObject.TYPE_DOUBLE),
-    ColorSetting: (Gimp.RGBArray.__gtype__, Gimp.RGB),
+    IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
+    FloatSetting: (Gimp.FloatArray, GObject.TYPE_DOUBLE),
+    ColorSetting: (Gimp.RGBArray, Gimp.RGB),
     StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
 
@@ -2872,15 +2876,15 @@ class ArraySetting(Setting):
   def _get_default_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0]
-    elif self._is_element_pdb_type_gtype():
-      return Gimp.ObjectArray.__gtype__
+    elif self._reference_element.can_be_registered_to_pdb():
+      return Gimp.ObjectArray
     else:
       return None
 
   def _get_default_element_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][1]
-    elif self._is_element_pdb_type_gtype():
+    elif self._reference_element.can_be_registered_to_pdb():
       return self._reference_element.pdb_type
     else:
       return None
@@ -2924,17 +2928,12 @@ class ArraySetting(Setting):
       return array.get_boxed()
     elif self.element_type == StringSetting:
       return values
-    elif self._is_element_pdb_type_gtype():
+    elif self._reference_element.can_be_registered_to_pdb():
       array = GObject.Value(Gimp.ObjectArray)
       Gimp.value_set_object_array(array, self._reference_element.pdb_type, values)
       return array.get_boxed()
     else:
       return values
-
-  def _is_element_pdb_type_gtype(self):
-    return (
-      self._reference_element.can_be_registered_to_pdb()
-      and isinstance(self._reference_element.pdb_type, GObject.GType))
 
 
 class ContainerSetting(Setting):
