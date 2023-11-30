@@ -57,9 +57,9 @@ class EditableLabel(Gtk.Box):
     
     self._entry.hide()
     
-    self.pack_start(self._hbox, False, False, 0)
-    self.pack_start(self._entry, False, False, 0)
-    
+    self.pack_start(self._hbox, True, True, 0)
+    self.pack_start(self._entry, True, True, 0)
+
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
     self._entry.connect('activate', self._on_entry_finished_editing)
     self._entry.connect('focus-out-event', self._on_entry_finished_editing)
