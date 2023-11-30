@@ -323,10 +323,8 @@ class PreviewsController:
     if (raw_item_id_to_display is None
         and not self._settings['main/selected_layers'].value[self._image.get_id()]
         and selected_layers_in_image):
-      # Use the first selected layer for preview
-      raw_item_id_to_display = selected_layers_in_image[0].get_id()
       # This triggers an event that updates the image preview as well.
-      self._name_preview.set_selected_items([raw_item_id_to_display])
+      self._name_preview.set_selected_items([layer.get_id() for layer in selected_layers_in_image])
     else:
       self._image_preview.update_item(raw_item_id_to_display)
       self._image_preview.update()
