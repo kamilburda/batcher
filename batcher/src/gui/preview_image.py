@@ -57,7 +57,7 @@ class ImagePreview(preview_base_.Preview):
   _MANUAL_UPDATE_LOCK = '_manual_update'
   
   _WIDGET_SPACING = 5
-  _BORDER_WIDTH = 6
+  _BORDER_WIDTH = 0
   _PREVIEW_ALPHA_CHECK_SIZE = 4
   
   def __init__(self, batcher, settings):
