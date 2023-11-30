@@ -467,6 +467,7 @@ class _ActionEditDialog(GimpUi.Dialog):
   
   _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING = 5
   
+  _MORE_OPTIONS_PADDING = 4
   _MORE_OPTIONS_SPACING = 4
   _MORE_OPTIONS_BORDER_WIDTH = 4
   
@@ -529,7 +530,8 @@ class _ActionEditDialog(GimpUi.Dialog):
     if self._label_procedure_description is not None:
       self._vbox.pack_start(self._label_procedure_description, False, False, 0)
     self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
-    self._vbox.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
+    self._vbox.pack_start(
+      action['more_options_expanded'].gui.widget, False, False, self._MORE_OPTIONS_PADDING)
     
     self.vbox.pack_start(self._vbox, False, False, 0)
     
