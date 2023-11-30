@@ -36,7 +36,7 @@ class ItemBox(Gtk.ScrolledWindow):
   Each item is an instance of the `ItemBoxItem` class or one of its subclasses.
   """
   
-  ITEM_SPACING = 4
+  ITEM_SPACING = 3
   VBOX_SPACING = 4
   
   def __init__(self, item_spacing: int = ITEM_SPACING, **kwargs):
