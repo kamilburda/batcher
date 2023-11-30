@@ -59,6 +59,7 @@ class NamePreview(preview_base_.Preview):
   
   _COLUMNS = (
     _COLUMN_ICON_ITEM,
+    _COLUMN_ICON_ITEM_VISIBLE,
     _COLUMN_ICON_TAG_VISIBLE,
     _COLUMN_ITEM_NAME_SENSITIVE,
     _COLUMN_ITEM_NAME,
@@ -67,9 +68,10 @@ class NamePreview(preview_base_.Preview):
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
     [2, GObject.TYPE_BOOLEAN],
-    [3, GObject.TYPE_STRING],
-    [4, GObject.TYPE_INT],
-    [5, GObject.TYPE_INT])
+    [3, GObject.TYPE_BOOLEAN],
+    [4, GObject.TYPE_STRING],
+    [5, GObject.TYPE_INT],
+    [6, GObject.TYPE_INT])
   
   def __init__(
         self,
@@ -102,8 +104,7 @@ class NamePreview(preview_base_.Preview):
     self._clearing_preview = False
     self._row_select_interactive = True
     self._initial_scroll_to_selection = True
-    
-    self._icon_image_filepath = os.path.join(pg.config.PLUGIN_DIRPATH, 'images', 'icon_image.png')
+
     self._icon_tag_filepath = os.path.join(pg.config.PLUGIN_DIRPATH, 'images', 'icon_tag.png')
     
     self._init_gui()
@@ -210,6 +211,7 @@ class NamePreview(preview_base_.Preview):
       model=self._tree_model,
       headers_visible=False,
       enable_search=False,
+      enable_tree_lines=True,
     )
     self._tree_view.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
     
@@ -221,7 +223,11 @@ class NamePreview(preview_base_.Preview):
     
     cell_renderer_icon_item = Gtk.CellRendererPixbuf()
     column.pack_start(cell_renderer_icon_item, False)
-    column.set_attributes(cell_renderer_icon_item, pixbuf=self._COLUMN_ICON_ITEM[0])
+    column.set_attributes(
+      cell_renderer_icon_item,
+      pixbuf=self._COLUMN_ICON_ITEM[0],
+      visible=self._COLUMN_ICON_ITEM_VISIBLE[0],
+    )
     
     cell_renderer_icon_tag = Gtk.CellRendererPixbuf()
     cell_renderer_icon_tag.set_property('pixbuf', self._icons['tag'])
@@ -256,36 +262,9 @@ class NamePreview(preview_base_.Preview):
     self._icons = {}
     self._icons['folder'] = self._tree_view.render_icon_pixbuf(
       Gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU)
-    self._icons['item'] = GdkPixbuf.Pixbuf.new_from_file_at_size(
-      self._icon_image_filepath, -1, self._icons['folder'].props.height)
     self._icons['tag'] = GdkPixbuf.Pixbuf.new_from_file_at_size(
       self._icon_tag_filepath, -1, self._icons['folder'].props.height)
-    
-    self._icons['group'] = self._icons['item'].copy()
-    
-    scaling_factor = 0.8
-    width_unscaled = self._icons['folder'].props.width
-    width = int(width_unscaled * scaling_factor)
-    height_unscaled = self._icons['folder'].props.height
-    height = int(height_unscaled * scaling_factor)
-    x_offset_unscaled = self._icons['group'].props.width - self._icons['folder'].props.width
-    x_offset = x_offset_unscaled + width_unscaled - width
-    y_offset_unscaled = self._icons['group'].props.height - self._icons['folder'].props.height
-    y_offset = y_offset_unscaled + height_unscaled - height
-    
-    self._icons['folder'].composite(
-      self._icons['group'],
-      x_offset,
-      y_offset,
-      width,
-      height,
-      x_offset,
-      y_offset,
-      scaling_factor,
-      scaling_factor,
-      GdkPixbuf.InterpType.BILINEAR,
-      255)
-  
+
   def _init_tags_menu(self):
     self._tags_menu_items = {}
     self._tags_remove_submenu_items = {}
@@ -608,10 +587,13 @@ class NamePreview(preview_base_.Preview):
       parent_tree_iter = self._tree_iters[self._get_key(item.parent)]
     else:
       parent_tree_iter = None
+
+    item_icon = self._get_icon_from_item(item)
     
     tree_iter = self._tree_model.append(
       parent_tree_iter,
-      [self._get_icon_from_item(item),
+      [item_icon,
+       item_icon is not None,
        bool(item.tags),
        True,
        item.name,
@@ -678,11 +660,7 @@ class NamePreview(preview_base_.Preview):
         processed_parents.add(parent)
   
   def _get_icon_from_item(self, item):
-    if item.type == pg.itemtree.TYPE_ITEM:
-      return self._icons['item']
-    elif item.type == pg.itemtree.TYPE_GROUP:
-      return self._icons['group']
-    elif item.type == pg.itemtree.TYPE_FOLDER:
+    if item.type == pg.itemtree.TYPE_FOLDER:
       return self._icons['folder']
     else:
       return None
