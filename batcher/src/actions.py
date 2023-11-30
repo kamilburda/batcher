@@ -608,6 +608,9 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     if placeholder_type_name is not None:
       arguments_dict['type'] = placeholder_type_name
 
+    if setting_type == pg.setting.BoolSetting:
+      arguments_dict['gui_type'] = 'check_button_no_text'
+
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
       arguments_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
     
