@@ -266,7 +266,7 @@ class ImagePreview(preview_base_.Preview):
     self._button_menu.add(arrow)
     
     self._menu_item_update_automatically = Gtk.CheckMenuItem(
-      label=_('Update Preview Automatically'),
+      label=_('Update Image Preview Automatically'),
       active=True,
     )
     
