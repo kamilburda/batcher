@@ -628,8 +628,11 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
         dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
         dict(
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
-      blurb='Saves files in PNG file format')
+      blurb='Saves files in PNG file format',
+      menu_label='Save as _PNG...',
+    )
 
+    actions_.pdb.remove_from_cache(self.procedure_name)
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
   
   def test_add_pdb_procedure(self, mock_get_pdb):
@@ -641,7 +644,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['function'].value, 'file-png-save')
     self.assertTrue(action['origin'].is_item('gimp_pdb'))
     self.assertEqual(action['enabled'].value, True)
-    self.assertEqual(action['display_name'].value, self.procedure_stub.get_name())
+    self.assertEqual(action['display_name'].value, 'Save as PNG')
     self.assertEqual(action['action_groups'].value, [actions_.DEFAULT_PROCEDURES_GROUP])
     
     self.assertEqual(action['arguments/run-mode'].gui.get_visible(), False)

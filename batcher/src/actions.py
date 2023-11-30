@@ -566,19 +566,31 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     while True:
       yield f'-{i}'
       i += 1
-  
+
+  def _get_pdb_procedure_display_name(proc):
+    menu_label = proc.get_menu_label()
+    if menu_label:
+      menu_label = menu_label.replace('_', '')
+      if menu_label.endswith('...'):
+        menu_label = menu_label[:-len('...')]
+
+      return menu_label
+    else:
+      return proc.get_name()
+
   action_dict = {
     'name': pdb_procedure_name,
     'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
-    'display_name': pdb_procedure_name,
     'display_options_on_create': True,
   }
   
   pdb_procedure_argument_names = []
 
   pdb_procedure = pdb[pdb_procedure_name].info
+
+  action_dict['display_name'] = _get_pdb_procedure_display_name(pdb_procedure)
   
   for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
     retval = pg.setting.get_setting_type_from_gtype(proc_arg.value_type, proc_arg)

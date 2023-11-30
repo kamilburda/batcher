@@ -51,12 +51,14 @@ class PdbProcedureStub:
         arguments_spec=None,
         return_vals_spec=None,
         blurb='',
+        menu_label=None,
   ):
     self.function = function
 
     self._name = name
     self._proc_type = proc_type
     self._blurb = blurb
+    self._menu_label = menu_label
 
     if arguments_spec is None:
       arguments_spec = []
@@ -82,6 +84,9 @@ class PdbProcedureStub:
 
   def get_return_values(self):
     return self._return_vals_spec
+
+  def get_menu_label(self):
+    return self._menu_label
 
 
 class GParamStub:
