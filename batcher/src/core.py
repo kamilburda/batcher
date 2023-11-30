@@ -586,7 +586,7 @@ class Batcher:
     if action['origin'].is_item('gimp_pdb'):
       args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
       
-      if function.has_run_mode():
+      if function.has_run_mode:
         kwargs = {'run_mode': args[0]}
         args = args[1:]
     
