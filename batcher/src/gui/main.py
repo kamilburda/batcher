@@ -354,7 +354,10 @@ class ExportLayersDialog:
     )
     self._hbox_preview_label.pack_start(self._preview_label, False, False, 0)
     
-    self._vpaned_previews = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL)
+    self._vpaned_previews = Gtk.Paned(
+      orientation=Gtk.Orientation.VERTICAL,
+      wide_handle=True,
+    )
     self._vpaned_previews.pack1(self._name_preview, True, True)
     self._vpaned_previews.pack2(self._image_preview, True, True)
     
@@ -469,12 +472,18 @@ class ExportLayersDialog:
     self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, True, True, 0)
     self._vbox_chooser_and_settings.pack_start(self._hbox_export_name_and_message, False, False, 0)
     
-    self._vpaned_chooser_and_actions = Gtk.Paned(orientation=Gtk.Orientation.VERTICAL)
+    self._vpaned_chooser_and_actions = Gtk.Paned(
+      orientation=Gtk.Orientation.VERTICAL,
+      wide_handle=True,
+    )
     self._vpaned_chooser_and_actions.pack1(self._vbox_chooser_and_settings, True, False)
     self._vpaned_chooser_and_actions.pack2(
       self._vbox_actions_and_message_for_edit_mode, False, True)
     
-    self._hpaned_settings_and_previews = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+    self._hpaned_settings_and_previews = Gtk.Paned(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      wide_handle=True,
+    )
     self._hpaned_settings_and_previews.pack1(self._vpaned_chooser_and_actions, True, False)
     self._hpaned_settings_and_previews.pack2(self._frame_previews, True, True)
     
