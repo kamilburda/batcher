@@ -4,7 +4,7 @@
 from collections.abc import Iterable
 import functools
 import sys
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Type, Union
 
 import gi
 
@@ -23,7 +23,7 @@ _USE_LOCALE = False
 
 def register_procedure(
       procedure: Callable,
-      procedure_type: Gimp.Procedure = Gimp.ImageProcedure,
+      procedure_type: Type[Gimp.Procedure] = Gimp.ImageProcedure,
       arguments: Optional[List[Union[Dict, str]]] = None,
       return_values: Optional[List[Union[Dict, str]]] = None,
       menu_label: Optional[str] = None,
