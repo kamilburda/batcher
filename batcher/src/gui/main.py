@@ -494,7 +494,7 @@ class ExportLayersDialog:
     self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
     self._button_close.hide()
 
-    self._button_stop = Gtk.Button(label=_('_Stop'))
+    self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
     
     self._label_button_settings = Gtk.Label(
@@ -1264,7 +1264,7 @@ class ExportLayersRepeatDialog:
 
     GimpUi.window_set_transient(self._dialog)
     
-    self._button_stop = Gtk.Button(label=_('_Stop'))
+    self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     
     self._buttonbox = Gtk.ButtonBox(orientation=Gtk.Orientation.HORIZONTAL)
     self._buttonbox.pack_start(self._button_stop, False, False, 0)
