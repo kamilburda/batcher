@@ -91,10 +91,11 @@ class PdbProcedureStub:
 
 class GParamStub:
 
-  def __init__(self, value_type, name, blurb=''):
+  def __init__(self, value_type, name, blurb='', default_value=None):
     self.value_type = value_type
     self.name = name
     self.blurb = blurb
+    self.default_value = default_value
 
 
 class ParasiteFunctionsStubMixin:

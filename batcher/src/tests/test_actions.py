@@ -627,7 +627,11 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
         dict(value_type=GObject.TYPE_INT, name='num-save-options', blurb='Number of save options'),
         dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
         dict(
-          value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
+          value_type=GObject.TYPE_STRING,
+          name='filename',
+          blurb='Filename to save the image in',
+          default_value='some_file'),
+      ],
       blurb='Saves files in PNG file format',
       menu_label='Save as _PNG...',
     )
@@ -653,7 +657,8 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['arguments/run-mode'].value, Gimp.RunMode.NONINTERACTIVE)
     self.assertEqual(action['arguments/num-save-options'].value, 0)
     self.assertEqual(action['arguments/save-options'].value, ())
-    self.assertEqual(action['arguments/filename'].value, '')
+    self.assertEqual(action['arguments/filename'].value, 'some_file')
+    self.assertEqual(action['arguments/filename'].default_value, 'some_file')
   
   def test_add_pdb_procedure_array_length_setting_is_updated_automatically(self, mock_get_pdb):
     action = actions_.add(self.procedures, self.procedure_name)
