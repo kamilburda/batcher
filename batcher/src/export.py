@@ -10,7 +10,6 @@ from gi.repository import Gimp
 from gi.repository import GLib
 
 import pygimplib as pg
-from pygimplib import pdb
 
 from src import exceptions
 from src import renamer as renamer_
@@ -407,32 +406,33 @@ def _export_item_once(
       default_file_extension,
       file_extension_properties,
 ):
-  def _raise_export_error():
-    raise exceptions.ExportError(pdb.last_error, raw_item.get_name(), default_file_extension)
+  def _raise_export_error(exception):
+    raise exceptions.ExportError(str(exception), raw_item.get_name(), default_file_extension)
 
-  export_func(
-    run_mode,
-    image,
-    raw_item,
-    output_filepath)
-
-  if pdb.last_status == Gimp.PDBStatusType.SUCCESS:
-    return ExportStatuses.EXPORT_SUCCESSFUL
-  elif pdb.last_status == Gimp.PDBStatusType.CANCEL:
-    raise exceptions.BatcherCancelError('cancelled')
-  elif pdb.last_status == Gimp.PDBStatusType.CALLING_ERROR:
-    if run_mode != Gimp.RunMode.INTERACTIVE:
-      return ExportStatuses.FORCE_INTERACTIVE
+  try:
+    export_func(
+      run_mode,
+      image,
+      raw_item,
+      output_filepath)
+  except pg.PDBProcedureError as e:
+    if e.status == Gimp.PDBStatusType.CANCEL:
+      raise exceptions.BatcherCancelError('cancelled')
+    elif e.status == Gimp.PDBStatusType.CALLING_ERROR:
+      if run_mode != Gimp.RunMode.INTERACTIVE:
+        return ExportStatuses.FORCE_INTERACTIVE
+      else:
+        _raise_export_error(e)
+    elif e.status == Gimp.PDBStatusType.EXECUTION_ERROR:
+      if file_extension != default_file_extension:
+        file_extension_properties[file_extension].is_valid = False
+        return ExportStatuses.USE_DEFAULT_FILE_EXTENSION
+      else:
+        _raise_export_error(e)
     else:
-      _raise_export_error()
-  elif pdb.last_status == Gimp.PDBStatusType.EXECUTION_ERROR:
-    if file_extension != default_file_extension:
-      file_extension_properties[file_extension].is_valid = False
-      return ExportStatuses.USE_DEFAULT_FILE_EXTENSION
-    else:
-      _raise_export_error()
+      _raise_export_error(e)
   else:
-    _raise_export_error()
+    return ExportStatuses.EXPORT_SUCCESSFUL
 
 
 def _sync_raw_item_name(batcher, item_to_process):

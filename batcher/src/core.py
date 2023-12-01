@@ -564,7 +564,7 @@ class Batcher:
   
   def _is_enabled(self, action):
     if self._is_preview:
-      if not(action['enabled'].value and action['enabled_for_previews'].value):
+      if not (action['enabled'].value and action['enabled_for_previews'].value):
         return False
     else:
       if not action['enabled'].value:
@@ -671,6 +671,18 @@ class Batcher:
       except exceptions.SkipAction as e:
         # Log skipped actions and continue processing.
         self._set_skipped_actions(action, str(e))
+      except pg.PDBProcedureError as e:
+        error_message = e.message
+        if error_message is None:
+          error_message = _(
+            'An error occurred. Please check the GIMP error message'
+            ' or the error console for details.')
+
+        # Log failed action, but raise error as this may result in unexpected
+        # behavior.
+        self._set_failed_actions(action, error_message)
+
+        raise exceptions.ActionError(error_message, action, self._current_item)
       except Exception as e:
         trace = traceback.format_exc()
         # Log failed action, but raise error as this may result in unexpected
@@ -679,13 +691,6 @@ class Batcher:
 
         raise exceptions.ActionError(str(e), action, self._current_item, trace)
       else:
-        if action['origin'].is_item('gimp_pdb') and pdb.last_error:
-          # Log failed action, but raise error as this may result in unexpected
-          # behavior.
-          self._set_failed_actions(action, pdb.last_error)
-
-          raise exceptions.ActionError(pdb.last_error, action, self._current_item)
-
         return retval
     
     return _handle_exceptions
