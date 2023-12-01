@@ -652,26 +652,13 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.assertEqual(action['action_groups'].value, [actions_.DEFAULT_PROCEDURES_GROUP])
     
     self.assertEqual(action['arguments/run-mode'].gui.get_visible(), False)
-    self.assertEqual(action['arguments/num-save-options'].gui.get_visible(), False)
-    
+
+    self.assertNotIn('num-save-options', action['arguments'])
+
     self.assertEqual(action['arguments/run-mode'].value, Gimp.RunMode.NONINTERACTIVE)
-    self.assertEqual(action['arguments/num-save-options'].value, 0)
     self.assertEqual(action['arguments/save-options'].value, ())
     self.assertEqual(action['arguments/filename'].value, 'some_file')
     self.assertEqual(action['arguments/filename'].default_value, 'some_file')
-  
-  def test_add_pdb_procedure_array_length_setting_is_updated_automatically(self, mock_get_pdb):
-    action = actions_.add(self.procedures, self.procedure_name)
-    
-    action['arguments/save-options'].add_element()
-    self.assertEqual(action['arguments/num-save-options'].value, 1)
-    action['arguments/save-options'].add_element()
-    self.assertEqual(action['arguments/num-save-options'].value, 2)
-    
-    del action['arguments/save-options'][-1]
-    self.assertEqual(action['arguments/num-save-options'].value, 1)
-    del action['arguments/save-options'][-1]
-    self.assertEqual(action['arguments/num-save-options'].value, 0)
 
   @mock.patch(
     f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp',

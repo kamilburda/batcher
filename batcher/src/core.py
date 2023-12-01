@@ -603,7 +603,11 @@ class Batcher:
         replaced_args.append(placeholders.get_replaced_arg(argument.value, self))
       elif isinstance(argument, pg.setting.Setting):
         if is_function_pdb_procedure:
-          replaced_args.append(argument.value_for_pdb)
+          if isinstance(argument, pg.setting.ArraySetting):
+            replaced_args.append(len(argument.value))
+            replaced_args.append(argument.value_for_pdb)
+          else:
+            replaced_args.append(argument.value_for_pdb)
         else:
           replaced_args.append(argument.value)
       else:
@@ -612,7 +616,8 @@ class Batcher:
     
     return replaced_args
   
-  def _set_apply_constraint_to_folders(self, function, action):
+  @staticmethod
+  def _set_apply_constraint_to_folders(function, action):
     if action['also_apply_to_parent_folders'].value:
       
       def _function_wrapper(*action_args, **action_kwargs):
@@ -640,7 +645,8 @@ class Batcher:
     
     return _function_wrapper
   
-  def _get_args_for_constraint_func(self, func, args):
+  @staticmethod
+  def _get_args_for_constraint_func(func, args):
     try:
       batcher_arg_position = inspect.getfullargspec(func).args.index('batcher')
     except ValueError:

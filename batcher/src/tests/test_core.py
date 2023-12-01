@@ -165,7 +165,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     batcher._invoker = invoker
     batcher._current_image = image
     batcher._current_raw_item = layer
-    
+
     actions = actions_.create('procedures')
     actions_.add(actions, {
       'name': 'autocrop',
@@ -179,7 +179,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
           'type': 'enum',
           'name': 'run_mode',
           'enum_type': Gimp.RunMode,
-          'default_value': Gimp.RunMode.INTERACTIVE,
+          'default_value': Gimp.RunMode.NONINTERACTIVE,
         },
         {
           'type': 'placeholder_image',
@@ -190,6 +190,12 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
           'type': 'placeholder_layer',
           'name': 'layer',
           'default_value': 'current_layer',
+        },
+        {
+          'type': 'array',
+          'element_type': 'drawable',
+          'name': 'selected_drawables',
+          'default_value': [],
         },
         {
           'type': 'int',
@@ -209,6 +215,9 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       ],
     })
     
-    replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'], False)
+    replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'], True)
     
-    self.assertListEqual(replaced_args, [0, image, layer, 10, 50, 'current_image'])
+    self.assertListEqual(replaced_args[:4], [Gimp.RunMode.NONINTERACTIVE, image, layer, 0])
+    # We cannot reliably test `Gimp.ObjectArray` for equality, so we at least check the type.
+    self.assertIsInstance(replaced_args[4], Gimp.ObjectArray)
+    self.assertListEqual(replaced_args[5:], [10, 50, 'current_image'])

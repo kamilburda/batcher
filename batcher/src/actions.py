@@ -502,8 +502,8 @@ def _set_up_action_post_creation(action):
     action['display_name'])
   
   if action['origin'].is_item('gimp_pdb'):
-    _connect_events_to_sync_array_and_array_length_arguments(action)
-    _hide_gui_for_run_mode_and_array_length_arguments(action)
+    _hide_gui_for_first_run_mode_arguments(action)
+    _remove_array_length_arguments(action)
 
 
 def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
@@ -512,41 +512,25 @@ def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
     widget=setting_enabled.gui.widget)
 
 
-def _connect_events_to_sync_array_and_array_length_arguments(action):
-  
-  def _increment_array_length(array_setting_, insertion_index, value, array_length_setting):
-    array_length_setting.set_value(array_length_setting.value + 1)
-  
-  def _decrement_array_length(array_setting_, insertion_index, array_length_setting):
-    array_length_setting.set_value(array_length_setting.value - 1)
-  
-  for length_setting, array_setting in _get_array_length_and_array_settings(action):
-    array_setting.connect_event('after-add-element', _increment_array_length, length_setting)
-    array_setting.connect_event('before-delete-element', _decrement_array_length, length_setting)
-
-
-def _hide_gui_for_run_mode_and_array_length_arguments(action):
+def _hide_gui_for_first_run_mode_arguments(action):
   first_argument = next(iter(action['arguments']), None)
   if (first_argument is not None
       and isinstance(first_argument, pg.setting.EnumSetting)
       and first_argument.enum_type == Gimp.RunMode):
     first_argument.gui.set_visible(False)
-  
-  for length_setting, _unused in _get_array_length_and_array_settings(action):
-    length_setting.gui.set_visible(False)
 
 
-def _get_array_length_and_array_settings(action):
-  array_length_and_array_settings = []
+def _remove_array_length_arguments(action):
+  array_length_setting_names = []
   previous_setting = None
   
   for setting in action['arguments']:
     if isinstance(setting, pg.setting.ArraySetting) and previous_setting is not None:
-      array_length_and_array_settings.append((previous_setting, setting))
+      array_length_setting_names.append(previous_setting.name)
     
     previous_setting = setting
-  
-  return array_length_and_array_settings
+
+  action['arguments'].remove(array_length_setting_names)
 
 
 def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]:
