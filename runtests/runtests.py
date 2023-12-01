@@ -148,6 +148,7 @@ class _Stream:
 
 pg.register_procedure(
   plug_in_run_tests,
+  procedure_type=Gimp.Procedure,
   arguments=[
     dict(
       name='run-mode',
