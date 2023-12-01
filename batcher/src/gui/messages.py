@@ -35,7 +35,7 @@ def display_message(
 def display_failure_message(
       main_message: str,
       failure_message: str,
-      details: str,
+      details: Optional[str] = None,
       parent: Optional[Gtk.Window] = None,
       report_description: Optional[str] = None,
       display_details_initially: bool = False,

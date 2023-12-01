@@ -435,13 +435,13 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   def set_warning(self, show, main_message=None, failure_message=None, details=None, parent=None):
     if show:
       self.set_tooltip(failure_message)
-      if details is not None:
-        if self._display_warning_message_event_id is not None:
-          self._button_warning.disconnect(self._display_warning_message_event_id)
-        
-        self._display_warning_message_event_id = self._button_warning.connect(
-          'clicked',
-          self._on_button_warning_clicked, main_message, failure_message, details, parent)
+
+      if self._display_warning_message_event_id is not None:
+        self._button_warning.disconnect(self._display_warning_message_event_id)
+
+      self._display_warning_message_event_id = self._button_warning.connect(
+        'clicked',
+        self._on_button_warning_clicked, main_message, failure_message, details, parent)
       
       self._button_warning.show()
     else:

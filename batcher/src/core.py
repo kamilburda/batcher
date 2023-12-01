@@ -544,7 +544,7 @@ class Batcher:
     
     def _function_wrapper(*action_args_and_function):
       action_args, function = action_args_and_function[:-1], action_args_and_function[-1]
-      
+
       if not self._is_enabled(action):
         return False
       
@@ -661,25 +661,41 @@ class Batcher:
   def _handle_exceptions_from_action(self, function, action):
     def _handle_exceptions(*args, **kwargs):
       try:
-        return function(*args, **kwargs)
+        retval = function(*args, **kwargs)
       except exceptions.SkipAction as e:
         # Log skipped actions and continue processing.
-        if 'procedure' in action.tags:
-          self._skipped_procedures[action.name].append((self._current_item, str(e)))
-        if 'constraint' in action.tags:
-          self._skipped_constraints[action.name].append((self._current_item, str(e)))
+        self._set_skipped_actions(action, str(e))
       except Exception as e:
         trace = traceback.format_exc()
         # Log failed action, but raise error as this may result in unexpected
         # behavior.
-        if 'procedure' in action.tags:
-          self._failed_procedures[action.name].append((self._current_item, str(e), trace))
-        if 'constraint' in action.tags:
-          self._failed_constraints[action.name].append((self._current_item, str(e), trace))
+        self._set_failed_actions(action, str(e), trace)
+
         raise exceptions.ActionError(str(e), action, self._current_item, trace)
+      else:
+        if action['origin'].is_item('gimp_pdb') and pdb.last_error:
+          # Log failed action, but raise error as this may result in unexpected
+          # behavior.
+          self._set_failed_actions(action, pdb.last_error)
+
+          raise exceptions.ActionError(pdb.last_error, action, self._current_item)
+
+        return retval
     
     return _handle_exceptions
-  
+
+  def _set_skipped_actions(self, action, error_message):
+    if 'procedure' in action.tags:
+      self._skipped_procedures[action.name].append((self._current_item, error_message))
+    if 'constraint' in action.tags:
+      self._skipped_constraints[action.name].append((self._current_item, error_message))
+
+  def _set_failed_actions(self, action, error_message, trace=None):
+    if 'procedure' in action.tags:
+      self._failed_procedures[action.name].append((self._current_item, error_message, trace))
+    if 'constraint' in action.tags:
+      self._failed_constraints[action.name].append((self._current_item, error_message, trace))
+
   def _init_attributes(self, **kwargs):
     init_argspec_names = set(inspect.getfullargspec(self._orig___init__).args)
     init_argspec_names.discard('self')
