@@ -178,7 +178,13 @@ class NamePreview(preview_base_.Preview):
     self._tree_model.clear()
     self._tree_iters.clear()
     self._clearing_preview = False
-  
+
+  def set_sensitive(self, sensitive):
+    # Functions created via GObject introspection are not hashable, causing
+    # functions in `pg.invocation` to fail. We therefore wrap this function to
+    # avoid the error.
+    super().set_sensitive(sensitive)
+
   def set_collapsed_items(self, collapsed_items: Set):
     """Sets the collapsed state of items in the preview."""
     self._collapsed_items = collapsed_items
