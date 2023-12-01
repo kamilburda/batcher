@@ -338,7 +338,8 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
     if procedure_type == Gimp.ImageProcedure:
       run_mode, image, n_drawables, drawables, args, run_data = procedure_args
     else:
-      run_mode, args, run_data = procedure_args
+      args, run_data = procedure_args
+      run_mode = args.index(0)
       image = None
       n_drawables = 0
       drawables = None

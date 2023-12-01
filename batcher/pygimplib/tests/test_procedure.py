@@ -19,7 +19,7 @@ def sample_procedure_2(*args, **kwargs):
   pass
 
 
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp.Procedure.new')
+@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp.ImageProcedure.new')
 class TestProcedure(unittest.TestCase):
 
   def setUp(self):
