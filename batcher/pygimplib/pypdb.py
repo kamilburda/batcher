@@ -8,6 +8,13 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 
+__all__ = [
+  'pdb',
+  'PyPDBProcedure',
+  'PDBProcedureError',
+]
+
+
 class _PyPDB:
 
   def __init__(self):
@@ -117,16 +124,23 @@ class PyPDBProcedure:
 
     result_list = [result.index(i) for i in range(result.length())]
 
-    if len(result_list) > 0:
-      if isinstance(result_list[0], Gimp.PDBStatusType):
-        self._pdb_wrapper._last_status = result_list.pop(0)
+    last_status = None
+    last_error = None
 
     if len(result_list) > 0:
-      if self._pdb_wrapper._last_status in [
-            Gimp.PDBStatusType.SUCCESS, Gimp.PDBStatusType.PASS_THROUGH]:
-        self._pdb_wrapper._last_error = None
-      else:
-        self._pdb_wrapper._last_error = result_list.pop(0)
+      if isinstance(result_list[0], Gimp.PDBStatusType):
+        last_status = result_list.pop(0)
+
+    if len(result_list) > 0:
+      if last_status not in [Gimp.PDBStatusType.SUCCESS, Gimp.PDBStatusType.PASS_THROUGH]:
+        last_error = result_list.pop(0)
+
+    self._pdb_wrapper._last_status = last_status
+    self._pdb_wrapper._last_error = last_error
+
+    if (last_status is not None
+        and last_status not in [Gimp.PDBStatusType.SUCCESS, Gimp.PDBStatusType.PASS_THROUGH]):
+      raise PDBProcedureError(last_error, last_status)
 
     if result_list:
       if len(result_list) == 1:
@@ -158,6 +172,18 @@ class PyPDBProcedure:
         processed_args.append(arg)
     
     return processed_args
+
+
+class PDBProcedureError(Exception):
+
+  def __init__(self, message, status):
+    super().__init__(message)
+
+    self.message = message
+    self.status = status
+
+  def __str__(self):
+    return str(self.message)
 
 
 pdb = _PyPDB()

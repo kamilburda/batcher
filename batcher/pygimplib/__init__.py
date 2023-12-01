@@ -62,6 +62,7 @@ from .procedure import main
 from .procedure import register_procedure
 from .procedure import set_use_locale
 from .pypdb import pdb
+from .pypdb import PDBProcedureError
 from .setting import SETTING_GUI_TYPES
 from .setting import SETTING_TYPES
 
@@ -86,6 +87,7 @@ __all__ = [
   'config',
   'main',
   'pdb',
+  'PDBProcedureError',
   'register_procedure',
   'set_use_locale',
   'SETTING_GUI_TYPES',
