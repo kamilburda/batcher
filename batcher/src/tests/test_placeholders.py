@@ -29,10 +29,8 @@ class TestGetReplacedArg(unittest.TestCase):
   def test_arg_matching_array_placeholder(self):
     batcher = _BatcherStub(current_image='image')
 
-    replaced_args = placeholders.get_replaced_arg('current_layer_for_array', batcher)
-
-    self.assertEqual(replaced_args[0], 1)
-    self.assertIsInstance(replaced_args[1], Gimp.ObjectArray)
+    self.assertTupleEqual(
+      placeholders.get_replaced_arg('current_layer_for_array', batcher), (None,))
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')

@@ -600,7 +600,15 @@ class Batcher:
     
     for argument in action_arguments:
       if isinstance(argument, placeholders.PlaceholderArraySetting):
-        replaced_args.extend(placeholders.get_replaced_arg(argument.value, self))
+        replaced_arg = placeholders.get_replaced_arg(argument.value, self)
+        if is_function_pdb_procedure:
+          replaced_args.extend([
+            len(replaced_arg),
+            pg.setting.array_as_pdb_compatible_type(
+              replaced_arg, element_pdb_type=argument.element_type.get_allowed_pdb_types()[0]),
+          ])
+        else:
+          replaced_args.append(replaced_arg)
       elif isinstance(argument, placeholders.PlaceholderSetting):
         replaced_args.append(placeholders.get_replaced_arg(argument.value, self))
       elif isinstance(argument, pg.setting.Setting):

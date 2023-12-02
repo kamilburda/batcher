@@ -45,27 +45,15 @@ def _get_current_layer(batcher):
 
 
 def _get_current_layer_for_array(batcher):
-  return [
-    1,  # array length
-    pg.setting.array_as_pdb_compatible_type(
-      (_get_current_layer(batcher),), element_pdb_type=Gimp.Layer),
-  ]
+  return (_get_current_layer(batcher),)
 
 
 def _get_background_layer_for_array(batcher):
-  return [
-    1,  # array length
-    pg.setting.array_as_pdb_compatible_type(
-      (background_foreground.get_background_layer(batcher),), element_pdb_type=Gimp.Layer),
-  ]
+  return (background_foreground.get_background_layer(batcher),)
 
 
 def _get_foreground_layer_for_array(batcher):
-  return [
-    1,  # array length
-    pg.setting.array_as_pdb_compatible_type(
-      (background_foreground.get_foreground_layer(batcher),), element_pdb_type=Gimp.Layer),
-  ]
+  return (background_foreground.get_foreground_layer(batcher),)
 
 
 _PLACEHOLDERS_RAW_LIST = [
@@ -156,7 +144,15 @@ class PlaceholderItemSetting(PlaceholderSetting):
 
 
 class PlaceholderArraySetting(PlaceholderSetting):
-  pass
+
+  def __init__(self, name, element_type, **kwargs):
+    super().__init__(name, **kwargs)
+
+    self._element_type = element_type
+
+  @property
+  def element_type(self):
+    return self._element_type
 
 
 class PlaceholderDrawableArraySetting(PlaceholderArraySetting):

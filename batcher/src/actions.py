@@ -586,9 +586,9 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
       proc_arg.value_type, proc_arg)
 
     if placeholder_type_name is not None:
-      setting_type = placeholder_type_name
       setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
-        setting_type_init_kwargs)
+        setting_type, placeholder_type_name, setting_type_init_kwargs)
+      setting_type = placeholder_type_name
 
     argument_dict = {
       'type': setting_type,
@@ -627,10 +627,15 @@ def _get_pdb_procedure_display_name(proc):
     return proc.get_name()
 
 
-def _remove_invalid_init_arguments_for_placeholder_settings(setting_type_init_kwargs):
-  setting_init_params = inspect.signature(pg.setting.Setting.__init__).parameters
-  placeholder_setting_init_params = (
-    inspect.signature(placeholders.PlaceholderSetting.__init__).parameters)
+def _remove_invalid_init_arguments_for_placeholder_settings(
+      setting_type, placeholder_type_name, setting_type_init_kwargs):
+  if isinstance(setting_type, str):
+    setting_type = pg.SETTING_TYPES[setting_type]
+
+  placeholder_type = pg.SETTING_TYPES[placeholder_type_name]
+
+  setting_init_params = inspect.signature(setting_type.__init__).parameters
+  placeholder_setting_init_params = inspect.signature(placeholder_type.__init__).parameters
 
   return {
     key: value for key, value in setting_type_init_kwargs.items()
