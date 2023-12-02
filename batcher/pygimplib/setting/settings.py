@@ -377,6 +377,11 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     methods in the `setting` package.
     """
     return self._tags
+
+  @classmethod
+  def get_allowed_pdb_types(cls):
+    """Returns the list of allowed PDB types for this setting type."""
+    return list(cls._ALLOWED_PDB_TYPES)
   
   @classmethod
   def get_allowed_gui_types(cls) -> List[Type[presenter_.Presenter]]:
