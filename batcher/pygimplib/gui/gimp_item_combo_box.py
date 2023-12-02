@@ -46,8 +46,6 @@ class GimpItemComboBox(Gtk.Box):
       **kwargs,
     )
     
-    self._displayed_item_combo_box = None
-    
     self._layer_combo_box = GimpUi.LayerComboBox.new(constraint=constraint, data=data)
     self._channel_combo_box = GimpUi.ChannelComboBox.new(constraint=constraint, data=data)
     self._vectors_combo_box = GimpUi.VectorsComboBox.new(constraint=constraint, data=data)
@@ -71,6 +69,8 @@ class GimpItemComboBox(Gtk.Box):
         self._vectors_combo_box.get_active,
         self._vectors_combo_box.set_active,
         Gimp.Vectors)]
+
+    self._displayed_item_combo_box = self._item_combo_boxes[0]
     
     self._item_types_combo_box = Gtk.ComboBoxText.new()
     
@@ -86,7 +86,7 @@ class GimpItemComboBox(Gtk.Box):
       self.pack_start(combo_box.widget, True, True, 0)
       
       combo_box.widget.connect(0, self._on_combo_box_changed)
-    
+
     self._item_types_combo_box.connect('changed', self._on_item_types_combo_box_changed)
     
     self._item_types_combo_box.set_active(0)

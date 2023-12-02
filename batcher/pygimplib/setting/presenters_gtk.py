@@ -53,22 +53,6 @@ class GtkPresenter(presenter_.Presenter):
     self._event_handler_id = None
 
 
-class GimpUiIntComboBoxPresenter(GtkPresenter):
-  """Abstract `setting.Presenter` subclass for widget classes inheriting from
-  `GimpUi.IntComboBox` .
-
-  These classes have a modified ``connect()`` method with different interface
-  and the signal handler being triggered even when setting the initial value,
-  which is undesired.
-  """
-
-  _ABSTRACT = True
-
-  def _connect_value_changed_event(self):
-    self._event_handler_id = Gtk.ComboBox.connect(
-      self._widget, self._VALUE_CHANGED_SIGNAL, self._on_value_changed)
-
-
 class IntSpinButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.SpinButton` widgets.
   
@@ -184,6 +168,24 @@ class ExpanderPresenter(GtkPresenter):
     self._widget.set_expanded(value)
 
 
+class EntryPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.Entry` widgets.
+
+  Value: Text in the entry.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    return Gtk.Entry()
+
+  def _get_value(self):
+    return self._widget.get_text()
+
+  def _set_value(self, value):
+    self._widget.set_text(value if value is not None else '')
+    # Place the cursor at the end of the text entry.
+    self._widget.set_position(-1)
+
+
 class ComboBoxPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.ComboBox` widgets.
 
@@ -216,6 +218,22 @@ class ComboBoxPresenter(GtkPresenter):
     self._widget.set_active(value)
 
 
+class GimpUiIntComboBoxPresenter(GtkPresenter):
+  """Abstract `setting.Presenter` subclass for widget classes inheriting from
+  `GimpUi.IntComboBox` .
+
+  These classes have a modified ``connect()`` method with different interface
+  and the signal handler being triggered even when setting the initial value,
+  which is undesired.
+  """
+
+  _ABSTRACT = True
+
+  def _connect_value_changed_event(self):
+    self._event_handler_id = Gtk.ComboBox.connect(
+      self._widget, self._VALUE_CHANGED_SIGNAL, self._on_value_changed)
+
+
 class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.EnumComboBox` widgets.
 
@@ -238,34 +256,30 @@ class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
 
   def _set_value(self, value):
     self._widget.set_active(value)
-  
 
-class EntryPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.Entry` widgets.
-  
-  Value: Text in the entry.
+
+class GimpObjectComboBoxPresenter(GimpUiIntComboBoxPresenter):
+  """Abstract `setting.Presenter` subclass for `GimpUi` combo boxes ued to
+  select GIMP objects (images, layers, channels, ...).
+
+  This presenter updates the underlying setting on initialization as these
+  `GimpUi` combo boxes are set to a valid value when they are created.
   """
-  
-  def _create_widget(self, setting, **kwargs):
-    return Gtk.Entry()
-  
-  def _get_value(self):
-    return self._widget.get_text()
 
-  def _set_value(self, value):
-    self._widget.set_text(value if value is not None else '')
-    # Place the cursor at the end of the text entry.
-    self._widget.set_position(-1)
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.update_setting_value(force=True)
 
 
-class ImageComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class ImageComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.ImageComboBox` widgets.
   
   Value: `Gimp.Image` selected in the combo box, or ``None`` if there is no
   image available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
     return GimpUi.ImageComboBox.new()
@@ -282,14 +296,17 @@ class ImageComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class ItemComboBoxPresenter(GtkPresenter):
+class ItemComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `gui.GimpItemComboBox` widgets.
   
   Value: `Gimp.Item` selected in the combo box, or ``None`` if there is no
   item available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def _connect_value_changed_event(self):
+    # This is a custom combo box rather than a `GimpUi` combo box. Therefore,
+    # the GTK ``connect`` method is used.
+    GtkPresenter._connect_value_changed_event(self)
   
   def _create_widget(self, setting, **kwargs):
     return pggui.GimpItemComboBox()
@@ -306,14 +323,12 @@ class ItemComboBoxPresenter(GtkPresenter):
       self._widget.set_active(value.get_id())
 
 
-class DrawableComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class DrawableComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.DrawableComboBox` widgets.
   
   Value: `Gimp.Drawable` selected in the combo box, or ``None`` if there is no
   drawable available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
     return GimpUi.DrawableComboBox.new()
@@ -330,14 +345,12 @@ class DrawableComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class LayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class LayerComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets.
   
   Value: `Gimp.Layer` selected in the combo box, or ``None`` if there is no
   layer available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new()
@@ -354,15 +367,13 @@ class LayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class TextLayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class TextLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
   the choices to `Gimp.TextLayer` instances.
 
   Value: `Gimp.TextLayer` selected in the combo box, or ``None`` if there is no
   text layer available.
   """
-
-  _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new(lambda image, item: item.is_text_layer())
@@ -379,15 +390,13 @@ class TextLayerComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class LayerMaskComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class LayerMaskComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
   the choices to `Gimp.Layer` instances having a layer mask.
 
   Value: `Gimp.LayerMask` from a `Gimp.Layer` selected in the combo box, or
   ``None`` if there is no layer with a mask available.
   """
-
-  _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new(
@@ -413,14 +422,12 @@ class LayerMaskComboBoxPresenter(GimpUiIntComboBoxPresenter):
         self._widget.set_active(layer.get_id())
 
 
-class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class ChannelComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.ChannelComboBox` widgets.
   
   Value: `Gimp.Channel` selected in the combo box, or ``None`` if there is no
   channel available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
     return GimpUi.ChannelComboBox.new()
@@ -437,14 +444,12 @@ class ChannelComboBoxPresenter(GimpUiIntComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class VectorsComboBoxPresenter(GimpUiIntComboBoxPresenter):
+class VectorsComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.VectorsComboBox` widgets.
   
   Value: `Gimp.Vectors` selected in the combo box, or ``None`` if there are no
   vectors available.
   """
-  
-  _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
     return GimpUi.VectorsComboBox.new()
