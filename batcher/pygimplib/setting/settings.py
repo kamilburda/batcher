@@ -2637,7 +2637,8 @@ class ArraySetting(Setting):
     # This ensures that this property is always up-to-date no matter what events
     # are connected to individual elements.
     self._value = self._array_as_tuple()
-    return self._array_as_pdb_compatible_type(self._value)
+    return array_as_pdb_compatible_type(
+      self._value, self.element_type, self._reference_element.pdb_type)
 
   @property
   def element_type(self) -> Type[Setting]:
@@ -3065,7 +3066,8 @@ def get_setting_type_from_gtype(
       `GObject.GType` instance representing a GIMP PDB parameter.
     pdb_param_info:
       Object representing GIMP PDB parameter information, obtainable via
-      `Gimp.Procedure.get_arguments()`.
+      `Gimp.Procedure.get_arguments()`. This is used to infer the element type
+      for a `Gimp.ObjectArray` argument.
 
   Returns:
     Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
@@ -3088,23 +3090,57 @@ def get_setting_type_from_gtype(
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
 
   if gtype == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
-    # HACK: Rely on the parameter name to infer the correct underlying object type.
-    if pdb_param_info.name == 'images':
-      return ArraySetting, dict(element_type=ImageSetting)
-    elif pdb_param_info.name == 'drawables':
-      return ArraySetting, dict(element_type=DrawableSetting)
-    elif pdb_param_info.name == 'layers':
-      return ArraySetting, dict(element_type=LayerSetting)
-    elif pdb_param_info.name == 'channels':
-      return ArraySetting, dict(element_type=ChannelSetting)
-    elif pdb_param_info.name == 'vectors':
-      return ArraySetting, dict(element_type=VectorsSetting)
-    elif pdb_param_info.name == 'children':
-      return ArraySetting, dict(element_type=ItemSetting)
-    else:
-      return None
+    return get_array_setting_type_from_gimp_object_array(pdb_param_info)
 
   return None
+
+
+def get_array_setting_type_from_gimp_object_array(
+      pdb_param_info: GObject.ParamSpec,
+) -> Union[Tuple[Type[ArraySetting], Dict[str, Any]], None]:
+  # HACK: Rely on the parameter name to infer the correct underlying object type.
+  if pdb_param_info.name == 'images':
+    return ArraySetting, dict(element_type=ImageSetting)
+  elif pdb_param_info.name == 'drawables':
+    return ArraySetting, dict(element_type=DrawableSetting)
+  elif pdb_param_info.name == 'layers':
+    return ArraySetting, dict(element_type=LayerSetting)
+  elif pdb_param_info.name == 'channels':
+    return ArraySetting, dict(element_type=ChannelSetting)
+  elif pdb_param_info.name == 'vectors':
+    return ArraySetting, dict(element_type=VectorsSetting)
+  elif pdb_param_info.name == 'children':
+    return ArraySetting, dict(element_type=ItemSetting)
+  else:
+    return None
+
+
+def array_as_pdb_compatible_type(
+      values: Tuple[Any],
+      element_setting_type: Optional[Type[Setting]] = None,
+      element_pdb_type: Union[GObject.GType, Type[GObject.GObject], None] = None,
+) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.FloatArray, Gimp.RGBArray, Gimp.ObjectArray]:
+  """Returns an array suitable to be passed to a GIMP PDB procedure."""
+  if element_setting_type == IntSetting:
+    array = GObject.Value(Gimp.Int32Array)
+    Gimp.value_set_int32_array(array, values)
+    return array.get_boxed()
+  elif element_setting_type == FloatSetting:
+    array = GObject.Value(Gimp.FloatArray)
+    Gimp.value_set_float_array(array, values)
+    return array.get_boxed()
+  elif element_setting_type == ColorSetting:
+    array = GObject.Value(Gimp.RGBArray)
+    Gimp.value_set_rgb_array(array, values)
+    return array.get_boxed()
+  elif element_setting_type == StringSetting:
+    return values
+  elif element_pdb_type is not None:
+    array = GObject.Value(Gimp.ObjectArray)
+    Gimp.value_set_object_array(array, element_pdb_type, values)
+    return array.get_boxed()
+  else:
+    return values
 
 
 _ARRAY_GTYPES_TO_SETTING_TYPES = {
@@ -3185,6 +3221,8 @@ def _process_type(type_or_name, type_map, error_message):
 
 __all__ = [
   'get_setting_type_from_gtype',
+  'get_array_setting_type_from_gimp_object_array',
+  'array_as_pdb_compatible_type',
   'SettingValueError',
   'SettingDefaultValueError',
   'process_setting_type',
