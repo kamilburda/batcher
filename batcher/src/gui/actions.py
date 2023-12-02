@@ -556,7 +556,15 @@ class _ActionEditDialog(GimpUi.Dialog):
     return label_description
   
   def _set_arguments(self, action, pdb_procedure):
-    for i, setting in enumerate(action['arguments']):
+    if pdb_procedure is not None:
+      pdb_argument_names_and_blurbs = {
+        arg.name: arg.blurb for arg in pdb_procedure.info.get_arguments()}
+    else:
+      pdb_argument_names_and_blurbs = {}
+
+    row_index = 0
+
+    for setting in action['arguments']:
       if not setting.gui.get_visible():
         continue
       
@@ -566,10 +574,10 @@ class _ActionEditDialog(GimpUi.Dialog):
         yalign=0.5,
       )
 
-      if pdb_procedure is not None:
-        label.set_tooltip_text(pdb_procedure.info.get_arguments()[i].blurb)
+      if pdb_procedure is not None and setting.name in pdb_argument_names_and_blurbs:
+        label.set_tooltip_text(pdb_argument_names_and_blurbs[setting.name])
       
-      self._grid_action_arguments.attach(label, 0, i, 1, 1)
+      self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
       
       widget_to_attach = setting.gui.widget
       
@@ -580,7 +588,9 @@ class _ActionEditDialog(GimpUi.Dialog):
       else:
         widget_to_attach = self._create_placeholder_widget()
       
-      self._grid_action_arguments.attach(widget_to_attach, 1, i, 1, 1)
+      self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
+
+      row_index += 1
   
   @staticmethod
   def _on_button_reset_clicked(button, action):

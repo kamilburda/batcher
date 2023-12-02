@@ -4,7 +4,7 @@ procedures during batch processing.
 The placeholder objects are defined in the `PLACEHOLDERS` dictionary.
 """
 
-from typing import Callable, List, Union, Type
+from typing import Callable, List, Optional, Union, Type
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -44,11 +44,38 @@ def _get_current_layer(batcher):
   return batcher.current_raw_item
 
 
+def _get_current_layer_for_array(batcher):
+  return [
+    1,  # array length
+    pg.setting.array_as_pdb_compatible_type(
+      (_get_current_layer(batcher),), element_pdb_type=Gimp.Layer),
+  ]
+
+
+def _get_background_layer_for_array(batcher):
+  return [
+    1,  # array length
+    pg.setting.array_as_pdb_compatible_type(
+      (background_foreground.get_background_layer(batcher),), element_pdb_type=Gimp.Layer),
+  ]
+
+
+def _get_foreground_layer_for_array(batcher):
+  return [
+    1,  # array length
+    pg.setting.array_as_pdb_compatible_type(
+      (background_foreground.get_foreground_layer(batcher),), element_pdb_type=Gimp.Layer),
+  ]
+
+
 _PLACEHOLDERS_RAW_LIST = [
   ('current_image', _('Current Image'), _get_current_image),
   ('current_layer', _('Current Layer'), _get_current_layer),
+  ('current_layer_for_array', _('Current Layer'), _get_current_layer_for_array),
   ('background_layer', _('Background Layer'), background_foreground.get_background_layer),
+  ('background_layer_for_array', _('Background Layer'), _get_background_layer_for_array),
   ('foreground_layer', _('Foreground Layer'), background_foreground.get_foreground_layer),
+  ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
 ]
 
 
@@ -128,6 +155,40 @@ class PlaceholderItemSetting(PlaceholderSetting):
   _ALLOWED_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
 
 
+class PlaceholderArraySetting(PlaceholderSetting):
+  pass
+
+
+class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
+
+  _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
+  _ALLOWED_PLACEHOLDERS = [
+    'current_layer_for_array',
+    'background_layer_for_array',
+    'foreground_layer_for_array',
+  ]
+
+
+class PlaceholderLayerArraySetting(PlaceholderArraySetting):
+
+  _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
+  _ALLOWED_PLACEHOLDERS = [
+    'current_layer_for_array',
+    'background_layer_for_array',
+    'foreground_layer_for_array',
+  ]
+
+
+class PlaceholderItemArraySetting(PlaceholderArraySetting):
+
+  _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
+  _ALLOWED_PLACEHOLDERS = [
+    'current_layer_for_array',
+    'background_layer_for_array',
+    'foreground_layer_for_array',
+  ]
+
+
 def get_replaced_arg(arg, batcher: 'src.core.Batcher'):
   """If ``arg`` is a placeholder object, returns a real object replacing the
   placeholder. Otherwise, ``arg`` is returned unchanged.
@@ -148,6 +209,7 @@ def get_replaced_arg(arg, batcher: 'src.core.Batcher'):
 
 def get_placeholder_type_name_from_pdb_type(
       pdb_type: Union[GObject.GType, Type[GObject.GObject]],
+      pdb_param_info: Optional[GObject.ParamSpec] = None,
 ) -> Union[str, None]:
   """Returns the name of a `pygimplib.setting.Setting` subclass representing a
   placeholder from the given GIMP PDB parameter type.
@@ -156,21 +218,32 @@ def get_placeholder_type_name_from_pdb_type(
     pdb_type:
       A `GObject.GObject` subclass or a `GObject.GType` instance representing a
       GIMP PDB parameter.
+    pdb_param_info:
+      Object representing GIMP PDB parameter information, obtainable via
+      `Gimp.Procedure.get_arguments()`. This is used to infer the element type
+      for a `Gimp.ObjectArray` argument.
 
   Returns:
     String as a human-readable name of a `pygimplib.setting.Setting` subclass
     representing a placeholder if ``pdb_type`` matches an identifier, or
     ``None`` otherwise.
   """
-  gtype = pdb_type
+  key = pdb_type
 
   if hasattr(pdb_type, '__gtype__'):
-    gtype = pdb_type.__gtype__
+    key = pdb_type.__gtype__
+
+  if key == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
+    _array_type, setting_dict = (
+      pg.setting.get_array_setting_type_from_gimp_object_array(pdb_param_info))
+    key = (key, setting_dict['element_type'])
 
   try:
-    return _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES[gtype]
+    placeholder_type_name = _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES[key]
   except (KeyError, TypeError):
     return None
+  else:
+    return placeholder_type_name
 
 
 _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
@@ -178,4 +251,10 @@ _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
   Gimp.Item.__gtype__: pg.setting.SETTING_TYPES[PlaceholderItemSetting],
   Gimp.Drawable.__gtype__: pg.setting.SETTING_TYPES[PlaceholderDrawableSetting],
   Gimp.Layer.__gtype__: pg.setting.SETTING_TYPES[PlaceholderLayerSetting],
+  (Gimp.ObjectArray.__gtype__, pg.setting.LayerSetting): (
+    pg.setting.SETTING_TYPES[PlaceholderLayerArraySetting]),
+  (Gimp.ObjectArray.__gtype__, pg.setting.DrawableSetting): (
+    pg.setting.SETTING_TYPES[PlaceholderDrawableArraySetting]),
+  (Gimp.ObjectArray.__gtype__, pg.setting.ItemSetting): (
+    pg.setting.SETTING_TYPES[PlaceholderItemArraySetting]),
 }

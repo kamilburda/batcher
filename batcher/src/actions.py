@@ -55,12 +55,12 @@ containing actions. These events include:
 * ``'after-clear-actions'``: invoked when calling `clear()` after clearing
   actions.
 """
+import inspect
+from typing import Any, Dict, Generator, List, Optional, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-
-from typing import Any, Dict, Generator, List, Optional, Union
 
 import pygimplib as pg
 from pygimplib.pypdb import pdb
@@ -503,7 +503,6 @@ def _set_up_action_post_creation(action):
   
   if action['origin'].is_item('gimp_pdb'):
     _hide_gui_for_first_run_mode_arguments(action)
-    _remove_array_length_arguments(action)
 
 
 def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
@@ -520,17 +519,20 @@ def _hide_gui_for_first_run_mode_arguments(action):
     first_argument.gui.set_visible(False)
 
 
-def _remove_array_length_arguments(action):
-  array_length_setting_names = []
-  previous_setting = None
+def _remove_array_length_arguments(arguments_list):
+  array_length_argument_indexes = []
   
-  for setting in action['arguments']:
-    if isinstance(setting, pg.setting.ArraySetting) and previous_setting is not None:
-      array_length_setting_names.append(previous_setting.name)
-    
-    previous_setting = setting
+  for i, argument_dict in enumerate(arguments_list):
+    setting_type = argument_dict['type']
+    if isinstance(setting_type, str):
+      setting_type = pg.SETTING_TYPES[setting_type]
 
-  action['arguments'].remove(array_length_setting_names)
+    if (issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting))
+        and i > 0):
+      array_length_argument_indexes.append(i - 1)
+
+  for index in reversed(array_length_argument_indexes):
+    del arguments_list[index]
 
 
 def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]:
@@ -550,17 +552,6 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     while True:
       yield f'-{i}'
       i += 1
-
-  def _get_pdb_procedure_display_name(proc):
-    menu_label = proc.get_menu_label()
-    if menu_label:
-      menu_label = menu_label.replace('_', '')
-      if menu_label.endswith('...'):
-        menu_label = menu_label[:-len('...')]
-
-      return menu_label
-    else:
-      return proc.get_name()
 
   action_dict = {
     'name': pdb_procedure_name,
@@ -591,33 +582,60 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     
     pdb_procedure_argument_names.append(unique_pdb_param_name)
 
-    arguments_dict = {
+    placeholder_type_name = placeholders.get_placeholder_type_name_from_pdb_type(
+      proc_arg.value_type, proc_arg)
+
+    if placeholder_type_name is not None:
+      setting_type = placeholder_type_name
+      setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
+        setting_type_init_kwargs)
+
+    argument_dict = {
       'type': setting_type,
       'name': unique_pdb_param_name,
       'display_name': proc_arg.name,
       **setting_type_init_kwargs,
     }
 
-    placeholder_type_name = placeholders.get_placeholder_type_name_from_pdb_type(
-      proc_arg.value_type)
-
-    if placeholder_type_name is not None:
-      arguments_dict['type'] = placeholder_type_name
-
     if setting_type == pg.setting.BoolSetting:
-      arguments_dict['gui_type'] = 'check_button_no_text'
+      argument_dict['gui_type'] = 'check_button_no_text'
 
     if (hasattr(proc_arg, 'default_value')
         and proc_arg.default_value is not None
         and placeholder_type_name is None):
-      arguments_dict['default_value'] = proc_arg.default_value
+      argument_dict['default_value'] = proc_arg.default_value
 
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
-      arguments_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
+      argument_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
     
-    action_dict['arguments'].append(arguments_dict)
+    action_dict['arguments'].append(argument_dict)
+
+  _remove_array_length_arguments(action_dict['arguments'])
   
   return action_dict
+
+
+def _get_pdb_procedure_display_name(proc):
+  menu_label = proc.get_menu_label()
+  if menu_label:
+    menu_label = menu_label.replace('_', '')
+    if menu_label.endswith('...'):
+      menu_label = menu_label[:-len('...')]
+
+    return menu_label
+  else:
+    return proc.get_name()
+
+
+def _remove_invalid_init_arguments_for_placeholder_settings(setting_type_init_kwargs):
+  setting_init_params = inspect.signature(pg.setting.Setting.__init__).parameters
+  placeholder_setting_init_params = (
+    inspect.signature(placeholders.PlaceholderSetting.__init__).parameters)
+
+  return {
+    key: value for key, value in setting_type_init_kwargs.items()
+    if key in setting_init_params or key in placeholder_setting_init_params
+  }
 
 
 def reorder(actions: pg.setting.Group, action_name: str, new_position: int):

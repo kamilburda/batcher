@@ -7,6 +7,8 @@ from gi.repository import GObject
 
 import parameterized
 
+from pygimplib.tests import stubs_gimp
+
 from src import placeholders
 
 
@@ -23,6 +25,14 @@ class TestGetReplacedArg(unittest.TestCase):
     batcher = _BatcherStub(current_image='image')
 
     self.assertEqual(placeholders.get_replaced_arg('current_image', batcher), 'image')
+
+  def test_arg_matching_array_placeholder(self):
+    batcher = _BatcherStub(current_image='image')
+
+    replaced_args = placeholders.get_replaced_arg('current_layer_for_array', batcher)
+
+    self.assertEqual(replaced_args[0], 1)
+    self.assertIsInstance(replaced_args[1], Gimp.ObjectArray)
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
@@ -48,6 +58,22 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
 
   def test_with_invalid_object_type(self):
     self.assertIsNone(placeholders.get_placeholder_type_name_from_pdb_type(object))
+
+  def test_with_layer_array(self):
+    param = stubs_gimp.GParamStub(Gimp.ObjectArray, 'layers')
+
+    # noinspection PyTypeChecker
+    self.assertEqual(
+      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param),
+      'placeholder_layer_array',
+    )
+
+  def test_image_array_is_unsupported(self):
+    param = stubs_gimp.GParamStub(Gimp.ObjectArray, 'images')
+
+    # noinspection PyTypeChecker
+    self.assertIsNone(
+      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param))
 
 
 class TestPlaceholderSetting(unittest.TestCase):
