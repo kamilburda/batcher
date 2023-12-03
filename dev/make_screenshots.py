@@ -96,7 +96,7 @@ def take_screenshots(gui, dialog, settings):
   
   actions.add(
     settings['main/constraints'],
-    builtin_constraints.BUILTIN_CONSTRAINTS['without_tags'])
+    builtin_constraints.BUILTIN_CONSTRAINTS['without_color_tags'])
   
   while Gtk.events_pending():
     Gtk.main_iteration()

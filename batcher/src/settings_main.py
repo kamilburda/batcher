@@ -101,13 +101,6 @@ def create_settings():
       'display_name': _('Overwrite mode (non-interactive run mode only)'),
     },
     {
-      'type': 'dict',
-      'name': 'available_tags',
-      'default_value': actions.BUILTIN_TAGS,
-      'pdb_type': None,
-      'gui_type': None,
-    },
-    {
       'type': 'bool',
       'name': 'edit_mode',
       'default_value': False,

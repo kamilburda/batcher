@@ -20,7 +20,7 @@ def insert_foreground_layer(batcher, tag):
 def _insert_tagged_layer(batcher, tag, insert_mode):
   tagged_items = [
     item for item in batcher.item_tree.iter(with_folders=True, filtered=False)
-    if tag in item.tags]
+    if tag != Gimp.ColorTag.NONE and item.raw.get_color_tag() == tag]
   merged_tagged_layer = None
   orig_merged_tagged_layer = None
   
@@ -31,8 +31,8 @@ def _insert_tagged_layer(batcher, tag, insert_mode):
     batcher_.invoker.remove(cleanup_tagged_layers_action_id, ['cleanup_contents'])
   
   # We use`Invoker.add` instead of `batcher.add_procedure` since the latter
-  # would add the function only at the start of processing and we already are in
-  # the middle of processing here.
+  # would add the function only at the start of processing, and we already
+  # are in the middle of processing here.
   cleanup_tagged_layers_action_id = batcher.invoker.add(
     _cleanup_tagged_layers, ['cleanup_contents'])
   
@@ -130,7 +130,7 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
   if tagged_layer is not None:
     name = batcher.current_raw_item.get_name()
     visible = batcher.current_raw_item.get_visible()
-    orig_tags = _get_tags(batcher.current_raw_item)
+    orig_color_tag = batcher.current_raw_item.get_color_tag()
     
     if layer_to_merge_down_str == 'current_item':
       layer_to_merge_down = batcher.current_raw_item
@@ -147,11 +147,7 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
     batcher.current_raw_item = merged_layer
     
     batcher.current_raw_item.set_visible(visible)
-    _set_tags(batcher.current_raw_item, orig_tags)
-    # We do not expect layer groups as folders to be merged since the plug-in
-    # manipulates regular layers only (a layer group is merged into a single
-    # layer during processing). Therefore, folder tags are ignored.
-    _set_tags(batcher.current_raw_item, set(), pg.itemtree.TYPE_FOLDER)
+    batcher.current_raw_item.set_color_tag(orig_color_tag)
 
 
 def get_background_layer(batcher):
@@ -193,12 +189,12 @@ def _get_adjacent_layer(
     position = batcher.current_image.get_item_position(batcher.current_raw_item)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
-      tags = [
-        procedure['arguments/tag'].value
+      color_tags = [
+        procedure['arguments/color_tag'].value
         for procedure in _get_previous_enabled_procedures(
           batcher, batcher.current_procedure, insert_tagged_layers_procedure_name)]
       
-      if _has_tag(next_layer, tags, None) or _has_tag(next_layer, tags, pg.itemtree.TYPE_FOLDER):
+      if next_layer.get_color_tag() in color_tags:
         adjacent_layer = next_layer
   
   if adjacent_layer is not None:
@@ -225,15 +221,3 @@ def _get_previous_enabled_procedures(batcher, current_action, action_orig_name_t
       previous_enabled_procedures.append(procedure)
   
   return previous_enabled_procedures
-
-
-def _has_tag(layer, tags, item_type=None):
-  return any(tag in _get_tags(layer, item_type) for tag in tags)
-
-
-def _get_tags(layer, item_type=None):
-  return pg.itemtree.get_tags_from_raw_item(layer, pg.config.SOURCE_NAME, item_type)
-
-
-def _set_tags(layer, tags, item_type=None):
-  return pg.itemtree.set_tags_for_raw_item(layer, tags, pg.config.SOURCE_NAME, item_type)

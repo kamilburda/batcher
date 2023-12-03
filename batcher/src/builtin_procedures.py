@@ -230,12 +230,12 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'insert_background_layers',
     'function': background_foreground.insert_background_layer,
     'display_name': _('Insert background layers'),
+    'display_options_on_create': True,
     'arguments': [
       {
-        'type': 'string',
-        'name': 'tag',
-        'display_name': _('Tag'),
-        'default_value': 'background',
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
       },
     ],
   },
@@ -243,12 +243,12 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'insert_foreground_layers',
     'function': background_foreground.insert_foreground_layer,
     'display_name': _('Insert foreground layers'),
+    'display_options_on_create': True,
     'arguments': [
       {
-        'type': 'string',
-        'name': 'tag',
-        'display_name': _('Tag'),
-        'default_value': 'foreground',
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
       },
     ],
   },

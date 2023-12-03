@@ -52,8 +52,6 @@ class PreviewsController:
       'preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect(
       'preview-updated', self._on_name_preview_updated)
-    self._name_preview.connect(
-      'preview-tags-changed', self._on_name_preview_tags_changed)
   
   def on_paned_outside_previews_notify_position(self, paned, property_spec):
     current_position = paned.get_position()
@@ -279,9 +277,6 @@ class PreviewsController:
       self._image_preview.lock_update(True, self._ACTION_ERROR_KEY)
     
     self._image_preview.update_item()
-  
-  def _on_name_preview_tags_changed(self, preview):
-    self._update_image_preview()
   
   def _on_toplevel_notify_is_active(self, toplevel, property_spec):
     if toplevel.is_active():

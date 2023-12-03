@@ -68,11 +68,6 @@ from pygimplib.pypdb import pdb
 from src import placeholders
 
 
-BUILTIN_TAGS = {
-  'background': _('Background'),
-  'foreground': _('Foreground'),
-}
-
 DEFAULT_PROCEDURES_GROUP = 'default_procedures'
 DEFAULT_CONSTRAINTS_GROUP = 'default_constraints'
 

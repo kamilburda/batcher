@@ -1,5 +1,9 @@
 """Built-in plug-in constraints."""
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 import pygimplib as pg
 
 
@@ -31,15 +35,20 @@ def is_visible(item):
   return item.raw.get_visible()
 
 
-def has_tags(item, tags=None):
-  if tags:
-    return any(tag for tag in tags if tag in item.tags)
+def has_color_tags(item, tags=None):
+  item_color_tag = item.raw.get_color_tag()
+
+  if item_color_tag == Gimp.ColorTag.NONE:
+    return False
   else:
-    return bool(item.tags)
+    if tags:
+      return any(item_color_tag == tag for tag in tags)
+    else:
+      return item_color_tag != Gimp.ColorTag.NONE
 
 
-def has_no_tags(item, tags=None):
-  return not has_tags(item, tags)
+def has_no_color_tags(item, tags=None):
+  return not has_color_tags(item, tags)
 
 
 _BUILTIN_CONSTRAINTS_LIST = [
@@ -92,33 +101,33 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'display_name': _('Visible'),
   },
   {
-    'name': 'with_tags',
+    'name': 'with_color_tags',
     'type': 'constraint',
-    'function': has_tags,
-    # FOR TRANSLATORS: Think of "Only layers with tags" when translating this
-    'display_name': _('With tags'),
+    'function': has_color_tags,
+    # FOR TRANSLATORS: Think of "Only layers with color tags" when translating this
+    'display_name': _('With color tags'),
     'arguments': [
       {
         'type': 'array',
-        'name': 'tags',
-        'display_name': _('Tags'),
-        'element_type': 'string',
+        'name': 'color_tags',
+        'display_name': _('Color tags'),
+        'element_type': 'color_tag',
         'default_value': (),
       },
     ],
   },
   {
-    'name': 'without_tags',
+    'name': 'without_color_tags',
     'type': 'constraint',
-    'function': has_no_tags,
-    # FOR TRANSLATORS: Think of "Only layers without tags" when translating this
-    'display_name': _('Without tags'),
+    'function': has_no_color_tags,
+    # FOR TRANSLATORS: Think of "Only layers without color tags" when translating this
+    'display_name': _('Without color tags'),
     'arguments': [
       {
         'type': 'array',
-        'name': 'tags',
-        'display_name': _('Tags'),
-        'element_type': 'string',
+        'name': 'color_tags',
+        'display_name': _('Color tags'),
+        'element_type': 'color_tag',
         'default_value': (),
       },
     ],

@@ -4,13 +4,13 @@ from collections.abc import Iterable
 from typing import Set
 
 import collections
-import os
 import traceback
 
 import gi
 gi.require_version('Gdk', '3.0')
-from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -29,7 +29,6 @@ class NamePreview(preview_base_.Preview):
   
   Additional features:
   * toggling "filter mode" - unselected items are not sensitive.
-  * assigning tags to items.
   
   Signals:
   
@@ -43,35 +42,30 @@ class NamePreview(preview_base_.Preview):
     * error: If ``None``, the preview was updated successfully. Otherwise,
       this is an `Exception` instance describing the error that occurred during
       the update.
-
-  * ``'preview-tags-changed'`` - An existing tag was added to or removed from an
-    item.
   """
   
   __gsignals__ = {
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-updated': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
-    'preview-tags-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
-  
-  _ADD_TAG_POPUP_HBOX_SPACING = 5
-  _ADD_TAG_POPUP_BORDER_WIDTH = 5
   
   _COLUMNS = (
     _COLUMN_ICON_ITEM,
     _COLUMN_ICON_ITEM_VISIBLE,
-    _COLUMN_ICON_TAG_VISIBLE,
+    _COLUMN_ICON_COLOR_TAG,
+    _COLUMN_ICON_COLOR_TAG_VISIBLE,
     _COLUMN_ITEM_NAME_SENSITIVE,
     _COLUMN_ITEM_NAME,
     _COLUMN_ITEM_ID,
     _COLUMN_ITEM_TYPE) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
-    [2, GObject.TYPE_BOOLEAN],
+    [2, GdkPixbuf.Pixbuf],
     [3, GObject.TYPE_BOOLEAN],
-    [4, GObject.TYPE_STRING],
-    [5, GObject.TYPE_INT],
-    [6, GObject.TYPE_INT])
+    [4, GObject.TYPE_BOOLEAN],
+    [5, GObject.TYPE_STRING],
+    [6, GObject.TYPE_INT],
+    [7, GObject.TYPE_INT])
   
   def __init__(
         self,
@@ -80,8 +74,7 @@ class NamePreview(preview_base_.Preview):
         initial_item_tree=None,
         collapsed_items=None,
         selected_items=None,
-        selected_items_filter_name='selected_in_preview',
-        available_tags_setting=None):
+        selected_items_filter_name='selected_in_preview'):
     super().__init__()
     
     self._batcher = batcher
@@ -90,7 +83,6 @@ class NamePreview(preview_base_.Preview):
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
     self._selected_items_filter_name = selected_items_filter_name
-    self._available_tags_setting = available_tags_setting
     
     self.is_filtering = False
     """If ``True``, unselected items are not sensitive."""
@@ -100,12 +92,9 @@ class NamePreview(preview_base_.Preview):
     self._tree_iters = collections.defaultdict(pg.utils.return_none_func)
     
     self._row_expand_collapse_interactive = True
-    self._toggle_tag_interactive = True
     self._clearing_preview = False
     self._row_select_interactive = True
     self._initial_scroll_to_selection = True
-
-    self._icon_tag_filepath = os.path.join(pg.config.PLUGIN_DIRPATH, 'images', 'icon_tag.png')
     
     self._init_gui()
   
@@ -166,8 +155,6 @@ class NamePreview(preview_base_.Preview):
     self._set_selection()
     self._set_item_tree_sensitive_for_selected(items)
     
-    self._update_available_tags()
-    
     self._tree_view.columns_autosize()
     
     self.emit('preview-updated', None)
@@ -223,8 +210,6 @@ class NamePreview(preview_base_.Preview):
     
     self._init_icons()
     
-    self._init_tags_menu()
-    
     column = Gtk.TreeViewColumn()
     
     cell_renderer_icon_item = Gtk.CellRendererPixbuf()
@@ -234,13 +219,14 @@ class NamePreview(preview_base_.Preview):
       pixbuf=self._COLUMN_ICON_ITEM[0],
       visible=self._COLUMN_ICON_ITEM_VISIBLE[0],
     )
-    
-    cell_renderer_icon_tag = Gtk.CellRendererPixbuf()
-    cell_renderer_icon_tag.set_property('pixbuf', self._icons['tag'])
-    column.pack_start(cell_renderer_icon_tag, False)
+
+    cell_renderer_icon_color_tag = Gtk.CellRendererPixbuf()
+    column.pack_start(cell_renderer_icon_color_tag, False)
     column.set_attributes(
-      cell_renderer_icon_tag,
-      visible=self._COLUMN_ICON_TAG_VISIBLE[0])
+      cell_renderer_icon_color_tag,
+      pixbuf=self._COLUMN_ICON_COLOR_TAG[0],
+      visible=self._COLUMN_ICON_COLOR_TAG_VISIBLE[0],
+    )
     
     cell_renderer_item_name = Gtk.CellRendererText()
     column.pack_start(cell_renderer_item_name, False)
@@ -262,218 +248,11 @@ class NamePreview(preview_base_.Preview):
     self._tree_view.connect('row-collapsed', self._on_tree_view_row_collapsed)
     self._tree_view.connect('row-expanded', self._on_tree_view_row_expanded)
     self._tree_view.get_selection().connect('changed', self._on_tree_selection_changed)
-    self._tree_view.connect('event', self._on_tree_view_right_button_press_event)
   
   def _init_icons(self):
-    self._icons = {}
-    self._icons['folder'] = self._tree_view.render_icon_pixbuf(
-      Gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU)
-    self._icons['tag'] = GdkPixbuf.Pixbuf.new_from_file_at_size(
-      self._icon_tag_filepath, -1, self._icons['folder'].props.height)
-
-  def _init_tags_menu(self):
-    self._tags_menu_items = {}
-    self._tags_remove_submenu_items = {}
-    
-    self._tags_menu_relative_position = None
-    
-    self._tags_menu = Gtk.Menu()
-    self._tags_remove_submenu = Gtk.Menu()
-    
-    self._tags_menu.append(Gtk.SeparatorMenuItem())
-    
-    self._menu_item_add_tag = Gtk.MenuItem(label=_('Add New Tag...'))
-    self._menu_item_add_tag.connect('activate', self._on_menu_item_add_tag_activate)
-    self._tags_menu.append(self._menu_item_add_tag)
-    
-    self._menu_item_remove_tag = Gtk.MenuItem(label=_('Remove Tag'))
-    self._menu_item_remove_tag.set_submenu(self._tags_remove_submenu)
-    self._tags_menu.append(self._menu_item_remove_tag)
-    
-    for tag, tag_display_name in self._available_tags_setting.default_value.items():
-      self._add_tag_menu_item(tag, tag_display_name)
-    
-    self._tags_menu.show_all()
-  
-  def _update_available_tags(self):
-    used_tags = set()
-    for item in self._batcher.item_tree.iter(filtered=False):
-      for tag in item.tags:
-        used_tags.add(tag)
-        if tag not in self._tags_menu_items:
-          self._add_tag_menu_item(tag, tag)
-          self._add_remove_tag_menu_item(tag, tag)
-    
-    for tag, menu_item in self._tags_remove_submenu_items.items():
-      menu_item.set_sensitive(tag not in used_tags)
-    
-    for tag in self._available_tags_setting.value:
-      if tag not in self._tags_menu_items:
-        self._add_tag_menu_item(tag, tag)
-        self._add_remove_tag_menu_item(tag, tag)
-    
-    self._menu_item_remove_tag.set_sensitive(
-      bool(self._tags_remove_submenu.get_children()))
-    
-    self._sort_tags_menu_items()
-    
-    for tag in self._tags_menu_items:
-      if tag not in self._available_tags_setting.value:
-        self._available_tags_setting.value[tag] = tag
-    
-    self._available_tags_setting.save()
-  
-  def _sort_tags_menu_items(self):
-    for new_tag_position, tag in (
-          enumerate(sorted(self._tags_menu_items, key=lambda tag_: tag_.lower()))):
-      self._tags_menu.reorder_child(self._tags_menu_items[tag], new_tag_position)
-      if tag in self._tags_remove_submenu_items:
-        self._tags_remove_submenu.reorder_child(
-          self._tags_remove_submenu_items[tag], new_tag_position)
-  
-  def _add_tag_menu_item(self, tag, tag_display_name):
-    self._tags_menu_items[tag] = Gtk.CheckMenuItem(label=tag_display_name)
-    self._tags_menu_items[tag].connect('toggled', self._on_tags_menu_item_toggled, tag)
-    self._tags_menu_items[tag].show()
-    self._tags_menu.prepend(self._tags_menu_items[tag])
-    
-    return self._tags_menu_items[tag]
-  
-  def _add_remove_tag_menu_item(self, tag, tag_display_name):
-    self._tags_remove_submenu_items[tag] = Gtk.MenuItem(label=tag_display_name)
-    self._tags_remove_submenu_items[tag].connect(
-      'activate', self._on_tags_remove_submenu_item_activate, tag)
-    self._tags_remove_submenu_items[tag].show()
-    self._tags_remove_submenu.prepend(self._tags_remove_submenu_items[tag])
-  
-  def _on_tree_view_right_button_press_event(self, tree_view, event):
-    if event.type == Gdk.EventType.BUTTON_PRESS and event.button.button == 3:
-      item_keys = []
-      stop_event_propagation = False
-      
-      # Get the current selection. We cannot use `TreeSelection.get_selection()`
-      # because this event is fired before the selection is updated.
-      selection_at_pos = self._tree_view.get_path_at_pos(int(event.x), int(event.y))
-      
-      if (selection_at_pos is not None
-          and self._tree_view.get_selection().count_selected_rows() > 1):
-        item_keys = self._get_keys_from_current_selection()
-        stop_event_propagation = True
-      else:
-        if selection_at_pos is not None:
-          tree_iter = self._tree_model.get_iter(selection_at_pos[0])
-          item_keys = [self._get_key_from_tree_iter(tree_iter)]
-      
-      self._toggle_tag_interactive = False
-      
-      items = [self._batcher.item_tree[item_key] for item_key in item_keys]
-      for tag, tags_menu_item in self._tags_menu_items.items():
-        tags_menu_item.set_active(all(tag in item.tags for item in items))
-      
-      self._toggle_tag_interactive = True
-      
-      if len(item_keys) >= 1:
-        self._tags_menu.popup_at_pointer(None)
-        
-        toplevel_window = pg.gui.get_toplevel_window(self)
-        if toplevel_window is not None:
-          self._tags_menu_relative_position = toplevel_window.get_window().get_pointer()
-      
-      return stop_event_propagation
-  
-  def _on_tags_menu_item_toggled(self, tags_menu_item, tag):
-    if self._toggle_tag_interactive:
-      self._batcher.input_image.undo_group_start()
-      
-      for item_key in self._get_keys_from_current_selection():
-        item = self._batcher.item_tree[item_key]
-        
-        if tags_menu_item.get_active():
-          item.add_tag(tag)
-        else:
-          item.remove_tag(tag)
-      
-      self._batcher.input_image.undo_group_end()
-      
-      # Modifying just one item could result in renaming other items
-      # differently, hence update the whole preview.
-      self.update(update_existing_contents_only=True)
-      
-      self.emit('preview-tags-changed')
-  
-  def _on_menu_item_add_tag_activate(self, menu_item_add_tag):
-    def _on_popup_focus_out_event(popup, event):
-      popup.destroy()
-    
-    def _on_popup_key_press_event(popup, event):
-      key_name = Gdk.keyval_name(event.keyval)
-      if key_name in ['Return', 'KP_Enter']:
-        entry_text = entry_add_tag.get_text()
-        if entry_text and entry_text not in self._tags_menu_items:
-          menu_item = self._add_tag_menu_item(entry_text, entry_text)
-          menu_item.set_active(True)
-          self._add_remove_tag_menu_item(entry_text, entry_text)
-        
-        popup.destroy()
-        return True
-      elif key_name == 'Escape':
-        popup.destroy()
-        return True
-    
-    def _set_popup_position(popup, window):
-      if self._tags_menu_relative_position is not None:
-        window_absolute_position = window.get_window().get_origin()
-        popup.move(
-          window_absolute_position.x + self._tags_menu_relative_position[0],
-          window_absolute_position.y + self._tags_menu_relative_position[1])
-        
-        self._tags_menu_relative_position = None
-
-    popup_add_tag = Gtk.Window(
-      type=Gtk.WindowType.TOPLEVEL,
-      type_hint=Gdk.WindowTypeHint.POPUP_MENU,
-      decorated=False,
-    )
-    
-    toplevel = pg.gui.get_toplevel_window(self)
-    if toplevel is not None:
-      popup_add_tag.set_transient_for(toplevel)
-    
-    _set_popup_position(popup_add_tag, toplevel)
-    
-    label_tag_name = Gtk.Label(label=_('Tag Name:'))
-    
-    entry_add_tag = Gtk.Entry()
-
-    hbox = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._ADD_TAG_POPUP_HBOX_SPACING,
-      border_width=self._ADD_TAG_POPUP_BORDER_WIDTH,
-    )
-    hbox.pack_start(label_tag_name, False, False, 0)
-    hbox.pack_start(entry_add_tag, False, False, 0)
-    
-    frame = Gtk.Frame()
-    frame.add(hbox)
-    
-    popup_add_tag.add(frame)
-    
-    popup_add_tag.connect('focus-out-event', _on_popup_focus_out_event)
-    popup_add_tag.connect('key-press-event', _on_popup_key_press_event)
-    
-    popup_add_tag.show_all()
-  
-  def _on_tags_remove_submenu_item_activate(self, tags_remove_submenu_item, tag):
-    self._tags_remove_submenu.remove(tags_remove_submenu_item)
-    self._tags_menu.remove(self._tags_menu_items[tag])
-    
-    del self._tags_menu_items[tag]
-    del self._tags_remove_submenu_items[tag]
-    del self._available_tags_setting.value[tag]
-    
-    self._menu_item_remove_tag.set_sensitive(bool(self._tags_remove_submenu.get_children()))
-    
-    self._available_tags_setting.save()
+    self._icons = {
+      'folder': self._tree_view.render_icon_pixbuf(Gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU),
+    }
   
   def _on_tree_view_row_collapsed(self, tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
@@ -595,12 +374,14 @@ class NamePreview(preview_base_.Preview):
       parent_tree_iter = None
 
     item_icon = self._get_icon_from_item(item)
+    color_tag_icon = self._get_color_tag_icon(item)
     
     tree_iter = self._tree_model.append(
       parent_tree_iter,
       [item_icon,
        item_icon is not None,
-       bool(item.tags),
+       color_tag_icon,
+       color_tag_icon is not None,
        True,
        item.name,
        item.raw.get_id(),
@@ -613,8 +394,6 @@ class NamePreview(preview_base_.Preview):
   def _update_item(self, item):
     self._tree_model.set(
       self._tree_iters[self._get_key(item)],
-      self._COLUMN_ICON_TAG_VISIBLE[0],
-      bool(item.tags),
       self._COLUMN_ITEM_NAME_SENSITIVE[0],
       True,
       self._COLUMN_ITEM_NAME[0],
@@ -670,7 +449,16 @@ class NamePreview(preview_base_.Preview):
       return self._icons['folder']
     else:
       return None
-  
+
+  @staticmethod
+  def _get_color_tag_icon(item):
+    color_tag = item.raw.get_color_tag()
+
+    if color_tag in _COLOR_TAGS_AND_PREMADE_PIXBUFS:
+      return _COLOR_TAGS_AND_PREMADE_PIXBUFS[color_tag]
+    else:
+      return None
+
   def _set_expanded_items(self, tree_path=None):
     """Sets the expanded state of items in the tree view.
     
@@ -730,6 +518,57 @@ class NamePreview(preview_base_.Preview):
           self._tree_model.get_path(self._tree_iters[self._selected_items[0]]))
         if first_selected_item_path is not None:
           self._tree_view.scroll_to_cell(first_selected_item_path, None, True, 0.5, 0.0)
+
+
+def _get_color_tag_pixbuf(color_tag):
+  border_color = 0xd0d0d0ff
+  default_color = 0x7f7f7fff
+
+  border_color_padding = 2
+  tag_color_padding = 3
+
+  if color_tag != Gimp.ColorTag.NONE and color_tag in Gimp.ColorTag.__enum_values__:
+    icon_size = Gtk.icon_size_lookup(Gtk.IconSize.MENU)
+
+    color_tag_pixbuf = GdkPixbuf.Pixbuf.new(
+      GdkPixbuf.Colorspace.RGB, True, 8, icon_size.width, icon_size.height)
+
+    color_tag_border_subpixbuf = color_tag_pixbuf.new_subpixbuf(
+      border_color_padding + 1,
+      border_color_padding + 1,
+      icon_size.width - border_color_padding * 2,
+      icon_size.height - border_color_padding * 2)
+
+    color_tag_border_subpixbuf.fill(border_color)
+
+    color_tag_color_subpixbuf = color_tag_pixbuf.new_subpixbuf(
+      tag_color_padding + 1,
+      tag_color_padding + 1,
+      icon_size.width - tag_color_padding * 2,
+      icon_size.height - tag_color_padding * 2)
+
+    color_tag_color_subpixbuf.fill(_COLOR_TAGS_AND_COLORS.get(color_tag, default_color))
+
+    return color_tag_pixbuf
+  else:
+    return None
+
+
+# Colors taken from:
+#  https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpwidgets-utils.c
+_COLOR_TAGS_AND_COLORS = {
+  Gimp.ColorTag.BLUE: 0x54669fff,
+  Gimp.ColorTag.GREEN: 0x6f8f30ff,
+  Gimp.ColorTag.YELLOW: 0xd2b62dff,
+  Gimp.ColorTag.ORANGE: 0xd97a26ff,
+  Gimp.ColorTag.BROWN: 0x573519ff,
+  Gimp.ColorTag.RED: 0xaa2a2fff,
+  Gimp.ColorTag.VIOLET: 0x6342aeff,
+  Gimp.ColorTag.GRAY: 0x575757ff,
+}
+
+_COLOR_TAGS_AND_PREMADE_PIXBUFS = {
+  color_tag: _get_color_tag_pixbuf(color_tag) for color_tag in _COLOR_TAGS_AND_COLORS}
 
 
 GObject.type_register(NamePreview)

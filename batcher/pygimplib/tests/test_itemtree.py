@@ -4,15 +4,8 @@ Because the public interface to test is identical for all `ItemTree`
 subclasses, it is sufficient to test the `itemtree` module using one of the
 subclasses. The `LayerTree` class was chosen for this purpose.
 """
-
-import pickle
-
 import unittest
 import unittest.mock as mock
-
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 
 from . import stubs_gimp
 from . import utils_itemtree
@@ -258,135 +251,37 @@ class TestItem(unittest.TestCase):
       ),
     )
   
-  def test_reset_without_tags(self):
+  def test_reset(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
     self.item.children = ['three', 'four']
-    self.item.tags.add('five')
     
     self.item.reset()
     
     self.assertEqual(self.item.name, 'main-background.jpg')
     self.assertEqual(self.item.parents, [])
     self.assertEqual(self.item.children, [])
-    self.assertEqual(self.item.tags, {'five'})
-  
-  def test_reset_with_tags(self):
-    self.item.name = 'main'
-    self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
-    
-    self.item.reset(tags=True)
-    
-    self.assertEqual(self.item.name, 'main-background.jpg')
-    self.assertEqual(self.item.parents, [])
-    self.assertEqual(self.item.children, [])
-    self.assertEqual(self.item.tags, set([]))
   
   def test_push_and_pop_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
     self.item.children = ['three', 'four']
-    self.item.tags.add('five')
     
     self.item.push_state()
-    self.item.reset(tags=True)
+    self.item.reset()
     self.item.pop_state()
     
     self.assertEqual(self.item.name, 'main')
     self.assertEqual(self.item.parents, ['one', 'two'])
     self.assertEqual(self.item.children, ['three', 'four'])
-    self.assertEqual(self.item.tags, {'five'})
   
   def test_pop_state_with_no_saved_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
     self.item.children = ['three', 'four']
-    self.item.tags.add('five')
     
     self.item.pop_state()
     
     self.assertEqual(self.item.name, 'main')
     self.assertEqual(self.item.parents, ['one', 'two'])
     self.assertEqual(self.item.children, ['three', 'four'])
-    self.assertEqual(self.item.tags, {'five'})
-
-  def test_add_tag(self):
-    self.assertEqual(self.item.tags, set())
-    
-    self.item.add_tag('background')
-    self.assertIn('background', self.item.tags)
-
-    self.item.add_tag('foreground')
-    self.assertIn('background', self.item.tags)
-    self.assertIn('foreground', self.item.tags)
-
-  def test_remove_tag(self):
-    self.assertEqual(self.item.tags, set())
-    
-    with self.assertRaises(ValueError):
-      self.item.remove_tag('background')
-    
-    self.item.add_tag('background')
-    self.item.remove_tag('background')
-    
-    self.assertNotIn('background', self.item.tags)
-    self.assertFalse(self.item.tags)
-    self.assertFalse(self.item.raw.get_parasite_list())
-
-  def test_initial_tags(self):
-    item_tags_source_name = 'test'
-    
-    layer = stubs_gimp.Layer('layer')
-    layer.attach_parasite(
-      Gimp.Parasite.new(
-        item_tags_source_name,
-        0,
-        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
-
-    # noinspection PyTypeChecker
-    item = pgitemtree.Item(layer, self.ITEM, tags_source_name=item_tags_source_name)
-    self.assertIn('background', item.tags)
-
-  def test_initial_tags_with_invalid_data(self):
-    item_tags_source_name = 'test'
-    
-    layer = stubs_gimp.Layer('layer')
-    layer.attach_parasite(
-      Gimp.Parasite.new(item_tags_source_name, 0, b'invalid_data'))
-
-    # noinspection PyTypeChecker
-    item = pgitemtree.Item(layer, self.ITEM, tags_source_name=item_tags_source_name)
-    self.assertFalse(item.tags)
-
-  def test_initial_tags_for_item_as_folder(self):
-    item_tags_source_name = 'test'
-    folder_tags_source_name = f'{item_tags_source_name}_{pgitemtree.FOLDER_KEY}'
-    
-    layer = stubs_gimp.Layer('layer')
-    layer.attach_parasite(
-      Gimp.Parasite.new(
-        folder_tags_source_name,
-        0,
-        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
-
-    # noinspection PyTypeChecker
-    item = pgitemtree.Item(layer, self.FOLDER, tags_source_name=item_tags_source_name)
-    self.assertEqual(item.tags_source_name, folder_tags_source_name)
-    self.assertIn('background', item.tags)
-
-  def test_initial_tags_for_item_as_folder_unrecognized_source_name(self):
-    item_tags_source_name = 'test'
-    folder_tags_source_name = f'{item_tags_source_name}_{pgitemtree.FOLDER_KEY}'
-    
-    layer = stubs_gimp.Layer('layer')
-    layer.attach_parasite(
-      Gimp.Parasite.new(
-        item_tags_source_name,
-        0,
-        pgutils.bytes_to_signed_bytes(pickle.dumps({'background'}))))
-
-    # noinspection PyTypeChecker
-    item = pgitemtree.Item(layer, self.FOLDER, tags_source_name=item_tags_source_name)
-    self.assertEqual(item.tags_source_name, folder_tags_source_name)
-    self.assertNotIn('background', item.tags)

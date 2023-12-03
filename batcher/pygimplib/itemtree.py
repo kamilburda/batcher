@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable, Iterator
-import pickle
-from typing import Generator, List, Optional, Set, Union, Tuple
+from typing import Generator, List, Optional, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -37,8 +36,7 @@ class Item:
         parents: Optional[Iterable[Item]] = None,
         children: Optional[Iterable[Item]] = None,
         prev_item: Optional[Item] = None,
-        next_item: Optional[Item] = None,
-        tags_source_name: Optional[str] = None):
+        next_item: Optional[Item] = None):
     if raw_item is None:
       raise TypeError('item cannot be None')
 
@@ -56,17 +54,11 @@ class Item:
     modifying the original item.
     """
 
-    self._tags_source_name = _get_effective_tags_source_name(
-      tags_source_name if tags_source_name else 'tags', self._type)
-
-    self._tags = self._load_tags()
-
     self._orig_name = self.name
     self._orig_parents = self._parents
     self._orig_children = self._children
-    self._orig_tags = set(self._tags)
 
-    self._item_attributes = ['name', '_parents', '_children', '_tags']
+    self._item_attributes = ['name', '_parents', '_children']
 
     self._saved_states = []
 
@@ -138,26 +130,6 @@ class Item:
     return self._next_item
 
   @property
-  def tags(self) -> Set[str]:
-    """A set of arbitrary strings attached to the item.
-    
-    Tags can be used for a variety of purposes, such as special handling of
-    items with specific tags. Tags are stored persistently in the `Gimp.Item`
-    object (``item`` attribute) as parasites. The name of the parasite source
-    is given by the ``tags_source_name`` attribute.
-    """
-    return self._tags
-
-  @property
-  def tags_source_name(self) -> Union[str, None]:
-    """Name of the persistent source for the ``tags`` attribute.
-    
-    Defaults to ``'tags'`` if ``None``. If ``type`` is ``FOLDER``,
-    ``'_folder'`` is appended to ``tags_source_name``.
-    """
-    return self._tags_source_name
-
-  @property
   def orig_name(self) -> str:
     """The original value of the ``Gimp.Item`` name.
     
@@ -174,11 +146,6 @@ class Item:
   def orig_children(self) -> Iterator[Item]:
     """The initial value of the ``children`` attribute of this item."""
     return iter(self._orig_children)
-
-  @property
-  def orig_tags(self) -> Iterator[str]:
-    """The initial value of the ``tags`` attribute for this item."""
-    return iter(self._orig_tags)
 
   def __str__(self) -> str:
     return pgutils.stringify_object(self, self.orig_name)
@@ -210,105 +177,11 @@ class Item:
     for attr_name, attr_value in saved_states.items():
       setattr(self, attr_name, attr_value)
 
-  def reset(self, tags: bool = False):
-    """Resets the item's attributes to the values upon its instantiation.
-
-    Is ``tags`` is ``True``, tags are also reset.
-    """
+  def reset(self):
+    """Resets the item's attributes to the values upon its instantiation."""
     self.name = self._orig_name
     self._parents = list(self._orig_parents)
     self._children = list(self._orig_children)
-    if tags:
-      self._tags = set(self._orig_tags)
-
-  def add_tag(self, tag: str):
-    """Adds the specified tag to the item.
-
-    The tag is saved to the item persistently.
-
-    This method has no effect if the tag already exists.
-    """
-    if tag in self._tags:
-      return
-
-    self._tags.add(tag)
-
-    self._save_tags()
-
-  def remove_tag(self, tag: str):
-    """Removes the specified tag from the item.
-
-    If the tag does not exist, ``ValueError`` is raised.
-    """
-    if tag not in self._tags:
-      raise ValueError(f'tag "{tag}" not found in {self}')
-
-    self._tags.remove(tag)
-
-    self._save_tags()
-
-  def _save_tags(self):
-    """Saves tags persistently to the item."""
-    set_tags_for_raw_item(self._raw_item, self._tags, self._tags_source_name)
-
-  def _load_tags(self):
-    return get_tags_from_raw_item(self._raw_item, self._tags_source_name)
-
-
-def get_tags_from_raw_item(
-      raw_item: Gimp.Item, source_name: str, item_type: Optional[int] = None,
-) -> Set[str]:
-  """Obtains a set of tags from a `Gimp.Item` instance, i.e. a raw item.
-
-  ``tags_source_name`` is the name of the persistent source (parasite) to obtain
-  tags from.
-
-  If ``item_type`` is ``TYPE_FOLDER``, then tags corresponding to the folder
-  type are returned. Otherwise, tags corresponding to ``TYPE_ITEM`` or
-  ``TYPE_GROUP`` are returned.
-  """
-  parasite = raw_item.get_parasite(_get_effective_tags_source_name(source_name, item_type))
-  if parasite:
-    parasite_data = pgutils.signed_bytes_to_bytes(parasite.get_data())
-    try:
-      tags = pickle.loads(parasite_data)
-    except Exception:
-      tags = set()
-
-    return tags
-  else:
-    return set()
-
-
-def set_tags_for_raw_item(
-      raw_item: Gimp.Item,
-      tags: Set[str],
-      source_name: str,
-      item_type: Optional[int] = None,
-):
-  remove_tags_from_raw_item(raw_item, source_name, item_type)
-
-  if tags:
-    raw_item.attach_parasite(
-      Gimp.Parasite.new(
-        _get_effective_tags_source_name(source_name, item_type),
-        Gimp.PARASITE_PERSISTENT | Gimp.PARASITE_UNDOABLE,
-        pgutils.bytes_to_signed_bytes(pickle.dumps(tags))))
-
-
-def remove_tags_from_raw_item(
-      raw_item: Gimp.Item,
-      source_name: str,
-      item_type: Optional[int] = None,
-):
-  raw_item.detach_parasite(_get_effective_tags_source_name(source_name, item_type))
-
-
-def _get_effective_tags_source_name(source_name, item_type=None):
-  if item_type == TYPE_FOLDER:
-    return f'{source_name}_{FOLDER_KEY}'
-  else:
-    return source_name
 
 
 class ItemTree(metaclass=abc.ABCMeta):
@@ -376,11 +249,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   
   @property
   def name(self) -> str:
-    """Optional name of the item tree.
-    
-    The name is currently used as an identifier of the persistent source for 
-    tags in items. See ``Item.tags`` for more information.
-    """
+    """Optional name of the item tree, serving as a string identifier."""
     return self._name
   
   def __getitem__(self, id_or_name: Union[int, str, Tuple[Union[int, str], str]]) -> Item:
@@ -550,10 +419,10 @@ class ItemTree(metaclass=abc.ABCMeta):
     child_items = []
     for raw_item in self._get_children_from_image(self._image):
       if raw_item.is_group():
-        child_items.append(Item(raw_item, TYPE_FOLDER, [], [], None, None, self._name))
-        child_items.append(Item(raw_item, TYPE_GROUP, [], [], None, None, self._name))
+        child_items.append(Item(raw_item, TYPE_FOLDER, [], [], None, None))
+        child_items.append(Item(raw_item, TYPE_GROUP, [], [], None, None))
       else:
-        child_items.append(Item(raw_item, TYPE_ITEM, [], [], None, None, self._name))
+        child_items.append(Item(raw_item, TYPE_ITEM, [], [], None, None))
     
     item_tree = child_items
     item_list = []
@@ -572,13 +441,10 @@ class ItemTree(metaclass=abc.ABCMeta):
         child_items = []
         for raw_item in item.raw.list_children():
           if raw_item.is_group():
-            child_items.append(
-              Item(raw_item, TYPE_FOLDER, parents_for_child, [], None, None, self._name))
-            child_items.append(
-              Item(raw_item, TYPE_GROUP, parents_for_child, [], None, None, self._name))
+            child_items.append(Item(raw_item, TYPE_FOLDER, parents_for_child, [], None, None))
+            child_items.append(Item(raw_item, TYPE_GROUP, parents_for_child, [], None, None))
           else:
-            child_items.append(
-              Item(raw_item, TYPE_ITEM, parents_for_child, [], None, None, self._name))
+            child_items.append(Item(raw_item, TYPE_ITEM, parents_for_child, [], None, None))
         
         # We break the convention here and access a private attribute from `Item`.
         item._orig_children = child_items

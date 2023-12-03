@@ -352,7 +352,7 @@ class TestSourceRead(unittest.TestCase):
         'gui_type': None,
       })
     self.assertSetEqual(
-      self.settings['main/constraints/visible'].tags, set(['action', 'constraint']))
+      self.settings['main/constraints/visible'].tags, {'action', 'constraint'})
     self.assertDictEqual(
       self.settings['main/constraints/visible/enabled'].to_dict(),
       {

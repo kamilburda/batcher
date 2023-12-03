@@ -69,11 +69,10 @@ Yes, you may insert any GIMP filter as a procedure:
 
 **I need every layer to have the same background.**
 
-1. In the preview to the right, right-click on the layer name you want to be your background.
-2. Check `Background`. A tag icon will be displayed next to the layer name.
-3. To add more layers as background, repeat steps 1 and 2. If you need to achieve a particular order of background layers, you need to reorder the layers in GIMP (i.e. outside the plug-in). The plug-in will sync with the changes done in GIMP.
-4. Add the "Insert background layers" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
-5. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
+1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
+2. In the plug-in, the color tag will be displayed next to the layer name(s).
+3. Add the "Insert background layers" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
+4. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
 **I want to save the image as a multi-page PDF file.**
@@ -210,30 +209,21 @@ Examples:
 
 **\[tags\]**
 
-All tags assigned to a layer.
-For example, suppose that a layer has the following tags: `left`, `middle`, `right`.
-Then (by default) the tags will be formatted as `left-middle-right`.
-
-Without arguments, tags are inserted in alphabetical order.
-
-See [Tagging Layers](#tagging-layers) for information about layer tags.
+[Color tag](https://docs.gimp.org/en/gimp-layer-new.html) assigned to a layer.
+For example, suppose that a layer has a green color tag assigned.
+Then (by default) the tag will be formatted as `green`.
 
 Arguments:
-* *separator*: A string separating the tags.
-  Defaults to `-`.
 * *wrapper*: A string that wraps around each tag.
   The wrapper must contain `%t` denoting the tag.
-* *tags...*: Specific tag names as comma-separated arguments.
-  If omitted, all tags are inserted.
-  Tags not assigned to a layer are ignored.
-
-If at least two arguments are specified and the second argument contains `%t`, then the first argument is considered to be the *separator* argument and the second argument the *wrapper* argument.
+* *color name, custom name, ...*: Color name in English followed by a custom name for the color. This allows you to map the color name to something else, e.g. `green` to `background`. You can specify multiple such pairs in case your image contains layers with different color tags.
 
 Examples:
-* `[tags]` → `left-middle-right`
-* `[tags, right, left]` → `right-left`
-* `[tags, _, (%t)]` → `(left)_(middle)_(right)`
-* `[tags, _, (%t), right, left]` → `(right)_(left)`
+* `[tags]` → `green`
+* `[tags, %t, green, background]` → `background`
+* `[tags, (%t), green, background]` → `(background)`
+* `[tags, %t, blue, foreground]` → ``
+* `[tags, %t, green, background, blue, foreground]` → `background`
 
 **\[current date\]**
 
@@ -340,12 +330,11 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 **Insert background layers**
 
-Insert layers tagged with `Background` as background for each layer.
-To set a layer as a background layer, see [Tagging Layers](#tagging-layers).
+Insert layers tagged with a specific color tag as background for each layer.
 
-Note that even background layers are processed and exported - to prevent this behavior, enable the `Without tags` constraint.
+Note that even background layers are processed and exported - to prevent this behavior, enable the `Without color tags` constraint.
 
-You may modify the tag representing the background layers by editing the procedure argument `Tag`.
+You may set a different color tag representing the background layers by editing the procedure argument `Color tag`.
 
 In the dialog, this procedure is always inserted in the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
@@ -353,8 +342,7 @@ If this is your intention, you can always move this procedure below `Use layer s
 
 **Insert foreground layers**
 
-Insert layers tagged with `Foreground` as foreground for each layer.
-To set a layer as a foreground layer, see [Tagging Layers](#tagging-layers).
+Insert layers tagged with a specific color tag as foreground for each layer.
 
 For more information, see "Insert background layers" above.
 
@@ -451,44 +439,26 @@ Process only layers at the top of the layer tree (i.e. do not process layers ins
 Process only visible layers.
 
 By default, layers (visible or not) whose parent layer groups are invisible are also ignored.
-To disable this behavior, edit the constraint, click on `More options` and then uncheck `Also apply to parent folders`.
+To disable this behavior, edit the constraint, click on `More options` and check `Also apply to parent folders`.
 
-**With tags**
+**With color tags**
 
-Process only layers with tags.
+Process only layers having a color tag.
 
-By default, all layers without tags are excluded.
-To process only layers with specific tags, edit this constraint and add the tags for the `Tags` argument.
-For example, by adding `background`, only layers containing the `background` tag will be processed.
-Other tagged layers will be excluded.
+By default, all layers without a color tag are excluded.
+To process only layers with specific color tags, edit this constraint and add the color tags for the `Color tags` argument.
+For example, by adding a blue tag, only layers containing the blue tag will be processed.
+Other tagged or untagged layers will be excluded.
 
-See [Tagging Layers](#tagging-layers) for information about tags.
+**Without color tags**
 
-**Without tags**
+Process only layers having no color tag.
 
-Process only layers with no tags.
+By default, all layers with a color tag are excluded.
+To ignore only specific color tags, edit this constraint and add the color tags for the `Color tags` argument.
 
-By default, all layers with tags are excluded.
-To ignore only specific tags, edit this constraint and add the tags for the `Tags` argument.
-
-See [Tagging Layers](#tagging-layers) for information about tags.
-
-
-Tagging Layers
---------------
-
-Tags attached to layers allow you to customize each layer individually.
-To attach a tag to one or more layers, select them in the preview, right-click on the selection and choose your tag.
-Tagged layers are indicated with a tag icon in the preview.
-
-Adding or removing tags modifies the current image.
-Save the image to keep the tags permanently.
-
-By default, Batcher provides `Background` and `Foreground` tags.
-To add custom tags, right-click anywhere on the preview, select `Add New Tag...` and name your new tag.
-The new tag will be immediately added to the currently selected layer(s).
-
-To remove custom tags, remove them first from all layers, then right-click anywhere on the preview, select `Remove Tag...` and select the tag you wish to remove.
+If a layer group is assigned a color tag, it will normally not be ignored.
+To also ignore layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
 
 
 More Options

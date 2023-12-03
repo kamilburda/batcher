@@ -87,15 +87,9 @@ Custom actions
   * Cancel
 * remove
 
-Tagged layers in built-in actions
-
 Preview
 * layer names
   * layers are organized in folder structure, names are properly uniquified
-  * tags
-    * assign tag to layer
-    * add tag
-    * remove tag
   * selected and not selected layers for the "Selected in preview" constraint
 * image
   * properly scaled image and procedures applied on the image

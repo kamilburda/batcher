@@ -7,6 +7,8 @@ import os
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 import pygimplib as pg
 
@@ -37,6 +39,48 @@ class FilenamePatternSetting(pg.setting.StringSetting):
       self._value = self._default_value
     else:
       self._value = value
+
+
+class GimpColorTagWithoutNoneComboBoxPresenter(pg.setting.presenters_gtk.EnumComboBoxPresenter):
+  """`setting.Presenter` subclass for `GimpUi.EnumComboBox` widgets representing
+  GIMP color tags.
+
+  This presenter omits the `Gimp.ColorTag.NONE` option, which can be convenient
+  when only an existing color tag must be selected.
+
+  Value: GIMP color tag selected in the enum combo box.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    combo_box = GimpUi.EnumComboBox.new_with_model(GimpUi.EnumStore.new(Gimp.ColorTag))
+
+    del combo_box.get_model()[int(Gimp.ColorTag.NONE)]
+
+    # If the default value is not valid, `set_active` returns `False`,
+    # but otherwise does not result in errors.
+    combo_box.set_active(int(setting.default_value))
+
+    return combo_box
+
+
+class ColorTagSetting(pg.setting.EnumSetting):
+  """Class for settings representing GIMP color tags (`Gimp.ColorTag` enums).
+
+  Allowed GIMP PDB types:
+  * `Gimp.ColorTag`
+
+  Default value: `Gimp.ColorTag.BLUE`
+  """
+
+  _ALLOWED_GUI_TYPES = [
+    GimpColorTagWithoutNoneComboBoxPresenter,
+    pg.SETTING_GUI_TYPES.enum_combo_box,
+  ]
+
+  _DEFAULT_DEFAULT_VALUE = Gimp.ColorTag.BLUE
+
+  def __init__(self, name, **kwargs):
+    super().__init__(name, enum_type=Gimp.ColorTag, **kwargs)
 
 
 class ImagesAndGimpItemsSetting(pg.setting.Setting):

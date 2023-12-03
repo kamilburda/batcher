@@ -9,9 +9,11 @@ import re
 import string
 from typing import Any, Callable, Dict, Generator, List, Optional
 
-import pygimplib as pg
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
-from src import actions
+import pygimplib as pg
 
 
 class ItemRenamer:
@@ -255,57 +257,46 @@ def _get_layer_path(
 
 
 def _get_tags(batcher, item, field_value, *args):
-  tags_to_insert = []
-  
-  def _insert_tag(tag):
-    if tag in actions.BUILTIN_TAGS:
-      tag_display_name = actions.BUILTIN_TAGS[tag]
-    else:
-      tag_display_name = tag
-    tags_to_insert.append(tag_display_name)
-  
-  def _get_tag_from_tag_display_name(tag_display_name):
-    builtin_tags_keys = list(actions.BUILTIN_TAGS)
-    builtin_tags_values = list(actions.BUILTIN_TAGS.values())
-    return builtin_tags_keys[builtin_tags_values.index(tag_display_name)]
-  
-  def _insert_all_tags():
-    for tag in item.tags:
-      _insert_tag(tag)
-    
-    tags_to_insert.sort(key=lambda tag_: tag_.lower())
-  
-  def _insert_specified_tags(tags):
-    for tag in tags:
-      if tag in actions.BUILTIN_TAGS:
-        continue
-      if tag in actions.BUILTIN_TAGS.values():
-        tag = _get_tag_from_tag_display_name(tag)
-      if tag in item.tags:
-        _insert_tag(tag)
-  
-  tag_separator = '-'
-  tag_wrapper = '{}'
-  tag_token = '%t'
-  
+  color_tag = item.raw.get_color_tag()
+  color_tag_default_names = {
+    value: value.value_name[len('GIMP_COLOR_TAG_'):].lower()
+    for value in Gimp.ColorTag.__enum_values__.values()}
+
+  # Make sure items without tags produce an empty string.
+  del color_tag_default_names[Gimp.ColorTag.NONE]
+
+  color_tag_name = color_tag_default_names.get(color_tag, '')
+
   if not args:
-    _insert_all_tags()
+    return color_tag_name
+
+  color_to_alternate_name_mapping = collections.defaultdict(lambda: color_tag_name)
+  tag_token = '%t'
+
+  if not args:
+    tag_wrapper = '{}'
   else:
-    if len(args) < 2:
-      _insert_specified_tags(args)
+    tag_wrapper = args[0].replace(tag_token, '{}')
+
+  processed_args = args[1:]
+
+  for i in range(0, len(processed_args), 2):
+    arg_color_name = processed_args[i].lower()
+
+    if i + 1 < len(processed_args):
+      color_to_alternate_name_mapping[arg_color_name] = processed_args[i + 1]
     else:
-      if tag_token in args[1]:
-        tag_separator = args[0]
-        tag_wrapper = args[1].replace(tag_token, '{}')
-        
-        if len(args) > 2:
-          _insert_specified_tags(args[2:])
-        else:
-          _insert_all_tags()
-      else:
-        _insert_specified_tags(args)
-  
-  return tag_separator.join(tag_wrapper.format(tag) for tag in tags_to_insert)
+      color_to_alternate_name_mapping[arg_color_name] = processed_args[i]
+      break
+
+  num_token_occurrences = tag_wrapper.count('{}')
+
+  mapped_color_tag_name = color_to_alternate_name_mapping[color_tag_name]
+
+  if mapped_color_tag_name:
+    return tag_wrapper.format(*([mapped_color_tag_name] * num_token_occurrences))
+  else:
+    return ''
 
 
 def _get_current_date(batcher, item, field_value, date_format='%Y-%m-%d'):
@@ -462,11 +453,14 @@ _FIELDS_LIST = [
     'display_name': _('Tags'),
     'str_to_insert': '[tags]',
     'examples_lines': [
-      [_('Suppose that a layer has tags "left", "middle" and "right".')],
-      ['[tags]', 'left-middle-right'],
-      ['[tags, left, right]', 'left-right'],
-      ['[tags, _, (%t)]', '(left)_(middle)_(right)'],
-      ['[tags, _, (%t), left, right]', '(left)_(right)'],
+      [_('Suppose that a layer has a green color tag.')],
+      ['[tags]', 'green'],
+      [_('You can map a color to another name.')],
+      ['[tags, %t, green, background]', 'background'],
+      ['[tags, (%t), green, background]', '(background)'],
+      [_('Missing tags are ignored.')],
+      ['[tags, %t, blue, foreground]', ''],
+      ['[tags, %t, green, background, blue, foreground]', 'background'],
     ],
   },
   {
