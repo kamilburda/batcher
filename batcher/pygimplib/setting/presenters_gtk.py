@@ -1,7 +1,7 @@
 """`setting.Presenter` subclasses for GTK GUI widgets."""
 
 import inspect
-import os.path
+import math
 import sys
 
 import gi
@@ -62,7 +62,7 @@ class IntSpinButtonPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
   def _create_widget(self, setting, **kwargs):
-    return _create_spin_button(setting)
+    return _create_spin_button(setting, digits=0)
   
   def _get_value(self):
     return self._widget.get_value_as_int()
@@ -79,7 +79,7 @@ class FloatSpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting, digits=1, **kwargs):
+  def _create_widget(self, setting, digits=None, **kwargs):
     return _create_spin_button(setting, digits=digits)
   
   def _get_value(self):
@@ -875,7 +875,7 @@ class PanedPositionPresenter(GtkPresenter):
     self._widget.set_position(value)
 
 
-def _create_spin_button(setting, digits=0):
+def _create_spin_button(setting, digits=None):
   if hasattr(setting, 'min_value') and setting.min_value is not None:
     min_value = setting.min_value
   elif hasattr(setting, 'pdb_min_value') and setting.pdb_min_value is not None:
@@ -889,14 +889,34 @@ def _create_spin_button(setting, digits=0):
     max_value = setting.pdb_max_value
   else:
     max_value = GLib.MAXINT
-  
-  return Gtk.SpinButton(
+
+  value_range = abs(max_value - min_value)
+
+  if value_range <= GLib.MAXUINT16:
+    spin_button_class = GimpUi.SpinScale
+  else:
+    spin_button_class = Gtk.SpinButton
+
+  step_increment = 1
+  page_increment = 10
+
+  if digits is None:
+    digits = 2
+
+    if 0 < value_range <= 1:
+      digits_in_value_range = -math.floor(math.log10(abs(value_range)))
+
+      digits = digits_in_value_range + 1
+      step_increment = 10 ** -digits
+      page_increment = 10 ** -(digits - 1)
+
+  return spin_button_class(
     adjustment=Gtk.Adjustment(
       value=setting.value,
       lower=min_value,
       upper=max_value,
-      step_increment=1,
-      page_increment=10,
+      step_increment=step_increment,
+      page_increment=page_increment,
     ),
     digits=digits,
     numeric=True,
