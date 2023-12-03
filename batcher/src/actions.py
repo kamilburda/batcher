@@ -605,6 +605,12 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
         and placeholder_type_name is None):
       argument_dict['default_value'] = proc_arg.default_value
 
+    if inspect.isclass(setting_type) and issubclass(setting_type, pg.setting.NumericSetting):
+      if hasattr(proc_arg, 'minimum'):
+        argument_dict['min_value'] = proc_arg.minimum
+      if hasattr(proc_arg, 'maximum'):
+        argument_dict['max_value'] = proc_arg.maximum
+
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
       argument_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
     
