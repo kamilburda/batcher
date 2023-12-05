@@ -80,6 +80,12 @@ class ColorTagSetting(pg.setting.EnumSetting):
   _DEFAULT_DEFAULT_VALUE = Gimp.ColorTag.BLUE
 
   def __init__(self, name, **kwargs):
+    # Ignore any `enum_type` in kwargs, which happens when saving and then
+    # loading this setting since `enum_type` is always persisted.
+    # We cannot pass multiple keyword arguments with the same name as this
+    # results in an error.
+    kwargs.pop('enum_type', None)
+
     super().__init__(name, enum_type=Gimp.ColorTag, **kwargs)
 
 
