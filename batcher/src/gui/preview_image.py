@@ -6,6 +6,8 @@ import time
 import traceback
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
@@ -58,7 +60,6 @@ class ImagePreview(preview_base_.Preview):
   
   _WIDGET_SPACING = 5
   _BORDER_WIDTH = 0
-  _PREVIEW_ALPHA_CHECK_SIZE = 4
   
   def __init__(self, batcher, settings):
     super().__init__()
@@ -69,10 +70,9 @@ class ImagePreview(preview_base_.Preview):
     self._item = None
     
     self._preview_pixbuf = None
+    self._preview_pixbuf_to_draw = None
     self._previous_preview_pixbuf_width = None
     self._previous_preview_pixbuf_height = None
-    
-    self.draw_checkerboard_alpha_background = True
     
     self._is_updating = False
     self._is_preview_image_allocated_size = False
@@ -89,11 +89,9 @@ class ImagePreview(preview_base_.Preview):
     self.prepare_image_for_rendering()
     
     self._init_gui()
-
-    self._preview_alpha_check_color_first = Gimp.check_custom_color1()
-    self._preview_alpha_check_color_second = Gimp.check_custom_color2()
     
     self.connect('size-allocate', self._on_size_allocate)
+    self._preview_image.connect('draw', self._on_preview_image_draw)
     self._preview_image.connect('size-allocate', self._on_preview_image_size_allocate)
     
     self._button_menu.connect('clicked', self._on_button_menu_clicked)
@@ -110,6 +108,7 @@ class ImagePreview(preview_base_.Preview):
     self._item = value
     if value is None:
       self._preview_pixbuf = None
+      self._preview_pixbuf_to_draw = None
       self._previous_preview_pixbuf_width = None
       self._previous_preview_pixbuf_height = None
   
@@ -147,7 +146,6 @@ class ImagePreview(preview_base_.Preview):
   
   def clear(self, use_item_name=False):
     self.item = None
-    self._preview_image.clear()
     self._preview_image.hide()
     self._folder_image.hide()
     self._show_placeholder_icon(use_item_name)
@@ -239,14 +237,13 @@ class ImagePreview(preview_base_.Preview):
     start_update_time = time.time()
     
     with pg.pdbutils.redirect_messages():
-      preview_pixbuf, error = self._get_in_memory_preview(self.item.raw)
+      self._preview_pixbuf, error = self._get_in_memory_preview(self.item.raw)
     
-    if preview_pixbuf is not None:
-      self._preview_image.set_from_pixbuf(preview_pixbuf)
+    if self._preview_pixbuf is not None:
+      self._preview_pixbuf_to_draw = self._preview_pixbuf
+      self._preview_image.queue_draw()
     else:
       self.clear(use_item_name=True)
-    
-    self.queue_draw()
     
     self._is_updating = False
     
@@ -285,10 +282,13 @@ class ImagePreview(preview_base_.Preview):
     self._hbox_buttons = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     self._hbox_buttons.pack_start(self._button_menu, False, False, 0)
     self._hbox_buttons.pack_start(self._button_refresh, False, False, 0)
-    
-    self._preview_image = Gtk.Image()
+
+    self._preview_image = Gtk.DrawingArea(
+      hexpand=True,
+      vexpand=True,
+    )
     self._preview_image.set_no_show_all(True)
-    
+
     self._placeholder_icon = Gtk.Image.new_from_icon_name(
       GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
     self._placeholder_icon.set_no_show_all(True)
@@ -345,12 +345,12 @@ class ImagePreview(preview_base_.Preview):
     self._preview_width, self._preview_height = self._get_preview_size(
       raw_item_preview.get_width(), raw_item_preview.get_height())
 
-    raw_item_preview_pixbuf = self._get_preview_pixbuf(
+    preview_pixbuf = self._get_preview_pixbuf(
       raw_item_preview, self._preview_width, self._preview_height)
     
     image_preview.delete()
     
-    return raw_item_preview_pixbuf, error
+    return preview_pixbuf, error
   
   def _get_image_preview(self):
     # The processing requires items in their original state as some procedures
@@ -478,11 +478,11 @@ class ImagePreview(preview_base_.Preview):
   def _resize_preview(self, preview_allocation, preview_pixbuf):
     if preview_pixbuf is None:
       return
-    
+
     if (preview_allocation.width >= preview_pixbuf.get_width()
         and preview_allocation.height >= preview_pixbuf.get_height()):
       return
-    
+
     scaled_preview_width, scaled_preview_height = self._get_preview_size(
       preview_pixbuf.get_width(), preview_pixbuf.get_height())
     
@@ -493,8 +493,8 @@ class ImagePreview(preview_base_.Preview):
     scaled_preview_pixbuf = preview_pixbuf.scale_simple(
       scaled_preview_width, scaled_preview_height, GdkPixbuf.InterpType.BILINEAR)
     
-    self._preview_image.set_from_pixbuf(scaled_preview_pixbuf)
-    self.queue_draw()
+    self._preview_pixbuf_to_draw = scaled_preview_pixbuf
+    self._preview_image.queue_draw()
     
     self._previous_preview_pixbuf_width = scaled_preview_width
     self._previous_preview_pixbuf_height = scaled_preview_height
@@ -515,12 +515,23 @@ class ImagePreview(preview_base_.Preview):
         self._current_placeholder_icon.hide()
       else:
         self._current_placeholder_icon.show()
-  
+
+  def _on_preview_image_draw(self, image, cairo_context):
+    if self._preview_pixbuf_to_draw is None:
+      return
+
+    image_allocation = image.get_allocation()
+    x = (image_allocation.width - self._preview_pixbuf_to_draw.get_width()) / 2
+    y = (image_allocation.height - self._preview_pixbuf_to_draw.get_height()) / 2
+
+    Gdk.cairo_set_source_pixbuf(cairo_context, self._preview_pixbuf_to_draw, x, y)
+    cairo_context.paint()
+
   def _on_preview_image_size_allocate(self, image, allocation):
     if not self._is_preview_image_allocated_size:
       self._set_contents()
       self._is_preview_image_allocated_size = True
-  
+
   def _show_placeholder_icon(self, use_item_name=False):
     self._current_placeholder_icon = self._placeholder_icon
     self._current_placeholder_icon_size = self._placeholder_icon_size
