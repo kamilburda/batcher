@@ -66,6 +66,11 @@ class NamePreview(preview_base_.Preview):
     [5, GObject.TYPE_STRING],
     [6, GObject.TYPE_INT],
     [7, GObject.TYPE_INT])
+
+  _ICON_XPAD = 2
+  _COLOR_TAG_BORDER_WIDTH = 1
+  _COLOR_TAG_BORDER_COLOR = 0xd0d0d0ff
+  _COLOR_TAG_DEFAULT_COLOR = 0x7f7f7fff
   
   def __init__(
         self,
@@ -212,7 +217,9 @@ class NamePreview(preview_base_.Preview):
     
     column = Gtk.TreeViewColumn()
     
-    cell_renderer_icon_item = Gtk.CellRendererPixbuf()
+    cell_renderer_icon_item = Gtk.CellRendererPixbuf(
+      xpad=self._ICON_XPAD,
+    )
     column.pack_start(cell_renderer_icon_item, False)
     column.set_attributes(
       cell_renderer_icon_item,
@@ -220,7 +227,9 @@ class NamePreview(preview_base_.Preview):
       visible=self._COLUMN_ICON_ITEM_VISIBLE[0],
     )
 
-    cell_renderer_icon_color_tag = Gtk.CellRendererPixbuf()
+    cell_renderer_icon_color_tag = Gtk.CellRendererPixbuf(
+      xpad=self._ICON_XPAD,
+    )
     column.pack_start(cell_renderer_icon_color_tag, False)
     column.set_attributes(
       cell_renderer_icon_color_tag,
@@ -250,10 +259,45 @@ class NamePreview(preview_base_.Preview):
     self._tree_view.get_selection().connect('changed', self._on_tree_selection_changed)
   
   def _init_icons(self):
-    self._icons = {
-      'folder': self._tree_view.render_icon_pixbuf(Gtk.STOCK_DIRECTORY, Gtk.IconSize.MENU),
+    self._folder_icon = pg.gui.utils.get_icon_pixbuf('folder', self._tree_view, Gtk.IconSize.MENU)
+
+    # Colors taken from:
+    #  https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpwidgets-utils.c
+    self._color_tags_and_icons = {
+      Gimp.ColorTag.BLUE: 0x54669fff,
+      Gimp.ColorTag.GREEN: 0x6f8f30ff,
+      Gimp.ColorTag.YELLOW: 0xd2b62dff,
+      Gimp.ColorTag.ORANGE: 0xd97a26ff,
+      Gimp.ColorTag.BROWN: 0x573519ff,
+      Gimp.ColorTag.RED: 0xaa2a2fff,
+      Gimp.ColorTag.VIOLET: 0x6342aeff,
+      Gimp.ColorTag.GRAY: 0x575757ff,
     }
-  
+
+    self._color_tags_and_premade_pixbufs = {
+      color_tag: self._get_color_tag_pixbuf(color_tag) for color_tag in
+      self._color_tags_and_icons}
+
+  def _get_color_tag_pixbuf(self, color_tag):
+    if color_tag != Gimp.ColorTag.NONE and color_tag in Gimp.ColorTag.__enum_values__:
+      icon_size = Gtk.icon_size_lookup(Gtk.IconSize.MENU)
+
+      color_tag_pixbuf = GdkPixbuf.Pixbuf.new(
+        GdkPixbuf.Colorspace.RGB, True, 8, icon_size.width, icon_size.height)
+      color_tag_pixbuf.fill(self._COLOR_TAG_BORDER_COLOR)
+
+      color_tag_color_subpixbuf = color_tag_pixbuf.new_subpixbuf(
+        self._COLOR_TAG_BORDER_WIDTH,
+        self._COLOR_TAG_BORDER_WIDTH,
+        icon_size.width - self._COLOR_TAG_BORDER_WIDTH * 2,
+        icon_size.height - self._COLOR_TAG_BORDER_WIDTH * 2)
+      color_tag_color_subpixbuf.fill(
+        self._color_tags_and_icons.get(color_tag, self._COLOR_TAG_DEFAULT_COLOR))
+
+      return color_tag_pixbuf
+    else:
+      return None
+
   def _on_tree_view_row_collapsed(self, tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
       self._collapsed_items.add(self._get_key_from_tree_iter(tree_iter))
@@ -446,16 +490,15 @@ class NamePreview(preview_base_.Preview):
   
   def _get_icon_from_item(self, item):
     if item.type == pg.itemtree.TYPE_FOLDER:
-      return self._icons['folder']
+      return self._folder_icon
     else:
       return None
 
-  @staticmethod
-  def _get_color_tag_icon(item):
+  def _get_color_tag_icon(self, item):
     color_tag = item.raw.get_color_tag()
 
-    if color_tag in _COLOR_TAGS_AND_PREMADE_PIXBUFS:
-      return _COLOR_TAGS_AND_PREMADE_PIXBUFS[color_tag]
+    if color_tag in self._color_tags_and_premade_pixbufs:
+      return self._color_tags_and_premade_pixbufs[color_tag]
     else:
       return None
 
@@ -518,57 +561,6 @@ class NamePreview(preview_base_.Preview):
           self._tree_model.get_path(self._tree_iters[self._selected_items[0]]))
         if first_selected_item_path is not None:
           self._tree_view.scroll_to_cell(first_selected_item_path, None, True, 0.5, 0.0)
-
-
-def _get_color_tag_pixbuf(color_tag):
-  border_color = 0xd0d0d0ff
-  default_color = 0x7f7f7fff
-
-  border_color_padding = 2
-  tag_color_padding = 3
-
-  if color_tag != Gimp.ColorTag.NONE and color_tag in Gimp.ColorTag.__enum_values__:
-    icon_size = Gtk.icon_size_lookup(Gtk.IconSize.MENU)
-
-    color_tag_pixbuf = GdkPixbuf.Pixbuf.new(
-      GdkPixbuf.Colorspace.RGB, True, 8, icon_size.width, icon_size.height)
-
-    color_tag_border_subpixbuf = color_tag_pixbuf.new_subpixbuf(
-      border_color_padding + 1,
-      border_color_padding + 1,
-      icon_size.width - border_color_padding * 2,
-      icon_size.height - border_color_padding * 2)
-
-    color_tag_border_subpixbuf.fill(border_color)
-
-    color_tag_color_subpixbuf = color_tag_pixbuf.new_subpixbuf(
-      tag_color_padding + 1,
-      tag_color_padding + 1,
-      icon_size.width - tag_color_padding * 2,
-      icon_size.height - tag_color_padding * 2)
-
-    color_tag_color_subpixbuf.fill(_COLOR_TAGS_AND_COLORS.get(color_tag, default_color))
-
-    return color_tag_pixbuf
-  else:
-    return None
-
-
-# Colors taken from:
-#  https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpwidgets-utils.c
-_COLOR_TAGS_AND_COLORS = {
-  Gimp.ColorTag.BLUE: 0x54669fff,
-  Gimp.ColorTag.GREEN: 0x6f8f30ff,
-  Gimp.ColorTag.YELLOW: 0xd2b62dff,
-  Gimp.ColorTag.ORANGE: 0xd97a26ff,
-  Gimp.ColorTag.BROWN: 0x573519ff,
-  Gimp.ColorTag.RED: 0xaa2a2fff,
-  Gimp.ColorTag.VIOLET: 0x6342aeff,
-  Gimp.ColorTag.GRAY: 0x575757ff,
-}
-
-_COLOR_TAGS_AND_PREMADE_PIXBUFS = {
-  color_tag: _get_color_tag_pixbuf(color_tag) for color_tag in _COLOR_TAGS_AND_COLORS}
 
 
 GObject.type_register(NamePreview)

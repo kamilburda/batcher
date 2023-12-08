@@ -5,6 +5,7 @@ from typing import Tuple, Union
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+from gi.repository import GdkPixbuf
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -78,5 +79,33 @@ def get_position_below_widget(widget: Gtk.Widget) -> Union[Tuple, None]:
     return (
       toplevel_window_position.x + widget_allocation.x,
       toplevel_window_position.y + widget_allocation.y + widget_allocation.height)
+  else:
+    return None
+
+
+def get_icon_pixbuf(
+      icon_name: str,
+      widget: Gtk.Widget,
+      icon_size: Gtk.IconSize,
+) -> Union[GdkPixbuf.Pixbuf, None]:
+  """Returns an icon as a pixbuf, or ``None`` if the icon name does not exist.
+
+  ``widget`` is used to set the icon theme and style appropriate for the widget.
+
+  ``icon_size`` should be one of the recognized `Gtk.IconSize` values.
+  """
+  icon_theme = Gtk.IconTheme.get_for_screen(widget.get_screen())
+  icon_size_lookup_result = Gtk.icon_size_lookup(icon_size)
+
+  icon_info = icon_theme.lookup_icon_for_scale(
+    icon_name,
+    min(icon_size_lookup_result.width, icon_size_lookup_result.height),
+    widget.get_scale_factor(),
+    Gtk.IconLookupFlags.FORCE_SYMBOLIC)
+
+  if icon_info is not None:
+    icon, _was_symbolic = icon_info.load_symbolic_for_context(widget.get_style_context())
+
+    return icon
   else:
     return None
