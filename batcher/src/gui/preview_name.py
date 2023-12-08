@@ -69,7 +69,7 @@ class NamePreview(preview_base_.Preview):
 
   _ICON_XPAD = 2
   _COLOR_TAG_BORDER_WIDTH = 1
-  _COLOR_TAG_BORDER_COLOR = 0xd0d0d0ff
+  _COLOR_TAG_BORDER_COLOR = 0xdcdcdcff
   _COLOR_TAG_DEFAULT_COLOR = 0x7f7f7fff
   
   def __init__(
