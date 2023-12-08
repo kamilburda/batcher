@@ -59,7 +59,6 @@ class ImagePreview(preview_base_.Preview):
   _MANUAL_UPDATE_LOCK = '_manual_update'
   
   _WIDGET_SPACING = 5
-  _BORDER_WIDTH = 0
   
   def __init__(self, batcher, settings):
     super().__init__()
@@ -89,8 +88,7 @@ class ImagePreview(preview_base_.Preview):
     self.prepare_image_for_rendering()
     
     self._init_gui()
-    
-    self.connect('size-allocate', self._on_size_allocate)
+
     self._preview_image.connect('draw', self._on_preview_image_draw)
     self._preview_image.connect('size-allocate', self._on_preview_image_size_allocate)
     
@@ -106,6 +104,7 @@ class ImagePreview(preview_base_.Preview):
   @item.setter
   def item(self, value):
     self._item = value
+
     if value is None:
       self._preview_pixbuf = None
       self._preview_pixbuf_to_draw = None
@@ -128,27 +127,24 @@ class ImagePreview(preview_base_.Preview):
       self.clear()
       return
     
-    self._placeholder_icon.hide()
-    
     if self.item.type != pg.itemtree.TYPE_FOLDER:
       self._is_updating = True
-      
-      self._folder_image.hide()
-      self._preview_image.show()
+
       self._set_item_name_label(self.item.name)
       
       if self._is_preview_image_allocated_size:
         self._set_contents()
     else:
-      self._preview_image.hide()
-      self._show_folder_image()
+      self._set_pixbuf(self._folder_icon)
       self._set_item_name_label(self.item.name)
   
   def clear(self, use_item_name=False):
     self.item = None
-    self._preview_image.hide()
-    self._folder_image.hide()
-    self._show_placeholder_icon(use_item_name)
+
+    self._set_pixbuf(self._no_selection_icon)
+
+    if not use_item_name:
+      self._set_no_selection_label()
   
   def resize(self):
     """Resizes the preview if the widget is smaller than the previewed image so
@@ -287,35 +283,22 @@ class ImagePreview(preview_base_.Preview):
       hexpand=True,
       vexpand=True,
     )
-    self._preview_image.set_no_show_all(True)
 
-    self._placeholder_icon = Gtk.Image.new_from_icon_name(
-      GimpUi.ICON_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
-    self._placeholder_icon.set_no_show_all(True)
-    
-    self._folder_image = Gtk.Image.new_from_icon_name('folder', Gtk.IconSize.DIALOG)
-    self._folder_image.set_no_show_all(True)
+    self._no_selection_icon = pg.gui.utils.get_icon_pixbuf(
+      GimpUi.ICON_DIALOG_QUESTION, self, Gtk.IconSize.DIALOG)
+
+    self._folder_icon = pg.gui.utils.get_icon_pixbuf('folder', self, Gtk.IconSize.DIALOG)
     
     self._label_item_name = Gtk.Label(ellipsize=Pango.EllipsizeMode.MIDDLE)
     
     self.set_spacing(self._WIDGET_SPACING)
-    self.set_border_width(self._BORDER_WIDTH)
     
     self.pack_start(self._hbox_buttons, False, False, 0)
     self.pack_start(self._preview_image, True, True, 0)
-    self.pack_start(self._placeholder_icon, True, True, 0)
-    self.pack_start(self._folder_image, True, True, 0)
     self.pack_start(self._label_item_name, False, False, 0)
-    
-    self._placeholder_icon_size = Gtk.icon_size_lookup(
-      self._placeholder_icon.get_property('icon-size'))
-    self._folder_icon_size = Gtk.icon_size_lookup(
-      self._folder_image.get_property('icon-size'))
-    
-    self._current_placeholder_icon = self._placeholder_icon
-    self._current_placeholder_icon_size = self._placeholder_icon_size
 
-    self._show_placeholder_icon()
+    self._set_pixbuf(self._no_selection_icon)
+    self._set_no_selection_label()
   
   def _get_in_memory_preview(self, raw_item):
     self._preview_width, self._preview_height = self._get_preview_size(
@@ -489,32 +472,15 @@ class ImagePreview(preview_base_.Preview):
     if (self._previous_preview_pixbuf_width == scaled_preview_width
         and self._previous_preview_pixbuf_height == scaled_preview_height):
       return
-    
-    scaled_preview_pixbuf = preview_pixbuf.scale_simple(
-      scaled_preview_width, scaled_preview_height, GdkPixbuf.InterpType.BILINEAR)
+
+    scaled_preview_pixbuf = self._scale_pixbuf(
+      preview_pixbuf, scaled_preview_width, scaled_preview_height)
     
     self._preview_pixbuf_to_draw = scaled_preview_pixbuf
     self._preview_image.queue_draw()
     
     self._previous_preview_pixbuf_width = scaled_preview_width
     self._previous_preview_pixbuf_height = scaled_preview_height
-  
-  def _on_size_allocate(self, preview, allocation):
-    if not self._is_updating and not self._preview_image.get_mapped():
-      preview_widget_allocated_width = allocation.width - self._BORDER_WIDTH
-      preview_widget_allocated_height = (
-        allocation.height
-        - self._hbox_buttons.get_allocation().height
-        - self._WIDGET_SPACING
-        - self._label_item_name.get_allocation().height
-        - self._WIDGET_SPACING
-        - self._BORDER_WIDTH * 2)
-      
-      if (preview_widget_allocated_width < self._current_placeholder_icon_size.width
-          or preview_widget_allocated_height < self._current_placeholder_icon_size.height):
-        self._current_placeholder_icon.hide()
-      else:
-        self._current_placeholder_icon.show()
 
   def _on_preview_image_draw(self, image, cairo_context):
     if self._preview_pixbuf_to_draw is None:
@@ -532,24 +498,30 @@ class ImagePreview(preview_base_.Preview):
       self._set_contents()
       self._is_preview_image_allocated_size = True
 
-  def _show_placeholder_icon(self, use_item_name=False):
-    self._current_placeholder_icon = self._placeholder_icon
-    self._current_placeholder_icon_size = self._placeholder_icon_size
-    
-    self._placeholder_icon.show()
-    
-    if not use_item_name:
-      self._set_item_name_label(_('No selection'))
-  
-  def _show_folder_image(self):
-    self._current_placeholder_icon = self._folder_image
-    self._current_placeholder_icon_size = self._folder_icon_size
-    
-    self._folder_image.show()
-  
+  def _set_pixbuf(self, pixbuf):
+    if self._preview_image.get_mapped():
+      pixbuf_width, pixbuf_height = self._get_preview_size(pixbuf.get_width(), pixbuf.get_height())
+    else:
+      pixbuf_width = pixbuf.get_width()
+      pixbuf_height = pixbuf.get_height()
+
+    self._preview_pixbuf = pixbuf
+    self._preview_pixbuf_to_draw = self._scale_pixbuf(pixbuf, pixbuf_width, pixbuf_height)
+    self._previous_preview_pixbuf_width = None
+    self._previous_preview_pixbuf_height = None
+
+    self._preview_image.queue_draw()
+
+  @staticmethod
+  def _scale_pixbuf(pixbuf, width, height):
+    return pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
+
   def _set_item_name_label(self, item_name):
     self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
-  
+
+  def _set_no_selection_label(self):
+    self._set_item_name_label(_('No selection'))
+
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)
   
