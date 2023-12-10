@@ -24,8 +24,8 @@ def commit_msg_check_first_line_length(commit_message):
     return commit_message
   else:
     print_error_message_and_exit(
-      'First line of commit message too long ({}), must be at most {}'.format(
-        len(first_line), FIRST_LINE_MAX_CHAR_LENGTH))
+      (f'First line of commit message too long ({len(first_line)}),'
+       f' must be at most {FIRST_LINE_MAX_CHAR_LENGTH}'))
 
 
 def commit_msg_check_second_line_is_empty(commit_message):
@@ -34,8 +34,7 @@ def commit_msg_check_second_line_is_empty(commit_message):
   if len(lines) <= 1 or not lines[1]:
     return commit_message
   else:
-    print_error_message_and_exit(
-      'If writing a commit message body, the second line must be empty')
+    print_error_message_and_exit('If writing a commit message body, the second line must be empty')
 
 
 def commit_msg_remove_trailing_period_from_first_line(commit_message):
@@ -59,8 +58,7 @@ def commit_msg_capitalize_first_letter_in_header(commit_message):
     header_without_leading_space = header.lstrip(' ')
     
     header_capitalized = (
-      ' ' + header_without_leading_space[0].upper()
-      + header_without_leading_space[1:])
+      f' {header_without_leading_space[0].upper()}{header_without_leading_space[1:]}')
     first_line_processed = ':'.join([scope, header_capitalized])
   
   return '\n'.join([first_line_processed] + body)
@@ -92,8 +90,7 @@ def process_commit_messages(commit_message_filepath):
   with open(commit_message_filepath, 'r') as commit_message_file:
     commit_message = commit_message_file.read()
   
-  commit_message_funcs = (
-    _get_module_level_functions_with_prefix(COMMIT_MESSAGE_FUNCS_PREFIX))
+  commit_message_funcs = _get_module_level_functions_with_prefix(COMMIT_MESSAGE_FUNCS_PREFIX)
   
   for func in commit_message_funcs:
     commit_message = func(commit_message)
