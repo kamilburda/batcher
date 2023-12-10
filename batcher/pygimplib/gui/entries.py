@@ -188,7 +188,7 @@ class FilenamePatternEntry(ExtendedEntry):
   """
   
   _BUTTON_MOUSE_LEFT = 1
-  _TOOLTIP_WINDOW_BORDER_WIDTH = 2
+  _TOOLTIP_WINDOW_BORDER_WIDTH = 3
   
   _COLUMNS = [
     _COLUMN_ITEM_NAMES,
@@ -297,15 +297,17 @@ class FilenamePatternEntry(ExtendedEntry):
       homogeneous=False,
       border_width=self._TOOLTIP_WINDOW_BORDER_WIDTH,
     )
-    self._field_tooltip_hbox.pack_start(self._field_tooltip_text, False, False, 0)
-    
-    self._field_tooltip_frame = Gtk.Frame(
+    self._field_tooltip_hbox.pack_start(self._field_tooltip_text, True, True, 0)
+
+    self._field_tooltip_scrolled_window = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.NEVER,
+      vscrollbar_policy=Gtk.PolicyType.NEVER,
       shadow_type=Gtk.ShadowType.ETCHED_IN,
     )
-    self._field_tooltip_frame.add(self._field_tooltip_hbox)
-    self._field_tooltip_frame.show_all()
+    self._field_tooltip_scrolled_window.add(self._field_tooltip_hbox)
+    self._field_tooltip_scrolled_window.show_all()
     
-    self._field_tooltip_window.add(self._field_tooltip_frame)
+    self._field_tooltip_window.add(self._field_tooltip_scrolled_window)
   
   def _add_columns(self):
     self._popup.tree_view.append_column(
