@@ -1135,17 +1135,15 @@ class ExportLayersDialog:
     self._progress_bar.set_visible(not enabled)
     self._button_stop.set_visible(not enabled)
     self._button_close.set_visible(enabled)
-    
-    for child in self._dialog.vbox:
-      if child not in (self._dialog.action_area, self._progress_bar):
-        child.set_sensitive(enabled)
+
+    self._hbox_contents.set_sensitive(enabled)
     
     self._button_settings.set_sensitive(enabled)
-    
+
     for button in self._dialog.action_area:
       if button != self._button_stop:
         button.set_sensitive(enabled)
-    
+
     if enabled:
       self._dialog.set_focus(self._file_extension_entry)
       self._file_extension_entry.set_position(-1)
