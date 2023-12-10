@@ -11,9 +11,9 @@ import sys
 import git
 
 GIT_HOOKS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-REPOSITORY_ROOT_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
+DEV_DIRPATH = os.path.dirname(GIT_HOOKS_DIRPATH)
 
-sys.path.append(REPOSITORY_ROOT_DIRPATH)
+sys.path.append(DEV_DIRPATH)
 
 from dev import sync_docs
 
@@ -34,10 +34,10 @@ def filepath_matches_gitignore(repo, filepath):
 
 
 def main():
-  repo = git.Repo(REPOSITORY_ROOT_DIRPATH)
+  repo = git.Repo(DEV_DIRPATH)
   
   staged_filepaths = [
-    os.path.normpath(os.path.join(REPOSITORY_ROOT_DIRPATH, diff.a_path))
+    os.path.normpath(os.path.join(DEV_DIRPATH, diff.a_path))
     for diff in repo.index.diff('HEAD')]
   
   filepaths_to_sync = sync_docs.get_filepaths(sync_docs.PATHS_TO_PREPROCESS_FILEPATH)
