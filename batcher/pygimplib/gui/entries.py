@@ -19,6 +19,7 @@ from . import cell_renderers as cell_renderers_
 from . import entry_expander as entry_expander_
 from . import entry_popup as entry_popup_
 from . import entry_undo as entry_undo_
+from . import utils as utils_
 
 __all__ = [
   'ExtendedEntry',
@@ -187,6 +188,7 @@ class FilenamePatternEntry(ExtendedEntry):
   """
   
   _BUTTON_MOUSE_LEFT = 1
+  _TOOLTIP_WINDOW_BORDER_WIDTH = 2
   
   _COLUMNS = [
     _COLUMN_ITEM_NAMES,
@@ -293,9 +295,9 @@ class FilenamePatternEntry(ExtendedEntry):
     self._field_tooltip_hbox = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
+      border_width=self._TOOLTIP_WINDOW_BORDER_WIDTH,
     )
-    self._field_tooltip_hbox.pack_start(
-      self._field_tooltip_text, False, False, 0)
+    self._field_tooltip_hbox.pack_start(self._field_tooltip_text, False, False, 0)
     
     self._field_tooltip_frame = Gtk.Frame(
       shadow_type=Gtk.ShadowType.ETCHED_IN,
@@ -342,6 +344,7 @@ class FilenamePatternEntry(ExtendedEntry):
         tooltip_text = ''
       self._field_tooltip_text.set_markup(tooltip_text)
       self._field_tooltip_window.show()
+      self._field_tooltip_text.select_region(0, 0)  # Prevents selecting the entire text
       self._update_field_tooltip_position()
   
   def _hide_field_tooltip(self):
@@ -349,29 +352,15 @@ class FilenamePatternEntry(ExtendedEntry):
       self._field_tooltip_window.hide()
   
   def _update_field_tooltip_position(self):
-    self._update_window_position(self._field_tooltip_window, place_above=True)
+    self._update_window_position(self._field_tooltip_window)
   
-  def _update_window_position(self, window, move_with_text_cursor=True, place_above=False):
-    entry_absolute_position = self.get_window().get_origin()
-    
-    if move_with_text_cursor:
-      text_up_to_cursor_position = self.get_text()[:self.get_position()]
-      self._pango_layout.set_text(text_up_to_cursor_position)
-      
-      x_offset = min(
-        self._pango_layout.get_pixel_size()[0] + self.get_layout_offsets()[0],
-        max(self.get_allocation().width - window.get_allocation().width, 0))
-      
-      x = entry_absolute_position.x + x_offset
-    else:
-      x = entry_absolute_position.x
-    
-    if not place_above:
-      y = entry_absolute_position.y + self.get_allocation().height
-    else:
-      y = entry_absolute_position.y - window.get_allocation().height
+  def _update_window_position(self, tooltip_window):
+    absolute_entry_position = utils_.get_absolute_widget_position(self)
 
-    window.move(x, y)
+    if absolute_entry_position is not None:
+      y = absolute_entry_position[1] - tooltip_window.get_allocation().height
+
+      tooltip_window.move(absolute_entry_position[0], y)
   
   def _on_filename_pattern_entry_changed(self, entry):
     if self._reset_cursor_position_before_assigning_from_row:

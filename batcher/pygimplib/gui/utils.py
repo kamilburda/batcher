@@ -66,8 +66,23 @@ def menu_popup_below_widget(menu: Gtk.Menu, widget: Gtk.Widget):
 
 
 def get_position_below_widget(widget: Gtk.Widget) -> Union[Tuple, None]:
-  """Returns x and y coordinates of the lower left corner for ``widget``
-  relative to the widget's top-level window.
+  """Returns absolute x and y coordinates of the lower left corner for
+  ``widget``.
+
+  If the widget has no top-level window associated, ``None`` is returned.
+  """
+  absolute_widget_position = get_absolute_widget_position(widget)
+
+  if absolute_widget_position is not None:
+    widget_allocation = widget.get_allocation()
+
+    return absolute_widget_position[0], absolute_widget_position[1] + widget_allocation.height
+  else:
+    return None
+
+
+def get_absolute_widget_position(widget: Gtk.Widget) -> Union[Tuple, None]:
+  """Returns absolute x and y coordinates of ``widget``.
 
   If the widget has no top-level window associated, ``None`` is returned.
   """
@@ -75,10 +90,17 @@ def get_position_below_widget(widget: Gtk.Widget) -> Union[Tuple, None]:
 
   if toplevel_window is not None:
     toplevel_window_position = toplevel_window.get_window().get_origin()
-    widget_allocation = widget.get_allocation()
+
+    widget_coordinates = widget.translate_coordinates(toplevel_window, 0, 0)
+    if widget_coordinates is not None:
+      widget_x, widget_y = widget_coordinates
+    else:
+      widget_allocation = widget.get_allocation()
+      widget_x, widget_y = widget_allocation.x, widget_allocation.y
+
     return (
-      toplevel_window_position.x + widget_allocation.x,
-      toplevel_window_position.y + widget_allocation.y + widget_allocation.height)
+      toplevel_window_position.x + widget_x,
+      toplevel_window_position.y + widget_y)
   else:
     return None
 
