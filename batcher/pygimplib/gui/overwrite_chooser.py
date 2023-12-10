@@ -25,7 +25,6 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
   _DIALOG_BORDER_WIDTH = 8
   _DIALOG_HBOX_CONTENTS_SPACING = 10
   _DIALOG_VBOX_SPACING = 5
-  _DIALOG_ACTION_AREA_SPACING = 8
   
   def __init__(
         self,
@@ -86,8 +85,6 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     self._buttons = {}
     for value, display_name in self.values_and_display_names.items():
       self._buttons[value] = self._dialog.add_button(display_name, value)
-    
-    self._dialog.action_area.set_spacing(self._DIALOG_ACTION_AREA_SPACING)
     
     self._checkbutton_apply_to_all.connect(
       'toggled', self._on_checkbutton_apply_to_all_toggled)
