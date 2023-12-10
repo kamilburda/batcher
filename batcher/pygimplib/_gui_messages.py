@@ -115,34 +115,72 @@ def display_alert_message(
       'You can help fix this error by sending a report with the text'
       ' in the details above to one of the following sites')
   
-  dialog = Gtk.MessageDialog(
+  dialog = GimpUi.Dialog(
     parent=parent,
-    message_type=message_type,
     modal=modal,
     destroy_with_parent=destroy_with_parent,
-    transient_for=parent,
   )
 
   if title is not None:
     dialog.set_title(title)
-  
+
+  hbox_icon_and_messages = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    spacing=12,
+    border_width=12,
+  )
+  dialog.vbox.pack_start(hbox_icon_and_messages, False, False, 0)
+
+  message_icon = _get_message_icon(message_type)
+  if message_icon is not None:
+    hbox_icon_and_messages.pack_start(message_icon, False, False, 0)
+
+  vbox_messages = Gtk.Box(
+    orientation=Gtk.Orientation.VERTICAL,
+    spacing=5,
+  )
+  hbox_icon_and_messages.pack_start(vbox_messages, False, False, 0)
+
   if message_markup:
-    dialog.set_markup(message_markup)
+    primary_message = Gtk.Label(
+      use_markup=True,
+      label=message_markup,
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+      wrap=True,
+      width_request=300,
+      max_width_chars=50,
+    )
+    vbox_messages.pack_start(primary_message, False, False, 0)
 
   if message_secondary_markup:
-    dialog.format_secondary_markup(message_secondary_markup)
-  
+    secondary_message = Gtk.Label(
+      use_markup=True,
+      label=message_secondary_markup,
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+      wrap=True,
+      width_request=300,
+      max_width_chars=50,
+    )
+    vbox_messages.pack_start(secondary_message, False, False, 0)
+
   if details is not None:
-    expander = Gtk.Expander(use_markup=True, label='<b>{}</b>'.format(_('Details')))
+    expander = Gtk.Expander(
+      use_markup=True,
+      label='<b>{}</b>'.format(_('Details')),
+    )
+    expander.connect('activate', _on_details_expander_activate, dialog)
 
     vbox_details = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
-      homogeneous=False,
       spacing=3,
     )
     
-    details_window = _get_details_window(details)
-    vbox_details.pack_start(details_window, False, False, 0)
+    details_widget = _get_details_widget(details)
+    vbox_details.pack_start(details_widget, False, False, 0)
     
     if report_uri_list:
       vbox_labels_report = _get_report_link_buttons_and_copy_icon(
@@ -153,10 +191,17 @@ def display_alert_message(
       expander.set_expanded(True)
     
     expander.add(vbox_details)
-    dialog.vbox.pack_start(expander, False, False, 0)
+
+    vbox_expander = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      border_width=6,
+    )
+    vbox_expander.pack_start(expander, False, False, 0)
+
+    dialog.vbox.pack_start(vbox_expander, False, False, 0)
   else:
-    details_window = None
-  
+    details_widget = None
+
   dialog.add_button(button_stock_id, button_response_id)
   
   if focus_on_button:
@@ -164,9 +209,9 @@ def display_alert_message(
     if button is not None:
       dialog.set_focus(button)
   else:
-    if details_window is not None and display_details_initially:
-      dialog.set_focus(details_window)
-  
+    if details_widget is not None and display_details_initially:
+      dialog.set_focus(details_widget)
+
   dialog.show_all()
   response_id = dialog.run()
   dialog.destroy()
@@ -174,9 +219,30 @@ def display_alert_message(
   return response_id
 
 
-def _get_details_window(details_text):
+def _get_message_icon(message_type=None):
+  if message_type == Gtk.MessageType.WARNING:
+    return Gtk.Image(
+      icon_name=GimpUi.ICON_DIALOG_WARNING,
+      icon_size=Gtk.IconSize.DIALOG,
+    )
+  elif message_type == Gtk.MessageType.ERROR:
+    return Gtk.Image(
+      icon_name=GimpUi.ICON_DIALOG_ERROR,
+      icon_size=Gtk.IconSize.DIALOG,
+    )
+  else:
+    return None
+
+
+def _on_details_expander_activate(expander, window):
+  if expander.get_expanded():
+    window.resize(window.get_allocation().width, 100)
+
+
+def _get_details_widget(details_text):
   scrolled_window = Gtk.ScrolledWindow(
-    width_request=400,
+    width_request=300,
+    max_content_width=300,
     height_request=200,
     shadow_type=Gtk.ShadowType.IN,
     hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
