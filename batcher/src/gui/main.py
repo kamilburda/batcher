@@ -353,7 +353,7 @@ class ExportLayersDialog:
       border_width=self._PREVIEW_LABEL_BORDER_WIDTH,
     )
     self._hbox_preview_label.pack_start(self._preview_label, False, False, 0)
-    
+
     self._vpaned_previews = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
@@ -529,7 +529,7 @@ class ExportLayersDialog:
     self._menu_settings.append(self._menu_item_import_settings)
     self._menu_settings.append(self._menu_item_export_settings)
     self._menu_settings.show_all()
-    
+
     self._dialog.action_area.pack_end(self._button_stop, False, False, 0)
     self._dialog.action_area.pack_start(self._button_settings, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_settings, True)
@@ -562,9 +562,6 @@ class ExportLayersDialog:
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
-    
-    # Move the action area above the progress bar.
-    self._dialog.vbox.reorder_child(self._dialog.action_area, -1)
   
   def _connect_events(self):
     self._box_procedures.connect(
