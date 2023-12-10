@@ -19,6 +19,7 @@ from . import cell_renderers as cell_renderers_
 from . import entry_expander as entry_expander_
 from . import entry_popup as entry_popup_
 from . import entry_undo as entry_undo_
+from . import popup_hide_context as popup_hide_context_
 from . import utils as utils_
 
 __all__ = [
@@ -260,6 +261,15 @@ class FilenamePatternEntry(ExtendedEntry):
     self._create_field_tooltip()
     
     self._add_columns()
+
+    self._field_tooltip_hide_context = popup_hide_context_.PopupHideContext(
+      self._field_tooltip_window,
+      self,
+      widgets_to_exclude_from_triggering_hiding=[
+        self._field_tooltip_window,
+        self,
+      ],
+    )
 
     self.connect(
       'notify::cursor-position', self._on_filename_pattern_entry_notify_cursor_position)

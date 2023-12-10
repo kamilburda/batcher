@@ -64,7 +64,15 @@ class EntryPopup:
     self._init_gui(column_types, rows)
     
     self._popup_hide_context = popup_hide_context_.PopupHideContext(
-      self._popup, self._entry, self.hide)
+      self._popup,
+      self._entry,
+      hide_callback=self.hide,
+      widgets_to_exclude_from_triggering_hiding=[
+        self._entry,
+        self._popup,
+        self._scrolled_window.get_vscrollbar(),
+      ],
+    )
     
     self._connect_events()
   
@@ -105,8 +113,6 @@ class EntryPopup:
   
   def show(self):
     if not self.is_shown() and len(self._rows_filtered) > 0:
-      self._popup_hide_context.connect_button_press_events_for_hiding()
-      
       self._popup.set_screen(self._entry.get_screen())
       
       self._popup.show()
@@ -120,7 +126,6 @@ class EntryPopup:
   def hide(self):
     if self.is_shown():
       self._popup.hide()
-      self._popup_hide_context.disconnect_button_press_events_for_hiding()
   
   def is_shown(self) -> bool:
     return self._popup.get_mapped()
@@ -266,14 +271,6 @@ class EntryPopup:
     
     self._tree_view.connect_after('realize', self._on_after_tree_view_realize)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
-    
-    wigets_to_exclude_from_hiding_popup_with_button_press = [
-      self._entry,
-      self._popup,
-      self._scrolled_window.get_vscrollbar()]
-    
-    for widget in wigets_to_exclude_from_hiding_popup_with_button_press:
-      self._popup_hide_context.exclude_widget_from_hiding_with_button_press(widget)
   
   def _update_position(self):
     position = utils_.get_position_below_widget(self._entry)

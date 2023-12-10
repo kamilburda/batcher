@@ -40,21 +40,21 @@ class MessageLabel(Gtk.Box):
     
     self._init_gui()
     
-    self._popup_hide_context = pg.gui.PopupHideContext(self._popup_more, self._button_more)
+    self._popup_hide_context = pg.gui.PopupHideContext(
+      self._popup_more,
+      self._button_more,
+      widgets_to_exclude_from_triggering_hiding=[
+        self._popup_more,
+        self._scrolled_window_more.get_hscrollbar(),
+        self._scrolled_window_more.get_vscrollbar(),
+      ],
+    )
     
     self._label_message.connect('size-allocate', self._on_label_message_size_allocate)
     self._button_more.connect('clicked', self._on_button_more_clicked)
     
     self._popup_more.connect('show', self._on_popup_more_show)
     self._popup_more.connect('hide', self._on_popup_more_hide)
-    
-    widgets_to_exclude_from_hiding_popup_with_button_press = [
-      self._popup_more,
-      self._scrolled_window_more.get_hscrollbar(),
-      self._scrolled_window_more.get_vscrollbar()]
-    
-    for widget in widgets_to_exclude_from_hiding_popup_with_button_press:
-      self._popup_hide_context.exclude_widget_from_hiding_with_button_press(widget)
   
   def set_text(
         self,
@@ -183,16 +183,12 @@ class MessageLabel(Gtk.Box):
       self._popup_more.move(*absolute_label_position)
   
   def _on_popup_more_show(self, popup):
-    self._popup_hide_context.connect_button_press_events_for_hiding()
-    
     self._popup_more.set_screen(self._button_more.get_screen())
     
     if self._message_type != Gtk.MessageType.ERROR:
       self._timeout_remove(self._clear_delay, self.set_text)
   
   def _on_popup_more_hide(self, popup):
-    self._popup_hide_context.disconnect_button_press_events_for_hiding()
-    
     if self._message_type != Gtk.MessageType.ERROR:
       self._timeout_add_strict(self._clear_delay, self.set_text, None)
   

@@ -1,6 +1,6 @@
 """Class simplifying hiding a popup window based on user actions."""
 
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import gi
 from gi.repository import GObject
@@ -27,6 +27,7 @@ class PopupHideContext:
         popup_to_hide: Gtk.Window,
         popup_owner_widget: Gtk.Widget,
         hide_callback: Optional[Callable] = None,
+        widgets_to_exclude_from_triggering_hiding: Optional[List[Gtk.Widget]] = None,
   ):
     """Initializes the context.
 
@@ -38,6 +39,9 @@ class PopupHideContext:
       hide_callback:
         A function to hide the popup.
         If ``None``, ``popup_to_hide.hide()`` is used to hide the popup.
+      widgets_to_exclude_from_triggering_hiding:
+        An optional list of widgets that should not trigger popup hiding when a
+        button is pressed.
     """
     self._popup_to_hide = popup_to_hide
     self._popup_owner_widget = popup_owner_widget
@@ -51,13 +55,32 @@ class PopupHideContext:
     
     self._popup_owner_widget.connect(
       'focus-out-event', self._on_popup_owner_widget_focus_out_event)
+    self._popup_to_hide.connect('show', self._on_popup_to_hide_show)
+    self._popup_to_hide.connect('hide', self._on_popup_to_hide_hide)
+
+    if widgets_to_exclude_from_triggering_hiding is not None:
+      for widget in widgets_to_exclude_from_triggering_hiding:
+        self._exclude_widget_from_hiding_with_button_press(widget)
   
-  def connect_button_press_events_for_hiding(self):
+  def _exclude_widget_from_hiding_with_button_press(self, widget):
+    widget.connect('enter-notify-event', self._on_widget_enter_notify_event)
+    widget.connect('leave-notify-event', self._on_widget_leave_notify_event)
+  
+  def _on_popup_owner_widget_focus_out_event(self, widget, event):
+    self._hide_callback()
+
+  def _on_popup_to_hide_show(self, popup):
+    self._connect_button_press_events_for_hiding()
+
+  def _on_popup_to_hide_hide(self, popup):
+    self._disconnect_button_press_events_for_hiding()
+
+  def _connect_button_press_events_for_hiding(self):
     self._button_press_emission_hook_id = GObject.add_emission_hook(
       self._popup_owner_widget,
       'button-press-event',
       self._on_emission_hook_button_press_event)
-    
+
     toplevel = utils_.get_toplevel_window(self._popup_owner_widget)
     if toplevel is not None:
       toplevel.get_group().add_window(self._popup_to_hide)
@@ -66,28 +89,21 @@ class PopupHideContext:
       self._toplevel_configure_event_id = toplevel.connect(
         'configure-event', self._on_toplevel_configure_event)
       self._toplevel_position = toplevel.get_position()
-  
-  def disconnect_button_press_events_for_hiding(self):
+
+  def _disconnect_button_press_events_for_hiding(self):
     if self._button_press_emission_hook_id is not None:
       GObject.remove_emission_hook(
         self._popup_owner_widget,
         'button-press-event',
         self._button_press_emission_hook_id)
-    
+
     toplevel = utils_.get_toplevel_window(self._popup_owner_widget)
     if (toplevel is not None
         and self._toplevel_configure_event_id is not None
         and toplevel.handler_is_connected(self._toplevel_configure_event_id)):
       toplevel.disconnect(self._toplevel_configure_event_id)
       self._toplevel_configure_event_id = None
-  
-  def exclude_widget_from_hiding_with_button_press(self, widget):
-    widget.connect('enter-notify-event', self._on_widget_enter_notify_event)
-    widget.connect('leave-notify-event', self._on_widget_leave_notify_event)
-  
-  def _on_popup_owner_widget_focus_out_event(self, widget, event):
-    self._hide_callback()
-  
+
   def _on_emission_hook_button_press_event(self, widget, event):
     if self._widgets_with_entered_pointers:
       return True
