@@ -1139,10 +1139,8 @@ class ExportLayersDialog:
     self._hbox_contents.set_sensitive(enabled)
     
     self._button_settings.set_sensitive(enabled)
-
-    for button in self._dialog.action_area:
-      if button != self._button_stop:
-        button.set_sensitive(enabled)
+    self._button_help.set_sensitive(enabled)
+    self._button_run.set_sensitive(enabled)
 
     if enabled:
       self._dialog.set_focus(self._file_extension_entry)
