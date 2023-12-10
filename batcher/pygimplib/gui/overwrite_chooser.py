@@ -22,9 +22,9 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
   already existing files.
   """
   
-  _DIALOG_BORDER_WIDTH = 8
-  _DIALOG_HBOX_CONTENTS_SPACING = 10
-  _DIALOG_VBOX_SPACING = 5
+  _DIALOG_CONTENTS_BORDER_WIDTH = 12
+  _DIALOG_CONTENTS_SPACING = 12
+  _DIALOG_HBOX_ICON_AND_MESSAGE_SPACING = 10
   
   def __init__(
         self,
@@ -48,7 +48,6 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
       modal=True,
       destroy_with_parent=True,
       transient_for=self._parent,
-      border_width=self._DIALOG_BORDER_WIDTH,
       resizable=False,
     )
     
@@ -65,22 +64,29 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     self._dialog_label_event_box = Gtk.EventBox()
     self._dialog_label_event_box.add(self._dialog_label)
     
-    self._hbox_dialog_contents = Gtk.Box(
+    self._hbox_icon_and_message = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
-      spacing=self._DIALOG_HBOX_CONTENTS_SPACING)
-    self._hbox_dialog_contents.pack_start(self._dialog_icon, False, False, 0)
-    self._hbox_dialog_contents.pack_start(
+      spacing=self._DIALOG_HBOX_ICON_AND_MESSAGE_SPACING,
+    )
+    self._hbox_icon_and_message.pack_start(self._dialog_icon, False, False, 0)
+    self._hbox_icon_and_message.pack_start(
       self._dialog_label_event_box, False, False, 0)
     
     self._checkbutton_apply_to_all = Gtk.CheckButton(
       label=_('_Apply action to all files'),
       use_underline=True,
     )
-    
-    self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
-    self._dialog.vbox.pack_start(self._hbox_dialog_contents, False, False, 0)
-    self._dialog.vbox.pack_start(self._checkbutton_apply_to_all, False, False, 0)
+
+    self._vbox_contents = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._DIALOG_CONTENTS_SPACING,
+      border_width=self._DIALOG_CONTENTS_BORDER_WIDTH,
+    )
+    self._vbox_contents.pack_start(self._hbox_icon_and_message, False, False, 0)
+    self._vbox_contents.pack_start(self._checkbutton_apply_to_all, False, False, 0)
+
+    self._dialog.vbox.pack_start(self._vbox_contents, False, False, 0)
     
     self._buttons = {}
     for value, display_name in self.values_and_display_names.items():
@@ -92,9 +98,17 @@ class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
     self._is_dialog_text_allocated_size = False
     self._dialog_label_event_box.connect(
       'size-allocate', self._on_dialog_text_event_box_size_allocate)
-    
+
+    self._center_buttons()
+
     self._dialog.set_focus(self._buttons[self.overwrite_mode])
-  
+
+  def _center_buttons(self):
+    action_area_parent_box = self._dialog.action_area.get_parent()
+    action_area_parent_box.set_child_packing(
+      self._dialog.action_area, True, False, 0, Gtk.PackType.END)
+    self._dialog.action_area.set_center_widget(None)
+
   def _choose(self, filepath):
     if filepath is not None:
       dirpath, filename = os.path.split(filepath)
