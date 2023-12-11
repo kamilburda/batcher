@@ -697,8 +697,8 @@ class ExportLayersDialog:
       setting.tags.discard('ignore_reset')
     
     status, message = update.update(
-      self._settings, handle_invalid='abort', sources={'persistent': source})
-    if status == update.ABORT:
+      self._settings, handle_invalid='terminate', sources={'persistent': source})
+    if status == update.TERMINATE:
       messages_.display_import_export_settings_failure_message(
         _(('Failed to import settings from file "{}".'
            ' Settings must be reset completely.').format(filepath)),

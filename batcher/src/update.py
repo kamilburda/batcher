@@ -13,7 +13,7 @@ from src import utils as utils_
 from src import version as version_
 from src.gui import messages
 
-_UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, ABORT = 0, 1, 2, 3, 4
+_UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, TERMINATE = 0, 1, 2, 3, 4
 
 
 def update(
@@ -29,12 +29,12 @@ def update(
     
     * ``'ask_to_clear'`` - a message is displayed asking the user whether to
       clear settings. If the user chose to clear the settings, `CLEAR_SETTINGS`
-      is returned, `ABORT` otherwise.
+      is returned, `TERMINATE` otherwise.
     
     * ``'clear'`` - settings will be cleared unconditionally and
       `CLEAR_SETTINGS` is returned.
     
-    * any other value - no action is taken and `ABORT` is returned.
+    * any other value - no action is taken and `TERMINATE` is returned.
   
   If ``sources`` is ``None``, default setting sources are updated. Otherwise,
   ``sources`` must be a dictionary of (key, source) pairs.
@@ -53,7 +53,7 @@ def update(
   * `NO_ACTION` - No update was performed as the plug-in version remains the
     same.
   
-  * `ABORT` - No update was performed. This value is returned if the user
+  * `TERMINATE` - No update was performed. This value is returned if the user
     cancelled clearing settings interactively.
   """
   if sources is None:
@@ -93,12 +93,12 @@ def update(
       utils_.clear_setting_sources(settings, sources)
       return CLEAR_SETTINGS, load_message
     else:
-      return ABORT, load_message
+      return TERMINATE, load_message
   elif handle_invalid == 'clear':
     utils_.clear_setting_sources(settings, sources)
     return CLEAR_SETTINGS, load_message
   else:
-    return ABORT, load_message
+    return TERMINATE, load_message
 
 
 def _load_previous_version(settings):

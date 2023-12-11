@@ -143,7 +143,7 @@ class TestUpdate(unittest.TestCase):
 
     load_result = self.settings['main/test_setting'].load()
 
-    self.assertEqual(status, update.ABORT)
+    self.assertEqual(status, update.TERMINATE)
     self.assertEqual(self.settings['main/plugin_version'].value, 'invalid_version')
     self.assertEqual(load_result.status, pg.setting.Persistor.SUCCESS)
 

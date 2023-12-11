@@ -30,7 +30,7 @@ def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables,
   
   status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
-  if status == update.ABORT:
+  if status == update.TERMINATE:
     return
   
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -49,7 +49,7 @@ def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _dra
   
   status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
-  if status == update.ABORT:
+  if status == update.TERMINATE:
     return
   
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -81,8 +81,8 @@ def plug_in_export_layers_with_config(
     pg.config.SOURCE_NAME, config_filepath, source_type='persistent')
   
   status, _unused = update.update(
-    SETTINGS, handle_invalid='abort', sources={'persistent': setting_source})
-  if status == update.ABORT:
+    SETTINGS, handle_invalid='terminate', sources={'persistent': setting_source})
+  if status == update.TERMINATE:
     sys.exit(1)
   
   load_result = SETTINGS.load({'persistent': setting_source})
