@@ -22,7 +22,7 @@ from src.gui import main as gui_main
 SETTINGS = settings_main.create_settings()
 
 
-def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, *args):
+def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
   
@@ -38,10 +38,10 @@ def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables,
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     _run_with_last_vals(layer_tree)
   else:
-    _run_noninteractive(layer_tree, args)
+    _run_noninteractive(layer_tree, config)
 
 
-def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _drawables):
+def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _drawables, _config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 
@@ -63,9 +63,11 @@ def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _dra
 
 
 def plug_in_export_layers_with_config(
-      _procedure, run_mode, image, _n_drawables, _drawables, config_filepath):
+      _procedure, run_mode, image, _n_drawables, _drawables, config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
+
+  config_filepath = config.get_property('config-filepath')
 
   if not config_filepath or not os.path.isfile(config_filepath):
     sys.exit(1)
@@ -93,10 +95,16 @@ def plug_in_export_layers_with_config(
   _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
 
 
-def _run_noninteractive(layer_tree, args):
+def _run_noninteractive(layer_tree, config):
   main_settings = [
     setting for setting in SETTINGS['main'].walk()
     if setting.can_be_registered_to_pdb()]
+
+  args = [config.get_property(prop.name) for prop in config.list_properties()]
+  # `config.list_properties()` contains additional properties or parameters
+  # added by GIMP (e.g. `Gimp.Procedure` object). It appears these are added
+  # before the plug-in-specific PDB parameters.
+  args = args[max(len(args) - len(main_settings), 0):]
   
   for setting, arg in zip(main_settings, pg.setting.iter_args(args, main_settings)):
     setting.set_value(arg)
