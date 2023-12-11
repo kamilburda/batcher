@@ -37,15 +37,14 @@ def run_github_page_locally(github_page_dirpath):
   page_config_filepath = os.path.join(github_page_dirpath, PAGE_CONFIG_FILENAME)
   
   with open(page_config_filepath, 'r', encoding=FILE_ENCODING) as f:
-    page_config = yaml.load(f.read())
+    page_config = yaml.load(f.read(), Loader=yaml.SafeLoader)
   
   page_ready = False
   
   while not page_ready:
     try:
       requests.get(
-        'http://{}:{}{}/'.format(
-          JEKYLL_SERVER_LOCALHOST_IP, JEKYLL_SERVER_PORT, page_config['baseurl']))
+        f'http://{JEKYLL_SERVER_LOCALHOST_IP}:{JEKYLL_SERVER_PORT}{page_config["baseurl"]}/')
     except requests.ConnectionError:
       pass
     else:

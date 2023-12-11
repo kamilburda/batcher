@@ -12,6 +12,9 @@ local_config_filename='_config_local.yml'
 local_config_entries='
 github: [metadata]'
 
+
+# Functions
+
 cleanup () {
   rm -f "$local_config_filename"
 }
@@ -30,7 +33,6 @@ usage () {
   exit 1
 }
 
-#-------------------------------------------------------------------------------
 
 # Parse options
 
@@ -55,7 +57,8 @@ done
 
 [[ "$1" = "--" ]] && shift
 
-#-------------------------------------------------------------------------------
+
+# Main code
 
 trap cleanup SIGINT SIGTERM SIGKILL
 

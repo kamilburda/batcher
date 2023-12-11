@@ -1,4 +1,4 @@
-# This file contains pathspecs to include in or exclude from the release package.
+# This file contains paths to include in or exclude from the release package.
 
 # Ignore all files
 !*
@@ -9,11 +9,11 @@
 # Ignore files
 !*.pyc
 !*.pyo
+!*.pyi
 !*.log
 !.git*
 !.git/
+!/batcher/config/config_dev.py
 !/batcher/locale/generate_pot.sh
-!/batcher/tests/
 !/batcher/pygimplib/tests/
-!/batcher/pygimplib/_lib/mock/
-!/batcher/config_dev.py
+!/batcher/src/tests/

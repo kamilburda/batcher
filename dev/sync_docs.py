@@ -16,12 +16,10 @@ from dev import preprocess_document_contents
 
 
 MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))
-PLUGINS_DIRPATH = os.path.dirname(MODULE_DIRPATH)
+ROOT_DIRPATH = os.path.dirname(MODULE_DIRPATH)
 
-PATHS_TO_PREPROCESS_FILEPATH = os.path.join(
-  MODULE_DIRPATH, 'sync_docs_files_to_preprocess.txt')
-PATHS_TO_COPY_FILEPATH = os.path.join(
-  MODULE_DIRPATH, 'sync_docs_files_to_copy.txt')
+PATHS_TO_PREPROCESS_FILEPATH = os.path.join(MODULE_DIRPATH, 'sync_docs_files_to_preprocess.txt')
+PATHS_TO_COPY_FILEPATH = os.path.join(MODULE_DIRPATH, 'sync_docs_files_to_copy.txt')
 
 
 def main():
@@ -36,15 +34,14 @@ def sync_files(filepaths_to_preprocess, filepaths_to_copy):
 
 
 def get_filepaths(file_list_filepath):
-  """
-  Return a dictionary of `{source_path: destination_path}`.
+  """Returns a dictionary of `{source_path: destination_path}` pairs.
   
-  `file_list_filepath` is a file containing newline-separated pairs of file or
+  ``file_list_filepath`` is a file containing newline-separated pairs of file or
   directory paths. The first path in the pair represents a "raw", unprocessed
   file or directory with unprocessed files, and the second path represents the
   processed file or directory with files.
   
-  Empty lines from `file_list_filepath` are ignored.
+  Empty lines from ``file_list_filepath`` are ignored.
   """
   
   def _list_filepaths(dirpath):
@@ -69,7 +66,7 @@ def get_filepaths(file_list_filepath):
   
   source_paths = [os.path.normpath(line) for line in lines[::2]]
   dest_paths = [os.path.normpath(line) for line in lines[1::2]]
-  path_root = PLUGINS_DIRPATH
+  path_root = ROOT_DIRPATH
   
   paths_to_sync = []
   

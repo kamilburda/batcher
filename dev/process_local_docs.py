@@ -86,8 +86,7 @@ def main(site_dirpath, page_config_filepath):
     html_relative_filepath = os.path.relpath(html_filepath, site_dirpath)
 
     remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
-    rename_paths_in_url_attributes(
-      RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
+    rename_paths_in_url_attributes(RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
 
     with open(html_filepath, 'wb') as f:
       write_to_html_file(parser.tree, f)
@@ -141,7 +140,7 @@ def find_all_html_elements_recursive(html_tree, match):
 def get_html_filepaths(site_dirpath):
   html_filepaths = []
   
-  for root, _unused, filenames in os.walk(site_dirpath):
+  for root, _dirnames, filenames in os.walk(site_dirpath):
     for filename in filenames:
       if filename.endswith('.html'):
         html_filepaths.append(os.path.join(root, filename))
@@ -181,11 +180,8 @@ def remove_baseurl_in_url_attributes(html_relative_filepath, html_tree):
   modify_url_attributes(html_tree, _get_relative_url_without_baseurl)
 
 
-def rename_paths_in_url_attributes(
-      relative_paths_to_rename, html_relative_filepath, html_tree):
-  """
-  Rename paths in URL attributes according to the `relative_paths_to_rename`
-  parameter.
+def rename_paths_in_url_attributes(relative_paths_to_rename, html_relative_filepath, html_tree):
+  """Renames paths in URL attributes according to ``relative_paths_to_rename``.
   """
   
   def _get_renamed_url(url_attribute_value):
@@ -203,14 +199,12 @@ def rename_paths_in_url_attributes(
         os.path.dirname(html_relative_dirpath))
     ).as_posix()
     
-    renamed_resolved_relative_url = _rename_resolved_relative_path(
-      resolved_relative_url)
+    renamed_resolved_relative_url = _rename_resolved_relative_path(resolved_relative_url)
     
     if renamed_resolved_relative_url is None:
       return url_attribute_value
     
-    renamed_html_relative_dirpath = _rename_resolved_relative_path(
-      html_relative_dirpath)
+    renamed_html_relative_dirpath = _rename_resolved_relative_path(html_relative_dirpath)
     
     if renamed_html_relative_dirpath is None:
       renamed_html_relative_dirpath = html_relative_dirpath
@@ -259,9 +253,8 @@ def modify_url_attributes(html_tree, get_new_url_attribute_value_func):
 
 
 def reorganize_files(site_dirpath):
-  """
-  Place all files except the top HTML file in one folder. Rename files for
-  improved readability.
+  """Places all files except the top HTML file in one directory. Files are
+  renamed for improved readability.
   """
   for orig_relative_path, renamed_relative_path in RELATIVE_PATHS_TO_MOVE.items():
     orig_path = os.path.normpath(os.path.join(site_dirpath, orig_relative_path))
@@ -274,7 +267,7 @@ def reorganize_files(site_dirpath):
 
 
 def write_to_html_file(html_tree, html_file):
-  html_file.write(bytes(HTML_DOCTYPE_DECLARATION) + b'\n')
+  html_file.write(HTML_DOCTYPE_DECLARATION.encode() + b'\n')
   html_tree.write(html_file, encoding=FILE_ENCODING, xml_declaration=False, method='html')
 
 
@@ -294,7 +287,7 @@ def init_page_config(page_config_filepath):
   
   if PAGE_CONFIG is None:
     with open(page_config_filepath, 'r', encoding=FILE_ENCODING) as f:
-      PAGE_CONFIG = yaml.load(f.read())
+      PAGE_CONFIG = yaml.load(f.read(), Loader=yaml.SafeLoader)
 
 
 def modify_url_attributes_in_file(

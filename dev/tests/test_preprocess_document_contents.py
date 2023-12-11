@@ -87,8 +87,8 @@ menu entries.""",
       """If the crashes occur to you, try reinstalling GIMP."""],
   }
   
-  _TEST_FILE_INTRO = """Batcher is a [GIMP](https://www.gimp.org/)
-plug-in that exports layers as separate images."""
+  _TEST_FILE_INTRO = """This is an awesome [GIMP](https://www.gimp.org/)
+plug-in."""
   
   _TEST_FILE_CONTENTS = """{}
 
@@ -110,7 +110,7 @@ plug-in that exports layers as separate images."""
       ' '.join(_TEST_SECTION_CONTENTS['known_issues'][2:]))
   
   _TEST_SOURCE_FILEPATH = 'test_filepath'
-  _TEST_MACTHING_REGEX = r'( *)(\{% include-section (.*?) %\})'
+  _TEST_MATCHING_REGEX = r'( *)(\{% include-section (.*?) %\})'
   
   _TEST_FILEPATH_WITH_SECTIONS = 'sections/README.md'
   
@@ -175,7 +175,7 @@ plug-in that exports layers as separate images."""
     mock_file.read.side_effect = lambda: self._TEST_FILE_CONTENTS
     
     tag = preprocess_document_contents.IncludeSectionTag(
-      self._TEST_SOURCE_FILEPATH, self._TEST_MACTHING_REGEX)
+      self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)
     
     tag.process_args([self._TEST_FILEPATH_WITH_SECTIONS], optional_args)
     
@@ -185,7 +185,7 @@ plug-in that exports layers as separate images."""
 class TestIncludeConfigTag(unittest.TestCase):
   
   _TEST_SOURCE_FILEPATH = 'test_filepath'
-  _TEST_MACTHING_REGEX = r'(\{% include-config (.*?) %\})'
+  _TEST_MATCHING_REGEX = r'(\{% include-config (.*?) %\})'
   
   @parameterized.parameterized.expand([
     ['no_argument', [], ''],
@@ -197,7 +197,7 @@ class TestIncludeConfigTag(unittest.TestCase):
       setattr(pg.config, args[0], expected_contents)
     
     tag = preprocess_document_contents.IncludeConfigTag(
-      self._TEST_SOURCE_FILEPATH, self._TEST_MACTHING_REGEX)
+      self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)
     
     tag.process_args(args, {})
     

@@ -4,39 +4,42 @@
 containing a Liquid-style tag and its arguments with the corresponding content.
 
 Usage:
-`<script name> <source file paths> <destination file paths>`
+
+    <script name> <source file paths> <destination file paths>
 
 Each file from the list of source file paths must have a counterpart in the
-destination file paths list. Thus the length of the two lists must be identical.
+destination file paths list. The length of the two lists thus must be identical.
 
 The following tags can be specified in the documents:
-* `{% include-section <relative file path> <arguments>... %}`:
+* ``{% include-section <relative file path> <arguments>... %}``:
   Replace the entire line containing this expression with the contents of the
   specified file.
   
-  Optional arguments to `include-section`:
-  * `section=<section name>` - Instead of the entire contents, insert only the
-    contents from the section <section name>. A section is a valid Markdown
-    section heading (underlining headers with '=' or '-', or using leading '#'s
-    separated from headers by a single space).
-  * `sentences=<index number>` or `sentences=<start index:end index>` - pick
+  Optional arguments to ``include-section``:
+  * ``section=<section name>`` - Instead of the entire contents, insert only
+    the contents from the section <section name>. A section is a valid
+    Markdown section heading (underlining headers with ``'='`` or ``'-'``,
+    or using leading ``'#'``s separated from headers by a single space).
+  * ``sentences=<index number>`` or ``sentences=<start index:end index>`` - pick
     chosen sentence(s) from sections by indexes using the Python slice notation.
     Index starts from 0.
-  * `no-header=(True | False)` - exclude section header. `False` by default. If
-    no section is specified, the first section header is ignored.
+  * ``no-header=(True | False)`` - exclude section header. ``False`` by default.
+    If no section is specified, the first section header is ignored.
   
   Examples:
+
       {% include-section 'docs/README.md' section=Features no-header=True %}
       {% include-section 'docs/README.md' section='Known Issues' %}
       {% include-section 'docs/README.md' section=License sentences=0 %}
 
-* `{% include-config <pygimplib configuration entry> %}`:
+* ``{% include-config <pygimplib configuration entry> %}``:
   Replace the expression with the corresponding configuration entry in
-  `pygimplib.config`. If no such entry is found, the expression is not replaced.
+  ``pygimplib.config``. If no such entry is found, the expression is not
+  replaced.
   
   Examples:
-  `{% include-config 'PLUGIN_NAME' %}` will insert a pygimplib configuration
-  entry titled `'PLUGIN_NAME'`, e.g. 'batcher'.
+  ``{% include-config 'PLUGIN_NAME' %}`` will insert a pygimplib configuration
+  entry titled ``'PLUGIN_NAME'``, e.g. ``'batcher'``.
 """
 
 import abc
@@ -54,9 +57,7 @@ def main(source_and_dest_filepaths):
 def preprocess_contents(source_and_dest_filepaths):
   for source_filepath, dest_filepath in source_and_dest_filepaths:
     if not os.path.isfile(source_filepath):
-      print(
-        'Warning: Input path "{}" does not exist or is not a file'.format(
-          source_filepath))
+      print(f'Warning: Input path "{source_filepath}" does not exist or is not a file')
       continue
     
     with open(source_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
@@ -67,8 +68,7 @@ def preprocess_contents(source_and_dest_filepaths):
     for tag_name, tag_class in _TAGS.items():
       tag = tag_class(source_filepath, _TAG_MATCHING_REGEXES[tag_name])
       try:
-        preprocessed_contents = _preprocess_contents(
-          source_filepath, tag, preprocessed_contents)
+        preprocessed_contents = _preprocess_contents(source_filepath, tag, preprocessed_contents)
       except DocumentNotFoundError as e:
         print(str(e))
     
@@ -89,34 +89,32 @@ def _preprocess_contents(source_filepath, tag, file_contents):
 
 
 def parse_args(args_str):
-  
   quote_char = "'"
   optional_arg_separator_char = '='
   
-  def _parse_optional_arg(args_str_to_parse, optional_arg_name_match):
-    optional_arg_name = args_str_to_parse[:optional_arg_name_match.end(1)]
-    args_str_to_parse = args_str_to_parse[optional_arg_name_match.end(1) + 1:]
+  def _parse_optional_arg(args_str_to_parse_, optional_arg_name_match_):
+    optional_arg_name_ = args_str_to_parse_[:optional_arg_name_match_.end(1)]
+    args_str_to_parse_ = args_str_to_parse_[optional_arg_name_match_.end(1) + 1:]
     
     optional_arg_value_with_quotes_match = (
-      re.search(quote_char + r'(.+?)' + quote_char + r'(\s|$)', args_str_to_parse))
+      re.search(quote_char + r'(.+?)' + quote_char + r'(\s|$)', args_str_to_parse_))
     
     if optional_arg_value_with_quotes_match is not None:
-      optional_arg_value = optional_arg_value_with_quotes_match.group(1)
-      args_str_to_parse = (
-        args_str_to_parse[optional_arg_value_with_quotes_match.end(1) + 1:].lstrip())
+      optional_arg_value_ = optional_arg_value_with_quotes_match.group(1)
+      args_str_to_parse_ = (
+        args_str_to_parse_[optional_arg_value_with_quotes_match.end(1) + 1:].lstrip())
     else:
       optional_arg_value_without_quotes_match = (
-        re.search(r'(.+?)(\s|$)', args_str_to_parse))
+        re.search(r'(.+?)(\s|$)', args_str_to_parse_))
       
       if optional_arg_value_without_quotes_match is not None:
-        optional_arg_value = optional_arg_value_without_quotes_match.group(1)
-        args_str_to_parse = (
-          args_str_to_parse[optional_arg_value_without_quotes_match.end(1) + 1:].lstrip())
+        optional_arg_value_ = optional_arg_value_without_quotes_match.group(1)
+        args_str_to_parse_ = (
+          args_str_to_parse_[optional_arg_value_without_quotes_match.end(1) + 1:].lstrip())
       else:
-        raise ValueError(
-          'missing value for optional argument "{}"'.format(optional_arg_name))
+        raise ValueError(f'missing value for optional argument "{optional_arg_name_}"')
     
-    return args_str_to_parse, optional_arg_name, optional_arg_value
+    return args_str_to_parse_, optional_arg_name_, optional_arg_value_
   
   parsed_args = {'args': [], 'optional_args': {}}
   
@@ -132,7 +130,7 @@ def parse_args(args_str):
         parsed_args['args'].append(args_str_to_parse[:end_quote_index])
         args_str_to_parse = args_str_to_parse[end_quote_index + 1:].lstrip()
       else:
-        raise ValueError('missing closing "{}": {}'.format(quote_char, args_str))
+        raise ValueError(f'missing closing "{quote_char}": {args_str}')
     else:
       optional_arg_name_match = (
         re.search(r'^(\S+?)' + optional_arg_separator_char, args_str_to_parse))
@@ -152,9 +150,6 @@ def parse_args(args_str):
           args_str_to_parse = ''
   
   return parsed_args
-
-
-#===============================================================================
 
 
 class DocumentNotFoundError(Exception):
@@ -205,8 +200,8 @@ class IncludeSectionTag(CustomLiquidTag):
     
     if not os.path.isfile(document_filepath):
       raise DocumentNotFoundError(
-        'Document path "{}" inside "{}" does not exist or is not a file'.format(
-          document_filepath, self.source_filepath))
+        (f'Document path "{document_filepath}" inside "{self.source_filepath}" does not'
+         ' exist or is not a file'))
     
     with open(document_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
       document_contents = f.read()
@@ -231,15 +226,11 @@ class IncludeSectionTag(CustomLiquidTag):
       os.path.join(os.path.dirname(self.source_filepath), relative_filepath))
   
   def _process_optional_args(self, optional_args):
-    processed_optional_args = {}
-    
-    processed_optional_args['section'] = optional_args.get('section', '')
-    processed_optional_args['sentences'] = (
-      self._parse_sentence_indices(optional_args.get('sentences', '')))
-    processed_optional_args['no-header'] = (
-      self._parse_bool_from_str(optional_args.get('no-header', 'False')))
-    
-    return processed_optional_args
+    return {
+      'section': optional_args.get('section', ''),
+      'sentences': self._parse_sentence_indices(optional_args.get('sentences', '')),
+      'no-header': self._parse_bool_from_str(optional_args.get('no-header', 'False')),
+    }
   
   @staticmethod
   def _parse_sentence_indices(arg_str):
@@ -294,7 +285,7 @@ class IncludeSectionTag(CustomLiquidTag):
 
 def find_section(contents, section_name=None, get_contents_if_section_name_empty=False):
   
-  def _get_section_contents(contents, start_of_section_contents, end_of_section_header):
+  def _get_section_contents(contents_, start_of_section_contents_, end_of_section_header_):
     next_section_match_regex = (
       '\n'
       + '('
@@ -302,17 +293,15 @@ def find_section(contents, section_name=None, get_contents_if_section_name_empty
       + '|'
       + r'.*?\n[=-]+\n'
       + ')')
-    next_section_match = re.search(
-      next_section_match_regex, contents[start_of_section_contents:])
+    next_section_match = re.search(next_section_match_regex, contents_[start_of_section_contents_:])
     
     if next_section_match:
       start_of_next_section_header = next_section_match.start(1)
-      end_of_section_contents = (
-        start_of_section_contents + start_of_next_section_header - 1)
+      end_of_section_contents = start_of_section_contents_ + start_of_next_section_header - 1
       
-      return contents[end_of_section_header:end_of_section_contents]
+      return contents_[end_of_section_header_:end_of_section_contents]
     else:
-      return contents[end_of_section_header:]
+      return contents_[end_of_section_header_:]
   
   section_header = ''
   section_contents = ''

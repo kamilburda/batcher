@@ -12,6 +12,10 @@ from gi.repository import GLib
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import Gio
+from gi.repository import GObject
 from gi.repository import Gtk
 
 from batcher import pygimplib as pg
@@ -24,7 +28,7 @@ from batcher.src import settings_main
 from batcher.src.gui import main as gui_main
 
 
-PLUGINS_DIRPATH = os.path.abspath(
+ROOT_DIRPATH = os.path.abspath(
   os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
 
 TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_DIRPATH, 'tests', 'test_images')
@@ -33,7 +37,7 @@ TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_con
 OUTPUT_DIRPATH = os.path.join(
   GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), 'Loading Screens', 'Components')
 
-SCREENSHOTS_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'images')
+SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_BASIC_USAGE_FILENAME = 'screenshot_dialog_basic_usage.png'
 SCREENSHOT_DIALOG_CUSTOMIZING_EXPORT_FILENAME = 'screenshot_dialog_customizing_export.png'
 SCREENSHOT_DIALOG_BATCH_EDITING_FILENAME = 'screenshot_dialog_batch_editing.png'
@@ -43,7 +47,7 @@ def main(settings=None):
   if not settings:
     settings = settings_main.create_settings()
 
-  image = pdb.gimp_file_load(TEST_IMAGES_FILEPATH, os.path.basename(TEST_IMAGES_FILEPATH))
+  image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
 
@@ -51,7 +55,7 @@ def main(settings=None):
 
   gui_main.ExportLayersDialog(layer_tree, settings, run_gui_func=take_screenshots)
 
-  pdb.gimp_image_delete(image)
+  image.delete()
 
 
 def take_screenshots(gui, dialog, settings):
@@ -136,7 +140,7 @@ def take_screenshots(gui, dialog, settings):
 
 def take_and_process_screenshot(
       screenshots_dirpath, filename, settings, decoration_offsets, gui, blur_folders=False):
-  #HACK: Wait a while until the window is fully shown.
+  # HACK: Wait a while until the window is fully shown.
   time.sleep(1)
   
   screenshot_image = take_screenshot()
@@ -145,14 +149,18 @@ def take_and_process_screenshot(
     blur_folder_chooser(screenshot_image, gui, decoration_offsets)
   
   crop_to_dialog(screenshot_image, settings, decoration_offsets)
+
+  selected_layers = screenshot_image.list_selected_layers()
+  layer_array = GObject.Value(Gimp.ObjectArray)
+  Gimp.value_set_object_array(layer_array, Gimp.Layer, selected_layers)
   
   pdb.gimp_file_save(
     screenshot_image,
-    screenshot_image.active_layer,
-    os.path.join(screenshots_dirpath, filename),
-    filename)
+    len(selected_layers),
+    layer_array.get_boxed(),
+    Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)))
   
-  pdb.gimp_image_delete(screenshot_image)
+  screenshot_image.delete()
 
 
 def blur_folder_chooser(image, gui, decoration_offsets):
@@ -165,13 +173,13 @@ def blur_folder_chooser(image, gui, decoration_offsets):
   selection_to_blur = folder_chooser_left_pane.get_allocation()
   selection_to_blur.y += decoration_offsets[1]
   
-  pdb.gimp_image_select_rectangle(image, 0, *selection_to_blur)
-  pdb.plug_in_gauss(image, image.active_layer, 25, 25, 0)
+  image.select_rectangle(0, *selection_to_blur)
+  pdb.plug_in_gauss(image, image.list_selected_layers()[0], 25, 25, 0)
   pdb.gimp_selection_none(image)
 
 
 def take_screenshot():
-  return pdb.plug_in_screenshot(1, -1, 0, 0, 0, 0)
+  return pdb.plug_in_screenshot(0, 0, 0, 0, 0)
 
 
 def move_dialog_to_corner(dialog, settings):
@@ -194,4 +202,4 @@ def crop_to_dialog(image, settings, decoration_offsets):
     0,
     0)
   
-  pdb.plug_in_autocrop(image, image.active_layer)
+  pdb.plug_in_autocrop(image, image.list_selected_layers()[0])

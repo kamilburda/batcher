@@ -21,14 +21,13 @@ import git
 
 DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-PLUGINS_DIRPATH = os.path.dirname(DEV_DIRPATH)
-
-PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
+ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
+PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   DEV_DIRPATH,
-  PLUGINS_DIRPATH,
+  ROOT_DIRPATH,
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
@@ -40,20 +39,19 @@ from dev import make_installers
 from dev import preprocess_document_contents
 
 
-GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')
-GITHUB_PAGE_BRANCH = 'gh-pages'
+GITHUB_PAGES_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
+GITHUB_PAGES_BRANCH = 'gh-pages'
 
 VERSION_STRING_FORMAT = 'major.minor[.patch[-prerelease[.patch]]]'
 
-PLUGIN_CONFIG_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config.py')
-PLUGIN_CONFIG_DEV_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config_dev.py')
-CHANGELOG_FILEPATH = os.path.join(PLUGINS_DIRPATH, 'CHANGELOG.md')
+PLUGIN_CONFIG_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config', 'config.py')
+PLUGIN_CONFIG_DEV_FILEPATH = os.path.join(PLUGIN_DIRPATH, 'config', 'config_dev.py')
+CHANGELOG_FILEPATH = os.path.join(ROOT_DIRPATH, 'CHANGELOG.md')
 
 INSTALLERS_OUTPUT_DIRPATH = make_installers.OUTPUT_DIRPATH_DEFAULT
 
 FILE_EXTENSIONS_AND_MIME_TYPES = {
   'zip': 'application/x-zip-compressed',
-  'exe': 'application/x-msdownload',
 }
 
 PROMPT_NO_EXIT_STATUS = 2
@@ -65,8 +63,8 @@ def main():
 
 
 def make_release(**kwargs):
-  repo = git.Repo(PLUGINS_DIRPATH)
-  gh_pages_repo = git.Repo(GITHUB_PAGE_DIRPATH)
+  repo = git.Repo(ROOT_DIRPATH)
+  gh_pages_repo = git.Repo(GITHUB_PAGES_DIRPATH)
   
   release_metadata = _ReleaseMetadata(
     repo,
@@ -77,8 +75,8 @@ def make_release(**kwargs):
     remote_repo_name=pg.config.REPOSITORY_NAME,
     **kwargs)
   
-  def handle_sigint(signal, frame):
-    _print_error('\nPerforming rollback and aborting.')
+  def handle_sigint(_signal, _frame):
+    _print_error('\nPerforming rollback and terminating.')
     _rollback(release_metadata)
     sys.exit(1)
   
@@ -88,8 +86,8 @@ def make_release(**kwargs):
     _make_release(release_metadata)
   except Exception:
     _print_error(
-      '\nThe following error has occurred:\n{}\nPerforming rollback and aborting.'.format(
-        traceback.format_exc()))
+      (f'\nThe following error has occurred:\n{traceback.format_exc()}'
+       '\nPerforming rollback and terminating.'))
     _rollback(release_metadata)
     sys.exit(1)
 
@@ -135,17 +133,14 @@ def _make_release(release_metadata):
 
 
 def _check_branches_for_local_changes(release_metadata):
-  if (not release_metadata.force
-      and _has_active_branch_local_changes(release_metadata.repo)):
+  if not release_metadata.force and _has_active_branch_local_changes(release_metadata.repo):
     _print_error_and_exit(
-      'Repository contains local changes.'
-      ' Please remove or commit changes before proceeding.')
+      'Repository contains local changes. Please remove or commit changes before proceeding.')
   
   if _has_active_branch_local_changes(release_metadata.gh_pages_repo):
     _print_error_and_exit(
-      ('Repository in the "{}" branch contains local changes.'
-       ' Please remove or commit changes before proceeding.').format(
-         release_metadata.gh_pages_repo.active_branch.name))
+      (f'Repository in the "{release_metadata.gh_pages_repo.active_branch.name}" branch'
+       ' contains local changes. Please remove or commit changes before proceeding.'))
 
 
 def _has_active_branch_local_changes(repo):
@@ -155,8 +150,8 @@ def _has_active_branch_local_changes(repo):
 def _check_if_tag_with_new_version_already_exists(release_metadata):
   if release_metadata.repo.git.tag('-l', release_metadata.new_version):
     _print_error_and_exit(
-      ('Repository already contains tag "{}", indicating that such a version'
-       ' is already released.').format(release_metadata.new_version))
+      (f'Repository already contains tag "{release_metadata.new_version}", indicating that'
+       ' such a version is already released.'))
 
 
 def _get_next_version(release_metadata):
@@ -164,25 +159,27 @@ def _get_next_version(release_metadata):
     ver = version_.Version.parse(release_metadata.current_version)
   except version_.InvalidVersionFormatError:
     _print_error_and_exit(
-      'Version string "{}" has invalid format; valid format: {}'.format(
-        release_metadata.current_version, VERSION_STRING_FORMAT))
-  
-  try:
-    ver.increment(release_metadata.release_type, release_metadata.prerelease)
-  except ValueError as e:
-    _print_error_and_exit(str(e))
-  
-  print('Current version:', release_metadata.current_version)
-  print('New version:', str(ver))
-  
-  return str(ver)
+      (f'Version string "{release_metadata.current_version}" has invalid format;'
+       f' must be "{VERSION_STRING_FORMAT}"'))
+  else:
+    try:
+      ver.increment(release_metadata.release_type, release_metadata.prerelease)
+    except ValueError as e:
+      _print_error_and_exit(str(e))
+
+    print('Current version:', release_metadata.current_version)
+    print('New version:', str(ver))
+
+    return str(ver)
+
+  raise RuntimeError('Failed to parse the current plug-in version')
 
 
 def _get_access_token(release_metadata):
   if release_metadata.dry_run:
     return None
   
-  return getpass.getpass('Enter your GitHub access token:')
+  return getpass.getpass('Enter your GitHub access token: ')
 
 
 def _prompt_to_proceed():
@@ -194,7 +191,7 @@ def _prompt_to_proceed():
     should_proceed = False
   
   if not should_proceed:
-    _print_error_and_exit('Aborting.', PROMPT_NO_EXIT_STATUS)
+    _print_error_and_exit('Terminating.', PROMPT_NO_EXIT_STATUS)
 
 
 def _get_release_notes_and_modify_changelog_first_header(release_metadata):
@@ -212,8 +209,9 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
     
     release_metadata.new_version_release_notes = release_notes.strip()
     
-    print('Replacing header name "{}" in the changelog with the new version'.format(
-      match.group(2) or match.group(3)))
+    print(
+      (f'Replacing header name "{match.group(2) or match.group(3)}"'
+       ' in the changelog with the new version'))
     
     if release_metadata.dry_run:
       return
@@ -245,8 +243,9 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
     'PLUGIN_VERSION': release_metadata.new_version,
     'PLUGIN_VERSION_RELEASE_DATE': release_metadata.new_version_release_date}
   
-  print('Modifying the following entries in file "{}": {}'.format(
-    plugin_config_filepath, ', '.join(entries_to_modify)))
+  print(
+    (f'Modifying the following entries in file "{plugin_config_filepath}":'
+     f' {", ".join(entries_to_modify)}'))
   
   if release_metadata.dry_run:
     return
@@ -270,8 +269,9 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
       break
   
   if entries_to_find:
-    _print_error_and_exit('Error: missing the following entries in file "{}": {}'.format(
-      plugin_config_filepath, ', '.join(entries_to_find)))
+    _print_error_and_exit(
+      (f'Error: missing the following entries in file "{plugin_config_filepath}":'
+       f' {", ".join(entries_to_find)}'))
   
   with open(plugin_config_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
     f.writelines(lines)
@@ -283,7 +283,7 @@ def _generate_translation_file(release_metadata):
   if release_metadata.dry_run and not release_metadata.force_make_output:
     return
   
-  orig_cwd = os.getcwdu()
+  orig_cwd = os.getcwd()
   os.chdir(pg.config.LOCALE_DIRPATH)
   
   subprocess.call([
@@ -298,7 +298,7 @@ def _generate_translation_file(release_metadata):
 
 
 def _create_release_commit(release_metadata, repo):
-  print('Creating release commit from branch "{}"'.format(repo.active_branch.name))
+  print(f'Creating release commit from branch "{repo.active_branch.name}"')
   
   if release_metadata.dry_run:
     return
@@ -312,7 +312,7 @@ def _create_release_commit(release_metadata, repo):
 
 
 def _create_release_tag(release_metadata):
-  print('Creating tag "{}"'.format(release_metadata.release_tag))
+  print(f'Creating tag "{release_metadata.release_tag}"')
   
   if release_metadata.dry_run:
     return
@@ -325,21 +325,20 @@ def _create_release_tag(release_metadata):
 
 
 def _get_release_message_header(release_metadata):
-  return 'Release {}'.format(release_metadata.new_version)
+  return f'Release {release_metadata.new_version}'
 
 
 def _prepare_gh_pages_for_update(release_metadata):
-  print('Preparing branch "{}" for update'.format(
-    release_metadata.gh_pages_repo.active_branch.name))
+  print(f'Preparing branch "{release_metadata.gh_pages_repo.active_branch.name}" for update')
   
   if release_metadata.dry_run:
     return
   
   for dirname in ['images', 'sections']:
-    shutil.rmtree(os.path.join(GITHUB_PAGE_DIRPATH, dirname))
+    shutil.rmtree(os.path.join(GITHUB_PAGES_DIRPATH, dirname))
     shutil.copytree(
-      os.path.join(GITHUB_PAGE_DIRPATH, 'dev', dirname),
-      os.path.join(GITHUB_PAGE_DIRPATH, dirname))
+      os.path.join(GITHUB_PAGES_DIRPATH, 'dev', dirname),
+      os.path.join(GITHUB_PAGES_DIRPATH, dirname))
 
 
 def _make_installers(release_metadata):
@@ -359,19 +358,18 @@ def _push_release_commit(release_metadata, repo, remote_branch=None):
   if remote_branch is None:
     remote_branch = release_metadata.remote_branch
   
-  print('Pushing release commit from branch "{}" to remote "{} {}"'.format(
-    repo.active_branch.name, release_metadata.remote_name, remote_branch))
+  print(
+    (f'Pushing release commit from branch "{repo.active_branch.name}"'
+     f' to remote "{release_metadata.remote_name} {remote_branch}"'))
   
   if release_metadata.dry_run:
     return
   
-  repo.git.push(release_metadata.remote_name, '{}:{}'.format(
-    repo.active_branch.name, remote_branch))
+  repo.git.push(release_metadata.remote_name, f'{repo.active_branch.name}:{remote_branch}')
 
 
 def _push_release_tag(release_metadata):
-  print('Pushing tag "{}" to remote "{}"'.format(
-    release_metadata.release_tag, release_metadata.remote_name))
+  print(f'Pushing tag "{release_metadata.release_tag}" to remote "{release_metadata.remote_name}"')
   
   if release_metadata.dry_run:
     return
@@ -398,7 +396,7 @@ def _create_github_release(release_metadata):
   
   access_token_header = {
     'Accept': 'application/vnd.github+json',
-    'Authorization': 'Bearer {}'.format(release_metadata.access_token),
+    'Authorization': f'Bearer {release_metadata.access_token}',
   }
   
   response = requests.post(
@@ -472,14 +470,13 @@ class _ReleaseMetadata:
     self.new_version_release_date = time.strftime('%B %d, %Y', time.gmtime())
     
     self._last_commit_id_before_release = self._repo.git.rev_parse('HEAD')
-    self._last_gh_pages_commit_id_before_release = (
-      self._gh_pages_repo.git.rev_parse('HEAD'))
+    self._last_gh_pages_commit_id_before_release = self._gh_pages_repo.git.rev_parse('HEAD')
     
     for name, value in kwargs.items():
       if hasattr(self, name):
         raise TypeError(
-          ('keyword argument "{}" already exists in class {}; to prevent name clashes,'
-           ' rename conflicting script options').format(name, type(self).__qualname__))
+          (f'keyword argument "{name}" already exists in class {type(self).__qualname__};'
+           ' to prevent name clashes, rename conflicting script options'))
       
       pg.utils.create_read_only_property(self, name, value)
   
@@ -504,12 +501,8 @@ class _ReleaseMetadata:
     return self.new_version
 
 
-#===============================================================================
-
-
 def parse_args(args):
-  parser = argparse.ArgumentParser(
-    description='Create a new release for the GIMP plug-in.')
+  parser = argparse.ArgumentParser(description='Create a new release for the GIMP plug-in.')
   
   parser.add_argument(
     'release_type',
@@ -530,8 +523,7 @@ def parse_args(args):
     nargs='*',
     default=['all'],
     choices=['zip', 'all'],
-    help=(
-      'installers to create; see help for "make_installers.py" for more information'),
+    help='installers to create; see help for "make_installers.py" for more information',
     dest='installers')
   
   parser.add_argument(

@@ -2,24 +2,23 @@
 
 """Creating installers for releases from the plug-in source."""
 
+import inspect
 import os
 import sys
-import inspect
 
 DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-PLUGINS_DIRPATH = os.path.dirname(DEV_DIRPATH)
-PLUGIN_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'batcher')
+ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
+PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   DEV_DIRPATH,
-  PLUGINS_DIRPATH,
+  ROOT_DIRPATH,
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
 import argparse
-import collections
 import pathlib
 import re
 import shutil
@@ -38,17 +37,17 @@ from dev import process_local_docs
 pg.config.LOG_MODE = 'none'
 
 
-INSTALLERS_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'installers')
+INSTALLERS_DIRPATH = os.path.join(ROOT_DIRPATH, 'installers')
 
 TEMP_INPUT_DIRPATH = os.path.join(INSTALLERS_DIRPATH, 'temp_input')
 OUTPUT_DIRPATH_DEFAULT = os.path.join(INSTALLERS_DIRPATH, 'output')
 
 INCLUDE_LIST_FILEPATH = os.path.join(DEV_DIRPATH, 'make_installers_included_files.txt')
 
-GITHUB_PAGE_DIRPATH = os.path.join(PLUGINS_DIRPATH, 'docs', 'gh-pages')
+GITHUB_PAGE_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
 
 README_RELATIVE_FILEPATH = os.path.join('docs', 'sections', 'index.html')
-README_RELATIVE_OUTPUT_FILEPATH = os.path.join('Readme.html')
+README_RELATIVE_OUTPUT_FILEPATH = 'Readme.html'
 
 
 def main():
@@ -88,7 +87,7 @@ def main():
 
 
 def make_installers(
-      input_dirpath=PLUGINS_DIRPATH,
+      input_dirpath=ROOT_DIRPATH,
       installer_dirpath=OUTPUT_DIRPATH_DEFAULT,
       force_if_dirty=False,
       installers=None,
@@ -140,7 +139,7 @@ def _create_temp_dirpath(temp_dirpath):
     shutil.rmtree(temp_dirpath)
   elif os.path.isfile(temp_dirpath):
     os.remove(temp_dirpath)
-    
+
   os.makedirs(temp_dirpath, exist_ok=True)
 
 
@@ -149,8 +148,7 @@ def _prepare_repo_files_for_packaging(
   repo = git.Repo(repository_dirpath)
   
   if not force_if_dirty and repo.git.status('--porcelain'):
-    print(('Repository contains local changes.'
-           ' Please remove or commit changes before proceeding.'),
+    print('Repository contains local changes. Please remove or commit changes before proceeding.',
           file=sys.stderr)
     exit(1)
   
@@ -227,13 +225,12 @@ def _get_relative_filepaths(filepaths, root_dirpath):
 
 
 def _compile_translation_files(source_dirpath):
-  orig_cwd = os.getcwdu()
+  orig_cwd = os.getcwd()
   os.chdir(source_dirpath)
   
   for root_dirpath, _unused, filenames in os.walk(source_dirpath):
     for filename in filenames:
-      if (os.path.isfile(os.path.join(root_dirpath, filename))
-          and filename.endswith('.po')):
+      if os.path.isfile(os.path.join(root_dirpath, filename)) and filename.endswith('.po'):
         po_file = os.path.join(root_dirpath, filename)
         language = pathlib.Path(root_dirpath).parts[-2]
         subprocess.call(['./generate_mo.sh', po_file, language])
@@ -254,18 +251,14 @@ def _create_user_docs(dirpath):
 
 
 def _set_permissions(dirpath, permissions):
+  """Sets file permissions for all files and subdirectories in the given
+  directory path.
   """
-  Set file permissions on all files and subdirectories in the given directory
-  path.
-  """
-  for root, subdirpaths, filenames in os.walk(dirpath):
-    for subdirpath in subdirpaths:
-      os.chmod(os.path.join(root, subdirpath), permissions)
+  for root, dirnames, filenames in os.walk(dirpath):
+    for dirname in dirnames:
+      os.chmod(os.path.join(root, dirname), permissions)
     for filename in filenames:
       os.chmod(os.path.join(root, filename), permissions)
-
-
-#===============================================================================
 
 
 def _create_installers(
@@ -292,12 +285,10 @@ def _create_installers(
 
 def _create_zip_archive(
       installer_dirpath, input_dirpath, input_filepaths, output_filepaths):
-  archive_filename = '{}-{}.zip'.format(
-    pg.config.PLUGIN_NAME, pg.config.PLUGIN_VERSION)
+  archive_filename = f'{pg.config.PLUGIN_NAME}-{pg.config.PLUGIN_VERSION}.zip'
   archive_filepath = os.path.join(installer_dirpath, archive_filename)
   
-  readme_filepath = os.path.join(
-    input_dirpath, pg.config.PLUGIN_NAME, README_RELATIVE_FILEPATH)
+  readme_filepath = os.path.join(input_dirpath, pg.config.PLUGIN_NAME, README_RELATIVE_FILEPATH)
   
   can_create_toplevel_readme = readme_filepath in input_filepaths
   
