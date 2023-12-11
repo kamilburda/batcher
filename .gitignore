@@ -5,8 +5,8 @@
 *.log
 *.pyi
 batcher/config/config_dev.py
-batcher/src/tests/test_images/incorrect_results/
-batcher/src/tests/test_images/temp_output/
+batcher/src/tests/tests_requiring_gimp/test_images/incorrect_results/
+batcher/src/tests/tests_requiring_gimp/test_images/temp_output/
 docs/gh-pages/
 installers/
 
