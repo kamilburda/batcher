@@ -16,6 +16,8 @@ __all__ = [
   'get_label_full_text_width',
   'menu_popup_below_widget',
   'get_position_below_widget',
+  'get_absolute_widget_position',
+  'get_icon_pixbuf',
 ]
 
 
