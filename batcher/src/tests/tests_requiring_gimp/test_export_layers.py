@@ -227,9 +227,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   @staticmethod
   def _load_layers(layer_filepaths):
-    """
-    Load layers from specified file paths into a new image. Return the image and
-    a dict with (layer name: Gimp.Layer instance) pairs.
+    """Loads layers from the specified file paths into a new image. Returns the
+    image and a dictionary of (layer name: Gimp.Layer instance) pairs.
     """
     image = pg.pdbutils.load_layers(
       layer_filepaths, image=None, strip_file_extension=True)
