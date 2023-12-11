@@ -183,7 +183,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
       for image_id, item_ids in value.items():
         image = Gimp.Image.get_by_id(image_id)
         
-        if image is None or image.get_file() is None:
+        if image is None or image.get_file() is None or image.get_file().get_path() is None:
           continue
         
         image_filepath = image.get_file().get_path()
@@ -284,7 +284,7 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
   
   @staticmethod
   def _get_image_import_dirpath(image):
-    if image.get_file() is not None:
+    if image.get_file() is not None and image.get_file().get_path() is not None:
       return os.path.dirname(image.get_file().get_path())
     else:
       return None

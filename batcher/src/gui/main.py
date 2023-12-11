@@ -189,7 +189,7 @@ def _update_directory(setting, current_image, current_image_dirpath):
     setting.set_value(current_image_dirpath)
     return True
   
-  if current_image.get_file() is not None:
+  if current_image.get_file() is not None and current_image.get_file().get_path() is not None:
     setting.set_value(os.path.dirname(current_image.get_file().get_path()))
     return True
   
