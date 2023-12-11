@@ -727,9 +727,11 @@ class Batcher:
       else:
         raise ValueError(
           f'invalid argument "{name}" encountered; must be one of {list(init_argspec_names)}')
-    
+
     if self._overwrite_chooser is None:
       self._overwrite_chooser = pg.overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
+    else:
+      self._overwrite_chooser.overwrite_mode = self._overwrite_mode
     
     if self._progress_updater is None:
       self._progress_updater = pg.progress.ProgressUpdater(None)

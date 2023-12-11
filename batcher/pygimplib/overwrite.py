@@ -29,6 +29,10 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
     By default, this is set to the value provided during object instantiation.
     """
     return self._overwrite_mode
+
+  @overwrite_mode.setter
+  def overwrite_mode(self, value: int):
+    self._overwrite_mode = value
   
   @abc.abstractmethod
   def choose(self, filepath: Optional[str] = None) -> int:
