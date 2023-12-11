@@ -103,7 +103,7 @@ def find_images_by_filepath(image_filepath: str) -> List[Gimp.Image]:
   """Returns a list of currently opened images in GIMP matching the given file
   path.
 
-  File path matching is performed via ``Gimp.Image.get_file()``.
+  File path matching is performed via `Gimp.Image.get_file()`.
   """
   return [
     image for image in Gimp.list_images()
@@ -116,7 +116,7 @@ def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Im
   
   If no match is found, ``None`` is returned.
   
-  File path matching is performed via ``Gimp.Image.get_file()``.
+  File path matching is performed via `Gimp.Image.get_file()`.
   
   For multiple matches, the first matching image is returned by default. There
   may be multiple opened images from the same file path, but there is no way to
@@ -142,7 +142,7 @@ def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Im
 def get_item_from_image_and_item_path(
       image: Gimp.Image, item_class_name: str, item_path: str,
 ) -> Union[Gimp.Item, None]:
-  """Returns a ``Gimp.Item`` given the image, item class name and item path.
+  """Returns a `Gimp.Item` given the image, item class name and item path.
   
   ``item_class_name`` corresponds to one of the GIMP item classes, e.g.
   ``'Layer'`` or ``'Channel'``.
@@ -201,12 +201,12 @@ def _get_children_from_image(image, item_class_name):
 
 
 def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[str], None]:
-  """Returns a ``Gimp.Item`` instance as a list of
+  """Returns a `Gimp.Item` instance as a list of
   ``[item class name, item path]`` or
   ``[image file path, item class name, item path]``.
   
   Item class name and item path are described in
-  ``get_item_from_image_and_item_path()``.
+  `get_item_from_image_and_item_path()`.
   """
   if item is None:
     return None
@@ -251,18 +251,12 @@ def load_layer(
 ) -> Gimp.Layer:
   """Loads an image as a layer given its file path to an existing image.
 
-  This is a wrapper for ``Gimp.file_load_layer`` with additional parameters.
+  This is a wrapper for `Gimp.file_load_layer()` with additional parameters.
   The loaded layer is also inserted at the end of the image.
 
   The layer name corresponds to the file name (base name of the file path).
   If ``strip_file_extension`` is ``True``, the file extension from the layer
   name is removed.
-
-  If the file contains multiple layers, you may customize the index of the
-  desired layer to load (``layer_to_load_index``). Only top-level layers are
-  supported (i.e. not layers inside layer groups). If the index is greater
-  than the number of layers in the loaded image or is negative, the last
-  layer is loaded.
   """
   layer = Gimp.file_load_layer(
     Gimp.RunMode.NONINTERACTIVE, image, Gio.file_new_for_path(filepath))
@@ -524,7 +518,7 @@ class GimpMessageFile:
     Args:
       message_handler:
         Handler to which messages are output. Possible values are the same as
-        for ``Gimp.message_get_handler()``.
+        for `Gimp.message_get_handler()`.
       message_prefix:
         If not ``None``, prepend this string to each message.
       message_delay_milliseconds:

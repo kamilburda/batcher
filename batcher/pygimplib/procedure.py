@@ -45,11 +45,11 @@ def register_procedure(
   The function name is used as the procedure name as found in the GIMP PDB,
   with ``_`` characters replaced with ``-``.
 
-  This is a wrapper for the `Gimp.PlugIn`_ class to simplify the registration of
+  This is a wrapper for the `Gimp.PlugIn` class to simplify the registration of
   plug-ins and their procedures.
 
   The description of parameters is provided below. For more detailed information
-  about the parameters, consult the `Gimp.Procedure`_ class (namely functions
+  about the parameters, consult the `Gimp.Procedure` class (namely functions
   starting with ``add_`` or ``set__``).
 
   Args:
@@ -64,7 +64,7 @@ def register_procedure(
       Each list element must either be a dictionary or a string.
       The dictionary must contain the ``'name'`` key representing the argument
       name and optionally other keys corresponding to the parameter names for
-      `GObject.Property`_.
+      `GObject.Property`.
       If the list element is a string, it must be the name of an argument
       already registered in a previous call to `register_procedure` (that is, a
       string can only be specified if a dictionary containing the same name was
@@ -92,18 +92,18 @@ def register_procedure(
     auxiliary_arguments: List of auxiliary arguments.
       See ``arguments`` for more information about the contentsn and format of
       the list.
-      See `Gimp.add_aux_argument_from_property`_ for more information about
+      See `Gimp.add_aux_argument_from_property` for more information about
       auxiliary arguments.
     run_data: Custom parameters passed to ``procedure`` as its last argument.
       ``procedure`` should only contain the run data as its last argument if
       ``run_data`` is not ``None``.
-    init_ui: If ``True``, user interface is initialized via `GimpUi.init`_.
-      See `GimpUi.init`_ for more information.
+    init_ui: If ``True``, user interface is initialized via `GimpUi.init`.
+      See `GimpUi.init` for more information.
     additional_init: Function allowing customization of procedure registration.
       The function accepts a single argument - a ``Gimp.Procedure`` instance
       corresponding to the registered procedure.
       You can use this function to call registration-related functions not
-      available via this function, e.g. `Gimp.Procedure.set_argument_sync`_
+      available via this function, e.g. `Gimp.Procedure.set_argument_sync`
       on individual procedure arguments.
 
   Example:
@@ -137,19 +137,6 @@ def register_procedure(
     ...                  'Applies a mind-blowing filter to each layer.'),
     ...   attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2023'),
     ... )
-
-  .. _Gimp.PlugIn
-      https://developer.gimp.org/api/3.0/libgimp/class.PlugIn.html
-  .. _Gimp.Procedure
-      https://developer.gimp.org/api/3.0/libgimp/class.Procedure.html
-  .. _GimpUi.init
-      https://developer.gimp.org/api/3.0/libgimpui/func.init.html
-  .. _Gimp.Procedure.set_argument_sync
-      https://developer.gimp.org/api/3.0/libgimp/method.Procedure.set_argument_sync.html
-  .. _GObject.Property
-      https://pygobject.readthedocs.io/en/latest/guide/api/properties.html#GObject.Property
-  .. _Gimp.add_aux_argument_from_property
-      https://developer.gimp.org/api/3.0/libgimp/method.Procedure.add_aux_argument_from_property.html
   """
   proc_name = procedure.__name__.replace('_', '-')
 
@@ -241,14 +228,14 @@ def main():
 def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
   class_dict = {}
 
-  # `GObject.property` objects must be specified when defining a `Gimp.PlugIn`
+  # `GObject.Property` objects must be specified when defining a `Gimp.PlugIn`
   # subclass, they cannot be added later as this will result in errors
   # (probably because the parent class of `Gimp.PlugIn`, `GObject.GObject`, has
   # a metaclass that performs property initialization upon class definition, not
   # object instantiation).
   # Therefore, the custom `Gimp.PlugIn` subclass must be created dynamically
   # where it is possible to pass a dictionary of class attributes, including
-  # `GObject.property` objects.
+  # `GObject.Property` objects.
   for name, gobject_property in _PLUGIN_PROPERTIES.items():
     class_dict[name.replace('-', '_')] = gobject_property
 

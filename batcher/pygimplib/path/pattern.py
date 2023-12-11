@@ -16,7 +16,7 @@ class StringPattern:
   Fields are enclosed in square brackets (such as ``'[field]'``). Field
   arguments are separated by commas (``','``). The number of arguments
   depends on the substitution function in the `fields` dictionary passed to
-  ``__init__``.
+  `__init__()`.
   
   To insert literal commas in field arguments, enclose the arguments in square
   brackets. To insert square brackets in field arguments, enclose the arguments
@@ -73,7 +73,7 @@ class StringPattern:
   
   @property
   def pattern_parts(self) -> List[Union[Tuple[str, List[str]], str]]:
-    """Parts of the ``pattern`` property split into strings and fields.
+    """Parts of the `pattern` property split into strings and fields.
 
     Strings represent parts of the pattern not containing any field. Fields
     are represented as tuples.
@@ -93,7 +93,7 @@ class StringPattern:
     If any substitution function raises an exception, the original string
     pattern is returned.
     
-    You may pass additional arguments if ``fields`` contains functions expecting
+    You may pass additional arguments if the fields contain functions expecting
     more arguments outside the parsed arguments. These arguments are prepended
     to each function.
     """
@@ -125,7 +125,7 @@ class StringPattern:
     """Returns a reconstructed string pattern from parsed pattern parts.
 
     The parsed ``pattern_parts`` can be returned from the ``pattern_parts``
-    attribute of a ``StringPattern`` instance.
+    attribute of a `StringPattern` instance.
     
     Raises:
       ValueError:

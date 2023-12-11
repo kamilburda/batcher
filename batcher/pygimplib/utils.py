@@ -14,7 +14,7 @@ from gi.repository import Gimp
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
   """Returns a context manager that does nothing.
 
-  This is a wrapper of ``contextlib.nullcontext`` that allows passing arbitrary
+  This is a wrapper of `contextlib.nullcontext` that allows passing arbitrary
   arguments that will be ignored.
   """
   return contextlib.nullcontext()
@@ -26,17 +26,17 @@ def empty_func(*args, **kwargs):
   Use this function when an empty function is desired to be passed as a
   parameter.
   
-  For example, if you need to serialize a ``collections.defaultdict``
-  instance (e.g. via ``pickle``) returning ``None`` for missing keys,
+  For example, if you need to serialize a `collections.defaultdict`
+  instance (e.g. via `pickle`) returning ``None`` for missing keys,
   you need to use a named function instead of ``lambda: None``. To emphasize
-  this particular intent, you may want to use the alias ``return_none_func``
+  this particular intent, you may want to use the alias `return_none_func()`
   instead.
   """
   return None
 
 
 return_none_func = empty_func
-"""Alias for ``empty_func`` emphasizing that the function should be used
+"""Alias for `empty_func()` emphasizing that the function should be used
 whenever ``None`` is meant to be returned."""
 
 
@@ -61,8 +61,9 @@ def stringify_object(object_, name: Optional[str] = None) -> str:
 def reprify_object(object_, name: Optional[str] = None) -> str:
   """Returns a string representation of the object useful for ``repr()`` calls.
   
-  The first part of the string, the class path, starts from the ``'pygimplib'``
-  module. If the full class path is not available, only the class name is given.
+  The first part of the string, the class path, starts from the
+  ``'pygimplib'`` package. If the full class path is not available, only the
+  class name is given.
 
   A custom ``name``, if not ``None``, replaces the default ``'object'``
   substring inserted in the string.
@@ -138,7 +139,7 @@ def bytes_to_signed_bytes(data: bytes) -> Tuple[int, ...]:
   -128 to 127).
 
   This function is useful when pickling data to be stored as data for
-  ``Gimp.Parasite`` instances as GIMP parasites do not accept data with byte
+  `Gimp.Parasite` instances as GIMP parasites do not accept data with byte
   values from 128 to 255.
   """
   return struct.unpack(f'>{len(data)}b', data)
@@ -148,7 +149,7 @@ def signed_bytes_to_bytes(data: Tuple[int, ...]) -> bytes:
   """Coverts a sequence of signed byte values (values from -128 to 127) to
   ``bytes``.
 
-  This function is useful when unpickling data from ``Gimp.Parasite``
+  This function is useful when unpickling data from `Gimp.Parasite`
   instances as GIMP parasites do not accept data with byte values from 128 to
   255.
   """

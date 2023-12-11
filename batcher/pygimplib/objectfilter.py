@@ -17,7 +17,7 @@ class ObjectFilter:
   """Class containing a list of rules determining whether an object matches
   given rules.
   
-  A rule can be a callable (function) or a nested ``ObjectFilter`` instance with
+  A rule can be a callable (function) or a nested `ObjectFilter` instance with
   its own rules and a different match type.
   """
   
@@ -38,9 +38,9 @@ class ObjectFilter:
     """Match type.
 
     Possible values:
-    * MATCH_ALL - For ``is_match()`` to return ``True``, an object must match
+    * MATCH_ALL - For `is_match()` to return ``True``, an object must match
       all rules.
-    * MATCH_ANY - For ``is_match()`` to return ``True``, an object must match
+    * MATCH_ANY - For `is_match()` to return ``True``, an object must match
       at least one rule.
     """
     return self._match_type
@@ -51,7 +51,7 @@ class ObjectFilter:
 
     The name does not have to be unique and can be used to manipulate
     multiple rules (functions or nested filters) with the same name at once
-    (e.g. by removing them with ``remove()``).
+    (e.g. by removing them with `remove()`).
     """
     return self._name
   
@@ -106,7 +106,7 @@ class ObjectFilter:
         Name of the added rule if `func_or_filter` is a callable. If this an
         empty string, the ``__name__`` attribute is used if it exists. ``name``
         does not have to be unique and can be used to manipulate multiple rules
-        with the same name at once (e.g. by removing them with ``remove()``).
+        with the same name at once (e.g. by removing them with `remove()`).
     
     Returns:
       If ``func_or_filter`` is a callable, a ``_Rule`` instance is returned,
@@ -116,7 +116,7 @@ class ObjectFilter:
       remove a rule.
     
     Raises:
-      TypeError: ``func_or_filter`` is not a callable or an ``ObjectFilter``
+      TypeError: ``func_or_filter`` is not a callable or an `ObjectFilter`
         instance.
     """
     args = args if args is not None else ()
@@ -256,11 +256,11 @@ class ObjectFilter:
     """Returns ``True`` if the specified object matches the rules, ``False``
     otherwise.
     
-    If ``match_type`` is ``MATCH_ALL``, ``True`` is returned if the object
+    If ``match_type`` is `MATCH_ALL`, ``True`` is returned if the object
     matches all rules and all top-level nested filters return ``True``.
     Otherwise, ``False`` is returned.
     
-    If ``match_type`` is ``MATCH_ANY``, ``True`` is returned if the object
+    If ``match_type`` is `MATCH_ANY`, ``True`` is returned if the object
     matches at least one rule or at least one top-level nested filter returns
     ``True``. Otherwise, ``False`` is returned.
     
@@ -317,7 +317,7 @@ class ObjectFilter:
       name:
         Name of the added rule (callable or nested filter).
       func_or_filter:
-        Callable (e.g. a function) or a nested ``ObjectFilter`` instance.
+        Callable (e.g. a function) or a nested `ObjectFilter` instance.
       count:
         If 0, return all occurrences. If greater than 0, return up to the
         first ``count`` occurrences. If less than 0, return up to the last

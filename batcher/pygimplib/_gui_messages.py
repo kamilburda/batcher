@@ -439,9 +439,9 @@ def add_gui_excepthook(
   `sys.excepthook` is restored after the decorated function is finished.
   
   The dialog will not be displayed for exceptions which are not subclasses of
-  ``Exception`` (such as ``SystemExit`` or ``KeyboardInterrupt``).
+  `Exception` (such as `SystemExit` or `KeyboardInterrupt`).
 
-  For the description of parameters, see ``display_alert_message()``.
+  For the description of parameters, see `display_alert_message()`.
   """
   global _gui_excepthook_parent
   
@@ -483,7 +483,7 @@ def set_gui_excepthook(
   exceptions.
   
   The dialog will not be displayed for exceptions which are not subclasses of
-  ``Exception`` (such as ``SystemExit`` or ``KeyboardInterrupt``).
+  `Exception` (such as `SystemExit` or `KeyboardInterrupt`).
   
   For information about parameters, see `add_gui_excepthook()`.
   """

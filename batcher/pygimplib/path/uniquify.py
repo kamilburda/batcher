@@ -20,7 +20,7 @@ def uniquify_string(
   """Modifies `str_` if needed to be unique among all ``existing_strings``.
 
   For more information on the ``position`` and ``generator`` parameters, see
-  ``uniquify_string_generic()``.
+  `uniquify_string_generic()`.
   """
   return uniquify_string_generic(
     str_,
@@ -38,7 +38,7 @@ def uniquify_filepath(
   already exists.
 
   For more information on the ``position`` and ``generator`` parameters, see
-  ``uniquify_string_generic()``.
+  `uniquify_string_generic()`.
   """
   return uniquify_string_generic(
     filepath,

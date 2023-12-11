@@ -19,7 +19,7 @@ class Invoker:
   * grouping actions and invoking only actions in specified groups,
   * adding actions to be invoked before or after each action, hereinafter
     "for-each actions",
-  * adding another ``Invoker`` instance as an action (i.e. nesting the current
+  * adding another `Invoker` instance as an action (i.e. nesting the current
     instance inside another instance).
   """
   
@@ -68,14 +68,14 @@ class Invoker:
     
     To control which actions are invoked, you may want to group them.
     
-    If ```groups``` is ``None`` or ``'default'``, the action is added to a
+    If ``groups`` is ``None`` or ``'default'``, the action is added to a
     default group appropriately named ``'default'``.
     
-    If ```groups``` is a list of group names (strings), the action is added to
+    If ``groups`` is a list of group names (strings), the action is added to
     the specified groups. Groups are created automatically if they previously
     did not exist.
     
-    If ```groups``` is ``'all'``, the action is added to all existing groups.
+    If ``groups`` is ``'all'``, the action is added to all existing groups.
     The action will not be added to the default group if it does not exist.
     
     By default, the action is added at the end of the list of actions in the
@@ -110,7 +110,7 @@ class Invoker:
     yield statements are encountered.
     
     To prevent activating generators and to treat generator functions as regular
-    functions, set ``run_generator`` to ``False``.
+    functions, pass ``run_generator=False``.
     
     If ``foreach`` is ``True`` and the action is a function, the action is
     treated as a "for-each" action. By default, a for-each action is
@@ -325,7 +325,7 @@ class Invoker:
     customize the insertion position. A negative value represents an
     n-th-to-last position.
     
-    If the action ID is not valid, ``ValueError`` is raised.
+    If the action ID is not valid, `ValueError` is raised.
     """
     self._check_action_id_is_valid(action_id)
     
@@ -420,7 +420,7 @@ class Invoker:
 
     If ``group`` is ``None`` or ``'default'``, use the default group.
     
-    If the ID is not valid or the action is not in the group, ``ValueError`` is
+    If the ID is not valid or the action is not in the group, `ValueError` is
     raised.
     """
     if group is None:
@@ -486,7 +486,7 @@ class Invoker:
     Negative numbers move the action to the n-th to last position, i.e. -1
     for the last position, -2 for the second to last position, etc.
     
-    ``ValueError`` is raised if:
+    `ValueError` is raised if:
     * ``action_id`` is not valid
     * ``group`` does not exist
     * the action having ``action_id`` is not in ``group``
@@ -522,7 +522,7 @@ class Invoker:
     If ``ignore_if_not_exists`` is ``True``, ``ValueError`` is not raised if
     ``action_id`` does not match any added action.
     
-    ``ValueError`` is raised if:
+    `ValueError` is raised if:
     * ``action_id`` is invalid and ``ignore_if_not_exists`` is ``False``
     * at least one of the specified groups does not exist
     """

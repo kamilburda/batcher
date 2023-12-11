@@ -58,8 +58,7 @@ class NoninteractiveOverwriteChooser(OverwriteChooser):
 
 
 class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
-  """Abstract class for choosing an overwrite mode interactively.
-  """
+  """Abstract class for choosing an overwrite mode interactively."""
   
   def __init__(
         self,
@@ -82,8 +81,8 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
 
     self.default_response = default_response
     """Default overwrite mode to return if the user made a choice that
-    returns a value not in ``values_and_display_names``. ``default_response``
-    does not have to be any of the values in ``values_and_display_names``.
+    returns a value not in `values_and_display_names`. This attribute
+    does not have to be any of the values in `values_and_display_names`.
     """
 
     self._apply_to_all = False
@@ -106,7 +105,7 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
     """Allows the user to choose the overwrite mode and return it.
     
     If the choice results in a value that is not in
-    ``values_and_display_names``, ``default_response``, must be returned.
+    `values_and_display_names`, `default_response` must be returned.
     """
     pass
 
@@ -158,8 +157,8 @@ def handle_overwrite(
 
 
 class OverwriteModes:
-  """Overwrite modes used by ``handle_overwrite`` and recommended to be handled
-  by custom ``OverwriteChooser`` subclasses.
+  """Overwrite modes used by `handle_overwrite()` and recommended to be handled
+  by custom `OverwriteChooser` subclasses.
   """
   REPLACE = 0
   """Indicates to overwrite an existing file with new contents."""

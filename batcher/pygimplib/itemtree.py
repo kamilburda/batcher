@@ -256,7 +256,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     """Returns an `Item` object by its ID or original name.
 
     An item's ID is the return value of ``Item.raw.get_id()``. An item's
-    original name is the ``Item.orig_name`` attribute.
+    original name is the `orig_name` property.
     
     To access an item group as a folder, pass a tuple ``(ID or name,
     'folder')``. For example:
@@ -273,7 +273,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     filters, ``False`` otherwise.
     
     The `Item` object is specified by its ID as obtained via
-    ``Item.raw.get_id()`` or its ``orig_name`` attribute.
+    ``Item.raw.get_id()`` or its `orig_name` property.
     """
     return id_or_name in self._itemtree or id_or_name in self._itemtree_names
   
@@ -283,7 +283,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     This includes immediate children of the image and nested children. Empty
     item groups (i.e. groups with no children) are excluded.
     
-    The returned number of items depends on whether ``is_filtered`` is
+    The returned number of items depends on whether `is_filtered` is
     ``True`` or ``False``.
     """
     return len([item for item in self])
@@ -291,8 +291,8 @@ class ItemTree(metaclass=abc.ABCMeta):
   def __iter__(self) -> Generator[Item, None, None]:
     """Iterates over items, excluding folders and empty item groups.
     
-    If the ``is_filtered`` attribute is ``False``, iterate over all items. If
-    ``is_filtered`` is ``True``, iterate only over items that match the filter.
+    If the `is_filtered` attribute is ``False``, iterate over all items. If
+    `is_filtered` is ``True``, iterate only over items that match the filter.
     
     Yields:
       The current `Item` instance.
@@ -315,7 +315,7 @@ class ItemTree(metaclass=abc.ABCMeta):
         If ``True``, empty item groups are included. Empty item groups as
         folders are still yielded if ``with_folders`` is ``True``.
       filtered:
-        If ``True`` and ``is_filtered`` attribute is also ``True``,
+        If ``True`` and the `is_filtered` attribute is also ``True``,
         the iteration is performed only over items matching the filter. Set
         this to ``False`` if you need to iterate over all items.
 

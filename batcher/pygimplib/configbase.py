@@ -42,8 +42,10 @@ def create_config(pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]) ->
   identifier (by default equivalent to the main plug-in directory name) or
   title.
 
-  Plug-ins can contain a `config.py` file under the main plug-in directory to
-  customize the configuration variables.
+  Plug-ins can contain a ``config.py`` file in the ``config`` subdirectory
+  under the main plug-in directory to customize the configuration variables.
+  Additionally, developers may also include a ``config_dev.py`` file acting as
+  a local configuration file for testing purposes.
   """
   config = _Config()
 

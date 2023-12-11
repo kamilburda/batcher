@@ -266,7 +266,7 @@ class DirpathValidator(FilepathValidator):
   """Class used for validating directory paths (relative or absolute).
   
   The same validation rules that apply to file paths in the
-  ``FilepathValidator`` class apply to directory paths in this class,
+  `FilepathValidator` class apply to directory paths in this class,
   with the following additions:
     * the specified path must be a directory path
   """

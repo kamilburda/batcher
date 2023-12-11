@@ -15,7 +15,7 @@ def get_file_extension(filename: str) -> str:
   If ``filename`` has no file extension, return an empty string.
   
   If ``filename`` has multiple periods, it is checked against
-  ``fileformats.file_formats_dict`` for a matching file extension containing
+  `fileformats.file_formats_dict` for a matching file extension containing
   periods. If there is no such extension, return the substring after the last
   period.
   """
