@@ -463,7 +463,7 @@ class _FileExtension:
 
 
 class _FileExtensionProperties:
-  """Mapping of file extensions from `pygimplib.fileformats.file_formats` to
+  """Mapping of file extensions from `pygimplib.fileformats.FILE_FORMATS` to
   `_FileExtension` instances.
   
   File extension as a key is always converted to lowercase.
@@ -471,7 +471,7 @@ class _FileExtensionProperties:
   def __init__(self):
     self._properties = collections.defaultdict(_FileExtension)
     
-    for file_format in pg.fileformats.file_formats:
+    for file_format in pg.fileformats.FILE_FORMATS:
       # This ensures that the file format dialog will be displayed only once per
       # file format if multiple file extensions for the same format are used
       # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).

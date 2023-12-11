@@ -15,7 +15,7 @@ def get_file_extension(filename: str) -> str:
   If ``filename`` has no file extension, return an empty string.
   
   If ``filename`` has multiple periods, it is checked against
-  `fileformats.file_formats_dict` for a matching file extension containing
+  `fileformats.FILE_FORMATS_DICT` for a matching file extension containing
   periods. If there is no such extension, return the substring after the last
   period.
   """
@@ -30,7 +30,7 @@ def get_file_extension(filename: str) -> str:
       return file_extension
     
     file_extension = file_extension[next_period_index + 1:]
-    if file_extension.lower() in pgfileformats.file_formats_dict:
+    if file_extension.lower() in pgfileformats.FILE_FORMATS_DICT:
       return file_extension
   
   return ''

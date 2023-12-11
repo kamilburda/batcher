@@ -504,7 +504,7 @@ class FileExtensionEntry(ExtendedEntry):
     self._extensions_text_pixel_rects = []
     
     self._popup = entry_popup_.EntryPopup(
-      self, self._COLUMN_TYPES, self._get_file_formats(pgfileformats.file_formats))
+      self, self._COLUMN_TYPES, self._get_file_formats(pgfileformats.FILE_FORMATS))
     self._popup.filter_rows_func = self._filter_file_formats
     self._popup.on_assign_from_selected_row = self._on_assign_from_selected_row
     self._popup.on_assign_last_value = self._do_assign_text

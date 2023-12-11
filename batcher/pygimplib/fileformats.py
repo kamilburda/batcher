@@ -60,8 +60,8 @@ def get_save_procedure(file_extension: str) -> Callable:
   procedure defined, the default save procedure is returned (as returned by
   `get_default_save_procedure()`).
   """
-  if file_extension in file_formats_dict:
-    file_format = file_formats_dict[file_extension]
+  if file_extension in FILE_FORMATS_DICT:
+    file_format = FILE_FORMATS_DICT[file_extension]
     if file_format.save_procedure_func and file_format.is_installed():
       return file_format.save_procedure_func
   
@@ -124,7 +124,7 @@ class _FileFormat:
     return self.is_builtin() or (self.is_third_party() and self.save_procedure_name in pdb)
 
 
-file_formats = _create_file_formats([
+FILE_FORMATS = _create_file_formats([
   {'description': 'Alias Pix image',
    'file_extensions': ['pix', 'matte', 'mask', 'alpha', 'als']},
   {'description': 'Apple Icon Image',
@@ -238,7 +238,7 @@ file_formats = _create_file_formats([
 ])
 """List of `_FileFormat` instances."""
 
-file_formats_dict = _create_file_formats_dict(file_formats)
+FILE_FORMATS_DICT = _create_file_formats_dict(FILE_FORMATS)
 """Dictionary of (file extension, `_FileFormat` instance) pairs.
 
 Only `_FileFormat` instances compatible with the version of the currently 
