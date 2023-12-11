@@ -3232,9 +3232,8 @@ __all__ = [
   'SettingDefaultValueError',
   'process_setting_type',
   'process_setting_gui_type',
-  'Setting',
 ]
 
 for name, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):
-  if issubclass(class_, Setting) and class_ is not Setting:
+  if issubclass(class_, Setting):
     __all__.append(name)

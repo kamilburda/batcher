@@ -10,6 +10,7 @@ from . import _sources_errors
 
 __all__ = [
   'Persistor',
+  'PersistorResult',
 ]
 
 

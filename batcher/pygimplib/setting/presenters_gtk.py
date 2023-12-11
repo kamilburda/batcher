@@ -923,10 +923,8 @@ def _create_spin_button(setting, digits=None):
   )
 
 
-__all__ = [
-  'GtkPresenter',
-]
+__all__ = []
 
 for name, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):
-  if issubclass(class_, GtkPresenter) and class_ is not GtkPresenter:
+  if issubclass(class_, GtkPresenter):
     __all__.append(name)

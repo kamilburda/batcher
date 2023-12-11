@@ -14,8 +14,8 @@ from . import settings as settings_
 from . import utils as utils_
 
 __all__ = [
-  'create_groups',
   'Group',
+  'create_groups',
   'GroupWalkCallbacks',
 ]
 
