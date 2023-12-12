@@ -11,10 +11,11 @@ A dialog corresponding to the file format appears, allowing you to adjust export
 Some file formats do not display dialogs, while some display the dialog for each layer (this cannot be prevented because such a file format only allows an interactive export).
 
 
-Repeating Last Export
----------------------
+Exporting Instantly
+-------------------
 
-If you made changes to your image and you want to export again with the same settings, you can do so simply by running `File → Export Layers (repeat)`.
+You can export in a single click by running `File → Export Layers Now`.
+This is useful e.g. if you made changes to your image and you want to export again with the same settings.
 
 
 Changing File Extension
@@ -74,6 +75,6 @@ It is also possible to run Batcher without the interactive dialog, allowing you 
 The `plug-in-export-layers` procedure can run the export with default or last used settings.
 In the latter case, the settings are loaded if they were saved before (via `Settings → Save Settings`).
 
-The `plug-in-export-layers-repeat` procedure always uses the last used settings.
+The `plug-in-export-layers-now` procedure always uses the last used settings.
 
 The `plug-in-export-layers-with-config` procedure allows you to run Batcher using the specified settings file obtained via `Settings → Export Settings...` in the plug-in dialog.

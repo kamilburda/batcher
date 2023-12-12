@@ -41,7 +41,7 @@ def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables,
     _run_noninteractive(layer_tree, config)
 
 
-def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _drawables, _config):
+def plug_in_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawables, _config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 
@@ -53,11 +53,7 @@ def plug_in_export_layers_repeat(_procedure, run_mode, image, _n_drawables, _dra
     return
   
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    SETTINGS['special/first_plugin_run'].load()
-    if SETTINGS['special/first_plugin_run'].value:
-      _run_export_layers_interactive(layer_tree)
-    else:
-      _run_export_layers_repeat_interactive(layer_tree)
+    _run_export_layers_now_interactive(layer_tree)
   else:
     _run_with_last_vals(layer_tree)
 
@@ -122,8 +118,8 @@ def _run_export_layers_interactive(layer_tree):
   gui_main.ExportLayersDialog(layer_tree, SETTINGS)
 
 
-def _run_export_layers_repeat_interactive(layer_tree):
-  gui_main.ExportLayersRepeatDialog(layer_tree, SETTINGS)
+def _run_export_layers_now_interactive(layer_tree):
+  gui_main.ExportLayersNowDialog(layer_tree, SETTINGS)
 
 
 def _run_plugin_noninteractive(run_mode, layer_tree):
@@ -147,14 +143,10 @@ pg.register_procedure(
 
 
 pg.register_procedure(
-  plug_in_export_layers_repeat,
-  menu_label=_('E_xport Layers (repeat)'),
+  plug_in_export_layers_now,
+  menu_label=_('E_xport Layers Now'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
-  documentation=(
-    _('Export layers as separate images instantly'),
-    _('If the plug-in is run for the first time (i.e. no last values exist),'
-      ' default values will be used.'),
-  ),
+  documentation=(_('Export layers as separate images instantly'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 

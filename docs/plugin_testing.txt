@@ -5,7 +5,7 @@
 * macOS
 
 
-# Main Dialog
+# Export Layers Dialog
 
 Interactive
 * load settings from the session and persistent sources
@@ -34,14 +34,10 @@ Image types
 * indexed
 
 
-# Main Dialog - the " (repeat)" version
+# Export Layers Now Dialog
 
 Interactive
 * load settings from the session and persistent sources
-* first run
-  * display the main dialog
-* subsequent runs
-  * display the " (repeat)" dialog
 
 Non-interactive
 * same as Run-with-last-vals

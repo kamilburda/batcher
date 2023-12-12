@@ -1229,7 +1229,7 @@ class ExportLayersDialog:
       return False
 
 
-class ExportLayersRepeatDialog:
+class ExportLayersNowDialog:
   
   _BORDER_WIDTH = 8
   _HBOX_HORIZONTAL_SPACING = 8
@@ -1242,7 +1242,7 @@ class ExportLayersRepeatDialog:
     self._image = self._layer_tree.image
     self._batcher = None
     
-    self._settings.load(['session'])
+    self._settings.load()
     
     self._init_gui()
     
