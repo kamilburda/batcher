@@ -2919,28 +2919,6 @@ class ArraySetting(Setting):
   def _array_as_tuple(self):
     return tuple(setting.value for setting in self._elements)
 
-  def _array_as_pdb_compatible_type(self, values):
-    if self.element_type == IntSetting:
-      array = GObject.Value(Gimp.Int32Array)
-      Gimp.value_set_int32_array(array, values)
-      return array.get_boxed()
-    elif self.element_type == FloatSetting:
-      array = GObject.Value(Gimp.FloatArray)
-      Gimp.value_set_float_array(array, values)
-      return array.get_boxed()
-    elif self.element_type == ColorSetting:
-      array = GObject.Value(Gimp.RGBArray)
-      Gimp.value_set_rgb_array(array, values)
-      return array.get_boxed()
-    elif self.element_type == StringSetting:
-      return values
-    elif self._reference_element.can_be_registered_to_pdb():
-      array = GObject.Value(Gimp.ObjectArray)
-      Gimp.value_set_object_array(array, self._reference_element.pdb_type, values)
-      return array.get_boxed()
-    else:
-      return values
-
 
 class ContainerSetting(Setting):
   """Abstract class for settings representing container types.

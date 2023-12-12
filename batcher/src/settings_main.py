@@ -49,12 +49,6 @@ def create_settings():
       'type': 'image',
       'name': 'image',
     },
-    {
-      'type': 'bool',
-      'name': 'first_plugin_run',
-      'default_value': True,
-      'setting_sources': ['session'],
-    },
   ])
   
   settings['main'].add([

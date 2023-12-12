@@ -1062,9 +1062,6 @@ class ExportLayersDialog:
       else:
         messages_.display_invalid_image_failure_message(parent=self._dialog)
     else:
-      self._settings['special/first_plugin_run'].set_value(False)
-      self._settings['special/first_plugin_run'].save()
-      
       if self._settings['main/edit_mode'].value or not self._batcher.exported_raw_items:
         should_quit = False
       
@@ -1147,17 +1144,6 @@ class ExportLayersDialog:
       self._file_extension_entry.set_position(-1)
     else:
       self._dialog.set_focus(self._button_stop)
-  
-  def _progress_set_value_and_show_dialog(self, fraction):
-    self._progress_bar.set_fraction(fraction)
-    
-    # Without this workaround, the main dialog would not appear until the export
-    # of the second layer.
-    if not self._dialog.get_mapped():
-      self._dialog.show()
-    
-    while Gtk.events_pending():
-      Gtk.main_iteration()
   
   @staticmethod
   def _on_dialog_delete_event(dialog, event):

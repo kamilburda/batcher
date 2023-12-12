@@ -146,12 +146,4 @@ def _is_fresh_start(sources):
   return all(not source.has_data() for source in sources.values())
 
 
-def _try_remove_file(filepath):
-  # noinspection PyBroadException
-  try:
-    os.remove(filepath)
-  except Exception:
-    pass
-
-
 _UPDATE_HANDLERS = {}

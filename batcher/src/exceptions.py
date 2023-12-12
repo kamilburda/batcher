@@ -26,10 +26,6 @@ class SkipAction(BatcherError):
   pass
 
 
-class InvalidPdbProcedureError(BatcherError):
-  pass
-
-
 class ExportError(BatcherError):
   
   def __init__(

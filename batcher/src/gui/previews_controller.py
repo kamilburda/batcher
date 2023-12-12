@@ -26,8 +26,6 @@ class PreviewsController:
     self._custom_actions = {}
     self._is_initial_selection_set = False
     
-    self._last_name_preview_update_successful = True
-    
     self._paned_outside_previews_previous_position = (
       self._settings['gui/size/paned_outside_previews_position'].value)
     self._paned_between_previews_previous_position = (

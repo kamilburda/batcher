@@ -296,21 +296,6 @@ class Persistor:
       for setting in cls._list_settings(settings_or_groups, include_groups=True):
         setting.invoke_event(event_name)
   
-  @classmethod
-  def _set_up_settings_to_ignore(cls, ignore_tag, source_name, filtered_settings):
-    settings_to_ignore = []
-    for setting in filtered_settings:
-      if setting.setting_sources is not None and source_name not in setting.setting_sources:
-        setting.tags.add(ignore_tag)
-        settings_to_ignore.append(setting)
-    
-    return settings_to_ignore
-  
-  @classmethod
-  def _clean_up_settings_to_ignore(cls, settings_to_ignore, ignore_tag):
-    for setting in settings_to_ignore:
-      setting.tags.discard(ignore_tag)
-  
   @staticmethod
   def _result(
         status, settings_not_loaded=None, statuses_per_source=None, messages_per_source=None):
