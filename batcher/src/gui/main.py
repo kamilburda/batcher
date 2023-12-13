@@ -878,7 +878,7 @@ class ExportLayersDialog:
   
   def _on_box_procedures_item_added(self, box_procedures, item):
     if any(item.action['orig_name'].value == name
-           for name in ['insert_background_layers', 'insert_foreground_layers']):
+           for name in ['insert_background', 'insert_foreground']):
       actions.reorder(self._settings['main/procedures'], item.action.name, 0)
   
   def _on_menu_item_show_more_settings_toggled(self, menu_item):

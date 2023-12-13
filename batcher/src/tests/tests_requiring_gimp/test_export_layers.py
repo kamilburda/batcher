@@ -89,13 +89,13 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_background(self):
     self.compare(
-      procedure_names_to_add={'insert_background_layers': 0},
+      procedure_names_to_add={'insert_background': 0},
       expected_results_dirpath=os.path.join(
         self.expected_results_root_dirpath, 'background'))
   
   def test_foreground(self):
     self.compare(
-      procedure_names_to_add={'insert_foreground_layers': 0},
+      procedure_names_to_add={'insert_foreground': 0},
       expected_results_dirpath=os.path.join(
         self.expected_results_root_dirpath, 'foreground'))
     

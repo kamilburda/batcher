@@ -221,28 +221,30 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Inherit transparency from layer groups'),
   },
   {
-    'name': 'insert_background_layers',
+    'name': 'insert_background',
     'function': background_foreground.insert_background_layer,
-    'display_name': _('Insert background layers'),
+    'display_name': _('Insert background'),
     'display_options_on_create': True,
     'arguments': [
       {
         'type': 'color_tag',
         'name': 'color_tag',
         'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.BLUE,
       },
     ],
   },
   {
-    'name': 'insert_foreground_layers',
+    'name': 'insert_foreground',
     'function': background_foreground.insert_foreground_layer,
-    'display_name': _('Insert foreground layers'),
+    'display_name': _('Insert foreground'),
     'display_options_on_create': True,
     'arguments': [
       {
         'type': 'color_tag',
         'name': 'color_tag',
         'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.GREEN,
       },
     ],
   },

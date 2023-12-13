@@ -40,7 +40,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     
     actions_.add(
       settings['main/procedures'],
-      builtin_procedures.BUILTIN_PROCEDURES['insert_background_layers'])
+      builtin_procedures.BUILTIN_PROCEDURES['insert_background'])
     
     batcher.add_procedure(pg.utils.empty_func, [actions_.DEFAULT_PROCEDURES_GROUP])
     
@@ -101,7 +101,7 @@ class TestAddActionFromSettings(unittest.TestCase):
   
   def test_add_action_from_settings(self, mock_get_pdb):
     procedure = actions_.add(
-      self.procedures, builtin_procedures.BUILTIN_PROCEDURES['insert_background_layers'])
+      self.procedures, builtin_procedures.BUILTIN_PROCEDURES['insert_background'])
     
     self.batcher._add_action_from_settings(procedure)
     
@@ -111,7 +111,7 @@ class TestAddActionFromSettings(unittest.TestCase):
     self.assertEqual(
       added_action_items[0][1],
       list(procedure['arguments'])
-      + [builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS['insert_background_layers']])
+      + [builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS['insert_background']])
     self.assertEqual(added_action_items[0][2], {})
   
   def test_add_pdb_proc_as_action_without_run_mode(self, mock_get_pdb):

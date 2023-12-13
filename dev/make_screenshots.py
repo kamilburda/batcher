@@ -93,9 +93,9 @@ def take_screenshots(gui, dialog, settings):
   
   actions.add(
     settings['main/procedures'],
-    builtin_procedures.BUILTIN_PROCEDURES['insert_background_layers'])
+    builtin_procedures.BUILTIN_PROCEDURES['insert_background'])
   actions.reorder(
-    settings['main/procedures'], 'insert_background_layers', 0)
+    settings['main/procedures'], 'insert_background', 0)
   settings['main/procedures/use_layer_size/enabled'].set_value(False)
   
   actions.add(

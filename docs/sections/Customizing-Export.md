@@ -71,7 +71,7 @@ Yes, you may insert any GIMP filter as a procedure:
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
 2. In the plug-in, the color tag will be displayed next to the layer name(s).
-3. Add the "Insert background layers" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
+3. Add the "Insert background" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
 4. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
@@ -328,27 +328,30 @@ This corresponds to how the layer is actually displayed in the image canvas.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
-**Insert background layers**
+**Insert background**
 
 Insert layers tagged with a specific color tag as background for each layer.
 
 Note that even background layers are processed and exported - to prevent this behavior, enable the `Without color tags` constraint.
 
+The _blue_ color tag is used as background by default.
 You may set a different color tag representing the background layers by editing the procedure argument `Color tag`.
 
 In the dialog, this procedure is always inserted in the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
 If this is your intention, you can always move this procedure below `Use layer size`.
 
-**Insert foreground layers**
+**Insert foreground**
 
 Insert layers tagged with a specific color tag as foreground for each layer.
 
-For more information, see "Insert background layers" above.
+The _green_ color tag is used as foreground by default.
+
+For more information, see "Insert background" above.
 
 **Merge background**
 
-Merges an already inserted background layer (via "Insert background layers", see above) with the current layer.
+Merges an already inserted background layer (via "Insert background", see above) with the current layer.
 
 This is useful if you wish to have a single merged layer rather than the background as a separate layer.
 
@@ -358,7 +361,7 @@ If there is no background layer inserted, this procedure has no effect.
 
 **Merge foreground**
 
-Merges an already inserted foreground layer (via "Insert foreground layers", see above) with the current layer.
+Merges an already inserted foreground layer (via "Insert foreground", see above) with the current layer.
 
 For more information, see "Merge background" above.
 
@@ -398,8 +401,8 @@ The description for an argument often indicates the range of valid values.
 
 If a procedure contains a layer/drawable/item argument, you may select one of the following:
 * (default) "Current Layer" - applies the procedure to the currently processed layer.
-* "Background Layer" - applies the procedure to the layer representing background, inserted via the "Insert background layers" procedure. If there is no such layer, the procedure will have no effect.
-* "Foreground Layer" - applies the procedure to the layer representing foreground, inserted via the "Insert foreground layers" procedure. If there is no such layer, the procedure will have no effect.
+* "Background Layer" - applies the procedure to the layer representing background, inserted via the "Insert background" procedure. If there is no such layer, the procedure will have no effect.
+* "Foreground Layer" - applies the procedure to the layer representing foreground, inserted via the "Insert foreground" procedure. If there is no such layer, the procedure will have no effect.
 
 
 Constraints

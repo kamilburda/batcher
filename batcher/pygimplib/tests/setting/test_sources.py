@@ -44,7 +44,7 @@ def _test_settings_for_read_write():
         'tags': ['action', 'procedure'],
       },
       {
-        'name': 'insert_background_layers',
+        'name': 'insert_background',
         'tags': ['action', 'procedure'],
       },
     ]
@@ -61,7 +61,7 @@ def _test_settings_for_read_write():
     group_.Group(name='arguments'),
   ])
   
-  procedures['insert_background_layers'].add([
+  procedures['insert_background'].add([
     {
       'type': 'bool',
       'name': 'enabled',
@@ -70,7 +70,7 @@ def _test_settings_for_read_write():
     group_.Group(name='arguments'),
   ])
   
-  procedures['insert_background_layers/arguments'].add([
+  procedures['insert_background/arguments'].add([
     {
       'type': 'str',
       'name': 'tag',
@@ -139,7 +139,7 @@ def _test_data_for_read_write():
                   ],
                 },
                 {
-                  'name': 'insert_background_layers',
+                  'name': 'insert_background',
                   'tags': ['action', 'procedure'],
                   'settings': [
                     {
@@ -238,9 +238,9 @@ class TestSourceRead(unittest.TestCase):
     expected_setting_values = {
       setting.get_path(): setting.value for setting in self.settings.walk()}
     expected_setting_values[
-      'all_settings/main/procedures/insert_background_layers/enabled'] = False
+      'all_settings/main/procedures/insert_background/enabled'] = False
     expected_setting_values[
-      'all_settings/main/procedures/insert_background_layers/arguments/tag'] = 'foreground'
+      'all_settings/main/procedures/insert_background/arguments/tag'] = 'foreground'
     expected_setting_values['all_settings/standalone_setting'] = 'something_else'
     
     self.source.read([self.settings['main/procedures'], self.settings['standalone_setting']])
@@ -268,7 +268,7 @@ class TestSourceRead(unittest.TestCase):
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
     # 'main/procedures/use_layer_size/enabled'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]
-    # 'main/procedures/insert_background_layers'
+    # 'main/procedures/insert_background'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][1]
     # 'main/constraints'
     del self.source.data[0]['settings'][0]['settings'][2]
@@ -279,13 +279,13 @@ class TestSourceRead(unittest.TestCase):
     
     self.source.read(
       [self.settings['main/file_extension'],
-       self.settings['main/procedures/insert_background_layers'],
+       self.settings['main/procedures/insert_background'],
        self.settings['main/procedures/use_layer_size']])
     
     self.assertListEqual(
       self.source.settings_not_loaded,
       [self.settings['main/file_extension'],
-       self.settings['main/procedures/insert_background_layers'],
+       self.settings['main/procedures/insert_background'],
        # Missing settings and empty groups must be expanded.
        self.settings['main/procedures/use_layer_size/enabled'],
        self.settings['main/procedures/use_layer_size/arguments']])
@@ -405,9 +405,9 @@ class TestSourceRead(unittest.TestCase):
     self.settings['main/procedures/use_layer_size/enabled'].tags.add('ignore_load')
     self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
     
-    self.settings['main/procedures/insert_background_layers'].tags.add('ignore_load')
-    self.settings['main/procedures/insert_background_layers/enabled'].set_value(False)
-    self.settings['main/procedures/insert_background_layers/arguments/tag'].set_value('fg')
+    self.settings['main/procedures/insert_background'].tags.add('ignore_load')
+    self.settings['main/procedures/insert_background/enabled'].set_value(False)
+    self.settings['main/procedures/insert_background/arguments/tag'].set_value('fg')
     
     self.settings['main/constraints'].tags.add('ignore_load')
     
@@ -421,9 +421,9 @@ class TestSourceRead(unittest.TestCase):
     self.assertEqual(self.settings['main/procedures/use_layer_size/enabled'].value, False)
     # The tag is found in the code for a parent
     self.assertEqual(
-      self.settings['main/procedures/insert_background_layers/enabled'].value, False)
+      self.settings['main/procedures/insert_background/enabled'].value, False)
     self.assertEqual(
-      self.settings['main/procedures/insert_background_layers/arguments/tag'].value, 'fg')
+      self.settings['main/procedures/insert_background/arguments/tag'].value, 'fg')
     # Group does not exist in the code, exists in the source but is not loaded
     self.assertNotIn('rename', self.settings['main/procedures'])
     # Setting does not exist in the code, exists in the source but is not loaded
@@ -467,14 +467,14 @@ class TestSourceRead(unittest.TestCase):
     self.settings['main/procedures'].reorder('use_layer_size', 1)
     
     self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
-    self.settings['main/procedures/insert_background_layers/enabled'].set_value(False)
+    self.settings['main/procedures/insert_background/enabled'].set_value(False)
     
     self.source.data = _test_data_for_read_write()
     
     self.source.read([self.settings])
     
     self.assertEqual(self.settings['main/procedures/use_layer_size/enabled'].value, True)
-    self.assertEqual(self.settings['main/procedures/insert_background_layers/enabled'].value, True)
+    self.assertEqual(self.settings['main/procedures/insert_background/enabled'].value, True)
   
   def test_read_invalid_setting_value_set_to_default_value(self):
     setting_dict = {
@@ -646,7 +646,7 @@ class TestSourceWrite(unittest.TestCase):
     
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
-    self.settings['main/procedures/insert_background_layers/enabled'].set_value(False)
+    self.settings['main/procedures/insert_background/enabled'].set_value(False)
     self.settings['standalone_setting'].set_value('something_else')
     
     expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['value'] = False
@@ -735,9 +735,9 @@ class TestSourceWrite(unittest.TestCase):
     self.settings['main/procedures/use_layer_size/enabled'].tags.add('ignore_save')
     self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
     
-    self.settings['main/procedures/insert_background_layers'].tags.add('ignore_save')
-    self.settings['main/procedures/insert_background_layers/enabled'].set_value(False)
-    self.settings['main/procedures/insert_background_layers/arguments/tag'].set_value('fg')
+    self.settings['main/procedures/insert_background'].tags.add('ignore_save')
+    self.settings['main/procedures/insert_background/enabled'].set_value(False)
+    self.settings['main/procedures/insert_background/arguments/tag'].set_value('fg')
     
     self.settings['main/constraints'].tags.add('ignore_save')
     self.settings['main/constraints'].add([{'name': 'enabled', 'type': 'bool'}])
@@ -750,7 +750,7 @@ class TestSourceWrite(unittest.TestCase):
     # 'main/procedures/use_layer_size/enabled' setting is not saved
     self.assertFalse(
       self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['settings'])
-    # 'main/procedures/insert_background_layers' group is not saved
+    # 'main/procedures/insert_background' group is not saved
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings'][1]['settings']), 1)
     # Child not present in data and the tag exists in the parent
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings']), 2)

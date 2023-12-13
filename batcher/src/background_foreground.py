@@ -155,7 +155,7 @@ def get_background_layer(batcher):
     batcher,
     lambda position, num_layers: position < num_layers - 1,
     1,
-    'insert_background_layers',
+    'insert_background',
     _('There are no background layers.'))
 
 
@@ -164,7 +164,7 @@ def get_foreground_layer(batcher):
     batcher,
     lambda position, num_layers: position > 0,
     -1,
-    'insert_foreground_layers',
+    'insert_foreground',
     _('There are no foreground layers.'))
 
 
