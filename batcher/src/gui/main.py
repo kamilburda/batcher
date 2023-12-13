@@ -49,7 +49,6 @@ def display_reset_prompt(parent=None, more_settings_shown=False):
     destroy_with_parent=True,
     buttons=Gtk.ButtonsType.YES_NO)
   dialog.set_transient_for(parent)
-  dialog.set_title(pg.config.PLUGIN_TITLE)
   
   dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
   
@@ -312,7 +311,7 @@ class ExportLayersDialog:
       actions.clear(self._settings['main/constraints'], add_initial_actions=True)
   
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=pg.config.PLUGIN_TITLE, role=pg.config.PLUGIN_NAME)
+    self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=pg.config.PLUGIN_NAME)
     self._dialog.set_default_size(*self._DIALOG_SIZE)
     self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
@@ -1106,7 +1105,6 @@ class ExportLayersDialog:
       self._get_overwrite_dialog_items(),
       default_value=self._settings['main/overwrite_mode'].items['replace'],
       default_response=pg.overwrite.OverwriteModes.CANCEL,
-      title=pg.config.PLUGIN_TITLE,
       parent=self._dialog)
     
     progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
@@ -1239,7 +1237,7 @@ class ExportLayersNowDialog:
     self.run_batcher()
   
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=pg.config.PLUGIN_TITLE, role=None)
+    self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=None)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
 
