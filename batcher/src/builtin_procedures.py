@@ -9,6 +9,8 @@ from src import background_foreground
 from src import export as export_
 from src import renamer as renamer_
 
+import pygimplib as pg
+
 
 NAME_ONLY_TAG = 'name'
 
@@ -149,6 +151,66 @@ def resize_to_layer_size(batcher):
 
 _BUILTIN_PROCEDURES_LIST = [
   {
+    'name': 'insert_background',
+    'function': background_foreground.insert_background_layer,
+    'display_name': _('Insert background'),
+    'menu_path': _('Background, foreground'),
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.BLUE,
+      },
+    ],
+  },
+  {
+    'name': 'insert_foreground',
+    'function': background_foreground.insert_foreground_layer,
+    'display_name': _('Insert foreground'),
+    'menu_path': _('Background, foreground'),
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.GREEN,
+      },
+    ],
+  },
+  {
+    'name': 'merge_background',
+    'function': background_foreground.merge_background,
+    'display_name': _('Merge background'),
+    'menu_path': _('Background, foreground'),
+    'arguments': [
+      {
+        'type': 'enum',
+        'name': 'merge_type',
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'display_name': _('Merge type'),
+      },
+    ],
+  },
+  {
+    'name': 'merge_foreground',
+    'function': background_foreground.merge_foreground,
+    'display_name': _('Merge foreground'),
+    'menu_path': _('Background, foreground'),
+    'arguments': [
+      {
+        'type': 'enum',
+        'name': 'merge_type',
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'display_name': _('Merge type'),
+      },
+    ],
+  },
+  {
     'name': 'export',
     'function': export_.export,
     'display_name': _('Export'),
@@ -219,62 +281,6 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'inherit_transparency_from_layer_groups',
     'function': inherit_transparency_from_layer_groups,
     'display_name': _('Inherit transparency from layer groups'),
-  },
-  {
-    'name': 'insert_background',
-    'function': background_foreground.insert_background_layer,
-    'display_name': _('Insert background'),
-    'display_options_on_create': True,
-    'arguments': [
-      {
-        'type': 'color_tag',
-        'name': 'color_tag',
-        'display_name': _('Color tag'),
-        'default_value': Gimp.ColorTag.BLUE,
-      },
-    ],
-  },
-  {
-    'name': 'insert_foreground',
-    'function': background_foreground.insert_foreground_layer,
-    'display_name': _('Insert foreground'),
-    'display_options_on_create': True,
-    'arguments': [
-      {
-        'type': 'color_tag',
-        'name': 'color_tag',
-        'display_name': _('Color tag'),
-        'default_value': Gimp.ColorTag.GREEN,
-      },
-    ],
-  },
-  {
-    'name': 'merge_background',
-    'function': background_foreground.merge_background,
-    'display_name': _('Merge background'),
-    'arguments': [
-      {
-        'type': 'enum',
-        'name': 'merge_type',
-        'enum_type': Gimp.MergeType,
-        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
-        'display_name': _('Merge type'),
-      },
-    ],
-  },
-  {
-    'name': 'merge_foreground',
-    'function': background_foreground.merge_foreground,
-    'display_name': _('Merge foreground'),
-    'arguments': [
-      {
-        'type': 'enum',
-        'name': 'merge_type',
-        'enum_type': Gimp.MergeType,
-        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
-        'display_name': _('Merge type'),
-      },
-    ],
   },
   {
     'name': 'remove_folder_structure',

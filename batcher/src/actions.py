@@ -112,6 +112,9 @@ def create(
 
   * ``'display_name'``: The display name (human-readable name) of the action.
 
+  * ``'menu_path'``: Menu path allowing to group related actions to submenus.
+     The menu path components are separated by ``'/'``.
+
   * ``'action_group'``: List of groups the action belongs to, used in
     `pygimplib.invoker.Invoker` and `core.Batcher`.
 
@@ -334,6 +337,7 @@ def _create_action(
       arguments=None,
       enabled=True,
       display_name=None,
+      menu_path=None,
       description=None,
       action_groups=None,
       tags=None,
@@ -387,6 +391,13 @@ def _create_action(
       'type': 'string',
       'name': 'display_name',
       'default_value': display_name,
+      'gui_type': None,
+      'tags': ['ignore_initialize_gui'],
+    },
+    {
+      'type': 'string',
+      'name': 'menu_path',
+      'default_value': menu_path,
       'gui_type': None,
       'tags': ['ignore_initialize_gui'],
     },

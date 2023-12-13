@@ -71,7 +71,7 @@ Yes, you may insert any GIMP filter as a procedure:
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
 2. In the plug-in, the color tag will be displayed next to the layer name(s).
-3. Add the "Insert background" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
+3. Add the "Background, foreground" → "Insert background" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
 4. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
@@ -295,39 +295,6 @@ You can add the same procedure multiple times.
 
 ### Built-in Procedures
 
-**Export**
-
-Performs export with additional customization not available in the main dialog.
-
-Options:
-* *Output folder*: Folder to save the output image(s).
-  When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
-* *File extension*: File extension of the output image(s).
-  This overrides the file extension in the main dialog.
-* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multi-page PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
-* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
-  The text entry next to `Save as` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
-  You very likely need to type `[layer name, %e]` in the text entry next to `Save as` to preserve file extensions in layer names.
-* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
-* *Preserve layer name after export*: If enabled, layer names will revert to the state before export (i.e. without adding a file extension to them).
-  This is probably only ever useful if you want to perform export multiple times, e.g. with multiple different file formats (which is possible by adding multiple Export procedures).
-
-When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect.
-
-
-**Remove folder structure**
-
-Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
-
-**Inherit transparency from layer groups**
-
-Combine opacity from all parent layer groups for each layer.
-This corresponds to how the layer is actually displayed in the image canvas.
-
-For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
-
 **Insert background**
 
 Insert layers tagged with a specific color tag as background for each layer.
@@ -363,7 +330,42 @@ If there is no background layer inserted, this procedure has no effect.
 
 Merges an already inserted foreground layer (via "Insert foreground", see above) with the current layer.
 
+When exporting layers, the foreground is merged automatically before the export, hence this procedure is only useful when batch editing layers.
+
 For more information, see "Merge background" above.
+
+**Export**
+
+Performs export with additional customization not available in the main dialog.
+
+Options:
+* *Output folder*: Folder to save the output image(s).
+  When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
+* *File extension*: File extension of the output image(s).
+  This overrides the file extension in the main dialog.
+* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
+  The latter two options provide multi-layer export. This allows exporting e.g. multi-page PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
+* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
+  The text entry next to `Save as` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
+* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
+  You very likely need to type `[layer name, %e]` in the text entry next to `Save as` to preserve file extensions in layer names.
+* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
+* *Preserve layer name after export*: If enabled, layer names will revert to the state before export (i.e. without adding a file extension to them).
+  This is probably only ever useful if you want to perform export multiple times, e.g. with multiple different file formats (which is possible by adding multiple Export procedures).
+
+When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect.
+
+
+**Remove folder structure**
+
+Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
+
+**Inherit transparency from layer groups**
+
+Combine opacity from all parent layer groups for each layer.
+This corresponds to how the layer is actually displayed in the image canvas.
+
+For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
 **Rename layer**
 

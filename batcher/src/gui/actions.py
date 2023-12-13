@@ -171,6 +171,8 @@ class ActionBox(pg.gui.ItemBox):
     self._vbox.pack_start(self._button_add, False, False, 0)
     
     self._actions_menu = Gtk.Menu()
+    # key: tuple of menu path components; value: `Gtk.MenuItem`
+    self._builtin_actions_submenus = {}
     self._init_actions_menu_popup()
   
   def _add_item_from_action(self, action):
@@ -250,9 +252,28 @@ class ActionBox(pg.gui.ItemBox):
     self._actions_menu.popup_at_pointer(None)
   
   def _add_action_to_menu_popup(self, action_dict):
+    if action_dict.get('menu_path') is None:
+      current_parent_menu = self._actions_menu
+    else:
+      parent_names = tuple(action_dict['menu_path'].split(pg.MENU_PATH_SEPARATOR))
+
+      current_parent_menu = self._actions_menu
+      for i in range(len(parent_names)):
+        current_names = parent_names[:i + 1]
+
+        if current_names not in self._builtin_actions_submenus:
+          self._builtin_actions_submenus[current_names] = Gtk.MenuItem(
+            label=current_names[-1], use_underline=False)
+          self._builtin_actions_submenus[current_names].set_submenu(Gtk.Menu())
+
+          current_parent_menu.append(self._builtin_actions_submenus[current_names])
+
+        current_parent_menu = self._builtin_actions_submenus[current_names].get_submenu()
+
     menu_item = Gtk.MenuItem(label=action_dict['display_name'], use_underline=False)
     menu_item.connect('activate', self._on_actions_menu_item_activate, action_dict)
-    self._actions_menu.append(menu_item)
+
+    current_parent_menu.append(menu_item)
   
   def _on_actions_menu_item_activate(self, menu_item, action_dict):
     item = self.add_item(action_dict)
