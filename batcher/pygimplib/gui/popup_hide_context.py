@@ -47,19 +47,22 @@ class PopupHideContext:
     self._popup_owner_widget = popup_owner_widget
     self._hide_callback = (
       hide_callback if hide_callback is not None else self._popup_to_hide.hide)
+    self._widgets_to_exclude_from_triggering_hiding = widgets_to_exclude_from_triggering_hiding
     
     self._button_press_emission_hook_id = None
     self._toplevel_configure_event_id = None
     self._toplevel_position = None
     self._widgets_with_entered_pointers = set()
-    
+
+  def enable(self):
+    """Connects events to hide the popup."""
     self._popup_owner_widget.connect(
       'focus-out-event', self._on_popup_owner_widget_focus_out_event)
     self._popup_to_hide.connect('show', self._on_popup_to_hide_show)
     self._popup_to_hide.connect('hide', self._on_popup_to_hide_hide)
 
-    if widgets_to_exclude_from_triggering_hiding is not None:
-      for widget in widgets_to_exclude_from_triggering_hiding:
+    if self._widgets_to_exclude_from_triggering_hiding is not None:
+      for widget in self._widgets_to_exclude_from_triggering_hiding:
         self._exclude_widget_from_hiding_with_button_press(widget)
   
   def _exclude_widget_from_hiding_with_button_press(self, widget):

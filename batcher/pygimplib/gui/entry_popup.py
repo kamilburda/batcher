@@ -73,6 +73,7 @@ class EntryPopup:
         self._scrolled_window.get_vscrollbar(),
       ],
     )
+    self._popup_hide_context.enable()
     
     self._connect_events()
   

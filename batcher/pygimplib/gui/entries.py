@@ -270,6 +270,7 @@ class FilenamePatternEntry(ExtendedEntry):
         self,
       ],
     )
+    self._field_tooltip_hide_context.enable()
 
     self.connect(
       'notify::cursor-position', self._on_filename_pattern_entry_notify_cursor_position)

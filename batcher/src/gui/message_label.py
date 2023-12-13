@@ -49,6 +49,7 @@ class MessageLabel(Gtk.Box):
         self._scrolled_window_more.get_vscrollbar(),
       ],
     )
+    self._popup_hide_context.enable()
     
     self._label_message.connect('size-allocate', self._on_label_message_size_allocate)
     self._button_more.connect('clicked', self._on_button_more_clicked)
