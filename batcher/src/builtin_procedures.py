@@ -216,12 +216,6 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   {
-    'name': 'ignore_folder_structure',
-    'function': remove_folder_hierarchy_from_item,
-    'display_name': _('Ignore folder structure'),
-    'additional_tags': [NAME_ONLY_TAG],
-  },
-  {
     'name': 'inherit_transparency_from_layer_groups',
     'function': inherit_transparency_from_layer_groups,
     'display_name': _('Inherit transparency from layer groups'),
@@ -279,6 +273,12 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Merge type'),
       },
     ],
+  },
+  {
+    'name': 'remove_folder_structure',
+    'function': remove_folder_hierarchy_from_item,
+    'display_name': _('Remove folder structure'),
+    'additional_tags': [NAME_ONLY_TAG],
   },
   {
     'name': 'rename',

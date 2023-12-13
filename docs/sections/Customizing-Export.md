@@ -37,7 +37,7 @@ Check the "Visible" constraint (or add one if not already).
 
 **I don't want to preserve folder hierarchy when exporting layers.**
 
-Add the "Ignore folder structure" procedure.
+Add the "Remove folder structure" procedure.
 
 
 **How do I rename the layers to form a sequence of numbers, e.g. "image001", "image002", ...?**
@@ -317,7 +317,7 @@ Options:
 When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect.
 
 
-**Ignore folder structure**
+**Remove folder structure**
 
 Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
 
