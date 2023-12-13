@@ -67,14 +67,13 @@ More Customization
 If you find yourself in the need of customizing layer names, applying additional procedures before exporting or excluding specific layers from the export, see [Customizing Export](Customizing-Export.md).
 
 
-Running Export Without Dialog (Non-Interactively)
--------------------------------------------------
+Running Batcher Without Dialog (Non-Interactively)
+--------------------------------------------------
 
-It is also possible to run Batcher without the interactive dialog, allowing you to automate the export.
+It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
 
-The `plug-in-export-layers` procedure can run the export with default or last used settings.
-In the latter case, the settings are loaded if they were saved before (via `Settings → Save Settings`).
+The `plug-in-batch-export-layers` procedure exports layers with the specified or last used (or saved) settings, depending on the value of the `run-mode` parameter.
 
-The `plug-in-export-layers-now` procedure always uses the last used settings.
+The `plug-in-batch-export-layers-now` procedure exports layers always the last used settings.
 
-The `plug-in-export-layers-with-config` procedure allows you to run Batcher using the specified settings file obtained via `Settings → Export Settings...` in the plug-in dialog.
+The `plug-in-batch-export-layers-with-config` procedure exports layers using the specified settings file obtained via `Settings → Export Settings...` in the plug-in dialog.

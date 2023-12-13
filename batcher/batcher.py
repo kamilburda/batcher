@@ -22,7 +22,7 @@ from src.gui import main as gui_main
 SETTINGS = settings_main.create_settings()
 
 
-def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, config):
+def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
   
@@ -41,7 +41,7 @@ def plug_in_export_layers(_procedure, run_mode, image, _n_drawables, _drawables,
     _run_noninteractive(layer_tree, config)
 
 
-def plug_in_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawables, _config):
+def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawables, _config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 
@@ -58,7 +58,7 @@ def plug_in_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawab
     _run_with_last_vals(layer_tree)
 
 
-def plug_in_export_layers_with_config(
+def plug_in_batch_export_layers_with_config(
       _procedure, run_mode, image, _n_drawables, _drawables, config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
@@ -133,7 +133,7 @@ def _run_plugin_noninteractive(run_mode, layer_tree):
 
 
 pg.register_procedure(
-  plug_in_export_layers,
+  plug_in_batch_export_layers,
   arguments=pg.setting.create_params(SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
@@ -148,7 +148,7 @@ pg.register_procedure(
 
 
 pg.register_procedure(
-  plug_in_export_layers_now,
+  plug_in_batch_export_layers_now,
   menu_label=_('E_xport Layers Now'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
   image_types='*',
@@ -162,7 +162,7 @@ pg.register_procedure(
 
 
 pg.register_procedure(
-  plug_in_export_layers_with_config,
+  plug_in_batch_export_layers_with_config,
   arguments=pg.setting.create_params(
     pg.setting.StringSetting(name='config_filepath', display_name=_('Path to configuration file')),
   ),
