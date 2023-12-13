@@ -29,6 +29,7 @@ def register_procedure(
       menu_label: Optional[str] = None,
       menu_path: Optional[Union[str, List[str]]] = None,
       image_types: Optional[str] = None,
+      sensitivity_mask: Optional[Gimp.ProcedureSensitivityMask] = None,
       documentation: Optional[Union[Tuple[str, str], Tuple[str, str, str]]] = None,
       attribution: Optional[Tuple[str, str, str]] = None,
       auxiliary_arguments: Optional[List[Union[Dict, str]]] = None,
@@ -81,6 +82,9 @@ def register_procedure(
       This can be a single string or a list of strings if you want your
       procedure to be accessible from mutliple menu paths in GIMP.
     image_types: Image types to which the procedure applies.
+    sensitivity_mask:
+      `Gimp.ProcedureSensitivityMask` determining when the menu entry will be
+      accessible (sensitive).
     documentation: Procedure documentation.
       This is either a tuple of (short description, help) strings or
       (short description, help, help ID) strings.
@@ -153,6 +157,7 @@ def register_procedure(
   proc_dict['menu_label'] = menu_label
   proc_dict['menu_path'] = menu_path
   proc_dict['image_types'] = image_types
+  proc_dict['sensitivity_mask'] = sensitivity_mask
   proc_dict['documentation'] = documentation
   proc_dict['attribution'] = attribution
   proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
@@ -297,6 +302,9 @@ def _do_create_procedure(plugin_instance, proc_name):
 
   if proc_dict['image_types'] is not None:
     procedure.set_image_types(proc_dict['image_types'])
+
+  if proc_dict['sensitivity_mask'] is not None:
+    procedure.set_sensitivity_mask(proc_dict['sensitivity_mask'])
 
   if proc_dict['documentation'] is not None:
     if len(proc_dict['documentation']) == 2:
