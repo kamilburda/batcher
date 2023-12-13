@@ -137,6 +137,11 @@ pg.register_procedure(
   arguments=pg.setting.create_params(SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
+  image_types='*',
+  sensitivity_mask=(
+    Gimp.ProcedureSensitivityMask.NO_DRAWABLES
+    | Gimp.ProcedureSensitivityMask.DRAWABLE
+    | Gimp.ProcedureSensitivityMask.DRAWABLES),
   documentation=(_('Export layers as separate images'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
@@ -146,6 +151,11 @@ pg.register_procedure(
   plug_in_export_layers_now,
   menu_label=_('E_xport Layers Now'),
   menu_path='<Image>/File/{}'.format(_('Batch')),
+  image_types='*',
+  sensitivity_mask=(
+    Gimp.ProcedureSensitivityMask.NO_DRAWABLES
+    | Gimp.ProcedureSensitivityMask.DRAWABLE
+    | Gimp.ProcedureSensitivityMask.DRAWABLES),
   documentation=(_('Export layers as separate images instantly'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
