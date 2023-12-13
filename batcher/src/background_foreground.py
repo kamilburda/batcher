@@ -179,7 +179,7 @@ def _get_adjacent_layer(
   if raw_item.get_parent() is None:
     children = batcher.current_image.list_layers()
   else:
-    children = raw_item.parent.list_children()
+    children = raw_item.get_parent().list_children()
   
   adjacent_layer = None
   
