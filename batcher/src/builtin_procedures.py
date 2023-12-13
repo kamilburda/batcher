@@ -113,7 +113,7 @@ def remove_folder_hierarchy_from_item(batcher):
   item.children = []
 
 
-def inherit_transparency_from_layer_groups(batcher):
+def apply_transparency_from_layer_groups(batcher):
   new_layer_opacity = batcher.current_raw_item.get_opacity() / 100.0
   for parent in batcher.current_item.parents:
     new_layer_opacity = new_layer_opacity * (parent.raw.get_opacity() / 100.0)
@@ -150,6 +150,11 @@ def resize_to_layer_size(batcher):
 
 
 _BUILTIN_PROCEDURES_LIST = [
+  {
+    'name': 'apply_transparency_from_layer_groups',
+    'function': apply_transparency_from_layer_groups,
+    'display_name': _('Apply transparency from layer groups'),
+  },
   {
     'name': 'insert_background',
     'function': background_foreground.insert_background_layer,
@@ -276,11 +281,6 @@ _BUILTIN_PROCEDURES_LIST = [
         'gui_type': 'check_button_no_text',
       },
     ],
-  },
-  {
-    'name': 'inherit_transparency_from_layer_groups',
-    'function': inherit_transparency_from_layer_groups,
-    'display_name': _('Inherit transparency from layer groups'),
   },
   {
     'name': 'remove_folder_structure',

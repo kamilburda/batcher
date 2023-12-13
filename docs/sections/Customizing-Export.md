@@ -295,6 +295,13 @@ You can add the same procedure multiple times.
 
 ### Built-in Procedures
 
+**Apply transparency from layer groups**
+
+Combine opacity from all parent layer groups for each layer.
+This corresponds to how the layer is actually displayed in the image canvas.
+
+For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
+
 **Insert background**
 
 Insert layers tagged with a specific color tag as background for each layer.
@@ -359,13 +366,6 @@ When exporting each layer separately (the default), the Export procedure usually
 **Remove folder structure**
 
 Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
-
-**Inherit transparency from layer groups**
-
-Combine opacity from all parent layer groups for each layer.
-This corresponds to how the layer is actually displayed in the image canvas.
-
-For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
 **Rename layer**
 
