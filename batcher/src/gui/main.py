@@ -41,40 +41,25 @@ else:
   _json_module_found = False
 
 
-def display_reset_prompt(parent=None, more_settings_shown=False):
+def display_reset_prompt(parent=None):
   dialog = Gtk.MessageDialog(
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     modal=True,
     destroy_with_parent=True,
-    buttons=Gtk.ButtonsType.YES_NO)
+    buttons=Gtk.ButtonsType.YES_NO,
+    title=_('Reset Settings'),
+  )
+
   dialog.set_transient_for(parent)
-  
   dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
-  
-  if more_settings_shown:
-    checkbutton_reset_actions = Gtk.CheckButton(
-      label=_('Remove procedures and constraints'),
-      use_underline=False,
-      active=True,
-    )
-    
-    dialog.vbox.pack_start(checkbutton_reset_actions, False, False, 0)
-  else:
-    checkbutton_reset_actions = None
-  
   dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
   
   dialog.show_all()
   response_id = dialog.run()
   dialog.destroy()
-
-  if checkbutton_reset_actions is not None:
-    clear_actions = checkbutton_reset_actions.get_active()
-  else:
-    clear_actions = False
   
-  return response_id, clear_actions
+  return response_id
 
 
 @contextlib.contextmanager
@@ -1009,26 +994,16 @@ class ExportLayersDialog:
         self._display_inline_message(_('Settings successfully exported.'), Gtk.MessageType.INFO)
   
   def _on_reset_settings_activate(self, menu_item):
-    response_id, clear_actions = display_reset_prompt(
-      parent=self._dialog,
-      more_settings_shown=self._settings['gui/show_more_settings'].value)
+    response_id = display_reset_prompt(parent=self._dialog)
     
     if response_id == Gtk.ResponseType.YES:
-      if clear_actions:
-        actions.clear(self._settings['main/procedures'])
-        actions.clear(self._settings['main/constraints'])
-      else:
-        self._settings['main/procedures'].tags.add('ignore_reset')
-        self._settings['main/constraints'].tags.add('ignore_reset')
+      actions.clear(self._settings['main/procedures'])
+      actions.clear(self._settings['main/constraints'])
       
       self._reset_settings()
       self._save_settings()
       
-      if clear_actions:
-        utils_.clear_setting_sources(self._settings)
-      else:
-        self._settings['main/procedures'].tags.remove('ignore_reset')
-        self._settings['main/constraints'].tags.remove('ignore_reset')
+      utils_.clear_setting_sources(self._settings)
       
       self._display_inline_message(_('Settings reset.'), Gtk.MessageType.INFO)
   
