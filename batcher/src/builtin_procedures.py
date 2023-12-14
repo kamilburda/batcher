@@ -9,8 +9,6 @@ from src import background_foreground
 from src import export as export_
 from src import renamer as renamer_
 
-import pygimplib as pg
-
 
 NAME_ONLY_TAG = 'name'
 
