@@ -518,16 +518,7 @@ class ExportLayersDialog:
     self._dialog.action_area.pack_start(self._button_settings, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_settings, True)
 
-    self._button_help = Gtk.LinkButton(
-      uri=(
-        pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
-        else pg.config.DOCS_URL),
-      label=_('_Help'),
-      use_underline=True,
-    )
-    # Make the button appear like a regular button
-    self._button_help.get_style_context().remove_class('link')
-    self._button_help.unset_state_flags(Gtk.StateFlags.LINK)
+    self._button_help = self._get_help_button(self._button_run)
 
     self._dialog.action_area.pack_start(self._button_help, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_help, True)
@@ -554,10 +545,6 @@ class ExportLayersDialog:
     self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
     self._button_close.connect('clicked', self._on_button_close_clicked)
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
-
-    # Make sure the link button retains the style of a regular button when clicked.
-    self._button_help.connect('clicked', lambda button, *args: button.unset_state_flags(
-      Gtk.StateFlags.VISITED | Gtk.StateFlags.LINK))
     
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
     self._menu_item_show_more_settings.connect(
@@ -600,7 +587,34 @@ class ExportLayersDialog:
     
     self._image_preview.connect('preview-updated', self._on_image_preview_updated)
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
-  
+
+  @staticmethod
+  def _get_help_button(reference_button):
+    button_help = Gtk.LinkButton(
+      uri=(
+        pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
+        else pg.config.DOCS_URL),
+      label=_('_Help'),
+      use_underline=True,
+    )
+    # Make the button appear like a regular button
+    button_help_style_context = button_help.get_style_context()
+
+    for style_class in button_help_style_context.list_classes():
+      button_help_style_context.remove_class(style_class)
+
+    for style_class in reference_button.get_style_context().list_classes():
+      button_help_style_context.add_class(style_class)
+
+    button_help.unset_state_flags(Gtk.StateFlags.LINK)
+
+    # Make sure the button retains the style of a regular button when clicked.
+    button_help.connect(
+      'clicked',
+      lambda button, *args: button.unset_state_flags(Gtk.StateFlags.VISITED | Gtk.StateFlags.LINK))
+
+    return button_help
+
   def _finish_init_and_show(self):
     while Gtk.events_pending():
       Gtk.main_iteration()
