@@ -85,10 +85,19 @@ def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
     merged_tagged_layer = children[first_tagged_layer_position]
   else:
     second_to_last_tagged_layer_position = first_tagged_layer_position + len(tagged_items) - 2
+    # It should not matter which items we obtain the color tag from as all
+    # items have the same color tag.
+    merged_color_tag = children[second_to_last_tagged_layer_position].get_color_tag()
     
     for i in range(second_to_last_tagged_layer_position, first_tagged_layer_position - 1, -1):
       merged_tagged_layer = image.merge_down(children[i], Gimp.MergeType.EXPAND_AS_NECESSARY)
-  
+
+    # The merged-down layer does not possess the attributes of the original
+    # layers, including the color tag, so we set it explicitly. This ensures
+    # that tagged layer groups are merged properly in "Merge back-/foreground"
+    # procedures.
+    merged_tagged_layer.set_color_tag(merged_color_tag)
+
   return merged_tagged_layer
 
 
