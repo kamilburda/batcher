@@ -295,7 +295,7 @@ You can add the same procedure multiple times.
 
 ### Built-in Procedures
 
-**Apply transparency from layer groups**
+**Apply opacity from layer groups**
 
 Combine opacity from all parent layer groups for each layer.
 This corresponds to how the layer is actually displayed in the image canvas.
