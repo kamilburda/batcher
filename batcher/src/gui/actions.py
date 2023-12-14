@@ -484,7 +484,8 @@ class _ActionEditDialog(GimpUi.Dialog):
   _MORE_OPTIONS_SPACING = 4
   _MORE_OPTIONS_BORDER_WIDTH = 4
 
-  _LABEL_PROCEDURE_NAME_MAX_CHARS = 50
+  _LABEL_PROCEDURE_NAME_MAX_WIDTH_CHARS = 50
+  _LABEL_PROCEDURE_DESCRIPTION_MAX_WIDTH_CHARS = 50
   
   def __init__(self, action, pdb_procedure, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -505,7 +506,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._label_procedure_name.label.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_procedure_name.label.set_markup(
       '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
-    self._label_procedure_name.label.set_max_width_chars(self._LABEL_PROCEDURE_NAME_MAX_CHARS)
+    self._label_procedure_name.label.set_max_width_chars(self._LABEL_PROCEDURE_NAME_MAX_WIDTH_CHARS)
     self._label_procedure_name.connect('changed', self._on_label_procedure_name_changed, action)
 
     self._label_procedure_description = None
@@ -557,14 +558,14 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
     self.connect('response', self._on_action_edit_dialog_response, action)
-  
-  @staticmethod
-  def _create_label_description(summary, full_description=None):
+
+  def _create_label_description(self, summary, full_description=None):
     label_description = Gtk.Label(
       label=summary,
-      wrap=True,
       xalign=0.0,
       yalign=0.5,
+      wrap=True,
+      max_width_chars=self._LABEL_PROCEDURE_DESCRIPTION_MAX_WIDTH_CHARS,
     )
     if full_description:
       label_description.set_tooltip_text(full_description)
