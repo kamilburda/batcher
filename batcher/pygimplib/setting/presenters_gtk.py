@@ -125,11 +125,10 @@ class CheckButtonLabelPresenter(GtkPresenter):
   """
   
   def _get_value(self):
-    label = self._widget.get_label()
-    return label if label is not None else ''
+    return self._widget.get_child().get_text()
   
   def _set_value(self, value):
-    self._widget.set_label(value if value is not None else '')
+    self._widget.get_child().set_text(value if value is not None else '')
 
 
 class CheckMenuItemPresenter(GtkPresenter):
