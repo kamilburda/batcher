@@ -72,8 +72,6 @@ class ActionBox(pg.gui.ItemBox):
   
   _ADD_BUTTON_HBOX_SPACING = 6
   
-  _ACTION_ENABLED_LABEL_MAX_CHAR_WIDTH = 1000
-  
   def __init__(
         self,
         actions: pg.setting.Group,
@@ -177,7 +175,7 @@ class ActionBox(pg.gui.ItemBox):
   
   def _add_item_from_action(self, action):
     self._init_action_item_gui(action)
-    
+
     item = _ActionBoxItem(action, action['enabled'].gui.widget)
     
     super().add_item(item)
@@ -190,18 +188,12 @@ class ActionBox(pg.gui.ItemBox):
   
   def _init_action_item_gui(self, action):
     action.initialize_gui()
-    
-    # HACK: Prevent displaying horizontal scrollbar by ellipsizing labels. To
-    # make ellipsizing work properly, the label width must be set explicitly.
+
     if isinstance(action['enabled'].gui, pg.setting.SETTING_GUI_TYPES.check_button):
-      action['enabled'].gui.widget.set_property('width-request', 1)
-      action['enabled'].gui.widget.get_child().set_ellipsize(Pango.EllipsizeMode.END)
-      action['enabled'].gui.widget.get_child().set_max_width_chars(
-        self._ACTION_ENABLED_LABEL_MAX_CHAR_WIDTH)
-      action['enabled'].gui.widget.get_child().connect(
-        'size-allocate',
-        self._on_action_item_gui_label_size_allocate,
-        action['enabled'].gui.widget)
+      enabled_widget = action['enabled'].gui.widget
+      enabled_widget.get_child().set_ellipsize(Pango.EllipsizeMode.END)
+      enabled_widget.get_child().connect(
+        'size-allocate', self._on_action_item_gui_label_size_allocate, enabled_widget)
   
   @staticmethod
   def _on_action_item_gui_label_size_allocate(item_gui_label, allocation, item_gui):
@@ -400,7 +392,7 @@ class ActionBox(pg.gui.ItemBox):
       item.action['arguments'].apply_gui_values_to_settings(force=True)
     else:
       item.action.set_values(action_values_before_dialog)
-    
+
     item.action_edit_dialog = None
   
   @staticmethod
