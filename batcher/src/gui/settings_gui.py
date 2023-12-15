@@ -77,12 +77,10 @@ def create_gui_settings():
     {
       'type': 'images_and_gimp_items',
       'name': 'name_preview_layers_collapsed_state',
-      'default_value': collections.defaultdict(set),
     },
     {
       'type': 'images_and_gimp_items',
       'name': 'image_preview_displayed_layers',
-      'default_value': collections.defaultdict(set),
     },
     {
       'type': 'image_ids_and_directories',
