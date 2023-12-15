@@ -1,20 +1,12 @@
 """Loading and saving settings."""
 
 import abc
-import ast
 from collections.abc import Iterable
+import json
 import os
 import pickle
 import traceback
 from typing import Any, Dict, List, Union
-
-try:
-  # noinspection PyUnresolvedReferences
-  import json
-except ImportError:
-  _json_module_found = False
-else:
-  _json_module_found = True
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -33,7 +25,6 @@ __all__ = [
   'Source',
   'GimpParasiteSource',
   'GimpSessionSource',
-  'PickleFileSource',
   'JsonFileSource',
 ]
 
@@ -632,135 +623,15 @@ class GimpParasiteSource(Source):
         pgutils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
-class PickleFileSource(Source):
-  """Class reading and writing settings to a file, formatted using the Python
-  `pickle` module.
-  
-  This class is useful as a persistent source (i.e. permanent storage) of
-  settings. This class is appropriate to use when saving settings to a file path
-  chosen by the user.
-  """
-  
-  _SOURCE_NAME_CONTENTS_SEPARATOR = ' '
-  
-  def __init__(self, source_name: str, filepath: str, source_type: str = 'persistent'):
-    super().__init__(source_name, source_type)
-    
-    self._filepath = filepath
-  
-  @property
-  def filepath(self) -> str:
-    """Path to the file containing saved settings."""
-    return self._filepath
-  
-  def clear(self):
-    all_data = self.read_all_data()
-    if all_data is not None and self.source_name in all_data:
-      del all_data[self.source_name]
-      
-      self.write_all_data(all_data)
-  
-  def has_data(self) -> Union[bool, str]:
-    """Returns ``True`` if the source contains data and the data have a valid
-    format, ``'invalid_format'`` if the source contains some data, but the data
-    do not have a valid format, and ``False`` otherwise.
-    
-    ``'invalid_format'`` represents an ambiguous value since there is no way to
-    determine if there are data under `source_name` or not.
-    """
-    try:
-      data = self.read_data_from_source()
-    except SourceError:
-      return 'invalid_format'
-    else:
-      return data is not None
-  
-  def read_data_from_source(self):
-    all_data = self.read_all_data()
-    if all_data is not None and self.source_name in all_data:
-      return self._get_settings_from_pickled_data(all_data[self.source_name])
-    else:
-      return None
-  
-  def write_data_to_source(self, data):
-    raw_data = self._pickle_settings(data)
-    
-    all_data = self.read_all_data()
-    if all_data is None:
-      all_data = {self.source_name: raw_data}
-    else:
-      all_data[self.source_name] = raw_data
-    
-    self.write_all_data(all_data)
-  
-  def read_all_data(self) -> Union[Dict[str, Any], None]:
-    """Reads the contents of the entire file into a dictionary of
-    (source name, contents) pairs.
-    
-    The dictionary also contains contents from other source names if they exist.
-
-    If the `filepath` property does not point to a valid file, ``None`` is
-    returned.
-    """
-    if not os.path.isfile(self._filepath):
-      return None
-    
-    all_data = {}
-    
-    try:
-      with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
-        for line in f:
-          split = line.split(self._SOURCE_NAME_CONTENTS_SEPARATOR, 1)
-          if len(split) == 2:
-            source_name, contents = split
-            all_data[source_name] = contents
-    except Exception:
-      raise SourceReadError(traceback.format_exc())
-    else:
-      return all_data
-  
-  def write_all_data(self, all_data: Dict[str, Any]):
-    """Writes ``all_data`` into the file, overwriting the entire file contents.
-    
-    ``all_data`` is a dictionary of (source name, contents) pairs.
-    """
-    try:
-      with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
-        for source_name, contents in all_data.items():
-          f.write(''.join([source_name, self._SOURCE_NAME_CONTENTS_SEPARATOR, contents, '\n']))
-    except Exception:
-      raise SourceWriteError(traceback.format_exc())
-  
-  @staticmethod
-  def _get_settings_from_pickled_data(contents):
-    try:
-      return pickle.loads(ast.literal_eval(contents))
-    except Exception:
-      raise SourceInvalidFormatError(traceback.format_exc())
-  
-  @staticmethod
-  def _pickle_settings(settings):
-    try:
-      return repr(pickle.dumps(settings))
-    except Exception:
-      raise SourceInvalidFormatError(traceback.format_exc())
-
-
 class JsonFileSource(Source):
   """Class reading and writing settings to a JSON file.
   
   This class is useful as a persistent source (i.e. permanent storage) of
   settings. This class is appropriate to use when saving settings to a file path
   chosen by the user.
-  
-  Compared to `PickleFileSource`, JSON files are more readable and, if need be,
-  easy to modify by hand.
   """
   
   def __init__(self, source_name: str, filepath: str, source_type: str = 'persistent'):
-    if not _json_module_found:
-      raise RuntimeError('"json" module not found')
-    
     super().__init__(source_name, source_type)
     
     self._filepath = filepath

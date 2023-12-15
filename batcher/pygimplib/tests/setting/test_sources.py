@@ -1035,25 +1035,6 @@ class _FileSourceTests:
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.sources.os.path.isfile',
   return_value=False)
-class TestPickleFileSource(unittest.TestCase, _FileSourceTests):
-  
-  def __init__(self, *args, **kwargs):
-    _FileSourceTests.__init__(
-      self, 'test_settings', 'test_filepath.pkl', sources_.PickleFileSource)
-    
-    unittest.TestCase.__init__(self, *args, **kwargs)
-  
-  def setUp(self):
-    self.source_name = self._source_name
-    self.filepath = self._filepath
-    self.source = self._source_class(self.source_name, self.filepath)
-    self.settings = stubs_group.create_test_settings()
-
-
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.setting.sources.open')
-@mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.sources.os.path.isfile',
-  return_value=False)
 class TestJsonFileSource(unittest.TestCase, _FileSourceTests):
   
   def __init__(self, *args, **kwargs):

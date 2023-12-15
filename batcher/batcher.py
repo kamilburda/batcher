@@ -69,13 +69,8 @@ def plug_in_batch_export_layers_with_config(
     sys.exit(1)
   
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
-  
-  if config_filepath.endswith('.pkl'):
-    setting_source_class = pg.setting.PickleFileSource
-  else:
-    setting_source_class = pg.setting.JsonFileSource
-  
-  setting_source = setting_source_class(
+
+  setting_source = pg.setting.JsonFileSource(
     pg.config.SOURCE_NAME, config_filepath, source_type='persistent')
   
   status, _unused = update.update(

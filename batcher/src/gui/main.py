@@ -35,11 +35,6 @@ from src.gui import preview_image as preview_image_
 from src.gui import preview_name as preview_name_
 from src.gui import previews_controller as previews_controller_
 
-if hasattr(pg.setting.sources, 'json'):
-  _json_module_found = True
-else:
-  _json_module_found = False
-
 
 def display_reset_prompt(parent=None):
   dialog = Gtk.MessageDialog(
@@ -674,10 +669,7 @@ class ExportLayersDialog:
       self._name_preview, self._image_preview, self._settings, self._image)
   
   def _load_settings(self, filepath, file_format, load_size_settings=True):
-    if file_format == 'pkl' or not _json_module_found:
-      source = pg.setting.sources.PickleFileSource(pg.config.SOURCE_NAME, filepath)
-    else:
-      source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
+    source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
     
     actions.clear(self._settings['main/procedures'], add_initial_actions=False)
     actions.clear(self._settings['main/constraints'], add_initial_actions=False)
@@ -735,11 +727,7 @@ class ExportLayersDialog:
     if filepath is None:
       save_result = self._settings.save()
     else:
-      if file_format == 'pkl' or not _json_module_found:
-        source = pg.setting.sources.PickleFileSource(pg.config.SOURCE_NAME, filepath)
-      else:
-        source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
-      
+      source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
       save_result = self._settings.save({'persistent': source})
     
     if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
@@ -794,24 +782,14 @@ class ExportLayersDialog:
       check_button_load_size_settings = None
     
     json_file_ext = '.json'
-    pickle_file_ext = '.pkl'
-    
-    if _json_module_found:
-      filter_json = Gtk.FileFilter()
-      filter_json.set_name(_('JSON file ({})').format(json_file_ext))
-      filter_json.add_mime_type('application/json')
-      file_dialog.add_filter(filter_json)
-      
-      default_file_ext = json_file_ext
-      default_file_format = json_file_ext[1:]
-    else:
-      default_file_ext = pickle_file_ext
-      default_file_format = pickle_file_ext[1:]
-    
-    filter_pickle = Gtk.FileFilter()
-    filter_pickle.set_name(_('Pickle file ({})').format(pickle_file_ext))
-    filter_pickle.add_pattern(f'*{pickle_file_ext}')
-    file_dialog.add_filter(filter_pickle)
+
+    filter_json = Gtk.FileFilter()
+    filter_json.set_name(_('JSON file ({})').format(json_file_ext))
+    filter_json.add_mime_type('application/json')
+    file_dialog.add_filter(filter_json)
+
+    default_file_ext = json_file_ext
+    default_file_format = json_file_ext[1:]
     
     filter_any = Gtk.FileFilter()
     filter_any.set_name(_('Any file'))
@@ -827,10 +805,7 @@ class ExportLayersDialog:
       
       file_ext = os.path.splitext(filepath)[1]
       if add_file_extension_if_missing and not file_ext:
-        if file_dialog.get_filter() == filter_pickle:
-          filepath += pickle_file_ext
-        else:
-          filepath += default_file_ext
+        filepath += default_file_ext
       
       file_ext = os.path.splitext(filepath)[1]
       if file_ext:
