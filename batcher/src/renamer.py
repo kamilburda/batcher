@@ -180,12 +180,12 @@ class NumberField(Field):
     
     if reset_numbering_on_parent:
       parent_item = item.parent if item.parent is not None else None
-      parent_id = parent_item.raw.get_id() if parent_item is not None else None
+      parent = parent_item.raw if parent_item is not None else None
     else:
       parent_item = None
-      parent_id = None
+      parent = None
     
-    if parent_id not in self._global_number_generators[field_value]:
+    if parent not in self._global_number_generators[field_value]:
       padding = padding if padding is not None else len(field_value)
       
       initial_number = int(field_value)
@@ -202,10 +202,10 @@ class NumberField(Field):
         else:
           initial_number = len(batcher.item_tree)
       
-      self._global_number_generators[field_value][parent_id] = self.generate_number(
+      self._global_number_generators[field_value][parent] = self.generate_number(
         initial_number, padding, ascending)
     
-    return next(self._global_number_generators[field_value][parent_id])
+    return next(self._global_number_generators[field_value][parent])
 
 
 class _PercentTemplate(string.Template):

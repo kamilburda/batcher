@@ -189,9 +189,9 @@ def _sync_selected_items_with_constraint(selected_items_setting, constraint, ima
   
   def _on_selected_items_changed(
         selected_items_setting_, selected_items_constraint, image_setting_):
-    if image_setting_.value is not None:
+    if image_setting_.value is not None and image_setting_.value.is_valid():
       selected_items_constraint['arguments/selected_layers'].set_value(
-        selected_items_setting_.value[image_setting_.value.get_id()])
+        selected_items_setting_.value[image_setting_.value])
   
   _on_selected_items_changed(selected_items_setting, constraint, image_setting)
   

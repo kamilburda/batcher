@@ -109,12 +109,12 @@ def _set_settings(func):
       self._settings['main/output_directory'].set_value(
         self._settings['gui/current_directory'].value)
       
-      self._settings['main/selected_layers'].value[self._image.get_id()] = (
+      self._settings['main/selected_layers'].value[self._image] = (
         self._name_preview.selected_items)
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.get_id()] = (
+      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image] = (
         self._name_preview.collapsed_items)
-      self._settings['gui/image_preview_displayed_layers'].value[self._image.get_id()] = (
-        [self._image_preview.item.raw.get_id()] if self._image_preview.item is not None else [])
+      self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
+        [self._image_preview.item.raw] if self._image_preview.item is not None else [])
     except pg.setting.SettingValueError as e:
       self._display_inline_message(str(e), Gtk.MessageType.ERROR, e.setting)
       return
@@ -659,8 +659,8 @@ class ExportLayersDialog:
       self._batcher_for_previews,
       self._settings,
       self._initial_layer_tree,
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image.get_id()],
-      self._settings['main/selected_layers'].value[self._image.get_id()],
+      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image],
+      self._settings['main/selected_layers'].value[self._image],
       'selected_in_preview')
     
     self._image_preview = preview_image_.ImagePreview(self._batcher_for_previews, self._settings)

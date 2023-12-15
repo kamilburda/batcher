@@ -43,11 +43,11 @@ def _get_images_and_items_with_ids():
 
 
 def _get_images_and_items_with_paths():
-  images, _unused = _get_images_and_items()
+  images, items = _get_images_and_items()
   
   images = [[images[0]], [images[1]], []]
   
-  return images
+  return images, items
 
 
 class TestImagesAndGimpItemsSetting(unittest.TestCase):
@@ -57,24 +57,38 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
     
     self.maxDiff = None
   
+  def test_set_value_from_objects(self):
+    images, items = _get_images_and_items()
+
+    self.setting.set_value({
+      images[0]: [items[0], items[1], (items[2], 'folder')],
+      images[1]: [items[3], (items[4], 'folder')],
+    })
+    
+    expected_value = collections.defaultdict(set)
+    expected_value[images[0]] = {items[0], items[1], (items[2], 'folder')}
+    expected_value[images[1]] = {items[3], (items[4], 'folder')}
+    
+    self.assertEqual(self.setting.value, expected_value)
+
   def test_set_value_from_ids(self):
     images, items = _get_images_and_items_with_ids()
-    
+
     with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
 
       self.setting.set_value(
         {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
-    
+
     expected_value = collections.defaultdict(set)
-    expected_value[1] = {1, 3, (4, 'folder')}
-    expected_value[2] = {5, (7, 'folder')}
-    
+    expected_value[images[0]] = {items[0], items[1], (items[2], 'folder')}
+    expected_value[images[1]] = {items[3], (items[5], 'folder')}
+
     self.assertEqual(self.setting.value, expected_value)
 
   def test_set_value_from_paths(self):
-    images = _get_images_and_items_with_paths()
+    images, items = _get_images_and_items_with_paths()
     
     with mock.patch(
           f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
@@ -94,10 +108,10 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
          os.path.abspath('filename_3'): [
            ('Layer', 'item_9'),
            ('Layer', 'item_10')]})
-    
+
     expected_value = collections.defaultdict(set)
-    expected_value[1] = {1, 3, (4, 'folder')}
-    expected_value[2] = {5, (7, 'folder')}
+    expected_value[images[0][0]] = {items[0], items[1], (items[2], 'folder')}
+    expected_value[images[1][0]] = {items[3], (items[4], 'folder')}
     
     self.assertEqual(self.setting.value, expected_value)
   
@@ -158,8 +172,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
 
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
-      temp_mock_gimp_module_src.Item.get_by_id.side_effect = (
-        self._get_properly_ordered_side_effect_items(items))
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
 
       expected_dict = {
         'name': 'selected_layers',
@@ -199,8 +212,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
 
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
-      temp_mock_gimp_module_src.Item.get_by_id.side_effect = (
-        self._get_properly_ordered_side_effect_items(items))
+      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
 
       expected_dict = {
         'name': 'selected_layers',
@@ -223,22 +235,6 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         self.assertIn(key, actual_dict['value'])
         for item in expected_dict['value'][key]:
           self.assertIn(item, actual_dict['value'][key])
-
-  def _get_properly_ordered_side_effect_items(self, items):
-    # We need to set up the items in the correct order since the setting
-    # stores the items as sets, which are unordered.
-    item_ids_and_items = {item.get_id(): item for item in items if item is not None}
-    flattened_raw_items = [
-      item for item_list in self.setting.value.values() for item in item_list]
-
-    reordered_items = []
-    for item in flattened_raw_items:
-      if isinstance(item, (tuple, list)):
-        reordered_items.append(item_ids_and_items[item[0]])
-      else:
-        reordered_items.append(item_ids_and_items[item])
-
-    return reordered_items
 
 
 class TestImageIdsAndDirectoriesSetting(unittest.TestCase):

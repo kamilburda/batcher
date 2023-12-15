@@ -56,7 +56,7 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
     _COLUMN_ITEM_NAME_SENSITIVE,
     _COLUMN_ITEM_NAME,
-    _COLUMN_ITEM_ID,
+    _COLUMN_ITEM,
     _COLUMN_ITEM_TYPE) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
@@ -64,7 +64,7 @@ class NamePreview(preview_base_.Preview):
     [3, GObject.TYPE_BOOLEAN],
     [4, GObject.TYPE_BOOLEAN],
     [5, GObject.TYPE_STRING],
-    [6, GObject.TYPE_INT],
+    [6, GObject.TYPE_PYOBJECT],
     [7, GObject.TYPE_INT])
 
   _ICON_XPAD = 2
@@ -92,7 +92,7 @@ class NamePreview(preview_base_.Preview):
     self.is_filtering = False
     """If ``True``, unselected items are not sensitive."""
     
-    # key: ID of `Item.raw` or (ID of `Item.raw`, 'folder') instance
+    # key: `Item.raw` or (`Item.raw`, 'folder')
     # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(pg.utils.return_none_func)
     
@@ -332,18 +332,18 @@ class NamePreview(preview_base_.Preview):
   @staticmethod
   def _get_key(item):
     if item.type != pg.itemtree.TYPE_FOLDER:
-      return item.raw.get_id()
+      return item.raw
     else:
-      return item.raw.get_id(), pg.itemtree.FOLDER_KEY
+      return item.raw, pg.itemtree.FOLDER_KEY
   
   def _get_key_from_tree_iter(self, tree_iter):
-    item_id = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_ID[0])
+    item = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM[0])
     item_type = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_TYPE[0])
     
     if item_type != pg.itemtree.TYPE_FOLDER:
-      return item_id
+      return item
     else:
-      return item_id, pg.itemtree.FOLDER_KEY
+      return item, pg.itemtree.FOLDER_KEY
   
   def _get_items_to_process(self):
     if self.is_filtering:
@@ -428,7 +428,7 @@ class NamePreview(preview_base_.Preview):
        color_tag_icon is not None,
        True,
        item.name,
-       item.raw.get_id(),
+       item.raw,
        item.type])
     
     self._tree_iters[self._get_key(item)] = tree_iter

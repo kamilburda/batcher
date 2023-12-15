@@ -24,7 +24,7 @@ def has_matching_default_file_extension(item, batcher):
 
 
 def is_item_in_selected_items(item, selected_items):
-  return item.raw.get_id() in selected_items
+  return item.raw in selected_items
 
 
 def is_top_level(item):

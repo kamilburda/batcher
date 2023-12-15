@@ -121,13 +121,13 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
       for key, items in raw_value.items():
         if isinstance(key, str):
           image = pg.pdbutils.find_image_by_filepath(key)
-        else:
+        elif isinstance(key, int):
           image = Gimp.Image.get_by_id(key)
+        else:
+          image = key
         
         if image is None:
           continue
-        
-        image_id = image.get_id()
         
         if not isinstance(items, Iterable) or isinstance(items, str):
           raise TypeError(f'expected a list-like, found {items}')
@@ -140,11 +140,15 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
               raise ValueError(
                 'list-likes representing items must contain exactly 2 or 3 elements'
                 f' (has {len(item)})')
-            
-            if isinstance(item[0], int):  # (item ID, item type)
-              item_object = Gimp.Item.get_by_id(item[0])
-              if item_object is not None:
-                processed_items.add(tuple(item))
+
+            if len(item) == 2 and not isinstance(item[0], str):
+              if isinstance(item[0], int):  # (item ID, item type)
+                item_object = Gimp.Item.get_by_id(item[0])
+                if item_object is not None:
+                  processed_items.add((item_object, item[1]))
+              else:  # (item, item type)
+                if item[0].is_valid():
+                  processed_items.add(tuple(item))
             else:
               if len(item) == 3:
                 item_type = item[2]
@@ -152,21 +156,24 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
               else:
                 item_type = None
                 item_class_name_and_path = item
-              
+
               item_object = pg.pdbutils.get_item_from_image_and_item_path(
                 image, *item_class_name_and_path)
-              
+
               if item_object is not None:
                 if item_type is None:
-                  processed_items.add(item_object.get_id())
+                  processed_items.add(item_object)
                 else:
-                  processed_items.add((item_object.get_id(), item_type))
-          else:
+                  processed_items.add((item_object, item_type))
+          elif isinstance(item, int):
             item_object = Gimp.Item.get_by_id(item)
             if item_object is not None:
+              processed_items.add(item_object)
+          else:
+            if item is not None:
               processed_items.add(item)
         
-        value[image_id] = processed_items
+        value[image] = processed_items
     else:
       value = raw_value
     
@@ -176,37 +183,38 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
     raw_value = {}
     
     if source_type == 'session':
-      for image_id, item_ids in value.items():
-        raw_value[image_id] = list(
-          item_id if isinstance(item_id, int) else list(item_id) for item_id in item_ids)
+      for image, items in value.items():
+        raw_value[image.get_id()] = list(
+          [item[0].get_id(), item[1]] if isinstance(item, (list, tuple)) else item.get_id()
+          for item in items)
     else:
-      for image_id, item_ids in value.items():
-        image = Gimp.Image.get_by_id(image_id)
-        
-        if image is None or image.get_file() is None or image.get_file().get_path() is None:
+      for image, items in value.items():
+        if (image is None
+            or not image.is_valid()
+            or image.get_file() is None or image.get_file().get_path() is None):
           continue
         
         image_filepath = image.get_file().get_path()
 
         raw_value[image_filepath] = []
         
-        for item_id in item_ids:
-          if isinstance(item_id, (list, tuple)):
-            if len(item_id) != 2:
+        for item in items:
+          if isinstance(item, (list, tuple)):
+            if len(item) != 2:
               raise ValueError(
                 'list-likes representing items must contain exactly 2 elements'
-                f' (has {len(item_id)})')
+                f' (has {len(item)})')
             
-            item = Gimp.Item.get_by_id(item_id[0])
-            item_type = item_id[1]
+            item_object = item[0]
+            item_type = item[1]
           else:
-            item = Gimp.Item.get_by_id(item_id)
+            item_object = item
             item_type = None
           
-          if item is None:
+          if item_object is None or not item_object.is_valid():
             continue
           
-          item_as_path = pg.pdbutils.get_item_as_path(item, include_image=False)
+          item_as_path = pg.pdbutils.get_item_as_path(item_object, include_image=False)
           
           if item_as_path is not None:
             if item_type is None:
