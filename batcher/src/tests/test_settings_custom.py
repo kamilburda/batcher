@@ -237,26 +237,76 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
           self.assertIn(item, actual_dict['value'][key])
 
 
-class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
+class TestImagesAndDirectoriesSetting(unittest.TestCase):
   
   def setUp(self):
-    self.setting = settings_custom.ImageIdsAndDirectoriesSetting(
-      'image_ids_and_directories', default_value={})
-    
     self.image_ids_and_filepaths = [
-      (0, None), (1, 'C:\\image.png'), (2, '/test/test.jpg'),
-      (4, '/test/another_test.gif')]
+      (0, None), (1, 'image.png'), (2, 'test.jpg'),
+      (4, 'another_test.gif')]
     self.image_list = self._create_image_list(self.image_ids_and_filepaths)
-    self.image_ids_and_directories = (
-      self._create_image_ids_and_directories(self.image_list))
+    self.images_and_directories = self._create_images_and_directories(self.image_list)
+
+    self.setting = settings_custom.ImagesAndDirectoriesSetting('images_and_directories')
+    self.setting.set_value(self.images_and_directories)
+
+  def test_update_images_and_dirpaths_add_new_images(self):
+    self.image_list.extend(
+      self._create_image_list([(5, 'new_image.png'), (6, None)]))
     
-    self.setting.set_value(self.image_ids_and_directories)
+    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
+      self.setting.update_images_and_dirpaths()
+    
+    self.assertEqual(
+      self.setting.value, self._create_images_and_directories(self.image_list))
   
+  def test_update_images_and_dirpaths_remove_closed_images(self):
+    self.image_list.pop(1)
+
+    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
+      self.setting.update_images_and_dirpaths()
+    
+    self.assertEqual(
+      self.setting.value, self._create_images_and_directories(self.image_list))
+  
+  def test_update_directory(self):
+    self.setting.update_dirpath(self.image_list[1], 'test_directory')
+    self.assertEqual(self.setting.value[self.image_list[1]], 'test_directory')
+  
+  def test_value_setitem_does_not_change_setting_value(self):
+    image_to_test = self.image_list[1]
+    self.setting.value[image_to_test] = 'test_directory'
+    self.assertNotEqual(self.setting.value[image_to_test], 'test_directory')
+    self.assertEqual(
+      self.setting.value[image_to_test],
+      self.images_and_directories[image_to_test])
+
+  def test_set_value_from_image_ids(self):
+    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+      temp_mock_gimp_module_src.Image.get_by_id.side_effect = self.image_list
+
+      self.setting.set_value({0: 'dirpath1', 1: 'dirpath2'})
+
+    self.assertDictEqual(
+      self.setting.value,
+      {self.image_list[0]: 'dirpath1', self.image_list[1]: 'dirpath2'})
+
+  def test_set_value_from_image_paths(self):
+    with mock.patch(
+          f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      temp_mock_gimp_module.list_images.side_effect = [[self.image_list[1]], [self.image_list[2]]]
+
+      self.setting.set_value(
+        {os.path.abspath('image.png'): 'dirpath1', os.path.abspath('test.jpg'): 'dirpath2'})
+
+    self.assertDictEqual(
+      self.setting.value,
+      {self.image_list[1]: 'dirpath1', self.image_list[2]: 'dirpath2'})
+
   def get_image_list(self):
     # `self.image_list` is wrapped into a method so that `mock.patch.object` can
     # be called on it.
     return self.image_list
-  
+
   @staticmethod
   def _create_image_list(image_ids_and_filepaths):
     return [
@@ -264,44 +314,9 @@ class TestImageIdsAndDirectoriesSetting(unittest.TestCase):
       for image_id, filepath in image_ids_and_filepaths]
 
   @staticmethod
-  def _create_image_ids_and_directories(image_list):
-    image_ids_and_directories = {}
+  def _create_images_and_directories(image_list):
+    images_and_directories = {}
     for image in image_list:
-      image_ids_and_directories[image.id_] = (
+      images_and_directories[image] = (
         os.path.dirname(image.get_file().get_path()) if image.get_file() is not None else None)
-    return image_ids_and_directories
-  
-  def test_update_image_ids_and_dirpaths_add_new_images(self):
-    self.image_list.extend(
-      self._create_image_list([(5, '/test/new_image.png'), (6, None)]))
-    
-    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
-      self.setting.update_image_ids_and_dirpaths()
-    
-    self.assertEqual(
-      self.setting.value, self._create_image_ids_and_directories(self.image_list))
-  
-  def test_update_image_ids_and_dirpaths_remove_closed_images(self):
-    self.image_list.pop(1)
-
-    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
-      self.setting.update_image_ids_and_dirpaths()
-    
-    self.assertEqual(
-      self.setting.value, self._create_image_ids_and_directories(self.image_list))
-  
-  def test_update_directory(self):
-    self.setting.update_dirpath(1, 'test_directory')
-    self.assertEqual(self.setting.value[1], 'test_directory')
-  
-  def test_update_directory_invalid_image_id(self):
-    with self.assertRaises(KeyError):
-      self.setting.update_dirpath(-1, 'test_directory')
-  
-  def test_value_setitem_does_not_change_setting_value(self):
-    image_id_to_test = 1
-    self.setting.value[image_id_to_test] = 'test_directory'
-    self.assertNotEqual(self.setting.value[image_id_to_test], 'test_directory')
-    self.assertEqual(
-      self.setting.value[image_id_to_test],
-      self.image_ids_and_directories[image_id_to_test])
+    return images_and_directories

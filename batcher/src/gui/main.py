@@ -124,7 +124,7 @@ def _set_settings(func):
   return func_wrapper
 
 
-def _setup_image_ids_and_directories_and_initial_directory(
+def _setup_images_and_directories_and_initial_directory(
       settings, current_directory_setting, current_image):
   """Sets up the initial directory path for the current image.
 
@@ -143,12 +143,12 @@ def _setup_image_ids_and_directories_and_initial_directory(
     persistent source.
     Directory 4. is set upon the instantiation of ``'main/output_directory'``.
   """
-  settings['gui/image_ids_and_directories'].update_image_ids_and_dirpaths()
+  settings['gui/images_and_directories'].update_images_and_dirpaths()
   
   update_performed = _update_directory(
     current_directory_setting,
     current_image,
-    settings['gui/image_ids_and_directories'].value[current_image.get_id()])
+    settings['gui/images_and_directories'].value[current_image])
   
   if not update_performed:
     current_directory_setting.set_value(settings['main/output_directory'].value)
@@ -176,15 +176,14 @@ def _update_directory(setting, current_image, current_image_dirpath):
 
 
 def _setup_output_directory_changed(settings, current_image):
-  def on_output_directory_changed(
-        output_directory, image_ids_and_directories, current_image_id):
-    image_ids_and_directories.update_dirpath(current_image_id, output_directory.value)
+  def on_output_directory_changed(output_directory, images_and_directories, current_image_):
+    images_and_directories.update_dirpath(current_image_, output_directory.value)
   
   settings['main/output_directory'].connect_event(
     'value-changed',
     on_output_directory_changed,
-    settings['gui/image_ids_and_directories'],
-    current_image.get_id())
+    settings['gui/images_and_directories'],
+    current_image)
 
 
 class ExportLayersDialog:
@@ -273,7 +272,7 @@ class ExportLayersDialog:
     if pg.setting.Persistor.FAIL in load_result.statuses_per_source.values():
       messages_.display_message(load_messages, Gtk.MessageType.WARNING)
     
-    _setup_image_ids_and_directories_and_initial_directory(
+    _setup_images_and_directories_and_initial_directory(
       self._settings, self._settings['gui/current_directory'], self._image)
     _setup_output_directory_changed(self._settings, self._image)
   

@@ -233,62 +233,50 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         pg.setting.value_to_str_prefix(value) + self.error_messages['value_must_be_dict'])
 
 
-class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
+class ImagesAndDirectoriesSetting(pg.setting.Setting):
   """Class for settings the list of currently opened images and their import
   directory paths.
   
-  The setting value is a dictionary of ``(image ID, import directory path)``
+  The setting value is a dictionary of ``(Gimp.Image, import directory path)``
   pairs. The import directory path is ``None`` if the image does not have any.
   
-  This setting cannot be registered to the PDB as no corresponding PDB type
-  exists.
-  
-  Default value: ``{}``
+  Default value: `collections.defaultdict(lambda: None)`
   """
   
-  _DEFAULT_DEFAULT_VALUE = {}
+  _DEFAULT_DEFAULT_VALUE = lambda self: collections.defaultdict(pg.utils.return_none_func)
   
   @property
   def value(self):
-    # Return a copy to prevent modifying the dictionary indirectly by assigning
-    # to individual items (`setting.value[image.get_id()] = dirpath`).
+    """The setting value.
+
+    A copy is returned to prevent modifying the dictionary indirectly by
+    assigning  to individual items.
+    """
     return dict(self._value)
   
-  def update_image_ids_and_dirpaths(self):
-    """Removes all (image ID, import directory path) pairs for images no longer
-    opened in GIMP. Adds (image ID, import directory path) pairs for new images
+  def update_images_and_dirpaths(self):
+    """Removes all (image, import directory path) pairs for images no longer
+    opened in GIMP. Adds (image, import directory path) pairs for new images
     opened in GIMP.
     """
-    current_images, current_image_ids = self._get_currently_opened_images()
-    self._filter_images_no_longer_opened(current_image_ids)
+    current_images = Gimp.list_images()
+    self._filter_images_no_longer_opened(current_images)
     self._add_new_opened_images(current_images)
   
-  def update_dirpath(self, image_id, dirpath):
-    """Assigns a new directory path to the specified image ID.
+  def update_dirpath(self, image, dirpath):
+    """Assigns a new directory path to the specified image.
     
-    If the image ID does not exist in the setting, `KeyError` is raised.
+    If the image does not exist in the setting, `KeyError` is raised.
     """
-    if image_id not in self._value:
-      raise KeyError(image_id)
-    
-    self._value[image_id] = dirpath
+    self._value[image] = dirpath
   
-  @staticmethod
-  def _get_currently_opened_images():
-    current_images = Gimp.list_images()
-    current_image_ids = set([image.get_id() for image in current_images])
-    
-    return current_images, current_image_ids
-  
-  def _filter_images_no_longer_opened(self, current_image_ids):
-    self._value = {
-      image_id: self._value[image_id] for image_id in self._value
-      if image_id in current_image_ids}
+  def _filter_images_no_longer_opened(self, current_images):
+    self._value = {image: self._value[image] for image in self._value if image in current_images}
   
   def _add_new_opened_images(self, current_images):
     for image in current_images:
-      if image.get_id() not in self._value:
-        self._value[image.get_id()] = self._get_image_import_dirpath(image)
+      if image not in self._value:
+        self._value[image] = self._get_image_import_dirpath(image)
   
   @staticmethod
   def _get_image_import_dirpath(image):
@@ -296,3 +284,48 @@ class ImageIdsAndDirectoriesSetting(pg.setting.Setting):
       return os.path.dirname(image.get_file().get_path())
     else:
       return None
+
+  def _raw_to_value(self, raw_value):
+    value = raw_value
+
+    if isinstance(value, dict):
+      value = collections.defaultdict(pg.utils.return_none_func)
+
+      for image_key, dirpath in raw_value.items():
+        if isinstance(image_key, int):
+          image = Gimp.Image.get_by_id(image_key)
+        elif isinstance(image_key, str):
+          image = pg.pdbutils.find_image_by_filepath(image_key)
+        else:
+          image = image_key
+
+        if image is not None and image.is_valid():
+          value[image] = dirpath
+
+    return value
+
+  def _value_to_raw(self, value, source_type):
+    raw_value = {}
+
+    if source_type == 'session':
+      for image, dirpath in value.items():
+        if image is not None and image.is_valid():
+          raw_value[image.get_id()] = dirpath
+    else:
+      for image, dirpath in value.items():
+        if (image is None
+            or not image.is_valid()
+            or image.get_file() is None or image.get_file().get_path() is None):
+          continue
+
+        raw_value[image.get_file().get_path()] = dirpath
+
+    return raw_value
+
+  def _init_error_messages(self):
+    self.error_messages['value_must_be_dict'] = _('Value must be a dictionary.')
+
+  def _validate(self, value):
+    if not isinstance(value, dict):
+      raise pg.setting.SettingValueError(
+        pg.setting.value_to_str_prefix(value) + self.error_messages['value_must_be_dict'])

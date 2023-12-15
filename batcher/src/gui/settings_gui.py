@@ -83,11 +83,8 @@ def create_gui_settings():
       'name': 'image_preview_displayed_layers',
     },
     {
-      'type': 'image_ids_and_directories',
-      'name': 'image_ids_and_directories',
-      'default_value': {},
-      'tags': ['ignore_reset'],
-      'setting_sources': ['session'],
+      'type': 'images_and_directories',
+      'name': 'images_and_directories',
     },
     {
       # Needs to be string type to avoid strict directory validation.

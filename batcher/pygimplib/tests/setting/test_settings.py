@@ -177,7 +177,7 @@ class TestSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, 'png')
   
   def test_reset_with_container_as_default_value(self):
-    setting = stubs_setting.StubSetting('image_ids_and_directories', default_value={})
+    setting = stubs_setting.StubSetting('images_and_directories', default_value={})
     setting.value[1] = 'image_directory'
     
     setting.reset()
