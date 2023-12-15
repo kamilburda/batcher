@@ -195,8 +195,9 @@ class ItemTree(metaclass=abc.ABCMeta):
   Each item in the tree is an `Item` instance. Each item contains `Gimp.Item`
   attributes and additional derived attributes.
 
-  Items can be directly accessed via their ID or name. Both ID and name are
-  unique in the entire tree (GIMP readily ensures that item names are unique).
+  Items can be directly accessed via their ID, name or the underlying
+  `Gimp.Item` instance. Both ID and name are unique in the entire tree (GIMP
+  readily ensures that item names are unique).
 
   Item groups (e.g. layer groups) are inserted twice in the tree - as folders
   and as items. Parents of items are always folders.
@@ -464,7 +465,7 @@ class ItemTree(metaclass=abc.ABCMeta):
           item_tree.insert(0, child_item)
       else:
         self._itemtree[item.raw.get_id()] = item
-        
+
         self._itemtree_all_types[item.raw] = item
         self._itemtree_all_types[item.raw.get_id()] = item
         self._itemtree_all_types[item.orig_name] = item
