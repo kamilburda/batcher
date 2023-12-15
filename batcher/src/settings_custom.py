@@ -91,12 +91,12 @@ class ColorTagSetting(pg.setting.EnumSetting):
 
 class ImagesAndGimpItemsSetting(pg.setting.Setting):
   """Class for settings representing a mapping of
-  ``(GIMP image ID, GIMP item IDs)`` pairs.
+  ``(GIMP image, GIMP items)`` pairs.
   
   The mapping is implemented as `collections.defaultdict(set)`.
   
-  A GIMP item ID can be represented as an integer or an ``(ID, FOLDER_KEY)``
-  tuple, where ``FOLDER_KEY`` is a string literal defined in
+  A GIMP item can be represented as a `Gimp.Item` instance or a ``(Gimp.Item,
+  FOLDER_KEY)`` tuple, where ``FOLDER_KEY`` is a string literal defined in
   `pygimplib.itemtree`.
   
   When storing this setting to a persistent source, images are stored as file
