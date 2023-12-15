@@ -229,16 +229,21 @@ class ItemTree(metaclass=abc.ABCMeta):
     rules.
     """
     
-    # Contains all items in the item tree (including item groups).
-    # key: ID of `Item.raw` or (ID of `Item.raw`, `FOLDER_KEY`) in case of folders
+    # Contains all items, including groups.
+    # key: `Item.raw` or (`Item.raw`, `FOLDER_KEY`) in case of folders
     # value: `Item` instance
     self._itemtree = {}
-    
-    # key:
-    #  `Item.orig_name` (derived from `Item.raw.get_name()`)
-    #   or (ID of `Item.raw`, `FOLDER_KEY`) in case of folders
+
+    # Contains all items, including groups, with all supported types (object, ID, string).
+    # key: One of the following:
+    #  * `Item.raw`
+    #  * (`Item.raw`, `FOLDER_KEY`)
+    #  * `Item.raw.get_id()
+    #  * (`Item.raw.get_id()`, `FOLDER_KEY`)
+    #  * `Item.orig_name`
+    #  * (`Item.orig_name`, `FOLDER_KEY`)
     # value: `Item` instance
-    self._itemtree_names = {}
+    self._itemtree_all_types = {}
     
     self._build_tree()
   
@@ -252,30 +257,32 @@ class ItemTree(metaclass=abc.ABCMeta):
     """Optional name of the item tree, serving as a string identifier."""
     return self._name
   
-  def __getitem__(self, id_or_name: Union[int, str, Tuple[Union[int, str], str]]) -> Item:
-    """Returns an `Item` object by its ID or original name.
+  def __getitem__(
+        self, key: Union[int, str, Gimp.Item, Tuple[Union[int, str, Gimp.Item], str]],
+  ) -> Item:
+    """Returns an `Item` instance using a corresponding `Gimp.Item` instance, ID
+     or original name.
 
     An item's ID is the return value of ``Item.raw.get_id()``. An item's
     original name is the `orig_name` property.
     
-    To access an item group as a folder, pass a tuple ``(ID or name,
-    'folder')``. For example:
+    To access an item group as a folder, pass a tuple ``(key, 'folder')``.
+    For example:
 
         item_tree['Frames', 'folder']
     """
-    try:
-      return self._itemtree[id_or_name]
-    except KeyError:
-      return self._itemtree_names[id_or_name]
+    return self._itemtree_all_types[key]
   
-  def __contains__(self, id_or_name: Union[int, str, Tuple[Union[int, str], str]]) -> bool:
-    """Returns ``True`` if an `Item` object is in the item tree, regardless of
+  def __contains__(
+        self, key: Union[int, str, Gimp.Item, Tuple[Union[int, str, Gimp.Item], str]],
+  ) -> bool:
+    """Returns ``True`` if an `Item` instance is in the item tree, regardless of
     filters, ``False`` otherwise.
     
-    The `Item` object is specified by its ID as obtained via
-    ``Item.raw.get_id()`` or its `orig_name` property.
+    ``key`` can be a `Gimp.Item` instance, ID (obtained via
+    ``Item.raw.get_id()``) or original name (obtained via ``Item.orig_name``).
     """
-    return id_or_name in self._itemtree or id_or_name in self._itemtree_names
+    return key in self._itemtree_all_types
   
   def __len__(self) -> int:
     """Returns the number of items in the tree.
@@ -433,7 +440,10 @@ class ItemTree(metaclass=abc.ABCMeta):
       
       if item.type == TYPE_FOLDER:
         self._itemtree[item.raw.get_id(), FOLDER_KEY] = item
-        self._itemtree_names[item.orig_name, FOLDER_KEY] = item
+
+        self._itemtree_all_types[item.raw, FOLDER_KEY] = item
+        self._itemtree_all_types[item.raw.get_id(), FOLDER_KEY] = item
+        self._itemtree_all_types[item.orig_name, FOLDER_KEY] = item
         
         parents_for_child = list(item.parents)
         parents_for_child.append(item)
@@ -454,7 +464,10 @@ class ItemTree(metaclass=abc.ABCMeta):
           item_tree.insert(0, child_item)
       else:
         self._itemtree[item.raw.get_id()] = item
-        self._itemtree_names[item.orig_name] = item
+        
+        self._itemtree_all_types[item.raw] = item
+        self._itemtree_all_types[item.raw.get_id()] = item
+        self._itemtree_all_types[item.orig_name] = item
     
     for i in range(1, len(item_list) - 1):
       # We break the convention here and access private attributes from `Item`.

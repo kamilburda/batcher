@@ -80,6 +80,26 @@ class TestLayerTree(unittest.TestCase):
       ('Overlay', self.FOLDER, [], []),
       ('Overlay', self.GROUP, [], []),
     ]
+
+  def test_getitem(self):
+    item = next(self.item_tree.iter(with_folders=False))
+
+    self.assertEqual(self.item_tree[item.raw], item)
+    self.assertEqual(self.item_tree[item.raw.get_id()], item)
+    self.assertEqual(self.item_tree[item.orig_name], item)
+
+    folder_item = next(self.item_tree.iter(with_folders=True))
+
+    self.assertEqual(self.item_tree[folder_item.raw, self.FOLDER_KEY], folder_item)
+    self.assertEqual(self.item_tree[folder_item.raw.get_id(), self.FOLDER_KEY], folder_item)
+    self.assertEqual(self.item_tree[folder_item.orig_name, self.FOLDER_KEY], folder_item)
+
+  def test_contains(self):
+    item = next(self.item_tree.iter())
+
+    self.assertIn(item.raw, self.item_tree)
+    self.assertIn(item.raw.get_id(), self.item_tree)
+    self.assertIn(item.orig_name, self.item_tree)
   
   def test_item_attributes(self):
     for item, properties in zip(
