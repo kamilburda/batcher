@@ -165,20 +165,20 @@ class ImagePreview(preview_base_.Preview):
       and allocation.width > self._preview_pixbuf.get_width()
       and allocation.height > self._preview_pixbuf.get_height())
   
-  def update_item(self, raw_item_id: Optional[int] = None):
-    if raw_item_id is None:
+  def update_item(self, raw_item: Optional[Gimp.Item] = None):
+    if raw_item is not None and raw_item.is_valid():
+      should_update = raw_item in self._batcher.item_tree
+    else:
       if (self.item is not None
           and self._batcher.item_tree is not None
-          and self.item.raw.get_id() in self._batcher.item_tree):
-        raw_item_id = self.item.raw.get_id()
+          and self.item.raw in self._batcher.item_tree):
+        raw_item = self.item.raw
         should_update = True
       else:
         should_update = False
-    else:
-      should_update = raw_item_id in self._batcher.item_tree
     
     if should_update:
-      item = self._batcher.item_tree[raw_item_id]
+      item = self._batcher.item_tree[raw_item]
       if self._batcher.item_tree.filter.is_match(item):
         self.item = item
         self._set_item_name_label(self.item.name)

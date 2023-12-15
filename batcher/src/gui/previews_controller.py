@@ -307,19 +307,19 @@ class PreviewsController:
     setting_value = self._settings['gui/image_preview_displayed_layers'].value[self._image]
     
     if not setting_value:
-      raw_item_id_to_display = None
+      raw_item_to_display = None
     else:
-      raw_item_id_to_display = list(setting_value)[0].get_id()
+      raw_item_to_display = list(setting_value)[0]
 
     selected_layers_in_image = self._image.list_selected_layers()
 
-    if (raw_item_id_to_display is None
+    if (raw_item_to_display is None
         and not self._settings['main/selected_layers'].value[self._image]
         and selected_layers_in_image):
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items(selected_layers_in_image)
     else:
-      self._image_preview.update_item(raw_item_id_to_display)
+      self._image_preview.update_item(raw_item_to_display)
       self._image_preview.update()
     
     self._is_initial_selection_set = True
