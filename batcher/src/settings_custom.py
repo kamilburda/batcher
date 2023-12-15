@@ -264,10 +264,7 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
     self._add_new_opened_images(current_images)
   
   def update_dirpath(self, image, dirpath):
-    """Assigns a new directory path to the specified image.
-    
-    If the image does not exist in the setting, `KeyError` is raised.
-    """
+    """Assigns a new directory path to the specified image."""
     self._value[image] = dirpath
   
   def _filter_images_no_longer_opened(self, current_images):
