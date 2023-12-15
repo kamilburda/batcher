@@ -92,3 +92,20 @@ class TestPlaceholderSetting(unittest.TestCase):
   def test_get_allowed_placeholders(
         self, test_case_suffix, placeholder_setting_type, expected_length):
     self.assertEqual(len(placeholder_setting_type.get_allowed_placeholders()), expected_length)
+
+
+class TestPlaceholderArraySetting(unittest.TestCase):
+
+  def test_to_dict(self):
+    setting = placeholders.PlaceholderDrawableArraySetting(
+      'drawables', element_type='layer')
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'drawables',
+        'type': 'placeholder_drawable_array',
+        'value': 'current_layer_for_array',
+        'element_type': 'layer',
+      }
+    )

@@ -148,11 +148,18 @@ class PlaceholderArraySetting(PlaceholderSetting):
   def __init__(self, name, element_type, **kwargs):
     super().__init__(name, **kwargs)
 
-    self._element_type = element_type
+    self._element_type = pg.setting.process_setting_type(element_type)
 
   @property
-  def element_type(self):
+  def element_type(self) -> Type[pg.setting.Setting]:
     return self._element_type
+
+  def to_dict(self, *args, **kwargs):
+    settings_dict = super().to_dict(*args, **kwargs)
+
+    settings_dict['element_type'] = pg.setting.SETTING_TYPES[self._element_type]
+
+    return settings_dict
 
 
 class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
