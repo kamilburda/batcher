@@ -34,7 +34,6 @@ def create_settings():
       },
       {
         'name': 'main',
-        'setting_attributes': {'setting_sources': ['session', 'persistent']},
       }
     ]
   })
@@ -65,7 +64,6 @@ def create_settings():
       'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       'display_name': _('Output directory'),
       'gui_type': None,
-      'tags': ['ignore_reset'],
     },
     {
       'type': 'filename_pattern',

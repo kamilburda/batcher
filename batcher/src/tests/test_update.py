@@ -29,7 +29,6 @@ class TestUpdate(unittest.TestCase):
       'groups': [
         {
           'name': 'main',
-          'setting_attributes': {'setting_sources': ['persistent']},
         }
       ]
     })
@@ -53,8 +52,6 @@ class TestUpdate(unittest.TestCase):
         'gui_type': None,
       },
     ])
-
-    pg.setting.GimpSessionSource._SESSION_DATA = {}
   
   def test_fresh_start_stores_current_version(self, *mocks):
     self.assertFalse(pg.setting.Persistor.get_default_setting_sources()['persistent'].has_data())

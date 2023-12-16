@@ -24,7 +24,6 @@ from ._sources_errors import *
 __all__ = [
   'Source',
   'GimpParasiteSource',
-  'GimpSessionSource',
   'JsonFileSource',
 ]
 
@@ -37,19 +36,10 @@ class Source(metaclass=abc.ABCMeta):
   
   _MAX_LENGTH_OF_OBJECT_AS_STRING_ON_ERROR_OUTPUT = 512
   
-  def __init__(self, source_name: str, source_type: str):
+  def __init__(self, source_name: str):
     self.source_name = source_name
     """A unique identifier to distinguish sources from different GIMP plug-ins
     or procedures within a GIMP plug-in."""
-
-    self.source_type = source_type
-    """String indicating how settings should be stored.
-    
-    If ``'persistent'``, this indicates that the setting source should store 
-    settings permanently. If ``'session'``, this indicates that the source 
-    should store settings within a single GIMP session (i.e. until the 
-    currently running GIMP instance is closed).
-    """
     
     self._settings_not_loaded = []
   
@@ -59,8 +49,7 @@ class Source(metaclass=abc.ABCMeta):
     loaded.
 
     "Not loaded" means that such settings or groups were not found in the
-    loaded data or their ``setting_sources`` attribute is not ``None`` and does
-    not contain `source_type`.
+    loaded data.
 
     This property is reset on each call to `read()`.
     """
@@ -83,8 +72,6 @@ class Source(metaclass=abc.ABCMeta):
     * The setting/group is not found in the source.
     * The setting/group or any of its parent groups contains ``'ignore_load'``
       in its ``tags`` attribute.
-    * The setting does not contain `source_type` in its ``setting_sources``
-      attribute.
     
     Raises:
       SourceNotFoundError:
@@ -252,26 +239,12 @@ class Source(metaclass=abc.ABCMeta):
     if self._IGNORE_LOAD_TAG in setting.tags:
       return False
     
-    if setting.setting_sources is not None and self.source_type not in setting.setting_sources:
-      self._settings_not_loaded.append(setting)
-      return False
-    
     return True
   
   def _should_group_be_loaded(self, group):
     return self._IGNORE_LOAD_TAG not in group.tags
   
-  def _should_dict_be_loaded(self, dict_):
-    setting_sources = dict_.get('setting_sources', None)
-    if setting_sources is not None and self.source_type not in setting_sources:
-      return False
-    
-    return True
-  
   def _add_setting_to_parent_group(self, dict_, path, matching_children):
-    if not self._should_dict_be_loaded(dict_):
-      return
-    
     parent_path = path.rsplit(utils_.SETTING_PATH_SEPARATOR, 1)[0]
     
     # If the assertion fails for some reason, then `matching_dicts` does not
@@ -324,8 +297,6 @@ class Source(metaclass=abc.ABCMeta):
     
     * The setting/group or any of its parent groups contains ``'ignore_save'``
       in its ``tags`` attribute.
-    * The setting does not contain `source_type` in its ``setting_sources``
-      attribute.
     
     Raises:
       SourceInvalidFormatError:
@@ -375,9 +346,9 @@ class Source(metaclass=abc.ABCMeta):
     
     if setting_dict is not None:
       # Overwrite the original setting dict
-      group_list[index] = setting.to_dict(source_type=self.source_type)
+      group_list[index] = setting.to_dict()
     else:
-      group_list.append(setting.to_dict(source_type=self.source_type))
+      group_list.append(setting.to_dict())
   
   def _group_to_data(self, group_list, group):
     if not self._should_group_be_saved(group):
@@ -412,9 +383,6 @@ class Source(metaclass=abc.ABCMeta):
   
   def _should_setting_be_saved(self, setting):
     if self._IGNORE_SAVE_TAG in setting.tags:
-      return False
-    
-    if setting.setting_sources is not None and self.source_type not in setting.setting_sources:
       return False
     
     return True
@@ -546,35 +514,6 @@ class Source(metaclass=abc.ABCMeta):
     pass
 
 
-# FIXME: Fix session source. For the fime being, the session source reads and
-#  writes nothing.
-class GimpSessionSource(Source):
-  """Class for reading and writing settings to a source that persists within a
-  single GIMP session.
-  """
-
-  _SESSION_DATA = {}
-
-  def __init__(self, source_name: str, source_type: str = 'session'):
-    super().__init__(source_name, source_type)
-  
-  def clear(self):
-    if self.source_name in self._SESSION_DATA:
-      del self._SESSION_DATA[self.source_name]
-  
-  def has_data(self):
-    return self.source_name in self._SESSION_DATA and self._SESSION_DATA[self.source_name]
-  
-  def read_data_from_source(self):
-    if self.source_name in self._SESSION_DATA:
-      return self._SESSION_DATA[self.source_name]
-    else:
-      return None
-  
-  def write_data_to_source(self, data):
-    self._SESSION_DATA[self.source_name] = data
-
-
 class GimpParasiteSource(Source):
   """Class reading and writing settings to a persistent source.
 
@@ -584,8 +523,8 @@ class GimpParasiteSource(Source):
   The ``parasiterc`` file maintained by GIMP is used as the persistent source.
   """
   
-  def __init__(self, source_name: str, source_type: str = 'persistent'):
-    super().__init__(source_name, source_type)
+  def __init__(self, source_name: str):
+    super().__init__(source_name)
 
     self._parasite_filepath = os.path.join(Gimp.directory(), 'parasiterc')
   
@@ -631,8 +570,8 @@ class JsonFileSource(Source):
   chosen by the user.
   """
   
-  def __init__(self, source_name: str, filepath: str, source_type: str = 'persistent'):
-    super().__init__(source_name, source_type)
+  def __init__(self, source_name: str, filepath: str):
+    super().__init__(source_name)
     
     self._filepath = filepath
   

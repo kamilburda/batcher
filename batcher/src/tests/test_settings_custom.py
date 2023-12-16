@@ -137,30 +137,6 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         self.setting.set_value(
           {1: object()})
   
-  def test_to_dict_with_ids(self):
-    images, items = _get_images_and_items_with_ids()
-
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
-      temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
-      temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
-    
-      self.setting.set_value(
-        {1: [1, 3, (4, 'folder')], 2: [5, (6, 'folder'), [7, 'folder'], 8], 3: [9, 10]})
-
-      setting_dict = self.setting.to_dict(source_type='session')
-
-      self.assertEqual(setting_dict['name'], 'selected_layers')
-      self.assertEqual(setting_dict['type'], 'images_and_gimp_items')
-      self.assertEqual(list(setting_dict['value']), [1, 2])
-      # We need to compare 'value' field element by element since unordered sets
-      # are converted to lists, and we cannot guarantee stable order in sets.
-      self.assertSetEqual(
-        set(tuple(item) if isinstance(item, list) else item for item in setting_dict['value'][1]),
-        {1, 3, (4, 'folder')})
-      self.assertSetEqual(
-        set(tuple(item) if isinstance(item, list) else item for item in setting_dict['value'][2]),
-        {5, (7, 'folder')})
-  
   def test_to_dict_with_paths(self):
     images, items = _get_images_and_items_with_ids()
 

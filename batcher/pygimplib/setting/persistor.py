@@ -50,14 +50,9 @@ class Persistor:
     
     The dictionary must contain ``(key, setting source(s))`` pairs.
     
-    The key is a string that identifies a group of sources. The key can be
-    specified in `setting.Setting` instances within ``setting_sources``
-    to indicate which groups of sources the setting can be read from or written
-    to. For example, if the ``setting_sources`` attribute of a setting contains
-    ``['persistent']``, then only setting sources under the ``'persistent'`` key
-    will be considered and other sources will be ignored. This is useful if you
-    need to e.g. save settings to a different file while still ignoring settings
-    not containing ``'persistent'``.
+    The key is a string that identifies a group of sources to load settings
+    from/save settings to. This way, you can e.g. use specific subsets of
+    sources when loading/saving settings at a certain point in your application.
 
     If ``sources`` is ``None``, there will be no default setting sources.
     """
@@ -83,7 +78,7 @@ class Persistor:
     """Loads values from the specified settings or groups, or creates new
     settings within the specified groups if they do not exist.
     
-    The order of setting sources in ``settings_or_groups`` indicates the
+    The order of setting sources in ``setting_sources`` indicates the
     preference of the sources, beginning with the first source. If not all
     settings could be found in the first source, the second source is read to
     assign values to the remaining settings. This continues until all sources
@@ -417,10 +412,7 @@ Args:
     * ``NO_SETTINGS`` - Used when the ``settings_or_groups`` parameter is empty.
   settings_not_loaded
     List of settings and groups that were not loaded when calling 
-    `Persistor.load()`. These settings were not found in any setting source 
-    or they were skipped if their ``setting_sources`` attribute is not 
-    ``None`` and does not contain the key identifying the group of sources (
-    see `set_default_setting_sources()` for more information on the key.). 
+    `Persistor.load()`. These settings were not found in any setting source. 
     For `Persistor.save()`, this attribute is always empty.
   statuses_per_source
     ``status`` values for each setting source passed to `Persistor.load()` or 

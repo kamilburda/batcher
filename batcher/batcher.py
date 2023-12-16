@@ -70,8 +70,7 @@ def plug_in_batch_export_layers_with_config(
   
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
 
-  setting_source = pg.setting.JsonFileSource(
-    pg.config.SOURCE_NAME, config_filepath, source_type='persistent')
+  setting_source = pg.setting.JsonFileSource(pg.config.SOURCE_NAME, config_filepath)
   
   status, _unused = update.update(
     SETTINGS, handle_invalid='terminate', sources={'persistent': setting_source})

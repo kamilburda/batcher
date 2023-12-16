@@ -103,11 +103,8 @@ def _set_settings(func):
     try:
       self._settings['main'].apply_gui_values_to_settings()
       self._settings['gui'].apply_gui_values_to_settings()
-      
-      self._settings['gui/current_directory'].gui.update_setting_value()
-      
-      self._settings['main/output_directory'].set_value(
-        self._settings['gui/current_directory'].value)
+
+      self._settings['main/output_directory'].gui.update_setting_value()
       
       self._settings['main/selected_layers'].value[self._image] = (
         self._name_preview.selected_items)
@@ -125,7 +122,7 @@ def _set_settings(func):
 
 
 def _setup_images_and_directories_and_initial_directory(
-      settings, current_directory_setting, current_image):
+      settings, output_directory_setting, current_image):
   """Sets up the initial directory path for the current image.
 
   The path is set according to the following priority list:
@@ -139,19 +136,15 @@ def _setup_images_and_directories_and_initial_directory(
   
   Notes:
   
-    Directory 3. is set upon loading ``'main/output_directory'`` from a
-    persistent source.
+    Directory 3. is set upon loading ``'main/output_directory'``.
     Directory 4. is set upon the instantiation of ``'main/output_directory'``.
   """
   settings['gui/images_and_directories'].update_images_and_dirpaths()
   
-  update_performed = _update_directory(
-    current_directory_setting,
+  _update_directory(
+    output_directory_setting,
     current_image,
     settings['gui/images_and_directories'].value[current_image])
-  
-  if not update_performed:
-    current_directory_setting.set_value(settings['main/output_directory'].value)
 
 
 def _update_directory(setting, current_image, current_image_dirpath):
@@ -273,7 +266,7 @@ class ExportLayersDialog:
       messages_.display_message(load_messages, Gtk.MessageType.WARNING)
     
     _setup_images_and_directories_and_initial_directory(
-      self._settings, self._settings['gui/current_directory'], self._image)
+      self._settings, self._settings['main/output_directory'], self._image)
     _setup_output_directory_changed(self._settings, self._image)
   
   def _init_actions(self):
@@ -628,6 +621,8 @@ class ExportLayersDialog:
   
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui({
+      'main/output_directory': [
+        pg.setting.SETTING_GUI_TYPES.folder_chooser_widget, self._folder_chooser],
       'main/file_extension': [
         pg.setting.SETTING_GUI_TYPES.extended_entry, self._file_extension_entry],
       'main/layer_filename_pattern': [
@@ -649,8 +644,6 @@ class ExportLayersDialog:
         pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_previews],
       'gui/size/settings_vpane_position': [
         pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_chooser_and_actions],
-      'gui/current_directory': [
-        pg.setting.SETTING_GUI_TYPES.folder_chooser_widget, self._folder_chooser],
     })
   
   def _init_gui_previews(self):
@@ -675,8 +668,7 @@ class ExportLayersDialog:
     
     settings_to_ignore_for_reset = []
     for setting in self._settings.walk(lambda s: 'ignore_reset' not in s.tags):
-      if ((setting.setting_sources is not None and list(setting.setting_sources) == ['session'])
-          or setting.get_path('root').startswith('gui/size')):
+      if setting.get_path('root').startswith('gui/size'):
         setting.tags.add('ignore_reset')
         settings_to_ignore_for_reset.append(setting)
     
@@ -1045,8 +1037,8 @@ class ExportLayersDialog:
     if overwrite_chooser.overwrite_mode in self._settings['main/overwrite_mode'].items.values():
       self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
     
-    self._settings['main'].save(['session'])
-    self._settings['gui'].save(['session'])
+    self._settings['main'].save()
+    self._settings['gui'].save()
     
     if should_quit:
       Gtk.main_quit()

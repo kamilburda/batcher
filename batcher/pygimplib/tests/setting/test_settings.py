@@ -1082,18 +1082,6 @@ class TestImageSetting(unittest.TestCase):
         'type': 'image',
         'default_value': None,
       })
-  
-  def test_to_dict_with_session_source_type(self):
-    self.image.id_ = 2
-    
-    self.assertDictEqual(
-      self.setting.to_dict(source_type='session'),
-      {
-        'name': 'image',
-        'value': 2,
-        'type': 'image',
-        'default_value': 2,
-      })
 
 
 @mock.patch(
@@ -1224,16 +1212,6 @@ class TestGimpItemSetting(unittest.TestCase):
         'default_value': None,
       })
   
-  def test_to_dict_value_is_none_and_source_type_is_session(self):
-    self.assertDictEqual(
-      self.StubItemSetting('item', default_value=None).to_dict(source_type='session'),
-      {
-        'name': 'item',
-        'value': None,
-        'type': 'stub_item',
-        'default_value': None,
-      })
-  
   def test_to_dict_without_image_filename(self):
     self.image.set_file(None)
 
@@ -1256,18 +1234,6 @@ class TestGimpItemSetting(unittest.TestCase):
         'value': [os.path.abspath('image_filepath'), 'Layer', 'layer'],
         'type': 'stub_item',
         'default_value': [os.path.abspath('image_filepath'), 'Layer', 'layer'],
-      })
-  
-  def test_to_dict_via_item_id(self):
-    self.layer.id_ = 2
-    
-    self.assertDictEqual(
-      self.setting.to_dict(source_type='session'),
-      {
-        'name': 'item',
-        'value': 2,
-        'type': 'stub_item',
-        'default_value': 2,
       })
 
 
@@ -1332,19 +1298,6 @@ class TestLayerMaskSetting(unittest.TestCase):
       {
         'name': 'mask',
         'value': [os.path.abspath('image_filepath'), 'Layer', 'group/layer'],
-        'type': 'layer_mask',
-      })
-
-  def test_to_dict_with_session_source_type(self):
-    self.setting.set_value(self.mask)
-
-    setting_dict = self.setting.to_dict(source_type='session')
-
-    self.assertDictEqual(
-      setting_dict,
-      {
-        'name': 'mask',
-        'value': self.mask.get_id(),
         'type': 'layer_mask',
       })
 
@@ -1433,13 +1386,6 @@ class TestDisplaySetting(unittest.TestCase):
 
     self.assertDictEqual(
       self.setting.to_dict(), {'name': 'display', 'value': None, 'type': 'display'})
-
-  def test_to_dict_with_session_source_type(self):
-    self.setting.set_value(self.display)
-
-    self.assertDictEqual(
-      self.setting.to_dict(source_type='session'),
-      {'name': 'display', 'value': 2, 'type': 'display'})
 
 
 @mock.patch(

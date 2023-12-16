@@ -200,7 +200,7 @@ class TestSourceRead(unittest.TestCase):
 
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = stubs_sources.StubSource(self.source_name, 'persistent')
+    self.source = stubs_sources.StubSource(self.source_name)
     
     self.settings = _test_settings_for_read_write()
     
@@ -431,38 +431,6 @@ class TestSourceRead(unittest.TestCase):
     # The tag exists in a group in the code and any child in the source is ignored
     self.assertFalse(list(self.settings['main/constraints']))
   
-  def test_read_settings_with_specific_setting_sources(self):
-    settings = stubs_group.create_test_settings_with_specific_setting_sources()
-    
-    self.source.data = stubs_group.create_test_data_with_specific_setting_sources()
-    
-    self.source.data[0]['settings'][1]['settings'].append({
-      'name': 'tag',
-      'type': 'string',
-      'value': 'background',
-      'setting_sources': ['persistent'],
-    })
-    self.source.data[0]['settings'][1]['settings'].append({
-      'name': 'enabled',
-      'type': 'bool',
-      'value': False,
-      'setting_sources': ['session'],
-    })
-    
-    settings['main/file_extension'].set_value('jpg')
-    settings['advanced/flatten'].set_value(True)
-    settings['advanced/use_layer_size'].set_value(True)
-    
-    self.source.read([settings])
-    
-    self.assertEqual(settings['main/file_extension'].value, 'png')
-    # This setting is ignored
-    self.assertEqual(settings['advanced/flatten'].value, True)
-    self.assertEqual(settings['advanced/use_layer_size'].value, True)
-    self.assertEqual(self.source.settings_not_loaded, [settings['advanced/use_layer_size']])
-    self.assertIn('advanced/tag', settings)
-    self.assertNotIn('advanced/enabled', settings)
-  
   def test_read_order_of_settings_in_source_has_no_effect_if_settings_exist_in_memory(self):
     self.settings['main/procedures'].reorder('use_layer_size', 1)
     
@@ -612,7 +580,7 @@ class TestSourceWrite(unittest.TestCase):
   
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = stubs_sources.StubSource(self.source_name, 'persistent')
+    self.source = stubs_sources.StubSource(self.source_name)
     
     self.settings = _test_settings_for_read_write()
     
@@ -755,26 +723,9 @@ class TestSourceWrite(unittest.TestCase):
     # Child not present in data and the tag exists in the parent
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings']), 2)
   
-  def test_write_settings_with_specific_setting_sources(self):
-    settings = stubs_group.create_test_settings_with_specific_setting_sources()
-    
-    expected_data = stubs_group.create_test_data_with_specific_setting_sources()
-    
-    expected_data[0]['settings'][0]['settings'][0]['default_value'] = (
-      expected_data[0]['settings'][0]['settings'][0]['value'])
-    
-    # 'advanced/use_layer_size' has no matching setting source
-    del expected_data[0]['settings'][1]['settings'][1]
-    # 'advanced/flatten' is ignored
-    del expected_data[0]['settings'][1]['settings'][0]
-    
-    self.source.write([settings])
-    
-    self.assertEqual(self.source.data, expected_data)
-  
   def test_write_setting_is_completely_overridden_and_extra_attributes_in_data_are_removed(self):
     self.source.data = _test_data_for_read_write()
-    self.source.data[0]['settings'][0]['settings'][0]['setting_sources'] = ['session']
+    self.source.data[0]['settings'][0]['settings'][0]['pdb_type'] = [None]
     
     expected_data = _test_data_for_read_write()
     

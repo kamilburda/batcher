@@ -154,8 +154,8 @@ class PlaceholderArraySetting(PlaceholderSetting):
   def element_type(self) -> Type[pg.setting.Setting]:
     return self._element_type
 
-  def to_dict(self, *args, **kwargs):
-    settings_dict = super().to_dict(*args, **kwargs)
+  def to_dict(self):
+    settings_dict = super().to_dict()
 
     settings_dict['element_type'] = pg.setting.SETTING_TYPES[self._element_type]
 

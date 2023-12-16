@@ -99,11 +99,10 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
   FOLDER_KEY)`` tuple, where ``FOLDER_KEY`` is a string literal defined in
   `pygimplib.itemtree`.
   
-  When storing this setting to a persistent source, images are stored as file
-  paths and items are stored as ``(item class name, item path)`` or ``(item
-  class name, item path, FOLDER_KEY)`` tuples. ``Item class name`` and ``item
-  path`` are described in
-  `pygimplib.pdbutils.get_item_from_image_and_item_path()`.
+  When storing this setting to a source, images are stored as file paths and
+  items are stored as ``(item class name, item path)`` or ``(item class name,
+  item path, FOLDER_KEY)`` tuples. ``Item class name`` and ``item path`` are
+  described in `pygimplib.pdbutils.get_item_from_image_and_item_path()`.
   
   Default value: `collections.defaultdict(set)`
   """
@@ -179,49 +178,43 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
     
     return value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     raw_value = {}
-    
-    if source_type == 'session':
-      for image, items in value.items():
-        raw_value[image.get_id()] = list(
-          [item[0].get_id(), item[1]] if isinstance(item, (list, tuple)) else item.get_id()
-          for item in items)
-    else:
-      for image, items in value.items():
-        if (image is None
-            or not image.is_valid()
-            or image.get_file() is None or image.get_file().get_path() is None):
-          continue
-        
-        image_filepath = image.get_file().get_path()
 
-        raw_value[image_filepath] = []
-        
-        for item in items:
-          if isinstance(item, (list, tuple)):
-            if len(item) != 2:
-              raise ValueError(
-                'list-likes representing items must contain exactly 2 elements'
-                f' (has {len(item)})')
-            
-            item_object = item[0]
-            item_type = item[1]
+    for image, items in value.items():
+      if (image is None
+          or not image.is_valid()
+          or image.get_file() is None or image.get_file().get_path() is None):
+        continue
+
+      image_filepath = image.get_file().get_path()
+
+      raw_value[image_filepath] = []
+
+      for item in items:
+        if isinstance(item, (list, tuple)):
+          if len(item) != 2:
+            raise ValueError(
+              'list-likes representing items must contain exactly 2 elements'
+              f' (has {len(item)})')
+
+          item_object = item[0]
+          item_type = item[1]
+        else:
+          item_object = item
+          item_type = None
+
+        if item_object is None or not item_object.is_valid():
+          continue
+
+        item_as_path = pg.pdbutils.get_item_as_path(item_object, include_image=False)
+
+        if item_as_path is not None:
+          if item_type is None:
+            raw_value[image_filepath].append(item_as_path)
           else:
-            item_object = item
-            item_type = None
-          
-          if item_object is None or not item_object.is_valid():
-            continue
-          
-          item_as_path = pg.pdbutils.get_item_as_path(item_object, include_image=False)
-          
-          if item_as_path is not None:
-            if item_type is None:
-              raw_value[image_filepath].append(item_as_path)
-            else:
-              raw_value[image_filepath].append(item_as_path + [item_type])
-    
+            raw_value[image_filepath].append(item_as_path + [item_type])
+
     return raw_value
   
   def _init_error_messages(self):
@@ -301,21 +294,16 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
 
     return value
 
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     raw_value = {}
 
-    if source_type == 'session':
-      for image, dirpath in value.items():
-        if image is not None and image.is_valid():
-          raw_value[image.get_id()] = dirpath
-    else:
-      for image, dirpath in value.items():
-        if (image is None
-            or not image.is_valid()
-            or image.get_file() is None or image.get_file().get_path() is None):
-          continue
+    for image, dirpath in value.items():
+      if (image is None
+          or not image.is_valid()
+          or image.get_file() is None or image.get_file().get_path() is None):
+        continue
 
-        raw_value[image.get_file().get_path()] = dirpath
+      raw_value[image.get_file().get_path()] = dirpath
 
     return raw_value
 

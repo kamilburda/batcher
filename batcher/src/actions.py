@@ -196,7 +196,6 @@ def create(
     name=name,
     setting_attributes={
       'pdb_type': None,
-      'setting_sources': None,
     })
   
   _ACTIONS_AND_INITIAL_ACTION_DICTS[actions] = initial_actions
@@ -351,14 +350,12 @@ def _create_action(
     tags=tags,
     setting_attributes={
       'pdb_type': None,
-      'setting_sources': None,
     })
   
   arguments_group = pg.setting.Group(
     'arguments',
     setting_attributes={
       'pdb_type': None,
-      'setting_sources': None,
     })
   
   if arguments:
@@ -369,7 +366,6 @@ def _create_action(
       'type': 'string',
       'name': 'function',
       'default_value': function,
-      'setting_sources': None,
       'gui_type': None,
     },
     {

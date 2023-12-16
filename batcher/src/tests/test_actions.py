@@ -493,8 +493,6 @@ class TestLoadSaveActions(unittest.TestCase):
   def setUp(self):
     self.test_procedures = get_action_data(test_procedures)
     self.procedures = actions_.create('procedures')
-
-    pg.setting.GimpSessionSource._SESSION_DATA = {}
   
   @parameterized.parameterized.expand([
     ('', False),

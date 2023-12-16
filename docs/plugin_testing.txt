@@ -8,9 +8,9 @@
 # Export Layers Dialog
 
 Interactive
-* load settings from the session and persistent sources
-* save settings to the session and persistent sources
-* save settings to the session source if the processing is canceled or stopped prematurely
+* load settings
+* save settings
+* save settings if the processing is canceled or stopped prematurely
 * Save Settings
 * Reset Settings
 * Import Settings
@@ -18,11 +18,11 @@ Interactive
 
 Non-interactive
 * do not load settings
-* do not save settings to the session source
+* do not save settings
 
 Run-with-last-vals
-* load settings from the session and persistent sources
-* save settings to the session source at the end
+* load settings
+* do not save settings
 
 Layer names and filenames
 * valid and invalid characters in filenames and directory names
@@ -36,15 +36,9 @@ Image types
 
 # Export Layers Now Dialog
 
-Interactive
-* load settings from the session and persistent sources
-
-Non-interactive
-* same as Run-with-last-vals
-
-Run-with-last-vals
-* load settings from the session and persistent sources
-* save settings to the session and persistent sources at the end
+Any run mode
+* load settings
+* do not save settings
 
 
 # Settings
@@ -66,9 +60,7 @@ Basic settings
 
 Setting persistence
 * no setting source
-* persistent source only
-* session-persistent source only
-* both setting sources
+* persistent source
 
 Built-in actions
 * procedures

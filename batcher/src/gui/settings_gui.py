@@ -8,13 +8,9 @@ import pygimplib as pg
 
 
 def create_gui_settings():
-  gui_settings = pg.setting.Group(
-    name='gui',
-    setting_attributes={'setting_sources': ['session', 'persistent']})
+  gui_settings = pg.setting.Group(name='gui')
   
-  size_gui_settings = pg.setting.Group(
-    name='size',
-    setting_attributes={'setting_sources': ['session', 'persistent']})
+  size_gui_settings = pg.setting.Group(name='size')
   
   size_gui_settings.add([
     {
@@ -85,15 +81,6 @@ def create_gui_settings():
     {
       'type': 'images_and_directories',
       'name': 'images_and_directories',
-    },
-    {
-      # Needs to be string type to avoid strict directory validation.
-      'type': 'string',
-      'name': 'current_directory',
-      'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
-      'gui_type': None,
-      'tags': ['ignore_load'],
-      'setting_sources': ['session'],
     },
     size_gui_settings,
   ])

@@ -32,15 +32,14 @@ class TestPersistor(unittest.TestCase):
     mock_gimp_module.directory.return_value = 'gimp_directory'
 
     self.settings = stubs_group.create_test_settings()
-    # FIXME: This is a temporary fix until a proper session source is implemented.
-    self.session_source = sources_.GimpParasiteSource('plug-in-session', source_type='session')
-    self.persistent_source = sources_.GimpParasiteSource('plug-in-persistent')
+    self.source = stubs_sources.StubSource('plug-in')
+    self.source_2 = sources_.GimpParasiteSource('plug-in-2')
     
     self.sources_for_persistor = {
-      'session': self.session_source,
-      'persistent': self.persistent_source,
+      'persistent': self.source,
+      'persistent_2': self.source_2,
     }
-    self.session_source_for_persistor = {'session': self.session_source}
+    self.source_2_for_persistor = {'persistent_2': self.source_2}
     
     persistor_.Persistor.set_default_setting_sources(None)
     mock_gimp_module.parasites = {}
@@ -72,88 +71,84 @@ class TestPersistor(unittest.TestCase):
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_as_dict_of_lists(self, *mocks):
-    session_source = stubs_sources.StubSource('session', 'session')
+    another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.persistent_source)
-    self._spy_for_source(self.session_source)
-    self._spy_for_source(session_source)
+    self._spy_for_source(self.source)
+    self._spy_for_source(self.source_2)
+    self._spy_for_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources({
-      'session': [self.session_source, session_source],
-      'persistent': self.persistent_source,
+      'persistent': self.source,
+      'persistent_2': [self.source_2, another_source],
     })
     
     self._test_load_save(None)
-    
-    self.assertEqual(self.session_source.read.call_count, 1)
-    self.assertEqual(self.session_source.write.call_count, 1)
-    self.assertEqual(session_source.read.call_count, 0)
-    self.assertEqual(session_source.write.call_count, 1)
-    self.assertEqual(self.persistent_source.read.call_count, 0)
-    self.assertEqual(self.persistent_source.write.call_count, 1)
+
+    self.assertEqual(self.source.read.call_count, 1)
+    self.assertEqual(self.source.write.call_count, 1)
+    self.assertEqual(self.source_2.read.call_count, 0)
+    self.assertEqual(self.source_2.write.call_count, 1)
+    self.assertEqual(another_source.read.call_count, 0)
+    self.assertEqual(another_source.write.call_count, 1)
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_dict(self, *mocks):
-    session_source = stubs_sources.StubSource('', 'session')
+    another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.persistent_source)
-    self._spy_for_source(self.session_source)
-    self._spy_for_source(session_source)
-    
-    session_source_for_persistor = {'session': session_source}
+    self._spy_for_source(self.source)
+    self._spy_for_source(self.source_2)
+    self._spy_for_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
     
-    self._test_load_save(session_source_for_persistor)
+    self._test_load_save({'persistent_2': another_source})
     
-    self.assertEqual(session_source.read.call_count, 1)
-    self.assertEqual(session_source.write.call_count, 1)
-    self.assertEqual(self.session_source.read.call_count, 0)
-    self.assertEqual(self.session_source.write.call_count, 0)
-    self.assertEqual(self.persistent_source.read.call_count, 0)
-    self.assertEqual(self.persistent_source.write.call_count, 0)
+    self.assertEqual(another_source.read.call_count, 1)
+    self.assertEqual(another_source.write.call_count, 1)
+    self.assertEqual(self.source_2.read.call_count, 0)
+    self.assertEqual(self.source_2.write.call_count, 0)
+    self.assertEqual(self.source.read.call_count, 0)
+    self.assertEqual(self.source.write.call_count, 0)
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_dict_of_lists(self, *mocks):
-    session_source = stubs_sources.StubSource('', 'session')
+    another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.persistent_source)
-    self._spy_for_source(self.session_source)
-    self._spy_for_source(session_source)
-    
-    session_source_for_persistor = {'session': [session_source, self.session_source]}
+    self._spy_for_source(self.source)
+    self._spy_for_source(self.source_2)
+    self._spy_for_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
     
-    self._test_load_save(session_source_for_persistor)
+    self._test_load_save({'persistent_2': [another_source, self.source_2]})
     
-    self.assertEqual(session_source.read.call_count, 1)
-    self.assertEqual(session_source.write.call_count, 1)
-    self.assertEqual(self.session_source.read.call_count, 0)
-    self.assertEqual(self.session_source.write.call_count, 1)
-    self.assertEqual(self.persistent_source.read.call_count, 0)
-    self.assertEqual(self.persistent_source.write.call_count, 0)
+    self.assertEqual(another_source.read.call_count, 1)
+    self.assertEqual(another_source.write.call_count, 1)
+    self.assertEqual(self.source_2.read.call_count, 0)
+    self.assertEqual(self.source_2.write.call_count, 1)
+    self.assertEqual(self.source.read.call_count, 0)
+    self.assertEqual(self.source.write.call_count, 0)
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_list(self, *mocks):
-    self._spy_for_source(self.persistent_source)
-    self._spy_for_source(self.session_source)
+    self._spy_for_source(self.source)
+    self._spy_for_source(self.source_2)
     
-    sources_for_persistor = ['session', 'persistent']
+    sources_for_persistor = ['persistent', 'persistent_2']
     default_sources = {
-      'session': self.session_source,
-      'persistent': self.persistent_source,
+      'persistent': self.source,
+      'persistent_2': self.source_2,
     }
     
     persistor_.Persistor.set_default_setting_sources(default_sources)
     
     self._test_load_save(sources_for_persistor)
-    
-    self.assertEqual(self.session_source.read.call_count, 1)
-    self.assertEqual(self.session_source.write.call_count, 1)
-    # `read` should not be called as all settings have been found in `self.session_source`.
-    self.assertEqual(self.persistent_source.read.call_count, 0)
-    self.assertEqual(self.persistent_source.write.call_count, 1)
+
+    self.assertEqual(self.source.read.call_count, 1)
+    self.assertEqual(self.source.write.call_count, 1)
+    # `read` should not be called as all settings have been found in `self.source`.
+    self.assertEqual(self.source_2.read.call_count, 0)
+    self.assertEqual(self.source_2.write.call_count, 1)
   
   @staticmethod
   def _spy_for_source(source):
@@ -180,9 +175,9 @@ class TestPersistor(unittest.TestCase):
   def test_load_combine_settings_from_multiple_sources(self, *mocks):
     self.settings['file_extension'].set_value('png')
     self.settings['flatten'].set_value(True)
-    self.session_source.write([self.settings['file_extension']])
+    self.source.write([self.settings['file_extension']])
     self.settings['file_extension'].set_value('jpg')
-    self.persistent_source.write([self.settings['flatten'], self.settings['file_extension']])
+    self.source_2.write([self.settings['flatten'], self.settings['file_extension']])
     self.settings['file_extension'].set_value('gif')
     self.settings['flatten'].set_value(False)
     
@@ -200,17 +195,17 @@ class TestPersistor(unittest.TestCase):
     
     settings['main/file_extension'].set_value('png')
     settings['advanced/flatten'].set_value(True)
-    self.session_source.write(settings.walk())
+    self.source_2.write(settings.walk())
     settings['main/file_extension'].set_value('gif')
     settings['advanced/flatten'].set_value(False)
     
-    persistor_.Persistor.load([settings], self.session_source_for_persistor)
+    persistor_.Persistor.load([settings], self.source_2_for_persistor)
     
     self.assertEqual(settings['main/file_extension'].value, 'png')
     self.assertEqual(settings['advanced/flatten'].value, True)
   
   def test_load_empty_settings(self, *mocks):
-    result = persistor_.Persistor.load([], self.session_source_for_persistor)
+    result = persistor_.Persistor.load([], self.source_2_for_persistor)
     self.assertEqual(result.status, persistor_.Persistor.NO_SETTINGS)
   
   def test_load_no_default_source(self, *mocks):
@@ -218,37 +213,32 @@ class TestPersistor(unittest.TestCase):
     self.assertEqual(result.status, persistor_.Persistor.FAIL)
   
   def test_load_missing_default_source_from_list(self, *mocks):
-    persistor_.Persistor.set_default_setting_sources(self.session_source_for_persistor)
+    persistor_.Persistor.set_default_setting_sources(self.source_2_for_persistor)
     
     result = persistor_.Persistor.load([self.settings], ['persistent'])
     
     self.assertEqual(result.status, persistor_.Persistor.FAIL)
   
   def test_load_settings_source_not_found(self, *mocks):
-    result = persistor_.Persistor.load([self.settings], self.sources_for_persistor)
-    
+    result = persistor_.Persistor.load([self.settings], {'persistent_2': self.source_2})
+
     self.assertEqual(result.status, persistor_.Persistor.PARTIAL_SUCCESS)
     self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['persistent']],
-      persistor_.Persistor.SOURCE_NOT_FOUND)
-    self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['session']],
+      result.statuses_per_source[self.sources_for_persistor['persistent_2']],
       persistor_.Persistor.SOURCE_NOT_FOUND)
     self.assertTrue(bool(result.settings_not_loaded))
   
   def test_load_settings_not_found(self, *mocks):
-    self.session_source.write([self.settings['flatten']])
-    self.persistent_source.write([self.settings['file_extension'], self.settings['flatten']])
+    self.source_2.write([self.settings['flatten']])
+    self.source.write([self.settings['file_extension'], self.settings['flatten']])
     
     result = persistor_.Persistor.load(
       [self.settings['overwrite_mode']], self.sources_for_persistor)
     
     self.assertEqual(result.status, persistor_.Persistor.PARTIAL_SUCCESS)
     self.assertTrue(bool(result.settings_not_loaded))
-    self.assertListEqual(
-      self.session_source.settings_not_loaded, [self.settings['overwrite_mode']])
-    self.assertListEqual(
-      self.persistent_source.settings_not_loaded, [self.settings['overwrite_mode']])
+    self.assertListEqual(self.source_2.settings_not_loaded, [self.settings['overwrite_mode']])
+    self.assertListEqual(self.source.settings_not_loaded, [self.settings['overwrite_mode']])
   
   def test_load_child_settings_not_found_in_first_but_subsequent_sources(self, *mocks):
     settings = stubs_group.create_test_settings_hierarchical()
@@ -263,15 +253,15 @@ class TestPersistor(unittest.TestCase):
     ])
     
     settings['advanced'].add([arguments_settings])
-    
-    self.persistent_source.write([settings])
+
+    self.source_2.write([settings])
     
     arguments_group = settings['advanced/arguments']
     overwrite_mode_setting = settings['advanced/overwrite_mode']
     
     settings['advanced'].remove(['overwrite_mode', 'arguments'])
     
-    self.session_source.write([settings])
+    self.source.write([settings])
     
     settings['advanced'].add([overwrite_mode_setting, arguments_group])
     
@@ -279,61 +269,34 @@ class TestPersistor(unittest.TestCase):
     
     self.assertEqual(result.status, persistor_.Persistor.SUCCESS)
     self.assertListEqual(
-      self.session_source.settings_not_loaded,
+      self.source.settings_not_loaded,
       [settings['advanced/overwrite_mode'], settings['advanced/arguments/tag']])
-    self.assertFalse(self.persistent_source.settings_not_loaded)
-  
-  def test_load_do_not_load_settings_with_source_name_not_matching_specified_sources(
-        self, *mocks):
-    settings = stubs_group.create_test_settings_with_specific_setting_sources()
-
-    persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
-    
-    settings['main/file_extension'].set_value('jpg')
-    settings['advanced/flatten'].set_value(True)
-    settings['advanced/use_layer_size'].set_value(True)
-
-    self.persistent_source.write([settings])
-    self.session_source.write([settings])
-
-    settings['main/file_extension'].reset()
-    settings['advanced/use_layer_size'].reset()
-    
-    result = persistor_.Persistor.load([settings], ['session'])
-    
-    self.assertEqual(result.status, persistor_.Persistor.PARTIAL_SUCCESS)
-    self.assertEqual(result.settings_not_loaded, [settings['main/file_extension']])
-    self.assertEqual(settings['main/file_extension'].value, 'png')
-    self.assertEqual(settings['advanced/flatten'].value, True)
-    self.assertEqual(settings['advanced/use_layer_size'].value, True)
+    self.assertFalse(self.source_2.settings_not_loaded)
   
   def test_load_fail_for_one_source(self, *mocks):
     persistor_.Persistor.save([self.settings], self.sources_for_persistor)
     
-    self.session_source.read_data_from_source = mock.Mock(
-      wraps=self.session_source.read_data_from_source)
-    self.session_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source.read_data_from_source = mock.Mock(wraps=self.source.read_data_from_source)
+    self.source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
     result = persistor_.Persistor.load([self.settings], self.sources_for_persistor)
     
     self.assertEqual(result.status, persistor_.Persistor.PARTIAL_SUCCESS)
     self.assertEqual(
       result.statuses_per_source[self.sources_for_persistor['persistent']],
-      persistor_.Persistor.SUCCESS)
-    self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['session']],
       persistor_.Persistor.FAIL)
+    self.assertEqual(
+      result.statuses_per_source[self.sources_for_persistor['persistent_2']],
+      persistor_.Persistor.SUCCESS)
   
   def test_load_fail_for_all_sources(self, *mocks):
     persistor_.Persistor.save([self.settings], self.sources_for_persistor)
     
-    self.session_source.read_data_from_source = mock.Mock(
-      wraps=self.session_source.read_data_from_source)
-    self.session_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source_2.read_data_from_source = mock.Mock(wraps=self.source_2.read_data_from_source)
+    self.source_2.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
-    self.persistent_source.read_data_from_source = mock.Mock(
-      wraps=self.persistent_source.read_data_from_source)
-    self.persistent_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source.read_data_from_source = mock.Mock(wraps=self.source.read_data_from_source)
+    self.source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
     result = persistor_.Persistor.load([self.settings], self.sources_for_persistor)
     
@@ -342,11 +305,11 @@ class TestPersistor(unittest.TestCase):
       result.statuses_per_source[self.sources_for_persistor['persistent']],
       persistor_.Persistor.FAIL)
     self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['session']],
+      result.statuses_per_source[self.sources_for_persistor['persistent_2']],
       persistor_.Persistor.FAIL)
   
   def test_save_empty_settings(self, *mocks):
-    result = persistor_.Persistor.save([], self.session_source_for_persistor)
+    result = persistor_.Persistor.save([], self.source_2_for_persistor)
     self.assertEqual(result.status, persistor_.Persistor.NO_SETTINGS)
   
   def test_save_no_default_source(self, *mocks):
@@ -354,64 +317,15 @@ class TestPersistor(unittest.TestCase):
     self.assertEqual(result.status, persistor_.Persistor.FAIL)
   
   def test_save_missing_default_source_from_list(self, *mocks):
-    persistor_.Persistor.set_default_setting_sources(self.session_source_for_persistor)
+    persistor_.Persistor.set_default_setting_sources(self.source_2_for_persistor)
     
     result = persistor_.Persistor.save([self.settings], ['persistent'])
     
     self.assertEqual(result.status, persistor_.Persistor.FAIL)
   
-  def test_save_ignore_settings_with_source_name_not_matching_specified_sources(
-        self, *mocks):
-    settings = stubs_group.create_test_settings_with_specific_setting_sources()
-    
-    persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
-    
-    settings['main/file_extension'].set_value('jpg')
-    settings['advanced/flatten'].set_value(True)
-    settings['advanced/use_layer_size'].set_value(True)
-    
-    save_result = persistor_.Persistor.save([settings], ['session'])
-    
-    settings['main/file_extension'].reset()
-    settings['advanced/flatten'].reset()
-    settings['advanced/use_layer_size'].reset()
-    
-    load_result = persistor_.Persistor.load([settings], ['session'])
-    
-    self.assertEqual(save_result.status, persistor_.Persistor.SUCCESS)
-    self.assertEqual(load_result.status, persistor_.Persistor.PARTIAL_SUCCESS)
-    self.assertEqual(load_result.settings_not_loaded, [settings['main/file_extension']])
-    self.assertEqual(settings['main/file_extension'].value, 'png')
-    # This setting is ignored
-    self.assertEqual(settings['advanced/flatten'].value, False)
-    self.assertEqual(settings['advanced/use_layer_size'].value, True)
-    
-    settings['main/file_extension'].set_value('jpg')
-    
-    save_result = persistor_.Persistor.save([settings], ['persistent'])
-    
-    settings['main/file_extension'].reset()
-    settings['advanced/flatten'].reset()
-    settings['advanced/use_layer_size'].reset()
-    
-    load_result = persistor_.Persistor.load([settings], ['persistent'])
-    
-    self.assertEqual(save_result.status, persistor_.Persistor.SUCCESS)
-    self.assertEqual(load_result.status, persistor_.Persistor.PARTIAL_SUCCESS)
-    self.assertEqual(load_result.settings_not_loaded, [settings['advanced/use_layer_size']])
-    self.assertEqual(settings['main/file_extension'].value, 'jpg')
-    # This setting is ignored
-    self.assertEqual(settings['advanced/flatten'].value, False)
-    self.assertEqual(settings['advanced/use_layer_size'].value, False)
-    
-    self.assertFalse(settings['main/file_extension'].tags)
-    self.assertSetEqual(settings['advanced/flatten'].tags, {'ignore_load', 'ignore_save'})
-    self.assertFalse(settings['advanced/use_layer_size'].tags)
-  
   def test_save_fail_for_one_source(self, *mocks):
-    self.session_source.read_data_from_source = mock.Mock(
-      wraps=self.session_source.read_data_from_source)
-    self.session_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source_2.read_data_from_source = mock.Mock(wraps=self.source_2.read_data_from_source)
+    self.source_2.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
     result = persistor_.Persistor.save([self.settings], self.sources_for_persistor)
     
@@ -420,17 +334,15 @@ class TestPersistor(unittest.TestCase):
       result.statuses_per_source[self.sources_for_persistor['persistent']],
       persistor_.Persistor.SUCCESS)
     self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['session']],
+      result.statuses_per_source[self.sources_for_persistor['persistent_2']],
       persistor_.Persistor.FAIL)
   
   def test_save_fail_for_all_sources(self, *mocks):
-    self.session_source.read_data_from_source = mock.Mock(
-      wraps=self.session_source.read_data_from_source)
-    self.session_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source_2.read_data_from_source = mock.Mock(wraps=self.source_2.read_data_from_source)
+    self.source_2.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
-    self.persistent_source.read_data_from_source = mock.Mock(
-      wraps=self.persistent_source.read_data_from_source)
-    self.persistent_source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
+    self.source.read_data_from_source = mock.Mock(wraps=self.source.read_data_from_source)
+    self.source.read_data_from_source.side_effect = sources_.SourceInvalidFormatError
     
     result = persistor_.Persistor.save([self.settings], self.sources_for_persistor)
     
@@ -439,7 +351,7 @@ class TestPersistor(unittest.TestCase):
       result.statuses_per_source[self.sources_for_persistor['persistent']],
       persistor_.Persistor.FAIL)
     self.assertEqual(
-      result.statuses_per_source[self.sources_for_persistor['session']],
+      result.statuses_per_source[self.sources_for_persistor['persistent_2']],
       persistor_.Persistor.FAIL)
 
 
@@ -460,14 +372,13 @@ class TestLoadSaveFromSettingsAndGroups(unittest.TestCase):
   def setUp(self, mock_gimp_module):
     mock_gimp_module.directory.return_value = 'gimp_directory'
 
-    self.settings = stubs_group.create_test_settings_with_specific_setting_sources()
-    # FIXME: This is a temporary fix until a proper session source is implemented.
-    self.session_source = sources_.GimpParasiteSource('plug-in-session', source_type='session')
-    self.persistent_source = sources_.GimpParasiteSource('plug-in-persistent')
-    
+    self.settings = stubs_group.create_test_settings_for_persistor()
+
+    self.source = stubs_sources.StubSource('plug-in')
+    self.source_2 = sources_.GimpParasiteSource('plug-in-2')
     self.sources_for_persistor = {
-      'session': self.session_source,
-      'persistent': self.persistent_source,
+      'persistent': self.source,
+      'persistent_2': self.source_2,
     }
 
     persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
@@ -558,60 +469,54 @@ class TestLoadSaveEvents(unittest.TestCase):
 
     self.setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='png')
     self.flatten = settings_.BoolSetting('flatten', default_value=False)
-    # FIXME: This is a temporary fix until a proper session source is implemented.
-    self.session_source = sources_.GimpParasiteSource('plug-in-session', source_type='session')
+    self.source = sources_.GimpParasiteSource('plug-in')
     
-    self.session_source_dict = {'session': self.session_source}
+    self.source_dict = {'persistent': self.source}
 
     mock_gimp_module.parasites = {}
   
   def test_before_load_event(self, *mocks):
-    persistor_.Persistor.save([self.setting, self.flatten], self.session_source_dict)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict)
     self.setting.set_value('gif')
     
-    self.setting.connect_event(
-      'before-load', stubs_setting.on_file_extension_changed, self.flatten)
-    persistor_.Persistor.load([self.setting], self.session_source_dict)
+    self.setting.connect_event('before-load', stubs_setting.on_file_extension_changed, self.flatten)
+    persistor_.Persistor.load([self.setting], self.source_dict)
     
     self.assertEqual(self.setting.value, 'png')
     self.assertEqual(self.flatten.value, True)
   
   def test_after_load_event(self, *mocks):
     self.flatten.set_value(True)
-    persistor_.Persistor.save([self.setting, self.flatten], self.session_source_dict)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict)
     
-    self.setting.connect_event(
-      'after-load', stubs_setting.on_file_extension_changed, self.flatten)
-    persistor_.Persistor.load([self.setting], self.session_source_dict)
+    self.setting.connect_event('after-load', stubs_setting.on_file_extension_changed, self.flatten)
+    persistor_.Persistor.load([self.setting], self.source_dict)
     
     self.assertEqual(self.setting.value, 'png')
     self.assertEqual(self.flatten.value, False)
   
   def test_after_load_event_not_all_settings_found_invoke_for_all_settings(self, *mocks):
     self.setting.set_value('gif')
-    persistor_.Persistor.save([self.setting], self.session_source_dict)
+    persistor_.Persistor.save([self.setting], self.source_dict)
     
-    self.setting.connect_event(
-      'after-load', stubs_setting.on_file_extension_changed, self.flatten)
-    persistor_.Persistor.load([self.setting, self.flatten], self.session_source_dict)
+    self.setting.connect_event('after-load', stubs_setting.on_file_extension_changed, self.flatten)
+    persistor_.Persistor.load([self.setting, self.flatten], self.source_dict)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, True)
   
   def test_after_load_event_is_triggered_even_after_fail(self, *mocks):
     self.flatten.set_value(True)
-    persistor_.Persistor.save([self.setting, self.flatten], self.session_source_dict)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict)
     
-    self.setting.connect_event(
-      'after-load', stubs_setting.on_file_extension_changed, self.flatten)
+    self.setting.connect_event('after-load', stubs_setting.on_file_extension_changed, self.flatten)
 
-    # FIXME: This is a temporary fix until a proper session source is implemented.
     with mock.patch(
            pgutils.get_pygimplib_module_path()
-           + '.setting.sources.GimpParasiteSource') as temp_mock_session_source:
-      temp_mock_session_source.read_data_from_source.side_effect = sources_.SourceReadError
+           + '.setting.sources.GimpParasiteSource') as temp_mock_source:
+      temp_mock_source.read_data_from_source.side_effect = sources_.SourceReadError
 
-      persistor_.Persistor.load([self.setting], self.session_source_dict)
+      persistor_.Persistor.load([self.setting], self.source_dict)
     
     self.assertEqual(self.setting.value, 'png')
     self.assertEqual(self.flatten.value, False)
@@ -621,11 +526,11 @@ class TestLoadSaveEvents(unittest.TestCase):
     spy_event = mock.Mock(wraps=stubs_setting.on_file_extension_changed)
     
     self.setting.set_value('gif')
-    persistor_.Persistor.save([self.setting], self.session_source_dict)
+    persistor_.Persistor.save([self.setting], self.source_dict)
     
     self.setting.connect_event('value-changed', spy_event, self.flatten)
     
-    persistor_.Persistor.load([self.setting, self.setting], self.session_source_dict)
+    persistor_.Persistor.load([self.setting, self.setting], self.source_dict)
 
     self.assertEqual(spy_event.call_count, 2)
     self.assertEqual(self.setting.value, 'gif')
@@ -634,14 +539,13 @@ class TestLoadSaveEvents(unittest.TestCase):
   def test_before_save_event(self, *mocks):
     self.setting.set_value('gif')
     
-    self.setting.connect_event(
-      'before-save', stubs_setting.on_file_extension_changed, self.flatten)
-    persistor_.Persistor.save([self.setting, self.flatten], self.session_source_dict)
+    self.setting.connect_event('before-save', stubs_setting.on_file_extension_changed, self.flatten)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, True)
     
-    persistor_.Persistor.load([self.setting, self.flatten], self.session_source_dict)
+    persistor_.Persistor.load([self.setting, self.flatten], self.source_dict)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, True)
@@ -649,30 +553,27 @@ class TestLoadSaveEvents(unittest.TestCase):
   def test_after_save_event(self, *mocks):
     self.setting.set_value('gif')
     
-    self.setting.connect_event(
-      'after-save', stubs_setting.on_file_extension_changed, self.flatten)
-    persistor_.Persistor.save([self.setting, self.flatten], self.session_source_dict)
+    self.setting.connect_event('after-save', stubs_setting.on_file_extension_changed, self.flatten)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, True)
     
-    persistor_.Persistor.load([self.setting, self.flatten], self.session_source_dict)
+    persistor_.Persistor.load([self.setting, self.flatten], self.source_dict)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, False)
   
   def test_after_save_event_is_triggered_even_after_fail(self, *mocks):
     self.setting.set_value('gif')
-    self.setting.connect_event(
-      'after-save', stubs_setting.on_file_extension_changed, self.flatten)
+    self.setting.connect_event('after-save', stubs_setting.on_file_extension_changed, self.flatten)
 
-    # FIXME: This is a temporary fix until a proper session source is implemented.
     with mock.patch(
            pgutils.get_pygimplib_module_path()
-           + '.setting.sources.GimpParasiteSource') as temp_mock_session_source:
-      temp_mock_session_source.read_data_from_source.side_effect = sources_.SourceReadError
+           + '.setting.sources.GimpParasiteSource') as temp_mock_source:
+      temp_mock_source.read_data_from_source.side_effect = sources_.SourceReadError
 
-      persistor_.Persistor.save([self.setting], self.session_source_dict)
+      persistor_.Persistor.save([self.setting], self.source_dict)
     
     self.assertEqual(self.flatten.value, True)
   
@@ -691,20 +592,15 @@ class TestLoadSaveEvents(unittest.TestCase):
   def test_event_triggering_is_not_enabled(self, *mocks):
     self.setting.set_value('gif')
     
-    self.setting.connect_event(
-      'before-save', stubs_setting.on_file_extension_changed, self.flatten)
+    self.setting.connect_event('before-save', stubs_setting.on_file_extension_changed, self.flatten)
+    self.setting.connect_event('before-load', stubs_setting.on_file_extension_changed, self.flatten)
     
-    self.setting.connect_event(
-      'before-load', stubs_setting.on_file_extension_changed, self.flatten)
-    
-    persistor_.Persistor.save(
-      [self.setting, self.flatten], self.session_source_dict, trigger_events=False)
+    persistor_.Persistor.save([self.setting, self.flatten], self.source_dict, trigger_events=False)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, False)
     
-    persistor_.Persistor.load(
-      [self.setting, self.flatten], self.session_source_dict, trigger_events=False)
+    persistor_.Persistor.load([self.setting, self.flatten], self.source_dict, trigger_events=False)
     
     self.assertEqual(self.setting.value, 'gif')
     self.assertEqual(self.flatten.value, False)

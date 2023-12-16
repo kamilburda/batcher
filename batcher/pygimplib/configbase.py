@@ -136,11 +136,9 @@ def _init_config_from_file(config: _Config):
 
 def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
-  config.SESSION_SOURCE = pgsetting.GimpSessionSource(config.SOURCE_NAME)
   config.PERSISTENT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
 
   pgsetting.persistor.Persistor.set_default_setting_sources({
-    'session': config.SESSION_SOURCE,
     'persistent': config.PERSISTENT_SOURCE,
   })
 

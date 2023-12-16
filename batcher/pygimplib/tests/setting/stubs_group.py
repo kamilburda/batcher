@@ -26,9 +26,6 @@ def create_test_settings():
                 ('skip', 'Skip'),
                 ('rename_new', 'Rename new file'),
                 ('rename_existing', 'Rename existing file')],
-      'error_messages': {
-        'invalid_value': (
-          'Invalid value. Something went wrong on our end... we are so sorry!')},
     },
   ])
   
@@ -71,10 +68,8 @@ def create_test_settings_hierarchical():
   return settings
 
 
-def create_test_settings_with_specific_setting_sources():
-  main_settings = group_.Group(
-    name='main',
-    setting_attributes={'setting_sources': ['persistent']})
+def create_test_settings_for_persistor():
+  main_settings = group_.Group(name='main')
   
   main_settings.add([
     {
@@ -84,15 +79,13 @@ def create_test_settings_with_specific_setting_sources():
     },
   ])
   
-  advanced_settings = group_.Group(
-    name='advanced', setting_attributes={'setting_sources': ['session']})
+  advanced_settings = group_.Group(name='advanced')
   
   advanced_settings.add([
     {
       'type': 'bool',
       'name': 'flatten',
       'default_value': False,
-      'setting_sources': ['persistent', 'session'],
       'tags': ['ignore_load', 'ignore_save'],
     },
     {
@@ -106,44 +99,3 @@ def create_test_settings_with_specific_setting_sources():
   settings.add([main_settings, advanced_settings])
   
   return settings
-
-
-def create_test_data_with_specific_setting_sources():
-  return [
-    {
-      'name': 'settings',
-      'settings': [
-        {
-          'name': 'main',
-          'setting_attributes': {'setting_sources': ['persistent']},
-          'settings': [
-            {
-              'type': 'file_extension',
-              'name': 'file_extension',
-              'value': 'png',
-              'setting_sources': ['persistent'],
-            },
-          ],
-        },
-        {
-          'name': 'advanced',
-          'setting_attributes': {'setting_sources': ['session']},
-          'settings': [
-            {
-              'type': 'bool',
-              'name': 'flatten',
-              'value': False,
-              'setting_sources': ['persistent', 'session'],
-              'tags': ['ignore_load', 'ignore_save'],
-            },
-            {
-              'type': 'bool',
-              'name': 'use_layer_size',
-              'value': False,
-              'setting_sources': ['session'],
-            },
-          ],
-        },
-      ],
-    },
-  ]

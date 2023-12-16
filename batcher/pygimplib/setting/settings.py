@@ -141,7 +141,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         gui_type_kwargs: Optional[Dict] = None,
         allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
-        setting_sources: Union[Dict, List, None] = None,
         error_messages: Optional[Dict[Any, str]] = None,
         tags: Optional[Iterable[str]] = None,
   ):
@@ -194,8 +193,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
         This parameter does not have any effect if the GUI type used in
         this setting cannot provide automatic GUI-to-setting update.
-      setting_sources:
-        See the `setting_sources` property.
       error_messages:
         A dictionary containing (message name, message contents) pairs. Use
         this to pass custom error messages. This way, you may also override
@@ -223,8 +220,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
     self._pdb_type = self._get_pdb_type(pdb_type)
     self._pdb_name = utils_.get_pdb_name(self._name)
-    
-    self._setting_sources = setting_sources
     
     self._setting_value_synchronizer = presenter_.SettingValueSynchronizer()
     self._setting_value_synchronizer.apply_gui_value_to_setting = self._apply_gui_value_to_setting
@@ -342,15 +337,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def pdb_name(self) -> str:
     """Setting name as it appears in the GIMP PDB as a PDB parameter name."""
     return self._pdb_name
-  
-  @property
-  def setting_sources(self) -> Union[Dict, List, None]:
-    """Groups of setting sources to use when loading or saving the setting.
-    
-    If ``None``, default settings sources as returned by
-    `setting.persistor.Persistor.get_default_setting_sources()` are used.
-    """
-    return self._setting_sources
   
   @property
   def error_messages(self) -> Dict[Any, str]:
@@ -601,7 +587,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     else:
       return None
   
-  def to_dict(self, source_type: str = 'persistent') -> Dict:
+  def to_dict(self) -> Dict:
     """Returns a dictionary representing the setting, appropriate for saving the
     setting (e.g. via `Setting.save()`).
     
@@ -616,10 +602,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     The dictionary can only contain keys as strings and values of one of the
     following types: ``int``, ``float``, ``bool``, ``str``, ``list``,
     ``dict``, ``None``.
-    
-    A `Setting` subclass may return different values for the same setting
-    attributes depending on the value of ``source_type``. If a subclass
-    utilizes ``source_type``, it is mentioned in the subclass' documentation.
     """
     settings_dict = {}
     
@@ -643,7 +625,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         else:
           raise TypeError(f'"pdb_type" does not have a valid value: "{val}"')
       elif key == 'default_value':
-        settings_dict[key] = self._value_to_raw(val, source_type)
+        settings_dict[key] = self._value_to_raw(val)
       elif key == 'tags':
         settings_dict[key] = list(val)
       else:
@@ -651,7 +633,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     settings_dict.update({
       'name': self.name,
-      'value': self._value_to_raw(self.value, source_type),
+      'value': self._value_to_raw(self.value),
       'type': _SETTING_TYPES[type(self)],
     })
     
@@ -705,7 +687,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     """
     return raw_value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     """Converts the given value to a value that can be saved.
     
     The converted value is returned, or the original value if no conversion is
@@ -713,10 +695,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     This method is called in `to_dict()` and is applied on the `value` and
     `default_value` properties.
-    
-    ``source_type`` is the setting source type passed to `to_dict()`. This
-    parameter may be used to convert the input value to a different format
-    depending on its value.
     """
     return value
   
@@ -880,8 +858,8 @@ class GenericSetting(Setting):
     
     super().__init__(name, **kwargs)
   
-  def to_dict(self, *args, **kwargs):
-    settings_dict = super().to_dict(*args, **kwargs)
+  def to_dict(self):
+    settings_dict = super().to_dict()
     
     settings_dict.pop('value_set', None)
     settings_dict.pop('value_save', None)
@@ -899,7 +877,7 @@ class GenericSetting(Setting):
     
     return value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     raw_value = value
     
     if self._before_value_save is not None:
@@ -1246,8 +1224,8 @@ class EnumSetting(Setting):
     """`GObject.GEnum` subclass whose values are used as setting values."""
     return self._enum_type
 
-  def to_dict(self, *args, **kwargs):
-    settings_dict = super().to_dict(*args, **kwargs)
+  def to_dict(self):
+    settings_dict = super().to_dict()
 
     settings_dict['enum_type'] = self.enum_type.__gtype__.name
 
@@ -1262,7 +1240,7 @@ class EnumSetting(Setting):
     else:
       return raw_value
 
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return int(value)
 
   def _validate(self, value):
@@ -1438,8 +1416,8 @@ class ChoiceSetting(Setting):
     """
     return self._empty_value
   
-  def to_dict(self, *args, **kwargs):
-    settings_dict = super().to_dict(*args, **kwargs)
+  def to_dict(self):
+    settings_dict = super().to_dict()
     
     settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
     
@@ -1569,10 +1547,8 @@ class ImageSetting(Setting):
   """Class for settings holding `Gimp.Image` objects.
   
   This class accepts as a value a file path to the image or image ID.
-  If calling `to_dict(source_type='session')`, image ID is returned for `value`
-  and `default_value`.
-  If calling `to_dict()` with any other value for `source_type`, the image file
-  path is returned or ``None`` if the image does not exist in the file system.
+  If calling `to_dict()`, the image file path is returned or ``None`` if the
+  image does not exist in the file system.
   
   Allowed GIMP PDB types:
   * `Gimp.Image`
@@ -1601,16 +1577,11 @@ class ImageSetting(Setting):
     
     return value
   
-  def _value_to_raw(self, value, source_type):
-    raw_value = value
-    
-    if source_type == 'session':
-      raw_value = value.get_id()
+  def _value_to_raw(self, value):
+    if value is not None and value.get_file() is not None:
+      raw_value = value.get_file().get_path()
     else:
-      if value is not None and value.get_file() is not None:
-        raw_value = value.get_file().get_path()
-      else:
-        raw_value = None
+      raw_value = None
     
     return raw_value
   
@@ -1628,11 +1599,9 @@ class GimpItemSetting(Setting):
     of the item's GIMP class (e.g. ``'Layer'``).
   * a tuple (item type, item ID). Item ID is are assigned by GIMP.
   * a `Gimp.Item` instance.
-  
-  If calling ``to_dict(source_type='session')``, a tuple (item type, item ID) is
-  returned for `value` and `default_value`.
-  If calling `to_dict()` with any other value for ``source_type``, a tuple
-  (image file path, item type, item path) is returned.
+
+  If calling `to_dict()`, a tuple (image file path, item type, item path) is
+  returned.
   """
   
   _ABSTRACT = True
@@ -1652,11 +1621,8 @@ class GimpItemSetting(Setting):
     
     return value
   
-  def _value_to_raw(self, value, source_type):
-    if source_type == 'session':
-      return self._item_to_id(value)
-    else:
-      return self._item_to_path(value)
+  def _value_to_raw(self, value):
+    return self._item_to_path(value)
 
   def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
     image = pgpdbutils.find_image_by_filepath(image_filepath)
@@ -1783,9 +1749,9 @@ class TextLayerSetting(GimpItemSetting):
 class LayerMaskSetting(GimpItemSetting):
   """Class for settings holding `Gimp.LayerMask` instances.
 
-  When serializing to a persistent source, the setting value as returned by
-  `Setting.to_dict()` corresponds to the layer path the layer mask is attached
-  to.
+  When serializing to a source, the setting value as returned by
+  `Setting.to_dict()` corresponds to the layer path the layer mask is
+  attached to.
 
   Allowed GIMP PDB types:
   * `Gimp.LayerMask`
@@ -1939,7 +1905,7 @@ class ColorSetting(Setting):
     else:
       return raw_value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return [value.r, value.g, value.b, value.a]
   
   def _validate(self, color):
@@ -1983,13 +1949,10 @@ class DisplaySetting(Setting):
     else:
       return raw_value
 
-  def _value_to_raw(self, value, source_type):
-    if source_type == 'session':
-      return value.get_id()
-    else:
-      # There is no way to recover `Gimp.Display` objects from a persistent
-      # source, hence return ``None``.
-      return None
+  def _value_to_raw(self, value):
+    # There is no way to recover `Gimp.Display` objects from a persistent
+    # source, hence return ``None``.
+    return None
 
   def _validate(self, display):
     if display is not None and not display.is_valid():
@@ -2035,7 +1998,7 @@ class ParasiteSetting(Setting):
     else:
       return raw_value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return [value.get_name(), value.get_flags(), value.get_data()]
   
   def _validate(self, parasite):
@@ -2181,7 +2144,7 @@ class FileSetting(Setting):
     else:
       return raw_value
 
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return value.get_path()
 
   def _validate(self, file_):
@@ -2223,7 +2186,7 @@ class BytesSetting(Setting):
     else:
       return raw_value
 
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return list(value.get_data())
 
   def _validate(self, file_):
@@ -2287,7 +2250,7 @@ class GimpResourceSetting(Setting):
     else:
       return raw_value
 
-  def _value_to_raw(self, resource, source_type):
+  def _value_to_raw(self, resource):
     if resource is not None:
       return {
         'name': resource.get_name(),
@@ -2323,7 +2286,7 @@ class BrushSetting(GimpResourceSetting):
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid brush.')
   
-  def _value_to_raw(self, resource, source_type):
+  def _value_to_raw(self, resource):
     if resource is not None:
       return {
         'name': resource.get_name(),
@@ -2407,7 +2370,7 @@ class PaletteSetting(GimpResourceSetting):
   def _init_error_messages(self):
     self.error_messages['invalid_value'] = _('Invalid palette.')
 
-  def _value_to_raw(self, resource, source_type):
+  def _value_to_raw(self, resource):
     if resource is not None:
       return {
         'name': resource.get_name(),
@@ -2663,14 +2626,12 @@ class ArraySetting(Setting):
     """
     return self._max_size
   
-  def to_dict(self, *args, **kwargs):
-    settings_dict = super().to_dict(*args, **kwargs)
-    
-    source_type = kwargs.get('source_type', 'persistent')
+  def to_dict(self):
+    settings_dict = super().to_dict()
     
     for key, val in settings_dict.items():
       if key == 'element_default_value':
-        settings_dict[key] = self._reference_element._value_to_raw(val, source_type)
+        settings_dict[key] = self._reference_element._value_to_raw(val)
       elif key == 'element_type':
         settings_dict[key] = _SETTING_TYPES[type(self._reference_element)]
     
@@ -2817,9 +2778,9 @@ class ArraySetting(Setting):
       # Let `_validate()` raise error
       return raw_value_array
   
-  def _value_to_raw(self, value_array, source_type):
+  def _value_to_raw(self, value_array):
     return [
-      self._reference_element._value_to_raw(value, source_type)
+      self._reference_element._value_to_raw(value)
       for value in value_array]
   
   def _validate(self, value_array):
@@ -2993,7 +2954,7 @@ class TupleSetting(ContainerSetting):
     else:
       return raw_value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return list(value)
 
 
@@ -3010,7 +2971,7 @@ class SetSetting(ContainerSetting):
     else:
       return raw_value
   
-  def _value_to_raw(self, value, source_type):
+  def _value_to_raw(self, value):
     return list(value)
 
 
