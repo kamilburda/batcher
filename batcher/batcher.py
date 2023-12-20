@@ -3,7 +3,6 @@
 """Main plug-in file."""
 
 import os
-import sys
 
 import pygimplib as pg
 
@@ -27,18 +26,18 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _draw
   SETTINGS['special/image'].set_value(image)
   
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
-  
+
   status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
   if status == update.TERMINATE:
     return
-  
+
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    _run_export_layers_interactive(layer_tree)
+    return _run_export_layers_interactive(layer_tree)
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
-    _run_with_last_vals(layer_tree)
+    return _run_with_last_vals(layer_tree)
   else:
-    _run_noninteractive(layer_tree, config)
+    return _run_noninteractive(layer_tree, config)
 
 
 def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawables, _config):
@@ -46,16 +45,16 @@ def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _
   SETTINGS['special/image'].set_value(image)
 
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
-  
+
   status, _unused = update.update(
     SETTINGS, 'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
   if status == update.TERMINATE:
     return
-  
+
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    _run_export_layers_now_interactive(layer_tree)
+    return _run_export_layers_now_interactive(layer_tree)
   else:
-    _run_with_last_vals(layer_tree)
+    return _run_with_last_vals(layer_tree)
 
 
 def plug_in_batch_export_layers_with_config(
@@ -65,24 +64,46 @@ def plug_in_batch_export_layers_with_config(
 
   config_filepath = config.get_property('config-filepath')
 
-  if not config_filepath or not os.path.isfile(config_filepath):
-    sys.exit(1)
-  
+  if config_filepath:
+    _load_settings_from_config(config_filepath)
+
   layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
 
+  return _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
+
+
+def _load_settings_from_config(config_filepath):
+  if not os.path.isfile(config_filepath):
+    return (
+      Gimp.PDBStatusType.EXECUTION_ERROR,
+      f'"{config_filepath}" is not a valid configuration file')
+
   setting_source = pg.setting.JsonFileSource(pg.config.SOURCE_NAME, config_filepath)
-  
-  status, _unused = update.update(
+
+  status, update_message = update.update(
     SETTINGS, handle_invalid='terminate', sources={'persistent': setting_source})
   if status == update.TERMINATE:
-    sys.exit(1)
-  
+    error_message = 'Failed to update settings in the configuration file to the latest version'
+
+    if update_message:
+      error_message += f'. Reason: {update_message}'
+    else:
+      error_message += '.'
+
+    return Gimp.PDBStatusType.EXECUTION_ERROR, error_message
+
   load_result = SETTINGS.load({'persistent': setting_source})
   if load_result.status not in [
        pg.setting.Persistor.SUCCESS, pg.setting.Persistor.PARTIAL_SUCCESS]:
-    sys.exit(1)
-  
-  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
+    error_message = 'Failed to load settings from the configuration file'
+
+    load_message = '\n'.join(load_result.messages_per_source).strip()
+    if load_message:
+      error_message += f'. Reason: {load_message}'
+    else:
+      error_message += '.'
+
+    return Gimp.PDBStatusType.EXECUTION_ERROR, error_message
 
 
 def _run_noninteractive(layer_tree, config):
@@ -119,11 +140,13 @@ def _run_export_layers_now_interactive(layer_tree):
 def _run_plugin_noninteractive(run_mode, layer_tree):
   batcher = core.Batcher(
     run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
-  
+
   try:
     batcher.run(item_tree=layer_tree, **utils_.get_settings_for_batcher(SETTINGS['main']))
   except exceptions.BatcherCancelError:
     pass
+  except Exception as e:
+    return Gimp.PDBStatusType.EXECUTION_ERROR, str(e)
 
 
 pg.register_procedure(
