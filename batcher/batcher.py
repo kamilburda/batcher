@@ -56,10 +56,10 @@ def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _
 
 
 def _run_noninteractive(layer_tree, config):
-  settings_filepath = config.get_property('settings-file')
+  settings_file = config.get_property('settings-file')
 
-  if settings_filepath:
-    gimp_status, message = _load_settings_from_file(settings_filepath)
+  if settings_file:
+    gimp_status, message = _load_settings_from_file(settings_file)
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
   else:
@@ -76,7 +76,9 @@ def _update_plugin(settings, run_mode):
   return status
 
 
-def _load_settings_from_file(settings_filepath):
+def _load_settings_from_file(settings_file):
+  settings_filepath = settings_file.get_path()
+
   if not os.path.isfile(settings_filepath):
     return (
       Gimp.PDBStatusType.EXECUTION_ERROR,
