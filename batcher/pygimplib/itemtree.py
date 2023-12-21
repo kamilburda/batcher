@@ -211,11 +211,9 @@ class ItemTree(metaclass=abc.ABCMeta):
   def __init__(
         self,
         image: Gimp.Image,
-        name: Optional[str] = None,
         is_filtered: bool = True,
         filter_match_type: int = pgobjectfilter.ObjectFilter.MATCH_ALL):
     self._image = image
-    self._name = name
     
     self.is_filtered = is_filtered
     """If ``True``, ignore items that do not match the filter
@@ -252,11 +250,6 @@ class ItemTree(metaclass=abc.ABCMeta):
   def image(self) -> Gimp.Image:
     """GIMP image to generate item tree from."""
     return self._image
-  
-  @property
-  def name(self) -> str:
-    """Optional name of the item tree, serving as a string identifier."""
-    return self._name
   
   def __getitem__(
         self, key: Union[int, str, Gimp.Item, Tuple[Union[int, str, Gimp.Item], str]],

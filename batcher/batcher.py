@@ -29,7 +29,7 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _draw
   if status == update.TERMINATE:
     return
 
-  layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
+  layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_export_layers_interactive(layer_tree)
@@ -47,7 +47,7 @@ def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _
   if status == update.TERMINATE:
     return
 
-  layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
+  layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_export_layers_now_interactive(layer_tree)

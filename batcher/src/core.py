@@ -751,7 +751,7 @@ class Batcher:
     if item_tree is not None:
       self._item_tree = item_tree
     else:
-      self._item_tree = pg.itemtree.LayerTree(self._input_image, name=pg.config.SOURCE_NAME)
+      self._item_tree = pg.itemtree.LayerTree(self._input_image)
     
     if self._item_tree.filter:
       self._item_tree.reset_filter()

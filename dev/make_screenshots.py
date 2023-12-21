@@ -49,7 +49,7 @@ def main(settings=None):
 
   image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 
-  layer_tree = pg.itemtree.LayerTree(image, name=pg.config.SOURCE_NAME)
+  layer_tree = pg.itemtree.LayerTree(image)
 
   settings['special/image'].set_value(image)
 
