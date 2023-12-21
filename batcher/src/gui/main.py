@@ -660,7 +660,7 @@ class ExportLayersDialog:
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, self._image)
   
-  def _load_settings(self, filepath, file_format, load_size_settings=True):
+  def _import_settings(self, filepath, file_format, load_size_settings=True):
     source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
     
     actions.clear(self._settings['main/procedures'], add_initial_actions=False)
@@ -957,7 +957,7 @@ class ExportLayersDialog:
     filepath, file_format, load_size_settings = self._get_setting_filepath(action='import')
     
     if filepath is not None:
-      import_successful = self._load_settings(filepath, file_format, load_size_settings)
+      import_successful = self._import_settings(filepath, file_format, load_size_settings)
       # Also override default setting sources so that the imported settings actually persist.
       self._save_settings()
       
