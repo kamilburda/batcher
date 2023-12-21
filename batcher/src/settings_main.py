@@ -74,13 +74,6 @@ def create_settings():
       'gui_type': None,
     },
     {
-      'type': 'images_and_gimp_items',
-      'name': 'selected_layers',
-      'default_value': collections.defaultdict(set),
-      'display_name': _('Selected layers'),
-      'pdb_type': None,
-    },
-    {
       'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
@@ -91,6 +84,22 @@ def create_settings():
         ('rename_existing', _('Rename _existing file'),
          pg.overwrite.OverwriteModes.RENAME_EXISTING)],
       'display_name': _('Overwrite mode (non-interactive run mode only)'),
+    },
+    {
+      'type': 'string',
+      'name': 'settings_file',
+      'default_value': '',
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (can be omitted)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'images_and_gimp_items',
+      'name': 'selected_layers',
+      'default_value': collections.defaultdict(set),
+      'display_name': _('Selected layers'),
+      'pdb_type': None,
     },
     {
       'type': 'bool',
