@@ -6,7 +6,7 @@ Use `c` to access, create or modify configuration entries.
 import os
 
 
-c.LOG_MODE = 'exceptions'
+c.LOG_MODE = 'error'
 
 c.PLUGIN_TITLE = lambda: _('Batcher')
 c.PLUGIN_VERSION = '0.0.1'

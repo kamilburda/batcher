@@ -4,75 +4,85 @@ from collections.abc import Iterable
 import datetime
 import os
 import sys
-import traceback
 from typing import IO, Optional
 
 from . import constants
 from . import pdbutils as pgpdbutils
 
-_LOG_MODES = ('none', 'exceptions', 'files', 'gimp_console')
+_LOG_MODES = ('none', 'error', 'output_and_error', 'gimp_console')
 
-_exception_logger = None
+_TEE_STDOUT = None
+_TEE_STDERR = None
 
 
 def log_output(
       log_mode: str,
       log_dirpaths: Iterable[str],
-      log_stdout_filename: Optional[str] = None,
-      log_stderr_filename: Optional[str] = None,
+      log_output_filename: Optional[str] = None,
+      log_error_filename: Optional[str] = None,
       log_header_title: str = '',
-      gimp_console_message_delay_milliseconds: int = 0):
-  """Redirects output to files or the GIMP console.
+      gimp_console_message_delay_milliseconds: int = 0,
+      flush_output: bool = False):
+  """Duplicates or redirects output to files or the GIMP console.
 
-  Logging is reset on each call to this function. For example, if ``log_mode``
-  was ``'files'`` and ``log_mode`` in the current call is ``'none'``, the log
-  files are closed, and ``stdout`` and ``stderr`` are restored.
+  Logging is reset on each call to this function. For example,
+  if ``log_mode`` was ``'output_and_error'`` and ``log_mode`` in the current
+  call is ``'none'``, any log files created by this function are closed,
+  and `sys.stdout` and `sys.stderr` are restored.
 
   Args:
     log_mode:
       The log mode. Possible values:
-      * ``'none'`` - No action is performed, i.e. the output is not redirected.
-      * ``'exceptions'`` - Only log exceptions to the error log file.
-      * ``'files'`` - Redirect standard output and error to log files.
-      * ``'gimp_console'`` - Redirect standard output and error to the GIMP
-        error console.
+      * ``'none'`` - No action is performed, i.e. the output is not
+        redirected/duplicated anywhere.
+      * ``'error'`` - Duplicates error output to a file.
+      * ``'output_and_error'`` - Both the standard output and error are
+        duplicated to log files.
+      * ``'gimp_console'`` - Both the standard output and error are redirected
+        to the GIMP error console.
     log_dirpaths:
-      List of directory paths for log files. If the first path is invalid or
-      permission to write is denied, subsequent directories are used. For the
-      ``'gimp_console'`` mode, this parameter has no effect.
-    log_stdout_filename:
-      File name of the log file to write standard output to. Applies to the
-      ``'files'`` mode only. This parameter must not be ``None`` if ``log_mode``
-      is ``'files'``.
-    log_stderr_filename:
-      File name of the log file to write error output to. Applies to the
-      ``'exceptions'`` and ``'files'`` modes only. This parameter must not be
-      ``None`` if ``log_mode`` is ``'files'`` or ``'exceptions'``.
+      List of directory paths for log files. If the first path is not valid or
+      the permission to write is denied, subsequent directories are used.
+      Applies to the ``'error'`` and ``'output_and_error'`` modes only.
+    log_output_filename:
+      File name of the log file to write standard output to. This parameter
+      must not be ``None`` if ``log_mode`` is ``'output_and_error'``. Applies
+      to the ``'output_and_error'`` mode only.
+    log_error_filename:
+      File name of the log file to write error output to. This parameter must
+      not be ``None`` if ``log_mode`` is ``'output_and_error'`` or
+      ``'error'``. Applies to the ``'error'`` and ``'output_and_error'``
+      modes only.
     log_header_title:
-      Optional title in the log header, written before the first output to
-      the log files. Applies to the ``'exceptions'`` and ``'files'`` modes only.
+      Optional title in the log header, written before the first output to the
+      log files. Applies to the ``'error'`` and ``'output_and_error'`` modes
+      only.
     gimp_console_message_delay_milliseconds:
      The delay to display messages to the GIMP console in milliseconds. Only
      applies to the ``'gimp_console'`` mode.
+    flush_output:
+      If ``True``, the output is flushed after each instance of writing. Applies
+      to the ``'error'`` and ``'output_and_error'`` modes only.
   """
-  _restore_orig_state(log_mode)
+  global _TEE_STDOUT
+  global _TEE_STDERR
+
+  _close_log_files_and_reset_streams(_TEE_STDOUT, _TEE_STDERR)
 
   if log_mode == 'none':
     return
 
-  if log_mode == 'exceptions':
-    _redirect_exception_output_to_file(
-      log_dirpaths, log_stderr_filename, log_header_title)
-  elif log_mode == 'files':
-    stdout_file = create_log_file(log_dirpaths, log_stdout_filename)
+  if log_mode in ['error', 'output_and_error']:
+    log_error_file = create_log_file(log_dirpaths, log_error_filename)
+    if log_error_file is not None:
+      _TEE_STDERR = Tee(sys.stderr, log_header_title=log_header_title, flush_output=flush_output)
+      _TEE_STDERR.start(log_error_file)
 
-    if stdout_file is not None:
-      sys.stdout = SimpleLogger(stdout_file, log_header_title)
-
-    stderr_file = create_log_file(log_dirpaths, log_stderr_filename)
-
-    if stderr_file is not None:
-      sys.stderr = SimpleLogger(stderr_file, log_header_title)
+    if log_mode == 'output_and_error':
+      log_output_file = create_log_file(log_dirpaths, log_output_filename)
+      if log_output_file is not None:
+        _TEE_STDOUT = Tee(sys.stdout, log_header_title=log_header_title, flush_output=flush_output)
+        _TEE_STDOUT.start(log_output_file)
   elif log_mode == 'gimp_console':
     sys.stdout = pgpdbutils.GimpMessageFile(
       message_delay_milliseconds=gimp_console_message_delay_milliseconds)
@@ -84,6 +94,9 @@ def log_output(
 
 
 def get_log_header(log_header_title: str) -> str:
+  """Returns the header written to a file before writing output for the first
+  time.
+  """
   return '\n'.join(('', '=' * 80, log_header_title, str(datetime.datetime.now()), '\n'))
 
 
@@ -124,73 +137,129 @@ def create_log_file(log_dirpaths: Iterable[str], log_filename: str, mode: str = 
   return log_file
 
 
-def _restore_orig_state(log_mode):
-  global _exception_logger
+def _close_log_files_and_reset_streams(tee_stdout, tee_stderr):
+  if tee_stdout is not None:
+    tee_stdout.stop()
 
-  for file_ in [_exception_logger, sys.stdout, sys.stderr]:
-    if (file_ is not None
-          and hasattr(file_, 'close')
-          and file_ not in [sys.__stdout__, sys.__stderr__]):
-      try:
-        file_.close()
-      except IOError:
-        # An exception could occur for an invalid file descriptor.
-        pass
-
-  _exception_logger = None
-  sys.excepthook = sys.__excepthook__
+  if tee_stderr is not None:
+    tee_stderr.stop()
 
   sys.stdout = sys.__stdout__
   sys.stderr = sys.__stderr__
 
 
-def _redirect_exception_output_to_file(log_dirpaths, log_filename, log_header_title):
-  global _exception_logger
+# Original version: https://stackoverflow.com/a/616686
+class Tee(object):
+  """File-like object that duplicates a stream -- either ``stdout`` or
+  ``stderr`` -- to the specified file, much like the Unix `tee` command.
+  """
 
-  def create_file_upon_exception_and_log_exception(exc_type, exc_value, exc_traceback):
-    global _exception_logger
+  def __init__(
+        self,
+        stream: IO,
+        log_header_title: Optional[str] = None,
+        flush_output: bool = False,
+  ):
+    """Initializes a `Tee` instance.
 
-    _exception_log_file = create_log_file(log_dirpaths, log_filename)
+    Args:
+      stream:
+        Either `sys.stdout` or `sys.stderr`. Other objects are invalid and raise
+        `ValueError`.
+      log_header_title:
+        Header text to write when writing into the file for the first time.
+      flush_output:
+        If ``True``, the output is flushed after each write.
+    """
+    self._streams = {sys.stdout: 'stdout', sys.stderr: 'stderr'}
 
-    if _exception_log_file is not None:
-      _exception_logger = SimpleLogger(_exception_log_file, log_header_title)
-      log_exception(exc_type, exc_value, exc_traceback)
+    self.log_header_title = log_header_title if log_header_title is not None else ''
+    self.flush_output = flush_output
 
-      sys.excepthook = log_exception
+    self._file = None
+    self._is_running = False
+
+    self._orig_stream = None
+    self._stream_name = ''
+    self._stream = None
+
+    self.stream = stream
+
+  def __del__(self):
+    if self.is_running():
+      self.stop()
+
+  @property
+  def stream(self):
+    """The stream whose output is being duplicated"""
+    return self._stream
+
+  @stream.setter
+  def stream(self, value: IO):
+    """Modifies the stream to duplicate output from.
+
+    Args:
+      value:
+        Stream object -- either `sys.stdout` or `sys.stderr`.
+    """
+    self._stream = value
+    if value in self._streams:
+      self._stream_name = self._streams[value]
     else:
-      sys.excepthook = sys.__excepthook__
+      raise ValueError('invalid stream; must be sys.stdout or sys.stderr')
 
-  def log_exception(exc_type, exc_value, exc_traceback):
-    global _exception_logger
+  def start(self, file_: IO):
+    """Starts duplicating output to the specified file.
 
-    if _exception_logger is not None:
-      _exception_logger.write(
-        ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback)))
+    Args:
+      file_:
+        File or file-like object to write output to.
+    """
+    self._orig_stream = self.stream
+    setattr(sys, self._stream_name, self)
 
-  sys.excepthook = create_file_upon_exception_and_log_exception
+    self._file = file_
+    self._is_running = True
 
+  def stop(self):
+    """Stops duplicating output to the file."""
+    setattr(sys, self._stream_name, self._orig_stream)
+    self._file.close()
 
-class SimpleLogger:
-  """Class wrapping a file object to write a header before the first output."""
+    self._file = None
+    self._is_running = False
 
-  def __init__(self, file_: IO, log_header_title: str):
-    self._log_file = file_
-    self._log_header_title = log_header_title
+  def is_running(self):
+    """Return ``True`` if duplication to file is enabled, ``False`` otherwise.
+    """
+    return self._is_running
 
   def write(self, data):
-    if self._log_header_title:
-      self._write(get_log_header(self._log_header_title))
+    """Writes output to both the stream and the specified file.
 
-    self._write(data)
+    If `log_header_title` is not empty, the log header is written before the
+    first output.
+    """
+    if self.log_header_title:
+      self._file.write(get_log_header(self.log_header_title))
 
-    self.write = self._write
+    self._write_with_flush(data)
+
+    if not self.flush_output:
+      self.write = self._write
+    else:
+      self.write = self._write_with_flush
 
   def _write(self, data):
-    self._log_file.write(str(data))
-    self.flush()
+    self._file.write(data)
+    self._stream.write(data)
+
+  def _write_with_flush(self, data):
+    self._file.write(data)
+    self._file.flush()
+    self._stream.write(data)
+    self._stream.flush()
 
   def flush(self):
-    self._log_file.flush()
-
-  def close(self):
-    self._log_file.close()
+    self._file.flush()
+    self._stream.flush()

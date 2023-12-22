@@ -87,7 +87,7 @@ def _init_config_initial(
 
   config.BUG_REPORT_URL_LIST = []
 
-  config.LOG_MODE = 'exceptions'
+  config.LOG_MODE = 'error'
 
 
 def _init_config_logging(config: _Config):
@@ -104,8 +104,8 @@ def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_STDOUT_DIRPATH = config.DEFAULT_LOGS_DIRPATH
   config.PLUGINS_LOG_STDERR_DIRPATH = config.DEFAULT_LOGS_DIRPATH
 
-  config.PLUGINS_LOG_STDOUT_FILENAME = 'output.log'
-  config.PLUGINS_LOG_STDERR_FILENAME = 'error.log'
+  config.PLUGINS_LOG_OUTPUT_FILENAME = 'output.log'
+  config.PLUGINS_LOG_ERROR_FILENAME = 'error.log'
 
   config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS = 50
 
@@ -142,12 +142,11 @@ def _init_config_per_procedure(config: _Config):
     'persistent': config.DEFAULT_SOURCE,
   })
 
-  # FIXME: Duplicate logging instead of redirecting it.
-  #   The latter is not practical in case of e.g. running tests from the IDE or
-  #   test-running the plug-in while expecting error messages in the GIMP
-  #   console.
-  # if config.LOG_MODE != 'gimp_console':
-  #   pglogging.log_output(
-  #     config.LOG_MODE, config.PLUGINS_LOG_DIRPATHS,
-  #     config.PLUGINS_LOG_STDOUT_FILENAME, config.PLUGINS_LOG_STDERR_FILENAME,
-  #     config.PLUGIN_TITLE, config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS)
+  pglogging.log_output(
+    config.LOG_MODE,
+    config.PLUGINS_LOG_DIRPATHS,
+    config.PLUGINS_LOG_OUTPUT_FILENAME,
+    config.PLUGINS_LOG_ERROR_FILENAME,
+    config.PLUGIN_TITLE,
+    config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS,
+  )

@@ -1,3 +1,6 @@
+import sys
+import io
+
 import unittest
 import unittest.mock as mock
 
@@ -46,3 +49,46 @@ class TestCreateLogFile(unittest.TestCase):
     
     self.assertEqual(log_file, expected_result)
     self.assertEqual(mock_makedirs.call_count, expected_num_calls_makedirs)
+
+
+@mock.patch('sys.stdout', new=io.StringIO())
+class TestTee(unittest.TestCase):
+
+  def setUp(self):
+    self.string_file = io.StringIO()
+
+  def test_write(self):
+    tee = pglogging.Tee(sys.stdout, log_header_title='Test Header')
+    tee.start(self.string_file)
+
+    print('Hello')
+    self.assertTrue(self.string_file.getvalue().endswith('Hello\n'))
+    self.assertTrue('Test Header' in self.string_file.getvalue())
+
+    print('Hi There Again')
+    self.assertTrue(
+      self.string_file.getvalue().endswith('Hello\nHi There Again\n'))
+
+  def test_stop(self):
+    tee_stdout = pglogging.Tee(
+      sys.stdout,
+      log_header_title='Test Header')
+
+    print('Hi There')
+    self.assertFalse(self.string_file.getvalue().endswith('Hi There\n'))
+
+    tee_stdout.start(self.string_file)
+
+    print('Hello')
+    self.assertTrue(self.string_file.getvalue().endswith('Hello\n'))
+
+    string_value = self.string_file.getvalue()
+    tee_stdout.stop()
+
+    print('Hi There Again')
+    self.assertFalse(string_value.endswith('Hi There Again\n'))
+
+  def test_invalid_stream(self):
+    with self.assertRaises(ValueError):
+      # noinspection PyTypeChecker
+      pglogging.Tee('invalid_stream', log_header_title='Test Header')
