@@ -686,7 +686,7 @@ class Batcher:
         if error_message is None:
           error_message = _(
             'An error occurred. Please check the GIMP error message'
-            ' or the error console for details.')
+            ' or the error console for details, if any.')
 
         # Log failed action, but raise error as this may result in unexpected
         # behavior.
