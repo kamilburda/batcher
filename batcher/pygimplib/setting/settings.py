@@ -715,7 +715,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     try:
       self._validate(value)
     except SettingValueError as e:
-      raise SettingValueError(str(e), setting=self)
+      e.setting = self
+      raise e
   
   def _should_validate_default_value(self):
     return not self._is_value_empty(self._default_value)

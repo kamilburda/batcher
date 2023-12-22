@@ -635,8 +635,8 @@ class JsonFileSource(Source):
     try:
       with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         all_data = json.load(f)
-    except Exception:
-      raise SourceReadError(traceback.format_exc())
+    except Exception as e:
+      raise SourceReadError from e
     else:
       return all_data
   
@@ -648,5 +648,5 @@ class JsonFileSource(Source):
     try:
       with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
         json.dump(all_data, f, indent=4)
-    except Exception:
-      raise SourceWriteError(traceback.format_exc())
+    except Exception as e:
+      raise SourceWriteError from e
