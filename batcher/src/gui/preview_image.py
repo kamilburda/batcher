@@ -371,7 +371,7 @@ class ImagePreview(preview_base_.Preview):
       messages_.display_failure_message(
         messages_.get_failing_action_message(e),
         failure_message=str(e),
-        details=traceback.format_exc(),
+        details=e.traceback,
         parent=pg.gui.get_toplevel_window(self))
       
       error = e

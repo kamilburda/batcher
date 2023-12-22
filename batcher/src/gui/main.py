@@ -1004,13 +1004,13 @@ class ExportLayersDialog:
       messages_.display_failure_message(
         messages_.get_failing_action_message(e),
         failure_message=str(e),
-        details=traceback.format_exc(),
+        details=e.traceback,
         parent=self._dialog)
       should_quit = False
     except exceptions.BatcherError as e:
       messages_.display_processing_failure_message(e, parent=self._dialog)
       should_quit = False
-    except Exception as e:
+    except Exception:
       if self._image.is_valid():
         raise
       else:
