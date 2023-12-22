@@ -37,7 +37,6 @@ ERROR_EXIT_STATUS = 1
 
 def display_alert_message(
       title: Optional[str] = None,
-      app_name: Optional[str] = None,
       parent: Optional[Gtk.Window] = None,
       message_type: Gtk.MessageType = Gtk.MessageType.ERROR,
       modal: bool = True,
@@ -58,9 +57,6 @@ def display_alert_message(
   Args:
     title:
       Message dialog title.
-    app_name:
-      Application name to use for the default text for
-      ``message_secondary_markup``.
     parent:
       Parent window.
     message_type:
@@ -98,17 +94,13 @@ def display_alert_message(
   Returns:
     Response ID when closing the displayed dialog.
   """
-  if app_name is None:
-    app_name = _('Plug-in')
-  
   if message_markup is None:
     message_markup = (
       '<span font_size="large"><b>{}</b></span>'.format(_('Oops. Something went wrong.')))
   
   if message_secondary_markup is None:
     message_secondary_markup = _(
-      '{} encountered an unexpected error and has to close. Sorry about that!').format(
-        GLib.markup_escape_text(app_name))
+      'An unexpected error occurred and the plug-in has to close. Sorry about that!')
   
   if report_description is None:
     report_description = _(
@@ -123,6 +115,8 @@ def display_alert_message(
 
   if title is not None:
     dialog.set_title(title)
+  else:
+    dialog.set_title('')
 
   hbox_icon_and_messages = Gtk.Box(
     orientation=Gtk.Orientation.HORIZONTAL,
@@ -287,6 +281,7 @@ def _get_report_link_buttons_and_copy_icon(report_uri_list, report_description, 
       ypad=6,
       wrap=True,
       wrap_mode=Pango.WrapMode.WORD,
+      max_width_chars=50,
     )
     
     button_copy_to_clipboard = Gtk.Button(
@@ -429,7 +424,6 @@ _gui_excepthook_additional_callback = pgutils.create_empty_func(False)
 
 def add_gui_excepthook(
       title: Optional[str] = None,
-      app_name: Optional[str] = None,
       report_uri_list: Optional[Iterable[Tuple[str, str]]] = None,
       parent: Optional[Gtk.Window] = None,
 ) -> Callable:
@@ -458,7 +452,6 @@ def add_gui_excepthook(
           exc_value,
           exc_traceback,
           title,
-          app_name,
           _gui_excepthook_parent,
           report_uri_list)
 
@@ -475,7 +468,6 @@ def add_gui_excepthook(
 
 def set_gui_excepthook(
       title: Optional[str] = None,
-      app_name: Optional[str] = None,
       report_uri_list: Optional[Iterable[Tuple[str, str]]] = None,
       parent: Optional[Gtk.Window] = None,
 ):
@@ -497,7 +489,6 @@ def set_gui_excepthook(
       exc_value,
       exc_traceback,
       title,
-      app_name,
       _gui_excepthook_parent,
       report_uri_list)
 
@@ -536,7 +527,6 @@ def _gui_excepthook_generic(
       exc_value,
       exc_traceback,
       title,
-      app_name,
       parent,
       report_uri_list):
   callback_result = _gui_excepthook_additional_callback(exc_type, exc_value, exc_traceback)
@@ -551,7 +541,6 @@ def _gui_excepthook_generic(
     
     display_alert_message(
       title=title,
-      app_name=app_name,
       parent=parent,
       details=exception_message,
       report_uri_list=report_uri_list)

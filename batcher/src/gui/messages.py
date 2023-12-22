@@ -47,7 +47,6 @@ def display_failure_message(
   
   pg.gui.display_alert_message(
     title=pg.config.PLUGIN_TITLE,
-    app_name=pg.config.PLUGIN_TITLE,
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,
