@@ -106,7 +106,7 @@ def display_alert_message(
     report_description = _(
       'You can help fix this error by sending a report with the text'
       ' in the details above to one of the following sites')
-  
+
   dialog = GimpUi.Dialog(
     parent=parent,
     modal=modal,
@@ -209,7 +209,7 @@ def display_alert_message(
   dialog.show_all()
   response_id = dialog.run()
   dialog.destroy()
-  
+
   return response_id
 
 
@@ -420,6 +420,11 @@ def display_message(
 
 _gui_excepthook_parent = None
 _gui_excepthook_additional_callback = pgutils.create_empty_func(False)
+# Once this is set to True, it prevents the exception dialog from being
+# displayed again if an exception occurred during `display_alert_message` (which
+# is used to create and display the exception dialog). This prevents potential
+# infinite loops and the inability of the user to close the dialog.
+_gui_excepthook_invoked = False
 
 
 def add_gui_excepthook(
@@ -529,25 +534,25 @@ def _gui_excepthook_generic(
       title,
       parent,
       report_uri_list):
+  global _gui_excepthook_invoked
+
   callback_result = _gui_excepthook_additional_callback(exc_type, exc_value, exc_traceback)
-  
+
   if callback_result:
     return
   
   sys.__excepthook__(exc_type, exc_value, exc_traceback)
   
   if issubclass(exc_type, Exception):
-    exception_message = ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    
-    display_alert_message(
-      title=title,
-      parent=parent,
-      details=exception_message,
-      report_uri_list=report_uri_list)
-    
-    # Make sure to quit the application since unhandled exceptions can
-    # mess up the application state.
-    if Gtk.main_level() > 0:
-      Gtk.main_quit()
+    if not _gui_excepthook_invoked:
+      _gui_excepthook_invoked = True
+
+      exception_message = ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+
+      display_alert_message(
+        title=title,
+        parent=parent,
+        details=exception_message,
+        report_uri_list=report_uri_list)
     
     sys.exit(ERROR_EXIT_STATUS)
