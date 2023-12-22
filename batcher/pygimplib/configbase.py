@@ -136,10 +136,10 @@ def _init_config_from_file(config: _Config):
 
 def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
-  config.PARASITE_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
+  config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
 
   pgsetting.persistor.Persistor.set_default_setting_sources({
-    'persistent': config.PARASITE_SOURCE,
+    'persistent': config.DEFAULT_SOURCE,
   })
 
   # FIXME: Duplicate logging instead of redirecting it.

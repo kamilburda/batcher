@@ -20,10 +20,14 @@ from src.gui import main as gui_main
 
 SETTINGS = settings_main.create_settings()
 
+_EXPORT_LAYERS_SOURCE_NAME = 'plug-in-batch-export-layers'
+
 
 def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, config):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
+
+  _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
 
   status = _update_plugin(SETTINGS, run_mode)
   if status == update.TERMINATE:
@@ -43,6 +47,8 @@ def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 
+  _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
+
   status = _update_plugin(SETTINGS, run_mode)
   if status == update.TERMINATE:
     return
@@ -55,17 +61,11 @@ def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _
     return _run_with_last_vals(layer_tree)
 
 
-def _run_noninteractive(layer_tree, config):
-  settings_file = config.get_property('settings-file')
+def _set_default_setting_source(source_name):
+  pg.config.SOURCE_NAME = source_name
 
-  if settings_file:
-    gimp_status, message = _load_settings_from_file(settings_file)
-    if gimp_status != Gimp.PDBStatusType.SUCCESS:
-      return gimp_status, message
-  else:
-    _set_settings_from_args(SETTINGS['main'], config)
-
-  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
+  pg.setting.Persistor.set_default_setting_sources(
+    {'persistent': pg.setting.GimpParasiteSource(source_name)})
 
 
 def _update_plugin(settings, run_mode):
@@ -123,6 +123,19 @@ def _set_settings_from_args(settings, config):
 
   for setting, arg in zip(args_as_settings, pg.setting.iter_args(args, args_as_settings)):
     setting.set_value(arg)
+
+
+def _run_noninteractive(layer_tree, config):
+  settings_file = config.get_property('settings-file')
+
+  if settings_file:
+    gimp_status, message = _load_settings_from_file(settings_file)
+    if gimp_status != Gimp.PDBStatusType.SUCCESS:
+      return gimp_status, message
+  else:
+    _set_settings_from_args(SETTINGS['main'], config)
+
+  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
 
 
 def _run_with_last_vals(layer_tree):
