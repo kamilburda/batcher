@@ -107,8 +107,6 @@ def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_OUTPUT_FILENAME = 'output.log'
   config.PLUGINS_LOG_ERROR_FILENAME = 'error.log'
 
-  config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS = 50
-
 
 def _init_config_from_file(config: _Config):
   orig_builtin_c = None
@@ -148,5 +146,4 @@ def _init_config_per_procedure(config: _Config):
     config.PLUGINS_LOG_OUTPUT_FILENAME,
     config.PLUGINS_LOG_ERROR_FILENAME,
     config.PLUGIN_TITLE,
-    config.GIMP_CONSOLE_MESSAGE_DELAY_MILLISECONDS,
   )

@@ -9,7 +9,7 @@ from typing import IO, Optional
 from . import constants
 from . import pdbutils as pgpdbutils
 
-_LOG_MODES = ('none', 'error', 'output_and_error', 'gimp_console')
+_LOG_MODES = ('none', 'error', 'output_and_error')
 
 _TEE_STDOUT = None
 _TEE_STDERR = None
@@ -21,9 +21,8 @@ def log_output(
       log_output_filename: Optional[str] = None,
       log_error_filename: Optional[str] = None,
       log_header_title: str = '',
-      gimp_console_message_delay_milliseconds: int = 0,
       flush_output: bool = False):
-  """Duplicates or redirects output to files or the GIMP console.
+  """Duplicates output from `sys.stdout` and `sys.stderr` to files.
 
   Logging is reset on each call to this function. For example,
   if ``log_mode`` was ``'output_and_error'`` and ``log_mode`` in the current
@@ -33,17 +32,14 @@ def log_output(
   Args:
     log_mode:
       The log mode. Possible values:
-      * ``'none'`` - No action is performed, i.e. the output is not
-        redirected/duplicated anywhere.
-      * ``'error'`` - Duplicates error output to a file.
-      * ``'output_and_error'`` - Both the standard output and error are
-        duplicated to log files.
-      * ``'gimp_console'`` - Both the standard output and error are redirected
-        to the GIMP error console.
+      * ``'none'`` - No action is performed, i.e. the output is not duplicated
+        anywhere.
+      * ``'error'`` - Duplicates error output (`sys.stderr`) to a file.
+      * ``'output_and_error'`` - Both the standard (`sys.stdout`) and the error
+        output (`sys.stderr`) are duplicated to log files.
     log_dirpaths:
       List of directory paths for log files. If the first path is not valid or
       the permission to write is denied, subsequent directories are used.
-      Applies to the ``'error'`` and ``'output_and_error'`` modes only.
     log_output_filename:
       File name of the log file to write standard output to. This parameter
       must not be ``None`` if ``log_mode`` is ``'output_and_error'``. Applies
@@ -51,18 +47,12 @@ def log_output(
     log_error_filename:
       File name of the log file to write error output to. This parameter must
       not be ``None`` if ``log_mode`` is ``'output_and_error'`` or
-      ``'error'``. Applies to the ``'error'`` and ``'output_and_error'``
-      modes only.
+      ``'error'``.
     log_header_title:
       Optional title in the log header, written before the first output to the
-      log files. Applies to the ``'error'`` and ``'output_and_error'`` modes
-      only.
-    gimp_console_message_delay_milliseconds:
-     The delay to display messages to the GIMP console in milliseconds. Only
-     applies to the ``'gimp_console'`` mode.
+      log files.
     flush_output:
-      If ``True``, the output is flushed after each instance of writing. Applies
-      to the ``'error'`` and ``'output_and_error'`` modes only.
+      If ``True``, the output is flushed after each instance of writing.
   """
   global _TEE_STDOUT
   global _TEE_STDERR
@@ -83,12 +73,6 @@ def log_output(
       if log_output_file is not None:
         _TEE_STDOUT = Tee(sys.stdout, log_header_title=log_header_title, flush_output=flush_output)
         _TEE_STDOUT.start(log_output_file)
-  elif log_mode == 'gimp_console':
-    sys.stdout = pgpdbutils.GimpMessageFile(
-      message_delay_milliseconds=gimp_console_message_delay_milliseconds)
-    sys.stderr = pgpdbutils.GimpMessageFile(
-      message_prefix='Error: ',
-      message_delay_milliseconds=gimp_console_message_delay_milliseconds)
   else:
     raise ValueError(f'invalid log mode "{log_mode}"; allowed values: {", ".join(_LOG_MODES)}')
 
