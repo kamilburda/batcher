@@ -7,7 +7,6 @@ import sys
 from typing import IO, Optional
 
 from . import constants
-from . import pdbutils as pgpdbutils
 
 _LOG_MODES = ('none', 'error', 'output_and_error')
 
