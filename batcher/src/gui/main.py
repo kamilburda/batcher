@@ -42,7 +42,6 @@ def display_reset_prompt(parent=None):
     modal=True,
     destroy_with_parent=True,
     buttons=Gtk.ButtonsType.YES_NO,
-    title=_('Reset Settings'),
   )
 
   dialog.set_transient_for(parent)
