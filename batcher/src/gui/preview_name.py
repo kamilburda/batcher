@@ -99,7 +99,6 @@ class NamePreview(preview_base_.Preview):
     self._row_expand_collapse_interactive = True
     self._clearing_preview = False
     self._row_select_interactive = True
-    self._initial_scroll_to_selection = True
     
     self._init_gui()
   
@@ -547,13 +546,12 @@ class NamePreview(preview_base_.Preview):
       if tree_iter is not None:
         self._tree_view.get_selection().select_iter(tree_iter)
     
-    if self._initial_scroll_to_selection and self._selected_items:
-      self._set_initial_scroll_to_selection()
-      self._initial_scroll_to_selection = False
+    if self._selected_items:
+      self._scroll_to_first_selected_item()
     
     self._row_select_interactive = True
   
-  def _set_initial_scroll_to_selection(self):
+  def _scroll_to_first_selected_item(self):
     if self._selected_items:
       tree_iter = self._tree_iters[self._selected_items[0]]
       if tree_iter is not None:
