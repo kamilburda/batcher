@@ -75,9 +75,9 @@ Yes, you may insert any GIMP filter as a procedure:
 4. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
-**I want to save the image as a multi-page PDF file.**
+**I want to save the image as a multipage PDF file.**
 
-While multi-page PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
+While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
 
 1. Add the "Export" procedure.
 2. Adjust the output folder as needed. The folder explorer in the main dialog will be ignored.
@@ -109,7 +109,7 @@ Invalid arguments result in the field being inserted literally.
 
 ### Available fields
 
-You can choose the fields from the dropdown list displayed when clicking on the text entry or you can type the fields manually.
+You can choose the fields from the dropdown list displayed when clicking on the text entry, or you can type the fields manually.
 
 **Number**
 
@@ -351,7 +351,7 @@ Options:
 * *File extension*: File extension of the output image(s).
   This overrides the file extension in the main dialog.
 * *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multi-page PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
+  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   The text entry next to `Save as` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
 * *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
@@ -397,7 +397,7 @@ The edit dialog allows you to edit the procedure name and the values of its argu
 ### Editing procedures
 
 When editing a procedure, you may (and sometimes have to) adjust its arguments.
-GIMP PDB procedures are usually accompanied with descriptions of the entire procedure as well as its arguments.
+GIMP PDB procedures are usually accompanied by descriptions of the entire procedure as well as its arguments.
 Hover over argument names to display tooltips describing them in more detail.
 The description for an argument often indicates the range of valid values.
 
