@@ -61,6 +61,7 @@ from typing import Any, Dict, Generator, List, Optional, Union
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 import pygimplib as pg
 from pygimplib.pypdb import pdb
@@ -603,7 +604,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
 
     if hasattr(proc_arg, 'default_value') and proc_arg.default_value is not None:
       if placeholder_type_name is None:
-        argument_dict['default_value'] = proc_arg.default_value
+        argument_dict['default_value'] = _get_arg_default_value(proc_arg)
       elif setting_type == placeholders.PlaceholderUnsupportedParameterSetting:
         argument_dict['default_param_value'] = proc_arg.default_value
 
@@ -652,6 +653,23 @@ def _remove_invalid_init_arguments_for_placeholder_settings(
     key: value for key, value in setting_type_init_kwargs.items()
     if key in setting_init_params or key in placeholder_setting_init_params
   }
+
+
+def _get_arg_default_value(proc_arg):
+  if proc_arg.value_type not in [GObject.TYPE_CHAR, GObject.TYPE_UCHAR]:
+    return proc_arg.default_value
+  else:
+    # For gchar and guchar types, the default value may be a string, while the
+    # value type is expected to be an int. We convert the value to int if
+    # possible to avoid errors (e.g. in `pygimplib.setting.NumericSetting`
+    # validation).
+    if isinstance(proc_arg.default_value, str):
+      try:
+        return ord(proc_arg.default_value)
+      except Exception:
+        return proc_arg.default_value
+    else:
+      return proc_arg.default_value
 
 
 def reorder(actions: pg.setting.Group, action_name: str, new_position: int):
