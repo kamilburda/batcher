@@ -14,7 +14,7 @@ class PreviewsController:
   _DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS = 50
   _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
   
-  _ACTION_ERROR_KEY = 'action_error'
+  _PREVIEW_ERROR_KEY = 'preview_error'
   
   def __init__(self, name_preview, image_preview, settings, image):
     self._name_preview = name_preview
@@ -46,10 +46,8 @@ class PreviewsController:
     self._connect_toplevel_notify_is_active()
   
   def connect_name_preview_events(self):
-    self._name_preview.connect(
-      'preview-selection-changed', self._on_name_preview_selection_changed)
-    self._name_preview.connect(
-      'preview-updated', self._on_name_preview_updated)
+    self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
+    self._name_preview.connect('preview-updated', self._on_name_preview_updated)
   
   def on_paned_outside_previews_notify_position(self, paned, property_spec):
     current_position = paned.get_position()
@@ -148,11 +146,11 @@ class PreviewsController:
     actions_.connect_event('before-remove-action', _on_before_remove_action)
   
   def _update_previews_on_setting_change(self, setting):
-    self._name_preview.lock_update(False, self._ACTION_ERROR_KEY)
+    self._name_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
     
-    self._image_preview.lock_update(False, self._ACTION_ERROR_KEY)
+    self._image_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
   
@@ -270,9 +268,9 @@ class PreviewsController:
     self._update_image_preview()
   
   def _on_name_preview_updated(self, preview, error):
-    if isinstance(error, exceptions.ActionError):
-      self._name_preview.lock_update(True, self._ACTION_ERROR_KEY)
-      self._image_preview.lock_update(True, self._ACTION_ERROR_KEY)
+    if error:
+      self._name_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
+      self._image_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
     
     self._image_preview.update_item()
   
