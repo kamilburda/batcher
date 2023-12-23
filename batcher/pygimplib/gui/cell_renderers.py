@@ -53,7 +53,7 @@ class CellRendererTextList(Gtk.CellRendererText):
     attr_name = self._property_name_to_attr(property_.name)
     if hasattr(self, attr_name):
       if (property_.name in ['text-list', 'markup-list']
-          and not(isinstance(value, list) or isinstance(value, tuple))):
+          and not (isinstance(value, list) or isinstance(value, tuple))):
         raise AttributeError('not a list or tuple')
       
       setattr(self, attr_name, value)

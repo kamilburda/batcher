@@ -6,7 +6,6 @@ During processing, these placeholders are replaced with real objects.
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 

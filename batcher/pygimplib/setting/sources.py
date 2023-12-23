@@ -5,7 +5,6 @@ from collections.abc import Iterable
 import json
 import os
 import pickle
-import traceback
 from typing import Any, Dict, List, Union
 
 import gi

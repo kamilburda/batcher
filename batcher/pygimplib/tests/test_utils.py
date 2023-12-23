@@ -133,7 +133,7 @@ class TestBytesRelatedFunctions(unittest.TestCase):
     )
 
   def test_escaped_string_to_bytes_returns_empty_bytes_on_malformed_input(self):
-    self.assertEqual(pgutils.escaped_string_to_bytes('\\x0x'),b'')
+    self.assertEqual(pgutils.escaped_string_to_bytes('\\x0x'), b'')
 
   def test_escaped_string_to_bytes_with_remove_overflow(self):
     self.assertEqual(

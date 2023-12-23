@@ -6,7 +6,6 @@ import pygimplib as pg
 
 from src import builtin_constraints
 from src import builtin_procedures
-from src import exceptions
 
 
 class PreviewsController:

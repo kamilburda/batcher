@@ -1,9 +1,5 @@
 """GUI-specific plug-in settings."""
 
-import collections
-
-from gi.repository import GLib
-
 import pygimplib as pg
 
 

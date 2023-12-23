@@ -1,7 +1,6 @@
 """Functions to invoke other functions in various ways, e.g. with a timeout."""
 
-from collections.abc import Iterable
-from typing import Callable, Dict
+from typing import Callable
 
 import gi
 gi.require_version('Gimp', '3.0')

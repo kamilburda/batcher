@@ -13,7 +13,6 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from . import constants as pgconstants
-from . import invocation as pginvocation
 from .pypdb import pdb
 
 

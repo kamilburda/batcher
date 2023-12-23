@@ -1,6 +1,5 @@
 """Updating the plug-in to the latest version."""
 
-import os
 from typing import Dict, List, Optional, Tuple, Union
 
 import gi

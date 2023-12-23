@@ -60,6 +60,7 @@ def append_to_list_before_and_after_invoke_twice(list_, arg):
   yield
   list_.append(arg)
 
+
 def append_to_list_before_middle_after_invoke_twice(list_, arg):
   list_.append(arg)
   yield

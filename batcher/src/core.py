@@ -140,7 +140,7 @@ class Batcher:
   
   @property
   def constraints(self) -> pg.setting.Group:
-    """Action group containing constraints.."""
+    """Action group containing constraints."""
     return self._constraints
   
   @property

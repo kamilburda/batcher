@@ -162,7 +162,9 @@ def take_and_process_screenshot(
 
 
 def blur_folder_chooser(image, gui, decoration_offsets):
-  scrolled_window = (gui.folder_chooser
+  scrolled_window = (
+    gui
+    .folder_chooser
     .get_children()[0]
     .get_children()[0].get_children()[1]
     .get_children()[0].get_children()[0])
