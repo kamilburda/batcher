@@ -3,7 +3,6 @@
 import contextlib
 import functools
 import os
-import traceback
 
 import gi
 gi.require_version('Gdk', '3.0')
