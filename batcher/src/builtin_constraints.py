@@ -1,5 +1,7 @@
 """Built-in plug-in constraints."""
 
+import collections
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -23,8 +25,9 @@ def has_matching_default_file_extension(item, batcher):
   return pg.path.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
 
-def is_item_in_selected_items(item, selected_items):
-  return item.raw in selected_items
+def is_item_in_items_selected_in_preview(item, selected_items):
+  image = item.raw.get_image()
+  return image in selected_items and item.raw in selected_items[image]
 
 
 def is_top_level(item):
@@ -74,13 +77,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
   {
     'name': 'selected_in_preview',
     'type': 'constraint',
-    'function': is_item_in_selected_items,
+    'function': is_item_in_items_selected_in_preview,
     # FOR TRANSLATORS: Think of "Only layers selected in preview" when translating this
     'display_name': _('Selected in preview'),
     'arguments': [
       {
-        'type': 'set',
+        'type': 'images_and_gimp_items',
         'name': 'selected_layers',
+        'default_value': collections.defaultdict(set),
         'display_name': _('Selected layers'),
         'gui_type': None,
       },

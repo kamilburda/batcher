@@ -349,9 +349,9 @@ class ImagePreview(preview_base_.Preview):
         item.reset()
     
     only_selected_item_constraint_id = self._batcher.add_constraint(
-      builtin_constraints.is_item_in_selected_items,
+      builtin_constraints.is_item_in_items_selected_in_preview,
       groups=[actions.DEFAULT_CONSTRAINTS_GROUP],
-      args=[[self.item.raw]])
+      args=[{self.item.raw.get_image(): {self.item.raw}}])
     
     error = None
     image_preview = None
