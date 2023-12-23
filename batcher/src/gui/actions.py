@@ -374,6 +374,10 @@ class ActionBox(pg.gui.ItemBox):
   
   def _on_action_edit_dialog_for_new_action_response(self, dialog, response_id, item):
     dialog.destroy()
+
+    if item not in self._items:
+      # This can happen if the item has been removed outside the dialog.
+      return
     
     if response_id == Gtk.ResponseType.OK:
       item.action['arguments'].apply_gui_values_to_settings(force=True)
