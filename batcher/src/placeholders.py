@@ -36,24 +36,28 @@ class Placeholder:
     return self._replacement_func(*args)
 
 
-def _get_current_image(batcher):
+def _get_current_image(setting, batcher):
   return batcher.current_image
 
 
-def _get_current_layer(batcher):
+def _get_current_layer(setting, batcher):
   return batcher.current_raw_item
 
 
-def _get_current_layer_for_array(batcher):
-  return (_get_current_layer(batcher),)
+def _get_current_layer_for_array(setting, batcher):
+  return (_get_current_layer(setting, batcher),)
 
 
-def _get_background_layer_for_array(batcher):
+def _get_background_layer_for_array(setting, batcher):
   return (background_foreground.get_background_layer(batcher),)
 
 
-def _get_foreground_layer_for_array(batcher):
+def _get_foreground_layer_for_array(setting, batcher):
   return (background_foreground.get_foreground_layer(batcher),)
+
+
+def _get_value_for_unsupported_parameter(setting, batcher):
+  return getattr(setting, 'default_param_value', None)
 
 
 _PLACEHOLDERS_RAW_LIST = [
@@ -64,6 +68,7 @@ _PLACEHOLDERS_RAW_LIST = [
   ('background_layer_for_array', _('Background Layer'), _get_background_layer_for_array),
   ('foreground_layer', _('Foreground Layer'), background_foreground.get_foreground_layer),
   ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
+  ('unsupported_parameter', '', _get_value_for_unsupported_parameter),
 ]
 
 
@@ -192,22 +197,41 @@ class PlaceholderItemArraySetting(PlaceholderArraySetting):
   ]
 
 
-def get_replaced_arg(arg, batcher: 'src.core.Batcher'):
-  """If ``arg`` is a placeholder object, returns a real object replacing the
-  placeholder. Otherwise, ``arg`` is returned unchanged.
+class PlaceholderUnsupportedParameterSetting(PlaceholderSetting):
 
-  Arguments after ``args`` are required arguments for actions and are used to
-  determine the real object that replaces the placeholder.
+  _DEFAULT_DEFAULT_VALUE = 'unsupported_parameter'
+  _ALLOWED_GUI_TYPES = [gui_placeholders.UnsupportedParameterPresenter]
+  _ALLOWED_PLACEHOLDERS = [
+    'unsupported_parameter',
+  ]
 
-  ``batcher`` is a `core.Batcher` instance holding necessary data for the
-  placeholder replacement.
+  def __init__(self, name, default_param_value=None, **kwargs):
+    self._default_param_value = default_param_value
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def default_param_value(self):
+    return self._default_param_value
+
+
+def get_replaced_value(setting: PlaceholderSetting, batcher: 'src.core.Batcher'):
+  """Returns a valid value replacing the placeholder value.
+
+  ``setting`` is the placeholder setting whose ``value`` property is replaced.
+
+  ``batcher`` is a `core.Batcher` instance holding data that may be used
+  depending on the subclass of ``setting``.
+
+  `KeyError` is raised if the placeholder value is not one of the keys in
+  `PLACEHOLDERS`.
   """
   try:
-    placeholder = PLACEHOLDERS[arg]
+    placeholder = PLACEHOLDERS[setting.value]
   except KeyError:
-    raise ValueError(f'invalid placeholder value "{arg}"')
+    raise ValueError(f'invalid placeholder value "{setting.value}"')
   else:
-    return placeholder.replace_args(batcher)
+    return placeholder.replace_args(setting, batcher)
 
 
 def get_placeholder_type_name_from_pdb_type(

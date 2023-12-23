@@ -572,10 +572,20 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
   for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
     retval = pg.setting.get_setting_type_from_gtype(proc_arg.value_type, proc_arg)
 
-    if retval is None:
-      raise UnsupportedPdbProcedureError(action_dict['name'], proc_arg.value_type)
+    if retval is not None:
+      setting_type, setting_type_init_kwargs = retval
 
-    setting_type, setting_type_init_kwargs = retval
+      placeholder_type_name = placeholders.get_placeholder_type_name_from_pdb_type(
+        proc_arg.value_type, proc_arg)
+
+      if placeholder_type_name is not None:
+        setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
+          setting_type, placeholder_type_name, setting_type_init_kwargs)
+        setting_type = placeholder_type_name
+    else:
+      setting_type = placeholders.PlaceholderUnsupportedParameterSetting
+      setting_type_init_kwargs = {}
+      placeholder_type_name = pg.setting.SETTING_TYPES[setting_type]
 
     unique_pdb_param_name = pg.path.uniquify_string(
       proc_arg.name,
@@ -584,14 +594,6 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     
     pdb_procedure_argument_names.append(unique_pdb_param_name)
 
-    placeholder_type_name = placeholders.get_placeholder_type_name_from_pdb_type(
-      proc_arg.value_type, proc_arg)
-
-    if placeholder_type_name is not None:
-      setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
-        setting_type, placeholder_type_name, setting_type_init_kwargs)
-      setting_type = placeholder_type_name
-
     argument_dict = {
       'type': setting_type,
       'name': unique_pdb_param_name,
@@ -599,13 +601,14 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
       **setting_type_init_kwargs,
     }
 
+    if hasattr(proc_arg, 'default_value') and proc_arg.default_value is not None:
+      if placeholder_type_name is None:
+        argument_dict['default_value'] = proc_arg.default_value
+      elif setting_type == placeholders.PlaceholderUnsupportedParameterSetting:
+        argument_dict['default_param_value'] = proc_arg.default_value
+
     if setting_type == pg.setting.BoolSetting:
       argument_dict['gui_type'] = 'check_button_no_text'
-
-    if (hasattr(proc_arg, 'default_value')
-        and proc_arg.default_value is not None
-        and placeholder_type_name is None):
-      argument_dict['default_value'] = proc_arg.default_value
 
     if inspect.isclass(setting_type) and issubclass(setting_type, pg.setting.NumericSetting):
       if hasattr(proc_arg, 'minimum'):
@@ -768,10 +771,3 @@ _ACTION_TYPES_AND_FUNCTIONS = {
   'procedure': _create_procedure,
   'constraint': _create_constraint,
 }
-
-
-class UnsupportedPdbProcedureError(Exception):
-  
-  def __init__(self, procedure_name, unsupported_param_type):
-    self.procedure_name = procedure_name
-    self.unsupported_param_type = unsupported_param_type

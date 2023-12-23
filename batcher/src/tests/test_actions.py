@@ -12,6 +12,7 @@ import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import actions as actions_
+from src import placeholders as placeholders_
 
 
 test_procedures = [
@@ -724,14 +725,29 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
   
   def test_unsupported_pdb_param_type(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type='unsupported', name='param-with-unsupported-type', blurb=''),
+      dict(
+        value_type='unsupported',
+        default_value='test',
+        name='param-with-unsupported-type',
+        blurb=''),
     ])
 
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    with self.assertRaises(actions_.UnsupportedPdbProcedureError):
-      actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
+    action_dict = actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
+
+    unsupported_param = action_dict['arguments'][-1]
+
+    self.assertDictEqual(
+      unsupported_param,
+      {
+        'type': placeholders_.PlaceholderUnsupportedParameterSetting,
+        'name': 'param-with-unsupported-type',
+        'display_name': 'param-with-unsupported-type',
+        'default_param_value': 'test',
+      }
+    )
   
   def test_default_run_mode_is_noninteractive(self, mock_get_pdb):
     self.procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)

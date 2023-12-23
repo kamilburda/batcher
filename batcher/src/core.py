@@ -600,7 +600,7 @@ class Batcher:
     
     for argument in action_arguments:
       if isinstance(argument, placeholders.PlaceholderArraySetting):
-        replaced_arg = placeholders.get_replaced_arg(argument.value, self)
+        replaced_arg = placeholders.get_replaced_value(argument, self)
         if is_function_pdb_procedure:
           replaced_args.extend([
             len(replaced_arg),
@@ -610,7 +610,7 @@ class Batcher:
         else:
           replaced_args.append(replaced_arg)
       elif isinstance(argument, placeholders.PlaceholderSetting):
-        replaced_args.append(placeholders.get_replaced_arg(argument.value, self))
+        replaced_args.append(placeholders.get_replaced_value(argument, self))
       elif isinstance(argument, pg.setting.Setting):
         if is_function_pdb_procedure:
           if isinstance(argument, pg.setting.ArraySetting):

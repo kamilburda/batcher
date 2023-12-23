@@ -7,6 +7,7 @@ from gi.repository import GObject
 
 import parameterized
 
+import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import placeholders
@@ -23,20 +24,24 @@ class TestGetReplacedArg(unittest.TestCase):
 
   def test_arg_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
+    setting = placeholders.PlaceholderImageSetting('placeholder')
 
-    self.assertEqual(placeholders.get_replaced_arg('current_image', batcher), 'image')
+    self.assertEqual(placeholders.get_replaced_value(setting, batcher), 'image')
 
   def test_arg_matching_array_placeholder(self):
     batcher = _BatcherStub(current_image='image')
+    setting = placeholders.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
 
     self.assertTupleEqual(
-      placeholders.get_replaced_arg('current_layer_for_array', batcher), (None,))
+      placeholders.get_replaced_value(setting, batcher), (None,))
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
 
     with self.assertRaises(ValueError):
-      placeholders.get_replaced_arg('invalid_placeholder', batcher)
+      # noinspection PyTypeChecker
+      placeholders.get_replaced_value(
+        pg.setting.StringSetting('placeholder', default_value='invalid_placeholder'), batcher)
 
 
 class TestGetPlaceholderNameFromPdbType(unittest.TestCase):

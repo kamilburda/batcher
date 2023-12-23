@@ -17,7 +17,8 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import actions as actions_
-from src.gui import messages as messages_
+from src.gui import placeholders as gui_placeholders_
+from src.gui import messages as gui_messages_
 
 
 class ActionBox(pg.gui.ItemBox):
@@ -305,25 +306,7 @@ class ActionBox(pg.gui.ItemBox):
     if response_id == Gtk.ResponseType.OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
-        try:
-          pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(procedure_name)
-        except actions_.UnsupportedPdbProcedureError as e:
-          messages_.display_failure_message(
-            main_message=_(
-              'An error occurred while adding procedure "{}".'.format(e.procedure_name)),
-            failure_message='',
-            details=(
-              _('Could not add procedure "{}" because the parameter type "{}"'
-                ' is not supported.').format(e.procedure_name, e.unsupported_param_type)),
-            parent=pg.gui.get_toplevel_window(self),
-            report_description=_(
-              'You can help fix this issue by sending a report with the text above'
-              ' to one of the sites below'),
-            display_details_initially=True)
-          
-          dialog.hide()
-          return
-
+        pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(procedure_name)
         pdb_proc_action_dict['enabled'] = False
         
         item = self.add_item(pdb_proc_action_dict)
@@ -471,7 +454,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   
   @staticmethod
   def _on_button_warning_clicked(button, main_message, short_message, full_message, parent):
-    messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
+    gui_messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
 
 
 class _ActionEditDialog(GimpUi.Dialog):
@@ -481,8 +464,6 @@ class _ActionEditDialog(GimpUi.Dialog):
   
   _GRID_ROW_SPACING = 4
   _GRID_COLUMN_SPACING = 8
-  
-  _PLACEHOLDER_WIDGET_HORIZONTAL_SPACING = 5
   
   _MORE_OPTIONS_PADDING = 4
   _MORE_OPTIONS_SPACING = 4
@@ -602,12 +583,12 @@ class _ActionEditDialog(GimpUi.Dialog):
       
       widget_to_attach = setting.gui.widget
       
-      if not isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
-        if isinstance(setting, pg.setting.ArraySetting):
-          if not setting.element_type.get_allowed_gui_types():
-            widget_to_attach = self._create_placeholder_widget()
+      if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
+        widget_to_attach = gui_placeholders_.create_placeholder_widget()
       else:
-        widget_to_attach = self._create_placeholder_widget()
+        if (isinstance(setting, pg.setting.ArraySetting)
+            and not setting.element_type.get_allowed_gui_types()):
+          widget_to_attach = gui_placeholders_.create_placeholder_widget()
       
       self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
 
@@ -633,26 +614,3 @@ class _ActionEditDialog(GimpUi.Dialog):
     
     action['more_options_expanded'].gui.widget.remove(self._vbox_more_options)
     self._vbox.remove(action['more_options_expanded'].gui.widget)
-  
-  def _create_placeholder_widget(self):
-    hbox = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._PLACEHOLDER_WIDGET_HORIZONTAL_SPACING,
-    )
-    
-    hbox.pack_start(
-      Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_WARNING, Gtk.IconSize.BUTTON),
-      False,
-      False,
-      0)
-    
-    label = Gtk.Label(
-      use_markup=True
-    )
-    label.set_markup(
-      '<span font_size="small">{}</span>'.format(
-        GLib.markup_escape_text(_('Cannot modify this parameter'))))
-    
-    hbox.pack_start(label, False, False, 0)
-    
-    return hbox
