@@ -24,7 +24,6 @@ def display_message(
   return pg.gui.display_message(
     message,
     message_type,
-    title=pg.config.PLUGIN_TITLE,
     parent=parent,
     buttons=buttons,
     message_in_text_view=message_in_text_view,
@@ -46,7 +45,6 @@ def display_failure_message(
       ' by sending a report with the text in the details to one of the sites below')
   
   pg.gui.display_alert_message(
-    title=pg.config.PLUGIN_TITLE,
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,
