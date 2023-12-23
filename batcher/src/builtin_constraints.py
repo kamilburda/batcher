@@ -30,6 +30,10 @@ def is_item_in_items_selected_in_preview(item, selected_items):
   return image in selected_items and item.raw in selected_items[image]
 
 
+def is_item_in_items_selected_in_gimp(item):
+  return item.raw in item.raw.get_image().list_selected_layers()
+
+
 def is_top_level(item):
   return item.depth == 0
 
@@ -73,6 +77,13 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_default_file_extension,
     # FOR TRANSLATORS: Think of "Only layers matching file extension" when translating this
     'display_name': _('Matching file extension'),
+  },
+  {
+    'name': 'selected_in_gimp',
+    'type': 'constraint',
+    'function': is_item_in_items_selected_in_gimp,
+    # FOR TRANSLATORS: Think of "Only layers selected in GIMP" when translating this
+    'display_name': _('Selected in GIMP'),
   },
   {
     'name': 'selected_in_preview',

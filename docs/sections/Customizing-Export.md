@@ -430,6 +430,10 @@ Process only layer groups.
 
 Process only layers having a file extension matching the extension typed in the text entry.
 
+**Selected in GIMP**
+
+Process only layers selected in GIMP.
+
 **Selected in preview**
 
 Process only layers selected in the preview.
