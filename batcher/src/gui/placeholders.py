@@ -79,10 +79,10 @@ def create_placeholder_widget(spacing=5):
 
   label = Gtk.Label(
     use_markup=True,
+    label=_('Cannot modify this parameter'),
     xalign=0.0,
     yalign=0.5,
   )
-  label.set_markup(GLib.markup_escape_text(_('Cannot modify this parameter')))
 
   hbox.pack_start(label, False, False, 0)
 
