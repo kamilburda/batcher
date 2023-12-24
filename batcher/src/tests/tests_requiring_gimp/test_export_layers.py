@@ -84,29 +84,41 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def test_use_image_size(self):
     self.compare(
       procedure_names_to_remove=['use_layer_size'],
-      expected_results_dirpath=os.path.join(
-        self.expected_results_root_dirpath, 'use_image_size'))
+      expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'use_image_size'),
+    )
   
   def test_background(self):
     self.compare(
       procedure_names_to_add={'insert_background': 0},
-      expected_results_dirpath=os.path.join(
-        self.expected_results_root_dirpath, 'background'))
+      expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'background'),
+      additional_init_before_run=(
+        lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.BLUE)),
+    )
   
   def test_foreground(self):
     self.compare(
       procedure_names_to_add={'insert_foreground': 0},
-      expected_results_dirpath=os.path.join(
-        self.expected_results_root_dirpath, 'foreground'))
+      expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'foreground'),
+      additional_init_before_run=(
+        lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.GREEN)),
+    )
     
     self._reload_image()
-  
+
+  @staticmethod
+  def _set_color_tag(image, layer_name, color_tag):
+    for layer in image.list_layers():
+      if layer.get_name() == layer_name:
+        layer.set_color_tag(color_tag)
+
   def compare(
         self,
         procedure_names_to_add=None,
         procedure_names_to_remove=None,
         different_results_and_expected_layers=None,
-        expected_results_dirpath=None):
+        expected_results_dirpath=None,
+        additional_init_before_run=None,
+  ):
     settings = settings_main.create_settings()
     settings['special/image'].set_value(self.test_image)
     settings['main/output_directory'].set_value(self.output_dirpath)
@@ -123,7 +135,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         layer.get_name(): layer
         for layer in self.expected_images[expected_results_dirpath].list_layers()}
     
-    self._export(settings, procedure_names_to_add, procedure_names_to_remove)
+    self._export(
+      settings, procedure_names_to_add, procedure_names_to_remove, additional_init_before_run)
     
     self.image_with_results, layers = self._load_layers_from_dirpath(self.output_dirpath)
     
@@ -141,7 +154,12 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         expected_results_dirpath)
   
   @staticmethod
-  def _export(settings, procedure_names_to_add, procedure_names_to_remove):
+  def _export(
+        settings,
+        procedure_names_to_add,
+        procedure_names_to_remove,
+        additional_init_before_run,
+  ):
     if procedure_names_to_add is None:
       procedure_names_to_add = {}
     
@@ -158,6 +176,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     for procedure_name in procedure_names_to_remove:
       if procedure_name in settings['main/procedures']:
         actions.remove(settings['main/procedures'], procedure_name)
+
+    if additional_init_before_run is not None:
+      additional_init_before_run(settings['special/image'].value)
     
     batcher = core.Batcher(
       settings['special/run_mode'].value,
