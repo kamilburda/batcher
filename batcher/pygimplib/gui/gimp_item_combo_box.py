@@ -4,13 +4,13 @@ import collections
 from typing import Optional
 
 import gi
-from gi.repository import GObject
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 __all__ = [
   'GimpItemComboBox',
