@@ -495,7 +495,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         `__init__()` is used instead.
     """
     if gui_type != 'automatic' and widget is None:
-      raise ValueError('widget cannot be None if gui_type is "automatic"')
+      raise ValueError('widget cannot be None if gui_type is not "automatic"')
     if gui_type == 'automatic' and widget is not None:
       raise ValueError('gui_type cannot be "automatic" if widget is not None')
     
