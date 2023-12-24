@@ -7,6 +7,7 @@ from .entries import *
 from .entry_expander import *
 from .entry_popup import *
 from .entry_undo import *
+from .file_chooser_widget import *
 from .gimp_item_combo_box import *
 from .item_box import *
 from .overwrite_chooser import *

@@ -296,7 +296,7 @@ class ExportLayersDialog:
     )
     self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
     
-    self._folder_chooser = Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
+    self._folder_chooser = pg.gui.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
     
     self._vbox_folder_chooser = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,

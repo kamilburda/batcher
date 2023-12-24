@@ -613,7 +613,7 @@ class FolderChooserWidgetPresenter(GtkPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
-    return Gtk.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
+    return pggui.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
   
   def _get_value(self):
     folder = self._widget.get_current_folder()
