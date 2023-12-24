@@ -37,6 +37,8 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     * placeholder text,
     * expandable width of the entry.
   """
+
+  _PLACEHOLDER_STYLE_CLASS_NAME = 'placeholder'
   
   def __init__(
         self,
@@ -73,7 +75,13 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
       self, self._minimum_width_chars, self._maximum_width_chars)
     
     self._has_placeholder_text_assigned = False
-    
+
+    self._placeholder_css_provider = Gtk.CssProvider()
+    self._placeholder_css_provider.load_from_data(
+      f'entry.{self._PLACEHOLDER_STYLE_CLASS_NAME} {{font-style: italic;}}'.encode())
+    self.get_style_context().add_provider(
+      self._placeholder_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
     self.connect('focus-in-event', self._on_extended_entry_focus_in_event)
     self.connect('focus-out-event', self._on_extended_entry_focus_out_event)
     self.connect_after('realize', self._on_after_extended_entry_realize)
@@ -146,23 +154,17 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
       # Delay font modification until after widget realization as the font may
       # have been different before the realization.
       if self.get_realized():
-        self._modify_font_for_placeholder_text(Gtk.StateFlags.INSENSITIVE, Pango.Style.ITALIC)
+        self.get_style_context().add_class(self._PLACEHOLDER_STYLE_CLASS_NAME)
       
       self._do_assign_text(self._placeholder_text)
   
   def _unassign_placeholder_text(self):
     if self._has_placeholder_text_assigned:
       self._has_placeholder_text_assigned = False
-      self._modify_font_for_placeholder_text(Gtk.StateFlags.NORMAL, Pango.Style.NORMAL)
+      self.get_style_context().remove_class(self._PLACEHOLDER_STYLE_CLASS_NAME)
       self._do_assign_text('')
       if self._popup is not None:
         self._popup.save_last_value()
-  
-  def _modify_font_for_placeholder_text(self, state_for_color, style):
-    font_description = self.get_pango_context().get_font_description()
-    font_description.set_style(style)
-    # FIXME: Replace deprecated function with `Gtk.StyleContext` and a custom CSS class
-    self.override_font(font_description)
   
   def _should_assign_placeholder_text(self, text):
     return (
