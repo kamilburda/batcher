@@ -42,6 +42,9 @@ If the previewed image takes too long to render, the preview is no longer update
 A button next to the arrow button above the image is displayed that allows you to manually update the image.
 To switch between automatic and manual update, click on the arrow button and select `Update Image Preview Automatically`.
 
+Note that the preview is only an approximation of what the exported image will look like and thus is not completely accurate when exporting with certain file formats.
+For example, the preview will show a transparent image if the JPEG format (which does not support transparency) is selected.
+
 
 Managing Settings
 -----------------
