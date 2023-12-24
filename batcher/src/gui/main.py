@@ -349,8 +349,9 @@ class ExportLayersDialog:
     
     self._file_extension_entry = pg.gui.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS)
-    self._file_extension_entry.set_activates_default(True)
+      maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
+      activates_default=True,
+    )
     
     self._save_as_label = Gtk.Label(
       xalign=0.0,
