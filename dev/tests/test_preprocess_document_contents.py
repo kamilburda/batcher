@@ -160,8 +160,8 @@ plug-in."""
      _TEST_SECTION_HEADERS['known_issues']
      + '\n' + ' '.join(_TEST_SECTION_CONTENTS['known_issues'][1:3])],
   ])
-  @mock.patch('preprocess_document_contents.os.path.isfile')
-  @mock.patch('preprocess_document_contents.open')
+  @mock.patch('dev.preprocess_document_contents.os.path.isfile')
+  @mock.patch('dev.preprocess_document_contents.open')
   def test_include_section(
         self,
         test_case_name,
