@@ -485,7 +485,7 @@ class ExportLayersDialog:
     self._button_settings.add(self._hbox_button_settings)
     
     self._menu_item_show_more_settings = Gtk.CheckMenuItem(label=_('Show More Settings'))
-    self._menu_item_edit_mode = Gtk.CheckMenuItem(label=_('Batch Editing'))
+    self._menu_item_edit_mode = Gtk.CheckMenuItem(label=_('Edit Layers'))
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
     self._menu_item_import_settings = Gtk.MenuItem(label=_('Import Settings...'))
