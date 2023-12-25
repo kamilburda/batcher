@@ -26,16 +26,16 @@ libgmp-dev
 libffi-dev
 gcc
 gettext
-python
-python-pip
+python3
+python3-pip
 gimp'
 
   sudo apt-get install -y $required_packages
 else
   required_packages='git
 ruby
-python27
-python-pip
+python3
+python3-pip
 gettext
 gimp'
 
@@ -70,14 +70,14 @@ sudo pip install $python_modules
 
 # GIMP initialization
 
-gimp_version_major_minor="$(gimp --version | sed 's/.*version \([0-9][0-9]*.[0-9][0-9]*\).*$/\1/')"
+required_version='2.99.16'
+gimp_version="$(gimp --version | sed 's/.*version \([0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*\)$/\1/')"
 
-if [ "$gimp_version_major_minor" = "2.8" ]; then
-  gimp_local_dirpath="$HOME"'/.gimp-2.8'
-elif [[ ! "$gimp_version_major_minor" < "2.9" ]]; then
+if [[ "$gimp_version" == "$required_version" ]]; then
+  gimp_version_major_minor="${gimp_version%.*}"
   gimp_local_dirpath="$HOME"'/.config/GIMP/'"$gimp_version_major_minor"
 else
-  echo "Unsupported version of GIMP ($gimp_version_major_minor). Please install GIMP version 2.8 or later."
+  echo "Unsupported version of GIMP ($gimp_version). Please install GIMP version $required_version."
   exit 1
 fi
 
@@ -88,25 +88,15 @@ repo_dirpath="$gimp_local_dirpath"'/'"$plugin_main_repo_dirname"
 
 gimprc_filename='gimprc'
 gimprc_filepath="$gimp_local_dirpath"'/'"$gimprc_filename"
-system_gimprc_filepath='/etc/gimp/2.0/gimprc'
 
 if [ ! -f "$gimprc_filepath" ]; then
   echo "$gimprc_filename"' does not exist, running GIMP...'
-  gimp --no-interface --new-instance --batch-interpreter='python-fu-eval' --batch 'pdb.gimp_quit(0)'
+  gimp --no-interface --new-instance --batch-interpreter='python-fu-eval' --batch "Gimp.get_pdb().run_procedure('gimp-quit', [True])"
 fi
 
 if [ ! -f "$gimprc_filepath" ]; then
-  echo "$gimprc_filename"' still does not exist, creating new file'
-  plugin_dirpaths_from_system_gimprc="$(grep -oE '\(plug-in-path ".*"\)' "$system_gimprc_filepath" | sed -r 's/\(plug-in-path "(.*)"\)/\1/')"
-  
-  echo 'Adding repository path to the list of plug-in directories in '"$gimprc_filename"
-  echo '(plug-in-path "'"$plugin_dirpaths_from_system_gimprc"':'"$repo_dirpath"'")' > "$gimprc_filepath"
-else
-  repo_dirpath_in_gimprc="$(grep -oE '\(plug-in-path ".*'"$repo_dirpath"'"\)' "$gimprc_filepath")"
-  if [ ! "$repo_dirpath_in_gimprc" ]; then
-    echo 'Adding repository path to the list of plug-in directories in '"$gimprc_filename"
-    sed -i -r -e 's:(\(plug-in-path ".*)("\)):\1\:'"$repo_dirpath"'\2:' "$gimprc_filepath"
-  fi
+  echo 'Warning: "'"$gimprc_filepath"'" could not be found or created.'
+  echo 'Manually run GIMP and add the repository path "'"$repo_dirpath"'" to the list of plug-in folders (Edit -> Preferences -> Folders -> Plug-Ins).'
 fi
 
 
