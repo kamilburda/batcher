@@ -54,7 +54,7 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 3. Add the "Top-level" constraint.
 
 
-**I want to adjust brightness in my layers before export. Can this be done?**
+**I want to adjust brightness in my layers. Can this be done?**
 
 Yes, you may insert any GIMP filter as a procedure:
 1. Select `Add Procedure... → Add Custom Procedure...`
@@ -71,7 +71,7 @@ Yes, you may insert any GIMP filter as a procedure:
 4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
-**I want to save the image as a multipage PDF file.**
+**I want to save the entire image as a single multipage PDF file.**
 
 While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
 
