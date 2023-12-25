@@ -13,7 +13,7 @@
 * PDB = GIMP procedural database
 
 
-## Development Setup <a name="Development-Setup"></a>
+## Development Setup
 
 This section explains how to set up development environment for Batcher.
 
@@ -49,7 +49,7 @@ To set up GitHub page locally:
       bundle install
 
 
-### Git Hooks <a name="Git-Hooks"></a>
+### Git Hooks
 
 Set up git hooks located in `dev/git_hooks` by creating symbolic links:
 
@@ -68,14 +68,14 @@ The repository contains readily available configuration for the PyCharm IDE.
 Among other things, the configuration suppresses several formatting warnings and missing references to global variables (such as `_` used as a function to return a translated string).
 
 
-## Creating a Release <a name="Creating-a-Release"></a>
+## Creating a Release
 
 Run `dev/make_installers.sh` to create installer(s).
 Use the `-i` option to specify platform(s) for which to create installers.
 The installers will be created in the `installers/output` directory.
 
 
-## Coding Conventions <a name="Coding-Conventions"></a>
+## Coding Conventions
 
 For Python modules, follow PEP 8 conventions unless specified otherwise below.
 
@@ -235,7 +235,7 @@ Do not use `Gtk.main_iteration()` (which forces the GUI to update) for this purp
 Make sure the code is compatible with Python 3.7 and above.
 
 
-## Writing Commit Messages <a name="Writing-Commit-Messages"></a>
+## Writing Commit Messages
 
 This section explains how to write good commit messages.
 The conventions are based on the following guidelines:
@@ -283,7 +283,7 @@ Use one of the following types of scope:
 To indicate a more detailed scope, use `.` as a path separator, e.g. `gui.settings: ...`.
 
 
-## Writing Documentation <a name="Writing-Documentation"></a>
+## Writing Documentation
 
 ### API Documentation
 
@@ -301,7 +301,7 @@ Similarly, class and module docstrings should begin with a one-line summary.
 Avoid beginning the module docstring with `This module...` and directly describe its purpose (e.g. `Loading and saving settings.` instead of `This module defines classes to load and save settings.`). 
 
 
-### User Documentation <a name="User-Documentation"></a>
+### User Documentation
 
 To update documentation for end users, modify the "raw" documentation - files located in `docs` (except files in `gh-pages`).
 Do not modify other documentation files outside `docs` as they are automatically updated by [git hooks](#Git-Hooks) when committing changes to the files in `docs`.

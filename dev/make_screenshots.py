@@ -38,9 +38,9 @@ OUTPUT_DIRPATH = os.path.join(
   GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
-SCREENSHOT_DIALOG_BASIC_USAGE_FILENAME = 'screenshot_dialog_basic_usage.png'
-SCREENSHOT_DIALOG_CUSTOMIZING_EXPORT_FILENAME = 'screenshot_dialog_customizing_export.png'
-SCREENSHOT_DIALOG_BATCH_EDITING_FILENAME = 'screenshot_dialog_batch_editing.png'
+SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
+SCREENSHOT_DIALOG_CUSTOMIZATION_FILENAME = 'screenshot_dialog_customization.png'
+SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
 def main(settings=None):
@@ -78,7 +78,7 @@ def take_screenshots(gui, dialog, settings):
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_BASIC_USAGE_FILENAME,
+    SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
     gui,
@@ -113,7 +113,7 @@ def take_screenshots(gui, dialog, settings):
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_CUSTOMIZING_EXPORT_FILENAME,
+    SCREENSHOT_DIALOG_CUSTOMIZATION_FILENAME,
     settings,
     decoration_offsets,
     gui,
@@ -127,7 +127,7 @@ def take_screenshots(gui, dialog, settings):
   
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_BATCH_EDITING_FILENAME,
+    SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
     gui,

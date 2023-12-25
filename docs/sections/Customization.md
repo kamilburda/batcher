@@ -1,5 +1,4 @@
-Getting Started with Customization
-----------------------------------
+## Getting Started with Customization
 
 Beyond the basic features, Batcher allows you to:
 * customize the layer name,
@@ -7,17 +6,15 @@ Beyond the basic features, Batcher allows you to:
 * selecting which layers to process by applying *constraints* (only visible layers, ...),
 * customize export to save multi-layer images (e.g. multi-page PDFs).
 
-To enable customization, press the `Settings` button and select `Show More Settings`.
-
-![Dialog of Batcher with additional customization](../images/screenshot_dialog_customizing_export.png)
-
-You may adjust the height of the bottom pane by dragging the separator above the procedures and constraints.
-
 As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below to help you get accustomed to the plug-in's features.
 
+When [editing layers](Usage.md#editing-layers), customization options are automatically displayed.
+To enable customization when exporting layers, select `Settings → Show More Settings`.
 
-Examples
---------
+![Dialog of Export Layers with additional customization](../images/screenshot_dialog_customization.png)
+
+
+## Examples
 
 **I want to export all layers using the image size, not the layer size.**
 
@@ -61,7 +58,7 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 **I want to adjust brightness in my layers before export. Can this be done?**
 
 Yes, you may insert any GIMP filter as a procedure:
-1. Select `Add Procedure...` → `Add Custom Procedure...`
+1. Select `Add Procedure... → Add Custom Procedure...`
 2. Find `gimp-drawable-brightness-contrast` in the procedure browser and select `Add`.
 3. Adjust the parameters as desired.
 4. Select `OK` to add the procedure.
@@ -72,7 +69,7 @@ Yes, you may insert any GIMP filter as a procedure:
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
 2. In the plug-in, the color tag will be displayed next to the layer name(s).
 3. Add the "Background, foreground" → "Insert background" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
-4. If you want to perform [batch editing](Batch-Editing.md) rather than export, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
+4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
 
 
 **I want to save the image as a multipage PDF file.**
@@ -87,11 +84,10 @@ While multipage PDF export is already possible in GIMP without any third-party p
 6. Specifically for the PDF format, you need to check `Layers as pages` when the native PDF export dialog is shown. Otherwise, only a single page will be exported.
 7. You may also want to uncheck the "Use layer size" procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
-Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP (at least in GIMP 2.10).
+Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP.
 
 
-Customizing Layer Names
------------------------
+## Adjusting Layer Names
 
 By default, layer names are used as filenames.
 The text entry next to `Save as` lets you customize the filenames.
@@ -277,11 +273,10 @@ Examples:
 * `[layer path, [,], [[[%c]]] ]` → `[Body],[Hands],[Left]`
 
 
-Procedures
-----------
+## Procedures
 
 Procedures allow you to apply image filters to each layer.
-Press the `Add Procedure...` button and select one of the available procedures, or add a [custom procedure](#Adding-Custom-Procedures).
+Press the `Add Procedure...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
 
 For each added procedure, you may perform any of the following:
 * enable and disable the procedure,
@@ -329,7 +324,8 @@ Merges an already inserted background layer (via "Insert background", see above)
 
 This is useful if you wish to have a single merged layer rather than the background as a separate layer.
 
-When exporting layers, the background is merged automatically before the export, hence this procedure is only useful when batch editing layers.
+When exporting layers, the background is merged automatically before the export.
+Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
 
 If there is no background layer inserted, this procedure has no effect.
 
@@ -337,7 +333,8 @@ If there is no background layer inserted, this procedure has no effect.
 
 Merges an already inserted foreground layer (via "Insert foreground", see above) with the current layer.
 
-When exporting layers, the foreground is merged automatically before the export, hence this procedure is only useful when batch editing layers.
+When exporting layers, the foreground is merged automatically before the export.
+Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
 
 For more information, see "Merge background" above.
 
@@ -370,7 +367,7 @@ Export all layers to the output folder on the same level, i.e. do not create sub
 **Rename layer**
 
 Rename a layer according to the specified pattern.
-This procedure uses the same text entry for patterns as the one next to `Save as` (as described in [Customizing Layer Names](#customizing-layer-names)).
+This procedure uses the same text entry for patterns as the one next to `Save as` (as described in [Adjusting Layer Names](#adjusting-layer-names)).
 If this procedure is specified, the text entry next to `Save as` has no effect.
 
 Additionally, this procedure allows customizing whether to also rename folders (by enabling `Rename folders`) or only rename folders (by enabling `Rename folders` and disabling `Rename layers`).
@@ -384,10 +381,10 @@ To keep the size of the image canvas and the layer position within the image, di
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 To export the entire layer, leave this setting enabled.
 
-When batch editing, you may want to disable this procedure as the image will be resized to the last processed layer's dimensions.
+When [editing layers](Usage.md#editing-layers), you may want to disable this procedure as the image will be resized to the last processed layer's dimensions.
 
 
-### Adding Custom Procedures <a name="Adding-Custom-Procedures"></a>
+### Adding Custom Procedures
 
 You can add any procedure available in the GIMP Procedural Database (PDB) by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
 Select the desired procedure from the browser dialog and press `Add`.
@@ -407,8 +404,7 @@ If a procedure contains a layer/drawable/item argument, you may select one of th
 * "Foreground Layer" - applies the procedure to the layer representing foreground, inserted via the "Insert foreground" procedure. If there is no such layer, the procedure will have no effect.
 
 
-Constraints
------------
+## Constraints
 
 To exclude certain layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
 As with procedures, you can enable, disable, reorder, edit or remove constraints as needed.
@@ -470,8 +466,7 @@ If a layer group is assigned a color tag, it will normally not be ignored.
 To also ignore layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
 
 
-More Options
-------------
+## More Options
 
 When editing procedures or constraints, you may adjust additional options when clicking on `More options`.
 

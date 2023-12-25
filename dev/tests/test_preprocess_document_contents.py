@@ -68,10 +68,8 @@ class TestParseArgs(unittest.TestCase):
 class TestIncludeSectionTag(unittest.TestCase):
   
   _TEST_SECTION_HEADERS = {
-    'translations': """Translations
-------------""",
-    'known_issues': """Known Issues
-------------""",
+    'translations': """## Translations""",
+    'known_issues': """## Known Issues""",
   }
   
   _TEST_SECTION_CONTENTS = {

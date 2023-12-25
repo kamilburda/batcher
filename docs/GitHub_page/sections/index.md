@@ -4,7 +4,10 @@ title: {% include-config 'PLUGIN_TITLE' %} – Documentation
 navbar_active_tab: docs
 ---
 
-{% include-config 'PLUGIN_TITLE' %} is a [GIMP](https://www.gimp.org/) plug-in that exports layers as separate images.
+{% include-config 'PLUGIN_TITLE' %} is an upcoming [GIMP](https://www.gimp.org/) plug-in for exporting layers as separate images and editing layers.
+
+Requires [GIMP 2.99.16](https://www.gimp.org/downloads/devel/). Earlier or later GIMP versions will **not** work.
+
 
 ### Getting started and need help?
 
@@ -13,12 +16,7 @@ See [Installation](Installation.html) and [Usage](Usage.html).
 
 ### Need more customization?
 
-See [Customizing Export](Customizing-Export.html).
-
-
-### Need to edit layers without exporting them?
-
-See [Batch Editing](Batch-Editing.html).
+See [Customization](Customization.html).
 
 
 ### Having trouble?

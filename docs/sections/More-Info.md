@@ -1,5 +1,4 @@
-Support
--------
+## Support
 
 You can report issues, ask questions or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
 
@@ -8,13 +7,11 @@ Before submitting a bug report:
 * Check the [GitHub Issues page](https://github.com/kamilburda/batcher/issues) for current issues.
 
 
-Translations
-------------
+## Translations
 
 If you would like to provide translations, see [TRANSLATIONS](TRANSLATIONS.md) for instructions.
 
 
-License
--------
+## License
 
 Batcher is licensed under the [BSD 3-Clause](LICENSE) license.

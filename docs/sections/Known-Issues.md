@@ -1,5 +1,4 @@
-Known Issues
-------------
+## Known Issues
 
 Sometimes, after you press the Export button, it may seem as though nothing happens.
 In that case, the file format dialog may be displayed behind GIMP. If so, simply select the dialog to bring it up.

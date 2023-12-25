@@ -1,11 +1,11 @@
 docs/images/download_icon.svg
 docs/gh-pages/dev/images/download_icon.svg
 
-docs/images/screenshot_dialog_basic_usage.png
-docs/gh-pages/dev/images/screenshot_dialog_basic_usage.png
+docs/images/screenshot_dialog_export_layers.png
+docs/gh-pages/dev/images/screenshot_dialog_export_layers.png
 
-docs/images/screenshot_dialog_batch_editing.png
-docs/gh-pages/dev/images/screenshot_dialog_batch_editing.png
+docs/images/screenshot_dialog_edit_layers.png
+docs/gh-pages/dev/images/screenshot_dialog_edit_layers.png
 
-docs/images/screenshot_dialog_customizing_export.png
-docs/gh-pages/dev/images/screenshot_dialog_customizing_export.png
+docs/images/screenshot_dialog_customization.png
+docs/gh-pages/dev/images/screenshot_dialog_customization.png
