@@ -1,12 +1,11 @@
 ## Getting Started with Customization
 
 Beyond the basic features, Batcher allows you to:
-* customize the layer name,
-* apply additional *procedures* before the export (insert background, scale down, ...),
-* selecting which layers to process by applying *constraints* (only visible layers, ...),
-* customize export to save multi-layer images (e.g. multi-page PDFs).
+* adjust layer names,
+* apply custom *procedures* (insert background, scale down, ...),
+* filter layers by applying *constraints* (only visible layers, ...).
 
-As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below to help you get accustomed to the plug-in's features.
+As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below.
 
 When [editing layers](Usage.md#editing-layers), customization options are automatically displayed.
 To enable customization when exporting layers, select `Settings → Show More Settings`.
