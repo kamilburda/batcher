@@ -18,11 +18,11 @@ The following steps apply if you want to use Poedit.
 
 To create a new translation for your language:
 
-1. Open Poedit, select `File → New from POT/PO file...` and select the `batcher.pot` file in the `batcher/locale` folder.
+1. Open Poedit, select `File → New from POT/PO file...` and select the `batcher/locale/batcher.pot` file.
 2. Set the language of the translation.
 3. Translate the strings (by filling in the `Translation` text field for each string).
-4. If desired, go to `Catalog → Properties...` and edit the translation file properties.
-   If you don't do this, warning messages may pop up when saving, but they should be harmless.
+4. If desired, go to `Translation → Properties...` and edit the translation file properties.
+   If you do not do this, warning messages may pop up when saving, but they should be harmless.
 5. When done, save your .po file.
 
 
@@ -30,7 +30,7 @@ To create a new translation for your language:
 
 If you spotted some translation errors in your .po file or the plug-in was updated since the last translation was made, you may need to update the translation:
 
-1. Open your .po file, select `Catalog → Update from POT file...` and select the `batcher.pot` file for the latest plug-in version.
+1. Open your .po file, select `Translation → Update from POT file...` and select the `batcher.pot` file for the latest plug-in version.
 2. Update the translated strings.
    Make sure to check for:
    * new strings,
@@ -41,7 +41,7 @@ If you spotted some translation errors in your .po file or the plug-in was updat
 
 ### Terminal
 
-If you don't want to use Poedit, you may use the terminal on Linux (or a Unix-like environment for Windows, such as Cygwin).
+If you do not wish to use Poedit, you may use the terminal on Unix-based systems (Linux, etc.) or Windows Subsystem for Linux (WSL) on Windows.
 
 
 #### Creating a New Translation
@@ -105,7 +105,7 @@ You can do so by submitting your translated .po file as follows:
   
       [repository root]/batcher/locale/[language]/LC_MESSAGES/batcher.po
   
-  If you're updating your translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
+  If you aree updating your translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
 
 
 ## How can I test my translation?
@@ -151,9 +151,10 @@ Run GIMP from the Windows command line as follows:
     set lang=[language].UTF-8
     gimp-[version].exe
 
-where `[version]` is the GIMP version, e.g. `gimp-2.8.exe` for GIMP 2.8.
+where `[version]` is the GIMP version.
 
 If Windows does not recognize the GIMP executable, specify the full path.
-Assuming GIMP was installed in the default installation path, the full path is:
-   
-    "C:\Program Files\GIMP 2\bin\gimp-[version].exe"
+
+For example, if GIMP 2.99 is installed, the full path by default will be
+    
+   "C:\Program Files\GIMP 2.99\bin\gimp-2.99.exe"
