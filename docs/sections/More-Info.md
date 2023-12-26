@@ -3,7 +3,7 @@
 You can report issues, ask questions or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
 
 Before submitting a bug report:
-* Check for [known issues](docs/sections/Known-Issues.md) that cannot be fixed in the plug-in.
+* Check for [known issues](docs/sections/Known-Issues.md) that cannot currently be fixed in the plug-in.
 * Check the [GitHub Issues page](https://github.com/kamilburda/batcher/issues) for current issues.
 
 
