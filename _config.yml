@@ -1,0 +1,25 @@
+# Site settings
+title: Batcher
+description: "Batch Layer Processing and Export for GIMP 2.99.16"
+baseurl: "/batcher"
+url: "https://kamilburda.github.io"
+repository: "kamilburda/batcher"
+github_username: "Kamil Burda"
+copyright_years: "2023"
+
+plugin_name: "batcher"
+plugin_version: "0.0.1"
+plugin_version_release_date: ""
+download_zip_suffix: ".zip"
+sections_url: "/sections/"
+license_remote_url: "blob/main/LICENSE"
+license_local_filename: "LICENSE.txt"
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-github-metadata
+  - jekyll-seo-tag
+
+# Build settings
+markdown: kramdown
+is_release_build: false
