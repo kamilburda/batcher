@@ -32,13 +32,12 @@ The following tags can be specified in the documents:
       {% include-section 'docs/README.md' section='Known Issues' %}
       {% include-section 'docs/README.md' section=License sentences=0 %}
 
-* ``{% include-config <pygimplib configuration entry> %}``:
+* ``{% include-config <configuration entry> %}``:
   Replace the expression with the corresponding configuration entry in
-  ``pygimplib.config``. If no such entry is found, the expression is not
+  the ``config`` module. If no such entry is found, the expression is not
   replaced.
   
-  Examples:
-  ``{% include-config 'PLUGIN_NAME' %}`` will insert a pygimplib configuration
+  Example: ``{% include-config 'PLUGIN_NAME' %}`` will insert a configuration
   entry titled ``'PLUGIN_NAME'``, e.g. ``'batcher'``.
 """
 
