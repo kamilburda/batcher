@@ -8,6 +8,7 @@ import os
 
 c.LOG_MODE = 'error'
 
+c.PLUGIN_NAME = 'batcher'
 c.PLUGIN_TITLE = lambda: _('Batcher')
 c.PLUGIN_VERSION = '0.0.1'
 c.PLUGIN_VERSION_RELEASE_DATE = ''
