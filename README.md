@@ -14,7 +14,7 @@ This is a work-in-progress plug-in that is currently not usable.
 * Customize processing with procedures and constraints
 
 
-### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.0) (1.0, )
+### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/0.0.1) (0.0.1, )
 
 See the [documentation](https://kamilburda.github.io/batcher/sections) for information about installation, usage and known issues.
 
