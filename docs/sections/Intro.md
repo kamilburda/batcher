@@ -8,5 +8,5 @@ This is a work-in-progress plug-in that is currently not usable.
 ## Features
 
 * Export in any file format provided by GIMP and third-party plug-ins
-* Batch edit layers
-* Customize processing with procedures and constraints
+* Batch edit layers with any GIMP procedure or plug-in
+* Limit export/editing to layers matching constraints
