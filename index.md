@@ -1,7 +1,7 @@
 ---
 layout: main
 title: Home
-navbar_active_tab: home
+navbar_active_tab: Home
 ---
 
 ### Getting started and need help?
