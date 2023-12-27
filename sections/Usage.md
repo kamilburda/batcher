@@ -7,11 +7,6 @@ navbar_active_tab: Usage
 * TOC
 {:toc}
 
-# Basic Usage
-
-Batcher allows you to export layers of an image, or edit layers in place without exporting them.
-
-
 ## Exporting Layers
 
 Open your image in GIMP and select `File → Batch → Export Layers...`.
