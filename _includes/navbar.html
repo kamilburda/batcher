@@ -6,7 +6,6 @@
           <li><a {% if page.navbar_active_tab == "home" %}class="active"{% endif %} href="{{ '/' | relative_url }}">Home</a></li>
         {% endif %}
         <li><a {% if page.navbar_active_tab == "docs" %}class="active"{% endif %} href="{{ site.sections_url | relative_url }}">Documentation</a></li>
-        <li><a href="https://github.com/{{ site.repository }}">View on GitHub</a></li>
       </ul>
     </div>
     <div class="right">
@@ -21,6 +20,12 @@
             <a href="{{ site.sections_url | relative_url }}{{ page.next_doc_filename }}">{{ page.next_doc_title }} »</a>
           </li>
         {% endif %}
+        <li class="navbar-github">
+          <a href="https://github.com/{{ site.repository }}">
+            <!-- GitHub logo taken from the official site: https://github.com/logos -->
+            <img src="/batcher/images/github-mark-white.svg" alt="">View on GitHub
+          </a>
+        </li>
       </ul>
     </div>
   </div>
