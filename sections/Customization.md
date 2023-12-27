@@ -2,10 +2,8 @@
 layout: docs_page
 title: Customization
 navbar_active_tab: Customization
+generate_toc: true
 ---
-
-* TOC
-{:toc}
 
 ## Getting Started with Customization
 
