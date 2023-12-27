@@ -295,20 +295,6 @@ a {
   }
 }
 
-.page-header-image {
-  @include large {
-    width: 30%;
-    order: 2;
-    padding-left: 1rem;
-  }
-  
-  @include medium {
-    width: 40%;
-    order: 2;
-    padding-left: 1rem;
-  }
-}
-
 .downloads-container {
   @include large {
     max-width: 72rem;
@@ -415,6 +401,11 @@ a {
     margin-bottom: 1rem;
     font-weight: normal;
     color: $section-headings-color;
+  }
+
+  h2 {
+    padding-bottom: 0.2rem;
+    border-bottom: 0.06em solid #acb6b9;
   }
 
   p {
