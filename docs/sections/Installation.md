@@ -13,7 +13,7 @@
 
 ## Linux
 
-The easier way to install any Python-based GIMP plug-in is to use a GIMP installation bundled in Flatpak (which can be downloaded from the [official GIMP page](https://www.gimp.org/downloads/devel/)) or AppImage.
+An easy way to install any Python-based GIMP plug-in is to use a GIMP installation bundled in Flatpak (which can be downloaded from the [official GIMP page](https://www.gimp.org/downloads/devel/)) or AppImage.
 
 1. Make sure you have Python 3.7 installed.
 2. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`.
