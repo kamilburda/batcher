@@ -4,6 +4,8 @@ title: Home
 navbar_active_tab: Home
 ---
 
+{% include-section '../sections/Intro.md' section='Features' %}
+
 ### Getting started and need help?
 
 See [Installation](sections/Installation.html) and [Usage](sections/Usage.html).
