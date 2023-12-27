@@ -1,7 +1,4 @@
-# Basic Usage
-
 Batcher allows you to export layers of an image, or edit layers in place without exporting them.
-
 
 ## Exporting Layers
 
