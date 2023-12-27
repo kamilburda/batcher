@@ -212,6 +212,8 @@ a {
 }
 
 .project-tagline {
+  margin-bottom: 2rem;
+
   font-weight: normal;
   opacity: 0.9;
 
@@ -220,20 +222,11 @@ a {
   }
 
   @include medium {
-    font-size: 1.15rem;
+    font-size: 1.0rem;
   }
 
   @include small {
-    font-size: 1rem;
-  }
-}
-
-.project-tagline ul {
-  padding-left:0;
-  list-style-position: inside;
-  
-  @include small {
-    text-align: left;
+    font-size: 0.8rem;
   }
 }
 
@@ -242,7 +235,7 @@ a {
   background-color: $header-bg-color;
   background-repeat: no-repeat;
   background-size: cover;
-  text-align: left;
+  text-align: center;
   padding: 1rem 0;
 }
 
@@ -260,38 +253,6 @@ a {
   @include medium {
     width: 100%;
     height: 100%;
-  }
-}
-
-.page-header-container {
-  @include large {
-    display: flex;
-    max-width: 72rem;
-    padding: 1rem 6rem;
-    margin: 0 auto;
-  }
-
-  @include medium {
-    display: flex;
-    padding: 1rem 4rem;
-  }
-
-  @include small {
-    padding: 1rem 1rem;
-  }
-}
-
-.page-header-text {
-  @include large {
-    width: 70%;
-    order: 1;
-    padding-right: 1rem;
-  }
-  
-  @include medium {
-    width: 60%;
-    order: 1;
-    padding-right: 1rem;
   }
 }
 
@@ -542,6 +503,13 @@ a {
     margin: 1rem 0;
     background-color: $hr-border-color;
     border: 0;
+  }
+}
+
+.main-content-borderless-header {
+  h2 {
+    padding-bottom: 0rem;
+    border-bottom: 0em;
   }
 }
 

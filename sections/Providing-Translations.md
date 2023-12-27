@@ -1,6 +1,7 @@
 ---
 layout: docs_page
 title: Providing Translations
+generate_toc: true
 ---
 
 
