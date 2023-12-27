@@ -4,9 +4,6 @@ title: Installation
 navbar_active_tab: Installation
 ---
 
-* TOC
-{:toc}
-
 ## Requirements
 
 * GIMP 2.99.16 (will **not** work in earlier or later versions)
