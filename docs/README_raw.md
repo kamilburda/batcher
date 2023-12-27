@@ -1,10 +1,5 @@
 # Batcher
 
-{% include-section 'sections/Intro.md' %}
+Batcher is an upcoming [GIMP 2.99.16](https://www.gimp.org/downloads/devel/) plug-in for exporting layers as separate images and editing layers.
 
-### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %})
-
-See the [documentation](https://kamilburda.github.io/batcher/sections) for information about installation, usage and known issues.
-
-
-{% include-section 'sections/More-info.md' %}
+This is a work-in-progress plug-in that is currently not usable.
