@@ -1,5 +1,3 @@
-Batcher allows you to export layers of an image, or edit layers in place without exporting them.
-
 ## Exporting Layers
 
 Open your image in GIMP and select `File → Batch → Export Layers...`.
@@ -12,7 +10,7 @@ A dialog corresponding to the file format appears, allowing you to adjust export
 Some file formats do not display dialogs, while some display the dialog for each layer (this cannot be prevented because such a file format only allows an interactive export).
 
 
-### Changing File Extension
+## Changing File Extension
 
 Type or choose your desired file extension in the `File extension` text entry.
 The dropdown list displays available file formats alongside their associated file extensions.
@@ -22,7 +20,7 @@ For now, the dropdown only contains a fixed list of file formats provided by GIM
 However, you may still enter a file extension not in the list in case you use a file format plug-in not recognized by Batcher.
 
 
-### Exporting Layers Instantly
+## Exporting Layers Instantly
 
 You can export in a single click by running `File → Export Layers Now`.
 This is useful e.g. if you made changes to your image and you want to export again with the same settings.
