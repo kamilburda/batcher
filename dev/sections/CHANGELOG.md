@@ -3,7 +3,6 @@ layout: docs_page
 title: Release Notes
 ---
 
-Upcoming
-========
+## Upcoming
 
 * Initial release.
