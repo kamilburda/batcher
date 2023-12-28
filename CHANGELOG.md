@@ -1,4 +1,3 @@
-Upcoming
-========
+## Upcoming
 
 * Initial release.
