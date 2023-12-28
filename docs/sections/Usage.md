@@ -73,7 +73,7 @@ To import settings from a file, select `Settings → Import Settings...` and sel
 If you find yourself in the need of customizing layer names, applying additional procedures before exporting or excluding specific layers from the export, see [Customization](Customization.md).
 
 
-## Running Batcher Without Dialog (Non-Interactively)
+## Running Batcher Without Dialog
 
 It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
 
@@ -82,3 +82,16 @@ The `plug-in-batch-export-layers` procedure exports layers with the specified or
 You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
 
 The `plug-in-batch-export-layers-now` procedure exports layers instantly, always with the last used settings.
+
+
+## Known Issues
+
+Sometimes, after you press the Export button, it may seem as though nothing happens.
+In that case, the file format dialog may be displayed behind GIMP. If so, simply select the dialog to bring it up.
+
+The following file formats require displaying the file format dialog for each image to be exported, not just the first image:
+* C source,
+* HTML.
+
+On Windows, exporting with the following file formats does not work properly if file paths contain accented (Unicode) characters:
+* X PixMap Image.

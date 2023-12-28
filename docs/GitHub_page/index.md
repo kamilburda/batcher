@@ -4,7 +4,7 @@ title: Home
 navbar_active_tab: Home
 ---
 
-{% include-section '../sections/Intro.md' section='Features' %}
+{% include-section '../sections/Intro.md' section='What can Batcher do?' %}
 
 ## Getting started and need help?
 
@@ -18,12 +18,7 @@ See [Customization](sections/Customization.html).
 
 ## Having trouble?
 
-See the [known issues](sections/Known-Issues.html) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
-
-
-## Want to translate {% include-config 'PLUGIN_TITLE' %} into your language?
-
-See the [instructions for providing translations](sections/Providing-Translations.html).
+See the [known issues](sections/Usage.html#known-issues) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
 
 
 ## Curious about the latest changes?

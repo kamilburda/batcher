@@ -5,8 +5,8 @@ Requires [GIMP 2.99.16](https://www.gimp.org/downloads/devel/) (a development ve
 This is a work-in-progress plug-in that is currently not usable.
 
 
-## Features
+## What can Batcher do?
 
-* Export in any file format provided by GIMP and third-party plug-ins
+* Export layers in any file format provided by GIMP and third-party plug-ins
 * Batch edit layers with any GIMP procedure or plug-in
 * Limit export/editing to layers matching constraints
