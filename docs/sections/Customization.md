@@ -98,9 +98,9 @@ The fields are described below in detail.
 
 The preview automatically updates as you change the filename pattern and so can greatly help you figure out how your specified pattern affects the layer names.
 
-Fields must be enclosed in square brackets and must have a correct number of arguments.
-Arguments must be separated by commas.
-Invalid arguments result in the field being inserted literally.
+Fields must be enclosed in square brackets and must have a correct number of options.
+Options must be separated by commas.
+Invalid options result in the field being inserted literally.
 
 ### Available fields
 
@@ -111,9 +111,9 @@ You can choose the fields from the dropdown list displayed when clicking on the 
 A number incrementing for each layer.
 The numbering is separate for each layer group.
 
-Arguments:
-* `%n` - Continue numbering across layer groups.
-* `%d<number>` - Use descending numbers, optionally with the specified padding (number of digits).
+Options:
+* `%n`: Continue numbering across layer groups.
+* `%d<number>`: Use descending numbers, optionally with the specified padding (number of digits).
 If the number is 0, the first number is the number of layers to export within a layer group, or, if `%n` is also specified, the number of all layers to export.
 
 Examples:
@@ -128,7 +128,7 @@ Examples:
 
 The layer name.
 
-Arguments:
+Options:
 * *file extension strip mode*:
 	* `%e`: If a layer has a recognized file extension, keep the extension.
 	* `%i`: If a layer has a recognized file extension that matches the one in the `File extension` text entry, keep the extension.
@@ -143,7 +143,7 @@ Examples:
 
 The current image name.
 
-Arguments:
+Options:
 * `%e`: If the image has a file extension, keep the extension.
 
 Examples:
@@ -155,7 +155,7 @@ Examples:
 The "full path" of a layer.
 For example, if the image has a layer group named `Body` containing a layer group named `Hands` containing a layer named `Left`, the layer path will be `Body-Hands-Left`.
 
-Arguments:
+Options:
 * *separator*: A string separating the path components.
   Defaults to `-`.
 * *wrapper*: A string that wraps around each path component.
@@ -179,9 +179,9 @@ Replaces a part of the specified field with another string.
 This essentially allows to fine-tune any field.
 Regular expressions are supported as well.
 
-Arguments:
+Options:
 * *field name*: Any recognized field described in this section, except "Number".
-The field can be specified with arguments; if so, enclose the field in square brackets (`[` and `]`).
+The field can be specified with options; if so, enclose the field in square brackets (`[` and `]`).
 * *pattern*: Part of the field to replace.
 The pattern can also be a regular expression using the same syntax as defined for the [`re` module for Python](https://docs.python.org/3/library/re.html).
 * *replacement*: Contents that should replace *pattern*.
@@ -195,7 +195,7 @@ For example, to ignore case, type `IGNORECASE` or `ignorecase`.
 You can specify multiple flags separated by commas.
 
 For the example below, suppose that a layer is named "Animal copy #1".
-While the square brackets (`[` and `]`) enclosing the first three field arguments are optional, they are necessary in case you need to specify an empty string (`[]`), leading spaces or commas.
+While the square brackets (`[` and `]`) enclosing the first three field options are optional, they are necessary in case you need to specify an empty string (`[]`), leading spaces or commas.
 
 Examples:
 * `[replace, [layer name], [a], [b] ]` → `Animbl copy #1`
@@ -208,7 +208,7 @@ Examples:
 For example, suppose that a layer has a green color tag assigned.
 Then (by default) the tag will be formatted as `green`.
 
-Arguments:
+Options:
 * *wrapper*: A string that wraps around each tag.
   The wrapper must contain `%t` denoting the tag.
 * *color name, custom name, ...*: Color name in English followed by a custom name for the color. This allows you to map the color name to something else, e.g. `green` to `background`. You can specify multiple such pairs in case your image contains layers with different color tags.
@@ -224,7 +224,7 @@ Examples:
 
 The current date.
 
-Arguments:
+Options:
 * *format*: Date format as per the [Python `strftime` function](http://strftime.org/).
   Defaults to `%Y-%m-%d` (year-month-day).
 
@@ -236,20 +236,20 @@ Examples:
 
 Layer or image attributes.
 
-Arguments
+Options:
 * *pattern*: A string formatting the attributes.
   Available attributes:
-  * `%w` - The layer width.
-  * `%h` - The layer height.
-  * `%x` - The layer *x*-offset.
-  * `%y` - The layer *y*-offset.
-  * `%iw` - The image width.
-  * `%ih` - The image height.
+  * `%w`: The layer width.
+  * `%h`: The layer height.
+  * `%x`: The layer *x*-offset.
+  * `%y`: The layer *y*-offset.
+  * `%iw`: The image width.
+  * `%ih`: The image height.
 * *measure*: The measure in which the attribute values are displayed.
   Applies to `%w`, `%h`, `%x` and `%y` only.
   Available measures:
-  * `%px` (default) - Display absolute values in pixels.
-  * `%pc` - Display percentages relative to the image.
+  * `%px` (default): Display absolute values in pixels.
+  * `%pc`: Display percentages relative to the image.
     A number may be included after `%pc` to specify the number of digits to round to (2 by default).
     For example, `%pc1` displays percentages rounded to a single decimal digit.
 
@@ -260,12 +260,12 @@ Examples:
 * `[attributes, %iw-%ih]` → `1000-500`
 
 
-### Inserting reserved characters in arguments
+### Inserting reserved characters in optionss
 
-To insert a literal space or comma in a field argument, enclose the argument with square brackets.
-To insert a literal square bracket (`[` or `]`), double the bracket and enclose the argument with square brackets (e.g. `[[[]` to insert a literal `[`).
+To insert a literal space or comma in a field option, enclose the option with square brackets.
+To insert a literal square bracket (`[` or `]`), double the bracket and enclose the option with square brackets (e.g. `[[[]` to insert a literal `[`).
 
-If the last argument is enclosed in square brackets, leave a single space between the last and the second to last closing square bracket.
+If the last option is enclosed in square brackets, leave a single space between the last and the second to last closing square bracket.
 
 Examples:
 * `[layer path, [ ] ]` → `Body Hands Left`
@@ -281,7 +281,7 @@ For each added procedure, you may perform any of the following:
 * enable and disable the procedure,
 * move the procedure up/down by dragging the procedure with mouse or by keyboard,
 * edit the procedure.
-  You may edit the name and the values of its arguments (if any) that are applied to each layer.
+  You may edit the name and the values of its options (if any) that are applied to each layer.
 * remove the procedure.
 
 You can add the same procedure multiple times.
@@ -303,7 +303,7 @@ Insert layers tagged with a specific color tag as background for each layer.
 Note that even background layers are processed and exported - to prevent this behavior, enable the `Without color tags` constraint.
 
 The _blue_ color tag is used as background by default.
-You may set a different color tag representing the background layers by editing the procedure argument `Color tag`.
+You may set a different color tag representing the background layers by editing the procedure option `Color tag`.
 
 In the dialog, this procedure is always inserted in the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
@@ -365,8 +365,8 @@ Export all layers to the output folder on the same level, i.e. do not create sub
 
 **Rename layer**
 
-Rename a layer according to the specified pattern.
-This procedure uses the same text entry for patterns as the one next to `Save as` (as described in [Adjusting Layer Names](#adjusting-layer-names)).
+Rename layers according to the specified pattern.
+This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-layer-names).
 If this procedure is specified, the text entry next to `Save as` has no effect.
 
 Additionally, this procedure allows customizing whether to also rename folders (by enabling `Rename folders`) or only rename folders (by enabling `Rename folders` and disabling `Rename layers`).
@@ -387,20 +387,20 @@ When [editing layers](Usage.md#editing-layers), you may want to disable this pro
 
 You can add any procedure available in the GIMP Procedural Database (PDB) by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
 Select the desired procedure from the browser dialog and press `Add`.
-The edit dialog allows you to edit the procedure name and the values of its arguments.
+The edit dialog allows you to edit the procedure name and the values of its options.
 
 
 ### Editing procedures
 
-When editing a procedure, you may (and sometimes have to) adjust its arguments.
-GIMP PDB procedures are usually accompanied by descriptions of the entire procedure as well as its arguments.
-Hover over argument names to display tooltips describing them in more detail.
-The description for an argument often indicates the range of valid values.
+When editing a procedure, you may (and sometimes have to) adjust its options.
+GIMP PDB procedures are usually accompanied by descriptions of the entire procedure as well as its options.
+Hover over option names to display tooltips describing them in more detail.
+The description for an option often indicates the range of valid values.
 
-If a procedure contains a layer/drawable/item argument, you may select one of the following:
-* (default) "Current Layer" - applies the procedure to the currently processed layer.
-* "Background Layer" - applies the procedure to the layer representing background, inserted via the "Insert background" procedure. If there is no such layer, the procedure will have no effect.
-* "Foreground Layer" - applies the procedure to the layer representing foreground, inserted via the "Insert foreground" procedure. If there is no such layer, the procedure will have no effect.
+If a procedure contains a layer/drawable/item option, you may select one of the following:
+* `Current Layer` (default): applies the procedure to the currently processed layer.
+* `Background Layer`: applies the procedure to the layer representing background, inserted via the "Insert background" procedure. If there is no such layer, the procedure will have no effect.
+* `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the "Insert foreground" procedure. If there is no such layer, the procedure will have no effect.
 
 
 ## Constraints
@@ -450,7 +450,7 @@ To disable this behavior, edit the constraint, click on `More options` and check
 Process only layers having a color tag.
 
 By default, all layers without a color tag are excluded.
-To process only layers with specific color tags, edit this constraint and add the color tags for the `Color tags` argument.
+To process only layers with specific color tags, edit this constraint and add the color tags for the `Color tags` option.
 For example, by adding a blue tag, only layers containing the blue tag will be processed.
 Other tagged or untagged layers will be excluded.
 
@@ -459,7 +459,7 @@ Other tagged or untagged layers will be excluded.
 Process only layers having no color tag.
 
 By default, all layers with a color tag are excluded.
-To ignore only specific color tags, edit this constraint and add the color tags for the `Color tags` argument.
+To ignore only specific color tags, edit this constraint and add the color tags for the `Color tags` option.
 
 If a layer group is assigned a color tag, it will normally not be ignored.
 To also ignore layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
