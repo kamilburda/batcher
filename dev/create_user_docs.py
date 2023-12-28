@@ -10,7 +10,7 @@ import psutil
 import requests
 import yaml
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 
 from dev import process_local_docs
 

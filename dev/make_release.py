@@ -31,7 +31,7 @@ sys.path.extend([
   PLUGIN_DIRPATH,
   PYGIMPLIB_DIRPATH])
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 
 from batcher.src import version as version_
 

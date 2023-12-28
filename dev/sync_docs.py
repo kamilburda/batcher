@@ -10,7 +10,7 @@ because any previous updates to such files are discarded.
 import os
 import shutil
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 
 from dev import preprocess_document_contents
 

@@ -46,7 +46,7 @@ import os
 import re
 import sys
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 
 
 def main(source_and_dest_filepaths):

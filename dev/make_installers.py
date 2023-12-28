@@ -29,7 +29,7 @@ import zipfile
 import git
 import pathspec
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 
 from dev import create_user_docs
 from dev import process_local_docs
