@@ -5,21 +5,31 @@ documentation purposes.
 """
 
 import os
+import sys
 import time
 
 import gi
 from gi.repository import GLib
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-gi.require_version('Gtk', '3.0')
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from batcher import pygimplib as pg
+import batcher.pygimplib as pg
 from batcher.pygimplib import pdb
+
+
+ROOT_DIRPATH = os.path.abspath(
+  os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
+
+PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
+
+sys.path.append(PLUGIN_DIRPATH)
+
 
 from batcher.src import actions
 from batcher.src import builtin_constraints
@@ -28,10 +38,8 @@ from batcher.src import settings_main
 from batcher.src.gui import main as gui_main
 
 
-ROOT_DIRPATH = os.path.abspath(
-  os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
-
-TEST_IMAGES_DIRPATH = os.path.join(pg.config.PLUGIN_DIRPATH, 'tests', 'test_images')
+TEST_IMAGES_DIRPATH = os.path.join(
+  ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
 TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
 
 OUTPUT_DIRPATH = os.path.join(
@@ -82,13 +90,11 @@ def take_screenshots(gui, dialog, settings):
     settings,
     decoration_offsets,
     gui,
+    dialog,
     blur_folders=True,
   )
   
   settings['gui/show_more_settings'].set_value(True)
-  
-  actions.clear(settings['main/procedures'])
-  actions.clear(settings['main/constraints'])
   
   actions.add(
     settings['main/procedures'],
@@ -117,6 +123,7 @@ def take_screenshots(gui, dialog, settings):
     settings,
     decoration_offsets,
     gui,
+    dialog,
     blur_folders=True,
   )
   
@@ -131,17 +138,18 @@ def take_screenshots(gui, dialog, settings):
     settings,
     decoration_offsets,
     gui,
+    dialog,
   )
   
   Gtk.main_quit()
   
 
 def take_and_process_screenshot(
-      screenshots_dirpath, filename, settings, decoration_offsets, gui, blur_folders=False):
+      screenshots_dirpath, filename, settings, decoration_offsets, gui, dialog, blur_folders=False):
   # HACK: Wait a while until the window is fully shown.
   time.sleep(1)
   
-  screenshot_image = take_screenshot()
+  screenshot_image = take_screenshot(dialog)
   
   if blur_folders:
     blur_folder_chooser(screenshot_image, gui, decoration_offsets)
@@ -162,24 +170,29 @@ def take_and_process_screenshot(
 
 
 def blur_folder_chooser(image, gui, decoration_offsets):
-  scrolled_window = (
+  folder_chooser_left_pane = (
     gui
     .folder_chooser
     .get_children()[0]
-    .get_children()[0].get_children()[1]
-    .get_children()[0].get_children()[0])
-  folder_chooser_left_pane = scrolled_window.get_children()[0]
-  
+    .get_children()[0]
+    .get_children()[0])
+
+  toplevel_window = gui.folder_chooser.get_toplevel()
+
+  widget_coordinates = folder_chooser_left_pane.translate_coordinates(toplevel_window, 0, 0)
+
   selection_to_blur = folder_chooser_left_pane.get_allocation()
-  selection_to_blur.y += decoration_offsets[1]
-  
-  image.select_rectangle(0, *selection_to_blur)
+  selection_to_blur.x += widget_coordinates[0]
+  selection_to_blur.y += widget_coordinates[1] + decoration_offsets[1]
+
+  image.select_rectangle(
+    0, selection_to_blur.x, selection_to_blur.y, selection_to_blur.width, selection_to_blur.height)
   pdb.plug_in_gauss(image, image.list_selected_layers()[0], 25, 25, 0)
   pdb.gimp_selection_none(image)
 
 
-def take_screenshot():
-  return pdb.plug_in_screenshot(0, 0, 0, 0, 0)
+def take_screenshot(dialog):
+  return pdb.plug_in_screenshot(1, 0, 0, 0, 0)
 
 
 def move_dialog_to_corner(dialog, settings):
