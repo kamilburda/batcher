@@ -19,6 +19,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-github-metadata
   - jekyll-seo-tag
+  - jekyll-feed
 
 # Build settings
 markdown: kramdown
