@@ -6,12 +6,15 @@ url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"
 github_username: "{% include-config 'AUTHOR_NAME' %}"
 copyright_years: "{% include-config 'COPYRIGHT_YEARS' %}"
+paginate: 10
+paginate_path: "/news/:num/"
 
 plugin_name: "{% include-config 'PLUGIN_NAME' %}"
 plugin_version: "{% include-config 'PLUGIN_VERSION' %}"
 plugin_version_release_date: "{% include-config 'PLUGIN_VERSION_RELEASE_DATE' %}"
 download_zip_suffix: ".zip"
 sections_url: "/sections/"
+news_url: "/news/"
 license_remote_url: "blob/main/LICENSE"
 license_local_filename: "LICENSE.txt"
 
