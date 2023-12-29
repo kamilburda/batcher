@@ -1,5 +1,5 @@
 ---
-layout: docs_page
+layout: page_docs
 title: Installation
 navbar_active_tab: Installation
 ---

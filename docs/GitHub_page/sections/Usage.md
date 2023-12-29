@@ -1,5 +1,5 @@
 ---
-layout: docs_page
+layout: page_docs
 title: Usage
 navbar_active_tab: Usage
 generate_toc: true
