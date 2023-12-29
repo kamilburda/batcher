@@ -366,7 +366,7 @@ a {
 
   h2 {
     padding-bottom: 0.2rem;
-    border-bottom: 0.06em solid #acb6b9;
+    border-bottom: 0.06em solid $header-border-color;
   }
 
   p {
@@ -511,15 +511,15 @@ a {
   }
 }
 
-.main-content-borderless-header {
+.home-header {
   h2 {
     padding-bottom: 0;
     border-bottom: 0;
   }
 }
 
-.post-header {
-  margin-bottom: 0 !important;
+h1.post-header {
+  margin-bottom: 0;
 }
 
 .post-meta {
@@ -541,6 +541,66 @@ a {
 .post-content {
   margin-top: 2rem;
 }
+
+.post-list {
+  > li {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid $post-list-border-color;
+  }
+}
+
+ul.post-list, ol.post-list {
+  margin-left: 0;
+  padding-left: 0;
+  list-style-type: none;
+}
+
+h2.post-list-header {
+  margin-top: 0.3rem;
+  border-bottom: 0;
+}
+
+/**
+ * Pagination navbar
+ *
+ * Originally taken from the Minima Jekyll theme and modified:
+ * https://github.com/jekyll/minima/blob/master/_sass/minima/_layout.scss
+ */
+.pagination {
+  list-style: none;
+  display: table;
+  padding-left: 0;
+
+  li {
+    float: left;
+    margin-top: 0;
+
+    a, div {
+      @include large {
+        font-size: 1.2rem;
+      }
+
+      @include medium {
+        font-size: 1.1rem;
+      }
+
+      @include small {
+        font-size: 1.0rem;
+      }
+
+      display: block;
+      min-width: 2.5rem;
+      padding: 0.5rem 0.6rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
+  }
+}
+
+ul.pagination {
+  margin: 0 auto;
+}
+
 
 .site-footer {
   padding-top: 2rem;
