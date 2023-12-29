@@ -13,8 +13,9 @@
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
 
-# Convert lines of .sh files to LF
+# Convert lines of the following file types to LF
 *.sh text eol=lf
+*.md text eol=lf
 
 
 #############
