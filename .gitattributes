@@ -1,0 +1,2 @@
+# Convert lines of the following file types to LF
+*.md text eol=lf
