@@ -1,5 +1,5 @@
 ---
-layout: main
+layout: home
 title: Home
 navbar_active_tab: Home
 ---

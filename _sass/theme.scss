@@ -518,6 +518,30 @@ a {
   }
 }
 
+.post-header {
+  margin-bottom: 0 !important;
+}
+
+.post-meta {
+  @include large {
+    font-size: 0.9rem;
+  }
+
+  @include medium {
+    font-size: 0.9rem;
+  }
+
+  @include small {
+    font-size: 0.8rem;
+  }
+
+  margin-top: 0.5rem;
+}
+
+.post-content {
+  margin-top: 2rem;
+}
+
 .site-footer {
   padding-top: 2rem;
   margin-top: 2rem;

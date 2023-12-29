@@ -6,12 +6,15 @@ url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"
 github_username: "Kamil Burda"
 copyright_years: "2023"
+paginate: 10
+paginate_path: "/news/:num/"
 
 plugin_name: "batcher"
 plugin_version: "0.0.1"
 plugin_version_release_date: ""
 download_zip_suffix: ".zip"
 sections_url: "/sections/"
+news_url: "/news/"
 license_remote_url: "blob/main/LICENSE"
 license_local_filename: "LICENSE.txt"
 

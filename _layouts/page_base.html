@@ -6,12 +6,6 @@
     {% include navbar.html %}
     
     <main id="content" class="main-content" role="main">
-      <h1>{{ page.title }}</h1>
-
-      {% if page.generate_toc %}
-        {% include toc.html html=content h_max=2 %}
-      {% endif %}
-      
       {{ content }}
     </main>
   </body>
