@@ -6,6 +6,7 @@ url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"
 github_username: "Kamil Burda"
 copyright_years: "2023"
+show_excerpts: true
 paginate: 10
 paginate_path: "/news/:num/"
 
