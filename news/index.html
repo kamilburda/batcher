@@ -17,15 +17,22 @@ navbar_active_tab: News
 
 {%- if posts.size > 0 -%}
   <ul class="post-list">
-    {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+    {%- assign date_format = "%b %-d, %Y" -%}
     {%- for post in posts -%}
     <li>
-      <span class="post-meta">{{ post.date | date: date_format }}</span>
       <h2 class="post-list-header">
         <a href="{{ post.url | relative_url }}">
           {{ post.title | escape }}
         </a>
       </h2>
+      <p class="post-meta">
+        {{ post.date | date: date_format }}
+        {% if post.author %}
+        • {% for author in post.author %}
+            <span>{{ author }}</span>
+            {%- if forloop.last == false %}, {% endif -%}
+          {% endfor %}
+        {% endif %}</p>
       {%- if site.show_excerpts -%}
         {{ post.excerpt }}
       {%- endif -%}
