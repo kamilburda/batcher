@@ -214,10 +214,15 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
     
     if release_metadata.dry_run:
       return
+
+    if release_metadata.new_version_release_date:
+      new_release_date_str = f'\n### {release_metadata.new_version_release_date}\n'
+    else:
+      new_release_date_str = ''
     
     if match.group(2):
       changelog_contents = re.sub(
-        r'##? .*?\n', r'## ' + release_metadata.new_version + r'\n',
+        r'##? .*?\n', r'## ' + release_metadata.new_version + r'\n' + new_release_date_str,
         changelog_contents,
         count=1)
     elif match.group(3):
@@ -226,7 +231,8 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
         (release_metadata.new_version
          + r'\n'
          + '-' * len(release_metadata.new_version)
-         + '\n'),
+         + r'\n'
+         + new_release_date_str),
         changelog_contents,
         count=1)
   
