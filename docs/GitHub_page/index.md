@@ -1,7 +1,6 @@
 ---
 layout: home
-title: Home
-navbar_active_tab: Home
+title: ""
 ---
 
 {% include-section '../sections/Intro.md' section='What can Batcher do?' %}
