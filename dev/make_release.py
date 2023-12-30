@@ -201,12 +201,11 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
   header_raw, release_notes = (
     preprocess_document_contents.find_section(changelog_contents))
   
-  header_pattern = r'(#+ (.*?)\n|(.*?)\n[=-]+\n)'
+  header_pattern = r'(##? (.*?)\n|(.*?)\n[=-]+\n)'
   match = re.search(header_pattern, header_raw)
   if (match
       and all(header not in release_metadata.released_versions
               for header in [match.group(2), match.group(3)])):
-    
     release_metadata.new_version_release_notes = release_notes.strip()
     
     print(
@@ -218,7 +217,7 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
     
     if match.group(2):
       changelog_contents = re.sub(
-        r'#+ .*?\n', r'## ' + release_metadata.new_version + r'\n',
+        r'##? .*?\n', r'## ' + release_metadata.new_version + r'\n',
         changelog_contents,
         count=1)
     elif match.group(3):
