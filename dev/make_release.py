@@ -110,7 +110,9 @@ def _make_release(release_metadata):
   _update_version_and_release_date_in_config(release_metadata, PLUGIN_CONFIG_FILEPATH)
   if os.path.isfile(PLUGIN_CONFIG_DEV_FILEPATH):
     _update_version_and_release_date_in_config(release_metadata, PLUGIN_CONFIG_DEV_FILEPATH)
-  
+
+  _generate_page_post_with_release_notes(release_metadata)
+
   _generate_translation_file(release_metadata)
   
   _create_release_commit(release_metadata, release_metadata.repo)
