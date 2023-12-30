@@ -3,7 +3,6 @@
 """Creating a new plug-in release."""
 
 import argparse
-import distutils.util
 import getpass
 import inspect
 import json
@@ -184,14 +183,13 @@ def _get_access_token(release_metadata):
 
 def _prompt_to_proceed():
   response = input('Proceed with release? [y/n] ')
-  
-  try:
-    should_proceed = distutils.util.strtobool(response)
-  except ValueError:
-    should_proceed = False
-  
-  if not should_proceed:
+
+  if not _should_proceed_based_on_yes_no_prompt(response):
     _print_error_and_exit('Terminating.', PROMPT_NO_EXIT_STATUS)
+
+
+def _should_proceed_based_on_yes_no_prompt(prompt):
+  return prompt.lower() in ['y', 'yes']
 
 
 def _get_release_notes_and_modify_changelog_first_header(release_metadata):
