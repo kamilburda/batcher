@@ -136,7 +136,8 @@ def _check_branches_for_local_changes(release_metadata):
     _print_error_and_exit(
       'Repository contains local changes. Please remove or commit changes before proceeding.')
   
-  if _has_active_branch_local_changes(release_metadata.gh_pages_repo):
+  if (not release_metadata.force
+      and _has_active_branch_local_changes(release_metadata.gh_pages_repo)):
     _print_error_and_exit(
       (f'Repository in the "{release_metadata.gh_pages_repo.active_branch.name}" branch'
        ' contains local changes. Please remove or commit changes before proceeding.'))
