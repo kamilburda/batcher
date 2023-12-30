@@ -4,12 +4,19 @@ import builtins
 import os
 from typing import Optional
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
+try:
+  import gi
+  gi.require_version('Gimp', '3.0')
+  from gi.repository import Gimp
+except ImportError:
+  _gi_modules_available = False
+else:
+  _gi_modules_available = True
 
 from . import logging as pglogging
-from . import setting as pgsetting
+
+if _gi_modules_available:
+  from . import setting as pgsetting
 
 
 class _Config:
@@ -94,12 +101,13 @@ def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_DIRPATHS = []
   config.PLUGINS_LOG_DIRPATHS.append(config.DEFAULT_LOGS_DIRPATH)
 
-  plugins_dirpath_alternate = Gimp.directory()
-  if plugins_dirpath_alternate != config.DEFAULT_LOGS_DIRPATH:
-    # Add the GIMP directory in the user directory as another log path in
-    # case the plug-in was installed system-wide and there is no permission to
-    # create log files there.
-    config.PLUGINS_LOG_DIRPATHS.append(plugins_dirpath_alternate)
+  if _gi_modules_available:
+    plugins_dirpath_alternate = Gimp.directory()
+    if plugins_dirpath_alternate != config.DEFAULT_LOGS_DIRPATH:
+      # Add the GIMP directory in the user directory as another log path in
+      # case the plug-in was installed system-wide and there is no permission to
+      # create log files there.
+      config.PLUGINS_LOG_DIRPATHS.append(plugins_dirpath_alternate)
 
   config.PLUGINS_LOG_STDOUT_DIRPATH = config.DEFAULT_LOGS_DIRPATH
   config.PLUGINS_LOG_STDERR_DIRPATH = config.DEFAULT_LOGS_DIRPATH
@@ -134,11 +142,15 @@ def _init_config_from_file(config: _Config):
 
 def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
-  config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
 
-  pgsetting.persistor.Persistor.set_default_setting_sources({
-    'persistent': config.DEFAULT_SOURCE,
-  })
+  if _gi_modules_available:
+    config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
+
+    pgsetting.persistor.Persistor.set_default_setting_sources({
+      'persistent': config.DEFAULT_SOURCE,
+    })
+  else:
+    config.DEFAULT_SOURCE = None
 
   pglogging.log_output(
     config.LOG_MODE,

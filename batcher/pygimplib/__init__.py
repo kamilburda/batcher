@@ -28,75 +28,96 @@ logging.log_output(
   log_header_title=ROOT_PLUGIN_DIRPATH)
 
 
-from gi.repository import GLib
+try:
+  from gi.repository import GLib
+except ImportError:
+  _gi_modules_available = False
+else:
+  _gi_modules_available = True
 
 
-def _(message):
-  return GLib.dgettext(None, message)
+if _gi_modules_available:
+  def _(message):
+    return GLib.dgettext(None, message)
+
+  # Install translations as early as possible so that module- or class-level
+  # strings are translated.
+  builtins._ = _
+else:
+  def _(message):
+    return message
+
+  builtins._ = _
 
 
-# Install translations as early as possible so that module- or class-level
-# strings are translated.
-builtins._ = _
+if _gi_modules_available:
+  from . import _gui_messages
 
-from . import _gui_messages
+  _gui_messages.set_gui_excepthook()
 
-_gui_messages.set_gui_excepthook()
 
 from . import configbase
-from . import fileformats
-from . import gui
-from . import invocation
 from . import invoker
-from . import itemtree
 from . import objectfilter
-from . import overwrite
-from . import path
-from . import pdbutils
 from . import progress
-from . import setting
 from . import utils
 
 from .constants import *
-from .procedure import main
-from .procedure import register_procedure
-from .procedure import set_use_locale
-from .pypdb import pdb
-from .pypdb import PDBProcedureError
-from .setting import SETTING_GUI_TYPES
-from .setting import SETTING_TYPES
 
 __all__ = [
   # Modules
-  'fileformats',
-  'gui',
-  'invocation',
   'invoker',
-  'itemtree',
   'logging',
   'objectfilter',
-  'overwrite',
-  'path',
-  'pdbutils',
   'progress',
-  'setting',
   'utils',
   # Global elements imported to or defined in this module
-  'TEXT_FILE_ENCODING',
   'config',
-  'main',
-  'pdb',
-  'PDBProcedureError',
-  'register_procedure',
-  'set_use_locale',
-  'SETTING_GUI_TYPES',
-  'SETTING_TYPES',
 ]
+
+if _gi_modules_available:
+  from . import fileformats
+  from . import gui
+  from . import invocation
+  from . import itemtree
+  from . import overwrite
+  from . import path
+  from . import pdbutils
+  from . import setting
+
+  from .procedure import main
+  from .procedure import register_procedure
+  from .procedure import set_use_locale
+  from .pypdb import pdb
+  from .pypdb import PDBProcedureError
+  from .setting import SETTING_GUI_TYPES
+  from .setting import SETTING_TYPES
+
+  __all__.extend([
+    # Modules
+    'fileformats',
+    'gui',
+    'invocation',
+    'itemtree',
+    'overwrite',
+    'path',
+    'pdbutils',
+    'setting',
+    # Global elements imported to or defined in this module
+    'main',
+    'pdb',
+    'PDBProcedureError',
+    'register_procedure',
+    'set_use_locale',
+    'SETTING_GUI_TYPES',
+    'SETTING_TYPES',
+  ])
 
 
 config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)
 
-_gui_messages.set_gui_excepthook(
-  title=config.PLUGIN_TITLE,
-  report_uri_list=config.BUG_REPORT_URL_LIST,
-)
+if _gi_modules_available:
+  _gui_messages.set_gui_excepthook(
+    title=config.PLUGIN_TITLE,
+    report_uri_list=config.BUG_REPORT_URL_LIST,
+  )
