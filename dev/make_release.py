@@ -281,6 +281,32 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
     f.writelines(lines)
 
 
+def _generate_page_post_with_release_notes(release_metadata):
+  new_post_dirpath = os.path.join(GITHUB_PAGES_DIRPATH, '_posts')
+  new_post_filename = (
+    f'{release_metadata.new_version_release_date_for_filename}'
+    f'-{release_metadata.new_version}-released.md')
+
+  new_post_filepath = os.path.join(new_post_dirpath, new_post_filename)
+
+  new_post_contents = f"""
+---
+layout: post
+title: "{pg.config.PLUGIN_TITLE} {release_metadata.new_version} released"
+author: "{pg.config.AUTHOR_NAME}"
+---
+
+<!-- end of summary -->
+
+{release_metadata.new_version_release_notes}
+
+[Download at GitHub]({pg.config.REPOSITORY_URL}/releases/tag/{release_metadata.new_version})
+""".strip()
+
+  with open(new_post_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+    f.write(new_post_contents + '\n')
+
+
 def _generate_translation_file(release_metadata):
   print('Generating .pot file for translations')
   
@@ -471,7 +497,10 @@ class _ReleaseMetadata:
     
     self.new_version = None
     self.new_version_release_notes = ''
-    self.new_version_release_date = time.strftime('%B %d, %Y', time.gmtime())
+
+    current_time = time.gmtime()
+    self.new_version_release_date = time.strftime('%B %d, %Y', current_time)
+    self.new_version_release_date_for_filename = time.strftime('%Y-%m-%d', current_time)
     
     self._last_commit_id_before_release = self._repo.git.rev_parse('HEAD')
     self._last_gh_pages_commit_id_before_release = self._gh_pages_repo.git.rev_parse('HEAD')
