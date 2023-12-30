@@ -6,10 +6,6 @@ import inspect
 import struct
 from typing import Callable, Optional, Tuple
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-
 
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
   """Returns a context manager that does nothing.
@@ -111,11 +107,6 @@ def get_pygimplib_module_path() -> str:
 def get_current_module_filepath() -> str:
   """Returns the full path name of the module this function is called from."""
   return inspect.stack()[1][1]
-
-
-def get_gimp_version_as_tuple() -> Tuple[int, int, int]:
-  """Returns the GIMP version as a tuple of (major, minor, patch) numbers."""
-  return Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION
 
 
 def create_read_only_property(obj, name: str, value):
