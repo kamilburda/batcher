@@ -31,26 +31,26 @@ logging.log_output(
 try:
   from gi.repository import GLib
 except ImportError:
-  _gi_modules_available = False
+  def _(message):
+    return message
 else:
-  _gi_modules_available = True
-
-
-if _gi_modules_available:
   def _(message):
     return GLib.dgettext(None, message)
 
-  # Install translations as early as possible so that module- or class-level
-  # strings are translated.
-  builtins._ = _
+# Install translations as early as possible so that module- or class-level
+# strings are translated.
+builtins._ = _
+
+
+try:
+  from gi.repository import Gimp as _Gimp
+except ImportError:
+  _gimp_modules_available = False
 else:
-  def _(message):
-    return message
-
-  builtins._ = _
+  _gimp_modules_available = True
 
 
-if _gi_modules_available:
+if _gimp_modules_available:
   from . import _gui_messages
 
   _gui_messages.set_gui_excepthook()
@@ -75,7 +75,7 @@ __all__ = [
   'config',
 ]
 
-if _gi_modules_available:
+if _gimp_modules_available:
   from . import fileformats
   from . import gui
   from . import invocation
@@ -116,7 +116,7 @@ if _gi_modules_available:
 
 config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)
 
-if _gi_modules_available:
+if _gimp_modules_available:
   _gui_messages.set_gui_excepthook(
     title=config.PLUGIN_TITLE,
     report_uri_list=config.BUG_REPORT_URL_LIST,

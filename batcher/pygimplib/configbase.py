@@ -8,14 +8,14 @@ try:
   import gi
   gi.require_version('Gimp', '3.0')
   from gi.repository import Gimp
-except ImportError:
-  _gi_modules_available = False
+except (ValueError, ImportError):
+  _gimp_modules_available = False
 else:
-  _gi_modules_available = True
+  _gimp_modules_available = True
 
 from . import logging as pglogging
 
-if _gi_modules_available:
+if _gimp_modules_available:
   from . import setting as pgsetting
 
 
@@ -101,7 +101,7 @@ def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_DIRPATHS = []
   config.PLUGINS_LOG_DIRPATHS.append(config.DEFAULT_LOGS_DIRPATH)
 
-  if _gi_modules_available:
+  if _gimp_modules_available:
     plugins_dirpath_alternate = Gimp.directory()
     if plugins_dirpath_alternate != config.DEFAULT_LOGS_DIRPATH:
       # Add the GIMP directory in the user directory as another log path in
@@ -143,7 +143,7 @@ def _init_config_from_file(config: _Config):
 def _init_config_per_procedure(config: _Config):
   config.SOURCE_NAME = config.PLUGIN_NAME
 
-  if _gi_modules_available:
+  if _gimp_modules_available:
     config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
 
     pgsetting.persistor.Persistor.set_default_setting_sources({
