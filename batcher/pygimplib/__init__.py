@@ -43,8 +43,10 @@ builtins._ = _
 
 
 try:
+  import gi
+  gi.require_version('Gimp', '3.0')
   from gi.repository import Gimp as _Gimp
-except ImportError:
+except (ValueError, ImportError):
   _gimp_modules_available = False
 else:
   _gimp_modules_available = True
