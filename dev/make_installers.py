@@ -100,7 +100,7 @@ def make_installers(
     _prepare_repo_files_for_packaging(
       input_dirpath, temp_repo_files_dirpath, force_if_dirty))
   
-  _compile_translation_files(pg.config.LOCALE_DIRPATH)
+  _compile_translation_files(os.path.join(PLUGIN_DIRPATH, 'locale'))
 
   temp_dirpath = TEMP_INPUT_DIRPATH
   
