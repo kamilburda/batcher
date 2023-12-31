@@ -316,7 +316,7 @@ def _generate_translation_file(release_metadata):
     return
   
   orig_cwd = os.getcwd()
-  os.chdir(pg.config.LOCALE_DIRPATH)
+  os.chdir(os.path.join(PLUGIN_DIRPATH, 'locale'))
   
   subprocess.call([
     './generate_pot.sh',
