@@ -85,6 +85,8 @@ def main(site_dirpath, page_config_filepath):
     parser = get_html_parser(html_filepath)
     html_relative_filepath = os.path.relpath(html_filepath, site_dirpath)
 
+    adjust_boolean_attributes_to_be_valid_xml(parser.tree)
+
     remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
     rename_paths_in_url_attributes(RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
 
@@ -92,6 +94,13 @@ def main(site_dirpath, page_config_filepath):
       write_to_html_file(parser.tree, f)
 
   reorganize_files(site_dirpath)
+
+
+def adjust_boolean_attributes_to_be_valid_xml(root):
+  for elem in root.iter():
+    for attribute_name in elem.attrib:
+      if elem.attrib[attribute_name] is None:
+        elem.attrib[attribute_name] = ''
 
 
 class LocalJekyllHTMLParser(html.parser.HTMLParser):
