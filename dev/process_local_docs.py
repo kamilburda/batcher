@@ -19,21 +19,16 @@ import yaml
 
 FILE_ENCODING = 'utf-8'
 
-FILENAMES_TO_REMOVE = [
+FILENAMES_AND_DIRNAMES_TO_REMOVE = [
+  'dev',
+  'feed.xml',
   'Gemfile',
   'Gemfile.lock',
   'robots.txt',
   'sitemap.xml',
-  'index.html',
-  'dev',
 ]
 
-RELATIVE_PATHS_TO_MOVE = {
-  'favicon.ico': 'docs/favicon.ico',
-  'assets': 'docs/assets',
-  'images': 'docs/images',
-  'sections': 'docs/sections',
-}
+DOCS_DIRNAME = 'docs'
 
 HTML_DOCTYPE_DECLARATION = '<!DOCTYPE html>'
 INDEX_HTML = 'index.html'
@@ -88,7 +83,6 @@ def main(site_dirpath, page_config_filepath):
     adjust_boolean_attributes_to_be_valid_xml(parser.tree)
 
     remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
-    rename_paths_in_url_attributes(RELATIVE_PATHS_TO_MOVE, html_relative_filepath, parser.tree)
 
     with open(html_filepath, 'wb') as f:
       write_to_html_file(parser.tree, f)
@@ -158,7 +152,7 @@ def get_html_filepaths(site_dirpath):
 
 
 def remove_redundant_files(site_dirpath):
-  for filename in FILENAMES_TO_REMOVE:
+  for filename in FILENAMES_AND_DIRNAMES_TO_REMOVE:
     filepath_to_remove = os.path.join(site_dirpath, filename)
     if os.path.isfile(filepath_to_remove):
       os.remove(filepath_to_remove)
@@ -189,67 +183,6 @@ def remove_baseurl_in_url_attributes(html_relative_filepath, html_tree):
   modify_url_attributes(html_tree, _get_relative_url_without_baseurl)
 
 
-def rename_paths_in_url_attributes(relative_paths_to_rename, html_relative_filepath, html_tree):
-  """Renames paths in URL attributes according to ``relative_paths_to_rename``.
-  """
-  
-  def _get_renamed_url(url_attribute_value):
-    is_url_attribute_relative_path = url_attribute_value.startswith('.')
-    
-    if not is_url_attribute_relative_path:
-      return url_attribute_value
-    
-    html_relative_dirpath = os.path.dirname(html_relative_filepath)
-    
-    resolved_relative_url = pathlib.Path(
-      os.path.relpath(
-        os.path.normpath(
-          os.path.join(html_relative_dirpath, url_attribute_value)),
-        os.path.dirname(html_relative_dirpath))
-    ).as_posix()
-    
-    renamed_resolved_relative_url = _rename_resolved_relative_path(resolved_relative_url)
-    
-    if renamed_resolved_relative_url is None:
-      return url_attribute_value
-    
-    renamed_html_relative_dirpath = _rename_resolved_relative_path(html_relative_dirpath)
-    
-    if renamed_html_relative_dirpath is None:
-      renamed_html_relative_dirpath = html_relative_dirpath
-    
-    new_url_attribute_value = os.path.relpath(
-      renamed_resolved_relative_url, renamed_html_relative_dirpath)
-    
-    if not new_url_attribute_value.startswith('.'):
-      new_url_attribute_value = os.path.join('.', new_url_attribute_value)
-    
-    new_url_attribute_value = pathlib.Path(new_url_attribute_value).as_posix()
-    
-    return new_url_attribute_value
-  
-  def _rename_resolved_relative_path(resolved_relative_path):
-    matching_relative_paths_to_rename = [
-      (orig_relative_path, renamed_relative_path)
-      for orig_relative_path, renamed_relative_path in relative_paths_to_rename.items()
-      if resolved_relative_path.startswith(orig_relative_path)]
-    
-    if not matching_relative_paths_to_rename:
-      return None
-    
-    orig_relative_path, renamed_relative_path = matching_relative_paths_to_rename[0]
-    
-    renamed_resolved_relative_path = re.sub(
-      re.escape(orig_relative_path),
-      renamed_relative_path,
-      resolved_relative_path,
-      count=1)
-    
-    return renamed_resolved_relative_path
-  
-  modify_url_attributes(html_tree, _get_renamed_url)
-
-
 def modify_url_attributes(html_tree, get_new_url_attribute_value_func):
   for tag, attributes in HTML_ELEMENTS_WITH_URLS.items():
     elements_to_fix = find_all_html_elements_recursive(html_tree, tag)
@@ -265,14 +198,14 @@ def reorganize_files(site_dirpath):
   """Places all files except the top HTML file in one directory. Files are
   renamed for improved readability.
   """
-  for orig_relative_path, renamed_relative_path in RELATIVE_PATHS_TO_MOVE.items():
-    orig_path = os.path.normpath(os.path.join(site_dirpath, orig_relative_path))
-    renamed_path = os.path.normpath(os.path.join(site_dirpath, renamed_relative_path))
-    
-    if not os.path.exists(os.path.dirname(renamed_path)):
-      os.makedirs(os.path.dirname(renamed_path))
-    
-    shutil.move(orig_path, renamed_path)
+  docs_dirpath = os.path.normpath(os.path.join(site_dirpath, DOCS_DIRNAME))
+
+  names_to_move = os.listdir(site_dirpath)
+
+  os.makedirs(docs_dirpath, exist_ok=True)
+
+  for name in names_to_move:
+    shutil.move(os.path.join(site_dirpath, name), os.path.join(docs_dirpath, name))
 
 
 def write_to_html_file(html_tree, html_file):
