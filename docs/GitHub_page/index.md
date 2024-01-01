@@ -22,4 +22,4 @@ See the [known issues](sections/Usage.html#known-issues) or feel free to [report
 
 ## Curious about the latest changes and other news?
 
-See [News](news).
+See [News](news/index.html).
