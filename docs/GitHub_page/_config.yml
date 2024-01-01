@@ -6,6 +6,7 @@ url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"
 github_username: "{% include-config 'AUTHOR_NAME' %}"
 copyright_years: "{% include-config 'COPYRIGHT_YEARS' %}"
+permalink: /:categories/:year-:month-:day-:slug:output_ext
 show_excerpts: true
 excerpt_separator: "<!-- end of summary -->"
 paginate: 10
