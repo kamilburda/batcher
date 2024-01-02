@@ -46,7 +46,7 @@ INCLUDE_LIST_FILEPATH = os.path.join(DEV_DIRPATH, 'make_installers_included_file
 
 GITHUB_PAGE_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
 
-README_RELATIVE_FILEPATH = os.path.join('docs', 'sections', 'index.html')
+README_RELATIVE_FILEPATH = os.path.join('docs', 'index.html')
 README_RELATIVE_OUTPUT_FILEPATH = 'Readme.html'
 
 
