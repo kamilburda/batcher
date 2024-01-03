@@ -12,6 +12,7 @@ from pygimplib.tests import stubs_gimp
 from src import actions as actions_
 from src import core
 from src import builtin_procedures
+from src import invoker as invoker_
 from src import settings_main
 from src import utils as utils_
 
@@ -57,7 +58,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     self.assertEqual(len(added_action_items), 6)
     
     initial_invoker = added_action_items[1]
-    self.assertIsInstance(initial_invoker, pg.invoker.Invoker)
+    self.assertIsInstance(initial_invoker, invoker_.Invoker)
     
     actions_in_initial_invoker = initial_invoker.list_actions(
       group=actions_.DEFAULT_PROCEDURES_GROUP)
@@ -80,7 +81,7 @@ class TestAddActionFromSettings(unittest.TestCase):
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())
     
-    self.invoker = pg.invoker.Invoker()
+    self.invoker = invoker_.Invoker()
     
     self.batcher._invoker = self.invoker
     
@@ -158,7 +159,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())
     
-    invoker = pg.invoker.Invoker()
+    invoker = invoker_.Invoker()
     image = stubs_gimp.Image()
     layer = stubs_gimp.Layer()
     

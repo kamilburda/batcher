@@ -59,7 +59,6 @@ if _gimp_modules_available:
 
 
 from . import configbase
-from . import invoker
 from . import objectfilter
 from . import progress
 from . import utils
@@ -68,7 +67,6 @@ from .constants import *
 
 __all__ = [
   # Modules
-  'invoker',
   'logging',
   'objectfilter',
   'progress',

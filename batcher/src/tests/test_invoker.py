@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from .. import invoker as pginvoker
+from .. import invoker as invoker_
 
 
 def append_test(list_):
@@ -77,7 +77,7 @@ def append_to_list_again(list_):
 class InvokerTestCase(unittest.TestCase):
   
   def setUp(self):
-    self.invoker = pginvoker.Invoker()
+    self.invoker = invoker_.Invoker()
 
 
 class TestInvoker(InvokerTestCase):
@@ -133,7 +133,7 @@ class TestInvoker(InvokerTestCase):
     action_ids.append(
       self.invoker.add(append_to_list_before, args=[test_list, 3], foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker))
     action_ids.append(self.invoker.add(additional_invoker))
     
@@ -142,7 +142,7 @@ class TestInvoker(InvokerTestCase):
   def test_add_return_unique_ids_across_multiple_invokers(self):
     action_id = self.invoker.add(append_test)
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     additional_action_id = additional_invoker.add(append_test)
     
     self.assertNotEqual(action_id, additional_action_id)
@@ -179,7 +179,7 @@ class TestInvoker(InvokerTestCase):
     self.assertEqual(len(self.invoker.list_actions('main')), 1)
     self.assertEqual(len(self.invoker.list_actions('main', foreach=True)), 1)
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     invoker_id = self.invoker.add(additional_invoker, ['main'])
     
     self.invoker.add_to_groups(invoker_id, ['additional'])
@@ -227,8 +227,8 @@ class TestInvoker(InvokerTestCase):
        (append_to_list_before, [test_list, 1], {})])
   
   def test_add_invoker_different_order(self):
-    additional_invoker = pginvoker.Invoker()
-    additional_invoker_2 = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
+    additional_invoker_2 = invoker_.Invoker()
     
     self.invoker.add(additional_invoker)
     self.invoker.add(additional_invoker_2, position=0)
@@ -247,7 +247,7 @@ class TestInvoker(InvokerTestCase):
     self.invoker.add(append_test, args=[test_list])
     self.assertTrue(self.invoker.contains(append_test))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     self.invoker.add(additional_invoker)
     self.assertTrue(self.invoker.contains(additional_invoker))
     
@@ -303,7 +303,7 @@ class TestInvoker(InvokerTestCase):
       self.invoker.add(
         append_to_list_before, ['main', 'additional'], [test_list, 2], foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker, ['main']))
     
     self.invoker.remove(action_ids[2], ['main'])
@@ -338,7 +338,7 @@ class TestInvoker(InvokerTestCase):
       self.invoker.add(
         append_to_list_before, ['additional'], [test_list, 4], foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker, ['main']))
     
     self.assertEqual(
@@ -392,7 +392,7 @@ class TestInvoker(InvokerTestCase):
     action_ids.append(
       self.invoker.add(append_to_list_before, args=[test_list, 3], foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker))
     
     self.assertEqual(
@@ -476,7 +476,7 @@ class TestInvoker(InvokerTestCase):
     action_ids.append(
       self.invoker.add(append_to_list_before, args=[test_list, 3], foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker))
     
     self.invoker.remove(action_ids[0])
@@ -519,7 +519,7 @@ class TestInvoker(InvokerTestCase):
     self.assertFalse(self.invoker.has_action(action_ids[3]))
     self.assertFalse(self.invoker.contains(append_to_list_before, foreach=True))
     
-    additional_invoker = pginvoker.Invoker()
+    additional_invoker = invoker_.Invoker()
     action_ids.append(self.invoker.add(additional_invoker))
     action_ids.append(self.invoker.add(additional_invoker))
     
@@ -893,7 +893,7 @@ class TestInvokerInvokeForeachActions(InvokerTestCase):
   
   def test_invoke_foreach_does_nothing_in_another_invoker(self):
     test_list = []
-    another_invoker = pginvoker.Invoker()
+    another_invoker = invoker_.Invoker()
     another_invoker.add(append_to_list, args=[test_list, 1])
     another_invoker.add(append_to_list, args=[test_list, 2])
     
@@ -915,7 +915,7 @@ class TestInvokerInvokeForeachActions(InvokerTestCase):
     self.invoker.add(append_to_list, args=[test_list, 1])
     self.invoker.add(append_to_list, args=[test_list, 2])
     
-    another_invoker = pginvoker.Invoker()
+    another_invoker = invoker_.Invoker()
     another_invoker.add(append_to_list, args=[test_list, 3])
     another_invoker.add(append_to_list, args=[test_list, 4])
     
@@ -930,7 +930,7 @@ class TestInvokerInvokeWithInvoker(InvokerTestCase):
   
   def test_invoke(self):
     test_list = []
-    another_invoker = pginvoker.Invoker()
+    another_invoker = invoker_.Invoker()
     another_invoker.add(append_to_list, args=[test_list, 1])
     another_invoker.add(append_test, args=[test_list])
     
@@ -943,7 +943,7 @@ class TestInvokerInvokeWithInvoker(InvokerTestCase):
   
   def test_invoke_after_adding_actions_to_invoker(self):
     test_list = []
-    another_invoker = pginvoker.Invoker()
+    another_invoker = invoker_.Invoker()
     
     self.invoker.add(append_to_list, args=[test_list, 2])
     self.invoker.add(another_invoker)
@@ -957,7 +957,7 @@ class TestInvokerInvokeWithInvoker(InvokerTestCase):
   
   def test_invoke_multiple_invokers_after_adding_actions_to_them(self):
     test_list = []
-    more_invokers = [pginvoker.Invoker(), pginvoker.Invoker()]
+    more_invokers = [invoker_.Invoker(), invoker_.Invoker()]
     
     self.invoker.add(append_to_list, args=[test_list, 2])
     self.invoker.add(more_invokers[0])
@@ -974,7 +974,7 @@ class TestInvokerInvokeWithInvoker(InvokerTestCase):
     self.assertListEqual(test_list, [2, 1, 'test', 3, 4])
   
   def test_invoke_empty_group(self):
-    another_invoker = pginvoker.Invoker()
+    another_invoker = invoker_.Invoker()
     try:
       self.invoker.add(another_invoker, ['invalid_group'])
     except Exception:

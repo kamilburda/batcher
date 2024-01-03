@@ -21,6 +21,7 @@ from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
 from src import export as export_
+from src import invoker as invoker_
 from src import placeholders
 
 
@@ -106,7 +107,7 @@ class Batcher:
     self._should_stop = False
     
     self._invoker = None
-    self._initial_invoker = pg.invoker.Invoker()
+    self._initial_invoker = invoker_.Invoker()
   
   @property
   def initial_run_mode(self) -> Gimp.RunMode:
@@ -333,7 +334,7 @@ class Batcher:
     return dict(self._failed_constraints)
   
   @property
-  def invoker(self) -> pg.invoker.Invoker:
+  def invoker(self) -> invoker_.Invoker:
     """`pygimplib.invoker.Invoker` instance to manage procedures and constraints
     applied on layers.
     
@@ -775,7 +776,7 @@ class Batcher:
     self._failed_procedures = collections.defaultdict(list)
     self._failed_constraints = collections.defaultdict(list)
     
-    self._invoker = pg.invoker.Invoker()
+    self._invoker = invoker_.Invoker()
     self._add_actions()
     self._add_name_only_actions()
     
