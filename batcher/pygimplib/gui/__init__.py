@@ -13,7 +13,6 @@ from .item_box import *
 from .overwrite_chooser import *
 from .parasite_box import *
 from .popup_hide_context import *
-from .progress_updater import *
 from .utils import *
 
 from .._gui_messages import *

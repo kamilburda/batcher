@@ -1,6 +1,6 @@
 import unittest
 
-from .. import progress as pgprogress
+from .. import progress as progress_
 
 
 class ProgressBarStub:
@@ -10,7 +10,7 @@ class ProgressBarStub:
     self.fraction = 0.0
 
 
-class ProgressUpdaterStub(pgprogress.ProgressUpdater):
+class ProgressUpdaterStub(progress_.ProgressUpdater):
   
   def _update_progress_bar(self):
     self.progress_bar.fraction = self._num_finished_tasks / self.num_total_tasks

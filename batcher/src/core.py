@@ -23,6 +23,7 @@ from src import exceptions
 from src import export as export_
 from src import invoker as invoker_
 from src import placeholders
+from src import progress as progress_
 
 
 _BATCHER_ARG_POSITION_IN_ACTIONS = 0
@@ -80,7 +81,7 @@ class Batcher:
         file_extension: str = 'png',
         overwrite_mode: int = pg.overwrite.OverwriteModes.SKIP,
         overwrite_chooser: Optional[pg.overwrite.OverwriteChooser] = None,
-        progress_updater: Optional[pg.progress.ProgressUpdater] = None,
+        progress_updater: Optional[progress_.ProgressUpdater] = None,
         item_tree: Optional[pg.itemtree.ItemTree] = None,
         is_preview: bool = False,
         process_contents: bool = True,
@@ -176,9 +177,9 @@ class Batcher:
     return self._overwrite_chooser
   
   @property
-  def progress_updater(self) -> pg.progress.ProgressUpdater:
-    """`pygimplib.progres.ProgressUpdater` instance indicating the number of
-    layers processed so far.
+  def progress_updater(self) -> progress_.ProgressUpdater:
+    """`progress.ProgressUpdater` instance indicating the number of layers
+    processed so far.
     
     If ``progress_updater=None`` was passed in `__init__()`, progress update is
     not tracked.
@@ -735,7 +736,7 @@ class Batcher:
       self._overwrite_chooser.overwrite_mode = self._overwrite_mode
     
     if self._progress_updater is None:
-      self._progress_updater = pg.progress.ProgressUpdater(None)
+      self._progress_updater = progress_.ProgressUpdater(None)
     
     if self._export_context_manager is None:
       self._export_context_manager = pg.utils.empty_context

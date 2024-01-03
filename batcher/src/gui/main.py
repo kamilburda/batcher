@@ -34,6 +34,7 @@ from src.gui import messages as messages_
 from src.gui import preview_image as preview_image_
 from src.gui import preview_name as preview_name_
 from src.gui import previews_controller as previews_controller_
+from src.gui import progress_updater as progress_updater_
 
 
 def display_reset_prompt(parent=None):
@@ -1062,7 +1063,7 @@ class ExportLayersDialog:
       default_response=pg.overwrite.OverwriteModes.CANCEL,
       parent=self._dialog)
     
-    progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
+    progress_updater = progress_updater_.GtkProgressUpdater(self._progress_bar)
     
     batcher = core.Batcher(
       Gimp.RunMode.INTERACTIVE,
@@ -1220,7 +1221,7 @@ class ExportLayersNowDialog:
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
   
   def run_batcher(self):
-    progress_updater = pg.gui.GtkProgressUpdater(self._progress_bar)
+    progress_updater = progress_updater_.GtkProgressUpdater(self._progress_bar)
     
     self._batcher = core.Batcher(
       Gimp.RunMode.WITH_LAST_VALS,

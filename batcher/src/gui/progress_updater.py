@@ -6,14 +6,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from .. import progress as pgprogress
-
-__all__ = [
-  'GtkProgressUpdater',
-]
+from src import progress as progress_
 
 
-class GtkProgressUpdater(pgprogress.ProgressUpdater):
+class GtkProgressUpdater(progress_.ProgressUpdater):
   
   def _fill_progress_bar(self):
     self.progress_bar.set_fraction(self._num_finished_tasks / self.num_total_tasks)

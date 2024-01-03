@@ -60,7 +60,6 @@ if _gimp_modules_available:
 
 from . import configbase
 from . import objectfilter
-from . import progress
 from . import utils
 
 from .constants import *
@@ -69,7 +68,6 @@ __all__ = [
   # Modules
   'logging',
   'objectfilter',
-  'progress',
   'utils',
   # Global elements imported to or defined in this module
   'config',
