@@ -6,6 +6,7 @@ import pygimplib as pg
 
 from src import builtin_constraints
 from src import builtin_procedures
+from src import invocation
 
 
 class PreviewsController:
@@ -74,11 +75,11 @@ class PreviewsController:
         'previews_sensitive')
     elif current_position != self._paned_outside_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
+        invocation.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove(self._image_preview.update)
+        invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
     
     self._paned_outside_previews_previous_position = current_position
@@ -114,11 +115,11 @@ class PreviewsController:
         'vpaned_preview_sensitive')
     elif current_position != self._paned_between_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
+        invocation.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove(self._image_preview.update)
+        invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
     
     self._paned_between_previews_previous_position = current_position
@@ -146,11 +147,11 @@ class PreviewsController:
   
   def _update_previews_on_setting_change(self, setting):
     self._name_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
-    pg.invocation.timeout_add_strict(
+    invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
     
     self._image_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
-    pg.invocation.timeout_add_strict(
+    invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
   
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
@@ -283,8 +284,8 @@ class PreviewsController:
   
   def _on_toplevel_notify_is_active(self, toplevel, property_spec):
     if toplevel.is_active():
-      pg.invocation.timeout_remove(self._name_preview.update)
-      pg.invocation.timeout_remove(self._image_preview.update)
+      invocation.timeout_remove(self._name_preview.update)
+      invocation.timeout_remove(self._image_preview.update)
       
       self._name_preview.update(reset_items=True)
       

@@ -13,6 +13,8 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
+from src import invocation
+
 
 class MessageLabel(Gtk.Box):
   """A widget to display a label, and optionally additional information in a
@@ -195,11 +197,11 @@ class MessageLabel(Gtk.Box):
   
   def _timeout_add_strict(self, delay, func, *args, **kwargs):
     if self._should_clear_text_after_delay(delay):
-      pg.invocation.timeout_add_strict(delay, func, None, *args, **kwargs)
+      invocation.timeout_add_strict(delay, func, None, *args, **kwargs)
   
   def _timeout_remove(self, delay, func):
     if self._should_clear_text_after_delay(delay):
-      pg.invocation.timeout_remove(func)
+      invocation.timeout_remove(func)
   
   @staticmethod
   def _should_clear_text_after_delay(clear_delay):
