@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from ...path import fileext
+from src.path import fileext
 
 
 class TestGetFilenameWithNewFileExtension(unittest.TestCase):
