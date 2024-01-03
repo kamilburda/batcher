@@ -1,12 +1,6 @@
 """Functions dealing with file extensions."""
 
-from .. import fileformats as pgfileformats
-
-__all__ = [
-  'get_file_extension',
-  'get_filename_with_new_file_extension',
-  'get_filename_root',
-]
+import pygimplib as pg
 
 
 def get_file_extension(filename: str) -> str:
@@ -30,7 +24,7 @@ def get_file_extension(filename: str) -> str:
       return file_extension
     
     file_extension = file_extension[next_period_index + 1:]
-    if file_extension.lower() in pgfileformats.FILE_FORMATS_DICT:
+    if file_extension.lower() in pg.fileformats.FILE_FORMATS_DICT:
       return file_extension
   
   return ''

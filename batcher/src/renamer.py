@@ -15,6 +15,8 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src.path import fileext
+
 
 class ItemRenamer:
   
@@ -215,7 +217,7 @@ class _PercentTemplate(string.Template):
 
 def _get_layer_name(batcher, item, field_value, file_extension_strip_mode=''):
   if file_extension_strip_mode in ['%e', '%i']:
-    file_extension = pg.path.get_file_extension(item.orig_name)
+    file_extension = fileext.get_file_extension(item.orig_name)
     if file_extension:
       if file_extension_strip_mode == '%i':
         if file_extension == batcher.file_extension:
@@ -223,7 +225,7 @@ def _get_layer_name(batcher, item, field_value, file_extension_strip_mode=''):
       else:
         return item.name
   
-  return pg.path.get_filename_root(item.name)
+  return fileext.get_filename_root(item.name)
 
 
 def _get_image_name(batcher, item, field_value, keep_extension_str=''):
@@ -235,7 +237,7 @@ def _get_image_name(batcher, item, field_value, keep_extension_str=''):
   if keep_extension_str == '%e':
     return image_name
   else:
-    return pg.path.get_filename_with_new_file_extension(image_name, '')
+    return fileext.get_filename_with_new_file_extension(image_name, '')
 
 
 def _get_layer_path(

@@ -12,6 +12,7 @@ from gi.repository import GLib
 import pygimplib as pg
 
 from src import exceptions
+from src.path import fileext
 from src import renamer as renamer_
 from src import uniquifier
 
@@ -157,7 +158,7 @@ def export(
       
       if overwrite_mode != pg.overwrite.OverwriteModes.SKIP:
         file_extension_properties[
-          pg.path.get_file_extension(item_to_process.name)].processed_count += 1
+          fileext.get_file_extension(item_to_process.name)].processed_count += 1
         # Append the original raw item
         batcher._exported_raw_items.append(item_to_process.raw)
     
@@ -207,20 +208,20 @@ def _process_item_name(
     if current_file_extension == default_file_extension:
       item.name += f'.{default_file_extension}'
     else:
-      item.name = pg.path.get_filename_with_new_file_extension(
+      item.name = fileext.get_filename_with_new_file_extension(
         item.name, current_file_extension, keep_extra_trailing_periods=True)
   else:
-    item.name = pg.path.get_filename_with_new_file_extension(
+    item.name = fileext.get_filename_with_new_file_extension(
       item.name, default_file_extension, keep_extra_trailing_periods=True)
   
   _validate_name(item)
   item_uniquifier.uniquify(
     item,
-    position=_get_unique_substring_position(item.name, pg.path.get_file_extension(item.name)))
+    position=_get_unique_substring_position(item.name, fileext.get_file_extension(item.name)))
 
 
 def _get_current_file_extension(item, default_file_extension, file_extension_properties):
-  item_file_extension = pg.path.get_file_extension(item.name)
+  item_file_extension = fileext.get_file_extension(item.name)
   
   if item_file_extension and file_extension_properties[item_file_extension].is_valid:
     return item_file_extension
@@ -277,7 +278,7 @@ def _export_item(
       file_extension_properties,
 ):
   output_filepath = _get_item_filepath(item, output_directory)
-  file_extension = pg.path.get_file_extension(item.name)
+  file_extension = fileext.get_file_extension(item.name)
   export_status = ExportStatuses.NOT_EXPORTED_YET
   
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))

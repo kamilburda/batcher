@@ -8,6 +8,8 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src.path import fileext
+
 
 def is_layer(item):
   return item.type == pg.itemtree.TYPE_ITEM
@@ -18,11 +20,11 @@ def is_nonempty_group(item):
 
 
 def has_matching_file_extension(item, file_extension):
-  return pg.path.get_file_extension(item.name).lower() == file_extension.lower()
+  return fileext.get_file_extension(item.name).lower() == file_extension.lower()
 
 
 def has_matching_default_file_extension(item, batcher):
-  return pg.path.get_file_extension(item.name).lower() == batcher.file_extension.lower()
+  return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
 
 def is_item_in_items_selected_in_preview(item, selected_items):
