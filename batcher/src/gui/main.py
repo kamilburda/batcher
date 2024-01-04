@@ -23,7 +23,6 @@ from src import core
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
-from src import invocation
 from src import renamer as renamer_
 from src import update
 from src import utils as utils_
@@ -821,7 +820,7 @@ class ExportLayersDialog:
     try:
       setting.gui.update_setting_value()
     except pg.setting.SettingValueError as e:
-      invocation.timeout_add_strict(
+      pg.invocation.timeout_add_strict(
         self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
         self._name_preview.set_sensitive, False)
       self._display_inline_message(str(e), Gtk.MessageType.ERROR, setting)
@@ -834,7 +833,7 @@ class ExportLayersDialog:
       self._name_preview.add_function_at_update(
         self._name_preview.set_sensitive, True)
       
-      invocation.timeout_add_strict(
+      pg.invocation.timeout_add_strict(
         self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
         self._name_preview.update)
   

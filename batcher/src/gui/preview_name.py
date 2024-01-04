@@ -172,7 +172,7 @@ class NamePreview(preview_base_.Preview):
 
   def set_sensitive(self, sensitive):
     # Functions created via GObject introspection are not hashable, causing
-    # functions in `invocation` to fail. We therefore wrap this function to
+    # functions in `pg.invocation` to fail. We therefore wrap this function to
     # avoid the error.
     super().set_sensitive(sensitive)
 

@@ -76,6 +76,7 @@ __all__ = [
 if _gimp_modules_available:
   from . import fileformats
   from . import gui
+  from . import invocation
   from . import itemtree
   from . import overwrite
   from . import path
@@ -94,6 +95,7 @@ if _gimp_modules_available:
     # Modules
     'fileformats',
     'gui',
+    'invocation',
     'itemtree',
     'overwrite',
     'path',
