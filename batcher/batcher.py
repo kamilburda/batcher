@@ -12,13 +12,13 @@ from gi.repository import Gimp
 
 from src import core
 from src import exceptions
-from src import settings_main
+from src import plugin_settings
 from src import update
 from src import utils as utils_
 from src.gui import main as gui_main
 
 
-SETTINGS = settings_main.create_settings()
+SETTINGS = plugin_settings.create_settings()
 
 _EXPORT_LAYERS_SOURCE_NAME = 'plug-in-batch-export-layers'
 

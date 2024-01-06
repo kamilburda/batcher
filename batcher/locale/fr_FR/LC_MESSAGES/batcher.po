@@ -77,7 +77,7 @@ msgid "Selected in preview"
 msgstr ""
 
 #: ../../export_layers/builtin_constraints.py:84
-#: ../../export_layers/settings_main.py:98
+#: ../../export_layers/plugin_settings.py:98
 msgid "Selected layers"
 msgstr ""
 
@@ -117,7 +117,7 @@ msgid "Output folder"
 msgstr ""
 
 #: ../../export_layers/builtin_procedures.py:166
-#: ../../export_layers/settings_main.py:75
+#: ../../export_layers/plugin_settings.py:75
 msgid "File extension"
 msgstr ""
 
@@ -207,7 +207,7 @@ msgid "Rename"
 msgstr ""
 
 #: ../../export_layers/builtin_procedures.py:299
-#: ../../export_layers/settings_main.py:90
+#: ../../export_layers/plugin_settings.py:90
 msgid "Layer filename pattern"
 msgstr ""
 
@@ -925,39 +925,39 @@ msgstr ""
 msgid "Value must be a dictionary."
 msgstr ""
 
-#: ../../export_layers/settings_main.py:53
+#: ../../export_layers/plugin_settings.py:53
 msgid "The run mode"
 msgstr "Mode de fonctionnement"
 
-#: ../../export_layers/settings_main.py:59
+#: ../../export_layers/plugin_settings.py:59
 msgid "Image"
 msgstr "Image"
 
-#: ../../export_layers/settings_main.py:82
+#: ../../export_layers/plugin_settings.py:82
 msgid "Output directory"
 msgstr "Répertoire de sortie"
 
-#: ../../export_layers/settings_main.py:91
+#: ../../export_layers/plugin_settings.py:91
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr ""
 
-#: ../../export_layers/settings_main.py:106
+#: ../../export_layers/plugin_settings.py:106
 msgid "_Replace"
 msgstr "_Remplacer"
 
-#: ../../export_layers/settings_main.py:107
+#: ../../export_layers/plugin_settings.py:107
 msgid "_Skip"
 msgstr "Pa_sser"
 
-#: ../../export_layers/settings_main.py:108
+#: ../../export_layers/plugin_settings.py:108
 msgid "Rename _new file"
 msgstr "Renommer le _nouveau fichier"
 
-#: ../../export_layers/settings_main.py:109
+#: ../../export_layers/plugin_settings.py:109
 msgid "Rename _existing file"
 msgstr "Renommer le fichier éxistant [E]"
 
-#: ../../export_layers/settings_main.py:111
+#: ../../export_layers/plugin_settings.py:111
 msgid "Overwrite mode (non-interactive run mode only)"
 msgstr "Mode d'écrasement (fonctionnement non-interactif uiquement)"
 

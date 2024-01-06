@@ -34,7 +34,7 @@ sys.path.append(PLUGIN_DIRPATH)
 from batcher.src import actions
 from batcher.src import builtin_constraints
 from batcher.src import builtin_procedures
-from batcher.src import settings_main
+from batcher.src import plugin_settings
 from batcher.src.gui import main as gui_main
 
 
@@ -53,7 +53,7 @@ SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 def main(settings=None):
   if not settings:
-    settings = settings_main.create_settings()
+    settings = plugin_settings.create_settings()
 
   image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 

@@ -79,7 +79,7 @@ msgid "Selected in preview"
 msgstr ""
 
 #: ../../export_layers/builtin_constraints.py:84
-#: ../../export_layers/settings_main.py:98
+#: ../../export_layers/plugin_settings.py:98
 msgid "Selected layers"
 msgstr "Gewählte Ebenen"
 
@@ -119,7 +119,7 @@ msgid "Output folder"
 msgstr ""
 
 #: ../../export_layers/builtin_procedures.py:166
-#: ../../export_layers/settings_main.py:75
+#: ../../export_layers/plugin_settings.py:75
 msgid "File extension"
 msgstr ""
 
@@ -209,7 +209,7 @@ msgid "Rename"
 msgstr ""
 
 #: ../../export_layers/builtin_procedures.py:299
-#: ../../export_layers/settings_main.py:90
+#: ../../export_layers/plugin_settings.py:90
 msgid "Layer filename pattern"
 msgstr "Dateinamensmuster für Ebenen"
 
@@ -939,39 +939,39 @@ msgstr ""
 msgid "Value must be a dictionary."
 msgstr ""
 
-#: ../../export_layers/settings_main.py:53
+#: ../../export_layers/plugin_settings.py:53
 msgid "The run mode"
 msgstr "Der Betriebsmodus"
 
-#: ../../export_layers/settings_main.py:59
+#: ../../export_layers/plugin_settings.py:59
 msgid "Image"
 msgstr "Bild"
 
-#: ../../export_layers/settings_main.py:82
+#: ../../export_layers/plugin_settings.py:82
 msgid "Output directory"
 msgstr "Ausgabeverzeichnis"
 
-#: ../../export_layers/settings_main.py:91
+#: ../../export_layers/plugin_settings.py:91
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr "Dateinamensmuster für Ebenen (leere Zeichenkette = Ebenenname)"
 
-#: ../../export_layers/settings_main.py:106
+#: ../../export_layers/plugin_settings.py:106
 msgid "_Replace"
 msgstr "_Ersetzen"
 
-#: ../../export_layers/settings_main.py:107
+#: ../../export_layers/plugin_settings.py:107
 msgid "_Skip"
 msgstr "_Überspringen"
 
-#: ../../export_layers/settings_main.py:108
+#: ../../export_layers/plugin_settings.py:108
 msgid "Rename _new file"
 msgstr "_Neue Datei umbenennen"
 
-#: ../../export_layers/settings_main.py:109
+#: ../../export_layers/plugin_settings.py:109
 msgid "Rename _existing file"
 msgstr "_Bestehende Datei umbenennen"
 
-#: ../../export_layers/settings_main.py:111
+#: ../../export_layers/plugin_settings.py:111
 msgid "Overwrite mode (non-interactive run mode only)"
 msgstr "Überschreibmodus (nur im nicht-interaktiven Ausführungsmodus)"
 

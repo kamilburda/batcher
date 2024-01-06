@@ -15,7 +15,7 @@ import pygimplib as pg
 from src import actions
 from src import core
 from src import builtin_procedures
-from src import settings_main
+from src import plugin_settings
 from src import utils as utils_
 
 
@@ -119,7 +119,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         expected_results_dirpath=None,
         additional_init_before_run=None,
   ):
-    settings = settings_main.create_settings()
+    settings = plugin_settings.create_settings()
     settings['special/image'].set_value(self.test_image)
     settings['main/output_directory'].set_value(self.output_dirpath)
     settings['main/file_extension'].set_value('xcf')

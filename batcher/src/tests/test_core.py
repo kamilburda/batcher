@@ -13,7 +13,7 @@ from src import actions as actions_
 from src import core
 from src import builtin_procedures
 from src import invoker as invoker_
-from src import settings_main
+from src import plugin_settings
 from src import utils as utils_
 
 
@@ -28,7 +28,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     cls.image.delete()
   
   def test_add_procedure_added_procedure_is_first_in_action_list(self):
-    settings = settings_main.create_settings()
+    settings = plugin_settings.create_settings()
     settings['special/image'].set_value(self.image)
     settings['main/file_extension'].set_value('xcf')
     
