@@ -14,9 +14,9 @@ from src import builtin_constraints
 from src import builtin_procedures
 from src import export as export_
 from src import overwrite
-# Despite being unused, `settings_custom` must be imported so that the custom
-# setting and GUI classes defined there are properly registered (via metaclasses
-# in `pg.setting.meta`).
+# Despite being unused, `settings_custom` must be imported so that the
+# setting and GUI classes defined there are properly registered (via respective
+# metaclasses in `pg.setting.meta`).
 # noinspection PyUnresolvedReferences
 from src import settings_custom
 
