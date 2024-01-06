@@ -13,10 +13,10 @@ import pygimplib as pg
 
 from src import exceptions
 from src import fileformats
-from src.path import fileext
 from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
+from src.path import fileext
 from src.path import validators as validators_
 
 

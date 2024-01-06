@@ -15,12 +15,12 @@ from gi.repository import Pango
 import pygimplib as pg
 
 from src import fileformats
-from . import cell_renderers as cell_renderers_
-from . import entry_expander as entry_expander_
-from . import entry_popup as entry_popup_
-from . import entry_undo as entry_undo_
+from src.gui import cell_renderers as cell_renderers_
+from src.gui import entry_expander as entry_expander_
+from src.gui import entry_popup as entry_popup_
+from src.gui import entry_undo as entry_undo_
+from src.gui import popup_hide_context as popup_hide_context_
 from src.path import pattern as pattern_
-from . import popup_hide_context as popup_hide_context_
 
 
 class ExtendedEntry(Gtk.Entry, Gtk.Editable):

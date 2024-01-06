@@ -13,7 +13,7 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
-from . import popup_hide_context as popup_hide_context_
+from src.gui import popup_hide_context as popup_hide_context_
 
 
 class MessageLabel(Gtk.Box):

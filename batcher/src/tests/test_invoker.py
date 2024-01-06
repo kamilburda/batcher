@@ -2,7 +2,7 @@ import unittest
 
 import parameterized
 
-from .. import invoker as invoker_
+from src import invoker as invoker_
 
 
 def append_test(list_):

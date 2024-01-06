@@ -1,6 +1,6 @@
 import unittest
 
-from .. import progress as progress_
+from src import progress as progress_
 
 
 class ProgressBarStub:
