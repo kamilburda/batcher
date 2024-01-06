@@ -7,7 +7,6 @@ import collections
 import traceback
 
 import gi
-gi.require_version('Gdk', '3.0')
 from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
