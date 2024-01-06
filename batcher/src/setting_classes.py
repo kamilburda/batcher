@@ -3,16 +3,93 @@
 import collections
 from collections.abc import Iterable
 import os
+from typing import Type
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
 
 import pygimplib as pg
 
 from src import renamer as renamer_
+
+
+class ValidatableStringSetting(pg.setting.StringSetting):
+  """Abstract class for string settings which are meant to be validated with one
+  of the `path.StringValidator` subclasses.
+
+  To determine whether the string is valid, `is_valid()` from the corresponding
+  subclass is called.
+
+  Error messages:
+    This class contains empty messages for error statuses from the specified
+    `path.StringValidator` subclass. Normally, if the value (string) assigned
+    is invalid, status messages returned from `is_valid()` are used. If
+    desired, you may fill the error messages with custom messages which
+    override the status messages from the method. See
+    `path.FileValidatorErrorStatuses` for available error statuses.
+  """
+
+  _ABSTRACT = True
+
+  def __init__(self, name: str, string_validator_class: Type[pg.path.StringValidator], **kwargs):
+    """Initializes a `ValidatableStringSetting` instance.
+
+    Args:
+      string_validator_class:
+        `path.StringValidator` subclass used to validate the value assigned to
+        this object.
+    """
+    self._string_validator = string_validator_class
+
+    super().__init__(name, **kwargs)
+
+  def _init_error_messages(self):
+    for status in pg.path.FileValidatorErrorStatuses.ERROR_STATUSES:
+      self.error_messages[status] = ''
+
+  def _validate(self, string_):
+    is_valid, status_messages = self._string_validator.is_valid(string_)
+    if not is_valid:
+      new_status_messages = []
+      for status, status_message in status_messages:
+        if self.error_messages[status]:
+          new_status_messages.append(self.error_messages[status])
+        else:
+          new_status_messages.append(status_message)
+
+      raise pg.setting.SettingValueError(
+        pg.setting.utils.value_to_str_prefix(string_)
+        + '\n'.join(message for message in new_status_messages))
+
+
+class DirpathSetting(ValidatableStringSetting):
+  """Class for settings storing directory paths as strings.
+
+  The `path.DirpathValidator` subclass is used to determine whether the
+  directory path is valid.
+
+  Default value: `Documents` directory in the user's home directory.
+
+  Empty values:
+  * ``None``
+  * ``''``
+  """
+
+  _ALLOWED_GUI_TYPES = [
+    pg.SETTING_GUI_TYPES.folder_chooser_widget,
+    pg.SETTING_GUI_TYPES.folder_chooser_button,
+  ]
+
+  _DEFAULT_DEFAULT_VALUE = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
+
+  _EMPTY_VALUES = [None, '']
+
+  def __init__(self, name, **kwargs):
+    super().__init__(name, pg.path.DirpathValidator, **kwargs)
 
 
 class FileExtensionEntryPresenter(pg.setting.ExtendedEntryPresenter):
@@ -25,7 +102,7 @@ class FileExtensionEntryPresenter(pg.setting.ExtendedEntryPresenter):
     return pg.gui.FileExtensionEntry()
 
 
-class FileExtensionSetting(pg.setting.ValidatableStringSetting):
+class FileExtensionSetting(ValidatableStringSetting):
   """Class for settings storing file extensions as strings.
 
   The `path.FileExtensionValidator` subclass is used to determine whether the
@@ -36,7 +113,7 @@ class FileExtensionSetting(pg.setting.ValidatableStringSetting):
   """
 
   _ALLOWED_GUI_TYPES = [
-    pg.setting.SETTING_GUI_TYPES.entry,
+    pg.SETTING_GUI_TYPES.entry,
     FileExtensionEntryPresenter,
   ]
 
