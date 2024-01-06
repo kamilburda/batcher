@@ -9,10 +9,6 @@ from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-__all__ = [
-  'EntryUndoContext',
-]
-
 
 class EntryUndoContext:
   """Class adding undo/redo capabilities to a `Gtk.Entry` instance."""

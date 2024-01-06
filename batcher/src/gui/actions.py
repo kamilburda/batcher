@@ -17,6 +17,7 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import actions as actions_
+from src.gui import editable_label as editable_label_
 from src.gui import placeholders as gui_placeholders_
 from src.gui import messages as gui_messages_
 
@@ -486,7 +487,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     self.action_area.pack_start(self._button_reset, False, False, 0)
     self.action_area.set_child_secondary(self._button_reset, True)
     
-    self._label_procedure_name = pg.gui.EditableLabel()
+    self._label_procedure_name = editable_label_.EditableLabel()
     self._label_procedure_name.label.set_use_markup(True)
     self._label_procedure_name.label.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_procedure_name.label.set_markup(

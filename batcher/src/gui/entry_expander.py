@@ -6,10 +6,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-__all__ = [
-  'EntryExpander',
-]
-
 
 class EntryExpander:
   """Class allowing the specified `Gtk.Entry` instance to have a flexible width.

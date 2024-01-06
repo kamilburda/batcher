@@ -16,6 +16,8 @@ import pygimplib as pg
 
 from src import renamer as renamer_
 
+from src.gui import entries as entries_
+
 
 class ValidatableStringSetting(pg.setting.StringSetting):
   """Abstract class for string settings which are meant to be validated with one
@@ -93,13 +95,13 @@ class DirpathSetting(ValidatableStringSetting):
 
 
 class FileExtensionEntryPresenter(pg.setting.ExtendedEntryPresenter):
-  """`setting.Presenter` subclass for `gui.FileExtensionEntry` widgets.
+  """`setting.Presenter` subclass for `gui.entries.FileExtensionEntry` widgets.
 
   Value: Text in the entry.
   """
 
   def _create_widget(self, setting, **kwargs):
-    return pg.gui.FileExtensionEntry()
+    return entries_.FileExtensionEntry()
 
 
 class FileExtensionSetting(ValidatableStringSetting):
@@ -138,13 +140,13 @@ class FileExtensionSetting(ValidatableStringSetting):
 
 class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
-  `pygimplib.gui.FilenamePatternEntry` widgets.
+  `gui.entries.FilenamePatternEntry` widgets.
 
   Value: Text in the entry.
   """
 
   def _create_widget(self, setting, **kwargs):
-    return pg.gui.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
+    return entries_.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
 
 
 class FilenamePatternSetting(pg.setting.StringSetting):

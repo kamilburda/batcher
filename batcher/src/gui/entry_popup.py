@@ -8,14 +8,9 @@ from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from .. import utils as pgutils
+import pygimplib as pg
 
 from . import popup_hide_context as popup_hide_context_
-from . import utils as utils_
-
-__all__ = [
-  'EntryPopup',
-]
 
 
 class EntryPopup:
@@ -39,15 +34,15 @@ class EntryPopup:
     self._height = height
     self._max_num_visible_rows = max_num_visible_rows
     
-    self.on_assign_from_selected_row = pgutils.create_empty_func(return_value=(None, None))
+    self.on_assign_from_selected_row = pg.utils.create_empty_func(return_value=(None, None))
     self.on_assign_last_value = self._entry.assign_text
     self.on_row_left_mouse_button_press = self.assign_from_selected_row
-    self.on_entry_left_mouse_button_press_func = pgutils.empty_func
-    self.on_entry_key_press_before_show_popup = pgutils.empty_func
+    self.on_entry_left_mouse_button_press_func = pg.utils.empty_func
+    self.on_entry_key_press_before_show_popup = pg.utils.empty_func
     self.on_entry_key_press = (
       lambda key_name, tree_path, stop_event_propagation: stop_event_propagation)
-    self.on_entry_after_assign_by_key_press = pgutils.empty_func
-    self.on_entry_changed_show_popup_condition = pgutils.create_empty_func(return_value=True)
+    self.on_entry_after_assign_by_key_press = pg.utils.empty_func
+    self.on_entry_changed_show_popup_condition = pg.utils.create_empty_func(return_value=True)
     
     self.trigger_popup = True
     
@@ -95,7 +90,7 @@ class EntryPopup:
     if func is not None:
       self._rows_filtered.set_visible_func(self._filter_rows)
     else:
-      self._rows_filtered.set_visible_func(pgutils.create_empty_func(return_value=True))
+      self._rows_filtered.set_visible_func(pg.utils.create_empty_func(return_value=True))
   
   @property
   def popup(self) -> Gtk.Window:
@@ -274,7 +269,7 @@ class EntryPopup:
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
   
   def _update_position(self):
-    position = utils_.get_position_below_widget(self._entry)
+    position = pg.gui.utils.get_position_below_widget(self._entry)
     if position is not None:
       self._popup.move(*position)
 

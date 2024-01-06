@@ -29,6 +29,7 @@ from src import update
 from src import utils as utils_
 
 from src.gui import actions as actions_
+from src.gui import entries as entries_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
@@ -350,7 +351,7 @@ class ExportLayersDialog:
       '<b>{}:</b>'.format(
         GLib.markup_escape_text(self._settings['main/file_extension'].display_name)))
     
-    self._file_extension_entry = pg.gui.FileExtensionEntry(
+    self._file_extension_entry = entries_.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
       maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
       activates_default=True,
@@ -368,7 +369,7 @@ class ExportLayersDialog:
       yalign=1.0,
     )
     
-    self._filename_pattern_entry = pg.gui.FilenamePatternEntry(
+    self._filename_pattern_entry = entries_.FilenamePatternEntry(
       renamer_.get_field_descriptions(renamer_.FIELDS),
       minimum_width_chars=self._FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
       maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,

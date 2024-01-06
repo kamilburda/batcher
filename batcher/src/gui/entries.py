@@ -12,21 +12,13 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from .. import fileformats as pgfileformats
-from .. import path as pgpath
+import pygimplib as pg
 
 from . import cell_renderers as cell_renderers_
 from . import entry_expander as entry_expander_
 from . import entry_popup as entry_popup_
 from . import entry_undo as entry_undo_
 from . import popup_hide_context as popup_hide_context_
-from . import utils as utils_
-
-__all__ = [
-  'ExtendedEntry',
-  'FilenamePatternEntry',
-  'FileExtensionEntry',
-]
 
 
 class ExtendedEntry(Gtk.Entry, Gtk.Editable):
@@ -88,9 +80,7 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
 
   @property
   def undo_context(self) -> entry_undo_.EntryUndoContext:
-    """`entry_undo_context.EntryUndoContext` instance to handle undo/redo
-    actions.
-    """
+    """`entry_undo.EntryUndoContext` instance to handle undo/redo actions."""
     return self._undo_context
 
   # HACK: Instead of connecting an 'insert-text' signal handler, we override the
@@ -331,13 +321,13 @@ class FilenamePatternEntry(ExtendedEntry):
     )
   
   def _on_filename_pattern_entry_notify_cursor_position(self, entry, property_spec):
-    field = pgpath.StringPattern.get_field_at_position(self.get_text(), self.get_position())
+    field = pg.path.StringPattern.get_field_at_position(self.get_text(), self.get_position())
     
     if field is None:
       self._hide_field_tooltip()
       return
     
-    matching_field_regex = pgpath.StringPattern.get_first_matching_field_regex(
+    matching_field_regex = pg.path.StringPattern.get_first_matching_field_regex(
       field, self._item_regexes_and_descriptions)
     
     if matching_field_regex not in self._item_regexes_and_descriptions:
@@ -370,7 +360,7 @@ class FilenamePatternEntry(ExtendedEntry):
     self._update_window_position(self._field_tooltip_window)
   
   def _update_window_position(self, tooltip_window):
-    absolute_entry_position = utils_.get_absolute_widget_position(self)
+    absolute_entry_position = pg.gui.utils.get_absolute_widget_position(self)
 
     if absolute_entry_position is not None:
       y = absolute_entry_position[1] - tooltip_window.get_allocation().height
@@ -437,7 +427,7 @@ class FilenamePatternEntry(ExtendedEntry):
         return (
           current_text[current_position - 1] == '['
           and current_text[current_position - 2] != '['
-          and not pgpath.StringPattern.get_field_at_position(current_text, current_position - 1))
+          and not pg.path.StringPattern.get_field_at_position(current_text, current_position - 1))
       else:
         return current_text[0] == '['
     else:
@@ -507,7 +497,7 @@ class FileExtensionEntry(ExtendedEntry):
     self._extensions_text_pixel_rects = []
     
     self._popup = entry_popup_.EntryPopup(
-      self, self._COLUMN_TYPES, self._get_file_formats(pgfileformats.FILE_FORMATS))
+      self, self._COLUMN_TYPES, self._get_file_formats(pg.fileformats.FILE_FORMATS))
     self._popup.filter_rows_func = self._filter_file_formats
     self._popup.on_assign_from_selected_row = self._on_assign_from_selected_row
     self._popup.on_assign_last_value = self._do_assign_text

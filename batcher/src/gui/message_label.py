@@ -13,6 +13,8 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
+from . import popup_hide_context as popup_hide_context_
+
 
 class MessageLabel(Gtk.Box):
   """A widget to display a label, and optionally additional information in a
@@ -40,7 +42,7 @@ class MessageLabel(Gtk.Box):
     
     self._init_gui()
     
-    self._popup_hide_context = pg.gui.PopupHideContext(
+    self._popup_hide_context = popup_hide_context_.PopupHideContext(
       self._popup_more,
       self._button_more,
       widgets_to_exclude_from_triggering_hiding=[
