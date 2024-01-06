@@ -19,7 +19,6 @@ from src import overwrite
 # in `pg.setting.meta`).
 # noinspection PyUnresolvedReferences
 from src import settings_custom
-from src.gui import settings_gui
 
 
 def create_settings():
@@ -118,7 +117,7 @@ def create_settings():
     },
   ])
   
-  settings.add([settings_gui.create_gui_settings()])
+  settings.add([_create_gui_settings()])
   
   settings['main'].add([
     actions.create(
@@ -148,6 +147,87 @@ def create_settings():
     settings['special/image'])
   
   return settings
+
+
+def _create_gui_settings():
+  gui_settings = pg.setting.Group(name='gui')
+
+  size_gui_settings = pg.setting.Group(name='size')
+
+  size_gui_settings.add([
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': (),
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': (),
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_outside_previews_position',
+      'default_value': 610,
+    },
+    {
+      'type': 'float',
+      'name': 'paned_between_previews_position',
+      'default_value': 360,
+    },
+    {
+      'type': 'float',
+      'name': 'settings_vpane_position',
+      'default_value': 400,
+    },
+  ])
+
+  gui_settings.add([
+    {
+      'type': 'bool',
+      'name': 'show_more_settings',
+      'default_value': False,
+    },
+    {
+      'type': 'bool',
+      'name': 'name_preview_sensitive',
+      'default_value': True,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'image_preview_sensitive',
+      'default_value': True,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'image_preview_automatic_update',
+      'default_value': True,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'image_preview_automatic_update_if_below_maximum_duration',
+      'default_value': True,
+      'gui_type': None,
+    },
+    {
+      'type': 'images_and_gimp_items',
+      'name': 'name_preview_layers_collapsed_state',
+    },
+    {
+      'type': 'images_and_gimp_items',
+      'name': 'image_preview_displayed_layers',
+    },
+    {
+      'type': 'images_and_directories',
+      'name': 'images_and_directories',
+    },
+    size_gui_settings,
+  ])
+
+  return gui_settings
 
 
 def _on_after_add_procedure(procedures, procedure, orig_procedure_dict, main_settings):
