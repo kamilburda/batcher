@@ -31,10 +31,9 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="_" />
-          <option value="N_" />
-          <option value="batcher.config.c" />
-          <option value="batcher.config_dev.c" />
           <option value="builtins.c" />
+          <option value="config.config.c" />
+          <option value="config.config_dev.c" />
         </list>
       </option>
     </inspection_tool>
