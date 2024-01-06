@@ -13,6 +13,7 @@ from src import actions
 from src import builtin_constraints
 from src import builtin_procedures
 from src import export as export_
+from src import overwrite
 # Despite being unused, `settings_custom` must be imported so that the custom
 # setting and GUI classes defined there are properly registered (via metaclasses
 # in `pg.setting.meta`).
@@ -78,11 +79,11 @@ def create_settings():
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
       'items': [
-        ('replace', _('_Replace'), pg.overwrite.OverwriteModes.REPLACE),
-        ('skip', _('_Skip'), pg.overwrite.OverwriteModes.SKIP),
-        ('rename_new', _('Rename _new file'), pg.overwrite.OverwriteModes.RENAME_NEW),
+        ('replace', _('_Replace'), overwrite.OverwriteModes.REPLACE),
+        ('skip', _('_Skip'), overwrite.OverwriteModes.SKIP),
+        ('rename_new', _('Rename _new file'), overwrite.OverwriteModes.RENAME_NEW),
         ('rename_existing', _('Rename _existing file'),
-         pg.overwrite.OverwriteModes.RENAME_EXISTING)],
+         overwrite.OverwriteModes.RENAME_EXISTING)],
       'display_name': _('Overwrite mode (non-interactive run mode only)'),
     },
     {

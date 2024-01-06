@@ -10,14 +10,10 @@ from gi.repository import Gtk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
-from .. import overwrite as pgoverwrite
-
-__all__ = [
-  'GtkDialogOverwriteChooser',
-]
+from src import overwrite
 
 
-class GtkDialogOverwriteChooser(pgoverwrite.InteractiveOverwriteChooser):
+class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
   """Class displaying a `Gtk.Dialog` prompting the user to choose how to handle
   already existing files.
   """

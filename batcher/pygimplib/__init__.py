@@ -78,7 +78,6 @@ if _gimp_modules_available:
   from . import gui
   from . import invocation
   from . import itemtree
-  from . import overwrite
   from . import path
   from . import pdbutils
   from . import setting
@@ -97,7 +96,6 @@ if _gimp_modules_available:
     'gui',
     'invocation',
     'itemtree',
-    'overwrite',
     'path',
     'pdbutils',
     'setting',

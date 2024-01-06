@@ -1,11 +1,12 @@
 import unittest
 import unittest.mock as mock
 
-from .. import overwrite as pgoverwrite
-from .. import utils as pgutils
+import pygimplib as pg
+
+from src import overwrite
 
 
-class InteractiveOverwriteChooserStub(pgoverwrite.InteractiveOverwriteChooser):
+class InteractiveOverwriteChooserStub(overwrite.InteractiveOverwriteChooser):
   
   def __init__(self, values_and_display_names, default_value, default_response):
     super().__init__(values_and_display_names, default_value, default_response)
@@ -57,21 +58,21 @@ class TestHandleOverwrite(unittest.TestCase):
   
   def setUp(self):
     self.filepath = '/test/image.png'
-    self.overwrite_chooser = pgoverwrite.NoninteractiveOverwriteChooser(
-      pgoverwrite.OverwriteModes.REPLACE)
+    self.overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
+      overwrite.OverwriteModes.REPLACE)
   
-  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.overwrite.os.path.exists')
+  @mock.patch('batcher.src.overwrite.os.path.exists')
   def test_handle_overwrite_file_exists(self, mock_os_path_exists):
     mock_os_path_exists.return_value = True
     
     self.assertEqual(
-      pgoverwrite.handle_overwrite(self.filepath, self.overwrite_chooser),
+      overwrite.handle_overwrite(self.filepath, self.overwrite_chooser),
       (self.overwrite_chooser.overwrite_mode, self.filepath))
   
-  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.overwrite.os.path.exists')
+  @mock.patch('batcher.src.overwrite.os.path.exists')
   def test_handle_overwrite_file_does_not_exist(self, mock_os_path_exists):
     mock_os_path_exists.return_value = False
     
     self.assertEqual(
-      pgoverwrite.handle_overwrite(self.filepath, self.overwrite_chooser),
-      (pgoverwrite.OverwriteModes.DO_NOTHING, self.filepath))
+      overwrite.handle_overwrite(self.filepath, self.overwrite_chooser),
+      (overwrite.OverwriteModes.DO_NOTHING, self.filepath))

@@ -23,6 +23,7 @@ from src import core
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
+from src import overwrite
 from src import renamer as renamer_
 from src import update
 from src import utils as utils_
@@ -30,6 +31,7 @@ from src import utils as utils_
 from src.gui import actions as actions_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
+from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import preview_image as preview_image_
 from src.gui import preview_name as preview_name_
 from src.gui import previews_controller as previews_controller_
@@ -220,7 +222,7 @@ class ExportLayersDialog:
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
-      overwrite_chooser=pg.overwrite.NoninteractiveOverwriteChooser(
+      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].items['replace']),
       item_tree=self._initial_layer_tree)
     
@@ -1056,10 +1058,10 @@ class ExportLayersDialog:
     self._set_gui_enabled(True)
   
   def _setup_batcher(self):
-    overwrite_chooser = pg.gui.GtkDialogOverwriteChooser(
+    overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
       self._get_overwrite_dialog_items(),
       default_value=self._settings['main/overwrite_mode'].items['replace'],
-      default_response=pg.overwrite.OverwriteModes.CANCEL,
+      default_response=overwrite.OverwriteModes.CANCEL,
       parent=self._dialog)
     
     progress_updater = progress_updater_.GtkProgressUpdater(self._progress_bar)
@@ -1227,7 +1229,7 @@ class ExportLayersNowDialog:
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
-      overwrite_chooser=pg.overwrite.NoninteractiveOverwriteChooser(
+      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].value),
       progress_updater=progress_updater,
       export_context_manager=handle_gui_in_export,

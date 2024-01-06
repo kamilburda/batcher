@@ -10,7 +10,6 @@ from .entry_undo import *
 from .file_chooser_widget import *
 from .gimp_item_combo_box import *
 from .item_box import *
-from .overwrite_chooser import *
 from .parasite_box import *
 from .popup_hide_context import *
 from .utils import *

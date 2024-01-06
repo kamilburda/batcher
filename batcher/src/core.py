@@ -22,6 +22,7 @@ from src import builtin_procedures
 from src import exceptions
 from src import export as export_
 from src import invoker as invoker_
+from src import overwrite
 from src import placeholders
 from src import progress as progress_
 
@@ -79,8 +80,8 @@ class Batcher:
         output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         layer_filename_pattern: str = '',
         file_extension: str = 'png',
-        overwrite_mode: int = pg.overwrite.OverwriteModes.SKIP,
-        overwrite_chooser: Optional[pg.overwrite.OverwriteChooser] = None,
+        overwrite_mode: int = overwrite.OverwriteModes.SKIP,
+        overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
         progress_updater: Optional[progress_.ProgressUpdater] = None,
         item_tree: Optional[pg.itemtree.ItemTree] = None,
         is_preview: bool = False,
@@ -168,7 +169,7 @@ class Batcher:
     return self._overwrite_mode
   
   @property
-  def overwrite_chooser(self) -> pg.overwrite.OverwriteChooser:
+  def overwrite_chooser(self) -> overwrite.OverwriteChooser:
     """`pygimplib.overwrite.OverwriteChooser` instance that is invoked during
     export if a file with the same name already exists.
     
@@ -731,7 +732,7 @@ class Batcher:
           f'invalid argument "{name}" encountered; must be one of {list(init_argspec_names)}')
 
     if self._overwrite_chooser is None:
-      self._overwrite_chooser = pg.overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
+      self._overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
     else:
       self._overwrite_chooser.overwrite_mode = self._overwrite_mode
     

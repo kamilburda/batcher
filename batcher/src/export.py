@@ -13,6 +13,7 @@ import pygimplib as pg
 
 from src import exceptions
 from src.path import fileext
+from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
 
@@ -156,7 +157,7 @@ def export(
             default_file_extension,
             file_extension_properties)
       
-      if overwrite_mode != pg.overwrite.OverwriteModes.SKIP:
+      if overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
           fileext.get_file_extension(item_to_process.name)].processed_count += 1
         # Append the original raw item
@@ -283,15 +284,15 @@ def _export_item(
   
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
-  overwrite_mode, output_filepath = pg.overwrite.handle_overwrite(
+  overwrite_mode, output_filepath = overwrite.handle_overwrite(
     output_filepath,
     batcher.overwrite_chooser,
     _get_unique_substring_position(output_filepath, file_extension))
   
-  if overwrite_mode == pg.overwrite.OverwriteModes.CANCEL:
+  if overwrite_mode == overwrite.OverwriteModes.CANCEL:
     raise exceptions.BatcherCancelError('cancelled')
   
-  if overwrite_mode != pg.overwrite.OverwriteModes.SKIP:
+  if overwrite_mode != overwrite.OverwriteModes.SKIP:
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
     
     export_status = _export_item_once_wrapper(
