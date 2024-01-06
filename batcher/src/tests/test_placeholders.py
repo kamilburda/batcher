@@ -10,7 +10,7 @@ import parameterized
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-from src import placeholders
+from src import placeholders as placeholders_
 
 
 class _BatcherStub:
@@ -24,23 +24,23 @@ class TestGetReplacedArg(unittest.TestCase):
 
   def test_arg_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
-    setting = placeholders.PlaceholderImageSetting('placeholder')
+    setting = placeholders_.PlaceholderImageSetting('placeholder')
 
-    self.assertEqual(placeholders.get_replaced_value(setting, batcher), 'image')
+    self.assertEqual(placeholders_.get_replaced_value(setting, batcher), 'image')
 
   def test_arg_matching_array_placeholder(self):
     batcher = _BatcherStub(current_image='image')
-    setting = placeholders.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
+    setting = placeholders_.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
 
     self.assertTupleEqual(
-      placeholders.get_replaced_value(setting, batcher), (None,))
+      placeholders_.get_replaced_value(setting, batcher), (None,))
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
 
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker
-      placeholders.get_replaced_value(
+      placeholders_.get_replaced_value(
         pg.setting.StringSetting('placeholder', default_value='invalid_placeholder'), batcher)
 
 
@@ -48,26 +48,26 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
 
   def test_with_gobject_subclass(self):
     self.assertEqual(
-      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.Image),
+      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.Image),
       'placeholder_image')
 
   def test_with_gtype(self):
     self.assertEqual(
-      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.Image.__gtype__),
+      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.Image.__gtype__),
       'placeholder_image')
 
   def test_with_non_matching_gtype(self):
-    self.assertIsNone(placeholders.get_placeholder_type_name_from_pdb_type(GObject.GObject))
+    self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(GObject.GObject))
 
   def test_with_invalid_object_type(self):
-    self.assertIsNone(placeholders.get_placeholder_type_name_from_pdb_type(object))
+    self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(object))
 
   def test_with_layer_array(self):
     param = stubs_gimp.GParamStub(Gimp.ObjectArray, 'layers')
 
     # noinspection PyTypeChecker
     self.assertEqual(
-      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param),
+      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param),
       'placeholder_layer_array',
     )
 
@@ -76,14 +76,14 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
 
     # noinspection PyTypeChecker
     self.assertIsNone(
-      placeholders.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param))
+      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param))
 
 
 class TestPlaceholderSetting(unittest.TestCase):
   
   @parameterized.parameterized.expand([
-    ('placeholder', placeholders.PlaceholderSetting, []),
-    ('image_placeholder', placeholders.PlaceholderImageSetting, ['current_image']),
+    ('placeholder', placeholders_.PlaceholderSetting, []),
+    ('image_placeholder', placeholders_.PlaceholderImageSetting, ['current_image']),
   ])
   def test_get_allowed_placeholder_names(
         self, test_case_suffix, placeholder_setting_type, expected_result):
@@ -91,8 +91,8 @@ class TestPlaceholderSetting(unittest.TestCase):
       placeholder_setting_type.get_allowed_placeholder_names(), expected_result)
   
   @parameterized.parameterized.expand([
-    ('placeholder', placeholders.PlaceholderSetting, 0),
-    ('image_placeholder', placeholders.PlaceholderImageSetting, 1),
+    ('placeholder', placeholders_.PlaceholderSetting, 0),
+    ('image_placeholder', placeholders_.PlaceholderImageSetting, 1),
   ])
   def test_get_allowed_placeholders(
         self, test_case_suffix, placeholder_setting_type, expected_length):
@@ -102,7 +102,7 @@ class TestPlaceholderSetting(unittest.TestCase):
 class TestPlaceholderArraySetting(unittest.TestCase):
 
   def test_to_dict(self):
-    setting = placeholders.PlaceholderDrawableArraySetting(
+    setting = placeholders_.PlaceholderDrawableArraySetting(
       'drawables', element_type='layer')
 
     self.assertDictEqual(
