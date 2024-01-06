@@ -24,7 +24,7 @@ def test_basic_settings_and_gui():
 
 
 def test_settings_and_gui(setting_data):
-  pggui.set_gui_excepthook('Test GUI for Settings', '')
+  pggui.set_gui_excepthook('Test GUI for Settings')
   pggui.set_gui_excepthook_additional_callback(_display_message_on_setting_value_error)
   
   settings = []
@@ -170,8 +170,6 @@ def _get_setting_data():
   setting_data['enum']['enum_type'] = Gimp.RunMode
 
   setting_data['string']['default_value'] = 'Test'
-
-  setting_data['file_extension']['default_value'] = 'png'
 
   setting_data.update(**_get_array_settings())
 
