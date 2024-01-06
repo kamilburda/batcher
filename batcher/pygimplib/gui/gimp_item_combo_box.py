@@ -4,6 +4,7 @@ import collections
 from typing import Optional
 
 import gi
+from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -11,6 +12,8 @@ from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+
+from . import utils as utils_
 
 __all__ = [
   'GimpItemComboBox',
@@ -34,8 +37,9 @@ class GimpItemComboBox(Gtk.Box):
   
   _GimpItemComboBox = collections.namedtuple(
     '_GimpItemComboBox',
-    ['name', 'widget', 'get_active_item_func', 'set_active_item_func', 'gimp_item_type'])
-  
+    ['icon_name', 'widget', 'get_active_item_func', 'set_active_item_func', 'gimp_item_type'])
+
+  _ITEM_TYPE_ICON_PADDING = 4
   _COMBO_BOX_SPACING = 4
   
   def __init__(self, constraint=None, data=None, **kwargs):
@@ -52,43 +56,53 @@ class GimpItemComboBox(Gtk.Box):
     
     self._item_combo_boxes = [
       self._GimpItemComboBox(
-        _('Layer'),
+        GimpUi.ICON_DIALOG_LAYERS,
         self._layer_combo_box,
         self._layer_combo_box.get_active,
         self._layer_combo_box.set_active,
         Gimp.Layer),
       self._GimpItemComboBox(
-        _('Channel'),
+        GimpUi.ICON_DIALOG_CHANNELS,
         self._channel_combo_box,
         self._channel_combo_box.get_active,
         self._channel_combo_box.set_active,
         Gimp.Channel),
       self._GimpItemComboBox(
-        _('Vectors'),
+        GimpUi.ICON_DIALOG_PATHS,
         self._vectors_combo_box,
         self._vectors_combo_box.get_active,
         self._vectors_combo_box.set_active,
         Gimp.Vectors)]
 
     self._displayed_item_combo_box = self._item_combo_boxes[0]
-    
-    self._item_types_combo_box = Gtk.ComboBoxText.new()
-    
-    self.pack_start(self._item_types_combo_box, True, True, 0)
-    
-    for combo_box in self._item_combo_boxes:
+
+    self._item_model = Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_INT)
+
+    self._item_types_combo_box = Gtk.ComboBox(model=self._item_model)
+
+    self.pack_start(self._item_types_combo_box, False, False, 0)
+
+    for index, combo_box in enumerate(self._item_combo_boxes):
       combo_box.widget.show_all()
       combo_box.widget.hide()
       combo_box.widget.set_no_show_all(True)
-      
-      self._item_types_combo_box.append_text(combo_box.name)
-      
+
+      self._item_model.append(
+        (utils_.get_icon_pixbuf(combo_box.icon_name, self, Gtk.IconSize.BUTTON), index))
+
       self.pack_start(combo_box.widget, True, True, 0)
-      
+
       combo_box.widget.connect(0, self._on_combo_box_changed)
 
+    self._icon_cell_renderer = Gtk.CellRendererPixbuf(
+      xpad=self._ITEM_TYPE_ICON_PADDING,
+    )
+
+    self._item_types_combo_box.pack_start(self._icon_cell_renderer, False)
+    self._item_types_combo_box.add_attribute(self._icon_cell_renderer, 'pixbuf', 0)
+
     self._item_types_combo_box.connect('changed', self._on_item_types_combo_box_changed)
-    
+
     self._item_types_combo_box.set_active(0)
   
   def get_active(self) -> Optional[int]:
