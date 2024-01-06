@@ -12,6 +12,7 @@ from gi.repository import GLib
 import pygimplib as pg
 
 from src import exceptions
+from src import fileformats
 from src.path import fileext
 from src import overwrite
 from src import renamer as renamer_
@@ -297,7 +298,7 @@ def _export_item(
     
     export_status = _export_item_once_wrapper(
       batcher,
-      pg.fileformats.get_save_procedure(file_extension),
+      fileformats.get_save_procedure(file_extension),
       _get_run_mode(batcher, file_extension, file_extension_properties),
       image,
       raw_item,
@@ -309,7 +310,7 @@ def _export_item(
     if export_status == ExportStatuses.FORCE_INTERACTIVE:
       export_status = _export_item_once_wrapper(
         batcher,
-        pg.fileformats.get_save_procedure(file_extension),
+        fileformats.get_save_procedure(file_extension),
         Gimp.RunMode.INTERACTIVE,
         image,
         raw_item,
@@ -465,7 +466,7 @@ class _FileExtension:
 
 
 class _FileExtensionProperties:
-  """Mapping of file extensions from `pygimplib.fileformats.FILE_FORMATS` to
+  """Mapping of file extensions from `fileformats.FILE_FORMATS` to
   `_FileExtension` instances.
   
   File extension as a key is always converted to lowercase.
@@ -473,7 +474,7 @@ class _FileExtensionProperties:
   def __init__(self):
     self._properties = collections.defaultdict(_FileExtension)
     
-    for file_format in pg.fileformats.FILE_FORMATS:
+    for file_format in fileformats.FILE_FORMATS:
       # This ensures that the file format dialog will be displayed only once per
       # file format if multiple file extensions for the same format are used
       # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).

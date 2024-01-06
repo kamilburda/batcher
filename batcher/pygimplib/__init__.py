@@ -74,7 +74,6 @@ __all__ = [
 ]
 
 if _gimp_modules_available:
-  from . import fileformats
   from . import gui
   from . import invocation
   from . import itemtree
@@ -92,7 +91,6 @@ if _gimp_modules_available:
 
   __all__.extend([
     # Modules
-    'fileformats',
     'gui',
     'invocation',
     'itemtree',

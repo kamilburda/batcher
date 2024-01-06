@@ -16,7 +16,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
-from .pypdb import pdb
+from pygimplib import pdb
 
 
 def get_default_save_procedure() -> Callable:
