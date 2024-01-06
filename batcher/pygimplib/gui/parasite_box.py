@@ -3,6 +3,8 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -32,7 +34,6 @@ class ParasiteBox(Gtk.Box):
   __gsignals__ = {'parasite-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
   
   _HBOX_SPACING = 5
-  _VBOX_SPACING = 3
   
   def __init__(self, parasite: Gimp.Parasite):
     super().__init__()
@@ -76,51 +77,40 @@ class ParasiteBox(Gtk.Box):
     
     self._parasite_data_entry = Gtk.Entry()
     
-    self._vbox_name_label = Gtk.Label(
-      label=_('Name'),
-      xalign=0.0,
-      yalign=0.5,
-    )
+    self._icon_name = Gtk.Image.new_from_icon_name(GimpUi.ICON_TOOL_TEXT, Gtk.IconSize.BUTTON)
     
-    self._vbox_name = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
+    self._hbox_name = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
-      spacing=self._VBOX_SPACING,
+      spacing=self._HBOX_SPACING,
     )
-    self._vbox_name.pack_start(self._vbox_name_label, False, False, 0)
-    self._vbox_name.pack_start(self._parasite_name_entry, False, False, 0)
+    self._hbox_name.pack_start(self._icon_name, False, False, 0)
+    self._hbox_name.pack_start(self._parasite_name_entry, True, True, 0)
     
-    self._vbox_flags_label = Gtk.Label(
-      label=_('Flags'),
-      xalign=0.0,
-      yalign=0.5,
-    )
+    self._icon_flags = Gtk.Image.new_from_icon_name(GimpUi.ICON_MARKER, Gtk.IconSize.BUTTON)
 
-    self._vbox_flags = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
+    self._hbox_flags = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
-      spacing=self._VBOX_SPACING,
+      spacing=self._HBOX_SPACING,
     )
-    self._vbox_flags.pack_start(self._vbox_flags_label, False, False, 0)
-    self._vbox_flags.pack_start(self._parasite_flags_spin_button, False, False, 0)
+    self._hbox_flags.pack_start(self._icon_flags, False, False, 0)
+    self._hbox_flags.pack_start(self._parasite_flags_spin_button, True, True, 0)
     
-    self._vbox_data_label = Gtk.Label(
-      label=_('Data'),
-      xalign=0.0,
-      yalign=0.5,
-    )
+    self._icon_data = Gtk.Image.new_from_icon_name(
+      GimpUi.ICON_FORMAT_INDENT_MORE, Gtk.IconSize.BUTTON)
     
-    self._vbox_data = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
+    self._hbox_data = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
-      spacing=self._VBOX_SPACING,
+      spacing=self._HBOX_SPACING,
     )
-    self._vbox_data.pack_start(self._vbox_data_label, False, False, 0)
-    self._vbox_data.pack_start(self._parasite_data_entry, False, False, 0)
+    self._hbox_data.pack_start(self._icon_data, False, False, 0)
+    self._hbox_data.pack_start(self._parasite_data_entry, True, True, 0)
 
-    self.pack_start(self._vbox_name, False, False, 0)
-    self.pack_start(self._vbox_flags, False, False, 0)
-    self.pack_start(self._vbox_data, False, False, 0)
+    self.pack_start(self._hbox_name, False, False, 0)
+    self.pack_start(self._hbox_flags, False, False, 0)
+    self.pack_start(self._hbox_data, False, False, 0)
     
     self._set_values(parasite)
     self._connect_changed_events()
