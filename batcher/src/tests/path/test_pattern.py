@@ -1,9 +1,8 @@
-import os
 import unittest
 
 import parameterized
 
-from .. import path as pgpath
+from src.path import pattern as pattern_
 
 
 def _get_field_value(field, arg1=1, arg2=2):
@@ -48,7 +47,7 @@ class TestStringPattern(unittest.TestCase):
   ])
   def test_generate_without_fields(
         self, test_case_suffix, pattern, expected_output):
-    self.assertEqual(pgpath.StringPattern(pattern).substitute(), expected_output)
+    self.assertEqual(pattern_.StringPattern(pattern).substitute(), expected_output)
   
   @parameterized.parameterized.expand([
     ('fields_without_arguments_with_constant_value',
@@ -181,7 +180,7 @@ class TestStringPattern(unittest.TestCase):
   ])
   def test_generate_with_fields(
         self, test_case_suffix, fields, pattern, expected_output):
-    self.assertEqual(pgpath.StringPattern(pattern, fields).substitute(), expected_output)
+    self.assertEqual(pattern_.StringPattern(pattern, fields).substitute(), expected_output)
   
   @parameterized.parameterized.expand([
     ('field_with_explicit_arguments',
@@ -198,7 +197,7 @@ class TestStringPattern(unittest.TestCase):
   ])
   def test_generate_multiple_times_yields_same_field(
         self, test_case_suffix, fields, pattern, expected_output):
-    string_pattern = pgpath.StringPattern(pattern, fields)
+    string_pattern = pattern_.StringPattern(pattern, fields)
     num_repeats = 3
     
     outputs = [string_pattern.substitute() for _unused in range(num_repeats)]
@@ -244,7 +243,7 @@ class TestStringPattern(unittest.TestCase):
       generators.append(generator)
       processed_fields.append((field_regex, lambda field, gen=generator: next(gen)))
     
-    string_pattern = pgpath.StringPattern(pattern, processed_fields)
+    string_pattern = pattern_.StringPattern(pattern, processed_fields)
     outputs = [string_pattern.substitute() for _unused in range(len(expected_outputs))]
     
     self.assertEqual(outputs, expected_outputs)
@@ -258,7 +257,7 @@ class TestStringPattern(unittest.TestCase):
     field_value_generator = _generate_number()
     fields = [('field', lambda field: next(field_value_generator))]
     
-    string_pattern = pgpath.StringPattern(pattern, fields)
+    string_pattern = pattern_.StringPattern(pattern, fields)
     outputs = [string_pattern.substitute() for _unused in range(len(expected_outputs))]
     
     self.assertListEqual(outputs, expected_outputs)
@@ -274,12 +273,12 @@ class TestStringPattern(unittest.TestCase):
       def get_field_value(self, field, arg1=1, arg2=2):
         return f'{arg1}{arg2}'
     
-    string_pattern = pgpath.StringPattern(pattern, [('field', _Field().get_field_value)])
+    string_pattern = pattern_.StringPattern(pattern, [('field', _Field().get_field_value)])
     self.assertEqual(string_pattern.substitute(), expected_output)
   
   def test_generate_field_function_with_kwargs_raises_error(self):
     with self.assertRaises(ValueError):
-      pgpath.StringPattern('[field, 3, 4]', [('field', _get_field_value_with_kwargs)])
+      pattern_.StringPattern('[field, 3, 4]', [('field', _get_field_value_with_kwargs)])
   
   @parameterized.parameterized.expand([
     ('', '', 0, None),
@@ -328,7 +327,7 @@ class TestStringPattern(unittest.TestCase):
   def test_get_field_at_position(
         self, test_case_suffix, pattern, position, expected_output):
     self.assertEqual(
-      pgpath.StringPattern.get_field_at_position(pattern, position), expected_output)
+      pattern_.StringPattern.get_field_at_position(pattern, position), expected_output)
   
   @parameterized.parameterized.expand([
     ('no_fields', ['img_12', '_345'], 'img_12_345'),
@@ -343,205 +342,8 @@ class TestStringPattern(unittest.TestCase):
   def test_reconstruct_pattern(
         self, test_case_suffix, pattern_parts, expected_str):
     self.assertEqual(
-      pgpath.StringPattern.reconstruct_pattern(pattern_parts), expected_str)
+      pattern_.StringPattern.reconstruct_pattern(pattern_parts), expected_str)
   
   def test_reconstruct_pattern_empty_list_for_field_raises_error(self):
     with self.assertRaises(ValueError):
-      pgpath.StringPattern.reconstruct_pattern(['img_', []])
-
-
-class TestFilenameValidator(unittest.TestCase):
-  
-  def test_is_valid_returns_no_status_messages(self):
-    self.assertEqual(pgpath.FilenameValidator.is_valid('one'), (True, []))
-  
-  @parameterized.parameterized.expand([
-    ('', '0n3_two_,o_O_;-()three.jpg', True),
-    ('', 'one/two\x09\x7f\\:|', False),
-    ('', '', False),
-    ('', ' one ', False),
-    ('', 'one.', False),
-    ('', '.one', True),
-    ('', 'NUL', False),
-    ('', 'NUL.txt', False),
-    ('', 'NUL (1)', True),
-  ])
-  def test_is_valid(self, test_case_suffix, str_, expected_is_valid):
-    if expected_is_valid:
-      self.assertTrue(pgpath.FilenameValidator.is_valid(str_)[0])
-    else:
-      self.assertFalse(pgpath.FilenameValidator.is_valid(str_)[0])
-  
-  @parameterized.parameterized.expand([
-    ('', 'one', 'one'),
-    ('', '0n3_two_,o_O_;-()three.jpg', '0n3_two_,o_O_;-()three.jpg'),
-    ('', 'one/two\x09\x7f\\:|', 'onetwo'),
-    ('', '', 'Untitled'),
-    ('', ' one ', 'one'),
-    ('', 'one.', 'one'),
-    ('', '.one', '.one'),
-    ('', 'NUL', 'NUL (1)'),
-    ('', 'NUL.txt', 'NUL (1).txt'),
-  ])
-  def test_validate(self, test_case_suffix, str_, expected_output):
-    self.assertEqual(pgpath.FilenameValidator.validate(str_), expected_output)
-  
-
-class TestFilepathValidator(unittest.TestCase):
-  
-  def test_is_valid_returns_no_status_messages(self):
-    self.assertEqual(
-      pgpath.FilepathValidator.is_valid(os.path.join('one', 'two', 'three')),
-      (True, []))
-  
-  @parameterized.parameterized.expand([
-    ('', [
-      'zero', '0n3', 'two', f',o_O_;-(){os.sep}{os.sep}{os.sep}', f'three.jpg{os.sep}'],
-     True),
-    ('', ['one', 'two', '\x09\x7f', ':|'], False),
-    ('', ['one', ':two', 'three'], False),
-    ('', [f'C:|{os.sep}two', 'three'], False),
-    ('', [' one', 'two', 'three '], False),
-    ('', ['one', ' two', 'three'], True),
-    ('', ['one', 'two ', 'three'], False),
-    ('', ['one', 'two', 'three.'], False),
-    ('', ['one.', 'two.', 'three'], False),
-    ('', ['.one', 'two', '.three'], True),
-    ('', ['one', 'two', 'NUL'], False),
-    ('', ['one', 'two', 'NUL.txt'], False),
-    ('', ['one', 'NUL', 'three'], False),
-    ('', ['one', 'NUL (1)', 'three'], True),
-    ('', [''], False),
-    ('', [f'C:{os.sep}two', 'three'], True, 'nt'),
-    ('', [f'C:{os.sep}two', 'three'], False, 'posix'),
-  ])
-  def test_is_valid(
-        self, test_case_suffix, path_components, expected_is_valid, os_name=None):
-    if os_name is not None and os.name != os_name:
-      return
-    
-    if expected_is_valid:
-      self.assertTrue(
-        pgpath.FilepathValidator.is_valid(os.path.join(*path_components))[0])
-    else:
-      self.assertFalse(
-        pgpath.FilepathValidator.is_valid(os.path.join(*path_components))[0])
-  
-  @parameterized.parameterized.expand([
-    ('',
-     ['one', 'two', 'three'],
-     ['one', 'two', 'three']),
-    ('',
-     ['zero', '0n3', 'two', f',o_O_;-(){os.sep}{os.sep}{os.sep}', f'three.jpg{os.sep}'],
-     ['zero', '0n3', 'two', ',o_O_;-()', 'three.jpg']),
-    ('',
-     ['one', 'two\x09\x7f', 'three:|'],
-     ['one', 'two', 'three']),
-    ('',
-     ['one', ':two', 'three'],
-     ['one', 'two', 'three']),
-    ('',
-     [' one', 'two', 'three '],
-     ['one', 'two', 'three']),
-    ('',
-     ['one', 'two ', 'three'],
-     ['one', 'two', 'three']),
-    ('',
-     ['one', 'two', 'three.'],
-     ['one', 'two', 'three']),
-    ('',
-     ['one.', 'two.', 'three'],
-     ['one', 'two', 'three']),
-    ('',
-     ['.one', 'two', '.three'],
-     ['.one', 'two', '.three']),
-    ('',
-     ['one', 'two', 'NUL'],
-     ['one', 'two', 'NUL (1)']),
-    ('',
-     ['one', 'two', 'NUL:|.txt'],
-     ['one', 'two', 'NUL (1).txt']),
-    ('',
-     ['one', 'NUL', 'three'],
-     ['one', 'NUL (1)', 'three']),
-    ('',
-     ['one', 'NUL (1)', 'three'],
-     ['one', 'NUL (1)', 'three']),
-    ('',
-     ['one', ':|', 'three'],
-     ['one', 'three']),
-    ('',
-     [''],
-     ['.']),
-    ('',
-     ['|'],
-     ['.']),
-    ('',
-     [f'C:{os.sep}two', 'three'],
-     [f'C:{os.sep}two', 'three'],
-     'nt'),
-    ('',
-     [f'C:|one{os.sep}two', 'three'],
-     ['C:', 'one', 'two', 'three'],
-     'nt'),
-    ('',
-     [f'C:|{os.sep}two', 'three'],
-     ['C:', 'two', 'three'],
-     'nt'),
-    ('',
-     [f'C:{os.sep}two', 'three'],
-     [f'C{os.sep}two', 'three'],
-     'posix'),
-    ('',
-     [f'C:|one{os.sep}two', 'three'],
-     ['Cone', 'two', 'three'],
-     'posix'),
-    ('',
-     [f'C:|{os.sep}two', 'three'],
-     ['C', 'two', 'three'],
-     'posix'),
-  ])
-  def test_validate(
-        self,
-        test_case_suffix,
-        path_components,
-        expected_path_components,
-        os_name=None):
-    if os_name is not None and os.name != os_name:
-      return
-    
-    self.assertEqual(
-      pgpath.FilepathValidator.validate(os.path.join(*path_components)),
-      os.path.join(*expected_path_components))
-
-
-class TestFileExtensionValidator(unittest.TestCase):
-  
-  def test_is_valid_returns_no_status_messages(self):
-    self.assertEqual(pgpath.FileExtensionValidator.is_valid('jpg'), (True, []))
-  
-  @parameterized.parameterized.expand([
-    ('', '.jpg', True),
-    ('', 'tar.gz', True),
-    ('', 'one/two\x09\x7f\\:|', False),
-    ('', '', False),
-    ('', ' jpg ', False),
-    ('', 'jpg.', False),
-  ])
-  def test_is_valid(self, test_case_suffix, str_, expected_is_valid):
-    if expected_is_valid:
-      self.assertTrue(pgpath.FileExtensionValidator.is_valid(str_)[0])
-    else:
-      self.assertFalse(pgpath.FileExtensionValidator.is_valid(str_)[0])
-  
-  @parameterized.parameterized.expand([
-    ('', 'jpg', 'jpg'),
-    ('', '.jpg', '.jpg'),
-    ('', 'tar.gz', 'tar.gz'),
-    ('', ' jpg ', ' jpg'),
-    ('', 'jpg.', 'jpg'),
-    ('', '', ''),
-    ('', 'one/two\x09\x7f\\:|', 'onetwo'),
-  ])
-  def test_validate(self, test_case_suffix, str_, expected_output):
-    self.assertEqual(pgpath.FileExtensionValidator.validate(str_), expected_output)
+      pattern_.StringPattern.reconstruct_pattern(['img_', []])

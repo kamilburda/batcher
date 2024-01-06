@@ -17,6 +17,7 @@ from src.path import fileext
 from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
+from src.path import validators as validators_
 
 
 class ExportModes:
@@ -263,7 +264,7 @@ def _copy_layer(raw_item, dest_image, item):
 
 
 def _validate_name(item):
-  item.name = pg.path.FilenameValidator.validate(item.name)
+  item.name = validators_.FilenameValidator.validate(item.name)
 
 
 def _get_unique_substring_position(str_, file_extension):

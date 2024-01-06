@@ -19,6 +19,7 @@ from . import cell_renderers as cell_renderers_
 from . import entry_expander as entry_expander_
 from . import entry_popup as entry_popup_
 from . import entry_undo as entry_undo_
+from src.path import pattern as pattern_
 from . import popup_hide_context as popup_hide_context_
 
 
@@ -322,13 +323,13 @@ class FilenamePatternEntry(ExtendedEntry):
     )
   
   def _on_filename_pattern_entry_notify_cursor_position(self, entry, property_spec):
-    field = pg.path.StringPattern.get_field_at_position(self.get_text(), self.get_position())
+    field = pattern_.StringPattern.get_field_at_position(self.get_text(), self.get_position())
     
     if field is None:
       self._hide_field_tooltip()
       return
     
-    matching_field_regex = pg.path.StringPattern.get_first_matching_field_regex(
+    matching_field_regex = pattern_.StringPattern.get_first_matching_field_regex(
       field, self._item_regexes_and_descriptions)
     
     if matching_field_regex not in self._item_regexes_and_descriptions:
@@ -428,7 +429,7 @@ class FilenamePatternEntry(ExtendedEntry):
         return (
           current_text[current_position - 1] == '['
           and current_text[current_position - 2] != '['
-          and not pg.path.StringPattern.get_field_at_position(current_text, current_position - 1))
+          and not pattern_.StringPattern.get_field_at_position(current_text, current_position - 1))
       else:
         return current_text[0] == '['
     else:

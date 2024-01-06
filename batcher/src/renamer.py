@@ -16,12 +16,13 @@ from gi.repository import Gimp
 import pygimplib as pg
 
 from src.path import fileext
+from src.path import pattern as pattern_
 
 
 class ItemRenamer:
   
   def __init__(self, pattern: str, fields_raw: Optional[List[Dict[str, Any]]] = None):
-    self._filename_pattern = pg.path.StringPattern(
+    self._filename_pattern = pattern_.StringPattern(
       pattern=pattern,
       fields=_get_fields_and_substitute_funcs(_init_fields(fields_raw)))
   
@@ -345,7 +346,7 @@ def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
 
 def _replace(
       batcher, item, field_value, field_to_replace_str, pattern, replacement, *count_and_flags):
-  field_name, field_args = pg.path.StringPattern.parse_field(field_to_replace_str)
+  field_name, field_args = pattern_.StringPattern.parse_field(field_to_replace_str)
   
   try:
     field_func = FIELDS[field_name]['substitute_func']

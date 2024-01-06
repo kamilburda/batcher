@@ -5,10 +5,6 @@ import inspect
 import re
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
-__all__ = [
-  'StringPattern',
-]
-
 
 class StringPattern:
   """Class providing string substitution based on fields and their arguments.

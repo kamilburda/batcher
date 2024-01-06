@@ -17,7 +17,6 @@ from gi.repository import GObject
 import parameterized
 
 from ... import utils as pgutils
-from ... import path as pgpath
 
 from ...setting import presenter as presenter_
 from ...setting import presenters_gtk

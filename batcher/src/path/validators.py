@@ -6,15 +6,6 @@ import pathlib
 import re
 from typing import List, Tuple
 
-__all__ = [
-  'FileValidatorErrorStatuses',
-  'StringValidator',
-  'FilenameValidator',
-  'FilepathValidator',
-  'DirpathValidator',
-  'FileExtensionValidator',
-]
-
 
 def N_(str_):
   return str_
@@ -157,7 +148,7 @@ class FilepathValidator(StringValidator):
   r"""Class for validating file paths (relative or absolute).
   
   The same validation rules that apply to file names in the
-  ``FilenameValidator`` class apply to file paths in this class, with the
+  `FilenameValidator` class apply to file paths in this class, with the
   following exceptions:
     * ``'/'`` and ``'\'`` characters are allowed
     * ``':'`` character is allowed to appear at the root level only as part of a

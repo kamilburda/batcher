@@ -8,6 +8,7 @@ import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import setting_classes
+from src.path import validators as validators_
 
 
 def _get_images_and_items():
@@ -68,7 +69,7 @@ class TestFileExtensionSetting(unittest.TestCase):
       setting_classes.FileExtensionSetting('file_ext', default_value=None)
 
   def test_custom_error_message(self):
-    self.setting.error_messages[pg.path.FileValidatorErrorStatuses.IS_EMPTY] = (
+    self.setting.error_messages[validators_.FileValidatorErrorStatuses.IS_EMPTY] = (
       'my custom message')
     try:
       self.setting.set_value('')

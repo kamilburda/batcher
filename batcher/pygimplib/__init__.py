@@ -77,7 +77,6 @@ if _gimp_modules_available:
   from . import gui
   from . import invocation
   from . import itemtree
-  from . import path
   from . import pdbutils
   from . import setting
 
@@ -94,7 +93,6 @@ if _gimp_modules_available:
     'gui',
     'invocation',
     'itemtree',
-    'path',
     'pdbutils',
     'setting',
     # Global elements imported to or defined in this module

@@ -14,43 +14,48 @@ from gi.repository import GLib
 
 import pygimplib as pg
 
-from src import renamer as renamer_
-
 from src.gui import entries as entries_
+from src import renamer as renamer_
+from src.path import validators as validators_
 
 
 class ValidatableStringSetting(pg.setting.StringSetting):
   """Abstract class for string settings which are meant to be validated with one
-  of the `path.StringValidator` subclasses.
+  of the `path.validators.StringValidator` subclasses.
 
   To determine whether the string is valid, `is_valid()` from the corresponding
   subclass is called.
 
   Error messages:
     This class contains empty messages for error statuses from the specified
-    `path.StringValidator` subclass. Normally, if the value (string) assigned
-    is invalid, status messages returned from `is_valid()` are used. If
+    `path.validators.StringValidator` subclass. Normally, if the value (string)
+    assigned is invalid, status messages returned from `is_valid()` are used. If
     desired, you may fill the error messages with custom messages which
     override the status messages from the method. See
-    `path.FileValidatorErrorStatuses` for available error statuses.
+    `path.validators.FileValidatorErrorStatuses` for available error statuses.
   """
 
   _ABSTRACT = True
 
-  def __init__(self, name: str, string_validator_class: Type[pg.path.StringValidator], **kwargs):
+  def __init__(
+        self,
+        name: str,
+        string_validator_class: Type[validators_.StringValidator],
+        **kwargs,
+  ):
     """Initializes a `ValidatableStringSetting` instance.
 
     Args:
       string_validator_class:
-        `path.StringValidator` subclass used to validate the value assigned to
-        this object.
+        `path.validators.StringValidator` subclass used to validate the value
+        assigned to this object.
     """
     self._string_validator = string_validator_class
 
     super().__init__(name, **kwargs)
 
   def _init_error_messages(self):
-    for status in pg.path.FileValidatorErrorStatuses.ERROR_STATUSES:
+    for status in validators_.FileValidatorErrorStatuses.ERROR_STATUSES:
       self.error_messages[status] = ''
 
   def _validate(self, string_):
@@ -71,8 +76,8 @@ class ValidatableStringSetting(pg.setting.StringSetting):
 class DirpathSetting(ValidatableStringSetting):
   """Class for settings storing directory paths as strings.
 
-  The `path.DirpathValidator` subclass is used to determine whether the
-  directory path is valid.
+  The `path.validatorsDirpathValidator` subclass is used to determine whether
+  the directory path is valid.
 
   Default value: `Documents` directory in the user's home directory.
 
@@ -91,7 +96,7 @@ class DirpathSetting(ValidatableStringSetting):
   _EMPTY_VALUES = [None, '']
 
   def __init__(self, name, **kwargs):
-    super().__init__(name, pg.path.DirpathValidator, **kwargs)
+    super().__init__(name, validators_.DirpathValidator, **kwargs)
 
 
 class ExtendedEntryPresenter(pg.setting.GtkPresenter):
@@ -121,8 +126,8 @@ class FileExtensionEntryPresenter(ExtendedEntryPresenter):
 class FileExtensionSetting(ValidatableStringSetting):
   """Class for settings storing file extensions as strings.
 
-  The `path.FileExtensionValidator` subclass is used to determine whether the
-  file extension is valid.
+  The `path.validatorsFileExtensionValidator` subclass is used to determine
+  whether the file extension is valid.
 
   Empty values:
   * ``''``
@@ -143,7 +148,7 @@ class FileExtensionSetting(ValidatableStringSetting):
       called. This involves removing leading '.' characters and converting the
       file extension to lowercase.
     """
-    super().__init__(name, pg.path.FileExtensionValidator, **kwargs)
+    super().__init__(name, validators_.FileExtensionValidator, **kwargs)
 
     if adjust_value:
       self._assign_value = self._adjust_value
