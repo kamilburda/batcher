@@ -524,26 +524,6 @@ msgstr ""
 msgid "Invalid placeholder."
 msgstr ""
 
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:60
-msgid "Layer"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:66
-msgid "Channel"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:72
-msgid "Vectors"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/item_box.py:330
-msgid "Size"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/item_box.py:542
-msgid "Element"
-msgstr ""
-
 #: ../../export_layers/pygimplib/gui/overwrite_chooser.py:79
 msgid "_Apply action to all files"
 msgstr "_Appliquer l'action à tous les fichiers"
@@ -562,18 +542,6 @@ msgstr ""
 
 #: ../../export_layers/pygimplib/gui/overwrite_chooser.py:113
 msgid "What would you like to do?"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:66
-msgid "Name"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:74
-msgid "Flags"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:83
-msgid "Data"
 msgstr ""
 
 #: ../../export_layers/pygimplib/path/validators.py:114

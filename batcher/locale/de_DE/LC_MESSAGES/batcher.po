@@ -531,26 +531,6 @@ msgstr ""
 msgid "Invalid placeholder."
 msgstr "Ungültiger Platzhalter."
 
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:60
-msgid "Layer"
-msgstr "Ebene"
-
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:66
-msgid "Channel"
-msgstr "Kanal"
-
-#: ../../export_layers/pygimplib/gui/gimp_item_combo_box.py:72
-msgid "Vectors"
-msgstr "Vektoren"
-
-#: ../../export_layers/pygimplib/gui/item_box.py:330
-msgid "Size"
-msgstr "Größe"
-
-#: ../../export_layers/pygimplib/gui/item_box.py:542
-msgid "Element"
-msgstr "Element"
-
 #: ../../export_layers/pygimplib/gui/overwrite_chooser.py:79
 msgid "_Apply action to all files"
 msgstr "_Aktion auf alle Dateien anwenden"
@@ -570,18 +550,6 @@ msgstr "Eine Datei mit dem gleichen Namen existiert bereits.\n"
 #: ../../export_layers/pygimplib/gui/overwrite_chooser.py:113
 msgid "What would you like to do?"
 msgstr "Was möchten Sie tun?"
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:66
-msgid "Name"
-msgstr "Name"
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:74
-msgid "Flags"
-msgstr "Markierungen"
-
-#: ../../export_layers/pygimplib/gui/parasite_box.py:83
-msgid "Data"
-msgstr "Daten"
 
 #: ../../export_layers/pygimplib/path/validators.py:114
 msgid "Filename is not specified."
