@@ -532,20 +532,6 @@ class DisplaySpinButtonPresenter(GtkPresenter):
       self._widget.set_value(value.get_id())
 
 
-class ExtendedEntryPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `gui.ExtendedEntry` widgets.
-  
-  Value: Text in the entry.
-  """
-  
-  def _get_value(self):
-    text = self._widget.get_text()
-    return text if text is not None else ''
-  
-  def _set_value(self, value):
-    self._widget.assign_text(value if value is not None else '')
-
-
 class GFileEntryPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.Entry` widgets used to store file or
   folder paths returning a `Gio.File` instance on output.

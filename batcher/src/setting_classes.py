@@ -94,7 +94,21 @@ class DirpathSetting(ValidatableStringSetting):
     super().__init__(name, pg.path.DirpathValidator, **kwargs)
 
 
-class FileExtensionEntryPresenter(pg.setting.ExtendedEntryPresenter):
+class ExtendedEntryPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.ExtendedEntry` widgets.
+
+  Value: Text in the entry.
+  """
+
+  def _get_value(self):
+    text = self._widget.get_text()
+    return text if text is not None else ''
+
+  def _set_value(self, value):
+    self._widget.assign_text(value if value is not None else '')
+
+
+class FileExtensionEntryPresenter(ExtendedEntryPresenter):
   """`setting.Presenter` subclass for `gui.entries.FileExtensionEntry` widgets.
 
   Value: Text in the entry.
@@ -138,7 +152,7 @@ class FileExtensionSetting(ValidatableStringSetting):
     self._value = value.lstrip('.')
 
 
-class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPresenter):
+class FilenamePatternEntryPresenter(ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
   `gui.entries.FilenamePatternEntry` widgets.
 
