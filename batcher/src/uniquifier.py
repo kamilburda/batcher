@@ -4,6 +4,8 @@ from typing import Generator, Optional
 
 import pygimplib as pg
 
+from src.path import uniquify
+
 
 class ItemUniquifier:
   """Class renaming `pygimplib.ItemTree.Item` instances to be unique under the
@@ -52,7 +54,7 @@ class ItemUniquifier:
       
       has_same_name = item.name in self._uniquified_item_names[parent]
       if has_same_name:
-        item.name = pg.path.uniquify_string(
+        item.name = uniquify.uniquify_string(
           item.name, self._uniquified_item_names[parent], position, generator=self.generator)
       
       self._uniquified_item_names[parent].add(item.name)

@@ -67,6 +67,7 @@ import pygimplib as pg
 from pygimplib.pypdb import pdb
 
 from src import placeholders
+from src.path import uniquify
 
 
 DEFAULT_PROCEDURES_GROUP = 'default_procedures'
@@ -297,7 +298,7 @@ def _uniquify_action_name(actions, name):
       i += 1
   
   return (
-    pg.path.uniquify_string(
+    uniquify.uniquify_string(
       name,
       [action.name for action in walk(actions)],
       generator=_generate_unique_action_name()))
@@ -315,7 +316,7 @@ def _uniquify_action_display_name(actions, display_name):
       i += 1
   
   return (
-    pg.path.uniquify_string(
+    uniquify.uniquify_string(
       display_name,
       [action['display_name'].value for action in walk(actions)],
       generator=_generate_unique_display_name()))
@@ -588,7 +589,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
       setting_type_init_kwargs = {}
       placeholder_type_name = pg.setting.SETTING_TYPES[setting_type]
 
-    unique_pdb_param_name = pg.path.uniquify_string(
+    unique_pdb_param_name = uniquify.uniquify_string(
       proc_arg.name,
       pdb_procedure_argument_names,
       generator=_generate_unique_pdb_procedure_argument_name())

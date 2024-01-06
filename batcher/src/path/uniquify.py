@@ -4,12 +4,6 @@ from collections.abc import Iterable
 import os
 from typing import Callable, Generator, Optional
 
-__all__ = [
-  'uniquify_string',
-  'uniquify_filepath',
-  'uniquify_string_generic',
-]
-
 
 def uniquify_string(
       str_: str,
@@ -27,7 +21,7 @@ def uniquify_string(
     lambda str_param: str_param not in existing_strings,
     position,
     generator)
-  
+
 
 def uniquify_filepath(
       filepath: str,

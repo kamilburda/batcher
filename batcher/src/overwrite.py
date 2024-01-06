@@ -4,7 +4,7 @@ import abc
 import os
 from typing import Dict, Optional, Tuple
 
-import pygimplib as pg
+from src.path import uniquify
 
 
 class OverwriteChooser(metaclass=abc.ABCMeta):
@@ -149,7 +149,7 @@ def handle_overwrite(
 
     if overwrite_chooser.overwrite_mode in (
          OverwriteModes.RENAME_NEW, OverwriteModes.RENAME_EXISTING):
-      processed_filepath = pg.path.uniquify_filepath(filepath, position)
+      processed_filepath = uniquify.uniquify_filepath(filepath, position)
       if overwrite_chooser.overwrite_mode == OverwriteModes.RENAME_NEW:
         filepath = processed_filepath
       else:
