@@ -1,8 +1,6 @@
 import unittest
 import unittest.mock as mock
 
-import pygimplib as pg
-
 from src import overwrite
 
 
