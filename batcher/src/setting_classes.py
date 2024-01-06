@@ -14,8 +14,8 @@ from gi.repository import GLib
 
 import pygimplib as pg
 
-from src.gui import entries as entries_
 from src import renamer as renamer_
+from src.gui import entries as entries_
 from src.path import validators as validators_
 
 
