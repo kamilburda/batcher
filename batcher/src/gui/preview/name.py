@@ -17,10 +17,11 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from . import base as preview_base_
+
 from src import exceptions
 from src import utils as utils_
 from src.gui import messages as messages_
-from src.gui import preview_base as preview_base_
 
 
 class NamePreview(preview_base_.Preview):
