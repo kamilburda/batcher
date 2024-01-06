@@ -14,7 +14,7 @@ from . import stubs_group
 class TestCreateParams(unittest.TestCase):
   
   def setUp(self):
-    self.file_ext_setting = settings_.FileExtensionSetting(
+    self.string_setting = settings_.StringSetting(
       'file_extension', default_value='png', display_name='File extension')
     self.unregistrable_setting = settings_.IntSetting(
       'num_exported_items', default_value=0, pdb_type=None)
@@ -27,7 +27,7 @@ class TestCreateParams(unittest.TestCase):
     self.settings = stubs_group.create_test_settings_hierarchical()
   
   def test_create_params_single_param(self):
-    params = pdbparams_.create_params(self.file_ext_setting)
+    params = pdbparams_.create_params(self.string_setting)
     param = params[0]
 
     self.assertEqual(len(params), 1)
@@ -43,7 +43,7 @@ class TestCreateParams(unittest.TestCase):
   
   def test_create_multiple_params(self):
     params = pdbparams_.create_params(
-      self.file_ext_setting, self.coordinates_setting, self.settings)
+      self.string_setting, self.coordinates_setting, self.settings)
     
     self.assertEqual(len(params), 6)
     
@@ -91,7 +91,7 @@ class TestCreateParams(unittest.TestCase):
   def test_create_params_invalid_argument(self):
     with self.assertRaises(TypeError):
       # noinspection PyTypeChecker
-      pdbparams_.create_params([self.file_ext_setting])
+      pdbparams_.create_params([self.string_setting])
   
   def test_create_params_with_unregistrable_setting(self):
     params = pdbparams_.create_params(self.unregistrable_setting)

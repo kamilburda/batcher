@@ -7,7 +7,7 @@ def create_test_settings():
   settings = group_.Group('main')
   settings.add([
     {
-      'type': 'file_extension',
+      'type': 'string',
       'name': 'file_extension',
       'default_value': 'bmp',
       'display_name': 'File extension',
@@ -36,7 +36,7 @@ def create_test_settings_hierarchical():
   main_settings = group_.Group('main')
   main_settings.add([
     {
-      'type': 'file_extension',
+      'type': 'string',
       'name': 'file_extension',
       'default_value': 'bmp',
       'display_name': 'File extension',
@@ -73,7 +73,7 @@ def create_test_settings_for_persistor():
   
   main_settings.add([
     {
-      'type': 'file_extension',
+      'type': 'string',
       'name': 'file_extension',
       'default_value': 'png',
     },

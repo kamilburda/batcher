@@ -2057,40 +2057,6 @@ class ValidatableStringSetting(StringSetting):
         + '\n'.join(message for message in new_status_messages))
 
 
-class FileExtensionSetting(ValidatableStringSetting):
-  """Class for settings storing file extensions as strings.
-  
-  The `path.FileExtensionValidator` subclass is used to determine whether the
-  file extension is valid.
-  
-  Empty values:
-  * ``''``
-  """
-  
-  _ALLOWED_GUI_TYPES = [
-    _SETTING_GUI_TYPES.entry,
-    _SETTING_GUI_TYPES.file_extension_entry,
-  ]
-
-  _EMPTY_VALUES = ['']
-  
-  def __init__(self, name, adjust_value=False, **kwargs):
-    """Additional parameters:
-    
-    adjust_value:
-      if ``True``, process the new value when `set_value()` is
-      called. This involves removing leading '.' characters and converting the
-      file extension to lowercase.
-    """
-    super().__init__(name, pgpath.FileExtensionValidator, **kwargs)
-    
-    if adjust_value:
-      self._assign_value = self._adjust_value
-  
-  def _adjust_value(self, value):
-    self._value = value.lstrip('.')
-
-
 class DirpathSetting(ValidatableStringSetting):
   """Class for settings storing directory paths as strings.
   

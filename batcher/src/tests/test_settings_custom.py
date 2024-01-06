@@ -50,6 +50,32 @@ def _get_images_and_items_with_paths():
   return images, items
 
 
+class TestFileExtensionSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = settings_custom.FileExtensionSetting('file_ext', default_value='png')
+
+  def test_with_adjust_value(self):
+    setting = settings_custom.FileExtensionSetting(
+      'file_ext', adjust_value=True, default_value='png')
+
+    setting.set_value('.jpg')
+
+    self.assertEqual(setting.value, 'jpg')
+
+  def test_invalid_default_value(self):
+    with self.assertRaises(pg.setting.SettingDefaultValueError):
+      settings_custom.FileExtensionSetting('file_ext', default_value=None)
+
+  def test_custom_error_message(self):
+    self.setting.error_messages[pg.path.FileValidatorErrorStatuses.IS_EMPTY] = (
+      'my custom message')
+    try:
+      self.setting.set_value('')
+    except pg.setting.SettingValueError as e:
+      self.assertEqual(str(e), 'my custom message')
+
+
 class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
   def setUp(self):

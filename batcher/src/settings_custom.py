@@ -15,6 +15,50 @@ import pygimplib as pg
 from src import renamer as renamer_
 
 
+class FileExtensionEntryPresenter(pg.setting.ExtendedEntryPresenter):
+  """`setting.Presenter` subclass for `gui.FileExtensionEntry` widgets.
+
+  Value: Text in the entry.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    return pg.gui.FileExtensionEntry()
+
+
+class FileExtensionSetting(pg.setting.ValidatableStringSetting):
+  """Class for settings storing file extensions as strings.
+
+  The `path.FileExtensionValidator` subclass is used to determine whether the
+  file extension is valid.
+
+  Empty values:
+  * ``''``
+  """
+
+  _ALLOWED_GUI_TYPES = [
+    pg.setting.SETTING_GUI_TYPES.entry,
+    FileExtensionEntryPresenter,
+  ]
+
+  _EMPTY_VALUES = ['']
+
+  def __init__(self, name, adjust_value=False, **kwargs):
+    """Additional parameters:
+
+    adjust_value:
+      if ``True``, process the new value when `set_value()` is
+      called. This involves removing leading '.' characters and converting the
+      file extension to lowercase.
+    """
+    super().__init__(name, pg.path.FileExtensionValidator, **kwargs)
+
+    if adjust_value:
+      self._assign_value = self._adjust_value
+
+  def _adjust_value(self, value):
+    self._value = value.lstrip('.')
+
+
 class FilenamePatternEntryPresenter(pg.setting.presenters_gtk.ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
   `pygimplib.gui.FilenamePatternEntry` widgets.

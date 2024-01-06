@@ -546,16 +546,6 @@ class ExtendedEntryPresenter(GtkPresenter):
     self._widget.assign_text(value if value is not None else '')
 
 
-class FileExtensionEntryPresenter(ExtendedEntryPresenter):
-  """`setting.Presenter` subclass for `gui.FileExtensionEntry` widgets.
-  
-  Value: Text in the entry.
-  """
-  
-  def _create_widget(self, setting, **kwargs):
-    return pggui.FileExtensionEntry()
-
-
 class GFileEntryPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.Entry` widgets used to store file or
   folder paths returning a `Gio.File` instance on output.

@@ -1429,31 +1429,6 @@ class TestParasiteSetting(unittest.TestCase):
       {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
 
 
-class TestFileExtensionSetting(unittest.TestCase):
-  
-  def setUp(self):
-    self.setting = settings_.FileExtensionSetting('file_ext', default_value='png')
-  
-  def test_with_adjust_value(self):
-    setting = settings_.FileExtensionSetting('file_ext', adjust_value=True, default_value='png')
-    
-    setting.set_value('.jpg')
-    
-    self.assertEqual(setting.value, 'jpg')
-  
-  def test_invalid_default_value(self):
-    with self.assertRaises(settings_.SettingDefaultValueError):
-      settings_.FileExtensionSetting('file_ext', default_value=None)
-  
-  def test_custom_error_message(self):
-    self.setting.error_messages[pgpath.FileValidatorErrorStatuses.IS_EMPTY] = (
-      'my custom message')
-    try:
-      self.setting.set_value('')
-    except settings_.SettingValueError as e:
-      self.assertEqual(str(e), 'my custom message')
-
-
 class TestFileSetting(unittest.TestCase):
 
   def setUp(self):
