@@ -1,4 +1,4 @@
-"""Custom setting classes specific to the plug-in."""
+"""Additional setting and setting GUI classes specific to the plug-in."""
 
 import collections
 from collections.abc import Iterable

@@ -905,7 +905,7 @@ msgid ""
 "and the image has width and height of 1000 and 500 pixels, respectively."
 msgstr ""
 
-#: ../../export_layers/settings_custom.py:169
+#: ../../export_layers/setting_classes.py:169
 msgid "Value must be a dictionary."
 msgstr ""
 

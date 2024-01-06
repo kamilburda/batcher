@@ -7,7 +7,7 @@ import unittest.mock as mock
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-import batcher.src.settings_custom as settings_custom
+from src import setting_classes
 
 
 def _get_images_and_items():
@@ -53,10 +53,10 @@ def _get_images_and_items_with_paths():
 class TestFileExtensionSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = settings_custom.FileExtensionSetting('file_ext', default_value='png')
+    self.setting = setting_classes.FileExtensionSetting('file_ext', default_value='png')
 
   def test_with_adjust_value(self):
-    setting = settings_custom.FileExtensionSetting(
+    setting = setting_classes.FileExtensionSetting(
       'file_ext', adjust_value=True, default_value='png')
 
     setting.set_value('.jpg')
@@ -65,7 +65,7 @@ class TestFileExtensionSetting(unittest.TestCase):
 
   def test_invalid_default_value(self):
     with self.assertRaises(pg.setting.SettingDefaultValueError):
-      settings_custom.FileExtensionSetting('file_ext', default_value=None)
+      setting_classes.FileExtensionSetting('file_ext', default_value=None)
 
   def test_custom_error_message(self):
     self.setting.error_messages[pg.path.FileValidatorErrorStatuses.IS_EMPTY] = (
@@ -79,7 +79,7 @@ class TestFileExtensionSetting(unittest.TestCase):
 class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = settings_custom.ImagesAndGimpItemsSetting('selected_layers')
+    self.setting = setting_classes.ImagesAndGimpItemsSetting('selected_layers')
     
     self.maxDiff = None
   
@@ -100,7 +100,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_from_ids(self):
     images, items = _get_images_and_items_with_ids()
 
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
 
@@ -144,7 +144,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_invalid_list_length_raises_error(self):
     images, items = _get_images_and_items_with_ids()
     
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
 
@@ -155,7 +155,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_set_value_invalid_collection_type_for_items_raises_error(self):
     images, items = _get_images_and_items_with_ids()
 
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
         
@@ -166,7 +166,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
   def test_to_dict_with_paths(self):
     images, items = _get_images_and_items_with_ids()
 
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
 
@@ -206,7 +206,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
     images[1].set_file(None)
     
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = images
       temp_mock_gimp_module_src.Item.get_by_id.side_effect = items
 
@@ -248,14 +248,14 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
     self.image_list = self._create_image_list(self.image_ids_and_filepaths)
     self.images_and_directories = self._create_images_and_directories(self.image_list)
 
-    self.setting = settings_custom.ImagesAndDirectoriesSetting('images_and_directories')
+    self.setting = setting_classes.ImagesAndDirectoriesSetting('images_and_directories')
     self.setting.set_value(self.images_and_directories)
 
   def test_update_images_and_dirpaths_add_new_images(self):
     self.image_list.extend(
       self._create_image_list([(5, 'new_image.png'), (6, None)]))
     
-    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
+    with mock.patch('src.setting_classes.Gimp.list_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -264,7 +264,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
   def test_update_images_and_dirpaths_remove_closed_images(self):
     self.image_list.pop(1)
 
-    with mock.patch('batcher.src.settings_custom.Gimp.list_images', new=self.get_image_list):
+    with mock.patch('src.setting_classes.Gimp.list_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -283,7 +283,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       self.images_and_directories[image_to_test])
 
   def test_set_value_from_image_ids(self):
-    with mock.patch('batcher.src.settings_custom.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = self.image_list
 
       self.setting.set_value({0: 'dirpath1', 1: 'dirpath2'})
