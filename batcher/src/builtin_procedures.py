@@ -223,7 +223,9 @@ _BUILTIN_PROCEDURES_LIST = [
       {
         'type': 'dirpath',
         'name': 'output_directory',
-        'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
+        # Will be automatically set to the value of the 'main/output_directory'
+        # setting when this procedure is added.
+        'default_value': None,
         'display_name': _('Output folder'),
         'gui_type': 'folder_chooser_button',
       },

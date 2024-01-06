@@ -232,8 +232,13 @@ def _create_gui_settings():
 
 def _on_after_add_procedure(procedures, procedure, orig_procedure_dict, main_settings):
   if procedure['orig_name'].value == 'export':
-    _set_initial_output_directory_in_export(
+    _set_initial_output_directory_in_export_if_undefined(
       procedure['arguments/output_directory'],
+      main_settings['output_directory'])
+
+    procedure['arguments/output_directory'].connect_event(
+      'value-changed',
+      _set_initial_output_directory_in_export_if_undefined,
       main_settings['output_directory'])
     
     _set_sensitive_for_image_filename_pattern_in_export(
@@ -246,12 +251,19 @@ def _on_after_add_procedure(procedures, procedure, orig_procedure_dict, main_set
       procedure['arguments/single_image_filename_pattern'])
 
 
-def _set_initial_output_directory_in_export(
+def _set_initial_output_directory_in_export_if_undefined(
       export_output_directory_setting, output_directory_setting):
   # The check avoids plug-in failing to display the GUI due to an invalid
   # directory.
   if output_directory_setting.value:
-    export_output_directory_setting.set_value(output_directory_setting.value)
+    # This check prevents the directory for the custom Export procedure to be
+    # overwritten at each start of the plug-in.
+    if export_output_directory_setting.value is None:
+      export_output_directory_setting.set_value(output_directory_setting.value)
+  else:
+    # Assign a safe value
+    if export_output_directory_setting.value is None:
+      export_output_directory_setting.set_value(output_directory_setting.default_value)
 
 
 def _set_sensitive_for_image_filename_pattern_in_export(
