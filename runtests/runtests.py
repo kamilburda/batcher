@@ -58,6 +58,7 @@ def plug_in_run_tests(
     config.get_property('modules'),
     config.get_property('ignored-modules'),
     config.get_property('output-stream'),
+    config.get_property('verbose'),
   )
 
 
@@ -66,7 +67,9 @@ def run_tests(
       test_module_name_prefix: str = 'test_',
       modules: Optional[List[str]] = None,
       ignored_modules: Optional[List[str]] = None,
-      output_stream: str = 'stderr'):
+      output_stream: str = 'stderr',
+      verbose: bool = False,
+):
   """Runs all modules containing tests located in the specified directory path.
 
   Modules containing tests are considered those that contain the
@@ -112,15 +115,55 @@ def run_tests(
   for module_name in module_names:
     if module_name.split('.')[-1].startswith(test_module_name_prefix):
       module = importlib.import_module(module_name)
-      run_test(module, stream=stream)
+      run_test(module, stream=stream, verbose=verbose)
 
   stream.close()
 
 
-def run_test(module, stream=sys.stderr):
+def run_test(module, stream=sys.stderr, verbose=False):
+  if verbose:
+    test_runner_output_stream = stream
+  else:
+    test_runner_output_stream = open(os.devnull, 'w')
+
   test_suite = unittest.TestLoader().loadTestsFromModule(module)
-  test_runner = unittest.TextTestRunner(stream=stream)
-  test_runner.run(test_suite)
+
+  test_runner = unittest.TextTestRunner(stream=test_runner_output_stream)
+
+  result = test_runner.run(test_suite)
+
+  if not verbose:
+    _print_error_output(result, module, stream)
+
+
+def _print_error_output(result, module, stream):
+  if result.testsRun == 0:
+    print(80 * '=', file=stream)
+    print(f'No tests found in module {module.__name__}', file=stream)
+    print(80 * '-' + '\n', file=stream)
+
+  if result.failures or result.errors or result.unexpectedSuccesses:
+    if result.failures:
+      _print_failure(result.failures, stream, 'FAIL')
+
+    if result.errors:
+      _print_failure(result.errors, stream, 'ERROR')
+
+    if result.unexpectedSuccesses:
+      _print_failure(result.unexpectedSuccesses, stream, 'UNEXPECTED SUCCESS')
+
+
+def _print_failure(failures, stream, header=None):
+  if header is None:
+    processed_header = ''
+  else:
+    processed_header = f'{header}: '
+
+  for test_case, message in failures:
+    print(80 * '=', file=stream)
+    print(f'{processed_header}{test_case}', file=stream)
+    print(80 * '-', file=stream)
+    print(f'{message.strip()}\n', file=stream)
 
 
 def _get_output_stream(stream_or_filepath):
@@ -186,6 +229,12 @@ pg.register_procedure(
       default='stderr',
       nick='_Output stream',
       blurb='Output stream or file path to write output to'),
+    dict(
+      name='verbose',
+      type=bool,
+      default=False,
+      nick='_Verbose',
+      blurb='If True, writes more detailed output'),
   ],
   documentation=('Runs automated tests in the specified directory path', ''),
 )
