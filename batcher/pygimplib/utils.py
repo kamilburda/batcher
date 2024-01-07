@@ -4,7 +4,10 @@ import ast
 import contextlib
 import inspect
 import struct
+import sys
+import traceback
 from typing import Callable, Optional, Tuple
+import warnings
 
 
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
@@ -208,3 +211,36 @@ def bytes_to_string(bytes_: bytes) -> str:
   ``'Test\x00\x7f\xffdata'``.
   """
   return bytes_.decode('ansi')
+
+
+def warn_with_traceback(message, *args, **kwargs):
+  """Prints a warning that includes the traceback up to the warning function
+  call.
+
+  You can pass additional arguments defined in `warnings.warn`.
+  """
+  orig_showwarning = warnings.showwarning
+  warnings.showwarning = _showwarning_with_traceback
+
+  warnings.warn(message, *args, **kwargs)
+
+  warnings.showwarning = orig_showwarning
+
+
+def _showwarning_with_traceback(message, category, filename, lineno, file=None, line=None):
+  """Wrapper to print warnings with traceback.
+
+  Taken from: https://stackoverflow.com/a/22376126
+  """
+  log_file = file if hasattr(file, 'write') else sys.stderr
+
+  log_file.write(f'{"=" * 80}\n')
+  log_file.write(f'{filename}:{lineno}: {category.__qualname__}: {message}\n')
+  log_file.write('\nTraceback:\n')
+
+  extracted_stack = traceback.extract_stack()
+  # This ensures that the next call to `write` and this function will not be
+  # included in the printed traceback.
+  extracted_stack = extracted_stack[:-2]
+
+  log_file.write(''.join(traceback.format_list(extracted_stack)))
