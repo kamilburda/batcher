@@ -15,8 +15,8 @@ root_dirpath = os.path.join(Gimp.directory(), 'batcher')
 sys.path.append(os.path.join(root_dirpath, 'batcher'))
 sys.path.append(os.path.join(root_dirpath, 'batcher', 'pygimplib'))
 import pygimplib as pg
-from pygimplib.tests.setting import test_setting_gui
-test_setting_gui.test_basic_settings_and_gui()
+from pygimplib.tests.setting import _test_setting_gui
+_test_setting_gui.test_basic_settings_and_gui()
 
 
 import importlib
