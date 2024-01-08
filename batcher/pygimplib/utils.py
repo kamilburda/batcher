@@ -5,7 +5,7 @@ import contextlib
 import inspect
 import struct
 import sys
-import traceback
+import traceback as traceback_
 from typing import Callable, Optional, Tuple, Type
 import warnings
 
@@ -213,56 +213,76 @@ def bytes_to_string(bytes_: bytes) -> str:
   return bytes_.decode('ansi')
 
 
-def warn_with_traceback(message: str, *args, **kwargs):
+def warn_with_traceback(message: str, *args, traceback=None, **kwargs):
   """Prints a warning that includes the traceback up to the warning function
   call.
 
   You can pass additional arguments defined in `warnings.warn`.
+
+  You can also pass a custom traceback if already created.
   """
   orig_showwarning = warnings.showwarning
-  warnings.showwarning = _showwarning_with_traceback
+  warnings.showwarning = _showwarning_with_traceback(traceback=traceback)
 
   warnings.warn(message, *args, **kwargs)
 
   warnings.showwarning = orig_showwarning
 
 
-def format_warning_with_traceback(
+def format_message_with_traceback(
       message: str,
       category: Type[Warning],
       filename: str,
       lineno: int,
       stack_levels_to_keep: Optional[int] = -1,
 ) -> str:
-  """Formats a warning message to include traceback.
+  """Formats a message to include traceback.
 
   ``message``, ``category``, ``filename`` and ``lineno`` have the same meaning
   as in `warnings.showwarning()`.
+
+  For the description of ``stack_levels_to_keep``, see `get_traceback()`.
+  """
+  return (
+    f'{"=" * 80}\n'
+    f'{filename}:{lineno}: {category.__qualname__}: {message}\n'
+    '\nTraceback:\n'
+    f'{get_traceback(stack_levels_to_keep)}'
+  )
+
+
+def get_traceback(stack_levels_to_keep: Optional[int] = -1):
+  """Returns traceback of the most recent call.
 
   ``stack_levels_to_keep`` is the number of stack levels to keep when printing
   the traceback. The value can be negative to remove the last ``n`` levels, or
   ``None`` to keep all levels.
   """
-  extracted_stack = traceback.extract_stack()
+  extracted_stack = traceback_.extract_stack()
   # This ensures that the call to `traceback.extract_stack()` will not be
   # included.
   extracted_stack = extracted_stack[:stack_levels_to_keep]
 
-  formatted_traceback = (
-    f'{"=" * 80}\n'
-    f'{filename}:{lineno}: {category.__qualname__}: {message}\n'
-    '\nTraceback:\n'
-    f'{"".join(traceback.format_list(extracted_stack))}'
-  )
-
-  return formatted_traceback
+  return "".join(traceback_.format_list(extracted_stack))
 
 
-def _showwarning_with_traceback(message, category, filepath, lineno, file=None, line=None):
-  """Wrapper to print warnings with traceback.
+def _showwarning_with_traceback(traceback=None):
 
-  Taken from: https://stackoverflow.com/a/22376126
-  """
-  log_file = file if hasattr(file, 'write') else sys.stderr
-  log_file.write(
-    format_warning_with_traceback(message, category, filepath, lineno, stack_levels_to_keep=-4))
+  def _showwarning(message, category, filepath, lineno, file=None, line=None):
+    """Wrapper to print warnings with traceback.
+
+    Taken from: https://stackoverflow.com/a/22376126
+    """
+    log_file = file if hasattr(file, 'write') else sys.stderr
+
+    if traceback is None:
+      # `stack_levels_to_keep` is set to a value such that all function calls
+      # leading to obtaining this message and printing the warning are ignored.
+      formatted_traceback = format_message_with_traceback(
+        message, category, filepath, lineno, stack_levels_to_keep=-5)
+    else:
+      formatted_traceback = traceback
+
+    log_file.write(formatted_traceback)
+
+  return _showwarning
