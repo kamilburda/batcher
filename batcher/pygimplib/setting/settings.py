@@ -371,7 +371,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   @classmethod
   def get_allowed_gui_types(cls) -> List[Type[presenter_.Presenter]]:
     """Returns the list of allowed GUI types for this setting type."""
-    return [process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
+    return [meta_.process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
   
   def __str__(self) -> str:
     return pgutils.stringify_object(self, self.name)
@@ -507,7 +507,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       # We need to disconnect the "GUI changed" event before removing the GUI.
       self._gui.auto_update_gui_to_setting(False)
     else:
-      processed_gui_type = process_setting_gui_type(gui_type)
+      processed_gui_type = meta_.process_setting_gui_type(gui_type)
 
     if gui_type_kwargs is None:
       gui_type_kwargs = self._gui_type_kwargs
@@ -799,7 +799,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         else:
           gui_type_to_return = presenter_.NullPresenter
       else:
-        processed_gui_type = process_setting_gui_type(gui_type)
+        processed_gui_type = meta_.process_setting_gui_type(gui_type)
         
         if processed_gui_type in allowed_gui_types:
           gui_type_to_return = processed_gui_type
@@ -2441,7 +2441,7 @@ class ArraySetting(Setting):
         type has one allowed PDB type for individual elements (e.g.
         `GObject.TYPE_DOUBLE` for `Gimp.FloatArray`).
     """
-    self._element_type = process_setting_type(element_type)
+    self._element_type = meta_.process_setting_type(element_type)
     self._min_size = min_size if min_size is not None else 0
     self._max_size = max_size
     
@@ -3007,61 +3007,12 @@ class SettingDefaultValueError(SettingValueError):
   pass
 
 
-def process_setting_type(setting_type_or_name: Union[Type[Setting], str]) -> Type[Setting]:
-  """Returns a `Setting` class based on the input type or name.
-  
-  ``setting_type_or_name`` can be a `Setting` class or a string
-  representing the class name or one of its aliases in `setting.SETTING_TYPES`.
-  
-  `ValueError` is raised if ``setting_type_or_name`` is not valid.
-  """
-  return _process_type(
-    setting_type_or_name,
-    _SETTING_TYPES,
-    (f'setting type "{setting_type_or_name}" is not recognized; refer to'
-     ' pygimplib.setting.SETTING_TYPES for the supported setting types and their'
-     ' aliases'))
-
-
-def process_setting_gui_type(
-      setting_gui_type_or_name: Union[Type[presenter_.Presenter], str],
-) -> Type[presenter_.Presenter]:
-  """Returns a `setting.Presenter` class based on the input type or name.
-  
-  ``setting_gui_type_or_name`` can be a `setting.Presenter` class or a string
-  representing the class name or one of its aliases in
-  `setting.SETTING_GUI_TYPES`.
-  
-  `ValueError` is raised if ``setting_gui_type_or_name`` is not valid.
-  """
-  return _process_type(
-    setting_gui_type_or_name,
-    _SETTING_GUI_TYPES,
-    (f'setting GUI type "{setting_gui_type_or_name}" is not recognized; refer to'
-     ' pygimplib.setting.SETTING_GUI_TYPES for the supported setting GUI types'
-     ' and their aliases'))
-
-
-def _process_type(type_or_name, type_map, error_message):
-  try:
-    type_map[type_or_name]
-  except TypeError:
-    raise TypeError(error_message)
-  
-  if isinstance(type_or_name, str):
-    return type_map[type_or_name]
-  else:
-    return type_or_name
-
-
 __all__ = [
   'get_setting_type_from_gtype',
   'get_array_setting_type_from_gimp_object_array',
   'array_as_pdb_compatible_type',
   'SettingValueError',
   'SettingDefaultValueError',
-  'process_setting_type',
-  'process_setting_gui_type',
 ]
 
 for name, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):

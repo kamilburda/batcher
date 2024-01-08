@@ -4,8 +4,17 @@ import collections
 import functools
 import inspect
 import re
+from typing import Union, Type
 
 from gi.repository import GObject
+
+__all__ = [
+  'process_setting_type',
+  'process_setting_gui_type',
+  'SETTING_TYPES',
+  'SETTING_GUI_TYPES',
+  'GTYPES_AND_SETTING_TYPES',
+]
 
 
 class _TypeMap:
@@ -312,3 +321,52 @@ def _update_gtypes(namespace, cls, gtypes_and_setting_types):
           ' it must be a GObject.GObject subclass or a GObject.GType instance')
 
       gtypes_and_setting_types[gtype].append(cls)
+
+
+def process_setting_type(
+      setting_type_or_name: Union[Type['setting.Setting'], str]) -> Type['setting.Setting']:
+  """Returns a `setting.Setting` class based on the input type or name.
+
+  ``setting_type_or_name`` can be a `setting.Setting` class or a string
+  representing the class name or one of its aliases in `setting.SETTING_TYPES`.
+
+  `ValueError` is raised if ``setting_type_or_name`` is not valid.
+  """
+  return _process_type(
+    setting_type_or_name,
+    SETTING_TYPES,
+    (f'setting type "{setting_type_or_name}" is not recognized; refer to'
+     ' pygimplib.setting.SETTING_TYPES for the supported setting types and their'
+     ' aliases'))
+
+
+def process_setting_gui_type(
+      setting_gui_type_or_name: Union[Type['setting.Presenter'], str],
+) -> Type['setting.Presenter']:
+  """Returns a `setting.Presenter` class based on the input type or name.
+
+  ``setting_gui_type_or_name`` can be a `setting.Presenter` class or a string
+  representing the class name or one of its aliases in
+  `setting.SETTING_GUI_TYPES`.
+
+  `ValueError` is raised if ``setting_gui_type_or_name`` is not valid.
+  """
+  return _process_type(
+    setting_gui_type_or_name,
+    SETTING_GUI_TYPES,
+    (
+      f'setting GUI type "{setting_gui_type_or_name}" is not recognized; refer to'
+      ' pygimplib.setting.SETTING_GUI_TYPES for the supported setting GUI types'
+      ' and their aliases'))
+
+
+def _process_type(type_or_name, type_map, error_message):
+  try:
+    type_map[type_or_name]
+  except TypeError:
+    raise TypeError(error_message)
+
+  if isinstance(type_or_name, str):
+    return type_map[type_or_name]
+  else:
+    return type_or_name

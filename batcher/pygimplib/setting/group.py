@@ -261,7 +261,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     except KeyError:
       raise TypeError(self._get_missing_required_attributes_message(['type']))
     
-    setting_type = settings_.process_setting_type(setting_type)
+    setting_type = meta_.process_setting_type(setting_type)
     
     # Do not modify the original `setting_data` in case it is expected to be
     # reused.
