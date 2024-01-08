@@ -374,6 +374,7 @@ _FIELDS_LIST = [
   {
     'type': NumberField,
     'regex': '^[0-9]+$',
+    # FOR TRANSLATORS: Translate only the "image" part
     'display_name': _('image001'),
     'str_to_insert': 'image[001]',
     'examples_lines': [
