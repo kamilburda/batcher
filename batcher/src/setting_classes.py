@@ -360,7 +360,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
     return raw_value
   
   def _init_error_messages(self):
-    self.error_messages['value_must_be_dict'] = _('Value must be a dictionary.')
+    self.error_messages['value_must_be_dict'] = 'value must be a dictionary'
   
   def _validate(self, value):
     if not isinstance(value, dict):
@@ -450,7 +450,7 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
     return raw_value
 
   def _init_error_messages(self):
-    self.error_messages['value_must_be_dict'] = _('Value must be a dictionary.')
+    self.error_messages['value_must_be_dict'] = 'value must be a dictionary'
 
   def _validate(self, value):
     if not isinstance(value, dict):

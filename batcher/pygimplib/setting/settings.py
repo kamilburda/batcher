@@ -1043,17 +1043,10 @@ class NumericSetting(Setting):
       return None
 
   def _init_error_messages(self):
-    self.error_messages['below_min'] = (
-      _('Value cannot be less than {}.').format(self.min_value))
-
-    self.error_messages['below_pdb_min'] = (
-      _('Value cannot be less than {}.').format(self.pdb_min_value))
-
-    self.error_messages['above_max'] = (
-      _('Value cannot be greater than {}.').format(self.max_value))
-
-    self.error_messages['above_pdb_max'] = (
-      _('Value cannot be greater than {}.').format(self.pdb_max_value))
+    self.error_messages['below_min'] = f'value cannot be less than {self.min_value}'
+    self.error_messages['below_pdb_min'] = f'value cannot be less than {self.pdb_min_value}'
+    self.error_messages['above_max'] = f'value cannot be greater than {self.max_value}'
+    self.error_messages['above_pdb_max'] = f'value cannot be greater than {self.pdb_max_value}'
   
   def _validate(self, value):
     if self.min_value is not None and value < self.min_value:
@@ -1256,8 +1249,8 @@ class EnumSetting(Setting):
         utils_.value_to_str_prefix(type(value)) + self.error_messages['invalid_type'])
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid value.')
-    self.error_messages['invalid_type'] = _('Enumerated value has an invalid type.')
+    self.error_messages['invalid_value'] = 'invalid value'
+    self.error_messages['invalid_type'] = 'enumerated value has an invalid type'
 
   def _get_pdb_type(self, pdb_type):
     return self._enum_type
@@ -1369,8 +1362,7 @@ class ChoiceSetting(Setting):
     # This member gets overridden during parent class instantiation, but can
     # still be accessible before the instantiation if need be.
     self._error_messages = {
-      'invalid_value': (
-        _('Invalid item value; valid values: {}').format(list(self._item_values))),
+      'invalid_value': f'invalid item value; valid values: {list(self._item_values)}',
       'invalid_default_value': (
         f'invalid identifier for the default value; must be one of {list(self._items)}'),
     }
@@ -1565,7 +1557,7 @@ class ImageSetting(Setting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid image.')
+    self.error_messages['invalid_value'] = 'invalid image'
   
   def _raw_to_value(self, raw_value):
     value = raw_value
@@ -1660,7 +1652,7 @@ class ItemSetting(GimpItemSetting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid item.')
+    self.error_messages['invalid_value'] = 'invalid item'
   
   def _validate(self, item):
     if item is not None and not isinstance(item, Gimp.Item):
@@ -1686,7 +1678,7 @@ class DrawableSetting(GimpItemSetting):
     return value
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid drawable.')
+    self.error_messages['invalid_value'] = 'invalid drawable'
   
   def _validate(self, drawable):
     if drawable is not None and not drawable.is_drawable():
@@ -1712,7 +1704,7 @@ class LayerSetting(GimpItemSetting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid layer.')
+    self.error_messages['invalid_value'] = 'invalid layer'
   
   def _validate(self, layer):
     if layer is not None and not layer.is_layer():
@@ -1738,7 +1730,7 @@ class TextLayerSetting(GimpItemSetting):
     return value
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid text layer.')
+    self.error_messages['invalid_value'] = 'invalid text layer'
 
   def _validate(self, layer):
     if layer is not None and not layer.is_text_layer():
@@ -1768,7 +1760,7 @@ class LayerMaskSetting(GimpItemSetting):
     return value
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid layer mask.')
+    self.error_messages['invalid_value'] = 'invalid layer mask'
 
   def _validate(self, drawable):
     if drawable is not None and not drawable.is_layer_mask():
@@ -1812,7 +1804,7 @@ class ChannelSetting(GimpItemSetting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid channel.')
+    self.error_messages['invalid_value'] = 'invalid channel'
   
   def _validate(self, channel):
     if channel is not None and not channel.is_channel():
@@ -1859,7 +1851,7 @@ class VectorsSetting(GimpItemSetting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid vectors.')
+    self.error_messages['invalid_value'] = 'invalid vectors'
   
   def _validate(self, vectors):
     if vectors is not None and not vectors.is_vectors():
@@ -1889,7 +1881,7 @@ class ColorSetting(Setting):
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid color.')
+    self.error_messages['invalid_value'] = 'invalid color'
   
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
@@ -1941,7 +1933,7 @@ class DisplaySetting(Setting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid display.')
+    self.error_messages['invalid_value'] = 'invalid display'
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, int):
@@ -1990,7 +1982,7 @@ class ParasiteSetting(Setting):
     return value
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid parasite.')
+    self.error_messages['invalid_value'] = 'invalid parasite'
   
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
@@ -2025,7 +2017,7 @@ class FileSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_file_entry]
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid file.')
+    self.error_messages['invalid_value'] = 'invalid file'
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
@@ -2062,7 +2054,7 @@ class BytesSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_bytes_entry]
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid byte sequence.')
+    self.error_messages['invalid_value'] = 'invalid byte sequence'
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
@@ -2116,7 +2108,7 @@ class GimpResourceSetting(Setting):
     super().__init__(name, **kwargs)
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid resource.')
+    self.error_messages['invalid_value'] = 'invalid resource'
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, dict):
@@ -2175,7 +2167,7 @@ class BrushSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Brush, **kwargs)
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid brush.')
+    self.error_messages['invalid_value'] = 'invalid brush'
   
   def _value_to_raw(self, resource):
     if resource is not None:
@@ -2213,7 +2205,7 @@ class FontSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Font, **kwargs)
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid font.')
+    self.error_messages['invalid_value'] = 'invalid font'
 
 
 class GradientSetting(GimpResourceSetting):
@@ -2236,7 +2228,7 @@ class GradientSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Gradient, **kwargs)
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid gradient.')
+    self.error_messages['invalid_value'] = 'invalid gradient'
 
 
 class PaletteSetting(GimpResourceSetting):
@@ -2259,7 +2251,7 @@ class PaletteSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Palette, **kwargs)
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid palette.')
+    self.error_messages['invalid_value'] = 'invalid palette'
 
   def _value_to_raw(self, resource):
     if resource is not None:
@@ -2291,7 +2283,7 @@ class PatternSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Pattern, **kwargs)
 
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Invalid pattern.')
+    self.error_messages['invalid_value'] = 'invalid pattern'
 
 
 class UnitSetting(IntSetting):
@@ -2624,7 +2616,7 @@ class ArraySetting(Setting):
         length_name = f'num-{self.pdb_name}'
       
       if length_description is None:
-        length_description = _('Number of elements in "{}"').format(self.pdb_name)
+        length_description = ''
 
       return [
         dict(
@@ -2646,19 +2638,19 @@ class ArraySetting(Setting):
       return None
   
   def _init_error_messages(self):
-    self.error_messages['invalid_value'] = _('Not an array.')
-    self.error_messages['negative_min_size'] = _(
-      'Minimum size ({}) cannot be negative.')
-    self.error_messages['min_size_greater_than_max_size'] = _(
-      'Minimum size ({}) cannot be greater than maximum size ({}).')
-    self.error_messages['min_size_greater_than_value_length'] = _(
-      'Minimum size ({}) cannot be greater than the length of the value ({}).')
-    self.error_messages['max_size_less_than_value_length'] = _(
-      'Maximum size ({}) cannot be less than the length of the value ({}).')
-    self.error_messages['delete_below_min_size'] = _(
-      'Cannot delete any more elements - at least {} elements must be present.')
-    self.error_messages['add_above_max_size'] = _(
-      'Cannot add any more elements - at most {} elements are allowed.')
+    self.error_messages['invalid_value'] = 'not an array'
+    self.error_messages['negative_min_size'] = (
+      'minimum size ({}) cannot be negative')
+    self.error_messages['min_size_greater_than_max_size'] = (
+      'minimum size ({}) cannot be greater than maximum size ({})')
+    self.error_messages['min_size_greater_than_value_length'] = (
+      'minimum size ({}) cannot be greater than the length of the value ({})')
+    self.error_messages['max_size_less_than_value_length'] = (
+      'maximum size ({}) cannot be less than the length of the value ({})')
+    self.error_messages['delete_below_min_size'] = (
+      'cannot delete any more elements - at least {} elements must be present')
+    self.error_messages['add_above_max_size'] = (
+      'cannot add any more elements - at most {} elements are allowed')
   
   def _raw_to_value(self, raw_value_array):
     if isinstance(raw_value_array, Iterable) and not isinstance(raw_value_array, str):
@@ -2812,8 +2804,8 @@ class ContainerSetting(Setting):
     return self._nullable
   
   def _init_error_messages(self):
-    self.error_messages['value_is_none'] = _(
-      'Cannot assign a null value (None) if the setting is not nullable.')
+    self.error_messages['value_is_none'] = (
+      'cannot assign a null value (None) if the setting is not nullable')
   
   def _validate(self, value):
     if value is None and not self._nullable:

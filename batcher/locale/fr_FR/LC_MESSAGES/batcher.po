@@ -647,94 +647,6 @@ msgstr "L'extension des fichiers ne peut pas se terminer avec un espace."
 msgid "File extension cannot end with a period."
 msgstr "L'extension des fichiers ne peuvent pas se terminer avec un point."
 
-#: ../../export_layers/pygimplib/setting/settings.py:939
-msgid "Value cannot be less than {}."
-msgstr "La valeur ne peut être inférieure à {}."
-
-#: ../../export_layers/pygimplib/setting/settings.py:941
-msgid "Value cannot be greater than {}."
-msgstr "La valeur ne peut être supérieure à {}."
-
-#: ../../export_layers/pygimplib/setting/settings.py:1117
-msgid "Invalid item value; valid values: {}"
-msgstr "Valeur invalide; liste des valeurs possibles : {}"
-
-#: ../../export_layers/pygimplib/setting/settings.py:1323
-msgid "Invalid image."
-msgstr "Image invalide."
-
-#: ../../export_layers/pygimplib/setting/settings.py:1429
-msgid "Invalid item."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1456
-msgid "Invalid drawable."
-msgstr "Drawable invalide."
-
-#: ../../export_layers/pygimplib/setting/settings.py:1483
-msgid "Invalid layer."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1510
-msgid "Invalid channel."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1560
-msgid "Invalid vectors."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1588
-msgid "Invalid color."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1634
-msgid "Invalid display."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1670
-msgid "Invalid parasite."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:1863
-msgid "Invalid number of tuple elements (must be at most {})."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2204
-msgid "Number of elements in \"{}\""
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2219
-msgid "Not an array."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2221
-msgid "Minimum size ({}) cannot be negative."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2223
-msgid "Minimum size ({}) cannot be greater than maximum size ({})."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2225
-msgid "Minimum size ({}) cannot be greater than the length of the value ({})."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2227
-msgid "Maximum size ({}) cannot be less than the length of the value ({})."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2229
-msgid "Cannot delete any more elements - at least {} elements must be present."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2231
-msgid "Cannot add any more elements - at most {} elements are allowed."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/settings.py:2372
-msgid "Cannot assign a null value (None) if the setting is not nullable."
-msgstr ""
-
 #: ../../export_layers/pygimplib/setting/sources.py:117
 msgid "Could not find setting source \"{}\"."
 msgstr "Impossible de trouver la source de réglages {}."
@@ -887,10 +799,6 @@ msgid ""
 "Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
 "of 1000, 270, 0 and 40 pixels, respectively,\n"
 "and the image has width and height of 1000 and 500 pixels, respectively."
-msgstr ""
-
-#: ../../export_layers/setting_classes.py:169
-msgid "Value must be a dictionary."
 msgstr ""
 
 #: ../../export_layers/plugin_settings.py:53
