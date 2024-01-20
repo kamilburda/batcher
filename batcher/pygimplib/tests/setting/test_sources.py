@@ -444,7 +444,7 @@ class TestSourceRead(unittest.TestCase):
     self.assertEqual(self.settings['main/procedures/use_layer_size/enabled'].value, True)
     self.assertEqual(self.settings['main/procedures/insert_background/enabled'].value, True)
   
-  def test_read_invalid_setting_value_set_to_default_value(self):
+  def test_read_invalid_setting_value_retains_the_value(self):
     setting_dict = {
       'name': 'some_number',
       'default_value': 2,
@@ -455,7 +455,7 @@ class TestSourceRead(unittest.TestCase):
     setting.set_value(5)
     
     setting_dict['type'] = 'int'
-    setting_dict['value'] = -1
+    setting_dict['value'] = 2
         
     self.source.data = [setting_dict]
     

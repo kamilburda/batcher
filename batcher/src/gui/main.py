@@ -95,30 +95,26 @@ def _set_settings(func):
   """Decorator for `Group.apply_gui_values_to_settings()` that prevents the
   decorated function from being invoked if there are invalid setting values.
 
-  For the invalid values, an error message is displayed.
+  When assigning an invalid value, a warning message is displayed.
   
   This decorator is meant to be used in the `ExportLayersDialog` class.
   """
   
   @functools.wraps(func)
   def func_wrapper(self, *args, **kwargs):
-    try:
-      self._settings['main'].apply_gui_values_to_settings()
-      self._settings['gui'].apply_gui_values_to_settings()
+    self._settings['main'].apply_gui_values_to_settings()
+    self._settings['gui'].apply_gui_values_to_settings()
 
-      self._settings['main/output_directory'].gui.update_setting_value()
-      
-      self._settings['main/selected_layers'].value[self._image] = (
-        self._name_preview.selected_items)
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image] = (
-        self._name_preview.collapsed_items)
-      self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
-        [self._image_preview.item.raw] if self._image_preview.item is not None else [])
-    except pg.setting.SettingValueError as e:
-      self._display_inline_message(str(e), Gtk.MessageType.ERROR, e.setting)
-      return
-    else:
-      func(self, *args, **kwargs)
+    self._settings['main/output_directory'].gui.update_setting_value()
+
+    self._settings['main/selected_layers'].value[self._image] = (
+      self._name_preview.selected_items)
+    self._settings['gui/name_preview_layers_collapsed_state'].value[self._image] = (
+      self._name_preview.collapsed_items)
+    self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
+      [self._image_preview.item.raw] if self._image_preview.item is not None else [])
+
+    func(self, *args, **kwargs)
   
   return func_wrapper
 
@@ -236,9 +232,6 @@ class ExportLayersDialog:
     self._init_actions()
     
     self._finish_init_and_show()
-    
-    pg.gui.set_gui_excepthook_additional_callback(
-      self._display_inline_message_on_setting_value_error)
     
     if not run_gui_func:
       Gtk.main()
@@ -550,16 +543,29 @@ class ExportLayersDialog:
       self._on_text_entry_changed,
       self._settings['main/file_extension'],
       'invalid_file_extension')
+
     self._file_extension_entry.connect(
       'focus-out-event',
       self._on_file_extension_entry_focus_out_event,
       self._settings['main/file_extension'])
-    
+
+    self._settings['main/file_extension'].connect_event(
+      'value-not-valid',
+      self._on_extended_entry_setting_value_not_valid,
+      'invalid_file_extension',
+    )
+
     self._filename_pattern_entry.connect(
       'changed',
       self._on_text_entry_changed,
       self._settings['main/layer_filename_pattern'],
       'invalid_layer_filename_pattern')
+
+    self._settings['main/layer_filename_pattern'].connect_event(
+      'value-not-valid',
+      self._on_extended_entry_setting_value_not_valid,
+      'invalid_layer_filename_pattern',
+    )
     
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
@@ -820,26 +826,30 @@ class ExportLayersDialog:
     return filepath, file_format, load_size_settings
   
   def _on_text_entry_changed(self, entry, setting, name_preview_lock_update_key=None):
-    try:
-      setting.gui.update_setting_value()
-    except pg.setting.SettingValueError as e:
-      pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-        self._name_preview.set_sensitive, False)
-      self._display_inline_message(str(e), Gtk.MessageType.ERROR, setting)
-      self._name_preview.lock_update(True, name_preview_lock_update_key)
-    else:
-      self._name_preview.lock_update(False, name_preview_lock_update_key)
-      if self._message_setting == setting:
-        self._display_inline_message(None)
-      
-      self._name_preview.add_function_at_update(
-        self._name_preview.set_sensitive, True)
-      
-      pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-        self._name_preview.update)
-  
+    setting.gui.update_setting_value()
+
+    self._name_preview.lock_update(False, name_preview_lock_update_key)
+
+    if self._message_setting == setting:
+      self._display_inline_message(None)
+
+    self._name_preview.add_function_at_update(
+      self._name_preview.set_sensitive, True)
+
+    pg.invocation.timeout_add_strict(
+      self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
+      self._name_preview.update)
+
+  def _on_extended_entry_setting_value_not_valid(
+        self, setting, message, _message_id, _details, name_preview_lock_update_key=None):
+    pg.invocation.timeout_add_strict(
+      self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
+      self._name_preview.set_sensitive, False)
+
+    self._display_inline_message(message, Gtk.MessageType.ERROR, setting)
+
+    self._name_preview.lock_update(True, name_preview_lock_update_key)
+
   @staticmethod
   def _on_file_extension_entry_focus_out_event(entry, event, setting):
     setting.apply_to_gui()
@@ -1151,24 +1161,16 @@ class ExportLayersDialog:
     for action_box in [self._box_procedures, self._box_constraints]:
       for box_item in action_box.items:
         box_item.close_edit_dialog()
-  
+
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting
-    
+
     if self._settings['main/edit_mode'].value:
       label_message = self._label_message_for_edit_mode
     else:
       label_message = self._label_message
     
     label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
-  
-  def _display_inline_message_on_setting_value_error(
-        self, exc_type, exc_value, exc_traceback):
-    if issubclass(exc_type, pg.setting.SettingValueError):
-      self._display_inline_message(str(exc_value), Gtk.MessageType.ERROR)
-      return True
-    else:
-      return False
 
 
 class ExportLayersNowDialog:

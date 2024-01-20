@@ -64,8 +64,8 @@ class TestCreateParams(unittest.TestCase):
         type=GObject.TYPE_INT,
         default=0,
         minimum=0,
-        nick='Number of elements in "coordinates"',
-        blurb='Number of elements in "coordinates"',
+        nick='',
+        blurb='',
       ))
     
     self.assertEqual(

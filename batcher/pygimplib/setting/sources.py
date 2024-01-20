@@ -229,10 +229,7 @@ class Source(metaclass=abc.ABCMeta):
     if not self._should_setting_be_loaded(setting):
       return
     
-    try:
-      setting.set_value(setting_dict['value'])
-    except settings_.SettingValueError:
-      setting.reset()
+    setting.set_value(setting_dict['value'])
   
   def _should_setting_be_loaded(self, setting):
     if self._IGNORE_LOAD_TAG in setting.tags:

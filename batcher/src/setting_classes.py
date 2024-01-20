@@ -26,13 +26,8 @@ class ValidatableStringSetting(pg.setting.StringSetting):
   To determine whether the string is valid, `is_valid()` from the corresponding
   subclass is called.
 
-  Error messages:
-    This class contains empty messages for error statuses from the specified
-    `path.validators.StringValidator` subclass. Normally, if the value (string)
-    assigned is invalid, status messages returned from `is_valid()` are used. If
-    desired, you may fill the error messages with custom messages which
-    override the status messages from the method. See
-    `path.validators.FileValidatorErrorStatuses` for available error statuses.
+  Message IDs for invalid values:
+    Message IDs defined in `path.validators.FileValidatorErrorStatuses`.
   """
 
   _ABSTRACT = True
@@ -54,23 +49,12 @@ class ValidatableStringSetting(pg.setting.StringSetting):
 
     super().__init__(name, **kwargs)
 
-  def _init_error_messages(self):
-    for status in validators_.FileValidatorErrorStatuses.ERROR_STATUSES:
-      self.error_messages[status] = ''
-
   def _validate(self, string_):
     is_valid, status_messages = self._string_validator.is_valid(string_)
-    if not is_valid:
-      new_status_messages = []
-      for status, status_message in status_messages:
-        if self.error_messages[status]:
-          new_status_messages.append(self.error_messages[status])
-        else:
-          new_status_messages.append(status_message)
 
-      raise pg.setting.SettingValueError(
-        pg.setting.utils.value_to_str_prefix(string_)
-        + '\n'.join(message for message in new_status_messages))
+    if not is_valid:
+      for status, status_message in status_messages:
+        self._handle_failed_validation(status_message, status)
 
 
 class DirpathSetting(ValidatableStringSetting):
@@ -359,13 +343,9 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
 
     return raw_value
   
-  def _init_error_messages(self):
-    self.error_messages['value_must_be_dict'] = 'value must be a dictionary'
-  
   def _validate(self, value):
     if not isinstance(value, dict):
-      raise pg.setting.SettingValueError(
-        pg.setting.value_to_str_prefix(value) + self.error_messages['value_must_be_dict'])
+      self._handle_failed_validation('value must be a dictionary', 'value_must_be_dict')
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
@@ -449,10 +429,6 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
 
     return raw_value
 
-  def _init_error_messages(self):
-    self.error_messages['value_must_be_dict'] = 'value must be a dictionary'
-
   def _validate(self, value):
     if not isinstance(value, dict):
-      raise pg.setting.SettingValueError(
-        pg.setting.value_to_str_prefix(value) + self.error_messages['value_must_be_dict'])
+      self._handle_failed_validation('value must be a dictionary', 'value_must_be_dict')

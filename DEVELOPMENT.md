@@ -112,8 +112,7 @@ Example:
 
     def __init__(
           self,
-          default_value,
-          error_messages=None):
+          default_value):
       with open(
              '/a/very/very/long/path/to/file.txt', 'w') as f:
         pass

@@ -29,6 +29,7 @@ class TestSetting(unittest.TestCase):
   
   def setUp(self):
     self.setting = stubs_setting.StubSetting('file_extension', default_value='png')
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
   def test_str(self):
     self.assertEqual(str(self.setting), '<StubSetting "file_extension">')
@@ -55,20 +56,10 @@ class TestSetting(unittest.TestCase):
     self.assertEqual(
       stubs_setting.StubSetting('file_extension', default_value='png').default_value, 'png')
   
-  def test_invalid_default_value(self):
-    with self.assertRaises(settings_.SettingDefaultValueError):
-      stubs_setting.StubSetting('setting', default_value=None)
-  
-  def test_empty_value_as_default_value(self):
-    try:
-      stubs_setting.StubSetting('setting', default_value='')
-    except settings_.SettingDefaultValueError:
-      self.fail(
-        'SettingDefaultValueError should not be raised - default value is an empty value')
-  
   def test_assign_empty_value_not_allowed(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value('')
+    self.setting.set_value('')
+
+    self.assertEqual(self.value_not_valid_counter.count, 1)
   
   def test_assign_empty_value_allowed(self):
     setting = stubs_setting.StubSetting('setting', default_value='', allow_empty_values=True)
@@ -93,21 +84,6 @@ class TestSetting(unittest.TestCase):
     
     self.assertEqual(setting.display_name, '_Setting')
     self.assertEqual(setting.description, 'My description')
-  
-  def test_custom_error_messages(self):
-    setting = stubs_setting.StubSetting('setting', default_value='')
-    
-    setting_with_custom_error_messages = stubs_setting.StubSetting(
-      'setting',
-      default_value='',
-      error_messages={
-        'invalid_value': 'this should override the original error message',
-        'custom_message': 'custom message'})
-    
-    self.assertIn('custom_message', setting_with_custom_error_messages.error_messages)
-    self.assertNotEqual(
-      setting.error_messages['invalid_value'],
-      setting_with_custom_error_messages.error_messages['invalid_value'])
 
   def test_pdb_type_automatic_is_not_registrable(self):
     self.assertIsNone(self.setting.pdb_type)
@@ -349,7 +325,7 @@ class TestSettingGui(unittest.TestCase):
     self.assertIs(type(setting.gui), stubs_setting.StubPresenter)
     self.assertIs(type(setting.gui.widget), stubs_setting.GuiWidgetStub)
   
-  def test_setting_invalid_gui_type_raise_error(self):
+  def test_setting_invalid_gui_type_raises_error(self):
     with self.assertRaises(ValueError):
       stubs_setting.StubWithGuiSetting(
         'flatten',
@@ -361,12 +337,12 @@ class TestSettingGui(unittest.TestCase):
     setting.set_gui()
     self.assertIs(type(setting.gui), presenter_.NullPresenter)
   
-  def test_set_gui_gui_type_is_specified_widget_is_none_raise_error(self):
+  def test_set_gui_gui_type_is_specified_widget_is_none_raises_error(self):
     setting = stubs_setting.StubWithGuiSetting('flatten', default_value=False)
     with self.assertRaises(ValueError):
       setting.set_gui(gui_type=stubs_setting.CheckButtonStubPresenter)
   
-  def test_set_gui_gui_type_is_none_widget_is_specified_raise_error(self):
+  def test_set_gui_gui_type_is_none_widget_is_specified_raises_error(self):
     setting = stubs_setting.StubWithGuiSetting('flatten', default_value=False)
     with self.assertRaises(ValueError):
       setting.set_gui(widget=stubs_setting.GuiWidgetStub)
@@ -379,7 +355,7 @@ class TestSettingGui(unittest.TestCase):
     self.assertIs(type(setting.gui), stubs_setting.YesNoToggleButtonStubPresenter)
     self.assertIs(type(setting.gui.widget), stubs_setting.GuiWidgetStub)
   
-  def test_set_gui_widget_is_none_presenter_has_no_wrapper_raise_error(self):
+  def test_set_gui_widget_is_none_presenter_has_no_wrapper_raises_error(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten',
       default_value=False,
@@ -432,17 +408,21 @@ class TestSettingGui(unittest.TestCase):
     self.setting.reset()
     self.assertEqual(self.widget.value, 'png')
   
-  def test_update_setting_value_raise_error_when_reset_to_disallowed_empty_value(self):
+  def test_update_setting_value_trigger_event_after_resetting_to_disallowed_empty_value(self):
     setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
+
+    value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(setting)
+
     setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
     setting.set_value('jpg')
     setting.reset()
-    
-    with self.assertRaises(settings_.SettingValueError):
-      # Raise error because setting is reset to an empty value, while empty
-      # values are disallowed (`allow_empty_values` is False).
-      setting.gui.update_setting_value()
-  
+
+    # Raise error because setting is reset to an empty value, while empty
+    # values are disallowed (`allow_empty_values` is False).
+    setting.gui.update_setting_value()
+
+    self.assertEqual(value_not_valid_counter.count, 1)
+
   def test_null_presenter_has_automatic_gui(self):
     setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
     self.assertTrue(setting.gui.gui_update_enabled)
@@ -584,42 +564,47 @@ class TestIntSetting(unittest.TestCase):
   
   def setUp(self):
     self.setting = settings_.IntSetting('count', default_value=0, min_value=0, max_value=100)
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
-  def test_value_is_below_min_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(-5)
+  def test_value_is_below_min_triggers_event(self):
+    self.setting.set_value(-5)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
 
-  def test_value_is_below_pdb_min_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      settings_.IntSetting('count').set_value(GLib.MININT - 1)
+  def test_value_is_below_pdb_min_triggers_event(self):
+    setting = settings_.IntSetting('count')
+    value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(setting)
 
-  def test_min_value_is_below_pdb_min_raises_error(self):
+    setting.set_value(GLib.MININT - 1)
+
+    self.assertEqual(value_not_valid_counter.count, 1)
+
+  def test_min_value_is_below_pdb_min_triggers_event(self):
     with self.assertRaises(ValueError):
       settings_.IntSetting('count', min_value=GLib.MININT - 1)
   
-  def test_min_value_does_not_raise_error(self):
-    try:
-      self.setting.set_value(0)
-    except settings_.SettingValueError:
-      self.fail('SettingValueError should not be raised')
+  def test_min_value_does_not_trigger_event(self):
+    self.setting.set_value(0)
+    self.assertEqual(self.value_not_valid_counter.count, 0)
   
-  def test_value_is_above_max_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(200)
+  def test_value_is_above_max_triggers_event(self):
+    self.setting.set_value(200)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
 
-  def test_value_is_above_pdb_max_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      settings_.IntSetting('count').set_value(GLib.MAXINT + 1)
+  def test_value_is_above_pdb_max_triggers_event(self):
+    setting = settings_.IntSetting('count')
+    value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(setting)
+
+    setting.set_value(GLib.MAXINT + 1)
+
+    self.assertEqual(value_not_valid_counter.count, 1)
 
   def test_max_value_is_above_pdb_max_raises_error(self):
     with self.assertRaises(ValueError):
       settings_.IntSetting('count', max_value=GLib.MAXINT + 1)
   
-  def test_max_value_does_not_raise_error(self):
-    try:
-      self.setting.set_value(100)
-    except settings_.SettingValueError:
-      self.fail('SettingValueError should not be raised')
+  def test_max_value_does_not_trigger_event(self):
+    self.setting.set_value(100)
+    self.assertEqual(self.value_not_valid_counter.count, 0)
 
   def test_get_pdb_param(self):
     self.assertEqual(
@@ -665,26 +650,23 @@ class TestFloatSetting(unittest.TestCase):
   def setUp(self):
     self.setting = settings_.FloatSetting(
       'clip_percent', default_value=0.0, min_value=0.0, max_value=100.0)
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
-  def test_value_below_min_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(-5.0)
+  def test_value_below_min_triggers_event(self):
+    self.setting.set_value(-5.0)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
   
-  def test_minimum_value_does_not_raise_error(self):
-    try:
-      self.setting.set_value(0.0)
-    except settings_.SettingValueError:
-      self.fail('SettingValueError should not be raised')
+  def test_minimum_value_does_not_trigger_event(self):
+    self.setting.set_value(0.0)
+    self.assertEqual(self.value_not_valid_counter.count, 0)
   
-  def test_value_above_max_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(200.0)
+  def test_value_above_max_triggers_event(self):
+    self.setting.set_value(200.0)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
   
-  def test_maximum_value_does_not_raise_error(self):
-    try:
-      self.setting.set_value(100.0)
-    except settings_.SettingValueError:
-      self.fail('SettingValueError should not be raised')
+  def test_maximum_value_does_not_trigger_event(self):
+    self.setting.set_value(100.0)
+    self.assertEqual(self.value_not_valid_counter.count, 0)
 
 
 class TestCreateEnumSetting(unittest.TestCase):
@@ -740,10 +722,6 @@ class TestCreateEnumSetting(unittest.TestCase):
   def test_string_enum_type_is_not_a_genum_subclass_raises_error(self):
     with self.assertRaises(TypeError):
       settings_.EnumSetting('distance_metric', 'GimpPDB')
-
-  def test_invalid_default_value_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      settings_.EnumSetting('distance_metric', Gimp.Precision, default_value=0)
 
   def test_pdb_type_is_ignored(self):
     setting = settings_.EnumSetting(
@@ -836,13 +814,6 @@ class TestCreateChoiceSetting(unittest.TestCase):
       settings_.ChoiceSetting(
         'overwrite_mode', [('skip', 'Skip', 4), ('replace', 'Replace', 4)])
   
-  def test_invalid_default_value_raises_error(self):
-    with self.assertRaises(settings_.SettingDefaultValueError):
-      settings_.ChoiceSetting(
-        'overwrite_mode',
-        [('skip', 'Skip'), ('replace', 'Replace')],
-        default_value='invalid_default_value')
-  
   def test_too_many_elements_in_items_raises_error(self):
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker
@@ -892,12 +863,16 @@ class TestChoiceSetting(unittest.TestCase):
       [('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
       display_name='Overwrite mode')
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
   def test_set_invalid_item(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(4)
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(-1)
+    self.setting.set_value(4)
+
+    self.assertEqual(self.value_not_valid_counter.count, 1)
+
+    self.setting.set_value(-1)
+
+    self.assertEqual(self.value_not_valid_counter.count, 2)
   
   def test_get_invalid_item(self):
     with self.assertRaises(KeyError):
@@ -937,9 +912,11 @@ class TestChoiceSetting(unittest.TestCase):
       [('choose', '-Choose Your Mode-'), ('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
       empty_value='choose')
+    value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(setting)
     
-    with self.assertRaises(settings_.SettingValueError):
-      setting.set_value(setting.items['choose'])
+    setting.set_value(setting.items['choose'])
+
+    self.assertEqual(value_not_valid_counter.count, 1)
   
   def test_to_dict(self):
     self.assertDictEqual(
@@ -968,6 +945,7 @@ class TestImageSetting(unittest.TestCase):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
     self.setting = settings_.ImageSetting('image', default_value=self.image)
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
   def test_set_value_with_object(self):
     image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
@@ -1023,11 +1001,11 @@ class TestImageSetting(unittest.TestCase):
     
     self.assertIsNone(self.setting.value)
   
-  def test_set_value_invalid_image_raises_error(self):
+  def test_set_value_invalid_image_triggers_event(self):
     self.image.valid = False
 
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(self.image)
+    self.setting.set_value(self.image)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
   
   def test_default_value_with_raw_type(self):
     self.image.set_file(Gio.file_new_for_path('file_path'))
@@ -1039,13 +1017,6 @@ class TestImageSetting(unittest.TestCase):
       setting = settings_.ImageSetting('image', default_value=os.path.abspath('file_path'))
     
     self.assertEqual(setting.default_value, self.image)
-  
-  def test_empty_value_as_default_value(self):
-    try:
-      settings_.ImageSetting('image', default_value=None)
-    except settings_.SettingDefaultValueError:
-      self.fail(
-        'SettingDefaultValueError should not be raised - default value is an empty value')
   
   def test_to_dict(self):
     self.image.set_file(Gio.file_new_for_path('file_path'))
@@ -1733,30 +1704,6 @@ class TestCreateArraySetting(unittest.TestCase):
     
     self.assertEqual(setting.element_display_name, 'Coordinate')
   
-  def test_create_passing_invalid_default_value_raises_error(self):
-    with self.assertRaises(settings_.SettingValueError):
-      settings_.ArraySetting(
-        'coordinates',
-        default_value=(-200.0, 200.0),
-        element_type='float',
-        element_min_value=-100.0,
-        element_max_value=100.0)
-  
-  @parameterized.parameterized.expand([
-    ('default_value_is_empty', ()),
-    ('default_value_is_not_empty', (1.0, 5.0, 10.0)),
-  ])
-  def test_create_invalid_element_default_value_raises_error(
-        self, test_case_suffix, default_value):
-    with self.assertRaises(settings_.SettingDefaultValueError):
-      settings_.ArraySetting(
-        'coordinates',
-        default_value=default_value,
-        element_type='float',
-        element_default_value=-200.0,
-        element_min_value=-100.0,
-        element_max_value=100.0)
-  
   @parameterized.parameterized.expand([
     ('native_array_type_as_element_pdb_type_is_registrable',
      'float',
@@ -1913,6 +1860,7 @@ class TestArraySetting(unittest.TestCase):
       element_type='float',
       element_min_value=-100.0,
       element_max_value=100.0)
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
   def test_get_elements(self):
     self.assertListEqual(
@@ -1955,21 +1903,10 @@ class TestArraySetting(unittest.TestCase):
     
     self.assertEqual(setting.value, (palette, palette2))
   
-  def test_set_value_validates_if_value_is_iterable(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(45)
-  
-  @parameterized.parameterized.expand([
-    ('first_is_invalid', (200.0, 50.0, 40.0)),
-    ('middle_is_invalid', (20.0, 200.0, 40.0)),
-    ('last_is_invalid', (20.0, 50.0, 200.0)),
-    ('two_are_invalid', (20.0, 200.0, 200.0)),
-    ('all_are_invalid', (200.0, 200.0, 200.0)),
-  ])
-  def test_set_value_validates_each_element_value_individually(
-        self, test_case_suffix, input_value):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(input_value)
+  def test_set_value_invalid_type_is_wrapped_in_iterable(self):
+    self.setting.set_value(45)
+
+    self.assertEqual(self.setting.value, (45,))
   
   def test_reset_retains_default_value(self):
     self.setting.set_value((20.0, 50.0, 40.0))
@@ -2141,7 +2078,7 @@ class TestArraySetting(unittest.TestCase):
         self, test_case_suffix, index, new_index, expected_values):
     self.setting.reorder_element(index, new_index)
     self.assertEqual(
-      [element.value for element in self.setting[:]],
+      [element.value for element in self.setting.get_elements()],
       expected_values)
   
   def test_set_element_value(self):
@@ -2150,9 +2087,8 @@ class TestArraySetting(unittest.TestCase):
     self.assertEqual(self.setting.value, (1.0, 50.0, 10.0))
   
   def test_set_element_value_validates_value(self):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting[1].set_value(200.0)
-  
+    self.setting[1].set_value(200.0)
+
   def test_reset_element_sets_element_default_value(self):
     self.setting[1].reset()
     self.assertEqual(self.setting[1].value, 0.0)
@@ -2229,7 +2165,7 @@ class TestArraySetting(unittest.TestCase):
      None,
      None,
      'num-coordinates',
-     'Number of elements in "coordinates"'),
+     ''),
     
     ('custom_length_name_and_description',
      'num-axes-coordinates',
@@ -2302,23 +2238,6 @@ class TestArraySettingCreateWithSize(unittest.TestCase):
     
     self.assertEqual(setting.min_size, expected_min_size)
     self.assertEqual(setting.max_size, expected_max_size)
-  
-  @parameterized.parameterized.expand([
-    ('min_size_negative', -1, None),
-    ('max_size_less_than_min_size', 5, 4),
-    ('max_size_less_than_default_value_length', 0, 2),
-    ('min_size_greater_than_default_value_length', 4, None),
-  ])
-  def test_create_raises_error_on_invalid_size(
-        self, test_case_suffix, min_size, max_size):
-    with self.assertRaises(settings_.SettingDefaultValueError):
-      settings_.ArraySetting(
-        'coordinates',
-        default_value=(1.0, 5.0, 10.0),
-        element_type='float',
-        element_default_value=0.0,
-        min_size=min_size,
-        max_size=max_size)
 
 
 class TestArraySettingSize(unittest.TestCase):
@@ -2333,45 +2252,40 @@ class TestArraySettingSize(unittest.TestCase):
       element_max_value=100.0,
       min_size=2,
       max_size=4)
-  
-  def test_set_value_with_respect_to_size(self):
-    try:
-      self.setting.set_value((5.0, 10.0))
-    except settings_.SettingValueError:
-      self.fail(
-        'setting the value while satisfying size restrictions should not raise error')
+    self.value_not_valid_counter = stubs_setting.get_value_not_valid_event_counter(self.setting)
   
   @parameterized.parameterized.expand([
     ('value_length_less_than_min_size', (1.0,)),
     ('value_length_greater_than_max_size', (1.0, 5.0, 10.0, 30.0, 70.0)),
   ])
-  def test_set_value_invalid_size_raises_error(self, test_case_suffix, value):
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.set_value(value)
-  
-  def test_add_element_with_respect_to_size(self):
-    try:
-      self.setting.add_element()
-    except settings_.SettingValueError:
-      self.fail(
-        'adding an element while satisfying size restrictions should not raise error')
-  
-  def test_add_element_more_than_max_size_raises_error(self):
+  def test_set_value_invalid_size_triggers_event(self, test_case_suffix, value):
+    self.setting.set_value(value)
+
+    self.assertEqual(self.value_not_valid_counter.count, 1)
+
+  def test_add_element(self):
     self.setting.add_element()
-    with self.assertRaises(settings_.SettingValueError):
-      self.setting.add_element()
+
+    self.assertEqual(len(self.setting.get_elements()), 4)
+  
+  def test_add_element_more_than_max_size_triggers_event(self):
+    self.setting.add_element()
+    self.setting.add_element()
+
+    self.assertEqual(len(self.setting.get_elements()), 5)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
   
   def test_delete_element_with_respect_to_size(self):
-    try:
-      del self.setting[-1]
-    except settings_.SettingValueError:
-      self.fail(
-        'deleting an element while satisfying size restrictions should not raise error')
-  
-  def test_delete_element_less_then_min_size_raises_error(self):
     del self.setting[-1]
-    with self.assertRaises(settings_.SettingValueError):
-      del self.setting[-1]
+
+    self.assertEqual(len(self.setting.get_elements()), 2)
+  
+  def test_delete_element_less_than_min_size_triggers_event(self):
+    del self.setting[-1]
+    del self.setting[-1]
+
+    self.assertEqual(len(self.setting.get_elements()), 1)
+    self.assertEqual(self.value_not_valid_counter.count, 1)
 
 
 class TestContainerSettings(unittest.TestCase):

@@ -8,7 +8,6 @@ import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import setting_classes
-from src.path import validators as validators_
 
 
 def _get_images_and_items():
@@ -63,18 +62,6 @@ class TestFileExtensionSetting(unittest.TestCase):
     setting.set_value('.jpg')
 
     self.assertEqual(setting.value, 'jpg')
-
-  def test_invalid_default_value(self):
-    with self.assertRaises(pg.setting.SettingDefaultValueError):
-      setting_classes.FileExtensionSetting('file_ext', default_value=None)
-
-  def test_custom_error_message(self):
-    self.setting.error_messages[validators_.FileValidatorErrorStatuses.IS_EMPTY] = (
-      'my custom message')
-    try:
-      self.setting.set_value('')
-    except pg.setting.SettingValueError as e:
-      self.assertEqual(str(e), 'my custom message')
 
 
 class TestImagesAndGimpItemsSetting(unittest.TestCase):

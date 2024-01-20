@@ -102,12 +102,9 @@ class StubSetting(settings_.Setting):
   _DEFAULT_DEFAULT_VALUE = 0
   _EMPTY_VALUES = ['']
   
-  def _init_error_messages(self):
-    self._error_messages['invalid_value'] = 'value cannot be None or an empty string'
-  
   def _validate(self, value):
     if value is None or value == '':
-      raise settings_.SettingValueError(self._error_messages['invalid_value'])
+      self._handle_failed_validation('value cannot be None or an empty string', 'invalid_value')
 
 
 class StubWithCallableDefaultDefaultValueSetting(StubSetting):
@@ -129,6 +126,22 @@ class StubWithGuiSetting(StubSetting):
     StubWithValueChangedSignalPresenter,
     StubWithoutGuiWidgetCreationPresenter,
   ]
+
+
+class Counter:
+
+  def __init__(self, start_value=0):
+    self.count = start_value
+
+  def increment(self):
+    self.count += 1
+
+
+def get_value_not_valid_event_counter(setting):
+  value_not_valid_counter = Counter()
+  setting.connect_event('value-not-valid', lambda *args: value_not_valid_counter.increment())
+
+  return value_not_valid_counter
 
 
 def on_file_extension_changed(file_extension, flatten):

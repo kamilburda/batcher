@@ -621,31 +621,12 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     is enabled or not. Passing ``force=True`` is useful if some GUI widgets
     are internally assigned a valid value on instantiation while the
     corresponding settings retain their own value.
-
-    If one or more values in the GUI widget(s) are not valid,
-    `setting.SettingValueError` is raised. The exception message contains
-    messages from all invalid settings.
     """
-    def _should_not_ignore(setting):
-      return 'ignore_apply_gui_value_to_setting' not in setting.tags
-    
-    exception_messages = []
-    exception_settings = []
+    def _should_not_ignore(setting_):
+      return 'ignore_apply_gui_value_to_setting' not in setting_.tags
     
     for setting in self.walk(include_setting_func=_should_not_ignore):
-      try:
-        setting.gui.update_setting_value()
-      except settings_.SettingValueError as e:
-        exception_messages.append(str(e))
-        exception_settings.append(e.setting)
-    
-    if exception_messages:
-      exception_message = '\n'.join(exception_messages)
-      raise settings_.SettingValueError(
-        exception_message,
-        setting=exception_settings[0],
-        messages=exception_messages,
-        settings=exception_settings)
+      setting.gui.update_setting_value()
   
   def to_dict(self):
     """Returns a dictionary representing the group, appropriate for saving it

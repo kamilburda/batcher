@@ -519,10 +519,6 @@ msgstr ""
 msgid "Foreground Layer"
 msgstr ""
 
-#: ../../export_layers/placeholders.py:104
-msgid "Invalid placeholder."
-msgstr ""
-
 #: ../../export_layers/pygimplib/gui/overwrite_chooser.py:79
 msgid "_Apply action to all files"
 msgstr ""

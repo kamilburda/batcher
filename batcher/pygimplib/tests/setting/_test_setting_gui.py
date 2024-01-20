@@ -25,7 +25,6 @@ def test_basic_settings_and_gui():
 
 def test_settings_and_gui(setting_data):
   pggui.set_gui_excepthook('Test GUI for Settings')
-  pggui.set_gui_excepthook_additional_callback(_display_message_on_setting_value_error)
   
   settings = []
   
@@ -246,11 +245,3 @@ def _check_setting_gui_interface(setting):
   
   assert setting.gui.get_sensitive()
   assert setting.gui.get_visible()
-
-
-def _display_message_on_setting_value_error(exc_type, exc_value, exc_traceback):
-  if issubclass(exc_type, settings_.SettingValueError):
-    Gimp.message(str(exc_value))
-    return True
-  else:
-    return False
