@@ -54,6 +54,24 @@ class TestSetting(unittest.TestCase):
   def test_explicit_default_value(self):
     self.assertEqual(
       stubs_setting.StubSetting('file_extension', default_value='png').default_value, 'png')
+
+  def test_value_not_valid_event_is_triggered_upon_invalid_value(self):
+    counter = 0
+
+    def increment_counter():
+      nonlocal counter
+      counter += 1
+
+    self.setting.connect_event('value-not-valid', lambda *args: increment_counter())
+
+    self.setting.set_value(None)
+
+    self.assertEqual(counter, 1)
+
+  def test_value_is_not_valid_on_instantiation(self):
+    setting = stubs_setting.StubSetting('file_extension', default_value=None)
+
+    self.assertFalse(setting.is_valid)
   
   def test_assign_empty_value_not_allowed(self):
     self.setting.set_value('')
@@ -561,19 +579,6 @@ class TestIntSetting(unittest.TestCase):
   
   def setUp(self):
     self.setting = settings_.IntSetting('count', default_value=0, min_value=0, max_value=100)
-
-  def test_value_not_valid_event_is_triggered_upon_invalid_value(self):
-    counter = 0
-
-    def increment_counter():
-      nonlocal counter
-      counter += 1
-
-    self.setting.connect_event('value-not-valid', lambda *args: increment_counter())
-
-    self.setting.set_value(-5)
-
-    self.assertEqual(counter, 1)
 
   def test_value_below_min_is_not_valid(self):
     self.setting.set_value(-5)
