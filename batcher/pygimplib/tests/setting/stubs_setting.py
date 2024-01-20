@@ -104,7 +104,7 @@ class StubSetting(settings_.Setting):
   
   def _validate(self, value):
     if value is None or value == '':
-      self._handle_failed_validation('value cannot be None or an empty string', 'invalid_value')
+      return 'value cannot be None or an empty string', 'invalid_value'
 
 
 class StubWithCallableDefaultDefaultValueSetting(StubSetting):

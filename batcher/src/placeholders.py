@@ -117,7 +117,7 @@ class PlaceholderSetting(pg.setting.Setting):
   
   def _validate(self, value):
     if value not in self._ALLOWED_PLACEHOLDERS:
-      self._handle_failed_validation('invalid placeholder', 'invalid_value')
+      return 'invalid placeholder', 'invalid_value'
 
 
 class PlaceholderImageSetting(PlaceholderSetting):

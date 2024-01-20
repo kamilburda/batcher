@@ -54,7 +54,7 @@ class ValidatableStringSetting(pg.setting.StringSetting):
 
     if not is_valid:
       for status, status_message in status_messages:
-        self._handle_failed_validation(status_message, status)
+        return status_message, status
 
 
 class DirpathSetting(ValidatableStringSetting):
@@ -345,7 +345,7 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
   
   def _validate(self, value):
     if not isinstance(value, dict):
-      self._handle_failed_validation('value must be a dictionary', 'value_must_be_dict')
+      return 'value must be a dictionary', 'value_must_be_dict'
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
@@ -431,4 +431,4 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
 
   def _validate(self, value):
     if not isinstance(value, dict):
-      self._handle_failed_validation('value must be a dictionary', 'value_must_be_dict')
+      return 'value must be a dictionary', 'value_must_be_dict'

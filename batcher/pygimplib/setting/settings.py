@@ -649,10 +649,11 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     """Checks whether the specified value is valid. If the value is not valid,
     the ``'value-not-valid'`` event is triggered.
 
-    Override this method in subclasses to provide subclass-specific validation.
-    If a value is not valid, you must call the `_handle_failed_validation()`
-    method and provide at least a message and a message ID (a string indicating
-    the type of message) there.
+    Override this method in subclasses to provide subclass-specific
+    validation. If a value is not valid, the overriden method must return a
+    tuple consisting of at least a message and a message ID (a string
+    indicating the type of message). If a value is valid, the overriden
+    method must return ``None``.
     """
     pass
   
@@ -717,7 +718,13 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def _validate_setting(self, value):
     self._is_valid = True
 
-    self._validate(value)
+    value_not_valid_args = self._validate(value)
+
+    if value_not_valid_args is not None:
+      if not isinstance(value_not_valid_args, Iterable) or isinstance(value_not_valid_args, str):
+        value_not_valid_args = (value_not_valid_args,)
+
+      self._handle_failed_validation(*value_not_valid_args, value=value)
 
   def _handle_failed_validation(
         self, message, message_id, prepend_value=True, value=None):
@@ -1043,18 +1050,16 @@ class NumericSetting(Setting):
   
   def _validate(self, value):
     if self.min_value is not None and value < self.min_value:
-      self._handle_failed_validation(f'value cannot be less than {self.min_value}', 'below_min')
+      return f'value cannot be less than {self.min_value}', 'below_min'
 
     if self.pdb_min_value is not None and value < self.pdb_min_value:
-      self._handle_failed_validation(
-        f'value cannot be less than {self.pdb_min_value}', 'below_pdb_min')
+      return f'value cannot be less than {self.pdb_min_value}', 'below_pdb_min'
 
     if self.max_value is not None and value > self.max_value:
-      self._handle_failed_validation(f'value cannot be greater than {self.max_value}', 'above_max')
+      return f'value cannot be greater than {self.max_value}', 'above_max'
 
     if self.pdb_max_value is not None and value > self.pdb_max_value:
-      self._handle_failed_validation(
-        f'value cannot be greater than {self.pdb_max_value}', 'above_pdb_max')
+      return f'value cannot be greater than {self.pdb_max_value}', 'above_pdb_max'
 
   def _check_min_and_max_values_against_pdb_min_and_max_values(self):
     if (self.min_value is not None
@@ -1227,13 +1232,13 @@ class EnumSetting(Setting):
     try:
       self.enum_type(value)
     except ValueError:
-      self._handle_failed_validation('invalid value', 'invalid_value')
+      return 'invalid value', 'invalid_value'
 
     if isinstance(value, GObject.GEnum) and not isinstance(value, self.enum_type):
-      self._handle_failed_validation(
+      return (
         f'enumerated value has an invalid type "{type(value)}"',
         'invalid_type',
-        prepend_value=False)
+        False)
 
   def _get_pdb_type(self, pdb_type):
     return self._enum_type
@@ -1437,8 +1442,7 @@ class ChoiceSetting(Setting):
   def _validate(self, value):
     if (value not in self._item_values
         or (not self._allow_empty_values and self._is_value_empty(value))):
-      self._handle_failed_validation(
-        f'invalid item value; valid values: {list(self._item_values)}', 'invalid_value')
+      return f'invalid item value; valid values: {list(self._item_values)}', 'invalid_value'
   
   def _get_items_description(self):
     items_description = ''
@@ -1549,7 +1553,7 @@ class ImageSetting(Setting):
   
   def _validate(self, image):
     if image is not None and not image.is_valid():
-      self._handle_failed_validation('invalid image', 'invalid_value')
+      return 'invalid image', 'invalid_value'
 
 
 class GimpItemSetting(Setting):
@@ -1622,7 +1626,7 @@ class ItemSetting(GimpItemSetting):
   
   def _validate(self, item):
     if item is not None and not isinstance(item, Gimp.Item):
-      self._handle_failed_validation('invalid item', 'invalid_value')
+      return 'invalid item', 'invalid_value'
 
 
 class DrawableSetting(GimpItemSetting):
@@ -1644,7 +1648,7 @@ class DrawableSetting(GimpItemSetting):
   
   def _validate(self, drawable):
     if drawable is not None and not drawable.is_drawable():
-      self._handle_failed_validation('invalid drawable', 'invalid_value')
+      return 'invalid drawable', 'invalid_value'
 
 
 class LayerSetting(GimpItemSetting):
@@ -1666,7 +1670,7 @@ class LayerSetting(GimpItemSetting):
   
   def _validate(self, layer):
     if layer is not None and not layer.is_layer():
-      self._handle_failed_validation('invalid layer', 'invalid_value')
+      return 'invalid layer', 'invalid_value'
 
 
 class TextLayerSetting(GimpItemSetting):
@@ -1688,7 +1692,7 @@ class TextLayerSetting(GimpItemSetting):
 
   def _validate(self, layer):
     if layer is not None and not layer.is_text_layer():
-      self._handle_failed_validation('invalid text layer', 'invalid_value')
+      return 'invalid text layer', 'invalid_value'
 
 
 class LayerMaskSetting(GimpItemSetting):
@@ -1714,7 +1718,7 @@ class LayerMaskSetting(GimpItemSetting):
 
   def _validate(self, drawable):
     if drawable is not None and not drawable.is_layer_mask():
-      self._handle_failed_validation('invalid layer mask', 'invalid_value')
+      return 'invalid layer mask', 'invalid_value'
 
   def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
     layer = super()._get_item_from_image_and_item_path(image_filepath, item_type_name, item_path)
@@ -1754,7 +1758,7 @@ class ChannelSetting(GimpItemSetting):
   
   def _validate(self, channel):
     if channel is not None and not channel.is_channel():
-      self._handle_failed_validation('invalid channel', 'invalid_value')
+      return 'invalid channel', 'invalid_value'
 
 
 class SelectionSetting(ChannelSetting):
@@ -1797,7 +1801,7 @@ class VectorsSetting(GimpItemSetting):
   
   def _validate(self, vectors):
     if vectors is not None and not vectors.is_vectors():
-      self._handle_failed_validation('invalid vectors', 'invalid_value')
+      return 'invalid vectors', 'invalid_value'
 
 
 class ColorSetting(Setting):
@@ -1840,7 +1844,7 @@ class ColorSetting(Setting):
   
   def _validate(self, color):
     if not isinstance(color, Gimp.RGB):
-      self._handle_failed_validation('invalid color', 'invalid_value')
+      return 'invalid color', 'invalid_value'
 
 
 class DisplaySetting(Setting):
@@ -1882,7 +1886,7 @@ class DisplaySetting(Setting):
 
   def _validate(self, display):
     if display is not None and not display.is_valid():
-      self._handle_failed_validation('invalid display', 'invalid_value')
+      return 'invalid display', 'invalid_value'
 
 
 class ParasiteSetting(Setting):
@@ -1925,7 +1929,7 @@ class ParasiteSetting(Setting):
   
   def _validate(self, parasite):
     if not isinstance(parasite, Gimp.Parasite):
-      self._handle_failed_validation('invalid parasite', 'invalid_value')
+      return 'invalid parasite', 'invalid_value'
 
 
 class FileSetting(Setting):
@@ -1958,7 +1962,7 @@ class FileSetting(Setting):
 
   def _validate(self, file_):
     if not isinstance(file_, Gio.File):
-      self._handle_failed_validation('invalid file', 'invalid_value')
+      return 'invalid file', 'invalid_value'
 
 
 class BytesSetting(Setting):
@@ -1996,7 +2000,7 @@ class BytesSetting(Setting):
 
   def _validate(self, file_):
     if not isinstance(file_, GLib.Bytes):
-      self._handle_failed_validation('invalid byte sequence', 'invalid_value')
+      return 'invalid byte sequence', 'invalid_value'
 
 
 class GimpResourceSetting(Setting):
@@ -2061,7 +2065,7 @@ class GimpResourceSetting(Setting):
 
   def _validate(self, resource):
     if resource is not None and not resource.is_valid():
-      self._handle_failed_validation('invalid resource', 'invalid_value')
+      return 'invalid resource', 'invalid_value'
 
 
 class BrushSetting(GimpResourceSetting):
@@ -2700,10 +2704,10 @@ class ContainerSetting(Setting):
   
   def _validate(self, value):
     if value is None and not self._nullable:
-      self._handle_failed_validation(
+      return (
         'cannot assign a null value (None) if the setting is not nullable',
         'value_is_none',
-        prepend_value=False,
+        False,
       )
 
 
