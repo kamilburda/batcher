@@ -128,22 +128,6 @@ class StubWithGuiSetting(StubSetting):
   ]
 
 
-class Counter:
-
-  def __init__(self, start_value=0):
-    self.count = start_value
-
-  def increment(self):
-    self.count += 1
-
-
-def get_value_not_valid_event_counter(setting):
-  value_not_valid_counter = Counter()
-  setting.connect_event('value-not-valid', lambda *args: value_not_valid_counter.increment())
-
-  return value_not_valid_counter
-
-
 def on_file_extension_changed(file_extension, flatten):
   if file_extension.value == 'png':
     flatten.set_value(False)

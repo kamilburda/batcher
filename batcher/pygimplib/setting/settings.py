@@ -220,6 +220,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     utils_.check_setting_name(name)
     self._name = name
+
+    self._is_valid = True
     
     self._default_value = self._resolve_default_value(default_value)
     
@@ -250,7 +252,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._tags = set(tags) if tags is not None else set()
 
     if self._should_validate_default_value():
-      self._validate(self._value)
+      self._validate_setting(self._value)
   
   @property
   def name(self) -> str:
@@ -294,7 +296,15 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     values explicitly when creating a setting.
     """
     return self._default_value
-  
+
+  @property
+  def is_valid(self):
+    """``True`` if the setting value is valid, ``False`` otherwise.
+
+    This property is set on each call to `set_value()` or upon instantiation.
+    """
+    return self._is_valid
+
   @property
   def gui(self) -> presenter_.Presenter:
     """The setting GUI widget.
@@ -697,15 +707,22 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   def _validate_and_assign_value(self, value):
     if not self._allow_empty_values:
-      self._validate(value)
+      self._validate_setting(value)
     else:
       if not self._is_value_empty(value):
-        self._validate(value)
+        self._validate_setting(value)
     
     self._assign_value(value)
 
+  def _validate_setting(self, value):
+    self._is_valid = True
+
+    self._validate(value)
+
   def _handle_failed_validation(
         self, message, message_id, prepend_value=True, value=None):
+    self._is_valid = False
+
     formatted_traceback = pgutils.get_traceback()
 
     if prepend_value:
