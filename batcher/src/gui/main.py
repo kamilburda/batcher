@@ -549,23 +549,11 @@ class ExportLayersDialog:
       self._on_file_extension_entry_focus_out_event,
       self._settings['main/file_extension'])
 
-    self._settings['main/file_extension'].connect_event(
-      'value-not-valid',
-      self._on_extended_entry_setting_value_not_valid,
-      'invalid_file_extension',
-    )
-
     self._filename_pattern_entry.connect(
       'changed',
       self._on_text_entry_changed,
       self._settings['main/layer_filename_pattern'],
       'invalid_layer_filename_pattern')
-
-    self._settings['main/layer_filename_pattern'].connect_event(
-      'value-not-valid',
-      self._on_extended_entry_setting_value_not_valid,
-      'invalid_layer_filename_pattern',
-    )
     
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
@@ -826,29 +814,30 @@ class ExportLayersDialog:
     return filepath, file_format, load_size_settings
   
   def _on_text_entry_changed(self, entry, setting, name_preview_lock_update_key=None):
-    setting.gui.update_setting_value()
+    validation_result = setting.validate(setting.gui.get_value())
 
-    self._name_preview.lock_update(False, name_preview_lock_update_key)
+    if validation_result is None:
+      setting.gui.update_setting_value()
 
-    if self._message_setting == setting:
-      self._display_inline_message(None)
+      self._name_preview.lock_update(False, name_preview_lock_update_key)
 
-    self._name_preview.add_function_at_update(
-      self._name_preview.set_sensitive, True)
+      if self._message_setting == setting:
+        self._display_inline_message(None)
 
-    pg.invocation.timeout_add_strict(
-      self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-      self._name_preview.update)
+      self._name_preview.add_function_at_update(
+        self._name_preview.set_sensitive, True)
 
-  def _on_extended_entry_setting_value_not_valid(
-        self, setting, message, _message_id, _details, name_preview_lock_update_key=None):
-    pg.invocation.timeout_add_strict(
-      self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-      self._name_preview.set_sensitive, False)
+      pg.invocation.timeout_add_strict(
+        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
+        self._name_preview.update)
+    else:
+      pg.invocation.timeout_add_strict(
+        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
+        self._name_preview.set_sensitive, False)
 
-    self._display_inline_message(message, Gtk.MessageType.ERROR, setting)
+      self._display_inline_message(validation_result.message, Gtk.MessageType.ERROR, setting)
 
-    self._name_preview.lock_update(True, name_preview_lock_update_key)
+      self._name_preview.lock_update(True, name_preview_lock_update_key)
 
   @staticmethod
   def _on_file_extension_entry_focus_out_event(entry, event, setting):
