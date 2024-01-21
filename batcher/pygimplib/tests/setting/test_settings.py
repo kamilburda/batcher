@@ -72,7 +72,13 @@ class TestSetting(unittest.TestCase):
     setting = stubs_setting.StubSetting('file_extension', default_value=None)
 
     self.assertFalse(setting.is_valid)
-  
+
+  def test_validate_for_valid_value(self):
+    self.assertIsNone(self.setting.validate('jpg'))
+
+  def test_validate_for_invalid_value(self):
+    self.assertIsInstance(self.setting.validate(''), settings_.ValueNotValidData)
+
   def test_assign_empty_value_not_allowed(self):
     self.setting.set_value('')
 

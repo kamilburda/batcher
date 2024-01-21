@@ -1,5 +1,8 @@
 """API to create and manage plug-in settings."""
 
+from __future__ import annotations
+
+import collections
 from collections.abc import Iterable
 import copy
 import importlib
@@ -252,7 +255,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._tags = set(tags) if tags is not None else set()
 
     if self._should_validate_default_value():
-      self._validate_setting(self._value)
+      self._validate_value(self._value)
   
   @property
   def name(self) -> str:
@@ -550,7 +553,26 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     effect.
     """
     return persistor_.Persistor.save([self], *args, **kwargs)
-  
+
+  def validate(self, value) -> Union[None, ValueNotValidData]:
+    """Validates the given ``value`` for this setting.
+
+    If ``value`` is valid, ``None`` is returned, otherwise a `ValueNotValidData`
+    tuple is returned, containing a message and an ID describing the problem.
+    """
+    value_not_valid_args = self._validate(value)
+
+    if value_not_valid_args is not None:
+      if not isinstance(value_not_valid_args, Iterable) or isinstance(value_not_valid_args, str):
+        value_not_valid_args = (value_not_valid_args,)
+
+      if len(value_not_valid_args) > 2:
+        value_not_valid_args = value_not_valid_args[:2]
+
+      return ValueNotValidData(*value_not_valid_args)
+    else:
+      return value_not_valid_args
+
   def is_value_empty(self) -> bool:
     """Returns ``True`` if the setting value is one of the empty values defined
     for the setting class, ``False`` otherwise.
@@ -708,14 +730,14 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   def _validate_and_assign_value(self, value):
     if not self._allow_empty_values:
-      self._validate_setting(value)
+      self._validate_value(value)
     else:
       if not self._is_value_empty(value):
-        self._validate_setting(value)
+        self._validate_value(value)
     
     self._assign_value(value)
 
-  def _validate_setting(self, value):
+  def _validate_value(self, value):
     self._is_valid = True
 
     value_not_valid_args = self._validate(value)
@@ -2868,6 +2890,9 @@ def array_as_pdb_compatible_type(
     return values
 
 
+ValueNotValidData = collections.namedtuple('ValueNotValidData', ['message', 'id'])
+
+
 _ARRAY_GTYPES_TO_SETTING_TYPES = {
   Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
   Gimp.FloatArray.__gtype__: (ArraySetting, dict(element_type=FloatSetting)),
@@ -2880,6 +2905,7 @@ __all__ = [
   'get_setting_type_from_gtype',
   'get_array_setting_type_from_gimp_object_array',
   'array_as_pdb_compatible_type',
+  'ValueNotValidData',
 ]
 
 for name, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):
