@@ -39,7 +39,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
 
   Subclasses of `Presenter` can wrap any attribute of a widget as a value.
   Specifically, accessing and modifying the value must be defined in the
-  `_get_value()` and `_set_value()` methods, respectively. The value does not
+  `get_value()` and `_set_value()` methods, respectively. The value does not
   have to be a "typical" property, e.g. the checked state of a check button,
   but also e.g. the label of the check button.
   
@@ -215,7 +215,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
     return None
   
   @abc.abstractmethod
-  def _get_value(self):
+  def get_value(self):
     """Returns the value of the GUI widget."""
     pass
   
@@ -231,7 +231,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
   
   def _copy_state(self, old_presenter):
     # noinspection PyProtectedMember
-    self._set_value(old_presenter._get_value())
+    self._set_value(old_presenter.get_value())
     self.set_sensitive(old_presenter.get_sensitive())
     self.set_visible(old_presenter.get_visible())
     
@@ -241,7 +241,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
   def _update_setting_value(self):
     """Assigns the GUI widget value, entered by the user, to the setting value.
     """
-    self._setting_value_synchronizer.apply_gui_value_to_setting(self._get_value())
+    self._setting_value_synchronizer.apply_gui_value_to_setting(self.get_value())
   
   @abc.abstractmethod
   def _connect_value_changed_event(self):
@@ -325,7 +325,7 @@ class NullPresenter(Presenter):
   def update_setting_value(self, force=False):
     pass
   
-  def _get_value(self):
+  def get_value(self):
     return self._value
   
   def _set_value(self, value):

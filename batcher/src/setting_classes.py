@@ -89,7 +89,7 @@ class ExtendedEntryPresenter(pg.setting.GtkPresenter):
   Value: Text in the entry.
   """
 
-  def _get_value(self):
+  def get_value(self):
     text = self._widget.get_text()
     return text if text is not None else ''
 

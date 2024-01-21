@@ -57,7 +57,7 @@ class StubPresenter(presenter_.Presenter):
   def _create_widget(self, setting, **kwargs):
     return GuiWidgetStub(setting.value)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.value
   
   def _set_value(self, value):

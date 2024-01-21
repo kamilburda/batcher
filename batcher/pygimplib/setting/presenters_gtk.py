@@ -64,7 +64,7 @@ class IntSpinButtonPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return _create_spin_button(setting, digits=0)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_value_as_int()
   
   def _set_value(self, value):
@@ -82,7 +82,7 @@ class FloatSpinButtonPresenter(GtkPresenter):
   def _create_widget(self, setting, digits=None, **kwargs):
     return _create_spin_button(setting, digits=digits)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_value()
   
   def _set_value(self, value):
@@ -100,7 +100,7 @@ class CheckButtonPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return Gtk.CheckButton(label=setting.display_name, use_underline=False)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_active()
   
   def _set_value(self, value):
@@ -124,7 +124,7 @@ class CheckButtonLabelPresenter(GtkPresenter):
   Value: Label of the check button.
   """
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_child().get_text()
   
   def _set_value(self, value):
@@ -142,7 +142,7 @@ class CheckMenuItemPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return Gtk.CheckMenuItem(label=setting.display_name)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_active()
   
   def _set_value(self, value):
@@ -160,7 +160,7 @@ class ExpanderPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return Gtk.Expander(label=setting.display_name, use_underline=True)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_expanded()
   
   def _set_value(self, value):
@@ -176,7 +176,7 @@ class EntryPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return Gtk.Entry()
 
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_text()
 
   def _set_value(self, value):
@@ -210,7 +210,7 @@ class ComboBoxPresenter(GtkPresenter):
     
     return combo_box
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_active()
   
   def _set_value(self, value):
@@ -250,7 +250,7 @@ class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
 
     return combo_box
 
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_active().value
 
   def _set_value(self, value):
@@ -283,7 +283,7 @@ class ImageComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.ImageComboBox.new()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Image.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -310,7 +310,7 @@ class ItemComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return pggui.GimpItemComboBox()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Item.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -332,7 +332,7 @@ class DrawableComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.DrawableComboBox.new()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Drawable.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -354,7 +354,7 @@ class LayerComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Layer.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -377,7 +377,7 @@ class TextLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.LayerComboBox.new(lambda image, item: item.is_text_layer())
 
-  def _get_value(self):
+  def get_value(self):
     return Gimp.TextLayer.get_by_id(self._widget.get_active().value)
 
   def _set_value(self, value):
@@ -401,7 +401,7 @@ class LayerMaskComboBoxPresenter(GimpObjectComboBoxPresenter):
     return GimpUi.LayerComboBox.new(
       lambda image, item: item.is_layer() and item.get_mask() is not None)
 
-  def _get_value(self):
+  def get_value(self):
     layer = Gimp.Layer.get_by_id(self._widget.get_active().value)
 
     if layer is not None:
@@ -431,7 +431,7 @@ class ChannelComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.ChannelComboBox.new()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Channel.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -453,7 +453,7 @@ class VectorsComboBoxPresenter(GimpObjectComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     return GimpUi.VectorsComboBox.new()
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Vectors.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
@@ -477,7 +477,7 @@ class ColorButtonPresenter(GtkPresenter):
     return GimpUi.ColorButton.new(
       setting.display_name, width, height, setting.value, GimpUi.ColorAreaType.SMALL_CHECKS)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_color()
   
   def _set_value(self, value):
@@ -495,7 +495,7 @@ class ParasiteBoxPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return pggui.ParasiteBox(setting.value)
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_parasite()
   
   def _set_value(self, value):
@@ -524,7 +524,7 @@ class DisplaySpinButtonPresenter(GtkPresenter):
       numeric=True,
     )
   
-  def _get_value(self):
+  def get_value(self):
     return Gimp.Display.get_by_id(self._widget.get_value_as_int())
   
   def _set_value(self, value):
@@ -548,7 +548,7 @@ class GFileEntryPresenter(GtkPresenter):
 
     return widget
 
-  def _get_value(self):
+  def get_value(self):
     return Gio.file_new_for_path(self._widget.get_text())
 
   def _set_value(self, value):
@@ -571,7 +571,7 @@ class GBytesEntryPresenter(GtkPresenter):
 
     return widget
 
-  def _get_value(self):
+  def get_value(self):
     return GLib.Bytes.new(
       pgutils.escaped_string_to_bytes(self._widget.get_text(), remove_overflow=True))
 
@@ -591,7 +591,7 @@ class FolderChooserWidgetPresenter(GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return pggui.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
   
-  def _get_value(self):
+  def get_value(self):
     folder = self._widget.get_current_folder()
 
     if folder is not None:
@@ -621,7 +621,7 @@ class FolderChooserButtonPresenter(GtkPresenter):
 
     return button
   
-  def _get_value(self):
+  def get_value(self):
     folder = self._widget.get_filename()
 
     if folder is not None:
@@ -642,7 +642,7 @@ class GimpResourceSelectButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'resource-set'
 
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_resource()
   
   def _set_value(self, value):
@@ -771,7 +771,7 @@ class ArrayBoxPresenter(GtkPresenter):
     
     return array_box
   
-  def _get_value(self):
+  def get_value(self):
     return tuple(array_element.value for array_element in self._setting.get_elements())
   
   def _set_value(self, value):
@@ -786,7 +786,7 @@ class ArrayBoxPresenter(GtkPresenter):
     self._widget.on_add_item = orig_on_add_item
   
   def _on_item_changed(self, *args):
-    self._setting_value_synchronizer.apply_gui_value_to_setting(self._get_value())
+    self._setting_value_synchronizer.apply_gui_value_to_setting(self.get_value())
   
   def _add_array_element(self, array_element, array_box):
     def _on_array_box_item_changed(array_element):
@@ -807,7 +807,7 @@ class WindowPositionPresenter(GtkPresenter):
   Value: Current position of the window as a tuple of 2 integers.
   """
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_position()
   
   def _set_value(self, value):
@@ -825,7 +825,7 @@ class WindowSizePresenter(GtkPresenter):
   Value: Current size of the window as a tuple of 2 integers.
   """
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_size()
   
   def _set_value(self, value):
@@ -843,7 +843,7 @@ class PanedPositionPresenter(GtkPresenter):
   Value: Position of the divider between the two panes.
   """
   
-  def _get_value(self):
+  def get_value(self):
     return self._widget.get_position()
   
   def _set_value(self, value):

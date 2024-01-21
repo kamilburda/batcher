@@ -40,7 +40,7 @@ class PlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
 
     return combo_box
   
-  def _get_value(self):
+  def get_value(self):
     return self._indexes_and_placeholder_names[self._widget.get_active()]
   
   def _set_value(self, value):
@@ -57,7 +57,7 @@ class UnsupportedParameterPresenter(pg.setting.GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return create_placeholder_widget()
 
-  def _get_value(self):
+  def get_value(self):
     return self._value
 
   def _set_value(self, value):
