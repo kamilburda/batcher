@@ -71,6 +71,15 @@ class SettingEventsMixin:
   """
   
   _event_handler_id_counter = itertools.count(start=1)
+
+  # key: event type
+  # value: {event handler ID: [event handler, arguments, keyword arguments, is enabled]}
+  _global_event_handlers = collections.defaultdict(dict)
+
+  # This allows faster lookup of global events via IDs.
+  # key: event handler ID
+  # value: event type
+  _global_event_handler_ids_and_types = {}
   
   def __init__(self):
     super().__init__()
@@ -134,18 +143,61 @@ class SettingEventsMixin:
     self._event_handler_ids_and_types[event_id] = event_type
     
     return event_id
-  
+
+  @classmethod
+  def connect_event_global(
+        cls,
+        event_type: str,
+        event_handler: Callable,
+        *event_handler_args,
+        **event_handler_kwargs,
+  ) -> int:
+    """Connects a global event handler, which is invoked for any `Setting`
+    instance.
+
+    For information about parameters, see `connect_event`.
+
+    Returns:
+      Numeric ID of the event handler. The ID can be used to remove the event
+      via `remove_event_global()`.
+
+    Raises:
+      TypeError: ``event_handler`` is not a function or the wrong number of
+        arguments was passed.
+    """
+    if not callable(event_handler):
+      raise TypeError(f'{event_handler} is not a function')
+
+    event_id = next(cls._event_handler_id_counter)
+    cls._global_event_handlers[event_type][event_id] = [
+      event_handler, event_handler_args, event_handler_kwargs, True]
+    cls._global_event_handler_ids_and_types[event_id] = event_type
+
+    return event_id
+
   def remove_event(self, event_id: int):
     """Removes the event handler specified by its ID as returned by
     `connect_event()`.
     """
-    if not self.has_event(event_id):
+    if event_id not in self._event_handler_ids_and_types:
       raise ValueError(f'event handler with ID {event_id} does not exist')
-    
+
     event_type = self._event_handler_ids_and_types[event_id]
     del self._event_handlers[event_type][event_id]
     del self._event_handler_ids_and_types[event_id]
-  
+
+  @classmethod
+  def remove_event_global(cls, event_id: int):
+    """Removes the global event handler specified by its ID as returned by
+    `connect_event_global()`.
+    """
+    if event_id not in cls._global_event_handler_ids_and_types:
+      raise ValueError(f'global event handler with ID {event_id} does not exist')
+
+    event_type = cls._global_event_handler_ids_and_types[event_id]
+    del cls._global_event_handlers[event_type][event_id]
+    del cls._global_event_handler_ids_and_types[event_id]
+
   def set_event_enabled(self, event_id: int, enabled: bool):
     """Enables or disables the event handler specified by its ID.
 
@@ -157,20 +209,39 @@ class SettingEventsMixin:
       ValueError:
         ``event_id`` is not valid.
     """
-    if not self.has_event(event_id):
+    if event_id not in self._event_handler_ids_and_types:
       raise ValueError(f'event handler with ID {event_id} does not exist')
 
     event_type = self._event_handler_ids_and_types[event_id]
     self._event_handlers[event_type][event_id][3] = enabled
+
+  @classmethod
+  def set_event_enabled_global(cls, event_id: int, enabled: bool):
+    """Enables or disables the global event handler specified by its ID.
+
+    For more information, see `set_event_enabled()`.
+    """
+    if event_id not in cls._global_event_handler_ids_and_types:
+      raise ValueError(f'global event handler with ID {event_id} does not exist')
+
+    event_type = cls._global_event_handler_ids_and_types[event_id]
+    cls._global_event_handlers[event_type][event_id][3] = enabled
   
   def has_event(self, event_id: int) -> bool:
     """Returns ``True`` if the event handler specified by its ID exists,
     ``False`` otherwise.
     """
-    return event_id in self._event_handler_ids_and_types
+    return (
+      event_id in self._event_handler_ids_and_types
+      or event_id in self._global_event_handler_ids_and_types
+    )
   
   def invoke_event(self, event_type: str, *additional_args, **additional_kwargs):
     """Manually calls all connected event handlers of the specified event type.
+
+    Global event handlers (connected via `connect_event_global()`) are
+    invoked before any setting-specific event handlers (connected via
+    `connect_event()`).
 
     Usually you do not need to call this function unless you implement custom
     event types (e.g. in a `setting.Setting` subclass) not provided by any
@@ -188,10 +259,12 @@ class SettingEventsMixin:
         `connect_event()` (if any). The same keyword arguments in
         `connect_event()` override keyword arguments in ``**additional_kwargs``.
     """
-    for (event_handler,
-         args,
-         kwargs,
-         enabled) in self._event_handlers[event_type].values():
+    event_handlers = itertools.chain(
+      self._global_event_handlers[event_type].values(),
+      self._event_handlers[event_type].values(),
+    )
+
+    for (event_handler, args, kwargs, enabled) in event_handlers:
       if enabled:
         event_handler_args = additional_args + tuple(args)
         event_handler_kwargs = dict(additional_kwargs, **kwargs)

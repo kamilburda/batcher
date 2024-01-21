@@ -55,19 +55,6 @@ class TestSetting(unittest.TestCase):
     self.assertEqual(
       stubs_setting.StubSetting('file_extension', default_value='png').default_value, 'png')
 
-  def test_value_not_valid_event_is_triggered_upon_invalid_value(self):
-    counter = 0
-
-    def increment_counter():
-      nonlocal counter
-      counter += 1
-
-    self.setting.connect_event('value-not-valid', lambda *args: increment_counter())
-
-    self.setting.set_value(None)
-
-    self.assertEqual(counter, 1)
-
   def test_value_is_not_valid_on_instantiation(self):
     setting = stubs_setting.StubSetting('file_extension', default_value=None)
 
@@ -306,6 +293,53 @@ class TestSettingEvents(unittest.TestCase):
     self.setting.reset()
     self.assertEqual(self.flatten.value, self.flatten.default_value)
     self.assertTrue(self.flatten.gui.get_sensitive())
+
+  def test_value_not_valid_event_is_triggered_upon_invalid_value(self):
+    counter = 0
+
+    def increment_counter():
+      nonlocal counter
+      counter += 1
+
+    self.setting.connect_event('value-not-valid', lambda *args: increment_counter())
+
+    self.setting.set_value(None)
+
+    self.assertEqual(counter, 1)
+
+
+class TestSettingGlobalEvents(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    cls.expected_list = []
+
+    cls.event_id = settings_.Setting.connect_event_global(
+      'value-changed', cls._append_to_list_global)
+
+  @classmethod
+  def tearDownClass(cls):
+    settings_.Setting.remove_event_global(cls.event_id)
+
+  def setUp(self):
+    TestSettingGlobalEvents.expected_list = []
+
+  def test_connect_value_changed_event(self):
+    setting = stubs_setting.StubSetting('file_extension', default_value='png')
+
+    setting.connect_event('value-changed', self._append_to_list)
+
+    setting.set_value('jpg')
+
+    self.assertEqual(self.expected_list, ['global', 'setting'])
+
+  @classmethod
+  def _append_to_list_global(cls, _setting):
+    cls.expected_list.append('global')
+
+  @staticmethod
+  def _append_to_list(_setting):
+    TestSettingGlobalEvents.expected_list.append('setting')
 
 
 class TestSettingGui(unittest.TestCase):
