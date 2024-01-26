@@ -7,6 +7,7 @@ import os
 
 
 c.LOG_MODE = 'error'
+c.WARN_ON_INVALID_SETTING_VALUES = True
 
 c.PLUGIN_NAME = 'batcher'
 c.PLUGIN_TITLE = lambda: _('Batcher')

@@ -2,6 +2,7 @@
 
 import builtins
 import os
+import sys
 from typing import Optional
 
 try:
@@ -96,6 +97,8 @@ def _init_config_initial(
 
   config.LOG_MODE = 'error'
 
+  config.WARN_ON_INVALID_SETTING_VALUES = True
+
 
 def _init_config_logging(config: _Config):
   config.PLUGINS_LOG_DIRPATHS = []
@@ -159,3 +162,10 @@ def _init_config_per_procedure(config: _Config):
     config.PLUGINS_LOG_ERROR_FILENAME,
     config.PLUGIN_TITLE,
   )
+
+  if config.WARN_ON_INVALID_SETTING_VALUES:
+    pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid)
+
+
+def _on_setting_value_not_valid(setting, message, _message_id, _details):
+  print(f'Warning: setting "{setting.get_path()}": {message}', file=sys.stderr)
