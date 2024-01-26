@@ -752,7 +752,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         self, message, message_id, prepend_value=True, value=None):
     self._is_valid = False
 
-    formatted_traceback = pgutils.get_traceback()
+    formatted_traceback = pgutils.get_traceback(stack_levels_to_keep=-2)
 
     if prepend_value:
       processed_message = f'"{value}": {message}'
