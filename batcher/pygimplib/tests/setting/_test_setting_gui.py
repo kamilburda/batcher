@@ -19,11 +19,9 @@ _SETTING_WIDGET_WIDTH = 450
 _SETTING_VALUE_LABEL_WIDTH = 150
 
 
-def test_basic_settings_and_gui():
-  test_settings_and_gui(_get_setting_data())
+def test_settings_and_gui():
+  setting_data = _get_setting_data()
 
-
-def test_settings_and_gui(setting_data):
   pggui.set_gui_excepthook('Test GUI for Settings')
 
   value_not_valid_event_id = settings_.Setting.connect_event_global(
