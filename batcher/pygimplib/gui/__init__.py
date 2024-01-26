@@ -6,5 +6,3 @@ from .gimp_item_combo_box import *
 from .item_box import *
 from .parasite_box import *
 from .utils import *
-
-from .._gui_messages import *

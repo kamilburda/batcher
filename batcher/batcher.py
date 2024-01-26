@@ -6,6 +6,13 @@ import os
 
 import pygimplib as pg
 
+from src import _gui_messages
+
+_gui_messages.set_gui_excepthook(
+  title=pg.config.PLUGIN_TITLE,
+  report_uri_list=pg.config.BUG_REPORT_URL_LIST,
+)
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp

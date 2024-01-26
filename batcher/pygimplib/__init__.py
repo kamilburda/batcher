@@ -52,12 +52,6 @@ else:
   _gimp_modules_available = True
 
 
-if _gimp_modules_available:
-  from . import _gui_messages
-
-  _gui_messages.set_gui_excepthook()
-
-
 from . import configbase
 from . import objectfilter
 from . import utils
@@ -107,9 +101,3 @@ if _gimp_modules_available:
 
 
 config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)
-
-if _gimp_modules_available:
-  _gui_messages.set_gui_excepthook(
-    title=config.PLUGIN_TITLE,
-    report_uri_list=config.BUG_REPORT_URL_LIST,
-  )

@@ -23,6 +23,7 @@ from src import core
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
+from src import _gui_messages
 from src import overwrite
 from src import renamer as renamer_
 from src import update
@@ -285,7 +286,7 @@ class ExportLayersDialog:
 
     GimpUi.window_set_transient(self._dialog)
 
-    pg.gui.set_gui_excepthook_parent(self._dialog)
+    _gui_messages.set_gui_excepthook_parent(self._dialog)
     
     self._folder_chooser_label = Gtk.Label(
       xalign=0.0,
@@ -1179,7 +1180,7 @@ class ExportLayersNowDialog:
     
     self._init_gui()
     
-    pg.gui.set_gui_excepthook_parent(self._dialog)
+    _gui_messages.set_gui_excepthook_parent(self._dialog)
     
     Gtk.main_iteration()
     self.show()

@@ -10,6 +10,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from src import exceptions
+from src import _gui_messages
 
 
 def display_message(
@@ -21,7 +22,7 @@ def display_message(
       button_response_id_to_focus: int = None,
       message_markup: bool = False,
 ):
-  return pg.gui.display_message(
+  return _gui_messages.display_message(
     message,
     message_type,
     parent=parent,
@@ -44,7 +45,7 @@ def display_failure_message(
       'If you believe this is an error in the plug-in, you can help fix it'
       ' by sending a report with the text in the details to one of the sites below')
   
-  pg.gui.display_alert_message(
+  _gui_messages.display_alert_message(
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,

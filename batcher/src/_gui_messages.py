@@ -20,14 +20,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-__all__ = [
-  'display_alert_message',
-  'display_message',
-  'add_gui_excepthook',
-  'set_gui_excepthook',
-  'set_gui_excepthook_parent',
-]
-
 
 ERROR_EXIT_STATUS = 1
 
