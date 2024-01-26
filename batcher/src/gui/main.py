@@ -23,21 +23,20 @@ from src import core
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
-from src import _gui_messages
 from src import overwrite
 from src import renamer as renamer_
 from src import update
 from src import utils as utils_
 
 from src.gui import actions as actions_
-from src.gui import entries as entries_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
-from src.gui import preview_image as preview_image_
-from src.gui import preview_name as preview_name_
-from src.gui import previews_controller as previews_controller_
 from src.gui import progress_updater as progress_updater_
+from src.gui.entry import entries as entries_
+from src.gui.preview import controller as previews_controller_
+from src.gui.preview import image as preview_image_
+from src.gui.preview import name as preview_name_
 
 
 def display_reset_prompt(parent=None):
@@ -286,7 +285,7 @@ class ExportLayersDialog:
 
     GimpUi.window_set_transient(self._dialog)
 
-    _gui_messages.set_gui_excepthook_parent(self._dialog)
+    messages_.set_gui_excepthook_parent(self._dialog)
     
     self._folder_chooser_label = Gtk.Label(
       xalign=0.0,
@@ -1180,7 +1179,7 @@ class ExportLayersNowDialog:
     
     self._init_gui()
     
-    _gui_messages.set_gui_excepthook_parent(self._dialog)
+    messages_.set_gui_excepthook_parent(self._dialog)
     
     Gtk.main_iteration()
     self.show()

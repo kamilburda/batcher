@@ -660,20 +660,20 @@ msgid ""
 "To fix this, save the settings again or reset them."
 msgstr ""
 
-#: ../../export_layers/src/_gui_messages.py:123
+#: ../../export_layers/src/gui/messages.py:123
 msgid "Plug-in"
 msgstr ""
 
-#: ../../export_layers/src/_gui_messages.py:128
+#: ../../export_layers/src/gui/messages.py:128
 msgid "Oops. Something went wrong."
 msgstr ""
 
-#: ../../export_layers/src/_gui_messages.py:132
+#: ../../export_layers/src/gui/messages.py:132
 #, python-brace-format
 msgid "{0} encountered an unexpected error and has to close. Sorry about that!"
 msgstr ""
 
-#: ../../export_layers/src/_gui_messages.py:137
+#: ../../export_layers/src/gui/messages.py:137
 msgid ""
 "You can help fix this error by sending a report with the text in the details "
 "above to one of the following sites"
@@ -681,15 +681,15 @@ msgstr ""
 "Vous pouvez aider à réparer cette erreur en envoyant un rapport de bogue "
 "avec le texte des détails à l'un des sites suivants."
 
-#: ../../export_layers/src/_gui_messages.py:153
+#: ../../export_layers/src/gui/messages.py:153
 msgid "Details"
 msgstr "Détails"
 
-#: ../../export_layers/src/_gui_messages.py:163
+#: ../../export_layers/src/gui/messages.py:163
 msgid "(right-click to copy link)"
 msgstr "(clique-droit pour copier le lien)"
 
-#: ../../export_layers/src/_gui_messages.py:237
+#: ../../export_layers/src/gui/messages.py:237
 msgid "Copy details to clipboard"
 msgstr ""
 
