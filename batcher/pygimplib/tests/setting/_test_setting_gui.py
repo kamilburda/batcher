@@ -10,7 +10,6 @@ from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from ... import gui as pggui
 from ...setting import meta as meta_
 from ...setting import settings as settings_
 
@@ -21,8 +20,6 @@ _SETTING_VALUE_LABEL_WIDTH = 150
 
 def test_settings_and_gui():
   setting_data = _get_setting_data()
-
-  pggui.set_gui_excepthook('Test GUI for Settings')
 
   value_not_valid_event_id = settings_.Setting.connect_event_global(
     'value-not-valid', _on_setting_value_not_valid)
