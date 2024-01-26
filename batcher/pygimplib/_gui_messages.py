@@ -20,8 +20,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from . import utils as pgutils
-
 __all__ = [
   'display_alert_message',
   'display_message',
@@ -418,7 +416,6 @@ def display_message(
 
 
 _gui_excepthook_parent = None
-_gui_excepthook_additional_callback = pgutils.create_empty_func(False)
 # Once this is set to True, it prevents the exception dialog from being
 # displayed again if an exception occurred during `display_alert_message` (which
 # is used to create and display the exception dialog). This prevents potential
@@ -519,11 +516,6 @@ def _gui_excepthook_generic(
       parent,
       report_uri_list):
   global _gui_excepthook_invoked
-
-  callback_result = _gui_excepthook_additional_callback(exc_type, exc_value, exc_traceback)
-
-  if callback_result:
-    return
   
   sys.__excepthook__(exc_type, exc_value, exc_traceback)
   
