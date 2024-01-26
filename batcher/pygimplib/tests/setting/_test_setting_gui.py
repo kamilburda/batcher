@@ -25,6 +25,9 @@ def test_basic_settings_and_gui():
 
 def test_settings_and_gui(setting_data):
   pggui.set_gui_excepthook('Test GUI for Settings')
+
+  value_not_valid_event_id = settings_.Setting.connect_event_global(
+    'value-not-valid', _on_setting_value_not_valid)
   
   settings = []
   
@@ -133,6 +136,8 @@ def test_settings_and_gui(setting_data):
   
   dialog.show_all()
 
+  settings_.Setting.remove_event_global(value_not_valid_event_id)
+
 
 def _get_setting_data():
   setting_data = {}
@@ -223,6 +228,90 @@ def _on_setting_value_changed(
   
   setting_value_changed_call_count_label.set_label(
     str(int(setting_value_changed_call_count_label.get_label()) + 1))
+
+
+def _on_setting_value_not_valid(_setting, message, _message_id, details):
+  print(_setting.name)
+
+  dialog = Gtk.Dialog()
+
+  dialog.vbox.pack_start(
+    Gtk.Label(
+      use_markup=True,
+      label='<b>Warning:</b>',
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+      wrap=True,
+      max_width_chars=50,
+    ),
+    False,
+    False,
+    0,
+  )
+
+  dialog.vbox.pack_start(
+    Gtk.Label(
+      label=message,
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+      wrap=True,
+      max_width_chars=50,
+    ),
+    False,
+    False,
+    0,
+  )
+
+  dialog.vbox.pack_start(
+    Gtk.Label(
+      use_markup=True,
+      label='<b>Details:</b>',
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+      wrap=True,
+      max_width_chars=50,
+    ),
+    False,
+    False,
+    0,
+  )
+
+  details_window = Gtk.ScrolledWindow(
+    width_request=300,
+    max_content_width=300,
+    height_request=200,
+    shadow_type=Gtk.ShadowType.IN,
+    hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+    vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+  )
+
+  text_view = Gtk.TextView(
+    buffer=Gtk.TextBuffer(text=details),
+    editable=False,
+    wrap_mode=Gtk.WrapMode.WORD,
+    cursor_visible=False,
+    pixels_above_lines=1,
+    pixels_below_lines=1,
+    pixels_inside_wrap=0,
+    left_margin=5,
+    right_margin=5,
+  )
+
+  details_window.add(text_view)
+
+  dialog.vbox.pack_start(details_window, True, True, 0)
+
+  dialog.vbox.set_spacing(5)
+  dialog.set_border_width(8)
+
+  close_button = dialog.add_button(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE)
+
+  close_button.connect('clicked', lambda *args: dialog.destroy())
+
+  dialog.show_all()
 
 
 def _on_reset_button_clicked(button, settings):
