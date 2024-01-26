@@ -28,7 +28,6 @@ __all__ = [
   'add_gui_excepthook',
   'set_gui_excepthook',
   'set_gui_excepthook_parent',
-  'set_gui_excepthook_additional_callback',
 ]
 
 
@@ -510,21 +509,6 @@ def set_gui_excepthook_parent(parent: Optional[Gtk.Window]):
   global _gui_excepthook_parent
   
   _gui_excepthook_parent = parent
-
-
-def set_gui_excepthook_additional_callback(callback):
-  """Sets a callback to be invoked at the beginning of exception handling before
-  displaying an error dialog.
-
-  If the callback returns ``True``, the exception handling is terminated at
-  this point. Returning ``True`` consequently prevents the error dialog from
-  being displayed and the application from being terminated.
-  
-  The callback takes the same parameters as `sys.excepthook`.
-  """
-  global _gui_excepthook_additional_callback
-  
-  _gui_excepthook_additional_callback = callback
 
 
 def _gui_excepthook_generic(
