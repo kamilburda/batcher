@@ -229,8 +229,6 @@ def _on_setting_value_changed(
 
 
 def _on_setting_value_not_valid(_setting, message, _message_id, details):
-  print(_setting.name)
-
   dialog = Gtk.Dialog()
 
   dialog.vbox.pack_start(
