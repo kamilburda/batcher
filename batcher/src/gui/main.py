@@ -256,10 +256,11 @@ class ExportLayersDialog:
     self._settings['main/constraints'].tags.add('ignore_load')
     
     load_result = self._settings.load()
-    load_messages = '\n\n'.join(
-      message for message in load_result.messages_per_source.values() if message)
     if pg.setting.Persistor.FAIL in load_result.statuses_per_source.values():
-      messages_.display_message(load_messages, Gtk.MessageType.WARNING)
+      messages_.display_message(
+        utils_.format_message_from_persistor_statuses(
+          load_result.statuses_per_source, separator='\n\n'),
+        Gtk.MessageType.WARNING)
     
     _setup_images_and_directories_and_initial_directory(
       self._settings, self._settings['main/output_directory'], self._image)
@@ -708,8 +709,8 @@ class ExportLayersDialog:
            for status in [pg.setting.Persistor.SOURCE_NOT_FOUND, pg.setting.Persistor.FAIL]):
       messages_.display_import_export_settings_failure_message(
         _('Failed to import settings from file "{}"'.format(filepath)),
-        details='\n\n'.join(
-          message for message in load_result.messages_per_source.values() if message),
+        details=utils_.format_message_from_persistor_statuses(
+          load_result.statuses_per_source, separator='\n\n'),
         parent=self._dialog)
       return False
     else:
@@ -725,8 +726,8 @@ class ExportLayersDialog:
     if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
       messages_.display_import_export_settings_failure_message(
         _('Failed to export settings to file "{}"'.format(filepath)),
-        details='\n\n'.join(
-          message for message in save_result.messages_per_source.values() if message),
+        details=utils_.format_message_from_persistor_statuses(
+          save_result.statuses_per_source, separator='\n\n'),
         parent=self._dialog)
       return False
     else:

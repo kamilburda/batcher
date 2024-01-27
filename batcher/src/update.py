@@ -117,7 +117,7 @@ def _load_previous_version(settings):
       load_message = ''
     else:
       load_status = load_result.status
-      load_message = '\n'.join(load_result.messages_per_source.values())
+      load_message = utils_.format_message_from_persistor_statuses(load_result.statuses_per_source)
 
   return previous_version, load_status, load_message
 

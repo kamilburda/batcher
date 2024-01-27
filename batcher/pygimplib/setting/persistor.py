@@ -145,19 +145,18 @@ class Persistor:
     
     cls._trigger_event(settings_or_groups, 'before-load', trigger_events)
     
-    settings_not_loaded, statuses_per_source, messages_per_source = cls._load(
+    settings_not_loaded, statuses_per_source = cls._load(
       settings_or_groups, processed_setting_sources)
     
     cls._trigger_event(settings_or_groups, 'after-load', trigger_events)
     
-    return cls._get_return_result(settings_not_loaded, statuses_per_source, messages_per_source)
+    return cls._get_return_result(settings_not_loaded, statuses_per_source)
   
   @classmethod
   def _load(cls, settings_or_groups, setting_sources):
     settings_not_loaded = settings_or_groups
     
     statuses_per_source = {}
-    messages_per_source = {}
     
     for _unused, sources in setting_sources.items():
       for source in sources:
@@ -165,20 +164,17 @@ class Persistor:
           source.read(settings_not_loaded)
         except _sources_errors.SourceNotFoundError as e:
           statuses_per_source[source] = cls.SOURCE_NOT_FOUND
-          messages_per_source[source] = str(e)
         except _sources_errors.SourceError as e:
           statuses_per_source[source] = cls.FAIL
-          messages_per_source[source] = str(e)
         else:
           statuses_per_source[source] = cls.SUCCESS
-          messages_per_source[source] = ''
           
           if source.settings_not_loaded:
             settings_not_loaded = source.settings_not_loaded
           else:
-            return [], statuses_per_source, messages_per_source
+            return [], statuses_per_source
     
-    return settings_not_loaded, statuses_per_source, messages_per_source
+    return settings_not_loaded, statuses_per_source
   
   @classmethod
   def save(
@@ -233,17 +229,15 @@ class Persistor:
     
     cls._trigger_event(settings_or_groups, 'before-save', trigger_events)
     
-    statuses_per_source, messages_per_source = cls._save(
-      settings_or_groups, processed_setting_sources)
+    statuses_per_source = cls._save(settings_or_groups, processed_setting_sources)
     
     cls._trigger_event(settings_or_groups, 'after-save', trigger_events)
     
-    return cls._get_return_result([], statuses_per_source, messages_per_source)
+    return cls._get_return_result([], statuses_per_source)
   
   @classmethod
   def _save(cls, settings_or_groups, setting_sources):
     statuses_per_source = {}
-    messages_per_source = {}
     
     for _unused, sources in setting_sources.items():
       for source in sources:
@@ -251,12 +245,10 @@ class Persistor:
           source.write(settings_or_groups)
         except _sources_errors.SourceError as e:
           statuses_per_source[source] = cls.FAIL
-          messages_per_source[source] = str(e)
         else:
           statuses_per_source[source] = cls.SUCCESS
-          messages_per_source[source] = ''
     
-    return statuses_per_source, messages_per_source
+    return statuses_per_source
   
   @classmethod
   def clear(
@@ -292,29 +284,24 @@ class Persistor:
         setting.invoke_event(event_name)
   
   @staticmethod
-  def _result(
-        status, settings_not_loaded=None, statuses_per_source=None, messages_per_source=None):
+  def _result(status, settings_not_loaded=None, statuses_per_source=None):
     if settings_not_loaded is None:
       settings_not_loaded = []
     
     if statuses_per_source is None:
       statuses_per_source = {}
     
-    if messages_per_source is None:
-      messages_per_source = {}
-    
-    return PersistorResult(status, settings_not_loaded, statuses_per_source, messages_per_source)
+    return PersistorResult(status, settings_not_loaded, statuses_per_source)
   
   @classmethod
-  def _get_return_result(cls, settings_not_loaded, statuses_per_source, messages_per_source):
+  def _get_return_result(cls, settings_not_loaded, statuses_per_source):
     if (all(status == cls.SUCCESS for status in statuses_per_source.values())
         and not settings_not_loaded):
       return cls._result(cls.SUCCESS)
     elif all(status == cls.FAIL for status in statuses_per_source.values()):
-      return cls._result(cls.FAIL, settings_not_loaded, statuses_per_source, messages_per_source)
+      return cls._result(cls.FAIL, settings_not_loaded, statuses_per_source)
     else:
-      return cls._result(
-        cls.PARTIAL_SUCCESS, settings_not_loaded, statuses_per_source, messages_per_source)
+      return cls._result(cls.PARTIAL_SUCCESS, settings_not_loaded, statuses_per_source)
   
   @classmethod
   def _process_setting_sources(cls, setting_sources):
@@ -366,7 +353,7 @@ class Persistor:
 
 PersistorResult = collections.namedtuple(
   'PersistorResult',
-  ['status', 'settings_not_loaded', 'statuses_per_source', 'messages_per_source'])
+  ['status', 'settings_not_loaded', 'statuses_per_source'])
 """Data describing the result of `Persistor.load()` or `Persistor.save()`.
 
 The names of parameters below are parameters passed to `Persistor.load()` or
@@ -423,8 +410,4 @@ Args:
     * ``SOURCE_NOT_FOUND`` - The source was not found when attempting to load
       settings, either because the corresponding file is missing or the source
       name does not exist.
-  messages_per_source
-    Messages for each setting source passed to `Persistor.load()` or 
-    `Persistor.save()`. It is a dictionary of (setting source, message) 
-    pairs.
 """

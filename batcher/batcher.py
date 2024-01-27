@@ -108,7 +108,8 @@ def _load_settings_from_file(settings_file):
        pg.setting.Persistor.SUCCESS, pg.setting.Persistor.PARTIAL_SUCCESS]:
     error_message = _('Failed to load settings from file.')
 
-    load_message = '\n'.join(load_result.messages_per_source.values()).strip()
+    load_message = utils_.format_message_from_persistor_statuses(
+      load_result.statuses_per_source).strip()
     if load_message:
       error_message += ' ' + _('Reason: {}').format(load_message)
 

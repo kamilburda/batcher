@@ -82,8 +82,7 @@ class Source(metaclass=abc.ABCMeta):
     """
     data = self.read_data_from_source()
     if data is None:
-      raise SourceNotFoundError(
-        _('Could not find setting source "{}".').format(self.source_name))
+      raise SourceNotFoundError
     
     self._settings_not_loaded = []
     
@@ -523,7 +522,12 @@ class GimpParasiteSource(Source):
     super().__init__(source_name)
 
     self._parasite_filepath = os.path.join(Gimp.directory(), 'parasiterc')
-  
+
+  @property
+  def filepath(self):
+    """Path to the file containing saved settings."""
+    return self._parasite_filepath
+
   def clear(self):
     if Gimp.get_parasite(self.source_name) is None:
       return
@@ -542,11 +546,7 @@ class GimpParasiteSource(Source):
     try:
       data = pickle.loads(parasite_data)
     except Exception:
-      raise SourceInvalidFormatError(
-        _('Settings for this plug-in stored in "{}" may be corrupt.'
-          ' This could happen if the file was edited manually.'
-          '\nTo fix this, save the settings again or reset them.').format(
-            self._parasite_filepath))
+      raise SourceInvalidFormatError
     
     return data
   
