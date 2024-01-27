@@ -29,6 +29,7 @@ from src import update
 from src import utils as utils_
 
 from src.gui import actions as actions_
+from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
@@ -368,9 +369,7 @@ class ExportLayersDialog:
       maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
       default_item=self._settings['main/layer_filename_pattern'].default_value)
     self._filename_pattern_entry.set_activates_default(True)
-    
-    self._label_message = message_label_.MessageLabel()
-    
+
     self._hbox_export_name_labels = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
@@ -391,14 +390,19 @@ class ExportLayersDialog:
     )
     self._hbox_export_name.pack_start(self._hbox_export_name_labels, False, False, 0)
     self._hbox_export_name.pack_start(self._hbox_export_name_entries, False, False, 0)
-    
-    self._hbox_export_name_and_message = Gtk.Box(
+
+    self._label_message = message_label_.MessageLabel()
+
+    self._box_warning_messages = message_box_.SettingValueNotValidMessageBox(message_type=Gtk.MessageType.WARNING)
+
+    self._hbox_export_name_and_messages = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING,
       border_width=self._HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH,
     )
-    self._hbox_export_name_and_message.pack_start(self._hbox_export_name, False, False, 0)
-    self._hbox_export_name_and_message.pack_start(self._label_message, True, True, 0)
+    self._hbox_export_name_and_messages.pack_start(self._hbox_export_name, False, False, 0)
+    self._hbox_export_name_and_messages.pack_start(self._box_warning_messages, False, False, 0)
+    self._hbox_export_name_and_messages.pack_start(self._label_message, True, True, 0)
     
     self._box_procedures = actions_.ActionBox(
       self._settings['main/procedures'],
@@ -437,7 +441,7 @@ class ExportLayersDialog:
       spacing=self._DIALOG_VBOX_SPACING,
     )
     self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, True, True, 0)
-    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name_and_message, False, False, 0)
+    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name_and_messages, False, False, 0)
     
     self._vpaned_chooser_and_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
