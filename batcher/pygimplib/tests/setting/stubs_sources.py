@@ -5,8 +5,8 @@ from ...setting import sources as sources_
 
 class StubSource(sources_.Source):
 
-  def __init__(self, source_name):
-    super().__init__(source_name)
+  def __init__(self, name):
+    super().__init__(name)
 
     self.data = []
 

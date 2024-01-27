@@ -35,8 +35,8 @@ class Source(metaclass=abc.ABCMeta):
   
   _MAX_LENGTH_OF_OBJECT_AS_STRING_ON_ERROR_OUTPUT = 512
   
-  def __init__(self, source_name: str):
-    self.source_name = source_name
+  def __init__(self, name: str):
+    self.name = name
     """A unique identifier to distinguish sources from different GIMP plug-ins
     or procedures within a GIMP plug-in."""
     
@@ -74,8 +74,7 @@ class Source(metaclass=abc.ABCMeta):
     
     Raises:
       SourceNotFoundError:
-        Could not find the source having the `source_name` attribute as its
-        name.
+        Could not find the source having the `name` attribute as its name.
       SourceInvalidFormatError:
         Existing data in the source have an invalid format. This could happen if
         the source was edited manually.
@@ -466,8 +465,9 @@ class Source(metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def clear(self):
     """Removes all settings from the source.
-    
-    Settings not belonging to `source_name` are kept intact.
+
+    Settings not belonging to the source name (corresponding to the `name`
+    attribute) are kept intact.
     
     This method is useful if settings are renamed, since the old settings would
     not be removed and would thus lead to bloating the source.
@@ -518,8 +518,8 @@ class GimpParasiteSource(Source):
   The ``parasiterc`` file maintained by GIMP is used as the persistent source.
   """
   
-  def __init__(self, source_name: str):
-    super().__init__(source_name)
+  def __init__(self, name: str):
+    super().__init__(name)
 
     self._parasite_filepath = os.path.join(Gimp.directory(), 'parasiterc')
 
@@ -529,16 +529,16 @@ class GimpParasiteSource(Source):
     return self._parasite_filepath
 
   def clear(self):
-    if Gimp.get_parasite(self.source_name) is None:
+    if Gimp.get_parasite(self.name) is None:
       return
     
-    Gimp.detach_parasite(self.source_name)
+    Gimp.detach_parasite(self.name)
   
   def has_data(self):
-    return Gimp.get_parasite(self.source_name) is not None
+    return Gimp.get_parasite(self.name) is not None
   
   def read_data_from_source(self):
-    parasite = Gimp.get_parasite(self.source_name)
+    parasite = Gimp.get_parasite(self.name)
     if parasite is None:
       return None
 
@@ -553,7 +553,7 @@ class GimpParasiteSource(Source):
   def write_data_to_source(self, data):
     Gimp.attach_parasite(
       Gimp.Parasite.new(
-        self.source_name,
+        self.name,
         Gimp.PARASITE_PERSISTENT,
         pgutils.bytes_to_signed_bytes(pickle.dumps(data))))
 
@@ -566,8 +566,8 @@ class JsonFileSource(Source):
   chosen by the user.
   """
   
-  def __init__(self, source_name: str, filepath: str):
-    super().__init__(source_name)
+  def __init__(self, name: str, filepath: str):
+    super().__init__(name)
     
     self._filepath = filepath
   
@@ -578,8 +578,8 @@ class JsonFileSource(Source):
   
   def clear(self):
     all_data = self.read_all_data()
-    if all_data is not None and self.source_name in all_data:
-      del all_data[self.source_name]
+    if all_data is not None and self.name in all_data:
+      del all_data[self.name]
       
       self.write_all_data(all_data)
 
@@ -588,8 +588,9 @@ class JsonFileSource(Source):
     format, ``'invalid_format'`` if the source contains some data, but the data
     do not have a valid format, and ``False`` otherwise.
 
-    ``'invalid_format'`` represents an ambiguous value since there is no way to
-    determine if there are data under `source_name` or not.
+    ``'invalid_format'`` represents an ambiguous value since there is no way
+    to determine if there are data under the source name (corresponding to
+    the `name` attribute) or not.
     """
     try:
       data = self.read_data_from_source()
@@ -600,17 +601,17 @@ class JsonFileSource(Source):
   
   def read_data_from_source(self):
     all_data = self.read_all_data()
-    if all_data is not None and self.source_name in all_data:
-      return all_data[self.source_name]
+    if all_data is not None and self.name in all_data:
+      return all_data[self.name]
     else:
       return None
   
   def write_data_to_source(self, data):
     all_data = self.read_all_data()
     if all_data is None:
-      all_data = {self.source_name: data}
+      all_data = {self.name: data}
     else:
-      all_data[self.source_name] = data
+      all_data[self.name] = data
     
     self.write_all_data(all_data)
   
