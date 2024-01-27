@@ -537,16 +537,16 @@ msgid "_Apply action to all files"
 msgstr "_Aktion auf alle Dateien anwenden"
 
 #: ../../batcher/src/gui/overwrite_chooser.py:113
-msgid "A file named \"{}\" already exists in \"{}\". "
+msgid "A file named \"{}\" already exists in \"{}\"."
 msgstr "Eine Datei mit dem Namen \"{}\" existiert bereits in \"{}\"."
 
 #: ../../batcher/src/gui/overwrite_chooser.py:116
-msgid "A file named \"{}\" already exists.\n"
-msgstr "Eine Datei mit dem Namen \"{}\" existiert bereits.\n"
+msgid "A file named \"{}\" already exists."
+msgstr "Eine Datei mit dem Namen \"{}\" existiert bereits."
 
 #: ../../batcher/src/gui/overwrite_chooser.py:118
-msgid "A file with the same name already exists.\n"
-msgstr "Eine Datei mit dem gleichen Namen existiert bereits.\n"
+msgid "A file with the same name already exists."
+msgstr "Eine Datei mit dem gleichen Namen existiert bereits."
 
 #: ../../batcher/src/gui/overwrite_chooser.py:120
 msgid "What would you like to do?"

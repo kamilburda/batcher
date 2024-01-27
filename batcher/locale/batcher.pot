@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 'batcher' 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-27 18:39+0100\n"
+"POT-Creation-Date: 2024-01-27 19:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -529,18 +529,18 @@ msgid "_Apply action to all files"
 msgstr ""
 
 #: ../../batcher/src/gui/overwrite_chooser.py:113
-msgid "A file named \"{}\" already exists in \"{}\". "
+msgid "A file named \"{}\" already exists in \"{}\"."
 msgstr ""
 
-#: ../../batcher/src/gui/overwrite_chooser.py:116
-msgid "A file named \"{}\" already exists.\n"
-msgstr ""
-
-#: ../../batcher/src/gui/overwrite_chooser.py:118
-msgid "A file with the same name already exists.\n"
+#: ../../batcher/src/gui/overwrite_chooser.py:117
+msgid "A file named \"{}\" already exists."
 msgstr ""
 
 #: ../../batcher/src/gui/overwrite_chooser.py:120
+msgid "A file with the same name already exists."
+msgstr ""
+
+#: ../../batcher/src/gui/overwrite_chooser.py:123
 msgid "What would you like to do?"
 msgstr ""
 
