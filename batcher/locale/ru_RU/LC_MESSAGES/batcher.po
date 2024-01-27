@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: export_layers 0.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 12:05+0200\n"
+"POT-Creation-Date: 2024-01-27 18:39+0100\n"
 "PO-Revision-Date: 2017-10-21 17:12+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,655 +19,437 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../../export_layers/actions.py:71
-msgid "Background"
+#: ../../batcher/batcher.py:92
+msgid "\"{}\" is not a valid file with settings"
 msgstr ""
 
-#: ../../export_layers/actions.py:72
-msgid "Foreground"
+#: ../../batcher/batcher.py:99
+msgid "Failed to update the file with settings to the latest version."
 msgstr ""
 
-#: ../../export_layers/actions.py:342
+#: ../../batcher/batcher.py:102 ../../batcher/batcher.py:114
+msgid "Reason: {}"
+msgstr ""
+
+#: ../../batcher/batcher.py:109
+msgid "Failed to load settings from file."
+msgstr ""
+
+#: ../../batcher/batcher.py:178
+msgid "E_xport Layers..."
+msgstr "Экспорт слоёв..."
+
+#: ../../batcher/batcher.py:179 ../../batcher/batcher.py:193
+msgid "Batch"
+msgstr ""
+
+#: ../../batcher/batcher.py:185
+msgid "Export layers as separate images"
+msgstr "Экспортировать слои как отдельные изображения"
+
+#: ../../batcher/batcher.py:192
+msgid "E_xport Layers Now"
+msgstr ""
+
+#: ../../batcher/batcher.py:199
+msgid "Export layers as separate images instantly"
+msgstr ""
+
+#: ../../batcher/config/config.py:13
+msgid "Batcher"
+msgstr ""
+
+#: ../../batcher/src/actions.py:378
 msgid "Built-in"
 msgstr ""
 
-#: ../../export_layers/actions.py:343
+#: ../../batcher/src/actions.py:379
 msgid "GIMP PDB procedure"
 msgstr ""
 
-#: ../../export_layers/actions.py:376
+#: ../../batcher/src/actions.py:419
 msgid "_More options"
 msgstr ""
 
-#: ../../export_layers/actions.py:383
+#: ../../batcher/src/actions.py:426
 msgid "Enable for previews"
 msgstr ""
 
-#: ../../export_layers/actions.py:450
+#: ../../batcher/src/actions.py:495
 msgid "Also apply to parent folders"
 msgstr ""
 
-#: ../../export_layers/background_foreground.py:159
+#: ../../batcher/src/background_foreground.py:168
 msgid "There are no background layers."
 msgstr ""
 
-#: ../../export_layers/background_foreground.py:168
+#: ../../batcher/src/background_foreground.py:177
 msgid "There are no foreground layers."
 msgstr ""
 
-#: ../../export_layers/batcher.py:861
-msgid "Processing \"{}\""
-msgstr ""
-
-#: ../../export_layers/builtin_constraints.py:59
+#: ../../batcher/src/builtin_constraints.py:68
 msgid "Layers"
 msgstr ""
 
-#: ../../export_layers/builtin_constraints.py:65
+#: ../../batcher/src/builtin_constraints.py:74
 msgid "Layer groups"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers matching file extension" when translating this
-#: ../../export_layers/builtin_constraints.py:72
+#: ../../batcher/src/builtin_constraints.py:81
 msgid "Matching file extension"
 msgstr ""
 
+#. FOR TRANSLATORS: Think of "Only layers selected in GIMP" when translating this
+#: ../../batcher/src/builtin_constraints.py:88
+msgid "Selected in GIMP"
+msgstr ""
+
 #. FOR TRANSLATORS: Think of "Only layers selected in preview" when translating this
-#: ../../export_layers/builtin_constraints.py:79
+#: ../../batcher/src/builtin_constraints.py:95
 msgid "Selected in preview"
 msgstr ""
 
-#: ../../export_layers/builtin_constraints.py:84
-#: ../../export_layers/plugin_settings.py:98
+#: ../../batcher/src/builtin_constraints.py:101
+#: ../../batcher/src/plugin_settings.py:101
 msgid "Selected layers"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only top-level layers" when translating this
-#: ../../export_layers/builtin_constraints.py:94
+#: ../../batcher/src/builtin_constraints.py:111
 msgid "Top-level"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only visible layers" when translating this
-#: ../../export_layers/builtin_constraints.py:101
+#: ../../batcher/src/builtin_constraints.py:118
 msgid "Visible"
 msgstr ""
 
-#. FOR TRANSLATORS: Think of "Only layers with tags" when translating this
-#: ../../export_layers/builtin_constraints.py:108
-msgid "With tags"
+#. FOR TRANSLATORS: Think of "Only layers with color tags" when translating this
+#: ../../batcher/src/builtin_constraints.py:125
+msgid "With color tags"
 msgstr ""
 
-#: ../../export_layers/builtin_constraints.py:113
-#: ../../export_layers/builtin_constraints.py:129
-#: ../../export_layers/renamer.py:465
-msgid "Tags"
+#: ../../batcher/src/builtin_constraints.py:130
+#: ../../batcher/src/builtin_constraints.py:146
+msgid "Color tags"
 msgstr ""
 
-#. FOR TRANSLATORS: Think of "Only layers without tags" when translating this
-#: ../../export_layers/builtin_constraints.py:124
-msgid "Without tags"
+#. FOR TRANSLATORS: Think of "Only layers without color tags" when translating this
+#: ../../batcher/src/builtin_constraints.py:141
+msgid "Without color tags"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:151
-#: ../../export_layers/gui/main.py:886
-msgid "Export"
+#: ../../batcher/src/builtin_procedures.py:154
+msgid "Apply opacity from layer groups"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:159
-msgid "Output folder"
+#: ../../batcher/src/builtin_procedures.py:159
+msgid "Insert background"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:166
-#: ../../export_layers/plugin_settings.py:75
-msgid "File extension"
+#: ../../batcher/src/builtin_procedures.py:160
+#: ../../batcher/src/builtin_procedures.py:175
+#: ../../batcher/src/builtin_procedures.py:190
+#: ../../batcher/src/builtin_procedures.py:205
+msgid "Background, foreground"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:175
-msgid "For each layer"
+#: ../../batcher/src/builtin_procedures.py:166
+#: ../../batcher/src/builtin_procedures.py:181
+msgid "Color tag"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:177
-msgid "For each top-level layer or group"
+#: ../../batcher/src/builtin_procedures.py:174
+msgid "Insert foreground"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:180
-msgid "For the entire image at once"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:183
-msgid "Perform export:"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:189
-msgid "Image filename pattern"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:196
-msgid "Use file extension in layer name"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:203
-msgid "Convert file extension to lowercase"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:210
-msgid "Preserve layer name after export"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:218
-msgid "Ignore folder structure"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:224
-msgid "Inherit transparency from layer groups"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:229
-msgid "Insert background layers"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:234
-#: ../../export_layers/builtin_procedures.py:247
-msgid "Tag"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:242
-msgid "Insert foreground layers"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:255
+#: ../../batcher/src/builtin_procedures.py:189
 msgid "Merge background"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:262
-#: ../../export_layers/builtin_procedures.py:280
-msgid "Expand as necessary"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:263
-#: ../../export_layers/builtin_procedures.py:281
-msgid "Clip to image"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:264
-#: ../../export_layers/builtin_procedures.py:282
-msgid "Clip to bottom layer"
-msgstr ""
-
-#: ../../export_layers/builtin_procedures.py:266
-#: ../../export_layers/builtin_procedures.py:284
+#: ../../batcher/src/builtin_procedures.py:197
+#: ../../batcher/src/builtin_procedures.py:212
 msgid "Merge type"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:273
+#: ../../batcher/src/builtin_procedures.py:204
 msgid "Merge foreground"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:291
+#: ../../batcher/src/builtin_procedures.py:219
+#: ../../batcher/src/gui/main.py:893
+msgid "Export"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:229
+msgid "Output folder"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:236
+#: ../../batcher/src/plugin_settings.py:58
+msgid "File extension"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:245
+msgid "For each layer"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:247
+msgid "For each top-level layer or group"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:250
+msgid "For the entire image at once"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:253
+msgid "Perform export:"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:259
+msgid "Image filename pattern"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:266
+msgid "Use file extension in layer name"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:273
+msgid "Convert file extension to lowercase"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:280
+msgid "Preserve layer name after export"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:288
+msgid "Remove folder structure"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:294
 msgid "Rename"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:299
-#: ../../export_layers/plugin_settings.py:90
+#: ../../batcher/src/builtin_procedures.py:302
+#: ../../batcher/src/plugin_settings.py:72
 msgid "Layer filename pattern"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:306
+#: ../../batcher/src/builtin_procedures.py:309
 msgid "Rename layers"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:313
+#: ../../batcher/src/builtin_procedures.py:316
 msgid "Rename folders"
 msgstr ""
 
-#: ../../export_layers/builtin_procedures.py:321
+#: ../../batcher/src/builtin_procedures.py:324
 msgid "Use layer size"
 msgstr ""
 
-#: ../../export_layers/config.py:22 ../../export_layers/config_dev.py:22
-msgid "Export Layers"
-msgstr "Экспортировать слои"
+#: ../../batcher/src/core.py:691
+msgid ""
+"An error occurred. Please check the GIMP error message or the error console "
+"for details, if any."
+msgstr ""
 
-#: ../../export_layers/exceptions.py:51
+#: ../../batcher/src/core.py:933
+msgid "Processing \"{}\""
+msgstr ""
+
+#: ../../batcher/src/exceptions.py:47
 msgid "Layer:"
 msgstr "Слой:"
 
-#: ../../export_layers/exceptions.py:53
+#: ../../batcher/src/exceptions.py:49
 msgid "File extension:"
 msgstr "Расширение файла:"
 
-#: ../../export_layers/export.py:258
+#: ../../batcher/src/export.py:287
 msgid "Saving \"{}\""
 msgstr ""
 
-#: ../../export_layers/gui/actions.py:267
+#: ../../batcher/src/gui/actions.py:291
 msgid "Procedure Browser"
 msgstr ""
 
-#: ../../export_layers/gui/actions.py:291
-msgid "An error occurred while adding procedure \"{}\"."
-msgstr ""
-
-#: ../../export_layers/gui/actions.py:294
-msgid ""
-"Could not add procedure \"{}\" because the parameter type \"{}\" is not "
-"supported."
-msgstr ""
-
-#: ../../export_layers/gui/actions.py:298
-msgid ""
-"You can help fix this issue by sending a report with the text above to one "
-"of the sites below"
-msgstr ""
-
-#: ../../export_layers/gui/actions.py:479
+#: ../../batcher/src/gui/actions.py:486
 msgid "_Reset"
 msgstr ""
 
-#: ../../export_layers/gui/actions.py:603
-msgid "Cannot modify this parameter"
-msgstr ""
-
-#: ../../export_layers/gui/main.py:66
+#: ../../batcher/src/gui/main.py:53
 msgid "Are you sure you want to reset settings?"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:70
-msgid "Remove procedures and constraints"
-msgstr ""
+#: ../../batcher/src/gui/main.py:283 ../../batcher/src/gui/main.py:1194
+msgid "Export Layers"
+msgstr "Экспортировать слои"
 
-#: ../../export_layers/gui/main.py:332
+#: ../../batcher/src/gui/main.py:296
 msgid "Save in folder:"
 msgstr "Сохранить в каталоге:"
 
-#: ../../export_layers/gui/main.py:349
+#: ../../batcher/src/gui/main.py:317
 msgid "Preview"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:380
+#: ../../batcher/src/gui/main.py:359
 msgid "Save as"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:422
+#: ../../batcher/src/gui/main.py:411
 msgid "Add P_rocedure..."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:423
+#: ../../batcher/src/gui/main.py:412
 msgid "Edit Procedure"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:424
+#: ../../batcher/src/gui/main.py:413
 msgid "Add Custom Procedure..."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:429
+#: ../../batcher/src/gui/main.py:418
 msgid "Add C_onstraint..."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:430
+#: ../../batcher/src/gui/main.py:419
 msgid "Edit Constraint"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:465
+#: ../../batcher/src/gui/main.py:462
 msgid "_Export"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:469
+#: ../../batcher/src/gui/main.py:466
 msgid "_Cancel"
 msgstr "Отменить"
 
-#: ../../export_layers/gui/main.py:475 ../../export_layers/gui/main.py:1229
+#: ../../batcher/src/gui/main.py:469 ../../batcher/src/gui/main.py:1200
 msgid "_Stop"
 msgstr "_Стоп"
 
-#: ../../export_layers/gui/main.py:478
+#: ../../batcher/src/gui/main.py:473
 msgid "_Settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:489
+#: ../../batcher/src/gui/main.py:489
 msgid "Show More Settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:490
-msgid "Batch Editing"
+#: ../../batcher/src/gui/main.py:490
+msgid "Edit Layers"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:491
+#: ../../batcher/src/gui/main.py:491
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
-#: ../../export_layers/gui/main.py:492
+#: ../../batcher/src/gui/main.py:492
 msgid "Reset settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:493
+#: ../../batcher/src/gui/main.py:493
 msgid "Import Settings..."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:494
+#: ../../batcher/src/gui/main.py:494
 msgid "Export Settings..."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:511
+#: ../../batcher/src/gui/main.py:586
 msgid "_Help"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:692
+#: ../../batcher/src/gui/main.py:711
 msgid "Failed to import settings from file \"{}\""
 msgstr ""
 
-#: ../../export_layers/gui/main.py:713
+#: ../../batcher/src/gui/main.py:728
 msgid "Failed to export settings to file \"{}\""
 msgstr ""
 
-#: ../../export_layers/gui/main.py:725
+#: ../../batcher/src/gui/main.py:740
 msgid "Settings successfully saved."
 msgstr "Настройки успешно сохранены."
 
-#: ../../export_layers/gui/main.py:734
+#: ../../batcher/src/gui/main.py:749
 msgid "Import Settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:738
+#: ../../batcher/src/gui/main.py:753
 msgid "Export Settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:756
+#: ../../batcher/src/gui/main.py:770
 msgid "Import size-related settings"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:768
+#: ../../batcher/src/gui/main.py:780
 msgid "JSON file ({})"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:779
-msgid "Pickle file ({})"
-msgstr ""
-
-#: ../../export_layers/gui/main.py:784
+#: ../../batcher/src/gui/main.py:788
 msgid "Any file"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:880
+#: ../../batcher/src/gui/main.py:887
 msgid "Run"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:881
+#: ../../batcher/src/gui/main.py:888
 msgid "Close"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:887
+#: ../../batcher/src/gui/main.py:894
 msgid "Cancel"
 msgstr ""
 
-#: ../../export_layers/gui/main.py:907
-msgid "This procedure is skipped. Reason: {}"
-msgstr ""
-
-#: ../../export_layers/gui/main.py:912
-msgid "This constraint is skipped. Reason: {}"
-msgstr ""
-
-#: ../../export_layers/gui/main.py:922
+#: ../../batcher/src/gui/main.py:918
 msgid "Disabling automatic preview update."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:923
+#: ../../batcher/src/gui/main.py:919
 msgid ""
 "The preview takes too long to update. You may turn automatic updates back on "
 "from the menu above the previewed image."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:955
+#: ../../batcher/src/gui/main.py:932
+msgid "This procedure is skipped. Reason: {}"
+msgstr ""
+
+#: ../../batcher/src/gui/main.py:938
+msgid "This constraint is skipped. Reason: {}"
+msgstr ""
+
+#: ../../batcher/src/gui/main.py:972
 msgid "Settings successfully imported."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:964
+#: ../../batcher/src/gui/main.py:981
 msgid "Settings successfully exported."
 msgstr ""
 
-#: ../../export_layers/gui/main.py:988
+#: ../../batcher/src/gui/main.py:995
 msgid "Settings reset."
 msgstr "Настройки сброшены."
 
-#: ../../export_layers/gui/main.py:1032 ../../export_layers/gui/main.py:1279
+#: ../../batcher/src/gui/main.py:1031 ../../batcher/src/gui/main.py:1250
 msgid "No layers were exported."
 msgstr "Никакие слои не экспортировались."
 
-#: ../../export_layers/gui/messages.py:43
-msgid ""
-"If you believe this is an error in the plug-in, you can help fix it by "
-"sending a report with the text in the details to one of the sites below"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:62
-msgid "There was a problem during processing:"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:70
-msgid ""
-"There was a problem during processing. Do not close the image during "
-"processing, keep it open until the processing is finished successfully."
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:85
-msgid ""
-"If you believe this is an error in the plug-in, you can help fix it by "
-"sending a report with the file and the text in the details to one of the "
-"sites below"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:100
-msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:102
-msgid "Failed to apply constraint \"{}\" on \"{}\" because:"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:107
-msgid "Failed to apply procedure \"{}\" because:"
-msgstr ""
-
-#: ../../export_layers/gui/messages.py:109
-msgid "Failed to apply constraint \"{}\" because:"
-msgstr ""
-
-#: ../../export_layers/gui/message_label.py:106
-msgid "_More"
-msgstr ""
-
-#: ../../export_layers/gui/preview_image.py:257
-msgid "Update Preview Automatically"
-msgstr ""
-
-#: ../../export_layers/gui/preview_image.py:265
-msgid "Update Preview"
-msgstr ""
-
-#: ../../export_layers/gui/preview_image.py:384
-msgid "There was a problem with updating the image preview:"
-msgstr ""
-
-#: ../../export_layers/gui/preview_image.py:546
-msgid "No selection"
-msgstr ""
-
-#: ../../export_layers/gui/preview_name.py:281
-msgid "Add New Tag..."
-msgstr ""
-
-#: ../../export_layers/gui/preview_name.py:285
-msgid "Remove Tag"
-msgstr ""
-
-#: ../../export_layers/gui/preview_name.py:438
-msgid "Tag Name:"
-msgstr ""
-
-#: ../../export_layers/placeholders.py:57
-msgid "Current Image"
-msgstr ""
-
-#: ../../export_layers/placeholders.py:58
-msgid "Current Layer"
-msgstr ""
-
-#: ../../export_layers/placeholders.py:60
-msgid "Background Layer"
-msgstr ""
-
-#: ../../export_layers/placeholders.py:62
-msgid "Foreground Layer"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/overwrite_chooser.py:79
-msgid "_Apply action to all files"
-msgstr "_Применить ко всем файлам"
-
-#: ../../export_layers/pygimplib/gui/overwrite_chooser.py:106
-msgid "A file named \"{}\" already exists in \"{}\". "
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/overwrite_chooser.py:109
-msgid "A file named \"{}\" already exists.\n"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/overwrite_chooser.py:111
-msgid "A file with the same name already exists.\n"
-msgstr ""
-
-#: ../../export_layers/pygimplib/gui/overwrite_chooser.py:113
-msgid "What would you like to do?"
-msgstr ""
-
-#: ../../export_layers/pygimplib/path/validators.py:114
-msgid "Filename is not specified."
-msgstr "Имя файла не указано."
-
-#: ../../export_layers/pygimplib/path/validators.py:116
-msgid "Filename contains invalid characters."
-msgstr "Название файла содержит недопустимые символы."
-
-#: ../../export_layers/pygimplib/path/validators.py:118
-msgid "Filename cannot end with spaces."
-msgstr "Имя файла не должно заканчиваться пробелом."
-
-#: ../../export_layers/pygimplib/path/validators.py:120
-msgid "Filename cannot end with a period."
-msgstr "Имя файла не должно заканчиваться периодом."
-
-#: ../../export_layers/pygimplib/path/validators.py:122
-msgid "\"{}\" is a reserved name that cannot be used in filenames.\n"
-msgstr ""
-"\"{}\" - зарегистрированное имя, которое не может быть использовано в именах "
-"файлов.\n"
-
-#: ../../export_layers/pygimplib/path/validators.py:175
-#: ../../export_layers/renamer.py:234
-msgid "Untitled"
-msgstr "Без названия"
-
-#: ../../export_layers/pygimplib/path/validators.py:202
-msgid "File path is not specified."
-msgstr "Путь к файлу не указан."
-
-#: ../../export_layers/pygimplib/path/validators.py:204
-#: ../../export_layers/pygimplib/path/validators.py:304
-msgid "Drive letter contains invalid characters."
-msgstr "Буква диска содержит недопустимые символы."
-
-#: ../../export_layers/pygimplib/path/validators.py:206
-msgid "File path contains invalid characters."
-msgstr "Путь к файлу содержит недопустимые символы."
-
-#: ../../export_layers/pygimplib/path/validators.py:208
-msgid "Path components in the file path cannot end with spaces."
-msgstr "Компоненты пути к файлу не должны заканчиваться пробелом."
-
-#: ../../export_layers/pygimplib/path/validators.py:210
-msgid "Path components in the file path cannot end with a period."
-msgstr "Компоненты пути к файлу не должны заканчиваться периодом."
-
-#: ../../export_layers/pygimplib/path/validators.py:212
-msgid "\"{}\" is a reserved name that cannot be used in file paths.\n"
-msgstr ""
-"\"{}\" - зарегистрированное имя, которое не может быть использовано в пути к "
-"файлу.\n"
-
-#: ../../export_layers/pygimplib/path/validators.py:302
-msgid "Directory path is not specified."
-msgstr "Путь к каталогу не указан."
-
-#: ../../export_layers/pygimplib/path/validators.py:306
-msgid "Directory path contains invalid characters."
-msgstr "Путь к каталогу содержит недопустымые символы."
-
-#: ../../export_layers/pygimplib/path/validators.py:308
-msgid "Path components in the directory path cannot end with spaces."
-msgstr "Компоненты пути к каталогу не могут заканчиваться пробелами."
-
-#: ../../export_layers/pygimplib/path/validators.py:310
-msgid "Path components in the directory path cannot end with a period."
-msgstr "Компоненты пути к каталогу не могут заканчиваться периодами."
-
-#: ../../export_layers/pygimplib/path/validators.py:312
-msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
-msgstr ""
-"\"{}\" - зарегистрированное имя, которое не может быть использовано в пути к "
-"каталогу.\n"
-
-#: ../../export_layers/pygimplib/path/validators.py:314
-msgid "Specified path is not a directory path."
-msgstr ""
-
-#: ../../export_layers/pygimplib/path/validators.py:347
-msgid "File extension is not specified."
-msgstr "Расширение файла не указано."
-
-#: ../../export_layers/pygimplib/path/validators.py:349
-msgid "File extension contains invalid characters."
-msgstr "Расширение файла содержит недопустимые символы."
-
-#: ../../export_layers/pygimplib/path/validators.py:351
-msgid "File extension cannot end with spaces."
-msgstr "Расширение файла не должно заканчиваться пробелом."
-
-#: ../../export_layers/pygimplib/path/validators.py:353
-msgid "File extension cannot end with a period."
-msgstr "Расширение файла не должно заканчиваться периодом."
-
-#: ../../export_layers/pygimplib/setting/sources.py:117
-msgid "Could not find setting source \"{}\"."
-msgstr "Не удалось найти источник настроек \"{}\"."
-
-#: ../../export_layers/pygimplib/setting/sources.py:584
-msgid ""
-"Settings for this plug-in may be corrupt.\n"
-"To fix this, save the settings again or reset them."
-msgstr ""
-
-#: ../../export_layers/pygimplib/setting/sources.py:625
-msgid ""
-"Settings for this plug-in stored in \"{}\" may be corrupt. This could happen "
-"if the file was edited manually.\n"
-"To fix this, save the settings again or reset them."
-msgstr ""
-
-#: ../../export_layers/src/gui/messages.py:123
-msgid "Plug-in"
-msgstr ""
-
-#: ../../export_layers/src/gui/messages.py:128
+#: ../../batcher/src/gui/messages.py:90
 msgid "Oops. Something went wrong."
 msgstr ""
 
-#: ../../export_layers/src/gui/messages.py:132
-#, python-brace-format
-msgid "{0} encountered an unexpected error and has to close. Sorry about that!"
+#: ../../batcher/src/gui/messages.py:94
+msgid ""
+"An unexpected error occurred and the plug-in has to close. Sorry about that!"
 msgstr ""
 
-#: ../../export_layers/src/gui/messages.py:137
+#: ../../batcher/src/gui/messages.py:98
 msgid ""
 "You can help fix this error by sending a report with the text in the details "
 "above to one of the following sites"
@@ -675,199 +457,408 @@ msgstr ""
 "Вы можете помочь исправить ошибку, отправив сообщение с текстом в деталях на "
 "один из следующих сайтов"
 
-#: ../../export_layers/src/gui/messages.py:153
+#: ../../batcher/src/gui/messages.py:158
 msgid "Details"
 msgstr "Детали"
 
-#: ../../export_layers/src/gui/messages.py:163
-msgid "(right-click to copy link)"
-msgstr "(правый клик- копировать ссылку)"
-
-#: ../../export_layers/src/gui/messages.py:237
+#: ../../batcher/src/gui/messages.py:281
 msgid "Copy details to clipboard"
 msgstr ""
 
-#: ../../export_layers/renamer.py:84
+#: ../../batcher/src/gui/messages.py:541
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:561
+msgid "There was a problem during processing:"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:569
+msgid ""
+"There was a problem during processing. Do not close the image during "
+"processing, keep it open until the processing is finished successfully."
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:588
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the file and the text in the details to one of the "
+"sites below"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:608
+msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:610
+msgid "Failed to apply constraint \"{}\" on \"{}\" because:"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:616
+msgid "Failed to apply procedure \"{}\" because:"
+msgstr ""
+
+#: ../../batcher/src/gui/messages.py:618
+msgid "Failed to apply constraint \"{}\" because:"
+msgstr ""
+
+#: ../../batcher/src/gui/message_box.py:52
+msgid "Plug-in errors occurred"
+msgstr ""
+
+#: ../../batcher/src/gui/message_box.py:75
+msgid "The plug-in encountered one or more errors."
+msgstr ""
+
+#: ../../batcher/src/gui/message_box.py:77
+msgid ""
+"The errors should not cause crashes, but you should exercise caution "
+"nonetheless."
+msgstr ""
+
+#: ../../batcher/src/gui/message_box.py:81
+msgid ""
+"You can help fix these errors by sending a report with the text in the "
+"details above to one of the following sites"
+msgstr ""
+
+#: ../../batcher/src/gui/message_label.py:113
+msgid "_More"
+msgstr ""
+
+#: ../../batcher/src/gui/overwrite_chooser.py:73
+msgid "_Apply action to all files"
+msgstr "_Применить ко всем файлам"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:113
+msgid "A file named \"{}\" already exists in \"{}\". "
+msgstr ""
+
+#: ../../batcher/src/gui/overwrite_chooser.py:116
+msgid "A file named \"{}\" already exists.\n"
+msgstr ""
+
+#: ../../batcher/src/gui/overwrite_chooser.py:118
+msgid "A file with the same name already exists.\n"
+msgstr ""
+
+#: ../../batcher/src/gui/overwrite_chooser.py:120
+msgid "What would you like to do?"
+msgstr ""
+
+#: ../../batcher/src/gui/placeholders.py:81
+msgid "Cannot modify this parameter"
+msgstr ""
+
+#: ../../batcher/src/gui/preview/image.py:262
+msgid "Update Image Preview Automatically"
+msgstr ""
+
+#: ../../batcher/src/gui/preview/image.py:273
+msgid "Update Preview"
+msgstr ""
+
+#: ../../batcher/src/gui/preview/image.py:380
+msgid "There was a problem with updating the image preview:"
+msgstr ""
+
+#: ../../batcher/src/gui/preview/image.py:523
+msgid "No selection"
+msgstr ""
+
+#: ../../batcher/src/gui/preview/name.py:392
+msgid "There was a problem with updating the name preview:"
+msgstr ""
+
+#: ../../batcher/src/path/validators.py:82
+msgid "Filename is not specified."
+msgstr "Имя файла не указано."
+
+#: ../../batcher/src/path/validators.py:84
+msgid "Filename contains invalid characters."
+msgstr "Название файла содержит недопустимые символы."
+
+#: ../../batcher/src/path/validators.py:86
+msgid "Filename cannot end with spaces."
+msgstr "Имя файла не должно заканчиваться пробелом."
+
+#: ../../batcher/src/path/validators.py:88
+msgid "Filename cannot end with a period."
+msgstr "Имя файла не должно заканчиваться периодом."
+
+#: ../../batcher/src/path/validators.py:90
+msgid "\"{}\" is a reserved name that cannot be used in filenames.\n"
+msgstr ""
+"\"{}\" - зарегистрированное имя, которое не может быть использовано в именах "
+"файлов.\n"
+
+#: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:236
+msgid "Untitled"
+msgstr "Без названия"
+
+#: ../../batcher/src/path/validators.py:163
+msgid "File path is not specified."
+msgstr "Путь к файлу не указан."
+
+#: ../../batcher/src/path/validators.py:165
+#: ../../batcher/src/path/validators.py:264
+msgid "Drive letter contains invalid characters."
+msgstr "Буква диска содержит недопустимые символы."
+
+#: ../../batcher/src/path/validators.py:167
+msgid "File path contains invalid characters."
+msgstr "Путь к файлу содержит недопустимые символы."
+
+#: ../../batcher/src/path/validators.py:169
+msgid "Path components in the file path cannot end with spaces."
+msgstr "Компоненты пути к файлу не должны заканчиваться пробелом."
+
+#: ../../batcher/src/path/validators.py:171
+msgid "Path components in the file path cannot end with a period."
+msgstr "Компоненты пути к файлу не должны заканчиваться периодом."
+
+#: ../../batcher/src/path/validators.py:173
+msgid "\"{}\" is a reserved name that cannot be used in file paths.\n"
+msgstr ""
+"\"{}\" - зарегистрированное имя, которое не может быть использовано в пути к "
+"файлу.\n"
+
+#: ../../batcher/src/path/validators.py:262
+msgid "Directory path is not specified."
+msgstr "Путь к каталогу не указан."
+
+#: ../../batcher/src/path/validators.py:266
+msgid "Directory path contains invalid characters."
+msgstr "Путь к каталогу содержит недопустымые символы."
+
+#: ../../batcher/src/path/validators.py:268
+msgid "Path components in the directory path cannot end with spaces."
+msgstr "Компоненты пути к каталогу не могут заканчиваться пробелами."
+
+#: ../../batcher/src/path/validators.py:270
+msgid "Path components in the directory path cannot end with a period."
+msgstr "Компоненты пути к каталогу не могут заканчиваться периодами."
+
+#: ../../batcher/src/path/validators.py:272
+msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
+msgstr ""
+"\"{}\" - зарегистрированное имя, которое не может быть использовано в пути к "
+"каталогу.\n"
+
+#: ../../batcher/src/path/validators.py:274
+msgid "Specified path is not a directory path."
+msgstr ""
+
+#: ../../batcher/src/path/validators.py:306
+msgid "File extension is not specified."
+msgstr "Расширение файла не указано."
+
+#: ../../batcher/src/path/validators.py:308
+msgid "File extension contains invalid characters."
+msgstr "Расширение файла содержит недопустимые символы."
+
+#: ../../batcher/src/path/validators.py:310
+msgid "File extension cannot end with spaces."
+msgstr "Расширение файла не должно заканчиваться пробелом."
+
+#: ../../batcher/src/path/validators.py:312
+msgid "File extension cannot end with a period."
+msgstr "Расширение файла не должно заканчиваться периодом."
+
+#: ../../batcher/src/placeholders.py:64
+msgid "Current Image"
+msgstr ""
+
+#: ../../batcher/src/placeholders.py:65 ../../batcher/src/placeholders.py:66
+msgid "Current Layer"
+msgstr ""
+
+#: ../../batcher/src/placeholders.py:67 ../../batcher/src/placeholders.py:68
+msgid "Background Layer"
+msgstr ""
+
+#: ../../batcher/src/placeholders.py:69 ../../batcher/src/placeholders.py:70
+msgid "Foreground Layer"
+msgstr ""
+
+#: ../../batcher/src/plugin_settings.py:65
+msgid "Output directory"
+msgstr "Конечный каталог"
+
+#: ../../batcher/src/plugin_settings.py:73
+msgid "Layer filename pattern (empty string = layer name)"
+msgstr ""
+
+#: ../../batcher/src/plugin_settings.py:81
+msgid "_Replace"
+msgstr "_Зименить"
+
+#: ../../batcher/src/plugin_settings.py:82
+msgid "_Skip"
+msgstr "_Пропустить"
+
+#: ../../batcher/src/plugin_settings.py:83
+msgid "Rename _new file"
+msgstr "Переименовать _новый файл"
+
+#: ../../batcher/src/plugin_settings.py:84
+msgid "Rename _existing file"
+msgstr "Переименовать _существующий файл"
+
+#: ../../batcher/src/plugin_settings.py:86
+msgid "Overwrite mode (non-interactive run mode only)"
+msgstr "Режим перезаписи (только для без-интерактивного режима)"
+
+#: ../../batcher/src/plugin_settings.py:92
+msgid "File with saved settings"
+msgstr ""
+
+#: ../../batcher/src/plugin_settings.py:93
+msgid "File with saved settings (optional)"
+msgstr ""
+
+#: ../../batcher/src/renamer.py:84
 msgid "Examples"
 msgstr ""
 
-#: ../../export_layers/renamer.py:386
+#. FOR TRANSLATORS: Translate only the "image" part
+#: ../../batcher/src/renamer.py:378
 msgid "image001"
 msgstr ""
 
-#: ../../export_layers/renamer.py:392
+#: ../../batcher/src/renamer.py:384
 msgid "To continue numbering across layer groups, use %n."
 msgstr ""
 
-#: ../../export_layers/renamer.py:394
+#: ../../batcher/src/renamer.py:386
 #, python-format
 msgid "To use descending numbers, use %d."
 msgstr ""
 
-#: ../../export_layers/renamer.py:395
+#: ../../batcher/src/renamer.py:387
 msgid "Suppose that the number of layers is 5:"
 msgstr ""
 
-#: ../../export_layers/renamer.py:404
+#: ../../batcher/src/renamer.py:396
 msgid "Layer name"
 msgstr ""
 
-#: ../../export_layers/renamer.py:407
+#: ../../batcher/src/renamer.py:399
 msgid ""
 "Suppose that a layer is named \"Frame.png\" and the file extension is "
 "\"png\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:411
+#: ../../batcher/src/renamer.py:403
 msgid "Suppose that a layer is named \"Frame.jpg\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:421
+#: ../../batcher/src/renamer.py:413
 msgid "Image name"
 msgstr ""
 
-#: ../../export_layers/renamer.py:424
+#: ../../batcher/src/renamer.py:416
 msgid "Suppose that the image is named \"Image.xcf\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:433
+#: ../../batcher/src/renamer.py:425
 msgid "Layer path"
 msgstr ""
 
-#: ../../export_layers/renamer.py:436
+#: ../../batcher/src/renamer.py:428
 msgid ""
 "Suppose that a layer named \"Left\" has parent groups named \"Hands\" and "
 "\"Body\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:440
+#: ../../batcher/src/renamer.py:432
 msgid ""
 "Suppose that the layer is named \"Left.jpg\" and the file extension is "
 "\"png\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:450
+#: ../../batcher/src/renamer.py:442
 msgid "Replace"
 msgstr ""
 
-#: ../../export_layers/renamer.py:453
+#: ../../batcher/src/renamer.py:445
 msgid "Suppose that a layer is named \"Animal copy #1\"."
 msgstr ""
 
-#: ../../export_layers/renamer.py:455
+#: ../../batcher/src/renamer.py:447
 msgid ""
 "You can use the regular expression syntax as defined in the \"re\" module "
 "for Python."
 msgstr ""
 
-#: ../../export_layers/renamer.py:457
+#: ../../batcher/src/renamer.py:449
 msgid ""
 "You can specify the number of replacements and flags as defined in the "
 "\"re\" module for Python."
 msgstr ""
 
-#: ../../export_layers/renamer.py:468
-msgid "Suppose that a layer has tags \"left\", \"middle\" and \"right\"."
+#: ../../batcher/src/renamer.py:457
+msgid "Tags"
 msgstr ""
 
-#: ../../export_layers/renamer.py:479
+#: ../../batcher/src/renamer.py:460
+msgid "Suppose that a layer has a green color tag."
+msgstr ""
+
+#: ../../batcher/src/renamer.py:462
+msgid "You can map a color to another name."
+msgstr ""
+
+#: ../../batcher/src/renamer.py:465
+msgid "Missing tags are ignored."
+msgstr ""
+
+#: ../../batcher/src/renamer.py:474
 msgid "Current date"
 msgstr ""
 
-#: ../../export_layers/renamer.py:483
+#: ../../batcher/src/renamer.py:478
 msgid ""
 "Custom date format uses formatting as per the \"strftime\" function in "
 "Python."
 msgstr ""
 
-#: ../../export_layers/renamer.py:491
+#: ../../batcher/src/renamer.py:486
 msgid "Attributes"
 msgstr ""
 
-#: ../../export_layers/renamer.py:494
+#: ../../batcher/src/renamer.py:489
 msgid ""
 "Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
 "of 1000, 270, 0 and 40 pixels, respectively,\n"
 "and the image has width and height of 1000 and 500 pixels, respectively."
 msgstr ""
 
-#: ../../export_layers/plugin_settings.py:53
-msgid "The run mode"
-msgstr "Режим запуска"
-
-#: ../../export_layers/plugin_settings.py:59
-msgid "Image"
-msgstr "Изображение"
-
-#: ../../export_layers/plugin_settings.py:82
-msgid "Output directory"
-msgstr "Конечный каталог"
-
-#: ../../export_layers/plugin_settings.py:91
-msgid "Layer filename pattern (empty string = layer name)"
-msgstr ""
-
-#: ../../export_layers/plugin_settings.py:106
-msgid "_Replace"
-msgstr "_Зименить"
-
-#: ../../export_layers/plugin_settings.py:107
-msgid "_Skip"
-msgstr "_Пропустить"
-
-#: ../../export_layers/plugin_settings.py:108
-msgid "Rename _new file"
-msgstr "Переименовать _новый файл"
-
-#: ../../export_layers/plugin_settings.py:109
-msgid "Rename _existing file"
-msgstr "Переименовать _существующий файл"
-
-#: ../../export_layers/plugin_settings.py:111
-msgid "Overwrite mode (non-interactive run mode only)"
-msgstr "Режим перезаписи (только для без-интерактивного режима)"
-
-#: ../../export_layers/update.py:108
+#: ../../batcher/src/update.py:86
 msgid ""
 "Due to significant changes in the plug-in, settings need to be reset. "
 "Proceed?"
 msgstr ""
 
-#: ../../export_layers.py:38
-msgid "Export layers as separate images"
-msgstr "Экспортировать слои как отдельные изображения"
-
-#: ../../export_layers.py:42
-msgid "E_xport Layers..."
-msgstr "Экспорт слоёв..."
-
-#: ../../export_layers.py:66
-msgid "Run \"{}\" with the last values specified"
-msgstr "Выполнить \"{}\" с последними указанными значениями"
-
-#: ../../export_layers.py:68
+#: ../../batcher/src/utils.py:50
 msgid ""
-"If the plug-in is run for the first time (i.e. no last values exist), "
-"default values will be used."
-msgstr ""
-"Если плагин запускается впервые (т.е. нет последних значений), будут "
-"использованы значения по-умолчанию."
-
-#: ../../export_layers.py:73
-msgid "E_xport Layers (repeat)"
-msgstr "Экспорт слоёв (повторно)"
-
-#: ../../export_layers.py:96
-msgid "Run \"{}\" with the specified configuration file"
+"Settings for this plug-in stored in \"{}\" may be corrupt. This could happen "
+"if the file was edited manually.\n"
+"To fix this, save the settings again or reset them."
 msgstr ""
 
-#: ../../export_layers.py:98
+#: ../../batcher/src/utils.py:55
 msgid ""
-"The configuration file can be obtained by exporting settings in the plug-"
-"in's interactive dialog. This procedure will fail if the specified "
-"configuration file does not exist or is not valid."
+"Settings for this plug-in may be corrupt.\n"
+"To fix this, save the settings again or reset them."
 msgstr ""
 
-#: ../../export_layers.py:108
-msgid "Path to configuration file"
+#: ../../batcher/src/utils.py:61
+msgid "Count not locate settings in file \"{}\" in \"{}\"."
+msgstr ""
+
+#: ../../batcher/src/utils.py:64
+msgid "Count not locate settings in \"{}\"."
 msgstr ""
