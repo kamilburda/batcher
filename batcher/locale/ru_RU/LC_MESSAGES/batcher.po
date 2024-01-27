@@ -1,11 +1,11 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Kamil Burda
-# This file is distributed under the same license as the 'export_layers' package.
+# This file is distributed under the same license as the 'batcher' package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: export_layers 0.0.0\n"
+"Project-Id-Version: batcher 0.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-27 18:39+0100\n"
 "PO-Revision-Date: 2017-10-21 17:12+0300\n"

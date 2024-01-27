@@ -1,13 +1,13 @@
-# German translations for 'export_layers' package
-# German translation for 'export_layers'.
+# German translations for 'batcher' package
+# German translation for 'batcher'.
 # Copyright (C) 2019 Kamil Burda
-# This file is distributed under the same license as the 'export_layers' package.
+# This file is distributed under the same license as the 'batcher' package.
 # 
 # Automatically generated, 2019.
 # Vinzenz Vietzke <vinz@vinzv.de>, 2019.
 msgid ""
 msgstr ""
-"Project-Id-Version: 'export_layers' 0.0.0\n"
+"Project-Id-Version: 'batcher' 0.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-27 18:39+0100\n"
 "PO-Revision-Date: 2019-08-31 14:37+0200\n"
