@@ -3,7 +3,6 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import GLib
 
 from src import background_foreground
 from src import export as export_
