@@ -130,6 +130,8 @@ def export(
     if batcher.process_export:
       if export_mode == ExportModes.EACH_LAYER:
         raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
+      else:
+        image_to_process.resize_to_layers()
       
       overwrite_mode, export_status = _export_item(
         batcher,
