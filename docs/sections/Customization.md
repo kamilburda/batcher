@@ -381,8 +381,8 @@ Options:
 * *Layer*: Layer to scale and to use for computing the new width or height.
 * *New width*: The new width.
 * *Unit for width*: Unit for the new width - pixels or percentages of image/item width/height.
-* *New width*: The new height.
-* *Unit for width*: Unit for the new height - pixels or percentages of image/item width/height.
+* *New height*: The new height.
+* *Unit for height*: Unit for the new height - pixels or percentages of image/item width/height.
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 
