@@ -441,7 +441,7 @@ _BUILTIN_PROCEDURES_LIST = [
   },
 ]
 
-# Translated display names could be displayed our of alphabetical order,
+# Translated display names could be displayed out of alphabetical order,
 # hence the sorting.
 _BUILTIN_PROCEDURES_LIST.sort(
   key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
