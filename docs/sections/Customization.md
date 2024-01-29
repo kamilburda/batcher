@@ -363,7 +363,7 @@ When exporting each layer separately (the default), the Export procedure usually
 
 Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
 
-**Rename layer**
+**Rename**
 
 Rename layers according to the specified pattern.
 This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-layer-names).
