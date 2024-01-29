@@ -1363,7 +1363,8 @@ class ChoiceSetting(Setting):
         `ChoiceSetting` accepts a valid item name for the ``default_value``
         parameter instead of a numeric value.
     """
-    self._items, self._items_display_names, self._item_values = self._create_item_attributes(items)
+    self._items, self._items_by_value, self._items_display_names = (
+      self._create_item_attributes(items))
 
     self._empty_value = self._get_empty_value(empty_value)
     
@@ -1379,12 +1380,13 @@ class ChoiceSetting(Setting):
   
   @property
   def items(self) -> Dict[str, int]:
-    """A dictionary of (item name, item value) pairs.
-    
-    An item name uniquely identifies each item. An item value is the
-    corresponding integer value.
-    """
+    """A dictionary of (item name, item value) pairs."""
     return self._items
+
+  @property
+  def items_by_value(self) -> Dict[int, str]:
+    """A dictionary of (item value, item name) pairs."""
+    return self._items_by_value
   
   @property
   def items_display_names(self) -> Dict[str, str]:
@@ -1423,7 +1425,16 @@ class ChoiceSetting(Setting):
       setting.value in (setting.items[name1], setting.items[name2], ...)
     """
     return any(self.value == self.items[item_name] for item_name in item_names)
-  
+
+  def get_name(self) -> str:
+    """Returns the item name corresponding to the current setting value.
+
+    This is a more convenient and less verbose alternative to
+
+      setting.items_by_value(setting.value)
+    """
+    return self._items_by_value[self.value]
+
   def set_item(self, item_name: str):
     """Sets the specified item as the setting value.
     
@@ -1462,9 +1473,9 @@ class ChoiceSetting(Setting):
         )
   
   def _validate(self, value):
-    if (value not in self._item_values
+    if (value not in self._items_by_value
         or (not self._allow_empty_values and self._is_value_empty(value))):
-      return f'invalid item value; valid values: {list(self._item_values)}', 'invalid_value'
+      return f'invalid item value; valid values: {list(self._items_by_value)}', 'invalid_value'
   
   def _get_items_description(self):
     items_description = ''
@@ -1480,29 +1491,35 @@ class ChoiceSetting(Setting):
   @staticmethod
   def _create_item_attributes(input_items):
     items = {}
+    items_by_value = {}
     items_display_names = {}
-    item_values = set()
 
     if not input_items:
       raise ValueError('must specify at least one item')
     if all(len(elem) == 2 for elem in input_items):
       for i, (item_name, item_display_name) in enumerate(input_items):
+        if item_name in items:
+          raise ValueError('cannot use the same name for multiple items - they must be unique')
+
         items[item_name] = i
+        items_by_value[i] = item_name
         items_display_names[item_name] = item_display_name
-        item_values.add(i)
     elif all(len(elem) == 3 for elem in input_items):
       for item_name, item_display_name, item_value in input_items:
-        if item_value in item_values:
+        if item_name in items:
+          raise ValueError('cannot use the same name for multiple items - they must be unique')
+
+        if item_value in items_by_value:
           raise ValueError('cannot set the same value for multiple items - they must be unique')
 
         items[item_name] = item_value
+        items_by_value[item_value] = item_name
         items_display_names[item_name] = item_display_name
-        item_values.add(item_value)
     else:
       raise ValueError(
         'wrong number of tuple elements in items - must be only 2- or only 3-element tuples')
 
-    return items, items_display_names, item_values
+    return items, items_by_value, items_display_names
 
   def _get_empty_value(self, empty_value_name):
     if empty_value_name is not None:

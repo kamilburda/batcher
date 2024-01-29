@@ -869,6 +869,11 @@ class TestCreateChoiceSetting(unittest.TestCase):
     with self.assertRaises(ValueError):
       settings_.ChoiceSetting(
         'overwrite_mode', [('skip', 'Skip', 4), ('replace', 'Replace', 4)])
+
+  def test_same_item_name_multiple_times_raises_error(self):
+    with self.assertRaises(ValueError):
+      settings_.ChoiceSetting(
+        'overwrite_mode', [('skip', 'Skip'), ('skip', 'Skip')])
   
   def test_too_many_elements_in_items_raises_error(self):
     with self.assertRaises(ValueError):
@@ -919,6 +924,9 @@ class TestChoiceSetting(unittest.TestCase):
       [('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
       display_name='Overwrite mode')
+
+  def test_get_name(self):
+    self.assertEqual(self.setting.get_name(), 'replace')
   
   def test_set_invalid_item(self):
     self.setting.set_value(4)
@@ -933,7 +941,12 @@ class TestChoiceSetting(unittest.TestCase):
     with self.assertRaises(KeyError):
       # noinspection PyStatementEffect
       self.setting.items['invalid_item']
-  
+
+  def test_get_invalid_item_value(self):
+    with self.assertRaises(KeyError):
+      # noinspection PyStatementEffect
+      self.setting.items_by_value[5]
+
   def test_description(self):
     self.assertEqual(self.setting.description, 'Overwrite mode { Skip (0), Replace (1) }')
   
