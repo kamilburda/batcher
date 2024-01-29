@@ -186,10 +186,10 @@ def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
 _SCALE_OBJECT_TYPES = IMAGE, LAYER = (0, 1)
 
 _SCALE_UNITS = (
-  PERCENT_IMAGE_WIDTH,
-  PERCENT_IMAGE_HEIGHT,
   PERCENT_LAYER_WIDTH,
   PERCENT_LAYER_HEIGHT,
+  PERCENT_IMAGE_WIDTH,
+  PERCENT_IMAGE_HEIGHT,
   PIXELS,
 ) = (0, 1, 2, 3, 4)
 
@@ -389,13 +389,13 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'choice',
-        'default_value': 'percentage_of_image_width',
+        'default_value': 'percentage_of_layer_width',
         'name': 'width_unit',
         'items': [
-          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
-          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
           ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
           ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
+          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
+          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
           ('pixels', _('Pixels'), PIXELS),
         ],
         'display_name': _('Unit for width'),
@@ -408,13 +408,13 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'choice',
-        'default_value': 'percentage_of_image_height',
+        'default_value': 'percentage_of_layer_height',
         'name': 'height_unit',
         'items': [
-          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
-          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
           ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
           ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
+          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
+          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
           ('pixels', _('Pixels'), PIXELS),
         ],
         'display_name': _('Unit for height'),
