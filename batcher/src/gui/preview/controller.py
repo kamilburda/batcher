@@ -210,7 +210,7 @@ class PreviewsController:
   
   def _connect_update_rendering_of_image_preview(self):
     def _after_add_action(actions, action, orig_action_dict, builtin_actions):
-      if action['orig_name'].value not in builtin_actions:
+      if action['orig_name'].value not in builtin_actions or action['orig_name'].value == 'scale':
         self._custom_actions[action.get_path()] = action
         
         _update_rendering_of_image_preview(action['enabled'])
