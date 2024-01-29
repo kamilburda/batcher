@@ -36,11 +36,11 @@ class Placeholder:
     return self._replacement_func(*args)
 
 
-def _get_current_image(setting, batcher):
+def _get_current_image(_setting, batcher):
   return batcher.current_image
 
 
-def _get_current_layer(setting, batcher):
+def _get_current_layer(_setting, batcher):
   return batcher.current_raw_item
 
 
@@ -48,15 +48,23 @@ def _get_current_layer_for_array(setting, batcher):
   return (_get_current_layer(setting, batcher),)
 
 
-def _get_background_layer_for_array(setting, batcher):
+def _get_background_layer(_setting, batcher):
+  return background_foreground.get_background_layer(batcher)
+
+
+def _get_background_layer_for_array(_setting, batcher):
   return (background_foreground.get_background_layer(batcher),)
 
 
-def _get_foreground_layer_for_array(setting, batcher):
+def _get_foreground_layer(_setting, batcher):
+  return background_foreground.get_foreground_layer(batcher)
+
+
+def _get_foreground_layer_for_array(_setting, batcher):
   return (background_foreground.get_foreground_layer(batcher),)
 
 
-def _get_value_for_unsupported_parameter(setting, batcher):
+def _get_value_for_unsupported_parameter(setting, _batcher):
   return getattr(setting, 'default_param_value', None)
 
 
@@ -64,9 +72,9 @@ _PLACEHOLDERS_RAW_LIST = [
   ('current_image', _('Current Image'), _get_current_image),
   ('current_layer', _('Current Layer'), _get_current_layer),
   ('current_layer_for_array', _('Current Layer'), _get_current_layer_for_array),
-  ('background_layer', _('Background Layer'), background_foreground.get_background_layer),
+  ('background_layer', _('Background Layer'), _get_background_layer),
   ('background_layer_for_array', _('Background Layer'), _get_background_layer_for_array),
-  ('foreground_layer', _('Foreground Layer'), background_foreground.get_foreground_layer),
+  ('foreground_layer', _('Foreground Layer'), _get_foreground_layer),
   ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
   ('unsupported_parameter', '', _get_value_for_unsupported_parameter),
 ]
