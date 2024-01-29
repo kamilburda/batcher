@@ -146,6 +146,54 @@ def resize_to_layer_size(batcher):
   image.resize(layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
 
 
+def scale(
+      _batcher,
+      image,
+      raw_item,
+      new_width,
+      width_unit,
+      new_height,
+      height_unit,
+      interpolation,
+      local_origin,
+):
+  width_pixels = _convert_to_pixels(image, raw_item, new_width, width_unit)
+  height_pixels = _convert_to_pixels(image, raw_item, new_height, height_unit)
+
+  Gimp.context_push()
+  Gimp.context_set_interpolation(interpolation)
+
+  raw_item.scale(width_pixels, height_pixels, local_origin)
+
+  Gimp.context_pop()
+
+
+def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
+  if dimension_unit == PERCENT_IMAGE_WIDTH:
+    pixels = (dimension / 100) * image.get_width()
+  elif dimension_unit == PERCENT_IMAGE_HEIGHT:
+    pixels = (dimension / 100) * image.get_height()
+  elif dimension_unit == PERCENT_LAYER_WIDTH:
+    pixels = (dimension / 100) * raw_item.get_width()
+  elif dimension_unit == PERCENT_LAYER_HEIGHT:
+    pixels = (dimension / 100) * raw_item.get_height()
+  else:
+    pixels = dimension
+
+  return int(pixels)
+
+
+_SCALE_OBJECT_TYPES = IMAGE, LAYER = (0, 1)
+
+_SCALE_UNITS = (
+  PERCENT_IMAGE_WIDTH,
+  PERCENT_IMAGE_HEIGHT,
+  PERCENT_LAYER_WIDTH,
+  PERCENT_LAYER_HEIGHT,
+  PIXELS,
+) = (0, 1, 2, 3, 4)
+
+
 _BUILTIN_PROCEDURES_LIST = [
   {
     'name': 'apply_opacity_from_layer_groups',
@@ -313,6 +361,75 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'rename_folders',
         'default_value': False,
         'display_name': _('Rename folders'),
+        'gui_type': 'check_button_no_text',
+      },
+    ],
+  },
+  {
+    'name': 'scale',
+    'function': scale,
+    'display_name': _('Scale'),
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'placeholder_image',
+        'name': 'image',
+        'display_name': _('Image'),
+      },
+      {
+        'type': 'placeholder_layer',
+        'name': 'layer',
+        'display_name': _('Layer'),
+      },
+      {
+        'type': 'float',
+        'default_value': 100.0,
+        'name': 'new_width',
+        'display_name': _('New width'),
+      },
+      {
+        'type': 'choice',
+        'default_value': 'percentage_of_image_width',
+        'name': 'width_unit',
+        'items': [
+          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
+          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
+          ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
+          ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
+          ('pixels', _('Pixels'), PIXELS),
+        ],
+        'display_name': _('Unit for width'),
+      },
+      {
+        'type': 'float',
+        'default_value': 100.0,
+        'name': 'new_height',
+        'display_name': _('New height'),
+      },
+      {
+        'type': 'choice',
+        'default_value': 'percentage_of_image_height',
+        'name': 'height_unit',
+        'items': [
+          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
+          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
+          ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
+          ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
+          ('pixels', _('Pixels'), PIXELS),
+        ],
+        'display_name': _('Unit for height'),
+      },
+      {
+        'type': 'enum',
+        'enum_type': Gimp.InterpolationType,
+        'name': 'interpolation',
+        'display_name': _('Interpolation'),
+      },
+      {
+        'type': 'bool',
+        'name': 'local_origin',
+        'default_value': False,
+        'display_name': _('Use local origin'),
         'gui_type': 'check_button_no_text',
       },
     ],
