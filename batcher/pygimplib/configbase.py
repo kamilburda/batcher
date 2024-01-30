@@ -163,8 +163,9 @@ def _init_config_per_procedure(config: _Config):
     config.PLUGIN_TITLE,
   )
 
-  if config.WARN_ON_INVALID_SETTING_VALUES:
-    pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid)
+  if _gimp_modules_available:
+    if config.WARN_ON_INVALID_SETTING_VALUES:
+      pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid)
 
 
 def _on_setting_value_not_valid(setting, message, _message_id, _details):
