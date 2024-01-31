@@ -170,7 +170,7 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   def _on_extended_entry_focus_out_event(self, entry, event):
     if self._should_assign_placeholder_text(self.get_text()):
       self._assign_placeholder_text()
-  
+
   def _on_after_extended_entry_realize(self, entry):
     if self._should_assign_placeholder_text(self.get_text()):
       self._assign_placeholder_text()
@@ -271,6 +271,7 @@ class FilenamePatternEntry(ExtendedEntry):
       'notify::cursor-position', self._on_filename_pattern_entry_notify_cursor_position)
     self.connect('changed', self._on_filename_pattern_entry_changed)
     self.connect('focus-out-event', self._on_filename_pattern_entry_focus_out_event)
+    self.connect('realize', self._on_filename_pattern_entry_realize)
 
   @property
   def popup(self) -> entry_popup_.EntryPopup:
@@ -293,6 +294,7 @@ class FilenamePatternEntry(ExtendedEntry):
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
     )
+    self._field_tooltip_window.set_attached_to(self)
     
     self._field_tooltip_text = Gtk.Label(
       selectable=True,
@@ -376,7 +378,10 @@ class FilenamePatternEntry(ExtendedEntry):
   
   def _on_filename_pattern_entry_focus_out_event(self, entry, event):
     self._hide_field_tooltip()
-  
+
+  def _on_filename_pattern_entry_realize(self, entry):
+    self._field_tooltip_window.set_transient_for(pg.gui.utils.get_toplevel_window(self))
+
   def _filter_suggested_items(self, suggested_items, row_iter, data=None):
     item = suggested_items[row_iter][self._COLUMN_ITEMS_TO_INSERT]
 

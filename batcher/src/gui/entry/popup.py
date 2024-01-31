@@ -247,13 +247,14 @@ class EntryPopup:
     # HACK: Make sure the height of the tree view can be set properly. Source:
     # https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/gtkentrycompletion.c#L573
     self._scrolled_window.get_vscrollbar().set_size_request(-1, 0)
-    
+
     # `Gtk.WindowType.POPUP` prevents the popup from stealing focus from the text entry.
     self._popup = Gtk.Window(
       type=Gtk.WindowType.POPUP,
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
     )
+    self._popup.set_attached_to(self._entry)
     self._popup.add(self._scrolled_window)
     
     self._scrolled_window.show_all()
@@ -264,6 +265,7 @@ class EntryPopup:
     self._entry.connect('key-press-event', self._on_entry_key_press_event)
     
     self._entry.connect('focus-out-event', self._on_entry_focus_out_event)
+    self._entry.connect('realize', self._on_entry_realize)
     
     self._tree_view.connect_after('realize', self._on_after_tree_view_realize)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
@@ -399,6 +401,9 @@ class EntryPopup:
   
   def _on_entry_focus_out_event(self, entry, event):
     self.save_last_value()
+
+  def _on_entry_realize(self, entry):
+    self._popup.set_transient_for(pg.gui.utils.get_toplevel_window(self._entry))
 
   def _on_after_tree_view_realize(self, tree_view):
     # Set the correct initial width and height of the tree view.

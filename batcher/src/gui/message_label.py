@@ -54,7 +54,9 @@ class MessageLabel(Gtk.Box):
     self._popup_hide_context.enable()
     
     self._label_message.connect('size-allocate', self._on_label_message_size_allocate)
+
     self._button_more.connect('clicked', self._on_button_more_clicked)
+    self._button_more.connect('realize', self._on_button_more_realize)
     
     self._popup_more.connect('show', self._on_popup_more_show)
     self._popup_more.connect('hide', self._on_popup_more_hide)
@@ -152,9 +154,10 @@ class MessageLabel(Gtk.Box):
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       width_request=self._POPUP_WIDTH,
     )
+    self._popup_more.set_attached_to(self._button_more)
     self._popup_more.add(self._scrolled_window_more)
-    self._popup_more.show_all()
-    self._popup_more.hide()
+
+    self._scrolled_window_more.show_all()
     
     self.set_spacing(self._MESSAGE_AND_MORE_BUTTON_SPACING)
 
@@ -184,7 +187,10 @@ class MessageLabel(Gtk.Box):
     absolute_label_position = pg.gui.get_position_below_widget(self)
     if absolute_label_position is not None:
       self._popup_more.move(*absolute_label_position)
-  
+
+  def _on_button_more_realize(self, button):
+    self._popup_more.set_transient_for(pg.gui.utils.get_toplevel_window(self._button_more))
+
   def _on_popup_more_show(self, popup):
     self._popup_more.set_screen(self._button_more.get_screen())
     
