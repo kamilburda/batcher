@@ -2,7 +2,7 @@
 
 {% include-section 'sections/Intro.md' %}
 
-### [Download latest release](https://github.com/kamilburda/gimp-export-layers/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %})
+### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %})
 
 ## Installation and Usage
 
