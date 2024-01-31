@@ -14,14 +14,14 @@ Batcher is a [GIMP](https://www.gimp.org/) plug-in for batch-exporting layers as
 
 ### [Download latest release](https://github.com/kamilburda/gimp-export-layers/releases/tag/0.1) (0.1, January 31, 2024)
 
-See the [documentation](https://kamilburda.github.io/gimp-export-layers/sections) for information about installation, usage and known issues.
+For installation and usage, see the [webpage](https://kamilburda.github.io/batcher).
 
 
 ## Support
 
 You can report issues, ask questions or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
 
-Before submitting a bug report, check the [GitHub Issues page](https://github.com/kamilburda/batcher/issues) for current issues.
+Before submitting a bug report, please check the [GitHub Issues page](https://github.com/kamilburda/batcher/issues) for current issues.
 
 
 ## License

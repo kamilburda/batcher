@@ -4,7 +4,7 @@
 
 ### [Download latest release](https://github.com/kamilburda/gimp-export-layers/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %})
 
-See the [documentation](https://kamilburda.github.io/gimp-export-layers/sections) for information about installation, usage and known issues.
+For installation and usage, see the [webpage](https://kamilburda.github.io/batcher).
 
 
 {% include-section 'sections/More-info.md' %}
