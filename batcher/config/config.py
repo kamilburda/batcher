@@ -11,8 +11,8 @@ c.WARN_ON_INVALID_SETTING_VALUES = True
 
 c.PLUGIN_NAME = 'batcher'
 c.PLUGIN_TITLE = lambda: _('Batcher')
-c.PLUGIN_VERSION = '0.0.1'
-c.PLUGIN_VERSION_RELEASE_DATE = ''
+c.PLUGIN_VERSION = '0.1'
+c.PLUGIN_VERSION_RELEASE_DATE = 'January 31, 2024'
 c.AUTHOR_NAME = 'Kamil Burda'
 c.COPYRIGHT_YEARS = '2023'
 c.PAGE_URL = 'https://kamilburda.github.io/batcher'
