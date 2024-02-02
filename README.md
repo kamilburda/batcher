@@ -1,4 +1,4 @@
-# # [![](docs/images/logo.svg)](https://kamilburda.github.io/batcher/) Batcher
+# [![](docs/images/logo.svg)](https://kamilburda.github.io/batcher/) Batcher
 
 Batcher is a [GIMP](https://www.gimp.org/) plug-in for batch-exporting layers as separate images and batch-editing layers.
 
