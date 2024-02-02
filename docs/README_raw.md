@@ -1,4 +1,4 @@
-# Batcher
+# # [![](docs/images/logo.svg)](https://kamilburda.github.io/batcher/) Batcher
 
 {% include-section 'sections/Intro.md' %}
 
