@@ -299,7 +299,7 @@ class NamePreview(preview_base_.Preview):
 
   def _on_tree_view_row_collapsed(self, tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
-      self._collapsed_items.add(self._get_key_from_tree_iter(tree_iter))
+      self._collapsed_items.add(self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path)))
       self._tree_view.columns_autosize()
   
   def _on_tree_view_row_expanded(self, tree_view, tree_iter, tree_path):
