@@ -1,11 +1,8 @@
 """Wrapper of ``Gimp.get_pdb()`` to simplify invoking GIMP PDB procedures."""
 
-from typing import Optional
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import GObject
 
 
 __all__ = [
@@ -86,10 +83,8 @@ class PyPDBProcedure:
     self._pdb_wrapper = pdb_wrapper
     self._name = proc_name
 
-    self._info = Gimp.get_pdb().lookup_procedure(self._name)
+    self._proc = Gimp.get_pdb().lookup_procedure(self._name)
     self._has_run_mode = self._get_has_run_mode()
-    
-    self._arg_types = [arg.value_type for arg in self._info.get_arguments()]
 
   @property
   def name(self):
@@ -97,9 +92,9 @@ class PyPDBProcedure:
     return self._name
 
   @property
-  def info(self):
+  def proc(self):
     """`Gimp.Procedure` instance containing procedure metadata."""
-    return self._info
+    return self._proc
 
   @property
   def has_run_mode(self):
@@ -108,16 +103,23 @@ class PyPDBProcedure:
     """
     return self._has_run_mode
 
-  def __call__(
-        self,
-        *args,
-        run_mode: Gimp.RunMode = Gimp.RunMode.NONINTERACTIVE,
-        config: Optional[Gimp.ProcedureConfig] = None):
-    if config is None:
-      processed_args = self._process_args(args, run_mode)
-      result = Gimp.get_pdb().run_procedure(self._name, processed_args)
-    else:
-      result = Gimp.get_pdb().run_procedure_config(self._name, config)
+  def __call__(self, *args, **kwargs):
+    """Calls the procedure.
+
+    The run mode parameter cannot be specified as a positional argument, only
+    as a keyword argument. If not specified, the run mode defaults to
+    `Gimp.RunMode.NONINTERACTIVE`.
+
+    Positional arguments correspond to the arguments specified in the GIMP PDB,
+    except the run mode as described above.
+
+    You can alternatively specify the arguments as keyword arguments. This way,
+    any omitted arguments earlier in the order will be replaced with their
+    default value.
+    """
+    config = self._create_config(*args, **kwargs)
+
+    result = self._proc.run(config)
 
     if result is None:
       return None
@@ -151,27 +153,43 @@ class PyPDBProcedure:
       return None
 
   def _get_has_run_mode(self):
-    proc_arg_info = self._info.get_arguments()
+    proc_arg_info = self._proc.get_arguments()
     if proc_arg_info:
       return proc_arg_info[0].value_type == Gimp.RunMode.__gtype__
     else:
       return False
-  
-  def _process_args(self, args, run_mode):
-    processed_args = []
-    arg_types = self._arg_types
-    
-    if self._has_run_mode:
-      processed_args.append(GObject.Value(Gimp.RunMode, run_mode))
-      arg_types = self._arg_types[1:]
-    
-    for arg, arg_type in zip(args, arg_types):
-      if arg_type is not None:
-        processed_args.append(GObject.Value(arg_type, arg))
+
+  def _create_config(self, *proc_args, **proc_kwargs):
+    config = self._proc.create_config()
+
+    arg_names = [arg.name for arg in self._proc.get_arguments()]
+    if self.has_run_mode:
+      arg_names = arg_names[1:]
+
+    property_names = set(prop.name for prop in config.list_properties())
+
+    for arg_name, arg_value in zip(arg_names, proc_args):
+      processed_arg_name = arg_name.replace('_', '-')
+
+      if processed_arg_name in property_names:
+        config.set_property(processed_arg_name, arg_value)
       else:
-        processed_args.append(arg)
-    
-    return processed_args
+        raise PDBProcedureError(
+          f'argument "{processed_arg_name}" does not exist or is not supported',
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+    # Keyword arguments can override positional arguments
+    for arg_name, arg_value in proc_kwargs.items():
+      processed_arg_name = arg_name.replace('_', '-')
+
+      if processed_arg_name in property_names:
+        config.set_property(processed_arg_name, arg_value)
+      else:
+        raise PDBProcedureError(
+          f'argument "{processed_arg_name}" does not exist or is not supported',
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+    return config
 
 
 class PDBProcedureError(Exception):

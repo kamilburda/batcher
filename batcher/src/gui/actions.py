@@ -502,7 +502,7 @@ class _ActionEditDialog(GimpUi.Dialog):
         action['description'].value)
     elif pdb_procedure is not None:
       self._label_procedure_description = self._create_label_description(
-        pdb_procedure.info.get_blurb(), pdb_procedure.info.get_help())
+        pdb_procedure.proc.get_blurb(), pdb_procedure.proc.get_help())
     
     self._grid_action_arguments = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -562,7 +562,7 @@ class _ActionEditDialog(GimpUi.Dialog):
   def _set_arguments(self, action, pdb_procedure):
     if pdb_procedure is not None:
       pdb_argument_names_and_blurbs = {
-        arg.name: arg.blurb for arg in pdb_procedure.info.get_arguments()}
+        arg.name: arg.blurb for arg in pdb_procedure.proc.get_arguments()}
     else:
       pdb_argument_names_and_blurbs = {}
 

@@ -567,7 +567,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
   
   pdb_procedure_argument_names = []
 
-  pdb_procedure = pdb[pdb_procedure_name].info
+  pdb_procedure = pdb[pdb_procedure_name].proc
 
   action_dict['display_name'] = _get_pdb_procedure_display_name(pdb_procedure)
   
