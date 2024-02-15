@@ -103,12 +103,11 @@ class PyPDBProcedure:
     """
     return self._has_run_mode
 
-  def __call__(self, *args, **kwargs):
+  def __call__(self, *args, run_mode=Gimp.RunMode.NONINTERACTIVE, **kwargs):
     """Calls the procedure.
 
-    The run mode parameter cannot be specified as a positional argument, only
-    as a keyword argument. If not specified, the run mode defaults to
-    `Gimp.RunMode.NONINTERACTIVE`.
+    The `run_mode` parameter cannot be specified as a positional argument, only
+    as a keyword argument.
 
     Positional arguments correspond to the arguments specified in the GIMP PDB,
     except the run mode as described above.
