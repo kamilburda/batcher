@@ -30,7 +30,8 @@ SETTINGS = plugin_settings.create_settings()
 _EXPORT_LAYERS_SOURCE_NAME = 'plug-in-batch-export-layers'
 
 
-def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _drawables, config):
+def plug_in_batch_export_layers(
+      _procedure, run_mode, image, _n_drawables, _drawables, config, _data):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 
@@ -50,7 +51,8 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _n_drawables, _draw
     return _run_noninteractive(layer_tree, config)
 
 
-def plug_in_batch_export_layers_now(_procedure, run_mode, image, _n_drawables, _drawables, _config):
+def plug_in_batch_export_layers_now(
+      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
 

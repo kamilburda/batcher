@@ -329,32 +329,22 @@ def _disable_locale(plugin_instance, name):
 
 def _get_procedure_wrapper(func, procedure_type, init_ui):
   @functools.wraps(func)
-  def func_wrapper(procedure, *procedure_args):
-    if procedure_type == Gimp.ImageProcedure:
-      run_mode, image, n_drawables, drawables, args, run_data = procedure_args
-    else:
-      args, run_data = procedure_args
-      run_mode = args.index(0)
-      image = None
-      n_drawables = 0
-      drawables = None
+  def func_wrapper(*procedure_and_args):
+    procedure = procedure_and_args[0]
+    config = procedure_and_args[-2]
 
-    config = procedure.create_config()
-    config.begin_run(None, run_mode, args)
-    config.get_values(args)
+    if procedure_type == Gimp.ImageProcedure:
+      run_mode = procedure_and_args[1]
+    else:
+      run_mode = next(
+        (config.get_property(prop.name)
+         for prop in config.list_properties() if prop.name == 'run-mode'),
+        Gimp.RunMode.NONINTERACTIVE)
 
     if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
       GimpUi.init(procedure.get_name())
 
-    if procedure_type == Gimp.ImageProcedure:
-      func_args = [procedure, run_mode, image, n_drawables, drawables, config]
-    else:
-      func_args = [procedure, run_mode, config]
-
-    if run_data is not None:
-      func_args.append(run_data)
-
-    return_values = func(*func_args)
+    return_values = func(*procedure_and_args)
 
     if return_values is None:
       return_values = []
@@ -367,8 +357,6 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
       exit_status = Gimp.PDBStatusType.SUCCESS
     else:
       exit_status = return_values.pop(0)
-
-    config.end_run(exit_status)
 
     formatted_return_values = procedure.new_return_values(exit_status, GLib.Error())
     if formatted_return_values.length() > 1:
