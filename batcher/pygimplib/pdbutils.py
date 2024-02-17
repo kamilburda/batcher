@@ -91,8 +91,8 @@ def _copy_image_sample_points(image, new_image):
 
 
 def _copy_image_grid(image, new_image):
-  new_image.grid_set_background_color(image.grid_get_background_color()[1])
-  new_image.grid_set_foreground_color(image.grid_get_foreground_color()[1])
+  new_image.grid_set_background_color(image.grid_get_background_color())
+  new_image.grid_set_foreground_color(image.grid_get_foreground_color())
   new_image.grid_set_offset(*image.grid_get_offset()[1:])
   new_image.grid_set_spacing(*image.grid_get_spacing()[1:])
   new_image.grid_set_style(image.grid_get_style())
