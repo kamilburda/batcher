@@ -1900,7 +1900,7 @@ class RgbSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [Gimp.RGB]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
+  _ALLOWED_GUI_TYPES = []
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
