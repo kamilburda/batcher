@@ -1843,7 +1843,7 @@ class VectorsSetting(GimpItemSetting):
       return 'invalid vectors', 'invalid_value'
 
 
-class ColorSetting(Setting):
+class RgbSetting(Setting):
   """Class for settings holding `Gimp.RGB` instances.
   
   Allowed GIMP PDB types:
@@ -1855,7 +1855,7 @@ class ColorSetting(Setting):
   * ``'invalid_value'``: The color assigned is not valid.
   """
 
-  _ALIASES = ['rgb', 'RGB']
+  _ALIASES = ['RGB']
 
   _ALLOWED_PDB_TYPES = [Gimp.RGB]
 
@@ -2334,7 +2334,7 @@ class ArraySetting(Setting):
   _NATIVE_ARRAY_PDB_TYPES = {
     IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
     FloatSetting: (Gimp.FloatArray, GObject.TYPE_DOUBLE),
-    ColorSetting: (Gimp.RGBArray, Gimp.RGB),
+    RgbSetting: (Gimp.RGBArray, Gimp.RGB),
     StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
 
@@ -2893,7 +2893,7 @@ def array_as_pdb_compatible_type(
     array = GObject.Value(Gimp.FloatArray)
     Gimp.value_set_float_array(array, values)
     return array.get_boxed()
-  elif element_setting_type == ColorSetting:
+  elif element_setting_type == RgbSetting:
     array = GObject.Value(Gimp.RGBArray)
     Gimp.value_set_rgb_array(array, values)
     return array.get_boxed()
@@ -2913,7 +2913,7 @@ ValueNotValidData = collections.namedtuple('ValueNotValidData', ['message', 'id'
 _ARRAY_GTYPES_TO_SETTING_TYPES = {
   Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
   Gimp.FloatArray.__gtype__: (ArraySetting, dict(element_type=FloatSetting)),
-  Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=ColorSetting)),
+  Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=RgbSetting)),
   GObject.TYPE_STRV: (ArraySetting, dict(element_type=StringSetting)),
 }
 

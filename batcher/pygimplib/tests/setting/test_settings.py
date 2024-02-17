@@ -1337,22 +1337,22 @@ class TestLayerMaskSetting(unittest.TestCase):
       })
 
 
-class TestColorSetting(unittest.TestCase):
+class TestRgbSetting(unittest.TestCase):
   
   def test_create_with_default_default_value(self):
-    self._assert_rgb_equal(settings_.ColorSetting('color').default_value, Gimp.RGB())
+    self._assert_rgb_equal(settings_.RgbSetting('color').default_value, Gimp.RGB())
   
   def test_set_value_with_object(self):
     color = Gimp.RGB()
     color.set(0.5, 0.5, 0.5)
     
-    setting = settings_.ColorSetting('color')
+    setting = settings_.RgbSetting('color')
     setting.set_value(color)
     
     self._assert_rgb_equal(setting.value, color)
   
   def test_set_value_with_list(self):
-    setting = settings_.ColorSetting('color')
+    setting = settings_.RgbSetting('color')
     setting.set_value([0.5, 0.2, 0.8])
 
     expected_color = Gimp.RGB()
@@ -1361,7 +1361,7 @@ class TestColorSetting(unittest.TestCase):
     self._assert_rgb_equal(setting.value, expected_color)
   
   def test_set_value_with_list_with_four_values(self):
-    setting = settings_.ColorSetting('color')
+    setting = settings_.RgbSetting('color')
     setting.set_value([0.5, 0.2, 0.8, 0.4])
 
     expected_color = Gimp.RGB()
@@ -1371,7 +1371,7 @@ class TestColorSetting(unittest.TestCase):
     self._assert_rgb_equal(setting.value, expected_color)
   
   def test_to_dict(self):
-    setting = settings_.ColorSetting('color')
+    setting = settings_.RgbSetting('color')
 
     color = Gimp.RGB()
     color.set(0.5, 0.2, 0.8)
@@ -1379,10 +1379,10 @@ class TestColorSetting(unittest.TestCase):
     setting.set_value(color)
 
     self.assertDictEqual(
-      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.0], 'type': 'color'})
+      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.0], 'type': 'rgb'})
   
   def test_to_dict_with_four_values(self):
-    setting = settings_.ColorSetting('color')
+    setting = settings_.RgbSetting('color')
 
     color = Gimp.RGB()
     color.set(0.5, 0.2, 0.8)
@@ -1391,7 +1391,7 @@ class TestColorSetting(unittest.TestCase):
     setting.set_value(color)
     
     self.assertDictEqual(
-      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.4], 'type': 'color'})
+      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.4], 'type': 'rgb'})
 
   @staticmethod
   def _assert_rgb_equal(color1, color2):
@@ -1882,8 +1882,8 @@ class TestCreateArraySetting(unittest.TestCase):
      (1.0, 5.0, 10.0),
      Gimp.FloatArray),
 
-    ('color',
-     'color',
+    ('rgb',
+     'rgb',
      (Gimp.RGB(), Gimp.RGB(), Gimp.RGB()),
      Gimp.RGBArray),
 
