@@ -468,7 +468,7 @@ class VectorsComboBoxPresenter(GimpObjectComboBoxPresenter):
 class ColorButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `GimpUi.ColorButton` widgets.
   
-  Value: `Gimp.RGB` instance representing color in RGBA.
+  Value: `Gegl.Color` instance representing color in RGBA.
   """
   
   _VALUE_CHANGED_SIGNAL = 'color-changed'
