@@ -11,6 +11,8 @@ import sys
 from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple, Type
 
 import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
@@ -1843,14 +1845,53 @@ class VectorsSetting(GimpItemSetting):
       return 'invalid vectors', 'invalid_value'
 
 
-class RgbSetting(Setting):
-  """Class for settings holding `Gimp.RGB` instances.
+class ColorSetting(Setting):
+  """Class for settings holding `Gegl.Color` instances.
   
   Allowed GIMP PDB types:
+  * `Gegl.Color`
+  
+  Default value: `Gegl.Color` instance with RGBA color `(1.0, 1.0, 1.0, 1.0)`.
+
+  Message IDs for invalid values:
+  * ``'invalid_value'``: The color assigned is not valid.
+  """
+
+  _ALLOWED_PDB_TYPES = [Gegl.Color]
+
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
+
+  # Create default value dynamically to avoid potential errors on GIMP startup.
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color()
+  
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list):
+      color = Gegl.Color()
+
+      if len(raw_value) >= 4:
+        color.set_rgba(*raw_value[:4])
+
+      return color
+    else:
+      return raw_value
+  
+  def _value_to_raw(self, value):
+    color = value.get_rgba()
+    return [color.red, color.green, color.blue, color.alpha]
+  
+  def _validate(self, color):
+    if not isinstance(color, Gegl.Color):
+      return 'invalid color', 'invalid_value'
+
+
+class RgbSetting(Setting):
+  """Class for settings holding `Gimp.RGB` instances.
+
+  Allowed GIMP PDB types:
   * `Gimp.RGB`
-  
+
   Default value: `Gimp.RGB` instance with color `(0, 0, 0)` and alpha set to 0.
-  
+
   Message IDs for invalid values:
   * ``'invalid_value'``: The color assigned is not valid.
   """
@@ -1863,7 +1904,7 @@ class RgbSetting(Setting):
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
-  
+
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
       color = Gimp.RGB()
@@ -1877,10 +1918,10 @@ class RgbSetting(Setting):
       return color
     else:
       return raw_value
-  
+
   def _value_to_raw(self, value):
     return [value.r, value.g, value.b, value.a]
-  
+
   def _validate(self, color):
     if not isinstance(color, Gimp.RGB):
       return 'invalid color', 'invalid_value'
