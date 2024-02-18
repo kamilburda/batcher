@@ -116,7 +116,7 @@ class PyPDBProcedure:
     any omitted arguments earlier in the order will be replaced with their
     default value.
     """
-    config = self._create_config(*args, **kwargs)
+    config = self._create_config(run_mode, *args, **kwargs)
 
     result = self._proc.run(config)
 
@@ -158,11 +158,12 @@ class PyPDBProcedure:
     else:
       return False
 
-  def _create_config(self, *proc_args, **proc_kwargs):
+  def _create_config(self, run_mode, *proc_args, **proc_kwargs):
     config = self._proc.create_config()
 
     arg_names = [arg.name for arg in self._proc.get_arguments()]
     if self.has_run_mode:
+      config.set_property(arg_names[0].replace('_', '-'), run_mode)
       arg_names = arg_names[1:]
 
     property_names = set(prop.name for prop in config.list_properties())
