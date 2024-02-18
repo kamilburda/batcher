@@ -70,7 +70,7 @@ sudo pip install $python_modules
 
 # GIMP initialization
 
-required_version='2.99.16'
+required_version='2.99.18'
 gimp_version="$(gimp --version | sed 's/.*version \([0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*\)$/\1/')"
 
 if [[ "$gimp_version" == "$required_version" ]]; then
