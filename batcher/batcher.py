@@ -2,9 +2,17 @@
 
 """Main plug-in file."""
 
+import builtins
+import gettext
 import os
 
 import pygimplib as pg
+
+gettext.bindtextdomain(
+  'batcher', os.path.join(os.path.dirname(pg.utils.get_current_module_filepath()), 'locale'))
+gettext.textdomain('batcher')
+
+builtins._ = gettext.gettext
 
 from src.gui import messages as messages_
 
