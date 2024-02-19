@@ -6,7 +6,7 @@ navbar_active_tab: Installation
 
 ## Requirements
 
-* GIMP 2.99.18 (will **not** work in earlier or later versions)
+* GIMP 2.99.16 (will **not** work in earlier or later versions)
 * Python 3.7 or higher
 
 
