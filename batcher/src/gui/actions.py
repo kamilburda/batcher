@@ -322,7 +322,10 @@ class ActionBox(pg.gui.ItemBox):
       item.action,
       pdb_procedure,
       title=self._get_action_edit_dialog_title(item),
-      role=pg.config.PLUGIN_NAME)
+      role=pg.config.PLUGIN_NAME,
+      parent=pg.gui.get_toplevel_window(self),
+      transient_for=pg.gui.get_toplevel_window(self),
+    )
     
     item.action_edit_dialog = action_edit_dialog
     
