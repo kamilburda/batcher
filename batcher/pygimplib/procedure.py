@@ -19,6 +19,8 @@ from gi.repository import GObject
 _PROCEDURE_NAMES_AND_DATA = {}
 _PLUGIN_PROPERTIES = {}
 _USE_LOCALE = False
+_INIT_PROCEDURES_FUNC = None
+_QUIT_FUNC = None
 
 
 def register_procedure(
@@ -36,6 +38,8 @@ def register_procedure(
       run_data: Optional[List] = None,
       init_ui: bool = True,
       additional_init: Optional[Callable] = None,
+      init_procedures_func: Optional[Callable] = None,
+      quit_func: Optional[Callable] = None,
 ):
   # noinspection PyUnresolvedReferences
   """Registers a function as a GIMP procedure.
@@ -109,6 +113,16 @@ def register_procedure(
       You can use this function to call registration-related functions not
       available via this function, e.g. `Gimp.Procedure.set_argument_sync`
       on individual procedure arguments.
+    init_procedures_func: Optional function returning a list of procedure names.
+      This function is called once for all registered procedures.
+      This function's behavior is identical to `Gimp.PlugIn.do_init_procedures`.
+      See `Gimp.PlugIn` for more information.
+      You only need to specify this argument once when registering multiple
+      procedures. Specifying this argument another time will override the
+      previous function.
+    quit_func: Optional function called before a plug-in terminates.
+      See `Gimp.PlugIn` for more information.
+      Like `init_procedures_func`, you only need to specify this function once.
 
   Example:
 
@@ -142,6 +156,9 @@ def register_procedure(
     ...   attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2023'),
     ... )
   """
+  global _INIT_PROCEDURES_FUNC
+  global _QUIT_FUNC
+
   proc_name = procedure.__name__.replace('_', '-')
 
   if proc_name in _PROCEDURE_NAMES_AND_DATA:
@@ -164,6 +181,9 @@ def register_procedure(
   proc_dict['run_data'] = run_data
   proc_dict['init_ui'] = init_ui
   proc_dict['additional_init'] = additional_init
+
+  _INIT_PROCEDURES_FUNC = init_procedures_func
+  _QUIT_FUNC = quit_func
 
 
 def _parse_and_check_parameters(parameters):
@@ -246,6 +266,12 @@ def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
 
   class_dict['do_query_procedures'] = _do_query_procedures
   class_dict['do_create_procedure'] = _do_create_procedure
+
+  if _INIT_PROCEDURES_FUNC:
+    class_dict['do_init_procedures'] = _INIT_PROCEDURES_FUNC
+
+  if _QUIT_FUNC:
+    class_dict['do_quit'] = _QUIT_FUNC
 
   if not _USE_LOCALE:
     class_dict['do_set_i18n'] = _disable_locale
