@@ -1,6 +1,6 @@
 ## Exporting Layers
 
-Open your image in GIMP and select `File → Batch → Export Layers...`.
+Open your image in GIMP and select `File → Export Layers...`.
 A dialog that appears allows you to choose the output folder and file extension.
 
 ![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
@@ -28,7 +28,7 @@ This is useful e.g. if you made changes to your image and you want to export aga
 
 ## Editing Layers
 
-To switch to layer editing mode, open your image in GIMP and select `File → Batch → Export Layers...`, then press the `Settings` button and select `Edit Layers`.
+To switch to layer editing mode, open your image in GIMP and select `File → Export Layers...`, then press the `Settings` button and select `Edit Layers`.
 
 The dialog now displays a list of procedures and constraints applied to layers:
 
