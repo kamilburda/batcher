@@ -91,7 +91,13 @@ gimprc_filepath="$gimp_local_dirpath"'/'"$gimprc_filename"
 
 if [ ! -f "$gimprc_filepath" ]; then
   echo "$gimprc_filename"' does not exist, running GIMP...'
-  gimp --no-interface --new-instance --batch-interpreter='python-fu-eval' --batch "Gimp.get_pdb().run_procedure('gimp-quit', [True])"
+
+  get_procedure="procedure = Gimp.get_pdb().lookup_procedure('gimp-quit')"
+  set_config="config = procedure.create_config(); config.set_property('force', True)"
+  run_procedure='procedure.run(config)'
+
+  gimp --no-interface --new-instance --batch-interpreter='python-fu-eval' \
+    --batch "${get_procedure}; ${set_config}; ${run_procedure}"
 fi
 
 if [ ! -f "$gimprc_filepath" ]; then
