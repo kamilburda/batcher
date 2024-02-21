@@ -1,4 +1,6 @@
-## Upcoming
+## 0.2
+
+### February 21, 2024
 
 * Updated Batcher to work with GIMP 2.99.18. Due to backwards incompatible changes, Batcher will no longer work with GIMP 2.99.16 and below.
 * Moved menu entries to the section containing `Export...` and `Export As...`. 
