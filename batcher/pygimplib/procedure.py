@@ -384,12 +384,16 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
     else:
       exit_status = return_values.pop(0)
 
-    formatted_return_values = procedure.new_return_values(exit_status, GLib.Error())
-    if formatted_return_values.length() > 1:
-      for i in reversed(range(1, formatted_return_values.length())):
-        if i - 1 < len(return_values):
-          formatted_return_values.remove(i)
-          formatted_return_values.insert(i, return_values[i - 1])
+    if exit_status in [Gimp.PDBStatusType.CALLING_ERROR, Gimp.PDBStatusType.EXECUTION_ERROR]:
+      error = GLib.Error(return_values[0]) if return_values else GLib.Error()
+      formatted_return_values = procedure.new_return_values(exit_status, error)
+    else:
+      formatted_return_values = procedure.new_return_values(exit_status, GLib.Error())
+      if formatted_return_values.length() > 1:
+        for i in reversed(range(1, formatted_return_values.length())):
+          if i - 1 < len(return_values):
+            formatted_return_values.remove(i)
+            formatted_return_values.insert(i, return_values[i - 1])
 
     return formatted_return_values
 
