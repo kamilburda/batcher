@@ -3,9 +3,27 @@ import os
 root_dirpath = os.path.join(Gimp.directory(), 'batcher')
 plugin_dirpath = os.path.join(root_dirpath, 'batcher')
 
-Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, root_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher', 'dev']), GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), os.path.join(plugin_dirpath, 'test_output.log'), False])
+procedure = Gimp.get_pdb().lookup_procedure('plug-in-run-tests')
+config = procedure.create_config()
+config.set_property('run-mode', Gimp.RunMode.NONINTERACTIVE)
+config.set_property('dirpath', root_dirpath)
+config.set_property('prefix', 'test_')
+config.set_property('modules', ['batcher', 'dev'])
+config.set_property('ignored-modules', ['batcher.src.tests.tests_requiring_gimp'])
+config.set_property('output-stream', os.path.join(plugin_dirpath, 'test_output.log'))
+config.set_property('verbose', False)
+procedure.run(config)
 
-Gimp.get_pdb().run_procedure('plug-in-run-tests', [Gimp.RunMode.NONINTERACTIVE, root_dirpath, 'test_', GObject.Value(GObject.TYPE_STRV, ['batcher.src.tests.tests_requiring_gimp']), GObject.Value(GObject.TYPE_STRV, []), os.path.join(plugin_dirpath, 'test_output_contents.log'), False])
+procedure = Gimp.get_pdb().lookup_procedure('plug-in-run-tests')
+config = procedure.create_config()
+config.set_property('run-mode', Gimp.RunMode.NONINTERACTIVE)
+config.set_property('dirpath', root_dirpath)
+config.set_property('prefix', 'test_')
+config.set_property('modules', ['batcher.src.tests.tests_requiring_gimp'])
+config.set_property('ignored-modules', [])
+config.set_property('output-stream', os.path.join(plugin_dirpath, 'test_output_contents.log'))
+config.set_property('verbose', False)
+procedure.run(config)
 
 
 import importlib

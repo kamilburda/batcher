@@ -49,9 +49,10 @@ if _ROOT_DIRPATH not in sys.path:
 
 
 def plug_in_run_tests(
-      procedure: Gimp.Procedure,
-      run_mode: Gimp.RunMode,
-      config: Gimp.ProcedureConfig):
+      _procedure: Gimp.Procedure,
+      config: Gimp.ProcedureConfig,
+      _data: Optional[bytes],
+):
   run_tests(
     config.get_property('dirpath'),
     config.get_property('prefix'),
