@@ -36,10 +36,6 @@ class PdbStub:
   def lookup_procedure(cls, proc_name):
     return cls._PROCEDURES.get(proc_name, None)
 
-  @classmethod
-  def run_procedure(cls, proc_name, args):
-    cls._PROCEDURES[proc_name].function(args)
-
 
 class PdbProcedureStub:
 
@@ -87,6 +83,9 @@ class PdbProcedureStub:
 
   def get_menu_label(self):
     return self._menu_label
+
+  def run(self, config):
+    pass
 
 
 class GParamStub:
