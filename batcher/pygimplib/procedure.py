@@ -38,8 +38,6 @@ def register_procedure(
       run_data: Optional[List] = None,
       init_ui: bool = True,
       additional_init: Optional[Callable] = None,
-      init_procedures_func: Optional[Callable] = None,
-      quit_func: Optional[Callable] = None,
 ):
   # noinspection PyUnresolvedReferences
   """Registers a function as a GIMP procedure.
@@ -113,16 +111,6 @@ def register_procedure(
       You can use this function to call registration-related functions not
       available via this function, e.g. `Gimp.Procedure.set_argument_sync`
       on individual procedure arguments.
-    init_procedures_func: Optional function returning a list of procedure names.
-      This function is called once for all registered procedures.
-      This function's behavior is identical to `Gimp.PlugIn.do_init_procedures`.
-      See `Gimp.PlugIn` for more information.
-      You only need to specify this argument once when registering multiple
-      procedures. Specifying this argument another time will override the
-      previous function.
-    quit_func: Optional function called before a plug-in terminates.
-      See `Gimp.PlugIn` for more information.
-      Like `init_procedures_func`, you only need to specify this function once.
 
   Example:
 
@@ -182,9 +170,6 @@ def register_procedure(
   proc_dict['init_ui'] = init_ui
   proc_dict['additional_init'] = additional_init
 
-  _INIT_PROCEDURES_FUNC = init_procedures_func
-  _QUIT_FUNC = quit_func
-
 
 def _parse_and_check_parameters(parameters):
   if parameters is None:
@@ -238,6 +223,30 @@ def set_use_locale(enabled):
   _USE_LOCALE = bool(enabled)
 
 
+def set_init_procedures_func(func: Optional[Callable] = None):
+  """Sets a function returning a list of procedure names, to be called during
+  plug-in initialization.
+
+  Passing ``None`` unsets the function.
+
+  This function's behavior is identical to `Gimp.PlugIn.do_init_procedures`.
+  See `Gimp.PlugIn` for more information.
+  """
+  global _INIT_PROCEDURES_FUNC
+  _INIT_PROCEDURES_FUNC = func
+
+
+def set_quit_func(func: Optional[Callable] = None):
+  """Sets a function to be called before a plug-in terminates.
+
+  Passing ``None`` unsets the function.
+
+  See `Gimp.PlugIn` for more information.
+  """
+  global _QUIT_FUNC
+  _QUIT_FUNC = func
+
+
 def main():
   """Initializes and runs the plug-in.
 
@@ -267,14 +276,14 @@ def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
   class_dict['do_query_procedures'] = _do_query_procedures
   class_dict['do_create_procedure'] = _do_create_procedure
 
+  if not _USE_LOCALE:
+    class_dict['do_set_i18n'] = _disable_locale
+
   if _INIT_PROCEDURES_FUNC:
     class_dict['do_init_procedures'] = _INIT_PROCEDURES_FUNC
 
   if _QUIT_FUNC:
     class_dict['do_quit'] = _QUIT_FUNC
-
-  if not _USE_LOCALE:
-    class_dict['do_set_i18n'] = _disable_locale
 
   return type(
     class_name,
