@@ -190,8 +190,8 @@ class ExportLayersDialog:
   
   _HBOX_EXPORT_LABELS_NAME_SPACING = 10
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
-  _HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING = 8
-  _HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH = 2
+  _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
+  _HBOX_MESSAGE_BORDER_WIDTH = 2
   
   _MORE_SETTINGS_HORIZONTAL_SPACING = 12
   _MORE_SETTINGS_BORDER_WIDTH = 3
@@ -295,18 +295,18 @@ class ExportLayersDialog:
     )
     self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
     
-    self._folder_chooser = pg.gui.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
+    self._folder_chooser = Gtk.FileChooserButton(action=Gtk.FileChooserAction.SELECT_FOLDER)
     
-    self._vbox_folder_chooser = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
+    self._hbox_folder_chooser = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._DIALOG_VBOX_SPACING,
     )
-    self._vbox_folder_chooser.pack_start(
+    self._hbox_folder_chooser.pack_start(
       self._folder_chooser_label,
       False,
       False,
       self._SAVE_IN_FOLDER_LABEL_PADDING)
-    self._vbox_folder_chooser.pack_start(self._folder_chooser, True, True, 0)
+    self._hbox_folder_chooser.pack_start(self._folder_chooser, False, False, 0)
     
     self._init_gui_previews()
     
@@ -391,19 +391,6 @@ class ExportLayersDialog:
     )
     self._hbox_export_name.pack_start(self._hbox_export_name_labels, False, False, 0)
     self._hbox_export_name.pack_start(self._hbox_export_name_entries, False, False, 0)
-
-    self._label_message = message_label_.MessageLabel()
-
-    self._box_warning_messages = message_box_.SettingValueNotValidMessageBox(message_type=Gtk.MessageType.WARNING)
-
-    self._hbox_export_name_and_messages = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._HBOX_EXPORT_NAME_AND_MESSAGE_HORIZONTAL_SPACING,
-      border_width=self._HBOX_EXPORT_NAME_AND_MESSAGE_BORDER_WIDTH,
-    )
-    self._hbox_export_name_and_messages.pack_start(self._hbox_export_name, False, False, 0)
-    self._hbox_export_name_and_messages.pack_start(self._box_warning_messages, False, False, 0)
-    self._hbox_export_name_and_messages.pack_start(self._label_message, True, True, 0)
     
     self._box_procedures = actions_.ActionBox(
       self._settings['main/procedures'],
@@ -427,30 +414,19 @@ class ExportLayersDialog:
     self._hbox_actions.pack_start(self._box_procedures, True, True, 0)
     self._hbox_actions.pack_start(self._box_constraints, True, True, 0)
     
-    self._label_message_for_edit_mode = message_label_.MessageLabel()
-    
-    self._vbox_actions_and_message_for_edit_mode = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-    )
-    self._vbox_actions_and_message_for_edit_mode.pack_start(
-      self._hbox_actions, True, True, 0)
-    self._vbox_actions_and_message_for_edit_mode.pack_start(
-      self._label_message_for_edit_mode, False, False, 0)
-    
     self._vbox_chooser_and_settings = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._DIALOG_VBOX_SPACING,
     )
-    self._vbox_chooser_and_settings.pack_start(self._vbox_folder_chooser, True, True, 0)
-    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name_and_messages, False, False, 0)
+    self._vbox_chooser_and_settings.pack_start(self._hbox_folder_chooser, False, False, 0)
+    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name, False, False, 0)
     
     self._vpaned_chooser_and_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
     self._vpaned_chooser_and_actions.pack1(self._vbox_chooser_and_settings, True, False)
-    self._vpaned_chooser_and_actions.pack2(
-      self._vbox_actions_and_message_for_edit_mode, False, True)
+    self._vpaned_chooser_and_actions.pack2(self._hbox_actions, False, True)
     
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -515,6 +491,19 @@ class ExportLayersDialog:
       ellipsize=Pango.EllipsizeMode.MIDDLE,
     )
     self._progress_bar.set_no_show_all(True)
+
+    self._label_message = message_label_.MessageLabel()
+
+    self._box_warning_messages = message_box_.SettingValueNotValidMessageBox(
+      message_type=Gtk.MessageType.WARNING)
+
+    self._hbox_messages = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_MESSAGE_HORIZONTAL_SPACING,
+      border_width=self._HBOX_MESSAGE_BORDER_WIDTH,
+    )
+    self._hbox_messages.pack_start(self._box_warning_messages, False, False, 0)
+    self._hbox_messages.pack_start(self._label_message, True, True, 0)
     
     self._hbox_contents = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -525,6 +514,7 @@ class ExportLayersDialog:
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
+    self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
   
   def _connect_events(self):
     self._box_procedures.connect(
@@ -624,7 +614,7 @@ class ExportLayersDialog:
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui({
       'main/output_directory': [
-        pg.setting.SETTING_GUI_TYPES.folder_chooser_widget, self._folder_chooser],
+        pg.setting.SETTING_GUI_TYPES.folder_chooser_button, self._folder_chooser],
       'main/file_extension': [
         pg.setting.SETTING_GUI_TYPES.extended_entry, self._file_extension_entry],
       'main/layer_filename_pattern': [
@@ -858,7 +848,7 @@ class ExportLayersDialog:
   
   def _show_hide_more_settings(self):
     if self._menu_item_show_more_settings.get_active():
-      self._vbox_actions_and_message_for_edit_mode.show()
+      self._hbox_actions.show()
       
       self._file_extension_label.hide()
       self._save_as_label.show()
@@ -867,7 +857,7 @@ class ExportLayersDialog:
     else:
       self._settings['main/edit_mode'].set_value(False)
       
-      self._vbox_actions_and_message_for_edit_mode.hide()
+      self._hbox_actions.hide()
       
       self._file_extension_label.show()
       self._save_as_label.hide()
@@ -882,13 +872,11 @@ class ExportLayersDialog:
       self._settings['gui/show_more_settings'].set_value(True)
       
       self._vbox_chooser_and_settings.hide()
-      self._label_message_for_edit_mode.show()
       
       self._button_run.set_label(_('Run'))
       self._button_close.set_label(_('Close'))
     else:
       self._vbox_chooser_and_settings.show()
-      self._label_message_for_edit_mode.hide()
       
       self._button_run.set_label(_('Export'))
       self._button_close.set_label(_('Cancel'))
@@ -1159,12 +1147,7 @@ class ExportLayersDialog:
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting
 
-    if self._settings['main/edit_mode'].value:
-      label_message = self._label_message_for_edit_mode
-    else:
-      label_message = self._label_message
-    
-    label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
+    self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
 
 
 class ExportLayersNowDialog:
