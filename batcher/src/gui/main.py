@@ -191,7 +191,6 @@ class ExportLayersDialog:
   _HBOX_EXPORT_LABELS_NAME_SPACING = 10
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
-  _HBOX_MESSAGE_BORDER_WIDTH = 2
   
   _MORE_SETTINGS_HORIZONTAL_SPACING = 12
   _MORE_SETTINGS_BORDER_WIDTH = 3
@@ -301,11 +300,7 @@ class ExportLayersDialog:
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._DIALOG_VBOX_SPACING,
     )
-    self._hbox_folder_chooser.pack_start(
-      self._folder_chooser_label,
-      False,
-      False,
-      self._SAVE_IN_FOLDER_LABEL_PADDING)
+    self._hbox_folder_chooser.pack_start(self._folder_chooser_label, False, False, 0)
     self._hbox_folder_chooser.pack_start(self._folder_chooser, False, False, 0)
     
     self._init_gui_previews()
@@ -500,18 +495,17 @@ class ExportLayersDialog:
     self._hbox_messages = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_MESSAGE_HORIZONTAL_SPACING,
-      border_width=self._HBOX_MESSAGE_BORDER_WIDTH,
     )
     self._hbox_messages.pack_start(self._box_warning_messages, False, False, 0)
     self._hbox_messages.pack_start(self._label_message, True, True, 0)
     
     self._hbox_contents = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
-      border_width=self._DIALOG_CONTENTS_BORDER_WIDTH,
     )
     self._hbox_contents.pack_start(self._hpaned_settings_and_previews, True, True, 0)
     
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
+    self._dialog.vbox.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
     self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
