@@ -192,9 +192,6 @@ class ExportLayersDialog:
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
   
-  _MORE_SETTINGS_HORIZONTAL_SPACING = 12
-  _MORE_SETTINGS_BORDER_WIDTH = 3
-  
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
   _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
@@ -400,34 +397,33 @@ class ExportLayersDialog:
       _('Add C_onstraint...'),
       _('Edit Constraint'),
       allow_custom_actions=False)
-    
-    self._hbox_actions = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._MORE_SETTINGS_HORIZONTAL_SPACING,
-      border_width=self._MORE_SETTINGS_BORDER_WIDTH,
-    )
-    self._hbox_actions.pack_start(self._box_procedures, True, True, 0)
-    self._hbox_actions.pack_start(self._box_constraints, True, True, 0)
-    
-    self._vbox_chooser_and_settings = Gtk.Box(
+
+    self._vbox_export_settings = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._DIALOG_VBOX_SPACING,
     )
-    self._vbox_chooser_and_settings.pack_start(self._hbox_folder_chooser, False, False, 0)
-    self._vbox_chooser_and_settings.pack_start(self._hbox_export_name, False, False, 0)
+    self._vbox_export_settings.pack_start(self._hbox_folder_chooser, False, False, 0)
+    self._vbox_export_settings.pack_start(self._hbox_export_name, False, False, 0)
     
-    self._vpaned_chooser_and_actions = Gtk.Paned(
+    self._vpaned_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_chooser_and_actions.pack1(self._vbox_chooser_and_settings, True, False)
-    self._vpaned_chooser_and_actions.pack2(self._hbox_actions, False, True)
+    self._vpaned_actions.pack1(self._box_procedures, False, False)
+    self._vpaned_actions.pack2(self._box_constraints, False, False)
+
+    self._vbox_export_settings_and_actions = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._DIALOG_VBOX_SPACING,
+    )
+    self._vbox_export_settings_and_actions.pack_start(self._vbox_export_settings, False, False, 0)
+    self._vbox_export_settings_and_actions.pack_start(self._vpaned_actions, True, True, 0)
     
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
       wide_handle=True,
     )
-    self._hpaned_settings_and_previews.pack1(self._vpaned_chooser_and_actions, True, False)
+    self._hpaned_settings_and_previews.pack1(self._vbox_export_settings_and_actions, True, False)
     self._hpaned_settings_and_previews.pack2(self._frame_previews, True, True)
     
     self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
@@ -628,8 +624,8 @@ class ExportLayersDialog:
         pg.setting.SETTING_GUI_TYPES.paned_position, self._hpaned_settings_and_previews],
       'gui/size/paned_between_previews_position': [
         pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_previews],
-      'gui/size/settings_vpane_position': [
-        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_chooser_and_actions],
+      'gui/size/actions_vpaned_position': [
+        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_actions],
     })
   
   def _init_gui_previews(self):
@@ -842,7 +838,7 @@ class ExportLayersDialog:
   
   def _show_hide_more_settings(self):
     if self._menu_item_show_more_settings.get_active():
-      self._hbox_actions.show()
+      self._vpaned_actions.show()
       
       self._file_extension_label.hide()
       self._save_as_label.show()
@@ -851,7 +847,7 @@ class ExportLayersDialog:
     else:
       self._settings['main/edit_mode'].set_value(False)
       
-      self._hbox_actions.hide()
+      self._vpaned_actions.hide()
       
       self._file_extension_label.show()
       self._save_as_label.hide()
@@ -865,12 +861,12 @@ class ExportLayersDialog:
     if self._menu_item_edit_mode.get_active():
       self._settings['gui/show_more_settings'].set_value(True)
       
-      self._vbox_chooser_and_settings.hide()
+      self._vbox_export_settings.hide()
       
       self._button_run.set_label(_('Run'))
       self._button_close.set_label(_('Close'))
     else:
-      self._vbox_chooser_and_settings.show()
+      self._vbox_export_settings.show()
       
       self._button_run.set_label(_('Export'))
       self._button_close.set_label(_('Cancel'))
