@@ -37,6 +37,7 @@ def register_procedure(
       auxiliary_arguments: Optional[List[Union[Dict, str]]] = None,
       run_data: Optional[List] = None,
       init_ui: bool = True,
+      pdb_procedure_type: Gimp.PDBProcType = Gimp.PDBProcType.PLUGIN,
       additional_init: Optional[Callable] = None,
 ):
   # noinspection PyUnresolvedReferences
@@ -105,6 +106,7 @@ def register_procedure(
       ``run_data`` is not ``None``.
     init_ui: If ``True``, user interface is initialized via `GimpUi.init`.
       See `GimpUi.init` for more information.
+    pdb_procedure_type: One of the values of the `Gimp.PDBProcType` enum.
     additional_init: Function allowing customization of procedure registration.
       The function accepts a single argument - a ``Gimp.Procedure`` instance
       corresponding to the registered procedure.
@@ -168,6 +170,7 @@ def register_procedure(
   proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
   proc_dict['run_data'] = run_data
   proc_dict['init_ui'] = init_ui
+  proc_dict['pdb_procedure_type'] = pdb_procedure_type
   proc_dict['additional_init'] = additional_init
 
 
@@ -305,7 +308,7 @@ def _do_create_procedure(plugin_instance, proc_name):
   procedure = proc_dict['procedure_type'].new(
     plugin_instance,
     proc_name,
-    Gimp.PDBProcType.PLUGIN,
+    proc_dict['pdb_procedure_type'],
     _get_procedure_wrapper(
       proc_dict['procedure'], proc_dict['procedure_type'], proc_dict['init_ui']),
     proc_dict['run_data'])
