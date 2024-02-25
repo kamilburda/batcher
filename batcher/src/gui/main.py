@@ -184,11 +184,10 @@ class ExportLayersDialog:
   _DIALOG_BORDER_WIDTH = 5
   _DIALOG_CONTENTS_BORDER_WIDTH = 5
   _DIALOG_VBOX_SPACING = 5
-  
+
+  _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _SAVE_IN_FOLDER_LABEL_PADDING = 3
   _PREVIEW_LABEL_BORDER_WIDTH = 5
-  
-  _HBOX_EXPORT_LABELS_NAME_SPACING = 10
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
   
@@ -284,22 +283,7 @@ class ExportLayersDialog:
     GimpUi.window_set_transient(self._dialog)
 
     messages_.set_gui_excepthook_parent(self._dialog)
-    
-    self._folder_chooser_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
-    )
-    self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
-    
-    self._folder_chooser = Gtk.FileChooserButton(action=Gtk.FileChooserAction.SELECT_FOLDER)
-    
-    self._hbox_folder_chooser = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._DIALOG_VBOX_SPACING,
-    )
-    self._hbox_folder_chooser.pack_start(self._folder_chooser_label, False, False, 0)
-    self._hbox_folder_chooser.pack_start(self._folder_chooser, False, False, 0)
-    
+
     self._init_gui_previews()
     
     self._preview_label = Gtk.Label(
@@ -329,7 +313,17 @@ class ExportLayersDialog:
     
     self._frame_previews = Gtk.Frame(shadow_type=Gtk.ShadowType.ETCHED_OUT)
     self._frame_previews.add(self._vbox_previews)
-    
+
+    self._folder_chooser_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
+    self._folder_chooser_label.set_markup(
+      '<b>{}</b>'.format(_('Save in folder:')))
+
+    self._folder_chooser = Gtk.FileChooserButton(
+      action=Gtk.FileChooserAction.SELECT_FOLDER)
+
     self._file_extension_label = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
@@ -363,27 +357,29 @@ class ExportLayersDialog:
       default_item=self._settings['main/layer_filename_pattern'].default_value)
     self._filename_pattern_entry.set_activates_default(True)
 
-    self._hbox_export_name_labels = Gtk.Box(
+    self._hbox_export_filename_labels = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
-    self._hbox_export_name_labels.pack_start(self._file_extension_label, False, False, 0)
-    self._hbox_export_name_labels.pack_start(self._save_as_label, False, False, 0)
+    self._hbox_export_filename_labels.pack_start(self._file_extension_label, False, False, 0)
+    self._hbox_export_filename_labels.pack_start(self._save_as_label, False, False, 0)
     
-    self._hbox_export_name_entries = Gtk.Box(
+    self._hbox_export_filename_entries = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
     )
-    self._hbox_export_name_entries.pack_start(self._filename_pattern_entry, False, False, 0)
-    self._hbox_export_name_entries.pack_start(self._dot_label, False, False, 0)
-    self._hbox_export_name_entries.pack_start(self._file_extension_entry, False, False, 0)
-    
-    self._hbox_export_name = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._HBOX_EXPORT_LABELS_NAME_SPACING,
+    self._hbox_export_filename_entries.pack_start(self._filename_pattern_entry, False, False, 0)
+    self._hbox_export_filename_entries.pack_start(self._dot_label, False, False, 0)
+    self._hbox_export_filename_entries.pack_start(self._file_extension_entry, False, False, 0)
+
+    self._grid_export_settings = Gtk.Grid(
+      row_spacing=self._DIALOG_VBOX_SPACING,
+      column_spacing=self._GRID_EXPORT_SETTINGS_COLUMN_SPACING,
     )
-    self._hbox_export_name.pack_start(self._hbox_export_name_labels, False, False, 0)
-    self._hbox_export_name.pack_start(self._hbox_export_name_entries, False, False, 0)
-    
+    self._grid_export_settings.attach(self._folder_chooser_label, 0, 0, 1, 1)
+    self._grid_export_settings.attach(self._folder_chooser, 1, 0, 1, 1)
+    self._grid_export_settings.attach(self._hbox_export_filename_labels, 0, 1, 1, 1)
+    self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
+
     self._box_procedures = actions_.ActionBox(
       self._settings['main/procedures'],
       builtin_procedures.BUILTIN_PROCEDURES,
@@ -398,13 +394,6 @@ class ExportLayersDialog:
       _('Edit Constraint'),
       allow_custom_actions=False)
 
-    self._vbox_export_settings = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._DIALOG_VBOX_SPACING,
-    )
-    self._vbox_export_settings.pack_start(self._hbox_folder_chooser, False, False, 0)
-    self._vbox_export_settings.pack_start(self._hbox_export_name, False, False, 0)
-    
     self._vpaned_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
@@ -416,7 +405,7 @@ class ExportLayersDialog:
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._DIALOG_VBOX_SPACING,
     )
-    self._vbox_export_settings_and_actions.pack_start(self._vbox_export_settings, False, False, 0)
+    self._vbox_export_settings_and_actions.pack_start(self._grid_export_settings, False, False, 0)
     self._vbox_export_settings_and_actions.pack_start(self._vpaned_actions, True, True, 0)
     
     self._hpaned_settings_and_previews = Gtk.Paned(
@@ -861,12 +850,12 @@ class ExportLayersDialog:
     if self._menu_item_edit_mode.get_active():
       self._settings['gui/show_more_settings'].set_value(True)
       
-      self._vbox_export_settings.hide()
+      self._grid_export_settings.hide()
       
       self._button_run.set_label(_('Run'))
       self._button_close.set_label(_('Close'))
     else:
-      self._vbox_export_settings.show()
+      self._grid_export_settings.show()
       
       self._button_run.set_label(_('Export'))
       self._button_close.set_label(_('Cancel'))
