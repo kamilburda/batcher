@@ -318,19 +318,11 @@ class ExportLayersDialog:
       xalign=0.0,
       yalign=0.5,
     )
-    self._folder_chooser_label.set_markup(
-      '<b>{}</b>'.format(_('Save in folder:')))
+    self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
 
     self._folder_chooser = Gtk.FileChooserButton(
-      action=Gtk.FileChooserAction.SELECT_FOLDER)
-
-    self._file_extension_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
+      action=Gtk.FileChooserAction.SELECT_FOLDER,
     )
-    self._file_extension_label.set_markup(
-      '<b>{}:</b>'.format(
-        GLib.markup_escape_text(self._settings['main/file_extension'].display_name)))
     
     self._file_extension_entry = entries_.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
@@ -338,11 +330,11 @@ class ExportLayersDialog:
       activates_default=True,
     )
     
-    self._save_as_label = Gtk.Label(
+    self._export_filename_label = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
     )
-    self._save_as_label.set_markup('<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
+    self._export_filename_label.set_markup('<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
     
     self._dot_label = Gtk.Label(
       label='.',
@@ -356,12 +348,6 @@ class ExportLayersDialog:
       maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
       default_item=self._settings['main/layer_filename_pattern'].default_value)
     self._filename_pattern_entry.set_activates_default(True)
-
-    self._hbox_export_filename_labels = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-    )
-    self._hbox_export_filename_labels.pack_start(self._file_extension_label, False, False, 0)
-    self._hbox_export_filename_labels.pack_start(self._save_as_label, False, False, 0)
     
     self._hbox_export_filename_entries = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -377,7 +363,7 @@ class ExportLayersDialog:
     )
     self._grid_export_settings.attach(self._folder_chooser_label, 0, 0, 1, 1)
     self._grid_export_settings.attach(self._folder_chooser, 1, 0, 1, 1)
-    self._grid_export_settings.attach(self._hbox_export_filename_labels, 0, 1, 1, 1)
+    self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
     self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
 
     self._box_procedures = actions_.ActionBox(
@@ -441,8 +427,7 @@ class ExportLayersDialog:
       0)
     self._button_settings = Gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
-    
-    self._menu_item_show_more_settings = Gtk.CheckMenuItem(label=_('Show More Settings'))
+
     self._menu_item_edit_mode = Gtk.CheckMenuItem(label=_('Edit Layers'))
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
@@ -450,7 +435,6 @@ class ExportLayersDialog:
     self._menu_item_export_settings = Gtk.MenuItem(label=_('Export Settings...'))
     
     self._menu_settings = Gtk.Menu()
-    self._menu_settings.append(self._menu_item_show_more_settings)
     self._menu_settings.append(self._menu_item_edit_mode)
     self._menu_settings.append(self._menu_item_save_settings)
     self._menu_settings.append(self._menu_item_reset_settings)
@@ -504,8 +488,6 @@ class ExportLayersDialog:
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
     
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
-    self._menu_item_show_more_settings.connect(
-      'toggled', self._on_menu_item_show_more_settings_toggled)
     self._menu_item_edit_mode.connect('toggled', self._on_menu_item_edit_mode_toggled)
     self._menu_item_save_settings.connect('activate', self._on_save_settings_activate)
     self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
@@ -578,7 +560,6 @@ class ExportLayersDialog:
       Gtk.main_iteration()
     
     self._dialog.vbox.show_all()
-    self._show_hide_more_settings()
     self._update_gui_for_edit_mode(update_name_preview=False)
     
     if not self._settings['main/edit_mode'].value:
@@ -600,8 +581,6 @@ class ExportLayersDialog:
         pg.setting.SETTING_GUI_TYPES.extended_entry, self._filename_pattern_entry],
       'main/edit_mode': [
         pg.setting.SETTING_GUI_TYPES.check_menu_item, self._menu_item_edit_mode],
-      'gui/show_more_settings': [
-        pg.setting.SETTING_GUI_TYPES.check_menu_item, self._menu_item_show_more_settings],
       'gui/image_preview_automatic_update': [
         pg.setting.SETTING_GUI_TYPES.check_menu_item,
         self._image_preview.menu_item_update_automatically],
@@ -822,34 +801,11 @@ class ExportLayersDialog:
            for name in ['insert_background', 'insert_foreground']):
       actions.reorder(self._settings['main/procedures'], item.action.name, 0)
   
-  def _on_menu_item_show_more_settings_toggled(self, menu_item):
-    self._show_hide_more_settings()
-  
-  def _show_hide_more_settings(self):
-    if self._menu_item_show_more_settings.get_active():
-      self._vpaned_actions.show()
-      
-      self._file_extension_label.hide()
-      self._save_as_label.show()
-      self._dot_label.show()
-      self._filename_pattern_entry.show()
-    else:
-      self._settings['main/edit_mode'].set_value(False)
-      
-      self._vpaned_actions.hide()
-      
-      self._file_extension_label.show()
-      self._save_as_label.hide()
-      self._dot_label.hide()
-      self._filename_pattern_entry.hide()
-  
   def _on_menu_item_edit_mode_toggled(self, menu_item):
     self._update_gui_for_edit_mode()
   
   def _update_gui_for_edit_mode(self, update_name_preview=True):
     if self._menu_item_edit_mode.get_active():
-      self._settings['gui/show_more_settings'].set_value(True)
-      
       self._grid_export_settings.hide()
       
       self._button_run.set_label(_('Run'))

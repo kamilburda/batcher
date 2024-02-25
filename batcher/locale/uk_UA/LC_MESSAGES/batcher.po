@@ -334,10 +334,6 @@ msgstr "_Стоп"
 msgid "_Settings"
 msgstr ""
 
-#: ../../batcher/src/gui/main.py:489
-msgid "Show More Settings"
-msgstr ""
-
 #: ../../batcher/src/gui/main.py:490
 msgid "Edit Layers"
 msgstr ""

@@ -185,11 +185,6 @@ def _create_gui_settings():
   gui_settings.add([
     {
       'type': 'bool',
-      'name': 'show_more_settings',
-      'default_value': False,
-    },
-    {
-      'type': 'bool',
       'name': 'name_preview_sensitive',
       'default_value': True,
       'gui_type': None,

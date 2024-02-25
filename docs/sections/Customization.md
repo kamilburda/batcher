@@ -7,9 +7,6 @@ Beyond the basic features, Batcher allows you to:
 
 As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below.
 
-When [editing layers](Usage.md#editing-layers), customization options are automatically displayed.
-To enable customization when exporting layers, select `Settings → Show More Settings`.
-
 ![Dialog of Export Layers with additional customization](../images/screenshot_dialog_customization.png)
 
 

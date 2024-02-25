@@ -70,7 +70,6 @@ def take_screenshots(gui, dialog, settings):
   os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
   
   settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
-  settings['gui/show_more_settings'].set_value(False)
   
   decoration_offsets = move_dialog_to_corner(dialog, settings)
   
@@ -93,8 +92,6 @@ def take_screenshots(gui, dialog, settings):
     dialog,
     blur_folders=True,
   )
-  
-  settings['gui/show_more_settings'].set_value(True)
   
   actions.add(
     settings['main/procedures'],
