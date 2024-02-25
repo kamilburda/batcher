@@ -179,8 +179,7 @@ def _setup_output_directory_changed(settings, current_image):
 
 
 class ExportLayersDialog:
-  
-  _DIALOG_SIZE = (900, 610)
+
   _DIALOG_BORDER_WIDTH = 5
   _DIALOG_CONTENTS_BORDER_WIDTH = 5
   _DIALOG_VBOX_SPACING = 5
@@ -276,7 +275,8 @@ class ExportLayersDialog:
   
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=pg.config.PLUGIN_NAME)
-    self._dialog.set_default_size(*self._DIALOG_SIZE)
+    if self._settings['gui/size/dialog_size'].value:
+      self._dialog.set_default_size(*self._settings['gui/size/dialog_size'].value)
     self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
 
