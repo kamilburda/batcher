@@ -366,21 +366,31 @@ class ExportLayersDialog:
       builtin_procedures.BUILTIN_PROCEDURES,
       _('Add P_rocedure...'),
       _('Edit Procedure'),
-      add_custom_action_text=_('Add Custom Procedure...'))
+      add_custom_action_text=_('Add Custom Procedure...'),
+      propagate_natural_height=True,
+    )
+
+    self._vbox_procedures_and_separator = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+    )
+    self._vbox_procedures_and_separator.pack_start(self._box_procedures, True, True, 0)
+    self._vbox_procedures_and_separator.pack_start(Gtk.Separator(), False, False, 0)
     
     self._box_constraints = actions_.ActionBox(
       self._settings['main/constraints'],
       builtin_constraints.BUILTIN_CONSTRAINTS,
       _('Add C_onstraint...'),
       _('Edit Constraint'),
-      allow_custom_actions=False)
+      allow_custom_actions=False,
+      propagate_natural_height=True,
+    )
 
     self._vpaned_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_actions.pack1(self._box_procedures, False, False)
-    self._vpaned_actions.pack2(self._box_constraints, False, False)
+    self._vpaned_actions.pack1(self._vbox_procedures_and_separator, True, False)
+    self._vpaned_actions.pack2(self._box_constraints, True, False)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
