@@ -70,10 +70,7 @@ class DirpathSetting(ValidatableStringSetting):
   * ``''``
   """
 
-  _ALLOWED_GUI_TYPES = [
-    pg.SETTING_GUI_TYPES.folder_chooser_button,
-    pg.SETTING_GUI_TYPES.folder_chooser_widget,
-  ]
+  _ALLOWED_GUI_TYPES = [pg.SETTING_GUI_TYPES.folder_chooser_button]
 
   _DEFAULT_DEFAULT_VALUE = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
 

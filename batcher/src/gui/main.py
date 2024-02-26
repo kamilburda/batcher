@@ -240,10 +240,6 @@ class ExportLayersDialog:
   def image_preview(self):
     return self._image_preview
   
-  @property
-  def folder_chooser(self):
-    return self._folder_chooser
-  
   def _init_settings(self):
     self._settings['main/procedures'].tags.add('ignore_load')
     self._settings['main/constraints'].tags.add('ignore_load')

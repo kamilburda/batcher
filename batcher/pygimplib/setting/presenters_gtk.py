@@ -581,28 +581,6 @@ class GBytesEntryPresenter(GtkPresenter):
     self._widget.set_position(-1)
 
 
-class FolderChooserWidgetPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.FileChooserWidget` widgets used as
-  folder choosers.
-  
-  Value: Current folder.
-  """
-
-  def _create_widget(self, setting, **kwargs):
-    return pggui.FileChooserWidget(action=Gtk.FileChooserAction.SELECT_FOLDER)
-  
-  def get_value(self):
-    folder = self._widget.get_current_folder()
-
-    if folder is not None:
-      return folder
-    else:
-      return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
-  
-  def _set_value(self, dirpath):
-    self._widget.set_current_folder(dirpath if dirpath is not None else '')
-
-
 class FolderChooserButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
   folder choosers.

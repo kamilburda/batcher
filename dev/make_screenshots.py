@@ -88,9 +88,6 @@ def take_screenshots(gui, dialog, settings):
     SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
-    gui,
-    dialog,
-    blur_folders=True,
   )
   
   actions.add(
@@ -119,9 +116,6 @@ def take_screenshots(gui, dialog, settings):
     SCREENSHOT_DIALOG_CUSTOMIZATION_FILENAME,
     settings,
     decoration_offsets,
-    gui,
-    dialog,
-    blur_folders=True,
   )
   
   settings['main/edit_mode'].set_value(True)
@@ -134,22 +128,16 @@ def take_screenshots(gui, dialog, settings):
     SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
-    gui,
-    dialog,
   )
   
   Gtk.main_quit()
   
 
-def take_and_process_screenshot(
-      screenshots_dirpath, filename, settings, decoration_offsets, gui, dialog, blur_folders=False):
+def take_and_process_screenshot(screenshots_dirpath, filename, settings, decoration_offsets):
   # HACK: Wait a while until the window is fully shown.
   time.sleep(1)
   
-  screenshot_image = take_screenshot(dialog)
-  
-  if blur_folders:
-    blur_folder_chooser(screenshot_image, gui, decoration_offsets)
+  screenshot_image = take_screenshot()
   
   crop_to_dialog(screenshot_image, settings, decoration_offsets)
 
@@ -166,29 +154,7 @@ def take_and_process_screenshot(
   screenshot_image.delete()
 
 
-def blur_folder_chooser(image, gui, decoration_offsets):
-  folder_chooser_left_pane = (
-    gui
-    .folder_chooser
-    .get_children()[0]
-    .get_children()[0]
-    .get_children()[0])
-
-  toplevel_window = gui.folder_chooser.get_toplevel()
-
-  widget_coordinates = folder_chooser_left_pane.translate_coordinates(toplevel_window, 0, 0)
-
-  selection_to_blur = folder_chooser_left_pane.get_allocation()
-  selection_to_blur.x += widget_coordinates[0]
-  selection_to_blur.y += widget_coordinates[1] + decoration_offsets[1]
-
-  image.select_rectangle(
-    0, selection_to_blur.x, selection_to_blur.y, selection_to_blur.width, selection_to_blur.height)
-  pdb.plug_in_gauss(image, image.list_selected_layers()[0], 25, 25, 0)
-  pdb.gimp_selection_none(image)
-
-
-def take_screenshot(dialog):
+def take_screenshot():
   return pdb.plug_in_screenshot(1, 0, 0, 0, 0)
 
 
