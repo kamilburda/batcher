@@ -178,7 +178,7 @@ def _create_gui_settings():
     {
       'type': 'float',
       'name': 'actions_vpaned_position',
-      'default_value': 180,
+      'default_value': 260,
     },
   ])
 
