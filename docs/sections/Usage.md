@@ -1,13 +1,18 @@
 ## Exporting Layers
 
 Open your image in GIMP and select `File → Export Layers...`.
-A dialog that appears allows you to choose the output folder and file extension.
+A dialog appears that allows you to choose the output folder, filenames and the file extension.
 
 ![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
 
 To export layers, press the `Export` button.
 A dialog corresponding to the file format appears, allowing you to adjust export settings.
 Some file formats do not display dialogs, while some display the dialog for each layer (this cannot be prevented because such a file format only allows an interactive export).
+
+
+### Changing Filenames
+
+See the [corresponding section in Customization](Customization.md#adjusting-filenames).
 
 
 ### Changing File Extension
