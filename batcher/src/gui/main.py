@@ -180,12 +180,12 @@ def _setup_output_directory_changed(settings, current_image):
 
 class ExportLayersDialog:
 
-  _DIALOG_BORDER_WIDTH = 5
-  _DIALOG_CONTENTS_BORDER_WIDTH = 5
+  _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
-  _PREVIEW_LABEL_BORDER_WIDTH = 5
+  _PREVIEW_LABEL_TOP_MARGIN = 8
+  _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
   _ACTION_PANED_SPACING = 10
@@ -273,7 +273,6 @@ class ExportLayersDialog:
     self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=pg.config.PLUGIN_NAME)
     if self._settings['gui/size/dialog_size'].value:
       self._dialog.set_default_size(*self._settings['gui/size/dialog_size'].value)
-    self._dialog.set_border_width(self._DIALOG_BORDER_WIDTH)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
 
     GimpUi.window_set_transient(self._dialog)
@@ -285,14 +284,10 @@ class ExportLayersDialog:
     self._preview_label = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
+      margin_top=self._PREVIEW_LABEL_TOP_MARGIN,
+      margin_bottom=self._PREVIEW_LABEL_BOTTOM_MARGIN,
     )
     self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
-    
-    self._hbox_preview_label = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      border_width=self._PREVIEW_LABEL_BORDER_WIDTH,
-    )
-    self._hbox_preview_label.pack_start(self._preview_label, False, False, 0)
 
     self._vpaned_previews = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
@@ -304,7 +299,7 @@ class ExportLayersDialog:
     self._vbox_previews = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
     )
-    self._vbox_previews.pack_start(self._hbox_preview_label, False, False, 0)
+    self._vbox_previews.pack_start(self._preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
     
     self._frame_previews = Gtk.Frame(shadow_type=Gtk.ShadowType.ETCHED_OUT)
