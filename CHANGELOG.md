@@ -1,3 +1,10 @@
+## Upcoming
+
+Redesigned user interface:
+* Replace the folder chooser widget with a folder chooser button.
+* Procedures and constraints are now aligned vertically. 
+
+
 ## 0.2
 
 ### February 21, 2024
