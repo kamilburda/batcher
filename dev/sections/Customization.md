@@ -14,9 +14,6 @@ Beyond the basic features, Batcher allows you to:
 
 As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below.
 
-When [editing layers](Usage.md#editing-layers), customization options are automatically displayed.
-To enable customization when exporting layers, select `Settings → Show More Settings`.
-
 ![Dialog of Export Layers with additional customization](../images/screenshot_dialog_customization.png)
 
 
@@ -93,7 +90,7 @@ While multipage PDF export is already possible in GIMP without any third-party p
 Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP.
 
 
-## Adjusting Layer Names
+## Adjusting Filenames
 
 By default, layer names are used as filenames.
 The text entry next to `Save as` lets you customize the filenames.
