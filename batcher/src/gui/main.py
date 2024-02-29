@@ -188,6 +188,7 @@ class ExportLayersDialog:
   _PREVIEW_LABEL_BORDER_WIDTH = 5
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
+  _ACTION_PANED_SPACING = 10
   
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
@@ -368,13 +369,8 @@ class ExportLayersDialog:
       _('Edit Procedure'),
       add_custom_action_text=_('Add Custom Procedure...'),
       propagate_natural_height=True,
+      margin_bottom=self._ACTION_PANED_SPACING,
     )
-
-    self._vbox_procedures_and_separator = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-    )
-    self._vbox_procedures_and_separator.pack_start(self._box_procedures, True, True, 0)
-    self._vbox_procedures_and_separator.pack_start(Gtk.Separator(), False, False, 0)
     
     self._box_constraints = actions_.ActionBox(
       self._settings['main/constraints'],
@@ -389,7 +385,7 @@ class ExportLayersDialog:
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_actions.pack1(self._vbox_procedures_and_separator, True, False)
+    self._vpaned_actions.pack1(self._box_procedures, True, False)
     self._vpaned_actions.pack2(self._box_constraints, True, False)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
