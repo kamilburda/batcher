@@ -133,9 +133,6 @@ def create(
 
   * ``'enabled_for_previews'``: If ``True``, this indicates that the action can
     be applied in the preview.
-
-  * ``'display_options_on_create'``: If ``True``, an action edit dialog is
-    displayed upon adding an action interactively.
   
   Each dictionary in the ``initial_actions`` list may contain the following
   fields:
@@ -164,8 +161,6 @@ def create(
   * ``'more_options_expanded'``
 
   * ``'enabled_for_previews'``
-
-  * ``'display_options_on_create'``
   
   Depending on the specified ``'type'``, the dictionary may contain additional
   fields and `create()` may generate additional settings.
@@ -344,7 +339,6 @@ def _create_action(
       tags=None,
       more_options_expanded=False,
       enabled_for_previews=True,
-      display_options_on_create=False,
       orig_name=None,
 ):
   action = pg.setting.Group(
@@ -424,12 +418,6 @@ def _create_action(
       'name': 'enabled_for_previews',
       'default_value': enabled_for_previews,
       'display_name': _('Enable for previews'),
-    },
-    {
-      'type': 'bool',
-      'name': 'display_options_on_create',
-      'default_value': display_options_on_create,
-      'gui_type': None,
     },
   ])
   
@@ -562,7 +550,6 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
-    'display_options_on_create': True,
   }
   
   pdb_procedure_argument_names = []

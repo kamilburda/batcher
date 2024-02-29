@@ -272,8 +272,7 @@ class ActionBox(pg.gui.ItemBox):
   def _on_actions_menu_item_activate(self, menu_item, action_dict):
     item = self.add_item(action_dict)
     
-    if action_dict.get('display_options_on_create', False):
-      self._display_action_edit_dialog(item)
+    self._display_action_edit_dialog(item)
   
   def _add_add_custom_action_to_menu_popup(self):
     menu_item = Gtk.MenuItem(label=self._add_custom_action_text, use_underline=False)
