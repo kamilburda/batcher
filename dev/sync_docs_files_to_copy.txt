@@ -9,6 +9,3 @@ docs/gh-pages/dev/images/screenshot_dialog_export_layers.png
 
 docs/images/screenshot_dialog_edit_layers.png
 docs/gh-pages/dev/images/screenshot_dialog_edit_layers.png
-
-docs/images/screenshot_dialog_customization.png
-docs/gh-pages/dev/images/screenshot_dialog_customization.png

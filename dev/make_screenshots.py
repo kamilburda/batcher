@@ -31,9 +31,6 @@ PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 sys.path.append(PLUGIN_DIRPATH)
 
 
-from batcher.src import actions
-from batcher.src import builtin_constraints
-from batcher.src import builtin_procedures
 from batcher.src import plugin_settings
 from batcher.src.gui import main as gui_main
 
@@ -47,7 +44,6 @@ OUTPUT_DIRPATH = os.path.join(
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
-SCREENSHOT_DIALOG_CUSTOMIZATION_FILENAME = 'screenshot_dialog_customization.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
@@ -86,34 +82,6 @@ def take_screenshots(gui, dialog, settings):
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
     SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME,
-    settings,
-    decoration_offsets,
-  )
-  
-  actions.add(
-    settings['main/procedures'],
-    builtin_procedures.BUILTIN_PROCEDURES['insert_background'])
-  actions.reorder(
-    settings['main/procedures'], 'insert_background', 0)
-  settings['main/procedures/use_layer_size/enabled'].set_value(False)
-  
-  actions.add(
-    settings['main/constraints'],
-    builtin_constraints.BUILTIN_CONSTRAINTS['without_color_tags'])
-  
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-  
-  gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['bottom-frame'].raw})
-  
-  dialog.set_focus(None)
-  
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-  
-  take_and_process_screenshot(
-    SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_CUSTOMIZATION_FILENAME,
     settings,
     decoration_offsets,
   )
