@@ -141,8 +141,9 @@ class ItemBoxItem:
   _HBOX_BUTTONS_SPACING = 3
   _HBOX_SPACING = 3
   
-  def __init__(self, item_widget: Gtk.Widget):
+  def __init__(self, item_widget: Gtk.Widget, button_display_mode='on_hover'):
     self._item_widget = item_widget
+    self._button_display_mode = button_display_mode
     
     self._hbox = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -178,19 +179,21 @@ class ItemBoxItem:
     self._has_hbox_buttons_focus = False
 
     self._button_remove = self._setup_item_button(GimpUi.ICON_WINDOW_CLOSE)
-    
-    self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
-    self._event_box.connect('leave-notify-event', self._on_event_box_leave_notify_event)
-    
+
     self._is_event_box_allocated_size = False
     self._buttons_allocation = None
-    self._event_box.connect('size-allocate', self._on_event_box_size_allocate)
-    self._event_box_buttons.connect('size-allocate', self._on_event_box_buttons_size_allocate)
+
+    if self._button_display_mode == 'on_hover':
+      self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
+      self._event_box.connect('leave-notify-event', self._on_event_box_leave_notify_event)
+      self._event_box.connect('size-allocate', self._on_event_box_size_allocate)
+      self._event_box_buttons.connect('size-allocate', self._on_event_box_buttons_size_allocate)
     
     self._event_box.show_all()
-    
-    self._hbox_buttons.set_no_show_all(True)
-    self._hbox_indicator_buttons.set_no_show_all(True)
+
+    if self._button_display_mode == 'on_hover':
+      self._hbox_buttons.set_no_show_all(True)
+      self._hbox_indicator_buttons.set_no_show_all(True)
   
   @property
   def widget(self) -> Gtk.EventBox:
@@ -212,13 +215,18 @@ class ItemBoxItem:
   
   def _setup_item_indicator_button(self, icon_name, position=None):
     return self._setup_button(icon_name, position, self._hbox_indicator_buttons)
-  
+
   @staticmethod
-  def _setup_button(icon_name, position, hbox):
+  def _setup_button(icon_name_or_image, position, hbox):
     button = Gtk.Button()
-    button.set_image(Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON))
+
+    if isinstance(icon_name_or_image, Gtk.Image):
+      button.set_image(icon_name_or_image)
+    else:
+      button.set_image(Gtk.Image.new_from_icon_name(icon_name_or_image, Gtk.IconSize.BUTTON))
+
     button.set_relief(Gtk.ReliefStyle.NONE)
-    
+
     hbox.pack_start(button, False, False, 0)
     if position is not None:
       hbox.reorder_child(button, position)

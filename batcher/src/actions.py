@@ -377,14 +377,15 @@ def _create_action(
     {
       'type': 'bool',
       'name': 'enabled',
+      'gui_type': None,
       'default_value': enabled,
+      'tags': ['ignore_initialize_gui'],
     },
     {
       'type': 'string',
       'name': 'display_name',
       'default_value': display_name,
-      'gui_type': None,
-      'tags': ['ignore_initialize_gui'],
+      'gui_type': 'label',
     },
     {
       'type': 'string',
@@ -488,19 +489,8 @@ def _create_constraint(
 
 
 def _set_up_action_post_creation(action):
-  action['enabled'].connect_event(
-    'after-set-gui',
-    _set_display_name_for_enabled_gui,
-    action['display_name'])
-  
   if action['origin'].is_item('gimp_pdb'):
     _hide_gui_for_first_run_mode_arguments(action)
-
-
-def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
-  setting_display_name.set_gui(
-    gui_type='check_button_label',
-    widget=setting_enabled.gui.widget)
 
 
 def _hide_gui_for_first_run_mode_arguments(action):

@@ -14,6 +14,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Pango
 
 from .. import gui as pggui
 from ..pypdb import pdb
@@ -183,6 +184,40 @@ class EntryPresenter(GtkPresenter):
     self._widget.set_text(value if value is not None else '')
     # Place the cursor at the end of the text entry.
     self._widget.set_position(-1)
+
+
+class LabelPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.Label` widgets.
+
+  Value: Label text.
+  """
+
+  def _create_widget(
+        self,
+        setting,
+        use_markup=True,
+        xalign=0.0,
+        yalign=0.5,
+        max_width_chars=50,
+        ellipsize=Pango.EllipsizeMode.END,
+        **kwargs,
+  ):
+    label = Gtk.Label(
+      use_markup=use_markup,
+      max_width_chars=max_width_chars,
+      xalign=xalign,
+      yalign=yalign,
+      ellipsize=ellipsize,
+      **kwargs,
+    )
+    label.set_markup(GLib.markup_escape_text(setting.display_name))
+    return label
+
+  def get_value(self):
+    return self._widget.get_label()
+
+  def _set_value(self, value):
+    self._widget.set_markup(value if value is not None else '')
 
 
 class ComboBoxPresenter(GtkPresenter):

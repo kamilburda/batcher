@@ -178,10 +178,10 @@ class ActionBox(pg.gui.ItemBox):
   def _add_item_from_action(self, action):
     self._init_action_item_gui(action)
 
-    item = _ActionBoxItem(action, action['enabled'].gui.widget)
+    item = _ActionBoxItem(action)
     
     super().add_item(item)
-    
+
     item.button_edit.connect('clicked', self._on_item_button_edit_clicked, item)
     item.button_remove.connect(
       'clicked', self._on_item_button_remove_clicked_remove_action_edit_dialog, item)
@@ -191,11 +191,11 @@ class ActionBox(pg.gui.ItemBox):
   def _init_action_item_gui(self, action):
     action.initialize_gui()
 
-    if isinstance(action['enabled'].gui, pg.setting.SETTING_GUI_TYPES.check_button):
-      enabled_widget = action['enabled'].gui.widget
-      enabled_widget.get_child().set_ellipsize(Pango.EllipsizeMode.END)
-      enabled_widget.get_child().connect(
-        'size-allocate', self._on_action_item_gui_label_size_allocate, enabled_widget)
+    if isinstance(action['display_name'].gui, pg.setting.SETTING_GUI_TYPES.label):
+      label_widget = action['display_name'].gui.widget
+      label_widget.set_ellipsize(Pango.EllipsizeMode.END)
+      label_widget.connect(
+        'size-allocate', self._on_action_item_gui_label_size_allocate, label_widget)
   
   @staticmethod
   def _on_action_item_gui_label_size_allocate(item_gui_label, allocation, item_gui):
@@ -398,18 +398,36 @@ class ActionBox(pg.gui.ItemBox):
 
 
 class _ActionBoxItem(pg.gui.ItemBoxItem):
+
+  _ACTION_ENABLED_STYLE_CLASS_NAME = 'action-enabled'
   
-  def __init__(self, action, item_widget):
-    super().__init__(item_widget)
-    
+  def __init__(self, action):
+    super().__init__(action['display_name'].gui.widget, button_display_mode='always')
+
     self.action_edit_dialog = None
-    
+
     self._action = action
+
+    self._item_widget_css_provider = Gtk.CssProvider()
+    self._item_widget_css_provider.load_from_data(
+      f'label.{self._ACTION_ENABLED_STYLE_CLASS_NAME} {{font-weight: bold;}}'.encode())
+    self._item_widget.get_style_context().add_provider(
+      self._item_widget_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
+    self._update_item_widget_style_based_on_enabled_state()
+
+    self._button_enabled_images = {
+      False: Gtk.Image.new_from_icon_name('checkbox', Gtk.IconSize.BUTTON),
+      True: Gtk.Image.new_from_icon_name('checkbox-checked', Gtk.IconSize.BUTTON),
+    }
+
+    self._button_enabled = self._setup_item_button(
+      self._button_enabled_images[self._action['enabled'].value], position=0)
+    self._button_enabled.connect('clicked', self._on_button_enabled_clicked)
 
     self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
 
-    self._button_warning = self._setup_item_indicator_button(
-      GimpUi.ICON_DIALOG_WARNING, position=0)
+    self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
     self._display_warning_message_event_id = None
@@ -417,10 +435,14 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   @property
   def action(self):
     return self._action
-  
+
   @property
   def button_edit(self):
     return self._button_edit
+
+  @property
+  def button_enabled(self):
+    return self._button_enabled
   
   def is_being_edited(self):
     return self.action_edit_dialog is not None
@@ -458,6 +480,17 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   @staticmethod
   def _on_button_warning_clicked(button, main_message, short_message, full_message, parent):
     gui_messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
+
+  def _on_button_enabled_clicked(self, _button):
+    self._action['enabled'].set_value(not self._action['enabled'].value)
+    self._button_enabled.set_image(self._button_enabled_images[self._action['enabled'].value])
+    self._update_item_widget_style_based_on_enabled_state()
+
+  def _update_item_widget_style_based_on_enabled_state(self):
+    if self._action['enabled'].value:
+      self._item_widget.get_style_context().add_class(self._ACTION_ENABLED_STYLE_CLASS_NAME)
+    else:
+      self._item_widget.get_style_context().remove_class(self._ACTION_ENABLED_STYLE_CLASS_NAME)
 
 
 class _ActionEditDialog(GimpUi.Dialog):

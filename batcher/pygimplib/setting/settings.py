@@ -1548,7 +1548,10 @@ class StringSetting(Setting):
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.entry]
+  _ALLOWED_GUI_TYPES = [
+    _SETTING_GUI_TYPES.entry,
+    _SETTING_GUI_TYPES.label,
+  ]
 
   _DEFAULT_DEFAULT_VALUE = ''
 

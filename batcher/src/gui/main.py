@@ -182,13 +182,13 @@ class ExportLayersDialog:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
+  _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _PREVIEW_LABEL_TOP_MARGIN = 8
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
-  _ACTION_PANED_SPACING = 10
   
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
@@ -262,7 +262,7 @@ class ExportLayersDialog:
     
     if self._settings['main/procedures'] in result.settings_not_loaded:
       actions.clear(self._settings['main/procedures'], add_initial_actions=True)
-    
+
     self._settings['main/constraints'].tags.discard('ignore_load')
     result = self._settings['main/constraints'].load()
     
@@ -280,7 +280,7 @@ class ExportLayersDialog:
     messages_.set_gui_excepthook_parent(self._dialog)
 
     self._init_gui_previews()
-    
+
     self._preview_label = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
@@ -295,15 +295,12 @@ class ExportLayersDialog:
     )
     self._vpaned_previews.pack1(self._name_preview, True, True)
     self._vpaned_previews.pack2(self._image_preview, True, True)
-    
+
     self._vbox_previews = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
     )
     self._vbox_previews.pack_start(self._preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
-    
-    self._frame_previews = Gtk.Frame(shadow_type=Gtk.ShadowType.ETCHED_OUT)
-    self._frame_previews.add(self._vbox_previews)
 
     self._folder_chooser_label = Gtk.Label(
       xalign=0.0,
@@ -364,8 +361,10 @@ class ExportLayersDialog:
       _('Edit Procedure'),
       add_custom_action_text=_('Add Custom Procedure...'),
       propagate_natural_height=True,
-      margin_bottom=self._ACTION_PANED_SPACING,
     )
+
+    self._frame_procedures = GimpUi.Frame(label=_('Procedures'))
+    self._frame_procedures.add(self._box_procedures)
     
     self._box_constraints = actions_.ActionBox(
       self._settings['main/constraints'],
@@ -376,16 +375,19 @@ class ExportLayersDialog:
       propagate_natural_height=True,
     )
 
+    self._frame_constraints = GimpUi.Frame(label=_('Constraints'))
+    self._frame_constraints.add(self._box_constraints)
+
     self._vpaned_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_actions.pack1(self._box_procedures, True, False)
-    self._vpaned_actions.pack2(self._box_constraints, True, False)
+    self._vpaned_actions.pack1(self._frame_procedures, True, False)
+    self._vpaned_actions.pack2(self._frame_constraints, True, False)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._DIALOG_VBOX_SPACING,
+      spacing=self._EXPORT_SETTINGS_AND_ACTIONS_SPACING,
     )
     self._vbox_export_settings_and_actions.pack_start(self._grid_export_settings, False, False, 0)
     self._vbox_export_settings_and_actions.pack_start(self._vpaned_actions, True, True, 0)
@@ -395,7 +397,7 @@ class ExportLayersDialog:
       wide_handle=True,
     )
     self._hpaned_settings_and_previews.pack1(self._vbox_export_settings_and_actions, True, False)
-    self._hpaned_settings_and_previews.pack2(self._frame_previews, True, True)
+    self._hpaned_settings_and_previews.pack2(self._vbox_previews, True, True)
     
     self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
