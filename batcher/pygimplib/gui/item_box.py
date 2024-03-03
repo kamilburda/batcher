@@ -144,13 +144,7 @@ class ItemBoxItem:
   def __init__(self, item_widget: Gtk.Widget, button_display_mode='on_hover'):
     self._item_widget = item_widget
     self._button_display_mode = button_display_mode
-    
-    self._hbox = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      homogeneous=False,
-      spacing=self._HBOX_SPACING,
-    )
-    
+
     self._hbox_indicator_buttons = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
@@ -168,13 +162,22 @@ class ItemBoxItem:
     
     self._event_box_buttons = Gtk.EventBox()
     self._event_box_buttons.add(self._hbox_buttons)
-    
+
+    self._hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_SPACING,
+    )
     self._hbox.pack_start(self._event_box_indicator_buttons, False, False, 0)
     self._hbox.pack_start(self._item_widget, True, True, 0)
     self._hbox.pack_start(self._event_box_buttons, False, False, 0)
-    
+
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+    )
+    self._vbox.pack_start(self._hbox, False, False, 0)
+
     self._event_box = Gtk.EventBox()
-    self._event_box.add(self._hbox)
+    self._event_box.add(self._vbox)
     
     self._has_hbox_buttons_focus = False
 
@@ -198,7 +201,11 @@ class ItemBoxItem:
   @property
   def widget(self) -> Gtk.EventBox:
     return self._event_box
-  
+
+  @property
+  def vbox(self) -> Gtk.Box:
+    return self._vbox
+
   @property
   def item_widget(self) -> Gtk.Widget:
     return self._item_widget
@@ -214,7 +221,9 @@ class ItemBoxItem:
     return self._setup_button(icon_name, position, self._hbox_buttons)
   
   def _setup_item_indicator_button(self, icon_name, position=None):
-    return self._setup_button(icon_name, position, self._hbox_indicator_buttons)
+    button = self._setup_button(icon_name, position, self._hbox_indicator_buttons)
+    button.connect('notify::visible', self._on_indicator_button_visible_changed)
+    return button
 
   @staticmethod
   def _setup_button(icon_name_or_image, position, hbox):
@@ -235,15 +244,15 @@ class ItemBoxItem:
 
     return button
   
-  def _on_event_box_enter_notify_event(self, event_box, event):
+  def _on_event_box_enter_notify_event(self, _event_box, event):
     if event.detail != Gdk.NotifyType.INFERIOR:
       self._hbox_buttons.show()
   
-  def _on_event_box_leave_notify_event(self, event_box, event):
+  def _on_event_box_leave_notify_event(self, _event_box, event):
     if event.detail != Gdk.NotifyType.INFERIOR:
       self._hbox_buttons.hide()
   
-  def _on_event_box_size_allocate(self, event_box, allocation):
+  def _on_event_box_size_allocate(self, _event_box, allocation):
     if not self._is_event_box_allocated_size and self._buttons_allocation is not None:
       self._is_event_box_allocated_size = True
       
@@ -251,7 +260,7 @@ class ItemBoxItem:
       if self._buttons_allocation.height >= allocation.height:
         self._hbox.set_property('height-request', allocation.height)
   
-  def _on_event_box_buttons_size_allocate(self, event_box, allocation):
+  def _on_event_box_buttons_size_allocate(self, _event_box, allocation):
     # Checking for 1-pixel width and height prevents wrong size from being allocated
     # when parent widgets are resized.
     if self._buttons_allocation is None and allocation.width > 1 and allocation.height > 1:
@@ -263,6 +272,15 @@ class ItemBoxItem:
       self._event_box_buttons.set_property('width-request', self._buttons_allocation.width)
       
       self._hbox_buttons.hide()
+
+  def _on_indicator_button_visible_changed(self, _button, _property_spec):
+    any_indicator_button_is_visible = any(
+      child.get_visible() for child in self._hbox_indicator_buttons.get_children())
+
+    if any_indicator_button_is_visible:
+      self._event_box_indicator_buttons.show()
+    else:
+      self._event_box_indicator_buttons.hide()
 
 
 class ArrayBox(ItemBox):

@@ -128,6 +128,9 @@ def create(
   * ``'tags'``: Additional tags added to each action (the
     `pygimplib.setting.Group` instance).
 
+  * ``'display_action_settings'``: If ``True``, action settings are displayed
+    upon adding an action interactively.
+
   * ``'more_options_expanded'``: If ``True``, additional options are displayed
     for an action when editing the action interactively.
 
@@ -157,6 +160,8 @@ def create(
   * ``'action_group'``
 
   * ``'tags'``
+
+  * ``'display_action_settings'``
 
   * ``'more_options_expanded'``
 
@@ -337,6 +342,7 @@ def _create_action(
       description=None,
       action_groups=None,
       tags=None,
+      display_action_settings=False,
       more_options_expanded=False,
       enabled_for_previews=True,
       orig_name=None,
@@ -405,6 +411,12 @@ def _create_action(
       'name': 'action_groups',
       'default_value': action_groups,
       'nullable': True,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'display_action_settings',
+      'default_value': display_action_settings,
       'gui_type': None,
     },
     {
@@ -540,6 +552,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
+    'display_action_settings': True,
   }
   
   pdb_procedure_argument_names = []

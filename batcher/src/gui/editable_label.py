@@ -36,24 +36,23 @@ class EditableLabel(Gtk.Box):
     self._label.set_no_show_all(True)
 
     self._button_edit = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
-    self._button_edit.set_image(
-      Gtk.Image.new_from_icon_name(GimpUi.ICON_EDIT, Gtk.IconSize.BUTTON))
+    self._button_edit.set_image(Gtk.Image.new_from_icon_name('document-edit', Gtk.IconSize.BUTTON))
     
-    self._hbox = Gtk.Box(
+    self._hbox_label = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       homogeneous=False,
       spacing=self._LABEL_EDIT_BUTTON_SPACING,
     )
-    self._hbox.pack_start(self._label, True, True, 0)
-    self._hbox.pack_start(self._button_edit, False, False, 0)
-    
+    self._hbox_label.pack_start(self._label, False, False, 0)
+    self._hbox_label.pack_start(self._button_edit, False, False, 0)
+
     self._entry = Gtk.Entry()
     self._entry.show_all()
     self._entry.set_no_show_all(True)
-    
+
     self._entry.hide()
     
-    self.pack_start(self._hbox, True, True, 0)
+    self.pack_start(self._hbox_label, True, True, 0)
     self.pack_start(self._entry, True, True, 0)
 
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
@@ -65,7 +64,7 @@ class EditableLabel(Gtk.Box):
     return self._label
   
   def _on_button_edit_clicked(self, button):
-    self._hbox.hide()
+    self._hbox_label.hide()
     
     self._entry.set_text(self._label.get_text())
     self._entry.grab_focus()
@@ -76,7 +75,7 @@ class EditableLabel(Gtk.Box):
     self._entry.hide()
     
     self._label.set_text(self._entry.get_text())
-    self._hbox.show()
+    self._hbox_label.show()
     
     self.emit('changed')
 
