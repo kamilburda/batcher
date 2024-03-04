@@ -438,7 +438,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _show_hide_action_settings(self):
     if self._action['display_action_settings'].value:
-      self._button_edit.set_relief(Gtk.ReliefStyle.NORMAL)
+      self._highlight_button(self._button_edit)
 
       self._action_settings_widget.show()
 
@@ -454,7 +454,17 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
       self._action_settings_widget.hide()
 
-      self._button_edit.set_relief(Gtk.ReliefStyle.NONE)
+      self._unhighlight_button(self._button_edit)
+
+  @staticmethod
+  def _highlight_button(button):
+    button.set_relief(Gtk.ReliefStyle.NORMAL)
+    button.set_state_flags(Gtk.StateFlags.CHECKED, False)
+
+  @staticmethod
+  def _unhighlight_button(button):
+    button.unset_state_flags(Gtk.StateFlags.CHECKED)
+    button.set_relief(Gtk.ReliefStyle.NONE)
 
   def _update_item_widget_style_based_on_enabled_state(self):
     if self._action['enabled'].value:
