@@ -317,8 +317,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._action = action
 
     self._hbox_action_name = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+    self._event_box_action_name = Gtk.EventBox()
+    self._event_box_action_name.add(self._hbox_action_name)
 
-    super().__init__(self._hbox_action_name, button_display_mode='always')
+    super().__init__(self._event_box_action_name, button_display_mode='always')
 
     self._label_action_name = self._create_label_action_name()
     self._label_action_name_for_editing = self._create_label_action_name_for_editing()
