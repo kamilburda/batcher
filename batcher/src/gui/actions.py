@@ -310,7 +310,10 @@ class ActionBox(pg.gui.ItemBox):
 
 class _ActionBoxItem(pg.gui.ItemBoxItem):
 
+  _ACTION_SETTINGS_LEFT_MARGIN = 6
+
   _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
+
   _ACTION_NAME_STYLE_CLASS = 'action-enabled'
   
   def __init__(self, action):
@@ -325,7 +328,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._label_action_name = self._create_label_action_name()
     self._label_action_name_for_editing = self._create_label_action_name_for_editing()
 
-    self._action_settings_widget = _ActionSettingsWidget(self._action)
+    self._action_settings_widget = _ActionSettingsWidget(
+      self._action,
+      margin_start=self._ACTION_SETTINGS_LEFT_MARGIN,
+    )
     self._action_settings_widget.show_all()
     self._action_settings_widget.set_no_show_all(True)
     self.vbox.pack_start(self._action_settings_widget, False, False, 0)
