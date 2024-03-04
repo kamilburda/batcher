@@ -488,12 +488,14 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 class _ActionSettingsWidget(Gtk.Box):
 
   _LABEL_ACTION_NAME_STYLE_CLASS_NAME = 'action-name'
-  
+
+  _VBOX_SPACING = 3
+
   _GRID_ROW_SPACING = 3
   _GRID_COLUMN_SPACING = 8
 
   _MORE_OPTIONS_SPACING = 3
-  _MORE_OPTIONS_LABEL_TOP_MARGIN = 6
+  _MORE_OPTIONS_LABEL_TOP_MARGIN = 3
   _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 3
 
   _LABEL_ACTION_DESCRIPTION_MAX_WIDTH_CHARS = 50
@@ -502,6 +504,7 @@ class _ActionSettingsWidget(Gtk.Box):
     super().__init__(*args, **kwargs)
 
     self.set_orientation(Gtk.Orientation.VERTICAL)
+    self.set_spacing(self._VBOX_SPACING)
 
     self._pdb_procedure = pdb[action['function'].value] if action['function'].value else None
 
