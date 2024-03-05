@@ -3,8 +3,8 @@
 from typing import Optional
 
 import gi
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -26,9 +26,11 @@ class EditableLabel(Gtk.Box):
   
   def __init__(self, text: Optional[str] = None, **kwargs):
     super().__init__(self, **kwargs)
+
+    self._text_before_editing = text if text is not None else ''
     
     self._label = Gtk.Label(
-      label=text,
+      label=self._text_before_editing,
       xalign=0.0,
       yalign=0.5,
     )
@@ -58,12 +60,19 @@ class EditableLabel(Gtk.Box):
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
     self._entry.connect('activate', self._on_entry_finished_editing)
     self._entry.connect('focus-out-event', self._on_entry_finished_editing)
+    self._entry.connect('key-press-event', self._on_entry_canceled_editing)
   
   @property
   def label(self):
     return self._label
+
+  def show_label(self):
+    self._entry.hide()
+    self._hbox_label.show()
   
-  def _on_button_edit_clicked(self, button):
+  def _on_button_edit_clicked(self, _button):
+    self._text_before_editing = self._label.get_text()
+
     self._hbox_label.hide()
     
     self._entry.set_text(self._label.get_text())
@@ -71,13 +80,28 @@ class EditableLabel(Gtk.Box):
     self._entry.set_position(-1)
     self._entry.show()
   
-  def _on_entry_finished_editing(self, entry, *args):
-    self._entry.hide()
-    
-    self._label.set_text(self._entry.get_text())
-    self._hbox_label.show()
-    
-    self.emit('changed')
+  def _on_entry_finished_editing(self, _entry, *_args):
+    new_text = self._entry.get_text()
+
+    if new_text:
+      self._label.set_text(new_text)
+      self._text_before_editing = new_text
+
+    self.show_label()
+
+    if new_text:
+      self.emit('changed')
+
+  def _on_entry_canceled_editing(self, _entry, event, *_args):
+    if Gdk.keyval_name(event.keyval) == 'Escape':
+      self._label.set_text(self._text_before_editing)
+      self._entry.set_text(self._text_before_editing)
+
+      self.show_label()
+
+      return True
+
+    return False
 
 
 GObject.type_register(EditableLabel)

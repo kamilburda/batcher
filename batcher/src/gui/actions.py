@@ -448,19 +448,21 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     if self._action['display_action_settings'].value:
       self._highlight_button(self._button_edit)
 
-      self._action_settings_widget.show()
-
       for child in self._hbox_action_name.get_children():
         self._hbox_action_name.remove(child)
 
       self._hbox_action_name.pack_start(self._label_action_name_for_editing, True, True, 0)
+
+      self._action_settings_widget.show()
     else:
+      self._action_settings_widget.hide()
+
       for child in self._hbox_action_name.get_children():
         self._hbox_action_name.remove(child)
 
       self._hbox_action_name.pack_start(self._label_action_name, True, True, 0)
 
-      self._action_settings_widget.hide()
+      self._label_action_name_for_editing.show_label()
 
       self._unhighlight_button(self._button_edit)
 
