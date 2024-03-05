@@ -185,7 +185,6 @@ class ExportLayersDialog:
   _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
-  _PREVIEW_LABEL_TOP_MARGIN = 8
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
@@ -284,7 +283,6 @@ class ExportLayersDialog:
     self._preview_label = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
-      margin_top=self._PREVIEW_LABEL_TOP_MARGIN,
       margin_bottom=self._PREVIEW_LABEL_BOTTOM_MARGIN,
     )
     self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
