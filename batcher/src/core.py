@@ -567,7 +567,7 @@ class Batcher:
   
   def _is_enabled(self, action):
     if self._is_preview:
-      if not (action['enabled'].value and action['enabled_for_previews'].value):
+      if not (action['enabled'].value and action['more_options/enabled_for_previews'].value):
         return False
     else:
       if not action['enabled'].value:
@@ -631,7 +631,7 @@ class Batcher:
   
   @staticmethod
   def _set_apply_constraint_to_folders(function, action):
-    if action['also_apply_to_parent_folders'].value:
+    if action['more_options/also_apply_to_parent_folders'].value:
       
       def _function_wrapper(*action_args, **action_kwargs):
         item = action_args[0]

@@ -359,6 +359,12 @@ def _create_action(
     setting_attributes={
       'pdb_type': None,
     })
+
+  more_options_group = pg.setting.Group(
+    'more_options',
+    setting_attributes={
+      'pdb_type': None,
+    })
   
   if arguments:
     arguments_group.add(arguments)
@@ -419,6 +425,7 @@ def _create_action(
       'default_value': display_action_settings,
       'gui_type': None,
     },
+    more_options_group,
     {
       'type': 'bool',
       'name': 'more_options_expanded',
@@ -426,6 +433,9 @@ def _create_action(
       'display_name': _('_More options'),
       'gui_type': 'expander',
     },
+  ])
+
+  more_options_group.add([
     {
       'type': 'bool',
       'name': 'enabled_for_previews',
@@ -488,7 +498,7 @@ def _create_constraint(
     tags=tags,
     **kwargs)
   
-  constraint.add([
+  constraint['more_options'].add([
     {
       'type': 'bool',
       'name': 'also_apply_to_parent_folders',

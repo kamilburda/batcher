@@ -538,10 +538,10 @@ class _ActionSettingsWidget(Gtk.Box):
       margin_top=self._MORE_OPTIONS_LABEL_BOTTOM_MARGIN,
     )
     self._vbox_more_options.pack_start(
-      action['enabled_for_previews'].gui.widget, False, False, 0)
-    if 'also_apply_to_parent_folders' in action:
+      action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
+    if 'also_apply_to_parent_folders' in action['more_options']:
       self._vbox_more_options.pack_start(
-        action['also_apply_to_parent_folders'].gui.widget, False, False, 0)
+        action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
     
     action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
     action['more_options_expanded'].gui.widget.set_margin_top(self._MORE_OPTIONS_LABEL_TOP_MARGIN)
