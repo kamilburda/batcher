@@ -450,6 +450,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _on_button_reset_clicked(self, _button):
     self._action['arguments'].reset()
+    self._action['more_options'].reset()
 
   def _show_hide_action_settings(self):
     if self._action['display_action_settings'].value:
