@@ -348,6 +348,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
 
+    self._button_reset = self._setup_item_button(GimpUi.ICON_VIEW_REFRESH, position=0)
+    self._button_reset.connect('clicked', self._on_button_reset_clicked)
+    self._button_reset.set_no_show_all(True)
+
     self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
@@ -444,9 +448,13 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_enabled.set_image(self._button_enabled_images[self._action['enabled'].value])
     self._update_item_widget_style_based_on_enabled_state()
 
+  def _on_button_reset_clicked(self, _button):
+    self._action['arguments'].reset()
+
   def _show_hide_action_settings(self):
     if self._action['display_action_settings'].value:
       self._highlight_button(self._button_edit)
+      self._button_reset.show()
 
       for child in self._hbox_action_name.get_children():
         self._hbox_action_name.remove(child)
@@ -464,6 +472,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
       self._label_action_name_for_editing.show_label()
 
+      self._button_reset.hide()
       self._unhighlight_button(self._button_edit)
 
   @staticmethod
@@ -510,9 +519,6 @@ class _ActionSettingsWidget(Gtk.Box):
 
     self._pdb_procedure = pdb[action['function'].value] if action['function'].value else None
 
-    # TODO: Resolve how to handle resetting
-    self._button_reset = Gtk.Button(label=_('_Reset'), use_underline=True)
-
     self._label_action_description = None
     
     if action['description'].value:
@@ -546,8 +552,6 @@ class _ActionSettingsWidget(Gtk.Box):
     self.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
     
     self._set_arguments(action, self._pdb_procedure)
-    
-    self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
 
   def _create_label_description(self, summary, full_description=None):
     label_description = Gtk.Label(
@@ -599,7 +603,3 @@ class _ActionSettingsWidget(Gtk.Box):
       self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
 
       row_index += 1
-  
-  @staticmethod
-  def _on_button_reset_clicked(button, action):
-    action['arguments'].reset()
