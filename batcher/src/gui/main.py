@@ -186,6 +186,7 @@ class ExportLayersDialog:
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
+  _CONSTRAINTS_TOP_MARGIN = 4
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
   
@@ -361,7 +362,9 @@ class ExportLayersDialog:
       propagate_natural_height=True,
     )
 
-    self._frame_procedures = GimpUi.Frame(label=_('Procedures'))
+    self._frame_procedures = GimpUi.Frame(
+      label=_('Procedures'),
+    )
     self._frame_procedures.add(self._box_procedures)
     
     self._box_constraints = actions_.ActionBox(
@@ -373,7 +376,10 @@ class ExportLayersDialog:
       propagate_natural_height=True,
     )
 
-    self._frame_constraints = GimpUi.Frame(label=_('Constraints'))
+    self._frame_constraints = GimpUi.Frame(
+      label=_('Constraints'),
+      margin_top=self._CONSTRAINTS_TOP_MARGIN,
+    )
     self._frame_constraints.add(self._box_constraints)
 
     self._vpaned_actions = Gtk.Paned(
