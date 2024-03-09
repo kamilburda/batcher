@@ -1,8 +1,10 @@
 ## Upcoming
 
 Redesigned user interface:
-* Replace the folder chooser widget with a folder chooser button.
-* Procedures and constraints are now aligned vertically. 
+* Replaced the folder chooser widget with a folder chooser button.
+* Procedures and constraints are now aligned vertically.
+* Procedures and constraints can now be edited directly in the main dialog rather than a separate dialog. Action settings can be expanded or collapsed by pressing the button with the edit icon.
+* Adjusted layout accordingly given the changes above (dialog dimensions, positions of separators, spacing/margins/border width).
 
 
 ## 0.2
