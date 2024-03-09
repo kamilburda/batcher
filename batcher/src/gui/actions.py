@@ -359,12 +359,16 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_reset.set_no_show_all(True)
 
     self._action_info = self._get_action_info()
-    self._create_action_info_popup()
 
-    self._button_info = self._setup_item_button(GimpUi.ICON_DIALOG_INFORMATION, position=0)
-    self._button_info.connect('clicked', self._on_button_info_clicked)
-    self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
-    self._button_info.set_no_show_all(True)
+    if self._action_info:
+      self._create_action_info_popup()
+
+      self._button_info = self._setup_item_button(GimpUi.ICON_DIALOG_INFORMATION, position=0)
+      self._button_info.connect('clicked', self._on_button_info_clicked)
+      self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
+      self._button_info.set_no_show_all(True)
+    else:
+      self._button_info = None
 
     self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
@@ -564,15 +568,17 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._info_popup.hide()
 
   def _update_info_popup_position(self):
-    position = pg.gui.utils.get_position_below_widget(self._button_info)
-    if position is not None:
-      self._info_popup.move(*position)
+    if self._button_info is not None:
+      position = pg.gui.utils.get_position_below_widget(self._button_info)
+      if position is not None:
+        self._info_popup.move(*position)
 
   def _show_hide_action_settings(self):
     if self._action['display_action_settings'].value:
       self._highlight_button(self._button_edit)
       self._button_reset.show()
-      self._button_info.show()
+      if self._button_info is not None:
+        self._button_info.show()
 
       for child in self._hbox_action_name.get_children():
         self._hbox_action_name.remove(child)
@@ -590,7 +596,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
       self._label_action_name_for_editing.show_label()
 
-      self._button_info.hide()
+      if self._button_info is not None:
+        self._button_info.hide()
       self._button_reset.hide()
       self._unhighlight_button(self._button_edit)
 
