@@ -170,7 +170,7 @@ def _create_gui_settings():
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (700, 600),
+      'default_value': (700, 650),
     },
     {
       'type': 'integer',
@@ -185,7 +185,7 @@ def _create_gui_settings():
     {
       'type': 'float',
       'name': 'actions_vpaned_position',
-      'default_value': 260,
+      'default_value': 300,
     },
   ])
 
