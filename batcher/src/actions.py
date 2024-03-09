@@ -342,7 +342,7 @@ def _create_action(
       description=None,
       action_groups=None,
       tags=None,
-      display_action_settings=False,
+      display_action_settings=True,
       more_options_expanded=False,
       enabled_for_previews=True,
       orig_name=None,
