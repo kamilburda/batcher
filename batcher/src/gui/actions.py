@@ -435,7 +435,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _create_label_action_name_for_editing(self):
     label_action_name_for_editing = editable_label_.EditableLabel()
-    
+
     label_action_name_for_editing.label.set_ellipsize(Pango.EllipsizeMode.END)
     label_action_name_for_editing.label.set_label(self._action['display_name'].value)
     label_action_name_for_editing.label.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
@@ -570,6 +570,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _on_button_enabled_clicked(self, _button):
     self._action['enabled'].set_value(not self._action['enabled'].value)
+
+    self._action['arguments'].apply_gui_values_to_settings(force=True)
 
     self._button_enabled.set_image(self._button_enabled_images[self._action['enabled'].value])
     self._set_tooltip_text_for_button_enabled()
