@@ -131,17 +131,10 @@ def create_settings():
   layers_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['layers'])
   layers_constraint_dict['display_action_settings'] = False
   
-  visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
-  visible_constraint_dict['enabled'] = False
-  visible_constraint_dict['display_action_settings'] = False
-  visible_constraint_dict['also_apply_to_parent_folders'] = True
-  
   settings['main'].add([
     actions.create(
       name='constraints',
-      initial_actions=[
-        layers_constraint_dict,
-        visible_constraint_dict]),
+      initial_actions=[layers_constraint_dict]),
   ])
   
   settings['main/procedures'].connect_event(
