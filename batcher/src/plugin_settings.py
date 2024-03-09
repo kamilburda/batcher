@@ -172,16 +172,19 @@ def _create_gui_settings():
       'type': 'integer',
       'name': 'paned_outside_previews_position',
       'default_value': 400,
+      'gui_type': None,
     },
     {
       'type': 'float',
       'name': 'paned_between_previews_position',
       'default_value': 280,
+      'gui_type': None,
     },
     {
       'type': 'float',
       'name': 'actions_vpaned_position',
       'default_value': 290,
+      'gui_type': None,
     },
   ])
 
