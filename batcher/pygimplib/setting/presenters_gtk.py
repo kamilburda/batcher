@@ -646,7 +646,7 @@ class FolderChooserButtonPresenter(GtkPresenter):
     self._widget.set_filename(dirpath if dirpath is not None else '')
 
 
-class GimpResourceSelectButtonPresenter(GtkPresenter):
+class GimpResourceChooserPresenter(GtkPresenter):
   """Abstract `setting.Presenter` subclass for widgets allowing to select and
   modify a `Gimp.Resource` instance via a specialized button.
   """
@@ -663,54 +663,54 @@ class GimpResourceSelectButtonPresenter(GtkPresenter):
       self._widget.set_resource(value)
 
 
-class BrushSelectButtonPresenter(GimpResourceSelectButtonPresenter):
-  """`setting.Presenter` subclass for `GimpUi.BrushSelectButton` widgets.
+class BrushChooserPresenter(GimpResourceChooserPresenter):
+  """`setting.Presenter` subclass for `GimpUi.BrushChooser` widgets.
 
   Value: A `Gimp.Brush` instance.
   """
 
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.BrushSelectButton.new(setting.display_name, setting.value)
+    return GimpUi.BrushChooser.new(setting.display_name, setting.value)
 
 
-class FontSelectButtonPresenter(GimpResourceSelectButtonPresenter):
-  """`setting.Presenter` subclass for `GimpUi.FontSelectButton` widgets.
+class FontChooserPresenter(GimpResourceChooserPresenter):
+  """`setting.Presenter` subclass for `GimpUi.FontChooser` widgets.
   
   Value: A `Gimp.Font` instance.
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.FontSelectButton.new(setting.display_name, setting.value)
+    return GimpUi.FontChooser.new(setting.display_name, setting.value)
 
 
-class GradientSelectButtonPresenter(GimpResourceSelectButtonPresenter):
-  """`setting.Presenter` subclass for `GimpUi.GradientSelectButton` widgets.
+class GradientChooserPresenter(GimpResourceChooserPresenter):
+  """`setting.Presenter` subclass for `GimpUi.GradientChooser` widgets.
   
   Value: A `Gimp.Gradient` instance.
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.GradientSelectButton.new(setting.display_name, setting.value)
+    return GimpUi.GradientChooser.new(setting.display_name, setting.value)
 
 
-class PaletteSelectButtonPresenter(GimpResourceSelectButtonPresenter):
-  """`setting.Presenter` subclass for `GimpUi.PaletteSelectButton` widgets.
+class PaletteChooserPresenter(GimpResourceChooserPresenter):
+  """`setting.Presenter` subclass for `GimpUi.PaletteChooser` widgets.
   
   Value: A `Gimp.Palette` instance.
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.PaletteSelectButton.new(setting.display_name, setting.value)
+    return GimpUi.PaletteChooser.new(setting.display_name, setting.value)
 
 
-class PatternSelectButtonPresenter(GimpResourceSelectButtonPresenter):
-  """`setting.Presenter` subclass for `GimpUi.PatternSelectButton` widgets.
+class PatternChooserPresenter(GimpResourceChooserPresenter):
+  """`setting.Presenter` subclass for `GimpUi.PatternChooser` widgets.
   
   Value: String representing a pattern.
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.PatternSelectButton.new(setting.display_name, setting.value)
+    return GimpUi.PatternChooser.new(setting.display_name, setting.value)
 
 
 class ArrayBoxPresenter(GtkPresenter):

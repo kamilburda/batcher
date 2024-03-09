@@ -6,6 +6,9 @@ Redesigned user interface:
 * Procedures and constraints can now be edited directly in the main dialog rather than a separate dialog. Action settings can be expanded or collapsed by pressing the button with the edit icon.
 * Adjusted layout accordingly given the changes above (dialog dimensions, positions of separators, spacing/margins/border width).
 
+Bug fixes:
+* Fixed crash for procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
+
 
 ## 0.2
 

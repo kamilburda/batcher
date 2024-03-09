@@ -2165,7 +2165,7 @@ class BrushSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Brush]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.brush_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.brush_chooser]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Brush, **kwargs)
@@ -2200,7 +2200,7 @@ class FontSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Font]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.font_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.font_chooser]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Font, **kwargs)
@@ -2220,7 +2220,7 @@ class GradientSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Gradient]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.gradient_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.gradient_chooser]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Gradient, **kwargs)
@@ -2240,7 +2240,7 @@ class PaletteSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Palette]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.palette_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.palette_chooser]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Palette, **kwargs)
@@ -2269,7 +2269,7 @@ class PatternSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Pattern]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.pattern_select_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.pattern_chooser]
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Pattern, **kwargs)
