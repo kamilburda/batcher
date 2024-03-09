@@ -342,6 +342,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._action_settings_widget.set_no_show_all(True)
     self.vbox.pack_start(self._action_settings_widget, False, False, 0)
 
+    self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
+    self._button_edit.connect('clicked', self._on_button_edit_clicked)
+    self._button_edit.set_tooltip_text(_('Edit'))
+
     self._button_enabled_images = {
       False: Gtk.Image.new_from_icon_name('checkbox', Gtk.IconSize.BUTTON),
       True: Gtk.Image.new_from_icon_name('checkbox-checked', Gtk.IconSize.BUTTON),
@@ -350,10 +354,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_enabled = self._setup_item_button(
       self._button_enabled_images[self._action['enabled'].value], position=0)
     self._button_enabled.connect('clicked', self._on_button_enabled_clicked)
-
-    self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
-    self._button_edit.connect('clicked', self._on_button_edit_clicked)
-    self._button_edit.set_tooltip_text(_('Edit'))
+    self._button_enabled.set_no_show_all(True)
 
     self._button_reset = self._setup_item_button(GimpUi.ICON_VIEW_REFRESH, position=0)
     self._button_reset.connect('clicked', self._on_button_reset_clicked)
@@ -591,9 +592,11 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   def _show_hide_action_settings(self):
     if self._action['display_action_settings'].value:
       self._highlight_button(self._button_edit)
-      self._button_reset.show()
+
       if self._button_info is not None:
         self._button_info.show()
+      self._button_reset.show()
+      self._button_enabled.show()
 
       for child in self._hbox_action_name.get_children():
         self._hbox_action_name.remove(child)
@@ -614,6 +617,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       if self._button_info is not None:
         self._button_info.hide()
       self._button_reset.hide()
+      self._button_enabled.hide()
+
       self._unhighlight_button(self._button_edit)
 
   @staticmethod
