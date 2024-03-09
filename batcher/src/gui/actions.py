@@ -435,13 +435,15 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _create_label_action_name_for_editing(self):
     label_action_name_for_editing = editable_label_.EditableLabel()
+    
     label_action_name_for_editing.label.set_ellipsize(Pango.EllipsizeMode.END)
     label_action_name_for_editing.label.set_label(self._action['display_name'].value)
     label_action_name_for_editing.label.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
-    label_action_name_for_editing.show_all()
-    label_action_name_for_editing.connect('changed', self._on_label_action_name_changed)
 
     label_action_name_for_editing.button_edit.set_tooltip_text(_('Edit Name'))
+
+    label_action_name_for_editing.show_all()
+    label_action_name_for_editing.connect('changed', self._on_label_action_name_changed)
 
     self._label_action_name_for_editing_css_provider = (
       self._create_and_attach_css_provider_to_widget(
