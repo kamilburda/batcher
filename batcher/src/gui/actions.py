@@ -303,10 +303,7 @@ class ActionBox(pg.gui.ItemBox):
     if response_id == Gtk.ResponseType.OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
-        pdb_proc_action_dict = actions_.get_action_dict_for_pdb_procedure(procedure_name)
-        pdb_proc_action_dict['enabled'] = False
-        
-        self.add_item(pdb_proc_action_dict)
+        self.add_item(actions_.get_action_dict_for_pdb_procedure(procedure_name))
     
     dialog.hide()
 
