@@ -129,6 +129,10 @@ class PreviewsController:
         self._update_previews_on_setting_change(action['enabled'])
       action['enabled'].connect_event(
         'value-changed', self._update_previews_on_setting_change)
+
+      for action_argument in action['arguments']:
+        action_argument.connect_event(
+          'value-changed', self._update_previews_on_setting_change)
     
     def _on_after_reorder_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
@@ -144,7 +148,7 @@ class PreviewsController:
     actions_.connect_event('after-reorder-action', _on_after_reorder_action)
     actions_.connect_event('before-remove-action', _on_before_remove_action)
   
-  def _update_previews_on_setting_change(self, setting):
+  def _update_previews_on_setting_change(self, _setting):
     self._name_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
