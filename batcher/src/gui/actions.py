@@ -353,10 +353,12 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
     self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
+    self._button_edit.set_tooltip_text(_('Edit'))
 
     self._button_reset = self._setup_item_button(GimpUi.ICON_VIEW_REFRESH, position=0)
     self._button_reset.connect('clicked', self._on_button_reset_clicked)
     self._button_reset.set_no_show_all(True)
+    self._button_reset.set_tooltip_text(_('Reset'))
 
     self._action_info = self._get_action_info()
 
@@ -364,17 +366,22 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       self._create_action_info_popup()
 
       self._button_info = self._setup_item_button(GimpUi.ICON_DIALOG_INFORMATION, position=0)
+      self._button_info.set_tooltip_text(_('Show More Information'))
+
       self._button_info.connect('clicked', self._on_button_info_clicked)
       self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
       self._button_info.set_no_show_all(True)
     else:
       self._button_info = None
 
+    self._button_remove.set_tooltip_text(_('Remove'))
+
     self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
     
     self._display_warning_message_event_id = None
 
+    self._set_tooltip_text_for_button_enabled()
     self._update_item_widget_style_based_on_enabled_state()
     self._show_hide_action_settings()
   
@@ -450,6 +457,12 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   def _on_label_action_name_changed(self, editable_label):
     self._action['display_name'].set_value(editable_label.label.get_text())
     editable_label.label.set_label(self._action['display_name'].value)
+
+  def _set_tooltip_text_for_button_enabled(self):
+    if self._action['enabled'].value:
+      self._button_enabled.set_tooltip_text(_('Toggle to Deactivate'))
+    else:
+      self._button_enabled.set_tooltip_text(_('Toggle to Activate'))
 
   def _get_action_info(self):
     action_info = ''
@@ -552,7 +565,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _on_button_enabled_clicked(self, _button):
     self._action['enabled'].set_value(not self._action['enabled'].value)
+
     self._button_enabled.set_image(self._button_enabled_images[self._action['enabled'].value])
+    self._set_tooltip_text_for_button_enabled()
     self._update_item_widget_style_based_on_enabled_state()
 
   def _on_button_reset_clicked(self, _button):
