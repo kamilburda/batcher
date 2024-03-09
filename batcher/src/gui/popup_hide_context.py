@@ -90,7 +90,9 @@ class PopupHideContext:
       self._toplevel_position = toplevel.get_position()
 
   def _disconnect_button_press_events_for_hiding(self):
-    if self._button_press_emission_hook_id is not None:
+    if (self._button_press_emission_hook_id is not None
+        and GObject.signal_handler_is_connected(
+          self._popup_owner_widget, self._button_press_emission_hook_id)):
       GObject.remove_emission_hook(
         self._popup_owner_widget,
         'button-press-event',
