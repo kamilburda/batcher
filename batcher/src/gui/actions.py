@@ -323,14 +323,31 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   _ACTION_INFO_POPUP_MAX_WIDTH_CHARS = 100
 
   def __init__(self, action):
-    self._action = action
-
     self._hbox_action_name = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     self._event_box_action_name = Gtk.EventBox()
     self._event_box_action_name.add(self._hbox_action_name)
 
     super().__init__(self._event_box_action_name, button_display_mode='always')
 
+    self._action = action
+    self._action_info = self._get_action_info()
+    self._display_warning_message_event_id = None
+
+    self._init_gui()
+
+  @property
+  def action(self):
+    return self._action
+
+  @property
+  def button_edit(self):
+    return self._button_edit
+
+  @property
+  def button_enabled(self):
+    return self._button_enabled
+
+  def _init_gui(self):
     self._label_action_name = self._create_label_action_name()
     self._label_action_name_for_editing = self._create_label_action_name_for_editing()
 
@@ -361,8 +378,6 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_reset.set_no_show_all(True)
     self._button_reset.set_tooltip_text(_('Reset'))
 
-    self._action_info = self._get_action_info()
-
     if self._action_info:
       self._create_action_info_popup()
 
@@ -379,24 +394,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
     self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
     self._button_warning.hide()
-    
-    self._display_warning_message_event_id = None
 
     self._set_tooltip_text_for_button_enabled()
     self._update_item_widget_style_based_on_enabled_state()
     self._show_hide_action_settings()
-  
-  @property
-  def action(self):
-    return self._action
-
-  @property
-  def button_edit(self):
-    return self._button_edit
-
-  @property
-  def button_enabled(self):
-    return self._button_enabled
   
   def set_tooltip(self, text):
     self.widget.set_tooltip_text(text)
