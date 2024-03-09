@@ -66,6 +66,14 @@ class EditableLabel(Gtk.Box):
   def label(self):
     return self._label
 
+  @property
+  def entry(self):
+    return self._entry
+
+  @property
+  def button_edit(self):
+    return self._button_edit
+
   def show_label(self):
     self._entry.hide()
     self._hbox_label.show()

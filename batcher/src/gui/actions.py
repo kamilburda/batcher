@@ -441,6 +441,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     label_action_name_for_editing.show_all()
     label_action_name_for_editing.connect('changed', self._on_label_action_name_changed)
 
+    label_action_name_for_editing.button_edit.set_tooltip_text(_('Edit Name'))
+
     self._label_action_name_for_editing_css_provider = (
       self._create_and_attach_css_provider_to_widget(
         label_action_name_for_editing.label, self._ACTION_NAME_STYLE_CLASS))
