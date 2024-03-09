@@ -57,6 +57,7 @@ def create_settings():
       'default_value': 'png',
       'display_name': _('File extension'),
       'adjust_value': True,
+      'auto_update_gui_to_setting': False,
     },
     {
       'type': 'string',
@@ -64,6 +65,7 @@ def create_settings():
       'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       'display_name': _('Output directory'),
       'gui_type': None,
+      'auto_update_gui_to_setting': False,
     },
     {
       'type': 'filename_pattern',
@@ -72,6 +74,7 @@ def create_settings():
       'display_name': _('Layer filename pattern'),
       'description': _('Layer filename pattern (empty string = layer name)'),
       'gui_type': None,
+      'auto_update_gui_to_setting': False,
     },
     {
       'type': 'choice',

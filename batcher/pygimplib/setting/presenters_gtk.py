@@ -124,6 +124,8 @@ class CheckButtonLabelPresenter(GtkPresenter):
   
   Value: Label of the check button.
   """
+
+  _VALUE_CHANGED_SIGNAL = 'notify::text'
   
   def get_value(self):
     return self._widget.get_child().get_text()
@@ -174,6 +176,8 @@ class EntryPresenter(GtkPresenter):
   Value: Text in the entry.
   """
 
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
   def _create_widget(self, setting, **kwargs):
     return Gtk.Entry()
 
@@ -191,6 +195,8 @@ class LabelPresenter(GtkPresenter):
 
   Value: Label text.
   """
+
+  _VALUE_CHANGED_SIGNAL = 'notify::text'
 
   def _create_widget(
         self,
@@ -574,6 +580,8 @@ class GFileEntryPresenter(GtkPresenter):
   Value: Current file or folder path as a `Gio.File` instance.
   """
 
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
   def _create_widget(self, setting, **kwargs):
     value = setting.value
 
@@ -600,6 +608,8 @@ class GBytesEntryPresenter(GtkPresenter):
   Value: Raw bytes as a `GLib.Bytes` instance.
   """
 
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
   def _create_widget(self, setting, **kwargs):
     widget = Gtk.Entry(text=pgutils.bytes_to_escaped_string(setting.value.get_data()))
     widget.set_position(-1)
@@ -622,6 +632,8 @@ class FolderChooserButtonPresenter(GtkPresenter):
   
   Value: Current folder.
   """
+
+  _VALUE_CHANGED_SIGNAL = 'file-set'
 
   def _create_widget(self, setting, **kwargs):
     button = Gtk.FileChooserButton(

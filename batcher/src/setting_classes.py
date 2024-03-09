@@ -86,6 +86,8 @@ class ExtendedEntryPresenter(pg.setting.GtkPresenter):
   Value: Text in the entry.
   """
 
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
   def get_value(self):
     text = self._widget.get_text()
     return text if text is not None else ''
