@@ -163,7 +163,7 @@ def _create_gui_settings():
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (700, 650),
+      'default_value': (700, 600),
     },
     {
       'type': 'integer',
