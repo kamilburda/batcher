@@ -130,8 +130,12 @@ class PreviewsController:
       action['enabled'].connect_event(
         'value-changed', self._update_previews_on_setting_change)
 
-      for action_argument in action['arguments']:
-        action_argument.connect_event(
+      for setting in action['arguments']:
+        setting.connect_event(
+          'value-changed', self._update_previews_on_setting_change)
+
+      for setting in action['more_options']:
+        setting.connect_event(
           'value-changed', self._update_previews_on_setting_change)
     
     def _on_after_reorder_action(_actions, action, *args, **kwargs):
