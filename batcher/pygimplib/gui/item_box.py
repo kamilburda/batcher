@@ -96,7 +96,6 @@ class ItemBox(Gtk.ScrolledWindow):
       self._items[next_item_position].item_widget.grab_focus()
     
     self._vbox_items.remove(item.widget)
-    item.remove_item_widget()
     
     self._items.remove(item)
   
@@ -212,9 +211,6 @@ class ItemBoxItem:
   @property
   def button_remove(self) -> Gtk.Button:
     return self._button_remove
-  
-  def remove_item_widget(self):
-    self._hbox.remove(self._item_widget)
   
   def _setup_item_button(self, icon_name, position=None):
     return self._setup_button(icon_name, position, self._hbox_buttons)
@@ -388,10 +384,8 @@ class ArrayBox(ItemBox):
   def add_item(self, item_value=None, index: Optional[int] = None):
     if item_value is None:
       item_value = self._new_item_default_value
-    
-    item_widget = self.on_add_item(item_value, index)
-    
-    item = ItemBoxItem(item_widget)
+
+    item = ItemBoxItem(self.on_add_item(item_value, index))
     
     super().add_item(item)
 
