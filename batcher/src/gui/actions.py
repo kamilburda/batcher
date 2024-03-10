@@ -496,7 +496,11 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
         copyright_text = pdb_procedure.proc.get_copyright()
         if copyright_text:
-          action_author_info.append(f'\u00a9 {copyright_text}')
+          if not authors.startswith(copyright_text):
+            action_author_info.append(f'\u00a9 {copyright_text}')
+          else:
+            if authors:
+              action_author_info[0] = f'\u00a9 {action_author_info[0]}'
 
         if action_author_info:
           action_info += '\n\n' + ', '.join(action_author_info)
