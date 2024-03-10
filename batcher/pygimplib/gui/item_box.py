@@ -59,8 +59,7 @@ class ItemBox(Gtk.ScrolledWindow):
       spacing=self.VBOX_SPACING,
     )
     self._vbox.pack_start(self._vbox_items, False, False, 0)
-    
-    self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
     self.add(self._vbox)
     self.get_child().set_shadow_type(Gtk.ShadowType.NONE)
   
