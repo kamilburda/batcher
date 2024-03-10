@@ -669,6 +669,14 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     return settings_dict
 
+  @classmethod
+  def get_default_default_value(cls):
+    """Returns the hard-coded default value for this setting class."""
+    if not callable(cls._DEFAULT_DEFAULT_VALUE):
+      return cls._DEFAULT_DEFAULT_VALUE
+    else:
+      return cls._DEFAULT_DEFAULT_VALUE()
+
   def _validate(self, value) -> Union[None, List, Tuple]:
     """Checks whether the specified value is valid. If the value is not valid,
     the ``'value-not-valid'`` event is triggered.
