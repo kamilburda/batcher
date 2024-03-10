@@ -616,7 +616,8 @@ class Batcher:
         replaced_args.append(placeholders.get_replaced_value(argument, self))
       elif isinstance(argument, pg.setting.Setting):
         if is_function_pdb_procedure:
-          if isinstance(argument, pg.setting.ArraySetting):
+          if (isinstance(argument, pg.setting.ArraySetting)
+              and argument.element_type != pg.setting.StringSetting):
             replaced_args.append(len(argument.value))
             replaced_args.append(argument.value_for_pdb)
           else:
