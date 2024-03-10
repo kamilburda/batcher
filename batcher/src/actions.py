@@ -523,22 +523,6 @@ def _hide_gui_for_first_run_mode_arguments(action):
     first_argument.gui.set_visible(False)
 
 
-def _remove_array_length_arguments(arguments_list):
-  array_length_argument_indexes = []
-  
-  for i, argument_dict in enumerate(arguments_list):
-    setting_type = argument_dict['type']
-    if isinstance(setting_type, str):
-      setting_type = pg.SETTING_TYPES[setting_type]
-
-    if (issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting))
-        and i > 0):
-      array_length_argument_indexes.append(i - 1)
-
-  for index in reversed(array_length_argument_indexes):
-    del arguments_list[index]
-
-
 def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]:
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added as an action via `add()`.
@@ -571,7 +555,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
 
   action_dict['display_name'] = _get_pdb_procedure_display_name(pdb_procedure)
   
-  for index, proc_arg in enumerate(pdb_procedure.get_arguments()):
+  for proc_arg in pdb_procedure.get_arguments():
     retval = pg.setting.get_setting_type_from_gtype(proc_arg.value_type, proc_arg)
 
     if retval is not None:
@@ -620,10 +604,10 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
 
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
       argument_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
-    
+
     action_dict['arguments'].append(argument_dict)
 
-  _remove_array_length_arguments(action_dict['arguments'])
+  _set_up_array_arguments(action_dict['arguments'])
   
   return action_dict
 
@@ -671,6 +655,45 @@ def _get_arg_default_value(proc_arg):
         return proc_arg.default_value
     else:
       return proc_arg.default_value
+
+
+def _set_up_array_arguments(arguments_list):
+  array_length_argument_indexes = []
+
+  for i, argument_dict in enumerate(arguments_list):
+    setting_type = pg.setting.process_setting_type(argument_dict['type'])
+
+    if issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting)):
+      array_element_type = pg.setting.process_setting_type(argument_dict['element_type'])
+    else:
+      array_element_type = None
+
+    if (issubclass(setting_type, pg.setting.ArraySetting)
+        and i > 0
+        and array_element_type != pg.setting.StringSetting):
+      _set_array_setting_attributes_based_on_length_attribute(
+        argument_dict, arguments_list[i - 1], array_element_type)
+
+    if (issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting))
+        and i > 0
+        and array_element_type != pg.setting.StringSetting):
+      array_length_argument_indexes.append(i - 1)
+
+  _remove_array_length_parameters(arguments_list, array_length_argument_indexes)
+
+
+def _set_array_setting_attributes_based_on_length_attribute(
+      array_dict, array_length_dict, element_type):
+  min_array_size = array_length_dict.get('min_value', 0)
+
+  array_dict['min_size'] = min_array_size
+  array_dict['max_size'] = array_length_dict.get('max_value')
+  array_dict['default_value'] = tuple([element_type.get_default_default_value()] * min_array_size)
+
+
+def _remove_array_length_parameters(arguments_list, array_length_argument_indexes):
+  for index in reversed(array_length_argument_indexes):
+    del arguments_list[index]
 
 
 def reorder(actions: pg.setting.Group, action_name: str, new_position: int):
