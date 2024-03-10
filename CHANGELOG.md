@@ -8,7 +8,8 @@ Redesigned user interface:
 * Adjusted layout accordingly given the changes above (dialog dimensions, positions of separators, spacing/margins/border width).
 
 Bug fixes:
-* Fixed crash for procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
+* Fixed crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
+* Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
 
 
 ## 0.2
