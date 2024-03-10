@@ -360,6 +360,8 @@ class ExportLayersDialog:
       _('Edit Procedure'),
       add_custom_action_text=_('Add Custom Procedure...'),
       propagate_natural_height=True,
+      propagate_natural_width=True,
+      hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
     self._frame_procedures = GimpUi.Frame(
@@ -374,6 +376,8 @@ class ExportLayersDialog:
       _('Edit Constraint'),
       allow_custom_actions=False,
       propagate_natural_height=True,
+      propagate_natural_width=True,
+      hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
     self._frame_constraints = GimpUi.Frame(
