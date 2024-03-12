@@ -1873,7 +1873,7 @@ class ColorSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color()
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color.new('black')
   
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
