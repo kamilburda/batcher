@@ -1862,7 +1862,7 @@ class ColorSetting(Setting):
   Allowed GIMP PDB types:
   * `Gegl.Color`
   
-  Default value: `Gegl.Color` instance with RGBA color `(1.0, 1.0, 1.0, 1.0)`.
+  Default value: `Gegl.Color` instance with RGBA color `(0.0, 0.0, 0.0, 1.0)`.
 
   Message IDs for invalid values:
   * ``'invalid_value'``: The color assigned is not valid.
