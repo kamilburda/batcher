@@ -83,7 +83,6 @@ class ActionBox(pg.gui.ItemBox):
         actions: pg.setting.Group,
         builtin_actions: Optional[Dict[str, Any]] = None,
         add_action_text: Optional[str] = None,
-        edit_action_text: Optional[str] = None,
         allow_custom_actions: bool = True,
         add_custom_action_text: Optional[str] = None,
         item_spacing: int = pg.gui.ItemBox.ITEM_SPACING,
@@ -93,7 +92,6 @@ class ActionBox(pg.gui.ItemBox):
     self._actions = actions
     self._builtin_actions = builtin_actions if builtin_actions is not None else {}
     self._add_action_text = add_action_text
-    self._edit_action_text = edit_action_text
     self._allow_custom_actions = allow_custom_actions
     self._add_custom_action_text = add_custom_action_text
     
