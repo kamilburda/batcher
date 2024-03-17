@@ -318,6 +318,7 @@ class ActionBox(pg.gui.ItemBox):
       [item],
       self._get_drag_icon,
       [item],
+      dest_widget=item.item_widget,
     )
 
   def _get_drag_icon(self, _widget, drag_context, item):
