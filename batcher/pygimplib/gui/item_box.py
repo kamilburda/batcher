@@ -197,7 +197,7 @@ class ItemBoxItem:
       self._hbox_indicator_buttons.set_no_show_all(True)
   
   @property
-  def widget(self) -> Gtk.EventBox:
+  def widget(self) -> Gtk.Widget:
     return self._event_box
 
   @property
