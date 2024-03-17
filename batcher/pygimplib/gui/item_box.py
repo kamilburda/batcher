@@ -105,12 +105,12 @@ class ItemBox(Gtk.ScrolledWindow):
   
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(
-      item.item_widget,
+      item.widget,
       self._get_drag_data,
       self._on_drag_data_received,
       [item],
       [item],
-      self)
+    )
   
   def _get_drag_data(self, dragged_item):
     return bytes([self._items.index(dragged_item)])
@@ -118,7 +118,7 @@ class ItemBox(Gtk.ScrolledWindow):
   def _on_drag_data_received(self, dragged_item_index_as_bytes, destination_item):
     dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
-  
+
   def _on_item_widget_key_press_event(self, widget, event, item):
     if event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
       key_name = Gdk.keyval_name(event.keyval)
@@ -207,11 +207,11 @@ class ItemBoxItem:
   @property
   def item_widget(self) -> Gtk.Widget:
     return self._item_widget
-  
+
   @property
   def button_remove(self) -> Gtk.Button:
     return self._button_remove
-  
+
   def _setup_item_button(self, icon_name, position=None):
     return self._setup_button(icon_name, position, self._hbox_buttons)
   
@@ -449,19 +449,6 @@ class ArrayBox(ItemBox):
     
     self._locker.unlock('prevent_removal_below_min_size')
     self._locker.unlock('emit_size_spin_button_value_changed')
-  
-  def _setup_drag(self, item):
-    self._drag_and_drop_context.setup_drag(
-      # Using the entire item allows dragging only by the label rather than the
-      # widget itself. This avoids problems with widgets such as spin buttons
-      # that do not behave correctly when reordering and also avoids accidental
-      # clicking and modifying the widget by the user.
-      item.widget,
-      self._get_drag_data,
-      self._on_drag_data_received,
-      [item],
-      [item],
-      self)
   
   def _on_size_spin_button_value_changed(self, size_spin_button):
     if self._locker.is_unlocked('emit_size_spin_button_value_changed'):

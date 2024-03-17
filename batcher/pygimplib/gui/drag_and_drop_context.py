@@ -28,7 +28,11 @@ class DragAndDropContext:
         drag_data_receive_func: Callable,
         get_drag_data_args: Optional[Iterable] = None,
         drag_data_receive_args: Optional[Iterable] = None,
-        scrolled_window: Optional[Gtk.ScrolledWindow] = None):
+        get_drag_icon_func: Callable = None,
+        get_drag_icon_func_args: Optional[Iterable] = None,
+        destroy_drag_icon_func: Callable = None,
+        destroy_drag_icon_func_args: Optional[Iterable] = None,
+  ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
     The displayed ``widget`` is used as the drag icon.
@@ -44,11 +48,19 @@ class DragAndDropContext:
         Optional positional arguments for ``get_drag_data_func``.
       drag_data_receive_args:
         Optional positional arguments for ``drag_data_receive_func``.
-      scrolled_window:
-        If ``widget`` is wrapped inside a `Gtk.ScrolledWindow`, you may
-        specify this scrolled window instance so that a default GTK drag icon
-        is assigned if ``widget`` is partially hidden inside the scrolled
-        window.
+      get_drag_icon_func:
+        Function to generate an icon when the dragging begins. If omitted, the
+        default icon assigned by the application will be used.
+        This function requires two arguments - the widget for which the dragging
+        is initiated (equivalent to ``widget``), and a `Gdk.DragContext`
+        instance.
+      get_drag_icon_func_args:
+        Optional additional positional arguments for ``get_drag_icon_func``.
+      destroy_drag_icon_func:
+        Function to destroy a drag icon created by ``get_drag_icon_func``. Only
+        applicable if ``get_drag_icon_func`` is not ``None``.
+      destroy_drag_icon_func_args:
+        Optional additional positional arguments for ``destroy_drag_icon_func``.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -75,8 +87,17 @@ class DragAndDropContext:
       Gtk.DestDefaults.ALL,
       [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
       Gdk.DragAction.MOVE)
-    
-    widget.connect('drag-begin', self._on_widget_drag_begin, scrolled_window)
+
+    if get_drag_icon_func is not None:
+      widget.connect(
+        'drag-begin',
+        get_drag_icon_func,
+        *(get_drag_icon_func_args if get_drag_icon_func_args is not None else ()))
+      if destroy_drag_icon_func is not None:
+        widget.connect(
+          'drag-end',
+          destroy_drag_icon_func,
+          *(destroy_drag_icon_func_args if destroy_drag_icon_func_args is not None else ()))
     widget.connect('drag-motion', self._on_widget_drag_motion)
     widget.connect('drag-failed', self._on_widget_drag_failed)
   
@@ -85,95 +106,32 @@ class DragAndDropContext:
   
   @staticmethod
   def _on_widget_drag_data_get(
-        widget,
-        drag_context,
+        _widget,
+        _drag_context,
         selection_data,
-        info,
-        timestamp,
+        _info,
+        _timestamp,
         get_drag_data_func,
         get_drag_data_args):
     selection_data.set(selection_data.get_target(), 8, get_drag_data_func(*get_drag_data_args))
   
   @staticmethod
   def _on_widget_drag_data_received(
-        widget,
-        drag_context,
-        drop_x,
-        drop_y,
+        _widget,
+        _drag_context,
+        _drop_x,
+        _drop_y,
         selection_data,
-        info,
-        timestamp,
+        _info,
+        _timestamp,
         drag_data_receive_func,
         *drag_data_receive_args):
     drag_data_receive_func(selection_data.get_data(), *drag_data_receive_args)
   
-  def _on_widget_drag_begin(self, widget, drag_context, scrolled_window):
-    drag_icon_pixbuf = self._get_drag_icon_pixbuf(widget, scrolled_window)
-    if drag_icon_pixbuf is not None:
-      widget.drag_source_set_icon_pixbuf(drag_icon_pixbuf)
-  
-  def _on_widget_drag_motion(self, widget, drag_context, drop_x, drop_y, timestamp):
+  def _on_widget_drag_motion(self, widget, _drag_context, _drop_x, _drop_y, _timestamp):
     self._last_widget_dest_drag = widget
   
-  def _on_widget_drag_failed(self, widget, drag_context, result):
+  def _on_widget_drag_failed(self, _widget, _drag_context, _result):
     if self._last_widget_dest_drag is not None:
       self._last_widget_dest_drag.drag_unhighlight()
       self._last_widget_dest_drag = None
-  
-  def _get_drag_icon_pixbuf(self, widget, scrolled_window):
-    if widget.get_window() is None:
-      return
-    
-    if (scrolled_window is not None
-        and self._are_items_partially_hidden_because_of_visible_horizontal_scrollbar(
-              scrolled_window)):
-      return None
-    
-    self._setup_widget_to_add_border_to_drag_icon(widget)
-    
-    while Gtk.events_pending():
-      Gtk.main_iteration()
-    
-    widget_allocation = widget.get_allocation()
-
-    drag_icon_pixbuf = Gdk.pixbuf_get_from_window(
-      widget.get_window(),
-      0,
-      0,
-      widget_allocation.width,
-      widget_allocation.height)
-    
-    self._restore_widget_after_creating_drag_icon(widget)
-    
-    return drag_icon_pixbuf
-  
-  @staticmethod
-  def _are_items_partially_hidden_because_of_visible_horizontal_scrollbar(scrolled_window):
-    return (
-      scrolled_window.get_hscrollbar() is not None
-      and scrolled_window.get_hscrollbar().get_mapped())
-  
-  def _setup_widget_to_add_border_to_drag_icon(self, widget):
-    self._remove_focus_outline(widget)
-    self._add_border(widget)
-  
-  @staticmethod
-  def _remove_focus_outline(widget):
-    if widget.has_focus():
-      widget.set_can_focus(False)
-  
-  @staticmethod
-  def _add_border(widget):
-    widget.drag_highlight()
-  
-  def _restore_widget_after_creating_drag_icon(self, widget):
-    self._add_focus_outline(widget)
-    self._remove_border(widget)
-  
-  @staticmethod
-  def _add_focus_outline(widget):
-    widget.set_can_focus(True)
-  
-  @staticmethod
-  def _remove_border(widget):
-    widget.drag_unhighlight()
