@@ -75,6 +75,8 @@ class ActionBox(pg.gui.ItemBox):
   }
   
   _ADD_BUTTON_HBOX_SPACING = 6
+
+  _DRAG_ICON_OFFSET = -8
   
   def __init__(
         self,
@@ -307,22 +309,46 @@ class ActionBox(pg.gui.ItemBox):
     
     dialog.hide()
 
+  def _setup_drag(self, item):
+    self._drag_and_drop_context.setup_drag(
+      item.widget,
+      self._get_drag_data,
+      self._on_drag_data_received,
+      [item],
+      [item],
+      self._get_drag_icon,
+      [item],
+    )
+
+  def _get_drag_icon(self, _widget, drag_context, item):
+    Gtk.drag_set_icon_widget(
+      drag_context,
+      item.create_drag_icon(),
+      self._DRAG_ICON_OFFSET,
+      self._DRAG_ICON_OFFSET,
+    )
+
 
 class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   _ACTION_SETTINGS_LEFT_MARGIN = 6
-
-  _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
 
   _ACTION_NAME_STYLE_CLASS = 'action-enabled'
 
   _ACTION_INFO_POPUP_BORDER_WIDTH = 3
   _ACTION_INFO_POPUP_MAX_WIDTH_CHARS = 100
 
+  _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
+
+  _DRAG_ICON_MIN_WIDTH = 100
+  _DRAG_ICON_BORDER_WIDTH = 8
+
   def __init__(self, action):
     self._hbox_action_name = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
     self._event_box_action_name = Gtk.EventBox()
     self._event_box_action_name.add(self._hbox_action_name)
+
+    self._drag_icon_window = None
 
     super().__init__(self._event_box_action_name, button_display_mode='always')
 
@@ -343,6 +369,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   @property
   def button_enabled(self):
     return self._button_enabled
+
+  @property
+  def drag_icon(self):
+    return self._drag_icon_window
 
   def _init_gui(self):
     self._label_action_name = self._create_label_action_name()
@@ -421,6 +451,37 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       if self._display_warning_message_event_id is not None:
         self._button_warning.disconnect(self._display_warning_message_event_id)
         self._display_warning_message_event_id = None
+
+  def create_drag_icon(self):
+    if self._drag_icon_window is not None:
+      # We do not destroy the widget on "drag-end" so that an animation
+      # indicating failed dragging is played.
+      self._drag_icon_window.destroy()
+      self._drag_icon_window = None
+
+    label = Gtk.Label(
+      label=f"<b>{self._action['display_name'].value}</b>",
+      use_markup=True,
+      xalign=0.0,
+      yalign=0.5,
+      max_width_chars=_ActionBoxItem._LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
+      ellipsize=Pango.EllipsizeMode.END,
+    )
+
+    frame = Gtk.Frame(shadow_type=Gtk.ShadowType.OUT)
+    frame.add(label)
+
+    self._drag_icon_window = Gtk.Window(
+      type=Gtk.WindowType.POPUP,
+      screen=self.widget.get_screen(),
+      height_request=label.get_layout().get_pixel_size()[1],
+      width_request=self._DRAG_ICON_MIN_WIDTH,
+      border_width=self._DRAG_ICON_BORDER_WIDTH,
+    )
+    self._drag_icon_window.add(frame)
+    self._drag_icon_window.show_all()
+
+    return self._drag_icon_window
 
   def _create_label_action_name(self):
     label_action_name = self._action['display_name'].gui.widget
