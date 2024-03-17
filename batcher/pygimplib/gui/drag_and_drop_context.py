@@ -19,7 +19,6 @@ class DragAndDropContext:
   
   def __init__(self):
     self._drag_type = self._get_unique_drag_type()
-    self._last_widget_dest_drag = None
   
   def setup_drag(
         self,
@@ -98,8 +97,6 @@ class DragAndDropContext:
           'drag-end',
           destroy_drag_icon_func,
           *(destroy_drag_icon_func_args if destroy_drag_icon_func_args is not None else ()))
-    widget.connect('drag-motion', self._on_widget_drag_motion)
-    widget.connect('drag-failed', self._on_widget_drag_failed)
   
   def _get_unique_drag_type(self):
     return f'{type(self).__qualname__}_{id(self)}'
@@ -127,11 +124,3 @@ class DragAndDropContext:
         drag_data_receive_func,
         *drag_data_receive_args):
     drag_data_receive_func(selection_data.get_data(), *drag_data_receive_args)
-  
-  def _on_widget_drag_motion(self, widget, _drag_context, _drop_x, _drop_y, _timestamp):
-    self._last_widget_dest_drag = widget
-  
-  def _on_widget_drag_failed(self, _widget, _drag_context, _result):
-    if self._last_widget_dest_drag is not None:
-      self._last_widget_dest_drag.drag_unhighlight()
-      self._last_widget_dest_drag = None
