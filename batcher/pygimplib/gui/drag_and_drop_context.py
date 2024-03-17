@@ -31,6 +31,7 @@ class DragAndDropContext:
         get_drag_icon_func_args: Optional[Iterable] = None,
         destroy_drag_icon_func: Callable = None,
         destroy_drag_icon_func_args: Optional[Iterable] = None,
+        dest_widget: Optional[Gtk.Widget] = None,
   ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
@@ -60,6 +61,10 @@ class DragAndDropContext:
         applicable if ``get_drag_icon_func`` is not ``None``.
       destroy_drag_icon_func_args:
         Optional additional positional arguments for ``destroy_drag_icon_func``.
+      dest_widget:
+        Optional different widget to use as the drag destination. You may e.g.
+        use a child of ``widget`` as a drag destination to limit the area where
+        ``widget`` can be dropped.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -76,13 +81,16 @@ class DragAndDropContext:
       Gdk.ModifierType.BUTTON1_MASK,
       [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
       Gdk.DragAction.MOVE)
-    
-    widget.connect(
+
+    if dest_widget is None:
+      dest_widget = widget
+
+    dest_widget.connect(
       'drag-data-received',
       self._on_widget_drag_data_received,
       drag_data_receive_func,
       *drag_data_receive_args)
-    widget.drag_dest_set(
+    dest_widget.drag_dest_set(
       Gtk.DestDefaults.ALL,
       [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
       Gdk.DragAction.MOVE)
