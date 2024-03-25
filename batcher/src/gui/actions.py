@@ -451,9 +451,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _set_tooltip_if_label_does_not_fit_text(self, label_action_name):
     if pg.gui.label_fits_text(label_action_name):
-      self._button_action.set_tooltip_text(None)
+      self.widget.set_tooltip_text(None)
     else:
-      self._button_action.set_tooltip_text(label_action_name)
+      self.widget.set_tooltip_text(label_action_name.get_text())
 
   def _on_label_action_name_changed(self, editable_label):
     self._action['display_name'].set_value(editable_label.label.get_text())
