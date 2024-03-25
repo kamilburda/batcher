@@ -205,6 +205,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': background_foreground.insert_background_layer,
     'display_name': _('Insert background'),
     'menu_path': _('Background, foreground'),
+    'display_options_on_create': True,
     'arguments': [
       {
         'type': 'color_tag',
@@ -219,6 +220,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': background_foreground.insert_foreground_layer,
     'display_name': _('Insert foreground'),
     'menu_path': _('Background, foreground'),
+    'display_options_on_create': True,
     'arguments': [
       {
         'type': 'color_tag',
@@ -263,6 +265,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': export_.export,
     'display_name': _('Export'),
     'additional_tags': [NAME_ONLY_TAG],
+    'display_options_on_create': True,
     'arguments': [
       {
         'type': 'dirpath',
@@ -337,6 +340,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': rename_layer,
     'display_name': _('Rename'),
     'additional_tags': [NAME_ONLY_TAG],
+    'display_options_on_create': True,
     'arguments': [
       {
         'type': 'filename_pattern',
@@ -365,6 +369,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'scale',
     'function': scale,
     'display_name': _('Scale'),
+    'display_options_on_create': True,
     'arguments': [
       {
         'type': 'placeholder_image',

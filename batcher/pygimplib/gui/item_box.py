@@ -179,7 +179,7 @@ class ItemBoxItem:
     
     self._has_hbox_buttons_focus = False
 
-    self._button_remove = self._setup_item_button(GimpUi.ICON_WINDOW_CLOSE)
+    self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
 
     self._is_event_box_allocated_size = False
     self._buttons_allocation = None
@@ -212,22 +212,30 @@ class ItemBoxItem:
   def button_remove(self) -> Gtk.Button:
     return self._button_remove
 
-  def _setup_item_button(self, icon_name, position=None):
-    return self._setup_button(icon_name, position, self._hbox_buttons)
+  def _setup_item_button(self, icon=None, text=None, position=None, button_class=Gtk.Button):
+    return self._setup_button(self._hbox_buttons, icon, text, position, button_class)
   
-  def _setup_item_indicator_button(self, icon_name, position=None):
-    button = self._setup_button(icon_name, position, self._hbox_indicator_buttons)
+  def _setup_item_indicator_button(self, icon=None, text=None, position=None):
+    button = self._setup_button(self._hbox_indicator_buttons, icon, text, position)
     button.connect('notify::visible', self._on_indicator_button_visible_changed)
     return button
 
   @staticmethod
-  def _setup_button(icon_name_or_image, position, hbox):
-    button = Gtk.Button()
+  def _setup_button(
+        hbox, icon_name_or_image=None, text=None, position=None, button_class=Gtk.Button):
+    if not issubclass(button_class, Gtk.Button):
+      raise TypeError('button_class must be the Gtk.Button class or one of its subclasses')
 
-    if isinstance(icon_name_or_image, Gtk.Image):
-      button.set_image(icon_name_or_image)
-    else:
-      button.set_image(Gtk.Image.new_from_icon_name(icon_name_or_image, Gtk.IconSize.BUTTON))
+    button = button_class()
+
+    if icon_name_or_image is not None:
+      if isinstance(icon_name_or_image, Gtk.Image):
+        button.set_image(icon_name_or_image)
+      else:
+        button.set_image(Gtk.Image.new_from_icon_name(icon_name_or_image, Gtk.IconSize.BUTTON))
+
+    if text is not None:
+      button.set_label(text)
 
     button.set_relief(Gtk.ReliefStyle.NONE)
 

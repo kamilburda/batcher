@@ -18,7 +18,6 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import actions as actions_
-from src.gui import editable_label as editable_label_
 from src.gui import placeholders as gui_placeholders_
 from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import messages as gui_messages_
@@ -179,29 +178,13 @@ class ActionBox(pg.gui.ItemBox):
     self._init_actions_menu_popup()
   
   def _add_item_from_action(self, action):
-    self._init_action_item_gui(action)
-
-    item = _ActionBoxItem(action)
-    
-    super().add_item(item)
-    
-    return item
-  
-  def _init_action_item_gui(self, action):
     action.initialize_gui()
 
-    if isinstance(action['display_name'].gui, pg.setting.SETTING_GUI_TYPES.label):
-      label_widget = action['display_name'].gui.widget
-      label_widget.set_ellipsize(Pango.EllipsizeMode.END)
-      label_widget.connect(
-        'size-allocate', self._on_action_item_gui_label_size_allocate, label_widget)
-  
-  @staticmethod
-  def _on_action_item_gui_label_size_allocate(item_gui_label, allocation, item_gui):
-    if pg.gui.label_fits_text(item_gui_label):
-      item_gui.set_tooltip_text(None)
-    else:
-      item_gui.set_tooltip_text(item_gui_label.get_text())
+    item = _ActionBoxItem(action)
+
+    super().add_item(item)
+
+    return item
   
   def _reorder_action(self, action, new_position):
     item = next((item_ for item_ in self._items if item_.action.name == action.name), None)
@@ -330,107 +313,55 @@ class ActionBox(pg.gui.ItemBox):
 
 class _ActionBoxItem(pg.gui.ItemBoxItem):
 
-  _ACTION_SETTINGS_LEFT_MARGIN = 6
-
-  _ACTION_NAME_STYLE_CLASS = 'action-enabled'
-
-  _ACTION_INFO_POPUP_BORDER_WIDTH = 3
-  _ACTION_INFO_POPUP_MAX_WIDTH_CHARS = 100
-
   _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
 
   _DRAG_ICON_MIN_WIDTH = 100
   _DRAG_ICON_BORDER_WIDTH = 8
 
   def __init__(self, action):
-    self._hbox_action_name = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-    self._event_box_action_name = Gtk.EventBox()
-    self._event_box_action_name.add(self._hbox_action_name)
-
+    self._action = action
+    self._display_warning_message_event_id = None
     self._drag_icon_window = None
 
-    super().__init__(self._event_box_action_name, button_display_mode='always')
+    self._button_action = self._action['enabled'].gui.widget
 
-    self._action = action
-    self._action_info = self._get_action_info()
-    self._display_warning_message_event_id = None
+    self._action['enabled'].connect_event('value-changed', self._on_action_enabled_changed)
+
+    super().__init__(self._button_action, button_display_mode='always')
 
     self._init_gui()
+
+    self._button_edit.connect('clicked', self._on_button_edit_clicked)
+    self._button_remove.connect('clicked', lambda *args: self.action_edit_dialog.destroy())
+
+    if self._action['display_options_on_create'].value:
+      self._action['display_options_on_create'].set_value(False)
+      self.widget.connect('realize', lambda *args: self.action_edit_dialog.show_all())
+
+    self._action_edit_dialog.connect('close', self._on_action_edit_dialog_close)
+    self._action_edit_dialog.connect('response', self._on_action_edit_dialog_response)
 
   @property
   def action(self):
     return self._action
 
   @property
-  def button_edit(self):
-    return self._button_edit
-
-  @property
-  def button_enabled(self):
-    return self._button_enabled
+  def action_edit_dialog(self):
+    return self._action_edit_dialog
 
   @property
   def drag_icon(self):
     return self._drag_icon_window
 
-  def _init_gui(self):
-    self._label_action_name = self._create_label_action_name()
-    self._label_action_name_for_editing = self._create_label_action_name_for_editing()
+  def is_being_edited(self):
+    return self.action_edit_dialog.get_mapped()
 
-    self._action_settings_widget = _ActionSettingsWidget(
-      self._action,
-      margin_start=self._ACTION_SETTINGS_LEFT_MARGIN,
-    )
-    self._action_settings_widget.show_all()
-    self._action_settings_widget.set_no_show_all(True)
-    self.vbox.pack_start(self._action_settings_widget, False, False, 0)
-
-    self._button_edit = self._setup_item_button(GimpUi.ICON_EDIT, position=0)
-    self._button_edit.connect('clicked', self._on_button_edit_clicked)
-    self._button_edit.set_tooltip_text(_('Edit'))
-
-    self._button_enabled_images = {
-      False: Gtk.Image.new_from_icon_name('checkbox', Gtk.IconSize.BUTTON),
-      True: Gtk.Image.new_from_icon_name('checkbox-checked', Gtk.IconSize.BUTTON),
-    }
-
-    self._button_enabled = self._setup_item_button(
-      self._button_enabled_images[self._action['enabled'].value], position=0)
-    self._button_enabled.connect('clicked', self._on_button_enabled_clicked)
-    self._button_enabled.set_no_show_all(True)
-
-    self._button_reset = self._setup_item_button(GimpUi.ICON_VIEW_REFRESH, position=0)
-    self._button_reset.connect('clicked', self._on_button_reset_clicked)
-    self._button_reset.set_no_show_all(True)
-    self._button_reset.set_tooltip_text(_('Reset'))
-
-    if self._action_info:
-      self._create_action_info_popup()
-
-      self._button_info = self._setup_item_button(GimpUi.ICON_DIALOG_INFORMATION, position=0)
-      self._button_info.set_tooltip_text(_('Show More Information'))
-
-      self._button_info.connect('clicked', self._on_button_info_clicked)
-      self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
-      self._button_info.set_no_show_all(True)
-    else:
-      self._button_info = None
-
-    self._button_remove.set_tooltip_text(_('Remove'))
-
-    self._button_warning = self._setup_item_indicator_button(GimpUi.ICON_DIALOG_WARNING, position=0)
-    self._button_warning.hide()
-
-    self._set_tooltip_text_for_button_enabled()
-    self._update_item_widget_style_based_on_enabled_state()
-    self._show_hide_action_settings()
-  
   def set_tooltip(self, text):
     self.widget.set_tooltip_text(text)
-  
+
   def has_warning(self):
     return self._button_warning.get_visible()
-  
+
   def set_warning(self, show, main_message=None, failure_message=None, details=None, parent=None):
     if show:
       self.set_tooltip(failure_message)
@@ -441,11 +372,11 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       self._display_warning_message_event_id = self._button_warning.connect(
         'clicked',
         self._on_button_warning_clicked, main_message, failure_message, details, parent)
-      
+
       self._button_warning.show()
     else:
       self._button_warning.hide()
-      
+
       self.set_tooltip(None)
       if self._display_warning_message_event_id is not None:
         self._button_warning.disconnect(self._display_warning_message_event_id)
@@ -463,7 +394,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       use_markup=True,
       xalign=0.0,
       yalign=0.5,
-      max_width_chars=_ActionBoxItem._LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
+      max_width_chars=self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
 
@@ -482,166 +413,176 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
     return self._drag_icon_window
 
-  def _create_label_action_name(self):
-    label_action_name = self._action['display_name'].gui.widget
-    label_action_name.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+  def _init_gui(self):
+    self._label_action_name = self._action['display_name'].gui.widget.get_child()
+    self._label_action_name.set_ellipsize(Pango.EllipsizeMode.END)
+    self._label_action_name.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+    self._label_action_name.connect('size-allocate', self._on_label_action_name_size_allocate)
 
-    self._label_action_name_css_provider = self._create_and_attach_css_provider_to_widget(
-      label_action_name, self._ACTION_NAME_STYLE_CLASS)
+    self._button_edit = self._setup_item_button(icon=GimpUi.ICON_EDIT, position=0)
+    self._button_edit.set_tooltip_text(_('Edit'))
 
-    return label_action_name
+    self._action_edit_dialog = _ActionEditDialog(
+      self._action,
+      self.widget,
+      title=self._action['display_name'].value,
+      role=pg.config.PLUGIN_NAME,
+      parent=pg.gui.get_toplevel_window(self.widget),
+      attached_to=pg.gui.get_toplevel_window(self.widget),
+    )
+    self.widget.connect(
+      'realize',
+      lambda *args: self._action_edit_dialog.set_transient_for(
+        pg.gui.get_toplevel_window(self.widget)))
 
-  def _create_label_action_name_for_editing(self):
-    label_action_name_for_editing = editable_label_.EditableLabel()
+    self._button_remove.set_tooltip_text(_('Remove'))
 
-    label_action_name_for_editing.label.set_ellipsize(Pango.EllipsizeMode.END)
-    label_action_name_for_editing.label.set_label(self._action['display_name'].value)
-    label_action_name_for_editing.label.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+    self._button_warning = self._setup_item_indicator_button(
+      icon=GimpUi.ICON_DIALOG_WARNING, position=0)
+    self._button_warning.hide()
 
-    label_action_name_for_editing.button_edit.set_tooltip_text(_('Edit Name'))
-
-    label_action_name_for_editing.show_all()
-    label_action_name_for_editing.connect('changed', self._on_label_action_name_changed)
-
-    self._label_action_name_for_editing_css_provider = (
-      self._create_and_attach_css_provider_to_widget(
-        label_action_name_for_editing.label, self._ACTION_NAME_STYLE_CLASS))
-
-    return label_action_name_for_editing
-
-  @staticmethod
-  def _create_and_attach_css_provider_to_widget(widget, style_class):
-    css_provider = Gtk.CssProvider()
-    css_provider.load_from_data(f'label.{style_class} {{font-weight: bold;}}'.encode())
-    widget.get_style_context().add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
-    return css_provider
+  def _on_label_action_name_size_allocate(self, label_action_name, _allocation):
+    if pg.gui.label_fits_text(label_action_name):
+      self._button_action.set_tooltip_text(None)
+    else:
+      self._button_action.set_tooltip_text(label_action_name)
 
   def _on_label_action_name_changed(self, editable_label):
     self._action['display_name'].set_value(editable_label.label.get_text())
     editable_label.label.set_label(self._action['display_name'].value)
 
-  def _set_tooltip_text_for_button_enabled(self):
-    if self._action['enabled'].value:
-      self._button_enabled.set_tooltip_text(_('Toggle to Deactivate'))
+  def _on_button_edit_clicked(self, _button):
+    if self.is_being_edited():
+      self.action_edit_dialog.present()
     else:
-      self._button_enabled.set_tooltip_text(_('Toggle to Activate'))
-
-  def _get_action_info(self):
-    action_info = ''
-
-    if self._action['origin'].is_item('gimp_pdb'):
-      pdb_procedure = pdb[self._action['function'].value] if self._action['function'].value else None
-      if pdb_procedure is not None:
-        action_main_info = []
-
-        blurb = pdb_procedure.proc.get_blurb()
-        if blurb:
-          action_main_info.append(blurb)
-
-        help_text = pdb_procedure.proc.get_help()
-        if help_text:
-          action_main_info.append(help_text)
-
-        action_info += '\n\n'.join(action_main_info)
-
-        action_author_info = []
-        authors = pdb_procedure.proc.get_authors()
-        if authors:
-          action_author_info.append(authors)
-
-        date_text = pdb_procedure.proc.get_date()
-        if date_text:
-          action_author_info.append(date_text)
-
-        copyright_text = pdb_procedure.proc.get_copyright()
-        if copyright_text:
-          if not authors.startswith(copyright_text):
-            action_author_info.append(f'\u00a9 {copyright_text}')
-          else:
-            if authors:
-              action_author_info[0] = f'\u00a9 {action_author_info[0]}'
-
-        if action_author_info:
-          action_info += '\n\n' + ', '.join(action_author_info)
-    else:
-      if self._action['description'].value:
-        action_info = self._action['description'].value
-
-    return action_info
-
-  def _create_action_info_popup(self):
-    self._info_popup = Gtk.Window(
-      type=Gtk.WindowType.POPUP,
-      type_hint=Gdk.WindowTypeHint.TOOLTIP,
-      resizable=False,
-    )
-    self._info_popup.set_attached_to(self.widget)
-
-    self.widget.connect('realize', self._on_action_box_item_realize)
-
-    self._info_popup_text = Gtk.Label(
-      label=self._action_info,
-      use_markup=False,
-      selectable=True,
-      wrap=True,
-      max_width_chars=self._ACTION_INFO_POPUP_MAX_WIDTH_CHARS,
-    )
-
-    self._info_popup_hbox = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      homogeneous=False,
-      border_width=self._ACTION_INFO_POPUP_BORDER_WIDTH,
-    )
-    self._info_popup_hbox.pack_start(self._info_popup_text, True, True, 0)
-
-    self._info_popup_hide_context = popup_hide_context_.PopupHideContext(
-      self._info_popup,
-      self.widget,
-      widgets_to_exclude_from_triggering_hiding=[
-        self._info_popup,
-        self.widget,
-      ],
-    )
-    self._info_popup_hide_context.enable()
-
-    self._info_popup_scrolled_window = Gtk.ScrolledWindow(
-      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      shadow_type=Gtk.ShadowType.ETCHED_IN,
-      propagate_natural_width=True,
-      propagate_natural_height=True,
-    )
-    self._info_popup_scrolled_window.add(self._info_popup_hbox)
-    self._info_popup_scrolled_window.show_all()
-
-    self._info_popup.add(self._info_popup_scrolled_window)
-
-  def _on_action_box_item_realize(self, _widget):
-    self._info_popup.set_transient_for(pg.gui.utils.get_toplevel_window(self.widget))
+      self.action_edit_dialog.show_all()
 
   @staticmethod
   def _on_button_warning_clicked(_button, main_message, short_message, full_message, parent):
     gui_messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
 
-  def _on_button_edit_clicked(self, _button):
-    self._action['display_action_settings'].set_value(
-      not self._action['display_action_settings'].value)
-
-    self._show_hide_action_settings()
-
-  def _on_button_enabled_clicked(self, _button):
-    self._action['enabled'].set_value(not self._action['enabled'].value)
-
+  def _on_action_enabled_changed(self, _setting):
     self._action['arguments'].apply_gui_values_to_settings(force=True)
 
-    self._button_enabled.set_image(self._button_enabled_images[self._action['enabled'].value])
-    self._set_tooltip_text_for_button_enabled()
-    self._update_item_widget_style_based_on_enabled_state()
+  def _on_action_edit_dialog_close(self, _dialog):
+    self.action_edit_dialog.hide()
 
-  def _on_button_reset_clicked(self, _button):
-    self._action['arguments'].reset()
-    self._action['more_options'].reset()
+  def _on_action_edit_dialog_response(self, _dialog, response_id):
+    if response_id == Gtk.ResponseType.CLOSE:
+      self.action_edit_dialog.hide()
+
+
+class _ActionEditDialog(GimpUi.Dialog):
+
+  _BORDER_WIDTH = 6
+
+  _GRID_ROW_SPACING = 3
+  _GRID_COLUMN_SPACING = 8
+
+  _MORE_OPTIONS_SPACING = 3
+  _MORE_OPTIONS_LABEL_TOP_MARGIN = 6
+  _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 3
+
+  _ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS = 60
+  _ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
+
+  def __init__(self, action, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.set_resizable(False)
+    self.connect('delete-event', lambda *args: self.hide_on_delete())
+
+    if action['origin'].is_item('gimp_pdb') and action['function'].value:
+      self._pdb_procedure = pdb[action['function'].value]
+    else:
+      self._pdb_procedure = None
+
+    self._set_up_action_info(action, self)
+
+    self._grid_action_arguments = Gtk.Grid(
+      row_spacing=self._GRID_ROW_SPACING,
+      column_spacing=self._GRID_COLUMN_SPACING,
+    )
+
+    self._vbox_more_options = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._MORE_OPTIONS_SPACING,
+      margin_top=self._MORE_OPTIONS_LABEL_BOTTOM_MARGIN,
+    )
+    self._vbox_more_options.pack_start(
+      action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
+    if 'also_apply_to_parent_folders' in action['more_options']:
+      self._vbox_more_options.pack_start(
+        action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
+
+    action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
+    action['more_options_expanded'].gui.widget.set_margin_top(self._MORE_OPTIONS_LABEL_TOP_MARGIN)
+
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      border_width=self._BORDER_WIDTH,
+    )
+
+    if self._action_info_hbox is not None:
+      self._vbox.pack_start(self._action_info_hbox, False, False, 0)
+    self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
+    self._vbox.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
+
+    self.vbox.pack_start(self._vbox, False, False, 0)
+
+    self._button_reset_response_id = 1
+    self._button_reset = self.add_button(_('Reset'), self._button_reset_response_id)
+    self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
+
+    self._button_close = self.add_button(_('Close'), Gtk.ResponseType.CLOSE)
+
+    self._set_arguments(action, self._pdb_procedure)
+
+    self.set_focus(self._button_close)
+
+  def _set_up_action_info(self, action, parent):
+    self._action_info = None
+    self._label_short_description = None
+    self._info_popup = None
+    self._info_popup_text = None
+    self._button_info = None
+    self._action_info_hbox = None
+
+    if self._pdb_procedure is not None:
+      short_description = self._pdb_procedure.proc.get_blurb()
+    else:
+      short_description = ''
+
+    self._action_info = _get_action_info(action, self._pdb_procedure)
+
+    if self._action_info is None:
+      return
+
+    self._label_short_description = Gtk.Label(
+      label=short_description,
+      use_markup=False,
+      selectable=True,
+      wrap=True,
+      max_width_chars=self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS,
+    )
+
+    self._info_popup, self._info_popup_text = _create_action_info_popup(self._action_info, parent)
+
+    self._button_info = Gtk.Button(
+      image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
+      relief=Gtk.ReliefStyle.NONE,
+    )
+    self._button_info.set_tooltip_text(_('Show More Information'))
+
+    self._button_info.connect('clicked', self._on_button_info_clicked)
+    self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
+
+    self._action_info_hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING,
+    )
+    self._action_info_hbox.pack_start(self._label_short_description, False, False, 0)
+    self._action_info_hbox.pack_start(self._button_info, False, False, 0)
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
@@ -657,104 +598,6 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       if position is not None:
         self._info_popup.move(*position)
 
-  def _show_hide_action_settings(self):
-    if self._action['display_action_settings'].value:
-      self._highlight_button(self._button_edit)
-
-      if self._button_info is not None:
-        self._button_info.show()
-      self._button_reset.show()
-      self._button_enabled.show()
-
-      for child in self._hbox_action_name.get_children():
-        self._hbox_action_name.remove(child)
-
-      self._hbox_action_name.pack_start(self._label_action_name_for_editing, True, True, 0)
-
-      self._action_settings_widget.show()
-    else:
-      self._action_settings_widget.hide()
-
-      for child in self._hbox_action_name.get_children():
-        self._hbox_action_name.remove(child)
-
-      self._hbox_action_name.pack_start(self._label_action_name, True, True, 0)
-
-      self._label_action_name_for_editing.show_label()
-
-      if self._button_info is not None:
-        self._button_info.hide()
-      self._button_reset.hide()
-      self._button_enabled.hide()
-
-      self._unhighlight_button(self._button_edit)
-
-  @staticmethod
-  def _highlight_button(button):
-    button.set_relief(Gtk.ReliefStyle.NORMAL)
-    button.set_state_flags(Gtk.StateFlags.CHECKED, False)
-
-  @staticmethod
-  def _unhighlight_button(button):
-    button.unset_state_flags(Gtk.StateFlags.CHECKED)
-    button.set_relief(Gtk.ReliefStyle.NONE)
-
-  def _update_item_widget_style_based_on_enabled_state(self):
-    if self._action['enabled'].value:
-      self._label_action_name.get_style_context().add_class(self._ACTION_NAME_STYLE_CLASS)
-      self._label_action_name_for_editing.label.get_style_context().add_class(
-        self._ACTION_NAME_STYLE_CLASS)
-    else:
-      self._label_action_name.get_style_context().remove_class(self._ACTION_NAME_STYLE_CLASS)
-      self._label_action_name_for_editing.label.get_style_context().remove_class(
-        self._ACTION_NAME_STYLE_CLASS)
-
-
-class _ActionSettingsWidget(Gtk.Box):
-
-  _LABEL_ACTION_NAME_STYLE_CLASS_NAME = 'action-name'
-
-  _VBOX_SPACING = 3
-
-  _GRID_ROW_SPACING = 3
-  _GRID_COLUMN_SPACING = 8
-
-  _MORE_OPTIONS_SPACING = 3
-  _MORE_OPTIONS_LABEL_TOP_MARGIN = 3
-  _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 3
-  
-  def __init__(self, action, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
-    self.set_orientation(Gtk.Orientation.VERTICAL)
-    self.set_spacing(self._VBOX_SPACING)
-
-    self._pdb_procedure = pdb[action['function'].value] if action['function'].value else None
-    
-    self._grid_action_arguments = Gtk.Grid(
-      row_spacing=self._GRID_ROW_SPACING,
-      column_spacing=self._GRID_COLUMN_SPACING,
-    )
-    
-    self._vbox_more_options = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._MORE_OPTIONS_SPACING,
-      margin_top=self._MORE_OPTIONS_LABEL_BOTTOM_MARGIN,
-    )
-    self._vbox_more_options.pack_start(
-      action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
-    if 'also_apply_to_parent_folders' in action['more_options']:
-      self._vbox_more_options.pack_start(
-        action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
-    
-    action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
-    action['more_options_expanded'].gui.widget.set_margin_top(self._MORE_OPTIONS_LABEL_TOP_MARGIN)
-
-    self.pack_start(self._grid_action_arguments, True, True, 0)
-    self.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
-    
-    self._set_arguments(action, self._pdb_procedure)
-  
   def _set_arguments(self, action, pdb_procedure):
     if pdb_procedure is not None:
       pdb_argument_names_and_blurbs = {
@@ -767,7 +610,7 @@ class _ActionSettingsWidget(Gtk.Box):
     for setting in action['arguments']:
       if not setting.gui.get_visible():
         continue
-      
+
       label = Gtk.Label(
         label=setting.display_name,
         xalign=0.0,
@@ -776,18 +619,114 @@ class _ActionSettingsWidget(Gtk.Box):
 
       if pdb_procedure is not None and setting.name in pdb_argument_names_and_blurbs:
         label.set_tooltip_text(pdb_argument_names_and_blurbs[setting.name])
-      
+
       self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
-      
+
       widget_to_attach = setting.gui.widget
-      
+
       if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
         widget_to_attach = gui_placeholders_.create_placeholder_widget()
       else:
         if (isinstance(setting, pg.setting.ArraySetting)
             and not setting.element_type.get_allowed_gui_types()):
           widget_to_attach = gui_placeholders_.create_placeholder_widget()
-      
+
       self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
 
       row_index += 1
+
+  @staticmethod
+  def _on_button_reset_clicked(_button, action):
+    action['arguments'].reset()
+    action['more_options'].reset()
+
+
+def _get_action_info(action, pdb_procedure):
+  if pdb_procedure is not None:
+    action_info = ''
+    action_main_info = []
+
+    help_text = pdb_procedure.proc.get_help()
+    if help_text:
+      action_main_info.append(help_text)
+
+    action_info += '\n\n'.join(action_main_info)
+
+    action_author_info = []
+    authors = pdb_procedure.proc.get_authors()
+    if authors:
+      action_author_info.append(authors)
+
+    date_text = pdb_procedure.proc.get_date()
+    if date_text:
+      action_author_info.append(date_text)
+
+    copyright_text = pdb_procedure.proc.get_copyright()
+    if copyright_text:
+      if not authors.startswith(copyright_text):
+        action_author_info.append(f'\u00a9 {copyright_text}')
+      else:
+        if authors:
+          action_author_info[0] = f'\u00a9 {action_author_info[0]}'
+
+    if action_author_info:
+      action_info += '\n\n' + ', '.join(action_author_info)
+
+    return action_info
+  else:
+    if action['description'].value:
+      return action['description'].value
+    else:
+      return None
+
+
+def _create_action_info_popup(action_info, widget, max_width_chars=100, border_width=3):
+  info_popup = Gtk.Window(
+    type=Gtk.WindowType.POPUP,
+    type_hint=Gdk.WindowTypeHint.TOOLTIP,
+    resizable=False,
+  )
+  info_popup.set_attached_to(widget)
+
+  widget.connect(
+    'realize',
+    lambda *args: info_popup.set_transient_for(pg.gui.utils.get_toplevel_window(widget)))
+
+  info_popup_text = Gtk.Label(
+    label=action_info,
+    use_markup=False,
+    selectable=True,
+    wrap=True,
+    max_width_chars=max_width_chars,
+  )
+
+  info_popup_hbox = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    homogeneous=False,
+    border_width=border_width,
+  )
+  info_popup_hbox.pack_start(info_popup_text, True, True, 0)
+
+  info_popup_hide_context = popup_hide_context_.PopupHideContext(
+    info_popup,
+    widget,
+    widgets_to_exclude_from_triggering_hiding=[
+      info_popup,
+      widget,
+    ],
+  )
+  info_popup_hide_context.enable()
+
+  info_popup_scrolled_window = Gtk.ScrolledWindow(
+    hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+    vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+    shadow_type=Gtk.ShadowType.ETCHED_IN,
+    propagate_natural_width=True,
+    propagate_natural_height=True,
+  )
+  info_popup_scrolled_window.add(info_popup_hbox)
+  info_popup_scrolled_window.show_all()
+
+  info_popup.add(info_popup_scrolled_window)
+
+  return info_popup, info_popup_text

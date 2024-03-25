@@ -128,8 +128,8 @@ def create(
   * ``'tags'``: Additional tags added to each action (the
     `pygimplib.setting.Group` instance).
 
-  * ``'display_action_settings'``: If ``True``, action settings are displayed
-    upon adding an action interactively.
+  * ``'display_options_on_create'``: If ``True``, an action edit dialog is
+    displayed upon adding an action interactively.
 
   * ``'more_options_expanded'``: If ``True``, additional options are displayed
     for an action when editing the action interactively.
@@ -161,7 +161,7 @@ def create(
 
   * ``'tags'``
 
-  * ``'display_action_settings'``
+  * ``'display_options_on_create'``
 
   * ``'more_options_expanded'``
 
@@ -342,7 +342,7 @@ def _create_action(
       description=None,
       action_groups=None,
       tags=None,
-      display_action_settings=True,
+      display_options_on_create=False,
       more_options_expanded=False,
       enabled_for_previews=True,
       orig_name=None,
@@ -389,15 +389,14 @@ def _create_action(
     {
       'type': 'bool',
       'name': 'enabled',
-      'gui_type': None,
       'default_value': enabled,
-      'tags': ['ignore_initialize_gui'],
     },
     {
       'type': 'string',
       'name': 'display_name',
       'default_value': display_name,
-      'gui_type': 'label',
+      'gui_type': None,
+      'tags': ['ignore_initialize_gui'],
     },
     {
       'type': 'string',
@@ -421,8 +420,8 @@ def _create_action(
     },
     {
       'type': 'bool',
-      'name': 'display_action_settings',
-      'default_value': display_action_settings,
+      'name': 'display_options_on_create',
+      'default_value': display_options_on_create,
       'gui_type': None,
     },
     more_options_group,
@@ -511,8 +510,19 @@ def _create_constraint(
 
 
 def _set_up_action_post_creation(action):
+  action['enabled'].connect_event(
+    'after-set-gui',
+    _set_display_name_for_enabled_gui,
+    action['display_name'])
+
   if action['origin'].is_item('gimp_pdb'):
     _hide_gui_for_first_run_mode_arguments(action)
+
+
+def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
+  setting_display_name.set_gui(
+    gui_type='check_button_label',
+    widget=setting_enabled.gui.widget)
 
 
 def _hide_gui_for_first_run_mode_arguments(action):
@@ -546,7 +556,7 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
     'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
-    'display_action_settings': True,
+    'display_options_on_create': True,
   }
   
   pdb_procedure_argument_names = []

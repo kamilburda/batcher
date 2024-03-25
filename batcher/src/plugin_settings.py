@@ -121,23 +121,17 @@ def create_settings():
   ])
   
   settings.add([_create_gui_settings()])
-
-  use_layer_size_procedure_dict = builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']
-  use_layer_size_procedure_dict['display_action_settings'] = False
   
   settings['main'].add([
     actions.create(
       name='procedures',
-      initial_actions=[use_layer_size_procedure_dict]),
+      initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
   ])
-
-  layers_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['layers'])
-  layers_constraint_dict['display_action_settings'] = False
   
   settings['main'].add([
     actions.create(
       name='constraints',
-      initial_actions=[layers_constraint_dict]),
+      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
   ])
   
   settings['main/procedures'].connect_event(

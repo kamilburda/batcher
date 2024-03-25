@@ -983,6 +983,7 @@ class ExportLayersDialog:
   def _setup_gui_before_batch_run(self):
     self._display_inline_message(None)
     self._reset_action_tooltips_and_indicators()
+    self._close_action_edit_dialogs()
     self._set_gui_enabled(False)
   
   def _restore_gui_after_batch_run(self):
@@ -1076,6 +1077,11 @@ class ExportLayersDialog:
       for box_item in action_box.items:
         box_item.set_tooltip(None)
         box_item.set_warning(False)
+
+  def _close_action_edit_dialogs(self):
+    for action_box in [self._box_procedures, self._box_constraints]:
+      for box_item in action_box.items:
+        box_item.action_edit_dialog.hide()
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting

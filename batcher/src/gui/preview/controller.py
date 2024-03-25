@@ -126,21 +126,22 @@ class PreviewsController:
   def _connect_actions_changed(self, actions_):
     def _on_after_add_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
-        self._update_previews_on_setting_change(action['enabled'])
+        self._update_previews_on_setting_change(action['enabled'], action)
+
       action['enabled'].connect_event(
-        'value-changed', self._update_previews_on_setting_change)
+        'value-changed', self._update_previews_on_setting_change, action)
 
       for setting in action['arguments']:
         setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change)
+          'value-changed', self._update_previews_on_setting_change, action)
 
       for setting in action['more_options']:
         setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change)
+          'value-changed', self._update_previews_on_setting_change, action)
     
     def _on_after_reorder_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
-        self._update_previews_on_setting_change(action['enabled'])
+        self._update_previews_on_setting_change(action['enabled'], action)
     
     def _on_before_remove_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
@@ -152,15 +153,19 @@ class PreviewsController:
     actions_.connect_event('after-reorder-action', _on_after_reorder_action)
     actions_.connect_event('before-remove-action', _on_before_remove_action)
   
-  def _update_previews_on_setting_change(self, _setting):
+  def _update_previews_on_setting_change(self, setting, action):
+    if (not action['more_options/enabled_for_previews'].value
+        and setting.name != 'enabled_for_previews'):
+      return
+
     self._name_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
-    
+
     self._image_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
-  
+
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_layers_collapsed_state'].connect_event(
       'after-load',
