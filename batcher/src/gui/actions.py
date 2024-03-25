@@ -9,6 +9,7 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -18,6 +19,7 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import actions as actions_
+from src.gui import editable_label as editable_label_
 from src.gui import placeholders as gui_placeholders_
 from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import messages as gui_messages_
@@ -313,7 +315,7 @@ class ActionBox(pg.gui.ItemBox):
 
 class _ActionBoxItem(pg.gui.ItemBoxItem):
 
-  _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
+  LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
 
   _DRAG_ICON_MIN_WIDTH = 100
   _DRAG_ICON_BORDER_WIDTH = 8
@@ -397,7 +399,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       use_markup=True,
       xalign=0.0,
       yalign=0.5,
-      max_width_chars=self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
+      max_width_chars=self.LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
 
@@ -419,7 +421,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   def _init_gui(self):
     self._label_action_name = self._action['display_name'].gui.widget.get_child()
     self._label_action_name.set_ellipsize(Pango.EllipsizeMode.END)
-    self._label_action_name.set_max_width_chars(self._LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+    self._label_action_name.set_max_width_chars(self.LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
     self._label_action_name.connect('size-allocate', self._on_label_action_name_size_allocate)
 
     self._button_edit = self._setup_item_button(icon=GimpUi.ICON_EDIT, position=0)
@@ -503,6 +505,11 @@ class _ActionEditDialog(GimpUi.Dialog):
     else:
       self._pdb_procedure = None
 
+    self._init_gui(action)
+
+  def _init_gui(self, action):
+    self._set_up_editable_name(action)
+
     self._set_up_action_info(action, self)
 
     self._grid_action_arguments = Gtk.Grid(
@@ -529,6 +536,7 @@ class _ActionEditDialog(GimpUi.Dialog):
       border_width=self._BORDER_WIDTH,
     )
 
+    self._vbox.pack_start(self._label_editable_action_name, False, False, 0)
     if self._action_info_hbox is not None:
       self._vbox.pack_start(self._action_info_hbox, False, False, 0)
     self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
@@ -545,6 +553,26 @@ class _ActionEditDialog(GimpUi.Dialog):
     self._set_arguments(action, self._pdb_procedure)
 
     self.set_focus(self._button_close)
+
+  def _set_up_editable_name(self, action):
+    self._label_editable_action_name = editable_label_.EditableLabel()
+    self._label_editable_action_name.label.set_use_markup(True)
+    self._label_editable_action_name.label.set_ellipsize(Pango.EllipsizeMode.END)
+    self._label_editable_action_name.label.set_markup(
+      '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
+    self._label_editable_action_name.label.set_max_width_chars(
+      _ActionBoxItem.LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+    self._label_editable_action_name.connect(
+      'changed', self._on_label_editable_action_name_changed, action)
+
+  def _on_label_editable_action_name_changed(self, editable_label, action):
+    action['display_name'].set_value(editable_label.label.get_text())
+
+    self._set_editable_label_text(editable_label.label.get_text())
+
+  def _set_editable_label_text(self, text):
+    self._label_editable_action_name.label.set_markup(
+      '<b>{}</b>'.format(GLib.markup_escape_text(text)))
 
   def _set_up_action_info(self, action, parent):
     self._action_info = None
@@ -641,10 +669,12 @@ class _ActionEditDialog(GimpUi.Dialog):
 
       row_index += 1
 
-  @staticmethod
-  def _on_button_reset_clicked(_button, action):
+  def _on_button_reset_clicked(self, _button, action):
     action['arguments'].reset()
     action['more_options'].reset()
+
+    action['display_name'].reset()
+    self._set_editable_label_text(action['display_name'].value)
 
 
 def _get_action_info(action, pdb_procedure):
