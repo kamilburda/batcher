@@ -359,6 +359,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
   def set_tooltip(self, text):
     self.widget.set_tooltip_text(text)
 
+  def reset_tooltip(self):
+    self._set_tooltip_if_label_does_not_fit_text(self._label_action_name)
+
   def has_warning(self):
     return self._button_warning.get_visible()
 
@@ -377,7 +380,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     else:
       self._button_warning.hide()
 
-      self.set_tooltip(None)
+      self.reset_tooltip()
       if self._display_warning_message_event_id is not None:
         self._button_warning.disconnect(self._display_warning_message_event_id)
         self._display_warning_message_event_id = None
@@ -442,6 +445,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_warning.hide()
 
   def _on_label_action_name_size_allocate(self, label_action_name, _allocation):
+    self._set_tooltip_if_label_does_not_fit_text(label_action_name)
+
+  def _set_tooltip_if_label_does_not_fit_text(self, label_action_name):
     if pg.gui.label_fits_text(label_action_name):
       self._button_action.set_tooltip_text(None)
     else:

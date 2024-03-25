@@ -1052,7 +1052,7 @@ class ExportLayersDialog:
           box_item.set_tooltip(message.format(skipped_message))
         else:
           if clear_previous:
-            box_item.set_tooltip(None)
+            box_item.reset_tooltip()
   
   def _set_warning_on_actions(self, batcher, clear_previous=True):
     action_boxes = [self._box_procedures, self._box_constraints]
@@ -1075,7 +1075,7 @@ class ExportLayersDialog:
   def _reset_action_tooltips_and_indicators(self):
     for action_box in [self._box_procedures, self._box_constraints]:
       for box_item in action_box.items:
-        box_item.set_tooltip(None)
+        box_item.reset_tooltip()
         box_item.set_warning(False)
 
   def _close_action_edit_dialogs(self):
