@@ -3,12 +3,14 @@
 Redesigned user interface:
 * Replaced the folder chooser widget with a folder chooser button.
 * Procedures and constraints are now aligned vertically.
-* Procedures and constraints can now be edited directly in the main dialog (rather than a separate dialog) by pressing the button with the edit icon.
-* Adjusting arguments for procedures and constraints now immediately updates the preview for improved feedback and interactivity.
-* Adjusted layout accordingly given the changes above (dialog dimensions, positions of separators, spacing/margins/border width).
+* Adjusting settings for procedures and constraints now immediately updates the preview for improved feedback and interactivity.
+* Multiple edit dialogs (one for each procedure/constraint) can now be displayed simultaneously.
+* Edit dialogs for procedures and constraints are no longer separate windows and are hidden/shown simultaneously with the main dialog.
+* Moved detailed information about a procedure/constraint from a tooltip to a button showing a popup.
+* Given the changes above, adjusted dialog dimensions, positions of separators and spacing/margins/border width.
 
 Bug fixes:
-* Fixed crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
+* Fixed a crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
 * Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
 
 
