@@ -192,7 +192,9 @@ class ExportLayersDialog:
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
-  _BUTTON_SETTINGS_SPACING = 2
+  _BUTTON_SETTINGS_SPACING = 3
+  _ARROW_ICON_PIXEL_SIZE = 12
+
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
   _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
@@ -436,17 +438,15 @@ class ExportLayersDialog:
       use_underline=True,
     )
 
-    self._arrow_button_settings = Gtk.Arrow(
-      arrow_type=Gtk.ArrowType.DOWN,
-      shadow_type=Gtk.ShadowType.IN,
-    )
+    self._image_arrow_settings = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
+    self._image_arrow_settings.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
 
     self._hbox_button_settings_components = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._BUTTON_SETTINGS_SPACING,
     )
     self._hbox_button_settings_components.pack_start(self._label_button_settings, False, False, 0)
-    self._hbox_button_settings_components.pack_start(self._arrow_button_settings, False, False, 0)
+    self._hbox_button_settings_components.pack_start(self._image_arrow_settings, False, False, 0)
 
     self._hbox_button_settings = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,

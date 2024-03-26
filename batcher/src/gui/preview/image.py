@@ -59,6 +59,7 @@ class ImagePreview(preview_base_.Preview):
   _MANUAL_UPDATE_LOCK = '_manual_update'
   
   _WIDGET_SPACING = 5
+  _ARROW_ICON_PIXEL_SIZE = 12
   
   def __init__(self, batcher, settings):
     super().__init__()
@@ -250,14 +251,14 @@ class ImagePreview(preview_base_.Preview):
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
 
-    self._button_menu = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
+    self._image_arrow = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
+    self._image_arrow.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
 
-    arrow = Gtk.Arrow(
-      arrow_type=Gtk.ArrowType.DOWN,
-      shadow_type=Gtk.ShadowType.IN,
+    self._button_menu = Gtk.Button(
+      image=self._image_arrow,
+      relief=Gtk.ReliefStyle.NONE,
     )
-    self._button_menu.add(arrow)
-    
+
     self._menu_item_update_automatically = Gtk.CheckMenuItem(
       label=_('Update Image Preview Automatically'),
       active=True,
