@@ -759,7 +759,7 @@ class ArrayBoxPresenter(GtkPresenter):
     self._widget.disconnect(self._item_changed_event_handler_id)
     self._item_changed_event_handler_id = None
   
-  def _create_widget(self, setting, width_request=300, **kwargs):
+  def _create_widget(self, setting, **kwargs):
     def _add_existing_element(array_element_value, index):
       return self._add_array_element(setting[index], array_box)
     
@@ -780,7 +780,6 @@ class ArrayBoxPresenter(GtkPresenter):
       setting.max_size,
       propagate_natural_width=True,
       propagate_natural_height=True,
-      width_request=width_request,
       **kwargs,
     )
     
