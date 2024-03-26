@@ -192,7 +192,7 @@ class ExportLayersDialog:
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
-  _BUTTON_SETTINGS_RIGHT_MARGIN = 3
+  _BUTTON_SETTINGS_SPACING = 2
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
   _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
@@ -445,14 +445,20 @@ class ExportLayersDialog:
     self._arrow_button_settings = Gtk.Arrow(
       arrow_type=Gtk.ArrowType.DOWN,
       shadow_type=Gtk.ShadowType.IN,
-      margin_right=self._BUTTON_SETTINGS_RIGHT_MARGIN,
     )
+
+    self._hbox_button_settings_components = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._BUTTON_SETTINGS_SPACING,
+    )
+    self._hbox_button_settings_components.pack_start(self._label_button_settings, False, False, 0)
+    self._hbox_button_settings_components.pack_start(self._arrow_button_settings, False, False, 0)
 
     self._hbox_button_settings = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
-    self._hbox_button_settings.pack_start(self._label_button_settings, True, True, 0)
-    self._hbox_button_settings.pack_start(self._arrow_button_settings, False, False, 0)
+    self._hbox_button_settings.set_center_widget(self._hbox_button_settings_components)
+
     self._button_settings = Gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
 
