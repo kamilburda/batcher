@@ -493,6 +493,7 @@ class _ActionEditDialog(GimpUi.Dialog):
 
   _ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS = 60
   _ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
+  _ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS = 40
 
   def __init__(self, action, *args, **kwargs):
     super().__init__(*args, **kwargs)
@@ -637,7 +638,7 @@ class _ActionEditDialog(GimpUi.Dialog):
       pdb_argument_names_and_blurbs = {
         arg.name: arg.blurb for arg in pdb_procedure.proc.get_arguments()}
     else:
-      pdb_argument_names_and_blurbs = {}
+      pdb_argument_names_and_blurbs = None
 
     row_index = 0
 
@@ -645,14 +646,18 @@ class _ActionEditDialog(GimpUi.Dialog):
       if not setting.gui.get_visible():
         continue
 
+      if pdb_procedure is not None:
+        argument_description = pdb_argument_names_and_blurbs[setting.name]
+      else:
+        argument_description = setting.display_name
+
       label = Gtk.Label(
-        label=setting.display_name,
+        label=argument_description,
         xalign=0.0,
         yalign=0.5,
+        max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+        wrap=True,
       )
-
-      if pdb_procedure is not None and setting.name in pdb_argument_names_and_blurbs:
-        label.set_tooltip_text(pdb_argument_names_and_blurbs[setting.name])
 
       self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
 
