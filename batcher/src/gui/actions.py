@@ -294,14 +294,13 @@ class ActionBox(pg.gui.ItemBox):
 
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(
-      item.widget,
+      item.item_widget,
       self._get_drag_data,
       self._on_drag_data_received,
       [item],
       [item],
       self._get_drag_icon,
       [item],
-      dest_widget=item.item_widget,
     )
 
   def _get_drag_icon(self, _widget, drag_context, item):
