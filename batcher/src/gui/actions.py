@@ -499,7 +499,7 @@ class _ActionEditDialog(GimpUi.Dialog):
     super().__init__(*args, **kwargs)
 
     self.set_resizable(False)
-    self.connect('delete-event', lambda *args: self.hide_on_delete())
+    self.connect('delete-event', lambda *_args: self.hide_on_delete())
 
     if action['origin'].is_item('gimp_pdb') and action['function'].value:
       self._pdb_procedure = pdb[action['function'].value]
