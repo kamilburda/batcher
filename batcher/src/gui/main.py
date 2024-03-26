@@ -185,8 +185,9 @@ class ExportLayersDialog:
   _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
+  _ACTION_LABEL_BOX_SPACING = 5
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
-  _CONSTRAINTS_TOP_MARGIN = 4
+  _CONSTRAINTS_TOP_MARGIN = 5
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
   
@@ -353,6 +354,13 @@ class ExportLayersDialog:
     self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
     self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
 
+    self._label_procedures = Gtk.Label(
+      label='<b>{}</b>'.format(_('Procedures')),
+      use_markup=True,
+      xalign=0.0,
+      yalign=0.5,
+    )
+
     self._box_procedures = actions_.ActionBox(
       self._settings['main/procedures'],
       builtin_procedures.BUILTIN_PROCEDURES,
@@ -363,11 +371,20 @@ class ExportLayersDialog:
       hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
-    self._frame_procedures = GimpUi.Frame(
-      label=_('Procedures'),
+    self._vbox_procedures = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._ACTION_LABEL_BOX_SPACING,
     )
-    self._frame_procedures.add(self._box_procedures)
-    
+    self._vbox_procedures.pack_start(self._label_procedures, False, False, 0)
+    self._vbox_procedures.pack_start(self._box_procedures, True, True, 0)
+
+    self._label_constraints = Gtk.Label(
+      label='<b>{}</b>'.format(_('Constraints')),
+      use_markup=True,
+      xalign=0.0,
+      yalign=0.5,
+    )
+
     self._box_constraints = actions_.ActionBox(
       self._settings['main/constraints'],
       builtin_constraints.BUILTIN_CONSTRAINTS,
@@ -378,18 +395,20 @@ class ExportLayersDialog:
       hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
-    self._frame_constraints = GimpUi.Frame(
-      label=_('Constraints'),
+    self._vbox_constraints = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._ACTION_LABEL_BOX_SPACING,
       margin_top=self._CONSTRAINTS_TOP_MARGIN,
     )
-    self._frame_constraints.add(self._box_constraints)
+    self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
+    self._vbox_constraints.pack_start(self._box_constraints, True, True, 0)
 
     self._vpaned_actions = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_actions.pack1(self._frame_procedures, True, False)
-    self._vpaned_actions.pack2(self._frame_constraints, True, False)
+    self._vpaned_actions.pack1(self._vbox_procedures, True, False)
+    self._vpaned_actions.pack2(self._vbox_constraints, True, False)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
