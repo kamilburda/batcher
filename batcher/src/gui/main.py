@@ -188,7 +188,6 @@ class ExportLayersDialog:
   _ACTION_LABEL_BOX_SPACING = 5
   _PREVIEWS_LEFT_MARGIN = 4
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
-  _CONSTRAINTS_TOP_MARGIN = 5
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
@@ -401,24 +400,17 @@ class ExportLayersDialog:
     self._vbox_constraints = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._ACTION_LABEL_BOX_SPACING,
-      margin_top=self._CONSTRAINTS_TOP_MARGIN,
     )
     self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
     self._vbox_constraints.pack_start(self._box_constraints, True, True, 0)
-
-    self._vpaned_actions = Gtk.Paned(
-      orientation=Gtk.Orientation.VERTICAL,
-      wide_handle=True,
-    )
-    self._vpaned_actions.pack1(self._vbox_procedures, True, False)
-    self._vpaned_actions.pack2(self._vbox_constraints, True, False)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._EXPORT_SETTINGS_AND_ACTIONS_SPACING,
     )
     self._vbox_export_settings_and_actions.pack_start(self._grid_export_settings, False, False, 0)
-    self._vbox_export_settings_and_actions.pack_start(self._vpaned_actions, True, True, 0)
+    self._vbox_export_settings_and_actions.pack_start(self._vbox_procedures, False, False, 0)
+    self._vbox_export_settings_and_actions.pack_start(self._vbox_constraints, False, False, 0)
     
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -626,8 +618,6 @@ class ExportLayersDialog:
         pg.setting.SETTING_GUI_TYPES.paned_position, self._hpaned_settings_and_previews],
       'gui/size/paned_between_previews_position': [
         pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_previews],
-      'gui/size/actions_vpaned_position': [
-        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_actions],
     })
   
   def _init_gui_previews(self):
