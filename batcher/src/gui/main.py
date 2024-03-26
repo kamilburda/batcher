@@ -183,6 +183,7 @@ class ExportLayersDialog:
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
   _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
+  _CONSTRAINTS_TOP_MARGIN = 5
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _ACTION_LABEL_BOX_SPACING = 5
@@ -400,6 +401,7 @@ class ExportLayersDialog:
     self._vbox_constraints = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._ACTION_LABEL_BOX_SPACING,
+      margin_top=self._CONSTRAINTS_TOP_MARGIN,
     )
     self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
     self._vbox_constraints.pack_start(self._box_constraints, True, True, 0)
