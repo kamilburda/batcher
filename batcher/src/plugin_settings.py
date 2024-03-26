@@ -160,18 +160,18 @@ def _create_gui_settings():
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (700, 620),
+      'default_value': (660, 540),
     },
     {
       'type': 'integer',
       'name': 'paned_outside_previews_position',
-      'default_value': 400,
+      'default_value': 370,
       'gui_type': None,
     },
     {
       'type': 'float',
       'name': 'paned_between_previews_position',
-      'default_value': 280,
+      'default_value': 260,
       'gui_type': None,
     },
   ])
