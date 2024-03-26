@@ -186,6 +186,7 @@ class ExportLayersDialog:
 
   _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _ACTION_LABEL_BOX_SPACING = 5
+  _PREVIEWS_LEFT_MARGIN = 4
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _CONSTRAINTS_TOP_MARGIN = 5
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
@@ -298,6 +299,7 @@ class ExportLayersDialog:
 
     self._vbox_previews = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
+      margin_start=self._PREVIEWS_LEFT_MARGIN,
     )
     self._vbox_previews.pack_start(self._preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
