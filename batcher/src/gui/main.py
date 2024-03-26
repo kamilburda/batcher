@@ -191,7 +191,8 @@ class ExportLayersDialog:
   _CONSTRAINTS_TOP_MARGIN = 5
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
-  
+
+  _BUTTON_SETTINGS_RIGHT_MARGIN = 3
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
   
   _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
@@ -441,15 +442,17 @@ class ExportLayersDialog:
       use_underline=True,
     )
 
+    self._arrow_button_settings = Gtk.Arrow(
+      arrow_type=Gtk.ArrowType.DOWN,
+      shadow_type=Gtk.ShadowType.IN,
+      margin_right=self._BUTTON_SETTINGS_RIGHT_MARGIN,
+    )
+
     self._hbox_button_settings = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
     self._hbox_button_settings.pack_start(self._label_button_settings, True, True, 0)
-    self._hbox_button_settings.pack_start(
-      Gtk.Arrow(arrow_type=Gtk.ArrowType.DOWN, shadow_type=Gtk.ShadowType.IN),
-      False,
-      False,
-      0)
+    self._hbox_button_settings.pack_start(self._arrow_button_settings, False, False, 0)
     self._button_settings = Gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
 
@@ -458,7 +461,7 @@ class ExportLayersDialog:
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
     self._menu_item_import_settings = Gtk.MenuItem(label=_('Import Settings...'))
     self._menu_item_export_settings = Gtk.MenuItem(label=_('Export Settings...'))
-    
+
     self._menu_settings = Gtk.Menu()
     self._menu_settings.append(self._menu_item_edit_mode)
     self._menu_settings.append(self._menu_item_save_settings)
@@ -475,7 +478,7 @@ class ExportLayersDialog:
 
     self._dialog.action_area.pack_start(self._button_help, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_help, True)
-    
+
     self._progress_bar = Gtk.ProgressBar(
       ellipsize=Pango.EllipsizeMode.MIDDLE,
     )
