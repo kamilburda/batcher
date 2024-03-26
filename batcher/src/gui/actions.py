@@ -316,8 +316,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
 
-  _DRAG_ICON_MIN_WIDTH = 100
-  _DRAG_ICON_BORDER_WIDTH = 8
+  _DRAG_ICON_WIDTH = 250
+  _DRAG_ICON_BORDER_WIDTH = 4
 
   def __init__(self, action):
     self._action = action
@@ -393,24 +393,24 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       self._drag_icon_window.destroy()
       self._drag_icon_window = None
 
-    label = Gtk.Label(
-      label=f"<b>{self._action['display_name'].value}</b>",
-      use_markup=True,
-      xalign=0.0,
-      yalign=0.5,
-      max_width_chars=self.LABEL_ACTION_NAME_MAX_WIDTH_CHARS,
-      ellipsize=Pango.EllipsizeMode.END,
-    )
+    button = Gtk.CheckButton(label=self._action['display_name'].value)
+    button.get_child().set_xalign(0.0)
+    button.get_child().set_yalign(0.5)
+    button.get_child().set_ellipsize(Pango.EllipsizeMode.END)
+    button.get_child().set_can_focus(False)
+
+    button.set_border_width(self._DRAG_ICON_BORDER_WIDTH)
+    button.set_can_focus(False)
+
+    button.set_active(self._action['enabled'].value)
 
     frame = Gtk.Frame(shadow_type=Gtk.ShadowType.OUT)
-    frame.add(label)
+    frame.add(button)
 
     self._drag_icon_window = Gtk.Window(
       type=Gtk.WindowType.POPUP,
       screen=self.widget.get_screen(),
-      height_request=label.get_layout().get_pixel_size()[1],
-      width_request=self._DRAG_ICON_MIN_WIDTH,
-      border_width=self._DRAG_ICON_BORDER_WIDTH,
+      width_request=self._DRAG_ICON_WIDTH,
     )
     self._drag_icon_window.add(frame)
     self._drag_icon_window.show_all()
