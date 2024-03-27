@@ -863,10 +863,7 @@ class ExportLayersDialog:
       self._settings['gui/image_preview_automatic_update'].set_value(False)
       
       self._display_inline_message(
-        '{}\n\n{}'.format(
-          _('Disabling automatic preview update.'),
-          _('The preview takes too long to update.'
-            ' You may turn automatic updates back on from the menu above the previewed image.')),
+        _('Disabling automatic preview update. The preview takes too long to update.'),
         Gtk.MessageType.INFO)
   
   def _on_name_preview_updated(self, preview, error):
