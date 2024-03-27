@@ -12,6 +12,7 @@ Redesigned user interface:
 Bug fixes:
 * Fixed a crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
 * Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
+* Fixed redundant preview update when the main dialog (re)gained focus.
 
 
 ## 0.2
