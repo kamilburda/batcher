@@ -431,7 +431,6 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       self.widget,
       title=self._action['display_name'].value,
       role=pg.config.PLUGIN_NAME,
-      parent=pg.gui.get_toplevel_window(self.widget),
     )
     self.widget.connect('realize', self._on_action_edit_dialog_realize)
 
