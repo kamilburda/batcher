@@ -432,12 +432,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
       title=self._action['display_name'].value,
       role=pg.config.PLUGIN_NAME,
       parent=pg.gui.get_toplevel_window(self.widget),
-      attached_to=pg.gui.get_toplevel_window(self.widget),
     )
-    self.widget.connect(
-      'realize',
-      lambda *args: self._action_edit_dialog.set_transient_for(
-        pg.gui.get_toplevel_window(self.widget)))
+    self.widget.connect('realize', self._on_action_edit_dialog_realize)
 
     self._button_remove.set_tooltip_text(_('Remove'))
 
@@ -447,6 +443,10 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _on_label_action_name_size_allocate(self, label_action_name, _allocation):
     self._set_tooltip_if_label_does_not_fit_text(label_action_name)
+
+  def _on_action_edit_dialog_realize(self, _dialog):
+    self._action_edit_dialog.set_transient_for(pg.gui.get_toplevel_window(self.widget))
+    self._action_edit_dialog.set_attached_to(pg.gui.get_toplevel_window(self.widget))
 
   def _set_tooltip_if_label_does_not_fit_text(self, label_action_name):
     if pg.gui.label_fits_text(label_action_name):

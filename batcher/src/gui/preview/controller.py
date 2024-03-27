@@ -299,14 +299,17 @@ class PreviewsController:
     if toplevel.is_active():
       pg.invocation.timeout_remove(self._name_preview.update)
       pg.invocation.timeout_remove(self._image_preview.update)
-      
-      self._name_preview.update(reset_items=True)
-      
-      if not self._is_initial_selection_set:
-        self._set_initial_selection_and_update_image_preview()
-      else:
-        self._image_preview.update()
-  
+
+      self._perform_full_preview_update()
+
+  def _perform_full_preview_update(self):
+    self._name_preview.update(reset_items=True)
+
+    if not self._is_initial_selection_set:
+      self._set_initial_selection_and_update_image_preview()
+    else:
+      self._image_preview.update()
+
   def _enable_preview_on_paned_drag(
         self, preview, preview_sensitive_setting, update_lock_key):
     preview.lock_update(False, update_lock_key)
