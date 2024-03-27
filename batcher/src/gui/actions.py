@@ -556,12 +556,16 @@ class _ActionEditDialog(GimpUi.Dialog):
 
   def _set_up_editable_name(self, action):
     self._label_editable_action_name = editable_label_.EditableLabel()
+
     self._label_editable_action_name.label.set_use_markup(True)
     self._label_editable_action_name.label.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_editable_action_name.label.set_markup(
       '<b>{}</b>'.format(GLib.markup_escape_text(action['display_name'].value)))
     self._label_editable_action_name.label.set_max_width_chars(
       _ActionBoxItem.LABEL_ACTION_NAME_MAX_WIDTH_CHARS)
+
+    self._label_editable_action_name.button_edit.set_tooltip_text(_('Edit Name'))
+
     self._label_editable_action_name.connect(
       'changed', self._on_label_editable_action_name_changed, action)
 
