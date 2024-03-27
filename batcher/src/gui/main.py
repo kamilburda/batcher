@@ -849,11 +849,7 @@ class ExportLayersDialog:
     if not self._image.is_valid():
       Gtk.main_quit()
       return
-    
-    if self._initial_layer_tree is not None:
-      self._initial_layer_tree = None
-      return
-  
+
   def _on_image_preview_updated(self, preview, error, update_duration_seconds):
     self._display_warnings_and_tooltips_for_actions()
     
