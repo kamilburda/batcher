@@ -1,5 +1,8 @@
 """Class interconnecting preview widgets for item names and images."""
 
+import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 from gi.repository import GLib
 
 import pygimplib as pg
@@ -282,8 +285,8 @@ class PreviewsController:
       pg.gui.get_toplevel_window(self._name_preview)
       or pg.gui.get_toplevel_window(self._image_preview))
     if toplevel is not None:
-      toplevel.connect('notify::is-active', self._on_toplevel_notify_is_active)
-   
+      toplevel.connect('window-state-event', self._on_toplevel_window_state_event)
+
   def _on_name_preview_selection_changed(self, preview):
     self._update_selected_items()
     self._update_image_preview()
@@ -294,9 +297,9 @@ class PreviewsController:
       self._image_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
     
     self._image_preview.update_item()
-  
-  def _on_toplevel_notify_is_active(self, toplevel, property_spec):
-    if toplevel.is_active():
+
+  def _on_toplevel_window_state_event(self, _toplevel, event):
+    if event.new_window_state & Gdk.WindowState.FOCUSED:
       pg.invocation.timeout_remove(self._name_preview.update)
       pg.invocation.timeout_remove(self._image_preview.update)
 
