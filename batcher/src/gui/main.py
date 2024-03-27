@@ -541,7 +541,7 @@ class ExportLayersDialog:
     
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
-    self._dialog.connect('notify::is-active', self._on_dialog_notify_is_active)
+    self._dialog.connect('window-state-event', self._on_dialog_window_state_event)
     
     self._hpaned_settings_and_previews.connect(
       'notify::position',
@@ -845,10 +845,11 @@ class ExportLayersDialog:
     if update_name_preview:
       self._name_preview.update()
   
-  def _on_dialog_notify_is_active(self, dialog, property_spec):
-    if not self._image.is_valid():
-      Gtk.main_quit()
-      return
+  def _on_dialog_window_state_event(self, _dialog, event):
+    if event.new_window_state & Gdk.WindowState.FOCUSED:
+      if not self._image.is_valid():
+        Gtk.main_quit()
+        return
 
   def _on_image_preview_updated(self, preview, error, update_duration_seconds):
     self._display_warnings_and_tooltips_for_actions()
