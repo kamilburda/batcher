@@ -45,7 +45,7 @@ class PreviewsController:
     self._connect_update_rendering_of_image_preview()
     self._connect_image_preview_menu_setting_changes()
     
-    self._connect_toplevel_notify_is_active()
+    self._connect_toplevel_window_state_event()
   
   def connect_name_preview_events(self):
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
@@ -280,7 +280,7 @@ class PreviewsController:
       lambda setting, update_if_below_setting: update_if_below_setting.set_value(False),
       self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'])
   
-  def _connect_toplevel_notify_is_active(self):
+  def _connect_toplevel_window_state_event(self):
     toplevel = (
       pg.gui.get_toplevel_window(self._name_preview)
       or pg.gui.get_toplevel_window(self._image_preview))
