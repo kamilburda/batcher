@@ -509,7 +509,7 @@ class ExportLayersDialog:
   
   def _connect_events(self):
     self._box_procedures.connect(
-      'action-box-item-added', self._on_box_procedures_item_added)
+      'action-box-item-added-interactive', self._on_box_procedures_item_added)
     
     self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
     self._button_close.connect('clicked', self._on_button_close_clicked)
@@ -550,7 +550,10 @@ class ExportLayersDialog:
       'notify::position',
       self._previews_controller.on_paned_between_previews_notify_position)
     
-    self._previews_controller.connect_setting_changes_to_previews()
+    self._previews_controller.connect_setting_changes_to_previews(
+      self._box_procedures,
+      self._box_constraints,
+    )
     self._previews_controller.connect_name_preview_events()
     
     self._image_preview.connect('preview-updated', self._on_image_preview_updated)
@@ -1097,7 +1100,7 @@ class ExportLayersDialog:
   def _close_action_edit_dialogs(self):
     for action_box in [self._box_procedures, self._box_constraints]:
       for box_item in action_box.items:
-        box_item.action_edit_dialog.hide()
+        box_item.edit_dialog.hide()
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting

@@ -1,5 +1,6 @@
 """Miscellaneous utility functions related to GTK widgets."""
 
+from collections.abc import Iterable
 from typing import Tuple, Union
 
 import gi
@@ -18,6 +19,7 @@ __all__ = [
   'get_position_below_widget',
   'get_absolute_widget_position',
   'get_icon_pixbuf',
+  'has_any_window_focus',
 ]
 
 
@@ -133,3 +135,20 @@ def get_icon_pixbuf(
     return icon
   else:
     return None
+
+
+def has_any_window_focus(windows_to_ignore: Iterable[Gtk.Window] = None):
+  """Returns ``True`` if any displayed window associated with the current
+  plug-in has focus, ``False`` otherwise.
+
+  You may ignore specific `Gtk.Window`s when calling this function by specifying
+  the ``windows_to_ignore`` iterable.
+  """
+  if windows_to_ignore is None:
+    windows_to_ignore = []
+
+  return any(
+    (w.get_window().get_state() & Gdk.WindowState.FOCUSED)
+    for w in Gtk.Window.list_toplevels()
+    if w.get_window() is not None and w not in windows_to_ignore and w.get_mapped()
+  )

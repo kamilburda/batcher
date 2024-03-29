@@ -23,17 +23,18 @@ class PreviewsController:
     self._image_preview = image_preview
     self._settings = settings
     self._image = image
-    
     self._selected_in_preview_constraints = {}
     self._custom_actions = {}
     self._is_initial_selection_set = False
-    
+
+    self._previously_focused_on_related_window = False
+
     self._paned_outside_previews_previous_position = (
       self._settings['gui/size/paned_outside_previews_position'].value)
     self._paned_between_previews_previous_position = (
       self._settings['gui/size/paned_between_previews_position'].value)
   
-  def connect_setting_changes_to_previews(self):
+  def connect_setting_changes_to_previews(self, action_box_procedures, action_box_constraints):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
     
@@ -44,9 +45,10 @@ class PreviewsController:
     self._connect_toggle_name_preview_filtering()
     self._connect_update_rendering_of_image_preview()
     self._connect_image_preview_menu_setting_changes()
-    
-    self._connect_toplevel_window_state_event()
-  
+
+    self._connect_toplevel_focus_change()
+    self._connect_attached_windows_focus_change(action_box_procedures, action_box_constraints)
+
   def connect_name_preview_events(self):
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
@@ -280,12 +282,54 @@ class PreviewsController:
       lambda setting, update_if_below_setting: update_if_below_setting.set_value(False),
       self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'])
   
-  def _connect_toplevel_window_state_event(self):
+  def _connect_toplevel_focus_change(self):
     toplevel = (
       pg.gui.get_toplevel_window(self._name_preview)
       or pg.gui.get_toplevel_window(self._image_preview))
     if toplevel is not None:
-      toplevel.connect('window-state-event', self._on_toplevel_window_state_event)
+      toplevel.connect('window-state-event', self._on_related_window_window_state_event)
+
+  def _connect_attached_windows_focus_change(self, action_box_procedures, action_box_constraints):
+    def _connect_window_state_event_for_edit_dialog(_box, action_item):
+      action_item.edit_dialog.connect(
+        'window-state-event', self._on_related_window_window_state_event)
+
+    action_box_procedures.connect(
+      'action-box-item-added', _connect_window_state_event_for_edit_dialog)
+
+    # Connect already added items
+    for item in action_box_procedures.items:
+      _connect_window_state_event_for_edit_dialog(action_box_procedures, item)
+
+    action_box_constraints.connect(
+      'action-box-item-added', _connect_window_state_event_for_edit_dialog)
+
+    # Connect already added items
+    for item in action_box_constraints.items:
+      _connect_window_state_event_for_edit_dialog(action_box_constraints, item)
+
+  def _on_related_window_window_state_event(self, window, event):
+    if not (event.new_window_state & Gdk.WindowState.FOCUSED):
+      if pg.gui.has_any_window_focus(windows_to_ignore=[window]):
+        self._previously_focused_on_related_window = True
+      else:
+        self._previously_focused_on_related_window = False
+      return
+
+    if ((event.new_window_state & Gdk.WindowState.FOCUSED)
+        and not self._previously_focused_on_related_window):
+      self._perform_full_preview_update()
+
+  def _perform_full_preview_update(self):
+    pg.invocation.timeout_remove(self._name_preview.update)
+    pg.invocation.timeout_remove(self._image_preview.update)
+
+    self._name_preview.update(reset_items=True)
+
+    if not self._is_initial_selection_set:
+      self._set_initial_selection_and_update_image_preview()
+    else:
+      self._image_preview.update()
 
   def _on_name_preview_selection_changed(self, preview):
     self._update_selected_items()
@@ -297,21 +341,6 @@ class PreviewsController:
       self._image_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
     
     self._image_preview.update_item()
-
-  def _on_toplevel_window_state_event(self, _toplevel, event):
-    if event.new_window_state & Gdk.WindowState.FOCUSED:
-      pg.invocation.timeout_remove(self._name_preview.update)
-      pg.invocation.timeout_remove(self._image_preview.update)
-
-      self._perform_full_preview_update()
-
-  def _perform_full_preview_update(self):
-    self._name_preview.update(reset_items=True)
-
-    if not self._is_initial_selection_set:
-      self._set_initial_selection_and_update_image_preview()
-    else:
-      self._image_preview.update()
 
   def _enable_preview_on_paned_drag(
         self, preview, preview_sensitive_setting, update_lock_key):

@@ -44,10 +44,17 @@ class ActionBox(pg.gui.ItemBox):
   
   Signals:
   
-  * ``'action-box-item-added'`` - An item (action) was added via `add_item()`.
+  * ``'action-box-item-added'`` - An item (action) was added.
     
     Arguments:
     
+    * The added item.
+
+  * ``'action-box-item-added-interactive'`` - An item (action) was added
+    interactively (via `add_item()`).
+
+    Arguments:
+
     * The added item.
     
   * ``'action-box-item-reordered'`` - An item (action) was reordered via
@@ -68,6 +75,8 @@ class ActionBox(pg.gui.ItemBox):
   
   __gsignals__ = {
     'action-box-item-added': (
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'action-box-item-added-interactive': (
       GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'action-box-item-reordered': (
       GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_INT)),
@@ -115,7 +124,11 @@ class ActionBox(pg.gui.ItemBox):
     
     self._before_clear_actions_event_id = self._actions.connect_event(
       'before-clear-actions', lambda _actions: self._clear())
-  
+
+  @property
+  def actions(self):
+    return self._actions
+
   def add_item(
         self,
         action_dict_or_pdb_proc_name: Union[Dict[str, Any], str],
@@ -125,8 +138,8 @@ class ActionBox(pg.gui.ItemBox):
     self._actions.set_event_enabled(self._after_add_action_event_id, True)
     
     item = self._add_item_from_action(action)
-    
-    self.emit('action-box-item-added', item)
+
+    self.emit('action-box-item-added-interactive', item)
     
     return item
   
@@ -185,6 +198,8 @@ class ActionBox(pg.gui.ItemBox):
     item = _ActionBoxItem(action)
 
     super().add_item(item)
+
+    self.emit('action-box-item-added', item)
 
     return item
   
@@ -333,29 +348,29 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._init_gui()
 
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
-    self._button_remove.connect('clicked', lambda *args: self.action_edit_dialog.destroy())
+    self._button_remove.connect('clicked', lambda *args: self.edit_dialog.destroy())
 
     if self._action['display_options_on_create'].value:
       self._action['display_options_on_create'].set_value(False)
-      self.widget.connect('realize', lambda *args: self.action_edit_dialog.show_all())
+      self.widget.connect('realize', lambda *args: self.edit_dialog.show_all())
 
-    self._action_edit_dialog.connect('close', self._on_action_edit_dialog_close)
-    self._action_edit_dialog.connect('response', self._on_action_edit_dialog_response)
+    self._edit_dialog.connect('close', self._on_action_edit_dialog_close)
+    self._edit_dialog.connect('response', self._on_action_edit_dialog_response)
 
   @property
   def action(self):
     return self._action
 
   @property
-  def action_edit_dialog(self):
-    return self._action_edit_dialog
+  def edit_dialog(self):
+    return self._edit_dialog
 
   @property
   def drag_icon(self):
     return self._drag_icon_window
 
   def is_being_edited(self):
-    return self.action_edit_dialog.get_mapped()
+    return self.edit_dialog.get_mapped()
 
   def set_tooltip(self, text):
     self.widget.set_tooltip_text(text)
@@ -426,7 +441,7 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._button_edit = self._setup_item_button(icon=GimpUi.ICON_EDIT, position=0)
     self._button_edit.set_tooltip_text(_('Edit'))
 
-    self._action_edit_dialog = _ActionEditDialog(
+    self._edit_dialog = _ActionEditDialog(
       self._action,
       self.widget,
       title=self._action['display_name'].value,
@@ -444,8 +459,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._set_tooltip_if_label_does_not_fit_text(label_action_name)
 
   def _on_action_widget_realize(self, _dialog):
-    self._action_edit_dialog.set_transient_for(pg.gui.get_toplevel_window(self.widget))
-    self._action_edit_dialog.set_attached_to(pg.gui.get_toplevel_window(self.widget))
+    self._edit_dialog.set_transient_for(pg.gui.get_toplevel_window(self.widget))
+    self._edit_dialog.set_attached_to(pg.gui.get_toplevel_window(self.widget))
 
   def _set_tooltip_if_label_does_not_fit_text(self, label_action_name):
     if pg.gui.label_fits_text(label_action_name):
@@ -459,9 +474,9 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
   def _on_button_edit_clicked(self, _button):
     if self.is_being_edited():
-      self.action_edit_dialog.present()
+      self.edit_dialog.present()
     else:
-      self.action_edit_dialog.show_all()
+      self.edit_dialog.show_all()
 
   @staticmethod
   def _on_button_warning_clicked(_button, main_message, short_message, full_message, parent):
@@ -471,11 +486,11 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
     self._action['arguments'].apply_gui_values_to_settings(force=True)
 
   def _on_action_edit_dialog_close(self, _dialog):
-    self.action_edit_dialog.hide()
+    self.edit_dialog.hide()
 
   def _on_action_edit_dialog_response(self, _dialog, response_id):
     if response_id == Gtk.ResponseType.CLOSE:
-      self.action_edit_dialog.hide()
+      self.edit_dialog.hide()
 
 
 class _ActionEditDialog(GimpUi.Dialog):
