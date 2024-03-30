@@ -34,7 +34,7 @@ class PreviewsController:
     self._paned_between_previews_previous_position = (
       self._settings['gui/size/paned_between_previews_position'].value)
   
-  def connect_setting_changes_to_previews(self, action_box_procedures, action_box_constraints):
+  def connect_setting_changes_to_previews(self, procedure_list, constraint_list):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
     
@@ -47,7 +47,7 @@ class PreviewsController:
     self._connect_image_preview_menu_setting_changes()
 
     self._connect_toplevel_focus_change()
-    self._connect_attached_windows_focus_change(action_box_procedures, action_box_constraints)
+    self._connect_attached_windows_focus_change(procedure_list, constraint_list)
 
   def connect_name_preview_events(self):
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
@@ -289,31 +289,28 @@ class PreviewsController:
     if toplevel is not None:
       toplevel.connect('window-state-event', self._on_related_window_window_state_event)
 
-  def _connect_attached_windows_focus_change(self, action_box_procedures, action_box_constraints):
-    def _connect_window_state_event_for_edit_dialog(_box, action_item):
-      action_item.edit_dialog.connect(
-        'window-state-event', self._on_related_window_window_state_event)
+  def _connect_attached_windows_focus_change(self, procedure_list, constraint_list):
+    def _connect_window_state_event_for_edit_dialog(_action_list, action_item):
+      action_item.editor.connect('window-state-event', self._on_related_window_window_state_event)
 
-    action_box_procedures.connect(
-      'action-box-item-added', _connect_window_state_event_for_edit_dialog)
+    procedure_list.connect('action-list-item-added', _connect_window_state_event_for_edit_dialog)
 
     # Connect already added items
-    for item in action_box_procedures.items:
-      _connect_window_state_event_for_edit_dialog(action_box_procedures, item)
+    for item in procedure_list.items:
+      _connect_window_state_event_for_edit_dialog(procedure_list, item)
 
-    if action_box_procedures.procedure_browser_dialog is not None:
-      action_box_procedures.procedure_browser_dialog.connect(
+    if procedure_list.procedure_browser is not None:
+      procedure_list.procedure_browser.connect(
         'window-state-event', self._on_related_window_window_state_event)
 
-    action_box_constraints.connect(
-      'action-box-item-added', _connect_window_state_event_for_edit_dialog)
+    constraint_list.connect('action-list-item-added', _connect_window_state_event_for_edit_dialog)
 
     # Connect already added items
-    for item in action_box_constraints.items:
-      _connect_window_state_event_for_edit_dialog(action_box_constraints, item)
+    for item in constraint_list.items:
+      _connect_window_state_event_for_edit_dialog(constraint_list, item)
 
-    if action_box_constraints.procedure_browser_dialog is not None:
-      action_box_constraints.procedure_browser_dialog.connect(
+    if constraint_list.procedure_browser is not None:
+      constraint_list.procedure_browser.connect(
         'window-state-event', self._on_related_window_window_state_event)
 
   def _on_related_window_window_state_event(self, window, event):

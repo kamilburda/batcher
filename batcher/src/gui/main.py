@@ -28,12 +28,12 @@ from src import renamer as renamer_
 from src import update
 from src import utils as utils_
 
-from src.gui import actions as actions_
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
+from src.gui.actions import list as action_list_
 from src.gui.entry import entries as entries_
 from src.gui.preview import controller as previews_controller_
 from src.gui.preview import image as preview_image_
@@ -366,7 +366,7 @@ class ExportLayersDialog:
       yalign=0.5,
     )
 
-    self._box_procedures = actions_.ActionBox(
+    self._procedure_list = action_list_.ActionList(
       self._settings['main/procedures'],
       builtin_procedures.BUILTIN_PROCEDURES,
       _('Add P_rocedure...'),
@@ -381,7 +381,7 @@ class ExportLayersDialog:
       spacing=self._ACTION_LABEL_BOX_SPACING,
     )
     self._vbox_procedures.pack_start(self._label_procedures, False, False, 0)
-    self._vbox_procedures.pack_start(self._box_procedures, True, True, 0)
+    self._vbox_procedures.pack_start(self._procedure_list, True, True, 0)
 
     self._label_constraints = Gtk.Label(
       label='<b>{}</b>'.format(_('Constraints')),
@@ -390,7 +390,7 @@ class ExportLayersDialog:
       yalign=0.5,
     )
 
-    self._box_constraints = actions_.ActionBox(
+    self._constraint_list = action_list_.ActionList(
       self._settings['main/constraints'],
       builtin_constraints.BUILTIN_CONSTRAINTS,
       _('Add C_onstraint...'),
@@ -406,7 +406,7 @@ class ExportLayersDialog:
       margin_top=self._CONSTRAINTS_TOP_MARGIN,
     )
     self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
-    self._vbox_constraints.pack_start(self._box_constraints, True, True, 0)
+    self._vbox_constraints.pack_start(self._constraint_list, True, True, 0)
 
     self._vbox_export_settings_and_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -508,8 +508,8 @@ class ExportLayersDialog:
     self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
   
   def _connect_events(self):
-    self._box_procedures.connect(
-      'action-box-item-added-interactive', self._on_box_procedures_item_added)
+    self._procedure_list.connect(
+      'action-list-item-added-interactive', self._on_procedure_list_item_added)
     
     self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
     self._button_close.connect('clicked', self._on_button_close_clicked)
@@ -551,8 +551,8 @@ class ExportLayersDialog:
       self._previews_controller.on_paned_between_previews_notify_position)
     
     self._previews_controller.connect_setting_changes_to_previews(
-      self._box_procedures,
-      self._box_constraints,
+      self._procedure_list,
+      self._constraint_list,
     )
     self._previews_controller.connect_name_preview_events()
     
@@ -825,7 +825,7 @@ class ExportLayersDialog:
   def _on_file_extension_entry_focus_out_event(entry, event, setting):
     setting.apply_to_gui()
   
-  def _on_box_procedures_item_added(self, box_procedures, item):
+  def _on_procedure_list_item_added(self, _procedure_list, item):
     if any(item.action['orig_name'].value == name
            for name in ['insert_background', 'insert_foreground']):
       actions.reorder(self._settings['main/procedures'], item.action.name, 0)
@@ -873,13 +873,13 @@ class ExportLayersDialog:
     self._set_warning_on_actions(self._batcher_for_previews, clear_previous=clear_previous)
     
     self._set_action_skipped_tooltips(
-      self._box_procedures,
+      self._procedure_list,
       self._batcher_for_previews.skipped_procedures,
       _('This procedure is skipped. Reason: {}'),
       clear_previous=clear_previous)
     
     self._set_action_skipped_tooltips(
-      self._box_constraints,
+      self._constraint_list,
       self._batcher_for_previews.skipped_constraints,
       _('This constraint is skipped. Reason: {}'),
       clear_previous=clear_previous)
@@ -1063,44 +1063,44 @@ class ExportLayersDialog:
     stop_batcher(self._batcher)
   
   @staticmethod
-  def _set_action_skipped_tooltips(action_box, skipped_actions, message, clear_previous=True):
-    for box_item in action_box.items:
-      if not box_item.has_warning():
-        if box_item.action.name in skipped_actions:
-          skipped_message = skipped_actions[box_item.action.name][0][1]
-          box_item.set_tooltip(message.format(skipped_message))
+  def _set_action_skipped_tooltips(action_list, skipped_actions, message, clear_previous=True):
+    for action_item in action_list.items:
+      if not action_item.has_warning():
+        if action_item.action.name in skipped_actions:
+          skipped_message = skipped_actions[action_item.action.name][0][1]
+          action_item.set_tooltip(message.format(skipped_message))
         else:
           if clear_previous:
-            box_item.reset_tooltip()
+            action_item.reset_tooltip()
   
   def _set_warning_on_actions(self, batcher, clear_previous=True):
-    action_boxes = [self._box_procedures, self._box_constraints]
+    action_lists = [self._procedure_list, self._constraint_list]
     failed_actions_dict = [batcher.failed_procedures, batcher.failed_constraints]
     
-    for action_box, failed_actions in zip(action_boxes, failed_actions_dict):
-      for box_item in action_box.items:
-        if box_item.action.name in failed_actions:
-          box_item.set_warning(
+    for action_list, failed_actions in zip(action_lists, failed_actions_dict):
+      for action_item in action_list.items:
+        if action_item.action.name in failed_actions:
+          action_item.set_warning(
             True,
             messages_.get_failing_action_message(
-              (box_item.action, failed_actions[box_item.action.name][0][0])),
-            failed_actions[box_item.action.name][0][1],
-            failed_actions[box_item.action.name][0][2],
+              (action_item.action, failed_actions[action_item.action.name][0][0])),
+            failed_actions[action_item.action.name][0][1],
+            failed_actions[action_item.action.name][0][2],
             parent=self._dialog)
         else:
           if clear_previous:
-            box_item.set_warning(False)
+            action_item.set_warning(False)
   
   def _reset_action_tooltips_and_indicators(self):
-    for action_box in [self._box_procedures, self._box_constraints]:
-      for box_item in action_box.items:
-        box_item.reset_tooltip()
-        box_item.set_warning(False)
+    for action_list in [self._procedure_list, self._constraint_list]:
+      for action_item in action_list.items:
+        action_item.reset_tooltip()
+        action_item.set_warning(False)
 
   def _close_action_edit_dialogs(self):
-    for action_box in [self._box_procedures, self._box_constraints]:
-      for box_item in action_box.items:
-        box_item.edit_dialog.hide()
+    for action_list in [self._procedure_list, self._constraint_list]:
+      for action_item in action_list.items:
+        action_item.editor.hide()
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
     self._message_setting = setting
