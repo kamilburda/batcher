@@ -104,9 +104,12 @@ class ActionBox(pg.gui.ItemBox):
     self._add_action_text = add_action_text
     self._allow_custom_actions = allow_custom_actions
     self._add_custom_action_text = add_custom_action_text
-    
-    self._pdb_procedure_browser_dialog = None
-    
+
+    if self._allow_custom_actions:
+      self._procedure_browser_dialog = self._create_procedure_browser_dialog()
+    else:
+      self._procedure_browser_dialog = None
+
     self._init_gui()
     
     self._after_add_action_event_id = self._actions.connect_event(
@@ -128,6 +131,10 @@ class ActionBox(pg.gui.ItemBox):
   @property
   def actions(self):
     return self._actions
+
+  @property
+  def procedure_browser_dialog(self):
+    return self._procedure_browser_dialog
 
   def add_item(
         self,
@@ -160,6 +167,29 @@ class ActionBox(pg.gui.ItemBox):
     self._actions.set_event_enabled(self._before_remove_action_event_id, True)
     
     self.emit('action-box-item-removed', item)
+
+  def _create_procedure_browser_dialog(self):
+    dialog = GimpUi.ProcBrowserDialog(
+      title=_('Procedure Browser'),
+      role=pg.config.PLUGIN_NAME,
+    )
+
+    dialog.add_buttons(
+      Gtk.STOCK_ADD, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+
+    dialog.set_default_response(Gtk.ResponseType.OK)
+
+    dialog.connect('response', self._on_procedure_browser_dialog_response)
+
+    return dialog
+
+  def _on_procedure_browser_dialog_response(self, dialog, response_id):
+    if response_id == Gtk.ResponseType.OK:
+      procedure_name = dialog.get_selected()
+      if procedure_name:
+        self.add_item(actions_.get_action_dict_for_pdb_procedure(procedure_name))
+
+    dialog.hide()
   
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
@@ -277,35 +307,7 @@ class ActionBox(pg.gui.ItemBox):
     self._actions_menu.append(menu_item)
   
   def _on_add_custom_action_menu_item_activate(self, menu_item):
-    if self._pdb_procedure_browser_dialog:
-      self._pdb_procedure_browser_dialog.show()
-    else:
-      self._pdb_procedure_browser_dialog = self._create_pdb_procedure_browser_dialog()
-  
-  def _create_pdb_procedure_browser_dialog(self):
-    dialog = GimpUi.ProcBrowserDialog(
-      title=_('Procedure Browser'),
-      role=pg.config.PLUGIN_NAME,
-    )
-
-    dialog.add_buttons(
-      Gtk.STOCK_ADD, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-    
-    dialog.set_default_response(Gtk.ResponseType.OK)
-    
-    dialog.connect('response', self._on_pdb_procedure_browser_dialog_response)
-    
-    dialog.show_all()
-    
-    return dialog
-  
-  def _on_pdb_procedure_browser_dialog_response(self, dialog, response_id):
-    if response_id == Gtk.ResponseType.OK:
-      procedure_name = dialog.get_selected()
-      if procedure_name:
-        self.add_item(actions_.get_action_dict_for_pdb_procedure(procedure_name))
-    
-    dialog.hide()
+    self._procedure_browser_dialog.show_all()
 
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(

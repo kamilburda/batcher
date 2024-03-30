@@ -301,12 +301,20 @@ class PreviewsController:
     for item in action_box_procedures.items:
       _connect_window_state_event_for_edit_dialog(action_box_procedures, item)
 
+    if action_box_procedures.procedure_browser_dialog is not None:
+      action_box_procedures.procedure_browser_dialog.connect(
+        'window-state-event', self._on_related_window_window_state_event)
+
     action_box_constraints.connect(
       'action-box-item-added', _connect_window_state_event_for_edit_dialog)
 
     # Connect already added items
     for item in action_box_constraints.items:
       _connect_window_state_event_for_edit_dialog(action_box_constraints, item)
+
+    if action_box_constraints.procedure_browser_dialog is not None:
+      action_box_constraints.procedure_browser_dialog.connect(
+        'window-state-event', self._on_related_window_window_state_event)
 
   def _on_related_window_window_state_event(self, window, event):
     if not (event.new_window_state & Gdk.WindowState.FOCUSED):
