@@ -217,6 +217,9 @@ class ItemBoxItem:
   
   def _setup_item_indicator_button(self, icon=None, text=None, position=None):
     button = self._setup_button(self._hbox_indicator_buttons, icon, text, position)
+    button.hide()
+    button.set_no_show_all(True)
+
     button.connect('notify::visible', self._on_indicator_button_visible_changed)
     return button
 
