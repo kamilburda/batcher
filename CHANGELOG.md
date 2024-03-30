@@ -14,6 +14,9 @@ Bug fixes:
 * Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
 * Fixed redundant preview update when the main dialog (re)gained focus.
 
+Other changes:
+* Moved menu entries back under the `Batch` submenu to avoid confusion with the `Export...` and `Export As...` menu entries.
+
 
 ## 0.2
 

@@ -186,7 +186,7 @@ pg.register_procedure(
   plug_in_batch_export_layers,
   arguments=pg.setting.create_params(SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
-  menu_path='<Image>/File/[Export]',
+  menu_path='<Image>/File/{}'.format(_('Batch')),
   image_types='*',
   sensitivity_mask=(
     Gimp.ProcedureSensitivityMask.NO_DRAWABLES
@@ -200,7 +200,7 @@ pg.register_procedure(
 pg.register_procedure(
   plug_in_batch_export_layers_now,
   menu_label=_('E_xport Layers Now'),
-  menu_path='<Image>/File/[Export]',
+  menu_path='<Image>/File/{}'.format(_('Batch')),
   image_types='*',
   sensitivity_mask=(
     Gimp.ProcedureSensitivityMask.NO_DRAWABLES
