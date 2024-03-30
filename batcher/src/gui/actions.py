@@ -495,7 +495,8 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
 class _ActionEditDialog(GimpUi.Dialog):
 
-  _BORDER_WIDTH = 6
+  _CONTENTS_BORDER_WIDTH = 6
+  _CONTENTS_SPACING = 3
 
   _GRID_ROW_SPACING = 3
   _GRID_COLUMN_SPACING = 8
@@ -547,7 +548,8 @@ class _ActionEditDialog(GimpUi.Dialog):
 
     self._vbox = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
-      border_width=self._BORDER_WIDTH,
+      border_width=self._CONTENTS_BORDER_WIDTH,
+      spacing=self._CONTENTS_SPACING,
     )
 
     self._vbox.pack_start(self._label_editable_action_name, False, False, 0)
