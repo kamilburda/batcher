@@ -724,11 +724,11 @@ class ExportLayersDialog:
   def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
     if action == 'import':
       dialog_action = Gtk.FileChooserAction.OPEN
-      button_ok = Gtk.STOCK_OPEN
+      button_ok = _('_Open')
       title = _('Import Settings')
     elif action == 'export':
       dialog_action = Gtk.FileChooserAction.SAVE
-      button_ok = Gtk.STOCK_SAVE
+      button_ok = _('_Save')
       title = _('Export Settings')
     else:
       raise ValueError('invalid action; valid values: "import", "export"')
@@ -742,7 +742,7 @@ class ExportLayersDialog:
     
     file_dialog.add_buttons(
       button_ok, Gtk.ResponseType.OK,
-      Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+      _('_Cancel'), Gtk.ResponseType.CANCEL)
 
     if action == 'import':
       check_button_load_size_settings = Gtk.CheckButton(

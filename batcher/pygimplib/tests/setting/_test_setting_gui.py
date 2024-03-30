@@ -300,7 +300,7 @@ def _on_setting_value_not_valid(_setting, message, _message_id, details):
   dialog.vbox.set_spacing(5)
   dialog.set_border_width(8)
 
-  close_button = dialog.add_button(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE)
+  close_button = dialog.add_button('_Close', Gtk.ResponseType.CLOSE)
 
   close_button.connect('clicked', lambda *args: dialog.destroy())
 

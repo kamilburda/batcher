@@ -37,7 +37,7 @@ def display_alert_message(
       display_details_initially: bool = True,
       report_uri_list: Optional[Iterable[Tuple[str, str]]] = None,
       report_description: Optional[str] = None,
-      button_stock_id=Gtk.STOCK_CLOSE,
+      button_text=_('_Close'),
       button_response_id: Gtk.ResponseType = Gtk.ResponseType.CLOSE,
       focus_on_button: bool = False,
 ) -> int:
@@ -72,8 +72,8 @@ def display_alert_message(
     report_description:
       Text accompanying ``report_uri_list``. If ``None``, default text is
       used. To suppress displaying the report description, pass an empty string.
-    button_stock_id:
-      Stock ID of the button to close the dialog with.
+    button_text:
+      Text of the button to close the dialog with.
     button_response_id:
       Response ID of the button to close the dialog with.
     focus_on_button:
@@ -187,7 +187,7 @@ def display_alert_message(
   else:
     details_widget = None
 
-  dialog.add_button(button_stock_id, button_response_id)
+  dialog.add_button(button_text, button_response_id)
 
   if focus_on_button:
     button = dialog.get_widget_for_response(button_response_id)
