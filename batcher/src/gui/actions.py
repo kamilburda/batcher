@@ -453,8 +453,6 @@ class _ActionBoxItem(pg.gui.ItemBoxItem):
 
     self._button_warning = self._setup_item_indicator_button(
       icon=GimpUi.ICON_DIALOG_WARNING, position=0)
-    self._button_warning.hide()
-    self._button_warning.set_no_show_all(True)
 
   def _on_label_action_name_size_allocate(self, label_action_name, _allocation):
     self._set_tooltip_if_label_does_not_fit_text(label_action_name)
