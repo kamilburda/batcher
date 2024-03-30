@@ -11,6 +11,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from . import browser as action_browser_
 from . import item as action_item_
 
 from src import actions as actions_
@@ -87,6 +88,7 @@ class ActionList(pg.gui.ItemBox):
         add_action_text: Optional[str] = None,
         allow_custom_actions: bool = True,
         add_custom_action_text: Optional[str] = None,
+        action_browser_text: Optional[str] = None,
         item_spacing: int = pg.gui.ItemBox.ITEM_SPACING,
         **kwargs):
     super().__init__(item_spacing=item_spacing, **kwargs)
@@ -96,13 +98,17 @@ class ActionList(pg.gui.ItemBox):
     self._add_action_text = add_action_text
     self._allow_custom_actions = allow_custom_actions
     self._add_custom_action_text = add_custom_action_text
+    self._action_browser_text = action_browser_text
 
     if self._allow_custom_actions:
-      self._procedure_browser = self._create_procedure_browser()
+      self._browser = action_browser_.ActionBrowser(title=self._action_browser_text)
     else:
-      self._procedure_browser = None
+      self._browser = None
 
     self._init_gui()
+
+    if self._browser is not None:
+      self._browser.widget.connect('response', self._on_action_browser_response)
 
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
@@ -126,8 +132,8 @@ class ActionList(pg.gui.ItemBox):
     return self._actions
 
   @property
-  def procedure_browser(self):
-    return self._procedure_browser
+  def browser(self):
+    return self._browser
 
   def add_item(
         self,
@@ -161,23 +167,7 @@ class ActionList(pg.gui.ItemBox):
 
     self.emit('action-list-item-removed', item)
 
-  def _create_procedure_browser(self):
-    dialog = GimpUi.ProcBrowserDialog(
-      title=_('Procedure Browser'),
-      role=pg.config.PLUGIN_NAME,
-    )
-
-    dialog.add_buttons(
-      Gtk.STOCK_ADD, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL,
-      Gtk.ResponseType.CANCEL)
-
-    dialog.set_default_response(Gtk.ResponseType.OK)
-
-    dialog.connect('response', self._on_procedure_browser_response)
-
-    return dialog
-
-  def _on_procedure_browser_response(self, dialog, response_id):
+  def _on_action_browser_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
@@ -315,7 +305,7 @@ class ActionList(pg.gui.ItemBox):
     self._actions_menu.append(menu_item)
 
   def _on_add_custom_action_menu_item_activate(self, menu_item):
-    self._procedure_browser.show_all()
+    self._browser.widget.show_all()
 
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(

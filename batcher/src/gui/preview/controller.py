@@ -299,8 +299,8 @@ class PreviewsController:
     for item in procedure_list.items:
       _connect_window_state_event_for_edit_dialog(procedure_list, item)
 
-    if procedure_list.procedure_browser is not None:
-      procedure_list.procedure_browser.connect(
+    if procedure_list.browser is not None:
+      procedure_list.browser.widget.connect(
         'window-state-event', self._on_related_window_window_state_event)
 
     constraint_list.connect('action-list-item-added', _connect_window_state_event_for_edit_dialog)
@@ -309,8 +309,8 @@ class PreviewsController:
     for item in constraint_list.items:
       _connect_window_state_event_for_edit_dialog(constraint_list, item)
 
-    if constraint_list.procedure_browser is not None:
-      constraint_list.procedure_browser.connect(
+    if constraint_list.browser is not None:
+      constraint_list.browser.widget.connect(
         'window-state-event', self._on_related_window_window_state_event)
 
   def _on_related_window_window_state_event(self, window, event):
