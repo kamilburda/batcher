@@ -85,6 +85,7 @@ class ActionList(pg.gui.ItemBox):
         self,
         actions: pg.setting.Group,
         builtin_actions: Optional[Dict[str, Any]] = None,
+        builtin_actions_text: Optional[str] = None,
         add_action_text: Optional[str] = None,
         allow_custom_actions: bool = True,
         add_custom_action_text: Optional[str] = None,
@@ -95,6 +96,7 @@ class ActionList(pg.gui.ItemBox):
 
     self._actions = actions
     self._builtin_actions = builtin_actions if builtin_actions is not None else {}
+    self._builtin_actions_text = builtin_actions_text
     self._add_action_text = add_action_text
     self._allow_custom_actions = allow_custom_actions
     self._add_custom_action_text = add_custom_action_text
@@ -103,6 +105,7 @@ class ActionList(pg.gui.ItemBox):
     if self._allow_custom_actions:
       self._browser = action_browser_.ActionBrowser(
         builtin_actions=self._builtin_actions,
+        builtin_actions_text=self._builtin_actions_text,
         title=self._action_browser_text,
       )
     else:

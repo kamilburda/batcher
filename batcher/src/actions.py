@@ -533,7 +533,8 @@ def _hide_gui_for_first_run_mode_arguments(action):
     first_argument.gui.set_visible(False)
 
 
-def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]:
+def get_action_dict_for_pdb_procedure(
+      pdb_procedure_or_name: Union[Gimp.Procedure, str]) -> Dict[str, Any]:
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added as an action via `add()`.
   
@@ -551,6 +552,13 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
       yield f'-{i}'
       i += 1
 
+  if isinstance(pdb_procedure_or_name, str):
+    pdb_procedure = pdb[pdb_procedure_or_name].proc
+    pdb_procedure_name = pdb_procedure_or_name
+  else:
+    pdb_procedure = pdb_procedure_or_name
+    pdb_procedure_name = pdb_procedure.get_name()
+
   action_dict = {
     'name': pdb_procedure_name,
     'function': pdb_procedure_name,
@@ -560,8 +568,6 @@ def get_action_dict_for_pdb_procedure(pdb_procedure_name: str) -> Dict[str, Any]
   }
   
   pdb_procedure_argument_names = []
-
-  pdb_procedure = pdb[pdb_procedure_name].proc
 
   action_dict['display_name'] = _get_pdb_procedure_display_name(pdb_procedure)
   

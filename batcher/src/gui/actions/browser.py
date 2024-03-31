@@ -15,13 +15,14 @@ from gi.repository import Gtk
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import actions as actions_
 from src.gui.entry import entries as entries_
 
 
 class ActionBrowser:
 
-  _DIALOG_SIZE = 500, 400
-  _HPANED_POSITION = 200
+  _DIALOG_SIZE = 550, 450
+  _HPANED_POSITION = 230
 
   _CONTENTS_BORDER_WIDTH = 6
   _VBOX_BROWSER_SPACING = 6
@@ -35,56 +36,92 @@ class ActionBrowser:
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_PYOBJECT])
 
-  _pdb_procedures = {}
-
-  def __init__(self, builtin_actions=None, title=None):
+  def __init__(self, builtin_actions=None, builtin_actions_text=None, title=None):
     self._builtin_actions = builtin_actions
+    self._builtin_actions_text = builtin_actions_text
     self._title = title
 
-    self._action_dict = None
+    self._parent_tree_iters = {}
+
+    self._predefined_parent_tree_iter_names = [
+      ('plug_ins', _('Plug-ins')),
+      ('gimp_procedures', _('GIMP Procedures')),
+      ('file_load_procedures', _('File Load Procedures')),
+      ('file_save_procedures', _('File Save Procedures')),
+    ]
+
+    self._contents_filled = False
 
     self._init_gui()
 
     self._entry_search.connect('changed', self._on_entry_search_changed)
     self._entry_search.connect('icon-press', self._on_entry_search_icon_press)
 
-  @classmethod
-  def _get_pdb_procedure_dict(cls):
-    if not cls._pdb_procedures:
-      cls._pdb_procedures = {
-        'plug_ins': [],
-        'gimp_procedures': [],
-      }
-
-      pdb_procedures = [
-        Gimp.get_pdb().lookup_procedure(name)
-        for name in pdb.gimp_pdb_query('', '', '', '', '', '', '')]
-
-      for pdb_procedure in pdb_procedures:
-        if pdb_procedure.get_proc_type() == Gimp.PDBProcType.INTERNAL:
-          cls._pdb_procedures['gimp_procedures'].append(pdb_procedure)
-        else:
-          cls._pdb_procedures['plug_ins'].append(pdb_procedure)
-
-    return cls._pdb_procedures
-
   @property
   def widget(self):
     return self._dialog
 
   def fill_contents_if_empty(self):
-    if self._action_dict is not None:
+    if self._contents_filled:
       return
 
-    self._action_dict = {'builtin_actions': []}
+    self._contents_filled = True
 
     if self._builtin_actions is not None:
-      for action in self._builtin_actions:
-        self._action_dict['builtin_actions'].append(action)
+      self._parent_tree_iters['builtin_actions'] = self._tree_model.append(
+        None,
+        [self._builtin_actions_text,
+         'builtin_actions',
+         None])
 
-    self._action_dict.update(self._get_pdb_procedure_dict())
+      for action_dict in self._builtin_actions.values():
+        self._tree_model.append(
+          self._parent_tree_iters['builtin_actions'],
+          [action_dict['display_name'],
+           'builtin_actions',
+           action_dict])
 
-    self._fill_tree_view()
+    for name, display_name in self._predefined_parent_tree_iter_names:
+      self._parent_tree_iters[name] = self._tree_model.append(
+        None,
+        [display_name,
+         name,
+         None])
+
+    pdb_procedures = [
+      Gimp.get_pdb().lookup_procedure(name)
+      for name in pdb.gimp_pdb_query('', '', '', '', '', '', '')]
+
+    procedure_dicts = [
+      actions_.get_action_dict_for_pdb_procedure(procedure) for procedure in pdb_procedures]
+
+    # Taken from: https://stackoverflow.com/q/3071415
+    sorted_indexes = sorted(
+      range(len(procedure_dicts)),
+      key=lambda index_: procedure_dicts[index_]['display_name'].lower())
+
+    for index in sorted_indexes:
+      procedure = pdb_procedures[index]
+      procedure_dict = procedure_dicts[index]
+
+      if (procedure_dict['name'].startswith('file-')
+            and procedure_dict['name'].endswith('-load')):
+        action_type = 'file_load_procedures'
+      elif (procedure_dict['name'].startswith('file-')
+            and procedure_dict['name'].endswith('-save')):
+        action_type = 'file_save_procedures'
+      elif (procedure_dict['name'].startswith('plug-in-')
+            or procedure.get_proc_type() in [
+                Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.EXTENSION, Gimp.PDBProcType.TEMPORARY]):
+        action_type = 'plug_ins'
+      else:
+        action_type = 'gimp_procedures'
+
+      self._tree_model.append(
+        self._parent_tree_iters[action_type],
+        [procedure_dict['display_name'],
+         action_type,
+         procedure_dict])
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
@@ -102,6 +139,16 @@ class ActionBrowser:
       enable_tree_lines=False,
     )
     self._tree_view.get_selection().set_mode(Gtk.SelectionMode.BROWSE)
+
+    column = Gtk.TreeViewColumn()
+
+    cell_renderer_item_name = Gtk.CellRendererText()
+    column.pack_start(cell_renderer_item_name, False)
+    column.set_attributes(
+      cell_renderer_item_name,
+      text=self._COLUMN_ACTION_NAME[0])
+
+    self._tree_view.append_column(column)
 
     self._scrolled_window_action_list = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
@@ -161,9 +208,6 @@ class ActionBrowser:
     self._dialog.set_focus(self._button_close)
 
     self._set_search_bar_icon_sensitivity()
-
-  def _fill_tree_view(self):
-    pass
 
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
