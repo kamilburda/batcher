@@ -34,6 +34,7 @@ class EntryUndoContext:
     
     self._cursor_changed_by_action = False
 
+  def enable(self):
     self._entry.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
     self._entry.connect('key-press-event', self._on_entry_key_press_event)
 

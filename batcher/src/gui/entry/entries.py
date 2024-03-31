@@ -30,13 +30,14 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   Additional features include:
     * undo/redo of text,
     * placeholder text,
-    * expandable width of the entry.
+    * optional expandable width of the entry.
   """
 
   _PLACEHOLDER_STYLE_CLASS_NAME = 'placeholder'
   
   def __init__(
         self,
+        expandable: bool = True,
         minimum_width_chars: int = -1,
         maximum_width_chars: int = -1,
         placeholder_text: Optional[str] = None,
@@ -45,12 +46,16 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     """Initializes an `ExtendedEntry` instance.
 
     Args:
+      expandable:
+        If ``True``, the entry width is made expandable. If ``False``, the entry
+        will not expand automatically, and ``minimum_width_chars`` and
+        ``maximum_width_chars`` will thus have no effect.
       minimum_width_chars:
         Minimum width specified as a number of characters. The entry will not
-        shrink below this width.
+        shrink below this width if ``expandable`` is ``True``.
       maximum_width_chars:
         Maximum width specified as a number of characters. The entry will not
-        expand above this width.
+        expand above this width if ``expandable`` is ``True``.
       placeholder_text:
         Text to display as a placeholder if the entry is empty. If ``None``,
         do not display any placeholder.
@@ -60,15 +65,22 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     """
     Gtk.Entry.__init__(self, **kwargs)
 
+    self._expandable = expandable
     self._minimum_width_chars = minimum_width_chars
     self._maximum_width_chars = maximum_width_chars
     self._placeholder_text = placeholder_text
 
     self._undo_context = entry_undo_.EntryUndoContext(self)
+    self._undo_context.enable()
+
+    if self._expandable:
+      self._entry_expander = entry_expander_.EntryExpander(
+        self, self._minimum_width_chars, self._maximum_width_chars)
+    else:
+      self._entry_expander = None
+
     self._popup = None
-    self._expander = entry_expander_.EntryExpander(
-      self, self._minimum_width_chars, self._maximum_width_chars)
-    
+
     self._has_placeholder_text_assigned = False
 
     self._placeholder_css_provider = Gtk.CssProvider()
@@ -89,7 +101,9 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   # HACK: Instead of connecting an 'insert-text' signal handler, we override the
   # `Gtk.Editable.do_insert_text` virtual method to avoid warnings related to
   # 'insert-text'.
-  # More information: https://stackoverflow.com/a/38831655
+  # More information:
+  # * https://stackoverflow.com/a/38831655
+  # * https://gitlab.gnome.org/GNOME/pygobject/-/issues/12
   def do_insert_text(self, new_text: str, new_text_length: int, position: int) -> int:
     return self.undo_context.handle_insert_text(new_text, new_text_length, position)
 

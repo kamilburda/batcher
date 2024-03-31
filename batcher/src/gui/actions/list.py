@@ -101,13 +101,17 @@ class ActionList(pg.gui.ItemBox):
     self._action_browser_text = action_browser_text
 
     if self._allow_custom_actions:
-      self._browser = action_browser_.ActionBrowser(title=self._action_browser_text)
+      self._browser = action_browser_.ActionBrowser(
+        builtin_actions=self._builtin_actions,
+        title=self._action_browser_text,
+      )
     else:
       self._browser = None
 
     self._init_gui()
 
     if self._browser is not None:
+      self._browser.widget.connect('realize', self._on_action_browser_realize)
       self._browser.widget.connect('response', self._on_action_browser_response)
 
     self._after_add_action_event_id = self._actions.connect_event(
@@ -166,6 +170,10 @@ class ActionList(pg.gui.ItemBox):
     self._actions.set_event_enabled(self._before_remove_action_event_id, True)
 
     self.emit('action-list-item-removed', item)
+
+  def _on_action_browser_realize(self, dialog):
+    dialog.set_transient_for(pg.gui.get_toplevel_window(self))
+    dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
   def _on_action_browser_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
@@ -305,6 +313,7 @@ class ActionList(pg.gui.ItemBox):
     self._actions_menu.append(menu_item)
 
   def _on_add_custom_action_menu_item_activate(self, menu_item):
+    self._browser.fill_contents_if_empty()
     self._browser.widget.show_all()
 
   def _setup_drag(self, item):
