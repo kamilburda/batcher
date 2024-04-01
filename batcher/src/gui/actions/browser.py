@@ -123,6 +123,10 @@ class ActionBrowser:
         self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
       False)
 
+    first_selectable_row = self._tree_model[0].iterchildren().next()
+    if first_selectable_row is not None:
+      self._tree_view.set_cursor(first_selectable_row.path)
+
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=self._title,
@@ -138,7 +142,7 @@ class ActionBrowser:
       enable_search=False,
       enable_tree_lines=False,
     )
-    self._tree_view.get_selection().set_mode(Gtk.SelectionMode.BROWSE)
+    self._tree_view.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
 
     column = Gtk.TreeViewColumn()
 
