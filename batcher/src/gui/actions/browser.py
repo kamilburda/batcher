@@ -16,6 +16,7 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import actions as actions_
+from src import placeholders as placeholders_
 from src.gui.entry import entries as entries_
 
 
@@ -46,12 +47,14 @@ class ActionBrowser:
       'gimp_procedures',
       'file_load_procedures',
       'file_save_procedures',
+      'other',
     ]
     self._predefined_parent_tree_iter_display_names = [
       _('Plug-ins'),
       _('GIMP Procedures'),
       _('File Load Procedures'),
       _('File Save Procedures'),
+      _('Other'),
     ]
 
     self._contents_filled = False
@@ -96,15 +99,18 @@ class ActionBrowser:
       procedure_dict = procedure_dicts[index]
 
       if (procedure_dict['name'].startswith('file-')
-            and procedure_dict['name'].endswith('-load')):
+          and (procedure_dict['name'].endswith('-load') or '-load-' in procedure_dict['name'])):
         action_type = 'file_load_procedures'
       elif (procedure_dict['name'].startswith('file-')
-            and procedure_dict['name'].endswith('-save')):
+            and (procedure_dict['name'].endswith('-save') or '-save-' in procedure_dict['name'])):
         action_type = 'file_save_procedures'
       elif (procedure_dict['name'].startswith('plug-in-')
             or procedure.get_proc_type() in [
                 Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.EXTENSION, Gimp.PDBProcType.TEMPORARY]):
-        action_type = 'plug_ins'
+        if self._has_plugin_procedure_image_or_drawable_arguments(procedure_dict):
+          action_type = 'plug_ins'
+        else:
+          action_type = 'other'
       else:
         action_type = 'gimp_procedures'
 
@@ -115,17 +121,60 @@ class ActionBrowser:
          procedure_dict])
 
     self._tree_view.expand_row(
-      self._tree_model[
-        self._predefined_parent_tree_iter_names.index('plug_ins')].path,
+      self._tree_model[self._predefined_parent_tree_iter_names.index('plug_ins')].path,
       False)
     self._tree_view.expand_row(
-      self._tree_model[
-        self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
+      self._tree_model[self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
       False)
 
     first_selectable_row = self._tree_model[0].iterchildren().next()
     if first_selectable_row is not None:
       self._tree_view.set_cursor(first_selectable_row.path)
+
+  def _has_plugin_procedure_image_or_drawable_arguments(self, action_dict):
+    if not action_dict['arguments']:
+      return False
+
+    if len(action_dict['arguments']) == 1:
+      return self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][0])
+
+    if (self._is_action_argument_run_mode(action_dict['arguments'][0])
+        and self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][1])):
+      return True
+
+    if self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][0]):
+      return True
+
+    return False
+
+  @staticmethod
+  def _is_action_argument_run_mode(action_argument):
+    return (
+      action_argument['type'] == pg.setting.EnumSetting
+      and action_argument['enum_type'] == Gimp.RunMode.__gtype__)
+
+  @staticmethod
+  def _is_action_argument_image_drawable_or_drawables(action_argument):
+    return (
+      action_argument['type'] in [
+        pg.setting.ImageSetting,
+        pg.setting.LayerSetting,
+        pg.setting.DrawableSetting,
+        pg.setting.ItemSetting,
+        placeholders_.PlaceholderImageSetting,
+        placeholders_.PlaceholderLayerSetting,
+        placeholders_.PlaceholderDrawableSetting,
+        placeholders_.PlaceholderItemSetting,
+        placeholders_.PlaceholderDrawableArraySetting,
+        placeholders_.PlaceholderLayerArraySetting,
+        placeholders_.PlaceholderItemArraySetting]
+      or (action_argument['type'] == pg.setting.ArraySetting
+          and action_argument['element_type'] in [
+              pg.setting.ImageSetting,
+              pg.setting.LayerSetting,
+              pg.setting.DrawableSetting,
+              pg.setting.ItemSetting])
+    )
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
