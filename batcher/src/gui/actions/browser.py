@@ -95,15 +95,7 @@ class ActionBrowser:
     procedure_dicts = [
       actions_.get_action_dict_for_pdb_procedure(procedure) for procedure in pdb_procedures]
 
-    # Taken from: https://stackoverflow.com/q/3071415
-    sorted_indexes = sorted(
-      range(len(procedure_dicts)),
-      key=lambda index_: procedure_dicts[index_]['display_name'].lower())
-
-    for index in sorted_indexes:
-      procedure = pdb_procedures[index]
-      procedure_dict = procedure_dicts[index]
-
+    for procedure, procedure_dict in zip(pdb_procedures, procedure_dicts):
       if (procedure_dict['name'].startswith('file-')
           and (procedure_dict['name'].endswith('-load') or '-load-' in procedure_dict['name'])):
         action_type = 'file_load_procedures'
@@ -198,7 +190,6 @@ class ActionBrowser:
     self._tree_model = Gtk.TreeStore(*[column[1] for column in self._COLUMNS])
 
     self._tree_view = Gtk.TreeView(
-      model=self._tree_model,
       headers_visible=True,
       enable_search=False,
       enable_tree_lines=False,
@@ -208,6 +199,7 @@ class ActionBrowser:
     column_name = Gtk.TreeViewColumn()
     column_name.set_resizable(True)
     column_name.set_title(_('Name'))
+    column_name.set_sort_column_id(self._COLUMN_ACTION_NAME[0])
 
     cell_renderer_action_name = Gtk.CellRendererText(
       width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
@@ -223,6 +215,7 @@ class ActionBrowser:
     column_menu_name = Gtk.TreeViewColumn()
     column_menu_name.set_resizable(True)
     column_menu_name.set_title(_('Menu Name'))
+    column_menu_name.set_sort_column_id(self._COLUMN_ACTION_MENU_NAME[0])
 
     cell_renderer_action_menu_name = Gtk.CellRendererText(
       width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
@@ -234,6 +227,16 @@ class ActionBrowser:
       text=self._COLUMN_ACTION_MENU_NAME[0])
 
     self._tree_view.append_column(column_menu_name)
+
+    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model)
+    self._tree_model_sorted.set_sort_func(
+      self._COLUMN_ACTION_NAME[0], self._sort_actions_by_name)
+    self._tree_model_sorted.set_sort_func(
+      self._COLUMN_ACTION_MENU_NAME[0], self._sort_actions_by_menu_name)
+    self._tree_model_sorted.set_sort_column_id(
+      self._COLUMN_ACTION_MENU_NAME[0], Gtk.SortType.ASCENDING)
+
+    self._tree_view.set_model(self._tree_model_sorted)
 
     self._scrolled_window_action_list = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
@@ -293,6 +296,54 @@ class ActionBrowser:
     self._dialog.set_focus(self._button_close)
 
     self._set_search_bar_icon_sensitivity()
+
+  def _sort_actions_by_name(self, model, first_iter, second_iter, _user_data):
+    first_row = Gtk.TreeModelRow(model, first_iter)
+    first_name = first_row[self._COLUMN_ACTION_NAME[0]]
+    first_type = first_row[self._COLUMN_ACTION_TYPE[0]]
+
+    second_row = Gtk.TreeModelRow(model, second_iter)
+    second_name = second_row[self._COLUMN_ACTION_NAME[0]]
+    second_type = second_row[self._COLUMN_ACTION_TYPE[0]]
+
+    if first_type == second_type:
+      if first_name < second_name:
+        return -1
+      elif first_name == second_name:
+        return 0
+      else:
+        return 1
+    else:
+      # Keep order of parents intact
+      return 0
+
+  def _sort_actions_by_menu_name(self, model, first_iter, second_iter, _user_data):
+    first_row = Gtk.TreeModelRow(model, first_iter)
+    first_name = first_row[self._COLUMN_ACTION_MENU_NAME[0]]
+    first_type = first_row[self._COLUMN_ACTION_TYPE[0]]
+
+    second_row = Gtk.TreeModelRow(model, second_iter)
+    second_name = second_row[self._COLUMN_ACTION_MENU_NAME[0]]
+    second_type = second_row[self._COLUMN_ACTION_TYPE[0]]
+
+    if first_type == second_type:
+      # Treat empty menu name as lower in order
+      if first_name != '' and second_name != '':
+        if first_name < second_name:
+          return -1
+        elif first_name == second_name:
+          return 0
+        else:
+          return 1
+      elif first_name == '' and second_name == '':
+        return 0
+      elif first_name == '' and second_name != '':
+        return 1
+      elif first_name != '' and second_name == '':
+        return -1
+    else:
+      # Keep order of parents intact
+      return 0
 
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
