@@ -369,7 +369,6 @@ class ExportLayersDialog:
     self._procedure_list = action_list_.ActionList(
       self._settings['main/procedures'],
       builtin_actions=builtin_procedures.BUILTIN_PROCEDURES,
-      builtin_actions_text=_('Built-in Procedures'),
       add_action_text=_('Add P_rocedure...'),
       allow_custom_actions=True,
       add_custom_action_text=_('Add Custom Procedure...'),

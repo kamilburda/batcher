@@ -36,9 +36,7 @@ class ActionBrowser:
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_PYOBJECT])
 
-  def __init__(self, builtin_actions=None, builtin_actions_text=None, title=None):
-    self._builtin_actions = builtin_actions
-    self._builtin_actions_text = builtin_actions_text
+  def __init__(self, title=None):
     self._title = title
 
     self._parent_tree_iters = {}
@@ -67,19 +65,6 @@ class ActionBrowser:
 
     self._contents_filled = True
 
-    if self._builtin_actions is not None:
-      self._parent_tree_iters['builtin_actions'] = self._tree_model.append(
-        None,
-        [self._builtin_actions_text,
-         'builtin_actions',
-         None])
-
-      for action_dict in self._builtin_actions.values():
-        self._tree_model.append(
-          self._parent_tree_iters['builtin_actions'],
-          [action_dict['display_name'],
-           'builtin_actions',
-           action_dict])
 
     for name, display_name in self._predefined_parent_tree_iter_names:
       self._parent_tree_iters[name] = self._tree_model.append(
