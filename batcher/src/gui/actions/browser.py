@@ -191,7 +191,7 @@ class ActionBrowser:
       enable_search=False,
       enable_tree_lines=False,
     )
-    self._tree_view.get_selection().set_mode(Gtk.SelectionMode.SINGLE)
+    self._tree_view.get_selection().set_mode(Gtk.SelectionMode.BROWSE)
 
     column = Gtk.TreeViewColumn()
 
