@@ -583,7 +583,7 @@ def get_action_dict_for_pdb_procedure(
       if placeholder_type_name is not None:
         setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
           setting_type, placeholder_type_name, setting_type_init_kwargs)
-        setting_type = placeholder_type_name
+        setting_type = pg.setting.SETTING_TYPES[placeholder_type_name]
     else:
       setting_type = placeholders.PlaceholderUnsupportedParameterSetting
       setting_type_init_kwargs = {}
