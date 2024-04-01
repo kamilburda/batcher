@@ -42,10 +42,16 @@ class ActionBrowser:
     self._parent_tree_iters = {}
 
     self._predefined_parent_tree_iter_names = [
-      ('plug_ins', _('Plug-ins')),
-      ('gimp_procedures', _('GIMP Procedures')),
-      ('file_load_procedures', _('File Load Procedures')),
-      ('file_save_procedures', _('File Save Procedures')),
+      'plug_ins',
+      'gimp_procedures',
+      'file_load_procedures',
+      'file_save_procedures',
+    ]
+    self._predefined_parent_tree_iter_display_names = [
+      _('Plug-ins'),
+      _('GIMP Procedures'),
+      _('File Load Procedures'),
+      _('File Save Procedures'),
     ]
 
     self._contents_filled = False
@@ -65,8 +71,8 @@ class ActionBrowser:
 
     self._contents_filled = True
 
-
-    for name, display_name in self._predefined_parent_tree_iter_names:
+    for name, display_name in zip(
+          self._predefined_parent_tree_iter_names, self._predefined_parent_tree_iter_display_names):
       self._parent_tree_iters[name] = self._tree_model.append(
         None,
         [display_name,
@@ -107,6 +113,15 @@ class ActionBrowser:
         [procedure_dict['display_name'],
          action_type,
          procedure_dict])
+
+    self._tree_view.expand_row(
+      self._tree_model[
+        self._predefined_parent_tree_iter_names.index('plug_ins')].path,
+      False)
+    self._tree_view.expand_row(
+      self._tree_model[
+        self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
+      False)
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
