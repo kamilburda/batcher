@@ -11,6 +11,7 @@ from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Pango
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -22,20 +23,24 @@ from src.gui.entry import entries as entries_
 
 class ActionBrowser:
 
-  _DIALOG_SIZE = 550, 450
-  _HPANED_POSITION = 230
+  _DIALOG_SIZE = 675, 450
+  _HPANED_POSITION = 325
 
   _CONTENTS_BORDER_WIDTH = 6
   _VBOX_BROWSER_SPACING = 6
   _HBOX_SEARCH_BAR_SPACING = 6
 
+  _PROCEDURE_NAME_WIDTH_CHARS = 25
+
   _COLUMNS = (
     _COLUMN_ACTION_NAME,
+    _COLUMN_ACTION_MENU_NAME,
     _COLUMN_ACTION_TYPE,
     _COLUMN_ACTION) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
-    [2, GObject.TYPE_PYOBJECT])
+    [2, GObject.TYPE_STRING],
+    [3, GObject.TYPE_PYOBJECT])
 
   def __init__(self, title=None):
     self._title = title
@@ -79,6 +84,7 @@ class ActionBrowser:
       self._parent_tree_iters[name] = self._tree_model.append(
         None,
         [display_name,
+         '',
          name,
          None])
 
@@ -114,9 +120,15 @@ class ActionBrowser:
       else:
         action_type = 'gimp_procedures'
 
+      if procedure_dict['display_name'] != procedure_dict['name']:
+        display_name = procedure_dict['display_name']
+      else:
+        display_name = ''
+
       self._tree_model.append(
         self._parent_tree_iters[action_type],
-        [procedure_dict['display_name'],
+        [procedure_dict['name'],
+         display_name,
          action_type,
          procedure_dict])
 
@@ -187,21 +199,41 @@ class ActionBrowser:
 
     self._tree_view = Gtk.TreeView(
       model=self._tree_model,
-      headers_visible=False,
+      headers_visible=True,
       enable_search=False,
       enable_tree_lines=False,
     )
     self._tree_view.get_selection().set_mode(Gtk.SelectionMode.BROWSE)
 
-    column = Gtk.TreeViewColumn()
+    column_name = Gtk.TreeViewColumn()
+    column_name.set_resizable(True)
+    column_name.set_title(_('Name'))
 
-    cell_renderer_item_name = Gtk.CellRendererText()
-    column.pack_start(cell_renderer_item_name, False)
-    column.set_attributes(
-      cell_renderer_item_name,
+    cell_renderer_action_name = Gtk.CellRendererText(
+      width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
+      ellipsize=Pango.EllipsizeMode.END,
+    )
+    column_name.pack_start(cell_renderer_action_name, False)
+    column_name.set_attributes(
+      cell_renderer_action_name,
       text=self._COLUMN_ACTION_NAME[0])
 
-    self._tree_view.append_column(column)
+    self._tree_view.append_column(column_name)
+
+    column_menu_name = Gtk.TreeViewColumn()
+    column_menu_name.set_resizable(True)
+    column_menu_name.set_title(_('Menu Name'))
+
+    cell_renderer_action_menu_name = Gtk.CellRendererText(
+      width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
+      ellipsize=Pango.EllipsizeMode.END,
+    )
+    column_menu_name.pack_start(cell_renderer_action_menu_name, False)
+    column_menu_name.set_attributes(
+      cell_renderer_action_menu_name,
+      text=self._COLUMN_ACTION_MENU_NAME[0])
+
+    self._tree_view.append_column(column_menu_name)
 
     self._scrolled_window_action_list = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
