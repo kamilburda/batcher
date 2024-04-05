@@ -843,7 +843,7 @@ class WindowPositionPresenter(GtkPresenter):
 
 
 class WindowSizePresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.Window` widgets to get/set position.
+  """`setting.Presenter` subclass for `Gtk.Window` widgets to get/set size.
   
   Value: Current size of the window as a tuple of 2 integers.
   """
