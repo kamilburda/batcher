@@ -32,6 +32,8 @@ class ActionBrowser:
   _VBOX_BROWSER_SPACING = 6
   _HBOX_SEARCH_BAR_SPACING = 6
 
+  _ARROW_ICON_PIXEL_SIZE = 12
+
   _PROCEDURE_NAME_WIDTH_CHARS = 25
 
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
@@ -74,6 +76,12 @@ class ActionBrowser:
 
     self._entry_search.connect('changed', self._on_entry_search_changed)
     self._entry_search.connect('icon-press', self._on_entry_search_icon_press)
+
+    self._button_search_settings.connect('clicked', self._on_button_search_settings_clicked)
+
+    for menu_item in self._menu_search_settings.get_children():
+      if isinstance(menu_item, Gtk.CheckMenuItem):
+        menu_item.connect('toggled', self._update_search_results)
 
   @property
   def widget(self):
@@ -274,11 +282,39 @@ class ActionBrowser:
       Gtk.EntryIconPosition.SECONDARY, GimpUi.ICON_EDIT_CLEAR)
     self._entry_search.set_icon_activatable(Gtk.EntryIconPosition.SECONDARY, True)
 
+    self._image_drop_down = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
+    self._image_drop_down.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
+
+    self._button_search_settings = Gtk.Button(
+      image=self._image_drop_down,
+      relief=Gtk.ReliefStyle.NONE,
+    )
+
+    self._menu_item_by_name = Gtk.CheckMenuItem(
+      label=_('by name'),
+      active=True,
+    )
+    self._menu_item_by_menu_name = Gtk.CheckMenuItem(
+      label=_('by menu name'),
+      active=True,
+    )
+    self._menu_item_by_description = Gtk.CheckMenuItem(
+      label=_('by description'),
+      active=True,
+    )
+
+    self._menu_search_settings = Gtk.Menu()
+    self._menu_search_settings.append(self._menu_item_by_name)
+    self._menu_search_settings.append(self._menu_item_by_menu_name)
+    self._menu_search_settings.append(self._menu_item_by_description)
+    self._menu_search_settings.show_all()
+
     self._hbox_search_bar = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_SEARCH_BAR_SPACING,
     )
     self._hbox_search_bar.pack_start(self._entry_search, True, True, 0)
+    self._hbox_search_bar.pack_start(self._button_search_settings, False, False, 0)
 
     self._vbox_browser = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -326,13 +362,15 @@ class ActionBrowser:
     if model.iter_parent(iter) is None:
       return True
 
-    return any(
-      processed_search_query in text
-      for text in [
-        self._process_text_for_search(row[0]),
-        self._process_text_for_search(row[1]),
-        self._process_text_for_search(row[2])]
-    )
+    enabled_search_criteria = []
+    if self._menu_item_by_name.get_active():
+      enabled_search_criteria.append(self._process_text_for_search(row[0]))
+    if self._menu_item_by_menu_name.get_active():
+      enabled_search_criteria.append(self._process_text_for_search(row[1]))
+    if self._menu_item_by_description.get_active():
+      enabled_search_criteria.append(self._process_text_for_search(row[2]))
+
+    return any(processed_search_query in text for text in enabled_search_criteria)
 
   @staticmethod
   def _process_text_for_search(text):
@@ -389,6 +427,9 @@ class ActionBrowser:
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
 
+    self._update_search_results()
+
+  def _update_search_results(self, *args):
     pg.invocation.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
       lambda: self._tree_model_filter.refilter(),  # Wrap `gi.FunctionInfo` as it is unhashable
@@ -400,3 +441,6 @@ class ActionBrowser:
 
   def _on_entry_search_icon_press(self, _entry, _icon_position, _event):
     self._entry_search.set_text('')
+
+  def _on_button_search_settings_clicked(self, button):
+    pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
