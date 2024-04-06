@@ -176,8 +176,7 @@ class ActionList(pg.gui.ItemBox):
     if response_id == Gtk.ResponseType.OK:
       procedure_name = dialog.get_selected()
       if procedure_name:
-        self.add_item(
-          actions_.get_action_dict_for_pdb_procedure(procedure_name))
+        self.add_item(actions_.get_action_dict_for_pdb_procedure(procedure_name))
 
     dialog.hide()
 

@@ -16,6 +16,8 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
+from . import utils as action_utils_
+
 from src import actions as actions_
 from src import placeholders as placeholders_
 from src.gui.entry import entries as entries_
@@ -37,12 +39,14 @@ class ActionBrowser:
   _COLUMNS = (
     _COLUMN_ACTION_NAME,
     _COLUMN_ACTION_MENU_NAME,
+    _COLUMN_ACTION_DESCRIPTION,
     _COLUMN_ACTION_TYPE,
     _COLUMN_ACTION) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
-    [3, GObject.TYPE_PYOBJECT])
+    [3, GObject.TYPE_STRING],
+    [4, GObject.TYPE_PYOBJECT])
 
   def __init__(self, title=None):
     self._title = title
@@ -87,6 +91,7 @@ class ActionBrowser:
         None,
         [display_name,
          '',
+         '',
          name,
          None])
 
@@ -123,6 +128,7 @@ class ActionBrowser:
         self._parent_tree_iters[action_type],
         [procedure_dict['name'],
          display_name,
+         action_utils_.get_action_description(procedure, procedure_dict),
          action_type,
          procedure_dict])
 
@@ -306,14 +312,18 @@ class ActionBrowser:
     row = Gtk.TreeModelRow(model, iter)
 
     processed_search_query = self._process_text_for_search(self._entry_search.get_text())
-    processed_name = self._process_text_for_search(row[0])
-    processed_menu_name = self._process_text_for_search(row[1])
 
     # Do not filter parents
     if model.iter_parent(iter) is None:
       return True
 
-    return processed_search_query in processed_name or processed_search_query in processed_menu_name
+    return any(
+      processed_search_query in text
+      for text in [
+        self._process_text_for_search(row[0]),
+        self._process_text_for_search(row[1]),
+        self._process_text_for_search(row[2])]
+    )
 
   @staticmethod
   def _process_text_for_search(text):

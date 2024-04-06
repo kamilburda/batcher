@@ -13,6 +13,8 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
+from . import utils as action_utils_
+
 from src.gui import editable_label as editable_label_
 from src.gui import placeholders as gui_placeholders_
 from src.gui import popup_hide_context as popup_hide_context_
@@ -129,18 +131,13 @@ class ActionEditor(GimpUi.Dialog):
     self._button_info = None
     self._action_info_hbox = None
 
-    if self._pdb_procedure is not None:
-      short_description = self._pdb_procedure.proc.get_blurb()
-    else:
-      short_description = ''
-
-    self._action_info = _get_action_info(action, self._pdb_procedure)
+    self._action_info = _get_action_info_from_pdb_procedure(self._pdb_procedure)
 
     if self._action_info is None:
       return
 
     self._label_short_description = Gtk.Label(
-      label=short_description,
+      label=action_utils_.get_action_description(self._pdb_procedure.proc, action),
       use_markup=False,
       selectable=True,
       wrap=True,
@@ -228,7 +225,10 @@ class ActionEditor(GimpUi.Dialog):
     self._set_editable_label_text(action['display_name'].value)
 
 
-def _get_action_info(action, pdb_procedure):
+def _get_action_info_from_pdb_procedure(pdb_procedure):
+  if pdb_procedure is None:
+    return None
+
   if pdb_procedure is not None:
     action_info = ''
     action_main_info = []
@@ -260,11 +260,6 @@ def _get_action_info(action, pdb_procedure):
       action_info += '\n\n' + ', '.join(action_author_info)
 
     return action_info
-  else:
-    if action['description'].value:
-      return action['description'].value
-    else:
-      return None
 
 
 def _create_action_info_popup(action_info, widget, max_width_chars=100, border_width=3):
