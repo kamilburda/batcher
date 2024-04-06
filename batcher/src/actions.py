@@ -564,7 +564,6 @@ def get_action_dict_for_pdb_procedure(
     'function': pdb_procedure_name,
     'origin': 'gimp_pdb',
     'arguments': [],
-    'display_options_on_create': True,
   }
   
   pdb_procedure_argument_names = []
