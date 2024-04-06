@@ -79,6 +79,15 @@ class ActionBrowser:
   def widget(self):
     return self._dialog
 
+  def get_selected_procedure(self):
+    model, selected_iter = self._tree_view.get_selection().get_selected()
+
+    if selected_iter is not None:
+      row = Gtk.TreeModelRow(model, selected_iter)
+      return row[self._COLUMN_ACTION[0]]
+    else:
+      return None
+
   def fill_contents_if_empty(self):
     if self._contents_filled:
       return
