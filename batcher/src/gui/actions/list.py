@@ -178,8 +178,9 @@ class ActionList(pg.gui.ItemBox):
 
       if procedure_dict is not None:
         self.add_item(procedure_dict)
-
-    dialog.hide()
+        dialog.hide()
+    else:
+      dialog.hide()
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
