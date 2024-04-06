@@ -372,7 +372,7 @@ class ExportLayersDialog:
       add_action_text=_('Add P_rocedure...'),
       allow_custom_actions=True,
       add_custom_action_text=_('Add Custom Procedure...'),
-      action_browser_text=_('Procedure Browser'),
+      action_browser_text=_('Add Custom Procedure'),
       propagate_natural_height=True,
       propagate_natural_width=True,
       hscrollbar_policy=Gtk.PolicyType.NEVER,
