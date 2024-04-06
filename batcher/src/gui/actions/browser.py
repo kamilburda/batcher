@@ -298,7 +298,7 @@ class ActionBrowser:
     self._button_add = self._dialog.add_button(_('_Add'), Gtk.ResponseType.OK)
     self._button_close = self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
 
-    self._dialog.set_focus(self._button_close)
+    self._dialog.set_focus(self._entry_search)
 
     self._set_search_bar_icon_sensitivity()
 
