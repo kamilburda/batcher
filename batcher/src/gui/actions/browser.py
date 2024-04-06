@@ -32,6 +32,8 @@ class ActionBrowser:
 
   _PROCEDURE_NAME_WIDTH_CHARS = 25
 
+  _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
+
   _COLUMNS = (
     _COLUMN_ACTION_NAME,
     _COLUMN_ACTION_MENU_NAME,
@@ -228,7 +230,10 @@ class ActionBrowser:
 
     self._tree_view.append_column(column_menu_name)
 
-    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model)
+    self._tree_model_filter = Gtk.TreeModelFilter(child_model=self._tree_model)
+    self._tree_model_filter.set_visible_func(self._get_row_visibility_based_on_search_query)
+
+    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model_filter)
     self._tree_model_sorted.set_sort_func(
       self._COLUMN_ACTION_NAME[0], self._sort_actions_by_name)
     self._tree_model_sorted.set_sort_func(
@@ -297,6 +302,23 @@ class ActionBrowser:
 
     self._set_search_bar_icon_sensitivity()
 
+  def _get_row_visibility_based_on_search_query(self, model, iter, _data):
+    row = Gtk.TreeModelRow(model, iter)
+
+    processed_search_query = self._process_text_for_search(self._entry_search.get_text())
+    processed_name = self._process_text_for_search(row[0])
+    processed_menu_name = self._process_text_for_search(row[1])
+
+    # Do not filter parents
+    if model.iter_parent(iter) is None:
+      return True
+
+    return processed_search_query in processed_name or processed_search_query in processed_menu_name
+
+  @staticmethod
+  def _process_text_for_search(text):
+    return text.replace('_', '-').lower()
+
   def _sort_actions_by_name(self, model, first_iter, second_iter, _user_data):
     first_row = Gtk.TreeModelRow(model, first_iter)
     first_name = first_row[self._COLUMN_ACTION_NAME[0]]
@@ -347,6 +369,11 @@ class ActionBrowser:
 
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
+
+    pg.invocation.timeout_add_strict(
+      self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
+      lambda: self._tree_model_filter.refilter(),  # Wrap `gi.FunctionInfo` as it is unhashable
+    )
 
   def _set_search_bar_icon_sensitivity(self):
     self._entry_search.set_icon_sensitive(
