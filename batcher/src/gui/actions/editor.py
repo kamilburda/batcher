@@ -22,6 +22,34 @@ from src.gui import popup_hide_context as popup_hide_context_
 
 class ActionEditor(GimpUi.Dialog):
 
+  def __init__(self, action, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.set_resizable(False)
+    self.connect('delete-event', lambda *_args: self.hide_on_delete())
+
+    self._action_editor_widget = ActionEditorWidget(action, self)
+
+    self.vbox.pack_start(self._action_editor_widget.widget, False, False, 0)
+
+    self._button_reset_response_id = 1
+    self._button_reset = self.add_button(_('Reset'), self._button_reset_response_id)
+    self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
+
+    self._button_close = self.add_button(_('Close'), Gtk.ResponseType.CLOSE)
+
+    self.set_focus(self._button_close)
+
+  def _on_button_reset_clicked(self, _button, action):
+    action['arguments'].reset()
+    action['more_options'].reset()
+
+    action['display_name'].reset()
+    self._set_editable_label_text(action['display_name'].value)
+
+
+class ActionEditorWidget:
+
   _CONTENTS_BORDER_WIDTH = 6
   _CONTENTS_SPACING = 3
 
@@ -38,23 +66,25 @@ class ActionEditor(GimpUi.Dialog):
   _ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
   _ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS = 40
 
-  def __init__(self, action, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+  def __init__(self, action, parent):
+    self._action = action
+    self._parent = parent
 
-    self.set_resizable(False)
-    self.connect('delete-event', lambda *_args: self.hide_on_delete())
-
-    if action['origin'].is_item('gimp_pdb') and action['function'].value:
-      self._pdb_procedure = pdb[action['function'].value]
+    if self._action['origin'].is_item('gimp_pdb') and self._action['function'].value:
+      self._pdb_procedure = pdb[self._action['function'].value]
     else:
       self._pdb_procedure = None
 
-    self._init_gui(action)
+    self._init_gui()
 
-  def _init_gui(self, action):
-    self._set_up_editable_name(action)
+  @property
+  def widget(self):
+    return self._vbox
 
-    self._set_up_action_info(action, self)
+  def _init_gui(self):
+    self._set_up_editable_name(self._action)
+
+    self._set_up_action_info(self._action, self._parent)
 
     self._grid_action_arguments = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -67,13 +97,14 @@ class ActionEditor(GimpUi.Dialog):
       margin_top=self._MORE_OPTIONS_LABEL_BOTTOM_MARGIN,
     )
     self._vbox_more_options.pack_start(
-      action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
-    if 'also_apply_to_parent_folders' in action['more_options']:
+      self._action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
+    if 'also_apply_to_parent_folders' in self._action['more_options']:
       self._vbox_more_options.pack_start(
-        action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
+        self._action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
 
-    action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
-    action['more_options_expanded'].gui.widget.set_margin_top(self._MORE_OPTIONS_LABEL_TOP_MARGIN)
+    self._action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
+    self._action['more_options_expanded'].gui.widget.set_margin_top(
+      self._MORE_OPTIONS_LABEL_TOP_MARGIN)
 
     self._vbox = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -85,19 +116,9 @@ class ActionEditor(GimpUi.Dialog):
     if self._action_info_hbox is not None:
       self._vbox.pack_start(self._action_info_hbox, False, False, 0)
     self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
-    self._vbox.pack_start(action['more_options_expanded'].gui.widget, False, False, 0)
+    self._vbox.pack_start(self._action['more_options_expanded'].gui.widget, False, False, 0)
 
-    self.vbox.pack_start(self._vbox, False, False, 0)
-
-    self._button_reset_response_id = 1
-    self._button_reset = self.add_button(_('Reset'), self._button_reset_response_id)
-    self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
-
-    self._button_close = self.add_button(_('Close'), Gtk.ResponseType.CLOSE)
-
-    self._set_arguments(action, self._pdb_procedure)
-
-    self.set_focus(self._button_close)
+    self._set_arguments(self._action, self._pdb_procedure)
 
   def _set_up_editable_name(self, action):
     self._label_editable_action_name = editable_label_.EditableLabel()
@@ -216,13 +237,6 @@ class ActionEditor(GimpUi.Dialog):
       self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
 
       row_index += 1
-
-  def _on_button_reset_clicked(self, _button, action):
-    action['arguments'].reset()
-    action['more_options'].reset()
-
-    action['display_name'].reset()
-    self._set_editable_label_text(action['display_name'].value)
 
 
 def _get_action_info_from_pdb_procedure(pdb_procedure):
