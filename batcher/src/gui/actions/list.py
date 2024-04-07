@@ -109,7 +109,7 @@ class ActionList(pg.gui.ItemBox):
 
     if self._browser is not None:
       self._browser.widget.connect('realize', self._on_action_browser_realize)
-      self._browser.widget.connect('response', self._on_action_browser_response)
+      self._browser.connect('add-procedure', self._on_action_browser_add_procedure)
 
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
@@ -172,15 +172,8 @@ class ActionList(pg.gui.ItemBox):
     dialog.set_transient_for(pg.gui.get_toplevel_window(self))
     dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
-  def _on_action_browser_response(self, dialog, response_id):
-    if response_id == Gtk.ResponseType.OK:
-      procedure_dict = self._browser.get_selected_procedure()
-
-      if procedure_dict is not None:
-        self.add_item(procedure_dict)
-        dialog.hide()
-    else:
-      dialog.hide()
+  def _on_action_browser_add_procedure(self, _browser, procedure_dict):
+    self.add_item(procedure_dict)
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)

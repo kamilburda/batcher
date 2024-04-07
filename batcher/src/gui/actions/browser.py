@@ -23,7 +23,7 @@ from src import placeholders as placeholders_
 from src.gui.entry import entries as entries_
 
 
-class ActionBrowser:
+class ActionBrowser(GObject.GObject):
 
   _DIALOG_SIZE = 675, 450
   _HPANED_POSITION = 325
@@ -50,7 +50,13 @@ class ActionBrowser:
     [3, GObject.TYPE_STRING],
     [4, GObject.TYPE_PYOBJECT])
 
-  def __init__(self, title=None):
+  __gsignals__ = {
+    'add-procedure': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+  }
+
+  def __init__(self, title=None, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
     self._title = title
 
     self._parent_tree_iters = {}
@@ -84,6 +90,8 @@ class ActionBrowser:
         menu_item.connect('toggled', self._update_search_results)
 
     self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
+
+    self._dialog.connect('response', self._on_dialog_response)
 
   @property
   def widget(self):
@@ -472,3 +480,16 @@ class ActionBrowser:
     else:
       self._label_no_selection.show()
       self._scrolled_window_action_settings.hide()
+
+  def _on_dialog_response(self, dialog, response_id):
+    if response_id == Gtk.ResponseType.OK:
+      procedure_dict = self.get_selected_procedure()
+
+      if procedure_dict is not None:
+        self.emit('add-procedure', procedure_dict)
+        dialog.hide()
+    else:
+      dialog.hide()
+
+
+GObject.type_register(ActionBrowser)
