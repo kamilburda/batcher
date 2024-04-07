@@ -83,6 +83,8 @@ class ActionBrowser:
       if isinstance(menu_item, Gtk.CheckMenuItem):
         menu_item.connect('toggled', self._update_search_results)
 
+    self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
+
   @property
   def widget(self):
     return self._dialog
@@ -266,14 +268,6 @@ class ActionBrowser:
 
     self._tree_view.set_model(self._tree_model_sorted)
 
-    self._scrolled_window_action_list = Gtk.ScrolledWindow(
-      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      propagate_natural_width=True,
-      propagate_natural_height=True,
-    )
-    self._scrolled_window_action_list.add(self._tree_view)
-
     self._entry_search = entries_.ExtendedEntry(
       expandable=False,
       placeholder_text=_('Search'),
@@ -316,6 +310,14 @@ class ActionBrowser:
     self._hbox_search_bar.pack_start(self._entry_search, True, True, 0)
     self._hbox_search_bar.pack_start(self._button_search_settings, False, False, 0)
 
+    self._scrolled_window_action_list = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      propagate_natural_width=True,
+      propagate_natural_height=True,
+    )
+    self._scrolled_window_action_list.add(self._tree_view)
+
     self._vbox_browser = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._VBOX_BROWSER_SPACING,
@@ -323,17 +325,32 @@ class ActionBrowser:
     self._vbox_browser.pack_start(self._hbox_search_bar, False, False, 0)
     self._vbox_browser.pack_start(self._scrolled_window_action_list, True, True, 0)
 
-    self._vbox_action = Gtk.Box(
+    self._vbox_action_settings = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
     )
 
-    self._scrolled_window_action = Gtk.ScrolledWindow(
+    self._scrolled_window_action_settings = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       propagate_natural_width=True,
       propagate_natural_height=True,
     )
-    self._scrolled_window_action.add(self._vbox_action)
+    self._scrolled_window_action_settings.add(self._vbox_action_settings)
+
+    self._label_no_selection = Gtk.Label(
+      label='<i>{}</i>'.format(_('Select a procedure')),
+      xalign=0.5,
+      yalign=0.5,
+      use_markup=True,
+    )
+    self._label_no_selection.show()
+    self._label_no_selection.set_no_show_all(True)
+
+    self._hbox_action_settings = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+    )
+    self._hbox_action_settings.pack_start(self._scrolled_window_action_settings, True, True, 0)
+    self._hbox_action_settings.pack_start(self._label_no_selection, True, True, 0)
 
     self._hpaned = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -342,7 +359,7 @@ class ActionBrowser:
       position=self._HPANED_POSITION,
     )
     self._hpaned.pack1(self._vbox_browser, True, False)
-    self._hpaned.pack2(self._scrolled_window_action, True, True)
+    self._hpaned.pack2(self._hbox_action_settings, True, True)
 
     self._dialog.vbox.pack_start(self._hpaned, True, True, 0)
 
@@ -444,3 +461,14 @@ class ActionBrowser:
 
   def _on_button_search_settings_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
+
+  def _on_tree_view_selection_changed(self, selection):
+    model, selected_iter = self._tree_view.get_selection().get_selected()
+
+    if selected_iter is not None and model.iter_parent(selected_iter) is not None:
+      # TODO: Display action settings
+      self._label_no_selection.hide()
+      self._scrolled_window_action_settings.show()
+    else:
+      self._label_no_selection.show()
+      self._scrolled_window_action_settings.hide()
