@@ -41,11 +41,7 @@ class ActionEditor(GimpUi.Dialog):
     self.set_focus(self._button_close)
 
   def _on_button_reset_clicked(self, _button, action):
-    action['arguments'].reset()
-    action['more_options'].reset()
-
-    action['display_name'].reset()
-    self._set_editable_label_text(action['display_name'].value)
+    self._action_editor_widget.reset()
 
 
 class ActionEditorWidget:
@@ -80,6 +76,13 @@ class ActionEditorWidget:
   @property
   def widget(self):
     return self._vbox
+
+  def reset(self):
+    self._action['arguments'].reset()
+    self._action['more_options'].reset()
+
+    self._action['display_name'].reset()
+    self._set_editable_label_text(self._action['display_name'].value)
 
   def _init_gui(self):
     self._set_up_editable_name(self._action)
