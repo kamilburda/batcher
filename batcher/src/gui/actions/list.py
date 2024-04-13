@@ -109,12 +109,11 @@ class ActionList(pg.gui.ItemBox):
 
     if self._browser is not None:
       self._browser.widget.connect('realize', self._on_action_browser_realize)
-      self._browser.connect('add-procedure', self._on_action_browser_add_procedure)
+      self._browser.connect('confirm-add-action', self._on_action_browser_confirm_add_action)
 
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
-      lambda _actions, action, orig_action_dict: self._add_item_from_action(
-        action))
+      lambda _actions, action, orig_action_dict: self._add_item_from_action(action))
 
     self._after_reorder_action_event_id = self._actions.connect_event(
       'after-reorder-action',
@@ -172,8 +171,8 @@ class ActionList(pg.gui.ItemBox):
     dialog.set_transient_for(pg.gui.get_toplevel_window(self))
     dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
-  def _on_action_browser_add_procedure(self, _browser, procedure_dict):
-    self.add_item(procedure_dict)
+  def _on_action_browser_confirm_add_action(self, _browser, action_dict, _action):
+    self.add_item(action_dict)
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)

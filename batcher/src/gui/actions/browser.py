@@ -34,7 +34,7 @@ class ActionBrowser(GObject.GObject):
 
   _ARROW_ICON_PIXEL_SIZE = 12
 
-  _PROCEDURE_NAME_WIDTH_CHARS = 25
+  _ACTION_NAME_WIDTH_CHARS = 25
 
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
 
@@ -43,15 +43,21 @@ class ActionBrowser(GObject.GObject):
     _COLUMN_ACTION_MENU_NAME,
     _COLUMN_ACTION_DESCRIPTION,
     _COLUMN_ACTION_TYPE,
+    _COLUMN_ACTION_DICT,
     _COLUMN_ACTION) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
     [3, GObject.TYPE_STRING],
-    [4, GObject.TYPE_PYOBJECT])
+    [4, GObject.TYPE_PYOBJECT],
+    [5, GObject.TYPE_PYOBJECT])
 
   __gsignals__ = {
-    'add-procedure': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'action-selected': (
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,GObject.TYPE_PYOBJECT)),
+    'confirm-add-action': (
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,GObject.TYPE_PYOBJECT)),
+    'cancel-add-action': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
 
   def __init__(self, title=None, *args, **kwargs):
@@ -97,14 +103,27 @@ class ActionBrowser(GObject.GObject):
   def widget(self):
     return self._dialog
 
-  def get_selected_procedure(self):
-    model, selected_iter = self._tree_view.get_selection().get_selected()
+  def get_selected_action(self, model=None, selected_iter=None):
+    if model is None and selected_iter is None:
+      model, selected_iter = self._tree_view.get_selection().get_selected()
 
     if selected_iter is not None:
       row = Gtk.TreeModelRow(model, selected_iter)
-      return row[self._COLUMN_ACTION[0]]
+
+      action_dict = row[self._COLUMN_ACTION_DICT[0]]
+      action = row[self._COLUMN_ACTION[0]]
+
+      if action_dict is not None:
+        if action is None:
+          # TODO: Create a new action
+          return action_dict, action
+        else:
+          # TODO: Replace action editor widget with the current action
+          return action_dict, action
+      else:
+        return None, None
     else:
-      return None
+      return None, None
 
   def fill_contents_if_empty(self):
     if self._contents_filled:
@@ -120,44 +139,46 @@ class ActionBrowser(GObject.GObject):
          '',
          '',
          name,
+         None,
          None])
 
     pdb_procedures = [
       Gimp.get_pdb().lookup_procedure(name)
       for name in pdb.gimp_pdb_query('', '', '', '', '', '', '')]
 
-    procedure_dicts = [
+    action_dicts = [
       actions_.get_action_dict_for_pdb_procedure(procedure) for procedure in pdb_procedures]
 
-    for procedure, procedure_dict in zip(pdb_procedures, procedure_dicts):
-      if (procedure_dict['name'].startswith('file-')
-          and (procedure_dict['name'].endswith('-load') or '-load-' in procedure_dict['name'])):
+    for procedure, action_dict in zip(pdb_procedures, action_dicts):
+      if (action_dict['name'].startswith('file-')
+          and (action_dict['name'].endswith('-load') or '-load-' in action_dict['name'])):
         action_type = 'file_load_procedures'
-      elif (procedure_dict['name'].startswith('file-')
-            and (procedure_dict['name'].endswith('-save') or '-save-' in procedure_dict['name'])):
+      elif (action_dict['name'].startswith('file-')
+            and (action_dict['name'].endswith('-save') or '-save-' in action_dict['name'])):
         action_type = 'file_save_procedures'
-      elif (procedure_dict['name'].startswith('plug-in-')
+      elif (action_dict['name'].startswith('plug-in-')
             or procedure.get_proc_type() in [
                 Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.EXTENSION, Gimp.PDBProcType.TEMPORARY]):
-        if self._has_plugin_procedure_image_or_drawable_arguments(procedure_dict):
+        if self._has_plugin_procedure_image_or_drawable_arguments(action_dict):
           action_type = 'plug_ins'
         else:
           action_type = 'other'
       else:
         action_type = 'gimp_procedures'
 
-      if procedure_dict['display_name'] != procedure_dict['name']:
-        display_name = procedure_dict['display_name']
+      if action_dict['display_name'] != action_dict['name']:
+        display_name = action_dict['display_name']
       else:
         display_name = ''
 
       self._tree_model.append(
         self._parent_tree_iters[action_type],
-        [procedure_dict['name'],
+        [action_dict['name'],
          display_name,
-         action_utils_.get_action_description(procedure, procedure_dict),
+         action_utils_.get_action_description(procedure, action_dict),
          action_type,
-         procedure_dict])
+         action_dict,
+         None])
 
     self._tree_view.expand_row(
       self._tree_model[self._predefined_parent_tree_iter_names.index('plug_ins')].path,
@@ -237,7 +258,7 @@ class ActionBrowser(GObject.GObject):
     column_name.set_sort_column_id(self._COLUMN_ACTION_NAME[0])
 
     cell_renderer_action_name = Gtk.CellRendererText(
-      width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
+      width_chars=self._ACTION_NAME_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
     column_name.pack_start(cell_renderer_action_name, False)
@@ -253,7 +274,7 @@ class ActionBrowser(GObject.GObject):
     column_menu_name.set_sort_column_id(self._COLUMN_ACTION_MENU_NAME[0])
 
     cell_renderer_action_menu_name = Gtk.CellRendererText(
-      width_chars=self._PROCEDURE_NAME_WIDTH_CHARS,
+      width_chars=self._ACTION_NAME_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
     column_menu_name.pack_start(cell_renderer_action_menu_name, False)
@@ -471,11 +492,15 @@ class ActionBrowser(GObject.GObject):
     pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
-    model, selected_iter = self._tree_view.get_selection().get_selected()
+    model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      # TODO: Display action settings
+      self.emit('action-selected', *self.get_selected_action(model, selected_iter))
+
       self._label_no_selection.hide()
+      # TODO: Display action settings
+      # ...
+
       self._scrolled_window_action_settings.show()
     else:
       self._label_no_selection.show()
@@ -483,12 +508,13 @@ class ActionBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      procedure_dict = self.get_selected_procedure()
+      action_dict, action = self.get_selected_action()
 
-      if procedure_dict is not None:
-        self.emit('add-procedure', procedure_dict)
+      if action_dict is not None:
+        self.emit('confirm-add-action', action_dict, action)
         dialog.hide()
     else:
+      self.emit('cancel-add-action')
       dialog.hide()
 
 
