@@ -262,11 +262,13 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   @property
   def name(self) -> str:
     """A string that identifies the setting.
-    
-    The name must be unique within a `setting.Group` instance.
+
+    The name must be unique within a `setting.Group` instance. If it is not, you
+    may call `uniquify_name()` to modify the name to be unique within that
+    group.
     """
     return self._name
-  
+
   @property
   def value(self):
     """The setting value.
@@ -390,7 +392,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   def __repr__(self) -> str:
     return pgutils.reprify_object(self, self.name)
-  
+
   def get_path(self, relative_path_group: Union['setting.Group', str, None] = None) -> str:
     """Returns the full path of this setting.
 
@@ -534,7 +536,15 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     )
     
     self.invoke_event('after-set-gui')
-  
+
+  def uniquify_name(self, group: 'setting.Group'):
+    """Modifies the ``name`` attribute to be unique within all immediate
+    children of the specified ``group``.
+
+    See `pygimplib.setting.utils.get_unique_setting_name` for more information.
+    """
+    self._name = utils_.get_unique_setting_name(self.name, group)
+
   def load(self, *args, **kwargs) -> persistor_.PersistorResult:
     """Loads a value for the current setting from the specified setting
     source(s).

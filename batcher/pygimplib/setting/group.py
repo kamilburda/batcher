@@ -200,7 +200,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     """
     return utils_.get_setting_path(self, relative_path_group)
   
-  def add(self, settings_groups_or_dicts):
+  def add(self, settings_groups_or_dicts, uniquify_name=False):
     """Adds settings and groups to this group.
 
     `settings_groups_or_dicts` is a list or list-like that can contain
@@ -234,18 +234,25 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     attributes specified during the initialization of this class via
     `setting_attributes`. These attributes can be overridden by attributes in
     individual settings.
+
+    If ``uniquify_name`` is ``True``, then the ``name`` attribute is made unique
+    within the group. Otherwise, `ValueError` is raised if a setting with the
+    same name already exists in the group.
     """
     for setting in settings_groups_or_dicts:
       if isinstance(setting, (settings_.Setting, Group)):
-        setting = self._add_setting(setting)
+        setting = self._add_setting(setting, uniquify_name)
       else:
-        setting = self._create_setting(setting)
+        setting = self._create_setting(setting, uniquify_name)
       
       self._set_as_parent_for_setting(setting)
   
-  def _add_setting(self, setting):
+  def _add_setting(self, setting, uniquify_name):
     if setting.name in self._settings:
-      raise ValueError(f'{setting} already exists in {self}')
+      if uniquify_name:
+        setting.uniquify_name(self)
+      else:
+        raise ValueError(f'{setting} already exists in {self}')
     
     if setting == self:
       raise ValueError(f'cannot add {setting} as a child of itself')
@@ -255,7 +262,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     
     return setting
   
-  def _create_setting(self, setting_data):
+  def _create_setting(self, setting_data, uniquify_name):
     try:
       setting_type = setting_data['type']
     except KeyError:
@@ -278,7 +285,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
          f' path separator "{utils_.SETTING_PATH_SEPARATOR}"'))
     
     if setting_data_copy['name'] in self._settings:
-      raise ValueError(f'setting "{setting_data_copy["name"]}" already exists')
+      if uniquify_name:
+        setting_data_copy['name'] = utils_.get_unique_setting_name(setting_data_copy['name'], self)
+      else:
+        raise ValueError(f'setting "{setting_data_copy["name"]}" already exists')
     
     for setting_attribute, setting_attribute_value in self._get_setting_attributes().items():
       if setting_attribute not in setting_data_copy:

@@ -95,6 +95,12 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
   def test_add_with_same_name_in_same_group(self):
     with self.assertRaises(ValueError):
       self.settings.add([self.setting_dict, self.setting_dict])
+
+  def test_add_with_same_name_in_same_group_if_uniquify_is_true(self):
+    self.settings.add([self.setting_dict, self.setting_dict], uniquify_name=True)
+
+    self.assertIn('use_layer_size', self.settings)
+    self.assertIn('use_layer_size_2', self.settings)
   
   def test_add_multiple_dicts_with_same_name_in_different_child_groups(self):
     special_settings = group_.Group('special')
@@ -256,6 +262,12 @@ class TestGroup(unittest.TestCase):
   def test_add_same_setting_in_same_group(self):
     with self.assertRaises(ValueError):
       self.special_settings.add([self.special_settings['first_plugin_run']])
+
+  def test_add_same_setting_in_same_group_if_uniquify_is_true(self):
+    self.special_settings.add([self.special_settings['first_plugin_run']], uniquify_name=True)
+
+    self.assertIn('first_plugin_run', self.special_settings)
+    self.assertIn('first_plugin_run_2', self.special_settings)
   
   def test_add_same_setting_in_different_child_groups(self):
     self.settings.add([self.special_settings['first_plugin_run'], self.special_settings])

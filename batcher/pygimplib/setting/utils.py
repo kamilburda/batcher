@@ -271,6 +271,47 @@ class SettingEventsMixin:
         event_handler(self, *event_handler_args, **event_handler_kwargs)
 
 
+def check_setting_name(setting_name: str):
+  """Checks if the specified setting name is valid.
+
+  A setting name must not contain `SETTING_PATH_SEPARATOR` or
+  `SETTING_ATTRIBUTE_SEPARATOR`.
+
+  If the setting name is not valid, `ValueError` is raised.
+  """
+  if not isinstance(setting_name, str):
+    raise TypeError('setting name must be a string')
+
+  if SETTING_PATH_SEPARATOR in setting_name or SETTING_ATTRIBUTE_SEPARATOR in setting_name:
+    raise ValueError(f'setting name "{setting_name}" is not valid')
+
+
+def get_unique_setting_name(setting_name: str, group: 'setting.Group') -> str:
+  """Returns a setting name modified to be unique within all immediate children
+  of the specified ``group``.
+
+  To make the name unique, ``'_2'`` is appended. If such a name exists, ``_3``
+  is appended instead, and so on.
+
+  Args:
+    setting_name: A setting name to be made unique.
+    group: A setting group to compare ``setting_name`` against.
+
+  Returns:
+    A setting name made unique, or ``setting_name`` if no modification is
+    necessary.
+  """
+  children_names = set(setting.name for setting in group)
+
+  new_setting_name = setting_name
+  i = 2
+  while new_setting_name in children_names:
+    new_setting_name = f'{setting_name}_{i}'
+    i += 1
+
+  return new_setting_name
+
+
 def get_pdb_name(setting_name: str) -> str:
   """Returns a setting name suitable for the description of the setting in the
   GIMP Procedural Database (PDB).
@@ -360,18 +401,3 @@ def get_setting_path(
         return setting_path[len(root_path + separator):]
     
     return setting_path
-
-
-def check_setting_name(setting_name: str):
-  """Checks if the specified setting name is valid.
-
-  A setting name must not contain `SETTING_PATH_SEPARATOR` or
-  `SETTING_ATTRIBUTE_SEPARATOR`.
-
-  If the setting name is not valid, `ValueError` is raised.
-  """
-  if not isinstance(setting_name, str):
-    raise TypeError('setting name must be a string')
-  
-  if SETTING_PATH_SEPARATOR in setting_name or SETTING_ATTRIBUTE_SEPARATOR in setting_name:
-    raise ValueError(f'setting name "{setting_name}" is not valid')
