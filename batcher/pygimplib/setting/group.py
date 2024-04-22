@@ -564,6 +564,14 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     
     for setting in self.walk(include_setting_func=_has_ignore_reset_tag):
       setting.reset()
+
+  def uniquify_name(self, group: 'setting.Group'):
+    """Modifies the ``name`` attribute to be unique within all immediate
+    children of the specified ``group``.
+
+    See `pygimplib.setting.utils.get_unique_setting_name` for more information.
+    """
+    self._name = utils_.get_unique_setting_name(self.name, group)
   
   def load(self, *args, **kwargs):
     """Loads child settings from the specified source(s).

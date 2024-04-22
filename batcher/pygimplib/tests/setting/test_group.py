@@ -286,6 +286,13 @@ class TestGroup(unittest.TestCase):
     self.settings.add([self.special_settings])
     with self.assertRaises(ValueError):
       self.settings.add([self.special_settings])
+
+  def test_add_same_group_in_same_group_if_uniquify_is_true(self):
+    self.settings.add([self.special_settings])
+    self.settings.add([self.special_settings], uniquify_name=True)
+
+    self.assertIn('special', self.settings)
+    self.assertIn('special', self.settings)
   
   def test_add_same_group_as_child_of_itself(self):
     with self.assertRaises(ValueError):
