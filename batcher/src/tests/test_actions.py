@@ -768,5 +768,5 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
     
     action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
     
-    self.assertEqual(action_dict['arguments'][-2]['type'], 'placeholder_image')
-    self.assertEqual(action_dict['arguments'][-1]['type'], 'placeholder_layer')
+    self.assertEqual(action_dict['arguments'][-2]['type'], placeholders_.PlaceholderImageSetting)
+    self.assertEqual(action_dict['arguments'][-1]['type'], placeholders_.PlaceholderLayerSetting)
