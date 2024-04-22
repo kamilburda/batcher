@@ -273,7 +273,7 @@ def add(
 
     _uniquify_name_and_display_name(actions, action_dict)
 
-    action = create_action(**action_dict)
+    action = create_action(action_dict)
 
     actions.add([action])
 
@@ -343,27 +343,29 @@ def _uniquify_action_display_name(actions, display_name):
       generator=_generate_unique_display_name()))
 
 
-def create_action(**kwargs):
-  """Creates a single action given the supplied keyword arguments.
+def create_action(action_dict):
+  """Creates a single action given the supplied dictionary.
 
-  At the very least, ``**kwargs`` must contain the following key-value pairs:
+  At the very least, ``action_dict`` must contain the following key-value pairs:
 
-  * ``name`` - represents the action name,
-  * ``type`` - represents the action type. Only the following values are
+  * ``'name'`` - represents the action name,
+  * ``'type'`` - represents the action type. Only the following values are
     allowed: ``'procedure'``, ``'constraint'``.
 
-  For the list of available arguments beside ``name`` and ``type``, see
+  For the list of available key-value pairs beside ``name`` and ``type``, see
   `create()`.
 
   An action created by this function is not added to a group of actions. Use
   `add()` to add an existing action to an existing action group.
   """
-  type_ = kwargs.pop('type', _DEFAULT_ACTION_TYPE)
+  action_dict_copy = dict(action_dict)
+
+  type_ = action_dict_copy.pop('type', _DEFAULT_ACTION_TYPE)
   
   if type_ not in _ACTION_TYPES_AND_FUNCTIONS:
     raise ValueError(f'invalid type "{type_}"; valid values: {list(_ACTION_TYPES_AND_FUNCTIONS)}')
   
-  return _ACTION_TYPES_AND_FUNCTIONS[type_](**kwargs)
+  return _ACTION_TYPES_AND_FUNCTIONS[type_](**action_dict_copy)
 
 
 def _create_action(

@@ -161,7 +161,7 @@ class TestManageActions(unittest.TestCase):
     self.assertEqual(action, self.procedures['autocrop'])
 
   def test_add_action_as_instance(self, mock_get_pdb):
-    autocrop_action = actions_.create_action(**self.autocrop_dict)
+    autocrop_action = actions_.create_action(self.autocrop_dict)
 
     actions_.add(self.procedures, autocrop_action)
 
@@ -169,8 +169,8 @@ class TestManageActions(unittest.TestCase):
     self.assertEqual(autocrop_action, self.procedures['autocrop'])
 
   def test_add_action_as_instance_with_the_same_name(self, mock_get_pdb):
-    autocrop_action = actions_.create_action(**self.autocrop_dict)
-    autocrop_action_2 = actions_.create_action(**self.autocrop_dict)
+    autocrop_action = actions_.create_action(self.autocrop_dict)
+    autocrop_action_2 = actions_.create_action(self.autocrop_dict)
 
     actions_.add(self.procedures, autocrop_action)
     actions_.add(self.procedures, autocrop_action_2)
