@@ -11,7 +11,10 @@ containing actions. These events include:
   * calling `clear()` before resetting actions (due to initial actions
     being added back).
   
-  Arguments: action dictionary to be added
+  Arguments:
+
+  * action dictionary or existing action to be added, depending on the type
+    passed to `add()`.
 
 * ``'after-add-action'``: invoked when:
   * calling `add()` after adding an action,
@@ -24,10 +27,10 @@ containing actions. These events include:
   
   * created action,
   
-  * original action dictionary (same as in ``'before-add-action'``). When this
-    event is triggered in `setting.Group.load()` or `setting.Persistor.load()`,
-    this argument is ``None`` as there is no way to obtain the original
-    dictionary.
+  * original action dictionary (same as in ``'before-add-action'``). When
+    this event is triggered in `setting.Group.load()` or
+    `setting.Persistor.load()`, or when an action was passed to `add()`,
+    this argument is ``None`` as there is no way to obtain it.
 
 * ``'before-reorder-action'``: invoked when calling `reorder()` before
   reordering an action.
@@ -223,15 +226,16 @@ def _set_up_action_after_loading(actions):
 
 
 def add(
-      actions: pg.setting.Group, action_dict_or_pdb_proc_name: Union[Dict[str, Any], str],
+      actions: pg.setting.Group,
+      action_dict_or_pdb_proc_name_or_action: Union[Dict[str, Any], str, pg.setting.Group],
 ) -> pg.setting.Group:
-  """Creates a new action and adds it to ``actions``.
+  """Adds a new or existing action to ``actions``.
 
-  The added action is a `pygimplib.setting.Group` instance.
-
-  ``action_dict_or_function`` can be one of the following:
-  * a dictionary - see `create()` for the required and accepted fields.
-  * a GIMP PDB procedure name.
+  ``action_dict_or_pdb_proc_name_or_action`` can be one of the following:
+  * a dictionary - see `create()` for the required and accepted fields,
+  * a GIMP PDB procedure name,
+  * an existing `pygimplib.setting.Group` instance representing an action,
+    created via `create_action()`.
 
   The same action can be added multiple times. Each action will be
   assigned a unique name and display name (e.g. ``'rename'`` and ``'Rename'``
@@ -244,30 +248,47 @@ def add(
   Returns:
     The added action.
   """
-  if isinstance(action_dict_or_pdb_proc_name, dict):
-    action_dict = dict(action_dict_or_pdb_proc_name)
+  action_dict = None
+  action = None
+
+  if isinstance(action_dict_or_pdb_proc_name_or_action, dict):
+    action_dict = dict(action_dict_or_pdb_proc_name_or_action)
+  elif isinstance(action_dict_or_pdb_proc_name_or_action, pg.setting.Group):
+    action = action_dict_or_pdb_proc_name_or_action
   else:
-    if action_dict_or_pdb_proc_name in pdb:
-      action_dict = get_action_dict_for_pdb_procedure(action_dict_or_pdb_proc_name)
+    if action_dict_or_pdb_proc_name_or_action in pdb:
+      action_dict = get_action_dict_for_pdb_procedure(action_dict_or_pdb_proc_name_or_action)
     else:
       raise TypeError(
-        f'"{action_dict_or_pdb_proc_name}" is not a valid GIMP PDB procedure name')
-  
-  _check_required_fields(action_dict)
-  
-  orig_action_dict = dict(action_dict)
-  
-  actions.invoke_event('before-add-action', action_dict)
+        f'"{action_dict_or_pdb_proc_name_or_action}" is not a valid GIMP PDB procedure name')
 
-  action_dict['orig_name'] = action_dict['name']
+  if action_dict is not None:
+    _check_required_fields(action_dict)
 
-  _uniquify_name_and_display_name(actions, action_dict)
-  
-  action = _create_action_by_type(**action_dict)
-  
-  actions.add([action])
-  
-  actions.invoke_event('after-add-action', action, orig_action_dict)
+    orig_action_dict = dict(action_dict)
+
+    actions.invoke_event('before-add-action', action_dict)
+
+    action_dict['orig_name'] = action_dict['name']
+
+    _uniquify_name_and_display_name(actions, action_dict)
+
+    action = create_action(**action_dict)
+
+    actions.add([action])
+
+    actions.invoke_event('after-add-action', action, orig_action_dict)
+  else:  # action is not None
+    actions.invoke_event('before-add-action', action)
+
+    action.uniquify_name(actions)
+
+    action['display_name'].set_value(
+      _uniquify_action_display_name(actions, action['display_name'].value))
+
+    actions.add([action])
+
+    actions.invoke_event('after-add-action', action, None)
   
   return action
 
@@ -322,7 +343,21 @@ def _uniquify_action_display_name(actions, display_name):
       generator=_generate_unique_display_name()))
 
 
-def _create_action_by_type(**kwargs):
+def create_action(**kwargs):
+  """Creates a single action given the supplied keyword arguments.
+
+  At the very least, ``**kwargs`` must contain the following key-value pairs:
+
+  * ``name`` - represents the action name,
+  * ``type`` - represents the action type. Only the following values are
+    allowed: ``'procedure'``, ``'constraint'``.
+
+  For the list of available arguments beside ``name`` and ``type``, see
+  `create()`.
+
+  An action created by this function is not added to a group of actions. Use
+  `add()` to add an existing action to an existing action group.
+  """
   type_ = kwargs.pop('type', _DEFAULT_ACTION_TYPE)
   
   if type_ not in _ACTION_TYPES_AND_FUNCTIONS:

@@ -154,12 +154,33 @@ class TestManageActions(unittest.TestCase):
     
     self.expected_dict = dict({'orig_name': 'autocrop'}, **self.autocrop_dict)
   
-  def test_add(self, mock_get_pdb):
+  def test_add_action_as_dict(self, mock_get_pdb):
     action = actions_.add(self.procedures, self.autocrop_dict)
     
     self.assertEqual(len(self.procedures), 1)
     self.assertEqual(action, self.procedures['autocrop'])
-  
+
+  def test_add_action_as_instance(self, mock_get_pdb):
+    autocrop_action = actions_.create_action(**self.autocrop_dict)
+
+    actions_.add(self.procedures, autocrop_action)
+
+    self.assertEqual(len(self.procedures), 1)
+    self.assertEqual(autocrop_action, self.procedures['autocrop'])
+
+  def test_add_action_as_instance_with_the_same_name(self, mock_get_pdb):
+    autocrop_action = actions_.create_action(**self.autocrop_dict)
+    autocrop_action_2 = actions_.create_action(**self.autocrop_dict)
+
+    actions_.add(self.procedures, autocrop_action)
+    actions_.add(self.procedures, autocrop_action_2)
+
+    self.assertEqual(len(self.procedures), 2)
+    self.assertEqual(autocrop_action, self.procedures['autocrop'])
+    self.assertEqual(autocrop_action_2, self.procedures['autocrop_2'])
+    self.assertEqual(autocrop_action['display_name'].value, 'Autocrop')
+    self.assertEqual(autocrop_action_2['display_name'].value, 'Autocrop (2)')
+
   def test_add_passing_invalid_object_raises_error(self, mock_get_pdb):
     with self.assertRaises(TypeError):
       actions_.add(self.procedures, 'invalid_object')

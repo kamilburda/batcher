@@ -137,10 +137,10 @@ class ActionList(pg.gui.ItemBox):
 
   def add_item(
         self,
-        action_dict_or_pdb_proc_name: Union[Dict[str, Any], str],
+        action_dict_or_pdb_proc_name_or_action: Union[Dict[str, Any], str, pg.setting.Group],
   ) -> action_item_.ActionItem:
     self._actions.set_event_enabled(self._after_add_action_event_id, False)
-    action = actions_.add(self._actions, action_dict_or_pdb_proc_name)
+    action = actions_.add(self._actions, action_dict_or_pdb_proc_name_or_action)
     self._actions.set_event_enabled(self._after_add_action_event_id, True)
 
     item = self._add_item_from_action(action)
@@ -286,10 +286,8 @@ class ActionList(pg.gui.ItemBox):
         current_parent_menu = self._builtin_actions_submenus[
           current_names].get_submenu()
 
-    menu_item = Gtk.MenuItem(label=action_dict['display_name'],
-                             use_underline=False)
-    menu_item.connect('activate', self._on_actions_menu_item_activate,
-                      action_dict)
+    menu_item = Gtk.MenuItem(label=action_dict['display_name'], use_underline=False)
+    menu_item.connect('activate', self._on_actions_menu_item_activate, action_dict)
 
     current_parent_menu.append(menu_item)
 
