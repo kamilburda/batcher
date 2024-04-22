@@ -74,6 +74,10 @@ class ActionEditorWidget:
     self._init_gui()
 
   @property
+  def action(self):
+    return self._action
+
+  @property
   def widget(self):
     return self._vbox
 

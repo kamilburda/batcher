@@ -16,6 +16,7 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
+from . import editor as action_editor_
 from . import utils as action_utils_
 
 from src import actions as actions_
@@ -44,7 +45,7 @@ class ActionBrowser(GObject.GObject):
     _COLUMN_ACTION_DESCRIPTION,
     _COLUMN_ACTION_TYPE,
     _COLUMN_ACTION_DICT,
-    _COLUMN_ACTION) = (
+    _COLUMN_ACTION_EDITOR) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
@@ -111,19 +112,29 @@ class ActionBrowser(GObject.GObject):
       row = Gtk.TreeModelRow(model, selected_iter)
 
       action_dict = row[self._COLUMN_ACTION_DICT[0]]
-      action = row[self._COLUMN_ACTION[0]]
+      action_editor = row[self._COLUMN_ACTION_EDITOR[0]]
 
       if action_dict is not None:
-        if action is None:
-          # TODO: Create a new action
-          return action_dict, action
+        if action_editor is None:
+          action = actions_.create_action(action_dict)
+
+          action.initialize_gui()
+
+          action_editor = action_editor_.ActionEditorWidget(action, self.widget)
+
+          model.get_model().set_value(
+            model.convert_iter_to_child_iter(selected_iter),
+            self._COLUMN_ACTION_EDITOR[0],
+            action_editor,
+          )
+
+          return action_dict, action, action_editor
         else:
-          # TODO: Replace action editor widget with the current action
-          return action_dict, action
+          return action_dict, action_editor.action, action_editor
       else:
-        return None, None
+        return None, None, None
     else:
-      return None, None
+      return None, None, None
 
   def fill_contents_if_empty(self):
     if self._contents_filled:
@@ -354,17 +365,12 @@ class ActionBrowser(GObject.GObject):
     self._vbox_browser.pack_start(self._hbox_search_bar, False, False, 0)
     self._vbox_browser.pack_start(self._scrolled_window_action_list, True, True, 0)
 
-    self._vbox_action_settings = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-    )
-
     self._scrolled_window_action_settings = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       propagate_natural_width=True,
       propagate_natural_height=True,
     )
-    self._scrolled_window_action_settings.add(self._vbox_action_settings)
 
     self._label_no_selection = Gtk.Label(
       label='<i>{}</i>'.format(_('Select a procedure')),
@@ -495,11 +501,17 @@ class ActionBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      self.emit('action-selected', *self.get_selected_action(model, selected_iter))
+      action_dict, action, action_editor = self.get_selected_action(model, selected_iter)
+
+      self.emit('action-selected', action_dict, action)
 
       self._label_no_selection.hide()
-      # TODO: Display action settings
-      # ...
+
+      for child in self._scrolled_window_action_settings:
+        self._scrolled_window_action_settings.remove(child)
+
+      action_editor.widget.show_all()
+      self._scrolled_window_action_settings.add(action_editor.widget)
 
       self._scrolled_window_action_settings.show()
     else:
@@ -508,7 +520,7 @@ class ActionBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      action_dict, action = self.get_selected_action()
+      action_dict, action, _action_editor = self.get_selected_action()
 
       if action_dict is not None:
         self.emit('confirm-add-action', action_dict, action)

@@ -171,8 +171,8 @@ class ActionList(pg.gui.ItemBox):
     dialog.set_transient_for(pg.gui.get_toplevel_window(self))
     dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
-  def _on_action_browser_confirm_add_action(self, _browser, action_dict, _action):
-    self.add_item(action_dict)
+  def _on_action_browser_confirm_add_action(self, _browser, _action_dict, action):
+    self.add_item(_action_dict)
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
