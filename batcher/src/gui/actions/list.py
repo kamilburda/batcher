@@ -105,11 +105,16 @@ class ActionList(pg.gui.ItemBox):
     else:
       self._browser = None
 
+    self._current_temporary_action = None
+    self._current_temporary_action_item = None
+
     self._init_gui()
 
     if self._browser is not None:
       self._browser.widget.connect('realize', self._on_action_browser_realize)
+      self._browser.connect('action-selected', self._on_action_browser_action_selected)
       self._browser.connect('confirm-add-action', self._on_action_browser_confirm_add_action)
+      self._browser.connect('cancel-add-action', self._on_action_browser_cancel_add_action)
 
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
@@ -138,12 +143,13 @@ class ActionList(pg.gui.ItemBox):
   def add_item(
         self,
         action_dict_or_pdb_proc_name_or_action: Union[Dict[str, Any], str, pg.setting.Group],
+        attach_editor_widget=True,
   ) -> action_item_.ActionItem:
     self._actions.set_event_enabled(self._after_add_action_event_id, False)
     action = actions_.add(self._actions, action_dict_or_pdb_proc_name_or_action)
     self._actions.set_event_enabled(self._after_add_action_event_id, True)
 
-    item = self._add_item_from_action(action)
+    item = self._add_item_from_action(action, attach_editor_widget=attach_editor_widget)
 
     self.emit('action-list-item-added-interactive', item)
 
@@ -168,11 +174,29 @@ class ActionList(pg.gui.ItemBox):
     self.emit('action-list-item-removed', item)
 
   def _on_action_browser_realize(self, dialog):
-    dialog.set_transient_for(pg.gui.get_toplevel_window(self))
     dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
-  def _on_action_browser_confirm_add_action(self, _browser, _action_dict, action):
-    self.add_item(_action_dict)
+  def _on_action_browser_action_selected(self, _browser, action):
+    if self._current_temporary_action != action:
+      if self._current_temporary_action_item:
+        self.remove_item(self._current_temporary_action_item)
+
+      self._current_temporary_action = action
+      self._current_temporary_action_item = self.add_item(action, attach_editor_widget=False)
+
+  def _on_action_browser_confirm_add_action(self, _browser, _action, action_editor):
+    if self._current_temporary_action_item:
+      self._current_temporary_action_item.editor.attach_editor_widget(action_editor)
+
+      self._current_temporary_action = None
+      self._current_temporary_action_item = None
+
+  def _on_action_browser_cancel_add_action(self, _browser):
+    if self._current_temporary_action_item:
+      self.remove_item(self._current_temporary_action_item)
+
+      self._current_temporary_action = None
+      self._current_temporary_action_item = None
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
@@ -206,10 +230,10 @@ class ActionList(pg.gui.ItemBox):
     self._builtin_actions_submenus = {}
     self._init_actions_menu_popup()
 
-  def _add_item_from_action(self, action):
+  def _add_item_from_action(self, action, attach_editor_widget=True):
     action.initialize_gui()
 
-    item = action_item_.ActionItem(action)
+    item = action_item_.ActionItem(action, attach_editor_widget=attach_editor_widget)
 
     super().add_item(item)
 

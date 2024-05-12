@@ -21,8 +21,10 @@ class ActionItem(pg.gui.ItemBoxItem):
   _DRAG_ICON_WIDTH = 250
   _DRAG_ICON_BORDER_WIDTH = 4
 
-  def __init__(self, action):
+  def __init__(self, action, attach_editor_widget=True):
     self._action = action
+    self._attach_editor_widget = attach_editor_widget
+
     self._display_warning_message_event_id = None
     self._drag_icon_window = None
 
@@ -131,6 +133,7 @@ class ActionItem(pg.gui.ItemBoxItem):
     self._editor = action_editor_.ActionEditor(
       self._action,
       self.widget,
+      attach_editor_widget=self._attach_editor_widget,
       title=self._action['display_name'].value,
       role=pg.config.PLUGIN_NAME,
     )

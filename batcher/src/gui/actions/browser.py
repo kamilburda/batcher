@@ -55,9 +55,9 @@ class ActionBrowser(GObject.GObject):
 
   __gsignals__ = {
     'action-selected': (
-      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,GObject.TYPE_PYOBJECT)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'confirm-add-action': (
-      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,GObject.TYPE_PYOBJECT)),
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
     'cancel-add-action': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
 
@@ -103,38 +103,6 @@ class ActionBrowser(GObject.GObject):
   @property
   def widget(self):
     return self._dialog
-
-  def get_selected_action(self, model=None, selected_iter=None):
-    if model is None and selected_iter is None:
-      model, selected_iter = self._tree_view.get_selection().get_selected()
-
-    if selected_iter is not None:
-      row = Gtk.TreeModelRow(model, selected_iter)
-
-      action_dict = row[self._COLUMN_ACTION_DICT[0]]
-      action_editor = row[self._COLUMN_ACTION_EDITOR[0]]
-
-      if action_dict is not None:
-        if action_editor is None:
-          action = actions_.create_action(action_dict)
-
-          action.initialize_gui()
-
-          action_editor = action_editor_.ActionEditorWidget(action, self.widget)
-
-          model.get_model().set_value(
-            model.convert_iter_to_child_iter(selected_iter),
-            self._COLUMN_ACTION_EDITOR[0],
-            action_editor,
-          )
-
-          return action_dict, action, action_editor
-        else:
-          return action_dict, action_editor.action, action_editor
-      else:
-        return None, None, None
-    else:
-      return None, None, None
 
   def fill_contents_if_empty(self):
     if self._contents_filled:
@@ -201,6 +169,28 @@ class ActionBrowser(GObject.GObject):
     first_selectable_row = self._tree_model[0].iterchildren().next()
     if first_selectable_row is not None:
       self._tree_view.set_cursor(first_selectable_row.path)
+
+  def _get_selected_action(self, model=None, selected_iter=None):
+    if model is None and selected_iter is None:
+      model, selected_iter = self._tree_view.get_selection().get_selected()
+
+    if selected_iter is not None:
+      row = Gtk.TreeModelRow(model, selected_iter)
+
+      action_dict = row[self._COLUMN_ACTION_DICT[0]]
+      action_editor = row[self._COLUMN_ACTION_EDITOR[0]]
+
+      selected_child_iter = model.convert_iter_to_child_iter(selected_iter)
+
+      if action_dict is not None:
+        if action_editor is None:
+          action_editor = self._add_action_editor_to_model(action_dict, model, selected_child_iter)
+
+        return action_dict, action_editor.action, action_editor, model, selected_child_iter
+      else:
+        return None, None, None, model, selected_child_iter
+    else:
+      return None, None, None, model, None
 
   def _has_plugin_procedure_image_or_drawable_arguments(self, action_dict):
     if not action_dict['arguments']:
@@ -498,20 +488,20 @@ class ActionBrowser(GObject.GObject):
     pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
+    print('_on_tree_view_selection_changed')
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      action_dict, action, action_editor = self.get_selected_action(model, selected_iter)
+      _action_dict, action, action_editor, _model, _iter = self._get_selected_action(
+        model, selected_iter)
 
-      self.emit('action-selected', action_dict, action)
+      self.emit('action-selected', action)
 
       self._label_no_selection.hide()
 
-      for child in self._scrolled_window_action_settings:
-        self._scrolled_window_action_settings.remove(child)
+      self._detach_action_editor()
 
-      action_editor.widget.show_all()
-      self._scrolled_window_action_settings.add(action_editor.widget)
+      self._attach_action_editor(action_editor)
 
       self._scrolled_window_action_settings.show()
     else:
@@ -520,14 +510,52 @@ class ActionBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      action_dict, action, _action_editor = self.get_selected_action()
+      action_dict, action, action_editor, model, selected_child_iter = self._get_selected_action()
 
-      if action_dict is not None:
-        self.emit('confirm-add-action', action_dict, action)
+      if action is not None:
+        self._detach_action_editor()
+        self._remove_action_editor_from_model(model, selected_child_iter)
+
+        self.emit('confirm-add-action', action, action_editor)
+
+        new_action_editor = self._add_action_editor_to_model(
+          action_dict, model, selected_child_iter)
+        self._attach_action_editor(new_action_editor)
+
         dialog.hide()
     else:
       self.emit('cancel-add-action')
       dialog.hide()
+
+  def _attach_action_editor(self, action_editor):
+    action_editor.widget.show_all()
+    self._scrolled_window_action_settings.add(action_editor.widget)
+
+  def _detach_action_editor(self):
+    for child in self._scrolled_window_action_settings:
+      self._scrolled_window_action_settings.remove(child)
+
+  def _add_action_editor_to_model(self, action_dict, model, selected_child_iter):
+    action = actions_.create_action(action_dict)
+
+    action.initialize_gui()
+
+    action_editor = action_editor_.ActionEditorWidget(action, self.widget)
+
+    model.get_model().set_value(
+      selected_child_iter,
+      self._COLUMN_ACTION_EDITOR[0],
+      action_editor,
+    )
+
+    return action_editor
+
+  def _remove_action_editor_from_model(self, model, selected_child_iter):
+    model.get_model().set_value(
+      selected_child_iter,
+      self._COLUMN_ACTION_EDITOR[0],
+      None,
+    )
 
 
 GObject.type_register(ActionBrowser)

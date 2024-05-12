@@ -22,15 +22,16 @@ from src.gui import popup_hide_context as popup_hide_context_
 
 class ActionEditor(GimpUi.Dialog):
 
-  def __init__(self, action, *args, **kwargs):
+  def __init__(self, action, *args, attach_editor_widget=True, **kwargs):
     super().__init__(*args, **kwargs)
 
     self.set_resizable(False)
     self.connect('delete-event', lambda *_args: self.hide_on_delete())
 
-    self._action_editor_widget = ActionEditorWidget(action, self)
+    self._action_editor_widget = None
 
-    self.vbox.pack_start(self._action_editor_widget.widget, False, False, 0)
+    if attach_editor_widget:
+      self.attach_editor_widget(ActionEditorWidget(action, self))
 
     self._button_reset_response_id = 1
     self._button_reset = self.add_button(_('Reset'), self._button_reset_response_id)
@@ -39,6 +40,13 @@ class ActionEditor(GimpUi.Dialog):
     self._button_close = self.add_button(_('Close'), Gtk.ResponseType.CLOSE)
 
     self.set_focus(self._button_close)
+
+  def attach_editor_widget(self, widget):
+    if self._action_editor_widget is not None:
+      raise ValueError('an ActionEditorWidget is already attached to this ActionEditor')
+
+    self._action_editor_widget = widget
+    self.vbox.pack_start(self._action_editor_widget.widget, False, False, 0)
 
   def _on_button_reset_clicked(self, _button, action):
     self._action_editor_widget.reset()
