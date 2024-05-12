@@ -319,8 +319,7 @@ class ActionList(pg.gui.ItemBox):
     self.add_item(action_dict)
 
   def _add_add_custom_action_to_menu_popup(self):
-    menu_item = Gtk.MenuItem(label=self._add_custom_action_text,
-                             use_underline=False)
+    menu_item = Gtk.MenuItem(label=self._add_custom_action_text, use_underline=False)
     menu_item.connect('activate', self._on_add_custom_action_menu_item_activate)
     self._actions_menu.append(menu_item)
 

@@ -84,6 +84,7 @@ class ActionBrowser(GObject.GObject):
     ]
 
     self._contents_filled = False
+    self._currently_filling_contents = False
 
     self._init_gui()
 
@@ -98,6 +99,7 @@ class ActionBrowser(GObject.GObject):
 
     self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
 
+    self._dialog.connect('show', self._on_dialog_show)
     self._dialog.connect('response', self._on_dialog_response)
 
   @property
@@ -168,7 +170,11 @@ class ActionBrowser(GObject.GObject):
 
     first_selectable_row = self._tree_model[0].iterchildren().next()
     if first_selectable_row is not None:
+      self._currently_filling_contents = True
+
       self._tree_view.set_cursor(first_selectable_row.path)
+
+      self._currently_filling_contents = False
 
   def _get_selected_action(self, model=None, selected_iter=None):
     if model is None and selected_iter is None:
@@ -494,7 +500,8 @@ class ActionBrowser(GObject.GObject):
       _action_dict, action, action_editor, _model, _iter = self._get_selected_action(
         model, selected_iter)
 
-      self.emit('action-selected', action)
+      if not self._currently_filling_contents:
+        self.emit('action-selected', action)
 
       self._label_no_selection.hide()
 
@@ -506,6 +513,15 @@ class ActionBrowser(GObject.GObject):
     else:
       self._label_no_selection.show()
       self._scrolled_window_action_settings.hide()
+
+  def _on_dialog_show(self, _dialog):
+    model, selected_iter = self._tree_view.get_selection().get_selected()
+
+    if selected_iter is not None and model.iter_parent(selected_iter) is not None:
+      _action_dict, action, action_editor, _model, _iter = self._get_selected_action(
+        model, selected_iter)
+
+      self.emit('action-selected', action)
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
