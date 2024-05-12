@@ -488,7 +488,6 @@ class ActionBrowser(GObject.GObject):
     pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
-    print('_on_tree_view_selection_changed')
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
