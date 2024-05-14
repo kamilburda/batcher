@@ -150,9 +150,7 @@ class PreviewsController:
     
     def _on_before_remove_action(_actions, action, *args, **kwargs):
       if action['enabled'].value:
-        # Changing the enabled state triggers the 'value-changed' event and thus
-        # properly keeps the previews in sync after action removal.
-        action['enabled'].set_value(False)
+        self._update_previews_on_setting_change(action['enabled'], action)
     
     actions_.connect_event('after-add-action', _on_after_add_action)
     actions_.connect_event('after-reorder-action', _on_after_reorder_action)
