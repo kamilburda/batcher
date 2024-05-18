@@ -570,7 +570,7 @@ class ActionBrowser(GObject.GObject):
   def _add_action_editor_widget_to_model(self, action_dict, model, selected_child_iter):
     action = actions_.create_action(action_dict)
 
-    action.initialize_gui()
+    action.initialize_gui(only_null=True)
 
     action_editor_widget = action_editor_.ActionEditorWidget(
       action, self.widget, show_additional_settings=True)

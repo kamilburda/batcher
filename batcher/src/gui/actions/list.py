@@ -242,7 +242,7 @@ class ActionList(pg.gui.ItemBox):
     self._init_actions_menu_popup()
 
   def _add_item_from_action(self, action, attach_editor_widget=True):
-    action.initialize_gui()
+    action.initialize_gui(only_null=True)
 
     item = action_item_.ActionItem(action, attach_editor_widget=attach_editor_widget)
 
