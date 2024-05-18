@@ -11,6 +11,7 @@ from .. import utils as pgutils
 from . import meta as meta_
 from . import persistor as persistor_
 from . import settings as settings_
+from . import presenter as presenter_
 from . import utils as utils_
 
 __all__ = [
@@ -593,7 +594,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     """
     return persistor_.Persistor.save([self], *args, **kwargs)
   
-  def initialize_gui(self, custom_gui: Optional[Dict[str, List]] = None):
+  def initialize_gui(self, custom_gui: Optional[Dict[str, List]] = None, only_null: bool = False):
     """Initializes GUI for all child settings.
 
     Child settings with the ``'ignore_initialize_gui'`` tag are ignored.
@@ -603,6 +604,11 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     contains (setting name, list of arguments to `setting.Setting.set_gui()`)
     key-value pairs. For more information about parameters in the list,
     see `setting.Setting.set_gui()`.
+
+    If ``only_null`` is ``True``, only settings with uninitialized GUI will have
+    their GUI initialized. This may prevent cases when existing widgets
+    displayed the in the application no longer have any effect after calling
+    this method again.
     
     Example:
     
@@ -622,10 +628,12 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     
     for setting in self.walk(include_setting_func=_should_not_ignore):
       if setting.get_path('root') not in custom_gui:
-        setting.set_gui()
+        if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
+          setting.set_gui()
       else:
         set_gui_args = custom_gui[setting.get_path('root')]
-        setting.set_gui(*set_gui_args)
+        if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
+          setting.set_gui(*set_gui_args)
   
   def apply_gui_values_to_settings(self, force: bool = False):
     """Applies GUI widget values, entered by the user, to settings.
