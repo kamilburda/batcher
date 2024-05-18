@@ -78,7 +78,7 @@ def create_placeholder_widget(spacing=5):
 
   label = Gtk.Label(
     use_markup=True,
-    label=_('Cannot modify this parameter'),
+    label=_('Cannot be modified'),
     xalign=0.0,
     yalign=0.5,
   )
