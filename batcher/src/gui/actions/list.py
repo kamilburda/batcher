@@ -183,7 +183,9 @@ class ActionList(pg.gui.ItemBox):
           self.remove_item(self._current_temporary_action_item)
 
         self._current_temporary_action = action
+        
         self._current_temporary_action_item = self.add_item(action, attach_editor_widget=False)
+        self._current_temporary_action_item.widget.set_sensitive(False)
     else:
       if self._current_temporary_action_item:
         self.remove_item(self._current_temporary_action_item)
@@ -194,6 +196,7 @@ class ActionList(pg.gui.ItemBox):
   def _on_action_browser_confirm_add_action(self, _browser, action, action_editor_widget):
     if self._current_temporary_action_item:
       self._current_temporary_action_item.editor.attach_editor_widget(action_editor_widget)
+      self._current_temporary_action_item.widget.set_sensitive(True)
 
       action_editor_widget.show_additional_settings = False
 
