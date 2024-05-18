@@ -191,9 +191,11 @@ class ActionList(pg.gui.ItemBox):
       self._current_temporary_action = None
       self._current_temporary_action_item = None
 
-  def _on_action_browser_confirm_add_action(self, _browser, _action, action_editor):
+  def _on_action_browser_confirm_add_action(self, _browser, action, action_editor):
     if self._current_temporary_action_item:
       self._current_temporary_action_item.editor.attach_editor_widget(action_editor)
+
+      action['enabled'].set_value(True)
 
       self._current_temporary_action = None
       self._current_temporary_action_item = None

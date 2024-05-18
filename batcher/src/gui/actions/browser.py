@@ -152,6 +152,10 @@ class ActionBrowser(GObject.GObject):
       else:
         display_name = ''
 
+      # This prevents certain procedures from triggering undesired behavior
+      #  (e.g. displaying a layer copy as a new image).
+      action_dict['enabled'] = False
+
       self._tree_model.append(
         self._parent_tree_iters[action_type],
         [action_dict['name'],
@@ -361,7 +365,7 @@ class ActionBrowser(GObject.GObject):
     self._vbox_browser.pack_start(self._hbox_search_bar, False, False, 0)
     self._vbox_browser.pack_start(self._scrolled_window_action_list, True, True, 0)
 
-    self._scrolled_window_action_settings = Gtk.ScrolledWindow(
+    self._scrolled_window_action_arguments = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       propagate_natural_width=True,
@@ -377,11 +381,11 @@ class ActionBrowser(GObject.GObject):
     self._label_no_selection.show()
     self._label_no_selection.set_no_show_all(True)
 
-    self._hbox_action_settings = Gtk.Box(
+    self._hbox_action = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
-    self._hbox_action_settings.pack_start(self._scrolled_window_action_settings, True, True, 0)
-    self._hbox_action_settings.pack_start(self._label_no_selection, True, True, 0)
+    self._hbox_action.pack_start(self._scrolled_window_action_arguments, True, True, 0)
+    self._hbox_action.pack_start(self._label_no_selection, True, True, 0)
 
     self._hpaned = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -390,7 +394,7 @@ class ActionBrowser(GObject.GObject):
       position=self._HPANED_POSITION,
     )
     self._hpaned.pack1(self._vbox_browser, True, False)
-    self._hpaned.pack2(self._hbox_action_settings, True, True)
+    self._hpaned.pack2(self._hbox_action, True, True)
 
     self._dialog.vbox.pack_start(self._hpaned, True, True, 0)
 
@@ -509,10 +513,10 @@ class ActionBrowser(GObject.GObject):
 
       self._attach_action_editor(action_editor)
 
-      self._scrolled_window_action_settings.show()
+      self._scrolled_window_action_arguments.show()
     else:
       self._label_no_selection.show()
-      self._scrolled_window_action_settings.hide()
+      self._scrolled_window_action_arguments.hide()
 
       if not self._currently_filling_contents:
         self.emit('action-selected', None)
@@ -549,11 +553,11 @@ class ActionBrowser(GObject.GObject):
 
   def _attach_action_editor(self, action_editor):
     action_editor.widget.show_all()
-    self._scrolled_window_action_settings.add(action_editor.widget)
+    self._scrolled_window_action_arguments.add(action_editor.widget)
 
   def _detach_action_editor(self):
-    for child in self._scrolled_window_action_settings:
-      self._scrolled_window_action_settings.remove(child)
+    for child in self._scrolled_window_action_arguments:
+      self._scrolled_window_action_arguments.remove(child)
 
   def _add_action_editor_to_model(self, action_dict, model, selected_child_iter):
     action = actions_.create_action(action_dict)
