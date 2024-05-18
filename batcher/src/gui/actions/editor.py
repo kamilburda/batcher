@@ -130,7 +130,7 @@ class ActionEditorWidget:
     self._vbox.pack_start(self._label_editable_action_name, False, False, 0)
     if self._action_info_hbox is not None:
       self._vbox.pack_start(self._action_info_hbox, False, False, 0)
-    self._vbox.pack_start(self._grid_action_arguments, True, True, 0)
+    self._vbox.pack_start(self._grid_action_arguments, False, False, 0)
     self._vbox.pack_start(self._action['more_options_expanded'].gui.widget, False, False, 0)
 
     self._set_arguments(self._action, self._pdb_procedure)
