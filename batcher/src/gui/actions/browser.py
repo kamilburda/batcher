@@ -45,7 +45,7 @@ class ActionBrowser(GObject.GObject):
     _COLUMN_ACTION_DESCRIPTION,
     _COLUMN_ACTION_TYPE,
     _COLUMN_ACTION_DICT,
-    _COLUMN_ACTION_EDITOR) = (
+    _COLUMN_ACTION_EDITOR_WIDGET) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
@@ -188,15 +188,22 @@ class ActionBrowser(GObject.GObject):
       row = Gtk.TreeModelRow(model, selected_iter)
 
       action_dict = row[self._COLUMN_ACTION_DICT[0]]
-      action_editor = row[self._COLUMN_ACTION_EDITOR[0]]
+      action_editor_widget = row[self._COLUMN_ACTION_EDITOR_WIDGET[0]]
 
       selected_child_iter = model.convert_iter_to_child_iter(selected_iter)
 
       if action_dict is not None:
-        if action_editor is None:
-          action_editor = self._add_action_editor_to_model(action_dict, model, selected_child_iter)
+        if action_editor_widget is None:
+          action_editor_widget = self._add_action_editor_widget_to_model(
+            action_dict, model, selected_child_iter)
 
-        return action_dict, action_editor.action, action_editor, model, selected_child_iter
+        return (
+          action_dict,
+          action_editor_widget.action,
+          action_editor_widget,
+          model,
+          selected_child_iter,
+        )
       else:
         return None, None, None, model, selected_child_iter
     else:
@@ -501,7 +508,7 @@ class ActionBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      _action_dict, action, action_editor, _model, _iter = self._get_selected_action(
+      _action_dict, action, action_editor_widget, _model, _iter = self._get_selected_action(
         model, selected_iter)
 
       if not self._currently_filling_contents:
@@ -509,9 +516,9 @@ class ActionBrowser(GObject.GObject):
 
       self._label_no_selection.hide()
 
-      self._detach_action_editor()
+      self._detach_action_editor_widget()
 
-      self._attach_action_editor(action_editor)
+      self._attach_action_editor_widget(action_editor_widget)
 
       self._scrolled_window_action_arguments.show()
     else:
@@ -525,7 +532,7 @@ class ActionBrowser(GObject.GObject):
     model, selected_iter = self._tree_view.get_selection().get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      _action_dict, action, action_editor, _model, _iter = self._get_selected_action(
+      _action_dict, action, action_editor_widget, _model, _iter = self._get_selected_action(
         model, selected_iter)
 
       self.emit('action-selected', action)
@@ -534,50 +541,52 @@ class ActionBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      action_dict, action, action_editor, model, selected_child_iter = self._get_selected_action()
+      action_dict, action, action_editor_widget, model, selected_child_iter = (
+        self._get_selected_action())
 
       if action is not None:
-        self._detach_action_editor()
-        self._remove_action_editor_from_model(model, selected_child_iter)
+        self._detach_action_editor_widget()
+        self._remove_action_editor_widget_from_model(model, selected_child_iter)
 
-        self.emit('confirm-add-action', action, action_editor)
+        self.emit('confirm-add-action', action, action_editor_widget)
 
-        new_action_editor = self._add_action_editor_to_model(
+        new_action_editor_widget = self._add_action_editor_widget_to_model(
           action_dict, model, selected_child_iter)
-        self._attach_action_editor(new_action_editor)
+        self._attach_action_editor_widget(new_action_editor_widget)
 
         dialog.hide()
     else:
       self.emit('cancel-add-action')
       dialog.hide()
 
-  def _attach_action_editor(self, action_editor):
-    action_editor.widget.show_all()
-    self._scrolled_window_action_arguments.add(action_editor.widget)
+  def _attach_action_editor_widget(self, action_editor_widget):
+    action_editor_widget.widget.show_all()
+    self._scrolled_window_action_arguments.add(action_editor_widget.widget)
 
-  def _detach_action_editor(self):
+  def _detach_action_editor_widget(self):
     for child in self._scrolled_window_action_arguments:
       self._scrolled_window_action_arguments.remove(child)
 
-  def _add_action_editor_to_model(self, action_dict, model, selected_child_iter):
+  def _add_action_editor_widget_to_model(self, action_dict, model, selected_child_iter):
     action = actions_.create_action(action_dict)
 
     action.initialize_gui()
 
-    action_editor = action_editor_.ActionEditorWidget(action, self.widget)
+    action_editor_widget = action_editor_.ActionEditorWidget(
+      action, self.widget, show_additional_settings=True)
 
     model.get_model().set_value(
       selected_child_iter,
-      self._COLUMN_ACTION_EDITOR[0],
-      action_editor,
+      self._COLUMN_ACTION_EDITOR_WIDGET[0],
+      action_editor_widget,
     )
 
-    return action_editor
+    return action_editor_widget
 
-  def _remove_action_editor_from_model(self, model, selected_child_iter):
+  def _remove_action_editor_widget_from_model(self, model, selected_child_iter):
     model.get_model().set_value(
       selected_child_iter,
-      self._COLUMN_ACTION_EDITOR[0],
+      self._COLUMN_ACTION_EDITOR_WIDGET[0],
       None,
     )
 

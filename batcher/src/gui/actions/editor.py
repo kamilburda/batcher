@@ -41,6 +41,10 @@ class ActionEditor(GimpUi.Dialog):
 
     self.set_focus(self._button_close)
 
+  @property
+  def widget(self):
+    return self._action_editor_widget
+
   def attach_editor_widget(self, widget):
     if self._action_editor_widget is not None:
       raise ValueError('an ActionEditorWidget is already attached to this ActionEditor')
@@ -60,6 +64,10 @@ class ActionEditorWidget:
   _GRID_ROW_SPACING = 3
   _GRID_COLUMN_SPACING = 8
 
+  _HBOX_ADDITIONAL_SETTINGS_SPACING = 6
+  _HBOX_ADDITIONAL_SETTINGS_TOP_MARGIN = 3
+  _HBOX_ADDITIONAL_SETTINGS_BOTTOM_MARGIN = 3
+
   _MORE_OPTIONS_SPACING = 3
   _MORE_OPTIONS_LABEL_TOP_MARGIN = 6
   _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 3
@@ -70,9 +78,11 @@ class ActionEditorWidget:
   _ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
   _ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS = 40
 
-  def __init__(self, action, parent):
+  def __init__(self, action, parent, show_additional_settings=False):
     self._action = action
     self._parent = parent
+
+    self._show_additional_settings = show_additional_settings
 
     if self._action['origin'].is_item('gimp_pdb') and self._action['function'].value:
       self._pdb_procedure = pdb[self._action['function'].value]
@@ -81,6 +91,9 @@ class ActionEditorWidget:
 
     self._init_gui()
 
+    self._button_preview.connect('clicked', self._on_button_preview_clicked)
+    self._button_reset.connect('clicked', self._on_button_reset_clicked)
+
   @property
   def action(self):
     return self._action
@@ -88,6 +101,16 @@ class ActionEditorWidget:
   @property
   def widget(self):
     return self._vbox
+
+  @property
+  def show_additional_settings(self):
+    return self._show_additional_settings
+
+  @show_additional_settings.setter
+  def show_additional_settings(self, value):
+    self._show_additional_settings = value
+
+    self._show_hide_additional_settings()
 
   def reset(self):
     self._action['arguments'].reset()
@@ -100,6 +123,22 @@ class ActionEditorWidget:
     self._set_up_editable_name(self._action)
 
     self._set_up_action_info(self._action, self._parent)
+
+    self._button_preview = Gtk.CheckButton(label=_('_Preview'), use_underline=True)
+    self._button_preview.show_all()
+
+    self._button_reset = Gtk.Button(label=_('_Reset'), use_underline=True)
+    self._button_reset.show_all()
+
+    self._hbox_additional_settings = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_ADDITIONAL_SETTINGS_SPACING,
+      margin_top=self._HBOX_ADDITIONAL_SETTINGS_TOP_MARGIN,
+      margin_bottom=self._HBOX_ADDITIONAL_SETTINGS_BOTTOM_MARGIN,
+    )
+    self._hbox_additional_settings.set_no_show_all(True)
+    self._hbox_additional_settings.pack_start(self._button_preview, False, False, 0)
+    self._hbox_additional_settings.pack_start(self._button_reset, False, False, 0)
 
     self._grid_action_arguments = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -130,10 +169,13 @@ class ActionEditorWidget:
     self._vbox.pack_start(self._label_editable_action_name, False, False, 0)
     if self._action_info_hbox is not None:
       self._vbox.pack_start(self._action_info_hbox, False, False, 0)
+    self._vbox.pack_start(self._hbox_additional_settings, False, False, 0)
     self._vbox.pack_start(self._grid_action_arguments, False, False, 0)
     self._vbox.pack_start(self._action['more_options_expanded'].gui.widget, False, False, 0)
 
     self._set_arguments(self._action, self._pdb_procedure)
+
+    self._show_hide_additional_settings()
 
   def _set_up_editable_name(self, action):
     self._label_editable_action_name = editable_label_.EditableLabel()
@@ -252,6 +294,18 @@ class ActionEditorWidget:
       self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
 
       row_index += 1
+
+  def _show_hide_additional_settings(self):
+    if self._show_additional_settings:
+      self._hbox_additional_settings.show()
+    else:
+      self._hbox_additional_settings.hide()
+
+  def _on_button_preview_clicked(self, _button):
+    self._action['enabled'].set_value(self._button_preview.get_active())
+
+  def _on_button_reset_clicked(self, _button):
+    self.reset()
 
 
 def _get_action_info_from_pdb_procedure(pdb_procedure):
