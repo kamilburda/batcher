@@ -514,6 +514,9 @@ class ActionBrowser(GObject.GObject):
       self._label_no_selection.show()
       self._scrolled_window_action_settings.hide()
 
+      if not self._currently_filling_contents:
+        self.emit('action-selected', None)
+
   def _on_dialog_show(self, _dialog):
     model, selected_iter = self._tree_view.get_selection().get_selected()
 
@@ -522,6 +525,8 @@ class ActionBrowser(GObject.GObject):
         model, selected_iter)
 
       self.emit('action-selected', action)
+    else:
+      self.emit('action-selected', None)
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:

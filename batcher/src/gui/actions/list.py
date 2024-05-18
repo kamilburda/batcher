@@ -177,12 +177,19 @@ class ActionList(pg.gui.ItemBox):
     dialog.set_attached_to(pg.gui.get_toplevel_window(self))
 
   def _on_action_browser_action_selected(self, _browser, action):
-    if self._current_temporary_action != action:
+    if action is not None:
+      if self._current_temporary_action != action:
+        if self._current_temporary_action_item:
+          self.remove_item(self._current_temporary_action_item)
+
+        self._current_temporary_action = action
+        self._current_temporary_action_item = self.add_item(action, attach_editor_widget=False)
+    else:
       if self._current_temporary_action_item:
         self.remove_item(self._current_temporary_action_item)
 
-      self._current_temporary_action = action
-      self._current_temporary_action_item = self.add_item(action, attach_editor_widget=False)
+      self._current_temporary_action = None
+      self._current_temporary_action_item = None
 
   def _on_action_browser_confirm_add_action(self, _browser, _action, action_editor):
     if self._current_temporary_action_item:
