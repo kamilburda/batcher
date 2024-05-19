@@ -96,6 +96,8 @@ class ItemBox(Gtk.ScrolledWindow):
       self._items[next_item_position].item_widget.grab_focus()
     
     self._vbox_items.remove(item.widget)
+    # This allows reusing `ItemBoxItem.item_widget`
+    item.detach_item_widget()
     
     self._items.remove(item)
   
@@ -211,6 +213,9 @@ class ItemBoxItem:
   @property
   def button_remove(self) -> Gtk.Button:
     return self._button_remove
+
+  def detach_item_widget(self):
+    self._hbox.remove(self._item_widget)
 
   def _setup_item_button(self, icon=None, text=None, position=None, button_class=Gtk.Button):
     return self._setup_button(self._hbox_buttons, icon, text, position, button_class)
