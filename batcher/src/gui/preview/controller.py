@@ -130,32 +130,33 @@ class PreviewsController:
   
   def _connect_actions_changed(self, actions_):
     def _on_after_add_action(_actions, action, *args, **kwargs):
-      if action['enabled'].value:
-        self._update_previews_on_setting_change(action['enabled'], action)
+      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
 
       action['enabled'].connect_event(
         'value-changed', self._update_previews_on_setting_change, action)
 
       for setting in action['arguments']:
         setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change, action)
+          'value-changed', self._update_previews_on_setting_change_if_enabled, action)
 
       for setting in action['more_options']:
         setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change, action)
+          'value-changed', self._update_previews_on_setting_change_if_enabled, action)
     
     def _on_after_reorder_action(_actions, action, *args, **kwargs):
-      if action['enabled'].value:
-        self._update_previews_on_setting_change(action['enabled'], action)
+      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
     
     def _on_before_remove_action(_actions, action, *args, **kwargs):
-      if action['enabled'].value:
-        self._update_previews_on_setting_change(action['enabled'], action)
+      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
     
     actions_.connect_event('after-add-action', _on_after_add_action)
     actions_.connect_event('after-reorder-action', _on_after_reorder_action)
     actions_.connect_event('before-remove-action', _on_before_remove_action)
-  
+
+  def _update_previews_on_setting_change_if_enabled(self, setting, action):
+    if action['enabled'].value:
+      self._update_previews_on_setting_change(setting, action)
+
   def _update_previews_on_setting_change(self, setting, action):
     if (not action['more_options/enabled_for_previews'].value
         and setting.name != 'enabled_for_previews'):
