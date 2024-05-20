@@ -72,7 +72,7 @@ class ItemBox(Gtk.ScrolledWindow):
     
     item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
     item.widget.connect('key-press-event', self._on_item_widget_key_press_event, item)
-    
+
     self._setup_drag(item)
     
     self._items.append(item)
@@ -81,7 +81,7 @@ class ItemBox(Gtk.ScrolledWindow):
   
   def reorder_item(self, item: ItemBoxItem, position: int) -> int:
     new_position = min(max(position, 0), len(self._items) - 1)
-    
+
     self._items.pop(self._get_item_position(item))
     self._items.insert(new_position, item)
     
@@ -96,8 +96,11 @@ class ItemBox(Gtk.ScrolledWindow):
       self._items[next_item_position].item_widget.grab_focus()
     
     self._vbox_items.remove(item.widget)
+
     # This allows reusing `ItemBoxItem.item_widget`
     item.detach_item_widget()
+
+    self._remove_drag(item)
     
     self._items.remove(item)
   
@@ -113,7 +116,10 @@ class ItemBox(Gtk.ScrolledWindow):
       [item],
       [item],
     )
-  
+
+  def _remove_drag(self, item):
+    self._drag_and_drop_context.remove_drag(item.widget)
+
   def _get_drag_data(self, dragged_item):
     return bytes([self._items.index(dragged_item)])
   

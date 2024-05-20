@@ -1,5 +1,6 @@
 """Class providing drag-and-drop capability to any GTK widget."""
 
+import collections
 from collections.abc import Iterable
 from typing import Callable, Optional
 
@@ -19,6 +20,8 @@ class DragAndDropContext:
   
   def __init__(self):
     self._drag_type = self._get_unique_drag_type()
+
+    self._widgets_and_event_ids = collections.defaultdict(dict)
   
   def setup_drag(
         self,
@@ -71,8 +74,8 @@ class DragAndDropContext:
     
     if drag_data_receive_args is None:
       drag_data_receive_args = ()
-    
-    widget.connect(
+
+    self._widgets_and_event_ids[widget]['drag-data-get'] = widget.connect(
       'drag-data-get',
       self._on_widget_drag_data_get,
       get_drag_data_func,
@@ -85,7 +88,7 @@ class DragAndDropContext:
     if dest_widget is None:
       dest_widget = widget
 
-    dest_widget.connect(
+    self._widgets_and_event_ids[widget]['drag-data-received'] = dest_widget.connect(
       'drag-data-received',
       self._on_widget_drag_data_received,
       drag_data_receive_func,
@@ -96,16 +99,44 @@ class DragAndDropContext:
       Gdk.DragAction.MOVE)
 
     if get_drag_icon_func is not None:
-      widget.connect(
+      self._widgets_and_event_ids[widget]['drag-begin'] = widget.connect(
         'drag-begin',
         get_drag_icon_func,
         *(get_drag_icon_func_args if get_drag_icon_func_args is not None else ()))
       if destroy_drag_icon_func is not None:
-        widget.connect(
+        self._widgets_and_event_ids[widget]['drag-end'] = widget.connect(
           'drag-end',
           destroy_drag_icon_func,
           *(destroy_drag_icon_func_args if destroy_drag_icon_func_args is not None else ()))
-  
+
+  def remove_drag(self, widget: Gtk.Widget):
+    """Removes drag-and-drop capability from the specified `Gtk.widget`
+    instance.
+
+    The widget must have its drag-and-drop capability enabled via
+    `setup_drag()`. Otherwise, `ValueError` is raised.
+
+    Args:
+      widget: Widget to remove drag-and-drop capability from.
+    """
+    if widget not in self._widgets_and_event_ids:
+      raise ValueError(
+        f'widget {widget} was not set up with this DragAndDropContext instance: {self}')
+
+    widget_events = self._widgets_and_event_ids.pop(widget)
+
+    widget.disconnect(widget_events['drag-data-get'])
+    widget.drag_source_unset()
+
+    widget.disconnect(widget_events['drag-data-received'])
+    widget.drag_dest_unset()
+
+    if 'drag-begin' in widget_events:
+      widget.disconnect(widget_events['drag-begin'])
+
+    if 'drag-end' in widget_events:
+      widget.disconnect(widget_events['drag-end'])
+
   def _get_unique_drag_type(self):
     return f'{type(self).__qualname__}_{id(self)}'
   

@@ -352,6 +352,9 @@ class ActionList(pg.gui.ItemBox):
       [item],
     )
 
+  def _remove_drag(self, item):
+    self._drag_and_drop_context.remove_drag(item.item_widget)
+
   def _get_drag_icon(self, _widget, drag_context, item):
     Gtk.drag_set_icon_widget(
       drag_context,
