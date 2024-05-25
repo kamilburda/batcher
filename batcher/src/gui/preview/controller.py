@@ -1,5 +1,7 @@
 """Class interconnecting preview widgets for item names and images."""
 
+import collections
+
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
@@ -129,25 +131,48 @@ class PreviewsController:
     self._paned_between_previews_previous_position = current_position
   
   def _connect_actions_changed(self, actions_):
+    # We store event IDs in lists in case the same action is added multiple times.
+    settings_and_event_ids = collections.defaultdict(lambda: collections.defaultdict(list))
+
     def _on_after_add_action(_actions, action, *args, **kwargs):
+      nonlocal settings_and_event_ids
+
       self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
 
-      action['enabled'].connect_event(
-        'value-changed', self._update_previews_on_setting_change, action)
+      settings_and_event_ids[action]['enabled'].append(
+        action['enabled'].connect_event(
+          'value-changed', self._update_previews_on_setting_change, action))
 
       for setting in action['arguments']:
-        setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change_if_enabled, action)
+        settings_and_event_ids[action][f'arguments/{setting.name}'].append(
+          setting.connect_event(
+            'value-changed', self._update_previews_on_setting_change_if_enabled, action))
 
       for setting in action['more_options']:
-        setting.connect_event(
-          'value-changed', self._update_previews_on_setting_change_if_enabled, action)
+        settings_and_event_ids[action][f'more_options/{setting.name}'].append(
+          setting.connect_event(
+            'value-changed', self._update_previews_on_setting_change_if_enabled, action))
     
     def _on_after_reorder_action(_actions, action, *args, **kwargs):
       self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
     
     def _on_before_remove_action(_actions, action, *args, **kwargs):
+      nonlocal settings_and_event_ids
+
       self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
+
+      should_remove_action_from_event_ids = False
+
+      for setting_path, event_ids in settings_and_event_ids[action].items():
+        if event_ids:
+          action[setting_path].remove_event(event_ids[-1])
+          event_ids.pop()
+          # We do not have to separately check if each list is empty as they are all updated at
+          # once.
+          should_remove_action_from_event_ids = True
+
+      if should_remove_action_from_event_ids:
+        del settings_and_event_ids[action]
     
     actions_.connect_event('after-add-action', _on_after_add_action)
     actions_.connect_event('after-reorder-action', _on_after_reorder_action)
