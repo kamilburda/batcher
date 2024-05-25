@@ -157,10 +157,6 @@ class ActionItem(pg.gui.ItemBoxItem):
     else:
       self.widget.set_tooltip_text(label_action_name.get_text())
 
-  def _on_label_action_name_changed(self, editable_label):
-    self._action['display_name'].set_value(editable_label.label.get_text())
-    editable_label.label.set_label(self._action['display_name'].value)
-
   def _on_button_edit_clicked(self, _button):
     if self.is_being_edited():
       self.editor.present()
