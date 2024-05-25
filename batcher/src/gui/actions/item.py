@@ -30,7 +30,8 @@ class ActionItem(pg.gui.ItemBoxItem):
 
     self._button_action = self._action['enabled'].gui.widget
 
-    self._action['enabled'].connect_event('value-changed', self._on_action_enabled_changed)
+    self._on_action_enabled_changed_event_id = (
+      self._action['enabled'].connect_event('value-changed', self._on_action_enabled_changed))
 
     super().__init__(self._button_action, button_display_mode='always')
 
@@ -120,6 +121,9 @@ class ActionItem(pg.gui.ItemBoxItem):
     self._drag_icon_window.show_all()
 
     return self._drag_icon_window
+
+  def prepare_action_for_detachment(self):
+    self._action['enabled'].remove_event(self._on_action_enabled_changed_event_id)
 
   def _init_gui(self):
     self._label_action_name = self._action['display_name'].gui.widget.get_child()

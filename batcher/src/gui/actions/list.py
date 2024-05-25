@@ -283,6 +283,8 @@ class ActionList(pg.gui.ItemBox):
     if self._get_item_position(item) == len(self._items) - 1:
       self._button_add.grab_focus()
 
+    item.prepare_action_for_detachment()
+
     super().remove_item(item)
 
   def _clear(self):
