@@ -50,9 +50,11 @@ class ActionEditor(GimpUi.Dialog):
       raise ValueError('an ActionEditorWidget is already attached to this ActionEditor')
 
     self._action_editor_widget = widget
+    self._action_editor_widget.set_parent(self)
+
     self.vbox.pack_start(self._action_editor_widget.widget, False, False, 0)
 
-  def _on_button_reset_clicked(self, _button, action):
+  def _on_button_reset_clicked(self, _button, _action):
     self._action_editor_widget.reset()
 
 
@@ -89,6 +91,10 @@ class ActionEditorWidget:
     else:
       self._pdb_procedure = None
 
+    self._info_popup = None
+    self._info_popup_text = None
+    self._parent_widget_realize_event_id = None
+
     self._init_gui()
 
     self._button_preview.connect('clicked', self._on_button_preview_clicked)
@@ -118,6 +124,14 @@ class ActionEditorWidget:
 
     self._action['display_name'].reset()
     self._set_editable_label_text(self._action['display_name'].value)
+
+  def set_parent(self, parent):
+    if self._info_popup is not None and self._parent_widget_realize_event_id is not None:
+      parent_widget = self._info_popup.get_attached_to()
+      parent_widget.disconnect(self._parent_widget_realize_event_id)
+
+    self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
+      _create_action_info_popup(self._action_info, parent))
 
   def _init_gui(self):
     self._set_up_editable_name(self._action)
@@ -222,7 +236,8 @@ class ActionEditorWidget:
       max_width_chars=self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS,
     )
 
-    self._info_popup, self._info_popup_text = _create_action_info_popup(self._action_info, parent)
+    self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
+      _create_action_info_popup(self._action_info, parent))
 
     self._button_info = Gtk.Button(
       image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
@@ -345,17 +360,17 @@ def _get_action_info_from_pdb_procedure(pdb_procedure):
     return action_info
 
 
-def _create_action_info_popup(action_info, widget, max_width_chars=100, border_width=3):
+def _create_action_info_popup(action_info, parent_widget, max_width_chars=100, border_width=3):
   info_popup = Gtk.Window(
     type=Gtk.WindowType.POPUP,
     type_hint=Gdk.WindowTypeHint.TOOLTIP,
     resizable=False,
   )
-  info_popup.set_attached_to(widget)
+  info_popup.set_attached_to(parent_widget)
 
-  widget.connect(
+  parent_widget_realize_event_id = parent_widget.connect(
     'realize',
-    lambda *args: info_popup.set_transient_for(pg.gui.utils.get_toplevel_window(widget)))
+    lambda *args: info_popup.set_transient_for(pg.gui.utils.get_toplevel_window(parent_widget)))
 
   info_popup_text = Gtk.Label(
     label=action_info,
@@ -374,10 +389,10 @@ def _create_action_info_popup(action_info, widget, max_width_chars=100, border_w
 
   info_popup_hide_context = popup_hide_context_.PopupHideContext(
     info_popup,
-    widget,
+    parent_widget,
     widgets_to_exclude_from_triggering_hiding=[
       info_popup,
-      widget,
+      parent_widget,
     ],
   )
   info_popup_hide_context.enable()
@@ -394,4 +409,4 @@ def _create_action_info_popup(action_info, widget, max_width_chars=100, border_w
 
   info_popup.add(info_popup_scrolled_window)
 
-  return info_popup, info_popup_text
+  return info_popup, info_popup_text, parent_widget_realize_event_id
