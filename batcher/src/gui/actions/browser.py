@@ -566,6 +566,8 @@ class ActionBrowser(GObject.GObject):
 
   def _detach_action_editor_widget(self):
     for child in self._scrolled_window_action_arguments:
+      if isinstance(child, Gtk.Viewport):
+        child.remove(child.get_child())
       self._scrolled_window_action_arguments.remove(child)
 
   def _add_action_editor_widget_to_model(self, action_dict, model, selected_child_iter):
