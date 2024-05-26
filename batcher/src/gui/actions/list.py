@@ -130,7 +130,7 @@ class ActionList(pg.gui.ItemBox):
       lambda _actions, action: self._remove_action(action))
 
     self._before_clear_actions_event_id = self._actions.connect_event(
-      'before-clear-actions', lambda _actions: self._clear())
+      'before-clear-actions', self._on_before_clear_actions)
 
   @property
   def actions(self):
@@ -211,6 +211,12 @@ class ActionList(pg.gui.ItemBox):
 
       self._current_temporary_action = None
       self._current_temporary_action_item = None
+
+  def _on_before_clear_actions(self, _actions):
+    self._clear()
+
+    self._current_temporary_action = None
+    self._current_temporary_action_item = None
 
   def _init_gui(self):
     self._button_add = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
