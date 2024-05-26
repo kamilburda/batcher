@@ -562,6 +562,7 @@ class ActionBrowser(GObject.GObject):
   def _attach_action_editor_widget(self, action_editor_widget):
     action_editor_widget.widget.show_all()
     self._scrolled_window_action_arguments.add(action_editor_widget.widget)
+    self._scrolled_window_action_arguments.get_child().set_shadow_type(Gtk.ShadowType.NONE)
 
   def _detach_action_editor_widget(self):
     for child in self._scrolled_window_action_arguments:
