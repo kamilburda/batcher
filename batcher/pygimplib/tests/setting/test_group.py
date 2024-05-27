@@ -754,7 +754,7 @@ class TestGroupGui(unittest.TestCase):
     file_extension_widget = stubs_setting.GuiWidgetStub('png')
     
     self.settings.initialize_gui(custom_gui={
-      'file_extension': [stubs_setting.StubPresenter, file_extension_widget]})
+      'file_extension': dict(gui_type=stubs_setting.StubPresenter, widget=file_extension_widget)})
     
     self.assertIs(
       type(self.settings['file_extension'].gui), stubs_setting.StubPresenter)
@@ -770,7 +770,33 @@ class TestGroupGui(unittest.TestCase):
     self.assertIs(
       type(self.settings['flatten'].gui.widget),
       stubs_setting.CheckButtonStub)
-  
+
+  def test_initialize_gui_with_global_arguments(self):
+    self.settings['file_extension'].gui.set_visible(False)
+
+    self.settings.initialize_gui(
+      copy_previous_visible=True,
+    )
+
+    self.assertFalse(self.settings['file_extension'].gui.get_visible())
+
+  def test_initialize_gui_custom_gui_arguments_override_global_arguments(self):
+    self.settings['file_extension'].gui.set_visible(False)
+
+    file_extension_widget = stubs_setting.GuiWidgetStub('png')
+
+    self.settings.initialize_gui(
+      custom_gui={
+        'file_extension': dict(
+          gui_type=stubs_setting.StubPresenter,
+          widget=file_extension_widget,
+          copy_previous_visible=False,
+        )},
+      copy_previous_visible=True,
+    )
+
+    self.assertTrue(self.settings['file_extension'].gui.get_visible())
+
   def test_apply_gui_values_to_settings(self):
     file_extension_widget = stubs_setting.GuiWidgetStub(None)
     flatten_widget = stubs_setting.GuiWidgetStub(None)

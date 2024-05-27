@@ -594,34 +594,46 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     """
     return persistor_.Persistor.save([self], *args, **kwargs)
   
-  def initialize_gui(self, custom_gui: Optional[Dict[str, List]] = None, only_null: bool = False):
+  def initialize_gui(
+        self,
+        custom_gui: Optional[Dict[str, Dict[str, Any]]] = None,
+        only_null: bool = False,
+        **set_gui_kwargs,
+  ):
     """Initializes GUI for all child settings.
 
     Child settings with the ``'ignore_initialize_gui'`` tag are ignored.
     
     Settings that are not provided with a readily available GUI can have
     their GUI initialized using the ``custom_gui`` dictionary. ``custom_gui``
-    contains (setting name, list of arguments to `setting.Setting.set_gui()`)
-    key-value pairs. For more information about parameters in the list,
-    see `setting.Setting.set_gui()`.
+    is a dictionary of (setting name, dictionary of keyword arguments to
+    `setting.Setting.set_gui()`). For more information about parameters in the
+    list, see `setting.Setting.set_gui()`.
 
     If ``only_null`` is ``True``, only settings with uninitialized GUI will have
     their GUI initialized. This may prevent cases when existing widgets
     displayed the in the application no longer have any effect after calling
     this method again.
+
+    The remaining keyword arguments are passed to each setting to the
+    `setting.Setting.set_gui()` method. See that method for available arguments.
+    These keyword arguments are overridden by those specified in ``custom_gui``.
     
     Example:
     
       file_extension_entry = Gtk.Entry()
       ...
-      main_settings.initialize_gui({
-        'file_extension': [
-          setting.SETTING_GUI_TYPES.entry, file_extension_entry]
-        ...
-      })
+      main_settings.initialize_gui(
+        {
+          'file_extension': dict(
+            gui_type=setting.SETTING_GUI_TYPES.entry,
+            widget=file_extension_entry),
+          ...
+        },
+        copy_previous_visible=False)
     """
-    def _should_not_ignore(setting):
-      return 'ignore_initialize_gui' not in setting.tags
+    def _should_not_ignore(setting_):
+      return 'ignore_initialize_gui' not in setting_.tags
     
     if custom_gui is None:
       custom_gui = {}
@@ -629,11 +641,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     for setting in self.walk(include_setting_func=_should_not_ignore):
       if setting.get_path('root') not in custom_gui:
         if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
-          setting.set_gui()
+          setting.set_gui(**set_gui_kwargs)
       else:
-        set_gui_args = custom_gui[setting.get_path('root')]
         if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
-          setting.set_gui(*set_gui_args)
+          setting.set_gui(**dict(set_gui_kwargs, **custom_gui[setting.get_path('root')]))
   
   def apply_gui_values_to_settings(self, force: bool = False):
     """Applies GUI widget values, entered by the user, to settings.
