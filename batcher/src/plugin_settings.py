@@ -176,6 +176,27 @@ def _create_gui_settings():
     },
   ])
 
+  procedure_browser_settings = pg.setting.Group(name='procedure_browser')
+
+  procedure_browser_settings.add([
+    {
+      'type': 'integer',
+      'name': 'paned_position',
+      'default_value': 325,
+      'gui_type': None,
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': (),
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': (675, 450),
+    },
+  ])
+
   gui_settings.add([
     {
       'type': 'bool',
@@ -214,6 +235,7 @@ def _create_gui_settings():
       'name': 'images_and_directories',
     },
     size_gui_settings,
+    procedure_browser_settings,
   ])
 
   return gui_settings

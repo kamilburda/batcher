@@ -106,6 +106,10 @@ class ActionBrowser(GObject.GObject):
   def widget(self):
     return self._dialog
 
+  @property
+  def paned(self):
+    return self._hpaned
+
   def fill_contents_if_empty(self):
     if self._contents_filled:
       return

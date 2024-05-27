@@ -634,6 +634,15 @@ class ExportLayersDialog:
         'gui/size/paned_between_previews_position': dict(
           gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
           widget=self._vpaned_previews),
+        'gui/procedure_browser/paned_position': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+          widget=self._procedure_list.browser.paned),
+        'gui/procedure_browser/dialog_position': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
+          widget=self._procedure_list.browser.widget),
+        'gui/procedure_browser/dialog_size': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
+          widget=self._procedure_list.browser.widget),
       },
       copy_previous_visible=False,
       copy_previous_sensitive=False,
