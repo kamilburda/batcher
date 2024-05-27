@@ -289,6 +289,9 @@ class ActionEditorWidget:
 
       if argument_description is None or not argument_description.strip():
         argument_description = setting.name
+        should_set_tooltip = False
+      else:
+        should_set_tooltip = True
 
       label = Gtk.Label(
         label=argument_description,
@@ -297,6 +300,9 @@ class ActionEditorWidget:
         max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
         wrap=True,
       )
+
+      if should_set_tooltip:
+        label.set_tooltip_text(setting.name)
 
       self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
 
