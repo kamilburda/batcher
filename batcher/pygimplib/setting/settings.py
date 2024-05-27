@@ -471,6 +471,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         widget=None,
         auto_update_gui_to_setting: bool = True,
         gui_type_kwargs: Optional[Dict] = None,
+        copy_previous_value: bool = True,
+        copy_previous_visible: bool = True,
+        copy_previous_sensitive: bool = True,
   ):
     """Creates a new `setting.Presenter` instance (holding a GUI widget) for
     this setting or removes the GUI.
@@ -506,6 +509,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         Keyword arguments for instantiating a particular `setting.Presenter`
         subclass. If ``None``, the ``gui_type_kwargs`` parameter specified in
         `__init__()` is used instead.
+      copy_previous_value:
+        See `pygimplib.setting.Presenter.__init__()`.
+      copy_previous_visible:
+        See `pygimplib.setting.Presenter.__init__()`.
+      copy_previous_sensitive:
+        See `pygimplib.setting.Presenter.__init__()`.
     """
     if gui_type != 'automatic' and widget is None:
       raise ValueError('widget cannot be None if gui_type is not "automatic"')
@@ -530,9 +539,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       self,
       widget,
       setting_value_synchronizer=self._setting_value_synchronizer,
-      old_presenter=self._gui,
       auto_update_gui_to_setting=auto_update_gui_to_setting,
       create_widget_kwargs=gui_type_kwargs,
+      previous_presenter=self._gui,
+      copy_previous_value=copy_previous_value,
+      copy_previous_visible=copy_previous_visible,
+      copy_previous_sensitive=copy_previous_sensitive,
     )
     
     self.invoke_event('after-set-gui')

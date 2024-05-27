@@ -61,9 +61,12 @@ class Presenter(metaclass=meta_.PresenterMeta):
         setting: 'setting.Setting',
         widget=None,
         setting_value_synchronizer: Optional[SettingValueSynchronizer] = None,
-        old_presenter: Presenter = None,
         auto_update_gui_to_setting: bool = True,
         create_widget_kwargs: Optional[Dict] = None,
+        previous_presenter: Presenter = None,
+        copy_previous_value: bool = True,
+        copy_previous_visible: bool = True,
+        copy_previous_sensitive: bool = True,
   ):
     """Initializes a `Presenter` instance.
 
@@ -82,23 +85,30 @@ class Presenter(metaclass=meta_.PresenterMeta):
       setting_value_synchronizer:
        A `SettingValueSynchronizer` instance to synchronize values between
        ``setting`` and this instance.
-      old_presenter:
-        `Presenter` instance that was previously assigned to ``setting`` (as
-        the ``setting.gui`` attribute). The state from that `Presenter`
-        instance will be copied to this object. If ``old_presenter`` is
-        ``None``, only ``setting.value`` will be copied to this instance.
       auto_update_gui_to_setting:
         If ``True``, ``setting.value`` is updated automatically if the GUI
         value is updated. This parameter does not have any effect if:
           * the `Presenter` class cannot provide automatic GUI-to-setting
             update, or
 
-          * ``old_presenter`` is not ``None`` and the automatic
+          * ``previous_presenter`` is not ``None`` and the automatic
             GUI-to-setting update was disabled in that presenter.
       create_widget_kwargs:
         Keyword arguments used when creating ``widget``. See the
         `setting.Presenter._create_widget()` method in particular
         `setting.Presenter` subclasses for available keyword arguments.
+      previous_presenter:
+        `Presenter` instance that was previously assigned to ``setting`` (as
+        the ``setting.gui`` attribute). The state from that `Presenter`
+        instance will be copied to this object. If ``previous_presenter`` is
+        ``None``, only ``setting.value`` will be copied to this instance.
+      copy_previous_value:
+        If ``True``, the value from ``previous_presenter`` is copied if not
+        ``None``, otherwise ``setting.value`` is copied.
+      copy_previous_visible:
+        If ``True``, the visible state from ``previous_presenter`` is copied.
+      copy_previous_sensitive:
+        If ``True``, the sensitive state from ``previous_presenter`` is copied.
     """
     self._setting = setting
     self._widget = widget
@@ -127,11 +137,13 @@ class Presenter(metaclass=meta_.PresenterMeta):
         raise ValueError(
           (f'cannot instantiate class "{type(self).__qualname__}": attribute "widget" is None'
            ' and this class does not support the creation of a GUI widget'))
-    
-    if old_presenter is not None:
-      self._copy_state(old_presenter)
+
+    if previous_presenter is not None:
+      self._copy_state(
+        previous_presenter, copy_previous_value, copy_previous_visible, copy_previous_sensitive)
     else:
-      self._setting_value_synchronizer.apply_setting_value_to_gui(self._setting.value)
+      if copy_previous_value:
+        self._setting_value_synchronizer.apply_setting_value_to_gui(self._setting.value)
 
     if self._value_changed_signal is not None:
       self._connect_value_changed_event()
@@ -229,15 +241,24 @@ class Presenter(metaclass=meta_.PresenterMeta):
     """
     pass
   
-  def _copy_state(self, old_presenter):
-    # noinspection PyProtectedMember
-    self._set_value(old_presenter.get_value())
-    self.set_sensitive(old_presenter.get_sensitive())
-    self.set_visible(old_presenter.get_visible())
-    
-    if not old_presenter.gui_update_enabled:
+  def _copy_state(
+        self,
+        previous_presenter,
+        copy_previous_value,
+        copy_previous_visible,
+        copy_previous_sensitive,
+  ):
+    if copy_previous_value:
+      # noinspection PyProtectedMember
+      self._set_value(previous_presenter.get_value())
+    if copy_previous_visible:
+      self.set_visible(previous_presenter.get_visible())
+    if copy_previous_sensitive:
+      self.set_sensitive(previous_presenter.get_sensitive())
+
+    if not previous_presenter.gui_update_enabled:
       self._value_changed_signal = None
-  
+
   def _update_setting_value(self):
     """Assigns the GUI widget value, entered by the user, to the setting value.
     """

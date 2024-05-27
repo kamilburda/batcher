@@ -367,7 +367,26 @@ class TestSettingGui(unittest.TestCase):
     self.assertFalse(self.setting.gui.get_sensitive())
     self.assertFalse(self.setting.gui.get_visible())
     self.assertEqual(self.widget.value, 'gif')
-  
+
+  def test_set_gui_disable_copying_previous_value(self):
+    self.setting.set_value('gif')
+
+    self.setting.set_gui(stubs_setting.StubPresenter, self.widget, copy_previous_value=False)
+
+    self.assertEqual(self.widget.value, '')
+
+  def test_set_gui_disable_copying_previous_visible_state(self):
+    self.setting.gui.set_visible(False)
+    self.setting.set_gui(stubs_setting.StubPresenter, self.widget, copy_previous_visible=False)
+
+    self.assertTrue(self.setting.gui.get_visible())
+
+  def test_set_gui_disable_copying_previous_sensitive_state(self):
+    self.setting.gui.set_sensitive(False)
+    self.setting.set_gui(stubs_setting.StubPresenter, self.widget, copy_previous_sensitive=False)
+
+    self.assertTrue(self.setting.gui.get_sensitive())
+
   def test_setting_gui_type(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten', default_value=False, gui_type=stubs_setting.CheckButtonStubPresenter)
