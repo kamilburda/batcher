@@ -605,27 +605,39 @@ class ExportLayersDialog:
     self._dialog.show()
   
   def _assign_gui_to_settings(self):
-    self._settings.initialize_gui({
-      'main/output_directory': [
-        pg.setting.SETTING_GUI_TYPES.folder_chooser_button, self._folder_chooser],
-      'main/file_extension': [
-        pg.setting.SETTING_GUI_TYPES.extended_entry, self._file_extension_entry],
-      'main/layer_filename_pattern': [
-        pg.setting.SETTING_GUI_TYPES.extended_entry, self._filename_pattern_entry],
-      'main/edit_mode': [
-        pg.setting.SETTING_GUI_TYPES.check_menu_item, self._menu_item_edit_mode],
-      'gui/image_preview_automatic_update': [
-        pg.setting.SETTING_GUI_TYPES.check_menu_item,
-        self._image_preview.menu_item_update_automatically],
-      'gui/size/dialog_position': [
-        pg.setting.SETTING_GUI_TYPES.window_position, self._dialog],
-      'gui/size/dialog_size': [
-        pg.setting.SETTING_GUI_TYPES.window_size, self._dialog],
-      'gui/size/paned_outside_previews_position': [
-        pg.setting.SETTING_GUI_TYPES.paned_position, self._hpaned_settings_and_previews],
-      'gui/size/paned_between_previews_position': [
-        pg.setting.SETTING_GUI_TYPES.paned_position, self._vpaned_previews],
-    })
+    self._settings.initialize_gui(
+      {
+        'main/output_directory': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.folder_chooser_button,
+          widget=self._folder_chooser),
+        'main/file_extension': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
+          widget=self._file_extension_entry),
+        'main/layer_filename_pattern': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
+          widget=self._filename_pattern_entry),
+        'main/edit_mode': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
+          widget=self._menu_item_edit_mode),
+        'gui/image_preview_automatic_update': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
+          widget=self._image_preview.menu_item_update_automatically),
+        'gui/size/dialog_position': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
+          widget=self._dialog),
+        'gui/size/dialog_size': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
+          widget=self._dialog),
+        'gui/size/paned_outside_previews_position': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+          widget=self._hpaned_settings_and_previews),
+        'gui/size/paned_between_previews_position': dict(
+          gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+          widget=self._vpaned_previews),
+      },
+      copy_previous_visible=False,
+      copy_previous_sensitive=False,
+    )
   
   def _init_gui_previews(self):
     self._name_preview = preview_name_.NamePreview(
