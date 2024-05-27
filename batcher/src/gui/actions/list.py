@@ -182,6 +182,8 @@ class ActionList(pg.gui.ItemBox):
         if self._current_temporary_action_item:
           self.remove_item(self._current_temporary_action_item)
 
+        action.tags.add('ignore_save')
+
         self._current_temporary_action = action
         
         self._current_temporary_action_item = self.add_item(action, attach_editor_widget=False)
@@ -201,6 +203,7 @@ class ActionList(pg.gui.ItemBox):
       action_editor_widget.show_additional_settings = False
 
       action['enabled'].set_value(True)
+      action.tags.remove('ignore_save')
 
       self._current_temporary_action = None
       self._current_temporary_action_item = None
