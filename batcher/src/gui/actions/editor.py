@@ -355,7 +355,9 @@ def _get_action_info_from_pdb_procedure(pdb_procedure):
           action_author_info[0] = f'\u00a9 {action_author_info[0]}'
 
     if action_author_info:
-      action_info += '\n\n' + ', '.join(action_author_info)
+      if action_info:
+        action_info += '\n\n'
+      action_info += ', '.join(action_author_info)
 
     return action_info
 
