@@ -123,9 +123,12 @@ class ActionBrowser(GObject.GObject):
          None,
          None])
 
+    # We pre-sort procedure names so that the column with these names will
+    # appear sorted for entries without a menu name (corresponding to the column
+    # used for sorting by default).
     pdb_procedures = [
       Gimp.get_pdb().lookup_procedure(name)
-      for name in pdb.gimp_pdb_query('', '', '', '', '', '', '')]
+      for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))]
 
     action_dicts = [
       actions_.get_action_dict_for_pdb_procedure(procedure) for procedure in pdb_procedures]
