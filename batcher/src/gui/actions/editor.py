@@ -287,6 +287,9 @@ class ActionEditorWidget:
       else:
         argument_description = setting.display_name
 
+      if argument_description is None or not argument_description.strip():
+        argument_description = setting.name
+
       label = Gtk.Label(
         label=argument_description,
         xalign=0.0,
