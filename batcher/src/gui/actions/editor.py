@@ -234,6 +234,7 @@ class ActionEditorWidget:
       selectable=True,
       wrap=True,
       max_width_chars=self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS,
+      xalign=0.0,
     )
 
     self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
