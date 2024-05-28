@@ -6,12 +6,15 @@ Redesigned user interface:
 * Adjusting settings for procedures and constraints now immediately updates the preview for improved feedback and interactivity.
 * Multiple edit dialogs (one for each procedure/constraint) can now be displayed simultaneously.
 * Edit dialogs for procedures and constraints are no longer separate windows and are hidden/shown simultaneously with the main dialog.
+* Completely reworked the custom procedure browser. You may now preview and tinker with a procedure/plug-in/script directly from the browser dialog before adding it to the list of procedures permanently.
+* In edit dialogs, replaced PDB parameter names with human-readable descriptions where available. The names are displayed as tooltips in case a user wants to track down issues with a procedure.
 * Moved detailed information about a procedure/constraint from a tooltip to a button showing a popup.
 * Given the changes above, adjusted dialog dimensions, positions of separators and spacing/margins/border width.
 
 Bug fixes:
 * Fixed a crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
 * Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
+* Fixed an issue where color parameters for some PDB procedures could not be adjusted.
 * Fixed redundant preview updates when the main, edit or procedure browser dialogs (re)gained focus.
 
 Other changes:
