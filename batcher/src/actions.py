@@ -641,7 +641,7 @@ def get_action_dict_for_pdb_procedure(
 
     if hasattr(proc_arg, 'default_value') and proc_arg.default_value is not None:
       if placeholder_type_name is None:
-        argument_dict['default_value'] = _get_arg_default_value(proc_arg)
+        argument_dict['default_value'] = _get_arg_default_value(pdb_procedure_name, proc_arg)
       elif setting_type == placeholders.PlaceholderUnsupportedParameterSetting:
         argument_dict['default_param_value'] = proc_arg.default_value
 
@@ -692,7 +692,13 @@ def _remove_invalid_init_arguments_for_placeholder_settings(
   }
 
 
-def _get_arg_default_value(proc_arg):
+def _get_arg_default_value(pdb_procedure_name, proc_arg):
+  if pdb_procedure_name in _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES:
+    proc_args_with_custom_defaults = (
+      _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES[pdb_procedure_name])
+    if proc_arg.name in proc_args_with_custom_defaults:
+      return proc_args_with_custom_defaults[proc_arg.name]
+
   if proc_arg.value_type not in [GObject.TYPE_CHAR, GObject.TYPE_UCHAR]:
     return proc_arg.default_value
   else:
@@ -864,4 +870,17 @@ def walk(
 _ACTION_TYPES_AND_FUNCTIONS = {
   'procedure': _create_procedure,
   'constraint': _create_constraint,
+}
+
+_PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES = {
+  'plug-in-lighting': {'new-image': False},
+  'plug-in-map-object': {'new-image': False, 'new-layer': False},
+  'plug-in-smooth-palette': {'show-image': False},
+  'script-fu-add-bevel': {'toggle': False},
+  'script-fu-circuit': {'toggle-3': False},
+  'script-fu-fuzzy-border': {'toggle-3': False, 'toggle-4': False},
+  'script-fu-old-photo': {'toggle-4': False},
+  'script-fu-round-corners': {'toggle-3': False},
+  'script-fu-slide': {'toggle': False},
+  'script-fu-spinning-globe': {'toggle-3': False},
 }

@@ -791,3 +791,18 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
     
     self.assertEqual(action_dict['arguments'][-2]['type'], placeholders_.PlaceholderImageSetting)
     self.assertEqual(action_dict['arguments'][-1]['type'], placeholders_.PlaceholderLayerSetting)
+
+  def test_with_hard_coded_custom_default_value(self, mock_get_pdb):
+    self.procedure_name = 'plug-in-lighting'
+    self.procedure_stub_kwargs['name'] = self.procedure_name
+
+    self.procedure_stub_kwargs['arguments_spec'].append(
+      dict(value_type=GObject.TYPE_BOOLEAN, name='new-image', default_value=True),
+    )
+
+    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    stubs_gimp.PdbStub.add_procedure(procedure_stub)
+
+    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
+
+    self.assertEqual(action_dict['arguments'][-1]['default_value'], False)
