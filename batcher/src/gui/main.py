@@ -1131,7 +1131,7 @@ class ExportLayersDialog:
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
 
 
-class ExportLayersNowDialog:
+class ExportLayersQuickDialog:
   
   _BORDER_WIDTH = 8
   _HBOX_HORIZONTAL_SPACING = 8

@@ -18,7 +18,7 @@ Bug fixes:
 * Fixed redundant preview updates when the main, edit or procedure browser dialogs (re)gained focus.
 
 Other changes:
-* Moved menu entries back under the `Batch` submenu to avoid confusion with the `Export...` and `Export As...` menu entries.
+* Renamed the `Export Layers Now` menu entry to `Export Layers (Quick)` for hopefully greater clarity.
 
 
 ## 0.2

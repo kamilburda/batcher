@@ -59,7 +59,7 @@ def plug_in_batch_export_layers(
     return _run_noninteractive(layer_tree, config)
 
 
-def plug_in_batch_export_layers_now(
+def plug_in_batch_export_layers_quick(
       _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
   SETTINGS['special/run_mode'].set_value(run_mode)
   SETTINGS['special/image'].set_value(image)
@@ -73,7 +73,7 @@ def plug_in_batch_export_layers_now(
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_export_layers_now_interactive(layer_tree)
+    return _run_export_layers_quick_interactive(layer_tree)
   else:
     return _run_with_last_vals(layer_tree)
 
@@ -166,8 +166,8 @@ def _run_export_layers_interactive(layer_tree):
   gui_main.ExportLayersDialog(layer_tree, SETTINGS)
 
 
-def _run_export_layers_now_interactive(layer_tree):
-  gui_main.ExportLayersNowDialog(layer_tree, SETTINGS)
+def _run_export_layers_quick_interactive(layer_tree):
+  gui_main.ExportLayersQuickDialog(layer_tree, SETTINGS)
 
 
 def _run_plugin_noninteractive(run_mode, layer_tree):
@@ -186,7 +186,7 @@ pg.register_procedure(
   plug_in_batch_export_layers,
   arguments=pg.setting.create_params(SETTINGS['main']),
   menu_label=_('E_xport Layers...'),
-  menu_path='<Image>/File/{}'.format(_('Batch')),
+  menu_path='<Image>/File/[Export]',
   image_types='*',
   sensitivity_mask=(
     Gimp.ProcedureSensitivityMask.NO_DRAWABLES
@@ -198,9 +198,9 @@ pg.register_procedure(
 
 
 pg.register_procedure(
-  plug_in_batch_export_layers_now,
-  menu_label=_('E_xport Layers Now'),
-  menu_path='<Image>/File/{}'.format(_('Batch')),
+  plug_in_batch_export_layers_quick,
+  menu_label=_('E_xport Layers (Quick)'),
+  menu_path='<Image>/File/[Export]',
   image_types='*',
   sensitivity_mask=(
     Gimp.ProcedureSensitivityMask.NO_DRAWABLES

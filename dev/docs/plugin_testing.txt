@@ -34,7 +34,7 @@ Image types
 * indexed
 
 
-# Export Layers Now Dialog
+# Export Layers (Quick) Dialog
 
 Any run mode
 * load settings
