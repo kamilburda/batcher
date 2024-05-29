@@ -97,8 +97,9 @@ class Persistor:
       not loaded yet.
 
     * ``'after-load'`` - invoked after loading settings. The event will also be
-      triggered for settings originally not present in memory as they are now
-      loaded. This event is triggered even if loading fails for any source.
+      triggered for settings originally not present in memory as they are loaded
+      at this point. This event is triggered even if loading fails for any
+      source.
 
     * events triggered in `setting.Setting.set_value()` when a setting is being
       loaded.
