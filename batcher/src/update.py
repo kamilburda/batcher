@@ -8,6 +8,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src import actions as actions_
 from src import utils as utils_
 from src import version as version_
 from src.gui import messages
@@ -145,4 +146,56 @@ def _is_fresh_start(sources):
   return all(not source.has_data() for source in sources.values())
 
 
-_UPDATE_HANDLERS = {}
+def _update_to_0_3(settings, sources):
+  _update_actions_to_0_3(settings, 'procedures')
+  _update_actions_to_0_3(settings, 'constraints')
+
+  if 'file_extension' in settings['main']:
+    settings['main/file_extension'].gui.auto_update_gui_to_setting(False)
+
+  if 'output_directory' in settings['main']:
+    settings['main/output_directory'].gui.auto_update_gui_to_setting(False)
+
+  if 'layer_filename_pattern' in settings['main']:
+    settings['main/layer_filename_pattern'].gui.auto_update_gui_to_setting(False)
+
+  if 'show_more_settings' in settings['gui']:
+    settings['gui'].remove(['show_more_settings'])
+
+  if 'dialog_size' in settings['gui/size']:
+    settings['gui/size/dialog_size'].reset()
+
+  if 'paned_outside_previews_position' in settings['gui/size']:
+    settings['gui/size/paned_outside_previews_position'].reset()
+    settings['gui/size/paned_outside_previews_position'].set_gui(None)
+
+  if 'paned_between_previews_position' in settings['gui/size']:
+    settings['gui/size/paned_between_previews_position'].reset()
+    settings['gui/size/paned_outside_previews_position'].set_gui(None)
+
+
+def _update_actions_to_0_3(settings, action_type):
+  for action in actions_.walk(settings[f'main/{action_type}']):
+    action['display_options_on_create'].set_value(False)
+
+    more_options_group = pg.setting.Group(
+      'more_options',
+      setting_attributes={
+        'pdb_type': None,
+      })
+    action.add([more_options_group])
+    action.reorder('more_options', -2)
+
+    enabled_for_previews_setting = action['enabled_for_previews']
+    action.remove(['enabled_for_previews'])
+    more_options_group.add([enabled_for_previews_setting])
+
+    if 'also_apply_to_parent_folders' in action:
+      also_apply_to_parent_folders_setting = action['also_apply_to_parent_folders']
+      action.remove(['also_apply_to_parent_folders'])
+      more_options_group.add([also_apply_to_parent_folders_setting])
+
+
+_UPDATE_HANDLERS = {
+  '0.3': _update_to_0_3,
+}
