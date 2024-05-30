@@ -496,7 +496,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         for multiple settings or for other purposes outside this setting.
 
         If ``gui_type`` is ``None``, the GUI is removed and any events the
-        GUI had are disconnected. The state of the old GUI is still preserved.
+        GUI had are disconnected. The state of the previous GUI is still
+        preserved.
       widget:
         A native GUI widget.
 
