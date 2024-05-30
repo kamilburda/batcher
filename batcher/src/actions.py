@@ -828,7 +828,7 @@ def clear(actions: pg.setting.Group, add_initial_actions: bool = True):
 
 def walk(
       actions: pg.setting.Group, action_type: Optional[str] = None, setting_name: str = None,
-) -> Generator[pg.setting.Group, None, None]:
+) -> Generator[Union[pg.setting.Setting, pg.setting.Group], None, None]:
   """Iterates over an action group, yielding actions or individual settings
   within each action.
   
