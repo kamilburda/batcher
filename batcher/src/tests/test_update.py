@@ -54,7 +54,7 @@ class TestUpdate(unittest.TestCase):
   def test_fresh_start_stores_current_version(self, *mocks):
     self.assertFalse(pg.setting.Persistor.get_default_setting_sources()['persistent'].has_data())
 
-    status, _unused = update.update(self.settings)
+    status, _unused = update.load_and_update(self.settings)
     
     self.assertEqual(status, update.FRESH_START)
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
@@ -75,7 +75,7 @@ class TestUpdate(unittest.TestCase):
     self.settings['main/plugin_version'].set_value(self.previous_version)
     self.settings['main/plugin_version'].save()
     
-    status, _unused = update.update(self.settings)
+    status, _unused = update.load_and_update(self.settings)
     
     self.assertEqual(status, update.UPDATE)
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
@@ -86,7 +86,7 @@ class TestUpdate(unittest.TestCase):
     
     self.settings['main/test_setting'].save()
     
-    status, _unused = update.update(self.settings)
+    status, _unused = update.load_and_update(self.settings)
     
     self.assertEqual(status, update.CLEAR_SETTINGS)
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
@@ -99,7 +99,7 @@ class TestUpdate(unittest.TestCase):
 
     self.settings['main'].save()
     
-    status, _unused = update.update(self.settings)
+    status, _unused = update.load_and_update(self.settings)
     
     load_result = self.settings['main/test_setting'].load()
     
@@ -116,7 +116,7 @@ class TestUpdate(unittest.TestCase):
 
     self.settings['main'].save()
     
-    status, _unused = update.update(self.settings, 'ask_to_clear')
+    status, _unused = update.load_and_update(self.settings, 'ask_to_clear')
     
     load_result = self.settings['main/test_setting'].load()
     
@@ -134,7 +134,7 @@ class TestUpdate(unittest.TestCase):
     self.settings['main/plugin_version'].set_value('invalid_version')
     self.settings['main'].save()
 
-    status, _unused = update.update(self.settings, 'ask_to_clear')
+    status, _unused = update.load_and_update(self.settings, 'ask_to_clear')
 
     load_result = self.settings['main/test_setting'].load()
 

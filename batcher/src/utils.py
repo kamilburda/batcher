@@ -26,7 +26,7 @@ def clear_setting_sources(
   
   pg.setting.Persistor.clear(sources)
   
-  save_plugin_version(settings, sources)
+  update_plugin_version(settings, sources)
 
 
 def format_message_from_persistor_statuses(
@@ -69,9 +69,11 @@ def get_messages_from_persistor_statuses(
   return messages_per_source
 
 
-def save_plugin_version(
+def update_plugin_version(
       settings: pg.setting.Group,
-      sources: Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]],
+      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
+      save_to_sources: bool = True,
 ):
   settings['main/plugin_version'].reset()
-  settings['main/plugin_version'].save(sources)
+  if save_to_sources:
+    settings['main/plugin_version'].save(sources)

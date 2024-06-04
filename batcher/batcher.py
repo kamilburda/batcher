@@ -45,14 +45,10 @@ def plug_in_batch_export_layers(
 
   _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
 
-  status = _update_plugin(SETTINGS, run_mode)
-  if status == update.TERMINATE:
-    return
-
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_export_layers_interactive(layer_tree)
+    return _run_interactive(layer_tree, gui_main.ExportLayersDialog)
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(layer_tree)
   else:
@@ -66,14 +62,10 @@ def plug_in_batch_export_layers_quick(
 
   _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
 
-  status = _update_plugin(SETTINGS, run_mode)
-  if status == update.TERMINATE:
-    return
-
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_export_layers_quick_interactive(layer_tree)
+    return _run_interactive(layer_tree, gui_main.ExportLayersQuickDialog)
   else:
     return _run_with_last_vals(layer_tree)
 
@@ -86,7 +78,7 @@ def _set_default_setting_source(source_name):
 
 
 def _update_plugin(settings, run_mode):
-  status, _message = update.update(
+  status, _message = update.load_and_update(
     settings,
     'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
 
@@ -103,25 +95,13 @@ def _load_settings_from_file(settings_file):
 
   setting_source = pg.setting.JsonFileSource(pg.config.SOURCE_NAME, settings_filepath)
 
-  status, update_message = update.update(
+  status, message = update.load_and_update(
     SETTINGS, handle_invalid='terminate', sources={'persistent': setting_source})
   if status == update.TERMINATE:
-    error_message = _('Failed to update the file with settings to the latest version.')
+    error_message = _('Failed to import settings from file "{}".').format(settings_filepath)
 
-    if update_message:
-      error_message += ' ' + _('Reason: {}').format(update_message)
-
-    return Gimp.PDBStatusType.EXECUTION_ERROR, error_message
-
-  load_result = SETTINGS.load({'persistent': setting_source})
-  if load_result.status not in [
-       pg.setting.Persistor.SUCCESS, pg.setting.Persistor.PARTIAL_SUCCESS]:
-    error_message = _('Failed to load settings from file.')
-
-    load_message = utils_.format_message_from_persistor_statuses(
-      load_result.statuses_per_source).strip()
-    if load_message:
-      error_message += ' ' + _('Reason: {}').format(load_message)
+    if message:
+      error_message += ' ' + _('Details: {}').format(message)
 
     return Gimp.PDBStatusType.EXECUTION_ERROR, error_message
 
@@ -157,17 +137,19 @@ def _run_noninteractive(layer_tree, config):
 
 
 def _run_with_last_vals(layer_tree):
-  SETTINGS['main'].load()
+  status = _update_plugin(SETTINGS, Gimp.RunMode.WITH_LAST_VALS)
+  if status == update.TERMINATE:
+    return
   
   _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree)
 
 
-def _run_export_layers_interactive(layer_tree):
-  gui_main.ExportLayersDialog(layer_tree, SETTINGS)
+def _run_interactive(layer_tree, gui_class):
+  status = _update_plugin(SETTINGS, Gimp.RunMode.INTERACTIVE)
+  if status == update.TERMINATE:
+    return
 
-
-def _run_export_layers_quick_interactive(layer_tree):
-  gui_main.ExportLayersQuickDialog(layer_tree, SETTINGS)
+  gui_class(layer_tree, SETTINGS)
 
 
 def _run_plugin_noninteractive(run_mode, layer_tree):

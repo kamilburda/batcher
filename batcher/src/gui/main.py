@@ -678,43 +678,37 @@ class ExportLayersDialog:
     
     for setting in settings_to_ignore_for_reset:
       setting.tags.discard('ignore_reset')
-    
-    status, message = update.update(
-      self._settings, handle_invalid='terminate', sources={'persistent': source})
-    if status == update.TERMINATE:
-      messages_.display_import_export_settings_failure_message(
-        _(('Failed to import settings from file "{}".'
-           ' Settings must be reset completely.').format(filepath)),
-        details=message,
-        parent=self._dialog)
-      
-      self._reset_settings()
-      actions.clear(self._settings['main/procedures'])
-      actions.clear(self._settings['main/constraints'])
-      return False
-    
+
     size_settings_to_ignore_for_load = []
     if not load_size_settings:
       for setting in self._settings['gui'].walk(lambda s: 'ignore_load' not in s.tags):
         if setting.get_path('root').startswith('gui/size'):
           setting.tags.add('ignore_load')
           size_settings_to_ignore_for_load.append(setting)
-    
-    load_result = self._settings.load({'persistent': source})
-    
+
+    status, message = update.load_and_update(
+      self._settings,
+      handle_invalid='terminate',
+      sources={'persistent': source},
+      update_sources=False,
+    )
+
     for setting in size_settings_to_ignore_for_load:
       setting.tags.discard('ignore_load')
-    
-    if any(status in load_result.statuses_per_source.values()
-           for status in [pg.setting.Persistor.SOURCE_NOT_FOUND, pg.setting.Persistor.FAIL]):
+
+    if status == update.TERMINATE:
       messages_.display_import_export_settings_failure_message(
-        _('Failed to import settings from file "{}"'.format(filepath)),
-        details=utils_.format_message_from_persistor_statuses(
-          load_result.statuses_per_source, separator='\n\n'),
+        _(('Failed to import settings from file "{}".'
+           ' Settings must be reset completely.')).format(filepath),
+        details=message,
         parent=self._dialog)
+
+      self._reset_settings()
+      actions.clear(self._settings['main/procedures'])
+      actions.clear(self._settings['main/constraints'])
       return False
-    else:
-      return True
+
+    return True
   
   def _save_settings(self, filepath=None, file_format='json'):
     if filepath is None:
