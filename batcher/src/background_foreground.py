@@ -216,13 +216,9 @@ def _get_adjacent_layer(
 
 
 def _get_previous_enabled_procedures(batcher, current_action, action_orig_name_to_match):
-  # HACK: This avoids a circular import. To resolve this, one possible way is to
-  # refactor `actions` to turn actions into classes.
-  from src import actions
-  
   previous_enabled_procedures = []
   
-  for procedure in actions.walk(batcher.procedures):
+  for procedure in batcher.procedures:
     if procedure == current_action:
       return previous_enabled_procedures
     

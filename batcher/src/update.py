@@ -8,7 +8,6 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src import actions as actions_
 from src import utils as utils_
 from src import version as version_
 from src.gui import messages
@@ -177,7 +176,7 @@ def _update_to_0_3(settings, sources):
 
 
 def _update_actions_to_0_3(settings, action_type):
-  for action in actions_.walk(settings[f'main/{action_type}']):
+  for action in settings[f'main/{action_type}']:
     action['display_options_on_create'].set_value(False)
 
     if 'more_options' not in action:

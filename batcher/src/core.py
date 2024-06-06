@@ -813,24 +813,24 @@ class Batcher:
     
     self._add_default_rename_procedure([actions.DEFAULT_PROCEDURES_GROUP])
     
-    for procedure in actions.walk(self._procedures):
+    for procedure in self._procedures:
       self._add_action_from_settings(procedure)
     
     self._add_default_export_procedure([actions.DEFAULT_PROCEDURES_GROUP])
     
-    for constraint in actions.walk(self._constraints):
+    for constraint in self._constraints:
       self._add_action_from_settings(constraint)
   
   def _add_name_only_actions(self):
     self._add_default_rename_procedure([_NAME_ONLY_ACTION_GROUP])
     
-    for procedure in actions.walk(self._procedures):
+    for procedure in self._procedures:
       self._add_action_from_settings(
         procedure, [builtin_procedures.NAME_ONLY_TAG], [_NAME_ONLY_ACTION_GROUP])
     
     self._add_default_export_procedure([_NAME_ONLY_ACTION_GROUP])
     
-    for constraint in actions.walk(self._constraints):
+    for constraint in self._constraints:
       self._add_action_from_settings(
         constraint, [builtin_procedures.NAME_ONLY_TAG], [_NAME_ONLY_ACTION_GROUP])
   
@@ -838,7 +838,7 @@ class Batcher:
     if (not self._edit_mode
         and not any(
           procedure['orig_name'].value == 'rename' and procedure['enabled'].value
-          for procedure in actions.walk(self._procedures))):
+          for procedure in self._procedures)):
       self._invoker.add(
         builtin_procedures.rename_layer,
         groups=action_groups,
@@ -848,7 +848,7 @@ class Batcher:
     if (not self._edit_mode
         and not any(
           procedure['orig_name'].value == 'export' and procedure['enabled'].value
-          for procedure in actions.walk(self._procedures))):
+          for procedure in self._procedures)):
       self._invoker.add(
         export_.export,
         groups=action_groups,

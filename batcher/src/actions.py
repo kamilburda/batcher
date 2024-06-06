@@ -59,7 +59,7 @@ containing actions. These events include:
   actions.
 """
 import inspect
-from typing import Any, Dict, Generator, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -321,7 +321,7 @@ def _uniquify_action_name(actions, name):
   return (
     uniquify.uniquify_string(
       name,
-      [action.name for action in walk(actions)],
+      [action.name for action in actions],
       generator=_generate_unique_action_name()))
 
 
@@ -329,17 +329,17 @@ def _uniquify_action_display_name(actions, display_name):
   """Returns ``display_name`` to be unique, i.e. modified to not match the
   display name of any existing action in ``actions``.
   """
-  
+
   def _generate_unique_display_name():
     i = 2
     while True:
       yield f' ({i})'
       i += 1
-  
+
   return (
     uniquify.uniquify_string(
       display_name,
-      [action['display_name'].value for action in walk(actions)],
+      [action['display_name'].value for action in actions],
       generator=_generate_unique_display_name()))
 
 
@@ -824,47 +824,6 @@ def clear(actions: pg.setting.Group, add_initial_actions: bool = True):
       _create_initial_actions(actions, _ACTIONS_AND_INITIAL_ACTION_DICTS[actions])
   
   actions.invoke_event('after-clear-actions')
-
-
-def walk(
-      actions: pg.setting.Group, action_type: Optional[str] = None, setting_name: str = None,
-) -> Generator[Union[pg.setting.Setting, pg.setting.Group], None, None]:
-  """Iterates over an action group, yielding actions or individual settings
-  within each action.
-  
-  The value of ``action_type`` limits the yielded actions to a specific type.
-  If ``action_type`` is ``None``, all actions are yielded. For allowed
-  action types, see `create()`. For example, ``action_type='procedure'`` would
-  only yield procedures. Invalid values for ``action_type`` raise `ValueError`.
-
-  If ``setting_name`` is ``None``, actions as `pygimplib.setting.Group`
-  instances are returned.
-
-  If ``setting_name`` is not ``None``, settings or nested groups within each
-  action matching the name are returned. For example, ``name='enabled'`` yields
-  the ``'enabled'`` setting for each action. For the list of possible names of
-  settings and subgroups, see `create()`.
-  """
-  action_types = list(_ACTION_TYPES_AND_FUNCTIONS)
-  
-  if action_type is not None and action_type not in action_types:
-    raise ValueError(f'invalid action type "{action_type}"')
-  
-  def has_matching_type(action_):
-    if action_type is None:
-      return any(type_ in action_.tags for type_ in action_types)
-    else:
-      return action_type in action_.tags
-  
-  for action in actions:
-    if not has_matching_type(action):
-      continue
-    
-    if setting_name is None:
-      yield action
-    else:
-      if setting_name in action:
-        yield action[setting_name]
 
 
 _ACTION_TYPES_AND_FUNCTIONS = {
