@@ -213,6 +213,8 @@ class ExportLayersDialog:
 
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
+  _PREVIEWS_INITIAL_UPDATE_KEY = 'initial_update'
+
   def __init__(self, initial_layer_tree, settings, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
     self._settings = settings
@@ -565,8 +567,7 @@ class ExportLayersDialog:
     return button_help
 
   def _finish_init_and_show(self):
-    while Gtk.events_pending():
-      Gtk.main_iteration()
+    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_INITIAL_UPDATE_KEY)
 
     self._dialog.vbox.show_all()
     self._update_gui_for_edit_mode(update_name_preview=False)
@@ -637,6 +638,7 @@ class ExportLayersDialog:
 
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, self._image)
+    self._previews_controller.lock_previews(self._PREVIEWS_INITIAL_UPDATE_KEY)
 
   def _import_settings(self, filepath, file_format, load_size_settings=True):
     source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
