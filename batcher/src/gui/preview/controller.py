@@ -9,9 +9,6 @@ from gi.repository import GLib
 
 import pygimplib as pg
 
-from src import builtin_constraints
-from src import builtin_procedures
-
 
 class PreviewsController:
   
@@ -19,6 +16,8 @@ class PreviewsController:
   _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
   
   _PREVIEW_ERROR_KEY = 'preview_error'
+  _PREVIEWS_SENSITIVE_KEY = 'previews_sensitive'
+  _VPANED_PREVIEW_SENSITIVE_KEY = 'vpaned_preview_sensitive'
   
   def __init__(self, name_preview, image_preview, settings, image):
     self._name_preview = name_preview
@@ -35,7 +34,20 @@ class PreviewsController:
       self._settings['gui/size/paned_outside_previews_position'].value)
     self._paned_between_previews_previous_position = (
       self._settings['gui/size/paned_between_previews_position'].value)
-  
+
+  def lock_previews(self, key):
+    self._name_preview.lock_update(True, key)
+    self._image_preview.lock_update(True, key)
+
+  def unlock_and_update_previews(self, key):
+    self._name_preview.lock_update(False, key)
+    pg.invocation.timeout_add_strict(
+      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
+
+    self._image_preview.lock_update(False, key)
+    pg.invocation.timeout_add_strict(
+      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
+
   def connect_setting_changes_to_previews(self, procedure_list, constraint_list):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
@@ -45,7 +57,8 @@ class PreviewsController:
     self._connect_setting_after_reset_displayed_items_in_image_preview()
     
     self._connect_toggle_name_preview_filtering()
-    self._connect_update_rendering_of_image_preview()
+    self._connect_update_rendering_of_image_preview(self._settings['main/procedures'])
+    self._connect_update_rendering_of_image_preview(self._settings['main/constraints'])
     self._connect_image_preview_menu_setting_changes()
 
     self._connect_toplevel_focus_change()
@@ -55,7 +68,7 @@ class PreviewsController:
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
   
-  def on_paned_outside_previews_notify_position(self, paned, property_spec):
+  def on_paned_outside_previews_notify_position(self, paned, _property_spec):
     current_position = paned.get_position()
     max_position = paned.get_property('max-position')
     
@@ -64,21 +77,21 @@ class PreviewsController:
       self._disable_preview_on_paned_drag(
         self._name_preview,
         self._settings['gui/name_preview_sensitive'],
-        'previews_sensitive')
+        self._PREVIEWS_SENSITIVE_KEY)
       self._disable_preview_on_paned_drag(
         self._image_preview,
         self._settings['gui/image_preview_sensitive'],
-        'previews_sensitive')
+        self._PREVIEWS_SENSITIVE_KEY)
     elif (current_position != max_position
           and self._paned_outside_previews_previous_position == max_position):
       self._enable_preview_on_paned_drag(
         self._name_preview,
         self._settings['gui/name_preview_sensitive'],
-        'previews_sensitive')
+        self._PREVIEWS_SENSITIVE_KEY)
       self._enable_preview_on_paned_drag(
         self._image_preview,
         self._settings['gui/image_preview_sensitive'],
-        'previews_sensitive')
+        self._PREVIEWS_SENSITIVE_KEY)
     elif current_position != self._paned_outside_previews_previous_position:
       if self._image_preview.is_larger_than_image():
         pg.invocation.timeout_add_strict(
@@ -90,7 +103,7 @@ class PreviewsController:
     
     self._paned_outside_previews_previous_position = current_position
   
-  def on_paned_between_previews_notify_position(self, paned, property_spec):
+  def on_paned_between_previews_notify_position(self, paned, _property_spec):
     current_position = paned.get_position()
     max_position = paned.get_property('max-position')
     min_position = paned.get_property('min-position')
@@ -100,25 +113,25 @@ class PreviewsController:
       self._disable_preview_on_paned_drag(
         self._image_preview,
         self._settings['gui/image_preview_sensitive'],
-        'vpaned_preview_sensitive')
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif (current_position != max_position
           and self._paned_between_previews_previous_position == max_position):
       self._enable_preview_on_paned_drag(
         self._image_preview,
         self._settings['gui/image_preview_sensitive'],
-        'vpaned_preview_sensitive')
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif (current_position == min_position
           and self._paned_between_previews_previous_position != min_position):
       self._disable_preview_on_paned_drag(
         self._name_preview,
         self._settings['gui/name_preview_sensitive'],
-        'vpaned_preview_sensitive')
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif (current_position != min_position
           and self._paned_between_previews_previous_position == min_position):
       self._enable_preview_on_paned_drag(
         self._name_preview,
         self._settings['gui/name_preview_sensitive'],
-        'vpaned_preview_sensitive')
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif current_position != self._paned_between_previews_previous_position:
       if self._image_preview.is_larger_than_image():
         pg.invocation.timeout_add_strict(
@@ -130,53 +143,58 @@ class PreviewsController:
     
     self._paned_between_previews_previous_position = current_position
   
-  def _connect_actions_changed(self, actions_):
+  def _connect_actions_changed(self, actions):
     # We store event IDs in lists in case the same action is added multiple times.
     settings_and_event_ids = collections.defaultdict(lambda: collections.defaultdict(list))
 
-    def _on_after_add_action(_actions, action, *args, **kwargs):
+    def _on_after_add_action(_actions, action_, _action_dict):
       nonlocal settings_and_event_ids
 
-      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
+      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
 
-      settings_and_event_ids[action]['enabled'].append(
-        action['enabled'].connect_event(
-          'value-changed', self._update_previews_on_setting_change, action))
+      settings_and_event_ids[action_]['enabled'].append(
+        action_['enabled'].connect_event(
+          'value-changed', self._update_previews_on_setting_change, action_))
 
-      for setting in action['arguments']:
-        settings_and_event_ids[action][f'arguments/{setting.name}'].append(
+      for setting in action_['arguments']:
+        settings_and_event_ids[action_][f'arguments/{setting.name}'].append(
           setting.connect_event(
-            'value-changed', self._update_previews_on_setting_change_if_enabled, action))
+            'value-changed', self._update_previews_on_setting_change_if_enabled, action_))
 
-      for setting in action['more_options']:
-        settings_and_event_ids[action][f'more_options/{setting.name}'].append(
+      for setting in action_['more_options']:
+        settings_and_event_ids[action_][f'more_options/{setting.name}'].append(
           setting.connect_event(
-            'value-changed', self._update_previews_on_setting_change_if_enabled, action))
+            'value-changed', self._update_previews_on_setting_change_if_enabled, action_))
     
-    def _on_after_reorder_action(_actions, action, *args, **kwargs):
-      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
+    def _on_after_reorder_action(_actions, action_, *args, **kwargs):
+      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
     
-    def _on_before_remove_action(_actions, action, *args, **kwargs):
+    def _on_before_remove_action(_actions, action_, *args, **kwargs):
       nonlocal settings_and_event_ids
 
-      self._update_previews_on_setting_change_if_enabled(action['enabled'], action)
+      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
 
       should_remove_action_from_event_ids = False
 
-      for setting_path, event_ids in settings_and_event_ids[action].items():
+      for setting_path, event_ids in settings_and_event_ids[action_].items():
         if event_ids:
-          action[setting_path].remove_event(event_ids[-1])
+          action_[setting_path].remove_event(event_ids[-1])
           event_ids.pop()
           # We do not have to separately check if each list is empty as they are all updated at
           # once.
           should_remove_action_from_event_ids = True
 
       if should_remove_action_from_event_ids:
-        del settings_and_event_ids[action]
+        del settings_and_event_ids[action_]
     
-    actions_.connect_event('after-add-action', _on_after_add_action)
-    actions_.connect_event('after-reorder-action', _on_after_reorder_action)
-    actions_.connect_event('before-remove-action', _on_before_remove_action)
+    actions.connect_event('after-add-action', _on_after_add_action)
+
+    # Activate event for existing actions
+    for action in actions:
+      _on_after_add_action(actions, action, None)
+
+    actions.connect_event('after-reorder-action', _on_after_reorder_action)
+    actions.connect_event('before-remove-action', _on_before_remove_action)
 
   def _update_previews_on_setting_change_if_enabled(self, setting, action):
     if action['enabled'].value:
@@ -187,13 +205,7 @@ class PreviewsController:
         and setting.name != 'enabled_for_previews'):
       return
 
-    self._name_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
-    pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
-
-    self._image_preview.lock_update(False, self._PREVIEW_ERROR_KEY)
-    pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
+    self.unlock_and_update_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_layers_collapsed_state'].connect_event(
@@ -214,35 +226,39 @@ class PreviewsController:
       lambda setting: self._name_preview.set_selected_items(setting.value[self._image]))
   
   def _connect_setting_after_reset_displayed_items_in_image_preview(self):
-    def _clear_image_preview(setting):
+    def _clear_image_preview(_setting):
       self._image_preview.clear()
     
     self._settings['gui/image_preview_displayed_layers'].connect_event(
       'after-reset', _clear_image_preview)
   
   def _connect_toggle_name_preview_filtering(self):
-    def _after_add_selected_in_preview(constraints, constraint, orig_constraint_dict):
-      if constraint['orig_name'].value == 'selected_in_preview':
-        self._selected_in_preview_constraints[constraint.name] = constraint
+    def _after_add_selected_in_preview(_constraints, constraint_, _orig_constraint_dict):
+      if constraint_['orig_name'].value == 'selected_in_preview':
+        self._selected_in_preview_constraints[constraint_.name] = constraint_
         
-        _on_enabled_changed(constraint['enabled'])
-        constraint['enabled'].connect_event('value-changed', _on_enabled_changed)
+        _on_enabled_changed(constraint_['enabled'])
+        constraint_['enabled'].connect_event('value-changed', _on_enabled_changed)
     
-    def _before_remove_selected_in_preview(constraints, constraint):
-      if constraint.name in self._selected_in_preview_constraints:
-        del self._selected_in_preview_constraints[constraint.name]
+    def _before_remove_selected_in_preview(_constraints, constraint_):
+      if constraint_.name in self._selected_in_preview_constraints:
+        del self._selected_in_preview_constraints[constraint_.name]
     
-    def _before_clear_constraints(constraints):
+    def _before_clear_constraints(_constraints):
       self._selected_in_preview_constraints = {}
       self._name_preview.is_filtering = False
     
-    def _on_enabled_changed(constraint_enabled):
+    def _on_enabled_changed(_constraint_enabled):
       self._name_preview.is_filtering = (
-        any(constraint['enabled'].value
-            for constraint in self._selected_in_preview_constraints.values()))
+        any(constraint_['enabled'].value
+            for constraint_ in self._selected_in_preview_constraints.values()))
     
     self._settings['main/constraints'].connect_event(
       'after-add-action', _after_add_selected_in_preview)
+
+    # Activate event for existing actions
+    for constraint in self._settings['main/constraints']:
+      _after_add_selected_in_preview(self._settings['main/constraints'], constraint, None)
     
     self._settings['main/constraints'].connect_event(
       'before-remove-action', _before_remove_selected_in_preview)
@@ -250,55 +266,42 @@ class PreviewsController:
     self._settings['main/constraints'].connect_event(
       'before-clear-actions', _before_clear_constraints)
   
-  def _connect_update_rendering_of_image_preview(self):
-    def _after_add_action(actions, action, orig_action_dict, builtin_actions):
-      if (action['origin'].is_item('gimp_pdb')
-          or (action['origin'].is_item('builtin') and action['orig_name'].value == 'scale')):
-        self._custom_actions[action.get_path()] = action
+  def _connect_update_rendering_of_image_preview(self, actions):
+    def _after_add_action(_actions, action_, _orig_action_dict):
+      if (action_['origin'].is_item('gimp_pdb')
+          or (action_['origin'].is_item('builtin') and action_['orig_name'].value == 'scale')):
+        self._custom_actions[action_.get_path()] = action_
         
-        _update_rendering_of_image_preview(action['enabled'])
-        action['enabled'].connect_event('value-changed', _update_rendering_of_image_preview)
+        _update_rendering_of_image_preview(action_['enabled'])
+        action_['enabled'].connect_event('value-changed', _update_rendering_of_image_preview)
     
-    def _before_remove_action(actions, action):
-      if action.get_path() in self._custom_actions:
-        del self._custom_actions[action.get_path()]
+    def _before_remove_action(_actions, action_):
+      if action_.get_path() in self._custom_actions:
+        del self._custom_actions[action_.get_path()]
     
-    def _before_clear_actions(actions):
-      for action in actions:
+    def _before_clear_actions(actions_):
+      for action in actions_:
         if action.get_path() in self._custom_actions:
           del self._custom_actions[action.get_path()]
       
       if not self._custom_actions:
         self._image_preview.prepare_image_for_rendering()
     
-    def _update_rendering_of_image_preview(action_enabled):
+    def _update_rendering_of_image_preview(_action_enabled):
       if not any(action['enabled'].value for action in self._custom_actions.values()):
         self._image_preview.prepare_image_for_rendering()
       else:
         self._image_preview.prepare_image_for_rendering(
           ['after_process_item_contents'], ['after_process_item_contents'])
     
-    self._settings['main/procedures'].connect_event(
-      'after-add-action',
-      _after_add_action,
-      builtin_procedures.BUILTIN_PROCEDURES)
-    
-    self._settings['main/procedures'].connect_event(
-      'before-remove-action', _before_remove_action)
-    
-    self._settings['main/procedures'].connect_event(
-      'before-clear-actions', _before_clear_actions)
-    
-    self._settings['main/constraints'].connect_event(
-      'after-add-action',
-      _after_add_action,
-      builtin_constraints.BUILTIN_CONSTRAINTS)
-    
-    self._settings['main/constraints'].connect_event(
-      'before-remove-action', _before_remove_action)
-    
-    self._settings['main/constraints'].connect_event(
-      'before-clear-actions', _before_clear_actions)
+    actions.connect_event('after-add-action', _after_add_action)
+
+    # Activate event for existing actions
+    for action in actions:
+      _after_add_action(actions, action, None)
+
+    actions.connect_event('before-remove-action', _before_remove_action)
+    actions.connect_event('before-clear-actions', _before_clear_actions)
   
   def _connect_image_preview_menu_setting_changes(self):
     self._settings['gui/image_preview_automatic_update'].connect_event(
@@ -360,14 +363,13 @@ class PreviewsController:
     else:
       self._image_preview.update()
 
-  def _on_name_preview_selection_changed(self, preview):
+  def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
     self._update_image_preview()
   
-  def _on_name_preview_updated(self, preview, error):
+  def _on_name_preview_updated(self, _preview, error):
     if error:
-      self._name_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
-      self._image_preview.lock_update(True, self._PREVIEW_ERROR_KEY)
+      self.lock_previews(self._PREVIEW_ERROR_KEY)
     
     self._image_preview.update_item()
 

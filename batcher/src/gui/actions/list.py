@@ -118,16 +118,20 @@ class ActionList(pg.gui.ItemBox):
 
     self._after_add_action_event_id = self._actions.connect_event(
       'after-add-action',
-      lambda _actions, action, orig_action_dict: self._add_item_from_action(action))
+      lambda _actions, action_, orig_action_dict: self._add_item_from_action(action_))
+
+    # Add already existing actions
+    for action in self._actions:
+      self._add_item_from_action(action)
 
     self._after_reorder_action_event_id = self._actions.connect_event(
       'after-reorder-action',
-      lambda _actions, action, current_position, new_position: (
-        self._reorder_action(action, new_position)))
+      lambda _actions, action_, current_position, new_position: (
+        self._reorder_action(action_, new_position)))
 
     self._before_remove_action_event_id = self._actions.connect_event(
       'before-remove-action',
-      lambda _actions, action: self._remove_action(action))
+      lambda _actions, action_: self._remove_action(action_))
 
     self._before_clear_actions_event_id = self._actions.connect_event(
       'before-clear-actions', self._on_before_clear_actions)
@@ -310,7 +314,7 @@ class ActionList(pg.gui.ItemBox):
 
     self._actions_menu.show_all()
 
-  def _on_button_add_clicked(self, button):
+  def _on_button_add_clicked(self, _button):
     self._actions_menu.popup_at_pointer(None)
 
   def _add_action_to_menu_popup(self, action_dict):
@@ -340,7 +344,7 @@ class ActionList(pg.gui.ItemBox):
 
     current_parent_menu.append(menu_item)
 
-  def _on_actions_menu_item_activate(self, menu_item, action_dict):
+  def _on_actions_menu_item_activate(self, _menu_item, action_dict):
     self.add_item(action_dict)
 
   def _add_add_custom_action_to_menu_popup(self):
@@ -348,7 +352,7 @@ class ActionList(pg.gui.ItemBox):
     menu_item.connect('activate', self._on_add_custom_action_menu_item_activate)
     self._actions_menu.append(menu_item)
 
-  def _on_add_custom_action_menu_item_activate(self, menu_item):
+  def _on_add_custom_action_menu_item_activate(self, _menu_item):
     self._browser.fill_contents_if_empty()
     self._browser.widget.show_all()
 
