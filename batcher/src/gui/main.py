@@ -214,6 +214,7 @@ class ExportLayersDialog:
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
   _PREVIEWS_INITIAL_UPDATE_KEY = 'initial_update'
+  _PREVIEWS_IMPORT_SETTINGS_KEY = 'import_settings'
 
   def __init__(self, initial_layer_tree, settings, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
@@ -657,6 +658,8 @@ class ExportLayersDialog:
     for setting in settings_to_ignore_for_reset:
       setting.tags.discard('ignore_reset')
 
+    self._previews_controller.lock_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
+
     size_settings_to_ignore_for_load = []
     if not load_size_settings:
       for setting in self._settings['gui'].walk(lambda s: 'ignore_load' not in s.tags):
@@ -673,6 +676,8 @@ class ExportLayersDialog:
 
     for setting in size_settings_to_ignore_for_load:
       setting.tags.discard('ignore_load')
+
+    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
 
     if status == update.TERMINATE:
       messages_.display_import_export_settings_failure_message(
