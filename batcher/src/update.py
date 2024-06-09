@@ -43,16 +43,18 @@ def load_and_update(
   if sources is None:
     sources = pg.setting.Persistor.get_default_setting_sources()
 
+  if _is_fresh_start(sources):
+    if update_sources:
+      settings.save(sources)
+
+    return FRESH_START, ''
+
   load_result = settings.load(sources)
   load_message = utils_.format_message_from_persistor_statuses(load_result.statuses_per_source)
 
   if any(status == pg.setting.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):
     return TERMINATE, load_message
-
-  if _is_fresh_start(sources):
-    utils_.update_plugin_version(settings, sources, save_to_sources=update_sources)
-    return FRESH_START, ''
 
   current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
 
