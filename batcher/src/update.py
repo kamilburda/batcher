@@ -75,7 +75,7 @@ def load_and_update(
 
       return UPDATE, load_message
   else:
-    return TERMINATE, 'failed to load'
+    return TERMINATE, _('Failed to obtain previous plug-in version.')
 
 
 def _get_previous_version(settings):
