@@ -2,40 +2,23 @@
 
 from typing import Dict, List, Optional, Tuple, Union
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-
 import pygimplib as pg
 
 from src import utils as utils_
 from src import version as version_
-from src.gui import messages
 
-_UPDATE_STATUSES = FRESH_START, UPDATE, CLEAR_SETTINGS, NO_ACTION, TERMINATE = 0, 1, 2, 3, 4
+_UPDATE_STATUSES = FRESH_START, UPDATE, NO_ACTION, TERMINATE = 0, 1, 2, 3
 
 
 def load_and_update(
       settings: pg.setting.Group,
-      handle_invalid: str = 'ask_to_clear',
       sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
       update_sources: bool = True,
 ) -> Tuple[int, str]:
   """Loads and updates settings and setting sources to the latest version of the
   plug-in.
   
-  Updating includes renaming settings or replacing obsolete settings.
-  
-  ``handle_invalid`` is a string indicating how to handle a failed update:
-
-    * ``'ask_to_clear'`` - a message is displayed asking the user whether to
-      clear settings. If the user chose to clear the settings, `CLEAR_SETTINGS`
-      is returned, `TERMINATE` otherwise.
-    
-    * ``'clear'`` - settings will be cleared unconditionally and
-      `CLEAR_SETTINGS` is returned.
-    
-    * any other value - no action is taken and `TERMINATE` is returned.
+  Updating involves renaming settings or replacing/removing obsolete settings.
   
   If ``sources`` is ``None``, default setting sources are used. Otherwise,
   ``sources`` must be a dictionary of (key, source) pairs.
@@ -48,15 +31,11 @@ def load_and_update(
   
   * `UPDATE` - The plug-in was successfully updated to the latest version.
   
-  * `CLEAR_SETTINGS` - An old version of the plug-in (incompatible with the
-    changes in later versions) was used that required clearing stored settings.
-  
   * `NO_ACTION` - No update was performed as the plug-in version remains the
     same.
   
-  * `TERMINATE` - No update was performed. This value is returned if the user
-    cancelled clearing settings interactively, or if the update failed (e.g.
-    because of a malformed setting source).
+  * `TERMINATE` - No update was performed. This value is returned if the update
+    failed (e.g. because of a malformed setting source).
 
   If ``update_sources`` is ``True``, the contents of ``sources`` are updated
   (overwritten), otherwise they are kept intact.
@@ -95,24 +74,8 @@ def load_and_update(
       )
 
       return UPDATE, load_message
-
-  if handle_invalid == 'ask_to_clear':
-    response = messages.display_message(
-      _('Due to significant changes in the plug-in, settings need to be reset. Proceed?'),
-      Gtk.MessageType.WARNING,
-      buttons=Gtk.ButtonsType.YES_NO,
-      button_response_id_to_focus=Gtk.ResponseType.NO)
-
-    if response == Gtk.ResponseType.YES:
-      utils_.clear_setting_sources(settings, sources)
-      return CLEAR_SETTINGS, load_message
-    else:
-      return TERMINATE, load_message
-  elif handle_invalid == 'clear':
-    utils_.clear_setting_sources(settings, sources)
-    return CLEAR_SETTINGS, load_message
   else:
-    return TERMINATE, load_message
+    return TERMINATE, 'failed to load'
 
 
 def _get_previous_version(settings):

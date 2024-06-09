@@ -669,7 +669,6 @@ class ExportLayersDialog:
 
     status, message = update.load_and_update(
       self._settings,
-      handle_invalid='terminate',
       sources={'persistent': source},
       update_sources=False,
     )
@@ -693,7 +692,7 @@ class ExportLayersDialog:
 
     return True
 
-  def _save_settings(self, filepath=None, file_format='json'):
+  def _save_settings(self, filepath=None):
     if filepath is None:
       save_result = self._settings.save()
     else:
@@ -919,10 +918,10 @@ class ExportLayersDialog:
 
   @_set_settings
   def _on_export_settings_activate(self, menu_item):
-    filepath, file_format, _unused = self._get_setting_filepath(action='export')
+    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='export')
 
     if filepath is not None:
-      export_successful = self._save_settings(filepath, file_format)
+      export_successful = self._save_settings(filepath)
       if export_successful:
         self._display_inline_message(_('Settings successfully exported.'), Gtk.MessageType.INFO)
 

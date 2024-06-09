@@ -6,6 +6,10 @@ import builtins
 import gettext
 import os
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 import pygimplib as pg
 
 gettext.bindtextdomain(
@@ -70,6 +74,53 @@ def plug_in_batch_export_layers_quick(
     return _run_with_last_vals(layer_tree)
 
 
+def _run_noninteractive(layer_tree, config):
+  settings_file = config.get_property('settings-file')
+
+  if settings_file:
+    gimp_status, message = _load_settings_from_file(settings_file)
+    if gimp_status != Gimp.PDBStatusType.SUCCESS:
+      return gimp_status, message
+  else:
+    _set_settings_from_args(SETTINGS['main'], config)
+
+  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
+
+  return Gimp.PDBStatusType.SUCCESS, ''
+
+
+def _run_with_last_vals(layer_tree):
+  update_successful, message = _load_and_update_settings(SETTINGS, Gimp.RunMode.WITH_LAST_VALS)
+  if not update_successful:
+    return Gimp.PDBStatusType.EXECUTION_ERROR, message
+
+  _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree)
+
+  return Gimp.PDBStatusType.SUCCESS, ''
+
+
+def _run_interactive(layer_tree, gui_class):
+  update_successful, message = _load_and_update_settings(SETTINGS, Gimp.RunMode.INTERACTIVE)
+  if not update_successful:
+    return Gimp.PDBStatusType.EXECUTION_ERROR, message
+
+  gui_class(layer_tree, SETTINGS)
+
+  return Gimp.PDBStatusType.SUCCESS, ''
+
+
+def _run_plugin_noninteractive(run_mode, layer_tree):
+  batcher = core.Batcher(
+    run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
+
+  try:
+    batcher.run(item_tree=layer_tree, **utils_.get_settings_for_batcher(SETTINGS['main']))
+  except exceptions.BatcherCancelError:
+    pass
+  except Exception as e:
+    return Gimp.PDBStatusType.EXECUTION_ERROR, str(e)
+
+
 def _set_default_setting_source(source_name):
   pg.config.SOURCE_NAME = source_name
 
@@ -77,12 +128,35 @@ def _set_default_setting_source(source_name):
     {'persistent': pg.setting.GimpParasiteSource(source_name)})
 
 
-def _update_plugin(settings, run_mode):
-  status, _message = update.load_and_update(
-    settings,
-    'ask_to_clear' if run_mode == Gimp.RunMode.INTERACTIVE else 'clear')
+def _load_and_update_settings(settings, run_mode):
+  status, load_message = update.load_and_update(settings)
 
-  return status
+  if status != update.TERMINATE:
+    return True, ''
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    response = messages_.display_message(
+      _(('Settings could not be loaded and must be reset. Proceed?'
+         '\nDetails: {}')).format(),
+      Gtk.MessageType.WARNING,
+      buttons=Gtk.ButtonsType.YES_NO,
+      button_response_id_to_focus=Gtk.ResponseType.NO)
+
+    if response == Gtk.ResponseType.YES:
+      utils_.clear_setting_sources(settings)
+      return True, ''
+    else:
+      return (
+        False,
+        _('Settings could not be loaded and were not reset. Details: {}').format(load_message))
+  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
+    utils_.clear_setting_sources(settings)
+    return (
+      False,
+      _(('Settings could not be loaded and must be reset in order to proceed.'
+         '\n\nDetails: {}')).format(load_message))
+
+  return False, load_message
 
 
 def _load_settings_from_file(settings_file):
@@ -95,8 +169,7 @@ def _load_settings_from_file(settings_file):
 
   setting_source = pg.setting.JsonFileSource(pg.config.SOURCE_NAME, settings_filepath)
 
-  status, message = update.load_and_update(
-    SETTINGS, handle_invalid='terminate', sources={'persistent': setting_source})
+  status, message = update.load_and_update(SETTINGS, sources={'persistent': setting_source})
   if status == update.TERMINATE:
     error_message = _('Failed to import settings from file "{}".').format(settings_filepath)
 
@@ -121,47 +194,6 @@ def _set_settings_from_args(settings, config):
 
   for setting, arg in zip(args_as_settings, pg.setting.iter_args(args, args_as_settings)):
     setting.set_value(arg)
-
-
-def _run_noninteractive(layer_tree, config):
-  settings_file = config.get_property('settings-file')
-
-  if settings_file:
-    gimp_status, message = _load_settings_from_file(settings_file)
-    if gimp_status != Gimp.PDBStatusType.SUCCESS:
-      return gimp_status, message
-  else:
-    _set_settings_from_args(SETTINGS['main'], config)
-
-  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
-
-
-def _run_with_last_vals(layer_tree):
-  status = _update_plugin(SETTINGS, Gimp.RunMode.WITH_LAST_VALS)
-  if status == update.TERMINATE:
-    return
-  
-  _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree)
-
-
-def _run_interactive(layer_tree, gui_class):
-  status = _update_plugin(SETTINGS, Gimp.RunMode.INTERACTIVE)
-  if status == update.TERMINATE:
-    return
-
-  gui_class(layer_tree, SETTINGS)
-
-
-def _run_plugin_noninteractive(run_mode, layer_tree):
-  batcher = core.Batcher(
-    run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
-
-  try:
-    batcher.run(item_tree=layer_tree, **utils_.get_settings_for_batcher(SETTINGS['main']))
-  except exceptions.BatcherCancelError:
-    pass
-  except Exception as e:
-    return Gimp.PDBStatusType.EXECUTION_ERROR, str(e)
 
 
 pg.register_procedure(
