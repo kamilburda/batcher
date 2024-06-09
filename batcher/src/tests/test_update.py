@@ -81,6 +81,9 @@ class TestUpdate(unittest.TestCase):
     mock_get_previous_version.return_value = None
     mock_version_parse.return_value = self.current_version
 
+    self.settings['main/plugin_version'].set_value(self.current_version)
+    self.settings['main/plugin_version'].save()
+
     status, _unused = update.load_and_update(self.settings)
 
     self.assertEqual(status, update.TERMINATE)
