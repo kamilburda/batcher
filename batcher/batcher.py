@@ -116,9 +116,11 @@ def _run_plugin_noninteractive(run_mode, layer_tree):
   try:
     batcher.run(item_tree=layer_tree, **utils_.get_settings_for_batcher(SETTINGS['main']))
   except exceptions.BatcherCancelError:
-    pass
+    return Gimp.PDBStatusType.SUCCESS, 'canceled'
   except Exception as e:
     return Gimp.PDBStatusType.EXECUTION_ERROR, str(e)
+
+  return Gimp.PDBStatusType.SUCCESS, ''
 
 
 def _set_default_setting_source(source_name):
