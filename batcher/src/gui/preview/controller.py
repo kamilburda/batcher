@@ -243,6 +243,8 @@ class PreviewsController:
     def _before_remove_selected_in_preview(_constraints, constraint_):
       if constraint_.name in self._selected_in_preview_constraints:
         del self._selected_in_preview_constraints[constraint_.name]
+
+      _on_enabled_changed(constraint_['enabled'])
     
     def _before_clear_constraints(_constraints):
       self._selected_in_preview_constraints = {}
