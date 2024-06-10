@@ -64,7 +64,7 @@ def load_and_update(
     if previous_version == current_version:
       return NO_ACTION, load_message
     else:
-      utils_.update_plugin_version(settings, sources, save_to_sources=update_sources)
+      settings['main/plugin_version'].reset()
 
       handle_update(
         settings,

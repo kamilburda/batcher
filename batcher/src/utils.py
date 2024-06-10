@@ -17,18 +17,6 @@ def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
   }
 
 
-def clear_setting_sources(
-      settings: pg.setting.Group,
-      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
-):
-  if sources is None:
-    sources = pg.setting.Persistor.get_default_setting_sources()
-  
-  pg.setting.Persistor.clear(sources)
-  
-  update_plugin_version(settings, sources)
-
-
 def format_message_from_persistor_statuses(
       statuses_per_source: Dict[pg.setting.Source, int],
       separator: str = '\n',
@@ -67,13 +55,3 @@ def get_messages_from_persistor_statuses(
       messages_per_source[source] = ''
 
   return messages_per_source
-
-
-def update_plugin_version(
-      settings: pg.setting.Group,
-      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
-      save_to_sources: bool = True,
-):
-  settings['main/plugin_version'].reset()
-  if save_to_sources:
-    settings['main/plugin_version'].save(sources)

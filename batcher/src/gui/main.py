@@ -933,9 +933,10 @@ class ExportLayersDialog:
       actions.clear(self._settings['main/constraints'])
 
       self._reset_settings()
-      self._save_settings()
 
-      utils_.clear_setting_sources(self._settings)
+      pg.setting.Persistor.clear()
+
+      self._save_settings()
 
       self._display_inline_message(_('Settings reset.'), Gtk.MessageType.INFO)
 

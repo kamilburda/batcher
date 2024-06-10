@@ -145,14 +145,14 @@ def _load_and_update_settings(settings, run_mode):
       button_response_id_to_focus=Gtk.ResponseType.NO)
 
     if response == Gtk.ResponseType.YES:
-      utils_.clear_setting_sources(settings)
+      pg.setting.Persistor.clear()
       return True, ''
     else:
       return (
         False,
         _('Settings could not be loaded and were not reset. Details: {}').format(load_message))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
-    utils_.clear_setting_sources(settings)
+    pg.setting.Persistor.clear()
     return (
       False,
       _(('Settings could not be loaded and must be reset in order to proceed.'
