@@ -280,17 +280,20 @@ class PreviewsController:
     def _before_remove_action(_actions, action_):
       if action_.get_path() in self._custom_actions:
         del self._custom_actions[action_.get_path()]
+
+      if not self._custom_actions:
+        self._image_preview.prepare_image_for_rendering()
     
     def _before_clear_actions(actions_):
-      for action in actions_:
-        if action.get_path() in self._custom_actions:
-          del self._custom_actions[action.get_path()]
+      for action_ in actions_:
+        if action_.get_path() in self._custom_actions:
+          del self._custom_actions[action_.get_path()]
       
       if not self._custom_actions:
         self._image_preview.prepare_image_for_rendering()
     
     def _update_rendering_of_image_preview(_action_enabled):
-      if not any(action['enabled'].value for action in self._custom_actions.values()):
+      if not any(action_['enabled'].value for action_ in self._custom_actions.values()):
         self._image_preview.prepare_image_for_rendering()
       else:
         self._image_preview.prepare_image_for_rendering(
