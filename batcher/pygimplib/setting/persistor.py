@@ -4,7 +4,7 @@ multiple setting sources.
 
 import collections
 from collections.abc import Iterable
-from typing import Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 from . import _sources_errors
 
@@ -74,6 +74,7 @@ class Persistor:
           None,
         ] = None,
         trigger_events: bool = True,
+        modify_data_func: Optional[Callable] = None,
   ) -> 'PersistorResult':
     """Loads values from the specified settings or groups, or creates new
     settings within the specified groups if they do not exist.
@@ -125,6 +126,10 @@ class Persistor:
       trigger_events:
         If ``True``, ``'before-load'`` and ``'after-load'`` events are triggered
         for each setting. If ``False``, these events are not triggered.
+      modify_data_func:
+        See the ``modify_data_func`` parameter in
+        `pygimplib.setting.Source.read()`. This function is applied to each
+        source separately.
 
     Returns:
       A `PersistorResult` instance describing the result, particularly in the
@@ -147,14 +152,14 @@ class Persistor:
     cls._trigger_event(settings_or_groups, 'before-load', trigger_events)
     
     settings_not_loaded, statuses_per_source = cls._load(
-      settings_or_groups, processed_setting_sources)
+      settings_or_groups, processed_setting_sources, modify_data_func)
     
     cls._trigger_event(settings_or_groups, 'after-load', trigger_events)
     
     return cls._get_return_result(settings_not_loaded, statuses_per_source)
   
   @classmethod
-  def _load(cls, settings_or_groups, setting_sources):
+  def _load(cls, settings_or_groups, setting_sources, modify_data_func):
     settings_not_loaded = settings_or_groups
     
     statuses_per_source = {}
@@ -162,7 +167,7 @@ class Persistor:
     for _unused, sources in setting_sources.items():
       for source in sources:
         try:
-          source.read(settings_not_loaded)
+          source.read(settings_not_loaded, modify_data_func=modify_data_func)
         except _sources_errors.SourceNotFoundError as e:
           statuses_per_source[source] = cls.SOURCE_NOT_FOUND
         except _sources_errors.SourceError as e:
@@ -187,6 +192,7 @@ class Persistor:
           None,
         ] = None,
         trigger_events: bool = True,
+        modify_data_func: Optional[Callable] = None,
   ) -> 'PersistorResult':
     """Saves settings to the specified setting sources.
     
@@ -209,6 +215,10 @@ class Persistor:
       trigger_events:
         If ``True``, trigger ``'before-save'`` and ``'after-save'`` events
         for each setting. If ``False``, these events are not triggered.
+      modify_data_func:
+        See the ``modify_data_func`` parameter in
+        `pygimplib.setting.Source.write()`. This function is applied to each
+        source separately.
     
     Returns:
       A `PersistorResult` instance describing the result, particularly in the
@@ -230,20 +240,20 @@ class Persistor:
     
     cls._trigger_event(settings_or_groups, 'before-save', trigger_events)
     
-    statuses_per_source = cls._save(settings_or_groups, processed_setting_sources)
+    statuses_per_source = cls._save(settings_or_groups, processed_setting_sources, modify_data_func)
     
     cls._trigger_event(settings_or_groups, 'after-save', trigger_events)
     
     return cls._get_return_result([], statuses_per_source)
   
   @classmethod
-  def _save(cls, settings_or_groups, setting_sources):
+  def _save(cls, settings_or_groups, setting_sources, modify_data_func):
     statuses_per_source = {}
     
     for _unused, sources in setting_sources.items():
       for source in sources:
         try:
-          source.write(settings_or_groups)
+          source.write(settings_or_groups, modify_data_func=modify_data_func)
         except _sources_errors.SourceError as e:
           statuses_per_source[source] = cls.FAIL
         else:

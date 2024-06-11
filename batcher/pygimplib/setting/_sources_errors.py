@@ -5,8 +5,9 @@ import traceback as traceback_
 __all__ = [
   'SourceError',
   'SourceNotFoundError',
-  'SourceReadError',
   'SourceInvalidFormatError',
+  'SourceModifyDataError',
+  'SourceReadError',
   'SourceWriteError',
 ]
 
@@ -33,6 +34,10 @@ class SourceNotFoundError(SourceError):
 
 
 class SourceInvalidFormatError(SourceError):
+  pass
+
+
+class SourceModifyDataError(SourceError):
   pass
 
 

@@ -575,6 +575,39 @@ class TestSourceRead(unittest.TestCase):
     with self.assertRaises(sources_.SourceInvalidFormatError):
       self.source.read([self.settings])
 
+  def test_read_with_modify_data_func(self):
+    def modify_data(data):
+      data[0]['settings'][0]['settings'][0]['value'] = 'jpg'
+      data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['value'] = False
+      data[0]['settings'][2]['value'] = 'something_else'
+
+      return data
+
+    self.source.data = _test_data_for_read_write()
+
+    expected_setting_values = {
+      setting.get_path(): setting.value for setting in self.settings.walk()}
+    expected_setting_values['all_settings/main/file_extension'] = 'jpg'
+    expected_setting_values['all_settings/main/procedures/use_layer_size/enabled'] = False
+    expected_setting_values['all_settings/standalone_setting'] = 'something_else'
+
+    self.source.read([self.settings], modify_data_func=modify_data)
+
+    for setting in self.settings.walk():
+      self.assertEqual(setting.value, expected_setting_values[setting.get_path()])
+
+  def test_read_error_in_modify_data_func_raises_error(self):
+    def modify_data_before_load(_data):
+      raise ValueError
+
+    with self.assertRaises(sources_.SourceModifyDataError):
+      self.source.read([self.settings], modify_data_func=modify_data_before_load)
+
+  def test_read_invalid_modify_data_func_raises_error(self):
+    with self.assertRaises(sources_.SourceModifyDataError):
+      # noinspection PyTypeChecker
+      self.source.read([self.settings], modify_data_func=12)
+
 
 class TestSourceWrite(unittest.TestCase):
   
@@ -776,6 +809,37 @@ class TestSourceWrite(unittest.TestCase):
     
     with self.assertRaises(sources_.SourceInvalidFormatError):
       self.source.write([self.settings])
+
+  def test_write_with_modify_data_func(self):
+    def modify_data(data):
+      data[0]['settings'][0]['settings'][0]['value'] = 'jpg'
+      data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['value'] = False
+      data[0]['settings'][2]['value'] = 'something_else'
+
+      return data
+
+    expected_data = _test_data_for_read_write()
+
+    expected_data[0]['settings'][0]['settings'][0]['value'] = 'jpg'
+    expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['value'] = False
+    expected_data[0]['settings'][2]['value'] = 'something_else'
+
+    self.source.data = _test_data_for_read_write()
+    self.source.write([self.settings], modify_data_func=modify_data)
+
+    self.assertListEqual(self.source.data, expected_data)
+
+  def test_write_error_in_modify_data_func_raises_error(self):
+    def modify_data(_data):
+      raise ValueError
+
+    with self.assertRaises(sources_.SourceModifyDataError):
+      self.source.write([self.settings], modify_data_func=modify_data)
+
+  def test_write_invalid_modify_data_func_raises_error(self):
+    with self.assertRaises(sources_.SourceModifyDataError):
+      # noinspection PyTypeChecker
+      self.source.write([self.settings], modify_data_func=12)
 
 
 @mock.patch(
