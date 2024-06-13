@@ -419,13 +419,13 @@ class ActionBrowser(GObject.GObject):
 
     self._set_search_bar_icon_sensitivity()
 
-  def _get_row_visibility_based_on_search_query(self, model, iter, _data):
-    row = Gtk.TreeModelRow(model, iter)
+  def _get_row_visibility_based_on_search_query(self, model, iter_, _data):
+    row = Gtk.TreeModelRow(model, iter_)
 
     processed_search_query = self._process_text_for_search(self._entry_search.get_text())
 
     # Do not filter parents
-    if model.iter_parent(iter) is None:
+    if model.iter_parent(iter_) is None:
       return True
 
     enabled_search_criteria = []
