@@ -7,7 +7,7 @@ import pygimplib as pg
 from src import utils as utils_
 from src import version as version_
 
-_UPDATE_STATUSES = FRESH_START, UPDATE, NO_ACTION, TERMINATE = 0, 1, 2, 3
+_UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
 
 
 def load_and_update(
@@ -29,10 +29,8 @@ def load_and_update(
   
   * `FRESH_START` - The plug-in was never used before or has no settings stored.
   
-  * `UPDATE` - The plug-in was successfully updated to the latest version.
-  
-  * `NO_ACTION` - No update was performed as the plug-in version remains the
-    same.
+  * `UPDATE` - The plug-in was successfully updated to the latest version, or no
+    update was performed as the plug-in version remains the same.
   
   * `TERMINATE` - No update was performed. This value is returned if the update
     failed (e.g. because of a malformed setting source).
@@ -45,124 +43,199 @@ def load_and_update(
 
   if _is_fresh_start(sources):
     if update_sources:
-      settings.save(sources)
+      _update_sources(settings, sources)
 
     return FRESH_START, ''
 
-  load_result = settings.load(sources)
+  load_result = settings.load(sources, modify_data_func=lambda data: handle_update(data, settings))
   load_message = utils_.format_message_from_persistor_statuses(load_result.statuses_per_source)
 
   if any(status == pg.setting.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):
     return TERMINATE, load_message
 
+  if update_sources:
+    _update_sources(settings, sources)
+
+  return UPDATE, load_message
+
+
+def handle_update(data, settings):
+  if not _UPDATE_HANDLERS:
+    return data
+
   current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
+  previous_version = _get_plugin_version(data)
 
-  previous_version = _get_previous_version(settings)
+  if previous_version is None:
+    raise pg.setting.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
 
-  if previous_version is not None:
-    if previous_version == current_version:
-      return NO_ACTION, load_message
-    else:
-      settings['main/plugin_version'].reset()
+  _update_plugin_version(data, current_version)
 
-      handle_update(
-        settings,
-        sources,
-        _UPDATE_HANDLERS,
-        previous_version,
-        current_version,
-        update_sources=update_sources,
-      )
+  for version_str, update_handler in _UPDATE_HANDLERS.items():
+    if previous_version < version_.Version.parse(version_str) <= current_version:
+      update_handler(data, settings)
 
-      return UPDATE, load_message
+  return data
+
+
+def _get_plugin_version(data) -> Union[version_.Version, None]:
+  plugin_version_dict = _get_plugin_version_dict(data)
+
+  if plugin_version_dict is not None:
+    try:
+      return version_.Version.parse(plugin_version_dict['value'])
+    except (version_.InvalidVersionFormatError, TypeError):
+      return None
   else:
-    return TERMINATE, _('Failed to obtain previous plug-in version.')
-
-
-def _get_previous_version(settings):
-  try:
-    return version_.Version.parse(settings['main/plugin_version'].value)
-  except (version_.InvalidVersionFormatError, TypeError):
     return None
 
 
-def handle_update(
-      settings,
-      sources,
-      handlers,
-      previous_version,
-      current_version,
-      update_sources=True,
-):
-  if not handlers:
-    return
+def _update_plugin_version(data, new_version):
+  plugin_version_dict = _get_plugin_version_dict(data)
 
-  if update_sources:
-    for source in sources.values():
-      source.clear()
+  if plugin_version_dict is not None:
+    plugin_version_dict['value'] = str(new_version)
+    plugin_version_dict['default_value'] = str(new_version)
 
-  for version_str, update_handler in handlers.items():
-    if previous_version < version_.Version.parse(version_str) <= current_version:
-      update_handler(settings, sources)
 
-  if update_sources:
-    settings.save(sources)
+def _get_plugin_version_dict(data) -> Union[dict, None]:
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    return _get_child_setting(main_settings_list, 'plugin_version')[0]
+  else:
+    return None
+
+
+def _get_top_level_group_list(data, name):
+  for index, dict_ in enumerate(data[0]['settings']):
+    if dict_['name'] == name:
+      return dict_['settings'], index
+
+  return None, None
+
+
+def _get_child_group_list(group_list, name):
+  for index, dict_ in enumerate(group_list):
+    if 'settings' in dict_ and dict_['name'] == name:
+      return dict_['settings'], index
+
+  return None, None
+
+
+def _get_child_setting(group_list, name):
+  for index, dict_ in enumerate(group_list):
+    if 'settings' not in dict_ and dict_['name'] == name:
+      return dict_, index
+
+  return None, None
 
 
 def _is_fresh_start(sources):
   return all(not source.has_data() for source in sources.values())
 
 
-def _update_to_0_3(settings, sources):
-  _update_actions_to_0_3(settings, 'procedures')
-  _update_actions_to_0_3(settings, 'constraints')
-
-  if 'file_extension' in settings['main']:
-    settings['main/file_extension'].gui.auto_update_gui_to_setting(False)
-
-  if 'output_directory' in settings['main']:
-    settings['main/output_directory'].gui.auto_update_gui_to_setting(False)
-
-  if 'layer_filename_pattern' in settings['main']:
-    settings['main/layer_filename_pattern'].gui.auto_update_gui_to_setting(False)
-
-  if 'show_more_settings' in settings['gui']:
-    settings['gui'].remove(['show_more_settings'])
-
-  if 'dialog_size' in settings['gui/size']:
-    settings['gui/size/dialog_size'].reset()
-
-  if 'paned_outside_previews_position' in settings['gui/size']:
-    settings['gui/size/paned_outside_previews_position'].reset()
-
-  if 'paned_between_previews_position' in settings['gui/size']:
-    settings['gui/size/paned_between_previews_position'].reset()
+def _update_sources(settings, sources):
+  for source in sources.values():
+    source.clear()
+  settings.save(sources)
 
 
-def _update_actions_to_0_3(settings, action_type):
-  for action in settings[f'main/{action_type}']:
-    action['display_options_on_create'].set_value(False)
+def _update_to_0_3(data, settings):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
-    if 'more_options' not in action:
-      more_options_group = pg.setting.Group(
-        'more_options',
-        setting_attributes={
+  if main_settings_list is not None:
+    _update_actions_to_0_3(main_settings_list, 'procedures')
+    _update_actions_to_0_3(main_settings_list, 'constraints')
+
+    setting_dict, _index = _get_child_setting(main_settings_list, 'file_extension')
+    if setting_dict is not None:
+      setting_dict['auto_update_gui_to_setting'] = False
+
+    setting_dict, _index = _get_child_setting(main_settings_list, 'output_directory')
+    if setting_dict is not None:
+      setting_dict['auto_update_gui_to_setting'] = False
+
+    setting_dict, _index = _get_child_setting(main_settings_list, 'layer_filename_pattern')
+    if setting_dict is not None:
+      setting_dict['auto_update_gui_to_setting'] = False
+
+  gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
+
+  if gui_settings_list is not None:
+    _setting, index = _get_child_setting(gui_settings_list, 'show_more_settings')
+    if index is not None:
+      gui_settings_list.pop(index)
+
+    gui_size_setting_list, _index = _get_child_group_list(gui_settings_list, 'size')
+
+    if gui_size_setting_list is not None:
+      setting_dict, _index = _get_child_setting(gui_size_setting_list, 'dialog_size')
+      if setting_dict is not None:
+        setting_dict['value'] = settings['gui/size/dialog_size'].default_value
+        setting_dict['default_value'] = settings['gui/size/dialog_size'].default_value
+
+      setting_dict, _index = (
+        _get_child_setting(gui_size_setting_list, 'paned_outside_previews_position'))
+      if setting_dict is not None:
+        setting_dict['value'] = settings['gui/size/paned_outside_previews_position'].default_value
+        setting_dict['default_value'] = (
+          settings['gui/size/paned_outside_previews_position'].default_value)
+
+      setting_dict, _index = (
+        _get_child_setting(gui_size_setting_list, 'paned_between_previews_position'))
+      if setting_dict is not None:
+        setting_dict['value'] = settings['gui/size/paned_between_previews_position'].default_value
+        setting_dict['default_value'] = (
+          settings['gui/size/paned_between_previews_position'].default_value)
+
+
+def _update_actions_to_0_3(main_settings_list, action_type):
+  actions_list, _index = _get_child_group_list(main_settings_list, action_type)
+
+  if actions_list is None:
+    return
+
+  for action_dict in actions_list:
+    action_list = action_dict['settings']
+
+    display_options_on_create_dict, _index = (
+      _get_child_setting(action_list, 'display_options_on_create'))
+    if display_options_on_create_dict:
+      display_options_on_create_dict['value'] = False
+      display_options_on_create_dict['default_value'] = False
+
+    more_options_list, _index = _get_child_group_list(action_list, 'more_options')
+
+    if more_options_list is None:
+      more_options_dict = {
+        'name': 'more_options',
+        'setting_attributes': {
           'pdb_type': None,
-        })
-      action.add([more_options_group])
-      action.reorder('more_options', -2)
+        },
+        'settings': [],
+      }
+      action_list.insert(-2, more_options_dict)
 
-    if 'enabled_for_previews' in action and 'enabled_for_previews' not in action['more_options']:
-      enabled_for_previews_setting = action['enabled_for_previews']
-      action.remove(['enabled_for_previews'])
-      action['more_options'].add([enabled_for_previews_setting])
+      more_options_list = more_options_dict['settings']
 
-    if ('also_apply_to_parent_folders' in action
-        and 'also_apply_to_parent_folders' not in action['more_options']):
-      also_apply_to_parent_folders_setting = action['also_apply_to_parent_folders']
-      action.remove(['also_apply_to_parent_folders'])
-      action['more_options'].add([also_apply_to_parent_folders_setting])
+    enabled_for_previews_in_more_options_dict, _index = (
+      _get_child_setting(more_options_list, 'enabled_for_previews'))
+    if enabled_for_previews_in_more_options_dict is None:
+      enabled_for_previews_dict, index = _get_child_setting(action_list, 'enabled_for_previews')
+      if enabled_for_previews_dict is not None:
+        action_list.pop(index)
+        more_options_list.append(enabled_for_previews_dict)
+
+    also_apply_to_parent_folders_in_more_options_dict, _index = (
+      _get_child_setting(more_options_list, 'also_apply_to_parent_folders'))
+    if also_apply_to_parent_folders_in_more_options_dict is None:
+      also_apply_to_parent_folders_dict, index = (
+        _get_child_setting(action_list, 'also_apply_to_parent_folders'))
+      if also_apply_to_parent_folders_dict is not None:
+        action_list.pop(index)
+        more_options_list.append(also_apply_to_parent_folders_dict)
 
 
 _UPDATE_HANDLERS = {

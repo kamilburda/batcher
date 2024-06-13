@@ -1,0 +1,1070 @@
+{
+    "plug-in-batch-export-layers": [
+        {
+            "settings": [
+                {
+                    "settings": [
+                        {
+                            "name": "file_extension",
+                            "default_value": "png",
+                            "display_name": "File extension",
+                            "adjust_value": true,
+                            "value": "png",
+                            "type": "file_extension"
+                        },
+                        {
+                            "name": "output_directory",
+                            "default_value": "C:\\Users\\username\\Documents",
+                            "display_name": "Output directory",
+                            "gui_type": null,
+                            "value": "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images",
+                            "type": "string"
+                        },
+                        {
+                            "name": "layer_filename_pattern",
+                            "default_value": "[layer name]",
+                            "display_name": "Layer filename pattern",
+                            "description": "Layer filename pattern (empty string = layer name)",
+                            "gui_type": null,
+                            "value": "[layer name]",
+                            "type": "filename_pattern"
+                        },
+                        {
+                            "name": "overwrite_mode",
+                            "default_value": "rename_new",
+                            "items": [
+                                [
+                                    "replace",
+                                    "_Replace",
+                                    0
+                                ],
+                                [
+                                    "skip",
+                                    "_Skip",
+                                    1
+                                ],
+                                [
+                                    "rename_new",
+                                    "Rename _new file",
+                                    2
+                                ],
+                                [
+                                    "rename_existing",
+                                    "Rename _existing file",
+                                    3
+                                ]
+                            ],
+                            "display_name": "Overwrite mode (non-interactive run mode only)",
+                            "value": 2,
+                            "type": "choice"
+                        },
+                        {
+                            "name": "selected_layers",
+                            "default_value": {},
+                            "display_name": "Selected layers",
+                            "pdb_type": null,
+                            "value": {
+                                "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": [
+                                    [
+                                        "Layer",
+                                        "main-background"
+                                    ]
+                                ]
+                            },
+                            "type": "images_and_gimp_items"
+                        },
+                        {
+                            "name": "edit_mode",
+                            "default_value": false,
+                            "pdb_type": null,
+                            "gui_type": null,
+                            "value": false,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "plugin_version",
+                            "default_value": "0.2",
+                            "pdb_type": null,
+                            "gui_type": null,
+                            "value": "0.2",
+                            "type": "string"
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": 0,
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": true,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Use layer size",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Use layer size",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_procedures"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_procedures"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "enabled_for_previews",
+                                            "default_value": true,
+                                            "display_name": "Enable for previews",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": false,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "use_layer_size",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "use_layer_size",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "name": "use_layer_size",
+                                    "tags": [
+                                        "action",
+                                        "procedure"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
+                                },
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": 0,
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "image",
+                                                    "display_name": "Image",
+                                                    "pdb_type": null,
+                                                    "value": "current_image",
+                                                    "type": "placeholder_image"
+                                                },
+                                                {
+                                                    "name": "layer",
+                                                    "display_name": "Layer",
+                                                    "pdb_type": null,
+                                                    "value": "current_layer",
+                                                    "type": "placeholder_layer"
+                                                },
+                                                {
+                                                    "default_value": 100.0,
+                                                    "name": "new_width",
+                                                    "display_name": "New width",
+                                                    "pdb_type": null,
+                                                    "value": 50.0,
+                                                    "type": "float"
+                                                },
+                                                {
+                                                    "default_value": "percentage_of_layer_width",
+                                                    "name": "width_unit",
+                                                    "items": [
+                                                        [
+                                                            "percentage_of_layer_width",
+                                                            "% of layer width",
+                                                            0
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_height",
+                                                            "% of layer height",
+                                                            1
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_width",
+                                                            "% of image width",
+                                                            2
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_height",
+                                                            "% of image height",
+                                                            3
+                                                        ],
+                                                        [
+                                                            "pixels",
+                                                            "Pixels",
+                                                            4
+                                                        ]
+                                                    ],
+                                                    "display_name": "Unit for width",
+                                                    "pdb_type": null,
+                                                    "value": 0,
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "default_value": 100.0,
+                                                    "name": "new_height",
+                                                    "display_name": "New height",
+                                                    "pdb_type": null,
+                                                    "value": 50.0,
+                                                    "type": "float"
+                                                },
+                                                {
+                                                    "default_value": "percentage_of_layer_height",
+                                                    "name": "height_unit",
+                                                    "items": [
+                                                        [
+                                                            "percentage_of_layer_width",
+                                                            "% of layer width",
+                                                            0
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_height",
+                                                            "% of layer height",
+                                                            1
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_width",
+                                                            "% of image width",
+                                                            2
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_height",
+                                                            "% of image height",
+                                                            3
+                                                        ],
+                                                        [
+                                                            "pixels",
+                                                            "Pixels",
+                                                            4
+                                                        ]
+                                                    ],
+                                                    "display_name": "Unit for height",
+                                                    "pdb_type": null,
+                                                    "value": 1,
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "enum_type": "GimpInterpolationType",
+                                                    "name": "interpolation",
+                                                    "display_name": "Interpolation",
+                                                    "pdb_type": null,
+                                                    "value": 0,
+                                                    "type": "enum"
+                                                },
+                                                {
+                                                    "name": "local_origin",
+                                                    "default_value": false,
+                                                    "display_name": "Use local origin",
+                                                    "gui_type": "check_button_no_text",
+                                                    "pdb_type": null,
+                                                    "value": true,
+                                                    "type": "bool"
+                                                }
+                                            ],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": true,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Scale",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Scale",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_procedures"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_procedures"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "enabled_for_previews",
+                                            "default_value": true,
+                                            "display_name": "Enable for previews",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "scale",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "scale",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "name": "scale",
+                                    "tags": [
+                                        "action",
+                                        "procedure"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
+                                },
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "script-fu-addborder",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "script-fu-addborder",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "gimp_pdb",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": 1,
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "run-mode",
+                                                    "display_name": "run-mode",
+                                                    "enum_type": "GimpRunMode",
+                                                    "default_value": 1,
+                                                    "pdb_type": null,
+                                                    "value": 1,
+                                                    "type": "enum"
+                                                },
+                                                {
+                                                    "name": "otherImage",
+                                                    "display_name": "otherImage",
+                                                    "pdb_type": "GimpImage",
+                                                    "value": "current_image",
+                                                    "type": "placeholder_image"
+                                                },
+                                                {
+                                                    "name": "drawable",
+                                                    "display_name": "drawable",
+                                                    "pdb_type": "GimpDrawable",
+                                                    "value": "current_layer",
+                                                    "type": "placeholder_drawable"
+                                                },
+                                                {
+                                                    "name": "adjustment",
+                                                    "display_name": "adjustment",
+                                                    "pdb_type": "gint",
+                                                    "default_value": 12,
+                                                    "min_value": 1,
+                                                    "max_value": 250,
+                                                    "value": 12,
+                                                    "type": "int"
+                                                },
+                                                {
+                                                    "name": "adjustment-2",
+                                                    "display_name": "adjustment-2",
+                                                    "pdb_type": "gint",
+                                                    "default_value": 12,
+                                                    "min_value": 1,
+                                                    "max_value": 250,
+                                                    "value": 12,
+                                                    "type": "int"
+                                                },
+                                                {
+                                                    "name": "color",
+                                                    "display_name": "color",
+                                                    "pdb_type": "GimpRGB",
+                                                    "value": [
+                                                        0.0,
+                                                        0.0,
+                                                        0.0,
+                                                        0.0
+                                                    ],
+                                                    "type": "rgb"
+                                                },
+                                                {
+                                                    "name": "adjustment-3",
+                                                    "display_name": "adjustment-3",
+                                                    "pdb_type": "gint",
+                                                    "default_value": 25,
+                                                    "min_value": 1,
+                                                    "max_value": 255,
+                                                    "value": 25,
+                                                    "type": "int"
+                                                },
+                                                {
+                                                    "name": "toggle",
+                                                    "display_name": "toggle",
+                                                    "pdb_type": "gboolean",
+                                                    "default_value": true,
+                                                    "gui_type": "check_button_no_text",
+                                                    "value": true,
+                                                    "type": "bool"
+                                                }
+                                            ],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": false,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Add Border",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Add Border",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_procedures"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_procedures"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "enabled_for_previews",
+                                            "default_value": true,
+                                            "display_name": "Enable for previews",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "script-fu-addborder",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "script-fu-addborder",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "name": "script-fu-addborder",
+                                    "tags": [
+                                        "action",
+                                        "procedure"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
+                                }
+                            ],
+                            "name": "procedures",
+                            "setting_attributes": {
+                                "pdb_type": null
+                            }
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": 0,
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": true,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Layers",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Layers",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_constraints"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_constraints"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "enabled_for_previews",
+                                            "default_value": true,
+                                            "display_name": "Enable for previews",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": false,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "layers",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "layers",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "also_apply_to_parent_folders",
+                                            "default_value": false,
+                                            "display_name": "Also apply to parent folders",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        }
+                                    ],
+                                    "name": "layers",
+                                    "tags": [
+                                        "action",
+                                        "constraint"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
+                                },
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": 0,
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": false,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Visible",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Visible",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_constraints"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_constraints"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "enabled_for_previews",
+                                            "default_value": true,
+                                            "display_name": "Enable for previews",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": false,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "visible",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "visible",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "also_apply_to_parent_folders",
+                                            "default_value": true,
+                                            "display_name": "Also apply to parent folders",
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        }
+                                    ],
+                                    "name": "visible",
+                                    "tags": [
+                                        "action",
+                                        "constraint"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
+                                }
+                            ],
+                            "name": "constraints",
+                            "setting_attributes": {
+                                "pdb_type": null
+                            }
+                        }
+                    ],
+                    "name": "main"
+                },
+                {
+                    "settings": [
+                        {
+                            "name": "show_more_settings",
+                            "default_value": false,
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "name_preview_sensitive",
+                            "default_value": true,
+                            "gui_type": null,
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "image_preview_sensitive",
+                            "default_value": true,
+                            "gui_type": null,
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "image_preview_automatic_update",
+                            "default_value": true,
+                            "gui_type": null,
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "image_preview_automatic_update_if_below_maximum_duration",
+                            "default_value": true,
+                            "gui_type": null,
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "name": "name_preview_layers_collapsed_state",
+                            "value": {
+                                "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": []
+                            },
+                            "type": "images_and_gimp_items"
+                        },
+                        {
+                            "name": "image_preview_displayed_layers",
+                            "value": {
+                                "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": [
+                                    [
+                                        "Layer",
+                                        "main-background"
+                                    ]
+                                ]
+                            },
+                            "type": "images_and_gimp_items"
+                        },
+                        {
+                            "name": "images_and_directories",
+                            "value": {
+                                "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images"
+                            },
+                            "type": "images_and_directories"
+                        },
+                        {
+                            "settings": [
+                                {
+                                    "name": "dialog_position",
+                                    "default_value": [],
+                                    "value": [
+                                        557,
+                                        186
+                                    ],
+                                    "type": "tuple"
+                                },
+                                {
+                                    "name": "dialog_size",
+                                    "default_value": [],
+                                    "value": [
+                                        900,
+                                        610
+                                    ],
+                                    "type": "tuple"
+                                },
+                                {
+                                    "name": "paned_outside_previews_position",
+                                    "default_value": 610,
+                                    "value": 610,
+                                    "type": "int"
+                                },
+                                {
+                                    "name": "paned_between_previews_position",
+                                    "default_value": 360,
+                                    "value": 360,
+                                    "type": "float"
+                                },
+                                {
+                                    "name": "settings_vpane_position",
+                                    "default_value": 400,
+                                    "value": 400,
+                                    "type": "float"
+                                }
+                            ],
+                            "name": "size"
+                        }
+                    ],
+                    "name": "gui"
+                }
+            ],
+            "name": "all_settings"
+        }
+    ]
+}
