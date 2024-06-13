@@ -139,7 +139,7 @@ def _load_and_update_settings(settings, run_mode):
   if run_mode == Gimp.RunMode.INTERACTIVE:
     response = messages_.display_message(
       _(('Settings could not be loaded and must be reset. Proceed?'
-         '\nDetails: {}')).format(),
+         '\nDetails: {}')).format(load_message),
       Gtk.MessageType.WARNING,
       buttons=Gtk.ButtonsType.YES_NO,
       button_response_id_to_focus=Gtk.ResponseType.NO)
