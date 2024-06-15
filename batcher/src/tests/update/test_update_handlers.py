@@ -44,11 +44,14 @@ class TestUpdateHandlers(unittest.TestCase):
     for action in self.settings['main/procedures']:
       self.assertIn('more_options', action)
       self.assertIn('enabled_for_previews', action['more_options'])
+      self.assertNotIn('enabled_for_previews', action)
 
     for action in self.settings['main/constraints']:
       self.assertIn('more_options', action)
       self.assertIn('enabled_for_previews', action['more_options'])
+      self.assertNotIn('enabled_for_previews', action)
       self.assertIn('also_apply_to_parent_folders', action['more_options'])
+      self.assertNotIn('also_apply_to_parent_folders', action)
 
     self.assertEqual(self.settings['gui/size/dialog_size'].value, orig_dialog_size_value)
     self.assertEqual(

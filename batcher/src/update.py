@@ -38,6 +38,26 @@ def load_and_update(
   If ``update_sources`` is ``True``, the contents of ``sources`` are updated
   (overwritten), otherwise they are kept intact.
   """
+  def _handle_update(data):
+    nonlocal current_version, previous_version
+
+    current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
+
+    previous_version = _get_plugin_version(data)
+    _update_plugin_version(data, current_version)
+
+    if not _UPDATE_HANDLERS:
+      return data
+
+    if previous_version is None:
+      raise pg.setting.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
+
+    for version_str, update_handler in _UPDATE_HANDLERS.items():
+      if previous_version < version_.Version.parse(version_str) <= current_version:
+        update_handler(data, settings)
+
+    return data
+
   if sources is None:
     sources = pg.setting.Persistor.get_default_setting_sources()
 
@@ -47,44 +67,37 @@ def load_and_update(
 
     return FRESH_START, ''
 
-  load_result = settings.load(sources, modify_data_func=lambda data: handle_update(data, settings))
+  current_version = None
+  previous_version = None
+
+  load_result = settings.load(sources, modify_data_func=_handle_update)
   load_message = utils_.format_message_from_persistor_statuses(load_result.statuses_per_source)
 
   if any(status == pg.setting.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):
     return TERMINATE, load_message
 
-  if update_sources:
+  if (update_sources
+      and current_version is not None and previous_version is not None
+      and previous_version < current_version):
     _update_sources(settings, sources)
 
   return UPDATE, load_message
-
-
-def handle_update(data, settings):
-  if not _UPDATE_HANDLERS:
-    return data
-
-  current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
-  previous_version = _get_plugin_version(data)
-
-  if previous_version is None:
-    raise pg.setting.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
-
-  _update_plugin_version(data, current_version)
-
-  for version_str, update_handler in _UPDATE_HANDLERS.items():
-    if previous_version < version_.Version.parse(version_str) <= current_version:
-      update_handler(data, settings)
-
-  return data
 
 
 def _get_plugin_version(data) -> Union[version_.Version, None]:
   plugin_version_dict = _get_plugin_version_dict(data)
 
   if plugin_version_dict is not None:
+    if 'value' in plugin_version_dict:
+      plugin_version = plugin_version_dict['value']
+    elif 'default_value' in plugin_version_dict:
+      plugin_version = plugin_version_dict['default_value']
+    else:
+      return None
+
     try:
-      return version_.Version.parse(plugin_version_dict['value'])
+      return version_.Version.parse(plugin_version)
     except (version_.InvalidVersionFormatError, TypeError):
       return None
   else:
