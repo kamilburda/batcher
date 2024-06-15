@@ -88,7 +88,7 @@ The `plug-in-batch-export-layers` procedure exports layers with the specified or
 
 You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
 
-The `plug-in-batch-export-layers-now` procedure exports layers instantly, always with the last used settings.
+The `plug-in-batch-export-layers-quick` procedure exports layers instantly, always with the last used settings.
 
 
 ## Known Issues
