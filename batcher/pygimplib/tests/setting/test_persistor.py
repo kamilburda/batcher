@@ -73,9 +73,9 @@ class TestPersistor(unittest.TestCase):
   def test_load_save_with_default_sources_as_dict_of_lists(self, *mocks):
     another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.source)
-    self._spy_for_source(self.source_2)
-    self._spy_for_source(another_source)
+    self._spy_on_source(self.source)
+    self._spy_on_source(self.source_2)
+    self._spy_on_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources({
       'persistent': self.source,
@@ -95,9 +95,9 @@ class TestPersistor(unittest.TestCase):
   def test_load_save_with_default_sources_and_dict(self, *mocks):
     another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.source)
-    self._spy_for_source(self.source_2)
-    self._spy_for_source(another_source)
+    self._spy_on_source(self.source)
+    self._spy_on_source(self.source_2)
+    self._spy_on_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
     
@@ -114,9 +114,9 @@ class TestPersistor(unittest.TestCase):
   def test_load_save_with_default_sources_and_dict_of_lists(self, *mocks):
     another_source = stubs_sources.StubSource('plug-in-another')
     
-    self._spy_for_source(self.source)
-    self._spy_for_source(self.source_2)
-    self._spy_for_source(another_source)
+    self._spy_on_source(self.source)
+    self._spy_on_source(self.source_2)
+    self._spy_on_source(another_source)
     
     persistor_.Persistor.set_default_setting_sources(self.sources_for_persistor)
     
@@ -131,8 +131,8 @@ class TestPersistor(unittest.TestCase):
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_list(self, *mocks):
-    self._spy_for_source(self.source)
-    self._spy_for_source(self.source_2)
+    self._spy_on_source(self.source)
+    self._spy_on_source(self.source_2)
     
     sources_for_persistor = ['persistent', 'persistent_2']
     default_sources = {
@@ -151,7 +151,7 @@ class TestPersistor(unittest.TestCase):
     self.assertEqual(self.source_2.write.call_count, 1)
   
   @staticmethod
-  def _spy_for_source(source):
+  def _spy_on_source(source):
     source.read = mock.Mock(wraps=source.read)
     source.write = mock.Mock(wraps=source.write)
   
