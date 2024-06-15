@@ -71,7 +71,7 @@ def load_and_update(
   previous_version = None
 
   load_result = settings.load(sources, modify_data_func=_handle_update)
-  load_message = utils_.format_message_from_persistor_statuses(load_result.statuses_per_source)
+  load_message = utils_.format_message_from_persistor_statuses(load_result)
 
   if any(status == pg.setting.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):

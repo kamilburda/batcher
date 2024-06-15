@@ -702,8 +702,7 @@ class ExportLayersDialog:
     if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
       messages_.display_import_export_settings_failure_message(
         _('Failed to export settings to file "{}"'.format(filepath)),
-        details=utils_.format_message_from_persistor_statuses(
-          save_result.statuses_per_source, separator='\n\n'),
+        details=utils_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
         parent=self._dialog)
       return False
     else:

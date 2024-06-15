@@ -18,6 +18,7 @@ gettext.textdomain('batcher')
 
 builtins._ = gettext.gettext
 
+from src import actions as actions_
 from src.gui import messages as messages_
 
 messages_.set_gui_excepthook(
@@ -138,25 +139,33 @@ def _load_and_update_settings(settings, run_mode):
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     response = messages_.display_message(
-      _(('Settings could not be loaded and must be reset. Proceed?'
-         '\nDetails: {}')).format(load_message),
+      (_('Settings for this plug-in could not be loaded and must be reset. Proceed?')
+       + '\n'
+       + _('Details: {}').format(load_message)),
       Gtk.MessageType.WARNING,
       buttons=Gtk.ButtonsType.YES_NO,
       button_response_id_to_focus=Gtk.ResponseType.NO)
 
     if response == Gtk.ResponseType.YES:
       pg.setting.Persistor.clear()
+      actions_.clear(settings['main/procedures'])
+      actions_.clear(settings['main/constraints'])
+
       return True, ''
     else:
       return (
         False,
-        _('Settings could not be loaded and were not reset. Details: {}').format(load_message))
+        (_('Settings could not be loaded and were not reset.')
+         + '\n\n'
+         + _('Details: {}').format(load_message)))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     pg.setting.Persistor.clear()
+
     return (
       False,
-      _(('Settings could not be loaded and must be reset in order to proceed.'
-         '\n\nDetails: {}')).format(load_message))
+      (_('Settings could not be loaded and had to be reset.')
+       + '\n\n'
+       + _('Details: {}').format(load_message)))
 
   return False, load_message
 

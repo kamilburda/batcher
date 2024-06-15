@@ -1,6 +1,6 @@
 """Utility functions used in other modules."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict
 
 import pygimplib as pg
 
@@ -18,40 +18,53 @@ def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
 
 
 def format_message_from_persistor_statuses(
-      statuses_per_source: Dict[pg.setting.Source, int],
+      persistor_result: pg.setting.PersistorResult,
       separator: str = '\n',
 ) -> str:
-  return separator.join(
-    message for message in get_messages_from_persistor_statuses(statuses_per_source).values()
-    if message)
+  messages = get_messages_from_persistor_statuses(persistor_result).values()
+
+  return separator.join(message for message in messages if message)
 
 
 def get_messages_from_persistor_statuses(
-      statuses_per_source: Dict[pg.setting.Source, int]
+      persistor_result: pg.setting.PersistorResult,
 ) -> Dict[pg.setting.Source, str]:
-  messages_per_source = {}
+  messages = {}
 
-  for source, status in statuses_per_source.items():
+  if not persistor_result.statuses_per_source:
+    return messages
+
+  if persistor_result.messages_per_source:
+    messages_per_source = persistor_result.messages_per_source
+  else:
+    messages_per_source = {}
+
+  for source, status in persistor_result.statuses_per_source.items():
+    message = messages_per_source.get(source, '')
+
     if status == pg.setting.Persistor.FAIL:
       if hasattr(source, 'filepath'):
-        message = _(
-          'Settings for this plug-in stored in "{}" may be corrupt.'
+        formatted_message = _(
+          'Settings stored in "{}" may be corrupt.'
           ' This could happen if the file was edited manually.'
-          '\nTo fix this, save the settings again or reset them.').format(source.filepath)
+          ' To fix this, save the settings again.').format(source.filepath)
+        if message:
+          formatted_message += _(' More information: {}').format(message)
+        messages[source] = formatted_message
       else:
-        message = _(
+        formatted_message = _(
           'Settings for this plug-in may be corrupt.'
-          '\nTo fix this, save the settings again or reset them.')
-
-      messages_per_source[source] = message
+          ' To fix this, save the settings again or reset them.')
+        if message:
+          formatted_message += _('More information: {}').format(message)
+        messages[source] = formatted_message
     elif status == pg.setting.Persistor.SOURCE_NOT_FOUND:
       if hasattr(source, 'filepath'):
-        messages_per_source[source] = _('Count not locate settings in file "{}" in "{}".').format(
+        messages[source] = _('Count not locate settings in file "{}" in "{}".').format(
           source.filepath, source.name)
       else:
-        messages_per_source[source] = _('Count not locate settings in "{}".').format(
-          source.name)
+        messages[source] = _('Count not locate settings in "{}".').format(source.name)
     else:
-      messages_per_source[source] = ''
+      messages[source] = ''
 
-  return messages_per_source
+  return messages
