@@ -500,7 +500,7 @@ class Source(metaclass=abc.ABCMeta):
       try:
         return modify_data_func(data)
       except Exception as e:
-        raise SourceModifyDataError(f'failed to modify data from source') from e
+        raise SourceModifyDataError(f'failed to modify data from source because: {e}')
     else:
       return data
 
