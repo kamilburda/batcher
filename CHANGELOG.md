@@ -12,6 +12,7 @@ Redesigned user interface:
 * Given the changes above, adjusted dialog dimensions, positions of separators and spacing/margins/border width.
 
 Bug fixes:
+* Added executable bit to the main `batcher.py` file. This could otherwise prevent the plug-in from being registered (i.e. from appearing in GIMP) on Unix-like platforms.
 * Fixed a crash for PDB procedures containing GIMP resources (brushes, palettes, gradients, patterns) as settings.
 * Prevented errors for PDB procedures with array arguments requiring a non-zero number of elements (e.g. pencil).
 * Fixed an issue where color parameters for some PDB procedures could not be adjusted.
