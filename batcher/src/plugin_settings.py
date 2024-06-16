@@ -87,6 +87,7 @@ def create_settings():
         ('rename_existing', _('Rename _existing file'),
          overwrite.OverwriteModes.RENAME_EXISTING)],
       'display_name': _('Overwrite mode (non-interactive run mode only)'),
+      'gui_type': None,
     },
     {
       'type': 'file',
@@ -103,6 +104,7 @@ def create_settings():
       'default_value': collections.defaultdict(set),
       'display_name': _('Selected layers'),
       'pdb_type': None,
+      'gui_type': None,
     },
     {
       'type': 'bool',
