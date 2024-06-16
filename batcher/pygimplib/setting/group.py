@@ -663,7 +663,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
       return 'ignore_apply_gui_value_to_setting' not in setting_.tags
     
     for setting in self.walk(include_setting_func=_should_not_ignore):
-      setting.gui.update_setting_value()
+      setting.gui.update_setting_value(force=force)
   
   def to_dict(self):
     """Returns a dictionary representing the group, appropriate for saving it
