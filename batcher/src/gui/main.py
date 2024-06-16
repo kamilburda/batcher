@@ -622,6 +622,7 @@ class ExportLayersDialog:
           gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
           widget=self._procedure_list.browser.widget),
       },
+      only_null=True,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
