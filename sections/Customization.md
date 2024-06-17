@@ -9,94 +9,87 @@ generate_toc: true
 
 Beyond the basic features, Batcher allows you to:
 * adjust layer names,
-* apply custom *procedures* (insert background, scale down, ...),
+* apply custom *procedures* to each layer (insert background, scale down, ...),
 * filter layers by applying *constraints* (only visible layers, ...).
 
 As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below.
-
-When [editing layers](Usage.md#editing-layers), customization options are automatically displayed.
-To enable customization when exporting layers, select `Settings → Show More Settings`.
-
-![Dialog of Export Layers with additional customization](../images/screenshot_dialog_customization.png)
 
 
 ## Examples
 
 **I want to export all layers using the image size, not the layer size.**
 
-Uncheck or remove the "Use layer size" procedure.
+Uncheck or remove the `Use layer size` procedure.
 
 
 **I want to export only visible layers.**
 
-Check the "Visible" constraint (or add one if not already).
+Add the `Visible` constraint (`Add Constraint... → Visible`).
 
 
 **I want to export only visible layers, including those that have invisible parent layer groups.**
 
-1. Check the "Visible" constraint (or add one if not already).
-2. Edit the "Visible" constraint (hover over the constraint and click on the pen and paper icon). In the dialog, click on `More options` and then uncheck `Also apply to parent folders`.
+1. Add the `Visible` constraint.
+2. Edit the `Visible` constraint (press the icon to the right of the constraint name).
+   In the dialog, click on `More options` and then uncheck `Also apply to parent folders`.
 
 
 **I don't want to preserve folder hierarchy when exporting layers.**
 
-Add the "Remove folder structure" procedure.
+Add the `Remove folder structure` procedure (`Add Procedure... → Remove folder structure`).
 
 
 **How do I rename the layers to form a sequence of numbers, e.g. "image001", "image002", ...?**
 
-Click on the text entry next to `Save as:` and choose `image001`, or type `image[001]` in the entry.
+Click on the text entry next to `Save as` and choose `image001`, or type `image[001]` in the entry.
 
 
 **My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?**
 
-In the text entry next to `Save as:`, type `[layer name, %e]`.
+In the text entry next to `Save as`, type `[layer name, %e]`.
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
 **How do I export only layer groups at the top level?**
 
-1. Uncheck the "Layers" constraint.
-2. Add the "Layer groups" constraint.
-3. Add the "Top-level" constraint.
+1. Uncheck the `Layers` constraint.
+2. Add the `Layer groups` constraint.
+3. Add the `Top-level` constraint.
 
 
 **I want to adjust brightness in my layers. Can this be done?**
 
-Yes, you may insert any GIMP filter as a procedure:
+Yes! You may insert any GIMP filter as a procedure:
 1. Select `Add Procedure... → Add Custom Procedure...`
-2. Find `gimp-drawable-brightness-contrast` in the procedure browser and select `Add`.
-3. Adjust the parameters as desired.
-4. Select `OK` to add the procedure.
+2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
+3. Adjust the options as desired.
+4. Select `Add` to add the procedure.
 
 
 **I need every layer to have the same background.**
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
-2. In the plug-in, the color tag will be displayed next to the layer name(s).
-3. Add the "Background, foreground" → "Insert background" procedure. If needed, you may place this procedure after "Use layer size" by dragging it onto "Use layer size".
-4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the "Merge background" procedure.
+2. In the plug-in, the color tag will now be displayed next to the layer name(s).
+3. Add the `Background, foreground → Insert background` procedure. If needed, you may place this procedure after `Use layer size` by dragging it onto `Use layer size`.
+4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the `Merge background` procedure.
 
 
 **I want to save the entire image as a single multipage PDF file.**
 
 While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
 
-1. Add the "Export" procedure.
+1. Add the `Export` procedure.
 2. Adjust the output folder as needed. The folder explorer in the main dialog will be ignored.
 3. Type `pdf` next to `File extension`.
 4. Select an option in `Perform export:`. To export a single image, select `For the entire image at once`.
-5. If needed and if `For the entire image at once` was selected, adjust `Image filename pattern` as seen fit.
+5. If you selected `For the entire image at once`, adjust `Image filename pattern` as seen fit.
 6. Specifically for the PDF format, you need to check `Layers as pages` when the native PDF export dialog is shown. Otherwise, only a single page will be exported.
-7. You may also want to uncheck the "Use layer size" procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
+7. You may also want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP.
 
 
-## Adjusting Layer Names
-
-By default, layer names are used as filenames.
-The text entry next to `Save as` lets you customize the filenames.
+## Adjusting Filenames
 
 There are several built-in *fields* that you can combine to form a filename pattern.
 For example, `image[001]` renames the layers to `image001`, `image002` and so on.
@@ -121,7 +114,7 @@ The numbering is separate for each layer group.
 Options:
 * `%n`: Continue numbering across layer groups.
 * `%d<number>`: Use descending numbers, optionally with the specified padding (number of digits).
-If the number is 0, the first number is the number of layers to export within a layer group, or, if `%n` is also specified, the number of all layers to export.
+  If the number is 0, the first number is the number of layers to export within a layer group, or, if `%n` is also specified, the number of all layers to export.
 
 Examples:
 * `[1]` → `1`, `2`, ...
@@ -142,7 +135,9 @@ Options:
 
 Examples:
 * `[layer name]` → `Frame.png`
+* `[layer name]` for a layer named `Some.Layer.png` → `Some.png`
 * `[layer name, %e]` → `Frame.png`
+* `[layer name, %e]` for a layer named `Some.Layer.png` → `Some.Layer.png`
 * `[layer name, %i]` → `Frame.png` (if the file extension is `png`)
 * `[layer name, %i]` → `Frame` (if the file extension is `jpg`)
 
@@ -201,7 +196,7 @@ Use the name without the `re.` prefix.
 For example, to ignore case, type `IGNORECASE` or `ignorecase`.
 You can specify multiple flags separated by commas.
 
-For the example below, suppose that a layer is named "Animal copy #1".
+For the example below, suppose that a layer is named `Animal copy #1`.
 While the square brackets (`[` and `]`) enclosing the first three field options are optional, they are necessary in case you need to specify an empty string (`[]`), leading spaces or commas.
 
 Examples:
@@ -267,7 +262,7 @@ Examples:
 * `[attributes, %iw-%ih]` → `1000-500`
 
 
-### Inserting reserved characters in optionss
+### Inserting reserved characters in options
 
 To insert a literal space or comma in a field option, enclose the option with square brackets.
 To insert a literal square bracket (`[` or `]`), double the bracket and enclose the option with square brackets (e.g. `[[[]` to insert a literal `[`).
@@ -284,11 +279,10 @@ Examples:
 Procedures allow you to apply image filters to each layer.
 Press the `Add Procedure...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
 
-For each added procedure, you may perform any of the following:
-* enable and disable the procedure,
-* move the procedure up/down by dragging the procedure with mouse or by keyboard,
-* edit the procedure.
-  You may edit the name and the values of its options (if any) that are applied to each layer.
+For each procedure, you may:
+* enable/disable the procedure,
+* move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
+* [edit the procedure](#editing-procedures-and-constraints),
 * remove the procedure.
 
 You can add the same procedure multiple times.
@@ -298,35 +292,36 @@ You can add the same procedure multiple times.
 
 **Apply opacity from layer groups**
 
-Combine opacity from all parent layer groups for each layer.
-This corresponds to how the layer is actually displayed in the image canvas.
+Combines opacity from all parent layer groups for each layer.
+This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
 **Insert background**
 
-Insert layers tagged with a specific color tag as background for each layer.
+Inserts layers tagged with a specific color tag as background for each layer.
 
-Note that even background layers are processed and exported - to prevent this behavior, enable the `Without color tags` constraint.
+Note that even background layers are processed and exported.
+To prevent such behavior, add the `Without color tags` constraint.
 
 The _blue_ color tag is used as background by default.
-You may set a different color tag representing the background layers by editing the procedure option `Color tag`.
+You may set a different color tag representing the background layers by adjusting the `Color tag` option.
 
-In the dialog, this procedure is always inserted in the first position.
+This procedure is always inserted at the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
 If this is your intention, you can always move this procedure below `Use layer size`.
 
 **Insert foreground**
 
-Insert layers tagged with a specific color tag as foreground for each layer.
+Inserts layers tagged with a specific color tag as foreground for each layer.
 
 The _green_ color tag is used as foreground by default.
 
-For more information, see "Insert background" above.
+For more information, see `Insert background` above.
 
 **Merge background**
 
-Merges an already inserted background layer (via "Insert background", see above) with the current layer.
+Merges an already inserted background layer (via `Insert background`, see above) with the current layer.
 
 This is useful if you wish to have a single merged layer rather than the background as a separate layer.
 
@@ -337,12 +332,12 @@ If there is no background layer inserted, this procedure has no effect.
 
 **Merge foreground**
 
-Merges an already inserted foreground layer (via "Insert foreground", see above) with the current layer.
+Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
 
 When exporting layers, the foreground is merged automatically before the export.
 Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
 
-For more information, see "Merge background" above.
+For more information, see `Merge background` above.
 
 **Export**
 
@@ -368,15 +363,15 @@ When exporting each layer separately (the default), the Export procedure usually
 
 **Remove folder structure**
 
-Export all layers to the output folder on the same level, i.e. do not create subfolders for layer groups.
+Exports all layers to the output folder on the same level, i.e. subfolders for layer groups are not created.
 
 **Rename**
 
-Rename layers according to the specified pattern.
-This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-layer-names).
-If this procedure is specified, the text entry next to `Save as` has no effect.
+Renames layers according to the specified pattern.
+This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-filenames).
+If this procedure is added and enabled, the text entry next to `Save as` has no effect.
 
-Additionally, this procedure allows customizing whether to also rename folders (by enabling `Rename folders`) or only rename folders (by enabling `Rename folders` and disabling `Rename layers`).
+Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`) or rename folders only (by checking `Rename folders` and unchecking `Rename layers`).
 
 **Scale**
 
@@ -409,69 +404,59 @@ When [editing layers](Usage.md#editing-layers), you may want to disable this pro
 
 ### Adding Custom Procedures
 
-You can add any procedure available in the GIMP Procedural Database (PDB) by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
-Select the desired procedure from the browser dialog and press `Add`.
-The edit dialog allows you to edit the procedure name and the values of its options.
+You can add any built-in GIMP procedure or plug-in by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
 
+![Procedure browser dialog](../images/screenshot_procedure_browser_dialog.png)
 
-### Editing procedures
+You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
-When editing a procedure, you may (and sometimes have to) adjust its options.
-GIMP PDB procedures are usually accompanied by descriptions of the entire procedure as well as its options.
-Hover over option names to display tooltips describing them in more detail.
-The description for an option often indicates the range of valid values.
-
-If a procedure contains a layer/drawable/item option, you may select one of the following:
-* `Current Layer` (default): applies the procedure to the currently processed layer.
-* `Background Layer`: applies the procedure to the layer representing background, inserted via the "Insert background" procedure. If there is no such layer, the procedure will have no effect.
-* `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the "Insert foreground" procedure. If there is no such layer, the procedure will have no effect.
+Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
+You can [edit the procedure](#editing-procedures-and-constraints) anytime after adding it.
 
 
 ## Constraints
 
 To exclude certain layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
-As with procedures, you can enable, disable, reorder, edit or remove constraints as needed.
-Adding the same constraint multiple times is also possible.
+Just like procedures, you may [enable/disable, reorder, edit or remove](#procedures) constraints.
 
 
 ### Built-in Constraints
 
 **Layers**
 
-Process only layers (i.e. ignore layer groups).
-This constraint is enabled by default.
+Processes only layers (i.e. layer groups are not processed).
 
 **Layer groups**
 
-Process only layer groups.
+Processes only layer groups.
+
+You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
 
 **Matching file extension**
 
-Process only layers having a file extension matching the extension typed in the text entry.
+Processes only layers having a file extension matching the extension typed in the text entry.
 
 **Selected in GIMP**
 
-Process only layers selected in GIMP.
+Processes only layers selected in GIMP.
 
 **Selected in preview**
 
-Process only layers selected in the preview.
+Processes only layers selected in the preview.
+
 If you save settings, the selection is saved as well.
 
 **Top-level**
 
-Process only layers at the top of the layer tree (i.e. do not process layers inside any layer group).
+Processes only layers at the top of the layer tree (i.e. layers inside any layer group are excluded).
 
 **Visible**
 
-Process only visible layers.
-
-By default, layers (visible or not) whose parent layer groups are invisible are also ignored.
-To disable this behavior, edit the constraint, click on `More options` and check `Also apply to parent folders`.
+Processes only visible layers.
 
 **With color tags**
 
-Process only layers having a color tag.
+Processes only layers having a color tag.
 
 By default, all layers without a color tag are excluded.
 To process only layers with specific color tags, edit this constraint and add the color tags for the `Color tags` option.
@@ -480,28 +465,49 @@ Other tagged or untagged layers will be excluded.
 
 **Without color tags**
 
-Process only layers having no color tag.
+Processes only layers without a color tag.
 
 By default, all layers with a color tag are excluded.
-To ignore only specific color tags, edit this constraint and add the color tags for the `Color tags` option.
+To exclude only specific color tags, edit this constraint and add the color tags for the `Color tags` option.
+For example, by adding a blue tag, all layers except the ones containing the blue tag will be processed.
 
-If a layer group is assigned a color tag, it will normally not be ignored.
-To also ignore layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
+If a layer group has a color tag, it will normally not be excluded.
+To also exclude layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
 
 
-## More Options
+## Editing Procedures and Constraints
 
-When editing procedures or constraints, you may adjust additional options when clicking on `More options`.
+To edit a procedure or a constraint, press the icon to the right of the procedure/constraint name and adjust the options in the displayed dialog.
+
+The dialog will be automatically displayed for most [built-in procedures](#built-in-procedures) when added.
+
+If a procedure contains a layer/drawable/item option, you may select one of the following:
+* `Current Layer` (default): applies the procedure to the currently processed layer.
+* `Background Layer`: applies the procedure to the layer representing background, inserted via the `Insert background` procedure. If there is no such layer, the procedure will have no effect.
+* `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the `Insert foreground` procedure. If there is no such layer, the procedure will have no effect.
+
+
+### More Options
+
+Expanding `More options` allows you to adjust the options below.
 
 **Enable for previews**
 
-If checked (the default), apply the procedure or constraint in the preview.
-
-Unchecking this can be handy if a procedure takes too long or manipulates the file system (reads or saves files).
+If checked (the default), the procedure/constraint is applied in the preview.
+Unchecking this can be useful if a procedure takes too long or manipulates the file system (reads or saves files).
 
 **Also apply to parent folders** (constraints only)
 
 If checked, a layer will satisfy a constraint if all of its parent groups also satisfy the constraint.
-For example, if checking this option for the "Visible" constraint, a visible layer would be ignored if any of its parent layer groups are not visible.
+For example, if this option is checked for the `Visible` constraint, a visible layer is excluded if any of its parent layer groups are not visible.
 
-This option is unchecked by default and is only checked for the "Visible" constraint that is displayed when running this plug-in for the first time.
+
+## Running Batcher Without Dialog
+
+It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
+
+The `plug-in-batch-export-layers` procedure exports layers with the specified or last used (or saved) settings, depending on the value of the `run-mode` parameter.
+
+You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
+
+The `plug-in-batch-export-layers-quick` procedure exports layers instantly, always with the last used settings.
