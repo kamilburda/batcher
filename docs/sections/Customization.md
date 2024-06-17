@@ -401,7 +401,7 @@ You can add any built-in GIMP procedure or plug-in by pressing `Add Procedure...
 
 ![Procedure browser dialog](../images/screenshot_procedure_browser_dialog.png)
 
-You can preview the selected procedure (by pressing `Preview`) and adjust its options.
+You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
 You can [edit the procedure](#editing-procedures-and-constraints) anytime after adding it.
