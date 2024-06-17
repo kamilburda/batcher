@@ -406,7 +406,6 @@ When [editing layers](Usage.md#editing-layers), you may want to disable this pro
 
 You can add any built-in GIMP procedure or plug-in by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
 
-[//]: # (TODO)
 ![Procedure browser dialog](../images/screenshot_procedure_browser_dialog.png)
 
 You can preview the selected procedure (by pressing `Preview`) and adjust its options.
