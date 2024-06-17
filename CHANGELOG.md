@@ -1,4 +1,6 @@
-## Upcoming
+## 0.3
+
+### June 17, 2024
 
 Redesigned user interface:
 * Replaced the folder chooser widget with a folder chooser button.
