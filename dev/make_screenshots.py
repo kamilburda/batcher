@@ -44,6 +44,7 @@ OUTPUT_DIRPATH = os.path.join(
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
+SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
@@ -67,7 +68,7 @@ def take_screenshots(gui, dialog, settings):
   
   settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
   
-  decoration_offsets = move_dialog_to_corner(dialog, settings)
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
   
   gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['main-background'].raw})
   
@@ -85,6 +86,30 @@ def take_screenshots(gui, dialog, settings):
     settings,
     decoration_offsets,
   )
+
+  gui.procedure_list.browser.fill_contents_if_empty()
+  gui.procedure_list.browser.widget.show_all()
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  gui.procedure_list.browser.widget.set_focus(None)
+
+  browser_decoration_offsets = move_dialog_to_corner(
+    dialog, settings['gui/procedure_browser/dialog_position'])
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME,
+    settings,
+    browser_decoration_offsets,
+    crop_to='browser_dialog',
+  )
+
+  gui.procedure_list.browser.widget.hide()
   
   settings['main/edit_mode'].set_value(True)
   
@@ -101,13 +126,24 @@ def take_screenshots(gui, dialog, settings):
   Gtk.main_quit()
   
 
-def take_and_process_screenshot(screenshots_dirpath, filename, settings, decoration_offsets):
+def take_and_process_screenshot(
+      screenshots_dirpath,
+      filename,
+      settings,
+      decoration_offsets,
+      crop_to='main_dialog',
+):
   # HACK: Wait a while until the window is fully shown.
   time.sleep(1)
   
   screenshot_image = take_screenshot()
-  
-  crop_to_dialog(screenshot_image, settings, decoration_offsets)
+
+  if crop_to == 'browser_dialog':
+    crop_to_dialog(
+      screenshot_image, settings['gui/procedure_browser/dialog_size'], decoration_offsets)
+  else:
+    crop_to_dialog(
+      screenshot_image, settings['gui/size/dialog_size'], decoration_offsets)
 
   selected_layers = screenshot_image.list_selected_layers()
   layer_array = GObject.Value(Gimp.ObjectArray)
@@ -126,23 +162,23 @@ def take_screenshot():
   return pdb.plug_in_screenshot(1, 0, 0, 0, 0)
 
 
-def move_dialog_to_corner(dialog, settings):
-  settings['gui/size/dialog_position'].set_value((0, 0))
+def move_dialog_to_corner(dialog, dialog_position_setting):
+  dialog_position_setting.set_value((0, 0))
   dialog.set_gravity(Gdk.Gravity.STATIC)
   decoration_offset_x, decoration_offset_y = dialog.get_position()
   dialog.set_gravity(Gdk.Gravity.NORTH_WEST)
-  settings['gui/size/dialog_position'].set_value((-decoration_offset_x, 0))
+  dialog_position_setting.set_value((-decoration_offset_x, 0))
   
   return decoration_offset_x, decoration_offset_y
 
 
-def crop_to_dialog(image, settings, decoration_offsets):
-  settings['gui/size/dialog_size'].gui.update_setting_value()
+def crop_to_dialog(image, dialog_size_setting, decoration_offsets):
+  dialog_size_setting.gui.update_setting_value()
   
   pdb.gimp_image_crop(
     image,
-    settings['gui/size/dialog_size'].value[0],
-    settings['gui/size/dialog_size'].value[1] + decoration_offsets[1],
+    dialog_size_setting.value[0],
+    dialog_size_setting.value[1] + decoration_offsets[1],
     0,
     0)
   

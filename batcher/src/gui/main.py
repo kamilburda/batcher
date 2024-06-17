@@ -253,6 +253,14 @@ class ExportLayersDialog:
   def image_preview(self):
     return self._image_preview
 
+  @property
+  def procedure_list(self):
+    return self._procedure_list
+
+  @property
+  def constraint_list(self):
+    return self._constraint_list
+
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=pg.config.PLUGIN_NAME)
     if self._settings['gui/size/dialog_size'].value:
