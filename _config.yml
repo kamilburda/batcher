@@ -5,7 +5,7 @@ baseurl: "/batcher"
 url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"
 github_username: "Kamil Burda"
-copyright_years: "2023"
+copyright_years: "2023-2024"
 permalink: /:categories/:year-:month-:day-:slug:output_ext
 show_excerpts: true
 excerpt_separator: "<!-- end of summary -->"
