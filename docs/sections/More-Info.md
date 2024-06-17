@@ -1,8 +1,7 @@
 ## Support
 
 You can report issues, ask questions or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
-
-Before submitting a bug report, please check the [GitHub Issues page](https://github.com/kamilburda/batcher/issues) for current issues.
+Please check the current issues there before submitting a report.
 
 
 ## License

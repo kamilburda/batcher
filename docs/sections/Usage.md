@@ -1,64 +1,82 @@
 ## Exporting Layers
 
 Open your image in GIMP and select `File → Export Layers...`.
-A dialog appears that allows you to choose the output folder, filenames and the file extension.
+
+A dialog appears that allows you to adjust export settings, such as the output folder, filenames and the file extension.
 
 ![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
 
 To export layers, press the `Export` button.
-A dialog corresponding to the file format appears, allowing you to adjust export settings.
-Some file formats do not display dialogs, while some display the dialog for each layer (this cannot be prevented because such a file format only allows an interactive export).
+If your chosen file format can be tweaked (e.g. compression level for PNG images), a dialog with file format settings will be displayed, allowing you to adjust them.
+
+Below you will find more information on adjusting the export settings.
 
 
 ### Changing Filenames
 
-See the [corresponding section in Customization](Customization.md#adjusting-filenames).
+By default, layer names are used as filenames.
+The text entry next to `Save as` lets you customize the filenames.
+
+For details, see [Adjusting Filenames](Customization.md#adjusting-filenames).
 
 
 ### Changing File Extension
 
-Type or choose your desired file extension in the `File extension` text entry.
+Type or choose your desired file extension next to the filename entry (`png` by default).
+
 The dropdown list displays available file formats alongside their associated file extensions.
-If a file format contains multiple file extensions, the first is selected by default, but you may also choose from the other extensions (by clicking or pressing Tab).
+If a file format contains multiple file extensions, the first is selected by default, but you may also choose a different extension (by clicking on it or pressing Tab).
 
 For now, the dropdown only contains a fixed list of file formats provided by GIMP and some recognized third-party plug-ins.
-However, you may still enter a file extension not in the list in case you use a file format plug-in not recognized by Batcher.
+However, you can still enter a file extension not in the list in case you use an unrecognized file format plug-in.
 
 
-### Exporting Layers Instantly
+### Procedures and Constraints
 
-You can export in a single click by running `File → Export Layers (Quick)`.
-This is useful e.g. if you made changes to your image and you want to export again with the same settings.
+Before the export, you can apply a multitude of *procedures* to each layer, such as scaling or background insertion.
+
+You can exclude layers from being exported based on one or more *constraints*, e.g. only visible layers or only layer groups.
+
+Procedures and constraints can be a powerful way to adjust the export to your heart's content.
+You can take a look at a few [examples](Customization.md#examples) to get started.
+
+For details, see [Procedures](Customization.md#procedures) and [Constraints](Customization.md#constraints).
+
+
+## Exporting Layers Instantly
+
+You can perform the export in a single click by running `File → Export Layers (Quick)`.
+This can be useful if you made changes to your image and you want to export again with the same settings.
 
 
 ## Editing Layers
 
-To switch to layer editing mode, open your image in GIMP and select `File → Export Layers...`, then press the `Settings` button and select `Edit Layers`.
+You can batch-edit layers without exporting them.
+This is where you leverage the power of [procedures](Customization.md#procedures) and [constraints](Customization.md#constraints).
+You can take a look at a few [examples](Customization.md#examples) to get started.
 
-The dialog now displays a list of procedures and constraints applied to layers:
+To switch to layer editing mode, open your image in GIMP and select `File → Export Layers...`, then press the `Settings` button and select `Edit Layers`.
+The export settings are now hidden.
 
 ![Dialog of Export Layers when editing layers](../images/screenshot_dialog_edit_layers.png)
 
 It is highly recommended to uncheck `Use layer size` as the entire image would be resized to the last layer processed.
-
-To learn more about procedures and constraints, see [Customization](Customization.md).
 
 If the `Layers` constraint is unchecked, layer groups will also be processed. The layer groups will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on layer groups (e.g. `gimp-drawable-brightness-contrast`).
 
 
 ## Preview
 
-To have a better grasp of what layers are actually exported and how, the preview displays the layer names in a folder structure.
-If you select a layer, the layer contents will be displayed at the bottom of the preview.
+The preview displays the resulting layer names and the contents the selected layer.
 
-You can adjust the width of the entire preview by dragging the separator between the preview and the folder chooser.
+You can adjust the width of the entire preview by dragging the separator at the left edge of the preview.
 You can also adjust the height of the previewed image by dragging the separator above the image.
 
 If the previewed image takes too long to render, the preview is no longer updated automatically.
-A button next to the arrow button above the image is displayed that allows you to manually update the image.
-To switch between automatic and manual update, click on the arrow button and select `Update Image Preview Automatically`.
+A refresh button above the image is displayed that allows you to manually update the image.
+To switch between automatic and manual update, press the arrow button and select `Update Image Preview Automatically`.
 
-Note that the preview is only an approximation of what the exported image will look like and thus is not completely accurate when exporting with certain file formats.
+Note that the preview is only an approximation of what the exported images will look like and thus is not completely accurate when exporting with certain file formats.
 For example, the preview will show a transparent image if the JPEG format (which does not support transparency) is selected.
 
 
@@ -71,22 +89,6 @@ To reset settings to their default values, select `Settings → Reset Settings`.
 You may also export settings to a custom file by selecting `Settings → Export Settings...`.
 This allows swapping between different plug-in configurations or sharing them.
 To import settings from a file, select `Settings → Import Settings...` and select the file.
-
-
-## More Customization
-
-If you find yourself in the need of customizing layer names, applying additional procedures before exporting or excluding specific layers from the export, see [Customization](Customization.md).
-
-
-## Running Batcher Without Dialog
-
-It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
-
-The `plug-in-batch-export-layers` procedure exports layers with the specified or last used (or saved) settings, depending on the value of the `run-mode` parameter.
-
-You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
-
-The `plug-in-batch-export-layers-quick` procedure exports layers instantly, always with the last used settings.
 
 
 ## Known Issues
