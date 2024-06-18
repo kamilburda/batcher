@@ -1,14 +1,2 @@
-docs/images/download_icon.svg
-docs/gh-pages/dev/images/download_icon.svg
-
-docs/images/logo.svg
-docs/gh-pages/dev/images/logo.svg
-
-docs/images/screenshot_dialog_export_layers.png
-docs/gh-pages/dev/images/screenshot_dialog_export_layers.png
-
-docs/images/screenshot_procedure_browser_dialog.png
-docs/gh-pages/dev/images/screenshot_procedure_browser_dialog.png
-
-docs/images/screenshot_dialog_edit_layers.png
-docs/gh-pages/dev/images/screenshot_dialog_edit_layers.png
+docs/images
+docs/gh-pages/dev/images
