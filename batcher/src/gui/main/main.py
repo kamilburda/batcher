@@ -1,7 +1,5 @@
-"""Main module for the plug-in GUI."""
+"""Main GUI dialog classes for each plug-in procedure."""
 
-import contextlib
-import functools
 import os
 
 import gi
@@ -39,149 +37,7 @@ from src.gui.preview import controller as previews_controller_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
 
-
-def display_reset_prompt(parent=None):
-  dialog = Gtk.MessageDialog(
-    parent=parent,
-    message_type=Gtk.MessageType.WARNING,
-    modal=True,
-    destroy_with_parent=True,
-    buttons=Gtk.ButtonsType.YES_NO,
-  )
-
-  dialog.set_transient_for(parent)
-  dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
-  dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
-
-  dialog.show_all()
-  response_id = dialog.run()
-  dialog.destroy()
-
-  return response_id
-
-
-@contextlib.contextmanager
-def handle_gui_in_export(run_mode, image, layer, output_filepath, window):
-  should_manipulate_window = run_mode == Gimp.RunMode.INTERACTIVE
-
-  if should_manipulate_window:
-    window_position = window.get_position()
-    window.hide()
-  else:
-    window_position = None
-
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-
-  try:
-    yield
-  finally:
-    if window_position is not None:
-      window.move(*window_position)
-      window.show()
-
-    while Gtk.events_pending():
-      Gtk.main_iteration()
-
-
-def stop_batcher(batcher):
-  if batcher is not None:
-    batcher.stop()
-    return True
-  else:
-    return False
-
-
-def _set_settings(func):
-  """Decorator for `Group.apply_gui_values_to_settings()` that prevents the
-  decorated function from being invoked if there are invalid setting values.
-
-  When assigning an invalid value, a warning message is displayed.
-
-  This decorator is meant to be used in the `ExportLayersDialog` class.
-  """
-
-  @functools.wraps(func)
-  def func_wrapper(self, *args, **kwargs):
-    self._settings['main'].apply_gui_values_to_settings()
-    self._settings['gui'].apply_gui_values_to_settings()
-
-    self._settings['main/output_directory'].gui.update_setting_value()
-
-    self._settings['main/selected_layers'].value[self._image] = (
-      self._name_preview.selected_items)
-    self._settings['gui/name_preview_layers_collapsed_state'].value[self._image] = (
-      self._name_preview.collapsed_items)
-    self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
-      [self._image_preview.item.raw] if self._image_preview.item is not None else [])
-
-    func(self, *args, **kwargs)
-
-  return func_wrapper
-
-
-def _set_up_output_directory_settings(settings, current_image):
-  _set_up_images_and_directories_and_initial_output_directory(
-    settings, settings['main/output_directory'], current_image)
-  _set_up_output_directory_changed(settings, current_image)
-
-
-def _set_up_images_and_directories_and_initial_output_directory(
-      settings, output_directory_setting, current_image):
-  """Sets up the initial directory path for the current image.
-
-  The path is set according to the following priority list:
-
-    1. Last export directory path of the current image
-    2. Import directory path of the current image
-    3. Last export directory path of any image (i.e. the current value of
-       ``'main/output_directory'``)
-    4. The default directory path (default value) for
-       ``'main/output_directory'``
-
-  Notes:
-
-    Directory 3. is set upon loading ``'main/output_directory'``.
-    Directory 4. is set upon the instantiation of ``'main/output_directory'``.
-  """
-  settings['gui/images_and_directories'].update_images_and_dirpaths()
-
-  _update_directory(
-    output_directory_setting,
-    current_image,
-    settings['gui/images_and_directories'].value[current_image])
-
-
-def _update_directory(setting, current_image, current_image_dirpath):
-  """Sets the directory path to the ``setting``.
-
-  The path is set according to the following priority list:
-
-  1. ``current_image_dirpath`` if not ``None``
-  2. ``current_image`` - import path of the current image if not ``None``
-
-  If update was performed, ``True`` is returned, ``False`` otherwise.
-  """
-  if current_image_dirpath is not None:
-    setting.set_value(current_image_dirpath)
-    return True
-
-  if current_image.get_file() is not None and current_image.get_file().get_path() is not None:
-    setting.set_value(os.path.dirname(current_image.get_file().get_path()))
-    return True
-
-  return False
-
-
-def _set_up_output_directory_changed(settings, current_image):
-  def on_output_directory_changed(output_directory, images_and_directories, current_image_):
-    images_and_directories.update_dirpath(current_image_, output_directory.value)
-
-  settings['main/output_directory'].connect_event(
-    'value-changed',
-    on_output_directory_changed,
-    settings['gui/images_and_directories'],
-    current_image)
+from src.gui.main import common
 
 
 class ExportLayersDialog:
@@ -232,7 +88,7 @@ class ExportLayersDialog:
         self._settings['main/overwrite_mode'].items['replace']),
       item_tree=self._initial_layer_tree)
 
-    _set_up_output_directory_settings(self._settings, self._image)
+    common.set_up_output_directory_settings(self._settings, self._image)
 
     self._init_gui()
     self._assign_gui_to_settings()
@@ -717,7 +573,7 @@ class ExportLayersDialog:
     else:
       return True
 
-  @_set_settings
+  @common.set_settings
   def _save_settings_to_default_location(self):
     save_successful = self._save_settings()
     if save_successful:
@@ -896,7 +752,7 @@ class ExportLayersDialog:
       return False
 
     if Gdk.keyval_name(event.keyval) == 'Escape':
-      stopped = stop_batcher(self._batcher)
+      stopped = common.stop_batcher(self._batcher)
       return stopped
 
     # Ctrl + S is pressed
@@ -924,7 +780,7 @@ class ExportLayersDialog:
       if import_successful:
         self._display_inline_message(_('Settings successfully imported.'), Gtk.MessageType.INFO)
 
-  @_set_settings
+  @common.set_settings
   def _on_export_settings_activate(self, menu_item):
     filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='export')
 
@@ -934,7 +790,7 @@ class ExportLayersDialog:
         self._display_inline_message(_('Settings successfully exported.'), Gtk.MessageType.INFO)
 
   def _on_reset_settings_activate(self, menu_item):
-    response_id = display_reset_prompt(parent=self._dialog)
+    response_id = common.display_reset_prompt(parent=self._dialog)
 
     if response_id == Gtk.ResponseType.YES:
       actions.clear(self._settings['main/procedures'])
@@ -948,7 +804,7 @@ class ExportLayersDialog:
 
       self._display_inline_message(_('Settings reset.'), Gtk.MessageType.INFO)
 
-  @_set_settings
+  @common.set_settings
   def _on_button_run_clicked(self, button, lock_update_key):
     self._set_up_gui_before_run()
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher()
@@ -1032,7 +888,7 @@ class ExportLayersDialog:
       self._settings['main/constraints'],
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
-      export_context_manager=handle_gui_in_export,
+      export_context_manager=common.handle_gui_in_export,
       export_context_manager_args=[self._dialog])
 
     return batcher, overwrite_chooser, progress_updater
@@ -1068,7 +924,7 @@ class ExportLayersDialog:
     Gtk.main_quit()
 
   def _on_button_stop_clicked(self, button):
-    stop_batcher(self._batcher)
+    common.stop_batcher(self._batcher)
 
   @staticmethod
   def _set_action_skipped_tooltips(action_list, skipped_actions, message, clear_previous=True):
@@ -1176,7 +1032,7 @@ class ExportLayersQuickDialog:
       overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].value),
       progress_updater=progress_updater,
-      export_context_manager=handle_gui_in_export,
+      export_context_manager=common.handle_gui_in_export,
       export_context_manager_args=[self._dialog])
     try:
       self._batcher.run(
@@ -1205,7 +1061,7 @@ class ExportLayersQuickDialog:
     self._dialog.hide()
 
   def _on_button_stop_clicked(self, button):
-    stop_batcher(self._batcher)
+    common.stop_batcher(self._batcher)
 
   def _on_dialog_delete_event(self, dialog, event):
-    stop_batcher(self._batcher)
+    common.stop_batcher(self._batcher)
