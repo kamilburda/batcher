@@ -565,8 +565,13 @@ class ExportLayersDialog:
       save_result = self._settings.save({'persistent': source})
 
     if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
+      if filepath is None:
+        main_message = _('Failed to save settings.')
+      else:
+        main_message = _('Failed to export settings to file "{}".'.format(filepath))
+
       messages_.display_import_export_settings_failure_message(
-        _('Failed to export settings to file "{}"'.format(filepath)),
+        main_message,
         details=utils_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
         parent=self._dialog)
       return False
@@ -854,8 +859,7 @@ class ExportLayersDialog:
     if overwrite_chooser.overwrite_mode in self._settings['main/overwrite_mode'].items.values():
       self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
 
-    self._settings['main'].save()
-    self._settings['gui'].save()
+    self._save_settings()
 
     if should_quit:
       Gtk.main_quit()
