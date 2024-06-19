@@ -103,17 +103,17 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
     self.assertIn('use_layer_size_2', self.settings)
   
   def test_add_multiple_dicts_with_same_name_in_different_child_groups(self):
-    special_settings = group_.Group('special')
-    special_settings.add([self.setting_dict])
+    gui_settings = group_.Group('gui')
+    gui_settings.add([self.setting_dict])
     
     main_settings = group_.Group('main')
     main_settings.add([self.setting_dict])
     
-    self.settings.add([special_settings, main_settings])
+    self.settings.add([gui_settings, main_settings])
     
-    self.assertIn('use_layer_size', special_settings)
+    self.assertIn('use_layer_size', gui_settings)
     self.assertIn('use_layer_size', main_settings)
-    self.assertNotEqual(special_settings['use_layer_size'], main_settings['use_layer_size'])
+    self.assertNotEqual(gui_settings['use_layer_size'], main_settings['use_layer_size'])
 
 
 class TestGroupAddFromDict(unittest.TestCase):
@@ -250,74 +250,74 @@ class TestGroup(unittest.TestCase):
   def setUp(self):
     self.settings = stubs_group.create_test_settings()
     
-    self.first_plugin_run_setting_dict = {
+    self.edit_mode_setting_dict = {
       'type': 'bool',
-      'name': 'first_plugin_run',
+      'name': 'edit_mode',
       'default_value': False,
     }
     
-    self.special_settings = group_.Group('special')
-    self.special_settings.add([self.first_plugin_run_setting_dict])
+    self.gui_settings = group_.Group('gui')
+    self.gui_settings.add([self.edit_mode_setting_dict])
   
   def test_add_same_setting_in_same_group(self):
     with self.assertRaises(ValueError):
-      self.special_settings.add([self.special_settings['first_plugin_run']])
+      self.gui_settings.add([self.gui_settings['edit_mode']])
 
   def test_add_same_setting_in_same_group_if_uniquify_is_true(self):
-    self.special_settings.add([self.special_settings['first_plugin_run']], uniquify_name=True)
+    self.gui_settings.add([self.gui_settings['edit_mode']], uniquify_name=True)
 
-    self.assertIn('first_plugin_run', self.special_settings)
-    self.assertIn('first_plugin_run_2', self.special_settings)
+    self.assertIn('edit_mode', self.gui_settings)
+    self.assertIn('edit_mode_2', self.gui_settings)
   
   def test_add_same_setting_in_different_child_groups(self):
-    self.settings.add([self.special_settings['first_plugin_run'], self.special_settings])
+    self.settings.add([self.gui_settings['edit_mode'], self.gui_settings])
     
-    self.assertIn('first_plugin_run', self.settings)
-    self.assertIn('first_plugin_run', self.special_settings)
-    self.assertEqual(self.settings['first_plugin_run'], self.special_settings['first_plugin_run'])
+    self.assertIn('edit_mode', self.settings)
+    self.assertIn('edit_mode', self.gui_settings)
+    self.assertEqual(self.settings['edit_mode'], self.gui_settings['edit_mode'])
   
   def test_add_group(self):
-    self.settings.add([self.special_settings])
+    self.settings.add([self.gui_settings])
     
-    self.assertIn('special', self.settings)
-    self.assertEqual(self.settings['special'], self.special_settings)
+    self.assertIn('gui', self.settings)
+    self.assertEqual(self.settings['gui'], self.gui_settings)
   
   def test_add_same_group_in_same_parent_group(self):
-    self.settings.add([self.special_settings])
+    self.settings.add([self.gui_settings])
     with self.assertRaises(ValueError):
-      self.settings.add([self.special_settings])
+      self.settings.add([self.gui_settings])
 
   def test_add_same_group_in_same_group_if_uniquify_is_true(self):
-    self.settings.add([self.special_settings])
-    self.settings.add([self.special_settings], uniquify_name=True)
+    self.settings.add([self.gui_settings])
+    self.settings.add([self.gui_settings], uniquify_name=True)
 
-    self.assertIn('special', self.settings)
-    self.assertIn('special', self.settings)
+    self.assertIn('gui', self.settings)
+    self.assertIn('gui', self.settings)
   
   def test_add_same_group_as_child_of_itself(self):
     with self.assertRaises(ValueError):
-      self.special_settings.add([self.special_settings])
+      self.gui_settings.add([self.gui_settings])
   
   def test_add_different_groups_with_same_name_in_different_child_groups(self):
     main_settings = group_.Group('main')
-    main_settings.add([self.special_settings])
+    main_settings.add([self.gui_settings])
     
-    different_special_settings = group_.Group('special')
-    self.settings.add([main_settings, different_special_settings])
+    different_gui_settings = group_.Group('gui')
+    self.settings.add([main_settings, different_gui_settings])
     
-    self.assertIn('special', self.settings)
-    self.assertIn('special', main_settings)
-    self.assertNotEqual(self.settings['special'], main_settings['special'])
+    self.assertIn('gui', self.settings)
+    self.assertIn('gui', main_settings)
+    self.assertNotEqual(self.settings['gui'], main_settings['gui'])
   
   def test_add_same_group_in_different_child_groups(self):
     main_settings = group_.Group('main')
-    main_settings.add([self.special_settings])
+    main_settings.add([self.gui_settings])
     
-    self.settings.add([self.special_settings, main_settings])
+    self.settings.add([self.gui_settings, main_settings])
     
-    self.assertIn('special', self.settings)
-    self.assertIn('special', main_settings)
-    self.assertEqual(self.settings['special'], main_settings['special'])
+    self.assertIn('gui', self.settings)
+    self.assertIn('gui', main_settings)
+    self.assertEqual(self.settings['gui'], main_settings['gui'])
   
   @parameterized.parameterized.expand([
     ('setting_exists_returns_setting_value',
@@ -451,13 +451,13 @@ class TestGroup(unittest.TestCase):
     self.assertIn('overwrite_mode', self.settings)
   
   def test_remove_setting_from_group_and_then_group(self):
-    self.settings.add([self.special_settings])
+    self.settings.add([self.gui_settings])
     
-    self.settings['special'].remove(['first_plugin_run'])
-    self.assertNotIn('first_plugin_run', self.settings['special'])
+    self.settings['gui'].remove(['edit_mode'])
+    self.assertNotIn('edit_mode', self.settings['gui'])
     
-    self.settings.remove(['special'])
-    self.assertNotIn('special', self.settings)
+    self.settings.remove(['gui'])
+    self.assertNotIn('gui', self.settings)
   
   def test_remove_settings_raise_error_if_invalid_name(self):
     with self.assertRaises(KeyError):
@@ -469,7 +469,7 @@ class TestGroup(unittest.TestCase):
       self.settings.remove(['file_extension'])
   
   def test_reset_settings_and_nested_groups_and_ignore_specified_settings(self):
-    self.settings.add([self.special_settings])
+    self.settings.add([self.gui_settings])
     self.settings['file_extension'].tags.add('ignore_reset')
     self.settings['overwrite_mode'].tags.update(
       ['ignore_reset', 'ignore_apply_gui_value_to_setting'])
@@ -477,7 +477,7 @@ class TestGroup(unittest.TestCase):
     self.settings['file_extension'].set_value('gif')
     self.settings['flatten'].set_value(True)
     self.settings['overwrite_mode'].set_item('skip')
-    self.settings['special/first_plugin_run'].set_value(True)
+    self.settings['gui/edit_mode'].set_value(True)
     
     self.settings.reset()
     
@@ -489,25 +489,25 @@ class TestGroup(unittest.TestCase):
       self.settings['flatten'].value,
       self.settings['flatten'].default_value)
     self.assertEqual(
-      self.settings['special/first_plugin_run'].value,
-      self.settings['special/first_plugin_run'].default_value)
+      self.settings['gui/edit_mode'].value,
+      self.settings['gui/edit_mode'].default_value)
   
   def test_reset_ignore_nested_group(self):
-    self.settings.add([self.special_settings])
-    self.settings['special'].tags.add('ignore_reset')
+    self.settings.add([self.gui_settings])
+    self.settings['gui'].tags.add('ignore_reset')
     
-    self.settings['special/first_plugin_run'].set_value(True)
+    self.settings['gui/edit_mode'].set_value(True)
     
     self.settings.reset()
     
     self.assertNotEqual(
-      self.settings['special/first_plugin_run'].value,
-      self.settings['special/first_plugin_run'].default_value)
+      self.settings['gui/edit_mode'].value,
+      self.settings['gui/edit_mode'].default_value)
   
   def test_to_dict(self):
     group = group_.Group('main', tags=['ignore_load'], setting_attributes={'gui_type': None})
     
-    group.add([self.first_plugin_run_setting_dict])
+    group.add([self.edit_mode_setting_dict])
     
     self.assertDictEqual(
       group.to_dict(),

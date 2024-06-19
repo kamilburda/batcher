@@ -120,7 +120,6 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         additional_init_before_run=None,
   ):
     settings = plugin_settings.create_settings()
-    settings['special/image'].set_value(self.test_image)
     settings['main/output_directory'].set_value(self.output_dirpath)
     settings['main/file_extension'].set_value('xcf')
     
@@ -152,9 +151,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         settings,
         test_case_name,
         expected_results_dirpath)
-  
-  @staticmethod
+
   def _export(
+        self,
         settings,
         procedure_names_to_add,
         procedure_names_to_remove,
@@ -178,11 +177,11 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         actions.remove(settings['main/procedures'], procedure_name)
 
     if additional_init_before_run is not None:
-      additional_init_before_run(settings['special/image'].value)
+      additional_init_before_run(self.test_image)
     
     batcher = core.Batcher(
-      settings['special/run_mode'].value,
-      settings['special/image'].value,
+      Gimp.RunMode.NONINTERACTIVE,
+      self.test_image,
       settings['main/procedures'],
       settings['main/constraints'],
     )

@@ -282,14 +282,14 @@ class TestSettingPath(unittest.TestCase):
       self.main_settings, self.main_settings, '')
 
   def test_get_path_with_relative_path_from_non_matching_group(self):
-    special_settings = group_.Group('special')
+    gui_settings = group_.Group('gui')
 
     self._test_get_path_with_relative_path(
-      self.setting, special_settings, 'main/advanced/file_extension')
+      self.setting, gui_settings, 'main/advanced/file_extension')
     self._test_get_path_with_relative_path(
-      self.advanced_settings, special_settings, 'main/advanced')
+      self.advanced_settings, gui_settings, 'main/advanced')
     self._test_get_path_with_relative_path(
-      self.main_settings, special_settings, 'main')
+      self.main_settings, gui_settings, 'main')
 
   def test_get_path_without_root_group(self):
     self.assertEqual(

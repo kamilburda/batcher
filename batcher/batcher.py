@@ -45,9 +45,6 @@ _EXPORT_LAYERS_SOURCE_NAME = 'plug-in-batch-export-layers'
 
 def plug_in_batch_export_layers(
       _procedure, run_mode, image, _n_drawables, _drawables, config, _data):
-  SETTINGS['special/run_mode'].set_value(run_mode)
-  SETTINGS['special/image'].set_value(image)
-
   _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree(image)
@@ -62,9 +59,6 @@ def plug_in_batch_export_layers(
 
 def plug_in_batch_export_layers_quick(
       _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
-  SETTINGS['special/run_mode'].set_value(run_mode)
-  SETTINGS['special/image'].set_value(image)
-
   _set_default_setting_source(_EXPORT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree(image)

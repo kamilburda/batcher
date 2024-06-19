@@ -29,12 +29,11 @@ class TestBatcherInitialActions(unittest.TestCase):
   
   def test_add_procedure_added_procedure_is_first_in_action_list(self):
     settings = plugin_settings.create_settings()
-    settings['special/image'].set_value(self.image)
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.Batcher(
-      settings['special/run_mode'].value,
-      settings['special/image'].value,
+      Gimp.RunMode.NONINTERACTIVE,
+      self.image,
       settings['main/procedures'],
       settings['main/constraints'],
     )

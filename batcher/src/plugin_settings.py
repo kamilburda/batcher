@@ -2,9 +2,6 @@
 
 import collections
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 from gi.repository import GLib
 
 import pygimplib as pg
@@ -26,29 +23,10 @@ def create_settings():
     'name': 'all_settings',
     'groups': [
       {
-        # These settings require special handling in the code, hence their separation
-        # from the other settings.
-        'name': 'special',
-        'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-        'setting_attributes': {'pdb_type': None, 'gui_type': None},
-      },
-      {
         'name': 'main',
       }
     ]
   })
-  
-  settings['special'].add([
-    {
-      'type': 'enum',
-      'name': 'run_mode',
-      'enum_type': Gimp.RunMode,
-    },
-    {
-      'type': 'image',
-      'name': 'image',
-    },
-  ])
   
   settings['main'].add([
     {
@@ -142,8 +120,7 @@ def create_settings():
   settings['main/constraints'].connect_event(
     'after-add-action',
     _on_after_add_constraint,
-    settings['main/selected_layers'],
-    settings['special/image'])
+    settings['main/selected_layers'])
   
   return settings
 
@@ -288,25 +265,20 @@ def _set_sensitive_for_image_filename_pattern_in_export(
 
 
 def _on_after_add_constraint(
-      constraints,
+      _constraints,
       constraint,
-      orig_constraint_dict,
-      selected_items_setting,
-      image_setting):
+      _orig_constraint_dict,
+      selected_items_setting):
   if constraint['orig_name'].value == 'selected_in_preview':
     constraint['arguments/selected_layers'].gui.set_visible(False)
-    _sync_selected_items_with_constraint(selected_items_setting, constraint, image_setting)
+    _sync_selected_items_with_constraint(selected_items_setting, constraint)
 
 
-def _sync_selected_items_with_constraint(selected_items_setting, constraint, image_setting):
+def _sync_selected_items_with_constraint(selected_items_setting, constraint):
   
-  def _on_selected_items_changed(
-        selected_items_setting_, selected_items_constraint, image_setting_):
-    if image_setting_.value is not None and image_setting_.value.is_valid():
-      selected_items_constraint['arguments/selected_layers'].set_value(
-        selected_items_setting_.value)
+  def _on_selected_items_changed(selected_items_setting_, selected_items_constraint):
+    selected_items_constraint['arguments/selected_layers'].set_value(selected_items_setting_.value)
+
+  _on_selected_items_changed(selected_items_setting, constraint)
   
-  _on_selected_items_changed(selected_items_setting, constraint, image_setting)
-  
-  selected_items_setting.connect_event(
-    'value-changed', _on_selected_items_changed, constraint, image_setting)
+  selected_items_setting.connect_event('value-changed', _on_selected_items_changed, constraint)

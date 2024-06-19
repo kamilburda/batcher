@@ -22,7 +22,7 @@ def _test_settings_for_read_write():
         'setting_attributes': {'gui_type': None},
       },
       {
-        'name': 'special',
+        'name': 'gui',
         'setting_attributes': {'gui_type': None},
       },
     ],
@@ -82,10 +82,10 @@ def _test_settings_for_read_write():
   
   settings['main'].add([constraints])
   
-  settings['special'].add([
+  settings['gui'].add([
     {
       'type': 'bool',
-      'name': 'first_plugin_run',
+      'name': 'edit_mode',
       'default_value': False,
     },
   ])
@@ -172,12 +172,12 @@ def _test_data_for_read_write():
           ],
         },
         {
-          'name': 'special',
+          'name': 'gui',
           'setting_attributes': {'gui_type': None},
           'settings': [
             {
               'type': 'bool',
-              'name': 'first_plugin_run',
+              'name': 'edit_mode',
               'value': False,
               'default_value': False,
               'gui_type': None,
@@ -274,7 +274,7 @@ class TestSourceRead(unittest.TestCase):
     del self.source.data[0]['settings'][0]['settings'][2]
     # 'main/file_extension'
     del self.source.data[0]['settings'][0]['settings'][0]
-    # 'special'
+    # 'gui'
     del self.source.data[0]['settings'][1]
     
     self.source.read(

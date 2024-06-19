@@ -28,8 +28,11 @@ def has_matching_default_file_extension(item, batcher):
 
 
 def is_item_in_items_selected_in_preview(item, selected_items):
-  image = item.raw.get_image()
-  return image in selected_items and item.raw in selected_items[image]
+  if item.raw.is_valid():
+    image = item.raw.get_image()
+    return image.is_valid() and image in selected_items and item.raw in selected_items[image]
+  else:
+    return False
 
 
 def is_item_in_items_selected_in_gimp(item):
