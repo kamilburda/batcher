@@ -56,7 +56,7 @@ def main(settings=None):
 
   layer_tree = pg.itemtree.LayerTree(image)
 
-  gui_main.ExportLayersDialog(layer_tree, settings, run_gui_func=take_screenshots)
+  gui_main.ExportLayersGui(layer_tree, settings, run_gui_func=take_screenshots)
 
   image.delete()
 

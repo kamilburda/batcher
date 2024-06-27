@@ -1,7 +1,5 @@
 """Main GUI dialog classes for each plug-in procedure."""
 
-import os
-
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
@@ -36,7 +34,7 @@ from src.gui.preview import name as preview_name_
 from src.gui.main import common
 
 
-class ExportLayersDialog:
+class ExportLayersGui:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
@@ -577,7 +575,7 @@ class ExportLayersDialog:
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
 
 
-class ExportLayersQuickDialog:
+class ExportLayersQuickGui:
 
   _BORDER_WIDTH = 8
   _HBOX_HORIZONTAL_SPACING = 8

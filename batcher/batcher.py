@@ -50,7 +50,7 @@ def plug_in_batch_export_layers(
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_interactive(layer_tree, gui_main.ExportLayersDialog)
+    return _run_interactive(layer_tree, gui_main.ExportLayersGui)
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(layer_tree)
   else:
@@ -64,7 +64,7 @@ def plug_in_batch_export_layers_quick(
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_interactive(layer_tree, gui_main.ExportLayersQuickDialog)
+    return _run_interactive(layer_tree, gui_main.ExportLayersQuickGui)
   else:
     return _run_with_last_vals(layer_tree)
 
