@@ -161,6 +161,33 @@ def _set_up_output_directory_changed(settings, current_image):
     current_image)
 
 
+def get_help_button(reference_button):
+  button_help = Gtk.LinkButton(
+    uri=(
+      pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
+      else pg.config.DOCS_URL),
+    label=_('_Help'),
+    use_underline=True,
+  )
+  # Make the button appear like a regular button
+  button_help_style_context = button_help.get_style_context()
+
+  for style_class in button_help_style_context.list_classes():
+    button_help_style_context.remove_class(style_class)
+
+  for style_class in reference_button.get_style_context().list_classes():
+    button_help_style_context.add_class(style_class)
+
+  button_help.unset_state_flags(Gtk.StateFlags.LINK)
+
+  # Make sure the button retains the style of a regular button when clicked.
+  button_help.connect(
+    'clicked',
+    lambda button, *args: button.unset_state_flags(Gtk.StateFlags.VISITED | Gtk.StateFlags.LINK))
+
+  return button_help
+
+
 class ExportSettings:
 
   _ROW_SPACING = 5
