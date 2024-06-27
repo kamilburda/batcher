@@ -9,7 +9,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -22,7 +21,6 @@ from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
 from src import overwrite
-from src import renamer as renamer_
 from src import update
 from src import utils as utils_
 
@@ -32,7 +30,6 @@ from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
 from src.gui.actions import list as action_list_
-from src.gui.entry import entries as entries_
 from src.gui.preview import controller as previews_controller_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
@@ -47,11 +44,9 @@ class ExportLayersDialog:
   _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
   _CONSTRAINTS_TOP_MARGIN = 5
 
-  _GRID_EXPORT_SETTINGS_COLUMN_SPACING = 10
   _ACTION_LABEL_BOX_SPACING = 5
   _PREVIEWS_LEFT_MARGIN = 4
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
-  _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
   _BUTTON_SETTINGS_SPACING = 3
@@ -59,12 +54,6 @@ class ExportLayersDialog:
 
   _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
 
-  _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
-  _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 10
-  _FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 12
-  _FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 40
-
-  _DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS = 100
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
@@ -77,7 +66,6 @@ class ExportLayersDialog:
     self._settings = settings
 
     self._image = self._initial_layer_tree.image
-    self._message_setting = None
     self._batcher = None
     self._batcher_for_previews = core.Batcher(
       Gimp.RunMode.NONINTERACTIVE,
@@ -150,57 +138,12 @@ class ExportLayersDialog:
     self._vbox_previews.pack_start(self._preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
 
-    self._folder_chooser_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
-    )
-    self._folder_chooser_label.set_markup('<b>{}</b>'.format(_('Save in folder:')))
-
-    self._folder_chooser = Gtk.FileChooserButton(
-      action=Gtk.FileChooserAction.SELECT_FOLDER,
-    )
-
-    self._file_extension_entry = entries_.FileExtensionEntry(
-      minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
-      activates_default=True,
-    )
-
-    self._export_filename_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
-    )
-    self._export_filename_label.set_markup('<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
-
-    self._dot_label = Gtk.Label(
-      label='.',
-      xalign=0.0,
-      yalign=1.0,
-    )
-
-    self._filename_pattern_entry = entries_.FilenamePatternEntry(
-      renamer_.get_field_descriptions(renamer_.FIELDS),
-      minimum_width_chars=self._FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
-      default_item=self._settings['main/layer_filename_pattern'].default_value)
-    self._filename_pattern_entry.set_activates_default(True)
-
-    self._hbox_export_filename_entries = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
-    )
-    self._hbox_export_filename_entries.pack_start(self._filename_pattern_entry, False, False, 0)
-    self._hbox_export_filename_entries.pack_start(self._dot_label, False, False, 0)
-    self._hbox_export_filename_entries.pack_start(self._file_extension_entry, False, False, 0)
-
-    self._grid_export_settings = Gtk.Grid(
+    self._export_settings = common.ExportSettings(
+      self._settings,
       row_spacing=self._DIALOG_VBOX_SPACING,
-      column_spacing=self._GRID_EXPORT_SETTINGS_COLUMN_SPACING,
+      name_preview=self._name_preview,
+      display_message_func=self._display_inline_message,
     )
-    self._grid_export_settings.attach(self._folder_chooser_label, 0, 0, 1, 1)
-    self._grid_export_settings.attach(self._folder_chooser, 1, 0, 1, 1)
-    self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
-    self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
 
     self._label_procedures = Gtk.Label(
       label='<b>{}</b>'.format(_('Procedures')),
@@ -257,7 +200,7 @@ class ExportLayersDialog:
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._EXPORT_SETTINGS_AND_ACTIONS_SPACING,
     )
-    self._vbox_export_settings_and_actions.pack_start(self._grid_export_settings, False, False, 0)
+    self._vbox_export_settings_and_actions.pack_start(self._export_settings.widget, False, False, 0)
     self._vbox_export_settings_and_actions.pack_start(self._vbox_procedures, False, False, 0)
     self._vbox_export_settings_and_actions.pack_start(self._vbox_constraints, False, False, 0)
 
@@ -367,23 +310,6 @@ class ExportLayersDialog:
     self._menu_item_import_settings.connect('activate', self._on_import_settings_activate)
     self._menu_item_export_settings.connect('activate', self._on_export_settings_activate)
 
-    self._file_extension_entry.connect(
-      'changed',
-      self._on_text_entry_changed,
-      self._settings['main/file_extension'],
-      'invalid_file_extension')
-
-    self._file_extension_entry.connect(
-      'focus-out-event',
-      self._on_file_extension_entry_focus_out_event,
-      self._settings['main/file_extension'])
-
-    self._filename_pattern_entry.connect(
-      'changed',
-      self._on_text_entry_changed,
-      self._settings['main/layer_filename_pattern'],
-      'invalid_layer_filename_pattern')
-
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
     self._dialog.connect('window-state-event', self._on_dialog_window_state_event)
@@ -438,26 +364,15 @@ class ExportLayersDialog:
     self._update_gui_for_edit_mode(update_name_preview=False)
 
     if not self._settings['main/edit_mode'].value:
-      self._dialog.set_focus(self._file_extension_entry)
+      self._dialog.set_focus(self._export_settings.file_extension_entry)
 
     self._button_run.grab_default()
-    # Place the cursor at the end of the text entry.
-    self._file_extension_entry.set_position(-1)
 
     self._dialog.show()
 
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui(
       {
-        'main/output_directory': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.folder_chooser_button,
-          widget=self._folder_chooser),
-        'main/file_extension': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
-          widget=self._file_extension_entry),
-        'main/layer_filename_pattern': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
-          widget=self._filename_pattern_entry),
         'main/edit_mode': dict(
           gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
           widget=self._menu_item_edit_mode),
@@ -663,36 +578,6 @@ class ExportLayersDialog:
 
     return filepath, file_format, load_size_settings
 
-  def _on_text_entry_changed(self, entry, setting, name_preview_lock_update_key=None):
-    validation_result = setting.validate(setting.gui.get_value())
-
-    if validation_result is None:
-      setting.gui.update_setting_value()
-
-      self._name_preview.lock_update(False, name_preview_lock_update_key)
-
-      if self._message_setting == setting:
-        self._display_inline_message(None)
-
-      self._name_preview.add_function_at_update(
-        self._name_preview.set_sensitive, True)
-
-      pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-        self._name_preview.update)
-    else:
-      pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-        self._name_preview.set_sensitive, False)
-
-      self._display_inline_message(validation_result.message, Gtk.MessageType.ERROR, setting)
-
-      self._name_preview.lock_update(True, name_preview_lock_update_key)
-
-  @staticmethod
-  def _on_file_extension_entry_focus_out_event(entry, event, setting):
-    setting.apply_to_gui()
-
   def _on_procedure_list_item_added(self, _procedure_list, item):
     if any(item.action['orig_name'].value == name
            for name in ['insert_background', 'insert_foreground']):
@@ -703,12 +588,12 @@ class ExportLayersDialog:
 
   def _update_gui_for_edit_mode(self, update_name_preview=True):
     if self._menu_item_edit_mode.get_active():
-      self._grid_export_settings.hide()
+      self._export_settings.widget.hide()
 
       self._button_run.set_label(_('Run'))
       self._button_close.set_label(_('Close'))
     else:
-      self._grid_export_settings.show()
+      self._export_settings.widget.show()
 
       self._button_run.set_label(_('Export'))
       self._button_close.set_label(_('Cancel'))
@@ -913,11 +798,7 @@ class ExportLayersDialog:
     self._button_help.set_sensitive(enabled)
     self._button_run.set_sensitive(enabled)
 
-    if enabled:
-      self._dialog.set_focus(self._file_extension_entry)
-      self._file_extension_entry.set_position(-1)
-    else:
-      self._dialog.set_focus(self._button_stop)
+    self._dialog.set_focus(self._button_stop)
 
   @staticmethod
   def _on_dialog_delete_event(dialog, event):
@@ -970,9 +851,7 @@ class ExportLayersDialog:
       for action_item in action_list.items:
         action_item.editor.hide()
 
-  def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR, setting=None):
-    self._message_setting = setting
-
+  def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
 
 
