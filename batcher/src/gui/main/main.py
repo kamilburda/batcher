@@ -21,7 +21,6 @@ from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
 from src import overwrite
-from src import update
 from src import utils as utils_
 
 from src.gui import message_box as message_box_
@@ -49,17 +48,11 @@ class ExportLayersDialog:
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
-  _BUTTON_SETTINGS_SPACING = 3
-  _ARROW_ICON_PIXEL_SIZE = 12
-
-  _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
-
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
   _PREVIEWS_INITIAL_UPDATE_KEY = 'initial_update'
-  _PREVIEWS_IMPORT_SETTINGS_KEY = 'import_settings'
 
   def __init__(self, initial_layer_tree, settings, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
@@ -221,46 +214,18 @@ class ExportLayersDialog:
     self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
 
-    self._label_button_settings = Gtk.Label(
-      label=_('_Settings'),
-      use_underline=True,
+    self._settings_manager = common.SettingsManager(
+      self._settings,
+      self._dialog,
+      self._image,
+      self._name_preview,
+      self._image_preview,
+      display_message_func=self._display_inline_message,
     )
-
-    self._image_arrow_settings = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
-    self._image_arrow_settings.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
-
-    self._hbox_button_settings_components = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._BUTTON_SETTINGS_SPACING,
-    )
-    self._hbox_button_settings_components.pack_start(self._label_button_settings, False, False, 0)
-    self._hbox_button_settings_components.pack_start(self._image_arrow_settings, False, False, 0)
-
-    self._hbox_button_settings = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-    )
-    self._hbox_button_settings.set_center_widget(self._hbox_button_settings_components)
-
-    self._button_settings = Gtk.Button()
-    self._button_settings.add(self._hbox_button_settings)
-
-    self._menu_item_edit_mode = Gtk.CheckMenuItem(label=_('Edit Layers'))
-    self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
-    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
-    self._menu_item_import_settings = Gtk.MenuItem(label=_('Import Settings...'))
-    self._menu_item_export_settings = Gtk.MenuItem(label=_('Export Settings...'))
-
-    self._menu_settings = Gtk.Menu()
-    self._menu_settings.append(self._menu_item_edit_mode)
-    self._menu_settings.append(self._menu_item_save_settings)
-    self._menu_settings.append(self._menu_item_reset_settings)
-    self._menu_settings.append(self._menu_item_import_settings)
-    self._menu_settings.append(self._menu_item_export_settings)
-    self._menu_settings.show_all()
 
     self._dialog.action_area.pack_end(self._button_stop, False, False, 0)
-    self._dialog.action_area.pack_start(self._button_settings, False, False, 0)
-    self._dialog.action_area.set_child_secondary(self._button_settings, True)
+    self._dialog.action_area.pack_start(self._settings_manager.button, False, False, 0)
+    self._dialog.action_area.set_child_secondary(self._settings_manager.button, True)
 
     self._button_help = self._get_help_button(self._button_run)
 
@@ -302,13 +267,6 @@ class ExportLayersDialog:
     self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
     self._button_close.connect('clicked', self._on_button_close_clicked)
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
-
-    self._button_settings.connect('clicked', self._on_button_settings_clicked)
-    self._menu_item_edit_mode.connect('toggled', self._on_menu_item_edit_mode_toggled)
-    self._menu_item_save_settings.connect('activate', self._on_save_settings_activate)
-    self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
-    self._menu_item_import_settings.connect('activate', self._on_import_settings_activate)
-    self._menu_item_export_settings.connect('activate', self._on_export_settings_activate)
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
@@ -373,9 +331,6 @@ class ExportLayersDialog:
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui(
       {
-        'main/edit_mode': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
-          widget=self._menu_item_edit_mode),
         'gui/image_preview_automatic_update': dict(
           gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
           widget=self._image_preview.menu_item_update_automatically),
@@ -421,173 +376,14 @@ class ExportLayersDialog:
       self._name_preview, self._image_preview, self._settings, self._image)
     self._previews_controller.lock_previews(self._PREVIEWS_INITIAL_UPDATE_KEY)
 
-  def _import_settings(self, filepath, file_format, load_size_settings=True):
-    source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
-
-    actions.clear(self._settings['main/procedures'], add_initial_actions=False)
-    actions.clear(self._settings['main/constraints'], add_initial_actions=False)
-
-    settings_to_ignore_for_reset = []
-    for setting in self._settings.walk(lambda s: 'ignore_reset' not in s.tags):
-      if setting.get_path('root').startswith('gui/size'):
-        setting.tags.add('ignore_reset')
-        settings_to_ignore_for_reset.append(setting)
-
-    self._reset_settings()
-
-    for setting in settings_to_ignore_for_reset:
-      setting.tags.discard('ignore_reset')
-
-    self._previews_controller.lock_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
-
-    size_settings_to_ignore_for_load = []
-    if not load_size_settings:
-      for setting in self._settings['gui'].walk(lambda s: 'ignore_load' not in s.tags):
-        if setting.get_path('root').startswith('gui/size'):
-          setting.tags.add('ignore_load')
-          size_settings_to_ignore_for_load.append(setting)
-
-    status, message = update.load_and_update(
-      self._settings,
-      sources={'persistent': source},
-      update_sources=False,
-    )
-
-    for setting in size_settings_to_ignore_for_load:
-      setting.tags.discard('ignore_load')
-
-    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
-
-    if status == update.TERMINATE:
-      messages_.display_import_export_settings_failure_message(
-        _(('Failed to import settings from file "{}".'
-           ' Settings must be reset completely.')).format(filepath),
-        details=message,
-        parent=self._dialog)
-
-      self._reset_settings()
-      actions.clear(self._settings['main/procedures'])
-      actions.clear(self._settings['main/constraints'])
-      return False
-
-    return True
-
-  def _save_settings(self, filepath=None):
-    if filepath is None:
-      save_result = self._settings.save()
-    else:
-      source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
-      save_result = self._settings.save({'persistent': source})
-
-    if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
-      if filepath is None:
-        main_message = _('Failed to save settings.')
-      else:
-        main_message = _('Failed to export settings to file "{}".'.format(filepath))
-
-      messages_.display_import_export_settings_failure_message(
-        main_message,
-        details=utils_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
-        parent=self._dialog)
-      return False
-    else:
-      return True
-
-  @common.set_settings
-  def _save_settings_to_default_location(self):
-    save_successful = self._save_settings()
-    if save_successful:
-      self._display_inline_message(_('Settings successfully saved.'), Gtk.MessageType.INFO)
-
-  def _reset_settings(self):
-    self._settings.reset()
-
-  def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
-    if action == 'import':
-      dialog_action = Gtk.FileChooserAction.OPEN
-      button_ok = _('_Open')
-      title = _('Import Settings')
-    elif action == 'export':
-      dialog_action = Gtk.FileChooserAction.SAVE
-      button_ok = _('_Save')
-      title = _('Export Settings')
-    else:
-      raise ValueError('invalid action; valid values: "import", "export"')
-
-    file_dialog = Gtk.FileChooserDialog(
-      title=title,
-      parent=self._dialog,
-      action=dialog_action,
-      do_overwrite_confirmation=True,
-    )
-
-    file_dialog.add_buttons(
-      button_ok, Gtk.ResponseType.OK,
-      _('_Cancel'), Gtk.ResponseType.CANCEL)
-
-    if action == 'import':
-      check_button_load_size_settings = Gtk.CheckButton(
-        label=_('Import size-related settings'),
-        border_width=self._IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH,
-      )
-      file_dialog.vbox.pack_start(check_button_load_size_settings, False, False, 0)
-    else:
-      check_button_load_size_settings = None
-
-    json_file_ext = '.json'
-
-    filter_json = Gtk.FileFilter()
-    filter_json.set_name(_('JSON file ({})').format(json_file_ext))
-    filter_json.add_mime_type('application/json')
-    file_dialog.add_filter(filter_json)
-
-    default_file_ext = json_file_ext
-    default_file_format = json_file_ext[1:]
-
-    filter_any = Gtk.FileFilter()
-    filter_any.set_name(_('Any file'))
-    filter_any.add_pattern('*')
-    file_dialog.add_filter(filter_any)
-
-    file_dialog.show_all()
-
-    response_id = file_dialog.run()
-
-    if response_id == Gtk.ResponseType.OK:
-      filepath = file_dialog.get_filename() if file_dialog.get_filename() is not None else ''
-
-      file_ext = os.path.splitext(filepath)[1]
-      if add_file_extension_if_missing and not file_ext:
-        filepath += default_file_ext
-
-      file_ext = os.path.splitext(filepath)[1]
-      if file_ext:
-        file_format = file_ext[1:]
-      else:
-        file_format = default_file_format
-    else:
-      filepath = None
-      file_format = None
-
-    if check_button_load_size_settings:
-      load_size_settings = check_button_load_size_settings.get_active()
-    else:
-      load_size_settings = False
-
-    file_dialog.destroy()
-
-    return filepath, file_format, load_size_settings
-
   def _on_procedure_list_item_added(self, _procedure_list, item):
     if any(item.action['orig_name'].value == name
            for name in ['insert_background', 'insert_foreground']):
       actions.reorder(self._settings['main/procedures'], item.action.name, 0)
 
-  def _on_menu_item_edit_mode_toggled(self, menu_item):
-    self._update_gui_for_edit_mode()
-
   def _update_gui_for_edit_mode(self, update_name_preview=True):
-    if self._menu_item_edit_mode.get_active():
+    # FIXME: Remove this once the Edit Layers dialog is created
+    if self._settings['main/edit_mode'].value:
       self._export_settings.widget.hide()
 
       self._button_run.set_label(_('Run'))
@@ -636,63 +432,6 @@ class ExportLayersDialog:
       self._batcher_for_previews.skipped_constraints,
       _('This constraint is skipped. Reason: {}'),
       clear_previous=clear_previous)
-
-  def _on_dialog_key_press_event(self, dialog, event):
-    if not dialog.get_mapped():
-      return False
-
-    if Gdk.keyval_name(event.keyval) == 'Escape':
-      stopped = common.stop_batcher(self._batcher)
-      return stopped
-
-    # Ctrl + S is pressed
-    if ((event.state & Gtk.accelerator_get_default_mod_mask()) == Gdk.ModifierType.CONTROL_MASK
-        and Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)) == 's'):
-      self._save_settings_to_default_location()
-      return True
-
-    return False
-
-  def _on_button_settings_clicked(self, button):
-    pg.gui.menu_popup_below_widget(self._menu_settings, button)
-
-  def _on_save_settings_activate(self, menu_item):
-    self._save_settings_to_default_location()
-
-  def _on_import_settings_activate(self, menu_item):
-    filepath, file_format, load_size_settings = self._get_setting_filepath(action='import')
-
-    if filepath is not None:
-      import_successful = self._import_settings(filepath, file_format, load_size_settings)
-      # Also override default setting sources so that the imported settings actually persist.
-      self._save_settings()
-
-      if import_successful:
-        self._display_inline_message(_('Settings successfully imported.'), Gtk.MessageType.INFO)
-
-  @common.set_settings
-  def _on_export_settings_activate(self, menu_item):
-    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='export')
-
-    if filepath is not None:
-      export_successful = self._save_settings(filepath)
-      if export_successful:
-        self._display_inline_message(_('Settings successfully exported.'), Gtk.MessageType.INFO)
-
-  def _on_reset_settings_activate(self, menu_item):
-    response_id = common.display_reset_prompt(parent=self._dialog)
-
-    if response_id == Gtk.ResponseType.YES:
-      actions.clear(self._settings['main/procedures'])
-      actions.clear(self._settings['main/constraints'])
-
-      self._reset_settings()
-
-      pg.setting.Persistor.clear()
-
-      self._save_settings()
-
-      self._display_inline_message(_('Settings reset.'), Gtk.MessageType.INFO)
 
   @common.set_settings
   def _on_button_run_clicked(self, button, lock_update_key):
@@ -744,7 +483,7 @@ class ExportLayersDialog:
     if overwrite_chooser.overwrite_mode in self._settings['main/overwrite_mode'].items.values():
       self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
 
-    self._save_settings()
+    self._settings_manager.save_settings()
 
     if should_quit:
       Gtk.main_quit()
@@ -794,11 +533,21 @@ class ExportLayersDialog:
 
     self._hbox_contents.set_sensitive(enabled)
 
-    self._button_settings.set_sensitive(enabled)
+    self._settings_manager.button.set_sensitive(enabled)
     self._button_help.set_sensitive(enabled)
     self._button_run.set_sensitive(enabled)
 
     self._dialog.set_focus(self._button_stop)
+
+  def _on_dialog_key_press_event(self, dialog, event):
+    if not dialog.get_mapped():
+      return False
+
+    if Gdk.keyval_name(event.keyval) == 'Escape':
+      stopped = common.stop_batcher(self._batcher)
+      return stopped
+
+    return False
 
   @staticmethod
   def _on_dialog_delete_event(dialog, event):
