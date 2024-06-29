@@ -75,28 +75,6 @@ def stop_batcher(batcher):
     return False
 
 
-def set_settings(func):
-
-  @functools.wraps(func)
-  def func_wrapper(self, *args, **kwargs):
-    self._settings['main'].apply_gui_values_to_settings()
-    self._settings['gui'].apply_gui_values_to_settings()
-
-    self._settings['main/output_directory'].gui.update_setting_value()
-
-    # FIXME: These settings should be synced automatically
-    self._settings['main/selected_layers'].value[self._image] = (
-      self._name_preview.selected_items)
-    self._settings['gui/name_preview_layers_collapsed_state'].value[self._image] = (
-      self._name_preview.collapsed_items)
-    self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
-      [self._image_preview.item.raw] if self._image_preview.item is not None else [])
-
-    func(self, *args, **kwargs)
-
-  return func_wrapper
-
-
 def set_up_output_directory_settings(settings, current_image):
   _set_up_images_and_directories_and_initial_output_directory(
     settings, settings['main/output_directory'], current_image)
@@ -369,19 +347,11 @@ class SettingsManager:
         self,
         settings,
         dialog,
-        # FIXME: Remove `image`, `name_preview` and `image_preview`,
-        #  which are only used for manually syncing settings.
-        image,
-        name_preview,
-        image_preview,
         previews_controller=None,
         display_message_func=None,
   ):
     self._settings = settings
     self._dialog = dialog
-    self._image = image
-    self._name_preview = name_preview
-    self._image_preview = image_preview
     self._previews_controller = previews_controller
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
@@ -493,11 +463,12 @@ class SettingsManager:
       if import_successful:
         self._display_message_func(_('Settings successfully imported.'), Gtk.MessageType.INFO)
 
-  @set_settings
   def _on_export_settings_activate(self, menu_item):
     filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='export')
 
     if filepath is not None:
+      self._settings.apply_gui_values_to_settings()
+
       export_successful = self.save_settings(filepath)
       if export_successful:
         self._display_message_func(_('Settings successfully exported.'), Gtk.MessageType.INFO)
@@ -514,8 +485,9 @@ class SettingsManager:
 
     return False
 
-  @set_settings
   def _save_settings_to_default_location(self):
+    self._settings.apply_gui_values_to_settings()
+
     save_successful = self.save_settings()
     if save_successful:
       self._display_message_func(_('Settings successfully saved.'), Gtk.MessageType.INFO)

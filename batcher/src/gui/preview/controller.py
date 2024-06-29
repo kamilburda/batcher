@@ -65,8 +65,10 @@ class PreviewsController:
     self._connect_attached_windows_focus_change(procedure_list, constraint_list)
 
   def connect_name_preview_events(self):
-    self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
+    self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
+    self._name_preview.connect(
+      'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
   
   def on_paned_outside_previews_notify_position(self, paned, _property_spec):
     current_position = paned.get_position()
@@ -368,15 +370,18 @@ class PreviewsController:
     else:
       self._image_preview.update()
 
-  def _on_name_preview_selection_changed(self, _preview):
-    self._update_selected_items()
-    self._update_image_preview()
-  
   def _on_name_preview_updated(self, _preview, error):
     if error:
       self.lock_previews(self._PREVIEW_ERROR_KEY)
-    
+
     self._image_preview.update_item()
+
+  def _on_name_preview_selection_changed(self, _preview):
+    self._update_selected_items()
+    self._update_image_preview()
+
+  def _on_name_preview_collapsed_items_changed(self, _preview):
+    self._update_collapsed_items()
 
   def _enable_preview_on_paned_drag(
         self, preview, preview_sensitive_setting, update_lock_key):
@@ -418,9 +423,10 @@ class PreviewsController:
     selected_items_dict = self._settings['main/selected_layers'].value
     selected_items_dict[self._image] = self._name_preview.selected_items
     self._settings['main/selected_layers'].set_value(selected_items_dict)
-  
+
   def _update_image_preview(self):
     item_from_cursor = self._name_preview.get_item_from_cursor()
+
     if item_from_cursor is not None:
       if (self._image_preview.item is None
           or item_from_cursor.raw != self._image_preview.item.raw
@@ -434,3 +440,11 @@ class PreviewsController:
         self._image_preview.update()
       else:
         self._image_preview.clear()
+
+    self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
+      [self._image_preview.item.raw] if self._image_preview.item is not None else [])
+
+  def _update_collapsed_items(self):
+    collapsed_items_dict = self._settings['gui/name_preview_layers_collapsed_state'].value
+    collapsed_items_dict[self._image] = self._name_preview.collapsed_items
+    self._settings['gui/name_preview_layers_collapsed_state'].set_value(collapsed_items_dict)

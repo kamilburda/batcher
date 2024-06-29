@@ -215,9 +215,7 @@ class ExportLayersGui:
     self._settings_manager = common.SettingsManager(
       self._settings,
       self._dialog,
-      self._image,
-      self._name_preview,
-      self._image_preview,
+      previews_controller=self._previews_controller,
       display_message_func=self._display_inline_message,
     )
 
@@ -404,8 +402,9 @@ class ExportLayersGui:
       _('This constraint is skipped. Reason: {}'),
       clear_previous=clear_previous)
 
-  @common.set_settings
   def _on_button_run_clicked(self, button, lock_update_key):
+    self._settings.apply_gui_values_to_settings()
+
     self._set_up_gui_before_run()
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher()
 

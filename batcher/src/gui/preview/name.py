@@ -45,8 +45,9 @@ class NamePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-updated': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
   
   _COLUMNS = (
@@ -180,6 +181,7 @@ class NamePreview(preview_base_.Preview):
     """Sets the collapsed state of items in the preview."""
     self._collapsed_items = collapsed_items
     self._set_expanded_items()
+    self.emit('preview-collapsed-items-changed')
   
   def set_selected_items(self, selected_items: Iterable):
     """Sets the selection of items in the preview."""
@@ -301,6 +303,8 @@ class NamePreview(preview_base_.Preview):
     if self._row_expand_collapse_interactive:
       self._collapsed_items.add(self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path)))
       self._tree_view.columns_autosize()
+
+      self.emit('preview-collapsed-items-changed')
   
   def _on_tree_view_row_expanded(self, tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
@@ -311,6 +315,8 @@ class NamePreview(preview_base_.Preview):
       self._set_expanded_items(tree_path)
       
       self._tree_view.columns_autosize()
+
+      self.emit('preview-collapsed-items-changed')
   
   def _on_tree_selection_changed(self, tree_selection):
     if not self._clearing_preview and self._row_select_interactive:
