@@ -27,7 +27,10 @@ from src.gui.preview import controller as previews_controller_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
 
+from src.gui.main import action_lists as action_lists_
 from src.gui.main import common
+from src.gui.main import export_settings as export_settings_
+from src.gui.main import settings_manager as settings_manager_
 
 
 class ExportLayersGui:
@@ -123,14 +126,14 @@ class ExportLayersGui:
     self._vbox_previews.pack_start(self._preview_label, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
 
-    self._export_settings = common.ExportSettings(
+    self._export_settings = export_settings_.ExportSettings(
       self._settings,
       row_spacing=self._DIALOG_VBOX_SPACING,
       name_preview=self._name_preview,
       display_message_func=self._display_inline_message,
     )
 
-    self._action_lists = common.ActionLists(
+    self._action_lists = action_lists_.ActionLists(
       self._settings,
       self._dialog,
     )
@@ -162,7 +165,7 @@ class ExportLayersGui:
     self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
 
-    self._settings_manager = common.SettingsManager(
+    self._settings_manager = settings_manager_.SettingsManager(
       self._settings,
       self._dialog,
       previews_controller=self._previews_controller,
