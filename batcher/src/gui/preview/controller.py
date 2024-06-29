@@ -5,7 +5,6 @@ import collections
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-from gi.repository import GLib
 
 import pygimplib as pg
 
@@ -13,11 +12,8 @@ import pygimplib as pg
 class PreviewsController:
   
   _DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS = 100
-  _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
   
   _PREVIEW_ERROR_KEY = 'preview_error'
-  _PREVIEWS_SENSITIVE_KEY = 'previews_sensitive'
-  _VPANED_PREVIEW_SENSITIVE_KEY = 'vpaned_preview_sensitive'
   
   def __init__(self, name_preview, image_preview, settings, image):
     self._name_preview = name_preview
@@ -29,11 +25,6 @@ class PreviewsController:
     self._is_initial_selection_set = False
 
     self._previously_focused_on_related_window = False
-
-    self._paned_outside_previews_previous_position = (
-      self._settings['gui/size/paned_outside_previews_position'].value)
-    self._paned_between_previews_previous_position = (
-      self._settings['gui/size/paned_between_previews_position'].value)
 
   def lock_previews(self, key):
     self._name_preview.lock_update(True, key)
@@ -69,81 +60,6 @@ class PreviewsController:
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect(
       'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
-  
-  def on_paned_outside_previews_notify_position(self, paned, _property_spec):
-    current_position = paned.get_position()
-    max_position = paned.get_property('max-position')
-    
-    if (current_position == max_position
-        and self._paned_outside_previews_previous_position != max_position):
-      self._disable_preview_on_paned_drag(
-        self._name_preview,
-        self._settings['gui/name_preview_sensitive'],
-        self._PREVIEWS_SENSITIVE_KEY)
-      self._disable_preview_on_paned_drag(
-        self._image_preview,
-        self._settings['gui/image_preview_sensitive'],
-        self._PREVIEWS_SENSITIVE_KEY)
-    elif (current_position != max_position
-          and self._paned_outside_previews_previous_position == max_position):
-      self._enable_preview_on_paned_drag(
-        self._name_preview,
-        self._settings['gui/name_preview_sensitive'],
-        self._PREVIEWS_SENSITIVE_KEY)
-      self._enable_preview_on_paned_drag(
-        self._image_preview,
-        self._settings['gui/image_preview_sensitive'],
-        self._PREVIEWS_SENSITIVE_KEY)
-    elif current_position != self._paned_outside_previews_previous_position:
-      if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
-          self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
-          self._image_preview.update)
-      else:
-        pg.invocation.timeout_remove(self._image_preview.update)
-        self._image_preview.resize()
-    
-    self._paned_outside_previews_previous_position = current_position
-  
-  def on_paned_between_previews_notify_position(self, paned, _property_spec):
-    current_position = paned.get_position()
-    max_position = paned.get_property('max-position')
-    min_position = paned.get_property('min-position')
-    
-    if (current_position == max_position
-        and self._paned_between_previews_previous_position != max_position):
-      self._disable_preview_on_paned_drag(
-        self._image_preview,
-        self._settings['gui/image_preview_sensitive'],
-        self._VPANED_PREVIEW_SENSITIVE_KEY)
-    elif (current_position != max_position
-          and self._paned_between_previews_previous_position == max_position):
-      self._enable_preview_on_paned_drag(
-        self._image_preview,
-        self._settings['gui/image_preview_sensitive'],
-        self._VPANED_PREVIEW_SENSITIVE_KEY)
-    elif (current_position == min_position
-          and self._paned_between_previews_previous_position != min_position):
-      self._disable_preview_on_paned_drag(
-        self._name_preview,
-        self._settings['gui/name_preview_sensitive'],
-        self._VPANED_PREVIEW_SENSITIVE_KEY)
-    elif (current_position != min_position
-          and self._paned_between_previews_previous_position == min_position):
-      self._enable_preview_on_paned_drag(
-        self._name_preview,
-        self._settings['gui/name_preview_sensitive'],
-        self._VPANED_PREVIEW_SENSITIVE_KEY)
-    elif current_position != self._paned_between_previews_previous_position:
-      if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
-          self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
-          self._image_preview.update)
-      else:
-        pg.invocation.timeout_remove(self._image_preview.update)
-        self._image_preview.resize()
-    
-    self._paned_between_previews_previous_position = current_position
 
   def _connect_actions_changed(self, actions):
     # We store event IDs in lists in case the same action is added multiple times.
@@ -382,21 +298,6 @@ class PreviewsController:
 
   def _on_name_preview_collapsed_items_changed(self, _preview):
     self._update_collapsed_items()
-
-  def _enable_preview_on_paned_drag(
-        self, preview, preview_sensitive_setting, update_lock_key):
-    preview.lock_update(False, update_lock_key)
-    preview.add_function_at_update(preview.set_sensitive, True)
-    # In case the image preview gets resized, the update would be canceled,
-    # hence update always.
-    GLib.timeout_add(self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS, preview.update)
-    preview_sensitive_setting.set_value(True)
-  
-  def _disable_preview_on_paned_drag(
-        self, preview, preview_sensitive_setting, update_lock_key):
-    preview.lock_update(True, update_lock_key)
-    preview.set_sensitive(False)
-    preview_sensitive_setting.set_value(False)
   
   def _set_initial_selection_and_update_image_preview(self):
     setting_value = self._settings['gui/image_preview_displayed_layers'].value[self._image]

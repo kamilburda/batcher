@@ -1,7 +1,10 @@
 import gi
 
+import src.gui.preview.base
+
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -17,12 +20,16 @@ from src.gui.preview import name as preview_name_
 
 class Previews:
 
-  _PREVIEWS_KEY = 'previews'
+  _PREVIEWS_GLOBAL_KEY = 'previews_global'
+  _PREVIEWS_SENSITIVE_KEY = 'previews_sensitive'
+  _VPANED_PREVIEW_SENSITIVE_KEY = 'vpaned_preview_sensitive'
+
+  _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
+
+  _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
   _PREVIEWS_LEFT_MARGIN = 4
   _PREVIEW_LABEL_BOTTOM_MARGIN = 4
-
-  _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
   def __init__(
         self,
@@ -60,6 +67,12 @@ class Previews:
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, self._image)
 
+    self._paned_outside_previews_previous_position = (
+      self._settings['gui/size/paned_outside_previews_position'].value)
+
+    self._paned_between_previews_previous_position = (
+      self._settings['gui/size/paned_between_previews_position'].value)
+
     if lock_previews:
       self.lock()
 
@@ -84,10 +97,10 @@ class Previews:
     return self._vbox_previews
 
   def lock(self):
-    self._previews_controller.lock_previews(self._PREVIEWS_KEY)
+    self._previews_controller.lock_previews(self._PREVIEWS_GLOBAL_KEY)
 
   def unlock(self):
-    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_KEY)
+    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_GLOBAL_KEY)
 
   def _init_gui(self):
     self._preview_label = Gtk.Label(
@@ -114,14 +127,14 @@ class Previews:
   def connect_events(self, action_lists, paned_outside_previews):
     self._vpaned_previews.connect(
       'notify::position',
-      self._previews_controller.on_paned_between_previews_notify_position)
-
-    self._image_preview.connect('preview-updated', self._on_image_preview_updated, action_lists)
-    self._name_preview.connect('preview-updated', self._on_name_preview_updated, action_lists)
+      self._on_paned_between_previews_notify_position)
 
     paned_outside_previews.connect(
       'notify::position',
-      self._previews_controller.on_paned_outside_previews_notify_position)
+      self._on_paned_outside_previews_notify_position)
+
+    self._image_preview.connect('preview-updated', self._on_image_preview_updated, action_lists)
+    self._name_preview.connect('preview-updated', self._on_name_preview_updated, action_lists)
 
     self._previews_controller.connect_setting_changes_to_previews(
       action_lists.procedure_list,
@@ -142,6 +155,104 @@ class Previews:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
+
+  def _on_paned_outside_previews_notify_position(self, paned, _property_spec):
+    current_position = paned.get_position()
+    max_position = paned.get_property('max-position')
+
+    if (current_position == max_position
+        and self._paned_outside_previews_previous_position != max_position):
+      self._disable_preview_on_paned_drag(
+        self._name_preview,
+        self._settings['gui/name_preview_sensitive'],
+        self._PREVIEWS_SENSITIVE_KEY)
+      self._disable_preview_on_paned_drag(
+        self._image_preview,
+        self._settings['gui/image_preview_sensitive'],
+        self._PREVIEWS_SENSITIVE_KEY)
+    elif (current_position != max_position
+          and self._paned_outside_previews_previous_position == max_position):
+      self._enable_preview_on_paned_drag(
+        self._name_preview,
+        self._settings['gui/name_preview_sensitive'],
+        self._PREVIEWS_SENSITIVE_KEY)
+      self._enable_preview_on_paned_drag(
+        self._image_preview,
+        self._settings['gui/image_preview_sensitive'],
+        self._PREVIEWS_SENSITIVE_KEY)
+    elif current_position != self._paned_outside_previews_previous_position:
+      if self._image_preview.is_larger_than_image():
+        pg.invocation.timeout_add_strict(
+          self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
+          self._image_preview.update)
+      else:
+        pg.invocation.timeout_remove(self._image_preview.update)
+        self._image_preview.resize()
+
+    self._paned_outside_previews_previous_position = current_position
+
+  def _on_paned_between_previews_notify_position(self, paned, _property_spec):
+    current_position = paned.get_position()
+    max_position = paned.get_property('max-position')
+    min_position = paned.get_property('min-position')
+
+    if (current_position == max_position
+        and self._paned_between_previews_previous_position != max_position):
+      self._disable_preview_on_paned_drag(
+        self._image_preview,
+        self._settings['gui/image_preview_sensitive'],
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
+    elif (current_position != max_position
+          and self._paned_between_previews_previous_position == max_position):
+      self._enable_preview_on_paned_drag(
+        self._image_preview,
+        self._settings['gui/image_preview_sensitive'],
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
+    elif (current_position == min_position
+          and self._paned_between_previews_previous_position != min_position):
+      self._disable_preview_on_paned_drag(
+        self._name_preview,
+        self._settings['gui/name_preview_sensitive'],
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
+    elif (current_position != min_position
+          and self._paned_between_previews_previous_position == min_position):
+      self._enable_preview_on_paned_drag(
+        self._name_preview,
+        self._settings['gui/name_preview_sensitive'],
+        self._VPANED_PREVIEW_SENSITIVE_KEY)
+    elif current_position != self._paned_between_previews_previous_position:
+      if self._image_preview.is_larger_than_image():
+        pg.invocation.timeout_add_strict(
+          self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
+          self._image_preview.update)
+      else:
+        pg.invocation.timeout_remove(self._image_preview.update)
+        self._image_preview.resize()
+
+    self._paned_between_previews_previous_position = current_position
+
+  def _enable_preview_on_paned_drag(
+        self,
+        preview: src.gui.preview.base.Preview,
+        preview_sensitive_setting: pg.setting.Setting,
+        update_lock_key: str,
+  ):
+    preview.lock_update(False, update_lock_key)
+    preview.add_function_at_update(preview.set_sensitive, True)
+    # In case the image preview gets resized, the update would be canceled,
+    # hence update always.
+    GLib.timeout_add(self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS, preview.update)
+    preview_sensitive_setting.set_value(True)
+
+  def _disable_preview_on_paned_drag(
+        self,
+        preview: src.gui.preview.base.Preview,
+        preview_sensitive_setting: pg.setting.Setting,
+        update_lock_key: str,
+  ):
+    preview.lock_update(True, update_lock_key)
+    preview.set_sensitive(False)
+    preview_sensitive_setting.set_value(False)
 
   def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, action_lists):
     action_lists.display_warnings_and_tooltips_for_actions(self._batcher_for_previews)
