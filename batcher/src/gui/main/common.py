@@ -1,5 +1,4 @@
 import contextlib
-import functools
 import os
 
 import gi
