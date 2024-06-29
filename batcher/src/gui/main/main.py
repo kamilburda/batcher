@@ -321,7 +321,7 @@ class ExportLayersGui:
     self._action_lists.display_warnings_and_tooltips_for_actions(
       self._batcher_for_previews, clear_previous=False)
 
-  def _on_button_run_clicked(self, button, lock_update_key):
+  def _on_button_run_clicked(self, _button, lock_update_key):
     self._settings.apply_gui_values_to_settings()
 
     self._set_up_gui_before_run()
@@ -333,7 +333,7 @@ class ExportLayersGui:
 
     try:
       self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
-    except exceptions.BatcherCancelError as e:
+    except exceptions.BatcherCancelError:
       should_quit = False
     except exceptions.ActionError as e:
       messages_.display_failure_message(
@@ -441,14 +441,14 @@ class ExportLayersGui:
     return False
 
   @staticmethod
-  def _on_dialog_delete_event(dialog, event):
+  def _on_dialog_delete_event(_dialog, _event):
     Gtk.main_quit()
 
   @staticmethod
-  def _on_button_close_clicked(button):
+  def _on_button_close_clicked(_button):
     Gtk.main_quit()
 
-  def _on_button_stop_clicked(self, button):
+  def _on_button_stop_clicked(self, _button):
     common.stop_batcher(self._batcher)
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
@@ -543,8 +543,8 @@ class ExportLayersQuickGui:
   def hide(self):
     self._dialog.hide()
 
-  def _on_button_stop_clicked(self, button):
+  def _on_button_stop_clicked(self, _button):
     common.stop_batcher(self._batcher)
 
-  def _on_dialog_delete_event(self, dialog, event):
+  def _on_dialog_delete_event(self, _dialog, _event):
     common.stop_batcher(self._batcher)
