@@ -23,13 +23,11 @@ from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
-from src.gui.preview import controller as previews_controller_
-from src.gui.preview import image as preview_image_
-from src.gui.preview import name as preview_name_
 
 from src.gui.main import action_lists as action_lists_
 from src.gui.main import common
 from src.gui.main import export_settings as export_settings_
+from src.gui.main import previews as previews_
 from src.gui.main import settings_manager as settings_manager_
 
 
@@ -39,15 +37,9 @@ class ExportLayersGui:
   _DIALOG_VBOX_SPACING = 5
   _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
 
-  _PREVIEWS_LEFT_MARGIN = 4
-  _PREVIEW_LABEL_BOTTOM_MARGIN = 4
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
-
-  _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
-
-  _PREVIEWS_INITIAL_UPDATE_KEY = 'initial_update'
 
   def __init__(self, initial_layer_tree, settings, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
@@ -55,14 +47,6 @@ class ExportLayersGui:
 
     self._image = self._initial_layer_tree.image
     self._batcher = None
-    self._batcher_for_previews = core.Batcher(
-      Gimp.RunMode.NONINTERACTIVE,
-      self._image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
-      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].items['replace']),
-      item_tree=self._initial_layer_tree)
 
     common.set_up_output_directory_settings(self._settings, self._image)
 
@@ -79,11 +63,11 @@ class ExportLayersGui:
 
   @property
   def name_preview(self):
-    return self._name_preview
+    return self._previews.name_preview
 
   @property
   def image_preview(self):
-    return self._image_preview
+    return self._previews.image_preview
 
   @property
   def procedure_list(self):
@@ -103,33 +87,17 @@ class ExportLayersGui:
 
     messages_.set_gui_excepthook_parent(self._dialog)
 
-    self._init_gui_previews()
-
-    self._preview_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
-      margin_bottom=self._PREVIEW_LABEL_BOTTOM_MARGIN,
+    self._previews = previews_.Previews(
+      self._settings,
+      self._initial_layer_tree,
+      lock_previews=True,
+      display_message_func=self._display_inline_message,
     )
-    self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
-
-    self._vpaned_previews = Gtk.Paned(
-      orientation=Gtk.Orientation.VERTICAL,
-      wide_handle=True,
-    )
-    self._vpaned_previews.pack1(self._name_preview, True, True)
-    self._vpaned_previews.pack2(self._image_preview, True, True)
-
-    self._vbox_previews = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      margin_start=self._PREVIEWS_LEFT_MARGIN,
-    )
-    self._vbox_previews.pack_start(self._preview_label, False, False, 0)
-    self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
 
     self._export_settings = export_settings_.ExportSettings(
       self._settings,
       row_spacing=self._DIALOG_VBOX_SPACING,
-      name_preview=self._name_preview,
+      name_preview=self._previews.name_preview,
       display_message_func=self._display_inline_message,
     )
 
@@ -153,7 +121,7 @@ class ExportLayersGui:
       wide_handle=True,
     )
     self._hpaned_settings_and_previews.pack1(self._vbox_export_settings_and_actions, True, False)
-    self._hpaned_settings_and_previews.pack2(self._vbox_previews, True, True)
+    self._hpaned_settings_and_previews.pack2(self._previews.vbox_previews, True, True)
 
     self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
@@ -168,7 +136,7 @@ class ExportLayersGui:
     self._settings_manager = settings_manager_.SettingsManager(
       self._settings,
       self._dialog,
-      previews_controller=self._previews_controller,
+      previews_controller=self._previews.controller,
       display_message_func=self._display_inline_message,
     )
 
@@ -218,24 +186,10 @@ class ExportLayersGui:
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
     self._dialog.connect('window-state-event', self._on_dialog_window_state_event)
 
-    self._hpaned_settings_and_previews.connect(
-      'notify::position',
-      self._previews_controller.on_paned_outside_previews_notify_position)
-    self._vpaned_previews.connect(
-      'notify::position',
-      self._previews_controller.on_paned_between_previews_notify_position)
-
-    self._previews_controller.connect_setting_changes_to_previews(
-      self._action_lists.procedure_list,
-      self._action_lists.constraint_list,
-    )
-    self._previews_controller.connect_name_preview_events()
-
-    self._image_preview.connect('preview-updated', self._on_image_preview_updated)
-    self._name_preview.connect('preview-updated', self._on_name_preview_updated)
+    self._previews.connect_events(self._action_lists, self._hpaned_settings_and_previews)
 
   def _finish_init_and_show(self):
-    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_INITIAL_UPDATE_KEY)
+    self._previews.unlock()
 
     self._dialog.vbox.show_all()
     self._update_gui_for_edit_mode(update_name_preview=False)
@@ -250,9 +204,6 @@ class ExportLayersGui:
   def _assign_gui_to_settings(self):
     self._settings.initialize_gui(
       {
-        'gui/image_preview_automatic_update': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
-          widget=self._image_preview.menu_item_update_automatically),
         'gui/size/dialog_position': dict(
           gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
           widget=self._dialog),
@@ -262,29 +213,11 @@ class ExportLayersGui:
         'gui/size/paned_outside_previews_position': dict(
           gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
           widget=self._hpaned_settings_and_previews),
-        'gui/size/paned_between_previews_position': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
-          widget=self._vpaned_previews),
       },
       only_null=True,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-
-  def _init_gui_previews(self):
-    self._name_preview = preview_name_.NamePreview(
-      self._batcher_for_previews,
-      self._settings,
-      self._initial_layer_tree,
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image],
-      self._settings['main/selected_layers'].value[self._image],
-      'selected_in_preview')
-
-    self._image_preview = preview_image_.ImagePreview(self._batcher_for_previews, self._settings)
-
-    self._previews_controller = previews_controller_.PreviewsController(
-      self._name_preview, self._image_preview, self._settings, self._image)
-    self._previews_controller.lock_previews(self._PREVIEWS_INITIAL_UPDATE_KEY)
 
   def _update_gui_for_edit_mode(self, update_name_preview=True):
     # FIXME: Remove this once the Edit Layers dialog is created
@@ -300,29 +233,13 @@ class ExportLayersGui:
       self._button_close.set_label(_('Cancel'))
 
     if update_name_preview:
-      self._name_preview.update()
+      self._previews.name_preview.update()
 
   def _on_dialog_window_state_event(self, _dialog, event):
     if event.new_window_state & Gdk.WindowState.FOCUSED:
       if not self._image.is_valid():
         Gtk.main_quit()
         return
-
-  def _on_image_preview_updated(self, _preview, _error, update_duration_seconds):
-    self._action_lists.display_warnings_and_tooltips_for_actions(self._batcher_for_previews)
-
-    if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
-        and (update_duration_seconds
-             >= self._MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS)):
-      self._settings['gui/image_preview_automatic_update'].set_value(False)
-
-      self._display_inline_message(
-        _('Disabling automatic preview update. The preview takes too long to update.'),
-        Gtk.MessageType.INFO)
-
-  def _on_name_preview_updated(self, _preview, _error):
-    self._action_lists.display_warnings_and_tooltips_for_actions(
-      self._batcher_for_previews, clear_previous=False)
 
   def _on_button_run_clicked(self, _button, lock_update_key):
     self._settings.apply_gui_values_to_settings()
@@ -331,8 +248,9 @@ class ExportLayersGui:
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher()
 
     should_quit = True
-    self._name_preview.lock_update(True, lock_update_key)
-    self._image_preview.lock_update(True, lock_update_key)
+
+    self._previews.name_preview.lock_update(True, lock_update_key)
+    self._previews.image_preview.lock_update(True, lock_update_key)
 
     try:
       self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
@@ -361,12 +279,12 @@ class ExportLayersGui:
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=self._dialog)
     finally:
-      self._name_preview.lock_update(False, lock_update_key)
-      self._image_preview.lock_update(False, lock_update_key)
+      self._previews.name_preview.lock_update(False, lock_update_key)
+      self._previews.image_preview.lock_update(False, lock_update_key)
 
       if self._settings['main/edit_mode'].value:
-        self._image_preview.update()
-        self._name_preview.update(reset_items=True)
+        self._previews.image_preview.update()
+        self._previews.name_preview.update(reset_items=True)
 
       self._action_lists.set_warning_on_actions(self._batcher)
 
