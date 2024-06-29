@@ -144,7 +144,7 @@ class PreviewsController:
         self._image_preview.resize()
     
     self._paned_between_previews_previous_position = current_position
-  
+
   def _connect_actions_changed(self, actions):
     # We store event IDs in lists in case the same action is added multiple times.
     settings_and_event_ids = collections.defaultdict(lambda: collections.defaultdict(list))

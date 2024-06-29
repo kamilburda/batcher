@@ -23,18 +23,6 @@ class ActionLists:
     self._settings = settings
     self._dialog = dialog
 
-    self._init_gui()
-
-    self._init_setting_gui()
-
-  def _init_gui(self):
-    self._label_procedures = Gtk.Label(
-      label='<b>{}</b>'.format(_('Procedures')),
-      use_markup=True,
-      xalign=0.0,
-      yalign=0.5,
-    )
-
     self._procedure_list = action_list_.ActionList(
       self._settings['main/procedures'],
       builtin_actions=builtin_procedures.BUILTIN_PROCEDURES,
@@ -45,6 +33,28 @@ class ActionLists:
       propagate_natural_height=True,
       propagate_natural_width=True,
       hscrollbar_policy=Gtk.PolicyType.NEVER,
+    )
+
+    self._constraint_list = action_list_.ActionList(
+      self._settings['main/constraints'],
+      builtin_actions=builtin_constraints.BUILTIN_CONSTRAINTS,
+      add_action_text=_('Add C_onstraint...'),
+      allow_custom_actions=False,
+      propagate_natural_height=True,
+      propagate_natural_width=True,
+      hscrollbar_policy=Gtk.PolicyType.NEVER,
+    )
+
+    self._init_gui()
+
+    self._init_setting_gui()
+
+  def _init_gui(self):
+    self._label_procedures = Gtk.Label(
+      label='<b>{}</b>'.format(_('Procedures')),
+      use_markup=True,
+      xalign=0.0,
+      yalign=0.5,
     )
 
     self._vbox_procedures = Gtk.Box(
@@ -59,16 +69,6 @@ class ActionLists:
       use_markup=True,
       xalign=0.0,
       yalign=0.5,
-    )
-
-    self._constraint_list = action_list_.ActionList(
-      self._settings['main/constraints'],
-      builtin_actions=builtin_constraints.BUILTIN_CONSTRAINTS,
-      add_action_text=_('Add C_onstraint...'),
-      allow_custom_actions=False,
-      propagate_natural_height=True,
-      propagate_natural_width=True,
-      hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
     self._vbox_constraints = Gtk.Box(
