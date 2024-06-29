@@ -168,10 +168,10 @@ class PreviewsController:
           setting.connect_event(
             'value-changed', self._update_previews_on_setting_change_if_enabled, action_))
     
-    def _on_after_reorder_action(_actions, action_, *args, **kwargs):
+    def _on_after_reorder_action(_actions, action_, *_args, **_kwargs):
       self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
     
-    def _on_before_remove_action(_actions, action_, *args, **kwargs):
+    def _on_before_remove_action(_actions, action_, *_args, **_kwargs):
       nonlocal settings_and_event_ids
 
       self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
