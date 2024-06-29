@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -163,7 +165,12 @@ class ActionLists:
         action_item.editor.hide()
 
   @staticmethod
-  def _set_action_skipped_tooltips(action_list, skipped_actions, message, clear_previous=True):
+  def _set_action_skipped_tooltips(
+        action_list: action_list_.ActionList,
+        skipped_actions: Dict[str, List],
+        message: str,
+        clear_previous: bool = True,
+  ):
     for action_item in action_list.items:
       if not action_item.has_warning():
         if action_item.action.name in skipped_actions:
