@@ -29,6 +29,7 @@ class BatcherManager:
 
   def run_batcher(
         self,
+        mode,
         image,
         action_lists,
         previews,
@@ -37,7 +38,7 @@ class BatcherManager:
         progress_bar,
   ):
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
-      image, parent_widget, progress_bar)
+      mode, image, parent_widget, progress_bar)
 
     self._settings.apply_gui_values_to_settings()
 
@@ -66,17 +67,17 @@ class BatcherManager:
       else:
         messages_.display_invalid_image_failure_message(parent=parent_widget)
     else:
-      if self._settings['main/edit_mode'].value or not self._batcher.exported_raw_items:
+      if mode == 'edit' or not self._batcher.exported_raw_items:
         should_quit = False
 
-      if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
+      if mode == 'export' and not self._batcher.exported_raw_items:
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
     finally:
       previews.name_preview.lock_update(False, self._PREVIEWS_BATCHER_RUN_KEY)
       previews.image_preview.lock_update(False, self._PREVIEWS_BATCHER_RUN_KEY)
 
-      if self._settings['main/edit_mode'].value:
+      if mode == 'edit':
         previews.image_preview.update()
         previews.name_preview.update(reset_items=True)
 
@@ -96,7 +97,7 @@ class BatcherManager:
   def stop_batcher(self):
     _stop_batcher(self._batcher)
 
-  def _set_up_batcher(self, image, parent_widget, progress_bar):
+  def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
     overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
       self._get_overwrite_dialog_items(),
       default_value=self._settings['main/overwrite_mode'].items['replace'],
@@ -110,6 +111,7 @@ class BatcherManager:
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
+      edit_mode=mode == 'edit',
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
       export_context_manager=_handle_gui_in_export,
@@ -132,6 +134,7 @@ class BatcherManagerQuick:
 
   def run_batcher(
         self,
+        mode,
         image,
         layer_tree,
         parent_widget,
@@ -144,6 +147,7 @@ class BatcherManagerQuick:
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
+      edit_mode=mode == 'edit',
       overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].value),
       progress_updater=progress_updater,
@@ -164,7 +168,7 @@ class BatcherManagerQuick:
       else:
         messages_.display_invalid_image_failure_message(parent=parent_widget)
     else:
-      if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
+      if mode == 'export' and not self._batcher.exported_raw_items:
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
 

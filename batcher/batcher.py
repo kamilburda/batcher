@@ -41,6 +41,7 @@ from src.gui import main as gui_main
 SETTINGS = plugin_settings.create_settings()
 
 _EXPORT_LAYERS_SOURCE_NAME = 'plug-in-batch-export-layers'
+_EDIT_LAYERS_SOURCE_NAME = 'plug-in-batch-edit-layers'
 
 
 def plug_in_batch_export_layers(
@@ -50,11 +51,11 @@ def plug_in_batch_export_layers(
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_interactive(layer_tree, gui_main.ExportLayersGui)
+    return _run_interactive(layer_tree, gui_main.BatchLayerProcessingGui, mode='export')
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
-    return _run_with_last_vals(layer_tree)
+    return _run_with_last_vals(layer_tree, mode='export')
   else:
-    return _run_noninteractive(layer_tree, config)
+    return _run_noninteractive(layer_tree, config, mode='export')
 
 
 def plug_in_batch_export_layers_quick(
@@ -64,12 +65,38 @@ def plug_in_batch_export_layers_quick(
   layer_tree = pg.itemtree.LayerTree(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_interactive(layer_tree, gui_main.ExportLayersQuickGui)
+    return _run_interactive(layer_tree, gui_main.BatchLayerProcessingQuickGui, mode='export')
   else:
-    return _run_with_last_vals(layer_tree)
+    return _run_with_last_vals(layer_tree, mode='export')
 
 
-def _run_noninteractive(layer_tree, config):
+def plug_in_batch_edit_layers(
+      _procedure, run_mode, image, _n_drawables, _drawables, config, _data):
+  _set_default_setting_source(_EDIT_LAYERS_SOURCE_NAME)
+
+  layer_tree = pg.itemtree.LayerTree(image)
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    return _run_interactive(layer_tree, gui_main.BatchLayerProcessingGui, mode='edit')
+  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
+    return _run_with_last_vals(layer_tree, mode='edit')
+  else:
+    return _run_noninteractive(layer_tree, config, mode='edit')
+
+
+def plug_in_batch_edit_layers_quick(
+      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
+  _set_default_setting_source(_EDIT_LAYERS_SOURCE_NAME)
+
+  layer_tree = pg.itemtree.LayerTree(image)
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    return _run_interactive(layer_tree, gui_main.BatchLayerProcessingQuickGui, mode='edit')
+  else:
+    return _run_with_last_vals(layer_tree, mode='edit')
+
+
+def _run_noninteractive(layer_tree, config, mode):
   settings_file = config.get_property('settings-file')
 
   if settings_file:
@@ -79,37 +106,40 @@ def _run_noninteractive(layer_tree, config):
   else:
     _set_settings_from_args(SETTINGS['main'], config)
 
-  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree)
+  _run_plugin_noninteractive(Gimp.RunMode.NONINTERACTIVE, layer_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_with_last_vals(layer_tree):
+def _run_with_last_vals(layer_tree, mode):
   update_successful, message = _load_and_update_settings(SETTINGS, Gimp.RunMode.WITH_LAST_VALS)
   if not update_successful:
     return Gimp.PDBStatusType.EXECUTION_ERROR, message
 
-  _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree)
+  _run_plugin_noninteractive(Gimp.RunMode.WITH_LAST_VALS, layer_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_interactive(layer_tree, gui_class):
+def _run_interactive(layer_tree, gui_class, *gui_class_args, **gui_class_kwargs):
   update_successful, message = _load_and_update_settings(SETTINGS, Gimp.RunMode.INTERACTIVE)
   if not update_successful:
     return Gimp.PDBStatusType.EXECUTION_ERROR, message
 
-  gui_class(layer_tree, SETTINGS)
+  gui_class(layer_tree, SETTINGS, *gui_class_args, **gui_class_kwargs)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_plugin_noninteractive(run_mode, layer_tree):
+def _run_plugin_noninteractive(run_mode, layer_tree, mode):
   batcher = core.Batcher(
     run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
 
   try:
-    batcher.run(item_tree=layer_tree, **utils_.get_settings_for_batcher(SETTINGS['main']))
+    batcher.run(
+      item_tree=layer_tree,
+      edit_mode=mode == 'edit',
+      **utils_.get_settings_for_batcher(SETTINGS['main']))
   except exceptions.BatcherCancelError:
     return Gimp.PDBStatusType.SUCCESS, 'canceled'
   except Exception as e:
@@ -226,6 +256,35 @@ pg.register_procedure(
     | Gimp.ProcedureSensitivityMask.DRAWABLE
     | Gimp.ProcedureSensitivityMask.DRAWABLES),
   documentation=(_('Export layers as separate images instantly'), ''),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_batch_edit_layers,
+  arguments=pg.setting.create_params(SETTINGS['main']),
+  menu_label=_('E_dit Layers...'),
+  menu_path='<Image>/File/[Export]',
+  image_types='*',
+  sensitivity_mask=(
+    Gimp.ProcedureSensitivityMask.NO_DRAWABLES
+    | Gimp.ProcedureSensitivityMask.DRAWABLE
+    | Gimp.ProcedureSensitivityMask.DRAWABLES),
+  documentation=(_('Batch-edit layers'), ''),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_batch_edit_layers_quick,
+  menu_label=_('E_dit Layers (Quick)'),
+  menu_path='<Image>/File/[Export]',
+  image_types='*',
+  sensitivity_mask=(
+    Gimp.ProcedureSensitivityMask.NO_DRAWABLES
+    | Gimp.ProcedureSensitivityMask.DRAWABLE
+    | Gimp.ProcedureSensitivityMask.DRAWABLES),
+  documentation=(_('Batch-edit layers instantly'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 

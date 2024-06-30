@@ -24,19 +24,23 @@ from src.gui.main import previews as previews_
 from src.gui.main import settings_manager as settings_manager_
 
 
-class ExportLayersGui:
+class BatchLayerProcessingGui:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
-  _EXPORT_SETTINGS_AND_ACTIONS_SPACING = 10
+  _VBOX_SETTINGS_SPACING = 10
 
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, initial_layer_tree, settings, run_gui_func=None):
+  def __init__(self, initial_layer_tree, settings, mode, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
     self._settings = settings
+
+    if mode not in ['edit', 'export']:
+      raise ValueError('mode must be either "edit" or "export"')
+    self._mode = mode
 
     self._image = self._initial_layer_tree.image
 
@@ -70,7 +74,14 @@ class ExportLayersGui:
     return self._action_lists.constraint_list
 
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=pg.config.PLUGIN_NAME)
+    if self._mode == 'edit':
+      title = _('Edit Layers')
+    elif self._mode == 'export':
+      title = _('Export Layers')
+    else:
+      title = None
+
+    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
     if self._settings['gui/size/dialog_size'].value:
       self._dialog.set_default_size(*self._settings['gui/size/dialog_size'].value)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
@@ -86,34 +97,37 @@ class ExportLayersGui:
       display_message_func=self._display_inline_message,
     )
 
-    self._export_settings = export_settings_.ExportSettings(
-      self._settings,
-      self._image,
-      row_spacing=self._DIALOG_VBOX_SPACING,
-      name_preview=self._previews.name_preview,
-      display_message_func=self._display_inline_message,
-    )
+    if self._mode == 'export':
+      self._export_settings = export_settings_.ExportSettings(
+        self._settings,
+        self._image,
+        row_spacing=self._DIALOG_VBOX_SPACING,
+        name_preview=self._previews.name_preview,
+        display_message_func=self._display_inline_message,
+      )
+    else:
+      self._export_settings = None
 
     self._action_lists = action_lists_.ActionLists(
       self._settings,
       self._dialog,
     )
 
-    self._vbox_export_settings_and_actions = Gtk.Box(
+    self._vbox_settings = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._EXPORT_SETTINGS_AND_ACTIONS_SPACING,
+      spacing=self._VBOX_SETTINGS_SPACING,
     )
-    self._vbox_export_settings_and_actions.pack_start(self._export_settings.widget, False, False, 0)
-    self._vbox_export_settings_and_actions.pack_start(
-      self._action_lists.vbox_procedures, False, False, 0)
-    self._vbox_export_settings_and_actions.pack_start(
-      self._action_lists.vbox_constraints, False, False, 0)
+
+    if self._mode == 'export':
+      self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
+    self._vbox_settings.pack_start(self._action_lists.vbox_procedures, False, False, 0)
+    self._vbox_settings.pack_start(self._action_lists.vbox_constraints, False, False, 0)
 
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
       wide_handle=True,
     )
-    self._hpaned_settings_and_previews.pack1(self._vbox_export_settings_and_actions, True, False)
+    self._hpaned_settings_and_previews.pack1(self._vbox_settings, True, False)
     self._hpaned_settings_and_previews.pack2(self._previews.vbox_previews, True, True)
 
     self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
@@ -185,9 +199,9 @@ class ExportLayersGui:
     self._previews.unlock()
 
     self._dialog.vbox.show_all()
-    self._update_gui_for_edit_mode(update_name_preview=False)
+    self._update_gui_for_mode()
 
-    if not self._settings['main/edit_mode'].value:
+    if self._mode == 'export':
       self._dialog.set_focus(self._export_settings.file_extension_entry)
 
     self._button_run.grab_default()
@@ -212,21 +226,13 @@ class ExportLayersGui:
       copy_previous_sensitive=False,
     )
 
-  def _update_gui_for_edit_mode(self, update_name_preview=True):
-    # FIXME: Remove this once the Edit Layers dialog is created
-    if self._settings['main/edit_mode'].value:
-      self._export_settings.widget.hide()
-
+  def _update_gui_for_mode(self):
+    if self._mode == 'edit':
       self._button_run.set_label(_('Run'))
       self._button_close.set_label(_('Close'))
     else:
-      self._export_settings.widget.show()
-
       self._button_run.set_label(_('Export'))
       self._button_close.set_label(_('Cancel'))
-
-    if update_name_preview:
-      self._previews.name_preview.update()
 
   def _on_dialog_window_state_event(self, _dialog, event):
     if event.new_window_state & Gdk.WindowState.FOCUSED:
@@ -238,6 +244,7 @@ class ExportLayersGui:
     self._set_up_gui_before_run()
 
     should_quit = self._batcher_manager.run_batcher(
+      self._mode,
       self._image,
       self._action_lists,
       self._previews,
@@ -328,15 +335,19 @@ class ExportLayersGui:
     return button_help
 
 
-class ExportLayersQuickGui:
+class BatchLayerProcessingQuickGui:
 
   _BORDER_WIDTH = 8
   _HBOX_HORIZONTAL_SPACING = 8
   _DIALOG_WIDTH = 500
 
-  def __init__(self, layer_tree, settings):
+  def __init__(self, layer_tree, settings, mode):
     self._layer_tree = layer_tree
     self._settings = settings
+
+    if mode not in ['edit', 'export']:
+      raise ValueError('mode must be either "edit" or "export"')
+    self._mode = mode
 
     self._image = self._layer_tree.image
 
@@ -351,6 +362,7 @@ class ExportLayersQuickGui:
     self.show()
 
     self._batcher_manager.run_batcher(
+      self._mode,
       self._image,
       self._layer_tree,
       self._dialog,
@@ -358,7 +370,14 @@ class ExportLayersQuickGui:
     )
 
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=None)
+    if self._mode == 'edit':
+      title = _('Edit Layers')
+    elif self._mode == 'export':
+      title = _('Export Layers')
+    else:
+      title = None
+
+    self._dialog = GimpUi.Dialog(title=title, role=None)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
 

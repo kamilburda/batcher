@@ -56,7 +56,7 @@ def main(settings=None):
 
   layer_tree = pg.itemtree.LayerTree(image)
 
-  gui_main.ExportLayersGui(layer_tree, settings, run_gui_func=take_screenshots)
+  gui_main.BatchLayerProcessingGui(layer_tree, settings, 'export', run_gui_func=take_screenshots)
 
   image.delete()
 
@@ -108,9 +108,10 @@ def take_screenshots(gui, dialog, settings):
   )
 
   gui.procedure_list.browser.widget.hide()
-  
+
+  # FIXME: Rework this to allow running an Edit Layers dialog
   settings['main/edit_mode'].set_value(True)
-  
+
   while Gtk.events_pending():
     Gtk.main_iteration()
   
