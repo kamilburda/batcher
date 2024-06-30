@@ -63,8 +63,8 @@ def menu_popup_below_widget(menu: Gtk.Menu, widget: Gtk.Widget):
   """Displays a `Gtk.Menu` popup below the specified `Gtk.Widget`."""
   menu.popup_at_widget(
     widget,
-    Gdk.Gravity.SOUTH,
-    Gdk.Gravity.NORTH,
+    Gdk.Gravity.SOUTH_WEST,
+    Gdk.Gravity.NORTH_WEST,
     None,
   )
 
