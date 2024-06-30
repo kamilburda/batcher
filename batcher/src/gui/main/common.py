@@ -12,26 +12,6 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 
-def display_reset_prompt(parent=None):
-  dialog = Gtk.MessageDialog(
-    parent=parent,
-    message_type=Gtk.MessageType.WARNING,
-    modal=True,
-    destroy_with_parent=True,
-    buttons=Gtk.ButtonsType.YES_NO,
-  )
-
-  dialog.set_transient_for(parent)
-  dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
-  dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
-
-  dialog.show_all()
-  response_id = dialog.run()
-  dialog.destroy()
-
-  return response_id
-
-
 @contextlib.contextmanager
 def handle_gui_in_export(run_mode, _image, _layer, _output_filepath, window):
   should_manipulate_window = run_mode == Gimp.RunMode.INTERACTIVE
@@ -56,12 +36,24 @@ def handle_gui_in_export(run_mode, _image, _layer, _output_filepath, window):
       Gtk.main_iteration()
 
 
-def stop_batcher(batcher):
-  if batcher is not None:
-    batcher.stop()
-    return True
-  else:
-    return False
+def display_reset_prompt(parent=None):
+  dialog = Gtk.MessageDialog(
+    parent=parent,
+    message_type=Gtk.MessageType.WARNING,
+    modal=True,
+    destroy_with_parent=True,
+    buttons=Gtk.ButtonsType.YES_NO,
+  )
+
+  dialog.set_transient_for(parent)
+  dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
+  dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
+
+  dialog.show_all()
+  response_id = dialog.run()
+  dialog.destroy()
+
+  return response_id
 
 
 def set_up_output_directory_settings(settings, current_image):

@@ -380,10 +380,12 @@ class Batcher:
     else:
       return None
   
-  def stop(self):
-    """Terminates batch processing prematurely.
+  def queue_stop(self):
+    """Instructs `Batcher` to terminate batch processing prematurely.
     
     The termination occurs after the current item is processed completely.
+
+    This method has no effect if the processing is not running.
     """
     self._should_stop = True
   

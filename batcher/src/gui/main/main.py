@@ -3,8 +3,6 @@
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
@@ -13,18 +11,12 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
-from src import core
-from src import exceptions
-from src import overwrite
-from src import utils as utils_
-
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
-from src.gui import overwrite_chooser as overwrite_chooser_
-from src.gui import progress_updater as progress_updater_
 
 from src.gui.main import action_lists as action_lists_
+from src.gui.main import batcher_manager as batcher_manager_
 from src.gui.main import common
 from src.gui.main import export_settings as export_settings_
 from src.gui.main import previews as previews_
@@ -46,7 +38,8 @@ class ExportLayersGui:
     self._settings = settings
 
     self._image = self._initial_layer_tree.image
-    self._batcher = None
+
+    self._batcher_manager = batcher_manager_.BatcherManager(self._settings)
 
     common.set_up_output_directory_settings(self._settings, self._image)
 
@@ -178,7 +171,7 @@ class ExportLayersGui:
     self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
 
   def _connect_events(self):
-    self._button_run.connect('clicked', self._on_button_run_clicked, 'processing')
+    self._button_run.connect('clicked', self._on_button_run_clicked)
     self._button_close.connect('clicked', self._on_button_close_clicked)
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
 
@@ -241,65 +234,22 @@ class ExportLayersGui:
         Gtk.main_quit()
         return
 
-  def _on_button_run_clicked(self, _button, lock_update_key):
-    self._settings.apply_gui_values_to_settings()
-
+  def _on_button_run_clicked(self, _button):
     self._set_up_gui_before_run()
-    self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher()
 
-    should_quit = True
+    should_quit = self._batcher_manager.run_batcher(
+      self._image,
+      self._action_lists,
+      self._previews,
+      self._settings_manager,
+      self._dialog,
+      self._progress_bar,
+    )
 
-    self._previews.name_preview.lock_update(True, lock_update_key)
-    self._previews.image_preview.lock_update(True, lock_update_key)
-
-    try:
-      self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
-    except exceptions.BatcherCancelError:
-      should_quit = False
-    except exceptions.ActionError as e:
-      messages_.display_failure_message(
-        messages_.get_failing_action_message(e),
-        failure_message=str(e),
-        details=e.traceback,
-        parent=self._dialog)
-      should_quit = False
-    except exceptions.BatcherError as e:
-      messages_.display_processing_failure_message(e, parent=self._dialog)
-      should_quit = False
-    except Exception:
-      if self._image.is_valid():
-        raise
-      else:
-        messages_.display_invalid_image_failure_message(parent=self._dialog)
-    else:
-      if self._settings['main/edit_mode'].value or not self._batcher.exported_raw_items:
-        should_quit = False
-
-      if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
-        messages_.display_message(
-          _('No layers were exported.'), Gtk.MessageType.INFO, parent=self._dialog)
-    finally:
-      self._previews.name_preview.lock_update(False, lock_update_key)
-      self._previews.image_preview.lock_update(False, lock_update_key)
-
-      if self._settings['main/edit_mode'].value:
-        self._previews.image_preview.update()
-        self._previews.name_preview.update(reset_items=True)
-
-      self._action_lists.set_warning_on_actions(self._batcher)
-
-      self._batcher = None
-
-    if overwrite_chooser.overwrite_mode in self._settings['main/overwrite_mode'].items.values():
-      self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
-
-    self._settings_manager.save_settings()
+    self._restore_gui_after_batch_run()
 
     if should_quit:
       Gtk.main_quit()
-    else:
-      self._restore_gui_after_batch_run()
-      progress_updater.reset()
 
   def _set_up_gui_before_run(self):
     self._display_inline_message(None)
@@ -311,32 +261,6 @@ class ExportLayersGui:
 
   def _restore_gui_after_batch_run(self):
     self._set_gui_enabled(True)
-
-  def _set_up_batcher(self):
-    overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
-      self._get_overwrite_dialog_items(),
-      default_value=self._settings['main/overwrite_mode'].items['replace'],
-      default_response=overwrite.OverwriteModes.CANCEL,
-      parent=self._dialog)
-
-    progress_updater = progress_updater_.GtkProgressUpdater(self._progress_bar)
-
-    batcher = core.Batcher(
-      Gimp.RunMode.INTERACTIVE,
-      self._image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
-      overwrite_chooser=overwrite_chooser,
-      progress_updater=progress_updater,
-      export_context_manager=common.handle_gui_in_export,
-      export_context_manager_args=[self._dialog])
-
-    return batcher, overwrite_chooser, progress_updater
-
-  def _get_overwrite_dialog_items(self):
-    return dict(zip(
-      self._settings['main/overwrite_mode'].items.values(),
-      self._settings['main/overwrite_mode'].items_display_names.values()))
 
   def _set_gui_enabled(self, enabled):
     self._progress_bar.set_visible(not enabled)
@@ -356,7 +280,7 @@ class ExportLayersGui:
       return False
 
     if Gdk.keyval_name(event.keyval) == 'Escape':
-      stopped = common.stop_batcher(self._batcher)
+      stopped = self._batcher_manager.stop_batcher()
       return stopped
 
     return False
@@ -370,7 +294,7 @@ class ExportLayersGui:
     Gtk.main_quit()
 
   def _on_button_stop_clicked(self, _button):
-    common.stop_batcher(self._batcher)
+    self._batcher_manager.stop_batcher()
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
@@ -387,15 +311,23 @@ class ExportLayersQuickGui:
     self._settings = settings
 
     self._image = self._layer_tree.image
-    self._batcher = None
+
+    self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._settings)
 
     self._init_gui()
 
     messages_.set_gui_excepthook_parent(self._dialog)
 
     Gtk.main_iteration()
+
     self.show()
-    self.run_batcher()
+
+    self._batcher_manager.run_batcher(
+      self._image,
+      self._layer_tree,
+      self._dialog,
+      self._progress_bar,
+    )
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=_('Export Layers'), role=None)
@@ -425,37 +357,6 @@ class ExportLayersQuickGui:
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
 
-  def run_batcher(self):
-    progress_updater = progress_updater_.GtkProgressUpdater(self._progress_bar)
-
-    self._batcher = core.Batcher(
-      Gimp.RunMode.WITH_LAST_VALS,
-      self._image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
-      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].value),
-      progress_updater=progress_updater,
-      export_context_manager=common.handle_gui_in_export,
-      export_context_manager_args=[self._dialog])
-    try:
-      self._batcher.run(
-        item_tree=self._layer_tree,
-        **utils_.get_settings_for_batcher(self._settings['main']))
-    except exceptions.BatcherCancelError:
-      pass
-    except exceptions.BatcherError as e:
-      messages_.display_processing_failure_message(e, parent=self._dialog)
-    except Exception:
-      if self._image.is_valid():
-        raise
-      else:
-        messages_.display_invalid_image_failure_message(parent=self._dialog)
-    else:
-      if not self._settings['main/edit_mode'].value and not self._batcher.exported_raw_items:
-        messages_.display_message(
-          _('No layers were exported.'), Gtk.MessageType.INFO, parent=self._dialog)
-
   def show(self):
     self._dialog.vbox.show_all()
     self._dialog.action_area.hide()
@@ -465,7 +366,7 @@ class ExportLayersQuickGui:
     self._dialog.hide()
 
   def _on_button_stop_clicked(self, _button):
-    common.stop_batcher(self._batcher)
+    self._batcher_manager.stop_batcher()
 
   def _on_dialog_delete_event(self, _dialog, _event):
-    common.stop_batcher(self._batcher)
+    self._batcher_manager.stop_batcher()
