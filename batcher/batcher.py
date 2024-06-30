@@ -133,12 +133,16 @@ def _run_interactive(layer_tree, gui_class, *gui_class_args, **gui_class_kwargs)
 
 def _run_plugin_noninteractive(run_mode, layer_tree, mode):
   batcher = core.Batcher(
-    run_mode, layer_tree.image, SETTINGS['main/procedures'], SETTINGS['main/constraints'])
+    run_mode,
+    layer_tree.image,
+    SETTINGS['main/procedures'],
+    SETTINGS['main/constraints'],
+    edit_mode=mode == 'edit',
+  )
 
   try:
     batcher.run(
       item_tree=layer_tree,
-      edit_mode=mode == 'edit',
       **utils_.get_settings_for_batcher(SETTINGS['main']))
   except exceptions.BatcherCancelError:
     return Gimp.PDBStatusType.SUCCESS, 'canceled'

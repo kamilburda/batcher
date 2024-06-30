@@ -92,6 +92,7 @@ class BatchLayerProcessingGui:
 
     self._previews = previews_.Previews(
       self._settings,
+      self._mode,
       self._initial_layer_tree,
       lock_previews=True,
       display_message_func=self._display_inline_message,

@@ -34,11 +34,13 @@ class Previews:
   def __init__(
         self,
         settings,
+        batcher_mode,
         initial_layer_tree,
         lock_previews=True,
         display_message_func=None,
   ):
     self._settings = settings
+    self._batcher_mode = batcher_mode
     self._initial_layer_tree = initial_layer_tree
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
@@ -50,6 +52,7 @@ class Previews:
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
+      edit_mode=self._batcher_mode == 'edit',
       overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].items['replace']),
       item_tree=self._initial_layer_tree)
