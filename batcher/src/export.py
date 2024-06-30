@@ -285,13 +285,13 @@ def _export_item(
   output_filepath = _get_item_filepath(item, output_directory)
   file_extension = fileext.get_file_extension(item.name)
   export_status = ExportStatuses.NOT_EXPORTED_YET
-  
-  batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
-  
+
   overwrite_mode, output_filepath = overwrite.handle_overwrite(
     output_filepath,
     batcher.overwrite_chooser,
     _get_unique_substring_position(output_filepath, file_extension))
+
+  batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
   if overwrite_mode == overwrite.OverwriteModes.CANCEL:
     raise exceptions.BatcherCancelError('cancelled')

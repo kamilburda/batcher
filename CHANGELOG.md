@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed incorrect progress bar text if the user chose the new file to be renamed (to avoid overwriting a file with the same name).
+
+
 ## 0.3
 
 ### June 17, 2024
