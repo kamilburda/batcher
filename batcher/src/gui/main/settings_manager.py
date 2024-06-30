@@ -4,6 +4,7 @@ import gi
 
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -14,8 +15,6 @@ from src import update
 from src import utils as utils_
 
 from src.gui import messages as messages_
-
-from src.gui.main import common
 
 
 class SettingsManager:
@@ -122,7 +121,7 @@ class SettingsManager:
     self._save_settings_to_default_location()
 
   def _on_reset_settings_activate(self, _menu_item):
-    response_id = common.display_reset_prompt(parent=self._dialog)
+    response_id = self._display_reset_prompt()
 
     if response_id == Gtk.ResponseType.YES:
       actions_.clear(self._settings['main/procedures'])
@@ -135,6 +134,25 @@ class SettingsManager:
       self.save_settings()
 
       self._display_message_func(_('Settings reset.'), Gtk.MessageType.INFO)
+
+  def _display_reset_prompt(self):
+    dialog = Gtk.MessageDialog(
+      parent=self._dialog,
+      message_type=Gtk.MessageType.WARNING,
+      modal=True,
+      destroy_with_parent=True,
+      buttons=Gtk.ButtonsType.YES_NO,
+    )
+
+    dialog.set_transient_for(self._dialog)
+    dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
+    dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
+
+    dialog.show_all()
+    response_id = dialog.run()
+    dialog.destroy()
+
+    return response_id
 
   def _on_import_settings_activate(self, _menu_item):
     filepath, file_format, load_size_settings = self._get_setting_filepath(action='import')

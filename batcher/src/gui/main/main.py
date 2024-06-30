@@ -1,5 +1,7 @@
 """Main GUI dialog classes for each plug-in procedure."""
 
+import os
+
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
@@ -17,7 +19,6 @@ from src.gui import messages as messages_
 
 from src.gui.main import action_lists as action_lists_
 from src.gui.main import batcher_manager as batcher_manager_
-from src.gui.main import common
 from src.gui.main import export_settings as export_settings_
 from src.gui.main import previews as previews_
 from src.gui.main import settings_manager as settings_manager_
@@ -40,8 +41,6 @@ class ExportLayersGui:
     self._image = self._initial_layer_tree.image
 
     self._batcher_manager = batcher_manager_.BatcherManager(self._settings)
-
-    common.set_up_output_directory_settings(self._settings, self._image)
 
     self._init_gui()
     self._assign_gui_to_settings()
@@ -89,6 +88,7 @@ class ExportLayersGui:
 
     self._export_settings = export_settings_.ExportSettings(
       self._settings,
+      self._image,
       row_spacing=self._DIALOG_VBOX_SPACING,
       name_preview=self._previews.name_preview,
       display_message_func=self._display_inline_message,
@@ -137,7 +137,7 @@ class ExportLayersGui:
     self._dialog.action_area.pack_start(self._settings_manager.button, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._settings_manager.button, True)
 
-    self._button_help = common.get_help_button(self._button_run)
+    self._button_help = self._get_help_button(self._button_run)
 
     self._dialog.action_area.pack_start(self._button_help, False, False, 0)
     self._dialog.action_area.set_child_secondary(self._button_help, True)
@@ -298,6 +298,34 @@ class ExportLayersGui:
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
+
+  @staticmethod
+  def _get_help_button(reference_button):
+    button_help = Gtk.LinkButton(
+      uri=(
+        pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
+        else pg.config.DOCS_URL),
+      label=_('_Help'),
+      use_underline=True,
+    )
+    # Make the button appear like a regular button
+    button_help_style_context = button_help.get_style_context()
+
+    for style_class in button_help_style_context.list_classes():
+      button_help_style_context.remove_class(style_class)
+
+    for style_class in reference_button.get_style_context().list_classes():
+      button_help_style_context.add_class(style_class)
+
+    button_help.unset_state_flags(Gtk.StateFlags.LINK)
+
+    # Make sure the button retains the style of a regular button when clicked.
+    button_help.connect(
+      'clicked',
+      lambda button, *args: button.unset_state_flags(
+        Gtk.StateFlags.VISITED | Gtk.StateFlags.LINK))
+
+    return button_help
 
 
 class ExportLayersQuickGui:

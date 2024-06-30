@@ -1,3 +1,5 @@
+import os
+
 import gi
 
 from gi.repository import GLib
@@ -28,12 +30,14 @@ class ExportSettings:
   def __init__(
         self,
         settings,
+        image,
         row_spacing=_ROW_SPACING,
         column_spacing=_COLUMN_SPACING,
         name_preview=None,
         display_message_func=None,
   ):
     self._settings = settings
+    self._image = image
     self._row_spacing = row_spacing
     self._column_spacing = column_spacing
     self._name_preview = name_preview
@@ -45,6 +49,8 @@ class ExportSettings:
     self._init_gui()
 
     self._init_setting_gui()
+
+    _set_up_output_directory_settings(self._settings, self._image)
 
   def _init_gui(self):
     self._folder_chooser_label = Gtk.Label(
@@ -183,3 +189,67 @@ class ExportSettings:
       self._message_setting = setting
 
       self._name_preview.lock_update(True, name_preview_lock_update_key)
+
+
+def _set_up_output_directory_settings(settings, current_image):
+  _set_up_images_and_directories_and_initial_output_directory(
+    settings, settings['main/output_directory'], current_image)
+  _set_up_output_directory_changed(settings, current_image)
+
+
+def _set_up_images_and_directories_and_initial_output_directory(
+      settings, output_directory_setting, current_image):
+  """Sets up the initial directory path for the current image.
+
+  The path is set according to the following priority list:
+
+    1. Last export directory path of the current image
+    2. Import directory path of the current image
+    3. Last export directory path of any image (i.e. the current value of
+       ``'main/output_directory'``)
+    4. The default directory path (default value) for
+       ``'main/output_directory'``
+
+  Notes:
+
+    Directory 3. is set upon loading ``'main/output_directory'``.
+    Directory 4. is set upon the instantiation of ``'main/output_directory'``.
+  """
+  settings['gui/images_and_directories'].update_images_and_dirpaths()
+
+  _update_directory(
+    output_directory_setting,
+    current_image,
+    settings['gui/images_and_directories'].value[current_image])
+
+
+def _update_directory(setting, current_image, current_image_dirpath):
+  """Sets the directory path to the ``setting``.
+
+  The path is set according to the following priority list:
+
+  1. ``current_image_dirpath`` if not ``None``
+  2. ``current_image`` - import path of the current image if not ``None``
+
+  If update was performed, ``True`` is returned, ``False`` otherwise.
+  """
+  if current_image_dirpath is not None:
+    setting.set_value(current_image_dirpath)
+    return True
+
+  if current_image.get_file() is not None and current_image.get_file().get_path() is not None:
+    setting.set_value(os.path.dirname(current_image.get_file().get_path()))
+    return True
+
+  return False
+
+
+def _set_up_output_directory_changed(settings, current_image):
+  def on_output_directory_changed(output_directory, images_and_directories, current_image_):
+    images_and_directories.update_dirpath(current_image_, output_directory.value)
+
+  settings['main/output_directory'].connect_event(
+    'value-changed',
+    on_output_directory_changed,
+    settings['gui/images_and_directories'],
+    current_image)

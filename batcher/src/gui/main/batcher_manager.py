@@ -1,3 +1,5 @@
+import contextlib
+
 import gi
 
 gi.require_version('Gimp', '3.0')
@@ -14,8 +16,6 @@ from src import utils as utils_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
-
-from src.gui.main import common
 
 
 class BatcherManager:
@@ -112,7 +112,7 @@ class BatcherManager:
       self._settings['main/constraints'],
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
-      export_context_manager=common.handle_gui_in_export,
+      export_context_manager=_handle_gui_in_export,
       export_context_manager_args=[parent_widget])
 
     return batcher, overwrite_chooser, progress_updater
@@ -147,7 +147,7 @@ class BatcherManagerQuick:
       overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].value),
       progress_updater=progress_updater,
-      export_context_manager=common.handle_gui_in_export,
+      export_context_manager=_handle_gui_in_export,
       export_context_manager_args=[parent_widget])
 
     try:
@@ -178,3 +178,27 @@ def _stop_batcher(batcher):
     return True
   else:
     return False
+
+
+@contextlib.contextmanager
+def _handle_gui_in_export(run_mode, _image, _layer, _output_filepath, window):
+  should_manipulate_window = run_mode == Gimp.RunMode.INTERACTIVE
+
+  if should_manipulate_window:
+    window_position = window.get_position()
+    window.hide()
+  else:
+    window_position = None
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  try:
+    yield
+  finally:
+    if window_position is not None:
+      window.move(*window_position)
+      window.show()
+
+    while Gtk.events_pending():
+      Gtk.main_iteration()
