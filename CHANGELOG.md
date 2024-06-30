@@ -1,5 +1,9 @@
 ## Upcoming
 
+User interface changes:
+* Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
+
+Bug fixes:
 * Fixed incorrect progress bar text if the user chose the new file to be renamed (to avoid overwriting a file with the same name).
 
 
