@@ -342,10 +342,10 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
-    'name': 'rename',
+    'name': 'rename_for_export_layers',
     'function': rename_layer,
     'display_name': _('Rename'),
-    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -367,6 +367,36 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'rename_folders',
         'default_value': False,
         'display_name': _('Rename folders'),
+        'gui_type': 'check_button_no_text',
+      },
+    ],
+  },
+  {
+    'name': 'rename_for_edit_layers',
+    'function': rename_layer,
+    'display_name': _('Rename'),
+    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'name_pattern',
+        'name': 'pattern',
+        'default_value': '[layer name]',
+        'display_name': _('Layer name pattern'),
+        'gui_type': 'name_pattern_entry',
+      },
+      {
+        'type': 'bool',
+        'name': 'rename_layers',
+        'default_value': True,
+        'display_name': _('Rename layers'),
+        'gui_type': 'check_button_no_text',
+      },
+      {
+        'type': 'bool',
+        'name': 'rename_layer_groups',
+        'default_value': False,
+        'display_name': _('Rename layer groups'),
         'gui_type': 'check_button_no_text',
       },
     ],
