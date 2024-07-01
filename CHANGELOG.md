@@ -2,6 +2,7 @@
 
 User interface changes:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
+* Dropdown menus are now consistently displayed below a GUI element and are left-aligned (e.g. menus displayed by pressing the `Add Procedure...` button or the `Settings` button).
 
 Bug fixes:
 * Fixed incorrect progress bar text if the user chose the new file to be renamed (to avoid overwriting a file with the same name).
