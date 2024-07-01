@@ -29,5 +29,3 @@ def get_filtered_builtin_actions(builtin_actions, tags=None):
     for name, action_dict in builtin_actions.items()
     if any(tag in action_dict['additional_tags'] for tag in tags)
   }
-
-
