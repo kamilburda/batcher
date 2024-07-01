@@ -8,6 +8,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from src import actions as actions_
+from src import builtin_actions_common
 from src import builtin_constraints
 from src import builtin_procedures
 
@@ -21,13 +22,14 @@ class ActionLists:
 
   _CONSTRAINTS_TOP_MARGIN = 5
 
-  def __init__(self, settings, dialog):
+  def __init__(self, settings, plugin_procedure, dialog):
     self._settings = settings
     self._dialog = dialog
 
     self._procedure_list = action_list_.ActionList(
       self._settings['main/procedures'],
-      builtin_actions=builtin_procedures.BUILTIN_PROCEDURES,
+      builtin_actions=builtin_actions_common.get_filtered_builtin_actions(
+        builtin_procedures.BUILTIN_PROCEDURES, [plugin_procedure]),
       add_action_text=_('Add P_rocedure...'),
       allow_custom_actions=True,
       add_custom_action_text=_('Add Custom Procedure...'),

@@ -9,6 +9,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 
 from src.path import fileext
+from src.builtin_actions_common import *
 
 
 def is_layer(item):
@@ -69,12 +70,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'type': 'constraint',
     'function': is_layer,
     'display_name': _('Layers'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'layer_groups',
     'type': 'constraint',
     'function': is_nonempty_group,
     'display_name': _('Layer groups'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'matching_file_extension',
@@ -82,6 +85,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_default_file_extension,
     # FOR TRANSLATORS: Think of "Only layers matching file extension" when translating this
     'display_name': _('Matching file extension'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'selected_in_gimp',
@@ -89,6 +93,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_item_in_items_selected_in_gimp,
     # FOR TRANSLATORS: Think of "Only layers selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'selected_in_preview',
@@ -96,6 +101,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_item_in_items_selected_in_preview,
     # FOR TRANSLATORS: Think of "Only layers selected in preview" when translating this
     'display_name': _('Selected in preview'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'images_and_gimp_items',
@@ -112,6 +118,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level layers" when translating this
     'display_name': _('Top-level'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'visible',
@@ -119,6 +126,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_visible,
     # FOR TRANSLATORS: Think of "Only visible layers" when translating this
     'display_name': _('Visible'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'with_color_tags',
@@ -126,6 +134,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_color_tags,
     # FOR TRANSLATORS: Think of "Only layers with color tags" when translating this
     'display_name': _('With color tags'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'array',
@@ -142,6 +151,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_color_tags,
     # FOR TRANSLATORS: Think of "Only layers without color tags" when translating this
     'display_name': _('Without color tags'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'array',

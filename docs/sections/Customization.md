@@ -383,7 +383,7 @@ Options:
 * *Use local origin*: If checked, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 
 
-**Use layer size**
+**Use layer size** (Export Layers only)
 
 If enabled, layers will be resized (not scaled) to their size instead of the image size.
 This procedure is enabled by default.
@@ -391,8 +391,6 @@ This procedure is enabled by default.
 To keep the size of the image canvas and the layer position within the image, disable this setting.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 To export the entire layer, leave this setting enabled.
-
-When [editing layers](Usage.md#editing-layers), you may want to disable this procedure as the image will be resized to the last processed layer's dimensions.
 
 
 ### Adding Custom Procedures

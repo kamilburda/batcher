@@ -7,9 +7,7 @@ from gi.repository import Gimp
 from src import background_foreground
 from src import export as export_
 from src import renamer as renamer_
-
-
-NAME_ONLY_TAG = 'name'
+from src.builtin_actions_common import *
 
 
 def set_selected_and_current_layer(batcher):
@@ -202,6 +200,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'apply_opacity_from_layer_groups',
     'function': apply_opacity_from_layer_groups,
     'display_name': _('Apply opacity from layer groups'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'insert_background',
@@ -209,6 +208,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Insert background'),
     'menu_path': _('Background, foreground'),
     'display_options_on_create': True,
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'color_tag',
@@ -224,6 +224,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Insert foreground'),
     'menu_path': _('Background, foreground'),
     'display_options_on_create': True,
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'color_tag',
@@ -238,6 +239,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': background_foreground.merge_background,
     'display_name': _('Merge background'),
     'menu_path': _('Background, foreground'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'enum',
@@ -253,6 +255,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': background_foreground.merge_foreground,
     'display_name': _('Merge foreground'),
     'menu_path': _('Background, foreground'),
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'enum',
@@ -267,7 +270,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'export',
     'function': export_.export,
     'display_name': _('Export'),
-    'additional_tags': [NAME_ONLY_TAG],
+    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -336,13 +339,13 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'remove_folder_structure',
     'function': remove_folder_hierarchy_from_item,
     'display_name': _('Remove folder structure'),
-    'additional_tags': [NAME_ONLY_TAG],
+    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'rename',
     'function': rename_layer,
     'display_name': _('Rename'),
-    'additional_tags': [NAME_ONLY_TAG],
+    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -373,6 +376,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': scale,
     'display_name': _('Scale'),
     'display_options_on_create': True,
+    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
         'type': 'placeholder_image',
@@ -441,6 +445,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'use_layer_size',
     'function': resize_to_layer_size,
     'display_name': _('Use layer size'),
+    'additional_tags': [EXPORT_LAYERS_TAG],
   },
 ]
 
