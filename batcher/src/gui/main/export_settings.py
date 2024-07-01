@@ -22,8 +22,8 @@ class ExportSettings:
 
   _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
   _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 10
-  _FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 12
-  _FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 40
+  _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 12
+  _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 40
 
   _DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS = 100
 
@@ -83,18 +83,18 @@ class ExportSettings:
       yalign=1.0,
     )
 
-    self._filename_pattern_entry = entries_.FilenamePatternEntry(
+    self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(renamer_.FIELDS),
-      minimum_width_chars=self._FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
-      default_item=self._settings['main/filename_pattern'].default_value)
-    self._filename_pattern_entry.set_activates_default(True)
+      minimum_width_chars=self._NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
+      maximum_width_chars=self._NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
+      default_item=self._settings['main/name_pattern'].default_value)
+    self._name_pattern_entry.set_activates_default(True)
 
     self._hbox_export_filename_entries = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
     )
-    self._hbox_export_filename_entries.pack_start(self._filename_pattern_entry, False, False, 0)
+    self._hbox_export_filename_entries.pack_start(self._name_pattern_entry, False, False, 0)
     self._hbox_export_filename_entries.pack_start(self._dot_label, False, False, 0)
     self._hbox_export_filename_entries.pack_start(self._file_extension_entry, False, False, 0)
 
@@ -120,11 +120,11 @@ class ExportSettings:
         'invalid_file_extension')
 
     if self._name_preview is not None:
-      self._filename_pattern_entry.connect(
+      self._name_pattern_entry.connect(
         'changed',
         self._on_text_entry_changed,
-        self._settings['main/filename_pattern'],
-        'invalid_filename_pattern')
+        self._settings['main/name_pattern'],
+        'invalid_name_pattern')
 
   def _init_setting_gui(self):
     self._settings['main/output_directory'].set_gui(
@@ -139,9 +139,9 @@ class ExportSettings:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-    self._settings['main/filename_pattern'].set_gui(
+    self._settings['main/name_pattern'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
-      widget=self._filename_pattern_entry,
+      widget=self._name_pattern_entry,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
@@ -155,8 +155,8 @@ class ExportSettings:
     return self._file_extension_entry
 
   @property
-  def filename_pattern_entry(self):
-    return self._filename_pattern_entry
+  def name_pattern_entry(self):
+    return self._name_pattern_entry
 
   @staticmethod
   def _on_file_extension_entry_focus_out_event(_entry, _event, setting):

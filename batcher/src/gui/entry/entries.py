@@ -190,7 +190,7 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
       self._assign_placeholder_text()
 
 
-class FilenamePatternEntry(ExtendedEntry):
+class NamePatternEntry(ExtendedEntry):
   """Subclass of `ExtendedEntry` used for typing a file name pattern.
 
   A popup displaying the list of suggested items (components of the pattern) is
@@ -215,7 +215,7 @@ class FilenamePatternEntry(ExtendedEntry):
         suggested_items: List[Tuple[str, str, str, str]],
         default_item: Optional[str] = None,
         **kwargs):
-    """Initializes a `FilenamePatternEntry` instance.
+    """Initializes a `NamePatternEntry` instance.
 
     Args:
       suggested_items:
@@ -281,11 +281,10 @@ class FilenamePatternEntry(ExtendedEntry):
     )
     self._field_tooltip_hide_context.enable()
 
-    self.connect(
-      'notify::cursor-position', self._on_filename_pattern_entry_notify_cursor_position)
-    self.connect('changed', self._on_filename_pattern_entry_changed)
-    self.connect('focus-out-event', self._on_filename_pattern_entry_focus_out_event)
-    self.connect('realize', self._on_filename_pattern_entry_realize)
+    self.connect('notify::cursor-position', self._on_name_pattern_entry_notify_cursor_position)
+    self.connect('changed', self._on_name_pattern_entry_changed)
+    self.connect('focus-out-event', self._on_name_pattern_entry_focus_out_event)
+    self.connect('realize', self._on_name_pattern_entry_realize)
 
   @property
   def popup(self) -> entry_popup_.EntryPopup:
@@ -339,7 +338,7 @@ class FilenamePatternEntry(ExtendedEntry):
       ),
     )
   
-  def _on_filename_pattern_entry_notify_cursor_position(self, entry, property_spec):
+  def _on_name_pattern_entry_notify_cursor_position(self, entry, property_spec):
     field = pattern_.StringPattern.get_field_at_position(self.get_text(), self.get_position())
     
     if field is None:
@@ -386,14 +385,14 @@ class FilenamePatternEntry(ExtendedEntry):
 
       tooltip_window.move(absolute_entry_position[0], y)
   
-  def _on_filename_pattern_entry_changed(self, entry):
+  def _on_name_pattern_entry_changed(self, entry):
     if self._reset_cursor_position_before_assigning_from_row:
       self._cursor_position_before_assigning_from_row = None
   
-  def _on_filename_pattern_entry_focus_out_event(self, entry, event):
+  def _on_name_pattern_entry_focus_out_event(self, entry, event):
     self._hide_field_tooltip()
 
-  def _on_filename_pattern_entry_realize(self, entry):
+  def _on_name_pattern_entry_realize(self, entry):
     self._field_tooltip_window.set_transient_for(pg.gui.utils.get_toplevel_window(self))
 
   def _filter_suggested_items(self, suggested_items, row_iter, data=None):
@@ -842,5 +841,5 @@ class FileExtensionEntry(ExtendedEntry):
 
 
 GObject.type_register(ExtendedEntry)
-GObject.type_register(FilenamePatternEntry)
+GObject.type_register(NamePatternEntry)
 GObject.type_register(FileExtensionEntry)

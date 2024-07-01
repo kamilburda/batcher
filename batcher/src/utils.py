@@ -8,7 +8,7 @@ import pygimplib as pg
 def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
   setting_names = [
     'output_directory',
-    'filename_pattern',
+    'name_pattern',
     'file_extension',
     'overwrite_mode',
   ]

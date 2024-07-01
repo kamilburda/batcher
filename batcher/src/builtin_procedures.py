@@ -300,11 +300,11 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Perform export:'),
       },
       {
-        'type': 'filename_pattern',
-        'name': 'single_image_filename_pattern',
+        'type': 'name_pattern',
+        'name': 'single_image_name_pattern',
         'default_value': '[image name]',
         'display_name': _('Image filename pattern'),
-        'gui_type': 'filename_pattern_entry',
+        'gui_type': 'name_pattern_entry',
       },
       {
         'type': 'bool',
@@ -343,11 +343,11 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_options_on_create': True,
     'arguments': [
       {
-        'type': 'filename_pattern',
+        'type': 'name_pattern',
         'name': 'pattern',
         'default_value': '[layer name]',
         'display_name': _('Layer filename pattern'),
-        'gui_type': 'filename_pattern_entry',
+        'gui_type': 'name_pattern_entry',
       },
       {
         'type': 'bool',

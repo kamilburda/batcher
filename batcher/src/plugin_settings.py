@@ -46,8 +46,8 @@ def create_settings_for_export_layers():
       'auto_update_gui_to_setting': False,
     },
     {
-      'type': 'filename_pattern',
-      'name': 'filename_pattern',
+      'type': 'name_pattern',
+      'name': 'name_pattern',
       'default_value': '[layer name]',
       'display_name': _('Layer filename pattern'),
       'description': _('Layer filename pattern (empty string = layer name)'),
@@ -310,14 +310,14 @@ def _create_gui_settings():
 
 def _on_after_add_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value == 'export':
-    _set_sensitive_for_image_filename_pattern_in_export(
+    _set_sensitive_for_image_name_pattern_in_export(
       procedure['arguments/export_mode'],
-      procedure['arguments/single_image_filename_pattern'])
+      procedure['arguments/single_image_name_pattern'])
     
     procedure['arguments/export_mode'].connect_event(
       'value-changed',
-      _set_sensitive_for_image_filename_pattern_in_export,
-      procedure['arguments/single_image_filename_pattern'])
+      _set_sensitive_for_image_name_pattern_in_export,
+      procedure['arguments/single_image_name_pattern'])
 
 
 def _on_after_add_procedure_for_export_layers(
@@ -348,12 +348,12 @@ def _set_initial_output_directory_in_export_if_undefined(
       export_output_directory_setting.set_value(output_directory_setting.default_value)
 
 
-def _set_sensitive_for_image_filename_pattern_in_export(
-      export_mode_setting, single_image_filename_pattern_setting):
+def _set_sensitive_for_image_name_pattern_in_export(
+      export_mode_setting, single_image_name_pattern_setting):
   if export_mode_setting.value == export_.ExportModes.ENTIRE_IMAGE_AT_ONCE:
-    single_image_filename_pattern_setting.gui.set_sensitive(True)
+    single_image_name_pattern_setting.gui.set_sensitive(True)
   else:
-    single_image_filename_pattern_setting.gui.set_sensitive(False)
+    single_image_name_pattern_setting.gui.set_sensitive(False)
 
 
 def _on_after_add_constraint(

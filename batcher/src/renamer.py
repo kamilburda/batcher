@@ -22,7 +22,7 @@ from src.path import pattern as pattern_
 class ItemRenamer:
   
   def __init__(self, pattern: str, fields_raw: Optional[List[Dict[str, Any]]] = None):
-    self._filename_pattern = pattern_.StringPattern(
+    self._name_pattern = pattern_.StringPattern(
       pattern=pattern,
       fields=_get_fields_and_substitute_funcs(_init_fields(fields_raw)))
   
@@ -30,7 +30,7 @@ class ItemRenamer:
     if item is None:
       item = batcher.current_item
     
-    return self._filename_pattern.substitute(batcher, item)
+    return self._name_pattern.substitute(batcher, item)
 
 
 def _get_fields_and_substitute_funcs(fields):

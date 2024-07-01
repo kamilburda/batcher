@@ -170,7 +170,7 @@ def _update_to_0_3(data, settings):
     if setting_dict is not None:
       setting_dict['auto_update_gui_to_setting'] = False
 
-    setting_dict, _index = _get_child_setting(main_settings_list, 'layer_filename_pattern')
+    setting_dict, _index = _get_child_setting(main_settings_list, 'layer_name_pattern')
     if setting_dict is not None:
       setting_dict['auto_update_gui_to_setting'] = False
 

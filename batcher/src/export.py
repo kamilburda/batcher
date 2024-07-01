@@ -34,7 +34,7 @@ def export(
       output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       file_extension: str = 'png',
       export_mode: int = ExportModes.EACH_LAYER,
-      single_image_filename_pattern: Optional[str] = None,
+      single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
       preserve_layer_name_after_export: bool = False,
@@ -44,8 +44,8 @@ def export(
   processed_parent_names = set()
   default_file_extension = file_extension
 
-  if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_filename_pattern is not None:
-    renamer_for_image = renamer_.ItemRenamer(single_image_filename_pattern)
+  if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_name_pattern is not None:
+    renamer_for_image = renamer_.ItemRenamer(single_image_name_pattern)
   else:
     renamer_for_image = None
   
@@ -89,7 +89,7 @@ def export(
         continue
       else:
         item_to_process = pg.itemtree.Item(item.raw, pg.itemtree.TYPE_ITEM, [], [], None, None)
-        if single_image_filename_pattern is not None:
+        if single_image_name_pattern is not None:
           item_to_process.name = renamer_for_image.rename(batcher, item_to_process)
         else:
           item_to_process.name = item.name

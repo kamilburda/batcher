@@ -140,21 +140,21 @@ class FileExtensionSetting(ValidatableStringSetting):
     self._value = value.lstrip('.')
 
 
-class FilenamePatternEntryPresenter(ExtendedEntryPresenter):
+class NamePatternEntryPresenter(ExtendedEntryPresenter):
   """`pygimplib.setting.Presenter` subclass for
-  `gui.entries.FilenamePatternEntry` widgets.
+  `gui.entries.NamePatternEntry` widgets.
 
   Value: Text in the entry.
   """
 
   def _create_widget(self, setting, **kwargs):
-    return entries_.FilenamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
+    return entries_.NamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
 
 
-class FilenamePatternSetting(pg.setting.StringSetting):
+class NamePatternSetting(pg.setting.StringSetting):
 
   _ALLOWED_GUI_TYPES = [
-    FilenamePatternEntryPresenter,
+    NamePatternEntryPresenter,
     pg.SETTING_GUI_TYPES.extended_entry,
     pg.SETTING_GUI_TYPES.entry,
   ]
