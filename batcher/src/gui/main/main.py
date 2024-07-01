@@ -204,6 +204,8 @@ class BatchLayerProcessingGui:
 
     if self._mode == 'export':
       self._dialog.set_focus(self._export_settings.file_extension_entry)
+    else:
+      self._dialog.set_focus(self._action_lists.procedure_list.button_add)
 
     self._button_run.grab_default()
 

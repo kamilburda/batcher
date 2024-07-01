@@ -144,6 +144,10 @@ class ActionList(pg.gui.ItemBox):
   def browser(self):
     return self._browser
 
+  @property
+  def button_add(self):
+    return self._button_add
+
   def add_item(
         self,
         action_dict_or_pdb_proc_name_or_action: Union[Dict[str, Any], str, pg.setting.Group],
