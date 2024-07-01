@@ -318,8 +318,8 @@ class ActionList(pg.gui.ItemBox):
 
     self._actions_menu.show_all()
 
-  def _on_button_add_clicked(self, _button):
-    self._actions_menu.popup_at_pointer(None)
+  def _on_button_add_clicked(self, button):
+    pg.gui.menu_popup_below_widget(self._actions_menu, button)
 
   def _add_action_to_menu_popup(self, action_dict):
     if action_dict.get('menu_path') is None:
