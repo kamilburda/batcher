@@ -78,7 +78,7 @@ class Batcher:
         constraints: pg.setting.Group,
         edit_mode: bool = False,
         output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
-        layer_filename_pattern: str = '',
+        filename_pattern: str = '',
         file_extension: str = 'png',
         overwrite_mode: int = overwrite.OverwriteModes.SKIP,
         overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
@@ -152,9 +152,9 @@ class Batcher:
     return self._output_directory
   
   @property
-  def layer_filename_pattern(self) -> str:
+  def filename_pattern(self) -> str:
     """Filename pattern for layers to be exported."""
-    return self._layer_filename_pattern
+    return self._filename_pattern
   
   @property
   def file_extension(self) -> str:
@@ -844,7 +844,7 @@ class Batcher:
       self._invoker.add(
         builtin_procedures.rename_layer,
         groups=action_groups,
-        args=[self._layer_filename_pattern])
+        args=[self._filename_pattern])
   
   def _add_default_export_procedure(self, action_groups):
     if (not self._edit_mode

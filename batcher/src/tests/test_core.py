@@ -28,7 +28,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     cls.image.delete()
   
   def test_add_procedure_added_procedure_is_first_in_action_list(self):
-    settings = plugin_settings.create_settings()
+    settings = plugin_settings.create_settings_for_export_layers()
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.Batcher(

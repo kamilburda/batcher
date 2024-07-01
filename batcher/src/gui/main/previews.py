@@ -47,14 +47,19 @@ class Previews:
 
     self._image = self._initial_layer_tree.image
 
+    if self._batcher_mode == 'export':
+      overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
+        self._settings['main/overwrite_mode'].items['replace'])
+    else:
+      overwrite_chooser = None
+
     self._batcher_for_previews = core.Batcher(
       Gimp.RunMode.NONINTERACTIVE,
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
-      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].items['replace']),
+      overwrite_chooser=overwrite_chooser,
       item_tree=self._initial_layer_tree)
 
     self._name_preview = preview_name_.NamePreview(

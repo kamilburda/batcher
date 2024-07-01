@@ -19,7 +19,7 @@ _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_m
 class TestUpdateHandlers(unittest.TestCase):
   
   def setUp(self):
-    self.settings = plugin_settings.create_settings()
+    self.settings = plugin_settings.create_settings_for_export_layers()
     self.plugin_version = pg.config.PLUGIN_VERSION
 
   def tearDown(self):

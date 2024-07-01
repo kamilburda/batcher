@@ -85,7 +85,9 @@ class BatcherManager:
 
       self._batcher = None
 
-    if overwrite_chooser.overwrite_mode in self._settings['main/overwrite_mode'].items.values():
+    if (mode == 'export'
+        and overwrite_chooser.overwrite_mode
+          in self._settings['main/overwrite_mode'].items.values()):
       self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
 
     settings_manager.save_settings()
@@ -98,11 +100,14 @@ class BatcherManager:
     _stop_batcher(self._batcher)
 
   def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
-    overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
-      self._get_overwrite_dialog_items(),
-      default_value=self._settings['main/overwrite_mode'].items['replace'],
-      default_response=overwrite.OverwriteModes.CANCEL,
-      parent=parent_widget)
+    if mode == 'export':
+      overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
+        self._get_overwrite_dialog_items(),
+        default_value=self._settings['main/overwrite_mode'].items['replace'],
+        default_response=overwrite.OverwriteModes.CANCEL,
+        parent=parent_widget)
+    else:
+      overwrite_chooser = None
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
@@ -140,6 +145,12 @@ class BatcherManagerQuick:
         parent_widget,
         progress_bar,
   ):
+    if mode == 'export':
+      overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
+        self._settings['main/overwrite_mode'].value)
+    else:
+      overwrite_chooser = None
+
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     self._batcher = core.Batcher(
@@ -148,8 +159,7 @@ class BatcherManagerQuick:
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=mode == 'edit',
-      overwrite_chooser=overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].value),
+      overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
       export_context_manager=_handle_gui_in_export,
       export_context_manager_args=[parent_widget])

@@ -18,7 +18,7 @@ from src import overwrite
 from src import setting_classes
 
 
-def create_settings():
+def create_settings_for_export_layers():
   settings = pg.setting.create_groups({
     'name': 'all_settings',
     'groups': [
@@ -47,7 +47,7 @@ def create_settings():
     },
     {
       'type': 'filename_pattern',
-      'name': 'layer_filename_pattern',
+      'name': 'filename_pattern',
       'default_value': '[layer name]',
       'display_name': _('Layer filename pattern'),
       'description': _('Layer filename pattern (empty string = layer name)'),
@@ -92,34 +92,8 @@ def create_settings():
       'gui_type': None,
     },
   ])
-  
-  settings.add([_create_gui_settings()])
-  
-  settings['main'].add([
-    actions.create(
-      name='procedures',
-      initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
-  ])
-  
-  settings['main'].add([
-    actions.create(
-      name='constraints',
-      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
-  ])
-  
-  settings['main/procedures'].connect_event(
-    'after-add-action', _on_after_add_procedure, settings['main'])
-  
-  settings['main/constraints'].connect_event(
-    'after-add-action',
-    _on_after_add_constraint,
-    settings['main/selected_layers'])
-  
-  return settings
 
-
-def _create_gui_settings():
-  gui_settings = pg.setting.Group(name='gui')
+  gui_settings = _create_gui_settings()
 
   size_gui_settings = pg.setting.Group(name='size')
 
@@ -147,6 +121,128 @@ def _create_gui_settings():
       'gui_type': None,
     },
   ])
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  settings['main'].add([
+    actions.create(
+      name='procedures',
+      initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
+  ])
+  
+  settings['main'].add([
+    actions.create(
+      name='constraints',
+      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
+  ])
+  
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)
+
+  settings['main/procedures'].connect_event(
+    'after-add-action', _on_after_add_procedure_for_export_layers, settings['main'])
+  
+  settings['main/constraints'].connect_event(
+    'after-add-action',
+    _on_after_add_constraint,
+    settings['main/selected_layers'])
+  
+  return settings
+
+
+def create_settings_for_edit_layers():
+  settings = pg.setting.create_groups({
+    'name': 'all_settings',
+    'groups': [
+      {
+        'name': 'main',
+      }
+    ]
+  })
+
+  settings['main'].add([
+    {
+      'type': 'file',
+      'name': 'settings_file',
+      'default_value': None,
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (optional)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'images_and_gimp_items',
+      'name': 'selected_layers',
+      'default_value': collections.defaultdict(set),
+      'display_name': _('Selected layers'),
+      'pdb_type': None,
+      'gui_type': None,
+    },
+    {
+      'type': 'string',
+      'name': 'plugin_version',
+      'default_value': pg.config.PLUGIN_VERSION,
+      'pdb_type': None,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings = _create_gui_settings()
+
+  size_gui_settings = pg.setting.Group(name='size')
+
+  size_gui_settings.add([
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': (),
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': (570, 500),
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_outside_previews_position',
+      'default_value': 300,
+      'gui_type': None,
+    },
+    {
+      'type': 'float',
+      'name': 'paned_between_previews_position',
+      'default_value': 220,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  settings['main'].add([
+    actions.create(name='procedures'),
+  ])
+
+  settings['main'].add([
+    actions.create(
+      name='constraints',
+      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
+  ])
+
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)
+
+  settings['main/constraints'].connect_event(
+    'after-add-action',
+    _on_after_add_constraint,
+    settings['main/selected_layers'])
+
+  return settings
+
+
+def _create_gui_settings():
+  gui_settings = pg.setting.Group(name='gui')
 
   procedure_browser_settings = pg.setting.Group(name='procedure_browser')
 
@@ -206,14 +302,26 @@ def _create_gui_settings():
       'type': 'images_and_directories',
       'name': 'images_and_directories',
     },
-    size_gui_settings,
     procedure_browser_settings,
   ])
 
   return gui_settings
 
 
-def _on_after_add_procedure(procedures, procedure, orig_procedure_dict, main_settings):
+def _on_after_add_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value == 'export':
+    _set_sensitive_for_image_filename_pattern_in_export(
+      procedure['arguments/export_mode'],
+      procedure['arguments/single_image_filename_pattern'])
+    
+    procedure['arguments/export_mode'].connect_event(
+      'value-changed',
+      _set_sensitive_for_image_filename_pattern_in_export,
+      procedure['arguments/single_image_filename_pattern'])
+
+
+def _on_after_add_procedure_for_export_layers(
+      _procedures, procedure, _orig_procedure_dict, main_settings):
   if procedure['orig_name'].value == 'export':
     _set_initial_output_directory_in_export_if_undefined(
       procedure['arguments/output_directory'],
@@ -223,15 +331,6 @@ def _on_after_add_procedure(procedures, procedure, orig_procedure_dict, main_set
       'value-changed',
       _set_initial_output_directory_in_export_if_undefined,
       main_settings['output_directory'])
-    
-    _set_sensitive_for_image_filename_pattern_in_export(
-      procedure['arguments/export_mode'],
-      procedure['arguments/single_image_filename_pattern'])
-    
-    procedure['arguments/export_mode'].connect_event(
-      'value-changed',
-      _set_sensitive_for_image_filename_pattern_in_export,
-      procedure['arguments/single_image_filename_pattern'])
 
 
 def _set_initial_output_directory_in_export_if_undefined(

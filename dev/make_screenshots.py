@@ -50,7 +50,7 @@ SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 def main(settings=None):
   if not settings:
-    settings = plugin_settings.create_settings()
+    settings = plugin_settings.create_settings_for_export_layers()
 
   image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 

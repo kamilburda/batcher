@@ -6,14 +6,23 @@ import pygimplib as pg
 
 
 def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
-  return {
+  setting_names = [
+    'output_directory',
+    'filename_pattern',
+    'file_extension',
+    'overwrite_mode',
+  ]
+
+  settings_for_batcher = {
     'procedures': main_settings['procedures'],
     'constraints': main_settings['constraints'],
-    'output_directory': main_settings['output_directory'].value,
-    'layer_filename_pattern': main_settings['layer_filename_pattern'].value,
-    'file_extension': main_settings['file_extension'].value,
-    'overwrite_mode': main_settings['overwrite_mode'].value,
   }
+
+  for setting_name in setting_names:
+    if setting_name in main_settings:
+      settings_for_batcher[setting_name] = main_settings[setting_name].value
+
+  return settings_for_batcher
 
 
 def format_message_from_persistor_statuses(

@@ -87,7 +87,7 @@ class ExportSettings:
       renamer_.get_field_descriptions(renamer_.FIELDS),
       minimum_width_chars=self._FILENAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
       maximum_width_chars=self._FILENAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
-      default_item=self._settings['main/layer_filename_pattern'].default_value)
+      default_item=self._settings['main/filename_pattern'].default_value)
     self._filename_pattern_entry.set_activates_default(True)
 
     self._hbox_export_filename_entries = Gtk.Box(
@@ -123,8 +123,8 @@ class ExportSettings:
       self._filename_pattern_entry.connect(
         'changed',
         self._on_text_entry_changed,
-        self._settings['main/layer_filename_pattern'],
-        'invalid_layer_filename_pattern')
+        self._settings['main/filename_pattern'],
+        'invalid_filename_pattern')
 
   def _init_setting_gui(self):
     self._settings['main/output_directory'].set_gui(
@@ -139,7 +139,7 @@ class ExportSettings:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-    self._settings['main/layer_filename_pattern'].set_gui(
+    self._settings['main/filename_pattern'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
       widget=self._filename_pattern_entry,
       copy_previous_visible=False,
