@@ -41,7 +41,8 @@ class ActionLists:
 
     self._constraint_list = action_list_.ActionList(
       self._settings['main/constraints'],
-      builtin_actions=builtin_constraints.BUILTIN_CONSTRAINTS,
+      builtin_actions=builtin_actions_common.get_filtered_builtin_actions(
+        builtin_constraints.BUILTIN_CONSTRAINTS, [plugin_procedure]),
       add_action_text=_('Add C_onstraint...'),
       allow_custom_actions=False,
       propagate_natural_height=True,
