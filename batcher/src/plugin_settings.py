@@ -221,8 +221,15 @@ def create_settings_for_edit_layers():
 
   settings.add([gui_settings])
 
+  rename_procedure_dict = dict(builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_layers'])
+  rename_procedure_dict['enabled'] = False
+  rename_procedure_dict['display_options_on_create'] = False
+  rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'
+
   settings['main'].add([
-    actions.create(name='procedures'),
+    actions.create(
+      name='procedures',
+      initial_actions=[rename_procedure_dict]),
   ])
 
   settings['main'].add([
