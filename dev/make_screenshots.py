@@ -48,20 +48,29 @@ SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
-def main(settings=None):
-  if not settings:
-    settings = plugin_settings.create_settings_for_export_layers()
-
+def main():
   image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 
   layer_tree = pg.itemtree.LayerTree(image)
 
-  gui_main.BatchLayerProcessingGui(layer_tree, settings, 'export', run_gui_func=take_screenshots)
+  gui_main.BatchLayerProcessingGui(
+    layer_tree,
+    plugin_settings.create_settings_for_export_layers(),
+    'export',
+    run_gui_func=take_screenshots_for_export_layers,
+  )
+
+  gui_main.BatchLayerProcessingGui(
+    layer_tree,
+    plugin_settings.create_settings_for_edit_layers(),
+    'edit',
+    run_gui_func=take_screenshots_for_edit_layers,
+  )
 
   image.delete()
 
 
-def take_screenshots(gui, dialog, settings):
+def take_screenshots_for_export_layers(gui, dialog, settings):
   os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
   
   settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
@@ -93,8 +102,8 @@ def take_screenshots(gui, dialog, settings):
 
   gui.procedure_list.browser.widget.set_focus(None)
 
-  browser_decoration_offsets = move_dialog_to_corner(
-    dialog, settings['gui/procedure_browser/dialog_position'])
+  move_dialog_to_corner(
+    dialog, settings['gui/procedure_browser/dialog_position'], *decoration_offsets)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -103,27 +112,34 @@ def take_screenshots(gui, dialog, settings):
     SCREENSHOTS_DIRPATH,
     SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME,
     settings,
-    browser_decoration_offsets,
+    decoration_offsets,
     crop_to='browser_dialog',
   )
 
   gui.procedure_list.browser.widget.hide()
+  
+  Gtk.main_quit()
 
-  # FIXME: Rework this to allow running an Edit Layers dialog
-  settings['main/edit_mode'].set_value(True)
+
+def take_screenshots_for_edit_layers(gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+
+  gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['main-background'].raw})
+
+  dialog.set_focus(None)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
-  
+
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
     SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
   )
-  
+
   Gtk.main_quit()
-  
+
 
 def take_and_process_screenshot(
       screenshots_dirpath,
@@ -161,13 +177,16 @@ def take_screenshot():
   return pdb.plug_in_screenshot(1, 0, 0, 0, 0)
 
 
-def move_dialog_to_corner(dialog, dialog_position_setting):
-  dialog_position_setting.set_value((0, 0))
-  dialog.set_gravity(Gdk.Gravity.STATIC)
-  decoration_offset_x, decoration_offset_y = dialog.get_position()
+def move_dialog_to_corner(
+      dialog, dialog_position_setting, decoration_offset_x=None, decoration_offset_y=None):
+  if decoration_offset_x is None:
+    dialog_position_setting.set_value((0, 0))
+    dialog.set_gravity(Gdk.Gravity.STATIC)
+    decoration_offset_x, decoration_offset_y = dialog.get_position()
+
   dialog.set_gravity(Gdk.Gravity.NORTH_WEST)
   dialog_position_setting.set_value((-decoration_offset_x, 0))
-  
+
   return decoration_offset_x, decoration_offset_y
 
 
