@@ -1,11 +1,14 @@
 ## Upcoming
 
-User interface changes:
+New features:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
+
+User interface changes:
 * Dropdown menus are now consistently displayed below a GUI element and are left-aligned (e.g. menus displayed by pressing the `Add Procedure...` button or the `Settings` button).
 
 Bug fixes:
-* Fixed Rename procedure not renaming layer groups when editing layers.
+* Fixed the `Rename` procedure not renaming layer groups when editing layers.
+* Fixed the `Remove folder structure` procedure not working when editing layers. A separate procedure with the same name was added for editing that also allows setting the visibility of child layers based on whether all its parents are visible.
 * Fixed incorrect progress bar text if the user chose the new file to be renamed (to avoid overwriting a file with the same name).
 
 

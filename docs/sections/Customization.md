@@ -358,6 +358,10 @@ When exporting each layer separately (the default), the Export procedure usually
 
 Exports all layers to the output folder on the same level, i.e. subfolders for layer groups are not created.
 
+Options:
+* (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
+
+
 **Rename**
 
 Renames layers according to the specified pattern.

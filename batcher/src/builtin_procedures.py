@@ -101,8 +101,29 @@ def preserve_locks_between_actions(batcher):
       item.raw.set_lock_alpha(lock_alpha)
 
 
-def remove_folder_hierarchy_from_item(batcher):
+def remove_folder_structure_from_item_for_export_layers(batcher):
   item = batcher.current_item
+
+  item.parents = []
+  item.children = []
+
+
+def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_visible=False):
+  item = batcher.current_item
+
+  if batcher.edit_mode and not batcher.is_preview:
+    image = item.raw.get_image()
+    raw_immediate_parent = item.parent.raw if item.parents else None
+
+    if raw_immediate_parent is not None:
+      raw_top_level_parent = item.parents[0].raw if item.parents else None
+      image.reorder_item(item.raw, None, image.get_item_position(raw_top_level_parent))
+
+      if not raw_immediate_parent.list_children():
+        image.remove_layer(raw_immediate_parent)
+
+      if consider_parent_visible and item.parents:
+        item.raw.set_visible(all(parent.raw.get_visible() for parent in item.parents))
 
   item.parents = []
   item.children = []
@@ -336,10 +357,25 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   {
-    'name': 'remove_folder_structure',
-    'function': remove_folder_hierarchy_from_item,
+    'name': 'remove_folder_structure_for_export_layers',
+    'function': remove_folder_structure_from_item_for_export_layers,
     'display_name': _('Remove folder structure'),
-    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
+  },
+  {
+    'name': 'remove_folder_structure_for_edit_layers',
+    'function': remove_folder_structure_from_item_for_edit_layers,
+    'display_name': _('Remove folder structure'),
+    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+    'arguments': [
+      {
+        'type': 'bool',
+        'name': 'consider_parent_visible',
+        'default_value': False,
+        'display_name': _('Consider visibility of parent folders'),
+        'gui_type': 'check_button_no_text',
+      },
+    ],
   },
   {
     'name': 'rename_for_export_layers',
