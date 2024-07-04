@@ -323,7 +323,19 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     widget via ``gui.widget``.
     """
     return self._gui
-  
+
+  @property
+  def gui_type(self) -> Type[presenter_.Presenter]:
+    """The type of the setting GUI widget.
+
+    This is a `setting.Presenter` class.
+
+    This property is useful if you need to obtain the GUI type information
+    passed to `__init__()` before `set_gui()` is called on this setting (at
+    which point the setting GUI is still uninitialized).
+    """
+    return self._gui_type
+
   @property
   def display_name(self) -> str:
     """Setting name in a human-readable format. Useful e.g. as GUI labels or
