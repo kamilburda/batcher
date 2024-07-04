@@ -112,6 +112,16 @@ def _update_plugin_version(data, new_version):
     plugin_version_dict['default_value'] = str(new_version)
 
 
+def _is_fresh_start(sources):
+  return all(not source.has_data() for source in sources.values())
+
+
+def _update_sources(settings, sources):
+  for source in sources.values():
+    source.clear()
+  settings.save(sources)
+
+
 def _get_plugin_version_dict(data) -> Union[dict, None]:
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
@@ -145,14 +155,22 @@ def _get_child_setting(group_list, name):
   return None, None
 
 
-def _is_fresh_start(sources):
-  return all(not source.has_data() for source in sources.values())
+def _rename_setting(group_list, previous_setting_name, new_setting_name):
+  setting_dict, _index = _get_child_setting(group_list, previous_setting_name)
+  if setting_dict is not None:
+    setting_dict['name'] = new_setting_name
 
 
-def _update_sources(settings, sources):
-  for source in sources.values():
-    source.clear()
-  settings.save(sources)
+def _set_setting_attribute_value(group_list, setting_name, attrib_name, new_attrib_value):
+  setting_dict, _index = _get_child_setting(group_list, setting_name)
+  if setting_dict is not None:
+    setting_dict[attrib_name] = new_attrib_value
+
+
+def _remove_setting(group_list, setting_name):
+  _setting_dict, index = _get_child_setting(group_list, setting_name)
+  if index is not None:
+    del group_list[index]
 
 
 def _update_to_0_3(data, settings):
@@ -251,6 +269,47 @@ def _update_actions_to_0_3(main_settings_list, action_type):
         more_options_list.append(also_apply_to_parent_folders_dict)
 
 
+def _update_to_0_4(data, _settings):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    _remove_setting(main_settings_list, 'edit_mode')
+
+    _rename_setting(main_settings_list, 'layer_filename_pattern', 'filename_pattern')
+    _set_setting_attribute_value(main_settings_list, 'filename_pattern', 'type', 'name_pattern')
+
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is None:
+      return
+
+    for procedure_dict in procedures_list:
+      procedure_list = procedure_dict['settings']
+
+      orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+
+      arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+      if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
+        arguments_list[3]['name'] = 'single_image_name_pattern'
+        arguments_list[3]['type'] = 'name_pattern'
+        arguments_list[3]['gui_type'] = 'name_pattern_entry'
+
+      if orig_name_setting_dict['default_value'] == 'rename' and arguments_list is not None:
+        procedure_dict['name'] = 'rename_for_export_layers'
+        orig_name_setting_dict['default_value'] = 'rename_for_export_layers'
+        orig_name_setting_dict['value'] = 'rename_for_export_layers'
+
+        arguments_list[0]['type'] = 'name_pattern'
+        arguments_list[0]['gui_type'] = 'name_pattern_entry'
+
+      if orig_name_setting_dict['default_value'] == 'remove_folder_structure':
+        procedure_dict['name'] = 'remove_folder_structure_for_export_layers'
+        orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
+        orig_name_setting_dict['value'] = 'remove_folder_structure_for_export_layers'
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
+  '0.4': _update_to_0_4,
 }
