@@ -82,14 +82,14 @@ While multipage PDF export is already possible in GIMP without any third-party p
 Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP.
 
 
-## Adjusting Filenames
+## Adjusting Layer Names (Filenames)
 
-There are several built-in *fields* that you can combine to form a filename pattern.
+There are several built-in *fields* that you can combine to form a name pattern.
 For example, `image[001]` renames the layers to `image001`, `image002` and so on.
 The text entry can show you examples of how each field is used if you place the text cursor inside a field.
 The fields are described below in detail.
 
-The preview automatically updates as you change the filename pattern and so can greatly help you figure out how your specified pattern affects the layer names.
+The preview automatically updates as you change the name pattern and so can greatly help you figure out how your specified pattern affects the layer names.
 
 Fields must be enclosed in square brackets and must have a correct number of options.
 Options must be separated by commas.
@@ -319,7 +319,7 @@ Merges an already inserted background layer (via `Insert background`, see above)
 This is useful if you wish to have a single merged layer rather than the background as a separate layer.
 
 When exporting layers, the background is merged automatically before the export.
-Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
+Hence, this procedure is only useful for [Edit Layers](Usage.md#batch-editing-layers).
 
 If there is no background layer inserted, this procedure has no effect.
 
@@ -328,7 +328,7 @@ If there is no background layer inserted, this procedure has no effect.
 Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
 
 When exporting layers, the foreground is merged automatically before the export.
-Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
+Hence, this procedure is only useful for [Edit Layers](Usage.md#batch-editing-layers).
 
 For more information, see `Merge background` above.
 
@@ -365,10 +365,10 @@ Options:
 **Rename**
 
 Renames layers according to the specified pattern.
-This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-filenames).
+This procedure uses the same text entry as the one next to `Save as`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
 If this procedure is added and enabled, the text entry next to `Save as` has no effect.
 
-Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`) or rename folders only (by checking `Rename folders` and unchecking `Rename layers`).
+Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename layer groups` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename layer groups` and unchecking `Rename layers`).
 
 **Scale**
 
