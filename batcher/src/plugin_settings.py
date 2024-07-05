@@ -131,11 +131,17 @@ def create_settings_for_export_layers():
       name='procedures',
       initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
   ])
+
+  visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
+  visible_constraint_dict['enabled'] = False
+  visible_constraint_dict['display_options_on_create'] = False
   
   settings['main'].add([
     actions.create(
       name='constraints',
-      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
+      initial_actions=[
+        builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
+        visible_constraint_dict]),
   ])
   
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)
@@ -232,10 +238,16 @@ def create_settings_for_edit_layers():
       initial_actions=[rename_procedure_dict]),
   ])
 
+  visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
+  visible_constraint_dict['enabled'] = False
+  visible_constraint_dict['display_options_on_create'] = False
+
   settings['main'].add([
     actions.create(
       name='constraints',
-      initial_actions=[builtin_constraints.BUILTIN_CONSTRAINTS['layers']]),
+      initial_actions=[
+        builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
+        visible_constraint_dict]),
   ])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)

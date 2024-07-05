@@ -3,6 +3,9 @@
 New features:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
 
+General changes:
+* Added back the `Visible` constraint (that was removed in the previous version) displayed on the first run/after reset. This time, however, `Also apply to parent folders` is not checked by default.
+
 User interface changes:
 * Dropdown menus are now consistently displayed below a GUI element and are left-aligned (e.g. menus displayed by pressing the `Add Procedure...` button or the `Settings` button).
 * Renamed `Import Settings...` to `Load Settings from File...` and `Export Settings...` to `Save Settings from File...` for clarity, respectively.
