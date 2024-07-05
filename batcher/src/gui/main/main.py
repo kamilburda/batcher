@@ -141,12 +141,20 @@ class BatchLayerProcessingGui:
     self._hpaned_settings_and_previews.pack1(self._vbox_settings, True, False)
     self._hpaned_settings_and_previews.pack2(self._previews.vbox_previews, True, True)
 
-    self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
+    self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
     self._button_run.hide()
+    if self._mode == 'export':
+      self._button_run.set_label(_('_Export'))
+    else:
+      self._button_run.set_label(_('Run'))
 
-    self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
+    self._button_close = self._dialog.add_button('', Gtk.ResponseType.CANCEL)
     self._button_close.hide()
+    if self._mode == 'export':
+      self._button_close.set_label(_('_Cancel'))
+    else:
+      self._button_close.set_label(_('Close'))
 
     self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
@@ -210,7 +218,6 @@ class BatchLayerProcessingGui:
     self._previews.unlock()
 
     self._dialog.vbox.show_all()
-    self._update_gui_for_mode()
 
     if self._mode == 'export':
       self._dialog.set_focus(self._export_settings.file_extension_entry)
@@ -238,14 +245,6 @@ class BatchLayerProcessingGui:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-
-  def _update_gui_for_mode(self):
-    if self._mode == 'edit':
-      self._button_run.set_label(_('Run'))
-      self._button_close.set_label(_('Close'))
-    else:
-      self._button_run.set_label(_('Export'))
-      self._button_close.set_label(_('Cancel'))
 
   def _on_dialog_window_state_event(self, _dialog, event):
     if event.new_window_state & Gdk.WindowState.FOCUSED:
