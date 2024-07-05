@@ -93,6 +93,8 @@ You may also save settings to a custom file by selecting `Settings → Save Sett
 This allows swapping between different plug-in configurations or sharing them.
 To load settings from a file, select `Settings → Load Settings from File...` and select the file.
 
+You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
+
 
 ## Known Issues
 

@@ -67,10 +67,8 @@ class BatcherManager:
       else:
         messages_.display_invalid_image_failure_message(parent=parent_widget)
     else:
-      if mode == 'edit' or not self._batcher.exported_raw_items:
-        should_quit = False
-
       if mode == 'export' and not self._batcher.exported_raw_items:
+        should_quit = False
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
     finally:

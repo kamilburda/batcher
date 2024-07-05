@@ -10,6 +10,7 @@ User interface changes:
 * Dropdown menus are now consistently displayed below a GUI element and are left-aligned (e.g. menus displayed by pressing the `Add Procedure...` button or the `Settings` button).
 * Renamed `Import Settings...` to `Load Settings from File...` and `Export Settings...` to `Save Settings from File...` for clarity, respectively.
 * Moved `Reset Settings` menu entry under the `Settings` button to the bottom.
+* Closing the main dialog automatically can be turned on/off via the new `Close when Done` menu under the `Settings` button.
 
 Bug fixes:
 * Fixed the `Rename` procedure not renaming layer groups when editing layers.

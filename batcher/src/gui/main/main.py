@@ -208,6 +208,8 @@ class BatchLayerProcessingGui:
     self._button_close.connect('clicked', self._on_button_close_clicked)
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
 
+    self._settings['gui/auto_close'].connect_event('value-changed', self._on_auto_close_changed)
+
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
     self._dialog.connect('window-state-event', self._on_dialog_window_state_event)
@@ -267,7 +269,7 @@ class BatchLayerProcessingGui:
 
     self._restore_gui_after_batch_run()
 
-    if should_quit:
+    if should_quit and self._settings['gui/auto_close'].value:
       Gtk.main_quit()
 
   def _set_up_gui_before_run(self):
@@ -314,6 +316,13 @@ class BatchLayerProcessingGui:
 
   def _on_button_stop_clicked(self, _button):
     self._batcher_manager.stop_batcher()
+
+  def _on_auto_close_changed(self, auto_close_setting):
+    if self._mode == 'export':
+      if auto_close_setting.value:
+        self._button_close.set_label(_('Cancel'))
+      else:
+        self._button_close.set_label(_('Close'))
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
