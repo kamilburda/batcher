@@ -67,25 +67,25 @@ class SettingsManager:
     self._button_settings.add(self._hbox_button_settings)
 
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
-    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
     self._menu_item_load_settings_from_file = Gtk.MenuItem(label=_('Load Settings from File...'))
     self._menu_item_save_settings_to_file = Gtk.MenuItem(label=_('Save Settings to File...'))
+    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
 
     self._menu_settings = Gtk.Menu()
     self._menu_settings.append(self._menu_item_save_settings)
-    self._menu_settings.append(self._menu_item_reset_settings)
     self._menu_settings.append(self._menu_item_load_settings_from_file)
     self._menu_settings.append(self._menu_item_save_settings_to_file)
+    self._menu_settings.append(self._menu_item_reset_settings)
     self._menu_settings.show_all()
 
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
 
     self._menu_item_save_settings.connect('activate', self._on_save_settings_activate)
-    self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
     self._menu_item_load_settings_from_file.connect(
       'activate', self._on_load_settings_from_file_activate)
     self._menu_item_save_settings_to_file.connect(
       'activate', self._on_save_settings_to_file_activate)
+    self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
 
@@ -123,6 +123,29 @@ class SettingsManager:
   def _on_save_settings_activate(self, _menu_item):
     self._save_settings_to_default_location()
 
+  def _on_load_settings_from_file_activate(self, _menu_item):
+    filepath, file_format, load_size_settings = self._get_setting_filepath(action='load')
+
+    if filepath is not None:
+      load_successful = self._load_settings_from_file(filepath, file_format, load_size_settings)
+      # Also override default setting sources so that the loaded settings actually persist.
+      self.save_settings()
+
+      if load_successful:
+        self._display_message_func(_('Settings successfully loaded.'), Gtk.MessageType.INFO)
+
+  def _on_save_settings_to_file_activate(self, _menu_item):
+    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='save')
+
+    if filepath is not None:
+      self._settings.apply_gui_values_to_settings()
+
+      save_successful = self.save_settings(filepath)
+      if save_successful:
+        self._display_message_func(
+          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)),
+          Gtk.MessageType.INFO)
+
   def _on_reset_settings_activate(self, _menu_item):
     response_id = self._display_reset_prompt()
 
@@ -156,29 +179,6 @@ class SettingsManager:
     dialog.destroy()
 
     return response_id
-
-  def _on_load_settings_from_file_activate(self, _menu_item):
-    filepath, file_format, load_size_settings = self._get_setting_filepath(action='load')
-
-    if filepath is not None:
-      load_successful = self._load_settings_from_file(filepath, file_format, load_size_settings)
-      # Also override default setting sources so that the loaded settings actually persist.
-      self.save_settings()
-
-      if load_successful:
-        self._display_message_func(_('Settings successfully loaded.'), Gtk.MessageType.INFO)
-
-  def _on_save_settings_to_file_activate(self, _menu_item):
-    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='save')
-
-    if filepath is not None:
-      self._settings.apply_gui_values_to_settings()
-
-      save_successful = self.save_settings(filepath)
-      if save_successful:
-        self._display_message_func(
-          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)),
-          Gtk.MessageType.INFO)
 
   def _on_dialog_key_press_event(self, dialog, event):
     if not dialog.get_mapped():
