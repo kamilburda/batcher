@@ -574,21 +574,6 @@ def display_invalid_image_failure_message(parent: Optional[Gtk.Window] = None):
     parent=parent)
 
 
-def display_import_export_settings_failure_message(
-      main_message: str,
-      details: str,
-      parent: Optional[Gtk.Window] = None,
-):
-  display_failure_message(
-    main_message,
-    failure_message='',
-    details=details,
-    parent=parent,
-    report_description=_(
-      'If you believe this is an error in the plug-in, you can help fix it'
-      ' by sending a report with the file and the text in the details to one of the sites below'))
-
-
 def get_failing_action_message(
       action_and_item_or_action_error: Union[
         Tuple[pg.setting.Group, pg.itemtree.Item], exceptions.ActionError],

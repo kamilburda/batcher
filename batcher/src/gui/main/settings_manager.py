@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import gi
 
@@ -22,9 +23,9 @@ class SettingsManager:
   _BUTTON_SETTINGS_SPACING = 3
   _ARROW_ICON_PIXEL_SIZE = 12
 
-  _IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH = 3
+  _LOAD_SETTINGS_FROM_FILE_CUSTOM_WIDGETS_BORDER_WIDTH = 3
 
-  _PREVIEWS_IMPORT_SETTINGS_KEY = 'import_settings'
+  _PREVIEWS_LOAD_SETTINGS_KEY = 'load_settings'
 
   def __init__(
         self,
@@ -67,22 +68,24 @@ class SettingsManager:
 
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
-    self._menu_item_import_settings = Gtk.MenuItem(label=_('Import Settings...'))
-    self._menu_item_export_settings = Gtk.MenuItem(label=_('Export Settings...'))
+    self._menu_item_load_settings_from_file = Gtk.MenuItem(label=_('Load Settings from File...'))
+    self._menu_item_save_settings_to_file = Gtk.MenuItem(label=_('Save Settings to File...'))
 
     self._menu_settings = Gtk.Menu()
     self._menu_settings.append(self._menu_item_save_settings)
     self._menu_settings.append(self._menu_item_reset_settings)
-    self._menu_settings.append(self._menu_item_import_settings)
-    self._menu_settings.append(self._menu_item_export_settings)
+    self._menu_settings.append(self._menu_item_load_settings_from_file)
+    self._menu_settings.append(self._menu_item_save_settings_to_file)
     self._menu_settings.show_all()
 
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
 
     self._menu_item_save_settings.connect('activate', self._on_save_settings_activate)
     self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
-    self._menu_item_import_settings.connect('activate', self._on_import_settings_activate)
-    self._menu_item_export_settings.connect('activate', self._on_export_settings_activate)
+    self._menu_item_load_settings_from_file.connect(
+      'activate', self._on_load_settings_from_file_activate)
+    self._menu_item_save_settings_to_file.connect(
+      'activate', self._on_save_settings_to_file_activate)
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
 
@@ -101,9 +104,9 @@ class SettingsManager:
       if filepath is None:
         main_message = _('Failed to save settings.')
       else:
-        main_message = _('Failed to export settings to file "{}".'.format(filepath))
+        main_message = _('Failed to save settings to file "{}".'.format(filepath))
 
-      messages_.display_import_export_settings_failure_message(
+      display_load_save_settings_failure_message(
         main_message,
         details=utils_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
         parent=self._dialog)
@@ -154,26 +157,28 @@ class SettingsManager:
 
     return response_id
 
-  def _on_import_settings_activate(self, _menu_item):
-    filepath, file_format, load_size_settings = self._get_setting_filepath(action='import')
+  def _on_load_settings_from_file_activate(self, _menu_item):
+    filepath, file_format, load_size_settings = self._get_setting_filepath(action='load')
 
     if filepath is not None:
-      import_successful = self._import_settings(filepath, file_format, load_size_settings)
-      # Also override default setting sources so that the imported settings actually persist.
+      load_successful = self._load_settings_from_file(filepath, file_format, load_size_settings)
+      # Also override default setting sources so that the loaded settings actually persist.
       self.save_settings()
 
-      if import_successful:
-        self._display_message_func(_('Settings successfully imported.'), Gtk.MessageType.INFO)
+      if load_successful:
+        self._display_message_func(_('Settings successfully loaded.'), Gtk.MessageType.INFO)
 
-  def _on_export_settings_activate(self, _menu_item):
-    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='export')
+  def _on_save_settings_to_file_activate(self, _menu_item):
+    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='save')
 
     if filepath is not None:
       self._settings.apply_gui_values_to_settings()
 
-      export_successful = self.save_settings(filepath)
-      if export_successful:
-        self._display_message_func(_('Settings successfully exported.'), Gtk.MessageType.INFO)
+      save_successful = self.save_settings(filepath)
+      if save_successful:
+        self._display_message_func(
+          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)),
+          Gtk.MessageType.INFO)
 
   def _on_dialog_key_press_event(self, dialog, event):
     if not dialog.get_mapped():
@@ -194,7 +199,7 @@ class SettingsManager:
     if save_successful:
       self._display_message_func(_('Settings successfully saved.'), Gtk.MessageType.INFO)
 
-  def _import_settings(self, filepath, _file_format, load_size_settings=True):
+  def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
     source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
 
     actions_.clear(self._settings['main/procedures'], add_initial_actions=False)
@@ -212,7 +217,7 @@ class SettingsManager:
       setting.tags.discard('ignore_reset')
 
     if self._previews_controller is not None:
-      self._previews_controller.lock_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
+      self._previews_controller.lock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
 
     size_settings_to_ignore_for_load = []
     if not load_size_settings:
@@ -231,11 +236,11 @@ class SettingsManager:
       setting.tags.discard('ignore_load')
 
     if self._previews_controller is not None:
-      self._previews_controller.unlock_and_update_previews(self._PREVIEWS_IMPORT_SETTINGS_KEY)
+      self._previews_controller.unlock_and_update_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
 
     if status == update.TERMINATE:
-      messages_.display_import_export_settings_failure_message(
-        _(('Failed to import settings from file "{}".'
+      display_load_save_settings_failure_message(
+        _(('Failed to load settings from file "{}".'
            ' Settings must be reset completely.')).format(filepath),
         details=message,
         parent=self._dialog)
@@ -248,16 +253,16 @@ class SettingsManager:
     return True
 
   def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
-    if action == 'import':
+    if action == 'load':
       dialog_action = Gtk.FileChooserAction.OPEN
       button_ok = _('_Open')
-      title = _('Import Settings')
-    elif action == 'export':
+      title = _('Load Settings from File')
+    elif action == 'save':
       dialog_action = Gtk.FileChooserAction.SAVE
       button_ok = _('_Save')
-      title = _('Export Settings')
+      title = _('Save Settings to File')
     else:
-      raise ValueError('invalid action; valid values: "import", "export"')
+      raise ValueError('invalid action; valid values: "load", "save"')
 
     file_dialog = Gtk.FileChooserDialog(
       title=title,
@@ -270,10 +275,10 @@ class SettingsManager:
       button_ok, Gtk.ResponseType.OK,
       _('_Cancel'), Gtk.ResponseType.CANCEL)
 
-    if action == 'import':
+    if action == 'load':
       check_button_load_size_settings = Gtk.CheckButton(
-        label=_('Import size-related settings'),
-        border_width=self._IMPORT_SETTINGS_CUSTOM_WIDGETS_BORDER_WIDTH,
+        label=_('Load size-related settings'),
+        border_width=self._LOAD_SETTINGS_FROM_FILE_CUSTOM_WIDGETS_BORDER_WIDTH,
       )
       file_dialog.vbox.pack_start(check_button_load_size_settings, False, False, 0)
     else:
@@ -322,3 +327,18 @@ class SettingsManager:
     file_dialog.destroy()
 
     return filepath, file_format, load_size_settings
+
+
+def display_load_save_settings_failure_message(
+      main_message: str,
+      details: str,
+      parent: Optional[Gtk.Window] = None,
+):
+  messages_.display_failure_message(
+    main_message,
+    failure_message='',
+    details=details,
+    parent=parent,
+    report_description=_(
+      'If you believe this is an error in the plug-in, you can help fix it'
+      ' by sending a report with the file and the text in the details to one of the sites below'))
