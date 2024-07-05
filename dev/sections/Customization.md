@@ -24,14 +24,14 @@ Uncheck or remove the `Use layer size` procedure.
 
 **I want to export only visible layers.**
 
-Add the `Visible` constraint (`Add Constraint... → Visible`).
+Check the `Visible` constraint (or add one if not already via `Add Constraint... → Visible`).
 
 
-**I want to export only visible layers, including those that have invisible parent layer groups.**
+**I want to export only visible layers. However, I also want to exclude those that have invisible parent layer groups.**
 
-1. Add the `Visible` constraint.
+1. Check the `Visible` constraint (or add one if not already).
 2. Edit the `Visible` constraint (press the icon to the right of the constraint name).
-   In the dialog, click on `More options` and then uncheck `Also apply to parent folders`.
+   In the dialog, click on `More options` and then check `Also apply to parent folders`.
 
 
 **I don't want to preserve folder hierarchy when exporting layers.**
@@ -508,8 +508,9 @@ For example, if this option is checked for the `Visible` constraint, a visible l
 
 It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
 
-The `plug-in-batch-export-layers` procedure exports layers with the specified or last used (or saved) settings, depending on the value of the `run-mode` parameter.
+The `plug-in-batch-export-layers` procedure exports layers with the specified or the last used settings, depending on the value of the `run-mode` parameter.
+Likewise, `plug-in-batch-edit-layers` runs batch editing layers with the specified/last used settings.
 
-You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
+You can also run `plug-in-batch-export-layers` or `plug-in-batch-edit-layers` with [settings imported from a file](Usage.md#managing-settings) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
 
-The `plug-in-batch-export-layers-quick` procedure exports layers instantly, always with the last used settings.
+The `plug-in-batch-export-layers-quick` and `plug-in-batch-edit-layers-quick` procedures perform export/editing with always the last used settings.

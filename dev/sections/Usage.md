@@ -26,7 +26,7 @@ The text entry next to `Save as` lets you customize the filenames.
 
 For details, see [Adjusting Filenames](Customization.md#adjusting-layer-names-filenames).
 
- 
+
 ### Changing File Extension
 
 Type or choose your desired file extension next to the filename entry (`png` by default).
@@ -96,9 +96,9 @@ After a successful export or editing, your settings (output folder, file extensi
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
 
-You may also export settings to a custom file by selecting `Settings → Export Settings...`.
+You may also save settings to a custom file by selecting `Settings → Save Settings to File...`.
 This allows swapping between different plug-in configurations or sharing them.
-To import settings from a file, select `Settings → Import Settings...` and select the file.
+To load settings from a file, select `Settings → Load Settings from File...` and select the file.
 
 
 ## Known Issues
