@@ -37,10 +37,10 @@ class BatcherManager:
         parent_widget,
         progress_bar,
   ):
+    self._settings.apply_gui_values_to_settings()
+
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
       mode, image, parent_widget, progress_bar)
-
-    self._settings.apply_gui_values_to_settings()
 
     should_quit = True
 
@@ -143,6 +143,8 @@ class BatcherManagerQuick:
         parent_widget,
         progress_bar,
   ):
+    self._settings.apply_gui_values_to_settings()
+
     if mode == 'export':
       overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
         self._settings['main/overwrite_mode'].value)

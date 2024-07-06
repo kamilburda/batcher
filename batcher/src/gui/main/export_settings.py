@@ -151,6 +151,10 @@ class ExportSettings:
     return self._grid_export_settings
 
   @property
+  def folder_chooser(self):
+    return self._folder_chooser
+
+  @property
   def file_extension_entry(self):
     return self._file_extension_entry
 

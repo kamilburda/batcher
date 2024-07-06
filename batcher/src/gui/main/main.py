@@ -376,19 +376,22 @@ class BatchLayerProcessingQuickGui:
 
     self._init_gui()
 
-    messages_.set_gui_excepthook_parent(self._dialog)
+    if mode == 'export' and self._settings['gui/show_quick_settings'].value:
+      self._quick_settings_gui = QuickSettingsGui(self._image, self._settings, self._mode)
+      self._quick_settings_gui.dialog.connect('response', self._on_quick_settings_gui_dialog_response)
+      self._quick_settings_gui.dialog.run()
+    else:
+      self._quick_settings_gui = None
 
-    Gtk.main_iteration()
+      self._run_batcher_quick()
 
-    self.show()
+  def show(self):
+    self._dialog.vbox.show_all()
+    self._dialog.action_area.hide()
+    self._dialog.show()
 
-    self._batcher_manager.run_batcher(
-      self._mode,
-      self._image,
-      self._layer_tree,
-      self._dialog,
-      self._progress_bar,
-    )
+  def hide(self):
+    self._dialog.hide()
 
   def _init_gui(self):
     if self._mode == 'edit':
@@ -425,16 +428,109 @@ class BatchLayerProcessingQuickGui:
     self._button_stop.connect('clicked', self._on_button_stop_clicked)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
 
-  def show(self):
-    self._dialog.vbox.show_all()
-    self._dialog.action_area.hide()
-    self._dialog.show()
+  def _on_quick_settings_gui_dialog_response(self, dialog, response_id):
+    if response_id == Gtk.ResponseType.OK:
+      dialog.hide()
 
-  def hide(self):
-    self._dialog.hide()
+      self._run_batcher_quick()
+
+      if self._quick_settings_gui is not None:
+        self._settings['gui/show_quick_settings'].set_value(
+          self._quick_settings_gui.should_show_dialog_next_time())
+
+        # This also saves export settings possibly modified in the quick dialog.
+        self._settings.save()
+    else:
+      dialog.hide()
+
+  def _run_batcher_quick(self):
+    messages_.set_gui_excepthook_parent(self._dialog)
+
+    Gtk.main_iteration()
+
+    self.show()
+
+    self._batcher_manager.run_batcher(
+      self._mode,
+      self._image,
+      self._layer_tree,
+      self._dialog,
+      self._progress_bar,
+    )
 
   def _on_button_stop_clicked(self, _button):
     self._batcher_manager.stop_batcher()
 
   def _on_dialog_delete_event(self, _dialog, _event):
     self._batcher_manager.stop_batcher()
+
+
+class QuickSettingsGui:
+
+  _BORDER_WIDTH = 8
+  _HBOX_HORIZONTAL_SPACING = 8
+  _DIALOG_VBOX_SPACING = 8
+  _DIALOG_WIDTH = 300
+
+  def __init__(self, image, settings, mode):
+    self._image = image
+    self._settings = settings
+
+    if mode not in ['edit', 'export']:
+      raise ValueError('mode must be either "edit" or "export"')
+    self._mode = mode
+
+    self._init_gui()
+
+    messages_.set_gui_excepthook_parent(self._dialog)
+
+    self.show()
+
+  @property
+  def dialog(self):
+    return self._dialog
+
+  def should_show_dialog_next_time(self):
+    return self._check_button_show_this_dialog.get_active()
+
+  def show(self):
+    self._dialog.show_all()
+
+  def _init_gui(self):
+    if self._mode == 'edit':
+      title = _('Edit Layers (Quick)')
+    elif self._mode == 'export':
+      title = _('Export Layers (Quick)')
+    else:
+      title = None
+
+    self._dialog = GimpUi.Dialog(title=title, role=None)
+    self._dialog.set_border_width(self._BORDER_WIDTH)
+    self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
+
+    self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
+
+    if self._mode == 'export':
+      self._export_settings = export_settings_.ExportSettings(
+        self._settings,
+        self._image,
+      )
+      self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
+    else:
+      self._export_settings = None
+
+    self._check_button_show_this_dialog = Gtk.CheckButton(label=_('Show this dialog'))
+    self._check_button_show_this_dialog.set_active(self._settings['gui/show_quick_settings'].value)
+
+    self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
+
+    self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
+    self._button_run.set_can_default(True)
+    if self._mode == 'export':
+      self._button_run.set_label(_('_Export'))
+    else:
+      self._button_run.set_label(_('_Run'))
+
+    self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
+
+    self._dialog.set_focus(self._export_settings.folder_chooser)

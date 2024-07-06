@@ -94,7 +94,10 @@ def create_settings_for_export_layers():
   ])
 
   gui_settings = _create_gui_settings()
-  gui_settings.add([_create_auto_close_gui_setting_dict(True)])
+  gui_settings.add([
+    _create_auto_close_setting_dict(True),
+    _create_show_quick_settings_setting_dict(),
+  ])
 
   size_gui_settings = pg.setting.Group(name='size')
 
@@ -196,7 +199,7 @@ def create_settings_for_edit_layers():
   ])
 
   gui_settings = _create_gui_settings()
-  gui_settings.add([_create_auto_close_gui_setting_dict(False)])
+  gui_settings.add([_create_auto_close_setting_dict(False)])
 
   size_gui_settings = pg.setting.Group(name='size')
 
@@ -329,13 +332,22 @@ def _create_gui_settings():
   return gui_settings
 
 
-def _create_auto_close_gui_setting_dict(default_value):
+def _create_auto_close_setting_dict(default_value):
   return {
     'type': 'bool',
     'name': 'auto_close',
     'default_value': default_value,
     'display_name': _('Close when Done'),
     'gui_type': 'check_menu_item',
+  }
+
+
+def _create_show_quick_settings_setting_dict():
+  return {
+    'type': 'bool',
+    'name': 'show_quick_settings',
+    'default_value': True,
+    'gui_type': None,
   }
 
 
