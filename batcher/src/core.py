@@ -883,8 +883,8 @@ class Batcher:
     else:
       self._current_image = self._input_image
       self._current_image.undo_group_start()
-    
-    self._orig_selected_raw_items = self._current_image.list_selected_layers()
+
+    self._orig_selected_raw_items = self._input_image.list_selected_layers()
   
   def _cleanup_contents(self, exception_occurred=False):
     self._invoker.invoke(
@@ -901,7 +901,8 @@ class Batcher:
         pg.pdbutils.try_delete_image(self._current_image)
     else:
       self._current_image.set_selected_layers([
-        layer for layer in self._orig_selected_raw_items if layer.is_valid()])
+        layer for layer in self._orig_selected_raw_items
+        if layer.is_valid() and layer.get_image() == self._current_image])
       self._current_image.undo_group_end()
       Gimp.displays_flush()
     
