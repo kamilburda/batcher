@@ -16,6 +16,7 @@ User interface changes:
 Bug fixes:
 * Fixed the `Rename` procedure not renaming layer groups when editing layers.
 * Fixed the `Remove folder structure` procedure not working when editing layers. A separate procedure with the same name was added for editing that also allows setting the visibility of child layers based on whether all its parents are visible.
+* Fixed the `Scale` procedure throwing errors if the resulting width or height would be 0 pixels. The new width and height will now always be at least 1 pixel.
 * Fixed incorrect progress bar text if the user chose the new file to be renamed (to avoid overwriting a file with the same name).
 
 

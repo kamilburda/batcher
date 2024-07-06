@@ -202,7 +202,12 @@ def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
   else:
     pixels = dimension
 
-  return int(pixels)
+  int_pixels = int(pixels)
+
+  if int_pixels <= 0:
+    int_pixels = 1
+
+  return int_pixels
 
 
 _SCALE_OBJECT_TYPES = IMAGE, LAYER = (0, 1)
