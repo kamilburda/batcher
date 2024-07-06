@@ -98,9 +98,9 @@ class Batcher:
     self._last_constraint = None
     self._current_image = None
     
-    self._orig_selected_layers = []
-    
+    self._orig_selected_raw_items = []
     self._exported_raw_items = []
+
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
     self._failed_procedures = collections.defaultdict(list)
@@ -289,7 +289,16 @@ class Batcher:
     modifying original layers.
     """
     return self._current_image
-  
+
+  @property
+  def orig_selected_raw_items(self) -> List[Gimp.Layer]:
+    """List of layers selected in GIMP prior to processing.
+
+    The selection changes during processing and is restored to this value at the
+    end of the processing
+    """
+    return list(self._orig_selected_raw_items)
+
   @property
   def exported_raw_items(self) -> List[Gimp.Layer]:
     """List of layers that were successfully exported.
@@ -771,11 +780,12 @@ class Batcher:
     self._current_image = self._input_image
     
     self._image_copy = None
-    self._orig_selected_layers = []
     
     self._should_stop = False
-    
+
+    self._orig_selected_raw_items = []
     self._exported_raw_items = []
+
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
     self._failed_procedures = collections.defaultdict(list)
@@ -874,7 +884,7 @@ class Batcher:
       self._current_image = self._input_image
       self._current_image.undo_group_start()
     
-    self._orig_selected_layers = self._current_image.list_selected_layers()
+    self._orig_selected_raw_items = self._current_image.list_selected_layers()
   
   def _cleanup_contents(self, exception_occurred=False):
     self._invoker.invoke(
@@ -891,7 +901,7 @@ class Batcher:
         pg.pdbutils.try_delete_image(self._current_image)
     else:
       self._current_image.set_selected_layers([
-        layer for layer in self._orig_selected_layers if layer.is_valid()])
+        layer for layer in self._orig_selected_raw_items if layer.is_valid()])
       self._current_image.undo_group_end()
       Gimp.displays_flush()
     
