@@ -34,10 +34,10 @@ class ActionEditor(GimpUi.Dialog):
       self.attach_editor_widget(ActionEditorWidget(action, self))
 
     self._button_reset_response_id = 1
-    self._button_reset = self.add_button(_('Reset'), self._button_reset_response_id)
+    self._button_reset = self.add_button(_('_Reset'), self._button_reset_response_id)
     self._button_reset.connect('clicked', self._on_button_reset_clicked, action)
 
-    self._button_close = self.add_button(_('Close'), Gtk.ResponseType.CLOSE)
+    self._button_close = self.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
 
     self.set_focus(self._button_close)
 
