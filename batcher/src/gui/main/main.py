@@ -532,5 +532,3 @@ class QuickSettingsGui:
       self._button_run.set_label(_('_Run'))
 
     self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
-
-    self._dialog.set_focus(self._export_settings.folder_chooser)
