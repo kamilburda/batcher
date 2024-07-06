@@ -52,8 +52,14 @@ For details, see [Procedures](Customization.md#procedures) and [Constraints](Cus
 
 ## Quick Export of Layers
 
-You can export layers in a single click by running `File → Export Layers (Quick)`.
-This can be useful if you made changes to your image and you want to export again with the same settings.
+If you need a simple export without customization, you can run `File → Export Layers (Quick)`.
+This can also be useful if you made changes to your image and you want to export again with the same settings.
+
+For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
+
+![Dialog of Export Layers (Quick)](../images/screenshot_dialog_export_layers_quick.png)
+
+This dialog can be skipped by simply unchecking `Show this dialog`.
 
 
 ## Batch Editing Layers
@@ -99,6 +105,8 @@ To reset settings to their default values, select `Settings → Reset Settings`.
 You may also save settings to a custom file by selecting `Settings → Save Settings to File...`.
 This allows swapping between different plug-in configurations or sharing them.
 To load settings from a file, select `Settings → Load Settings from File...` and select the file.
+
+You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
 
 
 ## Known Issues
