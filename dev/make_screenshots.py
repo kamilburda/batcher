@@ -44,6 +44,7 @@ OUTPUT_DIRPATH = os.path.join(
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
+SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME = 'screenshot_dialog_export_layers_quick.png'
 SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
@@ -66,6 +67,14 @@ def main():
     'edit',
     run_gui_func=take_screenshots_for_edit_layers,
   )
+
+  take_screenshots_for_export_layers_quick(
+    layer_tree,
+    plugin_settings.create_settings_for_export_layers(),
+  )
+
+  for _i in range(Gtk.main_level()):
+    Gtk.main_quit()
 
   image.delete()
 
@@ -117,8 +126,27 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   )
 
   gui.procedure_list.browser.widget.hide()
-  
-  Gtk.main_quit()
+
+
+def take_screenshots_for_export_layers_quick(layer_tree, settings):
+  gui = gui_main.QuickSettingsGui(
+    layer_tree.image,
+    settings,
+    'export',
+  )
+
+  decoration_offsets = move_dialog_to_corner(gui.dialog)
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME,
+    settings,
+    decoration_offsets,
+    crop_to=gui.dialog.get_size(),
+  )
 
 
 def take_screenshots_for_edit_layers(gui, dialog, settings):
@@ -138,8 +166,6 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
     decoration_offsets,
   )
 
-  Gtk.main_quit()
-
 
 def take_and_process_screenshot(
       screenshots_dirpath,
@@ -156,9 +182,11 @@ def take_and_process_screenshot(
   if crop_to == 'browser_dialog':
     crop_to_dialog(
       screenshot_image, settings['gui/procedure_browser/dialog_size'], decoration_offsets)
-  else:
+  elif crop_to == 'main_dialog':
     crop_to_dialog(
       screenshot_image, settings['gui/size/dialog_size'], decoration_offsets)
+  else:
+    crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
   selected_layers = screenshot_image.list_selected_layers()
   layer_array = GObject.Value(Gimp.ObjectArray)
@@ -178,25 +206,37 @@ def take_screenshot():
 
 
 def move_dialog_to_corner(
-      dialog, dialog_position_setting, decoration_offset_x=None, decoration_offset_y=None):
+      dialog, dialog_position_setting=None, decoration_offset_x=None, decoration_offset_y=None):
   if decoration_offset_x is None:
-    dialog_position_setting.set_value((0, 0))
+    if dialog_position_setting is not None:
+      dialog_position_setting.set_value((0, 0))
+    else:
+      dialog.move(0, 0)
+
     dialog.set_gravity(Gdk.Gravity.STATIC)
     decoration_offset_x, decoration_offset_y = dialog.get_position()
 
   dialog.set_gravity(Gdk.Gravity.NORTH_WEST)
-  dialog_position_setting.set_value((-decoration_offset_x, 0))
+  if dialog_position_setting is not None:
+    dialog_position_setting.set_value((-decoration_offset_x, 0))
+  else:
+    dialog.move(-decoration_offset_x, 0)
 
   return decoration_offset_x, decoration_offset_y
 
 
-def crop_to_dialog(image, dialog_size_setting, decoration_offsets):
-  dialog_size_setting.gui.update_setting_value()
+def crop_to_dialog(image, size_setting_or_tuple, decoration_offsets):
+  if isinstance(size_setting_or_tuple, tuple):
+    width, height = size_setting_or_tuple
+  else:
+    size_setting_or_tuple.gui.update_setting_value()
+    width = size_setting_or_tuple.value[0]
+    height = size_setting_or_tuple.value[1]
   
   pdb.gimp_image_crop(
     image,
-    dialog_size_setting.value[0],
-    dialog_size_setting.value[1] + decoration_offsets[1],
+    width,
+    height + decoration_offsets[1],
     0,
     0)
   

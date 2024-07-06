@@ -7,6 +7,7 @@ General changes:
 * Added back the `Visible` constraint (that was removed in the previous version) displayed on the first run/after reset. This time, however, `Also apply to parent folders` is not checked by default.
 
 User interface changes:
+* When `Export Layers (Quick)` is run for the first time, a small dialog with only export settings is now displayed. This reduces confusion as to where (output folder) and how (file extension, name pattern) the layers are exported. That dialog can be skipped by simply unchecking `Show this dialog`.
 * Dropdown menus are now consistently displayed below a GUI element and are left-aligned (e.g. menus displayed by pressing the `Add Procedure...` button or the `Settings` button).
 * Renamed `Import Settings...` to `Load Settings from File...` and `Export Settings...` to `Save Settings from File...` for clarity, respectively.
 * Moved `Reset Settings` menu entry under the `Settings` button to the bottom.
