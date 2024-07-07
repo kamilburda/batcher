@@ -89,14 +89,14 @@ If the `Layers` constraint is unchecked, layer groups will also be processed. Th
 You can run batch editing in a single click by running `File → Edit Layers (Quick)`.
 This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
 
-![Menu Entry for Edit Selected Layers](../images/screenshot_menu_edit_selected_layers.png)
-
 
 ## Quick Batch Editing of Selected Layers
 
 When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
 
 In this case, any constraints set in the [main dialog](#batch-editing-layers) will be ignored.
+
+![Menu Entry for Edit Selected Layers](../images/screenshot_menu_edit_selected_layers.png)
 
 
 ## Preview
