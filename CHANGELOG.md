@@ -2,8 +2,9 @@
 
 New features:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
+* Added `Export Selected Layers` and `Edit Selected Layers` menu entries when right-clicking on selected layers in GIMP. These behave as `Export Selected (Quick)` and `Edit Selected (Quick)`, respectively, except that only `Layers` and `Selected in GIMP` constraints apply.
 
-General changes:
+Changes to procedures and constraints:
 * Added back the `Visible` constraint (that was removed in the previous version) displayed on the first run/after reset. This time, however, `Also apply to parent folders` is not checked by default.
 
 User interface changes:

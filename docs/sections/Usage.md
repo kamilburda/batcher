@@ -55,6 +55,13 @@ For the first time, a small dialog with only export settings is displayed, where
 This dialog can be skipped by simply unchecking `Show this dialog`.
 
 
+## Quick Export of Selected Layers
+
+When you select multiple layers in GIMP, you can right-click and select `Export Selected Layers` to quickly export the selected layers.
+
+In this case, any constraints set in the [main dialog](#exporting-layers) will be ignored.
+
+
 ## Batch Editing Layers
 
 Open your image in GIMP and select `File → Edit Layers...`.
@@ -72,6 +79,13 @@ If the `Layers` constraint is unchecked, layer groups will also be processed. Th
 
 You can run batch editing in a single click by running `File → Edit Layers (Quick)`.
 This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
+
+
+## Quick Batch Editing of Selected Layers
+
+When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
+
+In this case, any constraints set in the [main dialog](#batch-editing-layers) will be ignored.
 
 
 ## Preview
