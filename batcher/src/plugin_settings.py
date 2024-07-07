@@ -138,7 +138,6 @@ def create_settings_for_export_layers():
 
   visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
-  visible_constraint_dict['display_options_on_create'] = False
   
   settings['main'].add([
     actions.create(
@@ -245,7 +244,6 @@ def create_settings_for_edit_layers():
 
   visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
-  visible_constraint_dict['display_options_on_create'] = False
 
   settings['main'].add([
     actions.create(
