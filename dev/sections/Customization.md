@@ -46,7 +46,7 @@ Click on the text entry next to `Save as` and choose `image001`, or type `image[
 
 **My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?**
 
-In the text entry next to `Save as`, type `[layer name, %e]`.
+In the text entry next to `Save as`, choose `Full layer name` or type `[layer name, %e]`.
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
@@ -140,6 +140,10 @@ Examples:
 * `[layer name, %e]` for a layer named `Some.Layer.png` → `Some.Layer.png`
 * `[layer name, %i]` → `Frame.png` (if the file extension is `png`)
 * `[layer name, %i]` → `Frame` (if the file extension is `jpg`)
+
+**Full layer name**
+
+Equivalent to `[layer name, %e]`.
 
 **\[image name\]**
 
