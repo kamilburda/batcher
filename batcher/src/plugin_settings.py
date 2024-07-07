@@ -6,7 +6,7 @@ from gi.repository import GLib
 
 import pygimplib as pg
 
-from src import actions
+from src import actions as actions_
 from src import builtin_constraints
 from src import builtin_procedures
 from src import export as export_
@@ -131,7 +131,7 @@ def create_settings_for_export_layers():
   settings.add([gui_settings])
 
   settings['main'].add([
-    actions.create(
+    actions_.create(
       name='procedures',
       initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
   ])
@@ -140,17 +140,17 @@ def create_settings_for_export_layers():
   visible_constraint_dict['enabled'] = False
   
   settings['main'].add([
-    actions.create(
+    actions_.create(
       name='constraints',
       initial_actions=[
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
         visible_constraint_dict]),
   ])
   
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
 
   settings['main/procedures'].connect_event(
-    'after-add-action', _on_after_add_procedure_for_export_layers, settings['main'])
+    'after-add-action', _on_after_add_export_procedure_for_export_layers, settings['main'])
   
   settings['main/constraints'].connect_event(
     'after-add-action',
@@ -237,7 +237,7 @@ def create_settings_for_edit_layers():
   rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'
 
   settings['main'].add([
-    actions.create(
+    actions_.create(
       name='procedures',
       initial_actions=[rename_procedure_dict]),
   ])
@@ -246,14 +246,14 @@ def create_settings_for_edit_layers():
   visible_constraint_dict['enabled'] = False
 
   settings['main'].add([
-    actions.create(
+    actions_.create(
       name='constraints',
       initial_actions=[
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
         visible_constraint_dict]),
   ])
 
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
 
   settings['main/constraints'].connect_event(
     'after-add-action',
@@ -349,7 +349,7 @@ def _create_show_quick_settings_setting_dict():
   }
 
 
-def _on_after_add_procedure(_procedures, procedure, _orig_procedure_dict):
+def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value == 'export':
     _set_sensitive_for_image_name_pattern_in_export(
       procedure['arguments/export_mode'],
@@ -361,7 +361,7 @@ def _on_after_add_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/single_image_name_pattern'])
 
 
-def _on_after_add_procedure_for_export_layers(
+def _on_after_add_export_procedure_for_export_layers(
       _procedures, procedure, _orig_procedure_dict, main_settings):
   if procedure['orig_name'].value == 'export':
     _set_initial_output_directory_in_export_if_undefined(
