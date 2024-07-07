@@ -264,7 +264,7 @@ pg.register_procedure(
     Gimp.ProcedureSensitivityMask.NO_DRAWABLES
     | Gimp.ProcedureSensitivityMask.DRAWABLE
     | Gimp.ProcedureSensitivityMask.DRAWABLES),
-  documentation=(_('Export layers as separate images instantly'), ''),
+  documentation=(_('Quick export of layers as separate images'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 
