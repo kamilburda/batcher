@@ -438,8 +438,13 @@ class BatchLayerProcessingQuickGui:
         self._settings['gui/show_quick_settings'].set_value(
           self._quick_settings_gui.should_show_dialog_next_time())
 
-        # This also saves export settings possibly modified in the quick dialog.
-        self._settings.save()
+        # Save export settings as they could be modified in the dialog.
+        pg.setting.Persistor.save([
+          self._settings['main/file_extension'],
+          self._settings['main/output_directory'],
+          self._settings['main/name_pattern'],
+          self._settings['gui/show_quick_settings'],
+        ])
     else:
       dialog.hide()
 
