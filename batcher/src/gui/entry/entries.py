@@ -257,7 +257,7 @@ class NamePatternEntry(ExtendedEntry):
     
     self._pango_layout = Pango.Layout.new(self.get_pango_context())
     
-    self._popup = entry_popup_.EntryPopup(self, self._COLUMN_TYPES, suggested_items)
+    self._popup = entry_popup_.EntryPopup(self, self._COLUMN_TYPES, suggested_items, height=-1)
     self._popup.filter_rows_func = self._filter_suggested_items
     self._popup.on_assign_from_selected_row = self._on_assign_from_selected_row
     self._popup.on_assign_last_value = self._assign_last_value

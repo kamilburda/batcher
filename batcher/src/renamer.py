@@ -408,6 +408,14 @@ _FIELDS_LIST = [
   },
   {
     'type': Field,
+    'regex': 'full layer name',
+    'substitute_func': _get_layer_name,
+    'display_name': _('Full layer name'),
+    'str_to_insert': '[layer name, %e]',
+    'examples_lines': [],
+  },
+  {
+    'type': Field,
     'regex': 'image name',
     'substitute_func': _get_image_name,
     'display_name': _('Image name'),
