@@ -93,10 +93,14 @@ Also note that if you export top-level layer groups and the first layer group co
 
 There are several built-in *fields* that you can combine to form a name pattern.
 For example, `image[001]` renames the layers to `image001`, `image002` and so on.
-The text entry can show you examples of how each field is used if you place the text cursor inside a field.
 The fields are described below in detail.
 
+Press the Down button or click anywhere on the entry to display the list of available fields.
+The text entry can show you examples of how each field is used if you place the text cursor inside a field (e.g. inside `[001]`).
+
 The preview automatically updates as you change the name pattern and so can greatly help you figure out how your specified pattern affects the layer names.
+
+You can combine multiple fields if needed, for example `[layer name]-[001]`.
 
 Fields must be enclosed in square brackets and must have a correct number of options.
 Options must be separated by commas.
