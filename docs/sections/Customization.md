@@ -62,9 +62,9 @@ Yes! You may insert any GIMP filter as a procedure:
 **I need every layer to have the same background.**
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
-2. In the plug-in, the color tag will now be displayed next to the layer name(s).
-3. Add the `Background, foreground → Insert background` procedure. If needed, you may place this procedure after `Use layer size` by dragging it onto `Use layer size`.
-4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the `Merge background` procedure.
+2. Add the `Insert background` procedure and adjust the color tag as necessary.
+3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Use layer size` by dragging it onto `Use layer size`.
+4. (optional) You can adjust how the background is merged with each layer by setting the merge type in the `Merge background` procedure that was added automatically.
 
 
 **I want to save the entire image as a single multipage PDF file.**
@@ -302,15 +302,16 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 Inserts layers tagged with a specific color tag as background for each layer.
 
-Note that even background layers are processed and exported.
-To prevent such behavior, add the `Without color tags` constraint.
-
 The _blue_ color tag is used as background by default.
 You may set a different color tag representing the background layers by adjusting the `Color tag` option.
 
-This procedure is always inserted at the first position.
+This procedure is inserted at the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
 If this is your intention, you can always move this procedure below `Use layer size`.
+
+The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
+
+By default, background layers themselves are excluded from editing/export as the `Not background` constraint is automatically added.
 
 **Insert foreground**
 
@@ -320,23 +321,25 @@ The _green_ color tag is used as foreground by default.
 
 For more information, see `Insert background` above.
 
-**Merge background**
+**Merge background** (only available if `Insert background` is added)
 
-Merges an already inserted background layer (via `Insert background`, see above) with the current layer.
+Merges already inserted background (via `Insert background`, see above) with the current layer.
 
-This is useful if you wish to have a single merged layer rather than the background as a separate layer.
+When exporting layers, the background is merged automatically.
+However, if needed, you can reorder this procedure to perform the merge earlier and then apply procedures on the current layer, now merged with the background.
 
-When exporting layers, the background is merged automatically before the export.
-Hence, this procedure is only useful for [Edit Layers](Usage.md#batch-editing-layers).
+For [Edit Layers](Usage.md#batch-editing-layers), this procedure ensures that you have a single merged layer rather than having the background as a separate layer.
+If this is not what you desire, you may uncheck this procedure.
 
 If there is no background layer inserted, this procedure has no effect.
 
-**Merge foreground**
+Options:
+* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
+
+
+**Merge foreground** (only available if `Insert foreground` is added)
 
 Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
-
-When exporting layers, the foreground is merged automatically before the export.
-Hence, this procedure is only useful for [Edit Layers](Usage.md#batch-editing-layers).
 
 For more information, see `Merge background` above.
 
@@ -434,6 +437,14 @@ Processes only layers (i.e. layer groups are not processed).
 Processes only layer groups.
 
 You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
+
+**Not background** (only available if `Insert background` is added)
+
+Processes only layers that are not inserted as background via `Insert background`.
+
+**Not foreground** (only available if `Insert foreground` is added)
+
+Processes only layers that are not inserted as foreground via `Insert foreground`.
 
 **Matching file extension**
 

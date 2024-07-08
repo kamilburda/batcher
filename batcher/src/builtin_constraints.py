@@ -52,6 +52,10 @@ def is_visible(item):
   return item.raw.get_visible()
 
 
+def has_color_tag(item, tag):
+  return item.raw.get_color_tag() == tag
+
+
 def has_color_tags(item, tags=None):
   item_color_tag = item.raw.get_color_tag()
 
@@ -62,6 +66,10 @@ def has_color_tags(item, tags=None):
       return any(item_color_tag == tag for tag in tags)
     else:
       return item_color_tag != Gimp.ColorTag.NONE
+
+
+def has_no_color_tag(item, tag):
+  return not has_color_tag(item, tag)
 
 
 def has_no_color_tags(item, tags=None):
@@ -82,6 +90,42 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_nonempty_group,
     'display_name': _('Layer groups'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+  },
+  {
+    'name': 'not_background',
+    'type': 'constraint',
+    'function': has_no_color_tag,
+    # FOR TRANSLATORS: Think of "Only layers that are not background" when translating this
+    'display_name': _('Not background'),
+    # This constraint is added/removed automatically alongside `insert_background`.
+    'additional_tags': [],
+    'arguments': [
+      {
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.BLUE,
+        'gui_type': None,
+      },
+    ],
+  },
+  {
+    'name': 'not_foreground',
+    'type': 'constraint',
+    'function': has_no_color_tag,
+    # FOR TRANSLATORS: Think of "Only layers that are not foreground" when translating this
+    'display_name': _('Not foreground'),
+    # This constraint is added/removed automatically alongside `insert_foreground`.
+    'additional_tags': [],
+    'arguments': [
+      {
+        'type': 'color_tag',
+        'name': 'color_tag',
+        'display_name': _('Color tag'),
+        'default_value': Gimp.ColorTag.GREEN,
+        'gui_type': None,
+      },
+    ],
   },
   {
     'name': 'matching_file_extension',

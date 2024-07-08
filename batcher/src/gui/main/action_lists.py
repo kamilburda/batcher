@@ -7,7 +7,6 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src import actions as actions_
 from src import builtin_actions_common
 from src import builtin_constraints
 from src import builtin_procedures
@@ -85,7 +84,10 @@ class ActionLists:
     self._vbox_constraints.pack_start(self._constraint_list, True, True, 0)
 
     self._procedure_list.connect(
-      'action-list-item-added-interactive', self._on_procedure_list_item_added)
+      'action-list-item-added-interactive',
+      _on_insert_background_foreground_procedure_item_added,
+      self._constraint_list,
+    )
 
   def _init_setting_gui(self):
     self._settings['gui/procedure_browser/paned_position'].set_gui(
@@ -183,7 +185,120 @@ class ActionLists:
           if clear_previous:
             action_item.reset_tooltip()
 
-  def _on_procedure_list_item_added(self, _procedure_list, item):
-    if any(item.action['orig_name'].value == name
-           for name in ['insert_background', 'insert_foreground']):
-      actions_.reorder(self._settings['main/procedures'], item.action.name, 0)
+
+def _on_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list):
+  if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
+    procedure_list.reorder_item(item, 0)
+
+    item.action['arguments/last_enabled_value_for_merge'].gui.set_visible(False)
+    item.action['arguments/last_enabled_value_for_constraint'].gui.set_visible(False)
+
+    merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
+
+    constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
+
+    item.action['enabled'].connect_event(
+      'value-changed',
+      _on_insert_background_foreground_procedure_enabled_changed,
+      item,
+      merge_item,
+      constraint_item,
+    )
+
+    procedure_list.connect(
+      'action-list-item-removed',
+      _on_insert_background_foreground_procedure_removed,
+      item,
+      merge_item,
+      constraint_list,
+      constraint_item,
+    )
+
+
+def _add_merge_background_foreground_procedure(procedure_list, item):
+  merge_procedure_orig_name_mapping = {
+    'insert_background': 'merge_background',
+    'insert_foreground': 'merge_foreground',
+  }
+  insert_procedure_name = merge_procedure_orig_name_mapping[item.action['orig_name'].value]
+
+  merge_item = procedure_list.add_item(
+    builtin_procedures.BUILTIN_PROCEDURES[insert_procedure_name])
+
+  export_procedure_index = next(
+    iter(index for index, item in enumerate(procedure_list.items)
+         if item.action['orig_name'].value == 'export'),
+    None)
+
+  if export_procedure_index is not None:
+    procedure_list.reorder_item(merge_item, export_procedure_index)
+
+  _set_buttons_for_action_item_sensitive(merge_item, False)
+
+  return merge_item
+
+
+def _add_not_background_foreground_constraint(item, constraint_list):
+  def _on_insert_background_foreground_color_tag_changed(color_tag_setting):
+    constraint_item.action['arguments/color_tag'].set_value(color_tag_setting.value)
+
+  constraint_orig_name_mapping = {
+    'insert_background': 'not_background',
+    'insert_foreground': 'not_foreground',
+  }
+  constraint_name = constraint_orig_name_mapping[item.action['orig_name'].value]
+
+  constraint_item = constraint_list.add_item(
+    builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
+
+  constraint_item.action['arguments/color_tag'].gui.set_visible(False)
+
+  item.action['arguments/color_tag'].connect_event(
+    'value-changed', _on_insert_background_foreground_color_tag_changed)
+  _on_insert_background_foreground_color_tag_changed(item.action['arguments/color_tag'])
+
+  _set_buttons_for_action_item_sensitive(constraint_item, False)
+
+  return constraint_item
+
+
+def _on_insert_background_foreground_procedure_enabled_changed(
+      enabled_setting,
+      insert_back_foreground_item,
+      merge_item,
+      constraint_item,
+):
+  if not enabled_setting.value:
+    insert_back_foreground_item.action['arguments/last_enabled_value_for_merge'].set_value(
+      merge_item.action['enabled'].value)
+    merge_item.action['enabled'].set_value(False)
+
+    insert_back_foreground_item.action['arguments/last_enabled_value_for_constraint'].set_value(
+      constraint_item.action['enabled'].value)
+    constraint_item.action['enabled'].set_value(False)
+  else:
+    merge_item.action['enabled'].set_value(
+      insert_back_foreground_item.action['arguments/last_enabled_value_for_merge'].value)
+    constraint_item.action['enabled'].set_value(
+      insert_back_foreground_item.action['arguments/last_enabled_value_for_constraint'].value)
+
+  merge_item.action['enabled'].gui.set_sensitive(enabled_setting.value)
+  constraint_item.action['enabled'].gui.set_sensitive(enabled_setting.value)
+
+
+def _on_insert_background_foreground_procedure_removed(
+      procedure_list,
+      removed_item,
+      insert_back_foreground_item,
+      merge_item,
+      constraint_list,
+      constraint_item):
+  if removed_item == insert_back_foreground_item:
+    if merge_item in procedure_list.items:
+      procedure_list.remove_item(merge_item)
+    if constraint_item in constraint_list.items:
+      constraint_list.remove_item(constraint_item)
+
+
+def _set_buttons_for_action_item_sensitive(item, sensitive):
+  item.button_remove.set_sensitive(sensitive)

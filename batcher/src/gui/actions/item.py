@@ -59,6 +59,10 @@ class ActionItem(pg.gui.ItemBoxItem):
   def drag_icon(self):
     return self._drag_icon_window
 
+  @property
+  def button_edit(self) -> Gtk.Button:
+    return self._button_edit
+
   def is_being_edited(self):
     return self.editor.get_mapped()
 

@@ -232,7 +232,6 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'insert_background',
     'function': background_foreground.insert_background_layer,
     'display_name': _('Insert background'),
-    'menu_path': _('Background, foreground'),
     'display_options_on_create': True,
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -242,13 +241,24 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.BLUE,
       },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value_for_merge',
+        'default_value': True,
+        'gui_type': None,
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value_for_constraint',
+        'default_value': True,
+        'gui_type': None,
+      },
     ],
   },
   {
     'name': 'insert_foreground',
     'function': background_foreground.insert_foreground_layer,
     'display_name': _('Insert foreground'),
-    'menu_path': _('Background, foreground'),
     'display_options_on_create': True,
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -258,14 +268,26 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
       },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value_for_merge',
+        'default_value': True,
+        'gui_type': None,
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value_for_constraint',
+        'default_value': True,
+        'gui_type': None,
+      },
     ],
   },
   {
     'name': 'merge_background',
     'function': background_foreground.merge_background,
     'display_name': _('Merge background'),
-    'menu_path': _('Background, foreground'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    # This procedure is added/removed automatically alongside `insert_background`.
+    'additional_tags': [],
     'arguments': [
       {
         'type': 'enum',
@@ -280,8 +302,8 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'merge_foreground',
     'function': background_foreground.merge_foreground,
     'display_name': _('Merge foreground'),
-    'menu_path': _('Background, foreground'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    # This procedure is added/removed automatically alongside `insert_foreground`.
+    'additional_tags': [],
     'arguments': [
       {
         'type': 'enum',

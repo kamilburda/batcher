@@ -9,11 +9,11 @@ from src import exceptions
 import pygimplib as pg
 
 
-def insert_background_layer(batcher, tag):
+def insert_background_layer(batcher, tag, *_args, **_kwargs):
   return _insert_tagged_layer(batcher, tag, 'after')
 
 
-def insert_foreground_layer(batcher, tag):
+def insert_foreground_layer(batcher, tag, *_args, **_kwargs):
   return _insert_tagged_layer(batcher, tag, 'before')
 
 

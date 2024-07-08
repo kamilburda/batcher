@@ -95,6 +95,9 @@ class ActionEditorWidget:
     self._info_popup_text = None
     self._parent_widget_realize_event_id = None
 
+    self._pdb_argument_names_and_blurbs = None
+    self._action_argument_indexes_in_grid = {}
+
     self._init_gui()
 
     self._button_preview.connect('clicked', self._on_button_preview_clicked)
@@ -189,6 +192,8 @@ class ActionEditorWidget:
 
     self._set_arguments(self._action, self._pdb_procedure)
 
+    self._set_grid_action_arguments_to_update_according_to_visible_state(self._action)
+
     self._show_hide_additional_settings()
 
   def _set_up_editable_name(self, action):
@@ -272,10 +277,8 @@ class ActionEditorWidget:
 
   def _set_arguments(self, action, pdb_procedure):
     if pdb_procedure is not None:
-      pdb_argument_names_and_blurbs = {
+      self._pdb_argument_names_and_blurbs = {
         arg.name: arg.blurb for arg in pdb_procedure.proc.get_arguments()}
-    else:
-      pdb_argument_names_and_blurbs = None
 
     row_index = 0
 
@@ -283,42 +286,119 @@ class ActionEditorWidget:
       if not setting.gui.get_visible():
         continue
 
-      if pdb_procedure is not None:
-        argument_description = pdb_argument_names_and_blurbs[setting.name]
-      else:
-        argument_description = setting.display_name
+      self._attach_label_to_grid(setting, row_index)
+      self._attach_widget_to_grid(setting, row_index)
 
-      if argument_description is None or not argument_description.strip():
-        argument_description = setting.name
-        should_set_tooltip = False
-      else:
-        should_set_tooltip = True
-
-      label = Gtk.Label(
-        label=argument_description,
-        xalign=0.0,
-        yalign=0.5,
-        max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
-        wrap=True,
-      )
-
-      if should_set_tooltip:
-        label.set_tooltip_text(setting.name)
-
-      self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
-
-      widget_to_attach = setting.gui.widget
-
-      if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
-        widget_to_attach = gui_placeholders_.create_placeholder_widget()
-      else:
-        if (isinstance(setting, pg.setting.ArraySetting)
-            and not setting.element_type.get_allowed_gui_types()):
-          widget_to_attach = gui_placeholders_.create_placeholder_widget()
-
-      self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
+      self._action_argument_indexes_in_grid[setting] = row_index
 
       row_index += 1
+
+  def _attach_action_argument_to_grid(self, setting, row_index):
+    self._attach_label_to_grid(setting, row_index)
+    self._attach_widget_to_grid(setting, row_index)
+
+  def _attach_label_to_grid(self, setting, row_index):
+    if self._pdb_procedure is not None:
+      argument_description = self._pdb_argument_names_and_blurbs[setting.name]
+    else:
+      argument_description = setting.display_name
+
+    if argument_description is None or not argument_description.strip():
+      argument_description = setting.name
+      should_set_tooltip = False
+    else:
+      should_set_tooltip = True
+
+    label = Gtk.Label(
+      label=argument_description,
+      xalign=0.0,
+      yalign=0.5,
+      max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+      wrap=True,
+    )
+
+    if should_set_tooltip:
+      label.set_tooltip_text(setting.name)
+
+    self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
+
+  def _attach_widget_to_grid(self, setting, row_index):
+    widget_to_attach = setting.gui.widget
+
+    if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
+      widget_to_attach = gui_placeholders_.create_placeholder_widget()
+    else:
+      if (isinstance(setting, pg.setting.ArraySetting)
+          and not setting.element_type.get_allowed_gui_types()):
+        widget_to_attach = gui_placeholders_.create_placeholder_widget()
+
+    self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
+
+  def _set_grid_action_arguments_to_update_according_to_visible_state(self, action):
+    for setting in action['arguments']:
+      setting.connect_event('gui-visible-changed', self._on_action_argument_gui_visible_changed)
+
+  def _on_action_argument_gui_visible_changed(self, setting):
+    if setting.gui.get_visible():
+      self._add_action_argument_to_grid(setting)
+    else:
+      self._remove_action_argument_from_grid(setting)
+
+  def _add_action_argument_to_grid(self, setting):
+    if setting in self._action_argument_indexes_in_grid:
+      return
+
+    previous_settings = []
+
+    for setting_in_arguments in self._action['arguments']:
+      if setting_in_arguments.name == setting.name:
+        break
+
+      previous_settings.insert(0, setting_in_arguments)
+
+    last_visible_previous_setting = None
+
+    for previous_setting in previous_settings:
+      if previous_setting in self._action_argument_indexes_in_grid:
+        last_visible_previous_setting = previous_setting
+        break
+
+    if last_visible_previous_setting is not None:
+      row_index = self._action_argument_indexes_in_grid[last_visible_previous_setting] + 1
+    else:
+      row_index = 0
+
+    self._grid_action_arguments.insert_row(row_index)
+    self._attach_action_argument_to_grid(setting, row_index)
+
+    if last_visible_previous_setting is not None:
+      new_action_argument_indexes_in_grid = {}
+      for setting_in_grid, row_index in self._action_argument_indexes_in_grid.items():
+        new_action_argument_indexes_in_grid[setting_in_grid] = row_index
+
+        if setting_in_grid == last_visible_previous_setting:
+          # The row indexes will be refreshed anyway, so any value is OK at this point.
+          new_action_argument_indexes_in_grid[setting] = 0
+      self._action_argument_indexes_in_grid = new_action_argument_indexes_in_grid
+    else:
+      self._action_argument_indexes_in_grid = dict(
+        {setting: 0}, **self._action_argument_indexes_in_grid)
+
+    self._refresh_action_argument_indexes_in_grid()
+
+    # This is necessary to show the newly attached widgets.
+    self._grid_action_arguments.show_all()
+
+  def _remove_action_argument_from_grid(self, setting):
+    row_index = self._action_argument_indexes_in_grid.pop(setting)
+    self._grid_action_arguments.remove_row(row_index)
+
+    self._refresh_action_argument_indexes_in_grid()
+
+  def _refresh_action_argument_indexes_in_grid(self):
+    self._action_argument_indexes_in_grid = {
+      setting: index for index, setting in enumerate(self._action_argument_indexes_in_grid)
+    }
 
   def _show_hide_additional_settings(self):
     if self._show_additional_settings:
