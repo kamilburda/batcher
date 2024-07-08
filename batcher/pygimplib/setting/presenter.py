@@ -169,21 +169,25 @@ class Presenter(metaclass=meta_.PresenterMeta):
   def get_sensitive(self) -> bool:
     """Returns the sensitive state of `Presenter.widget`."""
     pass
-  
-  @abc.abstractmethod
+
   def set_sensitive(self, sensitive: bool):
-    """Sets the sensitive state of `Presenter.widget`."""
-    pass
+    """Sets the sensitive state of `Presenter.widget`.
+
+    The ``'gui-sensitive-changed'`` setting event is triggered.
+    """
+    self._setting.invoke_event('gui-sensitive-changed')
   
   @abc.abstractmethod
   def get_visible(self) -> bool:
     """Returns the visible state of `Presenter.widget`."""
     pass
-  
-  @abc.abstractmethod
+
   def set_visible(self, visible: bool):
-    """Sets the visible state of `Presenter.widget`."""
-    pass
+    """Sets the visible state of `Presenter.widget`.
+
+    The ``'gui-visible-changed'`` setting event is triggered.
+    """
+    self._setting.invoke_event('gui-visible-changed')
   
   def update_setting_value(self, force: bool = False):
     """Manually assigns the GUI widget value, entered by the user, to the
@@ -336,12 +340,16 @@ class NullPresenter(Presenter):
   
   def set_sensitive(self, sensitive):
     self._sensitive = sensitive
+
+    super().set_sensitive(sensitive)
   
   def get_visible(self):
     return self._visible
   
   def set_visible(self, visible):
     self._visible = visible
+
+    super().set_visible(visible)
   
   def update_setting_value(self, force=False):
     pass

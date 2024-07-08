@@ -40,12 +40,16 @@ class GtkPresenter(presenter_.Presenter):
   
   def set_sensitive(self, sensitive):
     self._widget.set_sensitive(sensitive)
+
+    super().set_sensitive(sensitive)
   
   def get_visible(self):
     return self._widget.get_visible()
   
   def set_visible(self, visible):
     self._widget.set_visible(visible)
+
+    super().set_visible(visible)
   
   def _connect_value_changed_event(self):
     self._event_handler_id = self._widget.connect(

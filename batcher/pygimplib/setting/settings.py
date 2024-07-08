@@ -127,6 +127,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   * ``'after-save'``:
     invoked after saving a setting via `Setting.save()` or `Group.save()` if
     the setting is within a group.
+
+  * ``'gui-visible-changed'``: invoked after `Setting.gui.set_visible()` is
+    called.
+
+  * ``'gui-sensitive-changed'``: invoked after `Setting.gui.set_sensitive()` is
+    called.
   
   If a setting subclass supports "empty" values, such values will not be
   considered invalid when used as default values. However, empty values will be
