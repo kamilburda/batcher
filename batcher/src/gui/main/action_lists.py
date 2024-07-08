@@ -190,9 +190,6 @@ def _on_insert_background_foreground_procedure_item_added(procedure_list, item, 
   if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
     procedure_list.reorder_item(item, 0)
 
-    item.action['arguments/last_enabled_value_for_merge'].gui.set_visible(False)
-    item.action['arguments/last_enabled_value_for_constraint'].gui.set_visible(False)
-
     merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
 
     constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
@@ -200,7 +197,6 @@ def _on_insert_background_foreground_procedure_item_added(procedure_list, item, 
     item.action['enabled'].connect_event(
       'value-changed',
       _on_insert_background_foreground_procedure_enabled_changed,
-      item,
       merge_item,
       constraint_item,
     )
@@ -235,6 +231,8 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
 
   _set_buttons_for_action_item_sensitive(merge_item, False)
 
+  merge_item.action['arguments/last_enabled_value'].gui.set_visible(False)
+
   return merge_item
 
 
@@ -259,28 +257,27 @@ def _add_not_background_foreground_constraint(item, constraint_list):
 
   _set_buttons_for_action_item_sensitive(constraint_item, False)
 
+  constraint_item.action['arguments/last_enabled_value'].gui.set_visible(False)
+
   return constraint_item
 
 
 def _on_insert_background_foreground_procedure_enabled_changed(
       enabled_setting,
-      insert_back_foreground_item,
       merge_item,
       constraint_item,
 ):
   if not enabled_setting.value:
-    insert_back_foreground_item.action['arguments/last_enabled_value_for_merge'].set_value(
-      merge_item.action['enabled'].value)
+    merge_item.action['arguments/last_enabled_value'].set_value(merge_item.action['enabled'].value)
     merge_item.action['enabled'].set_value(False)
 
-    insert_back_foreground_item.action['arguments/last_enabled_value_for_constraint'].set_value(
+    constraint_item.action['arguments/last_enabled_value'].set_value(
       constraint_item.action['enabled'].value)
     constraint_item.action['enabled'].set_value(False)
   else:
-    merge_item.action['enabled'].set_value(
-      insert_back_foreground_item.action['arguments/last_enabled_value_for_merge'].value)
+    merge_item.action['enabled'].set_value(merge_item.action['arguments/last_enabled_value'].value)
     constraint_item.action['enabled'].set_value(
-      insert_back_foreground_item.action['arguments/last_enabled_value_for_constraint'].value)
+      constraint_item.action['arguments/last_enabled_value'].value)
 
   merge_item.action['enabled'].gui.set_sensitive(enabled_setting.value)
   constraint_item.action['enabled'].gui.set_sensitive(enabled_setting.value)

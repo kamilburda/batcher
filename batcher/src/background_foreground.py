@@ -117,7 +117,7 @@ def _copy_layer(layer, add_alpha=True):
   return layer_copy
 
 
-def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
+def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
   _merge_tagged_layer(
     batcher,
     merge_type,
@@ -125,7 +125,7 @@ def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
     'current_item')
 
 
-def merge_foreground(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY):
+def merge_foreground(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
   _merge_tagged_layer(
     batcher,
     merge_type,

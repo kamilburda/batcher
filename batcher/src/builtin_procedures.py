@@ -241,18 +241,6 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.BLUE,
       },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value_for_merge',
-        'default_value': True,
-        'gui_type': None,
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value_for_constraint',
-        'default_value': True,
-        'gui_type': None,
-      },
     ],
   },
   {
@@ -267,18 +255,6 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'color_tag',
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value_for_merge',
-        'default_value': True,
-        'gui_type': None,
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value_for_constraint',
-        'default_value': True,
-        'gui_type': None,
       },
     ],
   },
@@ -296,6 +272,12 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
         'display_name': _('Merge type'),
       },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
+        'gui_type': None,
+      },
     ],
   },
   {
@@ -311,6 +293,12 @@ _BUILTIN_PROCEDURES_LIST = [
         'enum_type': Gimp.MergeType,
         'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
         'display_name': _('Merge type'),
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
+        'gui_type': None,
       },
     ],
   },

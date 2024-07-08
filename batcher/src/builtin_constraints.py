@@ -52,7 +52,7 @@ def is_visible(item):
   return item.raw.get_visible()
 
 
-def has_color_tag(item, tag):
+def has_color_tag(item, tag, *_args, **_kwargs):
   return item.raw.get_color_tag() == tag
 
 
@@ -68,7 +68,7 @@ def has_color_tags(item, tags=None):
       return item_color_tag != Gimp.ColorTag.NONE
 
 
-def has_no_color_tag(item, tag):
+def has_no_color_tag(item, tag, *_args, **_kwargs):
   return not has_color_tag(item, tag)
 
 
@@ -107,6 +107,12 @@ _BUILTIN_CONSTRAINTS_LIST = [
         'default_value': Gimp.ColorTag.BLUE,
         'gui_type': None,
       },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
+        'gui_type': None,
+      },
     ],
   },
   {
@@ -123,6 +129,12 @@ _BUILTIN_CONSTRAINTS_LIST = [
         'name': 'color_tag',
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
+        'gui_type': None,
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
         'gui_type': None,
       },
     ],
