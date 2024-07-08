@@ -53,6 +53,12 @@ class ActionLists:
 
     self._init_setting_gui()
 
+    self._procedure_list.connect(
+      'action-list-item-added-interactive',
+      _on_insert_background_foreground_procedure_item_added,
+      self._constraint_list,
+    )
+
   def _init_gui(self):
     self._label_procedures = Gtk.Label(
       label='<b>{}</b>'.format(_('Procedures')),
@@ -82,12 +88,6 @@ class ActionLists:
     )
     self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
     self._vbox_constraints.pack_start(self._constraint_list, True, True, 0)
-
-    self._procedure_list.connect(
-      'action-list-item-added-interactive',
-      _on_insert_background_foreground_procedure_item_added,
-      self._constraint_list,
-    )
 
   def _init_setting_gui(self):
     self._settings['gui/procedure_browser/paned_position'].set_gui(
