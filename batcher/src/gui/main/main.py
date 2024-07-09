@@ -36,9 +36,10 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, initial_layer_tree, settings, mode, run_gui_func=None):
+  def __init__(self, initial_layer_tree, settings, source_name, mode, run_gui_func=None):
     self._initial_layer_tree = initial_layer_tree
     self._settings = settings
+    self._source_name = source_name
 
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
@@ -161,6 +162,7 @@ class BatchLayerProcessingGui:
 
     self._settings_manager = settings_manager_.SettingsManager(
       self._settings,
+      self._source_name,
       self._dialog,
       previews_controller=self._previews.controller,
       display_message_func=self._display_inline_message,

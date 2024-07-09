@@ -6,6 +6,7 @@ import pygimplib as pg
 
 from src import utils as utils_
 from src import version as version_
+from src.setting_source_names import *
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
 
@@ -14,6 +15,7 @@ def load_and_update(
       settings: pg.setting.Group,
       sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
       update_sources: bool = True,
+      source_name: Optional[str] = None,
 ) -> Tuple[int, str]:
   """Loads and updates settings and setting sources to the latest version of the
   plug-in.
@@ -37,6 +39,10 @@ def load_and_update(
 
   If ``update_sources`` is ``True``, the contents of ``sources`` are updated
   (overwritten), otherwise they are kept intact.
+
+  Some parts of the update may be skipped if the parts can only be applied to
+  the setting sources whose name match ``source_name``. If ``source_name`` is
+  ``None``, all parts of the update apply.
   """
   def _handle_update(data):
     nonlocal current_version, previous_version
@@ -54,12 +60,15 @@ def load_and_update(
 
     for version_str, update_handler in _UPDATE_HANDLERS.items():
       if previous_version < version_.Version.parse(version_str) <= current_version:
-        update_handler(data, settings)
+        update_handler(data, settings, source_name)
 
     return data
 
   if sources is None:
     sources = pg.setting.Persistor.get_default_setting_sources()
+
+  if source_name is None:
+    source_name = SOURCE_NAMES
 
   if _is_fresh_start(sources):
     if update_sources:
@@ -173,7 +182,10 @@ def _remove_setting(group_list, setting_name):
     del group_list[index]
 
 
-def _update_to_0_3(data, settings):
+def _update_to_0_3(data, settings, source_name):
+  if source_name != EXPORT_LAYERS_SOURCE_NAME:
+    return
+
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
@@ -269,7 +281,10 @@ def _update_actions_to_0_3(main_settings_list, action_type):
         more_options_list.append(also_apply_to_parent_folders_dict)
 
 
-def _update_to_0_4(data, _settings):
+def _update_to_0_4(data, _settings, source_name):
+  if source_name != EXPORT_LAYERS_SOURCE_NAME:
+    return
+
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:

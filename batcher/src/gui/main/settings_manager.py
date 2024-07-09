@@ -30,11 +30,13 @@ class SettingsManager:
   def __init__(
         self,
         settings,
+        source_name,
         dialog,
         previews_controller=None,
         display_message_func=None,
   ):
     self._settings = settings
+    self._source_name = source_name
     self._dialog = dialog
     self._previews_controller = previews_controller
     self._display_message_func = (
@@ -233,6 +235,7 @@ class SettingsManager:
       self._settings,
       sources={'persistent': source},
       update_sources=False,
+      source_name=self._source_name,
     )
 
     for setting in size_settings_to_ignore_for_load:
