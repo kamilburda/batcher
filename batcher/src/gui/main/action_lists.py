@@ -184,6 +184,7 @@ class ActionLists:
       _set_up_existing_insert_back_foreground_and_related_actions(
         self._procedure_list, self._constraint_list)
 
+      # This allows setting up the actions again when loading again.
       self._procedures_or_constraints_loaded = False
 
     self._procedures_or_constraints_loaded = True

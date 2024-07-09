@@ -298,7 +298,7 @@ class ActionEditorWidget:
     self._attach_widget_to_grid(setting, row_index)
 
   def _attach_label_to_grid(self, setting, row_index):
-    if self._pdb_procedure is not None:
+    if self._pdb_argument_names_and_blurbs is not None:
       argument_description = self._pdb_argument_names_and_blurbs[setting.name]
     else:
       argument_description = setting.display_name
@@ -356,12 +356,11 @@ class ActionEditorWidget:
 
       previous_settings.insert(0, setting_in_arguments)
 
-    last_visible_previous_setting = None
-
-    for previous_setting in previous_settings:
-      if previous_setting in self._action_argument_indexes_in_grid:
-        last_visible_previous_setting = previous_setting
-        break
+    last_visible_previous_setting = next(
+      iter(
+        previous_setting for previous_setting in previous_settings
+        if previous_setting in self._action_argument_indexes_in_grid),
+      None)
 
     if last_visible_previous_setting is not None:
       row_index = self._action_argument_indexes_in_grid[last_visible_previous_setting] + 1
@@ -373,12 +372,14 @@ class ActionEditorWidget:
 
     if last_visible_previous_setting is not None:
       new_action_argument_indexes_in_grid = {}
+
       for setting_in_grid, row_index in self._action_argument_indexes_in_grid.items():
         new_action_argument_indexes_in_grid[setting_in_grid] = row_index
 
         if setting_in_grid == last_visible_previous_setting:
           # The row indexes will be refreshed anyway, so any value is OK at this point.
           new_action_argument_indexes_in_grid[setting] = 0
+
       self._action_argument_indexes_in_grid = new_action_argument_indexes_in_grid
     else:
       self._action_argument_indexes_in_grid = dict(
