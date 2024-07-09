@@ -213,6 +213,8 @@ def _on_insert_background_foreground_procedure_item_added(procedure_list, item, 
 
     constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
 
+    _hide_internal_arguments_for_insert_background_foreground_procedure(item)
+
     _set_up_insert_background_foreground_procedure(
       item, merge_item, constraint_item, procedure_list, constraint_list)
     _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
@@ -245,6 +247,8 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
       else:
         constraint_item = None
 
+      _hide_internal_arguments_for_insert_background_foreground_procedure(item)
+
       if merge_item is not None:
         _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
 
@@ -256,6 +260,11 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
           item, merge_item, constraint_item, procedure_list, constraint_list)
 
 
+def _hide_internal_arguments_for_insert_background_foreground_procedure(item):
+  item.action['arguments/merge_procedure_name'].gui.set_visible(False)
+  item.action['arguments/constraint_name'].gui.set_visible(False)
+
+
 def _set_up_insert_background_foreground_procedure(
       item,
       merge_item,
@@ -263,9 +272,6 @@ def _set_up_insert_background_foreground_procedure(
       procedure_list: action_list_.ActionList,
       constraint_list: action_list_.ActionList,
 ):
-  item.action['arguments/merge_procedure_name'].gui.set_visible(False)
-  item.action['arguments/constraint_name'].gui.set_visible(False)
-
   item.action['enabled'].connect_event(
     'value-changed',
     _on_insert_background_foreground_procedure_enabled_changed,
