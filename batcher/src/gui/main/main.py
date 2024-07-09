@@ -364,7 +364,7 @@ class BatchLayerProcessingQuickGui:
   _HBOX_HORIZONTAL_SPACING = 8
   _DIALOG_WIDTH = 500
 
-  def __init__(self, layer_tree, settings, mode):
+  def __init__(self, layer_tree, settings, _source_name, mode):
     self._layer_tree = layer_tree
     self._settings = settings
 
