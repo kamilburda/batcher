@@ -390,8 +390,9 @@ class ActionEditorWidget:
     self._grid_action_arguments.show_all()
 
   def _remove_action_argument_from_grid(self, setting):
-    row_index = self._action_argument_indexes_in_grid.pop(setting)
-    self._grid_action_arguments.remove_row(row_index)
+    row_index = self._action_argument_indexes_in_grid.pop(setting, None)
+    if row_index is not None:
+      self._grid_action_arguments.remove_row(row_index)
 
     self._refresh_action_argument_indexes_in_grid()
 

@@ -241,6 +241,18 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.BLUE,
       },
+      {
+        'type': 'string',
+        'name': 'merge_procedure_name',
+        'default_value': '',
+        'gui_type': None,
+      },
+      {
+        'type': 'string',
+        'name': 'constraint_name',
+        'default_value': '',
+        'gui_type': None,
+      },
     ],
   },
   {
@@ -255,6 +267,18 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'color_tag',
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
+      },
+      {
+        'type': 'string',
+        'name': 'merge_procedure_name',
+        'default_value': '',
+        'gui_type': None,
+      },
+      {
+        'type': 'string',
+        'name': 'constraint_name',
+        'default_value': '',
+        'gui_type': None,
       },
     ],
   },
