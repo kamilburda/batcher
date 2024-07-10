@@ -28,7 +28,7 @@ class TestUpdateHandlers(unittest.TestCase):
   def tearDown(self):
     pg.config.PLUGIN_VERSION = self.plugin_version
 
-  def test_update(self, *_mocks):
+  def test_update_export_layers(self, *_mocks):
     source = pg.setting.sources.JsonFileSource(
       'plug-in-batch-export-layers', os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_0-2.json'))
 
