@@ -283,50 +283,6 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   {
-    'name': 'merge_background',
-    'function': background_foreground.merge_background,
-    'display_name': _('Merge background'),
-    # This procedure is added/removed automatically alongside `insert_background`.
-    'additional_tags': [],
-    'arguments': [
-      {
-        'type': 'enum',
-        'name': 'merge_type',
-        'enum_type': Gimp.MergeType,
-        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
-        'display_name': _('Merge type'),
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value',
-        'default_value': True,
-        'gui_type': None,
-      },
-    ],
-  },
-  {
-    'name': 'merge_foreground',
-    'function': background_foreground.merge_foreground,
-    'display_name': _('Merge foreground'),
-    # This procedure is added/removed automatically alongside `insert_foreground`.
-    'additional_tags': [],
-    'arguments': [
-      {
-        'type': 'enum',
-        'name': 'merge_type',
-        'enum_type': Gimp.MergeType,
-        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
-        'display_name': _('Merge type'),
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value',
-        'default_value': True,
-        'gui_type': None,
-      },
-    ],
-  },
-  {
     'name': 'export',
     'function': export_.export,
     'display_name': _('Export'),
@@ -392,6 +348,50 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': False,
         'display_name': _('Preserve layer name after export'),
         'gui_type': 'check_button_no_text',
+      },
+    ],
+  },
+  {
+    'name': 'merge_background',
+    'function': background_foreground.merge_background,
+    'display_name': _('Merge background'),
+    # This procedure is added/removed automatically alongside `insert_background`.
+    'additional_tags': [],
+    'arguments': [
+      {
+        'type': 'enum',
+        'name': 'merge_type',
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'display_name': _('Merge type'),
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
+        'gui_type': None,
+      },
+    ],
+  },
+  {
+    'name': 'merge_foreground',
+    'function': background_foreground.merge_foreground,
+    'display_name': _('Merge foreground'),
+    # This procedure is added/removed automatically alongside `insert_foreground`.
+    'additional_tags': [],
+    'arguments': [
+      {
+        'type': 'enum',
+        'name': 'merge_type',
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'display_name': _('Merge type'),
+      },
+      {
+        'type': 'bool',
+        'name': 'last_enabled_value',
+        'default_value': True,
+        'gui_type': None,
       },
     ],
   },
