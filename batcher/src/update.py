@@ -1,11 +1,16 @@
 """Updating the plug-in to the latest version."""
 
+import copy
 from typing import Dict, List, Optional, Tuple, Union
 
 import pygimplib as pg
 
+from src import actions as actions_
+from src import builtin_constraints
+from src import builtin_procedures
 from src import utils as utils_
 from src import version as version_
+from src.path import uniquify
 from src.setting_source_names import *
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
@@ -294,9 +299,12 @@ def _update_to_0_4(data, _settings, source_name):
     _set_setting_attribute_value(main_settings_list, 'filename_pattern', 'type', 'name_pattern')
 
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
 
-    if procedures_list is None:
+    if procedures_list is None or constraints_list is None:
       return
+
+    _handle_background_foreground_actions(procedures_list, constraints_list)
 
     for procedure_dict in procedures_list:
       procedure_list = procedure_dict['settings']
@@ -322,6 +330,105 @@ def _update_to_0_4(data, _settings, source_name):
         procedure_dict['name'] = 'remove_folder_structure_for_export_layers'
         orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
         orig_name_setting_dict['value'] = 'remove_folder_structure_for_export_layers'
+
+
+def _handle_background_foreground_actions(procedures_list, constraints_list):
+  _remove_merge_background_foreground_procedures(procedures_list)
+
+  merge_procedure_mapping = {
+    'insert_background': 'merge_background',
+    'insert_foreground': 'merge_foreground',
+  }
+  procedure_names = {action_dict['name'] for action_dict in procedures_list}
+
+  constraint_mapping = {
+    'insert_background': 'not_background',
+    'insert_foreground': 'not_foreground',
+  }
+  constraint_names = {action_dict['name'] for action_dict in constraints_list}
+
+  for procedure_dict in procedures_list:
+    procedure_list = procedure_dict['settings']
+    orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+
+    arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+    if (orig_name_setting_dict['default_value'] in ['insert_background', 'insert_foreground']
+        and arguments_list is not None):
+      arguments_list.append(
+        {
+          'type': 'string',
+          'name': 'merge_procedure_name',
+          'default_value': '',
+          'gui_type': None,
+        })
+      arguments_list.append(
+        {
+          'type': 'string',
+          'name': 'constraint_name',
+          'default_value': '',
+          'gui_type': None,
+        })
+
+      merge_procedure_name = merge_procedure_mapping[orig_name_setting_dict['default_value']]
+      merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
+
+      merge_group_dict = _create_action_as_saved_dict(
+        copy.deepcopy(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name]))
+
+      procedure_list.append(merge_group_dict)
+
+      arguments_list[-2]['default_value'] = merge_procedure_name
+
+      constraint_name = constraint_mapping[orig_name_setting_dict['default_value']]
+      constraint_name = _uniquify_action_name(constraint_name, constraint_names)
+
+      constraint_group_dict = _create_action_as_saved_dict(
+        copy.deepcopy(builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name]))
+
+      constraints_list.append(constraint_group_dict)
+
+      arguments_list[-1]['default_value'] = constraint_name
+
+
+def _remove_merge_background_foreground_procedures(procedures_list):
+  merge_procedure_indexes = []
+  for index, procedure_dict in enumerate(procedures_list):
+    orig_name_setting_dict, _index = _get_child_setting(
+      procedure_dict['settings'], 'orig_name')
+    if orig_name_setting_dict['default_value'] in ['merge_background', 'merge_foreground']:
+      merge_procedure_indexes.append(index)
+
+  for index in reversed(merge_procedure_indexes):
+    procedures_list.pop(index)
+
+
+def _create_action_as_saved_dict(action_dict):
+  action = actions_.create_action(action_dict)
+
+  source = pg.setting.SimpleInMemorySource('')
+  source.write(action)
+
+  return source.data[0]
+
+
+def _uniquify_action_name(name, existing_names):
+  """Returns ``name`` modified to be unique, i.e. to not match the name of any
+  existing action in ``actions``.
+  """
+
+  def _generate_unique_action_name():
+    i = 2
+    while True:
+      yield f'_{i}'
+      i += 1
+
+  uniquified_name = (
+    uniquify.uniquify_string(name, existing_names, generator=_generate_unique_action_name()))
+
+  existing_names.add(uniquified_name)
+
+  return uniquified_name
 
 
 _UPDATE_HANDLERS = {
