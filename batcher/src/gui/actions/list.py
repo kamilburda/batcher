@@ -325,8 +325,7 @@ class ActionList(pg.gui.ItemBox):
     if action_dict.get('menu_path') is None:
       current_parent_menu = self._actions_menu
     else:
-      parent_names = tuple(
-        action_dict['menu_path'].split(pg.MENU_PATH_SEPARATOR))
+      parent_names = tuple(action_dict['menu_path'].split(pg.MENU_PATH_SEPARATOR))
 
       current_parent_menu = self._actions_menu
       for i in range(len(parent_names)):
@@ -337,11 +336,9 @@ class ActionList(pg.gui.ItemBox):
             label=current_names[-1], use_underline=False)
           self._builtin_actions_submenus[current_names].set_submenu(Gtk.Menu())
 
-          current_parent_menu.append(
-            self._builtin_actions_submenus[current_names])
+          current_parent_menu.append(self._builtin_actions_submenus[current_names])
 
-        current_parent_menu = self._builtin_actions_submenus[
-          current_names].get_submenu()
+        current_parent_menu = self._builtin_actions_submenus[current_names].get_submenu()
 
     menu_item = Gtk.MenuItem(label=action_dict['display_name'], use_underline=False)
     menu_item.connect('activate', self._on_actions_menu_item_activate, action_dict)
