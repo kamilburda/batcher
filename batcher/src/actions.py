@@ -58,6 +58,7 @@ containing actions. These events include:
 * ``'after-clear-actions'``: invoked when calling `clear()` after clearing
   actions.
 """
+import copy
 import inspect
 from typing import Any, Dict, List, Optional, Union
 
@@ -252,7 +253,7 @@ def add(
   action = None
 
   if isinstance(action_dict_or_pdb_proc_name_or_action, dict):
-    action_dict = dict(action_dict_or_pdb_proc_name_or_action)
+    action_dict = copy.deepcopy(action_dict_or_pdb_proc_name_or_action)
   elif isinstance(action_dict_or_pdb_proc_name_or_action, pg.setting.Group):
     action = action_dict_or_pdb_proc_name_or_action
   else:
@@ -265,7 +266,7 @@ def add(
   if action_dict is not None:
     _check_required_fields(action_dict)
 
-    orig_action_dict = dict(action_dict)
+    orig_action_dict = copy.deepcopy(action_dict)
 
     actions.invoke_event('before-add-action', action_dict)
 
