@@ -10,7 +10,6 @@ from ...setting import sources as sources_
 
 from .. import stubs_gimp
 from . import stubs_group
-from . import stubs_sources
 
 
 def _test_settings_for_read_write():
@@ -200,7 +199,7 @@ class TestSourceRead(unittest.TestCase):
 
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = stubs_sources.StubSource(self.source_name)
+    self.source = sources_.SimpleInMemorySource(self.source_name)
     
     self.settings = _test_settings_for_read_write()
     
@@ -613,7 +612,7 @@ class TestSourceWrite(unittest.TestCase):
   
   def setUp(self):
     self.source_name = 'test_settings'
-    self.source = stubs_sources.StubSource(self.source_name)
+    self.source = sources_.SimpleInMemorySource(self.source_name)
     
     self.settings = _test_settings_for_read_write()
     

@@ -11,7 +11,6 @@ from ...setting import sources as sources_
 from .. import stubs_gimp
 from . import stubs_group
 from . import stubs_setting
-from . import stubs_sources
 
 
 @mock.patch(
@@ -32,7 +31,7 @@ class TestPersistor(unittest.TestCase):
     mock_gimp_module.directory.return_value = 'gimp_directory'
 
     self.settings = stubs_group.create_test_settings()
-    self.source = stubs_sources.StubSource('plug-in')
+    self.source = sources_.SimpleInMemorySource('plug-in')
     self.source_2 = sources_.GimpParasiteSource('plug-in-2')
     
     self.sources_for_persistor = {
@@ -71,7 +70,7 @@ class TestPersistor(unittest.TestCase):
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_as_dict_of_lists(self, *mocks):
-    another_source = stubs_sources.StubSource('plug-in-another')
+    another_source = sources_.SimpleInMemorySource('plug-in-another')
     
     self._spy_on_source(self.source)
     self._spy_on_source(self.source_2)
@@ -93,7 +92,7 @@ class TestPersistor(unittest.TestCase):
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_dict(self, *mocks):
-    another_source = stubs_sources.StubSource('plug-in-another')
+    another_source = sources_.SimpleInMemorySource('plug-in-another')
     
     self._spy_on_source(self.source)
     self._spy_on_source(self.source_2)
@@ -112,7 +111,7 @@ class TestPersistor(unittest.TestCase):
 
   # noinspection PyUnresolvedReferences
   def test_load_save_with_default_sources_and_dict_of_lists(self, *mocks):
-    another_source = stubs_sources.StubSource('plug-in-another')
+    another_source = sources_.SimpleInMemorySource('plug-in-another')
     
     self._spy_on_source(self.source)
     self._spy_on_source(self.source_2)
@@ -374,7 +373,7 @@ class TestLoadSaveFromSettingsAndGroups(unittest.TestCase):
 
     self.settings = stubs_group.create_test_settings_for_persistor()
 
-    self.source = stubs_sources.StubSource('plug-in')
+    self.source = sources_.SimpleInMemorySource('plug-in')
     self.source_2 = sources_.GimpParasiteSource('plug-in-2')
     self.sources_for_persistor = {
       'persistent': self.source,

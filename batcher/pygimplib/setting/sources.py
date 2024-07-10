@@ -24,6 +24,7 @@ __all__ = [
   'Source',
   'GimpParasiteSource',
   'JsonFileSource',
+  'SimpleInMemorySource',
 ]
 
 
@@ -689,3 +690,32 @@ class JsonFileSource(Source):
         json.dump(all_data, f, indent=4)
     except Exception as e:
       raise SourceWriteError from e
+
+
+class SimpleInMemorySource(Source):
+  """Class reading and writing settings to the memory.
+
+  This is useful in case you need to access and manipulate settings in their
+  persisted form (nested lists and dictionaries representing settings and
+  groups).
+
+  Note, however, that this class ignores the `name` attribute and completely
+  overwrites the stored data on `read()` or `write()`.
+  """
+
+  def __init__(self, name: Optional[str] = None):
+    super().__init__(name if name is not None else '')
+
+    self.data = []
+
+  def clear(self):
+    self.data = []
+
+  def has_data(self):
+    return bool(self.data)
+
+  def read_data_from_source(self):
+    return self.data
+
+  def write_data_to_source(self, data):
+    self.data = data

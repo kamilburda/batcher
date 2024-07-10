@@ -3,7 +3,6 @@ import unittest.mock as mock
 
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
-from pygimplib.tests.setting import stubs_sources
 
 from src import update
 
@@ -65,7 +64,7 @@ class TestUpdate(unittest.TestCase):
       },
     ])
 
-    self.source = stubs_sources.StubSource('test_settings')
+    self.source = pg.setting.SimpleInMemorySource('test_settings')
 
     self.source.data = [
       {
