@@ -1,6 +1,7 @@
 """Plug-in settings."""
 
 import collections
+import copy
 
 from gi.repository import GLib
 
@@ -136,7 +137,7 @@ def create_settings_for_export_layers():
       initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
   ])
 
-  visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
+  visible_constraint_dict = copy.deepcopy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
   
   settings['main'].add([
@@ -231,7 +232,7 @@ def create_settings_for_edit_layers():
 
   settings.add([gui_settings])
 
-  rename_procedure_dict = dict(builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_layers'])
+  rename_procedure_dict = copy.deepcopy(builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_layers'])
   rename_procedure_dict['enabled'] = False
   rename_procedure_dict['display_options_on_create'] = False
   rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'
@@ -242,7 +243,7 @@ def create_settings_for_edit_layers():
       initial_actions=[rename_procedure_dict]),
   ])
 
-  visible_constraint_dict = dict(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
+  visible_constraint_dict = copy.deepcopy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
 
   settings['main'].add([
