@@ -348,6 +348,9 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
   }
   constraint_names = {action_dict['name'] for action_dict in constraints_list}
 
+  merge_group_dicts = []
+  constraint_group_dicts = []
+
   for procedure_dict in procedures_list:
     procedure_list = procedure_dict['settings']
     orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
@@ -360,36 +363,42 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
         {
           'type': 'string',
           'name': 'merge_procedure_name',
-          'default_value': '',
           'gui_type': None,
         })
       arguments_list.append(
         {
           'type': 'string',
           'name': 'constraint_name',
-          'default_value': '',
           'gui_type': None,
         })
 
       merge_procedure_name = merge_procedure_mapping[orig_name_setting_dict['default_value']]
-      merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
-
       merge_group_dict = _create_action_as_saved_dict(
         builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
 
-      procedure_list.append(merge_group_dict)
+      unique_merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
+      merge_group_dict['name'] = unique_merge_procedure_name
+      arguments_list[-2]['default_value'] = unique_merge_procedure_name
+      arguments_list[-2]['value'] = unique_merge_procedure_name
 
-      arguments_list[-2]['default_value'] = merge_procedure_name
+      merge_group_dicts.append(merge_group_dict)
 
       constraint_name = constraint_mapping[orig_name_setting_dict['default_value']]
-      constraint_name = _uniquify_action_name(constraint_name, constraint_names)
-
       constraint_group_dict = _create_action_as_saved_dict(
         builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
 
-      constraints_list.append(constraint_group_dict)
+      unique_constraint_name = _uniquify_action_name(constraint_name, constraint_names)
+      constraint_group_dict['name'] = unique_constraint_name
+      arguments_list[-1]['default_value'] = unique_constraint_name
+      arguments_list[-1]['value'] = unique_constraint_name
 
-      arguments_list[-1]['default_value'] = constraint_name
+      constraint_group_dicts.append(constraint_group_dict)
+
+  for merge_group_dict in merge_group_dicts:
+    procedures_list.append(merge_group_dict)
+
+  for constraint_group_dict in constraint_group_dicts:
+    constraints_list.append(constraint_group_dict)
 
 
 def _remove_merge_background_foreground_procedures(procedures_list):

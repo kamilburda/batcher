@@ -42,10 +42,10 @@ class TestUpdateHandlers(unittest.TestCase):
       update_sources=False,
     )
 
+    self.assertEqual(status, update.UPDATE)
+
     self._assert_correct_contents_for_update_to_0_3(orig_setting_values_for_0_2)
     self._assert_correct_contents_for_update_to_0_4()
-
-    self.assertEqual(status, update.UPDATE)
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -80,6 +80,40 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       self.settings['main/name_pattern'], setting_classes.NamePatternSetting)
+
+    self.assertIn('insert_background', self.settings['main/procedures'])
+    self.assertIn('color_tag', self.settings['main/procedures/insert_background/arguments'])
+    self.assertEqual(
+      self.settings['main/procedures/insert_background/arguments/merge_procedure_name'].value,
+      'merge_background')
+    self.assertEqual(
+      self.settings['main/procedures/insert_background/arguments/constraint_name'].value,
+      'not_background')
+    self.assertIn('merge_background', self.settings['main/procedures'])
+    self.assertIn('merge_type', self.settings['main/procedures/merge_background/arguments'])
+    self.assertTrue(
+      self.settings['main/procedures/merge_background/arguments/last_enabled_value'].value)
+    self.assertIn('not_background', self.settings['main/constraints'])
+    self.assertIn('color_tag', self.settings['main/constraints/not_background/arguments'])
+    self.assertTrue(
+      self.settings['main/constraints/not_background/arguments/last_enabled_value'].value)
+
+    self.assertIn('insert_background_2', self.settings['main/procedures'])
+    self.assertIn('color_tag', self.settings['main/procedures/insert_background_2/arguments'])
+    self.assertEqual(
+      self.settings['main/procedures/insert_background_2/arguments/merge_procedure_name'].value,
+      'merge_background_2')
+    self.assertEqual(
+      self.settings['main/procedures/insert_background_2/arguments/constraint_name'].value,
+      'not_background_2')
+    self.assertIn('merge_background_2', self.settings['main/procedures'])
+    self.assertIn('merge_type', self.settings['main/procedures/merge_background_2/arguments'])
+    self.assertTrue(
+      self.settings['main/procedures/merge_background_2/arguments/last_enabled_value'].value)
+    self.assertIn('not_background_2', self.settings['main/constraints'])
+    self.assertIn('color_tag', self.settings['main/constraints/not_background_2/arguments'])
+    self.assertTrue(
+      self.settings['main/constraints/not_background_2/arguments/last_enabled_value'].value)
 
     self.assertIn('export', self.settings['main/procedures'])
     self.assertNotIn(
