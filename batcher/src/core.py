@@ -72,11 +72,11 @@ class Batcher:
   @_set_attributes_on_init
   def __init__(
         self,
-        initial_run_mode: Gimp.RunMode,
         input_image: Gimp.Image,
         procedures: pg.setting.Group,
         constraints: pg.setting.Group,
         edit_mode: bool = False,
+        initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
         output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         name_pattern: str = '',
         file_extension: str = 'png',
@@ -112,17 +112,17 @@ class Batcher:
     self._initial_invoker = invoker_.Invoker()
   
   @property
-  def initial_run_mode(self) -> Gimp.RunMode:
-    """The run mode to use for the first layer.
-    
-    For subsequent layers, `Gimp.RunMode.WITH_LAST_VALS` is used.
-    This usually has effect when saving images - if ``initial_run_mode`` is
-    `Gimp.RunMode.INTERACTIVE`, a native file format GUI is displayed for the
-    first layer and the same settings are then applied to subsequent layers.
-    If the file format in which the layer is exported to cannot handle
-    `Gimp.RunMode.WITH_LAST_VALS`, `Gimp.RunMode.INTERACTIVE` is forced.
+  def initial_export_run_mode(self) -> Gimp.RunMode:
+    """The run mode to use for the first layer when exporting.
+
+    If ``initial_export_run_mode`` is `Gimp.RunMode.INTERACTIVE`, a native
+    file format GUI is displayed for the first layer. For subsequent layers,
+    the same settings are applied and `Gimp.RunMode.WITH_LAST_VALS` is used.
+
+    If the file format cannot handle `Gimp.RunMode.WITH_LAST_VALS`,
+    `Gimp.RunMode.INTERACTIVE` is forced for each layer.
     """
-    return self._initial_run_mode
+    return self._initial_export_run_mode
   
   @property
   def input_image(self) -> Gimp.Image:

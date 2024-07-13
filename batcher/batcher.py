@@ -227,10 +227,10 @@ def _run_interactive(
 
 def _run_plugin_noninteractive(settings, run_mode, layer_tree, mode):
   batcher = core.Batcher(
-    run_mode,
     layer_tree.image,
     settings['main/procedures'],
     settings['main/constraints'],
+    initial_export_run_mode=run_mode,
     edit_mode=mode == 'edit',
   )
 

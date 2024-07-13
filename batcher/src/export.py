@@ -398,7 +398,7 @@ def _get_run_mode(batcher, file_extension, file_extension_properties):
   if file_extension_property.is_valid and file_extension_property.processed_count > 0:
     return Gimp.RunMode.WITH_LAST_VALS
   else:
-    return batcher.initial_run_mode
+    return batcher.initial_export_run_mode
 
 
 def _export_item_once(

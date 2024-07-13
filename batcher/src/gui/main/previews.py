@@ -54,11 +54,11 @@ class Previews:
       overwrite_chooser = None
 
     self._batcher_for_previews = core.Batcher(
-      Gimp.RunMode.NONINTERACTIVE,
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
+      initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser,
       item_tree=self._initial_layer_tree)
 

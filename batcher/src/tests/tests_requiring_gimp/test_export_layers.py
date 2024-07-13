@@ -180,10 +180,10 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       additional_init_before_run(self.test_image)
     
     batcher = core.Batcher(
-      Gimp.RunMode.NONINTERACTIVE,
       self.test_image,
       settings['main/procedures'],
       settings['main/constraints'],
+      initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))

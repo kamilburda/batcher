@@ -32,10 +32,10 @@ class TestBatcherInitialActions(unittest.TestCase):
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.Batcher(
-      Gimp.RunMode.NONINTERACTIVE,
       self.image,
       settings['main/procedures'],
       settings['main/constraints'],
+      initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
     actions_.add(
@@ -73,10 +73,10 @@ class TestAddActionFromSettings(unittest.TestCase):
   
   def setUp(self):
     self.batcher = core.Batcher(
-      initial_run_mode=Gimp.RunMode.INTERACTIVE,
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
+      initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())
     
@@ -151,10 +151,10 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
   
   def test_get_replaced_args(self):
     batcher = core.Batcher(
-      initial_run_mode=Gimp.RunMode.INTERACTIVE,
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
+      initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())
     

@@ -110,11 +110,11 @@ class BatcherManager:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     batcher = core.Batcher(
-      Gimp.RunMode.INTERACTIVE,
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=mode == 'edit',
+      initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
       export_context_manager=_handle_gui_in_export,
@@ -154,11 +154,11 @@ class BatcherManagerQuick:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     self._batcher = core.Batcher(
-      Gimp.RunMode.WITH_LAST_VALS,
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=mode == 'edit',
+      initial_export_run_mode=Gimp.RunMode.WITH_LAST_VALS,
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
       export_context_manager=_handle_gui_in_export,
