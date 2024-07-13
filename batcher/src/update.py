@@ -1,6 +1,5 @@
 """Updating the plug-in to the latest version."""
 
-import copy
 from typing import Dict, List, Optional, Tuple, Union
 
 import pygimplib as pg
@@ -376,7 +375,7 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
 
       merge_group_dict = _create_action_as_saved_dict(
-        copy.deepcopy(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name]))
+        builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
 
       procedure_list.append(merge_group_dict)
 
@@ -386,7 +385,7 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       constraint_name = _uniquify_action_name(constraint_name, constraint_names)
 
       constraint_group_dict = _create_action_as_saved_dict(
-        copy.deepcopy(builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name]))
+        builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
 
       constraints_list.append(constraint_group_dict)
 

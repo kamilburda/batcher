@@ -213,7 +213,7 @@ class TestManageActions(unittest.TestCase):
     self.procedures.connect_event('before-add-action', on_before_add_action)
     
     actions_.add(self.procedures, self.autocrop_dict)
-    
+
     self.assertIs(invoked_event_args[0][0], self.procedures)
     self.assertDictEqual(invoked_event_args[0][1], self.expected_dict)
     self.assertIsNot(invoked_event_args[0][1], self.autocrop_dict)
@@ -239,7 +239,7 @@ class TestManageActions(unittest.TestCase):
       
       self.assertIs(invoked_event_args[-1][0], self.procedures)
       self.assertIs(invoked_event_args[-1][1], action)
-      self.assertDictEqual(invoked_event_args[-1][2], self.autocrop_dict)
+      self.assertDictEqual(invoked_event_args[-1][2], self.expected_dict)
       self.assertIsNot(invoked_event_args[-1][2], self.autocrop_dict)
   
   def test_add_modifying_added_action_modifies_nothing_else(self, mock_get_pdb):

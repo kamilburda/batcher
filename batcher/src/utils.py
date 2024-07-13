@@ -1,5 +1,6 @@
 """Utility functions used in other modules."""
 
+import collections
 from typing import Any, Dict
 
 import pygimplib as pg
@@ -76,3 +77,41 @@ def get_messages_from_persistor_statuses(
       messages[source] = ''
 
   return messages
+
+
+def semi_deep_copy(object_):
+  """Returns a copy of the input object, recursively copying built-in Python
+  container types and primitive types and their subclasses, but leaving all
+  other objects intact.
+
+  The container types in question are dict, list, tuple, set and frozenset.
+
+  Be warned that circular references are not checked for.
+  """
+  if isinstance(object_, (list, tuple, set, frozenset)):
+    copied_children = []
+    for item in object_:
+      copied_children.append(semi_deep_copy(item))
+
+    return type(object_)(copied_children)
+  elif isinstance(object_, collections.defaultdict):
+    return _copy_dict(object_, collections.defaultdict(object_.default_factory))
+  elif isinstance(object_, dict):
+    return _copy_dict(object_)
+  else:
+    return object_
+
+
+def _copy_dict(dict_, initial_object=None):
+  if initial_object is None:
+    copied_children = {}
+  else:
+    copied_children = initial_object
+
+  for key, value in dict_.items():
+    key_copy = semi_deep_copy(key)
+    value_copy = semi_deep_copy(value)
+
+    copied_children[key_copy] = value_copy
+
+  return copied_children

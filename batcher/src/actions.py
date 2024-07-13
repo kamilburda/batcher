@@ -58,7 +58,6 @@ containing actions. These events include:
 * ``'after-clear-actions'``: invoked when calling `clear()` after clearing
   actions.
 """
-import copy
 import inspect
 from typing import Any, Dict, List, Optional, Union
 
@@ -71,6 +70,7 @@ import pygimplib as pg
 from pygimplib.pypdb import pdb
 
 from src import placeholders
+from src import utils
 from src.path import uniquify
 
 
@@ -253,7 +253,7 @@ def add(
   action = None
 
   if isinstance(action_dict_or_pdb_proc_name_or_action, dict):
-    action_dict = copy.deepcopy(action_dict_or_pdb_proc_name_or_action)
+    action_dict = utils.semi_deep_copy(action_dict_or_pdb_proc_name_or_action)
   elif isinstance(action_dict_or_pdb_proc_name_or_action, pg.setting.Group):
     action = action_dict_or_pdb_proc_name_or_action
   else:
@@ -266,15 +266,15 @@ def add(
   if action_dict is not None:
     _check_required_fields(action_dict)
 
-    orig_action_dict = copy.deepcopy(action_dict)
-
-    actions.invoke_event('before-add-action', action_dict)
-
     action_dict['orig_name'] = action_dict['name']
+
+    orig_action_dict = utils.semi_deep_copy(action_dict)
+
+    actions.invoke_event('before-add-action', orig_action_dict)
 
     _uniquify_name_and_display_name(actions, action_dict)
 
-    action = create_action(action_dict)
+    action = _create_action_without_copying(action_dict)
 
     actions.add([action])
 
@@ -359,14 +359,18 @@ def create_action(action_dict):
   An action created by this function is not added to a group of actions. Use
   `add()` to add an existing action to an existing action group.
   """
-  action_dict_copy = dict(action_dict)
+  action_dict_copy = utils.semi_deep_copy(action_dict)
 
-  type_ = action_dict_copy.pop('type', _DEFAULT_ACTION_TYPE)
-  
+  return _create_action_without_copying(action_dict_copy)
+
+
+def _create_action_without_copying(action_dict):
+  type_ = action_dict.pop('type', _DEFAULT_ACTION_TYPE)
+
   if type_ not in _ACTION_TYPES_AND_FUNCTIONS:
     raise ValueError(f'invalid type "{type_}"; valid values: {list(_ACTION_TYPES_AND_FUNCTIONS)}')
-  
-  return _ACTION_TYPES_AND_FUNCTIONS[type_](**action_dict_copy)
+
+  return _ACTION_TYPES_AND_FUNCTIONS[type_](**action_dict)
 
 
 def _create_action(

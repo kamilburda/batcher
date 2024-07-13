@@ -1,4 +1,3 @@
-import copy
 from typing import Dict, List
 
 import gi
@@ -298,8 +297,7 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
   }
   merge_procedure_name = merge_procedure_orig_name_mapping[item.action['orig_name'].value]
 
-  merge_item = procedure_list.add_item(
-    copy.deepcopy(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name]))
+  merge_item = procedure_list.add_item(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
 
   export_procedure_index = next(
     iter(index for index, item in enumerate(procedure_list.items)
@@ -326,7 +324,7 @@ def _add_not_background_foreground_constraint(item, constraint_list):
   constraint_name = constraint_orig_name_mapping[item.action['orig_name'].value]
 
   constraint_item = constraint_list.add_item(
-    copy.deepcopy(builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name]))
+    builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
 
   return constraint_item
 
