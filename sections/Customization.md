@@ -24,14 +24,14 @@ Uncheck or remove the `Use layer size` procedure.
 
 **I want to export only visible layers.**
 
-Add the `Visible` constraint (`Add Constraint... → Visible`).
+Check the `Visible` constraint (or add one if not already via `Add Constraint... → Visible`).
 
 
-**I want to export only visible layers, including those that have invisible parent layer groups.**
+**I want to export only visible layers. However, I also want to exclude those that have invisible parent layer groups.**
 
-1. Add the `Visible` constraint.
+1. Check the `Visible` constraint (or add one if not already).
 2. Edit the `Visible` constraint (press the icon to the right of the constraint name).
-   In the dialog, click on `More options` and then uncheck `Also apply to parent folders`.
+   In the dialog, click on `More options` and then check `Also apply to parent folders`.
 
 
 **I don't want to preserve folder hierarchy when exporting layers.**
@@ -46,7 +46,7 @@ Click on the text entry next to `Save as` and choose `image001`, or type `image[
 
 **My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?**
 
-In the text entry next to `Save as`, type `[layer name, %e]`.
+In the text entry next to `Save as`, choose `Full layer name` or type `[layer name, %e]`.
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
@@ -69,9 +69,9 @@ Yes! You may insert any GIMP filter as a procedure:
 **I need every layer to have the same background.**
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
-2. In the plug-in, the color tag will now be displayed next to the layer name(s).
-3. Add the `Background, foreground → Insert background` procedure. If needed, you may place this procedure after `Use layer size` by dragging it onto `Use layer size`.
-4. If you want to edit layers rather than export them, you may want to merge the inserted background with each layer. To do so, add the `Merge background` procedure.
+2. Add the `Insert background` procedure and adjust the color tag as necessary.
+3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Use layer size` by dragging it onto `Use layer size`.
+4. (optional) You can adjust how the background is merged with each layer by setting the merge type in the `Merge background` procedure that was added automatically.
 
 
 **I want to save the entire image as a single multipage PDF file.**
@@ -89,14 +89,18 @@ While multipage PDF export is already possible in GIMP without any third-party p
 Also note that if you export top-level layer groups and the first layer group contains only a single layer, the `Layers as pages` option in the PDF dialog cannot be checked, even if subsequent layer groups contain multiple layers. This is the current behavior of the PDF export in GIMP.
 
 
-## Adjusting Filenames
+## Adjusting Layer Names (Filenames)
 
-There are several built-in *fields* that you can combine to form a filename pattern.
+There are several built-in *fields* that you can combine to form a name pattern.
 For example, `image[001]` renames the layers to `image001`, `image002` and so on.
-The text entry can show you examples of how each field is used if you place the text cursor inside a field.
 The fields are described below in detail.
 
-The preview automatically updates as you change the filename pattern and so can greatly help you figure out how your specified pattern affects the layer names.
+Press the Down button or click anywhere on the entry to display the list of available fields.
+The text entry can show you examples of how each field is used if you place the text cursor inside a field (e.g. inside `[001]`).
+
+The preview automatically updates as you change the name pattern and so can greatly help you figure out how your specified pattern affects the layer names.
+
+You can combine multiple fields if needed, for example `[layer name]-[001]`.
 
 Fields must be enclosed in square brackets and must have a correct number of options.
 Options must be separated by commas.
@@ -140,6 +144,10 @@ Examples:
 * `[layer name, %e]` for a layer named `Some.Layer.png` → `Some.Layer.png`
 * `[layer name, %i]` → `Frame.png` (if the file extension is `png`)
 * `[layer name, %i]` → `Frame` (if the file extension is `jpg`)
+
+**Full layer name**
+
+Equivalent to `[layer name, %e]`.
 
 **\[image name\]**
 
@@ -301,15 +309,16 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 Inserts layers tagged with a specific color tag as background for each layer.
 
-Note that even background layers are processed and exported.
-To prevent such behavior, add the `Without color tags` constraint.
-
 The _blue_ color tag is used as background by default.
 You may set a different color tag representing the background layers by adjusting the `Color tag` option.
 
-This procedure is always inserted at the first position.
+This procedure is inserted at the first position.
 This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
 If this is your intention, you can always move this procedure below `Use layer size`.
+
+The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
+
+By default, background layers themselves are excluded from editing/export as the `Not background` constraint is automatically added.
 
 **Insert foreground**
 
@@ -319,23 +328,25 @@ The _green_ color tag is used as foreground by default.
 
 For more information, see `Insert background` above.
 
-**Merge background**
+**Merge background** (only available if `Insert background` is added)
 
-Merges an already inserted background layer (via `Insert background`, see above) with the current layer.
+Merges already inserted background (via `Insert background`, see above) with the current layer.
 
-This is useful if you wish to have a single merged layer rather than the background as a separate layer.
+When exporting layers, the background is merged automatically.
+However, if needed, you can reorder this procedure to perform the merge earlier and then apply procedures on the current layer, now merged with the background.
 
-When exporting layers, the background is merged automatically before the export.
-Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
+For [Edit Layers](Usage.md#batch-editing-layers), this procedure ensures that you have a single merged layer rather than having the background as a separate layer.
+If this is not what you desire, you may uncheck this procedure.
 
 If there is no background layer inserted, this procedure has no effect.
 
-**Merge foreground**
+Options:
+* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
+
+
+**Merge foreground** (only available if `Insert foreground` is added)
 
 Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
-
-When exporting layers, the foreground is merged automatically before the export.
-Hence, this procedure is only useful when [editing layers](Usage.md#editing-layers).
 
 For more information, see `Merge background` above.
 
@@ -353,7 +364,7 @@ Options:
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   The text entry next to `Save as` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
 * *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
-  You very likely need to type `[layer name, %e]` in the text entry next to `Save as` to preserve file extensions in layer names.
+  You very likely need to choose `Full layer name` in the text entry next to `Save as` to preserve file extensions in layer names.
 * *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
 * *Preserve layer name after export*: If enabled, layer names will revert to the state before export (i.e. without adding a file extension to them).
   This is probably only ever useful if you want to perform export multiple times, e.g. with multiple different file formats (which is possible by adding multiple Export procedures).
@@ -365,13 +376,17 @@ When exporting each layer separately (the default), the Export procedure usually
 
 Exports all layers to the output folder on the same level, i.e. subfolders for layer groups are not created.
 
+Options:
+* (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
+
+
 **Rename**
 
 Renames layers according to the specified pattern.
-This procedure uses the same text entry as the one next to `Save as` described in [Adjusting Layer Names](#adjusting-filenames).
+This procedure uses the same text entry as the one next to `Save as`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
 If this procedure is added and enabled, the text entry next to `Save as` has no effect.
 
-Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`) or rename folders only (by checking `Rename folders` and unchecking `Rename layers`).
+Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename layer groups` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename layer groups` and unchecking `Rename layers`).
 
 **Scale**
 
@@ -390,7 +405,7 @@ Options:
 * *Use local origin*: If checked, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 
 
-**Use layer size**
+**Use layer size** (Export Layers only)
 
 If enabled, layers will be resized (not scaled) to their size instead of the image size.
 This procedure is enabled by default.
@@ -398,8 +413,6 @@ This procedure is enabled by default.
 To keep the size of the image canvas and the layer position within the image, disable this setting.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 To export the entire layer, leave this setting enabled.
-
-When [editing layers](Usage.md#editing-layers), you may want to disable this procedure as the image will be resized to the last processed layer's dimensions.
 
 
 ### Adding Custom Procedures
@@ -431,6 +444,14 @@ Processes only layers (i.e. layer groups are not processed).
 Processes only layer groups.
 
 You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
+
+**Not background** (only available if `Insert background` is added)
+
+Processes only layers that are not inserted as background via `Insert background`.
+
+**Not foreground** (only available if `Insert foreground` is added)
+
+Processes only layers that are not inserted as foreground via `Insert foreground`.
 
 **Matching file extension**
 
@@ -506,8 +527,9 @@ For example, if this option is checked for the `Visible` constraint, a visible l
 
 It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
 
-The `plug-in-batch-export-layers` procedure exports layers with the specified or last used (or saved) settings, depending on the value of the `run-mode` parameter.
+The `plug-in-batch-export-layers` procedure exports layers with the specified or the last used settings, depending on the value of the `run-mode` parameter.
+Likewise, `plug-in-batch-edit-layers` runs batch editing layers with the specified/last used settings.
 
-You can run `plug-in-batch-export-layers` with settings imported from a file (obtained via `Settings → Export Settings...` in the plug-in dialog) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
+You can also run `plug-in-batch-export-layers` or `plug-in-batch-edit-layers` with [settings imported from a file](Usage.md#managing-settings) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
 
-The `plug-in-batch-export-layers-quick` procedure exports layers instantly, always with the last used settings.
+The `plug-in-batch-export-layers-quick` and `plug-in-batch-edit-layers-quick` procedures perform export/editing with always the last used settings.

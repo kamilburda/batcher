@@ -24,7 +24,7 @@ Below you will find more information on adjusting the export settings.
 By default, layer names are used as filenames.
 The text entry next to `Save as` lets you customize the filenames.
 
-For details, see [Adjusting Filenames](Customization.md#adjusting-filenames).
+For details, see [Adjusting Filenames](Customization.md#adjusting-layer-names-filenames).
 
 
 ### Changing File Extension
@@ -50,26 +50,53 @@ You can take a look at a few [examples](Customization.md#examples) to get starte
 For details, see [Procedures](Customization.md#procedures) and [Constraints](Customization.md#constraints).
 
 
-## Exporting Layers Instantly
+## Quick Export of Layers
 
-You can perform the export in a single click by running `File → Export Layers (Quick)`.
-This can be useful if you made changes to your image and you want to export again with the same settings.
+If you need a simple export without customization, you can run `File → Export Layers (Quick)`.
+This can also be useful if you made changes to your image and you want to export again with the same settings.
+
+For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
+
+![Dialog of Export Layers (Quick)](../images/screenshot_dialog_export_layers_quick.png)
+
+This dialog can be skipped by simply unchecking `Show this dialog`.
 
 
-## Editing Layers
+## Quick Export of Selected Layers
 
-You can batch-edit layers without exporting them.
+When you select multiple layers in GIMP, you can right-click and select `Export Selected Layers` to quickly export the selected layers.
+
+In this case, any constraints set in the [main dialog](#exporting-layers) will be ignored.
+
+![Menu Entry for Export Selected Layers](../images/screenshot_menu_export_selected_layers.png)
+
+
+## Batch Editing Layers
+
+Open your image in GIMP and select `File → Edit Layers...`.
+
 This is where you leverage the power of [procedures](Customization.md#procedures) and [constraints](Customization.md#constraints).
+The procedures will be applied to each layer in the current image satisfying the chosen constraints.
 You can take a look at a few [examples](Customization.md#examples) to get started.
 
-To switch to layer editing mode, open your image in GIMP and select `File → Export Layers...`, then press the `Settings` button and select `Edit Layers`.
-The export settings are now hidden.
-
-![Dialog of Export Layers when editing layers](../images/screenshot_dialog_edit_layers.png)
-
-It is highly recommended to uncheck `Use layer size` as the entire image would be resized to the last layer processed.
+![Dialog of Edit Layers](../images/screenshot_dialog_edit_layers.png)
 
 If the `Layers` constraint is unchecked, layer groups will also be processed. The layer groups will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on layer groups (e.g. `gimp-drawable-brightness-contrast`).
+
+
+## Quick Batch Layer Editing
+
+You can run batch editing in a single click by running `File → Edit Layers (Quick)`.
+This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
+
+
+## Quick Batch Editing of Selected Layers
+
+When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
+
+In this case, any constraints set in the [main dialog](#batch-editing-layers) will be ignored.
+
+![Menu Entry for Edit Selected Layers](../images/screenshot_menu_edit_selected_layers.png)
 
 
 ## Preview
@@ -93,9 +120,11 @@ After a successful export or editing, your settings (output folder, file extensi
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
 
-You may also export settings to a custom file by selecting `Settings → Export Settings...`.
+You may also save settings to a custom file by selecting `Settings → Save Settings to File...`.
 This allows swapping between different plug-in configurations or sharing them.
-To import settings from a file, select `Settings → Import Settings...` and select the file.
+To load settings from a file, select `Settings → Load Settings from File...` and select the file.
+
+You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
 
 
 ## Known Issues
