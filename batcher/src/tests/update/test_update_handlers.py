@@ -75,11 +75,11 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_0_4(self):
     self.assertNotIn('edit_mode', self.settings['main'])
 
-    self.assertIn('filename_pattern', self.settings['main'])
+    self.assertIn('name_pattern', self.settings['main'])
     self.assertNotIn('layer_filename_pattern', self.settings['main'])
 
     self.assertIsInstance(
-      self.settings['main/filename_pattern'], setting_classes.NamePatternSetting)
+      self.settings['main/name_pattern'], setting_classes.NamePatternSetting)
 
     self.assertIn('export', self.settings['main/procedures'])
     self.assertNotIn(

@@ -65,7 +65,7 @@ def load_and_update(
 
     for version_str, update_handler in _UPDATE_HANDLERS.items():
       if previous_version < version_.Version.parse(version_str) <= current_version:
-        update_handler(data, settings, source_name)
+        update_handler(data, settings, source_names)
 
     return data
 
@@ -73,7 +73,9 @@ def load_and_update(
     sources = pg.setting.Persistor.get_default_setting_sources()
 
   if source_name is None:
-    source_name = SOURCE_NAMES
+    source_names = SOURCE_NAMES
+  else:
+    source_names = [source_name]
 
   if _is_fresh_start(sources):
     if update_sources:
@@ -187,8 +189,8 @@ def _remove_setting(group_list, setting_name):
     del group_list[index]
 
 
-def _update_to_0_3(data, settings, source_name):
-  if source_name != EXPORT_LAYERS_SOURCE_NAME:
+def _update_to_0_3(data, settings, source_names):
+  if EXPORT_LAYERS_SOURCE_NAME not in source_names:
     return
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -286,8 +288,8 @@ def _update_actions_to_0_3(main_settings_list, action_type):
         more_options_list.append(also_apply_to_parent_folders_dict)
 
 
-def _update_to_0_4(data, _settings, source_name):
-  if source_name != EXPORT_LAYERS_SOURCE_NAME:
+def _update_to_0_4(data, _settings, source_names):
+  if EXPORT_LAYERS_SOURCE_NAME not in source_names:
     return
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -295,7 +297,7 @@ def _update_to_0_4(data, _settings, source_name):
   if main_settings_list is not None:
     _remove_setting(main_settings_list, 'edit_mode')
 
-    _rename_setting(main_settings_list, 'layer_filename_pattern', 'filename_pattern')
+    _rename_setting(main_settings_list, 'layer_filename_pattern', 'name_pattern')
     _set_setting_attribute_value(main_settings_list, 'filename_pattern', 'type', 'name_pattern')
 
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
