@@ -1,4 +1,6 @@
-## Upcoming
+## 0.4
+
+### July 13, 2024
 
 New features:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
