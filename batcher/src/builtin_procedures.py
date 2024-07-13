@@ -226,12 +226,14 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'apply_opacity_from_layer_groups',
     'function': apply_opacity_from_layer_groups,
     'display_name': _('Apply opacity from layer groups'),
+    'description': _('Combines opacity from all parent layer groups and the current layer.'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'insert_background',
     'function': background_foreground.insert_background_layer,
     'display_name': _('Insert background'),
+    'description': _('Inserts layers having the specified color tag behind the current layer.'),
     'display_options_on_create': True,
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -259,6 +261,8 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'insert_foreground',
     'function': background_foreground.insert_foreground_layer,
     'display_name': _('Insert foreground'),
+    'description': _(
+      'Inserts layers having the specified color tag in front of the current layer.'),
     'display_options_on_create': True,
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -286,6 +290,8 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'export',
     'function': export_.export,
     'display_name': _('Export'),
+    'description': _(
+      'Exports a layer with additional options. Overrides the default export options.'),
     'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'display_options_on_create': True,
     'arguments': [
@@ -550,6 +556,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'use_layer_size',
     'function': resize_to_layer_size,
     'display_name': _('Use layer size'),
+    'description': _('Resizes the current layer to use the layer size rather than the image size.'),
     'additional_tags': [EXPORT_LAYERS_TAG],
   },
 ]

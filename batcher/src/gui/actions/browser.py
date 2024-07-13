@@ -167,7 +167,7 @@ class ActionBrowser(GObject.GObject):
         self._parent_tree_iters[action_type],
         [action_dict['name'],
          display_name,
-         action_utils_.get_action_description(procedure, action_dict),
+         action_utils_.get_action_description(action_dict, procedure),
          action_type,
          action_dict,
          None])

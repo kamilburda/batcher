@@ -76,7 +76,10 @@ class ActionEditorWidget:
 
   _LABEL_ACTION_NAME_MAX_WIDTH_CHARS = 50
 
-  _ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS = 60
+  _ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_ACTION_INFO = 50
+  _ACTION_SHORT_DESCRIPTION_LABEL_RIGHT_MARGIN_WITHOUT_ACTION_INFO = 8
+  _ACTION_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_ACTION_INFO = 6
+  _ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_ACTION_INFO = 60
   _ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
   _ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS = 40
 
@@ -228,38 +231,55 @@ class ActionEditorWidget:
     self._button_info = None
     self._action_info_hbox = None
 
-    self._action_info = _get_action_info_from_pdb_procedure(self._pdb_procedure)
+    if self._pdb_procedure is not None:
+      short_description = action_utils_.get_action_description(action, self._pdb_procedure.proc)
+    else:
+      short_description = action_utils_.get_action_description(action, self._pdb_procedure)
 
-    if self._action_info is None:
+    if short_description is None:
       return
 
+    self._action_info = _get_action_info_from_pdb_procedure(self._pdb_procedure)
+
+    if self._action_info is not None:
+      max_width_chars = self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_ACTION_INFO
+    else:
+      max_width_chars = self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_ACTION_INFO
+
     self._label_short_description = Gtk.Label(
-      label=action_utils_.get_action_description(self._pdb_procedure.proc, action),
+      label=short_description,
       use_markup=False,
       selectable=True,
       wrap=True,
-      max_width_chars=self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS,
+      max_width_chars=max_width_chars,
       xalign=0.0,
     )
-
-    self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
-      _create_action_info_popup(self._action_info, parent))
-
-    self._button_info = Gtk.Button(
-      image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
-      relief=Gtk.ReliefStyle.NONE,
-    )
-    self._button_info.set_tooltip_text(_('Show More Information'))
-
-    self._button_info.connect('clicked', self._on_button_info_clicked)
-    self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
 
     self._action_info_hbox = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING,
     )
     self._action_info_hbox.pack_start(self._label_short_description, False, False, 0)
-    self._action_info_hbox.pack_start(self._button_info, False, False, 0)
+
+    if self._action_info is not None:
+      self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
+        _create_action_info_popup(self._action_info, parent))
+
+      self._button_info = Gtk.Button(
+        image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
+        relief=Gtk.ReliefStyle.NONE,
+      )
+      self._button_info.set_tooltip_text(_('Show More Information'))
+
+      self._button_info.connect('clicked', self._on_button_info_clicked)
+      self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
+
+      self._action_info_hbox.pack_start(self._button_info, False, False, 0)
+    else:
+      self._action_info_hbox.set_margin_end(
+        self._ACTION_SHORT_DESCRIPTION_LABEL_RIGHT_MARGIN_WITHOUT_ACTION_INFO)
+      self._action_info_hbox.set_margin_bottom(
+        self._ACTION_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_ACTION_INFO)
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
