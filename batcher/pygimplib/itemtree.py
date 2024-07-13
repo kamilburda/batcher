@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable, Iterator
-from typing import Generator, List, Optional, Union, Tuple
+from typing import Any, Dict, Generator, List, Optional, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -61,6 +61,7 @@ class Item:
     self._item_attributes = ['name', '_parents', '_children']
 
     self._saved_states = []
+    self._saved_named_states = {}
 
   @property
   def raw(self) -> Gimp.Item:
@@ -176,6 +177,27 @@ class Item:
 
     for attr_name, attr_value in saved_states.items():
       setattr(self, attr_name, attr_value)
+
+  def save_state(self, name: str):
+    """Saves the current values of item's attributes that can be modified under
+    the specified name.
+
+    The saved attributes can be accessed via the `get_named_state()` method.
+
+    Calling this method with the same ``name`` overrides the previously saved
+    attributes.
+    """
+    self._saved_named_states[name] = {
+      attr_name.lstrip('_'): getattr(self, attr_name) for attr_name in
+      self._item_attributes}
+
+  def get_named_state(self, name: str) -> Optional[Dict[str, Any]]:
+    """Returns the saved state for the given ``name``, or ``None`` if not
+    available.
+
+    See `save_state()` for more information.
+    """
+    return self._saved_named_states.get(name, None)
 
   def reset(self):
     """Resets the item's attributes to the values upon its instantiation."""

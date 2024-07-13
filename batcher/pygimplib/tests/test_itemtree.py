@@ -305,3 +305,38 @@ class TestItem(unittest.TestCase):
     self.assertEqual(self.item.name, 'main')
     self.assertEqual(self.item.parents, ['one', 'two'])
     self.assertEqual(self.item.children, ['three', 'four'])
+
+  def test_save_and_get_named_state(self):
+    self.item.name = 'main'
+    self.item.parents = ['one', 'two']
+    self.item.children = ['three', 'four']
+
+    self.item.save_state('export')
+
+    named_state = self.item.get_named_state('export')
+
+    self.assertDictEqual(
+      named_state, {'name': 'main', 'parents': ['one', 'two'], 'children': ['three', 'four']})
+
+  def test_save_and_get_named_state_for_the_same_name_overrides_previous_calls(self):
+    self.item.name = 'main'
+    self.item.parents = ['one', 'two']
+    self.item.children = ['three', 'four']
+
+    self.item.save_state('export')
+
+    self.item.name = 'advanced'
+
+    self.item.save_state('export')
+
+    named_state = self.item.get_named_state('export')
+
+    self.assertDictEqual(
+      named_state, {'name': 'advanced', 'parents': ['one', 'two'], 'children': ['three', 'four']})
+
+  def test_get_named_state_for_no_saved_state(self):
+    self.item.name = 'main'
+    self.item.parents = ['one', 'two']
+    self.item.children = ['three', 'four']
+
+    self.assertIsNone(self.item.get_named_state('export'))
