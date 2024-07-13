@@ -90,10 +90,16 @@ class TestUpdateHandlers(unittest.TestCase):
       self.settings['main/procedures/insert_background/arguments/constraint_name'].value,
       'not_background')
     self.assertIn('merge_background', self.settings['main/procedures'])
+    self.assertEqual(
+      self.settings['main/procedures/merge_background/display_name'].value,
+      'Merge background')
     self.assertIn('merge_type', self.settings['main/procedures/merge_background/arguments'])
     self.assertTrue(
       self.settings['main/procedures/merge_background/arguments/last_enabled_value'].value)
     self.assertIn('not_background', self.settings['main/constraints'])
+    self.assertEqual(
+      self.settings['main/constraints/not_background/display_name'].value,
+      'Not background')
     self.assertIn('color_tag', self.settings['main/constraints/not_background/arguments'])
     self.assertTrue(
       self.settings['main/constraints/not_background/arguments/last_enabled_value'].value)
@@ -107,10 +113,16 @@ class TestUpdateHandlers(unittest.TestCase):
       self.settings['main/procedures/insert_background_2/arguments/constraint_name'].value,
       'not_background_2')
     self.assertIn('merge_background_2', self.settings['main/procedures'])
+    self.assertEqual(
+      self.settings['main/procedures/merge_background_2/display_name'].value,
+      'Merge background (2)')
     self.assertIn('merge_type', self.settings['main/procedures/merge_background_2/arguments'])
     self.assertTrue(
       self.settings['main/procedures/merge_background_2/arguments/last_enabled_value'].value)
     self.assertIn('not_background_2', self.settings['main/constraints'])
+    self.assertEqual(
+      self.settings['main/constraints/not_background/display_name'].value,
+      'Not background')
     self.assertIn('color_tag', self.settings['main/constraints/not_background_2/arguments'])
     self.assertTrue(
       self.settings['main/constraints/not_background_2/arguments/last_enabled_value'].value)

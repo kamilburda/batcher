@@ -341,12 +341,22 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
     'insert_foreground': 'merge_foreground',
   }
   procedure_names = {action_dict['name'] for action_dict in procedures_list}
+  procedure_display_names = {
+    _get_child_setting(action_dict['settings'], 'display_name')[0]['value']
+    for action_dict in procedures_list
+    if _get_child_setting(action_dict['settings'], 'display_name')[0] is not None
+  }
 
   constraint_mapping = {
     'insert_background': 'not_background',
     'insert_foreground': 'not_foreground',
   }
   constraint_names = {action_dict['name'] for action_dict in constraints_list}
+  constraint_display_names = {
+    _get_child_setting(action_dict['settings'], 'display_name')[0]['value']
+    for action_dict in constraints_list
+    if _get_child_setting(action_dict['settings'], 'display_name')[0] is not None
+  }
 
   merge_group_dicts = []
   constraint_group_dicts = []
@@ -381,6 +391,13 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       arguments_list[-2]['default_value'] = unique_merge_procedure_name
       arguments_list[-2]['value'] = unique_merge_procedure_name
 
+      merge_procedure_display_name_dict, _index = _get_child_setting(
+        merge_group_dict['settings'], 'display_name')
+      if merge_procedure_display_name_dict is not None:
+        unique_merge_procedure_display_name = _uniquify_action_display_name(
+          merge_procedure_display_name_dict['value'], procedure_display_names)
+        merge_procedure_display_name_dict['value'] = unique_merge_procedure_display_name
+
       merge_group_dicts.append(merge_group_dict)
 
       constraint_name = constraint_mapping[orig_name_setting_dict['default_value']]
@@ -391,6 +408,13 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       constraint_group_dict['name'] = unique_constraint_name
       arguments_list[-1]['default_value'] = unique_constraint_name
       arguments_list[-1]['value'] = unique_constraint_name
+
+      constraint_display_name_dict, _index = _get_child_setting(
+        constraint_group_dict['settings'], 'display_name')
+      if constraint_display_name_dict is not None:
+        unique_constraint_display_name = _uniquify_action_display_name(
+          constraint_display_name_dict['value'], constraint_display_names)
+        constraint_display_name_dict['value'] = unique_constraint_display_name
 
       constraint_group_dicts.append(constraint_group_dict)
 
@@ -433,12 +457,31 @@ def _uniquify_action_name(name, existing_names):
       yield f'_{i}'
       i += 1
 
-  uniquified_name = (
-    uniquify.uniquify_string(name, existing_names, generator=_generate_unique_action_name()))
+  uniquified_name = uniquify.uniquify_string(
+    name, existing_names, generator=_generate_unique_action_name())
 
   existing_names.add(uniquified_name)
 
   return uniquified_name
+
+
+def _uniquify_action_display_name(display_name, existing_display_names):
+  """Returns ``display_name`` modified to be unique, i.e. to not match the
+  display name of any existing action in ``actions``.
+  """
+
+  def _generate_unique_action_display_name():
+    i = 2
+    while True:
+      yield f' ({i})'
+      i += 1
+
+  uniquified_display_name = uniquify.uniquify_string(
+    display_name, existing_display_names, generator=_generate_unique_action_display_name())
+
+  existing_display_names.add(uniquified_display_name)
+
+  return uniquified_display_name
 
 
 _UPDATE_HANDLERS = {
