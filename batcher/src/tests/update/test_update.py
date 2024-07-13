@@ -7,15 +7,15 @@ from pygimplib.tests import stubs_gimp
 from src import update
 
 
-def _update_to_0_3(data, _settings):
+def _update_to_0_3(data, _settings, _source_names):
   return data
 
 
-def _update_to_0_4(data, _settings):
+def _update_to_0_4(data, _settings, _source_names):
   return data
 
 
-def _update_to_0_3_with_error(_data, _settings):
+def _update_to_0_3_with_error(_data, _settings, _source_names):
   raise ValueError
 
 
