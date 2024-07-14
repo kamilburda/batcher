@@ -484,7 +484,28 @@ def _uniquify_action_display_name(display_name, existing_display_names):
   return uniquified_display_name
 
 
+def _update_to_0_5(data, _settings, _source_names):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is None:
+      return
+
+    for procedure_dict in procedures_list:
+      procedure_list = procedure_dict['settings']
+
+      orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+
+      arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+      if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
+        del arguments_list[-1]
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
+  '0.5': _update_to_0_5,
 }

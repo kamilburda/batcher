@@ -348,13 +348,6 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Convert file extension to lowercase'),
         'gui_type': 'check_button_no_text',
       },
-      {
-        'type': 'bool',
-        'name': 'preserve_layer_name_after_export',
-        'default_value': False,
-        'display_name': _('Preserve layer name after export'),
-        'gui_type': 'check_button_no_text',
-      },
     ],
   },
   {

@@ -432,7 +432,7 @@ class NamePreview(preview_base_.Preview):
        color_tag_icon,
        color_tag_icon is not None,
        True,
-       item.name,
+       self._get_item_name(item),
        item.raw,
        item.type])
     
@@ -446,7 +446,7 @@ class NamePreview(preview_base_.Preview):
       self._COLUMN_ITEM_NAME_SENSITIVE[0],
       True,
       self._COLUMN_ITEM_NAME[0],
-      item.name)
+      self._get_item_name(item))
   
   def _insert_parent_items(self, item, inserted_parents):
     for parent in item.parents:
@@ -506,6 +506,11 @@ class NamePreview(preview_base_.Preview):
       return self._color_tags_and_premade_pixbufs[color_tag]
     else:
       return None
+
+  @staticmethod
+  def _get_item_name(item):
+    item_state = item.get_named_state('export')
+    return item_state['name'] if item_state is not None else item.name
 
   def _set_expanded_items(self, tree_path=None):
     """Sets the expanded state of items in the tree view.

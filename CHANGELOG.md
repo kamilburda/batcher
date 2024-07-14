@@ -1,3 +1,8 @@
+## Upcoming
+
+* Removed the `Preserve layer name after export` option from the `Export` procedure. The layer name is now always preserved.
+
+
 ## 0.4
 
 ### July 13, 2024

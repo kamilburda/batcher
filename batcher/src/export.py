@@ -37,11 +37,10 @@ def export(
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
-      preserve_layer_name_after_export: bool = False,
 ) -> Generator[None, None, None]:
   item_uniquifier = uniquifier.ItemUniquifier()
   file_extension_properties = _FileExtensionProperties()
-  processed_parent_names = set()
+  processed_parents = set()
   default_file_extension = file_extension
 
   if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_name_pattern is not None:
@@ -107,10 +106,9 @@ def export(
         continue
       else:
         item_to_process = current_top_level_item
-    
-    if preserve_layer_name_after_export:
-      item_to_process.push_state()
-    
+
+    item_to_process.save_state('export')
+
     if batcher.process_names:
       if use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
@@ -119,7 +117,7 @@ def export(
       if convert_file_extension_to_lowercase:
         current_file_extension = current_file_extension.lower()
       
-      _process_parent_folder_names(item_to_process, item_uniquifier, processed_parent_names)
+      _process_parent_names(item_to_process, item_uniquifier, processed_parents)
       _process_item_name(
         item_to_process,
         item_uniquifier,
@@ -163,14 +161,9 @@ def export(
       
       if overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
-          fileext.get_file_extension(item_to_process.name)].processed_count += 1
+          fileext.get_file_extension(_get_item_export_name(item_to_process))].processed_count += 1
         # Append the original raw item
         batcher._exported_raw_items.append(item_to_process.raw)
-    
-    if preserve_layer_name_after_export:
-      item_to_process.pop_state()
-    
-    _sync_raw_item_name(batcher, item_to_process)
     
     if multi_layer_image is not None:
       _refresh_image(multi_layer_image)
@@ -193,13 +186,15 @@ def _get_top_level_item(item):
     return item
 
 
-def _process_parent_folder_names(item, item_uniquifier, processed_parent_names):
+def _process_parent_names(item, item_uniquifier, processed_parents):
   for parent in item.parents:
-    if parent not in processed_parent_names:
+    if parent not in processed_parents:
+      parent.save_state('export')
+
       _validate_name(parent)
-      item_uniquifier.uniquify(parent)
-      
-      processed_parent_names.add(parent)
+      _uniquify_name(item_uniquifier, parent)
+
+      processed_parents.add(parent)
 
 
 def _process_item_name(
@@ -209,24 +204,33 @@ def _process_item_name(
       default_file_extension,
       force_default_file_extension,
 ):
+  item_name = _get_item_export_name(item)
+
+  processed_item_name = item_name
+
   if not force_default_file_extension:
     if current_file_extension == default_file_extension:
-      item.name += f'.{default_file_extension}'
+      processed_item_name = item_name + f'.{default_file_extension}'
     else:
-      item.name = fileext.get_filename_with_new_file_extension(
-        item.name, current_file_extension, keep_extra_trailing_periods=True)
+      processed_item_name = fileext.get_filename_with_new_file_extension(
+        item_name, current_file_extension, keep_extra_trailing_periods=True)
   else:
-    item.name = fileext.get_filename_with_new_file_extension(
-      item.name, default_file_extension, keep_extra_trailing_periods=True)
-  
+    processed_item_name = fileext.get_filename_with_new_file_extension(
+      item_name, default_file_extension, keep_extra_trailing_periods=True)
+
+  _set_item_export_name(item, processed_item_name)
+
   _validate_name(item)
-  item_uniquifier.uniquify(
+  _uniquify_name(
+    item_uniquifier,
     item,
-    position=_get_unique_substring_position(item.name, fileext.get_file_extension(item.name)))
+    position=_get_unique_substring_position(
+      _get_item_export_name(item), fileext.get_file_extension(_get_item_export_name(item))),
+  )
 
 
 def _get_current_file_extension(item, default_file_extension, file_extension_properties):
-  item_file_extension = fileext.get_file_extension(item.name)
+  item_file_extension = fileext.get_file_extension(_get_item_export_name(item))
   
   if item_file_extension and file_extension_properties[item_file_extension].is_valid:
     return item_file_extension
@@ -260,13 +264,35 @@ def _merge_and_resize_image(batcher, image, raw_item):
 def _copy_layer(raw_item, dest_image, item):
   raw_item_copy = pg.pdbutils.copy_and_paste_layer(
     raw_item, dest_image, None, len(dest_image.list_layers()), True, True, True)
+
+  # We use `item.name` instead of `_get_item_export_name()` so that the original
+  # layer name is used in case of multi-layer export.
   raw_item_copy.set_name(item.name)
   
   return raw_item_copy
 
 
 def _validate_name(item):
-  item.name = validators_.FilenameValidator.validate(item.name)
+  _set_item_export_name(
+    item,
+    validators_.FilenameValidator.validate(_get_item_export_name(item)))
+
+
+def _uniquify_name(item_uniquifier, item, position=None):
+  item_name = _get_item_export_name(item)
+
+  uniquified_item_name = item_uniquifier.uniquify(item, item_name=item_name, position=position)
+
+  _set_item_export_name(item, uniquified_item_name)
+
+
+def _get_item_export_name(item):
+  item_state = item.get_named_state('export')
+  return item_state['name'] if item_state is not None else None
+
+
+def _set_item_export_name(item, name):
+  item.get_named_state('export')['name'] = name
 
 
 def _get_unique_substring_position(str_, file_extension):
@@ -283,7 +309,7 @@ def _export_item(
       file_extension_properties,
 ):
   output_filepath = _get_item_filepath(item, output_directory)
-  file_extension = fileext.get_file_extension(item.name)
+  file_extension = fileext.get_file_extension(_get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
   overwrite_mode, output_filepath = overwrite.handle_overwrite(
@@ -344,11 +370,11 @@ def _get_item_filepath(item, dirpath):
   
   path = os.path.abspath(dirpath)
   
-  path_components = [parent.name for parent in item.parents]
+  path_components = [_get_item_export_name(parent) for parent in item.parents]
   if path_components:
     path = os.path.join(path, os.path.join(*path_components))
   
-  return os.path.join(path, item.name)
+  return os.path.join(path, _get_item_export_name(item))
 
 
 def _make_dirs(item, dirpath, default_file_extension):
@@ -362,7 +388,8 @@ def _make_dirs(item, dirpath, default_file_extension):
     except (IndexError, AttributeError):
       message = str(e)
     
-    raise exceptions.InvalidOutputDirectoryError(message, item.name, default_file_extension)
+    raise exceptions.InvalidOutputDirectoryError(
+      message, _get_item_export_name(item), default_file_extension)
 
 
 def _export_item_once_wrapper(
@@ -439,11 +466,6 @@ def _export_item_once(
       _raise_export_error(e)
   else:
     return ExportStatuses.EXPORT_SUCCESSFUL
-
-
-def _sync_raw_item_name(batcher, item_to_process):
-  if batcher.current_item == item_to_process and batcher.process_names and not batcher.is_preview:
-    batcher.current_raw_item.set_name(batcher.current_item.name)
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):

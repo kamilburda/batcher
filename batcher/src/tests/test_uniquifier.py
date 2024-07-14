@@ -72,7 +72,7 @@ class TestUniquify(unittest.TestCase):
     
     for item in self.item_tree.iter():
       self._preprocess_name(item)
-      self.uniquifier.uniquify(item)
+      item.name = self.uniquifier.uniquify(item)
     
     self._compare_uniquified_names(self.item_tree, uniquified_names)
 
@@ -95,9 +95,10 @@ class TestUniquify(unittest.TestCase):
       
       self._preprocess_name(item)
       if item.type == pg.itemtree.TYPE_FOLDER:
-        self.uniquifier.uniquify(item)
+        item.name = self.uniquifier.uniquify(item)
       else:
-        self.uniquifier.uniquify(item, position=_get_file_extension_start_position(item.name))
+        item.name = self.uniquifier.uniquify(
+          item, position=_get_file_extension_start_position(item.name))
     
     self._compare_uniquified_names(self.item_tree, names_to_uniquify)
 
@@ -113,11 +114,11 @@ class TestUniquify(unittest.TestCase):
       item = self.item_tree[item_name]
       
       self._preprocess_name(item)
-      self.uniquifier.uniquify(item)
+      item.name = self.uniquifier.uniquify(item)
     
     for item_name in names_to_uniquify:
       item = self.item_tree[item_name]
-      self.uniquifier.uniquify(item)
+      item.name = self.uniquifier.uniquify(item)
     
     self._compare_uniquified_names(self.item_tree, names_to_uniquify)
 
@@ -131,7 +132,7 @@ class TestUniquify(unittest.TestCase):
       item = self.item_tree[item_name]
       
       self._preprocess_name(item)
-      self.uniquifier.uniquify(item)
+      item.name = self.uniquifier.uniquify(item)
     
     self.uniquifier.reset()
     
@@ -139,7 +140,7 @@ class TestUniquify(unittest.TestCase):
     
     for item_name in names_to_uniquify:
       item = self.item_tree[item_name]
-      self.uniquifier.uniquify(item)
+      item.name = self.uniquifier.uniquify(item)
     
     self._compare_uniquified_names(self.item_tree, names_to_uniquify)
   

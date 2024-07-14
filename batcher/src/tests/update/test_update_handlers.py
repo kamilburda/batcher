@@ -13,7 +13,7 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_LATEST_PLUGIN_VERSION = '0.4'
+_LATEST_PLUGIN_VERSION = '0.5'
 
 
 @mock.patch(
@@ -46,6 +46,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self._assert_correct_contents_for_update_to_0_3(orig_setting_values_for_0_2)
     self._assert_correct_contents_for_update_to_0_4()
+    self._assert_correct_contents_for_update_to_0_5()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -153,3 +154,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertNotIn('remove_folder_structure', self.settings['main/procedures'])
     self.assertIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
+
+  def _assert_correct_contents_for_update_to_0_5(self):
+    self.assertNotIn(
+      'preserve_layer_name_after_export', self.settings['main/procedures/export/arguments'])
