@@ -80,7 +80,7 @@ class Batcher:
         output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
         name_pattern: str = '',
         file_extension: str = 'png',
-        overwrite_mode: int = overwrite.OverwriteModes.SKIP,
+        overwrite_mode: int = overwrite.OverwriteModes.RENAME_NEW,
         overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
         progress_updater: Optional[progress_.ProgressUpdater] = None,
         item_tree: Optional[pg.itemtree.ItemTree] = None,
