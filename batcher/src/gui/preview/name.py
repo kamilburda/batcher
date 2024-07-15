@@ -19,6 +19,7 @@ import pygimplib as pg
 from . import base as preview_base_
 
 from src import exceptions
+from src import export as export_
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -507,10 +508,12 @@ class NamePreview(preview_base_.Preview):
     else:
       return None
 
-  @staticmethod
-  def _get_item_name(item):
-    item_state = item.get_named_state('export')
-    return item_state['name'] if item_state is not None else item.name
+  def _get_item_name(self, item):
+    if not self._batcher.edit_mode:
+      item_state = item.get_named_state(export_.EXPORT_ITEM_STATE_NAME)
+      return item_state['name'] if item_state is not None else item.name
+    else:
+      return item.name
 
   def _set_expanded_items(self, tree_path=None):
     """Sets the expanded state of items in the tree view.
