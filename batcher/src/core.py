@@ -847,10 +847,7 @@ class Batcher:
         constraint, [builtin_procedures.NAME_ONLY_TAG], [_NAME_ONLY_ACTION_GROUP])
   
   def _add_default_rename_procedure(self, action_groups):
-    if (not self._edit_mode
-        and not any(
-          procedure['orig_name'].value == 'rename' and procedure['enabled'].value
-          for procedure in self._procedures)):
+    if not self._edit_mode:
       self._invoker.add(
         builtin_procedures.rename_layer,
         groups=action_groups,

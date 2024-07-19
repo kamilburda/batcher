@@ -5,6 +5,9 @@ Changes to the `Export` procedure:
 * By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
 * Removed the `Preserve layer name after export` option. The layer name is now always preserved.
 
+Other changes:
+* The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Save as`).
+
 
 ## 0.4
 

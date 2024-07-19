@@ -375,8 +375,10 @@ Options:
 **Rename**
 
 Renames layers according to the specified pattern.
-This procedure uses the same text entry as the one next to `Save as`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
-If this procedure is added and enabled, the text entry next to `Save as` has no effect.
+
+This procedure uses the same text entry as the one in Export Layers next to `Save as`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
+
+For Export Layers, this procedure performs renaming on top of the entry next to `Save as`.
 
 Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename layer groups` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename layer groups` and unchecking `Rename layers`).
 
