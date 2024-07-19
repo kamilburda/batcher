@@ -244,12 +244,19 @@ class ComboBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
-    model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_INT)
+    self._value_to_row_index_mapping = {}
+    self._row_index_to_value_mapping = {}
 
-    for label, value in setting.get_item_display_names_and_values():
-      model.append((label if label is not None else '', value))
+    model = Gtk.ListStore(GObject.TYPE_STRING)
 
-    combo_box = Gtk.ComboBox(model=model, active=setting.default_value)
+    for index, (label, value) in enumerate(setting.get_item_display_names_and_values()):
+      self._value_to_row_index_mapping[value] = index
+      self._row_index_to_value_mapping[index] = value
+      model.append((label if label is not None else '',))
+
+    combo_box = Gtk.ComboBox(
+      model=model,
+      active=self._value_to_row_index_mapping[setting.default_value])
 
     renderer_text = Gtk.CellRendererText()
     combo_box.pack_start(renderer_text, True)
@@ -258,10 +265,10 @@ class ComboBoxPresenter(GtkPresenter):
     return combo_box
   
   def get_value(self):
-    return self._widget.get_active()
+    return self._row_index_to_value_mapping[self._widget.get_active()]
   
   def _set_value(self, value):
-    self._widget.set_active(value)
+    self._widget.set_active(self._value_to_row_index_mapping[value])
 
 
 class GimpUiIntComboBoxPresenter(GtkPresenter):
