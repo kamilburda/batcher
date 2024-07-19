@@ -6,6 +6,7 @@ from gi.repository import Gimp
 
 from src import background_foreground
 from src import export as export_
+from src import overwrite
 from src import renamer as renamer_
 from src.builtin_actions_common import *
 
@@ -311,6 +312,18 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('File extension'),
         'gui_type': 'file_extension_entry',
         'adjust_value': True,
+      },
+      {
+        'type': 'choice',
+        'name': 'overwrite_mode',
+        'default_value': 'ask',
+        'items': [
+          ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
+          ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
+          ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
+          ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
+          ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
+        'display_name': _('If a file already exists:'),
       },
       {
         'type': 'choice',

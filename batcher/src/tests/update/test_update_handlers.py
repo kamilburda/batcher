@@ -158,3 +158,8 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_0_5(self):
     self.assertNotIn(
       'preserve_layer_name_after_export', self.settings['main/procedures/export/arguments'])
+    self.assertIn('overwrite_mode', self.settings['main/procedures/export/arguments'])
+    # This checks whether `overwrite_mode` is the third argument.
+    self.assertIs(
+      list(self.settings['main/procedures/export/arguments'])[2],
+      self.settings['main/procedures/export/arguments/overwrite_mode'])

@@ -7,6 +7,7 @@ import pygimplib as pg
 from src import actions as actions_
 from src import builtin_constraints
 from src import builtin_procedures
+from src import overwrite
 from src import utils as utils_
 from src import version as version_
 from src.path import uniquify
@@ -502,6 +503,23 @@ def _update_to_0_5(data, _settings, _source_names):
 
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         del arguments_list[-1]
+
+        arguments_list.insert(
+          2,
+          {
+            'type': 'choice',
+            'name': 'overwrite_mode',
+            'default_value': 'ask',
+            'value': 'ask',
+            'items': [
+              ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
+              ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
+              ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
+              ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
+              ('rename_existing', _('Rename existing file'),
+               overwrite.OverwriteModes.RENAME_EXISTING)],
+            'display_name': _('If a file already exists:'),
+          })
 
 
 _UPDATE_HANDLERS = {

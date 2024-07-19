@@ -1,6 +1,9 @@
 ## Upcoming
 
-* Removed the `Preserve layer name after export` option from the `Export` procedure. The layer name is now always preserved.
+Changes to the `Export` procedure:
+* Add a new option `If a file exists:` that allows skipping the dialog asking the user to handle existing files and setting a fixed mode for all files.
+* By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
+* Removed the `Preserve layer name after export` option. The layer name is now always preserved.
 
 
 ## 0.4

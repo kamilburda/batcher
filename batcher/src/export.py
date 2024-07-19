@@ -36,6 +36,7 @@ def export(
       batcher: 'src.core.Batcher',
       output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       file_extension: str = 'png',
+      overwrite_mode: int = overwrite.OverwriteModes.ASK,
       export_mode: int = ExportModes.EACH_LAYER,
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
@@ -133,15 +134,21 @@ def export(
         raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
       else:
         image_to_process.resize_to_layers()
-      
-      overwrite_mode, export_status = _export_item(
+
+      if overwrite_mode == overwrite.OverwriteModes.ASK:
+        overwrite_chooser = batcher.overwrite_chooser
+      else:
+        overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(overwrite_mode)
+
+      chosen_overwrite_mode, export_status = _export_item(
         batcher,
         item_to_process,
         image_to_process,
         raw_item_to_process,
         output_directory,
         default_file_extension,
-        file_extension_properties)
+        file_extension_properties,
+        overwrite_chooser)
       
       if export_status == ExportStatuses.USE_DEFAULT_FILE_EXTENSION:
         if batcher.process_names:
@@ -153,16 +160,17 @@ def export(
             force_default_file_extension=True)
         
         if batcher.process_export:
-          overwrite_mode, _unused = _export_item(
+          chosen_overwrite_mode, _unused = _export_item(
             batcher,
             item_to_process,
             image_to_process,
             raw_item_to_process,
             output_directory,
             default_file_extension,
-            file_extension_properties)
+            file_extension_properties,
+            overwrite_chooser)
       
-      if overwrite_mode != overwrite.OverwriteModes.SKIP:
+      if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
           fileext.get_file_extension(_get_item_export_name(item_to_process))].processed_count += 1
         # Append the original raw item
@@ -310,22 +318,23 @@ def _export_item(
       output_directory,
       default_file_extension,
       file_extension_properties,
+      overwrite_chooser,
 ):
   output_filepath = _get_item_filepath(item, output_directory)
   file_extension = fileext.get_file_extension(_get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
-  overwrite_mode, output_filepath = overwrite.handle_overwrite(
+  chosen_overwrite_mode, output_filepath = overwrite.handle_overwrite(
     output_filepath,
-    batcher.overwrite_chooser,
+    overwrite_chooser,
     _get_unique_substring_position(output_filepath, file_extension))
 
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
-  if overwrite_mode == overwrite.OverwriteModes.CANCEL:
+  if chosen_overwrite_mode == overwrite.OverwriteModes.CANCEL:
     raise exceptions.BatcherCancelError('cancelled')
   
-  if overwrite_mode != overwrite.OverwriteModes.SKIP:
+  if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
     
     export_status = _export_item_once_wrapper(
@@ -351,7 +360,7 @@ def _export_item(
         default_file_extension,
         file_extension_properties)
   
-  return overwrite_mode, export_status
+  return chosen_overwrite_mode, export_status
 
 
 def _get_item_filepath(item, dirpath):

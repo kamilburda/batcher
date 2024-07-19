@@ -99,11 +99,7 @@ class BatcherManager:
 
   def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
     if mode == 'export':
-      overwrite_chooser = overwrite_chooser_.GtkDialogOverwriteChooser(
-        self._get_overwrite_dialog_items(),
-        default_value=self._settings['main/overwrite_mode'].items['replace'],
-        default_response=overwrite.OverwriteModes.CANCEL,
-        parent=parent_widget)
+      overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
     else:
       overwrite_chooser = None
 
@@ -121,11 +117,6 @@ class BatcherManager:
       export_context_manager_args=[parent_widget])
 
     return batcher, overwrite_chooser, progress_updater
-
-  def _get_overwrite_dialog_items(self):
-    return dict(zip(
-      self._settings['main/overwrite_mode'].items.values(),
-      self._settings['main/overwrite_mode'].items_display_names.values()))
 
 
 class BatcherManagerQuick:
@@ -145,24 +136,8 @@ class BatcherManagerQuick:
   ):
     self._settings.apply_gui_values_to_settings()
 
-    if mode == 'export':
-      overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].value)
-    else:
-      overwrite_chooser = None
-
-    progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
-
-    self._batcher = core.Batcher(
-      image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
-      edit_mode=mode == 'edit',
-      initial_export_run_mode=Gimp.RunMode.WITH_LAST_VALS,
-      overwrite_chooser=overwrite_chooser,
-      progress_updater=progress_updater,
-      export_context_manager=_handle_gui_in_export,
-      export_context_manager_args=[parent_widget])
+    self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
+      mode, image, parent_widget, progress_bar)
 
     try:
       self._batcher.run(
@@ -182,8 +157,52 @@ class BatcherManagerQuick:
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
 
+    if (mode == 'export'
+        and overwrite_chooser.overwrite_mode
+          in self._settings['main/overwrite_mode'].items.values()):
+      self._settings['main/overwrite_mode'].set_value(overwrite_chooser.overwrite_mode)
+
   def stop_batcher(self):
     _stop_batcher(self._batcher)
+
+  def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
+    if mode == 'export':
+      if self._settings['gui/show_quick_settings'].value:
+        overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
+      else:
+        overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
+          self._settings['main/overwrite_mode'].value)
+    else:
+      overwrite_chooser = None
+
+    progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
+
+    batcher = core.Batcher(
+      image,
+      self._settings['main/procedures'],
+      self._settings['main/constraints'],
+      edit_mode=mode == 'edit',
+      initial_export_run_mode=Gimp.RunMode.WITH_LAST_VALS,
+      overwrite_chooser=overwrite_chooser,
+      progress_updater=progress_updater,
+      export_context_manager=_handle_gui_in_export,
+      export_context_manager_args=[parent_widget])
+
+    return batcher, overwrite_chooser, progress_updater
+
+
+def _get_interactive_overwrite_chooser(settings, parent_widget):
+  return overwrite_chooser_.GtkDialogOverwriteChooser(
+    _get_overwrite_dialog_items(settings),
+    default_value=settings['main/overwrite_mode'].items['rename_new'],
+    default_response=overwrite.OverwriteModes.CANCEL,
+    parent=parent_widget)
+
+
+def _get_overwrite_dialog_items(settings):
+  return dict(zip(
+    settings['main/overwrite_mode'].items.values(),
+    settings['main/overwrite_mode'].items_display_names.values()))
 
 
 def _stop_batcher(batcher):

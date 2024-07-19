@@ -188,4 +188,11 @@ class OverwriteModes:
   if a file path does not exist and no action should be taken.
   """
 
-  OVERWRITE_MODES = REPLACE, SKIP, RENAME_NEW, RENAME_EXISTING, CANCEL, DO_NOTHING
+  ASK = 6
+  """Indicates to display an interactive dialog, prompting the user to choose
+  one of the other overwrite modes.
+  
+  This value should only be used when the application is run interactively.
+  """
+
+  OVERWRITE_MODES = REPLACE, SKIP, RENAME_NEW, RENAME_EXISTING, CANCEL, DO_NOTHING, ASK

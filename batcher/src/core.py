@@ -864,7 +864,11 @@ class Batcher:
       self._invoker.add(
         export_.export,
         groups=action_groups,
-        args=[self._output_directory, self._file_extension, export_.ExportModes.EACH_LAYER])
+        args=[
+          self._output_directory,
+          self._file_extension,
+          overwrite.OverwriteModes.ASK,
+          export_.ExportModes.EACH_LAYER])
   
   def _set_constraints(self):
     self._invoker.invoke(

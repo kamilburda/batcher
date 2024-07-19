@@ -49,7 +49,7 @@ class Previews:
 
     if self._batcher_mode == 'export':
       overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].items['replace'])
+        self._settings['main/overwrite_mode'].items['rename_new'])
     else:
       overwrite_chooser = None
 
