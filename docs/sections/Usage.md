@@ -45,14 +45,15 @@ For details, see [Procedures](Customization.md#procedures) and [Constraints](Cus
 
 ## Quick Export of Layers
 
-If you need a simple export without customization, you can run `File → Export Layers (Quick)`.
-This can also be useful if you made changes to your image and you want to export again with the same settings.
+If you made changes to your image and you want to export again with the same settings, or you need a simple export without customization, you can run `File → Export Layers (Quick)`.
 
 For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
 
 ![Dialog of Export Layers (Quick)](../images/screenshot_dialog_export_layers_quick.png)
 
 This dialog can be skipped by simply unchecking `Show this dialog`.
+
+Note that even procedures and constraints set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
 
 ## Quick Export of Selected Layers
