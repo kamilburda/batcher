@@ -58,7 +58,7 @@ class ExportSettings:
       yalign=0.5,
     )
     self._folder_chooser_label.set_markup(
-      '<b>{}</b>'.format(_('Save in folder:')))
+      '<b>{}</b>'.format(_('Folder:')))
 
     self._folder_chooser = Gtk.FileChooserButton(
       action=Gtk.FileChooserAction.SELECT_FOLDER,
@@ -75,7 +75,7 @@ class ExportSettings:
       yalign=0.5,
     )
     self._export_filename_label.set_markup(
-      '<b>{}:</b>'.format(GLib.markup_escape_text(_('Save as'))))
+      '<b>{}</b>'.format(GLib.markup_escape_text(_('Name:'))))
 
     self._dot_label = Gtk.Label(
       label='.',

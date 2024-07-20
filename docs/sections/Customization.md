@@ -34,12 +34,12 @@ Add the `Remove folder structure` procedure (`Add Procedure... → Remove folder
 
 **How do I rename the layers to form a sequence of numbers, e.g. "image001", "image002", ...?**
 
-Click on the text entry next to `Save as` and choose `image001`, or type `image[001]` in the entry.
+Click on the text entry next to `Name` and choose `image001`, or type `image[001]` in the entry.
 
 
 **My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?**
 
-In the text entry next to `Save as`, choose `Full layer name` or type `[layer name, %e]`.
+In the text entry next to `Name`, choose `Full layer name` or type `[layer name, %e]`.
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
@@ -356,9 +356,9 @@ Options:
 * *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
   The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
-  The text entry next to `Save as` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
+  The text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
 * *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
-  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Save as` to preserve file extensions in layer names.
+  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names.
 * *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
 
 When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect.
@@ -376,9 +376,9 @@ Options:
 
 Renames layers according to the specified pattern.
 
-This procedure uses the same text entry as the one in Export Layers next to `Save as`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
+This procedure uses the same text entry as the one in Export Layers next to `Name`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
 
-For Export Layers, this procedure performs renaming on top of the entry next to `Save as`.
+For Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
 Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename layer groups` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename layer groups` and unchecking `Rename layers`).
 

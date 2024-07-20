@@ -15,7 +15,7 @@ Below you will find more information on adjusting the export settings.
 ### Changing Filenames
 
 By default, layer names are used as filenames.
-The text entry next to `Save as` lets you customize the filenames.
+The text entry next to `Name` lets you customize the filenames.
 
 For details, see [Adjusting Filenames](Customization.md#adjusting-layer-names-filenames).
 
