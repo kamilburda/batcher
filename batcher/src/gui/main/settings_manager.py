@@ -71,7 +71,7 @@ class SettingsManager:
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
     self._menu_item_load_settings_from_file = Gtk.MenuItem(label=_('Load Settings from File...'))
     self._menu_item_save_settings_to_file = Gtk.MenuItem(label=_('Save Settings to File...'))
-    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset settings'))
+    self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset Settings'))
 
     self._settings['gui/auto_close'].set_gui()
 
