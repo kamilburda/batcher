@@ -16,7 +16,7 @@ from src.gui.entry import entries as entries_
 class ExportSettings:
 
   _ROW_SPACING = 5
-  _COLUMN_SPACING = 10
+  _COLUMN_SPACING = 7
 
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
 
@@ -90,6 +90,11 @@ class ExportSettings:
       default_item=self._settings['main/name_pattern'].default_value)
     self._name_pattern_entry.set_activates_default(True)
 
+    self._more_export_options_button = Gtk.Button(
+      label=_('E_xport Options...'),
+      use_underline=True,
+    )
+
     self._hbox_export_filename_entries = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
@@ -106,6 +111,19 @@ class ExportSettings:
     self._grid_export_settings.attach(self._folder_chooser, 1, 0, 1, 1)
     self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
     self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
+
+    self._hbox_more_export_options_button = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+    )
+    self._hbox_more_export_options_button.pack_start(
+      self._more_export_options_button, False, False, 0)
+
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._row_spacing,
+    )
+    self._vbox.pack_start(self._grid_export_settings, False, False, 0)
+    self._vbox.pack_start(self._hbox_more_export_options_button, False, False, 0)
 
     self._file_extension_entry.connect(
       'focus-out-event',
@@ -148,7 +166,7 @@ class ExportSettings:
 
   @property
   def widget(self):
-    return self._grid_export_settings
+    return self._vbox
 
   @property
   def folder_chooser(self):
