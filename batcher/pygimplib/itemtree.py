@@ -199,6 +199,15 @@ class Item:
     """
     return self._saved_named_states.get(name, None)
 
+  def delete_named_state(self, name: str):
+    """Deletes the saved state having the given ``name``.
+
+    This method has no effect if a state with the name ``name`` does not exist.
+
+    See `save_state()` for more information.
+    """
+    self._saved_named_states.pop(name, None)
+
   def reset(self):
     """Resets the item's attributes to the values upon its instantiation."""
     self.name = self._orig_name
