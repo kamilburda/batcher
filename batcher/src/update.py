@@ -322,16 +322,16 @@ def _update_to_0_4(data, _settings, source_names):
 
       if orig_name_setting_dict['default_value'] == 'rename' and arguments_list is not None:
         procedure_dict['name'] = 'rename_for_export_layers'
-        orig_name_setting_dict['default_value'] = 'rename_for_export_layers'
         orig_name_setting_dict['value'] = 'rename_for_export_layers'
+        orig_name_setting_dict['default_value'] = 'rename_for_export_layers'
 
         arguments_list[0]['type'] = 'name_pattern'
         arguments_list[0]['gui_type'] = 'name_pattern_entry'
 
       if orig_name_setting_dict['default_value'] == 'remove_folder_structure':
         procedure_dict['name'] = 'remove_folder_structure_for_export_layers'
-        orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
         orig_name_setting_dict['value'] = 'remove_folder_structure_for_export_layers'
+        orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
 
 
 def _handle_background_foreground_actions(procedures_list, constraints_list):
@@ -389,8 +389,8 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
 
       unique_merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
       merge_group_dict['name'] = unique_merge_procedure_name
-      arguments_list[-2]['default_value'] = unique_merge_procedure_name
       arguments_list[-2]['value'] = unique_merge_procedure_name
+      arguments_list[-2]['default_value'] = unique_merge_procedure_name
 
       merge_procedure_display_name_dict, _index = _get_child_setting(
         merge_group_dict['settings'], 'display_name')
@@ -407,8 +407,8 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
 
       unique_constraint_name = _uniquify_action_name(constraint_name, constraint_names)
       constraint_group_dict['name'] = unique_constraint_name
-      arguments_list[-1]['default_value'] = unique_constraint_name
       arguments_list[-1]['value'] = unique_constraint_name
+      arguments_list[-1]['default_value'] = unique_constraint_name
 
       constraint_display_name_dict, _index = _get_child_setting(
         constraint_group_dict['settings'], 'display_name')
@@ -485,7 +485,7 @@ def _uniquify_action_display_name(display_name, existing_display_names):
   return uniquified_display_name
 
 
-def _update_to_0_5(data, _settings, _source_names):
+def _update_to_0_5(data, _settings, source_names):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
@@ -502,6 +502,15 @@ def _update_to_0_5(data, _settings, _source_names):
       arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
+        # We retain `name` and only modify `orig_name` as only the latter is
+        # used in the code to check if a procedure is an export procedure.
+        if EXPORT_LAYERS_SOURCE_NAME in source_names:
+          orig_name_setting_dict['value'] = 'export_for_export_layers'
+          orig_name_setting_dict['default_value'] = 'export_for_export_layers'
+        elif EDIT_LAYERS_SOURCE_NAME in source_names:
+          orig_name_setting_dict['value'] = 'export_for_edit_layers'
+          orig_name_setting_dict['default_value'] = 'export_for_edit_layers'
+
         del arguments_list[-1]
 
         arguments_list.insert(

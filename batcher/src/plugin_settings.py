@@ -101,7 +101,7 @@ def create_settings_for_export_layers():
   )
 
   export_arguments = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['export']['arguments'])
+    builtin_procedures.BUILTIN_PROCEDURES['export_for_export_layers']['arguments'])
   # Remove settings already present in the main settings.
   export_arguments = export_arguments[2:]
 
@@ -380,7 +380,7 @@ def _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure
 
 
 def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value == 'export':
+  if procedure['orig_name'].value.startswith('export_for_'):
     _set_sensitive_for_image_name_pattern_in_export(
       procedure['arguments/export_mode'],
       procedure['arguments/single_image_name_pattern'])
@@ -393,7 +393,7 @@ def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict)
 
 def _on_after_add_export_procedure_for_export_layers(
       _procedures, procedure, _orig_procedure_dict, main_settings):
-  if procedure['orig_name'].value == 'export':
+  if procedure['orig_name'].value.startswith('export_for_'):
     _set_initial_output_directory_in_export_if_undefined(
       procedure['arguments/output_directory'],
       main_settings['output_directory'])

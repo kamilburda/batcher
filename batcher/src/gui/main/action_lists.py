@@ -301,7 +301,7 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
 
   export_procedure_index = next(
     iter(index for index, item in enumerate(procedure_list.items)
-         if item.action['orig_name'].value == 'export'),
+         if item.action['orig_name'].value.startswith('export_for_')),
     None)
   if export_procedure_index is not None:
     procedure_list.reorder_item(merge_item, export_procedure_index)

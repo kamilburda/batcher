@@ -858,10 +858,7 @@ class Batcher:
         args=[self._name_pattern])
   
   def _add_default_export_procedure(self, action_groups):
-    if (not self._edit_mode
-        and not any(
-          procedure['orig_name'].value == 'export' and procedure['enabled'].value
-          for procedure in self._procedures)):
+    if not self._edit_mode:
       self._invoker.add(
         export_.export,
         groups=action_groups,

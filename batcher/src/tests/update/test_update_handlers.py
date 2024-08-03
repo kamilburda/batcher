@@ -156,6 +156,10 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
 
   def _assert_correct_contents_for_update_to_0_5(self):
+    self.assertIn('export', self.settings['main/procedures'])
+    self.assertEqual(
+      self.settings['main/procedures/export/orig_name'].value, 'export_for_export_layers')
+
     self.assertNotIn(
       'preserve_layer_name_after_export', self.settings['main/procedures/export/arguments'])
     self.assertIn('overwrite_mode', self.settings['main/procedures/export/arguments'])

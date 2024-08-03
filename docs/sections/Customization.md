@@ -357,18 +357,20 @@ Merges an already inserted foreground layer (via `Insert foreground`, see above)
 
 For more information, see `Merge background` above.
 
-**Export**
+**Export**/**Also export as...**
 
-Performs export with additional customization not available in the main dialog.
+Exports a layer to the specified file format.
+
+For Export Layers, this performs export to another file format.
+This way, you can set up export to multiple file formats at once.
 
 Options:
 * *Output folder*: Folder to save the output image(s).
   When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
 * *File extension*: File extension of the output image(s).
-  This overrides the file extension in the main dialog.
 * All options specified in [More Export Options](#more-export-options).
 
-When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
+When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
 
 **Remove folder structure**

@@ -8,6 +8,7 @@ from src import background_foreground
 from src import export as export_
 from src import overwrite
 from src import renamer as renamer_
+from src import utils
 from src.builtin_actions_common import *
 
 
@@ -222,6 +223,94 @@ _SCALE_UNITS = (
 ) = (0, 1, 2, 3, 4)
 
 
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
+  'name': 'export_for_export_layers',
+  'function': export_.export,
+  'display_name': _('Also export as...'),
+  'description': _('Exports a layer to another file format.'),
+  'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
+  'display_options_on_create': True,
+  'arguments': [
+    {
+      'type': 'dirpath',
+      'name': 'output_directory',
+      # Will be automatically set to the value of the 'main/output_directory'
+      # setting when this procedure is added.
+      'default_value': None,
+      'display_name': _('Output folder'),
+      'gui_type': 'folder_chooser_button',
+    },
+    {
+      'type': 'file_extension',
+      'name': 'file_extension',
+      'default_value': 'png',
+      'display_name': _('File extension'),
+      'gui_type': 'file_extension_entry',
+      'adjust_value': True,
+    },
+    {
+      'type': 'choice',
+      'name': 'overwrite_mode',
+      'default_value': 'ask',
+      'items': [
+        ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
+        ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
+        ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
+        ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
+        ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
+      'display_name': _('If a file already exists:'),
+    },
+    {
+      'type': 'choice',
+      'name': 'export_mode',
+      'default_value': 'each_layer',
+      'items': [
+        ('each_layer', _('For each layer'), export_.ExportModes.EACH_LAYER),
+        ('each_top_level_layer_or_group',
+         _('For each top-level layer or group'),
+         export_.ExportModes.EACH_TOP_LEVEL_LAYER_OR_GROUP),
+        ('entire_image_at_once',
+         _('For the entire image at once'),
+         export_.ExportModes.ENTIRE_IMAGE_AT_ONCE),
+      ],
+      'display_name': _('Perform export:'),
+    },
+    {
+      'type': 'name_pattern',
+      'name': 'single_image_name_pattern',
+      'default_value': '[image name]',
+      'display_name': _('Image filename pattern'),
+      'gui_type': 'name_pattern_entry',
+    },
+    {
+      'type': 'bool',
+      'name': 'use_file_extension_in_item_name',
+      'default_value': False,
+      'display_name': _('Use file extension in layer name'),
+      'gui_type': 'check_button_no_text',
+    },
+    {
+      'type': 'bool',
+      'name': 'convert_file_extension_to_lowercase',
+      'default_value': False,
+      'display_name': _('Convert file extension to lowercase'),
+      'gui_type': 'check_button_no_text',
+    },
+  ],
+}
+
+
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(
+  _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS)
+
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
+  'name': 'export_for_edit_layers',
+  'display_name': _('Export'),
+  'description': _('Exports a layer to the specified file format.'),
+  'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+})
+
+
 _BUILTIN_PROCEDURES_LIST = [
   {
     'name': 'apply_opacity_from_layer_groups',
@@ -287,82 +376,8 @@ _BUILTIN_PROCEDURES_LIST = [
       },
     ],
   },
-  {
-    'name': 'export',
-    'function': export_.export,
-    'display_name': _('Export'),
-    'description': _(
-      'Exports a layer with additional options. Overrides the default export options.'),
-    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
-    'display_options_on_create': True,
-    'arguments': [
-      {
-        'type': 'dirpath',
-        'name': 'output_directory',
-        # Will be automatically set to the value of the 'main/output_directory'
-        # setting when this procedure is added.
-        'default_value': None,
-        'display_name': _('Output folder'),
-        'gui_type': 'folder_chooser_button',
-      },
-      {
-        'type': 'file_extension',
-        'name': 'file_extension',
-        'default_value': 'png',
-        'display_name': _('File extension'),
-        'gui_type': 'file_extension_entry',
-        'adjust_value': True,
-      },
-      {
-        'type': 'choice',
-        'name': 'overwrite_mode',
-        'default_value': 'ask',
-        'items': [
-          ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
-          ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
-          ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
-          ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
-          ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
-        'display_name': _('If a file already exists:'),
-      },
-      {
-        'type': 'choice',
-        'name': 'export_mode',
-        'default_value': 'each_layer',
-        'items': [
-          ('each_layer', _('For each layer'), export_.ExportModes.EACH_LAYER),
-          ('each_top_level_layer_or_group',
-           _('For each top-level layer or group'),
-           export_.ExportModes.EACH_TOP_LEVEL_LAYER_OR_GROUP),
-          ('entire_image_at_once',
-           _('For the entire image at once'),
-           export_.ExportModes.ENTIRE_IMAGE_AT_ONCE),
-        ],
-        'display_name': _('Perform export:'),
-      },
-      {
-        'type': 'name_pattern',
-        'name': 'single_image_name_pattern',
-        'default_value': '[image name]',
-        'display_name': _('Image filename pattern'),
-        'gui_type': 'name_pattern_entry',
-      },
-      {
-        'type': 'bool',
-        'name': 'use_file_extension_in_item_name',
-        'default_value': False,
-        'display_name': _('Use file extension in layer name'),
-        'gui_type': 'check_button_no_text',
-      },
-      {
-        'type': 'bool',
-        'name': 'convert_file_extension_to_lowercase',
-        'default_value': False,
-        'display_name': _('Convert file extension to lowercase'),
-        'gui_type': 'check_button_no_text',
-      },
-    ],
-  },
+  _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS,
+  _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS,
   {
     'name': 'merge_background',
     'function': background_foreground.merge_background,
