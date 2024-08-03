@@ -541,7 +541,7 @@ class QuickSettingsGui:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
         self._image,
-        self._dialog,
+        parent=self._dialog,
       )
       self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
     else:
