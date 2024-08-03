@@ -5,6 +5,9 @@ import collections
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import pygimplib as pg
 
@@ -39,27 +42,22 @@ class PreviewsController:
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
 
-  def connect_setting_changes_to_previews(self, procedure_list, constraint_list):
+  def connect_setting_changes_to_previews(self):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
     
     self._connect_setting_after_reset_collapsed_items_in_name_preview()
     self._connect_setting_after_reset_selected_items_in_name_preview()
     self._connect_setting_after_reset_displayed_items_in_image_preview()
-    
+
+    self._connect_name_preview_events()
     self._connect_toggle_name_preview_filtering()
+
     self._connect_update_rendering_of_image_preview(self._settings['main/procedures'])
     self._connect_update_rendering_of_image_preview(self._settings['main/constraints'])
     self._connect_image_preview_menu_setting_changes()
 
-    self._connect_toplevel_focus_change()
-    self._connect_attached_windows_focus_change(procedure_list, constraint_list)
-
-  def connect_name_preview_events(self):
-    self._name_preview.connect('preview-updated', self._on_name_preview_updated)
-    self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
-    self._name_preview.connect(
-      'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
+    self._connect_focus_changes_for_plugin_windows()
 
   def _connect_actions_changed(self, actions):
     # We store event IDs in lists in case the same action is added multiple times.
@@ -231,49 +229,37 @@ class PreviewsController:
       'value-changed',
       lambda setting, update_if_below_setting: update_if_below_setting.set_value(False),
       self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'])
-  
-  def _connect_toplevel_focus_change(self):
-    toplevel = (
-      pg.gui.get_toplevel_window(self._name_preview)
-      or pg.gui.get_toplevel_window(self._image_preview))
-    if toplevel is not None:
-      toplevel.connect('window-state-event', self._on_related_window_window_state_event)
 
-  def _connect_attached_windows_focus_change(self, procedure_list, constraint_list):
-    def _connect_window_state_event_for_edit_dialog(_action_list, action_item):
-      action_item.editor.connect('window-state-event', self._on_related_window_window_state_event)
+  def _connect_focus_changes_for_plugin_windows(self):
+    GObject.add_emission_hook(
+      Gtk.Window,
+      'window-state-event',
+      self._on_related_window_window_state_event)
 
-    procedure_list.connect('action-list-item-added', _connect_window_state_event_for_edit_dialog)
+  def _on_related_window_window_state_event(self, widget, event):
+    if not isinstance(widget, Gtk.Window):
+      # This handles widgets such as `Gtk.Menu` that display menu popups.
+      window = pg.gui.get_toplevel_window(widget)
+    else:
+      window = widget
 
-    # Connect already added items
-    for item in procedure_list.items:
-      _connect_window_state_event_for_edit_dialog(procedure_list, item)
-
-    if procedure_list.browser is not None:
-      procedure_list.browser.widget.connect(
-        'window-state-event', self._on_related_window_window_state_event)
-
-    constraint_list.connect('action-list-item-added', _connect_window_state_event_for_edit_dialog)
-
-    # Connect already added items
-    for item in constraint_list.items:
-      _connect_window_state_event_for_edit_dialog(constraint_list, item)
-
-    if constraint_list.browser is not None:
-      constraint_list.browser.widget.connect(
-        'window-state-event', self._on_related_window_window_state_event)
-
-  def _on_related_window_window_state_event(self, window, event):
-    if not (event.new_window_state & Gdk.WindowState.FOCUSED):
+    if (event.type != Gdk.EventType.WINDOW_STATE   # Safeguard, should not happen
+        or window.get_window_type() != Gtk.WindowType.TOPLEVEL   # Popup windows
+        or not (event.window_state.new_window_state & Gdk.WindowState.FOCUSED)):
       if pg.gui.has_any_window_focus(windows_to_ignore=[window]):
         self._previously_focused_on_related_window = True
       else:
         self._previously_focused_on_related_window = False
-      return
 
-    if ((event.new_window_state & Gdk.WindowState.FOCUSED)
+      return True
+
+    if ((event.window_state.new_window_state & Gdk.WindowState.FOCUSED)
         and not self._previously_focused_on_related_window):
       self._perform_full_preview_update()
+
+      return True
+
+    return True
 
   def _perform_full_preview_update(self):
     pg.invocation.timeout_remove(self._name_preview.update)
@@ -285,6 +271,12 @@ class PreviewsController:
       self._set_initial_selection_and_update_image_preview()
     else:
       self._image_preview.update()
+
+  def _connect_name_preview_events(self):
+    self._name_preview.connect('preview-updated', self._on_name_preview_updated)
+    self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
+    self._name_preview.connect(
+      'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
 
   def _on_name_preview_updated(self, _preview, error):
     if error:

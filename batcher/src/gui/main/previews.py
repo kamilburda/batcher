@@ -144,11 +144,7 @@ class Previews:
     self._image_preview.connect('preview-updated', self._on_image_preview_updated, action_lists)
     self._name_preview.connect('preview-updated', self._on_name_preview_updated, action_lists)
 
-    self._previews_controller.connect_setting_changes_to_previews(
-      action_lists.procedure_list,
-      action_lists.constraint_list,
-    )
-    self._previews_controller.connect_name_preview_events()
+    self._previews_controller.connect_setting_changes_to_previews()
 
   def _init_setting_gui(self):
     self._settings['gui/image_preview_automatic_update'].set_gui(
