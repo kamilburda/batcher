@@ -31,6 +31,12 @@ For now, the dropdown only contains a fixed list of file formats provided by GIM
 However, you can still enter a file extension not in the list in case you use an unrecognized file format plug-in.
 
 
+### More Export Options
+
+For Export Layers, pressing the `Export Options...` button reveals additional export options.
+These options are described in [More Export Options](#more-export-options).
+
+
 ### Procedures and Constraints
 
 Before the export, you can apply a multitude of *procedures* to each layer, such as scaling or background insertion.

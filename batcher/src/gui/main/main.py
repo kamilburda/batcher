@@ -114,7 +114,9 @@ class BatchLayerProcessingGui:
         self._image,
         row_spacing=self._DIALOG_VBOX_SPACING,
         name_preview=self._previews.name_preview,
+        image_preview=self._previews.image_preview,
         display_message_func=self._display_inline_message,
+        parent=self._dialog,
       )
     else:
       self._export_settings = None
@@ -233,6 +235,24 @@ class BatchLayerProcessingGui:
     self._dialog.show()
 
   def _assign_gui_to_settings(self):
+    if self._mode == 'edit':
+      self._assign_gui_to_settings_for_edit_mode()
+    elif self._mode == 'export':
+      self._assign_gui_to_settings_for_export_mode()
+
+  def _assign_gui_to_settings_for_edit_mode(self):
+    self._assign_gui_to_settings_common()
+
+  def _assign_gui_to_settings_for_export_mode(self):
+    self._settings['main/export'].tags.add('ignore_initialize_gui')
+
+    self._assign_gui_to_settings_common()
+
+    self._settings['main/export'].tags.remove('ignore_initialize_gui')
+
+    self._settings['main/export'].initialize_gui(only_null=True)
+
+  def _assign_gui_to_settings_common(self):
     self._settings.initialize_gui(
       {
         'gui/size/dialog_position': dict(
@@ -521,6 +541,7 @@ class QuickSettingsGui:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
         self._image,
+        self._dialog,
       )
       self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
     else:

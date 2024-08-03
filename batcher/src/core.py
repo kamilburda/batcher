@@ -6,7 +6,7 @@ import contextlib
 import functools
 import inspect
 import traceback
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -82,6 +82,7 @@ class Batcher:
         file_extension: str = 'png',
         overwrite_mode: int = overwrite.OverwriteModes.RENAME_NEW,
         overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
+        more_export_options: Dict[str, Any] = None,
         progress_updater: Optional[progress_.ProgressUpdater] = None,
         item_tree: Optional[pg.itemtree.ItemTree] = None,
         is_preview: bool = False,
@@ -747,7 +748,10 @@ class Batcher:
       self._overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
     else:
       self._overwrite_chooser.overwrite_mode = self._overwrite_mode
-    
+
+    if self._more_export_options is None:
+      self._more_export_options = {}
+
     if self._progress_updater is None:
       self._progress_updater = progress_.ProgressUpdater(None)
     
@@ -864,8 +868,9 @@ class Batcher:
         args=[
           self._output_directory,
           self._file_extension,
-          overwrite.OverwriteModes.ASK,
-          export_.ExportModes.EACH_LAYER])
+        ],
+        kwargs=self._more_export_options,
+      )
   
   def _set_constraints(self):
     self._invoker.invoke(

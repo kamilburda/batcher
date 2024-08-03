@@ -373,6 +373,7 @@ class NamePreview(preview_base_.Preview):
       # existing item trees are not automatically refreshed.
       for item in item_tree.iter_all():
         item.reset()
+        item.delete_named_state('export')
     
     error = None
     

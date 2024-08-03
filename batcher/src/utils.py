@@ -23,6 +23,12 @@ def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
     if setting_name in main_settings:
       settings_for_batcher[setting_name] = main_settings[setting_name].value
 
+  if 'export' in main_settings:
+    settings_for_batcher['more_export_options'] = {}
+
+    for setting in main_settings['export']:
+      settings_for_batcher['more_export_options'][setting.name] = setting.value
+
   return settings_for_batcher
 
 

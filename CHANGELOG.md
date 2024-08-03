@@ -1,15 +1,16 @@
 ## Upcoming
 
-Changes to export settings:
+Changes to the export options:
+* Added a button in the main dialog to adjust export options previously only available when adding the `Export` procedure.
 * Renamed `Save in Folder` to `Folder` and `Save As` to `Name` for brevity.
+* By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
 
 Changes to the `Export` procedure:
 * Add a new option `If a file exists:` that allows skipping the dialog asking the user to handle existing files and setting a fixed mode for all files.
-* By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
 * Removed the `Preserve layer name after export` option. The layer name is now always preserved.
 
 Other changes:
-* The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Name`).
+* The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Name`) instead of overriding it.
 
 
 ## 0.4

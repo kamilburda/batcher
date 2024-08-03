@@ -275,6 +275,20 @@ Examples:
 * `[layer path, [,], [[[%c]]] ]` → `[Body],[Hands],[Left]`
 
 
+## More Export Options
+
+For Export Layers, pressing the `Export Options...` button reveals additional export options described below:
+
+* *If a file exists*: If this is set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
+* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
+  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
+* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
+  For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
+* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
+  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names.
+* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
+
+
 ## Procedures
 
 Procedures allow you to apply image filters to each layer.
@@ -352,16 +366,9 @@ Options:
   When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
 * *File extension*: File extension of the output image(s).
   This overrides the file extension in the main dialog.
-* *If a file exists*: If this is set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
-* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
-* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
-  The text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
-  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names.
-* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
+* All options specified in [More Export Options](#more-export-options).
 
-When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect.
+When exporting each layer separately (the default), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
 
 **Remove folder structure**

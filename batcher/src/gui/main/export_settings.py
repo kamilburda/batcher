@@ -2,6 +2,8 @@ import os
 
 import gi
 
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -25,7 +27,7 @@ class ExportSettings:
   _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 12
   _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 40
 
-  _DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS = 100
+  _DELAY_PREVIEW_UPDATE_MILLISECONDS = 100
 
   def __init__(
         self,
@@ -34,15 +36,19 @@ class ExportSettings:
         row_spacing=_ROW_SPACING,
         column_spacing=_COLUMN_SPACING,
         name_preview=None,
+        image_preview=None,
         display_message_func=None,
+        parent=None,
   ):
     self._settings = settings
     self._image = image
     self._row_spacing = row_spacing
     self._column_spacing = column_spacing
     self._name_preview = name_preview
+    self._image_preview = image_preview
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
+    self._parent = parent
 
     self._message_setting = None
 
@@ -90,7 +96,7 @@ class ExportSettings:
       default_item=self._settings['main/name_pattern'].default_value)
     self._name_pattern_entry.set_activates_default(True)
 
-    self._more_export_options_button = Gtk.Button(
+    self._export_options_button = Gtk.Button(
       label=_('E_xport Options...'),
       use_underline=True,
     )
@@ -112,18 +118,19 @@ class ExportSettings:
     self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
     self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
 
-    self._hbox_more_export_options_button = Gtk.Box(
+    self._hbox_export_options_button = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
-    self._hbox_more_export_options_button.pack_start(
-      self._more_export_options_button, False, False, 0)
+    self._hbox_export_options_button.pack_start(self._export_options_button, False, False, 0)
 
     self._vbox = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._row_spacing,
     )
     self._vbox.pack_start(self._grid_export_settings, False, False, 0)
-    self._vbox.pack_start(self._hbox_more_export_options_button, False, False, 0)
+    self._vbox.pack_start(self._hbox_export_options_button, False, False, 0)
+
+    self._export_options_dialog = None
 
     self._file_extension_entry.connect(
       'focus-out-event',
@@ -143,6 +150,11 @@ class ExportSettings:
         self._on_text_entry_changed,
         self._settings['main/name_pattern'],
         'invalid_name_pattern')
+
+    self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
+
+    for setting in self._settings['main/export']:
+      setting.connect_event('value-changed', self._update_previews_on_export_options_change)
 
   def _init_setting_gui(self):
     self._settings['main/output_directory'].set_gui(
@@ -199,18 +211,104 @@ class ExportSettings:
         self._name_preview.set_sensitive, True)
 
       pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._name_preview.update)
     else:
       pg.invocation.timeout_add_strict(
-        self._DELAY_NAME_PREVIEW_UPDATE_TEXT_ENTRIES_MILLISECONDS,
-        self._name_preview.set_sensitive, False)
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._name_preview.set_sensitive,
+        False)
 
       self._display_message_func(validation_result.message, Gtk.MessageType.ERROR)
 
       self._message_setting = setting
 
       self._name_preview.lock_update(True, name_preview_lock_update_key)
+
+  def _on_export_options_button_clicked(self, _button):
+    if self._export_options_dialog is None:
+      self._export_options_dialog = ExportOptionsDialog(self._settings, parent=self._parent)
+
+      self._export_options_dialog.widget.show_all()
+    else:
+      self._export_options_dialog.widget.show()
+
+  def _update_previews_on_export_options_change(self, _setting):
+    if self._name_preview is not None:
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._name_preview.update)
+
+    if self._image_preview is not None:
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._image_preview.update)
+
+
+class ExportOptionsDialog:
+
+  _CONTENTS_BORDER_WIDTH = 6
+
+  _GRID_ROW_SPACING = 3
+  _GRID_COLUMN_SPACING = 8
+
+  def __init__(self, settings, parent=None):
+    self._settings = settings
+    self._parent = parent
+
+    self._init_gui()
+
+  def _init_gui(self):
+    self._dialog = GimpUi.Dialog(
+      title=_('Export Options'),
+      role=pg.config.PLUGIN_NAME,
+      parent=self._parent,
+    )
+
+    self._button_reset_response_id = 1
+    self._button_reset = self._dialog.add_button(_('_Reset'), self._button_reset_response_id)
+
+    self._button_reset.connect('clicked', self._on_export_options_dialog_button_reset_clicked)
+
+    self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
+
+    self._grid_export_options = Gtk.Grid(
+      row_spacing=self._GRID_ROW_SPACING,
+      column_spacing=self._GRID_COLUMN_SPACING,
+    )
+
+    self._settings['main/export'].initialize_gui(only_null=True)
+
+    for row_index, setting in enumerate(self._settings['main/export']):
+      label_for_setting = Gtk.Label(label=setting.display_name, xalign=0.0)
+      self._grid_export_options.attach(label_for_setting, 0, row_index, 1, 1)
+      self._grid_export_options.attach(setting.gui.widget, 1, row_index, 1, 1)
+
+    self._dialog.vbox.pack_start(self._grid_export_options, False, False, 0)
+    self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
+
+    self._dialog.connect('realize', self._on_export_options_dialog_realize)
+    self._dialog.connect('close', self._on_export_options_dialog_close)
+    self._dialog.connect('response', self._on_export_options_dialog_response)
+
+  @property
+  def widget(self):
+    return self._dialog
+
+  def _on_export_options_dialog_close(self, _dialog):
+    self._dialog.hide()
+
+  def _on_export_options_dialog_response(self, _dialog, response_id):
+    if response_id == Gtk.ResponseType.CLOSE:
+      self._dialog.hide()
+
+  def _on_export_options_dialog_realize(self, _dialog):
+    if self._parent is not None:
+      self._dialog.set_transient_for(pg.gui.get_toplevel_window(self._parent))
+      self._dialog.set_attached_to(pg.gui.get_toplevel_window(self._parent))
+
+  def _on_export_options_dialog_button_reset_clicked(self, _button):
+    self._settings['main/export'].reset()
 
 
 def _set_up_output_directory_settings(settings, current_image):

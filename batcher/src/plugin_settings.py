@@ -64,7 +64,7 @@ def create_settings_for_export_layers():
         ('skip', _('_Skip'), overwrite.OverwriteModes.SKIP),
         ('rename_new', _('Rename _new file'), overwrite.OverwriteModes.RENAME_NEW),
         ('rename_existing', _('Rename _existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
-      'display_name': _('Overwrite mode (non-interactive run mode only)'),
+      'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
     {
@@ -92,6 +92,22 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
   ])
+
+  export_settings = pg.setting.Group(
+    name='export',
+    setting_attributes={
+      'pdb_type': None,
+    },
+  )
+
+  export_arguments = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['export']['arguments'])
+  # Remove settings already present in the main settings.
+  export_arguments = export_arguments[2:]
+
+  export_settings.add(export_arguments)
+
+  settings['main'].add([export_settings])
 
   gui_settings = _create_gui_settings()
   gui_settings.add([
@@ -146,7 +162,9 @@ def create_settings_for_export_layers():
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
         visible_constraint_dict]),
   ])
-  
+
+  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
+
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
 
   settings['main/procedures'].connect_event(
@@ -348,6 +366,17 @@ def _create_show_quick_settings_setting_dict():
     'default_value': True,
     'gui_type': None,
   }
+
+
+def _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(main_settings):
+  _set_sensitive_for_image_name_pattern_in_export(
+    main_settings['export/export_mode'],
+    main_settings['export/single_image_name_pattern'])
+
+  main_settings['export/export_mode'].connect_event(
+    'value-changed',
+    _set_sensitive_for_image_name_pattern_in_export,
+    main_settings['export/single_image_name_pattern'])
 
 
 def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
