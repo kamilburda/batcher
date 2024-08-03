@@ -264,7 +264,6 @@ class ActionBrowser(GObject.GObject):
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=self._title,
-      role=pg.config.PLUGIN_NAME,
     )
     self._dialog.set_default_size(*self._DIALOG_SIZE)
 

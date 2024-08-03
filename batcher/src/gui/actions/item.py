@@ -143,7 +143,6 @@ class ActionItem(pg.gui.ItemBoxItem):
       self.widget,
       attach_editor_widget=self._attach_editor_widget,
       title=self._action['display_name'].value,
-      role=pg.config.PLUGIN_NAME,
     )
     self.widget.connect('realize', self._on_action_widget_realize)
 

@@ -423,7 +423,7 @@ class BatchLayerProcessingQuickGui:
     else:
       title = None
 
-    self._dialog = GimpUi.Dialog(title=title, role=None)
+    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
 
@@ -531,7 +531,7 @@ class QuickSettingsGui:
     else:
       title = None
 
-    self._dialog = GimpUi.Dialog(title=title, role=None)
+    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
 

@@ -39,7 +39,6 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=self._title,
-      role=None,
       parent=self._parent,
       modal=True,
       destroy_with_parent=True,

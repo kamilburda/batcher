@@ -261,7 +261,6 @@ class ExportOptionsDialog:
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=_('Export Options'),
-      role=pg.config.PLUGIN_NAME,
       parent=self._parent,
     )
 
