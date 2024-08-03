@@ -44,8 +44,7 @@ class PopupHideContext:
     self._hide_callback = (
       hide_callback if hide_callback is not None else self._popup_to_hide.hide)
     self._widgets_to_exclude_from_triggering_hiding = widgets_to_exclude_from_triggering_hiding
-    
-    self._button_press_emission_hook_id = None
+
     self._toplevel_configure_event_id = None
     self._toplevel_position = None
     self._widgets_with_entered_pointers = set()
@@ -75,7 +74,7 @@ class PopupHideContext:
     self._disconnect_button_press_events_for_hiding()
 
   def _connect_button_press_events_for_hiding(self):
-    self._button_press_emission_hook_id = GObject.add_emission_hook(
+    GObject.add_emission_hook(
       self._popup_owner_widget,
       'button-press-event',
       self._on_emission_hook_button_press_event)
@@ -90,14 +89,6 @@ class PopupHideContext:
       self._toplevel_position = toplevel.get_position()
 
   def _disconnect_button_press_events_for_hiding(self):
-    if (self._button_press_emission_hook_id is not None
-        and GObject.signal_handler_is_connected(
-          self._popup_owner_widget, self._button_press_emission_hook_id)):
-      GObject.remove_emission_hook(
-        self._popup_owner_widget,
-        'button-press-event',
-        self._button_press_emission_hook_id)
-
     toplevel = pg.gui.utils.get_toplevel_window(self._popup_owner_widget)
     if (toplevel is not None
         and self._toplevel_configure_event_id is not None
