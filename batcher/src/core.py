@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import GLib
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -77,7 +76,7 @@ class Batcher:
         constraints: pg.setting.Group,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
-        output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
+        output_directory: str = pg.utils.get_pictures_directory(),
         name_pattern: str = '',
         file_extension: str = 'png',
         overwrite_mode: int = overwrite.OverwriteModes.RENAME_NEW,

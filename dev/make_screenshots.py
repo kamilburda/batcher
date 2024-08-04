@@ -9,7 +9,6 @@ import sys
 import time
 
 import gi
-from gi.repository import GLib
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('Gimp', '3.0')
@@ -21,6 +20,8 @@ from gi.repository import Gtk
 
 import batcher.pygimplib as pg
 from batcher.pygimplib import pdb
+
+from batcher.src.setting_source_names import *
 
 
 ROOT_DIRPATH = os.path.abspath(
@@ -39,8 +40,7 @@ TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
 TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
 
-OUTPUT_DIRPATH = os.path.join(
-  GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES), 'Loading Screens', 'Components')
+OUTPUT_DIRPATH = os.path.join(pg.utils.get_pictures_directory(), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
@@ -57,6 +57,7 @@ def main():
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
+    EXPORT_LAYERS_SOURCE_NAME,
     'export',
     run_gui_func=take_screenshots_for_export_layers,
   )
@@ -64,6 +65,7 @@ def main():
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_edit_layers(),
+    EDIT_LAYERS_SOURCE_NAME,
     'edit',
     run_gui_func=take_screenshots_for_edit_layers,
   )

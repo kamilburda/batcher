@@ -696,7 +696,7 @@ class FolderChooserButtonPresenter(GtkPresenter):
     if folder is not None:
       return folder
     else:
-      return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
+      return pgutils.get_pictures_directory()
   
   def _set_value(self, dirpath):
     self._widget.set_filename(dirpath if dirpath is not None else '')

@@ -14,10 +14,10 @@
                         },
                         {
                             "name": "output_directory",
-                            "default_value": "C:\\Users\\Kamil\\Documents",
+                            "default_value": "C:\\Users\\Kamil\\Pictures",
                             "display_name": "Output directory",
                             "gui_type": null,
-                            "value": "C:\\Users",
+                            "value": "C:\\Users\\Kamil\\Pictures",
                             "type": "string"
                         },
                         {

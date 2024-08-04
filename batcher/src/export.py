@@ -7,7 +7,6 @@ from typing import Generator, Optional
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import GLib
 
 import pygimplib as pg
 
@@ -34,7 +33,7 @@ class ExportModes:
 
 def export(
       batcher: 'src.core.Batcher',
-      output_directory: str = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
+      output_directory: str = pg.utils.get_pictures_directory(),
       file_extension: str = 'png',
       overwrite_mode: int = overwrite.OverwriteModes.ASK,
       export_mode: int = ExportModes.EACH_LAYER,

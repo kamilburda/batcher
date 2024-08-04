@@ -2,8 +2,6 @@
 
 import collections
 
-from gi.repository import GLib
-
 import pygimplib as pg
 
 from src import actions as actions_
@@ -41,7 +39,7 @@ def create_settings_for_export_layers():
     {
       'type': 'string',
       'name': 'output_directory',
-      'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
+      'default_value': pg.utils.get_pictures_directory(),
       'display_name': _('Output directory'),
       'gui_type': None,
       'auto_update_gui_to_setting': False,

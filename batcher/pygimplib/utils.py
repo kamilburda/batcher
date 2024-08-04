@@ -9,6 +9,8 @@ import traceback as traceback_
 from typing import Callable, Optional, Tuple, Type
 import warnings
 
+from gi.repository import GLib
+
 
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
   """Returns a context manager that does nothing.
@@ -286,3 +288,13 @@ def _showwarning_with_traceback(traceback=None):
     log_file.write(formatted_traceback)
 
   return _showwarning
+
+
+def get_pictures_directory():
+  """Returns the ``Pictures`` user directory if the platform defines the
+  directory, and empty string otherwise.
+  """
+  try:
+    return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES)
+  except Exception:
+    return ''

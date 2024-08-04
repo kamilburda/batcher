@@ -10,7 +10,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-from gi.repository import GLib
 
 import pygimplib as pg
 
@@ -63,7 +62,7 @@ class DirpathSetting(ValidatableStringSetting):
   The `path.validatorsDirpathValidator` subclass is used to determine whether
   the directory path is valid.
 
-  Default value: `Documents` directory in the user's home directory.
+  Default value: `Pictures` directory in the user's home directory.
 
   Empty values:
   * ``None``
@@ -72,7 +71,7 @@ class DirpathSetting(ValidatableStringSetting):
 
   _ALLOWED_GUI_TYPES = [pg.SETTING_GUI_TYPES.folder_chooser_button]
 
-  _DEFAULT_DEFAULT_VALUE = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS)
+  _DEFAULT_DEFAULT_VALUE = pg.utils.get_pictures_directory()
 
   _EMPTY_VALUES = [None, '']
 
