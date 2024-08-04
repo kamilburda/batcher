@@ -372,6 +372,7 @@ Options:
 
 When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
+The name of the Export procedure is automatically updated as you modify the file extension.
 
 **Remove folder structure**
 
