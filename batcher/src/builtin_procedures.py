@@ -3,6 +3,7 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GLib
 
 from src import background_foreground
 from src import export as export_
@@ -234,9 +235,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
     {
       'type': 'dirpath',
       'name': 'output_directory',
-      # Will be automatically set to the value of the 'main/output_directory'
-      # setting when this procedure is added.
-      'default_value': None,
+      'default_value': GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS),
       'display_name': _('Output folder'),
       'gui_type': 'folder_chooser_button',
     },

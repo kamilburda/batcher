@@ -55,20 +55,6 @@ class ActionLists:
 
     self._init_setting_gui()
 
-    self._procedure_list.connect(
-      'action-list-item-added-interactive',
-      _on_insert_background_foreground_procedure_item_added,
-      self._constraint_list,
-    )
-
-    _set_up_existing_insert_back_foreground_and_related_actions(
-      self._procedure_list, self._constraint_list)
-
-    self._procedure_list.actions.connect_event(
-      'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
-    self._constraint_list.actions.connect_event(
-      'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
-
   @property
   def procedure_list(self):
     return self._procedure_list
@@ -179,6 +165,21 @@ class ActionLists:
       copy_previous_sensitive=False,
     )
 
+    self._procedure_list.connect(
+      'action-list-item-added-interactive',
+      _on_procedure_item_added,
+      self._settings,
+      self._constraint_list,
+    )
+
+    _set_up_existing_insert_back_foreground_and_related_actions(
+      self._procedure_list, self._constraint_list)
+
+    self._procedure_list.actions.connect_event(
+      'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
+    self._constraint_list.actions.connect_event(
+      'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
+
   def _set_up_existing_insert_back_foreground_and_related_actions_on_load(self, _actions):
     if self._procedures_or_constraints_loaded:
       _set_up_existing_insert_back_foreground_and_related_actions(
@@ -206,23 +207,34 @@ class ActionLists:
             action_item.reset_tooltip()
 
 
-def _on_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list):
+def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
-    procedure_list.reorder_item(item, 0)
+    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
 
-    merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
+  if item.action['orig_name'].value.startswith('export_for_'):
+    _handle_export_procedure_item_added(item)
 
-    constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
+  if item.action['orig_name'].value == 'export_for_export_layers':
+    _handle_export_for_export_layers_procedure_item_added(item, settings)
 
-    _hide_internal_arguments_for_insert_background_foreground_procedure(item)
 
-    _set_up_insert_background_foreground_procedure(
-      item, merge_item, constraint_item, procedure_list, constraint_list)
-    _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
-    _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
+def _handle_insert_background_foreground_procedure_item_added(
+      procedure_list, item, constraint_list):
+  procedure_list.reorder_item(item, 0)
 
-    item.action['arguments/merge_procedure_name'].set_value(merge_item.action.name)
-    item.action['arguments/constraint_name'].set_value(constraint_item.action.name)
+  merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
+
+  constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
+
+  _hide_internal_arguments_for_insert_background_foreground_procedure(item)
+
+  _set_up_insert_background_foreground_procedure(
+    item, merge_item, constraint_item, procedure_list, constraint_list)
+  _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
+  _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
+
+  item.action['arguments/merge_procedure_name'].set_value(merge_item.action.name)
+  item.action['arguments/constraint_name'].set_value(constraint_item.action.name)
 
 
 def _set_up_existing_insert_back_foreground_and_related_actions(
@@ -375,6 +387,41 @@ def _on_insert_background_foreground_procedure_removed(
       procedure_list.remove_item(merge_item)
     if constraint_item in constraint_list.items:
       constraint_list.remove_item(constraint_item)
+
+
+def _handle_export_procedure_item_added(item):
+  _set_display_name_for_export_procedure(
+    item.action['arguments/file_extension'],
+    item.action)
+
+  item.action['arguments/file_extension'].connect_event(
+    'value-changed',
+    _set_display_name_for_export_procedure,
+    item.action)
+
+
+def _set_display_name_for_export_procedure(file_extension_setting, export_procedure):
+  file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
+
+  if export_procedure['orig_name'].value == 'export_for_edit_layers':
+    export_procedure['display_name'].set_value(_('Export as {}').format(file_extension))
+  elif export_procedure['orig_name'].value == 'export_for_export_layers':
+    export_procedure['display_name'].set_value(_('Also export as {}').format(file_extension))
+
+
+def _handle_export_for_export_layers_procedure_item_added(item, settings):
+  _copy_setting_values_from_default_export_procedure(settings['main'], item.action)
+
+
+def _copy_setting_values_from_default_export_procedure(main_settings, export_procedure):
+  if main_settings['output_directory'].value:
+    export_procedure['arguments/output_directory'].set_value(
+      main_settings['output_directory'].value)
+
+  export_procedure['arguments/file_extension'].set_value(main_settings['file_extension'].value)
+
+  for setting in main_settings['export']:
+    export_procedure[f'arguments/{setting.name}'].set_value(setting.value)
 
 
 def _set_buttons_for_action_item_sensitive(item, sensitive):

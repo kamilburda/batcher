@@ -370,9 +370,13 @@ Options:
 * *File extension*: File extension of the output image(s).
 * All options specified in [More Export Options](#more-export-options).
 
-When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
-
 The name of the Export procedure is automatically updated as you modify the file extension.
+
+For Export Layers, when this procedure is added, the values of the options are copied from the default export options.
+For example, the output folder will be identical to the one currently selected in the main dialog.
+This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
+
+When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
 **Remove folder structure**
 

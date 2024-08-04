@@ -7,6 +7,7 @@ Changes to the export options:
 
 Changes to the `Export` procedure:
 * For Export Layers, the `Export` procedure now performs additional export instead of overriding the default export. The procedure name for Export Layers is now `Also export as...` to reflect this change. The name changes automatically as you modify the file extension (e.g. `Also export as PNG` if the file extension is `png`).
+* For Export Layers, when the `Export` procedure is added, values of the options are copied from the default export (e.g. the output folder will be identical to the one currently selected in the main dialog).
 * Add a new option `If a file exists:` that allows skipping the dialog asking the user to handle existing files and setting a fixed mode for all files.
 * Removed the `Preserve layer name after export` option. The layer name is now always preserved.
 

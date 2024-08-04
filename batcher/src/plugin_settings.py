@@ -166,9 +166,6 @@ def create_settings_for_export_layers():
   _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-
-  settings['main/procedures'].connect_event(
-    'after-add-action', _on_after_add_export_procedure_for_export_layers, settings['main'])
   
   settings['main/constraints'].connect_event(
     'after-add-action',
@@ -381,15 +378,6 @@ def _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure
 
 def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('export_for_'):
-    _set_display_name_for_export_procedure(
-      procedure['arguments/file_extension'],
-      procedure)
-
-    procedure['arguments/file_extension'].connect_event(
-      'value-changed',
-      _set_display_name_for_export_procedure,
-      procedure)
-
     _set_sensitive_for_image_name_pattern_in_export(
       procedure['arguments/export_mode'],
       procedure['arguments/single_image_name_pattern'])
@@ -398,43 +386,6 @@ def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict)
       'value-changed',
       _set_sensitive_for_image_name_pattern_in_export,
       procedure['arguments/single_image_name_pattern'])
-
-
-def _on_after_add_export_procedure_for_export_layers(
-      _procedures, procedure, _orig_procedure_dict, main_settings):
-  if procedure['orig_name'].value.startswith('export_for_'):
-    _set_initial_output_directory_in_export_if_undefined(
-      procedure['arguments/output_directory'],
-      main_settings['output_directory'])
-
-    procedure['arguments/output_directory'].connect_event(
-      'value-changed',
-      _set_initial_output_directory_in_export_if_undefined,
-      main_settings['output_directory'])
-
-
-def _set_initial_output_directory_in_export_if_undefined(
-      export_output_directory_setting, output_directory_setting):
-  # The check avoids plug-in failing to display the GUI due to an invalid
-  # directory.
-  if output_directory_setting.value:
-    # This check prevents the directory for the custom Export procedure to be
-    # overwritten at each start of the plug-in.
-    if export_output_directory_setting.value is None:
-      export_output_directory_setting.set_value(output_directory_setting.value)
-  else:
-    # Assign a safe value
-    if export_output_directory_setting.value is None:
-      export_output_directory_setting.set_value(output_directory_setting.default_value)
-
-
-def _set_display_name_for_export_procedure(file_extension_setting, export_procedure):
-  file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
-
-  if export_procedure['orig_name'].value == 'export_for_edit_layers':
-    export_procedure['display_name'].set_value(_('Export as {}').format(file_extension))
-  elif export_procedure['orig_name'].value == 'export_for_export_layers':
-    export_procedure['display_name'].set_value(_('Also export as {}').format(file_extension))
 
 
 def _set_sensitive_for_image_name_pattern_in_export(
