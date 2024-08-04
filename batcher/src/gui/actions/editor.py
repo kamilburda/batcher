@@ -41,6 +41,8 @@ class ActionEditor(GimpUi.Dialog):
 
     self.set_focus(self._button_close)
 
+    action['display_name'].connect_event('value-changed', self._on_action_display_name_changed)
+
   @property
   def widget(self):
     return self._action_editor_widget
@@ -56,6 +58,9 @@ class ActionEditor(GimpUi.Dialog):
 
   def _on_button_reset_clicked(self, _button, _action):
     self._action_editor_widget.reset()
+
+  def _on_action_display_name_changed(self, display_name_setting):
+    self.set_title(display_name_setting.value)
 
 
 class ActionEditorWidget:
@@ -106,6 +111,9 @@ class ActionEditorWidget:
     self._button_preview.connect('clicked', self._on_button_preview_clicked)
     self._button_reset.connect('clicked', self._on_button_reset_clicked)
 
+    self._action['display_name'].connect_event(
+      'value-changed', self._on_action_display_name_changed)
+
   @property
   def action(self):
     return self._action
@@ -125,11 +133,9 @@ class ActionEditorWidget:
     self._show_hide_additional_settings()
 
   def reset(self):
+    self._action['display_name'].reset()
     self._action['arguments'].reset()
     self._action['more_options'].reset()
-
-    self._action['display_name'].reset()
-    self._set_editable_label_text(self._action['display_name'].value)
 
   def set_parent(self, parent):
     if self._info_popup is not None and self._parent_widget_realize_event_id is not None:
@@ -214,10 +220,12 @@ class ActionEditorWidget:
     self._label_editable_action_name.connect(
       'changed', self._on_label_editable_action_name_changed, action)
 
-  def _on_label_editable_action_name_changed(self, editable_label, action):
+  @staticmethod
+  def _on_label_editable_action_name_changed(editable_label, action):
     action['display_name'].set_value(editable_label.label.get_text())
 
-    self._set_editable_label_text(editable_label.label.get_text())
+  def _on_action_display_name_changed(self, display_name_setting):
+    self._set_editable_label_text(display_name_setting.value)
 
   def _set_editable_label_text(self, text):
     self._label_editable_action_name.label.set_markup(
