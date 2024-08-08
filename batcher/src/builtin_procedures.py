@@ -267,9 +267,9 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
       'gui_type': 'radio_button_box',
     },
     {
-      'type': 'file_format_settings',
-      'name': 'file_format_settings',
-      'gui_type': 'file_format_settings',
+      'type': 'file_format_options',
+      'name': 'file_format_options',
+      'gui_type': 'file_format_options',
       'display_name': _('File format options')
     },
     {

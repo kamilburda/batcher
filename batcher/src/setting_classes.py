@@ -434,7 +434,7 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
       return 'value must be a dictionary', 'value_must_be_dict'
 
 
-class FileFormatSettingsPresenter(pg.setting.GtkPresenter):
+class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.Grid` widgets representing
   dictionaries of (string, value) pairs.
 
@@ -455,6 +455,6 @@ class FileFormatSettingsPresenter(pg.setting.GtkPresenter):
     pass
 
 
-class FileFormatSettingsSetting(pg.setting.DictSetting):
+class FileFormatOptionsSetting(pg.setting.DictSetting):
 
-  _ALLOWED_GUI_TYPES = [FileFormatSettingsPresenter]
+  _ALLOWED_GUI_TYPES = [FileFormatOptionsPresenter]

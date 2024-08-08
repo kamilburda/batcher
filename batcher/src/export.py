@@ -48,15 +48,15 @@ def export(
       output_directory: str = pg.utils.get_pictures_directory(),
       file_extension: str = 'png',
       file_format_mode: int = FileFormatModes.USE_EXPLICIT_VALUES,
-      file_format_settings: Optional[Dict] = None,
+      file_format_options: Optional[Dict] = None,
       overwrite_mode: int = overwrite.OverwriteModes.ASK,
       export_mode: int = ExportModes.EACH_LAYER,
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
 ) -> Generator[None, None, None]:
-  if file_format_settings is None:
-    file_format_settings = {}
+  if file_format_options is None:
+    file_format_options = {}
 
   item_uniquifier = uniquifier.ItemUniquifier()
   file_extension_properties = _FileExtensionProperties()
@@ -163,7 +163,7 @@ def export(
         raw_item_to_process,
         output_directory,
         file_format_mode,
-        file_format_settings,
+        file_format_options,
         default_file_extension,
         file_extension_properties,
         overwrite_chooser)
@@ -185,7 +185,7 @@ def export(
             raw_item_to_process,
             output_directory,
             file_format_mode,
-            file_format_settings,
+            file_format_options,
             default_file_extension,
             file_extension_properties,
             overwrite_chooser)
@@ -337,7 +337,7 @@ def _export_item(
       raw_item,
       output_directory,
       file_format_mode,
-      file_format_settings,
+      file_format_options,
       default_file_extension,
       file_extension_properties,
       overwrite_chooser,
@@ -367,7 +367,7 @@ def _export_item(
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_settings,
+      file_format_options,
       default_file_extension,
       file_extension_properties)
     
@@ -380,7 +380,7 @@ def _export_item(
         output_filepath,
         file_extension,
         file_format_mode,
-        file_format_settings,
+        file_format_options,
         default_file_extension,
         file_extension_properties)
   
@@ -436,7 +436,7 @@ def _export_item_once_wrapper(
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_settings,
+      file_format_options,
       default_file_extension,
       file_extension_properties,
 ):
@@ -451,7 +451,7 @@ def _export_item_once_wrapper(
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_settings,
+      file_format_options,
       default_file_extension,
       file_extension_properties)
   
@@ -474,7 +474,7 @@ def _export_item_once(
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_settings,
+      file_format_options,
       default_file_extension,
       file_extension_properties,
 ):
@@ -489,7 +489,7 @@ def _export_item_once(
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_settings)
+      file_format_options)
   except pg.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
       raise exceptions.BatcherCancelError('cancelled')
@@ -517,7 +517,7 @@ def _export_image(
       filepath: Union[str, Gio.File],
       file_extension: str,
       file_format_mode: int,
-      file_format_settings: Dict,
+      file_format_options: Dict,
 ):
   if not isinstance(layer_or_layers, Iterable):
     layers = [layer_or_layers]
@@ -532,7 +532,7 @@ def _export_image(
   layer_array = GObject.Value(Gimp.ObjectArray)
   Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
 
-  export_func, kwargs = _get_export_function(file_extension, file_format_mode, file_format_settings)
+  export_func, kwargs = _get_export_function(file_extension, file_format_mode, file_format_options)
 
   export_func(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode, **kwargs)
 
@@ -542,7 +542,7 @@ def _export_image(
 def _get_export_function(
       file_extension: str,
       file_format_mode: int,
-      file_format_settings: Dict,
+      file_format_options: Dict,
 ) -> Tuple[Callable, Dict]:
   """Returns the file export procedure and file format settings given the
   file extension.
@@ -558,7 +558,7 @@ def _get_export_function(
       and file_extension in fileformats.FILE_FORMATS_DICT):
     file_format = fileformats.FILE_FORMATS_DICT[file_extension]
     if file_format.export_procedure_name:
-      return getattr(pdb, file_format.export_procedure_name), file_format_settings
+      return getattr(pdb, file_format.export_procedure_name), file_format_options
 
   return pdb.gimp_file_save, {}
 

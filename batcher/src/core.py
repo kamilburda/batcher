@@ -123,7 +123,7 @@ class Batcher:
     Instead of using the native file format dialog, one can pass explicit
     file format arguments. This can be done by including
     ``file_format_mode=export.FileFormatModes.USE_EXPLICIT_VALUES`` and
-    ``file_format_settings=<dictionary of file format-specific settings>``
+    ``file_format_options=<dictionary of file format-specific options>``
     in the ``more_export_options`` dictionary.
 
     If the file format cannot handle `Gimp.RunMode.WITH_LAST_VALS`,
