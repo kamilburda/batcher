@@ -260,6 +260,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
          _('Use options below'),
          export_.FileFormatModes.USE_EXPLICIT_VALUES)],
       'display_name': _('How to adjust file format options:'),
+      'gui_type': 'radio_button_box',
     },
     {
       'type': 'file_format_settings',
