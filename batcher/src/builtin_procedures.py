@@ -260,6 +260,10 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
          _('Use options below'),
          export_.FileFormatModes.USE_EXPLICIT_VALUES)],
       'display_name': _('How to adjust file format options:'),
+      'description': _(
+        'Native dialogs usually allow you to adjust more options such as image metadata,'
+        ' while adjusting options in place is more convenient as no extra dialog is displayed'
+        ' before the export.'),
       'gui_type': 'radio_button_box',
     },
     {
