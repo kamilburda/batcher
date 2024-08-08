@@ -284,6 +284,7 @@ class RadioButtonBoxPresenter(GtkPresenter):
     self._row_index_to_value_mapping = {}
 
     self._widget = pggui.RadioButtonBox(**kwargs)
+    self._widget.set_tooltip_text(setting.description)
 
     for index, (label, value) in enumerate(setting.get_item_display_names_and_values()):
       self._widget.add(label)

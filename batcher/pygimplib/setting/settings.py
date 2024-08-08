@@ -1425,12 +1425,6 @@ class ChoiceSetting(Setting):
     super().__init__(name, **kwargs)
     
     self._empty_values.append(self._empty_value)
-    
-    self._items_description = self._get_items_description()
-  
-  @property
-  def description(self) -> str:
-    return f'{self._description} {self._items_description}'
   
   @property
   def items(self) -> Dict[str, int]:
@@ -1530,17 +1524,6 @@ class ChoiceSetting(Setting):
     if (value not in self._items_by_value
         or (not self._allow_empty_values and self._is_value_empty(value))):
       return f'invalid item value; valid values: {list(self._items_by_value)}', 'invalid_value'
-  
-  def _get_items_description(self):
-    items_description = ''
-    items_sep = ', '
-    
-    for value, display_name in zip(self._items.values(), self._items_display_names.values()):
-      description = utils_.get_processed_description(None, display_name)
-      items_description += f'{description} ({value}){items_sep}'
-    items_description = items_description[:-len(items_sep)]
-
-    return f'{{ {items_description} }}'
 
   @staticmethod
   def _create_item_attributes(input_items):
