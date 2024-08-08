@@ -271,6 +271,35 @@ class ComboBoxPresenter(GtkPresenter):
     self._widget.set_active(self._value_to_row_index_mapping[value])
 
 
+class RadioButtonBoxPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for a group of `Gtk.RadioButton` widgets.
+
+  Value: Item corresponding to the active radio button.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'active-button-changed'
+
+  def _create_widget(self, setting, **kwargs):
+    self._value_to_row_index_mapping = {}
+    self._row_index_to_value_mapping = {}
+
+    self._widget = pggui.RadioButtonBox(**kwargs)
+
+    for index, (label, value) in enumerate(setting.get_item_display_names_and_values()):
+      self._widget.add(label)
+
+      self._value_to_row_index_mapping[value] = index
+      self._row_index_to_value_mapping[index] = value
+
+    return self._widget
+
+  def get_value(self):
+    return self._row_index_to_value_mapping[self._widget.get_active()]
+
+  def _set_value(self, value):
+    self._widget.set_active(self._value_to_row_index_mapping[value])
+
+
 class GimpUiIntComboBoxPresenter(GtkPresenter):
   """Abstract `setting.Presenter` subclass for widget classes inheriting from
   `GimpUi.IntComboBox` .

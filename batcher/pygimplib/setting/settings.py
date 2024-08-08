@@ -1386,7 +1386,10 @@ class ChoiceSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.combo_box]
+  _ALLOWED_GUI_TYPES = [
+    _SETTING_GUI_TYPES.combo_box,
+    _SETTING_GUI_TYPES.radio_button_box,
+  ]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: next((name for name in self._items), None)
   
