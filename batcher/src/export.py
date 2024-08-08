@@ -47,7 +47,7 @@ def export(
       batcher: 'src.core.Batcher',
       output_directory: str = pg.utils.get_pictures_directory(),
       file_extension: str = 'png',
-      file_format_mode: int = FileFormatModes.USE_NATIVE_PLUGIN_VALUES,
+      file_format_mode: int = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_settings: Optional[Dict] = None,
       overwrite_mode: int = overwrite.OverwriteModes.ASK,
       export_mode: int = ExportModes.EACH_LAYER,

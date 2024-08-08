@@ -251,7 +251,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
     {
       'type': 'choice',
       'name': 'file_format_mode',
-      'default_value': 'use_native_plugin_values',
+      'default_value': 'use_explicit_values',
       'items': [
         ('use_native_plugin_values',
          _('Interactively'),
