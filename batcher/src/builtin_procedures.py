@@ -250,6 +250,25 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
     },
     {
       'type': 'choice',
+      'name': 'file_format_mode',
+      'default_value': 'use_native_plugin_values',
+      'items': [
+        ('use_native_plugin_values',
+         _('Interactively'),
+         export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES),
+        ('use_explicit_values',
+         _('Use options below'),
+         export_.FileFormatModes.USE_EXPLICIT_VALUES)],
+      'display_name': _('How to adjust file format options:'),
+    },
+    {
+      'type': 'file_format_settings',
+      'name': 'file_format_settings',
+      'gui_type': 'file_format_settings',
+      'display_name': _('File format options')
+    },
+    {
+      'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'ask',
       'items': [

@@ -1,14 +1,18 @@
 """Built-in procedure to export a given item as an image."""
 
 import collections
+from collections.abc import Iterable
 import os
-from typing import Generator, Optional
+from typing import Callable, Dict, Generator, List, Optional, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
+from gi.repository import GObject
 
 import pygimplib as pg
+from pygimplib import pdb
 
 from src import exceptions
 from src import fileformats
@@ -20,6 +24,14 @@ from src.path import validators as validators_
 
 
 EXPORT_ITEM_STATE_NAME = 'export'
+
+
+class FileFormatModes:
+
+  FILE_FORMAT_MODES =(
+    USE_NATIVE_PLUGIN_VALUES,
+    USE_EXPLICIT_VALUES,
+  ) = 0, 1
 
 
 class ExportModes:
@@ -35,12 +47,17 @@ def export(
       batcher: 'src.core.Batcher',
       output_directory: str = pg.utils.get_pictures_directory(),
       file_extension: str = 'png',
+      file_format_mode: int = FileFormatModes.USE_NATIVE_PLUGIN_VALUES,
+      file_format_settings: Optional[Dict] = None,
       overwrite_mode: int = overwrite.OverwriteModes.ASK,
       export_mode: int = ExportModes.EACH_LAYER,
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
 ) -> Generator[None, None, None]:
+  if file_format_settings is None:
+    file_format_settings = {}
+
   item_uniquifier = uniquifier.ItemUniquifier()
   file_extension_properties = _FileExtensionProperties()
   processed_parents = set()
@@ -145,6 +162,8 @@ def export(
         image_to_process,
         raw_item_to_process,
         output_directory,
+        file_format_mode,
+        file_format_settings,
         default_file_extension,
         file_extension_properties,
         overwrite_chooser)
@@ -165,6 +184,8 @@ def export(
             image_to_process,
             raw_item_to_process,
             output_directory,
+            file_format_mode,
+            file_format_settings,
             default_file_extension,
             file_extension_properties,
             overwrite_chooser)
@@ -315,6 +336,8 @@ def _export_item(
       image,
       raw_item,
       output_directory,
+      file_format_mode,
+      file_format_settings,
       default_file_extension,
       file_extension_properties,
       overwrite_chooser,
@@ -338,24 +361,26 @@ def _export_item(
     
     export_status = _export_item_once_wrapper(
       batcher,
-      fileformats.get_save_procedure(file_extension),
       _get_run_mode(batcher, file_extension, file_extension_properties),
       image,
       raw_item,
       output_filepath,
       file_extension,
+      file_format_mode,
+      file_format_settings,
       default_file_extension,
       file_extension_properties)
     
     if export_status == ExportStatuses.FORCE_INTERACTIVE:
       export_status = _export_item_once_wrapper(
         batcher,
-        fileformats.get_save_procedure(file_extension),
         Gimp.RunMode.INTERACTIVE,
         image,
         raw_item,
         output_filepath,
         file_extension,
+        file_format_mode,
+        file_format_settings,
         default_file_extension,
         file_extension_properties)
   
@@ -405,12 +430,13 @@ def _make_dirs(item, dirpath, default_file_extension):
 
 def _export_item_once_wrapper(
       batcher,
-      export_func,
       run_mode,
       image,
       raw_item,
       output_filepath,
       file_extension,
+      file_format_mode,
+      file_format_settings,
       default_file_extension,
       file_extension_properties,
 ):
@@ -419,12 +445,13 @@ def _export_item_once_wrapper(
          *batcher.export_context_manager_args, **batcher.export_context_manager_kwargs):
     export_status = _export_item_once(
       batcher,
-      export_func,
       run_mode,
       image,
       raw_item,
       output_filepath,
       file_extension,
+      file_format_mode,
+      file_format_settings,
       default_file_extension,
       file_extension_properties)
   
@@ -441,12 +468,13 @@ def _get_run_mode(batcher, file_extension, file_extension_properties):
 
 def _export_item_once(
       batcher,
-      export_func,
       run_mode,
       image,
       raw_item,
       output_filepath,
       file_extension,
+      file_format_mode,
+      file_format_settings,
       default_file_extension,
       file_extension_properties,
 ):
@@ -454,11 +482,14 @@ def _export_item_once(
     raise exceptions.ExportError(str(exception), raw_item.get_name(), default_file_extension)
 
   try:
-    export_func(
+    _export_image(
       run_mode,
       image,
       raw_item,
-      output_filepath)
+      output_filepath,
+      file_extension,
+      file_format_mode,
+      file_format_settings)
   except pg.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
       raise exceptions.BatcherCancelError('cancelled')
@@ -477,6 +508,59 @@ def _export_item_once(
       _raise_export_error(e)
   else:
     return ExportStatuses.EXPORT_SUCCESSFUL
+
+
+def _export_image(
+      run_mode: Gimp.RunMode,
+      image: Gimp.Image,
+      layer_or_layers: Union[Gimp.Layer, List[Gimp.Layer]],
+      filepath: Union[str, Gio.File],
+      file_extension: str,
+      file_format_mode: int,
+      file_format_settings: Dict,
+):
+  if not isinstance(layer_or_layers, Iterable):
+    layers = [layer_or_layers]
+  else:
+    layers = layer_or_layers
+
+  if not isinstance(filepath, Gio.File):
+    image_file = Gio.file_new_for_path(filepath)
+  else:
+    image_file = filepath
+
+  layer_array = GObject.Value(Gimp.ObjectArray)
+  Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
+
+  export_func, kwargs = _get_export_function(file_extension, file_format_mode, file_format_settings)
+
+  export_func(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode, **kwargs)
+
+  return pdb.last_status
+
+
+def _get_export_function(
+      file_extension: str,
+      file_format_mode: int,
+      file_format_settings: Dict,
+) -> Tuple[Callable, Dict]:
+  """Returns the file export procedure and file format settings given the
+  file extension.
+
+  The same file format settings are returned if ``file_format_mode`` is
+  ``FileFormatModes.USE_EXPLICIT_VALUES``. Otherwise, an empty dictionary is
+  returned.
+
+  If the file extension is not recognized, the default GIMP export procedure is
+  returned (``gimp-file-save``).
+  """
+  if (file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES
+      and file_extension in fileformats.FILE_FORMATS_DICT):
+    file_format = fileformats.FILE_FORMATS_DICT[file_extension]
+    if file_format.export_procedure_name:
+      return getattr(pdb, file_format.export_procedure_name), file_format_settings
+
+  return pdb.gimp_file_save, {}
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):

@@ -7,65 +7,7 @@ The list can be used for:
 * checking that the corresponding file format plug-in is installed
 """
 
-from collections.abc import Iterable
-from typing import Callable, List, Union
-
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-from gi.repository import Gio
-from gi.repository import GObject
-
 from pygimplib import pdb
-
-
-def get_default_save_procedure() -> Callable:
-  """Returns the `Gimp.file_save()` procedure with a more convenient interface.
-
-  The differences from `Gimp.file_save()` include:
-  * A single layer (drawable) can also be passed instead of always a list.
-  * The file path is specified as a string instead of a `Gio.File` instance.
-  """
-  return _save_image_default
-
-
-def _save_image_default(
-      run_mode: Gimp.RunMode,
-      image: Gimp.Image,
-      layer_or_layers: Union[Gimp.Layer, List[Gimp.Layer]],
-      filepath: Union[str, Gio.File],
-):
-  if not isinstance(layer_or_layers, Iterable):
-    layers = [layer_or_layers]
-  else:
-    layers = layer_or_layers
-
-  if not isinstance(filepath, Gio.File):
-    image_file = Gio.file_new_for_path(filepath)
-  else:
-    image_file = filepath
-
-  layer_array = GObject.Value(Gimp.ObjectArray)
-  Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
-
-  pdb.gimp_file_save(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode)
-
-  return pdb.last_status
-
-
-def get_save_procedure(file_extension: str) -> Callable:
-  """Returns the file save procedure for the given file extension.
-
-  If the file extension is not valid or does not have a specific save
-  procedure defined, the default save procedure is returned (as returned by
-  `get_default_save_procedure()`).
-  """
-  if file_extension in FILE_FORMATS_DICT:
-    file_format = FILE_FORMATS_DICT[file_extension]
-    if file_format.save_procedure_func and file_format.is_installed():
-      return file_format.save_procedure_func
-  
-  return get_default_save_procedure()
 
 
 def _create_file_formats(file_formats_params):
@@ -89,44 +31,38 @@ class _FileFormat:
         self,
         description,
         file_extensions,
-        save_procedure_name=None,
-        save_procedure_func=None,
-        save_procedure_func_args=None,
+        import_procedure_name=None,
+        export_procedure_name=None,
         versions=None,
         **kwargs):
     self.description = description
     self.file_extensions = file_extensions
     
-    self.save_procedure_name = save_procedure_name
-    
-    if save_procedure_func is not None:
-      self.save_procedure_func = save_procedure_func
-    else:
-      self.save_procedure_func = get_default_save_procedure()
-    
-    if save_procedure_func_args is not None:
-      self.save_procedure_func_args = save_procedure_func_args
-    else:
-      self.save_procedure_func_args = []
+    self.import_procedure_name = import_procedure_name
+    self.export_procedure_name = export_procedure_name
     
     self.version_check_func = versions if versions is not None else lambda: True
     
     for name, value in kwargs.items():
       setattr(self, name, value)
-  
-  def is_builtin(self):
-    return not self.save_procedure_name
-  
-  def is_third_party(self):
-    return bool(self.save_procedure_name)
-  
-  def is_installed(self):
-    return self.is_builtin() or (self.is_third_party() and self.save_procedure_name in pdb)
+
+  def is_import_installed(self):
+    return self._is_import_proc_builtin() or self.import_procedure_name in pdb
+
+  def _is_import_proc_builtin(self):
+    return self.import_procedure_name is None
+
+  def is_export_installed(self):
+    return self._is_export_proc_builtin() or self.export_procedure_name in pdb
+
+  def _is_export_proc_builtin(self):
+    return self.export_procedure_name is None
 
 
 FILE_FORMATS = _create_file_formats([
   {'description': 'Alias Pix image',
-   'file_extensions': ['pix', 'matte', 'mask', 'alpha', 'als']},
+   'file_extensions': ['pix', 'matte', 'mask', 'alpha', 'als'],
+   'export_procedure_name': 'file-pix-save'},
   {'description': 'Apple Icon Image',
    'file_extensions': ['icns']},
   {'description': 'ASCII art',
@@ -196,7 +132,8 @@ FILE_FORMATS = _create_file_formats([
   {'description': 'Photoshop image',
    'file_extensions': ['psd']},
   {'description': 'PNG image',
-   'file_extensions': ['png']},
+   'file_extensions': ['png'],
+   'export_procedure_name': 'file-png-save'},
   {'description': 'PNM image',
    'file_extensions': ['pnm']},
   {'description': 'Portable Document Format',
@@ -236,10 +173,13 @@ FILE_FORMATS = _create_file_formats([
   {'description': 'ZSoft PCX image',
    'file_extensions': ['pcx', 'pcc']},
 ])
-"""List of `_FileFormat` instances."""
+"""List of `_FileFormat` instances representing file import and export
+procedures.
+"""
 
 FILE_FORMATS_DICT = _create_file_formats_dict(FILE_FORMATS)
-"""Dictionary of (file extension, `_FileFormat` instance) pairs.
+"""Dictionary of (file extension, `_FileFormat` instance) pairs representing
+file import and export procedures.
 
 Only `_FileFormat` instances compatible with the version of the currently 
 running GIMP instance are included.

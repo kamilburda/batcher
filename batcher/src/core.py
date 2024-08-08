@@ -113,11 +113,18 @@ class Batcher:
   
   @property
   def initial_export_run_mode(self) -> Gimp.RunMode:
-    """The run mode to use for the first layer when exporting.
+    """The run mode to use for the first layer when exporting if using the
+    native file format dialog.
 
     If ``initial_export_run_mode`` is `Gimp.RunMode.INTERACTIVE`, a native
     file format GUI is displayed for the first layer. For subsequent layers,
     the same settings are applied and `Gimp.RunMode.WITH_LAST_VALS` is used.
+
+    Instead of using the native file format dialog, one can pass explicit
+    file format arguments. This can be done by including
+    ``file_format_mode=export.FileFormatModes.USE_EXPLICIT_VALUES`` and
+    ``file_format_settings=<dictionary of file format-specific settings>``
+    in the ``more_export_options`` dictionary.
 
     If the file format cannot handle `Gimp.RunMode.WITH_LAST_VALS`,
     `Gimp.RunMode.INTERACTIVE` is forced for each layer.

@@ -813,7 +813,7 @@ class FileExtensionEntry(ExtendedEntry):
   @staticmethod
   def _get_file_formats(file_formats):
     return [[file_format.description, file_format.file_extensions]
-            for file_format in file_formats if file_format.is_installed()]
+            for file_format in file_formats if file_format.is_export_installed()]
   
   @staticmethod
   def _get_text_pixel_size(text, pango_layout):

@@ -10,6 +10,8 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import pygimplib as pg
 
@@ -430,3 +432,29 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
   def _validate(self, value):
     if not isinstance(value, dict):
       return 'value must be a dictionary', 'value_must_be_dict'
+
+
+class FileFormatSettingsPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.Grid` widgets representing
+  dictionaries of (string, value) pairs.
+
+  Value: Dictionary of (string, value) pairs where the value is obtained from
+    each widget.
+  """
+
+  def _create_widget(self, setting, row_spacing=3, column_spacing=8, **kwargs):
+    return Gtk.Grid(
+      row_spacing=row_spacing,
+      column_spacing=column_spacing,
+    )
+
+  def get_value(self):
+    return {}
+
+  def _set_value(self, value):
+    pass
+
+
+class FileFormatSettingsSetting(pg.setting.DictSetting):
+
+  _ALLOWED_GUI_TYPES = [FileFormatSettingsPresenter]
