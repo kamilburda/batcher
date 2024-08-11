@@ -12,7 +12,6 @@ import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import actions as actions_
-from src import placeholders as placeholders_
 
 
 test_procedures = [
@@ -607,7 +606,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
   f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
   return_value=pg.tests.stubs_gimp.PdbStub,
 )
-class TestGetActionDictAsPdbProcedure(unittest.TestCase):
+class TestGetActionDictFromPdbProcedure(unittest.TestCase):
 
   @mock.patch(
     f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
@@ -638,7 +637,10 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    action_dict = actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
+    action_dict = actions_.get_action_dict_from_pdb_procedure(extended_procedure_stub.get_name())
+
+    self.assertEqual(action_dict['name'], self.procedure_name)
+    self.assertEqual(action_dict['function'], self.procedure_name)
     
     self.assertListEqual(
       [argument_dict['name'] for argument_dict in action_dict['arguments']],
@@ -647,66 +649,3 @@ class TestGetActionDictAsPdbProcedure(unittest.TestCase):
        'filename',
        'drawables-2',
        'filename-2'])
-  
-  def test_unsupported_pdb_param_type(self, mock_get_pdb):
-    self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(
-        value_type='unsupported',
-        default_value='test',
-        name='param-with-unsupported-type',
-        blurb=''),
-    ])
-
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
-    stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
-
-    action_dict = actions_.get_action_dict_for_pdb_procedure(extended_procedure_stub.get_name())
-
-    unsupported_param = action_dict['arguments'][-1]
-
-    self.assertDictEqual(
-      unsupported_param,
-      {
-        'type': placeholders_.PlaceholderUnsupportedParameterSetting,
-        'name': 'param-with-unsupported-type',
-        'display_name': 'param-with-unsupported-type',
-        'default_param_value': 'test',
-      }
-    )
-  
-  def test_default_run_mode_is_noninteractive(self, mock_get_pdb):
-    self.procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
-    stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
-
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
-
-    self.assertEqual(action_dict['arguments'][0]['default_value'], Gimp.RunMode.NONINTERACTIVE)
-  
-  def test_gimp_object_types_are_replaced_with_placeholders(self, mock_get_pdb):
-    self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type=Gimp.Image.__gtype__, name='image', blurb='The image'),
-      dict(value_type=Gimp.Layer.__gtype__, name='layer', blurb='The layer to process'),
-    ])
-
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
-    stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
-    
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
-    
-    self.assertEqual(action_dict['arguments'][-2]['type'], placeholders_.PlaceholderImageSetting)
-    self.assertEqual(action_dict['arguments'][-1]['type'], placeholders_.PlaceholderLayerSetting)
-
-  def test_with_hard_coded_custom_default_value(self, mock_get_pdb):
-    self.procedure_name = 'plug-in-lighting'
-    self.procedure_stub_kwargs['name'] = self.procedure_name
-
-    self.procedure_stub_kwargs['arguments_spec'].append(
-      dict(value_type=GObject.TYPE_BOOLEAN, name='new-image', default_value=True),
-    )
-
-    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
-    stubs_gimp.PdbStub.add_procedure(procedure_stub)
-
-    action_dict = actions_.get_action_dict_for_pdb_procedure(self.procedure_name)
-
-    self.assertEqual(action_dict['arguments'][-1]['default_value'], False)

@@ -135,7 +135,7 @@ class ActionBrowser(GObject.GObject):
       for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))]
 
     action_dicts = [
-      actions_.get_action_dict_for_pdb_procedure(procedure) for procedure in pdb_procedures]
+      actions_.get_action_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
 
     for procedure, action_dict in zip(pdb_procedures, action_dicts):
       if (action_dict['name'].startswith('file-')
