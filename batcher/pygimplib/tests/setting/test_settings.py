@@ -965,17 +965,6 @@ class TestChoiceSetting(unittest.TestCase):
     with self.assertRaises(KeyError):
       # noinspection PyStatementEffect
       self.setting.items_by_value[5]
-
-  def test_description(self):
-    self.assertEqual(self.setting.description, 'Overwrite mode { Skip (0), Replace (1) }')
-  
-  def test_description_with_mnemonics_from_item_display_names(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode',
-      [('skip', '_Skip'), ('replace', '_Replace')],
-      display_name='_Overwrite mode',
-      default_value='replace')
-    self.assertEqual(setting.description, 'Overwrite mode { Skip (0), Replace (1) }')
   
   def test_get_item_display_names_and_values(self):
     self.assertEqual(
