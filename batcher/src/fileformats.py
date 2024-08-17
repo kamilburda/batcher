@@ -33,7 +33,7 @@ class _FileFormat:
         file_extensions,
         import_procedure_name=None,
         export_procedure_name=None,
-        versions=None,
+        version_check_func=None,
         **kwargs):
     self.description = description
     self.file_extensions = file_extensions
@@ -41,7 +41,7 @@ class _FileFormat:
     self.import_procedure_name = import_procedure_name
     self.export_procedure_name = export_procedure_name
     
-    self.version_check_func = versions if versions is not None else lambda: True
+    self.version_check_func = version_check_func if version_check_func is not None else lambda: True
     
     for name, value in kwargs.items():
       setattr(self, name, value)
