@@ -15,7 +15,7 @@ from src import placeholders
 from src.path import uniquify
 
 
-def get_setting_dict_from_pdb_procedure(
+def get_setting_data_from_pdb_procedure(
       pdb_procedure_or_name: Union[Gimp.Procedure, str]) -> Tuple[Gimp.Procedure, str, List]:
   """Given the input, returns a GIMP PDB procedure, its name and arguments.
 

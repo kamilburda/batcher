@@ -10,12 +10,13 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src import fileformats as fileformats_
 from src import renamer as renamer_
+from src import settings_from_pdb as settings_from_pdb_
+from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
 
@@ -442,19 +443,177 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     each widget.
   """
 
-  def _create_widget(self, setting, row_spacing=3, column_spacing=8, **kwargs):
-    return Gtk.Grid(
-      row_spacing=row_spacing,
-      column_spacing=column_spacing,
+  def _create_widget(self, setting, **kwargs):
+    self._file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
+      initial_header_title=setting.display_name,
+      **kwargs,
     )
 
+    return self._file_format_options_box
+
+  def set_active_file_format(self, file_format, file_format_options):
+    # TODO
+    # display options for the current file format
+    # * create the grid if not already
+    # * replace the previous grid with the current grid
+    pass
+
   def get_value(self):
+    # TODO
+    # get the current file format and the values
+    # update the setting value - retain all dict entries and update only the key matching the file format
     return {}
 
   def _set_value(self, value):
+    # TODO
+    # Fill/update self._file_format_options_box with new data
+    # * for any grids that exist, update their values
     pass
 
 
 class FileFormatOptionsSetting(pg.setting.DictSetting):
+  """Class for settings storing file format-specific options.
+
+  The options are stored in a dictionary as pairs of
+  (file extension, settings representing options).
+  The ``None`` key, if exists, indicates the currently active file format (the
+  format whose options are displayed when running the plug-in interactively).
+
+  If the ``default_value`` parameter during initialization does not contain
+  the ``None`` key, the ``(None, initial_file_format)`` key-value pair is
+  added to ``default_value``. If the ``default_value`` parameter is not
+  specified, it is created and contains the ``(None, initial_file_format)``
+  pair.
+  """
 
   _ALLOWED_GUI_TYPES = [FileFormatOptionsPresenter]
+
+  def __init__(self, name: str, import_or_export: str, initial_file_format: str, **kwargs):
+    self._import_or_export = import_or_export
+    self._initial_file_format = initial_file_format
+
+    if 'default_value' not in kwargs:
+      kwargs['default_value'] = {}
+
+    if None not in kwargs['default_value']:
+      kwargs['default_value'] = {None: self._initial_file_format}
+
+    super().__init__(name, **kwargs)
+
+    self.set_active_file_format(initial_file_format)
+
+  @property
+  def import_or_export(self):
+    return self._import_or_export
+
+  def set_active_file_format(self, file_format: str):
+    self._value[None] = file_format
+
+    self._fill_file_format_options(file_format)
+
+    if hasattr(self.gui, 'set_active_file_format'):
+      self.gui.set_active_file_format(file_format, self._value)
+
+  def _fill_file_format_options(self, file_format):
+    if file_format in self._value or file_format not in fileformats_.FILE_FORMATS_DICT:
+      return
+
+    if self._import_or_export == 'import':
+      pdb_proc_name = fileformats_.FILE_FORMATS_DICT[file_format].import_procedure_name
+    elif self._import_or_export == 'export':
+      pdb_proc_name = fileformats_.FILE_FORMATS_DICT[file_format].export_procedure_name
+    else:
+      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+    if pdb_proc_name is None:
+      return
+
+    _pdb_proc, _pdb_proc_name, file_format_options_list = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(pdb_proc_name))
+
+    processed_file_format_options_list = self._remove_common_file_format_options(
+      file_format_options_list)
+
+    options_settings = self._create_file_format_options_settings(processed_file_format_options_list)
+
+    self._value[file_format] = options_settings
+
+  def _remove_common_file_format_options(self, file_format_options_list):
+    # HACK: Is there a better way to detect common arguments for load/export
+    # procedures?
+    options_to_filter_for_load = {
+      0: 'run-mode',
+      1: 'file',
+    }
+
+    options_to_filter_for_export = {
+      0: 'run-mode',
+      1: 'image',
+      2: 'num-drawables',
+      3: 'drawables',
+      4: 'file',
+    }
+
+    if self._import_or_export == 'import':
+      options_to_filter = options_to_filter_for_load
+    elif self._import_or_export == 'export':
+      options_to_filter = options_to_filter_for_export
+    else:
+      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+    return [
+      option_dict for index, option_dict in enumerate(file_format_options_list)
+      if not (index in options_to_filter and option_dict['name'] == options_to_filter[index])
+    ]
+
+  def _raw_to_value(self, raw_value):
+    value = {}
+
+    for key, options_or_active_file_format in raw_value.items():
+      if key is not None:
+        if isinstance(options_or_active_file_format, pg.setting.Group):
+          value[key] = options_or_active_file_format
+        else:
+          value[key] = self._create_file_format_options_settings(options_or_active_file_format)
+      else:
+        value[key] = options_or_active_file_format
+
+    return value
+
+  def _value_to_raw(self, value):
+    raw_value = {}
+
+    for key, group_or_active_file_format in value.items():
+      if key is not None:
+        raw_value[key] = [setting.to_dict() for setting in group_or_active_file_format]
+      else:
+        raw_value[key] = group_or_active_file_format
+
+    return raw_value
+
+  def _validate(self, value):
+    if None not in value:
+      return (
+        'the value must contain None as the dictionary key',
+        'value_does_not_contain_none_as_key',
+        False,
+      )
+
+  def _assign_value(self, value):
+    if None in self._value:
+      orig_active_file_format = self._value[None]
+    else:
+      orig_active_file_format = None
+
+    super()._assign_value(value)
+
+    if (None in value
+        and orig_active_file_format is not None
+        and value[None] != orig_active_file_format):
+      self.set_active_file_format(value[None])
+
+  @staticmethod
+  def _create_file_format_options_settings(file_format_options_list):
+    group = pg.setting.Group('file_format_options')
+    group.add(file_format_options_list)
+    return group

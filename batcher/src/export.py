@@ -557,8 +557,8 @@ def _get_export_function(
   if (file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES
       and file_extension in fileformats.FILE_FORMATS_DICT):
     file_format = fileformats.FILE_FORMATS_DICT[file_extension]
-    if file_format.export_procedure_name:
-      return getattr(pdb, file_format.export_procedure_name), file_format_options
+    if file_format.export_procedure_name and file_extension in file_format_options:
+      return getattr(pdb, file_format.export_procedure_name), file_format_options[file_extension]
 
   return pdb.gimp_file_save, {}
 

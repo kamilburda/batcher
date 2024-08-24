@@ -4,6 +4,10 @@ import os
 import unittest
 import unittest.mock as mock
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
@@ -310,3 +314,230 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       images_and_directories[image] = (
         os.path.dirname(image.get_file().get_path()) if image.get_file() is not None else None)
     return images_and_directories
+
+
+@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
+class TestFileFormatOptionsSetting(unittest.TestCase):
+
+  @mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
+  def setUp(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    self.common_options = [
+      {
+        'name': 'run-mode',
+        'type': pg.setting.EnumSetting,
+        'default_value': Gimp.RunMode.NONINTERACTIVE,
+        'enum_type': Gimp.RunMode.__gtype__,
+        'display_name': 'run-mode',
+      },
+      {
+        'name': 'image',
+        'type': pg.setting.ImageSetting,
+        'default_value': None,
+        'display_name': 'image',
+      },
+      {
+        'name': 'num-drawables',
+        'type': pg.setting.IntSetting,
+        'default_value': 0,
+        'display_name': 'num-drawables',
+      },
+      {
+        'name': 'drawables',
+        'type': pg.setting.ArraySetting,
+        'element_type': pg.setting.DrawableSetting,
+        'display_name': 'drawables',
+      },
+    ]
+
+    self.png_options = [
+      *self.common_options,
+      {
+        'name': 'interlaced',
+        'type': pg.setting.BoolSetting,
+        'display_name': 'interlaced',
+        'default_value': False,
+      },
+      {
+        'name': 'compression',
+        'type': pg.setting.IntSetting,
+        'display_name': 'compression',
+        'default_value': 9,
+      },
+    ]
+
+    self.jpg_options = [
+      *self.common_options,
+      {
+        'name': 'quality',
+        'type': pg.setting.FloatSetting,
+        'display_name': 'quality',
+        'default_value': 0.9,
+      },
+    ]
+
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-save', self.png_options
+
+    self.setting = setting_classes.FileFormatOptionsSetting('file_format_options', 'export', 'png')
+
+  def test_initial_file_format(self, *_mocks):
+    self.assertEqual(self.setting.value[None], 'png')
+
+    self.assertIn('png', self.setting.value)
+
+    for common_option_dict in self.common_options:
+      self.assertNotIn(common_option_dict['name'], self.setting.value['png'])
+
+    self.assertEqual(self.setting.value['png']['interlaced'].value, False)
+    self.assertEqual(self.setting.value['png']['compression'].value, 9)
+
+  def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+
+    self.setting.set_active_file_format('jpg')
+
+    self.assertEqual(self.setting.value[None], 'jpg')
+
+    self.assertIn('png', self.setting.value)
+    self.assertIn('jpg', self.setting.value)
+
+    self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
+
+  def test_set_active_file_format_has_no_effect_if_file_format_is_already_filled(
+        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    options = self.setting.value['png']
+
+    self.setting.set_active_file_format('png')
+
+    mock_get_setting_data_from_pdb_procedure.assert_not_called()
+
+    self.assertEqual(self.setting.value[None], 'png')
+    self.assertIs(options, self.setting.value['png'])
+
+  def test_set_active_file_format_to_unrecognized_format(
+        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    self.setting.set_active_file_format('unknown')
+
+    mock_get_setting_data_from_pdb_procedure.assert_not_called()
+
+    self.assertEqual(self.setting.value[None], 'unknown')
+    self.assertNotIn('unknown', self.setting.value)
+
+  def test_to_dict(self, *_mocks):
+    self.setting.set_active_file_format('unknown')
+    self.setting.value['png']['compression'].set_value(7)
+
+    self.maxDiff = None
+
+    self.assertEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'file_format_options',
+        'type': 'file_format_options',
+        'import_or_export': 'export',
+        'initial_file_format': 'png',
+        'value': {
+          None: 'unknown',
+          'png': [
+            {
+              'name': 'interlaced',
+              'type': 'bool',
+              'display_name': 'interlaced',
+              'default_value': False,
+              'value': False,
+            },
+            {
+              'name': 'compression',
+              'type': 'int',
+              'display_name': 'compression',
+              'default_value': 9,
+              'value': 7,
+            },
+          ],
+        },
+      }
+    )
+
+  def test_set_value_from_settings(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    png_group = pg.setting.Group('file_format_options')
+    png_group.add([
+      {
+        'name': 'interlaced',
+        'type': 'bool',
+        'display_name': 'interlaced',
+        'default_value': False,
+      },
+    ])
+
+    jpeg_group = pg.setting.Group('file_format_options')
+    jpeg_group.add([
+      {
+        'name': 'quality',
+        'type': pg.setting.FloatSetting,
+        'display_name': 'quality',
+        'default_value': 0.9,
+      },
+      {
+        'name': 'optimize',
+        'type': 'bool',
+        'display_name': 'optimize',
+        'default_value': False,
+      },
+    ])
+
+    self.setting.set_value({
+      'png': png_group,
+      'jpg': jpeg_group,
+      None: 'jpg',
+    })
+
+    mock_get_setting_data_from_pdb_procedure.assert_not_called()
+
+    self.assertEqual(self.setting.value[None], 'jpg')
+    self.assertNotIn('compression', self.setting.value['png'])
+    self.assertEqual(self.setting.value['png']['interlaced'].value, False)
+    self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
+    self.assertEqual(self.setting.value['jpg']['optimize'].value, False)
+
+  def test_set_value_from_raw_list(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    self.setting.set_value({
+      'jpg': [
+        {
+          'name': 'optimize',
+          'type': 'bool',
+          'display_name': 'optimize',
+          'default_value': False,
+        },
+      ],
+      'gif': [
+        {
+          'name': 'loop',
+          'type': 'bool',
+          'display_name': 'loop',
+          'default_value': True,
+        },
+      ],
+      None: 'jpg',
+    })
+
+    mock_get_setting_data_from_pdb_procedure.assert_not_called()
+
+    self.assertEqual(self.setting.value[None], 'jpg')
+    self.assertNotIn('png', self.setting.value)
+    self.assertNotIn('quality', self.setting.value['jpg'])
+    self.assertEqual(self.setting.value['jpg']['optimize'].value, False)
+    self.assertEqual(self.setting.value['gif']['loop'].value, True)
+
+  def test_validate_value_with_missing_none_key(self, *_mocks):
+    png_group = pg.setting.Group('file_format_options')
+    png_group.add([
+      {
+        'name': 'interlaced',
+        'type': 'bool',
+        'display_name': 'interlaced',
+        'default_value': False,
+      },
+    ])
+
+    self.assertIsInstance(self.setting.validate({'png': png_group}), pg.setting.ValueNotValidData)

@@ -587,7 +587,7 @@ def get_action_dict_from_pdb_procedure(
   """
 
   pdb_procedure, pdb_procedure_name, arguments = (
-    settings_from_pdb.get_setting_dict_from_pdb_procedure(pdb_procedure_or_name))
+    settings_from_pdb.get_setting_data_from_pdb_procedure(pdb_procedure_or_name))
 
   action_dict = {
     'name': pdb_procedure_name,

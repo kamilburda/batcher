@@ -17,7 +17,7 @@ from src import placeholders as placeholders_
   f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
   return_value=pg.tests.stubs_gimp.PdbStub,
 )
-class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
+class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
   @mock.patch(
     f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
@@ -48,18 +48,50 @@ class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    procedure, procedure_name, arguments = settings_from_pdb_.get_setting_dict_from_pdb_procedure(
+    procedure, procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       extended_procedure_stub.get_name())
 
     self.assertIs(procedure, extended_procedure_stub)
     self.assertEqual(procedure_name, self.procedure_name)
+
+    self.maxDiff = None
+
     self.assertListEqual(
-      [argument_dict['name'] for argument_dict in arguments],
-      ['run-mode',
-       'drawables',
-       'filename',
-       'drawables-2',
-       'filename-2'])
+      arguments,
+      [
+        {
+          'name': 'run-mode',
+          'type': pg.setting.EnumSetting,
+          'default_value': Gimp.RunMode.NONINTERACTIVE,
+          'enum_type': Gimp.RunMode.__gtype__,
+          'display_name': 'run-mode',
+        },
+        {
+          'name': 'drawables',
+          'type': placeholders_.PlaceholderDrawableArraySetting,
+          'element_type': pg.setting.DrawableSetting,
+          'display_name': 'drawables',
+        },
+        {
+          'name': 'filename',
+          'type': pg.setting.StringSetting,
+          'pdb_type': GObject.TYPE_STRING,
+          'display_name': 'filename',
+        },
+        {
+          'name': 'drawables-2',
+          'type': placeholders_.PlaceholderDrawableArraySetting,
+          'element_type': pg.setting.DrawableSetting,
+          'display_name': 'drawables',
+        },
+        {
+          'name': 'filename-2',
+          'type': pg.setting.StringSetting,
+          'pdb_type': GObject.TYPE_STRING,
+          'display_name': 'filename',
+        },
+      ]
+    )
 
   def test_unsupported_pdb_param_type(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'].extend([
@@ -73,7 +105,7 @@ class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_dict_from_pdb_procedure(
+    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       extended_procedure_stub.get_name())
 
     unsupported_param = arguments[-1]
@@ -92,7 +124,7 @@ class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
     self.procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_dict_from_pdb_procedure(
+    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       self.procedure_name)
 
     self.assertEqual(arguments[0]['default_value'], Gimp.RunMode.NONINTERACTIVE)
@@ -106,7 +138,7 @@ class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_dict_from_pdb_procedure(
+    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       self.procedure_name)
 
     self.assertEqual(arguments[-2]['type'], placeholders_.PlaceholderImageSetting)
@@ -123,7 +155,7 @@ class TestGetSettingDictFromPdbProcedure(unittest.TestCase):
     procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_dict_from_pdb_procedure(
+    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       self.procedure_name)
 
     self.assertEqual(arguments[-1]['default_value'], False)
