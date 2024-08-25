@@ -595,6 +595,7 @@ def get_action_dict_from_pdb_procedure(
     'origin': 'gimp_pdb',
     'arguments': arguments,
     'display_name': _get_pdb_procedure_display_name(pdb_procedure),
+    'description': _get_pdb_procedure_description(pdb_procedure),
   }
   
   return action_dict
@@ -610,6 +611,11 @@ def _get_pdb_procedure_display_name(proc):
     return menu_label
   else:
     return proc.get_name()
+
+
+def _get_pdb_procedure_description(pdb_procedure):
+  blurb = pdb_procedure.get_blurb()
+  return blurb if blurb is not None else ''
 
 
 def reorder(actions: pg.setting.Group, action_name: str, new_position: int):

@@ -17,7 +17,6 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from . import editor as action_editor_
-from . import utils as action_utils_
 
 from src import actions as actions_
 from src import placeholders as placeholders_
@@ -167,7 +166,7 @@ class ActionBrowser(GObject.GObject):
         self._parent_tree_iters[action_type],
         [action_dict['name'],
          display_name,
-         action_utils_.get_action_description(action_dict, procedure),
+         action_dict.get('description', ''),
          action_type,
          action_dict,
          None])

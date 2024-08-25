@@ -13,8 +13,6 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
-from . import utils as action_utils_
-
 from src.gui import editable_label as editable_label_
 from src.gui import placeholders as gui_placeholders_
 from src.gui import popup_hide_context as popup_hide_context_
@@ -238,12 +236,7 @@ class ActionEditorWidget:
     self._button_info = None
     self._action_info_hbox = None
 
-    if self._pdb_procedure is not None:
-      short_description = action_utils_.get_action_description(action, self._pdb_procedure.proc)
-    else:
-      short_description = action_utils_.get_action_description(action, self._pdb_procedure)
-
-    if short_description is None:
+    if action['description'].value is None:
       return
 
     self._action_info = _get_action_info_from_pdb_procedure(self._pdb_procedure)
@@ -254,7 +247,7 @@ class ActionEditorWidget:
       max_width_chars = self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_ACTION_INFO
 
     self._label_short_description = Gtk.Label(
-      label=short_description,
+      label=action['description'].value,
       use_markup=False,
       selectable=True,
       wrap=True,
