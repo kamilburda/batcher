@@ -103,7 +103,6 @@ class ActionEditorWidget:
     self._info_popup_text = None
     self._parent_widget_realize_event_id = None
 
-    self._pdb_argument_names_and_blurbs = None
     self._action_argument_indexes_in_grid = {}
 
     self._init_gui()
@@ -199,7 +198,7 @@ class ActionEditorWidget:
     self._vbox.pack_start(self._grid_action_arguments, False, False, 0)
     self._vbox.pack_start(self._action['more_options_expanded'].gui.widget, False, False, 0)
 
-    self._set_arguments(self._action, self._pdb_procedure)
+    self._set_arguments(self._action)
 
     self._set_grid_action_arguments_to_update_according_to_visible_state(self._action)
 
@@ -303,11 +302,7 @@ class ActionEditorWidget:
       if position is not None:
         self._info_popup.move(*position)
 
-  def _set_arguments(self, action, pdb_procedure):
-    if pdb_procedure is not None:
-      self._pdb_argument_names_and_blurbs = {
-        arg.name: arg.blurb for arg in pdb_procedure.proc.get_arguments()}
-
+  def _set_arguments(self, action):
     row_index = 0
 
     for setting in action['arguments']:
@@ -326,10 +321,7 @@ class ActionEditorWidget:
     self._attach_widget_to_grid(setting, row_index)
 
   def _attach_label_to_grid(self, setting, row_index):
-    if self._pdb_argument_names_and_blurbs is not None:
-      argument_description = self._pdb_argument_names_and_blurbs[setting.name]
-    else:
-      argument_description = setting.display_name
+    argument_description = setting.display_name
 
     if argument_description is None or not argument_description.strip():
       argument_description = setting.name

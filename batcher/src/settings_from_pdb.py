@@ -66,7 +66,7 @@ def get_setting_data_from_pdb_procedure(
     argument_dict = {
       'type': setting_type,
       'name': unique_pdb_param_name,
-      'display_name': proc_arg.name,
+      'display_name': proc_arg.blurb,
       **setting_type_init_kwargs,
     }
 

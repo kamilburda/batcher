@@ -64,31 +64,31 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': pg.setting.EnumSetting,
           'default_value': Gimp.RunMode.NONINTERACTIVE,
           'enum_type': Gimp.RunMode.__gtype__,
-          'display_name': 'run-mode',
+          'display_name': 'The run mode',
         },
         {
           'name': 'drawables',
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
-          'display_name': 'drawables',
+          'display_name': 'Drawables',
         },
         {
           'name': 'filename',
           'type': pg.setting.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
-          'display_name': 'filename',
+          'display_name': 'Filename to save the image in',
         },
         {
           'name': 'drawables-2',
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
-          'display_name': 'drawables',
+          'display_name': 'More drawables',
         },
         {
           'name': 'filename-2',
           'type': pg.setting.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
-          'display_name': 'filename',
+          'display_name': 'Another filename',
         },
       ]
     )
@@ -99,7 +99,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         value_type='unsupported',
         default_value='test',
         name='param-with-unsupported-type',
-        blurb=''),
+        blurb='Test'),
     ])
 
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
@@ -115,7 +115,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       {
         'type': placeholders_.PlaceholderUnsupportedParameterSetting,
         'name': 'param-with-unsupported-type',
-        'display_name': 'param-with-unsupported-type',
+        'display_name': 'Test',
         'default_param_value': 'test',
       }
     )
