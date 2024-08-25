@@ -268,7 +268,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
     },
     {
       'type': 'file_format_options',
-      'name': 'file_format_options',
+      'name': 'file_format_export_options',
       'import_or_export': 'export',
       'initial_file_format': 'png',
       'gui_type': 'file_format_options',

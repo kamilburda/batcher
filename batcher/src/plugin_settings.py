@@ -377,21 +377,21 @@ def _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure
 def _set_file_extension_options_for_default_export_procedure(main_settings):
   _show_hide_file_format_export_options(
     main_settings['export/file_format_mode'],
-    main_settings['export/file_format_options'])
+    main_settings['export/file_format_export_options'])
 
   main_settings['file_format_mode'].connect_event(
     'value-changed',
     _show_hide_file_format_export_options,
-    main_settings['export/file_format_options'])
+    main_settings['export/file_format_export_options'])
 
   _set_file_format_export_options(
     main_settings['file_extension'],
-    main_settings['export/file_format_options'])
+    main_settings['export/file_format_export_options'])
 
   main_settings['file_extension'].connect_event(
     'value-changed',
     _set_file_format_export_options,
-    main_settings['export/file_format_options'])
+    main_settings['export/file_format_export_options'])
 
 
 def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
@@ -414,12 +414,14 @@ def _set_sensitive_for_image_name_pattern_in_export(
     single_image_name_pattern_setting.gui.set_sensitive(False)
 
 
-def _set_file_format_export_options(file_extension_setting, file_format_options_setting):
-  file_format_options_setting.set_active_file_format(file_extension_setting.value)
+def _set_file_format_export_options(file_extension_setting, file_format_export_options_setting):
+  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
 
 
-def _show_hide_file_format_export_options(file_format_mode_setting, file_format_options_setting):
-  file_format_options_setting.gui.set_visible(file_format_mode_setting.is_item('use_explicit_values'))
+def _show_hide_file_format_export_options(
+      file_format_mode_setting, file_format_export_options_setting):
+  file_format_export_options_setting.gui.set_visible(
+    file_format_mode_setting.is_item('use_explicit_values'))
 
 
 def _on_after_add_constraint(

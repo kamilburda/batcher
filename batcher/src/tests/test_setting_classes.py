@@ -379,7 +379,8 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
 
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-save', self.png_options
 
-    self.setting = setting_classes.FileFormatOptionsSetting('file_format_options', 'export', 'png')
+    self.setting = setting_classes.FileFormatOptionsSetting(
+      'file_format_export_options', 'export', 'png')
 
   def test_initial_file_format(self, *_mocks):
     self.assertEqual(self.setting.value[None], 'png')
@@ -433,7 +434,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(
       self.setting.to_dict(),
       {
-        'name': 'file_format_options',
+        'name': 'file_format_export_options',
         'type': 'file_format_options',
         'import_or_export': 'export',
         'initial_file_format': 'png',
