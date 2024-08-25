@@ -500,8 +500,6 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
 
     super().__init__(name, **kwargs)
 
-    self.set_active_file_format(initial_file_format)
-
   @property
   def import_or_export(self):
     return self._import_or_export
