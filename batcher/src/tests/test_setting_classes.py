@@ -398,6 +398,8 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
 
     self.setting.set_active_file_format('jpg')
 
+    mock_get_setting_data_from_pdb_procedure.assert_called_once()
+
     self.assertEqual(self.setting.value[None], 'jpg')
 
     self.assertIn('png', self.setting.value)
@@ -415,6 +417,31 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
 
     self.assertEqual(self.setting.value[None], 'png')
     self.assertIs(options, self.setting.value['png'])
+
+  def test_set_active_file_format_with_alias(
+        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+
+    self.setting.set_active_file_format('jpeg')
+
+    self.assertEqual(self.setting.value[None], 'jpg')
+
+    self.assertIn('png', self.setting.value)
+    self.assertIn('jpg', self.setting.value)
+
+    self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
+
+  def test_set_active_file_format_with_alias_has_no_effect_if_file_format_is_already_filled(
+        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+
+    self.setting.set_active_file_format('jpg')
+
+    mock_get_setting_data_from_pdb_procedure.assert_called_once()
+
+    self.setting.set_active_file_format('jpeg')
+
+    self.assertEqual(self.setting.value[None], 'jpg')
 
   def test_set_active_file_format_to_unrecognized_format(
         self, mock_get_setting_data_from_pdb_procedure, *_mocks):

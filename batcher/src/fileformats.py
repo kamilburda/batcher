@@ -14,15 +14,26 @@ def _create_file_formats(file_formats_params):
   return [_FileFormat(**params) for params in file_formats_params]
 
 
-def _create_file_formats_dict(file_formats_):
-  file_formats_dict_ = {}
+def _create_file_formats_dict(file_formats):
+  file_formats_dict = {}
   
-  for file_format in file_formats_:
+  for file_format in file_formats:
     for file_extension in file_format.file_extensions:
-      if file_extension not in file_formats_dict_ and file_format.version_check_func():
-        file_formats_dict_[file_extension] = file_format
+      if file_extension not in file_formats_dict and file_format.version_check_func():
+        file_formats_dict[file_extension] = file_format
   
-  return file_formats_dict_
+  return file_formats_dict
+
+
+def _create_file_format_aliases(file_formats):
+  file_format_aliases = {}
+
+  for file_format in file_formats:
+    for file_extension in file_format.file_extensions:
+      if file_extension not in file_format_aliases:
+        file_format_aliases[file_extension] = file_format.file_extensions[0]
+
+  return file_format_aliases
 
 
 class _FileFormat:
@@ -185,3 +196,5 @@ file import and export procedures.
 Only `_FileFormat` instances compatible with the version of the currently 
 running GIMP instance are included.
 """
+
+FILE_FORMAT_ALIASES = _create_file_format_aliases(FILE_FORMATS)

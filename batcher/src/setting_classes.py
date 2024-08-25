@@ -507,15 +507,19 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     return self._import_or_export
 
   def set_active_file_format(self, file_format: str):
-    self._value[None] = file_format
+    processed_file_format = fileformats_.FILE_FORMAT_ALIASES.get(file_format, None)
 
-    self._fill_file_format_options(file_format)
+    self._value[None] = processed_file_format if processed_file_format is not None else file_format
+
+    self._fill_file_format_options(processed_file_format)
 
     if hasattr(self.gui, 'set_active_file_format'):
-      self.gui.set_active_file_format(file_format, self._value)
+      self.gui.set_active_file_format(processed_file_format, self._value)
 
   def _fill_file_format_options(self, file_format):
-    if file_format in self._value or file_format not in fileformats_.FILE_FORMATS_DICT:
+    if (file_format is None
+        or file_format in self._value
+        or file_format not in fileformats_.FILE_FORMATS_DICT):
       return
 
     if self._import_or_export == 'import':
