@@ -163,6 +163,8 @@ def create_settings_for_export_layers():
 
   _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
 
+  _set_file_extension_options_for_default_export_procedure(settings['main'])
+
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   
   settings['main/constraints'].connect_event(
@@ -379,14 +381,15 @@ def _set_file_extension_options_for_default_export_procedure(main_settings):
     main_settings['export/file_format_mode'],
     main_settings['export/file_format_export_options'])
 
-  main_settings['file_format_mode'].connect_event(
+  main_settings['export/file_format_mode'].connect_event(
     'value-changed',
     _show_hide_file_format_export_options,
     main_settings['export/file_format_export_options'])
 
-  _set_file_format_export_options(
-    main_settings['file_extension'],
-    main_settings['export/file_format_export_options'])
+  # FIXME: Resolve how to set the active file format initially without crashing the plug-in
+  # _set_file_format_export_options(
+  #   main_settings['file_extension'],
+  #   main_settings['export/file_format_export_options'])
 
   main_settings['file_extension'].connect_event(
     'value-changed',
