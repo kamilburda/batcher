@@ -149,30 +149,26 @@ def _set_up_array_arguments(arguments_list):
 
     if issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting)):
       array_element_type = pg.setting.process_setting_type(argument_dict['element_type'])
-    else:
-      array_element_type = None
 
-    if (issubclass(setting_type, pg.setting.ArraySetting)
-        and i > 0
-        and array_element_type != pg.setting.StringSetting):
-      _set_array_setting_attributes_based_on_length_attribute(
-        argument_dict, arguments_list[i - 1], array_element_type)
+      if i > 0 and array_element_type != pg.setting.StringSetting:
+        _set_array_setting_attributes_based_on_length_attribute(
+          setting_type, argument_dict, arguments_list[i - 1], array_element_type)
 
-    if (issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting))
-        and i > 0
-        and array_element_type != pg.setting.StringSetting):
-      array_length_argument_indexes.append(i - 1)
+        array_length_argument_indexes.append(i - 1)
 
   _remove_array_length_parameters(arguments_list, array_length_argument_indexes)
 
 
 def _set_array_setting_attributes_based_on_length_attribute(
-      array_dict, array_length_dict, element_type):
-  min_array_size = array_length_dict.get('min_value', 0)
+      setting_type, array_dict, array_length_dict, element_type):
+  if issubclass(setting_type, pg.setting.ArraySetting):
+    min_array_size = array_length_dict.get('min_value', 0)
 
-  array_dict['min_size'] = min_array_size
-  array_dict['max_size'] = array_length_dict.get('max_value')
-  array_dict['default_value'] = tuple([element_type.get_default_default_value()] * min_array_size)
+    array_dict['min_size'] = min_array_size
+    array_dict['max_size'] = array_length_dict.get('max_value')
+    array_dict['default_value'] = tuple([element_type.get_default_default_value()] * min_array_size)
+
+  array_dict['length_name'] = array_length_dict['name']
 
 
 def _remove_array_length_parameters(arguments_list, array_length_argument_indexes):

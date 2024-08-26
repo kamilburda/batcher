@@ -30,7 +30,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       name=self.procedure_name,
       arguments_spec=[
         dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
-        dict(value_type=GObject.TYPE_INT, name='num-drawables', blurb='Number of drawables'),
+        dict(value_type=GObject.TYPE_INT, name='n-drawables', blurb='Number of drawables'),
         dict(value_type=Gimp.ObjectArray.__gtype__, name='drawables', blurb='Drawables'),
         dict(
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
@@ -40,9 +40,10 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
   def test_with_non_unique_param_names(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type=GObject.TYPE_INT, name='num-drawables', blurb='Number of more drawables'),
+      dict(value_type=GObject.TYPE_INT, name='n-drawables', blurb='Number of more drawables'),
       dict(value_type=Gimp.ObjectArray.__gtype__, name='drawables', blurb='More drawables'),
       dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
+      dict(value_type=GObject.TYPE_STRV, name='brushes', blurb='Brush names'),
     ])
 
     extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
@@ -71,6 +72,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
           'display_name': 'Drawables',
+          'length_name': 'n-drawables',
         },
         {
           'name': 'filename',
@@ -83,12 +85,19 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
           'display_name': 'More drawables',
+          'length_name': 'n-drawables-2',
         },
         {
           'name': 'filename-2',
           'type': pg.setting.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
           'display_name': 'Another filename',
+        },
+        {
+          'name': 'brushes',
+          'type': pg.setting.ArraySetting,
+          'element_type': pg.setting.StringSetting,
+          'display_name': 'Brush names',
         },
       ]
     )
