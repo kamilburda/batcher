@@ -505,7 +505,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     return self._import_or_export
 
   def set_active_file_format(self, file_format: str):
-    processed_file_format = fileformats_.FILE_FORMAT_ALIASES.get(file_format, None)
+    processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
 
     self._value[None] = processed_file_format if processed_file_format is not None else file_format
 

@@ -1,6 +1,6 @@
 """Functions dealing with file extensions."""
 
-from src import fileformats
+from src import file_formats as file_formats_
 
 
 def get_file_extension(filename: str) -> str:
@@ -9,7 +9,7 @@ def get_file_extension(filename: str) -> str:
   If ``filename`` has no file extension, return an empty string.
   
   If ``filename`` has multiple periods, it is checked against
-  `fileformats.FILE_FORMATS_DICT` for a matching file extension containing
+  `file_formats.FILE_FORMATS_DICT` for a matching file extension containing
   periods. If there is no such extension, return the substring after the last
   period.
   """
@@ -24,7 +24,7 @@ def get_file_extension(filename: str) -> str:
       return file_extension
     
     file_extension = file_extension[next_period_index + 1:]
-    if file_extension.lower() in fileformats.FILE_FORMATS_DICT:
+    if file_extension.lower() in file_formats_.FILE_FORMATS_DICT:
       return file_extension
   
   return ''

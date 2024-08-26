@@ -18,7 +18,7 @@ from . import expander as entry_expander_
 from . import popup as entry_popup_
 from . import undo as entry_undo_
 
-from src import fileformats
+from src import file_formats as file_formats_
 from src.gui import cell_renderers as cell_renderers_
 from src.gui import popup_hide_context as popup_hide_context_
 from src.path import pattern as pattern_
@@ -518,7 +518,7 @@ class FileExtensionEntry(ExtendedEntry):
     self._extensions_text_pixel_rects = []
     
     self._popup = entry_popup_.EntryPopup(
-      self, self._COLUMN_TYPES, self._get_file_formats(fileformats.FILE_FORMATS))
+      self, self._COLUMN_TYPES, self._get_file_formats(file_formats_.FILE_FORMATS))
     self._popup.filter_rows_func = self._filter_file_formats
     self._popup.on_assign_from_selected_row = self._on_assign_from_selected_row
     self._popup.on_assign_last_value = self._do_assign_text

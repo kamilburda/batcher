@@ -15,7 +15,7 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src import exceptions
-from src import fileformats
+from src import file_formats as file_formats_
 from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
@@ -556,8 +556,8 @@ def _get_export_function(
   returned (``gimp-file-save``).
   """
   if (file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES
-      and file_extension in fileformats.FILE_FORMATS_DICT):
-    file_format = fileformats.FILE_FORMATS_DICT[file_extension]
+      and file_extension in file_formats_.FILE_FORMATS_DICT):
+    file_format = file_formats_.FILE_FORMATS_DICT[file_extension]
     if file_format.export_procedure_name and file_extension in file_format_export_options:
       # TODO: We need to obtain name: value pairs, not name: setting pairs
       return getattr(pdb, file_format.export_procedure_name), file_format_export_options[file_extension]
@@ -588,7 +588,7 @@ class _FileExtension:
 
 
 class _FileExtensionProperties:
-  """Mapping of file extensions from `fileformats.FILE_FORMATS` to
+  """Mapping of file extensions from `file_formats.FILE_FORMATS` to
   `_FileExtension` instances.
   
   File extension as a key is always converted to lowercase.
@@ -596,7 +596,7 @@ class _FileExtensionProperties:
   def __init__(self):
     self._properties = collections.defaultdict(_FileExtension)
     
-    for file_format in fileformats.FILE_FORMATS:
+    for file_format in file_formats_.FILE_FORMATS:
       # This ensures that the file format dialog will be displayed only once per
       # file format if multiple file extensions for the same format are used
       # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).
