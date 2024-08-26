@@ -559,10 +559,25 @@ def _get_export_function(
       and file_extension in file_formats_.FILE_FORMATS_DICT):
     file_format = file_formats_.FILE_FORMATS_DICT[file_extension]
     if file_format.export_procedure_name and file_extension in file_format_export_options:
-      # TODO: We need to obtain name: value pairs, not name: setting pairs
-      return getattr(pdb, file_format.export_procedure_name), file_format_export_options[file_extension]
+      file_format_option_kwargs = _get_file_format_options_as_kwargs(
+        file_format_export_options, file_extension, 'export')
+
+      if file_format_option_kwargs is not None:
+        return getattr(pdb, file_format.export_procedure_name), file_format_option_kwargs
 
   return pdb.gimp_file_save, {}
+
+
+def _get_file_format_options_as_kwargs(file_format_options, file_format, import_or_export):
+  file_formats_.fill_file_format_options(file_format_options, file_format, import_or_export)
+
+  if file_format in file_format_options:
+    return {
+      setting.name.replace('-', '_'): setting.value
+      for setting in file_format_options[file_format]
+    }
+  else:
+    return None
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):
