@@ -11,6 +11,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from src import file_formats as file_formats_
 from src import setting_classes
 
 
@@ -338,12 +339,6 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'display_name': 'image',
       },
       {
-        'name': 'num-drawables',
-        'type': pg.setting.IntSetting,
-        'default_value': 0,
-        'display_name': 'num-drawables',
-      },
-      {
         'name': 'drawables',
         'type': pg.setting.ArraySetting,
         'element_type': pg.setting.DrawableSetting,
@@ -380,55 +375,12 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.setting = setting_classes.FileFormatOptionsSetting(
       'file_format_export_options', 'export', 'png')
 
-  def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
-
+  def test_set_active_file_format(self, *_mocks):
     self.setting.set_active_file_format('jpg')
-
-    mock_get_setting_data_from_pdb_procedure.assert_called_once()
 
     self.assertEqual(self.setting.value[None], 'jpg')
 
-    self.assertNotIn('png', self.setting.value)
-    self.assertIn('jpg', self.setting.value)
-
-    self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
-
-  def test_set_active_file_format_has_no_effect_if_file_format_is_already_filled(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
-
-    self.setting.set_active_file_format('jpg')
-
-    options = self.setting.value['jpg']
-
-    self.setting.set_active_file_format('jpg')
-
-    mock_get_setting_data_from_pdb_procedure.assert_called_once()
-
-    self.assertEqual(self.setting.value[None], 'jpg')
-    self.assertIs(options, self.setting.value['jpg'])
-
-  def test_set_active_file_format_with_alias(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
-
-    self.setting.set_active_file_format('jpeg')
-
-    self.assertEqual(self.setting.value[None], 'jpg')
-
-    self.assertIn('jpg', self.setting.value)
-
-    self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
-
-  def test_set_active_file_format_with_alias_has_no_effect_if_file_format_is_already_filled(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
-
-    self.setting.set_active_file_format('jpg')
-
-    mock_get_setting_data_from_pdb_procedure.assert_called_once()
-
+  def test_set_active_file_format_with_alias(self, *_mocks):
     self.setting.set_active_file_format('jpeg')
 
     self.assertEqual(self.setting.value[None], 'jpg')
@@ -445,8 +397,12 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
   def test_to_dict(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-save', self.png_options
 
-    self.setting.set_active_file_format('png')
+    file_formats_.fill_file_format_options(self.setting.value, 'png', self.setting.import_or_export)
+    file_formats_.fill_file_format_options(
+      self.setting.value, 'unknown', self.setting.import_or_export)
+
     self.setting.set_active_file_format('unknown')
+
     self.setting.value['png']['compression'].set_value(7)
 
     self.maxDiff = None
@@ -480,7 +436,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       }
     )
 
-  def test_set_value_from_settings(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+  def test_set_value_from_settings(self, *_mocks):
     png_group = pg.setting.Group('file_format_options')
     png_group.add([
       {
@@ -512,8 +468,6 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       'jpg': jpeg_group,
       None: 'jpg',
     })
-
-    mock_get_setting_data_from_pdb_procedure.assert_not_called()
 
     self.assertEqual(self.setting.value[None], 'jpg')
     self.assertNotIn('compression', self.setting.value['png'])

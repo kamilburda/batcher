@@ -13,9 +13,8 @@ from gi.repository import GimpUi
 
 import pygimplib as pg
 
-from src import fileformats as fileformats_
+from src import file_formats as file_formats_
 from src import renamer as renamer_
-from src import settings_from_pdb as settings_from_pdb_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -444,6 +443,9 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
+    file_formats_.fill_file_format_options(
+      setting.value, setting.value[None], setting.import_or_export)
+
     self._file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
       initial_header_title=setting.display_name,
       **kwargs,
@@ -452,22 +454,23 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     return self._file_format_options_box
 
   def set_active_file_format(self, file_format, file_format_options):
-    # TODO
-    # display options for the current file format
-    # * create the grid if not already
-    # * replace the previous grid with the current grid
+    # TODO:
+    #  display options for the current file format
+    #  * create the grid if not already
+    #  * replace the previous grid with the current grid
     pass
 
   def get_value(self):
-    # TODO
-    # get the current file format and the values
-    # update the setting value - retain all dict entries and update only the key matching the file format
-    return {}
+    # TODO:
+    #  call `setting.update_setting_value()`
+    #  get the current file format and the values
+    #  update the setting value - retain all dict entries and update only the key matching the file format
+    return self.setting.value
 
   def _set_value(self, value):
-    # TODO
-    # Fill/update self._file_format_options_box with new data
-    # * for any grids that exist, update their values
+    # TODO:
+    #  Fill/update self._file_format_options_box with new data
+    #  * for any grids that exist, update their values
     pass
 
 
@@ -507,66 +510,10 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
   def set_active_file_format(self, file_format: str):
     processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
 
-    self._value[None] = processed_file_format if processed_file_format is not None else file_format
-
-    self._fill_file_format_options(processed_file_format)
+    self._value[None] = processed_file_format
 
     if hasattr(self.gui, 'set_active_file_format'):
       self.gui.set_active_file_format(processed_file_format, self._value)
-
-  def _fill_file_format_options(self, file_format):
-    if (file_format is None
-        or file_format in self._value
-        or file_format not in fileformats_.FILE_FORMATS_DICT):
-      return
-
-    if self._import_or_export == 'import':
-      pdb_proc_name = fileformats_.FILE_FORMATS_DICT[file_format].import_procedure_name
-    elif self._import_or_export == 'export':
-      pdb_proc_name = fileformats_.FILE_FORMATS_DICT[file_format].export_procedure_name
-    else:
-      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
-    if pdb_proc_name is None:
-      return
-
-    _pdb_proc, _pdb_proc_name, file_format_options_list = (
-      settings_from_pdb_.get_setting_data_from_pdb_procedure(pdb_proc_name))
-
-    processed_file_format_options_list = self._remove_common_file_format_options(
-      file_format_options_list)
-
-    options_settings = self._create_file_format_options_settings(processed_file_format_options_list)
-
-    self._value[file_format] = options_settings
-
-  def _remove_common_file_format_options(self, file_format_options_list):
-    # HACK: Is there a better way to detect common arguments for load/export
-    # procedures?
-    options_to_filter_for_load = {
-      0: 'run-mode',
-      1: 'file',
-    }
-
-    options_to_filter_for_export = {
-      0: 'run-mode',
-      1: 'image',
-      2: 'num-drawables',
-      3: 'drawables',
-      4: 'file',
-    }
-
-    if self._import_or_export == 'import':
-      options_to_filter = options_to_filter_for_load
-    elif self._import_or_export == 'export':
-      options_to_filter = options_to_filter_for_export
-    else:
-      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
-    return [
-      option_dict for index, option_dict in enumerate(file_format_options_list)
-      if not (index in options_to_filter and option_dict['name'] == options_to_filter[index])
-    ]
 
   def _raw_to_value(self, raw_value):
     value = {}
@@ -576,7 +523,8 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
         if isinstance(options_or_active_file_format, pg.setting.Group):
           value[key] = options_or_active_file_format
         else:
-          value[key] = self._create_file_format_options_settings(options_or_active_file_format)
+          value[key] = file_formats_.create_file_format_options_settings(
+            options_or_active_file_format)
       else:
         value[key] = options_or_active_file_format
 
@@ -613,9 +561,3 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
         and orig_active_file_format is not None
         and value[None] != orig_active_file_format):
       self.set_active_file_format(value[None])
-
-  @staticmethod
-  def _create_file_format_options_settings(file_format_options_list):
-    group = pg.setting.Group('file_format_options')
-    group.add(file_format_options_list)
-    return group

@@ -1,13 +1,96 @@
-"""List of built-in and several third-party file formats supported by GIMP.
+"""Managing file formats supported by GIMP and some third-party plug-ins.
 
-Each file format contains at least a name and a list of file extensions.
-
-The list can be used for:
-* listing all known and supported file formats in GUI
-* checking that the corresponding file format plug-in is installed
+A list of file format wrappers is provided that contains at least a name and a
+list of file extensions. The list can be used for:
+* checking that a file format is supported,
+* obtaining file format options (arguments).
 """
 
+import pygimplib as pg
 from pygimplib import pdb
+
+from src import settings_from_pdb as settings_from_pdb_
+
+
+def fill_file_format_options(file_format_options, file_format, import_or_export):
+  processed_file_format = FILE_FORMAT_ALIASES.get(file_format, file_format)
+
+  if (processed_file_format is None
+      or processed_file_format in file_format_options
+      or processed_file_format not in FILE_FORMATS_DICT):
+    return
+
+  if import_or_export == 'import':
+    pdb_proc_name = FILE_FORMATS_DICT[processed_file_format].import_procedure_name
+  elif import_or_export == 'export':
+    pdb_proc_name = FILE_FORMATS_DICT[processed_file_format].export_procedure_name
+  else:
+    raise ValueError(
+      'invalid value for import_or_export; must be either "import" or "export"')
+
+  if pdb_proc_name is None:
+    return
+
+  _pdb_proc, _pdb_proc_name, file_format_options_list = (
+    settings_from_pdb_.get_setting_data_from_pdb_procedure(pdb_proc_name))
+
+  processed_file_format_options_list = _remove_common_file_format_options(
+    file_format_options_list, import_or_export)
+
+  options_settings = create_file_format_options_settings(
+    processed_file_format_options_list)
+
+  file_format_options[processed_file_format] = options_settings
+
+
+def _remove_common_file_format_options(file_format_options_list, import_or_export):
+  # HACK: Is there a better way to detect common arguments for load/export
+  # procedures?
+  options_to_filter_for_load = {
+    0: 'run-mode',
+    1: 'file',
+  }
+
+  options_to_filter_for_export = {
+    0: 'run-mode',
+    1: 'image',
+    2: 'drawables',
+    3: 'file',
+  }
+
+  if import_or_export == 'import':
+    options_to_filter = options_to_filter_for_load
+  elif import_or_export == 'export':
+    options_to_filter = options_to_filter_for_export
+  else:
+    raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+  return [
+    option_dict for index, option_dict in enumerate(file_format_options_list)
+    if not (index in options_to_filter and option_dict['name'] == options_to_filter[index])
+  ]
+
+
+def create_file_format_options_settings(file_format_options_list):
+  group = pg.setting.Group('file_format_options')
+
+  processed_file_format_options_list = []
+  file_format_options_values = {}
+
+  for file_format_options in file_format_options_list:
+    if 'value' in file_format_options:
+      # The 'value' key must not be present when creating settings in a group
+      # from a dictionary.
+      file_format_options_values[file_format_options['name']] = file_format_options.pop('value')
+
+    processed_file_format_options_list.append(file_format_options)
+
+  group.add(processed_file_format_options_list)
+
+  for setting_name, value in file_format_options_values.items():
+    group[setting_name].set_value(value)
+
+  return group
 
 
 def _create_file_formats(file_formats_params):
