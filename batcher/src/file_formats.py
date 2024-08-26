@@ -43,25 +43,39 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
   file_format_options[processed_file_format] = options_settings
 
 
+def fill_and_get_file_format_options_as_kwargs(
+      file_format_options, file_format, import_or_export):
+  fill_file_format_options(file_format_options, file_format, import_or_export)
+
+  if file_format in file_format_options:
+    kwargs = {}
+
+    for setting in file_format_options[file_format]:
+      if (import_or_export == 'import'
+          and setting.name in _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD.values()):
+        continue
+
+      if (import_or_export == 'export'
+          and setting.name in _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT.values()):
+        continue
+
+      if isinstance(setting, pg.setting.ArraySetting):
+        length_name = setting.get_length_name(use_default=False)
+        if length_name is not None:
+          kwargs[length_name.replace('-', '_')] = len(setting.value)
+
+      kwargs[setting.name.replace('-', '_')] = setting.value
+
+    return kwargs
+  else:
+    return None
+
+
 def _remove_common_file_format_options(file_format_options_list, import_or_export):
-  # HACK: Is there a better way to detect common arguments for load/export
-  # procedures?
-  options_to_filter_for_load = {
-    0: 'run-mode',
-    1: 'file',
-  }
-
-  options_to_filter_for_export = {
-    0: 'run-mode',
-    1: 'image',
-    2: 'drawables',
-    3: 'file',
-  }
-
   if import_or_export == 'import':
-    options_to_filter = options_to_filter_for_load
+    options_to_filter = _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD
   elif import_or_export == 'export':
-    options_to_filter = options_to_filter_for_export
+    options_to_filter = _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT
   else:
     raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
 
@@ -281,3 +295,17 @@ running GIMP instance are included.
 """
 
 FILE_FORMAT_ALIASES = _create_file_format_aliases(FILE_FORMATS)
+
+# HACK: Is there a better way to detect common arguments for load/export
+# procedures?
+_PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD = {
+  0: 'run-mode',
+  1: 'file',
+}
+
+_PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT = {
+  0: 'run-mode',
+  1: 'image',
+  2: 'drawables',
+  3: 'file',
+}

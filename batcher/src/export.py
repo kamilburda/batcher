@@ -532,7 +532,7 @@ def _export_image(
   layer_array = GObject.Value(Gimp.ObjectArray)
   Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
 
-  export_func, kwargs = _get_export_function(
+  export_func, kwargs = get_export_function(
     file_extension, file_format_mode, file_format_export_options)
 
   export_func(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode, **kwargs)
@@ -540,7 +540,7 @@ def _export_image(
   return pdb.last_status
 
 
-def _get_export_function(
+def get_export_function(
       file_extension: str,
       file_format_mode: int,
       file_format_export_options: Dict,
@@ -558,26 +558,14 @@ def _get_export_function(
   if (file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES
       and file_extension in file_formats_.FILE_FORMATS_DICT):
     file_format = file_formats_.FILE_FORMATS_DICT[file_extension]
-    if file_format.export_procedure_name and file_extension in file_format_export_options:
-      file_format_option_kwargs = _get_file_format_options_as_kwargs(
+    if file_format.export_procedure_name:
+      file_format_option_kwargs = file_formats_.fill_and_get_file_format_options_as_kwargs(
         file_format_export_options, file_extension, 'export')
 
       if file_format_option_kwargs is not None:
         return getattr(pdb, file_format.export_procedure_name), file_format_option_kwargs
 
   return pdb.gimp_file_save, {}
-
-
-def _get_file_format_options_as_kwargs(file_format_options, file_format, import_or_export):
-  file_formats_.fill_file_format_options(file_format_options, file_format, import_or_export)
-
-  if file_format in file_format_options:
-    return {
-      setting.name.replace('-', '_'): setting.value
-      for setting in file_format_options[file_format]
-    }
-  else:
-    return None
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):

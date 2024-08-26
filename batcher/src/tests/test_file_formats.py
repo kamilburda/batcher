@@ -6,18 +6,15 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 import pygimplib as pg
-from pygimplib.tests import stubs_gimp
 
 from src import file_formats as file_formats_
 
 
-@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
 class TestFileFormatOptionsSetting(unittest.TestCase):
 
-  @mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
-  def setUp(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+  def setUp(self, mock_get_setting_data_from_pdb_procedure):
     self.common_options = [
       {
         'name': 'run-mode',
@@ -66,7 +63,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       },
     ]
 
-  def test_fill_file_format_options(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+  def test_fill_file_format_options(self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
@@ -78,7 +75,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(file_format_options['jpg']['quality'].value, 0.9)
 
   def test_fill_file_format_options_has_no_effect_after_already_filling_file_format(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+        self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
@@ -90,8 +87,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertIn('jpg', file_format_options)
     self.assertEqual(file_format_options['jpg']['quality'].value, 0.9)
 
-  def test_fill_file_format_options_with_alias(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+  def test_fill_file_format_options_with_alias(self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
@@ -104,7 +100,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(file_format_options['jpg']['quality'].value, 0.9)
 
   def test_fill_file_format_options_unrecognized_format(
-        self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+        self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
     file_formats_.fill_file_format_options(file_format_options, 'unknown', 'export')
