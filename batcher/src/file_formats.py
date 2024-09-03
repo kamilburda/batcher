@@ -138,19 +138,19 @@ class _FileFormat:
   def __init__(
         self,
         file_extensions,
-        description=None,
         import_procedure_name=None,
         export_procedure_name=None,
         version_check_func=None,
+        description=None,
         **kwargs):
     self.file_extensions = file_extensions
-
-    self._description = description
     
     self.import_procedure_name = import_procedure_name
     self.export_procedure_name = export_procedure_name
     
     self.version_check_func = version_check_func if version_check_func is not None else lambda: True
+
+    self._description = description
     
     for name, value in kwargs.items():
       setattr(self, name, value)
