@@ -155,14 +155,16 @@ class _FileFormat:
     for name, value in kwargs.items():
       setattr(self, name, value)
 
-  def get_description(self, import_or_export):
+  def get_description(self, import_or_export, max_char_length_for_inferred_description=35):
     """Returns the description of the file format.
 
     If passing ``description=None`` to `__init__()` and ``import_or_export``
-    is equal to ``'import'`` or ``'export'``, the description is obtained
+    is equal to ``'import'`` or ``'export'``, the description is inferred
     from the procedure whose name is `import_procedure_name` or
     `export_procedure_name`, respectively. If the load/export procedure does
-    not exist, the ``'<first file extension in uppercase> image'`` is returned.
+    not exist, the string ``'<first file extension in uppercase> image'`` is
+    returned. The string is also returned if the procedure exists and the label
+    has more than ``max_char_length_for_inferred_description`` characters.
 
     If passing a string to the ``description`` parameter in `__init__()`,
     then that description is returned.
@@ -181,7 +183,7 @@ class _FileFormat:
       if import_or_export == 'export' and self.export_procedure_name in pdb:
         menu_label = pdb[self.export_procedure_name].proc.get_menu_label()
 
-      if menu_label:
+      if menu_label and len(menu_label) <= max_char_length_for_inferred_description:
         return menu_label
       else:
         return _('{} image').format(self.file_extensions[0].upper())
@@ -218,8 +220,7 @@ FILE_FORMATS = _create_file_formats([
    'export_procedure_name': 'file-colorxhtml-save'},
   {'file_extensions': ['dds'],
    'export_procedure_name': 'file-dds-save'},
-  {'file_extensions': ['dcm', 'dicom'],
-   'description': 'DICOM image',
+  {'file_extensions': ['dicom', 'dcm'],
    'export_procedure_name': 'file-dicom-save'},
   {'file_extensions': ['eps'],
    'export_procedure_name': 'file-eps-save'},
