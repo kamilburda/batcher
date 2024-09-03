@@ -168,7 +168,7 @@ def _set_array_setting_attributes_based_on_length_attribute(
     array_dict['max_size'] = array_length_dict.get('max_value')
     array_dict['default_value'] = tuple([element_type.get_default_default_value()] * min_array_size)
 
-  array_dict['length_name'] = array_length_dict['name']
+    array_dict['length_name'] = array_length_dict['name']
 
 
 def _remove_array_length_parameters(arguments_list, array_length_argument_indexes):
