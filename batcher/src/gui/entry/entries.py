@@ -494,16 +494,23 @@ class FileExtensionEntry(ExtendedEntry):
   _COLUMNS = [_COLUMN_DESCRIPTION, _COLUMN_EXTENSIONS] = (0, 1)
   _COLUMN_TYPES = [GObject.TYPE_STRING, GObject.TYPE_STRV]
   
-  def __init__(self, **kwargs):
+  def __init__(self, import_or_export='export', **kwargs):
     """Initializes a `FileExtensionEntry` instance.
 
     Args:
+      import_or_export:
+        If this is equal to ``'import'`` or ``'export'``, the labels for each
+        file format is obtained from the corresponding file load or export
+        procedure, respectively. See
+        `src.file_formats._FileFormat.get_description()` for more information.
       **kwargs:
         Additional keyword arguments that can be passed to the parent class'
         `__init__()` method.
     """
     super().__init__(**kwargs)
-    
+
+    self._import_or_export = import_or_export
+
     self._tree_view_columns_rects = []
     
     self._cell_renderer_description = None
@@ -810,9 +817,8 @@ class FileExtensionEntry(ExtendedEntry):
         self._is_modifying_highlight = False
         self._highlighted_extension = ''
 
-  @staticmethod
-  def _get_file_formats(file_formats):
-    return [[file_format.description, file_format.file_extensions]
+  def _get_file_formats(self, file_formats):
+    return [[file_format.get_description(self._import_or_export), file_format.file_extensions]
             for file_format in file_formats if file_format.is_export_installed()]
   
   @staticmethod
