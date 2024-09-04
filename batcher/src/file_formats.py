@@ -226,6 +226,8 @@ FILE_FORMATS = _create_file_formats([
    'export_procedure_name': 'file-eps-save'},
   {'file_extensions': ['exr'],
    'export_procedure_name': 'file-exr-save'},
+  {'file_extensions': ['ff'],
+   'export_procedure_name': 'file-farbfeld-save'},
   {'file_extensions': ['fli', 'flc'],
    'export_procedure_name': 'file-fli-save'},
   {'file_extensions': ['gbr'],
