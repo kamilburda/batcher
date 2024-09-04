@@ -818,8 +818,10 @@ class FileExtensionEntry(ExtendedEntry):
         self._highlighted_extension = ''
 
   def _get_file_formats(self, file_formats):
-    return [[file_format.get_description(self._import_or_export), file_format.file_extensions]
-            for file_format in file_formats if file_format.is_export_installed()]
+    return sorted(
+      ([file_format.get_description(self._import_or_export), file_format.file_extensions]
+       for file_format in file_formats if file_format.is_export_installed()),
+      key=lambda item: item[0].lower())
   
   @staticmethod
   def _get_text_pixel_size(text, pango_layout):
