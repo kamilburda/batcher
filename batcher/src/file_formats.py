@@ -329,8 +329,7 @@ running GIMP instance are included.
 
 FILE_FORMAT_ALIASES = _create_file_format_aliases(FILE_FORMATS)
 
-# HACK: Is there a better way to detect common arguments for load/export
-# procedures?
+# HACK: Is there a better way to detect common arguments for load/export procedures?
 _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD = {
   0: 'run-mode',
   1: 'file',
