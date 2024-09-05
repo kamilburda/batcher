@@ -361,7 +361,7 @@ def _export_item(
     
     export_status = _export_item_once_wrapper(
       batcher,
-      _get_run_mode(batcher, file_extension, file_extension_properties),
+      _get_run_mode(batcher, file_format_mode, file_extension, file_extension_properties),
       image,
       raw_item,
       output_filepath,
@@ -458,7 +458,10 @@ def _export_item_once_wrapper(
   return export_status
 
 
-def _get_run_mode(batcher, file_extension, file_extension_properties):
+def _get_run_mode(batcher, file_format_mode, file_extension, file_extension_properties):
+  if file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES:
+    return Gimp.RunMode.NONINTERACTIVE
+
   file_extension_property = file_extension_properties[file_extension]
   if file_extension_property.is_valid and file_extension_property.processed_count > 0:
     return Gimp.RunMode.WITH_LAST_VALS
