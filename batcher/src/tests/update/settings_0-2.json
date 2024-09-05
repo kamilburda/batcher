@@ -632,7 +632,7 @@
                                                     "name": "local_origin",
                                                     "default_value": false,
                                                     "display_name": "Use local origin",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": true,
                                                     "type": "bool"
@@ -836,7 +836,7 @@
                                                     "display_name": "toggle",
                                                     "pdb_type": "gboolean",
                                                     "default_value": true,
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "value": true,
                                                     "type": "bool"
                                                 }
@@ -1026,7 +1026,7 @@
                                                     "name": "use_file_extension_in_item_name",
                                                     "default_value": false,
                                                     "display_name": "Use file extension in layer name",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": false,
                                                     "type": "bool"
@@ -1035,7 +1035,7 @@
                                                     "name": "convert_file_extension_to_lowercase",
                                                     "default_value": false,
                                                     "display_name": "Convert file extension to lowercase",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": false,
                                                     "type": "bool"
@@ -1044,7 +1044,7 @@
                                                     "name": "preserve_layer_name_after_export",
                                                     "default_value": false,
                                                     "display_name": "Preserve layer name after export",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": false,
                                                     "type": "bool"
@@ -1192,7 +1192,7 @@
                                                     "name": "rename_layers",
                                                     "default_value": true,
                                                     "display_name": "Rename layers",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": true,
                                                     "type": "bool"
@@ -1201,7 +1201,7 @@
                                                     "name": "rename_folders",
                                                     "default_value": false,
                                                     "display_name": "Rename folders",
-                                                    "gui_type": "check_button_no_text",
+                                                    "gui_type": "check_button",
                                                     "pdb_type": null,
                                                     "value": false,
                                                     "type": "bool"

@@ -10,7 +10,8 @@ import pygimplib as pg
 
 def attach_label_to_grid(
       grid, setting, row_index, column_index=0, width=1, height=1, max_width_chars=40):
-  if isinstance(setting.gui, setting_classes.FileFormatOptionsPresenter):
+  if isinstance(
+        setting.gui, (pg.setting.CheckButtonPresenter, setting_classes.FileFormatOptionsPresenter)):
     return
 
   label = Gtk.Label(
@@ -50,7 +51,8 @@ def attach_widget_to_grid(
 
   widget_to_attach.set_hexpand(True)
 
-  if not isinstance(setting.gui, setting_classes.FileFormatOptionsPresenter):
+  if not isinstance(
+        setting.gui, (pg.setting.CheckButtonPresenter, setting_classes.FileFormatOptionsPresenter)):
     final_column_index = column_index
     final_width = width
   else:

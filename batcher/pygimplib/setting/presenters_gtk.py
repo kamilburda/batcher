@@ -104,25 +104,23 @@ class CheckButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'clicked'
   
-  def _create_widget(self, setting, **kwargs):
-    return Gtk.CheckButton(label=setting.display_name, use_underline=False)
+  def _create_widget(self, setting, max_width_chars=40, **kwargs):
+    check_button = Gtk.CheckButton(
+      label=setting.display_name,
+      use_underline=False,
+    )
+
+    check_button.get_child().set_max_width_chars(max_width_chars)
+    check_button.get_child().set_use_markup(False)
+    check_button.get_child().set_line_wrap(True)
+
+    return check_button
   
   def get_value(self):
     return self._widget.get_active()
   
   def _set_value(self, value):
     self._widget.set_active(value)
-
-
-class CheckButtonNoTextPresenter(CheckButtonPresenter):
-  """`setting.Presenter` subclass for `Gtk.CheckButton` widgets without text
-  next to the checkbox.
-  
-  Value: Checked state of the check button (checked/unchecked).
-  """
-  
-  def _create_widget(self, setting, **kwargs):
-    return Gtk.CheckButton(label=None, use_underline=False)
 
 
 class CheckButtonLabelPresenter(GtkPresenter):

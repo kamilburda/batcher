@@ -77,7 +77,7 @@ def get_setting_data_from_pdb_procedure(
         argument_dict['default_param_value'] = proc_arg.default_value
 
     if setting_type == pg.setting.BoolSetting:
-      argument_dict['gui_type'] = 'check_button_no_text'
+      argument_dict['gui_type'] = 'check_button'
 
     if inspect.isclass(setting_type) and issubclass(setting_type, pg.setting.NumericSetting):
       if hasattr(proc_arg, 'minimum'):

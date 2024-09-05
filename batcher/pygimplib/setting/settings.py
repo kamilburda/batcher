@@ -1214,7 +1214,6 @@ class BoolSetting(Setting):
 
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.check_button,
-    _SETTING_GUI_TYPES.check_button_no_text,
     _SETTING_GUI_TYPES.check_menu_item,
     _SETTING_GUI_TYPES.expander,
   ]
