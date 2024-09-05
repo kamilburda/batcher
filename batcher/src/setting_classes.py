@@ -443,35 +443,31 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
+    # HACK: We are filling the file format options in the GUI as opposed to the
+    #  setting to avoid crashes on plug-in startup.
     file_formats_.fill_file_format_options(
       setting.value, setting.value[None], setting.import_or_export)
 
-    self._file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
+    file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
       initial_header_title=setting.display_name,
       **kwargs,
     )
 
-    return self._file_format_options_box
+    return file_format_options_box
 
-  def set_active_file_format(self, file_format, file_format_options):
-    # TODO:
-    #  display options for the current file format
-    #  * create the grid if not already
-    #  * replace the previous grid with the current grid
-    pass
+  def set_active_file_format(self, file_format):
+    self._widget.set_active_file_format(file_format, self.setting.value[file_format])
 
   def get_value(self):
     # TODO:
-    #  call `setting.update_setting_value()`
+    #  call `setting.update_setting_value()` (for settings that do not have the
+    #   automatic GUI-to-setting capability)
     #  get the current file format and the values
     #  update the setting value - retain all dict entries and update only the key matching the file format
     return self.setting.value
 
   def _set_value(self, value):
-    # TODO:
-    #  Fill/update self._file_format_options_box with new data
-    #  * for any grids that exist, update their values
-    pass
+    self._widget.set_active_file_format(value[None], value[value[None]])
 
 
 class FileFormatOptionsSetting(pg.setting.DictSetting):
@@ -513,7 +509,9 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     self._value[None] = processed_file_format
 
     if hasattr(self.gui, 'set_active_file_format'):
-      self.gui.set_active_file_format(processed_file_format, self._value)
+      # HACK: We are filling the file format options when the GUI exists to
+      #  avoid crashes on plug-in startup.
+      self.gui.set_active_file_format(processed_file_format)
 
   def _raw_to_value(self, raw_value):
     value = {}

@@ -14,8 +14,8 @@ import pygimplib as pg
 from pygimplib import pdb
 
 from src.gui import editable_label as editable_label_
-from src.gui import placeholders as gui_placeholders_
 from src.gui import popup_hide_context as popup_hide_context_
+from src.gui import utils as gui_utils_
 
 
 class ActionEditor(GimpUi.Dialog):
@@ -302,50 +302,28 @@ class ActionEditorWidget:
       if not setting.gui.get_visible():
         continue
 
-      self._attach_label_to_grid(setting, row_index)
-      self._attach_widget_to_grid(setting, row_index)
+      gui_utils_.attach_label_to_grid(
+        self._grid_action_arguments,
+        setting,
+        row_index,
+        max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+      )
+
+      gui_utils_.attach_widget_to_grid(self._grid_action_arguments, setting, row_index)
 
       self._action_argument_indexes_in_grid[setting] = row_index
 
       row_index += 1
 
   def _attach_action_argument_to_grid(self, setting, row_index):
-    self._attach_label_to_grid(setting, row_index)
-    self._attach_widget_to_grid(setting, row_index)
-
-  def _attach_label_to_grid(self, setting, row_index):
-    argument_description = setting.display_name
-
-    if argument_description is None or not argument_description.strip():
-      argument_description = setting.name
-      should_set_tooltip = False
-    else:
-      should_set_tooltip = True
-
-    label = Gtk.Label(
-      label=argument_description,
-      xalign=0.0,
-      yalign=0.5,
+    gui_utils_.attach_label_to_grid(
+      self._grid_action_arguments,
+      setting,
+      row_index,
       max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
-      wrap=True,
     )
 
-    if should_set_tooltip:
-      label.set_tooltip_text(setting.name)
-
-    self._grid_action_arguments.attach(label, 0, row_index, 1, 1)
-
-  def _attach_widget_to_grid(self, setting, row_index):
-    widget_to_attach = setting.gui.widget
-
-    if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
-      widget_to_attach = gui_placeholders_.create_placeholder_widget()
-    else:
-      if (isinstance(setting, pg.setting.ArraySetting)
-          and not setting.element_type.get_allowed_gui_types()):
-        widget_to_attach = gui_placeholders_.create_placeholder_widget()
-
-    self._grid_action_arguments.attach(widget_to_attach, 1, row_index, 1, 1)
+    gui_utils_.attach_widget_to_grid(self._grid_action_arguments, setting, row_index)
 
   def _set_grid_action_arguments_to_update_according_to_visible_state(self, action):
     for setting in action['arguments']:

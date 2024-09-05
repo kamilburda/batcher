@@ -12,6 +12,7 @@ import pygimplib as pg
 
 from src import renamer as renamer_
 
+from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 
 
@@ -262,6 +263,7 @@ class ExportOptionsDialog:
     self._dialog = GimpUi.Dialog(
       title=_('Export Options'),
       parent=self._parent,
+      resizable=False,
     )
 
     self._button_reset_response_id = 1
@@ -279,9 +281,8 @@ class ExportOptionsDialog:
     self._settings['main/export'].initialize_gui(only_null=True)
 
     for row_index, setting in enumerate(self._settings['main/export']):
-      label_for_setting = Gtk.Label(label=setting.display_name, xalign=0.0)
-      self._grid_export_options.attach(label_for_setting, 0, row_index, 1, 1)
-      self._grid_export_options.attach(setting.gui.widget, 1, row_index, 1, 1)
+      gui_utils_.attach_label_to_grid(self._grid_export_options, setting, row_index)
+      gui_utils_.attach_widget_to_grid(self._grid_export_options, setting, row_index)
 
     self._dialog.vbox.pack_start(self._grid_export_options, False, False, 0)
     self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
