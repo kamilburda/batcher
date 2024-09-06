@@ -271,6 +271,7 @@ class ExportOptionsDialog:
 
     self._button_reset.connect('clicked', self._on_export_options_dialog_button_reset_clicked)
 
+    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
     self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
 
     self._grid_export_options = Gtk.Grid(
