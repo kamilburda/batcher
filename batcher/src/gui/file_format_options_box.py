@@ -42,7 +42,22 @@ class FileFormatOptionsBox(Gtk.Box):
       '<b>' + _('{} options').format(active_file_format.upper()) + '</b>')
 
     if file_format_options is None:
+      self._label_message.set_label('<i>{}</i>'.format(_('File format not recognized')))
+      self._label_message.show()
+
+      self.pack_start(self._label_message, False, False, 0)
+
       return
+
+    if not file_format_options:
+      self._label_message.set_label('<i>{}</i>'.format(_('File format has no options')))
+      self._label_message.show()
+
+      self.pack_start(self._label_message, False, False, 0)
+
+      return
+
+    self._label_message.hide()
 
     if active_file_format not in self._grids_per_file_format:
       grid = self._create_file_format_options_grid(file_format_options)
@@ -59,6 +74,14 @@ class FileFormatOptionsBox(Gtk.Box):
       use_underline=False,
     )
 
+    self._label_message = Gtk.Label(
+      xalign=0.5,
+      use_markup=True,
+      use_underline=False,
+      no_show_all=True,
+      margin_bottom=self._header_spacing,
+    )
+
     self.set_orientation(Gtk.Orientation.VERTICAL)
     self.set_spacing(self._header_spacing)
 
@@ -71,6 +94,7 @@ class FileFormatOptionsBox(Gtk.Box):
       row_spacing=self._row_spacing,
       column_spacing=self._column_spacing,
       margin_start=self._left_margin,
+      margin_bottom=self._header_spacing,
     )
 
     file_format_options.initialize_gui(only_null=True)
