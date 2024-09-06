@@ -177,6 +177,7 @@ def _remove_array_length_parameters(arguments_list, array_length_argument_indexe
 
 
 _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES = {
+  'file-pdf-save': {'ignore-hidden': False, 'layers-as-pages': True, 'reverse-order': True},
   'plug-in-lighting': {'new-image': False},
   'plug-in-map-object': {'new-image': False, 'new-layer': False},
   'plug-in-smooth-palette': {'show-image': False},
