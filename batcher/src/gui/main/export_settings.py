@@ -233,6 +233,7 @@ class ExportSettings:
       self._export_options_dialog.widget.show_all()
     else:
       self._export_options_dialog.widget.show()
+      self._export_options_dialog.widget.present()
 
   def _update_previews_on_export_options_change(self, _setting):
     if self._name_preview is not None:
