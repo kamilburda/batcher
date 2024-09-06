@@ -459,11 +459,11 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     self._widget.set_active_file_format(file_format, self.setting.value.get(file_format, None))
 
   def get_value(self):
-    # TODO:
-    #  call `setting.update_setting_value()` (for settings that do not have the
-    #   automatic GUI-to-setting capability)
-    #  get the current file format and the values
-    #  update the setting value - retain all dict entries and update only the key matching the file format
+    if None in self.setting.value:
+      active_file_format = self.setting.value[None]
+      if active_file_format in self.setting.value:
+        self.setting.value[active_file_format].apply_gui_values_to_settings()
+
     return self.setting.value
 
   def _set_value(self, value):
