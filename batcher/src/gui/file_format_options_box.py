@@ -31,25 +31,25 @@ class FileFormatOptionsBox(Gtk.Box):
     self._left_margin = left_margin
 
     self._grids_per_file_format = {}
-    self._active_file_format = None
 
     self._init_gui()
 
   def set_active_file_format(self, active_file_format, file_format_options):
+    if len(self.get_children()) > 1:
+      self.remove(self.get_children()[-1])
+
+    self._label_header.set_label(
+      '<b>' + _('{} options').format(active_file_format.upper()) + '</b>')
+
+    if file_format_options is None:
+      return
+
     if active_file_format not in self._grids_per_file_format:
       grid = self._create_file_format_options_grid(file_format_options)
 
       self._grids_per_file_format[active_file_format] = grid
 
-    if len(self.get_children()) > 1:
-      self.remove(self.get_children()[-1])
-
-    self._active_file_format = active_file_format
-
     self.pack_start(self._grids_per_file_format[active_file_format], False, False, 0)
-
-    self._label_header.set_label(
-      '<b>' + _('{} options').format(self._active_file_format.upper()) + '</b>')
 
   def _init_gui(self):
     self._label_header = Gtk.Label(

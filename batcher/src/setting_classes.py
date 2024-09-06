@@ -456,7 +456,7 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     return file_format_options_box
 
   def set_active_file_format(self, file_format):
-    self._widget.set_active_file_format(file_format, self.setting.value[file_format])
+    self._widget.set_active_file_format(file_format, self.setting.value.get(file_format, None))
 
   def get_value(self):
     # TODO:
@@ -467,7 +467,7 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     return self.setting.value
 
   def _set_value(self, value):
-    self._widget.set_active_file_format(value[None], value[value[None]])
+    self._widget.set_active_file_format(value[None], value.get(value[None], None))
 
 
 class FileFormatOptionsSetting(pg.setting.DictSetting):
@@ -511,6 +511,8 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     if hasattr(self.gui, 'set_active_file_format'):
       # HACK: We are filling the file format options when the GUI exists to
       #  avoid crashes on plug-in startup.
+      file_formats_.fill_file_format_options(self._value, self._value[None], self._import_or_export)
+
       self.gui.set_active_file_format(processed_file_format)
 
   def _raw_to_value(self, raw_value):
