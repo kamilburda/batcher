@@ -15,6 +15,8 @@ from gi.repository import GimpUi
 from gi.repository import GLib
 from gi.repository import GObject
 
+from . import initnotifier as pginitnotifier
+
 
 _PROCEDURE_NAMES_AND_DATA = {}
 _PLUGIN_PROPERTIES = {}
@@ -381,6 +383,8 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
 
     if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
       GimpUi.init(procedure.get_name())
+
+    pginitnotifier.notifier.emit('start-procedure')
 
     return_values = func(*procedure_and_args)
 

@@ -74,6 +74,7 @@ if _gimp_modules_available:
   from . import pdbutils
   from . import setting
 
+  from .initnotifier import notifier
   from .procedure import main
   from .procedure import register_procedure
   from .procedure import set_use_locale
@@ -91,6 +92,7 @@ if _gimp_modules_available:
     'setting',
     # Global elements imported to or defined in this module
     'main',
+    'notifier',
     'pdb',
     'PDBProcedureError',
     'register_procedure',
