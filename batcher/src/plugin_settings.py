@@ -415,6 +415,24 @@ def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict)
       _set_sensitive_for_image_name_pattern_in_export,
       procedure['arguments/single_image_name_pattern'])
 
+    _show_hide_file_format_export_options(
+      procedure['arguments/file_format_mode'],
+      procedure['arguments/file_format_export_options'])
+
+    procedure['arguments/file_format_mode'].connect_event(
+      'value-changed',
+      _show_hide_file_format_export_options,
+      procedure['arguments/file_format_export_options'])
+
+    _set_file_format_export_options(
+      procedure['arguments/file_extension'],
+      procedure['arguments/file_format_export_options'])
+
+    procedure['arguments/file_extension'].connect_event(
+      'value-changed',
+      _set_file_format_export_options,
+      procedure['arguments/file_format_export_options'])
+
 
 def _set_sensitive_for_image_name_pattern_in_export(
       export_mode_setting, single_image_name_pattern_setting):
