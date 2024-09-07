@@ -946,6 +946,9 @@ class PanedPositionPresenter(GtkPresenter):
 
 
 def _create_spin_button(setting, digits=None):
+  if digits is None:
+    digits = 2
+
   if hasattr(setting, 'min_value') and setting.min_value is not None:
     min_value = setting.min_value
   elif hasattr(setting, 'pdb_min_value') and setting.pdb_min_value is not None:
@@ -970,15 +973,11 @@ def _create_spin_button(setting, digits=None):
   step_increment = 1
   page_increment = 10
 
-  if digits is None:
-    digits = 2
+  if 0 < value_range <= 1:
+    digits_in_value_range = -math.floor(math.log10(value_range))
 
-    if 0 < value_range <= 1:
-      digits_in_value_range = -math.floor(math.log10(value_range))
-
-      digits = digits_in_value_range + 1
-      step_increment = 10 ** -digits
-      page_increment = 10 ** -(digits - 1)
+    step_increment = 10 ** -(digits_in_value_range + 1)
+    page_increment = 10 ** -digits_in_value_range
 
   return spin_button_class(
     adjustment=Gtk.Adjustment(
