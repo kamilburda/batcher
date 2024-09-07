@@ -169,11 +169,14 @@ class BatcherManagerQuick:
     if mode == 'export':
       if self._settings['gui/show_quick_settings'].value:
         overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
+        initial_export_run_mode = Gimp.RunMode.INTERACTIVE
       else:
         overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
           self._settings['main/overwrite_mode'].value)
+        initial_export_run_mode = Gimp.RunMode.WITH_LAST_VALS
     else:
       overwrite_chooser = None
+      initial_export_run_mode = Gimp.RunMode.INTERACTIVE
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
@@ -182,7 +185,7 @@ class BatcherManagerQuick:
       self._settings['main/procedures'],
       self._settings['main/constraints'],
       edit_mode=mode == 'edit',
-      initial_export_run_mode=Gimp.RunMode.WITH_LAST_VALS,
+      initial_export_run_mode=initial_export_run_mode,
       overwrite_chooser=overwrite_chooser,
       progress_updater=progress_updater,
       export_context_manager=_handle_gui_in_export,
