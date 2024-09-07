@@ -520,7 +520,7 @@ def _update_to_0_5(data, _settings, source_names):
             'type': 'choice',
             'name': 'overwrite_mode',
             'default_value': 'ask',
-            'value': 'ask',
+            'value': overwrite.OverwriteModes.ASK,
             'items': [
               ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
               ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
@@ -550,7 +550,7 @@ def _update_to_0_5(data, _settings, source_names):
             'type': 'choice',
             'name': 'file_format_mode',
             'default_value': 'use_explicit_values',
-            'value': 'use_explicit_values',
+            'value': export_.FileFormatModes.USE_EXPLICIT_VALUES,
             'items': [
               ('use_native_plugin_values',
                _('Interactively'),
