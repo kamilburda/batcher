@@ -514,15 +514,18 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
   def _raw_to_value(self, raw_value):
     value = {}
 
-    for key, options_or_active_file_format in raw_value.items():
+    for key, group_or_active_file_format in raw_value.items():
       if key is not None:
-        if isinstance(options_or_active_file_format, pg.setting.Group):
-          value[key] = options_or_active_file_format
+        if isinstance(group_or_active_file_format, pg.setting.Group):
+          # We need to create new settings to avoid the same setting to be
+          # a part of multiple instances of `FileFormatOptionsSetting`.
+          value[key] = file_formats_.create_file_format_options_settings(
+            self._file_format_options_to_dict(group_or_active_file_format))
         else:
           value[key] = file_formats_.create_file_format_options_settings(
-            options_or_active_file_format)
+            group_or_active_file_format)
       else:
-        value[key] = options_or_active_file_format
+        value[key] = group_or_active_file_format
 
     return value
 
@@ -531,7 +534,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
 
     for key, group_or_active_file_format in value.items():
       if key is not None:
-        raw_value[key] = [setting.to_dict() for setting in group_or_active_file_format]
+        raw_value[key] = self._file_format_options_to_dict(group_or_active_file_format)
       else:
         raw_value[key] = group_or_active_file_format
 
@@ -557,3 +560,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
         and orig_active_file_format is not None
         and value[None] != orig_active_file_format):
       self.set_active_file_format(value[None])
+
+  @staticmethod
+  def _file_format_options_to_dict(file_format_options):
+    return [setting.to_dict() for setting in file_format_options]
