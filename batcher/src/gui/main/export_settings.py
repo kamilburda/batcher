@@ -230,7 +230,7 @@ class ExportSettings:
     if self._export_options_dialog is None:
       self._export_options_dialog = ExportOptionsDialog(self._settings, parent=self._parent)
 
-      self._export_options_dialog.widget.show_all()
+      self._export_options_dialog.widget.show()
     else:
       self._export_options_dialog.widget.show()
       self._export_options_dialog.widget.present()
@@ -279,6 +279,7 @@ class ExportOptionsDialog:
       row_spacing=self._GRID_ROW_SPACING,
       column_spacing=self._GRID_COLUMN_SPACING,
     )
+    self._grid_export_options.show()
 
     self._settings['main/export'].initialize_gui(only_null=True)
 

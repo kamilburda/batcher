@@ -20,6 +20,7 @@ def attach_label_to_grid(
     max_width_chars=max_width_chars,
     wrap=True,
   )
+  label.show()
 
   if _has_setting_display_name(setting):
     label.set_text(setting.display_name)

@@ -26,6 +26,8 @@ class RadioButtonBox(Gtk.Box):
     self.set_orientation(orientation)
     self.set_spacing(spacing)
 
+    self.show()
+
     self._radio_group = None
     self._buttons = []
 
@@ -37,6 +39,8 @@ class RadioButtonBox(Gtk.Box):
       button = Gtk.RadioButton.new_with_label_from_widget(self._radio_group, label)
 
     button.connect('toggled', self._on_radio_button_toggled)
+
+    button.show()
 
     self.pack_start(button, False, False, 0)
 
