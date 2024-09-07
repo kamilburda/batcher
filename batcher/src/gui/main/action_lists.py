@@ -172,9 +172,12 @@ class ActionLists:
       self._constraint_list,
     )
 
+    _set_up_existing_export_procedures(self._procedure_list)
+    self._procedure_list.actions.connect_event(
+      'after-load', lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
+
     _set_up_existing_insert_back_foreground_and_related_actions(
       self._procedure_list, self._constraint_list)
-
     self._procedure_list.actions.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
     self._constraint_list.actions.connect_event(
@@ -208,14 +211,20 @@ class ActionLists:
 
 
 def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
-  if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
-    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
-
   if item.action['orig_name'].value.startswith('export_for_'):
     _handle_export_procedure_item_added(item)
 
   if item.action['orig_name'].value == 'export_for_export_layers':
     _handle_export_for_export_layers_procedure_item_added(item, settings)
+
+  if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
+    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
+
+
+def _set_up_existing_export_procedures(procedure_list: action_list_.ActionList):
+  for item in procedure_list.items:
+    if item.action['orig_name'].value.startswith('export_for_'):
+      _handle_export_procedure_item_added(item)
 
 
 def _handle_insert_background_foreground_procedure_item_added(
