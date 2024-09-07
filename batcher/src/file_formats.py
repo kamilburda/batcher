@@ -81,7 +81,7 @@ def _remove_common_file_format_options(file_format_options_list, import_or_expor
 
   return [
     option_dict for index, option_dict in enumerate(file_format_options_list)
-    if not (index in options_to_filter and option_dict['name'] == options_to_filter[index])
+    if index not in options_to_filter
   ]
 
 
