@@ -9,7 +9,15 @@ import pygimplib as pg
 
 
 def attach_label_to_grid(
-      grid, setting, row_index, column_index=0, width=1, height=1, max_width_chars=40):
+      grid,
+      setting,
+      row_index,
+      column_index=0,
+      width=1,
+      height=1,
+      max_width_chars=40,
+      set_name_as_tooltip=True,
+):
   if isinstance(
         setting.gui, (pg.setting.CheckButtonPresenter, setting_classes.FileFormatOptionsPresenter)):
     return
@@ -24,7 +32,8 @@ def attach_label_to_grid(
 
   if _has_setting_display_name(setting):
     label.set_text(setting.display_name)
-    label.set_tooltip_text(setting.name)
+    if set_name_as_tooltip:
+      label.set_tooltip_text(setting.name)
   else:
     label.set_text(setting.name)
 
@@ -40,6 +49,7 @@ def attach_widget_to_grid(
       height=1,
       column_index_for_widget_without_label=0,
       width_for_widget_without_label=2,
+      set_name_as_tooltip=True,
 ):
   widget_to_attach = setting.gui.widget
 
@@ -60,7 +70,7 @@ def attach_widget_to_grid(
     final_column_index = column_index_for_widget_without_label
     final_width = width_for_widget_without_label
 
-    if _has_setting_display_name(setting):
+    if set_name_as_tooltip and _has_setting_display_name(setting):
       widget_to_attach.set_tooltip_text(setting.name)
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)

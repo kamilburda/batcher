@@ -307,9 +307,15 @@ class ActionEditorWidget:
         setting,
         row_index,
         max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+        set_name_as_tooltip=self._action['origin'].is_item('gimp_pdb'),
       )
 
-      gui_utils_.attach_widget_to_grid(self._grid_action_arguments, setting, row_index)
+      gui_utils_.attach_widget_to_grid(
+        self._grid_action_arguments,
+        setting,
+        row_index,
+        set_name_as_tooltip=self._action['origin'].is_item('gimp_pdb'),
+      )
 
       self._action_argument_indexes_in_grid[setting] = row_index
 
@@ -321,9 +327,15 @@ class ActionEditorWidget:
       setting,
       row_index,
       max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+      set_name_as_tooltip=self._action['origin'].is_item('gimp_pdb'),
     )
 
-    gui_utils_.attach_widget_to_grid(self._grid_action_arguments, setting, row_index)
+    gui_utils_.attach_widget_to_grid(
+      self._grid_action_arguments,
+      setting,
+      row_index,
+      set_name_as_tooltip=self._action['origin'].is_item('gimp_pdb'),
+    )
 
   def _set_grid_action_arguments_to_update_according_to_visible_state(self, action):
     for setting in action['arguments']:

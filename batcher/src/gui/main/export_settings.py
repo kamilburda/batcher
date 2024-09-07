@@ -284,8 +284,10 @@ class ExportOptionsDialog:
     self._settings['main/export'].initialize_gui(only_null=True)
 
     for row_index, setting in enumerate(self._settings['main/export']):
-      gui_utils_.attach_label_to_grid(self._grid_export_options, setting, row_index)
-      gui_utils_.attach_widget_to_grid(self._grid_export_options, setting, row_index)
+      gui_utils_.attach_label_to_grid(
+        self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
+      gui_utils_.attach_widget_to_grid(
+        self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
 
     self._dialog.vbox.pack_start(self._grid_export_options, False, False, 0)
     self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
