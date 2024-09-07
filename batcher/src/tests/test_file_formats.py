@@ -35,6 +35,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'element_type': pg.setting.DrawableSetting,
         'display_name': 'drawables',
       },
+      {
+        'name': 'file',
+        'type': pg.setting.FileSetting,
+      },
     ]
 
     self.png_options = [

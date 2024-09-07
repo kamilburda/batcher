@@ -344,6 +344,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'element_type': pg.setting.DrawableSetting,
         'display_name': 'drawables',
       },
+      {
+        'name': 'file',
+        'type': pg.setting.FileSetting,
+      },
     ]
 
     self.png_options = [
@@ -375,15 +379,23 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.setting = setting_classes.FileFormatOptionsSetting(
       'file_format_export_options', 'export', 'png')
 
-  def test_set_active_file_format(self, *_mocks):
+  def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+
     self.setting.set_active_file_format('jpg')
 
-    self.assertEqual(self.setting.value[None], 'jpg')
+    mock_get_setting_data_from_pdb_procedure.assert_called_once()
 
-  def test_set_active_file_format_with_alias(self, *_mocks):
+    self.assertEqual(self.setting.value[None], 'jpg')
+    self.assertIn('jpg', self.setting.value)
+
+  def test_set_active_file_format_with_alias(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+
     self.setting.set_active_file_format('jpeg')
 
     self.assertEqual(self.setting.value[None], 'jpg')
+    self.assertIn('jpg', self.setting.value)
 
   def test_set_active_file_format_to_unrecognized_format(
         self, mock_get_setting_data_from_pdb_procedure, *_mocks):
@@ -397,10 +409,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
   def test_to_dict(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-save', self.png_options
 
-    file_formats_.fill_file_format_options(self.setting.value, 'png', self.setting.import_or_export)
-    file_formats_.fill_file_format_options(
-      self.setting.value, 'unknown', self.setting.import_or_export)
-
+    self.setting.set_active_file_format('png')
     self.setting.set_active_file_format('unknown')
 
     self.setting.value['png']['compression'].set_value(7)
@@ -474,6 +483,9 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value['png']['interlaced'].value, False)
     self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
     self.assertEqual(self.setting.value['jpg']['optimize'].value, False)
+
+    self.assertIsNot(png_group, self.setting.value['png'])
+    self.assertIsNot(jpeg_group, self.setting.value['jpg'])
 
   def test_set_value_from_raw_list(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
     self.setting.set_value({

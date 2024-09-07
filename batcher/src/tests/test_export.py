@@ -39,6 +39,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'element_type': pg.setting.DrawableSetting,
         'display_name': 'drawables',
       },
+      {
+        'name': 'file',
+        'type': pg.setting.FileSetting,
+      },
     ]
 
     self.png_options = [
@@ -61,11 +65,6 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.file_format_options = [
       *self.common_options,
       *self.png_options,
-    ]
-
-    self.file_format_options_with_common_options_in_different_order = [
-      *self.png_options,
-      *self.common_options,
     ]
 
   def test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
@@ -113,20 +112,3 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
     self.assertFalse(file_format_options)
-
-  def test_get_export_function_filters_common_arguments_if_somehow_present(
-        self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
-    mock_get_setting_data_from_pdb_procedure.return_value = (
-      None, 'file-png-save', self.file_format_options_with_common_options_in_different_order)
-    mock_gimp.get_pdb().add_procedure(stubs_gimp.PdbProcedureStub('file-png-save'))
-
-    file_format_options = {}
-
-    proc, kwargs = export_.get_export_function(
-      'png', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
-
-    self.assertIs(proc, pdb.file_png_save)
-    mock_get_setting_data_from_pdb_procedure.assert_called_once()
-    self.assertEqual(len(file_format_options['png']), 5)
-
-    self.assertEqual(kwargs, {'is_interlaced': False, 'n_offsets': 2, 'offsets': (7, 11)})

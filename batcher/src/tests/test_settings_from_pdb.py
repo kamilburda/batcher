@@ -72,7 +72,6 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
           'display_name': 'Drawables',
-          'length_name': 'n-drawables',
         },
         {
           'name': 'filename',
@@ -85,7 +84,6 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': pg.setting.DrawableSetting,
           'display_name': 'More drawables',
-          'length_name': 'n-drawables-2',
         },
         {
           'name': 'filename-2',
