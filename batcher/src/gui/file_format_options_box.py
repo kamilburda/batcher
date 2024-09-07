@@ -31,6 +31,10 @@ class FileFormatOptionsBox(Gtk.Box):
     self._left_margin = left_margin
 
     self._grids_per_file_format = {}
+    # We use this to detect if a `pygimplib.setting.Group` instance holding
+    # file format options changed, in which case we need to create a new
+    # `Gtk.Grid`.
+    self._file_format_options_dict = {}
 
     self._init_gui()
 
@@ -59,10 +63,12 @@ class FileFormatOptionsBox(Gtk.Box):
 
     self._label_message.hide()
 
-    if active_file_format not in self._grids_per_file_format:
+    if (active_file_format not in self._grids_per_file_format
+        or file_format_options != self._file_format_options_dict.get(active_file_format)):
       grid = self._create_file_format_options_grid(file_format_options)
 
       self._grids_per_file_format[active_file_format] = grid
+      self._file_format_options_dict[active_file_format] = file_format_options
 
     self.pack_start(self._grids_per_file_format[active_file_format], False, False, 0)
 

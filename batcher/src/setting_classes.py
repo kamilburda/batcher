@@ -487,15 +487,11 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
 
   _ALLOWED_GUI_TYPES = [FileFormatOptionsPresenter]
 
+  _DEFAULT_DEFAULT_VALUE = lambda self: {None: self._initial_file_format}
+
   def __init__(self, name: str, import_or_export: str, initial_file_format: str, **kwargs):
     self._import_or_export = import_or_export
     self._initial_file_format = initial_file_format
-
-    if 'default_value' not in kwargs:
-      kwargs['default_value'] = {}
-
-    if None not in kwargs['default_value']:
-      kwargs['default_value'] = {None: self._initial_file_format}
 
     super().__init__(name, **kwargs)
 
