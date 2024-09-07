@@ -443,11 +443,6 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
-    # HACK: We are filling the file format options in the GUI as opposed to the
-    #  setting to avoid crashes on plug-in startup.
-    file_formats_.fill_file_format_options(
-      setting.value, setting.value[None], setting.import_or_export)
-
     file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
       initial_header_title=setting.display_name,
       **kwargs,
@@ -504,11 +499,9 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
 
     self._value[None] = processed_file_format
 
-    if hasattr(self.gui, 'set_active_file_format'):
-      # HACK: We are filling the file format options when the GUI exists to
-      #  avoid crashes on plug-in startup.
-      file_formats_.fill_file_format_options(self._value, self._value[None], self._import_or_export)
+    file_formats_.fill_file_format_options(self._value, self._value[None], self._import_or_export)
 
+    if hasattr(self.gui, 'set_active_file_format'):
       self.gui.set_active_file_format(processed_file_format)
 
   def _raw_to_value(self, raw_value):

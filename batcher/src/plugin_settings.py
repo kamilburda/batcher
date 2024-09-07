@@ -386,9 +386,11 @@ def _set_file_extension_options_for_default_export_procedure(main_settings):
     _show_hide_file_format_export_options,
     main_settings['export/file_format_export_options'])
 
-  _set_file_format_export_options(
-    main_settings['file_extension'],
-    main_settings['export/file_format_export_options'])
+  pg.notifier.connect(
+    'start-procedure',
+    lambda _notifier: _set_file_format_export_options(
+      main_settings['file_extension'],
+      main_settings['export/file_format_export_options']))
 
   main_settings['file_extension'].connect_event(
     'value-changed',
