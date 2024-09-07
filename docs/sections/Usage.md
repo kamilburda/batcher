@@ -6,8 +6,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 
 ![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
 
-To export layers, press the `Export` button.
-If your chosen file format can be tweaked (e.g. compression level for PNG images), a dialog with file format settings will be displayed, allowing you to adjust them.
+To export layers, simply press the `Export` button.
 
 Below you will find more information on adjusting the export settings.
 
@@ -31,10 +30,13 @@ For now, the dropdown only contains a fixed list of file formats provided by GIM
 However, you can still enter a file extension not in the list in case you use an unrecognized file format plug-in.
 
 
-### More Export Options
+### Export Options
 
 For Export Layers, pressing the `Export Options...` button reveals additional export options.
-These options are described in [More Export Options](#more-export-options).
+
+The most important for you will likely be file format options (compression for PNG, image quality for JPG, etc.).
+
+All options are described in [Export Options](Customization.md#export-options).
 
 
 ### Procedures and Constraints
@@ -129,10 +131,11 @@ You can turn auto-closing the main dialog on/off by checking/unchecking `Setting
 
 ## Known Issues
 
-Sometimes, after you press the Export button, it may seem as though nothing happens.
-In that case, the file format dialog may be displayed behind GIMP. If so, simply select the dialog to bring it up.
+If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
+In that case, the file format dialog may be displayed behind GIMP.
+If so, simply select the dialog in the taskbar to bring it up.
 
-The following file formats require displaying the file format dialog for each image to be exported, not just the first image:
+The following file formats require displaying a file format dialog for each image to be exported:
 * C source,
 * HTML.
 

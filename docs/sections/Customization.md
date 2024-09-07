@@ -77,6 +77,27 @@ While multipage PDF export is already possible in GIMP without any third-party p
 4. You may want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 
+**I want to be able to export to multiple file formats at once.**
+
+You can achieve this by adding the `Also export as...` (or `Export`) procedure.
+
+Each time you add this procedure, adjust the file extension, file format options and other settings as needed.
+
+
+## Export Options
+
+* *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first layer to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
+* *File format options*: A list of options specific to the file format typed in the main dialog.
+* *If a file exists*: If set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
+* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
+  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
+* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
+  For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
+* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension.
+  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names. However, the only way to adjust file format options for layer-specific file extensions is to set *How to adjust file format options* to `Interactively`.
+* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
+
+
 ## Adjusting Layer Names (Filenames)
 
 There are several built-in *fields* that you can combine to form a name pattern.
@@ -270,20 +291,6 @@ Examples:
 * `[layer path, [,], [[[%c]]] ]` → `[Body],[Hands],[Left]`
 
 
-## More Export Options
-
-For Export Layers, pressing the `Export Options...` button reveals additional export options described below:
-
-* *If a file exists*: If this is set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
-* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
-* *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
-  For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension instead of the one in the `File extension` text entry.
-  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names.
-* *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
-
-
 ## Procedures
 
 Procedures allow you to apply image filters to each layer.
@@ -299,6 +306,27 @@ You can add the same procedure multiple times.
 
 
 ### Built-in Procedures
+
+**Export**/**Also export as...**
+
+Exports a layer to the specified file format.
+
+For Export Layers, this performs export to another file format.
+This way, you can set up export to multiple file formats at once.
+
+Options:
+* *Output folder*: Folder to save the output image(s).
+  When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
+* *File extension*: File extension of the output image(s).
+* All options specified in [Export Options](#export-options).
+
+The name of the Export procedure is automatically updated as you modify the file extension.
+
+For Export Layers, when this procedure is added, the values of the options are copied from the default export options.
+For example, the output folder will be identical to the one currently selected in the main dialog.
+This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
+
+When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
 **Apply opacity from layer groups**
 
@@ -351,27 +379,6 @@ Options:
 Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
 
 For more information, see `Merge background` above.
-
-**Export**/**Also export as...**
-
-Exports a layer to the specified file format.
-
-For Export Layers, this performs export to another file format.
-This way, you can set up export to multiple file formats at once.
-
-Options:
-* *Output folder*: Folder to save the output image(s).
-  When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
-* *File extension*: File extension of the output image(s).
-* All options specified in [More Export Options](#more-export-options).
-
-The name of the Export procedure is automatically updated as you modify the file extension.
-
-For Export Layers, when this procedure is added, the values of the options are copied from the default export options.
-For example, the output folder will be identical to the one currently selected in the main dialog.
-This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
-
-When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
 **Remove folder structure**
 
