@@ -7,6 +7,7 @@ import pygimplib as pg
 from src import actions as actions_
 from src import builtin_constraints
 from src import builtin_procedures
+from src import export as export_
 from src import overwrite
 from src import utils as utils_
 from src import version as version_
@@ -528,6 +529,41 @@ def _update_to_0_5(data, _settings, source_names):
               ('rename_existing', _('Rename existing file'),
                overwrite.OverwriteModes.RENAME_EXISTING)],
             'display_name': _('If a file already exists:'),
+          })
+
+        arguments_list.insert(
+          2,
+          {
+            'type': 'file_format_options',
+            'name': 'file_format_export_options',
+            'default_value': {None: 'png'},
+            'value': {None: 'png'},
+            'import_or_export': 'export',
+            'initial_file_format': 'png',
+            'gui_type': 'file_format_options',
+            'display_name': _('File format options')
+          })
+
+        arguments_list.insert(
+          2,
+          {
+            'type': 'choice',
+            'name': 'file_format_mode',
+            'default_value': 'use_explicit_values',
+            'value': 'use_explicit_values',
+            'items': [
+              ('use_native_plugin_values',
+               _('Interactively'),
+               export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES),
+              ('use_explicit_values',
+               _('Use options below'),
+               export_.FileFormatModes.USE_EXPLICIT_VALUES)],
+            'display_name': _('How to adjust file format options:'),
+            'description': _(
+              'Native dialogs usually allow you to adjust more options such as image metadata,'
+              ' while adjusting options in place is more convenient as no extra dialog is displayed'
+              ' before the export.'),
+            'gui_type': 'radio_button_box',
           })
 
 

@@ -164,6 +164,16 @@ class TestUpdateHandlers(unittest.TestCase):
       'preserve_layer_name_after_export', self.settings['main/procedures/export/arguments'])
     self.assertIn('overwrite_mode', self.settings['main/procedures/export/arguments'])
     # This checks whether `overwrite_mode` is the third argument.
-    self.assertIs(
-      list(self.settings['main/procedures/export/arguments'])[2],
-      self.settings['main/procedures/export/arguments/overwrite_mode'])
+    self.assertEqual(
+      list(self.settings['main/procedures/export/arguments']),
+      [
+        self.settings['main/procedures/export/arguments/output_directory'],
+        self.settings['main/procedures/export/arguments/file_extension'],
+        self.settings['main/procedures/export/arguments/file_format_mode'],
+        self.settings['main/procedures/export/arguments/file_format_export_options'],
+        self.settings['main/procedures/export/arguments/overwrite_mode'],
+        self.settings['main/procedures/export/arguments/export_mode'],
+        self.settings['main/procedures/export/arguments/single_image_name_pattern'],
+        self.settings['main/procedures/export/arguments/use_file_extension_in_item_name'],
+        self.settings['main/procedures/export/arguments/convert_file_extension_to_lowercase'],
+      ])
