@@ -399,7 +399,7 @@ def _set_file_extension_options_for_default_export_procedure(main_settings):
   # reset first and the options, after resetting, would contain values for
   # the default file extension, which could be different.
   main_settings['export/file_format_export_options'].connect_event(
-    'value-changed',
+    'after-reset',
     _set_file_format_export_options_from_extension,
     main_settings['file_extension'])
 
@@ -432,6 +432,14 @@ def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict)
       'value-changed',
       _set_file_format_export_options,
       procedure['arguments/file_format_export_options'])
+
+    # This is needed in case settings are reset, since the file extension is
+    # reset first and the options, after resetting, would contain values for
+    # the default file extension, which could be different.
+    procedure['arguments/file_format_export_options'].connect_event(
+      'after-reset',
+      _set_file_format_export_options_from_extension,
+      procedure['arguments/file_extension'])
 
 
 def _set_sensitive_for_image_name_pattern_in_export(
