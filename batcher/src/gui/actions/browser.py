@@ -70,15 +70,11 @@ class ActionBrowser(GObject.GObject):
     self._predefined_parent_tree_iter_names = [
       'plug_ins',
       'gimp_procedures',
-      'file_load_procedures',
-      'file_save_procedures',
       'other',
     ]
     self._predefined_parent_tree_iter_display_names = [
       _('Plug-ins'),
       _('GIMP Procedures'),
-      _('File Load Procedures'),
-      _('File Save Procedures'),
       _('Other'),
     ]
 
@@ -126,24 +122,34 @@ class ActionBrowser(GObject.GObject):
          None,
          None])
 
+    def is_file_load_procedure(name_):
+      return (name_.startswith('file-')
+              and (name_.endswith('-load') or name_.endswith('-load-thumb')))
+
+    def is_file_save_procedure(name_):
+      return (name_.startswith('file-')
+              and (name_.endswith('-save')
+                   or name_.endswith('-save-internal')
+                   or name_.endswith('-save-multi')))
+
     # We pre-sort procedure names so that the column with these names will
     # appear sorted for entries without a menu name (corresponding to the column
     # used for sorting by default).
     pdb_procedures = [
       Gimp.get_pdb().lookup_procedure(name)
-      for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))]
+      for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))
+      if not is_file_load_procedure(name) and not is_file_save_procedure(name)
+    ]
 
     action_dicts = [
       actions_.get_action_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
 
     for procedure, action_dict in zip(pdb_procedures, action_dicts):
-      if (action_dict['name'].startswith('file-')
-          and (action_dict['name'].endswith('-load') or '-load-' in action_dict['name'])):
-        action_type = 'file_load_procedures'
-      elif (action_dict['name'].startswith('file-')
-            and (action_dict['name'].endswith('-save') or '-save-' in action_dict['name'])):
-        action_type = 'file_save_procedures'
-      elif (action_dict['name'].startswith('plug-in-')
+      procedure_name = action_dict['name']
+
+      if procedure_name.startswith('file-'):
+        action_type = 'other'
+      elif (procedure_name.startswith('plug-in-')
             or procedure.get_proc_type() in [
                 Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.EXTENSION, Gimp.PDBProcType.TEMPORARY]):
         if self._has_plugin_procedure_image_or_drawable_arguments(action_dict):
@@ -153,7 +159,7 @@ class ActionBrowser(GObject.GObject):
       else:
         action_type = 'gimp_procedures'
 
-      if action_dict['display_name'] != action_dict['name']:
+      if action_dict['display_name'] != procedure_name:
         display_name = action_dict['display_name']
       else:
         display_name = ''
@@ -164,7 +170,7 @@ class ActionBrowser(GObject.GObject):
 
       self._tree_model.append(
         self._parent_tree_iters[action_type],
-        [action_dict['name'],
+        [procedure_name,
          display_name,
          action_dict.get('description', ''),
          action_type,
