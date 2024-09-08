@@ -9,6 +9,7 @@ from src import builtin_constraints
 from src import builtin_procedures
 from src import export as export_
 from src import overwrite
+from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_
 from src.path import uniquify
@@ -536,8 +537,10 @@ def _update_to_0_5(data, _settings, source_names):
           {
             'type': 'file_format_options',
             'name': 'file_format_export_options',
-            'default_value': {None: 'png'},
-            'value': {None: 'png'},
+            'default_value': {
+              setting_classes_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
+            'value': {
+              setting_classes_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
             'import_or_export': 'export',
             'initial_file_format': 'png',
             'gui_type': 'file_format_options',

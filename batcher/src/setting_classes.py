@@ -454,35 +454,37 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
     self._widget.set_active_file_format(file_format, self.setting.value.get(file_format, None))
 
   def get_value(self):
-    if None in self.setting.value:
-      active_file_format = self.setting.value[None]
+    if FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY in self.setting.value:
+      active_file_format = self.setting.value[FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY]
       if active_file_format in self.setting.value:
         self.setting.value[active_file_format].apply_gui_values_to_settings()
 
     return self.setting.value
 
   def _set_value(self, value):
-    self._widget.set_active_file_format(value[None], value.get(value[None], None))
+    active_file_format_key = FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
+
+    self._widget.set_active_file_format(
+      value[active_file_format_key], value.get(value[active_file_format_key], None))
 
 
 class FileFormatOptionsSetting(pg.setting.DictSetting):
   """Class for settings storing file format-specific options.
 
-  The options are stored in a dictionary as pairs of
-  (file extension, settings representing options).
-  The ``None`` key, if exists, indicates the currently active file format (the
-  format whose options are displayed when running the plug-in interactively).
-
-  If the ``default_value`` parameter during initialization does not contain
-  the ``None`` key, the ``(None, initial_file_format)`` key-value pair is
-  added to ``default_value``. If the ``default_value`` parameter is not
-  specified, it is created and contains the ``(None, initial_file_format)``
-  pair.
+  The options are stored in a dictionary as pairs of (file extension,
+  settings representing options). The `ACTIVE_FILE_FORMAT_KEY` key,
+  if exists, indicates the currently active file format (the format whose
+  options are displayed when running the plug-in interactively).
   """
+
+  # Ideally, we would use `None` to represent the active file format to avoid
+  # the slightest possibility of a string being used as a file extension.
+  # However, JSON only allows strings as keys, so this will have to do.
+  ACTIVE_FILE_FORMAT_KEY = '_active'
 
   _ALLOWED_GUI_TYPES = [FileFormatOptionsPresenter]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: {None: self._initial_file_format}
+  _DEFAULT_DEFAULT_VALUE = lambda self: {self.ACTIVE_FILE_FORMAT_KEY: self._initial_file_format}
 
   def __init__(self, name: str, import_or_export: str, initial_file_format: str, **kwargs):
     self._import_or_export = import_or_export
@@ -497,9 +499,10 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
   def set_active_file_format(self, file_format: str):
     processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
 
-    self._value[None] = processed_file_format
+    self._value[self.ACTIVE_FILE_FORMAT_KEY] = processed_file_format
 
-    file_formats_.fill_file_format_options(self._value, self._value[None], self._import_or_export)
+    file_formats_.fill_file_format_options(
+      self._value, self._value[self.ACTIVE_FILE_FORMAT_KEY], self._import_or_export)
 
     if hasattr(self.gui, 'set_active_file_format'):
       self.gui.set_active_file_format(processed_file_format)
@@ -508,7 +511,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     value = {}
 
     for key, group_or_active_file_format in raw_value.items():
-      if key is not None:
+      if key != self.ACTIVE_FILE_FORMAT_KEY:
         if isinstance(group_or_active_file_format, pg.setting.Group):
           # We need to create new settings to avoid the same setting to be
           # a part of multiple instances of `FileFormatOptionsSetting`.
@@ -526,7 +529,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     raw_value = {}
 
     for key, group_or_active_file_format in value.items():
-      if key is not None:
+      if key != self.ACTIVE_FILE_FORMAT_KEY:
         raw_value[key] = self._file_format_options_to_dict(group_or_active_file_format)
       else:
         raw_value[key] = group_or_active_file_format
@@ -534,25 +537,25 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     return raw_value
 
   def _validate(self, value):
-    if None not in value:
+    if self.ACTIVE_FILE_FORMAT_KEY not in value:
       return (
-        'the value must contain None as the dictionary key',
-        'value_does_not_contain_none_as_key',
+        f'the value must contain {self.ACTIVE_FILE_FORMAT_KEY} as the dictionary key',
+        'value_does_not_contain_active_file_format_key',
         False,
       )
 
   def _assign_value(self, value):
-    if None in self._value:
-      orig_active_file_format = self._value[None]
+    if self.ACTIVE_FILE_FORMAT_KEY in self._value:
+      orig_active_file_format = self._value[self.ACTIVE_FILE_FORMAT_KEY]
     else:
       orig_active_file_format = None
 
     super()._assign_value(value)
 
-    if (None in value
-        and orig_active_file_format is not None
-        and value[None] != orig_active_file_format):
-      self.set_active_file_format(value[None])
+    if (orig_active_file_format is not None
+        and self.ACTIVE_FILE_FORMAT_KEY in value
+        and value[self.ACTIVE_FILE_FORMAT_KEY] != orig_active_file_format):
+      self.set_active_file_format(value[self.ACTIVE_FILE_FORMAT_KEY])
 
   @staticmethod
   def _file_format_options_to_dict(file_format_options):
