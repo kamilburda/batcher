@@ -503,6 +503,11 @@ def _update_to_0_5(data, _settings, source_names):
 
       arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
+      if arguments_list is not None:
+        for argument_dict in arguments_list:
+          if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'check_button_no_text':
+            argument_dict['gui_type'] = 'check_button'
+
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         # We retain `name` and only modify `orig_name` as only the latter is
         # used in the code to check if a procedure is an export procedure.
