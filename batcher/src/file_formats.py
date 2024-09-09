@@ -64,7 +64,7 @@ def fill_and_get_file_format_options_as_kwargs(
         if length_name is not None:
           kwargs[length_name.replace('-', '_')] = len(setting.value)
 
-      kwargs[setting.name.replace('-', '_')] = setting.value
+      kwargs[setting.name.replace('-', '_')] = setting.value_for_pdb
 
     return kwargs
   else:
