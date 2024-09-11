@@ -38,6 +38,9 @@ The most important for you will likely be file format options (compression for P
 
 All options are described in [Export Options](Customization.md#export-options).
 
+If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
+You will be prompted to set the file format options right after you press the `Export` button.
+
 
 ### Procedures and Constraints
 
