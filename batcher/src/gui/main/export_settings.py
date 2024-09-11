@@ -137,19 +137,17 @@ class ExportSettings:
       self._on_file_extension_entry_focus_out_event,
       self._settings['main/file_extension'])
 
-    if self._name_preview is not None:
-      self._file_extension_entry.connect(
-        'changed',
-        self._on_text_entry_changed,
-        self._settings['main/file_extension'],
-        'invalid_file_extension')
+    self._file_extension_entry.connect(
+      'changed',
+      self._on_text_entry_changed,
+      self._settings['main/file_extension'],
+      'invalid_file_extension')
 
-    if self._name_preview is not None:
-      self._name_pattern_entry.connect(
-        'changed',
-        self._on_text_entry_changed,
-        self._settings['main/name_pattern'],
-        'invalid_name_pattern')
+    self._name_pattern_entry.connect(
+      'changed',
+      self._on_text_entry_changed,
+      self._settings['main/name_pattern'],
+      'invalid_name_pattern')
 
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
@@ -196,28 +194,32 @@ class ExportSettings:
     if validation_result is None:
       setting.gui.update_setting_value()
 
-      self._name_preview.lock_update(False, name_preview_lock_update_key)
+      if self._name_preview is not None:
+        self._name_preview.lock_update(False, name_preview_lock_update_key)
 
       if self._message_setting == setting:
         self._display_message_func(None)
 
-      self._name_preview.add_function_at_update(
-        self._name_preview.set_sensitive, True)
+      if self._name_preview is not None:
+        self._name_preview.add_function_at_update(
+          self._name_preview.set_sensitive, True)
 
-      pg.invocation.timeout_add_strict(
-        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
-        self._name_preview.update)
+        pg.invocation.timeout_add_strict(
+          self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+          self._name_preview.update)
     else:
-      pg.invocation.timeout_add_strict(
-        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
-        self._name_preview.set_sensitive,
-        False)
+      if self._name_preview is not None:
+        pg.invocation.timeout_add_strict(
+          self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+          self._name_preview.set_sensitive,
+          False)
 
       self._display_message_func(validation_result.message, Gtk.MessageType.ERROR)
 
       self._message_setting = setting
 
-      self._name_preview.lock_update(True, name_preview_lock_update_key)
+      if self._name_preview is not None:
+        self._name_preview.lock_update(True, name_preview_lock_update_key)
 
   def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
