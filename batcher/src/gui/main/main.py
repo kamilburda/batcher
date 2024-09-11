@@ -100,6 +100,8 @@ class BatchLayerProcessingGui:
 
     messages_.set_gui_excepthook_parent(self._dialog)
 
+    self._label_message = message_label_.MessageLabel()
+
     self._previews = previews_.Previews(
       self._settings,
       self._mode,
@@ -183,8 +185,6 @@ class BatchLayerProcessingGui:
       ellipsize=Pango.EllipsizeMode.MIDDLE,
     )
     self._progress_bar.set_no_show_all(True)
-
-    self._label_message = message_label_.MessageLabel()
 
     self._box_warning_messages = message_box_.SettingValueNotValidMessageBox(
       message_type=Gtk.MessageType.WARNING)

@@ -16,6 +16,9 @@ Changes to the `Export` procedure:
 Other changes:
 * The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Name`) instead of overriding it.
 
+Bug fixes:
+* Fixed a crash when in-dialog warning messages were displayed on plug-in startup (e.g. if the plug-in was saved with an ill-formatted file extension).
+
 
 ## 0.4
 
