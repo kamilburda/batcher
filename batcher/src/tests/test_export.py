@@ -85,7 +85,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertNotIn('n-offsets', file_format_options['png'])
     self.assertEqual(file_format_options['png']['offsets'].get_length_name(), 'n-offsets')
 
-    self.assertEqual(kwargs, {'is_interlaced': False, 'n_offsets': 2, 'offsets': (7, 11)})
+    self.assertEqual(len(kwargs), 3)
+    self.assertFalse(kwargs['is_interlaced'])
+    self.assertEqual(kwargs['n_offsets'], 2)
+    self.assertIsInstance(kwargs['offsets'], Gimp.Int32Array)
 
   def test_get_default_export_function_if_file_format_mode_is_not_use_explicit_values(
         self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
