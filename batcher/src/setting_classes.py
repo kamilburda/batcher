@@ -12,6 +12,7 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Pango
 
 import pygimplib as pg
 
@@ -69,7 +70,7 @@ class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
 
   _VALUE_CHANGED_SIGNAL = 'file-set'
 
-  def _create_widget(self, setting, **kwargs):
+  def _create_widget(self, setting, width_chars=30, **kwargs):
     button = Gtk.FileChooserButton(
       title=setting.display_name,
       action=Gtk.FileChooserAction.SELECT_FOLDER,
@@ -77,6 +78,8 @@ class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
 
     if setting.value is not None:
       button.set_filename(setting.value)
+
+    self._set_width_chars(button, width_chars)
 
     return button
 
@@ -90,6 +93,24 @@ class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
 
   def _set_value(self, dirpath):
     self._widget.set_filename(dirpath if dirpath is not None else '')
+
+  @staticmethod
+  def _set_width_chars(button, width_chars):
+    combo_box = next(iter(child for child in button if isinstance(child, Gtk.ComboBox)), None)
+
+    if combo_box is not None:
+      cell_renderer = next(
+        iter(cr for cr in combo_box.get_cells() if isinstance(cr, Gtk.CellRendererText)), None)
+
+      if cell_renderer is not None:
+        # This should force each row to not take extra vertical space after
+        # reducing the number of characters to render.
+        cell_renderer.set_property(
+          'height', cell_renderer.get_preferred_height(combo_box).natural_size)
+
+        cell_renderer.set_property('max-width-chars', width_chars)
+        cell_renderer.set_property('ellipsize', Pango.EllipsizeMode.END)
+        cell_renderer.set_property('wrap-width', -1)
 
 
 class DirpathSetting(ValidatableStringSetting):
