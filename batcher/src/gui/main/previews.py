@@ -49,7 +49,7 @@ class Previews:
     self._image = self._initial_layer_tree.image
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
-      builtin_procedures.OVERWRITE_MODES['rename_new'][0])
+      builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1])
 
     self._batcher_for_previews = core.Batcher(
       self._image,

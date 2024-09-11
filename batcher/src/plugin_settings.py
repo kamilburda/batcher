@@ -55,7 +55,7 @@ def create_settings_for_export_layers():
       'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
-      'items': utils.semi_deep_copy(builtin_procedures.OVERWRITE_MODES_LIST),
+      'items': utils.semi_deep_copy(builtin_procedures.INTERACTIVE_OVERWRITE_MODES_LIST),
       'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },

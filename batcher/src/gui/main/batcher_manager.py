@@ -198,13 +198,13 @@ class BatcherManagerQuick:
 def _get_interactive_overwrite_chooser(settings, parent_widget):
   return overwrite_chooser_.GtkDialogOverwriteChooser(
     _get_overwrite_dialog_items(),
-    default_value=builtin_procedures.OVERWRITE_MODES['rename_new'][0],
+    default_value=builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1],
     default_response=overwrite.OverwriteModes.CANCEL,
     parent=parent_widget)
 
 
 def _get_overwrite_dialog_items():
-  return {value[0]: value[1] for value in builtin_procedures.OVERWRITE_MODES.values()}
+  return {value[1]: value[0] for value in builtin_procedures.INTERACTIVE_OVERWRITE_MODES.values()}
 
 
 def _stop_batcher(batcher):
