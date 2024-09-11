@@ -99,10 +99,7 @@ class BatcherManager:
     _stop_batcher(self._batcher)
 
   def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
-    if mode == 'export':
-      overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
-    else:
-      overwrite_chooser = None
+    overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
