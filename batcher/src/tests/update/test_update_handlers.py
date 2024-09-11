@@ -156,6 +156,12 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
 
   def _assert_correct_contents_for_update_to_0_5(self):
+    self.assertIsInstance(self.settings['main/output_directory'], setting_classes.DirpathSetting)
+    self.assertEqual(
+      self.settings['main/output_directory'].gui_type,
+      setting_classes.FolderChooserButtonPresenter,
+    )
+
     self.assertIn('export', self.settings['main/procedures'])
     self.assertEqual(
       self.settings['main/procedures/export/orig_name'].value, 'export_for_export_layers')

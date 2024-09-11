@@ -10,6 +10,8 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import pygimplib as pg
 
@@ -58,6 +60,38 @@ class ValidatableStringSetting(pg.setting.StringSetting):
         return status_message, status
 
 
+class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
+  folder choosers.
+
+  Value: Current folder.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'file-set'
+
+  def _create_widget(self, setting, **kwargs):
+    button = Gtk.FileChooserButton(
+      title=setting.display_name,
+      action=Gtk.FileChooserAction.SELECT_FOLDER,
+    )
+
+    if setting.value is not None:
+      button.set_filename(setting.value)
+
+    return button
+
+  def get_value(self):
+    folder = self._widget.get_filename()
+
+    if folder is not None:
+      return folder
+    else:
+      return pg.utils.get_pictures_directory()
+
+  def _set_value(self, dirpath):
+    self._widget.set_filename(dirpath if dirpath is not None else '')
+
+
 class DirpathSetting(ValidatableStringSetting):
   """Class for settings storing directory paths as strings.
 
@@ -71,7 +105,7 @@ class DirpathSetting(ValidatableStringSetting):
   * ``''``
   """
 
-  _ALLOWED_GUI_TYPES = [pg.SETTING_GUI_TYPES.folder_chooser_button]
+  _ALLOWED_GUI_TYPES = [FolderChooserButtonPresenter]
 
   _DEFAULT_DEFAULT_VALUE = pg.utils.get_pictures_directory()
 

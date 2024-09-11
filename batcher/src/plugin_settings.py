@@ -37,12 +37,11 @@ def create_settings_for_export_layers():
       'auto_update_gui_to_setting': False,
     },
     {
-      'type': 'string',
+      'type': 'dirpath',
       'name': 'output_directory',
       'default_value': pg.utils.get_pictures_directory(),
-      'display_name': _('Output directory'),
-      'gui_type': None,
-      'auto_update_gui_to_setting': False,
+      'display_name': _('Output folder'),
+      'gui_type': 'folder_chooser_button',
     },
     {
       'type': 'name_pattern',

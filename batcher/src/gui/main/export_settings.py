@@ -67,9 +67,7 @@ class ExportSettings:
     self._folder_chooser_label.set_markup(
       '<b>{}</b>'.format(_('Folder:')))
 
-    self._folder_chooser = Gtk.FileChooserButton(
-      action=Gtk.FileChooserAction.SELECT_FOLDER,
-    )
+    self._settings['main/output_directory'].set_gui()
 
     self._file_extension_entry = entries_.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
@@ -115,7 +113,8 @@ class ExportSettings:
       column_spacing=self._column_spacing,
     )
     self._grid_export_settings.attach(self._folder_chooser_label, 0, 0, 1, 1)
-    self._grid_export_settings.attach(self._folder_chooser, 1, 0, 1, 1)
+    self._grid_export_settings.attach(
+      self._settings['main/output_directory'].gui.widget, 1, 0, 1, 1)
     self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
     self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
 
@@ -158,12 +157,6 @@ class ExportSettings:
       setting.connect_event('value-changed', self._update_previews_on_export_options_change)
 
   def _init_setting_gui(self):
-    self._settings['main/output_directory'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.folder_chooser_button,
-      widget=self._folder_chooser,
-      copy_previous_visible=False,
-      copy_previous_sensitive=False,
-    )
     self._settings['main/file_extension'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
       widget=self._file_extension_entry,
@@ -183,7 +176,7 @@ class ExportSettings:
 
   @property
   def folder_chooser(self):
-    return self._folder_chooser
+    return self._settings['main/output_directory'].gui.widget
 
   @property
   def file_extension_entry(self):

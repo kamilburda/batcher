@@ -698,38 +698,6 @@ class GBytesEntryPresenter(GtkPresenter):
     self._widget.set_position(-1)
 
 
-class FolderChooserButtonPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
-  folder choosers.
-  
-  Value: Current folder.
-  """
-
-  _VALUE_CHANGED_SIGNAL = 'file-set'
-
-  def _create_widget(self, setting, **kwargs):
-    button = Gtk.FileChooserButton(
-      title=setting.display_name,
-      action=Gtk.FileChooserAction.SELECT_FOLDER,
-    )
-
-    if setting.value is not None:
-      button.set_filename(setting.value)
-
-    return button
-  
-  def get_value(self):
-    folder = self._widget.get_filename()
-
-    if folder is not None:
-      return folder
-    else:
-      return pgutils.get_pictures_directory()
-  
-  def _set_value(self, dirpath):
-    self._widget.set_filename(dirpath if dirpath is not None else '')
-
-
 class GimpResourceChooserPresenter(GtkPresenter):
   """Abstract `setting.Presenter` subclass for widgets allowing to select and
   modify a `Gimp.Resource` instance via a specialized button.
