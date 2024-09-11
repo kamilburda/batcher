@@ -8,6 +8,7 @@ from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from src import builtin_procedures
 from src import core
 from src import exceptions
 from src import overwrite
@@ -175,7 +176,7 @@ class BatcherManagerQuick:
           self._settings['main/overwrite_mode'].value)
         initial_export_run_mode = Gimp.RunMode.WITH_LAST_VALS
     else:
-      overwrite_chooser = None
+      overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
       initial_export_run_mode = Gimp.RunMode.INTERACTIVE
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
@@ -196,16 +197,14 @@ class BatcherManagerQuick:
 
 def _get_interactive_overwrite_chooser(settings, parent_widget):
   return overwrite_chooser_.GtkDialogOverwriteChooser(
-    _get_overwrite_dialog_items(settings),
-    default_value=settings['main/overwrite_mode'].items['rename_new'],
+    _get_overwrite_dialog_items(),
+    default_value=builtin_procedures.OVERWRITE_MODES['rename_new'][0],
     default_response=overwrite.OverwriteModes.CANCEL,
     parent=parent_widget)
 
 
-def _get_overwrite_dialog_items(settings):
-  return dict(zip(
-    settings['main/overwrite_mode'].items.values(),
-    settings['main/overwrite_mode'].items_display_names.values()))
+def _get_overwrite_dialog_items():
+  return {value[0]: value[1] for value in builtin_procedures.OVERWRITE_MODES.values()}
 
 
 def _stop_batcher(batcher):

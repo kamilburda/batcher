@@ -225,6 +225,20 @@ _SCALE_UNITS = (
 ) = (0, 1, 2, 3, 4)
 
 
+OVERWRITE_MODES_LIST = [
+  ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
+  ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
+  ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
+  ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
+  ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)
+]
+
+
+OVERWRITE_MODES = {
+  item[0]: tuple(*item[1:]) for item in OVERWRITE_MODES_LIST
+}
+
+
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
   'name': 'export_for_export_layers',
   'function': export_.export,
@@ -278,12 +292,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
       'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'ask',
-      'items': [
-        ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
-        ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
-        ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
-        ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
-        ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
+      'items': OVERWRITE_MODES_LIST,
       'display_name': _('If a file already exists:'),
     },
     {

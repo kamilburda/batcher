@@ -10,6 +10,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src import builtin_procedures
 from src import core
 from src import overwrite
 
@@ -47,11 +48,8 @@ class Previews:
 
     self._image = self._initial_layer_tree.image
 
-    if self._batcher_mode == 'export':
-      overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
-        self._settings['main/overwrite_mode'].items['rename_new'])
-    else:
-      overwrite_chooser = None
+    overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
+      builtin_procedures.OVERWRITE_MODES['rename_new'][0])
 
     self._batcher_for_previews = core.Batcher(
       self._image,

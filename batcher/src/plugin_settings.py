@@ -8,7 +8,6 @@ from src import actions as actions_
 from src import builtin_constraints
 from src import builtin_procedures
 from src import export as export_
-from src import overwrite
 # Despite being unused, `setting_classes` must be imported so that the
 # setting and GUI classes defined there are properly registered (via respective
 # metaclasses in `pg.setting.meta`).
@@ -56,11 +55,7 @@ def create_settings_for_export_layers():
       'type': 'choice',
       'name': 'overwrite_mode',
       'default_value': 'rename_new',
-      'items': [
-        ('replace', _('_Replace'), overwrite.OverwriteModes.REPLACE),
-        ('skip', _('_Skip'), overwrite.OverwriteModes.SKIP),
-        ('rename_new', _('Rename _new file'), overwrite.OverwriteModes.RENAME_NEW),
-        ('rename_existing', _('Rename _existing file'), overwrite.OverwriteModes.RENAME_EXISTING)],
+      'items': utils.semi_deep_copy(builtin_procedures.OVERWRITE_MODES_LIST),
       'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
