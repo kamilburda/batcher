@@ -87,7 +87,9 @@ class SettingValueNotValidMessageBox(Gtk.Box):
     pg.setting.Setting.connect_event_global('value-not-valid', self._on_setting_value_not_valid)
 
   def _on_setting_value_not_valid(self, setting, message, _message_id, details):
-    self.add_message(setting, message, details)
+    if (pg.config.WARN_ON_INVALID_SETTING_VALUES
+        and setting not in pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE):
+      self.add_message(setting, message, details)
 
 
 GObject.type_register(SettingValueNotValidMessageBox)

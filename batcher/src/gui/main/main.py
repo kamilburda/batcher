@@ -234,6 +234,9 @@ class BatchLayerProcessingGui:
 
     self._dialog.show()
 
+    if self._mode == 'export':
+      self._export_settings.file_extension_entry.set_position(-1)
+
   def _assign_gui_to_settings(self):
     if self._mode == 'edit':
       self._assign_gui_to_settings_for_edit_mode()

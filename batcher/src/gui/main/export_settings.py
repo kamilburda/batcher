@@ -133,16 +133,12 @@ class ExportSettings:
     self._export_options_dialog = None
 
     self._file_extension_entry.connect(
-      'focus-out-event',
-      self._on_file_extension_entry_focus_out_event,
-      self._settings['main/file_extension'])
-
-    self._file_extension_entry.connect(
       'changed',
-      self._on_text_entry_changed,
+      self._on_file_extension_entry_changed,
       self._settings['main/file_extension'],
       'invalid_file_extension')
 
+    self._set_up_invalid_setting_value_warning_suppression()
 
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
@@ -179,16 +175,12 @@ class ExportSettings:
   def name_pattern_entry(self):
     return self._name_pattern_entry
 
-  @staticmethod
-  def _on_file_extension_entry_focus_out_event(_entry, _event, setting):
-    setting.apply_to_gui()
+  def _on_file_extension_entry_changed(self, _entry, setting, name_preview_lock_update_key=None):
+    setting.gui.update_setting_value()
 
-  def _on_text_entry_changed(self, _entry, setting, name_preview_lock_update_key=None):
     validation_result = setting.validate(setting.gui.get_value())
 
     if validation_result is None:
-      setting.gui.update_setting_value()
-
       if self._name_preview is not None:
         self._name_preview.lock_update(False, name_preview_lock_update_key)
 
@@ -215,6 +207,22 @@ class ExportSettings:
 
       if self._name_preview is not None:
         self._name_preview.lock_update(True, name_preview_lock_update_key)
+
+  def _set_up_invalid_setting_value_warning_suppression(self):
+    pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
+      self._settings['main/file_extension'])
+
+    for procedure in self._settings['main/procedures']:
+      self._suppress_warning_for_file_extension_for_export_procedure(None, procedure, None)
+
+    self._settings['main/procedures'].connect_event(
+      'after-add-action', self._suppress_warning_for_file_extension_for_export_procedure)
+
+  @staticmethod
+  def _suppress_warning_for_file_extension_for_export_procedure(_procedures, procedure, _dict):
+    if procedure['orig_name'].value.startswith('export_for_'):
+      pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
+        procedure['arguments/file_extension'])
 
   def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
