@@ -98,6 +98,7 @@ def _init_config_initial(
   config.LOG_MODE = 'error'
 
   config.WARN_ON_INVALID_SETTING_VALUES = True
+  config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE = set()
 
 
 def _init_config_logging(config: _Config):
@@ -168,5 +169,6 @@ def _init_config_per_procedure(config: _Config):
 
 
 def _on_setting_value_not_valid(setting, message, _message_id, _details, config):
-  if config.WARN_ON_INVALID_SETTING_VALUES:
+  if (config.WARN_ON_INVALID_SETTING_VALUES
+      and setting not in config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE):
     print(f'Warning: setting "{setting.get_path()}": {message}', file=sys.stderr)
