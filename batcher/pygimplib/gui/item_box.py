@@ -231,7 +231,6 @@ class ItemBoxItem:
     button.hide()
     button.set_no_show_all(True)
 
-    button.connect('notify::visible', self._on_indicator_button_visible_changed)
     return button
 
   @staticmethod
@@ -289,15 +288,6 @@ class ItemBoxItem:
       self._event_box_buttons.set_property('width-request', self._buttons_allocation.width)
       
       self._hbox_buttons.hide()
-
-  def _on_indicator_button_visible_changed(self, _button, _property_spec):
-    any_indicator_button_is_visible = any(
-      child.get_visible() for child in self._hbox_indicator_buttons.get_children())
-
-    if any_indicator_button_is_visible:
-      self._event_box_indicator_buttons.show()
-    else:
-      self._event_box_indicator_buttons.hide()
 
 
 class ArrayBox(ItemBox):
