@@ -164,9 +164,9 @@ def _init_config_per_procedure(config: _Config):
   )
 
   if _gimp_modules_available:
-    if config.WARN_ON_INVALID_SETTING_VALUES:
-      pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid)
+    pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid, config)
 
 
-def _on_setting_value_not_valid(setting, message, _message_id, _details):
-  print(f'Warning: setting "{setting.get_path()}": {message}', file=sys.stderr)
+def _on_setting_value_not_valid(setting, message, _message_id, _details, config):
+  if config.WARN_ON_INVALID_SETTING_VALUES:
+    print(f'Warning: setting "{setting.get_path()}": {message}', file=sys.stderr)

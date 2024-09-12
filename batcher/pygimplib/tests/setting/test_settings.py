@@ -16,6 +16,7 @@ from gi.repository import GObject
 
 import parameterized
 
+from ... import config
 from ... import utils as pgutils
 
 from ...setting import presenter as presenter_
@@ -25,8 +26,21 @@ from .. import stubs_gimp
 from . import stubs_setting
 
 
-class TestSetting(unittest.TestCase):
-  
+class SettingTestCase(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    cls.orig_warn_on_invalid_setting_values = config.WARN_ON_INVALID_SETTING_VALUES
+
+    config.WARN_ON_INVALID_SETTING_VALUES = False
+
+  @classmethod
+  def tearDownClass(cls):
+    config.WARN_ON_INVALID_SETTING_VALUES = cls.orig_warn_on_invalid_setting_values
+
+
+class TestSetting(SettingTestCase):
+
   def setUp(self):
     self.setting = stubs_setting.StubSetting('file_extension', default_value='png')
   
@@ -257,7 +271,7 @@ class TestSetting(unittest.TestCase):
       })
 
 
-class TestSettingEvents(unittest.TestCase):
+class TestSettingEvents(SettingTestCase):
   
   def setUp(self):
     self.setting = stubs_setting.StubSetting('file_extension', default_value='png')
@@ -308,7 +322,7 @@ class TestSettingEvents(unittest.TestCase):
     self.assertEqual(counter, 1)
 
 
-class TestSettingGlobalEvents(unittest.TestCase):
+class TestSettingGlobalEvents(SettingTestCase):
 
   @classmethod
   def setUpClass(cls):
@@ -342,7 +356,7 @@ class TestSettingGlobalEvents(unittest.TestCase):
     TestSettingGlobalEvents.expected_list.append('setting')
 
 
-class TestSettingGui(unittest.TestCase):
+class TestSettingGui(SettingTestCase):
   
   def setUp(self):
     self.setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='png')
@@ -552,7 +566,7 @@ class TestSettingGui(unittest.TestCase):
       setting.gui.auto_update_gui_to_setting(True)
 
 
-class TestGenericSetting(unittest.TestCase):
+class TestGenericSetting(SettingTestCase):
   
   def test_value_functions_with_one_parameter(self):
     setting = settings_.GenericSetting(
@@ -624,7 +638,7 @@ class TestGenericSetting(unittest.TestCase):
         value_save='not_a_callable')
 
 
-class TestBoolSetting(unittest.TestCase):
+class TestBoolSetting(SettingTestCase):
 
   def test_set_value_value_is_converted_to_bool(self):
     setting = settings_.BoolSetting('flatten', default_value=False)
@@ -634,7 +648,7 @@ class TestBoolSetting(unittest.TestCase):
     self.assertEqual(setting.value, True)
 
 
-class TestIntSetting(unittest.TestCase):
+class TestIntSetting(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.IntSetting('count', default_value=0, min_value=0, max_value=100)
@@ -719,7 +733,7 @@ class TestIntSetting(unittest.TestCase):
       })
 
 
-class TestFloatSetting(unittest.TestCase):
+class TestFloatSetting(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.FloatSetting(
@@ -744,7 +758,7 @@ class TestFloatSetting(unittest.TestCase):
     self.assertTrue(self.setting.is_valid)
 
 
-class TestCreateEnumSetting(unittest.TestCase):
+class TestCreateEnumSetting(SettingTestCase):
 
   def test_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
@@ -807,7 +821,7 @@ class TestCreateEnumSetting(unittest.TestCase):
     self.assertEqual(setting.pdb_type, Gimp.Precision)
 
 
-class TestEnumSetting(unittest.TestCase):
+class TestEnumSetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.EnumSetting(
@@ -859,7 +873,7 @@ class TestEnumSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
 
 
-class TestCreateChoiceSetting(unittest.TestCase):
+class TestCreateChoiceSetting(SettingTestCase):
   
   def test_default_default_value_is_first_item(self):
     setting = settings_.ChoiceSetting(
@@ -935,7 +949,7 @@ class TestCreateChoiceSetting(unittest.TestCase):
         empty_value='invalid_value')
   
 
-class TestChoiceSetting(unittest.TestCase):
+class TestChoiceSetting(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.ChoiceSetting(
@@ -1010,7 +1024,7 @@ class TestChoiceSetting(unittest.TestCase):
   f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestImageSetting(unittest.TestCase):
+class TestImageSetting(SettingTestCase):
 
   @mock.patch(
     f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
@@ -1131,7 +1145,7 @@ class TestImageSetting(unittest.TestCase):
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestGimpItemSetting(unittest.TestCase):
+class TestGimpItemSetting(SettingTestCase):
   
   class StubItemSetting(settings_.GimpItemSetting):
     pass
@@ -1284,7 +1298,7 @@ class TestGimpItemSetting(unittest.TestCase):
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestLayerMaskSetting(unittest.TestCase):
+class TestLayerMaskSetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.LayerMaskSetting('mask')
@@ -1345,7 +1359,7 @@ class TestLayerMaskSetting(unittest.TestCase):
       })
 
 
-class TestRgbSetting(unittest.TestCase):
+class TestRgbSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
     self._assert_rgb_equal(settings_.RgbSetting('color').default_value, Gimp.RGB())
@@ -1413,7 +1427,7 @@ class TestRgbSetting(unittest.TestCase):
 
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestDisplaySetting(unittest.TestCase):
+class TestDisplaySetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.DisplaySetting('display')
@@ -1433,7 +1447,7 @@ class TestDisplaySetting(unittest.TestCase):
 
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestParasiteSetting(unittest.TestCase):
+class TestParasiteSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
     setting = settings_.ParasiteSetting('parasite')
@@ -1472,7 +1486,7 @@ class TestParasiteSetting(unittest.TestCase):
       {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
 
 
-class TestFileSetting(unittest.TestCase):
+class TestFileSetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.FileSetting('file')
@@ -1506,7 +1520,7 @@ class TestFileSetting(unittest.TestCase):
       })
 
 
-class TestBytesSetting(unittest.TestCase):
+class TestBytesSetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.BytesSetting('bytes')
@@ -1554,7 +1568,7 @@ class TestBytesSetting(unittest.TestCase):
 
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestBrushSetting(unittest.TestCase):
+class TestBrushSetting(SettingTestCase):
 
   @mock.patch(
     f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
@@ -1647,7 +1661,7 @@ class TestBrushSetting(unittest.TestCase):
 
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-class TestPaletteSetting(unittest.TestCase):
+class TestPaletteSetting(SettingTestCase):
 
   @mock.patch(
     f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
@@ -1714,7 +1728,7 @@ class TestPaletteSetting(unittest.TestCase):
       })
 
 
-class TestCreateArraySetting(unittest.TestCase):
+class TestCreateArraySetting(SettingTestCase):
   
   def test_create(self):
     setting = settings_.ArraySetting(
@@ -1925,7 +1939,7 @@ class TestCreateArraySetting(unittest.TestCase):
     self.assertEqual(setting.value_for_pdb, ('1', '5', '10'))
 
 
-class TestArraySetting(unittest.TestCase):
+class TestArraySetting(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.ArraySetting(
@@ -2284,7 +2298,7 @@ class TestArraySetting(unittest.TestCase):
     self.assertIsNone(setting.get_pdb_param())
 
 
-class TestArraySettingCreateWithSize(unittest.TestCase):
+class TestArraySettingCreateWithSize(SettingTestCase):
   
   @parameterized.parameterized.expand([
     ('default_sizes', None, None, 0, None),
@@ -2313,7 +2327,7 @@ class TestArraySettingCreateWithSize(unittest.TestCase):
     self.assertEqual(setting.max_size, expected_max_size)
 
 
-class TestArraySettingSize(unittest.TestCase):
+class TestArraySettingSize(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.ArraySetting(
@@ -2360,7 +2374,7 @@ class TestArraySettingSize(unittest.TestCase):
     self.assertFalse(self.setting.is_valid)
 
 
-class TestContainerSettings(unittest.TestCase):
+class TestContainerSettings(SettingTestCase):
   
   def test_set_value_nullable_allows_none(self):
     setting = settings_.ListSetting('setting', nullable=True)
