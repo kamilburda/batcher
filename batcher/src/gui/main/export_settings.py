@@ -143,11 +143,6 @@ class ExportSettings:
       self._settings['main/file_extension'],
       'invalid_file_extension')
 
-    self._name_pattern_entry.connect(
-      'changed',
-      self._on_text_entry_changed,
-      self._settings['main/name_pattern'],
-      'invalid_name_pattern')
 
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
