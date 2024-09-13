@@ -149,7 +149,7 @@ class ExtendedEntryPresenter(pg.setting.GtkPresenter):
     return text if text is not None else ''
 
   def _set_value(self, value):
-    self._widget.assign_text(value if value is not None else '')
+    self._widget.assign_text(value if value is not None else '', enable_undo=True)
 
 
 class FileExtensionEntryPresenter(ExtendedEntryPresenter):
@@ -184,8 +184,7 @@ class FileExtensionSetting(ValidatableStringSetting):
 
     adjust_value:
       if ``True``, process the new value when `set_value()` is
-      called. This involves removing leading '.' characters and converting the
-      file extension to lowercase.
+      called. This involves removing leading '.' characters.
     """
     super().__init__(name, validators_.FileExtensionValidator, **kwargs)
 

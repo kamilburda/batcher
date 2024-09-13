@@ -38,7 +38,6 @@ class ExportSettings:
         column_spacing=_COLUMN_SPACING,
         name_preview=None,
         image_preview=None,
-        display_message_func=None,
         parent=None,
   ):
     self._settings = settings
@@ -47,11 +46,7 @@ class ExportSettings:
     self._column_spacing = column_spacing
     self._name_preview = name_preview
     self._image_preview = image_preview
-    self._display_message_func = (
-      display_message_func if display_message_func is not None else pg.utils.empty_func)
     self._parent = parent
-
-    self._message_setting = None
 
     self._init_gui()
 
@@ -132,19 +127,6 @@ class ExportSettings:
 
     self._export_options_dialog = None
 
-    self._file_extension_entry.connect(
-      'changed',
-      self._on_file_extension_entry_changed,
-      self._settings['main/file_extension'],
-      'invalid_file_extension')
-
-    self._set_up_invalid_setting_value_warning_suppression()
-
-    self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
-
-    for setting in self._settings['main/export']:
-      setting.connect_event('value-changed', self._update_previews_on_export_options_change)
-
   def _init_setting_gui(self):
     self._settings['main/file_extension'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
@@ -158,6 +140,15 @@ class ExportSettings:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
+
+    self._set_up_file_extension_for_default_export()
+
+    self._set_up_file_extensions_for_export_procedures()
+
+    self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
+
+    for setting in self._settings['main/export']:
+      setting.connect_event('value-changed', self._update_previews_on_export_options_change)
 
   @property
   def widget(self):
@@ -175,54 +166,67 @@ class ExportSettings:
   def name_pattern_entry(self):
     return self._name_pattern_entry
 
-  def _on_file_extension_entry_changed(self, _entry, setting, name_preview_lock_update_key=None):
-    setting.gui.update_setting_value()
-
-    validation_result = setting.validate(setting.gui.get_value())
-
-    if validation_result is None:
-      if self._name_preview is not None:
-        self._name_preview.lock_update(False, name_preview_lock_update_key)
-
-      if self._message_setting == setting:
-        self._display_message_func(None)
-
-      if self._name_preview is not None:
-        self._name_preview.add_function_at_update(
-          self._name_preview.set_sensitive, True)
-
-        pg.invocation.timeout_add_strict(
-          self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
-          self._name_preview.update)
-    else:
-      if self._name_preview is not None:
-        pg.invocation.timeout_add_strict(
-          self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
-          self._name_preview.set_sensitive,
-          False)
-
-      self._display_message_func(validation_result.message, Gtk.MessageType.ERROR)
-
-      self._message_setting = setting
-
-      if self._name_preview is not None:
-        self._name_preview.lock_update(True, name_preview_lock_update_key)
-
-  def _set_up_invalid_setting_value_warning_suppression(self):
+  def _set_up_file_extension_for_default_export(self):
     pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
       self._settings['main/file_extension'])
 
+    self._file_extension_entry.connect(
+      'changed',
+      self._on_file_extension_entry_for_default_export_changed,
+      self._settings['main/file_extension'])
+
+    self._file_extension_entry.connect(
+      'focus-out-event',
+      self._on_file_extension_entry_focus_out_event,
+      self._settings['main/file_extension'])
+
+  def _set_up_file_extensions_for_export_procedures(self):
     for procedure in self._settings['main/procedures']:
-      self._suppress_warning_for_file_extension_for_export_procedure(None, procedure, None)
+      self._set_up_file_extension_for_export_procedure(None, procedure, None)
 
     self._settings['main/procedures'].connect_event(
-      'after-add-action', self._suppress_warning_for_file_extension_for_export_procedure)
+      'after-add-action', self._set_up_file_extension_for_export_procedure)
 
-  @staticmethod
-  def _suppress_warning_for_file_extension_for_export_procedure(_procedures, procedure, _dict):
+  def _set_up_file_extension_for_export_procedure(self, _procedures, procedure, _dict):
     if procedure['orig_name'].value.startswith('export_for_'):
       pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
         procedure['arguments/file_extension'])
+
+      procedure['arguments/file_extension'].set_gui()
+
+      procedure['arguments/file_extension'].gui.widget.connect(
+        'changed',
+        self._validate_file_extension,
+        procedure['arguments/file_extension'])
+
+      procedure['arguments/file_extension'].gui.widget.connect(
+        'focus-out-event',
+        self._on_file_extension_entry_focus_out_event,
+        procedure['arguments/file_extension'])
+
+  def _on_file_extension_entry_for_default_export_changed(self, _entry, setting):
+    self._validate_file_extension(_entry, setting)
+
+    pg.invocation.timeout_add_strict(
+      self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+      self._name_preview.update)
+
+  def _on_file_extension_entry_focus_out_event(self, _entry, _event, setting):
+    self._revert_file_extension_gui_to_last_valid_value(setting)
+
+  @staticmethod
+  def _validate_file_extension(_entry, setting):
+    validation_result = setting.validate(setting.gui.get_value())
+
+    if validation_result is None:
+      setting.gui.update_setting_value()
+
+  @staticmethod
+  def _revert_file_extension_gui_to_last_valid_value(setting):
+    validation_result = setting.validate(setting.gui.get_value())
+
+    if validation_result is not None:
+      setting.apply_to_gui()
 
   def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:

@@ -6,6 +6,7 @@ Changes to the export options:
 * The native file format dialog is no longer displayed by default. File format options are now adjusted in the export options (displayed by pressing the `Export Options...` button). This behavior can be toggled back if desired, particularly when you need to choose the image metadata to preserve (this can currently be adjusted only via native file format dialogs).
 * By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
 * The default export folder is now the `Pictures` user folder instead of `Documents`.
+* The file extension is now validated automatically. An invalid file extension is automatically reverted to the last valid value instead of displaying warnings.
 
 Changes to the `Export` procedure:
 * For Export Layers, the `Export` procedure now performs additional export instead of overriding the default export. The procedure name for Export Layers is now `Also export as...` to reflect this change. The name changes automatically as you modify the file extension (e.g. `Also export as PNG` if the file extension is `png`).

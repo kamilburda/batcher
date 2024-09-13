@@ -117,7 +117,6 @@ class BatchLayerProcessingGui:
         row_spacing=self._DIALOG_VBOX_SPACING,
         name_preview=self._previews.name_preview,
         image_preview=self._previews.image_preview,
-        display_message_func=self._display_inline_message,
         parent=self._dialog,
       )
     else:

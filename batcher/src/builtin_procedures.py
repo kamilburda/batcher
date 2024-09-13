@@ -266,6 +266,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
       'display_name': _('File extension'),
       'gui_type': 'file_extension_entry',
       'adjust_value': True,
+      'auto_update_gui_to_setting': False,
     },
     {
       'type': 'choice',

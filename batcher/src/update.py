@@ -515,6 +515,9 @@ def _update_to_0_5(data, _settings, source_names):
           if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'check_button_no_text':
             argument_dict['gui_type'] = 'check_button'
 
+          if argument_dict['name'] == 'file_extension':
+            argument_dict['auto_update_gui_to_setting'] = False
+
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         # We retain `name` and only modify `orig_name` as only the latter is
         # used in the code to check if a procedure is an export procedure.
