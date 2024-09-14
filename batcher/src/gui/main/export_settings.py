@@ -143,8 +143,6 @@ class ExportSettings:
 
     self._set_up_file_extension_for_default_export()
 
-    self._set_up_file_extensions_for_export_procedures()
-
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
     for setting in self._settings['main/export']:
@@ -180,32 +178,11 @@ class ExportSettings:
       self._on_file_extension_entry_focus_out_event,
       self._settings['main/file_extension'])
 
-  def _set_up_file_extensions_for_export_procedures(self):
-    for procedure in self._settings['main/procedures']:
-      self._set_up_file_extension_for_export_procedure(None, procedure, None)
-
-    self._settings['main/procedures'].connect_event(
-      'after-add-action', self._set_up_file_extension_for_export_procedure)
-
-  def _set_up_file_extension_for_export_procedure(self, _procedures, procedure, _dict):
-    if procedure['orig_name'].value.startswith('export_for_'):
-      pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
-        procedure['arguments/file_extension'])
-
-      procedure['arguments/file_extension'].set_gui()
-
-      procedure['arguments/file_extension'].gui.widget.connect(
-        'changed',
-        self._validate_file_extension,
-        procedure['arguments/file_extension'])
-
-      procedure['arguments/file_extension'].gui.widget.connect(
-        'focus-out-event',
-        self._on_file_extension_entry_focus_out_event,
-        procedure['arguments/file_extension'])
-
   def _on_file_extension_entry_for_default_export_changed(self, _entry, setting):
-    self._validate_file_extension(_entry, setting)
+    validation_result = setting.validate(setting.gui.get_value())
+
+    if validation_result is None:
+      setting.gui.update_setting_value()
 
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
@@ -213,13 +190,6 @@ class ExportSettings:
 
   def _on_file_extension_entry_focus_out_event(self, _entry, _event, setting):
     self._revert_file_extension_gui_to_last_valid_value(setting)
-
-  @staticmethod
-  def _validate_file_extension(_entry, setting):
-    validation_result = setting.validate(setting.gui.get_value())
-
-    if validation_result is None:
-      setting.gui.update_setting_value()
 
   @staticmethod
   def _revert_file_extension_gui_to_last_valid_value(setting):
