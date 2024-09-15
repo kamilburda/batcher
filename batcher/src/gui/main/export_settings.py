@@ -179,24 +179,15 @@ class ExportSettings:
       self._settings['main/file_extension'])
 
   def _on_file_extension_entry_for_default_export_changed(self, _entry, setting):
-    validation_result = setting.validate(setting.gui.get_value())
-
-    if validation_result is None:
-      setting.gui.update_setting_value()
+    apply_file_extension_gui_to_setting_if_valid(setting)
 
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
       self._name_preview.update)
 
-  def _on_file_extension_entry_focus_out_event(self, _entry, _event, setting):
-    self._revert_file_extension_gui_to_last_valid_value(setting)
-
   @staticmethod
-  def _revert_file_extension_gui_to_last_valid_value(setting):
-    validation_result = setting.validate(setting.gui.get_value())
-
-    if validation_result is not None:
-      setting.apply_to_gui()
+  def _on_file_extension_entry_focus_out_event(_entry, _event, setting):
+    revert_file_extension_gui_to_last_valid_value(setting)
 
   def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
@@ -286,6 +277,28 @@ class ExportOptionsDialog:
 
   def _on_export_options_dialog_button_reset_clicked(self, _button):
     self._settings['main/export'].reset()
+
+
+def apply_file_extension_gui_to_setting_if_valid(setting):
+  validation_result = setting.validate(setting.gui.get_value())
+
+  if validation_result is None:
+    setting.gui.update_setting_value()
+
+
+def revert_file_extension_gui_to_last_valid_value(setting):
+  validation_result_gui_value = setting.validate(setting.gui.get_value())
+
+  if validation_result_gui_value is not None:
+    # We presume the last setting value is valid. This might not be the case
+    # if the last value itself is not valid, which can happen when saving
+    # the setting with an invalid value. In that case, we revert to the
+    # setting's default value, which presumably is valid.
+    validation_result_setting_value = setting.validate(setting.value)
+    if validation_result_setting_value is None:
+      setting.apply_to_gui()
+    else:
+      setting.reset()
 
 
 def _set_up_output_directory_settings(settings, current_image):

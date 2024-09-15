@@ -14,6 +14,8 @@ from src import builtin_procedures
 from src.gui import messages as messages_
 from src.gui.actions import list as action_list_
 
+from src.gui.main import export_settings as export_settings_
+
 
 class ActionLists:
 
@@ -404,12 +406,15 @@ def _handle_export_procedure_item_added(item):
 
   item.action['arguments/file_extension'].gui.widget.connect(
     'changed',
-    _validate_file_extension,
+    lambda _entry, setting: export_settings_.apply_file_extension_gui_to_setting_if_valid(setting),
     item.action['arguments/file_extension'])
+
+  export_settings_.revert_file_extension_gui_to_last_valid_value(item.action['arguments/file_extension'])
 
   item.action['arguments/file_extension'].gui.widget.connect(
     'focus-out-event',
-    _revert_file_extension_gui_to_last_valid_value,
+    lambda _entry, _event, setting: (
+      export_settings_.revert_file_extension_gui_to_last_valid_value(setting)),
     item.action['arguments/file_extension'])
 
   _set_display_name_for_export_procedure(
@@ -420,20 +425,6 @@ def _handle_export_procedure_item_added(item):
     'value-changed',
     _set_display_name_for_export_procedure,
     item.action)
-
-
-def _validate_file_extension(_entry, setting):
-  validation_result = setting.validate(setting.gui.get_value())
-
-  if validation_result is None:
-    setting.gui.update_setting_value()
-
-
-def _revert_file_extension_gui_to_last_valid_value(_entry, _event, setting):
-  validation_result = setting.validate(setting.gui.get_value())
-
-  if validation_result is not None:
-    setting.apply_to_gui()
 
 
 def _set_display_name_for_export_procedure(file_extension_setting, export_procedure):
