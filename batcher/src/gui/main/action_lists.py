@@ -13,7 +13,6 @@ from src import builtin_procedures
 
 from src.gui import messages as messages_
 from src.gui.actions import list as action_list_
-
 from src.gui.main import export_settings as export_settings_
 
 
