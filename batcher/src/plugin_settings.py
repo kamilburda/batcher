@@ -118,18 +118,18 @@ def create_settings_for_export_layers():
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (660, 540),
+      'default_value': (640, 540),
     },
     {
       'type': 'integer',
       'name': 'paned_outside_previews_position',
-      'default_value': 370,
+      'default_value': 330,
       'gui_type': None,
     },
     {
       'type': 'float',
       'name': 'paned_between_previews_position',
-      'default_value': 260,
+      'default_value': 225,
       'gui_type': None,
     },
   ])

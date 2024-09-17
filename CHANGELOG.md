@@ -1,12 +1,14 @@
 ## Upcoming
 
-Changes to the export options:
-* Added a button named `Export Options...` in the main dialog to adjust export options previously only available when adding the `Export` procedure.
+Changes to the export settings:
+* Added a button named `Options...` in the main dialog to adjust options previously only available when adding the `Export` procedure.
+* Rearranged export settings horizontally, both in Export Layers and Export Layers (Quick).
 * Renamed `Save in Folder` to `Folder` and `Save As` to `Name` for brevity.
-* The native file format dialog is no longer displayed by default. File format options are now adjusted in the export options (displayed by pressing the `Export Options...` button). This behavior can be toggled back if desired, particularly when you need to choose the image metadata to preserve (this can currently be adjusted only via native file format dialogs).
+* The native file format dialog is no longer displayed by default. File format options are now adjusted in the export options (displayed by pressing the `Options...` button). This behavior can be toggled back if desired, particularly when you need to choose the image metadata to preserve (this can currently be adjusted only via native file format dialogs).
 * By default, when a file about to be exported already exists with the same name, the new file will be renamed. This was inconsistent previously (e.g. when running non-interactively, the default was to skip the new files).
 * The default export folder is now the `Pictures` user folder instead of `Documents`.
 * The file extension is now validated automatically. An invalid file extension is automatically reverted to the last valid value instead of displaying warnings.
+* The overwrite prompt is now displayed in Edit/Export Layers (Quick) if `Show This Dialog` is checked.
 
 Changes to the `Export` procedure:
 * For Export Layers, the `Export` procedure now performs additional export instead of overriding the default export. The procedure name for Export Layers is now `Also export as...` to reflect this change. The name changes automatically as you modify the file extension (e.g. `Also export as PNG` if the file extension is `png`).
@@ -18,8 +20,8 @@ Other changes:
 * The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Name`) instead of overriding it.
 
 Bug fixes:
-* Fixed unchangeable file extension in `Export Layers (Quick)`.
-* Fixed overwrite prompt not being displayed for `Export` procedures for `Edit Layers`. 
+* Fixed unchangeable file extension in Export Layers (Quick).
+* Fixed overwrite prompt not being displayed for `Export` procedures for Edit Layers. 
 * Fixed a crash when in-dialog warning messages were displayed on plug-in startup (e.g. if the plug-in was saved with an ill-formatted file extension).
 
 
@@ -29,7 +31,7 @@ Bug fixes:
 
 New features:
 * Created separate dialogs and menu entries for batch-editing layers, named `Edit Layers...` and `Edit Layers (Quick)`. Separate settings are provided for editing and exporting.
-* Added `Export Selected Layers` and `Edit Selected Layers` menu entries when right-clicking on selected layers in GIMP. These behave as `Export Layers (Quick)` and `Edit Layers (Quick)`, respectively, except that only `Layers` and `Selected in GIMP` constraints apply.
+* Added `Export Selected Layers` and `Edit Selected Layers` menu entries when right-clicking on selected layers in GIMP. These behave as Export Layers (Quick) and Edit Layers (Quick), respectively, except that only `Layers` and `Selected in GIMP` constraints apply.
 * Added a new layer name pattern called `Full layer name` which preserves the entire layer name, including characters beyond the last '.'. This is equivalent to `[layer name, %e]`, only more convenient.
 
 Changes to procedures and constraints:

@@ -32,7 +32,7 @@ However, you can still enter a file extension not in the list in case you use an
 
 ### Export Options
 
-For Export Layers, pressing the `Export Options...` button reveals additional export options.
+For Export Layers, pressing the `Options...` button reveals additional export options.
 
 The most important for you will likely be file format options (compression for PNG, image quality for JPG, etc.).
 

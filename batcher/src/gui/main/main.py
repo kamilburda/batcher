@@ -31,6 +31,7 @@ class BatchLayerProcessingGui:
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
   _VBOX_SETTINGS_SPACING = 10
+  _EXPORT_SETTINGS_BOTTOM_MARGIN = 10
 
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
@@ -114,11 +115,11 @@ class BatchLayerProcessingGui:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
         self._image,
-        row_spacing=self._DIALOG_VBOX_SPACING,
         name_preview=self._previews.name_preview,
         image_preview=self._previews.image_preview,
         parent=self._dialog,
       )
+      self._export_settings.widget.set_margin_bottom(self._EXPORT_SETTINGS_BOTTOM_MARGIN)
     else:
       self._export_settings = None
 
@@ -133,8 +134,6 @@ class BatchLayerProcessingGui:
       spacing=self._VBOX_SETTINGS_SPACING,
     )
 
-    if self._mode == 'export':
-      self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
     self._vbox_settings.pack_start(self._action_lists.vbox_procedures, False, False, 0)
     self._vbox_settings.pack_start(self._action_lists.vbox_constraints, False, False, 0)
 
@@ -202,6 +201,8 @@ class BatchLayerProcessingGui:
 
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
+    if self._mode == 'export':
+      self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
     self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
@@ -383,8 +384,9 @@ class BatchLayerProcessingGui:
 class BatchLayerProcessingQuickGui:
 
   _BORDER_WIDTH = 8
-  _HBOX_HORIZONTAL_SPACING = 8
-  _DIALOG_WIDTH = 500
+  _DIALOG_VBOX_SPACING = 8
+
+  _DEFAULT_DIALOG_WIDTH = 500
 
   def __init__(self, layer_tree, settings, _source_name, mode):
     self._layer_tree = layer_tree
@@ -400,130 +402,16 @@ class BatchLayerProcessingQuickGui:
 
     self._init_gui()
 
-    if mode == 'export' and self._settings['gui/show_quick_settings'].value:
-      self._quick_settings_gui = QuickSettingsGui(self._image, self._settings, self._mode)
-      self._quick_settings_gui.dialog.connect('response', self._on_quick_settings_gui_dialog_response)
-      self._quick_settings_gui.dialog.run()
-    else:
-      self._quick_settings_gui = None
-
-      self._run_batcher_quick()
-
-  def show(self):
-    self._dialog.vbox.show_all()
-    self._dialog.action_area.hide()
-    self._dialog.show()
-
-  def hide(self):
-    self._dialog.hide()
-
-  def _init_gui(self):
-    if self._mode == 'edit':
-      title = _('Edit Layers')
-    elif self._mode == 'export':
-      title = _('Export Layers')
-    else:
-      title = None
-
-    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
-    self._dialog.set_border_width(self._BORDER_WIDTH)
-    self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
-
-    GimpUi.window_set_transient(self._dialog)
-
-    self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
-
-    self._buttonbox = Gtk.ButtonBox(orientation=Gtk.Orientation.HORIZONTAL)
-    self._buttonbox.pack_start(self._button_stop, False, False, 0)
-
-    self._progress_bar = Gtk.ProgressBar(
-      ellipsize=Pango.EllipsizeMode.MIDDLE,
-    )
-
-    self._hbox_action_area = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._HBOX_HORIZONTAL_SPACING,
-    )
-    self._hbox_action_area.pack_start(self._progress_bar, True, True, 0)
-    self._hbox_action_area.pack_end(self._buttonbox, False, False, 0)
-
-    self._dialog.vbox.pack_end(self._hbox_action_area, False, False, 0)
-
-    self._button_stop.connect('clicked', self._on_button_stop_clicked)
-    self._dialog.connect('delete-event', self._on_dialog_delete_event)
-
-  def _on_quick_settings_gui_dialog_response(self, dialog, response_id):
-    if response_id == Gtk.ResponseType.OK:
-      dialog.hide()
-
-      self._run_batcher_quick()
-
-      if self._quick_settings_gui is not None:
-        self._settings['gui/show_quick_settings'].set_value(
-          self._quick_settings_gui.should_show_dialog_next_time())
-
-        # Save export settings as they could be modified in the dialog.
-        pg.setting.Persistor.save([
-          self._settings['main/file_extension'],
-          self._settings['main/output_directory'],
-          self._settings['main/name_pattern'],
-          self._settings['gui/show_quick_settings'],
-        ])
-    else:
-      dialog.hide()
-
-  def _run_batcher_quick(self):
-    messages_.set_gui_excepthook_parent(self._dialog)
-
-    Gtk.main_iteration()
-
-    self.show()
-
-    self._batcher_manager.run_batcher(
-      self._mode,
-      self._image,
-      self._layer_tree,
-      self._dialog,
-      self._progress_bar,
-    )
-
-  def _on_button_stop_clicked(self, _button):
-    self._batcher_manager.stop_batcher()
-
-  def _on_dialog_delete_event(self, _dialog, _event):
-    self._batcher_manager.stop_batcher()
-
-
-class QuickSettingsGui:
-
-  _BORDER_WIDTH = 8
-  _HBOX_HORIZONTAL_SPACING = 8
-  _DIALOG_VBOX_SPACING = 8
-  _DIALOG_WIDTH = 300
-
-  def __init__(self, image, settings, mode):
-    self._image = image
-    self._settings = settings
-
-    if mode not in ['edit', 'export']:
-      raise ValueError('mode must be either "edit" or "export"')
-    self._mode = mode
-
-    self._init_gui()
-
-    messages_.set_gui_excepthook_parent(self._dialog)
-
-    self.show()
-
-  @property
-  def dialog(self):
-    return self._dialog
-
-  def should_show_dialog_next_time(self):
-    return self._check_button_show_this_dialog.get_active()
-
-  def show(self):
     self._dialog.show_all()
+
+    if mode == 'export' and self._settings['gui/show_quick_settings'].value:
+      self._button_run.connect('clicked', self._on_button_run_clicked)
+
+      Gtk.main()
+    else:
+      Gtk.main_iteration()
+
+      self._run_batcher_quick()
 
   def _init_gui(self):
     if self._mode == 'edit':
@@ -535,30 +423,78 @@ class QuickSettingsGui:
 
     self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
     self._dialog.set_border_width(self._BORDER_WIDTH)
-    self._dialog.set_default_size(self._DIALOG_WIDTH, -1)
+    self._dialog.set_default_size(self._DEFAULT_DIALOG_WIDTH, -1)
 
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
 
-    if self._mode == 'export':
+    GimpUi.window_set_transient(self._dialog)
+
+    messages_.set_gui_excepthook_parent(self._dialog)
+
+    self._button_run = None
+    self._export_settings = None
+    self._check_button_show_this_dialog = None
+
+    if self._mode == 'export' and self._settings['gui/show_quick_settings'].value:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
         self._image,
         parent=self._dialog,
       )
       self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
-    else:
-      self._export_settings = None
 
-    self._check_button_show_this_dialog = Gtk.CheckButton(label=_('Show this dialog'))
-    self._check_button_show_this_dialog.set_active(self._settings['gui/show_quick_settings'].value)
+      self._check_button_show_this_dialog = Gtk.CheckButton(label=_('Show this dialog'))
+      self._check_button_show_this_dialog.set_active(self._settings['gui/show_quick_settings'].value)
 
-    self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
+      self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
 
-    self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
-    self._button_run.set_can_default(True)
-    if self._mode == 'export':
-      self._button_run.set_label(_('_Export'))
-    else:
-      self._button_run.set_label(_('_Run'))
+      self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
+      self._button_run.set_can_default(True)
 
-    self._button_close = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
+    self._button_cancel = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
+
+    self._progress_bar = Gtk.ProgressBar(
+      ellipsize=Pango.EllipsizeMode.MIDDLE,
+    )
+    self._progress_bar.set_no_show_all(True)
+
+    self._dialog.vbox.pack_end(self._progress_bar, True, True, 0)
+
+    self._button_cancel.connect('clicked', self._on_button_cancel_clicked)
+    self._dialog.connect('delete-event', self._on_dialog_delete_event)
+
+  def _on_button_run_clicked(self, _button):
+    self._run_batcher_quick()
+
+    self._settings['gui/show_quick_settings'].set_value(self._should_show_dialog_next_time())
+
+    self._settings.save()
+
+    Gtk.main_quit()
+
+  def _run_batcher_quick(self):
+    if self._button_run is not None:
+      self._button_run.set_sensitive(False)
+
+    self._progress_bar.show()
+
+    self._batcher_manager.run_batcher(
+      self._mode,
+      self._image,
+      self._layer_tree,
+      self._dialog,
+      self._progress_bar,
+    )
+
+  def _should_show_dialog_next_time(self):
+    return self._check_button_show_this_dialog.get_active()
+
+  def _on_button_cancel_clicked(self, _button):
+    self._batcher_manager.stop_batcher()
+
+    Gtk.main_quit()
+
+  def _on_dialog_delete_event(self, _dialog, _event):
+    self._batcher_manager.stop_batcher()
+
+    Gtk.main_quit()

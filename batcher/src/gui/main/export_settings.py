@@ -18,15 +18,12 @@ from src.gui.entry import entries as entries_
 
 class ExportSettings:
 
-  _ROW_SPACING = 5
-  _COLUMN_SPACING = 7
-
+  _SPACING_BETWEEN_COMPONENTS = 7
+  _SPACING_WITHIN_COMPONENTS = 7
   _HBOX_EXPORT_NAME_ENTRIES_SPACING = 3
 
-  _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 4
-  _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 10
-  _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 12
-  _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 40
+  _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 5
+  _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 5
 
   _DELAY_PREVIEW_UPDATE_MILLISECONDS = 100
 
@@ -34,16 +31,12 @@ class ExportSettings:
         self,
         settings,
         image,
-        row_spacing=_ROW_SPACING,
-        column_spacing=_COLUMN_SPACING,
         name_preview=None,
         image_preview=None,
         parent=None,
   ):
     self._settings = settings
     self._image = image
-    self._row_spacing = row_spacing
-    self._column_spacing = column_spacing
     self._name_preview = name_preview
     self._image_preview = image_preview
     self._parent = parent
@@ -63,6 +56,14 @@ class ExportSettings:
       '<b>{}</b>'.format(_('Folder:')))
 
     self._settings['main/output_directory'].set_gui()
+
+    self._hbox_folder_chooser = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._SPACING_WITHIN_COMPONENTS,
+    )
+    self._hbox_folder_chooser.pack_start(self._folder_chooser_label, False, False, 0)
+    self._hbox_folder_chooser.pack_start(
+      self._settings['main/output_directory'].gui.widget, True, True, 0)
 
     self._file_extension_entry = entries_.FileExtensionEntry(
       minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
@@ -85,45 +86,39 @@ class ExportSettings:
 
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(renamer_.FIELDS),
-      minimum_width_chars=self._NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
+      expandable=False,
       default_item=self._settings['main/name_pattern'].default_value)
     self._name_pattern_entry.set_activates_default(True)
-
-    self._export_options_button = Gtk.Button(
-      label=_('E_xport Options...'),
-      use_underline=True,
-    )
 
     self._hbox_export_filename_entries = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_EXPORT_NAME_ENTRIES_SPACING,
     )
-    self._hbox_export_filename_entries.pack_start(self._name_pattern_entry, False, False, 0)
+    self._hbox_export_filename_entries.pack_start(self._name_pattern_entry, True, True, 0)
     self._hbox_export_filename_entries.pack_start(self._dot_label, False, False, 0)
     self._hbox_export_filename_entries.pack_start(self._file_extension_entry, False, False, 0)
 
-    self._grid_export_settings = Gtk.Grid(
-      row_spacing=self._row_spacing,
-      column_spacing=self._column_spacing,
-    )
-    self._grid_export_settings.attach(self._folder_chooser_label, 0, 0, 1, 1)
-    self._grid_export_settings.attach(
-      self._settings['main/output_directory'].gui.widget, 1, 0, 1, 1)
-    self._grid_export_settings.attach(self._export_filename_label, 0, 1, 1, 1)
-    self._grid_export_settings.attach(self._hbox_export_filename_entries, 1, 1, 1, 1)
-
-    self._hbox_export_options_button = Gtk.Box(
+    self._hbox_export_filename_entries_with_label = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._SPACING_WITHIN_COMPONENTS,
     )
-    self._hbox_export_options_button.pack_start(self._export_options_button, False, False, 0)
+    (self._hbox_export_filename_entries_with_label.pack_start
+     (self._export_filename_label, False, False, 0))
+    self._hbox_export_filename_entries_with_label.pack_start(
+      self._hbox_export_filename_entries, True, True, 0)
 
-    self._vbox = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._row_spacing,
+    self._export_options_button = Gtk.Button(
+      label=_('O_ptions...'),
+      use_underline=True,
     )
-    self._vbox.pack_start(self._grid_export_settings, False, False, 0)
-    self._vbox.pack_start(self._hbox_export_options_button, False, False, 0)
+
+    self._hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._SPACING_BETWEEN_COMPONENTS,
+    )
+    self._hbox.pack_start(self._hbox_folder_chooser, True, True, 0)
+    self._hbox.pack_start(self._hbox_export_filename_entries_with_label, True, True, 0)
+    self._hbox.pack_start(self._export_options_button, False, False, 0)
 
     self._export_options_dialog = None
 
@@ -151,7 +146,7 @@ class ExportSettings:
 
   @property
   def widget(self):
-    return self._vbox
+    return self._hbox
 
   @property
   def folder_chooser(self):
