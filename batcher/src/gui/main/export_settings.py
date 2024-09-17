@@ -192,9 +192,10 @@ class ExportSettings:
   def _on_file_extension_entry_changed(self, _entry, setting):
     apply_file_extension_gui_to_setting_if_valid(setting)
 
-    pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
-      self._name_preview.update)
+    if self._name_preview is not None:
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._name_preview.update)
 
   @staticmethod
   def _on_file_extension_entry_focus_out_event(_entry, _event, setting):
