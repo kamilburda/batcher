@@ -491,6 +491,10 @@ def _update_to_0_5(data, _settings, source_names):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    file_extension_dict, _index = _get_child_setting(main_settings_list, 'file_extension')
+    if file_extension_dict is not None:
+      file_extension_dict['gui_type'] = None
+
     output_directory_dict, _index = _get_child_setting(main_settings_list, 'output_directory')
     if output_directory_dict is not None:
       output_directory_dict['type'] = 'dirpath'

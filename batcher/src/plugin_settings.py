@@ -34,6 +34,7 @@ def create_settings_for_export_layers():
       'display_name': _('File extension'),
       'adjust_value': True,
       'auto_update_gui_to_setting': False,
+      'gui_type': None,
     },
     {
       'type': 'dirpath',
