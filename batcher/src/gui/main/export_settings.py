@@ -128,20 +128,21 @@ class ExportSettings:
     self._export_options_dialog = None
 
   def _init_setting_gui(self):
-    self._settings['main/file_extension'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
-      widget=self._file_extension_entry,
-      copy_previous_visible=False,
-      copy_previous_sensitive=False,
-    )
     self._settings['main/name_pattern'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
       widget=self._name_pattern_entry,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
+    self._settings['main/file_extension'].set_gui(
+      gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
+      widget=self._file_extension_entry,
+      copy_previous_visible=False,
+      copy_previous_sensitive=False,
+    )
 
-    self._set_up_file_extension_for_default_export()
+    self._set_up_name_pattern()
+    self._set_up_file_extension()
 
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
@@ -164,13 +165,23 @@ class ExportSettings:
   def name_pattern_entry(self):
     return self._name_pattern_entry
 
-  def _set_up_file_extension_for_default_export(self):
+  def _set_up_name_pattern(self):
+    self._settings['main/name_pattern'].connect_event(
+      'value-changed', self._on_name_pattern_changed)
+
+  def _on_name_pattern_changed(self, _setting):
+    if self._name_preview is not None:
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._name_preview.update)
+
+  def _set_up_file_extension(self):
     pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
       self._settings['main/file_extension'])
 
     self._file_extension_entry.connect(
       'changed',
-      self._on_file_extension_entry_for_default_export_changed,
+      self._on_file_extension_entry_changed,
       self._settings['main/file_extension'])
 
     self._file_extension_entry.connect(
@@ -178,7 +189,7 @@ class ExportSettings:
       self._on_file_extension_entry_focus_out_event,
       self._settings['main/file_extension'])
 
-  def _on_file_extension_entry_for_default_export_changed(self, _entry, setting):
+  def _on_file_extension_entry_changed(self, _entry, setting):
     apply_file_extension_gui_to_setting_if_valid(setting)
 
     pg.invocation.timeout_add_strict(

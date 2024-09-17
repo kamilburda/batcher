@@ -498,6 +498,10 @@ def _update_to_0_5(data, _settings, source_names):
       if 'auto_update_gui_to_setting' in output_directory_dict:
         del output_directory_dict['auto_update_gui_to_setting']
 
+    name_pattern_dict, _index = _get_child_setting(main_settings_list, 'name_pattern')
+    if name_pattern_dict is not None and 'auto_update_gui_to_setting' in name_pattern_dict:
+      del name_pattern_dict['auto_update_gui_to_setting']
+
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
     if procedures_list is None:

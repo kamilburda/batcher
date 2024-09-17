@@ -49,7 +49,6 @@ def create_settings_for_export_layers():
       'display_name': _('Layer filename pattern'),
       'description': _('Layer filename pattern (empty string = layer name)'),
       'gui_type': None,
-      'auto_update_gui_to_setting': False,
     },
     {
       'type': 'choice',
