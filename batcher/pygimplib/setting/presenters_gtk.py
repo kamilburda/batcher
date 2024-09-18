@@ -326,6 +326,9 @@ class EnumComboBoxPresenter(GimpUiIntComboBoxPresenter):
   def _create_widget(self, setting, **kwargs):
     combo_box = GimpUi.EnumComboBox.new_with_model(GimpUi.EnumStore.new(setting.enum_type))
 
+    for excluded_value in setting.excluded_values:
+      del combo_box.get_model()[int(excluded_value)]
+
     # If the default value is not valid, `set_active` returns `False`,
     # but otherwise does not result in errors.
     combo_box.set_active(int(setting.default_value))

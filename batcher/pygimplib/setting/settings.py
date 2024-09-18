@@ -1252,6 +1252,7 @@ class EnumSetting(Setting):
         self,
         name: str,
         enum_type: Union[Type[GObject.GEnum], GObject.GType, str],
+        excluded_values: Optional[Iterable[GObject.GEnum]] = None,
         **kwargs,
   ):
     """Initializes an `EnumSetting` instance.
@@ -1266,11 +1267,16 @@ class EnumSetting(Setting):
         Enumerated type as a `GObject.GEnum` subclass or a string representing
         the module path plus name of a `GObject.GEnum` subclass, e.g.
         ``'gi.repository.Gimp.RunMode'`` for `Gimp.RunMode`.
+      excluded_values:
+        List of enumerated values to be excluded from the setting GUI. This is
+        useful in case this setting is used in a GIMP PDB procedure not
+        supporting particular value(s).
       **kwargs:
         Additional keyword arguments that can be passed to the parent class'
         `__init__()`.
     """
     self._enum_type = self._process_enum_type(enum_type)
+    self._excluded_values = self._process_excluded_values(excluded_values)
 
     kwargs['pdb_type'] = self._enum_type
 
@@ -1280,6 +1286,11 @@ class EnumSetting(Setting):
   def enum_type(self) -> Type[GObject.GEnum]:
     """`GObject.GEnum` subclass whose values are used as setting values."""
     return self._enum_type
+
+  @property
+  def excluded_values(self) -> List[GObject.GEnum]:
+    """`GObject.GEnum` values excluded from the setting GUI."""
+    return self._excluded_values
 
   def to_dict(self):
     settings_dict = super().to_dict()
@@ -1337,6 +1348,13 @@ class EnumSetting(Setting):
       raise TypeError(f'{processed_enum_type} is not a subclass of GObject.GEnum')
 
     return processed_enum_type
+
+  @staticmethod
+  def _process_excluded_values(excluded_values):
+    if excluded_values is not None:
+      return list(excluded_values)
+    else:
+      return []
 
   def _get_enum_type_from_string(self, enum_type_str):
     # HACK: We parse the `GType` name to obtain the `GEnum` instance. Is there
