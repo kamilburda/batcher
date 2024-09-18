@@ -941,7 +941,7 @@ def _create_spin_button(setting, digits=None):
   step_increment = 1
   page_increment = 10
 
-  if 0 < value_range <= 1:
+  if digits > 0 and 0 < value_range <= 1:
     digits_in_value_range = -math.floor(math.log10(value_range))
 
     step_increment = 10 ** -(digits_in_value_range + 1)
