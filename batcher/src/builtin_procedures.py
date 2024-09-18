@@ -369,8 +369,10 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
-        'type': 'color_tag',
+        'type': 'enum',
         'name': 'color_tag',
+        'enum_type': Gimp.ColorTag,
+        'excluded_values': [Gimp.ColorTag.NONE],
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.BLUE,
       },
@@ -398,8 +400,10 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
       {
-        'type': 'color_tag',
+        'type': 'enum',
         'name': 'color_tag',
+        'enum_type': Gimp.ColorTag,
+        'excluded_values': [Gimp.ColorTag.NONE],
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
       },
