@@ -592,6 +592,43 @@ def _update_to_0_5(data, _settings, source_names):
             'gui_type': 'radio_button_box',
           })
 
+      if (orig_name_setting_dict['default_value'] in ['insert_background', 'insert_foreground']
+          and arguments_list is not None):
+        for argument_dict in arguments_list:
+          if argument_dict['type'] == 'color_tag':
+            argument_dict['type'] = 'enum'
+            argument_dict['enum_type'] = 'GimpColorTag'
+            argument_dict['excluded_values'] = [0]
+
+    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
+
+    if constraints_list is None:
+      return
+
+    for constraint_dict in constraints_list:
+      constraint_list = constraint_dict['settings']
+
+      orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
+
+      arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
+
+      if (orig_name_setting_dict['default_value'] in ['not_background', 'not_foreground']
+          and arguments_list is not None):
+        for argument_dict in arguments_list:
+          if argument_dict['type'] == 'color_tag':
+            argument_dict['type'] = 'enum'
+            argument_dict['enum_type'] = 'GimpColorTag'
+            argument_dict['excluded_values'] = [0]
+
+      if (orig_name_setting_dict['default_value'] in ['with_color_tags', 'without_color_tags']
+          and arguments_list is not None):
+        for argument_dict in arguments_list:
+          if argument_dict['element_type'] == 'color_tag':
+            argument_dict['element_type'] = 'enum'
+            argument_dict['element_enum_type'] = 'GimpColorTag'
+            argument_dict['element_excluded_values'] = [0]
+            argument_dict['element_default_value'] = [1]
+
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,

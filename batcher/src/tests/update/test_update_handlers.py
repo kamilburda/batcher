@@ -3,6 +3,10 @@ import os
 import unittest
 import unittest.mock as mock
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
@@ -188,3 +192,33 @@ class TestUpdateHandlers(unittest.TestCase):
         self.settings['main/procedures/export/arguments/use_file_extension_in_item_name'],
         self.settings['main/procedures/export/arguments/convert_file_extension_to_lowercase'],
       ])
+
+    self.assertIsInstance(
+      self.settings['main/procedures/insert_background/arguments/color_tag'],
+      pg.setting.EnumSetting)
+    self.assertEquals(
+      self.settings['main/procedures/insert_background/arguments/color_tag'].enum_type,
+      Gimp.ColorTag)
+    self.assertEquals(
+      self.settings['main/procedures/insert_background/arguments/color_tag'].excluded_values,
+      [Gimp.ColorTag.NONE])
+
+    self.assertIsInstance(
+      self.settings['main/procedures/insert_background_2/arguments/color_tag'],
+      pg.setting.EnumSetting)
+    self.assertEquals(
+      self.settings['main/procedures/insert_background_2/arguments/color_tag'].enum_type,
+      Gimp.ColorTag)
+    self.assertEquals(
+      self.settings['main/procedures/insert_background_2/arguments/color_tag'].excluded_values,
+      [Gimp.ColorTag.NONE])
+
+    self.assertIsInstance(
+      self.settings['main/constraints/not_background/arguments/color_tag'],
+      pg.setting.EnumSetting)
+    self.assertEquals(
+      self.settings['main/constraints/not_background/arguments/color_tag'].enum_type,
+      Gimp.ColorTag)
+    self.assertEquals(
+      self.settings['main/constraints/not_background/arguments/color_tag'].excluded_values,
+      [Gimp.ColorTag.NONE])
