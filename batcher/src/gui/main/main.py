@@ -468,7 +468,23 @@ class BatchLayerProcessingQuickGui:
 
     self._settings['gui/show_quick_settings'].set_value(self._should_show_dialog_next_time())
 
-    self._settings.save()
+    settings_to_save = [
+      self._settings['gui'],
+    ]
+
+    if self._mode == 'export':
+      settings_to_save.extend([
+        self._settings['main/file_extension'],
+        self._settings['main/output_directory'],
+        self._settings['main/name_pattern'],
+        self._settings['main/overwrite_mode'],
+        self._settings['main/export'],
+      ])
+
+    # Save only select settings as e.g. constraints are modified by Export/Edit
+    # Selected Layers. We cannot use 'ignore_save' on procedures or constraints
+    # as that would save empty groups, effectively erasing them.
+    pg.setting.Persistor.save(settings_to_save)
 
     Gtk.main_quit()
 
