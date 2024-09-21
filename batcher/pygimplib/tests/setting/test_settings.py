@@ -820,6 +820,26 @@ class TestCreateEnumSetting(SettingTestCase):
     self.assertEqual(setting.enum_type, Gimp.Precision)
     self.assertEqual(setting.pdb_type, Gimp.Precision)
 
+  def test_with_excluded_values(self):
+    setting = settings_.EnumSetting(
+      'precision', Gimp.Precision,
+      default_value=Gimp.Precision.DOUBLE_GAMMA,
+      excluded_values=[Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR],
+    )
+
+    self.assertEqual(
+      setting.excluded_values, [Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR])
+
+  def test_with_excluded_values_ints_are_converted_to_enum_values(self):
+    setting = settings_.EnumSetting(
+      'precision', Gimp.Precision,
+      default_value=Gimp.Precision.DOUBLE_GAMMA,
+      excluded_values=[650, 600],
+    )
+
+    self.assertEqual(
+      setting.excluded_values, [Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR])
+
 
 class TestEnumSetting(SettingTestCase):
 
@@ -862,6 +882,24 @@ class TestEnumSetting(SettingTestCase):
         'type': 'enum',
         'enum_type': 'GimpPrecision',
         'default_value': 750,
+      })
+
+  def test_to_dict_with_excluded_values(self):
+    setting = settings_.EnumSetting(
+      'precision', Gimp.Precision,
+      default_value=Gimp.Precision.DOUBLE_GAMMA,
+      excluded_values=[Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR],
+    )
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'precision',
+        'value': 750,
+        'type': 'enum',
+        'enum_type': 'GimpPrecision',
+        'default_value': 750,
+        'excluded_values': [650, 600],
       })
 
   def test_set_value_with_int(self):

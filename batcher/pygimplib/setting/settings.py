@@ -1297,6 +1297,9 @@ class EnumSetting(Setting):
 
     settings_dict['enum_type'] = self.enum_type.__gtype__.name
 
+    if 'excluded_values' in settings_dict:
+      settings_dict['excluded_values'] = [int(value) for value in self.excluded_values]
+
     return settings_dict
 
   def _assign_value(self, value):
@@ -1349,10 +1352,9 @@ class EnumSetting(Setting):
 
     return processed_enum_type
 
-  @staticmethod
-  def _process_excluded_values(excluded_values):
+  def _process_excluded_values(self, excluded_values):
     if excluded_values is not None:
-      return list(excluded_values)
+      return [self.enum_type(value) for value in excluded_values]
     else:
       return []
 
