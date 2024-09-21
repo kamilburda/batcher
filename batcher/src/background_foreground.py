@@ -151,12 +151,15 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
     batcher.current_raw_item.set_visible(True)
     
     merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
-    merged_layer.set_name(name)
+
+    # Avoid errors if merge failed for some reason.
+    if merged_layer is not None:
+      merged_layer.set_name(name)
+
+      batcher.current_raw_item = merged_layer
     
-    batcher.current_raw_item = merged_layer
-    
-    batcher.current_raw_item.set_visible(visible)
-    batcher.current_raw_item.set_color_tag(orig_color_tag)
+      batcher.current_raw_item.set_visible(visible)
+      batcher.current_raw_item.set_color_tag(orig_color_tag)
 
 
 def get_background_layer(batcher):
