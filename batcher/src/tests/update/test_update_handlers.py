@@ -203,6 +203,10 @@ class TestUpdateHandlers(unittest.TestCase):
       self.settings['main/procedures/insert_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
+    self.assertEquals(
+      self.settings['main/procedures/merge_background/arguments/merge_type'].excluded_values,
+      [Gimp.MergeType.FLATTEN_IMAGE])
+
     self.assertIsInstance(
       self.settings['main/procedures/insert_background_2/arguments/color_tag'],
       pg.setting.EnumSetting)

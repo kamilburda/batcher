@@ -600,6 +600,12 @@ def _update_to_0_5(data, _settings, source_names):
             argument_dict['enum_type'] = 'GimpColorTag'
             argument_dict['excluded_values'] = [0]
 
+      if (orig_name_setting_dict['default_value'] in ['merge_background', 'merge_foreground']
+          and arguments_list is not None):
+        for argument_dict in arguments_list:
+          if argument_dict['name'] == 'merge_type':
+            argument_dict['excluded_values'] = [3]
+
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
 
     if constraints_list is None:

@@ -435,6 +435,7 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'merge_type',
         'enum_type': Gimp.MergeType,
         'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
         'display_name': _('Merge type'),
       },
       {
@@ -457,6 +458,7 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'merge_type',
         'enum_type': Gimp.MergeType,
         'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
         'display_name': _('Merge type'),
       },
       {
