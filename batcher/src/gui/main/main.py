@@ -388,13 +388,15 @@ class BatchLayerProcessingQuickGui:
 
   _DEFAULT_DIALOG_WIDTH = 500
 
-  def __init__(self, layer_tree, settings, _source_name, mode):
+  def __init__(self, layer_tree, settings, _source_name, mode, title=None):
     self._layer_tree = layer_tree
     self._settings = settings
 
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
     self._mode = mode
+
+    self._title = title
 
     self._image = self._layer_tree.image
 
@@ -414,14 +416,7 @@ class BatchLayerProcessingQuickGui:
       self._run_batcher_quick()
 
   def _init_gui(self):
-    if self._mode == 'edit':
-      title = _('Edit Layers (Quick)')
-    elif self._mode == 'export':
-      title = _('Export Layers (Quick)')
-    else:
-      title = None
-
-    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
+    self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DEFAULT_DIALOG_WIDTH, -1)
 

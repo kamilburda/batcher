@@ -77,7 +77,7 @@ def plug_in_batch_export_layers_quick(
       EXPORT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export'))
+      gui_class_kwargs=dict(mode='export', title=_('Export Layers (Quick)')))
   else:
     return _run_with_last_vals(
       SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
@@ -95,7 +95,7 @@ def plug_in_batch_export_selected_layers(
       EXPORT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export'),
+      gui_class_kwargs=dict(mode='export', title=_('Export Selected Layers')),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
@@ -139,7 +139,7 @@ def plug_in_batch_edit_layers_quick(
       EDIT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit'))
+      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers (Quick)')))
   else:
     return _run_with_last_vals(
       SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
@@ -157,7 +157,7 @@ def plug_in_batch_edit_selected_layers(
       EDIT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit'),
+      gui_class_kwargs=dict(mode='edit', title=_('Edit Selected Layers')),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
