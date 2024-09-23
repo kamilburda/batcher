@@ -23,7 +23,7 @@ from src.path import fileext
 from src.path import validators as validators_
 
 
-EXPORT_ITEM_STATE_NAME = 'export'
+EXPORT_NAME_ITEM_STATE = 'export_name'
 
 
 class FileFormatModes:
@@ -127,9 +127,9 @@ def export(
       else:
         item_to_process = current_top_level_item
 
-    item_to_process.save_state(EXPORT_ITEM_STATE_NAME)
-
     if batcher.process_names:
+      item_to_process.save_state(EXPORT_NAME_ITEM_STATE)
+
       if use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
           item_to_process, default_file_extension, file_extension_properties)
@@ -220,7 +220,7 @@ def _get_top_level_item(item):
 def _process_parent_names(item, item_uniquifier, processed_parents):
   for parent in item.parents:
     if parent not in processed_parents:
-      parent.save_state(EXPORT_ITEM_STATE_NAME)
+      parent.save_state(EXPORT_NAME_ITEM_STATE)
 
       _validate_name(parent)
       _uniquify_name(item_uniquifier, parent)
@@ -318,12 +318,12 @@ def _uniquify_name(item_uniquifier, item, position=None):
 
 
 def _get_item_export_name(item):
-  item_state = item.get_named_state(EXPORT_ITEM_STATE_NAME)
-  return item_state['name'] if item_state is not None else None
+  item_state = item.get_named_state(EXPORT_NAME_ITEM_STATE)
+  return item_state['name'] if item_state is not None else item.name
 
 
 def _set_item_export_name(item, name):
-  item.get_named_state(EXPORT_ITEM_STATE_NAME)['name'] = name
+  item.get_named_state(EXPORT_NAME_ITEM_STATE)['name'] = name
 
 
 def _get_unique_substring_position(str_, file_extension):

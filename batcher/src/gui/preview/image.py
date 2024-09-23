@@ -28,6 +28,7 @@ from . import base as preview_base_
 from src import actions
 from src import builtin_constraints
 from src import exceptions
+from src import export as export_
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -131,13 +132,13 @@ class ImagePreview(preview_base_.Preview):
     if self.item.type != pg.itemtree.TYPE_FOLDER:
       self._is_updating = True
 
-      self._set_item_name_label(self.item.name)
+      self._set_item_name_label(self.item)
       
       if self._is_preview_image_allocated_size:
         self._set_contents()
     else:
       self._set_pixbuf(self._folder_icon)
-      self._set_item_name_label(self.item.name)
+      self._set_item_name_label(self.item)
   
   def clear(self, use_item_name=False):
     self.item = None
@@ -182,7 +183,7 @@ class ImagePreview(preview_base_.Preview):
       item = self._batcher.item_tree[raw_item]
       if self._batcher.item_tree.filter.is_match(item):
         self.item = item
-        self._set_item_name_label(self.item.name)
+        self._set_item_name_label(self.item)
   
   def prepare_image_for_rendering(
         self,
@@ -517,11 +518,17 @@ class ImagePreview(preview_base_.Preview):
   def _scale_pixbuf(pixbuf, width, height):
     return pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
 
-  def _set_item_name_label(self, item_name):
+  def _set_item_name_label(self, item):
+    if not self._batcher.edit_mode:
+      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
+      item_name = item_state['name'] if item_state is not None else item.name
+    else:
+      item_name = item.name
+
     self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
 
   def _set_no_selection_label(self):
-    self._set_item_name_label(_('No selection'))
+    self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
 
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)

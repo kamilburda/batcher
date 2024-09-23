@@ -511,7 +511,7 @@ class NamePreview(preview_base_.Preview):
 
   def _get_item_name(self, item):
     if not self._batcher.edit_mode:
-      item_state = item.get_named_state(export_.EXPORT_ITEM_STATE_NAME)
+      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
       return item_state['name'] if item_state is not None else item.name
     else:
       return item.name
