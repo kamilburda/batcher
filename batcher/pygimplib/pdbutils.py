@@ -4,6 +4,7 @@ available in the GIMP procedural database (PDB) or the GIMP API.
 
 from collections.abc import Iterable
 import contextlib
+import inspect
 import os
 from typing import List, Optional, Union
 
@@ -187,12 +188,16 @@ def _find_item_by_name_in_children(item_name, children):
 
 def _get_children_from_image(image, item_class_name):
   item_type = getattr(Gimp, item_class_name, None)
-  
-  if item_type == Gimp.Layer:
+
+  if not inspect.isclass(item_type):
+    raise TypeError(
+      f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
+
+  if issubclass(item_type, Gimp.Layer):
     return image.list_layers()
-  elif item_type == Gimp.Channel:
+  elif issubclass(item_type, Gimp.Channel):
     return image.list_channels()
-  elif item_type == Gimp.Vectors:
+  elif issubclass(item_type, Gimp.Vectors):
     return image.list_vectors()
   else:
     raise TypeError(
