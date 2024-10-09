@@ -21,7 +21,8 @@ Other changes:
 
 Bug fixes:
 * Fixed unchangeable file extension in Export Layers (Quick).
-* Fixed overwrite prompt not being displayed for `Export` procedures for Edit Layers. 
+* Fixed overwrite prompt not being displayed for `Export` procedures for Edit Layers.
+* Fixed a crash when starting the plug-in if text layer(s) were selected in the preview and plug-in settings were saved.
 * Fixed a crash when in-dialog warning messages were displayed on plug-in startup (e.g. if the plug-in was saved with an ill-formatted file extension).
 
 
