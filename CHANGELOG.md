@@ -18,6 +18,7 @@ Changes to the `Export` procedure:
 
 Other changes:
 * The `Rename` procedure for Export Layers now performs renaming on top of the default renaming (the text entry next to `Name`) instead of overriding it.
+* File load and file save procedures can no longer be added as custom procedures due to being redundant (loading a file would have no effect and file save procedures are already covered by the `Export` procedure).
 
 Bug fixes:
 * Fixed unchangeable file extension in Export Layers (Quick).
