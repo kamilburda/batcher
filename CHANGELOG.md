@@ -24,6 +24,7 @@ Bug fixes:
 * Fixed overwrite prompt not being displayed for `Export` procedures for Edit Layers.
 * Fixed a crash when starting the plug-in if text layer(s) were selected in the preview and plug-in settings were saved.
 * Fixed a crash when in-dialog warning messages were displayed on plug-in startup (e.g. if the plug-in was saved with an ill-formatted file extension).
+* Removed the "Flatten" option from `Merge Back-/Foreground` as it was unsupported and caused merging to fail.
 
 
 ## 0.4
