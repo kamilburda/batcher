@@ -241,9 +241,6 @@ class SettingsManager:
     for setting in size_settings_to_ignore_for_load:
       setting.tags.discard('ignore_load')
 
-    if self._previews_controller is not None:
-      self._previews_controller.unlock_and_update_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
-
     if status == update.TERMINATE:
       display_load_save_settings_failure_message(
         _(('Failed to load settings from file "{}".'
@@ -254,9 +251,11 @@ class SettingsManager:
       self.reset_settings()
       actions_.clear(self._settings['main/procedures'])
       actions_.clear(self._settings['main/constraints'])
-      return False
 
-    return True
+    if self._previews_controller is not None:
+      self._previews_controller.unlock_and_update_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
+
+    return status != update.TERMINATE
 
   def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
     if action == 'load':
