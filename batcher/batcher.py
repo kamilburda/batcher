@@ -260,26 +260,26 @@ def _load_and_update_settings(settings, source_name, run_mode):
     return True, ''
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
-    response = messages_.display_message(
-      (_('Settings for this plug-in could not be loaded and must be reset. Proceed?')
-       + '\n'
-       + _('Details: {}').format(load_message)),
-      Gtk.MessageType.WARNING,
-      buttons=Gtk.ButtonsType.YES_NO,
-      button_response_id_to_focus=Gtk.ResponseType.NO)
+    messages_.display_alert_message(
+      title=pg.config.PLUGIN_TITLE,
+      message_type=Gtk.MessageType.WARNING,
+      message_markup=_(
+        'Settings for this plug-in could not be updated to the latest version'
+        ' and must be reset.'),
+      message_secondary_markup=_(
+        'If you believe this is an error in the plug-in, you can help fix it'
+        ' by sending a report with the text under the details.'),
+      display_details_initially=False,
+      details=load_message,
+      report_description=_(
+        'Send a report with the text in the details above to one of the following sites'),
+      report_uri_list=pg.config.BUG_REPORT_URL_LIST)
 
-    if response == Gtk.ResponseType.YES:
-      pg.setting.Persistor.clear()
-      actions_.clear(settings['main/procedures'])
-      actions_.clear(settings['main/constraints'])
+    pg.setting.Persistor.clear()
+    actions_.clear(settings['main/procedures'])
+    actions_.clear(settings['main/constraints'])
 
-      return True, ''
-    else:
-      return (
-        False,
-        (_('Settings could not be loaded and were not reset.')
-         + '\n\n'
-         + _('Details: {}').format(load_message)))
+    return True, ''
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     pg.setting.Persistor.clear()
 
