@@ -165,7 +165,7 @@ def display_alert_message(
     )
 
     details_widget = _get_details_widget(details)
-    vbox_details.pack_start(details_widget, False, False, 0)
+    vbox_details.pack_start(details_widget, True, True, 0)
 
     if report_uri_list:
       vbox_labels_report = _get_report_link_buttons_and_copy_icon(
@@ -181,9 +181,9 @@ def display_alert_message(
       orientation=Gtk.Orientation.VERTICAL,
       border_width=6,
     )
-    vbox_expander.pack_start(expander, False, False, 0)
+    vbox_expander.pack_start(expander, True, True, 0)
 
-    dialog.vbox.pack_start(vbox_expander, False, False, 0)
+    dialog.vbox.pack_start(vbox_expander, True, True, 0)
   else:
     details_widget = None
 
@@ -232,6 +232,7 @@ def _get_details_widget(details_text):
     shadow_type=Gtk.ShadowType.IN,
     hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
     vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+    vexpand=True,
   )
 
   exception_text_view = Gtk.TextView(
