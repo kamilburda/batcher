@@ -2,6 +2,8 @@
 
 from typing import Dict, List, Optional, Tuple, Union
 
+import traceback
+
 import pygimplib as pg
 
 from src import actions as actions_
@@ -88,7 +90,16 @@ def load_and_update(
   current_version = None
   previous_version = None
 
-  load_result = settings.load(sources, modify_data_func=_handle_update)
+  try:
+    load_result = settings.load(sources, modify_data_func=_handle_update)
+  except Exception:
+    # Gracefully exit the update upon an exception not caught by
+    # `setting.Persistor.load()`.
+    # This should be handled as early as possible in the client code to avoid
+    # disrupting the plug-in functionality. Ideally, settings should be reset
+    # completely.
+    return TERMINATE, traceback.format_exc()
+
   load_message = utils_.format_message_from_persistor_statuses(load_result)
 
   if any(status == pg.setting.Persistor.FAIL
