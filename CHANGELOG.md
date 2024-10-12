@@ -1,4 +1,6 @@
-## Upcoming
+## 0.5
+
+### October 12, 2024
 
 Changes to the export settings:
 * Added a button named `Options...` in the main dialog to adjust options previously only available when adding the `Export` procedure.

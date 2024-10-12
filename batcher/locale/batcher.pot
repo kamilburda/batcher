@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 0.4.0\n"
+"Project-Id-Version: 'batcher' 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-12 10:11+0200\n"
+"POT-Creation-Date: 2024-10-12 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -654,7 +654,7 @@ msgid "Export Layers"
 msgstr ""
 
 #: ../../batcher/src/gui/main/main.py:151
-#: ../../batcher/src/gui/main/main.py:446
+#: ../../batcher/src/gui/main/main.py:453
 msgid "_Export"
 msgstr ""
 
@@ -664,7 +664,7 @@ msgstr ""
 
 #: ../../batcher/src/gui/main/main.py:158
 #: ../../batcher/src/gui/main/main.py:348
-#: ../../batcher/src/gui/main/main.py:449
+#: ../../batcher/src/gui/main/main.py:456
 #: ../../batcher/src/gui/main/settings_manager.py:281
 msgid "_Cancel"
 msgstr ""
@@ -677,7 +677,7 @@ msgstr ""
 msgid "_Help"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:441
+#: ../../batcher/src/gui/main/main.py:448
 msgid "Show this dialog"
 msgstr ""
 
