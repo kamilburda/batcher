@@ -1216,9 +1216,13 @@ class TestGimpItemSetting(SettingTestCase):
   def test_set_value_with_list(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = [self.image]
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.list_layers()
 
-      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
+        self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
     
     self.assertEqual(self.setting.value, self.layer)
   
@@ -1228,9 +1232,13 @@ class TestGimpItemSetting(SettingTestCase):
     
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = [self.image]
-      
-      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'layer'])
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.list_layers()
+
+        self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'layer'])
     
     self.assertEqual(self.setting.value, self.layer)
   
@@ -1241,29 +1249,41 @@ class TestGimpItemSetting(SettingTestCase):
   def test_set_value_with_list_no_matching_image_returns_none(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = []
-      
-      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = []
+        temp_mock_get_children_from_image.return_value = []
+
+        self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group1/group2/layer'])
     
     self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_layer_returns_none(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = [self.image]
-      
-      self.setting.set_value(
-        [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/some_other_layer'])
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.list_layers()
+
+        self.setting.set_value(
+          [os.path.abspath('image_filepath'), 'Layer', 'group1/group2/some_other_layer'])
     
     self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_parent_returns_none(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = [self.image]
-      
-      self.setting.set_value(
-        [os.path.abspath('image_filepath'), 'Layer', 'group1/some_other_group2/layer'])
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.list_layers()
+
+        self.setting.set_value(
+          [os.path.abspath('image_filepath'), 'Layer', 'group1/some_other_group2/layer'])
     
     self.assertIsNone(self.setting.value)
   
@@ -1372,9 +1392,13 @@ class TestLayerMaskSetting(SettingTestCase):
   def test_set_value_with_list_containing_layer_path(self):
     with mock.patch(
           f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.return_value = [self.image]
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.list_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.list_layers()
 
-      self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group/layer'])
+        self.setting.set_value([os.path.abspath('image_filepath'), 'Layer', 'group/layer'])
 
     self.assertEqual(self.setting.value, self.mask)
 
