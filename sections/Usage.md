@@ -13,8 +13,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 
 ![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
 
-To export layers, press the `Export` button.
-If your chosen file format can be tweaked (e.g. compression level for PNG images), a dialog with file format settings will be displayed, allowing you to adjust them.
+To export layers, simply press the `Export` button.
 
 Below you will find more information on adjusting the export settings.
 
@@ -22,7 +21,7 @@ Below you will find more information on adjusting the export settings.
 ### Changing Filenames
 
 By default, layer names are used as filenames.
-The text entry next to `Save as` lets you customize the filenames.
+The text entry next to `Name` lets you customize the filenames.
 
 For details, see [Adjusting Filenames](Customization.md#adjusting-layer-names-filenames).
 
@@ -36,6 +35,18 @@ If a file format contains multiple file extensions, the first is selected by def
 
 For now, the dropdown only contains a fixed list of file formats provided by GIMP and some recognized third-party plug-ins.
 However, you can still enter a file extension not in the list in case you use an unrecognized file format plug-in.
+
+
+### Export Options
+
+For Export Layers, pressing the `Options...` button reveals additional export options.
+
+The most important for you will likely be file format options (compression for PNG, image quality for JPG, etc.).
+
+All options are described in [Export Options](Customization.md#export-options).
+
+If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
+You will be prompted to set the file format options right after you press the `Export` button.
 
 
 ### Procedures and Constraints
@@ -52,14 +63,15 @@ For details, see [Procedures](Customization.md#procedures) and [Constraints](Cus
 
 ## Quick Export of Layers
 
-If you need a simple export without customization, you can run `File → Export Layers (Quick)`.
-This can also be useful if you made changes to your image and you want to export again with the same settings.
+If you made changes to your image and you want to export again with the same settings, or you need a simple export without customization, you can run `File → Export Layers (Quick)`.
 
 For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
 
 ![Dialog of Export Layers (Quick)](../images/screenshot_dialog_export_layers_quick.png)
 
 This dialog can be skipped by simply unchecking `Show this dialog`.
+
+Note that even procedures and constraints set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
 
 ## Quick Export of Selected Layers
@@ -129,10 +141,11 @@ You can turn auto-closing the main dialog on/off by checking/unchecking `Setting
 
 ## Known Issues
 
-Sometimes, after you press the Export button, it may seem as though nothing happens.
-In that case, the file format dialog may be displayed behind GIMP. If so, simply select the dialog to bring it up.
+If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
+In that case, the file format dialog may be displayed behind GIMP.
+If so, simply select the dialog in the taskbar to bring it up.
 
-The following file formats require displaying the file format dialog for each image to be exported, not just the first image:
+The following file formats require displaying a file format dialog for each image to be exported:
 * C source,
 * HTML.
 
