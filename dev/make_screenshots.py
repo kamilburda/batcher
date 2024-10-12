@@ -70,9 +70,13 @@ def main():
     run_gui_func=take_screenshots_for_edit_layers,
   )
 
-  take_screenshots_for_export_layers_quick(
+  gui_main.BatchLayerProcessingQuickGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
+    EXPORT_LAYERS_SOURCE_NAME,
+    'export',
+    title='Export Layers (Quick)',
+    run_gui_func=take_screenshots_for_export_layers_quick,
   )
 
   for _i in range(Gtk.main_level()):
@@ -87,14 +91,17 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
   
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
-  
-  gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['main-background'].raw})
-  
+
+  # HACK: Wait until the preview is updated.
+  time.sleep(0.1)
+
   while Gtk.events_pending():
     Gtk.main_iteration()
-  
+
   dialog.set_focus(None)
-  
+
+  gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['main-background'].raw})
+
   while Gtk.events_pending():
     Gtk.main_iteration()
   
@@ -130,33 +137,18 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   gui.procedure_list.browser.widget.hide()
 
 
-def take_screenshots_for_export_layers_quick(layer_tree, settings):
-  gui = gui_main.QuickSettingsGui(
-    layer_tree.image,
-    settings,
-    'export',
-  )
+def take_screenshots_for_edit_layers(gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
-  decoration_offsets = move_dialog_to_corner(gui.dialog)
+  # HACK: Wait until the preview is updated.
+  time.sleep(0.1)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
 
-  take_and_process_screenshot(
-    SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME,
-    settings,
-    decoration_offsets,
-    crop_to=gui.dialog.get_size(),
-  )
-
-
-def take_screenshots_for_edit_layers(gui, dialog, settings):
-  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+  dialog.set_focus(None)
 
   gui.name_preview.set_selected_items({gui.name_preview.batcher.item_tree['main-background'].raw})
-
-  dialog.set_focus(None)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -166,6 +158,21 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
     SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
     settings,
     decoration_offsets,
+  )
+
+
+def take_screenshots_for_export_layers_quick(_gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog)
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME,
+    settings,
+    decoration_offsets,
+    crop_to=dialog.get_size(),
   )
 
 
