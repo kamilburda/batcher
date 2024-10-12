@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: batcher 0.4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-13 13:54+0200\n"
+"POT-Creation-Date: 2024-10-12 10:11+0200\n"
 "PO-Revision-Date: 2017-09-07 00:03+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,22 +18,46 @@ msgstr ""
 "X-Generator: Poedit 2.0.3\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../../batcher/batcher.py:264
+#: ../../batcher/batcher.py:80
+msgid "Export Layers (Quick)"
+msgstr ""
+
+#: ../../batcher/batcher.py:98
+msgid "Export Selected Layers"
+msgstr ""
+
+#: ../../batcher/batcher.py:142
+msgid "Edit Layers (Quick)"
+msgstr ""
+
+#: ../../batcher/batcher.py:160
+msgid "Edit Selected Layers"
+msgstr ""
+
+#: ../../batcher/batcher.py:267
 msgid ""
-"Settings for this plug-in could not be loaded and must be reset. Proceed?"
+"Settings for this plug-in could not be updated to the latest version and "
+"must be reset."
 msgstr ""
 
-#: ../../batcher/batcher.py:266 ../../batcher/batcher.py:282
-#: ../../batcher/batcher.py:290 ../../batcher/batcher.py:311
-msgid "Details: {}"
+#: ../../batcher/batcher.py:270
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text under the details."
 msgstr ""
 
-#: ../../batcher/batcher.py:280
-msgid "Settings could not be loaded and were not reset."
+#: ../../batcher/batcher.py:275
+msgid ""
+"Send a report with the text in the details above to one of the following "
+"sites"
 msgstr ""
 
 #: ../../batcher/batcher.py:288
 msgid "Settings could not be loaded and had to be reset."
+msgstr ""
+
+#: ../../batcher/batcher.py:290 ../../batcher/batcher.py:311
+msgid "Details: {}"
 msgstr ""
 
 #: ../../batcher/batcher.py:301
@@ -92,35 +116,35 @@ msgstr ""
 msgid "Batch-edit selected layers instantly"
 msgstr ""
 
-#: ../../batcher/config/config.py:13 ../../batcher/config/config_dev.py:13
+#: ../../batcher/config/config.py:14 ../../batcher/config/config_dev.py:14
 msgid "Batcher"
 msgstr ""
 
-#: ../../batcher/src/actions.py:426
+#: ../../batcher/src/actions.py:424
 msgid "Built-in"
 msgstr ""
 
-#: ../../batcher/src/actions.py:427
+#: ../../batcher/src/actions.py:425
 msgid "GIMP PDB procedure"
 msgstr ""
 
-#: ../../batcher/src/actions.py:474
+#: ../../batcher/src/actions.py:472
 msgid "_More options"
 msgstr ""
 
-#: ../../batcher/src/actions.py:484
+#: ../../batcher/src/actions.py:482
 msgid "Enable for previews"
 msgstr ""
 
-#: ../../batcher/src/actions.py:547
+#: ../../batcher/src/actions.py:545
 msgid "Also apply to parent folders"
 msgstr ""
 
-#: ../../batcher/src/background_foreground.py:168
+#: ../../batcher/src/background_foreground.py:171
 msgid "There are no background layers."
 msgstr ""
 
-#: ../../batcher/src/background_foreground.py:177
+#: ../../batcher/src/background_foreground.py:180
 msgid "There are no foreground layers."
 msgstr ""
 
@@ -137,270 +161,321 @@ msgstr ""
 msgid "Not background"
 msgstr ""
 
-#: ../../batcher/src/builtin_constraints.py:106
-#: ../../batcher/src/builtin_constraints.py:130
-#: ../../batcher/src/builtin_procedures.py:243
-#: ../../batcher/src/builtin_procedures.py:272
+#: ../../batcher/src/builtin_constraints.py:108
+#: ../../batcher/src/builtin_constraints.py:134
+#: ../../batcher/src/builtin_procedures.py:376
+#: ../../batcher/src/builtin_procedures.py:407
 msgid "Color tag"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers that are not foreground" when translating this
-#: ../../batcher/src/builtin_constraints.py:123
+#: ../../batcher/src/builtin_constraints.py:125
 msgid "Not foreground"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers matching file extension" when translating this
-#: ../../batcher/src/builtin_constraints.py:147
+#: ../../batcher/src/builtin_constraints.py:151
 msgid "Matching file extension"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers selected in GIMP" when translating this
-#: ../../batcher/src/builtin_constraints.py:155
+#: ../../batcher/src/builtin_constraints.py:159
 msgid "Selected in GIMP"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers selected in preview" when translating this
-#: ../../batcher/src/builtin_constraints.py:163
+#: ../../batcher/src/builtin_constraints.py:167
 msgid "Selected in preview"
 msgstr ""
 
-#: ../../batcher/src/builtin_constraints.py:170
-#: ../../batcher/src/plugin_settings.py:84
-#: ../../batcher/src/plugin_settings.py:188
+#: ../../batcher/src/builtin_constraints.py:174
+#: ../../batcher/src/plugin_settings.py:75
+#: ../../batcher/src/plugin_settings.py:196
 msgid "Selected layers"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only top-level layers" when translating this
-#: ../../batcher/src/builtin_constraints.py:180
+#: ../../batcher/src/builtin_constraints.py:184
 msgid "Top-level"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only visible layers" when translating this
-#: ../../batcher/src/builtin_constraints.py:188
+#: ../../batcher/src/builtin_constraints.py:192
 msgid "Visible"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers with color tags" when translating this
-#: ../../batcher/src/builtin_constraints.py:196
+#: ../../batcher/src/builtin_constraints.py:200
 msgid "With color tags"
 msgstr ""
 
-#: ../../batcher/src/builtin_constraints.py:202
-#: ../../batcher/src/builtin_constraints.py:219
+#: ../../batcher/src/builtin_constraints.py:206
+#: ../../batcher/src/builtin_constraints.py:226
 msgid "Color tags"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only layers without color tags" when translating this
-#: ../../batcher/src/builtin_constraints.py:213
+#: ../../batcher/src/builtin_constraints.py:220
 msgid "Without color tags"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:228
+#: ../../batcher/src/builtin_procedures.py:229 ../../batcher/src/renamer.py:450
+#: ../../batcher/src/update.py:561
+msgid "Replace"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:230 ../../batcher/src/update.py:562
+msgid "Skip"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:231 ../../batcher/src/update.py:563
+msgid "Rename new file"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:232 ../../batcher/src/update.py:564
+msgid "Rename existing file"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:242 ../../batcher/src/update.py:560
+msgid "Ask"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:250
+msgid "Also export as..."
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:251
+msgid "Exports a layer to another file format."
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:259
+#: ../../batcher/src/plugin_settings.py:43
+msgid "Output folder"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:266
+#: ../../batcher/src/plugin_settings.py:34
+msgid "File extension"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:277 ../../batcher/src/update.py:593
+msgid "Interactively"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:280 ../../batcher/src/update.py:596
+msgid "Use options below"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:282 ../../batcher/src/update.py:598
+msgid "How to adjust file format options:"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:284 ../../batcher/src/update.py:600
+msgid ""
+"Native dialogs usually allow you to adjust more options such as image "
+"metadata, while adjusting options in place is more convenient as no extra "
+"dialog is displayed before the export."
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:295 ../../batcher/src/update.py:581
+msgid "File format options"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:302 ../../batcher/src/update.py:566
+msgid "If a file already exists:"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:309
+msgid "For each layer"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:311
+msgid "For each top-level layer or group"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:314
+msgid "For the entire image at once"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:317
+msgid "Perform export:"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:323
+msgid "Image filename pattern"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:330
+msgid "Use file extension in layer name"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:337
+msgid "Convert file extension to lowercase"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:349
+msgid "Export"
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:350
+msgid "Exports a layer to the specified file format."
+msgstr ""
+
+#: ../../batcher/src/builtin_procedures.py:359
 msgid "Apply opacity from layer groups"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:229
+#: ../../batcher/src/builtin_procedures.py:360
 msgid "Combines opacity from all parent layer groups and the current layer."
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:235
+#: ../../batcher/src/builtin_procedures.py:366
 msgid "Insert background"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:236
+#: ../../batcher/src/builtin_procedures.py:367
 msgid "Inserts layers having the specified color tag behind the current layer."
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:263
+#: ../../batcher/src/builtin_procedures.py:396
 msgid "Insert foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:265
+#: ../../batcher/src/builtin_procedures.py:398
 msgid ""
 "Inserts layers having the specified color tag in front of the current layer."
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:292
-msgid "Export"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:294
-msgid ""
-"Exports a layer with additional options. Overrides the default export "
-"options."
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:304
-msgid "Output folder"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:311
-#: ../../batcher/src/plugin_settings.py:37
-msgid "File extension"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:320
-msgid "For each layer"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:322
-msgid "For each top-level layer or group"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:325
-msgid "For the entire image at once"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:328
-msgid "Perform export:"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:334
-msgid "Image filename pattern"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:341
-msgid "Use file extension in layer name"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:348
-msgid "Convert file extension to lowercase"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:355
-msgid "Preserve layer name after export"
-msgstr ""
-
-#: ../../batcher/src/builtin_procedures.py:363
+#: ../../batcher/src/builtin_procedures.py:429
 msgid "Merge background"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:372
-#: ../../batcher/src/builtin_procedures.py:394
+#: ../../batcher/src/builtin_procedures.py:439
+#: ../../batcher/src/builtin_procedures.py:462
 msgid "Merge type"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:385
+#: ../../batcher/src/builtin_procedures.py:452
 msgid "Merge foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:407
-#: ../../batcher/src/builtin_procedures.py:413
+#: ../../batcher/src/builtin_procedures.py:475
+#: ../../batcher/src/builtin_procedures.py:481
 msgid "Remove folder structure"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:420
+#: ../../batcher/src/builtin_procedures.py:488
 msgid "Consider visibility of parent folders"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:428
-#: ../../batcher/src/builtin_procedures.py:458
+#: ../../batcher/src/builtin_procedures.py:496
+#: ../../batcher/src/builtin_procedures.py:526
 msgid "Rename"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:436
-#: ../../batcher/src/plugin_settings.py:53
+#: ../../batcher/src/builtin_procedures.py:504
+#: ../../batcher/src/plugin_settings.py:50
 msgid "Layer filename pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:443
-#: ../../batcher/src/builtin_procedures.py:473
+#: ../../batcher/src/builtin_procedures.py:511
+#: ../../batcher/src/builtin_procedures.py:541
 msgid "Rename layers"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:450
+#: ../../batcher/src/builtin_procedures.py:518
 msgid "Rename folders"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:466
+#: ../../batcher/src/builtin_procedures.py:534
 msgid "Layer name pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:480
+#: ../../batcher/src/builtin_procedures.py:548
 msgid "Rename layer groups"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:488
+#: ../../batcher/src/builtin_procedures.py:556
 msgid "Scale"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:495
+#: ../../batcher/src/builtin_procedures.py:563
 msgid "Image"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:500
+#: ../../batcher/src/builtin_procedures.py:568
 msgid "Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:506
+#: ../../batcher/src/builtin_procedures.py:574
 msgid "New width"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:513
-#: ../../batcher/src/builtin_procedures.py:532
+#: ../../batcher/src/builtin_procedures.py:581
+#: ../../batcher/src/builtin_procedures.py:600
 #, python-format
 msgid "% of layer width"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:514
-#: ../../batcher/src/builtin_procedures.py:533
+#: ../../batcher/src/builtin_procedures.py:582
+#: ../../batcher/src/builtin_procedures.py:601
 #, python-format
 msgid "% of layer height"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:515
-#: ../../batcher/src/builtin_procedures.py:534
+#: ../../batcher/src/builtin_procedures.py:583
+#: ../../batcher/src/builtin_procedures.py:602
 #, python-format
 msgid "% of image width"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:516
-#: ../../batcher/src/builtin_procedures.py:535
+#: ../../batcher/src/builtin_procedures.py:584
+#: ../../batcher/src/builtin_procedures.py:603
 #, python-format
 msgid "% of image height"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:517
-#: ../../batcher/src/builtin_procedures.py:536
+#: ../../batcher/src/builtin_procedures.py:585
+#: ../../batcher/src/builtin_procedures.py:604
 msgid "Pixels"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:519
+#: ../../batcher/src/builtin_procedures.py:587
 msgid "Unit for width"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:525
+#: ../../batcher/src/builtin_procedures.py:593
 msgid "New height"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:538
+#: ../../batcher/src/builtin_procedures.py:606
 msgid "Unit for height"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:544
+#: ../../batcher/src/builtin_procedures.py:612
 msgid "Interpolation"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:550
+#: ../../batcher/src/builtin_procedures.py:618
 msgid "Use local origin"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:558
+#: ../../batcher/src/builtin_procedures.py:626
 msgid "Use layer size"
 msgstr ""
 
-#: ../../batcher/src/builtin_procedures.py:559
+#: ../../batcher/src/builtin_procedures.py:627
 msgid ""
 "Resizes the current layer to use the layer size rather than the image size."
 msgstr ""
 
-#: ../../batcher/src/core.py:703
+#: ../../batcher/src/core.py:710
 msgid ""
 "An error occurred. Please check the GIMP error message or the error console "
 "for details, if any."
 msgstr ""
 
-#: ../../batcher/src/core.py:947
+#: ../../batcher/src/core.py:956
 msgid "Processing \"{}\""
 msgstr ""
 
@@ -412,79 +487,77 @@ msgstr "Calques :"
 msgid "File extension:"
 msgstr "Extension des fichiers :"
 
-#: ../../batcher/src/export.py:294
+#: ../../batcher/src/export.py:354
 msgid "Saving \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:79
+#: ../../batcher/src/file_formats.py:189
+msgid "{} image"
+msgstr ""
+
+#: ../../batcher/src/gui/actions/browser.py:76
 msgid "Plug-ins"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:80
+#: ../../batcher/src/gui/actions/browser.py:77
 msgid "GIMP Procedures"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:81
-msgid "File Load Procedures"
-msgstr ""
-
-#: ../../batcher/src/gui/actions/browser.py:82
-msgid "File Save Procedures"
-msgstr ""
-
-#: ../../batcher/src/gui/actions/browser.py:83
+#: ../../batcher/src/gui/actions/browser.py:78
 msgid "Other"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:282
+#: ../../batcher/src/gui/actions/browser.py:286
 msgid "Name"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:298
+#: ../../batcher/src/gui/actions/browser.py:302
 msgid "Menu Name"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:327
+#: ../../batcher/src/gui/actions/browser.py:331
 msgid "Search"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:342
+#: ../../batcher/src/gui/actions/browser.py:346
 msgid "by name"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:346
+#: ../../batcher/src/gui/actions/browser.py:350
 msgid "by menu name"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:350
+#: ../../batcher/src/gui/actions/browser.py:354
 msgid "by description"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:390
+#: ../../batcher/src/gui/actions/browser.py:394
 msgid "Select a procedure"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:415
+#: ../../batcher/src/gui/actions/browser.py:419
 msgid "_Add"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:416
-#: ../../batcher/src/gui/actions/editor.py:40
-#: ../../batcher/src/gui/main/main.py:158
-#: ../../batcher/src/gui/main/main.py:327 ../../batcher/src/gui/messages.py:40
+#: ../../batcher/src/gui/actions/browser.py:420
+#: ../../batcher/src/gui/actions/editor.py:38
+#: ../../batcher/src/gui/main/export_settings.py:246
+#: ../../batcher/src/gui/main/main.py:160
+#: ../../batcher/src/gui/main/main.py:350 ../../batcher/src/gui/messages.py:40
 msgid "_Close"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:37
-#: ../../batcher/src/gui/actions/editor.py:150
+#: ../../batcher/src/gui/actions/editor.py:35
+#: ../../batcher/src/gui/actions/editor.py:153
+#: ../../batcher/src/gui/main/export_settings.py:241
 msgid "_Reset"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:147
+#: ../../batcher/src/gui/actions/editor.py:150
 msgid "_Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:212
+#: ../../batcher/src/gui/actions/editor.py:215
 msgid "Edit Name"
 msgstr ""
 
@@ -496,106 +569,124 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/item.py:150
+#: ../../batcher/src/gui/actions/item.py:149
 msgid "Remove"
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:34
+#: ../../batcher/src/gui/file_format_options_box.py:46
+msgid "{} options"
+msgstr ""
+
+#: ../../batcher/src/gui/file_format_options_box.py:49
+msgid "File format not recognized"
+msgstr ""
+
+#: ../../batcher/src/gui/file_format_options_box.py:57
+msgid "File format has no options"
+msgstr ""
+
+#: ../../batcher/src/gui/main/action_lists.py:35
 msgid "Add P_rocedure..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:36
+#: ../../batcher/src/gui/main/action_lists.py:37
 msgid "Add Custom Procedure..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:37
+#: ../../batcher/src/gui/main/action_lists.py:38
 msgid "Add Custom Procedure"
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:47
+#: ../../batcher/src/gui/main/action_lists.py:48
 msgid "Add C_onstraint..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:94
+#: ../../batcher/src/gui/main/action_lists.py:81
 msgid "This procedure is skipped. Reason: {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:100
+#: ../../batcher/src/gui/main/action_lists.py:87
 msgid "This constraint is skipped. Reason: {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:134
+#: ../../batcher/src/gui/main/action_lists.py:121
 msgid "Procedures"
 msgstr ""
 
-#: ../../batcher/src/gui/main/action_lists.py:148
+#: ../../batcher/src/gui/main/action_lists.py:135
 msgid "Constraints"
 msgstr ""
 
-#: ../../batcher/src/gui/main/batcher_manager.py:73
-#: ../../batcher/src/gui/main/batcher_manager.py:183
+#: ../../batcher/src/gui/main/action_lists.py:433
+msgid "Export as {}"
+msgstr ""
+
+#: ../../batcher/src/gui/main/action_lists.py:435
+msgid "Also export as {}"
+msgstr ""
+
+#: ../../batcher/src/gui/main/batcher_manager.py:74
+#: ../../batcher/src/gui/main/batcher_manager.py:156
 msgid "No layers were exported."
 msgstr "Aucun calque n'a été exporté."
 
-#: ../../batcher/src/gui/main/export_settings.py:61
-msgid "Save in folder:"
-msgstr "Sauvegarder dans le dossier :"
-
-#: ../../batcher/src/gui/main/export_settings.py:78
-msgid "Save as"
+#: ../../batcher/src/gui/main/export_settings.py:56
+msgid "Folder:"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:88 ../../batcher/src/gui/main/main.py:400
+#: ../../batcher/src/gui/main/export_settings.py:79
+msgid "Name:"
+msgstr ""
+
+#: ../../batcher/src/gui/main/export_settings.py:111
+msgid "O_ptions..."
+msgstr ""
+
+#: ../../batcher/src/gui/main/export_settings.py:235
+msgid "Export Options"
+msgstr ""
+
+#: ../../batcher/src/gui/main/main.py:89
 msgid "Edit Layers"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:90 ../../batcher/src/gui/main/main.py:402
+#: ../../batcher/src/gui/main/main.py:91
 msgid "Export Layers"
 msgstr "Exporter les calques"
 
-#: ../../batcher/src/gui/main/main.py:149
-#: ../../batcher/src/gui/main/main.py:537
+#: ../../batcher/src/gui/main/main.py:151
+#: ../../batcher/src/gui/main/main.py:446
 msgid "_Export"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:151
-#: ../../batcher/src/gui/main/main.py:539
+#: ../../batcher/src/gui/main/main.py:153
 msgid "_Run"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:156
-#: ../../batcher/src/gui/main/main.py:325
-#: ../../batcher/src/gui/main/main.py:541
-#: ../../batcher/src/gui/main/settings_manager.py:282
+#: ../../batcher/src/gui/main/main.py:158
+#: ../../batcher/src/gui/main/main.py:348
+#: ../../batcher/src/gui/main/main.py:449
+#: ../../batcher/src/gui/main/settings_manager.py:281
 msgid "_Cancel"
 msgstr "Annuler [C]"
 
-#: ../../batcher/src/gui/main/main.py:160
-#: ../../batcher/src/gui/main/main.py:412
+#: ../../batcher/src/gui/main/main.py:162
 msgid "_Stop"
 msgstr "_Stop"
 
-#: ../../batcher/src/gui/main/main.py:338
+#: ../../batcher/src/gui/main/main.py:361
 msgid "_Help"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:508
-msgid "Edit Layers (Quick)"
-msgstr ""
-
-#: ../../batcher/src/gui/main/main.py:510
-msgid "Export Layers (Quick)"
-msgstr ""
-
-#: ../../batcher/src/gui/main/main.py:529
+#: ../../batcher/src/gui/main/main.py:441
 msgid "Show this dialog"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:119
+#: ../../batcher/src/gui/main/previews.py:117
 msgid "Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:274
+#: ../../batcher/src/gui/main/previews.py:268
 msgid ""
 "Disabling automatic preview update. The preview takes too long to update."
 msgstr ""
@@ -617,7 +708,7 @@ msgid "Save Settings to File..."
 msgstr ""
 
 #: ../../batcher/src/gui/main/settings_manager.py:74
-msgid "Reset settings"
+msgid "Reset Settings"
 msgstr ""
 
 #: ../../batcher/src/gui/main/settings_manager.py:110
@@ -648,35 +739,35 @@ msgstr ""
 msgid "Settings successfully saved."
 msgstr "Sauvegarde des réglages effectuée avec succès."
 
-#: ../../batcher/src/gui/main/settings_manager.py:264
+#: ../../batcher/src/gui/main/settings_manager.py:263
 msgid "_Open"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:265
+#: ../../batcher/src/gui/main/settings_manager.py:264
 msgid "Load Settings from File"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:268
+#: ../../batcher/src/gui/main/settings_manager.py:267
 msgid "_Save"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:269
+#: ../../batcher/src/gui/main/settings_manager.py:268
 msgid "Save Settings to File"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:286
+#: ../../batcher/src/gui/main/settings_manager.py:285
 msgid "Load size-related settings"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:296
+#: ../../batcher/src/gui/main/settings_manager.py:295
 msgid "JSON file ({})"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:304
+#: ../../batcher/src/gui/main/settings_manager.py:303
 msgid "Any file"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:349
+#: ../../batcher/src/gui/main/settings_manager.py:348
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the file and the text in the details to one of the "
@@ -704,39 +795,39 @@ msgstr ""
 msgid "Details"
 msgstr "Détails"
 
-#: ../../batcher/src/gui/messages.py:281
+#: ../../batcher/src/gui/messages.py:282
 msgid "Copy details to clipboard"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:541
+#: ../../batcher/src/gui/messages.py:542
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the text in the details to one of the sites below"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:561
+#: ../../batcher/src/gui/messages.py:562
 msgid "There was a problem during processing:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:569
+#: ../../batcher/src/gui/messages.py:570
 msgid ""
 "There was a problem during processing. Do not close the image during "
 "processing, keep it open until the processing is finished successfully."
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:593
+#: ../../batcher/src/gui/messages.py:594
 msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:595
+#: ../../batcher/src/gui/messages.py:596
 msgid "Failed to apply constraint \"{}\" on \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:601
+#: ../../batcher/src/gui/messages.py:602
 msgid "Failed to apply procedure \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:603
+#: ../../batcher/src/gui/messages.py:604
 msgid "Failed to apply constraint \"{}\" because:"
 msgstr ""
 
@@ -760,23 +851,23 @@ msgid ""
 "details above to one of the following sites"
 msgstr ""
 
-#: ../../batcher/src/gui/overwrite_chooser.py:73
+#: ../../batcher/src/gui/overwrite_chooser.py:72
 msgid "_Apply action to all files"
 msgstr "_Appliquer l'action à tous les fichiers"
 
-#: ../../batcher/src/gui/overwrite_chooser.py:113
+#: ../../batcher/src/gui/overwrite_chooser.py:112
 msgid "A file named \"{}\" already exists in \"{}\"."
 msgstr ""
 
-#: ../../batcher/src/gui/overwrite_chooser.py:117
+#: ../../batcher/src/gui/overwrite_chooser.py:116
 msgid "A file named \"{}\" already exists."
 msgstr ""
 
-#: ../../batcher/src/gui/overwrite_chooser.py:120
+#: ../../batcher/src/gui/overwrite_chooser.py:119
 msgid "A file with the same name already exists."
 msgstr ""
 
-#: ../../batcher/src/gui/overwrite_chooser.py:123
+#: ../../batcher/src/gui/overwrite_chooser.py:122
 msgid "What would you like to do?"
 msgstr ""
 
@@ -784,23 +875,23 @@ msgstr ""
 msgid "Cannot be modified"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:263
+#: ../../batcher/src/gui/preview/image.py:264
 msgid "Update Image Preview Automatically"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:274
+#: ../../batcher/src/gui/preview/image.py:275
 msgid "Update Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:381
+#: ../../batcher/src/gui/preview/image.py:382
 msgid "There was a problem with updating the image preview:"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:524
+#: ../../batcher/src/gui/preview/image.py:531
 msgid "No selection"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/name.py:398
+#: ../../batcher/src/gui/preview/name.py:400
 msgid "There was a problem with updating the name preview:"
 msgstr ""
 
@@ -922,45 +1013,25 @@ msgstr ""
 msgid "Foreground Layer"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:45
-msgid "Output directory"
-msgstr "Répertoire de sortie"
-
-#: ../../batcher/src/plugin_settings.py:54
+#: ../../batcher/src/plugin_settings.py:51
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:63
-msgid "_Replace"
-msgstr "_Remplacer"
-
-#: ../../batcher/src/plugin_settings.py:64
-msgid "_Skip"
-msgstr "Pa_sser"
-
-#: ../../batcher/src/plugin_settings.py:65
-msgid "Rename _new file"
-msgstr "Renommer le _nouveau fichier"
+#: ../../batcher/src/plugin_settings.py:59
+msgid "How to handle conflicting files (non-interactive run mode only)"
+msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:66
-msgid "Rename _existing file"
-msgstr "Renommer le fichier éxistant [E]"
-
-#: ../../batcher/src/plugin_settings.py:68
-msgid "Overwrite mode (non-interactive run mode only)"
-msgstr "Mode d'écrasement (fonctionnement non-interactif uiquement)"
-
-#: ../../batcher/src/plugin_settings.py:75
-#: ../../batcher/src/plugin_settings.py:179
+#: ../../batcher/src/plugin_settings.py:187
 msgid "File with saved settings"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:76
-#: ../../batcher/src/plugin_settings.py:180
+#: ../../batcher/src/plugin_settings.py:67
+#: ../../batcher/src/plugin_settings.py:188
 msgid "File with saved settings (optional)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:340
+#: ../../batcher/src/plugin_settings.py:348
 msgid "Close when Done"
 msgstr ""
 
@@ -1028,10 +1099,6 @@ msgid ""
 "\"png\"."
 msgstr ""
 
-#: ../../batcher/src/renamer.py:450
-msgid "Replace"
-msgstr ""
-
 #: ../../batcher/src/renamer.py:453
 msgid "Suppose that a layer is named \"Animal copy #1\"."
 msgstr ""
@@ -1085,34 +1152,34 @@ msgid ""
 "and the image has width and height of 1000 and 500 pixels, respectively."
 msgstr ""
 
-#: ../../batcher/src/update.py:63
+#: ../../batcher/src/update.py:68
 msgid "Failed to obtain the previous plug-in version."
 msgstr ""
 
-#: ../../batcher/src/utils.py:57
+#: ../../batcher/src/utils.py:63
 msgid ""
 "Settings stored in \"{}\" may be corrupt. This could happen if the file was "
 "edited manually. To fix this, save the settings again."
 msgstr ""
 
-#: ../../batcher/src/utils.py:61
+#: ../../batcher/src/utils.py:67
 msgid " More information: {}"
 msgstr ""
 
-#: ../../batcher/src/utils.py:65
+#: ../../batcher/src/utils.py:71
 msgid ""
 "Settings for this plug-in may be corrupt. To fix this, save the settings "
 "again or reset them."
 msgstr ""
 
-#: ../../batcher/src/utils.py:68
+#: ../../batcher/src/utils.py:74
 msgid "More information: {}"
 msgstr ""
 
-#: ../../batcher/src/utils.py:72
+#: ../../batcher/src/utils.py:78
 msgid "Count not locate settings in file \"{}\" in \"{}\"."
 msgstr ""
 
-#: ../../batcher/src/utils.py:75
+#: ../../batcher/src/utils.py:81
 msgid "Count not locate settings in \"{}\"."
 msgstr ""
