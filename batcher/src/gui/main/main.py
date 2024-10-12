@@ -388,7 +388,7 @@ class BatchLayerProcessingQuickGui:
 
   _DEFAULT_DIALOG_WIDTH = 500
 
-  def __init__(self, layer_tree, settings, _source_name, mode, title=None):
+  def __init__(self, layer_tree, settings, _source_name, mode, title=None, run_gui_func=None):
     self._layer_tree = layer_tree
     self._settings = settings
 
@@ -409,11 +409,18 @@ class BatchLayerProcessingQuickGui:
     if mode == 'export' and self._settings['gui/show_quick_settings'].value:
       self._button_run.connect('clicked', self._on_button_run_clicked)
 
-      Gtk.main()
+      if not run_gui_func:
+        Gtk.main()
+      else:
+        run_gui_func(self, self._dialog, self._settings)
     else:
       Gtk.main_iteration()
 
       self._run_batcher_quick()
+
+  @property
+  def dialog(self):
+    return self._dialog
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
