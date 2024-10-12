@@ -8,8 +8,6 @@ from typing import Type
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
