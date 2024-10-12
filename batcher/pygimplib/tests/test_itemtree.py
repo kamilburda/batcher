@@ -123,7 +123,7 @@ class TestLayerTree(unittest.TestCase):
   
   def test_iter_with_different_item_types_excluded(self):
     limited_item_properties = [properties[:2] for properties in self.item_properties]
-    
+
     item_properties_without_empty_groups = list(limited_item_properties)
     del item_properties_without_empty_groups[
       item_properties_without_empty_groups.index(
@@ -131,7 +131,7 @@ class TestLayerTree(unittest.TestCase):
     del item_properties_without_empty_groups[
       item_properties_without_empty_groups.index(
         ('top-left-corner:', self.FOLDER)) + 1]
-    
+
     item_properties_without_folders_and_empty_groups = [
       (name, type_) for name, type_ in limited_item_properties if type_ != self.FOLDER]
     del item_properties_without_folders_and_empty_groups[
@@ -140,29 +140,72 @@ class TestLayerTree(unittest.TestCase):
     del item_properties_without_folders_and_empty_groups[
       item_properties_without_folders_and_empty_groups.index(
         ('top-left-corner:', self.GROUP))]
-    
+
     for item, (item_name, item_type) in zip(
           self.item_tree.iter(with_empty_groups=True), limited_item_properties):
       self.assertEqual(item.name, item_name)
       self.assertEqual(item.type, item_type)
-    
+
     for item, (item_name, item_type) in zip(
           self.item_tree.iter(), item_properties_without_empty_groups):
       self.assertEqual(item.name, item_name)
       self.assertEqual(item.type, item_type)
-    
+
     for item, (item_name, item_type) in zip(
           self.item_tree.iter(with_folders=False),
           item_properties_without_folders_and_empty_groups):
       self.assertEqual(item.name, item_name)
       self.assertEqual(item.type, item_type)
-    
+
     for item, (item_name, item_type) in zip(
           self.item_tree,
           item_properties_without_folders_and_empty_groups):
       self.assertEqual(item.name, item_name)
       self.assertEqual(item.type, item_type)
-  
+
+  def test_reversed(self):
+    limited_item_properties = list(
+      reversed([properties[:2] for properties in self.item_properties]))
+
+    item_properties_without_empty_groups = list(limited_item_properties)
+    del item_properties_without_empty_groups[
+      item_properties_without_empty_groups.index(
+        ('Overlay', self.FOLDER)) - 1]
+    del item_properties_without_empty_groups[
+      item_properties_without_empty_groups.index(
+        ('top-left-corner:', self.FOLDER)) - 1]
+
+    item_properties_without_folders_and_empty_groups = [
+      (name, type_) for name, type_ in limited_item_properties if type_ != self.FOLDER]
+    del item_properties_without_folders_and_empty_groups[
+      item_properties_without_folders_and_empty_groups.index(
+        ('Overlay', self.GROUP))]
+    del item_properties_without_folders_and_empty_groups[
+      item_properties_without_folders_and_empty_groups.index(
+        ('top-left-corner:', self.GROUP))]
+
+    for item, (item_name, item_type) in zip(
+          self.item_tree.iter(with_empty_groups=True, reverse=True), limited_item_properties):
+      self.assertEqual(item.name, item_name)
+      self.assertEqual(item.type, item_type)
+
+    for item, (item_name, item_type) in zip(
+          self.item_tree.iter(reverse=True), item_properties_without_empty_groups):
+      self.assertEqual(item.name, item_name)
+      self.assertEqual(item.type, item_type)
+
+    for item, (item_name, item_type) in zip(
+          self.item_tree.iter(with_folders=False, reverse=True),
+          item_properties_without_folders_and_empty_groups):
+      self.assertEqual(item.name, item_name)
+      self.assertEqual(item.type, item_type)
+
+    for item, (item_name, item_type) in zip(
+          reversed(self.item_tree),
+          item_properties_without_folders_and_empty_groups):
+      self.assertEqual(item.name, item_name)
+      self.assertEqual(item.type, item_type)
+
   def test_len(self):
     self.assertEqual(len(list(self.item_tree.iter())), 14)
     self.assertEqual(len(list(self.item_tree.iter(with_empty_groups=True))), 16)

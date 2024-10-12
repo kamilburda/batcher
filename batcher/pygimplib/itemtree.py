@@ -322,20 +322,35 @@ class ItemTree(metaclass=abc.ABCMeta):
   
   def __iter__(self) -> Generator[Item, None, None]:
     """Iterates over items, excluding folders and empty item groups.
-    
-    If the `is_filtered` attribute is ``False``, iterate over all items. If
-    `is_filtered` is ``True``, iterate only over items that match the filter.
+
+    If the `is_filtered` attribute is ``False``, iteration is performed over
+    all items. If `is_filtered` is ``True``, iteration is performed only over
+    items that match the filter.
     
     Yields:
       The current `Item` instance.
     """
     return self.iter(with_folders=False, with_empty_groups=False)
-  
+
+  def __reversed__(self) -> Generator[Item, None, None]:
+    """Iterates over items, excluding folders and empty item groups, in the
+    reversed order.
+
+    If the `is_filtered` attribute is ``False``, iteration is performed over
+    all items. If `is_filtered` is ``True``, iteration is performed only over
+    items that match the filter.
+
+    Yields:
+      The current `Item` instance.
+    """
+    return self.iter(with_folders=False, with_empty_groups=False, reverse=True)
+
   def iter(
         self,
         with_folders: bool = True,
         with_empty_groups: bool = False,
         filtered: bool = True,
+        reverse: bool = False,
   ) -> Generator[Item, None, None]:
     """Iterates over items, optionally including folders and empty item groups.
 
@@ -350,11 +365,19 @@ class ItemTree(metaclass=abc.ABCMeta):
         If ``True`` and the `is_filtered` attribute is also ``True``,
         the iteration is performed only over items matching the filter. Set
         this to ``False`` if you need to iterate over all items.
+      reverse:
+        If ``True``, the iteration is performed in reverse, starting from the
+        last item in the tree.
 
     Yields:
       The current `Item` instance.
     """
-    for item in self._itemtree.values():
+    if not reverse:
+      itemtree_values = self._itemtree.values()
+    else:
+      itemtree_values = reversed(self._itemtree.values())
+    
+    for item in itemtree_values:
       should_yield_item = True
       
       if not with_folders and item.type == TYPE_FOLDER:
@@ -370,16 +393,26 @@ class ItemTree(metaclass=abc.ABCMeta):
       if should_yield_item:
         yield item
   
-  def iter_all(self) -> Generator[Item, None, None]:
+  def iter_all(self, reverse: bool = False) -> Generator[Item, None, None]:
     """Iterates over all items.
     
     This is equivalent to ``iter(with_folders=True, with_empty_groups=True,
-    filtered=False)``.
+    filtered=False, reverse=reverse)``.
+
+    Args:
+      reverse:
+        If ``True``, the iteration is performed in reverse, starting from the
+        last item in the tree.
     
     Yields:
       The current `Item` instance.
     """
-    for item in self._itemtree.values():
+    if not reverse:
+      itemtree_values = self._itemtree.values()
+    else:
+      itemtree_values = reversed(self._itemtree.values())
+
+    for item in itemtree_values:
       yield item
   
   def prev(
