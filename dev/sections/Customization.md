@@ -79,7 +79,7 @@ Yes! You may insert any GIMP filter as a procedure:
 While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
 
 1. Select or type `pdf` as the file extension.
-2. Press the `Export Options...` button and select an option in `Perform export:`. To export a single image, select `For the entire image at once`.
+2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `For the entire image at once`.
 3. If you selected `For the entire image at once`, adjust `Image filename pattern` as seen fit.
 4. You may want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
