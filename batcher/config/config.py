@@ -10,6 +10,7 @@ c.LOG_MODE = 'error'
 c.WARN_ON_INVALID_SETTING_VALUES = True
 
 c.PLUGIN_NAME = 'batcher'
+c.DOMAIN_NAME = 'batcher'
 c.PLUGIN_TITLE = lambda: _('Batcher')
 c.PLUGIN_VERSION = '0.4'
 c.PLUGIN_VERSION_RELEASE_DATE = 'July 13, 2024'
