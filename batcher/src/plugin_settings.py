@@ -2,6 +2,10 @@
 
 import collections
 
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 import pygimplib as pg
 
 from src import actions as actions_
@@ -105,6 +109,7 @@ def create_settings_for_export_layers():
   gui_settings.add([
     _create_auto_close_setting_dict(True),
     _create_show_quick_settings_setting_dict(),
+    _create_images_and_directories_setting_dict(),
   ])
 
   size_gui_settings = pg.setting.Group(name='size')
@@ -273,6 +278,92 @@ def create_settings_for_edit_layers():
   return settings
 
 
+def create_settings_for_convert():
+  settings = pg.setting.create_groups({
+    'name': 'all_settings',
+    'groups': [
+      {
+        'name': 'main',
+      }
+    ]
+  })
+
+  settings['main'].add([
+    {
+      'type': 'enum',
+      'name': 'run_mode',
+      'enum_type': Gimp.RunMode,
+      'default_value': Gimp.RunMode.NONINTERACTIVE,
+      'display_name': _('Run mode'),
+      'description': _('The run mode'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'file',
+      'name': 'settings_file',
+      'default_value': None,
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (optional)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'string',
+      'name': 'plugin_version',
+      'default_value': pg.config.PLUGIN_VERSION,
+      'pdb_type': None,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings = _create_gui_settings()
+  gui_settings.add([_create_auto_close_setting_dict(False)])
+
+  size_gui_settings = pg.setting.Group(name='size')
+
+  size_gui_settings.add([
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': (),
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': (570, 500),
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_outside_previews_position',
+      'default_value': 300,
+      'gui_type': None,
+    },
+    {
+      'type': 'float',
+      'name': 'paned_between_previews_position',
+      'default_value': 220,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  settings['main'].add([
+    actions_.create(
+      name='procedures'),
+  ])
+
+  settings['main'].add([
+    actions_.create(
+      name='constraints'),
+  ])
+
+  return settings
+
+
 def _create_gui_settings():
   gui_settings = pg.setting.Group(name='gui')
 
@@ -324,15 +415,11 @@ def _create_gui_settings():
     },
     {
       'type': 'images_and_gimp_items',
-      'name': 'name_preview_layers_collapsed_state',
+      'name': 'name_preview_items_collapsed_state',
     },
     {
       'type': 'images_and_gimp_items',
-      'name': 'image_preview_displayed_layers',
-    },
-    {
-      'type': 'images_and_directories',
-      'name': 'images_and_directories',
+      'name': 'image_preview_displayed_items',
     },
     procedure_browser_settings,
   ])
@@ -356,6 +443,13 @@ def _create_show_quick_settings_setting_dict():
     'name': 'show_quick_settings',
     'default_value': True,
     'gui_type': None,
+  }
+
+
+def _create_images_and_directories_setting_dict():
+  return {
+    'type': 'images_and_directories',
+    'name': 'images_and_directories',
   }
 
 

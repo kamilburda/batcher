@@ -42,6 +42,7 @@ from src.setting_source_names import *
 
 SETTINGS_EXPORT_LAYERS = plugin_settings.create_settings_for_export_layers()
 SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
+SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
 
 
 def plug_in_batch_export_layers(
@@ -166,6 +167,12 @@ def plug_in_batch_edit_selected_layers(
       layer_tree,
       mode='edit',
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
+
+
+def plug_in_batch_convert(_procedure, config, _data):
+  _set_default_setting_source(CONVERT_SOURCE_NAME)
+
+  run_mode = config.get_property('run-mode')
 
 
 def _run_noninteractive(settings, source_name, layer_tree, config, mode):
@@ -419,6 +426,23 @@ pg.register_procedure(
     Gimp.ProcedureSensitivityMask.DRAWABLE
     | Gimp.ProcedureSensitivityMask.DRAWABLES),
   documentation=(_('Batch-edit selected layers instantly'), ''),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_batch_convert,
+  procedure_type=Gimp.Procedure,
+  arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
+  menu_label=_('Con_vert...'),
+  menu_path='<Image>/File/[Export]',
+  image_types='',
+  documentation=(
+    _('Batch-process images'),
+    _('This procedure allows batch conversion of image files and images opened in GIMP'
+      ' to the specified file format, optionally applying arbitrary procedures'
+      ' to each item and ignoring items according to the specified constraints.'),
+  ),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 
