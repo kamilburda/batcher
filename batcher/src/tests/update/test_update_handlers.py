@@ -17,7 +17,7 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_LATEST_PLUGIN_VERSION = '0.5'
+_LATEST_PLUGIN_VERSION = '0.6'
 
 
 @mock.patch(
@@ -51,6 +51,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_3(orig_setting_values_for_0_2)
     self._assert_correct_contents_for_update_to_0_4()
     self._assert_correct_contents_for_update_to_0_5()
+    self._assert_correct_contents_for_update_to_0_6()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -226,3 +227,12 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEquals(
       self.settings['main/constraints/not_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
+
+  def _assert_correct_contents_for_update_to_0_6(self):
+    self.assertIn('name_preview_items_collapsed_state', self.settings['gui'])
+    self.assertNotIn('name_preview_layers_collapsed_state', self.settings['gui'])
+
+    self.assertIn('image_preview_displayed_items', self.settings['gui'])
+    self.assertNotIn('image_preview_displayed_layers', self.settings['gui'])
+
+    self.assertIn('images_and_directories', self.settings['gui'])

@@ -647,8 +647,29 @@ def _update_to_0_5(data, _settings, source_names):
             argument_dict['element_default_value'] = [1]
 
 
+def _update_to_0_6(data, _settings, source_names):
+  if EXPORT_LAYERS_SOURCE_NAME not in source_names or EDIT_LAYERS_SOURCE_NAME not in source_names:
+    return
+
+  gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
+
+  if gui_settings_list is not None:
+    _rename_setting(
+      gui_settings_list,
+      'name_preview_layers_collapsed_state',
+      'name_preview_items_collapsed_state')
+    _rename_setting(
+      gui_settings_list,
+      'image_preview_displayed_layers',
+      'image_preview_displayed_items')
+
+  if EDIT_LAYERS_SOURCE_NAME in source_names:
+    _remove_setting(gui_settings_list, 'images_and_directories')
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
   '0.5': _update_to_0_5,
+  '0.6': _update_to_0_6,
 }
