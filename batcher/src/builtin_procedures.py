@@ -309,7 +309,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
         ('each_layer', _('For each layer'), export_.ExportModes.EACH_LAYER),
         ('each_top_level_layer_or_group',
          _('For each top-level layer or group'),
-         export_.ExportModes.EACH_TOP_LEVEL_LAYER_OR_GROUP),
+         export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER),
         ('entire_image_at_once',
          _('For the entire image at once'),
          export_.ExportModes.ENTIRE_IMAGE_AT_ONCE),

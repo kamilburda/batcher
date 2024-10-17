@@ -38,7 +38,7 @@ class ExportModes:
   
   EXPORT_MODES = (
     EACH_LAYER,
-    EACH_TOP_LEVEL_LAYER_OR_GROUP,
+    EACH_TOP_LEVEL_ITEM_OR_FOLDER,
     ENTIRE_IMAGE_AT_ONCE,
   ) = 0, 1, 2
 
@@ -112,7 +112,7 @@ def export(
           item_to_process.name = renamer_for_image.rename(batcher, item_to_process)
         else:
           item_to_process.name = item.name
-    elif export_mode == ExportModes.EACH_TOP_LEVEL_LAYER_OR_GROUP:
+    elif export_mode == ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER:
       if batcher.process_export:
         raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
         raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
