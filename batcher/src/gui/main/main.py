@@ -26,6 +26,37 @@ from src.gui.main import previews as previews_
 from src.gui.main import settings_manager as settings_manager_
 
 
+class BatchImageProcessingGui:
+
+  def __init__(self, initial_image_tree, settings, source_name, run_gui_func=None):
+    self._initial_image_tree = initial_image_tree
+    self._settings = settings
+    self._source_name = source_name
+
+    self._init_gui()
+    self._assign_gui_to_settings()
+    self._connect_events()
+
+    self._finish_init_and_show()
+
+    if not run_gui_func:
+      Gtk.main()
+    else:
+      run_gui_func(self, self._dialog, self._settings)
+
+  def _init_gui(self):
+    pass
+
+  def _assign_gui_to_settings(self):
+    pass
+
+  def _finish_init_and_show(self):
+    pass
+
+  def _connect_events(self):
+    pass
+
+
 class BatchLayerProcessingGui:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8

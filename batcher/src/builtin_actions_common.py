@@ -1,5 +1,8 @@
 """Common constants and functions for built-in procedures and constraints."""
 
+CONVERT_TAG = 'convert'
+"""Tag indicating that a built-in action is appropriate for Convert."""
+
 EDIT_LAYERS_TAG = 'edit_layers'
 """Tag indicating that a built-in action is appropriate for Edit Layers. For
 example, "Use layer size" should not be available for Edit Layers and such a
@@ -14,6 +17,7 @@ NAME_ONLY_TAG = 'name'
 
 
 __all__ = [
+  'CONVERT_TAG',
   'EDIT_LAYERS_TAG',
   'EXPORT_LAYERS_TAG',
   'NAME_ONLY_TAG',

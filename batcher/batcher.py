@@ -40,9 +40,30 @@ from src.gui import main as gui_main
 from src.setting_source_names import *
 
 
+SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
 SETTINGS_EXPORT_LAYERS = plugin_settings.create_settings_for_export_layers()
 SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
-SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
+
+
+def plug_in_batch_convert(_procedure, config, _data):
+  _set_default_setting_source(CONVERT_SOURCE_NAME)
+
+  run_mode = config.get_property('run-mode')
+
+  image_tree = None
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    return _run_interactive(
+      SETTINGS_CONVERT,
+      CONVERT_SOURCE_NAME,
+      image_tree,
+      gui_main.BatchImageProcessingGui)
+  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
+    return _run_with_last_vals(
+      SETTINGS_CONVERT, CONVERT_SOURCE_NAME, image_tree, mode='export')
+  else:
+    return _run_noninteractive(
+      SETTINGS_CONVERT, CONVERT_SOURCE_NAME, image_tree, config, mode='export')
 
 
 def plug_in_batch_export_layers(
@@ -169,13 +190,7 @@ def plug_in_batch_edit_selected_layers(
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
 
 
-def plug_in_batch_convert(_procedure, config, _data):
-  _set_default_setting_source(CONVERT_SOURCE_NAME)
-
-  run_mode = config.get_property('run-mode')
-
-
-def _run_noninteractive(settings, source_name, layer_tree, config, mode):
+def _run_noninteractive(settings, source_name, item_tree, config, mode):
   settings_file = config.get_property('settings-file')
 
   if settings_file:
@@ -185,12 +200,18 @@ def _run_noninteractive(settings, source_name, layer_tree, config, mode):
   else:
     _set_settings_from_args(settings['main'], config)
 
-  _run_plugin_noninteractive(settings, Gimp.RunMode.NONINTERACTIVE, layer_tree, mode)
+  _run_plugin_noninteractive(settings, source_name, Gimp.RunMode.NONINTERACTIVE, item_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_with_last_vals(settings, source_name, layer_tree, mode, process_loaded_settings_func=None):
+def _run_with_last_vals(
+      settings,
+      source_name,
+      item_tree,
+      mode,
+      process_loaded_settings_func=None,
+):
   update_successful, message = _load_and_update_settings(
     settings, source_name, Gimp.RunMode.WITH_LAST_VALS)
   if not update_successful:
@@ -199,7 +220,7 @@ def _run_with_last_vals(settings, source_name, layer_tree, mode, process_loaded_
   if process_loaded_settings_func is not None:
     process_loaded_settings_func(settings)
 
-  _run_plugin_noninteractive(settings, Gimp.RunMode.WITH_LAST_VALS, layer_tree, mode)
+  _run_plugin_noninteractive(settings, source_name, Gimp.RunMode.WITH_LAST_VALS, item_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
@@ -207,7 +228,7 @@ def _run_with_last_vals(settings, source_name, layer_tree, mode, process_loaded_
 def _run_interactive(
       settings,
       source_name,
-      layer_tree,
+      item_tree,
       gui_class,
       gui_class_args=None,
       gui_class_kwargs=None,
@@ -227,23 +248,31 @@ def _run_interactive(
   if process_loaded_settings_func is not None:
     process_loaded_settings_func(settings)
 
-  gui_class(layer_tree, settings, source_name, *gui_class_args, **gui_class_kwargs)
+  gui_class(item_tree, settings, source_name, *gui_class_args, **gui_class_kwargs)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_plugin_noninteractive(settings, run_mode, layer_tree, mode):
-  batcher = core.Batcher(
-    layer_tree.image,
-    settings['main/procedures'],
-    settings['main/constraints'],
-    initial_export_run_mode=run_mode,
-    edit_mode=mode == 'edit',
-  )
+def _run_plugin_noninteractive(settings, source_name, run_mode, item_tree, mode):
+  if source_name == CONVERT_SOURCE_NAME:
+    batcher = core.ImageBatcher(
+      procedures=settings['main/procedures'],
+      constraints=settings['main/constraints'],
+      initial_export_run_mode=run_mode,
+      edit_mode=mode == 'edit',
+    )
+  else:
+    batcher = core.LayerBatcher(
+      input_image=item_tree.image,
+      procedures=settings['main/procedures'],
+      constraints=settings['main/constraints'],
+      initial_export_run_mode=run_mode,
+      edit_mode=mode == 'edit',
+    )
 
   try:
     batcher.run(
-      item_tree=layer_tree,
+      item_tree=item_tree,
       **utils_.get_settings_for_batcher(settings['main']))
   except exceptions.BatcherCancelError:
     return Gimp.PDBStatusType.SUCCESS, 'canceled'
