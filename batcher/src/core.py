@@ -963,7 +963,7 @@ class Batcher:
     
     if self._process_contents:
       self._process_item_with_actions(self._current_raw_item)
-      self._refresh_current_image(self._current_raw_item)
+      self._refresh_current_image()
     
     self._progress_updater.update_tasks()
   
@@ -1039,7 +1039,7 @@ class Batcher:
       [self, self._current_item, self._current_raw_item],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
   
-  def _refresh_current_image(self, raw_item):
+  def _refresh_current_image(self):
     if not self._edit_mode and not self._keep_image_copy:
       for layer in self._current_image.list_layers():
         self._current_image.remove_layer(layer)
