@@ -103,7 +103,7 @@ class BatcherManager:
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = core.Batcher(
+    batcher = core.LayerBatcher(
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],
@@ -178,7 +178,7 @@ class BatcherManagerQuick:
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = core.Batcher(
+    batcher = core.LayerBatcher(
       image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],

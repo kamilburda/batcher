@@ -29,7 +29,7 @@ _BATCHER_ARG_POSITION_IN_ACTIONS = 0
 _NAME_ONLY_ACTION_GROUP = 'name'
 
 
-class Batcher:
+class LayerBatcher:
   """Class for batch-processing layers in the specified image with a sequence of
   actions (resize, rename, export, ...).
   """

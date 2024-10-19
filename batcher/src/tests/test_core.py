@@ -31,7 +31,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     settings = plugin_settings.create_settings_for_export_layers()
     settings['main/file_extension'].set_value('xcf')
     
-    batcher = core.Batcher(
+    batcher = core.LayerBatcher(
       self.image,
       settings['main/procedures'],
       settings['main/constraints'],
@@ -72,7 +72,7 @@ class TestBatcherInitialActions(unittest.TestCase):
 class TestAddActionFromSettings(unittest.TestCase):
   
   def setUp(self):
-    self.batcher = core.Batcher(
+    self.batcher = core.LayerBatcher(
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
@@ -150,7 +150,7 @@ class TestAddActionFromSettings(unittest.TestCase):
 class TestGetReplacedArgsAndKwargs(unittest.TestCase):
   
   def test_get_replaced_args(self):
-    batcher = core.Batcher(
+    batcher = core.LayerBatcher(
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),

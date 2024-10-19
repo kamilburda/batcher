@@ -51,7 +51,7 @@ class Previews:
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1])
 
-    self._batcher_for_previews = core.Batcher(
+    self._batcher_for_previews = core.LayerBatcher(
       self._image,
       self._settings['main/procedures'],
       self._settings['main/constraints'],

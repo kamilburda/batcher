@@ -179,7 +179,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
     
-    batcher = core.Batcher(
+    batcher = core.LayerBatcher(
       self.test_image,
       settings['main/procedures'],
       settings['main/constraints'],
