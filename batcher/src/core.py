@@ -3,7 +3,6 @@
 import collections
 from collections.abc import Iterable
 import contextlib
-import functools
 import inspect
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -30,45 +29,11 @@ _BATCHER_ARG_POSITION_IN_ACTIONS = 0
 _NAME_ONLY_ACTION_GROUP = 'name'
 
 
-def _set_attributes_on_init(func):
-  
-  @functools.wraps(func)
-  def func_wrapper(self, *args, **kwargs):
-    setattr(self, f'_orig_{func.__name__}', func)
-    
-    argspec = inspect.getfullargspec(func)
-    
-    arg_names = argspec.args[:len(argspec.args) - len(argspec.defaults)]
-    try:
-      arg_names.remove('self')
-    except ValueError:
-      pass
-    
-    full_kwargs = {}
-    
-    for arg_name, arg_value in zip(arg_names, args):
-      full_kwargs[arg_name] = arg_value
-    
-    kwarg_names = argspec.args[len(argspec.args) - len(argspec.defaults):]
-    
-    for kwarg_name, kwarg_value in zip(kwarg_names, argspec.defaults):
-      full_kwargs[kwarg_name] = kwarg_value
-    
-    full_kwargs.update(kwargs)
-    
-    self._init_attributes(**full_kwargs)
-    
-    func(self, **full_kwargs)
-  
-  return func_wrapper
-
-
 class Batcher:
   """Class for batch-processing layers in the specified image with a sequence of
   actions (resize, rename, export, ...).
   """
-  
-  @_set_attributes_on_init
+
   def __init__(
         self,
         input_image: Gimp.Image,
@@ -92,6 +57,27 @@ class Batcher:
         export_context_manager_args: Optional[Union[List, Tuple]] = None,
         export_context_manager_kwargs: Optional[Dict] = None,
   ):
+    self._input_image = input_image
+    self._procedures = procedures
+    self._constraints = constraints
+    self._edit_mode = edit_mode
+    self._initial_export_run_mode = initial_export_run_mode
+    self._output_directory = output_directory
+    self._name_pattern = name_pattern
+    self._file_extension = file_extension
+    self._overwrite_mode = overwrite_mode
+    self._overwrite_chooser = overwrite_chooser
+    self._more_export_options = more_export_options
+    self._progress_updater = progress_updater
+    self._item_tree = item_tree
+    self._is_preview = is_preview
+    self._process_contents = process_contents
+    self._process_names = process_names
+    self._process_export = process_export
+    self._export_context_manager = export_context_manager
+    self._export_context_manager_args = export_context_manager_args
+    self._export_context_manager_kwargs = export_context_manager_kwargs
+
     self._current_item = None
     self._current_raw_item = None
     self._current_procedure = None
@@ -110,7 +96,7 @@ class Batcher:
     
     self._invoker = None
     self._initial_invoker = invoker_.Invoker()
-  
+
   @property
   def initial_export_run_mode(self) -> Gimp.RunMode:
     """The run mode to use for the first layer when exporting if using the
@@ -375,7 +361,7 @@ class Batcher:
     `Batcher.__init__()`. Arguments in `*`*kwargs`` overwrite the
     corresponding `Batcher` properties. See the properties for details.
     """
-    self._init_attributes(**kwargs)
+    self._set_attributes(**kwargs)
     self._prepare_for_processing(self._item_tree, keep_image_copy)
     
     exception_occurred = False
@@ -739,8 +725,8 @@ class Batcher:
     if 'constraint' in action.tags:
       self._failed_constraints[action.name].append((self._current_item, error_message, trace))
 
-  def _init_attributes(self, **kwargs):
-    init_argspec_names = set(inspect.getfullargspec(self._orig___init__).args)
+  def _set_attributes(self, **kwargs):
+    init_argspec_names = set(inspect.getfullargspec(self.__init__).args)
     init_argspec_names.discard('self')
     
     for name, value in kwargs.items():
