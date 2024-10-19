@@ -47,11 +47,11 @@ class BatchLayerProcessingGui:
     self._mode = mode
 
     if mode == 'edit':
-      self._plugin_procedure = builtin_actions_common.EDIT_LAYERS_TAG
+      self._plugin_procedure_tag = builtin_actions_common.EDIT_LAYERS_TAG
     elif mode == 'export':
-      self._plugin_procedure = builtin_actions_common.EXPORT_LAYERS_TAG
+      self._plugin_procedure_tag = builtin_actions_common.EXPORT_LAYERS_TAG
     else:
-      self._plugin_procedure = None
+      self._plugin_procedure_tag = None
 
     self._image = self._initial_layer_tree.image
 
@@ -125,7 +125,7 @@ class BatchLayerProcessingGui:
 
     self._action_lists = action_lists_.ActionLists(
       self._settings,
-      self._plugin_procedure,
+      self._plugin_procedure_tag,
       self._dialog,
     )
 
