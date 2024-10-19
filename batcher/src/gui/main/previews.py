@@ -52,9 +52,9 @@ class Previews:
       builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1])
 
     self._batcher_for_previews = core.LayerBatcher(
-      self._image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
+      input_image=self._image,
+      procedures=self._settings['main/procedures'],
+      constraints=self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser,

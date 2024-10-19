@@ -180,9 +180,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       additional_init_before_run(self.test_image)
     
     batcher = core.LayerBatcher(
-      self.test_image,
-      settings['main/procedures'],
-      settings['main/constraints'],
+      input_image=self.test_image,
+      procedures=settings['main/procedures'],
+      constraints=settings['main/constraints'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     

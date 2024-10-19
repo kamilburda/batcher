@@ -356,10 +356,9 @@ class ImagePreview(preview_base_.Preview):
       args=[{self.item.raw.get_image(): {self.item.raw}}])
     
     error = None
-    image_preview = None
     
     try:
-      image_preview = self._batcher.run(
+      self._batcher.run(
         keep_image_copy=True,
         item_tree=self._batcher.item_tree,
         is_preview=True,
@@ -393,7 +392,7 @@ class ImagePreview(preview_base_.Preview):
       for item in self._batcher.item_tree.iter_all():
         item.pop_state()
     
-    return image_preview, error
+    return self._batcher.image_copy, error
   
   def _resize_image_for_batcher(self, batcher, *args, **kwargs):
     image = batcher.current_image

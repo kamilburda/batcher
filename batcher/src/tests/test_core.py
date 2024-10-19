@@ -32,9 +32,9 @@ class TestBatcherInitialActions(unittest.TestCase):
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.LayerBatcher(
-      self.image,
-      settings['main/procedures'],
-      settings['main/constraints'],
+      input_image=self.image,
+      procedures=settings['main/procedures'],
+      constraints=settings['main/constraints'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     

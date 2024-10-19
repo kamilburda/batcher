@@ -104,9 +104,9 @@ class BatcherManager:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     batcher = core.LayerBatcher(
-      image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
+      input_image=image,
+      procedures=self._settings['main/procedures'],
+      constraints=self._settings['main/constraints'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=overwrite_chooser,
@@ -179,9 +179,9 @@ class BatcherManagerQuick:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     batcher = core.LayerBatcher(
-      image,
-      self._settings['main/procedures'],
-      self._settings['main/constraints'],
+      input_image=image,
+      procedures=self._settings['main/procedures'],
+      constraints=self._settings['main/constraints'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=initial_export_run_mode,
       overwrite_chooser=overwrite_chooser,
