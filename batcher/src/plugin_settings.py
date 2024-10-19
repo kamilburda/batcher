@@ -20,6 +20,92 @@ from src import setting_classes
 from src import utils
 
 
+def create_settings_for_convert():
+  settings = pg.setting.create_groups({
+    'name': 'all_settings',
+    'groups': [
+      {
+        'name': 'main',
+      }
+    ]
+  })
+
+  settings['main'].add([
+    {
+      'type': 'enum',
+      'name': 'run_mode',
+      'enum_type': Gimp.RunMode,
+      'default_value': Gimp.RunMode.NONINTERACTIVE,
+      'display_name': _('Run mode'),
+      'description': _('The run mode'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'file',
+      'name': 'settings_file',
+      'default_value': None,
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (optional)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'string',
+      'name': 'plugin_version',
+      'default_value': pg.config.PLUGIN_VERSION,
+      'pdb_type': None,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings = _create_gui_settings()
+  gui_settings.add([_create_auto_close_setting_dict(False)])
+
+  size_gui_settings = pg.setting.Group(name='size')
+
+  size_gui_settings.add([
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': (),
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': (570, 500),
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_outside_previews_position',
+      'default_value': 300,
+      'gui_type': None,
+    },
+    {
+      'type': 'float',
+      'name': 'paned_between_previews_position',
+      'default_value': 220,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  settings['main'].add([
+    actions_.create(
+      name='procedures'),
+  ])
+
+  settings['main'].add([
+    actions_.create(
+      name='constraints'),
+  ])
+
+  return settings
+
+
 def create_settings_for_export_layers():
   settings = pg.setting.create_groups({
     'name': 'all_settings',
@@ -274,92 +360,6 @@ def create_settings_for_edit_layers():
     'after-add-action',
     _on_after_add_constraint,
     settings['main/selected_layers'])
-
-  return settings
-
-
-def create_settings_for_convert():
-  settings = pg.setting.create_groups({
-    'name': 'all_settings',
-    'groups': [
-      {
-        'name': 'main',
-      }
-    ]
-  })
-
-  settings['main'].add([
-    {
-      'type': 'enum',
-      'name': 'run_mode',
-      'enum_type': Gimp.RunMode,
-      'default_value': Gimp.RunMode.NONINTERACTIVE,
-      'display_name': _('Run mode'),
-      'description': _('The run mode'),
-      'gui_type': None,
-      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-    },
-    {
-      'type': 'file',
-      'name': 'settings_file',
-      'default_value': None,
-      'display_name': _('File with saved settings'),
-      'description': _('File with saved settings (optional)'),
-      'gui_type': None,
-      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-    },
-    {
-      'type': 'string',
-      'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
-      'pdb_type': None,
-      'gui_type': None,
-    },
-  ])
-
-  gui_settings = _create_gui_settings()
-  gui_settings.add([_create_auto_close_setting_dict(False)])
-
-  size_gui_settings = pg.setting.Group(name='size')
-
-  size_gui_settings.add([
-    {
-      'type': 'tuple',
-      'name': 'dialog_position',
-      'default_value': (),
-    },
-    {
-      'type': 'tuple',
-      'name': 'dialog_size',
-      'default_value': (570, 500),
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_outside_previews_position',
-      'default_value': 300,
-      'gui_type': None,
-    },
-    {
-      'type': 'float',
-      'name': 'paned_between_previews_position',
-      'default_value': 220,
-      'gui_type': None,
-    },
-  ])
-
-  gui_settings.add([size_gui_settings])
-
-  settings.add([gui_settings])
-
-  settings['main'].add([
-    actions_.create(
-      name='procedures'),
-  ])
-
-  settings['main'].add([
-    actions_.create(
-      name='constraints'),
-  ])
 
   return settings
 
