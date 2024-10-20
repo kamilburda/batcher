@@ -170,6 +170,15 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._overwrite_chooser
 
   @property
+  def more_export_options(self) -> Dict[str, Any]:
+    """Dictionary containing export options for each file extension as a key.
+
+    This property returns a shallow copy of the original dictionary to avoid
+    modifying the original.
+    """
+    return dict(self._more_export_options) if self._more_export_options is not None else {}
+
+  @property
   def progress_updater(self) -> progress_.ProgressUpdater:
     """`progress.ProgressUpdater` instance indicating the number of items
     processed so far.
