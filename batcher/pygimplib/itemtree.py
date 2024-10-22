@@ -216,35 +216,20 @@ class Item:
 
 
 class ItemTree(metaclass=abc.ABCMeta):
-  """Interface to store `Gimp.Item` objects in a tree-like structure.
+  """Interface to store objects in a tree-like structure.
 
-  Use one of the subclasses for items of a certain type:
-    * `LayerTree` for layers,
-    * `ChannelTree` for channels,
-    * `VectorTree` for vectors (paths).
+  Each item in the tree is an `Item` instance. Each item contains basic
+  attributes such as name or parents.
 
-  Each item in the tree is an `Item` instance. Each item contains `Gimp.Item`
-  attributes and additional derived attributes.
-
-  Items can be directly accessed via their ID, path or the underlying
-  `Gimp.Item` instance. Both ID and path are unique in the entire tree.
-
-  Item groups (e.g. layer groups) are inserted twice in the tree - as folders
-  and as items. Parents of items are always folders.
-
-  `ItemTree` is a static data structure - it does not account for
-  modifications, additions or removal of GIMP items by GIMP procedures outside
-  this class. To refresh the contents of the tree, create a new `ItemTree`
-  instance instead.
+  Items can be directly accessed via their ID, path or the underlying object.
+  Both ID and path are unique in the entire tree.
   """
   
   def __init__(
         self,
-        image: Gimp.Image,
         is_filtered: bool = True,
-        filter_match_type: int = pgobjectfilter.ObjectFilter.MATCH_ALL):
-    self._image = image
-    
+        filter_match_type: int = pgobjectfilter.ObjectFilter.MATCH_ALL,
+  ):
     self.is_filtered = is_filtered
     """If ``True``, ignore items that do not match the filter
     (`objectfilter.ObjectFilter`) in this object when iterating.
@@ -275,11 +260,6 @@ class ItemTree(metaclass=abc.ABCMeta):
     self._itemtree_all_types = {}
     
     self._build_tree()
-  
-  @property
-  def image(self) -> Gimp.Image:
-    """GIMP image to generate item tree from."""
-    return self._image
   
   def __getitem__(
         self,
@@ -355,6 +335,14 @@ class ItemTree(metaclass=abc.ABCMeta):
       The current `Item` instance.
     """
     return self.iter(with_folders=False, with_empty_groups=False, reverse=True)
+
+  def add(self, raw_item_or_raw_items):
+    # TODO: Implement this
+    pass
+
+  def remove(self, item_or_items):
+    # TODO
+    pass
 
   def iter(
         self,
@@ -490,7 +478,50 @@ class ItemTree(metaclass=abc.ABCMeta):
   def reset_filter(self):
     """Resets the filter, creating a new empty `objectfilter.ObjectFilter`."""
     self.filter = pgobjectfilter.ObjectFilter(self._filter_match_type)
-  
+
+  @abc.abstractmethod
+  def _build_tree(self):
+    pass
+
+
+class ImageTree(ItemTree):
+
+  def _build_tree(self):
+    pass
+
+
+class GimpItemTree(ItemTree):
+  """Interface to store `Gimp.Item` objects in a tree-like structure.
+
+  Use one of the subclasses for items of a certain type:
+    * `LayerTree` for layers,
+    * `ChannelTree` for channels,
+    * `VectorTree` for vectors (paths).
+
+  Item groups (e.g. layer groups) are inserted twice in the tree - as folders
+  and as items. Parents of items are always folders.
+
+  While you may add or remove items from `GimpItemTree`, it does not account for
+  modifications, additions or removal of GIMP items by GIMP procedures outside
+  this class. To refresh the contents of the tree, create a new `GimpItemTree`
+  instance instead.
+  """
+
+  def __init__(
+        self,
+        image: Gimp.Image,
+        *args,
+        **kwargs,
+  ):
+    self._image = image
+
+    super().__init__(*args, **kwargs)
+
+  @property
+  def image(self) -> Gimp.Image:
+    """GIMP image to generate item tree from."""
+    return self._image
+
   def _build_tree(self):
     child_items = []
     for raw_item in self._get_children_from_image(self._image):
@@ -499,26 +530,26 @@ class ItemTree(metaclass=abc.ABCMeta):
         child_items.append(Item(raw_item, TYPE_GROUP, [], [], None, None))
       else:
         child_items.append(Item(raw_item, TYPE_ITEM, [], [], None, None))
-    
+
     item_tree = child_items
     item_list = []
-    
+
     while item_tree:
       item = item_tree.pop(0)
       item_list.append(item)
-      
+
       if item.type == TYPE_FOLDER:
         self._itemtree[item.raw.get_id(), FOLDER_KEY] = item
 
         self._itemtree_all_types[item.raw, FOLDER_KEY] = item
         self._itemtree_all_types[item.raw.get_id(), FOLDER_KEY] = item
-        
+
         parents_for_child = list(item.parents)
         parents_for_child.append(item)
 
         item_path = tuple(item_.orig_name for item_ in parents_for_child)
         self._itemtree_all_types[item_path, FOLDER_KEY] = item
-        
+
         child_items = []
         for raw_item in item.raw.list_children():
           if raw_item.is_group():
@@ -526,11 +557,11 @@ class ItemTree(metaclass=abc.ABCMeta):
             child_items.append(Item(raw_item, TYPE_GROUP, parents_for_child, [], None, None))
           else:
             child_items.append(Item(raw_item, TYPE_ITEM, parents_for_child, [], None, None))
-        
+
         # We break the convention here and access a private attribute from `Item`.
         item._orig_children = child_items
         item.children = child_items
-        
+
         for child_item in reversed(child_items):
           item_tree.insert(0, child_item)
       else:
@@ -541,42 +572,42 @@ class ItemTree(metaclass=abc.ABCMeta):
 
         item_path = tuple(item_.orig_name for item_ in list(item.parents) + [item])
         self._itemtree_all_types[item_path] = item
-    
+
     for i in range(1, len(item_list) - 1):
       # We break the convention here and access private attributes from `Item`.
       # noinspection PyProtectedMember
       item_list[i]._prev_item = item_list[i - 1]
       # noinspection PyProtectedMember
       item_list[i]._next_item = item_list[i + 1]
-    
+
     if len(item_list) > 1:
       # noinspection PyProtectedMember
       item_list[0]._next_item = item_list[1]
       # noinspection PyProtectedMember
       item_list[-1]._prev_item = item_list[-2]
-  
+
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
     """Returns a list of immediate child items from the specified `Gimp.Image`.
-    
+
     If no child items exist, an empty list is returned.
     """
     pass
 
 
-class LayerTree(ItemTree):
+class LayerTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Layer]:
     return image.list_layers()
 
 
-class ChannelTree(ItemTree):
+class ChannelTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Channel]:
     return image.list_channels()
 
 
-class VectorTree(ItemTree):
+class VectorTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Vectors]:
     return image.list_vectors()
