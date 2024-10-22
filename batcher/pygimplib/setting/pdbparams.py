@@ -40,7 +40,7 @@ def create_params(
   for setting in settings:
     if setting.can_be_registered_to_pdb():
       params.extend(setting.get_pdb_param())
-  
+
   return params
 
 

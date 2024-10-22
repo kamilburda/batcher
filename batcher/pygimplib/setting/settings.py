@@ -2683,28 +2683,32 @@ class ArraySetting(Setting):
     For more information, see `Setting.get_pdb_param()`.
     """
     if self.can_be_registered_to_pdb():
-      if length_name is None:
-        length_name = self.get_length_name(use_default=True)
+      array_param_dict = dict(
+        name=self.pdb_name,
+        type=self.pdb_type,
+        nick=self.display_name,
+        blurb=self.description,
+      )
 
-      if length_description is None:
-        length_description = ''
+      if self.element_type != StringSetting:
+        if length_name is None:
+          length_name = self.get_length_name(use_default=True)
 
-      return [
-        dict(
+        if length_description is None:
+          length_description = ''
+
+        length_param_dict = dict(
           name=length_name,
           type=GObject.TYPE_INT,
           default=0,
           minimum=0,
           nick=length_description,
           blurb=length_description,
-        ),
-        dict(
-          name=self.pdb_name,
-          type=self.pdb_type,
-          nick=self.display_name,
-          blurb=self.description,
-        ),
-      ]
+        )
+
+        return [length_param_dict, array_param_dict]
+      else:
+        return [array_param_dict]
     else:
       return None
   

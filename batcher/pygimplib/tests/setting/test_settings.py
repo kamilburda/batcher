@@ -165,7 +165,7 @@ class TestSetting(SettingTestCase):
           nick='_Run mode',
           blurb='Run mode',
         )])
-  
+
   def test_get_pdb_param_for_nonregistrable_setting(self):
     self.assertIsNone(self.setting.get_pdb_param())
   
@@ -2345,6 +2345,23 @@ class TestArraySetting(SettingTestCase):
           type=Gimp.FloatArray,
           nick='Coordinates',
           blurb='Coordinates',
+        ),
+      ])
+
+  def test_get_pdb_param_for_string_array(self):
+    setting = settings_.ArraySetting(
+      'input_filepaths',
+      default_value=(),
+      element_type='string')
+
+    self.assertEqual(
+      setting.get_pdb_param(),
+      [
+        dict(
+          name='input-filepaths',
+          type=GObject.TYPE_STRV,
+          nick='Input filepaths',
+          blurb='Input filepaths',
         ),
       ])
   
