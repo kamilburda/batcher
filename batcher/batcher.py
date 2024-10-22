@@ -53,8 +53,6 @@ def plug_in_batch_convert(_procedure, config, _data):
   image_tree = pg.itemtree.ImageTree()
 
   def _fill_image_tree_with_loaded_inputs(settings):
-    nonlocal image_tree
-
     image_tree.add(settings['main/inputs'].value)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
