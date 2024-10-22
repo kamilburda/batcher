@@ -933,6 +933,28 @@ class Batcher(metaclass=abc.ABCMeta):
     self._should_stop = True
 
 
+class ImageBatcher(Batcher):
+  """Class for batch-processing files and opened GIMP images with a sequence of
+  actions (resize, rename, export, ...).
+  """
+
+  def _set_up_item_tree(self, item_tree):
+    # TODO: Implement this
+    raise NotImplementedError
+
+  def _process_item_with_actions(self):
+    # TODO:
+    #  if the item is a file path, load the file as an image
+    #  if the item is a GIMP image, create a copy
+
+    super()._process_item_with_actions()
+
+    # TODO:
+    #  if the item wqs originally a file path, remove the loaded image
+    #  if the item wqs originally a GIMP image, remove the copy
+    #  the above two are the same basically
+
+
 class LayerBatcher(Batcher):
   """Class for batch-processing layers in the specified image with a sequence of
   actions (resize, rename, export, ...).
