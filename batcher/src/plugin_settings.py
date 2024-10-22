@@ -42,6 +42,16 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
+      'type': 'array',
+      'name': 'inputs',
+      'element_type': 'string',
+      'default_value': (),
+      'display_name': _('Input files and opened GIMP images'),
+      'description': _(
+        'Input files and opened GIMP images'
+        ' (GIMP images start with an "[Image]/" prefix)'),
+    },
+    {
       'type': 'file',
       'name': 'settings_file',
       'default_value': None,

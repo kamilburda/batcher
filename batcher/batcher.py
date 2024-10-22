@@ -50,20 +50,37 @@ def plug_in_batch_convert(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = None
+  image_tree = pg.itemtree.ImageTree()
+
+  def _fill_image_tree_with_loaded_inputs(settings):
+    nonlocal image_tree
+
+    image_tree.add(settings['main/inputs'].value)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_CONVERT,
       CONVERT_SOURCE_NAME,
       image_tree,
-      gui_main.BatchImageProcessingGui)
+      gui_main.BatchImageProcessingGui,
+      process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
+    )
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
-      SETTINGS_CONVERT, CONVERT_SOURCE_NAME, image_tree, mode='export')
+      SETTINGS_CONVERT,
+      CONVERT_SOURCE_NAME,
+      image_tree,
+      mode='export',
+      process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
+    )
   else:
     return _run_noninteractive(
-      SETTINGS_CONVERT, CONVERT_SOURCE_NAME, image_tree, config, mode='export')
+      SETTINGS_CONVERT,
+      CONVERT_SOURCE_NAME,
+      image_tree,
+      config,
+      mode='export',
+    )
 
 
 def plug_in_batch_export_layers(
@@ -191,6 +208,9 @@ def plug_in_batch_edit_selected_layers(
 
 
 def _run_noninteractive(settings, source_name, item_tree, config, mode):
+  if source_name == CONVERT_SOURCE_NAME:
+    item_tree.add(config.get_property('inputs'))
+
   settings_file = config.get_property('settings-file')
 
   if settings_file:
@@ -376,6 +396,23 @@ def _set_constraints_to_only_selected_layers(settings):
 
 
 pg.register_procedure(
+  plug_in_batch_convert,
+  procedure_type=Gimp.Procedure,
+  arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
+  menu_label=_('Con_vert...'),
+  menu_path='<Image>/File/[Export]',
+  image_types='',
+  documentation=(
+    _('Batch-process images'),
+    _('This procedure allows batch conversion of image files and images opened in GIMP'
+      ' to the specified file format, optionally applying arbitrary procedures'
+      ' to each item and ignoring items according to the specified constraints.'),
+  ),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
   plug_in_batch_export_layers,
   arguments=pg.setting.create_params(SETTINGS_EXPORT_LAYERS['main']),
   menu_label=_('E_xport Layers...'),
@@ -455,23 +492,6 @@ pg.register_procedure(
     Gimp.ProcedureSensitivityMask.DRAWABLE
     | Gimp.ProcedureSensitivityMask.DRAWABLES),
   documentation=(_('Batch-edit selected layers instantly'), ''),
-  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
-)
-
-
-pg.register_procedure(
-  plug_in_batch_convert,
-  procedure_type=Gimp.Procedure,
-  arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
-  menu_label=_('Con_vert...'),
-  menu_path='<Image>/File/[Export]',
-  image_types='',
-  documentation=(
-    _('Batch-process images'),
-    _('This procedure allows batch conversion of image files and images opened in GIMP'
-      ' to the specified file format, optionally applying arbitrary procedures'
-      ' to each item and ignoring items according to the specified constraints.'),
-  ),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 
