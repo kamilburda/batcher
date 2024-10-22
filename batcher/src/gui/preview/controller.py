@@ -124,11 +124,11 @@ class PreviewsController:
     self.unlock_and_update_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
-    self._settings['gui/name_preview_layers_collapsed_state'].connect_event(
+    self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-load',
       lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image]))
 
-    self._settings['gui/name_preview_layers_collapsed_state'].connect_event(
+    self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-reset',
       lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image]))
   
@@ -145,7 +145,7 @@ class PreviewsController:
     def _clear_image_preview(_setting):
       self._image_preview.clear()
     
-    self._settings['gui/image_preview_displayed_layers'].connect_event(
+    self._settings['gui/image_preview_displayed_items'].connect_event(
       'after-reset', _clear_image_preview)
   
   def _connect_toggle_name_preview_filtering(self):
@@ -292,7 +292,7 @@ class PreviewsController:
     self._update_collapsed_items()
   
   def _set_initial_selection_and_update_image_preview(self):
-    setting_value = self._settings['gui/image_preview_displayed_layers'].value[self._image]
+    setting_value = self._settings['gui/image_preview_displayed_items'].value[self._image]
     
     if not setting_value:
       raw_item_to_display = None
@@ -334,10 +334,10 @@ class PreviewsController:
       else:
         self._image_preview.clear()
 
-    self._settings['gui/image_preview_displayed_layers'].value[self._image] = (
+    self._settings['gui/image_preview_displayed_items'].value[self._image] = (
       [self._image_preview.item.raw] if self._image_preview.item is not None else [])
 
   def _update_collapsed_items(self):
-    collapsed_items_dict = self._settings['gui/name_preview_layers_collapsed_state'].value
+    collapsed_items_dict = self._settings['gui/name_preview_items_collapsed_state'].value
     collapsed_items_dict[self._image] = self._name_preview.collapsed_items
-    self._settings['gui/name_preview_layers_collapsed_state'].set_value(collapsed_items_dict)
+    self._settings['gui/name_preview_items_collapsed_state'].set_value(collapsed_items_dict)

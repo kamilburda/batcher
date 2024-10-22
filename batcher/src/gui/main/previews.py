@@ -64,7 +64,7 @@ class Previews:
       self._batcher_for_previews,
       self._settings,
       self._initial_layer_tree,
-      self._settings['gui/name_preview_layers_collapsed_state'].value[self._image],
+      self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
       self._settings['main/selected_layers'].value[self._image],
       'selected_in_preview')
 
