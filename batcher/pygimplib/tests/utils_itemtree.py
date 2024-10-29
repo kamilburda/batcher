@@ -15,12 +15,11 @@ def parse_layers(tree_string: str) -> stubs_gimp.Image:
   
   tree_string = tree_string.strip()
   lines = tree_string.splitlines(False)
-  
-  num_lines = len(lines)
+
   parents = [image]
   current_parent = image
   
-  for i in range(num_lines):
+  for i in range(len(lines)):
     current_symbol = lines[i].strip()
     
     layer = None

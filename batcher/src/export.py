@@ -107,7 +107,7 @@ def export(
         yield
         continue
       else:
-        item_to_process = pg.itemtree.Item(item.raw, pg.itemtree.TYPE_ITEM, [], [], None, None)
+        item_to_process = pg.itemtree.GimpItem(item.raw, pg.itemtree.TYPE_ITEM, [], [], None, None)
         if single_image_name_pattern is not None:
           item_to_process.name = renamer_for_image.rename(batcher, item_to_process)
         else:

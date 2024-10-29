@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable, Iterator
-from typing import Any, Dict, Generator, List, Optional, Union, Tuple
+import os
+from typing import Any, Dict, Generator, List, Optional, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -22,37 +23,40 @@ See `ItemTree.__getitem__()` for more information.
 """
 
 
-class Item:
-  """Wrapper for a `Gimp.Item` object containing additional attributes.
+class Item(metaclass=abc.ABCMeta):
+  """Wrapper for an object allowing access to various attributes with a unified
+  interface.
 
   Note that the attributes will not be up-to-date if changes were made to the
-  original `Gimp.Item` object.
+  original object.
   """
 
   def __init__(
         self,
-        raw_item: Gimp.Item,
+        object_: Any,
         item_type: int,
-        parents: Optional[Iterable[Item]] = None,
-        children: Optional[Iterable[Item]] = None,
-        prev_item: Optional[Item] = None,
-        next_item: Optional[Item] = None):
-    if raw_item is None:
-      raise TypeError('item cannot be None')
+        parents: Optional[Iterable[Any]] = None,
+        children: Optional[Iterable[Any]] = None,
+        prev_item: Optional[Any] = None,
+        next_item: Optional[Any] = None):
+    if object_ is None:
+      raise TypeError('object_ cannot be None')
 
-    self._raw_item = raw_item
+    self._object = object_
     self._type = item_type
     self._parents = parents if parents is not None else []
     self._children = children if children is not None else []
     self._prev_item = prev_item
     self._next_item = next_item
 
-    self.name = raw_item.get_name()
+    self.name = self._get_name_from_object()
     """Item name as a string, initially equal to ``orig_name``.
     
-    Modify this attribute instead of calling ``Gimp.Item.set_name()`` to avoid
-    modifying the original item.
+    This can be used to set a new name to avoid modifying the original object
+    in GIMP.
     """
+
+    self._id = self._get_id_from_object()
 
     self._orig_name = self.name
     self._orig_parents = self._parents
@@ -64,27 +68,61 @@ class Item:
     self._saved_named_states = {}
 
   @property
-  def raw(self) -> Gimp.Item:
-    """Underlying `Gimp.Item` object wrapped by this instance."""
-    return self._raw_item
+  @abc.abstractmethod
+  def raw(self):
+    """A temporary object derived from the object passed to the instance of
+    this class to ``__init__()``.
+
+    Note that this may or may not be equivalent to the object passed to the
+    instantiation and may be permanent, depending on the subclass.
+
+    Additionally, this property may be ``None`` initially if the temporary
+    object is created externally at a later time. If the created object is
+    removed externally, it is recommended to set this property to ``None`` if a
+    subclass allows it.
+
+    This property is meant to be used when it is guaranteed that the temporary
+    object is ready to be used. Examples of temporary objects include loaded
+    images from disk, or layers of an image.
+    """
+    pass
 
   @property
   def type(self) -> int:
     """Item type.
-    
+
     The type can be one of the following values:
       * ``TYPE_ITEM`` - regular item
-      * ``TYPE_GROUP`` - item group (item whose raw `Gimp.Item` is a group with
-        children; this `Item` has no children and acts as a regular item)
-      * ``TYPE_FOLDER`` - item containing children (raw item is a group with
-        children)
+      * ``TYPE_GROUP`` - item group - an item whose underlying object represents
+        a group with children, but acts as a regular item with no children, e.g.
+        a group layer acting as a single merged layer.
+      * ``TYPE_FOLDER`` - item containing children (e.g. a folder on a file
+        system or group layer)
     """
     return self._type
 
   @property
+  def id(self):
+    """Item identifier, used to uniquely identify the underlying object among
+    all objects of the same type (e.g. file path in a file system or numeric ID
+    of a GIMP layer).
+
+    This property is guaranteed to be unchanged for this `Item` instance.
+    """
+    return self._id
+
+  @abc.abstractmethod
+  def _get_name_from_object(self):
+    pass
+
+  @abc.abstractmethod
+  def _get_id_from_object(self):
+    pass
+
+  @property
   def parents(self) -> List[Item]:
-    """List of `Item` parents for this item, sorted from the topmost
-    parent to the bottommost (immediate) parent.
+    """List of `Item` parents for this item, sorted from the topmost parent
+    to the bottommost (immediate) parent.
     """
     return self._parents
 
@@ -103,8 +141,8 @@ class Item:
 
   @property
   def depth(self) -> int:
-    """Integer indicating the depth of the item in the item tree.
-    
+    """The depth of the item in the item tree.
+
     0 means the item is at the top level. The greater the depth, the lower
     the item is in the item tree.
     """
@@ -113,7 +151,7 @@ class Item:
   @property
   def parent(self) -> Union[Item, None]:
     """Immediate `Item` parent of this object.
-    
+
     If this object has no parent, ``None`` is returned.
     """
     return self._parents[-1] if self._parents else None
@@ -132,9 +170,8 @@ class Item:
 
   @property
   def orig_name(self) -> str:
-    """The original value of the ``Gimp.Item`` name.
-    
-    This attribute may be used to access `Item`s in `ItemTree`.
+    """The original item name as derived from the object passed to
+    ``__init__()``.
     """
     return self._orig_name
 
@@ -215,6 +252,76 @@ class Item:
     self._children = list(self._orig_children)
 
 
+class GimpItem(Item):
+  """`Item` subclass for a `Gimp.Item` or `Gimp.Image` object."""
+
+  @property
+  def raw(self) -> Union[Gimp.Item, Gimp.Image]:
+    """Underlying `Gimp.Item` or `Gimp.Image` object wrapped by this instance.
+    """
+    return self._object
+
+  @property
+  def id(self) -> int:
+    """Numeric identifier used to uniquely identify the underlying GIMP object.
+
+    This property is guaranteed to be unchanged for this `Item` instance.
+    """
+    return self._id
+
+  def _get_name_from_object(self) -> str:
+    return self._object.get_name()
+
+  def _get_id_from_object(self) -> int:
+    return self._object.get_id()
+
+
+class ImageFileItem(Item):
+  """`Item` subclass for an image file.
+
+  The object passed to ``__init__()`` must be a file path pointing to an
+  existing image that can be loaded in GIMP, or a folder.
+
+  The `id` property represents the file path to the item.
+  """
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self._raw = None
+
+  @property
+  def raw(self) -> Union[Gimp.Image, None]:
+    """`Gimp.Image` object, if loaded from the file path given by the `id`
+    property, or ``None`` if not loaded.
+    """
+    return self._raw
+
+  @raw.setter
+  def raw(self, value: Optional[Gimp.Image]):
+    """Sets the `raw` property.
+
+    The ``value`` must either be a valid `Gimp.Image` instance loaded from
+    the file path given by the `id` property, or ``None`` to reset this
+    property (indicating that the image was deleted).
+    """
+    self._raw = value
+
+  @property
+  def id(self) -> str:
+    """File path used to locate a file on the file system.
+
+    This property is guaranteed to be unchanged for this `Item` instance.
+    """
+    return self._id
+
+  def _get_name_from_object(self) -> str:
+    return os.path.basename(self._object)
+
+  def _get_id_from_object(self) -> int:
+    return self._object
+
+
 class ItemTree(metaclass=abc.ABCMeta):
   """Interface to store objects in a tree-like structure.
 
@@ -236,17 +343,14 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     
     self._filter_match_type = filter_match_type
-    
-    # Filters applied to all items in `self._itemtree`
+
     self.filter = pgobjectfilter.ObjectFilter(self._filter_match_type)
-    """`objectfilter.ObjectFilter` instance that allows filtering items based on
-    rules.
+    """`objectfilter.ObjectFilter` instance that allows filtering items based
+    on rules.
     """
-    
-    # Contains all items, including groups.
-    # key: `Item.raw` or (`Item.raw`, `FOLDER_KEY`) in case of folders
-    # value: `Item` instance
-    self._itemtree = {}
+
+    self._first_item = None
+    self._last_item = None
 
     # Contains all items, including groups, with all supported types (object, ID, string).
     # key: One of the following:
@@ -258,41 +362,19 @@ class ItemTree(metaclass=abc.ABCMeta):
     #  * (tuple of `Item.orig_name`, `FOLDER_KEY`)
     # value: `Item` instance
     self._itemtree_all_types = {}
-    
-    self._build_tree()
   
-  def __getitem__(
-        self,
-        key: Union[
-          int,
-          Tuple[str, ...],
-          Gimp.Item,
-          Tuple[Union[int, Tuple[str, ...], Gimp.Item], str],
-        ],
-  ) -> Item:
-    """Returns an `Item` instance using a corresponding `Gimp.Item` instance, ID
-     or path.
-
-    An item's ID is the return value of ``Item.raw.get_id()``. An item's path
-    name is a tuple of `orig_name` properties of the item's parents followed by
-    the item's `orig_name`.
+  def __getitem__(self, key) -> Item:
+    """Returns an `Item` instance using a key, particularly `Item.raw` or
+    `Item.id`.
     
     To access an item group as a folder, pass a tuple ``(key, 'folder')``.
     For example:
 
-        item_tree[('Frames',), 'folder']
+        item_tree[item.id, 'folder']
     """
     return self._itemtree_all_types[key]
   
-  def __contains__(
-        self,
-        key: Union[
-          int,
-          Tuple[str, ...],
-          Gimp.Item,
-          Tuple[Union[int, Tuple[str, ...], Gimp.Item], str],
-        ],
-  ) -> bool:
+  def __contains__(self, key) -> bool:
     """Returns ``True`` if an `Item` instance is in the item tree, regardless of
     filters, ``False`` otherwise.
 
@@ -336,12 +418,72 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     return self.iter(with_folders=False, with_empty_groups=False, reverse=True)
 
-  def add(self, raw_item_or_raw_items):
-    # TODO: Implement this
+  def add(self, objects, parent_item=None, last_item=None):
+    child_items = []
+    for object_ in objects:
+      self._insert_item(object_, child_items, [])
+
+    item_tree = child_items
+    item_list = []
+
+    while item_tree:
+      item = item_tree.pop(0)
+      item_list.append(item)
+
+      if item.type == TYPE_FOLDER:
+        parents_for_child = self._add_item_to_itemtree_dicts(item)
+
+        child_items = []
+        for object_ in self._list_children_from_object(item):
+          self._insert_item(object_, child_items, parents_for_child)
+
+        # We break the convention here and access a private attribute from `Item`.
+        item._orig_children = child_items
+        item.children = child_items
+
+        for child_item in reversed(child_items):
+          item_tree.insert(0, child_item)
+      else:
+        self._add_item_to_itemtree_dicts(item)
+
+    # TODO: Based on the value of last_item, link the first new item with the
+    #  last existing item (if there is a previous item) and the last new item
+    #  with the next existing item (if there is a next item).
+    #  Also, check if last_item exists within this tree if not None.
+
+    for i in range(1, len(item_list) - 1):
+      # We break the convention here and access private attributes from `Item`.
+      # noinspection PyProtectedMember
+      item_list[i]._prev_item = item_list[i - 1]
+      # noinspection PyProtectedMember
+      item_list[i]._next_item = item_list[i + 1]
+
+    if len(item_list) > 1:
+      # noinspection PyProtectedMember
+      item_list[0]._next_item = item_list[1]
+      # noinspection PyProtectedMember
+      item_list[-1]._prev_item = item_list[-2]
+
+    if len(item_list) >= 1:
+      self._first_item = item_list[0]
+      self._last_item = item_list[-1]
+
+  @abc.abstractmethod
+  def _insert_item(self, object_, child_items, parents_for_child=None):
     pass
 
-  def remove(self, item_or_items):
-    # TODO
+  @abc.abstractmethod
+  def _add_item_to_itemtree_dicts(self, item):
+    pass
+
+  @abc.abstractmethod
+  def _list_children_from_object(self, item):
+    pass
+
+  def remove(self, items):
+    # TODO:
+    #  remove from _itemtree_all_types
+    #  update prev and next for affected items
     pass
 
   def iter(
@@ -372,25 +514,31 @@ class ItemTree(metaclass=abc.ABCMeta):
       The current `Item` instance.
     """
     if not reverse:
-      itemtree_values = self._itemtree.values()
+      current_item = self._first_item
     else:
-      itemtree_values = reversed(self._itemtree.values())
-    
-    for item in itemtree_values:
+      current_item = self._last_item
+
+    while current_item is not None:
       should_yield_item = True
-      
-      if not with_folders and item.type == TYPE_FOLDER:
+
+      if not with_folders and current_item.type == TYPE_FOLDER:
         should_yield_item = False
-      
-      if not with_empty_groups and (item.type == TYPE_GROUP and not item.raw.list_children()):
+
+      if (not with_empty_groups
+          and (current_item.type == TYPE_GROUP and not current_item.raw.list_children())):
         should_yield_item = False
-      
+
       if should_yield_item:
-        if (filtered and self.is_filtered) and not self.filter.is_match(item):
+        if (filtered and self.is_filtered) and not self.filter.is_match(current_item):
           should_yield_item = False
-      
+
       if should_yield_item:
-        yield item
+        yield current_item
+
+      if not reverse:
+        current_item = current_item.next
+      else:
+        current_item = current_item.prev
   
   def iter_all(self, reverse: bool = False) -> Generator[Item, None, None]:
     """Iterates over all items.
@@ -407,12 +555,17 @@ class ItemTree(metaclass=abc.ABCMeta):
       The current `Item` instance.
     """
     if not reverse:
-      itemtree_values = self._itemtree.values()
+      current_item = self._first_item
     else:
-      itemtree_values = reversed(self._itemtree.values())
+      current_item = self._last_item
 
-    for item in itemtree_values:
-      yield item
+    while current_item is not None:
+      yield current_item
+
+      if not reverse:
+        current_item = current_item.next
+      else:
+        current_item = current_item.prev
   
   def prev(
         self,
@@ -479,15 +632,47 @@ class ItemTree(metaclass=abc.ABCMeta):
     """Resets the filter, creating a new empty `objectfilter.ObjectFilter`."""
     self.filter = pgobjectfilter.ObjectFilter(self._filter_match_type)
 
-  @abc.abstractmethod
-  def _build_tree(self):
-    pass
-
 
 class ImageTree(ItemTree):
 
-  def _build_tree(self):
-    pass
+  def _insert_item(self, object_, child_items, parents_for_child=None):
+    if parents_for_child is None:
+      parents_for_child = []
+
+    if isinstance(object_, str):
+      if os.path.isdir(object_):
+        path = os.path.abspath(object_)
+        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
+      else:
+        # Files and non-existent files/folders are treated as regular items.
+        # How non-existent files are handled depends on the client code.
+        path = os.path.abspath(object_)
+        child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
+    else:  # GIMP image
+      child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
+
+  def _add_item_to_itemtree_dicts(self, item):
+    parents_for_child = list(item.parents)
+    parents_for_child.append(item)
+
+    if item.type == TYPE_FOLDER:
+      self._itemtree_all_types[item.id, FOLDER_KEY] = item
+
+      item_path = tuple(item_.orig_name for item_ in parents_for_child)
+      self._itemtree_all_types[item_path, FOLDER_KEY] = item
+    else:
+      self._itemtree_all_types[item.id] = item
+
+      item_path = tuple(item_.orig_name for item_ in parents_for_child)
+      self._itemtree_all_types[item_path] = item
+
+  def _list_children_from_object(self, item):
+    try:
+      filenames = os.listdir(item.id)
+    except FileNotFoundError:
+      return []
+    else:
+      return sorted(os.path.abspath(os.path.join(item.id, filename)) for filename in filenames)
 
 
 class GimpItemTree(ItemTree):
@@ -517,74 +702,44 @@ class GimpItemTree(ItemTree):
 
     super().__init__(*args, **kwargs)
 
+    self.add(self._get_children_from_image(self._image))
+
   @property
   def image(self) -> Gimp.Image:
     """GIMP image to generate item tree from."""
     return self._image
 
-  def _build_tree(self):
-    child_items = []
-    for raw_item in self._get_children_from_image(self._image):
-      if raw_item.is_group():
-        child_items.append(Item(raw_item, TYPE_FOLDER, [], [], None, None))
-        child_items.append(Item(raw_item, TYPE_GROUP, [], [], None, None))
-      else:
-        child_items.append(Item(raw_item, TYPE_ITEM, [], [], None, None))
+  def _insert_item(self, object_, child_items, parents_for_child=None):
+    if parents_for_child is None:
+      parents_for_child = []
 
-    item_tree = child_items
-    item_list = []
+    if object_.is_group():
+      child_items.append(GimpItem(object_, TYPE_FOLDER, parents_for_child, [], None, None))
+      child_items.append(GimpItem(object_, TYPE_GROUP, parents_for_child, [], None, None))
+    else:
+      child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
 
-    while item_tree:
-      item = item_tree.pop(0)
-      item_list.append(item)
+  def _add_item_to_itemtree_dicts(self, item):
+    parents_for_child = list(item.parents)
+    parents_for_child.append(item)
 
-      if item.type == TYPE_FOLDER:
-        self._itemtree[item.raw.get_id(), FOLDER_KEY] = item
+    if item.type == TYPE_FOLDER:
+      self._itemtree_all_types[item.raw, FOLDER_KEY] = item
+      self._itemtree_all_types[item.id, FOLDER_KEY] = item
 
-        self._itemtree_all_types[item.raw, FOLDER_KEY] = item
-        self._itemtree_all_types[item.raw.get_id(), FOLDER_KEY] = item
+      item_path = tuple(item_.orig_name for item_ in parents_for_child)
+      self._itemtree_all_types[item_path, FOLDER_KEY] = item
+    else:
+      self._itemtree_all_types[item.raw] = item
+      self._itemtree_all_types[item.id] = item
 
-        parents_for_child = list(item.parents)
-        parents_for_child.append(item)
+      item_path = tuple(item_.orig_name for item_ in parents_for_child)
+      self._itemtree_all_types[item_path] = item
 
-        item_path = tuple(item_.orig_name for item_ in parents_for_child)
-        self._itemtree_all_types[item_path, FOLDER_KEY] = item
+    return parents_for_child
 
-        child_items = []
-        for raw_item in item.raw.list_children():
-          if raw_item.is_group():
-            child_items.append(Item(raw_item, TYPE_FOLDER, parents_for_child, [], None, None))
-            child_items.append(Item(raw_item, TYPE_GROUP, parents_for_child, [], None, None))
-          else:
-            child_items.append(Item(raw_item, TYPE_ITEM, parents_for_child, [], None, None))
-
-        # We break the convention here and access a private attribute from `Item`.
-        item._orig_children = child_items
-        item.children = child_items
-
-        for child_item in reversed(child_items):
-          item_tree.insert(0, child_item)
-      else:
-        self._itemtree[item.raw.get_id()] = item
-
-        self._itemtree_all_types[item.raw] = item
-        self._itemtree_all_types[item.raw.get_id()] = item
-
-        item_path = tuple(item_.orig_name for item_ in list(item.parents) + [item])
-        self._itemtree_all_types[item_path] = item
-
-    for i in range(1, len(item_list) - 1):
-      # We break the convention here and access private attributes from `Item`.
-      # noinspection PyProtectedMember
-      item_list[i]._prev_item = item_list[i - 1]
-      # noinspection PyProtectedMember
-      item_list[i]._next_item = item_list[i + 1]
-
-    if len(item_list) > 1:
-      # noinspection PyProtectedMember
-      item_list[0]._next_item = item_list[1]
-      # noinspection PyProtectedMember
-      item_list[-1]._prev_item = item_list[-2]
+  def _list_children_from_object(self, item):
+    return item.raw.list_children()
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
