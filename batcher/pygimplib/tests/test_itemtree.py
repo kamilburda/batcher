@@ -1,9 +1,20 @@
 """Tests for the `itemtree` module.
 
+For convenience, tests for adding and removing items are provided for the
+`ImageTree` subclass as it is a common use case for this subclass.
+
+Likewise, for convenience, tests for other features (iteration,
+`__getitem__`, ...) are provided for the `GimpItemTree` subclass as it is
+easier to test such methods there thanks to readily available stubs and no
+need for extensive mocking and test setup.
+
 Because the public interface for `GimpItemTree` is identical for all its
 subclasses and their implementation only differs in which types of child
 objects are listed, it is sufficient to test the `GimpItemTree` using only
 one of its subclasses. The `LayerTree` class was chosen for this purpose.
+
+Likewise, tests for common features for all `Item` subclasses are written for
+the `GimpItem` subclass.
 """
 import os
 
@@ -466,15 +477,30 @@ class TestLayerTree(unittest.TestCase):
       self.tree[('Corners', 'top-left-corner')])
 
 
+class TestImageFileItem(unittest.TestCase):
+
+  def setUp(self):
+    self.path = os.path.join('some_path', 'Corners')
+
+    # noinspection PyTypeChecker
+    self.item = pgitemtree.ImageFileItem(self.path, pgitemtree.TYPE_ITEM)
+
+  def test_name(self):
+    self.assertEqual(self.item.name, 'Corners')
+
+  def test_id(self):
+    self.assertEqual(self.item.id, self.path)
+
+  def test_raw_on_instantiation(self):
+    self.assertIsNone(self.item.raw)
+
+
 class TestGimpItem(unittest.TestCase):
 
   def setUp(self):
-    self.ITEM = pgitemtree.TYPE_ITEM
-    self.GROUP = pgitemtree.TYPE_GROUP
-    self.FOLDER = pgitemtree.TYPE_FOLDER
-
     # noinspection PyTypeChecker
-    self.item = pgitemtree.GimpItem(stubs_gimp.Layer(name='main-background.jpg'), self.ITEM)
+    self.item = pgitemtree.GimpItem(
+      stubs_gimp.Layer(name='main-background.jpg'), pgitemtree.TYPE_ITEM)
   
   def test_str(self):
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
@@ -484,7 +510,7 @@ class TestGimpItem(unittest.TestCase):
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
 
   @mock.patch(f'{pgutils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
-  def test_repr(self, mock_id):
+  def test_repr(self, _mock_id):
     self.assertEqual(
       repr(self.item),
       '<{}.itemtree.GimpItem "main-background.jpg {}" at 0x0000002023b009130>'.format(
