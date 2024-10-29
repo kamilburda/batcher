@@ -257,7 +257,7 @@ class TestLayerTree(unittest.TestCase):
     item = next(self.tree.iter(with_folders=False))
 
     self.assertEqual(self.tree[item.raw], item)
-    self.assertEqual(self.tree[item.raw.get_id()], item)
+    self.assertEqual(self.tree[item.id], item)
 
     item_path = tuple(item_.orig_name for item_ in (list(item.parents) + [item]))
     self.assertEqual(self.tree[item_path], item)
@@ -265,7 +265,7 @@ class TestLayerTree(unittest.TestCase):
     folder_item = next(self.tree.iter(with_folders=True))
 
     self.assertEqual(self.tree[folder_item.raw, self.FOLDER_KEY], folder_item)
-    self.assertEqual(self.tree[folder_item.raw.get_id(), self.FOLDER_KEY], folder_item)
+    self.assertEqual(self.tree[folder_item.id, self.FOLDER_KEY], folder_item)
 
     folder_item_path = tuple(
       item_.orig_name for item_ in (list(folder_item.parents) + [folder_item]))
@@ -275,7 +275,7 @@ class TestLayerTree(unittest.TestCase):
     item = next(self.tree.iter())
 
     self.assertIn(item.raw, self.tree)
-    self.assertIn(item.raw.get_id(), self.tree)
+    self.assertIn(item.id, self.tree)
 
     item_path = tuple(item_.orig_name for item_ in (list(item.parents) + [item]))
     self.assertIn(item_path, self.tree)
