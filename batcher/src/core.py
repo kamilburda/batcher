@@ -287,10 +287,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def exported_raw_items(self) -> List:
-    """List of items that were successfully exported.
+    """List of successfully exported objects.
 
-    Does not include items skipped by the user (when files with the same names
-    already exist).
+    This list does not include items skipped by the user (when files with the
+    same names already exist).
     """
     return list(self._exported_raw_items)
 
@@ -431,7 +431,7 @@ class Batcher(metaclass=abc.ABCMeta):
     corresponding `Batcher` properties. See the properties for details.
     """
     self._set_attributes(**kwargs)
-    self._set_up_item_tree(self._item_tree)
+    self._set_up_item_tree()
     self._prepare_for_processing()
 
     exception_occurred = False
@@ -477,7 +477,7 @@ class Batcher(metaclass=abc.ABCMeta):
       self._export_context_manager_kwargs = {}
 
   @abc.abstractmethod
-  def _set_up_item_tree(self, item_tree):
+  def _set_up_item_tree(self):
     pass
 
   def _prepare_for_processing(self):
@@ -938,20 +938,38 @@ class ImageBatcher(Batcher):
   actions (resize, rename, export, ...).
   """
 
-  def _set_up_item_tree(self, item_tree):
-    # TODO: Implement this
-    raise NotImplementedError
+  def _set_up_item_tree(self):
+    if self._item_tree is None:
+      raise TypeError(
+        'item_tree for ImageBatcher must be'
+        f' {pg.itemtree.ImageTree.__module__}.{pg.itemtree.ImageTree.__qualname__}'
+        ' instance, not None')
+
+    if self._item_tree.filter:
+      self._item_tree.reset_filter()
 
   def _process_item_with_actions(self):
-    # TODO:
-    #  if the item is a file path, load the file as an image
-    #  if the item is a GIMP image, create a copy
+    if not self._edit_mode or self._is_preview:
+      if self._current_raw_item is None:
+        # TODO: load the file as an image
+        #  also assign the loaded image to item.raw
+        #  if the file does not exist, skip
+        pass
+      else:
+        # TODO: Create a copy of the image
+        pass
+    else:
+      # This would involve loading files, processing them and finally
+      # displaying them. For opened images, this would involve batch-editing
+      # images as a whole (not individual layers). Since this appears to be a
+      # very marginal use case, this feature is not implemented.
+      raise NotImplementedError('edit mode for batch image processing is not supported')
 
     super()._process_item_with_actions()
 
     # TODO:
     #  if the item wqs originally a file path, remove the loaded image
-    #  if the item wqs originally a GIMP image, remove the copy
+    #  if the item was originally a GIMP image, remove the copy
     #  the above two are the same basically
 
 
@@ -1025,10 +1043,8 @@ class LayerBatcher(Batcher):
     """
     return list(self._orig_selected_raw_items)
 
-  def _set_up_item_tree(self, item_tree):
-    if item_tree is not None:
-      self._item_tree = item_tree
-    else:
+  def _set_up_item_tree(self):
+    if self._item_tree is None:
       self._item_tree = pg.itemtree.LayerTree(self._input_image)
 
     if self._item_tree.filter:
