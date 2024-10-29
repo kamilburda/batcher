@@ -418,7 +418,10 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     return self.iter(with_folders=False, with_empty_groups=False, reverse=True)
 
-  def add(self, objects, parent_item=None, last_item=None):
+  def add(self, objects, parent_item=None, insert_after_item=None):
+    if not objects:
+      return
+
     child_items = []
     for object_ in objects:
       self._insert_item(object_, child_items, [])
@@ -438,6 +441,7 @@ class ItemTree(metaclass=abc.ABCMeta):
           self._insert_item(object_, child_items, parents_for_child)
 
         # We break the convention here and access a private attribute from `Item`.
+        # noinspection PyProtectedMember
         item._orig_children = child_items
         item.children = child_items
 
@@ -445,11 +449,6 @@ class ItemTree(metaclass=abc.ABCMeta):
           item_tree.insert(0, child_item)
       else:
         self._add_item_to_itemtree_dicts(item)
-
-    # TODO: Based on the value of last_item, link the first new item with the
-    #  last existing item (if there is a previous item) and the last new item
-    #  with the next existing item (if there is a next item).
-    #  Also, check if last_item exists within this tree if not None.
 
     for i in range(1, len(item_list) - 1):
       # We break the convention here and access private attributes from `Item`.
@@ -464,7 +463,22 @@ class ItemTree(metaclass=abc.ABCMeta):
       # noinspection PyProtectedMember
       item_list[-1]._prev_item = item_list[-2]
 
-    if len(item_list) >= 1:
+    if self._first_item is not None and self._last_item is not None and len(item_list) >= 1:
+      if insert_after_item is None:
+        insert_after_item = self._last_item
+
+      # noinspection PyProtectedMember
+      item_list[-1]._next_item = insert_after_item.next
+      if insert_after_item.next is not None:
+        # noinspection PyProtectedMember
+        insert_after_item.next._prev_item = item_list[-1]
+
+      # noinspection PyProtectedMember
+      item_list[0]._prev_item = insert_after_item
+      # noinspection PyProtectedMember
+      insert_after_item._next_item = item_list[0]
+
+    if self._first_item is None and self._last_item is None and len(item_list) >= 1:
       self._first_item = item_list[0]
       self._last_item = item_list[-1]
 
