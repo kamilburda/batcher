@@ -680,6 +680,8 @@ class ImageTree(ItemTree):
       item_path = tuple(item_.orig_name for item_ in parents_for_child)
       self._itemtree_all_types[item_path] = item
 
+    return parents_for_child
+
   def _list_children_from_object(self, item):
     try:
       filenames = os.listdir(item.id)
