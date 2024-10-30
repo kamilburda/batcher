@@ -114,7 +114,7 @@ class TestImageTree(unittest.TestCase):
         mock_abspath,
         mock_listdir,
         mock_isdir,
-        test_case_name_suffix,
+        _test_case_name_suffix,
         insert_after_path_and_is_folder_indicator,
         paths_and_is_folder_indicators,
         prev_item_path_and_is_folder_indicator,
@@ -186,6 +186,121 @@ class TestImageTree(unittest.TestCase):
         if not path_.startswith(self.root_path) else path_))
     mock_listdir.side_effect = [item[1] for item in self.paths[1:]]
     mock_isdir.side_effect = self.mock_isdir_return_values
+
+  @parameterized.parameterized.expand([
+    ('single_item',
+     [(('Corners', 'top-left3', 'bottom-right.png'), False)],
+     ),
+
+    ('multiple_items',
+     [(('Corners', 'top-left3', 'bottom-left.png'), False),
+      (('Corners', 'top-left3', 'bottom-right.png'), False),
+      (('Frames', 'top.png'), False)],
+     ),
+
+    ('last_item',
+     [(('Overlay',), True)],
+     ),
+
+    ('first_item_and_folder',
+     [(('Corners',), True)],
+     [(('Corners',), True),
+      (('Corners', 'top-left.png'), False),
+      (('Corners', 'top-left2'), True),
+      (('Corners', 'top-left3'), True),
+      (('Corners', 'top-left3', 'bottom-left.png'), False),
+      (('Corners', 'top-left3', 'bottom-right.png'), False),
+      (('Corners', 'top-right.png'), False)],
+     ),
+
+    ('invalid_items_are_skipped',
+     [(('non_existent_file',), False)],
+     )
+  ])
+  def test_remove(
+        self,
+        mock_abspath,
+        mock_listdir,
+        mock_isdir,
+        _test_case_name_suffix,
+        paths_to_remove,
+        removed_paths=None,
+  ):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    keys_to_remove = [
+      os.path.join(self.root_path, *path[0])
+      if not path[1] else (os.path.join(self.root_path, *path[0]), self.FOLDER_KEY)
+      for path in paths_to_remove]
+    items_to_remove = [
+      self.tree[key]
+      for key in keys_to_remove
+      if key in self.tree
+    ]
+
+    self.tree.remove(items_to_remove)
+
+    self.maxDiff = None
+
+    for key in keys_to_remove:
+      self.assertNotIn(key, self.tree)
+
+    for item in items_to_remove:
+      if item.parent is not None:
+        self.assertNotIn(item, item.parent.children)
+
+    if removed_paths is None:
+      removed_paths = paths_to_remove
+
+    for path in removed_paths:
+      self.expected_keys_and_paths.pop(path[0], None)
+
+    expected_keys = self._get_keys_from_expected_paths()
+
+    self.assertListEqual(
+      [item for item in self.tree.iter_all()],
+      [self.tree[key] for key in expected_keys])
+
+    self.assertListEqual(
+      [item for item in self.tree.iter_all(reverse=True)],
+      [self.tree[key] for key in reversed(expected_keys)])
+
+  def test_remove_all_but_one_item(self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    key_to_keep = os.path.join(self.root_path, 'main-background.jpg')
+
+    items_to_remove = [item for item in self.tree.iter_all() if item.id != key_to_keep]
+
+    self.tree.remove(items_to_remove)
+
+    self.assertEqual(len(self.tree), 1)
+    self.assertEqual(len(list(self.tree.iter_all())), 1)
+    self.assertIn(key_to_keep, self.tree)
+    self.assertIsNone(self.tree[key_to_keep].prev)
+    self.assertIsNone(self.tree[key_to_keep].next)
+    # noinspection PyProtectedMember
+    self.assertEqual(self.tree._first_item, self.tree[key_to_keep])
+    # noinspection PyProtectedMember
+    self.assertEqual(self.tree._last_item, self.tree[key_to_keep])
+
+  def test_remove_all_items(self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    self.tree.remove(self.tree.iter_all())
+
+    self.assertEqual(len(self.tree), 0)
+    self.assertEqual(len(list(self.tree.iter_all())), 0)
+    # noinspection PyProtectedMember
+    self.assertIsNone(self.tree._first_item)
+    # noinspection PyProtectedMember
+    self.assertIsNone(self.tree._last_item)
 
   def _get_keys_from_expected_paths(self):
     return [
@@ -475,6 +590,43 @@ class TestLayerTree(unittest.TestCase):
     self.assertEqual(
       self.tree.next(self.tree[('Corners',), self.FOLDER_KEY], filtered=False),
       self.tree[('Corners', 'top-left-corner')])
+
+  def test_get_all_children_from_item(self):
+    self.assertEqual(self.tree[('Corners', 'top-left-corner')].get_all_children(), [])
+
+  def test_get_all_children_from_folder(self):
+    self.maxDiff = None
+
+    self.assertListEqual(
+      self.tree[('Corners',), self.FOLDER_KEY].get_all_children(),
+      [
+        self.tree[('Corners', 'top-left-corner')],
+        self.tree[('Corners', 'top-right-corner')],
+        self.tree[(('Corners', 'top-left-corner:'), self.FOLDER_KEY)],
+        self.tree[('Corners', 'top-left-corner:')],
+        self.tree[(('Corners', 'top-left-corner::'), self.FOLDER_KEY)],
+        self.tree[('Corners', 'top-left-corner::')],
+        self.tree[('Corners', 'top-left-corner::', 'bottom-right-corner')],
+        self.tree[('Corners', 'top-left-corner::', 'bottom-left-corner')],
+      ])
+
+  def test_remove_group_item_also_removes_corresponding_folder(self):
+    item_path = ('Corners', 'top-left-corner:')
+    items_to_be_removed = [self.tree[(item_path, self.FOLDER_KEY)], self.tree[item_path]]
+
+    self.tree.remove([self.tree[(item_path, self.FOLDER_KEY)]])
+
+    for item in items_to_be_removed:
+      self.assertNotIn(item.id, self.tree)
+
+  def test_remove_folder_item_also_removes_corresponding_group(self):
+    item_path = ('Corners', 'top-left-corner:')
+    items_to_be_removed = [self.tree[(item_path, self.FOLDER_KEY)], self.tree[item_path]]
+
+    self.tree.remove([self.tree[item_path]])
+
+    for item in items_to_be_removed:
+      self.assertNotIn(item.id, self.tree)
 
 
 class TestImageFileItem(unittest.TestCase):

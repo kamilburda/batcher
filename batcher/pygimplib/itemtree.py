@@ -191,6 +191,29 @@ class Item(metaclass=abc.ABCMeta):
   def __repr__(self) -> str:
     return pgutils.reprify_object(self, f'{self.orig_name} {type(self.raw)}')
 
+  def get_all_children(self) -> List[Item]:
+    """Returns a list of all child items, including items from child folders
+    of any depth.
+
+    An empty list returned for items that are not folders (i.e. whose `type`
+    property is not `TYPE_FOLDER`).
+    """
+    if self.type != TYPE_FOLDER:
+      return []
+
+    all_children = []
+
+    items = list(self._children)
+    while items:
+      item = items.pop(0)
+
+      all_children.append(item)
+
+      if item.type == TYPE_FOLDER:
+        items.extend(item.children)
+
+    return all_children
+
   def push_state(self):
     """Saves the current values of item's attributes that can be modified.
 
@@ -418,7 +441,12 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     return self.iter(with_folders=False, with_empty_groups=False, reverse=True)
 
-  def add(self, objects, parent_item=None, insert_after_item=None):
+  def add(
+        self,
+        objects: Iterable,
+        parent_item: Optional[Item] = None,
+        insert_after_item: Optional[Item] = None,
+  ):
     if not objects:
       return
 
@@ -494,11 +522,63 @@ class ItemTree(metaclass=abc.ABCMeta):
   def _list_children_from_object(self, item):
     pass
 
-  def remove(self, items):
-    # TODO:
-    #  remove from _itemtree_all_types
-    #  update prev and next for affected items
-    pass
+  def remove(self, items: Iterable[Item]):
+    """Removes items from the tree.
+
+    Removing items whose `item_type` property is `TYPE_FOLDER` will result in
+    also removing all their children (including subfolders and their
+    children).
+
+    Items whose `item_type` property is `TYPE_FOLDER` will be removed along
+    with corresponding items of type `TYPE_GROUP`, and vice versa.
+
+    Any items that do not exist in the tree will be silently ignored without
+    raising an exception.
+    """
+    # TODO: Delete all keys, including item.raw and item path, if they exist,
+    #  or remove this to-do if only IDs will be used as keys.
+
+    for item in items:
+      if item.type == TYPE_ITEM:
+        item_keys = [item.id]
+      else:
+        # This ensures that items of type TYPE_FOLDER are always removed
+        # along with their corresponding item of TYPE_GROUP, if those exist.
+        item_keys = [item.id, (item.id, FOLDER_KEY)]
+
+      items_to_remove = []
+
+      for key in item_keys:
+        if key in self._itemtree_all_types:
+          items_to_remove.append(self._itemtree_all_types[key])
+          items_to_remove.extend(self._itemtree_all_types[key].get_all_children())
+
+      for item_to_remove in items_to_remove:
+        self._itemtree_all_types.pop(item_to_remove.id, None)
+        self._itemtree_all_types.pop((item_to_remove.id, FOLDER_KEY), None)
+
+        next_item = item_to_remove.next
+        previous_item = item_to_remove.prev
+
+        if previous_item is not None:
+          # noinspection PyProtectedMember
+          previous_item._next_item = next_item
+
+        if next_item is not None:
+          # noinspection PyProtectedMember
+          next_item._prev_item = previous_item
+
+        if item_to_remove.parent is not None:
+          try:
+            item_to_remove.parent.children.remove(item_to_remove)
+          except ValueError:
+            pass
+
+        if item_to_remove == self._first_item:
+          self._first_item = next_item
+
+        if item_to_remove == self._last_item:
+          self._last_item = previous_item
 
   def iter(
         self,
