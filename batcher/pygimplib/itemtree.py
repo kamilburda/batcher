@@ -450,9 +450,14 @@ class ItemTree(metaclass=abc.ABCMeta):
     if not objects:
       return
 
+    if parent_item is None:
+      parents_for_child_initial = []
+    else:
+      parents_for_child_initial = parent_item.parents + [parent_item]
+
     child_items = []
     for object_ in objects:
-      self._insert_item(object_, child_items, [])
+      self._insert_item(object_, child_items, list(parents_for_child_initial))
 
     item_tree = child_items
     item_list = []
@@ -466,7 +471,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
         child_items = []
         for object_ in self._list_children_from_object(item):
-          self._insert_item(object_, child_items, parents_for_child)
+          self._insert_item(object_, child_items, list(parents_for_child))
 
         # We break the convention here and access a private attribute from `Item`.
         # noinspection PyProtectedMember
@@ -493,7 +498,13 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     if self._first_item is not None and self._last_item is not None and len(item_list) >= 1:
       if insert_after_item is None:
-        insert_after_item = self._last_item
+        if parent_item is None:
+          insert_after_item = self._last_item
+        else:
+          if parent_item.children:
+            insert_after_item = parent_item.children[-1]
+          else:
+            insert_after_item = parent_item
 
       # noinspection PyProtectedMember
       item_list[-1]._next_item = insert_after_item.next
@@ -811,7 +822,8 @@ class GimpItemTree(ItemTree):
 
     if object_.is_group():
       child_items.append(GimpItem(object_, TYPE_FOLDER, parents_for_child, [], None, None))
-      child_items.append(GimpItem(object_, TYPE_GROUP, parents_for_child, [], None, None))
+      # Make sure each item keeps its own list of parents.
+      child_items.append(GimpItem(object_, TYPE_GROUP, list(parents_for_child), [], None, None))
     else:
       child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
 

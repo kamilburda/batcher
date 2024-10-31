@@ -108,6 +108,14 @@ class TestImageTree(unittest.TestCase):
      (['Corners', 'top-left3'], True),
      (['Corners', 'top-left3', 'bottom-left.png'], False),
      ),
+
+    ('under_specific_parent',
+     None,
+     [('bottom-left2.png', False), ('bottom-left3.png', False)],
+     (['Corners', 'top-left2'], True),
+     (['Corners', 'top-left3'], True),
+     (['Corners', 'top-left2'], True),
+     ),
   ])
   def test_add_additional_time(
         self,
@@ -119,6 +127,7 @@ class TestImageTree(unittest.TestCase):
         paths_and_is_folder_indicators,
         prev_item_path_and_is_folder_indicator,
         next_item_path_and_is_folder_indicator,
+        parent_item_path_and_is_folder_indicator=None,
   ):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
 
@@ -137,7 +146,20 @@ class TestImageTree(unittest.TestCase):
       )
       insert_after_item = self.tree[insert_after_key]
 
-    self.tree.add(objects_to_add, insert_after_item=insert_after_item)
+    if parent_item_path_and_is_folder_indicator is None:
+      parent_item = None
+    else:
+      parent_path = os.path.join(self.root_path, *parent_item_path_and_is_folder_indicator[0])
+      parent_key = (
+        (parent_path, self.FOLDER_KEY)
+        if parent_item_path_and_is_folder_indicator[1] else parent_path)
+      parent_item = self.tree[parent_key]
+
+    self.tree.add(
+      objects_to_add,
+      parent_item=parent_item,
+      insert_after_item=insert_after_item,
+    )
 
     added_keys = [os.path.join(self.root_path, object_to_add) for object_to_add in objects_to_add]
 
@@ -147,7 +169,7 @@ class TestImageTree(unittest.TestCase):
       if prev_item_path_and_is_folder_indicator[1] else prev_item_path
     )
 
-    if insert_after_item is None:
+    if insert_after_item is None and parent_item is None:
       next_item = None
       next_item_key = None
     else:
@@ -179,13 +201,61 @@ class TestImageTree(unittest.TestCase):
       [item for item in self.tree.iter_all()],
       [self.tree[key] for key in expected_keys])
 
-  def _set_up_tree_before_add(self, mock_abspath, mock_listdir, mock_isdir):
-    mock_abspath.side_effect = (
-      lambda path_: (
-        os.path.join(self.root_path, path_)
-        if not path_.startswith(self.root_path) else path_))
-    mock_listdir.side_effect = [item[1] for item in self.paths[1:]]
-    mock_isdir.side_effect = self.mock_isdir_return_values
+  def test_add_additional_time_under_parent_with_subfolders(
+        self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    parent_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
+
+    mock_isdir.side_effect = [False, True, False, False]
+    mock_listdir.side_effect = [
+      ['bottom-right2.png', 'bottom-right3.png']
+    ]
+    objects_to_add = [
+      os.path.join(self.root_path, *path)
+      for path in [
+        ('Corners', 'bottom-left2.png'),
+        ('Corners', 'bottom-right2'),
+      ]
+    ]
+
+    self.tree.add(
+      objects_to_add,
+      parent_item=parent_item,
+      insert_after_item=None,
+    )
+
+    added_keys = [
+      objects_to_add[0],
+      (objects_to_add[1], self.FOLDER_KEY),
+      os.path.join(self.root_path, 'Corners', 'bottom-right2', 'bottom-right2.png'),
+      os.path.join(self.root_path, 'Corners', 'bottom-right2', 'bottom-right3.png'),
+    ]
+
+    prev_item_key = os.path.join(self.root_path, 'Corners', 'top-right.png')
+    next_item_key = (os.path.join(self.root_path, 'Frames'), self.FOLDER_KEY)
+
+    self.maxDiff = None
+
+    for key in added_keys:
+      self.assertIn(key, self.tree)
+
+    self.assertEqual(self.tree[added_keys[0]].prev, self.tree[prev_item_key])
+    self.assertEqual(self.tree[prev_item_key].next, self.tree[added_keys[0]])
+    self.assertEqual(self.tree[added_keys[-1]].next, self.tree[next_item_key])
+    self.assertEqual(self.tree[next_item_key].prev, self.tree[added_keys[-1]])
+
+    expected_keys = self._get_keys_from_expected_paths()
+    prev_item_key_index = expected_keys.index(prev_item_key) + 1
+
+    expected_keys = (
+      expected_keys[:prev_item_key_index] + added_keys + expected_keys[prev_item_key_index:])
+
+    self.assertListEqual(
+      [item for item in self.tree.iter_all()],
+      [self.tree[key] for key in expected_keys])
 
   @parameterized.parameterized.expand([
     ('single_item',
@@ -301,6 +371,14 @@ class TestImageTree(unittest.TestCase):
     self.assertIsNone(self.tree._first_item)
     # noinspection PyProtectedMember
     self.assertIsNone(self.tree._last_item)
+
+  def _set_up_tree_before_add(self, mock_abspath, mock_listdir, mock_isdir):
+    mock_abspath.side_effect = (
+      lambda path_: (
+        os.path.join(self.root_path, path_)
+        if not path_.startswith(self.root_path) else path_))
+    mock_listdir.side_effect = [item[1] for item in self.paths[1:]]
+    mock_isdir.side_effect = self.mock_isdir_return_values
 
   def _get_keys_from_expected_paths(self):
     return [
