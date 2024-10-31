@@ -472,6 +472,24 @@ class ItemTree(metaclass=abc.ABCMeta):
     if not objects:
       return
 
+    if (parent_item is not None
+        and insert_after_item is not None
+        and not (parent_item == insert_after_item or insert_after_item in parent_item.children)):
+      raise ValueError(
+        'insert_after_item, if specified, must be a child of parent_item or equal to parent_item')
+
+    if parent_item is not None and (parent_item.id, FOLDER_KEY) not in self._itemtree_all_types:
+      raise ValueError(f'parent_item {parent_item.id} does not exist within this item tree')
+
+    if insert_after_item is not None:
+      key = (
+        (insert_after_item.id, FOLDER_KEY)
+        if insert_after_item.type == TYPE_FOLDER else insert_after_item.id)
+
+      if key not in self._itemtree_all_types:
+        raise ValueError(
+          f'insert_after_item {insert_after_item.id} does not exist within this item tree')
+
     if parent_item is None:
       parents_for_child_initial = []
     else:

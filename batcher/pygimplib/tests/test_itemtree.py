@@ -257,6 +257,77 @@ class TestImageTree(unittest.TestCase):
       [item for item in self.tree.iter_all()],
       [self.tree[key] for key in expected_keys])
 
+  def test_add_with_parent_item_when_insert_after_is_not_under_parent_or_is_not_parent_raises_error(
+        self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    parent_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
+
+    objects_to_add = [
+      os.path.join(self.root_path, *path)
+      for path in [
+        ('Corners', 'bottom-left2.png'),
+        ('Corners', 'bottom-right2'),
+      ]
+    ]
+
+    with self.assertRaises(ValueError):
+      self.tree.add(
+        objects_to_add,
+        parent_item=parent_item,
+        insert_after_item=self.tree[os.path.join(self.root_path, 'main-background.jpg')],
+      )
+
+  def test_add_parent_item_is_not_in_tree_raises_error(
+        self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    another_tree = pgitemtree.ImageTree()
+
+    parent_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
+
+    objects_to_add = [
+      os.path.join(self.root_path, *path)
+      for path in [
+        ('Corners', 'bottom-left2.png'),
+        ('Corners', 'bottom-right2'),
+      ]
+    ]
+
+    with self.assertRaises(ValueError):
+      another_tree.add(
+        objects_to_add,
+        parent_item=parent_item,
+      )
+
+  def test_add_insert_after_item_is_not_in_tree_raises_error(
+        self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    another_tree = pgitemtree.ImageTree()
+
+    insert_after_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
+
+    objects_to_add = [
+      os.path.join(self.root_path, *path)
+      for path in [
+        ('Corners', 'bottom-left2.png'),
+        ('Corners', 'bottom-right2'),
+      ]
+    ]
+
+    with self.assertRaises(ValueError):
+      another_tree.add(
+        objects_to_add,
+        insert_after_item=insert_after_item,
+      )
+
   @parameterized.parameterized.expand([
     ('single_item',
      [(('Corners', 'top-left3', 'bottom-right.png'), False)],
