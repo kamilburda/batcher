@@ -57,6 +57,10 @@ class Item(metaclass=abc.ABCMeta):
     """
 
     self._id = self._get_id_from_object()
+    if self._type != TYPE_FOLDER:
+      self._key = self._id
+    else:
+      self._key = (self._id, FOLDER_KEY)
 
     self._orig_name = self.name
     self._orig_parents = self._parents
@@ -110,6 +114,16 @@ class Item(metaclass=abc.ABCMeta):
     This property is guaranteed to be unchanged for this `Item` instance.
     """
     return self._id
+
+  @property
+  def key(self):
+    """Item identifier used for accessing the item in the tree it belongs to.
+
+    For non-folder types, this is equivalent to `id`. For folder types (i.e.
+    if the `type` property is equal to `TYPE_FOLDER`), this is equivalent to
+    ``(id, FOLDER_KEY)``.
+    """
+    return self._key
 
   @abc.abstractmethod
   def _get_name_from_object(self):
@@ -478,17 +492,12 @@ class ItemTree(metaclass=abc.ABCMeta):
       raise ValueError(
         'insert_after_item, if specified, must be a child of parent_item or equal to parent_item')
 
-    if parent_item is not None and (parent_item.id, FOLDER_KEY) not in self._itemtree_all_types:
+    if parent_item is not None and parent_item.key not in self._itemtree_all_types:
       raise ValueError(f'parent_item {parent_item.id} does not exist within this item tree')
 
-    if insert_after_item is not None:
-      key = (
-        (insert_after_item.id, FOLDER_KEY)
-        if insert_after_item.type == TYPE_FOLDER else insert_after_item.id)
-
-      if key not in self._itemtree_all_types:
-        raise ValueError(
-          f'insert_after_item {insert_after_item.id} does not exist within this item tree')
+    if insert_after_item is not None and insert_after_item.key not in self._itemtree_all_types:
+      raise ValueError(
+        f'insert_after_item {insert_after_item.id} does not exist within this item tree')
 
     if parent_item is None:
       parents_for_child_initial = []
@@ -801,12 +810,12 @@ class ImageTree(ItemTree):
     parents_for_child.append(item)
 
     if item.type == TYPE_FOLDER:
-      self._itemtree_all_types[item.id, FOLDER_KEY] = item
+      self._itemtree_all_types[item.key] = item
 
       item_path = tuple(item_.orig_name for item_ in parents_for_child)
       self._itemtree_all_types[item_path, FOLDER_KEY] = item
     else:
-      self._itemtree_all_types[item.id] = item
+      self._itemtree_all_types[item.key] = item
 
       item_path = tuple(item_.orig_name for item_ in parents_for_child)
       self._itemtree_all_types[item_path] = item
@@ -873,13 +882,13 @@ class GimpItemTree(ItemTree):
 
     if item.type == TYPE_FOLDER:
       self._itemtree_all_types[item.raw, FOLDER_KEY] = item
-      self._itemtree_all_types[item.id, FOLDER_KEY] = item
+      self._itemtree_all_types[item.key] = item
 
       item_path = tuple(item_.orig_name for item_ in parents_for_child)
       self._itemtree_all_types[item_path, FOLDER_KEY] = item
     else:
       self._itemtree_all_types[item.raw] = item
-      self._itemtree_all_types[item.id] = item
+      self._itemtree_all_types[item.key] = item
 
       item_path = tuple(item_.orig_name for item_ in parents_for_child)
       self._itemtree_all_types[item_path] = item

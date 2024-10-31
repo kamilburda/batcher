@@ -541,6 +541,7 @@ class TestLayerTree(unittest.TestCase):
 
     self.assertEqual(self.tree[folder_item.raw, self.FOLDER_KEY], folder_item)
     self.assertEqual(self.tree[folder_item.id, self.FOLDER_KEY], folder_item)
+    self.assertEqual(self.tree[folder_item.key], folder_item)
 
     folder_item_path = tuple(
       item_.orig_name for item_ in (list(folder_item.parents) + [folder_item]))
@@ -550,7 +551,7 @@ class TestLayerTree(unittest.TestCase):
     item = next(self.tree.iter())
 
     self.assertIn(item.raw, self.tree)
-    self.assertIn(item.id, self.tree)
+    self.assertIn(item.key, self.tree)
 
     item_path = tuple(item_.orig_name for item_ in (list(item.parents) + [item]))
     self.assertIn(item_path, self.tree)
@@ -766,7 +767,7 @@ class TestLayerTree(unittest.TestCase):
     self.tree.remove([self.tree[(item_path, self.FOLDER_KEY)]])
 
     for item in items_to_be_removed:
-      self.assertNotIn(item.id, self.tree)
+      self.assertNotIn(item.key, self.tree)
 
   def test_remove_folder_item_also_removes_corresponding_group(self):
     item_path = ('Corners', 'top-left-corner:')
@@ -775,7 +776,7 @@ class TestLayerTree(unittest.TestCase):
     self.tree.remove([self.tree[item_path]])
 
     for item in items_to_be_removed:
-      self.assertNotIn(item.id, self.tree)
+      self.assertNotIn(item.key, self.tree)
 
 
 class TestImageFileItem(unittest.TestCase):
