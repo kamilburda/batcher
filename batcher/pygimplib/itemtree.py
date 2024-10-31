@@ -401,14 +401,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     self._itemtree_all_types = {}
   
   def __getitem__(self, key) -> Item:
-    """Returns an `Item` instance using a key, particularly `Item.raw` or
-    `Item.id`.
-    
-    To access an item group as a folder, pass a tuple ``(key, 'folder')``.
-    For example:
-
-        item_tree[item.id, 'folder']
-    """
+    """Returns an `Item` instance using a key, specifically `Item.key`."""
     return self._itemtree_all_types[key]
   
   def __contains__(self, key) -> bool:
