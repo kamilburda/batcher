@@ -447,6 +447,28 @@ class ItemTree(metaclass=abc.ABCMeta):
         parent_item: Optional[Item] = None,
         insert_after_item: Optional[Item] = None,
   ):
+    """Adds the specified objects as `Item` instances to the tree.
+
+    Objects acting as folders will result in adding all their children as
+    `Item`s.
+
+    Args:
+      objects: The objects to be added.
+      parent_item:
+        The parent `Item` under which to add all items. If ``None``, the items
+        will be added to the top level.
+      insert_after_item:
+        An existing `Item` instance after which to insert the items. If
+        ``None``, the items will be inserted after the last existing item.
+
+    Raises:
+      ValueError:
+      * ``insert_after_item``, if specified, is not a child of ``parent_item``
+        or equal to ``parent_item``,
+      * ``parent_item``, if specified, does not exist within this item tree,
+      * ``insert_after_item``, if specified, does not exist within this item
+        tree.
+    """
     if not objects:
       return
 
