@@ -1,3 +1,8 @@
+## Upcoming
+
+* Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of files.
+
+
 ## 0.5
 
 ### October 12, 2024

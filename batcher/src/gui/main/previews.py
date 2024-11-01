@@ -51,7 +51,7 @@ class Previews:
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1])
 
-    self._batcher_for_previews = core.LayerBatcher(
+    self._batcher_for_name_preview = core.LayerBatcher(
       input_image=self._image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
@@ -61,14 +61,24 @@ class Previews:
       item_tree=self._initial_layer_tree)
 
     self._name_preview = preview_name_.NamePreview(
-      self._batcher_for_previews,
+      self._batcher_for_name_preview,
       self._settings,
       self._initial_layer_tree,
       self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
       self._settings['main/selected_layers'].value[self._image],
       'selected_in_preview')
 
-    self._image_preview = preview_image_.ImagePreview(self._batcher_for_previews, self._settings)
+    self._batcher_for_image_preview = core.LayerBatcher(
+      input_image=self._image,
+      procedures=self._settings['main/procedures'],
+      constraints=self._settings['main/constraints'],
+      edit_mode=self._batcher_mode == 'edit',
+      initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
+      overwrite_chooser=overwrite_chooser,
+      item_tree=self._initial_layer_tree)
+
+    self._image_preview = preview_image_.ImagePreview(
+      self._batcher_for_image_preview, self._settings)
 
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, self._image)
@@ -257,7 +267,7 @@ class Previews:
     preview_sensitive_setting.set_value(False)
 
   def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, action_lists):
-    action_lists.display_warnings_and_tooltips_for_actions(self._batcher_for_previews)
+    action_lists.display_warnings_and_tooltips_for_actions(self._batcher_for_image_preview)
 
     if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
         and (update_duration_seconds
@@ -270,4 +280,4 @@ class Previews:
 
   def _on_name_preview_updated(self, _preview, _error, action_lists):
     action_lists.display_warnings_and_tooltips_for_actions(
-      self._batcher_for_previews, clear_previous=False)
+      self._batcher_for_name_preview, clear_previous=False)

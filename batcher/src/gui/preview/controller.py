@@ -282,7 +282,8 @@ class PreviewsController:
     if error:
       self.lock_previews(self._PREVIEW_ERROR_KEY)
 
-    self._image_preview.update_item()
+    if self._image_preview.item is not None:
+      self._image_preview.set_item_name_label(self._image_preview.item)
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
@@ -307,8 +308,9 @@ class PreviewsController:
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items(selected_layers_in_image)
     else:
-      self._image_preview.update_item(raw_item_to_display)
-      self._image_preview.update()
+      if raw_item_to_display in self._name_preview.batcher.item_tree:
+        self._image_preview.item = self._name_preview.batcher.item_tree[raw_item_to_display]
+        self._image_preview.update()
     
     self._is_initial_selection_set = True
   

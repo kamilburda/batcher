@@ -25,8 +25,6 @@ import pygimplib as pg
 
 from . import base as preview_base_
 
-from src import actions
-from src import builtin_constraints
 from src import exceptions
 from src import export as export_
 from src import utils as utils_
@@ -128,17 +126,17 @@ class ImagePreview(preview_base_.Preview):
     if not self.item.raw.is_valid():
       self.clear()
       return
-    
+
     if self.item.type != pg.itemtree.TYPE_FOLDER:
       self._is_updating = True
 
-      self._set_item_name_label(self.item)
+      self.set_item_name_label(self.item)
       
       if self._is_preview_image_allocated_size:
         self._set_contents()
     else:
       self._set_pixbuf(self._folder_icon)
-      self._set_item_name_label(self.item)
+      self.set_item_name_label(self.item)
   
   def clear(self, use_item_name=False):
     self.item = None
@@ -166,24 +164,6 @@ class ImagePreview(preview_base_.Preview):
       self._preview_pixbuf is not None
       and allocation.width > self._preview_pixbuf.get_width()
       and allocation.height > self._preview_pixbuf.get_height())
-  
-  def update_item(self, raw_item: Optional[Gimp.Item] = None):
-    if raw_item is not None and raw_item.is_valid():
-      should_update = raw_item in self._batcher.item_tree
-    else:
-      if (self.item is not None
-          and self._batcher.item_tree is not None
-          and self.item.raw in self._batcher.item_tree):
-        raw_item = self.item.raw
-        should_update = True
-      else:
-        should_update = False
-    
-    if should_update:
-      item = self._batcher.item_tree[raw_item]
-      if self._batcher.item_tree.filter.is_match(item):
-        self.item = item
-        self._set_item_name_label(self.item)
   
   def prepare_image_for_rendering(
         self,
@@ -226,7 +206,19 @@ class ImagePreview(preview_base_.Preview):
       self._resize_item_action_id, groups='all', ignore_if_not_exists=True)
     self._resize_item_action_id = self._batcher.add_procedure(
       self._resize_item_for_batcher, ['after_process_item_contents'], ignore_if_exists=True)
-  
+
+  def set_item_name_label(self, item: pg.itemtree.Item):
+    if not self._batcher.edit_mode:
+      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
+      item_name = item_state['name'] if item_state is not None else item.name
+    else:
+      item_name = item.name
+
+    self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
+
+  def _set_no_selection_label(self):
+    self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
+
   def _set_contents(self):
     # Sanity check in case `item` changes before 'size-allocate' is emitted.
     if self.item is None:
@@ -338,29 +330,19 @@ class ImagePreview(preview_base_.Preview):
     return preview_pixbuf, error
   
   def _get_image_preview(self):
-    # The processing requires items in their original state as some procedures
-    # might depend on their values, which would otherwise produce an image that
-    # would not correspond to the real output. We therefore reset items.
-    # Also, we need to restore the items' state once the processing is finished
-    # so that proper names are displayed in the image preview - the same ones as
-    # produced by the name preview, since we assume here that the image preview
-    # is updated after the name preview.
-    if self._batcher.item_tree is not None:
-      for item in self._batcher.item_tree.iter_all():
-        item.push_state()
-        item.reset()
-    
-    only_selected_item_constraint_id = self._batcher.add_constraint(
-      builtin_constraints.is_item_in_items_selected_in_preview,
-      groups=[actions.DEFAULT_CONSTRAINTS_GROUP],
-      args=[{self.item.raw.get_image(): {self.item.raw}}])
-    
+    # We use a separate `pygimplib.ItemTree` with just the item to be previewed.
+    # A new item wrapping the original object is created to avoid introducing
+    # any changes to the item from other sources (e.g. the item could be
+    # renamed via the name preview).
+    tree_for_preview = type(self._batcher.item_tree)()
+    tree_for_preview.add([self.item.raw])
+
     error = None
-    
+
     try:
       self._batcher.run(
         keep_image_copy=True,
-        item_tree=self._batcher.item_tree,
+        item_tree=tree_for_preview,
         is_preview=True,
         process_contents=True,
         process_names=False,
@@ -384,13 +366,6 @@ class ImagePreview(preview_base_.Preview):
         parent=pg.gui.get_toplevel_window(self))
       
       error = e
-    
-    self._batcher.remove_action(
-      only_selected_item_constraint_id, [actions.DEFAULT_CONSTRAINTS_GROUP])
-    
-    if self._batcher.item_tree is not None:
-      for item in self._batcher.item_tree.iter_all():
-        item.pop_state()
     
     return self._batcher.image_copy, error
   
@@ -516,18 +491,6 @@ class ImagePreview(preview_base_.Preview):
   @staticmethod
   def _scale_pixbuf(pixbuf, width, height):
     return pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
-
-  def _set_item_name_label(self, item):
-    if not self._batcher.edit_mode:
-      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
-      item_name = item_state['name'] if item_state is not None else item.name
-    else:
-      item_name = item.name
-
-    self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
-
-  def _set_no_selection_label(self):
-    self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
 
   def _on_button_menu_clicked(self, button):
     pg.gui.menu_popup_below_widget(self._menu_settings, button)
