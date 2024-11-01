@@ -11,7 +11,6 @@ from gi.repository import Gimp
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-from src import file_formats as file_formats_
 from src import setting_classes
 
 
