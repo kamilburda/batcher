@@ -1,6 +1,6 @@
 ## Upcoming
 
-* Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of files.
+* Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of items.
 
 
 ## 0.5
