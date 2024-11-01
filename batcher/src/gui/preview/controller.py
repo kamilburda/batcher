@@ -294,26 +294,30 @@ class PreviewsController:
   
   def _set_initial_selection_and_update_image_preview(self):
     setting_value = self._settings['gui/image_preview_displayed_items'].value[self._image]
-    
+
     if not setting_value:
-      raw_item_to_display = None
+      item_key_to_display = None
     else:
-      raw_item_to_display = list(setting_value)[0]
+      item_key_to_display = list(setting_value)[0]
 
     selected_layers_in_image = self._image.list_selected_layers()
 
-    if (raw_item_to_display is None
+    if (item_key_to_display is None
         and not self._settings['main/selected_layers'].value[self._image]
         and selected_layers_in_image):
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items(selected_layers_in_image)
     else:
-      if raw_item_to_display in self._name_preview.batcher.item_tree:
-        self._image_preview.item = self._name_preview.batcher.item_tree[raw_item_to_display]
-        self._image_preview.update()
-    
+      item_tree = self._name_preview.batcher.item_tree
+      if item_key_to_display in item_tree:
+        item = item_tree[item_key_to_display]
+        if item.type == pg.itemtree.TYPE_FOLDER or item_tree.filter.is_match(item):
+          self._image_preview.item = item
+
+      self._image_preview.update()
+
     self._is_initial_selection_set = True
-  
+
   def _update_selected_items(self):
     selected_items_dict = self._settings['main/selected_layers'].value
     selected_items_dict[self._image] = self._name_preview.selected_items
@@ -336,8 +340,14 @@ class PreviewsController:
       else:
         self._image_preview.clear()
 
-    self._settings['gui/image_preview_displayed_items'].value[self._image] = (
-      [self._image_preview.item.raw] if self._image_preview.item is not None else [])
+    if self._image_preview.item is not None:
+      key = (
+        self._image_preview.item.raw
+        if self._image_preview.item.type != pg.itemtree.TYPE_FOLDER
+        else (self._image_preview.item.raw, pg.itemtree.FOLDER_KEY))
+      self._settings['gui/image_preview_displayed_items'].value[self._image] = [key]
+    else:
+      self._settings['gui/image_preview_displayed_items'].value[self._image] = []
 
   def _update_collapsed_items(self):
     collapsed_items_dict = self._settings['gui/name_preview_items_collapsed_state'].value
