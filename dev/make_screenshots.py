@@ -52,7 +52,8 @@ SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 def main():
   image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 
-  layer_tree = pg.itemtree.LayerTree(image)
+  layer_tree = pg.itemtree.LayerTree()
+  layer_tree.add_from_image(image)
 
   gui_main.BatchLayerProcessingGui(
     layer_tree,

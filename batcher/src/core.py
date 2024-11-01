@@ -1045,7 +1045,8 @@ class LayerBatcher(Batcher):
 
   def _set_up_item_tree(self):
     if self._item_tree is None:
-      self._item_tree = pg.itemtree.LayerTree(self._input_image)
+      self._item_tree = pg.itemtree.LayerTree()
+      self._item_tree.add_from_image(self._input_image)
 
     if self._item_tree.filter:
       self._item_tree.reset_filter()

@@ -483,8 +483,10 @@ class TestLayerTree(unittest.TestCase):
     """
     
     image = utils_itemtree.parse_layers(items_string)
+
+    self.tree = pgitemtree.LayerTree()
     # noinspection PyTypeChecker
-    self.tree = pgitemtree.LayerTree(image)
+    self.tree.add_from_image(image)
     
     self.ITEM = pgitemtree.TYPE_ITEM
     self.GROUP = pgitemtree.TYPE_GROUP

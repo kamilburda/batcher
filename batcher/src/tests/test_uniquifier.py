@@ -40,7 +40,9 @@ class TestUniquify(unittest.TestCase):
     """
     
     image = utils_itemtree.parse_layers(items_string)
-    self.item_tree = pg.itemtree.LayerTree(image)
+
+    self.item_tree = pg.itemtree.LayerTree()
+    self.item_tree.add_from_image(image)
 
   def test_uniquify(self):
     uniquified_names = {

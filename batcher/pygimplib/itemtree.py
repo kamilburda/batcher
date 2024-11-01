@@ -843,15 +843,16 @@ class GimpItemTree(ItemTree):
 
   def __init__(
         self,
-        image: Gimp.Image,
         *args,
         **kwargs,
   ):
-    self._image = image
+    self._image = None
 
     super().__init__(*args, **kwargs)
 
-    self.add(self._get_children_from_image(self._image))
+  def add_from_image(self, image: Gimp.Image):
+    self._image = image
+    self.add(self._get_children_from_image(image))
 
   @property
   def image(self) -> Gimp.Image:
