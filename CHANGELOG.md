@@ -1,6 +1,7 @@
 ## Upcoming
 
 * Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of items.
+* Fixed several bugs related to the preview when the selected item is changed.
 
 
 ## 0.5

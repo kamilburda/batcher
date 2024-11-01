@@ -40,7 +40,7 @@ class PreviewsController:
 
     self._image_preview.lock_update(False, key)
     pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._image_preview.update)
+      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._update_image_preview)
 
   def connect_setting_changes_to_previews(self):
     self._connect_actions_changed(self._settings['main/procedures'])
@@ -263,6 +263,8 @@ class PreviewsController:
 
   def _perform_full_preview_update(self):
     pg.invocation.timeout_remove(self._name_preview.update)
+
+    pg.invocation.timeout_remove(self._update_image_preview)
     pg.invocation.timeout_remove(self._image_preview.update)
 
     self._name_preview.update(reset_items=True)
@@ -270,7 +272,7 @@ class PreviewsController:
     if not self._is_initial_selection_set:
       self._set_initial_selection_and_update_image_preview()
     else:
-      self._image_preview.update()
+      self._update_image_preview()
 
   def _connect_name_preview_events(self):
     self._name_preview.connect('preview-updated', self._on_name_preview_updated)
