@@ -1,5 +1,9 @@
 """Managing items of a GIMP image (e.g. layers) in a tree-like structure."""
 
+# We break the convention in this module and access private attributes and
+# methods from `Item` within `ItemTree` and their subclasses. `ItemTree` and
+# `Item` are tightly coupled.
+
 from __future__ import annotations
 
 import abc
@@ -124,14 +128,6 @@ class Item(metaclass=abc.ABCMeta):
     ``(id, FOLDER_KEY)``.
     """
     return self._key
-
-  @abc.abstractmethod
-  def _get_name_from_object(self):
-    pass
-
-  @abc.abstractmethod
-  def _get_id_from_object(self):
-    pass
 
   @property
   def parents(self) -> List[Item]:
@@ -288,14 +284,51 @@ class Item(metaclass=abc.ABCMeta):
     self._parents = list(self._orig_parents)
     self._children = list(self._orig_children)
 
+  @abc.abstractmethod
+  def _list_child_objects(self) -> List:
+    pass
+
+  @abc.abstractmethod
+  def _get_name_from_object(self):
+    pass
+
+  @abc.abstractmethod
+  def _get_id_from_object(self):
+    pass
+
 
 class GimpItem(Item):
-  """`Item` subclass for a `Gimp.Item` or `Gimp.Image` object."""
+  """`Item` subclass for a `Gimp.Item` object."""
 
   @property
-  def raw(self) -> Union[Gimp.Item, Gimp.Image]:
-    """Underlying `Gimp.Item` or `Gimp.Image` object wrapped by this instance.
+  def raw(self) -> Gimp.Item:
+    """Underlying `Gimp.Item` object wrapped by this instance."""
+    return self._object
+
+  @property
+  def id(self) -> int:
+    """Numeric identifier used to uniquely identify the underlying GIMP object.
+
+    This property is guaranteed to be unchanged for this `Item` instance.
     """
+    return self._id
+
+  def _list_child_objects(self) -> List[Gimp.Item]:
+    return self.raw.list_children()
+
+  def _get_name_from_object(self) -> str:
+    return self._object.get_name()
+
+  def _get_id_from_object(self) -> int:
+    return self._object.get_id()
+
+
+class GimpImageItem(Item):
+  """`Item` subclass for a `Gimp.Image` object."""
+
+  @property
+  def raw(self) -> Gimp.Image:
+    """Underlying `Gimp.Image` object wrapped by this instance."""
     return self._object
 
   @property
@@ -311,6 +344,11 @@ class GimpItem(Item):
 
   def _get_id_from_object(self) -> int:
     return self._object.get_id()
+
+  def _list_child_objects(self) -> List:
+    # We cannot decide on which type of children (layers, channels, etc.) to
+    # list, so we return an empty list.
+    return []
 
 
 class ImageFileItem(Item):
@@ -351,6 +389,14 @@ class ImageFileItem(Item):
     This property is guaranteed to be unchanged for this `Item` instance.
     """
     return self._id
+
+  def _list_child_objects(self) -> List[str]:
+    try:
+      filenames = os.listdir(self.id)
+    except FileNotFoundError:
+      return []
+    else:
+      return sorted(os.path.abspath(os.path.join(self.id, filename)) for filename in filenames)
 
   def _get_name_from_object(self) -> str:
     return os.path.basename(self._object)
@@ -512,10 +558,10 @@ class ItemTree(metaclass=abc.ABCMeta):
         parents_for_child = self._add_item_to_itemtree_dicts(item)
 
         child_items = []
-        for object_ in self._list_children_from_object(item):
+        # noinspection PyProtectedMember
+        for object_ in item._list_child_objects():
           self._insert_item(object_, child_items, list(parents_for_child))
 
-        # We break the convention here and access a private attribute from `Item`.
         # noinspection PyProtectedMember
         item._orig_children = child_items
         item.children = child_items
@@ -526,7 +572,6 @@ class ItemTree(metaclass=abc.ABCMeta):
         self._add_item_to_itemtree_dicts(item)
 
     for i in range(1, len(item_list) - 1):
-      # We break the convention here and access private attributes from `Item`.
       # noinspection PyProtectedMember
       item_list[i]._prev_item = item_list[i - 1]
       # noinspection PyProtectedMember
@@ -569,10 +614,6 @@ class ItemTree(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
   def _add_item_to_itemtree_dicts(self, item):
-    pass
-
-  @abc.abstractmethod
-  def _list_children_from_object(self, item):
     pass
 
   def remove(self, items: Iterable[Item]):
@@ -671,8 +712,9 @@ class ItemTree(metaclass=abc.ABCMeta):
       if not with_folders and current_item.type == TYPE_FOLDER:
         should_yield_item = False
 
+      # noinspection PyProtectedMember
       if (not with_empty_groups
-          and (current_item.type == TYPE_GROUP and not current_item.raw.list_children())):
+          and (current_item.type == TYPE_GROUP and not current_item._list_child_objects())):
         should_yield_item = False
 
       if should_yield_item:
@@ -759,12 +801,14 @@ class ItemTree(metaclass=abc.ABCMeta):
       else:
         if adjacent_item.type == TYPE_FOLDER:
           continue
-      
+
       if with_empty_groups:
-        if adjacent_item.type == TYPE_GROUP and not adjacent_item.raw.list_children():
+        # noinspection PyProtectedMember
+        if adjacent_item.type == TYPE_GROUP and not adjacent_item._list_child_objects():
           break
       else:
-        if adjacent_item.type == TYPE_GROUP and not adjacent_item.raw.list_children():
+        # noinspection PyProtectedMember
+        if adjacent_item.type == TYPE_GROUP and not adjacent_item._list_child_objects():
           continue
       
       if filtered and self.is_filtered:
@@ -796,7 +840,7 @@ class ImageTree(ItemTree):
         path = os.path.abspath(object_)
         child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
     else:  # GIMP image
-      child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
 
   def _add_item_to_itemtree_dicts(self, item):
     parents_for_child = list(item.parents)
@@ -814,14 +858,6 @@ class ImageTree(ItemTree):
       self._itemtree_all_types[item_path] = item
 
     return parents_for_child
-
-  def _list_children_from_object(self, item):
-    try:
-      filenames = os.listdir(item.id)
-    except FileNotFoundError:
-      return []
-    else:
-      return sorted(os.path.abspath(os.path.join(item.id, filename)) for filename in filenames)
 
 
 class GimpItemTree(ItemTree):
@@ -888,9 +924,6 @@ class GimpItemTree(ItemTree):
       self._itemtree_all_types[item_path] = item
 
     return parents_for_child
-
-  def _list_children_from_object(self, item):
-    return item.raw.list_children()
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
