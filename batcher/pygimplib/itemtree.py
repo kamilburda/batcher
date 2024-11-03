@@ -452,10 +452,8 @@ class ItemTree(metaclass=abc.ABCMeta):
     return key in self._items
   
   def __len__(self) -> int:
-    """Returns the number of items in the tree.
-    
-    This includes immediate children of the image and nested children. Empty
-    item groups (i.e. groups with no children) are excluded.
+    """Returns the number of items in the tree, excluding folders and empty
+    item groups.
     
     The returned number of items depends on whether `is_filtered` is
     ``True`` or ``False``.
@@ -698,7 +696,13 @@ class ItemTree(metaclass=abc.ABCMeta):
     else:
       current_item = self._last_item
 
+    num_items = len(self._items)
+    item_counter = 0
+
     while current_item is not None:
+      if item_counter >= num_items:
+        raise AssertionError('The number of items is exceeded (possible infinite loop encountered)')
+
       should_yield_item = True
 
       if not with_folders and current_item.type == TYPE_FOLDER:
@@ -720,6 +724,8 @@ class ItemTree(metaclass=abc.ABCMeta):
         current_item = current_item.next
       else:
         current_item = current_item.prev
+
+      item_counter += 1
   
   def iter_all(self, reverse: bool = False) -> Generator[Item, None, None]:
     """Iterates over all items.
@@ -740,13 +746,21 @@ class ItemTree(metaclass=abc.ABCMeta):
     else:
       current_item = self._last_item
 
+    num_items = len(self._items)
+    item_counter = 0
+
     while current_item is not None:
+      if item_counter >= num_items:
+        raise AssertionError('The number of items is exceeded (possible infinite loop encountered)')
+
       yield current_item
 
       if not reverse:
         current_item = current_item.next
       else:
         current_item = current_item.prev
+
+      item_counter += 1
   
   def prev(
         self,
