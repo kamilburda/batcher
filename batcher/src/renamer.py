@@ -183,7 +183,7 @@ class NumberField(Field):
     
     if reset_numbering_on_parent:
       parent_item = item.parent if item.parent is not None else None
-      parent = parent_item.raw if parent_item is not None else None
+      parent = parent_item.key if parent_item is not None else None
     else:
       parent_item = None
       parent = None
