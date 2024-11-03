@@ -263,7 +263,11 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def current_raw_item(self) -> Gimp.Layer:
-    """The raw item (a GIMP object) that is currently being processed."""
+    """The raw item (a GIMP object) that is currently being processed.
+
+    Note that ``current_raw_item`` can be different from `current_item.raw` -
+    the former can be a copy while the latter can be the original raw item.
+    """
     return self._current_raw_item
 
   @current_raw_item.setter
