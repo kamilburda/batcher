@@ -121,6 +121,11 @@ class PreviewsController:
         and setting.name != 'enabled_for_previews'):
       return
 
+    # Changed selection is already handled by connecting to the name preview's
+    # 'preview-selection-changed' signal.
+    if action['orig_name'].value == 'selected_in_preview' and setting.name == 'selected_layers':
+      return
+
     self.unlock_and_update_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
