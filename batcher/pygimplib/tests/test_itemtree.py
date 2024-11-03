@@ -534,19 +534,16 @@ class TestLayerTree(unittest.TestCase):
   def test_getitem(self):
     item = next(self.tree.iter(with_folders=False))
 
-    self.assertEqual(self.tree[item.raw], item)
     self.assertEqual(self.tree[item.id], item)
 
     folder_item = next(self.tree.iter(with_folders=True))
 
-    self.assertEqual(self.tree[folder_item.raw, self.FOLDER_KEY], folder_item)
     self.assertEqual(self.tree[folder_item.id, self.FOLDER_KEY], folder_item)
     self.assertEqual(self.tree[folder_item.key], folder_item)
 
   def test_contains(self):
     item = next(self.tree.iter())
 
-    self.assertIn(item.raw, self.tree)
     self.assertIn(item.key, self.tree)
   
   def test_item_attributes(self):

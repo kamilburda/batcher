@@ -437,11 +437,11 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     # key: `Item.key`
     # value: `Item` instance
-    self._itemtree_all_types = {}
+    self._items = {}
   
   def __getitem__(self, key) -> Item:
     """Returns an `Item` instance using a key, specifically `Item.key`."""
-    return self._itemtree_all_types[key]
+    return self._items[key]
   
   def __contains__(self, key) -> bool:
     """Returns ``True`` if an `Item` instance is in the item tree, regardless of
@@ -449,7 +449,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     See `__getitem__()` for information about the possible values for ``key``.
     """
-    return key in self._itemtree_all_types
+    return key in self._items
   
   def __len__(self) -> int:
     """Returns the number of items in the tree.
@@ -524,10 +524,10 @@ class ItemTree(metaclass=abc.ABCMeta):
       raise ValueError(
         'insert_after_item, if specified, must be a child of parent_item or equal to parent_item')
 
-    if parent_item is not None and parent_item.key not in self._itemtree_all_types:
+    if parent_item is not None and parent_item.key not in self._items:
       raise ValueError(f'parent_item {parent_item.id} does not exist within this item tree')
 
-    if insert_after_item is not None and insert_after_item.key not in self._itemtree_all_types:
+    if insert_after_item is not None and insert_after_item.key not in self._items:
       raise ValueError(
         f'insert_after_item {insert_after_item.id} does not exist within this item tree')
 
@@ -548,9 +548,12 @@ class ItemTree(metaclass=abc.ABCMeta):
       item_list.append(item)
 
       if item.type == TYPE_FOLDER:
-        parents_for_child = self._add_item_to_itemtree_dicts(item)
+        self._add_item_to_itemtree(item)
 
+        parents_for_child = list(item.parents)
+        parents_for_child.append(item)
         child_items = []
+
         # noinspection PyProtectedMember
         for object_ in item._list_child_objects():
           self._insert_item(object_, child_items, list(parents_for_child))
@@ -562,7 +565,7 @@ class ItemTree(metaclass=abc.ABCMeta):
         for child_item in reversed(child_items):
           item_tree.insert(0, child_item)
       else:
-        self._add_item_to_itemtree_dicts(item)
+        self._add_item_to_itemtree(item)
 
     for i in range(1, len(item_list) - 1):
       # noinspection PyProtectedMember
@@ -605,9 +608,8 @@ class ItemTree(metaclass=abc.ABCMeta):
   def _insert_item(self, object_, child_items, parents_for_child=None):
     pass
 
-  @abc.abstractmethod
-  def _add_item_to_itemtree_dicts(self, item):
-    pass
+  def _add_item_to_itemtree(self, item):
+    self._items[item.key] = item
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
@@ -633,13 +635,13 @@ class ItemTree(metaclass=abc.ABCMeta):
       items_to_remove = []
 
       for key in item_keys:
-        if key in self._itemtree_all_types:
-          items_to_remove.append(self._itemtree_all_types[key])
-          items_to_remove.extend(self._itemtree_all_types[key].get_all_children())
+        if key in self._items:
+          items_to_remove.append(self._items[key])
+          items_to_remove.extend(self._items[key].get_all_children())
 
       for item_to_remove in items_to_remove:
-        self._itemtree_all_types.pop(item_to_remove.id, None)
-        self._itemtree_all_types.pop((item_to_remove.id, FOLDER_KEY), None)
+        self._items.pop(item_to_remove.id, None)
+        self._items.pop((item_to_remove.id, FOLDER_KEY), None)
 
         next_item = item_to_remove.next
         previous_item = item_to_remove.prev
@@ -832,14 +834,6 @@ class ImageTree(ItemTree):
     else:  # GIMP image
       child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
 
-  def _add_item_to_itemtree_dicts(self, item):
-    parents_for_child = list(item.parents)
-    parents_for_child.append(item)
-
-    self._itemtree_all_types[item.key] = item
-
-    return parents_for_child
-
 
 class GimpItemTree(ItemTree):
   """Interface to store `Gimp.Item` objects in a tree-like structure.
@@ -886,19 +880,6 @@ class GimpItemTree(ItemTree):
       child_items.append(GimpItem(object_, TYPE_GROUP, list(parents_for_child), [], None, None))
     else:
       child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
-
-  def _add_item_to_itemtree_dicts(self, item):
-    parents_for_child = list(item.parents)
-    parents_for_child.append(item)
-
-    if item.type == TYPE_FOLDER:
-      self._itemtree_all_types[item.raw, FOLDER_KEY] = item
-      self._itemtree_all_types[item.key] = item
-    else:
-      self._itemtree_all_types[item.raw] = item
-      self._itemtree_all_types[item.key] = item
-
-    return parents_for_child
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
