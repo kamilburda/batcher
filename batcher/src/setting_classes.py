@@ -251,7 +251,10 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
         if isinstance(key, str):
           image = pg.pdbutils.find_image_by_filepath(key)
         elif isinstance(key, int):
-          image = Gimp.Image.get_by_id(key)
+          if Gimp.Image.id_is_valid(key):
+            image = Gimp.Image.get_by_id(key)
+          else:
+            image = None
         else:
           image = key
         
@@ -272,12 +275,11 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
 
             if len(item) == 2 and not isinstance(item[0], str):
               if isinstance(item[0], int):  # (item ID, item type)
-                item_object = Gimp.Item.get_by_id(item[0])
-                if item_object is not None:
-                  processed_items.add((item_object, item[1]))
+                if Gimp.Item.id_is_valid(item[0]):
+                  processed_items.add((item[0], item[1]))
               else:  # (item, item type)
                 if item[0].is_valid():
-                  processed_items.add(tuple(item))
+                  processed_items.add((item[0].get_id(), item[1]))
             else:
               if len(item) == 3:
                 item_type = item[2]
@@ -291,16 +293,15 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
 
               if item_object is not None:
                 if item_type is None:
-                  processed_items.add(item_object)
+                  processed_items.add(item_object.get_id())
                 else:
-                  processed_items.add((item_object, item_type))
+                  processed_items.add((item_object.get_id(), item_type))
           elif isinstance(item, int):
-            item_object = Gimp.Item.get_by_id(item)
-            if item_object is not None:
-              processed_items.add(item_object)
+            if Gimp.Item.id_is_valid(item):
+              processed_items.add(item)
           else:
             if item is not None:
-              processed_items.add(item)
+              processed_items.add(item.get_id())
         
         value[image] = processed_items
     else:
@@ -328,16 +329,17 @@ class ImagesAndGimpItemsSetting(pg.setting.Setting):
               'list-likes representing items must contain exactly 2 elements'
               f' (has {len(item)})')
 
-          item_object = item[0]
+          item_id = item[0]
           item_type = item[1]
         else:
-          item_object = item
+          item_id = item
           item_type = None
 
-        if item_object is None or not item_object.is_valid():
+        if not Gimp.Item.id_is_valid(item_id):
           continue
 
-        item_as_path = pg.pdbutils.get_item_as_path(item_object, include_image=False)
+        item_as_path = pg.pdbutils.get_item_as_path(
+          Gimp.Item.get_by_id(item_id), include_image=False)
 
         if item_as_path is not None:
           if item_type is None:

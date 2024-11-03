@@ -58,16 +58,14 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
     _COLUMN_ITEM_NAME_SENSITIVE,
     _COLUMN_ITEM_NAME,
-    _COLUMN_ITEM,
-    _COLUMN_ITEM_TYPE) = (
+    _COLUMN_ITEM_KEY) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
     [2, GdkPixbuf.Pixbuf],
     [3, GObject.TYPE_BOOLEAN],
     [4, GObject.TYPE_BOOLEAN],
     [5, GObject.TYPE_STRING],
-    [6, GObject.TYPE_PYOBJECT],
-    [7, GObject.TYPE_INT])
+    [6, GObject.TYPE_PYOBJECT])
 
   _ICON_XPAD = 2
   _COLOR_TAG_BORDER_WIDTH = 1
@@ -94,7 +92,7 @@ class NamePreview(preview_base_.Preview):
     self.is_filtering = False
     """If ``True``, unselected items are not sensitive."""
     
-    # key: `Item.raw` or (`Item.raw`, 'folder')
+    # key: `Item.key`
     # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(pg.utils.return_none_func)
     
@@ -323,33 +321,20 @@ class NamePreview(preview_base_.Preview):
     if not self._clearing_preview and self._row_select_interactive:
       previous_selected_items = self._selected_items
       self._selected_items = self._get_keys_from_current_selection()
-      
+
       self.emit('preview-selection-changed')
-      
+
       if self.is_filtering and self._selected_items != previous_selected_items:
         self.update()
-  
+
   def _get_keys_from_current_selection(self):
     _unused, tree_paths = self._tree_view.get_selection().get_selected_rows()
     return [
       self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
       for tree_path in tree_paths]
   
-  @staticmethod
-  def _get_key(item):
-    if item.type != pg.itemtree.TYPE_FOLDER:
-      return item.raw
-    else:
-      return item.raw, pg.itemtree.FOLDER_KEY
-  
   def _get_key_from_tree_iter(self, tree_iter):
-    item = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM[0])
-    item_type = self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_TYPE[0])
-    
-    if item_type != pg.itemtree.TYPE_FOLDER:
-      return item
-    else:
-      return item, pg.itemtree.FOLDER_KEY
+    return self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_KEY[0])
   
   def _get_items_to_process(self):
     if self.is_filtering:
@@ -420,7 +405,7 @@ class NamePreview(preview_base_.Preview):
   
   def _insert_item(self, item):
     if item.parent:
-      parent_tree_iter = self._tree_iters[self._get_key(item.parent)]
+      parent_tree_iter = self._tree_iters[item.parent.key]
     else:
       parent_tree_iter = None
 
@@ -435,16 +420,15 @@ class NamePreview(preview_base_.Preview):
        color_tag_icon is not None,
        True,
        self._get_item_name(item),
-       item.raw,
-       item.type])
+       item.key])
     
-    self._tree_iters[self._get_key(item)] = tree_iter
+    self._tree_iters[item.key] = tree_iter
     
     return tree_iter
   
   def _update_item(self, item):
     self._tree_model.set(
-      self._tree_iters[self._get_key(item)],
+      self._tree_iters[item.key],
       self._COLUMN_ITEM_NAME_SENSITIVE[0],
       True,
       self._COLUMN_ITEM_NAME[0],
@@ -470,7 +454,7 @@ class NamePreview(preview_base_.Preview):
   
   def _get_item_sensitive(self, item):
     return self._tree_model.get_value(
-      self._tree_iters[self._get_key(item)], self._COLUMN_ITEM_NAME_SENSITIVE[0])
+      self._tree_iters[item.key], self._COLUMN_ITEM_NAME_SENSITIVE[0])
   
   def _set_items_sensitive(self, items, sensitive):
     processed_parents = set()
@@ -479,9 +463,9 @@ class NamePreview(preview_base_.Preview):
       self._set_parent_items_sensitive(item, processed_parents)
   
   def _set_item_sensitive(self, item, sensitive):
-    if self._get_key(item) in self._tree_iters:
+    if item.key in self._tree_iters:
       self._tree_model.set_value(
-        self._tree_iters[self._get_key(item)],
+        self._tree_iters[item.key],
         self._COLUMN_ITEM_NAME_SENSITIVE[0],
         sensitive)
   
@@ -490,7 +474,7 @@ class NamePreview(preview_base_.Preview):
       if parent not in processed_parents:
         parent_sensitive = any(
           self._get_item_sensitive(child) for child in parent.children
-          if self._get_key(child) in self._tree_iters)
+          if child.key in self._tree_iters)
         self._set_item_sensitive(parent, parent_sensitive)
         
         processed_parents.add(parent)

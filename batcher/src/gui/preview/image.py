@@ -1,6 +1,6 @@
 """Preview widget displaying a scaled-down image to be processed."""
 
-from typing import List, Optional, Union
+from typing import List, Union
 
 import time
 import traceback
@@ -123,7 +123,7 @@ class ImagePreview(preview_base_.Preview):
     if self.item is None:
       return
     
-    if not self.item.raw.is_valid():
+    if self.item.raw is not None and not self.item.raw.is_valid():
       self.clear()
       return
 

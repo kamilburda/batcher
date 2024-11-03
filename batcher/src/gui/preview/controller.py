@@ -329,9 +329,7 @@ class PreviewsController:
     item_from_cursor = self._name_preview.get_item_from_cursor()
 
     if item_from_cursor is not None:
-      if (self._image_preview.item is None
-          or item_from_cursor.raw != self._image_preview.item.raw
-          or item_from_cursor.type != self._image_preview.item.type):
+      if self._image_preview.item is None or item_from_cursor.key != self._image_preview.item.key:
         self._image_preview.item = item_from_cursor
         self._image_preview.update()
     else:
@@ -343,11 +341,8 @@ class PreviewsController:
         self._image_preview.clear()
 
     if self._image_preview.item is not None:
-      key = (
-        self._image_preview.item.raw
-        if self._image_preview.item.type != pg.itemtree.TYPE_FOLDER
-        else (self._image_preview.item.raw, pg.itemtree.FOLDER_KEY))
-      self._settings['gui/image_preview_displayed_items'].value[self._image] = [key]
+      self._settings['gui/image_preview_displayed_items'].value[self._image] = [
+        self._image_preview.item.key]
     else:
       self._settings['gui/image_preview_displayed_items'].value[self._image] = []
 

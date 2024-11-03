@@ -31,7 +31,7 @@ def has_matching_default_file_extension(item, batcher):
 def is_item_in_items_selected_in_preview(item, selected_items):
   if item.raw.is_valid():
     image = item.raw.get_image()
-    return image.is_valid() and image in selected_items and item.raw in selected_items[image]
+    return image.is_valid() and image in selected_items and item.key in selected_items[image]
   else:
     return False
 

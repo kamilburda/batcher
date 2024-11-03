@@ -178,6 +178,10 @@ class Image(GObject.GObject, ParasiteFunctionsStubMixin):
     except KeyError:
       return None
 
+  @classmethod
+  def id_is_valid(cls, id_):
+    return id_ in cls._images_and_ids
+
   def get_name(self):
     return self.name
 
@@ -240,7 +244,14 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
   @classmethod
   def get_by_id(cls, id_):
-    return cls._items_and_ids[id_]
+    try:
+      return cls._items_and_ids[id_]
+    except KeyError:
+      return None
+
+  @classmethod
+  def id_is_valid(cls, id_):
+    return id_ in cls._items_and_ids
 
   def get_name(self):
     return self.name
