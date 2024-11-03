@@ -838,8 +838,7 @@ class Batcher(metaclass=abc.ABCMeta):
         raise exceptions.BatcherCancelError('stopped by user')
 
       if self._edit_mode:
-        self._progress_updater.update_text(
-          _('Processing "{}"').format(item.orig_name))
+        self._progress_updater.update_text(_('Processing "{}"').format(item.orig_name))
 
       self._process_item(item)
 
