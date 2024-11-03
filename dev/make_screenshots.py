@@ -101,8 +101,12 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   dialog.set_focus(None)
 
-  gui.name_preview.set_selected_items(
-    {gui.name_preview.batcher.item_tree[('main-background',)].raw})
+  main_background_layer = next(
+    iter(
+      layer for layer in gui.name_preview.batcher.item_tree.image.list_layers()
+      if layer.get_name() == 'main-background'))
+
+  gui.name_preview.set_selected_items({main_background_layer})
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -150,8 +154,12 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
 
   dialog.set_focus(None)
 
-  gui.name_preview.set_selected_items(
-    {gui.name_preview.batcher.item_tree[('main-background',)].raw})
+  main_background_layer = next(
+    iter(
+      layer for layer in gui.name_preview.batcher.item_tree.image.list_layers()
+      if layer.get_name() == 'main-background'))
+
+  gui.name_preview.set_selected_items({main_background_layer})
 
   while Gtk.events_pending():
     Gtk.main_iteration()

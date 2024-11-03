@@ -55,7 +55,7 @@ class TestRenameWithNumberField(unittest.TestCase):
       Overlay2
     """
     
-    self.image = utils_itemtree.parse_layers(layers_string)
+    self.image = utils_itemtree.parse_layers(layers_string)[0]
   
   @parameterized.parameterized.expand([
     ('start_from_one',
@@ -183,7 +183,7 @@ class TestRenameWithNumberField(unittest.TestCase):
       item.name = renamer.rename(batcher_mock)
     
     expected_layer_tree = pg.itemtree.LayerTree()
-    expected_layer_tree.add_from_image(utils_itemtree.parse_layers(expected_layer_names_str))
+    expected_layer_tree.add_from_image(utils_itemtree.parse_layers(expected_layer_names_str)[0])
     
     self.assertListEqual(
       [renamed_item.name for renamed_item in layer_tree.iter(with_folders=False, filtered=False)],

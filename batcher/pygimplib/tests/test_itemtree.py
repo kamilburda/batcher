@@ -482,9 +482,10 @@ class TestLayerTree(unittest.TestCase):
       }
     """
     
-    image = utils_itemtree.parse_layers(items_string)
+    image, self.path_to_id = utils_itemtree.parse_layers(items_string)
 
     self.tree = pgitemtree.LayerTree()
+
     # noinspection PyTypeChecker
     self.tree.add_from_image(image)
     
@@ -536,27 +537,17 @@ class TestLayerTree(unittest.TestCase):
     self.assertEqual(self.tree[item.raw], item)
     self.assertEqual(self.tree[item.id], item)
 
-    item_path = tuple(item_.orig_name for item_ in (list(item.parents) + [item]))
-    self.assertEqual(self.tree[item_path], item)
-
     folder_item = next(self.tree.iter(with_folders=True))
 
     self.assertEqual(self.tree[folder_item.raw, self.FOLDER_KEY], folder_item)
     self.assertEqual(self.tree[folder_item.id, self.FOLDER_KEY], folder_item)
     self.assertEqual(self.tree[folder_item.key], folder_item)
 
-    folder_item_path = tuple(
-      item_.orig_name for item_ in (list(folder_item.parents) + [folder_item]))
-    self.assertEqual(self.tree[folder_item_path, self.FOLDER_KEY], folder_item)
-
   def test_contains(self):
     item = next(self.tree.iter())
 
     self.assertIn(item.raw, self.tree)
     self.assertIn(item.key, self.tree)
-
-    item_path = tuple(item_.orig_name for item_ in (list(item.parents) + [item]))
-    self.assertIn(item_path, self.tree)
   
   def test_item_attributes(self):
     for item, properties in zip(
@@ -675,107 +666,109 @@ class TestLayerTree(unittest.TestCase):
   
   def test_prev(self):
     self.assertEqual(
-      self.tree.prev(self.tree[('Frames', 'top-frame')]),
-      self.tree[('Frames',), self.FOLDER_KEY])
+      self.tree.prev(self.tree[self.path_to_id[('Frames', 'top-frame')]]),
+      self.tree[self.path_to_id[('Frames',)], self.FOLDER_KEY])
     self.assertEqual(
-      self.tree.prev(self.tree[('Corners', 'top-right-corner')]),
-      self.tree[('Corners', 'top-left-corner')])
+      self.tree.prev(self.tree[self.path_to_id[('Corners', 'top-right-corner')]]),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner')]])
     
     self.assertEqual(
-      self.tree.prev(self.tree[('Frames', 'top-frame')]),
-      self.tree[('Frames',), self.FOLDER_KEY])
+      self.tree.prev(self.tree[self.path_to_id[('Frames', 'top-frame')]]),
+      self.tree[self.path_to_id[('Frames',)], self.FOLDER_KEY])
     self.assertEqual(
-      self.tree.prev(self.tree[('Frames', 'top-frame')], with_folders=False),
-      self.tree[('Corners',)])
+      self.tree.prev(self.tree[self.path_to_id[('Frames', 'top-frame')]], with_folders=False),
+      self.tree[self.path_to_id[('Corners',)]])
     
     self.assertEqual(
-      self.tree.prev(self.tree[('Corners', 'top-left-corner::'), self.FOLDER_KEY]),
-      self.tree[('Corners', 'top-left-corner:'), self.FOLDER_KEY])
+      self.tree.prev(self.tree[self.path_to_id[('Corners', 'top-left-corner::')], self.FOLDER_KEY]),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner:')], self.FOLDER_KEY])
     self.assertEqual(
       self.tree.prev(
-        self.tree[('Corners', 'top-left-corner::'), self.FOLDER_KEY], with_empty_groups=True),
-      self.tree[('Corners', 'top-left-corner:')])
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::')], self.FOLDER_KEY],
+        with_empty_groups=True),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner:')]])
     
     self.assertEqual(
-      self.tree.prev(self.tree[('Corners',), self.FOLDER_KEY]),
+      self.tree.prev(self.tree[self.path_to_id[('Corners',)], self.FOLDER_KEY]),
       None)
     
     self.tree.filter.add(lambda item: item.type != self.ITEM)
     self.assertEqual(
-      self.tree.prev(self.tree[('Corners', 'top-left-corner::')]),
-      self.tree[('Corners', 'top-left-corner::'), self.FOLDER_KEY])
+      self.tree.prev(self.tree[self.path_to_id[('Corners', 'top-left-corner::')]]),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner::')], self.FOLDER_KEY])
     self.assertEqual(
-      self.tree.prev(self.tree[('Corners', 'top-left-corner::')], filtered=False),
-      self.tree[('Corners', 'top-left-corner::', 'bottom-left-corner')])
+      self.tree.prev(self.tree[self.path_to_id[('Corners', 'top-left-corner::')]], filtered=False),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-left-corner')]])
   
   def test_next(self):
     self.assertEqual(
-      self.tree.next(self.tree[('Frames',), self.FOLDER_KEY]),
-      self.tree[('Frames', 'top-frame')])
+      self.tree.next(self.tree[self.path_to_id[('Frames',)], self.FOLDER_KEY]),
+      self.tree[self.path_to_id[('Frames', 'top-frame')]])
     self.assertEqual(
-      self.tree.next(self.tree[('Corners', 'top-left-corner')]),
-      self.tree[('Corners', 'top-right-corner')])
+      self.tree.next(self.tree[self.path_to_id[('Corners', 'top-left-corner')]]),
+      self.tree[self.path_to_id[('Corners', 'top-right-corner')]])
     
     self.assertEqual(
-      self.tree.next(self.tree[('Corners',)]),
-      self.tree[('Frames',), self.FOLDER_KEY])
+      self.tree.next(self.tree[self.path_to_id[('Corners',)]]),
+      self.tree[self.path_to_id[('Frames',)], self.FOLDER_KEY])
     self.assertEqual(
-      self.tree.next(self.tree[('Corners',)], with_folders=False),
-      self.tree[('Frames', 'top-frame')])
+      self.tree.next(self.tree[self.path_to_id[('Corners',)]], with_folders=False),
+      self.tree[self.path_to_id[('Frames', 'top-frame')]])
     
     self.assertEqual(
-      self.tree.next(self.tree[('Overlay',), self.FOLDER_KEY]),
+      self.tree.next(self.tree[self.path_to_id[('Overlay',)], self.FOLDER_KEY]),
       None)
     self.assertEqual(
       self.tree.next(
-        self.tree[('Overlay',), self.FOLDER_KEY], with_empty_groups=True),
-      self.tree[('Overlay',)])
+        self.tree[self.path_to_id[('Overlay',)], self.FOLDER_KEY], with_empty_groups=True),
+      self.tree[self.path_to_id[('Overlay',)]])
     
     self.assertEqual(
-      self.tree.next(self.tree[('Overlay',)]),
+      self.tree.next(self.tree[self.path_to_id[('Overlay',)]]),
       None)
     
     self.tree.filter.add(lambda item: item.type != self.ITEM)
     self.assertEqual(
-      self.tree.next(self.tree[('Corners',), self.FOLDER_KEY]),
-      self.tree[('Corners', 'top-left-corner:'), self.FOLDER_KEY])
+      self.tree.next(self.tree[self.path_to_id[('Corners',)], self.FOLDER_KEY]),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner:')], self.FOLDER_KEY])
     self.assertEqual(
-      self.tree.next(self.tree[('Corners',), self.FOLDER_KEY], filtered=False),
-      self.tree[('Corners', 'top-left-corner')])
+      self.tree.next(self.tree[self.path_to_id[('Corners',)], self.FOLDER_KEY], filtered=False),
+      self.tree[self.path_to_id[('Corners', 'top-left-corner')]])
 
   def test_get_all_children_from_item(self):
-    self.assertEqual(self.tree[('Corners', 'top-left-corner')].get_all_children(), [])
+    self.assertEqual(
+      self.tree[self.path_to_id[('Corners', 'top-left-corner')]].get_all_children(), [])
 
   def test_get_all_children_from_folder(self):
     self.maxDiff = None
 
     self.assertListEqual(
-      self.tree[('Corners',), self.FOLDER_KEY].get_all_children(),
+      self.tree[self.path_to_id[('Corners',)], self.FOLDER_KEY].get_all_children(),
       [
-        self.tree[('Corners', 'top-left-corner')],
-        self.tree[('Corners', 'top-right-corner')],
-        self.tree[(('Corners', 'top-left-corner:'), self.FOLDER_KEY)],
-        self.tree[('Corners', 'top-left-corner:')],
-        self.tree[(('Corners', 'top-left-corner::'), self.FOLDER_KEY)],
-        self.tree[('Corners', 'top-left-corner::')],
-        self.tree[('Corners', 'top-left-corner::', 'bottom-right-corner')],
-        self.tree[('Corners', 'top-left-corner::', 'bottom-left-corner')],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner')]],
+        self.tree[self.path_to_id[('Corners', 'top-right-corner')]],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner:')], self.FOLDER_KEY],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner:')]],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::')], self.FOLDER_KEY],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::')]],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-right-corner')]],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-left-corner')]],
       ])
 
   def test_remove_group_item_also_removes_corresponding_folder(self):
-    item_path = ('Corners', 'top-left-corner:')
-    items_to_be_removed = [self.tree[(item_path, self.FOLDER_KEY)], self.tree[item_path]]
+    item_id = self.path_to_id[('Corners', 'top-left-corner:')]
+    items_to_be_removed = [self.tree[item_id, self.FOLDER_KEY], self.tree[item_id]]
 
-    self.tree.remove([self.tree[(item_path, self.FOLDER_KEY)]])
+    self.tree.remove([self.tree[item_id, self.FOLDER_KEY]])
 
     for item in items_to_be_removed:
       self.assertNotIn(item.key, self.tree)
 
   def test_remove_folder_item_also_removes_corresponding_group(self):
-    item_path = ('Corners', 'top-left-corner:')
-    items_to_be_removed = [self.tree[(item_path, self.FOLDER_KEY)], self.tree[item_path]]
+    item_id = self.path_to_id[('Corners', 'top-left-corner:')]
+    items_to_be_removed = [self.tree[item_id, self.FOLDER_KEY], self.tree[item_id]]
 
-    self.tree.remove([self.tree[item_path]])
+    self.tree.remove([self.tree[item_id]])
 
     for item in items_to_be_removed:
       self.assertNotIn(item.key, self.tree)

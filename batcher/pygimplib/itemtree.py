@@ -411,8 +411,8 @@ class ItemTree(metaclass=abc.ABCMeta):
   Each item in the tree is an `Item` instance. Each item contains basic
   attributes such as name or parents.
 
-  Items can be directly accessed via their ID, path or the underlying object.
-  Both ID and path are unique in the entire tree.
+  Items can be directly accessed via a unique item identifier. You may use the
+  `Item.key` property for this purpose.
   """
   
   def __init__(
@@ -435,14 +435,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     self._first_item = None
     self._last_item = None
 
-    # Contains all items, including groups, with all supported types (object, ID, string).
-    # key: One of the following:
-    #  * `Item.raw`
-    #  * (`Item.raw`, `FOLDER_KEY`)
-    #  * `Item.raw.get_id()
-    #  * (`Item.raw.get_id()`, `FOLDER_KEY`)
-    #  * tuple of `Item.orig_name`
-    #  * (tuple of `Item.orig_name`, `FOLDER_KEY`)
+    # key: `Item.key`
     # value: `Item` instance
     self._itemtree_all_types = {}
   
@@ -629,9 +622,6 @@ class ItemTree(metaclass=abc.ABCMeta):
     Any items that do not exist in the tree will be silently ignored without
     raising an exception.
     """
-    # TODO: Delete all keys, including item.raw and item path, if they exist,
-    #  or remove this to-do if only IDs will be used as keys.
-
     for item in items:
       if item.type == TYPE_ITEM:
         item_keys = [item.id]
@@ -846,16 +836,7 @@ class ImageTree(ItemTree):
     parents_for_child = list(item.parents)
     parents_for_child.append(item)
 
-    if item.type == TYPE_FOLDER:
-      self._itemtree_all_types[item.key] = item
-
-      item_path = tuple(item_.orig_name for item_ in parents_for_child)
-      self._itemtree_all_types[item_path, FOLDER_KEY] = item
-    else:
-      self._itemtree_all_types[item.key] = item
-
-      item_path = tuple(item_.orig_name for item_ in parents_for_child)
-      self._itemtree_all_types[item_path] = item
+    self._itemtree_all_types[item.key] = item
 
     return parents_for_child
 
@@ -913,15 +894,9 @@ class GimpItemTree(ItemTree):
     if item.type == TYPE_FOLDER:
       self._itemtree_all_types[item.raw, FOLDER_KEY] = item
       self._itemtree_all_types[item.key] = item
-
-      item_path = tuple(item_.orig_name for item_ in parents_for_child)
-      self._itemtree_all_types[item_path, FOLDER_KEY] = item
     else:
       self._itemtree_all_types[item.raw] = item
       self._itemtree_all_types[item.key] = item
-
-      item_path = tuple(item_.orig_name for item_ in parents_for_child)
-      self._itemtree_all_types[item_path] = item
 
     return parents_for_child
 
