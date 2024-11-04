@@ -262,8 +262,9 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._current_item
 
   @property
-  def current_raw_item(self) -> Gimp.Layer:
-    """The raw item (a GIMP object) that is currently being processed.
+  def current_raw_item(self) -> Union[Gimp.Item, Gimp.Image, None]:
+    """The raw item (a GIMP object) that is currently being processed, or
+    ``None`` if the raw item is not loaded yet.
 
     Note that ``current_raw_item`` can be different from `current_item.raw` -
     the former can be a copy while the latter can be the original raw item.
@@ -271,7 +272,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._current_raw_item
 
   @current_raw_item.setter
-  def current_raw_item(self, value: Gimp.Layer):
+  def current_raw_item(self, value: Union[Gimp.Item, Gimp.Image, None]):
     self._current_raw_item = value
 
   @property
@@ -291,10 +292,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def exported_raw_items(self) -> List:
-    """List of successfully exported objects.
+    """List of successfully exported raw items.
 
-    This list does not include items skipped by the user (when files with the
-    same names already exist).
+    This list does not include raw items skipped by the user (when files with
+    the same names already exist).
     """
     return list(self._exported_raw_items)
 
@@ -954,9 +955,10 @@ class ImageBatcher(Batcher):
   def _process_item_with_actions(self):
     if not self._edit_mode or self._is_preview:
       if self._current_raw_item is None:
-        # TODO: load the file as an image
-        #  also assign the loaded image to item.raw
-        #  if the file does not exist, skip
+        # TODO: load the file as an image, if not already (could be loaded
+        #  earlier, e.g. when evaluating a custom constraint)
+        #  - also assign the loaded image to item.raw
+        #  - if the file does not exist, skip
         pass
       else:
         # TODO: Create a copy of the image
