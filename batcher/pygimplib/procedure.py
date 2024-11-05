@@ -4,7 +4,7 @@
 from collections.abc import Iterable
 import functools
 import sys
-from typing import Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Callable, List, Optional, Tuple, Type, Union
 
 import gi
 
@@ -13,13 +13,11 @@ from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
-from gi.repository import GObject
 
 from . import initnotifier as pginitnotifier
 
 
 _PROCEDURE_NAMES_AND_DATA = {}
-_PLUGIN_PROPERTIES = {}
 _USE_LOCALE = False
 _INIT_PROCEDURES_FUNC = None
 _QUIT_FUNC = None
@@ -28,16 +26,16 @@ _QUIT_FUNC = None
 def register_procedure(
       procedure: Callable,
       procedure_type: Type[Gimp.Procedure] = Gimp.ImageProcedure,
-      arguments: Optional[List[Union[Dict, str]]] = None,
-      return_values: Optional[List[Union[Dict, str]]] = None,
+      arguments: Optional[Iterable[List]] = None,
+      return_values: Optional[Iterable[List]] = None,
       menu_label: Optional[str] = None,
-      menu_path: Optional[Union[str, List[str]]] = None,
+      menu_path: Optional[Union[str, Iterable[str]]] = None,
       image_types: Optional[str] = None,
       sensitivity_mask: Optional[Gimp.ProcedureSensitivityMask] = None,
       documentation: Optional[Union[Tuple[str, str], Tuple[str, str, str]]] = None,
       attribution: Optional[Tuple[str, str, str]] = None,
-      auxiliary_arguments: Optional[List[Union[Dict, str]]] = None,
-      run_data: Optional[List] = None,
+      auxiliary_arguments: Optional[Iterable[List]] = None,
+      run_data: Optional[Iterable] = None,
       init_ui: bool = True,
       pdb_procedure_type: Gimp.PDBProcType = Gimp.PDBProcType.PLUGIN,
       additional_init: Optional[Callable] = None,
@@ -67,21 +65,25 @@ def register_procedure(
       arguments will be pre-filled (see the documentation for
       `Gimp.ImageProcedure` for more information).
     arguments: List of arguments (procedure parameters).
-      Each list element must either be a dictionary or a string.
-      The dictionary must contain the ``'name'`` key representing the argument
-      name and optionally other keys corresponding to the parameter names for
-      `GObject.Property`.
-      If the list element is a string, it must be the name of an argument
-      already registered in a previous call to `register_procedure` (that is, a
-      string can only be specified if a dictionary containing the same name was
-      already specified). This allows reusing arguments for multiple plug-in
-      procedures without the need to duplicate the entire dictionary for each
-      procedure.
-      Underscores in names (``_``) are automatically replaced with hyphens
-      (``-``).
+      Each argument must be a list containing the following elements in this
+      order:
+      * argument type. The type corresponds to one of the
+        ``Gimp.Procedure.add_*_argument`` functions (e.g. the ``'boolean'``
+        type corresponds to the `Gimp.Procedure.add_boolean_argument` function).
+      * positional arguments according to the signature of the
+        ``Gimp.Procedure.add_*_argument`` function corresponding to the
+        argument type.
+
+      Underscores in argument names (``_``) are automatically replaced with
+      hyphens (``-``).
     return_values: List of return values.
-      See ``arguments`` for more information about the contentsn and format of
+      See ``arguments`` for more information about the contents and format of
       the list.
+
+      The argument type (first list element of a return value) corresponds to
+      one of the ``Gimp.Procedure.add_*_return_value`` functions (e.g. the
+      ``'boolean'`` type corresponds to the
+      `Gimp.Procedure.add_boolean_return_value` function).
     menu_label: Name of the menu entry in the GIMP user interface.
     menu_path: Path of the menu entry in the GIMP user interface.
       This can be a single string or a list of strings if you want your
@@ -101,8 +103,11 @@ def register_procedure(
     auxiliary_arguments: List of auxiliary arguments.
       See ``arguments`` for more information about the contentsn and format of
       the list.
-      See `Gimp.add_aux_argument_from_property` for more information about
-      auxiliary arguments.
+
+      The argument type (first list element of an auxiliary argument)
+      corresponds to one of the ``Gimp.Procedure.add_*_aux_argument``
+      functions (e.g. the ``'boolean'`` type corresponds to the
+      `Gimp.Procedure.add_boolean_aux_argument` function).
     run_data: Custom parameters passed to ``procedure`` as its last argument.
       ``procedure`` should only contain the run data as its last argument if
       ``run_data`` is not ``None``.
@@ -122,30 +127,40 @@ def register_procedure(
     >>> pg.register_procedure(
     ...   plug_in_awesome_filter,
     ...   arguments=[
-    ...     dict(name='run_mode',
-    ...          type=Gimp.RunMode,
-    ...          default=Gimp.RunMode.INTERACTIVE,
-    ...          nick='Run mode',
-    ...          blurb='The run mode'),
-    ...     dict(name='output_directory',
-    ...          type=str,
-    ...          default='some_dir',
-    ...          nick='Output directory',
-    ...          blurb='Output _directory'),
+    ...     [
+    ...        'enum',
+    ...        'run-mode',
+    ...        'Run mode',
+    ...        'The run mode',
+    ...        Gimp.RunMode,
+    ...        Gimp.RunMode.NONINTERACTIVE,
+    ...        GObject.ParamFlags.READWRITE,
+    ...     ],
+    ...     [
+    ...        'string',
+    ...        'output-directory',
+    ...        'Output directory',
+    ...        'Output _directory',
+    ...        'some_dir',
+    ...        GObject.ParamFlags.READWRITE,
+    ...     ],
     ...   ],
     ...   return_values=[
-    ...     dict(name='num_layers',
-    ...          type=int,
-    ...          default=0,
-    ...          nick='Number of processed layers',
-    ...          blurb='Number of processed layers'),
+    ...     [
+    ...        'int',
+    ...        'num-layers',
+    ...        'Number of processed layers',
+    ...        'Number of processed layers',
+    ...        0,
+    ...        GObject.ParamFlags.READWRITE,
+    ...     ],
     ...   ],
     ...   menu_label='Awesome Filter',
     ...   menu_path='<Image>/Filters',
     ...   image_types='*',
     ...   documentation=('An awesome filter.',
     ...                  'Applies a mind-blowing filter to each layer.'),
-    ...   attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2023'),
+    ...   attribution=('Jane Doe, John Doe', 'Jane Doe, John Doe', '2024'),
     ... )
   """
   global _INIT_PROCEDURES_FUNC
@@ -180,35 +195,32 @@ def _parse_and_check_parameters(parameters):
   if parameters is None:
     return None
 
-  if not isinstance(parameters, Iterable) or isinstance(parameters, str):
+  if not isinstance(parameters, Iterable):
     raise TypeError('Arguments and return values must be specified as a list-like iterable')
 
   processed_parameters = {}
 
   for param in parameters:
-    if isinstance(param, dict):
-      if 'name' not in param:
+    if isinstance(param, list):
+      if len(param) < 2:
         raise ValueError(
-          ('Dictionary describing an argument or a return value must also contain'
-           ' the "name" key representing the parameter name as registered in GIMP'))
+          ('The list describing an argument or a return value must contain'
+           ' at least two elements - type and name'))
 
-      name = param.pop('name').replace('_', '-')
-      if name not in _PLUGIN_PROPERTIES:
-        _PLUGIN_PROPERTIES[name] = GObject.Property(**param)
+      if not isinstance(param[0], str):
+        raise TypeError('The type of the argument or return value must be a string')
 
-      processed_parameters[name] = _PLUGIN_PROPERTIES[name]
-    elif isinstance(param, str):
-      name = param.replace('_', '-')
+      if not isinstance(param[1], str):
+        raise TypeError('The name of the argument or return value must be a string')
 
-      if name not in _PLUGIN_PROPERTIES:
-        raise ValueError(
-          ('You can only specify the name of an argument or a return value if a dictionary'
-           ' containing the name was already specified before'))
+      name = param.pop(1).replace('_', '-')
 
-      processed_parameters[name] = _PLUGIN_PROPERTIES[name]
+      if name in processed_parameters:
+        raise ValueError(f'Argument or return value named "{name}" was already specified')
+
+      processed_parameters[name] = list(param)
     else:
-      raise TypeError(
-        'Only dictionaries and strings are allowed when specifying an argument or a return value')
+      raise TypeError('Only lists are allowed when specifying an argument or return value')
 
   return processed_parameters
 
@@ -267,17 +279,6 @@ def main():
 def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
   class_dict = {}
 
-  # `GObject.Property` objects must be specified when defining a `Gimp.PlugIn`
-  # subclass, they cannot be added later as this will result in errors
-  # (probably because the parent class of `Gimp.PlugIn`, `GObject.GObject`, has
-  # a metaclass that performs property initialization upon class definition, not
-  # object instantiation).
-  # Therefore, the custom `Gimp.PlugIn` subclass must be created dynamically
-  # where it is possible to pass a dictionary of class attributes, including
-  # `GObject.Property` objects.
-  for name, gobject_property in _PLUGIN_PROPERTIES.items():
-    class_dict[name.replace('-', '_')] = gobject_property
-
   class_dict['do_query_procedures'] = _do_query_procedures
   class_dict['do_create_procedure'] = _do_create_procedure
 
@@ -297,7 +298,7 @@ def _create_plugin_class(class_name='PyPlugIn', bases=(Gimp.PlugIn,)):
   )
 
 
-def _do_query_procedures(plugin_instance):
+def _do_query_procedures(_plugin_instance):
   return list(_PROCEDURE_NAMES_AND_DATA)
 
 
@@ -316,16 +317,19 @@ def _do_create_procedure(plugin_instance, proc_name):
     proc_dict['run_data'])
 
   if proc_dict['arguments'] is not None:
-    for name in proc_dict['arguments']:
-      procedure.add_argument_from_property(plugin_instance, name)
+    for name, params in proc_dict['arguments'].items():
+      param_type = params.pop(0)
+      _get_add_param_func(procedure, param_type, 'argument')(name, *params)
 
   if proc_dict['return_values'] is not None:
-    for name in proc_dict['return_values']:
-      procedure.add_return_value_from_property(plugin_instance, name)
+    for name, params in proc_dict['return_values'].items():
+      param_type = params.pop(0)
+      _get_add_param_func(procedure, param_type, 'return_value')(name, *params)
 
   if proc_dict['auxiliary_arguments'] is not None:
-    for name in proc_dict['auxiliary_arguments']:
-      procedure.add_aux_argument_from_property(plugin_instance, name)
+    for name, params in proc_dict['auxiliary_arguments'].items():
+      param_type = params.pop(0)
+      _get_add_param_func(procedure, param_type, 'aux_argument')(name, *params)
 
   if proc_dict['menu_label'] is not None:
     procedure.set_menu_label(proc_dict['menu_label'])
@@ -363,7 +367,14 @@ def _do_create_procedure(plugin_instance, proc_name):
   return procedure
 
 
-def _disable_locale(plugin_instance, name):
+def _get_add_param_func(procedure, param_type, param_group):
+  try:
+    return getattr(procedure, f'add_{param_type}_{param_group}')
+  except AttributeError:
+    raise ValueError(f'type "{param_type}" is not valid')
+
+
+def _disable_locale(_plugin_instance, _name):
   return False
 
 
