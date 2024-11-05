@@ -107,7 +107,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
 
   @staticmethod
   def _set_color_tag(image, layer_name, color_tag):
-    for layer in image.list_layers():
+    for layer in image.get_layers():
       if layer.get_name() == layer_name:
         layer.set_color_tag(color_tag)
 
@@ -132,7 +132,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     else:
       expected_layers = {
         layer.get_name(): layer
-        for layer in self.expected_images[expected_results_dirpath].list_layers()}
+        for layer in self.expected_images[expected_results_dirpath].get_layers()}
     
     self._export(
       settings, procedure_names_to_add, procedure_names_to_remove, additional_init_before_run)
@@ -252,7 +252,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     """
     image = pg.pdbutils.load_layers(
       layer_filepaths, image=None, strip_file_extension=True)
-    return image, {layer.get_name(): layer for layer in image.list_layers()}
+    return image, {layer.get_name(): layer for layer in image.get_layers()}
   
   @staticmethod
   def _list_layer_filepaths(layers_dirpath):

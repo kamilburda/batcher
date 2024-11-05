@@ -197,7 +197,7 @@ class Image(GObject.GObject, ParasiteFunctionsStubMixin):
   def get_base_type(self):
     return self.base_type
 
-  def list_layers(self):
+  def get_layers(self):
     return self.layers
 
   def get_file(self):
@@ -292,7 +292,7 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
   def get_image(self):
     return self.image
 
-  def list_children(self):
+  def get_children(self):
     return self.children
 
   def get_parent(self):

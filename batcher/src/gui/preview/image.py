@@ -304,7 +304,7 @@ class ImagePreview(preview_base_.Preview):
     if image_preview is None or not image_preview.is_valid():
       return None, error
 
-    image_layers = image_preview.list_layers()
+    image_layers = image_preview.get_layers()
 
     if not image_layers:
       pg.pdbutils.try_delete_image(image_preview)

@@ -75,9 +75,9 @@ def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
       ['before_process_item_contents'], [batcher, batcher.current_item, layer_copy])
 
   if parent is None:
-    children = image.list_layers()
+    children = image.get_layers()
   else:
-    children = parent.list_children()
+    children = parent.get_children()
 
   merged_tagged_layer = None
 
@@ -189,9 +189,9 @@ def _get_adjacent_layer(
 ):
   raw_item = batcher.current_raw_item
   if raw_item.get_parent() is None:
-    children = batcher.current_image.list_layers()
+    children = batcher.current_image.get_layers()
   else:
-    children = raw_item.get_parent().list_children()
+    children = raw_item.get_parent().get_children()
   
   adjacent_layer = None
   

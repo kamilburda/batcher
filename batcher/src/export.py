@@ -294,7 +294,7 @@ def _merge_and_resize_image(batcher, image, raw_item):
 
 def _copy_layer(raw_item, dest_image, item):
   raw_item_copy = pg.pdbutils.copy_and_paste_layer(
-    raw_item, dest_image, None, len(dest_image.list_layers()), True, True, True)
+    raw_item, dest_image, None, len(dest_image.get_layers()), True, True, True)
 
   # We use `item.name` instead of `_get_item_export_name()` so that the original
   # layer name is used in case of multi-layer export.
@@ -577,7 +577,7 @@ def _refresh_image_copy_for_edit_mode(batcher, image_copy):
 
 
 def _refresh_image(image):
-  for layer in image.list_layers():
+  for layer in image.get_layers():
     image.remove_layer(layer)
 
 

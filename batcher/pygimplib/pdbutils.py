@@ -106,7 +106,7 @@ def find_images_by_filepath(image_filepath: str) -> List[Gimp.Image]:
   File path matching is performed via `Gimp.Image.get_file()`.
   """
   return [
-    image for image in Gimp.list_images()
+    image for image in Gimp.get_images()
     if image.get_file() and image.get_file().get_path() == image_filepath
   ]
 
@@ -168,7 +168,7 @@ def get_item_from_image_and_item_path(
   parent = matching_image_child
   matching_item = None
   for parent_or_item_name in item_path_components[1:]:
-    matching_item = _find_item_by_name_in_children(parent_or_item_name, parent.list_children())
+    matching_item = _find_item_by_name_in_children(parent_or_item_name, parent.get_children())
     
     if matching_item is None:
       return None
@@ -194,11 +194,11 @@ def _get_children_from_image(image, item_class_name):
       f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
 
   if issubclass(item_type, Gimp.Layer):
-    return image.list_layers()
+    return image.get_layers()
   elif issubclass(item_type, Gimp.Channel):
-    return image.list_channels()
+    return image.get_channels()
   elif issubclass(item_type, Gimp.Vectors):
-    return image.list_vectors()
+    return image.get_paths()
   else:
     raise TypeError(
       f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
@@ -270,7 +270,7 @@ def load_layer(
     layer_name = os.path.splitext(layer_name)[0]
   layer.set_name(layer_name)
 
-  image.insert_layer(layer, None, len(image.list_layers()))
+  image.insert_layer(layer, None, len(image.get_layers()))
 
   return layer
 
@@ -380,13 +380,13 @@ def compare_layers(
     for layer in layers:
       copy_and_paste_layer(layer, image, layer_group, 0, remove_lock_attributes=True)
     
-    for layer in layer_group.list_children():
+    for layer in layer_group.get_children():
       layer.set_visible(True)
     
     return layer_group
   
   def _process_layers(image, layer_group, apply_layer_attributes, apply_layer_masks):
-    for layer in layer_group.list_children():
+    for layer in layer_group.get_children():
       if layer.is_group():
         image.merge_layer_group(layer)
       else:
@@ -404,12 +404,12 @@ def compare_layers(
             layer.remove_mask(Gimp.MaskApplyMode.DISCARD)
   
   def _is_identical(layer_group):
-    layer_group.list_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
+    layer_group.get_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
     
-    for layer in layer_group.list_children()[1:]:
+    for layer in layer_group.get_children()[1:]:
       layer.set_visible(False)
     
-    for layer in layer_group.list_children()[1:]:
+    for layer in layer_group.get_children()[1:]:
       layer.set_visible(True)
       
       histogram_data = layer_group.histogram(Gimp.HistogramChannel.VALUE, 1 / 255, 1.0)
@@ -465,7 +465,7 @@ def compare_layers(
   _process_layers(image, layer_group, apply_layer_attributes, apply_layer_masks)
   
   has_alpha = False
-  for layer in layer_group.list_children():
+  for layer in layer_group.get_children():
     if layer.has_alpha():
       has_alpha = True
       _prepare_for_comparison_of_alpha_channels(layer)
@@ -473,7 +473,7 @@ def compare_layers(
   identical = _is_identical(layer_group)
   
   if identical and compare_alpha_channels and has_alpha:
-    for layer in layer_group.list_children():
+    for layer in layer_group.get_children():
       if layer.get_mask() is not None:
         _set_mask_to_layer(layer)
       else:

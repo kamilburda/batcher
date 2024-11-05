@@ -103,7 +103,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   main_background_layer = next(
     iter(
-      layer for layer in gui.name_preview.batcher.item_tree.image.list_layers()
+      layer for layer in gui.name_preview.batcher.item_tree.image.get_layers()
       if layer.get_name() == 'main-background'))
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
@@ -156,7 +156,7 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
 
   main_background_layer = next(
     iter(
-      layer for layer in gui.name_preview.batcher.item_tree.image.list_layers()
+      layer for layer in gui.name_preview.batcher.item_tree.image.get_layers()
       if layer.get_name() == 'main-background'))
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
@@ -208,7 +208,7 @@ def take_and_process_screenshot(
   else:
     crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
-  selected_layers = screenshot_image.list_selected_layers()
+  selected_layers = screenshot_image.get_selected_layers()
   layer_array = GObject.Value(Gimp.ObjectArray)
   Gimp.value_set_object_array(layer_array, Gimp.Layer, selected_layers)
   
@@ -260,4 +260,4 @@ def crop_to_dialog(image, size_setting_or_tuple, decoration_offsets):
     0,
     0)
   
-  pdb.plug_in_autocrop(image, image.list_selected_layers()[0])
+  pdb.plug_in_autocrop(image, image.get_selected_layers()[0])

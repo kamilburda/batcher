@@ -314,7 +314,7 @@ class GimpItem(Item):
     return self._id
 
   def _list_child_objects(self) -> List[Gimp.Item]:
-    return self.raw.list_children()
+    return self.raw.get_children()
 
   def _get_name_from_object(self) -> str:
     return self._object.get_name()
@@ -907,16 +907,16 @@ class GimpItemTree(ItemTree):
 class LayerTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Layer]:
-    return image.list_layers()
+    return image.get_layers()
 
 
 class ChannelTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Channel]:
-    return image.list_channels()
+    return image.get_channels()
 
 
 class VectorTree(GimpItemTree):
   
   def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Vectors]:
-    return image.list_vectors()
+    return image.get_paths()

@@ -17,7 +17,7 @@ def is_layer(item):
 
 
 def is_nonempty_group(item):
-  return item.type == pg.itemtree.TYPE_GROUP and item.raw.list_children()
+  return item.type == pg.itemtree.TYPE_GROUP and item.raw.get_children()
 
 
 def has_matching_file_extension(item, file_extension):
@@ -41,7 +41,7 @@ def is_item_in_items_selected_in_gimp(item, batcher):
     return item.raw in batcher.orig_selected_raw_items
   else:
     image = item.raw.get_image()
-    return image.is_valid() and item.raw in image.list_selected_layers()
+    return image.is_valid() and item.raw in image.get_selected_layers()
 
 
 def is_top_level(item):

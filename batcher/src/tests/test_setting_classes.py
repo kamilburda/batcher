@@ -109,7 +109,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
     with mock.patch(
           f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.side_effect = images
+      temp_mock_gimp_module.get_images.side_effect = images
       temp_mock_gimp_module.Layer = stubs_gimp.GimpModuleStub.Layer
 
       self.setting.set_value(
@@ -228,7 +228,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
     self.image_list.extend(
       self._create_image_list([(5, 'new_image.png'), (6, None)]))
     
-    with mock.patch('src.setting_classes.Gimp.list_images', new=self.get_image_list):
+    with mock.patch('src.setting_classes.Gimp.get_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -237,7 +237,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
   def test_update_images_and_dirpaths_remove_closed_images(self):
     self.image_list.pop(1)
 
-    with mock.patch('src.setting_classes.Gimp.list_images', new=self.get_image_list):
+    with mock.patch('src.setting_classes.Gimp.get_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -268,7 +268,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
   def test_set_value_from_image_paths(self):
     with mock.patch(
           f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.list_images.side_effect = [[self.image_list[1]], [self.image_list[2]]]
+      temp_mock_gimp_module.get_images.side_effect = [[self.image_list[1]], [self.image_list[2]]]
 
       self.setting.set_value(
         {os.path.abspath('image.png'): 'dirpath1', os.path.abspath('test.jpg'): 'dirpath2'})

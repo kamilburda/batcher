@@ -22,7 +22,7 @@ def set_selected_and_current_layer(batcher):
   if batcher.current_raw_item.is_valid():
     batcher.current_image.set_selected_layers([batcher.current_raw_item])
   else:
-    selected_layers = batcher.current_image.list_selected_layers()
+    selected_layers = batcher.current_image.get_selected_layers()
 
     if selected_layers:
       # There is no way to know which layer is the "right" one, so we resort to
@@ -33,7 +33,7 @@ def set_selected_and_current_layer(batcher):
         # The selected layer(s) may have been set by the procedure.
         batcher.current_raw_item = selected_layer
       else:
-        current_image_layers = batcher.current_image.list_layers()
+        current_image_layers = batcher.current_image.get_layers()
         if current_image_layers:
           # There is no way to know which layer is the "right" one, so we resort
           # to taking the first.
@@ -123,7 +123,7 @@ def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_v
       raw_top_level_parent = item.parents[0].raw if item.parents else None
       image.reorder_item(item.raw, None, image.get_item_position(raw_top_level_parent))
 
-      if not raw_immediate_parent.list_children():
+      if not raw_immediate_parent.get_children():
         image.remove_layer(raw_immediate_parent)
 
       if consider_parent_visible and item.parents:

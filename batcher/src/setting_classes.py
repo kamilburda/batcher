@@ -380,7 +380,7 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
     opened in GIMP. Adds (image, import directory path) pairs for new images
     opened in GIMP.
     """
-    current_images = Gimp.list_images()
+    current_images = Gimp.get_images()
     self._filter_images_no_longer_opened(current_images)
     self._add_new_opened_images(current_images)
   

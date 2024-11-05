@@ -1135,7 +1135,7 @@ class LayerBatcher(Batcher):
       self._current_image = self._input_image
       self._current_image.undo_group_start()
 
-    self._orig_selected_raw_items = self._input_image.list_selected_layers()
+    self._orig_selected_raw_items = self._input_image.get_selected_layers()
   
   def _do_cleanup_contents(self, exception_occurred):
     super()._do_cleanup_contents(exception_occurred)
@@ -1174,7 +1174,7 @@ class LayerBatcher(Batcher):
         self._current_raw_item,
         self._current_image,
         None,
-        len(self._current_image.list_layers()),
+        len(self._current_image.get_layers()),
         True,
         True,
         True)
@@ -1207,5 +1207,5 @@ class LayerBatcher(Batcher):
 
   def _refresh_current_image(self):
     if not self._edit_mode and not self._keep_image_copy:
-      for layer in self._current_image.list_layers():
+      for layer in self._current_image.get_layers():
         self._current_image.remove_layer(layer)
