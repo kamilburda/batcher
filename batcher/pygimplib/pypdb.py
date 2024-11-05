@@ -1,5 +1,4 @@
 """Wrapper of ``Gimp.get_pdb()`` to simplify invoking GIMP PDB procedures."""
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -164,35 +163,44 @@ class PyPDBProcedure:
   def _create_config(self, run_mode, *proc_args, **proc_kwargs):
     config = self._proc.create_config()
 
-    arg_names = [arg.name for arg in self._proc.get_arguments()]
+    args = self._proc.get_arguments()
+
     if self.has_run_mode:
-      config.set_property(arg_names[0].replace('_', '-'), run_mode)
-      arg_names = arg_names[1:]
+      config.set_property(args[0].name, run_mode)
+      args = args[1:]
 
-    property_names = set(prop.name for prop in config.list_properties())
+    for arg, arg_value in zip(args, proc_args):
+      config_set_property = _get_set_property_func(arg.value_type.name, config)
+      config_set_property(arg.name, arg_value)
 
-    for arg_name, arg_value in zip(arg_names, proc_args):
-      processed_arg_name = arg_name.replace('_', '-')
+    if proc_kwargs:
+      args_and_names = {arg.name: arg for arg in args}
 
-      if processed_arg_name in property_names:
-        config.set_property(processed_arg_name, arg_value)
-      else:
-        raise PDBProcedureError(
-          f'argument "{processed_arg_name}" does not exist or is not supported',
-          Gimp.PDBStatusType.CALLING_ERROR)
+      # Keyword arguments can override positional arguments
+      for arg_name, arg_value in proc_kwargs.items():
+        processed_arg_name = arg_name.replace('_', '-')
 
-    # Keyword arguments can override positional arguments
-    for arg_name, arg_value in proc_kwargs.items():
-      processed_arg_name = arg_name.replace('_', '-')
+        try:
+          arg = args_and_names[processed_arg_name]
+        except KeyError:
+          raise PDBProcedureError(
+            f'argument "{processed_arg_name}" does not exist or is not supported',
+            Gimp.PDBStatusType.CALLING_ERROR)
 
-      if processed_arg_name in property_names:
-        config.set_property(processed_arg_name, arg_value)
-      else:
-        raise PDBProcedureError(
-          f'argument "{processed_arg_name}" does not exist or is not supported',
-          Gimp.PDBStatusType.CALLING_ERROR)
+        arg_type_name = arg.value_type.name
+        config_set_property = _get_set_property_func(arg_type_name, config)
+        config_set_property(processed_arg_name, arg_value)
 
     return config
+
+
+def _get_set_property_func(arg_type_name, config):
+  if arg_type_name == 'GimpCoreObjectArray':
+    return config.set_core_object_array
+  elif arg_type_name == 'GimpColorArray':
+    return config.set_color_array
+  else:
+    return config.set_property
 
 
 class PDBProcedureError(Exception):
