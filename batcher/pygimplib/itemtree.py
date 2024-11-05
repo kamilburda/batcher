@@ -101,7 +101,7 @@ class Item(metaclass=abc.ABCMeta):
 
     The type can be one of the following values:
       * ``TYPE_ITEM`` - regular item
-      * ``TYPE_GROUP`` - item group - an item whose underlying object represents
+      * ``TYPE_GROUP`` - group item - an item whose underlying object represents
         a group with children, but acts as a regular item with no children, e.g.
         a group layer acting as a single merged layer.
       * ``TYPE_FOLDER`` - item containing children (e.g. a folder on a file
@@ -453,7 +453,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   
   def __len__(self) -> int:
     """Returns the number of items in the tree, excluding folders and empty
-    item groups.
+    group items.
     
     The returned number of items depends on whether `is_filtered` is
     ``True`` or ``False``.
@@ -461,7 +461,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     return len([item for item in self])
   
   def __iter__(self) -> Generator[Item, None, None]:
-    """Iterates over items, excluding folders and empty item groups.
+    """Iterates over items, excluding folders and empty group items.
 
     If the `is_filtered` attribute is ``False``, iteration is performed over
     all items. If `is_filtered` is ``True``, iteration is performed only over
@@ -473,7 +473,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     return self.iter(with_folders=False, with_empty_groups=False)
 
   def __reversed__(self) -> Generator[Item, None, None]:
-    """Iterates over items, excluding folders and empty item groups, in the
+    """Iterates over items, excluding folders and empty group items, in the
     reversed order.
 
     If the `is_filtered` attribute is ``False``, iteration is performed over
@@ -671,14 +671,14 @@ class ItemTree(metaclass=abc.ABCMeta):
         filtered: bool = True,
         reverse: bool = False,
   ) -> Generator[Item, None, None]:
-    """Iterates over items, optionally including folders and empty item groups.
+    """Iterates over items, optionally including folders and empty group items.
 
     Args:
       with_folders:
         If ``True``, folder items are included. Topmost folders are yielded
         first. Items are always yielded after all of its parent folders.
       with_empty_groups:
-        If ``True``, empty item groups are included. Empty item groups as
+        If ``True``, empty group items are included. Empty group items as
         folders are still yielded if ``with_folders`` is ``True``.
       filtered:
         If ``True`` and the `is_filtered` attribute is also ``True``,
@@ -857,7 +857,7 @@ class GimpItemTree(ItemTree):
     * `ChannelTree` for channels,
     * `VectorTree` for vectors (paths).
 
-  Item groups (e.g. layer groups) are inserted twice in the tree - as folders
+  group items (e.g. group layers) are inserted twice in the tree - as folders
   and as items. Parents of items are always folders.
 
   While you may add or remove items from `GimpItemTree`, it does not account for

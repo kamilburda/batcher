@@ -94,7 +94,7 @@ def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
 
     # The merged-down layer does not possess the attributes of the original
     # layers, including the color tag, so we set it explicitly. This ensures
-    # that tagged layer groups are merged properly in "Merge back-/foreground"
+    # that tagged group layers are merged properly in "Merge back-/foreground"
     # procedures.
     merged_tagged_layer.set_color_tag(merged_color_tag)
 

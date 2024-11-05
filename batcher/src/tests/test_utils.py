@@ -59,7 +59,7 @@ class TestSemiDeepCopy(unittest.TestCase):
         ],
       },
       {
-        'name': 'apply_opacity_from_layer_groups',
+        'name': 'apply_opacity_from_group_layers',
         'additional_tags': frozenset({'edit', 'export'}),
       },
     ]

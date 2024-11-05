@@ -381,7 +381,7 @@ _FIELDS_LIST = [
       ['[001]', '001, 002, ...'],
       ['[1]', '1, 2, ...'],
       ['[005]', '005, 006, ...'],
-      [_('To continue numbering across layer groups, use %n.')],
+      [_('To continue numbering across group layers, use %n.')],
       ['[001, %n]', '001, 002, ...'],
       [_('To use descending numbers, use %d.')],
       [_('Suppose that the number of layers is 5:')],

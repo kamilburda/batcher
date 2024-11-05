@@ -147,7 +147,7 @@ def get_item_from_image_and_item_path(
   ``item_class_name`` corresponds to one of the GIMP item classes, e.g.
   ``'Layer'`` or ``'Channel'``.
   
-  ``item_path`` consists of the item name and all of its parent layer groups,
+  ``item_path`` consists of the item name and all of its parent group layers,
   separated by ``'/'``. For example, if the item name is``' 'Left''`` its
   parent groups are ``'Hands'`` (immediate parent) and ``'Body'`` (parent of
   ``'Hands'``), then the item path is ``'Body/Hands/Left'``.
@@ -318,7 +318,7 @@ def copy_and_paste_layer(
   copy.
   
   If ``parent`` is ``None``, the layer is inserted in the main stack (outside
-  any layer group).
+  any group layer).
   
   If ``remove_lock_attributes`` is ``True``, all lock-related attributes are
   removed (lock position, alpha channel, etc.) for the layer copy.
@@ -374,25 +374,25 @@ def compare_layers(
   """
   
   def _copy_layers(image, layers, parent=None, position=0):
-    layer_group = Gimp.Layer.group_new(image)
-    image.insert_layer(layer_group, parent, position)
+    group_layer = Gimp.Layer.group_new(image)
+    image.insert_layer(group_layer, parent, position)
     
     for layer in layers:
-      copy_and_paste_layer(layer, image, layer_group, 0, remove_lock_attributes=True)
+      copy_and_paste_layer(layer, image, group_layer, 0, remove_lock_attributes=True)
     
-    for layer in layer_group.get_children():
+    for layer in group_layer.get_children():
       layer.set_visible(True)
     
-    return layer_group
+    return group_layer
   
-  def _process_layers(image, layer_group, apply_layer_attributes, apply_layer_masks):
-    for layer in layer_group.get_children():
+  def _process_layers(image, group_layer, apply_layer_attributes, apply_layer_masks):
+    for layer in group_layer.get_children():
       if layer.is_group():
         image.merge_layer_group(layer)
       else:
         if layer.get_opacity() != 100.0 or layer.get_mode() != Gimp.LayerMode.NORMAL:
           if apply_layer_attributes:
-            layer = _apply_layer_attributes(image, layer, layer_group)
+            layer = _apply_layer_attributes(image, layer, group_layer)
           else:
             layer.set_opacity(100.0)
             layer.set_mode(Gimp.LayerMode.NORMAL)
@@ -403,16 +403,16 @@ def compare_layers(
           else:
             layer.remove_mask(Gimp.MaskApplyMode.DISCARD)
   
-  def _is_identical(layer_group):
-    layer_group.get_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
+  def _is_identical(group_layer):
+    group_layer.get_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
     
-    for layer in layer_group.get_children()[1:]:
+    for layer in group_layer.get_children()[1:]:
       layer.set_visible(False)
     
-    for layer in layer_group.get_children()[1:]:
+    for layer in group_layer.get_children()[1:]:
       layer.set_visible(True)
       
-      histogram_data = layer_group.histogram(Gimp.HistogramChannel.VALUE, 1 / 255, 1.0)
+      histogram_data = group_layer.histogram(Gimp.HistogramChannel.VALUE, 1 / 255, 1.0)
       
       if histogram_data.percentile != 0.0:
         return False
@@ -460,26 +460,26 @@ def compare_layers(
     return False
   
   image = Gimp.Image.new(1, 1, Gimp.ImageBaseType.RGB)
-  layer_group = _copy_layers(image, layers)
+  group_layer = _copy_layers(image, layers)
   image.resize_to_layers()
-  _process_layers(image, layer_group, apply_layer_attributes, apply_layer_masks)
+  _process_layers(image, group_layer, apply_layer_attributes, apply_layer_masks)
   
   has_alpha = False
-  for layer in layer_group.get_children():
+  for layer in group_layer.get_children():
     if layer.has_alpha():
       has_alpha = True
       _prepare_for_comparison_of_alpha_channels(layer)
   
-  identical = _is_identical(layer_group)
+  identical = _is_identical(group_layer)
   
   if identical and compare_alpha_channels and has_alpha:
-    for layer in layer_group.get_children():
+    for layer in group_layer.get_children():
       if layer.get_mask() is not None:
         _set_mask_to_layer(layer)
       else:
         layer.fill(Gimp.FillType.WHITE)
     
-    identical = _is_identical(layer_group)
+    identical = _is_identical(group_layer)
   
   image.delete()
   

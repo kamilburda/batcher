@@ -85,10 +85,10 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
-    'name': 'layer_groups',
+    'name': 'group_layers',
     'type': 'constraint',
     'function': is_nonempty_group,
-    'display_name': _('Layer groups'),
+    'display_name': _('Group layers'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {

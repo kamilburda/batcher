@@ -133,7 +133,7 @@ def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_v
   item.children = []
 
 
-def apply_opacity_from_layer_groups(batcher):
+def apply_opacity_from_group_layers(batcher):
   new_layer_opacity = batcher.current_raw_item.get_opacity() / 100.0
   for parent in batcher.current_item.parents:
     new_layer_opacity = new_layer_opacity * (parent.raw.get_opacity() / 100.0)
@@ -354,10 +354,10 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
 
 _BUILTIN_PROCEDURES_LIST = [
   {
-    'name': 'apply_opacity_from_layer_groups',
-    'function': apply_opacity_from_layer_groups,
-    'display_name': _('Apply opacity from layer groups'),
-    'description': _('Combines opacity from all parent layer groups and the current layer.'),
+    'name': 'apply_opacity_from_group_layers',
+    'function': apply_opacity_from_group_layers,
+    'display_name': _('Apply opacity from group layers'),
+    'description': _('Combines opacity from all parent group layers and the current layer.'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
   {
@@ -543,9 +543,9 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'bool',
-        'name': 'rename_layer_groups',
+        'name': 'rename_group_layers',
         'default_value': False,
-        'display_name': _('Rename layer groups'),
+        'display_name': _('Rename group layers'),
         'gui_type': 'check_button',
       },
     ],

@@ -120,7 +120,7 @@ class NamePreview(preview_base_.Preview):
   
   def update(self, reset_items: bool = False, update_existing_contents_only: bool = False):
     """Updates the preview (add/remove item, move item to a different parent
-    item group, etc.).
+    group item, etc.).
     
     If ``reset_items`` is ``True``, full update is perform - new items are
     added, non-existent items are removed, etc. Note that setting this to

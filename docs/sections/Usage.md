@@ -46,7 +46,7 @@ You will be prompted to set the file format options right after you press the `E
 
 Before the export, you can apply a multitude of *procedures* to each layer, such as scaling or background insertion.
 
-You can exclude layers from being exported based on one or more *constraints*, e.g. only visible layers or only layer groups.
+You can exclude layers from being exported based on one or more *constraints*, e.g. only visible layers or only group layers.
 
 Procedures and constraints can be a powerful way to adjust the export to your heart's content.
 You can take a look at a few [examples](Customization.md#examples) to get started.
@@ -86,7 +86,7 @@ You can take a look at a few [examples](Customization.md#examples) to get starte
 
 ![Dialog of Edit Layers](../images/screenshot_dialog_edit_layers.png)
 
-If the `Layers` constraint is unchecked, layer groups will also be processed. The layer groups will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on layer groups (e.g. `gimp-drawable-brightness-contrast`).
+If the `Layers` constraint is unchecked, group layers will also be processed. The group layers will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on group layers (e.g. `gimp-drawable-brightness-contrast`).
 
 
 ## Quick Batch Layer Editing
