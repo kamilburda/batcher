@@ -18,7 +18,7 @@ from .pypdb import pdb
 
 
 def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
-  """Duplicates an image without layers, channels or vectors (keeping only
+  """Duplicates an image without layers, channels or paths (keeping only
   metadata such as dimensions, base type, parasites and more).
   
   For a full image copy, use the ``'gimp-image-duplicate'`` procedure.
@@ -191,17 +191,17 @@ def _get_children_from_image(image, item_class_name):
 
   if not inspect.isclass(item_type):
     raise TypeError(
-      f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
+      f'invalid item type "{item_class_name}"; must be Layer, Channel or Path')
 
   if issubclass(item_type, Gimp.Layer):
     return image.get_layers()
   elif issubclass(item_type, Gimp.Channel):
     return image.get_channels()
-  elif issubclass(item_type, Gimp.Vectors):
+  elif issubclass(item_type, Gimp.Path):
     return image.get_paths()
   else:
     raise TypeError(
-      f'invalid item type "{item_class_name}"; must be Layer, Channel or Vectors')
+      f'invalid item type "{item_class_name}"; must be Layer, Channel or Path')
 
 
 def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[str], None]:

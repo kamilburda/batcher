@@ -528,21 +528,21 @@ class ChannelComboBoxPresenter(GimpObjectComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
-class VectorsComboBoxPresenter(GimpObjectComboBoxPresenter):
-  """`setting.Presenter` subclass for `GimpUi.VectorsComboBox` widgets.
+class PathComboBoxPresenter(GimpObjectComboBoxPresenter):
+  """`setting.Presenter` subclass for `GimpUi.PathComboBox` widgets.
   
-  Value: `Gimp.Vectors` selected in the combo box, or ``None`` if there are no
-  vectors available.
+  Value: `Gimp.Path` selected in the combo box, or ``None`` if there is no
+  path available.
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.VectorsComboBox.new()
+    return GimpUi.PathComboBox.new()
   
   def get_value(self):
-    return Gimp.Vectors.get_by_id(self._widget.get_active().value)
+    return Gimp.Path.get_by_id(self._widget.get_active().value)
   
   def _set_value(self, value):
-    """Sets a `Gimp.Vectors` instance to be selected in the combo box.
+    """Sets a `Gimp.Path` instance to be selected in the combo box.
     
     Passing ``None`` has no effect.
     """

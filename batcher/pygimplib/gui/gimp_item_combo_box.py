@@ -22,7 +22,7 @@ __all__ = [
 
 class GimpItemComboBox(Gtk.Box):
   """Class defining a GTK widget for `Gimp.Item` instances acting as an
-  abstraction over GIMP objects - layers, channels and vectors.
+  abstraction over GIMP objects - layers, channels and paths.
   
   Signals:
     changed:
@@ -52,7 +52,7 @@ class GimpItemComboBox(Gtk.Box):
     
     self._layer_combo_box = GimpUi.LayerComboBox.new(constraint=constraint, data=data)
     self._channel_combo_box = GimpUi.ChannelComboBox.new(constraint=constraint, data=data)
-    self._vectors_combo_box = GimpUi.VectorsComboBox.new(constraint=constraint, data=data)
+    self._path_combo_box = GimpUi.PathComboBox.new(constraint=constraint, data=data)
     
     self._item_combo_boxes = [
       self._GimpItemComboBox(
@@ -69,10 +69,10 @@ class GimpItemComboBox(Gtk.Box):
         Gimp.Channel),
       self._GimpItemComboBox(
         GimpUi.ICON_DIALOG_PATHS,
-        self._vectors_combo_box,
-        self._vectors_combo_box.get_active,
-        self._vectors_combo_box.set_active,
-        Gimp.Vectors)]
+        self._path_combo_box,
+        self._path_combo_box.get_active,
+        self._path_combo_box.set_active,
+        Gimp.Path)]
 
     self._displayed_item_combo_box = self._item_combo_boxes[0]
 

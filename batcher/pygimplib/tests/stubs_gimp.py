@@ -274,7 +274,7 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
   def is_channel(self):
     return False
 
-  def is_vectors(self):
+  def is_path(self):
     return False
 
   def get_width(self):
@@ -331,9 +331,9 @@ class Channel(Item):
     return True
 
 
-class Vectors(Item):
+class Path(Item):
 
-  def is_vectors(self):
+  def is_path(self):
     return True
 
 
@@ -498,7 +498,7 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Layer = Layer
   LayerMask = LayerMask
   Channel = Channel
-  Vectors = Vectors
+  Path = Path
 
   Display = Display
 

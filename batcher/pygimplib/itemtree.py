@@ -855,7 +855,7 @@ class GimpItemTree(ItemTree):
   Use one of the subclasses for items of a certain type:
     * `LayerTree` for layers,
     * `ChannelTree` for channels,
-    * `VectorTree` for vectors (paths).
+    * `PathTree` for paths.
 
   group items (e.g. group layers) are inserted twice in the tree - as folders
   and as items. Parents of items are always folders.
@@ -916,7 +916,7 @@ class ChannelTree(GimpItemTree):
     return image.get_channels()
 
 
-class VectorTree(GimpItemTree):
+class PathTree(GimpItemTree):
   
-  def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Vectors]:
+  def _get_children_from_image(self, image: Gimp.Image) -> List[Gimp.Path]:
     return image.get_paths()

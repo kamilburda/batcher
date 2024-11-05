@@ -1655,7 +1655,7 @@ class ImageSetting(Setting):
 
 
 class GimpItemSetting(Setting):
-  """Abstract class for settings storing GIMP items - layers, channels, vectors.
+  """Abstract class for settings storing GIMP items - layers, channels, paths.
   
   This class accepts as a value one of the following:
   * a tuple (image file path, item type, item path) where item type is the name
@@ -1878,28 +1878,26 @@ class SelectionSetting(ChannelSetting):
   _ALLOWED_GUI_TYPES = []
 
 
-class VectorsSetting(GimpItemSetting):
-  """Class for settings holding `Gimp.Vectors` instances.
+class PathSetting(GimpItemSetting):
+  """Class for settings holding `Gimp.Path` instances.
   
   Allowed GIMP PDB types:
-  * `Gimp.Vectors`
+  * `Gimp.Path`
   
   Message IDs for invalid values:
-  * ``'invalid_value'``: The vectors instance assigned is not valid.
+  * ``'invalid_value'``: The path assigned is not valid.
   """
   
-  _ALIASES = ['path']
-  
-  _ALLOWED_PDB_TYPES = [Gimp.Vectors]
+  _ALLOWED_PDB_TYPES = [Gimp.Path]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.vectors_combo_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.path_combo_box]
   
   def _copy_value(self, value):
     return value
   
-  def _validate(self, vectors):
-    if vectors is not None and not vectors.is_vectors():
-      return 'invalid vectors', 'invalid_value'
+  def _validate(self, path):
+    if path is not None and not path.is_path():
+      return 'invalid path', 'invalid_value'
 
 
 class ColorSetting(Setting):
@@ -2404,7 +2402,7 @@ class ArraySetting(Setting):
   * `Gimp.RGBArray`
   * `GObject.TYPE_STRV` (string array)
   * `Gimp.ObjectArray` - any type inheriting from `GObject.GObject`, including
-    GIMP objects (e.g. images, layers, channels, vectors, brushes, patterns) or
+    GIMP objects (e.g. images, layers, channels, paths, brushes, patterns) or
     e.g. `Gio.File`.
   
   Default value: `()`
@@ -2990,8 +2988,8 @@ def get_array_setting_type_from_gimp_object_array(
     return ArraySetting, dict(element_type=LayerSetting)
   elif pdb_param_info.name == 'channels':
     return ArraySetting, dict(element_type=ChannelSetting)
-  elif pdb_param_info.name == 'vectors':
-    return ArraySetting, dict(element_type=VectorsSetting)
+  elif pdb_param_info.name == 'paths':
+    return ArraySetting, dict(element_type=PathSetting)
   elif pdb_param_info.name == 'children':
     return ArraySetting, dict(element_type=ItemSetting)
   else:
