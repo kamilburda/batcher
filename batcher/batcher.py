@@ -44,8 +44,7 @@ SETTINGS_EXPORT_LAYERS = plugin_settings.create_settings_for_export_layers()
 SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
 
 
-def plug_in_batch_export_layers(
-      _procedure, run_mode, image, _n_drawables, _drawables, config, _data):
+def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
   _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
@@ -66,8 +65,7 @@ def plug_in_batch_export_layers(
       SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, config, mode='export')
 
 
-def plug_in_batch_export_layers_quick(
-      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
+def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
   _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
@@ -85,8 +83,7 @@ def plug_in_batch_export_layers_quick(
       SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
 
 
-def plug_in_batch_export_selected_layers(
-      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
+def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
   _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
@@ -109,8 +106,7 @@ def plug_in_batch_export_selected_layers(
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
 
 
-def plug_in_batch_edit_layers(
-      _procedure, run_mode, image, _n_drawables, _drawables, config, _data):
+def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _data):
   _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
@@ -131,8 +127,7 @@ def plug_in_batch_edit_layers(
       SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, config, mode='edit')
 
 
-def plug_in_batch_edit_layers_quick(
-      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
+def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
   _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
@@ -150,8 +145,7 @@ def plug_in_batch_edit_layers_quick(
       SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
 
 
-def plug_in_batch_edit_selected_layers(
-      _procedure, run_mode, image, _n_drawables, _drawables, _config, _data):
+def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
   _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
 
   layer_tree = pg.itemtree.LayerTree()
