@@ -11,10 +11,7 @@ import time
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 from gi.repository import Gio
-from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
