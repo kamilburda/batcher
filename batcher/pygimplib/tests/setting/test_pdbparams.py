@@ -21,7 +21,7 @@ class TestCreateParams(unittest.TestCase):
     self.coordinates_setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_default_value=0.0)
     
     self.settings = stubs_group.create_test_settings_hierarchical()
@@ -72,7 +72,7 @@ class TestCreateParams(unittest.TestCase):
       params[2],
       dict(
         name='coordinates',
-        type=Gimp.FloatArray,
+        type=Gimp.DoubleArray,
         nick='Coordinates',
         blurb='Coordinates',
       ))
@@ -108,7 +108,7 @@ class TestCreateParams(unittest.TestCase):
       params[2],
       dict(
         name='coordinates',
-        type=Gimp.FloatArray,
+        type=Gimp.DoubleArray,
         nick='Coordinates',
         blurb='Coordinates',
       ))
@@ -159,7 +159,7 @@ class TestIterArgs(unittest.TestCase):
     coordinates_setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_default_value=0.0)
     
     self.settings.add([coordinates_setting])

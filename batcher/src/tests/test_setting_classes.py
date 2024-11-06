@@ -350,7 +350,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       *self.common_options,
       {
         'name': 'quality',
-        'type': pg.setting.FloatSetting,
+        'type': pg.setting.DoubleSetting,
         'display_name': 'quality',
         'default_value': 0.9,
       },
@@ -442,7 +442,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     jpeg_group.add([
       {
         'name': 'quality',
-        'type': pg.setting.FloatSetting,
+        'type': pg.setting.DoubleSetting,
         'display_name': 'quality',
         'default_value': 0.9,
       },

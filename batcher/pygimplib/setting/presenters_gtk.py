@@ -78,7 +78,7 @@ class IntSpinButtonPresenter(GtkPresenter):
     self._widget.set_value(value)
 
 
-class FloatSpinButtonPresenter(GtkPresenter):
+class DoubleSpinButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.SpinButton` widgets.
   
   Value: Floating point value of the spin button.

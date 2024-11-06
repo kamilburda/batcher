@@ -115,7 +115,7 @@ on their allowed PDB types.
 
 Be aware that this mapping is incomplete - for example, it does not contain 
 enumerated types (`GObject.GType` instances derived from `GObject.GEnum`) or 
-array types (e.g. `Gimp.FloatArray`). If you need to obtain a setting type 
+array types (e.g. `Gimp.DoubleArray`). If you need to obtain a setting type 
 for all supported `GObject.GType` instances, use
 `get_setting_type_from_gtype()`.
 """

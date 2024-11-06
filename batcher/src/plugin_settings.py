@@ -92,7 +92,7 @@ def create_settings_for_convert():
       'gui_type': None,
     },
     {
-      'type': 'float',
+      'type': 'integer',
       'name': 'paned_between_previews_position',
       'default_value': 220,
       'gui_type': None,
@@ -228,7 +228,7 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
     {
-      'type': 'float',
+      'type': 'integer',
       'name': 'paned_between_previews_position',
       'default_value': 225,
       'gui_type': None,
@@ -330,7 +330,7 @@ def create_settings_for_edit_layers():
       'gui_type': None,
     },
     {
-      'type': 'float',
+      'type': 'integer',
       'name': 'paned_between_previews_position',
       'default_value': 220,
       'gui_type': None,

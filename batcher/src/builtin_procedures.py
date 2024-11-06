@@ -568,7 +568,7 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Layer'),
       },
       {
-        'type': 'float',
+        'type': 'double',
         'default_value': 100.0,
         'name': 'new_width',
         'display_name': _('New width'),
@@ -587,7 +587,7 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Unit for width'),
       },
       {
-        'type': 'float',
+        'type': 'double',
         'default_value': 100.0,
         'name': 'new_height',
         'display_name': _('New height'),

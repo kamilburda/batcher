@@ -6,7 +6,6 @@ from typing import List, Tuple, Union
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import GObject
 
 import pygimplib as pg
 from pygimplib.pypdb import pdb
@@ -125,20 +124,7 @@ def _get_arg_default_value(pdb_procedure_name, proc_arg):
     if proc_arg.name in proc_args_with_custom_defaults:
       return proc_args_with_custom_defaults[proc_arg.name]
 
-  if proc_arg.value_type not in [GObject.TYPE_CHAR, GObject.TYPE_UCHAR]:
-    return proc_arg.default_value
-  else:
-    # For gchar and guchar types, the default value may be a string, while the
-    # value type is expected to be an int. We convert the value to int if
-    # possible to avoid errors (e.g. in `pygimplib.setting.NumericSetting`
-    # validation).
-    if isinstance(proc_arg.default_value, str):
-      try:
-        return ord(proc_arg.default_value)
-      except Exception:
-        return proc_arg.default_value
-    else:
-      return proc_arg.default_value
+  return proc_arg.default_value
 
 
 def _set_up_array_arguments(arguments_list):

@@ -294,7 +294,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
     Values for some `Setting` types, such as array types, must be converted to a
     type compatible with the GIMP PDB, e.g. a list of float values to
-    `Gimp.FloatArray` for an `ArraySetting` instance.
+    `Gimp.DoubleArray` for an `ArraySetting` instance.
     """
     return self._value
   
@@ -1014,14 +1014,7 @@ class NumericSetting(Setting):
   _PDB_TYPES_AND_MINIMUM_VALUES = {
     GObject.TYPE_INT: GLib.MININT,
     GObject.TYPE_UINT: 0,
-    GObject.TYPE_INT64: GLib.MININT64,
-    GObject.TYPE_UINT64: 0,
-    GObject.TYPE_LONG: GLib.MINLONG,
-    GObject.TYPE_ULONG: 0,
-    GObject.TYPE_CHAR: GLib.MININT8,
-    GObject.TYPE_UCHAR: 0,
     GObject.TYPE_DOUBLE: -GLib.MAXDOUBLE,
-    GObject.TYPE_FLOAT: -GLib.MAXFLOAT,
   }
   """Mapping of PDB types to minimum values allowed for each type.
   
@@ -1032,14 +1025,7 @@ class NumericSetting(Setting):
   _PDB_TYPES_AND_MAXIMUM_VALUES = {
     GObject.TYPE_INT: GLib.MAXINT,
     GObject.TYPE_UINT: GLib.MAXUINT,
-    GObject.TYPE_INT64: GLib.MAXINT64,
-    GObject.TYPE_UINT64: GLib.MAXUINT64,
-    GObject.TYPE_LONG: GLib.MAXLONG,
-    GObject.TYPE_ULONG: GLib.MAXULONG,
-    GObject.TYPE_CHAR: GLib.MAXINT8,
-    GObject.TYPE_UCHAR: GLib.MAXUINT8,
     GObject.TYPE_DOUBLE: GLib.MAXDOUBLE,
-    GObject.TYPE_FLOAT: GLib.MAXFLOAT,
   }
   """Mapping of PDB types to maximum values allowed for each type.
   
@@ -1154,47 +1140,33 @@ class IntSetting(NumericSetting):
   Allowed GIMP PDB types:
   * `GObject.TYPE_INT` (default)
   * `GObject.TYPE_UINT`
-  * `GObject.TYPE_INT64`
-  * `GObject.TYPE_UINT64`
-  * `GObject.TYPE_LONG`
-  * `GObject.TYPE_ULONG`
-  * `GObject.TYPE_CHAR`
-  * `GObject.TYPE_UCHAR`
   
   Default value: 0
   """
   
   _ALIASES = ['integer']
   
-  _ALLOWED_PDB_TYPES = [
-    GObject.TYPE_INT,
-    GObject.TYPE_UINT,
-    GObject.TYPE_INT64,
-    GObject.TYPE_UINT64,
-    GObject.TYPE_LONG,
-    GObject.TYPE_ULONG,
-    GObject.TYPE_CHAR,
-    GObject.TYPE_UCHAR,
-  ]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT, GObject.TYPE_UINT]
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0
 
 
-class FloatSetting(NumericSetting):
-  """Class for float settings.
+class DoubleSetting(NumericSetting):
+  """Class for double (double-precision floating-point numbers) settings.
   
   Allowed GIMP PDB types:
-  * `GObject.TYPE_DOUBLE` (default)
-  * `GObject.TYPE_FLOAT`
+  * `GObject.TYPE_DOUBLE`
   
   Default value: 0.0
   """
-  
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_DOUBLE, GObject.TYPE_FLOAT]
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.float_spin_button]
+  _ALIASES = ['float']
+  
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_DOUBLE]
+
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.double_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0.0
 
@@ -2358,12 +2330,12 @@ class ArraySetting(Setting):
   below.
 
   If the ``element_type`` specified during instantiation has a matching GObject
-  type (e.g. `Gimp.FloatArray` for float arrays), then the array setting can
+  type (e.g. `Gimp.DoubleArray` for float arrays), then the array setting can
   be registered to the GIMP PDB. To disable registration, pass ``pdb_type=None``
   in `Setting.__init__()` as one normally would. The PDB type of individual
   elements cannot be customized as it appears that the GIMP API provides a fixed
   element type for each array type (e.g. `GObject.TYPE_DOUBLE` for
-  `Gimp.FloatArray`).
+  `Gimp.DoubleArray`).
   
   Validation of setting values is performed for each element individually.
 
@@ -2398,7 +2370,7 @@ class ArraySetting(Setting):
 
   Allowed GIMP PDB types:
   * `Gimp.Int32Array`
-  * `Gimp.FloatArray`
+  * `Gimp.DoubleArray`
   * `Gimp.RGBArray`
   * `GObject.TYPE_STRV` (string array)
   * `Gimp.ObjectArray` - any type inheriting from `GObject.GObject`, including
@@ -2429,7 +2401,7 @@ class ArraySetting(Setting):
   _NATIVE_ARRAY_PDB_TYPES: Dict[Type[Setting], Tuple[GObject.GType, GObject.GType]]
   _NATIVE_ARRAY_PDB_TYPES = {
     IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
-    FloatSetting: (Gimp.FloatArray, GObject.TYPE_DOUBLE),
+    DoubleSetting: (Gimp.DoubleArray, GObject.TYPE_DOUBLE),
     RgbSetting: (Gimp.RGBArray, Gimp.RGB),
     StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
@@ -2479,7 +2451,7 @@ class ArraySetting(Setting):
         array elements.
         If ``element_pdb_type`` is specified, it will be ignored as each array
         type has one allowed PDB type for individual elements (e.g.
-        `GObject.TYPE_DOUBLE` for `Gimp.FloatArray`).
+        `GObject.TYPE_DOUBLE` for `Gimp.DoubleArray`).
     """
     self._element_type = meta_.process_setting_type(element_type)
     self._min_size = min_size if min_size is not None else 0
@@ -2526,7 +2498,7 @@ class ArraySetting(Setting):
     procedure argument.
 
     Certain array types as GIMP PDB procedure parameters (such as
-    `Gimp.FloatArray`) cannot accept a Python list/tuple and must be
+    `Gimp.DoubleArray`) cannot accept a Python list/tuple and must be
     converted to the appropriate GObject-compatible type. The `value`
     property ensures that the array is converted to a GObject-compatible type.
 
@@ -3000,14 +2972,14 @@ def array_as_pdb_compatible_type(
       values: Tuple[Any],
       element_setting_type: Optional[Type[Setting]] = None,
       element_pdb_type: Union[GObject.GType, Type[GObject.GObject], None] = None,
-) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.FloatArray, Gimp.RGBArray, Gimp.ObjectArray]:
+) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.DoubleArray, Gimp.RGBArray, Gimp.ObjectArray]:
   """Returns an array suitable to be passed to a GIMP PDB procedure."""
   if element_setting_type == IntSetting:
     array = GObject.Value(Gimp.Int32Array)
     Gimp.value_set_int32_array(array, values)
     return array.get_boxed()
-  elif element_setting_type == FloatSetting:
-    array = GObject.Value(Gimp.FloatArray)
+  elif element_setting_type == DoubleSetting:
+    array = GObject.Value(Gimp.DoubleArray)
     Gimp.value_set_float_array(array, values)
     return array.get_boxed()
   elif element_setting_type == RgbSetting:
@@ -3029,7 +3001,7 @@ ValueNotValidData = collections.namedtuple('ValueNotValidData', ['message', 'id'
 
 _ARRAY_GTYPES_TO_SETTING_TYPES = {
   Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
-  Gimp.FloatArray.__gtype__: (ArraySetting, dict(element_type=FloatSetting)),
+  Gimp.DoubleArray.__gtype__: (ArraySetting, dict(element_type=DoubleSetting)),
   Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=RgbSetting)),
   GObject.TYPE_STRV: (ArraySetting, dict(element_type=StringSetting)),
 }

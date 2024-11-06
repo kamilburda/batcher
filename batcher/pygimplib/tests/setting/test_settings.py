@@ -733,10 +733,10 @@ class TestIntSetting(SettingTestCase):
       })
 
 
-class TestFloatSetting(SettingTestCase):
+class TestDoubleSetting(SettingTestCase):
   
   def setUp(self):
-    self.setting = settings_.FloatSetting(
+    self.setting = settings_.DoubleSetting(
       'clip_percent', default_value=0.0, min_value=0.0, max_value=100.0)
   
   def test_value_below_min_is_not_valid(self):
@@ -769,14 +769,14 @@ class TestCreateEnumSetting(SettingTestCase):
 
   def test_with_custom_default_value(self):
     setting = settings_.EnumSetting(
-      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_GAMMA)
+      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_NON_LINEAR)
 
-    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_GAMMA)
+    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_NON_LINEAR)
 
   def test_with_custom_default_value_as_int(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision, default_value=750)
 
-    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_GAMMA)
+    self.assertEqual(setting.default_value, Gimp.Precision.DOUBLE_NON_LINEAR)
 
   def test_with_enum_type_as_string(self):
     setting = settings_.EnumSetting(
@@ -815,7 +815,7 @@ class TestCreateEnumSetting(SettingTestCase):
   def test_pdb_type_is_ignored(self):
     setting = settings_.EnumSetting(
       'precision', Gimp.Precision,
-      default_value=Gimp.Precision.DOUBLE_GAMMA, pdb_type=None)
+      default_value=Gimp.Precision.DOUBLE_NON_LINEAR, pdb_type=None)
 
     self.assertEqual(setting.enum_type, Gimp.Precision)
     self.assertEqual(setting.pdb_type, Gimp.Precision)
@@ -823,29 +823,29 @@ class TestCreateEnumSetting(SettingTestCase):
   def test_with_excluded_values(self):
     setting = settings_.EnumSetting(
       'precision', Gimp.Precision,
-      default_value=Gimp.Precision.DOUBLE_GAMMA,
-      excluded_values=[Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR],
+      default_value=Gimp.Precision.DOUBLE_NON_LINEAR,
+      excluded_values=[Gimp.Precision.FLOAT_NON_LINEAR, Gimp.Precision.FLOAT_LINEAR],
     )
 
     self.assertEqual(
-      setting.excluded_values, [Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR])
+      setting.excluded_values, [Gimp.Precision.FLOAT_NON_LINEAR, Gimp.Precision.FLOAT_LINEAR])
 
   def test_with_excluded_values_ints_are_converted_to_enum_values(self):
     setting = settings_.EnumSetting(
       'precision', Gimp.Precision,
-      default_value=Gimp.Precision.DOUBLE_GAMMA,
+      default_value=Gimp.Precision.DOUBLE_NON_LINEAR,
       excluded_values=[650, 600],
     )
 
     self.assertEqual(
-      setting.excluded_values, [Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR])
+      setting.excluded_values, [Gimp.Precision.FLOAT_NON_LINEAR, Gimp.Precision.FLOAT_LINEAR])
 
 
 class TestEnumSetting(SettingTestCase):
 
   def setUp(self):
     self.setting = settings_.EnumSetting(
-      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_GAMMA)
+      'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_NON_LINEAR)
 
   def test_get_pdb_param_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
@@ -868,7 +868,7 @@ class TestEnumSetting(SettingTestCase):
         dict(
           name='precision',
           type=Gimp.Precision,
-          default=Gimp.Precision.DOUBLE_GAMMA,
+          default=Gimp.Precision.DOUBLE_NON_LINEAR,
           nick='Precision',
           blurb='Precision',
         )])
@@ -887,8 +887,8 @@ class TestEnumSetting(SettingTestCase):
   def test_to_dict_with_excluded_values(self):
     setting = settings_.EnumSetting(
       'precision', Gimp.Precision,
-      default_value=Gimp.Precision.DOUBLE_GAMMA,
-      excluded_values=[Gimp.Precision.FLOAT_GAMMA, Gimp.Precision.FLOAT_LINEAR],
+      default_value=Gimp.Precision.DOUBLE_NON_LINEAR,
+      excluded_values=[Gimp.Precision.FLOAT_NON_LINEAR, Gimp.Precision.FLOAT_LINEAR],
     )
 
     self.assertDictEqual(
@@ -1796,24 +1796,24 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float')
+      element_type='double')
     
     self.assertEqual(setting.name, 'coordinates')
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
-    self.assertEqual(setting.pdb_type, Gimp.FloatArray)
-    self.assertEqual(setting.element_type, settings_.FloatSetting)
+    self.assertEqual(setting.pdb_type, Gimp.DoubleArray)
+    self.assertEqual(setting.element_type, settings_.DoubleSetting)
 
-    self.assertIsInstance(setting.value_for_pdb, Gimp.FloatArray)
+    self.assertIsInstance(setting.value_for_pdb, Gimp.DoubleArray)
   
   def test_create_with_default_default_value(self):
-    setting = settings_.ArraySetting('coordinates', element_type='float')
+    setting = settings_.ArraySetting('coordinates', element_type='double')
     
     self.assertEqual(setting.default_value, ())
     self.assertEqual(setting.value, ())
   
   def test_create_with_element_default_value(self):
-    setting = settings_.ArraySetting('coordinates', element_type='float')
+    setting = settings_.ArraySetting('coordinates', element_type='double')
     setting.add_element()
     
     self.assertEqual(setting[0].value, 0.0)
@@ -1822,7 +1822,7 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=[1.0, 5.0, 10.0],
-      element_type='float')
+      element_type='double')
     
     self.assertEqual(setting.default_value, (1.0, 5.0, 10.0))
     self.assertEqual(setting.value, (1.0, 5.0, 10.0))
@@ -1831,7 +1831,7 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_min_value=-100.0,
       element_max_value=100.0)
     
@@ -1847,7 +1847,7 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_min_value=-100.0,
       element_max_value=100.0,
       element_display_name='Coordinate')
@@ -1856,13 +1856,13 @@ class TestCreateArraySetting(SettingTestCase):
   
   @parameterized.parameterized.expand([
     ('native_array_type_as_element_pdb_type_is_registrable',
-     'float',
+     'double',
      (1.0, 5.0, 10.0),
      'automatic',
-     Gimp.FloatArray),
+     Gimp.DoubleArray),
 
     ('native_array_type_registration_is_disabled_explicitly',
-     'float',
+     'double',
      (1.0, 5.0, 10.0),
      None,
      None),
@@ -1914,7 +1914,7 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_pdb_type=GObject.TYPE_UINT64)
 
     self.assertEqual(setting.element_pdb_type, GObject.TYPE_DOUBLE)
@@ -1927,7 +1927,7 @@ class TestCreateArraySetting(SettingTestCase):
       default_value=values,
       element_type='array',
       element_default_value=(0.0, 0.0, 0.0),
-      element_element_type='float',
+      element_element_type='double',
       element_element_default_value=1.0)
     
     self.assertTupleEqual(setting.default_value, values)
@@ -1935,7 +1935,7 @@ class TestCreateArraySetting(SettingTestCase):
     self.assertEqual(setting.element_default_value, (0.0, 0.0, 0.0))
     
     for i in range(len(setting)):
-      self.assertEqual(setting[i].element_type, settings_.FloatSetting)
+      self.assertEqual(setting[i].element_type, settings_.DoubleSetting)
       self.assertEqual(setting[i].default_value, (0.0, 0.0, 0.0))
       self.assertEqual(setting[i].value, values[i])
       self.assertFalse(setting[i].can_be_registered_to_pdb())
@@ -1948,7 +1948,7 @@ class TestCreateArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'path_coordinates',
       element_type='array',
-      element_element_type='float')
+      element_element_type='double')
     
     setting.add_element()
     self.assertEqual(setting.value, ((),))
@@ -1961,10 +1961,10 @@ class TestCreateArraySetting(SettingTestCase):
      (1, 5, 10),
      Gimp.Int32Array),
 
-    ('float',
-     'float',
+    ('double',
+     'double',
      (1.0, 5.0, 10.0),
-     Gimp.FloatArray),
+     Gimp.DoubleArray),
 
     ('rgb',
      'rgb',
@@ -2007,7 +2007,7 @@ class TestArraySetting(SettingTestCase):
     self.setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_min_value=-100.0,
       element_max_value=100.0)
   
@@ -2023,7 +2023,7 @@ class TestArraySetting(SettingTestCase):
   def test_has_element_default_value_even_if_not_specified(self):
     setting = settings_.ArraySetting(
       'coordinates',
-      element_type='float')
+      element_type='double')
     
     self.assertTrue(hasattr(setting, 'element_default_value'))
     self.assertEqual(setting.element_default_value, 0.0)
@@ -2071,7 +2071,7 @@ class TestArraySetting(SettingTestCase):
         'value': [1.0, 5.0, 10.0],
         'type': 'array',
         'default_value': [1.0, 5.0, 10.0],
-        'element_type': 'float',
+        'element_type': 'double',
         'element_max_value': 100.0,
         'element_min_value': -100.0,
       })
@@ -2105,7 +2105,7 @@ class TestArraySetting(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type=settings_.FloatSetting,
+      element_type=settings_.DoubleSetting,
       element_default_value=0.0,
       element_min_value=-100.0,
       element_max_value=100.0)
@@ -2117,7 +2117,7 @@ class TestArraySetting(SettingTestCase):
         'value': [1.0, 5.0, 10.0],
         'type': 'array',
         'default_value': [1.0, 5.0, 10.0],
-        'element_type': 'float',
+        'element_type': 'double',
         'element_default_value': 0.0,
         'element_max_value': 100.0,
         'element_min_value': -100.0,
@@ -2342,7 +2342,7 @@ class TestArraySetting(SettingTestCase):
         ),
         dict(
           name='coordinates',
-          type=Gimp.FloatArray,
+          type=Gimp.DoubleArray,
           nick='Coordinates',
           blurb='Coordinates',
         ),
@@ -2397,7 +2397,7 @@ class TestArraySettingCreateWithSize(SettingTestCase):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_default_value=0.0,
       min_size=min_size,
       max_size=max_size)
@@ -2412,7 +2412,7 @@ class TestArraySettingSize(SettingTestCase):
     self.setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
-      element_type='float',
+      element_type='double',
       element_default_value=0.0,
       element_min_value=-100.0,
       element_max_value=100.0,
@@ -2537,8 +2537,8 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
 
   def test_builtin_array(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(Gimp.FloatArray.__gtype__, None),
-      (settings_.ArraySetting, dict(element_type=settings_.FloatSetting)),
+      settings_.get_setting_type_from_gtype(Gimp.DoubleArray.__gtype__, None),
+      (settings_.ArraySetting, dict(element_type=settings_.DoubleSetting)),
     )
 
   def test_object_array(self):
