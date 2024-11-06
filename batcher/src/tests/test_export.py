@@ -52,7 +52,6 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'element_type': pg.setting.IntSetting,
         'display_name': 'Offsets',
         'default_value': (7, 11),
-        'length_name': 'n-offsets',
       },
       {
         'name': 'is-interlaced',
@@ -82,12 +81,9 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(len(file_format_options['png']), 2)
     self.assertEqual(file_format_options['png']['is-interlaced'].value, False)
     self.assertEqual(file_format_options['png']['offsets'].value, (7, 11))
-    self.assertNotIn('n-offsets', file_format_options['png'])
-    self.assertEqual(file_format_options['png']['offsets'].get_length_name(), 'n-offsets')
 
     self.assertEqual(len(kwargs), 3)
     self.assertFalse(kwargs['is_interlaced'])
-    self.assertEqual(kwargs['n_offsets'], 2)
     self.assertIsInstance(kwargs['offsets'], Gimp.Int32Array)
 
   def test_get_default_export_function_if_file_format_mode_is_not_use_explicit_values(

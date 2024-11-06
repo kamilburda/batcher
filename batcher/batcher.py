@@ -346,7 +346,7 @@ def _set_settings_from_args(settings, config):
   # before the plug-in-specific PDB parameters.
   args = args[max(len(args) - len(args_as_settings), 0):]
 
-  for setting, arg in zip(args_as_settings, pg.setting.iter_args(args, args_as_settings)):
+  for setting, arg in zip(args_as_settings, args):
     setting.set_value(arg)
 
 

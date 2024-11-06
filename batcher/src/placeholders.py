@@ -6,9 +6,6 @@ The placeholder objects are defined in the `PLACEHOLDERS` dictionary.
 
 from typing import Callable, List, Optional, Union, Type
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 from gi.repository import GObject
 
 import pygimplib as pg

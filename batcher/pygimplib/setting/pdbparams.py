@@ -3,7 +3,7 @@ procedure arguments to assign them as values to settings.
 """
 
 from collections.abc import Iterable
-from typing import Any, Dict, Generator, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -14,7 +14,6 @@ from . import settings as settings_
 
 __all__ = [
   'create_params',
-  'iter_args',
   'list_param_values',
 ]
 
@@ -42,37 +41,6 @@ def create_params(
       params.extend(setting.get_pdb_param())
 
   return params
-
-
-def iter_args(
-      args: Union[List, Tuple], settings: Union[List, Tuple]
-) -> Generator[Any, None, None]:
-  """Iterates over arguments passed to a GIMP PDB procedure, skipping redundant
-  arguments.
-
-  ``settings`` is a list of `setting.Setting` instances that may modify the
-  iteration. For example, if an argument is matched by a setting of type
-  `setting.ArraySetting`, the array argument causes the preceding argument to
-  be skipped. The preceding argument is the array length and does not need to
-  exist as a separate setting because the length can be obtained from the
-  array itself in Python.
-
-  If there are more settings than non-skipped arguments, the remaining settings
-  will be ignored.
-  """
-  indexes_of_array_length_settings = set()
-  index = 0
-  
-  for setting in settings:
-    if isinstance(setting, settings_.ArraySetting):
-      index += 1
-      indexes_of_array_length_settings.add(index - 1)
-    
-    index += 1
-  
-  for arg_index in range(min(len(args), index)):
-    if arg_index not in indexes_of_array_length_settings:
-      yield args[arg_index]
 
 
 def list_param_values(

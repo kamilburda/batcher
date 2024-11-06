@@ -2281,60 +2281,16 @@ class TestArraySetting(SettingTestCase):
     self.setting.add_element(index, value)
     self.assertEqual(event_args[0][0], expected_index)
     self.assertEqual(event_args[0][1], expected_value)
-  
-  @parameterized.parameterized.expand([
-    ('default_length_name_and_description',
-     None,
-     None,
-     'num-coordinates',
-     ''),
-    
-    ('custom_length_name_and_description',
-     'num-axes-coordinates',
-     'The number of axes for coordinates',
-     'num-axes-coordinates',
-     'The number of axes for coordinates'),
-  ])
-  def test_get_pdb_param_for_registrable_setting(
-        self,
-        test_case_suffix,
-        length_name,
-        length_description,
-        expected_length_name,
-        expected_length_description):
+
+  def test_get_pdb_param_for_registrable_setting(self):
     self.assertEqual(
-      self.setting.get_pdb_param(length_name, length_description),
+      self.setting.get_pdb_param(),
       [
-        dict(
-          name=expected_length_name,
-          type=GObject.TYPE_INT,
-          default=0,
-          minimum=0,
-          nick=expected_length_description,
-          blurb=expected_length_description,
-        ),
         dict(
           name='coordinates',
           type=Gimp.DoubleArray,
           nick='Coordinates',
           blurb='Coordinates',
-        ),
-      ])
-
-  def test_get_pdb_param_for_string_array(self):
-    setting = settings_.ArraySetting(
-      'input_filepaths',
-      default_value=(),
-      element_type='string')
-
-    self.assertEqual(
-      setting.get_pdb_param(),
-      [
-        dict(
-          name='input-filepaths',
-          type=GObject.TYPE_STRV,
-          nick='Input filepaths',
-          blurb='Input filepaths',
         ),
       ])
   

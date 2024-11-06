@@ -714,6 +714,9 @@ def _update_to_0_6(data, _settings, source_names):
             if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'GimpRGB':
               argument_dict['pdb_type'] = 'GeglColor'
 
+          if argument_dict['type'] == 'array':
+            argument_dict.pop('length_name', None)
+
           if argument_dict['type'] == 'array' and argument_dict['element_type'] == 'float':
             argument_dict['element_type'] = 'double'
             if ('element_gui_type' in argument_dict

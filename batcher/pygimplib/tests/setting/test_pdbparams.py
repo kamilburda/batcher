@@ -56,20 +56,9 @@ class TestCreateParams(unittest.TestCase):
         nick='File extension',
         blurb='File extension',
       ))
-
-    self.assertDictEqual(
-      params[1],
-      dict(
-        name='num-coordinates',
-        type=GObject.TYPE_INT,
-        default=0,
-        minimum=0,
-        nick='',
-        blurb='',
-      ))
     
     self.assertEqual(
-      params[2],
+      params[1],
       dict(
         name='coordinates',
         type=Gimp.DoubleArray,
@@ -93,19 +82,8 @@ class TestCreateParams(unittest.TestCase):
         blurb='File extension',
       ))
 
-    self.assertDictEqual(
-      params[1],
-      dict(
-        name='num-coordinates',
-        type=GObject.TYPE_INT,
-        default=0,
-        minimum=0,
-        nick='',
-        blurb='',
-      ))
-
     self.assertEqual(
-      params[2],
+      params[1],
       dict(
         name='coordinates',
         type=Gimp.DoubleArray,
@@ -132,42 +110,6 @@ class TestCreateParams(unittest.TestCase):
   def test_create_params_with_unregistrable_setting(self):
     params = pdbparams_.create_params(self.unregistrable_setting)
     self.assertEqual(params, [])
-
-
-class TestIterArgs(unittest.TestCase):
-  
-  def setUp(self):
-    self.settings = stubs_group.create_test_settings_hierarchical()
-    self.args = ['png', False, 'replace']
-  
-  def test_iter_args_number_of_args_equals_number_of_settings(self):
-    self.assertListEqual(
-      list(pdbparams_.iter_args(self.args, list(self.settings.walk()))),
-      self.args)
-  
-  def test_iter_args_number_of_args_is_less_than_number_of_settings(self):
-    self.assertListEqual(
-      list(pdbparams_.iter_args(self.args[:-1], list(self.settings.walk()))),
-      self.args[:-1])
-  
-  def test_iter_args_number_of_args_is_more_than_number_of_settings(self):
-    self.assertListEqual(
-      list(pdbparams_.iter_args(self.args, list(self.settings.walk())[:-1])),
-      self.args[:-1])
-  
-  def test_iter_args_with_array_setting(self):
-    coordinates_setting = settings_.ArraySetting(
-      'coordinates',
-      default_value=(1.0, 5.0, 10.0),
-      element_type='double',
-      element_default_value=0.0)
-    
-    self.settings.add([coordinates_setting])
-    self.args.extend([3, (20.0, 50.0, 40.0)])
-    
-    self.assertListEqual(
-      list(pdbparams_.iter_args(self.args, list(self.settings.walk()))),
-      self.args[:-2] + [self.args[-1]])
 
 
 class TestListParamValues(unittest.TestCase):

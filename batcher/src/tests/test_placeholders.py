@@ -32,8 +32,7 @@ class TestGetReplacedArg(unittest.TestCase):
     batcher = _BatcherStub(current_image='image')
     setting = placeholders_.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
 
-    self.assertTupleEqual(
-      placeholders_.get_replaced_value(setting, batcher), (None,))
+    self.assertTupleEqual(placeholders_.get_replaced_value(setting, batcher), (None,))
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')
@@ -104,8 +103,7 @@ class TestPlaceholderSetting(unittest.TestCase):
 class TestPlaceholderArraySetting(unittest.TestCase):
 
   def test_to_dict(self):
-    setting = placeholders_.PlaceholderDrawableArraySetting(
-      'drawables', element_type='layer')
+    setting = placeholders_.PlaceholderDrawableArraySetting('drawables', element_type='layer')
 
     self.assertDictEqual(
       setting.to_dict(),

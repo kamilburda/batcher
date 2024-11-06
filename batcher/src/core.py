@@ -694,22 +694,14 @@ class Batcher(metaclass=abc.ABCMeta):
       if isinstance(argument, placeholders.PlaceholderArraySetting):
         replaced_arg = placeholders.get_replaced_value(argument, self)
         if is_function_pdb_procedure:
-          replaced_args.extend([
-            len(replaced_arg),
-            pg.setting.array_as_pdb_compatible_type(replaced_arg),
-          ])
+          replaced_args.append(pg.setting.array_as_pdb_compatible_type(replaced_arg))
         else:
           replaced_args.append(replaced_arg)
       elif isinstance(argument, placeholders.PlaceholderSetting):
         replaced_args.append(placeholders.get_replaced_value(argument, self))
       elif isinstance(argument, pg.setting.Setting):
         if is_function_pdb_procedure:
-          if (isinstance(argument, pg.setting.ArraySetting)
-              and argument.element_type != pg.setting.StringSetting):
-            replaced_args.append(len(argument.value))
-            replaced_args.append(argument.value_for_pdb)
-          else:
-            replaced_args.append(argument.value_for_pdb)
+          replaced_args.append(argument.value_for_pdb)
         else:
           replaced_args.append(argument.value)
       else:

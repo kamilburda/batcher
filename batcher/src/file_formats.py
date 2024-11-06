@@ -59,11 +59,6 @@ def fill_and_get_file_format_options_as_kwargs(
           and setting.name in _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT.values()):
         continue
 
-      if isinstance(setting, pg.setting.ArraySetting):
-        length_name = setting.get_length_name(use_default=False)
-        if length_name is not None:
-          kwargs[length_name.replace('-', '_')] = len(setting.value)
-
       kwargs[setting.name.replace('-', '_')] = setting.value_for_pdb
 
     return kwargs

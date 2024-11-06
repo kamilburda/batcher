@@ -30,7 +30,6 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       name=self.procedure_name,
       arguments_spec=[
         dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
-        dict(value_type=GObject.TYPE_INT, name='n-drawables', blurb='Number of drawables'),
         dict(
           value_type=GObject.GType.from_name('GimpCoreObjectArray'),
           name='drawables',
@@ -43,7 +42,6 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
   def test_with_non_unique_param_names(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type=GObject.TYPE_INT, name='n-drawables', blurb='Number of more drawables'),
       dict(
         value_type=GObject.GType.from_name('GimpCoreObjectArray'),
         name='drawables',

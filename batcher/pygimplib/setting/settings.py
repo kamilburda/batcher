@@ -639,11 +639,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     `GObject.Property` instance used for registering PDB parameters for a
     GIMP plug-in.
 
-    Most `Setting` subclasses return a list of only one dictionary, meaning the
-    setting is represented by one PDB parameter. Most notably, `ArraySetting`
-    returns two parameters, the first being the array length and the other being
-    the array contents.
-    
     If the setting does not support any PDB type, ``None`` is returned.
     """
     if self.can_be_registered_to_pdb():
@@ -2366,7 +2361,6 @@ class ArraySetting(Setting):
         element_type: Union[str, Type[Setting]],
         min_size: Optional[int] = 0,
         max_size: Optional[int] = None,
-        length_name: Optional[str] = None,
         **kwargs,
   ):
     """Initializes an `ArraySetting` instance.
@@ -2392,9 +2386,6 @@ class ArraySetting(Setting):
       max_size:
         Maximum array size. If ``None``, there is no upper limit on the array
         size.
-      length_name:
-        Name of an array length argument, useful when calling a PDB procedure
-        requiring an array length argument with a specific name.
       **kwargs:
         Additional keyword arguments for `Setting.__init__()`, plus all
         parameters that would be passed to the `Setting` class defined by
@@ -2410,7 +2401,6 @@ class ArraySetting(Setting):
     self._element_type = meta_.process_setting_type(element_type)
     self._min_size = min_size if min_size is not None else 0
     self._max_size = max_size
-    self._length_name = length_name
     
     self._element_kwargs = {
       key[len('element_'):]: value for key, value in kwargs.items()
@@ -2482,18 +2472,6 @@ class ArraySetting(Setting):
     If ``None``, the array size is unlimited.
     """
     return self._max_size
-
-  def get_length_name(self, use_default: bool = False) -> Union[str, None]:
-    """Returns the name of an array length argument, useful when calling a PDB
-    procedure requiring an array length argument with a specific name.
-
-    If ``use_default`` is ``True``, a default name is provided if the length
-    would be ``None``, specifically ``'num-<pdb_name property>'``.
-    """
-    if use_default and self._length_name is None:
-      return f'num-{self.pdb_name}'
-    else:
-      return self._length_name
 
   def to_dict(self) -> Dict:
     settings_dict = super().to_dict()
@@ -2591,47 +2569,16 @@ class ArraySetting(Setting):
     """Returns a list of array elements as `Setting` instances."""
     return list(self._elements)
   
-  def get_pdb_param(
-        self, length_name: Optional[str] = None, length_description: Optional[str] = None,
-  ) -> Union[List[Dict[str, Any]], None]:
-    """Returns a list of two dictionaries representing GIMP PDB parameters, the
-    first being the array length and the second the array itself.
-
-    If `element_type` does not support any PDB type, ``None`` is returned.
-
-    To customize the name and description of the length parameter,
-    pass ``length_name`` and ``length_description``, respectively. Passing
-    ``None`` creates the name and/or the description automatically.
-
-    For more information, see `Setting.get_pdb_param()`.
-    """
+  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
     if self.can_be_registered_to_pdb():
-      array_param_dict = dict(
-        name=self.pdb_name,
-        type=self.pdb_type,
-        nick=self.display_name,
-        blurb=self.description,
-      )
-
-      if self.element_type != StringSetting:
-        if length_name is None:
-          length_name = self.get_length_name(use_default=True)
-
-        if length_description is None:
-          length_description = ''
-
-        length_param_dict = dict(
-          name=length_name,
-          type=GObject.TYPE_INT,
-          default=0,
-          minimum=0,
-          nick=length_description,
-          blurb=length_description,
+      return [
+        dict(
+            name=self.pdb_name,
+            type=self.pdb_type,
+            nick=self.display_name,
+            blurb=self.description,
         )
-
-        return [length_param_dict, array_param_dict]
-      else:
-        return [array_param_dict]
+      ]
     else:
       return None
   

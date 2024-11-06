@@ -89,8 +89,6 @@ def get_setting_data_from_pdb_procedure(
 
     arguments.append(argument_dict)
 
-  _set_up_array_arguments(arguments)
-
   return pdb_procedure, pdb_procedure_name, arguments
 
 
@@ -125,41 +123,6 @@ def _get_arg_default_value(pdb_procedure_name, proc_arg):
       return proc_args_with_custom_defaults[proc_arg.name]
 
   return proc_arg.default_value
-
-
-def _set_up_array_arguments(arguments_list):
-  array_length_argument_indexes = []
-
-  for i, argument_dict in enumerate(arguments_list):
-    setting_type = pg.setting.process_setting_type(argument_dict['type'])
-
-    if issubclass(setting_type, (pg.setting.ArraySetting, placeholders.PlaceholderArraySetting)):
-      array_element_type = pg.setting.process_setting_type(argument_dict['element_type'])
-
-      if i > 0 and array_element_type != pg.setting.StringSetting:
-        _set_array_setting_attributes_based_on_length_attribute(
-          setting_type, argument_dict, arguments_list[i - 1], array_element_type)
-
-        array_length_argument_indexes.append(i - 1)
-
-  _remove_array_length_parameters(arguments_list, array_length_argument_indexes)
-
-
-def _set_array_setting_attributes_based_on_length_attribute(
-      setting_type, array_dict, array_length_dict, element_type):
-  if issubclass(setting_type, pg.setting.ArraySetting):
-    min_array_size = array_length_dict.get('min_value', 0)
-
-    array_dict['min_size'] = min_array_size
-    array_dict['max_size'] = array_length_dict.get('max_value')
-    array_dict['default_value'] = tuple([element_type.get_default_default_value()] * min_array_size)
-
-    array_dict['length_name'] = array_length_dict['name']
-
-
-def _remove_array_length_parameters(arguments_list, array_length_argument_indexes):
-  for index in reversed(array_length_argument_indexes):
-    del arguments_list[index]
 
 
 _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES = {
