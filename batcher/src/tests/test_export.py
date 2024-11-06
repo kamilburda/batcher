@@ -34,14 +34,14 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'display_name': 'image',
       },
       {
-        'name': 'drawables',
-        'type': pg.setting.ArraySetting,
-        'element_type': pg.setting.DrawableSetting,
-        'display_name': 'drawables',
-      },
-      {
         'name': 'file',
         'type': pg.setting.FileSetting,
+      },
+      {
+        'name': 'options',
+        'type': pg.setting.ExportOptionsSetting,
+        'default_value': None,
+        'display_name': 'options',
       },
     ]
 
@@ -67,6 +67,18 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     ]
 
   def test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
+    self._test_get_export_function(mock_get_setting_data_from_pdb_procedure, mock_gimp)
+
+  def test_get_export_function_with_fewer_common_options(
+        self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
+    self.file_format_options = [
+      *self.common_options[:-1],
+      *self.png_options,
+    ]
+
+    self._test_get_export_function(mock_get_setting_data_from_pdb_procedure, mock_gimp)
+
+  def _test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
     mock_get_setting_data_from_pdb_procedure.return_value = (
       None, 'file-png-export', self.file_format_options)
     mock_gimp.get_pdb().add_procedure(stubs_gimp.PdbProcedureStub('file-png-export'))
@@ -82,7 +94,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(file_format_options['png']['is-interlaced'].value, False)
     self.assertEqual(file_format_options['png']['offsets'].value, (7, 11))
 
-    self.assertEqual(len(kwargs), 3)
+    self.assertEqual(len(kwargs), 2)
     self.assertFalse(kwargs['is_interlaced'])
     self.assertIsInstance(kwargs['offsets'], Gimp.Int32Array)
 

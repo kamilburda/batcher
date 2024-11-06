@@ -205,13 +205,11 @@ def take_and_process_screenshot(
   else:
     crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
-  selected_layers = screenshot_image.get_selected_layers()
-
   pdb.gimp_file_save(
     screenshot_image,
-    len(selected_layers),
-    selected_layers,
-    Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)))
+    Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)),
+    None,
+  )
   
   screenshot_image.delete()
 

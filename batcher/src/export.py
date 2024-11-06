@@ -488,7 +488,6 @@ def _export_item_once(
     _export_image(
       run_mode,
       image,
-      raw_item,
       output_filepath,
       file_extension,
       file_format_mode,
@@ -516,17 +515,11 @@ def _export_item_once(
 def _export_image(
       run_mode: Gimp.RunMode,
       image: Gimp.Image,
-      layer_or_layers: Union[Gimp.Layer, List[Gimp.Layer]],
       filepath: Union[str, Gio.File],
       file_extension: str,
       file_format_mode: int,
       file_format_export_options: Dict,
 ):
-  if not isinstance(layer_or_layers, Iterable):
-    layers = [layer_or_layers]
-  else:
-    layers = layer_or_layers
-
   if not isinstance(filepath, Gio.File):
     image_file = Gio.file_new_for_path(filepath)
   else:
@@ -535,7 +528,9 @@ def _export_image(
   export_func, kwargs = get_export_function(
     file_extension, file_format_mode, file_format_export_options)
 
-  export_func(image, len(layers), layers, image_file, run_mode=run_mode, **kwargs)
+  # FIXME: Refactor this so that export functions missing some common arguments
+  #  (such as 'gimp-xcf-save') are handled within `get_export_function`.
+  export_func(image, image_file, None, run_mode=run_mode, **kwargs)
 
   return pdb.last_status
 

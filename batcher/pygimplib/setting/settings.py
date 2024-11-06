@@ -2046,6 +2046,23 @@ class FileSetting(Setting):
       return 'invalid file', 'invalid_value'
 
 
+class ExportOptionsSetting(Setting):
+  """Class for settings holding file export options.
+
+  Allowed GIMP PDB types:
+  * `Gimp.ExportOptions`
+
+  Message IDs for invalid values:
+  * ``'invalid_value'``: The `Gimp.ExportOptions` instance is not valid.
+  """
+
+  _DEFAULT_DEFAULT_VALUE = None
+
+  _ALLOWED_PDB_TYPES = [Gimp.ExportOptions]
+
+  _ALLOWED_GUI_TYPES = []
+
+
 class BytesSetting(Setting):
   """Class for settings storing byte sequences as `GLib.Bytes` (``GBytes``)
   instances.

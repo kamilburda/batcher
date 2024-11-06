@@ -76,7 +76,7 @@ def _remove_common_file_format_options(file_format_options_list, import_or_expor
 
   return [
     option_dict for index, option_dict in enumerate(file_format_options_list)
-    if index not in options_to_filter
+    if not (index in options_to_filter and options_to_filter[index] in option_dict)
   ]
 
 
@@ -300,7 +300,7 @@ FILE_FORMATS = _create_file_formats([
   {'file_extensions': ['xbm', 'bitmap'],
    'export_procedure_name': 'file-xbm-export'},
   {'file_extensions': ['xcf'],
-   'export_procedure_name': 'gimp-xcf-export'},
+   'export_procedure_name': 'gimp-xcf-save'},
   {'file_extensions': ['xmc'],
    'export_procedure_name': 'file-xmc-export'},
   {'file_extensions': ['xpm'],
@@ -333,6 +333,6 @@ _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD = {
 _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT = {
   0: 'run-mode',
   1: 'image',
-  2: 'drawables',
-  3: 'file',
+  2: 'file',
+  3: 'options',
 }
