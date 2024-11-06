@@ -1911,49 +1911,6 @@ class ColorSetting(Setting):
       return 'invalid color', 'invalid_value'
 
 
-class RgbSetting(Setting):
-  """Class for settings holding `Gimp.RGB` instances.
-
-  Allowed GIMP PDB types:
-  * `Gimp.RGB`
-
-  Default value: `Gimp.RGB` instance with color `(0, 0, 0)` and alpha set to 0.
-
-  Message IDs for invalid values:
-  * ``'invalid_value'``: The color assigned is not valid.
-  """
-
-  _ALIASES = ['RGB']
-
-  _ALLOWED_PDB_TYPES = [Gimp.RGB]
-
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.rgb_button]
-
-  # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.RGB()
-
-  def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, list):
-      color = Gimp.RGB()
-
-      if len(raw_value) >= 3:
-        color.set(*raw_value[:3])
-
-      if len(raw_value) >= 4:
-        color.set_alpha(raw_value[3])
-
-      return color
-    else:
-      return raw_value
-
-  def _value_to_raw(self, value):
-    return [value.r, value.g, value.b, value.a]
-
-  def _validate(self, color):
-    if not isinstance(color, Gimp.RGB):
-      return 'invalid color', 'invalid_value'
-
-
 class DisplaySetting(Setting):
   """Class for settings holding `Gimp.Display` instances.
   
@@ -2371,7 +2328,6 @@ class ArraySetting(Setting):
   Allowed GIMP PDB types:
   * `Gimp.Int32Array`
   * `Gimp.DoubleArray`
-  * `Gimp.RGBArray`
   * `GObject.TYPE_STRV` (string array)
   * `Gimp.ObjectArray` - any type inheriting from `GObject.GObject`, including
     GIMP objects (e.g. images, layers, channels, paths, brushes, patterns) or
@@ -2402,7 +2358,6 @@ class ArraySetting(Setting):
   _NATIVE_ARRAY_PDB_TYPES = {
     IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
     DoubleSetting: (Gimp.DoubleArray, GObject.TYPE_DOUBLE),
-    RgbSetting: (Gimp.RGBArray, Gimp.RGB),
     StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
   }
 
@@ -2972,7 +2927,7 @@ def array_as_pdb_compatible_type(
       values: Tuple[Any],
       element_setting_type: Optional[Type[Setting]] = None,
       element_pdb_type: Union[GObject.GType, Type[GObject.GObject], None] = None,
-) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.DoubleArray, Gimp.RGBArray, Gimp.ObjectArray]:
+) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.DoubleArray, Gimp.ObjectArray]:
   """Returns an array suitable to be passed to a GIMP PDB procedure."""
   if element_setting_type == IntSetting:
     array = GObject.Value(Gimp.Int32Array)
@@ -2981,10 +2936,6 @@ def array_as_pdb_compatible_type(
   elif element_setting_type == DoubleSetting:
     array = GObject.Value(Gimp.DoubleArray)
     Gimp.value_set_float_array(array, values)
-    return array.get_boxed()
-  elif element_setting_type == RgbSetting:
-    array = GObject.Value(Gimp.RGBArray)
-    Gimp.value_set_rgb_array(array, values)
     return array.get_boxed()
   elif element_setting_type == StringSetting:
     return values
@@ -3002,7 +2953,6 @@ ValueNotValidData = collections.namedtuple('ValueNotValidData', ['message', 'id'
 _ARRAY_GTYPES_TO_SETTING_TYPES = {
   Gimp.Int32Array.__gtype__: (ArraySetting, dict(element_type=IntSetting)),
   Gimp.DoubleArray.__gtype__: (ArraySetting, dict(element_type=DoubleSetting)),
-  Gimp.RGBArray.__gtype__: (ArraySetting, dict(element_type=RgbSetting)),
   GObject.TYPE_STRV: (ArraySetting, dict(element_type=StringSetting)),
 }
 

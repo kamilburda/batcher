@@ -1421,69 +1421,47 @@ class TestLayerMaskSetting(SettingTestCase):
       })
 
 
-class TestRgbSetting(SettingTestCase):
+class TestColorSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
-    self._assert_rgb_equal(settings_.RgbSetting('color').default_value, Gimp.RGB())
+    self._assert_color_equal(settings_.ColorSetting('color').default_value, Gegl.Color.new('black'))
   
   def test_set_value_with_object(self):
-    color = Gimp.RGB()
-    color.set(0.5, 0.5, 0.5)
+    color = Gegl.Color()
+    color.set_rgba(0.5, 0.5, 0.5, 0.4)
     
-    setting = settings_.RgbSetting('color')
+    setting = settings_.ColorSetting('color')
     setting.set_value(color)
     
-    self._assert_rgb_equal(setting.value, color)
+    self._assert_color_equal(setting.value, color)
   
   def test_set_value_with_list(self):
-    setting = settings_.RgbSetting('color')
-    setting.set_value([0.5, 0.2, 0.8])
-
-    expected_color = Gimp.RGB()
-    expected_color.set(0.5, 0.2, 0.8)
-
-    self._assert_rgb_equal(setting.value, expected_color)
-  
-  def test_set_value_with_list_with_four_values(self):
-    setting = settings_.RgbSetting('color')
+    setting = settings_.ColorSetting('color')
     setting.set_value([0.5, 0.2, 0.8, 0.4])
 
-    expected_color = Gimp.RGB()
-    expected_color.set(0.5, 0.2, 0.8)
-    expected_color.set_alpha(0.4)
-    
-    self._assert_rgb_equal(setting.value, expected_color)
+    expected_color = Gegl.Color()
+    expected_color.set_rgba(0.5, 0.2, 0.8, 0.4)
+
+    self._assert_color_equal(setting.value, expected_color)
   
   def test_to_dict(self):
-    setting = settings_.RgbSetting('color')
+    setting = settings_.ColorSetting('color')
 
-    color = Gimp.RGB()
-    color.set(0.5, 0.2, 0.8)
+    color = Gegl.Color()
+    color.set_rgba(0.5, 0.2, 0.8, 0.4)
 
     setting.set_value(color)
 
     self.assertDictEqual(
-      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.0], 'type': 'rgb'})
-  
-  def test_to_dict_with_four_values(self):
-    setting = settings_.RgbSetting('color')
-
-    color = Gimp.RGB()
-    color.set(0.5, 0.2, 0.8)
-    color.set_alpha(0.4)
-
-    setting.set_value(color)
-    
-    self.assertDictEqual(
-      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.4], 'type': 'rgb'})
+      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.4], 'type': 'color'})
 
   @staticmethod
-  def _assert_rgb_equal(color1, color2):
+  def _assert_color_equal(color1, color2):
     return (
-      color1.r == color2.r
-      and color1.g == color2.g
-      and color1.b == color2.b
-      and color1.a == color2.a
+      color1.red == color2.red
+      and color1.green == color2.green
+      and color1.blue == color2.blue
+      and color1.alpha == color2.alpha
     )
 
 
@@ -1965,11 +1943,6 @@ class TestCreateArraySetting(SettingTestCase):
      'double',
      (1.0, 5.0, 10.0),
      Gimp.DoubleArray),
-
-    ('rgb',
-     'rgb',
-     (Gimp.RGB(), Gimp.RGB(), Gimp.RGB()),
-     Gimp.RGBArray),
 
     ('image',
      'image',

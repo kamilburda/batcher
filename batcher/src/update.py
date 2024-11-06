@@ -707,6 +707,13 @@ def _update_to_0_6(data, _settings, source_names):
             if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'gfloat':
               argument_dict['pdb_type'] = 'gdouble'
 
+          if argument_dict['type'] == 'rgb':
+            argument_dict['type'] = 'color'
+            if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'rgb_button':
+              argument_dict['gui_type'] = 'color_button'
+            if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'GimpRGB':
+              argument_dict['pdb_type'] = 'GeglColor'
+
           if argument_dict['type'] == 'array' and argument_dict['element_type'] == 'float':
             argument_dict['element_type'] = 'double'
             if ('element_gui_type' in argument_dict

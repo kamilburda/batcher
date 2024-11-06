@@ -569,37 +569,6 @@ class ColorButtonPresenter(GtkPresenter):
     self._widget.set_color(value)
 
 
-class RgbButtonPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `GimpUi.ColorButton` widgets.
-
-  Value: `Gimp.RGB` instance representing color in RGBA.
-  """
-
-  _VALUE_CHANGED_SIGNAL = 'color-changed'
-
-  def _create_widget(self, setting, width=100, height=20):
-    color = Gegl.Color()
-    color.set_rgba(setting.value.r, setting.value.g, setting.value.b, setting.value.a)
-
-    return GimpUi.ColorButton.new(
-      setting.display_name, width, height, color, GimpUi.ColorAreaType.SMALL_CHECKS)
-
-  def get_value(self):
-    color = self._widget.get_color().get_rgba()
-
-    rgb = Gimp.RGB()
-    rgb.set(color.red, color.green, color.blue)
-    rgb.set_alpha(color.alpha)
-
-    return rgb
-
-  def _set_value(self, value):
-    color = Gegl.Color()
-    color.set_rgba(value.r, value.g, value.b, value.a)
-
-    self._widget.set_color(color)
-
-
 class ParasiteBoxPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `gui.ParasiteBox` widgets.
   
