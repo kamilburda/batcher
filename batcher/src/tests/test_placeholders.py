@@ -63,20 +63,22 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
     self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(object))
 
   def test_with_layer_array(self):
-    param = stubs_gimp.GParamStub(Gimp.ObjectArray, 'layers')
+    param = stubs_gimp.GParamStub(GObject.GType.from_name('GimpCoreObjectArray'), 'layers')
 
     # noinspection PyTypeChecker
     self.assertEqual(
-      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param),
+      placeholders_.get_placeholder_type_name_from_pdb_type(
+        GObject.GType.from_name('GimpCoreObjectArray'), param),
       'placeholder_layer_array',
     )
 
   def test_image_array_is_unsupported(self):
-    param = stubs_gimp.GParamStub(Gimp.ObjectArray, 'images')
+    param = stubs_gimp.GParamStub(GObject.GType.from_name('GimpCoreObjectArray'), 'images')
 
     # noinspection PyTypeChecker
     self.assertIsNone(
-      placeholders_.get_placeholder_type_name_from_pdb_type(Gimp.ObjectArray, param))
+      placeholders_.get_placeholder_type_name_from_pdb_type(
+        GObject.GType.from_name('GimpCoreObjectArray'), param))
 
 
 class TestPlaceholderSetting(unittest.TestCase):

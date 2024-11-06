@@ -483,9 +483,9 @@ class Pattern(Resource):
   pass
 
 
-class ObjectArray:
+class CoreObjectArray:
 
-  __gtype__ = Gimp.ObjectArray.__gtype__
+  __gtype__ = GObject.GType.from_name('GimpCoreObjectArray')
 
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
@@ -509,7 +509,7 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Palette = Palette
   Pattern = Pattern
 
-  ObjectArray = ObjectArray
+  CoreObjectArray = CoreObjectArray
 
   RunMode = Gimp.RunMode
   PDBStatusType = Gimp.PDBStatusType

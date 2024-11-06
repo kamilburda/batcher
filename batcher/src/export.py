@@ -532,13 +532,10 @@ def _export_image(
   else:
     image_file = filepath
 
-  layer_array = GObject.Value(Gimp.ObjectArray)
-  Gimp.value_set_object_array(layer_array, Gimp.Layer, layers)
-
   export_func, kwargs = get_export_function(
     file_extension, file_format_mode, file_format_export_options)
 
-  export_func(image, len(layers), layer_array.get_boxed(), image_file, run_mode=run_mode, **kwargs)
+  export_func(image, len(layers), layers, image_file, run_mode=run_mode, **kwargs)
 
   return pdb.last_status
 

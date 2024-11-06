@@ -252,22 +252,24 @@ def get_placeholder_type_name_from_pdb_type(
     pdb_param_info:
       Object representing GIMP PDB parameter information, obtainable via
       `Gimp.Procedure.get_arguments()`. This is used to infer the element type
-      for a `Gimp.ObjectArray` argument.
+      for an object array argument (images, layers, etc.).
 
   Returns:
     String as a human-readable name of a `pygimplib.setting.Setting` subclass
     representing a placeholder if ``pdb_type`` matches an identifier, or
     ``None`` otherwise.
   """
-  key = pdb_type
+  processed_type = pdb_type
 
   if hasattr(pdb_type, '__gtype__'):
-    key = pdb_type.__gtype__
+    processed_type = pdb_type.__gtype__
 
-  if key == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
+  if processed_type.name == 'GimpCoreObjectArray' and pdb_param_info is not None:
     _array_type, setting_dict = (
-      pg.setting.get_array_setting_type_from_gimp_object_array(pdb_param_info))
-    key = (key, setting_dict['element_type'])
+      pg.setting.get_array_setting_type_from_gimp_core_object_array(pdb_param_info))
+    key = (processed_type.name, setting_dict['element_type'])
+  else:
+    key = processed_type.name
 
   try:
     placeholder_type_name = _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES[key]
@@ -278,14 +280,14 @@ def get_placeholder_type_name_from_pdb_type(
 
 
 _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
-  Gimp.Image.__gtype__: pg.setting.SETTING_TYPES[PlaceholderImageSetting],
-  Gimp.Item.__gtype__: pg.setting.SETTING_TYPES[PlaceholderItemSetting],
-  Gimp.Drawable.__gtype__: pg.setting.SETTING_TYPES[PlaceholderDrawableSetting],
-  Gimp.Layer.__gtype__: pg.setting.SETTING_TYPES[PlaceholderLayerSetting],
-  (Gimp.ObjectArray.__gtype__, pg.setting.LayerSetting): (
+  'GimpImage': pg.setting.SETTING_TYPES[PlaceholderImageSetting],
+  'GimpItem': pg.setting.SETTING_TYPES[PlaceholderItemSetting],
+  'GimpDrawable': pg.setting.SETTING_TYPES[PlaceholderDrawableSetting],
+  'GimpLayer': pg.setting.SETTING_TYPES[PlaceholderLayerSetting],
+  ('GimpCoreObjectArray', pg.setting.LayerSetting): (
     pg.setting.SETTING_TYPES[PlaceholderLayerArraySetting]),
-  (Gimp.ObjectArray.__gtype__, pg.setting.DrawableSetting): (
+  ('GimpCoreObjectArray', pg.setting.DrawableSetting): (
     pg.setting.SETTING_TYPES[PlaceholderDrawableArraySetting]),
-  (Gimp.ObjectArray.__gtype__, pg.setting.ItemSetting): (
+  ('GimpCoreObjectArray', pg.setting.ItemSetting): (
     pg.setting.SETTING_TYPES[PlaceholderItemArraySetting]),
 }

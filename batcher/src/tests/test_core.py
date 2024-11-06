@@ -217,7 +217,6 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     
     replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'], True)
     
-    self.assertListEqual(replaced_args[:4], [Gimp.RunMode.NONINTERACTIVE, image, layer, 0])
-    # We cannot reliably test `Gimp.ObjectArray` for equality, so we at least check the type.
-    self.assertIsInstance(replaced_args[4], Gimp.ObjectArray)
-    self.assertListEqual(replaced_args[5:], [10, 50, 'current_image'])
+    self.assertListEqual(
+      replaced_args,
+      [Gimp.RunMode.NONINTERACTIVE, image, layer, 0, [], 10, 50, 'current_image'])

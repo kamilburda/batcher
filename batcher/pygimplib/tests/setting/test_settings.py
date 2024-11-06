@@ -1849,7 +1849,7 @@ class TestCreateArraySetting(SettingTestCase):
      'brush',
      (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
      'automatic',
-     Gimp.ObjectArray),
+     GObject.GType.from_name('GimpCoreObjectArray')),
 
     ('gimp_object_registration_is_disabled_explicitly',
      'brush',
@@ -1947,17 +1947,17 @@ class TestCreateArraySetting(SettingTestCase):
     ('image',
      'image',
      (stubs_gimp.Image(), stubs_gimp.Image(), stubs_gimp.Image()),
-     Gimp.ObjectArray),
+     tuple),
 
     ('layer',
      'layer',
      (stubs_gimp.Layer(), stubs_gimp.Layer(), stubs_gimp.Layer()),
-     Gimp.ObjectArray),
+     tuple),
 
     ('brush',
      'brush',
      (stubs_gimp.Brush(), stubs_gimp.Brush(), stubs_gimp.Brush()),
-     Gimp.ObjectArray),
+     tuple),
   ])
   def test_value_for_pdb_select_types(self, test_case_suffix, element_type, value, expected_type):
     setting = settings_.ArraySetting('array', element_type=element_type)
@@ -2514,12 +2514,13 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
       (settings_.ArraySetting, dict(element_type=settings_.DoubleSetting)),
     )
 
-  def test_object_array(self):
+  def test_core_object_array(self):
     param_spec = collections.namedtuple('ParamSpecStub', ['name'])('drawables')
 
     # noinspection PyTypeChecker
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(Gimp.ObjectArray.__gtype__, param_spec),
+      settings_.get_setting_type_from_gtype(
+        GObject.GType.from_name('GimpCoreObjectArray'), param_spec),
       (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
     )
 

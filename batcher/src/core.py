@@ -696,9 +696,7 @@ class Batcher(metaclass=abc.ABCMeta):
         if is_function_pdb_procedure:
           replaced_args.extend([
             len(replaced_arg),
-            pg.setting.array_as_pdb_compatible_type(
-              replaced_arg,
-              element_pdb_type=argument.element_type.get_allowed_pdb_types()[0]),
+            pg.setting.array_as_pdb_compatible_type(replaced_arg),
           ])
         else:
           replaced_args.append(replaced_arg)

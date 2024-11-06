@@ -2329,9 +2329,8 @@ class ArraySetting(Setting):
   * `Gimp.Int32Array`
   * `Gimp.DoubleArray`
   * `GObject.TYPE_STRV` (string array)
-  * `Gimp.ObjectArray` - any type inheriting from `GObject.GObject`, including
-    GIMP objects (e.g. images, layers, channels, paths, brushes, patterns) or
-    e.g. `Gio.File`.
+  * `Gimp.CoreObjectArray` - GIMP objects (e.g. images, layers, channels,
+    paths, brushes, patterns, ...).
   
   Default value: `()`
   
@@ -2464,8 +2463,7 @@ class ArraySetting(Setting):
     # This ensures that this property is always up-to-date no matter what events
     # are connected to individual elements.
     self._value = self._array_as_tuple()
-    return array_as_pdb_compatible_type(
-      self._value, self.element_type, self._reference_element.pdb_type)
+    return array_as_pdb_compatible_type(self._value, self.element_type)
 
   @property
   def element_type(self) -> Type[Setting]:
@@ -2708,7 +2706,7 @@ class ArraySetting(Setting):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0]
     elif self._reference_element.can_be_registered_to_pdb():
-      return Gimp.ObjectArray
+      return GObject.GType.from_name('GimpCoreObjectArray')
     else:
       return None
 
@@ -2875,7 +2873,7 @@ def get_setting_type_from_gtype(
     pdb_param_info:
       Object representing GIMP PDB parameter information, obtainable via
       `Gimp.Procedure.get_arguments()`. This is used to infer the element type
-      for a `Gimp.ObjectArray` argument.
+      for an object array argument (images, layers, etc.).
 
   Returns:
     Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
@@ -2897,13 +2895,13 @@ def get_setting_type_from_gtype(
   if gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
 
-  if gtype == Gimp.ObjectArray.__gtype__ and pdb_param_info is not None:
-    return get_array_setting_type_from_gimp_object_array(pdb_param_info)
+  if gtype.name == 'GimpCoreObjectArray' and pdb_param_info is not None:
+    return get_array_setting_type_from_gimp_core_object_array(pdb_param_info)
 
   return None
 
 
-def get_array_setting_type_from_gimp_object_array(
+def get_array_setting_type_from_gimp_core_object_array(
       pdb_param_info: GObject.ParamSpec,
 ) -> Union[Tuple[Type[ArraySetting], Dict[str, Any]], None]:
   # HACK: Rely on the parameter name to infer the correct underlying object type.
@@ -2924,10 +2922,9 @@ def get_array_setting_type_from_gimp_object_array(
 
 
 def array_as_pdb_compatible_type(
-      values: Tuple[Any],
+      values: Tuple[Any, ...],
       element_setting_type: Optional[Type[Setting]] = None,
-      element_pdb_type: Union[GObject.GType, Type[GObject.GObject], None] = None,
-) -> Union[Tuple[Any], Gimp.Int32Array, Gimp.DoubleArray, Gimp.ObjectArray]:
+) -> Union[Tuple[Any, ...], Gimp.Int32Array, Gimp.DoubleArray]:
   """Returns an array suitable to be passed to a GIMP PDB procedure."""
   if element_setting_type == IntSetting:
     array = GObject.Value(Gimp.Int32Array)
@@ -2935,13 +2932,7 @@ def array_as_pdb_compatible_type(
     return array.get_boxed()
   elif element_setting_type == DoubleSetting:
     array = GObject.Value(Gimp.DoubleArray)
-    Gimp.value_set_float_array(array, values)
-    return array.get_boxed()
-  elif element_setting_type == StringSetting:
-    return values
-  elif element_pdb_type is not None:
-    array = GObject.Value(Gimp.ObjectArray)
-    Gimp.value_set_object_array(array, element_pdb_type, values)
+    Gimp.value_set_double_array(array, values)
     return array.get_boxed()
   else:
     return values
@@ -2959,7 +2950,7 @@ _ARRAY_GTYPES_TO_SETTING_TYPES = {
 
 __all__ = [
   'get_setting_type_from_gtype',
-  'get_array_setting_type_from_gimp_object_array',
+  'get_array_setting_type_from_gimp_core_object_array',
   'array_as_pdb_compatible_type',
   'ValueNotValidData',
 ]

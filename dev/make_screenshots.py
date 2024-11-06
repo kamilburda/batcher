@@ -209,13 +209,11 @@ def take_and_process_screenshot(
     crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
   selected_layers = screenshot_image.get_selected_layers()
-  layer_array = GObject.Value(Gimp.ObjectArray)
-  Gimp.value_set_object_array(layer_array, Gimp.Layer, selected_layers)
-  
+
   pdb.gimp_file_save(
     screenshot_image,
     len(selected_layers),
-    layer_array.get_boxed(),
+    selected_layers,
     Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)))
   
   screenshot_image.delete()

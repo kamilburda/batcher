@@ -619,8 +619,8 @@ class TestGetActionDictFromPdbProcedure(unittest.TestCase):
       name=self.procedure_name,
       arguments_spec=[
         dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
-        dict(value_type=GObject.TYPE_INT, name='num-drawables', blurb='Number of drawables'),
-        dict(value_type=Gimp.ObjectArray.__gtype__, name='drawables', blurb='Drawables'),
+        dict(value_type=GObject.TYPE_INT, name='num-save-options', blurb='Number of save options'),
+        dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
         dict(
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
@@ -629,8 +629,8 @@ class TestGetActionDictFromPdbProcedure(unittest.TestCase):
   
   def test_with_non_unique_param_names(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type=GObject.TYPE_INT, name='num-drawables', blurb='Number of more drawables'),
-      dict(value_type=Gimp.ObjectArray.__gtype__, name='drawables', blurb='More drawables'),
+      dict(value_type=GObject.TYPE_INT, name='num-save-options', blurb='Number of save options'),
+      dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
       dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
     ])
 
@@ -645,7 +645,7 @@ class TestGetActionDictFromPdbProcedure(unittest.TestCase):
     self.assertListEqual(
       [argument_dict['name'] for argument_dict in action_dict['arguments']],
       ['run-mode',
-       'drawables',
+       'save-options',
        'filename',
-       'drawables-2',
+       'save-options-2',
        'filename-2'])
