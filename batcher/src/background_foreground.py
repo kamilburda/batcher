@@ -111,7 +111,7 @@ def _remove_locks_from_layer(layer):
 def _copy_layer(layer, add_alpha=True):
   layer_copy = layer.copy()
 
-  if add_alpha and not layer_copy.has_alpha() and not layer_copy.is_group():
+  if add_alpha and not layer_copy.has_alpha() and not layer_copy.is_group_layer():
     layer_copy.add_alpha()
 
   return layer_copy

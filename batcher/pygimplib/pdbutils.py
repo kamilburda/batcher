@@ -340,8 +340,8 @@ def copy_and_paste_layer(
   if set_visible:
     layer_copy.set_visible(True)
   
-  if merge_group and layer_copy.is_group():
-    layer_copy = image.merge_layer_group(layer_copy)
+  if merge_group and layer_copy.is_group_layer():
+    layer_copy = layer_copy.merge()
   
   return layer_copy
 
@@ -374,7 +374,7 @@ def compare_layers(
   """
   
   def _copy_layers(image, layers, parent=None, position=0):
-    group_layer = Gimp.Layer.group_new(image)
+    group_layer = Gimp.GroupLayer.new(image, None)
     image.insert_layer(group_layer, parent, position)
     
     for layer in layers:
@@ -387,8 +387,8 @@ def compare_layers(
   
   def _process_layers(image, group_layer, apply_layer_attributes, apply_layer_masks):
     for layer in group_layer.get_children():
-      if layer.is_group():
-        image.merge_layer_group(layer)
+      if layer.is_group_layer():
+        layer.merge()
       else:
         if layer.get_opacity() != 100.0 or layer.get_mode() != Gimp.LayerMode.NORMAL:
           if apply_layer_attributes:
@@ -428,10 +428,10 @@ def compare_layers(
     layer.remove_mask(Gimp.MaskApplyMode.DISCARD)
   
   def _apply_layer_attributes(image, layer, parent_group):
-    temp_group = Gimp.Layer.group_new(image)
+    temp_group = Gimp.GroupLayer.new(image, None)
     image.insert_layer(temp_group, parent_group, 0)
     image.reorder_item(layer, temp_group, 0)
-    layer = image.merge_layer_group(temp_group)
+    layer = temp_group.merge()
     
     return layer
   

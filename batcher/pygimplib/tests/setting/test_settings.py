@@ -1192,9 +1192,9 @@ class TestGimpItemSetting(SettingTestCase):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     self.image.set_file(Gio.file_new_for_path('image_filepath'))
     
-    self.parent_of_parent = stubs_gimp.Layer(name='group1', is_group=True)
+    self.parent_of_parent = stubs_gimp.GroupLayer(name='group1')
     
-    self.parent = stubs_gimp.Layer(name='group2', is_group=True)
+    self.parent = stubs_gimp.GroupLayer(name='group2')
     self.parent.parent = self.parent_of_parent
     
     self.layer = stubs_gimp.Layer(name='layer')
@@ -1366,7 +1366,7 @@ class TestLayerMaskSetting(SettingTestCase):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     self.image.set_file(Gio.file_new_for_path('image_filepath'))
 
-    self.parent = stubs_gimp.Layer(name='group', is_group=True)
+    self.parent = stubs_gimp.GroupLayer(name='group')
 
     self.layer = stubs_gimp.Layer(name='layer', mask=self.mask)
     self.layer.parent = self.parent

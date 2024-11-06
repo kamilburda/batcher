@@ -451,6 +451,29 @@ class LayerComboBoxPresenter(GimpObjectComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
+class GroupLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
+  """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+  the choices to `Gimp.GroupLayer` instances.
+
+  Value: `Gimp.GroupLayer` selected in the combo box, or ``None`` if there is no
+  group layer available.
+  """
+
+  def _create_widget(self, setting, **kwargs):
+    return GimpUi.LayerComboBox.new(lambda image, item: item.is_group_layer())
+
+  def get_value(self):
+    return Gimp.GroupLayer.get_by_id(self._widget.get_active().value)
+
+  def _set_value(self, value):
+    """Sets a `Gimp.GroupLayer` instance to be selected in the combo box.
+
+    Passing ``None`` has no effect.
+    """
+    if value is not None:
+      self._widget.set_active(value.get_id())
+
+
 class TextLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
   """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
   the choices to `Gimp.TextLayer` instances.

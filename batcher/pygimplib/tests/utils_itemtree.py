@@ -28,7 +28,7 @@ def parse_layers(
     current_symbol = lines[i].strip()
 
     if current_symbol.endswith(' {'):
-      layer = stubs_gimp.Layer(name=current_symbol.rstrip(' {'), is_group=True)
+      layer = stubs_gimp.GroupLayer(name=current_symbol.rstrip(' {'))
       if current_parent != image:
         layer.parent = current_parent
 

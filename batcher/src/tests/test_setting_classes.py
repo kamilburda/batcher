@@ -20,10 +20,10 @@ def _get_images_and_items():
   
   images = [image_1, image_2]
   
-  item_4 = stubs_gimp.Layer(name='item_4', image=image_1, is_group=True)
+  item_4 = stubs_gimp.GroupLayer(name='item_4', image=image_1)
   item_1 = stubs_gimp.Layer(name='item_1', image=image_1)
   item_3 = stubs_gimp.Layer(name='item_3', image=image_1, parent=item_4)
-  item_7 = stubs_gimp.Layer(name='item_7', image=image_2, is_group=True)
+  item_7 = stubs_gimp.GroupLayer(name='item_7', image=image_2)
   item_5 = stubs_gimp.Layer(name='item_5', image=image_2, parent=item_7)
   
   image_1.layers = [item_1, item_4]

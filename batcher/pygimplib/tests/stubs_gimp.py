@@ -219,7 +219,7 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
   _items_and_ids = {}
   
-  def __init__(self, name=None, id_=None, visible=True, image=None, parent=None, is_group=False):
+  def __init__(self, name=None, id_=None, visible=True, image=None, parent=None):
     GObject.GObject.__init__(self)
     ParasiteFunctionsStubMixin.__init__(self)
     
@@ -232,7 +232,6 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
     self._items_and_ids[self.id_] = self
 
-    self._is_group = is_group
     self.width = 0
     self.height = 0
     self.visible = visible
@@ -241,6 +240,9 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
     self.children = []
     self.parent = parent
     self.valid = True
+
+    self._is_group = False
+    self._is_group_layer = False
 
   @classmethod
   def get_by_id(cls, id_):
@@ -261,6 +263,9 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
   def is_group(self):
     return self._is_group
+
+  def is_group_layer(self):
+    return self._is_group_layer
 
   def is_layer(self):
     return False
@@ -317,6 +322,15 @@ class Layer(Item):
 
   def get_mask(self):
     return self.mask
+
+
+class GroupLayer(Layer):
+
+  def __init__(self, **kwargs):
+    super().__init__(**kwargs)
+
+    self._is_group = True
+    self._is_group_layer = True
 
 
 class LayerMask(Item):

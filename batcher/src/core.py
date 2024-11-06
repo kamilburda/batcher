@@ -1174,7 +1174,7 @@ class LayerBatcher(Batcher):
       self._current_raw_item = raw_item_copy
       self._current_raw_item.set_name(orig_raw_item_name)
     
-    if self._edit_mode and not self._is_preview and self._current_raw_item.is_group():
+    if self._edit_mode and not self._is_preview and self._current_raw_item.is_group_layer():
       # Group layers must be copied and inserted as layers as some procedures
       # do not work on group layers.
       raw_item_copy = pg.pdbutils.copy_and_paste_layer(

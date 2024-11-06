@@ -1738,6 +1738,28 @@ class LayerSetting(GimpItemSetting):
       return 'invalid layer', 'invalid_value'
 
 
+class GroupLayerSetting(GimpItemSetting):
+  """Class for settings holding `Gimp.GroupLayer` instances.
+
+  Allowed GIMP PDB types:
+  * `Gimp.GroupLayer`
+
+  Message IDs for invalid values:
+  * ``'invalid_value'``: The group layer assigned is not valid.
+  """
+
+  _ALLOWED_PDB_TYPES = [Gimp.GroupLayer]
+
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.group_layer_combo_box]
+
+  def _copy_value(self, value):
+    return value
+
+  def _validate(self, layer):
+    if layer is not None and not layer.is_group_layer():
+      return 'invalid group layer', 'invalid_value'
+
+
 class TextLayerSetting(GimpItemSetting):
   """Class for settings holding `Gimp.TextLayer` instances.
 
