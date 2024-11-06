@@ -362,7 +362,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self._ACTIVE_KEY = setting_classes.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
 
   def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
 
     self.setting.set_active_file_format('jpg')
 
@@ -372,7 +372,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertIn('jpg', self.setting.value)
 
   def test_set_active_file_format_with_alias(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
 
     self.setting.set_active_file_format('jpeg')
 
@@ -389,7 +389,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertNotIn('unknown', self.setting.value)
 
   def test_to_dict(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-save', self.png_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-export', self.png_options
 
     self.setting.set_active_file_format('png')
     self.setting.set_active_file_format('unknown')

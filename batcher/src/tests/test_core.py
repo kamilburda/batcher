@@ -86,7 +86,7 @@ class TestAddActionFromSettings(unittest.TestCase):
     
     self.procedures = actions_.create('procedures')
 
-    self.procedure_name = 'file-png-save'
+    self.procedure_name = 'file-png-export'
 
     self.procedure_stub_kwargs = dict(
       name=self.procedure_name,

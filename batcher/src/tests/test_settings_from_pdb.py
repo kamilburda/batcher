@@ -24,7 +24,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     return_value=pg.tests.stubs_gimp.PdbStub,
   )
   def setUp(self, mock_get_pdb):
-    self.procedure_name = 'file-png-save'
+    self.procedure_name = 'file-png-export'
 
     self.procedure_stub_kwargs = dict(
       name=self.procedure_name,

@@ -540,7 +540,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
   def setUp(self):
     self.procedures = actions_.create('procedures')
 
-    self.procedure_name = 'file-png-save'
+    self.procedure_name = 'file-png-export'
 
     self.procedure_stub = stubs_gimp.PdbProcedureStub(
       name=self.procedure_name,
@@ -564,10 +564,10 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
   def test_add_pdb_procedure(self, mock_get_pdb):
     action = actions_.add(self.procedures, self.procedure_name)
     
-    self.assertIn('file-png-save', self.procedures)
+    self.assertIn('file-png-export', self.procedures)
     
-    self.assertEqual(action.name, 'file-png-save')
-    self.assertEqual(action['function'].value, 'file-png-save')
+    self.assertEqual(action.name, 'file-png-export')
+    self.assertEqual(action['function'].value, 'file-png-export')
     self.assertTrue(action['origin'].is_item('gimp_pdb'))
     self.assertEqual(action['enabled'].value, True)
     self.assertEqual(action['display_name'].value, 'Save as PNG')
@@ -592,8 +592,8 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     self.procedures.save()
     self.procedures.load()
     
-    self.assertEqual(action.name, 'file-png-save')
-    self.assertEqual(action['function'].value, 'file-png-save')
+    self.assertEqual(action.name, 'file-png-export')
+    self.assertEqual(action['function'].value, 'file-png-export')
     self.assertTrue(action['origin'].is_item('gimp_pdb'))
     self.assertEqual(action['enabled'].value, False)
     self.assertEqual(action['arguments/filename'].value, 'image.png')
@@ -610,7 +610,7 @@ class TestGetActionDictFromPdbProcedure(unittest.TestCase):
     return_value=pg.tests.stubs_gimp.PdbStub,
   )
   def setUp(self, mock_get_pdb):
-    self.procedure_name = 'file-png-save'
+    self.procedure_name = 'file-png-export'
 
     self.procedure_stub_kwargs = dict(
       name=self.procedure_name,

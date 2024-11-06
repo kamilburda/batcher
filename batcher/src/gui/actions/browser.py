@@ -126,11 +126,11 @@ class ActionBrowser(GObject.GObject):
       return (name_.startswith('file-')
               and (name_.endswith('-load') or name_.endswith('-load-thumb')))
 
-    def is_file_save_procedure(name_):
+    def is_file_export_procedure(name_):
       return (name_.startswith('file-')
-              and (name_.endswith('-save')
-                   or name_.endswith('-save-internal')
-                   or name_.endswith('-save-multi')))
+              and (name_.endswith('-export')
+                   or name_.endswith('-export-internal')
+                   or name_.endswith('-export-multi')))
 
     # We pre-sort procedure names so that the column with these names will
     # appear sorted for entries without a menu name (corresponding to the column
@@ -138,7 +138,7 @@ class ActionBrowser(GObject.GObject):
     pdb_procedures = [
       Gimp.get_pdb().lookup_procedure(name)
       for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))
-      if not is_file_load_procedure(name) and not is_file_save_procedure(name)
+      if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     ]
 
     action_dicts = [

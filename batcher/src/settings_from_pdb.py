@@ -126,7 +126,7 @@ def _get_arg_default_value(pdb_procedure_name, proc_arg):
 
 
 _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES = {
-  'file-pdf-save': {'ignore-hidden': False, 'layers-as-pages': True, 'reverse-order': True},
+  'file-pdf-export': {'ignore-hidden': False, 'layers-as-pages': True, 'reverse-order': True},
   'plug-in-lighting': {'new-image': False},
   'plug-in-map-object': {'new-image': False, 'new-layer': False},
   'plug-in-smooth-palette': {'show-image': False},

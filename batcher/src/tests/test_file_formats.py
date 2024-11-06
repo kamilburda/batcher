@@ -70,7 +70,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
   def test_fill_file_format_options(self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
 
     file_formats_.fill_file_format_options(file_format_options, 'jpg', 'export')
 
@@ -82,7 +82,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
 
     file_formats_.fill_file_format_options(file_format_options, 'jpg', 'export')
     file_formats_.fill_file_format_options(file_format_options, 'jpg', 'export')
@@ -94,7 +94,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
   def test_fill_file_format_options_with_alias(self, mock_get_setting_data_from_pdb_procedure):
     file_format_options = {}
 
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-save', self.jpg_options
+    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
 
     file_formats_.fill_file_format_options(file_format_options, 'jpeg', 'export')
 
