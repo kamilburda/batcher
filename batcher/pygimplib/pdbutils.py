@@ -44,7 +44,7 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
     new_image.set_color_profile(color_profile)
 
   if image.get_base_type() == Gimp.ImageBaseType.INDEXED:
-    new_image.set_colormap(*image.get_colormap())
+    new_image.set_palette(image.get_palette())
 
   _copy_image_guides(image, new_image)
 
