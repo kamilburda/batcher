@@ -1,76 +1,38 @@
 """Class to generate GIMP PDB parameters out of settings and parse GIMP
 procedure arguments to assign them as values to settings.
 """
-
-from collections.abc import Iterable
-from typing import Any, Dict, List, Union
-
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
+from typing import List, Union
 
 from . import group as group_
 from . import settings as settings_
 
 __all__ = [
   'create_params',
-  'list_param_values',
 ]
 
 
 def create_params(
       *settings_or_groups: Union[settings_.Setting, group_.Group],
       recursive=False,
-) -> List[Dict[str, Any]]:
+) -> List[List]:
   """Returns a list of GIMP PDB parameters from the specified `setting.Setting`
   and `setting.Group` instances.
 
-  A PDB parameter is represented as a dictionary of ``(parameter name, value)``
-  pairs.
+  A PDB parameter is represented as a list of values. See the ``arguments``
+  parameter in `pygimplib.procedure.register_procedure()` for more information.
 
   If ``recursive`` is ``True``, groups are traversed recursively. Otherwise,
   only top-level settings within each group from ``settings_or_groups`` are
   considered.
   """
-  settings = _list_settings(settings_or_groups, recursive=recursive)
-  
   params = []
   
-  for setting in settings:
-    if setting.can_be_registered_to_pdb():
-      params.extend(setting.get_pdb_param())
+  for setting in _list_settings(settings_or_groups, recursive=recursive):
+    param = setting.get_pdb_param()
+    if param is not None:
+      params.append(param)
 
   return params
-
-
-def list_param_values(
-      settings_or_groups: Iterable[Union[settings_.Setting, group_.Group]],
-      ignore_run_mode: bool = True,
-      recursive=False,
-) -> List:
-  """Returns a list of setting values (`setting.Setting.value` properties)
-  registrable to PDB.
-
-  A setting can be registered if `setting.Setting.can_be_registered_to_pdb()`
-  returns ``True``.
-  
-  If ``ignore_run_mode`` is ``True``, setting(s) named ``'run_mode'`` are
-  ignored. This makes it possible to call PDB functions with the setting
-  values without manually omitting the ``'run_mode'`` setting.
-
-  If ``recursive`` is ``True``, groups are traversed recursively. Otherwise,
-  only top-level settings within each group from ``settings_or_groups`` are
-  considered.
-  """
-  settings = _list_settings(settings_or_groups, recursive=recursive)
-
-  if ignore_run_mode:
-    for i, setting in enumerate(settings):
-      if isinstance(setting, settings_.EnumSetting) and setting.enum_type == Gimp.RunMode:
-        del settings[i]
-        break
-  
-  return [setting.value_for_pdb for setting in settings if setting.can_be_registered_to_pdb()]
 
 
 def _list_settings(settings_or_groups, recursive=False):

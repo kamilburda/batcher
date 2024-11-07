@@ -109,62 +109,68 @@ class TestSetting(SettingTestCase):
     self.assertEqual(setting.display_name, '_Setting')
     self.assertEqual(setting.description, 'My description')
 
-  def test_pdb_type_automatic_is_not_registrable(self):
+  def test_pdb_type_automatic_is_not_usable(self):
     self.assertIsNone(self.setting.pdb_type)
-    self.assertFalse(self.setting.can_be_registered_to_pdb())
+    self.assertFalse(self.setting.can_be_used_in_pdb())
   
-  def test_pdb_type_automatic_is_registrable(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting('file_extension', default_value='png')
+  def test_pdb_type_automatic_is_usable(self):
+    setting = stubs_setting.StubRegistrableSetting('file_extension', default_value='png')
 
     self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
-    self.assertTrue(setting.can_be_registered_to_pdb())
+    self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_none(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type=None)
 
     self.assertIsNone(setting.pdb_type)
-    self.assertFalse(setting.can_be_registered_to_pdb())
+    self.assertFalse(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_gobject_subclass(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode)
 
     self.assertEqual(setting.pdb_type, Gimp.RunMode)
-    self.assertTrue(setting.can_be_registered_to_pdb())
+    self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_gtype(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode.__gtype__)
 
     self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
-    self.assertTrue(setting.can_be_registered_to_pdb())
+    self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_gtype_name(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type='gchararray')
 
     self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
-    self.assertTrue(setting.can_be_registered_to_pdb())
+    self.assertTrue(setting.can_be_used_in_pdb())
   
   def test_invalid_pdb_type(self):
     with self.assertRaises(ValueError):
-      stubs_setting.StubRegistrableToPdbSetting(
+      stubs_setting.StubRegistrableSetting(
         'file_extension', default_value='png', pdb_type=GObject.TYPE_INT)
-  
+
   def test_get_pdb_param_for_registrable_setting(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
-      'file_extension', default_value='png', display_name='_Run mode')
-    self.assertEqual(
+    setting = stubs_setting.StubRegistrableSetting(
+      'file_extension', default_value='png', display_name='_File extension')
+    self.assertListEqual(
       setting.get_pdb_param(),
       [
-        dict(
-          name='file-extension',
-          type=GObject.TYPE_STRING,
-          default='png',
-          nick='_Run mode',
-          blurb='Run mode',
-        )])
+        'stub_registrable',
+        'file_extension',
+        '_File extension',
+        'File extension',
+        'png',
+        GObject.ParamFlags.READWRITE,
+      ])
+
+  def test_get_pdb_param_for_registrable_setting_explicitly_disabled_registration(self):
+    setting = stubs_setting.StubRegistrableSetting(
+      'file_extension', default_value='png', display_name='_File extension', pdb_type=None)
+
+    self.assertIsNone(setting.get_pdb_param())
 
   def test_get_pdb_param_for_nonregistrable_setting(self):
     self.assertIsNone(self.setting.get_pdb_param())
@@ -243,7 +249,7 @@ class TestSetting(SettingTestCase):
       })
 
   def test_to_dict_with_pdb_type_as_gtype(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type=GObject.TYPE_STRING)
 
     self.assertDictEqual(
@@ -251,13 +257,13 @@ class TestSetting(SettingTestCase):
       {
         'name': 'file_extension',
         'value': 'png',
-        'type': 'stub_registrable_to_pdb',
+        'type': 'stub_usable_in_pdb',
         'default_value': 'png',
         'pdb_type': 'gchararray',
       })
 
   def test_to_dict_with_pdb_type_as_gobject_subclass(self):
-    setting = stubs_setting.StubRegistrableToPdbSetting(
+    setting = stubs_setting.StubRegistrableSetting(
       'file_extension', default_value='png', pdb_type=Gimp.RunMode)
 
     self.assertDictEqual(
@@ -265,7 +271,7 @@ class TestSetting(SettingTestCase):
       {
         'name': 'file_extension',
         'value': 'png',
-        'type': 'stub_registrable_to_pdb',
+        'type': 'stub_usable_in_pdb',
         'default_value': 'png',
         'pdb_type': 'GimpRunMode',
       })
@@ -694,31 +700,43 @@ class TestIntSetting(SettingTestCase):
 
     self.assertTrue(self.setting.is_valid)
 
-  def test_get_pdb_param(self):
-    self.assertEqual(
-      self.setting.get_pdb_param(),
+  def test_get_pdb_param_for_registrable_setting(self):
+    setting = settings_.IntSetting(
+      'num-items', default_value=1, display_name='_Number of items')
+    self.assertListEqual(
+      setting.get_pdb_param(),
       [
-        dict(
-          name='count',
-          type=GObject.TYPE_INT,
-          default=0,
-          minimum=0,
-          maximum=100,
-          nick='Count',
-          blurb='Count',
-        )])
+        'int',
+        'num-items',
+        '_Number of items',
+        'Number of items',
+        setting.pdb_min_value,
+        setting.pdb_max_value,
+        1,
+        GObject.ParamFlags.READWRITE,
+      ])
 
-  def test_get_pdb_param_no_min_or_max_value(self):
-    self.assertEqual(
-      settings_.IntSetting('count').get_pdb_param(),
+  def test_get_pdb_param_for_registrable_setting_explicit_min_and_max_value(self):
+    setting = settings_.IntSetting(
+      'num-items', default_value=1, display_name='_Number of items', min_value=2, max_value=10)
+    self.assertListEqual(
+      setting.get_pdb_param(),
       [
-        dict(
-          name='count',
-          type=GObject.TYPE_INT,
-          default=0,
-          nick='Count',
-          blurb='Count',
-        )])
+        'int',
+        'num-items',
+        '_Number of items',
+        'Number of items',
+        2,
+        10,
+        1,
+        GObject.ParamFlags.READWRITE,
+      ])
+
+  def test_get_pdb_param_for_registrable_setting_explicitly_disabled_registration(self):
+    setting = settings_.IntSetting(
+      'num-items', default_value=1, display_name='_Number of items', pdb_type=None)
+
+    self.assertIsNone(setting.get_pdb_param())
 
   def test_to_dict(self):
     self.assertDictEqual(
@@ -850,28 +868,30 @@ class TestEnumSetting(SettingTestCase):
   def test_get_pdb_param_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
 
-    self.assertEqual(
+    self.assertListEqual(
       setting.get_pdb_param(),
       [
-        dict(
-          name='precision',
-          type=Gimp.Precision,
-          default=next(iter(Gimp.Precision.__enum_values__.values())),
-          nick='Precision',
-          blurb='Precision',
-        )])
+        'enum',
+        'precision',
+        'Precision',
+        'Precision',
+        Gimp.Precision,
+        next(iter(Gimp.Precision.__enum_values__.values())),
+        GObject.ParamFlags.READWRITE,
+      ])
 
   def test_get_pdb_param_with_custom_default_value(self):
-    self.assertEqual(
+    self.assertListEqual(
       self.setting.get_pdb_param(),
       [
-        dict(
-          name='precision',
-          type=Gimp.Precision,
-          default=Gimp.Precision.DOUBLE_NON_LINEAR,
-          nick='Precision',
-          blurb='Precision',
-        )])
+        'enum',
+        'precision',
+        'Precision',
+        'Precision',
+        Gimp.Precision,
+        Gimp.Precision.DOUBLE_NON_LINEAR,
+        GObject.ParamFlags.READWRITE,
+      ])
 
   def test_to_dict(self):
     self.assertDictEqual(
@@ -1866,8 +1886,12 @@ class TestCreateArraySetting(SettingTestCase):
       element_type=element_type)
     
     self.assertEqual(setting.pdb_type, expected_pdb_type)
+    if pdb_type is None:
+      self.assertIsNone(setting.get_pdb_param())
+    else:
+      self.assertIsNotNone(setting.get_pdb_param())
   
-  def test_create_with_nonregistrable_type(self):
+  def test_create_with_nonregistrable_and_unusable_in_pdb_type(self):
     setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
@@ -1876,7 +1900,8 @@ class TestCreateArraySetting(SettingTestCase):
       element_value_save=lambda value: value)
     
     self.assertIsNone(setting.pdb_type)
-    self.assertFalse(setting.can_be_registered_to_pdb())
+    self.assertFalse(setting.can_be_used_in_pdb())
+    self.assertIsNone(setting.get_pdb_param())
   
   def test_create_with_explicit_valid_element_pdb_type(self):
     setting = settings_.ArraySetting(
@@ -1916,7 +1941,7 @@ class TestCreateArraySetting(SettingTestCase):
       self.assertEqual(setting[i].element_type, settings_.DoubleSetting)
       self.assertEqual(setting[i].default_value, (0.0, 0.0, 0.0))
       self.assertEqual(setting[i].value, values[i])
-      self.assertFalse(setting[i].can_be_registered_to_pdb())
+      self.assertFalse(setting[i].can_be_used_in_pdb())
       
       for j in range(len(setting[i])):
         self.assertEqual(setting[i][j].default_value, 1.0)
@@ -2283,15 +2308,14 @@ class TestArraySetting(SettingTestCase):
     self.assertEqual(event_args[0][1], expected_value)
 
   def test_get_pdb_param_for_registrable_setting(self):
-    self.assertEqual(
+    self.assertListEqual(
       self.setting.get_pdb_param(),
       [
-        dict(
-          name='coordinates',
-          type=Gimp.DoubleArray,
-          nick='Coordinates',
-          blurb='Coordinates',
-        ),
+        'double_array',
+        'coordinates',
+        'Coordinates',
+        'Coordinates',
+        GObject.ParamFlags.READWRITE,
       ])
   
   def test_get_pdb_param_for_nonregistrable_setting(self):

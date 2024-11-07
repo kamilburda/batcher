@@ -16,8 +16,8 @@ class TestCreateParams(unittest.TestCase):
   def setUp(self):
     self.string_setting = settings_.StringSetting(
       'file_extension', default_value='png', display_name='File extension')
-    self.unregistrable_setting = settings_.IntSetting(
-      'num_exported_items', default_value=0, pdb_type=None)
+    self.unregistrable_setting = settings_.GenericSetting(
+      'exported_items', default_value=0, pdb_type=None)
     self.coordinates_setting = settings_.ArraySetting(
       'coordinates',
       default_value=(1.0, 5.0, 10.0),
@@ -31,7 +31,7 @@ class TestCreateParams(unittest.TestCase):
     param = params[0]
 
     self.assertEqual(len(params), 1)
-    self.assertDictEqual(
+    self.assertListEqual(
       param,
       dict(
         name='file-extension',
@@ -47,7 +47,7 @@ class TestCreateParams(unittest.TestCase):
 
     self.assertEqual(len(params), 3)
     
-    self.assertDictEqual(
+    self.assertListEqual(
       params[0],
       dict(
         name='file-extension',
@@ -72,7 +72,7 @@ class TestCreateParams(unittest.TestCase):
 
     self.assertEqual(len(params), 6)
 
-    self.assertDictEqual(
+    self.assertListEqual(
       params[0],
       dict(
         name='file-extension',
@@ -92,7 +92,7 @@ class TestCreateParams(unittest.TestCase):
       ))
     
     for param, setting in zip(params[3:], self.settings.walk()):
-      self.assertDictEqual(
+      self.assertListEqual(
         param,
         dict(
           name=setting.pdb_name,
@@ -110,26 +110,3 @@ class TestCreateParams(unittest.TestCase):
   def test_create_params_with_unregistrable_setting(self):
     params = pdbparams_.create_params(self.unregistrable_setting)
     self.assertEqual(params, [])
-
-
-class TestListParamValues(unittest.TestCase):
-  
-  def setUp(self):
-    self.settings = stubs_group.create_test_settings_hierarchical()
-  
-  def test_list_param_values(self):
-    param_values = pdbparams_.list_param_values(
-      [self.settings['main/file_extension'], self.settings['advanced/flatten']])
-    self.assertEqual(param_values[0], self.settings['main/file_extension'].value)
-    self.assertEqual(param_values[1], self.settings['advanced/flatten'].value)
-
-  def test_list_param_values_recursive(self):
-    param_values = pdbparams_.list_param_values([self.settings], recursive=True)
-    self.assertEqual(param_values[0], self.settings['main/file_extension'].value)
-    self.assertEqual(param_values[1], self.settings['advanced/flatten'].value)
-    self.assertEqual(param_values[2], self.settings['advanced/overwrite_mode'].value)
-
-  def test_list_param_values_ignore_run_mode(self):
-    param_values = pdbparams_.list_param_values(
-      [settings_.EnumSetting('run_mode', enum_type=Gimp.RunMode), self.settings], recursive=True)
-    self.assertEqual(len(param_values), len(list(self.settings.walk())))

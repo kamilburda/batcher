@@ -112,9 +112,21 @@ class StubWithCallableDefaultDefaultValueSetting(StubSetting):
   _DEFAULT_DEFAULT_VALUE = lambda self: f'_{self.name}'
 
 
-class StubRegistrableToPdbSetting(StubSetting):
+class StubRegistrableSetting(StubSetting):
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, Gimp.RunMode.__gtype__]
+
+  _REGISTRABLE_TYPE_NAME = 'stub_registrable'
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class StubWithGuiSetting(StubSetting):

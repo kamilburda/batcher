@@ -153,6 +153,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   
   _ALLOWED_PDB_TYPES = []
 
+  _REGISTRABLE_TYPE_NAME = None
+
   _ALLOWED_GUI_TYPES = []
 
   _DEFAULT_DEFAULT_VALUE = None
@@ -622,34 +624,32 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     """
     return self._is_value_empty(self._value)
   
-  def can_be_registered_to_pdb(self) -> bool:
-    """Returns ``True`` if the setting can be registered as a GIMP PDB
-    parameter, ``False`` otherwise.
+  def can_be_used_in_pdb(self) -> bool:
+    """Returns ``True`` if the setting can be used as a GIMP PDB parameter,
+    ``False`` otherwise.
 
     This method returns ``True`` if the `pdb_type` property is not ``None``,
     i.e. the setting has a valid PDB type assigned.
+
+    Note that this does not mean that the setting value can be used when
+    registering a plug-in, only that it can be passed as a parameter to a PDB
+    procedure. To determine if the setting can be used for plug-in registration,
+    use `get_pdb_param()`.
     """
     return self._pdb_type is not None
   
-  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
-    """Returns a list of dictionaries representing GIMP PDB parameters for the
-    setting.
+  def get_pdb_param(self) -> Union[List, None]:
+    """Returns a list of setting attribute values usable as a GIMP PDB
+    parameter when registering a GIMP plug-in.
 
-    The dictionary can be passed as keyword arguments when creating a
-    `GObject.Property` instance used for registering PDB parameters for a
-    GIMP plug-in.
+    If the setting cannot be used for plug-in registration, ``None`` is
+    returned.
 
-    If the setting does not support any PDB type, ``None`` is returned.
+    If the setting's `pdb_type` is explicitly set to ``None``,
+    then the registration is disabled, i.e. ``None`` is also returned.
     """
-    if self.can_be_registered_to_pdb():
-      return [
-        dict(
-          name=self.pdb_name,
-          type=self.pdb_type,
-          default=self.default_value,
-          nick=self.display_name,
-          blurb=self.description,
-        )]
+    if self._REGISTRABLE_TYPE_NAME is not None and self.can_be_used_in_pdb():
+      return self._get_pdb_param()
     else:
       return None
   
@@ -875,6 +875,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
     return gtype in allowed_gtypes
 
+  def _get_pdb_param(self):
+    return None
+
   def _get_gui_type(self, gui_type):
     gui_type_to_return = None
     
@@ -1027,6 +1030,15 @@ class NumericSetting(Setting):
   For example, the maximum value allowed for type `GObject.TYPE_INT` would be
   `GLib.MAXINT`.
   """
+
+  _PDB_TYPES_AND_REGISTRABLE_TYPE_NAMES = {
+    GObject.TYPE_INT: 'int',
+    GObject.TYPE_UINT: 'uint',
+    GObject.TYPE_DOUBLE: 'double',
+  }
+  """Mapping of PDB types to strings used for registering a setting as a GIMP
+  PDB procedure parameter.
+  """
   
   def __init__(self, name: str, min_value=None, max_value=None, **kwargs):
     self._min_value = min_value
@@ -1080,27 +1092,6 @@ class NumericSetting(Setting):
     If ``None``, no checks for a maximum value are performed.
     """
     return self._pdb_max_value
-
-  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
-    """Returns a list of dictionaries representing GIMP PDB parameters for the
-    setting.
-
-    In addition to items provided by `Setting.get_pdb_param()`, this method adds
-    ``'minimum'`` and ``'maximum'`` if the `min_value` and `max_value` property
-    is not ``None``, respectively.
-    """
-    pdb_params = super().get_pdb_param()
-
-    if pdb_params is not None:
-      if self.min_value is not None:
-        pdb_params[0]['minimum'] = self.min_value
-
-      if self.max_value is not None:
-        pdb_params[0]['maximum'] = self.max_value
-
-      return pdb_params
-    else:
-      return None
   
   def _validate(self, value):
     if self.min_value is not None and value < self.min_value:
@@ -1114,6 +1105,23 @@ class NumericSetting(Setting):
 
     if self.pdb_max_value is not None and value > self.pdb_max_value:
       return f'value cannot be greater than {self.pdb_max_value}', 'above_pdb_max'
+
+  def _get_pdb_param(self):
+    type_ = self._PDB_TYPES_AND_REGISTRABLE_TYPE_NAMES.get(self._pdb_type, None)
+
+    if type_ is not None:
+      return [
+        type_,
+        self._name,
+        self._display_name,
+        self._description,
+        self._min_value if self._min_value is not None else self._pdb_min_value,
+        self._max_value if self._max_value is not None else self._pdb_max_value,
+        self._default_value,
+        GObject.ParamFlags.READWRITE,
+      ]
+    else:
+      return None
 
   def _check_min_and_max_values_against_pdb_min_and_max_values(self):
     if (self.min_value is not None
@@ -1143,6 +1151,8 @@ class IntSetting(NumericSetting):
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_INT, GObject.TYPE_UINT]
 
+  _REGISTRABLE_TYPE_NAME = 'int'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0
@@ -1160,6 +1170,8 @@ class DoubleSetting(NumericSetting):
   _ALIASES = ['float']
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_DOUBLE]
+
+  _REGISTRABLE_TYPE_NAME = 'double'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.double_spin_button]
 
@@ -1179,6 +1191,8 @@ class BoolSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_BOOLEAN]
 
+  _REGISTRABLE_TYPE_NAME = 'boolean'
+
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.check_button,
     _SETTING_GUI_TYPES.check_menu_item,
@@ -1190,6 +1204,16 @@ class BoolSetting(Setting):
   def _assign_value(self, value):
     self._value = bool(value)
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class EnumSetting(Setting):
   """Class for settings wrapping an enumerated type (`GObject.GEnum` subclass).
@@ -1200,6 +1224,8 @@ class EnumSetting(Setting):
   Default value: The first item defined for the specified `GObject.GEnum`
     subclass (e.g. `Gimp.RunMode.INTERACTIVE`).
   """
+
+  _REGISTRABLE_TYPE_NAME = 'enum'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.enum_combo_box]
 
@@ -1296,6 +1322,17 @@ class EnumSetting(Setting):
   def _get_pdb_type(self, pdb_type):
     return self._enum_type
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      self._enum_type,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
+
   def _process_enum_type(self, enum_type):
     if isinstance(enum_type, GObject.GType):
       processed_enum_type = enum_type.name
@@ -1371,6 +1408,8 @@ class ChoiceSetting(Setting):
   _ALIASES = ['options']
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
+
+  _REGISTRABLE_TYPE_NAME = 'choice'
 
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.combo_box,
@@ -1555,6 +1594,18 @@ class ChoiceSetting(Setting):
     else:
       return None
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Pass a `Gimp.Choice` instance to __init__ instead
+      Gimp.Choice.new(),
+      self._items_by_value[self._default_value],
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class StringSetting(Setting):
   """Class for string settings.
@@ -1569,12 +1620,24 @@ class StringSetting(Setting):
   
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
+  _REGISTRABLE_TYPE_NAME = 'string'
+
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.entry,
     _SETTING_GUI_TYPES.label,
   ]
 
   _DEFAULT_DEFAULT_VALUE = ''
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class ImageSetting(Setting):
@@ -1592,6 +1655,8 @@ class ImageSetting(Setting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Image]
+
+  _REGISTRABLE_TYPE_NAME = 'image'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.image_combo_box]
   
@@ -1619,6 +1684,17 @@ class ImageSetting(Setting):
   def _validate(self, image):
     if image is not None and not image.is_valid():
       return 'invalid image', 'invalid_value'
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing this as a parameter to ImageSetting
+      False,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class GimpItemSetting(Setting):
@@ -1671,6 +1747,17 @@ class GimpItemSetting(Setting):
     else:
       return None
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing this as a parameter to GimpItemSetting
+      False,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class ItemSetting(GimpItemSetting):
   """Class for settings holding `Gimp.Item` instances.
@@ -1683,6 +1770,8 @@ class ItemSetting(GimpItemSetting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Item]
+
+  _REGISTRABLE_TYPE_NAME = 'item'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.item_combo_box]
   
@@ -1706,6 +1795,8 @@ class DrawableSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Drawable]
 
+  _REGISTRABLE_TYPE_NAME = 'drawable'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.drawable_combo_box]
   
   def _copy_value(self, value):
@@ -1727,6 +1818,8 @@ class LayerSetting(GimpItemSetting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Layer]
+
+  _REGISTRABLE_TYPE_NAME = 'layer'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_combo_box]
   
@@ -1750,6 +1843,8 @@ class GroupLayerSetting(GimpItemSetting):
 
   _ALLOWED_PDB_TYPES = [Gimp.GroupLayer]
 
+  _REGISTRABLE_TYPE_NAME = 'group_layer'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.group_layer_combo_box]
 
   def _copy_value(self, value):
@@ -1771,6 +1866,8 @@ class TextLayerSetting(GimpItemSetting):
   """
 
   _ALLOWED_PDB_TYPES = [Gimp.TextLayer]
+
+  _REGISTRABLE_TYPE_NAME = 'text_layer'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.text_layer_combo_box]
 
@@ -1797,6 +1894,8 @@ class LayerMaskSetting(GimpItemSetting):
   """
 
   _ALLOWED_PDB_TYPES = [Gimp.LayerMask]
+
+  _REGISTRABLE_TYPE_NAME = 'layer_mask'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.layer_mask_combo_box]
 
@@ -1838,6 +1937,8 @@ class ChannelSetting(GimpItemSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Channel]
 
+  _REGISTRABLE_TYPE_NAME = 'channel'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.channel_combo_box]
   
   def _copy_value(self, value):
@@ -1864,6 +1965,8 @@ class SelectionSetting(ChannelSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Selection]
 
+  _REGISTRABLE_TYPE_NAME = 'selection'
+
   _ALLOWED_GUI_TYPES = []
 
 
@@ -1878,6 +1981,8 @@ class PathSetting(GimpItemSetting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Path]
+
+  _REGISTRABLE_TYPE_NAME = 'path'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.path_combo_box]
   
@@ -1903,6 +2008,8 @@ class ColorSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [Gegl.Color]
 
+  _REGISTRABLE_TYPE_NAME = 'color'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
@@ -1927,6 +2034,18 @@ class ColorSetting(Setting):
     if not isinstance(color, Gegl.Color):
       return 'invalid color', 'invalid_value'
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing this as a parameter to ColorSetting
+      False,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class DisplaySetting(Setting):
   """Class for settings holding `Gimp.Display` instances.
@@ -1946,6 +2065,8 @@ class DisplaySetting(Setting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Display]
+
+  _REGISTRABLE_TYPE_NAME = 'display'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.display_spin_button]
 
@@ -1969,6 +2090,17 @@ class DisplaySetting(Setting):
     if display is not None and not display.is_valid():
       return 'invalid display', 'invalid_value'
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing this as a parameter to DisplaySetting
+      False,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class ParasiteSetting(Setting):
   """Class for settings holding `Gimp.Parasite` instances.
@@ -1989,6 +2121,8 @@ class ParasiteSetting(Setting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Parasite]
+
+  _REGISTRABLE_TYPE_NAME = 'parasite'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_box]
 
@@ -2012,6 +2146,15 @@ class ParasiteSetting(Setting):
     if not isinstance(parasite, Gimp.Parasite):
       return 'invalid parasite', 'invalid_value'
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class FileSetting(Setting):
   """Class for settings storing files or directories as `Gio.File` instances
@@ -2027,6 +2170,8 @@ class FileSetting(Setting):
   _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_path('')
 
   _ALLOWED_PDB_TYPES = [Gio.File]
+
+  _REGISTRABLE_TYPE_NAME = 'file'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_file_entry]
 
@@ -2044,6 +2189,15 @@ class FileSetting(Setting):
   def _validate(self, file_):
     if not isinstance(file_, Gio.File):
       return 'invalid file', 'invalid_value'
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class ExportOptionsSetting(Setting):
@@ -2078,6 +2232,8 @@ class BytesSetting(Setting):
 
   _ALLOWED_PDB_TYPES = [GLib.Bytes]
 
+  _REGISTRABLE_TYPE_NAME = 'bytes'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_bytes_entry]
 
   def _raw_to_value(self, raw_value):
@@ -2099,6 +2255,15 @@ class BytesSetting(Setting):
   def _validate(self, file_):
     if not isinstance(file_, GLib.Bytes):
       return 'invalid byte sequence', 'invalid_value'
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class GimpResourceSetting(Setting):
@@ -2165,6 +2330,20 @@ class GimpResourceSetting(Setting):
     if resource is not None and not resource.is_valid():
       return 'invalid resource', 'invalid_value'
 
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing this as a parameter to GimpResourceSetting
+      False,
+      self._default_value,
+      # TODO: Allow passing this as a parameter to GimpResourceSetting
+      False,
+      GObject.ParamFlags.READWRITE,
+    ]
+
 
 class BrushSetting(GimpResourceSetting):
   """Class for settings storing brushes.
@@ -2179,6 +2358,8 @@ class BrushSetting(GimpResourceSetting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Brush]
+
+  _REGISTRABLE_TYPE_NAME = 'brush'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.brush_chooser]
 
@@ -2215,6 +2396,8 @@ class FontSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Font]
 
+  _REGISTRABLE_TYPE_NAME = 'font'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.font_chooser]
 
   def __init__(self, name, **kwargs):
@@ -2235,6 +2418,8 @@ class GradientSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Gradient]
 
+  _REGISTRABLE_TYPE_NAME = 'gradient'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.gradient_chooser]
 
   def __init__(self, name, **kwargs):
@@ -2254,6 +2439,8 @@ class PaletteSetting(GimpResourceSetting):
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Palette]
+
+  _REGISTRABLE_TYPE_NAME = 'palette'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.palette_chooser]
 
@@ -2284,6 +2471,8 @@ class PatternSetting(GimpResourceSetting):
   
   _ALLOWED_PDB_TYPES = [Gimp.Pattern]
 
+  _REGISTRABLE_TYPE_NAME = 'pattern'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.pattern_chooser]
 
   def __init__(self, name, **kwargs):
@@ -2301,9 +2490,24 @@ class UnitSetting(IntSetting):
 
   _ALLOWED_PDB_TYPES = [Gimp.Unit]
 
+  _REGISTRABLE_TYPE_NAME = 'unit'
+
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._name,
+      self._display_name,
+      self._description,
+      # TODO: Allow passing these as parameters to UnitSetting
+      False,
+      False,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
 
 
 class ArraySetting(Setting):
@@ -2363,8 +2567,8 @@ class ArraySetting(Setting):
   * `Gimp.Int32Array`
   * `Gimp.DoubleArray`
   * `GObject.TYPE_STRV` (string array)
-  * `Gimp.CoreObjectArray` - GIMP objects (e.g. images, layers, channels,
-    paths, brushes, patterns, ...).
+  * object arrays, i.e. arrays containing GIMP objects (e.g. images, layers,
+    channels, ...).
   
   Default value: `()`
   
@@ -2389,9 +2593,9 @@ class ArraySetting(Setting):
 
   _NATIVE_ARRAY_PDB_TYPES: Dict[Type[Setting], Tuple[GObject.GType, GObject.GType]]
   _NATIVE_ARRAY_PDB_TYPES = {
-    IntSetting: (Gimp.Int32Array, GObject.TYPE_INT),
-    DoubleSetting: (Gimp.DoubleArray, GObject.TYPE_DOUBLE),
-    StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING),
+    IntSetting: (Gimp.Int32Array, GObject.TYPE_INT, 'int32_array'),
+    DoubleSetting: (Gimp.DoubleArray, GObject.TYPE_DOUBLE, 'double_array'),
+    StringSetting: (GObject.TYPE_STRV, GObject.TYPE_STRING, 'string_array'),
   }
 
   def __init__(
@@ -2512,6 +2716,30 @@ class ArraySetting(Setting):
     """
     return self._max_size
 
+  def get_pdb_param(self) -> Union[List, None]:
+    if self.can_be_used_in_pdb():
+      if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
+        return [
+          self._NATIVE_ARRAY_PDB_TYPES[self.element_type][2],
+          self._name,
+          self._display_name,
+          self._description,
+          GObject.ParamFlags.READWRITE,
+        ]
+      elif self._reference_element.can_be_used_in_pdb():
+        return [
+          'core_object_array',
+          self._name,
+          self._display_name,
+          self._description,
+          self._reference_element.pdb_type,
+          GObject.ParamFlags.READWRITE,
+        ]
+      else:
+        return None
+    else:
+      return None
+
   def to_dict(self) -> Dict:
     settings_dict = super().to_dict()
     
@@ -2608,19 +2836,6 @@ class ArraySetting(Setting):
     """Returns a list of array elements as `Setting` instances."""
     return list(self._elements)
   
-  def get_pdb_param(self) -> Union[List[Dict[str, Any]], None]:
-    if self.can_be_registered_to_pdb():
-      return [
-        dict(
-            name=self.pdb_name,
-            type=self.pdb_type,
-            nick=self.display_name,
-            blurb=self.description,
-        )
-      ]
-    else:
-      return None
-  
   def _raw_to_value(self, raw_value_array):
     if isinstance(raw_value_array, Iterable) and not isinstance(raw_value_array, str):
       return tuple(
@@ -2691,7 +2906,7 @@ class ArraySetting(Setting):
   def _get_default_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][0]
-    elif self._reference_element.can_be_registered_to_pdb():
+    elif self._reference_element.can_be_used_in_pdb():
       return GObject.GType.from_name('GimpCoreObjectArray')
     else:
       return None
@@ -2699,11 +2914,11 @@ class ArraySetting(Setting):
   def _get_default_element_pdb_type(self):
     if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
       return self._NATIVE_ARRAY_PDB_TYPES[self.element_type][1]
-    elif self._reference_element.can_be_registered_to_pdb():
+    elif self._reference_element.can_be_used_in_pdb():
       return self._reference_element.pdb_type
     else:
       return None
-  
+
   def _create_reference_element(self):
     """Creates a reference element to access and validate the element default
     value.

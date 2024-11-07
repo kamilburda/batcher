@@ -338,7 +338,7 @@ def _load_settings_from_file(settings, settings_file, source_name):
 def _set_settings_from_args(settings, config):
   args_as_settings = [
     setting for setting in settings
-    if isinstance(setting, pg.setting.Setting) and setting.can_be_registered_to_pdb()]
+    if isinstance(setting, pg.setting.Setting) and setting.can_be_used_in_pdb()]
 
   args = [config.get_property(prop.name) for prop in config.list_properties()]
   # `config.list_properties()` contains additional properties or parameters

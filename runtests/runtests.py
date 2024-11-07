@@ -101,7 +101,7 @@ def run_tests(
   else:
     should_append = (
       lambda name: (
-        any(name.startswith(module) for module in modules)
+        any(name.startswith(module_) for module_ in modules)
         and not any(name.startswith(ignored_module) for ignored_module in ignored_modules)))
 
   for importer, module_name, is_package in pkgutil.walk_packages(path=[dirpath]):
@@ -194,48 +194,61 @@ pg.register_procedure(
   plug_in_run_tests,
   procedure_type=Gimp.Procedure,
   arguments=[
-    dict(
-      name='run-mode',
-      type=Gimp.RunMode,
-      default=Gimp.RunMode.NONINTERACTIVE,
-      nick='Run mode',
-      blurb='The run mode'),
-    dict(
-      name='dirpath',
-      type=str,
-      default=PLUGIN_DIRPATH,
-      nick='_Directory',
-      blurb='Directory path containing test modules'),
-    dict(
-      name='prefix',
-      type=str,
-      default='test_',
-      nick='_Prefix of test modules',
-      blurb='Prefix of test modules'),
-    dict(
-      name='modules',
-      type=GObject.TYPE_STRV,
-      default=[],
-      nick='Modules to _include',
-      blurb='Modules to include'),
-    dict(
-      name='ignored_modules',
-      type=GObject.TYPE_STRV,
-      default=[],
-      nick='Modules to i_gnore',
-      blurb='Modules to ignore'),
-    dict(
-      name='output_stream',
-      type=str,
-      default='stderr',
-      nick='_Output stream',
-      blurb='Output stream or file path to write output to'),
-    dict(
-      name='verbose',
-      type=bool,
-      default=False,
-      nick='_Verbose',
-      blurb='If True, writes more detailed output'),
+    [
+      'enum',
+      'run-mode',
+      'Run mode',
+      'The run mode',
+      Gimp.RunMode,
+      Gimp.RunMode.NONINTERACTIVE,
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'string',
+      'dirpath',
+      '_Directory',
+      'Directory path containing test modules',
+      PLUGIN_DIRPATH,
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'string',
+      'prefix',
+      '_Prefix of test modules',
+      'Prefix of test modules',
+      'test_',
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'string_array',
+      'modules',
+      'Modules to _include',
+      'Modules to include',
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'string_array',
+      'ignored_modules',
+      'Modules to i_gnore',
+      'Modules to ignore',
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'string',
+      'output_stream',
+      '_Output stream',
+      'Output stream or file path to write output to',
+      'stderr',
+      GObject.ParamFlags.READWRITE,
+    ],
+    [
+      'boolean',
+      'verbose',
+      '_Verbose',
+      'If True, writes more detailed output',
+      False,
+      GObject.ParamFlags.READWRITE,
+    ],
   ],
   documentation=('Runs automated tests in the specified directory path', ''),
 )
