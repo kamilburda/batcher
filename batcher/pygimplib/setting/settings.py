@@ -1030,15 +1030,6 @@ class NumericSetting(Setting):
   For example, the maximum value allowed for type `GObject.TYPE_INT` would be
   `GLib.MAXINT`.
   """
-
-  _PDB_TYPES_AND_REGISTRABLE_TYPE_NAMES = {
-    GObject.TYPE_INT: 'int',
-    GObject.TYPE_UINT: 'uint',
-    GObject.TYPE_DOUBLE: 'double',
-  }
-  """Mapping of PDB types to strings used for registering a setting as a GIMP
-  PDB procedure parameter.
-  """
   
   def __init__(self, name: str, min_value=None, max_value=None, **kwargs):
     self._min_value = min_value
@@ -1107,21 +1098,16 @@ class NumericSetting(Setting):
       return f'value cannot be greater than {self.pdb_max_value}', 'above_pdb_max'
 
   def _get_pdb_param(self):
-    type_ = self._PDB_TYPES_AND_REGISTRABLE_TYPE_NAMES.get(self._pdb_type, None)
-
-    if type_ is not None:
-      return [
-        type_,
-        self._pdb_name,
-        self._display_name,
-        self._description,
-        self._min_value if self._min_value is not None else self._pdb_min_value,
-        self._max_value if self._max_value is not None else self._pdb_max_value,
-        self._default_value,
-        GObject.ParamFlags.READWRITE,
-      ]
-    else:
-      return None
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._pdb_name,
+      self._display_name,
+      self._description,
+      self._min_value if self._min_value is not None else self._pdb_min_value,
+      self._max_value if self._max_value is not None else self._pdb_max_value,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
 
   def _check_min_and_max_values_against_pdb_min_and_max_values(self):
     if (self.min_value is not None
@@ -1141,17 +1127,36 @@ class IntSetting(NumericSetting):
   """Class for integer settings.
   
   Allowed GIMP PDB types:
-  * `GObject.TYPE_INT` (default)
-  * `GObject.TYPE_UINT`
+  * `GObject.TYPE_INT`
   
   Default value: 0
   """
   
   _ALIASES = ['integer']
   
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT, GObject.TYPE_UINT]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
 
   _REGISTRABLE_TYPE_NAME = 'int'
+
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
+
+  _DEFAULT_DEFAULT_VALUE = 0
+
+
+class UintSetting(NumericSetting):
+  """Class for unsigned integer settings.
+
+  Allowed GIMP PDB types:
+  * `GObject.TYPE_UINT`
+
+  Default value: 0
+  """
+
+  _ALIASES = ['unsigned_integer']
+
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_UINT]
+
+  _REGISTRABLE_TYPE_NAME = 'uint'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
 

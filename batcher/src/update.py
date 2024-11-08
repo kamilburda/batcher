@@ -700,6 +700,10 @@ def _update_to_0_6(data, _settings, source_names):
               elif argument_dict['pdb_type'] in ['guint64', 'gulong', 'guchar']:
                 argument_dict['pdb_type'] = 'guint'
 
+          if argument_dict['type'] == 'int':
+            if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'guint':
+              argument_dict['type'] = 'uint'
+
           if argument_dict['type'] == 'float':
             argument_dict['type'] = 'double'
             if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'float_spin_button':

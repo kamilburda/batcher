@@ -751,6 +751,34 @@ class TestIntSetting(SettingTestCase):
       })
 
 
+class TestUintSetting(SettingTestCase):
+
+  def setUp(self):
+    self.setting = settings_.UintSetting('count', default_value=1, max_value=100)
+
+  def test_value_below_pdb_min_is_not_valid(self):
+    setting = settings_.UintSetting('count')
+
+    setting.set_value(-1)
+
+    self.assertFalse(setting.is_valid)
+
+  def test_min_value_below_pdb_min_is_not_valid(self):
+    with self.assertRaises(ValueError):
+      settings_.UintSetting('count', min_value=-1)
+
+  def test_to_dict(self):
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'count',
+        'type': 'uint',
+        'value': 1,
+        'default_value': 1,
+        'max_value': 100,
+      })
+
+
 class TestDoubleSetting(SettingTestCase):
   
   def setUp(self):
@@ -2490,7 +2518,7 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
   def test_uint_setting(self):
     self.assertEqual(
       settings_.get_setting_type_from_gtype(GObject.TYPE_UINT, None),
-      (settings_.IntSetting, dict(pdb_type=GObject.TYPE_UINT)),
+      (settings_.UintSetting, dict(pdb_type=GObject.TYPE_UINT)),
     )
 
   def test_enum(self):

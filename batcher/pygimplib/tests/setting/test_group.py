@@ -135,39 +135,36 @@ class TestGroupAddFromDict(unittest.TestCase):
     self.assertIsNone(settings['use_layer_size'].pdb_type)
   
   def test_add_with_group_level_attributes_overridden_by_setting_attributes(self):
-    settings = group_.Group(name='main', setting_attributes={'pdb_type': None})
+    settings = group_.Group(name='main', setting_attributes={'display_name': 'some_name'})
     settings.add([
       {'type': 'bool', 'name': 'flatten'},
       {
        'type': 'int',
        'name': 'drawables',
-       'pdb_type': GObject.TYPE_UINT,
+       'display_name': 'some_other_name',
       }
     ])
-    
-    self.assertIsNone(settings['flatten'].pdb_type)
-    self.assertEqual(settings['drawables'].pdb_type, GObject.TYPE_UINT)
+
+    self.assertEqual(settings['flatten'].display_name, 'some_name')
+    self.assertEqual(settings['drawables'].display_name, 'some_other_name')
   
   def test_add_with_group_level_attributes_overridden_by_child_group_attributes(self):
     additional_settings = group_.Group(
-      name='additional', setting_attributes={'pdb_type': GObject.TYPE_UINT})
+      name='additional', setting_attributes={'display_name': 'some_other_name'})
     additional_settings.add([{'type': 'int', 'name': 'drawables'}])
     
-    settings = group_.Group(
-      name='main', setting_attributes={'pdb_type': None, 'display_name': 'Setting name'})
+    settings = group_.Group(name='main', setting_attributes={'display_name': 'some_name'})
     settings.add([
       {'type': 'bool', 'name': 'flatten'},
       additional_settings,
     ])
-    
-    self.assertIsNone(settings['flatten'].pdb_type)
-    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_UINT)
-    self.assertEqual(settings['flatten'].display_name, 'Setting name')
-    self.assertEqual(settings['additional/drawables'].display_name, 'Drawables')
+
+    self.assertEqual(settings['flatten'].display_name, 'some_name')
+    self.assertEqual(settings['additional/drawables'].display_name, 'some_other_name')
   
   def test_add_with_top_group_attributes_applied_recursively(self):
     settings = group_.Group(
-      name='main', setting_attributes={'pdb_type': GObject.TYPE_UINT})
+      name='main', setting_attributes={'display_name': 'some_name'})
     
     additional_settings = group_.Group(name='additional')
     
@@ -178,26 +175,26 @@ class TestGroupAddFromDict(unittest.TestCase):
     
     additional_settings.add([{'type': 'int', 'name': 'drawables'}])
     
-    self.assertEqual(settings['images'].pdb_type, GObject.TYPE_UINT)
-    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_UINT)
+    self.assertEqual(settings['images'].display_name, 'some_name')
+    self.assertEqual(settings['additional/drawables'].display_name, 'some_name')
   
   def test_add_with_top_group_attributes_not_applied_recursively_if_disabled(self):
     settings = group_.Group(
       name='main',
-      setting_attributes={'pdb_type': GObject.TYPE_UINT},
+      setting_attributes={'display_name': 'some_other_name'},
       recurse_setting_attributes=False)
     
     additional_settings = group_.Group(name='additional')
     
     settings.add([
-      {'type': 'int', 'name': 'images'},
+      {'type': 'int', 'name': 'images', 'display_name': 'some_name'},
       additional_settings,
     ])
     
-    additional_settings.add([{'type': 'int', 'name': 'drawables'}])
+    additional_settings.add([{'type': 'int', 'name': 'drawables', 'display_name': 'some_name'}])
     
-    self.assertEqual(settings['images'].pdb_type, GObject.TYPE_UINT)
-    self.assertEqual(settings['additional/drawables'].pdb_type, GObject.TYPE_INT)
+    self.assertEqual(settings['images'].display_name, 'some_name')
+    self.assertEqual(settings['additional/drawables'].display_name, 'some_name')
 
 
 class TestGroupCreateGroupsFromDict(unittest.TestCase):
