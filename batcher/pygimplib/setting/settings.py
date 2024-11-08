@@ -3089,17 +3089,16 @@ def get_setting_type_from_gtype(
     # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
     # instance can have its minimum and maximum values properly adjusted.
     return setting_type, dict(pdb_type=gtype)
-
-  if hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
+  elif hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
     return EnumSetting, dict(enum_type=gtype)
-
-  if gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
+  elif gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
-
-  if hasattr(gtype, 'name') and gtype.name == 'GimpCoreObjectArray' and pdb_param_info is not None:
+  elif (hasattr(gtype, 'name')
+        and gtype.name == 'GimpCoreObjectArray'
+        and pdb_param_info is not None):
     return get_array_setting_type_from_gimp_core_object_array(pdb_param_info)
-
-  return None
+  else:
+    return None
 
 
 def get_array_setting_type_from_gimp_core_object_array(
