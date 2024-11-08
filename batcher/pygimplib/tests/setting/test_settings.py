@@ -257,7 +257,7 @@ class TestSetting(SettingTestCase):
       {
         'name': 'file_extension',
         'value': 'png',
-        'type': 'stub_usable_in_pdb',
+        'type': 'stub_registrable',
         'default_value': 'png',
         'pdb_type': 'gchararray',
       })
@@ -271,7 +271,7 @@ class TestSetting(SettingTestCase):
       {
         'name': 'file_extension',
         'value': 'png',
-        'type': 'stub_usable_in_pdb',
+        'type': 'stub_registrable',
         'default_value': 'png',
         'pdb_type': 'GimpRunMode',
       })
@@ -1472,16 +1472,27 @@ class TestColorSetting(SettingTestCase):
 
     setting.set_value(color)
 
-    self.assertDictEqual(
-      setting.to_dict(), {'name': 'color', 'value': [0.5, 0.2, 0.8, 0.4], 'type': 'color'})
+    actual_dict = setting.to_dict()
+
+    self.assertIn('value', actual_dict)
+
+    # We test the values separately due to floating point precision errors.
+    actual_values = actual_dict.pop('value')
+
+    self.assertDictEqual(actual_dict, {'name': 'color', 'type': 'color'})
+    for value, expected_value in zip(actual_values, [0.5, 0.2, 0.8, 0.4]):
+      self.assertAlmostEqual(value, expected_value)
 
   @staticmethod
   def _assert_color_equal(color1, color2):
+    rgba1 = color1.get_rgba()
+    rgba2 = color2.get_rgba()
+
     return (
-      color1.red == color2.red
-      and color1.green == color2.green
-      and color1.blue == color2.blue
-      and color1.alpha == color2.alpha
+      rgba1.red == rgba2.red
+      and rgba1.green == rgba2.green
+      and rgba1.blue == rgba2.blue
+      and rgba1.alpha == rgba2.alpha
     )
 
 

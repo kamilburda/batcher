@@ -5,21 +5,22 @@ import gi
 
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import procedure as pgprocedure
 from .. import utils as pgutils
 
 
-def sample_procedure(*args, **kwargs):
+def sample_procedure(*_args, **_kwargs):
   pass
 
 
-def sample_procedure_2(*args, **kwargs):
+def sample_procedure_2(*_args, **_kwargs):
   pass
 
 
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp.ImageProcedure.new')
+@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp')
 class TestProcedure(unittest.TestCase):
 
   def setUp(self):
@@ -28,18 +29,63 @@ class TestProcedure(unittest.TestCase):
 
     pgprocedure.set_use_locale(False)
 
-  def test_register_single_procedure(self, mock_gimp_procedure):
+    self.run_mode_argument = [
+      'enum',
+      'run-mode',
+      'Run mode',
+      'The run mode',
+      Gimp.RunMode,
+      Gimp.RunMode.NONINTERACTIVE,
+      GObject.ParamFlags.READWRITE,
+    ]
+
+    self.output_directory_argument = [
+      'string',
+      'output-directory',
+      'Output directory',
+      'Output directory',
+      'some_dir',
+      GObject.ParamFlags.READWRITE,
+    ]
+
+    self.num_layers_return_value = [
+      'integer',
+      'num-layers',
+      'Number of processed layers',
+      'Number of processed layers',
+      0,
+      GLib.MAXINT,
+      0,
+      GObject.ParamFlags.READWRITE,
+    ]
+
+    self.aux_argument = [
+      'string',
+      'config-only-arg',
+      'Config-only argument',
+      'Config-only argument',
+      '',
+      GObject.ParamFlags.READWRITE,
+    ]
+
+  def test_register_single_procedure(self, mock_gimp_module):
     pgprocedure.register_procedure(
       sample_procedure,
+      # We pass an explicit `procedure_type` argument since the default
+      # argument value would have to be mocked (the default value is the
+      # non-mocked `Gimp.ImageProcedure` class despite the `Gimp` module being
+      # mocked as the module was mocked after the `procedure` module was
+      # imported). This is more readable.
+      procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
-        dict(name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-        dict(name='output-directory', type=str, default='some_dir', nick='Output directory'),
+        self.run_mode_argument,
+        self.output_directory_argument,
       ],
       return_values=[
-        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
+        self.num_layers_return_value,
       ],
       auxiliary_arguments=[
-        dict(name='config-only-arg', type=str, default='', nick='Config-only argument')
+        self.aux_argument,
       ],
       menu_label='Sample Procedure',
       menu_path='<Image>/Filters',
@@ -51,169 +97,178 @@ class TestProcedure(unittest.TestCase):
 
     # Do not instantiate with `Gimp.PlugIn` as the parent class as objects of
     # these classes should not be instantiated outside `Gimp.main()`.
-    # We still need to specify `GObject.GObject` since its metaclass is
-    # responsible for initializing `GObject.Property` as class attributes.
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
-    plugin.do_create_procedure('sample-procedure')
+    plugin = pgprocedure._create_plugin_class(bases=())()
+
+    mock_procedure = plugin.do_create_procedure('sample-procedure')
 
     self.assertEqual(plugin.do_query_procedures(), ['sample-procedure'])
 
-    mock_procedure_object = mock_gimp_procedure.return_value
+    mock_procedure.add_enum_argument.assert_called_once_with(*self.run_mode_argument[1:])
+    mock_procedure.add_string_argument.assert_called_once_with(*self.output_directory_argument[1:])
+    mock_procedure.add_integer_return_value.assert_called_once_with(
+      *self.num_layers_return_value[1:])
+    mock_procedure.add_string_aux_argument.assert_called_once_with(*self.aux_argument[1:])
 
-    self.assertListEqual(
-      [call.args[1]
-       for call in mock_gimp_procedure.return_value.add_argument_from_property.call_args_list],
-      ['run-mode', 'output-directory'],
-    )
-    self.assertListEqual(
-      [call.args[1]
-       for call in mock_gimp_procedure.return_value.add_return_value_from_property.call_args_list],
-      ['num-layers'],
-    )
-    self.assertListEqual(
-      [call.args[1]
-       for call in mock_gimp_procedure.return_value.add_aux_argument_from_property.call_args_list],
-      ['config-only-arg'],
-    )
-
-    mock_procedure_object.set_menu_label.assert_called_once_with('Sample Procedure')
-    mock_procedure_object.add_menu_path.assert_called_once_with('<Image>/Filters')
-    mock_procedure_object.set_image_types.assert_called_once_with('*')
-    mock_procedure_object.set_documentation.assert_called_once_with(
+    mock_procedure.set_menu_label.assert_called_once_with('Sample Procedure')
+    mock_procedure.add_menu_path.assert_called_once_with('<Image>/Filters')
+    mock_procedure.set_image_types.assert_called_once_with('*')
+    mock_procedure.set_documentation.assert_called_once_with(
       'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-procedure')
-    mock_procedure_object.set_attribution.assert_called_once_with(
+    mock_procedure.set_attribution.assert_called_once_with(
       'Jane Doe, John Doe', 'Jane Doe, John Doe', '2023')
-    mock_procedure_object.set_sensitivity_mask.assert_called_once_with(0)
+    mock_procedure.set_sensitivity_mask.assert_called_once_with(0)
 
     self.assertTrue(hasattr(plugin, 'do_set_i18n'))
 
-    plugin_class = type(plugin)
-
-    self.assertIsInstance(plugin_class.run_mode, GObject.Property)
-    self.assertEqual(plugin_class.run_mode.nick, 'Run mode')
-    self.assertEqual(plugin.run_mode, Gimp.RunMode.INTERACTIVE)
-
-    self.assertIsInstance(plugin_class.output_directory, GObject.Property)
-    self.assertEqual(plugin_class.output_directory.nick, 'Output directory')
-    self.assertEqual(plugin.output_directory, 'some_dir')
-
-    self.assertIsInstance(plugin_class.num_layers, GObject.Property)
-    self.assertEqual(plugin_class.num_layers.nick, 'Number of processed layers')
-    self.assertEqual(plugin.num_layers, 0)
-
-    self.assertIsInstance(plugin_class.config_only_arg, GObject.Property)
-    self.assertEqual(plugin_class.config_only_arg.nick, 'Config-only argument')
-    self.assertEqual(plugin.config_only_arg, '')
-
-  def test_create_procedure_no_matching_name(self, mock_gimp_procedure):
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
+  def test_create_procedure_no_matching_name(self, _mock_gimp_module):
+    plugin = pgprocedure._create_plugin_class(bases=())()
     self.assertIsNone(plugin.do_create_procedure('nonexistent-procedure'))
 
-  def test_register_procedure_with_locale(self, *mocks):
+  def test_register_procedure_with_locale(self, mock_gimp_module):
     pgprocedure.set_use_locale(True)
-    pgprocedure.register_procedure(sample_procedure)
+    pgprocedure.register_procedure(
+      sample_procedure,
+      procedure_type=mock_gimp_module.ImageProcedure
+    )
 
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
+    plugin = pgprocedure._create_plugin_class(bases=())()
 
     self.assertFalse(hasattr(plugin, 'do_set_i18n'))
 
-  def test_register_procedure_with_multiple_menu_paths(self, mock_gimp_procedure):
+  def test_register_procedure_with_multiple_menu_paths(self, mock_gimp_module):
     pgprocedure.register_procedure(
       sample_procedure,
+      procedure_type=mock_gimp_module.ImageProcedure,
       menu_path=['<Image>/Filters', '<Image>/Colors'],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
-    plugin.do_create_procedure('sample-procedure')
+    plugin = pgprocedure._create_plugin_class(bases=())()
+    mock_procedure = plugin.do_create_procedure('sample-procedure')
 
     self.assertListEqual(
-      mock_gimp_procedure.return_value.add_menu_path.call_args_list,
+      mock_procedure.add_menu_path.call_args_list,
       [(('<Image>/Filters',),), (('<Image>/Colors',),)],
     )
 
-  def test_register_procedure_with_documentation_of_3_elements(self, mock_gimp_procedure):
+  def test_register_procedure_with_documentation_of_3_elements(self, mock_gimp_module):
     pgprocedure.register_procedure(
       sample_procedure,
+      procedure_type=mock_gimp_module.ImageProcedure,
       documentation=(
         'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc'),
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
-    plugin.do_create_procedure('sample-procedure')
+    plugin = pgprocedure._create_plugin_class(bases=())()
+    mock_procedure = plugin.do_create_procedure('sample-procedure')
 
-    mock_gimp_procedure.return_value.set_documentation.assert_called_once_with(
+    mock_procedure.set_documentation.assert_called_once_with(
       'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc')
 
-  def test_register_multiple_procedures(self, mock_gimp_procedure):
+  def test_register_multiple_procedures(self, mock_gimp_module):
+    mock_gimp_module.ImageProcedure.new.side_effect = [
+      mock.Mock(),
+      mock.Mock(),
+    ]
+
     pgprocedure.register_procedure(
       sample_procedure,
+      procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
-        dict(name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-        dict(name='output-directory', type=str, default='some_dir', nick='Output directory'),
+        self.run_mode_argument,
+        self.output_directory_argument,
       ],
       return_values=[
-        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
+        self.num_layers_return_value,
       ],
     )
 
     pgprocedure.register_procedure(
       sample_procedure_2,
+      procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
-        'run-mode',
-        dict(name='output-directory-2', type=str, default='some_dir_2', nick='Output directory 2'),
+        self.run_mode_argument,
+        self.output_directory_argument,
       ],
       return_values=[
-        dict(name='num-layers', type=int, default=0, nick='Number of processed layers'),
+        self.num_layers_return_value,
       ],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=(GObject.GObject,))()
-    plugin.do_create_procedure('sample-procedure')
-    plugin.do_create_procedure('sample-procedure-2')
+    plugin = pgprocedure._create_plugin_class(bases=())()
+    mock_procedure = plugin.do_create_procedure('sample-procedure')
+    mock_procedure_2 = plugin.do_create_procedure('sample-procedure-2')
 
-    self.assertEqual(
-      [call.args[1] for call in mock_gimp_procedure.call_args_list],
-      ['sample-procedure', 'sample-procedure-2'])
+    self.assertEqual(plugin.do_query_procedures(), ['sample-procedure', 'sample-procedure-2'])
 
-    plugin_class = type(plugin)
+    mock_procedure.add_enum_argument.assert_called_once_with(*self.run_mode_argument[1:])
+    mock_procedure.add_string_argument.assert_called_once_with(*self.output_directory_argument[1:])
+    mock_procedure.add_integer_return_value.assert_called_once_with(
+      *self.num_layers_return_value[1:])
 
-    self.assertIsInstance(plugin_class.run_mode, GObject.Property)
-    self.assertEqual(plugin_class.run_mode.nick, 'Run mode')
-    self.assertEqual(plugin.run_mode, Gimp.RunMode.INTERACTIVE)
+    mock_procedure_2.add_enum_argument.assert_called_once_with(*self.run_mode_argument[1:])
+    mock_procedure_2.add_string_argument.assert_called_once_with(*self.output_directory_argument[1:])
+    mock_procedure_2.add_integer_return_value.assert_called_once_with(
+      *self.num_layers_return_value[1:])
 
-    self.assertIsInstance(plugin_class.output_directory, GObject.Property)
-    self.assertEqual(plugin_class.output_directory.nick, 'Output directory')
-    self.assertEqual(plugin.output_directory, 'some_dir')
-
-    self.assertIsInstance(plugin_class.output_directory_2, GObject.Property)
-    self.assertEqual(plugin_class.output_directory_2.nick, 'Output directory 2')
-    self.assertEqual(plugin.output_directory_2, 'some_dir_2')
-
-    self.assertIsInstance(plugin_class.num_layers, GObject.Property)
-    self.assertEqual(plugin_class.num_layers.nick, 'Number of processed layers')
-    self.assertEqual(plugin.num_layers, 0)
-
-  def test_register_procedure_raises_error_if_dict_is_missing_name(self, *mocks):
-    with self.assertRaises(ValueError):
+  def test_register_procedure_raises_error_if_type_is_not_string(self, mock_gimp_module):
+    with self.assertRaises(TypeError):
       pgprocedure.register_procedure(
         sample_procedure,
+        procedure_type=mock_gimp_module.ImageProcedure,
         arguments=[
-          dict(type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
+          [
+            Gimp.RunMode,
+            'run-mode',
+            'Run mode',
+            'The run mode',
+            Gimp.RunMode,
+            Gimp.RunMode.NONINTERACTIVE,
+            GObject.ParamFlags.READWRITE,
+          ],
         ],
       )
 
-  def test_register_procedure_raises_error_if_as_string_has_no_corresponding_dict(self, *mocks):
+  def test_register_procedure_raises_error_if_multiple_arguments_have_same_name(
+        self, mock_gimp_module):
     with self.assertRaises(ValueError):
       pgprocedure.register_procedure(
         sample_procedure,
+        procedure_type=mock_gimp_module.ImageProcedure,
         arguments=[
-          dict(
-            name='run-mode', type=Gimp.RunMode, default=Gimp.RunMode.INTERACTIVE, nick='Run mode'),
-          'output-directory',
+          [
+            'enum',
+            'run-mode',
+            'Run mode',
+            'The run mode',
+            Gimp.RunMode,
+            Gimp.RunMode.NONINTERACTIVE,
+            GObject.ParamFlags.READWRITE,
+          ],
+          [
+            'enum',
+            'run-mode',
+            'Run mode',
+            'The run mode',
+            Gimp.RunMode,
+            Gimp.RunMode.NONINTERACTIVE,
+            GObject.ParamFlags.READWRITE,
+          ],
         ],
       )
 
-  def test_register_procedure_raises_error_if_registering_already_registered_proc(self, *mocks):
+  def test_register_procedure_raises_error_if_missing_mandatory_args(self, mock_gimp_module):
+    with self.assertRaises(ValueError):
+      pgprocedure.register_procedure(
+        sample_procedure,
+        procedure_type=mock_gimp_module.ImageProcedure,
+        arguments=[
+          [
+            'enum',
+          ],
+        ],
+      )
+
+  def test_register_procedure_raises_error_if_proc_with_same_name_already_exists(self, *mocks):
     pgprocedure.register_procedure(sample_procedure)
     with self.assertRaises(ValueError):
       pgprocedure.register_procedure(sample_procedure)

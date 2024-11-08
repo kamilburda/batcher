@@ -1112,7 +1112,7 @@ class NumericSetting(Setting):
     if type_ is not None:
       return [
         type_,
-        self._name,
+        self._pdb_name,
         self._display_name,
         self._description,
         self._min_value if self._min_value is not None else self._pdb_min_value,
@@ -1207,7 +1207,7 @@ class BoolSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       self._default_value,
@@ -1325,7 +1325,7 @@ class EnumSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       self._enum_type,
@@ -1597,7 +1597,7 @@ class ChoiceSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Pass a `Gimp.Choice` instance to __init__ instead
@@ -1632,7 +1632,7 @@ class StringSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       self._default_value,
@@ -1688,7 +1688,7 @@ class ImageSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing this as a parameter to ImageSetting
@@ -1750,7 +1750,7 @@ class GimpItemSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing this as a parameter to GimpItemSetting
@@ -2037,7 +2037,7 @@ class ColorSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing this as a parameter to ColorSetting
@@ -2093,7 +2093,7 @@ class DisplaySetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing this as a parameter to DisplaySetting
@@ -2149,7 +2149,7 @@ class ParasiteSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       GObject.ParamFlags.READWRITE,
@@ -2193,7 +2193,7 @@ class FileSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       GObject.ParamFlags.READWRITE,
@@ -2259,7 +2259,7 @@ class BytesSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       GObject.ParamFlags.READWRITE,
@@ -2333,7 +2333,7 @@ class GimpResourceSetting(Setting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing this as a parameter to GimpResourceSetting
@@ -2499,7 +2499,7 @@ class UnitSetting(IntSetting):
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,
-      self._name,
+      self._pdb_name,
       self._display_name,
       self._description,
       # TODO: Allow passing these as parameters to UnitSetting
@@ -2721,7 +2721,7 @@ class ArraySetting(Setting):
       if self.element_type in self._NATIVE_ARRAY_PDB_TYPES:
         return [
           self._NATIVE_ARRAY_PDB_TYPES[self.element_type][2],
-          self._name,
+          self._pdb_name,
           self._display_name,
           self._description,
           GObject.ParamFlags.READWRITE,
@@ -2729,7 +2729,7 @@ class ArraySetting(Setting):
       elif self._reference_element.can_be_used_in_pdb():
         return [
           'core_object_array',
-          self._name,
+          self._pdb_name,
           self._display_name,
           self._description,
           self._reference_element.pdb_type,
@@ -3096,7 +3096,7 @@ def get_setting_type_from_gtype(
   if gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
 
-  if gtype.name == 'GimpCoreObjectArray' and pdb_param_info is not None:
+  if hasattr(gtype, 'name') and gtype.name == 'GimpCoreObjectArray' and pdb_param_info is not None:
     return get_array_setting_type_from_gimp_core_object_array(pdb_param_info)
 
   return None

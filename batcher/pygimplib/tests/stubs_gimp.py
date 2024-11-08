@@ -510,6 +510,7 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   Item = Item
   Layer = Layer
+  GroupLayer = GroupLayer
   LayerMask = LayerMask
   Channel = Channel
   Path = Path

@@ -33,74 +33,104 @@ class TestCreateParams(unittest.TestCase):
     self.assertEqual(len(params), 1)
     self.assertListEqual(
       param,
-      dict(
-        name='file-extension',
-        type=GObject.TYPE_STRING,
-        default='png',
-        nick='File extension',
-        blurb='File extension',
-      ))
+      [
+        'string',
+        'file-extension',
+        'File extension',
+        'File extension',
+        'png',
+        GObject.ParamFlags.READWRITE,
+      ])
   
   def test_create_multiple_params(self):
     params = pdbparams_.create_params(
       self.string_setting, self.coordinates_setting, self.settings)
 
-    self.assertEqual(len(params), 3)
+    self.assertEqual(len(params), 2)
     
     self.assertListEqual(
       params[0],
-      dict(
-        name='file-extension',
-        type=GObject.TYPE_STRING,
-        default='png',
-        nick='File extension',
-        blurb='File extension',
-      ))
+      [
+        'string',
+        'file-extension',
+        'File extension',
+        'File extension',
+        'png',
+        GObject.ParamFlags.READWRITE,
+      ])
     
     self.assertEqual(
       params[1],
-      dict(
-        name='coordinates',
-        type=Gimp.DoubleArray,
-        nick='Coordinates',
-        blurb='Coordinates',
-      ))
+      [
+        'double_array',
+        'coordinates',
+        'Coordinates',
+        'Coordinates',
+        GObject.ParamFlags.READWRITE,
+      ])
 
   def test_create_multiple_params_recursive(self):
     params = pdbparams_.create_params(
       self.string_setting, self.coordinates_setting, self.settings, recursive=True)
 
-    self.assertEqual(len(params), 6)
+    self.assertEqual(len(params), 5)
 
     self.assertListEqual(
       params[0],
-      dict(
-        name='file-extension',
-        type=GObject.TYPE_STRING,
-        default='png',
-        nick='File extension',
-        blurb='File extension',
-      ))
+      [
+        'string',
+        'file-extension',
+        'File extension',
+        'File extension',
+        'png',
+        GObject.ParamFlags.READWRITE,
+      ])
 
     self.assertEqual(
       params[1],
-      dict(
-        name='coordinates',
-        type=Gimp.DoubleArray,
-        nick='Coordinates',
-        blurb='Coordinates',
-      ))
-    
-    for param, setting in zip(params[3:], self.settings.walk()):
-      self.assertListEqual(
-        param,
-        dict(
-          name=setting.pdb_name,
-          type=setting.pdb_type,
-          default=setting.default_value,
-          nick=setting.display_name,
-          blurb=setting.description,
-        ))
+      [
+        'double_array',
+        'coordinates',
+        'Coordinates',
+        'Coordinates',
+        GObject.ParamFlags.READWRITE,
+      ])
+
+    self.assertEqual(
+      params[2],
+      [
+        'string',
+        'file-extension',
+        'File extension',
+        'File extension',
+        'bmp',
+        GObject.ParamFlags.READWRITE,
+      ])
+
+    self.assertEqual(
+      params[3],
+      [
+        'boolean',
+        'flatten',
+        'Flatten',
+        'Flatten',
+        False,
+        GObject.ParamFlags.READWRITE,
+      ])
+
+    # We omit the `Gimp.Choice` object and check its contents manually below.
+    self.assertEqual(
+      params[4][:4] + params[4][5:],
+      [
+        'choice',
+        'overwrite-mode',
+        'Overwrite mode',
+        'Overwrite mode',
+        'rename_new',
+        GObject.ParamFlags.READWRITE,
+      ])
+
+    # TODO: Check for the contents of the `Gimp.Choice` instance
 
   def test_create_params_invalid_argument(self):
     with self.assertRaises(TypeError):

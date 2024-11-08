@@ -111,16 +111,17 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
           f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.side_effect = images
       temp_mock_gimp_module.Layer = stubs_gimp.GimpModuleStub.Layer
+      temp_mock_gimp_module.GroupLayer = stubs_gimp.GimpModuleStub.GroupLayer
 
       self.setting.set_value(
         {os.path.abspath('filename_1'): [
           ('Layer', 'item_1'),
           ('Layer', 'item_4/item_3'),
-          ('Layer', 'item_4', 'folder')],
+          ('GroupLayer', 'item_4', 'folder')],
          os.path.abspath('filename_2'): [
           ('Layer', 'item_7/item_5'),
-          ('Layer', 'item_6', 'folder'),
-          ('Layer', 'item_7', 'folder'),
+          ('GroupLayer', 'item_6', 'folder'),
+          ('GroupLayer', 'item_7', 'folder'),
           ('Layer', 'item_8')],
          os.path.abspath('filename_3'): [
            ('Layer', 'item_9'),
@@ -161,10 +162,10 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         os.path.abspath('filename_1'): [
           ['Layer', 'item_1'],
           ['Layer', 'item_4/item_3'],
-          ['Layer', 'item_4', 'folder']],
+          ['GroupLayer', 'item_4', 'folder']],
         os.path.abspath('filename_2'): [
           ['Layer', 'item_7/item_5'],
-          ['Layer', 'item_7', 'folder']],
+          ['GroupLayer', 'item_7', 'folder']],
       },
     }
 
@@ -196,7 +197,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
         os.path.abspath('filename_1'): [
           ['Layer', 'item_1'],
           ['Layer', 'item_4/item_3'],
-          ['Layer', 'item_4', 'folder']],
+          ['GroupLayer', 'item_4', 'folder']],
       },
     }
 
@@ -319,14 +320,13 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'display_name': 'image',
       },
       {
-        'name': 'drawables',
-        'type': pg.setting.ArraySetting,
-        'element_type': pg.setting.DrawableSetting,
-        'display_name': 'drawables',
-      },
-      {
         'name': 'file',
         'type': pg.setting.FileSetting,
+      },
+      {
+        'name': 'options',
+        'type': pg.setting.ExportOptionsSetting,
+        'display_name': 'options',
       },
     ]
 

@@ -219,4 +219,4 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     
     self.assertListEqual(
       replaced_args,
-      [Gimp.RunMode.NONINTERACTIVE, image, layer, 0, [], 10, 50, 'current_image'])
+      [Gimp.RunMode.NONINTERACTIVE, image, layer, (), 10, 50, 'current_image'])

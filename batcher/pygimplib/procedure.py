@@ -201,24 +201,26 @@ def _parse_and_check_parameters(parameters):
   processed_parameters = {}
 
   for param in parameters:
-    if isinstance(param, list):
-      if len(param) < 2:
+    processed_param = list(param)
+
+    if isinstance(processed_param, list):
+      if len(processed_param) < 2:
         raise ValueError(
           ('The list describing an argument or a return value must contain'
            ' at least two elements - type and name'))
 
-      if not isinstance(param[0], str):
+      if not isinstance(processed_param[0], str):
         raise TypeError('The type of the argument or return value must be a string')
 
-      if not isinstance(param[1], str):
+      if not isinstance(processed_param[1], str):
         raise TypeError('The name of the argument or return value must be a string')
 
-      name = param.pop(1).replace('_', '-')
+      name = processed_param.pop(1).replace('_', '-')
 
       if name in processed_parameters:
         raise ValueError(f'Argument or return value named "{name}" was already specified')
 
-      processed_parameters[name] = list(param)
+      processed_parameters[name] = processed_param
     else:
       raise TypeError('Only lists are allowed when specifying an argument or return value')
 

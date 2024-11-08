@@ -30,14 +30,13 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'display_name': 'image',
       },
       {
-        'name': 'drawables',
-        'type': pg.setting.ArraySetting,
-        'element_type': pg.setting.DrawableSetting,
-        'display_name': 'drawables',
-      },
-      {
         'name': 'file',
         'type': pg.setting.FileSetting,
+      },
+      {
+        'name': 'options',
+        'type': pg.setting.ExportOptionsSetting,
+        'display_name': 'options',
       },
     ]
 
@@ -75,6 +74,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     file_formats_.fill_file_format_options(file_format_options, 'jpg', 'export')
 
     mock_get_setting_data_from_pdb_procedure.assert_called_once()
+    self.assertEqual(len(file_format_options['jpg']), 1)
     self.assertIn('jpg', file_format_options)
     self.assertEqual(file_format_options['jpg']['quality'].value, 0.9)
 
