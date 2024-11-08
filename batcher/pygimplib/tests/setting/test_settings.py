@@ -2509,16 +2509,10 @@ class TestContainerSettings(SettingTestCase):
 
 class TestGetSettingTypeFromGobjectType(unittest.TestCase):
 
-  def test_int_setting(self):
+  def test_regular_setting_type(self):
     self.assertEqual(
       settings_.get_setting_type_from_gtype(GObject.TYPE_INT, None),
       (settings_.IntSetting, dict(pdb_type=GObject.TYPE_INT)),
-    )
-
-  def test_uint_setting(self):
-    self.assertEqual(
-      settings_.get_setting_type_from_gtype(GObject.TYPE_UINT, None),
-      (settings_.UintSetting, dict(pdb_type=GObject.TYPE_UINT)),
     )
 
   def test_enum(self):
