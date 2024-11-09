@@ -497,6 +497,70 @@ class Pattern(Resource):
   pass
 
 
+class Unit:
+
+  def __init__(self, name=None, factor=None, digits=None, symbol=None, abbreviation=None):
+    self._name = name
+    self._factor = factor
+    self._digits = digits
+    self._symbol = symbol
+    self._abbreviation = abbreviation
+
+  @classmethod
+  def new(cls, *args, **kwargs):
+    return Unit(*args, **kwargs)
+
+  @classmethod
+  def inch(cls):
+    return Unit._inch
+
+  @classmethod
+  def mm(cls):
+    return Unit._mm
+
+  @classmethod
+  def percent(cls):
+    return Unit._percent
+
+  @classmethod
+  def pica(cls):
+    return Unit._pica
+
+  @classmethod
+  def pixel(cls):
+    return Unit._pixel
+
+  @classmethod
+  def point(cls):
+    return Unit._point
+
+  def get_name(self):
+    return self._name
+
+  def get_factor(self):
+    return self._factor
+
+  def get_digits(self):
+    return self._digits
+
+  def get_symbol(self):
+    return self._symbol
+
+  def get_abbreviation(self):
+    return self._abbreviation
+
+  def is_built_in(self):
+    pass
+
+
+Unit._inch = Unit('inch')
+Unit._mm = Unit('mm')
+Unit._percent = Unit('percent')
+Unit._pica = Unit('pica')
+Unit._pixel = Unit('pixel')
+Unit._point = Unit('point')
+
+
 class CoreObjectArray:
 
   __gtype__ = GObject.GType.from_name('GimpCoreObjectArray')
@@ -523,6 +587,8 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Gradient = Gradient
   Palette = Palette
   Pattern = Pattern
+
+  Unit = Unit
 
   CoreObjectArray = CoreObjectArray
 

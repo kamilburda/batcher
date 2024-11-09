@@ -2484,22 +2484,45 @@ class PatternSetting(GimpResourceSetting):
     super().__init__(name, Gimp.Pattern, **kwargs)
 
 
-class UnitSetting(IntSetting):
-  """Class for integer settings representing IDs of `Gimp.Unit` instances.
+class UnitSetting(Setting):
+  """Class for settings storing `Gimp.Unit` instances.
 
   Allowed GIMP PDB types:
   * `Gimp.Unit`
 
-  Default value: 0
+  Default value: A `Gimp.Unit.pixel()` instance representing pixels.
   """
 
   _ALLOWED_PDB_TYPES = [Gimp.Unit]
 
   _REGISTRABLE_TYPE_NAME = 'unit'
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.int_spin_button]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.unit_combo_box]
 
-  _DEFAULT_DEFAULT_VALUE = 0
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Unit.pixel()
+
+  def __init__(self, name: str, show_pixels=True, show_percent=True, **kwargs):
+    self._show_pixels = show_pixels
+    self._show_percent = show_percent
+
+    self._built_in_units = {
+      Gimp.Unit.inch(): 'inch',
+      Gimp.Unit.mm(): 'mm',
+      Gimp.Unit.percent(): 'percent',
+      Gimp.Unit.pica(): 'pica',
+      Gimp.Unit.pixel(): 'pixel',
+      Gimp.Unit.point(): 'point',
+    }
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def show_pixels(self):
+    return self._show_pixels
+
+  @property
+  def show_percent(self):
+    return self._show_percent
 
   def _get_pdb_param(self):
     return [
@@ -2507,12 +2530,38 @@ class UnitSetting(IntSetting):
       self._pdb_name,
       self._display_name,
       self._description,
-      # TODO: Allow passing these as parameters to UnitSetting
-      False,
-      False,
+      self._show_pixels,
+      self._show_percent,
       self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
+
+  def _validate(self, unit):
+    if unit is None or not isinstance(unit, Gimp.Unit):
+      return 'invalid unit', 'invalid_value'
+
+  def _raw_to_value(self, raw_value: Union[Iterable, str]):
+    if isinstance(raw_value, str):
+      if hasattr(Gimp.Unit, raw_value):
+        return getattr(Gimp.Unit, raw_value)()
+      else:
+        return raw_value
+    elif isinstance(raw_value, Iterable):
+      return Gimp.Unit.new(*raw_value)
+    else:
+      return raw_value
+
+  def _value_to_raw(self, unit: Gimp.Unit) -> Union[List, str]:
+    if unit in self._built_in_units:
+      return self._built_in_units[unit]
+    else:
+      return [
+        unit.get_name(),
+        unit.get_factor(),
+        unit.get_digits(),
+        unit.get_symbol(),
+        unit.get_abbreviation(),
+      ]
 
 
 class ArraySetting(Setting):
@@ -2756,9 +2805,11 @@ class ArraySetting(Setting):
     
     return settings_dict
   
-  def __getitem__(self, index: int) -> Setting:
-    """Returns an array element at the specified index."""
-    return self._elements[index]
+  def __getitem__(self, index_or_slice: Union[int, slice]) -> Union[Setting, List[Setting]]:
+    """Returns an array element at the specified index, or a list of elements
+    if given a slice.
+    """
+    return self._elements[index_or_slice]
   
   def __delitem__(self, index: int):
     """Removes an array element at the specified index."""

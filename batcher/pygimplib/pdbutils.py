@@ -14,7 +14,6 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from . import constants as pgconstants
-from .pypdb import pdb
 
 
 def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
@@ -35,7 +34,7 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
     new_image.set_file(image_file)
 
   new_image.set_resolution(*image.get_resolution()[1:])
-  pdb.gimp_image_set_unit(new_image, pdb.gimp_image_get_unit(image))
+  new_image.set_unit(image.get_unit())
 
   _copy_image_parasites(image, new_image)
 

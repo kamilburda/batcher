@@ -1827,6 +1827,64 @@ class TestPaletteSetting(SettingTestCase):
       })
 
 
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+class TestUnitSetting(SettingTestCase):
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new=stubs_gimp.GimpModuleStub())
+  def setUp(self):
+    self.setting = settings_.UnitSetting('unit')
+
+  def test_create_with_default_default_value(self):
+    self.assertEqual(self.setting.value, stubs_gimp.Unit.pixel())
+
+  def test_set_value_with_object(self):
+    unit = stubs_gimp.Unit(name='custom')
+    self.setting.set_value(unit)
+
+    self.assertEqual(self.setting.value, unit)
+
+  def test_set_value_with_builtin_unit(self):
+    self.setting.set_value('percent')
+
+    self.assertEqual(self.setting.value, stubs_gimp.Unit.percent())
+
+  def test_set_value_with_list(self):
+    unit_args = ['some_unit', 2.0, 2, 'u', 'u']
+    self.setting.set_value(unit_args)
+
+    self.assertEqual(self.setting.value.get_name(), unit_args[0])
+    self.assertEqual(self.setting.value.get_factor(), unit_args[1])
+    self.assertEqual(self.setting.value.get_digits(), unit_args[2])
+    self.assertEqual(self.setting.value.get_symbol(), unit_args[3])
+    self.assertEqual(self.setting.value.get_abbreviation(), unit_args[4])
+
+  def test_to_dict_builtin_unit(self):
+    self.setting.set_value('percent')
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'unit',
+        'type': 'unit',
+        'value': 'percent',
+      })
+
+  def test_to_dict_custom_unit(self):
+    unit_args = ['some_unit', 2.0, 2, 'u', 'u']
+    self.setting.set_value(unit_args)
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'unit',
+        'type': 'unit',
+        'value': unit_args,
+      })
+
+
 class TestCreateArraySetting(SettingTestCase):
   
   def test_create(self):

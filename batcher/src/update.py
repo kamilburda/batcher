@@ -718,6 +718,14 @@ def _update_to_0_6(data, _settings, source_names):
             if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'GimpRGB':
               argument_dict['pdb_type'] = 'GeglColor'
 
+          if argument_dict['type'] == 'unit':
+            argument_dict['value'] = 'pixel'
+            argument_dict['default_value'] = 'pixel'
+            if 'pdb_type' in argument_dict:
+              argument_dict['pdb_type'] = 'GimpUnit'
+            if 'gui_type' in argument_dict:
+              argument_dict['gui_type'] = 'unit_combo_box'
+
           if argument_dict['type'] == 'array':
             argument_dict.pop('length_name', None)
 
