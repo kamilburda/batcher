@@ -2343,8 +2343,6 @@ class GimpResourceSetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = None
 
-  _EMPTY_VALUES = [None]
-
   def __init__(
         self,
         name: str,
