@@ -2501,7 +2501,7 @@ class UnitSetting(Setting):
 
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Unit.pixel()
 
-  def __init__(self, name: str, show_pixels=True, show_percent=True, **kwargs):
+  def __init__(self, name: str, show_pixels: bool = True, show_percent: bool = True, **kwargs):
     self._show_pixels = show_pixels
     self._show_percent = show_percent
 
@@ -2518,10 +2518,16 @@ class UnitSetting(Setting):
 
   @property
   def show_pixels(self):
+    """``True`` if pixels should be displayed as a unit for the setting's GUI,
+    ``False`` otherwise.
+    """
     return self._show_pixels
 
   @property
   def show_percent(self):
+    """``True`` if percentage should be displayed as a unit for the setting's
+    GUI, ``False`` otherwise.
+    """
     return self._show_percent
 
   def _get_pdb_param(self):
