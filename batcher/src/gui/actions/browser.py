@@ -151,7 +151,7 @@ class ActionBrowser(GObject.GObject):
         action_type = 'other'
       elif (procedure_name.startswith('plug-in-')
             or procedure.get_proc_type() in [
-                Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.EXTENSION, Gimp.PDBProcType.TEMPORARY]):
+                Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.PERSISTENT, Gimp.PDBProcType.TEMPORARY]):
         if self._has_plugin_procedure_image_or_drawable_arguments(action_dict):
           action_type = 'plug_ins'
         else:
