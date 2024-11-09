@@ -184,13 +184,14 @@ class ActionBrowser(GObject.GObject):
       self._tree_model[self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
       False)
 
-    first_selectable_row = self._tree_model[0].iterchildren().next()
-    if first_selectable_row is not None:
-      self._currently_filling_contents = True
+    first_selectable_path = self._tree_model[0].path
+    first_selectable_path.down()
 
-      self._tree_view.set_cursor(first_selectable_row.path)
+    self._currently_filling_contents = True
 
-      self._currently_filling_contents = False
+    self._tree_view.set_cursor(first_selectable_path)
+
+    self._currently_filling_contents = False
 
   def _get_selected_action(self, model=None, selected_iter=None):
     if model is None and selected_iter is None:
