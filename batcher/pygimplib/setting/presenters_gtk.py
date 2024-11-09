@@ -717,7 +717,7 @@ class BrushChooserPresenter(GimpResourceChooserPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.BrushChooser.new(setting.display_name, setting.value)
+    return GimpUi.BrushChooser.new(None, None, setting.value)
 
 
 class FontChooserPresenter(GimpResourceChooserPresenter):
@@ -727,7 +727,7 @@ class FontChooserPresenter(GimpResourceChooserPresenter):
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.FontChooser.new(setting.display_name, setting.value)
+    return GimpUi.FontChooser.new(None, None, setting.value)
 
 
 class GradientChooserPresenter(GimpResourceChooserPresenter):
@@ -737,7 +737,7 @@ class GradientChooserPresenter(GimpResourceChooserPresenter):
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.GradientChooser.new(setting.display_name, setting.value)
+    return GimpUi.GradientChooser.new(None, None, setting.value)
 
 
 class PaletteChooserPresenter(GimpResourceChooserPresenter):
@@ -747,7 +747,7 @@ class PaletteChooserPresenter(GimpResourceChooserPresenter):
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.PaletteChooser.new(setting.display_name, setting.value)
+    return GimpUi.PaletteChooser.new(None, None, setting.value)
 
 
 class PatternChooserPresenter(GimpResourceChooserPresenter):
@@ -757,7 +757,7 @@ class PatternChooserPresenter(GimpResourceChooserPresenter):
   """
   
   def _create_widget(self, setting, **kwargs):
-    return GimpUi.PatternChooser.new(setting.display_name, setting.value)
+    return GimpUi.PatternChooser.new(None, None, setting.value)
 
 
 class UnitComboBoxPresenter(GtkPresenter):
