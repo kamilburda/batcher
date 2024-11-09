@@ -1120,7 +1120,18 @@ class TestImageSetting(SettingTestCase):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
     self.setting = settings_.ImageSetting('image', default_value=self.image)
-  
+
+  def test_set_value_none_is_allowed(self):
+    self.setting.set_value(None)
+
+    self.assertTrue(self.setting.is_valid)
+
+  def test_set_value_none_is_not_allowed(self):
+    setting = settings_.ImageSetting('image', default_value=self.image, none_ok=False)
+    setting.set_value(None)
+
+    self.assertFalse(setting.is_valid)
+
   def test_set_value_with_object(self):
     image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
@@ -1254,7 +1265,7 @@ class TestGimpItemSetting(SettingTestCase):
     self.parent.children = [self.layer]
     
     self.setting = self.StubItemSetting('item', default_value=self.layer)
-  
+
   def test_set_value_with_object(self):
     layer = stubs_gimp.Layer(name='layer2')
     
