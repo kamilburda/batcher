@@ -1677,12 +1677,27 @@ class TestBrushSetting(SettingTestCase):
     self.brush = stubs_gimp.Brush(name='Star')
 
   def test_create_with_default_default_value(self):
-    self.assertIsNone(self.setting.value)
+    self.assertEqual(self.setting.value, stubs_gimp.GimpModuleStub.DEFAULT_BRUSH)
 
   def test_create_with_custom_default_value(self):
-    self.setting = settings_.BrushSetting('brush', default_value=self.brush)
+    setting = settings_.BrushSetting(
+      'brush', default_value=self.brush, default_to_context=False)
 
-    self.assertEqual(self.setting.value, self.brush)
+    self.assertEqual(setting.value, self.brush)
+
+  def test_none_is_allowed(self):
+    setting = settings_.BrushSetting('brush', default_value=self.brush)
+
+    setting.set_value(None)
+
+    self.assertIsNone(setting.value)
+
+  def test_none_is_not_allowed(self):
+    setting = settings_.BrushSetting('brush', default_value=self.brush, none_ok=False)
+
+    setting.set_value(None)
+
+    self.assertFalse(setting.is_valid)
 
   def test_set_value_with_object(self):
     brush = stubs_gimp.Brush()
@@ -1723,7 +1738,16 @@ class TestBrushSetting(SettingTestCase):
       {
         'name': 'brush',
         'type': 'brush',
-        'value': None,
+        'value': {
+          'name': None,
+          'angle': 0.0,
+          'aspect_ratio': 0.0,
+          'hardness': 0.0,
+          'radius': 0.0,
+          'shape': 0,
+          'spacing': 0,
+          'spikes': 0,
+        },
       })
 
   def test_to_dict(self):
@@ -1770,10 +1794,11 @@ class TestPaletteSetting(SettingTestCase):
     self.palette = stubs_gimp.Palette(name='Standard')
 
   def test_create_with_default_default_value(self):
-    self.assertIsNone(self.setting.value)
+    self.assertEqual(self.setting.value, stubs_gimp.GimpModuleStub.DEFAULT_PALETTE)
 
   def test_create_with_custom_default_value(self):
-    self.setting = settings_.PaletteSetting('palette', default_value=self.palette)
+    self.setting = settings_.PaletteSetting(
+      'palette', default_value=self.palette, default_to_context=False)
 
     self.assertEqual(self.setting.value, self.palette)
 
@@ -1804,7 +1829,7 @@ class TestPaletteSetting(SettingTestCase):
       {
         'name': 'palette',
         'type': 'palette',
-        'value': None,
+        'value': {'name': None, 'columns': 0},
       })
 
   def test_to_dict(self):

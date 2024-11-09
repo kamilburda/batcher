@@ -599,6 +599,32 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
 
   _PDB_INSTANCE = PdbStub()
 
+  DEFAULT_BRUSH = Brush()
+  DEFAULT_FONT = Font()
+  DEFAULT_GRADIENT = Gradient()
+  DEFAULT_PALETTE = Palette()
+  DEFAULT_PATTERN = Pattern()
+
   @classmethod
   def get_pdb(cls):
     return cls._PDB_INSTANCE
+
+  @classmethod
+  def context_get_brush(cls):
+    return cls.DEFAULT_BRUSH
+
+  @classmethod
+  def context_get_font(cls):
+    return cls.DEFAULT_FONT
+
+  @classmethod
+  def context_get_gradient(cls):
+    return cls.DEFAULT_GRADIENT
+
+  @classmethod
+  def context_get_palette(cls):
+    return cls.DEFAULT_PALETTE
+
+  @classmethod
+  def context_get_pattern(cls):
+    return cls.DEFAULT_PATTERN

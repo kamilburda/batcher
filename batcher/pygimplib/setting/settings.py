@@ -2294,11 +2294,34 @@ class GimpResourceSetting(Setting):
         self,
         name: str,
         resource_type: Union[GObject.GType, Type[GObject.GObject]],
+        none_ok: bool = True,
+        default_to_context: bool = True,
         **kwargs,
   ):
     self._resource_type = resource_type
+    self._none_ok = none_ok
+    self._default_to_context = default_to_context
+
+    if self._default_to_context:
+      kwargs['default_value'] = self._get_default_value_from_gimp_context()
 
     super().__init__(name, **kwargs)
+
+  @property
+  def none_ok(self):
+    """If ``True``, ``None`` is allowed as a valid value for this setting."""
+    return self._none_ok
+
+  @property
+  def default_to_context(self):
+    """If ``True``, `the default setting value is inferred from the GIMP
+    context (the currently active resource) and the ``default_value`` parameter
+    in `__init__()` is ignored.
+    """
+    return self._none_ok
+
+  def _get_default_value_from_gimp_context(self):
+    return None
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, dict):
@@ -2332,6 +2355,9 @@ class GimpResourceSetting(Setting):
       return None
 
   def _validate(self, resource):
+    if not self._none_ok and resource is None:
+      return 'None is not allowed for this resource', 'invalid_value'
+
     if resource is not None and not resource.is_valid():
       return 'invalid resource', 'invalid_value'
 
@@ -2341,11 +2367,9 @@ class GimpResourceSetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
-      # TODO: Allow passing this as a parameter to GimpResourceSetting
-      False,
+      self._none_ok,
       self._default_value,
-      # TODO: Allow passing this as a parameter to GimpResourceSetting
-      False,
+      self._default_to_context,
       GObject.ParamFlags.READWRITE,
     ]
 
@@ -2370,6 +2394,9 @@ class BrushSetting(GimpResourceSetting):
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Brush, **kwargs)
+
+  def _get_default_value_from_gimp_context(self):
+    return Gimp.context_get_brush()
   
   def _value_to_raw(self, resource):
     if resource is not None:
@@ -2408,6 +2435,9 @@ class FontSetting(GimpResourceSetting):
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Font, **kwargs)
 
+  def _get_default_value_from_gimp_context(self):
+    return Gimp.context_get_font()
+
 
 class GradientSetting(GimpResourceSetting):
   """Class for settings storing gradients.
@@ -2430,6 +2460,9 @@ class GradientSetting(GimpResourceSetting):
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Gradient, **kwargs)
 
+  def _get_default_value_from_gimp_context(self):
+    return Gimp.context_get_gradient()
+
 
 class PaletteSetting(GimpResourceSetting):
   """Class for settings storing color palettes.
@@ -2451,6 +2484,9 @@ class PaletteSetting(GimpResourceSetting):
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Palette, **kwargs)
+
+  def _get_default_value_from_gimp_context(self):
+    return Gimp.context_get_palette()
 
   def _value_to_raw(self, resource):
     if resource is not None:
@@ -2482,6 +2518,9 @@ class PatternSetting(GimpResourceSetting):
 
   def __init__(self, name, **kwargs):
     super().__init__(name, Gimp.Pattern, **kwargs)
+
+  def _get_default_value_from_gimp_context(self):
+    return Gimp.context_get_pattern()
 
 
 class UnitSetting(Setting):
