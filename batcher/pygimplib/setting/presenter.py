@@ -200,9 +200,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
     internally assigned a valid value on instantiation while the setting
     retains its own value.
     """
-    # The `is_value_empty` check makes sure that settings with empty values
-    # which are not allowed will be properly invalidated.
-    if self._value_changed_signal is None or self._setting.is_value_empty() or force:
+    if self._value_changed_signal is None or force:
       self._update_setting_value()
   
   def auto_update_gui_to_setting(self, enabled: bool):
@@ -237,12 +235,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
   
   @abc.abstractmethod
   def _set_value(self, value):
-    """Sets the value of the GUI widget.
-    
-    If the value passed is one of the empty values allowed for the corresponding
-    setting and the widget cannot handle the value, this method must wrap
-    the empty value into a safe value (that the widget can handle).
-    """
+    """Sets the value of the GUI widget."""
     pass
   
   def _copy_state(

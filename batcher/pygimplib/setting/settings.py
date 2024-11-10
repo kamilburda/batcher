@@ -133,14 +133,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
   * ``'gui-sensitive-changed'``: invoked after `Setting.gui.set_sensitive()` is
     called.
-  
-  If a setting subclass supports "empty" values, such values will not be
-  considered invalid when used as default values. However, empty values will be
-  treated as invalid when assigning one of such values to the setting after
-  instantiation. Examples of empty values include "Choose an item" for
-  `ChoiceSetting` instances. Empty values are useful when users must choose a
-  different value, yet no valid value is a good candidate for a default value.
-  
+
   If you need to create a custom `Setting` subclass and your plug-in is
   composed of multiple modules, you must ensure that the module where your
   subclass is defined is imported (i.e. the module is kept in the memory).
@@ -158,8 +151,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   _ALLOWED_GUI_TYPES = []
 
   _DEFAULT_DEFAULT_VALUE = None
-
-  _EMPTY_VALUES = []
   
   def __init__(
         self,
@@ -170,7 +161,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         pdb_type: Union[GObject.GType, Type[GObject.GObject], str, None] = 'automatic',
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         gui_type_kwargs: Optional[Dict] = None,
-        allow_empty_values: bool = False,
         auto_update_gui_to_setting: bool = True,
         tags: Optional[Iterable[str]] = None,
   ):
@@ -181,10 +171,8 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         Setting name. See the `name` property for more information.
       default_value:
         Default setting value. During instantiation, the default value is
-        validated. If one of the so-called "empty values" (specific to each
-        setting class) is passed as the default value, default value validation
-        is not performed. If omitted, a subclass-specific default value is
-        assigned.
+        validated. Usually, a `Setting` subclass defines its own default value
+        appropriate for that subclass.
       display_name:
         See the `display_name` property.
       description:
@@ -213,9 +201,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         Keyword arguments for instantiating a particular GUI widget. See the
         `setting.Presenter._create_widget()` method in particular
         `setting.Presenter` subclasses for available keyword arguments.
-      allow_empty_values:
-        If ``False`` and an empty value is passed to `set_value()`, then the
-        value is considered invalid. Otherwise, the value is considered valid.
       auto_update_gui_to_setting:
         If ``True``, the setting value is automatically updated if the GUI
         value is updated. If ``False``, the setting must be updated manually by
@@ -240,9 +225,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self._value = self._copy_value(self._default_value)
     
-    self._allow_empty_values = allow_empty_values
-    self._empty_values = list(self._EMPTY_VALUES)
-    
     self._display_name = utils_.get_processed_display_name(display_name, self._name)
     self._description = utils_.get_processed_description(description, self._display_name)
 
@@ -264,8 +246,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self._tags = set(tags) if tags is not None else set()
 
-    if self._should_validate_default_value():
-      self._validate_value(self._value)
+    self._validate_value(self._value)
   
   @property
   def name(self) -> str:
@@ -617,12 +598,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       return ValueNotValidData(*value_not_valid_args)
     else:
       return value_not_valid_args
-
-  def is_value_empty(self) -> bool:
-    """Returns ``True`` if the setting value is one of the empty values defined
-    for the setting class, ``False`` otherwise.
-    """
-    return self._is_value_empty(self._value)
   
   def can_be_used_in_pdb(self) -> bool:
     """Returns ``True`` if the setting can be used as a GIMP PDB parameter,
@@ -746,9 +721,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     """
     self._value = value
   
-  def _is_value_empty(self, value):
-    return value in self._empty_values
-  
   def _raw_to_value(self, raw_value):
     """Converts the given value to a type or format compatible with a particular
     `Setting` subclass.
@@ -775,12 +747,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return value
   
   def _validate_and_assign_value(self, value):
-    if not self._allow_empty_values:
-      self._validate_value(value)
-    else:
-      if not self._is_value_empty(value):
-        self._validate_value(value)
-    
+    self._validate_value(value)
     self._assign_value(value)
 
   def _validate_value(self, value):
@@ -811,9 +778,6 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       message_id,
       formatted_traceback,
     )
-
-  def _should_validate_default_value(self):
-    return not self._is_value_empty(self._default_value)
   
   def _apply_gui_value_to_setting(self, value):
     self._validate_and_assign_value(value)
@@ -1460,7 +1424,6 @@ class ChoiceSetting(Setting):
         self,
         name: str,
         items: Union[List[Tuple[str, str]], List[Tuple[str, str, int]], Gimp.Choice],
-        empty_value: Optional[str] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1474,17 +1437,11 @@ class ChoiceSetting(Setting):
         assign explicit item values. Values must be unique and specified in
         each tuple. Use only 2- or only 3-element tuples, they cannot be
         combined.
-      empty_value:
-        See the `empty_value` property.
     """
     self._items, self._items_by_value, self._items_display_names, self._choice = (
       self._create_item_attributes(items))
-
-    self._empty_value = self._get_empty_value(empty_value)
     
     super().__init__(name, **kwargs)
-    
-    self._empty_values.append(self._empty_value)
   
   @property
   def items(self) -> Dict[str, int]:
@@ -1503,14 +1460,6 @@ class ChoiceSetting(Setting):
     Item display names can be used e.g. as combo box items in the GUI.
     """
     return self._items_display_names
-  
-  @property
-  def empty_value(self) -> Union[str, None]:
-    """Item name designated as the empty value.
-    
-    By default, the setting does not have an empty value.
-    """
-    return self._empty_value
   
   def to_dict(self):
     settings_dict = super().to_dict()
@@ -1581,8 +1530,7 @@ class ChoiceSetting(Setting):
         )
   
   def _validate(self, item_name):
-    if (item_name not in self._items
-        or (not self._allow_empty_values and self._is_value_empty(item_name))):
+    if item_name not in self._items:
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
 
   @staticmethod
@@ -1631,16 +1579,6 @@ class ChoiceSetting(Setting):
       choice.add(name, value, display_name, '')
 
     return items, items_by_value, items_display_names, choice
-
-  def _get_empty_value(self, empty_value_name):
-    if empty_value_name is not None:
-      if empty_value_name in self._items:
-        return empty_value_name
-      else:
-        raise ValueError(
-          f'invalid empty value "{empty_value_name}"; must be one of {list(self._items)}')
-    else:
-      return None
 
   def _get_pdb_param(self):
     return [
@@ -2128,9 +2066,6 @@ class DisplaySetting(Setting):
   
   Message IDs for invalid values:
   * ``'invalid_value'``: The display assigned is not valid.
-  
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Display]
@@ -2138,8 +2073,6 @@ class DisplaySetting(Setting):
   _REGISTRABLE_TYPE_NAME = 'display'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.display_spin_button]
-
-  _EMPTY_VALUES = [None]
   
   def _copy_value(self, value):
     return value
@@ -2339,10 +2272,10 @@ class GimpResourceSetting(Setting):
   """Abstract class for settings storing `Gimp.Resource` instances (brushes,
   fonts, etc.).
 
-  Default value: ``None``
-
-  Empty values:
-  * ``None``
+  Default value:
+    If ``default_to_context`` is ``False``, the default value is ``None``.
+    If ``default_to_context`` is ``True``, it is the currently active resource
+    obtainable via `Gimp.context_get_<resource_type>()`.
 
   Message IDs for invalid values:
   * ``'invalid_value'``: The resource is not valid.
@@ -2443,9 +2376,6 @@ class BrushSetting(GimpResourceSetting):
   * `Gimp.Brush`
 
   Default value: ``None``
-
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Brush]
@@ -2483,9 +2413,6 @@ class FontSetting(GimpResourceSetting):
   * `Gimp.Font`
   
   Default value: ``None``
-
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Font]
@@ -2508,9 +2435,6 @@ class GradientSetting(GimpResourceSetting):
   * `Gimp.Gradient`
   
   Default value: ``None``
-
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Gradient]
@@ -2533,9 +2457,6 @@ class PaletteSetting(GimpResourceSetting):
   * `Gimp.Palette`
   
   Default value: ``None``
-
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Palette]
@@ -2567,9 +2488,6 @@ class PatternSetting(GimpResourceSetting):
   * `Gimp.Pattern`
   
   Default value: ``None``
-
-  Empty values:
-  * ``None``
   """
   
   _ALLOWED_PDB_TYPES = [Gimp.Pattern]

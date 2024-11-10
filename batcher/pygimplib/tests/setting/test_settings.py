@@ -78,18 +78,7 @@ class TestSetting(SettingTestCase):
     self.assertIsNone(self.setting.validate('jpg'))
 
   def test_validate_for_invalid_value(self):
-    self.assertIsInstance(self.setting.validate(''), settings_.ValueNotValidData)
-
-  def test_assign_empty_value_not_allowed(self):
-    self.setting.set_value('')
-
-    self.assertFalse(self.setting.is_valid)
-  
-  def test_assign_empty_value_allowed(self):
-    setting = stubs_setting.StubSetting('setting', default_value='', allow_empty_values=True)
-    setting.set_value('')
-    
-    self.assertEqual(setting.value, '')
+    self.assertIsInstance(self.setting.validate(None), settings_.ValueNotValidData)
   
   def test_get_generated_display_name(self):
     self.assertEqual(self.setting.display_name, 'File extension')
@@ -503,19 +492,6 @@ class TestSettingGui(SettingTestCase):
     self.setting.set_value('jpg')
     self.setting.reset()
     self.assertEqual(self.widget.value, 'png')
-  
-  def test_update_setting_value_after_resetting_to_disallowed_empty_value(self):
-    setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
-
-    setting.set_gui(stubs_setting.StubWithValueChangedSignalPresenter, self.widget)
-    setting.set_value('jpg')
-    setting.reset()
-
-    # Raise error because setting is reset to an empty value, while empty
-    # values are disallowed (`allow_empty_values` is False).
-    setting.gui.update_setting_value()
-
-    self.assertFalse(setting.is_valid)
 
   def test_null_presenter_has_automatic_gui(self):
     setting = stubs_setting.StubWithGuiSetting('file_extension', default_value='')
@@ -1004,35 +980,6 @@ class TestCreateChoiceSetting(SettingTestCase):
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker
       settings_.ChoiceSetting('overwrite_mode', [('skip',), ('replace',)])
-  
-  def test_no_empty_value(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
-    self.assertIsNone(setting.empty_value)
-  
-  def test_valid_empty_value(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode',
-      [('choose', 'Choose your mode'), ('skip', 'Skip'), ('replace', 'Replace')],
-      default_value='replace',
-      empty_value='choose')
-    self.assertEqual(setting.empty_value, setting.items['choose'])
-  
-  def test_empty_value_is_equal_to_default_default_value(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode',
-      [('choose', 'Choose your mode'), ('skip', 'Skip'), ('replace', 'Replace')],
-      empty_value='choose')
-    
-    self.assertEqual(setting.default_value, 'choose')
-    self.assertEqual(setting.empty_value, 'choose')
-  
-  def test_invalid_empty_value_raises_error(self):
-    with self.assertRaises(ValueError):
-      settings_.ChoiceSetting(
-        'overwrite_mode',
-        [('skip', 'Skip'), ('replace', 'Replace')],
-        empty_value='invalid_value')
 
 
 class TestChoiceSetting(SettingTestCase):
@@ -1069,29 +1016,6 @@ class TestChoiceSetting(SettingTestCase):
   def test_get_item_display_names_and_values(self):
     self.assertEqual(
       self.setting.get_item_display_names_and_values(), [('Skip', 0), ('Replace', 1)])
-  
-  def test_is_value_empty(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode',
-      [('choose', '-Choose Your Mode-'), ('skip', 'Skip'), ('replace', 'Replace')],
-      default_value='replace',
-      empty_value='choose',
-      allow_empty_values=True)
-    
-    self.assertFalse(setting.is_value_empty())
-    setting.set_value(setting.items['choose'])
-    self.assertTrue(setting.is_value_empty())
-  
-  def test_set_empty_value_not_allowed(self):
-    setting = settings_.ChoiceSetting(
-      'overwrite_mode',
-      [('choose', '-Choose Your Mode-'), ('skip', 'Skip'), ('replace', 'Replace')],
-      default_value='replace',
-      empty_value='choose')
-    
-    setting.set_value(setting.items['choose'])
-
-    self.assertFalse(setting.is_valid)
   
   def test_to_dict(self):
     self.assertDictEqual(

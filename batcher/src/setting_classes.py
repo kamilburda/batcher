@@ -119,16 +119,11 @@ class DirpathSetting(ValidatableStringSetting):
 
   Default value: `Pictures` directory in the user's home directory.
 
-  Empty values:
-  * ``None``
-  * ``''``
   """
 
   _ALLOWED_GUI_TYPES = [FolderChooserButtonPresenter]
 
   _DEFAULT_DEFAULT_VALUE = pg.utils.get_pictures_directory()
-
-  _EMPTY_VALUES = [None, '']
 
   def __init__(self, name, **kwargs):
     super().__init__(name, validators_.DirpathValidator, **kwargs)
@@ -165,17 +160,12 @@ class FileExtensionSetting(ValidatableStringSetting):
 
   The `path.validatorsFileExtensionValidator` subclass is used to determine
   whether the file extension is valid.
-
-  Empty values:
-  * ``''``
   """
 
   _ALLOWED_GUI_TYPES = [
     pg.SETTING_GUI_TYPES.entry,
     FileExtensionEntryPresenter,
   ]
-
-  _EMPTY_VALUES = ['']
 
   def __init__(self, name, adjust_value=False, **kwargs):
     """Additional parameters:

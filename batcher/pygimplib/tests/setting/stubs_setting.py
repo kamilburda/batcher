@@ -100,11 +100,10 @@ class YesNoToggleButtonStubPresenter(StubPresenter):
 class StubSetting(settings_.Setting):
   
   _DEFAULT_DEFAULT_VALUE = 0
-  _EMPTY_VALUES = ['']
   
   def _validate(self, value):
-    if value is None or value == '':
-      return 'value cannot be None or an empty string', 'invalid_value'
+    if value is None:
+      return 'value cannot be None', 'invalid_value'
 
 
 class StubWithCallableDefaultDefaultValueSetting(StubSetting):
