@@ -130,7 +130,9 @@ class TestCreateParams(unittest.TestCase):
         GObject.ParamFlags.READWRITE,
       ])
 
-    # TODO: Check for the contents of the `Gimp.Choice` instance
+    self.assertIsInstance(params[4][4], Gimp.Choice)
+    self.assertListEqual(
+      params[4][4].list_nicks(), list(self.settings['advanced/overwrite_mode'].items))
 
   def test_create_params_invalid_argument(self):
     with self.assertRaises(TypeError):
