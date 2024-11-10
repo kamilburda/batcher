@@ -242,19 +242,19 @@ class ComboBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
   
   def _create_widget(self, setting, **kwargs):
-    self._value_to_row_index_mapping = {}
-    self._row_index_to_value_mapping = {}
+    self._name_to_row_index_mapping = {}
+    self._row_index_to_name_mapping = {}
 
     model = Gtk.ListStore(GObject.TYPE_STRING)
 
-    for index, (label, value) in enumerate(setting.get_item_display_names_and_values()):
-      self._value_to_row_index_mapping[value] = index
-      self._row_index_to_value_mapping[index] = value
+    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names)):
+      self._name_to_row_index_mapping[name] = index
+      self._row_index_to_name_mapping[index] = name
       model.append((label if label is not None else '',))
 
     combo_box = Gtk.ComboBox(
       model=model,
-      active=self._value_to_row_index_mapping[setting.default_value])
+      active=self._name_to_row_index_mapping[setting.default_value])
 
     renderer_text = Gtk.CellRendererText()
     combo_box.pack_start(renderer_text, True)
@@ -263,10 +263,10 @@ class ComboBoxPresenter(GtkPresenter):
     return combo_box
   
   def get_value(self):
-    return self._row_index_to_value_mapping[self._widget.get_active()]
-  
+    return self._row_index_to_name_mapping[self._widget.get_active()]
+
   def _set_value(self, value):
-    self._widget.set_active(self._value_to_row_index_mapping[value])
+    self._widget.set_active(self._name_to_row_index_mapping[value])
 
 
 class RadioButtonBoxPresenter(GtkPresenter):
@@ -278,25 +278,25 @@ class RadioButtonBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'active-button-changed'
 
   def _create_widget(self, setting, **kwargs):
-    self._value_to_row_index_mapping = {}
-    self._row_index_to_value_mapping = {}
+    self._name_to_row_index_mapping = {}
+    self._row_index_to_name_mapping = {}
 
     self._widget = pggui.RadioButtonBox(**kwargs)
     self._widget.set_tooltip_text(setting.description)
 
-    for index, (label, value) in enumerate(setting.get_item_display_names_and_values()):
+    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names)):
       self._widget.add(label)
 
-      self._value_to_row_index_mapping[value] = index
-      self._row_index_to_value_mapping[index] = value
+      self._name_to_row_index_mapping[name] = index
+      self._row_index_to_name_mapping[index] = name
 
     return self._widget
 
   def get_value(self):
-    return self._row_index_to_value_mapping[self._widget.get_active()]
+    return self._row_index_to_name_mapping[self._widget.get_active()]
 
   def _set_value(self, value):
-    self._widget.set_active(self._value_to_row_index_mapping[value])
+    self._widget.set_active(self._name_to_row_index_mapping[value])
 
 
 class GimpUiIntComboBoxPresenter(GtkPresenter):
