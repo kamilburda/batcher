@@ -694,34 +694,35 @@ def _update_to_0_6(data, _settings, source_names):
             argument_dict['type'] = 'path'
             if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'vectors_combo_box':
               argument_dict['gui_type'] = 'path_combo_box'
+            if argument_dict.get('pdb_type', None) is not None:
+                argument_dict['pdb_type'] = 'GimpPath'
+
+          if argument_dict['type'] == 'int':
             if 'pdb_type' in argument_dict:
               if argument_dict['pdb_type'] in ['gint64', 'glong', 'gchar']:
                 argument_dict['pdb_type'] = 'gint'
-              elif argument_dict['pdb_type'] in ['guint64', 'gulong', 'guchar']:
+              elif argument_dict['pdb_type'] in ['guint', 'guint64', 'gulong', 'guchar']:
+                argument_dict['type'] = 'uint'
                 argument_dict['pdb_type'] = 'guint'
-
-          if argument_dict['type'] == 'int':
-            if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'guint':
-              argument_dict['type'] = 'uint'
 
           if argument_dict['type'] == 'float':
             argument_dict['type'] = 'double'
             if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'float_spin_button':
               argument_dict['gui_type'] = 'double_spin_button'
-            if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'gfloat':
+            if argument_dict.get('pdb_type', None) == 'gfloat':
               argument_dict['pdb_type'] = 'gdouble'
 
           if argument_dict['type'] == 'rgb':
             argument_dict['type'] = 'color'
             if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'rgb_button':
               argument_dict['gui_type'] = 'color_button'
-            if 'pdb_type' in argument_dict and argument_dict['pdb_type'] == 'GimpRGB':
+            if argument_dict.get('pdb_type', None) == 'GimpRGB':
               argument_dict['pdb_type'] = 'GeglColor'
 
           if argument_dict['type'] == 'unit':
             argument_dict['value'] = 'pixel'
             argument_dict['default_value'] = 'pixel'
-            if 'pdb_type' in argument_dict:
+            if argument_dict.get('pdb_type', None) is not None:
               argument_dict['pdb_type'] = 'GimpUnit'
             if 'gui_type' in argument_dict:
               argument_dict['gui_type'] = 'unit_combo_box'
@@ -731,8 +732,7 @@ def _update_to_0_6(data, _settings, source_names):
 
           if argument_dict['type'] == 'array' and argument_dict['element_type'] == 'float':
             argument_dict['element_type'] = 'double'
-            if ('element_gui_type' in argument_dict
-                and argument_dict['element_gui_type'] == 'float_spin_button'):
+            if argument_dict.get('element_gui_type', None) == 'float_spin_button':
               argument_dict['element_gui_type'] = 'double_spin_button'
 
       if orig_name_setting_dict['default_value'] == 'apply_opacity_from_layer_groups':
@@ -753,8 +753,7 @@ def _update_to_0_6(data, _settings, source_names):
           description_setting_dict['default_value'] = builtin_constraints.BUILTIN_CONSTRAINTS[
             'apply_opacity_from_group_layers']['description']
 
-      if (orig_name_setting_dict['default_value'] in [
-            'rename_for_export_layers', 'rename_for_edit_layers']
+      if (orig_name_setting_dict['default_value'] == 'rename_for_edit_layers'
           and arguments_list is not None):
         for argument_dict in arguments_list:
           if argument_dict['name'] == 'rename_layer_groups':

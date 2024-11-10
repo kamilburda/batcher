@@ -236,3 +236,27 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertNotIn('image_preview_displayed_layers', self.settings['gui'])
 
     self.assertIn('images_and_directories', self.settings['gui'])
+
+    self.assertIsInstance(
+      self.settings['gui/size/paned_between_previews_position'], pg.setting.IntSetting)
+
+    self.assertIsInstance(
+      self.settings['main/procedures/scale/arguments/new_width'], pg.setting.DoubleSetting)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/new_width'].gui_type,
+      pg.setting.DoubleSpinButtonPresenter)
+    self.assertIsInstance(
+      self.settings['main/procedures/scale/arguments/new_height'], pg.setting.DoubleSetting)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/new_height'].gui_type,
+      pg.setting.DoubleSpinButtonPresenter)
+
+    self.assertIsInstance(
+      self.settings['main/procedures/script-fu-addborder/arguments/color'],
+      pg.setting.ColorSetting)
+    self.assertEqual(
+      self.settings['main/procedures/script-fu-addborder/arguments/color'].gui_type,
+      pg.setting.ColorButtonPresenter)
+    self.assertEqual(
+      self.settings['main/procedures/script-fu-addborder/arguments/color'].pdb_type.name,
+      'GeglColor')
