@@ -983,7 +983,7 @@ class TestCreateChoiceSetting(SettingTestCase):
       settings_.ChoiceSetting(
         'overwrite_mode',
         [('skip', 'Skip', 4), ('replace', 'Replace')], default_value='replace')
-    
+
   def test_same_explicit_item_value_multiple_times_raises_error(self):
     with self.assertRaises(ValueError):
       settings_.ChoiceSetting(
@@ -1024,8 +1024,8 @@ class TestCreateChoiceSetting(SettingTestCase):
       [('choose', 'Choose your mode'), ('skip', 'Skip'), ('replace', 'Replace')],
       empty_value='choose')
     
-    self.assertEqual(setting.default_value, setting.items['choose'])
-    self.assertEqual(setting.empty_value, setting.items['choose'])
+    self.assertEqual(setting.default_value, 'choose')
+    self.assertEqual(setting.empty_value, 'choose')
   
   def test_invalid_empty_value_raises_error(self):
     with self.assertRaises(ValueError):
@@ -1033,7 +1033,7 @@ class TestCreateChoiceSetting(SettingTestCase):
         'overwrite_mode',
         [('skip', 'Skip'), ('replace', 'Replace')],
         empty_value='invalid_value')
-  
+
 
 class TestChoiceSetting(SettingTestCase):
   

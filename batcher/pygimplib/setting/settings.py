@@ -1377,12 +1377,45 @@ class EnumSetting(Setting):
     return None, None
 
 
+class StringSetting(Setting):
+  """Class for string settings.
+
+  Allowed GIMP PDB types:
+  * `GObject.TYPE_STRING`
+
+  Default value: ``''``
+  """
+
+  _ALIASES = ['str']
+
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
+
+  _REGISTRABLE_TYPE_NAME = 'string'
+
+  _ALLOWED_GUI_TYPES = [
+    _SETTING_GUI_TYPES.entry,
+    _SETTING_GUI_TYPES.label,
+  ]
+
+  _DEFAULT_DEFAULT_VALUE = ''
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._pdb_name,
+      self._display_name,
+      self._description,
+      self._default_value,
+      GObject.ParamFlags.READWRITE,
+    ]
+
+
 class ChoiceSetting(Setting):
   """Class for settings with a limited number of values, accessed by their
   associated names.
   
   Allowed GIMP PDB types:
-  * `GObject.TYPE_INT`
+  * `GObject.TYPE_STRING`
   
   Default value: Name of the first item passed to the ``items`` parameter in
   `ChoiceSetting.__init__()`.
@@ -1412,7 +1445,7 @@ class ChoiceSetting(Setting):
   
   _ALIASES = ['options']
 
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_INT]
+  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
   _REGISTRABLE_TYPE_NAME = 'choice'
 
@@ -1426,7 +1459,7 @@ class ChoiceSetting(Setting):
   def __init__(
         self,
         name: str,
-        items: Union[List[Tuple[str, str]], List[Tuple[str, str, int]]],
+        items: Union[List[Tuple[str, str]], List[Tuple[str, str, int]], Gimp.Choice],
         empty_value: Optional[str] = None,
         **kwargs,
   ):
@@ -1434,20 +1467,17 @@ class ChoiceSetting(Setting):
 
     Args:
       items:
-        A list of either (item name, item display name) tuples
-        or (item name, item display name, item value) tuples. For 2-element
-        tuples, item values are assigned automatically, starting with 0. Use
-        3-element tuples to assign explicit item values. Values must be unique
-        and specified in each tuple. Use only 2- or only 3-element tuples, they
-        cannot be combined.
+        A list of (item name, item display name) tuples, (item name,
+        item display name, item value) tuples or a `Gimp.Choice` instance
+        filled with possible choices. For 2-element tuples, item values are
+        assigned automatically, starting with 0. Use 3-element tuples to
+        assign explicit item values. Values must be unique and specified in
+        each tuple. Use only 2- or only 3-element tuples, they cannot be
+        combined.
       empty_value:
         See the `empty_value` property.
-      default_value:
-        Default item name (identifier). Unlike other `Setting` subclasses,
-        `ChoiceSetting` accepts a valid item name for the ``default_value``
-        parameter instead of a numeric value.
     """
-    self._items, self._items_by_value, self._items_display_names = (
+    self._items, self._items_by_value, self._items_display_names, self._choice = (
       self._create_item_attributes(items))
 
     self._empty_value = self._get_empty_value(empty_value)
@@ -1550,10 +1580,10 @@ class ChoiceSetting(Setting):
           prepend_value=False,
         )
   
-  def _validate(self, value):
-    if (value not in self._items_by_value
-        or (not self._allow_empty_values and self._is_value_empty(value))):
-      return f'invalid item value; valid values: {list(self._items_by_value)}', 'invalid_value'
+  def _validate(self, item_name):
+    if (item_name not in self._items
+        or (not self._allow_empty_values and self._is_value_empty(item_name))):
+      return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
 
   @staticmethod
   def _create_item_attributes(input_items):
@@ -1561,8 +1591,18 @@ class ChoiceSetting(Setting):
     items_by_value = {}
     items_display_names = {}
 
+    if isinstance(input_items, Gimp.Choice):
+      for name in input_items.list_nicks():
+        value = input_items.get_id(name)
+        items[name] = value
+        items_by_value[value] = name
+        items_display_names[name] = input_items.get_label(name)
+
+      return items, items_by_value, items_display_names, input_items
+
     if not input_items:
       raise ValueError('must specify at least one item')
+
     if all(len(elem) == 2 for elem in input_items):
       for i, (item_name, item_display_name) in enumerate(input_items):
         if item_name in items:
@@ -1586,16 +1626,19 @@ class ChoiceSetting(Setting):
       raise ValueError(
         'wrong number of tuple elements in items - must be only 2- or only 3-element tuples')
 
-    return items, items_by_value, items_display_names
+    choice = Gimp.Choice.new()
+    for (name, value), display_name in zip(items.items(), items_display_names.values()):
+      choice.add(name, value, display_name, '')
+
+    return items, items_by_value, items_display_names, choice
 
   def _get_empty_value(self, empty_value_name):
     if empty_value_name is not None:
       if empty_value_name in self._items:
-        return self._items[empty_value_name]
+        return empty_value_name
       else:
         raise ValueError(
-          (f'invalid identifier for the empty value "{empty_value_name}"'
-           f'; must be one of {list(self._items)}'))
+          f'invalid empty value "{empty_value_name}"; must be one of {list(self._items)}')
     else:
       return None
 
@@ -1605,42 +1648,8 @@ class ChoiceSetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
-      # TODO: Pass a `Gimp.Choice` instance to __init__ instead
-      Gimp.Choice.new(),
+      self._choice,
       self._items_by_value[self._default_value],
-      GObject.ParamFlags.READWRITE,
-    ]
-
-
-class StringSetting(Setting):
-  """Class for string settings.
-  
-  Allowed GIMP PDB types:
-  * `GObject.TYPE_STRING`
-  
-  Default value: ``''``
-  """
-  
-  _ALIASES = ['str']
-  
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
-
-  _REGISTRABLE_TYPE_NAME = 'string'
-
-  _ALLOWED_GUI_TYPES = [
-    _SETTING_GUI_TYPES.entry,
-    _SETTING_GUI_TYPES.label,
-  ]
-
-  _DEFAULT_DEFAULT_VALUE = ''
-
-  def _get_pdb_param(self):
-    return [
-      self._REGISTRABLE_TYPE_NAME,
-      self._pdb_name,
-      self._display_name,
-      self._description,
-      self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
 
