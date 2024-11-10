@@ -1406,8 +1406,6 @@ class ChoiceSetting(Setting):
     * ``'invalid_default_value'``: Item name is invalid (not found in the
       ``items`` parameter in `__init__()`).
   """
-  
-  _ALIASES = ['options']
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
 
