@@ -117,8 +117,10 @@ class DirpathSetting(ValidatableStringSetting):
   The `path.validatorsDirpathValidator` subclass is used to determine whether
   the directory path is valid.
 
-  Default value: `Pictures` directory in the user's home directory.
+  If ``None`` or an empty string is assigned to this seting, the default value
+  (see below) is assigned instead.
 
+  Default value: `Pictures` directory in the user's home directory.
   """
 
   _ALLOWED_GUI_TYPES = [FolderChooserButtonPresenter]
@@ -127,6 +129,12 @@ class DirpathSetting(ValidatableStringSetting):
 
   def __init__(self, name, **kwargs):
     super().__init__(name, validators_.DirpathValidator, **kwargs)
+
+  def _raw_to_value(self, raw_value):
+    if raw_value:
+      return raw_value
+    else:
+      return self._DEFAULT_DEFAULT_VALUE
 
 
 class ExtendedEntryPresenter(pg.setting.GtkPresenter):
