@@ -3318,6 +3318,6 @@ __all__ = [
   'ValueNotValidData',
 ]
 
-for name, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):
+for name_, class_ in inspect.getmembers(sys.modules[__name__], inspect.isclass):
   if issubclass(class_, Setting):
-    __all__.append(name)
+    __all__.append(name_)
