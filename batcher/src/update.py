@@ -675,114 +675,149 @@ def _update_to_0_6(data, _settings, source_names):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    overwrite_mode_dict, _index = _get_child_setting(main_settings_list, 'overwrite_mode')
+    if overwrite_mode_dict is not None:
+      _update_choice_setting(overwrite_mode_dict)
+
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is None:
-      return
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
 
-    for procedure_dict in procedures_list:
-      procedure_list = procedure_dict['settings']
+        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+        display_name_setting_dict, _index = _get_child_setting(procedure_list, 'display_name')
+        description_setting_dict, _index = _get_child_setting(procedure_list, 'description')
+        origin_setting_dict, _index = _get_child_setting(procedure_list, 'origin')
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
-      orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-      display_name_setting_dict, _index = _get_child_setting(procedure_list, 'display_name')
-      description_setting_dict, _index = _get_child_setting(procedure_list, 'description')
-      arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        _update_origin_setting(origin_setting_dict)
+        _update_arguments_list(arguments_list)
 
-      if arguments_list is not None:
-        for argument_dict in arguments_list:
-          if argument_dict['type'] == 'vectors':
-            argument_dict['type'] = 'path'
-            if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'vectors_combo_box':
-              argument_dict['gui_type'] = 'path_combo_box'
-            if argument_dict.get('pdb_type', None) is not None:
-                argument_dict['pdb_type'] = 'GimpPath'
+        if orig_name_setting_dict['default_value'] == 'apply_opacity_from_layer_groups':
+          # We retain `name` and only modify `orig_name` as only the latter is
+          # potentially used in the code.
+          orig_name_setting_dict['value'] = 'apply_opacity_from_group_layers'
+          orig_name_setting_dict['default_value'] = 'apply_opacity_from_group_layers'
 
-          if argument_dict['type'] == 'int':
-            if 'pdb_type' in argument_dict:
-              if argument_dict['pdb_type'] in ['gint64', 'glong', 'gchar']:
-                argument_dict['pdb_type'] = 'gint'
-              elif argument_dict['pdb_type'] in ['guint', 'guint64', 'gulong', 'guchar']:
-                argument_dict['type'] = 'uint'
-                argument_dict['pdb_type'] = 'guint'
+          if display_name_setting_dict is not None:
+            display_name_setting_dict['value'] = builtin_procedures.BUILTIN_PROCEDURES[
+              'apply_opacity_from_group_layers']['display_name']
+            display_name_setting_dict['default_value'] = builtin_procedures.BUILTIN_PROCEDURES[
+              'apply_opacity_from_group_layers']['display_name']
 
-          if argument_dict['type'] == 'float':
-            argument_dict['type'] = 'double'
-            if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'float_spin_button':
-              argument_dict['gui_type'] = 'double_spin_button'
-            if argument_dict.get('pdb_type', None) == 'gfloat':
-              argument_dict['pdb_type'] = 'gdouble'
+          if description_setting_dict is not None:
+            description_setting_dict['value'] = builtin_procedures.BUILTIN_PROCEDURES[
+              'apply_opacity_from_group_layers']['description']
+            description_setting_dict['default_value'] = builtin_procedures.BUILTIN_PROCEDURES[
+              'apply_opacity_from_group_layers']['description']
 
-          if argument_dict['type'] == 'rgb':
-            argument_dict['type'] = 'color'
-            if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'rgb_button':
-              argument_dict['gui_type'] = 'color_button'
-            if argument_dict.get('pdb_type', None) == 'GimpRGB':
-              argument_dict['pdb_type'] = 'GeglColor'
-
-          if argument_dict['type'] == 'unit':
-            argument_dict['value'] = 'pixel'
-            argument_dict['default_value'] = 'pixel'
-            if argument_dict.get('pdb_type', None) is not None:
-              argument_dict['pdb_type'] = 'GimpUnit'
-            if 'gui_type' in argument_dict:
-              argument_dict['gui_type'] = 'unit_combo_box'
-
-          if argument_dict['type'] == 'array':
-            argument_dict.pop('length_name', None)
-
-          if argument_dict['type'] == 'array' and argument_dict['element_type'] == 'float':
-            argument_dict['element_type'] = 'double'
-            if argument_dict.get('element_gui_type', None) == 'float_spin_button':
-              argument_dict['element_gui_type'] = 'double_spin_button'
-
-      if orig_name_setting_dict['default_value'] == 'apply_opacity_from_layer_groups':
-        # We retain `name` and only modify `orig_name` as only the latter is
-        # potentially used in the code.
-        orig_name_setting_dict['value'] = 'apply_opacity_from_group_layers'
-        orig_name_setting_dict['default_value'] = 'apply_opacity_from_group_layers'
-
-        if display_name_setting_dict is not None:
-          display_name_setting_dict['value'] = builtin_constraints.BUILTIN_CONSTRAINTS[
-            'apply_opacity_from_group_layers']['display_name']
-          display_name_setting_dict['default_value'] = builtin_constraints.BUILTIN_CONSTRAINTS[
-            'apply_opacity_from_group_layers']['display_name']
-
-        if description_setting_dict is not None:
-          description_setting_dict['value'] = builtin_constraints.BUILTIN_CONSTRAINTS[
-            'apply_opacity_from_group_layers']['description']
-          description_setting_dict['default_value'] = builtin_constraints.BUILTIN_CONSTRAINTS[
-            'apply_opacity_from_group_layers']['description']
-
-      if (orig_name_setting_dict['default_value'] == 'rename_for_edit_layers'
-          and arguments_list is not None):
-        for argument_dict in arguments_list:
-          if argument_dict['name'] == 'rename_layer_groups':
-            argument_dict['name'] = 'rename_group_layers'
-            argument_dict['display_name'] = builtin_procedures.BUILTIN_PROCEDURES[
-              orig_name_setting_dict['default_value']]['arguments'][2]
+        if (orig_name_setting_dict['default_value'] == 'rename_for_edit_layers'
+            and arguments_list is not None):
+          for argument_dict in arguments_list:
+            if argument_dict['name'] == 'rename_layer_groups':
+              argument_dict['name'] = 'rename_group_layers'
+              argument_dict['display_name'] = builtin_procedures.BUILTIN_PROCEDURES[
+                orig_name_setting_dict['default_value']]['arguments'][2]
 
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
 
-    if constraints_list is None:
-      return
+    if constraints_list is not None:
+      for constraint_dict in constraints_list:
+        constraint_list = constraint_dict['settings']
 
-    for constraint_dict in constraints_list:
-      constraint_list = constraint_dict['settings']
+        orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
+        display_name_setting_dict, _index = _get_child_setting(constraint_list, 'display_name')
+        origin_setting_dict, _index = _get_child_setting(constraint_list, 'origin')
+        arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
-      orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
-      display_name_setting_dict, _index = _get_child_setting(constraint_list, 'display_name')
+        _update_origin_setting(origin_setting_dict)
+        _update_arguments_list(arguments_list)
 
-      if orig_name_setting_dict['default_value'] == 'layer_groups':
-        # We retain `name` and only modify `orig_name` as only the latter is
-        # potentially used in the code.
-        orig_name_setting_dict['value'] = 'group_layers'
-        orig_name_setting_dict['default_value'] = 'group_layers'
+        if orig_name_setting_dict['default_value'] == 'layer_groups':
+          # We retain `name` and only modify `orig_name` as only the latter is
+          # potentially used in the code.
+          orig_name_setting_dict['value'] = 'group_layers'
+          orig_name_setting_dict['default_value'] = 'group_layers'
 
-        if display_name_setting_dict is not None:
-          display_name_setting_dict['value'] = (
-            builtin_constraints.BUILTIN_CONSTRAINTS['group_layers']['display_name'])
-          display_name_setting_dict['default_value'] = (
-            builtin_constraints.BUILTIN_CONSTRAINTS['group_layers']['display_name'])
+          if display_name_setting_dict is not None:
+            display_name_setting_dict['value'] = (
+              builtin_constraints.BUILTIN_CONSTRAINTS['group_layers']['display_name'])
+            display_name_setting_dict['default_value'] = (
+              builtin_constraints.BUILTIN_CONSTRAINTS['group_layers']['display_name'])
+
+
+def _update_arguments_list(arguments_list):
+  if arguments_list is None:
+    return
+
+  for argument_dict in arguments_list:
+    if argument_dict['type'] == 'vectors':
+      argument_dict['type'] = 'path'
+      if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'vectors_combo_box':
+        argument_dict['gui_type'] = 'path_combo_box'
+      if argument_dict.get('pdb_type', None) is not None:
+          argument_dict['pdb_type'] = 'GimpPath'
+
+    if argument_dict['type'] == 'int':
+      if 'pdb_type' in argument_dict:
+        if argument_dict['pdb_type'] in ['gint64', 'glong', 'gchar']:
+          argument_dict['pdb_type'] = 'gint'
+        elif argument_dict['pdb_type'] in ['guint', 'guint64', 'gulong', 'guchar']:
+          argument_dict['type'] = 'uint'
+          argument_dict['pdb_type'] = 'guint'
+
+    if argument_dict['type'] == 'float':
+      argument_dict['type'] = 'double'
+      if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'float_spin_button':
+        argument_dict['gui_type'] = 'double_spin_button'
+      if argument_dict.get('pdb_type', None) == 'gfloat':
+        argument_dict['pdb_type'] = 'gdouble'
+
+    if argument_dict['type'] == 'choice':
+      _update_choice_setting(argument_dict)
+
+    if argument_dict['type'] == 'rgb':
+      argument_dict['type'] = 'color'
+      if 'gui_type' in argument_dict and argument_dict['gui_type'] == 'rgb_button':
+        argument_dict['gui_type'] = 'color_button'
+      if argument_dict.get('pdb_type', None) == 'GimpRGB':
+        argument_dict['pdb_type'] = 'GeglColor'
+
+    if argument_dict['type'] == 'unit':
+      argument_dict['value'] = 'pixel'
+      argument_dict['default_value'] = 'pixel'
+      if argument_dict.get('pdb_type', None) is not None:
+        argument_dict['pdb_type'] = 'GimpUnit'
+      if 'gui_type' in argument_dict:
+        argument_dict['gui_type'] = 'unit_combo_box'
+
+    if argument_dict['type'] == 'array':
+      argument_dict.pop('length_name', None)
+
+    if argument_dict['type'] == 'array' and argument_dict['element_type'] == 'float':
+      argument_dict['element_type'] = 'double'
+      if argument_dict.get('element_gui_type', None) == 'float_spin_button':
+        argument_dict['element_gui_type'] = 'double_spin_button'
+
+
+def _update_origin_setting(origin_setting_dict):
+  if origin_setting_dict is not None:
+    _update_choice_setting(origin_setting_dict)
+
+
+def _update_choice_setting(setting_dict):
+  for index, item_tuple in enumerate(setting_dict['items']):
+    if len(item_tuple) >= 3:
+      item_value = item_tuple[2]
+    else:
+      item_value = index
+
+    if setting_dict['value'] == item_value:
+      setting_dict['value'] = item_tuple[0]
+      break
+  else:
+    setting_dict['value'] = setting_dict['default_value']
 
 
 _UPDATE_HANDLERS = {

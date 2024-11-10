@@ -10,6 +10,8 @@ from gi.repository import Gimp
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from src import builtin_procedures
+from src import builtin_constraints
 from src import plugin_settings
 from src import setting_classes
 from src import update
@@ -229,6 +231,8 @@ class TestUpdateHandlers(unittest.TestCase):
       [Gimp.ColorTag.NONE])
 
   def _assert_correct_contents_for_update_to_0_6(self):
+    self.assertEqual(self.settings['main/overwrite_mode'].value, 'rename_new')
+
     self.assertIn('name_preview_items_collapsed_state', self.settings['gui'])
     self.assertNotIn('name_preview_layers_collapsed_state', self.settings['gui'])
 
@@ -240,16 +244,35 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIsInstance(
       self.settings['gui/size/paned_between_previews_position'], pg.setting.IntSetting)
 
+    for procedure in self.settings['main/procedures']:
+      if procedure['orig_name'].value in builtin_procedures.BUILTIN_PROCEDURES:
+        self.assertEqual(procedure['origin'].value, 'builtin')
+      else:
+        self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+
     self.assertIsInstance(
       self.settings['main/procedures/scale/arguments/new_width'], pg.setting.DoubleSetting)
     self.assertEqual(
       self.settings['main/procedures/scale/arguments/new_width'].gui_type,
       pg.setting.DoubleSpinButtonPresenter)
+
     self.assertIsInstance(
       self.settings['main/procedures/scale/arguments/new_height'], pg.setting.DoubleSetting)
     self.assertEqual(
       self.settings['main/procedures/scale/arguments/new_height'].gui_type,
       pg.setting.DoubleSpinButtonPresenter)
+
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/width_unit'].value,
+      'percentage_of_layer_width')
+
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/height_unit'].value,
+      'percentage_of_layer_height')
+
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/export_mode'].value,
+      'each_layer')
 
     self.assertIsInstance(
       self.settings['main/procedures/script-fu-addborder/arguments/color'],
@@ -260,3 +283,9 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/procedures/script-fu-addborder/arguments/color'].pdb_type.name,
       'GeglColor')
+
+    for procedure in self.settings['main/constraints']:
+      if procedure['orig_name'].value in builtin_constraints.BUILTIN_CONSTRAINTS:
+        self.assertEqual(procedure['origin'].value, 'builtin')
+      else:
+        self.assertEqual(procedure['origin'].value, 'gimp_pdb')
