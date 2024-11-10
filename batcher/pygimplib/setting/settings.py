@@ -1403,7 +1403,7 @@ class ChoiceSetting(Setting):
   Message IDs for invalid values:
     * ``'invalid_value'``: The value assigned is not one of the items in this
       setting.
-    * ``'invalid_default_value'``: Item name is invalid (not found in the
+    * ``'invalid_default_value'``: Item name is not valid (not found in the
       ``items`` parameter in `__init__()`).
   """
 
