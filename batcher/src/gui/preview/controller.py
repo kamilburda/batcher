@@ -191,8 +191,8 @@ class PreviewsController:
   
   def _connect_update_rendering_of_image_preview(self, actions):
     def _after_add_action(_actions, action_, _orig_action_dict):
-      if (action_['origin'].is_item('gimp_pdb')
-          or (action_['origin'].is_item('builtin') and action_['orig_name'].value == 'scale')):
+      if (action_['origin'].value == 'gimp_pdb'
+          or (action_['origin'].value == 'builtin' and action_['orig_name'].value == 'scale')):
         self._custom_actions[action_.get_path()] = action_
         
         _update_rendering_of_image_preview(action_['enabled'])

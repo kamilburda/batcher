@@ -473,15 +473,13 @@ class TestGroup(unittest.TestCase):
     
     self.settings['file_extension'].set_value('gif')
     self.settings['flatten'].set_value(True)
-    self.settings['overwrite_mode'].set_item('skip')
+    self.settings['overwrite_mode'].set_value('skip')
     self.settings['gui/edit_mode'].set_value(True)
     
     self.settings.reset()
     
     self.assertEqual(self.settings['file_extension'].value, 'gif')
-    self.assertEqual(
-      self.settings['overwrite_mode'].value,
-      self.settings['overwrite_mode'].items['skip'])
+    self.assertEqual(self.settings['overwrite_mode'].value, 'skip')
     self.assertEqual(
       self.settings['flatten'].value,
       self.settings['flatten'].default_value)

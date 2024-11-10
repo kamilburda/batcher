@@ -562,7 +562,7 @@ def _set_file_format_export_options_from_extension(
 def _show_hide_file_format_export_options(
       file_format_mode_setting, file_format_export_options_setting):
   file_format_export_options_setting.gui.set_visible(
-    file_format_mode_setting.is_item('use_explicit_values'))
+    file_format_mode_setting.value == 'use_explicit_values')
 
 
 def _on_after_add_constraint(

@@ -580,7 +580,7 @@ class Batcher(metaclass=abc.ABCMeta):
     specified action groups instead of the groups defined in ``action[
     'action_groups']``.
     """
-    if action['origin'].is_item('builtin'):
+    if action['origin'].value == 'builtin':
       if 'procedure' in action.tags:
         function = builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS[
           action['orig_name'].value]
@@ -593,7 +593,7 @@ class Batcher(metaclass=abc.ABCMeta):
           action,
           None,
           None)
-    elif action['origin'].is_item('gimp_pdb'):
+    elif action['origin'].value == 'gimp_pdb':
       if action['function'].value in pdb:
         function = pdb[action['function'].value]
       else:
@@ -672,10 +672,10 @@ class Batcher(metaclass=abc.ABCMeta):
       self._last_constraint = action
 
   def _get_action_args_and_kwargs(self, action, action_args, function):
-    args = self._get_replaced_args(action_args, action['origin'].is_item('gimp_pdb'))
+    args = self._get_replaced_args(action_args, action['origin'].value == 'gimp_pdb')
     kwargs = {}
 
-    if action['origin'].is_item('gimp_pdb'):
+    if action['origin'].value == 'gimp_pdb':
       args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
 
       if function.has_run_mode:

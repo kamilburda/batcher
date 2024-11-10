@@ -555,7 +555,7 @@ def _set_up_action_post_creation(action):
     _set_display_name_for_enabled_gui,
     action['display_name'])
 
-  if action['origin'].is_item('gimp_pdb'):
+  if action['origin'].value == 'gimp_pdb':
     _hide_gui_for_first_run_mode_arguments(action)
 
 

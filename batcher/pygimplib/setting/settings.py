@@ -1416,7 +1416,7 @@ class ChoiceSetting(Setting):
     _SETTING_GUI_TYPES.radio_button_box,
   ]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: next((name for name in self._items), None)
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self._items), None)
   
   def __init__(
         self,
@@ -1465,21 +1465,6 @@ class ChoiceSetting(Setting):
     settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
     
     return settings_dict
-  
-  def is_item(self, *item_names: str) -> bool:
-    """Returns ``True`` if the setting value is set to one the specified items,
-    ``False`` otherwise.
-    
-    If only one item is specified, this is a more convenient and less verbose
-    alternative to:
-
-      setting.value == setting.items[item_name]
-    
-    If multiple items are specified, this is equivalent to:
-    
-      setting.value in (setting.items[name1], setting.items[name2], ...)
-    """
-    return any(self.value == self.items[item_name] for item_name in item_names)
 
   def get_name(self) -> str:
     """Returns the item name corresponding to the current setting value.
@@ -1489,15 +1474,6 @@ class ChoiceSetting(Setting):
       setting.items_by_value(setting.value)
     """
     return self._items_by_value[self.value]
-
-  def set_item(self, item_name: str):
-    """Sets the specified item as the setting value.
-    
-    This is a more convenient and less verbose alternative to
-      
-      setting.set_value(setting.items[item_name])
-    """
-    self.set_value(self.items[item_name])
   
   def get_item_display_names_and_values(self) -> List[Tuple[str, int]]:
     """Returns a list of (item display name, item value) tuples."""
@@ -1508,25 +1484,19 @@ class ChoiceSetting(Setting):
   
   def _resolve_default_value(self, default_value):
     if isinstance(default_value, type(Setting.DEFAULT_VALUE)):
-      default_default_value = super()._resolve_default_value(default_value)
-
-      if default_default_value is not None:
-        return self._items[default_default_value]
-      else:
-        return default_default_value
+      # We assume that at least one item exists (this is handled before this
+      # method) and thus the default value is valid.
+      return super()._resolve_default_value(default_value)
     else:
       if default_value in self._items:
-        # `default_value` is passed as a string (identifier), while the actual
-        # value (integer) must be passed to the setting initialization.
-        return self._items[default_value]
+        return default_value
       else:
         self._handle_failed_validation(
-          (f'invalid identifier for the default value "{default_value}"'
-           f'; must be one of {list(self._items)}'),
+          f'invalid default value "{default_value}"; must be one of {list(self._items)}',
           'invalid_default_value',
           prepend_value=False,
         )
-  
+
   def _validate(self, item_name):
     if item_name not in self._items:
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
@@ -1585,7 +1555,7 @@ class ChoiceSetting(Setting):
       self._display_name,
       self._description,
       self._choice,
-      self._items_by_value[self._default_value],
+      self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
 

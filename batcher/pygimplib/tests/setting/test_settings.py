@@ -940,7 +940,7 @@ class TestCreateChoiceSetting(SettingTestCase):
   def test_default_default_value_is_first_item(self):
     setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
-    self.assertEqual(setting.default_value, setting.items['skip'])
+    self.assertEqual(setting.default_value, 'skip')
   
   def test_no_items_raises_error(self):
     with self.assertRaises(ValueError):
@@ -991,9 +991,6 @@ class TestChoiceSetting(SettingTestCase):
       default_value='replace',
       display_name='Overwrite mode')
 
-  def test_get_name(self):
-    self.assertEqual(self.setting.get_name(), 'replace')
-  
   def test_set_invalid_item(self):
     self.setting.set_value(4)
 
@@ -1022,7 +1019,7 @@ class TestChoiceSetting(SettingTestCase):
       self.setting.to_dict(),
       {
         'name': 'overwrite_mode',
-        'value': 1,
+        'value': 'replace',
         'type': 'choice',
         'default_value': 'replace',
         'items': [['skip', 'Skip'], ['replace', 'Replace']],

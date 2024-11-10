@@ -568,7 +568,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     
     self.assertEqual(action.name, 'file-png-export')
     self.assertEqual(action['function'].value, 'file-png-export')
-    self.assertTrue(action['origin'].is_item('gimp_pdb'))
+    self.assertEqual(action['origin'].value, 'gimp_pdb')
     self.assertEqual(action['enabled'].value, True)
     self.assertEqual(action['display_name'].value, 'Save as PNG')
     self.assertEqual(action['action_groups'].value, [actions_.DEFAULT_PROCEDURES_GROUP])
@@ -594,7 +594,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
     
     self.assertEqual(action.name, 'file-png-export')
     self.assertEqual(action['function'].value, 'file-png-export')
-    self.assertTrue(action['origin'].is_item('gimp_pdb'))
+    self.assertEqual(action['origin'].value, 'gimp_pdb')
     self.assertEqual(action['enabled'].value, False)
     self.assertEqual(action['arguments/filename'].value, 'image.png')
 
