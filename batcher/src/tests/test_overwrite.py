@@ -22,32 +22,30 @@ class InteractiveOverwriteChooserStub(overwrite.InteractiveOverwriteChooser):
 
 
 class TestInteractiveOverwriteChooser(unittest.TestCase):
-
-  _OVERWRITE_MODES = SKIP, REPLACE, RENAME_NEW, RENAME_EXISTING = (0, 1, 2, 3)
   
   def setUp(self):
     self.values_and_display_names = {
-      self.SKIP: 'Skip',
-      self.REPLACE: 'Replace',
-      self.RENAME_NEW: 'Rename new',
-      self.RENAME_EXISTING: 'Rename existing',
+      overwrite.OverwriteModes.SKIP: 'Skip',
+      overwrite.OverwriteModes.REPLACE: 'Replace',
+      overwrite.OverwriteModes.RENAME_NEW: 'Rename new',
+      overwrite.OverwriteModes.RENAME_EXISTING: 'Rename existing',
     }
-    self.default_response = self.SKIP
+    self.default_response = overwrite.OverwriteModes.SKIP
     self.overwrite_chooser = InteractiveOverwriteChooserStub(
-      self.values_and_display_names, self.REPLACE, self.default_response)
+      self.values_and_display_names, overwrite.OverwriteModes.REPLACE, self.default_response)
   
   def test_choose_overwrite_default_value(self):
     self.overwrite_chooser.choose()
-    self.assertEqual(self.overwrite_chooser.overwrite_mode, self.REPLACE)
+    self.assertEqual(self.overwrite_chooser.overwrite_mode, overwrite.OverwriteModes.REPLACE)
 
   def test_choose_overwrite(self):
-    for mode in self._OVERWRITE_MODES:
+    for mode in self.values_and_display_names:
       self.overwrite_chooser.set_overwrite_mode(mode)
       self.overwrite_chooser.choose()
       self.assertEqual(self.overwrite_chooser.overwrite_mode, mode)
     
   def test_choose_overwrite_default_response(self):
-    self.overwrite_chooser.set_overwrite_mode(-1)
+    self.overwrite_chooser.set_overwrite_mode('unrecognized_value')
     self.overwrite_chooser.choose()
     self.assertEqual(self.overwrite_chooser.overwrite_mode, self.default_response)
 

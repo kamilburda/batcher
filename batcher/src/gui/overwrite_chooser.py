@@ -24,16 +24,18 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
   
   def __init__(
         self,
-        values_and_display_names: Dict[int, str],
-        default_value: int,
-        default_response: int,
+        values_and_display_names: Dict[str, str],
+        default_value: str,
+        default_response: str,
         title: str = '',
         parent: Optional[Gtk.Window] = None):
     super().__init__(values_and_display_names, default_value, default_response)
     
     self._title = title
     self._parent = parent
-    
+
+    self._response_ids_and_values = {}
+
     self._init_gui()
   
   def _init_gui(self):
@@ -84,8 +86,9 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
     self._dialog.vbox.pack_start(self._vbox_contents, False, False, 0)
     
     self._buttons = {}
-    for value, display_name in self.values_and_display_names.items():
-      self._buttons[value] = self._dialog.add_button(display_name, value)
+    for response_id, (value, display_name) in enumerate(self.values_and_display_names.items()):
+      self._buttons[value] = self._dialog.add_button(display_name, response_id)
+      self._response_ids_and_values[response_id] = value
     
     self._checkbutton_apply_to_all.connect(
       'toggled', self._on_checkbutton_apply_to_all_toggled)
@@ -126,7 +129,9 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
     
     self._dialog.show_all()
     
-    self._overwrite_mode = self._dialog.run()
+    response_id = self._dialog.run()
+
+    self._overwrite_mode = self._response_ids_and_values[response_id]
     
     if self._overwrite_mode not in self._values:
       self._overwrite_mode = self.default_response

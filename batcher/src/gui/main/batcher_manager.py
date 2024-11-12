@@ -99,7 +99,7 @@ class BatcherManager:
     _stop_batcher(self._batcher)
 
   def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
-    overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
+    overwrite_chooser = _get_interactive_overwrite_chooser(parent_widget)
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
@@ -166,14 +166,14 @@ class BatcherManagerQuick:
   def _set_up_batcher(self, mode, image, parent_widget, progress_bar):
     if mode == 'export':
       if self._settings['gui/show_quick_settings'].value:
-        overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
+        overwrite_chooser = _get_interactive_overwrite_chooser(parent_widget)
         initial_export_run_mode = Gimp.RunMode.INTERACTIVE
       else:
         overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
           self._settings['main/overwrite_mode'].value)
         initial_export_run_mode = Gimp.RunMode.WITH_LAST_VALS
     else:
-      overwrite_chooser = _get_interactive_overwrite_chooser(self._settings, parent_widget)
+      overwrite_chooser = _get_interactive_overwrite_chooser(parent_widget)
       initial_export_run_mode = Gimp.RunMode.INTERACTIVE
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
@@ -192,16 +192,12 @@ class BatcherManagerQuick:
     return batcher, overwrite_chooser, progress_updater
 
 
-def _get_interactive_overwrite_chooser(settings, parent_widget):
+def _get_interactive_overwrite_chooser(parent_widget):
   return overwrite_chooser_.GtkDialogOverwriteChooser(
-    _get_overwrite_dialog_items(),
-    default_value=builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1],
+    builtin_procedures.INTERACTIVE_OVERWRITE_MODES,
+    default_value=overwrite.OverwriteModes.RENAME_NEW,
     default_response=overwrite.OverwriteModes.CANCEL,
     parent=parent_widget)
-
-
-def _get_overwrite_dialog_items():
-  return {value[1]: value[0] for value in builtin_procedures.INTERACTIVE_OVERWRITE_MODES.values()}
 
 
 def _stop_batcher(batcher):

@@ -9,8 +9,6 @@ import pygimplib as pg
 from src import actions as actions_
 from src import builtin_constraints
 from src import builtin_procedures
-from src import export as export_
-from src import overwrite
 from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_
@@ -555,14 +553,13 @@ def _update_to_0_5(data, _settings, source_names):
             'type': 'choice',
             'name': 'overwrite_mode',
             'default_value': 'ask',
-            'value': overwrite.OverwriteModes.ASK,
+            'value': 6,
             'items': [
-              ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
-              ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
-              ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
-              ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
-              ('rename_existing', _('Rename existing file'),
-               overwrite.OverwriteModes.RENAME_EXISTING)],
+              ('ask', _('Ask'), 6),
+              ('replace', _('Replace'), 0),
+              ('skip', _('Skip'), 1),
+              ('rename_new', _('Rename new file'), 2),
+              ('rename_existing', _('Rename existing file'), 3)],
             'display_name': _('If a file already exists:'),
           })
 
@@ -587,14 +584,10 @@ def _update_to_0_5(data, _settings, source_names):
             'type': 'choice',
             'name': 'file_format_mode',
             'default_value': 'use_explicit_values',
-            'value': export_.FileFormatModes.USE_EXPLICIT_VALUES,
+            'value': 1,
             'items': [
-              ('use_native_plugin_values',
-               _('Interactively'),
-               export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES),
-              ('use_explicit_values',
-               _('Use options below'),
-               export_.FileFormatModes.USE_EXPLICIT_VALUES)],
+              ('use_native_plugin_values', _('Interactively'), 0),
+              ('use_explicit_values', _('Use options below'), 1)],
             'display_name': _('How to adjust file format options:'),
             'description': _(
               'Native dialogs usually allow you to adjust more options such as image metadata,'

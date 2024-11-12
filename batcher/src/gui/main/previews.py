@@ -10,7 +10,6 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src import builtin_procedures
 from src import core
 from src import overwrite
 
@@ -49,7 +48,7 @@ class Previews:
     self._image = self._initial_layer_tree.image
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
-      builtin_procedures.INTERACTIVE_OVERWRITE_MODES['rename_new'][1])
+      overwrite.OverwriteModes.RENAME_NEW)
 
     self._batcher_for_name_preview = core.LayerBatcher(
       input_image=self._image,

@@ -45,7 +45,7 @@ class Batcher(metaclass=abc.ABCMeta):
         output_directory: str = pg.utils.get_pictures_directory(),
         name_pattern: str = '',
         file_extension: str = 'png',
-        overwrite_mode: int = overwrite.OverwriteModes.RENAME_NEW,
+        overwrite_mode: str = overwrite.OverwriteModes.RENAME_NEW,
         overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
         more_export_options: Dict[str, Any] = None,
         progress_updater: Optional[progress_.ProgressUpdater] = None,
@@ -154,7 +154,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._file_extension
 
   @property
-  def overwrite_mode(self) -> int:
+  def overwrite_mode(self) -> str:
     """One of the `pygimplib.overwrite.OverwriteModes` values indicating how to
     handle files with the same name.
     """

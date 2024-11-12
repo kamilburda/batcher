@@ -16,14 +16,14 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
   file).
   """
 
-  def __init__(self, overwrite_mode: int):
+  def __init__(self, overwrite_mode: str):
     """Initializes the instance with a default overwrite mode."""
     super().__init__()
 
     self._overwrite_mode = overwrite_mode
   
   @property
-  def overwrite_mode(self) -> int:
+  def overwrite_mode(self) -> str:
     """The overwrite mode chosen by the user.
 
     By default, this is set to the value provided during object instantiation.
@@ -31,11 +31,11 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
     return self._overwrite_mode
 
   @overwrite_mode.setter
-  def overwrite_mode(self, value: int):
+  def overwrite_mode(self, value: str):
     self._overwrite_mode = value
   
   @abc.abstractmethod
-  def choose(self, filepath: Optional[str] = None) -> int:
+  def choose(self, filepath: Optional[str] = None) -> str:
     """Returns a value indicating how to handle the conflicting file.
 
     The user is assumed to choose one of the possible overwrite modes. The
@@ -57,7 +57,7 @@ class NoninteractiveOverwriteChooser(OverwriteChooser):
   no user interaction.
   """
   
-  def choose(self, filepath: Optional[str] = None) -> int:
+  def choose(self, filepath: Optional[str] = None) -> str:
     return self._overwrite_mode
 
 
@@ -66,9 +66,9 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
   
   def __init__(
         self,
-        values_and_display_names: Dict[int, str],
-        default_value: int,
-        default_response: int,
+        values_and_display_names: Dict[str, str],
+        default_value: str,
+        default_response: str,
   ):
     super().__init__(default_value)
     
@@ -98,7 +98,7 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
     """
     return self._apply_to_all
   
-  def choose(self, filepath: Optional[str] = None) -> int:
+  def choose(self, filepath: Optional[str] = None) -> str:
     if self._overwrite_mode is None or not self._apply_to_all:
       return self._choose(filepath)
     else:
@@ -116,7 +116,7 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
 
 def handle_overwrite(
       filepath: str, overwrite_chooser: OverwriteChooser, position: Optional[int] = None
-) -> Tuple[int, str]:
+) -> Tuple[str, str]:
   """Resolves how to handle an existing file path.
 
   ``overwrite_chooser`` is presented to the user to let them choose the
@@ -164,31 +164,31 @@ class OverwriteModes:
   """Overwrite modes used by `handle_overwrite()` and recommended to be handled
   by custom `OverwriteChooser` subclasses.
   """
-  REPLACE = 0
+  REPLACE = 'replace'
   """Indicates to overwrite an existing file with new contents."""
 
-  SKIP = 1
+  SKIP = 'skip'
   """Indicates to avoid overwriting an existing file."""
 
-  RENAME_NEW = 2
+  RENAME_NEW = 'rename_new'
   """Indicates to rename the file path whose contents are about to be written
   to the file system.
   """
 
-  RENAME_EXISTING = 3
+  RENAME_EXISTING = 'rename_existing'
   """Indicates to rename the existing file path in the file system."""
 
-  CANCEL = 4
+  CANCEL = 'cancel'
   """This value should be used if the user terminated the overwrite chooser,
   for example by closing a dialog if an interactive overwrite chooser is used.
   """
 
-  DO_NOTHING = 5
+  DO_NOTHING = 'do_nothing'
   """This value should if there is no need to display an overwrite chooser, i.e.
   if a file path does not exist and no action should be taken.
   """
 
-  ASK = 6
+  ASK = 'ask'
   """Indicates to display an interactive dialog, prompting the user to choose
   one of the other overwrite modes.
   

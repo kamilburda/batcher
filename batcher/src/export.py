@@ -1,15 +1,13 @@
 """Built-in procedure to export a given item as an image."""
 
 import collections
-from collections.abc import Iterable
 import os
-from typing import Callable, Dict, Generator, List, Optional, Union, Tuple
+from typing import Callable, Dict, Generator, Optional, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
-from gi.repository import GObject
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -28,10 +26,10 @@ EXPORT_NAME_ITEM_STATE = 'export_name'
 
 class FileFormatModes:
 
-  FILE_FORMAT_MODES =(
+  FILE_FORMAT_MODES = (
     USE_NATIVE_PLUGIN_VALUES,
     USE_EXPLICIT_VALUES,
-  ) = 0, 1
+  ) = 'use_native_plugin_values', 'use_explicit_values'
 
 
 class ExportModes:
@@ -40,17 +38,17 @@ class ExportModes:
     EACH_LAYER,
     EACH_TOP_LEVEL_ITEM_OR_FOLDER,
     ENTIRE_IMAGE_AT_ONCE,
-  ) = 0, 1, 2
+  ) = 'each_layer', 'each_top_level_layer_or_group', 'entire_image_at_once'
 
 
 def export(
       batcher: 'src.core.Batcher',
       output_directory: str = pg.utils.get_pictures_directory(),
       file_extension: str = 'png',
-      file_format_mode: int = FileFormatModes.USE_EXPLICIT_VALUES,
+      file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_export_options: Optional[Dict] = None,
-      overwrite_mode: int = overwrite.OverwriteModes.ASK,
-      export_mode: int = ExportModes.EACH_LAYER,
+      overwrite_mode: str = overwrite.OverwriteModes.ASK,
+      export_mode: str = ExportModes.EACH_LAYER,
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
@@ -517,7 +515,7 @@ def _export_image(
       image: Gimp.Image,
       filepath: Union[str, Gio.File],
       file_extension: str,
-      file_format_mode: int,
+      file_format_mode: str,
       file_format_export_options: Dict,
 ):
   if not isinstance(filepath, Gio.File):
@@ -537,7 +535,7 @@ def _export_image(
 
 def get_export_function(
       file_extension: str,
-      file_format_mode: int,
+      file_format_mode: str,
       file_format_export_options: Dict,
 ) -> Tuple[Callable, Dict]:
   """Returns the file export procedure and file format settings given the

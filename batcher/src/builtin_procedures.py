@@ -222,24 +222,27 @@ _SCALE_UNITS = (
   PERCENT_IMAGE_WIDTH,
   PERCENT_IMAGE_HEIGHT,
   PIXELS,
-) = (0, 1, 2, 3, 4)
+) = (
+  'percent_layer_width',
+  'percent_layer_height',
+  'percent_image_width',
+  'percent_image_height',
+  'pixels',
+)
 
 
 INTERACTIVE_OVERWRITE_MODES_LIST = [
-  ('replace', _('Replace'), overwrite.OverwriteModes.REPLACE),
-  ('skip', _('Skip'), overwrite.OverwriteModes.SKIP),
-  ('rename_new', _('Rename new file'), overwrite.OverwriteModes.RENAME_NEW),
-  ('rename_existing', _('Rename existing file'), overwrite.OverwriteModes.RENAME_EXISTING)
+  (overwrite.OverwriteModes.REPLACE, _('Replace')),
+  (overwrite.OverwriteModes.SKIP, _('Skip')),
+  (overwrite.OverwriteModes.RENAME_NEW, _('Rename new file')),
+  (overwrite.OverwriteModes.RENAME_EXISTING, _('Rename existing file'))
 ]
 
-
-INTERACTIVE_OVERWRITE_MODES = {
-  item[0]: item[1:] for item in INTERACTIVE_OVERWRITE_MODES_LIST
-}
+INTERACTIVE_OVERWRITE_MODES = dict(INTERACTIVE_OVERWRITE_MODES_LIST)
 
 
 _EXPORT_OVERWRITE_MODES_LIST = [
-  ('ask', _('Ask'), overwrite.OverwriteModes.ASK),
+  (overwrite.OverwriteModes.ASK, _('Ask')),
   *INTERACTIVE_OVERWRITE_MODES_LIST
 ]
 
@@ -273,12 +276,9 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
       'name': 'file_format_mode',
       'default_value': 'use_explicit_values',
       'items': [
-        ('use_native_plugin_values',
-         _('Interactively'),
-         export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES),
-        ('use_explicit_values',
-         _('Use options below'),
-         export_.FileFormatModes.USE_EXPLICIT_VALUES)],
+        (export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES, _('Interactively')),
+        (export_.FileFormatModes.USE_EXPLICIT_VALUES, _('Use options below')),
+      ],
       'display_name': _('How to adjust file format options:'),
       'description': _(
         'Native dialogs usually allow you to adjust more options such as image metadata,'
@@ -306,13 +306,9 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
       'name': 'export_mode',
       'default_value': 'each_layer',
       'items': [
-        ('each_layer', _('For each layer'), export_.ExportModes.EACH_LAYER),
-        ('each_top_level_layer_or_group',
-         _('For each top-level layer or group'),
-         export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER),
-        ('entire_image_at_once',
-         _('For the entire image at once'),
-         export_.ExportModes.ENTIRE_IMAGE_AT_ONCE),
+        (export_.ExportModes.EACH_LAYER, _('For each layer')),
+        (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
+        (export_.ExportModes.ENTIRE_IMAGE_AT_ONCE, _('For the entire image at once')),
       ],
       'display_name': _('Perform export:'),
     },
@@ -578,11 +574,11 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': 'percentage_of_layer_width',
         'name': 'width_unit',
         'items': [
-          ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
-          ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
-          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
-          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
-          ('pixels', _('Pixels'), PIXELS),
+          (PERCENT_LAYER_WIDTH, _('% of layer width')),
+          (PERCENT_LAYER_HEIGHT, _('% of layer height')),
+          (PERCENT_IMAGE_WIDTH, _('% of image width')),
+          (PERCENT_IMAGE_HEIGHT, _('% of image height')),
+          (PIXELS, _('Pixels')),
         ],
         'display_name': _('Unit for width'),
       },
@@ -597,11 +593,11 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': 'percentage_of_layer_height',
         'name': 'height_unit',
         'items': [
-          ('percentage_of_layer_width', _('% of layer width'), PERCENT_LAYER_WIDTH),
-          ('percentage_of_layer_height', _('% of layer height'), PERCENT_LAYER_HEIGHT),
-          ('percentage_of_image_width', _('% of image width'), PERCENT_IMAGE_WIDTH),
-          ('percentage_of_image_height', _('% of image height'), PERCENT_IMAGE_HEIGHT),
-          ('pixels', _('Pixels'), PIXELS),
+          (PERCENT_LAYER_WIDTH, _('% of layer width')),
+          (PERCENT_LAYER_HEIGHT, _('% of layer height')),
+          (PERCENT_IMAGE_WIDTH, _('% of image width')),
+          (PERCENT_IMAGE_HEIGHT, _('% of image height')),
+          (PIXELS, _('Pixels')),
         ],
         'display_name': _('Unit for height'),
       },
