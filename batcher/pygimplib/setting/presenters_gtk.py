@@ -247,7 +247,7 @@ class ComboBoxPresenter(GtkPresenter):
 
     model = Gtk.ListStore(GObject.TYPE_STRING)
 
-    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names)):
+    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names.values())):
       self._name_to_row_index_mapping[name] = index
       self._row_index_to_name_mapping[index] = name
       model.append((label if label is not None else '',))
@@ -284,7 +284,7 @@ class RadioButtonBoxPresenter(GtkPresenter):
     self._widget = pggui.RadioButtonBox(**kwargs)
     self._widget.set_tooltip_text(setting.description)
 
-    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names)):
+    for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names.values())):
       self._widget.add(label)
 
       self._name_to_row_index_mapping[name] = index
