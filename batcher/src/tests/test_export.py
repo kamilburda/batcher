@@ -81,7 +81,7 @@ class TestExport(unittest.TestCase):
   def _test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
     mock_get_setting_data_from_pdb_procedure.return_value = (
       None, 'file-png-export', self.file_format_options)
-    mock_gimp.get_pdb().add_procedure(stubs_gimp.PdbProcedureStub('file-png-export'))
+    mock_gimp.get_pdb().add_procedure(stubs_gimp.Procedure('file-png-export'))
 
     file_format_options = {}
 
@@ -100,7 +100,7 @@ class TestExport(unittest.TestCase):
 
   def test_get_default_export_function_if_file_format_mode_is_not_use_explicit_values(
         self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
-    mock_gimp.get_pdb().add_procedure(stubs_gimp.PdbProcedureStub('gimp-file-save'))
+    mock_gimp.get_pdb().add_procedure(stubs_gimp.Procedure('gimp-file-save'))
 
     file_format_options = {}
 
@@ -113,7 +113,7 @@ class TestExport(unittest.TestCase):
 
   def test_get_default_export_function_if_file_format_is_not_recognized(
         self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
-    mock_gimp.get_pdb().add_procedure(stubs_gimp.PdbProcedureStub('gimp-file-save'))
+    mock_gimp.get_pdb().add_procedure(stubs_gimp.Procedure('gimp-file-save'))
 
     file_format_options = {}
 

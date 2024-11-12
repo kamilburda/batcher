@@ -50,7 +50,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       dict(value_type=GObject.TYPE_STRV, name='brushes', blurb='Brush names'),
     ])
 
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
     procedure, procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
@@ -113,7 +113,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         blurb='Test'),
     ])
 
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
     _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
@@ -132,7 +132,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     )
 
   def test_default_run_mode_is_noninteractive(self, mock_get_pdb):
-    self.procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    self.procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
 
     _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
@@ -146,7 +146,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       dict(value_type=Gimp.Layer.__gtype__, name='layer', blurb='The layer to process'),
     ])
 
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
     _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
@@ -163,7 +163,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       dict(value_type=GObject.TYPE_BOOLEAN, name='new-image', default_value=True),
     )
 
-    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
     _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(

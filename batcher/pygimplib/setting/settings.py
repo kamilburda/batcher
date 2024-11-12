@@ -1394,17 +1394,17 @@ class ChoiceSetting(Setting):
   
   Raises:
     ValueError:
-      No items were specified, the same value was assigned to multiple items,
-      or an uneven number of elements was passed to the ``items`` parameter
-      in `__init__()`.
+      The same numeric value was assigned to multiple items, or an uneven
+      number of elements was passed to the ``items`` parameter in `__init__()`.
     KeyError:
       Invalid key for the `items` or `items_display_names` property.
   
   Message IDs for invalid values:
     * ``'invalid_value'``: The value assigned is not one of the items in this
-      setting.
+      setting if the ``items`` parameter passed to `__init__()` was not empty.
     * ``'invalid_default_value'``: Item name is not valid (not found in the
-      ``items`` parameter in `__init__()`).
+      ``items`` parameter in `__init__()`) if the ``items`` parameter passed to
+      `__init__()` was not empty.
   """
 
   _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING]
@@ -1414,14 +1414,18 @@ class ChoiceSetting(Setting):
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.combo_box,
     _SETTING_GUI_TYPES.radio_button_box,
+    _SETTING_GUI_TYPES.choice_combo_box,
   ]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self._items), None)
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self._items), '')
   
   def __init__(
         self,
         name: str,
-        items: Union[List[Tuple[str, str]], List[Tuple[str, str, int]], Gimp.Choice],
+        items: Optional[
+          Union[List[Tuple[str, str]], List[Tuple[str, str, int]], Gimp.Choice]
+        ] = None,
+        procedure: Optional[Union[Gimp.Procedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1435,7 +1439,17 @@ class ChoiceSetting(Setting):
         assign explicit item values. Values must be unique and specified in
         each tuple. Use only 2- or only 3-element tuples, they cannot be
         combined.
+        If ``items`` is ``None`` or an empty list, any string can be assigned
+        to this setting. This is a workaround to allow settings of this type
+        to be created from GIMP PDB parameters as currently there is no way to
+        obtain a list of choices from PDB parameters.
+      procedure:
+        A `Gimp.Procedure` instance, or name thereof, whose PDB parameter having
+        the name ``name`` contains possible choices.
     """
+    self._procedure = self._process_procedure(procedure)
+    self._procedure_config = self._create_procedure_config(self._procedure)
+
     self._items, self._items_by_value, self._items_display_names, self._choice = (
       self._create_item_attributes(items))
     
@@ -1458,12 +1472,39 @@ class ChoiceSetting(Setting):
     Item display names can be used e.g. as combo box items in the GUI.
     """
     return self._items_display_names
-  
+
+  @property
+  def procedure(self) -> Union[Gimp.Procedure, None]:
+    """A `Gimp.Procedure` instance containing the `Gimp.Choice` instance for
+    this setting.
+    """
+    return self._procedure
+
+  @property
+  def procedure_config(self) -> Union[Gimp.ProcedureConfig, None]:
+    """A `Gimp.ProcedureConfig` instance containing the `Gimp.Choice` instance
+    for this setting.
+    """
+    return self._procedure_config
+
   def to_dict(self):
     settings_dict = super().to_dict()
-    
-    settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
-    
+
+    if 'items' in settings_dict:
+      if settings_dict['items'] is None:
+        settings_dict['items'] = []
+      elif isinstance(settings_dict['items'], Gimp.Choice):
+        settings_dict['items'] = [
+          [name, self._choice.get_label(name), self._choice.get_id(name)]
+          for name in self._choice.list_nicks()
+        ]
+      else:
+        settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
+
+    if 'procedure' in settings_dict:
+      if settings_dict['procedure'] is not None:
+        settings_dict['procedure'] = self._procedure.get_name()
+
     return settings_dict
 
   def get_name(self) -> str:
@@ -1488,24 +1529,49 @@ class ChoiceSetting(Setting):
       # method) and thus the default value is valid.
       return super()._resolve_default_value(default_value)
     else:
-      if default_value in self._items:
-        return default_value
+      if self._items:
+        if default_value in self._items:
+          return default_value
+        else:
+          self._handle_failed_validation(
+            f'invalid default value "{default_value}"; must be one of {list(self._items)}',
+            'invalid_default_value',
+            prepend_value=False,
+          )
       else:
-        self._handle_failed_validation(
-          f'invalid default value "{default_value}"; must be one of {list(self._items)}',
-          'invalid_default_value',
-          prepend_value=False,
-        )
+        return ''
 
   def _validate(self, item_name):
-    if item_name not in self._items:
+    if self._items and item_name not in self._items:
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
+
+  @staticmethod
+  def _process_procedure(procedure) -> Union[Gimp.Procedure, None]:
+    if procedure is None:
+      return None
+    elif isinstance(procedure, Gimp.Procedure):
+      return procedure
+    elif isinstance(procedure, str):
+      if Gimp.get_pdb().procedure_exists(procedure):
+        return Gimp.get_pdb().lookup_procedure(procedure)
+    else:
+      raise TypeError('procedure must be None, a string or a Gimp.Procedure instance')
+
+  @staticmethod
+  def _create_procedure_config(procedure):
+    if procedure is not None:
+      return procedure.create_config()
+    else:
+      return None
 
   @staticmethod
   def _create_item_attributes(input_items):
     items = {}
     items_by_value = {}
     items_display_names = {}
+
+    if not input_items:
+      return items, items_by_value, items_display_names, Gimp.Choice.new()
 
     if isinstance(input_items, Gimp.Choice):
       for name in input_items.list_nicks():
@@ -1515,9 +1581,6 @@ class ChoiceSetting(Setting):
         items_display_names[name] = input_items.get_label(name)
 
       return items, items_by_value, items_display_names, input_items
-
-    if not input_items:
-      raise ValueError('must specify at least one item')
 
     if all(len(elem) == 2 for elem in input_items):
       for i, (item_name, item_display_name) in enumerate(input_items):
@@ -3103,16 +3166,16 @@ class DictSetting(ContainerSetting):
       return raw_value
 
 
-def get_setting_type_from_gtype(
+def get_setting_type_and_kwargs(
       gtype: GObject.GType,
       pdb_param_info: Optional[GObject.ParamSpec] = None,
+      pdb_procedure: Optional[Gimp.Procedure] = None,
 ) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
   """Given a GIMP PDB parameter type, returns the corresponding `Setting`
-  subclass.
+  subclass and keyword arguments passable to its ``__init__()`` method.
 
-  Along with a `Setting` subclass, keyword arguments passable to its
-  ``__init__()`` method are returned (some of which are positional arguments
-  such as ``enum_type`` for `EnumSetting`).
+  Some of the keyword arguments passable may be positional arguments, such as
+  ``enum_type`` for `EnumSetting`.
 
   If ``gtype`` does not match any `setting.Setting` subclass, ``None`` is
   returned.
@@ -3123,7 +3186,13 @@ def get_setting_type_from_gtype(
     pdb_param_info:
       Object representing GIMP PDB parameter information, obtainable via
       `Gimp.Procedure.get_arguments()`. This is used to infer the element type
-      for an object array argument (images, layers, etc.).
+      for an object array argument (images, layers, etc.) and to help obtain
+      keyword arguments for `ChoiceSetting`. If ``None``,
+      the `StringSetting` type will be returned instead.
+    pdb_procedure:
+      If not ``None``, it is a `Gimp.Procedure` instance allowing to infer
+      string choices for the `ChoiceSetting` type. If ``None``,
+      the `StringSetting` type will be returned instead.
 
   Returns:
     Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
@@ -3131,13 +3200,23 @@ def get_setting_type_from_gtype(
     ``None`` if there is no matching `setting.Setting` subclass for ``gtype``.
   """
   if gtype in meta_.GTYPES_AND_SETTING_TYPES:
-    # If multiple `GType`s map to the same `Setting` subclass, use the
-    # `Setting` subclass registered (i.e. declared) the earliest.
-    setting_type = meta_.GTYPES_AND_SETTING_TYPES[gtype][0]
+    if (pdb_param_info is not None
+        and isinstance(pdb_param_info, Gimp.ParamChoice)
+        and pdb_procedure is not None):
+      return (
+        ChoiceSetting,
+        dict(
+          items=None,
+          procedure=pdb_procedure,
+          gui_type=_SETTING_GUI_TYPES.choice_combo_box))
+    else:
+      # If multiple `GType`s map to the same `Setting` subclass, use the
+      # `Setting` subclass registered (i.e. declared) the earliest.
+      setting_type = meta_.GTYPES_AND_SETTING_TYPES[gtype][0]
 
-    # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
-    # instance can have its minimum and maximum values properly adjusted.
-    return setting_type, dict(pdb_type=gtype)
+      # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
+      # instance can have its minimum and maximum values properly adjusted.
+      return setting_type, dict(pdb_type=gtype)
   elif hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
     return EnumSetting, dict(enum_type=gtype)
   elif gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
@@ -3198,7 +3277,7 @@ _ARRAY_GTYPES_TO_SETTING_TYPES = {
 
 
 __all__ = [
-  'get_setting_type_from_gtype',
+  'get_setting_type_and_kwargs',
   'get_array_setting_type_from_gimp_core_object_array',
   'array_as_pdb_compatible_type',
   'ValueNotValidData',

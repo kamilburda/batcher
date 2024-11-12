@@ -542,7 +542,7 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
 
     self.procedure_name = 'file-png-export'
 
-    self.procedure_stub = stubs_gimp.PdbProcedureStub(
+    self.procedure_stub = stubs_gimp.Procedure(
       name=self.procedure_name,
       proc_type=Gimp.PDBProcType.PLUGIN,
       arguments_spec=[
@@ -629,7 +629,7 @@ class TestGetActionDictFromPdbProcedure(unittest.TestCase):
       dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
     ])
 
-    extended_procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
     action_dict = actions_.get_action_dict_from_pdb_procedure(extended_procedure_stub.get_name())

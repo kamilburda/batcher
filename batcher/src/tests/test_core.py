@@ -117,13 +117,13 @@ class TestAddActionFromSettings(unittest.TestCase):
   def test_add_pdb_proc_as_action_without_run_mode(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'] = self.procedure_stub_kwargs['arguments_spec'][1:]
 
-    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
     self._test_add_pdb_proc_as_action(procedure_stub, [('save-options', ()), ('filename', '')], {})
   
   def test_add_pdb_proc_as_action_with_run_mode(self, mock_get_pdb):
-    procedure_stub = stubs_gimp.PdbProcedureStub(**self.procedure_stub_kwargs)
+    procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
     self._test_add_pdb_proc_as_action(

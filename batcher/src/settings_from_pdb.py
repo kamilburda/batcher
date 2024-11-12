@@ -38,7 +38,7 @@ def get_setting_data_from_pdb_procedure(
   arguments = []
 
   for proc_arg in pdb_procedure.get_arguments():
-    retval = pg.setting.get_setting_type_from_gtype(proc_arg.value_type, proc_arg)
+    retval = pg.setting.get_setting_type_and_kwargs(proc_arg.value_type, proc_arg, pdb_procedure)
 
     if retval is not None:
       setting_type, setting_type_init_kwargs = retval

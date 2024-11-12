@@ -20,6 +20,7 @@ from ... import config
 from ... import utils as pgutils
 
 from ...setting import presenter as presenter_
+from ...setting import presenters_gtk as presenters_gtk_
 from ...setting import settings as settings_
 
 from .. import stubs_gimp
@@ -942,9 +943,11 @@ class TestCreateChoiceSetting(SettingTestCase):
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
     self.assertEqual(setting.default_value, 'skip')
   
-  def test_no_items_raises_error(self):
-    with self.assertRaises(ValueError):
-      settings_.ChoiceSetting('overwrite_mode', [])
+  def test_no_items_does_not_validate_value(self):
+    setting = settings_.ChoiceSetting('overwrite_mode', [])
+
+    setting.set_value('some_item')
+    self.assertTrue(setting.is_valid)
   
   def test_explicit_item_values(self):
     setting = settings_.ChoiceSetting(
@@ -953,7 +956,30 @@ class TestCreateChoiceSetting(SettingTestCase):
       default_value='replace')
     self.assertEqual(setting.items['skip'], 5)
     self.assertEqual(setting.items['replace'], 6)
-  
+
+  def test_with_procedure(self):
+    procedure = stubs_gimp.Procedure('some-procedure')
+
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          new=stubs_gimp.GimpModuleStub()):
+      # noinspection PyTypeChecker
+      setting = settings_.ChoiceSetting('output-format', procedure=procedure)
+
+    self.assertEqual(setting.procedure, procedure)
+
+  def test_with_procedure_via_name(self):
+    procedure = stubs_gimp.Procedure('some-procedure')
+
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          new=stubs_gimp.GimpModuleStub()) as mock_gimp:
+      mock_gimp.get_pdb().add_procedure(procedure)
+      # noinspection PyTypeChecker
+      setting = settings_.ChoiceSetting('output-format', procedure='some-procedure')
+
+    self.assertEqual(setting.procedure, procedure)
+
   def test_inconsistent_number_of_elements_raises_error(self):
     with self.assertRaises(ValueError):
       settings_.ChoiceSetting(
@@ -1024,6 +1050,58 @@ class TestChoiceSetting(SettingTestCase):
         'default_value': 'replace',
         'items': [['skip', 'Skip'], ['replace', 'Replace']],
         'display_name': 'Overwrite mode',
+      })
+
+  def test_to_dict_if_items_is_none(self):
+    setting = settings_.ChoiceSetting('overwrite_mode', items=None, display_name='Overwrite mode')
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'overwrite_mode',
+        'value': '',
+        'type': 'choice',
+        'items': [],
+        'display_name': 'Overwrite mode',
+      })
+
+  def test_to_dict_if_items_is_gimp_choice(self):
+    choice = Gimp.Choice()
+    choice.add('rename_new', 0, 'Rename new', '')
+    choice.add('rename_existing', 1, 'Rename existing', '')
+
+    setting = settings_.ChoiceSetting(
+      'overwrite_mode', items=choice, display_name='Overwrite mode')
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'overwrite_mode',
+        'value': 'rename_new',
+        'type': 'choice',
+        'items': [
+          ['rename_new', 'Rename new', 0],
+          ['rename_existing', 'Rename existing', 1],
+        ],
+        'display_name': 'Overwrite mode',
+      })
+
+  def test_to_dict_with_procedure(self):
+    procedure = stubs_gimp.Procedure('some-procedure')
+
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          new=stubs_gimp.GimpModuleStub()) as mock_gimp:
+      mock_gimp.get_pdb().add_procedure(procedure)
+      # noinspection PyTypeChecker
+      setting = settings_.ChoiceSetting('output-format', procedure=procedure)
+
+    self.assertDictEqual(
+      setting.to_dict(),
+      {
+        'name': 'output-format',
+        'value': '',
+        'type': 'choice',
+        'procedure': 'some-procedure',
       })
 
 
@@ -2522,23 +2600,40 @@ class TestContainerSettings(SettingTestCase):
       setting.to_dict(), {'name': 'setting', 'value': list(expected_value), 'type': 'set'})
 
 
-class TestGetSettingTypeFromGobjectType(unittest.TestCase):
+class TestGetSettingTypeAndKwargs(unittest.TestCase):
 
   def test_regular_setting_type(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(GObject.TYPE_INT, None),
+      settings_.get_setting_type_and_kwargs(GObject.TYPE_INT, None),
       (settings_.IntSetting, dict(pdb_type=GObject.TYPE_INT)),
     )
 
+  def test_choice(self):
+    procedure = stubs_gimp.Procedure('some-procedure')
+    param_spec = stubs_gimp.GParamStub(GObject.TYPE_STRING, 'output-format')
+
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.isinstance') as mock_isinstance:
+      mock_isinstance.return_value = True
+      # noinspection PyTypeChecker
+      setting_type, kwargs = settings_.get_setting_type_and_kwargs(
+        GObject.TYPE_STRING, param_spec, procedure)
+
+    self.assertEqual(setting_type, settings_.ChoiceSetting)
+    self.assertEqual(len(kwargs), 3)
+    self.assertIsNone(kwargs['items'])
+    self.assertEqual(kwargs['procedure'], procedure)
+    self.assertEqual(kwargs['gui_type'], presenters_gtk_.ChoiceComboBoxPresenter)
+
   def test_enum(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(Gimp.ImageType.__gtype__, None),
+      settings_.get_setting_type_and_kwargs(Gimp.ImageType.__gtype__, None),
       (settings_.EnumSetting, dict(enum_type=Gimp.ImageType.__gtype__)),
     )
 
   def test_builtin_array(self):
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(Gimp.DoubleArray.__gtype__, None),
+      settings_.get_setting_type_and_kwargs(Gimp.DoubleArray.__gtype__, None),
       (settings_.ArraySetting, dict(element_type=settings_.DoubleSetting)),
     )
 
@@ -2547,10 +2642,10 @@ class TestGetSettingTypeFromGobjectType(unittest.TestCase):
 
     # noinspection PyTypeChecker
     self.assertEqual(
-      settings_.get_setting_type_from_gtype(
+      settings_.get_setting_type_and_kwargs(
         GObject.GType.from_name('GimpCoreObjectArray'), param_spec),
       (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
     )
 
   def test_unrecognized_gtype_returns_none(self):
-    self.assertIsNone(settings_.get_setting_type_from_gtype(Gimp.Procedure, None))
+    self.assertIsNone(settings_.get_setting_type_and_kwargs(Gimp.Procedure, None))

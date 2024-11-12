@@ -5,8 +5,6 @@ import math
 import sys
 
 import gi
-gi.require_version('Gegl', '0.4')
-from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -228,6 +226,33 @@ class LabelPresenter(GtkPresenter):
 
   def _set_value(self, value):
     self._widget.set_markup(value if value is not None else '')
+
+
+class ChoiceComboBoxPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `GimpUi.StringComboBox` widgets displaying
+  a set of string choices.
+
+  This presenter updates the underlying setting on initialization as these
+  `GimpUi` combo boxes are set to a valid value when they are created.
+
+  Value: Item selected in the combo box.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.update_setting_value(force=True)
+
+  def _create_widget(self, setting, **kwargs):
+    return GimpUi.prop_choice_combo_box_new(setting.procedure_config, setting.name)
+
+  def get_value(self):
+    return self._widget.get_active()
+
+  def _set_value(self, value):
+    self._widget.set_active(value)
 
 
 class ComboBoxPresenter(GtkPresenter):

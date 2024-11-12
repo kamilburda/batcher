@@ -37,7 +37,7 @@ class PdbStub:
     return cls._PROCEDURES.get(proc_name, None)
 
 
-class PdbProcedureStub:
+class Procedure:
 
   def __init__(
         self,
@@ -87,6 +87,21 @@ class PdbProcedureStub:
   def run(self, config):
     pass
 
+  @staticmethod
+  def create_config():
+    return ProcedureConfig()
+
+
+class ProcedureConfig:
+  pass
+
+
+class Choice:
+
+  @classmethod
+  def new(cls):
+    return Choice()
+
 
 class GParamStub:
 
@@ -95,6 +110,15 @@ class GParamStub:
     self.name = name
     self.blurb = blurb
     self.default_value = default_value
+
+  def get_name(self):
+    return self.name
+
+  def get_blurb(self):
+    return self.blurb
+
+  def get_default_value(self):
+    return self.default_value
 
 
 class ParasiteFunctionsStubMixin:
@@ -567,6 +591,10 @@ class CoreObjectArray:
 
 
 class GimpModuleStub(ParasiteFunctionsStubMixin):
+
+  Procedure = Procedure
+
+  Choice = Choice
 
   Parasite = Parasite
 
