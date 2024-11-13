@@ -244,6 +244,16 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIsInstance(
       self.settings['gui/size/paned_between_previews_position'], pg.setting.IntSetting)
 
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/file_format_mode'].value,
+      'use_explicit_values')
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/overwrite_mode'].value,
+      'ask')
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/export_mode'].value,
+      'each_layer')
+
     for procedure in self.settings['main/procedures']:
       if procedure['orig_name'].value in builtin_procedures.BUILTIN_PROCEDURES:
         self.assertEqual(procedure['origin'].value, 'builtin')

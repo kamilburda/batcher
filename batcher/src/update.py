@@ -672,6 +672,12 @@ def _update_to_0_6(data, _settings, source_names):
     if overwrite_mode_dict is not None:
       _update_choice_setting(overwrite_mode_dict)
 
+    export_settings_list, _index = _get_child_group_list(gui_settings_list, 'export')
+    if export_settings_list is not None:
+      for setting_dict in export_settings_list:
+        if 'settings' not in setting_dict and setting_dict['type'] == 'choice':
+          _update_choice_setting(setting_dict)
+
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
     if procedures_list is not None:
