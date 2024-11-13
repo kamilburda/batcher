@@ -2080,7 +2080,7 @@ class ColorSetting(Setting):
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color.new('black')
-  
+
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
       color = Gegl.Color()
@@ -2106,8 +2106,7 @@ class ColorSetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
-      # TODO: Allow passing this as a parameter to ColorSetting
-      False,
+      True,
       self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
