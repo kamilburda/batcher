@@ -957,6 +957,20 @@ class TestCreateChoiceSetting(SettingTestCase):
     self.assertEqual(setting.items['skip'], 5)
     self.assertEqual(setting.items['replace'], 6)
 
+  def test_with_help(self):
+    setting = settings_.ChoiceSetting(
+      'overwrite_mode',
+      [('skip', 'Skip', 5, 'Skips the conflicting file'),
+       ('replace', 'Replace', 6, 'Replaces the conflicting file')],
+      default_value='replace')
+    self.assertDictEqual(
+      setting.items_help,
+      {
+        'skip': 'Skips the conflicting file',
+        'replace': 'Replaces the conflicting file',
+      }
+    )
+
   def test_with_procedure(self):
     procedure = stubs_gimp.Procedure('some-procedure')
 
@@ -1066,8 +1080,8 @@ class TestChoiceSetting(SettingTestCase):
 
   def test_to_dict_if_items_is_gimp_choice(self):
     choice = Gimp.Choice()
-    choice.add('rename_new', 0, 'Rename new', '')
-    choice.add('rename_existing', 1, 'Rename existing', '')
+    choice.add('rename_new', 0, 'Rename new', 'Renames new file')
+    choice.add('rename_existing', 1, 'Rename existing', 'Renames existing file')
 
     setting = settings_.ChoiceSetting(
       'overwrite_mode', items=choice, display_name='Overwrite mode')
@@ -1079,8 +1093,8 @@ class TestChoiceSetting(SettingTestCase):
         'value': 'rename_new',
         'type': 'choice',
         'items': [
-          ['rename_new', 'Rename new', 0],
-          ['rename_existing', 'Rename existing', 1],
+          ['rename_new', 'Rename new', 0, 'Renames new file'],
+          ['rename_existing', 'Rename existing', 1, 'Renames existing file'],
         ],
         'display_name': 'Overwrite mode',
       })

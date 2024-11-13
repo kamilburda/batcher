@@ -1423,7 +1423,11 @@ class ChoiceSetting(Setting):
         self,
         name: str,
         items: Optional[
-          Union[List[Tuple[str, str]], List[Tuple[str, str, int]], Gimp.Choice]
+          Union[
+            List[Tuple[str, str]],
+            List[Tuple[str, str, int]],
+            List[Tuple[str, str, int, str]],
+            Gimp.Choice]
         ] = None,
         procedure: Optional[Union[Gimp.Procedure, str]] = None,
         **kwargs,
@@ -1450,7 +1454,7 @@ class ChoiceSetting(Setting):
     self._procedure = self._process_procedure(procedure)
     self._procedure_config = self._create_procedure_config(self._procedure)
 
-    self._items, self._items_by_value, self._items_display_names, self._choice = (
+    self._items, self._items_by_value, self._items_display_names, self._items_help, self._choice = (
       self._create_item_attributes(items))
     
     super().__init__(name, **kwargs)
@@ -1464,7 +1468,7 @@ class ChoiceSetting(Setting):
   def items_by_value(self) -> Dict[int, str]:
     """A dictionary of (item value, item name) pairs."""
     return self._items_by_value
-  
+
   @property
   def items_display_names(self) -> Dict[str, str]:
     """A dictionary of (item name, item display name) pairs.
@@ -1472,6 +1476,14 @@ class ChoiceSetting(Setting):
     Item display names can be used e.g. as combo box items in the GUI.
     """
     return self._items_display_names
+
+  @property
+  def items_help(self) -> Dict[str, str]:
+    """A dictionary of (item name, item help) pairs.
+
+    Item help describes the item in more detail.
+    """
+    return self._items_help
 
   @property
   def procedure(self) -> Union[Gimp.Procedure, None]:
@@ -1495,7 +1507,12 @@ class ChoiceSetting(Setting):
         settings_dict['items'] = []
       elif isinstance(settings_dict['items'], Gimp.Choice):
         settings_dict['items'] = [
-          [name, self._choice.get_label(name), self._choice.get_id(name)]
+          [
+            name,
+            self._choice.get_label(name),
+            self._choice.get_id(name),
+            self._choice.get_help(name),
+          ]
           for name in self._choice.list_nicks()
         ]
       else:
@@ -1569,9 +1586,10 @@ class ChoiceSetting(Setting):
     items = {}
     items_by_value = {}
     items_display_names = {}
+    items_help = {}
 
     if not input_items:
-      return items, items_by_value, items_display_names, Gimp.Choice.new()
+      return items, items_by_value, items_display_names, items_help, Gimp.Choice.new()
 
     if isinstance(input_items, Gimp.Choice):
       for name in input_items.list_nicks():
@@ -1579,8 +1597,9 @@ class ChoiceSetting(Setting):
         items[name] = value
         items_by_value[value] = name
         items_display_names[name] = input_items.get_label(name)
+        items_help[name] = input_items.get_help(name)
 
-      return items, items_by_value, items_display_names, input_items
+      return items, items_by_value, items_display_names, items_help, input_items
 
     if all(len(elem) == 2 for elem in input_items):
       for i, (item_name, item_display_name) in enumerate(input_items):
@@ -1590,8 +1609,15 @@ class ChoiceSetting(Setting):
         items[item_name] = i
         items_by_value[i] = item_name
         items_display_names[item_name] = item_display_name
-    elif all(len(elem) == 3 for elem in input_items):
-      for item_name, item_display_name, item_value in input_items:
+        items_help[item_name] = ''
+    elif all(len(elem) in [3, 4] for elem in input_items):
+      for item in input_items:
+        if len(item) == 3:
+          item_name, item_display_name, item_value = item
+          item_help = ''
+        else:
+          item_name, item_display_name, item_value, item_help = item
+
         if item_name in items:
           raise ValueError('cannot use the same name for multiple items - they must be unique')
 
@@ -1601,15 +1627,17 @@ class ChoiceSetting(Setting):
         items[item_name] = item_value
         items_by_value[item_value] = item_name
         items_display_names[item_name] = item_display_name
+        items_help[item_name] = item_help
     else:
       raise ValueError(
         'wrong number of tuple elements in items - must be only 2- or only 3-element tuples')
 
     choice = Gimp.Choice.new()
-    for (name, value), display_name in zip(items.items(), items_display_names.values()):
-      choice.add(name, value, display_name, '')
+    for item in zip(items.items(), items_display_names.values(), items_help.values()):
+      (name, value), display_name, help_ = item
+      choice.add(name, value, display_name, help_)
 
-    return items, items_by_value, items_display_names, choice
+    return items, items_by_value, items_display_names, items_help, choice
 
   def _get_pdb_param(self):
     return [
