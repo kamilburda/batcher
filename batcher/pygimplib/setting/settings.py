@@ -2131,7 +2131,22 @@ class DisplaySetting(Setting):
   _REGISTRABLE_TYPE_NAME = 'display'
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.display_spin_button]
-  
+
+  def __init__(
+        self,
+        name: str,
+        none_ok: bool = True,
+        **kwargs,
+  ):
+    self._none_ok = none_ok
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def none_ok(self):
+    """If ``True``, ``None`` is allowed as a valid value for this setting."""
+    return self._none_ok
+
   def _copy_value(self, value):
     return value
 
@@ -2147,6 +2162,9 @@ class DisplaySetting(Setting):
     return None
 
   def _validate(self, display):
+    if not self._none_ok and display is None:
+      return 'None is not allowed for this setting', 'invalid_value'
+
     if display is not None and not display.is_valid():
       return 'invalid display', 'invalid_value'
 
@@ -2156,8 +2174,7 @@ class DisplaySetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
-      # TODO: Allow passing this as a parameter to DisplaySetting
-      False,
+      self._none_ok,
       GObject.ParamFlags.READWRITE,
     ]
 
