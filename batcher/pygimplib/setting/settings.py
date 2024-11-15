@@ -1556,7 +1556,7 @@ class ChoiceSetting(Setting):
             prepend_value=False,
           )
       else:
-        return ''
+        return default_value
 
   def _validate(self, item_name):
     if self._items and item_name not in self._items:

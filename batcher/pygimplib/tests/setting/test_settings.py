@@ -942,8 +942,17 @@ class TestCreateChoiceSetting(SettingTestCase):
     setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
     self.assertEqual(setting.default_value, 'skip')
+
+  def test_with_explicit_default_value_is_in_items(self):
+    setting = settings_.ChoiceSetting(
+      'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')], default_value='replace')
+    self.assertEqual(setting.default_value, 'replace')
+
+  def test_with_explicit_default_value_if_items_is_empty(self):
+    setting = settings_.ChoiceSetting('overwrite_mode', None, default_value='replace')
+    self.assertEqual(setting.default_value, 'replace')
   
-  def test_no_items_does_not_validate_value(self):
+  def test_empty_items_does_not_validate_value(self):
     setting = settings_.ChoiceSetting('overwrite_mode', [])
 
     setting.set_value('some_item')
