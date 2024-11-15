@@ -92,7 +92,9 @@ class ActionEditorWidget:
 
     self._show_additional_settings = show_additional_settings
 
-    if self._action['origin'].value == 'gimp_pdb' and self._action['function'].value:
+    if (self._action['origin'].value == 'gimp_pdb'
+        and self._action['function'].value
+        and self._action['function'].value in pdb):
       self._pdb_procedure = pdb[self._action['function'].value]
     else:
       self._pdb_procedure = None
