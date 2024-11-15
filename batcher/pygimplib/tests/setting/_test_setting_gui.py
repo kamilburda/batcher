@@ -11,6 +11,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from ...setting import meta as meta_
+from ...setting import presenters_gtk as presenters_gtk_
 from ...setting import settings as settings_
 
 
@@ -32,6 +33,10 @@ def test_settings_and_gui():
     
     for gui_type in setting_type.get_allowed_gui_types():
       item['gui_type'] = gui_type
+      if setting_type_name == 'choice' and gui_type == presenters_gtk_.ChoiceComboBoxPresenter:
+        item['procedure'] = 'file-png-export'
+        item['name'] = 'format'
+        item['items'] = []
       settings.append(setting_type(**item))
   
   dialog = Gtk.Dialog(
@@ -161,8 +166,8 @@ def _get_setting_data():
     }
 
   setting_data['choice']['items'] = [
-    ('skip', 'SKIP'),
-    ('overwrite', 'OVERWRITE'),
+    ('skip', 'Skip'),
+    ('overwrite', 'Overwrite'),
   ]
   setting_data['choice']['default_value'] = 'skip'
 
@@ -307,12 +312,12 @@ def _on_setting_value_not_valid(_setting, message, _message_id, details):
   dialog.show_all()
 
 
-def _on_reset_button_clicked(button, settings):
+def _on_reset_button_clicked(_button, settings):
   for setting in settings:
     setting.reset()
 
 
-def _on_update_settings_button_clicked(button, settings):
+def _on_update_settings_button_clicked(_button, settings):
   for setting in settings:
     setting.gui.update_setting_value(force=True)
 
