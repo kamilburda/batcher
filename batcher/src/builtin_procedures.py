@@ -217,8 +217,6 @@ def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
   return int_pixels
 
 
-_SCALE_OBJECT_TYPES = IMAGE, LAYER = (0, 1)
-
 _SCALE_UNITS = (
   PERCENT_LAYER_WIDTH,
   PERCENT_LAYER_HEIGHT,
