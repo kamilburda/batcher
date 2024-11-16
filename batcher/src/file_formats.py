@@ -286,7 +286,7 @@ FILE_FORMATS = _create_file_formats([
    'export_procedure_name': 'file-psd-export'},
   {'file_extensions': ['qoi'],
    'export_procedure_name': 'file-qoi-export'},
-  {'file_extensions': ['data', 'raw'],
+  {'file_extensions': ['raw', 'data'],
    'export_procedure_name': 'file-raw-export'},
   {'file_extensions': ['hdr'],
    'export_procedure_name': 'file-export-rgbe'},
