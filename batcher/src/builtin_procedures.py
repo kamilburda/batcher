@@ -223,10 +223,10 @@ _SCALE_UNITS = (
   PERCENT_IMAGE_HEIGHT,
   PIXELS,
 ) = (
-  'percent_layer_width',
-  'percent_layer_height',
-  'percent_image_width',
-  'percent_image_height',
+  'percentage_of_layer_width',
+  'percentage_of_layer_height',
+  'percentage_of_image_width',
+  'percentage_of_image_height',
   'pixels',
 )
 
@@ -571,7 +571,7 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'choice',
-        'default_value': 'percentage_of_layer_width',
+        'default_value': PERCENT_LAYER_WIDTH,
         'name': 'width_unit',
         'items': [
           (PERCENT_LAYER_WIDTH, _('% of layer width')),
@@ -590,7 +590,7 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'choice',
-        'default_value': 'percentage_of_layer_height',
+        'default_value': PERCENT_LAYER_HEIGHT,
         'name': 'height_unit',
         'items': [
           (PERCENT_LAYER_WIDTH, _('% of layer width')),
