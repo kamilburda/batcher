@@ -44,7 +44,7 @@ class ExportError(BatcherError):
     str_ = self._message
     
     if self.item_name:
-      str_ += '\n{} {}'.format(_('Layer:'), self.item_name)
+      str_ += '\n{} {}'.format(_('Item:'), self.item_name)
     if self.file_extension:
       str_ += '\n{} {}'.format(_('File extension:'), self.file_extension)
     
