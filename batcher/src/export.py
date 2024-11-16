@@ -344,10 +344,13 @@ def _export_item(
   file_extension = fileext.get_file_extension(_get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
-  chosen_overwrite_mode, output_filepath = overwrite.handle_overwrite(
-    output_filepath,
-    overwrite_chooser,
-    _get_unique_substring_position(output_filepath, file_extension))
+  try:
+    chosen_overwrite_mode, output_filepath = overwrite.handle_overwrite(
+      output_filepath,
+      overwrite_chooser,
+      _get_unique_substring_position(output_filepath, file_extension))
+  except OSError as e:
+    raise exceptions.ExportError(str(e), _get_item_export_name(item), file_extension)
 
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
