@@ -135,8 +135,11 @@ def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_v
 
 def apply_opacity_from_group_layers(batcher):
   new_layer_opacity = batcher.current_raw_item.get_opacity() / 100.0
-  for parent in batcher.current_item.parents:
-    new_layer_opacity = new_layer_opacity * (parent.raw.get_opacity() / 100.0)
+
+  raw_parent = batcher.current_item.raw.get_parent()
+  while raw_parent is not None:
+    new_layer_opacity = new_layer_opacity * (raw_parent.get_opacity() / 100.0)
+    raw_parent = raw_parent.get_parent()
   
   batcher.current_raw_item.set_opacity(new_layer_opacity * 100.0)
 
