@@ -88,27 +88,25 @@ def fill_and_get_file_format_options_as_kwargs(
     return None
 
 
-def get_common_arguments_as_kwargs(file_format, import_or_export, *args):
-  return {
-    arg_name.replace('-', '_'): arg
-    for arg_name, arg in zip(file_format.get_common_arguments(import_or_export), args)
-  }
-
-
 class _FileFormat:
   
   def __init__(
         self,
         file_extensions,
         import_procedure_name=None,
+        import_func=None,
         export_procedure_name=None,
+        export_func=None,
         version_check_func=None,
         description=None,
         **kwargs):
     self.file_extensions = file_extensions
     
     self.import_procedure_name = import_procedure_name
+    self._import_func = import_func
+
     self.export_procedure_name = export_procedure_name
+    self._export_func = export_func
     
     self.version_check_func = version_check_func if version_check_func is not None else lambda: True
 
@@ -116,9 +114,6 @@ class _FileFormat:
     
     for name, value in kwargs.items():
       setattr(self, name, value)
-
-    self._common_arguments_for_import = None
-    self._common_arguments_for_export = None
 
   def get_description(self, import_or_export, max_char_length_for_inferred_description=35):
     """Returns the description of the file format.
@@ -165,38 +160,17 @@ class _FileFormat:
   def _is_export_proc_builtin(self):
     return self.export_procedure_name is None
 
-  def get_common_arguments(self, import_or_export):
-    if import_or_export == 'import':
-      if self._common_arguments_for_import is None:
-        self._common_arguments_for_import = self._get_common_arguments_for_proc(
-          self.import_procedure_name, _COMMON_PDB_ARGUMENTS_FOR_FILE_LOAD)
-
-      return self._common_arguments_for_import
-    elif import_or_export == 'export':
-      if self._common_arguments_for_export is None:
-        self._common_arguments_for_export = self._get_common_arguments_for_proc(
-          self.export_procedure_name, _COMMON_PDB_ARGUMENTS_FOR_FILE_EXPORT)
-
-      return self._common_arguments_for_export
+  def get_import_func(self):
+    if self._import_func is None:
+      return getattr(pdb, self.import_procedure_name)
     else:
-      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+      return self._import_func
 
-  @staticmethod
-  def _get_common_arguments_for_proc(proc_name, common_arguments):
-    if proc_name in pdb:
-      argument_names = [arg.name for arg in pdb[proc_name].proc.get_arguments()]
-
-      common_argument_names = []
-
-      for index, arg_name in enumerate(argument_names):
-        if index in common_arguments and common_arguments[index] == arg_name:
-          common_argument_names.append(arg_name)
-        else:
-          break
-
-      return common_argument_names
+  def get_export_func(self):
+    if self._export_func is None:
+      return getattr(pdb, self.export_procedure_name)
     else:
-      return []
+      return self._export_func
 
 
 def _create_file_formats(file_formats_params):
@@ -329,7 +303,10 @@ FILE_FORMATS = _create_file_formats([
   {'file_extensions': ['xbm', 'bitmap'],
    'export_procedure_name': 'file-xbm-export'},
   {'file_extensions': ['xcf'],
-   'export_procedure_name': 'gimp-xcf-save'},
+   'export_procedure_name': 'gimp-xcf-save',
+   'export_func': (
+     lambda image, file, options, **kwargs: pdb.gimp_xcf_save(image, file, **kwargs))
+   },
   {'file_extensions': ['xmc'],
    'export_procedure_name': 'file-xmc-export'},
   {'file_extensions': ['xpm'],

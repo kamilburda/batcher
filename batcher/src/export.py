@@ -524,16 +524,9 @@ def _export_image(
     image_file = filepath
 
   export_func, kwargs = get_export_function(
-    file_extension,
-    file_format_mode,
-    file_format_export_options,
-    run_mode,
-    image,
-    image_file,
-    None,
-  )
+    file_extension, file_format_mode, file_format_export_options)
 
-  export_func(**kwargs)
+  export_func(image, image_file, None, run_mode=run_mode, **kwargs)
 
   return pdb.last_status
 
@@ -542,10 +535,6 @@ def get_export_function(
       file_extension: str,
       file_format_mode: str,
       file_format_export_options: Dict,
-      run_mode: Gimp.RunMode,
-      image: Gimp.Image,
-      image_file: Gio.File,
-      export_options: Optional[Gimp.ExportOptions],
 ) -> Tuple[Callable, Dict]:
   """Returns the file export procedure and file format settings given the
   file extension.
@@ -565,21 +554,9 @@ def get_export_function(
         file_format_export_options, file_extension, 'export')
 
       if file_format_option_kwargs is not None:
-        kwargs = file_formats_.get_common_arguments_as_kwargs(
-          file_format, 'export', run_mode, image, image_file, export_options)
+        return file_format.get_export_func(), file_format_option_kwargs
 
-        kwargs.update(file_format_option_kwargs)
-
-        return getattr(pdb, file_format.export_procedure_name), kwargs
-
-  common_kwargs = {
-    'run_mode': run_mode,
-    'image': image,
-    'file': image_file,
-    'options': export_options,
-  }
-
-  return pdb.gimp_file_save, common_kwargs
+  return pdb.gimp_file_save, {}
 
 
 def _refresh_image_copy_for_edit_mode(batcher, image_copy):

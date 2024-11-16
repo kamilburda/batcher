@@ -108,14 +108,7 @@ class TestExport(unittest.TestCase):
 
     # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'png',
-      export_.FileFormatModes.USE_EXPLICIT_VALUES,
-      file_format_options,
-      Gimp.RunMode.NONINTERACTIVE,
-      None,
-      '',
-      None,
-    )
+      'png', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.file_png_export)
     mock_get_setting_data_from_pdb_procedure.assert_called_once()
@@ -123,12 +116,7 @@ class TestExport(unittest.TestCase):
     self.assertEqual(file_format_options['png']['is-interlaced'].value, False)
     self.assertEqual(file_format_options['png']['offsets'].value, (7, 11))
 
-    self.assertListEqual(
-      list(kwargs), ['run_mode', 'image', 'file', 'options', 'offsets', 'is_interlaced'])
-    self.assertEqual(kwargs['run_mode'], Gimp.RunMode.NONINTERACTIVE)
-    self.assertEqual(kwargs['image'], None)
-    self.assertEqual(kwargs['file'], '')
-    self.assertEqual(kwargs['options'], None)
+    self.assertListEqual(list(kwargs), ['offsets', 'is_interlaced'])
     self.assertFalse(kwargs['is_interlaced'])
     self.assertIsInstance(kwargs['offsets'], Gimp.Int32Array)
 
@@ -140,14 +128,7 @@ class TestExport(unittest.TestCase):
 
     # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'unknown',
-      export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES,
-      file_format_options,
-      Gimp.RunMode.NONINTERACTIVE,
-      None,
-      '',
-      None,
-    )
+      'unknown', export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
@@ -161,14 +142,7 @@ class TestExport(unittest.TestCase):
 
     # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'unknown',
-      export_.FileFormatModes.USE_EXPLICIT_VALUES,
-      file_format_options,
-      Gimp.RunMode.NONINTERACTIVE,
-      None,
-      '',
-      None,
-    )
+      'unknown', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
