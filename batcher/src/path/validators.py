@@ -156,7 +156,8 @@ class FilepathValidator(StringValidator):
   
   _INVALID_CHARS_PATTERN_WITHOUT_DRIVE = f'[{_INVALID_CHARS}]'
   _INVALID_CHARS_PATTERN = f'[{_INVALID_CHARS}{_VALID_DRIVE_CHARS}]'
-  
+
+  # noinspection PyProtectedMember
   _INVALID_NAMES = FilenameValidator._INVALID_NAMES
   
   ERROR_STATUSES_MESSAGES = {
@@ -299,7 +300,8 @@ class FileExtensionValidator(StringValidator):
 
     * do not end with spaces or periods
   """
-  
+
+  # noinspection PyProtectedMember
   _INVALID_CHARS_PATTERN = FilenameValidator._INVALID_CHARS_PATTERN
   
   ERROR_STATUSES_MESSAGES = {

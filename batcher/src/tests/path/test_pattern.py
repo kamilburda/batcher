@@ -270,7 +270,8 @@ class TestStringPattern(unittest.TestCase):
         self, test_case_suffix, pattern, expected_output):
     class _Field:
       
-      def get_field_value(self, field, arg1=1, arg2=2):
+      @staticmethod
+      def get_field_value(_field, arg1=1, arg2=2):
         return f'{arg1}{arg2}'
     
     string_pattern = pattern_.StringPattern(pattern, [('field', _Field().get_field_value)])

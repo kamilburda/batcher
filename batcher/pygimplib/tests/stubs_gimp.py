@@ -536,26 +536,32 @@ class Unit:
 
   @classmethod
   def inch(cls):
+    # noinspection PyProtectedMember
     return Unit._inch
 
   @classmethod
   def mm(cls):
+    # noinspection PyProtectedMember
     return Unit._mm
 
   @classmethod
   def percent(cls):
+    # noinspection PyProtectedMember
     return Unit._percent
 
   @classmethod
   def pica(cls):
+    # noinspection PyProtectedMember
     return Unit._pica
 
   @classmethod
   def pixel(cls):
+    # noinspection PyProtectedMember
     return Unit._pixel
 
   @classmethod
   def point(cls):
+    # noinspection PyProtectedMember
     return Unit._point
 
   def get_name(self):

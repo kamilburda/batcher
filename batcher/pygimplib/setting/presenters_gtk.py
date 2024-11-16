@@ -903,7 +903,7 @@ class ArrayBoxPresenter(GtkPresenter):
     self._setting_value_synchronizer.apply_gui_value_to_setting(self.get_value())
   
   def _add_array_element(self, array_element, array_box):
-    def _on_array_box_item_changed(array_element):
+    def _on_array_box_item_changed(_array_element):
       array_box.emit('array-box-item-changed')
     
     array_element.set_gui()

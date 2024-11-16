@@ -306,26 +306,26 @@ class EntryPopup:
       if key_name in ['Up', 'KP_Up']:
         self.select_and_assign_row_after_key_press(
           tree_path,
-          next_row=lambda tree_path: tree_path[0] - 1,
+          next_row=lambda tree_path_: tree_path_[0] - 1,
           next_row_if_no_current_selection=len(self._rows_filtered) - 1,
           current_row_before_unselection=0)
       elif key_name in ['Down', 'KP_Down']:
         self.select_and_assign_row_after_key_press(
           tree_path,
-          next_row=lambda tree_path: tree_path[0] + 1,
+          next_row=lambda tree_path_: tree_path_[0] + 1,
           next_row_if_no_current_selection=0,
           current_row_before_unselection=len(self._rows_filtered) - 1)
       elif key_name in ['Page_Up', 'KP_Page_Up']:
         self.select_and_assign_row_after_key_press(
           tree_path,
-          next_row=lambda tree_path: max(tree_path[0] - self._max_num_visible_rows, 0),
+          next_row=lambda tree_path_: max(tree_path_[0] - self._max_num_visible_rows, 0),
           next_row_if_no_current_selection=len(self._rows_filtered) - 1,
           current_row_before_unselection=0)
       elif key_name in ['Page_Down', 'KP_Page_Down']:
         self.select_and_assign_row_after_key_press(
           tree_path,
-          next_row=lambda tree_path: min(
-            tree_path[0] + self._max_num_visible_rows, len(self._rows_filtered) - 1),
+          next_row=lambda tree_path_: min(
+            tree_path_[0] + self._max_num_visible_rows, len(self._rows_filtered) - 1),
           next_row_if_no_current_selection=0,
           current_row_before_unselection=len(self._rows_filtered) - 1)
       elif key_name in ['Return', 'KP_Enter']:

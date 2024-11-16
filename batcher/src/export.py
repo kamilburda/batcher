@@ -192,6 +192,7 @@ def export(
         file_extension_properties[
           fileext.get_file_extension(_get_item_export_name(item_to_process))].processed_count += 1
         # Append the original raw item
+        # noinspection PyProtectedMember
         batcher._exported_raw_items.append(item_to_process.raw)
     
     if multi_layer_image is not None:

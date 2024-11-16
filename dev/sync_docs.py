@@ -53,10 +53,10 @@ def get_filepaths(file_list_filepath):
         
     return listed_filepaths
   
-  def _replace_path_part(path, part_to_replace, replacement, path_root):
-    processed_path = os.path.relpath(os.path.join(path_root, path), path_root)
+  def _replace_path_part(path, part_to_replace, replacement, path_root_):
+    processed_path = os.path.relpath(os.path.join(path_root_, path), path_root_)
     processed_path = processed_path.replace(part_to_replace, replacement, 1)
-    processed_path = os.path.join(path_root, processed_path)
+    processed_path = os.path.join(path_root_, processed_path)
     return processed_path
   
   with open(file_list_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:

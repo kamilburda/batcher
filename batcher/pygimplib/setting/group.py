@@ -560,8 +560,8 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
 
     Child settings with the ``'ignore_reset'`` tag are ignored.
     """
-    def _has_ignore_reset_tag(setting):
-      return 'ignore_reset' not in setting.tags
+    def _has_ignore_reset_tag(setting_):
+      return 'ignore_reset' not in setting_.tags
     
     for setting in self.walk(include_setting_func=_has_ignore_reset_tag):
       setting.reset()

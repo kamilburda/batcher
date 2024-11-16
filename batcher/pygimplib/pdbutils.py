@@ -372,46 +372,46 @@ def compare_layers(
   the layer masks are ignored.
   """
   
-  def _copy_layers(image, layers, parent=None, position=0):
-    group_layer = Gimp.GroupLayer.new(image, None)
-    image.insert_layer(group_layer, parent, position)
+  def _copy_layers(image_, layers_, parent=None, position=0):
+    group_layer_ = Gimp.GroupLayer.new(image_, None)
+    image_.insert_layer(group_layer_, parent, position)
     
-    for layer in layers:
-      copy_and_paste_layer(layer, image, group_layer, 0, remove_lock_attributes=True)
+    for layer in layers_:
+      copy_and_paste_layer(layer, image_, group_layer_, 0, remove_lock_attributes=True)
     
-    for layer in group_layer.get_children():
+    for layer in group_layer_.get_children():
       layer.set_visible(True)
     
-    return group_layer
+    return group_layer_
   
-  def _process_layers(image, group_layer, apply_layer_attributes, apply_layer_masks):
-    for layer in group_layer.get_children():
+  def _process_layers(image_, group_layer_, apply_layer_attributes_, apply_layer_masks_):
+    for layer in group_layer_.get_children():
       if layer.is_group_layer():
         layer.merge()
       else:
         if layer.get_opacity() != 100.0 or layer.get_mode() != Gimp.LayerMode.NORMAL:
-          if apply_layer_attributes:
-            layer = _apply_layer_attributes(image, layer, group_layer)
+          if apply_layer_attributes_:
+            layer = _apply_layer_attributes(image_, layer, group_layer_)
           else:
             layer.set_opacity(100.0)
             layer.set_mode(Gimp.LayerMode.NORMAL)
         
         if layer.get_mask() is not None:
-          if apply_layer_masks and layer.get_apply_mask():
+          if apply_layer_masks_ and layer.get_apply_mask():
             layer.remove_mask(Gimp.MaskApplyMode.APPLY)
           else:
             layer.remove_mask(Gimp.MaskApplyMode.DISCARD)
   
-  def _is_identical(group_layer):
-    group_layer.get_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
+  def _is_identical(group_layer_):
+    group_layer_.get_children()[0].set_mode(Gimp.LayerMode.DIFFERENCE)
     
-    for layer in group_layer.get_children()[1:]:
+    for layer in group_layer_.get_children()[1:]:
       layer.set_visible(False)
     
-    for layer in group_layer.get_children()[1:]:
+    for layer in group_layer_.get_children()[1:]:
       layer.set_visible(True)
       
-      histogram_data = group_layer.histogram(Gimp.HistogramChannel.VALUE, 1 / 255, 1.0)
+      histogram_data = group_layer_.histogram(Gimp.HistogramChannel.VALUE, 1 / 255, 1.0)
       
       if histogram_data.percentile != 0.0:
         return False
@@ -426,10 +426,10 @@ def compare_layers(
     Gimp.floating_sel_anchor(floating_selection)
     layer.remove_mask(Gimp.MaskApplyMode.DISCARD)
   
-  def _apply_layer_attributes(image, layer, parent_group):
-    temp_group = Gimp.GroupLayer.new(image, None)
-    image.insert_layer(temp_group, parent_group, 0)
-    image.reorder_item(layer, temp_group, 0)
+  def _apply_layer_attributes(image_, layer, parent_group):
+    temp_group = Gimp.GroupLayer.new(image_, None)
+    image_.insert_layer(temp_group, parent_group, 0)
+    image_.reorder_item(layer, temp_group, 0)
     layer = temp_group.merge()
     
     return layer

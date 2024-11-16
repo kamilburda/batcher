@@ -750,6 +750,7 @@ class _ActionItem:
     self.action = action
     self.action_id = action_id
     self.groups = groups if groups is not None else set()
+    # noinspection PyProtectedMember
     self.action_type = action_type if action_type is not None else Invoker._TYPE_ACTION
     self.action_function = action_function
     self.run_generator = run_generator

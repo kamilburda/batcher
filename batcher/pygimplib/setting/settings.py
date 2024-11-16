@@ -947,7 +947,8 @@ class GenericSetting(Setting):
     
     return raw_value
   
-  def _validate_function(self, func, name):
+  @staticmethod
+  def _validate_function(func, name):
     if func is None:
       return
     
@@ -1783,12 +1784,6 @@ class GimpItemSetting(Setting):
 
   def _item_to_path(self, item):
     return pgpdbutils.get_item_as_path(item)
-
-  def _item_to_id(self, item):
-    if item is not None:
-      return item.get_id()
-    else:
-      return None
 
   def _get_pdb_param(self):
     return [
@@ -2813,6 +2808,7 @@ class ArraySetting(Setting):
     if 'default_value' not in self._element_kwargs:
       self._element_kwargs['default_value'] = self._reference_element.default_value
     else:
+      # noinspection PyProtectedMember
       self._element_kwargs['default_value'] = self._reference_element._raw_to_value(
         self._element_kwargs['default_value'])
 
@@ -2899,6 +2895,7 @@ class ArraySetting(Setting):
     
     for key, val in settings_dict.items():
       if key == 'element_default_value':
+        # noinspection PyProtectedMember
         settings_dict[key] = self._reference_element._value_to_raw(val)
       elif key == 'element_type':
         settings_dict[key] = _SETTING_TYPES[type(self._reference_element)]
@@ -2994,6 +2991,7 @@ class ArraySetting(Setting):
   
   def _raw_to_value(self, raw_value_array):
     if isinstance(raw_value_array, Iterable) and not isinstance(raw_value_array, str):
+      # noinspection PyProtectedMember
       return tuple(
         self._reference_element._raw_to_value(raw_value)
         for raw_value in raw_value_array)
@@ -3002,6 +3000,7 @@ class ArraySetting(Setting):
       return (raw_value_array,)
   
   def _value_to_raw(self, value_array):
+    # noinspection PyProtectedMember
     return [
       self._reference_element._value_to_raw(value)
       for value in value_array]
@@ -3038,6 +3037,7 @@ class ArraySetting(Setting):
       )
     
     for value in value_array:
+      # noinspection PyProtectedMember
       self._reference_element._validate(value)
     self._reference_element.reset()
   

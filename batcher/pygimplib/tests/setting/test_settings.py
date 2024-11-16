@@ -2427,8 +2427,8 @@ class TestArraySetting(SettingTestCase):
         self, test_case_suffix, index, value, expected_index, expected_value):
     event_args = []
     
-    def _on_before_add_element(array_setting, index, value):
-      event_args.append((index, value))
+    def _on_before_add_element(_array_setting, index_, value_):
+      event_args.append((index_, value_))
     
     self.setting.connect_event('before-add-element', _on_before_add_element)
     
@@ -2453,8 +2453,8 @@ class TestArraySetting(SettingTestCase):
         self, test_case_suffix, index, value, expected_index, expected_value):
     event_args = []
     
-    def _on_after_add_element(array_setting, insertion_index, value):
-      event_args.append((insertion_index, value))
+    def _on_after_add_element(_array_setting, insertion_index, value_):
+      event_args.append((insertion_index, value_))
     
     self.setting.connect_event('after-add-element', _on_after_add_element)
     

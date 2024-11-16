@@ -228,8 +228,8 @@ class TestManageActions(unittest.TestCase):
         self, mock_get_pdb, test_case_suffix, action_names_to_add):
     invoked_event_args = []
     
-    def on_after_add_action(actions, action, orig_action_dict):
-      invoked_event_args.append((actions, action, orig_action_dict))
+    def on_after_add_action(actions, action_, orig_action_dict):
+      invoked_event_args.append((actions, action_, orig_action_dict))
     
     self.procedures.connect_event('after-add-action', on_after_add_action)
     
