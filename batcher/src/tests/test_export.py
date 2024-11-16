@@ -2,14 +2,18 @@ import unittest
 import unittest.mock as mock
 
 import gi
+
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
+from gi.repository import GObject
 
 import pygimplib as pg
 from pygimplib import pdb
 from pygimplib.tests import stubs_gimp
 
 from src import export as export_
+from src import file_formats as file_formats_
 
 
 @mock.patch(
@@ -66,6 +70,23 @@ class TestExport(unittest.TestCase):
       *self.png_options,
     ]
 
+    self.procedure_name = 'file-png-export'
+    self.procedure_stub_kwargs = dict(
+      name=self.procedure_name,
+      arguments_spec=[
+        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(value_type=Gimp.Image, name='image', blurb='Image'),
+        dict(value_type=Gio.File, name='file', blurb='File to save the image in'),
+        dict(value_type=Gimp.ExportOptions, name='options', blurb='Export options'),
+        dict(value_type=Gimp.Int32Array, name='offsets'),
+        dict(value_type=GObject.TYPE_BOOLEAN, name='is-interlaced'),
+      ],
+    )
+    self.procedure = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
+
+    export_.pdb.remove_from_cache(self.procedure_name)
+    file_formats_.pdb.remove_from_cache(self.procedure_name)
+
   def test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
     self._test_get_export_function(mock_get_setting_data_from_pdb_procedure, mock_gimp)
 
@@ -81,12 +102,20 @@ class TestExport(unittest.TestCase):
   def _test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
     mock_get_setting_data_from_pdb_procedure.return_value = (
       None, 'file-png-export', self.file_format_options)
-    mock_gimp.get_pdb().add_procedure(stubs_gimp.Procedure('file-png-export'))
+    mock_gimp.get_pdb().add_procedure(self.procedure)
 
     file_format_options = {}
 
+    # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'png', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
+      'png',
+      export_.FileFormatModes.USE_EXPLICIT_VALUES,
+      file_format_options,
+      Gimp.RunMode.NONINTERACTIVE,
+      None,
+      '',
+      None,
+    )
 
     self.assertIs(proc, pdb.file_png_export)
     mock_get_setting_data_from_pdb_procedure.assert_called_once()
@@ -94,7 +123,12 @@ class TestExport(unittest.TestCase):
     self.assertEqual(file_format_options['png']['is-interlaced'].value, False)
     self.assertEqual(file_format_options['png']['offsets'].value, (7, 11))
 
-    self.assertEqual(len(kwargs), 2)
+    self.assertListEqual(
+      list(kwargs), ['run_mode', 'image', 'file', 'options', 'offsets', 'is_interlaced'])
+    self.assertEqual(kwargs['run_mode'], Gimp.RunMode.NONINTERACTIVE)
+    self.assertEqual(kwargs['image'], None)
+    self.assertEqual(kwargs['file'], '')
+    self.assertEqual(kwargs['options'], None)
     self.assertFalse(kwargs['is_interlaced'])
     self.assertIsInstance(kwargs['offsets'], Gimp.Int32Array)
 
@@ -104,8 +138,16 @@ class TestExport(unittest.TestCase):
 
     file_format_options = {}
 
+    # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'unknown', export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES, file_format_options)
+      'unknown',
+      export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES,
+      file_format_options,
+      Gimp.RunMode.NONINTERACTIVE,
+      None,
+      '',
+      None,
+    )
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
@@ -117,8 +159,16 @@ class TestExport(unittest.TestCase):
 
     file_format_options = {}
 
+    # noinspection PyTypeChecker
     proc, kwargs = export_.get_export_function(
-      'unknown', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
+      'unknown',
+      export_.FileFormatModes.USE_EXPLICIT_VALUES,
+      file_format_options,
+      Gimp.RunMode.NONINTERACTIVE,
+      None,
+      '',
+      None,
+    )
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()

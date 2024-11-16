@@ -22,11 +22,12 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
 
   if import_or_export == 'import':
     pdb_proc_name = FILE_FORMATS_DICT[processed_file_format].import_procedure_name
+    common_arguments = _COMMON_PDB_ARGUMENTS_FOR_FILE_LOAD
   elif import_or_export == 'export':
     pdb_proc_name = FILE_FORMATS_DICT[processed_file_format].export_procedure_name
+    common_arguments = _COMMON_PDB_ARGUMENTS_FOR_FILE_EXPORT
   else:
-    raise ValueError(
-      'invalid value for import_or_export; must be either "import" or "export"')
+    raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
 
   if pdb_proc_name is None:
     return
@@ -35,7 +36,7 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
     settings_from_pdb_.get_setting_data_from_pdb_procedure(pdb_proc_name))
 
   processed_file_format_options_list = _remove_common_file_format_options(
-    file_format_options_list, import_or_export)
+    file_format_options_list, common_arguments)
 
   options_settings = create_file_format_options_settings(
     processed_file_format_options_list)
@@ -43,42 +44,12 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
   file_format_options[processed_file_format] = options_settings
 
 
-def fill_and_get_file_format_options_as_kwargs(
-      file_format_options, file_format, import_or_export):
-  fill_file_format_options(file_format_options, file_format, import_or_export)
-
-  if file_format in file_format_options:
-    kwargs = {}
-
-    for setting in file_format_options[file_format]:
-      if (import_or_export == 'import'
-          and setting.name in _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD.values()):
-        continue
-
-      if (import_or_export == 'export'
-          and setting.name in _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT.values()):
-        continue
-
-      kwargs[setting.name.replace('-', '_')] = setting.value_for_pdb
-
-    return kwargs
-  else:
-    return None
-
-
-def _remove_common_file_format_options(file_format_options_list, import_or_export):
-  if import_or_export == 'import':
-    options_to_filter = _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD
-  elif import_or_export == 'export':
-    options_to_filter = _PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT
-  else:
-    raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
+def _remove_common_file_format_options(file_format_options_list, common_arguments):
   return [
     option_dict for index, option_dict in enumerate(file_format_options_list)
     if not (
-      index in options_to_filter
-      and options_to_filter[index] == option_dict.get('name', None))
+      index in common_arguments
+      and common_arguments[index] == option_dict.get('name', None))
   ]
 
 
@@ -104,30 +75,24 @@ def create_file_format_options_settings(file_format_options_list):
   return group
 
 
-def _create_file_formats(file_formats_params):
-  return [_FileFormat(**params) for params in file_formats_params]
+def fill_and_get_file_format_options_as_kwargs(
+      file_format_options, file_format, import_or_export):
+  fill_file_format_options(file_format_options, file_format, import_or_export)
+
+  if file_format in file_format_options:
+    return {
+      setting.name.replace('-', '_'): setting.value_for_pdb
+      for setting in file_format_options[file_format]
+    }
+  else:
+    return None
 
 
-def _create_file_formats_dict(file_formats):
-  file_formats_dict = {}
-  
-  for file_format in file_formats:
-    for file_extension in file_format.file_extensions:
-      if file_extension not in file_formats_dict and file_format.version_check_func():
-        file_formats_dict[file_extension] = file_format
-  
-  return file_formats_dict
-
-
-def _create_file_format_aliases(file_formats):
-  file_format_aliases = {}
-
-  for file_format in file_formats:
-    for file_extension in file_format.file_extensions:
-      if file_extension not in file_format_aliases:
-        file_format_aliases[file_extension] = file_format.file_extensions[0]
-
-  return file_format_aliases
+def get_common_arguments_as_kwargs(file_format, import_or_export, *args):
+  return {
+    arg_name.replace('-', '_'): arg
+    for arg_name, arg in zip(file_format.get_common_arguments(import_or_export), args)
+  }
 
 
 class _FileFormat:
@@ -151,6 +116,9 @@ class _FileFormat:
     
     for name, value in kwargs.items():
       setattr(self, name, value)
+
+    self._common_arguments_for_import = None
+    self._common_arguments_for_export = None
 
   def get_description(self, import_or_export, max_char_length_for_inferred_description=35):
     """Returns the description of the file format.
@@ -196,6 +164,65 @@ class _FileFormat:
 
   def _is_export_proc_builtin(self):
     return self.export_procedure_name is None
+
+  def get_common_arguments(self, import_or_export):
+    if import_or_export == 'import':
+      if self._common_arguments_for_import is None:
+        self._common_arguments_for_import = self._get_common_arguments_for_proc(
+          self.import_procedure_name, _COMMON_PDB_ARGUMENTS_FOR_FILE_LOAD)
+
+      return self._common_arguments_for_import
+    elif import_or_export == 'export':
+      if self._common_arguments_for_export is None:
+        self._common_arguments_for_export = self._get_common_arguments_for_proc(
+          self.export_procedure_name, _COMMON_PDB_ARGUMENTS_FOR_FILE_EXPORT)
+
+      return self._common_arguments_for_export
+    else:
+      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+  @staticmethod
+  def _get_common_arguments_for_proc(proc_name, common_arguments):
+    if proc_name in pdb:
+      argument_names = [arg.name for arg in pdb[proc_name].proc.get_arguments()]
+
+      common_argument_names = []
+
+      for index, arg_name in enumerate(argument_names):
+        if index in common_arguments and common_arguments[index] == arg_name:
+          common_argument_names.append(arg_name)
+        else:
+          break
+
+      return common_argument_names
+    else:
+      return []
+
+
+def _create_file_formats(file_formats_params):
+  return [_FileFormat(**params) for params in file_formats_params]
+
+
+def _create_file_formats_dict(file_formats):
+  file_formats_dict = {}
+
+  for file_format in file_formats:
+    for file_extension in file_format.file_extensions:
+      if file_extension not in file_formats_dict and file_format.version_check_func():
+        file_formats_dict[file_extension] = file_format
+
+  return file_formats_dict
+
+
+def _create_file_format_aliases(file_formats):
+  file_format_aliases = {}
+
+  for file_format in file_formats:
+    for file_extension in file_format.file_extensions:
+      if file_extension not in file_format_aliases:
+        file_format_aliases[file_extension] = file_format.file_extensions[0]
+
+  return file_format_aliases
 
 
 FILE_FORMATS = _create_file_formats([
@@ -327,12 +354,12 @@ running GIMP instance are included.
 FILE_FORMAT_ALIASES = _create_file_format_aliases(FILE_FORMATS)
 
 # HACK: Is there a better way to detect common arguments for load/export procedures?
-_PDB_ARGUMENTS_TO_FILTER_FOR_FILE_LOAD = {
+_COMMON_PDB_ARGUMENTS_FOR_FILE_LOAD = {
   0: 'run-mode',
   1: 'file',
 }
 
-_PDB_ARGUMENTS_TO_FILTER_FOR_FILE_EXPORT = {
+_COMMON_PDB_ARGUMENTS_FOR_FILE_EXPORT = {
   0: 'run-mode',
   1: 'image',
   2: 'file',
