@@ -360,6 +360,7 @@ def _export_item(
     export_status = _export_item_once_wrapper(
       batcher,
       _get_run_mode(batcher, file_format_mode, file_extension, file_extension_properties),
+      item,
       image,
       raw_item,
       output_filepath,
@@ -373,6 +374,7 @@ def _export_item(
       export_status = _export_item_once_wrapper(
         batcher,
         Gimp.RunMode.INTERACTIVE,
+        item,
         image,
         raw_item,
         output_filepath,
@@ -429,6 +431,7 @@ def _make_dirs(item, dirpath, default_file_extension):
 def _export_item_once_wrapper(
       batcher,
       run_mode,
+      item,
       image,
       raw_item,
       output_filepath,
@@ -442,10 +445,9 @@ def _export_item_once_wrapper(
          run_mode, image, raw_item, output_filepath,
          *batcher.export_context_manager_args, **batcher.export_context_manager_kwargs):
     export_status = _export_item_once(
-      batcher,
       run_mode,
+      item,
       image,
-      raw_item,
       output_filepath,
       file_extension,
       file_format_mode,
@@ -468,10 +470,9 @@ def _get_run_mode(batcher, file_format_mode, file_extension, file_extension_prop
 
 
 def _export_item_once(
-      batcher,
       run_mode,
+      item,
       image,
-      raw_item,
       output_filepath,
       file_extension,
       file_format_mode,
@@ -480,7 +481,8 @@ def _export_item_once(
       file_extension_properties,
 ):
   def _raise_export_error(exception):
-    raise exceptions.ExportError(str(exception), raw_item.get_name(), default_file_extension)
+    raise exceptions.ExportError(
+      str(exception), _get_item_export_name(item), default_file_extension)
 
   try:
     _export_image(
