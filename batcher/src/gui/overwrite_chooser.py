@@ -131,7 +131,8 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
     
     response_id = self._dialog.run()
 
-    self._overwrite_mode = self._response_ids_and_values[response_id]
+    self._overwrite_mode = self._response_ids_and_values.get(
+      response_id, overwrite.OverwriteModes.CANCEL)
     
     if self._overwrite_mode not in self._values:
       self._overwrite_mode = self.default_response
