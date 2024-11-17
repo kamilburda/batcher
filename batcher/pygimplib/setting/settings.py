@@ -3152,7 +3152,7 @@ class ContainerSetting(Setting):
 class ListSetting(ContainerSetting):
   """Class for settings representing lists (mutable sequences of elements)."""
   
-  _DEFAULT_DEFAULT_VALUE = []
+  _DEFAULT_DEFAULT_VALUE = lambda self: []
   
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, list) and raw_value is not None:
@@ -3165,7 +3165,7 @@ class TupleSetting(ContainerSetting):
   """Class for settings representing tuples (immutable sequences of elements).
   """
   
-  _DEFAULT_DEFAULT_VALUE = ()
+  _DEFAULT_DEFAULT_VALUE = lambda self: ()
   
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, tuple) and raw_value is not None:
@@ -3182,7 +3182,7 @@ class SetSetting(ContainerSetting):
   elements).
   """
   
-  _DEFAULT_DEFAULT_VALUE = set()
+  _DEFAULT_DEFAULT_VALUE = lambda self: set()
   
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, set) and raw_value is not None:
@@ -3201,7 +3201,7 @@ class DictSetting(ContainerSetting):
   
   _ALIASES = ['dictionary', 'map']
   
-  _DEFAULT_DEFAULT_VALUE = {}
+  _DEFAULT_DEFAULT_VALUE = lambda self: {}
   
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, dict) and raw_value is not None:
