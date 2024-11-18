@@ -1,4 +1,6 @@
-## Upcoming
+## 0.6
+
+### November 18, 2024
 
 * Updated Batcher to work with GIMP 3.0.0-RC1. **Batcher now requires GIMP 3.0.0-RC1 or later.** Earlier development versions of GIMP (2.99.x) will not work. Any future GIMP 3.x version will work unless stated otherwise.
 * Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of items.
