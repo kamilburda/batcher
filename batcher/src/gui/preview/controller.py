@@ -5,6 +5,8 @@ import collections
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -285,12 +287,15 @@ class PreviewsController:
     self._name_preview.connect(
       'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
 
-  def _on_name_preview_updated(self, _preview, error):
+  def _on_name_preview_updated(self, _preview, error, reset_items):
     if error:
       self.lock_previews(self._PREVIEW_ERROR_KEY)
 
     if self._image_preview.item is not None:
       self._image_preview.set_item_name_label(self._image_preview.item)
+
+    if reset_items:
+      self._update_tagged_items()
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
@@ -324,6 +329,16 @@ class PreviewsController:
       self._image_preview.update()
 
     self._is_initial_selection_set = True
+
+  def _update_tagged_items(self):
+    tagged_items = [
+      item
+      for item in self._name_preview.batcher.item_tree.iter(with_folders=False, filtered=False)
+      if (item.raw is not None
+          and item.raw.is_valid()
+          and item.raw.get_color_tag() != Gimp.ColorTag.NONE)
+    ]
+    self._settings['main/tagged_items'].set_value(tagged_items)
 
   def _update_selected_items(self):
     selected_items_dict = self._settings['main/selected_layers'].value

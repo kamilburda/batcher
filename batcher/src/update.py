@@ -672,6 +672,19 @@ def _update_to_0_6(data, _settings, source_names):
     if overwrite_mode_dict is not None:
       _update_choice_setting(overwrite_mode_dict)
 
+    main_settings_list.insert(
+      -2,
+      {
+        'type': 'tagged_items',
+        'name': 'tagged_items',
+        'default_value': [],
+        'pdb_type': None,
+        'gui_type': None,
+        'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+        'value': [],
+      },
+    )
+
     export_settings_list, _index = _get_child_group_list(gui_settings_list, 'export')
     if export_settings_list is not None:
       for setting_dict in export_settings_list:
@@ -692,6 +705,19 @@ def _update_to_0_6(data, _settings, source_names):
 
         _update_origin_setting(origin_setting_dict)
         _update_arguments_list(arguments_list)
+
+        if (orig_name_setting_dict['default_value'] in ['insert_background', 'insert_foreground']
+            and arguments_list is not None):
+          arguments_list.insert(
+            1,
+            {
+              'type': 'tagged_items',
+              'name': 'tagged_items',
+              'default_value': [],
+              'gui_type': None,
+              'tags': ['ignore_reset'],
+              'value': [],
+            })
 
         if orig_name_setting_dict['default_value'] == 'apply_opacity_from_layer_groups':
           # We retain `name` and only modify `orig_name` as only the latter is

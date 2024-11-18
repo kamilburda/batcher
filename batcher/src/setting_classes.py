@@ -564,3 +564,13 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
   @staticmethod
   def _file_format_options_to_dict(file_format_options):
     return [setting.to_dict() for setting in file_format_options]
+
+
+class TaggedItemsSetting(pg.setting.ListSetting):
+  """Class for settings storing a list of items with color tags.
+
+  This class disallows saving setting values by always returning an empty list.
+  """
+
+  def _value_to_raw(self, value):
+    return []

@@ -177,6 +177,14 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
     {
+      'type': 'tagged_items',
+      'name': 'tagged_items',
+      'default_value': [],
+      'pdb_type': None,
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
       'type': 'string',
       'name': 'plugin_version',
       'default_value': pg.config.PLUGIN_VERSION,
@@ -261,7 +269,13 @@ def create_settings_for_export_layers():
   _set_file_extension_options_for_default_export_procedure(settings['main'])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-  
+
+  settings['main/procedures'].connect_event(
+    'after-add-action',
+    _on_after_add_insert_background_foreground,
+    settings['main/tagged_items'],
+  )
+
   settings['main/constraints'].connect_event(
     'after-add-action',
     _on_after_add_constraint,
@@ -297,6 +311,14 @@ def create_settings_for_edit_layers():
       'display_name': _('Selected layers'),
       'pdb_type': None,
       'gui_type': None,
+    },
+    {
+      'type': 'tagged_items',
+      'name': 'tagged_items',
+      'default_value': [],
+      'pdb_type': None,
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
       'type': 'string',
@@ -366,6 +388,11 @@ def create_settings_for_edit_layers():
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
 
+  settings['main/procedures'].connect_event(
+    'after-add-action',
+    _on_after_add_insert_background_foreground,
+    settings['main/tagged_items'],
+  )
   settings['main/constraints'].connect_event(
     'after-add-action',
     _on_after_add_constraint,
@@ -593,11 +620,33 @@ def _show_hide_file_format_export_options(
     file_format_mode_setting.value == 'use_explicit_values')
 
 
+def _on_after_add_insert_background_foreground(
+      _procedures,
+      procedure,
+      _orig_procedure_dict,
+      tagged_items_setting,
+):
+  if procedure['orig_name'].value in ['insert_background', 'insert_foreground']:
+    procedure['arguments/tagged_items'].gui.set_visible(False)
+    _sync_tagged_items_with_procedure(tagged_items_setting, procedure)
+
+
+def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
+
+  def _on_tagged_items_changed(tagged_items_setting_, procedure_):
+    procedure_['arguments/tagged_items'].set_value(tagged_items_setting_.value)
+
+  _on_tagged_items_changed(tagged_items_setting, procedure)
+
+  tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
+
+
 def _on_after_add_constraint(
       _constraints,
       constraint,
       _orig_constraint_dict,
-      selected_items_setting):
+      selected_items_setting,
+):
   if constraint['orig_name'].value == 'selected_in_preview':
     constraint['arguments/selected_layers'].gui.set_visible(False)
     _sync_selected_items_with_constraint(selected_items_setting, constraint)
@@ -605,8 +654,8 @@ def _on_after_add_constraint(
 
 def _sync_selected_items_with_constraint(selected_items_setting, constraint):
   
-  def _on_selected_items_changed(selected_items_setting_, selected_items_constraint):
-    selected_items_constraint['arguments/selected_layers'].set_value(selected_items_setting_.value)
+  def _on_selected_items_changed(selected_items_setting_, constraint_):
+    constraint_['arguments/selected_layers'].set_value(selected_items_setting_.value)
 
   _on_selected_items_changed(selected_items_setting, constraint)
   

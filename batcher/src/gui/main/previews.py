@@ -277,6 +277,6 @@ class Previews:
         _('Disabling automatic preview update. The preview takes too long to update.'),
         Gtk.MessageType.INFO)
 
-  def _on_name_preview_updated(self, _preview, _error, action_lists):
+  def _on_name_preview_updated(self, _preview, _error, _reset_items, action_lists):
     action_lists.display_warnings_and_tooltips_for_actions(
       self._batcher_for_name_preview, clear_previous=False)

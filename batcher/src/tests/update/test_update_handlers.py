@@ -233,6 +233,8 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_0_6(self):
     self.assertEqual(self.settings['main/overwrite_mode'].value, 'rename_new')
 
+    self.assertEqual(self.settings['main/tagged_items'].value, [])
+
     self.assertIn('name_preview_items_collapsed_state', self.settings['gui'])
     self.assertNotIn('name_preview_layers_collapsed_state', self.settings['gui'])
 
@@ -259,6 +261,12 @@ class TestUpdateHandlers(unittest.TestCase):
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+
+    self.assertEqual(
+      self.settings['main/procedures/insert_background/arguments/tagged_items'].value, [])
+
+    self.assertEqual(
+      self.settings['main/procedures/insert_background_2/arguments/tagged_items'].value, [])
 
     self.assertIsInstance(
       self.settings['main/procedures/scale/arguments/new_width'], pg.setting.DoubleSetting)

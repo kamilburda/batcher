@@ -46,7 +46,8 @@ class NamePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    'preview-updated': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-updated': (
+      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_BOOLEAN)),
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
@@ -145,7 +146,7 @@ class NamePreview(preview_base_.Preview):
     error = self._process_items(reset_items=reset_items)
     
     if error:
-      self.emit('preview-updated', error)
+      self.emit('preview-updated', error, reset_items)
       return
     
     items = self._get_items_to_process()
@@ -161,7 +162,7 @@ class NamePreview(preview_base_.Preview):
     
     self._tree_view.columns_autosize()
     
-    self.emit('preview-updated', None)
+    self.emit('preview-updated', None, reset_items)
   
   def clear(self):
     """Clears the entire preview."""

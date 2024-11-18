@@ -374,6 +374,13 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': Gimp.ColorTag.BLUE,
       },
       {
+        'type': 'tagged_items',
+        'name': 'tagged_items',
+        'default_value': [],
+        'gui_type': None,
+        'tags': ['ignore_reset'],
+      },
+      {
         'type': 'string',
         'name': 'merge_procedure_name',
         'default_value': '',
@@ -403,6 +410,13 @@ _BUILTIN_PROCEDURES_LIST = [
         'excluded_values': [Gimp.ColorTag.NONE],
         'display_name': _('Color tag'),
         'default_value': Gimp.ColorTag.GREEN,
+      },
+      {
+        'type': 'tagged_items',
+        'name': 'tagged_items',
+        'default_value': [],
+        'gui_type': None,
+        'tags': ['ignore_reset'],
       },
       {
         'type': 'string',

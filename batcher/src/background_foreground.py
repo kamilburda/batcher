@@ -9,18 +9,24 @@ from src import exceptions
 import pygimplib as pg
 
 
-def insert_background_layer(batcher, tag, *_args, **_kwargs):
-  return _insert_tagged_layer(batcher, tag, 'after')
+def insert_background_layer(batcher, tag, item_tree_for_preview, *_args, **_kwargs):
+  return _insert_tagged_layer(batcher, tag, item_tree_for_preview, 'after')
 
 
-def insert_foreground_layer(batcher, tag, *_args, **_kwargs):
-  return _insert_tagged_layer(batcher, tag, 'before')
+def insert_foreground_layer(batcher, tag, item_tree_for_preview, *_args, **_kwargs):
+  return _insert_tagged_layer(batcher, tag, item_tree_for_preview, 'before')
 
 
-def _insert_tagged_layer(batcher, tag, insert_mode):
-  tagged_items = [
-    item for item in batcher.item_tree.iter(with_folders=True, filtered=False)
-    if tag != Gimp.ColorTag.NONE and item.raw.get_color_tag() == tag]
+def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
+  if batcher.is_preview:
+    tagged_items = tagged_items_for_preview
+  else:
+    tagged_items = batcher.item_tree.iter(with_folders=True, filtered=False)
+
+  processed_tagged_items = [
+    item for item in tagged_items
+    if tag != Gimp.ColorTag.NONE and item.raw.is_valid() and item.raw.get_color_tag() == tag]
+
   merged_tagged_layer = None
   orig_merged_tagged_layer = None
   
@@ -44,13 +50,13 @@ def _insert_tagged_layer(batcher, tag, insert_mode):
     if insert_mode == 'after':
       position += 1
     
-    if not tagged_items:
+    if not processed_tagged_items:
       yield
       continue
     
     if orig_merged_tagged_layer is None:
       merged_tagged_layer = _insert_merged_tagged_layer(
-        batcher, image, tagged_items, current_parent, position)
+        batcher, image, processed_tagged_items, current_parent, position)
 
       if merged_tagged_layer is not None:
         orig_merged_tagged_layer = _copy_layer(merged_tagged_layer)
