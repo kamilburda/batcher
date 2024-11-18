@@ -1139,10 +1139,14 @@ class LayerBatcher(Batcher):
         pg.pdbutils.try_delete_image(self._current_image)
         self._image_copy = None
     else:
-      self._current_image.set_selected_layers([
+      selected_layers = [
         layer for layer in self._orig_selected_raw_items
-        if layer.is_valid() and layer.get_image() == self._current_image])
+        if layer.is_valid() and layer.get_image() == self._current_image]
+      if selected_layers:
+        self._current_image.set_selected_layers(selected_layers)
+
       self._current_image.undo_group_end()
+
       Gimp.displays_flush()
     
     Gimp.context_pop()
