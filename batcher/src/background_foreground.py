@@ -21,7 +21,7 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
   if batcher.is_preview:
     tagged_items = tagged_items_for_preview
   else:
-    tagged_items = batcher.item_tree.iter(with_folders=True, filtered=False)
+    tagged_items = batcher.item_tree.iter(with_folders=False, filtered=False)
 
   processed_tagged_items = [
     item for item in tagged_items

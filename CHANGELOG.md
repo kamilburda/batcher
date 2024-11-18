@@ -2,6 +2,7 @@
 
 * Greatly optimized the preview when changing selection. The performance drop was noticeable for hundreds of items.
 * Fixed several bugs related to the preview when the selected item is changed.
+* Fixed `Insert background` and `Insert foreground` procedures inserting group layers twice.
 
 
 ## 0.5
