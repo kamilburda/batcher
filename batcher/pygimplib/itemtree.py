@@ -490,11 +490,9 @@ class ItemTree(metaclass=abc.ABCMeta):
         objects: Iterable,
         parent_item: Optional[Item] = None,
         insert_after_item: Optional[Item] = None,
+        with_folders: bool = True,
   ):
     """Adds the specified objects as `Item` instances to the tree.
-
-    Objects acting as folders will result in adding all their children as
-    `Item`s.
 
     Args:
       objects: The objects to be added.
@@ -504,6 +502,9 @@ class ItemTree(metaclass=abc.ABCMeta):
       insert_after_item:
         An existing `Item` instance after which to insert the items. If
         ``None``, the items will be inserted after the last existing item.
+      with_folders:
+        If ``True``, objects acting as folders will result in adding all their
+        children as `Item`s.
 
     Raises:
       ValueError:
@@ -536,7 +537,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     child_items = []
     for object_ in objects:
-      self._insert_item(object_, child_items, list(parents_for_child_initial))
+      self._insert_item(object_, child_items, list(parents_for_child_initial), with_folders)
 
     item_tree = child_items
     item_list = []
@@ -554,7 +555,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
         # noinspection PyProtectedMember
         for object_ in item._list_child_objects():
-          self._insert_item(object_, child_items, list(parents_for_child))
+          self._insert_item(object_, child_items, list(parents_for_child), with_folders)
 
         # noinspection PyProtectedMember
         item._orig_children = child_items
@@ -603,7 +604,7 @@ class ItemTree(metaclass=abc.ABCMeta):
       self._last_item = item_list[-1]
 
   @abc.abstractmethod
-  def _insert_item(self, object_, child_items, parents_for_child=None):
+  def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     pass
 
   def _add_item_to_itemtree(self, item):
@@ -832,14 +833,15 @@ class ItemTree(metaclass=abc.ABCMeta):
 
 class ImageTree(ItemTree):
 
-  def _insert_item(self, object_, child_items, parents_for_child=None):
+  def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
       parents_for_child = []
 
     if isinstance(object_, str):
       if os.path.isdir(object_):
-        path = os.path.abspath(object_)
-        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
+        if with_folders:
+          path = os.path.abspath(object_)
+          child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
       else:
         # Files and non-existent files/folders are treated as regular items.
         # How non-existent files are handled depends on the client code.
@@ -884,12 +886,13 @@ class GimpItemTree(ItemTree):
     """GIMP image to generate item tree from."""
     return self._image
 
-  def _insert_item(self, object_, child_items, parents_for_child=None):
+  def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
       parents_for_child = []
 
     if object_.is_group():
-      child_items.append(GimpItem(object_, TYPE_FOLDER, parents_for_child, [], None, None))
+      if with_folders:
+        child_items.append(GimpItem(object_, TYPE_FOLDER, parents_for_child, [], None, None))
       # Make sure each item keeps its own list of parents.
       child_items.append(GimpItem(object_, TYPE_GROUP, list(parents_for_child), [], None, None))
     else:

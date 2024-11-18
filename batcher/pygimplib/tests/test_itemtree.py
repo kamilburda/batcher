@@ -87,6 +87,18 @@ class TestImageTree(unittest.TestCase):
           self.tree[os.path.join(self.root_path, *key)].id,
           os.path.join(self.root_path, *path))
 
+  def test_add_without_folders(self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0], with_folders=False)
+
+    self.assertEqual(mock_isdir.call_count, 4)
+    self.assertEqual(len(list(self.tree.iter_all())), 1)
+
+    self.assertEqual(
+      self.tree[os.path.join(self.root_path, 'main-background.jpg')].id,
+      os.path.join(self.root_path, 'main-background.jpg'))
+
   @parameterized.parameterized.expand([
     ('after_last_item',
      None,
