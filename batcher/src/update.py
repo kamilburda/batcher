@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import traceback
 
 import pygimplib as pg
+from pygimplib import pdb
 
 from src import actions as actions_
 from src import builtin_constraints
@@ -697,6 +698,7 @@ def _update_to_0_6(data, _settings, source_names):
       for procedure_dict in procedures_list:
         procedure_list = procedure_dict['settings']
 
+        function_setting_dict, _index = _get_child_setting(procedure_list, 'function')
         orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         display_name_setting_dict, _index = _get_child_setting(procedure_list, 'display_name')
         description_setting_dict, _index = _get_child_setting(procedure_list, 'description')
@@ -705,6 +707,8 @@ def _update_to_0_6(data, _settings, source_names):
 
         _update_origin_setting(origin_setting_dict)
         _update_arguments_list(arguments_list)
+        _change_drawable_to_drawables_for_pdb_procedure(
+          arguments_list, origin_setting_dict, function_setting_dict)
 
         if (orig_name_setting_dict['default_value'] in ['insert_background', 'insert_foreground']
             and arguments_list is not None):
@@ -743,7 +747,7 @@ def _update_to_0_6(data, _settings, source_names):
             if argument_dict['name'] == 'rename_layer_groups':
               argument_dict['name'] = 'rename_group_layers'
               argument_dict['display_name'] = builtin_procedures.BUILTIN_PROCEDURES[
-                orig_name_setting_dict['default_value']]['arguments'][2]
+                orig_name_setting_dict['default_value']]['arguments'][2]['display_name']
 
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
 
@@ -751,6 +755,7 @@ def _update_to_0_6(data, _settings, source_names):
       for constraint_dict in constraints_list:
         constraint_list = constraint_dict['settings']
 
+        function_setting_dict, _index = _get_child_setting(constraint_list, 'function')
         orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
         display_name_setting_dict, _index = _get_child_setting(constraint_list, 'display_name')
         origin_setting_dict, _index = _get_child_setting(constraint_list, 'origin')
@@ -824,6 +829,42 @@ def _update_arguments_list(arguments_list):
       argument_dict['element_type'] = 'double'
       if argument_dict.get('element_gui_type', None) == 'float_spin_button':
         argument_dict['element_gui_type'] = 'double_spin_button'
+
+
+def _change_drawable_to_drawables_for_pdb_procedure(
+      arguments_list, origin_setting_dict, function_setting_dict):
+  if any(list_or_dict is None
+         for list_or_dict in [arguments_list, origin_setting_dict, function_setting_dict]):
+    return
+
+  if not (origin_setting_dict['value'] == 'gimp_pdb'
+      and len(arguments_list) >= 3
+      and (arguments_list[0]['type'] == 'enum' and arguments_list[0]['enum_type'] == 'GimpRunMode')
+      and arguments_list[1]['type'] == 'placeholder_image'
+      and arguments_list[2]['type'] == 'placeholder_drawable'):
+    return
+
+  pdb_proc_name = function_setting_dict['value']
+
+  if pdb_proc_name not in pdb:
+    return
+
+  pdb_proc = pdb[pdb_proc_name].proc
+  pdb_proc_args = pdb_proc.get_arguments()
+
+  if len(pdb_proc_args) < 3:
+    return
+
+  drawables_arg = pdb_proc_args[2]
+  if drawables_arg.value_type.name == 'GimpCoreObjectArray':
+    arguments_list[2] = {
+      'type': 'placeholder_drawable_array',
+      'name': drawables_arg.name,
+      'element_type': 'drawable',
+      'display_name': drawables_arg.blurb,
+      'pdb_type': None,
+      'value': 'current_layer_for_array',
+    }
 
 
 def _update_origin_setting(origin_setting_dict):

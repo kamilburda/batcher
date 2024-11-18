@@ -12,6 +12,7 @@ from pygimplib.tests import stubs_gimp
 
 from src import builtin_procedures
 from src import builtin_constraints
+from src import placeholders
 from src import plugin_settings
 from src import setting_classes
 from src import update
@@ -291,6 +292,13 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/procedures/export/arguments/export_mode'].value,
       'each_layer')
+
+    self.assertNotIn(
+      'drawable',
+      self.settings['main/procedures/script-fu-addborder/arguments'])
+    self.assertIsInstance(
+      self.settings['main/procedures/script-fu-addborder/arguments/drawables'],
+      placeholders.PlaceholderDrawableArraySetting)
 
     self.assertIsInstance(
       self.settings['main/procedures/script-fu-addborder/arguments/color'],
