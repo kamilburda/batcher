@@ -53,7 +53,7 @@ You will be prompted to set the file format options right after you press the `E
 
 Before the export, you can apply a multitude of *procedures* to each layer, such as scaling or background insertion.
 
-You can exclude layers from being exported based on one or more *constraints*, e.g. only visible layers or only layer groups.
+You can exclude layers from being exported based on one or more *constraints*, e.g. only visible layers or only group layers.
 
 Procedures and constraints can be a powerful way to adjust the export to your heart's content.
 You can take a look at a few [examples](Customization.md#examples) to get started.
@@ -93,7 +93,7 @@ You can take a look at a few [examples](Customization.md#examples) to get starte
 
 ![Dialog of Edit Layers](../images/screenshot_dialog_edit_layers.png)
 
-If the `Layers` constraint is unchecked, layer groups will also be processed. The layer groups will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on layer groups (e.g. `gimp-drawable-brightness-contrast`).
+If the `Layers` constraint is unchecked, group layers will also be processed. The group layers will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on group layers (e.g. `gimp-drawable-brightness-contrast`).
 
 
 ## Quick Batch Layer Editing
@@ -140,6 +140,9 @@ You can turn auto-closing the main dialog on/off by checking/unchecking `Setting
 
 
 ## Known Issues
+
+The export option `Interactively` is currently broken for many file formats [due to a bug in GIMP 3.0.0-RC1](https://gitlab.gnome.org/GNOME/gimp/-/issues/12349).
+This will be fixed in GIMP 3.0.0-RC2.
 
 If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
 In that case, the file format dialog may be displayed behind GIMP.

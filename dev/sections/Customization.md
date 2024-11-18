@@ -27,7 +27,7 @@ Uncheck or remove the `Use layer size` procedure.
 Check the `Visible` constraint (or add one if not already via `Add Constraint... → Visible`).
 
 
-**I want to export only visible layers. However, I also want to exclude those that have invisible parent layer groups.**
+**I want to export only visible layers. However, I also want to exclude those that have invisible parent group layers.**
 
 1. Check the `Visible` constraint (or add one if not already).
 2. Edit the `Visible` constraint (press the icon to the right of the constraint name).
@@ -50,10 +50,10 @@ In the text entry next to `Name`, choose `Full layer name` or type `[layer name,
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
-**How do I export only layer groups at the top level?**
+**How do I export only group layers at the top level?**
 
 1. Uncheck the `Layers` constraint.
-2. Add the `Layer groups` constraint.
+2. Add the `Group layers` constraint.
 3. Add the `Top-level` constraint.
 
 
@@ -76,7 +76,7 @@ Yes! You may insert any GIMP filter as a procedure:
 
 **I want to save the entire image as a single multipage PDF file.**
 
-While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each layer group (instead of the entire image).
+While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each group layer (instead of the entire image).
 
 1. Select or type `pdf` as the file extension.
 2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `For the entire image at once`.
@@ -96,8 +96,8 @@ Each time you add this procedure, adjust the file extension, file format options
 * *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first layer to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
 * *File format options*: A list of options specific to the file format typed in the main dialog.
 * *If a file exists*: If set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
-* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or layer group separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level layer group and/or with additional custom procedures applied before the export.
+* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or group layer separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
+  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level group layer and/or with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
 * *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension.
@@ -129,18 +129,18 @@ You can choose the fields from the dropdown list displayed when clicking on the 
 **Number**
 
 A number incrementing for each layer.
-The numbering is separate for each layer group.
+The numbering is separate for each group layer.
 
 Options:
-* `%n`: Continue numbering across layer groups.
+* `%n`: Continue numbering across group layers.
 * `%d<number>`: Use descending numbers, optionally with the specified padding (number of digits).
-  If the number is 0, the first number is the number of layers to export within a layer group, or, if `%n` is also specified, the number of all layers to export.
+  If the number is 0, the first number is the number of layers to export within a group layer, or, if `%n` is also specified, the number of all layers to export.
 
 Examples:
 * `[1]` → `1`, `2`, ...
 * `[001]` → `001`, `002`, ..., `009`, `010`, ..., `999`, `1000`, ...
 * `[005]` → `005`, `006`, ...
-* `[001, %n]` → `001`, `002`, ... (continues numbering across layer groups)
+* `[001, %n]` → `001`, `002`, ... (continues numbering across group layers)
 * `[000, %d]` → `010`, `009`, ... (if the number of layers is 10)
 * `[10, %d2]` → `10`, `09`, ...
 
@@ -179,7 +179,7 @@ Examples:
 **\[layer path\]**
 
 The "full path" of a layer.
-For example, if the image has a layer group named `Body` containing a layer group named `Hands` containing a layer named `Left`, the layer path will be `Body-Hands-Left`.
+For example, if the image has a group layer named `Body` containing a group layer named `Hands` containing a layer named `Left`, the layer path will be `Body-Hands-Left`.
 
 Options:
 * *separator*: A string separating the path components.
@@ -335,9 +335,9 @@ This simplifies setting up export to multiple file formats without the hassle of
 
 When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
-**Apply opacity from layer groups**
+**Apply opacity from group layers**
 
-Combines opacity from all parent layer groups for each layer.
+Combines opacity from all parent group layers for each layer.
 This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
@@ -389,7 +389,7 @@ For more information, see `Merge background` above.
 
 **Remove folder structure**
 
-Exports all layers to the output folder on the same level, i.e. subfolders for layer groups are not created.
+Exports all layers to the output folder on the same level, i.e. subfolders for group layers are not created.
 
 Options:
 * (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
@@ -403,7 +403,7 @@ This procedure uses the same text entry as the one in Export Layers next to `Nam
 
 For Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
-Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename layer groups` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename layer groups` and unchecking `Rename layers`).
+Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename group layers` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename layers`).
 
 **Scale**
 
@@ -454,11 +454,11 @@ Just like procedures, you may [enable/disable, reorder, edit or remove](#procedu
 
 **Layers**
 
-Processes only layers (i.e. layer groups are not processed).
+Processes only layers (i.e. group layers are not processed).
 
-**Layer groups**
+**Group layers**
 
-Processes only layer groups.
+Processes only group layers.
 
 You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
 
@@ -486,7 +486,7 @@ If you save settings, the selection is saved as well.
 
 **Top-level**
 
-Processes only layers at the top of the layer tree (i.e. layers inside any layer group are excluded).
+Processes only layers at the top of the layer tree (i.e. layers inside any group layer are excluded).
 
 **Visible**
 
@@ -509,8 +509,8 @@ By default, all layers with a color tag are excluded.
 To exclude only specific color tags, edit this constraint and add the color tags for the `Color tags` option.
 For example, by adding a blue tag, all layers except the ones containing the blue tag will be processed.
 
-If a layer group has a color tag, it will normally not be excluded.
-To also exclude layer groups with color tags, click on `More options` and check `Also apply to parent folders`.
+If a group layer has a color tag, it will normally not be excluded.
+To also exclude group layers with color tags, click on `More options` and check `Also apply to parent folders`.
 
 
 ## Editing Procedures and Constraints
@@ -537,7 +537,7 @@ Unchecking this can be useful if a procedure takes too long or manipulates the f
 **Also apply to parent folders** (constraints only)
 
 If checked, a layer will satisfy a constraint if all of its parent groups also satisfy the constraint.
-For example, if this option is checked for the `Visible` constraint, a visible layer is excluded if any of its parent layer groups are not visible.
+For example, if this option is checked for the `Visible` constraint, a visible layer is excluded if any of its parent group layers are not visible.
 
 
 ## Running Batcher Without Dialog
