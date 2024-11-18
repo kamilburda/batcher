@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed preview not working correctly for group layers.
+
+
 ## 0.6
 
 ### November 18, 2024
