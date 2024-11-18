@@ -641,7 +641,7 @@ def _update_to_0_5(data, _settings, source_names):
 
 
 def _update_to_0_6(data, _settings, source_names):
-  if EXPORT_LAYERS_SOURCE_NAME not in source_names or EDIT_LAYERS_SOURCE_NAME not in source_names:
+  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
     return
 
   gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
