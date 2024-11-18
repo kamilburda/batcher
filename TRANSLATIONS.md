@@ -149,12 +149,10 @@ Run GIMP from the terminal as follows:
 Run GIMP from the Windows command line as follows:
    
     set lang=[language].UTF-8
-    gimp-[version].exe
-
-where `[version]` is the GIMP version.
+    gimp.exe
 
 If Windows does not recognize the GIMP executable, specify the full path.
 
-For example, if GIMP 2.99 is installed, the full path by default will be
+For example, if GIMP 3.0 is installed, the full path by default will be
     
-   "C:\Program Files\GIMP 2.99\bin\gimp-2.99.exe"
+   "C:\Program Files\GIMP 3\bin\gimp.exe"

@@ -1,7 +1,7 @@
 ## Requirements
 
-* GIMP 2.99.18 (will **not** work in earlier or later versions)
-* Python 3.7 or higher (comes pre-installed with official GIMP installations except Linux)
+* GIMP 3.0.0-RC1 or later
+* Python 3.7 or later (comes pre-installed with official GIMP installations except Linux)
 
 
 ## Windows

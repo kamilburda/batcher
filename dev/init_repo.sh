@@ -70,8 +70,10 @@ sudo pip install $python_modules
 
 # GIMP initialization
 
-required_version='2.99.18'
-gimp_version="$(gimp --version | sed 's/.*version \([0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*\)$/\1/')"
+required_version='3.0.0-RC1'
+version_regex='s/.*version \([0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*\)/\1/'
+version_rc_regex='/-RC[0-9][0-9]*/ s/\(.*-RC[0-9][0-9]*\).*/\1/'
+gimp_version="$(gimp --version | sed "$version_regex"'; '"$version_rc_regex")"
 
 if [[ "$gimp_version" == "$required_version" ]]; then
   gimp_version_major_minor="${gimp_version%.*}"

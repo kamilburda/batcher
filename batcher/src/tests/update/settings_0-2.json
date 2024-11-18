@@ -64,7 +64,7 @@
                             "display_name": "Selected layers",
                             "pdb_type": null,
                             "value": {
-                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": []
+                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\3.0\\test_images\\test_image_contents.xcf": []
                             },
                             "type": "images_and_gimp_items"
                         },
@@ -975,7 +975,7 @@
                                                     "display_name": "Output folder",
                                                     "gui_type": "folder_chooser_button",
                                                     "pdb_type": null,
-                                                    "value": "C:\\Users\\username\\AppData\\Roaming\\GIMP\\2.99\\test_images",
+                                                    "value": "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\3.0\\test_images",
                                                     "type": "dirpath"
                                                 },
                                                 {
@@ -1901,14 +1901,14 @@
                         {
                             "name": "name_preview_layers_collapsed_state",
                             "value": {
-                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": []
+                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\3.0\\test_images\\test_image_contents.xcf": []
                             },
                             "type": "images_and_gimp_items"
                         },
                         {
                             "name": "image_preview_displayed_layers",
                             "value": {
-                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": [
+                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\3.0\\test_images\\test_image_contents.xcf": [
                                     [
                                         "Layer",
                                         "main-background"
@@ -1920,7 +1920,7 @@
                         {
                             "name": "images_and_directories",
                             "value": {
-                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\2.99\\test_images\\test_image_contents.xcf": "C:\\Users"
+                                "C:\\Users\\Kamil\\AppData\\Roaming\\GIMP\\3.0\\test_images\\test_image_contents.xcf": "C:\\Users"
                             },
                             "type": "images_and_directories"
                         },

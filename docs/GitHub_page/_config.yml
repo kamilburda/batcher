@@ -1,6 +1,6 @@
 # Site settings
 title: Batcher
-description: "Batch layer processing and export plug-in for GIMP 2.99.18."
+description: "Batch layer processing and export plug-in for GIMP 3.0.0-RC1 and later."
 baseurl: "/batcher"
 url: "https://kamilburda.github.io"
 repository: "kamilburda/batcher"

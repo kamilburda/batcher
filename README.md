@@ -2,7 +2,7 @@
 
 Batcher is a [GIMP](https://www.gimp.org/) plug-in for batch-exporting layers as separate images and batch-editing layers.
 
-**Batcher currently requires [GIMP 2.99.18](https://www.gimp.org/downloads/devel/) (a development version as a precursor to GIMP 3.0). Earlier or later GIMP versions will _not_ work.**
+**Batcher requires [GIMP 3.0.0-RC1](https://www.gimp.org/downloads/devel/) or later.**
 
 
 ## What can Batcher do?
