@@ -335,7 +335,7 @@ class ImagePreview(preview_base_.Preview):
     # any changes to the item from other sources (e.g. the item could be
     # renamed via the name preview).
     tree_for_preview = type(self._batcher.item_tree)()
-    tree_for_preview.add([self.item.raw], with_folders=False)
+    tree_for_preview.add([self.item.id], with_folders=False)
 
     error = None
 
