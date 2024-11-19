@@ -68,8 +68,8 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, initial_layer_tree, settings, source_name, mode, run_gui_func=None):
-    self._initial_layer_tree = initial_layer_tree
+  def __init__(self, initial_item_tree, settings, source_name, mode, run_gui_func=None):
+    self._initial_item_tree = initial_item_tree
     self._settings = settings
     self._source_name = source_name
 
@@ -84,7 +84,7 @@ class BatchLayerProcessingGui:
     else:
       self._plugin_procedure_tag = None
 
-    self._image = self._initial_layer_tree.image
+    self._image = self._initial_item_tree.image
 
     self._batcher_manager = batcher_manager_.BatcherManager(self._settings)
 
@@ -137,7 +137,7 @@ class BatchLayerProcessingGui:
     self._previews = previews_.Previews(
       self._settings,
       self._mode,
-      self._initial_layer_tree,
+      self._initial_item_tree,
       lock_previews=True,
       display_message_func=self._display_inline_message,
     )
@@ -419,8 +419,8 @@ class BatchLayerProcessingQuickGui:
 
   _DEFAULT_DIALOG_WIDTH = 500
 
-  def __init__(self, layer_tree, settings, _source_name, mode, title=None, run_gui_func=None):
-    self._layer_tree = layer_tree
+  def __init__(self, item_tree, settings, _source_name, mode, title=None, run_gui_func=None):
+    self._item_tree = item_tree
     self._settings = settings
 
     if mode not in ['edit', 'export']:
@@ -429,7 +429,7 @@ class BatchLayerProcessingQuickGui:
 
     self._title = title
 
-    self._image = self._layer_tree.image
+    self._image = self._item_tree.image
 
     self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._settings)
 
@@ -530,7 +530,7 @@ class BatchLayerProcessingQuickGui:
     self._batcher_manager.run_batcher(
       self._mode,
       self._image,
-      self._layer_tree,
+      self._item_tree,
       self._dialog,
       self._progress_bar,
     )

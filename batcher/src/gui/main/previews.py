@@ -35,17 +35,17 @@ class Previews:
         self,
         settings,
         batcher_mode,
-        initial_layer_tree,
+        initial_item_tree,
         lock_previews=True,
         display_message_func=None,
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
-    self._initial_layer_tree = initial_layer_tree
+    self._initial_item_tree = initial_item_tree
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
-    self._image = self._initial_layer_tree.image
+    self._image = self._initial_item_tree.image
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)
@@ -57,12 +57,12 @@ class Previews:
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser,
-      item_tree=self._initial_layer_tree)
+      item_tree=self._initial_item_tree)
 
     self._name_preview = preview_name_.NamePreview(
       self._batcher_for_name_preview,
       self._settings,
-      self._initial_layer_tree,
+      self._initial_item_tree,
       self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
       self._settings['main/selected_items'].value[self._image],
       'selected_in_preview')
@@ -74,7 +74,7 @@ class Previews:
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser,
-      item_tree=self._initial_layer_tree)
+      item_tree=self._initial_item_tree)
 
     self._image_preview = preview_image_.ImagePreview(
       self._batcher_for_image_preview, self._settings)

@@ -128,7 +128,7 @@ class BatcherManagerQuick:
         self,
         mode,
         image,
-        layer_tree,
+        item_tree,
         parent_widget,
         progress_bar,
   ):
@@ -139,7 +139,7 @@ class BatcherManagerQuick:
 
     try:
       self._batcher.run(
-        item_tree=layer_tree,
+        item_tree=item_tree,
         **utils_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
