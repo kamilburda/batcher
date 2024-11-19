@@ -267,7 +267,8 @@ class Batcher(metaclass=abc.ABCMeta):
     ``None`` if the raw item is not loaded yet.
 
     Note that ``current_raw_item`` can be different from `current_item.raw` -
-    the former can be a copy while the latter can be the original raw item.
+    the former can be a copy while the latter is guaranteed to be the original
+    raw item.
     """
     return self._current_raw_item
 
