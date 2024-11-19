@@ -494,12 +494,12 @@ class TestLayerTree(unittest.TestCase):
       }
     """
     
-    image, self.path_to_id = utils_itemtree.parse_layers(items_string)
+    self.image, self.path_to_id = utils_itemtree.parse_layers(items_string)
 
     self.tree = pgitemtree.LayerTree()
 
     # noinspection PyTypeChecker
-    self.tree.add_from_image(image)
+    self.tree.add_from_image(self.image)
     
     self.ITEM = pgitemtree.TYPE_ITEM
     self.GROUP = pgitemtree.TYPE_GROUP
@@ -763,6 +763,31 @@ class TestLayerTree(unittest.TestCase):
         self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-right-corner')]],
         self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-left-corner')]],
       ])
+
+  def test_add_from_item_id(self):
+    item_id = self.path_to_id[('main-background.jpg',)]
+
+    tree = pgitemtree.LayerTree()
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp.Item',
+          new=stubs_gimp.Item,
+    ):
+      tree.add([item_id])
+
+    self.assertEqual(len(tree), 1)
+    self.assertEqual(list(tree)[0].raw, self.image.get_layers()[-2])
+
+  def test_add_invalid_item_id_is_ignored(self):
+    item_id = -1
+
+    tree = pgitemtree.LayerTree()
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp.Item',
+          new=stubs_gimp.Item,
+    ):
+      tree.add([item_id])
+
+    self.assertEqual(len(tree), 0)
 
   def test_remove_group_item_also_removes_corresponding_folder(self):
     item_id = self.path_to_id[('Corners', 'top-left-corner:')]

@@ -495,7 +495,9 @@ class ItemTree(metaclass=abc.ABCMeta):
     """Adds the specified objects as `Item` instances to the tree.
 
     Args:
-      objects: The objects to be added.
+      objects:
+        The objects to be added. These can be GIMP objects, file paths, or
+        integers representing IDs of GIMP objects.
       parent_item:
         The parent `Item` under which to add all items. If ``None``, the items
         will be added to the top level.
@@ -832,6 +834,14 @@ class ItemTree(metaclass=abc.ABCMeta):
 
 
 class ImageTree(ItemTree):
+  """`ItemTree` subclass for images as `Gimp.Image` instances or file paths.
+
+  When adding items:
+  * files and non-existent files/folders are treated as regular items. How
+    non-existent files are handled depends on the client code.
+  * Numeric IDs are converted to `Gimp.Image` instances. Any invalid IDs are
+    silently skipped.
+  """
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
@@ -843,10 +853,12 @@ class ImageTree(ItemTree):
           path = os.path.abspath(object_)
           child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
       else:
-        # Files and non-existent files/folders are treated as regular items.
-        # How non-existent files are handled depends on the client code.
         path = os.path.abspath(object_)
         child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
+    elif isinstance(object_, int):
+      if Gimp.Image.id_is_valid(object_):
+        gimp_object = Gimp.Image.get_by_id(object_)
+        child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
     else:  # GIMP image
       child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
 
@@ -859,7 +871,7 @@ class GimpItemTree(ItemTree):
     * `ChannelTree` for channels,
     * `PathTree` for paths.
 
-  group items (e.g. group layers) are inserted twice in the tree - as folders
+  Group items (e.g. group layers) are inserted twice in the tree - as folders
   and as items. Parents of items are always folders.
 
   While you may add or remove items from `GimpItemTree`, it does not account for
@@ -887,16 +899,24 @@ class GimpItemTree(ItemTree):
     return self._image
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
+    if isinstance(object_, int):
+      if Gimp.Item.id_is_valid(object_):
+        gimp_object = Gimp.Item.get_by_id(object_)
+      else:
+        return
+    else:
+      gimp_object = object_
+
     if parents_for_child is None:
       parents_for_child = []
 
-    if object_.is_group():
+    if gimp_object.is_group():
       if with_folders:
-        child_items.append(GimpItem(object_, TYPE_FOLDER, parents_for_child, [], None, None))
+        child_items.append(GimpItem(gimp_object, TYPE_FOLDER, parents_for_child, [], None, None))
       # Make sure each item keeps its own list of parents.
-      child_items.append(GimpItem(object_, TYPE_GROUP, list(parents_for_child), [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_GROUP, list(parents_for_child), [], None, None))
     else:
-      child_items.append(GimpItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
