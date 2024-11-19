@@ -170,7 +170,7 @@ def create_settings_for_export_layers():
     },
     {
       'type': 'images_and_gimp_items',
-      'name': 'selected_layers',
+      'name': 'selected_items',
       'default_value': collections.defaultdict(set),
       'display_name': _('Selected layers'),
       'pdb_type': None,
@@ -279,7 +279,7 @@ def create_settings_for_export_layers():
   settings['main/constraints'].connect_event(
     'after-add-action',
     _on_after_add_constraint,
-    settings['main/selected_layers'])
+    settings['main/selected_items'])
   
   return settings
 
@@ -306,7 +306,7 @@ def create_settings_for_edit_layers():
     },
     {
       'type': 'images_and_gimp_items',
-      'name': 'selected_layers',
+      'name': 'selected_items',
       'default_value': collections.defaultdict(set),
       'display_name': _('Selected layers'),
       'pdb_type': None,
@@ -396,7 +396,7 @@ def create_settings_for_edit_layers():
   settings['main/constraints'].connect_event(
     'after-add-action',
     _on_after_add_constraint,
-    settings['main/selected_layers'])
+    settings['main/selected_items'])
 
   return settings
 
@@ -648,14 +648,14 @@ def _on_after_add_constraint(
       selected_items_setting,
 ):
   if constraint['orig_name'].value == 'selected_in_preview':
-    constraint['arguments/selected_layers'].gui.set_visible(False)
+    constraint['arguments/selected_items'].gui.set_visible(False)
     _sync_selected_items_with_constraint(selected_items_setting, constraint)
 
 
 def _sync_selected_items_with_constraint(selected_items_setting, constraint):
   
   def _on_selected_items_changed(selected_items_setting_, constraint_):
-    constraint_['arguments/selected_layers'].set_value(selected_items_setting_.value)
+    constraint_['arguments/selected_items'].set_value(selected_items_setting_.value)
 
   _on_selected_items_changed(selected_items_setting, constraint)
   

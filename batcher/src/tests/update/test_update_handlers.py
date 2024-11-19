@@ -20,7 +20,7 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_LATEST_PLUGIN_VERSION = '0.6'
+_LATEST_PLUGIN_VERSION = '1.0'
 
 
 @mock.patch(
@@ -55,6 +55,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_4()
     self._assert_correct_contents_for_update_to_0_5()
     self._assert_correct_contents_for_update_to_0_6()
+    self._assert_correct_contents_for_update_to_1_0()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -315,3 +316,7 @@ class TestUpdateHandlers(unittest.TestCase):
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+
+  def _assert_correct_contents_for_update_to_1_0(self):
+    self.assertIn('selected_items', self.settings['main'])
+    self.assertNotIn('selected_layers', self.settings['main'])

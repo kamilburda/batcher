@@ -64,7 +64,7 @@ class Previews:
       self._settings,
       self._initial_layer_tree,
       self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
-      self._settings['main/selected_layers'].value[self._image],
+      self._settings['main/selected_items'].value[self._image],
       'selected_in_preview')
 
     self._batcher_for_image_preview = core.LayerBatcher(

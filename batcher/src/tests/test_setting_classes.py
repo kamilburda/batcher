@@ -83,7 +83,7 @@ class TestFileExtensionSetting(unittest.TestCase):
 class TestImagesAndGimpItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.ImagesAndGimpItemsSetting('selected_layers')
+    self.setting = setting_classes.ImagesAndGimpItemsSetting('selected_items')
     
     self.maxDiff = None
   
@@ -167,7 +167,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       -2: [-12, -13]})
 
     expected_dict = {
-      'name': 'selected_layers',
+      'name': 'selected_items',
       'type': 'images_and_gimp_items',
       'value': {
         os.path.abspath('filename_1'): [
@@ -202,7 +202,7 @@ class TestImagesAndGimpItemsSetting(unittest.TestCase):
       -2: [-12, -13]})
 
     expected_dict = {
-      'name': 'selected_layers',
+      'name': 'selected_items',
       'type': 'images_and_gimp_items',
       'value': {
         os.path.abspath('filename_1'): [

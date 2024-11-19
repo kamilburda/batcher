@@ -553,7 +553,7 @@ class TestGenericSetting(SettingTestCase):
   
   def test_value_functions_with_one_parameter(self):
     setting = settings_.GenericSetting(
-      'selected_layers',
+      'selected_items',
       value_set=lambda value: tuple(value),
       value_save=lambda value: list(value))
 
@@ -564,7 +564,7 @@ class TestGenericSetting(SettingTestCase):
       setting.to_dict(), {'name': setting.name, 'value': [4, 6, 2], 'type': 'generic'})
   
   def test_value_functions_as_none(self):
-    setting = settings_.GenericSetting('selected_layers')
+    setting = settings_.GenericSetting('selected_items')
     
     setting.set_value([4, 6, 2])
     
@@ -574,26 +574,26 @@ class TestGenericSetting(SettingTestCase):
   
   def test_value_functions_with_two_parameters(self):
     setting = settings_.GenericSetting(
-      'selected_layers',
+      'selected_items',
       value_set=lambda value, setting_: tuple(f'{setting_.name}_{str(item)}' for item in value),
       value_save=lambda value, setting_: list(value))
     
     setting.set_value([4, 6, 2])
     
     self.assertEqual(
-      setting.value, ('selected_layers_4', 'selected_layers_6', 'selected_layers_2'))
+      setting.value, ('selected_items_4', 'selected_items_6', 'selected_items_2'))
     self.assertDictEqual(
       setting.to_dict(),
       {
         'name': setting.name,
-        'value': ['selected_layers_4', 'selected_layers_6', 'selected_layers_2'],
+        'value': ['selected_items_4', 'selected_items_6', 'selected_items_2'],
         'type': 'generic',
       })
   
   def test_value_set_with_invalid_number_of_parameters_raises_error(self):
     with self.assertRaises(TypeError):
       settings_.GenericSetting(
-        'selected_layers',
+        'selected_items',
         value_set=lambda value, setting, redundant: tuple(value),
         value_save=lambda value, setting: list(value))
   
@@ -601,14 +601,14 @@ class TestGenericSetting(SettingTestCase):
     with self.assertRaises(TypeError):
       # noinspection PyTypeChecker
       settings_.GenericSetting(
-        'selected_layers',
+        'selected_items',
         value_set='not_a_callable',
         value_save=lambda value, setting: list(value))
   
   def test_value_save_with_invalid_number_of_parameters_raises_error(self):
     with self.assertRaises(TypeError):
       settings_.GenericSetting(
-        'selected_layers',
+        'selected_items',
         value_set=lambda value, setting: tuple(value),
         value_save=lambda value, setting, redundant: list(value))
   
@@ -616,7 +616,7 @@ class TestGenericSetting(SettingTestCase):
     with self.assertRaises(TypeError):
       # noinspection PyTypeChecker
       settings_.GenericSetting(
-        'selected_layers',
+        'selected_items',
         value_set=lambda value, setting: tuple(value),
         value_save='not_a_callable')
 

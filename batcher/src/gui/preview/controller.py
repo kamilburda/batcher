@@ -125,7 +125,7 @@ class PreviewsController:
 
     # Changed selection is already handled by connecting to the name preview's
     # 'preview-selection-changed' signal.
-    if action['orig_name'].value == 'selected_in_preview' and setting.name == 'selected_layers':
+    if action['orig_name'].value == 'selected_in_preview' and setting.name == 'selected_items':
       return
 
     self.unlock_and_update_previews(self._PREVIEW_ERROR_KEY)
@@ -140,11 +140,11 @@ class PreviewsController:
       lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image]))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
-    self._settings['main/selected_layers'].connect_event(
+    self._settings['main/selected_items'].connect_event(
       'after-load',
       lambda setting: self._name_preview.set_selected_items(setting.value[self._image]))
 
-    self._settings['main/selected_layers'].connect_event(
+    self._settings['main/selected_items'].connect_event(
       'after-reset',
       lambda setting: self._name_preview.set_selected_items(setting.value[self._image]))
   
@@ -315,7 +315,7 @@ class PreviewsController:
     selected_layers_in_image = self._image.get_selected_layers()
 
     if (item_key_to_display is None
-        and not self._settings['main/selected_layers'].value[self._image]
+        and not self._settings['main/selected_items'].value[self._image]
         and selected_layers_in_image):
       # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items(selected_layers_in_image)
@@ -341,9 +341,9 @@ class PreviewsController:
     self._settings['main/tagged_items'].set_value(tagged_items)
 
   def _update_selected_items(self):
-    selected_items_dict = self._settings['main/selected_layers'].value
+    selected_items_dict = self._settings['main/selected_items'].value
     selected_items_dict[self._image] = self._name_preview.selected_items
-    self._settings['main/selected_layers'].set_value(selected_items_dict)
+    self._settings['main/selected_items'].set_value(selected_items_dict)
 
   def _update_image_preview(self):
     item_from_cursor = self._name_preview.get_item_from_cursor()

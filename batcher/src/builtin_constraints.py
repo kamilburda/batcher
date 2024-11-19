@@ -167,7 +167,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'arguments': [
       {
         'type': 'images_and_gimp_items',
-        'name': 'selected_layers',
+        'name': 'selected_items',
         'default_value': collections.defaultdict(set),
         'gui_type': None,
       },

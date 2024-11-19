@@ -886,9 +886,37 @@ def _update_choice_setting(setting_dict):
     setting_dict['value'] = setting_dict['default_value']
 
 
+def _update_to_1_0(data, _settings, source_names):
+  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
+    return
+
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  # 'selected_items' may exist as a new setting. We need to remove that one
+  # and instead rename the original so that the value of the original setting
+  # is preserved on update.
+  _remove_setting(main_settings_list, 'selected_items')
+  _rename_setting(main_settings_list, 'selected_layers', 'selected_items')
+
+  constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
+  if constraints_list is not None:
+    for constraint_dict in constraints_list:
+      constraint_list = constraint_dict['settings']
+
+      orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
+      arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
+
+      if (orig_name_setting_dict['default_value'] == 'selected_in_preview'
+          and arguments_list is not None):
+        for argument_dict in arguments_list:
+          if argument_dict['name'] == 'selected_layers':
+            argument_dict['name'] = 'selected_items'
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
   '0.5': _update_to_0_5,
   '0.6': _update_to_0_6,
+  '1.0': _update_to_1_0,
 }
