@@ -137,7 +137,7 @@ class ActionBrowser(GObject.GObject):
     # used for sorting by default).
     pdb_procedures = [
       Gimp.get_pdb().lookup_procedure(name)
-      for name in sorted(pdb.gimp_pdb_query('', '', '', '', '', '', ''))
+      for name in sorted(Gimp.get_pdb().query_procedures(*([''] * 8)))
       if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     ]
 
