@@ -84,7 +84,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._last_constraint = None
     self._current_image = None
 
-    self._exported_raw_items = []
+    self._exported_items = []
 
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
@@ -292,13 +292,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._current_image
 
   @property
-  def exported_raw_items(self) -> List:
-    """List of successfully exported raw items.
+  def exported_items(self) -> List[pg.itemtree.Item]:
+    """List of successfully exported items.
 
-    This list does not include raw items skipped by the user (when files with
-    the same names already exist).
+    This list does not include items skipped by the user (when files with the
+    same names already exist).
     """
-    return list(self._exported_raw_items)
+    return list(self._exported_items)
 
   @property
   def skipped_procedures(self) -> Dict[str, List]:
@@ -494,7 +494,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._should_stop = False
 
-    self._exported_raw_items = []
+    self._exported_items = []
 
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
