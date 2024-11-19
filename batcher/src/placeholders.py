@@ -65,7 +65,7 @@ def _get_value_for_unsupported_parameter(setting, _batcher):
   return getattr(setting, 'default_param_value', None)
 
 
-_PLACEHOLDERS_RAW_LIST = [
+_PLACEHOLDERS_LIST = [
   ('current_image', _('Current Image'), _get_current_image),
   ('current_layer', _('Current Layer'), _get_current_layer),
   ('current_layer_for_array', _('Current Layer'), _get_current_layer_for_array),
@@ -77,7 +77,7 @@ _PLACEHOLDERS_RAW_LIST = [
 ]
 
 
-PLACEHOLDERS = {args[0]: Placeholder(*args) for args in _PLACEHOLDERS_RAW_LIST}
+PLACEHOLDERS = {args[0]: Placeholder(*args) for args in _PLACEHOLDERS_LIST}
 """Mapping of a placeholder name to a placeholder object.
 
 The following placeholder objects are defined:
