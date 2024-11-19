@@ -487,6 +487,9 @@ class NamePreview(preview_base_.Preview):
       return None
 
   def _get_color_tag_icon(self, item):
+    if item.raw is None:
+      return None
+
     color_tag = item.raw.get_color_tag()
 
     if color_tag in self._color_tags_and_premade_pixbufs:
