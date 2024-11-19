@@ -377,8 +377,6 @@ class ImagePreview(preview_base_.Preview):
       max(1, int(round(image.get_height() * self._preview_scaling_factor))),
       0,
       0)
-    
-    Gimp.context_set_interpolation(Gimp.InterpolationType.LINEAR)
   
   @staticmethod
   def _merge_items_for_batcher(batcher, item=None, raw_item=None):
@@ -391,12 +389,17 @@ class ImagePreview(preview_base_.Preview):
   def _scale_item_for_batcher(self, batcher, item=None, raw_item=None):
     if raw_item is None or not raw_item.is_valid():
       raw_item = batcher.current_raw_item
-    
+
+    Gimp.context_push()
+    Gimp.context_set_interpolation(Gimp.InterpolationType.LINEAR)
+
     raw_item.transform_scale(
       raw_item.get_offsets().offset_x * self._preview_scaling_factor,
       raw_item.get_offsets().offset_y * self._preview_scaling_factor,
       (raw_item.get_offsets().offset_x + raw_item.get_width()) * self._preview_scaling_factor,
       (raw_item.get_offsets().offset_y + raw_item.get_height()) * self._preview_scaling_factor)
+
+    Gimp.context_pop()
   
   @staticmethod
   def _resize_item_for_batcher(batcher, item=None, raw_item=None):
