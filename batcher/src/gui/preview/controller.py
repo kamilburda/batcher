@@ -331,6 +331,9 @@ class PreviewsController:
     self._is_initial_selection_set = True
 
   def _update_tagged_items(self):
+    if 'tagged_items' not in self._settings['main']:
+      return
+
     tagged_items = [
       item
       for item in self._name_preview.batcher.item_tree.iter(with_folders=False, filtered=False)
