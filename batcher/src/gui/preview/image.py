@@ -1,7 +1,5 @@
 """Preview widget displaying a scaled-down image to be processed."""
 
-from typing import List, Union
-
 import time
 import traceback
 
@@ -76,16 +74,10 @@ class ImagePreview(preview_base_.Preview):
     self._is_updating = False
     self._is_preview_image_allocated_size = False
     
-    self._preview_width = None
-    self._preview_height = None
-    self._preview_scaling_factor = None
-    
     self._resize_image_action_id = None
     self._merge_items_action_id = None
     self._scale_item_action_id = None
     self._resize_item_action_id = None
-    
-    self.prepare_image_for_rendering()
     
     self._init_gui()
 
@@ -164,48 +156,6 @@ class ImagePreview(preview_base_.Preview):
       self._preview_pixbuf is not None
       and allocation.width > self._preview_pixbuf.get_width()
       and allocation.height > self._preview_pixbuf.get_height())
-  
-  def prepare_image_for_rendering(
-        self,
-        resize_image_action_groups: Union[str, List[str], None] = None,
-        scale_item_action_groups: Union[str, List[str], None] = None,
-  ):
-    """Adds procedures that prepare an image for rendering in the preview.
-    
-    Specifically, the image to be previewed is resized, scaled and later merged
-    into a single layer.
-    
-    Subsequent calls to this method will remove the previously added procedures.
-    
-    The optional action groups allow to customize at which point during
-    processing the resize and scale procedures are applied. By default, these
-    procedures are applied before applying other procedures added by the user.
-    """
-    if resize_image_action_groups is None:
-      resize_image_action_groups = ['before_process_items_contents']
-    
-    if scale_item_action_groups is None:
-      scale_item_action_groups = ['before_process_item_contents']
-    
-    self._batcher.remove_action(
-      self._resize_image_action_id, groups='all', ignore_if_not_exists=True)
-    self._resize_image_action_id = self._batcher.add_procedure(
-      self._resize_image_for_batcher, resize_image_action_groups, ignore_if_exists=True)
-    
-    self._batcher.remove_action(
-      self._merge_items_action_id, groups='all', ignore_if_not_exists=True)
-    self._merge_items_action_id = self._batcher.add_procedure(
-      self._merge_items_for_batcher, ['after_process_item_contents'], ignore_if_exists=True)
-    
-    self._batcher.remove_action(
-      self._scale_item_action_id, groups='all', ignore_if_not_exists=True)
-    self._scale_item_action_id = self._batcher.add_procedure(
-      self._scale_item_for_batcher, scale_item_action_groups, ignore_if_exists=True)
-    
-    self._batcher.remove_action(
-      self._resize_item_action_id, groups='all', ignore_if_not_exists=True)
-    self._resize_item_action_id = self._batcher.add_procedure(
-      self._resize_item_for_batcher, ['after_process_item_contents'], ignore_if_exists=True)
 
   def set_item_name_label(self, item: pg.itemtree.Item):
     if not self._batcher.edit_mode:
@@ -227,7 +177,7 @@ class ImagePreview(preview_base_.Preview):
     start_update_time = time.time()
     
     with pg.pdbutils.redirect_messages():
-      self._preview_pixbuf, error = self._get_in_memory_preview(self.item.raw)
+      self._preview_pixbuf, error = self._get_in_memory_preview()
     
     if self._preview_pixbuf is not None:
       self._preview_pixbuf_to_draw = self._preview_pixbuf
@@ -294,11 +244,7 @@ class ImagePreview(preview_base_.Preview):
     self._set_pixbuf(self._no_selection_icon)
     self._set_no_selection_label()
   
-  def _get_in_memory_preview(self, raw_item):
-    self._preview_width, self._preview_height = self._get_preview_size(
-      raw_item.get_width(), raw_item.get_height())
-    self._preview_scaling_factor = self._preview_width / raw_item.get_width()
-    
+  def _get_in_memory_preview(self):
     image_preview, error = self._get_image_preview()
     
     if image_preview is None or not image_preview.is_valid():
@@ -312,19 +258,12 @@ class ImagePreview(preview_base_.Preview):
     
     if image_preview.get_base_type() != Gimp.ImageBaseType.RGB:
       image_preview.convert_rgb()
-    
-    raw_item_preview = image_layers[0]
-    
-    if raw_item_preview.get_mask() is not None:
-      raw_item_preview.remove_mask(Gimp.MaskApplyMode.APPLY)
-    
-    # Recompute the size as the item may have been resized during processing.
-    self._preview_width, self._preview_height = self._get_preview_size(
-      raw_item_preview.get_width(), raw_item_preview.get_height())
 
-    preview_pixbuf = self._get_preview_pixbuf(
-      raw_item_preview, self._preview_width, self._preview_height)
-    
+    preview_width, preview_height = self._get_preview_size(
+      image_preview.get_width(), image_preview.get_height())
+
+    preview_pixbuf = self._get_preview_pixbuf(image_preview, preview_width, preview_height)
+
     image_preview.delete()
     
     return preview_pixbuf, error
@@ -368,53 +307,16 @@ class ImagePreview(preview_base_.Preview):
       error = e
     
     return self._batcher.image_copy, error
-  
-  def _resize_image_for_batcher(self, batcher, *args, **kwargs):
-    image = batcher.current_image
-    
-    image.resize(
-      max(1, int(round(image.get_width() * self._preview_scaling_factor))),
-      max(1, int(round(image.get_height() * self._preview_scaling_factor))),
-      0,
-      0)
-  
-  @staticmethod
-  def _merge_items_for_batcher(batcher, item=None, raw_item=None):
-    raw_item_merged = batcher.current_image.merge_visible_layers(
-      Gimp.MergeType.EXPAND_AS_NECESSARY)
-    
-    batcher.current_image.set_selected_layers([raw_item_merged])
-    batcher.current_raw_item = raw_item_merged
-    
-  def _scale_item_for_batcher(self, batcher, item=None, raw_item=None):
-    if raw_item is None or not raw_item.is_valid():
-      raw_item = batcher.current_raw_item
 
-    Gimp.context_push()
-    Gimp.context_set_interpolation(Gimp.InterpolationType.LINEAR)
-
-    raw_item.transform_scale(
-      raw_item.get_offsets().offset_x * self._preview_scaling_factor,
-      raw_item.get_offsets().offset_y * self._preview_scaling_factor,
-      (raw_item.get_offsets().offset_x + raw_item.get_width()) * self._preview_scaling_factor,
-      (raw_item.get_offsets().offset_y + raw_item.get_height()) * self._preview_scaling_factor)
-
-    Gimp.context_pop()
-  
   @staticmethod
-  def _resize_item_for_batcher(batcher, item=None, raw_item=None):
-    batcher.current_raw_item.resize_to_image_size()
-  
-  @staticmethod
-  def _get_preview_pixbuf(raw_item, preview_width, preview_height):
-    return raw_item.get_thumbnail(
-      preview_width, preview_height, Gimp.PixbufTransparency.SMALL_CHECKS)
+  def _get_preview_pixbuf(image, preview_width, preview_height):
+    return image.get_thumbnail(preview_width, preview_height, Gimp.PixbufTransparency.SMALL_CHECKS)
   
   def _get_preview_size(self, width, height):
     preview_widget_allocation = self._preview_image.get_allocation()
     preview_widget_width = preview_widget_allocation.width
     preview_widget_height = preview_widget_allocation.height
-    
+
     if preview_widget_width > preview_widget_height:
       preview_height = min(preview_widget_height, height)
       preview_width = int(round((preview_height / height) * width))
@@ -434,7 +336,7 @@ class ImagePreview(preview_base_.Preview):
       preview_width = 1
     if preview_height == 0:
       preview_height = 1
-    
+
     return preview_width, preview_height
   
   def _resize_preview(self, preview_allocation, preview_pixbuf):

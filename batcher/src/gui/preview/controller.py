@@ -196,31 +196,15 @@ class PreviewsController:
       if (action_['origin'].value == 'gimp_pdb'
           or (action_['origin'].value == 'builtin' and action_['orig_name'].value == 'scale')):
         self._custom_actions[action_.get_path()] = action_
-        
-        _update_rendering_of_image_preview(action_['enabled'])
-        action_['enabled'].connect_event('value-changed', _update_rendering_of_image_preview)
     
     def _before_remove_action(_actions, action_):
       if action_.get_path() in self._custom_actions:
         del self._custom_actions[action_.get_path()]
-
-      if not self._custom_actions:
-        self._image_preview.prepare_image_for_rendering()
     
     def _before_clear_actions(actions_):
       for action_ in actions_:
         if action_.get_path() in self._custom_actions:
           del self._custom_actions[action_.get_path()]
-      
-      if not self._custom_actions:
-        self._image_preview.prepare_image_for_rendering()
-    
-    def _update_rendering_of_image_preview(_action_enabled):
-      if not any(action_['enabled'].value for action_ in self._custom_actions.values()):
-        self._image_preview.prepare_image_for_rendering()
-      else:
-        self._image_preview.prepare_image_for_rendering(
-          ['after_process_item_contents'], ['after_process_item_contents'])
     
     actions.connect_event('after-add-action', _after_add_action)
 
