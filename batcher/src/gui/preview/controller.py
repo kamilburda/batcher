@@ -26,7 +26,6 @@ class PreviewsController:
     self._settings = settings
     self._image = image
     self._selected_in_preview_constraints = {}
-    self._custom_actions = {}
     self._is_initial_selection_set = False
 
     self._previously_focused_on_related_window = False
@@ -55,8 +54,6 @@ class PreviewsController:
     self._connect_name_preview_events()
     self._connect_toggle_name_preview_filtering()
 
-    self._connect_update_rendering_of_image_preview(self._settings['main/procedures'])
-    self._connect_update_rendering_of_image_preview(self._settings['main/constraints'])
     self._connect_image_preview_menu_setting_changes()
 
     self._connect_focus_changes_for_plugin_windows()
@@ -190,30 +187,6 @@ class PreviewsController:
     
     self._settings['main/constraints'].connect_event(
       'before-clear-actions', _before_clear_constraints)
-  
-  def _connect_update_rendering_of_image_preview(self, actions):
-    def _after_add_action(_actions, action_, _orig_action_dict):
-      if (action_['origin'].value == 'gimp_pdb'
-          or (action_['origin'].value == 'builtin' and action_['orig_name'].value == 'scale')):
-        self._custom_actions[action_.get_path()] = action_
-    
-    def _before_remove_action(_actions, action_):
-      if action_.get_path() in self._custom_actions:
-        del self._custom_actions[action_.get_path()]
-    
-    def _before_clear_actions(actions_):
-      for action_ in actions_:
-        if action_.get_path() in self._custom_actions:
-          del self._custom_actions[action_.get_path()]
-    
-    actions.connect_event('after-add-action', _after_add_action)
-
-    # Activate event for existing actions
-    for action in actions:
-      _after_add_action(actions, action, None)
-
-    actions.connect_event('before-remove-action', _before_remove_action)
-    actions.connect_event('before-clear-actions', _before_clear_actions)
   
   def _connect_image_preview_menu_setting_changes(self):
     self._settings['gui/image_preview_automatic_update'].connect_event(
