@@ -255,9 +255,6 @@ class ImagePreview(preview_base_.Preview):
     if not image_layers:
       pg.pdbutils.try_delete_image(image_preview)
       return None, error
-    
-    if image_preview.get_base_type() != Gimp.ImageBaseType.RGB:
-      image_preview.convert_rgb()
 
     preview_width, preview_height = self._get_preview_size(
       image_preview.get_width(), image_preview.get_height())
