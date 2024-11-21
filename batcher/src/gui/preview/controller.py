@@ -63,8 +63,6 @@ class PreviewsController:
     settings_and_event_ids = collections.defaultdict(lambda: collections.defaultdict(list))
 
     def _on_after_add_action(_actions, action_, _action_dict):
-      nonlocal settings_and_event_ids
-
       self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
 
       settings_and_event_ids[action_]['enabled'].append(
@@ -85,8 +83,6 @@ class PreviewsController:
       self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
     
     def _on_before_remove_action(_actions, action_, *_args, **_kwargs):
-      nonlocal settings_and_event_ids
-
       self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
 
       should_remove_action_from_event_ids = False
