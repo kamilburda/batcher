@@ -160,10 +160,9 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     
     invoker = invoker_.Invoker()
     image = stubs_gimp.Image()
-    layer = stubs_gimp.Layer()
+    layer = stubs_gimp.Layer(image=image)
     
     batcher._invoker = invoker
-    batcher._current_image = image
     batcher._current_raw_item = layer
 
     actions = actions_.create('procedures')

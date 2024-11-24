@@ -230,8 +230,9 @@ def _get_layer_name(batcher, item, field_value, file_extension_strip_mode=''):
 
 
 def _get_image_name(batcher, item, field_value, keep_extension_str=''):
-  if batcher.current_image is not None and batcher.current_image.get_name() is not None:
-    image_name = batcher.current_image.get_name()
+  image = batcher.current_raw_item.get_image()
+  if image is not None and image.get_name() is not None:
+    image_name = image.get_name()
   else:
     image_name = _('Untitled')
   
@@ -307,7 +308,7 @@ def _get_current_date(batcher, item, field_value, date_format='%Y-%m-%d'):
 
 
 def _get_attributes(batcher, item, field_value, pattern, measure='%px'):
-  image = batcher.current_image
+  image = batcher.current_raw_item.get_image()
   
   fields = {
     'iw': image.get_width(),

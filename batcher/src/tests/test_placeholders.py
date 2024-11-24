@@ -16,8 +16,17 @@ from src import placeholders as placeholders_
 class _BatcherStub:
 
   def __init__(self, current_image=None, current_raw_item=None):
-    self.current_image = current_image
-    self.current_raw_item = current_raw_item
+    self.current_raw_item = _RawItemStub(current_raw_item, current_image)
+
+
+class _RawItemStub:
+
+  def __init__(self, raw_item, image):
+    self.raw_item = raw_item
+    self.image = image
+
+  def get_image(self):
+    return self.image
 
 
 class TestGetReplacedArg(unittest.TestCase):
@@ -32,7 +41,10 @@ class TestGetReplacedArg(unittest.TestCase):
     batcher = _BatcherStub(current_image='image')
     setting = placeholders_.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
 
-    self.assertTupleEqual(placeholders_.get_replaced_value(setting, batcher), (None,))
+    result = placeholders_.get_replaced_value(setting, batcher)
+
+    self.assertEqual(len(result), 1)
+    self.assertIsInstance(result[0], _RawItemStub)
 
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image='image')

@@ -43,7 +43,7 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
     _cleanup_tagged_layers, ['cleanup_contents'])
   
   while True:
-    image = batcher.current_image
+    image = batcher.current_raw_item.get_image()
     current_parent = batcher.current_raw_item.get_parent()
     
     position = image.get_item_position(batcher.current_raw_item)
@@ -156,7 +156,7 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
     
     batcher.current_raw_item.set_visible(True)
     
-    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
+    merged_layer = batcher.current_raw_item.get_image().merge_down(layer_to_merge_down, merge_type)
 
     # Avoid errors if merge failed for some reason.
     if merged_layer is not None:
@@ -193,9 +193,11 @@ def _get_adjacent_layer(
       insert_tagged_layers_procedure_name,
       skip_message,
 ):
+  image = batcher.current_raw_item.get_image()
   raw_item = batcher.current_raw_item
+
   if raw_item.get_parent() is None:
-    children = batcher.current_image.get_layers()
+    children = image.get_layers()
   else:
     children = raw_item.get_parent().get_children()
   
@@ -204,7 +206,7 @@ def _get_adjacent_layer(
   num_layers = len(children)
   
   if num_layers > 1:
-    position = batcher.current_image.get_item_position(batcher.current_raw_item)
+    position = image.get_item_position(batcher.current_raw_item)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
       color_tags = [
@@ -218,7 +220,7 @@ def _get_adjacent_layer(
   if adjacent_layer is not None:
     # This is necessary for some procedures relying on selected layers, e.g.
     # `plug-in-autocrop-layer`.
-    batcher.current_image.set_selected_layers([adjacent_layer])
+    image.set_selected_layers([adjacent_layer])
     return adjacent_layer
   else:
     raise exceptions.SkipAction(skip_message)

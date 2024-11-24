@@ -19,10 +19,12 @@ def set_selected_and_current_layer(batcher):
   # be raised if a procedure requires at least one layer. An empty image
   # could occur e.g. if all layers were removed by the previous procedures.
 
+  image = batcher.current_raw_item.get_image()
+
   if batcher.current_raw_item.is_valid():
-    batcher.current_image.set_selected_layers([batcher.current_raw_item])
+    image.set_selected_layers([batcher.current_raw_item])
   else:
-    selected_layers = batcher.current_image.get_selected_layers()
+    selected_layers = image.get_selected_layers()
 
     if selected_layers:
       # There is no way to know which layer is the "right" one, so we resort to
@@ -33,12 +35,12 @@ def set_selected_and_current_layer(batcher):
         # The selected layer(s) may have been set by the procedure.
         batcher.current_raw_item = selected_layer
       else:
-        current_image_layers = batcher.current_image.get_layers()
-        if current_image_layers:
+        image_layers = image.get_layers()
+        if image_layers:
           # There is no way to know which layer is the "right" one, so we resort
           # to taking the first.
-          batcher.current_raw_item = current_image_layers[0]
-          batcher.current_image.set_selected_layers([current_image_layers[0]])
+          batcher.current_raw_item = image_layers[0]
+          image.set_selected_layers([image_layers[0]])
 
 
 def set_selected_and_current_layer_after_action(batcher):
@@ -168,7 +170,7 @@ def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
 
 
 def resize_to_layer_size(batcher):
-  image = batcher.current_image
+  image = batcher.current_raw_item.get_image()
   layer = batcher.current_raw_item
   
   layer_offset_x, layer_offset_y = layer.get_offsets()[1:]

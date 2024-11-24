@@ -78,7 +78,7 @@ def export(
     image_copy.undo_freeze()
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [image_copy])
   else:
-    image_copy = batcher.current_image
+    image_copy = batcher.current_raw_item.get_image()
   
   while True:
     item = batcher.current_item

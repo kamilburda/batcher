@@ -287,11 +287,6 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._last_constraint
 
   @property
-  def current_image(self) -> Gimp.Image:
-    """The current `Gimp.Image` being processed."""
-    return self._current_image
-
-  @property
   def exported_items(self) -> List[pg.itemtree.Item]:
     """List of successfully exported items.
 
@@ -995,17 +990,6 @@ class LayerBatcher(Batcher):
 
     self._image_copy = None
     self._orig_selected_raw_items = []
-
-  @property
-  def current_image(self) -> Gimp.Image:
-    """The current `Gimp.Image` being processed.
-
-    If `edit_mode` is ``True``, this is equivalent to `input_image`.
-
-    If `edit_mode` is ``False``, this is a copy of `input_image` to avoid
-    modifying original layers.
-    """
-    return self._current_image
 
   @property
   def input_image(self) -> Gimp.Image:
