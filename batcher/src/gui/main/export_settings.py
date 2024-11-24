@@ -30,7 +30,7 @@ class ExportSettings:
   def __init__(
         self,
         settings,
-        image,
+        image=None,
         name_preview=None,
         image_preview=None,
         parent=None,
@@ -45,7 +45,8 @@ class ExportSettings:
 
     self._init_setting_gui()
 
-    _set_up_output_directory_settings(self._settings, self._image)
+    if self._image is not None:
+      _set_up_output_directory_settings(self._settings, self._image)
 
   def _init_gui(self):
     self._folder_chooser_label = Gtk.Label(
