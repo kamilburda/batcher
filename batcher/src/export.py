@@ -67,11 +67,8 @@ def export(
     renamer_for_image = None
   
   if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
-    # We use the original image (accessed via `current_item.raw`) in case the
-    # possible image copy (accessed via `current_raw_item`) gets modified
-    # between items.
     multi_layer_image = pg.pdbutils.duplicate_image_without_contents(
-      batcher.current_item.raw.get_image())
+      batcher.current_raw_item.get_image())
     multi_layer_image.undo_freeze()
     batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [multi_layer_image])
   else:
