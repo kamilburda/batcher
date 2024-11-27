@@ -413,6 +413,10 @@ class ItemTree(metaclass=abc.ABCMeta):
 
   Items can be directly accessed via a unique item identifier. You may use the
   `Item.key` property for this purpose.
+
+  While you may add or remove items from the tree, it does not account for
+  modifications, additions or removal outside this class. To refresh the
+  contents of the tree, call `refresh()` or create a new instance.
   """
   
   def __init__(
@@ -832,6 +836,24 @@ class ItemTree(metaclass=abc.ABCMeta):
     """Resets the filter, creating a new empty `objectfilter.ObjectFilter`."""
     self.filter = pgobjectfilter.ObjectFilter(self._filter_match_type)
 
+  @abc.abstractmethod
+  def refresh(self):
+    """Refreshes the contents of the tree, thus keeping it in sync with the most
+    recent changes performed externally.
+
+    This can, for example, involve removing and adding layers as items to the
+    tree from a GIMP image based on the current list of layers in the image.
+
+    See the documentation for specific subclasses for more information.
+    """
+    pass
+
+  def _clear(self):
+    self._first_item = None
+    self._last_item = None
+
+    self._items = {}
+
 
 class ImageTree(ItemTree):
   """`ItemTree` subclass for images as `Gimp.Image` instances or file paths.
@@ -839,9 +861,22 @@ class ImageTree(ItemTree):
   When adding items:
   * files and non-existent files/folders are treated as regular items. How
     non-existent files are handled depends on the client code.
-  * Numeric IDs are converted to `Gimp.Image` instances. Any invalid IDs are
+  * numeric IDs are converted to `Gimp.Image` instances. Any invalid IDs are
     silently skipped.
   """
+
+  def refresh(self):
+    """Removes GIMP images from the tree that are no longer opened in GIMP.
+
+    Items representing files and folders are kept intact, even if they no longer
+    exist.
+    """
+    image_items_to_remove = [
+      item for item in self._items.values() if isinstance(item, GimpImageItem)
+      and not item.raw.is_valid()
+    ]
+
+    self.remove(image_items_to_remove)
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
@@ -873,11 +908,6 @@ class GimpItemTree(ItemTree):
 
   Group items (e.g. group layers) are inserted twice in the tree - as folders
   and as items. Parents of items are always folders.
-
-  While you may add or remove items from `GimpItemTree`, it does not account for
-  modifications, additions or removal of GIMP items by GIMP procedures outside
-  this class. To refresh the contents of the tree, create a new `GimpItemTree`
-  instance instead.
   """
 
   def __init__(
@@ -897,6 +927,16 @@ class GimpItemTree(ItemTree):
   def image(self) -> Gimp.Image:
     """GIMP image to generate item tree from."""
     return self._image
+
+  def refresh(self):
+    """Removes all items and adds items from the image given by the `image`
+    property.
+
+    If `image` is ``None``, the tree is kept intact.
+    """
+    if self._image is not None:
+      self._clear()
+      self.add(self._get_children_from_image(self._image))
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if isinstance(object_, int):

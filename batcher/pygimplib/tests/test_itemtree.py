@@ -559,25 +559,28 @@ class TestLayerTree(unittest.TestCase):
     self.assertIn(item.key, self.tree)
   
   def test_item_attributes(self):
+    self._test_item_attributes()
+
+  def _test_item_attributes(self):
     for item, properties in zip(
           self.tree.iter(with_folders=True, with_empty_groups=True), self.item_properties):
       self.assertEqual(item.orig_name, properties[0])
       self.assertEqual(item.type, properties[1])
-      
+
       parents = properties[2]
       children = properties[3]
-      
+
       for (expected_parent_name, expected_parent_type), parent in zip(parents, item.parents):
         self.assertEqual(parent.orig_name, expected_parent_name)
         self.assertEqual(parent.type, expected_parent_type)
-      
+
       for (expected_child_name, expected_child_type), child in zip(children, item.children):
         self.assertEqual(child.orig_name, expected_child_name)
         self.assertEqual(child.type, expected_child_type)
-      
+
       self.assertEqual(item.parents, list(item.orig_parents))
       self.assertEqual(item.children, list(item.orig_children))
-  
+
   def test_iter_with_different_item_types_excluded(self):
     limited_item_properties = [properties[:2] for properties in self.item_properties]
 
@@ -806,6 +809,49 @@ class TestLayerTree(unittest.TestCase):
 
     for item in items_to_be_removed:
       self.assertNotIn(item.key, self.tree)
+
+  def test_refresh(self):
+    self.tree.refresh()
+
+    self._test_item_attributes()
+
+
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+class TestImageTreeWithGimpImages(unittest.TestCase):
+
+  def setUp(self):
+    self.tree = pgitemtree.ImageTree()
+
+  def test_add_by_object(self, _mock_gimp_module):
+    image = stubs_gimp.Image(name='some_image')
+
+    self.tree.add([image])
+
+    self.assertEqual(len(self.tree), 1)
+    self.assertEqual(self.tree[image.get_id()].raw, image)
+
+  def test_add_by_id(self, _mock_gimp_module):
+    image = stubs_gimp.Image(name='some_image')
+
+    self.tree.add([image.get_id()])
+
+    self.assertEqual(len(self.tree), 1)
+    self.assertEqual(self.tree[image.get_id()].raw, image)
+
+  def test_refresh_removes_invalid_images(self, _mock_gimp_module):
+    image = stubs_gimp.Image(name='some_image')
+    image2 = stubs_gimp.Image(name='some_image_2')
+
+    self.tree.add([image, image2])
+
+    # Simulate image deletion
+    image.valid = False
+
+    self.tree.refresh()
+
+    self.assertEqual(len(self.tree), 1)
+    self.assertEqual(self.tree[image2.get_id()].raw, image2)
 
 
 class TestImageFileItem(unittest.TestCase):
