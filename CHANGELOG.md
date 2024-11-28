@@ -2,6 +2,7 @@
 
 * Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
 * Fixed preview not working correctly for group layers.
+* Fixed incorrect names in the preview.
 
 
 ## 0.6

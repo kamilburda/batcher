@@ -277,8 +277,24 @@ class PreviewsController:
       self.lock_previews(self._PREVIEW_ERROR_KEY)
 
     if self._image_preview.item is not None:
-      self._image_preview.set_item_name_label(self._image_preview.item)
+      selected_item = self._get_item_selected_in_name_preview()
+      if selected_item is not None and selected_item.key == self._image_preview.item.key:
+        self._image_preview.item = selected_item
+        self._image_preview.set_item_name_label(selected_item)
+      else:
+        self._image_preview.set_item_name_label(self._image_preview.item)
 
+  def _get_item_selected_in_name_preview(self):
+    item_from_cursor = self._name_preview.get_item_from_cursor()
+
+    if item_from_cursor is not None:
+      return item_from_cursor
+    else:
+      items_from_selected_rows = self._name_preview.get_items_from_selected_rows()
+      if items_from_selected_rows:
+        return items_from_selected_rows[0]
+      else:
+        return None
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
