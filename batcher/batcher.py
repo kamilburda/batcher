@@ -277,23 +277,26 @@ def _run_interactive(
 def _run_plugin_noninteractive(settings, source_name, run_mode, item_tree, mode):
   if source_name == CONVERT_SOURCE_NAME:
     batcher = core.ImageBatcher(
+      item_tree=item_tree,
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],
+      refresh_item_tree=False,
       initial_export_run_mode=run_mode,
       edit_mode=mode == 'edit',
     )
   else:
     batcher = core.LayerBatcher(
+      item_tree=item_tree,
       input_image=item_tree.image,
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],
+      refresh_item_tree=False,
       initial_export_run_mode=run_mode,
       edit_mode=mode == 'edit',
     )
 
   try:
     batcher.run(
-      item_tree=item_tree,
       **utils_.get_settings_for_batcher(settings['main']))
   except exceptions.BatcherCancelError:
     return Gimp.PDBStatusType.SUCCESS, 'canceled'

@@ -23,7 +23,8 @@ class BatcherManager:
 
   _PREVIEWS_BATCHER_RUN_KEY = 'batcher_run'
 
-  def __init__(self, settings):
+  def __init__(self, item_tree, settings):
+    self._item_tree = item_tree
     self._settings = settings
 
     self._batcher = None
@@ -45,8 +46,7 @@ class BatcherManager:
 
     should_quit = True
 
-    previews.name_preview.lock_update(True, self._PREVIEWS_BATCHER_RUN_KEY)
-    previews.image_preview.lock_update(True, self._PREVIEWS_BATCHER_RUN_KEY)
+    previews.lock(self._PREVIEWS_BATCHER_RUN_KEY)
 
     try:
       self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
@@ -73,12 +73,11 @@ class BatcherManager:
         messages_.display_message(
           _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
     finally:
-      previews.name_preview.lock_update(False, self._PREVIEWS_BATCHER_RUN_KEY)
-      previews.image_preview.lock_update(False, self._PREVIEWS_BATCHER_RUN_KEY)
+      previews.unlock(self._PREVIEWS_BATCHER_RUN_KEY, update=False)
 
       if mode == 'edit':
         previews.image_preview.update()
-        previews.name_preview.update(reset_items=True)
+        previews.name_preview.update()
 
       action_lists.set_warning_on_actions(self._batcher)
 
@@ -104,6 +103,7 @@ class BatcherManager:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     batcher = core.LayerBatcher(
+      item_tree=self._item_tree,
       input_image=image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
@@ -119,7 +119,8 @@ class BatcherManager:
 
 class BatcherManagerQuick:
 
-  def __init__(self, settings):
+  def __init__(self, item_tree, settings):
+    self._item_tree = item_tree
     self._settings = settings
 
     self._batcher = None
@@ -179,6 +180,7 @@ class BatcherManagerQuick:
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
     batcher = core.LayerBatcher(
+      item_tree=self._item_tree,
       input_image=image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],

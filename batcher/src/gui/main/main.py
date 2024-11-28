@@ -68,8 +68,8 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, initial_item_tree, settings, source_name, mode, run_gui_func=None):
-    self._initial_item_tree = initial_item_tree
+  def __init__(self, item_tree, settings, source_name, mode, run_gui_func=None):
+    self._item_tree = item_tree
     self._settings = settings
     self._source_name = source_name
 
@@ -84,9 +84,9 @@ class BatchLayerProcessingGui:
     else:
       self._plugin_procedure_tag = None
 
-    self._image = self._initial_item_tree.image
+    self._image = self._item_tree.image
 
-    self._batcher_manager = batcher_manager_.BatcherManager(self._settings)
+    self._batcher_manager = batcher_manager_.BatcherManager(self._item_tree, self._settings)
 
     self._init_gui()
     self._assign_gui_to_settings()
@@ -137,7 +137,7 @@ class BatchLayerProcessingGui:
     self._previews = previews_.Previews(
       self._settings,
       self._mode,
-      self._initial_item_tree,
+      self._item_tree,
       lock_previews=True,
       display_message_func=self._display_inline_message,
     )
@@ -431,7 +431,7 @@ class BatchLayerProcessingQuickGui:
 
     self._image = self._item_tree.image
 
-    self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._settings)
+    self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._item_tree, self._settings)
 
     self._init_gui()
 

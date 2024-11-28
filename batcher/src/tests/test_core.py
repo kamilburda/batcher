@@ -22,7 +22,7 @@ class TestBatcherInitialActions(unittest.TestCase):
   @classmethod
   def setUpClass(cls):
     cls.image = stubs_gimp.Image(width=1, height=1, base_type=Gimp.ImageBaseType.RGB)
-  
+
   @classmethod
   def tearDownClass(cls):
     cls.image.delete()
@@ -32,6 +32,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.LayerBatcher(
+      item_tree=pg.itemtree.LayerTree(),
       input_image=self.image,
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],
@@ -73,6 +74,7 @@ class TestAddActionFromSettings(unittest.TestCase):
   
   def setUp(self):
     self.batcher = core.LayerBatcher(
+      item_tree=pg.itemtree.LayerTree(),
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),
@@ -151,6 +153,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
   
   def test_get_replaced_args(self):
     batcher = core.LayerBatcher(
+      item_tree=pg.itemtree.LayerTree(),
       input_image=mock.MagicMock(),
       procedures=mock.MagicMock(),
       constraints=mock.MagicMock(),

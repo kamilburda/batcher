@@ -253,7 +253,7 @@ class SettingsManager:
       actions_.clear(self._settings['main/constraints'])
 
     if self._previews_controller is not None:
-      self._previews_controller.unlock_and_update_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
+      self._previews_controller.unlock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
 
     return status != update.TERMINATE
 

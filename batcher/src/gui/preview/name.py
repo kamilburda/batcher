@@ -46,8 +46,7 @@ class NamePreview(preview_base_.Preview):
   """
   
   __gsignals__ = {
-    'preview-updated': (
-      GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_BOOLEAN)),
+    'preview-updated': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
@@ -77,7 +76,6 @@ class NamePreview(preview_base_.Preview):
         self,
         batcher,
         settings,
-        initial_item_tree=None,
         collapsed_items=None,
         selected_items=None,
         selected_items_filter_name='selected_in_preview'):
@@ -85,7 +83,6 @@ class NamePreview(preview_base_.Preview):
     
     self._batcher = batcher
     self._settings = settings
-    self._initial_item_tree = initial_item_tree
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
     self._selected_items_filter_name = selected_items_filter_name
@@ -119,19 +116,10 @@ class NamePreview(preview_base_.Preview):
   def selected_items(self):
     return self._selected_items
   
-  def update(self, reset_items: bool = False, update_existing_contents_only: bool = False):
+  def update(self):
     """Updates the preview (add/remove item, move item to a different parent
-    group item, etc.).
-    
-    If ``reset_items`` is ``True``, full update is perform - new items are
-    added, non-existent items are removed, etc. Note that setting this to
-    ``True`` may introduce a performance penalty for hundreds of items.
-    
-    If ``update_existing_contents_only`` is ``True``, only the contents of
-    the existing items are updated. Note that the items will not be
-    reparented, expanded/collapsed or added/removed even if they need to be.
-    This option is useful if you know the item structure will be preserved.
-    
+    group, etc.).
+
     If an exception was captured during the update, the method is terminated
     prematurely. It is the responsibility of the caller to handle the error
     (e.g. lock or clear the preview).
@@ -139,30 +127,25 @@ class NamePreview(preview_base_.Preview):
     update_locked = super().update()
     if update_locked:
       return
-    
-    if not update_existing_contents_only:
-      self.clear()
-    
-    error = self._process_items(reset_items=reset_items)
+
+    error = self._process_items()
     
     if error:
-      self.emit('preview-updated', error, reset_items)
+      self.emit('preview-updated', error)
       return
     
     items = self._get_items_to_process()
-    
-    if not update_existing_contents_only:
-      self._insert_items(items)
-      self._set_expanded_items()
-    else:
-      self._update_items(items)
+
+    self.clear()
+    self._insert_items(items)
+    self._set_expanded_items()
     
     self._set_selection()
     self._set_item_tree_sensitive_for_selected(items)
     
     self._tree_view.columns_autosize()
     
-    self.emit('preview-updated', None, reset_items)
+    self.emit('preview-updated', None)
   
   def clear(self):
     """Clears the entire preview."""
@@ -344,28 +327,18 @@ class NamePreview(preview_base_.Preview):
     else:
       return list(self._batcher.item_tree)
   
-  def _process_items(self, reset_items=False):
-    if not reset_items:
-      if self._initial_item_tree is not None:
-        item_tree = self._initial_item_tree
-        self._initial_item_tree = None
-      else:
-        item_tree = self._batcher.item_tree
-    else:
-      item_tree = None
-    
-    if item_tree is not None:
-      # We need to reset item attributes explicitly before processing since
-      # existing item trees are not automatically refreshed.
-      for item in item_tree.iter_all():
-        item.reset()
-        item.delete_named_state('export')
-    
+  def _process_items(self):
+    # We need to reset item attributes explicitly before processing as some
+    # items will not be refreshed (removed and re-added) by the tree.
+    # The performance hit of doing this is negligible.
+    for item in self._batcher.item_tree.iter_all():
+      item.reset()
+      item.delete_named_state(export_.EXPORT_NAME_ITEM_STATE)
+
     error = None
-    
+
     try:
       self._batcher.run(
-        item_tree=item_tree,
         is_preview=True,
         process_contents=False,
         process_names=True,
@@ -391,12 +364,6 @@ class NamePreview(preview_base_.Preview):
       error = e
     
     return error
-  
-  def _update_items(self, items):
-    updated_parents = set()
-    for item in items:
-      self._update_parent_items(item, updated_parents)
-      self._update_item(item)
   
   def _insert_items(self, items):
     inserted_parents = set()
@@ -427,25 +394,11 @@ class NamePreview(preview_base_.Preview):
     
     return tree_iter
   
-  def _update_item(self, item):
-    self._tree_model.set(
-      self._tree_iters[item.key],
-      self._COLUMN_ITEM_NAME_SENSITIVE[0],
-      True,
-      self._COLUMN_ITEM_NAME[0],
-      self._get_item_name(item))
-  
   def _insert_parent_items(self, item, inserted_parents):
     for parent in item.parents:
       if parent not in inserted_parents:
         self._insert_item(parent)
         inserted_parents.add(parent)
-  
-  def _update_parent_items(self, item, updated_parents):
-    for parent in item.parents:
-      if parent not in updated_parents:
-        self._update_item(parent)
-        updated_parents.add(parent)
   
   def _set_item_tree_sensitive_for_selected(self, items):
     if self.is_filtering:
@@ -511,7 +464,7 @@ class NamePreview(preview_base_.Preview):
     the tree path, otherwise set the states in the whole tree view.
     """
     self._row_expand_collapse_interactive = False
-    
+
     if tree_path is None:
       self._tree_view.expand_all()
     else:

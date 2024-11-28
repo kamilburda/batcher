@@ -34,14 +34,44 @@ class PreviewsController:
     self._name_preview.lock_update(True, key)
     self._image_preview.lock_update(True, key)
 
-  def unlock_and_update_previews(self, key):
+  def unlock_previews(
+        self,
+        key,
+        update=True,
+        name_preview_update_args=None,
+        name_preview_update_kwargs=None,
+        image_preview_update_args=None,
+        image_preview_update_kwargs=None,
+  ):
     self._name_preview.lock_update(False, key)
-    pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._name_preview.update)
-
     self._image_preview.lock_update(False, key)
-    pg.invocation.timeout_add_strict(
-      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS, self._update_image_preview)
+
+    if update:
+      if name_preview_update_args is None:
+        name_preview_update_args = ()
+
+      if name_preview_update_kwargs is None:
+        name_preview_update_kwargs = {}
+
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
+        self._name_preview.update,
+        *name_preview_update_args,
+        *name_preview_update_kwargs,
+      )
+
+      if image_preview_update_args is None:
+        image_preview_update_args = ()
+
+      if image_preview_update_kwargs is None:
+        image_preview_update_kwargs = {}
+
+      pg.invocation.timeout_add_strict(
+        self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
+        self._update_image_preview,
+        *image_preview_update_args,
+        *image_preview_update_kwargs,
+      )
 
   def connect_setting_changes_to_previews(self):
     self._connect_actions_changed(self._settings['main/procedures'])
@@ -121,7 +151,7 @@ class PreviewsController:
     if action['orig_name'].value == 'selected_in_preview' and setting.name == 'selected_items':
       return
 
-    self.unlock_and_update_previews(self._PREVIEW_ERROR_KEY)
+    self.unlock_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
@@ -227,7 +257,9 @@ class PreviewsController:
     pg.invocation.timeout_remove(self._update_image_preview)
     pg.invocation.timeout_remove(self._image_preview.update)
 
-    self._name_preview.update(reset_items=True)
+    self._name_preview.update()
+
+    self._update_tagged_items()
 
     if not self._is_initial_selection_set:
       self._set_initial_selection_and_update_image_preview()
@@ -240,15 +272,13 @@ class PreviewsController:
     self._name_preview.connect(
       'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
 
-  def _on_name_preview_updated(self, _preview, error, reset_items):
+  def _on_name_preview_updated(self, _preview, error):
     if error:
       self.lock_previews(self._PREVIEW_ERROR_KEY)
 
     if self._image_preview.item is not None:
       self._image_preview.set_item_name_label(self._image_preview.item)
 
-    if reset_items:
-      self._update_tagged_items()
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()

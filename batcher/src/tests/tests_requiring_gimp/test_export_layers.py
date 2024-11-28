@@ -180,6 +180,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       additional_init_before_run(self.test_image)
     
     batcher = core.LayerBatcher(
+      item_tree=pg.itemtree.LayerTree(),
       input_image=self.test_image,
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],

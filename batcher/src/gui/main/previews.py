@@ -35,46 +35,46 @@ class Previews:
         self,
         settings,
         batcher_mode,
-        initial_item_tree,
+        item_tree,
         lock_previews=True,
         display_message_func=None,
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
-    self._initial_item_tree = initial_item_tree
+    self._item_tree = item_tree
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
-    self._image = self._initial_item_tree.image
+    self._image = self._item_tree.image
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)
 
     self._batcher_for_name_preview = core.LayerBatcher(
+      item_tree=self._item_tree,
       input_image=self._image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
-      overwrite_chooser=overwrite_chooser,
-      item_tree=self._initial_item_tree)
+      overwrite_chooser=overwrite_chooser)
 
     self._name_preview = preview_name_.NamePreview(
       self._batcher_for_name_preview,
       self._settings,
-      self._initial_item_tree,
       self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
       self._settings['main/selected_items'].value[self._image],
       'selected_in_preview')
 
     self._batcher_for_image_preview = core.LayerBatcher(
+      # This is an empty tree that will be replaced during the preview anyway.
+      item_tree=type(self._item_tree)(),
       input_image=self._image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
-      overwrite_chooser=overwrite_chooser,
-      item_tree=self._initial_item_tree)
+      overwrite_chooser=overwrite_chooser)
 
     self._image_preview = preview_image_.ImagePreview(
       self._batcher_for_image_preview, self._settings)
@@ -111,11 +111,26 @@ class Previews:
   def vbox_previews(self):
     return self._vbox_previews
 
-  def lock(self):
-    self._previews_controller.lock_previews(self._PREVIEWS_GLOBAL_KEY)
+  def lock(self, key=_PREVIEWS_GLOBAL_KEY):
+    self._previews_controller.lock_previews(key)
 
-  def unlock(self):
-    self._previews_controller.unlock_and_update_previews(self._PREVIEWS_GLOBAL_KEY)
+  def unlock(
+        self,
+        key=_PREVIEWS_GLOBAL_KEY,
+        update=True,
+        name_preview_update_args=None,
+        name_preview_update_kwargs=None,
+        image_preview_update_args=None,
+        image_preview_update_kwargs=None,
+  ):
+    self._previews_controller.unlock_previews(
+      key,
+      update=update,
+      name_preview_update_args=name_preview_update_args,
+      name_preview_update_kwargs=name_preview_update_kwargs,
+      image_preview_update_args=image_preview_update_args,
+      image_preview_update_kwargs=image_preview_update_kwargs,
+    )
 
   def _init_gui(self):
     self._preview_label = Gtk.Label(
@@ -277,6 +292,6 @@ class Previews:
         _('Disabling automatic preview update. The preview takes too long to update.'),
         Gtk.MessageType.INFO)
 
-  def _on_name_preview_updated(self, _preview, _error, _reset_items, action_lists):
+  def _on_name_preview_updated(self, _preview, _error, action_lists):
     action_lists.display_warnings_and_tooltips_for_actions(
       self._batcher_for_name_preview, clear_previous=False)

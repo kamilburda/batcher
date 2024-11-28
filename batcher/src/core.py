@@ -38,8 +38,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def __init__(
         self,
+        item_tree: pg.itemtree.ItemTree,
         procedures: pg.setting.Group,
         constraints: pg.setting.Group,
+        refresh_item_tree: bool = True,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
         output_directory: str = pg.utils.get_pictures_directory(),
@@ -49,7 +51,6 @@ class Batcher(metaclass=abc.ABCMeta):
         overwrite_chooser: Optional[overwrite.OverwriteChooser] = None,
         more_export_options: Dict[str, Any] = None,
         progress_updater: Optional[progress_.ProgressUpdater] = None,
-        item_tree: Optional[pg.itemtree.ItemTree] = None,
         is_preview: bool = False,
         process_contents: bool = True,
         process_names: bool = True,
@@ -58,8 +59,10 @@ class Batcher(metaclass=abc.ABCMeta):
         export_context_manager_args: Optional[Union[List, Tuple]] = None,
         export_context_manager_kwargs: Optional[Dict] = None,
   ):
+    self._item_tree = item_tree
     self._procedures = procedures
     self._constraints = constraints
+    self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode
     self._initial_export_run_mode = initial_export_run_mode
     self._output_directory = output_directory
@@ -69,7 +72,6 @@ class Batcher(metaclass=abc.ABCMeta):
     self._overwrite_chooser = overwrite_chooser
     self._more_export_options = more_export_options
     self._progress_updater = progress_updater
-    self._item_tree = item_tree
     self._is_preview = is_preview
     self._process_contents = process_contents
     self._process_names = process_names
@@ -97,6 +99,15 @@ class Batcher(metaclass=abc.ABCMeta):
     self._initial_invoker = invoker_.Invoker()
 
   @property
+  def item_tree(self) -> pg.itemtree.ItemTree:
+    """`pygimplib.itemtree.ItemTree` instance containing items to be processed.
+
+    If the item tree has filters (constraints) set, they will be reset on each
+    call to `run()`.
+    """
+    return self._item_tree
+
+  @property
   def procedures(self) -> pg.setting.Group:
     """Action group containing procedures."""
     return self._procedures
@@ -105,6 +116,16 @@ class Batcher(metaclass=abc.ABCMeta):
   def constraints(self) -> pg.setting.Group:
     """Action group containing constraints."""
     return self._constraints
+
+  @property
+  def refresh_item_tree(self) -> bool:
+    """If ``True``, `item_tree` is refreshed on each call to `run()`.
+
+    Specifically, `item_tree.refresh()` is invoked before the start of
+    processing. See `pygimplib.itemtree.ItemTree.refresh()` for more
+    information.
+    """
+    return self._refresh_item_tree
 
   @property
   def edit_mode(self) -> bool:
@@ -187,16 +208,6 @@ class Batcher(metaclass=abc.ABCMeta):
     not tracked.
     """
     return self._progress_updater
-
-  @property
-  def item_tree(self) -> pg.itemtree.ItemTree:
-    """`pygimplib.itemtree.ItemTree` instance containing items to be processed.
-
-    If ``item_tree=None`` was passed to `__init__()`, an item tree is
-    automatically created at the start of processing. If the item tree has
-    constraints (filters) set, they will be reset on each call to `run()`.
-    """
-    return self._item_tree
 
   @property
   def is_preview(self) -> bool:
@@ -477,9 +488,11 @@ class Batcher(metaclass=abc.ABCMeta):
     if self._export_context_manager_kwargs is None:
       self._export_context_manager_kwargs = {}
 
-  @abc.abstractmethod
   def _set_up_item_tree(self):
-    pass
+    if self._refresh_item_tree:
+      self._item_tree.refresh()
+
+    self._item_tree.reset_filter()
 
   def _prepare_for_processing(self):
     self._current_item = None
@@ -928,16 +941,6 @@ class ImageBatcher(Batcher):
   actions (resize, rename, export, ...).
   """
 
-  def _set_up_item_tree(self):
-    if self._item_tree is None:
-      raise TypeError(
-        'item_tree for ImageBatcher must be'
-        f' {pg.itemtree.ImageTree.__module__}.{pg.itemtree.ImageTree.__qualname__}'
-        ' instance, not None')
-
-    if self._item_tree.filter:
-      self._item_tree.reset_filter()
-
   def _process_item_with_actions(self):
     if not self._edit_mode or self._is_preview:
       if self._current_raw_item is None:
@@ -1022,14 +1025,6 @@ class LayerBatcher(Batcher):
     end of the processing
     """
     return list(self._orig_selected_raw_items)
-
-  def _set_up_item_tree(self):
-    if self._item_tree is None:
-      self._item_tree = pg.itemtree.LayerTree()
-      self._item_tree.add_from_image(self._input_image)
-
-    if self._item_tree.filter:
-      self._item_tree.reset_filter()
 
   def _prepare_for_processing(self):
     super()._prepare_for_processing()

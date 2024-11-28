@@ -111,7 +111,7 @@ class ImagePreview(preview_base_.Preview):
     update_locked = super().update()
     if update_locked:
       return
-    
+
     if self.item is None:
       return
     
@@ -277,8 +277,9 @@ class ImagePreview(preview_base_.Preview):
 
     try:
       self._batcher.run(
-        keep_image_copy=True,
         item_tree=tree_for_preview,
+        refresh_item_tree=False,
+        keep_image_copy=True,
         is_preview=True,
         process_contents=True,
         process_names=False,
