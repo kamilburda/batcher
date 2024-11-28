@@ -915,28 +915,32 @@ class GimpItemTree(ItemTree):
         *args,
         **kwargs,
   ):
-    self._image = None
+    self._images = []
 
     super().__init__(*args, **kwargs)
 
   def add_from_image(self, image: Gimp.Image):
-    self._image = image
+    self._images.append(image)
     self.add(self._get_children_from_image(image))
 
   @property
-  def image(self) -> Gimp.Image:
-    """GIMP image to generate item tree from."""
-    return self._image
+  def images(self) -> List[Gimp.Image]:
+    """GIMP images from which items are generated.
+
+    These images are also used for re-generating the tree via `refresh()`.
+    """
+    return self._images
 
   def refresh(self):
     """Removes all items and adds items from the image given by the `image`
     property.
 
-    If `image` is ``None``, the tree is kept intact.
+    This method will also remove any items not added via `add_from_image()`.
     """
-    if self._image is not None:
-      self._clear()
-      self.add(self._get_children_from_image(self._image))
+    self._clear()
+
+    for image in self._images:
+      self.add(self._get_children_from_image(image))
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if isinstance(object_, int):

@@ -100,8 +100,8 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   main_background_layer = next(
     iter(
-      layer for layer in gui.name_preview.batcher.item_tree.image.get_layers()
-      if layer.get_name() == 'main-background'))
+      item.raw for item in gui.name_preview.batcher.item_tree
+      if item.raw.get_name() == 'main-background'))
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
 
@@ -153,8 +153,8 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
 
   main_background_layer = next(
     iter(
-      layer for layer in gui.name_preview.batcher.item_tree.image.get_layers()
-      if layer.get_name() == 'main-background'))
+      item.raw for item in gui.name_preview.batcher.item_tree
+      if item.raw.get_name() == 'main-background'))
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
 

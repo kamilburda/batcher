@@ -28,8 +28,8 @@ from src.gui.main import settings_manager as settings_manager_
 
 class BatchImageProcessingGui:
 
-  def __init__(self, initial_image_tree, settings, source_name, run_gui_func=None):
-    self._initial_image_tree = initial_image_tree
+  def __init__(self, item_tree, settings, source_name, run_gui_func=None):
+    self._item_tree = item_tree
     self._settings = settings
     self._source_name = source_name
 
@@ -84,7 +84,7 @@ class BatchLayerProcessingGui:
     else:
       self._plugin_procedure_tag = None
 
-    self._image = self._item_tree.image
+    self._image = self._item_tree.images[0]
 
     self._batcher_manager = batcher_manager_.BatcherManager(self._item_tree, self._settings)
 
@@ -429,7 +429,7 @@ class BatchLayerProcessingQuickGui:
 
     self._title = title
 
-    self._image = self._item_tree.image
+    self._image = self._item_tree.images[0]
 
     self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._item_tree, self._settings)
 

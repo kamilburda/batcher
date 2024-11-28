@@ -45,7 +45,7 @@ class Previews:
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
-    self._image = self._item_tree.image
+    self._image = self._item_tree.images[0]
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)

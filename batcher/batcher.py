@@ -287,7 +287,7 @@ def _run_plugin_noninteractive(settings, source_name, run_mode, item_tree, mode)
   else:
     batcher = core.LayerBatcher(
       item_tree=item_tree,
-      input_image=item_tree.image,
+      input_image=item_tree.images[0],
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],
       refresh_item_tree=False,
