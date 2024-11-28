@@ -245,8 +245,10 @@ class ImagePreview(preview_base_.Preview):
     self._set_no_selection_label()
   
   def _get_in_memory_preview(self):
-    image_preview, error = self._get_image_preview()
-    
+    image_copies, error = self._get_image_preview()
+
+    image_preview = image_copies[0]
+
     if image_preview is None or not image_preview.is_valid():
       return None, error
 
@@ -261,7 +263,8 @@ class ImagePreview(preview_base_.Preview):
 
     preview_pixbuf = self._get_preview_pixbuf(image_preview, preview_width, preview_height)
 
-    image_preview.delete()
+    for image in image_copies:
+      pg.pdbutils.try_delete_image(image)
     
     return preview_pixbuf, error
   
@@ -279,7 +282,7 @@ class ImagePreview(preview_base_.Preview):
       self._batcher.run(
         item_tree=tree_for_preview,
         refresh_item_tree=False,
-        keep_image_copy=True,
+        keep_image_copies=True,
         is_preview=True,
         process_contents=True,
         process_names=False,
@@ -303,8 +306,8 @@ class ImagePreview(preview_base_.Preview):
         parent=pg.gui.get_toplevel_window(self))
       
       error = e
-    
-    return self._batcher.image_copy, error
+
+    return self._batcher.image_copies, error
 
   @staticmethod
   def _get_preview_pixbuf(image, preview_width, preview_height):

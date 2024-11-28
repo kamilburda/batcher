@@ -971,51 +971,42 @@ class LayerBatcher(Batcher):
   """Class for batch-processing layers in the specified image with a sequence of
   actions (resize, rename, export, ...).
 
-  If ``edit_mode`` is set to ``'export'``, batch-processing and export of
-  layers is performed. A copy of the image and the layers to be processed are
-  created so that the original image and its soon-to-be processed layers are
-  left intact. The image copy is automatically destroyed once processing is
-  done. To keep the image copy, pass ``keep_image_copy=True`` to `__init__()`
-  or `run()`.
+  If ``edit_mode`` is ``False``, batch-processing and export of layers is
+  performed. The processing and export is applied on a copy of the layer
+  within a copy of the original image. Each copy is automatically destroyed
+  once the processing of the layer is done. To keep the image and layer
+  copies, pass ``keep_image_copies=True`` to `__init__()` or `run()`.
   """
 
   def __init__(
         self,
         input_image: Gimp.Image,
         *args,
-        keep_image_copy: bool = False,
+        keep_image_copies: bool = False,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
 
     self._input_image = input_image
-    self._keep_image_copy = keep_image_copy
-
-    self._image_copy = None
+    self._keep_image_copies = keep_image_copies
+    self._image_copies = []
     self._orig_selected_raw_items = []
 
   @property
-  def input_image(self) -> Gimp.Image:
-    """Input `Gimp.Image` containing layers to process."""
-    return self._input_image
+  def keep_image_copies(self) -> bool:
+    """If ``True`` and `edit_mode` is ``False``, image and layer copies are
+    preserved once batch processing and export (a `run()` call) is done.
+    """
+    return self._keep_image_copies
 
   @property
-  def keep_image_copy(self) -> bool:
-    """If ``True``, a copy of the currently processed image is preserved once
-    batch processing and export (a `run()` call) is done.
-    """
-    return self._keep_image_copy
+  def image_copies(self) -> List[Gimp.Image]:
+    """`Gimp.Image` instances containing copies of the processed layers.
 
-  @property
-  def image_copy(self) -> Union[Gimp.Image, None]:
-    """`Gimp.Image` as a copy of the original image used for batch-processing
-    and exporting layers.
-
-    If ``keep_image_copy`` is ``False`` or creating an image copy is not
-    applicable (e.g. if ``edit_mode`` is ``True``), this property will then
-    return ``None``.
+    If ``keep_image_copies`` is ``False`` or creating an image copy is not
+    applicable (if ``edit_mode`` is ``True``), this will return an empty list.
     """
-    return self._image_copy
+    return list(self._image_copies)
 
   @property
   def orig_selected_raw_items(self) -> List[Gimp.Layer]:
@@ -1029,10 +1020,9 @@ class LayerBatcher(Batcher):
   def _prepare_for_processing(self):
     super()._prepare_for_processing()
 
+    self._image_copies = []
     self._orig_selected_raw_items = []
-
     self._current_image = self._input_image
-    self._image_copy = None
 
   def _add_actions_before_initial_invoker(self):
     super()._add_actions_before_initial_invoker()
@@ -1096,12 +1086,7 @@ class LayerBatcher(Batcher):
 
     Gimp.context_push()
     
-    if not self._edit_mode or self._is_preview:
-      self._image_copy = pg.pdbutils.duplicate_image_without_contents(self._input_image)
-      self._current_image = self._image_copy
-      
-      self._current_image.undo_freeze()
-    else:
+    if self._edit_mode and not self._is_preview:
       self._current_image = self._input_image
       self._current_image.undo_group_start()
 
@@ -1111,11 +1096,8 @@ class LayerBatcher(Batcher):
     super()._do_cleanup_contents(exception_occurred)
 
     if not self._edit_mode or self._is_preview:
-      self._current_image.undo_thaw()
-      
-      if not self._keep_image_copy or exception_occurred:
-        pg.pdbutils.try_delete_image(self._current_image)
-        self._image_copy = None
+      if not self._keep_image_copies or exception_occurred:
+        self._remove_image_copies()
     else:
       selected_layers = [
         layer for layer in self._orig_selected_raw_items
@@ -1131,18 +1113,21 @@ class LayerBatcher(Batcher):
   
   def _process_item_with_actions(self):
     if not self._edit_mode or self._is_preview:
+      image_copy = export_.create_empty_image_copy(self._current_item.raw.get_image())
+      self._image_copies.append(image_copy)
+
       raw_item_copy = pg.pdbutils.copy_and_paste_layer(
         self._current_raw_item,
-        self._current_image,
+        image_copy,
         None,
-        len(self._current_image.get_layers()),
+        0,
         True,
         True,
         True)
 
-      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       orig_raw_item_name = self._current_raw_item.get_name()
       self._current_raw_item = raw_item_copy
+      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_raw_item.set_name(orig_raw_item_name)
     
     if self._edit_mode and not self._is_preview and self._current_raw_item.is_group_layer():
@@ -1150,23 +1135,25 @@ class LayerBatcher(Batcher):
       # do not work on group layers.
       raw_item_copy = pg.pdbutils.copy_and_paste_layer(
         self._current_raw_item,
-        self._current_image,
+        self._current_raw_item.get_image(),
         self._current_raw_item.get_parent(),
-        self._current_image.get_item_position(self._current_raw_item) + 1,
+        self._current_raw_item.get_image().get_item_position(self._current_raw_item) + 1,
         True,
         True,
         True)
 
-      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       orig_raw_item_name = self._current_raw_item.get_name()
       self._current_raw_item = raw_item_copy
+      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_raw_item.set_name(orig_raw_item_name)
 
     super()._process_item_with_actions()
 
-    self._refresh_current_image()
+    self._remove_image_copies()
 
-  def _refresh_current_image(self):
-    if not self._edit_mode and not self._keep_image_copy:
-      for layer in self._current_image.get_layers():
-        self._current_image.remove_layer(layer)
+  def _remove_image_copies(self):
+    if not self._edit_mode and not self._keep_image_copies:
+      for image in self._image_copies:
+        pg.pdbutils.try_delete_image(image)
+
+      self._image_copies = []

@@ -26,46 +26,21 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
   processed_tagged_items = [
     item for item in tagged_items
     if tag != Gimp.ColorTag.NONE and item.raw.is_valid() and item.raw.get_color_tag() == tag]
-
-  merged_tagged_layer = None
-  orig_merged_tagged_layer = None
-  
-  def _cleanup_tagged_layers(batcher_):
-    if orig_merged_tagged_layer is not None and orig_merged_tagged_layer.is_valid():
-      orig_merged_tagged_layer.delete()
-    
-    batcher_.invoker.remove(cleanup_tagged_layers_action_id, ['cleanup_contents'])
-  
-  # We use`Invoker.add` instead of `batcher.add_procedure` since the latter
-  # would add the function only at the start of processing, and we already
-  # are in the middle of processing here.
-  cleanup_tagged_layers_action_id = batcher.invoker.add(
-    _cleanup_tagged_layers, ['cleanup_contents'])
   
   while True:
-    image = batcher.current_raw_item.get_image()
-    current_parent = batcher.current_raw_item.get_parent()
-    
-    position = image.get_item_position(batcher.current_raw_item)
-    if insert_mode == 'after':
-      position += 1
-    
     if not processed_tagged_items:
       yield
       continue
-    
-    if orig_merged_tagged_layer is None:
-      merged_tagged_layer = _insert_merged_tagged_layer(
-        batcher, image, processed_tagged_items, current_parent, position)
 
-      if merged_tagged_layer is not None:
-        orig_merged_tagged_layer = _copy_layer(merged_tagged_layer)
-        _remove_locks_from_layer(orig_merged_tagged_layer)
-    else:
-      merged_tagged_layer = _copy_layer(orig_merged_tagged_layer)
-      _remove_locks_from_layer(merged_tagged_layer)
-      image.insert_layer(merged_tagged_layer, current_parent, position)
-    
+    image = batcher.current_raw_item.get_image()
+    current_parent = batcher.current_raw_item.get_parent()
+
+    position = image.get_item_position(batcher.current_raw_item)
+    if insert_mode == 'after':
+      position += 1
+
+    _insert_merged_tagged_layer(batcher, image, processed_tagged_items, current_parent, position)
+
     yield
 
 
@@ -76,9 +51,6 @@ def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
     layer_copy = pg.pdbutils.copy_and_paste_layer(
       item.raw, image, parent, first_tagged_layer_position + i, True, True, True)
     layer_copy.set_visible(True)
-    
-    batcher.invoker.invoke(
-      ['before_process_item_contents'], [batcher, batcher.current_item, layer_copy])
 
   if parent is None:
     children = image.get_layers()
@@ -105,22 +77,6 @@ def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
     merged_tagged_layer.set_color_tag(merged_color_tag)
 
   return merged_tagged_layer
-
-
-def _remove_locks_from_layer(layer):
-  layer.set_lock_alpha(False)
-  layer.set_lock_content(False)
-  layer.set_lock_position(False)
-  layer.set_lock_visibility(False)
-
-
-def _copy_layer(layer, add_alpha=True):
-  layer_copy = layer.copy()
-
-  if add_alpha and not layer_copy.has_alpha() and not layer_copy.is_group_layer():
-    layer_copy.add_alpha()
-
-  return layer_copy
 
 
 def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):

@@ -60,34 +60,39 @@ def export(
   file_extension_properties = _FileExtensionProperties()
   processed_parents = set()
   default_file_extension = file_extension
+  image_copies = []
+  multi_layer_images = []
 
   if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_name_pattern is not None:
     renamer_for_image = renamer_.ItemRenamer(single_image_name_pattern)
   else:
     renamer_for_image = None
-  
-  if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
-    multi_layer_image = pg.pdbutils.duplicate_image_without_contents(
-      batcher.current_raw_item.get_image())
-    multi_layer_image.undo_freeze()
-    batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [multi_layer_image])
-  else:
-    multi_layer_image = None
-  
-  if batcher.edit_mode and batcher.process_export:
-    image_copy = pg.pdbutils.duplicate_image_without_contents(batcher.current_raw_item.get_image())
-    image_copy.undo_freeze()
-    batcher.invoker.add(_delete_image_on_cleanup, ['cleanup_contents'], [image_copy])
-  else:
-    image_copy = batcher.current_raw_item.get_image()
-  
+
+  batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [multi_layer_images])
+  batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
+
   while True:
     item = batcher.current_item
     current_file_extension = default_file_extension
-    
+
     item_to_process = item
     raw_item_to_process = batcher.current_raw_item
-    
+
+    if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
+      if not multi_layer_images:
+        multi_layer_image = create_empty_image_copy(batcher.current_raw_item.get_image())
+        multi_layer_images.append(multi_layer_image)
+      else:
+        multi_layer_image = multi_layer_images[-1]
+    else:
+      multi_layer_image = None
+
+    if batcher.edit_mode and batcher.process_export:
+      image_copy = create_empty_image_copy(batcher.current_raw_item.get_image())
+      image_copies.append(image_copy)
+    else:
+      image_copy = batcher.current_raw_item.get_image()
+
     if batcher.edit_mode and batcher.process_export:
       raw_item_to_process = _copy_layer(raw_item_to_process, image_copy, item)
     
@@ -102,7 +107,7 @@ def export(
         raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
       
       if batcher.item_tree.next(item, with_folders=False) is not None:
-        _refresh_image_copy_for_edit_mode(batcher, image_copy)
+        _remove_image_copies_for_edit_mode(batcher, image_copies)
         yield
         continue
       else:
@@ -120,7 +125,7 @@ def export(
       next_top_level_item = _get_top_level_item(batcher.item_tree.next(item, with_folders=False))
       
       if current_top_level_item == next_top_level_item:
-        _refresh_image_copy_for_edit_mode(batcher, image_copy)
+        _remove_image_copies_for_edit_mode(batcher, image_copies)
         yield
         continue
       else:
@@ -197,9 +202,9 @@ def export(
         batcher._exported_items.append(item_to_process)
     
     if multi_layer_image is not None:
-      _refresh_image(multi_layer_image)
+      _remove_multi_layer_images(multi_layer_images)
     
-    _refresh_image_copy_for_edit_mode(batcher, image_copy)
+    _remove_image_copies_for_edit_mode(batcher, image_copies)
     
     yield
 
@@ -207,6 +212,12 @@ def export(
 def _delete_image_on_cleanup(batcher, image):
   if batcher.process_export:
     if image is not None:
+      pg.pdbutils.try_delete_image(image)
+
+
+def _delete_images_on_cleanup(batcher, images):
+  if batcher.process_export:
+    for image in images:
       pg.pdbutils.try_delete_image(image)
 
 
@@ -566,14 +577,24 @@ def get_export_function(
   return pdb.gimp_file_save, {}
 
 
-def _refresh_image_copy_for_edit_mode(batcher, image_copy):
+def _remove_image_copies_for_edit_mode(batcher, image_copies):
   if batcher.edit_mode and batcher.process_export:
-    _refresh_image(image_copy)
+    for image in image_copies:
+      pg.pdbutils.try_delete_image(image)
+    image_copies.clear()
 
 
-def _refresh_image(image):
-  for layer in image.get_layers():
-    image.remove_layer(layer)
+def _remove_multi_layer_images(images):
+  for image in images:
+    pg.pdbutils.try_delete_image(image)
+  images.clear()
+
+
+def create_empty_image_copy(orig_image):
+  image_copy = pg.pdbutils.duplicate_image_without_contents(orig_image)
+  image_copy.undo_freeze()
+
+  return image_copy
 
 
 class _FileExtension:
