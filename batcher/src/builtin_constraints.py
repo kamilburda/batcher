@@ -1,7 +1,5 @@
 """Built-in plug-in constraints."""
 
-import collections
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -26,14 +24,6 @@ def has_matching_file_extension(item, file_extension):
 
 def has_matching_default_file_extension(item, batcher):
   return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
-
-
-def is_item_in_items_selected_in_preview(item, selected_items):
-  if item.raw.is_valid():
-    image = item.raw.get_image()
-    return image.is_valid() and image in selected_items and item.key in selected_items[image]
-  else:
-    return False
 
 
 def is_item_in_items_selected_in_gimp(item):
@@ -153,22 +143,6 @@ _BUILTIN_CONSTRAINTS_LIST = [
     # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
-  },
-  {
-    'name': 'selected_in_preview',
-    'type': 'constraint',
-    'function': is_item_in_items_selected_in_preview,
-    # FOR TRANSLATORS: Think of "Only items selected in preview" when translating this
-    'display_name': _('Selected in preview'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
-    'arguments': [
-      {
-        'type': 'images_and_gimp_items',
-        'name': 'selected_items',
-        'default_value': collections.defaultdict(set),
-        'gui_type': None,
-      },
-    ],
   },
   {
     'name': 'top_level',

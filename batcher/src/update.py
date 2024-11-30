@@ -347,7 +347,7 @@ def _update_to_0_4(data, _settings, source_names):
 
 
 def _handle_background_foreground_actions(procedures_list, constraints_list):
-  _remove_merge_background_foreground_procedures(procedures_list)
+  _remove_action_by_orig_names(procedures_list, ['merge_background', 'merge_foreground'])
 
   merge_procedure_mapping = {
     'insert_background': 'merge_background',
@@ -438,16 +438,15 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
     constraints_list.append(constraint_group_dict)
 
 
-def _remove_merge_background_foreground_procedures(procedures_list):
-  merge_procedure_indexes = []
-  for index, procedure_dict in enumerate(procedures_list):
-    orig_name_setting_dict, _index = _get_child_setting(
-      procedure_dict['settings'], 'orig_name')
-    if orig_name_setting_dict['default_value'] in ['merge_background', 'merge_foreground']:
-      merge_procedure_indexes.append(index)
+def _remove_action_by_orig_names(actions_list, action_orig_names):
+  indexes = []
+  for index, action_dict in enumerate(actions_list):
+    orig_name_setting_dict, _index = _get_child_setting(action_dict['settings'], 'orig_name')
+    if orig_name_setting_dict['default_value'] in action_orig_names:
+      indexes.append(index)
 
-  for index in reversed(merge_procedure_indexes):
-    procedures_list.pop(index)
+  for index in reversed(indexes):
+    actions_list.pop(index)
 
 
 def _create_action_as_saved_dict(action_dict):
@@ -900,17 +899,7 @@ def _update_to_1_0(data, _settings, source_names):
 
   constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
   if constraints_list is not None:
-    for constraint_dict in constraints_list:
-      constraint_list = constraint_dict['settings']
-
-      orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
-      arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
-
-      if (orig_name_setting_dict['default_value'] == 'selected_in_preview'
-          and arguments_list is not None):
-        for argument_dict in arguments_list:
-          if argument_dict['name'] == 'selected_layers':
-            argument_dict['name'] = 'selected_items'
+    _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
 
 
 _UPDATE_HANDLERS = {

@@ -28,9 +28,6 @@ class NamePreview(preview_base_.Preview):
   """A widget displaying a preview of batch-processed items - names and their
   folder structure.
   
-  Additional features:
-  * toggling "filter mode" - unselected items are not sensitive.
-  
   Signals:
   
   * ``'preview-selection-changed'`` - The selection in the preview was modified
@@ -56,16 +53,14 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ICON_ITEM_VISIBLE,
     _COLUMN_ICON_COLOR_TAG,
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
-    _COLUMN_ITEM_NAME_SENSITIVE,
     _COLUMN_ITEM_NAME,
     _COLUMN_ITEM_KEY) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
     [2, GdkPixbuf.Pixbuf],
     [3, GObject.TYPE_BOOLEAN],
-    [4, GObject.TYPE_BOOLEAN],
-    [5, GObject.TYPE_STRING],
-    [6, GObject.TYPE_PYOBJECT])
+    [4, GObject.TYPE_STRING],
+    [5, GObject.TYPE_PYOBJECT])
 
   _ICON_XPAD = 2
   _COLOR_TAG_BORDER_WIDTH = 1
@@ -77,18 +72,13 @@ class NamePreview(preview_base_.Preview):
         batcher,
         settings,
         collapsed_items=None,
-        selected_items=None,
-        selected_items_filter_name='selected_in_preview'):
+        selected_items=None):
     super().__init__()
     
     self._batcher = batcher
     self._settings = settings
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
-    self._selected_items_filter_name = selected_items_filter_name
-    
-    self.is_filtering = False
-    """If ``True``, unselected items are not sensitive."""
     
     # key: `Item.key`
     # value: `Gtk.TreeIter` instance
@@ -141,7 +131,6 @@ class NamePreview(preview_base_.Preview):
     self._set_expanded_items()
     
     self._set_selection()
-    self._set_item_tree_sensitive_for_selected(items)
     
     self._tree_view.columns_autosize()
     
@@ -225,8 +214,7 @@ class NamePreview(preview_base_.Preview):
     column.pack_start(cell_renderer_item_name, False)
     column.set_attributes(
       cell_renderer_item_name,
-      text=self._COLUMN_ITEM_NAME[0],
-      sensitive=self._COLUMN_ITEM_NAME_SENSITIVE[0])
+      text=self._COLUMN_ITEM_NAME[0])
     
     self._tree_view.append_column(column)
     
@@ -308,9 +296,6 @@ class NamePreview(preview_base_.Preview):
 
       self.emit('preview-selection-changed')
 
-      if self.is_filtering and self._selected_items != previous_selected_items:
-        self.update()
-
   def _get_keys_from_current_selection(self):
     _unused, tree_paths = self._tree_view.get_selection().get_selected_rows()
     return [
@@ -321,11 +306,7 @@ class NamePreview(preview_base_.Preview):
     return self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_KEY[0])
   
   def _get_items_to_process(self):
-    if self.is_filtering:
-      with self._batcher.item_tree.filter.remove_temp(name=self._selected_items_filter_name):
-        return list(self._batcher.item_tree)
-    else:
-      return list(self._batcher.item_tree)
+    return list(self._batcher.item_tree)
   
   def _process_items(self):
     # We need to reset item attributes explicitly before processing as some
@@ -386,7 +367,6 @@ class NamePreview(preview_base_.Preview):
        item_icon is not None,
        color_tag_icon,
        color_tag_icon is not None,
-       True,
        self._get_item_name(item),
        item.key])
     
@@ -399,39 +379,6 @@ class NamePreview(preview_base_.Preview):
       if parent not in inserted_parents:
         self._insert_item(parent)
         inserted_parents.add(parent)
-  
-  def _set_item_tree_sensitive_for_selected(self, items):
-    if self.is_filtering:
-      self._set_items_sensitive(items, False)
-      self._set_items_sensitive(
-        [self._batcher.item_tree[item_key] for item_key in self._selected_items], True)
-  
-  def _get_item_sensitive(self, item):
-    return self._tree_model.get_value(
-      self._tree_iters[item.key], self._COLUMN_ITEM_NAME_SENSITIVE[0])
-  
-  def _set_items_sensitive(self, items, sensitive):
-    processed_parents = set()
-    for item in items:
-      self._set_item_sensitive(item, sensitive)
-      self._set_parent_items_sensitive(item, processed_parents)
-  
-  def _set_item_sensitive(self, item, sensitive):
-    if item.key in self._tree_iters:
-      self._tree_model.set_value(
-        self._tree_iters[item.key],
-        self._COLUMN_ITEM_NAME_SENSITIVE[0],
-        sensitive)
-  
-  def _set_parent_items_sensitive(self, item, processed_parents):
-    for parent in reversed(list(item.parents)):
-      if parent not in processed_parents:
-        parent_sensitive = any(
-          self._get_item_sensitive(child) for child in parent.children
-          if child.key in self._tree_iters)
-        self._set_item_sensitive(parent, parent_sensitive)
-        
-        processed_parents.add(parent)
   
   def _get_icon_from_item(self, item):
     if item.type == pg.itemtree.TYPE_FOLDER:

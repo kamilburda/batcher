@@ -25,7 +25,6 @@ class PreviewsController:
     self._image_preview = image_preview
     self._settings = settings
     self._image = image
-    self._selected_in_preview_constraints = {}
     self._is_initial_selection_set = False
 
     self._previously_focused_on_related_window = False
@@ -82,7 +81,6 @@ class PreviewsController:
     self._connect_setting_after_reset_displayed_items_in_image_preview()
 
     self._connect_name_preview_events()
-    self._connect_toggle_name_preview_filtering()
 
     self._connect_image_preview_menu_setting_changes()
 
@@ -146,11 +144,6 @@ class PreviewsController:
         and setting.name != 'enabled_for_previews'):
       return
 
-    # Changed selection is already handled by connecting to the name preview's
-    # 'preview-selection-changed' signal.
-    if action['orig_name'].value == 'selected_in_preview' and setting.name == 'selected_items':
-      return
-
     self.unlock_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
@@ -177,42 +170,6 @@ class PreviewsController:
     
     self._settings['gui/image_preview_displayed_items'].connect_event(
       'after-reset', _clear_image_preview)
-  
-  def _connect_toggle_name_preview_filtering(self):
-    def _after_add_selected_in_preview(_constraints, constraint_, _orig_constraint_dict):
-      if constraint_['orig_name'].value == 'selected_in_preview':
-        self._selected_in_preview_constraints[constraint_.name] = constraint_
-        
-        _on_enabled_changed(constraint_['enabled'])
-        constraint_['enabled'].connect_event('value-changed', _on_enabled_changed)
-    
-    def _before_remove_selected_in_preview(_constraints, constraint_):
-      if constraint_.name in self._selected_in_preview_constraints:
-        del self._selected_in_preview_constraints[constraint_.name]
-
-      _on_enabled_changed(constraint_['enabled'])
-    
-    def _before_clear_constraints(_constraints):
-      self._selected_in_preview_constraints = {}
-      self._name_preview.is_filtering = False
-    
-    def _on_enabled_changed(_constraint_enabled):
-      self._name_preview.is_filtering = (
-        any(constraint_['enabled'].value
-            for constraint_ in self._selected_in_preview_constraints.values()))
-    
-    self._settings['main/constraints'].connect_event(
-      'after-add-action', _after_add_selected_in_preview)
-
-    # Activate event for existing actions
-    for constraint in self._settings['main/constraints']:
-      _after_add_selected_in_preview(self._settings['main/constraints'], constraint, None)
-    
-    self._settings['main/constraints'].connect_event(
-      'before-remove-action', _before_remove_selected_in_preview)
-    
-    self._settings['main/constraints'].connect_event(
-      'before-clear-actions', _before_clear_constraints)
   
   def _connect_image_preview_menu_setting_changes(self):
     self._settings['gui/image_preview_automatic_update'].connect_event(

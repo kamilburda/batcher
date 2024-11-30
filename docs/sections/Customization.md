@@ -471,12 +471,6 @@ Processes only layers having a file extension matching the extension typed in th
 
 Processes only layers selected in GIMP.
 
-**Selected in preview**
-
-Processes only layers selected in the preview.
-
-If you save settings, the selection is saved as well.
-
 **Top-level**
 
 Processes only layers at the top of the layer tree (i.e. layers inside any group layer are excluded).

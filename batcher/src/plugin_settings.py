@@ -275,11 +275,6 @@ def create_settings_for_export_layers():
     _on_after_add_insert_background_foreground,
     settings['main/tagged_items'],
   )
-
-  settings['main/constraints'].connect_event(
-    'after-add-action',
-    _on_after_add_constraint,
-    settings['main/selected_items'])
   
   return settings
 
@@ -393,10 +388,6 @@ def create_settings_for_edit_layers():
     _on_after_add_insert_background_foreground,
     settings['main/tagged_items'],
   )
-  settings['main/constraints'].connect_event(
-    'after-add-action',
-    _on_after_add_constraint,
-    settings['main/selected_items'])
 
   return settings
 
@@ -639,24 +630,3 @@ def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
   _on_tagged_items_changed(tagged_items_setting, procedure)
 
   tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
-
-
-def _on_after_add_constraint(
-      _constraints,
-      constraint,
-      _orig_constraint_dict,
-      selected_items_setting,
-):
-  if constraint['orig_name'].value == 'selected_in_preview':
-    constraint['arguments/selected_items'].gui.set_visible(False)
-    _sync_selected_items_with_constraint(selected_items_setting, constraint)
-
-
-def _sync_selected_items_with_constraint(selected_items_setting, constraint):
-  
-  def _on_selected_items_changed(selected_items_setting_, constraint_):
-    constraint_['arguments/selected_items'].set_value(selected_items_setting_.value)
-
-  _on_selected_items_changed(selected_items_setting, constraint)
-  
-  selected_items_setting.connect_event('value-changed', _on_selected_items_changed, constraint)

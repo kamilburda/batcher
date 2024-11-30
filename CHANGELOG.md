@@ -1,5 +1,10 @@
 ## Upcoming
 
+General changes:
+* Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent. For Convert, this is very likely redundant as the user is able to add and remove arbitrary items.
+
+
+Bug fixes:
 * Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
 * Fixed export for procedures manipulating image dimensions, selection and other image-wide attributes (such as `script-fu-addborder`, `script-fu-circuit` or conversion to the indexed type).
 * Fixed preview not working correctly for group layers.
