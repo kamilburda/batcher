@@ -73,6 +73,9 @@ class ImagePreview(preview_base_.Preview):
     
     self._is_updating = False
     self._is_preview_image_allocated_size = False
+
+    self._set_update_duration_action_id = None
+    self._update_duration_seconds = 0.0
     
     self._init_gui()
 
@@ -168,9 +171,9 @@ class ImagePreview(preview_base_.Preview):
     # Sanity check in case `item` changes before 'size-allocate' is emitted.
     if self.item is None:
       return
-    
-    start_update_time = time.time()
-    
+
+    self._update_duration_seconds = 0.0
+
     with pg.pdbutils.redirect_messages():
       self._preview_pixbuf, error = self._get_in_memory_preview()
     
@@ -181,10 +184,8 @@ class ImagePreview(preview_base_.Preview):
       self.clear(use_item_name=True)
     
     self._is_updating = False
-    
-    update_duration_seconds = time.time() - start_update_time
 
-    self.emit('preview-updated', error, update_duration_seconds)
+    self.emit('preview-updated', error, self._update_duration_seconds)
   
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
@@ -240,6 +241,13 @@ class ImagePreview(preview_base_.Preview):
     self._set_no_selection_label()
   
   def _get_in_memory_preview(self):
+    start_update_time = time.time()
+
+    self._batcher.remove_action(
+      self._set_update_duration_action_id, groups='all', ignore_if_not_exists=True)
+    self._set_update_duration_action_id = self._batcher.add_procedure(
+      self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
+
     image_copies, error = self._get_image_preview()
 
     image_preview = image_copies[0]
@@ -262,7 +270,10 @@ class ImagePreview(preview_base_.Preview):
       pg.pdbutils.try_delete_image(image)
     
     return preview_pixbuf, error
-  
+
+  def _set_update_duration(self, _batcher, start_update_time):
+    self._update_duration_seconds = time.time() - start_update_time
+
   def _get_image_preview(self):
     # We use a separate `pygimplib.ItemTree` with just the item to be previewed.
     # A new item wrapping the original object is created to avoid introducing
