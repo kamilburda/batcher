@@ -214,7 +214,7 @@ class PreviewsController:
     pg.invocation.timeout_remove(self._update_image_preview)
     pg.invocation.timeout_remove(self._image_preview.update)
 
-    self._name_preview.update()
+    self._name_preview.update(full_update=True)
 
     self._update_tagged_items()
 
@@ -255,7 +255,7 @@ class PreviewsController:
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
-    self._update_image_preview()
+    self._update_image_preview(update_on_identical_item=False)
 
   def _on_name_preview_collapsed_items_changed(self, _preview):
     self._update_collapsed_items()
@@ -292,23 +292,27 @@ class PreviewsController:
 
     tagged_items = [
       item
-      for item in self._name_preview.batcher.item_tree.iter(with_folders=False, filtered=False)
+      for item in self._name_preview.batcher.item_tree.iter(with_folders=True, filtered=False)
       if (item.raw is not None
           and item.raw.is_valid()
           and item.raw.get_color_tag() != Gimp.ColorTag.NONE)
     ]
     self._settings['main/tagged_items'].set_value(tagged_items)
 
+    self._name_preview.set_tagged_items(set(item.key for item in tagged_items))
+
   def _update_selected_items(self):
     selected_items_dict = self._settings['main/selected_items'].value
     selected_items_dict[self._image] = self._name_preview.selected_items
     self._settings['main/selected_items'].set_value(selected_items_dict)
 
-  def _update_image_preview(self):
+  def _update_image_preview(self, update_on_identical_item=True):
     item_from_cursor = self._name_preview.get_item_from_cursor()
 
     if item_from_cursor is not None:
-      if self._image_preview.item is None or item_from_cursor.key != self._image_preview.item.key:
+      if (update_on_identical_item
+          or self._image_preview.item is None
+          or item_from_cursor.key != self._image_preview.item.key):
         self._image_preview.item = item_from_cursor
         self._image_preview.update()
     else:

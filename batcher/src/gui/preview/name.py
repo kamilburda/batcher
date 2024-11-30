@@ -79,6 +79,8 @@ class NamePreview(preview_base_.Preview):
     self._settings = settings
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
+
+    self._tagged_items = set()
     
     # key: `Item.key`
     # value: `Gtk.TreeIter` instance
@@ -106,34 +108,37 @@ class NamePreview(preview_base_.Preview):
   def selected_items(self):
     return self._selected_items
   
-  def update(self):
+  def update(self, full_update=False):
     """Updates the preview (add/remove item, move item to a different parent
     group, etc.).
 
     If an exception was captured during the update, the method is terminated
     prematurely. It is the responsibility of the caller to handle the error
     (e.g. lock or clear the preview).
+
+    If ``full_update`` is ``True``, the item tree is refreshed based on changes
+    outside of this application (addition, removal, update of items).
     """
     update_locked = super().update()
     if update_locked:
       return
 
-    error = self._process_items()
-    
+    existing_items_parents_and_previous = self._get_items()
+
+    error = self._process_items(full_update)
+
     if error:
       self.emit('preview-updated', error)
       return
-    
-    items = self._get_items_to_process()
 
-    self.clear()
-    self._insert_items(items)
+    self._sync_new_items_with_tree_view(existing_items_parents_and_previous)
+
     self._set_expanded_items()
-    
+
     self._set_selection()
-    
+
     self._tree_view.columns_autosize()
-    
+
     self.emit('preview-updated', None)
   
   def clear(self):
@@ -160,7 +165,23 @@ class NamePreview(preview_base_.Preview):
     self._selected_items = list(selected_items)
     self._set_selection()
     self.emit('preview-selection-changed')
-  
+
+  def set_tagged_items(self, tagged_items: Set):
+    """Assigns color tags to the specified items in the preview.
+
+    Existing items not present in ``tagged_items`` will have their color tags
+    removed if they have one.
+    """
+    for item_key in self._tagged_items:
+      if item_key in self._tree_iters:
+        self._remove_color_tag(item_key)
+
+    self._tagged_items = tagged_items
+
+    for item_key in self._tagged_items:
+      if item_key in self._tree_iters:
+        self._set_color_tag(item_key)
+
   def get_items_from_selected_rows(self):
     return [self._batcher.item_tree[item_key]
             for item_key in self._get_keys_from_current_selection()]
@@ -282,9 +303,9 @@ class NamePreview(preview_base_.Preview):
       item_key = self._get_key_from_tree_iter(tree_iter)
       if item_key in self._collapsed_items:
         self._collapsed_items.remove(item_key)
-      
+
       self._set_expanded_items(tree_path)
-      
+
       self._tree_view.columns_autosize()
 
       self.emit('preview-collapsed-items-changed')
@@ -308,7 +329,7 @@ class NamePreview(preview_base_.Preview):
   def _get_items_to_process(self):
     return list(self._batcher.item_tree)
   
-  def _process_items(self):
+  def _process_items(self, full_update=False):
     # We need to reset item attributes explicitly before processing as some
     # items will not be refreshed (removed and re-added) by the tree.
     # The performance hit of doing this is negligible.
@@ -320,6 +341,7 @@ class NamePreview(preview_base_.Preview):
 
     try:
       self._batcher.run(
+        refresh_item_tree=full_update,
         is_preview=True,
         process_contents=False,
         process_names=True,
@@ -345,41 +367,169 @@ class NamePreview(preview_base_.Preview):
       error = e
     
     return error
+
+  def _get_items(self):
+    items = {}
+    previous_items = {}
+    parents = {}
+
+    previous_item_per_parent = collections.defaultdict(lambda: None)
+    visited_parents = set()
+
+    for item in self._batcher.item_tree:
+      # We also explicitly insert parents as they would be omitted due to not
+      # matching constraints.
+      for parent_item in item.parents:
+        if parent_item not in visited_parents:
+          items[parent_item.key] = parent_item
+          previous_items[parent_item.key] = previous_item_per_parent[parent_item.parent]
+          parents[parent_item.key] = parent_item.parent
+
+          previous_item_per_parent[parent_item.parent] = parent_item
+          visited_parents.add(parent_item)
+
+      items[item.key] = item
+      previous_items[item.key] = previous_item_per_parent[item.parent]
+      parents[item.key] = item.parent
+
+      previous_item_per_parent[item.parent] = item
+
+    return items, previous_items, parents
+
+  def _sync_new_items_with_tree_view(self, existing_items_parents_and_previous):
+    existing_items, previous_existing_items, existing_parents = existing_items_parents_and_previous
+    new_items, previous_new_items, new_parents = self._get_items()
+
+    parents_to_remove = {}
+
+    for new_item_key, new_item in new_items.items():
+      previous_new_item = previous_new_items[new_item_key]
+
+      if new_item_key in existing_items and new_item_key in self._tree_iters:
+        previous_existing_item = previous_existing_items[new_item_key]
+        existing_parent = existing_parents[new_item_key]
+        new_parent = new_parents[new_item_key]
+
+        parents_are_equal = (
+          (new_parent is None and existing_parent is None)
+          or (
+            new_parent is not None
+            and existing_parent is not None
+            and new_parent.key not in parents_to_remove
+            and new_parent.key == existing_parent.key))
+
+        if not parents_are_equal:
+          # We cannot use `Gtk.TreeStore.move_after()` here as that method only
+          # works within the same parent. Hence, we remove and insert the
+          # item under a new parent.
+
+          if new_item.type != pg.itemtree.TYPE_FOLDER:
+            self._remove_item_by_key(new_item_key)
+          else:
+            # We cannot remove a parent from the `Gtk.TreeStore` at this
+            # point as all child `Gtk.TreeIter`s would be removed as well. We
+            # remove all obsoleted parents at tne end.
+            parent_iter = self._tree_iters.pop(new_item_key, None)
+            if parent_iter is not None:
+              parents_to_remove[new_item_key] = parent_iter
+
+          self._insert_item(new_item, previous_new_item)
+        else:
+          previous_items_are_equal = (
+            (previous_new_item is None and previous_existing_item is None)
+            or (
+              previous_new_item is not None
+              and previous_existing_item is not None
+              and previous_new_item.key == previous_existing_item.key))
+
+          if not previous_items_are_equal:
+            self._move_item(new_item, previous_new_item)
+            self._update_item(new_item)
+          else:
+            self._update_item(new_item)
+
+        del existing_items[new_item_key]
+      else:
+        self._insert_item(new_item, previous_new_item)
+
+        if new_item_key in existing_items:
+          del existing_items[new_item_key]
+
+    # We need to delete children first to avoid crashes (accessing child
+    # `Gtk.TreeIter`s that no longer exist), hence the reversed iteration.
+    for no_longer_existing_item_key in reversed(existing_items):
+      self._remove_item_by_key(no_longer_existing_item_key)
+
+    for tree_iter in reversed(parents_to_remove.values()):
+      self._remove_item_by_iter(tree_iter)
   
-  def _insert_items(self, items):
-    inserted_parents = set()
-    for item in items:
-      self._insert_parent_items(item, inserted_parents)
-      self._insert_item(item)
-  
-  def _insert_item(self, item):
+  def _insert_item(self, item, previous_item):
+    if item.key in self._tree_iters:
+      return
+
     if item.parent:
       parent_tree_iter = self._tree_iters[item.parent.key]
     else:
       parent_tree_iter = None
 
+    if previous_item:
+      previous_tree_iter = self._tree_iters[previous_item.key]
+    else:
+      previous_tree_iter = None
+
     item_icon = self._get_icon_from_item(item)
-    color_tag_icon = self._get_color_tag_icon(item)
-    
-    tree_iter = self._tree_model.append(
+    color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
+
+    tree_iter = self._tree_model.insert_after(
       parent_tree_iter,
+      previous_tree_iter,
       [item_icon,
        item_icon is not None,
        color_tag_icon,
        color_tag_icon is not None,
        self._get_item_name(item),
        item.key])
-    
+
+    if item.type == pg.itemtree.TYPE_FOLDER:
+      self._row_expand_collapse_interactive = False
+      self._tree_view.expand_row(self._tree_model[tree_iter].path, True)
+      self._row_expand_collapse_interactive = True
+
     self._tree_iters[item.key] = tree_iter
-    
+
     return tree_iter
-  
-  def _insert_parent_items(self, item, inserted_parents):
-    for parent in item.parents:
-      if parent not in inserted_parents:
-        self._insert_item(parent)
-        inserted_parents.add(parent)
-  
+
+  def _set_color_tag(self, item_key):
+    if item_key not in self._batcher.item_tree:
+      return
+
+    item = self._batcher.item_tree[item_key]
+
+    color_tag_icon = self._get_color_tag_icon(item)
+
+    self._tree_model.set(
+      self._tree_iters[item_key],
+      [
+        self._COLUMN_ICON_COLOR_TAG[0],
+        self._COLUMN_ICON_COLOR_TAG_VISIBLE[0],
+      ],
+      [
+        color_tag_icon,
+        color_tag_icon is not None,
+      ])
+
+  def _remove_color_tag(self, item_key):
+    self._tree_model.set(
+      self._tree_iters[item_key],
+      [
+        self._COLUMN_ICON_COLOR_TAG[0],
+        self._COLUMN_ICON_COLOR_TAG_VISIBLE[0],
+      ],
+      [
+        None,
+        False,
+      ])
+
   def _get_icon_from_item(self, item):
     if item.type == pg.itemtree.TYPE_FOLDER:
       return self._folder_icon
@@ -404,6 +554,29 @@ class NamePreview(preview_base_.Preview):
     else:
       return item.name
 
+  def _update_item(self, item):
+    self._tree_model.set_value(
+      self._tree_iters[item.key],
+      self._COLUMN_ITEM_NAME[0],
+      self._get_item_name(item))
+
+  def _move_item(self, item, previous_item):
+    item_tree_iter = self._tree_iters[item.key]
+    if previous_item is not None:
+      previous_item_tree_iter = self._tree_iters[previous_item.key]
+    else:
+      previous_item_tree_iter = None
+
+    self._tree_model.move_after(item_tree_iter, previous_item_tree_iter)
+
+  def _remove_item_by_key(self, item_key):
+    tree_iter = self._tree_iters.pop(item_key, None)
+    if tree_iter is not None:
+      self._tree_model.remove(tree_iter)
+
+  def _remove_item_by_iter(self, tree_iter):
+    self._tree_model.remove(tree_iter)
+
   def _set_expanded_items(self, tree_path=None):
     """Sets the expanded state of items in the tree view.
     
@@ -424,17 +597,14 @@ class NamePreview(preview_base_.Preview):
         item_tree_iter = self._tree_iters[item_key]
         if item_tree_iter is None:
           continue
-        
+
         item_tree_path = self._tree_model.get_path(item_tree_iter)
         if tree_path is None or self._tree_view.row_expanded(item_tree_path):
           self._tree_view.collapse_row(item_tree_path)
-    
+
     self._row_expand_collapse_interactive = True
   
   def _remove_no_longer_valid_collapsed_items(self):
-    if self._batcher.item_tree is None:
-      return
-    
     self._collapsed_items = set(
       [item_key for item_key in self._collapsed_items if item_key in self._batcher.item_tree])
   
