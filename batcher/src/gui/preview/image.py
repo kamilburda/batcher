@@ -74,11 +74,6 @@ class ImagePreview(preview_base_.Preview):
     self._is_updating = False
     self._is_preview_image_allocated_size = False
     
-    self._resize_image_action_id = None
-    self._merge_items_action_id = None
-    self._scale_item_action_id = None
-    self._resize_item_action_id = None
-    
     self._init_gui()
 
     self._preview_image.connect('draw', self._on_preview_image_draw)
@@ -188,7 +183,7 @@ class ImagePreview(preview_base_.Preview):
     self._is_updating = False
     
     update_duration_seconds = time.time() - start_update_time
-    
+
     self.emit('preview-updated', error, update_duration_seconds)
   
   def _init_gui(self):
