@@ -29,19 +29,21 @@ class Previews:
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
 
   _PREVIEWS_LEFT_MARGIN = 4
-  _PREVIEW_LABEL_BOTTOM_MARGIN = 4
+  _LABEL_TOP_BOTTOM_MARGIN = 4
 
   def __init__(
         self,
         settings,
         batcher_mode,
         item_tree,
+        top_label,
         lock_previews=True,
         display_message_func=None,
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
     self._item_tree = item_tree
+    self._top_label = top_label
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
@@ -130,12 +132,12 @@ class Previews:
     )
 
   def _init_gui(self):
-    self._preview_label = Gtk.Label(
+    self._label_top = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
-      margin_bottom=self._PREVIEW_LABEL_BOTTOM_MARGIN,
+      margin_bottom=self._LABEL_TOP_BOTTOM_MARGIN,
     )
-    self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
+    self._label_top.set_markup('<b>{}</b>'.format(self._top_label))
 
     self._vpaned_previews = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
@@ -148,7 +150,7 @@ class Previews:
       orientation=Gtk.Orientation.VERTICAL,
       margin_start=self._PREVIEWS_LEFT_MARGIN,
     )
-    self._vbox_previews.pack_start(self._preview_label, False, False, 0)
+    self._vbox_previews.pack_start(self._label_top, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
 
   def connect_events(self, action_lists, paned_outside_previews):

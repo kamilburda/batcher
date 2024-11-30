@@ -138,6 +138,7 @@ class BatchLayerProcessingGui:
       self._settings,
       self._mode,
       self._item_tree,
+      _('Input Layers'),
       lock_previews=True,
       display_message_func=self._display_inline_message,
     )

@@ -56,6 +56,7 @@ class ImagePreview(preview_base_.Preview):
   _MANUAL_UPDATE_LOCK = '_manual_update'
   
   _WIDGET_SPACING = 5
+  _HBOX_SPACING = 4
   _ARROW_ICON_PIXEL_SIZE = 12
   
   def __init__(self, batcher, settings):
@@ -190,6 +191,12 @@ class ImagePreview(preview_base_.Preview):
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
 
+    self._preview_label = Gtk.Label(
+      xalign=0.0,
+      yalign=0.5,
+    )
+    self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
+
     self._image_arrow = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
     self._image_arrow.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
 
@@ -215,9 +222,13 @@ class ImagePreview(preview_base_.Preview):
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)
     
-    self._hbox_buttons = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-    self._hbox_buttons.pack_start(self._button_menu, False, False, 0)
-    self._hbox_buttons.pack_start(self._button_refresh, False, False, 0)
+    self._hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_SPACING,
+    )
+    self._hbox.pack_start(self._preview_label, False, False, 0)
+    self._hbox.pack_start(self._button_menu, False, False, 0)
+    self._hbox.pack_start(self._button_refresh, False, False, 0)
 
     self._preview_image = Gtk.DrawingArea(
       hexpand=True,
@@ -233,7 +244,7 @@ class ImagePreview(preview_base_.Preview):
     
     self.set_spacing(self._WIDGET_SPACING)
     
-    self.pack_start(self._hbox_buttons, False, False, 0)
+    self.pack_start(self._hbox, False, False, 0)
     self.pack_start(self._preview_image, True, True, 0)
     self.pack_start(self._label_item_name, False, False, 0)
 
