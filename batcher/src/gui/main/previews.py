@@ -286,7 +286,7 @@ class Previews:
       self._settings['gui/image_preview_automatic_update'].set_value(False)
 
       self._display_message_func(
-        _('Disabling automatic preview update. The preview takes too long to update.'),
+        _('The preview no longer updates automatically as rendering takes too long.'),
         Gtk.MessageType.INFO)
 
   def _on_name_preview_updated(self, _preview, _error, action_lists):
