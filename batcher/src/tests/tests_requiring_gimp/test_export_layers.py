@@ -178,10 +178,12 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
 
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
-    
+
+    item_tree = pg.itemtree.LayerTree()
+    item_tree.add_from_image(self.test_image)
+
     batcher = core.LayerBatcher(
-      item_tree=pg.itemtree.LayerTree(),
-      input_image=self.test_image,
+      item_tree=item_tree,
       procedures=settings['main/procedures'],
       constraints=settings['main/constraints'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,

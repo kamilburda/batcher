@@ -52,7 +52,6 @@ class Previews:
 
     self._batcher_for_name_preview = core.LayerBatcher(
       item_tree=self._item_tree,
-      input_image=self._image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',
@@ -69,7 +68,6 @@ class Previews:
     self._batcher_for_image_preview = core.LayerBatcher(
       # This is an empty tree that will be replaced during the preview anyway.
       item_tree=type(self._item_tree)(),
-      input_image=self._image,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
       edit_mode=self._batcher_mode == 'edit',

@@ -84,7 +84,6 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_raw_item = None
     self._current_procedure = None
     self._last_constraint = None
-    self._current_image = None
 
     self._exported_items = []
 
@@ -921,7 +920,6 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_raw_item = None
     self._current_procedure = None
     self._last_constraint = None
-    self._current_image = None
 
   def _do_cleanup_contents(self, exception_occurred):
     pass
@@ -980,17 +978,16 @@ class LayerBatcher(Batcher):
 
   def __init__(
         self,
-        input_image: Gimp.Image,
         *args,
         keep_image_copies: bool = False,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
 
-    self._input_image = input_image
     self._keep_image_copies = keep_image_copies
     self._image_copies = []
-    self._orig_selected_raw_items = []
+
+    self._orig_images_and_selected_raw_items = {}
 
   @property
   def keep_image_copies(self) -> bool:
@@ -1008,21 +1005,12 @@ class LayerBatcher(Batcher):
     """
     return list(self._image_copies)
 
-  @property
-  def orig_selected_raw_items(self) -> List[Gimp.Layer]:
-    """List of layers selected in GIMP prior to processing.
-
-    The selection changes during processing and is restored to this value at the
-    end of the processing
-    """
-    return list(self._orig_selected_raw_items)
-
   def _prepare_for_processing(self):
     super()._prepare_for_processing()
 
     self._image_copies = []
-    self._orig_selected_raw_items = []
-    self._current_image = self._input_image
+
+    self._orig_images_and_selected_raw_items = {}
 
   def _add_actions_before_initial_invoker(self):
     super()._add_actions_before_initial_invoker()
@@ -1085,12 +1073,6 @@ class LayerBatcher(Batcher):
     super()._setup_contents()
 
     Gimp.context_push()
-    
-    if self._edit_mode and not self._is_preview:
-      self._current_image = self._input_image
-      self._current_image.undo_group_start()
-
-    self._orig_selected_raw_items = self._input_image.get_selected_layers()
   
   def _do_cleanup_contents(self, exception_occurred):
     super()._do_cleanup_contents(exception_occurred)
@@ -1099,13 +1081,16 @@ class LayerBatcher(Batcher):
       if not self._keep_image_copies or exception_occurred:
         self._remove_image_copies()
     else:
-      selected_layers = [
-        layer for layer in self._orig_selected_raw_items
-        if layer.is_valid() and layer.get_image() == self._current_image]
-      if selected_layers:
-        self._current_image.set_selected_layers(selected_layers)
+      for image, selected_layers in self._orig_images_and_selected_raw_items.items():
+        if not image.is_valid():
+          continue
 
-      self._current_image.undo_group_end()
+        filtered_selected_layers = [
+          layer for layer in selected_layers if layer.is_valid() and layer.get_image() == image]
+        if filtered_selected_layers:
+          image.set_selected_layers(filtered_selected_layers)
+
+        image.undo_group_end()
 
       Gimp.displays_flush()
     
@@ -1129,7 +1114,7 @@ class LayerBatcher(Batcher):
       self._current_raw_item = raw_item_copy
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_raw_item.set_name(orig_raw_item_name)
-    
+
     if self._edit_mode and not self._is_preview and self._current_raw_item.is_group_layer():
       # Group layers must be copied and inserted as layers as some procedures
       # do not work on group layers.
@@ -1146,6 +1131,12 @@ class LayerBatcher(Batcher):
       self._current_raw_item = raw_item_copy
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_raw_item.set_name(orig_raw_item_name)
+
+    if self._edit_mode and not self._is_preview:
+      image = self._current_raw_item.get_image()
+      if image not in self._orig_images_and_selected_raw_items:
+        image.undo_group_start()
+        self._orig_images_and_selected_raw_items[image] = image.get_selected_layers()
 
     super()._process_item_with_actions()
 

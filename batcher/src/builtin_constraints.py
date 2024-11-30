@@ -36,12 +36,9 @@ def is_item_in_items_selected_in_preview(item, selected_items):
     return False
 
 
-def is_item_in_items_selected_in_gimp(item, batcher):
-  if not batcher.is_preview:
-    return item.raw in batcher.orig_selected_raw_items
-  else:
-    image = item.raw.get_image()
-    return image.is_valid() and item.raw in image.get_selected_layers()
+def is_item_in_items_selected_in_gimp(item):
+  image = item.raw.get_image()
+  return image.is_valid() and item.raw in image.get_selected_layers()
 
 
 def is_top_level(item):
