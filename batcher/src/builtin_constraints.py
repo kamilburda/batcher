@@ -92,7 +92,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'not_background',
     'type': 'constraint',
     'function': has_no_color_tag,
-    # FOR TRANSLATORS: Think of "Only layers that are not background" when translating this
+    # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
     'display_name': _('Not background'),
     # This constraint is added/removed automatically alongside `insert_background`.
     'additional_tags': [],
@@ -117,7 +117,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'not_foreground',
     'type': 'constraint',
     'function': has_no_color_tag,
-    # FOR TRANSLATORS: Think of "Only layers that are not foreground" when translating this
+    # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
     'display_name': _('Not foreground'),
     # This constraint is added/removed automatically alongside `insert_foreground`.
     'additional_tags': [],
@@ -142,7 +142,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'matching_file_extension',
     'type': 'constraint',
     'function': has_matching_default_file_extension,
-    # FOR TRANSLATORS: Think of "Only layers matching file extension" when translating this
+    # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
@@ -150,7 +150,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'selected_in_gimp',
     'type': 'constraint',
     'function': is_item_in_items_selected_in_gimp,
-    # FOR TRANSLATORS: Think of "Only layers selected in GIMP" when translating this
+    # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
@@ -158,7 +158,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'selected_in_preview',
     'type': 'constraint',
     'function': is_item_in_items_selected_in_preview,
-    # FOR TRANSLATORS: Think of "Only layers selected in preview" when translating this
+    # FOR TRANSLATORS: Think of "Only items selected in preview" when translating this
     'display_name': _('Selected in preview'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -174,7 +174,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'top_level',
     'type': 'constraint',
     'function': is_top_level,
-    # FOR TRANSLATORS: Think of "Only top-level layers" when translating this
+    # FOR TRANSLATORS: Think of "Only top-level items" when translating this
     'display_name': _('Top-level'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
@@ -182,7 +182,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'visible',
     'type': 'constraint',
     'function': is_visible,
-    # FOR TRANSLATORS: Think of "Only visible layers" when translating this
+    # FOR TRANSLATORS: Think of "Only visible items" when translating this
     'display_name': _('Visible'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
   },
@@ -190,7 +190,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'with_color_tags',
     'type': 'constraint',
     'function': has_color_tags,
-    # FOR TRANSLATORS: Think of "Only layers with color tags" when translating this
+    # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
     'display_name': _('With color tags'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
@@ -210,7 +210,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'name': 'without_color_tags',
     'type': 'constraint',
     'function': has_no_color_tags,
-    # FOR TRANSLATORS: Think of "Only layers without color tags" when translating this
+    # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
     'display_name': _('Without color tags'),
     'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
     'arguments': [
