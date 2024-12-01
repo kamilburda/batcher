@@ -4,7 +4,6 @@ import abc
 import collections
 from collections.abc import Iterable
 import contextlib
-import inspect
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -648,7 +647,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
       if 'constraint' in action.tags:
         function = self._set_apply_constraint_to_folders(function, action)
-        function = self._get_constraint_func(function, orig_function, action['orig_name'].value)
+        function = self._get_constraint_func(function, action['orig_name'].value)
 
       return function(*args, **kwargs)
 
@@ -728,35 +727,12 @@ class Batcher(metaclass=abc.ABCMeta):
     else:
       return function
 
-  def _get_constraint_func(self, func, orig_func=None, name=''):
+  def _get_constraint_func(self, func, name=''):
 
     def _function_wrapper(*args, **kwargs):
-      func_args = self._get_args_for_constraint_func(
-        orig_func if orig_func is not None else func,
-        args)
-
-      self._item_tree.filter.add(func, func_args, kwargs, name=name)
+      self._item_tree.filter.add(func, args, kwargs, name=name)
 
     return _function_wrapper
-
-  @staticmethod
-  def _get_args_for_constraint_func(func, args):
-    try:
-      batcher_arg_position = inspect.getfullargspec(func).args.index('batcher')
-    except ValueError:
-      batcher_arg_position = None
-
-    if batcher_arg_position is not None:
-      func_args = args
-    else:
-      if len(args) > 1:
-        batcher_arg_position = _BATCHER_ARG_POSITION_IN_ACTIONS
-      else:
-        batcher_arg_position = 0
-
-      func_args = args[:batcher_arg_position] + args[batcher_arg_position + 1:]
-
-    return func_args
 
   def _handle_exceptions_from_action(self, function, action):
     def _handle_exceptions(*args, **kwargs):

@@ -10,15 +10,15 @@ from src.path import fileext
 from src.builtin_actions_common import *
 
 
-def is_layer(item):
+def is_layer(item, _batcher):
   return item.type == pg.itemtree.TYPE_ITEM
 
 
-def is_nonempty_group(item):
+def is_nonempty_group(item, _batcher):
   return item.type == pg.itemtree.TYPE_GROUP and item.raw.get_children()
 
 
-def has_matching_file_extension(item, file_extension):
+def has_matching_file_extension(item, _batcher, file_extension):
   return fileext.get_file_extension(item.name).lower() == file_extension.lower()
 
 
@@ -26,24 +26,24 @@ def has_matching_default_file_extension(item, batcher):
   return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
 
-def is_item_in_items_selected_in_gimp(item):
+def is_item_in_items_selected_in_gimp(item, _batcher):
   image = item.raw.get_image()
   return image.is_valid() and item.raw in image.get_selected_layers()
 
 
-def is_top_level(item):
+def is_top_level(item, _batcher):
   return item.depth == 0
 
 
-def is_visible(item):
+def is_visible(item, _batcher):
   return item.raw.get_visible()
 
 
-def has_color_tag(item, tag, *_args, **_kwargs):
+def has_color_tag(item, _batcher, tag, *_args, **_kwargs):
   return item.raw.get_color_tag() == tag
 
 
-def has_color_tags(item, tags=None):
+def has_color_tags(item, _batcher, tags=None):
   item_color_tag = item.raw.get_color_tag()
 
   if item_color_tag == Gimp.ColorTag.NONE:
@@ -55,12 +55,12 @@ def has_color_tags(item, tags=None):
       return item_color_tag != Gimp.ColorTag.NONE
 
 
-def has_no_color_tag(item, tag, *_args, **_kwargs):
-  return not has_color_tag(item, tag)
+def has_no_color_tag(item, _batcher, tag, *_args, **_kwargs):
+  return not has_color_tag(item, _batcher, tag)
 
 
-def has_no_color_tags(item, tags=None):
-  return not has_color_tags(item, tags)
+def has_no_color_tags(item, _batcher, tags=None):
+  return not has_color_tags(item, _batcher, tags)
 
 
 _BUILTIN_CONSTRAINTS_LIST = [
