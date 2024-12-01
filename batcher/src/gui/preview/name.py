@@ -310,9 +310,8 @@ class NamePreview(preview_base_.Preview):
 
       self.emit('preview-collapsed-items-changed')
   
-  def _on_tree_selection_changed(self, tree_selection):
+  def _on_tree_selection_changed(self, _tree_selection):
     if not self._clearing_preview and self._row_select_interactive:
-      previous_selected_items = self._selected_items
       self._selected_items = self._get_keys_from_current_selection()
 
       self.emit('preview-selection-changed')
