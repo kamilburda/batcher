@@ -187,12 +187,20 @@ class Item(metaclass=abc.ABCMeta):
 
   @property
   def orig_parents(self) -> Iterator[Item]:
-    """The initial value of the ``parents`` attribute of this item."""
+    """The initial value of the ``parents`` attribute of this item.
+
+    Note that this property will not be kept up-to-date if changes to the
+    parents of the underlying object were made externally.
+    """
     return iter(self._orig_parents)
 
   @property
   def orig_children(self) -> Iterator[Item]:
-    """The initial value of the ``children`` attribute of this item."""
+    """The initial value of the ``children`` attribute of this item.
+
+    Note that this property will not be kept up-to-date if changes to the
+    children of the underlying object were made externally.
+    """
     return iter(self._orig_children)
 
   def __str__(self) -> str:
