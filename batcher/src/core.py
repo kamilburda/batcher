@@ -381,21 +381,13 @@ class Batcher(metaclass=abc.ABCMeta):
       but applied only if `process_contents` is ``True``.
 
     * ``'before_process_item'`` - invoked immediately before applying procedures
-      on an item.
-      These arguments are required:
-      * a `Batcher` instance
-      * the current `pygimplib.itemtree.Item` to be processed
-      * the current GIMP object to be processed
+      on an item. One argument is required - a `Batcher` instance.
 
     * ``'before_process_item_contents'`` - same as ``'before_process_item'``,
       but applied only if `process_contents` is ``True``.
 
     * ``'after_process_item'`` - invoked immediately after all procedures have
-      been applied to an item.
-      These arguments are required:
-      * `Batcher` instance
-      * the current `pygimplib.itemtree.Item` that has been processed
-      * the current GIMP object that has been processed
+      been applied to an item. One argument is required - a `Batcher` instance.
 
     * ``'after_process_item_contents'`` - same as ``'after_process_item'``, but
       applied only if `process_contents` is ``True``.
@@ -867,7 +859,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def _process_item_with_name_only_actions(self):
     self._invoker.invoke(
       ['before_process_item'],
-      [self, self._current_item, self._current_raw_item],
+      [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     self._invoker.invoke(
@@ -877,19 +869,19 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._invoker.invoke(
       ['after_process_item'],
-      [self, self._current_item, self._current_raw_item],
+      [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
   def _process_item_with_actions(self):
     self._invoker.invoke(
       ['before_process_item'],
-      [self, self._current_item, self._current_raw_item],
+      [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     if self._process_contents:
       self._invoker.invoke(
         ['before_process_item_contents'],
-        [self, self._current_item, self._current_raw_item],
+        [self],
         additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     self._invoker.invoke(
@@ -900,12 +892,12 @@ class Batcher(metaclass=abc.ABCMeta):
     if self._process_contents:
       self._invoker.invoke(
         ['after_process_item_contents'],
-        [self, self._current_item, self._current_raw_item],
+        [self],
         additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     self._invoker.invoke(
       ['after_process_item'],
-      [self, self._current_item, self._current_raw_item],
+      [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
   def _cleanup_contents(self, exception_occurred=False):
