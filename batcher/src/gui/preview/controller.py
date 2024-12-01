@@ -56,7 +56,7 @@ class PreviewsController:
         self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
         self._name_preview.update,
         *name_preview_update_args,
-        *name_preview_update_kwargs,
+        **name_preview_update_kwargs,
       )
 
       if image_preview_update_args is None:
@@ -69,7 +69,7 @@ class PreviewsController:
         self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
         self._update_image_preview,
         *image_preview_update_args,
-        *image_preview_update_kwargs,
+        **image_preview_update_kwargs,
       )
 
   def connect_setting_changes_to_previews(self):
