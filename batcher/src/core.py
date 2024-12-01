@@ -985,6 +985,9 @@ class LayerBatcher(Batcher):
     super().__init__(*args, **kwargs)
 
     self._keep_image_copies = keep_image_copies
+
+    self._current_image = None
+
     self._image_copies = []
 
     self._orig_images_and_selected_raw_items = {}
@@ -997,6 +1000,14 @@ class LayerBatcher(Batcher):
     return self._keep_image_copies
 
   @property
+  def current_image(self) -> Optional[Gimp.Image]:
+    """A `Gimp.Image` instance containing a layer currently being processed.
+
+    This property is ``None`` outside the processing of individual layers.
+    """
+    return self._current_image
+
+  @property
   def image_copies(self) -> List[Gimp.Image]:
     """`Gimp.Image` instances containing copies of the processed layers.
 
@@ -1007,6 +1018,8 @@ class LayerBatcher(Batcher):
 
   def _prepare_for_processing(self):
     super()._prepare_for_processing()
+
+    self._current_image = None
 
     self._image_copies = []
 
@@ -1097,13 +1110,17 @@ class LayerBatcher(Batcher):
     Gimp.context_pop()
   
   def _process_item_with_actions(self):
+    self._current_image = self._current_item.raw.get_image()
+
     if not self._edit_mode or self._is_preview:
-      image_copy = export_.create_empty_image_copy(self._current_item.raw.get_image())
+      image_copy = export_.create_empty_image_copy(self._current_image)
       self._image_copies.append(image_copy)
+
+      self._current_image = image_copy
 
       raw_item_copy = pg.pdbutils.copy_and_paste_layer(
         self._current_raw_item,
-        image_copy,
+        self._current_image,
         None,
         0,
         True,
@@ -1120,9 +1137,9 @@ class LayerBatcher(Batcher):
       # do not work on group layers.
       raw_item_copy = pg.pdbutils.copy_and_paste_layer(
         self._current_raw_item,
-        self._current_raw_item.get_image(),
+        self._current_image,
         self._current_raw_item.get_parent(),
-        self._current_raw_item.get_image().get_item_position(self._current_raw_item) + 1,
+        self._current_image.get_item_position(self._current_raw_item) + 1,
         True,
         True,
         True)
@@ -1133,14 +1150,16 @@ class LayerBatcher(Batcher):
       self._current_raw_item.set_name(orig_raw_item_name)
 
     if self._edit_mode and not self._is_preview:
-      image = self._current_raw_item.get_image()
-      if image not in self._orig_images_and_selected_raw_items:
-        image.undo_group_start()
-        self._orig_images_and_selected_raw_items[image] = image.get_selected_layers()
+      if self._current_image not in self._orig_images_and_selected_raw_items:
+        self._current_image.undo_group_start()
+        self._orig_images_and_selected_raw_items[self._current_image] = (
+          self._current_image.get_selected_layers())
 
     super()._process_item_with_actions()
 
     self._remove_image_copies()
+
+    self._current_image = None
 
   def _remove_image_copies(self):
     if not self._edit_mode and not self._keep_image_copies:

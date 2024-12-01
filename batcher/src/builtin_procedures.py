@@ -19,7 +19,11 @@ def set_selected_and_current_layer(batcher):
   # be raised if a procedure requires at least one layer. An empty image
   # could occur e.g. if all layers were removed by the previous procedures.
 
-  image = batcher.current_raw_item.get_image()
+  image = batcher.current_image
+
+  if image is None or not image.is_valid():
+    # The image does not exist anymore and there is nothing we can do.
+    return
 
   if batcher.current_raw_item.is_valid():
     image.set_selected_layers([batcher.current_raw_item])
