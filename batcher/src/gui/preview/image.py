@@ -113,7 +113,7 @@ class ImagePreview(preview_base_.Preview):
 
     if self.item is None:
       return
-    
+
     if self.item.raw is not None and not self.item.raw.is_valid():
       self.clear()
       return
@@ -260,6 +260,9 @@ class ImagePreview(preview_base_.Preview):
       self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
 
     image_copies, error = self._get_image_preview()
+
+    if not image_copies:
+      return None, None
 
     image_preview = image_copies[0]
 
