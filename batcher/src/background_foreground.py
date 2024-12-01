@@ -162,7 +162,7 @@ def _get_adjacent_layer(
   num_layers = len(children)
   
   if num_layers > 1:
-    position = image.get_item_position(batcher.current_raw_item)
+    position = image.get_item_position(raw_item)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
       color_tags = [
