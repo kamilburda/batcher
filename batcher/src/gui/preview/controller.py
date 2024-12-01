@@ -17,6 +17,7 @@ import pygimplib as pg
 class PreviewsController:
   
   _DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS = 100
+  _DELAY_IMAGE_PREVIEW_SELECTION_CHANGED_UPDATE_MILLISECONDS = 30
   
   _PREVIEW_ERROR_KEY = 'preview_error'
   
@@ -255,7 +256,16 @@ class PreviewsController:
 
   def _on_name_preview_selection_changed(self, _preview):
     self._update_selected_items()
-    self._update_image_preview(update_on_identical_item=False)
+
+    # There could be a rapid sequence of 'preview-selection-changed' signals
+    # invoked if a selected item and preceding items are removed from the name
+    # preview due to not matching constraints. Therefore, we delay the image
+    # preview update when the selection changes.
+    pg.invocation.timeout_add_strict(
+      self._DELAY_IMAGE_PREVIEW_SELECTION_CHANGED_UPDATE_MILLISECONDS,
+      self._update_image_preview,
+      **dict(update_on_identical_item=False),
+    )
 
   def _on_name_preview_collapsed_items_changed(self, _preview):
     self._update_collapsed_items()

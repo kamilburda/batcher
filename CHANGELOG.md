@@ -1,8 +1,11 @@
 ## Upcoming
 
-General changes:
+Changes to procedures and constraints:
 * Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent. For Convert, this is very likely redundant as the user is able to add and remove arbitrary items.
-* Optimized the update of input layers (when layers are added/removed/renamed/updated upon changing procedures or constraints) if many layers (hundreds and more) are present.
+
+User interface changes:
+* Added a small delay to the image preview when the selected item changes. This prevents excessive changes when the selection changes rapidly.
+* Optimized the update of input items (when items are added/removed/renamed/updated upon changing procedures or constraints) if many items (hundreds and more) are present.
 
 Bug fixes:
 * Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
