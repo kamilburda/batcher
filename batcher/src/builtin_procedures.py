@@ -155,12 +155,6 @@ def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
   renamed_parents = set()
   
   while True:
-    if rename_layers:
-      batcher.current_item.name = renamer.rename(batcher)
-
-      if batcher.process_names and not batcher.is_preview:
-        batcher.current_raw_item.set_name(batcher.current_item.name)
-    
     if rename_folders:
       for parent in batcher.current_item.parents:
         if parent not in renamed_parents:
@@ -169,7 +163,13 @@ def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
 
           if batcher.edit_mode and batcher.process_names and not batcher.is_preview:
             parent.raw.set_name(parent.name)
-    
+
+    if rename_layers:
+      batcher.current_item.name = renamer.rename(batcher)
+
+      if batcher.process_names and not batcher.is_preview:
+        batcher.current_raw_item.set_name(batcher.current_item.name)
+
     yield
 
 

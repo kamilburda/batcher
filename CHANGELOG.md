@@ -13,6 +13,7 @@ Bug fixes:
 * Fixed preview not working correctly for group layers.
 * Fixed constraints incorrectly excluding items in the preview. The bug caused items e.g. matching the `Matching File Extension` constraint to be excluded from the preview as its name may have changed during processing.
 * Fixed incorrect names in the preview.
+* Fixed the `Rename` procedure renaming folders after items if `Rename folders` is enabled.
 
 
 ## 0.6
