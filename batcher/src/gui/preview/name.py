@@ -630,17 +630,23 @@ class NamePreview(preview_base_.Preview):
       if first_selected_tree_iter is not None:
         first_selected_tree_path = self._tree_model.get_path(first_selected_tree_iter)
         if first_selected_tree_path is not None:
-          self._scroll_to_item(first_selected_tree_path)
-          self._set_cursor_to_item_if_not_set(first_selected_tree_path)
+          tree_path_with_cursor = self._set_cursor_to_item_if_not_set(first_selected_tree_path)
+          self._scroll_to_cursor(tree_path_with_cursor)
     
     self._row_select_interactive = True
-  
-  def _scroll_to_item(self, tree_path):
-    self._tree_view.scroll_to_cell(tree_path, None, True, 0.5, 0.0)
 
   def _set_cursor_to_item_if_not_set(self, tree_path):
-    if self._tree_view.get_cursor()[0] is None:
+    tree_path_with_cursor, _unused = self._tree_view.get_cursor()
+
+    if tree_path_with_cursor is None:
       self._tree_view.set_cursor(tree_path, None, False)
+      tree_path_with_cursor = tree_path
+
+    return tree_path_with_cursor
+
+  def _scroll_to_cursor(self, tree_path):
+    if tree_path is not None:
+      self._tree_view.scroll_to_cell(tree_path, None, True, 0.5, 0.0)
 
 
 GObject.type_register(NamePreview)
