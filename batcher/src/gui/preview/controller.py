@@ -276,7 +276,7 @@ class PreviewsController:
     else:
       item_key_to_display = list(setting_value)[0]
 
-    selected_layers_in_image = self._image.get_selected_layers()
+    selected_layers_in_image = [image.get_id() for image in self._image.get_selected_layers()]
 
     if (item_key_to_display is None
         and not self._settings['main/selected_items'].value[self._image]
