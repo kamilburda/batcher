@@ -312,9 +312,14 @@ class NamePreview(preview_base_.Preview):
   
   def _on_tree_selection_changed(self, _tree_selection):
     if not self._clearing_preview and self._row_select_interactive:
+      previous_selected_items = self._selected_items
       self._selected_items = self._get_keys_from_current_selection()
 
-      self.emit('preview-selection-changed')
+      # According to the docs for `Gtk.TreeSelection`, the 'changed' signal can
+      # be emitted even if the selection did not change. We thus check whether
+      # the selection really changed.
+      if previous_selected_items != self._selected_items:
+        self.emit('preview-selection-changed')
 
   def _get_keys_from_current_selection(self):
     _unused, tree_paths = self._tree_view.get_selection().get_selected_rows()
