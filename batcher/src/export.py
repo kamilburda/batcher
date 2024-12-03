@@ -209,12 +209,6 @@ def export(
     yield
 
 
-def _delete_image_on_cleanup(batcher, image):
-  if batcher.process_export:
-    if image is not None:
-      pg.pdbutils.try_delete_image(image)
-
-
 def _delete_images_on_cleanup(batcher, images):
   if batcher.process_export:
     for image in images:
