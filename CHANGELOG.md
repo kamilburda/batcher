@@ -6,7 +6,7 @@ Changes to procedures and constraints:
 User interface changes:
 * Added a small delay to the image preview when the selected item changes. This prevents excessive changes when the selection changes rapidly.
 * Optimized the update of input items (when items are added/removed/renamed/updated upon changing procedures or constraints) if many items (hundreds and more) are present.
-* For Export Layers and Edit Layers, Moved the "Preview" label directly above the image thumbnail and added a label named "Input Layers" above the list of layers.
+* For Export Layers and Edit Layers, moved the "Preview" label directly above the image thumbnail and added a label named "Input Layers" above the list of layers.
 
 Bug fixes:
 * Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
