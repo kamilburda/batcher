@@ -281,8 +281,15 @@ class PreviewsController:
     if (item_key_to_display is None
         and not self._settings['main/selected_items'].value[self._image]
         and selected_layers_in_image):
-      # This triggers an event that updates the image preview as well.
       self._name_preview.set_selected_items(selected_layers_in_image)
+
+      # `NamePreview.set_selected_items` triggers the
+      # 'preview-selection-changed' event that also updates the image preview
+      # with a delay. We need to update the image preview immediately to
+      # avoid a "glitch" when there is a very short time period displaying a
+      # placeholder icon.
+      pg.invocation.timeout_remove(self._update_image_preview)
+      self._update_image_preview()
     else:
       item_tree = self._name_preview.batcher.item_tree
       if item_key_to_display in item_tree:
