@@ -151,7 +151,7 @@ def apply_opacity_from_group_layers(batcher):
 
 
 def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
-  renamer = renamer_.ItemRenamer(pattern)
+  renamer = renamer_.ItemRenamer(pattern, rename_items=rename_layers, rename_folders=rename_folders)
   renamed_parents = set()
   
   while True:
