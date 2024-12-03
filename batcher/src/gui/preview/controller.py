@@ -313,7 +313,9 @@ class PreviewsController:
           and item.raw.is_valid()
           and item.raw.get_color_tag() != Gimp.ColorTag.NONE)
     ]
-    self._settings['main/tagged_items'].set_value(tagged_items)
+    # Remove folders to avoid inserting tagged group items twice.
+    self._settings['main/tagged_items'].set_value(
+      [item for item in tagged_items if item.type != pg.itemtree.TYPE_FOLDER])
 
     self._name_preview.set_tagged_items(set(item.key for item in tagged_items))
 
