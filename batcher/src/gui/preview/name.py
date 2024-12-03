@@ -325,9 +325,6 @@ class NamePreview(preview_base_.Preview):
   def _get_key_from_tree_iter(self, tree_iter):
     return self._tree_model.get_value(tree_iter, column=self._COLUMN_ITEM_KEY[0])
   
-  def _get_items_to_process(self):
-    return list(self._batcher.item_tree)
-  
   def _process_items(self, full_update=False):
     # We need to reset item attributes explicitly before processing as some
     # items will not be refreshed (removed and re-added) by the tree.
