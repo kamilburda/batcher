@@ -105,8 +105,8 @@ def export(
       if batcher.process_export:
         raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
         raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
-      
-      if batcher.item_tree.next(item, with_folders=False) is not None:
+
+      if _get_next_item(batcher, item) is not None:
         _remove_image_copies_for_edit_mode(batcher, image_copies)
         yield
         continue
@@ -122,7 +122,7 @@ def export(
         raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
       
       current_top_level_item = _get_top_level_item(item)
-      next_top_level_item = _get_top_level_item(batcher.item_tree.next(item, with_folders=False))
+      next_top_level_item = _get_top_level_item(_get_next_item(batcher, item))
       
       if current_top_level_item == next_top_level_item:
         _remove_image_copies_for_edit_mode(batcher, image_copies)
@@ -226,6 +226,13 @@ def _get_top_level_item(item):
     return item.parents[0]
   else:
     return item
+
+
+def _get_next_item(batcher, item):
+  if batcher.matching_items is not None:
+    return batcher.matching_items[item]
+  else:
+    batcher.item_tree.next(item, with_folders=False)
 
 
 def _process_parent_names(item, item_uniquifier, processed_parents):

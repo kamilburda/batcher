@@ -190,20 +190,23 @@ class NumberField(Field):
     
     if parent not in self._global_number_generators[field_value]:
       padding = padding if padding is not None else len(field_value)
-      
       initial_number = int(field_value)
+
+      if batcher.matching_items is not None:
+        tree_items = batcher.matching_items
+      else:
+        tree_items = batcher.item_tree
       
       if initial_number == 0 and not ascending:
         if reset_numbering_on_parent:
           if parent_item is not None:
             initial_number = len([
-              tree_item for tree_item in batcher.item_tree
+              tree_item for tree_item in tree_items
               if tree_item.depth == parent_item.depth + 1 and tree_item.parent == parent_item])
           else:
-            initial_number = len(
-              [tree_item for tree_item in batcher.item_tree if tree_item.depth == 0])
+            initial_number = len([tree_item for tree_item in tree_items if tree_item.depth == 0])
         else:
-          initial_number = len(batcher.item_tree)
+          initial_number = len(tree_items)
       
       self._global_number_generators[field_value][parent] = self.generate_number(
         initial_number, padding, ascending)

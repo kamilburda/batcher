@@ -291,10 +291,11 @@ class PreviewsController:
       pg.invocation.timeout_remove(self._update_image_preview)
       self._update_image_preview()
     else:
-      item_tree = self._name_preview.batcher.item_tree
-      if item_key_to_display in item_tree:
-        item = item_tree[item_key_to_display]
-        if item.type == pg.itemtree.TYPE_FOLDER or item_tree.filter.is_match(item):
+      batcher = self._name_preview.batcher
+      if item_key_to_display in batcher.item_tree:
+        item = batcher.item_tree[item_key_to_display]
+        if ((batcher.matching_items is not None and item in batcher.matching_items)
+            or item.type == pg.itemtree.TYPE_FOLDER):
           self._image_preview.item = item
 
       self._image_preview.update()

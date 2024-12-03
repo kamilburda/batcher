@@ -372,7 +372,12 @@ class NamePreview(preview_base_.Preview):
     previous_item_per_parent = collections.defaultdict(lambda: None)
     visited_parents = set()
 
-    for item in self._batcher.item_tree:
+    if self._batcher.matching_items is not None:
+      item_tree_items = self._batcher.matching_items
+    else:
+      item_tree_items = self._batcher.item_tree
+
+    for item in item_tree_items:
       # We also explicitly insert parents as they would be omitted due to not
       # matching constraints.
       for parent_item in item.parents:

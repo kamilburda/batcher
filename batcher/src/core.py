@@ -84,6 +84,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_procedure = None
     self._last_constraint = None
 
+    self._matching_items = None
     self._exported_items = []
 
     self._skipped_procedures = collections.defaultdict(list)
@@ -296,6 +297,17 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._last_constraint
 
   @property
+  def matching_items(self) -> Optional[Dict[pg.itemtree.Item, Optional[pg.itemtree.Item]]]:
+    """A dictionary of (item, next item or None) pairs matching the constraints,
+    or ``None`` if not initialized.
+
+    This is useful if you need to work with items matching constraints at the
+    start of processing as some items may no longer match these constraints
+    at the end of processing.
+    """
+    return self._matching_items
+
+  @property
   def exported_items(self) -> List[pg.itemtree.Item]:
     """List of successfully exported items.
 
@@ -492,6 +504,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._should_stop = False
 
+    self._matching_items = None
     self._exported_items = []
 
     self._skipped_procedures = collections.defaultdict(list)
@@ -787,7 +800,9 @@ class Batcher(metaclass=abc.ABCMeta):
     pass
 
   def _process_items(self):
-    self._progress_updater.num_total_tasks = len(self._item_tree)
+    self._matching_items = self._get_items_matching_constraints()
+
+    self._progress_updater.num_total_tasks = len(self._matching_items)
 
     self._invoker.invoke(
       ['before_process_items'],
@@ -800,7 +815,7 @@ class Batcher(metaclass=abc.ABCMeta):
         [self],
         additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
-    for item in self._item_tree:
+    for item in self._matching_items:
       if self._should_stop:
         raise exceptions.BatcherCancelError('stopped by user')
 
@@ -819,6 +834,21 @@ class Batcher(metaclass=abc.ABCMeta):
       ['after_process_items'],
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+
+  def _get_items_matching_constraints(self):
+    matching_items = {}
+
+    matching_items_list = list(self._item_tree)
+
+    matching_next_items_list = list(matching_items_list)
+    if matching_next_items_list:
+      del matching_next_items_list[0]
+      matching_next_items_list.append(None)
+
+    for item, next_item in zip(matching_items_list, matching_next_items_list):
+      matching_items[item] = next_item
+
+    return matching_items
 
   def _process_item(self, item):
     self._current_item = item
