@@ -565,12 +565,19 @@ def display_processing_failure_message(
     parent=parent)
 
 
-def display_invalid_image_failure_message(parent: Optional[Gtk.Window] = None):
+def display_invalid_image_failure_message(
+      exception: Exception,
+      parent: Optional[Gtk.Window] = None,
+):
   display_failure_message(
-    _('There was a problem during processing.'
-      ' Do not close the image during processing,'
-      ' keep it open until the processing is finished successfully.'),
-    failure_message='',
+    _('There was a problem during processing:'),
+    failure_message=str(exception),
+    report_description=_(
+      'If you closed an image during processing, do not close it and instead'
+      ' keep it open until the processing is finished successfully.'
+      '\n\nIf you believe this is an error in the plug-in, you can help fix it'
+      ' by sending a report with the text in the details to one of the sites below'
+    ),
     details=traceback.format_exc(),
     parent=parent)
 

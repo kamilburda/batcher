@@ -32,7 +32,6 @@ class BatcherManager:
   def run_batcher(
         self,
         mode,
-        image,
         action_lists,
         previews,
         settings_manager,
@@ -62,11 +61,9 @@ class BatcherManager:
     except exceptions.BatcherError as e:
       messages_.display_processing_failure_message(e, parent=parent_widget)
       should_quit = False
-    except Exception:
-      if image.is_valid():
-        raise
-      else:
-        messages_.display_invalid_image_failure_message(parent=parent_widget)
+    except Exception as e:
+      should_quit = False
+      messages_.display_invalid_image_failure_message(e, parent=parent_widget)
     else:
       if mode == 'export' and not self._batcher.exported_items:
         should_quit = False
@@ -127,7 +124,6 @@ class BatcherManagerQuick:
   def run_batcher(
         self,
         mode,
-        image,
         item_tree,
         parent_widget,
         progress_bar,
@@ -145,11 +141,8 @@ class BatcherManagerQuick:
       pass
     except exceptions.BatcherError as e:
       messages_.display_processing_failure_message(e, parent=parent_widget)
-    except Exception:
-      if image.is_valid():
-        raise
-      else:
-        messages_.display_invalid_image_failure_message(parent=parent_widget)
+    except Exception as e:
+      messages_.display_invalid_image_failure_message(e, parent=parent_widget)
     else:
       if mode == 'export' and not self._batcher.exported_items:
         messages_.display_message(

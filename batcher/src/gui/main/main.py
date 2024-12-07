@@ -248,7 +248,6 @@ class BatchLayerProcessingGui:
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
-    self._dialog.connect('window-state-event', self._on_dialog_window_state_event)
 
     self._previews.connect_events(self._action_lists, self._hpaned_settings_and_previews)
 
@@ -305,18 +304,11 @@ class BatchLayerProcessingGui:
       copy_previous_sensitive=False,
     )
 
-  def _on_dialog_window_state_event(self, _dialog, event):
-    if event.new_window_state & Gdk.WindowState.FOCUSED:
-      if not self._image.is_valid():
-        Gtk.main_quit()
-        return
-
   def _on_button_run_clicked(self, _button):
     self._set_up_gui_before_run()
 
     should_quit = self._batcher_manager.run_batcher(
       self._mode,
-      self._image,
       self._action_lists,
       self._previews,
       self._settings_manager,
@@ -530,7 +522,6 @@ class BatchLayerProcessingQuickGui:
 
     self._batcher_manager.run_batcher(
       self._mode,
-      self._image,
       self._item_tree,
       self._dialog,
       self._progress_bar,
