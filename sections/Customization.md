@@ -420,6 +420,9 @@ Options:
 * *Unit for height*: Unit for the new height - pixels or percentages of layer/image width/height.
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
+* *Scale to fit*: If checked, the layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the layer will be fit.
+* *Keep aspect ratio*: If checked, the layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
+* *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
 **Use layer size** (Export Layers only)
