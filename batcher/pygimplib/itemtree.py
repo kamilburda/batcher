@@ -940,12 +940,16 @@ class GimpItemTree(ItemTree):
     return self._images
 
   def refresh(self):
-    """Removes all items and adds items from the image given by the `image`
+    """Removes all items and adds items from the image given by the `images`
     property.
+
+    This method will ignore any images that are no longer valid.
 
     This method will also remove any items not added via `add_from_image()`.
     """
     self._clear()
+
+    self._images = [image for image in self._images if image.is_valid()]
 
     for image in self._images:
       self.add(self._get_children_from_image(image))
