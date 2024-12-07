@@ -402,12 +402,12 @@ pg.register_procedure(
   plug_in_batch_convert,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
-  menu_label=_('Con_vert...'),
+  menu_label=_('_Batch Convert...'),
   menu_path='<Image>/File/[Export]',
   image_types='',
   documentation=(
-    _('Batch-process images'),
-    _('This procedure allows batch conversion of image files and images opened in GIMP'
+    _('Batch-process image files'),
+    _('This procedure allows batch conversion of image files'
       ' to the specified file format, optionally applying arbitrary procedures'
       ' to each item and ignoring items according to the specified constraints.'),
   ),
