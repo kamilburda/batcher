@@ -20,7 +20,7 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_LATEST_PLUGIN_VERSION = '0.6'
+_LATEST_PLUGIN_VERSION = '0.7'
 
 
 @mock.patch(
@@ -55,6 +55,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_4()
     self._assert_correct_contents_for_update_to_0_5()
     self._assert_correct_contents_for_update_to_0_6()
+    self._assert_correct_contents_for_update_to_0_7()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -315,3 +316,11 @@ class TestUpdateHandlers(unittest.TestCase):
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+
+  def _assert_correct_contents_for_update_to_0_7(self):
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/scale_to_fit'].value, False)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/keep_aspect_ratio'].value, False)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/dimension_to_keep'].value, 'width')
