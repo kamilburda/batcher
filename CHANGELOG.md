@@ -1,4 +1,6 @@
-## Upcoming
+## 0.7
+
+### December 07, 2024
 
 * Added `Scale to fit` and `Keep aspect ratio` options to the Scale procedure.
 
