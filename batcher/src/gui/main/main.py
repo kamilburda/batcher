@@ -68,7 +68,7 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, item_tree, settings, source_name, mode, run_gui_func=None):
+  def __init__(self, item_tree, settings, source_name, mode, current_image=None, run_gui_func=None):
     self._item_tree = item_tree
     self._settings = settings
     self._source_name = source_name
@@ -84,7 +84,7 @@ class BatchLayerProcessingGui:
     else:
       self._plugin_procedure_tag = None
 
-    self._image = self._item_tree.images[0]
+    self._current_image = current_image
 
     self._batcher_manager = batcher_manager_.BatcherManager(self._item_tree, self._settings)
 
@@ -146,7 +146,7 @@ class BatchLayerProcessingGui:
     if self._mode == 'export':
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
-        self._image,
+        self._current_image,
         name_preview=self._previews.name_preview,
         image_preview=self._previews.image_preview,
         parent=self._dialog,
@@ -412,7 +412,16 @@ class BatchLayerProcessingQuickGui:
 
   _DEFAULT_DIALOG_WIDTH = 500
 
-  def __init__(self, item_tree, settings, _source_name, mode, title=None, run_gui_func=None):
+  def __init__(
+        self,
+        item_tree,
+        settings,
+        _source_name,
+        mode,
+        title=None,
+        current_image=None,
+        run_gui_func=None,
+  ):
     self._item_tree = item_tree
     self._settings = settings
 
@@ -422,7 +431,7 @@ class BatchLayerProcessingQuickGui:
 
     self._title = title
 
-    self._image = self._item_tree.images[0]
+    self._current_image = current_image
 
     self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._item_tree, self._settings)
 
@@ -464,7 +473,7 @@ class BatchLayerProcessingQuickGui:
     if self._mode == 'export' and self._settings['gui/show_quick_settings'].value:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
-        self._image,
+        self._current_image,
         parent=self._dialog,
       )
       self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)

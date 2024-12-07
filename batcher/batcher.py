@@ -96,7 +96,7 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
       EXPORT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingGui,
-      gui_class_kwargs=dict(mode='export'))
+      gui_class_kwargs=dict(mode='export', current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
       SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
@@ -117,7 +117,7 @@ def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _
       EXPORT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export', title=_('Export Layers (Quick)')))
+      gui_class_kwargs=dict(mode='export', title=_('Export Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(
       SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
@@ -135,7 +135,7 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
       EXPORT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export', title=_('Export Selected Layers')),
+      gui_class_kwargs=dict(mode='export', title=_('Export Selected Layers'), current_image=image),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
@@ -158,7 +158,7 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
       EDIT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingGui,
-      gui_class_kwargs=dict(mode='edit'))
+      gui_class_kwargs=dict(mode='edit', current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
       SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
@@ -179,7 +179,7 @@ def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _co
       EDIT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers (Quick)')))
+      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(
       SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
@@ -197,7 +197,7 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
       EDIT_LAYERS_SOURCE_NAME,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit', title=_('Edit Selected Layers')),
+      gui_class_kwargs=dict(mode='edit', title=_('Edit Selected Layers'), current_image=image),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
