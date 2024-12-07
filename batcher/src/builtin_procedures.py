@@ -232,14 +232,20 @@ def _convert_to_pixels(image, layer, dimension, dimension_unit):
 
 
 def _get_keep_aspect_ratio_values(dimension_to_keep, layer, width_pixels, height_pixels):
+  layer_width = layer.get_width()
+  if layer_width == 0:
+    layer_width = 1
+
+  layer_height = layer.get_height()
+  if layer_height == 0:
+    layer_height = 1
+
   if dimension_to_keep == WIDTH:
     processed_width_pixels = width_pixels
-    processed_height_pixels = int(
-      round(layer.get_height() * (processed_width_pixels / layer.get_width())))
+    processed_height_pixels = int(round(layer_height * (processed_width_pixels / layer_width)))
   elif dimension_to_keep == HEIGHT:
     processed_height_pixels = height_pixels
-    processed_width_pixels = int(
-      round(layer.get_width() * (processed_height_pixels / layer.get_height())))
+    processed_width_pixels = int(round(layer_width * (processed_height_pixels / layer_height)))
   else:
     raise ValueError('invalid value for dimension_to_keep; must be "width" or "height"')
 
