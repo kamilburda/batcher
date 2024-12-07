@@ -55,6 +55,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_4()
     self._assert_correct_contents_for_update_to_0_5()
     self._assert_correct_contents_for_update_to_0_6()
+    self._assert_correct_contents_for_update_to_0_7()
     self._assert_correct_contents_for_update_to_1_0()
 
   def _get_orig_setting_values_for_0_2(self):
@@ -316,6 +317,14 @@ class TestUpdateHandlers(unittest.TestCase):
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+
+  def _assert_correct_contents_for_update_to_0_7(self):
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/scale_to_fit'].value, False)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/keep_aspect_ratio'].value, False)
+    self.assertEqual(
+      self.settings['main/procedures/scale/arguments/dimension_to_keep'].value, 'width')
 
   def _assert_correct_contents_for_update_to_1_0(self):
     self.assertIn('selected_items', self.settings['main'])

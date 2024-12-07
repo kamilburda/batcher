@@ -776,6 +776,54 @@ def _update_to_0_6(data, _settings, source_names):
               builtin_constraints.BUILTIN_CONSTRAINTS['group_layers']['display_name'])
 
 
+def _update_to_0_7(data, _settings, source_names):
+  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
+    return
+
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
+
+        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+        if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
+          arguments_list.extend([
+            {
+              'type': 'bool',
+              'name': 'scale_to_fit',
+              'default_value': False,
+              'display_name': _('Scale to fit'),
+              'gui_type': 'check_button',
+              'value': False,
+            },
+            {
+              'type': 'bool',
+              'name': 'keep_aspect_ratio',
+              'default_value': False,
+              'display_name': _('Keep aspect ratio'),
+              'gui_type': 'check_button',
+              'value': False,
+            },
+            {
+              'type': 'choice',
+              'default_value': builtin_procedures.WIDTH,
+              'name': 'dimension_to_keep',
+              'items': [
+                (builtin_procedures.WIDTH, _('Width')),
+                (builtin_procedures.HEIGHT, _('Height')),
+              ],
+              'display_name': _('Dimension to keep'),
+              'value': builtin_procedures.WIDTH,
+            },
+          ])
+
+
 def _update_arguments_list(arguments_list):
   if arguments_list is None:
     return
@@ -907,5 +955,6 @@ _UPDATE_HANDLERS = {
   '0.4': _update_to_0_4,
   '0.5': _update_to_0_5,
   '0.6': _update_to_0_6,
+  '0.7': _update_to_0_7,
   '1.0': _update_to_1_0,
 }

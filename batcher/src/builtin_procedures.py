@@ -184,34 +184,48 @@ def resize_to_layer_size(batcher):
 def scale(
       _batcher,
       image,
-      raw_item,
+      layer,
       new_width,
       width_unit,
       new_height,
       height_unit,
       interpolation,
       local_origin,
+      scale_to_fit,
+      keep_aspect_ratio,
+      dimension_to_keep,
 ):
-  width_pixels = _convert_to_pixels(image, raw_item, new_width, width_unit)
-  height_pixels = _convert_to_pixels(image, raw_item, new_height, height_unit)
+  width_pixels = _convert_to_pixels(image, layer, new_width, width_unit)
+  height_pixels = _convert_to_pixels(image, layer, new_height, height_unit)
+
+  if scale_to_fit and not keep_aspect_ratio:
+    processed_width_pixels, processed_height_pixels = _get_scale_to_fit_values(
+      layer, width_pixels, height_pixels)
+  else:
+    if keep_aspect_ratio:
+      processed_width_pixels, processed_height_pixels = _get_keep_aspect_ratio_values(
+        dimension_to_keep, layer, width_pixels, height_pixels)
+    else:
+      processed_width_pixels = width_pixels
+      processed_height_pixels = height_pixels
 
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
 
-  raw_item.scale(width_pixels, height_pixels, local_origin)
+  layer.scale(processed_width_pixels, processed_height_pixels, local_origin)
 
   Gimp.context_pop()
 
 
-def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
+def _convert_to_pixels(image, layer, dimension, dimension_unit):
   if dimension_unit == PERCENT_IMAGE_WIDTH:
     pixels = (dimension / 100) * image.get_width()
   elif dimension_unit == PERCENT_IMAGE_HEIGHT:
     pixels = (dimension / 100) * image.get_height()
   elif dimension_unit == PERCENT_LAYER_WIDTH:
-    pixels = (dimension / 100) * raw_item.get_width()
+    pixels = (dimension / 100) * layer.get_width()
   elif dimension_unit == PERCENT_LAYER_HEIGHT:
-    pixels = (dimension / 100) * raw_item.get_height()
+    pixels = (dimension / 100) * layer.get_height()
   else:
     pixels = dimension
 
@@ -221,6 +235,45 @@ def _convert_to_pixels(image, raw_item, dimension, dimension_unit):
     int_pixels = 1
 
   return int_pixels
+
+
+def _get_keep_aspect_ratio_values(dimension_to_keep, layer, width_pixels, height_pixels):
+  layer_width = layer.get_width()
+  if layer_width == 0:
+    layer_width = 1
+
+  layer_height = layer.get_height()
+  if layer_height == 0:
+    layer_height = 1
+
+  if dimension_to_keep == WIDTH:
+    processed_width_pixels = width_pixels
+    processed_height_pixels = int(round(layer_height * (processed_width_pixels / layer_width)))
+  elif dimension_to_keep == HEIGHT:
+    processed_height_pixels = height_pixels
+    processed_width_pixels = int(round(layer_width * (processed_height_pixels / layer_height)))
+  else:
+    raise ValueError('invalid value for dimension_to_keep; must be "width" or "height"')
+
+  return processed_width_pixels, processed_height_pixels
+
+
+def _get_scale_to_fit_values(layer, width_pixels, height_pixels):
+  layer_width = layer.get_width()
+  if layer_width == 0:
+    layer_width = 1
+
+  layer_height = layer.get_height()
+  if layer_height == 0:
+    layer_height = 1
+
+  processed_width_pixels = width_pixels
+  processed_height_pixels = int(round(layer_height * (width_pixels / layer_width)))
+  if processed_height_pixels > height_pixels:
+    processed_height_pixels = height_pixels
+    processed_width_pixels = int(round(layer_width * (height_pixels / layer_height)))
+
+  return processed_width_pixels, processed_height_pixels
 
 
 _SCALE_UNITS = (
@@ -235,6 +288,15 @@ _SCALE_UNITS = (
   'percentage_of_image_width',
   'percentage_of_image_height',
   'pixels',
+)
+
+
+_SCALE_DIMENSIONS = (
+  WIDTH,
+  HEIGHT,
+) = (
+  'width',
+  'height',
 )
 
 
@@ -634,6 +696,30 @@ _BUILTIN_PROCEDURES_LIST = [
         'default_value': False,
         'display_name': _('Use local origin'),
         'gui_type': 'check_button',
+      },
+      {
+        'type': 'bool',
+        'name': 'scale_to_fit',
+        'default_value': False,
+        'display_name': _('Scale to fit'),
+        'gui_type': 'check_button',
+      },
+      {
+        'type': 'bool',
+        'name': 'keep_aspect_ratio',
+        'default_value': False,
+        'display_name': _('Keep aspect ratio'),
+        'gui_type': 'check_button',
+      },
+      {
+        'type': 'choice',
+        'default_value': WIDTH,
+        'name': 'dimension_to_keep',
+        'items': [
+          (WIDTH, _('Width')),
+          (HEIGHT, _('Height')),
+        ],
+        'display_name': _('Dimension to keep'),
       },
     ],
   },

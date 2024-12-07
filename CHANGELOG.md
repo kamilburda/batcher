@@ -18,6 +18,13 @@ Bug fixes:
 * Fixed the `Rename` procedure assigning incorrect descending numbers if `Rename folders` is enabled.
 
 
+## 0.7
+
+### December 07, 2024
+
+* Added `Scale to fit` and `Keep aspect ratio` options to the Scale procedure.
+
+
 ## 0.6
 
 ### November 18, 2024

@@ -293,6 +293,7 @@ def create_settings_for_export_layers():
   _set_file_extension_options_for_default_export_procedure(settings['main'])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
@@ -406,6 +407,7 @@ def create_settings_for_edit_layers():
   ])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
@@ -633,6 +635,81 @@ def _show_hide_file_format_export_options(
       file_format_mode_setting, file_format_export_options_setting):
   file_format_export_options_setting.gui.set_visible(
     file_format_mode_setting.value == 'use_explicit_values')
+
+
+def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value == 'scale':
+    _set_sensitive_for_keep_aspect_ratio(
+      procedure['arguments/scale_to_fit'],
+      procedure['arguments/keep_aspect_ratio'],
+    )
+
+    procedure['arguments/scale_to_fit'].connect_event(
+      'value-changed',
+      _set_sensitive_for_keep_aspect_ratio,
+      procedure['arguments/keep_aspect_ratio'])
+
+    _set_sensitive_for_scale_to_fit_and_dimension_to_ignore(
+      procedure['arguments/keep_aspect_ratio'],
+      procedure['arguments/scale_to_fit'],
+      procedure['arguments/dimension_to_keep'],
+    )
+
+    procedure['arguments/keep_aspect_ratio'].connect_event(
+      'value-changed',
+      _set_sensitive_for_scale_to_fit_and_dimension_to_ignore,
+      procedure['arguments/scale_to_fit'],
+      procedure['arguments/dimension_to_keep'])
+
+    _set_sensitive_for_dimension_to_ignore(
+      procedure['arguments/dimension_to_keep'],
+      procedure['arguments/new_width'],
+      procedure['arguments/width_unit'],
+      procedure['arguments/new_height'],
+      procedure['arguments/height_unit'])
+
+    procedure['arguments/dimension_to_keep'].connect_event(
+      'value-changed',
+      _set_sensitive_for_dimension_to_ignore,
+      procedure['arguments/new_width'],
+      procedure['arguments/width_unit'],
+      procedure['arguments/new_height'],
+      procedure['arguments/height_unit'])
+
+    procedure['arguments/dimension_to_keep'].connect_event(
+      'gui-sensitive-changed',
+      _set_sensitive_for_dimension_to_ignore,
+      procedure['arguments/new_width'],
+      procedure['arguments/width_unit'],
+      procedure['arguments/new_height'],
+      procedure['arguments/height_unit'])
+
+
+def _set_sensitive_for_keep_aspect_ratio(scale_to_fit_setting, keep_aspect_ratio_setting):
+  keep_aspect_ratio_setting.gui.set_sensitive(not scale_to_fit_setting.value)
+
+
+def _set_sensitive_for_scale_to_fit_and_dimension_to_ignore(
+      keep_aspect_ratio_setting, scale_to_fit_setting, dimension_to_keep_setting):
+  scale_to_fit_setting.gui.set_sensitive(not keep_aspect_ratio_setting.value)
+  dimension_to_keep_setting.gui.set_sensitive(keep_aspect_ratio_setting.value)
+
+
+def _set_sensitive_for_dimension_to_ignore(
+      dimension_to_keep_setting,
+      new_width_setting,
+      width_unit_setting,
+      new_height_setting,
+      height_unit_setting,
+):
+  is_sensitive = dimension_to_keep_setting.gui.get_sensitive()
+  is_width = dimension_to_keep_setting.value == builtin_procedures.WIDTH
+  is_height = dimension_to_keep_setting.value == builtin_procedures.HEIGHT
+
+  new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
+  width_unit_setting.gui.set_sensitive(is_width or not is_sensitive)
+  new_height_setting.gui.set_sensitive(is_height or not is_sensitive)
+  height_unit_setting.gui.set_sensitive(is_height or not is_sensitive)
 
 
 def _on_after_add_insert_background_foreground(
