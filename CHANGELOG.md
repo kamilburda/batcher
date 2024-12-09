@@ -7,14 +7,15 @@ User interface changes:
 * Added a small delay to the image preview when the selected item changes. This prevents excessive changes when the selection changes rapidly.
 * Optimized the update of input items (when items are added/removed/renamed/updated upon changing procedures or constraints) if many items (hundreds and more) are present.
 * For Export Layers and Edit Layers, moved the "Preview" label directly above the image thumbnail and added a label named "Input Layers" above the list of layers.
+* Simplified how the preview is created internally, removing steps such as downscaling or merging layers.
 
 Bug fixes:
-* Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
 * Fixed Export/Edit Selected Layers not working for group layers.
 * Fixed export for procedures manipulating image dimensions, selection and other image-wide attributes (such as `script-fu-addborder`, `script-fu-circuit` or conversion to the indexed type).
-* Fixed preview not working correctly for group layers.
+* Fixed occasional artifacts in the preview.
+* Fixed the preview not working correctly for group layers.
 * Fixed constraints incorrectly excluding items in the preview. The bug caused items e.g. matching the `Matching File Extension` constraint to be excluded from the preview as its name may have changed during processing.
-* Fixed incorrect names in the preview.
+* Fixed occasional incorrect names in the preview under the image thumbnail.
 * Fixed the `Rename` procedure renaming folders after items if `Rename folders` is enabled.
 * Fixed the `Rename` procedure assigning incorrect descending numbers if `Rename folders` is enabled.
 
