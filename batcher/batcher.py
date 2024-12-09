@@ -393,8 +393,6 @@ def _set_constraints_to_only_selected_layers(settings):
   actions_.clear(settings['main/constraints'], add_initial_actions=False)
 
   actions_.add(
-    settings['main/constraints'], builtin_constraints.BUILTIN_CONSTRAINTS['layers'])
-  actions_.add(
     settings['main/constraints'], builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
 
 

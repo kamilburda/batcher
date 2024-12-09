@@ -10,6 +10,7 @@ User interface changes:
 
 Bug fixes:
 * Simplified how the preview is created internally (removing steps such as downscaling or merging). As a side effect, this eliminates some occasional artifacts in the image thumbnail.
+* Fixed Export/Edit Selected Layers not working for group layers.
 * Fixed export for procedures manipulating image dimensions, selection and other image-wide attributes (such as `script-fu-addborder`, `script-fu-circuit` or conversion to the indexed type).
 * Fixed preview not working correctly for group layers.
 * Fixed constraints incorrectly excluding items in the preview. The bug caused items e.g. matching the `Matching File Extension` constraint to be excluded from the preview as its name may have changed during processing.
