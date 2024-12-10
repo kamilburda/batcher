@@ -175,6 +175,7 @@ class TestRenameWithNumberField(unittest.TestCase):
     
     batcher_mock = mock.Mock()
     batcher_mock.item_tree = layer_tree
+    batcher_mock.matching_items = layer_tree
     
     renamer = renamer_.ItemRenamer(pattern, fields_raw=[renamer_.FIELDS['^[0-9]+$']])
     
