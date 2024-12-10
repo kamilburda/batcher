@@ -1774,7 +1774,7 @@ class GimpItemSetting(Setting):
   def _value_to_raw(self, value):
     return self._item_to_path(value)
 
-  def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
+  def _get_item_from_image_and_item_path(self, item_type_name, item_path, image_filepath):
     image = pgpdbutils.find_image_by_filepath(image_filepath)
 
     if image is None:
@@ -1961,8 +1961,8 @@ class LayerMaskSetting(GimpItemSetting):
     if drawable is not None and not drawable.is_layer_mask():
       return 'invalid layer mask', 'invalid_value'
 
-  def _get_item_from_image_and_item_path(self, image_filepath, item_type_name, item_path):
-    layer = super()._get_item_from_image_and_item_path(image_filepath, item_type_name, item_path)
+  def _get_item_from_image_and_item_path(self, item_type_name, item_path, image_filepath):
+    layer = super()._get_item_from_image_and_item_path(item_type_name, item_path, image_filepath)
 
     if layer is not None:
       return layer.get_mask()

@@ -206,7 +206,7 @@ def _get_children_from_image(image, item_class_name):
 def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[str], None]:
   """Returns a `Gimp.Item` instance as a list of
   ``[item class name, item path]`` or
-  ``[image file path, item class name, item path]``.
+  ``[item class name, item path, image file path]``.
   
   Item class name and item path are described in
   `get_item_from_image_and_item_path()`.
@@ -214,21 +214,32 @@ def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[
   if item is None:
     return None
   
-  item_as_path = []
-  
-  if include_image:
-    if item.get_image() is not None and item.get_image().get_file() is not None:
-      item_as_path.append(item.get_image().get_file().get_path())
-    else:
-      return None
+  item_as_path = [type(item).__name__]
 
   parents = _get_item_parents(item)
   item_path = pgconstants.GIMP_ITEM_PATH_SEPARATOR.join(
     parent_or_item.get_name() for parent_or_item in parents + [item])
-  
-  item_as_path.extend([type(item).__name__, item_path])
-  
-  return item_as_path
+
+  item_as_path.append(item_path)
+
+  if include_image:
+    image = item.get_image()
+    if image is None or not image.is_valid():
+      return None
+
+    image_file = image.get_file()
+    if image_file is None:
+      return None
+
+    image_filepath = image_file.get_path()
+    if image_filepath is None:
+      return None
+
+    item_as_path.append(image_file.get_path())
+
+    return item_as_path
+  else:
+    return item_as_path
 
 
 def _get_item_parents(item):
