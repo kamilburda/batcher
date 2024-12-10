@@ -1,4 +1,6 @@
-"""Managing items of a GIMP image (e.g. layers) in a tree-like structure."""
+"""Storing and managing file paths, GIMP images, and GIMP items in a tree-like
+structure.
+"""
 
 # We break the convention in this module and access private attributes and
 # methods from `Item` within `ItemTree` and their subclasses. `ItemTree` and
