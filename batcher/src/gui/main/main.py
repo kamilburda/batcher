@@ -141,12 +141,13 @@ class BatchLayerProcessingGui:
       _('Input Layers'),
       lock_previews=True,
       display_message_func=self._display_inline_message,
+      current_image=self._current_image,
     )
 
     if self._mode == 'export':
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
-        self._current_image,
+        current_image=self._current_image,
         name_preview=self._previews.name_preview,
         image_preview=self._previews.image_preview,
         parent=self._dialog,
@@ -473,7 +474,7 @@ class BatchLayerProcessingQuickGui:
     if self._mode == 'export' and self._settings['gui/show_quick_settings'].value:
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
-        self._current_image,
+        current_image=self._current_image,
         parent=self._dialog,
       )
       self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)

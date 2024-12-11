@@ -39,6 +39,7 @@ class Previews:
         top_label,
         lock_previews=True,
         display_message_func=None,
+        current_image=None,
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
@@ -47,7 +48,7 @@ class Previews:
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
-    self._image = self._item_tree.images[0]
+    self._current_image = current_image
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)
@@ -63,8 +64,8 @@ class Previews:
     self._name_preview = preview_name_.NamePreview(
       self._batcher_for_name_preview,
       self._settings,
-      self._settings['gui/name_preview_items_collapsed_state'].value[self._image],
-      self._settings['main/selected_items'].value[self._image])
+      set(self._settings['gui/name_preview_items_collapsed_state'].loaded_items),
+      list(self._settings['main/selected_items'].loaded_items))
 
     self._batcher_for_image_preview = core.LayerBatcher(
       # This is an empty tree that will be replaced during the preview anyway.
@@ -79,7 +80,7 @@ class Previews:
       self._batcher_for_image_preview, self._settings)
 
     self._previews_controller = previews_controller_.PreviewsController(
-      self._name_preview, self._image_preview, self._settings, self._image)
+      self._name_preview, self._image_preview, self._settings, current_image=self._current_image)
 
     self._paned_outside_previews_previous_position = (
       self._settings['gui/size/paned_outside_previews_position'].value)

@@ -1,4 +1,3 @@
-import collections
 import os
 
 import unittest
@@ -36,24 +35,6 @@ def _get_images_and_items():
   return images, items
 
 
-def _get_images_and_items_with_ids():
-  images, items = _get_images_and_items()
-  
-  # `None` indicates invalid images/items that must not be in the expected data.
-  images = [images[0], images[1], None]
-  items = [items[0], items[1], items[2], items[3], None, items[4], None, None, None]
-  
-  return images, items
-
-
-def _get_images_and_items_with_paths():
-  images, items = _get_images_and_items()
-  
-  images = [[images[0]], [images[1]], []]
-  
-  return images, items
-
-
 class TestDirpathSetting(unittest.TestCase):
 
   def setUp(self):
@@ -80,148 +61,285 @@ class TestFileExtensionSetting(unittest.TestCase):
 
 
 @mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-class TestImagesAndGimpItemsSetting(unittest.TestCase):
+class TestItemTreeItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.ImagesAndGimpItemsSetting('selected_items')
-    
+    self.setting = setting_classes.ItemTreeItemsSetting('selected_items')
+
     self.maxDiff = None
-  
-  def test_set_value_from_objects(self, *_mocks):
+
+  def test_set_value_from_ids(self, gimp_module_stub):
     images, items = _get_images_and_items()
 
-    self.setting.set_value({
-      images[0]: [items[0], items[1], (items[2], 'folder')],
-      images[1]: [items[3], (items[4], 'folder')],
-    })
-    
-    expected_value = collections.defaultdict(set)
-    expected_value[images[0]] = {items[0].id_, items[1].id_, (items[2].id_, 'folder')}
-    expected_value[images[1]] = {items[3].id_, (items[4].id_, 'folder')}
-    
-    self.assertEqual(self.setting.value, expected_value)
+    gimp_module_stub.get_images = lambda: images
 
-  def test_set_value_from_ids(self, *_mocks):
-    images, items = _get_images_and_items_with_ids()
+    self.setting.set_value([
+      items[0].id_,
+      items[1].id_,
+      (items[2].id_, 'folder'),
+      items[3].id_,
+      (-10, 'folder'),
+      [items[4].id_, 'folder'],
+      -11,
+      -12,
+      -13,
+    ])
 
-    self.setting.set_value({
-      images[0].id_: [items[0].id_, items[1].id_, (items[2].id_, 'folder')],
-      images[1].id_: [items[3].id_, (-10, 'folder'), [items[5].id_, 'folder'], -11],
-      -2: [-12, -13]})
-
-    expected_value = collections.defaultdict(set)
-    expected_value[images[0]] = {items[0].id_, items[1].id_, (items[2].id_, 'folder')}
-    expected_value[images[1]] = {items[3].id_, (items[5].id_, 'folder')}
-
-    self.assertEqual(self.setting.value, expected_value)
-
-  def test_set_value_from_paths(self, *_mocks):
-    images, items = _get_images_and_items_with_paths()
-
-    with mock.patch(
-          f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
-      temp_mock_gimp_module.get_images.side_effect = images
-      temp_mock_gimp_module.Layer = stubs_gimp.GimpModuleStub.Layer
-      temp_mock_gimp_module.GroupLayer = stubs_gimp.GimpModuleStub.GroupLayer
-
-      self.setting.set_value(
-        {os.path.abspath('filename_1'): [
-          ('Layer', 'item_1'),
-          ('Layer', 'item_4/item_3'),
-          ('GroupLayer', 'item_4', 'folder')],
-         os.path.abspath('filename_2'): [
-          ('Layer', 'item_7/item_5'),
-          ('GroupLayer', 'item_6', 'folder'),
-          ('GroupLayer', 'item_7', 'folder'),
-          ('Layer', 'item_8')],
-         os.path.abspath('filename_3'): [
-           ('Layer', 'item_9'),
-           ('Layer', 'item_10')]})
-
-    expected_value = collections.defaultdict(set)
-    expected_value[images[0][0]] = {items[0].id_, items[1].id_, (items[2].id_, 'folder')}
-    expected_value[images[1][0]] = {items[3].id_, (items[4].id_, 'folder')}
-
-    self.assertEqual(self.setting.value, expected_value)
-
-  def test_set_value_invalid_list_length_raises_error(self, *_mocks):
-    images, items = _get_images_and_items_with_ids()
-
-    with self.assertRaises(ValueError):
-      self.setting.set_value({
-        images[0].id_: [
-          items[0].id_, items[1].id_, (items[2].id_, 'folder', 'extra_item_1', 'extra_item_2')]})
-
-  def test_set_value_invalid_collection_type_for_items_raises_error(self, *_mocks):
-    images, items = _get_images_and_items_with_ids()
-
-    with self.assertRaises(TypeError):
-      self.setting.set_value({images[0].id_: object()})
-
-  def test_to_dict_with_paths(self, *_mocks):
-    images, items = _get_images_and_items_with_ids()
-
-    self.setting.set_value({
-      images[0].id_: [items[0].id_, items[1].id_, (items[2].id_, 'folder')],
-      images[1].id_: [items[3].id_, (-10, 'folder'), [items[5].id_, 'folder'], -11],
-      -2: [-12, -13]})
-
-    expected_dict = {
-      'name': 'selected_items',
-      'type': 'images_and_gimp_items',
-      'value': {
-        os.path.abspath('filename_1'): [
-          ['Layer', 'item_1'],
-          ['Layer', 'item_4/item_3'],
-          ['GroupLayer', 'item_4', 'folder']],
-        os.path.abspath('filename_2'): [
-          ['Layer', 'item_7/item_5'],
-          ['GroupLayer', 'item_7', 'folder']],
-      },
+    expected_value_and_loaded_items = {
+      items[0].id_: images[0],
+      items[1].id_: images[0],
+      (items[2].id_, 'folder'): images[0],
+      items[3].id_: images[1],
+      (items[4].id_, 'folder'): images[1],
     }
 
-    actual_dict = self.setting.to_dict()
+    expected_value = list(expected_value_and_loaded_items)
 
-    self.assertEqual(actual_dict['name'], expected_dict['name'])
-    self.assertEqual(actual_dict['type'], expected_dict['type'])
-    # We need to compare 'value' field element by element since unordered sets
-    # are converted to lists, and we cannot guarantee stable order in sets.
-    for key in expected_dict['value']:
-      self.assertIn(key, actual_dict['value'])
-      for item in expected_dict['value'][key]:
-        self.assertIn(item, actual_dict['value'][key])
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.loaded_items, expected_value_and_loaded_items)
 
-  def test_to_dict_with_image_without_filepaths(self, *_mocks):
-    images, items = _get_images_and_items_with_ids()
+  def test_set_value_from_paths(self, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+    image_3_filepath = os.path.abspath('filename_3')
+
+    gimp_module_stub.get_images = lambda: images
+
+    self.setting.set_value([
+      ('Layer', 'item_1', '', image_1_filepath),
+      ('Layer', 'item_4/item_3', '', image_1_filepath),
+      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', 'item_9', '', image_3_filepath),
+      ('Layer', 'item_10', '', image_3_filepath),
+    ])
+
+    expected_value_and_loaded_items = {
+      items[0].id_: images[0],
+      items[1].id_: images[0],
+      (items[2].id_, 'folder'): images[0],
+      items[3].id_: images[1],
+      (items[4].id_, 'folder'): images[1],
+    }
+
+    expected_value = list(expected_value_and_loaded_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.loaded_items, expected_value_and_loaded_items)
+
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_set_value_from_paths_items_without_loaded_image_are_ignored(
+        self, mock_isfile, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+    image_3_filepath = os.path.abspath('filename_3')
 
     images[1].set_file(None)
 
-    self.setting.set_value({
-      images[0].id_: [items[0].id_, items[1].id_, (items[2].id_, 'folder')],
-      images[1].id_: [items[3].id_, (-10, 'folder'), [items[5].id_, 'folder'], -11],
-      -2: [-12, -13]})
+    gimp_module_stub.get_images = lambda: images
+    mock_isfile.side_effect = [True, True, True, True, False, False]
+
+    self.setting.set_value([
+      ('Layer', 'item_1', '', image_1_filepath),
+      ('Layer', 'item_4/item_3', '', image_1_filepath),
+      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', 'item_9', '', image_3_filepath),
+      ('Layer', 'item_10', '', image_3_filepath),
+    ])
+
+    expected_not_loaded_items = [
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+    ]
+
+    expected_loaded_items = {
+      items[0].id_: images[0],
+      items[1].id_: images[0],
+      (items[2].id_, 'folder'): images[0],
+    }
+
+    expected_value = [
+      items[0].id_,
+      items[1].id_,
+      (items[2].id_, 'folder')
+    ]
+    expected_value.extend(expected_not_loaded_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.loaded_items, expected_loaded_items)
+    self.assertEqual(self.setting.not_loaded_items, expected_not_loaded_items)
+
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_set_value_from_paths_overrides_previous_loaded_items_and_not_loaded_items(
+        self, mock_isfile, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+    image_3_filepath = os.path.abspath('filename_3')
+
+    gimp_module_stub.get_images = lambda: images
+    mock_isfile.side_effect = [False, False]
+
+    self.setting.set_value([
+      ('Layer', 'item_1', '', image_1_filepath),
+      ('Layer', 'item_4/item_3', '', image_1_filepath),
+      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', 'item_9', '', image_3_filepath),
+      ('Layer', 'item_10', '', image_3_filepath),
+    ])
+
+    self.assertEqual(self.setting.not_loaded_items, [])
+
+    images[1].set_file(None)
+
+    mock_isfile.side_effect = [True, True, True, True, False, False]
+
+    self.setting.set_value([
+      ('Layer', 'item_1', '', image_1_filepath),
+      ('Layer', 'item_4/item_3', '', image_1_filepath),
+      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', 'item_9', '', image_3_filepath),
+      ('Layer', 'item_10', '', image_3_filepath),
+    ])
+
+    expected_not_loaded_items = [
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+    ]
+
+    expected_loaded_items = {
+      items[0].id_: images[0],
+      items[1].id_: images[0],
+      (items[2].id_, 'folder'): images[0],
+    }
+
+    expected_value = [
+      items[0].id_,
+      items[1].id_,
+      (items[2].id_, 'folder')
+    ]
+    expected_value.extend(expected_not_loaded_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.loaded_items, expected_loaded_items)
+    self.assertEqual(self.setting.not_loaded_items, expected_not_loaded_items)
+
+  def test_set_value_invalid_list_length_raises_error(self, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    gimp_module_stub.get_images = lambda: images
+
+    with self.assertRaises(ValueError):
+      self.setting.set_value([
+        items[0].id_, items[1].id_, ['Layer', items[2].id_, 'folder', 'filename_1', 'extra_item_1'],
+      ])
+
+  def test_set_value_invalid_item_type_raises_error(self, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    gimp_module_stub.get_images = lambda: images
+
+    with self.assertRaises(TypeError):
+      self.setting.set_value([object()])
+
+  def test_to_dict(self, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+
+    gimp_module_stub.get_images = lambda: images
+
+    self.setting.set_value([
+      items[0].id_,
+      items[1].id_,
+      (items[2].id_, 'folder'),
+      items[3].id_,
+      (-10, 'folder'),
+      [items[4].id_, 'folder'],
+      -11,
+      -12,
+      -13,
+    ])
 
     expected_dict = {
       'name': 'selected_items',
-      'type': 'images_and_gimp_items',
-      'value': {
-        os.path.abspath('filename_1'): [
-          ['Layer', 'item_1'],
-          ['Layer', 'item_4/item_3'],
-          ['GroupLayer', 'item_4', 'folder']],
-      },
+      'type': 'item_tree_items',
+      'value': [
+        ['Layer', 'item_1', '', image_1_filepath],
+        ['Layer', 'item_4/item_3', '', image_1_filepath],
+        ['GroupLayer', 'item_4', 'folder', image_1_filepath],
+        ['Layer', 'item_7/item_5', '', image_2_filepath],
+        ['GroupLayer', 'item_7', 'folder', image_2_filepath],
+      ],
     }
 
-    actual_dict = self.setting.to_dict()
+    self.assertEqual(self.setting.to_dict(), expected_dict)
 
-    self.assertEqual(actual_dict['name'], expected_dict['name'])
-    self.assertEqual(actual_dict['type'], expected_dict['type'])
-    # We need to compare 'value' field element by element since unordered sets
-    # are converted to lists, and we cannot guarantee stable order in sets.
-    for key in expected_dict['value']:
-      self.assertIn(key, actual_dict['value'])
-      for item in expected_dict['value'][key]:
-        self.assertIn(item, actual_dict['value'][key])
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_to_dict_with_image_without_filepath(self, mock_isfile, gimp_module_stub):
+    images, items = _get_images_and_items()
+
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+    image_3_filepath = os.path.abspath('filename_3')
+
+    images[1].set_file(None)
+
+    gimp_module_stub.get_images = lambda: images
+    mock_isfile.side_effect = [True, True, True, True, False, False]
+
+    self.setting.set_value([
+      ('Layer', 'item_1', '', image_1_filepath),
+      ('Layer', 'item_4/item_3', '', image_1_filepath),
+      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
+      ('Layer', 'item_7/item_5', '', image_2_filepath),
+      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
+      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', 'item_9', '', image_3_filepath),
+      ('Layer', 'item_10', '', image_3_filepath),
+    ])
+
+    expected_dict = {
+      'name': 'selected_items',
+      'type': 'item_tree_items',
+      'value': [
+        ['Layer', 'item_1', '', image_1_filepath],
+        ['Layer', 'item_4/item_3', '', image_1_filepath],
+        ['GroupLayer', 'item_4', 'folder', image_1_filepath],
+        ['Layer', 'item_7/item_5', '', image_2_filepath],
+        ['GroupLayer', 'item_6', 'folder', image_2_filepath],
+        ['GroupLayer', 'item_7', 'folder', image_2_filepath],
+        ['Layer', 'item_8', '', image_2_filepath],
+      ],
+    }
+
+    self.assertEqual(self.setting.to_dict(), expected_dict)
 
 
 class TestImagesAndDirectoriesSetting(unittest.TestCase):

@@ -21,11 +21,11 @@ class PreviewsController:
   
   _PREVIEW_ERROR_KEY = 'preview_error'
   
-  def __init__(self, name_preview, image_preview, settings, image):
+  def __init__(self, name_preview, image_preview, settings, current_image=None):
     self._name_preview = name_preview
     self._image_preview = image_preview
     self._settings = settings
-    self._image = image
+    self._current_image = current_image
     self._is_initial_selection_set = False
 
     self._previously_focused_on_related_window = False
@@ -150,20 +150,20 @@ class PreviewsController:
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-load',
-      lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image]))
+      lambda setting: self._name_preview.set_collapsed_items(set(setting.loaded_items)))
 
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_collapsed_items(setting.value[self._image]))
+      lambda setting: self._name_preview.set_collapsed_items(set(setting.loaded_items)))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
     self._settings['main/selected_items'].connect_event(
       'after-load',
-      lambda setting: self._name_preview.set_selected_items(setting.value[self._image]))
+      lambda setting: self._name_preview.set_selected_items(setting.loaded_items))
 
     self._settings['main/selected_items'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_selected_items(setting.value[self._image]))
+      lambda setting: self._name_preview.set_selected_items(setting.loaded_items))
   
   def _connect_setting_after_reset_displayed_items_in_image_preview(self):
     def _clear_image_preview(_setting):
@@ -253,7 +253,7 @@ class PreviewsController:
         return None
 
   def _on_name_preview_selection_changed(self, _preview):
-    self._update_selected_items()
+    self._settings['main/selected_items'].set_loaded_items(self._name_preview.selected_items)
 
     # There could be a rapid sequence of 'preview-selection-changed' signals
     # invoked if a selected item and preceding items are removed from the name
@@ -266,22 +266,33 @@ class PreviewsController:
     )
 
   def _on_name_preview_collapsed_items_changed(self, _preview):
-    self._update_collapsed_items()
-  
+    self._settings['gui/name_preview_items_collapsed_state'].set_loaded_items(
+      self._name_preview.collapsed_items)
+
   def _set_initial_selection_and_update_image_preview(self):
-    setting_value = self._settings['gui/image_preview_displayed_items'].value[self._image]
-
-    if not setting_value:
-      item_key_to_display = None
+    displayed_items_setting = self._settings['gui/image_preview_displayed_items']
+    if self._current_image is not None:
+      item_key_to_display = next(
+        iter(
+          item_key for item_key, image in displayed_items_setting.loaded_items.items()
+          if image == self._current_image),
+        None)
     else:
-      item_key_to_display = list(setting_value)[0]
+      item_key_to_display = next(
+        iter(item_key for item_key in displayed_items_setting.loaded_items),
+        None,
+      )
 
-    selected_layers_in_image = [image.get_id() for image in self._image.get_selected_layers()]
+    if self._current_image is not None:
+      selected_layers_in_current_image = [
+        image.get_id() for image in self._current_image.get_selected_layers()]
+    else:
+      selected_layers_in_current_image = []
 
     if (item_key_to_display is None
-        and not self._settings['main/selected_items'].value[self._image]
-        and selected_layers_in_image):
-      self._name_preview.set_selected_items(selected_layers_in_image)
+        and not self._settings['main/selected_items'].loaded_items
+        and selected_layers_in_current_image):
+      self._name_preview.set_selected_items(selected_layers_in_current_image)
 
       # `NamePreview.set_selected_items` triggers the
       # 'preview-selection-changed' event that also updates the image preview
@@ -319,11 +330,6 @@ class PreviewsController:
 
     self._name_preview.set_tagged_items(set(item.key for item in tagged_items))
 
-  def _update_selected_items(self):
-    selected_items_dict = self._settings['main/selected_items'].value
-    selected_items_dict[self._image] = self._name_preview.selected_items
-    self._settings['main/selected_items'].set_value(selected_items_dict)
-
   def _update_image_preview(self, update_on_identical_item=True):
     item_from_cursor = self._name_preview.get_item_from_cursor()
 
@@ -342,12 +348,7 @@ class PreviewsController:
         self._image_preview.clear()
 
     if self._image_preview.item is not None:
-      self._settings['gui/image_preview_displayed_items'].value[self._image] = [
-        self._image_preview.item.key]
+      self._settings['gui/image_preview_displayed_items'].set_loaded_items(
+        [self._image_preview.item.key])
     else:
-      self._settings['gui/image_preview_displayed_items'].value[self._image] = []
-
-  def _update_collapsed_items(self):
-    collapsed_items_dict = self._settings['gui/name_preview_items_collapsed_state'].value
-    collapsed_items_dict[self._image] = self._name_preview.collapsed_items
-    self._settings['gui/name_preview_items_collapsed_state'].set_value(collapsed_items_dict)
+      self._settings['gui/image_preview_displayed_items'].set_loaded_items([])

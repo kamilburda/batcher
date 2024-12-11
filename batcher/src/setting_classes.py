@@ -1,7 +1,6 @@
 """Additional setting and setting GUI classes specific to the plug-in."""
 
 import collections
-from collections.abc import Iterable
 import os
 from typing import Type
 
@@ -217,139 +216,141 @@ class NamePatternSetting(pg.setting.StringSetting):
       self._value = value
 
 
-class ImagesAndGimpItemsSetting(pg.setting.Setting):
-  """Class for settings representing a mapping of
-  ``(GIMP image, GIMP items)`` pairs.
-  
-  The mapping is implemented as `collections.defaultdict(set)`.
-  
-  A GIMP item can be represented as a `Gimp.Item` instance or a ``(Gimp.Item,
-  FOLDER_KEY)`` tuple, where ``FOLDER_KEY`` is a string literal defined in
-  `pygimplib.itemtree`.
-  
-  When storing this setting to a source, images are stored as file paths and
-  items are stored as ``(item class name, item path)`` or ``(item class name,
-  item path, FOLDER_KEY)`` tuples. ``Item class name`` and ``item path`` are
-  described in `pygimplib.pdbutils.get_item_from_image_and_item_path()`.
-  
-  Default value: `collections.defaultdict(set)`
+class ItemTreeItemsSetting(pg.setting.Setting):
+  """Class for settings representing `pygimplib.itemtree.Item` instances,
+  specifically a list of values of the `pygimplib.itemtree.Item.key` property.
+
+  The `loaded_items` property is a subset of items whose corresponding
+  `Gimp.Image`s are loaded. It is an ordered mapping of ``item key: image``
+  where ``image`` is a `Gimp.Image` instance for
+  `pygimplib.itemtree.GimpItem`s, or ``None`` for all other
+  `pygimplib.itemtree.Item` subclasses. In the latter case, `loaded_items`
+  contains all items as the `value` property in the same order.
+
+  Depending on the `pygimplib.itemtree.Item` subclass, each item is stored in
+  one of the following formats:
+
+  * ``[class name, item path components, folder key, image file path]`` for
+    `pygimplib.itemtree.GimpItem`s. The ``class name`` corresponds to one of
+    the GIMP item classes, e.g. ``'Layer'`` or ``'Channel'``. ``item path
+    components`` is a list of path components from the topmost parent to the
+    item itself.
+  * ``[class name, image file path]`` for `pygimplib.itemtree.GimpImageItem`s.
+    ``class name`` is ``'Image'``.
+  * ``[class name, file path, folder key]`` for
+    `pygimplib.itemtree.GimpImageItem`s. ``class name`` is ``'str'``.
+
+  ``folder key`` is either ``''`` or `pygimplib.itemtree.FOLDER_KEY`,
+  signifying that an item is either a regular item or a folder, respectively.
+
+  Default value: `[]`
   """
   
   _ALLOWED_PDB_TYPES = []
 
   _ALLOWED_GUI_TYPES = []
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: collections.defaultdict(set)
-  
+  _DEFAULT_DEFAULT_VALUE = lambda self: []
+
+  def __init__(self, name, **kwargs):
+    super().__init__(name, **kwargs)
+
+    self._loaded_items = {}
+    self._not_loaded_items = []
+
+  @property
+  def loaded_items(self):
+    return self._loaded_items
+
+  @property
+  def not_loaded_items(self):
+    return self._not_loaded_items
+
   def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, dict):
-      value = collections.defaultdict(set)
-      
-      for key, items in raw_value.items():
-        if isinstance(key, str):
-          image = pg.pdbutils.find_image_by_filepath(key)
-        elif isinstance(key, int):
-          if Gimp.Image.id_is_valid(key):
-            image = Gimp.Image.get_by_id(key)
-          else:
-            image = None
-        else:
-          image = key
-        
-        if image is None:
-          continue
-        
-        if not isinstance(items, Iterable) or isinstance(items, str):
-          raise TypeError(f'expected a list-like, found {items}')
-        
-        processed_items = set()
-        
-        for item in items:
-          if isinstance(item, (list, tuple)):
-            if len(item) not in [2, 3]:
-              raise ValueError(
-                'list-likes representing items must contain exactly 2 or 3 elements'
-                f' (has {len(item)})')
+    if not isinstance(raw_value, (list, tuple)):
+      return raw_value
 
-            if len(item) == 2 and not isinstance(item[0], str):
-              if isinstance(item[0], int):  # (item ID, item type)
-                if Gimp.Item.id_is_valid(item[0]):
-                  processed_items.add((item[0], item[1]))
-              else:  # (item, item type)
-                if item[0].is_valid():
-                  processed_items.add((item[0].get_id(), item[1]))
-            else:
-              if len(item) == 3:
-                item_type = item[2]
-                item_class_name_and_path = item[:2]
+    self._loaded_items = {}
+    self._not_loaded_items = []
+
+    opened_images = {
+      image.get_file().get_path(): image
+      for image in Gimp.get_images()
+      if image.get_file() is not None and image.get_file().get_path() is not None}
+
+    value = []
+
+    for item_data in raw_value:
+      if isinstance(item_data, int):
+        if Gimp.Item.id_is_valid(item_data):
+          value.append(item_data)
+
+          image = Gimp.Item.get_by_id(item_data).get_image()
+          self._loaded_items[item_data] = image
+      elif isinstance(item_data, (list, tuple)):
+        if len(item_data) == 2:  # (item ID, folder key)
+          if isinstance(item_data[0], int) and isinstance(item_data[1], str):
+            item_id, folder_key = item_data
+            if Gimp.Item.id_is_valid(item_id):
+              value.append((item_id, folder_key))
+
+              image = Gimp.Item.get_by_id(item_id).get_image()
+              self._loaded_items[(item_id, folder_key)] = image
+          else:
+            raise TypeError(f'items with two elements must be (item ID, folder key)')
+        elif len(item_data) == 4:  # (item class name, item path, folder key, image path)
+          if item_data[3] in opened_images:
+            image = opened_images[item_data[3]]
+
+            item_object = pg.pdbutils.get_item_from_image_and_item_path(
+              image, item_data[0], item_data[1])
+            if item_object is not None:
+              if item_data[2] == pg.itemtree.FOLDER_KEY:
+                item_key = (item_object.get_id(), pg.itemtree.FOLDER_KEY)
               else:
-                item_type = None
-                item_class_name_and_path = item
+                item_key = item_object.get_id()
 
-              item_object = pg.pdbutils.get_item_from_image_and_item_path(
-                image, *item_class_name_and_path)
+              value.append(item_key)
 
-              if item_object is not None:
-                if item_type is None:
-                  processed_items.add(item_object.get_id())
-                else:
-                  processed_items.add((item_object.get_id(), item_type))
-          elif isinstance(item, int):
-            if Gimp.Item.id_is_valid(item):
-              processed_items.add(item)
+              self._loaded_items[item_key] = image
           else:
-            if item is not None:
-              processed_items.add(item.get_id())
-        
-        value[image] = processed_items
-    else:
-      value = raw_value
-    
-    return value
-  
-  def _value_to_raw(self, value):
-    raw_value = {}
+            if os.path.isfile(item_data[3]):
+              value.append(item_data)
+              self._not_loaded_items.append(item_data)
+        else:
+          raise ValueError('unsupported format for items')
+      else:
+        raise TypeError(f'unsupported type for items')
 
-    for image, items in value.items():
-      if (image is None
-          or not image.is_valid()
-          or image.get_file() is None or image.get_file().get_path() is None):
+    return value
+
+  def _value_to_raw(self, value):
+    raw_value = []
+
+    for item_key in self._loaded_items:
+      if isinstance(item_key, int):  # item ID
+        item_key_data = [item_key]
+        folder_key = ''
+      else:  # (item ID, folder key)
+        item_key_data = item_key
+        folder_key = pg.itemtree.FOLDER_KEY
+
+      if not Gimp.Item.id_is_valid(item_key_data[0]):
         continue
 
-      image_filepath = image.get_file().get_path()
+      item_as_path = pg.pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_key_data[0]))
+      if item_as_path is not None:
+        item_class_name, item_path, image_filepath = item_as_path
+        raw_value.append([item_class_name, item_path, folder_key, image_filepath])
 
-      raw_value[image_filepath] = []
-
-      for item in items:
-        if isinstance(item, (list, tuple)):
-          if len(item) != 2:
-            raise ValueError(
-              'list-likes representing items must contain exactly 2 elements'
-              f' (has {len(item)})')
-
-          item_id = item[0]
-          item_type = item[1]
-        else:
-          item_id = item
-          item_type = None
-
-        if not Gimp.Item.id_is_valid(item_id):
-          continue
-
-        item_as_path = pg.pdbutils.get_item_as_path(
-          Gimp.Item.get_by_id(item_id), include_image=False)
-
-        if item_as_path is not None:
-          if item_type is None:
-            raw_value[image_filepath].append(item_as_path)
-          else:
-            raw_value[image_filepath].append(item_as_path + [item_type])
+    for item_data in self._not_loaded_items:
+      raw_value.append(list(item_data))
 
     return raw_value
-  
+
   def _validate(self, value):
-    if not isinstance(value, dict):
-      return 'value must be a dictionary', 'value_must_be_dict'
+    if not isinstance(value, (list, tuple)):
+      return 'value must be a list or a tuple', 'value_must_be_list_or_tuple'
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
