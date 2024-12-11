@@ -235,7 +235,7 @@ def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[
     if image_filepath is None:
       return None
 
-    item_as_path.append(image_file.get_path())
+    item_as_path.append(image_filepath)
 
     return item_as_path
   else:
