@@ -150,20 +150,20 @@ class PreviewsController:
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-load',
-      lambda setting: self._name_preview.set_collapsed_items(set(setting.loaded_items)))
+      lambda setting: self._name_preview.set_collapsed_items(set(setting.active_items)))
 
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_collapsed_items(set(setting.loaded_items)))
+      lambda setting: self._name_preview.set_collapsed_items(set(setting.active_items)))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
     self._settings['main/selected_items'].connect_event(
       'after-load',
-      lambda setting: self._name_preview.set_selected_items(setting.loaded_items))
+      lambda setting: self._name_preview.set_selected_items(setting.active_items))
 
     self._settings['main/selected_items'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_selected_items(setting.loaded_items))
+      lambda setting: self._name_preview.set_selected_items(setting.active_items))
   
   def _connect_setting_after_reset_displayed_items_in_image_preview(self):
     def _clear_image_preview(_setting):
@@ -253,7 +253,7 @@ class PreviewsController:
         return None
 
   def _on_name_preview_selection_changed(self, _preview):
-    self._settings['main/selected_items'].set_loaded_items(self._name_preview.selected_items)
+    self._settings['main/selected_items'].set_active_items(self._name_preview.selected_items)
 
     # There could be a rapid sequence of 'preview-selection-changed' signals
     # invoked if a selected item and preceding items are removed from the name
@@ -266,7 +266,7 @@ class PreviewsController:
     )
 
   def _on_name_preview_collapsed_items_changed(self, _preview):
-    self._settings['gui/name_preview_items_collapsed_state'].set_loaded_items(
+    self._settings['gui/name_preview_items_collapsed_state'].set_active_items(
       self._name_preview.collapsed_items)
 
   def _set_initial_selection_and_update_image_preview(self):
@@ -274,12 +274,12 @@ class PreviewsController:
     if self._current_image is not None:
       item_key_to_display = next(
         iter(
-          item_key for item_key, image in displayed_items_setting.loaded_items.items()
+          item_key for item_key, image in displayed_items_setting.active_items.items()
           if image == self._current_image),
         None)
     else:
       item_key_to_display = next(
-        iter(item_key for item_key in displayed_items_setting.loaded_items),
+        iter(item_key for item_key in displayed_items_setting.active_items),
         None,
       )
 
@@ -290,7 +290,7 @@ class PreviewsController:
       selected_layers_in_current_image = []
 
     if (item_key_to_display is None
-        and not self._settings['main/selected_items'].loaded_items
+        and not self._settings['main/selected_items'].active_items
         and selected_layers_in_current_image):
       self._name_preview.set_selected_items(selected_layers_in_current_image)
 
@@ -348,7 +348,7 @@ class PreviewsController:
         self._image_preview.clear()
 
     if self._image_preview.item is not None:
-      self._settings['gui/image_preview_displayed_items'].set_loaded_items(
+      self._settings['gui/image_preview_displayed_items'].set_active_items(
         [self._image_preview.item.key])
     else:
-      self._settings['gui/image_preview_displayed_items'].set_loaded_items([])
+      self._settings['gui/image_preview_displayed_items'].set_active_items([])

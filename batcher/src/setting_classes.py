@@ -1,8 +1,9 @@
 """Additional setting and setting GUI classes specific to the plug-in."""
 
 import collections
+from collections.abc import Iterable
 import os
-from typing import Type
+from typing import Dict, List, Type
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -220,15 +221,8 @@ class ItemTreeItemsSetting(pg.setting.Setting):
   """Class for settings representing `pygimplib.itemtree.Item` instances,
   specifically a list of values of the `pygimplib.itemtree.Item.key` property.
 
-  The `loaded_items` property is a subset of items whose corresponding
-  `Gimp.Image`s are loaded. It is an ordered mapping of ``item key: image``
-  where ``image`` is a `Gimp.Image` instance for
-  `pygimplib.itemtree.GimpItem`s, or ``None`` for all other
-  `pygimplib.itemtree.Item` subclasses. In the latter case, `loaded_items`
-  contains all items as the `value` property in the same order.
-
-  Depending on the `pygimplib.itemtree.Item` subclass, each item is stored in
-  one of the following formats:
+  Depending on the `pygimplib.itemtree.Item` subclass, each item is persistently
+  stored in one of the following formats:
 
   * ``[class name, item path components, folder key, image file path]`` for
     `pygimplib.itemtree.GimpItem`s. The ``class name`` corresponds to one of
@@ -255,23 +249,67 @@ class ItemTreeItemsSetting(pg.setting.Setting):
   def __init__(self, name, **kwargs):
     super().__init__(name, **kwargs)
 
-    self._loaded_items = {}
-    self._not_loaded_items = []
+    self._initial_active_items = {}
+    self._active_items = {}
+    self._inactive_items = []
 
   @property
-  def loaded_items(self):
-    return self._loaded_items
+  def active_items(self) -> Dict:
+    """Subset of items whose corresponding `Gimp.Image`s are loaded.
+
+    It is an ordered mapping of ``item key: image`` where ``image`` is a
+    `Gimp.Image` instance for `pygimplib.itemtree.GimpItem`s, or ``None`` for
+    all other `pygimplib.itemtree.Item` subclasses. In the latter case,
+    `active_items` contains all items as the `value` property in the same
+    order.
+    """
+    return self._active_items
 
   @property
-  def not_loaded_items(self):
-    return self._not_loaded_items
+  def inactive_items(self) -> List:
+    """Subset of items whose corresponding `Gimp.Image`s are not loaded.
+
+    These items are not a part of the `active_items` property, but are included
+    in the `value` property and are stored persistently when the setting is
+    saved.
+    """
+    return self._inactive_items
+
+  def set_active_items(self, item_keys: Iterable):
+    """Sets a new subset of items in the `active_subset` property and adds new
+    items to the `value` property.
+
+    The ``'value-changed'`` event is invoked once all items are set.
+    """
+    self._active_items = {}
+
+    for item_key in item_keys:
+      if isinstance(item_key, int):
+        item_id = item_key
+        processed_item_key = item_key
+      else:
+        item_id = item_key[0]
+        processed_item_key = tuple(item_key)
+
+      if processed_item_key in self._initial_active_items:
+        self._active_items[processed_item_key] = self._initial_active_items[processed_item_key]
+      else:
+        if Gimp.Item.id_is_valid(item_id):
+          self._value.append(processed_item_key)
+
+          image = Gimp.Item.get_by_id(item_id).get_image()
+          self._active_items[processed_item_key] = image
+          self._initial_active_items[processed_item_key] = image
+
+    self.invoke_event('value-changed')
 
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, (list, tuple)):
       return raw_value
 
-    self._loaded_items = {}
-    self._not_loaded_items = []
+    self._initial_active_items = {}
+    self._active_items = {}
+    self._inactive_items = []
 
     opened_images = {
       image.get_file().get_path(): image
@@ -286,7 +324,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
           value.append(item_data)
 
           image = Gimp.Item.get_by_id(item_data).get_image()
-          self._loaded_items[item_data] = image
+          self._active_items[item_data] = image
       elif isinstance(item_data, (list, tuple)):
         if len(item_data) == 2:  # (item ID, folder key)
           if isinstance(item_data[0], int) and isinstance(item_data[1], str):
@@ -295,7 +333,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
               value.append((item_id, folder_key))
 
               image = Gimp.Item.get_by_id(item_id).get_image()
-              self._loaded_items[(item_id, folder_key)] = image
+              self._active_items[(item_id, folder_key)] = image
           else:
             raise TypeError(f'items with two elements must be (item ID, folder key)')
         elif len(item_data) == 4:  # (item class name, item path, folder key, image path)
@@ -312,22 +350,24 @@ class ItemTreeItemsSetting(pg.setting.Setting):
 
               value.append(item_key)
 
-              self._loaded_items[item_key] = image
+              self._active_items[item_key] = image
           else:
             if os.path.isfile(item_data[3]):
               value.append(item_data)
-              self._not_loaded_items.append(item_data)
+              self._inactive_items.append(item_data)
         else:
           raise ValueError('unsupported format for items')
       else:
         raise TypeError(f'unsupported type for items')
+
+    self._initial_active_items = dict(self._active_items)
 
     return value
 
   def _value_to_raw(self, value):
     raw_value = []
 
-    for item_key in self._loaded_items:
+    for item_key in self._active_items:
       if isinstance(item_key, int):  # item ID
         item_key_data = [item_key]
         folder_key = ''
@@ -343,7 +383,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
         item_class_name, item_path, image_filepath = item_as_path
         raw_value.append([item_class_name, item_path, folder_key, image_filepath])
 
-    for item_data in self._not_loaded_items:
+    for item_data in self._inactive_items:
       raw_value.append(list(item_data))
 
     return raw_value
