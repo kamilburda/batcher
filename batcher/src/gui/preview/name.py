@@ -72,13 +72,16 @@ class NamePreview(preview_base_.Preview):
         batcher,
         settings,
         collapsed_items=None,
-        selected_items=None):
+        selected_items=None,
+        initial_cursor_item=None,
+  ):
     super().__init__()
     
     self._batcher = batcher
     self._settings = settings
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
+    self._initial_cursor_item = initial_cursor_item
 
     self._tagged_items = set()
     
@@ -626,13 +629,22 @@ class NamePreview(preview_base_.Preview):
         self._tree_view.get_selection().select_iter(tree_iter)
 
     if self._selected_items:
-      first_selected_tree_iter = self._tree_iters[self._selected_items[0]]
-      if first_selected_tree_iter is not None:
-        first_selected_tree_path = self._tree_model.get_path(first_selected_tree_iter)
-        if first_selected_tree_path is not None:
-          tree_path_with_cursor = self._set_cursor_to_item_if_not_set(first_selected_tree_path)
-          self._scroll_to_cursor(tree_path_with_cursor)
-    
+      if self._initial_cursor_item is None:
+        first_selected_tree_iter = self._tree_iters.get(self._selected_items[0], None)
+        if first_selected_tree_iter is not None:
+          first_selected_tree_path = self._tree_model.get_path(first_selected_tree_iter)
+          if first_selected_tree_path is not None:
+            tree_path_with_cursor = self._set_cursor_to_item_if_not_set(first_selected_tree_path)
+            self._scroll_to_cursor(tree_path_with_cursor)
+      else:
+        tree_iter = self._tree_iters.get(self._initial_cursor_item, None)
+        if tree_iter is not None:
+          tree_path = self._tree_model.get_path(tree_iter)
+          if tree_path is not None:
+            tree_path_with_cursor = self._set_cursor_to_item_if_not_set(tree_path)
+            self._scroll_to_cursor(tree_path_with_cursor)
+        self._initial_cursor_item = None
+
     self._row_select_interactive = True
 
   def _set_cursor_to_item_if_not_set(self, tree_path):

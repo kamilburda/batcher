@@ -348,7 +348,6 @@ class PreviewsController:
         self._image_preview.clear()
 
     if self._image_preview.item is not None:
-      self._settings['gui/image_preview_displayed_items'].set_active_items(
-        [self._image_preview.item.key])
+      self._settings['gui/image_preview_displayed_items'].set_value([self._image_preview.item.key])
     else:
-      self._settings['gui/image_preview_displayed_items'].set_active_items([])
+      self._settings['gui/image_preview_displayed_items'].set_value([])
