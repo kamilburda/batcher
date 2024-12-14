@@ -307,60 +307,6 @@ class Item(metaclass=abc.ABCMeta):
     pass
 
 
-class GimpItem(Item):
-  """`Item` subclass for a `Gimp.Item` object."""
-
-  @property
-  def raw(self) -> Gimp.Item:
-    """Underlying `Gimp.Item` object wrapped by this instance."""
-    return self._object
-
-  @property
-  def id(self) -> int:
-    """Numeric identifier used to uniquely identify the underlying GIMP object.
-
-    This property is guaranteed to be unchanged for this `Item` instance.
-    """
-    return self._id
-
-  def _list_child_objects(self) -> List[Gimp.Item]:
-    return self.raw.get_children()
-
-  def _get_name_from_object(self) -> str:
-    return self._object.get_name()
-
-  def _get_id_from_object(self) -> int:
-    return self._object.get_id()
-
-
-class GimpImageItem(Item):
-  """`Item` subclass for a `Gimp.Image` object."""
-
-  @property
-  def raw(self) -> Gimp.Image:
-    """Underlying `Gimp.Image` object wrapped by this instance."""
-    return self._object
-
-  @property
-  def id(self) -> int:
-    """Numeric identifier used to uniquely identify the underlying GIMP object.
-
-    This property is guaranteed to be unchanged for this `Item` instance.
-    """
-    return self._id
-
-  def _get_name_from_object(self) -> str:
-    return self._object.get_name()
-
-  def _get_id_from_object(self) -> int:
-    return self._object.get_id()
-
-  def _list_child_objects(self) -> List:
-    # We cannot decide on which type of children (layers, channels, etc.) to
-    # list, so we return an empty list.
-    return []
-
-
 class ImageFileItem(Item):
   """`Item` subclass for an image file.
 
@@ -413,6 +359,60 @@ class ImageFileItem(Item):
 
   def _get_id_from_object(self) -> int:
     return self._object
+
+
+class GimpItem(Item):
+  """`Item` subclass for a `Gimp.Item` object."""
+
+  @property
+  def raw(self) -> Gimp.Item:
+    """Underlying `Gimp.Item` object wrapped by this instance."""
+    return self._object
+
+  @property
+  def id(self) -> int:
+    """Numeric identifier used to uniquely identify the underlying GIMP object.
+
+    This property is guaranteed to be unchanged for this `Item` instance.
+    """
+    return self._id
+
+  def _list_child_objects(self) -> List[Gimp.Item]:
+    return self.raw.get_children()
+
+  def _get_name_from_object(self) -> str:
+    return self._object.get_name()
+
+  def _get_id_from_object(self) -> int:
+    return self._object.get_id()
+
+
+class GimpImageItem(Item):
+  """`Item` subclass for a `Gimp.Image` object."""
+
+  @property
+  def raw(self) -> Gimp.Image:
+    """Underlying `Gimp.Image` object wrapped by this instance."""
+    return self._object
+
+  @property
+  def id(self) -> int:
+    """Numeric identifier used to uniquely identify the underlying GIMP object.
+
+    This property is guaranteed to be unchanged for this `Item` instance.
+    """
+    return self._id
+
+  def _get_name_from_object(self) -> str:
+    return self._object.get_name()
+
+  def _get_id_from_object(self) -> int:
+    return self._object.get_id()
+
+  def _list_child_objects(self) -> List:
+    # We cannot decide on which type of children (layers, channels, etc.) to
+    # list, so we return an empty list.
+    return []
 
 
 class ItemTree(metaclass=abc.ABCMeta):
