@@ -1730,13 +1730,13 @@ class GimpItemSetting(Setting):
   """Abstract class for settings storing GIMP items - layers, channels, paths.
   
   This class accepts as a value one of the following:
-  * a tuple (image file path, item type, item path components) where item
+  * a tuple (item type, item path components, image file path) where item
     type is the name of the item's GIMP class (e.g. ``'Layer'``).
   * a tuple (item type, item ID). Item ID is are assigned by GIMP.
   * a `Gimp.Item` instance.
 
-  If calling `to_dict()`, a tuple (image file path, item type, item path
-  components) is returned.
+  If calling `to_dict()`, a tuple (item path components, item type,
+  image file path) is returned.
   """
   
   _ABSTRACT = True
