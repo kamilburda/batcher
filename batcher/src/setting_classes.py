@@ -264,8 +264,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
     """Subset of items that are not loaded.
 
     Items not loaded represent items whose corresponding `Gimp.Image`s are not
-    loaded. This only holds for the `GimpItemTreeItemsSetting` subclass. For
-    all other subclasses of `ItemTreeItemsSetting`, this property is empty.
+    loaded, but exist in the file system.
 
     These items are not a part of the `active_items` property, but are included
     in the `value` property and are stored persistently when the setting is
@@ -347,11 +346,6 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
   is either ``''`` or `pygimplib.itemtree.FOLDER_KEY`, signifying that an
   item is either a regular item or a folder, respectively. ``image file
   path`` is a file path to the image containing the corresponding item.
-
-  * ``[class name, image file path]`` for `pygimplib.itemtree.GimpImageItem`s.
-    ``class name`` is ``'Image'``.
-  * ``[class name, file path, folder key]`` for
-    `pygimplib.itemtree.GimpImageItem`s. ``class name`` is ``'str'``.
   """
 
   def _do_set_active_items(self, item_keys: Iterable):
@@ -398,7 +392,7 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
               image = Gimp.Item.get_by_id(item_id).get_image()
               self._active_items[(item_id, folder_key)] = image
           else:
-            raise TypeError(f'items with two elements must be (item ID, folder key)')
+            raise TypeError('items with two elements must be (item ID, folder key)')
         elif len(item_data) == 4:  # (item class name, item path, folder key, image path)
           if item_data[3] in opened_images:
             image = opened_images[item_data[3]]
@@ -419,9 +413,9 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
               value.append(item_data)
               self._inactive_items.append(item_data)
         else:
-          raise ValueError('unsupported format for items')
+          raise ValueError('unsupported format for GIMP items')
       else:
-        raise TypeError(f'unsupported type for items')
+        raise TypeError('unsupported type for GIMP items')
 
     return value
 
@@ -442,6 +436,72 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
       return [item_class_name, item_path_components, folder_key, image_filepath]
 
     return None
+
+
+class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
+  """Class for settings representing `pygimplib.itemtree.GimpImageItem`
+  instances.
+
+  The persistent format for each item for settings of this subclass is simply
+  ``image file path``, representing a file path to the image.
+  """
+
+  def _do_set_active_items(self, item_keys: Iterable):
+    for item_id in item_keys:
+      if item_id in self._initial_active_items:
+        self._active_items[item_id] = self._initial_active_items[item_id]
+      else:
+        if Gimp.Image.id_is_valid(item_id):
+          self._value.append(item_id)
+          self._active_items[item_id] = None
+          self._initial_active_items[item_id] = None
+
+  def _fill_value_active_inactive_items(self, raw_value):
+    value = []
+
+    opened_images = {
+      image.get_file().get_path(): image
+      for image in Gimp.get_images()
+      if image.get_file() is not None and image.get_file().get_path() is not None}
+
+    for item_data in raw_value:
+      if isinstance(item_data, int):
+        if Gimp.Image.id_is_valid(item_data):
+          value.append(item_data)
+          self._active_items[item_data] = None
+      elif isinstance(item_data, str):
+        if item_data in opened_images:
+          image = opened_images[item_data]
+          image_id = image.get_id()
+
+          value.append(image_id)
+          self._active_items[image_id] = None
+        else:
+          if os.path.isfile(item_data):
+            value.append(item_data)
+            self._inactive_items.append(item_data)
+      else:
+        raise TypeError('unsupported type for GIMP images')
+
+    return value
+
+  def _active_item_to_raw(self, item_key):
+    if not Gimp.Image.id_is_valid(item_key):
+      return None
+
+    image = Gimp.Image.get_by_id(item_key)
+    if image is None or not image.is_valid():
+      return None
+
+    image_file = image.get_file()
+    if image_file is None:
+      return None
+
+    image_filepath = image_file.get_path()
+    if image_filepath is None:
+      return None
+
+    return image_filepath
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):

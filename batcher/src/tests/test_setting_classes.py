@@ -294,14 +294,14 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
       (items[4].id_, 'folder'),
     ]
 
-    expected_value_and_active_items = {
+    expected_active_items = {
       items[1].id_: images[0],
       items[3].id_: images[1],
       (items[4].id_, 'folder'): images[1],
     }
 
     self.assertEqual(self.setting.value, expected_value)
-    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+    self.assertEqual(self.setting.active_items, expected_active_items)
 
   def test_set_active_items_multiple_times_with_different_subsets(self, gimp_module_stub):
     images, items = _get_images_and_items()
@@ -337,14 +337,14 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
       (items[4].id_, 'folder'),
     ]
 
-    expected_value_and_active_items = {
+    expected_active_items = {
       items[0].id_: images[0],
       (items[2].id_, 'folder'): images[0],
       items[3].id_: images[1],
     }
 
     self.assertEqual(self.setting.value, expected_value)
-    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+    self.assertEqual(self.setting.active_items, expected_active_items)
 
   def test_set_active_items_new_items_are_added_to_value(self, gimp_module_stub):
     images, items = _get_images_and_items()
@@ -369,13 +369,13 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
       items[3].id_,
     ]
 
-    expected_value_and_active_items = {
+    expected_active_items = {
       items[1].id_: images[0],
       items[3].id_: images[1],
     }
 
     self.assertEqual(self.setting.value, expected_value)
-    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+    self.assertEqual(self.setting.active_items, expected_active_items)
 
   @mock.patch('src.setting_classes.os.path.isfile')
   def test_set_active_items_inactive_items_are_kept_intact(self, mock_isfile, gimp_module_stub):
@@ -418,13 +418,13 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     ]
     expected_value.extend(expected_inactive_items)
 
-    expected_value_and_active_items = {
+    expected_active_items = {
       items[0].id_: images[0],
       (items[2].id_, 'folder'): images[0],
     }
 
     self.assertEqual(self.setting.value, expected_value)
-    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+    self.assertEqual(self.setting.active_items, expected_active_items)
     self.assertEqual(self.setting.inactive_items, expected_inactive_items)
 
   def test_to_dict(self, gimp_module_stub):
@@ -497,6 +497,236 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
         ['GroupLayer', ['item_6'], 'folder', image_2_filepath],
         ['GroupLayer', ['item_7'], 'folder', image_2_filepath],
         ['Layer', ['item_8'], '', image_2_filepath],
+      ],
+    }
+
+    self.assertEqual(self.setting.to_dict(), expected_dict)
+
+
+@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+class TestGimpImageTreeItemsSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = setting_classes.GimpImageTreeItemsSetting('selected_items')
+
+    self.images = [
+      stubs_gimp.Image(filepath='filename_1'),
+      stubs_gimp.Image(filepath='filename_2'),
+    ]
+
+    self.maxDiff = None
+
+  def test_set_value_from_ids(self, gimp_module_stub):
+    gimp_module_stub.get_images = lambda: self.images
+
+    self.setting.set_value([
+      self.images[0].id_,
+      self.images[1].id_,
+      -10,
+    ])
+
+    expected_value_and_active_items = {
+      self.images[0].id_: None,
+      self.images[1].id_: None,
+    }
+
+    expected_value = list(expected_value_and_active_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_set_value_from_paths(self, mock_isfile, gimp_module_stub):
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+    image_3_filepath = os.path.abspath('filename_3')
+    image_4_filepath = os.path.abspath('filename_4')
+
+    self.images[1].set_file(None)
+
+    gimp_module_stub.get_images = lambda: self.images
+    mock_isfile.side_effect = [True, True, False]
+
+    self.setting.set_value([
+      image_1_filepath,
+      image_2_filepath,
+      image_3_filepath,
+      image_4_filepath,
+    ])
+
+    expected_inactive_items = [
+      image_2_filepath,
+      image_3_filepath,
+    ]
+
+    expected_active_items = {
+      self.images[0].id_: None,
+    }
+
+    expected_value = [
+      self.images[0].id_,
+    ]
+    expected_value.extend(expected_inactive_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+    self.assertEqual(self.setting.inactive_items, expected_inactive_items)
+
+  def test_set_active_items(self, gimp_module_stub):
+    gimp_module_stub.get_images = lambda: self.images
+
+    self.setting.set_value([
+      self.images[0].id_,
+      self.images[1].id_,
+    ])
+
+    self.setting.set_active_items([
+      self.images[1].id_,
+      -14,
+    ])
+
+    expected_value = [
+      self.images[0].id_,
+      self.images[1].id_,
+    ]
+
+    expected_active_items = {
+      self.images[1].id_: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+
+  def test_set_active_items_multiple_times_with_different_subsets(self, gimp_module_stub):
+    gimp_module_stub.get_images = lambda: self.images
+
+    self.setting.set_value([
+      self.images[0].id_,
+      self.images[1].id_,
+    ])
+
+    self.setting.set_active_items([
+      self.images[1].id_,
+      -14,
+    ])
+
+    self.setting.set_active_items([
+      self.images[0].id_,
+    ])
+
+    expected_value = [
+      self.images[0].id_,
+      self.images[1].id_,
+    ]
+
+    expected_active_items = {
+      self.images[0].id_: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+
+  def test_set_active_items_new_items_are_added_to_value(self, gimp_module_stub):
+    gimp_module_stub.get_images = lambda: self.images
+
+    self.setting.set_value([
+      self.images[1].id_,
+    ])
+
+    self.setting.set_active_items([
+      self.images[0].id_,
+    ])
+
+    expected_value = [
+      self.images[1].id_,
+      self.images[0].id_,
+    ]
+
+    expected_active_items = {
+      self.images[0].id_: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_set_active_items_inactive_items_are_kept_intact(self, mock_isfile, gimp_module_stub):
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+
+    self.images[1].set_file(None)
+
+    gimp_module_stub.get_images = lambda: self.images
+
+    mock_isfile.side_effect = [True]
+
+    self.setting.set_value([
+      image_1_filepath,
+      image_2_filepath,
+    ])
+
+    self.setting.set_active_items([
+      self.images[0].id_,
+    ])
+
+    expected_inactive_items = [
+      image_2_filepath,
+    ]
+
+    expected_value = [
+      self.images[0].id_,
+    ]
+    expected_value.extend(expected_inactive_items)
+
+    expected_active_items = {
+      self.images[0].id_: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+    self.assertEqual(self.setting.inactive_items, expected_inactive_items)
+
+  def test_to_dict(self, gimp_module_stub):
+    image_1_filepath = os.path.abspath('filename_1')
+    image_2_filepath = os.path.abspath('filename_2')
+
+    gimp_module_stub.get_images = lambda: self.images
+
+    self.setting.set_value([
+      self.images[0].id_,
+      self.images[1].id_,
+    ])
+
+    expected_dict = {
+      'name': 'selected_items',
+      'type': 'gimp_image_tree_items',
+      'value': [
+        image_1_filepath,
+        image_2_filepath,
+      ],
+    }
+
+    self.assertEqual(self.setting.to_dict(), expected_dict)
+
+  @mock.patch('src.setting_classes.os.path.isfile')
+  def test_to_dict_with_image_without_filepath(self, mock_isfile, gimp_module_stub):
+    image_1_filepath = os.path.abspath('filename_1')
+
+    self.images[1].set_file(None)
+
+    gimp_module_stub.get_images = lambda: self.images
+    mock_isfile.side_effect = [True]
+
+    self.setting.set_value([
+      self.images[0].id_,
+      self.images[1].id_,
+    ])
+
+    expected_dict = {
+      'name': 'selected_items',
+      'type': 'gimp_image_tree_items',
+      'value': [
+        image_1_filepath,
       ],
     }
 
