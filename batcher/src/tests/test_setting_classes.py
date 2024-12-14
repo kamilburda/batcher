@@ -61,10 +61,10 @@ class TestFileExtensionSetting(unittest.TestCase):
 
 
 @mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-class TestItemTreeItemsSetting(unittest.TestCase):
+class TestGimpItemTreeItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.ItemTreeItemsSetting('selected_items')
+    self.setting = setting_classes.GimpItemTreeItemsSetting('selected_items')
 
     self.maxDiff = None
 
@@ -449,7 +449,7 @@ class TestItemTreeItemsSetting(unittest.TestCase):
 
     expected_dict = {
       'name': 'selected_items',
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'value': [
         ['Layer', ['item_1'], '', image_1_filepath],
         ['Layer', ['item_4', 'item_3'], '', image_1_filepath],
@@ -488,7 +488,7 @@ class TestItemTreeItemsSetting(unittest.TestCase):
 
     expected_dict = {
       'name': 'selected_items',
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'value': [
         ['Layer', ['item_1'], '', image_1_filepath],
         ['Layer', ['item_4', 'item_3'], '', image_1_filepath],

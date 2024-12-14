@@ -940,8 +940,10 @@ def _update_to_1_0(data, _settings, source_names):
   gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
 
   if gui_settings_list is not None:
-    _update_items_setting_for_1_0(gui_settings_list, 'image_preview_displayed_items')
-    _update_items_setting_for_1_0(gui_settings_list, 'name_preview_items_collapsed_state')
+    _update_items_setting_for_1_0(
+      gui_settings_list, 'image_preview_displayed_items', 'gimp_item_tree_items')
+    _update_items_setting_for_1_0(
+      gui_settings_list, 'name_preview_items_collapsed_state', 'gimp_item_tree_items')
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
@@ -952,7 +954,7 @@ def _update_to_1_0(data, _settings, source_names):
     _remove_setting(main_settings_list, 'selected_items')
     _rename_setting(main_settings_list, 'selected_layers', 'selected_items')
 
-    _update_items_setting_for_1_0(main_settings_list, 'selected_items')
+    _update_items_setting_for_1_0(main_settings_list, 'selected_items', 'gimp_item_tree_items')
 
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
@@ -978,8 +980,10 @@ def _update_to_1_0(data, _settings, source_names):
       _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
 
 
-def _update_items_setting_for_1_0(settings_list, setting_name):
+def _update_items_setting_for_1_0(settings_list, setting_name, new_type_name):
   setting_dict, _index = _get_child_setting(settings_list, setting_name)
+
+  setting_dict['type'] = new_type_name
 
   setting_dict.pop('default_value', None)
 

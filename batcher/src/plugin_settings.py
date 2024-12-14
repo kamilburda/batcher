@@ -191,7 +191,7 @@ def create_settings_for_export_layers():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'name': 'selected_items',
       'display_name': _('Selected layers'),
       'pdb_type': None,
@@ -322,7 +322,7 @@ def create_settings_for_edit_layers():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'name': 'selected_items',
       'display_name': _('Selected layers'),
       'pdb_type': None,
@@ -492,11 +492,11 @@ def _create_gui_settings():
       'gui_type': None,
     },
     {
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'name': 'name_preview_items_collapsed_state',
     },
     {
-      'type': 'item_tree_items',
+      'type': 'gimp_item_tree_items',
       'name': 'image_preview_displayed_items',
     },
     procedure_browser_settings,

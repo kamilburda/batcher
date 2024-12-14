@@ -1,5 +1,6 @@
 """Additional setting and setting GUI classes specific to the plug-in."""
 
+import abc
 import collections
 from collections.abc import Iterable
 import os
@@ -218,28 +219,19 @@ class NamePatternSetting(pg.setting.StringSetting):
 
 
 class ItemTreeItemsSetting(pg.setting.Setting):
-  """Class for settings representing `pygimplib.itemtree.Item` instances,
-  specifically a list of values of the `pygimplib.itemtree.Item.key` property.
+  """Abstract class for settings representing `pygimplib.itemtree.Item`
+  instances, specifically a list of values of the
+  `pygimplib.itemtree.Item.key` property.
 
-  Depending on the `pygimplib.itemtree.Item` subclass, each item is persistently
-  stored in one of the following formats:
-
-  * ``[class name, item path components, folder key, image file path]`` for
-    `pygimplib.itemtree.GimpItem`s. The ``class name`` corresponds to one of
-    the GIMP item classes, e.g. ``'Layer'`` or ``'Channel'``. ``item path
-    components`` is a list of path components from the topmost parent to the
-    item itself.
-  * ``[class name, image file path]`` for `pygimplib.itemtree.GimpImageItem`s.
-    ``class name`` is ``'Image'``.
-  * ``[class name, file path, folder key]`` for
-    `pygimplib.itemtree.GimpImageItem`s. ``class name`` is ``'str'``.
-
-  ``folder key`` is either ``''`` or `pygimplib.itemtree.FOLDER_KEY`,
-  signifying that an item is either a regular item or a folder, respectively.
+  The persistent format of settings of this class depends on the subclass of
+  `ItemTreeItemsSetting`. For more information, see the documentation for the
+  subclasses.
 
   Default value: `[]`
   """
-  
+
+  _ABSTRACT = True
+
   _ALLOWED_PDB_TYPES = []
 
   _ALLOWED_GUI_TYPES = []
@@ -259,17 +251,21 @@ class ItemTreeItemsSetting(pg.setting.Setting):
   def active_items(self) -> Dict:
     """Subset of items whose corresponding `Gimp.Image`s are loaded.
 
-    It is an ordered mapping of ``item key: image`` where ``image`` is a
-    `Gimp.Image` instance for `pygimplib.itemtree.GimpItem`s, or ``None`` for
-    all other `pygimplib.itemtree.Item` subclasses. In the latter case,
-    `active_items` contains all items as the `value` property in the same
-    order.
+    It is an ordered mapping of ``item key: image``. ``image`` is an existing
+    `Gimp.Image` instance for the `GimpItemTreeItemsSetting` subclass,
+    or ``None`` for all other subclasses of `ItemTreeItemsSetting`. In the
+    latter case, `active_items` contains all items as the `value` property in
+    the same order.
     """
     return self._active_items
 
   @property
   def inactive_items(self) -> List:
-    """Subset of items whose corresponding `Gimp.Image`s are not loaded.
+    """Subset of items that are not loaded.
+
+    Items not loaded represent items whose corresponding `Gimp.Image`s are not
+    loaded. This only holds for the `GimpItemTreeItemsSetting` subclass. For
+    all other subclasses of `ItemTreeItemsSetting`, this property is empty.
 
     These items are not a part of the `active_items` property, but are included
     in the `value` property and are stored persistently when the setting is
@@ -285,6 +281,80 @@ class ItemTreeItemsSetting(pg.setting.Setting):
     """
     self._active_items = {}
 
+    self._do_set_active_items(item_keys)
+
+    self.invoke_event('value-changed')
+
+  @abc.abstractmethod
+  def _do_set_active_items(self, item_keys: Iterable):
+    pass
+
+  def _raw_to_value(self, raw_value):
+    if not isinstance(raw_value, (list, tuple)):
+      return raw_value
+
+    self._initial_active_items = {}
+    self._active_items = {}
+    self._inactive_items = []
+
+    value = self._fill_value_active_inactive_items(raw_value)
+
+    self._initial_active_items = dict(self._active_items)
+
+    return value
+
+  @abc.abstractmethod
+  def _fill_value_active_inactive_items(self, raw_value):
+    pass
+
+  def _value_to_raw(self, value):
+    raw_value = []
+
+    for item_key in self._active_items:
+      item_as_raw = self._active_item_to_raw(item_key)
+      if item_as_raw is not None:
+        raw_value.append(item_as_raw)
+
+    for item_data in self._inactive_items:
+      raw_value.append(list(item_data))
+
+    return raw_value
+
+  @abc.abstractmethod
+  def _active_item_to_raw(self, item_key):
+    pass
+
+  def _validate(self, value):
+    if not isinstance(value, (list, tuple)):
+      return 'value must be a list or a tuple', 'value_must_be_list_or_tuple'
+
+  def _on_before_reset(self, _setting):
+    self._initial_active_items = {}
+    self._active_items = {}
+    self._inactive_items = []
+
+
+class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
+  """Class for settings representing `pygimplib.itemtree.GimpItem` instances.
+
+  The persistent format for each item for settings of this subclass is the
+  following:
+  ``[class name, item path components, folder key, image file path]``.
+
+  The ``class name`` corresponds to one of the GIMP item classes,
+  e.g. ``'Layer'`` or ``'Channel'``. ``item path components`` is a list of
+  path components from the topmost parent to the item itself. ``folder key``
+  is either ``''`` or `pygimplib.itemtree.FOLDER_KEY`, signifying that an
+  item is either a regular item or a folder, respectively. ``image file
+  path`` is a file path to the image containing the corresponding item.
+
+  * ``[class name, image file path]`` for `pygimplib.itemtree.GimpImageItem`s.
+    ``class name`` is ``'Image'``.
+  * ``[class name, file path, folder key]`` for
+    `pygimplib.itemtree.GimpImageItem`s. ``class name`` is ``'str'``.
+  """
+
+  def _do_set_active_items(self, item_keys: Iterable):
     for item_key in item_keys:
       if isinstance(item_key, int):
         item_id = item_key
@@ -303,22 +373,13 @@ class ItemTreeItemsSetting(pg.setting.Setting):
           self._active_items[processed_item_key] = image
           self._initial_active_items[processed_item_key] = image
 
-    self.invoke_event('value-changed')
-
-  def _raw_to_value(self, raw_value):
-    if not isinstance(raw_value, (list, tuple)):
-      return raw_value
-
-    self._initial_active_items = {}
-    self._active_items = {}
-    self._inactive_items = []
+  def _fill_value_active_inactive_items(self, raw_value):
+    value = []
 
     opened_images = {
       image.get_file().get_path(): image
       for image in Gimp.get_images()
       if image.get_file() is not None and image.get_file().get_path() is not None}
-
-    value = []
 
     for item_data in raw_value:
       if isinstance(item_data, int):
@@ -362,42 +423,25 @@ class ItemTreeItemsSetting(pg.setting.Setting):
       else:
         raise TypeError(f'unsupported type for items')
 
-    self._initial_active_items = dict(self._active_items)
-
     return value
 
-  def _value_to_raw(self, value):
-    raw_value = []
+  def _active_item_to_raw(self, item_key):
+    if isinstance(item_key, int):  # item ID
+      item_id = item_key
+      folder_key = ''
+    else:  # (item ID, folder key)
+      item_id = item_key[0]
+      folder_key = pg.itemtree.FOLDER_KEY
 
-    for item_key in self._active_items:
-      if isinstance(item_key, int):  # item ID
-        item_key_data = [item_key]
-        folder_key = ''
-      else:  # (item ID, folder key)
-        item_key_data = item_key
-        folder_key = pg.itemtree.FOLDER_KEY
+    if not Gimp.Item.id_is_valid(item_id):
+      return None
 
-      if not Gimp.Item.id_is_valid(item_key_data[0]):
-        continue
+    item_as_path = pg.pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_id))
+    if item_as_path is not None:
+      item_class_name, item_path_components, image_filepath = item_as_path
+      return [item_class_name, item_path_components, folder_key, image_filepath]
 
-      item_as_path = pg.pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_key_data[0]))
-      if item_as_path is not None:
-        item_class_name, item_path_components, image_filepath = item_as_path
-        raw_value.append([item_class_name, item_path_components, folder_key, image_filepath])
-
-    for item_data in self._inactive_items:
-      raw_value.append(list(item_data))
-
-    return raw_value
-
-  def _validate(self, value):
-    if not isinstance(value, (list, tuple)):
-      return 'value must be a list or a tuple', 'value_must_be_list_or_tuple'
-
-  def _on_before_reset(self, _setting):
-    self._initial_active_items = {}
-    self._active_items = {}
-    self._inactive_items = []
+    return None
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
