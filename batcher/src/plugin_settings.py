@@ -1,7 +1,5 @@
 """Plug-in settings."""
 
-import collections
-
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp

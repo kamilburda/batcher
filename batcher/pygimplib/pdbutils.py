@@ -13,8 +13,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-from . import constants as pgconstants
-
 
 def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
   """Duplicates an image without layers, channels or paths (keeping only
