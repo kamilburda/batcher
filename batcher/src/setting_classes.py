@@ -253,6 +253,8 @@ class ItemTreeItemsSetting(pg.setting.Setting):
     self._active_items = {}
     self._inactive_items = []
 
+    self.connect_event('before-reset', self._on_before_reset)
+
   @property
   def active_items(self) -> Dict:
     """Subset of items whose corresponding `Gimp.Image`s are loaded.
@@ -391,6 +393,11 @@ class ItemTreeItemsSetting(pg.setting.Setting):
   def _validate(self, value):
     if not isinstance(value, (list, tuple)):
       return 'value must be a list or a tuple', 'value_must_be_list_or_tuple'
+
+  def _on_before_reset(self, _setting):
+    self._initial_active_items = {}
+    self._active_items = {}
+    self._inactive_items = []
 
 
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
