@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import contextlib
 import inspect
 import os
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -139,20 +139,19 @@ def find_image_by_filepath(image_filepath: str, index: int = 0) -> Union[Gimp.Im
 
 
 def get_item_from_image_and_item_path(
-      image: Gimp.Image, item_class_name: str, item_path: str,
+      item_class_name: str, item_path_components: Union[List[str], Tuple[str]], image: Gimp.Image,
 ) -> Union[Gimp.Item, None]:
-  """Returns a `Gimp.Item` given the image, item class name and item path.
+  """Returns a `Gimp.Item` given the item class name, item path components and
+  an image.
   
   ``item_class_name`` corresponds to one of the GIMP item classes, e.g.
   ``'Layer'`` or ``'Channel'``.
   
-  ``item_path`` consists of the item name and all of its parent group layers,
-  separated by ``'/'``. For example, if the item name is``' 'Left''`` its
+  ``item_path_components`` is a list-like of names of the item's parent's names
+  and the item itself. For example, if the item name is``' 'Left''`` its
   parent groups are ``'Hands'`` (immediate parent) and ``'Body'`` (parent of
-  ``'Hands'``), then the item path is ``'Body/Hands/Left'``.
+  ``'Hands'``), then the item path is ``['Body', 'Hands', 'Left']``.
   """
-  item_path_components = item_path.split(pgconstants.GIMP_ITEM_PATH_SEPARATOR)
-  
   if len(item_path_components) < 1:
     return None
   
@@ -205,22 +204,21 @@ def _get_children_from_image(image, item_class_name):
 
 def get_item_as_path(item: Gimp.Item, include_image: bool = True) -> Union[List[str], None]:
   """Returns a `Gimp.Item` instance as a list of
-  ``[item class name, item path]`` or
-  ``[item class name, item path, image file path]``.
+  ``[item class name, item path components]`` or
+  ``[item class name, item path components, image file path]``.
   
-  Item class name and item path are described in
+  Item class name and item path components are described in
   `get_item_from_image_and_item_path()`.
   """
   if item is None:
     return None
-  
+
   item_as_path = [type(item).__name__]
 
   parents = _get_item_parents(item)
-  item_path = pgconstants.GIMP_ITEM_PATH_SEPARATOR.join(
-    parent_or_item.get_name() for parent_or_item in parents + [item])
+  item_path_components = [parent_or_item.get_name() for parent_or_item in parents + [item]]
 
-  item_as_path.append(item_path)
+  item_as_path.append(item_path_components)
 
   if include_image:
     image = item.get_image()

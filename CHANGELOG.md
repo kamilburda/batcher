@@ -18,6 +18,7 @@ Bug fixes:
 * Fixed occasional incorrect names in the preview under the image thumbnail.
 * Fixed the `Rename` procedure renaming folders after items if `Rename folders` is enabled.
 * Fixed the `Rename` procedure assigning incorrect descending numbers if `Rename folders` is enabled.
+* Fixed loading settings related to layers (e.g. layers selected in the preview) whose names contain `/`.
 
 
 ## 0.7

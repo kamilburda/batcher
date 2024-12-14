@@ -108,15 +108,15 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     gimp_module_stub.get_images = lambda: images
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
-      ('Layer', 'item_9', '', image_3_filepath),
-      ('Layer', 'item_10', '', image_3_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
+      ('Layer', ['item_9'], '', image_3_filepath),
+      ('Layer', ['item_10'], '', image_3_filepath),
     ])
 
     expected_value_and_active_items = {
@@ -147,22 +147,22 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [True, True, True, True, False, False]
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
-      ('Layer', 'item_9', '', image_3_filepath),
-      ('Layer', 'item_10', '', image_3_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
+      ('Layer', ['item_9'], '', image_3_filepath),
+      ('Layer', ['item_10'], '', image_3_filepath),
     ])
 
     expected_inactive_items = [
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
     ]
 
     expected_active_items = {
@@ -195,15 +195,15 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [False, False]
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
-      ('Layer', 'item_9', '', image_3_filepath),
-      ('Layer', 'item_10', '', image_3_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
+      ('Layer', ['item_9'], '', image_3_filepath),
+      ('Layer', ['item_10'], '', image_3_filepath),
     ])
 
     self.assertEqual(self.setting.inactive_items, [])
@@ -213,22 +213,22 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [True, True, True, True, False, False]
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
-      ('Layer', 'item_9', '', image_3_filepath),
-      ('Layer', 'item_10', '', image_3_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
+      ('Layer', ['item_9'], '', image_3_filepath),
+      ('Layer', ['item_10'], '', image_3_filepath),
     ])
 
     expected_inactive_items = [
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
     ]
 
     expected_active_items = {
@@ -391,13 +391,13 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [True, True, True, False, False, False, False]
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
     ])
 
     self.setting.set_active_items([
@@ -406,9 +406,9 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     ])
 
     expected_inactive_items = [
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
     ]
 
     expected_value = [
@@ -451,11 +451,11 @@ class TestItemTreeItemsSetting(unittest.TestCase):
       'name': 'selected_items',
       'type': 'item_tree_items',
       'value': [
-        ['Layer', 'item_1', '', image_1_filepath],
-        ['Layer', 'item_4/item_3', '', image_1_filepath],
-        ['GroupLayer', 'item_4', 'folder', image_1_filepath],
-        ['Layer', 'item_7/item_5', '', image_2_filepath],
-        ['GroupLayer', 'item_7', 'folder', image_2_filepath],
+        ['Layer', ['item_1'], '', image_1_filepath],
+        ['Layer', ['item_4', 'item_3'], '', image_1_filepath],
+        ['GroupLayer', ['item_4'], 'folder', image_1_filepath],
+        ['Layer', ['item_7', 'item_5'], '', image_2_filepath],
+        ['GroupLayer', ['item_7'], 'folder', image_2_filepath],
       ],
     }
 
@@ -475,28 +475,28 @@ class TestItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [True, True, True, True, False, False]
 
     self.setting.set_value([
-      ('Layer', 'item_1', '', image_1_filepath),
-      ('Layer', 'item_4/item_3', '', image_1_filepath),
-      ('GroupLayer', 'item_4', 'folder', image_1_filepath),
-      ('Layer', 'item_7/item_5', '', image_2_filepath),
-      ('GroupLayer', 'item_6', 'folder', image_2_filepath),
-      ('GroupLayer', 'item_7', 'folder', image_2_filepath),
-      ('Layer', 'item_8', '', image_2_filepath),
-      ('Layer', 'item_9', '', image_3_filepath),
-      ('Layer', 'item_10', '', image_3_filepath),
+      ('Layer', ['item_1'], '', image_1_filepath),
+      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
+      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
+      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
+      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
+      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
+      ('Layer', ['item_8'], '', image_2_filepath),
+      ('Layer', ['item_9'], '', image_3_filepath),
+      ('Layer', ['item_10'], '', image_3_filepath),
     ])
 
     expected_dict = {
       'name': 'selected_items',
       'type': 'item_tree_items',
       'value': [
-        ['Layer', 'item_1', '', image_1_filepath],
-        ['Layer', 'item_4/item_3', '', image_1_filepath],
-        ['GroupLayer', 'item_4', 'folder', image_1_filepath],
-        ['Layer', 'item_7/item_5', '', image_2_filepath],
-        ['GroupLayer', 'item_6', 'folder', image_2_filepath],
-        ['GroupLayer', 'item_7', 'folder', image_2_filepath],
-        ['Layer', 'item_8', '', image_2_filepath],
+        ['Layer', ['item_1'], '', image_1_filepath],
+        ['Layer', ['item_4', 'item_3'], '', image_1_filepath],
+        ['GroupLayer', ['item_4'], 'folder', image_1_filepath],
+        ['Layer', ['item_7', 'item_5'], '', image_2_filepath],
+        ['GroupLayer', ['item_6'], 'folder', image_2_filepath],
+        ['GroupLayer', ['item_7'], 'folder', image_2_filepath],
+        ['Layer', ['item_8'], '', image_2_filepath],
       ],
     }
 

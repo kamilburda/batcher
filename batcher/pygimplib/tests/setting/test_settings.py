@@ -1303,8 +1303,9 @@ class TestGimpItemSetting(SettingTestCase):
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
-        self.setting.set_value(['Layer', 'group1/group2/layer', os.path.abspath('image_filepath')])
-    
+        self.setting.set_value(
+          ['Layer', ['group1', 'group2', 'layer'], os.path.abspath('image_filepath')])
+
     self.assertEqual(self.setting.value, self.layer)
   
   def test_set_value_with_list_and_top_level_layer(self):
@@ -1319,7 +1320,7 @@ class TestGimpItemSetting(SettingTestCase):
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
-        self.setting.set_value(['Layer', 'layer', os.path.abspath('image_filepath')])
+        self.setting.set_value(['Layer', ['layer'], os.path.abspath('image_filepath')])
     
     self.assertEqual(self.setting.value, self.layer)
   
@@ -1336,7 +1337,8 @@ class TestGimpItemSetting(SettingTestCase):
         temp_mock_gimp_module.get_images.return_value = []
         temp_mock_get_children_from_image.return_value = []
 
-        self.setting.set_value(['Layer', 'group1/group2/layer', os.path.abspath('image_filepath')])
+        self.setting.set_value(
+          ['Layer', ['group1', 'group2', 'layer'], os.path.abspath('image_filepath')])
     
     self.assertIsNone(self.setting.value)
   
@@ -1350,7 +1352,7 @@ class TestGimpItemSetting(SettingTestCase):
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
         self.setting.set_value(
-          ['Layer', 'group1/group2/some_other_layer', os.path.abspath('image_filepath')])
+          ['Layer', ['group1', 'group2', 'some_other_layer'], os.path.abspath('image_filepath')])
     
     self.assertIsNone(self.setting.value)
   
@@ -1364,7 +1366,7 @@ class TestGimpItemSetting(SettingTestCase):
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
         self.setting.set_value(
-          ['Layer', 'group1/some_other_group2/layer', os.path.abspath('image_filepath')])
+          ['Layer', ['group1', 'some_other_group2', 'layer'], os.path.abspath('image_filepath')])
     
     self.assertIsNone(self.setting.value)
   
@@ -1393,9 +1395,10 @@ class TestGimpItemSetting(SettingTestCase):
       self.setting.to_dict(),
       {
         'name': 'item',
-        'value': ['Layer', 'group1/group2/layer', os.path.abspath('image_filepath')],
+        'value': ['Layer', ['group1', 'group2', 'layer'], os.path.abspath('image_filepath')],
         'type': 'stub_item',
-        'default_value': ['Layer', 'group1/group2/layer', os.path.abspath('image_filepath')],
+        'default_value': [
+          'Layer', ['group1', 'group2', 'layer'], os.path.abspath('image_filepath')],
       })
   
   def test_to_dict_value_is_none(self):
@@ -1427,9 +1430,9 @@ class TestGimpItemSetting(SettingTestCase):
       self.setting.to_dict(),
       {
         'name': 'item',
-        'value': ['Layer', 'layer', os.path.abspath('image_filepath')],
+        'value': ['Layer', ['layer'], os.path.abspath('image_filepath')],
         'type': 'stub_item',
-        'default_value': ['Layer', 'layer', os.path.abspath('image_filepath')],
+        'default_value': ['Layer', ['layer'], os.path.abspath('image_filepath')],
       })
 
 
@@ -1479,7 +1482,7 @@ class TestLayerMaskSetting(SettingTestCase):
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
-        self.setting.set_value(['Layer', 'group/layer', os.path.abspath('image_filepath')])
+        self.setting.set_value(['Layer', ['group', 'layer'], os.path.abspath('image_filepath')])
 
     self.assertEqual(self.setting.value, self.mask)
 
@@ -1497,7 +1500,7 @@ class TestLayerMaskSetting(SettingTestCase):
       setting_dict,
       {
         'name': 'mask',
-        'value': ['Layer', 'group/layer', os.path.abspath('image_filepath')],
+        'value': ['Layer', ['group', 'layer'], os.path.abspath('image_filepath')],
         'type': 'layer_mask',
       })
 

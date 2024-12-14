@@ -1730,13 +1730,13 @@ class GimpItemSetting(Setting):
   """Abstract class for settings storing GIMP items - layers, channels, paths.
   
   This class accepts as a value one of the following:
-  * a tuple (image file path, item type, item path) where item type is the name
-    of the item's GIMP class (e.g. ``'Layer'``).
+  * a tuple (image file path, item type, item path components) where item
+    type is the name of the item's GIMP class (e.g. ``'Layer'``).
   * a tuple (item type, item ID). Item ID is are assigned by GIMP.
   * a `Gimp.Item` instance.
 
-  If calling `to_dict()`, a tuple (image file path, item type, item path) is
-  returned.
+  If calling `to_dict()`, a tuple (image file path, item type, item path
+  components) is returned.
   """
   
   _ABSTRACT = True
@@ -1774,13 +1774,14 @@ class GimpItemSetting(Setting):
   def _value_to_raw(self, value):
     return self._item_to_path(value)
 
-  def _get_item_from_image_and_item_path(self, item_type_name, item_path, image_filepath):
+  def _get_item_from_image_and_item_path(
+        self, item_type_name, item_path_components, image_filepath):
     image = pgpdbutils.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None
 
-    return pgpdbutils.get_item_from_image_and_item_path(image, item_type_name, item_path)
+    return pgpdbutils.get_item_from_image_and_item_path(item_type_name, item_path_components, image)
 
   def _item_to_path(self, item):
     return pgpdbutils.get_item_as_path(item)
@@ -1961,8 +1962,10 @@ class LayerMaskSetting(GimpItemSetting):
     if drawable is not None and not drawable.is_layer_mask():
       return 'invalid layer mask', 'invalid_value'
 
-  def _get_item_from_image_and_item_path(self, item_type_name, item_path, image_filepath):
-    layer = super()._get_item_from_image_and_item_path(item_type_name, item_path, image_filepath)
+  def _get_item_from_image_and_item_path(
+        self, item_type_name, item_path_components, image_filepath):
+    layer = super()._get_item_from_image_and_item_path(
+      item_type_name, item_path_components, image_filepath)
 
     if layer is not None:
       return layer.get_mask()

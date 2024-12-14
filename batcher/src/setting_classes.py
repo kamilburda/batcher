@@ -343,7 +343,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
             image = opened_images[item_data[3]]
 
             item_object = pg.pdbutils.get_item_from_image_and_item_path(
-              image, item_data[0], item_data[1])
+              item_data[0], item_data[1], image)
             if item_object is not None:
               if item_data[2] == pg.itemtree.FOLDER_KEY:
                 item_key = (item_object.get_id(), pg.itemtree.FOLDER_KEY)
@@ -382,8 +382,8 @@ class ItemTreeItemsSetting(pg.setting.Setting):
 
       item_as_path = pg.pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_key_data[0]))
       if item_as_path is not None:
-        item_class_name, item_path, image_filepath = item_as_path
-        raw_value.append([item_class_name, item_path, folder_key, image_filepath])
+        item_class_name, item_path_components, image_filepath = item_as_path
+        raw_value.append([item_class_name, item_path_components, folder_key, image_filepath])
 
     for item_data in self._inactive_items:
       raw_value.append(list(item_data))
