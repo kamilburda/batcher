@@ -705,7 +705,7 @@ def _update_to_0_6(data, _settings, source_names):
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
         _update_origin_setting(origin_setting_dict)
-        _update_arguments_list(arguments_list)
+        _update_arguments_list_for_0_6(arguments_list)
         _change_drawable_to_drawables_for_pdb_procedure(
           arguments_list, origin_setting_dict, function_setting_dict)
 
@@ -761,7 +761,7 @@ def _update_to_0_6(data, _settings, source_names):
         arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
         _update_origin_setting(origin_setting_dict)
-        _update_arguments_list(arguments_list)
+        _update_arguments_list_for_0_6(arguments_list)
 
         if orig_name_setting_dict['default_value'] == 'layer_groups':
           # We retain `name` and only modify `orig_name` as only the latter is
@@ -824,7 +824,7 @@ def _update_to_0_7(data, _settings, source_names):
           ])
 
 
-def _update_arguments_list(arguments_list):
+def _update_arguments_list_for_0_6(arguments_list):
   if arguments_list is None:
     return
 
@@ -937,17 +937,64 @@ def _update_to_1_0(data, _settings, source_names):
   if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
     return
 
+  gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
+
+  if gui_settings_list is not None:
+    _update_items_setting_for_1_0(gui_settings_list, 'image_preview_displayed_items')
+    _update_items_setting_for_1_0(gui_settings_list, 'name_preview_items_collapsed_state')
+
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
-  # 'selected_items' may exist as a new setting. We need to remove that one
-  # and instead rename the original so that the value of the original setting
-  # is preserved on update.
-  _remove_setting(main_settings_list, 'selected_items')
-  _rename_setting(main_settings_list, 'selected_layers', 'selected_items')
+  if main_settings_list is not None:
+    # 'selected_items' may exist as a new setting. We need to remove that one
+    # and instead rename the original so that the value of the original setting
+    # is preserved on update.
+    _remove_setting(main_settings_list, 'selected_items')
+    _rename_setting(main_settings_list, 'selected_layers', 'selected_items')
 
-  constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
-  if constraints_list is not None:
-    _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
+    _update_items_setting_for_1_0(main_settings_list, 'selected_items')
+
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
+
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+        gimp_item_setting_types = [
+          'item', 'drawable', 'layer', 'group_layer', 'text_layer',
+          'layer_mask', 'channel', 'selection', 'path']
+
+        if arguments_list is not None:
+          for argument_dict in arguments_list:
+            if argument_dict['type'] in gimp_item_setting_types:
+              if argument_dict['value'] and len(argument_dict['value']) == 3:
+                argument_dict['value'][1] = argument_dict['value'][1].split('/')
+                argument_dict['value'].append(argument_dict['value'].pop(0))
+
+    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
+    if constraints_list is not None:
+      _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
+
+
+def _update_items_setting_for_1_0(settings_list, setting_name):
+  setting_dict, _index = _get_child_setting(settings_list, setting_name)
+
+  setting_dict.pop('default_value', None)
+
+  new_value = []
+  for image_filepath, items in setting_dict['value'].items():
+    for item_data in items:
+      if len(item_data) >= 2:
+        new_value.append([
+          item_data[0],
+          item_data[1].split('/'),
+          pg.itemtree.FOLDER_KEY if len(item_data) >= 3 else '',
+          image_filepath,
+        ])
+
+  setting_dict['value'] = new_value
 
 
 _UPDATE_HANDLERS = {
