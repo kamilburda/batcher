@@ -93,11 +93,34 @@ The following placeholder objects are defined:
   current image. This placeholder is used for PDB procedures containing
   `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item` parameters.
 
+* ``PLACEHOLDERS['current_layer_for_array']``: The layer currently being
+  processed in the current image. This placeholder is used for PDB procedures
+  containing the `Gimp.CoreObjectArray` parameter whose object type is
+  `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
+
 * ``PLACEHOLDERS['background_layer']``: The layer positioned immediately after
   the currently processed layer.
 
+* ``PLACEHOLDERS['background_layer_for_array']``: The layer positioned 
+  immediately after the currently processed layer. This placeholder is used for 
+  PDB procedures containing the `Gimp.CoreObjectArray` parameter whose object 
+  type is `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
+
 * ``PLACEHOLDERS['foreground_layer']``: The layer positioned immediately before
   the currently processed layer.
+
+* ``PLACEHOLDERS['background_layer_for_array']``: The layer positioned 
+  immediately before the currently processed layer. This placeholder is used 
+  for PDB procedures containing the `Gimp.CoreObjectArray` parameter whose 
+  object type is `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
+
+* ``PLACEHOLDERS['all_top_level_layers']``: All layers in the currently 
+  processed image. This placeholder is used for PDB procedures containing the 
+  `Gimp.CoreObjectArray` parameter whose object type is `Gimp.Layer`, 
+  `Gimp.Drawable` or `Gimp.Item`.
+
+* ``PLACEHOLDERS['unsupported_parameter']``: Indicates that the parameter
+  is not supported by this plug-in and cannot be modified.
 """
 
 
