@@ -110,17 +110,17 @@ def preserve_layer_locks_between_actions(layer_batcher):
       item.raw.set_lock_alpha(lock_alpha)
 
 
-def remove_folder_structure_from_item_for_export_layers(batcher):
+def remove_folder_structure_from_item(batcher):
   item = batcher.current_item
 
   item.parents = []
   item.children = []
 
 
-def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_visible=False):
-  item = batcher.current_item
+def remove_folder_structure_from_item_for_edit_layers(layer_batcher, consider_parent_visible=False):
+  item = layer_batcher.current_item
 
-  if batcher.edit_mode and not batcher.is_preview:
+  if layer_batcher.edit_mode and not layer_batcher.is_preview:
     image = item.raw.get_image()
     raw_immediate_parent = item.parent.raw if item.parents else None
 
@@ -551,7 +551,7 @@ _BUILTIN_PROCEDURES_LIST = [
   },
   {
     'name': 'remove_folder_structure_for_export_layers',
-    'function': remove_folder_structure_from_item_for_export_layers,
+    'function': remove_folder_structure_from_item,
     'display_name': _('Remove folder structure'),
     'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
   },

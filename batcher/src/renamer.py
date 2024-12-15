@@ -240,12 +240,18 @@ class _PercentTemplate(string.Template):
 
 
 def _get_layer_name(
-      batcher, item, _rename_items, _rename_folders, _field_value, file_extension_strip_mode=''):
+      layer_batcher,
+      item,
+      _rename_items,
+      _rename_folders,
+      _field_value,
+      file_extension_strip_mode='',
+):
   if file_extension_strip_mode in ['%e', '%i']:
     file_extension = fileext.get_file_extension(item.orig_name)
     if file_extension:
       if file_extension_strip_mode == '%i':
-        if file_extension == batcher.file_extension:
+        if file_extension == layer_batcher.file_extension:
           return item.name
       else:
         return item.name
@@ -254,8 +260,8 @@ def _get_layer_name(
 
 
 def _get_image_name(
-      layer_batcher, _item, _rename_items, _rename_folders, _field_value, keep_extension_str=''):
-  image = layer_batcher.current_image
+      batcher, _item, _rename_items, _rename_folders, _field_value, keep_extension_str=''):
+  image = batcher.current_image
   if image is not None and image.get_name() is not None:
     image_name = image.get_name()
   else:
@@ -268,7 +274,7 @@ def _get_image_name(
 
 
 def _get_layer_path(
-      batcher,
+      layer_batcher,
       item,
       rename_items,
       rename_folders,
@@ -289,12 +295,12 @@ def _get_layer_path(
   path_components = [parent.name for parent in item.parents]
   path_components += [
     _get_layer_name(
-      batcher, item, rename_items, rename_folders, field_value, file_extension_strip_mode)]
+      layer_batcher, item, rename_items, rename_folders, field_value, file_extension_strip_mode)]
   
   return separator.join(wrapper.format(path_component) for path_component in path_components)
 
 
-def _get_tags(_batcher, item, _rename_items, _rename_folders, _field_value, *args):
+def _get_tags(_layer_batcher, item, _rename_items, _rename_folders, _field_value, *args):
   color_tag = item.raw.get_color_tag()
   color_tag_default_names = {
     value: value.value_name[len('GIMP_COLOR_TAG_'):].lower()

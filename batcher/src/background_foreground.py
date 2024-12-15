@@ -9,19 +9,19 @@ from src import exceptions
 import pygimplib as pg
 
 
-def insert_background_layer(batcher, tag, item_tree_for_preview, *_args, **_kwargs):
-  return _insert_tagged_layer(batcher, tag, item_tree_for_preview, 'after')
+def insert_background_layer(layer_batcher, tag, item_tree_for_preview, *_args, **_kwargs):
+  return _insert_tagged_layer(layer_batcher, tag, item_tree_for_preview, 'after')
 
 
-def insert_foreground_layer(batcher, tag, item_tree_for_preview, *_args, **_kwargs):
-  return _insert_tagged_layer(batcher, tag, item_tree_for_preview, 'before')
+def insert_foreground_layer(layer_batcher, tag, item_tree_for_preview, *_args, **_kwargs):
+  return _insert_tagged_layer(layer_batcher, tag, item_tree_for_preview, 'before')
 
 
-def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
-  if batcher.is_preview:
+def _insert_tagged_layer(layer_batcher, tag, tagged_items_for_preview, insert_mode):
+  if layer_batcher.is_preview:
     tagged_items = tagged_items_for_preview
   else:
-    tagged_items = batcher.item_tree.iter(with_folders=False, filtered=False)
+    tagged_items = layer_batcher.item_tree.iter(with_folders=False, filtered=False)
 
   processed_tagged_items = [
     item for item in tagged_items
@@ -32,19 +32,20 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
       yield
       continue
 
-    image = batcher.current_image
-    current_parent = batcher.current_layer.get_parent()
+    image = layer_batcher.current_image
+    current_parent = layer_batcher.current_layer.get_parent()
 
-    position = image.get_item_position(batcher.current_layer)
+    position = image.get_item_position(layer_batcher.current_layer)
     if insert_mode == 'after':
       position += 1
 
-    _insert_merged_tagged_layer(batcher, image, processed_tagged_items, current_parent, position)
+    _insert_merged_tagged_layer(
+      layer_batcher, image, processed_tagged_items, current_parent, position)
 
     yield
 
 
-def _insert_merged_tagged_layer(_batcher, image, tagged_items, parent, position):
+def _insert_merged_tagged_layer(_layer_batcher, image, tagged_items, parent, position):
   first_tagged_layer_position = position
   
   for i, item in enumerate(tagged_items):
@@ -79,49 +80,51 @@ def _insert_merged_tagged_layer(_batcher, image, tagged_items, parent, position)
   return merged_tagged_layer
 
 
-def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
+def merge_background(
+      layer_batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
   _merge_tagged_layer(
-    batcher,
+    layer_batcher,
     merge_type,
     get_background_layer,
     'current_item')
 
 
-def merge_foreground(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
+def merge_foreground(
+      layer_batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
   _merge_tagged_layer(
-    batcher,
+    layer_batcher,
     merge_type,
     get_foreground_layer,
     'tagged_layer')
 
 
-def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_merge_down_str):
-  tagged_layer = get_tagged_layer_func(batcher)
+def _merge_tagged_layer(layer_batcher, merge_type, get_tagged_layer_func, layer_to_merge_down_str):
+  tagged_layer = get_tagged_layer_func(layer_batcher)
   
   if tagged_layer is not None:
-    name = batcher.current_layer.get_name()
-    visible = batcher.current_layer.get_visible()
-    orig_color_tag = batcher.current_layer.get_color_tag()
+    name = layer_batcher.current_layer.get_name()
+    visible = layer_batcher.current_layer.get_visible()
+    orig_color_tag = layer_batcher.current_layer.get_color_tag()
     
     if layer_to_merge_down_str == 'current_item':
-      layer_to_merge_down = batcher.current_layer
+      layer_to_merge_down = layer_batcher.current_layer
     elif layer_to_merge_down_str == 'tagged_layer':
       layer_to_merge_down = tagged_layer
     else:
       raise ValueError('invalid value for "layer_to_merge_down_str"')
     
-    batcher.current_layer.set_visible(True)
+    layer_batcher.current_layer.set_visible(True)
     
-    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
+    merged_layer = layer_batcher.current_image.merge_down(layer_to_merge_down, merge_type)
 
     # Avoid errors if merge failed for some reason.
     if merged_layer is not None:
       merged_layer.set_name(name)
 
-      batcher.current_layer = merged_layer
+      layer_batcher.current_layer = merged_layer
 
-      batcher.current_layer.set_visible(visible)
-      batcher.current_layer.set_color_tag(orig_color_tag)
+      layer_batcher.current_layer.set_visible(visible)
+      layer_batcher.current_layer.set_color_tag(orig_color_tag)
 
 
 def get_background_layer(batcher):
