@@ -865,42 +865,59 @@ class ItemTree(metaclass=abc.ABCMeta):
     self._items = {}
 
 
-class ImageTree(ItemTree):
-  """`ItemTree` subclass for images as `Gimp.Image` instances or file paths.
+class ImageFileTree(ItemTree):
+  """`ItemTree` subclass for images as or file paths.
 
-  When adding items:
-  * files and non-existent files/folders are treated as regular items. How
-    non-existent files are handled depends on the client code.
-  * numeric IDs are converted to `Gimp.Image` instances. Any invalid IDs are
-    silently skipped.
+  Files and non-existent files/folders are treated as regular items. How
+  non-existent files are handled depends on the client code.
   """
 
   def refresh(self):
-    """Removes GIMP images from the tree that are no longer opened in GIMP.
+    """This method does nothing as no external changes will require refreshing
+    the tree contents.
 
-    Items representing files and folders are kept intact, even if they no longer
-    exist.
+    Files and folders that no longer exist must be handled in the client code.
     """
-    image_items_to_remove = [
-      item for item in self._items.values() if isinstance(item, GimpImageItem)
-      and not item.raw.is_valid()
-    ]
-
-    self.remove(image_items_to_remove)
+    pass
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
       parents_for_child = []
 
-    if isinstance(object_, str):
-      if os.path.isdir(object_):
-        if with_folders:
-          path = os.path.abspath(object_)
-          child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
-      else:
+    if os.path.isdir(object_):
+      if with_folders:
         path = os.path.abspath(object_)
-        child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
-    elif isinstance(object_, int):
+        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
+    else:
+      path = os.path.abspath(object_)
+      child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
+
+
+class GimpImageTree(ItemTree):
+  """`ItemTree` subclass for images as `Gimp.Image` instances.
+
+  Numeric IDs are converted to `Gimp.Image` instances. Any invalid IDs are
+  silently skipped.
+  """
+
+  def refresh(self):
+    """Removes all items and adds all opened GIMP images.
+
+    This effectively removes no longer valid images and adds newly opened
+    images.
+    """
+    self._clear()
+
+    self.add_opened_images()
+
+  def add_opened_images(self):
+    self.add(Gimp.get_images())
+
+  def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
+    if parents_for_child is None:
+      parents_for_child = []
+
+    if isinstance(object_, int):
       if Gimp.Image.id_is_valid(object_):
         gimp_object = Gimp.Image.get_by_id(object_)
         child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))

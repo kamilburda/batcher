@@ -1,7 +1,7 @@
 """Tests for the `itemtree` module.
 
 For convenience, tests for adding and removing items are provided for the
-`ImageTree` subclass as it is a common use case for this subclass.
+`ImageFileTree` subclass as it is a common use case for this subclass.
 
 Likewise, for convenience, tests for other features (iteration,
 `__getitem__`, ...) are provided for the `GimpItemTree` subclass as it is
@@ -32,7 +32,7 @@ from .. import utils as pgutils
 @mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.path.isdir')
 @mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.listdir')
 @mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.path.abspath')
-class TestImageTree(unittest.TestCase):
+class TestImageFileTree(unittest.TestCase):
 
   def setUp(self):
     self.paths = [
@@ -67,7 +67,7 @@ class TestImageTree(unittest.TestCase):
 
     self.FOLDER_KEY = pgitemtree.FOLDER_KEY
 
-    self.tree = pgitemtree.ImageTree()
+    self.tree = pgitemtree.ImageFileTree()
 
   def test_add(self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
@@ -298,7 +298,7 @@ class TestImageTree(unittest.TestCase):
 
     self.tree.add(self.paths[0])
 
-    another_tree = pgitemtree.ImageTree()
+    another_tree = pgitemtree.ImageFileTree()
 
     parent_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
 
@@ -322,7 +322,7 @@ class TestImageTree(unittest.TestCase):
 
     self.tree.add(self.paths[0])
 
-    another_tree = pgitemtree.ImageTree()
+    another_tree = pgitemtree.ImageFileTree()
 
     insert_after_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
 
@@ -818,10 +818,10 @@ class TestLayerTree(unittest.TestCase):
 
 @mock.patch(
   f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-class TestImageTreeWithGimpImages(unittest.TestCase):
+class TestGimpImageTree(unittest.TestCase):
 
   def setUp(self):
-    self.tree = pgitemtree.ImageTree()
+    self.tree = pgitemtree.GimpImageTree()
 
   def test_add_by_object(self, _mock_gimp_module):
     image = stubs_gimp.Image(name='some_image')
@@ -839,19 +839,40 @@ class TestImageTreeWithGimpImages(unittest.TestCase):
     self.assertEqual(len(self.tree), 1)
     self.assertEqual(self.tree[image.get_id()].raw, image)
 
-  def test_refresh_removes_invalid_images(self, _mock_gimp_module):
-    image = stubs_gimp.Image(name='some_image')
-    image2 = stubs_gimp.Image(name='some_image_2')
+  def test_add_opened_images(self, mock_gimp_module):
+    images = [
+      stubs_gimp.Image(name='some_image'),
+      stubs_gimp.Image(name='some_image_2'),
+    ]
 
-    self.tree.add([image, image2])
+    mock_gimp_module.get_images = lambda: images
 
-    # Simulate image deletion
-    image.valid = False
+    self.tree.add_opened_images()
+
+    self.assertEqual(len(self.tree), 2)
+    self.assertEqual(self.tree[images[0].get_id()].raw, images[0])
+    self.assertEqual(self.tree[images[1].get_id()].raw, images[1])
+
+  def test_refresh(self, mock_gimp_module):
+    images = [
+      stubs_gimp.Image(name='some_image'),
+      stubs_gimp.Image(name='some_image_2'),
+    ]
+
+    mock_gimp_module.get_images = lambda: images
+
+    self.tree.add_opened_images()
+
+    del images[1]
+
+    images.append(stubs_gimp.Image(name='some_image_3'))
 
     self.tree.refresh()
 
-    self.assertEqual(len(self.tree), 1)
-    self.assertEqual(self.tree[image2.get_id()].raw, image2)
+    self.assertEqual(len(self.tree), 2)
+    self.assertEqual(self.tree[images[0].get_id()].raw, images[0])
+    self.assertEqual(self.tree[images[1].get_id()].raw, images[1])
+    self.assertEqual(images[1].get_name(), 'some_image_3')
 
 
 class TestImageFileItem(unittest.TestCase):

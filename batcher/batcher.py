@@ -53,7 +53,7 @@ def plug_in_batch_convert(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.ImageTree()
+  image_tree = pg.itemtree.ImageFileTree()
 
   def _fill_image_tree_with_loaded_inputs(settings):
     image_tree.add(settings['main/inputs'].value)
