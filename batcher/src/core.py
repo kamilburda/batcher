@@ -1031,15 +1031,15 @@ class LayerBatcher(Batcher):
 
   @property
   def current_image(self) -> Optional[Gimp.Image]:
-    """A `Gimp.Image` instance containing a layer currently being processed.
+    """A `Gimp.Image` instance currently being processed.
 
-    This property is ``None`` outside the processing of individual layers.
+    This property is ``None`` outside the processing.
     """
     return self._current_image
 
   @property
   def image_copies(self) -> List[Gimp.Image]:
-    """`Gimp.Image` instances containing copies of the processed layers.
+    """`Gimp.Image` instances as copies of original images.
 
     If ``keep_image_copies`` is ``False`` or creating an image copy is not
     applicable (if ``edit_mode`` is ``True``), this will return an empty list.
