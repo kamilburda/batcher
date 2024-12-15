@@ -924,11 +924,7 @@ class Batcher(metaclass=abc.ABCMeta):
       self._process_item_with_name_only_actions()
 
     if self._process_contents:
-      self._store_selected_layers_in_current_image()
-
       self._process_item_with_actions()
-
-      self._remove_image_copies()
 
     self._progress_updater.update_tasks()
 
@@ -949,6 +945,8 @@ class Batcher(metaclass=abc.ABCMeta):
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
   def _process_item_with_actions(self):
+    self._store_selected_layers_in_current_image_and_start_undo_group()
+
     self._invoker.invoke(
       ['before_process_item'],
       [self],
@@ -976,7 +974,9 @@ class Batcher(metaclass=abc.ABCMeta):
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
-  def _store_selected_layers_in_current_image(self):
+    self._remove_image_copies()
+
+  def _store_selected_layers_in_current_image_and_start_undo_group(self):
     if self._edit_mode and not self._is_preview and self._current_image is not None:
       if self._current_image not in self._orig_images_and_selected_layers:
         self._current_image.undo_group_start()
