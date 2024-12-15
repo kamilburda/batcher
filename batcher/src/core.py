@@ -315,7 +315,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     This property is ``None`` outside the processing.
     """
-    return self._current_image
+    return self._current_layer
 
   @property
   def current_procedure(self) -> pg.setting.Group:
