@@ -962,11 +962,17 @@ def _update_to_1_0(data, _settings, source_names):
       for procedure_dict in procedures_list:
         procedure_list = procedure_dict['settings']
 
+        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
         gimp_item_setting_types = [
           'item', 'drawable', 'layer', 'group_layer', 'text_layer',
           'layer_mask', 'channel', 'selection', 'path']
+
+        if orig_name_setting_dict['default_value'] == 'remove_folder_structure_for_export_layers':
+          procedure_dict['name'] = 'remove_folder_structure'
+          orig_name_setting_dict['value'] = 'remove_folder_structure'
+          orig_name_setting_dict['default_value'] = 'remove_folder_structure'
 
         if arguments_list is not None:
           for argument_dict in arguments_list:

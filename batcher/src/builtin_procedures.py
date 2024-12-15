@@ -550,10 +550,10 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   {
-    'name': 'remove_folder_structure_for_export_layers',
+    'name': 'remove_folder_structure',
     'function': remove_folder_structure_from_item,
     'display_name': _('Remove folder structure'),
-    'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [NAME_ONLY_TAG, CONVERT_TAG, EXPORT_LAYERS_TAG],
   },
   {
     'name': 'remove_folder_structure_for_edit_layers',

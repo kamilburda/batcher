@@ -162,9 +162,6 @@ class TestUpdateHandlers(unittest.TestCase):
       setting_classes.NamePatternEntryPresenter,
     )
 
-    self.assertNotIn('remove_folder_structure', self.settings['main/procedures'])
-    self.assertIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
-
   def _assert_correct_contents_for_update_to_0_5(self):
     self.assertEqual(
       self.settings['main/file_extension'].gui_type,
@@ -329,3 +326,6 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_1_0(self):
     self.assertIn('selected_items', self.settings['main'])
     self.assertNotIn('selected_layers', self.settings['main'])
+
+    self.assertNotIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
+    self.assertIn('remove_folder_structure', self.settings['main/procedures'])
