@@ -83,6 +83,13 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
+      'type': 'image_file_tree_items',
+      'name': 'selected_items',
+      'display_name': _('Selected files and folders'),
+      'pdb_type': None,
+      'gui_type': None,
+    },
+    {
       'type': 'string',
       'name': 'plugin_version',
       'default_value': pg.config.PLUGIN_VERSION,
