@@ -72,8 +72,8 @@ Yes! You may insert any GIMP filter as a procedure:
 While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each group layer (instead of the entire image).
 
 1. Select or type `pdf` as the file extension.
-2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `For the entire image at once`.
-3. If you selected `For the entire image at once`, adjust `Image filename pattern` as seen fit.
+2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
+3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
 4. You may want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 
@@ -89,8 +89,8 @@ Each time you add this procedure, adjust the file extension, file format options
 * *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first layer to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
 * *File format options*: A list of options specific to the file format typed in the main dialog.
 * *If a file exists*: If set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
-* *Perform export*: Whether to export each layer separately ("For each layer"), each top-level layer or group layer separately ("For each top-level layer or group"), or a single image containing all layers ("For the entire image at once").
-  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs per top-level group layer and/or with additional custom procedures applied before the export.
+* *Perform export*: Whether to export each item separately ("For each image"/"For each layer"), each top-level item or folder separately ("For each top-level layer or group"/"For each top-level image or folder"), or a single image containing all items ("As a single image").
+  The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
 * *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension.
