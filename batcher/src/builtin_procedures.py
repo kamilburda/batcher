@@ -374,11 +374,11 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = {
     {
       'type': 'choice',
       'name': 'export_mode',
-      'default_value': 'each_layer',
+      'default_value': 'each_item',
       'items': [
-        (export_.ExportModes.EACH_LAYER, _('For each layer')),
+        (export_.ExportModes.EACH_ITEM, _('For each layer')),
         (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
-        (export_.ExportModes.ENTIRE_IMAGE_AT_ONCE, _('For the entire image at once')),
+        (export_.ExportModes.ALL_ITEMS_AT_ONCE, _('For the entire image at once')),
       ],
       'display_name': _('Perform export:'),
     },

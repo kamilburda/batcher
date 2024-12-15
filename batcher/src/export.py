@@ -35,10 +35,10 @@ class FileFormatModes:
 class ExportModes:
   
   EXPORT_MODES = (
-    EACH_LAYER,
+    EACH_ITEM,
     EACH_TOP_LEVEL_ITEM_OR_FOLDER,
-    ENTIRE_IMAGE_AT_ONCE,
-  ) = 'each_layer', 'each_top_level_layer_or_group', 'entire_image_at_once'
+    ALL_ITEMS_AT_ONCE,
+  ) = 'each_item', 'each_top_level_item_or_folder', 'all_items_at_once'
 
 
 def export(
@@ -48,7 +48,7 @@ def export(
       file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_export_options: Optional[Dict] = None,
       overwrite_mode: str = overwrite.OverwriteModes.ASK,
-      export_mode: str = ExportModes.EACH_LAYER,
+      export_mode: str = ExportModes.EACH_ITEM,
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
@@ -63,7 +63,7 @@ def export(
   image_copies = []
   multi_layer_images = []
 
-  if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE and single_image_name_pattern is not None:
+  if export_mode == ExportModes.ALL_ITEMS_AT_ONCE and single_image_name_pattern is not None:
     renamer_for_image = renamer_.ItemRenamer(single_image_name_pattern)
   else:
     renamer_for_image = None
@@ -78,7 +78,7 @@ def export(
     item_to_process = item
     layer_to_process = batcher.current_layer
 
-    if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
+    if export_mode != ExportModes.EACH_ITEM and batcher.process_export:
       if not multi_layer_images:
         multi_layer_image = create_empty_image_copy(batcher.current_image)
         multi_layer_images.append(multi_layer_image)
@@ -101,7 +101,7 @@ def export(
     else:
       image_to_process = multi_layer_image
     
-    if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE:
+    if export_mode == ExportModes.ALL_ITEMS_AT_ONCE:
       if batcher.process_export:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
         layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
@@ -150,7 +150,7 @@ def export(
         force_default_file_extension=False)
     
     if batcher.process_export:
-      if export_mode == ExportModes.EACH_LAYER:
+      if export_mode == ExportModes.EACH_ITEM:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
       else:
         image_to_process.resize_to_layers()

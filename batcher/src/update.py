@@ -956,6 +956,11 @@ def _update_to_1_0(data, _settings, source_names):
 
     _update_items_setting_for_1_0(main_settings_list, 'selected_items', 'gimp_item_tree_items')
 
+    export_settings_list, _index = _get_child_group_list(main_settings_list, 'export')
+
+    if export_settings_list is not None:
+      _update_export_mode_setting(export_settings_list)
+
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
     if procedures_list is not None:
@@ -973,6 +978,10 @@ def _update_to_1_0(data, _settings, source_names):
           procedure_dict['name'] = 'remove_folder_structure'
           orig_name_setting_dict['value'] = 'remove_folder_structure'
           orig_name_setting_dict['default_value'] = 'remove_folder_structure'
+
+        if (orig_name_setting_dict['default_value'] == 'export_for_export_layers'
+            and arguments_list is not None):
+          _update_export_mode_setting(arguments_list)
 
         if arguments_list is not None:
           for argument_dict in arguments_list:
@@ -1005,6 +1014,22 @@ def _update_items_setting_for_1_0(settings_list, setting_name, new_type_name):
         ])
 
   setting_dict['value'] = new_value
+
+
+def _update_export_mode_setting(settings_list):
+  export_mode_dict, _index = _get_child_setting(settings_list, 'export_mode')
+  if export_mode_dict is not None:
+    export_mode_dict['items'][0][0] = 'each_item'
+    export_mode_dict['items'][1][0] = 'each_top_level_item_or_folder'
+    export_mode_dict['items'][2][0] = 'all_items_at_once'
+
+    export_mode_dict['default_value'] = 'each_item'
+    if export_mode_dict['value'] == 'each_layer':
+      export_mode_dict['value'] = 'each_item'
+    elif export_mode_dict['value'] == 'each_top_level_layer_or_group':
+      export_mode_dict['value'] = 'each_top_level_item_or_folder'
+    elif export_mode_dict['value'] == 'entire_image_at_once':
+      export_mode_dict['value'] = 'all_items_at_once'
 
 
 _UPDATE_HANDLERS = {

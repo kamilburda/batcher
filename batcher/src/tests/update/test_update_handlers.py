@@ -252,9 +252,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/procedures/export/arguments/overwrite_mode'].value,
       'ask')
-    self.assertEqual(
-      self.settings['main/procedures/export/arguments/export_mode'].value,
-      'each_layer')
 
     for procedure in self.settings['main/procedures']:
       if procedure['orig_name'].value in builtin_procedures.BUILTIN_PROCEDURES:
@@ -287,10 +284,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/procedures/scale/arguments/height_unit'].value,
       'percentage_of_layer_height')
-
-    self.assertEqual(
-      self.settings['main/procedures/export/arguments/export_mode'].value,
-      'each_layer')
 
     self.assertNotIn(
       'drawable',
@@ -327,5 +320,15 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('selected_items', self.settings['main'])
     self.assertNotIn('selected_layers', self.settings['main'])
 
+    self.assertEqual(self.settings['main/export/export_mode'].value, 'each_item')
+    self.assertEqual(self.settings['main/export/export_mode'].default_value, 'each_item')
+
     self.assertNotIn('remove_folder_structure_for_export_layers', self.settings['main/procedures'])
     self.assertIn('remove_folder_structure', self.settings['main/procedures'])
+
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/export_mode'].value,
+      'each_item')
+    self.assertEqual(
+      self.settings['main/procedures/export/arguments/export_mode'].default_value,
+      'each_item')
