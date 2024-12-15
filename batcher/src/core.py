@@ -1032,29 +1032,47 @@ class ImageBatcher(Batcher):
   """
 
   def _process_item_with_actions(self):
+    self._current_image = self._current_item.raw
+
+    should_load_image = self._current_image is None
+
     if not self._edit_mode or self._is_preview:
-      if self._current_raw_item is None:
-        # TODO: load the file as an image, if not already (could be loaded
-        #  earlier, e.g. when evaluating a custom constraint)
-        #  - also assign the loaded image to item.raw
-        #  - if the file does not exist, skip
-        pass
+      if should_load_image:
+        loaded_image = self._load_image(self._current_item.id)
+        if loaded_image is not None:
+          self._image_copies.append(loaded_image)
+          self._current_image = loaded_image
+          self._current_item.raw = loaded_image
       else:
-        # TODO: Create a copy of the image
-        pass
+        image_copy = self._current_image.duplicate()
+        self._image_copies.append(image_copy)
+
+        self._current_image = image_copy
     else:
-      # This would involve loading files, processing them and finally
-      # displaying them. For opened images, this would involve batch-editing
-      # images as a whole (not individual layers). Since this appears to be a
-      # very marginal use case, this feature is not implemented.
-      raise NotImplementedError('edit mode for batch image processing is not supported')
+      raise NotImplementedError('edit mode for batch image processing is currently not supported')
 
-    super()._process_item_with_actions()
+    self._current_raw_item = self._current_image
+    self._current_layer = self._get_current_layer(self._current_image)
 
-    # TODO:
-    #  if the item wqs originally a file path, remove the loaded image
-    #  if the item was originally a GIMP image, remove the copy
-    #  the above two are the same basically
+    if self._current_image is not None:
+      super()._process_item_with_actions()
+
+    if should_load_image:
+      self._current_item.raw = None
+      self._current_raw_item = None
+
+    self._current_image = None
+    self._current_layer = None
+
+  def _load_image(self, image_filepath):
+    # TODO: load the file as an image
+    #  - if the file does not exist, skip
+    return None
+
+  def _get_current_layer(self, image):
+    # TODO: Get the current layer, see builtin_procedures.set_selected_and_current_layer
+    #  for inspiration
+    return None
 
 
 class LayerBatcher(Batcher):
