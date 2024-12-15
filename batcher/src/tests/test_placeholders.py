@@ -17,6 +17,8 @@ class _BatcherStub:
 
   def __init__(self, current_image=None, current_raw_item=None):
     self.current_raw_item = _RawItemStub(current_raw_item, current_image)
+    self.current_layer = self.current_raw_item
+    self.current_image = current_image
 
 
 class _RawItemStub:

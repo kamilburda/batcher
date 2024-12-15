@@ -37,12 +37,14 @@ def set_selected_and_current_layer(batcher):
 
       if selected_layer.is_valid():
         # The selected layer(s) may have been set by the procedure.
+        batcher.current_layer = selected_layer
         batcher.current_raw_item = selected_layer
       else:
         image_layers = image.get_layers()
         if image_layers:
           # There is no way to know which layer is the "right" one, so we resort
           # to taking the first.
+          batcher.current_layer = image_layers[0]
           batcher.current_raw_item = image_layers[0]
           image.set_selected_layers([image_layers[0]])
 

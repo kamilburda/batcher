@@ -119,6 +119,7 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
       merged_layer.set_name(name)
 
       batcher.current_raw_item = merged_layer
+      batcher.current_layer = merged_layer
     
       batcher.current_raw_item.set_visible(visible)
       batcher.current_raw_item.set_color_tag(orig_color_tag)
@@ -149,20 +150,20 @@ def _get_adjacent_layer(
       insert_tagged_layers_procedure_name,
       skip_message,
 ):
-  image = batcher.current_raw_item.get_image()
-  raw_item = batcher.current_raw_item
+  image = batcher.current_image
+  layer = batcher.current_layer
 
-  if raw_item.get_parent() is None:
+  if layer.get_parent() is None:
     children = image.get_layers()
   else:
-    children = raw_item.get_parent().get_children()
+    children = layer.get_parent().get_children()
   
   adjacent_layer = None
   
   num_layers = len(children)
   
   if num_layers > 1:
-    position = image.get_item_position(raw_item)
+    position = image.get_item_position(layer)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
       color_tags = [

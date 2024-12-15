@@ -309,6 +309,10 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     return self._current_image
 
+  @current_image.setter
+  def current_image(self, value: Gimp.Image):
+    self._current_image = value
+
   @property
   def current_layer(self) -> Optional[Gimp.Layer]:
     """A `Gimp.Layer` instance currently being processed.
@@ -316,6 +320,10 @@ class Batcher(metaclass=abc.ABCMeta):
     This property is ``None`` outside the processing.
     """
     return self._current_layer
+
+  @current_layer.setter
+  def current_layer(self, value: Gimp.Layer):
+    self._current_layer = value
 
   @property
   def current_procedure(self) -> pg.setting.Group:

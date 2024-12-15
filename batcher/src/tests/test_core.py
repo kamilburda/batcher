@@ -155,7 +155,9 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     layer = stubs_gimp.Layer(image=image)
     
     batcher._invoker = invoker
-    batcher._current_raw_item = layer
+    batcher.current_raw_item = layer
+    batcher.current_image = image
+    batcher.current_layer = layer
 
     actions = actions_.create('procedures')
     actions_.add(actions, {

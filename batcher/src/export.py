@@ -299,6 +299,7 @@ def _merge_and_resize_image(batcher, image, raw_item):
   image.set_selected_layers([raw_item_merged])
   
   if not batcher.edit_mode:
+    batcher.current_layer = raw_item_merged
     batcher.current_raw_item = raw_item_merged
   
   return raw_item_merged

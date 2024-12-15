@@ -34,11 +34,11 @@ class Placeholder:
 
 
 def _get_current_image(_setting, batcher):
-  return batcher.current_raw_item.get_image()
+  return batcher.current_image
 
 
 def _get_current_layer(_setting, batcher):
-  return batcher.current_raw_item
+  return batcher.current_layer
 
 
 def _get_current_layer_for_array(setting, batcher):
