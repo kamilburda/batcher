@@ -81,6 +81,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._current_item = None
     self._current_raw_item = None
+    self._current_image = None
+    self._current_layer = None
     self._current_procedure = None
     self._last_constraint = None
 
@@ -286,6 +288,22 @@ class Batcher(metaclass=abc.ABCMeta):
   @current_raw_item.setter
   def current_raw_item(self, value: Union[Gimp.Item, Gimp.Image, None]):
     self._current_raw_item = value
+
+  @property
+  def current_image(self) -> Optional[Gimp.Image]:
+    """A `Gimp.Image` instance currently being processed.
+
+    This property is ``None`` outside the processing.
+    """
+    return self._current_image
+
+  @property
+  def current_layer(self) -> Optional[Gimp.Layer]:
+    """A `Gimp.Layer` instance currently being processed.
+
+    This property is ``None`` outside the processing.
+    """
+    return self._current_image
 
   @property
   def current_procedure(self) -> pg.setting.Group:
@@ -513,6 +531,8 @@ class Batcher(metaclass=abc.ABCMeta):
   def _prepare_for_processing(self):
     self._current_item = None
     self._current_raw_item = None
+    self._current_image = None
+    self._current_layer = None
     self._current_procedure = None
     self._last_constraint = None
 
@@ -1018,9 +1038,6 @@ class LayerBatcher(Batcher):
 
     self._image_copies = []
 
-    self._current_image = None
-    self._current_layer = None
-
     self._orig_images_and_selected_raw_items = {}
 
   @property
@@ -1029,22 +1046,6 @@ class LayerBatcher(Batcher):
     preserved once batch processing and export (a `run()` call) is done.
     """
     return self._keep_image_copies
-
-  @property
-  def current_image(self) -> Optional[Gimp.Image]:
-    """A `Gimp.Image` instance currently being processed.
-
-    This property is ``None`` outside the processing.
-    """
-    return self._current_image
-
-  @property
-  def current_layer(self) -> Optional[Gimp.Layer]:
-    """A `Gimp.Layer` instance currently being processed.
-
-    This property is ``None`` outside the processing.
-    """
-    return self._current_image
 
   @property
   def image_copies(self) -> List[Gimp.Image]:
@@ -1059,9 +1060,6 @@ class LayerBatcher(Batcher):
     super()._prepare_for_processing()
 
     self._image_copies = []
-
-    self._current_image = None
-    self._current_layer = None
 
     self._orig_images_and_selected_raw_items = {}
 
