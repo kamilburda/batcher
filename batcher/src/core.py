@@ -1016,9 +1016,10 @@ class LayerBatcher(Batcher):
 
     self._keep_image_copies = keep_image_copies
 
-    self._current_image = None
-
     self._image_copies = []
+
+    self._current_image = None
+    self._current_layer = None
 
     self._orig_images_and_selected_raw_items = {}
 
@@ -1038,6 +1039,14 @@ class LayerBatcher(Batcher):
     return self._current_image
 
   @property
+  def current_layer(self) -> Optional[Gimp.Layer]:
+    """A `Gimp.Layer` instance currently being processed.
+
+    This property is ``None`` outside the processing.
+    """
+    return self._current_image
+
+  @property
   def image_copies(self) -> List[Gimp.Image]:
     """`Gimp.Image` instances as copies of original images.
 
@@ -1049,9 +1058,10 @@ class LayerBatcher(Batcher):
   def _prepare_for_processing(self):
     super()._prepare_for_processing()
 
-    self._current_image = None
-
     self._image_copies = []
+
+    self._current_image = None
+    self._current_layer = None
 
     self._orig_images_and_selected_raw_items = {}
 
@@ -1179,6 +1189,8 @@ class LayerBatcher(Batcher):
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_raw_item.set_name(orig_raw_item_name)
 
+    self._current_layer = self._current_raw_item
+
     if self._edit_mode and not self._is_preview:
       if self._current_image not in self._orig_images_and_selected_raw_items:
         self._current_image.undo_group_start()
@@ -1190,6 +1202,7 @@ class LayerBatcher(Batcher):
     self._remove_image_copies()
 
     self._current_image = None
+    self._current_layer = None
 
   def _remove_image_copies(self):
     if not self._edit_mode and not self._keep_image_copies:
