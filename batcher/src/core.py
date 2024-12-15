@@ -57,6 +57,7 @@ class Batcher(metaclass=abc.ABCMeta):
         export_context_manager: Optional[contextlib.AbstractContextManager] = None,
         export_context_manager_args: Optional[Union[List, Tuple]] = None,
         export_context_manager_kwargs: Optional[Dict] = None,
+        keep_image_copies: bool = False,
   ):
     self._item_tree = item_tree
     self._procedures = procedures
@@ -78,6 +79,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._export_context_manager = export_context_manager
     self._export_context_manager_args = export_context_manager_args
     self._export_context_manager_kwargs = export_context_manager_kwargs
+    self._keep_image_copies = keep_image_copies
 
     self._current_item = None
     self._current_raw_item = None
@@ -89,6 +91,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._matching_items = None
     self._matching_items_and_parents = None
     self._exported_items = []
+
+    self._image_copies = []
+    self._orig_images_and_selected_layers = {}
 
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
@@ -270,6 +275,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._export_context_manager_kwargs
 
   @property
+  def keep_image_copies(self) -> bool:
+    """If ``True`` and `edit_mode` is ``False``, image copies are preserved once
+    batch processing and export (a `run()` call) is done.
+    """
+    return self._keep_image_copies
+
+  @property
   def current_item(self) -> pg.itemtree.Item:
     """A `pygimplib.itemtree.Item` instance currently being processed."""
     return self._current_item
@@ -347,6 +359,15 @@ class Batcher(metaclass=abc.ABCMeta):
     same names already exist).
     """
     return list(self._exported_items)
+
+  @property
+  def image_copies(self) -> List[Gimp.Image]:
+    """`Gimp.Image` instances as copies of original images.
+
+    If ``keep_image_copies`` is ``False`` or creating an image copy is not
+    applicable (if ``edit_mode`` is ``True``), this will return an empty list.
+    """
+    return list(self._image_copies)
 
   @property
   def skipped_procedures(self) -> Dict[str, List]:
@@ -541,6 +562,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._matching_items = None
     self._matching_items_and_parents = None
     self._exported_items = []
+
+    self._image_copies = []
+    self._orig_images_and_selected_layers = {}
 
     self._skipped_procedures = collections.defaultdict(list)
     self._skipped_constraints = collections.defaultdict(list)
@@ -910,7 +934,11 @@ class Batcher(metaclass=abc.ABCMeta):
       self._process_item_with_name_only_actions()
 
     if self._process_contents:
+      self._store_selected_layers_in_current_image()
+
       self._process_item_with_actions()
+
+      self._remove_image_copies()
 
     self._progress_updater.update_tasks()
 
@@ -957,6 +985,20 @@ class Batcher(metaclass=abc.ABCMeta):
       ['after_process_item'],
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+
+  def _store_selected_layers_in_current_image(self):
+    if self._edit_mode and not self._is_preview and self._current_image is not None:
+      if self._current_image not in self._orig_images_and_selected_layers:
+        self._current_image.undo_group_start()
+        self._orig_images_and_selected_layers[self._current_image] = (
+          self._current_image.get_selected_layers())
+
+  def _remove_image_copies(self):
+    if not self._edit_mode and not self._keep_image_copies:
+      for image in self._image_copies:
+        pg.pdbutils.try_delete_image(image)
+
+      self._image_copies = []
 
   def _cleanup_contents(self, exception_occurred=False):
     self._invoker.invoke(
@@ -1029,39 +1071,9 @@ class LayerBatcher(Batcher):
   def __init__(
         self,
         *args,
-        keep_image_copies: bool = False,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
-
-    self._keep_image_copies = keep_image_copies
-
-    self._image_copies = []
-
-    self._orig_images_and_selected_raw_items = {}
-
-  @property
-  def keep_image_copies(self) -> bool:
-    """If ``True`` and `edit_mode` is ``False``, image and layer copies are
-    preserved once batch processing and export (a `run()` call) is done.
-    """
-    return self._keep_image_copies
-
-  @property
-  def image_copies(self) -> List[Gimp.Image]:
-    """`Gimp.Image` instances as copies of original images.
-
-    If ``keep_image_copies`` is ``False`` or creating an image copy is not
-    applicable (if ``edit_mode`` is ``True``), this will return an empty list.
-    """
-    return list(self._image_copies)
-
-  def _prepare_for_processing(self):
-    super()._prepare_for_processing()
-
-    self._image_copies = []
-
-    self._orig_images_and_selected_raw_items = {}
 
   def _add_actions_before_initial_invoker(self):
     super()._add_actions_before_initial_invoker()
@@ -1132,7 +1144,7 @@ class LayerBatcher(Batcher):
       if not self._keep_image_copies or exception_occurred:
         self._remove_image_copies()
     else:
-      for image, selected_layers in self._orig_images_and_selected_raw_items.items():
+      for image, selected_layers in self._orig_images_and_selected_layers.items():
         if not image.is_valid():
           continue
 
@@ -1189,22 +1201,7 @@ class LayerBatcher(Batcher):
 
     self._current_layer = self._current_raw_item
 
-    if self._edit_mode and not self._is_preview:
-      if self._current_image not in self._orig_images_and_selected_raw_items:
-        self._current_image.undo_group_start()
-        self._orig_images_and_selected_raw_items[self._current_image] = (
-          self._current_image.get_selected_layers())
-
     super()._process_item_with_actions()
-
-    self._remove_image_copies()
 
     self._current_image = None
     self._current_layer = None
-
-  def _remove_image_copies(self):
-    if not self._edit_mode and not self._keep_image_copies:
-      for image in self._image_copies:
-        pg.pdbutils.try_delete_image(image)
-
-      self._image_copies = []
