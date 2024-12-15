@@ -1208,6 +1208,7 @@ class LayerBatcher(Batcher):
   
   def _process_item_with_actions(self):
     self._current_image = self._current_item.raw.get_image()
+    self._current_layer = self._current_item.raw
 
     if not self._edit_mode or self._is_preview:
       image_copy = export_.create_empty_image_copy(self._current_image)
@@ -1215,8 +1216,8 @@ class LayerBatcher(Batcher):
 
       self._current_image = image_copy
 
-      raw_item_copy = pg.pdbutils.copy_and_paste_layer(
-        self._current_raw_item,
+      layer_copy = pg.pdbutils.copy_and_paste_layer(
+        self._current_layer,
         self._current_image,
         None,
         0,
@@ -1224,29 +1225,29 @@ class LayerBatcher(Batcher):
         True,
         True)
 
-      orig_raw_item_name = self._current_raw_item.get_name()
-      self._current_raw_item = raw_item_copy
+      orig_layer_name = self._current_layer.get_name()
+      self._current_layer = layer_copy
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
-      self._current_raw_item.set_name(orig_raw_item_name)
+      self._current_layer.set_name(orig_layer_name)
 
-    if self._edit_mode and not self._is_preview and self._current_raw_item.is_group_layer():
+    if self._edit_mode and not self._is_preview and self._current_layer.is_group_layer():
       # Group layers must be copied and inserted as layers as some procedures
       # do not work on group layers.
-      raw_item_copy = pg.pdbutils.copy_and_paste_layer(
-        self._current_raw_item,
+      layer_copy = pg.pdbutils.copy_and_paste_layer(
+        self._current_layer,
         self._current_image,
-        self._current_raw_item.get_parent(),
-        self._current_image.get_item_position(self._current_raw_item) + 1,
+        self._current_layer.get_parent(),
+        self._current_image.get_item_position(self._current_layer) + 1,
         True,
         True,
         True)
 
-      orig_raw_item_name = self._current_raw_item.get_name()
-      self._current_raw_item = raw_item_copy
+      orig_layer_name = self._current_layer.get_name()
+      self._current_layer = layer_copy
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
-      self._current_raw_item.set_name(orig_raw_item_name)
+      self._current_layer.set_name(orig_layer_name)
 
-    self._current_layer = self._current_raw_item
+    self._current_raw_item = self._current_layer
 
     super()._process_item_with_actions()
 
