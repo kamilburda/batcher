@@ -513,6 +513,7 @@ If a procedure contains a layer/drawable/item option, you may select one of the 
 * `Current Layer` (default): applies the procedure to the currently processed layer.
 * `Background Layer`: applies the procedure to the layer representing background, inserted via the `Insert background` procedure. If there is no such layer, the procedure will have no effect.
 * `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the `Insert foreground` procedure. If there is no such layer, the procedure will have no effect.
+* `All Layers`: applies the procedure to all layers within the currently processed image. This option is available usually only for procedures having the `The input drawables` argument. Note that a procedure may not work on multiple layers at once and thus may yield an error if this option is chosen.
 
 
 ### More Options

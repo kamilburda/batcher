@@ -61,6 +61,10 @@ def _get_foreground_layer_for_array(_setting, batcher):
   return (background_foreground.get_foreground_layer(batcher),)
 
 
+def _get_all_top_level_layers(_setting, batcher):
+  return batcher.current_image.get_layers()
+
+
 def _get_value_for_unsupported_parameter(setting, _batcher):
   return getattr(setting, 'default_param_value', None)
 
@@ -73,6 +77,7 @@ _PLACEHOLDERS_LIST = [
   ('background_layer_for_array', _('Background Layer'), _get_background_layer_for_array),
   ('foreground_layer', _('Foreground Layer'), _get_foreground_layer),
   ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
+  ('all_top_level_layers', _('All Layers'), _get_all_top_level_layers),
   ('unsupported_parameter', '', _get_value_for_unsupported_parameter),
 ]
 
@@ -175,6 +180,7 @@ class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'all_top_level_layers',
   ]
 
 
@@ -185,6 +191,7 @@ class PlaceholderLayerArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'all_top_level_layers',
   ]
 
 
@@ -195,6 +202,7 @@ class PlaceholderItemArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'all_top_level_layers',
   ]
 
 
