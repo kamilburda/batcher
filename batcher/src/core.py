@@ -1069,9 +1069,30 @@ class ImageBatcher(Batcher):
     #  - if the file does not exist, skip
     return None
 
-  def _get_current_layer(self, image):
-    # TODO: Get the current layer, see builtin_procedures.set_selected_and_current_layer
-    #  for inspiration
+  @staticmethod
+  def _get_current_layer(image):
+    if image is None or not image.is_valid():
+      return None
+
+    layers = image.get_layers()
+
+    if len(layers) == 0:
+      return None
+    elif len(layers) == 1:
+      return layers[0]
+    else:
+      selected_layers = image.get_selected_layers()
+      if selected_layers:
+        # There is no way to know which layer is the "right" one, so we resort
+        # to taking the first.
+        if selected_layers[0].is_valid():
+          return selected_layers[0]
+      else:
+        # There is no way to know which layer is the "right" one, so we resort
+        # to taking the first.
+        if layers[0].is_valid():
+          return layers[0]
+
     return None
 
 
