@@ -504,6 +504,45 @@ class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
     return image_filepath
 
 
+class ImageFileTreeItemsSetting(ItemTreeItemsSetting):
+  """Class for settings representing `pygimplib.itemtree.ImageFileItem`
+  instances.
+
+  The persistent format for each item for settings of this subclass is
+  ``[file path, folder key]``. ``folder key`` is either ``''`` or
+  `pygimplib.itemtree.FOLDER_KEY`, signifying that an item is either a
+  regular file or a folder, respectively.
+
+  The `inactive_items` property is always empty for this subclass.
+  """
+
+  def _do_set_active_items(self, item_keys: Iterable):
+    for item_key in item_keys:
+      if isinstance(item_key, str):
+        processed_item_key = item_key
+      else:
+        processed_item_key = tuple(item_key)
+
+      if processed_item_key in self._initial_active_items:
+        self._active_items[processed_item_key] = self._initial_active_items[processed_item_key]
+      else:
+        self._value.append(processed_item_key)
+        self._active_items[processed_item_key] = None
+        self._initial_active_items[processed_item_key] = None
+
+  def _fill_value_active_inactive_items(self, raw_value):
+    value = []
+
+    for item_data in raw_value:
+      value.append(item_data)
+      self._active_items[item_data] = None
+
+    return value
+
+  def _active_item_to_raw(self, item_key):
+    return item_key
+
+
 class ImagesAndDirectoriesSetting(pg.setting.Setting):
   """Class for settings the list of currently opened images and their import
   directory paths.

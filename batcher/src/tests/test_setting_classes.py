@@ -733,6 +733,133 @@ class TestGimpImageTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.to_dict(), expected_dict)
 
 
+class TestImageFileTreeItemsSetting(unittest.TestCase):
+
+  def setUp(self):
+    self.setting = setting_classes.ImageFileTreeItemsSetting('selected_items')
+
+    self.image_filepaths = [
+      os.path.abspath('filename_1'),
+      os.path.abspath('filename_2'),
+      os.path.abspath('filename_3'),
+    ]
+
+    self.maxDiff = None
+
+  def test_set_value_from_ids(self):
+    self.setting.set_value([
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ])
+
+    expected_value_and_active_items = {
+      self.image_filepaths[0]: None,
+      self.image_filepaths[1]: None,
+      self.image_filepaths[2]: None,
+    }
+
+    expected_value = list(expected_value_and_active_items)
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_value_and_active_items)
+
+  def test_set_active_items(self):
+    self.setting.set_value([
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ])
+
+    self.setting.set_active_items([
+      self.image_filepaths[1],
+    ])
+
+    expected_value = [
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ]
+
+    expected_active_items = {
+      self.image_filepaths[1]: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+
+  def test_set_active_items_multiple_times_with_different_subsets(self):
+    self.setting.set_value([
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ])
+
+    self.setting.set_active_items([
+      self.image_filepaths[1],
+    ])
+
+    self.setting.set_active_items([
+      self.image_filepaths[0],
+    ])
+
+    expected_value = [
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ]
+
+    expected_active_items = {
+      self.image_filepaths[0]: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+
+  def test_set_active_items_new_items_are_added_to_value(self):
+    self.setting.set_value([
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+    ])
+
+    self.setting.set_active_items([
+      self.image_filepaths[2],
+    ])
+
+    expected_value = [
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ]
+
+    expected_active_items = {
+      self.image_filepaths[2]: None,
+    }
+
+    self.assertEqual(self.setting.value, expected_value)
+    self.assertEqual(self.setting.active_items, expected_active_items)
+    self.assertFalse(self.setting.inactive_items)
+
+  def test_to_dict(self):
+    self.setting.set_value([
+      self.image_filepaths[0],
+      self.image_filepaths[1],
+      self.image_filepaths[2],
+    ])
+
+    expected_dict = {
+      'name': 'selected_items',
+      'type': 'image_file_tree_items',
+      'value': [
+        self.image_filepaths[0],
+        self.image_filepaths[1],
+        self.image_filepaths[2],
+      ],
+    }
+
+    self.assertEqual(self.setting.to_dict(), expected_dict)
+
+
 class TestImagesAndDirectoriesSetting(unittest.TestCase):
   
   def setUp(self):
