@@ -446,7 +446,7 @@ class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
   ``image file path``, representing a file path to the image.
   """
 
-  def _do_set_active_items(self, item_keys: Iterable):
+  def _do_set_active_items(self, item_keys: Iterable[int]):
     for item_id in item_keys:
       if item_id in self._initial_active_items:
         self._active_items[item_id] = self._initial_active_items[item_id]
