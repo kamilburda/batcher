@@ -91,7 +91,7 @@ def create_settings_for_convert():
     },
   ])
 
-  gui_settings = _create_gui_settings()
+  gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
   size_gui_settings = pg.setting.Group(name='size')
@@ -230,7 +230,7 @@ def create_settings_for_export_layers():
 
   settings['main'].add([export_settings])
 
-  gui_settings = _create_gui_settings()
+  gui_settings = _create_gui_settings('gimp_item_tree_items')
   gui_settings.add([
     _create_auto_close_setting_dict(True),
     _create_show_quick_settings_setting_dict(),
@@ -345,7 +345,7 @@ def create_settings_for_edit_layers():
     },
   ])
 
-  gui_settings = _create_gui_settings()
+  gui_settings = _create_gui_settings('gimp_item_tree_items')
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
   size_gui_settings = pg.setting.Group(name='size')
@@ -442,7 +442,7 @@ def create_dummy_settings_for_export_and_edit_layers():
   return settings
 
 
-def _create_gui_settings():
+def _create_gui_settings(item_tree_items_setting_type):
   gui_settings = pg.setting.Group(name='gui')
 
   procedure_browser_settings = pg.setting.Group(name='procedure_browser')
@@ -492,11 +492,11 @@ def _create_gui_settings():
       'gui_type': None,
     },
     {
-      'type': 'gimp_item_tree_items',
+      'type': item_tree_items_setting_type,
       'name': 'name_preview_items_collapsed_state',
     },
     {
-      'type': 'gimp_item_tree_items',
+      'type': item_tree_items_setting_type,
       'name': 'image_preview_displayed_items',
     },
     procedure_browser_settings,
