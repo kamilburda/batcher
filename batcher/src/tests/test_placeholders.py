@@ -15,41 +15,32 @@ from src import placeholders as placeholders_
 
 class _BatcherStub:
 
-  def __init__(self, current_image=None, current_raw_item=None):
-    self.current_raw_item = _RawItemStub(current_raw_item, current_image)
-    self.current_layer = self.current_raw_item
-    self.current_image = current_image
-
-
-class _RawItemStub:
-
-  def __init__(self, raw_item, image):
-    self.raw_item = raw_item
-    self.image = image
-
-  def get_image(self):
-    return self.image
+  def __init__(self, current_image_name=None, current_layer_name=None):
+    self.current_image = stubs_gimp.Image(name=current_image_name)
+    self.current_layer = stubs_gimp.Layer(name=current_layer_name, image=current_image_name)
 
 
 class TestGetReplacedArg(unittest.TestCase):
 
   def test_arg_matching_placeholder(self):
-    batcher = _BatcherStub(current_image='image')
+    batcher = _BatcherStub(current_image_name='image')
     setting = placeholders_.PlaceholderImageSetting('placeholder')
 
-    self.assertEqual(placeholders_.get_replaced_value(setting, batcher), 'image')
+    result = placeholders_.get_replaced_value(setting, batcher)
+
+    self.assertIsInstance(result, stubs_gimp.Image)
 
   def test_arg_matching_array_placeholder(self):
-    batcher = _BatcherStub(current_image='image')
+    batcher = _BatcherStub(current_image_name='image')
     setting = placeholders_.PlaceholderDrawableArraySetting('placeholder', element_type='layer')
 
     result = placeholders_.get_replaced_value(setting, batcher)
 
     self.assertEqual(len(result), 1)
-    self.assertIsInstance(result[0], _RawItemStub)
+    self.assertIsInstance(result[0], stubs_gimp.Layer)
 
   def test_arg_not_matching_placeholder(self):
-    batcher = _BatcherStub(current_image='image')
+    batcher = _BatcherStub(current_image_name='image')
 
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker

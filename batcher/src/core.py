@@ -82,7 +82,6 @@ class Batcher(metaclass=abc.ABCMeta):
     self._keep_image_copies = keep_image_copies
 
     self._current_item = None
-    self._current_raw_item = None
     self._current_image = None
     self._current_layer = None
     self._current_procedure = None
@@ -285,21 +284,6 @@ class Batcher(metaclass=abc.ABCMeta):
   def current_item(self) -> pg.itemtree.Item:
     """A `pygimplib.itemtree.Item` instance currently being processed."""
     return self._current_item
-
-  @property
-  def current_raw_item(self) -> Union[Gimp.Item, Gimp.Image, None]:
-    """The raw item (a GIMP object) that is currently being processed, or
-    ``None`` if the raw item is not loaded yet.
-
-    Note that ``current_raw_item`` can be different from `current_item.raw` -
-    the former can be a copy while the latter is guaranteed to be the original
-    raw item.
-    """
-    return self._current_raw_item
-
-  @current_raw_item.setter
-  def current_raw_item(self, value: Union[Gimp.Item, Gimp.Image, None]):
-    self._current_raw_item = value
 
   @property
   def current_image(self) -> Optional[Gimp.Image]:
@@ -559,7 +543,6 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _prepare_for_processing(self):
     self._current_item = None
-    self._current_raw_item = None
     self._current_image = None
     self._current_layer = None
     self._current_procedure = None
@@ -936,7 +919,6 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _process_item(self, item):
     self._current_item = item
-    self._current_raw_item = item.raw
 
     if self._is_preview and self._process_names:
       self._process_item_with_name_only_actions()
@@ -1017,7 +999,8 @@ class Batcher(metaclass=abc.ABCMeta):
     self._do_cleanup_contents(exception_occurred)
 
     self._current_item = None
-    self._current_raw_item = None
+    self._current_image = None
+    self._current_layer = None
     self._current_procedure = None
     self._last_constraint = None
 
@@ -1059,7 +1042,6 @@ class ImageBatcher(Batcher):
     else:
       raise NotImplementedError('edit mode for batch image processing is currently not supported')
 
-    self._current_raw_item = self._current_image
     self._current_layer = self._get_current_layer(self._current_image)
 
     if self._current_image is not None:
@@ -1067,7 +1049,6 @@ class ImageBatcher(Batcher):
 
     if should_load_image:
       self._current_item.raw = None
-      self._current_raw_item = None
 
     self._current_image = None
     self._current_layer = None
@@ -1134,13 +1115,13 @@ class LayerBatcher(Batcher):
       foreach=True)
 
     self._invoker.add(
-      builtin_procedures.sync_item_name_and_raw_item_name,
+      builtin_procedures.sync_item_name_and_layer_name,
       [actions.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
     if self._edit_mode:
       self._invoker.add(
-        builtin_procedures.preserve_locks_between_actions,
+        builtin_procedures.preserve_layer_locks_between_actions,
         [actions.DEFAULT_PROCEDURES_GROUP],
         foreach=True)
 
@@ -1246,8 +1227,6 @@ class LayerBatcher(Batcher):
       self._current_layer = layer_copy
       # This eliminates the " copy" suffix appended by GIMP after creating a copy.
       self._current_layer.set_name(orig_layer_name)
-
-    self._current_raw_item = self._current_layer
 
     super()._process_item_with_actions()
 

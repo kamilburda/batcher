@@ -76,11 +76,11 @@ def export(
     current_file_extension = default_file_extension
 
     item_to_process = item
-    raw_item_to_process = batcher.current_raw_item
+    layer_to_process = batcher.current_layer
 
     if export_mode != ExportModes.EACH_LAYER and batcher.process_export:
       if not multi_layer_images:
-        multi_layer_image = create_empty_image_copy(batcher.current_raw_item.get_image())
+        multi_layer_image = create_empty_image_copy(batcher.current_image)
         multi_layer_images.append(multi_layer_image)
       else:
         multi_layer_image = multi_layer_images[-1]
@@ -88,13 +88,13 @@ def export(
       multi_layer_image = None
 
     if batcher.edit_mode and batcher.process_export:
-      image_copy = create_empty_image_copy(batcher.current_raw_item.get_image())
+      image_copy = create_empty_image_copy(batcher.current_image)
       image_copies.append(image_copy)
     else:
-      image_copy = batcher.current_raw_item.get_image()
+      image_copy = batcher.current_image
 
     if batcher.edit_mode and batcher.process_export:
-      raw_item_to_process = _copy_layer(raw_item_to_process, image_copy, item)
+      layer_to_process = _copy_layer(layer_to_process, image_copy, item)
     
     if multi_layer_image is None:
       image_to_process = image_copy
@@ -103,8 +103,8 @@ def export(
     
     if export_mode == ExportModes.ENTIRE_IMAGE_AT_ONCE:
       if batcher.process_export:
-        raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
-        raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
+        layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
+        layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
 
       if _get_next_item(batcher, item) is not None:
         _remove_image_copies_for_edit_mode(batcher, image_copies)
@@ -118,8 +118,8 @@ def export(
           item_to_process.name = item.name
     elif export_mode == ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER:
       if batcher.process_export:
-        raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
-        raw_item_to_process = _copy_layer(raw_item_to_process, image_to_process, item)
+        layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
+        layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
       
       current_top_level_item = _get_top_level_item(item)
       next_top_level_item = _get_top_level_item(_get_next_item(batcher, item))
@@ -151,7 +151,7 @@ def export(
     
     if batcher.process_export:
       if export_mode == ExportModes.EACH_LAYER:
-        raw_item_to_process = _merge_and_resize_image(batcher, image_copy, raw_item_to_process)
+        layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
       else:
         image_to_process.resize_to_layers()
 
@@ -164,7 +164,7 @@ def export(
         batcher,
         item_to_process,
         image_to_process,
-        raw_item_to_process,
+        layer_to_process,
         output_directory,
         file_format_mode,
         file_format_export_options,
@@ -186,7 +186,7 @@ def export(
             batcher,
             item_to_process,
             image_to_process,
-            raw_item_to_process,
+            layer_to_process,
             output_directory,
             file_format_mode,
             file_format_export_options,
@@ -281,7 +281,7 @@ def _get_current_file_extension(item, default_file_extension, file_extension_pro
     return default_file_extension
 
 
-def _merge_and_resize_image(batcher, image, raw_item):
+def _merge_and_resize_image(batcher, image, layer):
   """Merges all layers in the current image into one.
   
   Merging is necessary for:
@@ -290,30 +290,29 @@ def _merge_and_resize_image(batcher, image, raw_item):
   * multi-layer images, with each layer containing background or foreground
     which are originally separate layers.
   """
-  raw_item_name = raw_item.get_name()
+  layer_name = layer.get_name()
   
-  raw_item_merged = image.merge_visible_layers(Gimp.MergeType.EXPAND_AS_NECESSARY)
-  raw_item_merged.resize_to_image_size()
+  layer_merged = image.merge_visible_layers(Gimp.MergeType.EXPAND_AS_NECESSARY)
+  layer_merged.resize_to_image_size()
   
-  raw_item_merged.set_name(raw_item_name)
-  image.set_selected_layers([raw_item_merged])
+  layer_merged.set_name(layer_name)
+  image.set_selected_layers([layer_merged])
   
   if not batcher.edit_mode:
-    batcher.current_layer = raw_item_merged
-    batcher.current_raw_item = raw_item_merged
+    batcher.current_layer = layer_merged
   
-  return raw_item_merged
+  return layer_merged
 
 
-def _copy_layer(raw_item, dest_image, item):
-  raw_item_copy = pg.pdbutils.copy_and_paste_layer(
-    raw_item, dest_image, None, len(dest_image.get_layers()), True, True, True)
+def _copy_layer(layer, dest_image, item):
+  layer_copy = pg.pdbutils.copy_and_paste_layer(
+    layer, dest_image, None, len(dest_image.get_layers()), True, True, True)
 
   # We use `item.name` instead of `_get_item_export_name()` so that the original
   # layer name is used in case of multi-layer export.
-  raw_item_copy.set_name(item.name)
+  layer_copy.set_name(item.name)
   
-  return raw_item_copy
+  return layer_copy
 
 
 def _validate_name(item):
@@ -347,7 +346,7 @@ def _export_item(
       batcher,
       item,
       image,
-      raw_item,
+      layer,
       output_directory,
       file_format_mode,
       file_format_export_options,
@@ -380,7 +379,7 @@ def _export_item(
       _get_run_mode(batcher, file_format_mode, file_extension, file_extension_properties),
       item,
       image,
-      raw_item,
+      layer,
       output_filepath,
       file_extension,
       file_format_mode,
@@ -394,7 +393,7 @@ def _export_item(
         Gimp.RunMode.INTERACTIVE,
         item,
         image,
-        raw_item,
+        layer,
         output_filepath,
         file_extension,
         file_format_mode,
@@ -451,7 +450,7 @@ def _export_item_once_wrapper(
       run_mode,
       item,
       image,
-      raw_item,
+      layer,
       output_filepath,
       file_extension,
       file_format_mode,
@@ -460,7 +459,7 @@ def _export_item_once_wrapper(
       file_extension_properties,
 ):
   with batcher.export_context_manager(
-         run_mode, image, raw_item, output_filepath,
+         run_mode, image, layer, output_filepath,
          *batcher.export_context_manager_args, **batcher.export_context_manager_kwargs):
     export_status = _export_item_once(
       run_mode,

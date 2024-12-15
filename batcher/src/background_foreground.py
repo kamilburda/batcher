@@ -32,10 +32,10 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
       yield
       continue
 
-    image = batcher.current_raw_item.get_image()
-    current_parent = batcher.current_raw_item.get_parent()
+    image = batcher.current_image
+    current_parent = batcher.current_layer.get_parent()
 
-    position = image.get_item_position(batcher.current_raw_item)
+    position = image.get_item_position(batcher.current_layer)
     if insert_mode == 'after':
       position += 1
 
@@ -44,7 +44,7 @@ def _insert_tagged_layer(batcher, tag, tagged_items_for_preview, insert_mode):
     yield
 
 
-def _insert_merged_tagged_layer(batcher, image, tagged_items, parent, position):
+def _insert_merged_tagged_layer(_batcher, image, tagged_items, parent, position):
   first_tagged_layer_position = position
   
   for i, item in enumerate(tagged_items):
@@ -99,30 +99,29 @@ def _merge_tagged_layer(batcher, merge_type, get_tagged_layer_func, layer_to_mer
   tagged_layer = get_tagged_layer_func(batcher)
   
   if tagged_layer is not None:
-    name = batcher.current_raw_item.get_name()
-    visible = batcher.current_raw_item.get_visible()
-    orig_color_tag = batcher.current_raw_item.get_color_tag()
+    name = batcher.current_layer.get_name()
+    visible = batcher.current_layer.get_visible()
+    orig_color_tag = batcher.current_layer.get_color_tag()
     
     if layer_to_merge_down_str == 'current_item':
-      layer_to_merge_down = batcher.current_raw_item
+      layer_to_merge_down = batcher.current_layer
     elif layer_to_merge_down_str == 'tagged_layer':
       layer_to_merge_down = tagged_layer
     else:
       raise ValueError('invalid value for "layer_to_merge_down_str"')
     
-    batcher.current_raw_item.set_visible(True)
+    batcher.current_layer.set_visible(True)
     
-    merged_layer = batcher.current_raw_item.get_image().merge_down(layer_to_merge_down, merge_type)
+    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
 
     # Avoid errors if merge failed for some reason.
     if merged_layer is not None:
       merged_layer.set_name(name)
 
-      batcher.current_raw_item = merged_layer
       batcher.current_layer = merged_layer
-    
-      batcher.current_raw_item.set_visible(visible)
-      batcher.current_raw_item.set_color_tag(orig_color_tag)
+
+      batcher.current_layer.set_visible(visible)
+      batcher.current_layer.set_color_tag(orig_color_tag)
 
 
 def get_background_layer(batcher):

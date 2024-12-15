@@ -254,8 +254,8 @@ def _get_layer_name(
 
 
 def _get_image_name(
-      batcher, _item, _rename_items, _rename_folders, _field_value, keep_extension_str=''):
-  image = batcher.current_raw_item.get_image()
+      layer_batcher, _item, _rename_items, _rename_folders, _field_value, keep_extension_str=''):
+  image = layer_batcher.current_image
   if image is not None and image.get_name() is not None:
     image_name = image.get_name()
   else:
@@ -343,8 +343,8 @@ def _get_current_date(
 
 
 def _get_attributes(
-      batcher, item, _rename_items, _rename_folders, _field_value, pattern, measure='%px'):
-  image = batcher.current_raw_item.get_image()
+      layer_batcher, item, _rename_items, _rename_folders, _field_value, pattern, measure='%px'):
+  image = layer_batcher.current_image
   
   fields = {
     'iw': image.get_width(),

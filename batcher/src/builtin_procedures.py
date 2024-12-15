@@ -25,8 +25,8 @@ def set_selected_and_current_layer(batcher):
     # The image does not exist anymore and there is nothing we can do.
     return
 
-  if batcher.current_raw_item.is_valid():
-    image.set_selected_layers([batcher.current_raw_item])
+  if batcher.current_layer.is_valid():
+    image.set_selected_layers([batcher.current_layer])
   else:
     selected_layers = image.get_selected_layers()
 
@@ -38,14 +38,12 @@ def set_selected_and_current_layer(batcher):
       if selected_layer.is_valid():
         # The selected layer(s) may have been set by the procedure.
         batcher.current_layer = selected_layer
-        batcher.current_raw_item = selected_layer
       else:
         image_layers = image.get_layers()
         if image_layers:
           # There is no way to know which layer is the "right" one, so we resort
           # to taking the first.
           batcher.current_layer = image_layers[0]
-          batcher.current_raw_item = image_layers[0]
           image.set_selected_layers([image_layers[0]])
 
 
@@ -56,18 +54,17 @@ def set_selected_and_current_layer_after_action(batcher):
     set_selected_and_current_layer(batcher)
 
 
-def sync_item_name_and_raw_item_name(batcher):
+def sync_item_name_and_layer_name(layer_batcher):
   yield
   
-  if batcher.process_names and not batcher.is_preview:
-    batcher.current_item.name = batcher.current_raw_item.get_name()
+  if layer_batcher.process_names and not layer_batcher.is_preview:
+    layer_batcher.current_item.name = layer_batcher.current_layer.get_name()
 
 
-def preserve_locks_between_actions(batcher):
-  # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`
-  # instead of `current_raw_item`. We need to use `Item.raw` for parents as
-  # well.
-  item = batcher.current_item
+def preserve_layer_locks_between_actions(layer_batcher):
+  # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`.
+  # We need to use `Item.raw` for parents as well.
+  item = layer_batcher.current_item
   locks_content = {}
   locks_visibility = {}
 
@@ -141,43 +138,45 @@ def remove_folder_structure_from_item_for_edit_layers(batcher, consider_parent_v
   item.children = []
 
 
-def apply_opacity_from_group_layers(batcher):
-  new_layer_opacity = batcher.current_raw_item.get_opacity() / 100.0
+def apply_opacity_from_group_layers(layer_batcher):
+  new_layer_opacity = layer_batcher.current_layer.get_opacity() / 100.0
 
-  raw_parent = batcher.current_item.raw.get_parent()
+  raw_parent = layer_batcher.current_item.raw.get_parent()
   while raw_parent is not None:
     new_layer_opacity = new_layer_opacity * (raw_parent.get_opacity() / 100.0)
     raw_parent = raw_parent.get_parent()
   
-  batcher.current_raw_item.set_opacity(new_layer_opacity * 100.0)
+  layer_batcher.current_layer.set_opacity(new_layer_opacity * 100.0)
 
 
-def rename_layer(batcher, pattern, rename_layers=True, rename_folders=False):
+def rename_layer(layer_batcher, pattern, rename_layers=True, rename_folders=False):
   renamer = renamer_.ItemRenamer(pattern, rename_items=rename_layers, rename_folders=rename_folders)
   renamed_parents = set()
   
   while True:
     if rename_folders:
-      for parent in batcher.current_item.parents:
+      for parent in layer_batcher.current_item.parents:
         if parent not in renamed_parents:
-          parent.name = renamer.rename(batcher, item=parent)
+          parent.name = renamer.rename(layer_batcher, item=parent)
           renamed_parents.add(parent)
 
-          if batcher.edit_mode and batcher.process_names and not batcher.is_preview:
+          if (layer_batcher.edit_mode
+              and layer_batcher.process_names
+              and not layer_batcher.is_preview):
             parent.raw.set_name(parent.name)
 
     if rename_layers:
-      batcher.current_item.name = renamer.rename(batcher)
+      layer_batcher.current_item.name = renamer.rename(layer_batcher)
 
-      if batcher.process_names and not batcher.is_preview:
-        batcher.current_raw_item.set_name(batcher.current_item.name)
+      if layer_batcher.process_names and not layer_batcher.is_preview:
+        layer_batcher.current_layer.set_name(layer_batcher.current_item.name)
 
     yield
 
 
 def resize_to_layer_size(batcher):
-  image = batcher.current_raw_item.get_image()
-  layer = batcher.current_raw_item
+  image = batcher.current_image
+  layer = batcher.current_layer
   
   layer_offset_x, layer_offset_y = layer.get_offsets()[1:]
   image.resize(layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
