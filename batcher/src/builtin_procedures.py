@@ -386,7 +386,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
     {
       'type': 'name_pattern',
       'name': 'single_image_name_pattern',
-      'default_value': '[image name]',
+      'default_value': _('Untitled'),
       'display_name': _('Image filename pattern'),
       'gui_type': 'name_pattern_entry',
     },
@@ -427,6 +427,13 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5] = {
   ],
   'display_name': _('Perform export:'),
 }
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6] = {
+  'type': 'name_pattern',
+  'name': 'single_image_name_pattern',
+  'default_value': '[image name]',
+  'display_name': _('Image filename pattern'),
+  'gui_type': 'name_pattern_entry',
+}
 
 
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(
@@ -448,6 +455,13 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5] = {
     (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
   ],
   'display_name': _('Perform export:'),
+}
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6] = {
+  'type': 'name_pattern',
+  'name': 'single_image_name_pattern',
+  'default_value': '[image name]',
+  'display_name': _('Image filename pattern'),
+  'gui_type': 'name_pattern_entry',
 }
 
 
