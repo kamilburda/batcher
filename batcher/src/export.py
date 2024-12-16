@@ -37,8 +37,8 @@ class ExportModes:
   EXPORT_MODES = (
     EACH_ITEM,
     EACH_TOP_LEVEL_ITEM_OR_FOLDER,
-    ALL_ITEMS_AT_ONCE,
-  ) = 'each_item', 'each_top_level_item_or_folder', 'all_items_at_once'
+    SINGLE_IMAGE,
+  ) = 'each_item', 'each_top_level_item_or_folder', 'single_image'
 
 
 def export(
@@ -63,10 +63,10 @@ def export(
   image_copies = []
   multi_layer_images = []
 
-  if export_mode == ExportModes.ALL_ITEMS_AT_ONCE and single_image_name_pattern is not None:
-    renamer_for_image = renamer_.ItemRenamer(single_image_name_pattern)
+  if export_mode == ExportModes.SINGLE_IMAGE and single_image_name_pattern is not None:
+    renamer_for_single_image = renamer_.ItemRenamer(single_image_name_pattern)
   else:
-    renamer_for_image = None
+    renamer_for_single_image = None
 
   batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [multi_layer_images])
   batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
@@ -101,7 +101,7 @@ def export(
     else:
       image_to_process = multi_layer_image
     
-    if export_mode == ExportModes.ALL_ITEMS_AT_ONCE:
+    if export_mode == ExportModes.SINGLE_IMAGE:
       if batcher.process_export:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
         layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
@@ -113,7 +113,7 @@ def export(
       else:
         item_to_process = pg.itemtree.GimpItem(item.raw, pg.itemtree.TYPE_ITEM, [], [], None, None)
         if single_image_name_pattern is not None:
-          item_to_process.name = renamer_for_image.rename(batcher, item_to_process)
+          item_to_process.name = renamer_for_single_image.rename(batcher, item_to_process)
         else:
           item_to_process.name = item.name
     elif export_mode == ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER:

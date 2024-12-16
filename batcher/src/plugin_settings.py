@@ -619,7 +619,7 @@ def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict)
 
 def _set_sensitive_for_image_name_pattern_in_export(
       export_mode_setting, single_image_name_pattern_setting):
-  if export_mode_setting.value == export_.ExportModes.ALL_ITEMS_AT_ONCE:
+  if export_mode_setting.value == export_.ExportModes.SINGLE_IMAGE:
     single_image_name_pattern_setting.gui.set_sensitive(True)
   else:
     single_image_name_pattern_setting.gui.set_sensitive(False)

@@ -1021,7 +1021,7 @@ def _update_export_mode_setting(settings_list):
   if export_mode_dict is not None:
     export_mode_dict['items'][0][0] = 'each_item'
     export_mode_dict['items'][1][0] = 'each_top_level_item_or_folder'
-    export_mode_dict['items'][2][0] = 'all_items_at_once'
+    export_mode_dict['items'][2][0] = 'single_image'
 
     export_mode_dict['default_value'] = 'each_item'
     if export_mode_dict['value'] == 'each_layer':
@@ -1029,7 +1029,7 @@ def _update_export_mode_setting(settings_list):
     elif export_mode_dict['value'] == 'each_top_level_layer_or_group':
       export_mode_dict['value'] = 'each_top_level_item_or_folder'
     elif export_mode_dict['value'] == 'entire_image_at_once':
-      export_mode_dict['value'] = 'all_items_at_once'
+      export_mode_dict['value'] = 'single_image'
 
 
 _UPDATE_HANDLERS = {

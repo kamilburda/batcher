@@ -379,7 +379,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
         (export_.ExportModes.EACH_ITEM, _('For each image')),
         (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
          _('For each top-level image or folder')),
-        (export_.ExportModes.ALL_ITEMS_AT_ONCE, _('As a single image')),
+        (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
       ],
       'display_name': _('Perform export:'),
     },
@@ -423,7 +423,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5] = {
   'items': [
     (export_.ExportModes.EACH_ITEM, _('For each layer')),
     (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
-    (export_.ExportModes.ALL_ITEMS_AT_ONCE, _('As a single image')),
+    (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
   ],
   'display_name': _('Perform export:'),
 }
@@ -445,7 +445,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5] = {
   'items': [
     (export_.ExportModes.EACH_ITEM, _('For each layer')),
     (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
-    (export_.ExportModes.ALL_ITEMS_AT_ONCE, _('As a single image')),
+    (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
   ],
   'display_name': _('Perform export:'),
 }
