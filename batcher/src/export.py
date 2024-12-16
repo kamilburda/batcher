@@ -88,14 +88,16 @@ def export(
       multi_layer_image = None
 
     if batcher.edit_mode and batcher.process_export:
-      image_copy = create_empty_image_copy(batcher.current_image)
+      image_copy, layer_to_process = batcher.create_copy(batcher.current_image, layer_to_process)
       image_copies.append(image_copy)
+
+      if layer_to_process is None:
+        layer_to_process = batcher.current_layer
+      else:
+        layer_to_process.set_name(item.name)
     else:
       image_copy = batcher.current_image
 
-    if batcher.edit_mode and batcher.process_export:
-      layer_to_process = _copy_layer(layer_to_process, image_copy, item)
-    
     if multi_layer_image is None:
       image_to_process = image_copy
     else:

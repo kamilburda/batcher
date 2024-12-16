@@ -1016,6 +1016,14 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     self._should_stop = True
 
+  @abc.abstractmethod
+  def create_copy(self, image, layer) -> Tuple[Gimp.Image, Optional[Gimp.Layer]]:
+    """Creates a copy of the specified image.
+
+    How the copy is created depends on the subclass.
+    """
+    pass
+
 
 class ImageBatcher(Batcher):
   """Class for batch-processing files and opened GIMP images with a sequence of
@@ -1031,14 +1039,14 @@ class ImageBatcher(Batcher):
       if should_load_image:
         loaded_image = self._load_image(self._current_item.id)
         if loaded_image is not None:
-          self._image_copies.append(loaded_image)
           self._current_image = loaded_image
           self._current_item.raw = loaded_image
+          self._image_copies.append(loaded_image)
       else:
-        image_copy = self._current_image.duplicate()
-        self._image_copies.append(image_copy)
+        image_copy, _not_applicable = self.create_copy(self._current_image, None)
 
         self._current_image = image_copy
+        self._image_copies.append(image_copy)
     else:
       raise NotImplementedError('edit mode for batch image processing is currently not supported')
 
@@ -1083,6 +1091,9 @@ class ImageBatcher(Batcher):
           return layers[0]
 
     return None
+
+  def create_copy(self, image, layer):
+    return image.duplicate(), None
 
 
 class LayerBatcher(Batcher):
@@ -1185,24 +1196,11 @@ class LayerBatcher(Batcher):
     self._current_layer = self._current_item.raw
 
     if not self._edit_mode or self._is_preview:
-      image_copy = export_.create_empty_image_copy(self._current_image)
-      self._image_copies.append(image_copy)
+      image_copy, layer_copy = self.create_copy(self._current_image, self._current_layer)
 
       self._current_image = image_copy
-
-      layer_copy = pg.pdbutils.copy_and_paste_layer(
-        self._current_layer,
-        self._current_image,
-        None,
-        0,
-        True,
-        True,
-        True)
-
-      orig_layer_name = self._current_layer.get_name()
       self._current_layer = layer_copy
-      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
-      self._current_layer.set_name(orig_layer_name)
+      self._image_copies.append(image_copy)
 
     if self._edit_mode and not self._is_preview and self._current_layer.is_group_layer():
       # Group layers must be copied and inserted as layers as some procedures
@@ -1225,3 +1223,20 @@ class LayerBatcher(Batcher):
 
     self._current_image = None
     self._current_layer = None
+
+  def create_copy(self, image, layer):
+    image_copy = export_.create_empty_image_copy(image)
+
+    layer_copy = pg.pdbutils.copy_and_paste_layer(
+      layer,
+      image_copy,
+      None,
+      0,
+      True,
+      True,
+      True)
+
+    # This eliminates the " copy" suffix appended by GIMP after creating a layer copy.
+    layer_copy.set_name(layer.get_name())
+
+    return image_copy, layer_copy
