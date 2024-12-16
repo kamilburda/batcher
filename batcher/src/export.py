@@ -111,7 +111,7 @@ def export(
         yield
         continue
       else:
-        item_to_process = pg.itemtree.GimpItem(item.raw, pg.itemtree.TYPE_ITEM, [], [], None, None)
+        item_to_process = _NameOnlyItem(None, pg.itemtree.TYPE_ITEM, [], [], None, None)
         if single_image_name_pattern is not None:
           item_to_process.name = renamer_for_single_image.rename(batcher, item_to_process)
         else:
@@ -629,6 +629,23 @@ class _FileExtensionProperties:
   
   def __getitem__(self, key):
     return self._properties[key.lower()]
+
+
+class _NameOnlyItem(pg.itemtree.Item):
+  """`pygimplib.itemtree.Item` subclass used to store the item name only."""
+
+  @property
+  def raw(self):
+    return None
+
+  def _list_child_objects(self):
+    return []
+
+  def _get_name_from_object(self) -> str:
+    return ''
+
+  def _get_id_from_object(self):
+    return None
 
 
 class ExportStatuses:
