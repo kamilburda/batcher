@@ -1096,13 +1096,6 @@ class LayerBatcher(Batcher):
   copies, pass ``keep_image_copies=True`` to `__init__()` or `run()`.
   """
 
-  def __init__(
-        self,
-        *args,
-        **kwargs,
-  ):
-    super().__init__(*args, **kwargs)
-
   def _add_actions_before_initial_invoker(self):
     super()._add_actions_before_initial_invoker()
 
