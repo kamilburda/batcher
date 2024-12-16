@@ -45,9 +45,6 @@ class Item(metaclass=abc.ABCMeta):
         children: Optional[Iterable[Any]] = None,
         prev_item: Optional[Any] = None,
         next_item: Optional[Any] = None):
-    if object_ is None:
-      raise TypeError('object_ cannot be None')
-
     self._object = object_
     self._type = item_type
     self._parents = parents if parents is not None else []
