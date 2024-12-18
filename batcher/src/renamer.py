@@ -24,22 +24,35 @@ class ItemRenamer:
   def __init__(
         self,
         pattern: str,
-        fields_raw: Optional[List[Dict[str, Any]]] = None,
+        fields_raw: Dict[str, Any],
         rename_items: bool = True,
         rename_folders: bool = False,
   ):
+    self._fields_raw = fields_raw
+    self._rename_items = rename_items
+    self._rename_folders = rename_folders
+
     self._name_pattern = pattern_.StringPattern(
       pattern=pattern,
       fields=_get_fields_and_substitute_funcs(_init_fields(fields_raw)))
 
-    self._rename_items = rename_items
-    self._rename_folders = rename_folders
-  
+  @property
+  def fields_raw(self):
+    return self._fields_raw
+
+  @property
+  def rename_items(self):
+    return self._rename_items
+
+  @property
+  def rename_folders(self):
+    return self._rename_folders
+
   def rename(self, batcher: 'src.core.Batcher', item: Optional[pg.itemtree.Item] = None):
     if item is None:
       item = batcher.current_item
     
-    return self._name_pattern.substitute(batcher, item, self._rename_items, self._rename_folders)
+    return self._name_pattern.substitute(self, batcher, item)
 
 
 def _get_fields_and_substitute_funcs(fields):
@@ -49,12 +62,9 @@ def _get_fields_and_substitute_funcs(fields):
 
 
 def _init_fields(fields_raw):
-  if fields_raw is None:
-    fields_raw = _FIELDS_LIST_FOR_LAYERS
-  
   fields = []
   
-  for field_raw in fields_raw:
+  for field_raw in fields_raw.values():
     # Use a copy to avoid modifying the original that could be reused.
     field_raw_copy = field_raw.copy()
     
@@ -177,7 +187,7 @@ class NumberField(Field):
       yield str_i
       i += increment
   
-  def _get_number(self, batcher, item, rename_items, rename_folders, field_value, *args):
+  def _get_number(self, renamer, batcher, item, field_value, *args):
     reset_numbering_on_parent = True
     ascending = True
     padding = None
@@ -204,11 +214,11 @@ class NumberField(Field):
       initial_number = int(field_value)
 
       if batcher.matching_items is not None:
-        if rename_items and not rename_folders:
+        if renamer.rename_items and not renamer.rename_folders:
           tree_items = batcher.matching_items
-        elif rename_items and rename_folders:
+        elif renamer.rename_items and renamer.rename_folders:
           tree_items = batcher.matching_items_and_parents
-        elif not rename_items and rename_folders:
+        elif not renamer.rename_items and renamer.rename_folders:
           tree_items = [
             item for item in batcher.matching_items_and_parents
             if item.type == pg.itemtree.TYPE_FOLDER]
@@ -240,10 +250,9 @@ class _PercentTemplate(string.Template):
 
 
 def _get_layer_name(
+      _renamer,
       layer_batcher,
       item,
-      _rename_items,
-      _rename_folders,
       _field_value,
       file_extension_strip_mode='',
 ):
@@ -259,8 +268,7 @@ def _get_layer_name(
   return fileext.get_filename_root(item.name)
 
 
-def _get_image_name(
-      batcher, _item, _rename_items, _rename_folders, _field_value, keep_extension_str=''):
+def _get_image_name(_renamer, batcher, _item, _field_value, keep_extension_str=''):
   image = batcher.current_image
   if image is not None and image.get_name() is not None:
     image_name = image.get_name()
@@ -274,10 +282,9 @@ def _get_image_name(
 
 
 def _get_layer_path(
+      renamer,
       layer_batcher,
       item,
-      rename_items,
-      rename_folders,
       field_value,
       separator='-',
       wrapper=None,
@@ -294,13 +301,12 @@ def _get_layer_path(
   
   path_components = [parent.name for parent in item.parents]
   path_components += [
-    _get_layer_name(
-      layer_batcher, item, rename_items, rename_folders, field_value, file_extension_strip_mode)]
+    _get_layer_name(renamer, layer_batcher, item, field_value, file_extension_strip_mode)]
   
   return separator.join(wrapper.format(path_component) for path_component in path_components)
 
 
-def _get_tags(_layer_batcher, item, _rename_items, _rename_folders, _field_value, *args):
+def _get_tags(_renamer, _layer_batcher, item, _field_value, *args):
   color_tag = item.raw.get_color_tag()
   color_tag_default_names = {
     value: value.value_name[len('GIMP_COLOR_TAG_'):].lower()
@@ -343,13 +349,11 @@ def _get_tags(_layer_batcher, item, _rename_items, _rename_folders, _field_value
     return ''
 
 
-def _get_current_date(
-      _batcher, _item, _rename_items, _rename_folders, _field_value, date_format='%Y-%m-%d'):
+def _get_current_date(_renamer, _batcher, _item, _field_value, date_format='%Y-%m-%d'):
   return datetime.datetime.now().strftime(date_format)
 
 
-def _get_attributes(
-      layer_batcher, _item, _rename_items, _rename_folders, _field_value, pattern, measure='%px'):
+def _get_attributes(_renamer, layer_batcher, _item, _field_value, pattern, measure='%px'):
   image = layer_batcher.current_image
   layer = layer_batcher.current_layer
 
@@ -393,10 +397,9 @@ def _get_attributes(
 
 
 def _replace(
+      renamer,
       batcher,
       item,
-      rename_items,
-      rename_folders,
       _field_value,
       field_to_replace_str,
       pattern,
@@ -405,11 +408,11 @@ def _replace(
   field_name, field_args = pattern_.StringPattern.parse_field(field_to_replace_str)
   
   try:
-    field_func = FIELDS_FOR_LAYERS[field_name]['substitute_func']
+    field_func = renamer.fields_raw[field_name]['substitute_func']
   except KeyError:
     return ''
   
-  str_to_process = field_func(batcher, item, rename_items, rename_folders, field_name, *field_args)
+  str_to_process = field_func(renamer, batcher, item, field_name, *field_args)
   
   count = 0
   flags = 0

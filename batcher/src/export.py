@@ -64,7 +64,8 @@ def export(
   multi_layer_images = []
 
   if export_mode == ExportModes.SINGLE_IMAGE and single_image_name_pattern is not None:
-    renamer_for_single_image = renamer_.ItemRenamer(single_image_name_pattern)
+    renamer_for_single_image = renamer_.ItemRenamer(
+      single_image_name_pattern, renamer_.FIELDS_FOR_LAYERS)
   else:
     renamer_for_single_image = None
 
