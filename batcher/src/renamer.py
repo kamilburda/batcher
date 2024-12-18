@@ -248,7 +248,7 @@ def _get_layer_name(
       file_extension_strip_mode='',
 ):
   if file_extension_strip_mode in ['%e', '%i']:
-    file_extension = fileext.get_file_extension(item.orig_name)
+    file_extension = fileext.get_file_extension(item.name)
     if file_extension:
       if file_extension_strip_mode == '%i':
         if file_extension == layer_batcher.file_extension:
