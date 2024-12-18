@@ -50,7 +50,7 @@ def _get_fields_and_substitute_funcs(fields):
 
 def _init_fields(fields_raw):
   if fields_raw is None:
-    fields_raw = _FIELDS_LIST
+    fields_raw = _FIELDS_LIST_FOR_LAYERS
   
   fields = []
   
@@ -405,7 +405,7 @@ def _replace(
   field_name, field_args = pattern_.StringPattern.parse_field(field_to_replace_str)
   
   try:
-    field_func = FIELDS[field_name]['substitute_func']
+    field_func = FIELDS_FOR_LAYERS[field_name]['substitute_func']
   except KeyError:
     return ''
   
@@ -426,7 +426,7 @@ def _replace(
   return re.sub(pattern, replacement, str_to_process, count=count, flags=flags)
 
 
-_FIELDS_LIST = [
+_COMMON_FIELDS_LIST = [
   {
     'type': NumberField,
     'regex': '^[0-9]+$',
@@ -445,6 +445,57 @@ _FIELDS_LIST = [
       ['[10, %d2]', '10, 09, ...'],
     ],
   },
+  {
+    'type': Field,
+    'regex': 'current date',
+    'substitute_func': _get_current_date,
+    'display_name': _('Current date'),
+    'str_to_insert': '[current date]',
+    'examples_lines': [
+      ['[current date]', '2019-01-28'],
+      [_('Custom date format uses formatting as per the "strftime" function in Python.')],
+      ['[current date, %m.%d.%Y_%H-%M]', '28.01.2019_19-04'],
+    ],
+  },
+  {
+    'type': Field,
+    'regex': 'attributes',
+    'substitute_func': _get_attributes,
+    'display_name': _('Attributes'),
+    'str_to_insert': '[attributes]',
+    'examples_lines': [
+      [_('Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
+         'of 1000, 270, 0 and 40 pixels, respectively,\n'
+         'and the image has width and height of 1000 and 500 pixels, respectively.')],
+      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
+      ['[attributes, %iw-%ih]', '1000-500'],
+    ],
+  },
+  {
+    'type': Field,
+    'regex': 'replace',
+    'substitute_func': _replace,
+    'display_name': _('Replace'),
+    'str_to_insert': '[replace]',
+    'examples_lines': [
+      [_('Suppose that a layer is named "Animal copy #1".')],
+      ['[replace, [layer name], [a], [b] ]', 'Animbl copy #1'],
+      [_('You can use the regular expression syntax as defined in the "re" module for Python.')],
+      ['[replace, [layer name], [ copy(?: #[[0-9]]+)*$], [] ]', 'Animal'],
+      [_('You can specify the number of replacements and flags as defined in the "re" module for Python.')],
+      ['[replace, [layer name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
+    ],
+  },
+]
+
+
+_COMMON_FIELDS = {field['regex']: field for field in _COMMON_FIELDS_LIST}
+
+
+_FIELDS_LIST_FOR_LAYERS = [
+  _COMMON_FIELDS['^[0-9]+$'],
   {
     'type': Field,
     'regex': 'layer name',
@@ -501,21 +552,6 @@ _FIELDS_LIST = [
   },
   {
     'type': Field,
-    'regex': 'replace',
-    'substitute_func': _replace,
-    'display_name': _('Replace'),
-    'str_to_insert': '[replace]',
-    'examples_lines': [
-      [_('Suppose that a layer is named "Animal copy #1".')],
-      ['[replace, [layer name], [a], [b] ]', 'Animbl copy #1'],
-      [_('You can use the regular expression syntax as defined in the "re" module for Python.')],
-      ['[replace, [layer name], [ copy(?: #[[0-9]]+)*$], [] ]', 'Animal'],
-      [_('You can specify the number of replacements and flags as defined in the "re" module for Python.')],
-      ['[replace, [layer name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
-    ],
-  },
-  {
-    'type': Field,
     'regex': 'tags',
     'substitute_func': _get_tags,
     'display_name': _('Tags'),
@@ -531,34 +567,9 @@ _FIELDS_LIST = [
       ['[tags, %t, green, background, blue, foreground]', 'background'],
     ],
   },
-  {
-    'type': Field,
-    'regex': 'current date',
-    'substitute_func': _get_current_date,
-    'display_name': _('Current date'),
-    'str_to_insert': '[current date]',
-    'examples_lines': [
-      ['[current date]', '2019-01-28'],
-      [_('Custom date format uses formatting as per the "strftime" function in Python.')],
-      ['[current date, %m.%d.%Y_%H-%M]', '28.01.2019_19-04'],
-    ],
-  },
-  {
-    'type': Field,
-    'regex': 'attributes',
-    'substitute_func': _get_attributes,
-    'display_name': _('Attributes'),
-    'str_to_insert': '[attributes]',
-    'examples_lines': [
-      [_('Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
-         'of 1000, 270, 0 and 40 pixels, respectively,\n'
-         'and the image has width and height of 1000 and 500 pixels, respectively.')],
-      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
-      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
-      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
-      ['[attributes, %iw-%ih]', '1000-500'],
-    ],
-  },
+  _COMMON_FIELDS['current date'],
+  _COMMON_FIELDS['attributes'],
+  _COMMON_FIELDS['replace'],
 ]
 
-FIELDS = {field['regex']: field for field in _FIELDS_LIST}
+FIELDS_FOR_LAYERS = {field['regex']: field for field in _FIELDS_LIST_FOR_LAYERS}

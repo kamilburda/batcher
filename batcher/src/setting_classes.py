@@ -200,7 +200,7 @@ class NamePatternEntryPresenter(ExtendedEntryPresenter):
   """
 
   def _create_widget(self, setting, **kwargs):
-    return entries_.NamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS))
+    return entries_.NamePatternEntry(renamer_.get_field_descriptions(renamer_.FIELDS_FOR_LAYERS))
 
 
 class NamePatternSetting(pg.setting.StringSetting):

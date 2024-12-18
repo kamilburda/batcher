@@ -86,7 +86,7 @@ class ExportSettings:
     )
 
     self._name_pattern_entry = entries_.NamePatternEntry(
-      renamer_.get_field_descriptions(renamer_.FIELDS),
+      renamer_.get_field_descriptions(renamer_.FIELDS_FOR_LAYERS),
       expandable=False,
       default_item=self._settings['main/name_pattern'].default_value)
     self._name_pattern_entry.set_activates_default(True)
