@@ -146,7 +146,7 @@ Options:
 	* `%e`: If a layer has a recognized file extension, keep the extension.
 	* `%i`: If a layer has a recognized file extension that matches the one in the `File extension` text entry, keep the extension.
 
-Examples:
+Examples for Export Layers where the file extension is appended to each layer in the preview:
 * `[layer name]` → `Frame.png`
 * `[layer name]` for a layer named `Some.Layer.png` → `Some.png`
 * `[layer name, %e]` → `Frame.png`
