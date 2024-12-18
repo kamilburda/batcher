@@ -4,7 +4,7 @@ New features:
 * You may now attempt to apply a procedure to multiple layers at once using the new `All Layers` option, if available for a particular procedure (usually those having the `The input drawables` argument). Note that a procedure may still fail even if this option is available as it may not support working with multiple layers at once.
 
 Changes to procedures and constraints:
-* Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent. For Convert, this is very likely redundant as the user is able to add and remove arbitrary items.
+* Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent.
 * Rename procedure: For the `[attributes]` field, changed the layer attributes from `%w`, `%h`, `%x` and `%y` to `%lw`, `%lh`, `%lx` and `%ly`, respectively.
 
 User interface changes:
