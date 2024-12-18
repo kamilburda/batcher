@@ -349,41 +349,46 @@ def _get_current_date(
 
 
 def _get_attributes(
-      layer_batcher, item, _rename_items, _rename_folders, _field_value, pattern, measure='%px'):
+      layer_batcher, _item, _rename_items, _rename_folders, _field_value, pattern, measure='%px'):
   image = layer_batcher.current_image
-  
-  fields = {
-    'iw': image.get_width(),
-    'ih': image.get_height(),
-  }
-  
-  layer_fields = {}
-  
-  if measure == '%px':
-    layer_fields = {
-      'lw': item.raw.get_width(),
-      'lh': item.raw.get_height(),
-      'lx': item.raw.get_offsets().offset_x,
-      'ly': item.raw.get_offsets().offset_y,
-    }
-  elif measure.startswith('%pc'):
-    match = re.match(r'^' + re.escape('%pc') + r'([0-9]*)$', measure)
-    
-    if match is not None:
-      if match.group(1):
-        round_digits = int(match.group(1))
-      else:
-        round_digits = 2
-      
+  layer = layer_batcher.current_layer
+
+  fields = {}
+
+  if image is not None:
+    fields.update({
+      'iw': image.get_width(),
+      'ih': image.get_height(),
+    })
+
+  if layer is not None:
+    layer_fields = {}
+
+    if measure == '%px':
       layer_fields = {
-        'lw': round(item.raw.get_width() / image.get_width(), round_digits),
-        'lh': round(item.raw.get_height() / image.get_height(), round_digits),
-        'lx': round(item.raw.get_offsets().offset_x / image.get_width(), round_digits),
-        'ly': round(item.raw.get_offsets().offset_y / image.get_height(), round_digits),
+        'lw': layer.get_width(),
+        'lh': layer.get_height(),
+        'lx': layer.get_offsets().offset_x,
+        'ly': layer.get_offsets().offset_y,
       }
-  
-  fields.update(layer_fields)
-  
+    elif measure.startswith('%pc'):
+      match = re.match(r'^' + re.escape('%pc') + r'([0-9]*)$', measure)
+
+      if match is not None:
+        if match.group(1):
+          round_digits = int(match.group(1))
+        else:
+          round_digits = 2
+
+        layer_fields = {
+          'lw': round(layer.get_width() / image.get_width(), round_digits),
+          'lh': round(layer.get_height() / image.get_height(), round_digits),
+          'lx': round(layer.get_offsets().offset_x / image.get_width(), round_digits),
+          'ly': round(layer.get_offsets().offset_y / image.get_height(), round_digits),
+        }
+
+    fields.update(layer_fields)
+
   return _PercentTemplate(pattern).safe_substitute(fields)
 
 
