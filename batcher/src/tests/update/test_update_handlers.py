@@ -20,7 +20,7 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_LATEST_PLUGIN_VERSION = '1.0'
+_LATEST_PLUGIN_VERSION = '0.8'
 
 
 @mock.patch(
@@ -56,7 +56,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_5()
     self._assert_correct_contents_for_update_to_0_6()
     self._assert_correct_contents_for_update_to_0_7()
-    self._assert_correct_contents_for_update_to_1_0()
+    self._assert_correct_contents_for_update_to_0_8()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -316,7 +316,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/procedures/scale/arguments/dimension_to_keep'].value, 'width')
 
-  def _assert_correct_contents_for_update_to_1_0(self):
+  def _assert_correct_contents_for_update_to_0_8(self):
     self.assertIn('selected_items', self.settings['main'])
     self.assertNotIn('selected_layers', self.settings['main'])
 

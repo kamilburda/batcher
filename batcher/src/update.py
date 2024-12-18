@@ -933,16 +933,16 @@ def _update_to_0_7(data, _settings, source_names):
           ])
 
 
-def _update_to_1_0(data, _settings, source_names):
+def _update_to_0_8(data, _settings, source_names):
   if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
     return
 
   gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
 
   if gui_settings_list is not None:
-    _update_items_setting_for_1_0(
+    _update_items_setting_for_0_8(
       gui_settings_list, 'image_preview_displayed_items', 'gimp_item_tree_items')
-    _update_items_setting_for_1_0(
+    _update_items_setting_for_0_8(
       gui_settings_list, 'name_preview_items_collapsed_state', 'gimp_item_tree_items')
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -954,7 +954,7 @@ def _update_to_1_0(data, _settings, source_names):
     _remove_setting(main_settings_list, 'selected_items')
     _rename_setting(main_settings_list, 'selected_layers', 'selected_items')
 
-    _update_items_setting_for_1_0(main_settings_list, 'selected_items', 'gimp_item_tree_items')
+    _update_items_setting_for_0_8(main_settings_list, 'selected_items', 'gimp_item_tree_items')
 
     export_settings_list, _index = _get_child_group_list(main_settings_list, 'export')
 
@@ -995,7 +995,7 @@ def _update_to_1_0(data, _settings, source_names):
       _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
 
 
-def _update_items_setting_for_1_0(settings_list, setting_name, new_type_name):
+def _update_items_setting_for_0_8(settings_list, setting_name, new_type_name):
   setting_dict, _index = _get_child_setting(settings_list, setting_name)
 
   setting_dict['type'] = new_type_name
@@ -1038,5 +1038,5 @@ _UPDATE_HANDLERS = {
   '0.5': _update_to_0_5,
   '0.6': _update_to_0_6,
   '0.7': _update_to_0_7,
-  '1.0': _update_to_1_0,
+  '0.8': _update_to_0_8,
 }
