@@ -920,6 +920,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _process_item(self, item):
     self._current_item = item
+    self._current_image = self._get_initial_current_image()
+    self._current_layer = self._get_initial_current_layer()
 
     if self._is_preview and self._process_names:
       self._process_item_with_name_only_actions()
@@ -976,6 +978,14 @@ class Batcher(metaclass=abc.ABCMeta):
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     self._remove_image_copies()
+
+  @abc.abstractmethod
+  def _get_initial_current_image(self):
+    pass
+
+  @abc.abstractmethod
+  def _get_initial_current_layer(self):
+    pass
 
   def _store_selected_layers_in_current_image_and_start_undo_group(self):
     if self._edit_mode and not self._is_preview and self._current_image is not None:
@@ -1048,9 +1058,13 @@ class ImageBatcher(Batcher):
   actions (resize, rename, export, ...).
   """
 
-  def _process_item_with_actions(self):
-    self._current_image = self._current_item.raw
+  def _get_initial_current_image(self):
+    return self._current_item.raw
 
+  def _get_initial_current_layer(self):
+    return None
+
+  def _process_item_with_actions(self):
     should_load_image = self._current_image is None
 
     if not self._edit_mode or self._is_preview:
@@ -1125,6 +1139,12 @@ class LayerBatcher(Batcher):
   copies, pass ``keep_image_copies=True`` to `__init__()` or `run()`.
   """
 
+  def _get_initial_current_image(self):
+    return self._current_item.raw.get_image()
+
+  def _get_initial_current_layer(self):
+    return self._current_item.raw
+
   def _add_actions_before_initial_invoker(self):
     super()._add_actions_before_initial_invoker()
 
@@ -1183,9 +1203,6 @@ class LayerBatcher(Batcher):
       )
   
   def _process_item_with_actions(self):
-    self._current_image = self._current_item.raw.get_image()
-    self._current_layer = self._current_item.raw
-
     if not self._edit_mode or self._is_preview:
       image_copy, layer_copy = self.create_copy(self._current_image, self._current_layer)
 
