@@ -848,7 +848,7 @@ class Batcher(metaclass=abc.ABCMeta):
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
   def _setup_contents(self):
-    pass
+    Gimp.context_push()
 
   def _process_items(self):
     self._matching_items, self._matching_items_and_parents = self._get_items_matching_constraints()
@@ -1006,7 +1006,24 @@ class Batcher(metaclass=abc.ABCMeta):
     self._last_constraint = None
 
   def _do_cleanup_contents(self, exception_occurred):
-    pass
+    if not self._edit_mode or self._is_preview:
+      if not self._keep_image_copies or exception_occurred:
+        self._remove_image_copies()
+    else:
+      for image, selected_layers in self._orig_images_and_selected_layers.items():
+        if not image.is_valid():
+          continue
+
+        filtered_selected_layers = [
+          layer for layer in selected_layers if layer.is_valid() and layer.get_image() == image]
+        if filtered_selected_layers:
+          image.set_selected_layers(filtered_selected_layers)
+
+        image.undo_group_end()
+
+      Gimp.displays_flush()
+
+    Gimp.context_pop()
 
   def queue_stop(self):
     """Instructs `Batcher` to terminate batch processing prematurely.
@@ -1164,33 +1181,6 @@ class LayerBatcher(Batcher):
         ],
         kwargs=self._more_export_options,
       )
-
-  def _setup_contents(self):
-    super()._setup_contents()
-
-    Gimp.context_push()
-  
-  def _do_cleanup_contents(self, exception_occurred):
-    super()._do_cleanup_contents(exception_occurred)
-
-    if not self._edit_mode or self._is_preview:
-      if not self._keep_image_copies or exception_occurred:
-        self._remove_image_copies()
-    else:
-      for image, selected_layers in self._orig_images_and_selected_layers.items():
-        if not image.is_valid():
-          continue
-
-        filtered_selected_layers = [
-          layer for layer in selected_layers if layer.is_valid() and layer.get_image() == image]
-        if filtered_selected_layers:
-          image.set_selected_layers(filtered_selected_layers)
-
-        image.undo_group_end()
-
-      Gimp.displays_flush()
-    
-    Gimp.context_pop()
   
   def _process_item_with_actions(self):
     self._current_image = self._current_item.raw.get_image()
