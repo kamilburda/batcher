@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -1061,10 +1062,10 @@ class ImageBatcher(Batcher):
     self._current_image = None
     self._current_layer = None
 
-  def _load_image(self, image_filepath):
-    # TODO: load the file as an image
-    #  - if the file does not exist, skip
-    return None
+  @staticmethod
+  def _load_image(image_filepath):
+    return pdb.gimp_file_load(
+      Gio.file_new_for_path(image_filepath), run_mode=Gimp.RunMode.NONINTERACTIVE)
 
   @staticmethod
   def _get_current_layer(image):
