@@ -361,10 +361,10 @@ def _get_attributes(
   
   if measure == '%px':
     layer_fields = {
-      'w': item.raw.get_width(),
-      'h': item.raw.get_height(),
-      'x': item.raw.get_offsets().offset_x,
-      'y': item.raw.get_offsets().offset_y,
+      'lw': item.raw.get_width(),
+      'lh': item.raw.get_height(),
+      'lx': item.raw.get_offsets().offset_x,
+      'ly': item.raw.get_offsets().offset_y,
     }
   elif measure.startswith('%pc'):
     match = re.match(r'^' + re.escape('%pc') + r'([0-9]*)$', measure)
@@ -376,10 +376,10 @@ def _get_attributes(
         round_digits = 2
       
       layer_fields = {
-        'w': round(item.raw.get_width() / image.get_width(), round_digits),
-        'h': round(item.raw.get_height() / image.get_height(), round_digits),
-        'x': round(item.raw.get_offsets().offset_x / image.get_width(), round_digits),
-        'y': round(item.raw.get_offsets().offset_y / image.get_height(), round_digits),
+        'lw': round(item.raw.get_width() / image.get_width(), round_digits),
+        'lh': round(item.raw.get_height() / image.get_height(), round_digits),
+        'lx': round(item.raw.get_offsets().offset_x / image.get_width(), round_digits),
+        'ly': round(item.raw.get_offsets().offset_y / image.get_height(), round_digits),
       }
   
   fields.update(layer_fields)
@@ -548,9 +548,9 @@ _FIELDS_LIST = [
       [_('Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
          'of 1000, 270, 0 and 40 pixels, respectively,\n'
          'and the image has width and height of 1000 and 500 pixels, respectively.')],
-      ['[attributes, %w-%h-%x-%y]', '1000-270-0-40'],
-      ['[attributes, %w-%h-%x-%y, %pc]', '1.0-0.54-0.0-0.08'],
-      ['[attributes, %w-%h-%x-%y, %pc1]', '1.0-0.5-0.0-0.1'],
+      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
       ['[attributes, %iw-%ih]', '1000-500'],
     ],
   },

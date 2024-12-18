@@ -5,6 +5,7 @@ New features:
 
 Changes to procedures and constraints:
 * Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent. For Convert, this is very likely redundant as the user is able to add and remove arbitrary items.
+* Rename procedure: For the `[attributes]` field, changed the layer attributes from `%w`, `%h`, `%x` and `%y` to `%lw`, `%lh`, `%lx` and `%ly`, respectively.
 
 User interface changes:
 * Added a small delay to the image preview when the selected item changes. This prevents excessive changes when the selection changes rapidly.

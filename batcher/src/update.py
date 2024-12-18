@@ -1,8 +1,8 @@
 """Updating the plug-in to the latest version."""
 
-from typing import Dict, List, Optional, Tuple, Union
-
+import re
 import traceback
+from typing import Dict, List, Optional, Tuple, Union
 
 import pygimplib as pg
 from pygimplib import pdb
@@ -13,6 +13,7 @@ from src import builtin_procedures
 from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_
+from src.path import pattern as pattern_
 from src.path import uniquify
 from src.setting_source_names import *
 
@@ -956,8 +957,10 @@ def _update_to_0_8(data, _settings, source_names):
 
     _update_items_setting_for_0_8(main_settings_list, 'selected_items', 'gimp_item_tree_items')
 
-    export_settings_list, _index = _get_child_group_list(main_settings_list, 'export')
+    _replace_layer_related_options_in_attributes_field_in_pattern(
+      main_settings_list, 'name_pattern')
 
+    export_settings_list, _index = _get_child_group_list(main_settings_list, 'export')
     if export_settings_list is not None:
       _update_export_mode_setting(export_settings_list)
 
@@ -979,9 +982,18 @@ def _update_to_0_8(data, _settings, source_names):
           orig_name_setting_dict['value'] = 'remove_folder_structure'
           orig_name_setting_dict['default_value'] = 'remove_folder_structure'
 
-        if (orig_name_setting_dict['default_value'] == 'export_for_export_layers'
+        if (orig_name_setting_dict['default_value']
+              in ['rename_for_export_layers', 'rename_for_edit_layers']
+            and arguments_list is not None):
+          _replace_layer_related_options_in_attributes_field_in_pattern(
+            arguments_list, 'pattern')
+
+        if (orig_name_setting_dict['default_value']
+              in ['export_for_export_layers', 'export_for_edit_layers']
             and arguments_list is not None):
           _update_export_mode_setting(arguments_list)
+          _replace_layer_related_options_in_attributes_field_in_pattern(
+            arguments_list, 'single_image_name_pattern')
 
         if arguments_list is not None:
           for argument_dict in arguments_list:
@@ -1030,6 +1042,66 @@ def _update_export_mode_setting(settings_list):
       export_mode_dict['value'] = 'each_top_level_item_or_folder'
     elif export_mode_dict['value'] == 'entire_image_at_once':
       export_mode_dict['value'] = 'single_image'
+
+
+def _replace_layer_related_options_in_attributes_field_in_pattern(settings_list, setting_name):
+  setting_dict, _index = _get_child_setting(settings_list, setting_name)
+  if setting_dict is not None:
+    setting_dict['value'] = _replace_field_arguments_in_pattern(
+      setting_dict['value'],
+      [
+        ['attributes', '%w', '%lw'],
+        ['attributes', '%h', '%lh'],
+        ['attributes', '%x', '%lx'],
+        ['attributes', '%y', '%ly'],
+      ])
+
+
+def _replace_field_arguments_in_pattern(
+      pattern, field_regexes_arguments_and_replacements, as_lists=False):
+  string_pattern = pattern_.StringPattern(
+    pattern,
+    fields={item[0]: lambda *args: None for item in field_regexes_arguments_and_replacements})
+
+  processed_pattern_parts = []
+
+  for part in string_pattern.pattern_parts:
+    if isinstance(part, str):
+      processed_pattern_parts.append(part)
+    else:
+      field_regex = part[0]
+      new_arguments = []
+
+      if len(part) > 1:
+        if not as_lists:
+          for argument in part[1]:
+            new_argument = argument
+            for item in field_regexes_arguments_and_replacements:
+              if field_regex != item[0]:
+                continue
+
+              new_argument = re.sub(item[1], item[2], new_argument)
+
+            new_arguments.append(new_argument)
+        else:
+          new_arguments = list(part[1])
+
+          for item in field_regexes_arguments_and_replacements:
+            if field_regex != item[0]:
+              continue
+
+            if len(item[1]) != len(part[1]):
+              continue
+
+            for i in range(len(item[1])):
+              new_arguments[i] = re.sub(item[1][i], item[2][i], new_arguments[i])
+
+            for i in range(len(item[1]), len(item[2])):
+              new_arguments.append(item[2][i])
+
+      processed_pattern_parts.append((field_regex, new_arguments))
+
+  return pattern_.StringPattern.reconstruct_pattern(processed_pattern_parts)
 
 
 _UPDATE_HANDLERS = {

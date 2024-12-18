@@ -253,19 +253,19 @@ Examples:
 
 **\[attributes\]**
 
-Layer or image attributes.
+Attributes of the current image and the current Layer.
 
 Options:
 * *pattern*: A string formatting the attributes.
   Available attributes:
-  * `%w`: The layer width.
-  * `%h`: The layer height.
-  * `%x`: The layer *x*-offset.
-  * `%y`: The layer *y*-offset.
   * `%iw`: The image width.
   * `%ih`: The image height.
+  * `%lw`: The layer width.
+  * `%lh`: The layer height.
+  * `%lx`: The layer *x*-offset.
+  * `%ly`: The layer *y*-offset.
 * *measure*: The measure in which the attribute values are displayed.
-  Applies to `%w`, `%h`, `%x` and `%y` only.
+  Applies to `%lw`, `%lh`, `%lx` and `%ly` only.
   Available measures:
   * `%px` (default): Display absolute values in pixels.
   * `%pc`: Display percentages relative to the image.
@@ -273,9 +273,9 @@ Options:
     For example, `%pc1` displays percentages rounded to a single decimal digit.
 
 Examples:
-* `[attributes, %w-%h-%x-%y]` → `1000-270-0-40`
-* `[attributes, %w-%h-%x-%y, %pc]` → `1.0-0.54-0.0-0.08`
-* `[attributes, %w-%h-%x-%y, %pc1]` → `1.0-0.5-0.0-0.1`
+* `[attributes, %lw-%lh-%lx-%ly]` → `1000-270-0-40`
+* `[attributes, %lw-%lh-%lx-%ly, %pc]` → `1.0-0.54-0.0-0.08`
+* `[attributes, %lw-%lh-%lx-%ly, %pc1]` → `1.0-0.5-0.0-0.1`
 * `[attributes, %iw-%ih]` → `1000-500`
 
 
