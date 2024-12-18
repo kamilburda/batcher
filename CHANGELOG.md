@@ -5,6 +5,7 @@ New features:
 
 Changes to procedures and constraints:
 * Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent.
+* Rename procedure: Added `%n` option to the `[layer name]` and `[layer path]` fields acting as the inverse of `%i`.
 * Rename procedure: For the `[attributes]` field, changed the layer attributes from `%w`, `%h`, `%x` and `%y` to `%lw`, `%lh`, `%lx` and `%ly`, respectively.
 
 User interface changes:

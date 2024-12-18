@@ -256,15 +256,15 @@ def _get_layer_name(
       _field_value,
       file_extension_strip_mode='',
 ):
-  if file_extension_strip_mode in ['%e', '%i']:
-    file_extension = fileext.get_file_extension(item.name)
-    if file_extension:
-      if file_extension_strip_mode == '%i':
-        if file_extension == layer_batcher.file_extension:
-          return item.name
-      else:
-        return item.name
-  
+  if file_extension_strip_mode == '%e':
+    return item.name
+  elif file_extension_strip_mode == '%i':
+    if fileext.get_file_extension(item.name) == layer_batcher.file_extension:
+      return item.name
+  elif file_extension_strip_mode == '%n':
+    if fileext.get_file_extension(item.name) != layer_batcher.file_extension:
+      return item.name
+
   return fileext.get_filename_root(item.name)
 
 
@@ -406,7 +406,7 @@ def _replace(
       replacement,
       *count_and_flags):
   field_name, field_args = pattern_.StringPattern.parse_field(field_to_replace_str)
-  
+
   try:
     field_func = renamer.fields_raw[field_name]['substitute_func']
   except KeyError:
@@ -510,10 +510,11 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[layer name]', 'Frame'],
       ['[layer name, %e]', 'Frame.png'],
       ['[layer name, %i]', 'Frame.png'],
-      [_('Suppose that a layer is named "Frame.jpg".')],
-      ['[layer name]', 'Frame'],
+      ['[layer name, %n]', 'Frame'],
+      [_('Suppose that a layer is named "Frame.jpg" and the file extension is "png".')],
       ['[layer name, %e]', 'Frame.jpg'],
       ['[layer name, %i]', 'Frame'],
+      ['[layer name, %n]', 'Frame.jpg'],
     ],
   },
   {
@@ -548,9 +549,9 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[layer path, _]', 'Body_Hands_Left'],
       ['[layer path, _, (%c)]', '(Body)_(Hands)_(Left)'],
       [_('Suppose that the layer is named "Left.jpg" and the file extension is "png".')],
-      ['[layer path]', 'Body-Hands-Left'],
       ['[layer path, -, %c, %e]', 'Body-Hands-Left.jpg'],
       ['[layer path, -, %c, %i]', 'Body-Hands-Left'],
+      ['[layer path, -, %c, %n]', 'Body-Hands-Left.jpg'],
     ],
   },
   {

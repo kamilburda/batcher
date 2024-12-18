@@ -143,16 +143,19 @@ The layer name.
 
 Options:
 * *file extension strip mode*:
-	* `%e`: If a layer has a recognized file extension, keep the extension.
-	* `%i`: If a layer has a recognized file extension that matches the one in the `File extension` text entry, keep the extension.
+	* `%e`: Never strip the extension.
+	* `%i` (does not apply to Edit Layers): Strip the extension only if the layer has a recognized file extension that does not match the entered file extension.
+	* `%n` (does not apply to Edit Layers): Strip the extension only if the layer has a recognized file extension that matches the entered file extension (the inverse of `%i`).
 
-Examples for Export Layers where the file extension is appended to each layer in the preview:
-* `[layer name]` → `Frame.png`
-* `[layer name]` for a layer named `Some.Layer.png` → `Some.png`
-* `[layer name, %e]` → `Frame.png`
-* `[layer name, %e]` for a layer named `Some.Layer.png` → `Some.Layer.png`
-* `[layer name, %i]` → `Frame.png` (if the file extension is `png`)
-* `[layer name, %i]` → `Frame` (if the file extension is `jpg`)
+Examples:
+* `[layer name]` for a layer named `Frame` → `Frame`
+* `[layer name]` for a layer named `Frame.png` → `Frame`
+* `[layer name, %e]` for a layer named `Frame.png` if the file extension is `png` → `Frame.png`
+* `[layer name, %i]` for a layer named `Frame.png` if the file extension is `png` → `Frame.png`
+* `[layer name, %n]` for a layer named `Frame.png` if the file extension is `png` → `Frame`
+* `[layer name, %e]` for a layer named `Frame.png` if the file extension is `jpg` → `Frame.jpg`
+* `[layer name, %i]` for a layer named `Frame.png` if the file extension is `jpg` → `Frame`
+* `[layer name, %n]` for a layer named `Frame.png` if the file extension is `jpg` → `Frame.jpg`
 
 **Full layer name**
 
@@ -180,17 +183,13 @@ Options:
 * *wrapper*: A string that wraps around each path component.
   The wrapper must contain `%c` denoting the path component.
   Defaults to `%c`.
-* *file extension strip mode*:
-	* `%e`: If a layer has a recognized file extension, keep the extension.
-	* `%i`: If a layer has a recognized file extension that matches the one in the `File extension` text entry, keep the extension.
+* *file extension strip mode*: See the `\[layer name\]` field.
 
 Examples:
 * `[layer path]` → `Body-Hands-Left`
 * `[layer path, _]` → `Body_Hands_Left`
 * `[layer path, _, (%c)]` → `(Body)_(Hands)_(Left)`
 * `[layer path, _, (%c), %e]` → `Body-Hands-Left.png` (if the layer name is `Left.png` and the file extension is `png`)
-* `[layer path, _, (%c), %i]` → `Body-Hands-Left.png` (if the layer name is `Left.png` and the file extension is `png`)
-* `[layer path, _, (%c), %i]` → `Body-Hands-Left` (if the layer name is `Left.png` and the file extension is e.g. `jpg`)
 
 **\[replace\]**
 
