@@ -28,10 +28,9 @@ from src.gui.main import settings_manager as settings_manager_
 
 class BatchImageProcessingGui:
 
-  def __init__(self, item_tree, settings, source_name, run_gui_func=None):
+  def __init__(self, item_tree, settings, run_gui_func=None):
     self._item_tree = item_tree
     self._settings = settings
-    self._source_name = source_name
 
     self._init_gui()
     self._assign_gui_to_settings()
@@ -68,11 +67,9 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(
-        self, item_tree, settings, source_name, mode, current_image=None, run_gui_func=None):
+  def __init__(self, item_tree, settings, mode, current_image=None, run_gui_func=None):
     self._item_tree = item_tree
     self._settings = settings
-    self._source_name = source_name
 
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
@@ -198,7 +195,6 @@ class BatchLayerProcessingGui:
 
     self._settings_manager = settings_manager_.SettingsManager(
       self._settings,
-      self._source_name,
       self._dialog,
       previews_controller=self._previews.controller,
       display_message_func=self._display_inline_message,
@@ -418,7 +414,6 @@ class BatchLayerProcessingQuickGui:
         self,
         item_tree,
         settings,
-        _source_name,
         mode,
         title=None,
         current_image=None,
