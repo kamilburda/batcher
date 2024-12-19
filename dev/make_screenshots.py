@@ -18,7 +18,7 @@ from gi.repository import Gtk
 import batcher.pygimplib as pg
 from batcher.pygimplib import pdb
 
-from batcher.src.setting_source_names import *
+from batcher.src.procedure_groups import *
 
 
 ROOT_DIRPATH = os.path.abspath(
@@ -55,7 +55,7 @@ def main():
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
-    EXPORT_LAYERS_SOURCE_NAME,
+    EXPORT_LAYERS_GROUP,
     'export',
     run_gui_func=take_screenshots_for_export_layers,
   )
@@ -63,7 +63,7 @@ def main():
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_edit_layers(),
-    EDIT_LAYERS_SOURCE_NAME,
+    EDIT_LAYERS_GROUP,
     'edit',
     run_gui_func=take_screenshots_for_edit_layers,
   )
@@ -71,7 +71,7 @@ def main():
   gui_main.BatchLayerProcessingQuickGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
-    EXPORT_LAYERS_SOURCE_NAME,
+    EXPORT_LAYERS_GROUP,
     'export',
     title='Export Layers (Quick)',
     run_gui_func=take_screenshots_for_export_layers_quick,

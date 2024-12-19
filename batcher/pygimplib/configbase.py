@@ -145,10 +145,10 @@ def _init_config_from_file(config: _Config):
 
 
 def _init_config_per_procedure(config: _Config):
-  config.SOURCE_NAME = config.PLUGIN_NAME
+  config.PROCEDURE_GROUP = config.PLUGIN_NAME
 
   if _gimp_modules_available:
-    config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.SOURCE_NAME)
+    config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.PROCEDURE_GROUP)
 
     pgsetting.persistor.Persistor.set_default_setting_sources({
       'persistent': config.DEFAULT_SOURCE,

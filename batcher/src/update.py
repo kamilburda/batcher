@@ -15,7 +15,7 @@ from src import utils as utils_
 from src import version as version_
 from src.path import pattern as pattern_
 from src.path import uniquify
-from src.setting_source_names import *
+from src.procedure_groups import *
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
 
@@ -24,7 +24,7 @@ def load_and_update(
       settings: pg.setting.Group,
       sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
       update_sources: bool = True,
-      source_name: Optional[str] = None,
+      procedure_group: Optional[str] = None,
 ) -> Tuple[int, str]:
   """Loads and updates settings and setting sources to the latest version of the
   plug-in.
@@ -50,8 +50,8 @@ def load_and_update(
   (overwritten), otherwise they are kept intact.
 
   Some parts of the update may be skipped if the parts can only be applied to
-  the setting sources whose name match ``source_name``. If ``source_name`` is
-  ``None``, all parts of the update apply.
+  the setting sources whose name match ``procedure_group``. If
+  ``procedure_group`` is ``None``, all parts of the update apply.
   """
   def _handle_update(data):
     nonlocal current_version, previous_version
@@ -69,17 +69,17 @@ def load_and_update(
 
     for version_str, update_handler in _UPDATE_HANDLERS.items():
       if previous_version < version_.Version.parse(version_str) <= current_version:
-        update_handler(data, settings, source_names)
+        update_handler(data, settings, procedure_groups)
 
     return data
 
   if sources is None:
     sources = pg.setting.Persistor.get_default_setting_sources()
 
-  if source_name is None:
-    source_names = SOURCE_NAMES
+  if procedure_group is None:
+    procedure_groups = PROCEDURE_GROUPS
   else:
-    source_names = [source_name]
+    procedure_groups = [procedure_group]
 
   if _is_fresh_start(sources):
     if update_sources:
@@ -202,8 +202,8 @@ def _remove_setting(group_list, setting_name):
     del group_list[index]
 
 
-def _update_to_0_3(data, settings, source_names):
-  if EXPORT_LAYERS_SOURCE_NAME not in source_names:
+def _update_to_0_3(data, settings, procedure_groups):
+  if EXPORT_LAYERS_GROUP not in procedure_groups:
     return
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -301,8 +301,8 @@ def _update_actions_to_0_3(main_settings_list, action_type):
         more_options_list.append(also_apply_to_parent_folders_dict)
 
 
-def _update_to_0_4(data, _settings, source_names):
-  if EXPORT_LAYERS_SOURCE_NAME not in source_names:
+def _update_to_0_4(data, _settings, procedure_groups):
+  if EXPORT_LAYERS_GROUP not in procedure_groups:
     return
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -497,7 +497,7 @@ def _uniquify_action_display_name(display_name, existing_display_names):
   return uniquified_display_name
 
 
-def _update_to_0_5(data, _settings, source_names):
+def _update_to_0_5(data, _settings, procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
@@ -539,10 +539,10 @@ def _update_to_0_5(data, _settings, source_names):
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         # We retain `name` and only modify `orig_name` as only the latter is
         # used in the code to check if a procedure is an export procedure.
-        if EXPORT_LAYERS_SOURCE_NAME in source_names:
+        if EXPORT_LAYERS_GROUP in procedure_groups:
           orig_name_setting_dict['value'] = 'export_for_export_layers'
           orig_name_setting_dict['default_value'] = 'export_for_export_layers'
-        elif EDIT_LAYERS_SOURCE_NAME in source_names:
+        elif EDIT_LAYERS_GROUP in procedure_groups:
           orig_name_setting_dict['value'] = 'export_for_edit_layers'
           orig_name_setting_dict['default_value'] = 'export_for_edit_layers'
 
@@ -641,8 +641,8 @@ def _update_to_0_5(data, _settings, source_names):
             argument_dict['element_default_value'] = [1]
 
 
-def _update_to_0_6(data, _settings, source_names):
-  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
+def _update_to_0_6(data, _settings, procedure_groups):
+  if not (EXPORT_LAYERS_GROUP in procedure_groups or EDIT_LAYERS_GROUP in procedure_groups):
     return
 
   gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
@@ -663,7 +663,7 @@ def _update_to_0_6(data, _settings, source_names):
     if setting_dict is not None:
       setting_dict['type'] = 'integer'
 
-  if EDIT_LAYERS_SOURCE_NAME in source_names:
+  if EDIT_LAYERS_GROUP in procedure_groups:
     _remove_setting(gui_settings_list, 'images_and_directories')
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -886,8 +886,8 @@ def _update_choice_setting(setting_dict):
     setting_dict['value'] = setting_dict['default_value']
 
 
-def _update_to_0_7(data, _settings, source_names):
-  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
+def _update_to_0_7(data, _settings, procedure_groups):
+  if not (EXPORT_LAYERS_GROUP in procedure_groups or EDIT_LAYERS_GROUP in procedure_groups):
     return
 
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
@@ -934,8 +934,8 @@ def _update_to_0_7(data, _settings, source_names):
           ])
 
 
-def _update_to_0_8(data, _settings, source_names):
-  if not (EXPORT_LAYERS_SOURCE_NAME in source_names or EDIT_LAYERS_SOURCE_NAME in source_names):
+def _update_to_0_8(data, _settings, procedure_groups):
+  if not (EXPORT_LAYERS_GROUP in procedure_groups or EDIT_LAYERS_GROUP in procedure_groups):
     return
 
   gui_settings_list, _index = _get_top_level_group_list(data, 'gui')

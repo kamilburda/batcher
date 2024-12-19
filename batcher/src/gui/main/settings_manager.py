@@ -102,7 +102,7 @@ class SettingsManager:
     if filepath is None:
       save_result = self._settings.save()
     else:
-      source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
+      source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
       save_result = self._settings.save({'persistent': source})
 
     if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
@@ -205,7 +205,7 @@ class SettingsManager:
       self._display_message_func(_('Settings successfully saved.'), Gtk.MessageType.INFO)
 
   def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
-    source = pg.setting.sources.JsonFileSource(pg.config.SOURCE_NAME, filepath)
+    source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
 
     actions_.clear(self._settings['main/procedures'], add_initial_actions=False)
     actions_.clear(self._settings['main/constraints'], add_initial_actions=False)

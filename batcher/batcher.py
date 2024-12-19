@@ -40,7 +40,7 @@ from src import plugin_settings
 from src import update
 from src import utils as utils_
 from src.gui import main as gui_main
-from src.setting_source_names import *
+from src.procedure_groups import *
 
 
 SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
@@ -49,7 +49,7 @@ SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
 
 
 def plug_in_batch_convert(_procedure, config, _data):
-  _set_default_setting_source(CONVERT_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(CONVERT_GROUP)
 
   run_mode = config.get_property('run-mode')
 
@@ -61,7 +61,7 @@ def plug_in_batch_convert(_procedure, config, _data):
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_CONVERT,
-      CONVERT_SOURCE_NAME,
+      CONVERT_GROUP,
       image_tree,
       gui_main.BatchImageProcessingGui,
       process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
@@ -69,7 +69,7 @@ def plug_in_batch_convert(_procedure, config, _data):
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
       SETTINGS_CONVERT,
-      CONVERT_SOURCE_NAME,
+      CONVERT_GROUP,
       image_tree,
       mode='export',
       process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
@@ -77,7 +77,7 @@ def plug_in_batch_convert(_procedure, config, _data):
   else:
     return _run_noninteractive(
       SETTINGS_CONVERT,
-      CONVERT_SOURCE_NAME,
+      CONVERT_GROUP,
       image_tree,
       config,
       mode='export',
@@ -85,7 +85,7 @@ def plug_in_batch_convert(_procedure, config, _data):
 
 
 def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
-  _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -93,20 +93,20 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EXPORT_LAYERS,
-      EXPORT_LAYERS_SOURCE_NAME,
+      EXPORT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingGui,
       gui_class_kwargs=dict(mode='export', current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
-      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
+      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_GROUP, layer_tree, mode='export')
   else:
     return _run_noninteractive(
-      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, config, mode='export')
+      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_GROUP, layer_tree, config, mode='export')
 
 
 def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -114,17 +114,17 @@ def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EXPORT_LAYERS,
-      EXPORT_LAYERS_SOURCE_NAME,
+      EXPORT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
       gui_class_kwargs=dict(mode='export', title=_('Export Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(
-      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_SOURCE_NAME, layer_tree, mode='export')
+      SETTINGS_EXPORT_LAYERS, EXPORT_LAYERS_GROUP, layer_tree, mode='export')
 
 
 def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_default_setting_source(EXPORT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -132,7 +132,7 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EXPORT_LAYERS,
-      EXPORT_LAYERS_SOURCE_NAME,
+      EXPORT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
       gui_class_kwargs=dict(mode='export', title=_('Export Selected Layers'), current_image=image),
@@ -140,14 +140,14 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
   else:
     return _run_with_last_vals(
       SETTINGS_EXPORT_LAYERS,
-      EXPORT_LAYERS_SOURCE_NAME,
+      EXPORT_LAYERS_GROUP,
       layer_tree,
       mode='export',
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
 
 
 def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _data):
-  _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -155,20 +155,20 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EDIT_LAYERS,
-      EDIT_LAYERS_SOURCE_NAME,
+      EDIT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingGui,
       gui_class_kwargs=dict(mode='edit', current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(
-      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
+      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_GROUP, layer_tree, mode='edit')
   else:
     return _run_noninteractive(
-      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, config, mode='edit')
+      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_GROUP, layer_tree, config, mode='edit')
 
 
 def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -176,17 +176,17 @@ def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _co
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EDIT_LAYERS,
-      EDIT_LAYERS_SOURCE_NAME,
+      EDIT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
       gui_class_kwargs=dict(mode='edit', title=_('Edit Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(
-      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_SOURCE_NAME, layer_tree, mode='edit')
+      SETTINGS_EDIT_LAYERS, EDIT_LAYERS_GROUP, layer_tree, mode='edit')
 
 
 def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_default_setting_source(EDIT_LAYERS_SOURCE_NAME)
+  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -194,7 +194,7 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
       SETTINGS_EDIT_LAYERS,
-      EDIT_LAYERS_SOURCE_NAME,
+      EDIT_LAYERS_GROUP,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
       gui_class_kwargs=dict(mode='edit', title=_('Edit Selected Layers'), current_image=image),
@@ -202,53 +202,55 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
   else:
     return _run_with_last_vals(
       SETTINGS_EDIT_LAYERS,
-      EDIT_LAYERS_SOURCE_NAME,
+      EDIT_LAYERS_GROUP,
       layer_tree,
       mode='edit',
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
 
 
-def _run_noninteractive(settings, source_name, item_tree, config, mode):
-  if source_name == CONVERT_SOURCE_NAME:
+def _run_noninteractive(settings, procedure_group, item_tree, config, mode):
+  if procedure_group == CONVERT_GROUP:
     item_tree.add(config.get_property('inputs'))
 
   settings_file = config.get_property('settings-file')
 
   if settings_file:
-    gimp_status, message = _load_settings_from_file(settings, settings_file, source_name)
+    gimp_status, message = _load_settings_from_file(settings, settings_file, procedure_group)
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
   else:
     _set_settings_from_args(settings['main'], config)
 
-  _run_plugin_noninteractive(settings, source_name, Gimp.RunMode.NONINTERACTIVE, item_tree, mode)
+  _run_plugin_noninteractive(
+    settings, procedure_group, Gimp.RunMode.NONINTERACTIVE, item_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
 def _run_with_last_vals(
       settings,
-      source_name,
+      procedure_group,
       item_tree,
       mode,
       process_loaded_settings_func=None,
 ):
   update_successful, message = _load_and_update_settings(
-    settings, source_name, Gimp.RunMode.WITH_LAST_VALS)
+    settings, procedure_group, Gimp.RunMode.WITH_LAST_VALS)
   if not update_successful:
     return Gimp.PDBStatusType.EXECUTION_ERROR, message
 
   if process_loaded_settings_func is not None:
     process_loaded_settings_func(settings)
 
-  _run_plugin_noninteractive(settings, source_name, Gimp.RunMode.WITH_LAST_VALS, item_tree, mode)
+  _run_plugin_noninteractive(
+    settings, procedure_group, Gimp.RunMode.WITH_LAST_VALS, item_tree, mode)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
 def _run_interactive(
       settings,
-      source_name,
+      procedure_group,
       item_tree,
       gui_class,
       gui_class_args=None,
@@ -262,20 +264,20 @@ def _run_interactive(
     gui_class_kwargs = {}
 
   update_successful, message = _load_and_update_settings(
-    settings, source_name, Gimp.RunMode.INTERACTIVE)
+    settings, procedure_group, Gimp.RunMode.INTERACTIVE)
   if not update_successful:
     return Gimp.PDBStatusType.EXECUTION_ERROR, message
 
   if process_loaded_settings_func is not None:
     process_loaded_settings_func(settings)
 
-  gui_class(item_tree, settings, source_name, *gui_class_args, **gui_class_kwargs)
+  gui_class(item_tree, settings, procedure_group, *gui_class_args, **gui_class_kwargs)
 
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _run_plugin_noninteractive(settings, source_name, run_mode, item_tree, mode):
-  if source_name == CONVERT_SOURCE_NAME:
+def _run_plugin_noninteractive(settings, procedure_group, run_mode, item_tree, mode):
+  if procedure_group == CONVERT_GROUP:
     batcher = core.ImageBatcher(
       item_tree=item_tree,
       procedures=settings['main/procedures'],
@@ -305,15 +307,15 @@ def _run_plugin_noninteractive(settings, source_name, run_mode, item_tree, mode)
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _set_default_setting_source(source_name):
-  pg.config.SOURCE_NAME = source_name
+def _set_procedure_group_and_default_setting_source(procedure_group):
+  pg.config.PROCEDURE_GROUP = procedure_group
 
   pg.setting.Persistor.set_default_setting_sources(
-    {'persistent': pg.setting.GimpParasiteSource(source_name)})
+    {'persistent': pg.setting.GimpParasiteSource(procedure_group)})
 
 
-def _load_and_update_settings(settings, source_name, run_mode):
-  status, load_message = update.load_and_update(settings, source_name=source_name)
+def _load_and_update_settings(settings, procedure_group, run_mode):
+  status, load_message = update.load_and_update(settings, procedure_group=procedure_group)
 
   if status != update.TERMINATE:
     return True, ''
@@ -351,7 +353,7 @@ def _load_and_update_settings(settings, source_name, run_mode):
   return False, load_message
 
 
-def _load_settings_from_file(settings, settings_file, source_name):
+def _load_settings_from_file(settings, settings_file, procedure_group):
   settings_filepath = settings_file.get_path()
 
   if not os.path.isfile(settings_filepath):
@@ -359,10 +361,10 @@ def _load_settings_from_file(settings, settings_file, source_name):
       Gimp.PDBStatusType.EXECUTION_ERROR,
       _('"{}" is not a valid file with settings').format(settings_filepath))
 
-  setting_source = pg.setting.JsonFileSource(pg.config.SOURCE_NAME, settings_filepath)
+  setting_source = pg.setting.JsonFileSource(pg.config.PROCEDURE_GROUP, settings_filepath)
 
   status, message = update.load_and_update(
-    settings, sources={'persistent': setting_source}, source_name=source_name)
+    settings, sources={'persistent': setting_source}, procedure_group=procedure_group)
   if status == update.TERMINATE:
     error_message = _('Failed to import settings from file "{}".').format(settings_filepath)
 

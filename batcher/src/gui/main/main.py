@@ -68,7 +68,8 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, item_tree, settings, source_name, mode, current_image=None, run_gui_func=None):
+  def __init__(
+        self, item_tree, settings, source_name, mode, current_image=None, run_gui_func=None):
     self._item_tree = item_tree
     self._settings = settings
     self._source_name = source_name
