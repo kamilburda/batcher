@@ -22,7 +22,7 @@ class ActionLists:
 
   _CONSTRAINTS_TOP_MARGIN = 5
 
-  def __init__(self, settings, plugin_procedure_tag, dialog):
+  def __init__(self, settings, dialog):
     self._settings = settings
     self._dialog = dialog
 
@@ -31,7 +31,7 @@ class ActionLists:
     self._procedure_list = action_list_.ActionList(
       self._settings['main/procedures'],
       builtin_actions=builtin_actions_common.get_filtered_builtin_actions(
-        builtin_procedures.BUILTIN_PROCEDURES, [plugin_procedure_tag]),
+        builtin_procedures.BUILTIN_PROCEDURES, [pg.config.PROCEDURE_GROUP]),
       add_action_text=_('Add P_rocedure...'),
       allow_custom_actions=True,
       add_custom_action_text=_('Add Custom Procedure...'),
@@ -44,7 +44,7 @@ class ActionLists:
     self._constraint_list = action_list_.ActionList(
       self._settings['main/constraints'],
       builtin_actions=builtin_actions_common.get_filtered_builtin_actions(
-        builtin_constraints.BUILTIN_CONSTRAINTS, [plugin_procedure_tag]),
+        builtin_constraints.BUILTIN_CONSTRAINTS, [pg.config.PROCEDURE_GROUP]),
       add_action_text=_('Add C_onstraint...'),
       allow_custom_actions=False,
       propagate_natural_height=True,

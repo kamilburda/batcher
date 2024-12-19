@@ -13,8 +13,6 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
-from src import builtin_actions_common
-
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
@@ -74,13 +72,6 @@ class BatchLayerProcessingGui:
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
     self._mode = mode
-
-    if mode == 'edit':
-      self._plugin_procedure_tag = builtin_actions_common.EDIT_LAYERS_TAG
-    elif mode == 'export':
-      self._plugin_procedure_tag = builtin_actions_common.EXPORT_LAYERS_TAG
-    else:
-      self._plugin_procedure_tag = None
 
     self._current_image = current_image
 
@@ -156,7 +147,6 @@ class BatchLayerProcessingGui:
 
     self._action_lists = action_lists_.ActionLists(
       self._settings,
-      self._plugin_procedure_tag,
       self._dialog,
     )
 

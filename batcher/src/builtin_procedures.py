@@ -7,11 +7,12 @@ from gi.repository import Gimp
 import pygimplib as pg
 
 from src import background_foreground
+from src import builtin_actions_common
 from src import export as export_
 from src import overwrite
 from src import renamer as renamer_
 from src import utils
-from src.builtin_actions_common import *
+from src.procedure_groups import *
 
 
 def set_selected_and_current_layer(batcher):
@@ -322,7 +323,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
   'function': export_.export,
   'display_name': _('Also export as...'),
   'description': _('Exports an image to another file format.'),
-  'additional_tags': [NAME_ONLY_TAG, CONVERT_TAG],
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {
@@ -414,7 +415,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = utils.semi_deep_copy(
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS.update({
   'name': 'export_for_export_layers',
   'description': _('Exports a layer to another file format.'),
-  'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
 })
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5] = {
   'type': 'choice',
@@ -443,7 +444,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
   'name': 'export_for_edit_layers',
   'display_name': _('Export'),
   'description': _('Exports a layer to the specified file format.'),
-  'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
 })
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5] = {
   'type': 'choice',
@@ -471,7 +472,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': apply_opacity_from_group_layers,
     'display_name': _('Apply opacity from group layers'),
     'description': _('Combines opacity from all parent group layers and the current layer.'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'insert_background',
@@ -479,7 +480,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Insert background'),
     'description': _('Inserts layers having the specified color tag behind the current layer.'),
     'display_options_on_create': True,
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'enum',
@@ -517,7 +518,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'description': _(
       'Inserts layers having the specified color tag in front of the current layer.'),
     'display_options_on_create': True,
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'enum',
@@ -601,13 +602,13 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'remove_folder_structure',
     'function': remove_folder_structure_from_item,
     'display_name': _('Remove folder structure'),
-    'additional_tags': [NAME_ONLY_TAG, CONVERT_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'remove_folder_structure_for_edit_layers',
     'function': remove_folder_structure_from_item_for_edit_layers,
     'display_name': _('Remove folder structure'),
-    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'bool',
@@ -622,7 +623,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'rename_for_export_layers',
     'function': rename_layer,
     'display_name': _('Rename'),
-    'additional_tags': [NAME_ONLY_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -652,7 +653,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'rename_for_edit_layers',
     'function': rename_layer,
     'display_name': _('Rename'),
-    'additional_tags': [NAME_ONLY_TAG, EDIT_LAYERS_TAG],
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -683,7 +684,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': scale,
     'display_name': _('Scale'),
     'display_options_on_create': True,
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'placeholder_image',
@@ -777,7 +778,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': resize_to_layer_size,
     'display_name': _('Use layer size'),
     'description': _('Resizes the current layer to use the layer size rather than the image size.'),
-    'additional_tags': [EXPORT_LAYERS_TAG],
+    'additional_tags': [EXPORT_LAYERS_GROUP],
   },
 ]
 

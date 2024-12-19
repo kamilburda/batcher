@@ -7,7 +7,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 
 from src.path import fileext
-from src.builtin_actions_common import *
+from src.procedure_groups import *
 
 
 def is_layer(item, _layer_batcher):
@@ -69,14 +69,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'type': 'constraint',
     'function': is_layer,
     'display_name': _('Layers'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'group_layers',
     'type': 'constraint',
     'function': is_nonempty_group,
     'display_name': _('Group layers'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'not_background',
@@ -134,7 +134,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_default_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'selected_in_gimp',
@@ -142,7 +142,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_item_in_items_selected_in_gimp,
     # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'top_level',
@@ -150,7 +150,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level items" when translating this
     'display_name': _('Top-level'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'visible',
@@ -158,7 +158,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_visible,
     # FOR TRANSLATORS: Think of "Only visible items" when translating this
     'display_name': _('Visible'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'with_color_tags',
@@ -166,7 +166,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_color_tags,
     # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
     'display_name': _('With color tags'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'array',
@@ -186,7 +186,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_color_tags,
     # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
     'display_name': _('Without color tags'),
-    'additional_tags': [EDIT_LAYERS_TAG, EXPORT_LAYERS_TAG],
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'array',
