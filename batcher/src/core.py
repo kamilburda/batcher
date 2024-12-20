@@ -1064,6 +1064,52 @@ class ImageBatcher(Batcher):
   def _get_initial_current_layer(self):
     return None
 
+  def _add_actions_before_initial_invoker(self):
+    super()._add_actions_before_initial_invoker()
+
+    self._invoker.add(
+      builtin_procedures.set_selected_and_current_layer, [actions.DEFAULT_PROCEDURES_GROUP])
+
+    self._invoker.add(
+      builtin_procedures.set_selected_and_current_layer_after_action,
+      [actions.DEFAULT_PROCEDURES_GROUP],
+      foreach=True)
+
+  def _add_actions_before_procedures_from_settings(self):
+    super()._add_actions_before_procedures_from_settings()
+
+    self._add_default_rename_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+
+  def _add_actions_after_procedures_from_settings(self):
+    super()._add_actions_after_procedures_from_settings()
+
+    self._add_default_export_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+
+  def _add_name_only_actions_before_procedures_from_settings(self):
+    self._add_default_rename_procedure([_NAME_ONLY_ACTION_GROUP])
+
+  def _add_name_only_actions_after_procedures_from_settings(self):
+    self._add_default_export_procedure([_NAME_ONLY_ACTION_GROUP])
+
+  def _add_default_rename_procedure(self, action_groups):
+    if not self._edit_mode:
+      self._invoker.add(
+        builtin_procedures.rename_image,
+        groups=action_groups,
+        args=[self._name_pattern])
+
+  def _add_default_export_procedure(self, action_groups):
+    if not self._edit_mode:
+      self._invoker.add(
+        export_.export,
+        groups=action_groups,
+        args=[
+          self._output_directory,
+          self._file_extension,
+        ],
+        kwargs=self._more_export_options,
+      )
+
   def _process_item_with_actions(self):
     should_load_image = self._current_image is None
 
