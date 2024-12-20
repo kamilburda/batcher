@@ -970,6 +970,8 @@ def _update_to_0_8(data, _settings, procedure_groups):
       for procedure_dict in procedures_list:
         procedure_list = procedure_dict['settings']
 
+        _replace_action_tags_with_plug_in_procedure_groups(procedure_dict)
+
         orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
@@ -1005,6 +1007,21 @@ def _update_to_0_8(data, _settings, procedure_groups):
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
     if constraints_list is not None:
       _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
+      for constraint_dict in constraints_list:
+        _replace_action_tags_with_plug_in_procedure_groups(constraint_dict)
+
+
+def _replace_action_tags_with_plug_in_procedure_groups(action_dict):
+  tags_new_name_mapping = {
+    'convert': 'plug-in-batch-convert',
+    'export_layers': 'plug-in-batch-export-layers',
+    'edit_layers': 'plug-in-batch-edit-layers',
+  }
+
+  if 'tags' in action_dict:
+    action_dict['tags'] = [
+      tags_new_name_mapping[tag] if tag in tags_new_name_mapping else tag
+      for tag in action_dict['tags']]
 
 
 def _update_items_setting_for_0_8(settings_list, setting_name, new_type_name):
