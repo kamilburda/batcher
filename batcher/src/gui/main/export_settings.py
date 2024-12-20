@@ -144,6 +144,8 @@ class ExportSettings:
 
     for setting in self._settings['main/export']:
       setting.connect_event('value-changed', self._update_previews_on_export_options_change)
+    self._settings['main/output_directory'].connect_event(
+      'value-changed', self._update_previews_on_export_options_change)
 
   @property
   def widget(self):
