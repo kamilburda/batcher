@@ -150,6 +150,23 @@ def apply_opacity_from_group_layers(layer_batcher):
   layer_batcher.current_layer.set_opacity(new_layer_opacity * 100.0)
 
 
+def rename_image(image_batcher, pattern, rename_images=True, rename_folders=False):
+  renamer = renamer_.ItemRenamer(pattern, rename_images, rename_folders)
+  renamed_parents = set()
+
+  while True:
+    if rename_folders:
+      for parent in image_batcher.current_item.parents:
+        if parent not in renamed_parents:
+          parent.name = renamer.rename(image_batcher, item=parent)
+          renamed_parents.add(parent)
+
+    if rename_images:
+      image_batcher.current_item.name = renamer.rename(image_batcher)
+
+    yield
+
+
 def rename_layer(layer_batcher, pattern, rename_layers=True, rename_folders=False):
   renamer = renamer_.ItemRenamer(pattern, rename_layers, rename_folders)
   renamed_parents = set()
@@ -615,6 +632,36 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'consider_parent_visible',
         'default_value': False,
         'display_name': _('Consider visibility of parent folders'),
+        'gui_type': 'check_button',
+      },
+    ],
+  },
+  {
+    'name': 'rename_for_convert',
+    'function': rename_image,
+    'display_name': _('Rename'),
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP],
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'name_pattern',
+        'name': 'pattern',
+        'default_value': '[image name]',
+        'display_name': _('Image filename pattern'),
+        'gui_type': 'name_pattern_entry',
+      },
+      {
+        'type': 'bool',
+        'name': 'rename_images',
+        'default_value': True,
+        'display_name': _('Rename images'),
+        'gui_type': 'check_button',
+      },
+      {
+        'type': 'bool',
+        'name': 'rename_folders',
+        'default_value': False,
+        'display_name': _('Rename folders'),
         'gui_type': 'check_button',
       },
     ],
