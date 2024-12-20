@@ -2,10 +2,11 @@
 
 New features:
 * You may now attempt to apply a procedure to multiple layers at once using the new `All Layers` option, if available for a particular procedure (usually those having the `The input drawables` argument). Note that a procedure may still fail even if this option is available as it may not support working with multiple layers at once.
+* Rename procedure: Added a new field named `[output folder]` that allows inserting the output folder selected in the plug-in dialog. You can adjust the path components to be inserted as well as the separator and wrapper around each component (in the same vein as `[layer path]`).
+* Rename procedure: Added `%n` option to the `[layer name]` and `[layer path]` fields acting as the inverse of `%i`.
 
 Changes to procedures and constraints:
 * Removed the `Selected in preview` constraint. For Export Layers and Edit Layers, the `Selected in GIMP` and `With color tags` constraints already provide a good equivalent.
-* Rename procedure: Added `%n` option to the `[layer name]` and `[layer path]` fields acting as the inverse of `%i`.
 * Rename procedure: For the `[attributes]` field, changed the layer attributes from `%w`, `%h`, `%x` and `%y` to `%lw`, `%lh`, `%lx` and `%ly`, respectively.
 
 User interface changes:

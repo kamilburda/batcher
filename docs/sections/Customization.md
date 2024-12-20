@@ -191,6 +191,29 @@ Examples:
 * `[layer path, _, (%c)]` → `(Body)_(Hands)_(Left)`
 * `[layer path, _, (%c), %e]` → `Body-Hands-Left.png` (if the layer name is `Left.png` and the file extension is `png`)
 
+**\[output folder\]**
+
+The output folder selected in the plug-in dialog.
+
+Options:
+* *path component strip mode* (defaults to `%b`):
+  * `%b<number>`: Keep only `<number>` path components from the end. `%b` is transformed to the last path component, i.e. the folder name.
+  * `%f<number>`: Keep only `<number>` path components from the start. `%f` preserves the entire folder path.
+* *separator*: A string separating the path components.
+  Defaults to `-`.
+* *wrapper*: A string that wraps around each path component.
+  The wrapper must contain `%c` denoting the path component.
+  Defaults to `%c`.
+
+Examples for a folder with the path `C:\Users\username\Pictures`:
+* `[output folder]` → `Pictures`
+* `[output folder, %b2]` → `username-Pictures`
+* `[output folder, %f]` → `C-Users-username-Pictures`
+* `[output folder, %f2]` → `Users-username-Pictures`
+* `[output folder, %f3]` → `username-Pictures`
+* `[output folder, %f3, _]` → `username_Pictures`
+* `[output folder, %f3, _, (%c)]` → `(username)_(Pictures)`
+
 **\[replace\]**
 
 Replaces a part of the specified field with another string.

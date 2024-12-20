@@ -5,6 +5,8 @@ The pattern can contain one or more fields provided in this module.
 
 import collections
 import datetime
+import os
+import pathlib
 import re
 import string
 from typing import Any, Callable, Dict, Generator, List, Optional
@@ -383,6 +385,47 @@ def _get_layer_path(
   )
 
 
+def _get_output_directory(
+      _renamer,
+      batcher,
+      _item,
+      _field_value,
+      path_component_strip_mode='%b',
+      separator='-',
+      wrapper=None,
+):
+  path_component_token = '%c'
+
+  if wrapper is None:
+    wrapper = '{}'
+  else:
+    if path_component_token in wrapper:
+      wrapper = wrapper.replace(path_component_token, '{}')
+    else:
+      wrapper = '{}'
+
+  path_components = pathlib.Path(batcher.output_directory).parts
+
+  if path_component_strip_mode.startswith('%b'):
+    num_path_components_from_end = 1
+    try:
+      num_path_components_from_end = int(path_component_strip_mode[len('%b'):])
+    except ValueError:
+      pass
+
+    path_components = path_components[-num_path_components_from_end:]
+  elif path_component_strip_mode.startswith('%f'):
+    num_path_components_from_start = 1
+    try:
+      num_path_components_from_start = int(path_component_strip_mode[len('%f'):])
+    except ValueError:
+      pass
+
+    path_components = path_components[:num_path_components_from_start]
+
+  return separator.join(wrapper.format(path_component) for path_component in path_components)
+
+
 def _get_tags(_renamer, _layer_batcher, item, _field_value, *args):
   color_tag = item.raw.get_color_tag()
   color_tag_default_names = {
@@ -504,6 +547,34 @@ def _replace(
     flags |= getattr(re, flag_name.upper())
   
   return re.sub(pattern, replacement, str_to_process, count=count, flags=flags)
+
+
+_examples_lines_for_output_folder_field_for_windows = [
+  [_(r'Suppose that the output folder is "C:\Users\username\Pictures".')],
+  ['[output folder]', 'Pictures'],
+  ['[output folder, %b2]', 'username-Pictures'],
+  ['[output folder, %f]', 'C-Users-username-Pictures'],
+  ['[output folder, %f2]', 'Users-username-Pictures'],
+  ['[output folder, %f3]', 'username-Pictures'],
+  ['[output folder, %f3, _]', 'username_Pictures'],
+  ['[output folder, %f3, _, (%c)]', '(username)_(Pictures)'],
+]
+
+
+_examples_lines_for_output_folder_field_for_unix = [
+  [_('Suppose that the output folder is "/home/username/Pictures".')],
+  ['[output folder]', 'Pictures'],
+  ['[output folder, %b2]', 'username-Pictures'],
+  ['[output folder, %f]', 'home-username-Pictures'],
+  ['[output folder, %f2]', 'home-username'],
+  ['[output folder, %f2, _]', 'username_Pictures'],
+  ['[output folder, %f2, _, (%c)]', '(username)_(Pictures)'],
+]
+
+if os.name == 'nt':
+  _examples_lines_for_output_folder_field = _examples_lines_for_output_folder_field_for_windows
+else:
+  _examples_lines_for_output_folder_field = _examples_lines_for_output_folder_field_for_unix
 
 
 _FIELDS_LIST = [
@@ -630,6 +701,15 @@ _FIELDS_LIST = [
       ['[layer path, -, %c, %n]', 'Body-Hands-Left.jpg'],
     ],
     'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'output folder',
+    'substitute_func': _get_output_directory,
+    'display_name': _('Output folder'),
+    'str_to_insert': '[output folder]',
+    'examples_lines': _examples_lines_for_output_folder_field,
+    'procedure_groups': [CONVERT_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
   {
     'type': Field,
