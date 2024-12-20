@@ -44,10 +44,7 @@ def create_settings_for_convert():
       'name': 'inputs',
       'element_type': 'string',
       'default_value': (),
-      'display_name': _('Input files and opened GIMP images'),
-      'description': _(
-        'Input files and opened GIMP images'
-        ' (GIMP images start with an "[Image]/" prefix)'),
+      'display_name': _('Input files (non-interactive run mode only)'),
     },
     {
       'type': 'file_extension',
@@ -71,6 +68,14 @@ def create_settings_for_convert():
       'default_value': '[image name]',
       'display_name': _('Image filename pattern'),
       'description': _('Image filename pattern (empty string = image name)'),
+      'gui_type': None,
+    },
+    {
+      'type': 'choice',
+      'name': 'overwrite_mode',
+      'default_value': 'rename_new',
+      'items': utils.semi_deep_copy(builtin_procedures.INTERACTIVE_OVERWRITE_MODES_LIST),
+      'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
     {
