@@ -7,6 +7,7 @@ import pygimplib as pg
 from pygimplib.tests import utils_itemtree
 
 from src import renamer as renamer_
+from src.procedure_groups import *
 
 
 class TestNumberField(unittest.TestCase):
@@ -178,7 +179,7 @@ class TestRenameWithNumberField(unittest.TestCase):
     batcher_mock.matching_items = layer_tree
     
     renamer = renamer_.ItemRenamer(
-      pattern, fields_raw={'^[0-9]+$': renamer_.FIELDS_FOR_LAYERS['^[0-9]+$']})
+      pattern, fields_raw={'^[0-9]+$': renamer_.get_fields([EXPORT_LAYERS_GROUP])['^[0-9]+$']})
     
     for item in layer_tree:
       batcher_mock.current_item = item

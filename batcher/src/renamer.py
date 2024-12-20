@@ -17,6 +17,7 @@ import pygimplib as pg
 
 from src.path import fileext
 from src.path import pattern as pattern_
+from src.procedure_groups import *
 
 
 class ItemRenamer:
@@ -24,17 +25,21 @@ class ItemRenamer:
   def __init__(
         self,
         pattern: str,
-        fields_raw: Dict[str, Any],
         rename_items: bool = True,
         rename_folders: bool = False,
+        fields_raw: Optional[Dict[str, Any]] = None,
   ):
-    self._fields_raw = fields_raw
+    if fields_raw is not None:
+      self._fields_raw = fields_raw
+    else:
+      self._fields_raw = get_fields()
+
     self._rename_items = rename_items
     self._rename_folders = rename_folders
 
     self._name_pattern = pattern_.StringPattern(
       pattern=pattern,
-      fields=_get_fields_and_substitute_funcs(_init_fields(fields_raw)))
+      fields=_get_fields_and_substitute_funcs(_init_fields(self._fields_raw)))
 
   @property
   def fields_raw(self):
@@ -74,7 +79,10 @@ def _init_fields(fields_raw):
   return fields
 
 
-def get_field_descriptions(fields):
+def get_field_descriptions(fields=None):
+  if fields is None:
+    fields = get_fields()
+
   descriptions = []
   
   for field in fields.values():
@@ -111,12 +119,15 @@ class Field:
         substitute_func: Callable,
         display_name: str,
         str_to_insert: str,
-        examples_lines: List[List[str]]):
+        examples_lines: List[List[str]],
+        procedure_groups: List[str],
+  ):
     self._regex = regex
     self._substitute_func = substitute_func
     self._display_name = display_name
     self._str_to_insert = str_to_insert
     self._examples_lines = examples_lines
+    self._procedure_groups = procedure_groups
   
   def __str__(self) -> str:
     return self.examples
@@ -145,6 +156,10 @@ class Field:
   def examples(self) -> str:
     return _get_formatted_examples(self._examples_lines)
 
+  @property
+  def procedure_groups(self) -> List[str]:
+    return self._procedure_groups
+
 
 class NumberField(Field):
   
@@ -153,13 +168,16 @@ class NumberField(Field):
         regex: str,
         display_name: str,
         str_to_insert: str,
-        examples_lines: List[List[str]]):
+        examples_lines: List[List[str]],
+        procedure_groups: List[str],
+  ):
     super().__init__(
       regex,
       self._get_number,
       display_name,
       str_to_insert,
       examples_lines,
+      procedure_groups,
     )
     
     # key: field value
@@ -429,7 +447,7 @@ def _replace(
   return re.sub(pattern, replacement, str_to_process, count=count, flags=flags)
 
 
-_COMMON_FIELDS_LIST = [
+_FIELDS_LIST = [
   {
     'type': NumberField,
     'regex': '^[0-9]+$',
@@ -447,58 +465,8 @@ _COMMON_FIELDS_LIST = [
       ['[000, %d]', '005, 004, ...'],
       ['[10, %d2]', '10, 09, ...'],
     ],
+    'procedure_groups': [CONVERT_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
-  {
-    'type': Field,
-    'regex': 'current date',
-    'substitute_func': _get_current_date,
-    'display_name': _('Current date'),
-    'str_to_insert': '[current date]',
-    'examples_lines': [
-      ['[current date]', '2019-01-28'],
-      [_('Custom date format uses formatting as per the "strftime" function in Python.')],
-      ['[current date, %m.%d.%Y_%H-%M]', '28.01.2019_19-04'],
-    ],
-  },
-  {
-    'type': Field,
-    'regex': 'attributes',
-    'substitute_func': _get_attributes,
-    'display_name': _('Attributes'),
-    'str_to_insert': '[attributes]',
-    'examples_lines': [
-      [_('Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
-         'of 1000, 270, 0 and 40 pixels, respectively,\n'
-         'and the image has width and height of 1000 and 500 pixels, respectively.')],
-      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
-      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
-      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
-      ['[attributes, %iw-%ih]', '1000-500'],
-    ],
-  },
-  {
-    'type': Field,
-    'regex': 'replace',
-    'substitute_func': _replace,
-    'display_name': _('Replace'),
-    'str_to_insert': '[replace]',
-    'examples_lines': [
-      [_('Suppose that a layer is named "Animal copy #1".')],
-      ['[replace, [layer name], [a], [b] ]', 'Animbl copy #1'],
-      [_('You can use the regular expression syntax as defined in the "re" module for Python.')],
-      ['[replace, [layer name], [ copy(?: #[[0-9]]+)*$], [] ]', 'Animal'],
-      [_('You can specify the number of replacements and flags as defined in the "re" module for Python.')],
-      ['[replace, [layer name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
-    ],
-  },
-]
-
-
-_COMMON_FIELDS = {field['regex']: field for field in _COMMON_FIELDS_LIST}
-
-
-_FIELDS_LIST_FOR_LAYERS = [
-  _COMMON_FIELDS['^[0-9]+$'],
   {
     'type': Field,
     'regex': 'layer name',
@@ -516,6 +484,7 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[layer name, %i]', 'Frame'],
       ['[layer name, %n]', 'Frame.jpg'],
     ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
   {
     'type': Field,
@@ -524,6 +493,7 @@ _FIELDS_LIST_FOR_LAYERS = [
     'display_name': _('Full layer name'),
     'str_to_insert': '[layer name, %e]',
     'examples_lines': [],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
   {
     'type': Field,
@@ -536,6 +506,7 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[image name]', 'Image'],
       ['[image name, %e]', 'Image.xcf'],
     ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
   {
     'type': Field,
@@ -553,6 +524,7 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[layer path, -, %c, %i]', 'Body-Hands-Left'],
       ['[layer path, -, %c, %n]', 'Body-Hands-Left.jpg'],
     ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
   {
     'type': Field,
@@ -570,10 +542,63 @@ _FIELDS_LIST_FOR_LAYERS = [
       ['[tags, %t, blue, foreground]', ''],
       ['[tags, %t, green, background, blue, foreground]', 'background'],
     ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   },
-  _COMMON_FIELDS['current date'],
-  _COMMON_FIELDS['attributes'],
-  _COMMON_FIELDS['replace'],
+  {
+    'type': Field,
+    'regex': 'current date',
+    'substitute_func': _get_current_date,
+    'display_name': _('Current date'),
+    'str_to_insert': '[current date]',
+    'examples_lines': [
+      ['[current date]', '2019-01-28'],
+      [_('Custom date format uses formatting as per the "strftime" function in Python.')],
+      ['[current date, %m.%d.%Y_%H-%M]', '28.01.2019_19-04'],
+    ],
+    'procedure_groups': [CONVERT_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'attributes',
+    'substitute_func': _get_attributes,
+    'display_name': _('Attributes'),
+    'str_to_insert': '[attributes]',
+    'examples_lines': [
+      [_('Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
+         'of 1000, 270, 0 and 40 pixels, respectively,\n'
+         'and the image has width and height of 1000 and 500 pixels, respectively.')],
+      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
+      ['[attributes, %iw-%ih]', '1000-500'],
+    ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'replace',
+    'substitute_func': _replace,
+    'display_name': _('Replace'),
+    'str_to_insert': '[replace]',
+    'examples_lines': [
+      [_('Suppose that a layer is named "Animal copy #1".')],
+      ['[replace, [layer name], [a], [b] ]', 'Animbl copy #1'],
+      [_('You can use the regular expression syntax as defined in the "re" module for Python.')],
+      ['[replace, [layer name], [ copy(?: #[[0-9]]+)*$], [] ]', 'Animal'],
+      [_('You can specify the number of replacements and flags as defined in the "re" module for Python.')],
+      ['[replace, [layer name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
+    ],
+    'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
 ]
 
-FIELDS_FOR_LAYERS = {field['regex']: field for field in _FIELDS_LIST_FOR_LAYERS}
+
+def get_fields(tags=None):
+  if tags is None:
+    tags = [pg.config.PROCEDURE_GROUP]
+
+  return {
+    field['regex']: field
+    for field in _FIELDS_LIST
+    if any(tag in field['procedure_groups'] for tag in tags)
+  }
