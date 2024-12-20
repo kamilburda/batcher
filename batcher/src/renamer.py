@@ -552,23 +552,22 @@ def _replace(
 _examples_lines_for_output_folder_field_for_windows = [
   [_(r'Suppose that the output folder is "C:\Users\username\Pictures".')],
   ['[output folder]', 'Pictures'],
+  ['[output folder, %]', 'C-Users-username-Pictures'],
   ['[output folder, %b2]', 'username-Pictures'],
-  ['[output folder, %f]', 'C-Users-username-Pictures'],
-  ['[output folder, %f2]', 'Users-username-Pictures'],
-  ['[output folder, %f3]', 'username-Pictures'],
-  ['[output folder, %f3, _]', 'username_Pictures'],
-  ['[output folder, %f3, _, (%c)]', '(username)_(Pictures)'],
+  ['[output folder, %b2, _]', 'username_Pictures'],
+  ['[output folder, %b2, _, (%c)]', '(username)_(Pictures)'],
+  ['[output folder, %f2]', 'C-Users'],
 ]
 
 
 _examples_lines_for_output_folder_field_for_unix = [
   [_('Suppose that the output folder is "/home/username/Pictures".')],
   ['[output folder]', 'Pictures'],
+  ['[output folder, %]', 'home-username-Pictures'],
   ['[output folder, %b2]', 'username-Pictures'],
-  ['[output folder, %f]', 'home-username-Pictures'],
+  ['[output folder, %b2, _]', 'username_Pictures'],
+  ['[output folder, %b2, _, (%c)]', '(username)_(Pictures)'],
   ['[output folder, %f2]', 'home-username'],
-  ['[output folder, %f2, _]', 'username_Pictures'],
-  ['[output folder, %f2, _, (%c)]', '(username)_(Pictures)'],
 ]
 
 if os.name == 'nt':

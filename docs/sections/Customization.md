@@ -198,7 +198,8 @@ The output folder selected in the plug-in dialog.
 Options:
 * *path component strip mode* (defaults to `%b`):
   * `%b<number>`: Keep only `<number>` path components from the end. `%b` is transformed to the last path component, i.e. the folder name.
-  * `%f<number>`: Keep only `<number>` path components from the start. `%f` preserves the entire folder path.
+  * `%f<number>`: Keep only `<number>` path components from the start.
+  * any other value, such as `%`, will resolve to the full path.
 * *separator*: A string separating the path components.
   Defaults to `-`.
 * *wrapper*: A string that wraps around each path component.
@@ -207,12 +208,11 @@ Options:
 
 Examples for a folder with the path `C:\Users\username\Pictures`:
 * `[output folder]` → `Pictures`
+* `[output folder, %]` → `C-Users-username-Pictures`
 * `[output folder, %b2]` → `username-Pictures`
-* `[output folder, %f]` → `C-Users-username-Pictures`
-* `[output folder, %f2]` → `Users-username-Pictures`
-* `[output folder, %f3]` → `username-Pictures`
-* `[output folder, %f3, _]` → `username_Pictures`
-* `[output folder, %f3, _, (%c)]` → `(username)_(Pictures)`
+* `[output folder, %b2, _]` → `username_Pictures`
+* `[output folder, %b2, _, (%c)]` → `(username)_(Pictures)`
+* `[output folder, %f2]` → `C-Users`
 
 **\[replace\]**
 
