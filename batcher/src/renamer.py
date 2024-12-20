@@ -286,27 +286,44 @@ def _get_layer_name(
   return fileext.get_filename_root(item.name)
 
 
-def _get_image_name(_renamer, batcher, _item, _field_value, keep_extension_str=''):
+def _get_image_name_for_layer_batcher(
+      _renamer, batcher, _item, _field_value, file_extension_strip_mode=''):
   image = batcher.current_image
   if image is not None and image.get_name() is not None:
     image_name = image.get_name()
   else:
     image_name = _('Untitled')
-  
-  if keep_extension_str == '%e':
+
+  if file_extension_strip_mode == '%e':
     return image_name
   else:
     return fileext.get_filename_with_new_file_extension(image_name, '')
 
 
-def _get_layer_path(
+def _get_image_name_for_image_batcher(
+      _renamer, image_batcher, item, _field_value, file_extension_strip_mode=''):
+  if file_extension_strip_mode == '%e':
+    return item.name
+  elif file_extension_strip_mode == '%i':
+    if fileext.get_file_extension(item.name) == image_batcher.file_extension:
+      return item.name
+  elif file_extension_strip_mode == '%n':
+    if fileext.get_file_extension(item.name) != image_batcher.file_extension:
+      return item.name
+
+  return fileext.get_filename_root(item.name)
+
+
+def _get_item_path(
+      item_substitute_func,
       renamer,
-      layer_batcher,
+      batcher,
       item,
       field_value,
       separator='-',
       wrapper=None,
-      file_extension_strip_mode=''):
+      file_extension_strip_mode='',
+):
   path_component_token = '%c'
   
   if wrapper is None:
@@ -319,9 +336,51 @@ def _get_layer_path(
   
   path_components = [parent.name for parent in item.parents]
   path_components += [
-    _get_layer_name(renamer, layer_batcher, item, field_value, file_extension_strip_mode)]
+    item_substitute_func(renamer, batcher, item, field_value, file_extension_strip_mode)]
   
   return separator.join(wrapper.format(path_component) for path_component in path_components)
+
+
+def _get_layer_path(
+      renamer,
+      layer_batcher,
+      item,
+      field_value,
+      separator='-',
+      wrapper=None,
+      file_extension_strip_mode='',
+):
+  return _get_item_path(
+    _get_layer_name,
+    renamer,
+    layer_batcher,
+    item,
+    field_value,
+    separator=separator,
+    wrapper=wrapper,
+    file_extension_strip_mode=file_extension_strip_mode,
+  )
+
+
+def _get_image_path(
+      renamer,
+      image_batcher,
+      item,
+      field_value,
+      separator='-',
+      wrapper=None,
+      file_extension_strip_mode='',
+):
+  return _get_item_path(
+    _get_image_name_for_image_batcher,
+    renamer,
+    image_batcher,
+    item,
+    field_value,
+    separator=separator,
+    wrapper=wrapper,
+    file_extension_strip_mode=file_extension_strip_mode,
+  )
 
 
 def _get_tags(_renamer, _layer_batcher, item, _field_value, *args):
@@ -498,7 +557,7 @@ _FIELDS_LIST = [
   {
     'type': Field,
     'regex': 'image name',
-    'substitute_func': _get_image_name,
+    'substitute_func': _get_image_name_for_layer_batcher,
     'display_name': _('Image name'),
     'str_to_insert': '[image name]',
     'examples_lines': [
@@ -507,6 +566,34 @@ _FIELDS_LIST = [
       ['[image name, %e]', 'Image.xcf'],
     ],
     'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'image name',
+    'substitute_func': _get_image_name_for_image_batcher,
+    'display_name': _('Image name'),
+    'str_to_insert': '[image name]',
+    'examples_lines': [
+      [_('Suppose that an image is named "Image.png" and the file extension is "png".')],
+      ['[image name]', 'Image'],
+      ['[image name, %e]', 'Image.png'],
+      ['[image name, %i]', 'Image.png'],
+      ['[image name, %n]', 'Image'],
+      [_('Suppose that an image is named "Image.jpg" and the file extension is "png".')],
+      ['[image name, %e]', 'Image.jpg'],
+      ['[image name, %i]', 'Image'],
+      ['[image name, %n]', 'Image.jpg'],
+    ],
+    'procedure_groups': [CONVERT_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'full image name',
+    'substitute_func': _get_image_name_for_image_batcher,
+    'display_name': _('Full image name'),
+    'str_to_insert': '[image name, %e]',
+    'examples_lines': [],
+    'procedure_groups': [CONVERT_GROUP],
   },
   {
     'type': Field,
@@ -525,6 +612,24 @@ _FIELDS_LIST = [
       ['[layer path, -, %c, %n]', 'Body-Hands-Left.jpg'],
     ],
     'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'image path',
+    'substitute_func': _get_image_path,
+    'display_name': _('Image path'),
+    'str_to_insert': '[image path]',
+    'examples_lines': [
+      [_('Suppose that an image named "Left" has parent folders named "Hands" and "Body".')],
+      ['[image path]', 'Body-Hands-Left'],
+      ['[image path, _]', 'Body_Hands_Left'],
+      ['[image path, _, (%c)]', '(Body)_(Hands)_(Left)'],
+      [_('Suppose that an image is named "Left.jpg" and the file extension is "png".')],
+      ['[image path, -, %c, %e]', 'Body-Hands-Left.jpg'],
+      ['[image path, -, %c, %i]', 'Body-Hands-Left'],
+      ['[image path, -, %c, %n]', 'Body-Hands-Left.jpg'],
+    ],
+    'procedure_groups': [CONVERT_GROUP],
   },
   {
     'type': Field,
@@ -576,6 +681,23 @@ _FIELDS_LIST = [
   },
   {
     'type': Field,
+    'regex': 'attributes',
+    'substitute_func': _get_attributes,
+    'display_name': _('Attributes'),
+    'str_to_insert': '[attributes]',
+    'examples_lines': [
+      [_('Suppose that an image has width and height of 1000 and 500 pixels, respectively,'
+         'and the current layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n'
+         'of 1000, 270, 0 and 40 pixels, respectively.')],
+      ['[attributes, %iw-%ih]', '1000-500'],
+      ['[attributes, %lw-%lh-%lx-%ly]', '1000-270-0-40'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
+      ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
+    ],
+    'procedure_groups': [CONVERT_GROUP],
+  },
+  {
+    'type': Field,
     'regex': 'replace',
     'substitute_func': _replace,
     'display_name': _('Replace'),
@@ -589,6 +711,22 @@ _FIELDS_LIST = [
       ['[replace, [layer name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
     ],
     'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'replace',
+    'substitute_func': _replace,
+    'display_name': _('Replace'),
+    'str_to_insert': '[replace]',
+    'examples_lines': [
+      [_('Suppose that an image is named "Animal copy #1".')],
+      ['[replace, [image name], [a], [b] ]', 'Animbl copy #1'],
+      [_('You can use the regular expression syntax as defined in the "re" module for Python.')],
+      ['[replace, [image name], [ copy(?: #[[0-9]]+)*$], [] ]', 'Animal'],
+      [_('You can specify the number of replacements and flags as defined in the "re" module for Python.')],
+      ['[replace, [image name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
+    ],
+    'procedure_groups': [CONVERT_GROUP],
   },
 ]
 
