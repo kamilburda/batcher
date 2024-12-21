@@ -17,6 +17,7 @@ from src import core
 from src import builtin_procedures
 from src import plugin_settings
 from src import utils as utils_
+from src.procedure_groups import *
 
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
@@ -31,6 +32,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
+    pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+
     Gimp.context_push()
     
     cls.test_image_filepath = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
