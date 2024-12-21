@@ -372,8 +372,6 @@ pg.register_procedure(
 
 pg.register_procedure(
   plug_in_batch_export_selected_layers,
-  arguments=pg.setting.create_params(
-    plugin_settings.create_dummy_settings_for_export_and_edit_layers()['main']),
   menu_label=_('E_xport Selected Layers'),
   menu_path='<Layers>/Layers Menu/[Batch]',
   image_types='*',
@@ -416,8 +414,6 @@ pg.register_procedure(
 
 pg.register_procedure(
   plug_in_batch_edit_selected_layers,
-  arguments=pg.setting.create_params(
-    plugin_settings.create_dummy_settings_for_export_and_edit_layers()['main']),
   menu_label=_('E_dit Selected Layers'),
   menu_path='<Layers>/Layers Menu/[Batch]',
   image_types='*',

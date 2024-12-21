@@ -426,34 +426,6 @@ def create_settings_for_edit_layers():
   return settings
 
 
-# HACK: This is currently required in order to be able to register
-#  "Export Selected Layers" and "Edit Selected Layers".
-#  More info: https://gitlab.gnome.org/GNOME/gimp/-/issues/12365
-def create_dummy_settings_for_export_and_edit_layers():
-  settings = pg.setting.create_groups({
-    'name': 'all_settings',
-    'groups': [
-      {
-        'name': 'main',
-      }
-    ]
-  })
-
-  settings['main'].add([
-    {
-      'type': 'file',
-      'name': 'settings_file',
-      'default_value': None,
-      'display_name': _('File with saved settings'),
-      'description': _('File with saved settings (ignored)'),
-      'gui_type': None,
-      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-    },
-  ])
-
-  return settings
-
-
 def _create_gui_settings(item_tree_items_setting_type):
   gui_settings = pg.setting.Group(name='gui')
 
