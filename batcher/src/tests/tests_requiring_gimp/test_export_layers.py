@@ -1,4 +1,4 @@
-"""Test cases for exporting layers. Requires GIMP to be running."""
+"""Test cases for Export Layers. Requires GIMP to be running."""
 
 import inspect
 import os
