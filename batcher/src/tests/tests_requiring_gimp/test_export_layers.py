@@ -83,7 +83,9 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       shutil.rmtree(self.output_dirpath)
   
   def test_default_settings(self):
-    self.compare()
+    self.compare(
+      expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'default'),
+    )
   
   def test_use_image_size(self):
     self.compare(
