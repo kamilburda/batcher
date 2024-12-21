@@ -23,7 +23,8 @@ from src.procedure_groups import *
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 TEST_IMAGES_DIRPATH = os.path.join(_CURRENT_MODULE_DIRPATH, 'test_images')
 
-DEFAULT_EXPECTED_RESULTS_DIRPATH = os.path.join(TEST_IMAGES_DIRPATH, 'expected_results')
+DEFAULT_EXPECTED_RESULTS_DIRPATH = os.path.join(
+  TEST_IMAGES_DIRPATH, 'export_layers_expected_results')
 OUTPUT_DIRPATH = os.path.join(TEST_IMAGES_DIRPATH, 'temp_output')
 INCORRECT_RESULTS_DIRPATH = os.path.join(TEST_IMAGES_DIRPATH, 'incorrect_results')
 
@@ -35,8 +36,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
     Gimp.context_push()
-    
-    cls.test_image_filepath = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
+
+    cls.test_image_filepath = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
     cls.test_image = cls._load_image()
     
     cls.output_dirpath = OUTPUT_DIRPATH
@@ -77,7 +78,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def tearDown(self):
     if self.image_with_results is not None:
       self.image_with_results.delete()
-    
+
     if os.path.exists(self.output_dirpath):
       shutil.rmtree(self.output_dirpath)
   
@@ -141,7 +142,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       settings, procedure_names_to_add, procedure_names_to_remove, additional_init_before_run)
     
     self.image_with_results, layers = self._load_layers_from_dirpath(self.output_dirpath)
-    
+
     if different_results_and_expected_layers is not None:
       for layer_name, expected_layer_name in different_results_and_expected_layers:
         expected_layers[layer_name] = expected_layers[expected_layer_name]

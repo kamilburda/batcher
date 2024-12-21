@@ -33,7 +33,7 @@ from batcher.src.gui import main as gui_main
 
 TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
-TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_export_layers_contents.xcf')
+TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
 
 OUTPUT_DIRPATH = os.path.join(pg.utils.get_pictures_directory(), 'Loading Screens', 'Components')
 
