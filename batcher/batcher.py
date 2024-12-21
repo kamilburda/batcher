@@ -43,37 +43,8 @@ from src.gui import main as gui_main
 from src.procedure_groups import *
 
 
-SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
 SETTINGS_EXPORT_LAYERS = plugin_settings.create_settings_for_export_layers()
 SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
-
-
-def plug_in_batch_convert(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(CONVERT_GROUP)
-
-  run_mode = config.get_property('run-mode')
-
-  image_tree = pg.itemtree.ImageFileTree()
-
-  def _fill_image_tree_with_loaded_inputs(settings):
-    image_tree.add(settings['main/inputs'].value)
-
-  if run_mode == Gimp.RunMode.INTERACTIVE:
-    return _run_interactive(
-      SETTINGS_CONVERT,
-      image_tree,
-      gui_main.BatchImageProcessingGui,
-      process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
-    )
-  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
-    return _run_with_last_vals(
-      SETTINGS_CONVERT,
-      image_tree,
-      mode='export',
-      process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
-    )
-  else:
-    return _run_noninteractive(SETTINGS_CONVERT, image_tree, config, mode='export')
 
 
 def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
@@ -368,23 +339,6 @@ def _set_constraints_to_only_selected_layers(settings):
 
   actions_.add(
     settings['main/constraints'], builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
-
-
-pg.register_procedure(
-  plug_in_batch_convert,
-  procedure_type=Gimp.Procedure,
-  arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
-  menu_label=_('_Batch Convert...'),
-  menu_path='<Image>/File/[Export]',
-  image_types='',
-  documentation=(
-    _('Batch-process image files'),
-    _('This procedure allows batch conversion of image files'
-      ' to the specified file format, optionally applying arbitrary procedures'
-      ' to each item and ignoring items according to the specified constraints.'),
-  ),
-  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
-)
 
 
 pg.register_procedure(
