@@ -67,8 +67,11 @@ class Previews:
       set(self._settings['gui/name_preview_items_collapsed_state'].active_items),
       list(self._settings['main/selected_items'].active_items),
       initial_cursor_item=(
-        self._settings['gui/image_preview_displayed_items'].value[0]
-        if self._settings['gui/image_preview_displayed_items'].value else None),
+        next(
+          iter(key for key in self._settings['gui/image_preview_displayed_items'].active_items),
+          None,
+        )
+        if self._settings['gui/image_preview_displayed_items'].active_items else None),
     )
 
     self._batcher_for_image_preview = core.LayerBatcher(
