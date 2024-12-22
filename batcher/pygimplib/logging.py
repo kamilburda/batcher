@@ -235,14 +235,17 @@ class Tee(object):
 
   def _write(self, data):
     self._file.write(data)
-    self._stream.write(data)
+    if self._stream is not None:
+      self._stream.write(data)
 
   def _write_with_flush(self, data):
     self._file.write(data)
     self._file.flush()
-    self._stream.write(data)
-    self._stream.flush()
+    if self._stream is not None:
+      self._stream.write(data)
+      self._stream.flush()
 
   def flush(self):
     self._file.flush()
-    self._stream.flush()
+    if self._stream is not None:
+      self._stream.flush()
