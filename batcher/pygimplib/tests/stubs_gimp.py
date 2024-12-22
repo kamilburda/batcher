@@ -234,7 +234,7 @@ class Image(GObject.GObject, ParasiteFunctionsStubMixin):
     return self.valid
 
   def delete(self):
-    pass
+    self.valid = False
 
 
 class Item(GObject.GObject, ParasiteFunctionsStubMixin):
