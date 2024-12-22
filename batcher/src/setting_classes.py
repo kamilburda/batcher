@@ -707,14 +707,16 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
 
     for key, group_or_active_file_format in raw_value.items():
       if key != self.ACTIVE_FILE_FORMAT_KEY:
-        if isinstance(group_or_active_file_format, pg.setting.Group):
-          # We need to create new settings to avoid the same setting to be
-          # a part of multiple instances of `FileFormatOptionsSetting`.
-          value[key] = file_formats_.create_file_format_options_settings(
-            self._file_format_options_to_dict(group_or_active_file_format))
-        else:
-          value[key] = file_formats_.create_file_format_options_settings(
-            group_or_active_file_format)
+        processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(key, key)
+        if file_formats_.file_format_procedure_exists(processed_file_format, self.import_or_export):
+          if isinstance(group_or_active_file_format, pg.setting.Group):
+            # We need to create new settings to avoid the same setting to be
+            # a part of multiple instances of `FileFormatOptionsSetting`.
+            value[key] = file_formats_.create_file_format_options_settings(
+              self._file_format_options_to_dict(group_or_active_file_format))
+          else:
+            value[key] = file_formats_.create_file_format_options_settings(
+              group_or_active_file_format)
       else:
         value[key] = group_or_active_file_format
 

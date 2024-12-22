@@ -29,7 +29,7 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
   else:
     raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
 
-  if pdb_proc_name is None:
+  if pdb_proc_name is None or pdb_proc_name not in pdb:
     return
 
   _pdb_proc, _pdb_proc_name, file_format_options_list = (
@@ -86,6 +86,20 @@ def fill_and_get_file_format_options_as_kwargs(
     }
   else:
     return None
+
+
+def file_format_procedure_exists(file_format, import_or_export):
+  if file_format not in FILE_FORMATS_DICT:
+    return False
+
+  if import_or_export == 'import':
+    pdb_proc_name = FILE_FORMATS_DICT[file_format].import_procedure_name
+  elif import_or_export == 'export':
+    pdb_proc_name = FILE_FORMATS_DICT[file_format].export_procedure_name
+  else:
+    raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+  return pdb_proc_name in pdb
 
 
 class _FileFormat:

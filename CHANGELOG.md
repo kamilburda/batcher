@@ -24,6 +24,7 @@ Bug fixes:
 * Fixed occasional incorrect names in the preview under the image thumbnail.
 * Fixed the `Rename` procedure renaming folders after items if `Rename folders` is enabled.
 * Fixed the `Rename` procedure assigning incorrect descending numbers if `Rename folders` is enabled.
+* Fixed a crash on plug-in startup if a file format is no longer available.
 * Fixed loading settings related to layers (e.g. layers selected in the preview) whose names contain `/`.
 
 
