@@ -333,10 +333,15 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
 
 class Layer(Item):
 
-  def __init__(self, mask=None, **kwargs):
+  def __init__(self, mask=None, filters=None, **kwargs):
     super().__init__(**kwargs)
 
     self.mask = mask
+
+    if filters is not None:
+      self.filters = filters
+    else:
+      self.filters = []
 
   def is_layer(self):
     return True
@@ -346,6 +351,9 @@ class Layer(Item):
 
   def get_mask(self):
     return self.mask
+
+  def get_filters(self):
+    return self.filters
 
 
 class GroupLayer(Layer):
@@ -373,6 +381,50 @@ class Path(Item):
 
   def is_path(self):
     return True
+
+
+class DrawableFilter(GObject.GObject):
+
+  _image_id_counter = itertools.count(start=1)
+
+  _filters_and_ids = {}
+
+  def __init__(self, name=None, id_=None):
+    super().__init__()
+
+    self.name = name
+
+    if id_ is None:
+      self.id_ = next(self._image_id_counter)
+    else:
+      self.id_ = id_
+
+    self._filters_and_ids[self.id_] = self
+
+    self.valid = True
+
+  @classmethod
+  def get_by_id(cls, id_):
+    try:
+      return cls._filters_and_ids[id_]
+    except KeyError:
+      return None
+
+  @classmethod
+  def id_is_valid(cls, id_):
+    return id_ in cls._filters_and_ids
+
+  def get_name(self):
+    return self.name
+
+  def get_id(self):
+    return self.id_
+
+  def is_valid(self):
+    return self.valid
+
+  def delete(self):
+    self.valid = False
 
 
 class Display(GObject.GObject):

@@ -2058,6 +2058,98 @@ class PathSetting(GimpItemSetting):
       return 'invalid path', 'invalid_value'
 
 
+class DrawableFilterSetting(Setting):
+  """Class for settings holding `Gimp.DrawableFilter` objects.
+
+  This class accepts as a value one of the following:
+  * a tuple (drawable type, drawable path components, image file path, position
+     of the filter in the drawable, filter name) where drawable type is the name
+     of the drawable's GIMP class (e.g. ``'Layer'``) holding the filter.
+  * an ID (assigned by GIMP) representing a `Gimp.DrawableFilter` instance.
+  * a `Gimp.DrawableFilter` instance.
+
+  Allowed GIMP PDB types:
+  * `Gimp.DrawableFilter`
+
+  Message IDs for invalid values:
+  * ``'invalid_value'``: The drawable filter assigned is invalid.
+  """
+
+  _ALLOWED_PDB_TYPES = [Gimp.DrawableFilter]
+
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.drawable_filter_combo_box]
+
+  def __init__(self, name: str, **kwargs):
+    self.drawable = None
+    """The drawable holding the filter (the setting value)."""
+
+    super().__init__(name, **kwargs)
+
+  def _copy_value(self, value):
+    return value
+
+  def _raw_to_value(self, raw_value):
+    value = raw_value
+
+    if isinstance(raw_value, int):
+      value = Gimp.DrawableFilter.get_by_id(raw_value)
+    elif isinstance(raw_value, Iterable):
+      self.drawable, value = self._get_drawable_and_drawable_filter_by_path(raw_value)
+
+    return value
+
+  def _value_to_raw(self, value):
+    if self.drawable is None:
+      return None
+
+    try:
+      drawable_filter_order = self.drawable.get_filters().index(value)
+    except ValueError:
+      return None
+
+    drawable_as_path = pgpdbutils.get_item_as_path(self.drawable)
+
+    if drawable_as_path is None:
+      return None
+
+    return [*drawable_as_path, drawable_filter_order, value.get_name()]
+
+  def _validate(self, drawable_filter):
+    if drawable_filter is not None and not drawable_filter.is_valid():
+      return 'invalid drawable filter', 'invalid_value'
+
+  @staticmethod
+  def _get_drawable_and_drawable_filter_by_path(path):
+    path_list = list(path)
+
+    drawable_type_name, drawable_path_components, image_filepath = path_list[:-2]
+    drawable_filter_position = path_list[-2]
+    drawable_filter_name = path_list[-1]
+
+    image = pgpdbutils.find_image_by_filepath(image_filepath)
+
+    if image is None:
+      return None, None
+
+    drawable = pgpdbutils.get_item_from_image_and_item_path(
+      drawable_type_name, drawable_path_components, image)
+
+    if drawable is None:
+      return None, None
+
+    drawable_filters = drawable.get_filters()
+
+    if drawable_filter_position > len(drawable_filters):
+      return None, None
+
+    drawable_filter = drawable_filters[drawable_filter_position]
+
+    if drawable_filter.get_name() != drawable_filter_name:
+      return None, None
+
+    return drawable, drawable_filter
+
+
 class ColorSetting(Setting):
   """Class for settings holding `Gegl.Color` instances.
   
@@ -3292,6 +3384,8 @@ def get_array_setting_type_from_gimp_core_object_array(
     return ArraySetting, dict(element_type=PathSetting)
   elif pdb_param_info.name == 'children':
     return ArraySetting, dict(element_type=ItemSetting)
+  elif pdb_param_info.name == 'filters':
+    return ArraySetting, dict(element_type=DrawableFilterSetting)
   else:
     return None
 

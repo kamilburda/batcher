@@ -1505,6 +1505,77 @@ class TestLayerMaskSetting(SettingTestCase):
       })
 
 
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch(
+  f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+class TestDrawableFilterSetting(SettingTestCase):
+
+  def setUp(self):
+    self.setting = settings_.DrawableFilterSetting('filter')
+
+    self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
+    self.image.set_file(Gio.file_new_for_path('image_filepath'))
+
+    self.parent = stubs_gimp.GroupLayer(name='group')
+
+    self.drawable_filter = stubs_gimp.DrawableFilter(name='layer_filter')
+    self.drawable_filter_2 = stubs_gimp.DrawableFilter(name='layer_filter_2')
+    self.drawable_filter_3 = stubs_gimp.DrawableFilter(name='layer_filter_3')
+
+    self.layer = stubs_gimp.Layer(name='layer')
+    self.layer.parent = self.parent
+    self.layer.image = self.image
+    self.layer.filters = [self.drawable_filter, self.drawable_filter_2, self.drawable_filter_3]
+
+    self.image.layers = [self.parent]
+    self.parent.children = [self.layer]
+
+  def test_set_value_from_drawable_filter(self):
+    self.setting.set_value(self.drawable_filter)
+
+    self.assertEqual(self.setting.value, self.drawable_filter)
+
+  def test_set_value_with_id(self):
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp'
+    ) as temp_mock_gimp_module:
+      temp_mock_gimp_module.DrawableFilter.get_by_id.return_value = self.drawable_filter
+
+      self.setting.set_value(2)
+
+    self.assertEqual(self.setting.value, self.drawable_filter)
+
+  def test_set_value_with_list_containing_layer_path(self):
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch(
+            f'{pgutils.get_pygimplib_module_path()}.pdbutils._get_children_from_image'
+      ) as temp_mock_get_children_from_image:
+        temp_mock_gimp_module.get_images.return_value = [self.image]
+        temp_mock_get_children_from_image.return_value = self.image.get_layers()
+
+        self.setting.set_value(
+          ['Layer', ['group', 'layer'], os.path.abspath('image_filepath'), 1, 'layer_filter_2'])
+
+    self.assertEqual(self.setting.value, self.drawable_filter_2)
+    self.assertEqual(self.setting.drawable, self.layer)
+
+  def test_to_dict(self):
+    self.setting.drawable = self.layer
+
+    self.setting.set_value(self.drawable_filter_2)
+
+    self.assertDictEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'filter',
+        'value': [
+          'Layer', ['group', 'layer'], os.path.abspath('image_filepath'), 1, 'layer_filter_2'],
+        'type': 'drawable_filter',
+      })
+
+
 class TestColorSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
