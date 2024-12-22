@@ -2139,7 +2139,7 @@ class DrawableFilterSetting(Setting):
 
     drawable_filters = drawable.get_filters()
 
-    if drawable_filter_position > len(drawable_filters):
+    if drawable_filter_position >= len(drawable_filters):
       return None, None
 
     drawable_filter = drawable_filters[drawable_filter_position]
