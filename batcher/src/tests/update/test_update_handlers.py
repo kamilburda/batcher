@@ -199,34 +199,34 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIsInstance(
       self.settings['main/procedures/insert_background/arguments/color_tag'],
       pg.setting.EnumSetting)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/procedures/insert_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/procedures/insert_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/procedures/merge_background/arguments/merge_type'].excluded_values,
       [Gimp.MergeType.FLATTEN_IMAGE])
 
     self.assertIsInstance(
       self.settings['main/procedures/insert_background_2/arguments/color_tag'],
       pg.setting.EnumSetting)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/procedures/insert_background_2/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/procedures/insert_background_2/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
     self.assertIsInstance(
       self.settings['main/constraints/not_background/arguments/color_tag'],
       pg.setting.EnumSetting)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/constraints/not_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
-    self.assertEquals(
+    self.assertEqual(
       self.settings['main/constraints/not_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
