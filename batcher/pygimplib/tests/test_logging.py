@@ -32,7 +32,7 @@ class TestCreateLogFile(unittest.TestCase):
   @mock.patch(f'{pgutils.get_pygimplib_module_path()}.logging.open')
   def test_create_log_file(
         self,
-        test_case_suffix,
+        _test_case_suffix,
         io_open_side_effect,
         makedirs_side_effect,
         expected_result,
@@ -55,19 +55,18 @@ class TestCreateLogFile(unittest.TestCase):
 class TestTee(unittest.TestCase):
 
   def setUp(self):
-    self.string_file = io.StringIO()
+    self.string_files = [io.StringIO()]
 
   def test_write(self):
     tee = pglogging.Tee(sys.stdout, log_header_title='Test Header')
-    tee.start(self.string_file)
+    tee.start(self.string_files)
 
     print('Hello')
-    self.assertTrue(self.string_file.getvalue().endswith('Hello\n'))
-    self.assertTrue('Test Header' in self.string_file.getvalue())
+    self.assertTrue(self.string_files[0].getvalue().endswith('Hello\n'))
+    self.assertTrue('Test Header' in self.string_files[0].getvalue())
 
     print('Hi There Again')
-    self.assertTrue(
-      self.string_file.getvalue().endswith('Hello\nHi There Again\n'))
+    self.assertTrue(self.string_files[0].getvalue().endswith('Hello\nHi There Again\n'))
 
   def test_stop(self):
     tee_stdout = pglogging.Tee(
@@ -75,14 +74,14 @@ class TestTee(unittest.TestCase):
       log_header_title='Test Header')
 
     print('Hi There')
-    self.assertFalse(self.string_file.getvalue().endswith('Hi There\n'))
+    self.assertFalse(self.string_files[0].getvalue().endswith('Hi There\n'))
 
-    tee_stdout.start(self.string_file)
+    tee_stdout.start(self.string_files)
 
     print('Hello')
-    self.assertTrue(self.string_file.getvalue().endswith('Hello\n'))
+    self.assertTrue(self.string_files[0].getvalue().endswith('Hello\n'))
 
-    string_value = self.string_file.getvalue()
+    string_value = self.string_files[0].getvalue()
     tee_stdout.stop()
 
     print('Hi There Again')

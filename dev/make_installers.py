@@ -34,7 +34,8 @@ import batcher.pygimplib as pg
 from dev import create_user_docs
 from dev import process_local_docs
 
-pg.config.LOG_MODE = 'none'
+pg.config.STDOUT_LOG_HANDLES = []
+pg.config.STDERR_LOG_HANDLES = []
 
 
 INSTALLERS_DIRPATH = os.path.join(ROOT_DIRPATH, 'installers')

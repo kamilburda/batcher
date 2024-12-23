@@ -4,76 +4,100 @@ from collections.abc import Iterable
 import datetime
 import os
 import sys
-from typing import IO, Optional
+from typing import IO, List, Optional
 
-from . import constants
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
-_LOG_MODES = ('none', 'error', 'output_and_error')
+from . import constants as pgconstants
+from . import invocation as pginvocation
+
+_HANDLES = ('file', 'gimp_message')
 
 _TEE_STDOUT = None
 _TEE_STDERR = None
 
 
+_ORIG_STDOUT = sys.stdout
+_ORIG_STDERR = sys.stderr
+
+
 def log_output(
-      log_mode: str,
-      log_dirpaths: Iterable[str],
+      stdout_handles: Optional[List[str]] = None,
+      stderr_handles: Optional[List[str]] = None,
+      log_dirpaths: Optional[List[str]] = None,
       log_output_filename: Optional[str] = None,
       log_error_filename: Optional[str] = None,
       log_header_title: str = '',
       flush_output: bool = False):
   """Duplicates output from `sys.stdout` and `sys.stderr` to files.
 
-  Logging is reset on each call to this function. For example,
-  if ``log_mode`` was ``'output_and_error'`` and ``log_mode`` in the current
-  call is ``'none'``, any log files created by this function are closed,
-  and `sys.stdout` and `sys.stderr` are restored.
+  You may duplicate output to sources specified via `stdout_handles` and error
+  output via `stderr_handles`, respectively. Use one or more of the following
+  handles:
+  * ``'file'`` - duplicates output to a file.
+  * ``'gimp_message'`` - duplicates output to the GIMP message console.
+
+  Logging is reset on each call to this function and `sys.stdout` and
+  `sys.stderr` are restored at the beginning of this function.
 
   Args:
-    log_mode:
-      The log mode. Possible values:
-      * ``'none'`` - No action is performed, i.e. the output is not duplicated
-        anywhere.
-      * ``'error'`` - Duplicates error output (`sys.stderr`) to a file.
-      * ``'output_and_error'`` - Both the standard (`sys.stdout`) and the error
-        output (`sys.stderr`) are duplicated to log files.
+    stdout_handles: List of handles to duplicate standard output to.
+    stderr_handles: List of handles to duplicate standard error output to.
     log_dirpaths:
-      List of directory paths for log files. If the first path is not valid or
-      the permission to write is denied, subsequent directories are used.
+      List of directory paths for log files if the ``'file'`` handle is
+      specified. If the first path is not valid or the permission to write is
+      denied there, subsequent directories are probed until a valid directory is
+      identified.
     log_output_filename:
-      File name of the log file to write standard output to. This parameter
-      must not be ``None`` if ``log_mode`` is ``'output_and_error'``. Applies
-      to the ``'output_and_error'`` mode only.
+      File name of the log file to write standard output to if the ``'file'``
+      handle is specified in ``stdout_handles``.
     log_error_filename:
-      File name of the log file to write error output to. This parameter must
-      not be ``None`` if ``log_mode`` is ``'output_and_error'`` or
-      ``'error'``.
+      File name of the log file to write standard output to if the ``'file'``
+      handle is specified in ``stderr_handles``.
     log_header_title:
       Optional title in the log header, written before the first output to the
       log files.
     flush_output:
-      If ``True``, the output is flushed after each instance of writing.
+      If ``True``, the output is flushed after each instance of writing. Only
+      has effect for ``'file'`` handles.
   """
   global _TEE_STDOUT
   global _TEE_STDERR
 
   _close_log_files_and_reset_streams(_TEE_STDOUT, _TEE_STDERR)
 
-  if log_mode == 'none':
-    return
+  output_files = _prepare_log_files(stdout_handles, log_dirpaths, log_output_filename)
 
-  if log_mode in ['error', 'output_and_error']:
-    log_error_file = create_log_file(log_dirpaths, log_error_filename)
-    if log_error_file is not None:
-      _TEE_STDERR = Tee(sys.stderr, log_header_title=log_header_title, flush_output=flush_output)
-      _TEE_STDERR.start(log_error_file)
+  if output_files:
+    _TEE_STDOUT = Tee('stdout', log_header_title=log_header_title, flush_output=flush_output)
+    _TEE_STDOUT.start(output_files)
 
-    if log_mode == 'output_and_error':
-      log_output_file = create_log_file(log_dirpaths, log_output_filename)
-      if log_output_file is not None:
-        _TEE_STDOUT = Tee(sys.stdout, log_header_title=log_header_title, flush_output=flush_output)
-        _TEE_STDOUT.start(log_output_file)
-  else:
-    raise ValueError(f'invalid log mode "{log_mode}"; allowed values: {", ".join(_LOG_MODES)}')
+  error_files = _prepare_log_files(stderr_handles, log_dirpaths, log_error_filename)
+
+  if error_files:
+    _TEE_STDERR = Tee('stderr', log_header_title=log_header_title, flush_output=flush_output)
+    _TEE_STDERR.start(error_files)
+
+
+def _prepare_log_files(handles, log_dirpaths, log_filename):
+  log_files = []
+
+  if handles is not None:
+    for handle in handles:
+      if handle == 'file':
+        if log_dirpaths is None or log_filename is None:
+          raise ValueError(
+            'log directory paths and filename must be specified if logging to a file')
+
+        log_files.append(create_log_file(log_dirpaths, log_filename))
+      elif handle == 'gimp_message':
+        log_files.append(GimpMessageFile())
+      else:
+        raise ValueError(f'handle not valid; valid handles: {", ".join(_HANDLES)}')
+
+  return log_files
 
 
 def get_log_header(log_header_title: str) -> str:
@@ -111,7 +135,7 @@ def create_log_file(log_dirpaths: Iterable[str], log_filename: str, mode: str = 
 
     try:
       log_file = open(
-        os.path.join(log_dirpath, log_filename), mode, encoding=constants.TEXT_FILE_ENCODING)
+        os.path.join(log_dirpath, log_filename), mode, encoding=pgconstants.TEXT_FILE_ENCODING)
     except IOError:
       continue
     else:
@@ -127,89 +151,95 @@ def _close_log_files_and_reset_streams(tee_stdout, tee_stderr):
   if tee_stderr is not None:
     tee_stderr.stop()
 
-  sys.stdout = sys.__stdout__
-  sys.stderr = sys.__stderr__
+  sys.stdout = _ORIG_STDOUT
+  sys.stderr = _ORIG_STDERR
+
+
+class GimpMessageFile:
+
+  def __init__(self, handler_type=Gimp.MessageHandlerType.ERROR_CONSOLE, delay_milliseconds=50):
+    self._orig_handler = Gimp.message_get_handler()
+    self._delay_milliseconds = delay_milliseconds
+
+    Gimp.message_set_handler(handler_type)
+
+    self._buffer = ''
+
+  def write(self, data):
+    self._buffer += str(data)
+
+    pginvocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
+
+  def flush(self):
+    pass
+
+  def close(self):
+    Gimp.message_set_handler(self._orig_handler)
+
+  def _display_data_and_flush(self):
+    Gimp.message(self._buffer)
+    self._buffer = ''
 
 
 # Original version: https://stackoverflow.com/a/616686
-class Tee(object):
+class Tee:
   """File-like object that duplicates a stream -- either ``stdout`` or
-  ``stderr`` -- to the specified file, much like the Unix `tee` command.
+  ``stderr`` -- to the specified files, much like the Unix `tee` command.
   """
 
   def __init__(
         self,
-        stream: IO,
+        stream_name: str,
         log_header_title: Optional[str] = None,
         flush_output: bool = False,
   ):
     """Initializes a `Tee` instance.
 
     Args:
-      stream:
-        Either `sys.stdout` or `sys.stderr`. Other objects are invalid and raise
+      stream_name:
+        Either ``'stdout'`` or ``'stderr'`` representing `sys.stdout` or
+        `sys.stderr`, respectively. Other objects are invalid and raise
         `ValueError`.
       log_header_title:
         Header text to write when writing into the file for the first time.
       flush_output:
         If ``True``, the output is flushed after each write.
     """
-    self._streams = {sys.stdout: 'stdout', sys.stderr: 'stderr'}
+    self._valid_stream_names = {'stdout', 'stderr'}
+
+    if stream_name not in self._valid_stream_names:
+      raise ValueError(f'invalid stream "{stream_name}"; must be "stdout" or "stderr"')
+
+    self._stream_name = stream_name
 
     self.log_header_title = log_header_title if log_header_title is not None else ''
     self.flush_output = flush_output
 
-    self._file = None
+    self._orig_stream = getattr(sys, stream_name)
+
+    self._files = []
     self._is_running = False
-
-    self._orig_stream = None
-    self._stream_name = ''
-    self._stream = None
-
-    self.stream = stream
 
   def __del__(self):
     if self.is_running():
       self.stop()
 
-  @property
-  def stream(self):
-    """The stream whose output is being duplicated"""
-    return self._stream
-
-  @stream.setter
-  def stream(self, value: IO):
-    """Modifies the stream to duplicate output from.
-
-    Args:
-      value:
-        Stream object -- either `sys.stdout` or `sys.stderr`.
+  def start(self, files: List):
+    """Starts duplicating output to the specified files or file-like objects.
     """
-    self._stream = value
-    if value in self._streams:
-      self._stream_name = self._streams[value]
-    else:
-      raise ValueError('invalid stream; must be sys.stdout or sys.stderr')
-
-  def start(self, file_: IO):
-    """Starts duplicating output to the specified file.
-
-    Args:
-      file_:
-        File or file-like object to write output to.
-    """
-    self._orig_stream = self.stream
     setattr(sys, self._stream_name, self)
 
-    self._file = file_
+    self._files = files
     self._is_running = True
 
   def stop(self):
     """Stops duplicating output to the file."""
     setattr(sys, self._stream_name, self._orig_stream)
-    self._file.close()
 
-    self._file = None
+    for file_ in self._files:
+      file_.close()
+
+    self._files = []
     self._is_running = False
 
   def is_running(self):
@@ -224,7 +254,8 @@ class Tee(object):
     first output.
     """
     if self.log_header_title:
-      self._file.write(get_log_header(self.log_header_title))
+      for file_ in self._files:
+        file_.write(get_log_header(self.log_header_title))
 
     self._write_with_flush(data)
 
@@ -234,18 +265,24 @@ class Tee(object):
       self.write = self._write_with_flush
 
   def _write(self, data):
-    self._file.write(data)
-    if self._stream is not None:
-      self._stream.write(data)
+    for file_ in self._files:
+      file_.write(data)
+
+    if self._orig_stream is not None:
+      self._orig_stream.write(data)
 
   def _write_with_flush(self, data):
-    self._file.write(data)
-    self._file.flush()
-    if self._stream is not None:
-      self._stream.write(data)
-      self._stream.flush()
+    for file_ in self._files:
+      file_.write(data)
+      file_.flush()
+
+    if self._orig_stream is not None:
+      self._orig_stream.write(data)
+      self._orig_stream.flush()
 
   def flush(self):
-    self._file.flush()
-    if self._stream is not None:
-      self._stream.flush()
+    for file_ in self._files:
+      file_.flush()
+
+    if self._orig_stream is not None:
+      self._orig_stream.flush()

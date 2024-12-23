@@ -95,7 +95,8 @@ def _init_config_initial(
 
   config.BUG_REPORT_URL_LIST = []
 
-  config.LOG_MODE = 'error'
+  config.STDOUT_LOG_HANDLES = []
+  config.STDERR_LOG_HANDLES = ['file']
 
   config.WARN_ON_INVALID_SETTING_VALUES = True
   config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE = set()
@@ -157,7 +158,8 @@ def _init_config_per_procedure(config: _Config):
     config.DEFAULT_SOURCE = None
 
   pglogging.log_output(
-    config.LOG_MODE,
+    config.STDOUT_LOG_HANDLES,
+    config.STDERR_LOG_HANDLES,
     config.PLUGINS_LOG_DIRPATHS,
     config.PLUGINS_LOG_OUTPUT_FILENAME,
     config.PLUGINS_LOG_ERROR_FILENAME,

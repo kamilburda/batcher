@@ -6,7 +6,9 @@ Use `c` to access, create or modify configuration entries.
 import os
 
 
-c.LOG_MODE = 'error'
+c.STDOUT_LOG_HANDLES = []
+c.STDERR_LOG_HANDLES = ['file']
+
 c.WARN_ON_INVALID_SETTING_VALUES = True
 
 c.PLUGIN_NAME = 'batcher'

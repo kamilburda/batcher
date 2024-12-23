@@ -22,7 +22,7 @@ from . import logging
 # Enable logging as early as possible to capture any unexpected errors (such
 # as missing modules) before pygimplib is fully initialized.
 logging.log_output(
-  log_mode='error',
+  stderr_handles=['file'],
   log_dirpaths=[ROOT_PLUGIN_DIRPATH, os.path.dirname(PYGIMPLIB_DIRPATH), PYGIMPLIB_DIRPATH],
   log_error_filename='error.log',
   log_header_title=ROOT_PLUGIN_DIRPATH)
