@@ -598,6 +598,37 @@ class PathComboBoxPresenter(GimpObjectComboBoxPresenter):
       self._widget.set_active(value.get_id())
 
 
+class DrawableFilterComboBoxPresenter(GimpObjectComboBoxPresenter):
+  """`setting.Presenter` subclass for `gui.DrawableFilterComboBox` widgets.
+
+  Value: `Gimp.DrawableFilter` selected in the combo box, or ``None`` if there
+  is no drawable filter available.
+  """
+
+  def _connect_value_changed_event(self):
+    # This is a custom combo box rather than a `GimpUi` combo box. Therefore,
+    # the GTK ``connect`` method is used.
+    GtkPresenter._connect_value_changed_event(self)
+
+  def _create_widget(self, setting, **kwargs):
+    return pggui.GimpDrawableFilterComboBox()
+
+  def get_value(self):
+    self._setting.drawable = self._widget.get_active_drawable()
+
+    return Gimp.DrawableFilter.get_by_id(self._widget.get_active())
+
+  def _set_value(self, value):
+    """Sets a `Gimp.DrawableFilter` instance to be selected in the combo box.
+
+    Passing ``None`` or an ID that does not correspond to any
+    `Gimp.DrawableFilter` object has no effect.
+    """
+    if value is not None and self._setting.drawable is not None:
+      self._widget.set_active_drawable(self._setting.drawable)
+      self._widget.set_active(value.get_id())
+
+
 class ColorButtonPresenter(GtkPresenter):
   """`setting.Presenter` subclass for `GimpUi.ColorButton` widgets.
   
