@@ -220,20 +220,18 @@ class Tee:
     self._files = []
     self._is_running = False
 
-  def __del__(self):
-    if self.is_running():
-      self.stop()
-
   def start(self, files: List):
-    """Starts duplicating output to the specified files or file-like objects.
-    """
+    """Starts duplicating output to the specified files or file-like objects."""
     setattr(sys, self._stream_name, self)
 
     self._files = files
     self._is_running = True
 
   def stop(self):
-    """Stops duplicating output to the file."""
+    """Stops duplicating output to the files specified in `start()`."""
+    if not self._is_running:
+      return
+
     setattr(sys, self._stream_name, self._orig_stream)
 
     for file_ in self._files:
@@ -243,12 +241,13 @@ class Tee:
     self._is_running = False
 
   def is_running(self):
-    """Return ``True`` if duplication to file is enabled, ``False`` otherwise.
+    """Return ``True`` if the duplication of output is enabled, ``False``
+    otherwise.
     """
     return self._is_running
 
   def write(self, data):
-    """Writes output to both the stream and the specified file.
+    """Writes output to both the stream and the files specified in `start()`.
 
     If `log_header_title` is not empty, the log header is written before the
     first output.
