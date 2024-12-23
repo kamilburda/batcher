@@ -37,7 +37,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
 
     Gimp.context_push()
 
-    cls.test_image_filepath = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
+    cls.test_image_filepath = os.path.join(
+      TEST_IMAGES_DIRPATH, 'export_layers_inputs', 'test_contents.xcf')
     cls.test_image = cls._load_image()
     
     cls.output_dirpath = OUTPUT_DIRPATH
