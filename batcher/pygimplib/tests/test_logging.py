@@ -58,7 +58,7 @@ class TestTee(unittest.TestCase):
     self.string_files = [io.StringIO()]
 
   def test_write(self):
-    tee = pglogging.Tee(sys.stdout, log_header_title='Test Header')
+    tee = pglogging.Tee('stdout', log_header_title='Test Header')
     tee.start(self.string_files)
 
     print('Hello')
@@ -70,7 +70,7 @@ class TestTee(unittest.TestCase):
 
   def test_stop(self):
     tee_stdout = pglogging.Tee(
-      sys.stdout,
+      'stdout',
       log_header_title='Test Header')
 
     print('Hi There')
@@ -89,5 +89,4 @@ class TestTee(unittest.TestCase):
 
   def test_invalid_stream(self):
     with self.assertRaises(ValueError):
-      # noinspection PyTypeChecker
       pglogging.Tee('invalid_stream', log_header_title='Test Header')
