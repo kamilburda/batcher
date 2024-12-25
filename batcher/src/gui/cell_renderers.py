@@ -14,20 +14,20 @@ class CellRendererTextList(Gtk.CellRendererText):
       GObject.TYPE_STRV,
       'list of strings',
       'List of strings to render',
-      GObject.PARAM_READWRITE,
+      GObject.ParamFlags.READWRITE,
     ),
     'markup-list': (
       GObject.TYPE_STRV,
       'list of strings in markup',
       'List of strings with markup to render',
-      GObject.PARAM_WRITABLE,
+      GObject.ParamFlags.WRITABLE,
     ),
     'text-list-separator': (
       GObject.TYPE_STRING,
       'separator for list of strings',
       'Text separator for the list of strings ("text-list" and "markup-list" properties)',
       ', ',     # Default value
-      GObject.PARAM_READWRITE,
+      GObject.ParamFlags.READWRITE,
     ),
   }
   
