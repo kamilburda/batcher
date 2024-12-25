@@ -15,8 +15,9 @@ from src.path import uniquify
 
 
 def get_setting_data_from_pdb_procedure(
-      pdb_procedure_or_name: Union[Gimp.Procedure, str]) -> Tuple[Gimp.Procedure, str, List]:
-  """Given the input, returns a GIMP PDB procedure, its name and arguments.
+      pdb_procedure_or_name: Union[pg.pypdb.PDBProcedure, str],
+) -> Tuple[pg.pypdb.PDBProcedure, str, List]:
+  """Given the input, returns a PDB procedure, its name and arguments.
 
   The returned arguments are a list of dictionaries. From each dictionary,
   `pygimplib.setting.Setting` instances can be created.
@@ -28,16 +29,16 @@ def get_setting_data_from_pdb_procedure(
   """
 
   if isinstance(pdb_procedure_or_name, str):
-    pdb_procedure = pdb[pdb_procedure_or_name].proc
+    pdb_procedure = pdb[pdb_procedure_or_name]
     pdb_procedure_name = pdb_procedure_or_name
   else:
     pdb_procedure = pdb_procedure_or_name
-    pdb_procedure_name = pdb_procedure.get_name()
+    pdb_procedure_name = pdb_procedure.name
 
   pdb_procedure_argument_names = []
   arguments = []
 
-  for proc_arg in pdb_procedure.get_arguments():
+  for proc_arg in pdb_procedure.arguments:
     retval = pg.setting.get_setting_type_and_kwargs(proc_arg.value_type, proc_arg, pdb_procedure)
 
     if retval is not None:

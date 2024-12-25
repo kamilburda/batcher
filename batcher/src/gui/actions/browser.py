@@ -68,11 +68,13 @@ class ActionBrowser(GObject.GObject):
     self._parent_tree_iters = {}
 
     self._predefined_parent_tree_iter_names = [
+      'filters',
       'plug_ins',
       'gimp_procedures',
       'other',
     ]
     self._predefined_parent_tree_iter_display_names = [
+      _('Filters, Effects'),
       _('Plug-ins'),
       _('GIMP Procedures'),
       _('Other'),
@@ -132,12 +134,19 @@ class ActionBrowser(GObject.GObject):
                    or name_.endswith('-export-internal')
                    or name_.endswith('-export-multi')))
 
+    def is_procedure_gimp_plugin(procedure_):
+      return (
+        isinstance(procedure_, pg.pypdb.GimpPDBProcedure)
+        and procedure_.proc.get_proc_type() in [
+          Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.PERSISTENT, Gimp.PDBProcType.TEMPORARY]
+      )
+
     # We pre-sort procedure names so that the column with these names will
     # appear sorted for entries without a menu name (corresponding to the column
     # used for sorting by default).
     pdb_procedures = [
-      Gimp.get_pdb().lookup_procedure(name)
-      for name in sorted(Gimp.get_pdb().query_procedures(*([''] * 8)))
+      pdb[name]
+      for name in sorted(pdb.list_all_procedure_names())
       if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     ]
 
@@ -147,11 +156,11 @@ class ActionBrowser(GObject.GObject):
     for procedure, action_dict in zip(pdb_procedures, action_dicts):
       procedure_name = action_dict['name']
 
-      if procedure_name.startswith('file-'):
+      if isinstance(procedure, pg.pypdb.GeglProcedure):
+        action_type = 'filters'
+      elif procedure_name.startswith('file-'):
         action_type = 'other'
-      elif (procedure_name.startswith('plug-in-')
-            or procedure.get_proc_type() in [
-                Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.PERSISTENT, Gimp.PDBProcType.TEMPORARY]):
+      elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
         if self._has_plugin_procedure_image_or_drawable_arguments(action_dict):
           action_type = 'plug_ins'
         else:
@@ -178,10 +187,7 @@ class ActionBrowser(GObject.GObject):
          None])
 
     self._tree_view.expand_row(
-      self._tree_model[self._predefined_parent_tree_iter_names.index('plug_ins')].path,
-      False)
-    self._tree_view.expand_row(
-      self._tree_model[self._predefined_parent_tree_iter_names.index('gimp_procedures')].path,
+      self._tree_model[self._predefined_parent_tree_iter_names.index('filters')].path,
       False)
 
     first_selectable_path = self._tree_model[0].path

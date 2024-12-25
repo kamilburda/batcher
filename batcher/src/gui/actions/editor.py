@@ -428,22 +428,22 @@ def _get_action_info_from_pdb_procedure(pdb_procedure):
     action_info = ''
     action_main_info = []
 
-    help_text = pdb_procedure.proc.get_help()
+    help_text = pdb_procedure.help
     if help_text:
       action_main_info.append(help_text)
 
     action_info += '\n\n'.join(action_main_info)
 
     action_author_info = []
-    authors = pdb_procedure.proc.get_authors()
+    authors = pdb_procedure.authors
     if authors:
       action_author_info.append(authors)
 
-    date_text = pdb_procedure.proc.get_date()
+    date_text = pdb_procedure.date
     if date_text:
       action_author_info.append(date_text)
 
-    copyright_text = pdb_procedure.proc.get_copyright()
+    copyright_text = pdb_procedure.copyright
     if copyright_text:
       if not authors.startswith(copyright_text):
         action_author_info.append(f'\u00a9 {copyright_text}')

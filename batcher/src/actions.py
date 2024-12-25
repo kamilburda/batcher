@@ -232,7 +232,7 @@ def add(
 
   ``action_dict_or_pdb_proc_name_or_action`` can be one of the following:
   * a dictionary - see `create()` for the required and accepted fields,
-  * a GIMP PDB procedure name,
+  * a PDB procedure name,
   * an existing `pygimplib.setting.Group` instance representing an action,
     created via `create_action()`.
 
@@ -574,7 +574,7 @@ def _hide_gui_for_first_run_mode_arguments(action):
 
 
 def get_action_dict_from_pdb_procedure(
-      pdb_procedure_or_name: Union[Gimp.Procedure, str]) -> Dict[str, Any]:
+      pdb_procedure_or_name: Union[pg.pypdb.PDBProcedure, str]) -> Dict[str, Any]:
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added as an action via `add()`.
   
@@ -601,8 +601,8 @@ def get_action_dict_from_pdb_procedure(
   return action_dict
 
 
-def _get_pdb_procedure_display_name(proc):
-  menu_label = proc.get_menu_label()
+def _get_pdb_procedure_display_name(pdb_procedure):
+  menu_label = pdb_procedure.menu_label
   if menu_label:
     menu_label = menu_label.replace('_', '')
     if menu_label.endswith('...'):
@@ -610,11 +610,11 @@ def _get_pdb_procedure_display_name(proc):
 
     return menu_label
   else:
-    return proc.get_name()
+    return pdb_procedure.name
 
 
 def _get_pdb_procedure_description(pdb_procedure):
-  blurb = pdb_procedure.get_blurb()
+  blurb = pdb_procedure.blurb
   return blurb if blurb is not None else ''
 
 

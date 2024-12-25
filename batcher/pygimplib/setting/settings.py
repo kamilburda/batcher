@@ -20,6 +20,8 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import pdbutils as pgpdbutils
+from .. import pypdb
+from ..pypdb import pdb
 from .. import utils as pgutils
 
 from . import meta as meta_
@@ -1430,7 +1432,7 @@ class ChoiceSetting(Setting):
             List[Tuple[str, str, int, str]],
             Gimp.Choice]
         ] = None,
-        procedure: Optional[Union[Gimp.Procedure, str]] = None,
+        procedure: Optional[Union[pypdb.PDBProcedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1449,8 +1451,8 @@ class ChoiceSetting(Setting):
         to be created from GIMP PDB parameters as currently there is no way to
         obtain a list of choices from PDB parameters.
       procedure:
-        A `Gimp.Procedure` instance, or name thereof, whose PDB parameter having
-        the name ``name`` contains possible choices.
+        A `pypdb.PDBProcedure` instance, or name thereof, whose PDB parameter
+        having the name ``name`` contains possible choices.
     """
     self._procedure = self._process_procedure(procedure)
     self._procedure_config = self._create_procedure_config(self._procedure)
@@ -1487,16 +1489,16 @@ class ChoiceSetting(Setting):
     return self._items_help
 
   @property
-  def procedure(self) -> Union[Gimp.Procedure, None]:
-    """A `Gimp.Procedure` instance containing the `Gimp.Choice` instance for
+  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
+    """A `pypdb.PDBProcedure` instance containing the `Gimp.Choice` instance for
     this setting.
     """
     return self._procedure
 
   @property
-  def procedure_config(self) -> Union[Gimp.ProcedureConfig, None]:
-    """A `Gimp.ProcedureConfig` instance containing the `Gimp.Choice` instance
-    for this setting.
+  def procedure_config(self) -> Union[Gimp.ConfigInterface, None]:
+    """A procedure config containing the `Gimp.Choice` instance for this
+    setting.
     """
     return self._procedure_config
 
@@ -1521,7 +1523,7 @@ class ChoiceSetting(Setting):
 
     if 'procedure' in settings_dict:
       if settings_dict['procedure'] is not None:
-        settings_dict['procedure'] = self._procedure.get_name()
+        settings_dict['procedure'] = self._procedure.name
 
     return settings_dict
 
@@ -1564,16 +1566,18 @@ class ChoiceSetting(Setting):
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
 
   @staticmethod
-  def _process_procedure(procedure) -> Union[Gimp.Procedure, None]:
+  def _process_procedure(procedure) -> Union[pypdb.PDBProcedure, str, None]:
     if procedure is None:
       return None
-    elif isinstance(procedure, Gimp.Procedure):
+    elif isinstance(procedure, pypdb.PDBProcedure):
       return procedure
     elif isinstance(procedure, str):
-      if Gimp.get_pdb().procedure_exists(procedure):
-        return Gimp.get_pdb().lookup_procedure(procedure)
+      if procedure in pdb:
+        return pdb[procedure]
+      else:
+        return None
     else:
-      raise TypeError('procedure must be None, a string or a Gimp.Procedure instance')
+      raise TypeError('procedure must be None, a string or a pypdb.PDBProcedure instance')
 
   @staticmethod
   def _create_procedure_config(procedure):
@@ -3308,7 +3312,7 @@ class DictSetting(ContainerSetting):
 def get_setting_type_and_kwargs(
       gtype: GObject.GType,
       pdb_param_info: Optional[GObject.ParamSpec] = None,
-      pdb_procedure: Optional[Gimp.Procedure] = None,
+      pdb_procedure: Optional[pypdb.PDBProcedure] = None,
 ) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
   """Given a GIMP PDB parameter type, returns the corresponding `Setting`
   subclass and keyword arguments passable to its ``__init__()`` method.
@@ -3323,13 +3327,13 @@ def get_setting_type_and_kwargs(
     gtype:
       `GObject.GType` instance representing a GIMP PDB parameter.
     pdb_param_info:
-      Object representing GIMP PDB parameter information, obtainable via
-      `Gimp.Procedure.get_arguments()`. This is used to infer the element type
+      Object representing PDB parameter information, obtainable via
+      `pypdb.PDBProcedure.arguments`. This is used to infer the element type
       for an object array argument (images, layers, etc.) and to help obtain
       keyword arguments for `ChoiceSetting`. If ``None``,
       the `StringSetting` type will be returned instead.
     pdb_procedure:
-      If not ``None``, it is a `Gimp.Procedure` instance allowing to infer
+      If not ``None``, it is a `pypdb.PDBProcedure` instance allowing to infer
       string choices for the `ChoiceSetting` type. If ``None``,
       the `StringSetting` type will be returned instead.
 

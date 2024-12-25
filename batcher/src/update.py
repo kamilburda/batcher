@@ -849,8 +849,7 @@ def _change_drawable_to_drawables_for_pdb_procedure(
   if pdb_proc_name not in pdb:
     return
 
-  pdb_proc = pdb[pdb_proc_name].proc
-  pdb_proc_args = pdb_proc.get_arguments()
+  pdb_proc_args = pdb[pdb_proc_name].arguments
 
   if len(pdb_proc_args) < 3:
     return

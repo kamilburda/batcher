@@ -9,6 +9,8 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
+from .. import pypdb
+
 
 def _get_result_tuple_type(arg_name) -> collections.namedtuple:
   return collections.namedtuple(
@@ -35,6 +37,67 @@ class PdbStub:
   @classmethod
   def lookup_procedure(cls, proc_name):
     return cls._PROCEDURES.get(proc_name, None)
+
+
+class StubPDBProcedure(pypdb.PDBProcedure):
+
+  def __init__(self, proc):
+    self._proc = proc
+
+    super().__init__(None, proc.get_name())
+
+  def __call__(self, *args, run_mode=Gimp.RunMode.NONINTERACTIVE, **kwargs):
+    pass
+
+  @property
+  def proc(self):
+    return self._proc
+
+  @property
+  def arguments(self):
+    return self._proc.get_arguments()
+
+  @property
+  def aux_arguments(self):
+    return None
+
+  @property
+  def return_values(self):
+    return self._proc.get_return_values()
+
+  @property
+  def authors(self):
+    return None
+
+  @property
+  def blurb(self):
+    return self._proc.get_blurb()
+
+  @property
+  def copyright(self):
+    return None
+
+  @property
+  def date(self):
+    return None
+
+  @property
+  def help(self):
+    return self._proc.get_help()
+
+  @property
+  def menu_label(self):
+    return self._proc.get_menu_label()
+
+  @property
+  def menu_paths(self):
+    return None
+
+  def create_config(self):
+    return None
+
+  def _get_has_run_mode(self):
+    return False
 
 
 class Procedure:

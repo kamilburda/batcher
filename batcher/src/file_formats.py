@@ -152,10 +152,10 @@ class _FileFormat:
       menu_label = None
 
       if import_or_export == 'import' and self.import_procedure_name in pdb:
-        menu_label = pdb[self.import_procedure_name].proc.get_menu_label()
+        menu_label = pdb[self.import_procedure_name].menu_label
 
       if import_or_export == 'export' and self.export_procedure_name in pdb:
-        menu_label = pdb[self.export_procedure_name].proc.get_menu_label()
+        menu_label = pdb[self.export_procedure_name].menu_label
 
       if menu_label and len(menu_label) <= max_char_length_for_inferred_description:
         return menu_label

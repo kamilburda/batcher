@@ -278,8 +278,8 @@ def get_placeholder_type_name_from_pdb_type(
       A `GObject.GObject` subclass or a `GObject.GType` instance representing a
       GIMP PDB parameter.
     pdb_param_info:
-      Object representing GIMP PDB parameter information, obtainable via
-      `Gimp.Procedure.get_arguments()`. This is used to infer the element type
+      Object representing PDB parameter information, obtainable via
+      `pypdb.PDBProcedure.arguments`. This is used to infer the element type
       for an object array argument (images, layers, etc.).
 
   Returns:

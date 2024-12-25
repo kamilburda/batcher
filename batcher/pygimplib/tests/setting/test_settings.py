@@ -17,6 +17,7 @@ from gi.repository import GObject
 import parameterized
 
 from ... import config
+from ... import pypdb
 from ... import utils as pgutils
 
 from ...setting import presenter as presenter_
@@ -937,7 +938,7 @@ class TestEnumSetting(SettingTestCase):
 
 
 class TestCreateChoiceSetting(SettingTestCase):
-  
+
   def test_default_default_value_is_first_item(self):
     setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')])
@@ -981,13 +982,14 @@ class TestCreateChoiceSetting(SettingTestCase):
     )
 
   def test_with_procedure(self):
-    procedure = stubs_gimp.Procedure('some-procedure')
+    procedure = stubs_gimp.StubPDBProcedure(stubs_gimp.Procedure('some-procedure'))
 
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
           new=stubs_gimp.GimpModuleStub()):
-      # noinspection PyTypeChecker
       setting = settings_.ChoiceSetting('output-format', procedure=procedure)
+
+    settings_.pdb.remove_from_cache('some-procedure')
 
     self.assertEqual(setting.procedure, procedure)
 
@@ -995,13 +997,15 @@ class TestCreateChoiceSetting(SettingTestCase):
     procedure = stubs_gimp.Procedure('some-procedure')
 
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
           new=stubs_gimp.GimpModuleStub()) as mock_gimp:
       mock_gimp.get_pdb().add_procedure(procedure)
-      # noinspection PyTypeChecker
       setting = settings_.ChoiceSetting('output-format', procedure='some-procedure')
 
-    self.assertEqual(setting.procedure, procedure)
+    settings_.pdb.remove_from_cache('some-procedure')
+
+    self.assertIsInstance(setting.procedure, pypdb.PDBProcedure)
+    self.assertEqual(setting.procedure.name, procedure.get_name())
 
   def test_inconsistent_number_of_elements_raises_error(self):
     with self.assertRaises(ValueError):
@@ -1112,11 +1116,12 @@ class TestChoiceSetting(SettingTestCase):
     procedure = stubs_gimp.Procedure('some-procedure')
 
     with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
           new=stubs_gimp.GimpModuleStub()) as mock_gimp:
       mock_gimp.get_pdb().add_procedure(procedure)
-      # noinspection PyTypeChecker
-      setting = settings_.ChoiceSetting('output-format', procedure=procedure)
+      setting = settings_.ChoiceSetting('output-format', procedure='some-procedure')
+
+    settings_.pdb.remove_from_cache('some-procedure')
 
     self.assertDictEqual(
       setting.to_dict(),
@@ -2715,6 +2720,8 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
       # noinspection PyTypeChecker
       setting_type, kwargs = settings_.get_setting_type_and_kwargs(
         GObject.TYPE_STRING, param_spec, procedure)
+
+    settings_.pdb.remove_from_cache('some-procedure')
 
     self.assertEqual(setting_type, settings_.ChoiceSetting)
     self.assertEqual(len(kwargs), 3)

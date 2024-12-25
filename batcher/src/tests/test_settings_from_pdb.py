@@ -56,7 +56,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     procedure, procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
       extended_procedure_stub.get_name())
 
-    self.assertIs(procedure, extended_procedure_stub)
+    self.assertIsInstance(procedure, pg.pypdb.PDBProcedure)
     self.assertEqual(procedure_name, self.procedure_name)
 
     self.maxDiff = None
