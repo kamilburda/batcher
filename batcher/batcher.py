@@ -9,8 +9,6 @@ import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-gi.require_version('Gegl', '0.4')
-from gi.repository import Gegl
 
 import pygimplib as pg
 
@@ -19,8 +17,6 @@ gettext.bindtextdomain(
 gettext.textdomain('batcher')
 
 builtins._ = gettext.gettext
-
-pg.notifier.connect('start-procedure', lambda _notifier: Gegl.init())
 
 from src import actions as actions_
 from src import builtin_constraints

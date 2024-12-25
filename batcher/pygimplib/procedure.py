@@ -8,6 +8,8 @@ from typing import Callable, List, Optional, Tuple, Type, Union
 
 import gi
 
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -396,6 +398,8 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
 
     if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
       GimpUi.init(procedure.get_name())
+
+    Gegl.init()
 
     pginitnotifier.notifier.emit('start-procedure')
 
