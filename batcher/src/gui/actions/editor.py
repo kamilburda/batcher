@@ -261,7 +261,7 @@ class ActionEditorWidget:
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._ACTION_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING,
     )
-    self._action_info_hbox.pack_start(self._label_short_description, False, False, 0)
+    self._action_info_hbox.pack_start(self._label_short_description, True, True, 0)
 
     if self._action_info:
       self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
