@@ -209,7 +209,7 @@ class TestConvertCompareContents(unittest.TestCase):
   @classmethod
   def _load_image(cls, image_filepath):
     return pdb.gimp_file_load(
-      Gio.file_new_for_path(image_filepath), run_mode=Gimp.RunMode.NONINTERACTIVE)
+      run_mode=Gimp.RunMode.NONINTERACTIVE, file=Gio.file_new_for_path(image_filepath))
 
   @staticmethod
   def _get_gimp_version_as_tuple():

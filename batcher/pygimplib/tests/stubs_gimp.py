@@ -46,7 +46,7 @@ class StubPDBProcedure(pypdb.PDBProcedure):
 
     super().__init__(None, proc.get_name())
 
-  def __call__(self, *args, run_mode=Gimp.RunMode.NONINTERACTIVE, **kwargs):
+  def __call__(self, *args, **kwargs):
     pass
 
   @property
@@ -95,9 +95,6 @@ class StubPDBProcedure(pypdb.PDBProcedure):
 
   def create_config(self):
     return None
-
-  def _get_has_run_mode(self):
-    return False
 
 
 class Procedure:

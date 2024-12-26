@@ -547,7 +547,12 @@ def _export_image(
   export_func, kwargs = get_export_function(
     file_extension, file_format_mode, file_format_export_options)
 
-  export_func(image, image_file, None, run_mode=run_mode, **kwargs)
+  export_func(
+    run_mode=run_mode,
+    image=image,
+    file=image_file,
+    options=None,
+    **kwargs)
 
   return pdb.last_status
 

@@ -735,43 +735,39 @@ class Batcher(metaclass=abc.ABCMeta):
       self._last_constraint = action
 
   def _get_action_args_and_kwargs(self, action, action_args, function):
-    args = self._get_replaced_args(action_args, action['origin'].value == 'gimp_pdb')
-    kwargs = {}
+    args, kwargs = self._get_replaced_args(action_args, action['origin'].value == 'gimp_pdb')
 
     if action['origin'].value == 'gimp_pdb':
       args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
 
-      if function.has_run_mode:
-        kwargs = {'run_mode': args[0]}
-        args = args[1:]
-
     return args, kwargs
 
   def _get_replaced_args(self, action_arguments, is_function_pdb_procedure):
-    """Returns a list of action arguments, replacing any placeholder values with
-    real values.
+    """Returns positional and keyword arguments for an action, replacing any
+    placeholder values with real values.
     """
     replaced_args = []
+    replaced_kwargs = {}
 
     for argument in action_arguments:
       if isinstance(argument, placeholders.PlaceholderArraySetting):
         replaced_arg = placeholders.get_replaced_value(argument, self)
         if is_function_pdb_procedure:
-          replaced_args.append(pg.setting.array_as_pdb_compatible_type(replaced_arg))
+          replaced_kwargs[argument.name] = pg.setting.array_as_pdb_compatible_type(replaced_arg)
         else:
-          replaced_args.append(replaced_arg)
+          replaced_kwargs[argument.name] = replaced_arg
       elif isinstance(argument, placeholders.PlaceholderSetting):
-        replaced_args.append(placeholders.get_replaced_value(argument, self))
+        replaced_kwargs[argument.name] = placeholders.get_replaced_value(argument, self)
       elif isinstance(argument, pg.setting.Setting):
         if is_function_pdb_procedure:
-          replaced_args.append(argument.value_for_pdb)
+          replaced_kwargs[argument.name] = argument.value_for_pdb
         else:
-          replaced_args.append(argument.value)
+          replaced_kwargs[argument.name] = argument.value
       else:
         # Other arguments inserted within `Batcher`
         replaced_args.append(argument)
 
-    return replaced_args
+    return replaced_args, replaced_kwargs
 
   @staticmethod
   def _set_apply_constraint_to_folders(function, action):
@@ -1142,7 +1138,8 @@ class ImageBatcher(Batcher):
   @staticmethod
   def _load_image(image_filepath):
     return pdb.gimp_file_load(
-      Gio.file_new_for_path(image_filepath), run_mode=Gimp.RunMode.NONINTERACTIVE)
+      run_mode=Gimp.RunMode.NONINTERACTIVE,
+      file=Gio.file_new_for_path(image_filepath))
 
   @staticmethod
   def _get_current_layer(image):

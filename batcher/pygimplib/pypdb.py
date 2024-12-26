@@ -6,8 +6,11 @@ import abc
 from typing import List, Optional
 
 import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import GObject
 
 
 __all__ = [
@@ -38,32 +41,36 @@ class _PyPDB:
     return self._last_error
 
   def __getattr__(self, name: str) -> PDBProcedure:
-    proc_name = name.replace('_', '-')
+    proc_name = self._process_procedure_name(name)
 
-    if not self._procedure_exists(proc_name):
+    if self._gimp_pdb_procedure_exists(proc_name):
+      return self._get_proc_by_name(proc_name, GimpPDBProcedure)
+    elif self._gegl_operation_exists(proc_name):
+      return self._get_proc_by_name(proc_name, GeglProcedure)
+    else:
       raise AttributeError(f'procedure "{proc_name}" does not exist')
 
-    return self._get_proc_by_name(proc_name)
-
   def __getitem__(self, name: str) -> PDBProcedure:
-    proc_name = name.replace('_', '-')
+    proc_name = self._process_procedure_name(name)
 
-    if not self._procedure_exists(proc_name):
+    if self._gimp_pdb_procedure_exists(proc_name):
+      return self._get_proc_by_name(proc_name, GimpPDBProcedure)
+    elif self._gegl_operation_exists(proc_name):
+      return self._get_proc_by_name(proc_name, GeglProcedure)
+    else:
       raise KeyError(f'procedure "{proc_name}" does not exist')
-
-    return self._get_proc_by_name(proc_name)
 
   def __contains__(self, name: Optional[str]) -> bool:
     if name is None:
       return False
 
-    proc_name = name.replace('_', '-')
+    proc_name = self._process_procedure_name(name)
 
-    return self._procedure_exists(proc_name)
+    return self._gimp_pdb_procedure_exists(proc_name) or self._gegl_operation_exists(proc_name)
 
   @staticmethod
   def list_all_procedure_names() -> List[str]:
-    return Gimp.get_pdb().query_procedures(*([''] * 8))
+    return Gegl.list_operations() + Gimp.get_pdb().query_procedures(*([''] * 8))
 
   def remove_from_cache(self, name: str):
     """Removes a `PDBProcedure` instance matching ``name`` from the internal
@@ -73,22 +80,30 @@ class _PyPDB:
 
     No action is taken if there is no procedure matching ``name`` in the cache.
     """
-    proc_name = name.replace('_', '-')
+    proc_name = self._process_procedure_name(name)
 
     try:
       del self._proc_cache[proc_name]
     except KeyError:
       pass
 
-  def _get_proc_by_name(self, proc_name):
+  def _get_proc_by_name(self, proc_name, proc_class):
     if proc_name not in self._proc_cache:
-      self._proc_cache[proc_name] = GimpPDBProcedure(self, proc_name)
+      self._proc_cache[proc_name] = proc_class(self, proc_name)
 
     return self._proc_cache[proc_name]
 
   @staticmethod
-  def _procedure_exists(proc_name):
+  def _gimp_pdb_procedure_exists(proc_name):
     return Gimp.get_pdb().procedure_exists(proc_name)
+
+  @staticmethod
+  def _gegl_operation_exists(proc_name):
+    return Gegl.has_operation(proc_name)
+
+  @staticmethod
+  def _process_procedure_name(name):
+    return name.replace('__', ':').replace('_', '-')
 
 
 class PDBProcedure(metaclass=abc.ABCMeta):
@@ -97,36 +112,19 @@ class PDBProcedure(metaclass=abc.ABCMeta):
     self._pypdb_instance = pypdb_instance
     self._name = name
 
-    self._has_run_mode = self._get_has_run_mode()
-
   @abc.abstractmethod
-  def __call__(self, *args, run_mode=Gimp.RunMode.NONINTERACTIVE, **kwargs):
+  def __call__(self, **kwargs):
     """Calls the procedure.
 
-    The `run_mode` parameter cannot be specified as a positional argument, only
-    as a keyword argument. Depending on the subclass, this parameter may be
-    ignored.
+    All procedure arguments must be specified as keyword arguments (unless
+    defined otherwise in subclasses).
 
-    Positional arguments correspond to the arguments specified in the procedure,
-    except the run mode as described above.
+    If any keyword argument is omitted, the default value is used for that
+    argument as defined in the procedure.
 
-    You can alternatively specify the arguments as keyword arguments. This way,
-    any omitted arguments earlier in the order will be replaced with their
-    default value.
+    All underscore characters  (``_``) in argument names are automatically
+    replaced by ``-``.
     """
-    pass
-
-  @property
-  def has_run_mode(self):
-    """``True`` if the procedure has a run mode as its first argument, ``False``
-    otherwise.
-    """
-    return self._has_run_mode
-
-  @property
-  @abc.abstractmethod
-  def proc(self):
-    """Underlying instance used to obtain procedure information."""
     pass
 
   @property
@@ -192,13 +190,6 @@ class PDBProcedure(metaclass=abc.ABCMeta):
     """Creates a procedure config filled with default values."""
     pass
 
-  @abc.abstractmethod
-  def _get_has_run_mode(self):
-    """Returns ``True`` if the procedure has a run mode as its first argument,
-    ``False`` otherwise.
-    """
-    pass
-
 
 class GimpPDBProcedure(PDBProcedure):
 
@@ -207,8 +198,15 @@ class GimpPDBProcedure(PDBProcedure):
 
     super().__init__(pypdb_instance, name)
 
-  def __call__(self, *args, run_mode=Gimp.RunMode.NONINTERACTIVE, **kwargs):
-    config = self._create_config_for_call(run_mode, *args, **kwargs)
+  def __call__(self, **kwargs):
+    """Calls a GIMP PDB procedure.
+
+    All arguments must be specified as keyword arguments.
+
+    Return values from the procedure are returned as a tuple of values. If the
+    procedure does not define any return value, ``None`` is returned.
+    """
+    config = self._create_config_for_call(**kwargs)
 
     result = self._proc.run(config)
 
@@ -291,49 +289,190 @@ class GimpPDBProcedure(PDBProcedure):
   def create_config(self):
     return self._proc.create_config()
 
-  def _get_has_run_mode(self):
-    proc_arg_info = self._proc.get_arguments()
-    if proc_arg_info:
-      return proc_arg_info[0].value_type == Gimp.RunMode.__gtype__
-    else:
-      return False
+  def _create_config_for_call(self, **proc_kwargs):
+    config = self.create_config()
 
-  def _create_config_for_call(self, run_mode, *proc_args, **proc_kwargs):
-    config = self._proc.create_config()
+    args = self.arguments
 
-    args = self._proc.get_arguments()
+    args_and_names = {arg.name: arg for arg in args}
 
-    if self.has_run_mode:
-      config.set_property(args[0].name, run_mode)
-      args = args[1:]
+    for arg_name, arg_value in proc_kwargs.items():
+      processed_arg_name = arg_name.replace('_', '-')
 
-    for arg, arg_value in zip(args, proc_args):
-      config_set_property = _get_set_property_func(arg.value_type.name, config)
-      config_set_property(arg.name, arg_value)
+      try:
+        arg = args_and_names[processed_arg_name]
+      except KeyError:
+        raise PDBProcedureError(
+          f'argument "{processed_arg_name}" does not exist',
+          Gimp.PDBStatusType.CALLING_ERROR)
 
-    if proc_kwargs:
-      args_and_names = {arg.name: arg for arg in args}
-
-      # Keyword arguments can override positional arguments
-      for arg_name, arg_value in proc_kwargs.items():
-        processed_arg_name = arg_name.replace('_', '-')
-
-        try:
-          arg = args_and_names[processed_arg_name]
-        except KeyError:
-          raise PDBProcedureError(
-            f'argument "{processed_arg_name}" does not exist or is not supported',
-            Gimp.PDBStatusType.CALLING_ERROR)
-
-        arg_type_name = arg.value_type.name
-        config_set_property = _get_set_property_func(arg_type_name, config)
-        config_set_property(processed_arg_name, arg_value)
+      arg_type_name = arg.value_type.name
+      config_set_property = _get_set_property_func(arg_type_name, config)
+      config_set_property(processed_arg_name, arg_value)
 
     return config
 
 
 class GeglProcedure(PDBProcedure):
-  pass
+
+  def __init__(self, pypdb_instance, name):
+    self._filter_properties = Gegl.Operation.list_properties(name)
+
+    self._drawable_param = Gimp.param_spec_drawable(
+      'drawable-', 'Drawable', 'Drawable', False, GObject.ParamFlags.READWRITE)
+    self._merge_filter_param = GObject.param_spec_boolean(
+      'merge-filter-', 'Merge filter', 'Merge filter', False, GObject.ParamFlags.READWRITE)
+    self._blend_mode_param = GObject.param_spec_enum(
+      'blend-mode-',
+      'Blend mode',
+      'Blend mode',
+      Gimp.LayerMode.__gtype__,
+      Gimp.LayerMode.REPLACE,
+      GObject.ParamFlags.READWRITE,
+    )
+    self._opacity_param = GObject.param_spec_double(
+      'opacity-', 'Opacity', 'Opacity', 0.0, 1.0, 1.0, GObject.ParamFlags.READWRITE)
+    self._visible_param = GObject.param_spec_boolean(
+      'visible-', 'Visible', 'Visible', True, GObject.ParamFlags.READWRITE)
+    self._filter_name_param = GObject.param_spec_string(
+      'name-', 'Filter name', 'Filter name', '', GObject.ParamFlags.READWRITE)
+
+    self._keys = {key: None for key in Gegl.Operation.list_keys(name)}
+    self._properties = {prop.get_name(): prop for prop in self._get_properties()}
+
+    super().__init__(pypdb_instance, name)
+
+  def __call__(self, *args, **kwargs):
+    """Applies a layer effect (drawable filter, GEGL operation) on the specified
+    drawable.
+
+    Beside arguments defined by the GEGL operation, you may specify the
+    following additional keyword arguments, all of which have a trailing ``_``:
+
+    * ``drawable_`` - The ``Gimp.Drawable`` instance to apply the layer effect
+      to. This argument may be specified as the first and the only positional
+      argument.
+    *  ``merge_filter_`` - If ``False`` (default), the layer effect is applied
+      non-destructively and the filter is returned. If ``True``, the layer
+      effect is immediately merged into the drawable and ``None`` is returned.
+    * ``blend_mode_`` - The `Gimp.LayerMode` to apply to the layer effect.
+    * ``opacity_`` - The opacity of the layer effect.
+    * ``visible_`` - If ``True`` (default), the layer effect is visible. If
+      ``False``, the layer effect is not visible.
+    * ``name_`` - A custom name for the layer effect. If an empty string, the
+      default name of the layer effect is assigned.
+
+    All arguments must be specified as keyword arguments, except the
+    ``drawable_`` argument, which may be specified as the first and the only
+    positional argument.
+    """
+    processed_kwargs = {name.replace('_', '-'): value for name, value in kwargs.items()}
+
+    if 'drawable-' in processed_kwargs:
+      drawable = processed_kwargs.pop('drawable-')
+    else:
+      if not args or not isinstance(args[0], Gimp.Drawable):
+        raise PDBProcedureError(
+          ('if the "drawable_" parameter is not specified as a keyword argument, it must be'
+           ' specified as the first and only positional argument'),
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+      drawable = args[0]
+
+    merge_filter = processed_kwargs.pop('merge-filter-', self._merge_filter_param.default_value)
+    blend_mode = processed_kwargs.pop('blend-mode-', self._blend_mode_param.default_value)
+    opacity = processed_kwargs.pop('opacity-', self._opacity_param.default_value)
+    visible = processed_kwargs.pop('visible-', self._visible_param.default_value)
+    name = processed_kwargs.pop('name-', self._filter_name_param.default_value)
+
+    drawable_filter = Gimp.DrawableFilter.new(drawable, self.name, name)
+    drawable_filter.set_blend_mode(blend_mode)
+    drawable_filter.set_opacity(opacity)
+    drawable_filter.set_visible(visible)
+    drawable_filter.update()
+
+    config = drawable_filter.get_config()
+
+    # Keyword arguments can override positional arguments
+    for arg_name, arg_value in processed_kwargs.items():
+      if arg_name not in self._properties:
+        raise PDBProcedureError(
+          f'argument "{arg_name}" does not exist or is not supported',
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+      config.set_property(arg_name, arg_value)
+
+    drawable.append_filter(drawable_filter)
+
+    if merge_filter:
+      drawable.merge_filter(drawable_filter)
+
+      return None
+    else:
+      return drawable_filter
+
+  @property
+  def arguments(self):
+    return list(self._properties.values())
+
+  @property
+  def aux_arguments(self):
+    return []
+
+  @property
+  def return_values(self):
+    return []
+
+  @property
+  def authors(self):
+    return ''
+
+  @property
+  def blurb(self):
+    if 'description' in self._keys:
+      return Gegl.Operation.get_key(self.name, 'description')
+    else:
+      return ''
+
+  @property
+  def copyright(self):
+    return ''
+
+  @property
+  def date(self):
+    return ''
+
+  @property
+  def help(self):
+    return ''
+
+  @property
+  def menu_label(self):
+    if 'title' in self._keys:
+      return Gegl.Operation.get_key(self.name, 'title')
+    else:
+      return ''
+
+  @property
+  def menu_paths(self):
+    return []
+
+  def create_config(self):
+    """This subclass does not support config creation, hence this method returns
+    ``None``.
+    """
+    return None
+
+  def _get_properties(self):
+    return [
+      self._drawable_param,
+      *self._filter_properties,
+      self._merge_filter_param,
+      self._blend_mode_param,
+      self._opacity_param,
+      self._visible_param,
+      self._filter_name_param,
+    ]
 
 
 def _get_set_property_func(arg_type_name, config):

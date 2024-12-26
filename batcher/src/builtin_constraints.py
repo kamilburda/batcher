@@ -39,28 +39,28 @@ def is_visible(item, _layer_batcher):
   return item.raw.get_visible()
 
 
-def has_color_tag(item, _layer_batcher, tag, *_args, **_kwargs):
-  return item.raw.get_color_tag() == tag
+def has_color_tag(item, _layer_batcher, color_tag, *_args, **_kwargs):
+  return item.raw.get_color_tag() == color_tag
 
 
-def has_color_tags(item, _layer_batcher, tags=None):
+def has_color_tags(item, _layer_batcher, color_tags=None):
   item_color_tag = item.raw.get_color_tag()
 
   if item_color_tag == Gimp.ColorTag.NONE:
     return False
   else:
-    if tags:
-      return any(item_color_tag == tag for tag in tags)
+    if color_tags:
+      return any(item_color_tag == tag for tag in color_tags)
     else:
       return item_color_tag != Gimp.ColorTag.NONE
 
 
-def has_no_color_tag(item, _layer_batcher, tag, *_args, **_kwargs):
-  return not has_color_tag(item, _layer_batcher, tag)
+def has_no_color_tag(item, _layer_batcher, color_tag, *_args, **_kwargs):
+  return not has_color_tag(item, _layer_batcher, color_tag)
 
 
-def has_no_color_tags(item, _layer_batcher, tags=None):
-  return not has_color_tags(item, _layer_batcher, tags)
+def has_no_color_tags(item, _layer_batcher, color_tags=None):
+  return not has_color_tags(item, _layer_batcher, color_tags)
 
 
 _BUILTIN_CONSTRAINTS_LIST = [

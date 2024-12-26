@@ -207,8 +207,18 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       ],
     })
     
-    replaced_args = batcher._get_replaced_args(actions['autocrop/arguments'], True)
-    
-    self.assertListEqual(
-      replaced_args,
-      [Gimp.RunMode.NONINTERACTIVE, image, layer, (), 10, 50, 'current_image'])
+    replaced_args, replaced_kwargs = batcher._get_replaced_args(actions['autocrop/arguments'], True)
+
+    self.assertFalse(replaced_args)
+
+    self.assertDictEqual(
+      replaced_kwargs,
+      {
+        'run_mode': Gimp.RunMode.NONINTERACTIVE,
+        'image': image,
+        'layer': layer,
+        'selected_drawables': (),
+        'offset_x': 10,
+        'offset_y': 50,
+        'same_value_as_placeholder_value': 'current_image',
+      })

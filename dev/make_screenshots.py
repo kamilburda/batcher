@@ -45,7 +45,7 @@ SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
 def main():
-  image = pdb.gimp_file_load(Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
+  image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -201,16 +201,23 @@ def take_and_process_screenshot(
     crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
   pdb.gimp_file_save(
-    screenshot_image,
-    Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)),
-    None,
+    image=screenshot_image,
+    file=Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)),
+    options=None,
   )
   
   screenshot_image.delete()
 
 
 def take_screenshot():
-  return pdb.plug_in_screenshot(1, 0, 0, 0, 0)
+  return pdb.plug_in_screenshot(
+    shoot_type=1,
+    x1=0,
+    y1=0,
+    x2=0,
+    y2=0,
+    include_pointer=False,
+  )
 
 
 def move_dialog_to_corner(
@@ -242,10 +249,10 @@ def crop_to_dialog(image, size_setting_or_tuple, decoration_offsets):
     height = size_setting_or_tuple.value[1]
   
   pdb.gimp_image_crop(
-    image,
-    width,
-    height + decoration_offsets[1],
-    0,
-    0)
+    image=image,
+    new_width=width,
+    new_height=height + decoration_offsets[1],
+    offx=0,
+    offy=0)
   
-  pdb.plug_in_autocrop(image, image.get_selected_layers()[0])
+  pdb.plug_in_autocrop(image=image, drawable=image.get_selected_layers()[0])

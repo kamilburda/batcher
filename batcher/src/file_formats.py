@@ -213,6 +213,10 @@ def _create_file_format_aliases(file_formats):
   return file_format_aliases
 
 
+def _gimp_xcf_save_wrapper(options=None, **kwargs):
+  pdb.gimp_xcf_save(**kwargs)
+
+
 FILE_FORMATS = _create_file_formats([
   {'file_extensions': ['txt', 'ansi', 'text'],
    'export_procedure_name': 'file-aa-export'},
@@ -318,9 +322,7 @@ FILE_FORMATS = _create_file_formats([
    'export_procedure_name': 'file-xbm-export'},
   {'file_extensions': ['xcf'],
    'export_procedure_name': 'gimp-xcf-save',
-   'export_func': (
-     lambda image, file, options, **kwargs: pdb.gimp_xcf_save(image, file, **kwargs))
-   },
+   'export_func': _gimp_xcf_save_wrapper},
   {'file_extensions': ['xmc'],
    'export_procedure_name': 'file-xmc-export'},
   {'file_extensions': ['xpm'],
