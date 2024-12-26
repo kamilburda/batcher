@@ -327,8 +327,6 @@ class GeglProcedure(PDBProcedure):
 
     self._drawable_param = Gimp.param_spec_drawable(
       'drawable-', 'Drawable', 'Drawable', False, GObject.ParamFlags.READWRITE)
-    self._merge_filter_param = GObject.param_spec_boolean(
-      'merge-filter-', 'Merge filter', 'Merge filter', False, GObject.ParamFlags.READWRITE)
     self._blend_mode_param = GObject.param_spec_enum(
       'blend-mode-',
       'Blend mode',
@@ -339,6 +337,8 @@ class GeglProcedure(PDBProcedure):
     )
     self._opacity_param = GObject.param_spec_double(
       'opacity-', 'Opacity', 'Opacity', 0.0, 1.0, 1.0, GObject.ParamFlags.READWRITE)
+    self._merge_filter_param = GObject.param_spec_boolean(
+      'merge-filter-', 'Merge filter', 'Merge filter', False, GObject.ParamFlags.READWRITE)
     self._visible_param = GObject.param_spec_boolean(
       'visible-', 'Visible', 'Visible', True, GObject.ParamFlags.READWRITE)
     self._filter_name_param = GObject.param_spec_string(
@@ -386,9 +386,9 @@ class GeglProcedure(PDBProcedure):
 
       drawable = args[0]
 
-    merge_filter = processed_kwargs.pop('merge-filter-', self._merge_filter_param.default_value)
     blend_mode = processed_kwargs.pop('blend-mode-', self._blend_mode_param.default_value)
     opacity = processed_kwargs.pop('opacity-', self._opacity_param.default_value)
+    merge_filter = processed_kwargs.pop('merge-filter-', self._merge_filter_param.default_value)
     visible = processed_kwargs.pop('visible-', self._visible_param.default_value)
     name = processed_kwargs.pop('name-', self._filter_name_param.default_value)
 
@@ -474,9 +474,9 @@ class GeglProcedure(PDBProcedure):
     return [
       self._drawable_param,
       *self._filter_properties,
-      self._merge_filter_param,
       self._blend_mode_param,
       self._opacity_param,
+      self._merge_filter_param,
       self._visible_param,
       self._filter_name_param,
     ]
