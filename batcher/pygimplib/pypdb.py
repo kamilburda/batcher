@@ -402,13 +402,13 @@ class GeglProcedure(PDBProcedure):
 
       config.set_property(arg_name, arg_value)
 
-    drawable.append_filter(drawable_filter)
-
     if merge_filter:
       drawable.merge_filter(drawable_filter)
 
       return None
     else:
+      drawable.append_filter(drawable_filter)
+
       return drawable_filter
 
   @property
