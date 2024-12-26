@@ -243,7 +243,7 @@ class ActionEditorWidget:
 
     self._action_info = _get_action_info_from_pdb_procedure(self._pdb_procedure)
 
-    if self._action_info is not None:
+    if self._action_info:
       max_width_chars = self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_ACTION_INFO
     else:
       max_width_chars = self._ACTION_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_ACTION_INFO
@@ -263,7 +263,7 @@ class ActionEditorWidget:
     )
     self._action_info_hbox.pack_start(self._label_short_description, False, False, 0)
 
-    if self._action_info is not None:
+    if self._action_info:
       self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
         _create_action_info_popup(self._action_info, parent))
 
