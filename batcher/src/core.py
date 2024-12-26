@@ -656,7 +656,7 @@ class Batcher(metaclass=abc.ABCMeta):
           action,
           None,
           None)
-    elif action['origin'].value == 'gimp_pdb':
+    elif action['origin'].value in ['gimp_pdb', 'gegl']:
       if action['function'].value in pdb:
         function = pdb[action['function'].value]
       else:
@@ -735,9 +735,10 @@ class Batcher(metaclass=abc.ABCMeta):
       self._last_constraint = action
 
   def _get_action_args_and_kwargs(self, action, action_args, function):
-    args, kwargs = self._get_replaced_args(action_args, action['origin'].value == 'gimp_pdb')
+    args, kwargs = self._get_replaced_args(
+      action_args, action['origin'].value in ['gimp_pdb', 'gegl'])
 
-    if action['origin'].value == 'gimp_pdb':
+    if action['origin'].value in ['gimp_pdb', 'gegl']:
       args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
 
     return args, kwargs

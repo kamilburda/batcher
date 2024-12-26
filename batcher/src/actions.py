@@ -105,9 +105,10 @@ def create(
     function to be saved to a persistent setting source.
 
   * ``'origin'``: Type of the function. If ``'builtin'``, the function is
-    defined directly in the plug-in. If ``'gimp_pdb'``, the function is taken
-    from the GIMP PDB. The origin affects how the function is modified
-    (wrapped) during processing in a `core.Batcher` instance.
+    defined directly in the plug-in. If ``'gimp_pdb'``, the function is a GIMP
+    PDB procedure. If ``'gegl'``, the function is a GEGL operation. The origin,
+    among other things, can be used to provide an appropriate wrapper during
+    processing in a `core.Batcher` instance.
 
   * ``'arguments'``: Arguments to ``'function'`` as a `pygimplib.setting.Group`
     instance containing arguments as separate `Setting` instances.
@@ -422,7 +423,8 @@ def _create_action(
       'default_value': origin,
       'items': [
         ('builtin', _('Built-in')),
-        ('gimp_pdb', _('GIMP PDB procedure'))],
+        ('gimp_pdb', _('GIMP PDB procedure')),
+        ('gegl', _('GEGL operation'))],
       'gui_type': None,
     },
     arguments_group,
@@ -592,13 +594,22 @@ def get_action_dict_from_pdb_procedure(
   action_dict = {
     'name': pdb_procedure_name,
     'function': pdb_procedure_name,
-    'origin': 'gimp_pdb',
+    'origin': _get_pdb_procedure_origin(pdb_procedure),
     'arguments': arguments,
     'display_name': _get_pdb_procedure_display_name(pdb_procedure),
     'description': _get_pdb_procedure_description(pdb_procedure),
   }
   
   return action_dict
+
+
+def _get_pdb_procedure_origin(pdb_procedure):
+  if isinstance(pdb_procedure, pg.pypdb.GimpPDBProcedure):
+    return 'gimp_pdb'
+  elif isinstance(pdb_procedure, pg.pypdb.GeglProcedure):
+    return 'gegl'
+  else:
+    raise TypeError(f'unsupported PDB procedure type {type(pdb_procedure)} for {pdb_procedure}')
 
 
 def _get_pdb_procedure_display_name(pdb_procedure):

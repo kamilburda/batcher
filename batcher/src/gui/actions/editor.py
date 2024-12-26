@@ -92,7 +92,7 @@ class ActionEditorWidget:
 
     self._show_additional_settings = show_additional_settings
 
-    if (self._action['origin'].value == 'gimp_pdb'
+    if (self._action['origin'].value in ['gimp_pdb', 'gegl']
         and self._action['function'].value
         and self._action['function'].value in pdb):
       self._pdb_procedure = pdb[self._action['function'].value]
@@ -309,14 +309,14 @@ class ActionEditorWidget:
         setting,
         row_index,
         max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
-        set_name_as_tooltip=self._action['origin'].value == 'gimp_pdb',
+        set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
       gui_utils_.attach_widget_to_grid(
         self._grid_action_arguments,
         setting,
         row_index,
-        set_name_as_tooltip=self._action['origin'].value == 'gimp_pdb',
+        set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
       self._action_argument_indexes_in_grid[setting] = row_index
@@ -329,14 +329,14 @@ class ActionEditorWidget:
       setting,
       row_index,
       max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
-      set_name_as_tooltip=self._action['origin'].value == 'gimp_pdb',
+      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
     )
 
     gui_utils_.attach_widget_to_grid(
       self._grid_action_arguments,
       setting,
       row_index,
-      set_name_as_tooltip=self._action['origin'].value == 'gimp_pdb',
+      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
     )
 
   def _set_grid_action_arguments_to_update_according_to_visible_state(self, action):
