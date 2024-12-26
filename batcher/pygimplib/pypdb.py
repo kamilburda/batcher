@@ -69,8 +69,15 @@ class _PyPDB:
     return self._gimp_pdb_procedure_exists(proc_name) or self._gegl_operation_exists(proc_name)
 
   @staticmethod
-  def list_all_procedure_names() -> List[str]:
-    return Gegl.list_operations() + Gimp.get_pdb().query_procedures(*([''] * 8))
+  def list_all_gegl_operations():
+    return Gegl.list_operations()
+
+  @staticmethod
+  def list_all_gimp_pdb_procedures():
+    return Gimp.get_pdb().query_procedures(*([''] * 8))
+
+  def list_all_procedure_names(self) -> List[str]:
+    return self.list_all_gegl_operations() + self.list_all_gimp_pdb_procedures()
 
   def remove_from_cache(self, name: str):
     """Removes a `PDBProcedure` instance matching ``name`` from the internal

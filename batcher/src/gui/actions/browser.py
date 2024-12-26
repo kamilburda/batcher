@@ -4,6 +4,8 @@ The list includes GIMP PDB procedures.
 """
 
 import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -134,6 +136,24 @@ class ActionBrowser(GObject.GObject):
                    or name_.endswith('-export-internal')
                    or name_.endswith('-export-multi')))
 
+    def is_gegl_operation_internal(name_):
+      categories = Gegl.Operation.get_key(name_, 'categories')
+
+      if categories:
+        return any(
+          category in ['input', 'output', 'programming']
+          for category in categories.split(':'))
+      else:
+        return False
+
+    def is_gegl_operation_hidden(name_):
+      categories = Gegl.Operation.get_key(name_, 'categories')
+
+      if categories:
+        return 'hidden' in categories.split(':')
+      else:
+        return False
+
     def is_procedure_gimp_plugin(procedure_):
       return (
         isinstance(procedure_, pg.pypdb.GimpPDBProcedure)
@@ -146,9 +166,15 @@ class ActionBrowser(GObject.GObject):
     # used for sorting by default).
     pdb_procedures = [
       pdb[name]
-      for name in sorted(pdb.list_all_procedure_names())
-      if not is_file_load_procedure(name) and not is_file_export_procedure(name)
+      for name in sorted(pdb.list_all_gegl_operations())
+      if not is_gegl_operation_internal(name)
     ]
+
+    pdb_procedures.extend(
+      pdb[name]
+      for name in sorted(pdb.list_all_gimp_pdb_procedures())
+      if not is_file_load_procedure(name) and not is_file_export_procedure(name)
+    )
 
     action_dicts = [
       actions_.get_action_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
@@ -157,7 +183,10 @@ class ActionBrowser(GObject.GObject):
       procedure_name = action_dict['name']
 
       if isinstance(procedure, pg.pypdb.GeglProcedure):
-        action_type = 'filters'
+        if not is_gegl_operation_hidden(procedure_name):
+          action_type = 'filters'
+        else:
+          action_type = 'other'
       elif procedure_name.startswith('file-'):
         action_type = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
