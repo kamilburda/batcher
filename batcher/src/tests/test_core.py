@@ -83,7 +83,11 @@ class TestAddActionFromSettings(unittest.TestCase):
     self.procedure_stub_kwargs = dict(
       name=self.procedure_name,
       arguments_spec=[
-        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(
+          value_type=Gimp.RunMode.__gtype__,
+          name='run-mode',
+          blurb='The run mode',
+          default_value=Gimp.RunMode.NONINTERACTIVE),
         dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
         dict(
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],

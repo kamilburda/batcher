@@ -2729,10 +2729,20 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
     self.assertEqual(kwargs['procedure'], procedure)
     self.assertEqual(kwargs['gui_type'], presenters_gtk_.ChoiceComboBoxPresenter)
 
-  def test_enum(self):
+  def test_enum_with_gtype(self):
     self.assertEqual(
       settings_.get_setting_type_and_kwargs(Gimp.ImageType.__gtype__, None),
       (settings_.EnumSetting, dict(enum_type=Gimp.ImageType.__gtype__)),
+    )
+
+  def test_enum_with_pdb_procedure_and_parameter(self):
+    procedure = stubs_gimp.StubPDBProcedure(stubs_gimp.Procedure('some-procedure'))
+    param_spec = stubs_gimp.GParamStub(GObject.TYPE_ENUM, 'output-format')
+
+    # noinspection PyTypeChecker
+    self.assertEqual(
+      settings_.get_setting_type_and_kwargs(Gimp.ImageType.__gtype__, param_spec, procedure),
+      (settings_.EnumSetting, dict(enum_type=(procedure, param_spec))),
     )
 
   def test_builtin_array(self):

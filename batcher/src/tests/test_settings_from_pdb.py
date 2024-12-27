@@ -29,7 +29,11 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     self.procedure_stub_kwargs = dict(
       name=self.procedure_name,
       arguments_spec=[
-        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(
+          value_type=Gimp.RunMode.__gtype__,
+          name='run-mode',
+          blurb='The run mode',
+          default_value=Gimp.RunMode.NONINTERACTIVE),
         dict(
           value_type=GObject.GType.from_name('GimpCoreObjectArray'),
           name='drawables',
@@ -68,7 +72,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'name': 'run-mode',
           'type': pg.setting.EnumSetting,
           'default_value': Gimp.RunMode.NONINTERACTIVE,
-          'enum_type': Gimp.RunMode.__gtype__,
+          'enum_type': (procedure, procedure.arguments[0]),
           'display_name': 'The run mode',
         },
         {

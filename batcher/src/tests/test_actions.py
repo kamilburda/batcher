@@ -546,7 +546,11 @@ class TestManagePdbProceduresAsActions(unittest.TestCase):
       name=self.procedure_name,
       proc_type=Gimp.PDBProcType.PLUGIN,
       arguments_spec=[
-        dict(value_type=Gimp.RunMode.__gtype__, name='run-mode', blurb='The run mode'),
+        dict(
+          value_type=Gimp.RunMode.__gtype__,
+          name='run-mode',
+          blurb='The run mode',
+          default_value=Gimp.RunMode.NONINTERACTIVE),
         dict(value_type=Gimp.Int32Array.__gtype__, name='save-options', blurb='Save options'),
         dict(
           value_type=GObject.TYPE_STRING,
