@@ -314,7 +314,7 @@ class GimpPDBProcedure(PDBProcedure):
           Gimp.PDBStatusType.CALLING_ERROR)
 
       arg_type_name = arg.value_type.name
-      config_set_property = _get_set_property_func(arg_type_name, config)
+      config_set_property = _get_set_property_func_for_gimp_pdb_procedure(arg_type_name, config)
       config_set_property(processed_arg_name, arg_value)
 
     return config
@@ -481,7 +481,7 @@ class GeglProcedure(PDBProcedure):
     ]
 
 
-def _get_set_property_func(arg_type_name, config):
+def _get_set_property_func_for_gimp_pdb_procedure(arg_type_name, config):
   if arg_type_name == 'GimpCoreObjectArray':
     return config.set_core_object_array
   elif arg_type_name == 'GimpColorArray':
