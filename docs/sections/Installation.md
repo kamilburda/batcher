@@ -1,6 +1,6 @@
 ## Requirements
 
-* GIMP 3.0.0-RC1 or later
+* GIMP 3.0.0-RC2 or later
 * Python 3.7 or later (comes pre-installed with official GIMP installations except Linux)
 
 
