@@ -1340,12 +1340,14 @@ class EnumSetting(Setting):
     procedure = None
     procedure_param = None
 
-    if isinstance(enum_type, GObject.GType):
-      processed_enum_type = enum_type.name
-    else:
+    if inspect.isclass(enum_type) and issubclass(enum_type, GObject.GEnum):
       processed_enum_type = enum_type
+    elif isinstance(enum_type, GObject.GType) or isinstance(enum_type, str):
+      if isinstance(enum_type, GObject.GType):
+        processed_enum_type = enum_type.name
+      else:
+        processed_enum_type = enum_type
 
-    if isinstance(processed_enum_type, str):
       module_path, enum_class_name = self._get_enum_type_from_string(processed_enum_type)
 
       if not module_path or not enum_class_name:
@@ -1353,26 +1355,26 @@ class EnumSetting(Setting):
 
       module_with_enum = importlib.import_module(module_path)
       processed_enum_type = getattr(module_with_enum, enum_class_name)
-    elif isinstance(processed_enum_type, (tuple, list)) and len(processed_enum_type) == 2:
-      if isinstance(processed_enum_type[0], str):
-        if processed_enum_type[0] in pdb:
-          procedure = pdb[processed_enum_type[0]]
+    elif isinstance(enum_type, (tuple, list)) and len(enum_type) == 2:
+      if isinstance(enum_type[0], str):
+        if enum_type[0] in pdb:
+          procedure = pdb[enum_type[0]]
       else:
-        procedure = processed_enum_type[0]
+        procedure = enum_type[0]
 
       if procedure is not None:
-        if isinstance(processed_enum_type[1], str):
+        if isinstance(enum_type[1], str):
           procedure_param = next(
-            iter(prop for prop in procedure.arguments if prop.name == processed_enum_type[1]),
+            iter(prop for prop in procedure.arguments if prop.name == enum_type[1]),
             None)
         else:
-          procedure_param = processed_enum_type[1]
+          procedure_param = enum_type[1]
 
       if procedure_param is not None:
         processed_enum_type = type(procedure_param.get_default_value())
       else:
         raise TypeError(
-          f'procedure "{processed_enum_type[0]}" or its property "{processed_enum_type[1]}"'
+          f'procedure "{enum_type[0]}" or its property "{enum_type[1]}"'
           ' does not exist')
     else:
       raise TypeError(
@@ -3419,7 +3421,10 @@ def get_setting_type_and_kwargs(
       # instance can have its minimum and maximum values properly adjusted.
       return setting_type, dict(pdb_type=gtype)
   elif hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
-    return EnumSetting, dict(enum_type=(pdb_procedure, pdb_param_info))
+    if pdb_procedure is not None and pdb_param_info is not None:
+      return EnumSetting, dict(enum_type=(pdb_procedure, pdb_param_info))
+    else:
+      return EnumSetting, dict(enum_type=gtype)
   elif gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
   elif (hasattr(gtype, 'name')
