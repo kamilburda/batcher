@@ -820,6 +820,93 @@ class TestCreateEnumSetting(SettingTestCase):
     self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
     self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
 
+  def test_with_enum_type_as_procedure_and_param_spec(self):
+    procedure = stubs_gimp.StubPDBProcedure(stubs_gimp.Procedure('some-procedure'))
+    procedure_param = stubs_gimp.GParamStub(
+      GObject.TYPE_ENUM, 'distance-metric', '', Gegl.DistanceMetric.EUCLIDEAN)
+
+    setting = settings_.EnumSetting(
+      'distance_metric',
+      (procedure, procedure_param),
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
+    self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.procedure, procedure)
+    self.assertEqual(setting.procedure_param, procedure_param)
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+    return_value=stubs_gimp.PdbStub)
+  def test_with_enum_type_as_procedure_and_param_spec_as_strings(self, _mock_get_pdb):
+    procedure_param_dict = dict(
+      value_type=Gegl.DistanceMetric.__gtype__,
+      name='distance-metric',
+      blurb='',
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    stub_procedure = stubs_gimp.Procedure('some-procedure', arguments_spec=[procedure_param_dict])
+
+    stubs_gimp.PdbStub.add_procedure(stub_procedure)
+
+    setting = settings_.EnumSetting(
+      'distance_metric',
+      ('some-procedure', 'distance-metric'),
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
+    self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.pdb_type, Gegl.DistanceMetric)
+    self.assertEqual(setting.procedure.proc, stub_procedure)
+    self.assertEqual(setting.procedure_param, stub_procedure.get_arguments()[0])
+
+    settings_.pdb.remove_from_cache('some-procedure')
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+    return_value=stubs_gimp.PdbStub)
+  def test_with_enum_type_as_unrecognized_procedure_raises_error(self, _mock_get_pdb):
+    procedure_param_dict = dict(
+      value_type=Gegl.DistanceMetric.__gtype__,
+      name='distance-metric',
+      blurb='',
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    stub_procedure = stubs_gimp.Procedure('some-procedure', arguments_spec=[procedure_param_dict])
+
+    stubs_gimp.PdbStub.add_procedure(stub_procedure)
+
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting(
+        'distance_metric',
+        ('unrecognized-procedure', 'distance-metric'),
+        default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    settings_.pdb.remove_from_cache('some-procedure')
+
+  @mock.patch(
+    f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
+    return_value=stubs_gimp.PdbStub)
+  def test_with_enum_type_as_unrecognized_procedure_parameter_raises_error(self, _mock_get_pdb):
+    procedure_param_dict = dict(
+      value_type=Gegl.DistanceMetric.__gtype__,
+      name='distance-metric',
+      blurb='',
+      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    stub_procedure = stubs_gimp.Procedure('some-procedure', arguments_spec=[procedure_param_dict])
+
+    stubs_gimp.PdbStub.add_procedure(stub_procedure)
+
+    with self.assertRaises(TypeError):
+      settings_.EnumSetting(
+        'distance_metric',
+        ('some-procedure', 'unrecognized-parameter'),
+        default_value=Gegl.DistanceMetric.EUCLIDEAN)
+
+    settings_.pdb.remove_from_cache('some-procedure')
+
   def test_string_enum_type_has_invalid_format_raises_error(self):
     with self.assertRaises(TypeError):
       settings_.EnumSetting('distance_metric', 'gi')
