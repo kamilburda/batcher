@@ -1,6 +1,10 @@
 ## Upcoming
 
+General changes:
+* Updated Batcher to work with GIMP 3.0.0-RC2. **Due to backwards-incompatible changes, Batcher now requires GIMP 3.0.0-RC2 or later**. Saved settings from previous versions will still work properly.
+
 New features:
+* Non-destructive layer effects (filters, GEGL operations) can now be added as custom procedures. They can be found under the `Filters, Effects` category in the custom procedure browser. Beside parameters specific to each effect, you can adjust their blend mode, opacity, or they can optionally be merged into the layer (i.e. applied destructively).
 * You may now attempt to apply a procedure to multiple layers at once using the new `All Layers` option, if available for a particular procedure (usually those having the `The input drawables` argument). Note that a procedure may still fail even if this option is available as it may not support working with multiple layers at once.
 * Rename procedure: Added a new field named `[output folder]` that allows inserting the output folder selected in the plug-in dialog. You can adjust the path components to be inserted as well as the separator and wrapper around each component (in the same vein as `[layer path]`).
 * Rename procedure: Added `%n` option to the `[layer name]` and `[layer path]` fields acting as the inverse of `%i`.
