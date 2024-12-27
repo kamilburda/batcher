@@ -406,7 +406,15 @@ class GeglProcedure(PDBProcedure):
           f'argument "{arg_name}" does not exist or is not supported',
           Gimp.PDBStatusType.CALLING_ERROR)
 
-      config.set_property(arg_name, arg_value)
+      if isinstance(self._properties[arg_name], GObject.ParamSpecEnum):
+        # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
+        #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
+        processed_value = (
+          self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
+      else:
+        processed_value = arg_value
+
+      config.set_property(arg_name, processed_value)
 
     if merge_filter:
       drawable.merge_filter(drawable_filter)
