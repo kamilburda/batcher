@@ -400,11 +400,18 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
+    properties_from_config = {prop.get_name() for prop in config.list_properties()}
+
     for arg_name, arg_value in processed_kwargs.items():
       if arg_name not in self._properties:
         raise PDBProcedureError(
           f'argument "{arg_name}" does not exist or is not supported',
           Gimp.PDBStatusType.CALLING_ERROR)
+
+      # Silently skip properties not supported in GIMP as the procedure
+      # may still finish successfully.
+      if arg_name not in properties_from_config:
+        continue
 
       if isinstance(self._properties[arg_name], GObject.ParamSpecEnum):
         # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
