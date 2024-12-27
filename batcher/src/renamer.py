@@ -617,15 +617,6 @@ _FIELDS_LIST = [
   },
   {
     'type': Field,
-    'regex': 'full image name',
-    'substitute_func': _get_image_name_for_image_batcher,
-    'display_name': _('Full image name'),
-    'str_to_insert': '[image name, %e]',
-    'examples_lines': [],
-    'procedure_groups': [CONVERT_GROUP],
-  },
-  {
-    'type': Field,
     'regex': 'image path',
     'substitute_func': _get_image_path,
     'display_name': _('Image path'),
