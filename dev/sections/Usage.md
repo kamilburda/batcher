@@ -141,9 +141,6 @@ You can turn auto-closing the main dialog on/off by checking/unchecking `Setting
 
 ## Known Issues
 
-The export option `Interactively` is currently broken for many file formats [due to a bug in GIMP 3.0.0-RC1](https://gitlab.gnome.org/GNOME/gimp/-/issues/12349).
-This will be fixed in GIMP 3.0.0-RC2.
-
 If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
 In that case, the file format dialog may be displayed behind GIMP.
 If so, simply select the dialog in the taskbar to bring it up.
