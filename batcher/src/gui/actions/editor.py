@@ -13,6 +13,7 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import actions as actions_
 from src.gui import editable_label as editable_label_
 from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import utils as gui_utils_
@@ -104,6 +105,7 @@ class ActionEditorWidget:
     self._parent_widget_realize_event_id = None
 
     self._action_argument_indexes_in_grid = {}
+    self._action_more_options_indexes_in_grid = {}
 
     self._init_gui()
 
@@ -170,18 +172,13 @@ class ActionEditorWidget:
       column_spacing=self._GRID_COLUMN_SPACING,
     )
 
-    self._vbox_more_options = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._MORE_OPTIONS_SPACING,
+    self._grid_more_options = Gtk.Grid(
+      row_spacing=self._GRID_ROW_SPACING,
+      column_spacing=self._GRID_COLUMN_SPACING,
       margin_top=self._MORE_OPTIONS_LABEL_BOTTOM_MARGIN,
     )
-    self._vbox_more_options.pack_start(
-      self._action['more_options/enabled_for_previews'].gui.widget, False, False, 0)
-    if 'also_apply_to_parent_folders' in self._action['more_options']:
-      self._vbox_more_options.pack_start(
-        self._action['more_options/also_apply_to_parent_folders'].gui.widget, False, False, 0)
 
-    self._action['more_options_expanded'].gui.widget.add(self._vbox_more_options)
+    self._action['more_options_expanded'].gui.widget.add(self._grid_more_options)
     self._action['more_options_expanded'].gui.widget.set_margin_top(
       self._MORE_OPTIONS_LABEL_TOP_MARGIN)
 
@@ -200,7 +197,9 @@ class ActionEditorWidget:
 
     self._set_arguments(self._action)
 
-    self._set_grid_action_arguments_to_update_according_to_visible_state(self._action)
+    self._set_more_options(self._action)
+
+    self._set_grids_to_update_according_to_visible_state(self._action)
 
     self._show_hide_additional_settings()
 
@@ -298,14 +297,24 @@ class ActionEditorWidget:
         self._info_popup.move(*position)
 
   def _set_arguments(self, action):
-    row_index = 0
+    row_index_for_arguments = -1
+    row_index_for_more_options = -1
 
     for setting in action['arguments']:
       if not setting.gui.get_visible():
         continue
 
+      grid, indexes_in_grid = self._get_grid_and_indexes_in_grid(setting)
+
+      if actions_.MORE_OPTIONS_TAG in setting.tags:
+        row_index_for_more_options += 1
+        row_index = row_index_for_more_options
+      else:
+        row_index_for_arguments += 1
+        row_index = row_index_for_arguments
+
       gui_utils_.attach_label_to_grid(
-        self._grid_action_arguments,
+        grid,
         setting,
         row_index,
         max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
@@ -313,33 +322,45 @@ class ActionEditorWidget:
       )
 
       gui_utils_.attach_widget_to_grid(
-        self._grid_action_arguments,
+        grid,
         setting,
         row_index,
         set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
-      self._action_argument_indexes_in_grid[setting] = row_index
+      indexes_in_grid[setting] = row_index
+
+  def _set_more_options(self, action):
+    row_index = len(self._action_more_options_indexes_in_grid)
+
+    for setting in action['more_options']:
+      if not setting.gui.get_visible():
+        continue
+
+      gui_utils_.attach_label_to_grid(
+        self._grid_more_options,
+        setting,
+        row_index,
+        max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+        set_name_as_tooltip=False,
+      )
+
+      gui_utils_.attach_widget_to_grid(
+        self._grid_more_options,
+        setting,
+        row_index,
+        set_name_as_tooltip=False,
+      )
 
       row_index += 1
 
-  def _attach_action_argument_to_grid(self, setting, row_index):
-    gui_utils_.attach_label_to_grid(
-      self._grid_action_arguments,
-      setting,
-      row_index,
-      max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
-      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
-    )
+  def _get_grid_and_indexes_in_grid(self, setting):
+    if actions_.MORE_OPTIONS_TAG in setting.tags:
+      return self._grid_more_options, self._action_more_options_indexes_in_grid
+    else:
+      return self._grid_action_arguments, self._action_argument_indexes_in_grid
 
-    gui_utils_.attach_widget_to_grid(
-      self._grid_action_arguments,
-      setting,
-      row_index,
-      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
-    )
-
-  def _set_grid_action_arguments_to_update_according_to_visible_state(self, action):
+  def _set_grids_to_update_according_to_visible_state(self, action):
     for setting in action['arguments']:
       setting.connect_event('gui-visible-changed', self._on_action_argument_gui_visible_changed)
 
@@ -350,62 +371,101 @@ class ActionEditorWidget:
       self._remove_action_argument_from_grid(setting)
 
   def _add_action_argument_to_grid(self, setting):
-    if setting in self._action_argument_indexes_in_grid:
+    grid, indexes_in_grid = self._get_grid_and_indexes_in_grid(setting)
+
+    if setting in indexes_in_grid:
       return
 
-    previous_settings = []
+    previous_settings_for_arguments = []
+    previous_settings_for_more_options = []
 
     for setting_in_arguments in self._action['arguments']:
       if setting_in_arguments.name == setting.name:
         break
 
+      if actions_.MORE_OPTIONS_TAG in setting_in_arguments.tags:
+        previous_settings = previous_settings_for_more_options
+      else:
+        previous_settings = previous_settings_for_arguments
+
       previous_settings.insert(0, setting_in_arguments)
+
+    if actions_.MORE_OPTIONS_TAG in setting.tags:
+      previous_settings = previous_settings_for_more_options
+    else:
+      previous_settings = previous_settings_for_arguments
 
     last_visible_previous_setting = next(
       iter(
         previous_setting for previous_setting in previous_settings
-        if previous_setting in self._action_argument_indexes_in_grid),
+        if previous_setting in indexes_in_grid),
       None)
 
     if last_visible_previous_setting is not None:
-      row_index = self._action_argument_indexes_in_grid[last_visible_previous_setting] + 1
+      row_index = indexes_in_grid[last_visible_previous_setting] + 1
     else:
       row_index = 0
 
-    self._grid_action_arguments.insert_row(row_index)
-    self._attach_action_argument_to_grid(setting, row_index)
+    grid.insert_row(row_index)
+    self._attach_action_argument_to_grid(setting, grid, row_index)
 
     if last_visible_previous_setting is not None:
-      new_action_argument_indexes_in_grid = {}
+      new_indexes_in_grid = {}
 
-      for setting_in_grid, row_index in self._action_argument_indexes_in_grid.items():
-        new_action_argument_indexes_in_grid[setting_in_grid] = row_index
+      for setting_in_grid, row_index in indexes_in_grid.items():
+        new_indexes_in_grid[setting_in_grid] = row_index
 
         if setting_in_grid == last_visible_previous_setting:
           # The row indexes will be refreshed anyway, so any value is OK at this point.
-          new_action_argument_indexes_in_grid[setting] = 0
+          new_indexes_in_grid[setting] = 0
 
-      self._action_argument_indexes_in_grid = new_action_argument_indexes_in_grid
+      indexes_in_grid = new_indexes_in_grid
     else:
-      self._action_argument_indexes_in_grid = dict(
-        {setting: 0}, **self._action_argument_indexes_in_grid)
+      indexes_in_grid = dict({setting: 0}, **indexes_in_grid)
 
-    self._refresh_action_argument_indexes_in_grid()
+    indexes_in_grid = self._refresh_indexes_in_grid(indexes_in_grid)
+
+    if actions_.MORE_OPTIONS_TAG in setting.tags:
+      self._action_more_options_indexes_in_grid = indexes_in_grid
+    else:
+      self._action_argument_indexes_in_grid = indexes_in_grid
 
     # This is necessary to show the newly attached widgets.
-    self._grid_action_arguments.show_all()
+    grid.show_all()
+
+  def _attach_action_argument_to_grid(self, setting, grid, row_index):
+    gui_utils_.attach_label_to_grid(
+      grid,
+      setting,
+      row_index,
+      max_width_chars=self._ACTION_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
+    )
+
+    gui_utils_.attach_widget_to_grid(
+      grid,
+      setting,
+      row_index,
+      set_name_as_tooltip=self._action['origin'].value in ['gimp_pdb', 'gegl'],
+    )
 
   def _remove_action_argument_from_grid(self, setting):
-    row_index = self._action_argument_indexes_in_grid.pop(setting, None)
+    grid, indexes_in_grid = self._get_grid_and_indexes_in_grid(setting)
+
+    row_index = indexes_in_grid.pop(setting, None)
     if row_index is not None:
-      self._grid_action_arguments.remove_row(row_index)
+      grid.remove_row(row_index)
 
-    self._refresh_action_argument_indexes_in_grid()
+    indexes_in_grid = self._refresh_indexes_in_grid(indexes_in_grid)
 
-  def _refresh_action_argument_indexes_in_grid(self):
-    self._action_argument_indexes_in_grid = {
-      setting: index for index, setting in enumerate(self._action_argument_indexes_in_grid)
-    }
+    if actions_.MORE_OPTIONS_TAG in setting.tags:
+      self._action_more_options_indexes_in_grid = indexes_in_grid
+    else:
+      self._action_argument_indexes_in_grid = indexes_in_grid
+
+  @staticmethod
+  def _refresh_indexes_in_grid(indexes_in_grid):
+    return {setting: index for index, setting in enumerate(indexes_in_grid)}
 
   def _show_hide_additional_settings(self):
     if self._show_additional_settings:

@@ -75,6 +75,8 @@ from src.path import uniquify
 DEFAULT_PROCEDURES_GROUP = 'default_procedures'
 DEFAULT_CONSTRAINTS_GROUP = 'default_constraints'
 
+MORE_OPTIONS_TAG = 'more_options'
+
 _DEFAULT_ACTION_TYPE = 'procedure'
 _REQUIRED_ACTION_FIELDS = ['name']
 
@@ -406,10 +408,10 @@ def _create_action(
     setting_attributes={
       'pdb_type': None,
     })
-  
+
   if arguments:
     arguments_group.add(arguments)
-  
+
   action.add([
     {
       'type': 'string',
@@ -591,15 +593,20 @@ def get_action_dict_from_pdb_procedure(
   pdb_procedure, pdb_procedure_name, arguments = (
     settings_from_pdb.get_setting_data_from_pdb_procedure(pdb_procedure_or_name))
 
+  origin = _get_pdb_procedure_origin(pdb_procedure)
+
+  if origin == 'gegl':
+    _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments)
+
   action_dict = {
     'name': pdb_procedure_name,
     'function': pdb_procedure_name,
-    'origin': _get_pdb_procedure_origin(pdb_procedure),
+    'origin': origin,
     'arguments': arguments,
     'display_name': _get_pdb_procedure_display_name(pdb_procedure),
     'description': _get_pdb_procedure_description(pdb_procedure),
   }
-  
+
   return action_dict
 
 
@@ -610,6 +617,15 @@ def _get_pdb_procedure_origin(pdb_procedure):
     return 'gegl'
   else:
     raise TypeError(f'unsupported PDB procedure type {type(pdb_procedure)} for {pdb_procedure}')
+
+
+def _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments):
+  for argument_dict in arguments:
+    if argument_dict['name'] in ['visible-', 'name-']:
+      if 'tags' not in argument_dict:
+        argument_dict['tags'] = []
+
+      argument_dict['tags'].append(MORE_OPTIONS_TAG)
 
 
 def _get_pdb_procedure_display_name(pdb_procedure):
