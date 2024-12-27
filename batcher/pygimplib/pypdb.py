@@ -400,7 +400,6 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
-    # Keyword arguments can override positional arguments
     for arg_name, arg_value in processed_kwargs.items():
       if arg_name not in self._properties:
         raise PDBProcedureError(
