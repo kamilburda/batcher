@@ -1216,7 +1216,13 @@ class EnumSetting(Setting):
   def __init__(
         self,
         name: str,
-        enum_type: Union[Type[GObject.GEnum], GObject.GType, str],
+        enum_type: Union[
+          Type[GObject.GEnum],
+          GObject.GType,
+          str,
+          Tuple[pypdb.PDBProcedure, GObject.ParamSpec],
+          Tuple[str, str],
+        ],
         excluded_values: Optional[Iterable[GObject.GEnum]] = None,
         **kwargs,
   ):
@@ -1229,9 +1235,17 @@ class EnumSetting(Setting):
       name:
         Setting name. See the `name` property for more information.
       enum_type:
-        Enumerated type as a `GObject.GEnum` subclass or a string representing
-        the module path plus name of a `GObject.GEnum` subclass, e.g.
-        ``'gi.repository.Gimp.RunMode'`` for `Gimp.RunMode`.
+        Enumerated type. The type can be specified in one of the following ways:
+
+        * a `GObject.GEnum` subclass,
+        * a `GObject.GType` instance representing the enumerated type,
+        * a string representing the module path plus name of a `GObject.GEnum`
+          subclass, e.g. ``'gi.repository.Gimp.RunMode'`` for `Gimp.RunMode`,
+        * a tuple of ``(pypdb.PDBProcedure, GObject.ParamSpec)`` instances,
+          the first representing a PDB procedure and the second representing one
+          of its properties.
+        * a tuple of ``(PDB procedure name, property name)`` strings
+          representing a PDB procedure argument.
       excluded_values:
         List of enumerated values to be excluded from the setting GUI. This is
         useful in case this setting is used in a GIMP PDB procedure not
@@ -1240,7 +1254,7 @@ class EnumSetting(Setting):
         Additional keyword arguments that can be passed to the parent class'
         `__init__()`.
     """
-    self._enum_type = self._process_enum_type(enum_type)
+    self._enum_type, self._procedure, self._procedure_param = self._process_enum_type(enum_type)
     self._excluded_values = self._process_excluded_values(excluded_values)
 
     kwargs['pdb_type'] = self._enum_type
@@ -1253,6 +1267,20 @@ class EnumSetting(Setting):
     return self._enum_type
 
   @property
+  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
+    """A PDB procedure containing the enum in this setting, or ``None`` if not
+    specified.
+    """
+    return self._procedure
+
+  @property
+  def procedure_param(self) -> Union[GObject.ParamSpec, None]:
+    """A property representing the enum in this setting, or ``None`` if not
+    specified.
+    """
+    return self._procedure_param
+
+  @property
   def excluded_values(self) -> List[GObject.GEnum]:
     """`GObject.GEnum` values excluded from the setting GUI."""
     return self._excluded_values
@@ -1260,7 +1288,10 @@ class EnumSetting(Setting):
   def to_dict(self):
     settings_dict = super().to_dict()
 
-    settings_dict['enum_type'] = self.enum_type.__gtype__.name
+    if self._procedure is not None and self._procedure_param is not None:
+      settings_dict['enum_type'] = [self._procedure.name, self._procedure_param.get_name()]
+    else:
+      settings_dict['enum_type'] = self.enum_type.__gtype__.name
 
     if 'excluded_values' in settings_dict:
       settings_dict['excluded_values'] = [int(value) for value in self.excluded_values]
@@ -1306,6 +1337,9 @@ class EnumSetting(Setting):
     ]
 
   def _process_enum_type(self, enum_type):
+    procedure = None
+    procedure_param = None
+
     if isinstance(enum_type, GObject.GType):
       processed_enum_type = enum_type.name
     else:
@@ -1319,6 +1353,30 @@ class EnumSetting(Setting):
 
       module_with_enum = importlib.import_module(module_path)
       processed_enum_type = getattr(module_with_enum, enum_class_name)
+    elif isinstance(processed_enum_type, (tuple, list)) and len(processed_enum_type) == 2:
+      if isinstance(processed_enum_type[0], str):
+        if processed_enum_type[0] in pdb:
+          procedure = pdb[processed_enum_type[0]]
+      else:
+        procedure = processed_enum_type[0]
+
+      if procedure is not None:
+        if isinstance(processed_enum_type[1], str):
+          procedure_param = next(
+            iter(prop for prop in procedure.arguments if prop.name == processed_enum_type[1]),
+            None)
+        else:
+          procedure_param = processed_enum_type[1]
+
+      if procedure_param is not None:
+        processed_enum_type = type(procedure_param.get_default_value())
+      else:
+        raise TypeError(
+          f'procedure "{processed_enum_type[0]}" or its property "{processed_enum_type[1]}"'
+          ' does not exist')
+    else:
+      raise TypeError(
+        f'"{enum_type}" is not a supported type to derive a GObject.GEnum type from')
 
     if not inspect.isclass(processed_enum_type):
       raise TypeError(f'{processed_enum_type} is not a class')
@@ -1326,7 +1384,7 @@ class EnumSetting(Setting):
     if not issubclass(processed_enum_type, GObject.GEnum):
       raise TypeError(f'{processed_enum_type} is not a subclass of GObject.GEnum')
 
-    return processed_enum_type
+    return processed_enum_type, procedure, procedure_param
 
   def _process_excluded_values(self, excluded_values):
     if excluded_values is not None:
@@ -3361,7 +3419,7 @@ def get_setting_type_and_kwargs(
       # instance can have its minimum and maximum values properly adjusted.
       return setting_type, dict(pdb_type=gtype)
   elif hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
-    return EnumSetting, dict(enum_type=gtype)
+    return EnumSetting, dict(enum_type=(pdb_procedure, pdb_param_info))
   elif gtype in _ARRAY_GTYPES_TO_SETTING_TYPES:
     return _ARRAY_GTYPES_TO_SETTING_TYPES[gtype]
   elif (hasattr(gtype, 'name')
