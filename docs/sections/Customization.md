@@ -452,7 +452,7 @@ To export the entire layer, leave this setting enabled.
 
 ### Adding Custom Procedures
 
-You can add any built-in GIMP procedure or plug-in by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`.
+You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`. Both built-in and any third-party plug-ins and layer effects are supported.
 
 ![Procedure browser dialog](../images/screenshot_procedure_browser_dialog.png)
 
@@ -460,6 +460,13 @@ You can preview how the selected procedure affects the resulting image (by press
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
 You can [edit the procedure](#editing-procedures-and-constraints) anytime after adding it.
+
+All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
+* *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).
+* *Opacity* - the opacity of the effect.
+* *Merge filter* - the effect will be applied destructively, i.e. will be merged into the layer.
+* *Visible* (displayed under `More options`) - if unchecked, the effect will be added, but will not be applied.
+* *Filter name* (displayed under `More options`) - a custom name for the effect. If empty, a default name is assigned by GIMP.
 
 
 ## Constraints
