@@ -974,7 +974,8 @@ class Batcher(metaclass=abc.ABCMeta):
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
 
-    self._remove_image_copies()
+    if not self._edit_mode and not self._keep_image_copies:
+      self._remove_image_copies()
 
   @abc.abstractmethod
   def _get_initial_current_image(self):
@@ -992,11 +993,10 @@ class Batcher(metaclass=abc.ABCMeta):
           self._current_image.get_selected_layers())
 
   def _remove_image_copies(self):
-    if not self._edit_mode and not self._keep_image_copies:
-      for image in self._image_copies:
-        pg.pdbutils.try_delete_image(image)
+    for image in self._image_copies:
+      pg.pdbutils.try_delete_image(image)
 
-      self._image_copies = []
+    self._image_copies = []
 
   def _cleanup_contents(self, exception_occurred=False):
     self._invoker.invoke(
