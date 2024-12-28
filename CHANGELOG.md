@@ -1,4 +1,6 @@
-## Upcoming
+## 0.8
+
+### December 28, 2024
 
 General changes:
 * Updated Batcher to work with GIMP 3.0.0-RC2. **Due to backwards-incompatible changes, Batcher now requires GIMP 3.0.0-RC2 or later**. Saved settings from previous versions will still work properly.
