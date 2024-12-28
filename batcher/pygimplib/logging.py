@@ -6,12 +6,20 @@ import os
 import sys
 from typing import IO, List, Optional
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
+
+try:
+  import gi
+  gi.require_version('Gimp', '3.0')
+  from gi.repository import Gimp
+
+  from . import invocation as pginvocation
+except (ImportError, ValueError):
+  _gobject_dependent_modules_imported = False
+else:
+  _gobject_dependent_modules_imported = True
+
 
 from . import constants as pgconstants
-from . import invocation as pginvocation
 
 _HANDLES = ('file', 'gimp_message')
 
@@ -93,7 +101,8 @@ def _prepare_log_files(handles, log_dirpaths, log_filename):
 
         log_files.append(create_log_file(log_dirpaths, log_filename))
       elif handle == 'gimp_message':
-        log_files.append(GimpMessageFile())
+        if _gobject_dependent_modules_imported:
+          log_files.append(GimpMessageFile())
       else:
         raise ValueError(f'handle not valid; valid handles: {", ".join(_HANDLES)}')
 
@@ -155,30 +164,31 @@ def _close_log_files_and_reset_streams(tee_stdout, tee_stderr):
   sys.stderr = _ORIG_STDERR
 
 
-class GimpMessageFile:
+if _gobject_dependent_modules_imported:
+  class GimpMessageFile:
 
-  def __init__(self, handler_type=Gimp.MessageHandlerType.ERROR_CONSOLE, delay_milliseconds=50):
-    self._orig_handler = Gimp.message_get_handler()
-    self._delay_milliseconds = delay_milliseconds
+    def __init__(self, handler_type=Gimp.MessageHandlerType.ERROR_CONSOLE, delay_milliseconds=50):
+      self._orig_handler = Gimp.message_get_handler()
+      self._delay_milliseconds = delay_milliseconds
 
-    Gimp.message_set_handler(handler_type)
+      Gimp.message_set_handler(handler_type)
 
-    self._buffer = ''
+      self._buffer = ''
 
-  def write(self, data):
-    self._buffer += str(data)
+    def write(self, data):
+      self._buffer += str(data)
 
-    pginvocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
+      pginvocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
 
-  def flush(self):
-    pass
+    def flush(self):
+      pass
 
-  def close(self):
-    Gimp.message_set_handler(self._orig_handler)
+    def close(self):
+      Gimp.message_set_handler(self._orig_handler)
 
-  def _display_data_and_flush(self):
-    Gimp.message(self._buffer)
-    self._buffer = ''
+    def _display_data_and_flush(self):
+      Gimp.message(self._buffer)
+      self._buffer = ''
 
 
 # Original version: https://stackoverflow.com/a/616686
