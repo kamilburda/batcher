@@ -11,12 +11,16 @@ import time
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 from gi.repository import Gio
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import batcher.pygimplib as pg
-from batcher.pygimplib import pdb
+import pygimplib as pg
+from pygimplib import pdb
+
+from src.procedure_groups import *
 
 
 ROOT_DIRPATH = os.path.abspath(
@@ -27,8 +31,8 @@ PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 sys.path.append(PLUGIN_DIRPATH)
 
 
-from batcher.src import plugin_settings
-from batcher.src.gui import main as gui_main
+from src import plugin_settings
+from src.gui import main as gui_main
 
 
 TEST_IMAGES_DIRPATH = os.path.join(
@@ -50,6 +54,8 @@ def main():
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
+  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
@@ -57,12 +63,16 @@ def main():
     run_gui_func=take_screenshots_for_export_layers,
   )
 
+  pg.config.PROCEDURE_GROUP = EDIT_LAYERS_GROUP
+
   gui_main.BatchLayerProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_edit_layers(),
     'edit',
     run_gui_func=take_screenshots_for_edit_layers,
   )
+
+  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
   gui_main.BatchLayerProcessingQuickGui(
     layer_tree,
@@ -85,7 +95,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
-  # HACK: Wait until the preview is updated.
+  # Wait until the preview is updated.
   time.sleep(0.1)
 
   while Gtk.events_pending():
@@ -100,6 +110,9 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
 
+  # Wait until the preview is updated.
+  time.sleep(0.1)
+
   while Gtk.events_pending():
     Gtk.main_iteration()
   
@@ -112,6 +125,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   gui.procedure_list.browser.fill_contents_if_empty()
   gui.procedure_list.browser.widget.show_all()
+  gui.procedure_list.browser.select_action('gegl:gaussian-blur')
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -138,7 +152,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 def take_screenshots_for_edit_layers(gui, dialog, settings):
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
-  # HACK: Wait until the preview is updated.
+  # Wait until the preview is updated.
   time.sleep(0.1)
 
   while Gtk.events_pending():
@@ -152,6 +166,9 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
       if item.raw.get_name() == 'main-background'))
 
   gui.name_preview.set_selected_items({main_background_layer.get_id()})
+
+  # Wait until the preview is updated.
+  time.sleep(0.1)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -201,6 +218,7 @@ def take_and_process_screenshot(
     crop_to_dialog(screenshot_image, crop_to, decoration_offsets)
 
   pdb.gimp_file_save(
+    run_mode=Gimp.RunMode.NONINTERACTIVE,
     image=screenshot_image,
     file=Gio.file_new_for_path(os.path.join(screenshots_dirpath, filename)),
     options=None,
@@ -211,7 +229,7 @@ def take_and_process_screenshot(
 
 def take_screenshot():
   return pdb.plug_in_screenshot(
-    shoot_type=1,
+    shoot_type='screen',
     x1=0,
     y1=0,
     x2=0,
