@@ -109,6 +109,21 @@ class ActionBrowser(GObject.GObject):
   def paned(self):
     return self._hpaned
 
+  def select_action(self, name):
+    parents = [self._tree_model_sorted]
+
+    while parents:
+      parent = parents.pop(0)
+
+      for row in parent:
+        if row[0] == name:
+          converted_path = self._tree_model_filter.convert_child_path_to_path(row.path)
+          self._tree_view.get_selection().select_iter(row.iter)
+          self._tree_view.scroll_to_cell(converted_path, None, True, 0.5, 0.0)
+          return
+
+        parents.append(row.iterchildren())
+
   def fill_contents_if_empty(self):
     if self._contents_filled:
       return
