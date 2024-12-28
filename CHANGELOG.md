@@ -14,6 +14,7 @@ Changes to procedures and constraints:
 * Rename procedure: For the `[attributes]` field, changed the layer attributes from `%w`, `%h`, `%x` and `%y` to `%lw`, `%lh`, `%lx` and `%ly`, respectively.
 
 User interface changes:
+* Increased the width of the procedure browser so that there is more space to display labels for layer effects without the labels spanning too many lines.
 * Added a small delay to the image preview when the selected item changes. This prevents excessive changes when the selection changes rapidly.
 * Optimized the update of input items (when items are added/removed/renamed/updated upon changing procedures or constraints) if many items (hundreds and more) are present.
 * For Export Layers and Edit Layers, moved the "Preview" label directly above the image thumbnail and added a label named "Input Layers" above the list of layers.

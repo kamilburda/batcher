@@ -446,7 +446,7 @@ def _create_gui_settings(item_tree_items_setting_type):
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (675, 450),
+      'default_value': (800, 450),
     },
   ])
 
