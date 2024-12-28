@@ -414,10 +414,13 @@ class GeglProcedure(PDBProcedure):
         continue
 
       if isinstance(self._properties[arg_name], GObject.ParamSpecEnum):
-        # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
-        #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
-        processed_value = (
-          self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
+        if not isinstance(arg_value, str):
+          # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
+          #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
+          processed_value = (
+            self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
+        else:
+          processed_value = arg_value
       else:
         processed_value = arg_value
 
