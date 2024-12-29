@@ -176,7 +176,7 @@ class BatchLayerProcessingGui:
     self._button_close = self._dialog.add_button('', Gtk.ResponseType.CANCEL)
     self._button_close.hide()
     if self._mode == 'export':
-      self._button_close.set_label(_('_Cancel'))
+      self._set_close_button_label(self._settings['gui/auto_close'])
     else:
       self._button_close.set_label(_('_Close'))
 
@@ -356,10 +356,13 @@ class BatchLayerProcessingGui:
 
   def _on_auto_close_changed(self, auto_close_setting):
     if self._mode == 'export':
-      if auto_close_setting.value:
-        self._button_close.set_label(_('_Cancel'))
-      else:
-        self._button_close.set_label(_('_Close'))
+      self._set_close_button_label(auto_close_setting)
+
+  def _set_close_button_label(self, auto_close_setting):
+    if auto_close_setting.value:
+      self._button_close.set_label(_('_Cancel'))
+    else:
+      self._button_close.set_label(_('_Close'))
 
   def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)

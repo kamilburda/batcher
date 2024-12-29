@@ -1,3 +1,9 @@
+## Upcoming
+
+Bug fixes:
+* For Export Layers, fixed the wrong name for the `Cancel`/`Close` button on plug-in startup if `Close When Done` is unchecked.
+
+
 ## 0.8
 
 ### December 28, 2024
