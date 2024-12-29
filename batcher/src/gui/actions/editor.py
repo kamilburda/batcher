@@ -21,7 +21,7 @@ from src.gui import utils as gui_utils_
 
 class ActionEditor(GimpUi.Dialog):
 
-  _MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR = 700
+  _MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR = 650
 
   def __init__(self, action, *args, attach_editor_widget=True, **kwargs):
     super().__init__(*args, **kwargs)
