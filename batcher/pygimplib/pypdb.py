@@ -400,7 +400,7 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
-    properties_from_config = {prop.get_name() for prop in config.list_properties()}
+    properties_from_config = {prop.get_name(): prop for prop in config.list_properties()}
 
     for arg_name, arg_value in processed_kwargs.items():
       if arg_name not in self._properties:
@@ -413,14 +413,15 @@ class GeglProcedure(PDBProcedure):
       if arg_name not in properties_from_config:
         continue
 
-      if isinstance(self._properties[arg_name], GObject.ParamSpecEnum):
-        if not isinstance(arg_value, str):
-          # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
-          #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
-          processed_value = (
-            self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
-        else:
-          processed_value = arg_value
+      should_transform_enum_to_choice = (
+        isinstance(self._properties[arg_name], GObject.ParamSpecEnum)
+        and isinstance(properties_from_config[arg_name], (Gimp.ParamChoice, Gimp.ParamSpecChoice)))
+
+      # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
+      #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
+      if should_transform_enum_to_choice:
+        processed_value = (
+          self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
       else:
         processed_value = arg_value
 
