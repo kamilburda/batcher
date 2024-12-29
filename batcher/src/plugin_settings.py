@@ -44,7 +44,8 @@ def create_settings_for_convert():
       'name': 'inputs',
       'element_type': 'string',
       'default_value': (),
-      'display_name': _('Input files (non-interactive run mode only)'),
+      'display_name': _('Input files and folders (non-interactive run mode only)'),
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
       'type': 'file_extension',
