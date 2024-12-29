@@ -292,7 +292,7 @@ class ActionBrowser(GObject.GObject):
   def _is_action_argument_run_mode(action_argument):
     return (
       action_argument['type'] == pg.setting.EnumSetting
-      and action_argument['enum_type'] == Gimp.RunMode.__gtype__)
+      and action_argument['name'] == 'run-mode')
 
   @staticmethod
   def _is_action_argument_image_drawable_or_drawables(action_argument):

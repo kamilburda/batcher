@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed GIMP plug-ins being displayed in the wrong category in the custom procedure browser.
+
+
 ## 0.8.1
 
 ### December 29, 2024
