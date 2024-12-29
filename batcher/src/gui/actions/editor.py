@@ -21,11 +21,24 @@ from src.gui import utils as gui_utils_
 
 class ActionEditor(GimpUi.Dialog):
 
+  _MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR = 700
+
   def __init__(self, action, *args, attach_editor_widget=True, **kwargs):
     super().__init__(*args, **kwargs)
 
     self.set_resizable(False)
     self.connect('delete-event', lambda *_args: self.hide_on_delete())
+
+    self._scrolled_window_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
+
+    self._scrolled_window = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      propagate_natural_width=True,
+      propagate_natural_height=True,
+      max_content_height=self._MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR,
+    )
+    self._scrolled_window.add(self._scrolled_window_viewport)
 
     self._action_editor_widget = None
 
@@ -53,7 +66,9 @@ class ActionEditor(GimpUi.Dialog):
     self._action_editor_widget = widget
     self._action_editor_widget.set_parent(self)
 
-    self.vbox.pack_start(self._action_editor_widget.widget, False, False, 0)
+    self._scrolled_window_viewport.add(self._action_editor_widget.widget)
+
+    self.vbox.pack_start(self._scrolled_window, False, False, 0)
 
   def _on_button_reset_clicked(self, _button, _action):
     self._action_editor_widget.reset()

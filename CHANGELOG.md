@@ -1,8 +1,11 @@
 ## Upcoming
 
+User interface changes:
+* Dialogs for editing procedures, constraints and export settings are now scrollable if exceeding a certain height. Some custom procedures (e.g. `gegl:styles`) and file formats (e.g. DDS) have a large number of parameters, which previously made the dialogs too high to fit the screen.
+
 Bug fixes:
-* For Export Layers, fixed the wrong name for the `Cancel`/`Close` button on plug-in startup if `Close When Done` is unchecked.
 * Fixed visually unappealing borders in the custom procedure browser appearing when switching to a procedure requiring scrolling.
+* For Export Layers, fixed the wrong name for the `Cancel`/`Close` button on plug-in startup if `Close When Done` is unchecked.
 
 
 ## 0.8

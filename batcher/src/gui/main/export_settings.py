@@ -222,6 +222,8 @@ class ExportSettings:
 
 class ExportOptionsDialog:
 
+  _MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR = 700
+
   _CONTENTS_BORDER_WIDTH = 6
 
   _GRID_ROW_SPACING = 3
@@ -262,7 +264,21 @@ class ExportOptionsDialog:
       gui_utils_.attach_widget_to_grid(
         self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
 
-    self._dialog.vbox.pack_start(self._grid_export_options, False, False, 0)
+    self._scrolled_window_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
+    self._scrolled_window_viewport.add(self._grid_export_options)
+    self._scrolled_window_viewport.show()
+
+    self._scrolled_window = Gtk.ScrolledWindow(
+      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+      propagate_natural_width=True,
+      propagate_natural_height=True,
+      max_content_height=self._MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR,
+    )
+    self._scrolled_window.add(self._scrolled_window_viewport)
+    self._scrolled_window.show()
+
+    self._dialog.vbox.pack_start(self._scrolled_window, False, False, 0)
     self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
 
     self._dialog.connect('realize', self._on_export_options_dialog_realize)
