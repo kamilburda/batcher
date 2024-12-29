@@ -1,4 +1,6 @@
-## Upcoming
+## 0.8.1
+
+### December 29, 2024
 
 User interface changes:
 * Dialogs for editing procedures, constraints and export settings are now scrollable if exceeding a certain height. Some custom procedures (e.g. `gegl:styles`) and file formats (e.g. DDS) have a large number of parameters, which previously made the dialogs too high to fit the screen.

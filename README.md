@@ -12,7 +12,7 @@ Batcher is a [GIMP](https://www.gimp.org/) plug-in for batch-exporting layers as
 * Limit export/editing to layers matching constraints
 
 
-### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/0.8) (0.8, December 28, 2024)
+### [Download latest release](https://github.com/kamilburda/batcher/releases/tag/0.8.1) (0.8.1, December 29, 2024)
 
 ## Installation and Usage
 

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 0.8\n"
+"Project-Id-Version: 'batcher' 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-28 12:29+0100\n"
+"POT-Creation-Date: 2024-12-29 20:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,14 +234,14 @@ msgid "Exports an image to another file format."
 msgstr ""
 
 #: ../../batcher/src/builtin_procedures.py:350
-#: ../../batcher/src/plugin_settings.py:62
-#: ../../batcher/src/plugin_settings.py:177 ../../batcher/src/renamer.py:699
+#: ../../batcher/src/plugin_settings.py:63
+#: ../../batcher/src/plugin_settings.py:178 ../../batcher/src/renamer.py:699
 msgid "Output folder"
 msgstr ""
 
 #: ../../batcher/src/builtin_procedures.py:357
-#: ../../batcher/src/plugin_settings.py:53
-#: ../../batcher/src/plugin_settings.py:168
+#: ../../batcher/src/plugin_settings.py:54
+#: ../../batcher/src/plugin_settings.py:169
 msgid "File extension"
 msgstr ""
 
@@ -301,7 +301,7 @@ msgstr ""
 #: ../../batcher/src/builtin_procedures.py:452
 #: ../../batcher/src/builtin_procedures.py:481
 #: ../../batcher/src/builtin_procedures.py:650
-#: ../../batcher/src/plugin_settings.py:69
+#: ../../batcher/src/plugin_settings.py:70
 msgid "Image filename pattern"
 msgstr ""
 
@@ -403,7 +403,7 @@ msgid "Rename folders"
 msgstr ""
 
 #: ../../batcher/src/builtin_procedures.py:680
-#: ../../batcher/src/plugin_settings.py:184
+#: ../../batcher/src/plugin_settings.py:185
 msgid "Layer filename pattern"
 msgstr ""
 
@@ -580,37 +580,37 @@ msgstr ""
 msgid "by description"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:445
+#: ../../batcher/src/gui/actions/browser.py:447
 msgid "Select a procedure"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:470
+#: ../../batcher/src/gui/actions/browser.py:472
 msgid "_Add"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/browser.py:471
-#: ../../batcher/src/gui/actions/editor.py:39
-#: ../../batcher/src/gui/main/export_settings.py:249
+#: ../../batcher/src/gui/actions/browser.py:473
+#: ../../batcher/src/gui/actions/editor.py:52
+#: ../../batcher/src/gui/main/export_settings.py:251
 #: ../../batcher/src/gui/main/main.py:181
-#: ../../batcher/src/gui/main/main.py:362 ../../batcher/src/gui/messages.py:40
+#: ../../batcher/src/gui/main/main.py:365 ../../batcher/src/gui/messages.py:40
 msgid "_Close"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:36
-#: ../../batcher/src/gui/actions/editor.py:157
-#: ../../batcher/src/gui/main/export_settings.py:244
+#: ../../batcher/src/gui/actions/editor.py:49
+#: ../../batcher/src/gui/actions/editor.py:172
+#: ../../batcher/src/gui/main/export_settings.py:246
 msgid "_Reset"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:154
+#: ../../batcher/src/gui/actions/editor.py:169
 msgid "_Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:216
+#: ../../batcher/src/gui/actions/editor.py:231
 msgid "Edit Name"
 msgstr ""
 
-#: ../../batcher/src/gui/actions/editor.py:273
+#: ../../batcher/src/gui/actions/editor.py:288
 msgid "Show More Information"
 msgstr ""
 
@@ -622,15 +622,15 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: ../../batcher/src/gui/file_format_options_box.py:46
+#: ../../batcher/src/gui/file_format_options_box.py:47
 msgid "{} options"
 msgstr ""
 
-#: ../../batcher/src/gui/file_format_options_box.py:49
+#: ../../batcher/src/gui/file_format_options_box.py:50
 msgid "File format not recognized"
 msgstr ""
 
-#: ../../batcher/src/gui/file_format_options_box.py:57
+#: ../../batcher/src/gui/file_format_options_box.py:58
 msgid "File format has no options"
 msgstr ""
 
@@ -691,7 +691,7 @@ msgstr ""
 msgid "O_ptions..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:238
+#: ../../batcher/src/gui/main/export_settings.py:240
 msgid "Export Options"
 msgstr ""
 
@@ -708,7 +708,7 @@ msgid "Input Layers"
 msgstr ""
 
 #: ../../batcher/src/gui/main/main.py:172
-#: ../../batcher/src/gui/main/main.py:473
+#: ../../batcher/src/gui/main/main.py:476
 msgid "_Export"
 msgstr ""
 
@@ -716,22 +716,21 @@ msgstr ""
 msgid "_Run"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:179
-#: ../../batcher/src/gui/main/main.py:360
-#: ../../batcher/src/gui/main/main.py:476
-#: ../../batcher/src/gui/main/settings_manager.py:279
-msgid "_Cancel"
-msgstr ""
-
 #: ../../batcher/src/gui/main/main.py:183
 msgid "_Stop"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:373
+#: ../../batcher/src/gui/main/main.py:363
+#: ../../batcher/src/gui/main/main.py:479
+#: ../../batcher/src/gui/main/settings_manager.py:279
+msgid "_Cancel"
+msgstr ""
+
+#: ../../batcher/src/gui/main/main.py:376
 msgid "_Help"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:468
+#: ../../batcher/src/gui/main/main.py:471
 msgid "Show this dialog"
 msgstr ""
 
@@ -1063,44 +1062,44 @@ msgid "The run mode"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:47
-msgid "Input files (non-interactive run mode only)"
+msgid "Input files and folders (non-interactive run mode only)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:70
+#: ../../batcher/src/plugin_settings.py:71
 msgid "Image filename pattern (empty string = image name)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:78
-#: ../../batcher/src/plugin_settings.py:193
+#: ../../batcher/src/plugin_settings.py:79
+#: ../../batcher/src/plugin_settings.py:194
 msgid "How to handle conflicting files (non-interactive run mode only)"
-msgstr ""
-
-#: ../../batcher/src/plugin_settings.py:85
-#: ../../batcher/src/plugin_settings.py:200
-#: ../../batcher/src/plugin_settings.py:331
-msgid "File with saved settings"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:86
 #: ../../batcher/src/plugin_settings.py:201
 #: ../../batcher/src/plugin_settings.py:332
+msgid "File with saved settings"
+msgstr ""
+
+#: ../../batcher/src/plugin_settings.py:87
+#: ../../batcher/src/plugin_settings.py:202
+#: ../../batcher/src/plugin_settings.py:333
 msgid "File with saved settings (optional)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:93
+#: ../../batcher/src/plugin_settings.py:94
 msgid "Selected files and folders"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:185
+#: ../../batcher/src/plugin_settings.py:186
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:208
-#: ../../batcher/src/plugin_settings.py:339
+#: ../../batcher/src/plugin_settings.py:209
+#: ../../batcher/src/plugin_settings.py:340
 msgid "Selected layers"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:497
+#: ../../batcher/src/plugin_settings.py:498
 msgid "Close when Done"
 msgstr ""
 
