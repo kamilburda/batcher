@@ -20,8 +20,17 @@ class RadioButtonBox(Gtk.Box):
 
   __gsignals__ = {'active-button-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
 
-  def __init__(self, orientation: Gtk.Orientation = Gtk.Orientation.VERTICAL, spacing: int = 3):
+  def __init__(
+        self,
+        orientation: Gtk.Orientation = Gtk.Orientation.VERTICAL,
+        spacing: int = 3,
+        label_width_chars=20,
+        label_max_width_chars=40,
+  ):
     super().__init__()
+
+    self._label_width_chars = label_width_chars
+    self._label_max_width_chars = label_max_width_chars
 
     self.set_orientation(orientation)
     self.set_spacing(spacing)
@@ -37,6 +46,10 @@ class RadioButtonBox(Gtk.Box):
       button = Gtk.RadioButton.new_with_label(self._radio_group, label)
     else:
       button = Gtk.RadioButton.new_with_label_from_widget(self._radio_group, label)
+
+    button.get_child().set_width_chars(self._label_width_chars)
+    button.get_child().set_max_width_chars(self._label_max_width_chars)
+    button.get_child().set_line_wrap(True)
 
     button.connect('toggled', self._on_radio_button_toggled)
 

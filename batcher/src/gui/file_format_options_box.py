@@ -3,6 +3,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Pango
 
 from src.gui import utils as gui_utils_
 
@@ -78,6 +79,7 @@ class FileFormatOptionsBox(Gtk.Box):
       xalign=0.0,
       use_markup=True,
       use_underline=False,
+      ellipsize=Pango.EllipsizeMode.END,
     )
 
     self._label_message = Gtk.Label(
@@ -86,6 +88,7 @@ class FileFormatOptionsBox(Gtk.Box):
       use_underline=False,
       no_show_all=True,
       margin_bottom=self._header_spacing,
+      ellipsize=Pango.EllipsizeMode.END,
     )
 
     self.set_orientation(Gtk.Orientation.VERTICAL)

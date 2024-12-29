@@ -15,6 +15,7 @@ def attach_label_to_grid(
       column_index=0,
       width=1,
       height=1,
+      width_chars=20,
       max_width_chars=40,
       set_name_as_tooltip=True,
 ):
@@ -25,6 +26,7 @@ def attach_label_to_grid(
   label = Gtk.Label(
     xalign=0.0,
     yalign=0.5,
+    width_chars=width_chars,
     max_width_chars=max_width_chars,
     wrap=True,
   )
@@ -50,6 +52,7 @@ def attach_widget_to_grid(
       column_index_for_widget_without_label=0,
       width_for_widget_without_label=2,
       set_name_as_tooltip=True,
+      width_chars_for_check_button_labels=25,
 ):
   widget_to_attach = setting.gui.widget
 
@@ -72,6 +75,9 @@ def attach_widget_to_grid(
 
     if set_name_as_tooltip and _has_setting_display_name(setting):
       widget_to_attach.set_tooltip_text(setting.name)
+
+    if isinstance(setting.gui, pg.setting.CheckButtonPresenter):
+      widget_to_attach.get_child().set_width_chars(width_chars_for_check_button_labels)
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
 

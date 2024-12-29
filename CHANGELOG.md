@@ -2,6 +2,7 @@
 
 User interface changes:
 * Dialogs for editing procedures, constraints and export settings are now scrollable if exceeding a certain height. Some custom procedures (e.g. `gegl:styles`) and file formats (e.g. DDS) have a large number of parameters, which previously made the dialogs too high to fit the screen.
+* Increased the minimum width of labels in dialogs. This makes particularly the procedure browser dialog more readable.
 
 Bug fixes:
 * Fixed visually unappealing borders in the custom procedure browser appearing when switching to a procedure requiring scrolling.

@@ -102,12 +102,13 @@ class CheckButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'clicked'
   
-  def _create_widget(self, setting, max_width_chars=40, **kwargs):
+  def _create_widget(self, setting, width_chars=20, max_width_chars=40, **kwargs):
     check_button = Gtk.CheckButton(
       label=setting.display_name,
       use_underline=False,
     )
 
+    check_button.get_child().set_width_chars(width_chars)
     check_button.get_child().set_max_width_chars(max_width_chars)
     check_button.get_child().set_use_markup(False)
     check_button.get_child().set_line_wrap(True)
