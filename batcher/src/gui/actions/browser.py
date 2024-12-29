@@ -440,6 +440,8 @@ class ActionBrowser(GObject.GObject):
       propagate_natural_width=True,
       propagate_natural_height=True,
     )
+    self._scrolled_window_action_arguments_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
+    self._scrolled_window_action_arguments.add(self._scrolled_window_action_arguments_viewport)
 
     self._label_no_selection = Gtk.Label(
       label='<i>{}</i>'.format(_('Select a procedure')),
@@ -623,14 +625,13 @@ class ActionBrowser(GObject.GObject):
 
   def _attach_action_editor_widget(self, action_editor_widget):
     action_editor_widget.widget.show_all()
-    self._scrolled_window_action_arguments.add(action_editor_widget.widget)
-    self._scrolled_window_action_arguments.get_child().set_shadow_type(Gtk.ShadowType.NONE)
+    self._scrolled_window_action_arguments_viewport.add(action_editor_widget.widget)
 
   def _detach_action_editor_widget(self):
-    for child in self._scrolled_window_action_arguments:
-      if isinstance(child, Gtk.Viewport):
-        child.remove(child.get_child())
-      self._scrolled_window_action_arguments.remove(child)
+    viewport_child = self._scrolled_window_action_arguments_viewport.get_child()
+
+    if viewport_child is not None:
+      self._scrolled_window_action_arguments_viewport.remove(viewport_child)
 
   def _add_action_editor_widget_to_model(self, action_dict, model, selected_child_iter):
     action = actions_.create_action(action_dict)

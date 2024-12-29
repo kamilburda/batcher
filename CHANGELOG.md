@@ -2,6 +2,7 @@
 
 Bug fixes:
 * For Export Layers, fixed the wrong name for the `Cancel`/`Close` button on plug-in startup if `Close When Done` is unchecked.
+* Fixed visually unappealing borders in the custom procedure browser appearing when switching to a procedure requiring scrolling.
 
 
 ## 0.8
