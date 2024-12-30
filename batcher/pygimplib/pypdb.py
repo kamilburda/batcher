@@ -102,7 +102,7 @@ class _PyPDB:
 
   @staticmethod
   def _gimp_pdb_procedure_exists(proc_name):
-    return Gimp.get_pdb().procedure_exists(proc_name)
+    return Gimp.is_canonical_identifier(proc_name) and Gimp.get_pdb().procedure_exists(proc_name)
 
   @staticmethod
   def _gegl_operation_exists(proc_name):
