@@ -375,7 +375,7 @@ pg.register_procedure(
   image_types='',
   documentation=(
     _('Batch-process image files'),
-    _('This procedure allows batch conversion of image files'
+    _('This procedure performs batch conversion of image files'
       ' to the specified file format, optionally applying arbitrary procedures'
       ' to each item and ignoring items according to the specified constraints.'),
   ),
