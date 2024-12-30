@@ -396,7 +396,6 @@ class GeglProcedure(PDBProcedure):
     drawable_filter.set_blend_mode(blend_mode)
     drawable_filter.set_opacity(opacity)
     drawable_filter.set_visible(visible)
-    drawable_filter.update()
 
     config = drawable_filter.get_config()
 
@@ -426,6 +425,8 @@ class GeglProcedure(PDBProcedure):
         processed_value = arg_value
 
       config.set_property(arg_name, processed_value)
+
+    drawable_filter.update()
 
     if merge_filter:
       drawable.merge_filter(drawable_filter)
