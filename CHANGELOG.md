@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed warnings issued by GIMP when adding or applying layer effects as custom procedures.
+
+
 ## 0.8.2
 
 ### December 29, 2024
