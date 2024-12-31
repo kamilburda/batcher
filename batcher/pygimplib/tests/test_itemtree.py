@@ -99,6 +99,30 @@ class TestImageFileTree(unittest.TestCase):
       self.tree[os.path.join(self.root_path, 'main-background.jpg')].id,
       os.path.join(self.root_path, 'main-background.jpg'))
 
+  def test_add_with_folders_but_without_expand_folders(
+        self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0], with_folders=True, expand_folders=False)
+
+    items = list(self.tree.iter_all())
+
+    self.assertEqual(mock_isdir.call_count, 4)
+    self.assertEqual(len(items), 4)
+
+    self.assertEqual(
+      self.tree[os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY].id,
+      items[0].id)
+    self.assertEqual(
+      self.tree[os.path.join(self.root_path, 'Frames'), self.FOLDER_KEY].id,
+      items[1].id)
+    self.assertEqual(
+      self.tree[os.path.join(self.root_path, 'main-background.jpg')].id,
+      items[2].id)
+    self.assertEqual(
+      self.tree[os.path.join(self.root_path, 'Overlay'), self.FOLDER_KEY].id,
+      items[3].id)
+
   @parameterized.parameterized.expand([
     ('after_last_item',
      None,

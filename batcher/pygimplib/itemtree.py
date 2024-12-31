@@ -502,6 +502,7 @@ class ItemTree(metaclass=abc.ABCMeta):
         parent_item: Optional[Item] = None,
         insert_after_item: Optional[Item] = None,
         with_folders: bool = True,
+        expand_folders: bool = True,
   ):
     """Adds the specified objects as `Item` instances to the tree.
 
@@ -516,8 +517,11 @@ class ItemTree(metaclass=abc.ABCMeta):
         An existing `Item` instance after which to insert the items. If
         ``None``, the items will be inserted after the last existing item.
       with_folders:
-        If ``True``, objects acting as folders will result in adding all their
-        children as `Item`s.
+        If ``True``, objects acting as folders will be added as `Item`s.
+      expand_folders:
+        If ``True``, all children of objects acting as folders will be added
+        as `Item`s. If ``False``, only the folder itself will be added. This
+        parameter has no effect if ``with_folders`` is ``False``.
 
     Raises:
       ValueError:
@@ -562,20 +566,21 @@ class ItemTree(metaclass=abc.ABCMeta):
       if item.type == TYPE_FOLDER:
         self._add_item_to_itemtree(item)
 
-        parents_for_child = list(item.parents)
-        parents_for_child.append(item)
-        child_items = []
+        if expand_folders:
+          parents_for_child = list(item.parents)
+          parents_for_child.append(item)
+          child_items = []
 
-        # noinspection PyProtectedMember
-        for object_ in item._list_child_objects():
-          self._insert_item(object_, child_items, list(parents_for_child), with_folders)
+          # noinspection PyProtectedMember
+          for object_ in item._list_child_objects():
+            self._insert_item(object_, child_items, list(parents_for_child), with_folders)
 
-        # noinspection PyProtectedMember
-        item._orig_children = child_items
-        item.children = child_items
+          # noinspection PyProtectedMember
+          item._orig_children = child_items
+          item.children = child_items
 
-        for child_item in reversed(child_items):
-          item_tree.insert(0, child_item)
+          for child_item in reversed(child_items):
+            item_tree.insert(0, child_item)
       else:
         self._add_item_to_itemtree(item)
 
