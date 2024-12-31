@@ -2,6 +2,7 @@
 
 import collections
 import itertools
+import re
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -754,6 +755,10 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   @classmethod
   def get_pdb(cls):
     return cls._PDB_INSTANCE
+
+  @classmethod
+  def is_canonical_identifier(cls, identifier):
+    return re.search(r'[^a-zA-Z0-9-]', identifier) is None
 
   @classmethod
   def context_get_brush(cls):
