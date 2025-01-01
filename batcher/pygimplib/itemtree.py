@@ -503,7 +503,7 @@ class ItemTree(metaclass=abc.ABCMeta):
         insert_after_item: Optional[Item] = None,
         with_folders: bool = True,
         expand_folders: bool = True,
-  ):
+  ) -> List[Item]:
     """Adds the specified objects as `Item` instances to the tree.
 
     Args:
@@ -523,6 +523,9 @@ class ItemTree(metaclass=abc.ABCMeta):
         as `Item`s. If ``False``, only the folder itself will be added. This
         parameter has no effect if ``with_folders`` is ``False``.
 
+    Returns:
+      List of added `Item`s.
+
     Raises:
       ValueError:
       * ``insert_after_item``, if specified, is not a child of ``parent_item``
@@ -532,7 +535,7 @@ class ItemTree(metaclass=abc.ABCMeta):
         tree.
     """
     if not objects:
-      return
+      return []
 
     if (parent_item is not None
         and insert_after_item is not None
@@ -557,11 +560,11 @@ class ItemTree(metaclass=abc.ABCMeta):
       self._insert_item(object_, child_items, list(parents_for_child_initial), with_folders)
 
     item_tree = child_items
-    item_list = []
+    added_items = []
 
     while item_tree:
       item = item_tree.pop(0)
-      item_list.append(item)
+      added_items.append(item)
 
       if item.type == TYPE_FOLDER:
         self._add_item_to_itemtree(item)
@@ -584,19 +587,19 @@ class ItemTree(metaclass=abc.ABCMeta):
       else:
         self._add_item_to_itemtree(item)
 
-    for i in range(1, len(item_list) - 1):
+    for i in range(1, len(added_items) - 1):
       # noinspection PyProtectedMember
-      item_list[i]._prev_item = item_list[i - 1]
+      added_items[i]._prev_item = added_items[i - 1]
       # noinspection PyProtectedMember
-      item_list[i]._next_item = item_list[i + 1]
+      added_items[i]._next_item = added_items[i + 1]
 
-    if len(item_list) > 1:
+    if len(added_items) > 1:
       # noinspection PyProtectedMember
-      item_list[0]._next_item = item_list[1]
+      added_items[0]._next_item = added_items[1]
       # noinspection PyProtectedMember
-      item_list[-1]._prev_item = item_list[-2]
+      added_items[-1]._prev_item = added_items[-2]
 
-    if self._first_item is not None and self._last_item is not None and len(item_list) >= 1:
+    if self._first_item is not None and self._last_item is not None and len(added_items) >= 1:
       if insert_after_item is None:
         if parent_item is None:
           insert_after_item = self._last_item
@@ -607,19 +610,21 @@ class ItemTree(metaclass=abc.ABCMeta):
             insert_after_item = parent_item
 
       # noinspection PyProtectedMember
-      item_list[-1]._next_item = insert_after_item.next
+      added_items[-1]._next_item = insert_after_item.next
       if insert_after_item.next is not None:
         # noinspection PyProtectedMember
-        insert_after_item.next._prev_item = item_list[-1]
+        insert_after_item.next._prev_item = added_items[-1]
 
       # noinspection PyProtectedMember
-      item_list[0]._prev_item = insert_after_item
+      added_items[0]._prev_item = insert_after_item
       # noinspection PyProtectedMember
-      insert_after_item._next_item = item_list[0]
+      insert_after_item._next_item = added_items[0]
 
-    if self._first_item is None and self._last_item is None and len(item_list) >= 1:
-      self._first_item = item_list[0]
-      self._last_item = item_list[-1]
+    if self._first_item is None and self._last_item is None and len(added_items) >= 1:
+      self._first_item = added_items[0]
+      self._last_item = added_items[-1]
+
+    return added_items
 
   @abc.abstractmethod
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):

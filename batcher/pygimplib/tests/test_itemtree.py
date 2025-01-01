@@ -72,20 +72,30 @@ class TestImageFileTree(unittest.TestCase):
   def test_add(self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
 
-    self.tree.add(self.paths[0])
+    added_items = self.tree.add(self.paths[0])
 
     self.assertEqual(mock_isdir.call_count, len(self.mock_isdir_return_values))
 
-    for key, path_and_is_folder in self.expected_keys_and_paths.items():
+    self.assertEqual(len(added_items), len(list(self.tree.iter_all())))
+    self.assertEqual(len(added_items), len(self.expected_keys_and_paths))
+
+    for (key, path_and_is_folder), added_item in zip(
+          self.expected_keys_and_paths.items(), added_items):
       path, is_folder = path_and_is_folder
       if is_folder:
         self.assertEqual(
           self.tree[os.path.join(self.root_path, *key), self.FOLDER_KEY].id,
           os.path.join(self.root_path, *path))
+        self.assertEqual(
+          self.tree[os.path.join(self.root_path, *key), self.FOLDER_KEY].id,
+          added_item.id)
       else:
         self.assertEqual(
           self.tree[os.path.join(self.root_path, *key)].id,
           os.path.join(self.root_path, *path))
+        self.assertEqual(
+          self.tree[os.path.join(self.root_path, *key)].id,
+          added_item.id)
 
   def test_add_without_folders(self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
