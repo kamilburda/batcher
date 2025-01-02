@@ -579,7 +579,7 @@ class ItemTree(metaclass=abc.ABCMeta):
             self._insert_item(object_, child_items, list(parents_for_child), with_folders)
 
           # noinspection PyProtectedMember
-          item._orig_children = child_items
+          item._orig_children = list(child_items)
           item.children = child_items
 
           for child_item in reversed(child_items):
@@ -679,6 +679,12 @@ class ItemTree(metaclass=abc.ABCMeta):
         if item_to_remove.parent is not None:
           try:
             item_to_remove.parent.children.remove(item_to_remove)
+          except ValueError:
+            pass
+
+          try:
+            # noinspection PyProtectedMember
+            item_to_remove.parent._orig_children.remove(item_to_remove)
           except ValueError:
             pass
 

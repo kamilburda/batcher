@@ -437,6 +437,8 @@ class TestImageFileTree(unittest.TestCase):
     for item in items_to_remove:
       if item.parent is not None:
         self.assertNotIn(item, item.parent.children)
+        # noinspection PyProtectedMember
+        self.assertNotIn(item, item.parent._orig_children)
 
     if removed_paths is None:
       removed_paths = paths_to_remove
