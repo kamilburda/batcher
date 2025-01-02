@@ -412,7 +412,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
       'type': 'bool',
       'name': 'use_file_extension_in_item_name',
       'default_value': False,
-      'display_name': _('Use file extension in layer name'),
+      'display_name': _('Keep original file extension'),
       'gui_type': 'check_button',
     },
     {
@@ -434,25 +434,14 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS.update({
   'description': _('Exports a layer to another file format.'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
 })
-_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5] = {
-  'type': 'choice',
-  'name': 'export_mode',
-  'default_value': 'each_item',
-  'items': [
-    (export_.ExportModes.EACH_ITEM, _('For each layer')),
-    (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
-    (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
-  ],
-  'display_name': _('Perform export:'),
-}
-_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6] = {
-  'type': 'name_pattern',
-  'name': 'single_image_name_pattern',
-  'default_value': '[image name]',
-  'display_name': _('Image filename pattern'),
-  'gui_type': 'name_pattern_entry',
-}
-
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5]['items'] = [
+  (export_.ExportModes.EACH_ITEM, _('For each layer')),
+  (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
+  (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
+]
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6]['default_value'] = '[image name]'
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][7]['display_name'] = _(
+  'Use file extension in layer name')
 
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(
   _EXPORT_PROCEDURE_DICT_FOR_CONVERT)
@@ -463,24 +452,14 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
   'description': _('Exports a layer to the specified file format.'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
 })
-_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5] = {
-  'type': 'choice',
-  'name': 'export_mode',
-  'default_value': 'each_item',
-  'items': [
-    (export_.ExportModes.EACH_ITEM, _('For each layer')),
-    (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
-    (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
-  ],
-  'display_name': _('Perform export:'),
-}
-_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6] = {
-  'type': 'name_pattern',
-  'name': 'single_image_name_pattern',
-  'default_value': '[image name]',
-  'display_name': _('Image filename pattern'),
-  'gui_type': 'name_pattern_entry',
-}
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5]['items'] = [
+  (export_.ExportModes.EACH_ITEM, _('For each layer')),
+  (export_.ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER, _('For each top-level layer or group')),
+  (export_.ExportModes.SINGLE_IMAGE, _('As a single image')),
+]
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6]['default_value'] = '[image name]'
+_EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
+  'Use file extension in layer name')
 
 
 _BUILTIN_PROCEDURES_LIST = [
