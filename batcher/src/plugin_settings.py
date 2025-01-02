@@ -48,6 +48,11 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
+      'type': 'list',
+      'name': 'inputs_interactive',
+      'display_name': _('Input files and folders'),
+    },
+    {
       'type': 'file_extension',
       'name': 'file_extension',
       'default_value': 'png',
