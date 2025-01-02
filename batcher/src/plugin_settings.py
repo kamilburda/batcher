@@ -94,13 +94,6 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'image_file_tree_items',
-      'name': 'selected_items',
-      'display_name': _('Selected files and folders'),
-      'pdb_type': None,
-      'gui_type': None,
-    },
-    {
       'type': 'string',
       'name': 'plugin_version',
       'default_value': pg.config.PLUGIN_VERSION,
@@ -190,13 +183,6 @@ def create_settings_for_export_layers():
       'description': _('File with saved settings (optional)'),
       'gui_type': None,
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-    },
-    {
-      'type': 'gimp_item_tree_items',
-      'name': 'selected_items',
-      'display_name': _('Selected layers'),
-      'pdb_type': None,
-      'gui_type': None,
     },
     {
       'type': 'tagged_items',
@@ -304,13 +290,6 @@ def create_settings_for_edit_layers():
       'description': _('File with saved settings (optional)'),
       'gui_type': None,
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
-    },
-    {
-      'type': 'gimp_item_tree_items',
-      'name': 'selected_items',
-      'display_name': _('Selected layers'),
-      'pdb_type': None,
-      'gui_type': None,
     },
     {
       'type': 'tagged_items',
@@ -429,6 +408,10 @@ def _create_gui_settings(item_tree_items_setting_type):
       'name': 'image_preview_automatic_update_if_below_maximum_duration',
       'default_value': True,
       'gui_type': None,
+    },
+    {
+      'type': item_tree_items_setting_type,
+      'name': 'selected_items',
     },
     {
       'type': item_tree_items_setting_type,

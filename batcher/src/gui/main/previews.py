@@ -65,7 +65,7 @@ class Previews:
       self._batcher_for_name_preview,
       self._settings,
       set(self._settings['gui/name_preview_items_collapsed_state'].active_items),
-      list(self._settings['main/selected_items'].active_items),
+      list(self._settings['gui/selected_items'].active_items),
       initial_cursor_item=(
         next(
           iter(key for key in self._settings['gui/image_preview_displayed_items'].active_items),

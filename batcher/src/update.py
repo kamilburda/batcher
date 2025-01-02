@@ -1120,6 +1120,13 @@ def _replace_field_arguments_in_pattern(
   return pattern_.StringPattern.reconstruct_pattern(processed_pattern_parts)
 
 
+def _update_to_1_0(data, _settings, procedure_groups):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    _remove_setting(main_settings_list, 'selected_items')
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
@@ -1127,4 +1134,5 @@ _UPDATE_HANDLERS = {
   '0.6': _update_to_0_6,
   '0.7': _update_to_0_7,
   '0.8': _update_to_0_8,
+  '1.0': _update_to_1_0,
 }

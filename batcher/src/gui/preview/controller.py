@@ -157,11 +157,11 @@ class PreviewsController:
       lambda setting: self._name_preview.set_collapsed_items(set(setting.active_items)))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
-    self._settings['main/selected_items'].connect_event(
+    self._settings['gui/selected_items'].connect_event(
       'after-load',
       lambda setting: self._name_preview.set_selected_items(setting.active_items))
 
-    self._settings['main/selected_items'].connect_event(
+    self._settings['gui/selected_items'].connect_event(
       'after-reset',
       lambda setting: self._name_preview.set_selected_items(setting.active_items))
   
@@ -253,7 +253,8 @@ class PreviewsController:
         return None
 
   def _on_name_preview_selection_changed(self, _preview):
-    self._settings['main/selected_items'].set_active_items(self._name_preview.selected_items)
+    self._settings['gui/selected_items'].set_active_items(
+      self._name_preview.selected_items)
 
     # There could be a rapid sequence of 'preview-selection-changed' signals
     # invoked if a selected item and preceding items are removed from the name
@@ -290,7 +291,7 @@ class PreviewsController:
       selected_layers_in_current_image = []
 
     if (item_key_to_display is None
-        and not self._settings['main/selected_items'].active_items
+        and not self._settings['gui/selected_items'].active_items
         and selected_layers_in_current_image):
       self._name_preview.set_selected_items(selected_layers_in_current_image)
 
