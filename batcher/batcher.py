@@ -58,7 +58,8 @@ def plug_in_batch_convert(_procedure, config, _data):
     return _run_interactive(
       SETTINGS_CONVERT,
       image_tree,
-      gui_main.BatchImageProcessingGui,
+      gui_main.BatchProcessingGui,
+      gui_class_kwargs=dict(mode='export', title=_('Batch Convert')),
       process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
     )
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
@@ -82,8 +83,8 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
     return _run_interactive(
       SETTINGS_EXPORT_LAYERS,
       layer_tree,
-      gui_main.BatchLayerProcessingGui,
-      gui_class_kwargs=dict(mode='export', current_image=image))
+      gui_main.BatchProcessingGui,
+      gui_class_kwargs=dict(mode='export', title=_('Export Layers'), current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(SETTINGS_EXPORT_LAYERS, layer_tree, mode='export')
   else:
@@ -137,8 +138,8 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
     return _run_interactive(
       SETTINGS_EDIT_LAYERS,
       layer_tree,
-      gui_main.BatchLayerProcessingGui,
-      gui_class_kwargs=dict(mode='edit', current_image=image))
+      gui_main.BatchProcessingGui,
+      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers'), current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(SETTINGS_EDIT_LAYERS, layer_tree, mode='edit')
   else:

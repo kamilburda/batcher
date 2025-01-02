@@ -56,7 +56,7 @@ def main():
 
   pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
-  gui_main.BatchLayerProcessingGui(
+  gui_main.BatchProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
     'export',
@@ -65,7 +65,7 @@ def main():
 
   pg.config.PROCEDURE_GROUP = EDIT_LAYERS_GROUP
 
-  gui_main.BatchLayerProcessingGui(
+  gui_main.BatchProcessingGui(
     layer_tree,
     plugin_settings.create_settings_for_edit_layers(),
     'edit',

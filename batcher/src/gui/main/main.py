@@ -54,7 +54,7 @@ class BatchImageProcessingGui:
     pass
 
 
-class BatchLayerProcessingGui:
+class BatchProcessingGui:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
@@ -65,13 +65,15 @@ class BatchLayerProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, item_tree, settings, mode, current_image=None, run_gui_func=None):
+  def __init__(self, item_tree, settings, mode, title=None, current_image=None, run_gui_func=None):
     self._item_tree = item_tree
     self._settings = settings
 
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
     self._mode = mode
+
+    self._title = title
 
     self._current_image = current_image
 
@@ -105,14 +107,7 @@ class BatchLayerProcessingGui:
     return self._action_lists.constraint_list
 
   def _init_gui(self):
-    if self._mode == 'edit':
-      title = _('Edit Layers')
-    elif self._mode == 'export':
-      title = _('Export Layers')
-    else:
-      title = None
-
-    self._dialog = GimpUi.Dialog(title=title, role=pg.config.PLUGIN_NAME)
+    self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
     if self._settings['gui/size/dialog_size'].value:
       self._dialog.set_default_size(*self._settings['gui/size/dialog_size'].value)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
