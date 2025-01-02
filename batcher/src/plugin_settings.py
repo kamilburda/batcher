@@ -113,31 +113,14 @@ def create_settings_for_convert():
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
   size_gui_settings = pg.setting.Group(name='size')
-
-  size_gui_settings.add([
-    {
-      'type': 'tuple',
-      'name': 'dialog_position',
-      'default_value': (),
-    },
-    {
-      'type': 'tuple',
-      'name': 'dialog_size',
-      'default_value': (570, 500),
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_outside_previews_position',
-      'default_value': 300,
-      'gui_type': None,
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_between_previews_position',
-      'default_value': 220,
-      'gui_type': None,
-    },
-  ])
+  size_gui_settings.add(
+    _create_size_gui_settings(
+      dialog_position=(),
+      dialog_size=(640, 640),
+      paned_outside_previews_position=330,
+      paned_between_previews_position=225,
+    )
+  )
 
   gui_settings.add([size_gui_settings])
 
@@ -256,31 +239,14 @@ def create_settings_for_export_layers():
   ])
 
   size_gui_settings = pg.setting.Group(name='size')
-
-  size_gui_settings.add([
-    {
-      'type': 'tuple',
-      'name': 'dialog_position',
-      'default_value': (),
-    },
-    {
-      'type': 'tuple',
-      'name': 'dialog_size',
-      'default_value': (640, 540),
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_outside_previews_position',
-      'default_value': 330,
-      'gui_type': None,
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_between_previews_position',
-      'default_value': 225,
-      'gui_type': None,
-    },
-  ])
+  size_gui_settings.add(
+    _create_size_gui_settings(
+      dialog_position=(),
+      dialog_size=(640, 540),
+      paned_outside_previews_position=330,
+      paned_between_previews_position=225,
+    )
+  )
 
   gui_settings.add([size_gui_settings])
 
@@ -367,31 +333,14 @@ def create_settings_for_edit_layers():
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
   size_gui_settings = pg.setting.Group(name='size')
-
-  size_gui_settings.add([
-    {
-      'type': 'tuple',
-      'name': 'dialog_position',
-      'default_value': (),
-    },
-    {
-      'type': 'tuple',
-      'name': 'dialog_size',
-      'default_value': (570, 500),
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_outside_previews_position',
-      'default_value': 300,
-      'gui_type': None,
-    },
-    {
-      'type': 'integer',
-      'name': 'paned_between_previews_position',
-      'default_value': 220,
-      'gui_type': None,
-    },
-  ])
+  size_gui_settings.add(
+    _create_size_gui_settings(
+      dialog_position=(),
+      dialog_size=(570, 500),
+      paned_outside_previews_position=300,
+      paned_between_previews_position=220,
+    )
+  )
 
   gui_settings.add([size_gui_settings])
 
@@ -493,6 +442,38 @@ def _create_gui_settings(item_tree_items_setting_type):
   ])
 
   return gui_settings
+
+
+def _create_size_gui_settings(
+      dialog_position,
+      dialog_size,
+      paned_outside_previews_position,
+      paned_between_previews_position,
+):
+  return [
+    {
+      'type': 'tuple',
+      'name': 'dialog_position',
+      'default_value': dialog_position,
+    },
+    {
+      'type': 'tuple',
+      'name': 'dialog_size',
+      'default_value': dialog_size,
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_outside_previews_position',
+      'default_value': paned_outside_previews_position,
+      'gui_type': None,
+    },
+    {
+      'type': 'integer',
+      'name': 'paned_between_previews_position',
+      'default_value': paned_between_previews_position,
+      'gui_type': None,
+    },
+  ]
 
 
 def _create_auto_close_setting_dict(default_value):
