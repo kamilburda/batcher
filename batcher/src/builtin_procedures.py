@@ -412,7 +412,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
       'type': 'bool',
       'name': 'use_file_extension_in_item_name',
       'default_value': False,
-      'display_name': _('Keep original file extension'),
+      'display_name': _('Use original file extension'),
       'gui_type': 'check_button',
     },
     {
