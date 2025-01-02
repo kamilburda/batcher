@@ -1,3 +1,5 @@
+import collections
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -84,3 +86,20 @@ def attach_widget_to_grid(
 
 def _has_setting_display_name(setting):
   return setting.display_name is not None and setting.display_name.strip()
+
+
+def image_file_tree_items_to_filepaths(item_tree: pg.itemtree.ItemTree):
+  return [
+    [item.id, item.parent.id] if item.parent is not None else [item.id, None]
+    for item in item_tree.iter_all()]
+
+
+def add_filepaths_to_image_file_tree(item_tree: pg.itemtree.ItemTree, filepaths_and_parent_folders):
+  parent_items = collections.defaultdict(lambda: None)
+
+  for filepath, parent_dirpath in filepaths_and_parent_folders:
+    added_items = item_tree.add(
+      [filepath], parent_item=parent_items[parent_dirpath], expand_folders=False)
+
+    if added_items and added_items[0].type == pg.itemtree.TYPE_FOLDER:
+      parent_items[filepath] = added_items[0]
