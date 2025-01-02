@@ -66,8 +66,8 @@ class Item(metaclass=abc.ABCMeta):
       self._key = (self._id, FOLDER_KEY)
 
     self._orig_name = self.name
-    self._orig_parents = self._parents
-    self._orig_children = self._children
+    self._orig_parents = list(self._parents)
+    self._orig_children = list(self._children)
 
     self._item_attributes = ['name', '_parents', '_children']
 
@@ -578,10 +578,6 @@ class ItemTree(metaclass=abc.ABCMeta):
           for object_ in item._list_child_objects():
             self._insert_item(object_, child_items, list(parents_for_child), with_folders)
 
-          # noinspection PyProtectedMember
-          item._orig_children = list(child_items)
-          item.children = child_items
-
           for child_item in reversed(child_items):
             item_tree.insert(0, child_item)
       else:
@@ -632,6 +628,11 @@ class ItemTree(metaclass=abc.ABCMeta):
 
   def _add_item_to_itemtree(self, item):
     self._items[item.key] = item
+
+    if item.parent is not None:
+      # noinspection PyProtectedMember
+      item.parent._orig_children.append(item)
+      item.parent.children.append(item)
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
