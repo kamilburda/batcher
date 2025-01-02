@@ -555,6 +555,15 @@ class ItemTree(metaclass=abc.ABCMeta):
     else:
       parents_for_child_initial = parent_item.parents + [parent_item]
 
+    if insert_after_item is None:
+      if parent_item is None:
+        insert_after_item = self._last_item
+      else:
+        if parent_item.children:
+          insert_after_item = parent_item.children[-1]
+        else:
+          insert_after_item = parent_item
+
     child_items = []
     for object_ in objects:
       self._insert_item(object_, child_items, list(parents_for_child_initial), with_folders)
@@ -596,15 +605,6 @@ class ItemTree(metaclass=abc.ABCMeta):
       added_items[-1]._prev_item = added_items[-2]
 
     if self._first_item is not None and self._last_item is not None and len(added_items) >= 1:
-      if insert_after_item is None:
-        if parent_item is None:
-          insert_after_item = self._last_item
-        else:
-          if parent_item.children:
-            insert_after_item = parent_item.children[-1]
-          else:
-            insert_after_item = parent_item
-
       # noinspection PyProtectedMember
       added_items[-1]._next_item = insert_after_item.next
       if insert_after_item.next is not None:
