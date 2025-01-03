@@ -102,6 +102,22 @@ def create_settings_for_convert():
     },
   ])
 
+  export_settings = pg.setting.Group(
+    name='export',
+    setting_attributes={
+      'pdb_type': None,
+    },
+  )
+
+  export_arguments = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['export_for_convert']['arguments'])
+  # Remove settings already present in the main settings.
+  export_arguments = export_arguments[2:]
+
+  export_settings.add(export_arguments)
+
+  settings['main'].add([export_settings])
+
   gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
