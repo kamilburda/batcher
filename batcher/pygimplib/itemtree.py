@@ -891,12 +891,16 @@ class ImageFileTree(ItemTree):
   """
 
   def refresh(self):
-    """This method does nothing as no external changes will require refreshing
-    the tree contents.
+    """Resets attributes in all items and removes saved states from all items.
 
-    Files and folders that no longer exist must be handled in the client code.
+    This method does not remove files or folders that no longer exist.
     """
-    pass
+    for item in self.iter_all():
+      item.reset()
+      # noinspection PyProtectedMember
+      item._saved_states.clear()
+      # noinspection PyProtectedMember
+      item._saved_named_states.clear()
 
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     if parents_for_child is None:
