@@ -215,8 +215,8 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if item.action['orig_name'].value.startswith('export_for_'):
     _handle_export_procedure_item_added(item)
 
-  if item.action['orig_name'].value == 'export_for_export_layers':
-    _handle_export_for_export_layers_procedure_item_added(item, settings)
+    if item.action['orig_name'].value != 'export_for_edit_layers':
+      _handle_export_procedure_item_added_for_export_mode(item, settings)
 
   if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
     _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
@@ -429,13 +429,17 @@ def _handle_export_procedure_item_added(item):
 def _set_display_name_for_export_procedure(file_extension_setting, export_procedure):
   file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
 
+  export_procedure_name = None
   if export_procedure['orig_name'].value == 'export_for_edit_layers':
-    export_procedure['display_name'].set_value(_('Export as {}').format(file_extension))
-  elif export_procedure['orig_name'].value == 'export_for_export_layers':
-    export_procedure['display_name'].set_value(_('Also export as {}').format(file_extension))
+    export_procedure_name = _('Export as {}')
+  elif export_procedure['orig_name'].value.startswith('export_for_'):
+    export_procedure_name = _('Also export as {}')
+
+  if export_procedure_name is not None:
+    export_procedure['display_name'].set_value(export_procedure_name.format(file_extension))
 
 
-def _handle_export_for_export_layers_procedure_item_added(item, settings):
+def _handle_export_procedure_item_added_for_export_mode(item, settings):
   _copy_setting_values_from_default_export_procedure(settings['main'], item.action)
 
 
