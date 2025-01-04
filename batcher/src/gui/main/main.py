@@ -149,7 +149,7 @@ class BatchProcessingGui:
     self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
     self._button_run.hide()
-    if self._mode == 'export':
+    if self._mode == 'export' and self._item_type == 'layer':
       self._button_run.set_label(_('_Export'))
     else:
       self._button_run.set_label(_('_Run'))
@@ -455,7 +455,13 @@ class BatchLayerProcessingQuickGui:
 
       self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
 
-      self._button_run = self._dialog.add_button(_('_Export'), Gtk.ResponseType.OK)
+      if self._item_type == 'layer':
+        button_run_label = _('_Export')
+      else:
+        button_run_label = _('_Run')
+
+      self._button_run = self._dialog.add_button(button_run_label, Gtk.ResponseType.OK)
+
       self._button_run.set_can_default(True)
 
     self._button_cancel = self._dialog.add_button(_('_Cancel'), Gtk.ResponseType.CANCEL)
