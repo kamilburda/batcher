@@ -60,6 +60,7 @@ def main():
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
     'export',
+    'layer',
     run_gui_func=take_screenshots_for_export_layers,
   )
 
@@ -69,6 +70,7 @@ def main():
     layer_tree,
     plugin_settings.create_settings_for_edit_layers(),
     'edit',
+    'layer',
     run_gui_func=take_screenshots_for_edit_layers,
   )
 
@@ -78,6 +80,7 @@ def main():
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
     'export',
+    'layer',
     title='Export Layers (Quick)',
     run_gui_func=take_screenshots_for_export_layers_quick,
   )
