@@ -1,7 +1,6 @@
 import os
 
 import gi
-
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib

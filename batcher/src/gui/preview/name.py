@@ -294,14 +294,14 @@ class NamePreview(preview_base_.Preview):
     else:
       return None
 
-  def _on_tree_view_row_collapsed(self, tree_view, tree_iter, tree_path):
+  def _on_tree_view_row_collapsed(self, _tree_view, _tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
       self._collapsed_items.add(self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path)))
       self._tree_view.columns_autosize()
 
       self.emit('preview-collapsed-items-changed')
   
-  def _on_tree_view_row_expanded(self, tree_view, tree_iter, tree_path):
+  def _on_tree_view_row_expanded(self, _tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
       item_key = self._get_key_from_tree_iter(tree_iter)
       if item_key in self._collapsed_items:
@@ -351,7 +351,7 @@ class NamePreview(preview_base_.Preview):
         process_names=True,
         process_export=False,
         **utils_.get_settings_for_batcher(self._settings['main']))
-    except exceptions.BatcherCancelError as e:
+    except exceptions.BatcherCancelError:
       pass
     except exceptions.ActionError as e:
       messages_.display_failure_message(
