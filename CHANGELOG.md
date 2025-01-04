@@ -1,5 +1,6 @@
 ## Upcoming
 
+* Replaced the placeholder icon in the image preview when there is no selection.
 * Fixed warnings issued by GIMP when adding or applying layer effects as custom procedures.
 
 

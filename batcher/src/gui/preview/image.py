@@ -163,10 +163,12 @@ class ImagePreview(preview_base_.Preview):
     else:
       item_name = item.name
 
+    self._label_item_name.set_sensitive(True)
     self._label_item_name.set_markup(f'<i>{GLib.markup_escape_text(item_name)}</i>')
 
   def _set_no_selection_label(self):
     self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
+    self._label_item_name.set_sensitive(False)
 
   def _set_contents(self):
     # Sanity check in case `item` changes before 'size-allocate' is emitted.
@@ -236,7 +238,7 @@ class ImagePreview(preview_base_.Preview):
     )
 
     self._no_selection_icon = pg.gui.utils.get_icon_pixbuf(
-      GimpUi.ICON_DIALOG_QUESTION, self, Gtk.IconSize.DIALOG)
+      GimpUi.ICON_IMAGE, self, Gtk.IconSize.DIALOG)
 
     self._folder_icon = pg.gui.utils.get_icon_pixbuf('folder', self, Gtk.IconSize.DIALOG)
     
