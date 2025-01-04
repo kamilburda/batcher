@@ -378,7 +378,7 @@ class BatchProcessingGui:
     return button_help
 
 
-class BatchLayerProcessingQuickGui:
+class BatchProcessingQuickGui:
 
   _BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 8

@@ -74,7 +74,7 @@ def main():
 
   pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
-  gui_main.BatchLayerProcessingQuickGui(
+  gui_main.BatchProcessingQuickGui(
     layer_tree,
     plugin_settings.create_settings_for_export_layers(),
     'export',
