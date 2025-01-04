@@ -286,7 +286,7 @@ class PreviewsController:
 
     if self._current_image is not None:
       selected_layers_in_current_image = [
-        image.get_id() for image in self._current_image.get_selected_layers()]
+        layer.get_id() for layer in self._current_image.get_selected_layers()]
     else:
       selected_layers_in_current_image = []
 
