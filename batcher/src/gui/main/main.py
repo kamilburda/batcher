@@ -35,16 +35,24 @@ class BatchProcessingGui:
 
   _DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS = 10000
 
-  def __init__(self, item_tree, settings, mode, title=None, current_image=None, run_gui_func=None):
-    self._item_tree = item_tree
-    self._settings = settings
-
+  def __init__(
+        self,
+        item_tree,
+        settings,
+        mode,
+        item_type,
+        title=None,
+        current_image=None,
+        run_gui_func=None,
+  ):
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
+
+    self._item_tree = item_tree
+    self._settings = settings
     self._mode = mode
-
+    self._item_type = item_type
     self._title = title
-
     self._current_image = current_image
 
     self._batcher_manager = batcher_manager_.BatcherManager(self._item_tree, self._settings)
@@ -88,11 +96,19 @@ class BatchProcessingGui:
 
     self._label_message = message_label_.MessageLabel()
 
+    if self._item_type == 'image':
+      previews_top_label = _('Input Images')
+    elif self._item_type == 'layer':
+      previews_top_label = _('Input Layers')
+    else:
+      previews_top_label = _('Input Items')
+
     self._previews = previews_.Previews(
       self._settings,
       self._mode,
+      self._item_type,
       self._item_tree,
-      _('Input Layers'),
+      previews_top_label,
       lock_previews=True,
       display_message_func=self._display_inline_message,
       current_image=self._current_image,
@@ -262,6 +278,7 @@ class BatchProcessingGui:
 
     should_quit = self._batcher_manager.run_batcher(
       self._mode,
+      self._item_type,
       self._action_lists,
       self._previews,
       self._settings_manager,
@@ -373,19 +390,19 @@ class BatchLayerProcessingQuickGui:
         item_tree,
         settings,
         mode,
+        item_type,
         title=None,
         current_image=None,
         run_gui_func=None,
   ):
-    self._item_tree = item_tree
-    self._settings = settings
-
     if mode not in ['edit', 'export']:
       raise ValueError('mode must be either "edit" or "export"')
+
+    self._item_tree = item_tree
+    self._settings = settings
     self._mode = mode
-
+    self._item_type = item_type
     self._title = title
-
     self._current_image = current_image
 
     self._batcher_manager = batcher_manager_.BatcherManagerQuick(self._item_tree, self._settings)
@@ -486,6 +503,7 @@ class BatchLayerProcessingQuickGui:
 
     self._batcher_manager.run_batcher(
       self._mode,
+      self._item_type,
       self._item_tree,
       self._dialog,
       self._progress_bar,

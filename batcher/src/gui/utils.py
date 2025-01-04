@@ -4,6 +4,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from src import core
 from src import setting_classes
 from src.gui import placeholders as gui_placeholders_
 
@@ -103,3 +104,12 @@ def add_filepaths_to_image_file_tree(item_tree: pg.itemtree.ItemTree, filepaths_
 
     if added_items and added_items[0].type == pg.itemtree.TYPE_FOLDER:
       parent_items[filepath] = added_items[0]
+
+
+def get_batcher_class(item_type):
+  if item_type == 'image':
+    return core.ImageBatcher
+  elif item_type == 'layer':
+    return core.LayerBatcher
+  else:
+    raise ValueError('item_type must be either "image" or "layer"')

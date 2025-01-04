@@ -17,6 +17,7 @@ from src import utils as utils_
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
+from src.gui import utils as gui_utils_
 
 
 class BatcherManager:
@@ -32,6 +33,7 @@ class BatcherManager:
   def run_batcher(
         self,
         mode,
+        item_type,
         action_lists,
         previews,
         settings_manager,
@@ -41,7 +43,7 @@ class BatcherManager:
     self._settings.apply_gui_values_to_settings()
 
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
-      mode, parent_widget, progress_bar)
+      mode, item_type, parent_widget, progress_bar)
 
     should_quit = True
 
@@ -94,12 +96,12 @@ class BatcherManager:
   def stop_batcher(self):
     _stop_batcher(self._batcher)
 
-  def _set_up_batcher(self, mode, parent_widget, progress_bar):
+  def _set_up_batcher(self, mode, item_type, parent_widget, progress_bar):
     overwrite_chooser = _get_interactive_overwrite_chooser(parent_widget)
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = core.LayerBatcher(
+    batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
@@ -124,6 +126,7 @@ class BatcherManagerQuick:
   def run_batcher(
         self,
         mode,
+        item_type,
         item_tree,
         parent_widget,
         progress_bar,
@@ -131,7 +134,7 @@ class BatcherManagerQuick:
     self._settings.apply_gui_values_to_settings()
 
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
-      mode, parent_widget, progress_bar)
+      mode, item_type, parent_widget, progress_bar)
 
     try:
       self._batcher.run(
@@ -156,7 +159,7 @@ class BatcherManagerQuick:
   def stop_batcher(self):
     _stop_batcher(self._batcher)
 
-  def _set_up_batcher(self, mode, parent_widget, progress_bar):
+  def _set_up_batcher(self, mode, item_type, parent_widget, progress_bar):
     if mode == 'export':
       if self._settings['gui/show_quick_settings'].value:
         overwrite_chooser = _get_interactive_overwrite_chooser(parent_widget)
@@ -171,7 +174,7 @@ class BatcherManagerQuick:
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = core.LayerBatcher(
+    batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],

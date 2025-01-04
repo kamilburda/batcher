@@ -59,7 +59,8 @@ def plug_in_batch_convert(_procedure, config, _data):
       SETTINGS_CONVERT,
       image_tree,
       gui_main.BatchProcessingGui,
-      gui_class_kwargs=dict(mode='export', title=_('Batch Convert')),
+      gui_class_kwargs=dict(
+        mode='export', item_type='image', title=_('Batch Convert')),
       process_loaded_settings_func=_fill_image_tree_with_loaded_inputs,
     )
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
@@ -84,7 +85,8 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
       SETTINGS_EXPORT_LAYERS,
       layer_tree,
       gui_main.BatchProcessingGui,
-      gui_class_kwargs=dict(mode='export', title=_('Export Layers'), current_image=image))
+      gui_class_kwargs=dict(
+        mode='export', item_type='layer', title=_('Export Layers'), current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(SETTINGS_EXPORT_LAYERS, layer_tree, mode='export')
   else:
@@ -102,7 +104,8 @@ def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _
       SETTINGS_EXPORT_LAYERS,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export', title=_('Export Layers (Quick)'), current_image=image))
+      gui_class_kwargs=dict(
+        mode='export', item_type='layer', title=_('Export Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(SETTINGS_EXPORT_LAYERS, layer_tree, mode='export')
 
@@ -118,7 +121,8 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
       SETTINGS_EXPORT_LAYERS,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='export', title=_('Export Selected Layers'), current_image=image),
+      gui_class_kwargs=dict(
+        mode='export', item_type='layer', title=_('Export Selected Layers'), current_image=image),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
@@ -139,7 +143,8 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
       SETTINGS_EDIT_LAYERS,
       layer_tree,
       gui_main.BatchProcessingGui,
-      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers'), current_image=image))
+      gui_class_kwargs=dict(
+        mode='edit', item_type='layer', title=_('Edit Layers'), current_image=image))
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
     return _run_with_last_vals(SETTINGS_EDIT_LAYERS, layer_tree, mode='edit')
   else:
@@ -157,7 +162,8 @@ def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _co
       SETTINGS_EDIT_LAYERS,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit', title=_('Edit Layers (Quick)'), current_image=image))
+      gui_class_kwargs=dict(
+        mode='edit', item_type='layer', title=_('Edit Layers (Quick)'), current_image=image))
   else:
     return _run_with_last_vals(SETTINGS_EDIT_LAYERS, layer_tree, mode='edit')
 
@@ -173,7 +179,8 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
       SETTINGS_EDIT_LAYERS,
       layer_tree,
       gui_main.BatchLayerProcessingQuickGui,
-      gui_class_kwargs=dict(mode='edit', title=_('Edit Selected Layers'), current_image=image),
+      gui_class_kwargs=dict(
+        mode='edit', item_type='layer', title=_('Edit Selected Layers'), current_image=image),
       process_loaded_settings_func=_set_constraints_to_only_selected_layers)
   else:
     return _run_with_last_vals(
@@ -247,23 +254,18 @@ def _run_interactive(
 
 def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
   if pg.config.PROCEDURE_GROUP == CONVERT_GROUP:
-    batcher = core.ImageBatcher(
-      item_tree=item_tree,
-      procedures=settings['main/procedures'],
-      constraints=settings['main/constraints'],
-      refresh_item_tree=False,
-      initial_export_run_mode=run_mode,
-      edit_mode=mode == 'edit',
-    )
+    batcher_class = core.ImageBatcher
   else:
-    batcher = core.LayerBatcher(
-      item_tree=item_tree,
-      procedures=settings['main/procedures'],
-      constraints=settings['main/constraints'],
-      refresh_item_tree=False,
-      initial_export_run_mode=run_mode,
-      edit_mode=mode == 'edit',
-    )
+    batcher_class = core.LayerBatcher
+
+  batcher = batcher_class(
+    item_tree=item_tree,
+    procedures=settings['main/procedures'],
+    constraints=settings['main/constraints'],
+    refresh_item_tree=False,
+    initial_export_run_mode=run_mode,
+    edit_mode=mode == 'edit',
+  )
 
   try:
     batcher.run(

@@ -10,9 +10,9 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src import core
 from src import overwrite
 
+from src.gui import utils as gui_utils_
 from src.gui.preview import controller as previews_controller_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
@@ -35,6 +35,7 @@ class Previews:
         self,
         settings,
         batcher_mode,
+        item_type,
         item_tree,
         top_label,
         lock_previews=True,
@@ -43,6 +44,7 @@ class Previews:
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
+    self._item_type = item_type
     self._item_tree = item_tree
     self._top_label = top_label
     self._display_message_func = (
@@ -53,7 +55,7 @@ class Previews:
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)
 
-    self._batcher_for_name_preview = core.LayerBatcher(
+    self._batcher_for_name_preview = gui_utils_.get_batcher_class(self._item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
       constraints=self._settings['main/constraints'],
@@ -74,7 +76,7 @@ class Previews:
         if self._settings['gui/image_preview_displayed_items'].active_items else None),
     )
 
-    self._batcher_for_image_preview = core.LayerBatcher(
+    self._batcher_for_image_preview = gui_utils_.get_batcher_class(self._item_type)(
       # This is an empty tree that will be replaced during the preview anyway.
       item_tree=type(self._item_tree)(),
       procedures=self._settings['main/procedures'],
