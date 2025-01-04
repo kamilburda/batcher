@@ -69,7 +69,7 @@ class BatcherManager:
       if mode == 'export' and not self._batcher.exported_items:
         should_quit = False
         messages_.display_message(
-          _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
+          _get_no_items_processed_message(item_type), Gtk.MessageType.INFO, parent=parent_widget)
     finally:
       previews.unlock(self._PREVIEWS_BATCHER_RUN_KEY, update=False)
 
@@ -148,7 +148,7 @@ class BatcherManagerQuick:
     else:
       if mode == 'export' and not self._batcher.exported_items:
         messages_.display_message(
-          _('No layers were exported.'), Gtk.MessageType.INFO, parent=parent_widget)
+          _get_no_items_processed_message(item_type), Gtk.MessageType.INFO, parent=parent_widget)
 
     if (mode == 'export'
         and overwrite_chooser.overwrite_mode
@@ -201,6 +201,15 @@ def _stop_batcher(batcher):
     return True
   else:
     return False
+
+
+def _get_no_items_processed_message(item_type):
+  if item_type == 'image':
+    return _('No images were processed.')
+  elif item_type == 'layer':
+    return _('No layers were processed.')
+  else:
+    return _('No items were processed.')
 
 
 @contextlib.contextmanager
