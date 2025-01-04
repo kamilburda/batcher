@@ -557,12 +557,14 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     if insert_after_item is None:
       if parent_item is None:
-        insert_after_item = self._last_item
+        processed_insert_after_item = self._last_item
       else:
         if parent_item.children:
-          insert_after_item = parent_item.children[-1]
+          processed_insert_after_item = parent_item.children[-1]
         else:
-          insert_after_item = parent_item
+          processed_insert_after_item = parent_item
+    else:
+      processed_insert_after_item = insert_after_item
 
     child_items = []
     for object_ in objects:
@@ -606,15 +608,17 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     if self._first_item is not None and self._last_item is not None and len(added_items) >= 1:
       # noinspection PyProtectedMember
-      added_items[-1]._next_item = insert_after_item.next
-      if insert_after_item.next is not None:
+      added_items[-1]._next_item = processed_insert_after_item.next
+      if processed_insert_after_item.next is not None:
         # noinspection PyProtectedMember
-        insert_after_item.next._prev_item = added_items[-1]
+        processed_insert_after_item.next._prev_item = added_items[-1]
+      else:
+        self._last_item = added_items[-1]
 
       # noinspection PyProtectedMember
-      added_items[0]._prev_item = insert_after_item
+      added_items[0]._prev_item = processed_insert_after_item
       # noinspection PyProtectedMember
-      insert_after_item._next_item = added_items[0]
+      processed_insert_after_item._next_item = added_items[0]
 
     if self._first_item is None and self._last_item is None and len(added_items) >= 1:
       self._first_item = added_items[0]
