@@ -9,7 +9,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import builtin_procedures
-from src import core
 from src import exceptions
 from src import overwrite
 from src import utils as utils_
