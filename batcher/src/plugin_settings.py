@@ -145,6 +145,12 @@ def create_settings_for_convert():
       name='constraints'),
   ])
 
+  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
+  _set_file_extension_options_for_default_export_procedure(settings['main'])
+
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+
   return settings
 
 
