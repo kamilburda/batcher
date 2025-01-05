@@ -657,6 +657,8 @@ class ItemTree(metaclass=abc.ABCMeta):
     Any items that do not exist in the tree will be silently ignored without
     raising an exception.
     """
+    removed_items = []
+
     for item in items:
       if item.type == TYPE_ITEM:
         item_keys = [item.id]
@@ -704,6 +706,10 @@ class ItemTree(metaclass=abc.ABCMeta):
 
         if item_to_remove == self._last_item:
           self._last_item = previous_item
+
+      removed_items.extend(items_to_remove)
+
+    return removed_items
 
   def iter(
         self,

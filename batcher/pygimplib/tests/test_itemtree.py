@@ -404,9 +404,9 @@ class TestImageFileTree(unittest.TestCase):
       (('Corners', 'top-left.png'), False),
       (('Corners', 'top-left2'), True),
       (('Corners', 'top-left3'), True),
+      (('Corners', 'top-right.png'), False),
       (('Corners', 'top-left3', 'bottom-left.png'), False),
-      (('Corners', 'top-left3', 'bottom-right.png'), False),
-      (('Corners', 'top-right.png'), False)],
+      (('Corners', 'top-left3', 'bottom-right.png'), False)],
      ),
 
     ('invalid_items_are_skipped',
@@ -436,7 +436,22 @@ class TestImageFileTree(unittest.TestCase):
       if key in self.tree
     ]
 
-    self.tree.remove(items_to_remove)
+    if removed_paths is None:
+      removed_paths = paths_to_remove
+
+    for path in removed_paths:
+      self.expected_keys_and_paths.pop(path[0], None)
+
+    expected_keys = self._get_keys_from_expected_paths()
+
+    expected_removed_keys = [
+      os.path.join(self.root_path, *path[0])
+      if not path[1] else (os.path.join(self.root_path, *path[0]), self.FOLDER_KEY)
+      for path in removed_paths]
+    expected_removed_keys = [
+      item_key for item_key in expected_removed_keys if item_key in self.tree]
+
+    removed_items = self.tree.remove(items_to_remove)
 
     self.maxDiff = None
 
@@ -449,14 +464,6 @@ class TestImageFileTree(unittest.TestCase):
         # noinspection PyProtectedMember
         self.assertNotIn(item, item.parent._orig_children)
 
-    if removed_paths is None:
-      removed_paths = paths_to_remove
-
-    for path in removed_paths:
-      self.expected_keys_and_paths.pop(path[0], None)
-
-    expected_keys = self._get_keys_from_expected_paths()
-
     self.assertListEqual(
       [item for item in self.tree.iter_all()],
       [self.tree[key] for key in expected_keys])
@@ -464,6 +471,8 @@ class TestImageFileTree(unittest.TestCase):
     self.assertListEqual(
       [item for item in self.tree.iter_all(reverse=True)],
       [self.tree[key] for key in reversed(expected_keys)])
+
+    self.assertListEqual([item.key for item in removed_items], expected_removed_keys)
 
   def test_remove_all_but_one_item(self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
