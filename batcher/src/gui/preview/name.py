@@ -157,12 +157,12 @@ class NamePreview(preview_base_.Preview):
     # avoid the error.
     super().set_sensitive(sensitive)
 
-  def set_collapsed_items(self, collapsed_items: Set):
+  def set_collapsed_items(self, collapsed_items: Iterable):
     """Sets the collapsed state of items in the preview."""
-    self._collapsed_items = collapsed_items
+    self._collapsed_items = set(collapsed_items)
     self._set_expanded_items()
     self.emit('preview-collapsed-items-changed')
-  
+
   def set_selected_items(self, selected_items: Iterable):
     """Sets the selection of items in the preview."""
     self._selected_items = list(selected_items)
@@ -328,8 +328,7 @@ class NamePreview(preview_base_.Preview):
   def _on_tree_view_row_expanded(self, _tree_view, tree_iter, tree_path):
     if self._row_expand_collapse_interactive:
       item_key = self._get_key_from_tree_iter(tree_iter)
-      if item_key in self._collapsed_items:
-        self._collapsed_items.remove(item_key)
+      self._collapsed_items.discard(item_key)
 
       self._set_expanded_items(tree_path)
 
@@ -649,7 +648,7 @@ class NamePreview(preview_base_.Preview):
   
   def _remove_no_longer_valid_collapsed_items(self):
     self._collapsed_items = set(
-      [item_key for item_key in self._collapsed_items if item_key in self._batcher.item_tree])
+      item_key for item_key in self._collapsed_items if item_key in self._batcher.item_tree)
   
   def _set_selection(self):
     self._row_select_interactive = False

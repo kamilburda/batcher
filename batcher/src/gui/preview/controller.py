@@ -150,11 +150,11 @@ class PreviewsController:
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-load',
-      lambda setting: self._name_preview.set_collapsed_items(set(setting.active_items)))
+      lambda setting: self._name_preview.set_collapsed_items(setting.active_items))
 
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
       'after-reset',
-      lambda setting: self._name_preview.set_collapsed_items(set(setting.active_items)))
+      lambda setting: self._name_preview.set_collapsed_items(setting.active_items))
   
   def _connect_setting_after_reset_selected_items_in_name_preview(self):
     self._settings['gui/selected_items'].connect_event(
