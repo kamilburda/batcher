@@ -31,6 +31,11 @@ class Previews:
   _PREVIEWS_LEFT_MARGIN = 4
   _LABEL_TOP_BOTTOM_MARGIN = 4
 
+  _NAME_PREVIEW_BUTTONS_SPACING = 4
+  _BUTTONS_GRID_ROW_SPACING = 3
+  _BUTTONS_GRID_COLUMN_SPACING = 3
+  _NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN = 4
+
   def __init__(
         self,
         settings,
@@ -39,6 +44,7 @@ class Previews:
         item_tree,
         top_label,
         lock_previews=True,
+        manage_items=False,
         display_message_func=None,
         current_image=None,
   ):
@@ -47,6 +53,7 @@ class Previews:
     self._item_type = item_type
     self._item_tree = item_tree
     self._top_label = top_label
+    self._manage_items = manage_items
     self._display_message_func = (
       display_message_func if display_message_func is not None else pg.utils.empty_func)
 
@@ -141,6 +148,20 @@ class Previews:
       image_preview_update_kwargs=image_preview_update_kwargs,
     )
 
+  def _init_setting_gui(self):
+    self._settings['gui/image_preview_automatic_update'].set_gui(
+      gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
+      widget=self._image_preview.menu_item_update_automatically,
+      copy_previous_visible=False,
+      copy_previous_sensitive=False,
+    )
+    self._settings['gui/size/paned_between_previews_position'].set_gui(
+      gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+      widget=self._vpaned_previews,
+      copy_previous_visible=False,
+      copy_previous_sensitive=False,
+    )
+
   def _init_gui(self):
     self._label_top = Gtk.Label(
       xalign=0.0,
@@ -149,11 +170,17 @@ class Previews:
     )
     self._label_top.set_markup('<b>{}</b>'.format(self._top_label))
 
+    if self._manage_items:
+      self._set_up_managing_items()
+      upper_widget = self._vbox_name_preview_and_buttons
+    else:
+      upper_widget = self._name_preview
+
     self._vpaned_previews = Gtk.Paned(
       orientation=Gtk.Orientation.VERTICAL,
       wide_handle=True,
     )
-    self._vpaned_previews.pack1(self._name_preview, True, True)
+    self._vpaned_previews.pack1(upper_widget, True, True)
     self._vpaned_previews.pack2(self._image_preview, True, True)
 
     self._vbox_previews = Gtk.Box(
@@ -162,6 +189,75 @@ class Previews:
     )
     self._vbox_previews.pack_start(self._label_top, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
+
+  def _set_up_managing_items(self):
+    self._button_add_files = Gtk.Button(
+      label=_('Add _Files...'), use_underline=True, hexpand=True)
+    self._button_add_folders = Gtk.Button(
+      label=_('Add F_olders...'), use_underline=True, hexpand=True)
+    self._button_remove_items = Gtk.Button(
+      label=_('R_emove Selected'), use_underline=True, hexpand=True)
+    self._button_remove_all_items = Gtk.Button(
+      label=_('Re_move All'), use_underline=True, hexpand=True)
+
+    self._grid_buttons = Gtk.Grid(
+      row_spacing=self._BUTTONS_GRID_ROW_SPACING,
+      column_spacing=self._BUTTONS_GRID_COLUMN_SPACING,
+      column_homogeneous=True,
+      hexpand=True,
+    )
+    self._grid_buttons.attach(self._button_add_files, 0, 0, 1, 1)
+    self._grid_buttons.attach(self._button_add_folders, 1, 0, 1, 1)
+    self._grid_buttons.attach(self._button_remove_items, 0, 1, 1, 1)
+    self._grid_buttons.attach(self._button_remove_all_items, 1, 1, 1, 1)
+
+    self._vbox_name_preview_and_buttons = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
+      margin_bottom=self._NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN,
+    )
+    self._vbox_name_preview_and_buttons.pack_start(self._name_preview, True, True, 0)
+    self._vbox_name_preview_and_buttons.pack_start(self._grid_buttons, False, False, 0)
+
+    self._button_add_files.connect(
+      'clicked', self._on_button_add_files_clicked, _('Add Files'))
+    self._button_add_folders.connect(
+      'clicked', self._on_button_add_folders_clicked, _('Add Folders'))
+
+  def _on_button_add_files_clicked(self, _button, title):
+    filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
+    if filepaths:
+      self._name_preview.add_items(filepaths)
+
+  def _on_button_add_folders_clicked(self, _button, title):
+    dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
+    if dirpaths:
+      self._name_preview.add_items(dirpaths)
+
+  def _get_paths(self, file_chooser_action, title):
+    file_dialog = Gtk.FileChooserDialog(
+      title=title,
+      action=file_chooser_action,
+      select_multiple=True,
+      modal=True,
+      parent=pg.gui.get_toplevel_window(self._vbox_previews),
+      transient_for=pg.gui.get_toplevel_window(self._vbox_previews),
+    )
+
+    file_dialog.add_buttons(
+      _('_Add'), Gtk.ResponseType.OK,
+      _('_Cancel'), Gtk.ResponseType.CANCEL)
+
+    paths = []
+
+    response_id = file_dialog.run()
+
+    if response_id == Gtk.ResponseType.OK:
+      paths = file_dialog.get_filenames()
+
+    file_dialog.destroy()
+
+    return paths
 
   def connect_events(self, action_lists, paned_outside_previews):
     self._vpaned_previews.connect(
@@ -176,20 +272,6 @@ class Previews:
     self._name_preview.connect('preview-updated', self._on_name_preview_updated, action_lists)
 
     self._previews_controller.connect_setting_changes_to_previews()
-
-  def _init_setting_gui(self):
-    self._settings['gui/image_preview_automatic_update'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
-      widget=self._image_preview.menu_item_update_automatically,
-      copy_previous_visible=False,
-      copy_previous_sensitive=False,
-    )
-    self._settings['gui/size/paned_between_previews_position'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
-      widget=self._vpaned_previews,
-      copy_previous_visible=False,
-      copy_previous_sensitive=False,
-    )
 
   def _on_paned_outside_previews_notify_position(self, paned, _property_spec):
     current_position = paned.get_position()

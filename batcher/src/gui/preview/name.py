@@ -196,7 +196,13 @@ class NamePreview(preview_base_.Preview):
       return self._batcher.item_tree[item_key]
     else:
       return None
-  
+
+  def add_items(self, objects_):
+    added_items = self._batcher.item_tree.add(objects_)
+
+    for item in added_items:
+      self._insert_item(item, item.prev)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
 

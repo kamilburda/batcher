@@ -110,6 +110,7 @@ class BatchProcessingGui:
       self._item_tree,
       previews_top_label,
       lock_previews=True,
+      manage_items=self._item_type == 'image',
       display_message_func=self._display_inline_message,
       current_image=self._current_image,
     )
