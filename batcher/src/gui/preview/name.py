@@ -203,22 +203,17 @@ class NamePreview(preview_base_.Preview):
     if added_items:
       folder_items_to_expand = []
 
-      first_item = added_items[0]
-
-      if first_item.prev:
-        if first_item.prev.parents:
-          previous_item = first_item.prev.parents[0]
+      for item in added_items:
+        if item.prev:
+          if item.parent == item.prev.parent:
+            previous_item = item.prev
+          else:
+            previous_item = None
         else:
-          previous_item = first_item.prev
-      else:
-        previous_item = None
+          previous_item = None
 
-      first_tree_iter = self._insert_item(first_item, previous_item)
-      if first_item.type == pg.itemtree.TYPE_FOLDER and not first_item.parents:
-        folder_items_to_expand.append((first_item, first_tree_iter))
-
-      for item in added_items[1:]:
-        tree_iter = self._insert_item(item, item.prev)
+        tree_iter = self._insert_item(
+          item, previous_item, insert_mode='after' if previous_item is not None else 'before')
 
         if item.type == pg.itemtree.TYPE_FOLDER and not item.parents:
           folder_items_to_expand.append((item, tree_iter))
@@ -501,7 +496,7 @@ class NamePreview(preview_base_.Preview):
     for tree_iter in reversed(parents_to_remove.values()):
       self._remove_item_by_iter(tree_iter)
   
-  def _insert_item(self, item, previous_item):
+  def _insert_item(self, item, previous_item, insert_mode='after'):
     if item.key in self._tree_iters:
       return None
 
@@ -518,7 +513,14 @@ class NamePreview(preview_base_.Preview):
     item_icon = self._get_icon_from_item(item)
     color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
 
-    tree_iter = self._tree_model.insert_after(
+    if insert_mode == 'after':
+      insert_func = self._tree_model.insert_after
+    elif insert_mode == 'before':
+      insert_func = self._tree_model.insert_before
+    else:
+      raise ValueError('invalid insert_mode; must be "after" or "before"')
+
+    tree_iter = insert_func(
       parent_tree_iter,
       previous_tree_iter,
       [item_icon,

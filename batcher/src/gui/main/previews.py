@@ -232,10 +232,7 @@ class Previews:
   def _on_button_add_folders_clicked(self, _button, title):
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
-      for dirpath in dirpaths:
-        # We need to add each folder individually to avoid inserting subsequent
-        # folders under the first folder.
-        self._name_preview.add_items([dirpath])
+      self._name_preview.add_items(dirpaths)
 
   def _get_paths(self, file_chooser_action, title):
     file_dialog = Gtk.FileChooserDialog(
