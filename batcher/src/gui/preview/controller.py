@@ -229,6 +229,8 @@ class PreviewsController:
     self._name_preview.connect('preview-selection-changed', self._on_name_preview_selection_changed)
     self._name_preview.connect(
       'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
+    self._name_preview.connect('preview-added-items', self._on_name_preview_added_items)
+    self._name_preview.connect('preview-removed-items', self._on_name_preview_removed_items)
 
   def _on_name_preview_updated(self, _preview, error):
     if error:
@@ -269,6 +271,16 @@ class PreviewsController:
   def _on_name_preview_collapsed_items_changed(self, _preview):
     self._settings['gui/name_preview_items_collapsed_state'].set_active_items(
       self._name_preview.collapsed_items)
+
+  def _on_name_preview_added_items(self, _preview, _added_items):
+    pg.invocation.timeout_remove(self._name_preview.update)
+
+    self._name_preview.update()
+
+  def _on_name_preview_removed_items(self, _preview, _removed_items):
+    pg.invocation.timeout_remove(self._name_preview.update)
+
+    self._name_preview.update()
 
   def _set_initial_selection_and_update_image_preview(self):
     displayed_items_setting = self._settings['gui/image_preview_displayed_items']

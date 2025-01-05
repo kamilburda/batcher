@@ -46,6 +46,8 @@ class NamePreview(preview_base_.Preview):
     'preview-updated': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    'preview-added-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-removed-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
   _COLUMNS = (
@@ -204,39 +206,13 @@ class NamePreview(preview_base_.Preview):
   def add_items(self, objects):
     added_items = self._batcher.item_tree.add(objects)
 
-    if added_items:
-      for item in added_items:
-        if item.prev:
-          if item.parent == item.prev.parent:
-            previous_item = item.prev
-          else:
-            previous_item = None
-        else:
-          previous_item = None
-
-        self._insert_item(
-          item, previous_item, insert_mode='after' if previous_item is not None else 'before')
-
-      self._set_expanded_items()
+    self.emit('preview-added-items', added_items)
 
   def remove_selected_items(self):
-    if not self._selected_items:
-      return
-
-    previous_selected_items = self._selected_items
-
-    self.set_selected_items([])
-
     removed_items = self._batcher.item_tree.remove(
-      [self._batcher.item_tree[item_key] for item_key in previous_selected_items])
+      [self._batcher.item_tree[item_key] for item_key in self._selected_items])
 
-    # We need to delete children first to avoid crashes (accessing child
-    # `Gtk.TreeIter`s that no longer exist), hence the reversed iteration.
-    for item in reversed(removed_items):
-      self._remove_item_by_key(item.key)
-
-    self.set_collapsed_items(
-      item_key for item_key in self._collapsed_items if item_key not in self._batcher.item_tree)
+    self.emit('preview-removed-items', removed_items)
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
@@ -512,7 +488,7 @@ class NamePreview(preview_base_.Preview):
     for tree_iter in reversed(parents_to_remove.values()):
       self._remove_item_by_iter(tree_iter)
   
-  def _insert_item(self, item, previous_item, insert_mode='after'):
+  def _insert_item(self, item, previous_item):
     if item.key in self._tree_iters:
       return None
 
@@ -529,14 +505,7 @@ class NamePreview(preview_base_.Preview):
     item_icon = self._get_icon_from_item(item)
     color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
 
-    if insert_mode == 'after':
-      insert_func = self._tree_model.insert_after
-    elif insert_mode == 'before':
-      insert_func = self._tree_model.insert_before
-    else:
-      raise ValueError('invalid insert_mode; must be "after" or "before"')
-
-    tree_iter = insert_func(
+    tree_iter = self._tree_model.insert_after(
       parent_tree_iter,
       previous_tree_iter,
       [item_icon,
