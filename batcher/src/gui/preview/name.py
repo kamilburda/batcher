@@ -201,6 +201,8 @@ class NamePreview(preview_base_.Preview):
     added_items = self._batcher.item_tree.add(objects)
 
     if added_items:
+      folder_items_to_expand = []
+
       first_item = added_items[0]
 
       if first_item.prev:
@@ -211,12 +213,17 @@ class NamePreview(preview_base_.Preview):
       else:
         previous_item = None
 
-      tree_iter = self._insert_item(first_item, previous_item)
-      self._expand_folder_item(tree_iter, first_item)
+      first_tree_iter = self._insert_item(first_item, previous_item)
+      folder_items_to_expand.append((first_item, first_tree_iter))
 
       for item in added_items[1:]:
         tree_iter = self._insert_item(item, item.prev)
-        self._expand_folder_item(tree_iter, item)
+
+        if item.type == pg.itemtree.TYPE_FOLDER and not item.parents:
+          folder_items_to_expand.append((item, tree_iter))
+
+      for folder_item, tree_iter in folder_items_to_expand:
+        self._expand_folder_item(tree_iter, folder_item)
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
