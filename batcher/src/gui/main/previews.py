@@ -223,6 +223,8 @@ class Previews:
       'clicked', self._on_button_add_files_clicked, _('Add Files'))
     self._button_add_folders.connect(
       'clicked', self._on_button_add_folders_clicked, _('Add Folders'))
+    self._button_remove_items.connect(
+      'clicked', self._on_button_remove_items_clicked)
 
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
@@ -233,6 +235,9 @@ class Previews:
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
       self._name_preview.add_items(dirpaths)
+
+  def _on_button_remove_items_clicked(self, _button):
+    self._name_preview.remove_selected_items()
 
   def _get_paths(self, file_chooser_action, title):
     file_dialog = Gtk.FileChooserDialog(

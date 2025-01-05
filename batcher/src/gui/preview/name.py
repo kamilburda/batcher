@@ -187,13 +187,17 @@ class NamePreview(preview_base_.Preview):
 
   def get_items_from_selected_rows(self):
     return [self._batcher.item_tree[item_key]
-            for item_key in self._get_keys_from_current_selection()]
+            for item_key in self._get_keys_from_current_selection()
+            if item_key in self._batcher.item_tree]
   
   def get_item_from_cursor(self):
     tree_path, _unused = self._tree_view.get_cursor()
     if tree_path is not None:
       item_key = self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
-      return self._batcher.item_tree[item_key]
+      if item_key in self._batcher.item_tree:
+        return self._batcher.item_tree[item_key]
+      else:
+        return None
     else:
       return None
 
@@ -201,8 +205,6 @@ class NamePreview(preview_base_.Preview):
     added_items = self._batcher.item_tree.add(objects)
 
     if added_items:
-      folder_items_to_expand = []
-
       for item in added_items:
         if item.prev:
           if item.parent == item.prev.parent:
@@ -212,14 +214,29 @@ class NamePreview(preview_base_.Preview):
         else:
           previous_item = None
 
-        tree_iter = self._insert_item(
+        self._insert_item(
           item, previous_item, insert_mode='after' if previous_item is not None else 'before')
 
-        if item.type == pg.itemtree.TYPE_FOLDER and not item.parents:
-          folder_items_to_expand.append((item, tree_iter))
+      self._set_expanded_items()
 
-      for folder_item, tree_iter in folder_items_to_expand:
-        self._expand_folder_item(tree_iter, folder_item)
+  def remove_selected_items(self):
+    if not self._selected_items:
+      return
+
+    previous_selected_items = self._selected_items
+
+    self.set_selected_items([])
+
+    removed_items = self._batcher.item_tree.remove(
+      [self._batcher.item_tree[item_key] for item_key in previous_selected_items])
+
+    # We need to delete children first to avoid crashes (accessing child
+    # `Gtk.TreeIter`s that no longer exist), hence the reversed iteration.
+    for item in reversed(removed_items):
+      self._remove_item_by_key(item.key)
+
+    self.set_collapsed_items(
+      item_key for item_key in self._collapsed_items if item_key not in self._batcher.item_tree)
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
