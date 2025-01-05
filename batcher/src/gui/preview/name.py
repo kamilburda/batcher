@@ -214,7 +214,8 @@ class NamePreview(preview_base_.Preview):
         previous_item = None
 
       first_tree_iter = self._insert_item(first_item, previous_item)
-      folder_items_to_expand.append((first_item, first_tree_iter))
+      if first_item.type == pg.itemtree.TYPE_FOLDER and not first_item.parents:
+        folder_items_to_expand.append((first_item, first_tree_iter))
 
       for item in added_items[1:]:
         tree_iter = self._insert_item(item, item.prev)
