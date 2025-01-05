@@ -509,7 +509,8 @@ class ItemTree(metaclass=abc.ABCMeta):
     Args:
       objects:
         The objects to be added. These can be GIMP objects, file paths, or
-        integers representing IDs of GIMP objects.
+        integers representing IDs of GIMP objects. The same object cannot be
+        added multiple times.
       parent_item:
         The parent `Item` under which to add all items. If ``None``, the items
         will be added to the top level.
@@ -524,7 +525,8 @@ class ItemTree(metaclass=abc.ABCMeta):
         parameter has no effect if ``with_folders`` is ``False``.
 
     Returns:
-      List of added `Item`s.
+      List of added `Item`s. If attempting to add objects that were already
+      added previously, these will not be returned.
 
     Raises:
       ValueError:
@@ -575,10 +577,9 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     while item_tree:
       item = item_tree.pop(0)
-      added_items.append(item)
 
       if item.type == TYPE_FOLDER:
-        self._add_item_to_itemtree(item)
+        self._add_item_to_itemtree(item, added_items)
 
         if expand_folders:
           parents_for_child = list(item.parents)
@@ -592,7 +593,7 @@ class ItemTree(metaclass=abc.ABCMeta):
           for child_item in reversed(child_items):
             item_tree.insert(0, child_item)
       else:
-        self._add_item_to_itemtree(item)
+        self._add_item_to_itemtree(item, added_items)
 
     for i in range(1, len(added_items) - 1):
       # noinspection PyProtectedMember
@@ -630,8 +631,13 @@ class ItemTree(metaclass=abc.ABCMeta):
   def _insert_item(self, object_, child_items, parents_for_child=None, with_folders=True):
     pass
 
-  def _add_item_to_itemtree(self, item):
+  def _add_item_to_itemtree(self, item, added_items):
+    if item.key in self._items:
+      return
+
     self._items[item.key] = item
+
+    added_items.append(item)
 
     if item.parent is not None:
       # noinspection PyProtectedMember

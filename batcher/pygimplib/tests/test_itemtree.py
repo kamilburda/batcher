@@ -303,6 +303,15 @@ class TestImageFileTree(unittest.TestCase):
       [item for item in self.tree.iter_all()],
       [self.tree[key] for key in expected_keys])
 
+  def test_add_does_not_add_same_item_multiple_times(
+        self, _mock_abspath, _mock_listdir, _mock_isdir):
+    added_items = self.tree.add(['main-background.jpg'])
+    added_items_2 = self.tree.add(['main-background.jpg'])
+
+    self.assertEqual(len(list(self.tree.iter_all())), 1)
+    self.assertEqual(len(added_items), 1)
+    self.assertFalse(added_items_2)
+
   def test_add_with_parent_item_when_insert_after_is_not_under_parent_or_is_not_parent_raises_error(
         self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
