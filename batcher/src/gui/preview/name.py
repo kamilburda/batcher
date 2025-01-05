@@ -197,11 +197,26 @@ class NamePreview(preview_base_.Preview):
     else:
       return None
 
-  def add_items(self, objects_):
-    added_items = self._batcher.item_tree.add(objects_)
+  def add_items(self, objects):
+    added_items = self._batcher.item_tree.add(objects)
 
-    for item in added_items:
-      self._insert_item(item, item.prev)
+    if added_items:
+      first_item = added_items[0]
+
+      if first_item.prev:
+        if first_item.prev.parents:
+          previous_item = first_item.prev.parents[0]
+        else:
+          previous_item = first_item.prev
+      else:
+        previous_item = None
+
+      tree_iter = self._insert_item(first_item, previous_item)
+      self._expand_folder_item(tree_iter, first_item)
+
+      for item in added_items[1:]:
+        tree_iter = self._insert_item(item, item.prev)
+        self._expand_folder_item(tree_iter, item)
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
@@ -480,7 +495,7 @@ class NamePreview(preview_base_.Preview):
   
   def _insert_item(self, item, previous_item):
     if item.key in self._tree_iters:
-      return
+      return None
 
     if item.parent:
       parent_tree_iter = self._tree_iters[item.parent.key]
@@ -505,14 +520,17 @@ class NamePreview(preview_base_.Preview):
        self._get_item_name(item),
        item.key])
 
-    if item.type == pg.itemtree.TYPE_FOLDER:
-      self._row_expand_collapse_interactive = False
-      self._tree_view.expand_row(self._tree_model[tree_iter].path, True)
-      self._row_expand_collapse_interactive = True
+    self._expand_folder_item(tree_iter, item)
 
     self._tree_iters[item.key] = tree_iter
 
     return tree_iter
+
+  def _expand_folder_item(self, tree_iter, item):
+    if tree_iter is not None and item.type == pg.itemtree.TYPE_FOLDER:
+      self._row_expand_collapse_interactive = False
+      self._tree_view.expand_row(self._tree_model[tree_iter].path, True)
+      self._row_expand_collapse_interactive = True
 
   def _set_color_tag(self, item_key):
     if item_key not in self._batcher.item_tree:
