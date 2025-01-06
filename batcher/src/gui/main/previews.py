@@ -1,7 +1,5 @@
+
 import gi
-
-import src.gui.preview.base
-
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
@@ -14,6 +12,7 @@ from src import overwrite
 
 from src.gui import utils as gui_utils_
 from src.gui.preview import controller as previews_controller_
+from src.gui.preview import base as preview_base_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
 
@@ -360,7 +359,7 @@ class Previews:
 
   def _enable_preview_on_paned_drag(
         self,
-        preview: src.gui.preview.base.Preview,
+        preview: preview_base_.Preview,
         preview_sensitive_setting: pg.setting.Setting,
         update_lock_key: str,
   ):
@@ -373,7 +372,7 @@ class Previews:
 
   def _disable_preview_on_paned_drag(
         self,
-        preview: src.gui.preview.base.Preview,
+        preview: preview_base_.Preview,
         preview_sensitive_setting: pg.setting.Setting,
         update_lock_key: str,
   ):
