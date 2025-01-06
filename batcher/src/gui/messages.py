@@ -37,8 +37,8 @@ def display_alert_message(
       display_details_initially: bool = True,
       report_uri_list: Optional[Iterable[Tuple[str, str]]] = None,
       report_description: Optional[str] = None,
-      button_text=_('_Close'),
-      button_response_id: Gtk.ResponseType = Gtk.ResponseType.CLOSE,
+      button_texts_and_responses=((_('_Close'), Gtk.ResponseType.CLOSE),),
+      response_id_of_button_to_focus=None,
 ) -> int:
   """Displays a message to alert the user about an error or an exception that
   occurred in the application.
@@ -71,10 +71,11 @@ def display_alert_message(
     report_description:
       Text accompanying ``report_uri_list``. If ``None``, default text is
       used. To suppress displaying the report description, pass an empty string.
-    button_text:
-      Text of the button to close the dialog with.
-    button_response_id:
-      Response ID of the button to close the dialog with.
+    button_texts_and_responses:
+      Buttons to display in the dialog as a list-like of (text, response ID).
+    response_id_of_button_to_focus:
+      If not ``None``, the default focus is set to the button (from
+      ``button_texts_and_responses``) having this response ID.
 
   Returns:
     Response ID when closing the displayed dialog.
@@ -182,10 +183,16 @@ def display_alert_message(
   else:
     details_widget = None
 
-  dialog.add_button(button_text, button_response_id)
+  for button_text, button_response_id in button_texts_and_responses:
+    dialog.add_button(button_text, button_response_id)
 
-  if details_widget is not None and display_details_initially:
-    dialog.set_focus(details_widget)
+  if response_id_of_button_to_focus is not None:
+    button = dialog.get_widget_for_response(response_id_of_button_to_focus)
+    if button is not None:
+      dialog.set_focus(button)
+  else:
+    if details_widget is not None and display_details_initially:
+      dialog.set_focus(details_widget)
 
   dialog.show_all()
   response_id = dialog.run()
