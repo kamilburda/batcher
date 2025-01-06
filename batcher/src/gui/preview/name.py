@@ -214,6 +214,11 @@ class NamePreview(preview_base_.Preview):
 
     self.emit('preview-removed-items', removed_items)
 
+  def remove_all_items(self):
+    removed_items = self._batcher.item_tree.clear(return_removed=True)
+
+    self.emit('preview-removed-items', removed_items)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
 
