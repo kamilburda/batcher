@@ -39,7 +39,6 @@ def display_alert_message(
       report_description: Optional[str] = None,
       button_text=_('_Close'),
       button_response_id: Gtk.ResponseType = Gtk.ResponseType.CLOSE,
-      focus_on_button: bool = False,
 ) -> int:
   """Displays a message to alert the user about an error or an exception that
   occurred in the application.
@@ -76,10 +75,6 @@ def display_alert_message(
       Text of the button to close the dialog with.
     button_response_id:
       Response ID of the button to close the dialog with.
-    focus_on_button:
-      If ``True``, the close button is focused. If ``False`` and ``details`` is
-      not ``None``, the box with details is focused. Otherwise, the widget with
-      focus will be determined automatically.
 
   Returns:
     Response ID when closing the displayed dialog.
@@ -189,13 +184,8 @@ def display_alert_message(
 
   dialog.add_button(button_text, button_response_id)
 
-  if focus_on_button:
-    button = dialog.get_widget_for_response(button_response_id)
-    if button is not None:
-      dialog.set_focus(button)
-  else:
-    if details_widget is not None and display_details_initially:
-      dialog.set_focus(details_widget)
+  if details_widget is not None and display_details_initially:
+    dialog.set_focus(details_widget)
 
   dialog.show_all()
   response_id = dialog.run()
