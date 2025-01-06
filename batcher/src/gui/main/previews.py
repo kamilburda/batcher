@@ -236,29 +236,33 @@ class Previews:
       'clicked', self._on_button_remove_all_items_clicked)
 
     self.name_preview.tree_view.connect(
+      'key-press-event', self._on_name_preview_key_press_event)
+    self.name_preview.tree_view.connect(
       'key-release-event', self._on_name_preview_key_release_event)
 
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
-      can_add = self._check_files_and_warn_if_needed(filepaths)
-
-      if can_add:
-        self._name_preview.add_items(filepaths)
+      self._add_items_to_name_preview(filepaths)
 
   def _on_button_add_folders_clicked(self, _button, title):
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
-      can_add = self._check_files_and_warn_if_needed(dirpaths)
-
-      if can_add:
-        self._name_preview.add_items(dirpaths)
+      self._add_items_to_name_preview(dirpaths)
 
   def _on_button_remove_items_clicked(self, _button):
     self._name_preview.remove_selected_items()
 
   def _on_button_remove_all_items_clicked(self, _button):
     self._name_preview.remove_all_items()
+
+  def _on_name_preview_key_press_event(self, _tree_view, event):
+    key_name = Gdk.keyval_name(event.keyval)
+
+    if key_name == 'v' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # ctrl + V
+      text = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()
+      if text is not None:
+        self._add_items_to_name_preview([line for line in text.splitlines() if line])
 
   def _on_name_preview_key_release_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
@@ -268,7 +272,12 @@ class Previews:
         Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.MOD1_MASK)
 
       if not (event.state & modifiers_not_allowed_for_delete):
-        self.name_preview.remove_selected_items()
+        self._name_preview.remove_selected_items()
+
+  def _add_items_to_name_preview(self, paths):
+    can_add = self._check_files_and_warn_if_needed(paths)
+    if can_add:
+      self._name_preview.add_items(paths)
 
   def _check_files_and_warn_if_needed(self, paths):
     warned_on_count_first_threshold = False
