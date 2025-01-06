@@ -893,11 +893,21 @@ class ItemTree(metaclass=abc.ABCMeta):
     """
     pass
 
-  def _clear(self):
+  def clear(self, return_removed=False):
+    """Removes all items from the item tree and optionally returns all removed
+    items.
+    """
+    if return_removed:
+      removed_items = list(self._items.values())
+    else:
+      removed_items = None
+
     self._first_item = None
     self._last_item = None
 
     self._items = {}
+
+    return removed_items
 
 
 class ImageFileTree(ItemTree):
@@ -945,7 +955,7 @@ class GimpImageTree(ItemTree):
     This effectively removes no longer valid images and adds newly opened
     images.
     """
-    self._clear()
+    self.clear()
 
     self.add_opened_images()
 
@@ -1005,7 +1015,7 @@ class GimpItemTree(ItemTree):
 
     This method will also remove any items not added via `add_from_image()`.
     """
-    self._clear()
+    self.clear()
 
     self._images = [image for image in self._images if image.is_valid()]
 
