@@ -634,7 +634,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   def _add_item_to_itemtree(self, item, added_items):
     # If an item with the same key already exists, return that item and
     # ignore the new item (the `item` parameter). This in particular prevents
-    # existing empty folders from being disconnected from its child items.
+    # existing empty folders from being disconnected from its new child items.
     if item.key in self._items:
       return self._items[item.key]
 
