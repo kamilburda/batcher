@@ -579,7 +579,7 @@ class ItemTree(metaclass=abc.ABCMeta):
       item = item_tree.pop(0)
 
       if item.type == TYPE_FOLDER:
-        self._add_item_to_itemtree(item, added_items)
+        item = self._add_item_to_itemtree(item, added_items)
 
         if expand_folders:
           parents_for_child = list(item.parents)
@@ -593,7 +593,7 @@ class ItemTree(metaclass=abc.ABCMeta):
           for child_item in reversed(child_items):
             item_tree.insert(0, child_item)
       else:
-        self._add_item_to_itemtree(item, added_items)
+        item = self._add_item_to_itemtree(item, added_items)
 
     for i in range(1, len(added_items) - 1):
       # noinspection PyProtectedMember
@@ -632,8 +632,11 @@ class ItemTree(metaclass=abc.ABCMeta):
     pass
 
   def _add_item_to_itemtree(self, item, added_items):
+    # If an item with the same key already exists, return that item and
+    # ignore the new item (the `item` parameter). This in particular prevents
+    # existing empty folders from being disconnected from its child items.
     if item.key in self._items:
-      return
+      return self._items[item.key]
 
     self._items[item.key] = item
 
@@ -643,6 +646,8 @@ class ItemTree(metaclass=abc.ABCMeta):
       # noinspection PyProtectedMember
       item.parent._orig_children.append(item)
       item.parent.children.append(item)
+
+    return item
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
