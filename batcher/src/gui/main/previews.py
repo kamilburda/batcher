@@ -1,3 +1,4 @@
+import os
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -10,6 +11,7 @@ import pygimplib as pg
 
 from src import overwrite
 
+from src.gui import messages as messages_
 from src.gui import utils as gui_utils_
 from src.gui.preview import controller as previews_controller_
 from src.gui.preview import base as preview_base_
@@ -26,6 +28,9 @@ class Previews:
   _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
 
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
+
+  _FILE_COUNT_FIRST_THRESHOLD = 1000
+  _FILE_COUNT_SECOND_THRESHOLD = 10000
 
   _PREVIEWS_LEFT_MARGIN = 4
   _LABEL_TOP_BOTTOM_MARGIN = 4
@@ -230,18 +235,103 @@ class Previews:
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
-      self._name_preview.add_items(filepaths)
+      can_add = self._check_file_count_and_warn_on_too_many_files(filepaths)
+
+      if can_add:
+        self._name_preview.add_items(filepaths)
 
   def _on_button_add_folders_clicked(self, _button, title):
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
-      self._name_preview.add_items(dirpaths)
+      can_add = self._check_file_count_and_warn_on_too_many_files(dirpaths)
+
+      if can_add:
+        self._name_preview.add_items(dirpaths)
 
   def _on_button_remove_items_clicked(self, _button):
     self._name_preview.remove_selected_items()
 
   def _on_button_remove_all_items_clicked(self, _button):
     self._name_preview.remove_all_items()
+
+  def _check_file_count_and_warn_on_too_many_files(self, paths):
+    warned_on_count_first_threshold = False
+    warned_on_count_second_threshold = False
+    can_continue = True
+
+    def _warn_on_exceeding_thresholds(path_count_):
+      nonlocal warned_on_count_first_threshold
+      nonlocal warned_on_count_second_threshold
+      nonlocal can_continue
+
+      if not warned_on_count_first_threshold and path_count_ > self._FILE_COUNT_FIRST_THRESHOLD:
+        warned_on_count_first_threshold = True
+
+        can_continue = self._warn_on_exceeding_file_count(
+          _('You are about to add more than {} files. Are you sure you want to continue?').format(
+            self._FILE_COUNT_FIRST_THRESHOLD))
+
+        if not can_continue:
+          return
+
+      if not warned_on_count_second_threshold and path_count_ > self._FILE_COUNT_SECOND_THRESHOLD:
+        warned_on_count_second_threshold = True
+
+        can_continue = self._warn_on_exceeding_file_count(
+          _(('<b>WARNING:</b> You are about to add more than {} files.'
+             ' To be on the safe side, check if you added the files or folders you really wanted.'
+             ' Do you want to continue?')).format(
+            self._FILE_COUNT_SECOND_THRESHOLD))
+
+        if not can_continue:
+          return
+
+    filepaths = []
+    dirpaths = []
+    for path in paths:
+      if os.path.isdir(path):
+        dirpaths.append(path)
+      else:
+        filepaths.append(path)
+
+    path_count = len(filepaths)
+
+    _warn_on_exceeding_thresholds(path_count)
+
+    if warned_on_count_first_threshold and not can_continue:
+      return False
+
+    if warned_on_count_second_threshold:
+      return can_continue
+
+    for dirpath in dirpaths:
+      for _root_dirpath, _dirnames, filenames in os.walk(dirpath):
+        path_count += len(filenames)
+        _warn_on_exceeding_thresholds(path_count)
+
+        if warned_on_count_first_threshold and not can_continue:
+          return False
+
+        if warned_on_count_second_threshold:
+          return can_continue
+
+    return True
+
+  def _warn_on_exceeding_file_count(self, message_markup):
+    response_id = messages_.display_alert_message(
+      parent=pg.gui.get_toplevel_window(self._vbox_previews),
+      message_type=Gtk.MessageType.WARNING,
+      modal=True,
+      destroy_with_parent=True,
+      message_markup=message_markup,
+      message_secondary_markup='',
+      details=None,
+      display_details_initially=False,
+      button_texts_and_responses=[(_('Yes'), Gtk.ResponseType.YES), (_('No'), Gtk.ResponseType.NO)],
+      response_id_of_button_to_focus=Gtk.ResponseType.NO,
+    )
+
+    return response_id == Gtk.ResponseType.YES
 
   def _get_paths(self, file_chooser_action, title):
     file_dialog = Gtk.FileChooserDialog(
