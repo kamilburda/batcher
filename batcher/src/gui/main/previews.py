@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -235,7 +236,7 @@ class Previews:
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
-      can_add = self._check_file_count_and_warn_on_too_many_files(filepaths)
+      can_add = self._check_files_and_warn_if_needed(filepaths)
 
       if can_add:
         self._name_preview.add_items(filepaths)
@@ -243,7 +244,7 @@ class Previews:
   def _on_button_add_folders_clicked(self, _button, title):
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
-      can_add = self._check_file_count_and_warn_on_too_many_files(dirpaths)
+      can_add = self._check_files_and_warn_if_needed(dirpaths)
 
       if can_add:
         self._name_preview.add_items(dirpaths)
@@ -254,12 +255,20 @@ class Previews:
   def _on_button_remove_all_items_clicked(self, _button):
     self._name_preview.remove_all_items()
 
-  def _check_file_count_and_warn_on_too_many_files(self, paths):
+  def _check_files_and_warn_if_needed(self, paths):
     warned_on_count_first_threshold = False
     warned_on_count_second_threshold = False
     can_continue = True
 
-    def _warn_on_exceeding_thresholds(path_count_):
+    def _warn_on_adding_top_level_folder(dirpath_):
+      nonlocal can_continue
+
+      if len(pathlib.Path(dirpath_).parts) <= 2:
+        can_continue = self._warn_on_adding_items(
+          _('You are about to add a top-level folder named "{}".'
+            ' Are you sure you want to continue?').format(dirpath))
+
+    def _warn_on_exceeding_file_count_thresholds(path_count_):
       nonlocal warned_on_count_first_threshold
       nonlocal warned_on_count_second_threshold
       nonlocal can_continue
@@ -267,7 +276,7 @@ class Previews:
       if not warned_on_count_first_threshold and path_count_ > self._FILE_COUNT_FIRST_THRESHOLD:
         warned_on_count_first_threshold = True
 
-        can_continue = self._warn_on_exceeding_file_count(
+        can_continue = self._warn_on_adding_items(
           _('You are about to add more than {} files. Are you sure you want to continue?').format(
             self._FILE_COUNT_FIRST_THRESHOLD))
 
@@ -277,7 +286,7 @@ class Previews:
       if not warned_on_count_second_threshold and path_count_ > self._FILE_COUNT_SECOND_THRESHOLD:
         warned_on_count_second_threshold = True
 
-        can_continue = self._warn_on_exceeding_file_count(
+        can_continue = self._warn_on_adding_items(
           _(('<b>WARNING:</b> You are about to add more than {} files.'
              ' To be on the safe side, check if you added the files or folders you really wanted.'
              ' Do you want to continue?')).format(
@@ -296,7 +305,7 @@ class Previews:
 
     path_count = len(filepaths)
 
-    _warn_on_exceeding_thresholds(path_count)
+    _warn_on_exceeding_file_count_thresholds(path_count)
 
     if warned_on_count_first_threshold and not can_continue:
       return False
@@ -305,9 +314,15 @@ class Previews:
       return can_continue
 
     for dirpath in dirpaths:
+      _warn_on_adding_top_level_folder(dirpath)
+
+      if not can_continue:
+        return False
+
       for _root_dirpath, _dirnames, filenames in os.walk(dirpath):
         path_count += len(filenames)
-        _warn_on_exceeding_thresholds(path_count)
+
+        _warn_on_exceeding_file_count_thresholds(path_count)
 
         if warned_on_count_first_threshold and not can_continue:
           return False
@@ -317,7 +332,7 @@ class Previews:
 
     return True
 
-  def _warn_on_exceeding_file_count(self, message_markup):
+  def _warn_on_adding_items(self, message_markup):
     response_id = messages_.display_alert_message(
       parent=pg.gui.get_toplevel_window(self._vbox_previews),
       message_type=Gtk.MessageType.WARNING,
