@@ -540,8 +540,7 @@ def display_failure_message(
     details=details,
     display_details_initially=display_details_initially,
     report_uri_list=pg.config.BUG_REPORT_URL_LIST,
-    report_description=report_description,
-    focus_on_button=True)
+    report_description=report_description)
 
 
 def display_processing_failure_message(
