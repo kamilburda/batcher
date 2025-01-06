@@ -2,6 +2,8 @@ import os
 import pathlib
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GLib
@@ -233,6 +235,9 @@ class Previews:
     self._button_remove_all_items.connect(
       'clicked', self._on_button_remove_all_items_clicked)
 
+    self.name_preview.tree_view.connect(
+      'key-release-event', self._on_name_preview_key_release_event)
+
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
@@ -254,6 +259,16 @@ class Previews:
 
   def _on_button_remove_all_items_clicked(self, _button):
     self._name_preview.remove_all_items()
+
+  def _on_name_preview_key_release_event(self, _tree_view, event):
+    key_name = Gdk.keyval_name(event.keyval)
+
+    if key_name == 'Delete':
+      modifiers_not_allowed_for_delete = (
+        Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.MOD1_MASK)
+
+      if not (event.state & modifiers_not_allowed_for_delete):
+        self.name_preview.remove_selected_items()
 
   def _check_files_and_warn_if_needed(self, paths):
     warned_on_count_first_threshold = False
