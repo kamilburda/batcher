@@ -1,6 +1,12 @@
 import collections
+import os
+import urllib.parse
+import struct
+import sys
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -113,3 +119,44 @@ def get_batcher_class(item_type):
     return core.LayerBatcher
   else:
     raise ValueError('item_type must be either "image" or "layer"')
+
+
+def get_paths_from_clipboard(clipboard):
+  text = clipboard.wait_for_text()
+  if text is not None:
+    return [path for path in text.splitlines() if os.path.exists(path)]
+
+  selection_data = clipboard.wait_for_contents(Gdk.Atom.intern('CF_HDROP', False))
+  if selection_data is not None:
+    # The code is based on: https://stackoverflow.com/a/77205658
+    data = selection_data.get_data()
+    if data:
+      # https://learn.microsoft.com/en-us/windows/win32/api/shlobj_core/ns-shlobj_core-dropfiles
+      windows_dropfiles_struct_for_cf_hdrop_format_size_bytes = 20
+      offset, _x_coord, _y_coord, _is_nonclient, is_unicode = struct.unpack(
+        'Illii', data[:windows_dropfiles_struct_for_cf_hdrop_format_size_bytes])
+      decoded_data = data[offset:].decode('utf-16' if is_unicode else 'ansi')
+
+      return [path for path in decoded_data.split('\0') if os.path.exists(path)]
+
+  selection_data = clipboard.wait_for_contents(Gdk.Atom.intern('text/uri-list', False))
+
+  if selection_data is not None:
+    # More info: https://www.iana.org/assignments/media-types/text/uri-list
+    data = selection_data.get_data()
+    if data:
+      decoded_data = urllib.parse.unquote(data, encoding=sys.getfilesystemencoding())
+
+      paths = []
+      for raw_path in decoded_data.split('\r\n'):
+        if raw_path.startswith('file://'):
+          path = raw_path[len('file://'):]
+        else:
+          path = raw_path
+
+        if os.path.exists(path):
+          paths.append(path)
+
+      return paths
+
+  return []

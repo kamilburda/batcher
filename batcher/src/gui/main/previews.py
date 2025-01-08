@@ -260,9 +260,11 @@ class Previews:
     key_name = Gdk.keyval_name(event.keyval)
 
     if key_name == 'v' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # ctrl + V
-      text = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()
-      if text is not None:
-        self._add_items_to_name_preview([line for line in text.splitlines() if line])
+      clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+      paths = gui_utils_.get_paths_from_clipboard(clipboard)
+      if paths:
+        self._add_items_to_name_preview(paths)
 
   def _on_name_preview_key_release_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
