@@ -203,7 +203,7 @@ class Previews:
     self._button_add_folders = Gtk.Button(
       label=_('Add Fol_ders...'), use_underline=True, hexpand=True)
     self._button_remove_items = Gtk.Button(
-      label=_('R_emove Selected'), use_underline=True, hexpand=True)
+      label=_('R_emove'), use_underline=True, hexpand=True)
     self._button_remove_all_items = Gtk.Button(
       label=_('Re_move All'), use_underline=True, hexpand=True)
 
