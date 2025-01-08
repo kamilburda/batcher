@@ -240,6 +240,16 @@ class Previews:
     self.name_preview.tree_view.connect(
       'key-release-event', self._on_name_preview_key_release_event)
 
+    self.name_preview.tree_view.connect(
+      'drag-data-received', self._on_name_preview_drag_data_received)
+    self.name_preview.tree_view.drag_dest_set(
+      Gtk.DestDefaults.ALL,
+      [
+        Gtk.TargetEntry.new('text/uri-list', 0, 0),
+        Gtk.TargetEntry.new('CF_HDROP', 0, 0),
+      ],
+      Gdk.DragAction.MOVE)
+
   def _on_button_add_files_clicked(self, _button, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
@@ -289,6 +299,19 @@ class Previews:
 
       if not (event.state & modifiers_not_allowed_for_delete):
         self._name_preview.remove_selected_items()
+
+  def _on_name_preview_drag_data_received(
+        self,
+        _widget,
+        _drag_context,
+        _drop_x,
+        _drop_y,
+        selection_data,
+        _info,
+        _timestamp):
+      paths = gui_utils_.get_paths_from_drag_data(selection_data)
+      if paths:
+        self._add_items_to_name_preview(paths)
 
   def _add_items_to_name_preview(self, paths):
     can_add = self._check_files_and_warn_if_needed(paths)

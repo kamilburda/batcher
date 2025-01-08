@@ -1,5 +1,6 @@
 import collections
 import os
+import re
 import urllib.parse
 import struct
 import sys
@@ -127,6 +128,33 @@ def get_paths_from_clipboard(clipboard):
     return [path for path in text.splitlines() if os.path.exists(path)]
 
   selection_data = clipboard.wait_for_contents(Gdk.Atom.intern('CF_HDROP', False))
+  returned_paths = _get_paths_from_windows_cf_hdrop(selection_data)
+  if returned_paths is not None:
+    return returned_paths
+
+  selection_data = clipboard.wait_for_contents(Gdk.Atom.intern('text/uri-list', False))
+  returned_paths = _get_paths_from_text_uri_list(selection_data)
+  if returned_paths is not None:
+    return returned_paths
+
+  return []
+
+
+def get_paths_from_drag_data(selection_data):
+  if selection_data.get_target().name() == 'text/uri-list':
+    returned_paths = _get_paths_from_text_uri_list(selection_data)
+    if returned_paths is not None:
+      return returned_paths
+
+  if selection_data.get_target().name() == 'CF_HDROP':
+    returned_paths = _get_paths_from_windows_cf_hdrop(selection_data)
+    if returned_paths is not None:
+      return returned_paths
+
+  return []
+
+
+def _get_paths_from_windows_cf_hdrop(selection_data):
   if selection_data is not None:
     # The code is based on: https://stackoverflow.com/a/77205658
     data = selection_data.get_data()
@@ -139,8 +167,10 @@ def get_paths_from_clipboard(clipboard):
 
       return [path for path in decoded_data.split('\0') if os.path.exists(path)]
 
-  selection_data = clipboard.wait_for_contents(Gdk.Atom.intern('text/uri-list', False))
+  return None
 
+
+def _get_paths_from_text_uri_list(selection_data):
   if selection_data is not None:
     # More info: https://www.iana.org/assignments/media-types/text/uri-list
     data = selection_data.get_data()
@@ -149,14 +179,16 @@ def get_paths_from_clipboard(clipboard):
 
       paths = []
       for raw_path in decoded_data.split('\r\n'):
-        if raw_path.startswith('file://'):
-          path = raw_path[len('file://'):]
-        else:
-          path = raw_path
+        path = raw_path.replace('/0', '')
+        path = re.sub(r'^file:/+', r'', path)
 
-        if os.path.exists(path):
-          paths.append(path)
+        if path:
+          if os.name != 'nt':
+            path = f'/{path}'
+
+          if os.path.exists(path):
+            paths.append(path)
 
       return paths
 
-  return []
+  return None
