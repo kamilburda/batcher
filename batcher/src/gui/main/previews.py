@@ -265,6 +265,20 @@ class Previews:
       paths = gui_utils_.get_paths_from_clipboard(clipboard)
       if paths:
         self._add_items_to_name_preview(paths)
+    elif key_name == 'c' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # ctrl + C
+      clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+      item_tree = self._name_preview.batcher.item_tree
+      clipboard.set_text(
+        os.linesep.join([
+          item_tree[item_key].id for item_key in self._name_preview.selected_items
+          if item_key in item_tree]),
+        -1,
+      )
+
+      self._display_message_func(
+        _('Copied the selected images and folders as text.'),
+        Gtk.MessageType.INFO)
 
   def _on_name_preview_key_release_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
