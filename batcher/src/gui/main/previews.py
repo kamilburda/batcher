@@ -9,6 +9,7 @@ from gi.repository import Gimp
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import Pango
 
 import pygimplib as pg
 
@@ -42,6 +43,8 @@ class Previews:
   _BUTTONS_GRID_ROW_SPACING = 3
   _BUTTONS_GRID_COLUMN_SPACING = 3
   _NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN = 4
+
+  _NAME_PREVIEW_PLACEHOLDER_LABEL_PAD = 8
 
   def __init__(
         self,
@@ -218,13 +221,40 @@ class Previews:
     self._grid_buttons.attach(self._button_remove_items, 0, 1, 1, 1)
     self._grid_buttons.attach(self._button_remove_all_items, 1, 1, 1, 1)
 
+    self._name_preview_placeholder_label = Gtk.Label(
+      label=(
+        '<i>' + _('Drop or paste files and folders here, or add them via buttons below') + '</i>'),
+      use_markup=True,
+      xalign=0.5,
+      yalign=0.5,
+      width_chars=30,
+      max_width_chars=40,
+      justify=Gtk.Justification.CENTER,
+      wrap=True,
+      wrap_mode=Pango.WrapMode.WORD,
+      margin_top=self._NAME_PREVIEW_PLACEHOLDER_LABEL_PAD,
+      margin_bottom=self._NAME_PREVIEW_PLACEHOLDER_LABEL_PAD,
+      margin_start=self._NAME_PREVIEW_PLACEHOLDER_LABEL_PAD,
+      margin_end=self._NAME_PREVIEW_PLACEHOLDER_LABEL_PAD,
+    )
+
+    self._name_preview_overlay = Gtk.Overlay(
+      hexpand=True,
+      vexpand=True,
+    )
+    self._name_preview_overlay.add_overlay(self._name_preview_placeholder_label)
+    self._name_preview_overlay.set_overlay_pass_through(self._name_preview_placeholder_label, True)
+    self._name_preview_overlay.add(self._name_preview)
+
     self._vbox_name_preview_and_buttons = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
       margin_bottom=self._NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN,
     )
-    self._vbox_name_preview_and_buttons.pack_start(self._name_preview, True, True, 0)
+    self._vbox_name_preview_and_buttons.pack_start(self._name_preview_overlay, True, True, 0)
     self._vbox_name_preview_and_buttons.pack_start(self._grid_buttons, False, False, 0)
+
+    self._show_hide_name_preview_placeholder_label()
 
     self._button_add_files.connect(
       'clicked', self._on_button_add_files_clicked, _('Add Files'))
@@ -235,14 +265,14 @@ class Previews:
     self._button_remove_all_items.connect(
       'clicked', self._on_button_remove_all_items_clicked)
 
-    self.name_preview.tree_view.connect(
+    self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
-    self.name_preview.tree_view.connect(
+    self._name_preview.tree_view.connect(
       'key-release-event', self._on_name_preview_key_release_event)
 
-    self.name_preview.tree_view.connect(
+    self._name_preview_overlay.connect(
       'drag-data-received', self._on_name_preview_drag_data_received)
-    self.name_preview.tree_view.drag_dest_set(
+    self._name_preview_overlay.drag_dest_set(
       Gtk.DestDefaults.ALL,
       [
         Gtk.TargetEntry.new('text/uri-list', 0, 0),
@@ -561,5 +591,14 @@ class Previews:
         Gtk.MessageType.INFO)
 
   def _on_name_preview_updated(self, _preview, _error, action_lists):
+    if self._manage_items:
+      self._show_hide_name_preview_placeholder_label()
+
     action_lists.display_warnings_and_tooltips_for_actions(
       self._batcher_for_name_preview, clear_previous=False)
+
+  def _show_hide_name_preview_placeholder_label(self):
+    if len(self._name_preview.tree_view.get_model()) <= 0:
+      self._name_preview_placeholder_label.show()
+    else:
+      self._name_preview_placeholder_label.hide()
