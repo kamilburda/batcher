@@ -210,7 +210,7 @@ class SettingsManager:
 
     settings_to_ignore_for_reset = []
     for setting in self._settings.walk(lambda s: 'ignore_reset' not in s.tags):
-      if setting.get_path('root').startswith('gui/size'):
+      if setting.get_path('root').startswith('gui/size/'):
         setting.tags.add('ignore_reset')
         settings_to_ignore_for_reset.append(setting)
 
@@ -225,7 +225,7 @@ class SettingsManager:
     size_settings_to_ignore_for_load = []
     if not load_size_settings:
       for setting in self._settings['gui'].walk(lambda s: 'ignore_load' not in s.tags):
-        if setting.get_path('root').startswith('gui/size'):
+        if setting.get_path('root').startswith('gui/size/'):
           setting.tags.add('ignore_load')
           size_settings_to_ignore_for_load.append(setting)
 
