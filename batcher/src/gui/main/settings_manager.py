@@ -127,7 +127,7 @@ class SettingsManager:
     self._save_settings_to_default_location()
 
   def _on_load_settings_from_file_activate(self, _menu_item):
-    filepath, file_format, load_size_settings = self._get_setting_filepath(action='load')
+    filepath, file_format, load_size_settings = self._get_setting_file_and_options(action='load')
 
     if filepath is not None:
       load_successful = self._load_settings_from_file(filepath, file_format, load_size_settings)
@@ -138,7 +138,7 @@ class SettingsManager:
         self._display_message_func(_('Settings successfully loaded.'), Gtk.MessageType.INFO)
 
   def _on_save_settings_to_file_activate(self, _menu_item):
-    filepath, _file_format, _load_size_settings = self._get_setting_filepath(action='save')
+    filepath, _file_format, _load_size_settings = self._get_setting_file_and_options(action='save')
 
     if filepath is not None:
       self._settings.apply_gui_values_to_settings()
@@ -255,7 +255,7 @@ class SettingsManager:
 
     return status != update.TERMINATE
 
-  def _get_setting_filepath(self, action, add_file_extension_if_missing=True):
+  def _get_setting_file_and_options(self, action, add_file_extension_if_missing=True):
     if action == 'load':
       dialog_action = Gtk.FileChooserAction.OPEN
       button_ok = _('_Open')
