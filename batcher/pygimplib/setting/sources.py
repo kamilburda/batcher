@@ -190,12 +190,15 @@ class Source(metaclass=abc.ABCMeta):
           ('Error while parsing data from a source: every dictionary must always contain'
            ' either "value" or "settings" key'))
 
-  @staticmethod
-  def _get_matching_dicts_for_group_path(data_dict, group_path):
+  def _get_matching_dicts_for_group_path(self, data_dict, group_path):
+    group_path_components = self._split_path(group_path)
+
     return {
       path: dict_
       for path, dict_ in data_dict.items()
-      if path is not None and path.startswith(group_path) and path != group_path
+      if (path is not None
+          and self._path_contains_prefix(path, group_path_components)
+          and path != group_path)
     }
 
   def _get_matching_children(self, group, group_path, matching_dicts, prefixes_to_ignore):
@@ -205,9 +208,9 @@ class Source(metaclass=abc.ABCMeta):
       child_path = child.get_path()
 
       if self._IGNORE_LOAD_TAG in child.tags:
-        prefixes_to_ignore.add(child_path)
+        self._add_prefix_to_ignore(prefixes_to_ignore, child_path)
 
-      if any(child_path.startswith(prefix) for prefix in prefixes_to_ignore):
+      if any(self._path_contains_prefix(child_path, prefix) for prefix in prefixes_to_ignore):
         continue
 
       matching_children[child_path] = child
@@ -229,14 +232,25 @@ class Source(metaclass=abc.ABCMeta):
 
     for path, dict_ in matching_dicts.items():
       if self._IGNORE_LOAD_TAG in dict_.get('tags', []) and path not in matching_children:
-        prefixes_to_ignore.add(path)
+        self._add_prefix_to_ignore(prefixes_to_ignore, path)
 
-      if any(path.startswith(prefix) for prefix in prefixes_to_ignore):
+      if any(self._path_contains_prefix(path, prefix) for prefix in prefixes_to_ignore):
         continue
 
       filtered_matching_dicts[path] = dict_
 
     return filtered_matching_dicts
+
+  def _add_prefix_to_ignore(self, prefixes_to_ignore, path):
+    prefixes_to_ignore.add(self._split_path(path))
+
+  def _path_contains_prefix(self, path, prefix):
+    path_components = self._split_path(path)
+    return prefix == path_components[:len(prefix)]
+
+  @staticmethod
+  def _split_path(path):
+    return tuple(path.split(utils_.SETTING_PATH_SEPARATOR))
 
   def _update_setting(self, setting, setting_dict):
     if not self._should_setting_be_loaded(setting):
