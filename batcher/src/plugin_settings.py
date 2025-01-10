@@ -51,6 +51,8 @@ def create_settings_for_convert():
       'type': 'list',
       'name': 'inputs_interactive',
       'display_name': _('Input files and folders'),
+      'pdb_type': None,
+      'gui_type': None,
     },
     {
       'type': 'file_extension',
