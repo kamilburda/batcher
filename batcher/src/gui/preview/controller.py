@@ -13,6 +13,8 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src.gui import utils as gui_utils_
+
 
 class PreviewsController:
   
@@ -29,6 +31,14 @@ class PreviewsController:
     self._is_initial_selection_set = False
 
     self._previously_focused_on_related_window = False
+
+  @property
+  def name_preview(self):
+    return self._name_preview
+
+  @property
+  def image_preview(self):
+    return self._image_preview
 
   def lock_previews(self, key):
     self._name_preview.lock_update(True, key)
@@ -73,10 +83,19 @@ class PreviewsController:
         **image_preview_update_kwargs,
       )
 
+  def add_inputs_and_update_name_preview(self, inputs_setting):
+    gui_utils_.add_paths_to_image_file_tree(
+      self._name_preview.batcher.item_tree, inputs_setting.value)
+
+    pg.invocation.timeout_add_strict(
+      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
+      self._name_preview.update)
+
   def connect_setting_changes_to_previews(self):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
     
+    self._connect_setting_load_save_inputs_interactive_in_name_preview()
     self._connect_setting_after_reset_collapsed_items_in_name_preview()
     self._connect_setting_after_reset_selected_items_in_name_preview()
     self._connect_setting_after_reset_displayed_items_in_image_preview()
@@ -146,6 +165,18 @@ class PreviewsController:
       return
 
     self.unlock_previews(self._PREVIEW_ERROR_KEY)
+
+  def _connect_setting_load_save_inputs_interactive_in_name_preview(self):
+    if 'inputs_interactive' in self._settings['main']:
+      self._settings['main/inputs_interactive'].connect_event(
+        'after-load', self.add_inputs_and_update_name_preview)
+
+      self._settings['main/inputs_interactive'].connect_event(
+        'before-save', self._get_inputs_from_name_preview)
+
+  def _get_inputs_from_name_preview(self, setting):
+    setting.set_value(
+      gui_utils_.image_file_tree_items_to_paths(self._name_preview.batcher.item_tree))
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(

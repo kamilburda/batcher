@@ -222,6 +222,9 @@ class BatchProcessingGui:
     self._previews.connect_events(self._action_lists, self._hpaned_settings_and_previews)
 
   def _finish_init_and_show(self):
+    self._previews.controller.add_inputs_and_update_name_preview(
+      self._settings['main/inputs_interactive'])
+
     self._previews.unlock()
 
     self._dialog.vbox.show_all()

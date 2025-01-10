@@ -96,13 +96,13 @@ def _has_setting_display_name(setting):
   return setting.display_name is not None and setting.display_name.strip()
 
 
-def image_file_tree_items_to_filepaths(item_tree: pg.itemtree.ItemTree):
+def image_file_tree_items_to_paths(item_tree: pg.itemtree.ItemTree):
   return [
     [item.id, item.parent.id] if item.parent is not None else [item.id, None]
     for item in item_tree.iter_all()]
 
 
-def add_filepaths_to_image_file_tree(item_tree: pg.itemtree.ItemTree, filepaths_and_parent_folders):
+def add_paths_to_image_file_tree(item_tree: pg.itemtree.ItemTree, filepaths_and_parent_folders):
   parent_items = collections.defaultdict(lambda: None)
 
   for filepath, parent_dirpath in filepaths_and_parent_folders:
