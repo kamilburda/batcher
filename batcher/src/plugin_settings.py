@@ -51,6 +51,7 @@ def create_settings_for_convert():
       'type': 'int',
       'name': 'max_num_inputs',
       'default_value': 2000,
+      'min_value': 0,
       'display_name': _(
         'Maximum number of input files to process'
         ' (set to 0 to remove this restriction; non-interactive run mode only)'),
