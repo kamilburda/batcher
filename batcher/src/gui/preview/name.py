@@ -76,6 +76,7 @@ class NamePreview(preview_base_.Preview):
         collapsed_items=None,
         selected_items=None,
         initial_cursor_item=None,
+        show_original_name=False,
   ):
     super().__init__()
     
@@ -84,6 +85,7 @@ class NamePreview(preview_base_.Preview):
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
     self._initial_cursor_item = initial_cursor_item
+    self._show_original_name = show_original_name
 
     self._tagged_items = set()
     
@@ -202,6 +204,9 @@ class NamePreview(preview_base_.Preview):
         return None
     else:
       return None
+
+  def set_show_original_name(self, show_original_name):
+    self._show_original_name = show_original_name
 
   def add_items(self, objects):
     added_items = self._batcher.item_tree.add(objects)
@@ -581,11 +586,14 @@ class NamePreview(preview_base_.Preview):
       return None
 
   def _get_item_name(self, item):
-    if not self._batcher.edit_mode:
-      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
-      return item_state['name'] if item_state is not None else item.name
+    if not self._show_original_name:
+      if not self._batcher.edit_mode:
+        item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
+        return item_state['name'] if item_state is not None else item.name
+      else:
+        return item.name
     else:
-      return item.name
+      return item.orig_name
 
   def _update_item(self, item):
     self._tree_model.set_value(

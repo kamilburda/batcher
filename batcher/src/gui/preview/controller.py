@@ -83,7 +83,10 @@ class PreviewsController:
         **image_preview_update_kwargs,
       )
 
-  def add_initial_inputs_to_name_preview(self):
+  def initialize_inputs_in_name_preview(self):
+    if 'show_original_item_names' in self._settings['gui']:
+      self._show_original_or_processed_item_names()
+
     if 'inputs_interactive' in self._settings['gui'] and 'keep_inputs' in self._settings['gui']:
       if self._settings['gui/keep_inputs'].value:
         self._add_inputs_to_name_preview()
@@ -98,10 +101,18 @@ class PreviewsController:
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
       self._name_preview.update)
 
+  def _show_original_or_processed_item_names(self):
+    self._name_preview.set_show_original_name(self._settings['gui/show_original_item_names'].value)
+
+    pg.invocation.timeout_add_strict(
+      self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
+      self._name_preview.update)
+
   def connect_setting_changes_to_previews(self):
     self._connect_actions_changed(self._settings['main/procedures'])
     self._connect_actions_changed(self._settings['main/constraints'])
-    
+
+    self._connect_setting_show_original_item_names_changed_in_name_preview()
     self._connect_setting_load_save_inputs_interactive_in_name_preview()
     self._connect_setting_after_reset_collapsed_items_in_name_preview()
     self._connect_setting_after_reset_selected_items_in_name_preview()
@@ -173,7 +184,17 @@ class PreviewsController:
 
     self.unlock_previews(self._PREVIEW_ERROR_KEY)
 
+  def _connect_setting_show_original_item_names_changed_in_name_preview(self):
+    if 'show_original_item_names' in self._settings['gui']:
+      self._settings['gui/show_original_item_names'].connect_event(
+        'value-changed',
+        lambda _setting: self._show_original_or_processed_item_names())
+
   def _connect_setting_load_save_inputs_interactive_in_name_preview(self):
+    if ('inputs_interactive' not in self._settings['gui']
+        or 'keep_inputs' not in self._settings['gui']):
+      return
+
     orig_keep_inputs_value = None
     ignore_load_tag_added = False
     ignore_reset_tag_added = False
@@ -243,21 +264,20 @@ class PreviewsController:
         self._name_preview.remove_all_items()
         should_reset_inputs = False
 
-    if 'inputs_interactive' in self._settings['gui'] and 'keep_inputs' in self._settings['gui']:
-      self._settings['gui/inputs_interactive'].connect_event(
-        'before-load', _set_up_loading_of_inputs)
+    self._settings['gui/inputs_interactive'].connect_event(
+      'before-load', _set_up_loading_of_inputs)
 
-      self._settings['gui/inputs_interactive'].connect_event(
-        'after-load', _add_inputs_to_name_preview)
+    self._settings['gui/inputs_interactive'].connect_event(
+      'after-load', _add_inputs_to_name_preview)
 
-      self._settings['gui/inputs_interactive'].connect_event(
-        'before-save', _get_inputs_from_name_preview)
+    self._settings['gui/inputs_interactive'].connect_event(
+      'before-save', _get_inputs_from_name_preview)
 
-      self._settings['gui/inputs_interactive'].connect_event(
-        'before-reset', _set_up_reset_and_loading_from_file)
+    self._settings['gui/inputs_interactive'].connect_event(
+      'before-reset', _set_up_reset_and_loading_from_file)
 
-      self._settings['gui/inputs_interactive'].connect_event(
-        'after-reset', _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs)
+    self._settings['gui/inputs_interactive'].connect_event(
+      'after-reset', _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(

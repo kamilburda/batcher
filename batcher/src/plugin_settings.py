@@ -126,6 +126,7 @@ def create_settings_for_convert():
   gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([
     _create_inputs_interactive_setting_dict(),
+    _create_show_original_item_names_setting_dict(False),
     _create_keep_inputs_setting_dict(True, _('Keep Input Images')),
     _create_auto_close_setting_dict(False),
   ])
@@ -496,6 +497,15 @@ def _create_inputs_interactive_setting_dict():
     'display_name': _('Input files and folders'),
     'pdb_type': None,
     'gui_type': None,
+  }
+
+
+def _create_show_original_item_names_setting_dict(default_value):
+  return {
+    'type': 'bool',
+    'name': 'show_original_item_names',
+    'default_value': default_value,
+    'display_name': _('Show Original Names'),
   }
 
 

@@ -182,7 +182,7 @@ class Previews:
 
     if self._manage_items:
       self._set_up_managing_items()
-      upper_widget = self._vbox_name_preview_and_buttons
+      upper_widget = self._vbox_name_preview_and_options
     else:
       upper_widget = self._name_preview
 
@@ -201,26 +201,6 @@ class Previews:
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
 
   def _set_up_managing_items(self):
-    self._button_add_files = Gtk.Button(
-      label=_('Add _Files...'), use_underline=True, hexpand=True)
-    self._button_add_folders = Gtk.Button(
-      label=_('Add Fol_ders...'), use_underline=True, hexpand=True)
-    self._button_remove_items = Gtk.Button(
-      label=_('R_emove'), use_underline=True, hexpand=True)
-    self._button_remove_all_items = Gtk.Button(
-      label=_('Re_move All'), use_underline=True, hexpand=True)
-
-    self._grid_buttons = Gtk.Grid(
-      row_spacing=self._BUTTONS_GRID_ROW_SPACING,
-      column_spacing=self._BUTTONS_GRID_COLUMN_SPACING,
-      column_homogeneous=True,
-      hexpand=True,
-    )
-    self._grid_buttons.attach(self._button_add_files, 0, 0, 1, 1)
-    self._grid_buttons.attach(self._button_add_folders, 1, 0, 1, 1)
-    self._grid_buttons.attach(self._button_remove_items, 0, 1, 1, 1)
-    self._grid_buttons.attach(self._button_remove_all_items, 1, 1, 1, 1)
-
     self._name_preview_placeholder_label = Gtk.Label(
       label=(
         '<i>' + _('Drop or paste files and folders here, or add them via buttons below') + '</i>'),
@@ -246,13 +226,38 @@ class Previews:
     self._name_preview_overlay.set_overlay_pass_through(self._name_preview_placeholder_label, True)
     self._name_preview_overlay.add(self._name_preview)
 
-    self._vbox_name_preview_and_buttons = Gtk.Box(
+    self._button_add_files = Gtk.Button(
+      label=_('Add _Files...'), use_underline=True, hexpand=True)
+    self._button_add_folders = Gtk.Button(
+      label=_('Add Fol_ders...'), use_underline=True, hexpand=True)
+    self._button_remove_items = Gtk.Button(
+      label=_('R_emove'), use_underline=True, hexpand=True)
+    self._button_remove_all_items = Gtk.Button(
+      label=_('Re_move All'), use_underline=True, hexpand=True)
+
+    self._grid_buttons = Gtk.Grid(
+      row_spacing=self._BUTTONS_GRID_ROW_SPACING,
+      column_spacing=self._BUTTONS_GRID_COLUMN_SPACING,
+      column_homogeneous=True,
+      hexpand=True,
+    )
+    self._grid_buttons.attach(self._button_add_files, 0, 0, 1, 1)
+    self._grid_buttons.attach(self._button_add_folders, 1, 0, 1, 1)
+    self._grid_buttons.attach(self._button_remove_items, 0, 1, 1, 1)
+    self._grid_buttons.attach(self._button_remove_all_items, 1, 1, 1, 1)
+
+    self._vbox_name_preview_and_options = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
       margin_bottom=self._NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN,
     )
-    self._vbox_name_preview_and_buttons.pack_start(self._name_preview_overlay, True, True, 0)
-    self._vbox_name_preview_and_buttons.pack_start(self._grid_buttons, False, False, 0)
+    self._vbox_name_preview_and_options.pack_start(self._name_preview_overlay, True, True, 0)
+    self._vbox_name_preview_and_options.pack_start(self._grid_buttons, False, False, 0)
+
+    if 'show_original_item_names' in self._settings['gui']:
+      self._settings['gui/show_original_item_names'].set_gui()
+      self._vbox_name_preview_and_options.pack_start(
+        self._settings['gui/show_original_item_names'].gui.widget, False, False, 0)
 
     self._show_hide_name_preview_placeholder_label()
 

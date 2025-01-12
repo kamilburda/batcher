@@ -222,7 +222,7 @@ class BatchProcessingGui:
     self._previews.connect_events(self._action_lists, self._hpaned_settings_and_previews)
 
   def _finish_init_and_show(self):
-    self._previews.controller.add_initial_inputs_to_name_preview()
+    self._previews.controller.initialize_inputs_in_name_preview()
 
     self._previews.unlock()
 
