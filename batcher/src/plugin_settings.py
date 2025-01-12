@@ -48,13 +48,6 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'list',
-      'name': 'inputs_interactive',
-      'display_name': _('Input files and folders'),
-      'pdb_type': None,
-      'gui_type': None,
-    },
-    {
       'type': 'file_extension',
       'name': 'file_extension',
       'default_value': 'png',
@@ -122,8 +115,9 @@ def create_settings_for_convert():
 
   gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([
-    _create_auto_close_setting_dict(False),
+    _create_inputs_interactive_setting_dict(),
     _create_keep_inputs_setting_dict(True, _('Keep Input Images')),
+    _create_auto_close_setting_dict(False),
   ])
 
   size_gui_settings = pg.setting.Group(name='size')
@@ -485,13 +479,13 @@ def _create_size_gui_settings(
   ]
 
 
-def _create_auto_close_setting_dict(default_value):
+def _create_inputs_interactive_setting_dict():
   return {
-    'type': 'bool',
-    'name': 'auto_close',
-    'default_value': default_value,
-    'display_name': _('Close when Done'),
-    'gui_type': 'check_menu_item',
+    'type': 'list',
+    'name': 'inputs_interactive',
+    'display_name': _('Input files and folders'),
+    'pdb_type': None,
+    'gui_type': None,
   }
 
 
@@ -501,6 +495,16 @@ def _create_keep_inputs_setting_dict(default_value, title):
     'name': 'keep_inputs',
     'default_value': default_value,
     'display_name': title,
+    'gui_type': 'check_menu_item',
+  }
+
+
+def _create_auto_close_setting_dict(default_value):
+  return {
+    'type': 'bool',
+    'name': 'auto_close',
+    'default_value': default_value,
+    'display_name': _('Close when Done'),
     'gui_type': 'check_menu_item',
   }
 

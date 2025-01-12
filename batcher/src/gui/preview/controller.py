@@ -84,7 +84,7 @@ class PreviewsController:
       )
 
   def add_initial_inputs_to_name_preview(self):
-    if 'inputs_interactive' in self._settings['main'] and 'keep_inputs' in self._settings['gui']:
+    if 'inputs_interactive' in self._settings['gui'] and 'keep_inputs' in self._settings['gui']:
       if self._settings['gui/keep_inputs'].value:
         self._add_inputs_to_name_preview()
 
@@ -92,7 +92,7 @@ class PreviewsController:
     self._name_preview.remove_all_items()
 
     gui_utils_.add_paths_to_image_file_tree(
-      self._name_preview.batcher.item_tree, self._settings['main/inputs_interactive'].value)
+      self._name_preview.batcher.item_tree, self._settings['gui/inputs_interactive'].value)
 
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
@@ -243,20 +243,20 @@ class PreviewsController:
         self._name_preview.remove_all_items()
         should_reset_inputs = False
 
-    if 'inputs_interactive' in self._settings['main'] and 'keep_inputs' in self._settings['gui']:
-      self._settings['main/inputs_interactive'].connect_event(
+    if 'inputs_interactive' in self._settings['gui'] and 'keep_inputs' in self._settings['gui']:
+      self._settings['gui/inputs_interactive'].connect_event(
         'before-load', _set_up_loading_of_inputs)
 
-      self._settings['main/inputs_interactive'].connect_event(
+      self._settings['gui/inputs_interactive'].connect_event(
         'after-load', _add_inputs_to_name_preview)
 
-      self._settings['main/inputs_interactive'].connect_event(
+      self._settings['gui/inputs_interactive'].connect_event(
         'before-save', _get_inputs_from_name_preview)
 
-      self._settings['main/inputs_interactive'].connect_event(
+      self._settings['gui/inputs_interactive'].connect_event(
         'before-reset', _set_up_reset_and_loading_from_file)
 
-      self._settings['main/inputs_interactive'].connect_event(
+      self._settings['gui/inputs_interactive'].connect_event(
         'after-reset', _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
