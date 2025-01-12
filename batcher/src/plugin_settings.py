@@ -121,7 +121,10 @@ def create_settings_for_convert():
   settings['main'].add([export_settings])
 
   gui_settings = _create_gui_settings('image_file_tree_items')
-  gui_settings.add([_create_auto_close_setting_dict(False)])
+  gui_settings.add([
+    _create_auto_close_setting_dict(False),
+    _create_keep_inputs_setting_dict(True, _('Keep Input Images')),
+  ])
 
   size_gui_settings = pg.setting.Group(name='size')
   size_gui_settings.add(
@@ -488,6 +491,16 @@ def _create_auto_close_setting_dict(default_value):
     'name': 'auto_close',
     'default_value': default_value,
     'display_name': _('Close when Done'),
+    'gui_type': 'check_menu_item',
+  }
+
+
+def _create_keep_inputs_setting_dict(default_value, title):
+  return {
+    'type': 'bool',
+    'name': 'keep_inputs',
+    'default_value': default_value,
+    'display_name': title,
     'gui_type': 'check_menu_item',
   }
 

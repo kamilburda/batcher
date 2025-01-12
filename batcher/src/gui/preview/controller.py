@@ -83,9 +83,16 @@ class PreviewsController:
         **image_preview_update_kwargs,
       )
 
-  def add_inputs_and_update_name_preview(self, inputs_setting):
+  def add_initial_inputs_to_name_preview(self):
+    if 'inputs_interactive' in self._settings['main'] and 'keep_inputs' in self._settings['gui']:
+      if self._settings['gui/keep_inputs'].value:
+        self._add_inputs_to_name_preview()
+
+  def _add_inputs_to_name_preview(self):
+    self._name_preview.remove_all_items()
+
     gui_utils_.add_paths_to_image_file_tree(
-      self._name_preview.batcher.item_tree, inputs_setting.value)
+      self._name_preview.batcher.item_tree, self._settings['main/inputs_interactive'].value)
 
     pg.invocation.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
@@ -167,16 +174,90 @@ class PreviewsController:
     self.unlock_previews(self._PREVIEW_ERROR_KEY)
 
   def _connect_setting_load_save_inputs_interactive_in_name_preview(self):
-    if 'inputs_interactive' in self._settings['main']:
+    orig_keep_inputs_value = None
+    ignore_load_tag_added = False
+    ignore_reset_tag_added = False
+    should_reset_inputs = False
+
+    def _set_up_loading_of_inputs(setting_):
+      nonlocal orig_keep_inputs_value
+      nonlocal ignore_load_tag_added
+
+      if orig_keep_inputs_value is None:
+        # This should be set in the `before-reset` event handler, but put it
+        # here as well just in case the code related to loading from files
+        # changes.
+        orig_keep_inputs_value = self._settings['gui/keep_inputs'].value
+
+      if orig_keep_inputs_value and 'ignore_load' not in setting_.tags:
+        ignore_load_tag_added = True
+        setting_.tags.add('ignore_load')
+
+    def _add_inputs_to_name_preview(setting_):
+      nonlocal orig_keep_inputs_value
+      nonlocal ignore_load_tag_added
+
+      if not orig_keep_inputs_value:
+        self._add_inputs_to_name_preview()
+
+      orig_keep_inputs_value = None
+
+      if ignore_load_tag_added:
+        setting_.tags.discard('ignore_load')
+        ignore_load_tag_added = False
+
+    def _get_inputs_from_name_preview(setting_):
+      if self._settings['gui/keep_inputs'].value:
+        setting_.set_value(
+          gui_utils_.image_file_tree_items_to_paths(self._name_preview.batcher.item_tree))
+      else:
+        setting_.set_value([])
+
+    def _set_up_reset_and_loading_from_file(setting_):
+      nonlocal ignore_reset_tag_added
+      nonlocal should_reset_inputs
+      nonlocal orig_keep_inputs_value
+
+      if self._settings['gui/keep_inputs'].value:
+        if 'ignore_reset' not in setting_.tags:
+          ignore_reset_tag_added = True
+          setting_.tags.add('ignore_reset')
+      else:
+        should_reset_inputs = True
+
+      if orig_keep_inputs_value is None:
+        # Loading from file involves resetting settings first. Therefore,
+        # obtaining the original value of this setting before loading is not
+        # feasible.
+        orig_keep_inputs_value = self._settings['gui/keep_inputs'].value
+
+    def _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs(setting_):
+      nonlocal ignore_reset_tag_added
+      nonlocal should_reset_inputs
+
+      if ignore_reset_tag_added:
+        setting_.tags.discard('ignore_reset')
+        ignore_reset_tag_added = False
+
+      if should_reset_inputs:
+        self._name_preview.remove_all_items()
+        should_reset_inputs = False
+
+    if 'inputs_interactive' in self._settings['main'] and 'keep_inputs' in self._settings['gui']:
       self._settings['main/inputs_interactive'].connect_event(
-        'after-load', self.add_inputs_and_update_name_preview)
+        'before-load', _set_up_loading_of_inputs)
 
       self._settings['main/inputs_interactive'].connect_event(
-        'before-save', self._get_inputs_from_name_preview)
+        'after-load', _add_inputs_to_name_preview)
 
-  def _get_inputs_from_name_preview(self, setting):
-    setting.set_value(
-      gui_utils_.image_file_tree_items_to_paths(self._name_preview.batcher.item_tree))
+      self._settings['main/inputs_interactive'].connect_event(
+        'before-save', _get_inputs_from_name_preview)
+
+      self._settings['main/inputs_interactive'].connect_event(
+        'before-reset', _set_up_reset_and_loading_from_file)
+
+      self._settings['main/inputs_interactive'].connect_event(
+        'after-reset', _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs)
 
   def _connect_setting_after_reset_collapsed_items_in_name_preview(self):
     self._settings['gui/name_preview_items_collapsed_state'].connect_event(
