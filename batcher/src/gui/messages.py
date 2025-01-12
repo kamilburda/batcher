@@ -132,6 +132,7 @@ def display_alert_message(
       wrap=True,
       width_request=300,
       max_width_chars=50,
+      wrap_mode=Pango.WrapMode.WORD_CHAR,
     )
     vbox_messages.pack_start(primary_message, False, False, 0)
 
@@ -145,6 +146,7 @@ def display_alert_message(
       wrap=True,
       width_request=300,
       max_width_chars=50,
+      wrap_mode=Pango.WrapMode.WORD_CHAR,
     )
     vbox_messages.pack_start(secondary_message, False, False, 0)
 
