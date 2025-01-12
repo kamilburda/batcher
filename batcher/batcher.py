@@ -194,10 +194,10 @@ def _run_noninteractive(settings, item_tree, config, mode):
   if pg.config.PROCEDURE_GROUP == CONVERT_GROUP:
     item_tree.add(config.get_property('inputs'))
 
-  settings_file = config.get_property('settings-file')
+  settings_filepath = config.get_property('settings-file')
 
-  if settings_file:
-    gimp_status, message = _load_settings_from_file(settings, settings_file)
+  if settings_filepath:
+    gimp_status, message = _load_settings_from_file(settings, settings_filepath)
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
   else:
@@ -324,9 +324,7 @@ def _load_and_update_settings(settings, run_mode):
   return False, load_message
 
 
-def _load_settings_from_file(settings, settings_file):
-  settings_filepath = settings_file.get_path()
-
+def _load_settings_from_file(settings, settings_filepath):
   if not os.path.isfile(settings_filepath):
     return (
       Gimp.PDBStatusType.EXECUTION_ERROR,
