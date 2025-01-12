@@ -192,7 +192,11 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
 
 def _run_noninteractive(settings, item_tree, config, mode):
   if pg.config.PROCEDURE_GROUP == CONVERT_GROUP:
-    item_tree.add(config.get_property('inputs'))
+    inputs, gimp_status, message = _load_inputs(config.get_property('inputs'))
+    if gimp_status != Gimp.PDBStatusType.SUCCESS:
+      return gimp_status, message
+
+    item_tree.add(inputs)
 
   settings_filepath = config.get_property('settings-file')
 
@@ -276,6 +280,21 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
     return Gimp.PDBStatusType.EXECUTION_ERROR, str(e)
 
   return Gimp.PDBStatusType.SUCCESS, ''
+
+
+def _load_inputs(filepath):
+  if not os.path.isfile(filepath):
+    return (
+      [], Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
+
+  try:
+    with open(filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as inputs_file:
+      inputs = [path for path in inputs_file.read().splitlines() if path]
+  except Exception as e:
+    return (
+      [], Gimp.PDBStatusType.EXECUTION_ERROR, f'Error obtaining inputs from file "{filepath}": {e}')
+  else:
+    return inputs, Gimp.PDBStatusType.SUCCESS, ''
 
 
 def _set_procedure_group_and_default_setting_source(procedure_group):

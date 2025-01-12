@@ -40,11 +40,11 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'array',
+      'type': 'string',
       'name': 'inputs',
-      'element_type': 'string',
-      'default_value': (),
-      'display_name': _('Input files and folders (non-interactive run mode only)'),
+      'default_value': '',
+      'display_name': _(
+        'Path to file with input files and folders on each line (non-interactive run mode only)'),
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
