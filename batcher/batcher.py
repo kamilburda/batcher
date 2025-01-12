@@ -192,11 +192,10 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
 
 def _run_noninteractive(settings, item_tree, config, mode):
   if pg.config.PROCEDURE_GROUP == CONVERT_GROUP:
-    inputs, gimp_status, message = _load_inputs(config.get_property('inputs'))
+    gimp_status, message = _load_inputs(
+      item_tree, config.get_property('inputs'), config.get_property('max-num-inputs'))
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
-
-    item_tree.add(inputs)
 
   settings_filepath = config.get_property('settings-file')
 
@@ -282,19 +281,29 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _load_inputs(filepath):
+def _load_inputs(item_tree, filepath, max_num_inputs):
   if not os.path.isfile(filepath):
     return (
-      [], Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
+      Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
 
   try:
     with open(filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as inputs_file:
       inputs = [path for path in inputs_file.read().splitlines() if path]
   except Exception as e:
     return (
-      [], Gimp.PDBStatusType.EXECUTION_ERROR, f'Error obtaining inputs from file "{filepath}": {e}')
-  else:
-    return inputs, Gimp.PDBStatusType.SUCCESS, ''
+      Gimp.PDBStatusType.EXECUTION_ERROR, f'Error obtaining inputs from file "{filepath}": {e}')
+
+  item_tree.add(inputs)
+
+  if max_num_inputs != 0 and len(item_tree) > max_num_inputs:
+    return (
+      Gimp.PDBStatusType.EXECUTION_ERROR,
+      (f'File "{filepath}" contains more than {max_num_inputs} files to process'
+       ' (including files in folders).'
+       ' Check if you specified the files and folders you truly wish to process.'
+       ' To remove this restriction, set "max-num-inputs" to 0.'))
+
+  return Gimp.PDBStatusType.SUCCESS, ''
 
 
 def _set_procedure_group_and_default_setting_source(procedure_group):

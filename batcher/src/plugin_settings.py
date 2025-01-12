@@ -48,6 +48,15 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
+      'type': 'int',
+      'name': 'max_num_inputs',
+      'default_value': 2000,
+      'display_name': _(
+        'Maximum number of input files to process'
+        ' (set to 0 to remove this restriction; non-interactive run mode only)'),
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
       'type': 'file_extension',
       'name': 'file_extension',
       'default_value': 'png',
