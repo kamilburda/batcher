@@ -359,7 +359,7 @@ class Previews:
       if len(pathlib.Path(dirpath_).parts) <= 2:
         can_continue = self._warn_on_adding_items(
           _('You are about to add a top-level folder named "{}".'
-            ' Are you sure you want to continue?').format(dirpath))
+            ' Are you sure you want to continue?').format(dirpath_))
 
     def _warn_on_exceeding_file_count_thresholds(path_count_):
       nonlocal warned_on_count_first_threshold
