@@ -422,6 +422,13 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
       'display_name': _('Convert file extension to lowercase'),
       'gui_type': 'check_button',
     },
+    {
+      'type': 'bool',
+      'name': 'use_original_modification_date',
+      'default_value': False,
+      'display_name': _('Use original modification date'),
+      'gui_type': 'check_button',
+    },
   ],
 }
 
@@ -442,6 +449,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5]['items'] = [
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6]['default_value'] = '[image name]'
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][7]['display_name'] = _(
   'Use file extension in layer name')
+del _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][9]
 
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(
   _EXPORT_PROCEDURE_DICT_FOR_CONVERT)
@@ -460,6 +468,7 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5]['items'] = [
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6]['default_value'] = '[image name]'
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
   'Use file extension in layer name')
+del _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][9]
 
 
 _BUILTIN_PROCEDURES_LIST = [

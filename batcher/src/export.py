@@ -52,6 +52,7 @@ def export(
       single_image_name_pattern: Optional[str] = None,
       use_file_extension_in_item_name: bool = False,
       convert_file_extension_to_lowercase: bool = False,
+      use_original_modification_date: bool = False,
 ) -> Generator[None, None, None]:
   if file_format_export_options is None:
     file_format_export_options = {}
@@ -172,7 +173,9 @@ def export(
         file_format_export_options,
         default_file_extension,
         file_extension_properties,
-        overwrite_chooser)
+        overwrite_chooser,
+        use_original_modification_date,
+      )
       
       if export_status == ExportStatuses.USE_DEFAULT_FILE_EXTENSION:
         if batcher.process_names:
@@ -194,7 +197,9 @@ def export(
             file_format_export_options,
             default_file_extension,
             file_extension_properties,
-            overwrite_chooser)
+            overwrite_chooser,
+            use_original_modification_date,
+          )
       
       if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
@@ -355,6 +360,7 @@ def _export_item(
       default_file_extension,
       file_extension_properties,
       overwrite_chooser,
+      use_original_modification_date,
 ):
   output_filepath = _get_item_filepath(item, output_directory)
   file_extension = fileext.get_file_extension(_get_item_export_name(item))
@@ -387,7 +393,9 @@ def _export_item(
       file_format_mode,
       file_format_export_options,
       default_file_extension,
-      file_extension_properties)
+      file_extension_properties,
+      use_original_modification_date,
+    )
     
     if export_status == ExportStatuses.FORCE_INTERACTIVE:
       export_status = _export_item_once_wrapper(
@@ -401,7 +409,9 @@ def _export_item(
         file_format_mode,
         file_format_export_options,
         default_file_extension,
-        file_extension_properties)
+        file_extension_properties,
+        use_original_modification_date,
+      )
   
   return chosen_overwrite_mode, export_status
 
@@ -459,6 +469,7 @@ def _export_item_once_wrapper(
       file_format_export_options,
       default_file_extension,
       file_extension_properties,
+      use_original_modification_date,
 ):
   with batcher.export_context_manager(
          run_mode, image, layer, output_filepath,
@@ -472,7 +483,9 @@ def _export_item_once_wrapper(
       file_format_mode,
       file_format_export_options,
       default_file_extension,
-      file_extension_properties)
+      file_extension_properties,
+      use_original_modification_date,
+    )
   
   return export_status
 
@@ -498,6 +511,7 @@ def _export_item_once(
       file_format_export_options,
       default_file_extension,
       file_extension_properties,
+      use_original_modification_date,
 ):
   def _raise_export_error(exception):
     raise exceptions.ExportError(
@@ -506,11 +520,14 @@ def _export_item_once(
   try:
     _export_image(
       run_mode,
+      item,
       image,
       output_filepath,
       file_extension,
       file_format_mode,
-      file_format_export_options)
+      file_format_export_options,
+      use_original_modification_date,
+    )
   except pg.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
       raise exceptions.BatcherCancelError('cancelled')
@@ -533,11 +550,13 @@ def _export_item_once(
 
 def _export_image(
       run_mode: Gimp.RunMode,
+      item: pg.itemtree.Item,
       image: Gimp.Image,
       filepath: Union[str, Gio.File],
       file_extension: str,
       file_format_mode: str,
       file_format_export_options: Dict,
+      use_original_modification_date: bool,
 ):
   if not isinstance(filepath, Gio.File):
     image_file = Gio.file_new_for_path(filepath)
@@ -554,7 +573,16 @@ def _export_image(
     options=None,
     **kwargs)
 
+  if use_original_modification_date:
+    _set_original_modification_date(item, filepath)
+
   return pdb.last_status
+
+
+def _set_original_modification_date(item, filepath):
+  if isinstance(item, pg.itemtree.ImageFileItem) and os.path.isfile(item.id):
+    orig_filepath_stat = os.stat(item.id)
+    os.utime(filepath, times=(orig_filepath_stat.st_atime, orig_filepath_stat.st_mtime))
 
 
 def get_export_function(
