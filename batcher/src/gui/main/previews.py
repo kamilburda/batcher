@@ -579,7 +579,8 @@ class Previews:
     preview_sensitive_setting.set_value(False)
 
   def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, action_lists):
-    action_lists.display_warnings_and_tooltips_for_actions(self._batcher_for_image_preview)
+    action_lists.display_warnings_and_tooltips_for_actions_and_deactivate_failing_actions(
+      self._batcher_for_image_preview)
 
     if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
         and (update_duration_seconds
@@ -594,7 +595,7 @@ class Previews:
     if self._manage_items:
       self._show_hide_name_preview_placeholder_label()
 
-    action_lists.display_warnings_and_tooltips_for_actions(
+    action_lists.display_warnings_and_tooltips_for_actions_and_deactivate_failing_actions(
       self._batcher_for_name_preview, clear_previous=False)
 
   def _show_hide_name_preview_placeholder_label(self):

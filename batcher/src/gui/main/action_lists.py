@@ -72,8 +72,9 @@ class ActionLists:
   def vbox_constraints(self):
     return self._vbox_constraints
 
-  def display_warnings_and_tooltips_for_actions(self, batcher, clear_previous=True):
-    self.set_warning_on_actions(batcher, clear_previous=clear_previous)
+  def display_warnings_and_tooltips_for_actions_and_deactivate_failing_actions(
+        self, batcher, clear_previous=True):
+    self.set_warnings_and_deactivate_failed_actions(batcher, clear_previous=clear_previous)
 
     self._set_action_skipped_tooltips(
       self._procedure_list,
@@ -87,7 +88,7 @@ class ActionLists:
       _('This constraint is skipped. Reason: {}'),
       clear_previous=clear_previous)
 
-  def set_warning_on_actions(self, batcher, clear_previous=True):
+  def set_warnings_and_deactivate_failed_actions(self, batcher, clear_previous=True):
     action_lists = [self._procedure_list, self._constraint_list]
     failed_actions_dict = [batcher.failed_procedures, batcher.failed_constraints]
 
@@ -101,8 +102,10 @@ class ActionLists:
             failed_actions[action_item.action.name][0][1],
             failed_actions[action_item.action.name][0][2],
             parent=self._dialog)
+
+          action_item.action['enabled'].set_value(False)
         else:
-          if clear_previous:
+          if clear_previous and action_item.action['enabled'].value:
             action_item.set_warning(False)
 
   def reset_action_tooltips_and_indicators(self):

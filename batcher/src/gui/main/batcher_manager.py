@@ -77,7 +77,7 @@ class BatcherManager:
         previews.image_preview.update()
         previews.name_preview.update()
 
-      action_lists.set_warning_on_actions(self._batcher)
+      action_lists.set_warnings_and_deactivate_failed_actions(self._batcher)
 
       self._batcher = None
 

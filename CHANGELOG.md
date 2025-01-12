@@ -2,6 +2,7 @@
 
 * Replaced the placeholder icon in the image preview when there is no selection.
 * When running Batcher non-interactively, the `settings-file` parameter is now a string rather than a `GFile` object for convenience.
+* Procedures and constraints causing errors are now automatically deactivated. This avoids spamming the user with warning dialogs.
 * Fixed warnings issued by GIMP when adding or applying layer effects as custom procedures.
 
 
