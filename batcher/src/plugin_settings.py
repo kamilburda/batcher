@@ -648,7 +648,17 @@ def _show_hide_file_format_export_options(
 
 
 def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value == 'scale':
+  if procedure['orig_name'].value.startswith('scale_for_'):
+    _set_sensitive_for_local_origin(
+      procedure['arguments/object_to_scale'],
+      procedure['arguments/local_origin'],
+    )
+
+    procedure['arguments/object_to_scale'].connect_event(
+      'value-changed',
+      _set_sensitive_for_local_origin,
+      procedure['arguments/local_origin'])
+
     _set_sensitive_for_keep_aspect_ratio(
       procedure['arguments/scale_to_fit'],
       procedure['arguments/keep_aspect_ratio'],
@@ -693,6 +703,10 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/width_unit'],
       procedure['arguments/new_height'],
       procedure['arguments/height_unit'])
+
+
+def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
+  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value == builtin_procedures.LAYER)
 
 
 def _set_sensitive_for_keep_aspect_ratio(scale_to_fit_setting, keep_aspect_ratio_setting):

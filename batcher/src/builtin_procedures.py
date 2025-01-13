@@ -204,6 +204,7 @@ def scale(
       _batcher,
       image,
       layer,
+      object_to_scale,
       new_width,
       width_unit,
       new_height,
@@ -231,7 +232,10 @@ def scale(
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
 
-  layer.scale(processed_width_pixels, processed_height_pixels, local_origin)
+  if object_to_scale == LAYER:
+    layer.scale(processed_width_pixels, processed_height_pixels, local_origin)
+  else:
+    image.scale(processed_width_pixels, processed_height_pixels)
 
   Gimp.context_pop()
 
@@ -316,6 +320,15 @@ _SCALE_DIMENSIONS = (
 ) = (
   'width',
   'height',
+)
+
+
+_SCALE_OBJECTS = (
+  IMAGE,
+  LAYER,
+) = (
+  'image',
+  'layer',
 )
 
 
@@ -469,6 +482,125 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6]['default_value'] = '[imag
 _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
   'Use file extension in layer name')
 del _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][9]
+
+
+_SCALE_PROCEDURE_DICT_FOR_CONVERT = {
+  'name': 'scale_for_convert',
+  'function': scale,
+  'display_name': _('Scale'),
+  'display_options_on_create': True,
+  'additional_tags': [CONVERT_GROUP],
+  'arguments': [
+    {
+      'type': 'placeholder_image',
+      'name': 'image',
+      'display_name': _('Image'),
+    },
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'choice',
+      'name': 'object_to_scale',
+      'default_value': IMAGE,
+      'items': [
+        (IMAGE, _('Image')),
+        (LAYER, _('Layer')),
+      ],
+      'display_name': _('Object to scale'),
+    },
+    {
+      'type': 'double',
+      'name': 'new_width',
+      'default_value': 100.0,
+      'display_name': _('New width'),
+    },
+    {
+      'type': 'choice',
+      'name': 'width_unit',
+      'default_value': PERCENT_IMAGE_WIDTH,
+      'items': [
+        (PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (PIXELS, _('Pixels')),
+      ],
+      'display_name': _('Unit for width'),
+    },
+    {
+      'type': 'double',
+      'name': 'new_height',
+      'default_value': 100.0,
+      'display_name': _('New height'),
+    },
+    {
+      'type': 'choice',
+      'name': 'height_unit',
+      'default_value': PERCENT_IMAGE_HEIGHT,
+      'items': [
+        (PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (PIXELS, _('Pixels')),
+      ],
+      'display_name': _('Unit for height'),
+    },
+    {
+      'type': 'enum',
+      'enum_type': Gimp.InterpolationType,
+      'name': 'interpolation',
+      'display_name': _('Interpolation'),
+    },
+    {
+      'type': 'bool',
+      'name': 'local_origin',
+      'default_value': False,
+      'display_name': _('Use local origin'),
+      'gui_type': 'check_button',
+    },
+    {
+      'type': 'bool',
+      'name': 'scale_to_fit',
+      'default_value': False,
+      'display_name': _('Scale to fit'),
+      'gui_type': 'check_button',
+    },
+    {
+      'type': 'bool',
+      'name': 'keep_aspect_ratio',
+      'default_value': False,
+      'display_name': _('Keep aspect ratio'),
+      'gui_type': 'check_button',
+    },
+    {
+      'type': 'choice',
+      'name': 'dimension_to_keep',
+      'default_value': WIDTH,
+      'items': [
+        (WIDTH, _('Width')),
+        (HEIGHT, _('Height')),
+      ],
+      'display_name': _('Dimension to keep'),
+    },
+  ],
+}
+
+_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS = utils.semi_deep_copy(
+  _SCALE_PROCEDURE_DICT_FOR_CONVERT)
+
+_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS.update({
+  'name': 'scale_for_export_layers_and_edit_layers',
+  'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+})
+_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][2]['default_value'] = LAYER
+_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][4]['default_value'] = (
+  PERCENT_LAYER_WIDTH)
+_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][6]['default_value'] = (
+  PERCENT_LAYER_HEIGHT)
 
 
 _BUILTIN_PROCEDURES_LIST = [
@@ -714,100 +846,8 @@ _BUILTIN_PROCEDURES_LIST = [
       },
     ],
   },
-  {
-    'name': 'scale',
-    'function': scale,
-    'display_name': _('Scale'),
-    'display_options_on_create': True,
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-    'arguments': [
-      {
-        'type': 'placeholder_image',
-        'name': 'image',
-        'display_name': _('Image'),
-      },
-      {
-        'type': 'placeholder_layer',
-        'name': 'layer',
-        'display_name': _('Layer'),
-      },
-      {
-        'type': 'double',
-        'default_value': 100.0,
-        'name': 'new_width',
-        'display_name': _('New width'),
-      },
-      {
-        'type': 'choice',
-        'default_value': PERCENT_LAYER_WIDTH,
-        'name': 'width_unit',
-        'items': [
-          (PERCENT_LAYER_WIDTH, _('% of layer width')),
-          (PERCENT_LAYER_HEIGHT, _('% of layer height')),
-          (PERCENT_IMAGE_WIDTH, _('% of image width')),
-          (PERCENT_IMAGE_HEIGHT, _('% of image height')),
-          (PIXELS, _('Pixels')),
-        ],
-        'display_name': _('Unit for width'),
-      },
-      {
-        'type': 'double',
-        'default_value': 100.0,
-        'name': 'new_height',
-        'display_name': _('New height'),
-      },
-      {
-        'type': 'choice',
-        'default_value': PERCENT_LAYER_HEIGHT,
-        'name': 'height_unit',
-        'items': [
-          (PERCENT_LAYER_WIDTH, _('% of layer width')),
-          (PERCENT_LAYER_HEIGHT, _('% of layer height')),
-          (PERCENT_IMAGE_WIDTH, _('% of image width')),
-          (PERCENT_IMAGE_HEIGHT, _('% of image height')),
-          (PIXELS, _('Pixels')),
-        ],
-        'display_name': _('Unit for height'),
-      },
-      {
-        'type': 'enum',
-        'enum_type': Gimp.InterpolationType,
-        'name': 'interpolation',
-        'display_name': _('Interpolation'),
-      },
-      {
-        'type': 'bool',
-        'name': 'local_origin',
-        'default_value': False,
-        'display_name': _('Use local origin'),
-        'gui_type': 'check_button',
-      },
-      {
-        'type': 'bool',
-        'name': 'scale_to_fit',
-        'default_value': False,
-        'display_name': _('Scale to fit'),
-        'gui_type': 'check_button',
-      },
-      {
-        'type': 'bool',
-        'name': 'keep_aspect_ratio',
-        'default_value': False,
-        'display_name': _('Keep aspect ratio'),
-        'gui_type': 'check_button',
-      },
-      {
-        'type': 'choice',
-        'default_value': WIDTH,
-        'name': 'dimension_to_keep',
-        'items': [
-          (WIDTH, _('Width')),
-          (HEIGHT, _('Height')),
-        ],
-        'display_name': _('Dimension to keep'),
-      },
-    ],
-  },
+  _SCALE_PROCEDURE_DICT_FOR_CONVERT,
+  _SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS,
   {
     'name': 'use_layer_size',
     'function': resize_to_layer_size,

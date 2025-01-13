@@ -1129,6 +1129,50 @@ def _update_to_1_0(data, _settings, procedure_groups):
   if main_settings_list is not None:
     _remove_setting(main_settings_list, 'selected_items')
 
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
+
+        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+        if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
+          procedure_dict['name'] = 'scale_for_export_layers_and_edit_layers'
+          orig_name_setting_dict['value'] = 'scale_for_export_layers_and_edit_layers'
+          orig_name_setting_dict['default_value'] = 'scale_for_export_layers_and_edit_layers'
+
+          arguments_list.insert(
+            2,
+            {
+              'type': 'choice',
+              'name': 'object_to_scale',
+              'default_value': builtin_procedures.LAYER,
+              'value': builtin_procedures.LAYER,
+              'items': [
+                (builtin_procedures.IMAGE, _('Image')),
+                (builtin_procedures.LAYER, _('Layer')),
+              ],
+              'display_name': _('Object to scale'),
+            })
+
+          arguments_list[4]['items'] = [
+            (builtin_procedures.PERCENT_IMAGE_WIDTH, _('% of image width')),
+            (builtin_procedures.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+            (builtin_procedures.PERCENT_LAYER_WIDTH, _('% of layer width')),
+            (builtin_procedures.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+            (builtin_procedures.PIXELS, _('Pixels')),
+          ]
+
+          arguments_list[6]['items'] = [
+            (builtin_procedures.PERCENT_IMAGE_WIDTH, _('% of image width')),
+            (builtin_procedures.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+            (builtin_procedures.PERCENT_LAYER_WIDTH, _('% of layer width')),
+            (builtin_procedures.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+            (builtin_procedures.PIXELS, _('Pixels')),
+          ]
+
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
