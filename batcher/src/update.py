@@ -1121,6 +1121,9 @@ def _replace_field_arguments_in_pattern(
 
 
 def _update_to_1_0(data, _settings, procedure_groups):
+  if not (EXPORT_LAYERS_GROUP in procedure_groups or EDIT_LAYERS_GROUP in procedure_groups):
+    return
+
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
