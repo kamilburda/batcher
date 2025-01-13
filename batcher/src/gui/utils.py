@@ -98,7 +98,7 @@ def _has_setting_display_name(setting):
 
 def image_file_tree_items_to_paths(item_tree: pg.itemtree.ItemTree):
   return [
-    [item.id, item.parent.id] if item.parent is not None else [item.id, None]
+    [item.id, item.orig_parent.id] if item.orig_parent is not None else [item.id, None]
     for item in item_tree.iter_all()]
 
 

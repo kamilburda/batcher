@@ -185,6 +185,15 @@ class Item(metaclass=abc.ABCMeta):
     return self._orig_name
 
   @property
+  def orig_parent(self) -> Union[Item, None]:
+    """The initial value of the ``parent`` attribute of this item.
+
+    Note that this property will not be kept up-to-date if changes to the
+    parents of the underlying object were made externally.
+    """
+    return self._orig_parents[-1] if self._orig_parents else None
+
+  @property
   def orig_parents(self) -> Iterator[Item]:
     """The initial value of the ``parents`` attribute of this item.
 
