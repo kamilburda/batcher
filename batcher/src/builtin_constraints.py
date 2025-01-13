@@ -150,7 +150,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level items" when translating this
     'display_name': _('Top-level'),
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'visible',
