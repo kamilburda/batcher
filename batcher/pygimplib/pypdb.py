@@ -62,7 +62,13 @@ class _PyPDB:
 
     proc_name = self._process_procedure_name(name)
 
-    return self._gimp_pdb_procedure_exists(proc_name) or self._gegl_operation_exists(proc_name)
+    if proc_name not in self._proc_cache:
+      try:
+        self._proc_cache[proc_name] = self._create_proc(proc_name)
+      except AttributeError:
+        return False
+
+    return proc_name in self._proc_cache
 
   @staticmethod
   def list_all_gegl_operations():
