@@ -6,6 +6,7 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src import file_formats as file_formats_
 from src.path import fileext
 from src.procedure_groups import *
 
@@ -24,6 +25,14 @@ def has_matching_file_extension(item, _batcher, file_extension):
 
 def has_matching_default_file_extension(item, layer_batcher):
   return fileext.get_file_extension(item.name).lower() == layer_batcher.file_extension.lower()
+
+
+def has_recognized_file_format(item, _image_batcher):
+  file_extension = fileext.get_file_extension(item.name).lower()
+  return (
+    file_extension in file_formats_.FILE_FORMATS_DICT
+    and file_formats_.FILE_FORMATS_DICT[file_extension].has_import_proc()
+  )
 
 
 def is_item_in_items_selected_in_gimp(item, _layer_batcher):
@@ -135,6 +144,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  },
+  {
+    'name': 'recognized_file_format',
+    'type': 'constraint',
+    'function': has_recognized_file_format,
+    # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
+    'display_name': _('Recognized file format'),
+    'additional_tags': [CONVERT_GROUP],
   },
   {
     'name': 'selected_in_gimp',
