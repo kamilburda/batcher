@@ -6,12 +6,12 @@ from src import file_formats as file_formats_
 def get_file_extension(filename: str) -> str:
   """Returns the file extension from ``filename``.
   
-  If ``filename`` has no file extension, return an empty string.
+  If ``filename`` has no file extension, an empty string is returned.
   
   If ``filename`` has multiple periods, it is checked against
   `file_formats.FILE_FORMATS_DICT` for a matching file extension containing
-  periods. If there is no such extension, return the substring after the last
-  period.
+  periods. If there is no such extension, the substring after the last period
+  is returned.
   """
   if '.' not in filename:
     return ''
