@@ -145,14 +145,30 @@ def create_settings_for_convert():
 
   settings.add([gui_settings])
 
+  remove_folder_structure_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['remove_folder_structure'])
+  remove_folder_structure_procedure_dict['enabled'] = False
+  remove_folder_structure_procedure_dict['display_options_on_create'] = False
+
+  scale_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['scale_for_convert'])
+  scale_procedure_dict['enabled'] = False
+  scale_procedure_dict['display_options_on_create'] = False
+
   settings['main'].add([
     actions_.create(
-      name='procedures'),
+      name='procedures',
+      initial_actions=[
+        remove_folder_structure_procedure_dict,
+        scale_procedure_dict,
+      ]),
   ])
 
   settings['main'].add([
     actions_.create(
-      name='constraints'),
+      name='constraints',
+      initial_actions=[
+        builtin_constraints.BUILTIN_CONSTRAINTS['recognized_file_format']]),
   ])
 
   _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
