@@ -542,9 +542,11 @@ def _replace(
       count = int(count_and_flags[0])
     except ValueError:
       pass
-  
+
   for flag_name in count_and_flags[1:]:
-    flags |= getattr(re, flag_name.upper())
+    processed_flag_name = flag_name.upper()
+    if processed_flag_name in re.RegexFlag.__members__:
+      flags |= getattr(re, flag_name.upper())
   
   return re.sub(pattern, replacement, str_to_process, count=count, flags=flags)
 
