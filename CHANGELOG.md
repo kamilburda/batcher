@@ -1,9 +1,16 @@
 ## Upcoming
 
-* For the Scale procedure, you may now choose whether to scale a layer (the default for Export Layers and Edit Layers) or the entire image (a new option, the default for Batch Convert).
-* Replaced the placeholder icon in the image preview when there is no selection.
-* When running Batcher non-interactively, the `settings-file` parameter is now a string rather than a `GFile` object for convenience.
+Changes to procedures and constraints:
+* For the `Scale` procedure, you may now choose whether to scale a layer (the default for Export Layers and Edit Layers) or the entire image (a new option, the default for Batch Convert).
 * Procedures and constraints causing errors are now automatically deactivated. This avoids spamming the user with warning dialogs.
+
+User interface changes:
+* Replaced the placeholder icon in the image preview when there is no selection.
+
+Other changes:
+* When running Batcher non-interactively, the `settings-file` parameter is now a string rather than a `GFile` object for convenience.
+
+Bug fixes:
 * Fixed warnings issued by GIMP when adding or applying layer effects as custom procedures.
 
 
