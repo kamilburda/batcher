@@ -498,7 +498,9 @@ Processes only layers that are not inserted as foreground via `Insert foreground
 
 **Matching file extension**
 
-Processes only layers having a file extension matching the extension typed in the text entry.
+Processes only layers having a file extension matching the specified extension.
+
+If you check `Use default file extension`, the file extension typed in the main dialog will be used instead.
 
 **Selected in GIMP**
 

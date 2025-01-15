@@ -2,6 +2,7 @@
 
 Changes to procedures and constraints:
 * For the `Scale` procedure, you may now choose whether to scale a layer (the default for Export Layers and Edit Layers) or the entire image (a new option, the default for Batch Convert).
+* The `Matching file extension` constraint now allows customizing the file extension.
 * Procedures and constraints causing errors are now automatically deactivated. This avoids spamming the user with warning dialogs.
 
 User interface changes:
