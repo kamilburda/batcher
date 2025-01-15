@@ -58,7 +58,7 @@ def export(
     file_format_export_options = {}
 
   item_uniquifier = uniquifier.ItemUniquifier()
-  file_extension_properties = _FileExtensionProperties()
+  file_extension_properties = _FileExtensionProperties('export')
   processed_parents = set()
   default_file_extension = file_extension
   image_copies = []
@@ -603,7 +603,7 @@ def get_export_function(
   if (file_format_mode == FileFormatModes.USE_EXPLICIT_VALUES
       and file_extension in file_formats_.FILE_FORMATS_DICT):
     file_format = file_formats_.FILE_FORMATS_DICT[file_extension]
-    if file_format.export_procedure_name:
+    if file_format.has_export_proc():
       file_format_option_kwargs = file_formats_.fill_and_get_file_format_options_as_kwargs(
         file_format_export_options, file_extension, 'export')
 
@@ -651,10 +651,21 @@ class _FileExtensionProperties:
   
   File extension as a key is always converted to lowercase.
   """
-  def __init__(self):
+  def __init__(self, import_or_export):
+    if import_or_export not in ['import', 'export']:
+      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+    self._import_or_export = import_or_export
+
     self._properties = collections.defaultdict(_FileExtension)
-    
+
     for file_format in file_formats_.FILE_FORMATS:
+      if self._import_or_export == 'import' and not file_format.has_import_proc():
+        continue
+
+      if self._import_or_export == 'export' and not file_format.has_export_proc():
+        continue
+
       # This ensures that the file format dialog will be displayed only once per
       # file format if multiple file extensions for the same format are used
       # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).

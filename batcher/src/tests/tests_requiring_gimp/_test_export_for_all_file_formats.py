@@ -7,6 +7,9 @@ from src import utils as utils_
 
 def test_export_for_all_file_formats(batcher, settings, output_dirpath):
   for file_format in file_formats_.FILE_FORMATS:
+    if not file_format.has_export_proc():
+      continue
+
     for file_extension in file_format.file_extensions:
       try:
         batcher.run(

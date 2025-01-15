@@ -494,7 +494,7 @@ class FileExtensionEntry(ExtendedEntry):
   _COLUMNS = [_COLUMN_DESCRIPTION, _COLUMN_EXTENSIONS] = (0, 1)
   _COLUMN_TYPES = [GObject.TYPE_STRING, GObject.TYPE_STRV]
   
-  def __init__(self, **kwargs):
+  def __init__(self, import_or_export='export', **kwargs):
     """Initializes a `FileExtensionEntry` instance.
 
     Args:
@@ -502,6 +502,8 @@ class FileExtensionEntry(ExtendedEntry):
         Additional keyword arguments that can be passed to the parent class'
         `__init__()` method.
     """
+    self._import_or_export = import_or_export
+
     super().__init__(**kwargs)
 
     self._tree_view_columns_rects = []
@@ -810,11 +812,15 @@ class FileExtensionEntry(ExtendedEntry):
         self._is_modifying_highlight = False
         self._highlighted_extension = ''
 
-  @staticmethod
-  def _get_file_formats(file_formats):
+  def _get_file_formats(self, file_formats):
+    def has_file_procedure(file_format):
+      return (
+        file_format.has_export_proc()
+        if self._import_or_export == 'export' else file_format.has_import_proc())
+
     return sorted(
-      ([file_format.get_description('export'), file_format.file_extensions]
-       for file_format in file_formats if file_format.is_export_installed()),
+      ([file_format.get_description(self._import_or_export), file_format.file_extensions]
+       for file_format in file_formats if has_file_procedure(file_format)),
       key=lambda item: item[0].lower())
   
   @staticmethod

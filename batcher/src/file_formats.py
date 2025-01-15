@@ -17,7 +17,7 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
 
   if (processed_file_format is None
       or processed_file_format in file_format_options
-      or processed_file_format not in FILE_FORMATS_DICT):
+      or not file_format_procedure_exists(processed_file_format, import_or_export)):
     return
 
   if import_or_export == 'import':
@@ -28,9 +28,6 @@ def fill_file_format_options(file_format_options, file_format, import_or_export)
     common_arguments = _COMMON_PDB_ARGUMENTS_FOR_FILE_EXPORT
   else:
     raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
-  if pdb_proc_name is None or pdb_proc_name not in pdb:
-    return
 
   _pdb_proc, _pdb_proc_name, file_format_options_list = (
     settings_from_pdb_.get_setting_data_from_pdb_procedure(pdb_proc_name))
@@ -93,13 +90,11 @@ def file_format_procedure_exists(file_format, import_or_export):
     return False
 
   if import_or_export == 'import':
-    pdb_proc_name = FILE_FORMATS_DICT[file_format].import_procedure_name
+    return FILE_FORMATS_DICT[file_format].has_import_proc()
   elif import_or_export == 'export':
-    pdb_proc_name = FILE_FORMATS_DICT[file_format].export_procedure_name
+    return FILE_FORMATS_DICT[file_format].has_export_proc()
   else:
     raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
-  return pdb_proc_name in pdb
 
 
 class _FileFormat:
@@ -162,27 +157,21 @@ class _FileFormat:
       else:
         return _('{} image').format(self.file_extensions[0].upper())
 
-  def is_import_installed(self):
-    return self._is_import_proc_builtin() or self.import_procedure_name in pdb
-
-  def _is_import_proc_builtin(self):
-    return self.import_procedure_name is None
-
-  def is_export_installed(self):
-    return self._is_export_proc_builtin() or self.export_procedure_name in pdb
-
-  def _is_export_proc_builtin(self):
-    return self.export_procedure_name is None
+  def has_import_proc(self):
+    return self.import_procedure_name in pdb
 
   def get_import_func(self):
     if self._import_func is None:
-      return getattr(pdb, self.import_procedure_name)
+      return pdb[self.import_procedure_name]
     else:
       return self._import_func
 
+  def has_export_proc(self):
+    return self.export_procedure_name in pdb
+
   def get_export_func(self):
     if self._export_func is None:
-      return getattr(pdb, self.export_procedure_name)
+      return pdb[self.export_procedure_name]
     else:
       return self._export_func
 
