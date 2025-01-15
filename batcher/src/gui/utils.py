@@ -49,6 +49,11 @@ def attach_label_to_grid(
   else:
     label.set_text(setting.name)
 
+  label.set_sensitive(setting.gui.get_sensitive())
+
+  setting.connect_event(
+    'gui-sensitive-changed', lambda _setting: label.set_sensitive(setting.gui.get_sensitive()))
+
   grid.attach(label, column_index, row_index, width, height)
 
 
