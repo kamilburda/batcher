@@ -178,7 +178,8 @@ class ActionLists:
 
     _set_up_existing_export_procedures(self._procedure_list)
     self._procedure_list.actions.connect_event(
-      'after-load', lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
+      'after-load',
+      lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
 
     _set_up_existing_insert_back_foreground_and_related_actions(
       self._procedure_list, self._constraint_list)
