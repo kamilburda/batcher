@@ -177,9 +177,6 @@ def create_settings_for_convert():
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
-  settings['main/constraints'].connect_event(
-    'after-add-action', _on_after_add_matching_file_extension_constraint)
-
   return settings
 
 
@@ -317,9 +314,6 @@ def create_settings_for_export_layers():
     _on_after_add_insert_background_foreground,
     settings['main/tagged_items'],
   )
-
-  settings['main/constraints'].connect_event(
-    'after-add-action', _on_after_add_matching_file_extension_constraint)
 
   return settings
 
@@ -777,22 +771,3 @@ def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
   _on_tagged_items_changed(tagged_items_setting, procedure)
 
   tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
-
-
-def _on_after_add_matching_file_extension_constraint(
-      _constraints, constraint, _orig_constraint_dict):
-  if constraint['orig_name'].value == 'matching_file_extension':
-    _set_sensitive_for_file_extension(
-      constraint['arguments/use_default_file_extension'],
-      constraint['arguments/file_extension'],
-    )
-
-    constraint['arguments/use_default_file_extension'].connect_event(
-      'value-changed',
-      _set_sensitive_for_file_extension,
-      constraint['arguments/file_extension'])
-
-
-def _set_sensitive_for_file_extension(
-      use_default_file_extension_setting, file_extension_setting):
-  file_extension_setting.gui.set_sensitive(not use_default_file_extension_setting.value)

@@ -19,13 +19,12 @@ def is_nonempty_group(item, _layer_batcher):
   return item.type == pg.itemtree.TYPE_GROUP and item.raw.get_children()
 
 
-def has_matching_file_extension(item, batcher, use_default_file_extension, file_extension):
-  current_file_extension = fileext.get_file_extension(item.name).lower()
+def has_matching_file_extension(item, batcher):
+  return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
-  if not use_default_file_extension:
-    return current_file_extension == file_extension.lower()
+
+
   else:
-    return current_file_extension == batcher.file_extension.lower()
 
 
 def has_recognized_file_format(item, _image_batcher):
@@ -146,19 +145,11 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'display_name': _('Matching file extension'),
     'arguments': [
       {
-        'type': 'bool',
-        'name': 'use_default_file_extension',
-        'display_name': _('Use default file extension'),
-        'default_value': False,
       },
       {
         'type': 'string',
-        'name': 'file_extension',
-        'display_name': _('File extension'),
-        'default_value': 'png',
       },
     ],
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'recognized_file_format',

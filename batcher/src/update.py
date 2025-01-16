@@ -1173,34 +1173,6 @@ def _update_to_1_0(data, _settings, procedure_groups):
             (builtin_procedures.PIXELS, _('Pixels')),
           ]
 
-    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
-
-    if constraints_list is not None:
-      for constraint_dict in constraints_list:
-        constraint_list = constraint_dict['settings']
-
-        orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
-
-        if (orig_name_setting_dict['default_value'] == 'matching_file_extension'
-            and arguments_list is not None):
-          arguments_list.extend([
-            {
-              'type': 'bool',
-              'name': 'use_default_file_extension',
-              'display_name': _('Use default file extension'),
-              # The default is `False`, but the previous behavior allowed only
-              # the default extension, so we retain that behavior when updating.
-              'default_value': True,
-            },
-            {
-              'type': 'string',
-              'name': 'file_extension',
-              'display_name': _('File extension'),
-              'default_value': 'png',
-            },
-          ])
-
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
