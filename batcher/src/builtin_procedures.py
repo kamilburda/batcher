@@ -510,8 +510,8 @@ _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
 del _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][9]
 
 
-_SCALE_PROCEDURE_DICT_FOR_CONVERT = {
-  'name': 'scale_for_convert',
+_SCALE_PROCEDURE_DICT_FOR_IMAGES = {
+  'name': 'scale_for_images',
   'function': scale,
   'display_name': _('Scale'),
   'display_options_on_create': True,
@@ -615,18 +615,15 @@ _SCALE_PROCEDURE_DICT_FOR_CONVERT = {
   ],
 }
 
-_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS = utils.semi_deep_copy(
-  _SCALE_PROCEDURE_DICT_FOR_CONVERT)
+_SCALE_PROCEDURE_DICT_FOR_LAYERS = utils.semi_deep_copy(_SCALE_PROCEDURE_DICT_FOR_IMAGES)
 
-_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS.update({
-  'name': 'scale_for_export_layers_and_edit_layers',
+_SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
+  'name': 'scale_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][2]['default_value'] = LAYER
-_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][4]['default_value'] = (
-  PERCENT_LAYER_WIDTH)
-_SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS['arguments'][6]['default_value'] = (
-  PERCENT_LAYER_HEIGHT)
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = LAYER
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = PERCENT_LAYER_WIDTH
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = PERCENT_LAYER_HEIGHT
 
 
 _BUILTIN_PROCEDURES_LIST = [
@@ -906,8 +903,8 @@ _BUILTIN_PROCEDURES_LIST = [
       },
     ],
   },
-  _SCALE_PROCEDURE_DICT_FOR_CONVERT,
-  _SCALE_PROCEDURE_DICT_FOR_EXPORT_LAYERS_AND_EDIT_LAYERS,
+  _SCALE_PROCEDURE_DICT_FOR_IMAGES,
+  _SCALE_PROCEDURE_DICT_FOR_LAYERS,
   {
     'name': 'resize_to_layer_size',
     'function': resize_to_layer_size,

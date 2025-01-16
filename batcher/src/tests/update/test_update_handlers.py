@@ -267,29 +267,25 @@ class TestUpdateHandlers(unittest.TestCase):
       self.settings['main/procedures/insert_background_2/arguments/tagged_items'].value, [])
 
     self.assertIsInstance(
-      self.settings['main/procedures/scale_for_export_layers_and_edit_layers/arguments/new_width'],
+      self.settings['main/procedures/scale_for_layers/arguments/new_width'],
       pg.setting.DoubleSetting)
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/new_width'].gui_type,
+      self.settings['main/procedures/scale_for_layers/arguments/new_width'].gui_type,
       pg.setting.DoubleSpinButtonPresenter)
 
     self.assertIsInstance(
-      self.settings['main/procedures/scale_for_export_layers_and_edit_layers/arguments/new_height'],
+      self.settings['main/procedures/scale_for_layers/arguments/new_height'],
       pg.setting.DoubleSetting)
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/new_height'].gui_type,
+      self.settings['main/procedures/scale_for_layers/arguments/new_height'].gui_type,
       pg.setting.DoubleSpinButtonPresenter)
 
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/width_unit'].value,
+      self.settings['main/procedures/scale_for_layers/arguments/width_unit'].value,
       'percentage_of_layer_width')
 
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/height_unit'].value,
+      self.settings['main/procedures/scale_for_layers/arguments/height_unit'].value,
       'percentage_of_layer_height')
 
     self.assertNotIn(
@@ -317,19 +313,13 @@ class TestUpdateHandlers(unittest.TestCase):
 
   def _assert_correct_contents_for_update_to_0_7(self):
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/scale_to_fit'
-      ].value,
+      self.settings['main/procedures/scale_for_layers/arguments/scale_to_fit'].value,
       False)
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/keep_aspect_ratio'
-      ].value,
+      self.settings['main/procedures/scale_for_layers/arguments/keep_aspect_ratio'].value,
       False)
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/dimension_to_keep'
-      ].value,
+      self.settings['main/procedures/scale_for_layers/arguments/dimension_to_keep'].value,
       'width')
 
   def _assert_correct_contents_for_update_to_0_8(self):
@@ -353,16 +343,14 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('selected_items', self.settings['gui'])
 
     self.assertNotIn('scale', self.settings['main/procedures'])
-    self.assertIn('scale_for_export_layers_and_edit_layers', self.settings['main/procedures'])
+    self.assertIn('scale_for_layers', self.settings['main/procedures'])
 
     self.assertEqual(
-      list(
-        self.settings['main/procedures/scale_for_export_layers_and_edit_layers/arguments'])[2].name,
+      list(self.settings['main/procedures/scale_for_layers/arguments'])[2].name,
       'object_to_scale',
     )
     self.assertEqual(
-      self.settings[
-        'main/procedures/scale_for_export_layers_and_edit_layers/arguments/object_to_scale'].value,
+      self.settings['main/procedures/scale_for_layers/arguments/object_to_scale'].value,
       builtin_procedures.LAYER,
     )
 

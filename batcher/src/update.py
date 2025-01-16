@@ -1139,9 +1139,9 @@ def _update_to_1_0(data, _settings, procedure_groups):
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
         if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
-          procedure_dict['name'] = 'scale_for_export_layers_and_edit_layers'
-          orig_name_setting_dict['value'] = 'scale_for_export_layers_and_edit_layers'
-          orig_name_setting_dict['default_value'] = 'scale_for_export_layers_and_edit_layers'
+          procedure_dict['name'] = 'scale_for_layers'
+          orig_name_setting_dict['value'] = 'scale_for_layers'
+          orig_name_setting_dict['default_value'] = 'scale_for_layers'
 
           arguments_list.insert(
             2,

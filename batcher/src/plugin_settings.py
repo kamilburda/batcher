@@ -151,7 +151,7 @@ def create_settings_for_convert():
   remove_folder_structure_procedure_dict['display_options_on_create'] = False
 
   scale_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['scale_for_convert'])
+    builtin_procedures.BUILTIN_PROCEDURES['scale_for_images'])
   scale_procedure_dict['enabled'] = False
   scale_procedure_dict['display_options_on_create'] = False
 
