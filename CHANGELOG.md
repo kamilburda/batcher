@@ -2,6 +2,7 @@
 
 Changes to procedures and constraints:
 * For the `Scale` procedure, you may now choose whether to scale a layer (the default for Export Layers and Edit Layers) or the entire image (a new option, the default for Batch Convert).
+* Introduced `Merge filters` as a built-in procedure that merges all visible filters (layer effects) in the specified layer. This is equivalent to adding the `gimp-drawable-merge-filters` procedure, only more convenient.
 * Introduced a new constraint `Matching text...` that allows filtering items that start with, contain or end with the specified text. You may also specify a Python regular expression or perform case-insensitive matching. The name of the constraint automatically changes as you adjust its options.
 * Procedures and constraints causing errors are now automatically deactivated. This avoids spamming the user with warning dialogs.
 

@@ -111,6 +111,10 @@ def preserve_layer_locks_between_actions(layer_batcher):
       item.raw.set_lock_alpha(lock_alpha)
 
 
+def merge_filters(_batcher, layer):
+  layer.merge_filters()
+
+
 def remove_folder_structure_from_item(batcher):
   item = batcher.current_item
 
@@ -732,6 +736,20 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'last_enabled_value',
         'default_value': True,
         'gui_type': None,
+      },
+    ],
+  },
+  {
+    'name': 'merge_filters',
+    'function': merge_filters,
+    'display_name': _('Merge filters'),
+    'description': _('Merges all visible filters (layer effects) in the specified layer.'),
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'arguments': [
+      {
+        'type': 'placeholder_layer',
+        'name': 'layer',
+        'display_name': _('Layer'),
       },
     ],
   },

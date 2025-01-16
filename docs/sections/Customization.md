@@ -402,6 +402,10 @@ Merges an already inserted foreground layer (via `Insert foreground`, see above)
 
 For more information, see `Merge background` above.
 
+**Merge filters**
+
+Merges all visible filters (layer effects) in the specified layer.
+
 **Remove folder structure**
 
 Exports all layers to the output folder on the same level, i.e. subfolders for group layers are not created.
