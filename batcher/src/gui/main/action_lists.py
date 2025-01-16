@@ -187,6 +187,17 @@ class ActionLists:
     self._constraint_list.actions.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_actions_on_load)
 
+    self._constraint_list.connect(
+      'action-list-item-added-interactive',
+      _on_constraint_item_added,
+      self._settings,
+    )
+
+    _set_up_existing_matching_text_constraints(self._constraint_list)
+    self._constraint_list.actions.connect_event(
+      'after-load',
+      lambda _constraints: _set_up_existing_matching_text_constraints(self._constraint_list))
+
   def _set_up_existing_insert_back_foreground_and_related_actions_on_load(self, _actions):
     if self._procedures_or_constraints_loaded:
       _set_up_existing_insert_back_foreground_and_related_actions(
@@ -459,3 +470,77 @@ def _copy_setting_values_from_default_export_procedure(main_settings, export_pro
 
 def _set_buttons_for_action_item_sensitive(item, sensitive):
   item.button_remove.set_sensitive(sensitive)
+
+
+def _on_constraint_item_added(_constraint_list, item, _settings):
+  if item.action['orig_name'].value == 'matching_text':
+    _handle_matching_text_constraint_item_added(item)
+
+
+def _set_up_existing_matching_text_constraints(constraint_list: action_list_.ActionList):
+  for item in constraint_list.items:
+    if item.action['orig_name'].value == 'matching_text':
+      _handle_matching_text_constraint_item_added(item)
+
+
+def _handle_matching_text_constraint_item_added(item):
+  _set_display_name_for_matching_text_constraint(
+    item.action['arguments/match_mode'],
+    item.action['arguments/text'],
+    item.action['arguments/ignore_case_sensitivity'],
+    item.action)
+
+  item.action['arguments/match_mode'].connect_event(
+    'value-changed',
+    _set_display_name_for_matching_text_constraint,
+    item.action['arguments/text'],
+    item.action['arguments/ignore_case_sensitivity'],
+    item.action)
+
+  item.action['arguments/text'].connect_event(
+    'value-changed',
+    lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, constraint: (
+      _set_display_name_for_matching_text_constraint(
+        match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint)),
+    item.action['arguments/match_mode'],
+    item.action['arguments/ignore_case_sensitivity'],
+    item.action)
+
+  item.action['arguments/ignore_case_sensitivity'].connect_event(
+    'value-changed',
+    lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, constraint: (
+      _set_display_name_for_matching_text_constraint(
+        match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint)),
+    item.action['arguments/match_mode'],
+    item.action['arguments/text'],
+    item.action)
+
+
+def _set_display_name_for_matching_text_constraint(
+      match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint):
+  display_name = None
+
+  if match_mode_setting.value == builtin_constraints.STARTS_WITH:
+    if text_setting.value:
+      display_name = _('Starting with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Starting with any text')
+  elif match_mode_setting.value == builtin_constraints.CONTAINS:
+    if text_setting.value:
+      display_name = _('Containing "{}"').format(text_setting.value)
+    else:
+      display_name = _('Containing any text')
+  elif match_mode_setting.value == builtin_constraints.ENDS_WITH:
+    if text_setting.value:
+      display_name = _('Ending with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Ending with any text')
+  elif match_mode_setting.value == builtin_constraints.REGEX:
+    display_name = _('Matching pattern "{}"').format(text_setting.value)
+
+  if display_name is not None:
+    if ignore_case_sensitivity_setting.value:
+      # FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+      display_name += _(' (case-insensitive)')
+
+    constraint['display_name'].set_value(display_name)

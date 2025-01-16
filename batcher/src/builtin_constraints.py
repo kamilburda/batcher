@@ -1,5 +1,7 @@
 """Built-in plug-in constraints."""
 
+import re
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -23,8 +25,32 @@ def has_matching_file_extension(item, batcher):
   return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
 
+def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
+  if not text:
+    return True
 
+  if ignore_case_sensitivity:
+    processed_item_name = item.name.lower()
+    processed_text = text.lower()
   else:
+    processed_item_name = item.name
+    processed_text = text
+
+  if match_mode == STARTS_WITH:
+    return processed_item_name.startswith(processed_text)
+  elif match_mode == CONTAINS:
+    return processed_text in processed_item_name
+  elif match_mode == ENDS_WITH:
+    return processed_item_name.endswith(processed_text)
+  elif match_mode == REGEX:
+    try:
+      match = re.search(processed_text, processed_item_name)
+    except re.error:
+      return False
+    else:
+      return match is not None
+  else:
+    raise ValueError(f'unrecognized match mode; must be one of: {", ".join(_MATCH_MODES)}')
 
 
 def has_recognized_file_format(item, _image_batcher):
@@ -70,6 +96,19 @@ def has_no_color_tag(item, _layer_batcher, color_tag, *_args, **_kwargs):
 
 def has_no_color_tags(item, _layer_batcher, color_tags=None):
   return not has_color_tags(item, _layer_batcher, color_tags)
+
+
+_MATCH_MODES = (
+  STARTS_WITH,
+  CONTAINS,
+  ENDS_WITH,
+  REGEX,
+) = (
+  'starts_with',
+  'contains',
+  'ends_with',
+  'regex',
+)
 
 
 _BUILTIN_CONSTRAINTS_LIST = [
@@ -143,11 +182,40 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  },
+  {
+    'name': 'matching_text',
+    'type': 'constraint',
+    'function': is_matching_text,
+    # FOR TRANSLATORS: Think of "Only items matching text" when translating this
+    'display_name': _('Matching text...'),
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'display_options_on_create': True,
     'arguments': [
       {
+        'type': 'choice',
+        'name': 'match_mode',
+        'default_value': CONTAINS,
+        'items': [
+          (STARTS_WITH, _('Starts with text')),
+          (CONTAINS, _('Contains text')),
+          (ENDS_WITH, _('Ends with text')),
+          (REGEX, _('Matches regular expression')),
+        ],
+        'display_name': _('How to perform matching'),
       },
       {
         'type': 'string',
+        'name': 'text',
+        'default_value': 'image',
+        'display_name': _('Text to match'),
+      },
+      {
+        'type': 'bool',
+        'name': 'ignore_case_sensitivity',
+        'default_value': False,
+        'display_name': _('Ignore case sensitivity'),
       },
     ],
   },

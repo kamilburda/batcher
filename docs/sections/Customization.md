@@ -500,6 +500,15 @@ Processes only layers that are not inserted as foreground via `Insert foreground
 
 Processes only layers having the file extension typed in the main dialog.
 
+**Matching text...**
+
+Processes only images or layers matching the specified text.
+
+You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching file extension` constraint).
+
+Matching can be made case-insensitive by checking the *Ignore case sensitivity* option.
+
+You can also specify a regular expression pattern as defined in the [`re` module for Python](https://docs.python.org/3/library/re.html). Errors in the regular expression pattern will result in no matches.
 
 **Selected in GIMP**
 
