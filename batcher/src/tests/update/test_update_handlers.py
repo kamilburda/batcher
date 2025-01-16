@@ -365,3 +365,7 @@ class TestUpdateHandlers(unittest.TestCase):
         'main/procedures/scale_for_export_layers_and_edit_layers/arguments/object_to_scale'].value,
       builtin_procedures.LAYER,
     )
+
+    self.assertNotIn('use_layer_size', self.settings['main/procedures'])
+    self.assertIn('resize_to_layer_size', self.settings['main/procedures'])
+    self.assertIn('layers', self.settings['main/procedures/resize_to_layer_size/arguments'])

@@ -386,75 +386,75 @@ class TestLoadSaveFromSettingsAndGroups(unittest.TestCase):
   def test_load_save_setting(self, *mocks):
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['advanced/flatten'].set_value(True)
-    self.settings['advanced/use_layer_size'].set_value(True)
+    self.settings['advanced/resize_to_layer_size'].set_value(True)
     
     self.settings['main/file_extension'].save()
     
     self.settings['main/file_extension'].reset()
     self.settings['advanced/flatten'].reset()
-    self.settings['advanced/use_layer_size'].reset()
+    self.settings['advanced/resize_to_layer_size'].reset()
     
     self.settings['main/file_extension'].load()
     
     self.assertEqual(self.settings['main/file_extension'].value, 'jpg')
     self.assertEqual(self.settings['advanced/flatten'].value, False)
-    self.assertEqual(self.settings['advanced/use_layer_size'].value, False)
+    self.assertEqual(self.settings['advanced/resize_to_layer_size'].value, False)
   
   def test_load_setting_has_no_effect_if_setting_has_ignore_tag(self, *mocks):
     self.settings['main/file_extension'].tags.add('ignore_load')
     
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['advanced/flatten'].set_value(True)
-    self.settings['advanced/use_layer_size'].set_value(True)
+    self.settings['advanced/resize_to_layer_size'].set_value(True)
     
     self.settings['main/file_extension'].save()
     
     self.settings['main/file_extension'].reset()
     self.settings['advanced/flatten'].reset()
-    self.settings['advanced/use_layer_size'].reset()
+    self.settings['advanced/resize_to_layer_size'].reset()
     
     self.settings['main/file_extension'].load()
     
     self.assertEqual(self.settings['main/file_extension'].value, 'png')
     self.assertEqual(self.settings['advanced/flatten'].value, False)
-    self.assertEqual(self.settings['advanced/use_layer_size'].value, False)
+    self.assertEqual(self.settings['advanced/resize_to_layer_size'].value, False)
   
   def test_load_save_group(self, *mocks):
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['advanced/flatten'].set_value(True)
-    self.settings['advanced/use_layer_size'].set_value(True)
+    self.settings['advanced/resize_to_layer_size'].set_value(True)
     
     self.settings['advanced'].save()
 
     self.settings['main/file_extension'].reset()
     self.settings['advanced/flatten'].reset()
-    self.settings['advanced/use_layer_size'].reset()
+    self.settings['advanced/resize_to_layer_size'].reset()
 
     self.settings['advanced'].load()
     
     self.assertEqual(self.settings['main/file_extension'].value, 'png')
     # 'advanced/flatten' value must not be loaded
     self.assertEqual(self.settings['advanced/flatten'].value, False)
-    self.assertEqual(self.settings['advanced/use_layer_size'].value, True)
+    self.assertEqual(self.settings['advanced/resize_to_layer_size'].value, True)
   
   def test_load_group_has_no_effect_if_group_has_ignore_tag(self, *mocks):
     self.settings['advanced'].tags.add('ignore_load')
     
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['advanced/flatten'].set_value(True)
-    self.settings['advanced/use_layer_size'].set_value(True)
+    self.settings['advanced/resize_to_layer_size'].set_value(True)
     
     self.settings['advanced'].save()
     
     self.settings['main/file_extension'].reset()
     self.settings['advanced/flatten'].reset()
-    self.settings['advanced/use_layer_size'].reset()
+    self.settings['advanced/resize_to_layer_size'].reset()
     
     self.settings['advanced'].load()
     
     self.assertEqual(self.settings['main/file_extension'].value, 'png')
     self.assertEqual(self.settings['advanced/flatten'].value, False)
-    self.assertEqual(self.settings['advanced/use_layer_size'].value, False)
+    self.assertEqual(self.settings['advanced/resize_to_layer_size'].value, False)
 
 
 @mock.patch(

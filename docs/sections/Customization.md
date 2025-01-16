@@ -12,7 +12,7 @@ As the amount of customization may be overwhelming at first, you may want to tak
 
 **I want to export all layers using the image size, not the layer size.**
 
-Uncheck or remove the `Use layer size` procedure.
+Uncheck or remove the `Resize to layer size` procedure.
 
 
 **I want to export only visible layers.**
@@ -63,7 +63,7 @@ Yes! You may insert any GIMP filter as a procedure:
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
 2. Add the `Insert background` procedure and adjust the color tag as necessary.
-3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Use layer size` by dragging it onto `Use layer size`.
+3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
 4. (optional) You can adjust how the background is merged with each layer by setting the merge type in the `Merge background` procedure that was added automatically.
 
 
@@ -74,7 +74,7 @@ While multipage PDF export is already possible in GIMP without any third-party p
 1. Select or type `pdf` as the file extension.
 2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
 3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
-4. You may want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
+4. You may want to uncheck the `Resize to layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 
 **I want to be able to export to multiple file formats at once.**
@@ -365,8 +365,8 @@ The _blue_ color tag is used as background by default.
 You may set a different color tag representing the background layers by adjusting the `Color tag` option.
 
 This procedure is inserted at the first position.
-This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
-If this is your intention, you can always move this procedure below `Use layer size`.
+This prevents potential confusion when `Resize to layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
+If this is your intention, you can always move this procedure below `Resize to layer size`.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
@@ -451,14 +451,14 @@ Options:
 * *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
-**Use layer size** (Export Layers only)
+**Resize to layer size** (Batch Convert and Export Layers only)
 
-If enabled, layers will be resized (not scaled) to their size instead of the image size.
-This procedure is enabled by default.
+If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
 
-To keep the size of the image canvas and the layer position within the image, disable this setting.
+This procedure is enabled by default for Export Layers.
+
+To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
-To export the entire layer, leave this setting enabled.
 
 
 ### Adding Custom Procedures

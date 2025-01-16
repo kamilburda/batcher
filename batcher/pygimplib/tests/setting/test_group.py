@@ -50,16 +50,16 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
     self.settings = group_.Group('main')
     self.setting_dict = {
       'type': 'bool',
-      'name': 'use_layer_size',
+      'name': 'resize_to_layer_size',
       'default_value': False,
     }
   
   def test_add(self):
     self.settings.add([self.setting_dict])
     
-    self.assertIn('use_layer_size', self.settings)
-    self.assertIsInstance(self.settings['use_layer_size'], settings_.BoolSetting)
-    self.assertEqual(self.settings['use_layer_size'].value, False)
+    self.assertIn('resize_to_layer_size', self.settings)
+    self.assertIsInstance(self.settings['resize_to_layer_size'], settings_.BoolSetting)
+    self.assertEqual(self.settings['resize_to_layer_size'].value, False)
   
   def test_add_with_missing_type_attribute(self):
     del self.setting_dict['type']
@@ -99,8 +99,8 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
   def test_add_with_same_name_in_same_group_if_uniquify_is_true(self):
     self.settings.add([self.setting_dict, self.setting_dict], uniquify_name=True)
 
-    self.assertIn('use_layer_size', self.settings)
-    self.assertIn('use_layer_size_2', self.settings)
+    self.assertIn('resize_to_layer_size', self.settings)
+    self.assertIn('resize_to_layer_size_2', self.settings)
   
   def test_add_multiple_dicts_with_same_name_in_different_child_groups(self):
     gui_settings = group_.Group('gui')
@@ -111,9 +111,9 @@ class TestGroupAddWithSettingDict(unittest.TestCase):
     
     self.settings.add([gui_settings, main_settings])
     
-    self.assertIn('use_layer_size', gui_settings)
-    self.assertIn('use_layer_size', main_settings)
-    self.assertNotEqual(gui_settings['use_layer_size'], main_settings['use_layer_size'])
+    self.assertIn('resize_to_layer_size', gui_settings)
+    self.assertIn('resize_to_layer_size', main_settings)
+    self.assertNotEqual(gui_settings['resize_to_layer_size'], main_settings['resize_to_layer_size'])
 
 
 class TestGroupAddFromDict(unittest.TestCase):
@@ -127,12 +127,12 @@ class TestGroupAddFromDict(unittest.TestCase):
       },
       {
        'type': 'bool',
-       'name': 'use_layer_size',
+       'name': 'resize_to_layer_size',
       }
     ])
     
     self.assertIsNone(settings['flatten'].pdb_type)
-    self.assertIsNone(settings['use_layer_size'].pdb_type)
+    self.assertIsNone(settings['resize_to_layer_size'].pdb_type)
   
   def test_add_with_group_level_attributes_overridden_by_setting_attributes(self):
     settings = group_.Group(name='main', setting_attributes={'display_name': 'some_name'})

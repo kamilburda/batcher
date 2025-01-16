@@ -90,7 +90,7 @@ def create_test_settings_for_persistor():
     },
     {
       'type': 'bool',
-      'name': 'use_layer_size',
+      'name': 'resize_to_layer_size',
       'default_value': False,
     },
   ])

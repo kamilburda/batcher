@@ -148,13 +148,14 @@ def on_file_extension_changed(file_extension, flatten):
     flatten.gui.set_sensitive(False)
 
 
-def on_file_extension_changed_with_use_layer_size(file_extension, use_layer_size):
+def on_file_extension_changed_with_resize_to_layer_size(file_extension, resize_to_layer_size):
   if file_extension.value == 'png':
-    use_layer_size.gui.set_visible(True)
+    resize_to_layer_size.gui.set_visible(True)
   else:
-    use_layer_size.gui.set_visible(False)
+    resize_to_layer_size.gui.set_visible(False)
 
 
-def on_use_layer_size_changed(use_layer_size, file_extension, file_extension_value='jpg'):
-  if use_layer_size.value:
+def on_resize_to_layer_size_changed(
+      resize_to_layer_size, file_extension, file_extension_value='jpg'):
+  if resize_to_layer_size.value:
     file_extension.set_value(file_extension_value)

@@ -90,7 +90,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_use_image_size(self):
     self.compare(
-      procedure_names_to_remove=['use_layer_size'],
+      procedure_names_to_remove=['resize_to_layer_size'],
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'use_image_size'),
     )
   

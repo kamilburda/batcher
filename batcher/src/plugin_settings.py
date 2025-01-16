@@ -289,7 +289,7 @@ def create_settings_for_export_layers():
   settings['main'].add([
     actions_.create(
       name='procedures',
-      initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['use_layer_size']]),
+      initial_actions=[builtin_procedures.BUILTIN_PROCEDURES['resize_to_layer_size']]),
   ])
 
   visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])

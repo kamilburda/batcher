@@ -18,11 +18,11 @@ class TestGetUniqueSettingName(unittest.TestCase):
       },
       {
        'type': 'bool',
-       'name': 'use_layer_size',
+       'name': 'resize_to_layer_size',
       },
       {
        'type': 'bool',
-       'name': 'use_layer_size_2',
+       'name': 'resize_to_layer_size_2',
       },
     ])
 
@@ -38,8 +38,8 @@ class TestGetUniqueSettingName(unittest.TestCase):
 
   def test_multiple_iterations_needed(self):
     self.assertEqual(
-      utils_.get_unique_setting_name('use_layer_size', self.group),
-      'use_layer_size_3')
+      utils_.get_unique_setting_name('resize_to_layer_size', self.group),
+      'resize_to_layer_size_3')
 
 
 class TestGetProcessedSettingAttribute(unittest.TestCase):
@@ -133,39 +133,39 @@ class TestSettingEventsMixin(unittest.TestCase):
     self.assertFalse(self.flatten.value)
 
   def test_connect_event_with_keyword_arguments(self):
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
-    use_layer_size.connect_event(
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
+    resize_to_layer_size.connect_event(
       'test-event',
-      stubs_setting.on_use_layer_size_changed,
+      stubs_setting.on_resize_to_layer_size_changed,
       self.file_extension,
       file_extension_value='tiff')
 
-    use_layer_size.set_value(True)
-    use_layer_size.invoke_event('test-event')
+    resize_to_layer_size.set_value(True)
+    resize_to_layer_size.invoke_event('test-event')
 
     self.assertEqual(self.file_extension.value, 'tiff')
 
   def test_invoke_event_with_keyword_arguments(self):
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
-    use_layer_size.connect_event(
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
+    resize_to_layer_size.connect_event(
       'test-event',
-      stubs_setting.on_use_layer_size_changed,
+      stubs_setting.on_resize_to_layer_size_changed,
       file_extension_value='tiff')
 
-    use_layer_size.set_value(True)
-    use_layer_size.invoke_event('test-event', file_extension=self.file_extension)
+    resize_to_layer_size.set_value(True)
+    resize_to_layer_size.invoke_event('test-event', file_extension=self.file_extension)
 
     self.assertEqual(self.file_extension.value, 'tiff')
 
   def test_invoke_event_places_invoke_event_arguments_first(self):
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
-    use_layer_size.connect_event(
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
+    resize_to_layer_size.connect_event(
       'test-event',
-      stubs_setting.on_use_layer_size_changed,
+      stubs_setting.on_resize_to_layer_size_changed,
       'tiff')
 
-    use_layer_size.set_value(True)
-    use_layer_size.invoke_event('test-event', self.file_extension)
+    resize_to_layer_size.set_value(True)
+    resize_to_layer_size.invoke_event('test-event', self.file_extension)
 
     self.assertEqual(self.file_extension.value, 'tiff')
 
@@ -173,18 +173,18 @@ class TestSettingEventsMixin(unittest.TestCase):
     self.file_extension.connect_event(
       'test-event', stubs_setting.on_file_extension_changed, self.flatten)
 
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
     self.file_extension.connect_event(
       'test-event',
-      stubs_setting.on_file_extension_changed_with_use_layer_size,
-      use_layer_size)
+      stubs_setting.on_file_extension_changed_with_resize_to_layer_size,
+      resize_to_layer_size)
 
     self.file_extension.set_value('jpg')
     self.file_extension.invoke_event('test-event')
 
     self.assertEqual(self.file_extension.value, 'jpg')
     self.assertTrue(self.flatten.value)
-    self.assertFalse(use_layer_size.gui.get_visible())
+    self.assertFalse(resize_to_layer_size.gui.get_visible())
 
   def test_remove_event(self):
     event_id = self.file_extension.connect_event(
@@ -201,18 +201,18 @@ class TestSettingEventsMixin(unittest.TestCase):
     event_id = self.file_extension.connect_event(
       'test-event', stubs_setting.on_file_extension_changed, self.flatten)
 
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
     self.file_extension.connect_event(
       'test-event',
-      stubs_setting.on_file_extension_changed_with_use_layer_size,
-      use_layer_size)
+      stubs_setting.on_file_extension_changed_with_resize_to_layer_size,
+      resize_to_layer_size)
 
     self.file_extension.remove_event(event_id)
     self.file_extension.set_value('jpg')
     self.file_extension.invoke_event('test-event')
 
     self.assertFalse(self.flatten.value)
-    self.assertFalse(use_layer_size.gui.get_visible())
+    self.assertFalse(resize_to_layer_size.gui.get_visible())
 
   def test_remove_event_invalid_id_raises_error(self):
     with self.assertRaises(ValueError):

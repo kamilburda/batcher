@@ -286,11 +286,11 @@ class TestSettingEvents(SettingTestCase):
     self.setting.connect_event(
       'value-changed', stubs_setting.on_file_extension_changed, self.flatten)
     
-    use_layer_size = settings_.BoolSetting('use_layer_size', default_value=False)
-    use_layer_size.connect_event(
-      'value-changed', stubs_setting.on_use_layer_size_changed, self.setting)
+    resize_to_layer_size = settings_.BoolSetting('resize_to_layer_size', default_value=False)
+    resize_to_layer_size.connect_event(
+      'value-changed', stubs_setting.on_resize_to_layer_size_changed, self.setting)
     
-    use_layer_size.set_value(True)
+    resize_to_layer_size.set_value(True)
     
     self.assertEqual(self.setting.value, 'jpg')
     self.assertEqual(self.flatten.value, True)

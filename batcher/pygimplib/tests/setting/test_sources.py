@@ -39,7 +39,7 @@ def _test_settings_for_read_write():
     'name': 'procedures',
     'groups': [
       {
-        'name': 'use_layer_size',
+        'name': 'resize_to_layer_size',
         'tags': ['action', 'procedure'],
       },
       {
@@ -51,7 +51,7 @@ def _test_settings_for_read_write():
   
   settings['main'].add([procedures])
   
-  procedures['use_layer_size'].add([
+  procedures['resize_to_layer_size'].add([
     {
       'type': 'bool',
       'name': 'enabled',
@@ -121,7 +121,7 @@ def _test_data_for_read_write():
               'name': 'procedures',
               'settings': [
                 {
-                  'name': 'use_layer_size',
+                  'name': 'resize_to_layer_size',
                   'tags': ['action', 'procedure'],
                   'settings': [
                     {
@@ -216,7 +216,7 @@ class TestSourceRead(unittest.TestCase):
     expected_setting_values = {
       setting.get_path(): setting.value for setting in self.settings.walk()}
     expected_setting_values['all_settings/main/file_extension'] = 'jpg'
-    expected_setting_values['all_settings/main/procedures/use_layer_size/enabled'] = False
+    expected_setting_values['all_settings/main/procedures/resize_to_layer_size/enabled'] = False
     expected_setting_values['all_settings/standalone_setting'] = 'something_else'
     
     self.source.read([self.settings])
@@ -263,9 +263,9 @@ class TestSourceRead(unittest.TestCase):
   def test_read_not_all_settings_found(self):
     self.source.data = _test_data_for_read_write()
     
-    # 'main/procedures/use_layer_size/arguments'
+    # 'main/procedures/resize_to_layer_size/arguments'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
-    # 'main/procedures/use_layer_size/enabled'
+    # 'main/procedures/resize_to_layer_size/enabled'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]
     # 'main/procedures/insert_background'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][1]
@@ -279,15 +279,15 @@ class TestSourceRead(unittest.TestCase):
     self.source.read(
       [self.settings['main/file_extension'],
        self.settings['main/procedures/insert_background'],
-       self.settings['main/procedures/use_layer_size']])
+       self.settings['main/procedures/resize_to_layer_size']])
     
     self.assertListEqual(
       self.source.settings_not_loaded,
       [self.settings['main/file_extension'],
        self.settings['main/procedures/insert_background'],
        # Missing settings and empty groups must be expanded.
-       self.settings['main/procedures/use_layer_size/enabled'],
-       self.settings['main/procedures/use_layer_size/arguments']])
+       self.settings['main/procedures/resize_to_layer_size/enabled'],
+       self.settings['main/procedures/resize_to_layer_size/arguments']])
     
     # Test if `settings_not_loaded` is reset on each call to `read()`
     self.source.read([self.settings['main/constraints']])
@@ -297,7 +297,7 @@ class TestSourceRead(unittest.TestCase):
   def test_read_creates_new_child_groups_and_settings_if_missing(self):
     self.source.data = _test_data_for_read_write()
     
-    # Add 'main/procedures/use_layer_size/arguments/tag'
+    # Add 'main/procedures/resize_to_layer_size/arguments/tag'
     tag_argument = {
       'type': 'string',
       'name': 'tag',
@@ -342,7 +342,7 @@ class TestSourceRead(unittest.TestCase):
     self.assertEqual(
       len(list(self.settings.walk(include_groups=True))), expected_num_settings_and_groups)
     self.assertDictEqual(
-      self.settings['main/procedures/use_layer_size/arguments/tag'].to_dict(),
+      self.settings['main/procedures/resize_to_layer_size/arguments/tag'].to_dict(),
       {
         'type': 'string',
         'name': 'tag',
@@ -401,8 +401,8 @@ class TestSourceRead(unittest.TestCase):
     
     self.settings['main/file_extension'].set_value('jpg')
     
-    self.settings['main/procedures/use_layer_size/enabled'].tags.add('ignore_load')
-    self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
+    self.settings['main/procedures/resize_to_layer_size/enabled'].tags.add('ignore_load')
+    self.settings['main/procedures/resize_to_layer_size/enabled'].set_value(False)
     
     self.settings['main/procedures/insert_background'].tags.add('ignore_load')
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
@@ -417,7 +417,7 @@ class TestSourceRead(unittest.TestCase):
     # source is ignored. Therefore, the setting value is overridden.
     self.assertEqual(self.settings['main/file_extension'].value, 'png')
     # The tag is found in the code, therefore the value for this setting will not be overridden
-    self.assertEqual(self.settings['main/procedures/use_layer_size/enabled'].value, False)
+    self.assertEqual(self.settings['main/procedures/resize_to_layer_size/enabled'].value, False)
     # The tag is found in the code for a parent
     self.assertEqual(
       self.settings['main/procedures/insert_background/enabled'].value, False)
@@ -431,16 +431,16 @@ class TestSourceRead(unittest.TestCase):
     self.assertFalse(list(self.settings['main/constraints']))
   
   def test_read_order_of_settings_in_source_has_no_effect_if_settings_exist_in_memory(self):
-    self.settings['main/procedures'].reorder('use_layer_size', 1)
+    self.settings['main/procedures'].reorder('resize_to_layer_size', 1)
     
-    self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
+    self.settings['main/procedures/resize_to_layer_size/enabled'].set_value(False)
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
     
     self.source.data = _test_data_for_read_write()
     
     self.source.read([self.settings])
     
-    self.assertEqual(self.settings['main/procedures/use_layer_size/enabled'].value, True)
+    self.assertEqual(self.settings['main/procedures/resize_to_layer_size/enabled'].value, True)
     self.assertEqual(self.settings['main/procedures/insert_background/enabled'].value, True)
   
   def test_read_invalid_setting_value_retains_the_value(self):
@@ -587,7 +587,7 @@ class TestSourceRead(unittest.TestCase):
     expected_setting_values = {
       setting.get_path(): setting.value for setting in self.settings.walk()}
     expected_setting_values['all_settings/main/file_extension'] = 'jpg'
-    expected_setting_values['all_settings/main/procedures/use_layer_size/enabled'] = False
+    expected_setting_values['all_settings/main/procedures/resize_to_layer_size/enabled'] = False
     expected_setting_values['all_settings/standalone_setting'] = 'something_else'
 
     self.source.read([self.settings], modify_data_func=modify_data)
@@ -629,7 +629,7 @@ class TestSourceWrite(unittest.TestCase):
     expected_data = _test_data_for_read_write()
     
     self.settings['main/file_extension'].set_value('jpg')
-    self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
+    self.settings['main/procedures/resize_to_layer_size/enabled'].set_value(False)
     self.settings['standalone_setting'].set_value('something_else')
     
     expected_data[0]['settings'][0]['settings'][0]['value'] = 'jpg'
@@ -645,7 +645,7 @@ class TestSourceWrite(unittest.TestCase):
     expected_data = _test_data_for_read_write()
     
     self.settings['main/file_extension'].set_value('jpg')
-    self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
+    self.settings['main/procedures/resize_to_layer_size/enabled'].set_value(False)
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
     self.settings['standalone_setting'].set_value('something_else')
     
@@ -662,7 +662,7 @@ class TestSourceWrite(unittest.TestCase):
   def test_write_adds_groups_which_are_not_present_in_source(self):
     expected_data = _test_data_for_read_write()
     
-    # Keep only 'main/procedures/use_layer_size/enabled' and 'standalone_setting'
+    # Keep only 'main/procedures/resize_to_layer_size/enabled' and 'standalone_setting'
     del expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
     del expected_data[0]['settings'][0]['settings'][1]['settings'][1]
     del expected_data[0]['settings'][0]['settings'][2]
@@ -670,7 +670,7 @@ class TestSourceWrite(unittest.TestCase):
     del expected_data[0]['settings'][1]
     
     self.source.write(
-      [self.settings['main/procedures/use_layer_size/enabled'],
+      [self.settings['main/procedures/resize_to_layer_size/enabled'],
        self.settings['standalone_setting']])
     
     self.assertListEqual(self.source.data, expected_data)
@@ -690,8 +690,8 @@ class TestSourceWrite(unittest.TestCase):
       'gui_type': None,
     }
     
-    self.settings['main/procedures/use_layer_size/arguments'].add([new_setting])
-    self.settings['main/procedures/use_layer_size/arguments/origin'].set_value('builtin')
+    self.settings['main/procedures/resize_to_layer_size/arguments'].add([new_setting])
+    self.settings['main/procedures/resize_to_layer_size/arguments/origin'].set_value('builtin')
     
     expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1][
       'settings'].append(expected_new_setting_dict)
@@ -732,8 +732,8 @@ class TestSourceWrite(unittest.TestCase):
     
     self.settings['main/file_extension'].set_value('jpg')
     
-    self.settings['main/procedures/use_layer_size/enabled'].tags.add('ignore_save')
-    self.settings['main/procedures/use_layer_size/enabled'].set_value(False)
+    self.settings['main/procedures/resize_to_layer_size/enabled'].tags.add('ignore_save')
+    self.settings['main/procedures/resize_to_layer_size/enabled'].set_value(False)
     
     self.settings['main/procedures/insert_background'].tags.add('ignore_save')
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
@@ -747,7 +747,7 @@ class TestSourceWrite(unittest.TestCase):
     
     self.assertEqual(
       self.source.data[0]['settings'][0]['settings'][0]['value'], 'jpg')
-    # 'main/procedures/use_layer_size/enabled' setting is not saved
+    # 'main/procedures/resize_to_layer_size/enabled' setting is not saved
     self.assertFalse(
       self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['settings'])
     # 'main/procedures/insert_background' group is not saved
@@ -785,13 +785,13 @@ class TestSourceWrite(unittest.TestCase):
     self.assertEqual(self.source.data, expected_data)
   
   def test_write_current_order_of_settings_within_group_is_applied_to_data(self):
-    self.settings['main/procedures'].reorder('use_layer_size', 1)
+    self.settings['main/procedures'].reorder('resize_to_layer_size', 1)
     
     self.source.data = _test_data_for_read_write()
     
     expected_data = _test_data_for_read_write()
-    use_layer_size_dict = expected_data[0]['settings'][0]['settings'][1]['settings'].pop(0)
-    expected_data[0]['settings'][0]['settings'][1]['settings'].append(use_layer_size_dict)
+    resize_to_layer_size_dict = expected_data[0]['settings'][0]['settings'][1]['settings'].pop(0)
+    expected_data[0]['settings'][0]['settings'][1]['settings'].append(resize_to_layer_size_dict)
     
     self.source.write([self.settings])
     

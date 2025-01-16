@@ -1173,6 +1173,23 @@ def _update_to_1_0(data, _settings, procedure_groups):
             (builtin_procedures.PIXELS, _('Pixels')),
           ]
 
+        if (orig_name_setting_dict['default_value'] == 'use_layer_size'
+            and arguments_list is not None):
+          procedure_dict['name'] = 'resize_to_layer_size'
+          orig_name_setting_dict['value'] = 'resize_to_layer_size'
+          orig_name_setting_dict['default_value'] = 'resize_to_layer_size'
+
+          arguments_list.append(
+            {
+              'type': 'placeholder_layer_array',
+              'name': 'layers',
+              'default_value': 'current_layer_for_array',
+              'value': 'current_layer_for_array',
+              'element_type': 'layer',
+              'display_name': _('Layers'),
+            },
+          )
+
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
