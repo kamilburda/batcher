@@ -115,6 +115,16 @@ def merge_filters(_batcher, layer):
   layer.merge_filters()
 
 
+def merge_visible_layers(image_batcher, merge_type):
+  image = image_batcher.current_image
+
+  image.merge_visible_layers(merge_type)
+
+  for layer in image.get_layers():
+    if not layer.get_visible():
+      image.remove_layer(layer)
+
+
 def remove_folder_structure_from_item(batcher):
   item = batcher.current_item
 
@@ -750,6 +760,26 @@ _BUILTIN_PROCEDURES_LIST = [
         'type': 'placeholder_layer',
         'name': 'layer',
         'display_name': _('Layer'),
+      },
+    ],
+  },
+  {
+    'name': 'merge_visible_layers',
+    'function': merge_visible_layers,
+    'display_name': _('Merge visible layers'),
+    'description': _(
+      'Merges all visible layers within the image into a single layer. Invisible layers are'
+      ' removed.\n\nThis is useful if the image contains multiple layers and you want to apply'
+      ' filters (layer effects) or other procedures on the entire image.'),
+    'additional_tags': [CONVERT_GROUP],
+    'arguments': [
+      {
+        'type': 'enum',
+        'name': 'merge_type',
+        'enum_type': Gimp.MergeType,
+        'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+        'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
+        'display_name': _('Merge type'),
       },
     ],
   },

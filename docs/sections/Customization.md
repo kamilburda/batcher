@@ -406,6 +406,12 @@ For more information, see `Merge background` above.
 
 Merges all visible filters (layer effects) in the specified layer.
 
+**Merge visible layers** (Batch Convert only)
+
+Merges all visible layers within the image into a single layer. Invisible layers are removed.
+
+This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other procedures on the entire image.
+
 **Remove folder structure**
 
 Exports all layers to the output folder on the same level, i.e. subfolders for group layers are not created.
