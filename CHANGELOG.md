@@ -16,6 +16,7 @@ Other changes:
 
 Bug fixes:
 * Fixed warnings issued by GIMP when adding or applying layer effects as custom procedures.
+* Fixed the `Rename` procedure not working for Edit Layers.
 
 
 ## 0.8.2
