@@ -233,8 +233,8 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
     if item.action['orig_name'].value != 'export_for_edit_layers':
       _handle_export_procedure_item_added_for_export_mode(item, settings)
 
-  if item.action['orig_name'].value in [
-       'insert_background_for_layers', 'insert_foreground_for_layers']:
+  if any(item.action['orig_name'].value.startswith(prefix) for prefix in [
+       'insert_background_for_', 'insert_foreground_for_']):
     _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
 
 
@@ -253,14 +253,17 @@ def _handle_insert_background_foreground_procedure_item_added(
   constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
 
   _hide_internal_arguments_for_insert_background_foreground_procedure(item)
-
-  _set_up_insert_background_foreground_procedure(
-    item, merge_item, constraint_item, procedure_list, constraint_list)
   _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
   _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
 
-  item.action['arguments/merge_procedure_name'].set_value(merge_item.action.name)
-  item.action['arguments/constraint_name'].set_value(constraint_item.action.name)
+  if merge_item is not None or constraint_item is not None:
+    _set_up_insert_background_foreground_procedure(
+      item, merge_item, constraint_item, procedure_list, constraint_list)
+
+  if merge_item is not None:
+    item.action['arguments/merge_procedure_name'].set_value(merge_item.action.name)
+  if constraint_item is not None:
+    item.action['arguments/constraint_name'].set_value(constraint_item.action.name)
 
 
 def _set_up_existing_insert_back_foreground_and_related_actions(
@@ -268,10 +271,12 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
       constraint_list: action_list_.ActionList,
 ):
   for item in procedure_list.items:
-    if item.action['orig_name'].value in [
-         'insert_background_for_layers', 'insert_foreground_for_layers']:
-      merge_procedure_name = item.action['arguments/merge_procedure_name'].value
-      if merge_procedure_name in procedure_list.actions:
+    if any(item.action['orig_name'].value.startswith(prefix) for prefix in [
+         'insert_background_for_', 'insert_foreground_for_']):
+      merge_procedure_name = (
+        item.action['arguments/merge_procedure_name'].value
+        if 'merge_procedure_name' in item.action['arguments'] else None)
+      if merge_procedure_name is not None and merge_procedure_name in procedure_list.actions:
         merge_item = next(
           iter(
             item_ for item_ in procedure_list.items if item_.action.name == merge_procedure_name),
@@ -279,8 +284,10 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
       else:
         merge_item = None
 
-      constraint_name = item.action['arguments/constraint_name'].value
-      if constraint_name in constraint_list.actions:
+      constraint_name = (
+        item.action['arguments/constraint_name'].value
+        if 'constraint_name' in item.action['arguments'] else None)
+      if constraint_name is not None and constraint_name in constraint_list.actions:
         constraint_item = next(
           iter(item_ for item_ in constraint_list.items if item_.action.name == constraint_name),
           None)
@@ -288,21 +295,19 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
         constraint_item = None
 
       _hide_internal_arguments_for_insert_background_foreground_procedure(item)
+      _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
+      _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
 
-      if merge_item is not None:
-        _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
-
-      if constraint_item is not None:
-        _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
-
-      if merge_item is not None and constraint_item is not None:
+      if merge_item is not None or constraint_item is not None:
         _set_up_insert_background_foreground_procedure(
           item, merge_item, constraint_item, procedure_list, constraint_list)
 
 
 def _hide_internal_arguments_for_insert_background_foreground_procedure(item):
-  item.action['arguments/merge_procedure_name'].gui.set_visible(False)
-  item.action['arguments/constraint_name'].gui.set_visible(False)
+  if 'merge_procedure_name' in item.action['arguments']:
+    item.action['arguments/merge_procedure_name'].gui.set_visible(False)
+  if 'constraint_name' in item.action['arguments']:
+    item.action['arguments/constraint_name'].gui.set_visible(False)
 
 
 def _set_up_insert_background_foreground_procedure(
@@ -315,8 +320,8 @@ def _set_up_insert_background_foreground_procedure(
   item.action['enabled'].connect_event(
     'value-changed',
     _on_insert_background_foreground_procedure_enabled_changed,
-    merge_item.action,
-    constraint_item.action,
+    merge_item.action if merge_item is not None else None,
+    constraint_item.action if constraint_item is not None else None,
   )
 
   procedure_list.connect(
@@ -331,9 +336,15 @@ def _set_up_insert_background_foreground_procedure(
 
 def _add_merge_background_foreground_procedure(procedure_list, item):
   merge_procedure_orig_name_mapping = {
+    'insert_background_for_images': 'merge_background',
     'insert_background_for_layers': 'merge_background',
+    'insert_foreground_for_images': 'merge_foreground',
     'insert_foreground_for_layers': 'merge_foreground',
   }
+
+  if item.action['orig_name'].value not in merge_procedure_orig_name_mapping:
+    return None
+
   merge_procedure_name = merge_procedure_orig_name_mapping[item.action['orig_name'].value]
 
   merge_item = procedure_list.add_item(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
@@ -349,10 +360,11 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
 
 
 def _set_up_merge_background_foreground_procedure(merge_item, constraint_item):
-  if constraint_item is not None:
-    _set_buttons_for_action_item_sensitive(merge_item, False)
+  if merge_item is not None:
+    if constraint_item is not None:
+      _set_buttons_for_action_item_sensitive(merge_item, False)
 
-  merge_item.action['arguments/last_enabled_value'].gui.set_visible(False)
+    merge_item.action['arguments/last_enabled_value'].gui.set_visible(False)
 
 
 def _add_not_background_foreground_constraint(item, constraint_list):
@@ -360,6 +372,10 @@ def _add_not_background_foreground_constraint(item, constraint_list):
     'insert_background_for_layers': 'not_background',
     'insert_foreground_for_layers': 'not_foreground',
   }
+
+  if item.action['orig_name'].value not in constraint_orig_name_mapping:
+    return None
+
   constraint_name = constraint_orig_name_mapping[item.action['orig_name'].value]
 
   constraint_item = constraint_list.add_item(
@@ -369,6 +385,9 @@ def _add_not_background_foreground_constraint(item, constraint_list):
 
 
 def _set_up_not_background_foreground_constraint(item, constraint_item, merge_item):
+  if constraint_item is None:
+    return
+
   def _on_insert_background_foreground_color_tag_changed(color_tag_setting):
     constraint_item.action['arguments/color_tag'].set_value(color_tag_setting.value)
 
@@ -389,17 +408,23 @@ def _on_insert_background_foreground_procedure_enabled_changed(
       constraint,
 ):
   if not enabled_setting.value:
-    merge_procedure['arguments/last_enabled_value'].set_value(merge_procedure['enabled'].value)
-    merge_procedure['enabled'].set_value(False)
+    if merge_procedure is not None:
+      merge_procedure['arguments/last_enabled_value'].set_value(merge_procedure['enabled'].value)
+      merge_procedure['enabled'].set_value(False)
 
-    constraint['arguments/last_enabled_value'].set_value(constraint['enabled'].value)
-    constraint['enabled'].set_value(False)
+    if constraint is not None:
+      constraint['arguments/last_enabled_value'].set_value(constraint['enabled'].value)
+      constraint['enabled'].set_value(False)
   else:
-    merge_procedure['enabled'].set_value(merge_procedure['arguments/last_enabled_value'].value)
-    constraint['enabled'].set_value(constraint['arguments/last_enabled_value'].value)
+    if merge_procedure is not None:
+      merge_procedure['enabled'].set_value(merge_procedure['arguments/last_enabled_value'].value)
+    if constraint is not None:
+      constraint['enabled'].set_value(constraint['arguments/last_enabled_value'].value)
 
-  merge_procedure['enabled'].gui.set_sensitive(enabled_setting.value)
-  constraint['enabled'].gui.set_sensitive(enabled_setting.value)
+  if merge_procedure is not None:
+    merge_procedure['enabled'].gui.set_sensitive(enabled_setting.value)
+  if constraint is not None:
+    constraint['enabled'].gui.set_sensitive(enabled_setting.value)
 
 
 def _on_insert_background_foreground_procedure_removed(
@@ -410,9 +435,9 @@ def _on_insert_background_foreground_procedure_removed(
       constraint_list,
       constraint_item):
   if removed_item == insert_back_foreground_item:
-    if merge_item in procedure_list.items:
+    if merge_item is not None and merge_item in procedure_list.items:
       procedure_list.remove_item(merge_item)
-    if constraint_item in constraint_list.items:
+    if constraint_item is not None and constraint_item in constraint_list.items:
       constraint_list.remove_item(constraint_item)
 
 

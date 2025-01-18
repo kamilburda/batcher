@@ -1,25 +1,61 @@
 """Background and foreground layer insertion and manipulation."""
+import os.path
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 from src import exceptions
 
 import pygimplib as pg
+from pygimplib import pdb
+
+
+def insert_background_from_file(image_batcher, image_filepath, *_args, **_kwargs):
+  return _insert_layer_from_file(image_batcher, image_filepath, 'after')
+
+
+def insert_foreground_from_file(image_batcher, image_filepath, *_args, **_kwargs):
+  return _insert_layer_from_file(image_batcher, image_filepath, 'before')
+
+
+def _insert_layer_from_file(image_batcher, image_filepath, insert_mode):
+  if os.path.exists(image_filepath):
+    image_to_insert = pdb.gimp_file_load(
+      run_mode=Gimp.RunMode.NONINTERACTIVE,
+      file=Gio.file_new_for_path(image_filepath))
+  else:
+    image_to_insert = None
+
+  while True:
+    if image_to_insert is None:
+      yield
+      continue
+
+    image = image_batcher.current_image
+    current_parent = image_batcher.current_layer.get_parent()
+
+    position = image.get_item_position(image_batcher.current_layer)
+    if insert_mode == 'after':
+      position += 1
+
+    _insert_layers(image, image_to_insert.get_layers(), current_parent, position)
+
+    yield
 
 
 def insert_background_from_color_tags(
       layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
-  return _insert_tagged_layer(layer_batcher, color_tag, tagged_items, 'after')
+  return _insert_tagged_layers(layer_batcher, color_tag, tagged_items, 'after')
 
 
 def insert_foreground_from_color_tags(
       layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
-  return _insert_tagged_layer(layer_batcher, color_tag, tagged_items, 'before')
+  return _insert_tagged_layers(layer_batcher, color_tag, tagged_items, 'before')
 
 
-def _insert_tagged_layer(layer_batcher, tag, tagged_items_for_preview, insert_mode):
+def _insert_tagged_layers(layer_batcher, tag, tagged_items_for_preview, insert_mode):
   if layer_batcher.is_preview:
     tagged_items = tagged_items_for_preview
   else:
@@ -41,18 +77,17 @@ def _insert_tagged_layer(layer_batcher, tag, tagged_items_for_preview, insert_mo
     if insert_mode == 'after':
       position += 1
 
-    _insert_merged_tagged_layer(
-      layer_batcher, image, processed_tagged_items, current_parent, position)
+    _insert_layers(image, [item.raw for item in processed_tagged_items], current_parent, position)
 
     yield
 
 
-def _insert_merged_tagged_layer(_layer_batcher, image, tagged_items, parent, position):
+def _insert_layers(image, layers, parent, position):
   first_tagged_layer_position = position
   
-  for i, item in enumerate(tagged_items):
+  for i, layer in enumerate(layers):
     layer_copy = pg.pdbutils.copy_and_paste_layer(
-      item.raw, image, parent, first_tagged_layer_position + i, True, True, True)
+      layer, image, parent, first_tagged_layer_position + i, True, True, True)
     layer_copy.set_visible(True)
 
   if parent is None:
@@ -62,14 +97,14 @@ def _insert_merged_tagged_layer(_layer_batcher, image, tagged_items, parent, pos
 
   merged_tagged_layer = None
 
-  if len(tagged_items) == 1:
+  if len(layers) == 1:
     merged_tagged_layer = children[first_tagged_layer_position]
   else:
-    second_to_last_tagged_layer_position = first_tagged_layer_position + len(tagged_items) - 2
+    second_to_last_tagged_layer_position = first_tagged_layer_position + len(layers) - 2
     # It should not matter which items we obtain the color tag from as all
     # items have the same color tag.
     merged_color_tag = children[second_to_last_tagged_layer_position].get_color_tag()
-    
+
     for i in range(second_to_last_tagged_layer_position, first_tagged_layer_position - 1, -1):
       merged_tagged_layer = image.merge_down(children[i], Gimp.MergeType.EXPAND_AS_NECESSARY)
 
@@ -82,51 +117,41 @@ def _insert_merged_tagged_layer(_layer_batcher, image, tagged_items, parent, pos
   return merged_tagged_layer
 
 
-def merge_background(
-      layer_batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
-  _merge_tagged_layer(
-    layer_batcher,
-    merge_type,
-    get_background_layer,
-    'current_item')
+def merge_background(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
+  _merge_layer(batcher, merge_type, get_background_layer, 'current_layer')
 
 
-def merge_foreground(
-      layer_batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
-  _merge_tagged_layer(
-    layer_batcher,
-    merge_type,
-    get_foreground_layer,
-    'tagged_layer')
+def merge_foreground(batcher, merge_type=Gimp.MergeType.EXPAND_AS_NECESSARY, *_args, **_kwargs):
+  _merge_layer(batcher, merge_type, get_foreground_layer, 'inserted_layer')
 
 
-def _merge_tagged_layer(layer_batcher, merge_type, get_tagged_layer_func, layer_to_merge_down_str):
-  tagged_layer = get_tagged_layer_func(layer_batcher)
+def _merge_layer(batcher, merge_type, get_inserted_layer_func, layer_to_merge_str):
+  inserted_layer = get_inserted_layer_func(batcher)
   
-  if tagged_layer is not None:
-    name = layer_batcher.current_layer.get_name()
-    visible = layer_batcher.current_layer.get_visible()
-    orig_color_tag = layer_batcher.current_layer.get_color_tag()
+  if inserted_layer is not None:
+    name = batcher.current_layer.get_name()
+    visible = batcher.current_layer.get_visible()
+    orig_color_tag = batcher.current_layer.get_color_tag()
     
-    if layer_to_merge_down_str == 'current_item':
-      layer_to_merge_down = layer_batcher.current_layer
-    elif layer_to_merge_down_str == 'tagged_layer':
-      layer_to_merge_down = tagged_layer
+    if layer_to_merge_str == 'current_layer':
+      layer_to_merge_down = batcher.current_layer
+    elif layer_to_merge_str == 'inserted_layer':
+      layer_to_merge_down = inserted_layer
     else:
-      raise ValueError('invalid value for "layer_to_merge_down_str"')
+      raise ValueError('invalid value for "layer_to_merge_str"')
     
-    layer_batcher.current_layer.set_visible(True)
+    batcher.current_layer.set_visible(True)
     
-    merged_layer = layer_batcher.current_image.merge_down(layer_to_merge_down, merge_type)
+    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
 
     # Avoid errors if merge failed for some reason.
     if merged_layer is not None:
       merged_layer.set_name(name)
 
-      layer_batcher.current_layer = merged_layer
+      batcher.current_layer = merged_layer
 
-      layer_batcher.current_layer.set_visible(visible)
-      layer_batcher.current_layer.set_color_tag(orig_color_tag)
+      batcher.current_layer.set_visible(visible)
+      batcher.current_layer.set_color_tag(orig_color_tag)
 
 
 def get_background_layer(batcher):
@@ -134,7 +159,7 @@ def get_background_layer(batcher):
     batcher,
     lambda position, num_layers: position < num_layers - 1,
     1,
-    'insert_background_for_layers',
+    ['insert_background_for_images', 'insert_background_for_layers'],
     _('There are no background layers.'))
 
 
@@ -143,7 +168,7 @@ def get_foreground_layer(batcher):
     batcher,
     lambda position, num_layers: position > 0,
     -1,
-    'insert_foreground_for_layers',
+    ['insert_foreground_for_images', 'insert_foreground_for_layers'],
     _('There are no foreground layers.'))
 
 
@@ -151,7 +176,7 @@ def _get_adjacent_layer(
       batcher,
       position_cond_func,
       adjacent_position_increment,
-      insert_tagged_layers_procedure_name,
+      insert_layers_procedure_names,
       skip_message,
 ):
   image = batcher.current_image
@@ -170,12 +195,17 @@ def _get_adjacent_layer(
     position = image.get_item_position(layer)
     if position_cond_func(position, num_layers):
       next_layer = children[position + adjacent_position_increment]
+      # A `None` element represents a background/foreground layer inserted
+      # via other means than color tags (e.g. from a file). If there are no
+      # matching color tags and `None` is present at least once, we always
+      # consider `next_layer` to be the background/foreground.
       color_tags = [
         procedure['arguments/color_tag'].value
+        if 'color_tag' in procedure['arguments'] else None
         for procedure in _get_previous_enabled_procedures(
-          batcher, batcher.current_procedure, insert_tagged_layers_procedure_name)]
+          batcher, batcher.current_procedure, insert_layers_procedure_names)]
       
-      if next_layer.get_color_tag() in color_tags:
+      if next_layer.get_color_tag() in color_tags or None in color_tags:
         adjacent_layer = next_layer
   
   if adjacent_layer is not None:
@@ -187,14 +217,15 @@ def _get_adjacent_layer(
     raise exceptions.SkipAction(skip_message)
 
 
-def _get_previous_enabled_procedures(batcher, current_action, action_orig_name_to_match):
+def _get_previous_enabled_procedures(batcher, current_action, action_orig_names_to_match):
   previous_enabled_procedures = []
   
   for procedure in batcher.procedures:
     if procedure == current_action:
       return previous_enabled_procedures
     
-    if procedure['enabled'].value and procedure['orig_name'].value == action_orig_name_to_match:
+    if any(procedure['enabled'].value and procedure['orig_name'].value == orig_name
+           for orig_name in action_orig_names_to_match):
       previous_enabled_procedures.append(procedure)
   
   return previous_enabled_procedures

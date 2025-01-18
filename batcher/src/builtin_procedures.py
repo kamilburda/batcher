@@ -637,6 +637,29 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
+    'name': 'insert_background_for_images',
+    'function': background_foreground.insert_background_from_file,
+    'display_name': _('Insert background'),
+    'description': _('Inserts the specified image behind the current layer.'),
+    'display_options_on_create': True,
+    'additional_tags': [CONVERT_GROUP],
+    'arguments': [
+      {
+        'type': 'filepath',
+        'name': 'image_filepath',
+        'display_name': _('Path to image'),
+        'default_value': '',
+        'nullable': True,
+      },
+      {
+        'type': 'string',
+        'name': 'merge_procedure_name',
+        'default_value': '',
+        'gui_type': None,
+      },
+    ],
+  },
+  {
     'name': 'insert_background_for_layers',
     'function': background_foreground.insert_background_from_color_tags,
     'display_name': _('Insert background'),
@@ -668,6 +691,29 @@ _BUILTIN_PROCEDURES_LIST = [
       {
         'type': 'string',
         'name': 'constraint_name',
+        'default_value': '',
+        'gui_type': None,
+      },
+    ],
+  },
+  {
+    'name': 'insert_foreground_for_images',
+    'function': background_foreground.insert_foreground_from_file,
+    'display_name': _('Insert foreground'),
+    'description': _('Inserts the specified image in front of the current layer.'),
+    'display_options_on_create': True,
+    'additional_tags': [CONVERT_GROUP],
+    'arguments': [
+      {
+        'type': 'filepath',
+        'name': 'image_filepath',
+        'display_name': _('Path to image'),
+        'default_value': '',
+        'nullable': True,
+      },
+      {
+        'type': 'string',
+        'name': 'merge_procedure_name',
         'default_value': '',
         'gui_type': None,
       },
