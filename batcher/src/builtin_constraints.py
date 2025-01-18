@@ -132,7 +132,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
     'display_name': _('Not background'),
-    # This constraint is added/removed automatically alongside `insert_background`.
+    # This constraint is added/removed automatically alongside `insert_background_for_layers`.
     'additional_tags': [],
     'arguments': [
       {
@@ -157,7 +157,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
     'display_name': _('Not foreground'),
-    # This constraint is added/removed automatically alongside `insert_foreground`.
+    # This constraint is added/removed automatically alongside `insert_foreground_for_layers`.
     'additional_tags': [],
     'arguments': [
       {

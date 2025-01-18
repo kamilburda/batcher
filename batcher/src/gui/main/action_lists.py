@@ -233,7 +233,8 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
     if item.action['orig_name'].value != 'export_for_edit_layers':
       _handle_export_procedure_item_added_for_export_mode(item, settings)
 
-  if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
+  if item.action['orig_name'].value in [
+       'insert_background_for_layers', 'insert_foreground_for_layers']:
     _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
 
 
@@ -267,7 +268,8 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
       constraint_list: action_list_.ActionList,
 ):
   for item in procedure_list.items:
-    if item.action['orig_name'].value in ['insert_background', 'insert_foreground']:
+    if item.action['orig_name'].value in [
+         'insert_background_for_layers', 'insert_foreground_for_layers']:
       merge_procedure_name = item.action['arguments/merge_procedure_name'].value
       if merge_procedure_name in procedure_list.actions:
         merge_item = next(
@@ -329,8 +331,8 @@ def _set_up_insert_background_foreground_procedure(
 
 def _add_merge_background_foreground_procedure(procedure_list, item):
   merge_procedure_orig_name_mapping = {
-    'insert_background': 'merge_background',
-    'insert_foreground': 'merge_foreground',
+    'insert_background_for_layers': 'merge_background',
+    'insert_foreground_for_layers': 'merge_foreground',
   }
   merge_procedure_name = merge_procedure_orig_name_mapping[item.action['orig_name'].value]
 
@@ -355,8 +357,8 @@ def _set_up_merge_background_foreground_procedure(merge_item, constraint_item):
 
 def _add_not_background_foreground_constraint(item, constraint_list):
   constraint_orig_name_mapping = {
-    'insert_background': 'not_background',
-    'insert_foreground': 'not_foreground',
+    'insert_background_for_layers': 'not_background',
+    'insert_foreground_for_layers': 'not_foreground',
   }
   constraint_name = constraint_orig_name_mapping[item.action['orig_name'].value]
 

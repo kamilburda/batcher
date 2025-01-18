@@ -1190,6 +1190,16 @@ def _update_to_1_0(data, _settings, procedure_groups):
             },
           )
 
+        if (orig_name_setting_dict['default_value'] == 'insert_background'
+            and arguments_list is not None):
+          orig_name_setting_dict['value'] = 'insert_background_for_layers'
+          orig_name_setting_dict['default_value'] = 'insert_background_for_layers'
+
+        if (orig_name_setting_dict['default_value'] == 'insert_foreground'
+            and arguments_list is not None):
+          orig_name_setting_dict['value'] = 'insert_foreground_for_layers'
+          orig_name_setting_dict['default_value'] = 'insert_foreground_for_layers'
+
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,

@@ -311,7 +311,7 @@ def create_settings_for_export_layers():
 
   settings['main/procedures'].connect_event(
     'after-add-action',
-    _on_after_add_insert_background_foreground,
+    _on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
 
@@ -400,7 +400,7 @@ def create_settings_for_edit_layers():
 
   settings['main/procedures'].connect_event(
     'after-add-action',
-    _on_after_add_insert_background_foreground,
+    _on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
 
@@ -752,13 +752,14 @@ def _set_sensitive_for_dimension_to_ignore(
   height_unit_setting.gui.set_sensitive(is_height or not is_sensitive)
 
 
-def _on_after_add_insert_background_foreground(
+def _on_after_add_insert_background_foreground_for_layers(
       _procedures,
       procedure,
       _orig_procedure_dict,
       tagged_items_setting,
 ):
-  if procedure['orig_name'].value in ['insert_background', 'insert_foreground']:
+  if procedure['orig_name'].value in [
+       'insert_background_for_layers', 'insert_foreground_for_layers']:
     procedure['arguments/tagged_items'].gui.set_visible(False)
     _sync_tagged_items_with_procedure(tagged_items_setting, procedure)
 

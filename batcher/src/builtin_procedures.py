@@ -635,8 +635,8 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
-    'name': 'insert_background',
-    'function': background_foreground.insert_background_layer,
+    'name': 'insert_background_for_layers',
+    'function': background_foreground.insert_background_from_color_tags,
     'display_name': _('Insert background'),
     'description': _('Inserts layers having the specified color tag behind the current layer.'),
     'display_options_on_create': True,
@@ -672,8 +672,8 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   {
-    'name': 'insert_foreground',
-    'function': background_foreground.insert_foreground_layer,
+    'name': 'insert_foreground_for_layers',
+    'function': background_foreground.insert_foreground_from_color_tags,
     'display_name': _('Insert foreground'),
     'description': _(
       'Inserts layers having the specified color tag in front of the current layer.'),
@@ -716,7 +716,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'merge_background',
     'function': background_foreground.merge_background,
     'display_name': _('Merge background'),
-    # This procedure is added/removed automatically alongside `insert_background`.
+    # This procedure is added/removed automatically alongside `insert_background_for_layers`.
     'additional_tags': [],
     'arguments': [
       {
@@ -739,7 +739,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'merge_foreground',
     'function': background_foreground.merge_foreground,
     'display_name': _('Merge foreground'),
-    # This procedure is added/removed automatically alongside `insert_foreground`.
+    # This procedure is added/removed automatically alongside `insert_foreground_for_layers`.
     'additional_tags': [],
     'arguments': [
       {

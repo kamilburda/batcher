@@ -9,11 +9,13 @@ from src import exceptions
 import pygimplib as pg
 
 
-def insert_background_layer(layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+def insert_background_from_color_tags(
+      layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
   return _insert_tagged_layer(layer_batcher, color_tag, tagged_items, 'after')
 
 
-def insert_foreground_layer(layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+def insert_foreground_from_color_tags(
+      layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
   return _insert_tagged_layer(layer_batcher, color_tag, tagged_items, 'before')
 
 
@@ -132,7 +134,7 @@ def get_background_layer(batcher):
     batcher,
     lambda position, num_layers: position < num_layers - 1,
     1,
-    'insert_background',
+    'insert_background_for_layers',
     _('There are no background layers.'))
 
 
@@ -141,7 +143,7 @@ def get_foreground_layer(batcher):
     batcher,
     lambda position, num_layers: position > 0,
     -1,
-    'insert_foreground',
+    'insert_foreground_for_layers',
     _('There are no foreground layers.'))
 
 

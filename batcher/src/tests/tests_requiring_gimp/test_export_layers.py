@@ -96,7 +96,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_background(self):
     self.compare(
-      procedure_names_to_add={'insert_background': 0},
+      procedure_names_to_add={'insert_background_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'background'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.BLUE)),
@@ -104,7 +104,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_foreground(self):
     self.compare(
-      procedure_names_to_add={'insert_foreground': 0},
+      procedure_names_to_add={'insert_foreground_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'foreground'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.GREEN)),
