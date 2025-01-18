@@ -36,13 +36,13 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
     processed_item_name = item.name
     processed_text = text
 
-  if match_mode == STARTS_WITH:
+  if match_mode == MatchModes.STARTS_WITH:
     return processed_item_name.startswith(processed_text)
-  elif match_mode == CONTAINS:
+  elif match_mode == MatchModes.CONTAINS:
     return processed_text in processed_item_name
-  elif match_mode == ENDS_WITH:
+  elif match_mode == MatchModes.ENDS_WITH:
     return processed_item_name.endswith(processed_text)
-  elif match_mode == REGEX:
+  elif match_mode == MatchModes.REGEX:
     try:
       match = re.search(processed_text, processed_item_name)
     except re.error:
@@ -50,7 +50,8 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
     else:
       return match is not None
   else:
-    raise ValueError(f'unrecognized match mode; must be one of: {", ".join(_MATCH_MODES)}')
+    raise ValueError(
+      f'unrecognized match mode; must be one of: {", ".join(MatchModes.MATCH_MODES)}')
 
 
 def has_recognized_file_format(item, _image_batcher):
@@ -98,17 +99,18 @@ def has_no_color_tags(item, _layer_batcher, color_tags=None):
   return not has_color_tags(item, _layer_batcher, color_tags)
 
 
-_MATCH_MODES = (
-  STARTS_WITH,
-  CONTAINS,
-  ENDS_WITH,
-  REGEX,
-) = (
-  'starts_with',
-  'contains',
-  'ends_with',
-  'regex',
-)
+class MatchModes:
+  MATCH_MODES = (
+    STARTS_WITH,
+    CONTAINS,
+    ENDS_WITH,
+    REGEX,
+  ) = (
+    'starts_with',
+    'contains',
+    'ends_with',
+    'regex',
+  )
 
 
 _BUILTIN_CONSTRAINTS_LIST = [
@@ -196,12 +198,12 @@ _BUILTIN_CONSTRAINTS_LIST = [
       {
         'type': 'choice',
         'name': 'match_mode',
-        'default_value': CONTAINS,
+        'default_value': MatchModes.CONTAINS,
         'items': [
-          (STARTS_WITH, _('Starts with text')),
-          (CONTAINS, _('Contains text')),
-          (ENDS_WITH, _('Ends with text')),
-          (REGEX, _('Matches regular expression')),
+          (MatchModes.STARTS_WITH, _('Starts with text')),
+          (MatchModes.CONTAINS, _('Contains text')),
+          (MatchModes.ENDS_WITH, _('Ends with text')),
+          (MatchModes.REGEX, _('Matches regular expression')),
         ],
         'display_name': _('How to perform matching'),
       },

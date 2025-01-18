@@ -260,7 +260,7 @@ def scale(
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
 
-  if object_to_scale == LAYER:
+  if object_to_scale == ScaleObjects.LAYER:
     layer.scale(processed_width_pixels, processed_height_pixels, local_origin)
   else:
     image.scale(processed_width_pixels, processed_height_pixels)
@@ -269,13 +269,13 @@ def scale(
 
 
 def _convert_to_pixels(image, layer, dimension, dimension_unit):
-  if dimension_unit == PERCENT_IMAGE_WIDTH:
+  if dimension_unit == ScaleUnits.PERCENT_IMAGE_WIDTH:
     pixels = (dimension / 100) * image.get_width()
-  elif dimension_unit == PERCENT_IMAGE_HEIGHT:
+  elif dimension_unit == ScaleUnits.PERCENT_IMAGE_HEIGHT:
     pixels = (dimension / 100) * image.get_height()
-  elif dimension_unit == PERCENT_LAYER_WIDTH:
+  elif dimension_unit == ScaleUnits.PERCENT_LAYER_WIDTH:
     pixels = (dimension / 100) * layer.get_width()
-  elif dimension_unit == PERCENT_LAYER_HEIGHT:
+  elif dimension_unit == ScaleUnits.PERCENT_LAYER_HEIGHT:
     pixels = (dimension / 100) * layer.get_height()
   else:
     pixels = dimension
@@ -297,10 +297,10 @@ def _get_keep_aspect_ratio_values(dimension_to_keep, layer, width_pixels, height
   if layer_height == 0:
     layer_height = 1
 
-  if dimension_to_keep == WIDTH:
+  if dimension_to_keep == ScaleDimensions.WIDTH:
     processed_width_pixels = width_pixels
     processed_height_pixels = int(round(layer_height * (processed_width_pixels / layer_width)))
-  elif dimension_to_keep == HEIGHT:
+  elif dimension_to_keep == ScaleDimensions.HEIGHT:
     processed_height_pixels = height_pixels
     processed_width_pixels = int(round(layer_width * (processed_height_pixels / layer_height)))
   else:
@@ -327,37 +327,40 @@ def _get_scale_to_fit_values(layer, width_pixels, height_pixels):
   return processed_width_pixels, processed_height_pixels
 
 
-_SCALE_UNITS = (
-  PERCENT_LAYER_WIDTH,
-  PERCENT_LAYER_HEIGHT,
-  PERCENT_IMAGE_WIDTH,
-  PERCENT_IMAGE_HEIGHT,
-  PIXELS,
-) = (
-  'percentage_of_layer_width',
-  'percentage_of_layer_height',
-  'percentage_of_image_width',
-  'percentage_of_image_height',
-  'pixels',
-)
+class ScaleUnits:
+  SCALE_UNITS = (
+    PERCENT_IMAGE_WIDTH,
+    PERCENT_IMAGE_HEIGHT,
+    PERCENT_LAYER_WIDTH,
+    PERCENT_LAYER_HEIGHT,
+    PIXELS,
+  ) = (
+    'percentage_of_image_width',
+    'percentage_of_image_height',
+    'percentage_of_layer_width',
+    'percentage_of_layer_height',
+    'pixels',
+  )
 
 
-_SCALE_DIMENSIONS = (
-  WIDTH,
-  HEIGHT,
-) = (
-  'width',
-  'height',
-)
+class ScaleDimensions:
+  SCALE_DIMENSIONS = (
+    WIDTH,
+    HEIGHT,
+  ) = (
+    'width',
+    'height',
+  )
 
 
-_SCALE_OBJECTS = (
-  IMAGE,
-  LAYER,
-) = (
-  'image',
-  'layer',
-)
+class ScaleObjects:
+  SCALE_OBJECTS = (
+    IMAGE,
+    LAYER,
+  ) = (
+    'image',
+    'layer',
+  )
 
 
 INTERACTIVE_OVERWRITE_MODES_LIST = [
@@ -532,10 +535,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'object_to_scale',
-      'default_value': IMAGE,
+      'default_value': ScaleObjects.IMAGE,
       'items': [
-        (IMAGE, _('Image')),
-        (LAYER, _('Layer')),
+        (ScaleObjects.IMAGE, _('Image')),
+        (ScaleObjects.LAYER, _('Layer')),
       ],
       'display_name': _('Object to scale'),
     },
@@ -548,13 +551,13 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'width_unit',
-      'default_value': PERCENT_IMAGE_WIDTH,
+      'default_value': ScaleUnits.PERCENT_IMAGE_WIDTH,
       'items': [
-        (PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (PIXELS, _('Pixels')),
+        (ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (ScaleUnits.PIXELS, _('Pixels')),
       ],
       'display_name': _('Unit for width'),
     },
@@ -567,13 +570,13 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'height_unit',
-      'default_value': PERCENT_IMAGE_HEIGHT,
+      'default_value': ScaleUnits.PERCENT_IMAGE_HEIGHT,
       'items': [
-        (PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (PIXELS, _('Pixels')),
+        (ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (ScaleUnits.PIXELS, _('Pixels')),
       ],
       'display_name': _('Unit for height'),
     },
@@ -607,10 +610,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'dimension_to_keep',
-      'default_value': WIDTH,
+      'default_value': ScaleDimensions.WIDTH,
       'items': [
-        (WIDTH, _('Width')),
-        (HEIGHT, _('Height')),
+        (ScaleDimensions.WIDTH, _('Width')),
+        (ScaleDimensions.HEIGHT, _('Height')),
       ],
       'display_name': _('Dimension to keep'),
     },
@@ -623,9 +626,9 @@ _SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'name': 'scale_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = LAYER
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = PERCENT_LAYER_WIDTH
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = PERCENT_LAYER_HEIGHT
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = ScaleObjects.LAYER
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = ScaleUnits.PERCENT_LAYER_WIDTH
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = ScaleUnits.PERCENT_LAYER_HEIGHT
 
 
 _BUILTIN_PROCEDURES_LIST = [

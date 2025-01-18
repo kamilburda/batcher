@@ -345,7 +345,7 @@ class TestUpdateHandlers(unittest.TestCase):
     )
     self.assertEqual(
       self.settings['main/procedures/scale/arguments/object_to_scale'].value,
-      builtin_procedures.LAYER,
+      builtin_procedures.ScaleObjects.LAYER,
     )
 
     self.assertIn('layers', self.settings['main/procedures/use_layer_size/arguments'])

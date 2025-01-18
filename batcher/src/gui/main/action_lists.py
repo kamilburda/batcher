@@ -548,22 +548,22 @@ def _set_display_name_for_matching_text_constraint(
       match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint):
   display_name = None
 
-  if match_mode_setting.value == builtin_constraints.STARTS_WITH:
+  if match_mode_setting.value == builtin_constraints.MatchModes.STARTS_WITH:
     if text_setting.value:
       display_name = _('Starting with "{}"').format(text_setting.value)
     else:
       display_name = _('Starting with any text')
-  elif match_mode_setting.value == builtin_constraints.CONTAINS:
+  elif match_mode_setting.value == builtin_constraints.MatchModes.CONTAINS:
     if text_setting.value:
       display_name = _('Containing "{}"').format(text_setting.value)
     else:
       display_name = _('Containing any text')
-  elif match_mode_setting.value == builtin_constraints.ENDS_WITH:
+  elif match_mode_setting.value == builtin_constraints.MatchModes.ENDS_WITH:
     if text_setting.value:
       display_name = _('Ending with "{}"').format(text_setting.value)
     else:
       display_name = _('Ending with any text')
-  elif match_mode_setting.value == builtin_constraints.REGEX:
+  elif match_mode_setting.value == builtin_constraints.MatchModes.REGEX:
     display_name = _('Matching pattern "{}"').format(text_setting.value)
 
   if display_name is not None:

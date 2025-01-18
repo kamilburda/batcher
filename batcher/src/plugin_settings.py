@@ -722,7 +722,8 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
 
 
 def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
-  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value == builtin_procedures.LAYER)
+  local_origin_setting.gui.set_sensitive(
+    object_to_scale_setting.value == builtin_procedures.ScaleObjects.LAYER)
 
 
 def _set_sensitive_for_keep_aspect_ratio(scale_to_fit_setting, keep_aspect_ratio_setting):
@@ -743,8 +744,8 @@ def _set_sensitive_for_dimension_to_ignore(
       height_unit_setting,
 ):
   is_sensitive = dimension_to_keep_setting.gui.get_sensitive()
-  is_width = dimension_to_keep_setting.value == builtin_procedures.WIDTH
-  is_height = dimension_to_keep_setting.value == builtin_procedures.HEIGHT
+  is_width = dimension_to_keep_setting.value == builtin_procedures.ScaleDimensions.WIDTH
+  is_height = dimension_to_keep_setting.value == builtin_procedures.ScaleDimensions.HEIGHT
 
   new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
   width_unit_setting.gui.set_sensitive(is_width or not is_sensitive)

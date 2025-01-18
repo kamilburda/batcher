@@ -918,14 +918,14 @@ def _update_to_0_7(data, _settings, procedure_groups):
             },
             {
               'type': 'choice',
-              'default_value': builtin_procedures.WIDTH,
+              'default_value': builtin_procedures.ScaleDimensions.WIDTH,
               'name': 'dimension_to_keep',
               'items': [
-                (builtin_procedures.WIDTH, _('Width')),
-                (builtin_procedures.HEIGHT, _('Height')),
+                (builtin_procedures.ScaleDimensions.WIDTH, _('Width')),
+                (builtin_procedures.ScaleDimensions.HEIGHT, _('Height')),
               ],
               'display_name': _('Dimension to keep'),
-              'value': builtin_procedures.WIDTH,
+              'value': builtin_procedures.ScaleDimensions.WIDTH,
             },
           ])
 
@@ -1143,29 +1143,29 @@ def _update_to_1_0(data, _settings, procedure_groups):
             {
               'type': 'choice',
               'name': 'object_to_scale',
-              'default_value': builtin_procedures.LAYER,
-              'value': builtin_procedures.LAYER,
+              'default_value': builtin_procedures.ScaleObjects.LAYER,
+              'value': builtin_procedures.ScaleObjects.LAYER,
               'items': [
-                (builtin_procedures.IMAGE, _('Image')),
-                (builtin_procedures.LAYER, _('Layer')),
+                (builtin_procedures.ScaleObjects.IMAGE, _('Image')),
+                (builtin_procedures.ScaleObjects.LAYER, _('Layer')),
               ],
               'display_name': _('Object to scale'),
             })
 
           arguments_list[4]['items'] = [
-            (builtin_procedures.PERCENT_IMAGE_WIDTH, _('% of image width')),
-            (builtin_procedures.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-            (builtin_procedures.PERCENT_LAYER_WIDTH, _('% of layer width')),
-            (builtin_procedures.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-            (builtin_procedures.PIXELS, _('Pixels')),
+            (builtin_procedures.ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
+            (builtin_procedures.ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+            (builtin_procedures.ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
+            (builtin_procedures.ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+            (builtin_procedures.ScaleUnits.PIXELS, _('Pixels')),
           ]
 
           arguments_list[6]['items'] = [
-            (builtin_procedures.PERCENT_IMAGE_WIDTH, _('% of image width')),
-            (builtin_procedures.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-            (builtin_procedures.PERCENT_LAYER_WIDTH, _('% of layer width')),
-            (builtin_procedures.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-            (builtin_procedures.PIXELS, _('Pixels')),
+            (builtin_procedures.ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
+            (builtin_procedures.ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+            (builtin_procedures.ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
+            (builtin_procedures.ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+            (builtin_procedures.ScaleUnits.PIXELS, _('Pixels')),
           ]
 
         if (orig_name_setting_dict['default_value'] == 'use_layer_size'
