@@ -755,7 +755,6 @@ def _update_to_0_6(data, _settings, procedure_groups):
       for constraint_dict in constraints_list:
         constraint_list = constraint_dict['settings']
 
-        function_setting_dict, _index = _get_child_setting(constraint_list, 'function')
         orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
         display_name_setting_dict, _index = _get_child_setting(constraint_list, 'display_name')
         origin_setting_dict, _index = _get_child_setting(constraint_list, 'origin')
