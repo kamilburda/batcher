@@ -334,7 +334,6 @@ def _update_to_0_4(data, _settings, procedure_groups):
         arguments_list[3]['gui_type'] = 'name_pattern_entry'
 
       if orig_name_setting_dict['default_value'] == 'rename' and arguments_list is not None:
-        procedure_dict['name'] = 'rename_for_export_layers'
         orig_name_setting_dict['value'] = 'rename_for_export_layers'
         orig_name_setting_dict['default_value'] = 'rename_for_export_layers'
 
@@ -342,7 +341,6 @@ def _update_to_0_4(data, _settings, procedure_groups):
         arguments_list[0]['gui_type'] = 'name_pattern_entry'
 
       if orig_name_setting_dict['default_value'] == 'remove_folder_structure':
-        procedure_dict['name'] = 'remove_folder_structure_for_export_layers'
         orig_name_setting_dict['value'] = 'remove_folder_structure_for_export_layers'
         orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
 
@@ -978,7 +976,6 @@ def _update_to_0_8(data, _settings, procedure_groups):
           'layer_mask', 'channel', 'selection', 'path']
 
         if orig_name_setting_dict['default_value'] == 'remove_folder_structure_for_export_layers':
-          procedure_dict['name'] = 'remove_folder_structure'
           orig_name_setting_dict['value'] = 'remove_folder_structure'
           orig_name_setting_dict['default_value'] = 'remove_folder_structure'
 
@@ -1138,7 +1135,6 @@ def _update_to_1_0(data, _settings, procedure_groups):
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
         if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
-          procedure_dict['name'] = 'scale_for_layers'
           orig_name_setting_dict['value'] = 'scale_for_layers'
           orig_name_setting_dict['default_value'] = 'scale_for_layers'
 
@@ -1174,7 +1170,6 @@ def _update_to_1_0(data, _settings, procedure_groups):
 
         if (orig_name_setting_dict['default_value'] == 'use_layer_size'
             and arguments_list is not None):
-          procedure_dict['name'] = 'resize_to_layer_size'
           orig_name_setting_dict['value'] = 'resize_to_layer_size'
           orig_name_setting_dict['default_value'] = 'resize_to_layer_size'
 
