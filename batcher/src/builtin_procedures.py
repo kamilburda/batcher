@@ -132,7 +132,8 @@ def remove_folder_structure_from_item(batcher):
   item.children = []
 
 
-def remove_folder_structure_from_item_for_edit_layers(layer_batcher, consider_parent_visible=False):
+def remove_folder_structure_from_item_for_edit_layers(
+      layer_batcher, consider_parent_visible=False):
   item = layer_batcher.current_item
 
   if layer_batcher.edit_mode and not layer_batcher.is_preview:
@@ -211,7 +212,8 @@ def resize_to_layer_size(_batcher, layers):
     layer = layers[0]
 
     layer_offset_x, layer_offset_y = layer.get_offsets()[1:]
-    layer.get_image().resize(layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
+    layer.get_image().resize(
+      layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
   elif len(layers) > 1:
     image = layers[0].get_image()
 
