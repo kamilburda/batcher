@@ -705,9 +705,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
       self._set_current_procedure_and_constraint(action)
 
-      orig_function = function
-
-      args, kwargs = self._get_action_args_and_kwargs(action, action_args, orig_function)
+      args, kwargs = self._get_action_args_and_kwargs(action, action_args)
 
       if 'constraint' in action.tags:
         function = self._set_apply_constraint_to_folders(function, action)
@@ -734,7 +732,7 @@ class Batcher(metaclass=abc.ABCMeta):
     if 'constraint' in action.tags:
       self._last_constraint = action
 
-  def _get_action_args_and_kwargs(self, action, action_args, function):
+  def _get_action_args_and_kwargs(self, action, action_args):
     args, kwargs = self._get_replaced_args(
       action_args, action['origin'].value in ['gimp_pdb', 'gegl'])
 
