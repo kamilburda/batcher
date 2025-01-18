@@ -896,7 +896,7 @@ _BUILTIN_PROCEDURES_LIST = [
       },
       {
         'type': 'bool',
-        'name': 'rename_group_layers',
+        'name': 'rename_folders',
         'default_value': False,
         'display_name': _('Rename group layers'),
         'gui_type': 'check_button',
