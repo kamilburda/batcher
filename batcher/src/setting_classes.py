@@ -22,57 +22,15 @@ from src.gui.entry import entries as entries_
 from src.path import validators as validators_
 
 
-class ValidatableStringSetting(pg.setting.StringSetting):
-  """Abstract class for string settings which are meant to be validated with one
-  of the `path.validators.StringValidator` subclasses.
-
-  To determine whether the string is valid, `is_valid()` from the corresponding
-  subclass is called.
-
-  Message IDs for invalid values:
-    Message IDs defined in `path.validators.FileValidatorErrorStatuses`.
-  """
-
-  _ABSTRACT = True
-
-  def __init__(
-        self,
-        name: str,
-        string_validator_class: Type[validators_.StringValidator],
-        **kwargs,
-  ):
-    """Initializes a `ValidatableStringSetting` instance.
-
-    Args:
-      string_validator_class:
-        `path.validators.StringValidator` subclass used to validate the value
-        assigned to this object.
-    """
-    self._string_validator = string_validator_class
-
-    super().__init__(name, **kwargs)
-
-  def _validate(self, string_):
-    is_valid, status_messages = self._string_validator.is_valid(string_)
-
-    if not is_valid:
-      for status, status_message in status_messages:
-        return status_message, status
-
-
-class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
-  folder choosers.
-
-  Value: Current folder.
-  """
+class AbstractFileChooserButtonPresenter(pg.setting.GtkPresenter):
 
   _VALUE_CHANGED_SIGNAL = 'file-set'
 
-  def _create_widget(self, setting, width_chars=30, **kwargs):
+  def _create_widget(
+        self, setting, action=Gtk.FileChooserAction.OPEN, width_chars=30, **kwargs):
     button = Gtk.FileChooserButton(
       title=setting.display_name,
-      action=Gtk.FileChooserAction.SELECT_FOLDER,
+      action=action,
     )
 
     if setting.value is not None:
@@ -88,7 +46,7 @@ class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
     if folder is not None:
       return folder
     else:
-      return pg.utils.get_pictures_directory()
+      return self._setting.default_value
 
   def _set_value(self, dirpath):
     self._widget.set_filename(dirpath if dirpath is not None else '')
@@ -112,13 +70,118 @@ class FolderChooserButtonPresenter(pg.setting.GtkPresenter):
         cell_renderer.set_property('wrap-width', -1)
 
 
+class FileChooserButtonPresenter(AbstractFileChooserButtonPresenter):
+  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
+  file choosers.
+
+  Value: Current file.
+  """
+
+  def _create_widget(self, setting, width_chars=30, **kwargs):
+    return super()._create_widget(
+      setting, action=Gtk.FileChooserAction.OPEN, width_chars=width_chars, **kwargs)
+
+
+class FolderChooserButtonPresenter(AbstractFileChooserButtonPresenter):
+  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
+  folder choosers.
+
+  Value: Current folder.
+  """
+
+  def _create_widget(self, setting, width_chars=30, **kwargs):
+    return super()._create_widget(
+      setting, action=Gtk.FileChooserAction.SELECT_FOLDER, width_chars=width_chars, **kwargs)
+
+
+class ValidatableStringSetting(pg.setting.StringSetting):
+  """Abstract class for string settings which are meant to be validated with one
+  of the `path.validators.StringValidator` subclasses.
+
+  To determine whether the string is valid, `is_valid()` from the corresponding
+  subclass is called.
+
+  If you pass ``nullable=True``, ``None`` or an empty string will be
+  considered a valid value.
+
+  Message IDs for invalid values:
+    Message IDs defined in `path.validators.FileValidatorErrorStatuses`.
+  """
+
+  _ABSTRACT = True
+
+  def __init__(
+        self,
+        name: str,
+        string_validator_class: Type[validators_.StringValidator],
+        nullable: bool = False,
+        **kwargs,
+  ):
+    """Initializes a `ValidatableStringSetting` instance.
+
+    Args:
+      string_validator_class:
+        `path.validators.StringValidator` subclass used to validate the value
+        assigned to this object.
+      nullable:
+        See the `nullable` property.
+    """
+    self._string_validator = string_validator_class
+    self._nullable = nullable
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def nullable(self) -> bool:
+    """If ``True``, ``None`` is treated as a valid value when calling
+    `set_value()`.
+    """
+    return self._nullable
+
+  def _validate(self, string_):
+    if self._nullable and not string_:
+      return
+
+    is_valid, status_messages = self._string_validator.is_valid(string_)
+
+    if not is_valid:
+      for status, status_message in status_messages:
+        return status_message, status
+
+
+class FilepathSetting(ValidatableStringSetting):
+  """Class for settings storing file paths as strings.
+
+  The `path.validators.FilepathValidator` subclass is used to determine whether
+  the file path is valid.
+
+  If ``None`` or an empty string is assigned to this setting, the default value
+  (see below) is assigned instead.
+
+  Default value: An empty string.
+  """
+
+  _ALLOWED_GUI_TYPES = [FileChooserButtonPresenter]
+
+  _DEFAULT_DEFAULT_VALUE = ''
+
+  def __init__(self, name, **kwargs):
+    super().__init__(name, validators_.FilepathValidator, **kwargs)
+
+  def _raw_to_value(self, raw_value):
+    if raw_value:
+      return raw_value
+    else:
+      return self._DEFAULT_DEFAULT_VALUE
+
+
 class DirpathSetting(ValidatableStringSetting):
   """Class for settings storing directory paths as strings.
 
-  The `path.validatorsDirpathValidator` subclass is used to determine whether
+  The `path.validators.DirpathValidator` subclass is used to determine whether
   the directory path is valid.
 
-  If ``None`` or an empty string is assigned to this seting, the default value
+  If ``None`` or an empty string is assigned to this setting, the default value
   (see below) is assigned instead.
 
   Default value: `Pictures` directory in the user's home directory.
@@ -167,7 +230,7 @@ class FileExtensionEntryPresenter(ExtendedEntryPresenter):
 class FileExtensionSetting(ValidatableStringSetting):
   """Class for settings storing file extensions as strings.
 
-  The `path.validatorsFileExtensionValidator` subclass is used to determine
+  The `path.validators.FileExtensionValidator` subclass is used to determine
   whether the file extension is valid.
   """
 
