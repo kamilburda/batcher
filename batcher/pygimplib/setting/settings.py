@@ -695,9 +695,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     the ``'value-not-valid'`` event is triggered.
 
     Override this method in subclasses to provide subclass-specific
-    validation. If a value is not valid, the overriden method must return a
+    validation. If a value is not valid, the overridden method must return a
     tuple consisting of at least a message and a message ID (a string
-    indicating the type of message). If a value is valid, the overriden
+    indicating the type of message). If a value is valid, the overridden
     method must return ``None``.
     """
     pass
