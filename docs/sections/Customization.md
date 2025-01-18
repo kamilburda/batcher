@@ -359,32 +359,37 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 **Insert background**
 
-Inserts layers tagged with a specific color tag as background for each layer.
+Inserts a new layer behind the current layer.
 
-The _blue_ color tag is used as background by default.
-You may set a different color tag representing the background layers by adjusting the `Color tag` option.
+For Batch Convert, specify an image file to be loaded as background.
+
+For Export Layers and Edit Layers, mark layers in your opened image with a color tag.
+The _blue_ color tag is used for background by default.
+You may set a different color tag by adjusting the `Color tag` option.
 
 This procedure is inserted at the first position.
-This prevents potential confusion when `Resize to layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
+This prevents potential confusion when `Resize to layer size` is not present and the background is offset relative to the layer rather than the image canvas.
 If this is your intention, you can always move this procedure below `Resize to layer size`.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
-By default, background layers themselves are excluded from editing/export as the `Not background` constraint is automatically added.
+For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` constraint is automatically added and enabled.
 
 **Insert foreground**
 
-Inserts layers tagged with a specific color tag as foreground for each layer.
+Inserts a new layer in front of the current layer.
 
-The _green_ color tag is used as foreground by default.
+For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
+
+The `Merge foreground` procedure is added automatically. For Export Layers and Edit Layers, the `Not foreground` constraint is added automatically.
 
 For more information, see `Insert background` above.
 
 **Merge background** (only available if `Insert background` is added)
 
-Merges already inserted background (via `Insert background`, see above) with the current layer.
+Merges already inserted background (via `Insert background`, see above) into the current layer.
 
-When exporting layers, the background is merged automatically.
+When exporting, the background is merged automatically.
 However, if needed, you can reorder this procedure to perform the merge earlier and then apply procedures on the current layer, now merged with the background.
 
 For [Edit Layers](Usage.md#batch-editing-layers), this procedure ensures that you have a single merged layer rather than having the background as a separate layer.
@@ -398,7 +403,7 @@ Options:
 
 **Merge foreground** (only available if `Insert foreground` is added)
 
-Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
+Merges already inserted foreground (via `Insert foreground`, see above) with the current layer.
 
 For more information, see `Merge background` above.
 
