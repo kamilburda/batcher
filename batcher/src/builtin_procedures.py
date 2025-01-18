@@ -111,6 +111,104 @@ def preserve_layer_locks_between_actions(layer_batcher):
       item.raw.set_lock_alpha(lock_alpha)
 
 
+def align_and_offset_layers(
+      batcher,
+      layers_to_align,
+      reference_object,
+      reference_layer,
+      horizontal_align,
+      vertical_align,
+      x_offset,
+      x_offset_unit,
+      y_offset,
+      y_offset_unit,
+):
+  image_width = batcher.current_image.get_width()
+  image_height = batcher.current_image.get_height()
+
+  if reference_layer is not None:
+    ref_layer_x, ref_layer_y = reference_layer.get_offsets()[1:]
+    ref_layer_width = reference_layer.get_width()
+    ref_layer_height = reference_layer.get_height()
+  else:
+    ref_layer_x = 0
+    ref_layer_y = 0
+    ref_layer_width = 1
+    ref_layer_height = 1
+
+  for layer in layers_to_align:
+    new_x, new_y = layer.get_offsets()[1:]
+
+    if horizontal_align == HorizontalAlignments.LEFT:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_x = 0
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_x = ref_layer_x
+    elif horizontal_align == HorizontalAlignments.CENTER:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_x = (image_width - layer.get_width()) // 2
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_x = ref_layer_x + (ref_layer_width - layer.get_width()) // 2
+    elif horizontal_align == HorizontalAlignments.RIGHT:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_x = image_width - layer.get_width()
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_x = ref_layer_x + ref_layer_width - layer.get_width()
+
+    if vertical_align == VerticalAlignments.TOP:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_y = 0
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_y = ref_layer_y
+    elif vertical_align == VerticalAlignments.CENTER:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_y = (image_height - layer.get_height()) // 2
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_y = ref_layer_y + (ref_layer_height - layer.get_height()) // 2
+    elif vertical_align == VerticalAlignments.BOTTOM:
+      if reference_object == AlignReferenceObjects.IMAGE:
+        new_y = image_height - layer.get_height()
+      elif reference_object == AlignReferenceObjects.LAYER:
+        new_y = ref_layer_y + ref_layer_height - layer.get_height()
+
+    if x_offset:
+      if x_offset_unit == Units.PIXELS:
+        new_x += int(x_offset)
+      elif x_offset_unit == Units.PERCENT_IMAGE_WIDTH:
+        new_x += int(round((image_width * x_offset) / 100))
+      elif x_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
+        new_x += int(round((image_height * x_offset) / 100))
+      elif x_offset_unit == Units.PERCENT_LAYER_WIDTH:
+        new_x += int(round((ref_layer_width * x_offset) / 100))
+      elif x_offset_unit == Units.PERCENT_LAYER_HEIGHT:
+        new_x += int(round((ref_layer_height * x_offset) / 100))
+
+    if y_offset:
+      if y_offset_unit == Units.PIXELS:
+        new_y += int(y_offset)
+      elif y_offset_unit == Units.PERCENT_IMAGE_WIDTH:
+        new_y += int(round((image_width * y_offset) / 100))
+      elif y_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
+        new_y += int(round((image_height * y_offset) / 100))
+      elif y_offset_unit == Units.PERCENT_LAYER_WIDTH:
+        new_y += int(round((ref_layer_width * y_offset) / 100))
+      elif y_offset_unit == Units.PERCENT_LAYER_HEIGHT:
+        new_y += int(round((ref_layer_height * y_offset) / 100))
+
+    layer.set_offsets(new_x, new_y)
+
+
+def apply_opacity_from_group_layers(layer_batcher):
+  new_layer_opacity = layer_batcher.current_layer.get_opacity() / 100.0
+
+  raw_parent = layer_batcher.current_item.raw.get_parent()
+  while raw_parent is not None:
+    new_layer_opacity = new_layer_opacity * (raw_parent.get_opacity() / 100.0)
+    raw_parent = raw_parent.get_parent()
+
+  layer_batcher.current_layer.set_opacity(new_layer_opacity * 100.0)
+
+
 def merge_filters(_batcher, layer):
   layer.merge_filters()
 
@@ -152,17 +250,6 @@ def remove_folder_structure_from_item_for_edit_layers(
 
   item.parents = []
   item.children = []
-
-
-def apply_opacity_from_group_layers(layer_batcher):
-  new_layer_opacity = layer_batcher.current_layer.get_opacity() / 100.0
-
-  raw_parent = layer_batcher.current_item.raw.get_parent()
-  while raw_parent is not None:
-    new_layer_opacity = new_layer_opacity * (raw_parent.get_opacity() / 100.0)
-    raw_parent = raw_parent.get_parent()
-  
-  layer_batcher.current_layer.set_opacity(new_layer_opacity * 100.0)
 
 
 def rename_image(image_batcher, pattern, rename_images=True, rename_folders=False):
@@ -269,13 +356,13 @@ def scale(
 
 
 def _convert_to_pixels(image, layer, dimension, dimension_unit):
-  if dimension_unit == ScaleUnits.PERCENT_IMAGE_WIDTH:
+  if dimension_unit == Units.PERCENT_IMAGE_WIDTH:
     pixels = (dimension / 100) * image.get_width()
-  elif dimension_unit == ScaleUnits.PERCENT_IMAGE_HEIGHT:
+  elif dimension_unit == Units.PERCENT_IMAGE_HEIGHT:
     pixels = (dimension / 100) * image.get_height()
-  elif dimension_unit == ScaleUnits.PERCENT_LAYER_WIDTH:
+  elif dimension_unit == Units.PERCENT_LAYER_WIDTH:
     pixels = (dimension / 100) * layer.get_width()
-  elif dimension_unit == ScaleUnits.PERCENT_LAYER_HEIGHT:
+  elif dimension_unit == Units.PERCENT_LAYER_HEIGHT:
     pixels = (dimension / 100) * layer.get_height()
   else:
     pixels = dimension
@@ -297,10 +384,10 @@ def _get_keep_aspect_ratio_values(dimension_to_keep, layer, width_pixels, height
   if layer_height == 0:
     layer_height = 1
 
-  if dimension_to_keep == ScaleDimensions.WIDTH:
+  if dimension_to_keep == Dimensions.WIDTH:
     processed_width_pixels = width_pixels
     processed_height_pixels = int(round(layer_height * (processed_width_pixels / layer_width)))
-  elif dimension_to_keep == ScaleDimensions.HEIGHT:
+  elif dimension_to_keep == Dimensions.HEIGHT:
     processed_height_pixels = height_pixels
     processed_width_pixels = int(round(layer_width * (processed_height_pixels / layer_height)))
   else:
@@ -327,8 +414,8 @@ def _get_scale_to_fit_values(layer, width_pixels, height_pixels):
   return processed_width_pixels, processed_height_pixels
 
 
-class ScaleUnits:
-  SCALE_UNITS = (
+class Units:
+  UNITS = (
     PERCENT_IMAGE_WIDTH,
     PERCENT_IMAGE_HEIGHT,
     PERCENT_LAYER_WIDTH,
@@ -343,13 +430,51 @@ class ScaleUnits:
   )
 
 
-class ScaleDimensions:
-  SCALE_DIMENSIONS = (
+class Dimensions:
+  DIMENSIONS = (
     WIDTH,
     HEIGHT,
   ) = (
     'width',
     'height',
+  )
+
+
+class HorizontalAlignments:
+  HORIZONTAL_ALIGNMENTS = (
+    KEEP,
+    LEFT,
+    CENTER,
+    RIGHT,
+  ) = (
+    'keep',
+    'left',
+    'center',
+    'right',
+  )
+
+
+class VerticalAlignments:
+  VERTICAL_ALIGNMENTS = (
+    KEEP,
+    TOP,
+    CENTER,
+    BOTTOM,
+  ) = (
+    'keep',
+    'top',
+    'center',
+    'bottom',
+  )
+
+
+class AlignReferenceObjects:
+  ALIGN_REFERENCE_OBJECTS = (
+    IMAGE,
+    LAYER,
+  ) = (
+    'image',
+    'layer',
   )
 
 
@@ -551,13 +676,13 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'width_unit',
-      'default_value': ScaleUnits.PERCENT_IMAGE_WIDTH,
+      'default_value': Units.PERCENT_IMAGE_WIDTH,
       'items': [
-        (ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (ScaleUnits.PIXELS, _('Pixels')),
+        (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (Units.PIXELS, _('Pixels')),
       ],
       'display_name': _('Unit for width'),
     },
@@ -570,13 +695,13 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'height_unit',
-      'default_value': ScaleUnits.PERCENT_IMAGE_HEIGHT,
+      'default_value': Units.PERCENT_IMAGE_HEIGHT,
       'items': [
-        (ScaleUnits.PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (ScaleUnits.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (ScaleUnits.PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (ScaleUnits.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (ScaleUnits.PIXELS, _('Pixels')),
+        (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
+        (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+        (Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
+        (Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
+        (Units.PIXELS, _('Pixels')),
       ],
       'display_name': _('Unit for height'),
     },
@@ -610,10 +735,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
     {
       'type': 'choice',
       'name': 'dimension_to_keep',
-      'default_value': ScaleDimensions.WIDTH,
+      'default_value': Dimensions.WIDTH,
       'items': [
-        (ScaleDimensions.WIDTH, _('Width')),
-        (ScaleDimensions.HEIGHT, _('Height')),
+        (Dimensions.WIDTH, _('Width')),
+        (Dimensions.HEIGHT, _('Height')),
       ],
       'display_name': _('Dimension to keep'),
     },
@@ -627,8 +752,8 @@ _SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 _SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = ScaleObjects.LAYER
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = ScaleUnits.PERCENT_LAYER_WIDTH
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = ScaleUnits.PERCENT_LAYER_HEIGHT
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = Units.PERCENT_LAYER_WIDTH
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = Units.PERCENT_LAYER_HEIGHT
 
 
 _BUILTIN_PROCEDURES_LIST = [
@@ -638,6 +763,102 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Apply opacity from group layers'),
     'description': _('Combines opacity from all parent group layers and the current layer.'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  },
+  {
+    'name': 'align_and_offset_layers',
+    'function': align_and_offset_layers,
+    'display_name': _('Align and offset'),
+    'description': _(
+      'Aligns layer(s) with the image or, if specified, another layer.'
+      '\n\nYou may specify additional offsets after the alignment is applied.'),
+    'display_options_on_create': True,
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'arguments': [
+      {
+        'type': 'placeholder_layer_array',
+        'name': 'layers_to_align',
+        'element_type': 'layer',
+        'default_value': 'current_layer_for_array',
+        'display_name': _('Layers to align'),
+      },
+      {
+        'type': 'choice',
+        'name': 'reference_object',
+        'default_value': AlignReferenceObjects.IMAGE,
+        'items': [
+          (AlignReferenceObjects.IMAGE, _('Image')),
+          (AlignReferenceObjects.LAYER, _('Another layer')),
+        ],
+        'display_name': _('Object to align layers with'),
+      },
+      {
+        'type': 'placeholder_layer',
+        'name': 'reference_layer',
+        'display_name': _('Another layer to align layers with'),
+      },
+      {
+        'type': 'choice',
+        'name': 'horizontal_align',
+        'default_value': HorizontalAlignments.KEEP,
+        'items': [
+          (HorizontalAlignments.KEEP, _('Keep')),
+          (HorizontalAlignments.LEFT, _('Left')),
+          (HorizontalAlignments.CENTER, _('Center')),
+          (HorizontalAlignments.RIGHT, _('Right')),
+        ],
+        'display_name': _('Horizontal alignment'),
+      },
+      {
+        'type': 'choice',
+        'name': 'vertical_align',
+        'default_value': VerticalAlignments.KEEP,
+        'items': [
+          (VerticalAlignments.KEEP, _('Keep')),
+          (VerticalAlignments.TOP, _('Top')),
+          (VerticalAlignments.CENTER, _('Center')),
+          (VerticalAlignments.BOTTOM, _('Bottom')),
+        ],
+        'display_name': _('Vertical alignment'),
+      },
+      {
+        'type': 'double',
+        'name': 'x_offset',
+        'default_value': 0.0,
+        'display_name': _('Additional X-offset'),
+      },
+      {
+        'type': 'choice',
+        'name': 'x_offset_unit',
+        'default_value': Units.PIXELS,
+        'items': [
+          (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
+          (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+          (Units.PERCENT_LAYER_WIDTH, _('% of another layer width')),
+          (Units.PERCENT_LAYER_HEIGHT, _('% of another layer height')),
+          (Units.PIXELS, _('Pixels')),
+        ],
+        'display_name': _('Unit for the additional X-offset'),
+      },
+      {
+        'type': 'double',
+        'name': 'y_offset',
+        'default_value': 0.0,
+        'display_name': _('Additional Y-offset'),
+      },
+      {
+        'type': 'choice',
+        'name': 'y_offset_unit',
+        'default_value': Units.PIXELS,
+        'items': [
+          (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
+          (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
+          (Units.PERCENT_LAYER_WIDTH, _('% of another layer width')),
+          (Units.PERCENT_LAYER_HEIGHT, _('% of another layer height')),
+          (Units.PIXELS, _('Pixels')),
+        ],
+        'display_name': _('Unit for the additional Y-offset'),
+      },
+    ],
   },
   {
     'name': 'insert_background_for_images',

@@ -174,6 +174,7 @@ def create_settings_for_convert():
   _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
   _set_file_extension_options_for_default_export_procedure(settings['main'])
 
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_align_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
@@ -306,6 +307,7 @@ def create_settings_for_export_layers():
   _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
   _set_file_extension_options_for_default_export_procedure(settings['main'])
 
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_align_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
@@ -395,6 +397,7 @@ def create_settings_for_edit_layers():
         visible_constraint_dict]),
   ])
 
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_align_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
 
@@ -602,6 +605,24 @@ def _set_file_extension_options_for_default_export_procedure(main_settings):
     main_settings['file_extension'])
 
 
+def _on_after_add_align_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value == 'align_and_offset_layers':
+    _set_sensitive_for_reference_layer_in_align(
+      procedure['arguments/reference_object'],
+      procedure['arguments/reference_layer'])
+
+    procedure['arguments/reference_object'].connect_event(
+      'value-changed',
+      _set_sensitive_for_reference_layer_in_align,
+      procedure['arguments/reference_layer'])
+
+
+def _set_sensitive_for_reference_layer_in_align(
+      reference_object_setting, reference_layer_setting):
+  reference_layer_setting.gui.set_sensitive(
+    reference_object_setting.value == builtin_procedures.AlignReferenceObjects.LAYER)
+
+
 def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('export_for_'):
     _set_sensitive_for_image_name_pattern_in_export(
@@ -744,8 +765,8 @@ def _set_sensitive_for_dimension_to_ignore(
       height_unit_setting,
 ):
   is_sensitive = dimension_to_keep_setting.gui.get_sensitive()
-  is_width = dimension_to_keep_setting.value == builtin_procedures.ScaleDimensions.WIDTH
-  is_height = dimension_to_keep_setting.value == builtin_procedures.ScaleDimensions.HEIGHT
+  is_width = dimension_to_keep_setting.value == builtin_procedures.Dimensions.WIDTH
+  is_height = dimension_to_keep_setting.value == builtin_procedures.Dimensions.HEIGHT
 
   new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
   width_unit_setting.gui.set_sensitive(is_width or not is_sensitive)
