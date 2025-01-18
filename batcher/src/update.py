@@ -1194,6 +1194,12 @@ def _update_to_1_0(data, _settings, procedure_groups):
           orig_name_setting_dict['value'] = 'insert_foreground_for_layers'
           orig_name_setting_dict['default_value'] = 'insert_foreground_for_layers'
 
+        if (orig_name_setting_dict['default_value'] == 'rename_for_edit_layers'
+            and arguments_list is not None):
+          for argument_dict in arguments_list:
+            if argument_dict['name'] == 'rename_group_layers':
+              argument_dict['name'] = 'rename_folders'
+
 
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
