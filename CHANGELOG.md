@@ -1,5 +1,7 @@
 ## Upcoming
 
+**New major feature: Batch conversion of files.** You can now batch-process image files and convert them to a different file format, optionally applying procedures (scale, insert background, ...) and filtering the list of images to be processed via constraints (filenames having a particular file extension, beginning/ending with a prefix/suffix, ...).
+
 Changes to procedures and constraints:
 * Added a new procedure named `Align and offset` that allows aligning layer(s) with the image or another layer. You may also apply offsets with pixels or a percentage of image/layer width/height.
 * For the `Scale` procedure, you may now choose whether to scale a layer (the default for Export Layers and Edit Layers) or the entire image (a new option, the default for Batch Convert).
