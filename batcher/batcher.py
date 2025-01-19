@@ -52,7 +52,10 @@ def plug_in_batch_convert(_procedure, config, _data):
   image_tree = pg.itemtree.ImageFileTree()
 
   def _fill_image_tree_with_loaded_inputs(settings):
-    image_tree.add(settings['main/inputs'].value)
+    if run_mode == Gimp.RunMode.NONINTERACTIVE:
+      image_tree.add(settings['main/inputs'].value)
+    else:
+      utils_.add_objects_to_item_tree(image_tree, settings['gui/inputs_interactive'].value)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(

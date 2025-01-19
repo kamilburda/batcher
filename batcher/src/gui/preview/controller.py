@@ -13,7 +13,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src.gui import utils as gui_utils_
+from src import utils as utils_
 
 
 class PreviewsController:
@@ -94,7 +94,7 @@ class PreviewsController:
   def _add_inputs_to_name_preview(self):
     self._name_preview.remove_all_items()
 
-    gui_utils_.add_paths_to_image_file_tree(
+    utils_.add_objects_to_item_tree(
       self._name_preview.batcher.item_tree, self._settings['gui/inputs_interactive'].value)
 
     pg.invocation.timeout_add_strict(
@@ -229,8 +229,7 @@ class PreviewsController:
 
     def _get_inputs_from_name_preview(setting_):
       if self._settings['gui/keep_inputs'].value:
-        setting_.set_value(
-          gui_utils_.image_file_tree_items_to_paths(self._name_preview.batcher.item_tree))
+        setting_.set_value(utils_.item_tree_items_to_paths(self._name_preview.batcher.item_tree))
       else:
         setting_.set_value([])
 
