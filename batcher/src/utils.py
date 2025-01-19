@@ -123,7 +123,7 @@ def _copy_dict(dict_, initial_object=None):
   return copied_children
 
 
-def item_tree_items_to_paths(item_tree: pg.itemtree.ItemTree):
+def item_tree_items_to_objects(item_tree: pg.itemtree.ItemTree):
   return [
     [item.id, item.orig_parent.id] if item.orig_parent is not None else [item.id, None]
     for item in item_tree.iter_all()]

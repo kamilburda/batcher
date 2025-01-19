@@ -229,7 +229,7 @@ class PreviewsController:
 
     def _get_inputs_from_name_preview(setting_):
       if self._settings['gui/keep_inputs'].value:
-        setting_.set_value(utils_.item_tree_items_to_paths(self._name_preview.batcher.item_tree))
+        setting_.set_value(utils_.item_tree_items_to_objects(self._name_preview.batcher.item_tree))
       else:
         setting_.set_value([])
 
