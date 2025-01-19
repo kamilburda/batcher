@@ -377,8 +377,8 @@ class ImageFileItem(Item):
             if not os.path.isdir(resolved_path):
               filtered_paths.append(path)
             else:
-              # This detects symbolic links to folders pointing to one of its
-              # parent folders, which could create an infinite loop. We exclude
+              # This detects a symbolic link pointing to one of its parent
+              # folders, which could create an infinite loop. We exclude
               # these links to avoid getting stuck in a loop.
               if not pathlib.Path(item_path).is_relative_to(resolved_path):
                 filtered_paths.append(path)
