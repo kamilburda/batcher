@@ -1,0 +1,32 @@
+# Site settings
+title: Batcher
+description: "Image automation plug-in for GIMP 3."
+baseurl: "/batcher"
+url: "https://kamilburda.github.io"
+repository: "kamilburda/batcher"
+github_username: "Kamil Burda"
+copyright_years: "2023-2025"
+permalink: /:categories/:year-:month-:day-:slug:output_ext
+show_excerpts: true
+excerpt_separator: "<!-- end of summary -->"
+paginate: 10
+paginate_path: "/news/:num/"
+
+plugin_name: "batcher"
+plugin_version: "0.8.2"
+plugin_version_release_date: "December 29, 2024"
+download_zip_suffix: ".zip"
+sections_url: "/sections/"
+news_url: "/news/"
+license_remote_url: "blob/main/LICENSE"
+license_local_filename: "LICENSE.txt"
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-github-metadata
+  - jekyll-seo-tag
+  - jekyll-feed
+
+# Build settings
+markdown: kramdown
+is_release_build: false

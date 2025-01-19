@@ -1,0 +1,29 @@
+---
+layout: home
+title: ""
+---
+
+## What can Batcher do?
+
+* Export images to any file format provided by GIMP and third-party plug-ins
+* Apply arbitrary procedures (scale, insert background, layer effects, ...) during batch processing
+* Apply constraints to restrict the images/layers to process (only images matching a suffix, only visible layers, ...)
+
+## Getting started and need help?
+
+See [Installation](sections/Installation.html) and [Usage](sections/Usage.html).
+
+
+## Need more customization?
+
+See [Customization](sections/Customization.html).
+
+
+## Having trouble?
+
+See the [known issues](sections/Usage.html#known-issues) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
+
+
+## Curious about the latest changes and other news?
+
+See [News](news/index.html).
