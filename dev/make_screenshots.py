@@ -20,6 +20,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import utils as utils_
 from src.procedure_groups import *
 
 
@@ -37,11 +38,12 @@ from src.gui import main as gui_main
 
 TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
-TEST_IMAGES_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
+TEST_IMAGE_FOR_LAYERS_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
 
 OUTPUT_DIRPATH = os.path.join(pg.utils.get_pictures_directory(), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
+SCREENSHOT_DIALOG_CONVERT_FILENAME = 'screenshot_dialog_convert.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME = 'screenshot_dialog_export_layers_quick.png'
 SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
@@ -49,7 +51,27 @@ SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
 
 def main():
-  image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGES_FILEPATH))
+  image_file_tree = pg.itemtree.ImageFileTree()
+  image_file_tree.add([
+    os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs', filename)
+    for filename in os.listdir(os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs'))])
+
+  pg.config.PROCEDURE_GROUP = CONVERT_GROUP
+
+  convert_settings = plugin_settings.create_settings_for_convert()
+  convert_settings['gui/inputs_interactive'].set_value(
+    utils_.item_tree_items_to_objects(image_file_tree))
+
+  gui_main.BatchProcessingGui(
+    image_file_tree,
+    convert_settings,
+    'export',
+    'image',
+    title='Batch Convert',
+    run_gui_func=take_screenshots_for_convert,
+  )
+
+  image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGE_FOR_LAYERS_FILEPATH))
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -61,6 +83,7 @@ def main():
     plugin_settings.create_settings_for_export_layers(),
     'export',
     'layer',
+    title='Export Layers',
     run_gui_func=take_screenshots_for_export_layers,
   )
 
@@ -71,6 +94,7 @@ def main():
     plugin_settings.create_settings_for_edit_layers(),
     'edit',
     'layer',
+    title='Edit Layers',
     run_gui_func=take_screenshots_for_edit_layers,
   )
 
@@ -89,6 +113,45 @@ def main():
     Gtk.main_quit()
 
   image.delete()
+
+
+def take_screenshots_for_convert(gui, dialog, settings):
+  os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
+
+  settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
+
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+
+  # Wait until the preview is updated.
+  time.sleep(0.2)
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  dialog.set_focus(None)
+
+  # We iterate without filtering as file extensions from item names are stripped
+  # as a part of processing (the default Rename procedure). As a result, the
+  # initial "Recognized file format" constraint will not match any item.
+  main_background_item = next(
+    iter(
+      item for item in gui.name_preview.batcher.item_tree.iter(filtered=False)
+      if item.id.endswith('main-background.xcf')))
+
+  gui.name_preview.set_selected_items([main_background_item.key])
+
+  # Wait until the preview is updated.
+  time.sleep(0.1)
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_CONVERT_FILENAME,
+    settings,
+    decoration_offsets,
+  )
 
 
 def take_screenshots_for_export_layers(gui, dialog, settings):
@@ -111,7 +174,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
       item.raw for item in gui.name_preview.batcher.item_tree
       if item.raw.get_name() == 'main-background'))
 
-  gui.name_preview.set_selected_items({main_background_layer.get_id()})
+  gui.name_preview.set_selected_items([main_background_layer.get_id()])
 
   # Wait until the preview is updated.
   time.sleep(0.1)
@@ -168,7 +231,7 @@ def take_screenshots_for_edit_layers(gui, dialog, settings):
       item.raw for item in gui.name_preview.batcher.item_tree
       if item.raw.get_name() == 'main-background'))
 
-  gui.name_preview.set_selected_items({main_background_layer.get_id()})
+  gui.name_preview.set_selected_items([main_background_layer.get_id()])
 
   # Wait until the preview is updated.
   time.sleep(0.1)
