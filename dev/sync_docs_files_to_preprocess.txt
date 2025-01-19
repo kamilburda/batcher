@@ -1,14 +1,5 @@
 docs/README_raw.md
 README.md
 
-docs/GitHub_page/_config.yml
-docs/gh-pages/_config.yml
-
-docs/GitHub_page/index.md
-docs/gh-pages/index.md
-
-docs/GitHub_page/sections
-docs/gh-pages/dev/sections
-
-docs/GitHub_page/sections/CHANGELOG.md
-docs/gh-pages/sections/CHANGELOG.md
+docs/GitHub_page
+docs/gh-pages/dev
