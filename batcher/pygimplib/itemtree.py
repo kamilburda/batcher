@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable, Iterator
+import pathlib
 import os
 from typing import Any, Dict, Generator, List, Optional, Union
 
@@ -353,12 +354,38 @@ class ImageFileItem(Item):
     return self._id
 
   def _list_child_objects(self) -> List[str]:
+    item_path = os.path.abspath(self.id)
+
     try:
-      filenames = os.listdir(self.id)
-    except FileNotFoundError:
+      filenames = os.listdir(item_path)
+    except OSError:
       return []
     else:
-      return sorted(os.path.abspath(os.path.join(self.id, filename)) for filename in filenames)
+      paths = sorted(os.path.join(item_path, filename) for filename in filenames)
+
+      filtered_paths = []
+      for path in paths:
+        if os.path.islink(path):
+          try:
+            # This detects symbolic link loops.
+            resolved_path_object = pathlib.Path(path).resolve()
+          except (OSError, RuntimeError):
+            pass
+          else:
+            resolved_path = str(resolved_path_object)
+
+            if not os.path.isdir(resolved_path):
+              filtered_paths.append(path)
+            else:
+              # This detects symbolic links to folders pointing to one of its
+              # parent folders, which could create an infinite loop. We exclude
+              # these links to avoid getting stuck in a loop.
+              if not pathlib.Path(item_path).is_relative_to(resolved_path):
+                filtered_paths.append(path)
+        else:
+          filtered_paths.append(path)
+
+      return filtered_paths
 
   def _get_name_from_object(self) -> str:
     return os.path.basename(self._object)
