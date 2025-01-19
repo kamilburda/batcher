@@ -140,7 +140,7 @@ def export(
       if use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
           item_to_process, default_file_extension, file_extension_properties)
-      
+
       if convert_file_extension_to_lowercase:
         current_file_extension = current_file_extension.lower()
       
@@ -280,7 +280,7 @@ def _process_item_name(
 
 
 def _get_current_file_extension(item, default_file_extension, file_extension_properties):
-  item_file_extension = fileext.get_file_extension(_get_item_export_name(item))
+  item_file_extension = fileext.get_file_extension(item.orig_name)
   
   if item_file_extension and file_extension_properties[item_file_extension].is_valid:
     return item_file_extension

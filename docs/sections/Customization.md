@@ -93,8 +93,7 @@ Each time you add this procedure, adjust the file extension, file format options
   The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension.
-  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names. However, the only way to adjust file format options for layer-specific file extensions is to set *How to adjust file format options* to `Interactively`.
+* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension. Note that the only way to adjust file format options for each different file format is to set *How to adjust file format options* to `Interactively`.
 * *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
 
 

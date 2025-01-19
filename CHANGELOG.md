@@ -6,6 +6,7 @@ Changes to procedures and constraints:
 * Renamed `Use layer size` to `Resize to layer size` and allowed customizing the layer. You may now resize the background layer, foreground layer or all layers (the latter effectively resizing the image to fit all layers).
 * Added `Merge filters` as a built-in procedure that merges all visible filters (layer effects) in the specified layer. This is equivalent to adding the `gimp-drawable-merge-filters` procedure, only more convenient.
 * Added a new constraint named `Matching text...` that allows filtering items that start with, contain or end with the specified text. You may also specify a Python regular expression or perform case-insensitive matching. The name of the constraint automatically changes as you adjust its options.
+* The `Use file extension in layer name` option for the `Export` procedure now uses the original layer name. This way, you no longer need to specify the `[full layer name]` field just to preserve the file extension. This also allows using different name patterns that do not include the layer name (such as `image[001]`).
 * Procedures and constraints causing errors are now automatically deactivated. This avoids spamming the user with warning dialogs.
 
 User interface changes:
