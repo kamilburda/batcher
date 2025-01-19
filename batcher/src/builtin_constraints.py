@@ -57,7 +57,8 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
 def has_recognized_file_format(item, _image_batcher):
   file_extension = fileext.get_file_extension(item.name).lower()
   return (
-    file_extension in file_formats_.FILE_FORMATS_DICT
+    file_extension
+    and file_extension in file_formats_.FILE_FORMATS_DICT
     and file_formats_.FILE_FORMATS_DICT[file_extension].has_import_proc()
   )
 
