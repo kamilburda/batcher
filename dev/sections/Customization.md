@@ -19,7 +19,7 @@ As the amount of customization may be overwhelming at first, you may want to tak
 
 **I want to export all layers using the image size, not the layer size.**
 
-Uncheck or remove the `Use layer size` procedure.
+Uncheck or remove the `Resize to layer size` procedure.
 
 
 **I want to export only visible layers.**
@@ -70,7 +70,7 @@ Yes! You may insert any GIMP filter as a procedure:
 
 1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
 2. Add the `Insert background` procedure and adjust the color tag as necessary.
-3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Use layer size` by dragging it onto `Use layer size`.
+3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
 4. (optional) You can adjust how the background is merged with each layer by setting the merge type in the `Merge background` procedure that was added automatically.
 
 
@@ -81,7 +81,7 @@ While multipage PDF export is already possible in GIMP without any third-party p
 1. Select or type `pdf` as the file extension.
 2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
 3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
-4. You may want to uncheck the `Use layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
+4. You may want to uncheck the `Resize to layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 
 **I want to be able to export to multiple file formats at once.**
@@ -100,8 +100,7 @@ Each time you add this procedure, adjust the file extension, file format options
   The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
   For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension.
-  For Export Layers, you very likely need to choose `Full layer name` in the text entry next to `Name` to preserve file extensions in layer names. However, the only way to adjust file format options for layer-specific file extensions is to set *How to adjust file format options* to `Interactively`.
+* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension. Note that the only way to adjust file format options for each different file format is to set *How to adjust file format options* to `Interactively`.
 * *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
 
 
@@ -336,6 +335,22 @@ You can add the same procedure multiple times.
 
 ### Built-in Procedures
 
+**Align and offset**
+
+Aligns layer(s) with the current image or, if specified, another layer within the image.
+You may specify additional offsets after the alignment is applied.
+
+Options:
+* *Layers to align*: Layers to align. This can be a single layer (e.g. the current layer, background, foreground) or all layers inserted in the currently processed image.
+* *Object to align layers with*: Whether to align with the entire image or another layer.
+* *Another layer to align layers with*
+* *Horizontal alignment*: Left, center or right alignment, or *Keep* the horizontal position intact.
+* *Vertical alignment*: Top, center or bottom alignment, or *Keep* the vertical position intact.
+* *Additional X-offset*: Moves the layers horizontally by the specified amount.
+* *Unit for the additional X-offset*: Can be pixels or percentages of image/another layer width/height.
+* *Additional Y-offset*: Moves the layers vertically by the specified amount.
+* *Unit for the additional Y-offset*: Can be pixels or percentages of image/another layer width/height.
+
 **Export**/**Also export as...**
 
 Exports a layer to the specified file format.
@@ -366,32 +381,37 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 **Insert background**
 
-Inserts layers tagged with a specific color tag as background for each layer.
+Inserts a new layer behind the current layer.
 
-The _blue_ color tag is used as background by default.
-You may set a different color tag representing the background layers by adjusting the `Color tag` option.
+For Batch Convert, specify an image file to be loaded as background.
+
+For Export Layers and Edit Layers, mark layers in your opened image with a color tag.
+The _blue_ color tag is used for background by default.
+You may set a different color tag by adjusting the `Color tag` option.
 
 This procedure is inserted at the first position.
-This prevents potential confusion when `Use layer size` is unchecked and the background is offset relative to the layer rather than the image canvas.
-If this is your intention, you can always move this procedure below `Use layer size`.
+This prevents potential confusion when `Resize to layer size` is not present and the background is offset relative to the layer rather than the image canvas.
+If this is your intention, you can always move this procedure below `Resize to layer size`.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
-By default, background layers themselves are excluded from editing/export as the `Not background` constraint is automatically added.
+For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` constraint is automatically added and enabled.
 
 **Insert foreground**
 
-Inserts layers tagged with a specific color tag as foreground for each layer.
+Inserts a new layer in front of the current layer.
 
-The _green_ color tag is used as foreground by default.
+For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
+
+The `Merge foreground` procedure is added automatically. For Export Layers and Edit Layers, the `Not foreground` constraint is added automatically.
 
 For more information, see `Insert background` above.
 
 **Merge background** (only available if `Insert background` is added)
 
-Merges already inserted background (via `Insert background`, see above) with the current layer.
+Merges already inserted background (via `Insert background`, see above) into the current layer.
 
-When exporting layers, the background is merged automatically.
+When exporting, the background is merged automatically.
 However, if needed, you can reorder this procedure to perform the merge earlier and then apply procedures on the current layer, now merged with the background.
 
 For [Edit Layers](Usage.md#batch-editing-layers), this procedure ensures that you have a single merged layer rather than having the background as a separate layer.
@@ -405,9 +425,19 @@ Options:
 
 **Merge foreground** (only available if `Insert foreground` is added)
 
-Merges an already inserted foreground layer (via `Insert foreground`, see above) with the current layer.
+Merges already inserted foreground (via `Insert foreground`, see above) with the current layer.
 
 For more information, see `Merge background` above.
+
+**Merge filters**
+
+Merges all visible filters (layer effects) in the specified layer.
+
+**Merge visible layers** (Batch Convert only)
+
+Merges all visible layers within the image into a single layer. Invisible layers are removed.
+
+This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other procedures on the entire image.
 
 **Remove folder structure**
 
@@ -436,25 +466,26 @@ This is similar to the built-in `Scale layer...` procedure in GIMP that allows s
 Options:
 * *Image*: Image to use for computing the new width or height.
 * *Layer*: Layer to scale and to use for computing the new width or height.
+* *Object to scale*: Whether to scale the entire *Image* or the *Layer* within the image.
 * *New width*: The new width.
-* *Unit for width*: Unit for the new width - pixels or percentages of layer/image width/height.
+* *Unit for width*: Unit for the new width - pixels or percentages of image/layer width/height.
 * *New height*: The new height.
-* *Unit for height*: Unit for the new height - pixels or percentages of layer/image width/height.
+* *Unit for height*: Unit for the new height - pixels or percentages of image/layer width/height.
 * *Interpolation*: Type of interpolation to use.
-* *Use local origin*: If checked, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
+* *Use local origin*: If checked and *Object to scale* is set to *Layer*, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 * *Scale to fit*: If checked, the layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the layer will be fit.
 * *Keep aspect ratio*: If checked, the layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
 * *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
-**Use layer size** (Export Layers only)
+**Resize to layer size** (Batch Convert and Export Layers only)
 
-If enabled, layers will be resized (not scaled) to their size instead of the image size.
-This procedure is enabled by default.
+If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
 
-To keep the size of the image canvas and the layer position within the image, disable this setting.
+This procedure is enabled by default for Export Layers.
+
+To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
-To export the entire layer, leave this setting enabled.
 
 
 ### Adding Custom Procedures
@@ -504,7 +535,17 @@ Processes only layers that are not inserted as foreground via `Insert foreground
 
 **Matching file extension**
 
-Processes only layers having a file extension matching the extension typed in the text entry.
+Processes only layers having the file extension typed in the main dialog.
+
+**Matching text...**
+
+Processes only images or layers matching the specified text.
+
+You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching file extension` constraint).
+
+Matching can be made case-insensitive by checking the *Ignore case sensitivity* option.
+
+You can also specify a regular expression pattern as defined in the [`re` module for Python](https://docs.python.org/3/library/re.html). Errors in the regular expression pattern will result in no matches.
 
 **Selected in GIMP**
 
