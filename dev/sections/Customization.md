@@ -38,7 +38,7 @@ Yes! You may apply any GIMP filter or plug-in:
 
 **How can I insert watermarks?**
 
-You can think of watermarks as foreground, i.e. an image/layer added on top of your existing image/layer.
+You can think of watermarks as foreground, i.e. a layer added on top of your images.
 
 For Batch Convert:
 1. Add the `Insert foreground` procedure and specify an image file serving as the foreground.
