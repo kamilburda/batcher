@@ -129,7 +129,7 @@ a {
 .navbar-container {
   @include large {
     max-width: 72rem;
-    padding: 1rem 6rem;
+    padding: 1.25rem 6rem;
     margin: 0 auto;
   }
 
@@ -178,14 +178,10 @@ a {
 
 .navbar a {
   color: $navbar-link-color;
-  
-  &:hover {
-    color: $navbar-link-color-active;
-  }
 }
 
 .navbar a.active {
-  color: $navbar-link-color-active;
+  font-weight: bold;
 }
 
 .navbar-logo {

@@ -1,6 +1,7 @@
 ---
 layout: home
 title: ""
+navbar_active_tab: Home
 ---
 
 ## What can Batcher do?
