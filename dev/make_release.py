@@ -363,12 +363,12 @@ def _get_release_message_header(release_metadata):
 
 def _prepare_gh_pages_for_update(release_metadata):
   print(f'Preparing branch "{release_metadata.gh_pages_repo.active_branch.name}" for update')
-  
+
   if release_metadata.dry_run:
     return
 
   for filename in os.listdir(os.path.join(GITHUB_PAGES_DIRPATH, 'dev')):
-    if os.path.isdir(filename):
+    if os.path.isdir(os.path.join(GITHUB_PAGES_DIRPATH, filename)):
       shutil.rmtree(os.path.join(GITHUB_PAGES_DIRPATH, filename))
       shutil.copytree(
         os.path.join(GITHUB_PAGES_DIRPATH, 'dev', filename),
