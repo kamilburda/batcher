@@ -29,7 +29,7 @@ Click on the text entry next to `Name` and choose `image001`, or type `image[001
 
 **I want to adjust brightness in the images. Can this be done?**
 
-Yes! You may insert any GIMP filter as a procedure:
+Yes! You may apply any GIMP filter or plug-in:
 1. Select `Add Procedure... → Add Custom Procedure...`
 2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
 3. Adjust the options as desired.
