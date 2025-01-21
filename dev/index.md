@@ -6,8 +6,8 @@ title: ""
 ## What can Batcher do?
 
 * Export images to any file format provided by GIMP and third-party plug-ins
-* Apply arbitrary procedures (scale, insert background, layer effects, ...) during batch processing
-* Apply constraints to restrict the images/layers to process (only images matching a suffix, only visible layers, ...)
+* Apply arbitrary procedures during batch processing (rename, scale, insert background, filters, ...)
+* Apply constraints to restrict the images/layers to process (only images matching a filename suffix, only visible layers, ...)
 
 ## Getting started and need help?
 
