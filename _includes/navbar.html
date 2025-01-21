@@ -2,7 +2,9 @@
   <div class="navbar-container" role="navigation">
     <div>
       <ul>
-        {%- assign sections_relative_url = site.sections_url | relative_url -%}
+        {%- assign page_url_filename = page.url | remove_last: '/' | split: '/' | last -%}
+        {%- assign len_sections = page.url.size | minus: page_url_filename.size -%}
+        {%- assign sections_relative_url = page.url | slice: 0, len_sections | relative_url -%}
         {%- assign file_ext = "" -%}
         {%- if site.is_release_build -%}
           {%- assign file_ext = ".html" -%}
