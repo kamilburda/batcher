@@ -1,14 +1,70 @@
 ## Getting Started with Customization
 
 Beyond the basic features, Batcher allows you to:
-* adjust layer names,
-* apply custom *procedures* to each layer (insert background, scale down, ...),
-* filter layers by applying *constraints* (only visible layers, ...).
+* adjust image/layer names,
+* apply custom *procedures* to each image/layer (scale down, insert background, layer effects, GIMP plug-ins, ...),
+* filter image/layers by applying *constraints* (only filenames matching a suffix, only visible layers, ...).
 
 As the amount of customization may be overwhelming at first, you may want to take a look at a few [examples](#examples) below.
 
 
 ## Examples
+
+**I don't want to preserve folder hierarchy when exporting.**
+
+Add and check the `Remove folder structure` procedure if not already (`Add Procedure... → Remove folder structure`).
+
+
+**How do I rename the images to form a sequence of numbers, e.g. "image001", "image002", ...?**
+
+Click on the text entry next to `Name` and choose `image001`, or type `image[001]` in the entry.
+
+
+**I want to adjust brightness in the images. Can this be done?**
+
+Yes! You may insert any GIMP filter as a procedure:
+1. Select `Add Procedure... → Add Custom Procedure...`
+2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
+3. Adjust the options as desired.
+4. Select `Add` to add the procedure.
+
+
+**How can I insert watermarks?**
+
+You can think of watermarks as foreground, i.e. an image/layer added on top of your existing image/layer.
+
+For Batch Convert:
+1. Add the `Insert foreground` procedure and specify an image file serving as the foreground.
+2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
+
+For Export Layers and Edit Layers:
+1. In GIMP, assign a color tag to the layer(s) you want to consider foreground (right-click on a layer → `Color Tags` → choose your color).
+2. Add the `Insert foreground` procedure and adjust the color tag as necessary.
+3. (optional) If you want the foreground to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
+4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
+
+
+**I need every image to have the same background.**
+
+You can follow the same steps as in the example above, except that you add the `Insert background` procedure (and adjust `Merge background` as needed).
+
+
+**I want to create a single multipage PDF file.**
+
+While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each folder/group layer as separate PDFs.
+
+1. Select or type `pdf` as the file extension.
+2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
+3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
+4. For Export Layers, you may want to uncheck the `Resize to layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
+
+
+**I want to be able to export to multiple file formats at once.**
+
+You can achieve this by adding the `Also export as...` (or `Export`) procedure.
+
+Each time you add this procedure, adjust the file extension, file format options and other settings as needed.
+
 
 **I want to export all layers using the image size, not the layer size.**
 
@@ -27,16 +83,6 @@ Check the `Visible` constraint (or add one if not already via `Add Constraint...
    In the dialog, click on `More options` and then check `Also apply to parent folders`.
 
 
-**I don't want to preserve folder hierarchy when exporting layers.**
-
-Add the `Remove folder structure` procedure (`Add Procedure... → Remove folder structure`).
-
-
-**How do I rename the layers to form a sequence of numbers, e.g. "image001", "image002", ...?**
-
-Click on the text entry next to `Name` and choose `image001`, or type `image[001]` in the entry.
-
-
 **My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?**
 
 In the text entry next to `Name`, choose `Full layer name` or type `[layer name, %e]`.
@@ -50,63 +96,30 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 3. Add the `Top-level` constraint.
 
 
-**I want to adjust brightness in my layers. Can this be done?**
-
-Yes! You may insert any GIMP filter as a procedure:
-1. Select `Add Procedure... → Add Custom Procedure...`
-2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
-3. Adjust the options as desired.
-4. Select `Add` to add the procedure.
-
-
-**I need every layer to have the same background.**
-
-1. In GIMP, assign a color tag to the layer(s) you want to consider background (right-click on a layer → `Color Tags` → choose your color).
-2. Add the `Insert background` procedure and adjust the color tag as necessary.
-3. (optional) If you want the background to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
-4. (optional) You can adjust how the background is merged with each layer by setting the merge type in the `Merge background` procedure that was added automatically.
-
-
-**I want to save the entire image as a single multipage PDF file.**
-
-While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each group layer (instead of the entire image).
-
-1. Select or type `pdf` as the file extension.
-2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
-3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
-4. You may want to uncheck the `Resize to layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
-
-
-**I want to be able to export to multiple file formats at once.**
-
-You can achieve this by adding the `Also export as...` (or `Export`) procedure.
-
-Each time you add this procedure, adjust the file extension, file format options and other settings as needed.
-
-
 ## Export Options
 
-* *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first layer to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
+* *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first image to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
 * *File format options*: A list of options specific to the file format typed in the main dialog.
 * *If a file exists*: If set to `Ask` (the default), the user is asked to choose how to handle existing files (replace, skip, rename, etc.). Setting this to a different value applies that mode to each file without asking the user (e.g. setting this to `Replace` will automatically replace all existing files with the same name).
-* *Perform export*: Whether to export each item separately ("For each image"/"For each layer"), each top-level item or folder separately ("For each top-level layer or group"/"For each top-level image or folder"), or a single image containing all items ("As a single image").
+* *Perform export*: Whether to export each item separately ("For each image"/"For each layer"), each top-level item or folder separately ("For each top-level image or folder"/"For each top-level layer or group"), or a single image containing all items ("As a single image").
   The latter two options provide multi-layer export. This allows exporting e.g. multipage PDFs or animated GIFs with additional custom procedures applied before the export.
 * *Image filename pattern*: Filename pattern available when a single image is exported (the "Entire image at once" option is selected).
-  For Export Layers, the text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
-* *Use file extension in layer name*: If a layer name has a recognized file extension, use that file extension in place of the default file extension. Note that the only way to adjust file format options for each different file format is to set *How to adjust file format options* to `Interactively`.
+  The text entry next to `Name` still applies to individual layer names (since some multi-layer file formats also store layer names, e.g. TIFF or PSD).
+* *Use original file extension*/*Use file extension in layer name*: If an image/layer name has a recognized file extension, use that file extension in place of the default file extension. Note that, currently, the only way to adjust file format options for each different file format is to set *How to adjust file format options* to `Interactively`.
 * *Convert file extension to lowercase*: File extensions in layer names are converted to lowercase.
+* *Use original modification date* (Batch Convert only): Preserves the original access and modification dates.
 
 
-## Adjusting Layer Names (Filenames)
+## Adjusting Filenames
 
 There are several built-in *fields* that you can combine to form a name pattern.
-For example, `image[001]` renames the layers to `image001`, `image002` and so on.
+For example, `image[001]` renames the images/layers to `image001`, `image002` and so on.
 The fields are described below in detail.
 
 Press the Down button or click anywhere on the entry to display the list of available fields.
 The text entry can show you examples of how each field is used if you place the text cursor inside a field (e.g. inside `[001]`).
 
-The preview automatically updates as you change the name pattern and so can greatly help you figure out how your specified pattern affects the layer names.
+The input list of images/layers automatically updates as you change the name pattern and so can greatly help you figure out how your specified pattern affects the image/layer names.
 
 You can combine multiple fields if needed, for example `[layer name]-[001]`.
 
@@ -120,31 +133,71 @@ You can choose the fields from the dropdown list displayed when clicking on the 
 
 **Number**
 
-A number incrementing for each layer.
-The numbering is separate for each group layer.
+A number incrementing for each image/layer.
+The numbering is separate for each folder/group layer.
 
 Options:
-* `%n`: Continue numbering across group layers.
+* `%n`: Continue numbering across folders/group layers.
 * `%d<number>`: Use descending numbers, optionally with the specified padding (number of digits).
-  If the number is 0, the first number is the number of layers to export within a group layer, or, if `%n` is also specified, the number of all layers to export.
+  If the number is 0, the first number is the number of images/layers to export within a folder/group layer, or, if `%n` is also specified, the number of all images/layers to export.
 
 Examples:
 * `[1]` → `1`, `2`, ...
 * `[001]` → `001`, `002`, ..., `009`, `010`, ..., `999`, `1000`, ...
 * `[005]` → `005`, `006`, ...
-* `[001, %n]` → `001`, `002`, ... (continues numbering across group layers)
+* `[001, %n]` → `001`, `002`, ... (continues numbering across folders/group layers)
 * `[000, %d]` → `010`, `009`, ... (if the number of layers is 10)
 * `[10, %d2]` → `10`, `09`, ...
 
-**\[layer name\]**
+**\[image name\]**
+
+The current image name.
+
+Options:
+* *file extension strip mode*:
+	* `%e`: Never strip the extension.
+	* `%i` (Batch Convert only): Strip the extension only if the image has a file extension that does not match the entered file extension.
+	* `%n` (Batch Convert only): Strip the extension only if the image has a file extension that matches the entered file extension (the inverse of `%i`).
+
+Examples:
+* `[image name]` for an image named `Frame` → `Frame`
+* `[layer name]` for an image named `Frame.png` → `Frame`
+* `[image name, %e]` for an image named `Frame.png` if the file extension is `png` → `Frame.png`
+* `[image name, %i]` for an image named `Frame.png` if the file extension is `png` → `Frame.png`
+* `[image name, %n]` for an image named `Frame.png` if the file extension is `png` → `Frame`
+* `[image name, %e]` for an image named `Frame.png` if the file extension is `jpg` → `Frame.jpg`
+* `[image name, %i]` for an image named `Frame.png` if the file extension is `jpg` → `Frame`
+* `[image name, %n]` for an image named `Frame.png` if the file extension is `jpg` → `Frame.jpg`
+
+**\[image path\]** (Batch Convert only)
+
+The "full path" of an image, from its topmost folder added as input to the image itself. This does not include folders above the folder added as input.
+
+For example, if the folder named `Body` contains a subfolder named `Hands` which contains an image named `Left`, the image path will be `Body-Hands-Left`.
+
+Options:
+* *separator*: A string separating the path components.
+  Defaults to `-`.
+* *wrapper*: A string that wraps around each path component.
+  The wrapper must contain `%c` denoting the path component.
+  Defaults to `%c`.
+* *file extension strip mode*: See the `\[image name\]` field.
+
+Examples:
+* `[image path]` → `Body-Hands-Left`
+* `[image path, _]` → `Body_Hands_Left`
+* `[image path, _, (%c)]` → `(Body)_(Hands)_(Left)`
+* `[image path, _, (%c), %e]` → `Body-Hands-Left.png` (if the image name is `Left.png` and the file extension is `png`)
+
+**\[layer name\]** (Export Layers and Edit Layers only)
 
 The layer name.
 
 Options:
 * *file extension strip mode*:
 	* `%e`: Never strip the extension.
-	* `%i` (does not apply to Edit Layers): Strip the extension only if the layer has a recognized file extension that does not match the entered file extension.
-	* `%n` (does not apply to Edit Layers): Strip the extension only if the layer has a recognized file extension that matches the entered file extension (the inverse of `%i`).
+	* `%i` (does not apply to Edit Layers): Strip the extension only if the layer has a file extension that does not match the entered file extension.
+	* `%n` (does not apply to Edit Layers): Strip the extension only if the layer has a file extension that matches the entered file extension (the inverse of `%i`).
 
 Examples:
 * `[layer name]` for a layer named `Frame` → `Frame`
@@ -156,20 +209,9 @@ Examples:
 * `[layer name, %i]` for a layer named `Frame.png` if the file extension is `jpg` → `Frame`
 * `[layer name, %n]` for a layer named `Frame.png` if the file extension is `jpg` → `Frame.jpg`
 
-**Full layer name**
+**Full layer name** (Export Layers and Edit Layers only)
 
 Equivalent to `[layer name, %e]`.
-
-**\[image name\]**
-
-The current image name.
-
-Options:
-* `%e`: If the image has a file extension, keep the extension.
-
-Examples:
-* `[image name]` → `Image`
-* `[image name, %e]` → `Image.xcf`
 
 **\[layer path\]**
 
@@ -234,15 +276,15 @@ Use the name without the `re.` prefix.
 For example, to ignore case, type `IGNORECASE` or `ignorecase`.
 You can specify multiple flags separated by commas.
 
-For the example below, suppose that a layer is named `Animal copy #1`.
+For the example below, suppose that an image is named `Animal copy #1`.
 While the square brackets (`[` and `]`) enclosing the first three field options are optional, they are necessary in case you need to specify an empty string (`[]`), leading spaces or commas.
 
 Examples:
-* `[replace, [layer name], [a], [b] ]` → `Animbl copy #1`
-* `[replace, [layer name], [a], [b], 1, ignorecase]` → `bnimal copy #1`
-* `[replace, [layer name], [ copy(?: #[[0-9]]+)*$], [] ]` → `Animal`
+* `[replace, [image name], [a], [b] ]` → `Animbl copy #1`
+* `[replace, [image name], [a], [b], 1, ignorecase]` → `bnimal copy #1`
+* `[replace, [image name], [ copy(?: #[[0-9]]+)*$], [] ]` → `Animal`
 
-**\[tags\]**
+**\[tags\]** (Export Layers and Edit Layers only)
 
 [Color tag](https://docs.gimp.org/en/gimp-layer-new.html) assigned to a layer.
 For example, suppose that a layer has a green color tag assigned.
@@ -308,13 +350,13 @@ To insert a literal square bracket (`[` or `]`), double the bracket and enclose 
 If the last option is enclosed in square brackets, leave a single space between the last and the second to last closing square bracket.
 
 Examples:
-* `[layer path, [ ] ]` → `Body Hands Left`
-* `[layer path, [,], [[[%c]]] ]` → `[Body],[Hands],[Left]`
+* `[image path, [ ] ]` → `Body Hands Left`
+* `[image path, [,], [[[%c]]] ]` → `[Body],[Hands],[Left]`
 
 
 ## Procedures
 
-Procedures allow you to apply image filters to each layer.
+Procedures allow you to apply image filters to each image/layer.
 Press the `Add Procedure...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
 
 For each procedure, you may:
@@ -346,26 +388,26 @@ Options:
 
 **Export**/**Also export as...**
 
-Exports a layer to the specified file format.
+Exports an image/layer to the specified file format.
 
-For Export Layers, this performs export to another file format.
-This way, you can set up export to multiple file formats at once.
+For Batch Convert and Export Layers, this performs export to another file format.
+
+You can add this procedure multiple times to export to multiple file formats at once.
 
 Options:
-* *Output folder*: Folder to save the output image(s).
-  When this procedure is added, the output folder is set to the folder displayed in the main dialog upon the plug-in startup.
+* *Output folder*: Folder to export the output image(s) to.
 * *File extension*: File extension of the output image(s).
 * All options specified in [Export Options](#export-options).
 
 The name of the Export procedure is automatically updated as you modify the file extension.
 
-For Export Layers, when this procedure is added, the values of the options are copied from the default export options.
+For Batch Convert and Export Layers, when this procedure is added, the values of the options are copied from the default export options.
 For example, the output folder will be identical to the one currently selected in the main dialog.
 This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
 
-When exporting each layer separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
+When exporting each image separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
 
-**Apply opacity from group layers**
+**Apply opacity from group layers** (Export Layers and Edit Layers only)
 
 Combines opacity from all parent group layers for each layer.
 This corresponds to how the layer is actually displayed in GIMP.
@@ -434,7 +476,7 @@ This is useful if the image contains multiple layers and you want to apply filte
 
 **Remove folder structure**
 
-Exports all layers to the output folder on the same level, i.e. subfolders for group layers are not created.
+Exports all images to the output folder on the same level, i.e. subfolders are not created.
 
 Options:
 * (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
@@ -442,23 +484,21 @@ Options:
 
 **Rename**
 
-Renames layers according to the specified pattern.
+Renames images/layers according to the specified pattern.
 
-This procedure uses the same text entry as the one in Export Layers next to `Name`, described in [Adjusting Layer Names (Filenames)](#adjusting-layer-names-filenames).
+This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Adjusting Layer Names (Filenames)](#adjusting-filenames).
 
-For Export Layers, this procedure performs renaming on top of the entry next to `Name`.
+For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
-Additionally, this procedure allows customizing whether to rename both layers and folders (by checking `Rename folders`, or `Rename group layers` in Edit Layers) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename layers`).
+Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
 
 **Scale**
 
-Scales layers.
-
-This is similar to the built-in `Scale layer...` procedure in GIMP that allows scaling width and height individually, using absolute (pixels) or relative (percentages) measures.
+Scales the entire image or a layer, using absolute (pixels) or relative (percentages) measures.
 
 Options:
-* *Image*: Image to use for computing the new width or height.
-* *Layer*: Layer to scale and to use for computing the new width or height.
+* *Image*: Image to scale and/or to use for computing the new width or height.
+* *Layer*: Layer to scale and/or to use for computing the new width or height.
 * *Object to scale*: Whether to scale the entire *Image* or the *Layer* within the image.
 * *New width*: The new width.
 * *Unit for width*: Unit for the new width - pixels or percentages of image/layer width/height.
@@ -466,8 +506,8 @@ Options:
 * *Unit for height*: Unit for the new height - pixels or percentages of image/layer width/height.
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and *Object to scale* is set to *Layer*, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
-* *Scale to fit*: If checked, the layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the layer will be fit.
-* *Keep aspect ratio*: If checked, the layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
+* *Scale to fit*: If checked, the image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the image/layer will be fit.
+* *Keep aspect ratio*: If checked, the image/layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
 * *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
@@ -502,37 +542,37 @@ All layer effects (procedures under the `Filters, Effects` category) have the fo
 
 ## Constraints
 
-To exclude certain layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
+To exclude certain images/layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
 Just like procedures, you may [enable/disable, reorder, edit or remove](#procedures) constraints.
 
 
 ### Built-in Constraints
 
-**Layers**
+**Layers** (Export Layers and Edit Layers only)
 
 Processes only layers (i.e. group layers are not processed).
 
-**Group layers**
+**Group layers** (Export Layers and Edit Layers only)
 
 Processes only group layers.
 
 You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
 
-**Not background** (only available if `Insert background` is added)
+**Not background** (Export Layers and Edit Layers only, and only available if `Insert background` is added)
 
 Processes only layers that are not inserted as background via `Insert background`.
 
-**Not foreground** (only available if `Insert foreground` is added)
+**Not foreground** (Export Layers and Edit Layers only, and only available if `Insert foreground` is added)
 
 Processes only layers that are not inserted as foreground via `Insert foreground`.
 
 **Matching file extension**
 
-Processes only layers having the file extension typed in the main dialog.
+Processes only images/layers having the file extension typed in the main dialog.
 
 **Matching text...**
 
-Processes only images or layers matching the specified text.
+Processes only images/layers matching the specified text.
 
 You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching file extension` constraint).
 
@@ -540,19 +580,25 @@ Matching can be made case-insensitive by checking the *Ignore case sensitivity* 
 
 You can also specify a regular expression pattern as defined in the [`re` module for Python](https://docs.python.org/3/library/re.html). Errors in the regular expression pattern will result in no matches.
 
-**Selected in GIMP**
+**Recognized file format** (Batch Convert only)
+
+Processes only images whose original file extension is supported by GIMP.
+
+If you use third-party file load plug-ins with their own file extension, uncheck this constraint so they can be processed.
+
+**Selected in GIMP** (Export Layers and Edit Layers only)
 
 Processes only layers selected in GIMP.
 
 **Top-level**
 
-Processes only layers at the top of the layer tree (i.e. layers inside any group layer are excluded).
+Processes only top-level images/layers (i.e. images/layers inside any folder/group layer are excluded).
 
-**Visible**
+**Visible** (Export Layers and Edit Layers only)
 
 Processes only visible layers.
 
-**With color tags**
+**With color tags** (Export Layers and Edit Layers only)
 
 Processes only layers having a color tag.
 
@@ -561,7 +607,7 @@ To process only layers with specific color tags, edit this constraint and add th
 For example, by adding a blue tag, only layers containing the blue tag will be processed.
 Other tagged or untagged layers will be excluded.
 
-**Without color tags**
+**Without color tags** (Export Layers and Edit Layers only)
 
 Processes only layers without a color tag.
 
@@ -580,10 +626,12 @@ To edit a procedure or a constraint, press the icon to the right of the procedur
 The dialog will be automatically displayed for most [built-in procedures](#built-in-procedures) when added.
 
 If a procedure contains a layer/drawable/item option, you may select one of the following:
-* `Current Layer` (default): applies the procedure to the currently processed layer.
+* `Current Layer` (default): applies the procedure to the currently processed layer. For Batch Convert, an input image usually contains a single layer, which will be considered the current layer. In case of multi-layer images, the first layer is considered, or the first selected layer if the stored image file contains information on the selected layers (e.g. XCF or PSD).
 * `Background Layer`: applies the procedure to the layer representing background, inserted via the `Insert background` procedure. If there is no such layer, the procedure will have no effect.
 * `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the `Insert foreground` procedure. If there is no such layer, the procedure will have no effect.
 * `All Layers`: applies the procedure to all layers within the currently processed image. This option is available usually only for procedures having the `The input drawables` argument. Note that a procedure may not work on multiple layers at once and thus may yield an error if this option is chosen.
+
+If a procedure contains an image option, there is only one option available - `Current Image`, representing the currently processed image.
 
 
 ### More Options
@@ -593,11 +641,11 @@ Expanding `More options` allows you to adjust the options below.
 **Enable for previews**
 
 If checked (the default), the procedure/constraint is applied in the preview.
-Unchecking this can be useful if a procedure takes too long or manipulates the file system (reads or saves files).
+Unchecking this can be useful if a procedure takes too long.
 
 **Also apply to parent folders** (constraints only)
 
-If checked, a layer will satisfy a constraint if all of its parent groups also satisfy the constraint.
+If checked, an image/layer will satisfy a constraint if all of its parent folders/group layers also satisfy the constraint.
 For example, if this option is checked for the `Visible` constraint, a visible layer is excluded if any of its parent group layers are not visible.
 
 
@@ -605,9 +653,12 @@ For example, if this option is checked for the `Visible` constraint, a visible l
 
 It is also possible to run Batcher without an interactive dialog, e.g. for automation purposes.
 
+The `plug-in-batch-convert` procedure allows running Batch Convert non-interactively, using the supplied UTF-8-encoded file (the `inputs` parameter) containing files and folders on each line, plus other export parameters such as the output folder or file extension. If `run-mode` is `Gimp.RunMode.WITH_LAST_VALS`, all these parameters (including `inputs`) will be ignored and instead the settings last used interactively (in the main dialog) will be considered.
+
 The `plug-in-batch-export-layers` procedure exports layers with the specified or the last used settings, depending on the value of the `run-mode` parameter.
 Likewise, `plug-in-batch-edit-layers` runs batch editing layers with the specified/last used settings.
 
-You can also run `plug-in-batch-export-layers` or `plug-in-batch-edit-layers` with [settings imported from a file](Usage.md#managing-settings) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file).
+You can also run `plug-in-batch-convert`, `plug-in-batch-export-layers` or `plug-in-batch-edit-layers` with [settings imported from a file](Usage.md#managing-settings) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file). The exception is the `inputs` parameter for `plug-in-batch-convert`, which will always be considered and the saved input images in the settings file will be ignored.
 
-The `plug-in-batch-export-layers-quick` and `plug-in-batch-edit-layers-quick` procedures perform export/editing with always the last used settings.
+The `plug-in-batch-export-layers-quick` and `plug-in-batch-edit-layers-quick` procedures perform layer export/editing with always the last used settings.
+The `plug-in-batch-export-selected-layers` and `plug-in-batch-edit-selecetged-layers` procedures perform export/editing of selected layers with always the last used settings.
