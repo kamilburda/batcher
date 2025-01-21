@@ -22,8 +22,3 @@ See [Customization](sections/Customization.html).
 ## Having trouble?
 
 See the [known issues](sections/Usage.html#known-issues) or feel free to [report other issues](https://github.com/kamilburda/batcher/issues) or [ask questions](https://github.com/kamilburda/batcher/discussions).
-
-
-## Curious about the latest changes and other news?
-
-See [News](news/index.html).
