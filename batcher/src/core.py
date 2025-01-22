@@ -1053,6 +1053,11 @@ class ImageBatcher(Batcher):
   actions (resize, rename, export, ...).
   """
 
+  def __init__(self, *args, **kwargs):
+    self._should_load_image = False
+
+    super().__init__(*args, **kwargs)
+
   def _get_initial_current_image(self):
     return self._current_item.raw
 
@@ -1106,10 +1111,10 @@ class ImageBatcher(Batcher):
       )
 
   def _process_item_with_actions(self):
-    should_load_image = self._current_image is None
+    self._should_load_image = self._current_image is None
 
     if not self._edit_mode or self._is_preview:
-      if should_load_image:
+      if self._should_load_image:
         loaded_image = self._load_image(self._current_item.id)
         if loaded_image is not None:
           self._current_image = loaded_image
@@ -1128,7 +1133,7 @@ class ImageBatcher(Batcher):
     if self._current_image is not None:
       super()._process_item_with_actions()
 
-    if should_load_image:
+    if self._should_load_image:
       self._current_item.raw = None
 
     self._current_image = None
@@ -1168,6 +1173,14 @@ class ImageBatcher(Batcher):
 
   def create_copy(self, image, layer):
     return image.duplicate(), None
+
+  def _do_cleanup_contents(self, exception_occurred):
+    super()._do_cleanup_contents(exception_occurred)
+
+    if self._should_load_image:
+      self._current_item.raw = None
+
+    self._should_load_image = False
 
 
 class LayerBatcher(Batcher):
