@@ -14,6 +14,7 @@ Changes to procedures and constraints:
 User interface changes:
 * Replaced the placeholder icon in the image preview when there is no selection.
 * Labels describing procedure/constraint parameters are now insensitive (grayed out) if their corresponding GUI elements are insensitive.
+* Export settings are now insensitive while exporting.
 
 Other changes:
 * When running Batcher non-interactively, the `settings-file` parameter is now a string rather than a `GFile` object for convenience.

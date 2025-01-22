@@ -312,6 +312,8 @@ class BatchProcessingGui:
 
     self._hbox_contents.set_sensitive(enabled)
 
+    if self._export_settings is not None:
+      self._export_settings.widget.set_sensitive(enabled)
     self._settings_manager.button.set_sensitive(enabled)
     self._button_help.set_sensitive(enabled)
     self._button_run.set_sensitive(enabled)
@@ -507,6 +509,12 @@ class BatchProcessingQuickGui:
   def _run_batcher_quick(self):
     if self._button_run is not None:
       self._button_run.set_sensitive(False)
+
+    if self._export_settings is not None:
+      self._export_settings.widget.set_sensitive(False)
+
+    if self._check_button_show_this_dialog is not None:
+      self._check_button_show_this_dialog.set_sensitive(False)
 
     self._progress_bar.show()
 
