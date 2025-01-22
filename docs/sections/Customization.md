@@ -66,6 +66,12 @@ You can achieve this by adding the `Also export as...` (or `Export`) procedure.
 Each time you add this procedure, adjust the file extension, file format options and other settings as needed.
 
 
+**I want to apply procedure(s) on image files (such as scaling), but I also want to export them using their original file format.**
+
+1. Press the `Options...` button and check `Use original file extension`.
+2. Add and adjust your desired procedures.
+
+
 **I want to export all layers using the image size, not the layer size.**
 
 Uncheck or remove the `Resize to layer size` procedure.
