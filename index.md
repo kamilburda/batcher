@@ -1,16 +1,18 @@
 ---
 layout: home
 title: ""
-navbar_active_tab: Home
 ---
 
 ## What can Batcher do?
 
-* Export layers in any file format provided by GIMP and third-party plug-ins
-* Batch edit layers with any GIMP procedure or plug-in
-* Limit export/editing to layers matching constraints
+* **Convert image files** to any file format provided by GIMP and third-party plug-ins
+* **Export layers** as images
+* **Batch-edit layers** in an image
+* **Apply any filter or plug-in** during batch processing (rename, scale, ...)
+* **Apply constraints** to process only specific images/layers (matching a suffix, visible layers, ...)
 
-## Getting started and need help?
+
+## Getting started?
 
 See [Installation](sections/Installation.html) and [Usage](sections/Usage.html).
 
@@ -22,9 +24,4 @@ See [Customization](sections/Customization.html).
 
 ## Having trouble?
 
-See the [known issues](sections/Usage.html#known-issues) or feel free to [report other issues or ask questions](https://github.com/kamilburda/batcher/issues).
-
-
-## Curious about the latest changes and other news?
-
-See [News](news/index.html).
+See the [known issues](sections/Usage.html#known-issues) or feel free to [report other issues](https://github.com/kamilburda/batcher/issues) or [ask questions](https://github.com/kamilburda/batcher/discussions).
