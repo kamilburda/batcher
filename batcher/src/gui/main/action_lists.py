@@ -253,8 +253,8 @@ def _handle_insert_background_foreground_procedure_item_added(
   constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
 
   _hide_internal_arguments_for_insert_background_foreground_procedure(item)
-  _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
-  _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
+  _set_up_merge_background_foreground_procedure(merge_item)
+  _set_up_not_background_foreground_constraint(item, constraint_item)
 
   if merge_item is not None or constraint_item is not None:
     _set_up_insert_background_foreground_procedure(
@@ -295,8 +295,8 @@ def _set_up_existing_insert_back_foreground_and_related_actions(
         constraint_item = None
 
       _hide_internal_arguments_for_insert_background_foreground_procedure(item)
-      _set_up_merge_background_foreground_procedure(merge_item, constraint_item)
-      _set_up_not_background_foreground_constraint(item, constraint_item, merge_item)
+      _set_up_merge_background_foreground_procedure(merge_item)
+      _set_up_not_background_foreground_constraint(item, constraint_item)
 
       if merge_item is not None or constraint_item is not None:
         _set_up_insert_background_foreground_procedure(
@@ -359,10 +359,9 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
   return merge_item
 
 
-def _set_up_merge_background_foreground_procedure(merge_item, constraint_item):
+def _set_up_merge_background_foreground_procedure(merge_item):
   if merge_item is not None:
-    if constraint_item is not None:
-      _set_buttons_for_action_item_sensitive(merge_item, False)
+    _set_buttons_for_action_item_sensitive(merge_item, False)
 
     merge_item.action['arguments/last_enabled_value'].gui.set_visible(False)
 
@@ -384,14 +383,14 @@ def _add_not_background_foreground_constraint(item, constraint_list):
   return constraint_item
 
 
-def _set_up_not_background_foreground_constraint(item, constraint_item, merge_item):
+def _set_up_not_background_foreground_constraint(item, constraint_item):
   if constraint_item is None:
     return
 
   def _on_insert_background_foreground_color_tag_changed(color_tag_setting):
     constraint_item.action['arguments/color_tag'].set_value(color_tag_setting.value)
 
-  if merge_item is not None:
+  if constraint_item is not None:
     _set_buttons_for_action_item_sensitive(constraint_item, False)
 
   constraint_item.action['arguments/color_tag'].gui.set_visible(False)
