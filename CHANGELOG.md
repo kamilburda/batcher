@@ -1,4 +1,6 @@
-## Upcoming
+## 1.0-RC1
+
+### January 22, 2025
 
 **New major feature: Batch conversion of files.** You can now batch-process image files and convert them to a different file format, optionally applying procedures (scale, insert background, ...) and filtering the list of images to be processed via constraints (filenames having a particular file extension, beginning/ending with a prefix/suffix, ...).
 
