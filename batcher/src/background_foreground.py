@@ -21,10 +21,16 @@ def insert_foreground_from_file(image_batcher, image_filepath, *_args, **_kwargs
 
 
 def _insert_layer_from_file(image_batcher, image_filepath, insert_mode):
+  image_copies = []
+
+  image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
+
   if os.path.exists(image_filepath):
     image_to_insert = pdb.gimp_file_load(
       run_mode=Gimp.RunMode.NONINTERACTIVE,
       file=Gio.file_new_for_path(image_filepath))
+
+    image_copies.append(image_to_insert)
   else:
     image_to_insert = None
 
@@ -43,6 +49,13 @@ def _insert_layer_from_file(image_batcher, image_filepath, insert_mode):
     _insert_layers(image, image_to_insert.get_layers(), current_parent, position)
 
     yield
+
+
+def _delete_images_on_cleanup(_batcher, images):
+  for image in images:
+    pg.pdbutils.try_delete_image(image)
+
+  images.clear()
 
 
 def insert_background_from_color_tags(
