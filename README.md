@@ -1,6 +1,6 @@
 # [![](docs/images/logo.svg)](https://kamilburda.github.io/batcher/) Batcher
 
-Batcher is an image automation plug-in for [GIMP](https://www.gimp.org/).
+Batcher is a batch image processing plug-in for [GIMP](https://www.gimp.org/).
 
 **Batcher requires [GIMP 3.0.0-RC2](https://www.gimp.org/downloads/devel/) or later.**
 
