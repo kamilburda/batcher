@@ -17,11 +17,9 @@ from gi.repository import GObject
 import parameterized
 
 from ... import config
-from ... import pypdb
 from ... import utils as pgutils
 
 from ...setting import presenter as presenter_
-from ...setting import presenters_gtk as presenters_gtk_
 from ...setting import settings as settings_
 
 from .. import stubs_gimp
@@ -1035,10 +1033,6 @@ class TestCreateChoiceSetting(SettingTestCase):
     setting = settings_.ChoiceSetting(
       'overwrite_mode', [('skip', 'Skip'), ('replace', 'Replace')], default_value='replace')
     self.assertEqual(setting.default_value, 'replace')
-
-  def test_with_explicit_default_value_if_items_is_empty(self):
-    setting = settings_.ChoiceSetting('overwrite_mode', None, default_value='replace')
-    self.assertEqual(setting.default_value, 'replace')
   
   def test_empty_items_does_not_validate_value(self):
     setting = settings_.ChoiceSetting('overwrite_mode', [])
@@ -1067,32 +1061,6 @@ class TestCreateChoiceSetting(SettingTestCase):
         'replace': 'Replaces the conflicting file',
       }
     )
-
-  def test_with_procedure(self):
-    procedure = stubs_gimp.StubPDBProcedure(stubs_gimp.Procedure('some-procedure'))
-
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
-          new=stubs_gimp.GimpModuleStub()):
-      setting = settings_.ChoiceSetting('output-format', procedure=procedure)
-
-    settings_.pdb.remove_from_cache('some-procedure')
-
-    self.assertEqual(setting.procedure, procedure)
-
-  def test_with_procedure_via_name(self):
-    procedure = stubs_gimp.Procedure('some-procedure')
-
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
-          new=stubs_gimp.GimpModuleStub()) as mock_gimp:
-      mock_gimp.get_pdb().add_procedure(procedure)
-      setting = settings_.ChoiceSetting('output-format', procedure='some-procedure')
-
-    settings_.pdb.remove_from_cache('some-procedure')
-
-    self.assertIsInstance(setting.procedure, pypdb.PDBProcedure)
-    self.assertEqual(setting.procedure.name, procedure.get_name())
 
   def test_inconsistent_number_of_elements_raises_error(self):
     with self.assertRaises(ValueError):
@@ -1197,26 +1165,6 @@ class TestChoiceSetting(SettingTestCase):
           ['rename_existing', 'Rename existing', 1, 'Renames existing file'],
         ],
         'display_name': 'Overwrite mode',
-      })
-
-  def test_to_dict_with_procedure(self):
-    procedure = stubs_gimp.Procedure('some-procedure')
-
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.pypdb.Gimp',
-          new=stubs_gimp.GimpModuleStub()) as mock_gimp:
-      mock_gimp.get_pdb().add_procedure(procedure)
-      setting = settings_.ChoiceSetting('output-format', procedure='some-procedure')
-
-    settings_.pdb.remove_from_cache('some-procedure')
-
-    self.assertDictEqual(
-      setting.to_dict(),
-      {
-        'name': 'output-format',
-        'value': '',
-        'type': 'choice',
-        'procedure': 'some-procedure',
       })
 
 
@@ -2813,8 +2761,6 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
     self.assertEqual(setting_type, settings_.ChoiceSetting)
     self.assertEqual(len(kwargs), 3)
     self.assertIsNone(kwargs['items'])
-    self.assertEqual(kwargs['procedure'], procedure)
-    self.assertEqual(kwargs['gui_type'], presenters_gtk_.ChoiceComboBoxPresenter)
 
   def test_enum_with_gtype(self):
     self.assertEqual(

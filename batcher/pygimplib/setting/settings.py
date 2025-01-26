@@ -1477,7 +1477,6 @@ class ChoiceSetting(Setting):
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.combo_box,
     _SETTING_GUI_TYPES.radio_button_box,
-    _SETTING_GUI_TYPES.choice_combo_box,
   ]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self._items), '')
@@ -1492,7 +1491,6 @@ class ChoiceSetting(Setting):
             List[Tuple[str, str, int, str]],
             Gimp.Choice]
         ] = None,
-        procedure: Optional[Union[pypdb.PDBProcedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1506,17 +1504,7 @@ class ChoiceSetting(Setting):
         assign explicit item values. Values must be unique and specified in
         each tuple. Use only 2- or only 3-element tuples, they cannot be
         combined.
-        If ``items`` is ``None`` or an empty list, any string can be assigned
-        to this setting. This is a workaround to allow settings of this type
-        to be created from GIMP PDB parameters as currently there is no way to
-        obtain a list of choices from PDB parameters.
-      procedure:
-        A `pypdb.PDBProcedure` instance, or name thereof, whose PDB parameter
-        having the name ``name`` contains possible choices.
     """
-    self._procedure = self._process_procedure(procedure)
-    self._procedure_config = self._create_procedure_config(self._procedure)
-
     self._items, self._items_by_value, self._items_display_names, self._items_help, self._choice = (
       self._create_item_attributes(items))
     
@@ -1548,20 +1536,6 @@ class ChoiceSetting(Setting):
     """
     return self._items_help
 
-  @property
-  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
-    """A `pypdb.PDBProcedure` instance containing the `Gimp.Choice` instance for
-    this setting.
-    """
-    return self._procedure
-
-  @property
-  def procedure_config(self) -> Union[Gimp.ConfigInterface, None]:
-    """A procedure config containing the `Gimp.Choice` instance for this
-    setting.
-    """
-    return self._procedure_config
-
   def to_dict(self):
     settings_dict = super().to_dict()
 
@@ -1572,18 +1546,14 @@ class ChoiceSetting(Setting):
         settings_dict['items'] = [
           [
             name,
-            self._choice.get_label(name),
+            self._choice.get_label(name) if self._choice.get_label(name) is not None else '',
             self._choice.get_id(name),
-            self._choice.get_help(name),
+            self._choice.get_help(name) if self._choice.get_help(name) is not None else '',
           ]
           for name in self._choice.list_nicks()
         ]
       else:
         settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
-
-    if 'procedure' in settings_dict:
-      if settings_dict['procedure'] is not None:
-        settings_dict['procedure'] = self._procedure.name
 
     return settings_dict
 
@@ -1609,42 +1579,18 @@ class ChoiceSetting(Setting):
       # method) and thus the default value is valid.
       return super()._resolve_default_value(default_value)
     else:
-      if self._items:
-        if default_value in self._items:
-          return default_value
-        else:
-          self._handle_failed_validation(
-            f'invalid default value "{default_value}"; must be one of {list(self._items)}',
-            'invalid_default_value',
-            prepend_value=False,
-          )
-      else:
+      if default_value in self._items:
         return default_value
+      else:
+        self._handle_failed_validation(
+          f'invalid default value "{default_value}"; must be one of {list(self._items)}',
+          'invalid_default_value',
+          prepend_value=False,
+        )
 
   def _validate(self, item_name):
     if self._items and item_name not in self._items:
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
-
-  @staticmethod
-  def _process_procedure(procedure) -> Union[pypdb.PDBProcedure, str, None]:
-    if procedure is None:
-      return None
-    elif isinstance(procedure, pypdb.PDBProcedure):
-      return procedure
-    elif isinstance(procedure, str):
-      if procedure in pdb:
-        return pdb[procedure]
-      else:
-        return None
-    else:
-      raise TypeError('procedure must be None, a string or a pypdb.PDBProcedure instance')
-
-  @staticmethod
-  def _create_procedure_config(procedure):
-    if procedure is not None:
-      return procedure.create_config()
-    else:
-      return None
 
   @staticmethod
   def _create_item_attributes(input_items):
@@ -1661,8 +1607,12 @@ class ChoiceSetting(Setting):
         value = input_items.get_id(name)
         items[name] = value
         items_by_value[value] = name
-        items_display_names[name] = input_items.get_label(name)
-        items_help[name] = input_items.get_help(name)
+
+        item_label = input_items.get_label(name)
+        items_display_names[name] = item_label if item_label is not None else ''
+
+        item_help = input_items.get_help(name)
+        items_help[name] = item_help if item_help is not None else ''
 
       return items, items_by_value, items_display_names, items_help, input_items
 
@@ -3388,14 +3338,15 @@ def get_setting_type_and_kwargs(
       `GObject.GType` instance representing a GIMP PDB parameter.
     pdb_param_info:
       Object representing PDB parameter information, obtainable via
-      `pypdb.PDBProcedure.arguments`. This is used to infer the element type
-      for an object array argument (images, layers, etc.) and to help obtain
-      keyword arguments for `ChoiceSetting`. If ``None``,
-      the `StringSetting` type will be returned instead.
+      `pypdb.PDBProcedure.arguments`. This is used to infer additional arguments
+      passed to the `__init__()` method of the corresponding `Setting` subclass,
+      such as the element type of object array arguments (images, layers, etc.),
+      or the list of choices for `ChoiceSetting`.
     pdb_procedure:
-      If not ``None``, it is a `pypdb.PDBProcedure` instance allowing to infer
-      string choices for the `ChoiceSetting` type. If ``None``,
-      the `StringSetting` type will be returned instead.
+      If not ``None``, it is a `pypdb.PDBProcedure` instance used to infer
+      additional arguments passed to the `__init__()` method of the
+      corresponding `Setting` subclass, in particular for the `EnumSetting`
+      subclass.
 
   Returns:
     Tuple of (`setting.Setting` subclass, dictionary of keyword arguments to be
@@ -3403,15 +3354,12 @@ def get_setting_type_and_kwargs(
     ``None`` if there is no matching `setting.Setting` subclass for ``gtype``.
   """
   if gtype in meta_.GTYPES_AND_SETTING_TYPES:
-    if (pdb_param_info is not None
-        and isinstance(pdb_param_info, Gimp.ParamChoice)
-        and pdb_procedure is not None):
+    if pdb_param_info is not None and isinstance(pdb_param_info, Gimp.ParamChoice):
       return (
         ChoiceSetting,
         dict(
-          items=None,
-          procedure=pdb_procedure,
-          gui_type=_SETTING_GUI_TYPES.choice_combo_box))
+          default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
+          items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
     else:
       # If multiple `GType`s map to the same `Setting` subclass, use the
       # `Setting` subclass registered (i.e. declared) the earliest.

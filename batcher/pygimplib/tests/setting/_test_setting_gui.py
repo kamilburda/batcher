@@ -11,7 +11,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from ...setting import meta as meta_
-from ...setting import presenters_gtk as presenters_gtk_
 from ...setting import settings as settings_
 
 
@@ -33,10 +32,6 @@ def test_settings_and_gui():
     
     for gui_type in setting_type.get_allowed_gui_types():
       item['gui_type'] = gui_type
-      if setting_type_name == 'choice' and gui_type == presenters_gtk_.ChoiceComboBoxPresenter:
-        item['procedure'] = 'file-png-export'
-        item['name'] = 'format'
-        item['items'] = []
       settings.append(setting_type(**item))
   
   dialog = Gtk.Dialog(

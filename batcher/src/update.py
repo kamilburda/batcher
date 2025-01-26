@@ -1201,6 +1201,35 @@ def _update_to_1_0_rc1(data, _settings, procedure_groups):
               argument_dict['name'] = 'rename_folders'
 
 
+def _update_to_1_0_rc2(data, _settings, _procedure_groups):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
+
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+        _update_choice_arguments_for_1_0_rc2(arguments_list)
+
+    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
+    if constraints_list is not None:
+      for constraint_dict in constraints_list:
+        constraint_list = constraint_dict['settings']
+
+        arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
+
+        _update_choice_arguments_for_1_0_rc2(arguments_list)
+
+
+def _update_choice_arguments_for_1_0_rc2(arguments_list):
+  for argument_dict in arguments_list:
+    if argument_dict['type'] == 'choice':
+      argument_dict.pop('procedure', None)
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
@@ -1209,4 +1238,5 @@ _UPDATE_HANDLERS = {
   '0.7': _update_to_0_7,
   '0.8': _update_to_0_8,
   '1.0-RC1': _update_to_1_0_rc1,
+  '1.0-RC2': _update_to_1_0_rc2,
 }
