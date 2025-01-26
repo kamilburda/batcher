@@ -3438,21 +3438,13 @@ def get_setting_type_and_kwargs(
 def get_array_setting_type_from_gimp_core_object_array(
       pdb_param_info: GObject.ParamSpec,
 ) -> Union[Tuple[Type[ArraySetting], Dict[str, Any]], None]:
-  # HACK: Rely on the parameter name to infer the correct underlying object type.
-  if pdb_param_info.name == 'images':
-    return ArraySetting, dict(element_type=ImageSetting)
-  elif pdb_param_info.name == 'drawables':
-    return ArraySetting, dict(element_type=DrawableSetting)
-  elif pdb_param_info.name == 'layers':
-    return ArraySetting, dict(element_type=LayerSetting)
-  elif pdb_param_info.name == 'channels':
-    return ArraySetting, dict(element_type=ChannelSetting)
-  elif pdb_param_info.name == 'paths':
-    return ArraySetting, dict(element_type=PathSetting)
-  elif pdb_param_info.name == 'children':
-    return ArraySetting, dict(element_type=ItemSetting)
-  elif pdb_param_info.name == 'filters':
-    return ArraySetting, dict(element_type=DrawableFilterSetting)
+  array_element_gtype = Gimp.param_spec_core_object_array_get_object_type(pdb_param_info)
+
+  if array_element_gtype in meta_.GTYPES_AND_SETTING_TYPES:
+    # If multiple `GType`s map to the same `Setting` subclass, use the
+    # `Setting` subclass registered (i.e. declared) the earliest.
+    element_type = meta_.GTYPES_AND_SETTING_TYPES[array_element_gtype][0]
+    return ArraySetting, dict(element_type=element_type)
   else:
     return None
 
