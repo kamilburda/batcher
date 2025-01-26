@@ -3,6 +3,9 @@
 General changes:
 * Updated Batcher to work with GIMP 3.0.0-RC3. **Due to backwards-incompatible changes, Batcher now requires GIMP 3.0.0-RC3 or later**. Saved settings from previous versions will still work properly.
 
+Bug fixes:
+* Fixed settings from version 0.8 not being updated to 1.0-RC1 and later.
+
 
 ## 1.0-RC1
 
