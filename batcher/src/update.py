@@ -669,7 +669,7 @@ def _update_to_0_6(data, _settings, procedure_groups):
   if main_settings_list is not None:
     overwrite_mode_dict, _index = _get_child_setting(main_settings_list, 'overwrite_mode')
     if overwrite_mode_dict is not None:
-      _update_choice_setting(overwrite_mode_dict)
+      _update_choice_setting_for_0_6(overwrite_mode_dict)
 
     main_settings_list.insert(
       -2,
@@ -688,7 +688,7 @@ def _update_to_0_6(data, _settings, procedure_groups):
     if export_settings_list is not None:
       for setting_dict in export_settings_list:
         if 'settings' not in setting_dict and setting_dict['type'] == 'choice':
-          _update_choice_setting(setting_dict)
+          _update_choice_setting_for_0_6(setting_dict)
 
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
@@ -703,7 +703,7 @@ def _update_to_0_6(data, _settings, procedure_groups):
         origin_setting_dict, _index = _get_child_setting(procedure_list, 'origin')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
-        _update_origin_setting(origin_setting_dict)
+        _update_origin_setting_for_0_6(origin_setting_dict)
         _update_arguments_list_for_0_6(arguments_list)
         _change_drawable_to_drawables_for_pdb_procedure(
           arguments_list, origin_setting_dict, function_setting_dict)
@@ -758,7 +758,7 @@ def _update_to_0_6(data, _settings, procedure_groups):
         origin_setting_dict, _index = _get_child_setting(constraint_list, 'origin')
         arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
-        _update_origin_setting(origin_setting_dict)
+        _update_origin_setting_for_0_6(origin_setting_dict)
         _update_arguments_list_for_0_6(arguments_list)
 
         if orig_name_setting_dict['default_value'] == 'layer_groups':
@@ -802,7 +802,7 @@ def _update_arguments_list_for_0_6(arguments_list):
         argument_dict['pdb_type'] = 'gdouble'
 
     if argument_dict['type'] == 'choice':
-      _update_choice_setting(argument_dict)
+      _update_choice_setting_for_0_6(argument_dict)
 
     if argument_dict['type'] == 'rgb':
       argument_dict['type'] = 'color'
@@ -863,12 +863,12 @@ def _change_drawable_to_drawables_for_pdb_procedure(
     }
 
 
-def _update_origin_setting(origin_setting_dict):
+def _update_origin_setting_for_0_6(origin_setting_dict):
   if origin_setting_dict is not None:
-    _update_choice_setting(origin_setting_dict)
+    _update_choice_setting_for_0_6(origin_setting_dict)
 
 
-def _update_choice_setting(setting_dict):
+def _update_choice_setting_for_0_6(setting_dict):
   for index, item_tuple in enumerate(setting_dict['items']):
     if len(item_tuple) >= 3:
       item_value = item_tuple[2]
