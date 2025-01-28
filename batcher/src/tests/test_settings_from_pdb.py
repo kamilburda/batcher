@@ -14,6 +14,10 @@ from src import placeholders as placeholders_
 
 
 @mock.patch(
+  f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
+  new_callable=stubs_gimp.GimpModuleStub,
+)
+@mock.patch(
   f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
   return_value=pg.tests.stubs_gimp.PdbStub,
 )
@@ -33,23 +37,28 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           value_type=Gimp.RunMode.__gtype__,
           name='run-mode',
           blurb='The run mode',
-          default_value=Gimp.RunMode.NONINTERACTIVE),
+          default_value=Gimp.RunMode.NONINTERACTIVE,
+        ),
         dict(
           value_type=GObject.GType.from_name('GimpCoreObjectArray'),
           name='drawables',
-          blurb='Drawables'),
+          blurb='Drawables',
+          object_type=Gimp.Drawable.__gtype__,
+        ),
         dict(
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
 
     settings_from_pdb_.pdb.remove_from_cache(self.procedure_name)
 
-  def test_with_non_unique_param_names(self, mock_get_pdb):
+  def test_with_non_unique_param_names(self, *_mocks):
     self.procedure_stub_kwargs['arguments_spec'].extend([
       dict(
         value_type=GObject.GType.from_name('GimpCoreObjectArray'),
         name='drawables',
-        blurb='More drawables'),
+        blurb='More drawables',
+        object_type=Gimp.Drawable.__gtype__,
+      ),
       dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
       dict(value_type=GObject.TYPE_STRV, name='brushes', blurb='Brush names'),
     ])
@@ -108,7 +117,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       ]
     )
 
-  def test_unsupported_pdb_param_type(self, mock_get_pdb):
+  def test_unsupported_pdb_param_type(self, *_mocks):
     self.procedure_stub_kwargs['arguments_spec'].extend([
       dict(
         value_type='unsupported',
@@ -135,7 +144,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       }
     )
 
-  def test_default_run_mode_is_noninteractive(self, mock_get_pdb):
+  def test_default_run_mode_is_noninteractive(self, *_mocks):
     self.procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
 
@@ -144,7 +153,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
     self.assertEqual(arguments[0]['default_value'], Gimp.RunMode.NONINTERACTIVE)
 
-  def test_gimp_object_types_are_replaced_with_placeholders(self, mock_get_pdb):
+  def test_gimp_object_types_are_replaced_with_placeholders(self, *_mocks):
     self.procedure_stub_kwargs['arguments_spec'].extend([
       dict(value_type=Gimp.Image.__gtype__, name='image', blurb='The image'),
       dict(value_type=Gimp.Layer.__gtype__, name='layer', blurb='The layer to process'),
@@ -159,7 +168,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     self.assertEqual(arguments[-2]['type'], placeholders_.PlaceholderImageSetting)
     self.assertEqual(arguments[-1]['type'], placeholders_.PlaceholderLayerSetting)
 
-  def test_with_hard_coded_custom_default_value(self, mock_get_pdb):
+  def test_with_hard_coded_custom_default_value(self, *_mocks):
     self.procedure_name = 'plug-in-lighting'
     self.procedure_stub_kwargs['name'] = self.procedure_name
 

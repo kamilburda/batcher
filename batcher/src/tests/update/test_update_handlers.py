@@ -20,6 +20,12 @@ from src import update
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
+_SETTINGS_MODULE_PATH = f'{pg.utils.get_pygimplib_module_path()}.setting.settings'
+
+_MOCK_PNG_CHOICE = Gimp.Choice.new()
+_MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
+_MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
+
 _LATEST_PLUGIN_VERSION = '1.0-RC2'
 
 
@@ -35,6 +41,15 @@ class TestUpdateHandlers(unittest.TestCase):
   def tearDown(self):
     pg.config.PLUGIN_VERSION = self.plugin_version
 
+  @mock.patch(
+    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_default',
+    return_value=_MOCK_PNG_CHOICE_DEFAULT_VALUE)
+  @mock.patch(
+    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_choice',
+    return_value=_MOCK_PNG_CHOICE)
+  @mock.patch(
+    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_core_object_array_get_object_type',
+    return_value=Gimp.Drawable.__gtype__)
   def test_update_export_layers(self, *_mocks):
     source = pg.setting.sources.JsonFileSource(
       'plug-in-batch-export-layers', os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_0-2.json'))

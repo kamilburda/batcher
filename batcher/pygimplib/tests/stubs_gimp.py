@@ -166,11 +166,14 @@ class Choice:
 
 class GParamStub:
 
-  def __init__(self, value_type, name, blurb='', default_value=None):
+  def __init__(self, value_type, name, blurb='', default_value=None, **additional_kwargs):
     self.value_type = value_type
     self.name = name
     self.blurb = blurb
     self.default_value = default_value
+
+    for name, value in additional_kwargs.items():
+      setattr(self, name, value)
 
   def get_name(self):
     return self.name
@@ -180,6 +183,10 @@ class GParamStub:
 
   def get_default_value(self):
     return self.default_value
+
+
+class ChoiceParamStub(GParamStub):
+  pass
 
 
 class ParasiteFunctionsStubMixin:
@@ -742,6 +749,8 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   RunMode = Gimp.RunMode
   PDBStatusType = Gimp.PDBStatusType
 
+  ParamChoice = ChoiceParamStub
+
   PARASITE_PERSISTENT = Gimp.PARASITE_PERSISTENT
 
   _PDB_INSTANCE = PdbStub()
@@ -779,3 +788,15 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   @classmethod
   def context_get_pattern(cls):
     return cls.DEFAULT_PATTERN
+
+  @classmethod
+  def param_spec_choice_get_default(cls, param_spec):
+    return param_spec.default_value
+
+  @classmethod
+  def param_spec_choice_get_choice(cls, param_spec):
+    return param_spec.choice if hasattr(param_spec, 'choice') else None
+
+  @classmethod
+  def param_spec_core_object_array_get_object_type(cls, param_spec):
+    return param_spec.object_type if hasattr(param_spec, 'object_type') else None

@@ -1,4 +1,5 @@
 import unittest
+import unittest.mock as mock
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -66,8 +67,12 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
   def test_with_invalid_object_type(self):
     self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(object))
 
-  def test_with_layer_array(self):
-    param = stubs_gimp.GParamStub(GObject.GType.from_name('GimpCoreObjectArray'), 'layers')
+  @mock.patch(
+    f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new_callable=stubs_gimp.GimpModuleStub)
+  def test_with_layer_array(self, _mock_gimp):
+    param = stubs_gimp.GParamStub(
+      GObject.GType.from_name('GimpCoreObjectArray'), 'layers', object_type=Gimp.Layer.__gtype__)
 
     # noinspection PyTypeChecker
     self.assertEqual(
@@ -76,8 +81,12 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
       'placeholder_layer_array',
     )
 
-  def test_image_array_is_unsupported(self):
-    param = stubs_gimp.GParamStub(GObject.GType.from_name('GimpCoreObjectArray'), 'images')
+  @mock.patch(
+    f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
+    new_callable=stubs_gimp.GimpModuleStub)
+  def test_image_array_is_unsupported(self, _mock_gimp):
+    param = stubs_gimp.GParamStub(
+      GObject.GType.from_name('GimpCoreObjectArray'), 'images', object_type=Gimp.Image.__gtype__)
 
     # noinspection PyTypeChecker
     self.assertIsNone(

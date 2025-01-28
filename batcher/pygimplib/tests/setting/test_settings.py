@@ -1,6 +1,5 @@
 """Tests for the `setting.setting` and `setting.presenter` modules."""
 
-import collections
 import os
 import unittest
 import unittest.mock as mock
@@ -2747,20 +2746,34 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
 
   def test_choice(self):
     procedure = stubs_gimp.Procedure('some-procedure')
-    param_spec = stubs_gimp.GParamStub(GObject.TYPE_STRING, 'output-format')
 
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.setting.settings.isinstance') as mock_isinstance:
+    choice = Gimp.Choice.new()
+    choice.add('auto', 0, 'Automatic', '')
+    choice.add('rgb8', 1, '8 bpc RGB', '')
+    choice_default_value = 'auto'
+
+    param_spec = stubs_gimp.ChoiceParamStub(
+      GObject.TYPE_STRING, 'output-format', default_value=choice_default_value, choice=choice)
+
+    settings_module_path = f'{pgutils.get_pygimplib_module_path()}.setting.settings'
+
+    with mock.patch(f'{settings_module_path}.isinstance') as mock_isinstance:
       mock_isinstance.return_value = True
-      # noinspection PyTypeChecker
-      setting_type, kwargs = settings_.get_setting_type_and_kwargs(
-        GObject.TYPE_STRING, param_spec, procedure)
+      with mock.patch(f'{settings_module_path}.Gimp', new_callable=stubs_gimp.GimpModuleStub):
+        # noinspection PyTypeChecker
+        setting_type, kwargs = settings_.get_setting_type_and_kwargs(
+          GObject.TYPE_STRING, param_spec, procedure)
 
     settings_.pdb.remove_from_cache('some-procedure')
 
     self.assertEqual(setting_type, settings_.ChoiceSetting)
-    self.assertEqual(len(kwargs), 3)
-    self.assertIsNone(kwargs['items'])
+    self.assertDictEqual(
+      kwargs,
+      {
+        'default_value': choice_default_value,
+        'items': choice,
+      }
+    )
 
   def test_enum_with_gtype(self):
     self.assertEqual(
@@ -2785,14 +2798,18 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
     )
 
   def test_core_object_array(self):
-    param_spec = collections.namedtuple('ParamSpecStub', ['name'])('drawables')
+    param_spec = stubs_gimp.GParamStub(
+      GObject.TYPE_BOXED, name='drawables', object_type=Gimp.Drawable.__gtype__)
 
-    # noinspection PyTypeChecker
-    self.assertEqual(
-      settings_.get_setting_type_and_kwargs(
-        GObject.GType.from_name('GimpCoreObjectArray'), param_spec),
-      (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
-    )
+    with mock.patch(
+          f'{pgutils.get_pygimplib_module_path()}.setting.settings.Gimp',
+          new_callable=stubs_gimp.GimpModuleStub):
+      # noinspection PyTypeChecker
+      self.assertEqual(
+        settings_.get_setting_type_and_kwargs(
+          GObject.GType.from_name('GimpCoreObjectArray'), param_spec),
+        (settings_.ArraySetting, dict(element_type=settings_.DrawableSetting)),
+      )
 
   def test_unrecognized_gtype_returns_none(self):
     self.assertIsNone(settings_.get_setting_type_and_kwargs(Gimp.Procedure, None))
