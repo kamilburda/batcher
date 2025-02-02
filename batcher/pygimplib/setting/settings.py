@@ -2345,30 +2345,66 @@ class FileSetting(Setting):
   * `Gio.File`
 
   Default value:
-    A `Gio.File` instance with no path (`Gio.File.get_path()` returns ``None``).
+    A `Gio.File` instance with no path (`Gio.File.get_uri()` returns ``None``).
   """
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_path('')
+  _DEFAULT_DEFAULT_VALUE = lambda self: Gio.file_new_for_uri('')
 
   _ALLOWED_PDB_TYPES = [Gio.File]
 
   _REGISTRABLE_TYPE_NAME = 'file'
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.g_file_entry]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.file_chooser]
+
+  def __init__(
+        self,
+        name: str,
+        action: Union[Gimp.FileChooserAction, int],
+        none_ok: bool = True,
+        **kwargs,
+  ):
+    self._action = self._process_action(action)
+    self._none_ok = none_ok
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def action(self) -> Gimp.FileChooserAction:
+    """The `Gimp.FileChooserAction` associated with this setting, indicating
+    whether to open or save a file or a folder.
+
+    This property is used to determine the appropriate GUI widget.
+    """
+    return self._action
+
+  @property
+  def none_ok(self):
+    """If ``True``, ``None`` is allowed as a valid value for this setting."""
+    return self._none_ok
+
+  def to_dict(self):
+    settings_dict = super().to_dict()
+
+    settings_dict['action'] = int(self._action)
+
+    return settings_dict
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
-      return Gio.file_new_for_path(raw_value)
+      return Gio.file_new_for_uri(raw_value)
     elif raw_value is None:
-      return Gio.file_new_for_path('')
+      if self._none_ok:
+        return None
+      else:
+        return Gio.file_new_for_uri('')
     else:
       return raw_value
 
   def _value_to_raw(self, value):
-    return value.get_path()
+    return value.get_uri()
 
   def _validate(self, file_):
-    if not isinstance(file_, Gio.File):
+    if not self._none_ok and not isinstance(file_, Gio.File):
       return 'invalid file', 'invalid_value'
 
   def _get_pdb_param(self):
@@ -2377,8 +2413,18 @@ class FileSetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
+      self._action,
+      self._none_ok,
+      self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
+
+  @staticmethod
+  def _process_action(action):
+    if isinstance(action, int) and action in Gimp.FileChooserAction.__enum_values__:
+      return Gimp.FileChooserAction.__enum_values__[action]
+    else:
+      return action
 
 
 class ExportOptionsSetting(Setting):
@@ -3360,6 +3406,12 @@ def get_setting_type_and_kwargs(
         dict(
           default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
           items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
+    elif pdb_param_info is not None and gtype == Gio.File.__gtype__:
+      return (
+        FileSetting,
+        dict(
+          action=Gimp.param_spec_file_get_action(pdb_param_info),
+          none_ok=Gimp.param_spec_file_none_allowed(pdb_param_info)))
     else:
       # If multiple `GType`s map to the same `Setting` subclass, use the
       # `Setting` subclass registered (i.e. declared) the earliest.

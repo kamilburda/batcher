@@ -1734,7 +1734,7 @@ class TestParasiteSetting(SettingTestCase):
 class TestFileSetting(SettingTestCase):
 
   def setUp(self):
-    self.setting = settings_.FileSetting('file')
+    self.setting = settings_.FileSetting('file', Gimp.FileChooserAction.ANY)
 
   def test_with_default_default_value(self):
     self.assertIsInstance(self.setting.value, Gio.File)
@@ -1742,15 +1742,15 @@ class TestFileSetting(SettingTestCase):
 
   def test_set_value_with_string(self):
     cwd = os.getcwd()
-    self.setting.set_value(cwd)
+
+    self.setting.set_value(Gio.file_new_for_path(cwd))
 
     self.assertEqual(self.setting.value.get_path(), cwd)
 
   def test_set_value_with_none(self):
     self.setting.set_value(None)
 
-    self.assertIsInstance(self.setting.value, Gio.File)
-    self.assertIsNone(self.setting.value.get_path())
+    self.assertIsNone(self.setting.value, None)
 
   def test_to_dict(self):
     cwd = os.getcwd()
@@ -1760,6 +1760,7 @@ class TestFileSetting(SettingTestCase):
       self.setting.to_dict(),
       {
         'name': 'file',
+        'action': int(Gimp.FileChooserAction.ANY),
         'value': cwd,
         'type': 'file',
       })

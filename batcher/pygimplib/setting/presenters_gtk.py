@@ -9,7 +9,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
@@ -670,32 +669,23 @@ class DisplaySpinButtonPresenter(GtkPresenter):
       self._widget.set_value(value.get_id())
 
 
-class GFileEntryPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `Gtk.Entry` widgets used to store file or
-  folder paths returning a `Gio.File` instance on output.
+class FileChooserPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `pygimplib.gui.FileChooser` widgets used
+  to store file or folder paths as `Gio.File` instances.
 
   Value: Current file or folder path as a `Gio.File` instance.
   """
 
   _VALUE_CHANGED_SIGNAL = 'changed'
 
-  def _create_widget(self, setting, **kwargs):
-    value = setting.value
-
-    widget = Gtk.Entry(
-      text=value.get_path() if value is not None and value.get_path() is not None else '')
-    widget.set_position(-1)
-
-    return widget
+  def _create_widget(self, setting, width_chars=30, **kwargs):
+    return pggui.FileChooser(setting.action, setting.value, setting.display_name, width_chars)
 
   def get_value(self):
-    return Gio.file_new_for_path(self._widget.get_text())
+    return self._widget.get_file()
 
   def _set_value(self, value):
-    self._widget.set_text(
-      value.get_path() if value is not None and value.get_path() is not None else '')
-    # Place the cursor at the end of the text entry.
-    self._widget.set_position(-1)
+    self._widget.set_file(value)
 
 
 class GBytesEntryPresenter(GtkPresenter):
