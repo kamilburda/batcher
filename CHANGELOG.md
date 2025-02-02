@@ -2,9 +2,11 @@
 
 General changes:
 * Updated Batcher to work with GIMP 3.0.0-RC3. **Due to backwards-incompatible changes, Batcher now requires GIMP 3.0.0-RC3 or later**. Saved settings from previous versions will still work properly.
+* Improved GUI for settings and procedure arguments representing files or folders.
 
 Bug fixes:
 * Fixed settings from version 0.8 not being updated to 1.0-RC1 and later.
+* Fixed a potential bug where arrays of images, layers and other GIMP objects as procedure or constraint arguments could not be edited.
 
 
 ## 1.0-RC1
