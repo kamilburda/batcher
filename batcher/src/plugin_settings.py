@@ -41,9 +41,11 @@ def create_settings_for_convert():
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
-      'type': 'string',
+      'type': 'file',
       'name': 'inputs',
-      'default_value': '',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
       'display_name': _(
         'Path to file with input files and folders on each line (non-interactive run mode only)'),
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
@@ -91,9 +93,11 @@ def create_settings_for_convert():
       'gui_type': None,
     },
     {
-      'type': 'string',
+      'type': 'file',
       'name': 'settings_file',
-      'default_value': '',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
       'display_name': _('Path to file with saved settings'),
       'description': _('Path to file with saved settings (optional)'),
       'gui_type': None,
@@ -226,9 +230,11 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
     {
-      'type': 'string',
+      'type': 'file',
       'name': 'settings_file',
-      'default_value': '',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
       'display_name': _('Path to file with saved settings'),
       'description': _('Path to file with saved settings (optional)'),
       'gui_type': None,
@@ -333,9 +339,11 @@ def create_settings_for_edit_layers():
 
   settings['main'].add([
     {
-      'type': 'string',
+      'type': 'file',
       'name': 'settings_file',
-      'default_value': '',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
       'display_name': _('Path to file with saved settings'),
       'description': _('Path to file with saved settings (optional)'),
       'gui_type': None,
