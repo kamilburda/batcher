@@ -2,7 +2,7 @@
 
 Batcher is a batch image processing plug-in for [GIMP](https://www.gimp.org/).
 
-**Batcher requires [GIMP 3.0.0-RC2](https://www.gimp.org/downloads/devel/) or later.**
+**Batcher requires [GIMP 3.0.0-RC3](https://www.gimp.org/downloads/devel/) or later.**
 
 
 ## What can Batcher do?
