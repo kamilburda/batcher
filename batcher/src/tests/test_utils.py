@@ -43,7 +43,7 @@ class TestSemiDeepCopy(unittest.TestCase):
         'display_options_on_create': True,
         'arguments': [
           {
-            'type': 'dirpath',
+            'type': 'string',
             'name': 'output_directory',
           },
           {
@@ -90,7 +90,7 @@ class TestSemiDeepCopy(unittest.TestCase):
       'display_options_on_create': True,
       'arguments': [
         {
-          'type': 'dirpath',
+          'type': 'string',
           'name': 'output_directory',
         },
       ],

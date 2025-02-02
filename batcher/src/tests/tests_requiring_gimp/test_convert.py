@@ -90,7 +90,7 @@ class TestConvertCompareContents(unittest.TestCase):
         expected_results_dirpath=None,
   ):
     settings = plugin_settings.create_settings_for_convert()
-    settings['main/output_directory'].set_value(self.output_dirpath)
+    settings['main/output_directory'].set_value(Gio.file_new_for_path(self.output_dirpath))
     settings['main/file_extension'].set_value('png')
 
     if expected_results_dirpath is None:

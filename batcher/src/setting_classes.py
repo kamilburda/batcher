@@ -4,14 +4,12 @@ import abc
 import collections
 from collections.abc import Iterable
 import os
-from typing import Dict, List, Type
+from typing import Dict, List, Type, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import Pango
+from gi.repository import Gio
 
 import pygimplib as pg
 
@@ -20,78 +18,6 @@ from src import renamer as renamer_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
-
-
-class AbstractFileChooserButtonPresenter(pg.setting.GtkPresenter):
-
-  _VALUE_CHANGED_SIGNAL = 'file-set'
-
-  def _create_widget(
-        self, setting, action=Gtk.FileChooserAction.OPEN, width_chars=30, **kwargs):
-    button = Gtk.FileChooserButton(
-      title=setting.display_name,
-      action=action,
-    )
-
-    if setting.value is not None:
-      button.set_filename(setting.value)
-
-    self._set_width_chars(button, width_chars)
-
-    return button
-
-  def get_value(self):
-    folder = self._widget.get_filename()
-
-    if folder is not None:
-      return folder
-    else:
-      return self._setting.default_value
-
-  def _set_value(self, dirpath):
-    self._widget.set_filename(dirpath if dirpath is not None else '')
-
-  @staticmethod
-  def _set_width_chars(button, width_chars):
-    combo_box = next(iter(child for child in button if isinstance(child, Gtk.ComboBox)), None)
-
-    if combo_box is not None:
-      cell_renderer = next(
-        iter(cr for cr in combo_box.get_cells() if isinstance(cr, Gtk.CellRendererText)), None)
-
-      if cell_renderer is not None:
-        # This should force each row to not take extra vertical space after
-        # reducing the number of characters to render.
-        cell_renderer.set_property(
-          'height', cell_renderer.get_preferred_height(combo_box).natural_size)
-
-        cell_renderer.set_property('max-width-chars', width_chars)
-        cell_renderer.set_property('ellipsize', Pango.EllipsizeMode.END)
-        cell_renderer.set_property('wrap-width', -1)
-
-
-class FileChooserButtonPresenter(AbstractFileChooserButtonPresenter):
-  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
-  file choosers.
-
-  Value: Current file.
-  """
-
-  def _create_widget(self, setting, width_chars=30, **kwargs):
-    return super()._create_widget(
-      setting, action=Gtk.FileChooserAction.OPEN, width_chars=width_chars, **kwargs)
-
-
-class FolderChooserButtonPresenter(AbstractFileChooserButtonPresenter):
-  """`setting.Presenter` subclass for `Gtk.FileChooserButton` widgets used as
-  folder choosers.
-
-  Value: Current folder.
-  """
-
-  def _create_widget(self, setting, width_chars=30, **kwargs):
-    return super()._create_widget(
-      setting, action=Gtk.FileChooserAction.SELECT_FOLDER, width_chars=width_chars, **kwargs)
 
 
 class ValidatableStringSetting(pg.setting.StringSetting):
@@ -147,58 +73,6 @@ class ValidatableStringSetting(pg.setting.StringSetting):
     if not is_valid:
       for status, status_message in status_messages:
         return status_message, status
-
-
-class FilepathSetting(ValidatableStringSetting):
-  """Class for settings storing file paths as strings.
-
-  The `path.validators.FilepathValidator` subclass is used to determine whether
-  the file path is valid.
-
-  If ``None`` or an empty string is assigned to this setting, the default value
-  (see below) is assigned instead.
-
-  Default value: An empty string.
-  """
-
-  _ALLOWED_GUI_TYPES = [FileChooserButtonPresenter]
-
-  _DEFAULT_DEFAULT_VALUE = ''
-
-  def __init__(self, name, **kwargs):
-    super().__init__(name, validators_.FilepathValidator, **kwargs)
-
-  def _raw_to_value(self, raw_value):
-    if raw_value:
-      return raw_value
-    else:
-      return self._DEFAULT_DEFAULT_VALUE
-
-
-class DirpathSetting(ValidatableStringSetting):
-  """Class for settings storing directory paths as strings.
-
-  The `path.validators.DirpathValidator` subclass is used to determine whether
-  the directory path is valid.
-
-  If ``None`` or an empty string is assigned to this setting, the default value
-  (see below) is assigned instead.
-
-  Default value: `Pictures` directory in the user's home directory.
-  """
-
-  _ALLOWED_GUI_TYPES = [FolderChooserButtonPresenter]
-
-  _DEFAULT_DEFAULT_VALUE = pg.utils.get_pictures_directory()
-
-  def __init__(self, name, **kwargs):
-    super().__init__(name, validators_.DirpathValidator, **kwargs)
-
-  def _raw_to_value(self, raw_value):
-    if raw_value:
-      return raw_value
-    else:
-      return self._DEFAULT_DEFAULT_VALUE
 
 
 class ExtendedEntryPresenter(pg.setting.GtkPresenter):
@@ -636,10 +510,13 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
     self._filter_images_no_longer_opened(current_images)
     self._add_new_opened_images(current_images)
   
-  def update_dirpath(self, image, dirpath):
+  def update_dirpath(self, image, directory: Union[str, Gio.File]):
     """Assigns a new directory path to the specified image."""
-    self._value[image] = dirpath
-  
+    if isinstance(directory, Gio.File):
+      self._value[image] = directory.get_path()
+    else:
+      self._value[image] = directory
+
   def _filter_images_no_longer_opened(self, current_images):
     self._value = {image: self._value[image] for image in self._value if image in current_images}
   

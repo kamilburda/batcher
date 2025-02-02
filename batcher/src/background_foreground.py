@@ -4,7 +4,6 @@ import os.path
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import Gio
 
 from src import exceptions
 
@@ -12,23 +11,25 @@ import pygimplib as pg
 from pygimplib import pdb
 
 
-def insert_background_from_file(image_batcher, image_filepath, *_args, **_kwargs):
-  return _insert_layer_from_file(image_batcher, image_filepath, 'after')
+def insert_background_from_file(image_batcher, image_file, *_args, **_kwargs):
+  return _insert_layer_from_file(image_batcher, image_file, 'after')
 
 
-def insert_foreground_from_file(image_batcher, image_filepath, *_args, **_kwargs):
-  return _insert_layer_from_file(image_batcher, image_filepath, 'before')
+def insert_foreground_from_file(image_batcher, image_file, *_args, **_kwargs):
+  return _insert_layer_from_file(image_batcher, image_file, 'before')
 
 
-def _insert_layer_from_file(image_batcher, image_filepath, insert_mode):
+def _insert_layer_from_file(image_batcher, image_file, insert_mode):
   image_copies = []
 
   image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
 
-  if os.path.exists(image_filepath):
+  if (image_file is not None
+      and image_file.get_path() is not None
+      and os.path.exists(image_file.get_path())):
     image_to_insert = pdb.gimp_file_load(
       run_mode=Gimp.RunMode.NONINTERACTIVE,
-      file=Gio.file_new_for_path(image_filepath))
+      file=image_file)
 
     image_copies.append(image_to_insert)
   else:

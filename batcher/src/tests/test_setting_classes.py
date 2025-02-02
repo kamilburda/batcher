@@ -35,17 +35,6 @@ def _get_images_and_items():
   return images, items
 
 
-class TestDirpathSetting(unittest.TestCase):
-
-  def setUp(self):
-    self.setting = setting_classes.DirpathSetting('dirpath')
-
-  def test_set_value_is_none_assigns_default_default_value(self):
-    self.setting.set_value(None)
-
-    self.assertEqual(self.setting.value, self.setting.default_value)
-
-
 class TestFileExtensionSetting(unittest.TestCase):
 
   def setUp(self):

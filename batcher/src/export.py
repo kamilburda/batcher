@@ -43,7 +43,7 @@ class ExportModes:
 
 def export(
       batcher: 'src.core.Batcher',
-      output_directory: str = pg.utils.get_pictures_directory(),
+      output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_pictures_directory()),
       file_extension: str = 'png',
       file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_export_options: Optional[Dict] = None,
@@ -416,8 +416,8 @@ def _export_item(
   return chosen_overwrite_mode, export_status
 
 
-def _get_item_filepath(item, dirpath):
-  """Returns a file path based on the specified directory path and the name of
+def _get_item_filepath(item, directory: Gio.File):
+  """Returns a file path based on the specified directory and the name of
   the item and its parents.
   
   The file path created has the following format:
@@ -430,16 +430,18 @@ def _get_item_filepath(item, dirpath):
   Item path components consist of parents' item names, starting with the
   topmost parent.
   """
-  if dirpath is None:
+  if directory is None or directory.get_path() is None:
     dirpath = ''
+  else:
+    dirpath = directory.get_path()
   
-  path = os.path.abspath(dirpath)
+  dirpath = os.path.abspath(dirpath)
   
   path_components = [_get_item_export_name(parent) for parent in item.parents]
   if path_components:
-    path = os.path.join(path, os.path.join(*path_components))
+    dirpath = os.path.join(dirpath, os.path.join(*path_components))
   
-  return os.path.join(path, _get_item_export_name(item))
+  return os.path.join(dirpath, _get_item_export_name(item))
 
 
 def _make_dirs(item, dirpath, default_file_extension):

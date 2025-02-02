@@ -3,6 +3,7 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 import pygimplib as pg
 
@@ -67,11 +68,11 @@ def create_settings_for_convert():
       'gui_type': None,
     },
     {
-      'type': 'dirpath',
+      'type': 'file',
       'name': 'output_directory',
-      'default_value': pg.utils.get_pictures_directory(),
+      'default_value': Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
-      'gui_type': 'folder_chooser_button',
     },
     {
       'type': 'name_pattern',
@@ -202,11 +203,11 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
     {
-      'type': 'dirpath',
+      'type': 'file',
       'name': 'output_directory',
-      'default_value': pg.utils.get_pictures_directory(),
+      'default_value': Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
-      'gui_type': 'folder_chooser_button',
     },
     {
       'type': 'name_pattern',

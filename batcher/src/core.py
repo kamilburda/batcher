@@ -44,7 +44,7 @@ class Batcher(metaclass=abc.ABCMeta):
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
-        output_directory: str = pg.utils.get_pictures_directory(),
+        output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_pictures_directory()),
         name_pattern: str = '',
         file_extension: str = 'png',
         overwrite_mode: str = overwrite.OverwriteModes.RENAME_NEW,
@@ -167,8 +167,8 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._initial_export_run_mode
 
   @property
-  def output_directory(self) -> str:
-    """Output directory path to save exported items to."""
+  def output_directory(self) -> Gio.File:
+    """Output directory to save exported items to."""
     return self._output_directory
 
   @property

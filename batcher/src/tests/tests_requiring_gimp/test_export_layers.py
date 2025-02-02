@@ -127,7 +127,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         additional_init_before_run=None,
   ):
     settings = plugin_settings.create_settings_for_export_layers()
-    settings['main/output_directory'].set_value(self.output_dirpath)
+    settings['main/output_directory'].set_value(Gio.file_new_for_path(self.output_dirpath))
     settings['main/file_extension'].set_value('xcf')
     
     if expected_results_dirpath is None:

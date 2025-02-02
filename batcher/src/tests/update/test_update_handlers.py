@@ -6,6 +6,7 @@ import unittest.mock as mock
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
@@ -73,6 +74,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_7()
     self._assert_correct_contents_for_update_to_0_8()
     self._assert_correct_contents_for_update_to_1_0_rc1()
+    self._assert_correct_contents_for_update_to_1_0_rc2()
 
   def _get_orig_setting_values_for_0_2(self):
     return {
@@ -180,12 +182,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       self.settings['main/file_extension'].gui_type,
       pg.setting.NullPresenter,
-    )
-
-    self.assertIsInstance(self.settings['main/output_directory'], setting_classes.DirpathSetting)
-    self.assertEqual(
-      self.settings['main/output_directory'].gui_type,
-      setting_classes.FolderChooserButtonPresenter,
     )
 
     self.assertIn('export', self.settings['main/procedures'])
@@ -364,3 +360,10 @@ class TestUpdateHandlers(unittest.TestCase):
     )
 
     self.assertIn('layers', self.settings['main/procedures/use_layer_size/arguments'])
+
+  def _assert_correct_contents_for_update_to_1_0_rc2(self):
+    self.assertEqual(
+      self.settings['main/output_directory'].gui_type, pg.setting.FileChooserPresenter)
+    self.assertIsInstance(self.settings['main/output_directory'].value, Gio.File)
+    self.assertEqual(
+      self.settings['main/output_directory'].action, Gimp.FileChooserAction.SELECT_FOLDER)

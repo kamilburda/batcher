@@ -3,6 +3,7 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 import pygimplib as pg
 
@@ -513,11 +514,11 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
   'display_options_on_create': True,
   'arguments': [
     {
-      'type': 'dirpath',
+      'type': 'file',
       'name': 'output_directory',
-      'default_value': pg.utils.get_pictures_directory(),
+      'default_value': Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
-      'gui_type': 'folder_chooser_button',
     },
     {
       'type': 'file_extension',
@@ -869,11 +870,12 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [CONVERT_GROUP],
     'arguments': [
       {
-        'type': 'filepath',
-        'name': 'image_filepath',
-        'display_name': _('Path to image'),
-        'default_value': '',
-        'nullable': True,
+        'type': 'file',
+        'name': 'image_file',
+        'default_value': None,
+        'action': Gimp.FileChooserAction.OPEN,
+        'display_name': _('Image'),
+        'none_ok': True,
       },
       {
         'type': 'string',
@@ -929,11 +931,12 @@ _BUILTIN_PROCEDURES_LIST = [
     'additional_tags': [CONVERT_GROUP],
     'arguments': [
       {
-        'type': 'filepath',
-        'name': 'image_filepath',
-        'display_name': _('Path to image'),
-        'default_value': '',
-        'nullable': True,
+        'type': 'file',
+        'name': 'image_file',
+        'default_value': None,
+        'action': Gimp.FileChooserAction.OPEN,
+        'display_name': _('Image'),
+        'none_ok': True,
       },
       {
         'type': 'string',

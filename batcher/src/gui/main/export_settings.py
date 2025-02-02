@@ -3,6 +3,7 @@ import os
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import Gio
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -369,11 +370,11 @@ def _update_directory(setting, current_image, current_image_dirpath):
   If update was performed, ``True`` is returned, ``False`` otherwise.
   """
   if current_image_dirpath is not None:
-    setting.set_value(current_image_dirpath)
+    setting.set_value(Gio.file_new_for_path(current_image_dirpath))
     return True
 
   if current_image.get_file() is not None and current_image.get_file().get_path() is not None:
-    setting.set_value(os.path.dirname(current_image.get_file().get_path()))
+    setting.set_value(Gio.file_new_for_path(os.path.dirname(current_image.get_file().get_path())))
     return True
 
   return False

@@ -31,6 +31,7 @@ from typing import List, Optional
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 from gi.repository import GObject
 
 PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(
@@ -204,11 +205,13 @@ pg.register_procedure(
       GObject.ParamFlags.READWRITE,
     ],
     [
-      'string',
+      'file',
       'dirpath',
       '_Directory',
       'Directory path containing test modules',
-      PLUGIN_DIRPATH,
+      Gimp.FileChooserAction.SELECT_FOLDER,
+      False,
+      Gio.file_new_for_path(PLUGIN_DIRPATH),
       GObject.ParamFlags.READWRITE,
     ],
     [

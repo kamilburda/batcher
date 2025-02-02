@@ -118,7 +118,7 @@ def main():
 def take_screenshots_for_convert(gui, dialog, settings):
   os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
 
-  settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
 
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
@@ -157,7 +157,7 @@ def take_screenshots_for_convert(gui, dialog, settings):
 def take_screenshots_for_export_layers(gui, dialog, settings):
   os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
   
-  settings['main/output_directory'].set_value(OUTPUT_DIRPATH)
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
   
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
