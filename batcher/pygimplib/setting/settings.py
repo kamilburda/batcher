@@ -2185,6 +2185,21 @@ class ColorSetting(Setting):
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color.new('black')
 
+  def __init__(
+        self,
+        name: str,
+        has_alpha: bool = True,
+        **kwargs,
+  ):
+    self._has_alpha = has_alpha
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def has_alpha(self) -> bool:
+    """Returns ``True`` if this color setting supports the alpha channel."""
+    return self._has_alpha
+
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
       color = Gegl.Color()
@@ -2210,7 +2225,7 @@ class ColorSetting(Setting):
       self._pdb_name,
       self._display_name,
       self._description,
-      True,
+      self._has_alpha,
       self._default_value,
       GObject.ParamFlags.READWRITE,
     ]
@@ -2538,7 +2553,7 @@ class GimpResourceSetting(Setting):
     context (the currently active resource) and the ``default_value`` parameter
     in `__init__()` is ignored.
     """
-    return self._none_ok
+    return self._default_to_context
 
   def _get_default_value_from_gimp_context(self):
     return None
@@ -3082,7 +3097,8 @@ class ArraySetting(Setting):
     """Returns the number of elements of the array."""
     return len(self._elements)
   
-  def add_element(self, index: Optional[int] = None, value=ELEMENT_DEFAULT_VALUE) -> Setting:
+  def add_element(
+        self, index: Optional[int] = None, value=ELEMENT_DEFAULT_VALUE) -> Setting:
     """Adds a new element with the specified value at the specified index
     (starting from 0).
     
@@ -3400,26 +3416,62 @@ def get_setting_type_and_kwargs(
     ``None`` if there is no matching `setting.Setting` subclass for ``gtype``.
   """
   if gtype in meta_.GTYPES_AND_SETTING_TYPES:
-    if pdb_param_info is not None and isinstance(pdb_param_info, Gimp.ParamChoice):
-      return (
-        ChoiceSetting,
-        dict(
-          default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
-          items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
-    elif pdb_param_info is not None and gtype == Gio.File.__gtype__:
-      return (
-        FileSetting,
-        dict(
-          action=Gimp.param_spec_file_get_action(pdb_param_info),
-          none_ok=Gimp.param_spec_file_none_allowed(pdb_param_info)))
-    else:
-      # If multiple `GType`s map to the same `Setting` subclass, use the
-      # `Setting` subclass registered (i.e. declared) the earliest.
-      setting_type = meta_.GTYPES_AND_SETTING_TYPES[gtype][0]
+    if pdb_param_info is not None:
+      if isinstance(pdb_param_info, Gimp.ParamChoice):
+        return (
+          ChoiceSetting,
+          dict(
+            default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
+            items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
+      elif gtype == Gio.File.__gtype__:
+        return (
+          FileSetting,
+          dict(
+            action=Gimp.param_spec_file_get_action(pdb_param_info),
+            none_ok=Gimp.param_spec_file_none_allowed(pdb_param_info)))
+      elif gtype == Gimp.Image.__gtype__:
+        return ImageSetting, dict(none_ok=Gimp.param_spec_image_none_allowed(pdb_param_info))
+      elif gtype in [
+            Gimp.Item.__gtype__,
+            Gimp.Drawable.__gtype__,
+            Gimp.Layer.__gtype__,
+            Gimp.GroupLayer.__gtype__,
+            Gimp.TextLayer.__gtype__,
+            Gimp.Channel.__gtype__,
+            Gimp.LayerMask.__gtype__,
+            Gimp.Selection.__gtype__,
+            Gimp.Path.__gtype__]:
+        return (
+          _get_setting_type_from_mapping(gtype),
+          dict(none_ok=Gimp.param_spec_item_none_allowed(pdb_param_info)))
+      elif gtype == Gimp.DrawableFilter.__gtype__:
+        return (
+          DrawableFilterSetting,
+          dict(none_ok=Gimp.param_spec_drawable_filter_none_allowed(pdb_param_info)))
+      elif gtype == Gimp.Display.__gtype__:
+        return (
+          DisplaySetting,
+          dict(none_ok=Gimp.param_spec_display_none_allowed(pdb_param_info)))
+      elif gtype == Gegl.Color.__gtype__:
+        return (
+          ColorSetting,
+          dict(has_alpha=Gimp.param_spec_color_has_alpha(pdb_param_info)))
+      elif gtype.parent == Gimp.Resource.__gtype__:
+        return (
+          _get_setting_type_from_mapping(gtype),
+          dict(
+            none_ok=Gimp.param_spec_resource_none_allowed(pdb_param_info),
+            default_to_context=Gimp.param_spec_resource_defaults_to_context(pdb_param_info)))
+      elif gtype == Gimp.Unit.__gtype__:
+        return (
+          UnitSetting,
+          dict(
+            show_pixels=Gimp.param_spec_unit_pixel_allowed(pdb_param_info),
+            show_percent=Gimp.param_spec_unit_percent_allowed(pdb_param_info)))
 
-      # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
-      # instance can have its minimum and maximum values properly adjusted.
-      return setting_type, dict(pdb_type=gtype)
+    # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
+    # instance can have its minimum and maximum values properly adjusted.
+    return _get_setting_type_from_mapping(gtype), dict(pdb_type=gtype)
   elif hasattr(gtype, 'parent') and gtype.parent == GObject.GEnum.__gtype__:
     if pdb_procedure is not None and pdb_param_info is not None:
       return EnumSetting, dict(enum_type=(pdb_procedure, pdb_param_info))
@@ -3441,12 +3493,15 @@ def get_array_setting_type_from_gimp_core_object_array(
   array_element_gtype = Gimp.param_spec_core_object_array_get_object_type(pdb_param_info)
 
   if array_element_gtype in meta_.GTYPES_AND_SETTING_TYPES:
-    # If multiple `GType`s map to the same `Setting` subclass, use the
-    # `Setting` subclass registered (i.e. declared) the earliest.
-    element_type = meta_.GTYPES_AND_SETTING_TYPES[array_element_gtype][0]
-    return ArraySetting, dict(element_type=element_type)
+    return ArraySetting, dict(element_type=_get_setting_type_from_mapping(array_element_gtype))
   else:
     return None
+
+
+def _get_setting_type_from_mapping(gtype):
+  # If multiple `GType`s map to the same `Setting` subclass, use the
+  # `Setting` subclass registered (i.e. declared) the earliest.
+  return meta_.GTYPES_AND_SETTING_TYPES[gtype][0]
 
 
 def array_as_pdb_compatible_type(

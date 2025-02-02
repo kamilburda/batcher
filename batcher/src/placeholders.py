@@ -4,6 +4,7 @@ procedures during batch processing.
 The placeholder objects are defined in the `PLACEHOLDERS` dictionary.
 """
 
+import inspect
 from typing import Callable, List, Optional, Union, Type
 
 from gi.repository import GObject
@@ -128,6 +129,22 @@ class PlaceholderSetting(pg.setting.Setting):
    
   _ALLOWED_GUI_TYPES = [gui_placeholders.PlaceholdersComboBoxPresenter]
   _ALLOWED_PLACEHOLDERS = []
+
+  def __init__(self, name, **kwargs):
+    parent_class_parameters = inspect.signature(super().__init__).parameters
+
+    # This ensures that extra arguments not specified in
+    # `pygimplib.Setting.__init__` are not passed there.
+    keys_to_delete = []
+    for key, value in kwargs.items():
+      if key not in parent_class_parameters:
+        pg.utils.create_read_only_property(self, key, value)
+        keys_to_delete.append(key)
+
+    for key in keys_to_delete:
+      del kwargs[key]
+
+    super().__init__(name, **kwargs)
 
   def _get_pdb_type(self, pdb_type):
     # Avoid errors when creating placeholder settings. Placeholders cannot be
