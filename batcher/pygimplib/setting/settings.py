@@ -2537,7 +2537,7 @@ class GimpResourceSetting(Setting):
     self._none_ok = none_ok
     self._default_to_context = default_to_context
 
-    if self._default_to_context:
+    if not self._none_ok or self._default_to_context:
       kwargs['default_value'] = self._get_default_value_from_gimp_context()
 
     super().__init__(name, **kwargs)
