@@ -73,6 +73,10 @@ class TestVersion(unittest.TestCase):
     ['patch_with_prerelease', (3, 3, None, 'alpha', None), 'patch', '3.3.1'],
     ['patch_with_prerelease_patch', (3, 3, None, 'alpha', 2), 'patch', '3.3.1'],
     ['patch_with_patch_prerelease_patch', (3, 3, 1, 'alpha', 2), 'patch', '3.3.2'],
+    ['release_for_major', (4, 0, None, 'alpha', None), 'release', '4.0'],
+    ['release_for_minor', (3, 3, None, 'alpha', None), 'release', '3.3'],
+    ['release_for_patch', (3, 3, 1, 'alpha', None), 'release', '3.3.1'],
+    ['release_for_patch_prerelease_patch', (3, 3, 1, 'alpha', 2), 'release', '3.3.1'],
   ])
   def test_increment(self, test_case_suffix, version_values, component_to_increment, expected_str):
     ver = version_.Version(*version_values)
@@ -90,12 +94,11 @@ class TestVersion(unittest.TestCase):
     ['same_nonfirst_minor', (3, 3, None, 'alpha', 2), 'minor', 'alpha', '3.3-alpha.3'],
     ['same_nonfirst_patch', (3, 3, 1, 'alpha', 2), 'patch', 'alpha', '3.3.1-alpha.3'],
     ['new_prerelease_same_major', (4, 0, None, 'alpha', None), 'major', 'beta', '4.0-beta'],
-    ['new_prerelease_same_minor', (3, 3, None, 'alpha', None), 'major', 'beta', '3.3-beta'],
-    ['new_prerelease_same_patch', (3, 3, 1, 'alpha', None), 'major', 'beta', '3.3.1-beta'],
+    ['new_prerelease_same_minor', (3, 3, None, 'alpha', None), 'minor', 'beta', '3.3-beta'],
+    ['new_prerelease_same_patch', (3, 3, 1, 'alpha', None), 'patch', 'beta', '3.3.1-beta'],
     ['new_prerelease_same_nonfirst_major', (4, 0, None, 'alpha', 2), 'major', 'beta', '4.0-beta'],
-    ['new_prerelease_same_nonfirst_minor', (3, 3, None, 'alpha', 2), 'major', 'beta', '3.3-beta'],
-    ['new_prerelease_same_nonfirst_patch', (3, 3, 1, 'alpha', 2), 'major', 'beta', '3.3.1-beta'],
-    ['empty_prerelease_assumes_no_prerelease', (3, 3, 1, None, None), 'major', '', '4.0'],
+    ['new_prerelease_same_nonfirst_minor', (3, 3, None, 'alpha', 2), 'minor', 'beta', '3.3-beta'],
+    ['new_prerelease_same_nonfirst_patch', (3, 3, 1, 'alpha', 2), 'patch', 'beta', '3.3.1-beta'],
   ])
   def test_increment_with_prerelease(
         self, test_case_suffix, version_values, component_to_increment, prerelease, expected_str):
@@ -109,6 +112,8 @@ class TestVersion(unittest.TestCase):
     ['new_prerelease_same_major_lexically_earlier', (4, 0, None, 'beta', None), 'major', 'alpha'],
     ['new_prerelease_same_minor_lexically_earlier', (3, 3, None, 'beta', None), 'minor', 'alpha'],
     ['new_prerelease_same_patch_lexically_earlier', (3, 3, 1, 'beta', None), 'patch', 'alpha'],
+    ['release_if_version_has_no_prerelease', (3, 3, 1, None, None), 'release', None],
+    ['release_if_prerelease_is_specified_as_parameter', (3, 3, 1, None, None), 'release', 'alpha'],
   ])
   def test_increment_invalid_parameters_raise_error(
         self, test_case_suffix, version_values, component_to_increment, prerelease):

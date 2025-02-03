@@ -110,7 +110,9 @@ class Version:
         * The specified ``prerelease`` contains non-alphanumeric characters or
           is lexically earlier than the existing ``prerelease`` attribute.
     """
-    if component_to_increment not in ['major', 'minor', 'patch']:
+    available_components_to_increment = ['major', 'minor', 'patch', 'release']
+
+    if component_to_increment not in available_components_to_increment:
       raise ValueError(f'invalid version component "{component_to_increment}"')
     
     if prerelease:
@@ -121,6 +123,13 @@ class Version:
         raise ValueError(
           f'the specified pre-release "{prerelease}" is lexically earlier than'
           f' the existing pre-release "{self.prerelease}"')
+
+    if component_to_increment == 'release':
+      if prerelease:
+        raise ValueError('cannot specify prerelease if the increment is "release"')
+
+      if not self.prerelease:
+        raise ValueError('if the increment is "release", the existing version must be a prerelease')
     
     if not prerelease:
       prerelease = None
@@ -138,7 +147,10 @@ class Version:
       if self.patch is None:
         self.patch = 0
       self.patch += 1
-    
+
+    def increment_release():
+      pass
+
     def clear_prerelease():
       self.prerelease = None
       self.prerelease_patch = None
@@ -158,9 +170,13 @@ class Version:
       increment_component_func = increment_minor
     elif component_to_increment == 'patch':
       increment_component_func = increment_patch
+    elif component_to_increment == 'release':
+      increment_component_func = increment_release
     else:
-      raise ValueError('increment can only be one of "major", "minor" or "patch"')
-    
+      raise ValueError((
+        'increment can only be one of the following:'
+        f' {", ".join(available_components_to_increment)}'))
+
     if prerelease is None:
       increment_component_func()
       clear_prerelease()
