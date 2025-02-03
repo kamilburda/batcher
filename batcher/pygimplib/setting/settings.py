@@ -2764,13 +2764,15 @@ class UnitSetting(Setting):
     self._show_pixels = show_pixels
     self._show_percent = show_percent
 
+    # We use id() instead of relying on hashes as hashes may either be
+    # unavailable or, when using stubs, result in 0 hash for all these objects.
     self._built_in_units = {
-      Gimp.Unit.inch(): 'inch',
-      Gimp.Unit.mm(): 'mm',
-      Gimp.Unit.percent(): 'percent',
-      Gimp.Unit.pica(): 'pica',
-      Gimp.Unit.pixel(): 'pixel',
-      Gimp.Unit.point(): 'point',
+      id(Gimp.Unit.inch()): 'inch',
+      id(Gimp.Unit.mm()): 'mm',
+      id(Gimp.Unit.percent()): 'percent',
+      id(Gimp.Unit.pica()): 'pica',
+      id(Gimp.Unit.pixel()): 'pixel',
+      id(Gimp.Unit.point()): 'point',
     }
 
     super().__init__(name, **kwargs)
@@ -2817,8 +2819,8 @@ class UnitSetting(Setting):
       return raw_value
 
   def _value_to_raw(self, unit: Gimp.Unit) -> Union[List, str]:
-    if unit in self._built_in_units:
-      return self._built_in_units[unit]
+    if id(unit) in self._built_in_units:
+      return self._built_in_units[id(unit)]
     else:
       return [
         unit.get_name(),

@@ -399,7 +399,11 @@ class Item(GObject.GObject, ParasiteFunctionsStubMixin):
     return self.valid
 
 
-class Layer(Item):
+class Drawable(Item):
+  pass
+
+
+class Layer(Drawable):
 
   def __init__(self, mask=None, filters=None, **kwargs):
     super().__init__(**kwargs)
@@ -433,15 +437,25 @@ class GroupLayer(Layer):
     self._is_group_layer = True
 
 
-class LayerMask(Item):
-
-  def is_layer_mask(self):
-    return True
+class TextLayer(Layer):
+  pass
 
 
 class Channel(Item):
 
   def is_channel(self):
+    return True
+
+
+class LayerMask(Channel):
+
+  def is_layer_mask(self):
+    return True
+
+
+class Selection(Channel):
+
+  def is_layer_mask(self):
     return True
 
 
@@ -641,7 +655,7 @@ class Pattern(Resource):
   pass
 
 
-class Unit:
+class Unit(GObject.GObject):
 
   def __init__(self, name=None, factor=None, digits=None, symbol=None, abbreviation=None):
     self._name = name
@@ -727,11 +741,16 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   Image = Image
 
   Item = Item
+  Drawable = Drawable
   Layer = Layer
   GroupLayer = GroupLayer
-  LayerMask = LayerMask
+  TextLayer = TextLayer
   Channel = Channel
+  LayerMask = LayerMask
+  Selection = Selection
   Path = Path
+
+  DrawableFilter = DrawableFilter
 
   Display = Display
 
