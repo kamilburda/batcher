@@ -40,6 +40,8 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
   if color_profile is not None:
     new_image.set_color_profile(color_profile)
 
+  _copy_image_simulation_profile(image, new_image)
+
   if image.get_base_type() == Gimp.ImageBaseType.INDEXED:
     new_image.set_palette(image.get_palette())
 
@@ -48,8 +50,6 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
   _copy_image_sample_points(image, new_image)
 
   _copy_image_grid(image, new_image)
-
-  _copy_image_simulation_profile(image, new_image)
 
   image_metadata = image.get_metadata()
   if image_metadata is not None:
