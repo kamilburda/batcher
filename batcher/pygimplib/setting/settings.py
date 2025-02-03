@@ -1831,9 +1831,6 @@ class ItemSetting(GimpItemSetting):
     return value
   
   def _validate(self, item):
-    if not self._none_ok and item is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if item is not None and not isinstance(item, Gimp.Item):
       return 'invalid item', 'invalid_value'
 
@@ -1858,9 +1855,6 @@ class DrawableSetting(GimpItemSetting):
     return value
   
   def _validate(self, drawable):
-    if not self._none_ok and drawable is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if drawable is not None and not drawable.is_drawable():
       return 'invalid drawable', 'invalid_value'
 
@@ -1885,9 +1879,6 @@ class LayerSetting(GimpItemSetting):
     return value
   
   def _validate(self, layer):
-    if not self._none_ok and layer is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if layer is not None and not layer.is_layer():
       return 'invalid layer', 'invalid_value'
 
@@ -1912,9 +1903,6 @@ class GroupLayerSetting(GimpItemSetting):
     return value
 
   def _validate(self, layer):
-    if not self._none_ok and layer is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if layer is not None and not layer.is_group_layer():
       return 'invalid group layer', 'invalid_value'
 
@@ -1939,9 +1927,6 @@ class TextLayerSetting(GimpItemSetting):
     return value
 
   def _validate(self, layer):
-    if not self._none_ok and layer is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if layer is not None and not layer.is_text_layer():
       return 'invalid text layer', 'invalid_value'
 
@@ -1970,9 +1955,6 @@ class LayerMaskSetting(GimpItemSetting):
     return value
 
   def _validate(self, drawable):
-    if not self._none_ok and drawable is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if drawable is not None and not drawable.is_layer_mask():
       return 'invalid layer mask', 'invalid_value'
 
@@ -2017,9 +1999,6 @@ class ChannelSetting(GimpItemSetting):
     return value
   
   def _validate(self, channel):
-    if not self._none_ok and channel is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if channel is not None and not channel.is_channel():
       return 'invalid channel', 'invalid_value'
 
@@ -2065,9 +2044,6 @@ class PathSetting(GimpItemSetting):
     return value
   
   def _validate(self, path):
-    if not self._none_ok and path is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if path is not None and not path.is_path():
       return 'invalid path', 'invalid_value'
 
@@ -2281,9 +2257,6 @@ class DisplaySetting(Setting):
     return None
 
   def _validate(self, display):
-    if not self._none_ok and display is None:
-      return 'None is not allowed for this setting', 'invalid_value'
-
     if display is not None and not display.is_valid():
       return 'invalid display', 'invalid_value'
 
