@@ -2069,11 +2069,18 @@ class DrawableFilterSetting(Setting):
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.drawable_filter_combo_box]
 
-  def __init__(self, name: str, **kwargs):
+  def __init__(self, name: str, none_ok: bool = True, **kwargs):
     self.drawable = None
     """The drawable holding the filter (the setting value)."""
 
+    self._none_ok = none_ok
+
     super().__init__(name, **kwargs)
+
+  @property
+  def none_ok(self):
+    """If ``True``, ``None`` is allowed as a valid value for this setting."""
+    return self._none_ok
 
   def _copy_value(self, value):
     return value
