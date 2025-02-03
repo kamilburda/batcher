@@ -49,6 +49,8 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
 
   _copy_image_grid(image, new_image)
 
+  _copy_image_simulation_profile(image, new_image)
+
   image_metadata = image.get_metadata()
   if image_metadata is not None:
     new_image.set_metadata(image_metadata)
@@ -94,6 +96,14 @@ def _copy_image_grid(image, new_image):
   new_image.grid_set_offset(*image.grid_get_offset()[1:])
   new_image.grid_set_spacing(*image.grid_get_spacing()[1:])
   new_image.grid_set_style(image.grid_get_style())
+
+
+def _copy_image_simulation_profile(image, new_image):
+  profile = image.get_simulation_profile()
+  if profile:
+    new_image.set_simulation_profile(profile)
+  new_image.set_simulation_intent(image.get_simulation_intent())
+  new_image.set_simulation_bpc(image.get_simulation_bpc())
 
 
 def find_images_by_filepath(image_filepath: str) -> List[Gimp.Image]:
