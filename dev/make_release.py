@@ -547,7 +547,7 @@ def parse_args(args):
   
   parser.add_argument(
     'release_type',
-    choices=['major', 'minor', 'patch'],
+    choices=['major', 'minor', 'patch', 'release'],
     help='the type of the new release')
   
   parser.add_argument(
