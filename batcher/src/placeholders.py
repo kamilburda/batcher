@@ -62,6 +62,10 @@ def _get_foreground_layer_for_array(_setting, batcher):
   return (background_foreground.get_foreground_layer(batcher),)
 
 
+def _get_none_object(_setting, _batcher):
+  return None
+
+
 def _get_all_top_level_layers(_setting, batcher):
   return batcher.current_image.get_layers()
 
@@ -79,6 +83,7 @@ _PLACEHOLDERS_LIST = [
   ('foreground_layer', _('Foreground Layer'), _get_foreground_layer),
   ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
   ('all_top_level_layers', _('All Layers'), _get_all_top_level_layers),
+  ('none', _('None'), _get_none_object),
   ('unsupported_parameter', '', _get_value_for_unsupported_parameter),
 ]
 
@@ -128,9 +133,17 @@ The following placeholder objects are defined:
 class PlaceholderSetting(pg.setting.Setting):
    
   _ALLOWED_GUI_TYPES = [gui_placeholders.PlaceholdersComboBoxPresenter]
-  _ALLOWED_PLACEHOLDERS = []
+
+  _DEFAULT_PLACEHOLDERS = []
 
   def __init__(self, name, **kwargs):
+    self._placeholder_names = list(self._DEFAULT_PLACEHOLDERS)
+
+    self._process_kwargs_before_parent_init(kwargs)
+
+    super().__init__(name, **kwargs)
+
+  def _process_kwargs_before_parent_init(self, kwargs):
     parent_class_parameters = inspect.signature(super().__init__).parameters
 
     # This ensures that extra arguments not specified in
@@ -144,54 +157,62 @@ class PlaceholderSetting(pg.setting.Setting):
     for key in keys_to_delete:
       del kwargs[key]
 
-    super().__init__(name, **kwargs)
-
   def _get_pdb_type(self, pdb_type):
-    # Avoid errors when creating placeholder settings. Placeholders cannot be
-    # registered to the PDB anyway.
+    # This avoids errors when creating placeholder settings. Placeholders
+    # cannot be registered to the PDB anyway.
     return None
-  
-  @classmethod
-  def get_allowed_placeholder_names(cls) -> List[str]:
-    """Returns a list of allowed names of placeholders for this setting class.
+
+  def get_placeholder_names(self) -> List[str]:
+    """Returns a list of names of placeholders applicable for this setting
+    class.
     """
-    return list(cls._ALLOWED_PLACEHOLDERS)
-  
-  @classmethod
-  def get_allowed_placeholders(cls) -> List[Placeholder]:
-    """Returns a list of allowed placeholder objects for this setting class.
+    return list(self._placeholder_names)
+
+  def get_placeholders(self) -> List[Placeholder]:
+    """Returns a list of placeholder objects applicable for this setting class.
     """
     return [
       placeholder for placeholder_name, placeholder in PLACEHOLDERS.items()
-      if placeholder_name in cls._ALLOWED_PLACEHOLDERS]
-  
+      if placeholder_name in self._placeholder_names]
+
   def _validate(self, value):
-    if value not in self._ALLOWED_PLACEHOLDERS:
+    if value not in self._placeholder_names:
       return 'invalid placeholder', 'invalid_value'
 
 
-class PlaceholderImageSetting(PlaceholderSetting):
+class PlaceholderGimpObjectSetting(PlaceholderSetting):
+
+  def __init__(self, name, none_ok: bool = False, **kwargs):
+    self._none_ok = none_ok
+
+    super().__init__(name, **kwargs)
+
+    if none_ok:
+      self._placeholder_names.append('none')
+
+
+class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_image'
-  _ALLOWED_PLACEHOLDERS = ['current_image']
+  _DEFAULT_PLACEHOLDERS = ['current_image']
 
 
-class PlaceholderDrawableSetting(PlaceholderSetting):
+class PlaceholderDrawableSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _ALLOWED_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
 
 
-class PlaceholderLayerSetting(PlaceholderSetting):
+class PlaceholderLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _ALLOWED_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
 
 
-class PlaceholderItemSetting(PlaceholderSetting):
+class PlaceholderItemSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _ALLOWED_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
 
 
 class PlaceholderArraySetting(PlaceholderSetting):
@@ -216,7 +237,7 @@ class PlaceholderArraySetting(PlaceholderSetting):
 class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _ALLOWED_PLACEHOLDERS = [
+  _DEFAULT_PLACEHOLDERS = [
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
@@ -227,7 +248,7 @@ class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
 class PlaceholderLayerArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _ALLOWED_PLACEHOLDERS = [
+  _DEFAULT_PLACEHOLDERS = [
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
@@ -238,7 +259,7 @@ class PlaceholderLayerArraySetting(PlaceholderArraySetting):
 class PlaceholderItemArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _ALLOWED_PLACEHOLDERS = [
+  _DEFAULT_PLACEHOLDERS = [
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
@@ -250,7 +271,7 @@ class PlaceholderUnsupportedParameterSetting(PlaceholderSetting):
 
   _DEFAULT_DEFAULT_VALUE = 'unsupported_parameter'
   _ALLOWED_GUI_TYPES = [gui_placeholders.UnsupportedParameterPresenter]
-  _ALLOWED_PLACEHOLDERS = [
+  _DEFAULT_PLACEHOLDERS = [
     'unsupported_parameter',
   ]
 

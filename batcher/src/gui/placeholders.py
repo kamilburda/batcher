@@ -30,7 +30,7 @@ class PlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     combo_box = Gtk.ComboBoxText.new()
 
-    for index, placeholder in enumerate(setting.get_allowed_placeholders()):
+    for index, placeholder in enumerate(setting.get_placeholders()):
       self._indexes_and_placeholder_names[index] = placeholder.name
       self._placeholder_names_and_indexes[placeholder.name] = index
 

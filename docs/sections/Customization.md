@@ -631,13 +631,16 @@ To edit a procedure or a constraint, press the icon to the right of the procedur
 
 The dialog will be automatically displayed for most [built-in procedures](#built-in-procedures) when added.
 
-If a procedure contains a layer/drawable/item option, you may select one of the following:
+If a procedure contains an image argument, you may select one of the following:
+* `Current Image` (default): applies the procedure the currently processed image.
+* `None`: ignores the image. Only available if a procedure allows omitting it (i.e. if the image is optional).
+
+If a procedure contains a layer/drawable/item argument, you may select one of the following:
 * `Current Layer` (default): applies the procedure to the currently processed layer. For Batch Convert, an input image usually contains a single layer, which will be considered the current layer. In case of multi-layer images, the first layer is considered, or the first selected layer if the stored image file contains information on the selected layers (e.g. XCF or PSD).
 * `Background Layer`: applies the procedure to the layer representing background, inserted via the `Insert background` procedure. If there is no such layer, the procedure will have no effect.
 * `Foreground Layer`: applies the procedure to the layer representing foreground, inserted via the `Insert foreground` procedure. If there is no such layer, the procedure will have no effect.
+* `None`: ignores the layer. Only available if a procedure allows omitting it (i.e. if the layer is optional).
 * `All Layers`: applies the procedure to all layers within the currently processed image. This option is available usually only for procedures having the `The input drawables` argument. Note that a procedure may not work on multiple layers at once and thus may yield an error if this option is chosen.
-
-If a procedure contains an image option, there is only one option available - `Current Image`, representing the currently processed image.
 
 
 ### More Options

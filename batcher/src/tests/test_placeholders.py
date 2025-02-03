@@ -100,18 +100,20 @@ class TestPlaceholderSetting(unittest.TestCase):
     ('placeholder', placeholders_.PlaceholderSetting, []),
     ('image_placeholder', placeholders_.PlaceholderImageSetting, ['current_image']),
   ])
-  def test_get_allowed_placeholder_names(
+  def test_get_placeholder_names(
         self, test_case_suffix, placeholder_setting_type, expected_result):
+    placeholder_setting = placeholder_setting_type('setting')
     self.assertListEqual(
-      placeholder_setting_type.get_allowed_placeholder_names(), expected_result)
+      placeholder_setting.get_placeholder_names(), expected_result)
   
   @parameterized.parameterized.expand([
     ('placeholder', placeholders_.PlaceholderSetting, 0),
     ('image_placeholder', placeholders_.PlaceholderImageSetting, 1),
   ])
-  def test_get_allowed_placeholders(
+  def test_get_placeholders(
         self, test_case_suffix, placeholder_setting_type, expected_length):
-    self.assertEqual(len(placeholder_setting_type.get_allowed_placeholders()), expected_length)
+    placeholder_setting = placeholder_setting_type('setting')
+    self.assertEqual(len(placeholder_setting.get_placeholders()), expected_length)
 
 
 class TestPlaceholderArraySetting(unittest.TestCase):
