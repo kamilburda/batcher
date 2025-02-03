@@ -2,7 +2,9 @@
 
 General changes:
 * Updated Batcher to work with GIMP 3.0.0-RC3. **Due to backwards-incompatible changes, Batcher now requires GIMP 3.0.0-RC3 or later**. Saved settings from previous versions will still work properly.
-* Improved GUI for settings and procedure arguments representing files or folders.
+* You can now choose `None` for image and layer arguments in custom procedures if a procedure allows omitting them.
+* More appropriate GUI is displayed for settings and procedure arguments representing files or folders. You can also choose to omit these arguments if a procedure allows omitting them.
+* For `Gimp.Unit` procedure arguments, the pixel and/or percentage units are not shown if a procedure is set to hide them.
 
 Bug fixes:
 * Fixed settings from version 0.8 not being updated to 1.0-RC1 and later.
