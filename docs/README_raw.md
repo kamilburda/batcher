@@ -30,6 +30,11 @@ Make sure to check the current issues first before submitting a report.
 You can also ask questions or discuss ideas related to Batcher on the [GitHub Discussions page](https://github.com/kamilburda/batcher/discussions).
 
 
+## Example screenshot
+
+![](docs/images/screenshot_dialog_convert.png)
+
+
 ## License
 
 Batcher is licensed under the [BSD 3-Clause](LICENSE) license.
