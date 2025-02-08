@@ -37,16 +37,11 @@ class FileChooser(Gtk.Box):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
 
     self._text_entry = None
-    self._file_chooser_open = None
-    self._folder_chooser_select = None
-    self._file_chooser_save = None
+    self._file_chooser = None
 
     # We allow the use of `Gimp.FileChooserAction.ANY`, for which we need to
     # create a separate widget (a plain text entry since it is unknown
     # whether the user wants open or save files or folders).
-    # Also, we use custom widgets for selecting a file or folder for opening.
-    # It seems that the native file dialog on Windows causes the plug-in to
-    # freeze for some reason.
     if file_action == Gimp.FileChooserAction.ANY:
       self._widget_type = 'text_entry'
 
@@ -58,52 +53,40 @@ class FileChooser(Gtk.Box):
       self._text_entry = Gtk.Entry(text=initial_text)
       self._text_entry.set_position(-1)
 
-      self._text_entry.connect('changed', self._emit_changed_event)
+      self._text_entry.connect('notify::text', self._emit_changed_event)
 
       self.pack_start(self._text_entry, False, False, 0)
-    elif file_action == Gimp.FileChooserAction.OPEN:
-      self._widget_type = 'file_chooser_open'
-
-      self._file_chooser_open = self._create_file_chooser_button_for_opening(
-        file_action, initial_value, title, width_chars)
-
-      self.pack_start(self._file_chooser_open, False, False, 0)
-    elif file_action == Gimp.FileChooserAction.SELECT_FOLDER:
-      self._widget_type = 'folder_chooser_select'
-
-      self._folder_chooser_select = self._create_file_chooser_button_for_opening(
-        file_action, initial_value, title, width_chars)
-
-      self.pack_start(self._folder_chooser_select, False, False, 0)
     else:
-      self._widget_type = 'file_chooser_save'
+      self._widget_type = 'file_chooser'
 
-      self._file_chooser_save = GimpUi.FileChooser(
+      self._file_chooser = GimpUi.FileChooser(
         action=file_action,
         title=title,
         file=initial_value,
       )
-      self._file_chooser_save.get_children()[1].connect('notify::text', self._emit_changed_event)
 
-      self.pack_start(self._file_chooser_save, False, False, 0)
+      entry = next(
+        iter(
+          child for child in self._file_chooser.get_children()
+          if isinstance(child, Gtk.Entry)),
+        None)
+      if entry is not None:
+        entry.connect('notify::text', self._emit_changed_event)
+
+      button = next(
+        iter(
+          child for child in self._file_chooser.get_children()
+          if isinstance(child, (Gtk.Button, Gtk.FileChooserButton))),
+        None)
+
+      if button is not None:
+        self._set_width_chars(button, width_chars)
+        if isinstance(button, Gtk.FileChooserButton):
+          button.connect('selection-changed', self._emit_changed_event)
+
+      self.pack_start(self._file_chooser, False, False, 0)
 
     self.show_all()
-
-  def _create_file_chooser_button_for_opening(
-        self, file_action, initial_value, title, width_chars):
-    button = Gtk.FileChooserButton(
-      title=title,
-      action=file_action,
-    )
-
-    if initial_value is not None:
-      button.set_file(initial_value)
-
-    self._set_width_chars(button, width_chars)
-
-    button.connect('file-set', self._emit_changed_event)
-
-    return button
 
   @staticmethod
   def _set_width_chars(button, width_chars):
@@ -127,16 +110,10 @@ class FileChooser(Gtk.Box):
     self.emit('changed', self.get_file())
 
   def get_file(self) -> Union[Gio.File, None]:
-    if self._widget_type == 'file_chooser_save':
-      return self._file_chooser_save.get_file()
-    elif self._widget_type == 'file_chooser_open':
-      return self._file_chooser_open.get_file()
-    elif self._widget_type == 'folder_chooser_select':
-      return self._folder_chooser_select.get_file()
-    elif self._widget_type == 'text_entry':
+    if self._widget_type == 'text_entry':
       return Gio.file_new_for_path(self._text_entry.get_text())
-
-    return None
+    else:
+      return self._file_chooser.get_file()
 
   def set_file(self, file_or_path: Union[Gio.File, str, None]):
     if file_or_path is None:
@@ -146,16 +123,12 @@ class FileChooser(Gtk.Box):
     else:
       file_ = file_or_path
 
-    if self._widget_type == 'file_chooser_save':
-      self._file_chooser_save.set_file(file_)
-    elif self._widget_type == 'file_chooser_open':
-      self._file_chooser_open.set_file(file_)
-    elif self._widget_type == 'folder_chooser_select':
-      self._folder_chooser_select.set_file(file_)
-    elif self._widget_type == 'text_entry':
+    if self._widget_type == 'text_entry':
       self._text_entry.set_text(file_.get_path() if file_.get_path() is not None else '')
       # Place the cursor at the end of the text entry.
       self._text_entry.set_position(-1)
+    else:
+      self._file_chooser.set_file(file_)
 
 
 GObject.type_register(FileChooser)
