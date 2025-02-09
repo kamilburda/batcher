@@ -223,8 +223,7 @@ def _get_adjacent_layer(
         adjacent_layer = next_layer
   
   if adjacent_layer is not None:
-    # This is necessary for some procedures relying on selected layers, e.g.
-    # `plug-in-autocrop-layer`.
+    # This is necessary for some procedures relying on selected layers.
     image.set_selected_layers([adjacent_layer])
     return adjacent_layer
   else:

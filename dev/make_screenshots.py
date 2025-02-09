@@ -332,11 +332,6 @@ def crop_to_dialog(image, size_setting_or_tuple, decoration_offsets):
     width = size_setting_or_tuple.value[0]
     height = size_setting_or_tuple.value[1]
   
-  pdb.gimp_image_crop(
-    image=image,
-    new_width=width,
-    new_height=height + decoration_offsets[1],
-    offx=0,
-    offy=0)
+  image.crop(width, height + decoration_offsets[1], 0, 0)
   
-  pdb.plug_in_autocrop(image=image, drawable=image.get_selected_layers()[0])
+  image.autocrop(image.get_selected_layers()[0])
