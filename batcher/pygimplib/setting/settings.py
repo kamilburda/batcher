@@ -2396,7 +2396,10 @@ class FileSetting(Setting):
       return raw_value
 
   def _value_to_raw(self, value):
-    return value.get_uri()
+    if value is not None:
+      return value.get_uri()
+    else:
+      return value
 
   def _validate(self, file_):
     if not self._none_ok and not isinstance(file_, Gio.File):
