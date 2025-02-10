@@ -2,7 +2,7 @@
 
 Batcher is a batch image processing plug-in for [GIMP](https://www.gimp.org/).
 
-**Batcher requires [GIMP 3.0.0-RC2](https://www.gimp.org/downloads/devel/) or later.**
+**Batcher requires [GIMP 3.0.0-RC3](https://www.gimp.org/downloads/devel/) or later.**
 
 
 ## What can Batcher do?
@@ -28,6 +28,11 @@ You can report issues or request new features on the [GitHub Issues page](https:
 Make sure to check the current issues first before submitting a report.
 
 You can also ask questions or discuss ideas related to Batcher on the [GitHub Discussions page](https://github.com/kamilburda/batcher/discussions).
+
+
+## Example screenshot
+
+![](docs/images/screenshot_dialog_convert.png)
 
 
 ## License
