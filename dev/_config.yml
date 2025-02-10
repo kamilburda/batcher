@@ -13,8 +13,8 @@ paginate: 10
 paginate_path: "/news/:num/"
 
 plugin_name: "batcher"
-plugin_version: "1.0-RC1"
-plugin_version_release_date: "January 22, 2025"
+plugin_version: "1.0-RC2"
+plugin_version_release_date: "February 10, 2025"
 download_zip_suffix: ".zip"
 sections_url: "/sections/"
 news_url: "/news/"
