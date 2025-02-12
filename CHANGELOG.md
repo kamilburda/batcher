@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed Batcher not working when installed in a folder with elevated privileges (e.g. the system `plug-ins` folder containing built-in GIMP plug-ins instead of the user-specific `plug-ins` folder).
+
+
 ## 1.0-RC2
 
 ### February 10, 2025

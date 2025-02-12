@@ -99,7 +99,9 @@ def _prepare_log_files(handles, log_dirpaths, log_filename):
           raise ValueError(
             'log directory paths and filename must be specified if logging to a file')
 
-        log_files.append(create_log_file(log_dirpaths, log_filename))
+        log_file = create_log_file(log_dirpaths, log_filename)
+        if log_file is not None:
+          log_files.append(log_file)
       elif handle == 'gimp_message':
         if _gobject_dependent_modules_imported:
           log_files.append(GimpMessageFile())
