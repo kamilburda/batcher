@@ -1,9 +1,8 @@
 """Wrapper of ``Gimp.get_pdb()`` to simplify invoking GIMP PDB procedures."""
 
-from __future__ import annotations
-
 import abc
-from typing import List, Optional
+import keyword
+from typing import Optional
 
 import gi
 gi.require_version('Gegl', '0.4')
@@ -40,16 +39,16 @@ class _PyPDB:
     """Error message of the last `GimpPDBProcedure` invoked by this class."""
     return self._last_error
 
-  def __getattr__(self, name: str) -> PDBProcedure:
-    proc_name = self._process_procedure_name(name)
+  def __getattr__(self, name: str) -> 'PDBProcedure':
+    proc_name = self.python_name_to_canonical_name(name)
 
     if proc_name not in self._proc_cache:
       self._proc_cache[proc_name] = self._create_proc(proc_name)
 
     return self._proc_cache[proc_name]
 
-  def __getitem__(self, name: str) -> PDBProcedure:
-    proc_name = self._process_procedure_name(name)
+  def __getitem__(self, name: str) -> 'PDBProcedure':
+    proc_name = self.python_name_to_canonical_name(name)
 
     if proc_name not in self._proc_cache:
       self._proc_cache[proc_name] = self._create_proc(proc_name)
@@ -60,7 +59,7 @@ class _PyPDB:
     if name is None:
       return False
 
-    proc_name = self._process_procedure_name(name)
+    proc_name = self.python_name_to_canonical_name(name)
 
     if proc_name not in self._proc_cache:
       try:
@@ -78,7 +77,7 @@ class _PyPDB:
   def list_all_gimp_pdb_procedures():
     return Gimp.get_pdb().query_procedures(*([''] * 8))
 
-  def list_all_procedure_names(self) -> List[str]:
+  def list_all_procedure_names(self):
     return self.list_all_gegl_operations() + self.list_all_gimp_pdb_procedures()
 
   def remove_from_cache(self, name: str):
@@ -89,7 +88,7 @@ class _PyPDB:
 
     No action is taken if there is no procedure matching ``name`` in the cache.
     """
-    proc_name = self._process_procedure_name(name)
+    proc_name = self.python_name_to_canonical_name(name)
 
     try:
       del self._proc_cache[proc_name]
@@ -105,16 +104,20 @@ class _PyPDB:
       raise AttributeError(f'procedure "{proc_name}" does not exist')
 
   @staticmethod
+  def python_name_to_canonical_name(name):
+    return name.replace('__', ':').replace('_', '-')
+
+  @staticmethod
+  def canonical_name_to_python_name(name):
+    return name.replace('-', '_').replace(':', '__')
+
+  @staticmethod
   def _gimp_pdb_procedure_exists(proc_name):
     return Gimp.is_canonical_identifier(proc_name) and Gimp.get_pdb().procedure_exists(proc_name)
 
   @staticmethod
   def _gegl_operation_exists(proc_name):
     return Gegl.has_operation(proc_name)
-
-  @staticmethod
-  def _process_procedure_name(name):
-    return name.replace('__', ':').replace('_', '-')
 
 
 class PDBProcedure(metaclass=abc.ABCMeta):
@@ -135,8 +138,31 @@ class PDBProcedure(metaclass=abc.ABCMeta):
 
     All underscore characters  (``_``) in argument names are automatically
     replaced by ``-``.
+
+    Arguments whose names match a Python keyword (``if``, ``lambda``,
+    etc.) can be specified by appending a ``_``, e.g. ``lambda_=<value>``.
     """
     pass
+
+  @staticmethod
+  def _process_arg_name(arg_name):
+    """Transforms the given Python argument name to the name of a property
+    defined for this procedure.
+
+    For example, ``'run_mode'`` is transformed to ``'run-mode'``.
+
+    Argument names matching a Python keyword can be specified with a trailing
+    ``_``, e.g. ``lambda_``. This is transformed such that the trailing `_``
+    is removed, e.g. ``lambda``.
+    """
+    processed_arg_name = arg_name.replace('_', '-')
+
+    # This allows passing arguments with a trailing '_' to avoid name clashes
+    # with Python keywords.
+    if processed_arg_name.endswith('-') and keyword.iskeyword(processed_arg_name[:-1]):
+      processed_arg_name = processed_arg_name[:-1]
+
+    return processed_arg_name
 
   @property
   @abc.abstractmethod
@@ -308,7 +334,7 @@ class GimpPDBProcedure(PDBProcedure):
     args_and_names = {arg.name: arg for arg in args}
 
     for arg_name, arg_value in proc_kwargs.items():
-      processed_arg_name = arg_name.replace('_', '-')
+      processed_arg_name = self._process_arg_name(arg_name)
 
       try:
         arg = args_and_names[processed_arg_name]
@@ -377,7 +403,7 @@ class GeglProcedure(PDBProcedure):
     ``drawable_`` argument, which may be specified as the first and the only
     positional argument.
     """
-    processed_kwargs = {name.replace('_', '-'): value for name, value in kwargs.items()}
+    processed_kwargs = {self._process_arg_name(name): value for name, value in kwargs.items()}
 
     if 'drawable-' in processed_kwargs:
       drawable = processed_kwargs.pop('drawable-')
