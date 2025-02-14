@@ -1,4 +1,4 @@
-"""Renaming layer names according to the specified pattern.
+"""Renaming image/layer names according to the specified pattern.
 
 The pattern can contain one or more fields provided in this module.
 """

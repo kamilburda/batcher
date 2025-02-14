@@ -1,4 +1,4 @@
-"""Widget for placeholder GIMP objects (images, layers) such as "Current layer".
+"""Widget for placeholder GIMP objects (images, layers) such as "Current image".
 
 During processing, these placeholders are replaced with real objects.
 """

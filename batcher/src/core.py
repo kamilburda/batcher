@@ -1,4 +1,4 @@
-"""Batch-processing layers and exporting layers as separate images."""
+"""Batch-processing and exporting images."""
 
 import abc
 import collections

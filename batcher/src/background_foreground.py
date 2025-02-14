@@ -1,4 +1,4 @@
-"""Background and foreground layer insertion and manipulation."""
+"""Background and foreground insertion and manipulation."""
 import os.path
 
 import gi
