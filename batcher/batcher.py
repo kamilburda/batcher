@@ -405,6 +405,7 @@ pg.register_procedure(
   menu_label=_('_Batch Convert...'),
   menu_path='<Image>/File/[Export]',
   image_types='',
+  sensitivity_mask=Gimp.ProcedureSensitivityMask.ALWAYS,
   documentation=(
     _('Batch-process image files'),
     _('This procedure performs batch conversion of image files'

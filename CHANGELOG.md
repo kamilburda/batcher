@@ -1,3 +1,8 @@
+## Upcoming
+
+* Batch Convert is now guaranteed to be accessible in GIMP even if no image is opened.
+
+
 ## 1.0-RC3
 
 ### February 13, 2025
