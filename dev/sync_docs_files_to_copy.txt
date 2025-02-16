@@ -1,2 +1,2 @@
 docs/images
-docs/gh-pages/dev/images
+docs/gh-pages/dev/assets/images

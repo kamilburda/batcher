@@ -4,7 +4,7 @@ In GIMP, select `File → Batch Convert...`.
 
 A dialog appears that allows you to add input files and folders and adjust export settings, such as the output folder, filenames and the file extension.
 
-![Dialog of Batch Convert](../images/screenshot_dialog_convert.png)
+![Dialog of Batch Convert](../assets/images/screenshot_dialog_convert.png){: .align-center}
 
 To start batch conversion, simply press the `Run` button.
 
@@ -34,7 +34,7 @@ Open an image in GIMP and select `File → Export Layers...`.
 
 A dialog appears that allows you to adjust export settings, such as the output folder, filenames and the file extension.
 
-![Dialog of Export Layers](../images/screenshot_dialog_export_layers.png)
+![Dialog of Export Layers](../assets/images/screenshot_dialog_export_layers.png){: .align-center}
 
 To export layers, simply press the `Export` button.
 
@@ -44,65 +44,64 @@ Layer names are used as filenames by default.
 For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
 
 
-## Quick Export of Layers
+### Quick Export of Layers
 
 If you made changes to your image, and you want to export again with the same settings, or you need a simple export without customization, you can run `File → Export Layers (Quick)`.
 
 For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
 
-![Dialog of Export Layers (Quick)](../images/screenshot_dialog_export_layers_quick.png)
+![Dialog of Export Layers (Quick)](../assets/images/screenshot_dialog_export_layers_quick.png){: .align-center}
 
 This dialog can be skipped by simply unchecking `Show this dialog`.
 
 Note that even procedures and constraints set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
 
-## Quick Export of Selected Layers
+### Quick Export of Selected Layers
 
 When you select multiple layers in GIMP, you can right-click and select `Export Selected Layers` to quickly export the selected layers.
 
 In this case, any constraints set in the [main dialog](#exporting-layers) will be ignored.
 
-![Menu Entry for Export Selected Layers](../images/screenshot_menu_export_selected_layers.png)
+![Menu Entry for Export Selected Layers](../assets/images/screenshot_menu_export_selected_layers.png){: .align-center}
 
 
-## Batch Editing Layers
+## Editing Layers
 
 Open an image in GIMP and select `File → Edit Layers...`.
 
-![Dialog of Edit Layers](../images/screenshot_dialog_edit_layers.png)
+![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
 
 To run batch editing, simply press the `Run` button.
+This will apply procedures to each layer satisfying the activated constraints.
 
-This is where you leverage the power of [procedures and constraints](#procedures-and-constraints).
-The procedures will be applied to each layer in the current image satisfying the chosen constraints.
-You can take a look at a few [examples](Customization.md#examples) to get started.
+You can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
 
 If the `Layers` constraint is unchecked, group layers will also be processed. The group layers will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on group layers.
 
 
-## Quick Batch Layer Editing
+### Quick Layer Editing
 
 You can run batch editing in a single click by running `File → Edit Layers (Quick)`.
 This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
 
 
-## Quick Batch Editing of Selected Layers
+### Quick Editing of Selected Layers
 
 When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
 
 In this case, any constraints set in the [main dialog](#batch-editing-layers) will be ignored.
 
-![Menu Entry for Edit Selected Layers](../images/screenshot_menu_edit_selected_layers.png)
+![Menu Entry for Edit Selected Layers](../assets/images/screenshot_menu_edit_selected_layers.png){: .align-center}
 
 
 ## Adjusting Export Settings
 
-### Changing Filenames
+### Renaming
 
-The text entry next to `Name` lets you customize the filenames. A popup offers you several patterns you can combine to create the final filename, such as the image name, a numbered sequence, and more.
+The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create the final filename, such as the image name, a numbered sequence, and more.
 
-For details, see [Adjusting Filenames](Customization.md#adjusting-filenames).
+For details, see [Adjusting Filenames](Customization/Adjusting Filenames.md).
 
 ### Changing File Extension
 
@@ -121,7 +120,7 @@ Pressing the `Options...` button reveals additional export options, particularly
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
 
-All options are described in [Export Options](Customization.md#export-options).
+All options are described in [Export Options](Customization/Export Options.md).
 
 
 ## Procedures and Constraints
@@ -131,11 +130,11 @@ Before the start of batch processing, you can apply a multitude of *procedures* 
 You can exclude images/layers from being processed/exported based on one or more *constraints* (only filenames matching a suffix, only visible layers, ...).
 
 Procedures and constraints can be a powerful way to adjust batch processing to your heart's content.
-You can take a look at a few [examples](Customization.md#examples) to get started.
+You can take a look at a few [examples](Examples.md) to get started.
 
 The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the procedures and constraints.
 
-For details, see [Procedures](Customization.md#procedures) and [Constraints](Customization.md#constraints).
+For details, see [Procedures](Customization/Procedures.md) and [Constraints](Customization/Constraints.md).
 
 
 ## Preview
@@ -166,16 +165,3 @@ To load settings from a file, select `Settings → Load Settings from File...` a
 You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
 
 For Batch Convert, you can optionally turn off saving input images by unchecking `Settings → Keep Input Images`. When this setting is checked, `Reset Settings` will not remove the input images. When loading settings from a file and this setting is checked, the input images will be preserved and any input images stored in the file will be ignored. If you want to load the input images from the file, uncheck this setting.
-
-## Known Issues
-
-If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
-In that case, the file format dialog may be displayed behind GIMP.
-If so, simply select the dialog in the taskbar to bring it up.
-
-The following file formats require displaying a file format dialog for each image to be exported:
-* C source,
-* HTML.
-
-On Windows, exporting with the following file formats does not work properly if file paths contain accented (Unicode) characters:
-* X PixMap Image.
