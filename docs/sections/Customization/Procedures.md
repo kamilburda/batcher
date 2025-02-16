@@ -136,7 +136,7 @@ Options:
 
 Renames images/layers according to the specified pattern.
 
-This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Adjusting Layer Names (Filenames)](Adjusting Filenames.md).
+This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
 
 For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
