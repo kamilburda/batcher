@@ -232,7 +232,7 @@ timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 # Pagination with jekyll-paginate
 paginate: 5 # amount of posts to show
-paginate_path: /page:num/
+paginate_path: /news/page:num/
 
 # Pagination with jekyll-paginate-v2
 # See https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration
@@ -319,10 +319,10 @@ defaults:
     values:
       layout: single
       author_profile: false
-      read_time: true
+      # read_time: true
       comments: # true
-      share: true
-      related: true
+      # share: true
+      # related: true
   # _pages
   - scope:
       path: ""
