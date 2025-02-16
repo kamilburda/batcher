@@ -1,0 +1,34 @@
+# main links
+main:
+  - title: "Installation"
+    url: /docs/installation/
+  - title: "User Guide"
+    url: /docs/usage/
+  - title: "News"
+    url: /news/
+docs:
+  - title: Getting Started
+    children:
+      - title: Installation
+        url: /docs/installation/
+      - title: Usage
+        url: /docs/usage/
+  - title: Examples
+    url: /docs/examples/
+  - title: Customization
+    url: /docs/customization/
+    children:
+      - title: Export Options
+        url: /docs/export-options/
+      - title: Adjusting Filenames
+        url: /docs/adjusting-filenames/
+      - title: Procedures
+        url: /docs/procedures/
+      - title: Constraints
+        url: /docs/constraints/
+      - title: Editing Procedures and Constraints
+        url: /docs/editing-procedures-and-constraints/
+  - title: Running via Command Line
+    url: /docs/running-via-command-line/
+  - title: Known Issues
+    url: /docs/known-issues/

@@ -1,4 +1,21 @@
-<footer class="site-footer">
-  <span class="site-footer-credits">© {{ site.copyright_years }} {{ site.github_username }}.</span>
-  <span class="site-footer-license"><a href="{% if site.github.repository_url %}{{ site.github.repository_url }}/{{ site.license_remote_url }}{% else %}{{ site.license_local_filename | prepend: site.sections_url | relative_url }}{% endif %}">License</a></span>
-</footer>
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    {% if site.data.ui-text[site.locale].follow_label %}
+      <li><strong>{{ site.data.ui-text[site.locale].follow_label }}</strong></li>
+    {% endif %}
+
+    {% if site.footer.links %}
+      {% for link in site.footer.links %}
+        {% if link.label and link.url %}
+          <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer"><i class="{{ link.icon | default: 'fas fa-link' }}" aria-hidden="true"></i> {{ link.label }}</a></li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% unless site.atom_feed.hide %}
+      <li><a href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].feed_label | default: "Feed" }}</a></li>
+    {% endunless %}
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; {{ site.copyright_start_year }}-{{ site.time | date: '%Y' }} {{ site.copyright | default: site.title }}</div>
