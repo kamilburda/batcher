@@ -1,7 +1,8 @@
 ---
 layout: splash
 title: "Batcher"
-excerpt: "A batch image processing plug-in for GIMP.<br/>Highly customizable, too."
+excerpt: "A batch image processing plug-in for GIMP.<br/> Highly customizable, too."
+custom_subtitle: "Batch image processing plug-in for GIMP"
 header:
   overlay_color: "#3c3c3c"
   # overlay_filter: "0.5"

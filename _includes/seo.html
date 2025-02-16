@@ -1,8 +1,14 @@
 <!-- begin _includes/seo.html -->
 {%- assign title_separator = site.title_separator | default: '-' -%}
 
+{%- if page.custom_subtitle -%}
+  {%- assign page_subtitle = page.custom_subtitle -%}
+{%- else -%}
+  {%- assign page_subtitle = site.title -%}
+{%- endif -%}
+
 {%- assign page_title = page.title | default: site.title | replace: '|', '&#124;' -%}
-{%- assign seo_title = page_title | append: " " | append: title_separator | append: " " | append: site.title | replace: '|', '&#124;' -%}
+{%- assign seo_title = page_title | append: " " | append: title_separator | append: " " | append: page_subtitle | replace: '|', '&#124;' -%}
 
 {%- assign page_title = page_title | markdownify | strip_html | strip_newlines | escape_once -%}
 {%- assign seo_title  = seo_title  | markdownify | strip_html | strip_newlines | escape_once -%}
