@@ -293,7 +293,7 @@ def _generate_page_post_with_release_notes(release_metadata):
 
   new_post_contents = f"""
 ---
-layout: post
+layout: posts
 title: "{pg.config.PLUGIN_TITLE} {release_metadata.new_version} Released"
 author: "{pg.config.AUTHOR_NAME}"
 category: news
