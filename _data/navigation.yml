@@ -20,8 +20,8 @@ docs:
     children:
       - title: Export Options
         url: /docs/export-options/
-      - title: Adjusting Filenames
-        url: /docs/adjusting-filenames/
+      - title: Renaming
+        url: /docs/renaming/
       - title: Procedures
         url: /docs/procedures/
       - title: Constraints

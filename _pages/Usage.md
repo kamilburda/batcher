@@ -106,7 +106,7 @@ In this case, any constraints set in the [main dialog](#batch-editing-layers) wi
 
 The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create the final filename, such as the image name, a numbered sequence, and more.
 
-For details, see [Adjusting Filenames](Customization/Adjusting Filenames.md).
+For details, see [Renaming](Customization/Renaming.md).
 
 ### Changing File Extension
 

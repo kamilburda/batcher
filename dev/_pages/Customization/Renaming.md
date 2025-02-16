@@ -1,6 +1,6 @@
 ---
-title: Adjusting Filenames
-permalink: /docs/adjusting-filenames/
+title: Renaming
+permalink: /docs/renaming/
 ---
 
 Batcher offers renaming each image/layer using several built-in *fields*.

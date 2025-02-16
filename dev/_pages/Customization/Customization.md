@@ -5,7 +5,7 @@ toc: false
 ---
 
 Beyond the basic features, Batcher allows you to:
-* [adjust image/layer names](Adjusting Filenames.md),
+* [adjust image/layer names](Renaming.md),
 * apply [procedures](Procedures.md) to each image/layer (scale down, insert background, layer effects, GIMP plug-ins, ...) during batch processing,
 * filter image/layers by applying [constraints](Constraints.md) (only filenames matching a suffix, only visible layers, ...).
 
