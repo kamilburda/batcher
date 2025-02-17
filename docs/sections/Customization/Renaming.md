@@ -23,14 +23,14 @@ The numbering is separate for each folder/group layer.
 Options:
 * `%n`: Continue numbering across folders/group layers.
 * `%d<number>`: Use descending numbers, optionally with the specified padding (number of digits).
-  If the number is 0, the first number is the number of images/layers to export within a folder/group layer, or, if `%n` is also specified, the number of all images/layers to export.
+  If the number is 0, the first number is the number of images/layers within a folder/group layer, or, if `%n` is also specified, the number of all images/layers.
 
 Examples:
 * `[1]` → `1`, `2`, ...
 * `[001]` → `001`, `002`, ..., `009`, `010`, ..., `999`, `1000`, ...
 * `[005]` → `005`, `006`, ...
 * `[001, %n]` → `001`, `002`, ... (continues numbering across folders/group layers)
-* `[000, %d]` → `010`, `009`, ... (if the number of layers is 10)
+* `[000, %d]` → `010`, `009`, ... (if the number of images/layers is 10)
 * `[10, %d2]` → `10`, `09`, ...
 
 ### \[image name\]
