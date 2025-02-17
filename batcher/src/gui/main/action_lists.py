@@ -181,6 +181,11 @@ class ActionLists:
       'after-load',
       lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
 
+    _set_up_existing_rename_procedures(self._procedure_list)
+    self._procedure_list.actions.connect_event(
+      'after-load',
+      lambda _procedures: _set_up_existing_rename_procedures(self._procedure_list))
+
     _set_up_existing_insert_back_foreground_and_related_actions(
       self._procedure_list, self._constraint_list)
     self._procedure_list.actions.connect_event(
@@ -227,6 +232,9 @@ class ActionLists:
 
 
 def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
+  if item.action['orig_name'].value.startswith('rename_for_'):
+    _handle_rename_procedure_item_added(item)
+
   if item.action['orig_name'].value.startswith('export_for_'):
     _handle_export_procedure_item_added(item)
 
@@ -236,6 +244,12 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if any(item.action['orig_name'].value.startswith(prefix) for prefix in [
        'insert_background_for_', 'insert_foreground_for_']):
     _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
+
+
+def _set_up_existing_rename_procedures(procedure_list: action_list_.ActionList):
+  for item in procedure_list.items:
+    if item.action['orig_name'].value.startswith('rename_for_'):
+      _handle_rename_procedure_item_added(item)
 
 
 def _set_up_existing_export_procedures(procedure_list: action_list_.ActionList):
@@ -438,6 +452,21 @@ def _on_insert_background_foreground_procedure_removed(
       procedure_list.remove_item(merge_item)
     if constraint_item is not None and constraint_item in constraint_list.items:
       constraint_list.remove_item(constraint_item)
+
+
+def _handle_rename_procedure_item_added(item):
+  _set_display_name_for_rename_procedure(
+    item.action['arguments/pattern'],
+    item.action)
+
+  item.action['arguments/pattern'].connect_event(
+    'value-changed',
+    _set_display_name_for_rename_procedure,
+    item.action)
+
+
+def _set_display_name_for_rename_procedure(pattern_setting, rename_procedure):
+  rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
 
 
 def _handle_export_procedure_item_added(item):

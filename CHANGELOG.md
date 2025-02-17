@@ -1,6 +1,7 @@
 ## Upcoming
 
 * Batch Convert is now guaranteed to be accessible in GIMP even if no image is opened.
+* The `Rename` procedure is now automatically renamed based on the specified pattern (e.g. `Rename to "image[001]""`).
 
 
 ## 1.0-RC3
