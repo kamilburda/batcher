@@ -30,9 +30,15 @@ Make sure to check the current issues first before submitting a report.
 You can also ask questions or discuss ideas related to Batcher on the [GitHub Discussions page](https://github.com/kamilburda/batcher/discussions).
 
 
-## Example screenshot
+## Example screenshots
 
 ![](docs/images/screenshot_dialog_convert.png)
+
+![](docs/images/screenshot_dialog_export_layers_quick.png)
+
+![](docs/images/screenshot_menu_export_selected_layers.png)
+
+![](docs/images/screenshot_procedure_browser_dialog.png)
 
 
 ## License
