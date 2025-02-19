@@ -1,7 +1,14 @@
 ## Requirements
 
-* GIMP 3.0.0-RC3 or later
+* [GIMP 3.0.0-RC3](https://www.gimp.org/downloads/devel/) or later
 * Python 3.7 or later (comes pre-installed with official GIMP installations except Linux)
+
+
+## Download
+
+Batcher can currently be installed only manually by copying files from a ZIP archive.
+
+**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %}**
 
 
 ## Windows
