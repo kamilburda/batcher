@@ -97,13 +97,14 @@ In this case, any constraints set in the [main dialog](#batch-editing-layers) wi
 
 ## Adjusting Export Settings
 
-### Renaming
+### Filename Pattern
 
-The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create the final filename, such as the image name, a numbered sequence, and more.
+The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
-### Changing File Extension
+
+### File Extension
 
 Type or choose your desired file extension next to the filename entry (`png` by default).
 
@@ -112,6 +113,7 @@ If a file format contains multiple file extensions, the first is selected by def
 
 For now, the dropdown only contains a fixed list of file formats provided by GIMP.
 However, you can still enter a file extension not in the list in case you use a third-party file export plug-in.
+
 
 ### Export Options
 
