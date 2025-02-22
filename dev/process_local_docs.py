@@ -26,9 +26,10 @@ FILENAMES_AND_DIRNAMES_TO_REMOVE = [
   'Gemfile.lock',
   'robots.txt',
   'sitemap.xml',
+  'staticman.yml',
 ]
 
-DOCS_DIRNAME = 'docs'
+DOCS_DIRNAME = 'documentation'
 
 HTML_DOCTYPE_DECLARATION = '<!DOCTYPE html>'
 INDEX_HTML = 'index.html'
@@ -176,8 +177,15 @@ def remove_baseurl_in_url_attributes(html_relative_filepath, html_tree):
     new_url_attribute_value = url_attribute_value
     new_url_attribute_value = re.sub(
       r'^' + re.escape(PAGE_CONFIG['baseurl']), new_baseurl, new_url_attribute_value)
-    new_url_attribute_value = re.sub(r'/$', r'/' + INDEX_HTML, new_url_attribute_value)
-    
+    if re.match(r'.*/[^/]+#[^/]*$', new_url_attribute_value):
+      new_url_attribute_value = re.sub(
+        r'(.*)/([^/]+)#([^/]*)$', rf'\1/\2/{INDEX_HTML}#\3', new_url_attribute_value)
+    elif re.match(r'.*/#[^/]*$', new_url_attribute_value):
+      new_url_attribute_value = re.sub(
+        r'(.*)/#([^/]*)$', rf'\1/{INDEX_HTML}#\2', new_url_attribute_value)
+    else:
+      new_url_attribute_value = re.sub(r'/$', rf'/{INDEX_HTML}', new_url_attribute_value)
+
     return new_url_attribute_value
   
   modify_url_attributes(html_tree, _get_relative_url_without_baseurl)
@@ -192,6 +200,15 @@ def modify_url_attributes(html_tree, get_new_url_attribute_value_func):
         attribute_value = element.get(attribute)
         if attribute_value is not None:
           element.set(attribute, get_new_url_attribute_value_func(attribute_value))
+
+  elements_with_style_attribute_to_fix = html_tree.findall(".//*[@style]")
+  for element in elements_with_style_attribute_to_fix:
+    if 'style' in element.attrib:
+      style_attribute = element.attrib['style']
+      match = re.match(r'(.*url\([\'"])(.*?)([\'"]\).*?)$', style_attribute)
+      if match:
+        new_url = get_new_url_attribute_value_func(match.group(2))
+        element.set('style', f'{match.group(1)}{new_url}{match.group(3)}')
 
 
 def reorganize_files(site_dirpath):

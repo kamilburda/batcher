@@ -47,7 +47,7 @@ INCLUDE_LIST_FILEPATH = os.path.join(DEV_DIRPATH, 'make_installers_included_file
 
 GITHUB_PAGE_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
 
-README_RELATIVE_FILEPATH = os.path.join('docs', 'index.html')
+README_RELATIVE_FILEPATH = os.path.join('documentation', 'index.html')
 README_RELATIVE_OUTPUT_FILEPATH = 'Readme.html'
 
 
@@ -310,15 +310,25 @@ def _create_zip_archive(
 
 def _create_toplevel_readme_for_zip_archive(readme_filepath):
   def _modify_relative_paths(url_attribute_value):
-    url_filepath = os.path.join(os.path.dirname(readme_filepath), url_attribute_value)
-    
+    url_filepath_and_anchor = (
+      os.path.join(os.path.dirname(readme_filepath), url_attribute_value).rsplit('#', maxsplit=1))
+
+    if len(url_filepath_and_anchor) == 1:
+      url_filepath = url_filepath_and_anchor[0]
+      anchor = ''
+    else:
+      url_filepath = url_filepath_and_anchor[0]
+      anchor = f'#{url_filepath_and_anchor[1]}'
+
     if not os.path.exists(url_filepath):
       return url_attribute_value
-    
+
     new_url_attribute_value = os.path.relpath(
       os.path.normpath(url_filepath), TEMP_INPUT_DIRPATH)
-    
-    return pathlib.Path(new_url_attribute_value).as_posix()
+
+    new_url_attribute_value = pathlib.Path(new_url_attribute_value).as_posix()
+
+    return f'{new_url_attribute_value}{anchor}'
   
   toplevel_readme_filepath = os.path.join(
     TEMP_INPUT_DIRPATH, os.path.basename(readme_filepath))
