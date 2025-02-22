@@ -163,8 +163,6 @@ Options:
 
 ### Resize to layer size
 
-*Only available for: Export Layers, Edit Layers*
-
 If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
 
 This procedure is enabled by default for Export Layers.
