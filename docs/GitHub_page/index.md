@@ -48,4 +48,4 @@ feature_row_customization:
 
 Feel free to [ask questions](https://github.com/kamilburda/batcher/discussions) related to Batcher.
 
-Found a bug? You can [report it on GitHub](https://github.com/kamilburda/batcher/issues). Just make sure to check the GitHub issues and the [known issues](docs/known-issues) first. Thank you. 😊
+Found a bug? You can [report it on GitHub](https://github.com/kamilburda/batcher/issues). Just make sure to check the GitHub issues and the [known issues](docs/known-issues/) first. Thank you. 😊
