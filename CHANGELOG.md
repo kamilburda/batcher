@@ -1,6 +1,10 @@
 ## Upcoming
 
+General changes:
+* When exporting each image/layer individually, layers are no longer automatically merged into one. This allows preserving layers when exporting to a multi-layer format such as PSD.
 * Batch Convert is now guaranteed to be accessible in GIMP even if no image is opened.
+
+Changes to procedures:
 * The `Rename` procedure is now automatically renamed based on the specified pattern (e.g. `Rename to "image[001]""`).
 
 

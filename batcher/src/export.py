@@ -153,9 +153,7 @@ def export(
         force_default_file_extension=False)
     
     if batcher.process_export:
-      if export_mode == ExportModes.EACH_ITEM:
-        layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
-      else:
+      if export_mode != ExportModes.EACH_ITEM:
         image_to_process.resize_to_layers()
 
       if overwrite_mode == overwrite.OverwriteModes.ASK:
