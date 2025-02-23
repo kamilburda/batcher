@@ -40,7 +40,8 @@ while [[ "${1:0:1}" = "-" && "$1" != "--" ]]; do
   case "$1" in
     -r | --release )
       local_config_entries="$local_config_entries"'
-is_release_build: true'
+is_release_build: true
+search: false'
     ;;
     -h | --help )
       usage
