@@ -40,6 +40,7 @@ from src.procedure_groups import *
 
 
 SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
+SETTINGS_EXPORT_IMAGES = plugin_settings.create_settings_for_export_images()
 SETTINGS_EXPORT_LAYERS = plugin_settings.create_settings_for_export_layers()
 SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
 
@@ -75,6 +76,51 @@ def plug_in_batch_convert(_procedure, config, _data):
     )
   else:
     return _run_noninteractive(SETTINGS_CONVERT, image_tree, config, mode='export')
+
+
+def plug_in_batch_export_images(_procedure, config, _data):
+  _set_procedure_group_and_default_setting_source(EXPORT_IMAGES_GROUP)
+
+  run_mode = config.get_property('run-mode')
+
+  image_tree = pg.itemtree.GimpImageTree()
+  image_tree.add_opened_images()
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    return _run_interactive(
+      SETTINGS_EXPORT_IMAGES,
+      image_tree,
+      gui_main.BatchProcessingGui,
+      gui_class_kwargs=dict(
+        mode='export', item_type='image', title=_('Export Images')),
+    )
+  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
+    return _run_with_last_vals(
+      SETTINGS_EXPORT_IMAGES,
+      image_tree,
+      mode='export',
+    )
+  else:
+    return _run_noninteractive(SETTINGS_EXPORT_IMAGES, image_tree, config, mode='export')
+
+
+def plug_in_batch_export_images_quick(_procedure, config, _data):
+  _set_procedure_group_and_default_setting_source(EXPORT_IMAGES_GROUP)
+
+  run_mode = config.get_property('run-mode')
+
+  image_tree = pg.itemtree.GimpImageTree()
+  image_tree.add_opened_images()
+
+  if run_mode == Gimp.RunMode.INTERACTIVE:
+    return _run_interactive(
+      SETTINGS_EXPORT_IMAGES,
+      image_tree,
+      gui_main.BatchProcessingQuickGui,
+      gui_class_kwargs=dict(
+        mode='export', item_type='image', title=_('Export Images (Quick)')))
+  else:
+    return _run_with_last_vals(SETTINGS_EXPORT_IMAGES, image_tree, mode='export')
 
 
 def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
@@ -412,6 +458,32 @@ pg.register_procedure(
       ' to the specified file format, optionally applying arbitrary procedures'
       ' to each item and ignoring items according to the specified constraints.'),
   ),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_batch_export_images,
+  procedure_type=Gimp.Procedure,
+  arguments=pg.setting.create_params(SETTINGS_EXPORT_IMAGES['main']),
+  menu_label=_('E_xport Images...'),
+  menu_path='<Image>/File/[Export]',
+  image_types='',
+  sensitivity_mask=Gimp.ProcedureSensitivityMask.ALWAYS,
+  documentation=(_('Exports images opened in GIMP'), ''),
+  attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
+)
+
+
+pg.register_procedure(
+  plug_in_batch_export_images_quick,
+  procedure_type=Gimp.Procedure,
+  arguments=pg.setting.create_params(SETTINGS_EXPORT_IMAGES['main/run_mode']),
+  menu_label=_('E_xport Images (Quick)'),
+  menu_path='<Image>/File/[Export]',
+  image_types='',
+  sensitivity_mask=Gimp.ProcedureSensitivityMask.ALWAYS,
+  documentation=(_('Quickly export images opened in GIMP'), ''),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )
 

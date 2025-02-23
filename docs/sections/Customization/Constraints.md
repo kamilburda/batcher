@@ -1,6 +1,6 @@
 To exclude certain images/layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
 
-Just like [procedures](Procedures.md), you may enable/disable, reorder, [edit](Editing Procedures and Constraints.md) or remove constraints.
+Just like [procedures](Procedures.md), you may enable/disable, reorder, [edit](Editing%20Procedures%20and%20Constraints.md) or remove constraints.
 
 
 ## Built-in Constraints
@@ -18,6 +18,18 @@ Processes only layers (i.e. group layers are not processed).
 Processes only group layers.
 
 You need to disable the `Layers` constraint since having both enabled will result in no layer being processed.
+
+### Imported
+
+*Only available for: Export Images*
+
+Processes only images imported from a non-native (non-XCF) file format.
+
+### Not Imported
+
+*Only available for: Export Images*
+
+Processes only images that are native (XCF) images or are unsaved images without a file.
 
 ### Not background
 
@@ -57,6 +69,18 @@ Processes only images whose original file extension is supported by GIMP.
 
 If you use third-party file load plug-ins with their own file extension, uncheck this constraint so they can be processed.
 
+### Saved or exported
+
+*Only available for: Export Images*
+
+Processes only images that are saved as native (XCF) files or exported to another file format.
+
+### Not Saved or exported
+
+*Only available for: Export Images*
+
+Processes only images created in GIMP not yet saved to a file.
+
 ### Selected in GIMP
 
 *Only available for: Export Layers, Edit Layers*
@@ -64,6 +88,8 @@ If you use third-party file load plug-ins with their own file extension, uncheck
 Processes only layers selected in GIMP.
 
 ### Top-level
+
+*Only available for: Batch Convert, Export Layers, Edit Layers*
 
 Processes only top-level images/layers (i.e. images/layers inside any folder/group layer are excluded).
 
@@ -96,3 +122,15 @@ For example, by adding a blue tag, all layers except the ones containing the blu
 
 If a group layer has a color tag, it will normally not be excluded.
 To also exclude group layers with color tags, click on `More options` and check `Also apply to parent folders`.
+
+### With unsaved changes
+
+*Only available for: Export Images*
+
+Processes only images with unsaved changes ("dirty" images).
+
+### With no unsaved changes
+
+*Only available for: Export Images*
+
+Processes only images with no unsaved changes ("clean" images).

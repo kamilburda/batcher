@@ -15,6 +15,7 @@ import pygimplib as pg
 
 from src import file_formats as file_formats_
 from src import renamer as renamer_
+from src import utils
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -252,7 +253,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
         raw_value.append(item_as_raw)
 
     for item_data in self._inactive_items:
-      raw_value.append(list(item_data))
+      raw_value.append(utils.semi_deep_copy(item_data))
 
     return raw_value
 
@@ -350,9 +351,9 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
               value.append(item_data)
               self._inactive_items.append(item_data)
         else:
-          raise ValueError('unsupported format for GIMP items')
+          raise ValueError(f'unsupported format for GIMP items: {item_data}')
       else:
-        raise TypeError('unsupported type for GIMP items')
+        raise TypeError(f'unsupported type for GIMP items: {item_data}')
 
     return value
 
@@ -418,7 +419,7 @@ class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
             value.append(item_data)
             self._inactive_items.append(item_data)
       else:
-        raise TypeError('unsupported type for GIMP images')
+        raise TypeError(f'unsupported type for GIMP images: {item_data}')
 
     return value
 

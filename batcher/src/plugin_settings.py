@@ -187,6 +187,155 @@ def create_settings_for_convert():
   return settings
 
 
+def create_settings_for_export_images():
+  settings = pg.setting.create_groups({
+    'name': 'all_settings',
+    'groups': [
+      {
+        'name': 'main',
+      }
+    ]
+  })
+
+  settings['main'].add([
+    {
+      'type': 'enum',
+      'name': 'run_mode',
+      'enum_type': Gimp.RunMode,
+      'default_value': Gimp.RunMode.NONINTERACTIVE,
+      'display_name': _('Run mode'),
+      'description': _('The run mode'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'file_extension',
+      'name': 'file_extension',
+      'default_value': 'png',
+      'display_name': _('File extension'),
+      'adjust_value': True,
+      'auto_update_gui_to_setting': False,
+      'gui_type': None,
+    },
+    {
+      'type': 'file',
+      'name': 'output_directory',
+      'default_value': Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'display_name': _('Output folder'),
+    },
+    {
+      'type': 'name_pattern',
+      'name': 'name_pattern',
+      'default_value': '[image name]',
+      'display_name': _('Image filename pattern'),
+      'description': _('Image filename pattern (empty string = image name)'),
+      'gui_type': None,
+    },
+    {
+      'type': 'choice',
+      'name': 'overwrite_mode',
+      'default_value': 'rename_new',
+      'items': utils.semi_deep_copy(builtin_procedures.INTERACTIVE_OVERWRITE_MODES_LIST),
+      'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
+      'gui_type': None,
+    },
+    {
+      'type': 'file',
+      'name': 'settings_file',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (optional)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'string',
+      'name': 'plugin_version',
+      'default_value': pg.config.PLUGIN_VERSION,
+      'pdb_type': None,
+      'gui_type': None,
+    },
+  ])
+
+  export_settings = pg.setting.Group(
+    name='export',
+    setting_attributes={
+      'pdb_type': None,
+    },
+  )
+
+  export_arguments = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['export_for_export_images']['arguments'])
+  # Remove settings already present in the main settings.
+  export_arguments = export_arguments[2:]
+
+  export_settings.add(export_arguments)
+
+  settings['main'].add([export_settings])
+
+  gui_settings = _create_gui_settings('gimp_image_tree_items')
+  gui_settings.add([
+    _create_auto_close_setting_dict(True),
+    _create_show_quick_settings_setting_dict(),
+  ])
+
+  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings.add(
+    _create_size_gui_settings(
+      dialog_position=(),
+      dialog_size=(640, 540),
+      paned_outside_previews_position=330,
+      paned_between_previews_position=225,
+    )
+  )
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  scale_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['scale_for_images'])
+  scale_procedure_dict['enabled'] = False
+  scale_procedure_dict['display_options_on_create'] = False
+
+  settings['main'].add([
+    actions_.create(
+      name='procedures',
+      initial_actions=[
+        scale_procedure_dict,
+      ]),
+  ])
+
+  not_saved_or_exported_constraint_dict = utils.semi_deep_copy(
+    builtin_constraints.BUILTIN_CONSTRAINTS['not_saved_or_exported'])
+  not_saved_or_exported_constraint_dict['enabled'] = False
+
+  with_unsaved_changes_constraint_dict = utils.semi_deep_copy(
+    builtin_constraints.BUILTIN_CONSTRAINTS['with_unsaved_changes'])
+  with_unsaved_changes_constraint_dict['enabled'] = False
+
+  settings['main'].add([
+    actions_.create(
+      name='constraints',
+      initial_actions=[
+        not_saved_or_exported_constraint_dict,
+        with_unsaved_changes_constraint_dict,
+      ]),
+  ])
+
+  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
+  _set_file_extension_options_for_default_export_procedure(settings['main'])
+
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_align_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
+  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+
+  return settings
+
+
 def create_settings_for_export_layers():
   settings = pg.setting.create_groups({
     'name': 'all_settings',

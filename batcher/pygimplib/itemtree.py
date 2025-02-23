@@ -437,7 +437,15 @@ class GimpImageItem(Item):
     return self._id
 
   def _get_name_from_object(self) -> str:
-    return self._object.get_name()
+    object_file = self._object.get_file()
+    if object_file is not None:
+      path = object_file.get_path()
+      if path:
+        return os.path.basename(path)
+      else:
+        return self._object.get_name()
+    else:
+      return self._object.get_name()
 
   def _get_id_from_object(self) -> int:
     return self._object.get_id()

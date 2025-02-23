@@ -602,6 +602,17 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
   ],
 }
 
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES = utils.semi_deep_copy(
+  _EXPORT_PROCEDURE_DICT_FOR_CONVERT)
+
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES.update({
+  'name': 'export_for_export_images',
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
+})
+_EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][5]['items'].pop(1)
+del _EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][9]
+del _EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][7]
+
 
 _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = utils.semi_deep_copy(
   _EXPORT_PROCEDURE_DICT_FOR_CONVERT)
@@ -646,7 +657,7 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
   'function': scale,
   'display_name': _('Scale'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP],
+  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'placeholder_image',
@@ -773,7 +784,7 @@ _BUILTIN_PROCEDURES_LIST = [
       'Aligns layer(s) with the image or, if specified, another layer.'
       '\n\nYou may specify additional offsets after the alignment is applied.'),
     'display_options_on_create': True,
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'placeholder_layer_array',
@@ -867,7 +878,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Insert background'),
     'description': _('Inserts the specified image behind the current layer.'),
     'display_options_on_create': True,
-    'additional_tags': [CONVERT_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
     'arguments': [
       {
         'type': 'file',
@@ -928,7 +939,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'display_name': _('Insert foreground'),
     'description': _('Inserts the specified image in front of the current layer.'),
     'display_options_on_create': True,
-    'additional_tags': [CONVERT_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
     'arguments': [
       {
         'type': 'file',
@@ -985,13 +996,14 @@ _BUILTIN_PROCEDURES_LIST = [
     ],
   },
   _EXPORT_PROCEDURE_DICT_FOR_CONVERT,
+  _EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES,
   _EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS,
   _EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS,
   {
     'name': 'merge_background',
     'function': background_foreground.merge_background,
     'display_name': _('Merge background'),
-    # This procedure is added/removed automatically alongside `insert_background_for_layers`.
+    # This procedure is added/removed automatically alongside `insert_background_for_*`.
     'additional_tags': [],
     'arguments': [
       {
@@ -1014,7 +1026,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'name': 'merge_foreground',
     'function': background_foreground.merge_foreground,
     'display_name': _('Merge foreground'),
-    # This procedure is added/removed automatically alongside `insert_foreground_for_layers`.
+    # This procedure is added/removed automatically alongside `insert_foreground_for_*`.
     'additional_tags': [],
     'arguments': [
       {
@@ -1038,7 +1050,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': merge_filters,
     'display_name': _('Merge filters'),
     'description': _('Merges all visible filters (layer effects) in the specified layer.'),
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'placeholder_layer',
@@ -1055,7 +1067,7 @@ _BUILTIN_PROCEDURES_LIST = [
       'Merges all visible layers within the image into a single layer. Invisible layers are'
       ' removed.\n\nThis is useful if the image contains multiple layers and you want to apply'
       ' filters (layer effects) or other procedures on the entire image.'),
-    'additional_tags': [CONVERT_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
     'arguments': [
       {
         'type': 'enum',
@@ -1114,6 +1126,29 @@ _BUILTIN_PROCEDURES_LIST = [
         'name': 'rename_folders',
         'default_value': False,
         'display_name': _('Rename folders'),
+        'gui_type': 'check_button',
+      },
+    ],
+  },
+  {
+    'name': 'rename_for_export_images',
+    'function': rename_image,
+    'display_name': _('Rename'),
+    'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
+    'display_options_on_create': True,
+    'arguments': [
+      {
+        'type': 'name_pattern',
+        'name': 'pattern',
+        'default_value': '[image name]',
+        'display_name': _('Image filename pattern'),
+        'gui_type': 'name_pattern_entry',
+      },
+      {
+        'type': 'bool',
+        'name': 'rename_images',
+        'default_value': True,
+        'display_name': _('Rename images'),
         'gui_type': 'check_button',
       },
     ],
@@ -1185,7 +1220,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': resize_to_layer_size,
     'display_name': _('Resize to layer size'),
     'description': _('Resizes the image canvas to fit the specified layer(s).'),
-    'additional_tags': [CONVERT_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
       {
         'type': 'placeholder_layer_array',

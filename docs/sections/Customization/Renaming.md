@@ -105,6 +105,8 @@ Equivalent to `[layer name, %e]`.
 
 ### \[layer path\]
 
+*Only available for: Export Layers, Edit Layers*
+
 The "full path" of a layer.
 For example, if the image has a group layer named `Body` containing a group layer named `Hands` containing a layer named `Left`, the layer path will be `Body-Hands-Left`.
 

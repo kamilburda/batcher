@@ -44,17 +44,25 @@ OUTPUT_DIRPATH = os.path.join(pg.utils.get_pictures_directory(), 'Loading Screen
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_CONVERT_FILENAME = 'screenshot_dialog_convert.png'
+SCREENSHOT_DIALOG_EXPORT_IMAGES_FILENAME = 'screenshot_dialog_export_images.png'
+SCREENSHOT_DIALOG_EXPORT_IMAGES_QUICK_FILENAME = 'screenshot_dialog_export_images_quick.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME = 'screenshot_dialog_export_layers_quick.png'
 SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
 
+_WAIT_TIME_FOR_PREVIEW_SECONDS = 0.2
+
 
 def main():
+  os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
+
+  input_files_dirpath = os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs')
+
   image_file_tree = pg.itemtree.ImageFileTree()
   image_file_tree.add([
-    os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs', filename)
-    for filename in os.listdir(os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs'))])
+    os.path.join(input_files_dirpath, filename)
+    for filename in os.listdir(input_files_dirpath)])
 
   pg.config.PROCEDURE_GROUP = CONVERT_GROUP
 
@@ -71,12 +79,50 @@ def main():
     run_gui_func=take_screenshots_for_convert,
   )
 
+  pg.config.PROCEDURE_GROUP = EXPORT_IMAGES_GROUP
+
+  image_filepaths = [
+    os.path.join(root_dirpath, filename)
+    for root_dirpath, dirnames_, filenames in os.walk(input_files_dirpath)
+    for filename in filenames
+    if os.path.isfile(os.path.join(root_dirpath, filename))
+  ]
+  existing_images = Gimp.get_images()
+  images = [
+    pdb.gimp_file_load(file=Gio.file_new_for_path(filepath))
+    for filepath in image_filepaths]
+
+  gimp_image_tree = pg.itemtree.GimpImageTree()
+  gimp_image_tree.add_opened_images()
+  gimp_image_tree.remove([gimp_image_tree[image.get_id()] for image in existing_images])
+
+  gui_main.BatchProcessingGui(
+    gimp_image_tree,
+    plugin_settings.create_settings_for_export_images(),
+    'export',
+    'image',
+    title='Export Images',
+    run_gui_func=take_screenshots_for_export_images,
+  )
+
+  gui_main.BatchProcessingQuickGui(
+    gimp_image_tree,
+    plugin_settings.create_settings_for_export_images(),
+    'export',
+    'image',
+    title='Export Images (Quick)',
+    run_gui_func=take_screenshots_for_export_images_quick,
+  )
+
+  for image in images:
+    image.delete()
+
+  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+
   image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGE_FOR_LAYERS_FILEPATH))
 
   layer_tree = pg.itemtree.LayerTree()
   layer_tree.add_from_image(image)
-
-  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
   gui_main.BatchProcessingGui(
     layer_tree,
@@ -85,6 +131,15 @@ def main():
     'layer',
     title='Export Layers',
     run_gui_func=take_screenshots_for_export_layers,
+  )
+
+  gui_main.BatchProcessingQuickGui(
+    layer_tree,
+    plugin_settings.create_settings_for_export_layers(),
+    'export',
+    'layer',
+    title='Export Layers (Quick)',
+    run_gui_func=take_screenshots_for_export_layers_quick,
   )
 
   pg.config.PROCEDURE_GROUP = EDIT_LAYERS_GROUP
@@ -98,17 +153,6 @@ def main():
     run_gui_func=take_screenshots_for_edit_layers,
   )
 
-  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
-
-  gui_main.BatchProcessingQuickGui(
-    layer_tree,
-    plugin_settings.create_settings_for_export_layers(),
-    'export',
-    'layer',
-    title='Export Layers (Quick)',
-    run_gui_func=take_screenshots_for_export_layers_quick,
-  )
-
   for _i in range(Gtk.main_level()):
     Gtk.main_quit()
 
@@ -116,35 +160,22 @@ def main():
 
 
 def take_screenshots_for_convert(gui, dialog, settings):
-  os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
   settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
 
-  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
-
-  # Wait until the preview is updated.
-  time.sleep(0.2)
-
-  while Gtk.events_pending():
-    Gtk.main_iteration()
+  _wait_until_preview_is_updated(n_repetitions=2)
 
   dialog.set_focus(None)
 
-  # We iterate without filtering as file extensions from item names are stripped
-  # as a part of processing (the default Rename procedure). As a result, the
-  # initial "Recognized file format" constraint will not match any item.
-  main_background_item = next(
+  selected_item = next(
     iter(
       item for item in gui.name_preview.batcher.item_tree.iter(filtered=False)
       if item.id.endswith('main-background.xcf')))
 
-  gui.name_preview.set_selected_items([main_background_item.key])
+  gui.name_preview.set_selected_items([selected_item.key])
 
-  # Wait until the preview is updated.
-  time.sleep(0.1)
-
-  while Gtk.events_pending():
-    Gtk.main_iteration()
+  _wait_until_preview_is_updated()
 
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
@@ -154,34 +185,70 @@ def take_screenshots_for_convert(gui, dialog, settings):
   )
 
 
-def take_screenshots_for_export_layers(gui, dialog, settings):
-  os.makedirs(OUTPUT_DIRPATH, exist_ok=True)
-  
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
-  
+def take_screenshots_for_export_images(gui, dialog, settings):
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
-  # Wait until the preview is updated.
-  time.sleep(0.1)
+  _wait_until_preview_is_updated(n_repetitions=2)
+
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+
+  dialog.set_focus(None)
+
+  selected_item = next(
+    iter(
+      item.raw for item in gui.name_preview.batcher.item_tree
+      if item.raw.get_name().startswith('main-background')))
+
+  gui.name_preview.set_selected_items([selected_item.get_id()])
+
+  _wait_until_preview_is_updated()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EXPORT_IMAGES_FILENAME,
+    settings,
+    decoration_offsets,
+  )
+
+
+def take_screenshots_for_export_images_quick(_gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
 
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EXPORT_IMAGES_QUICK_FILENAME,
+    settings,
+    decoration_offsets,
+    crop_to=dialog.get_size(),
+  )
+
+
+def take_screenshots_for_export_layers(gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+
+  _wait_until_preview_is_updated(n_repetitions=2)
+
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+
   dialog.set_focus(None)
 
-  main_background_layer = next(
+  selected_item = next(
     iter(
       item.raw for item in gui.name_preview.batcher.item_tree
       if item.raw.get_name() == 'main-background'))
 
-  gui.name_preview.set_selected_items([main_background_layer.get_id()])
+  gui.name_preview.set_selected_items([selected_item.get_id()])
 
-  # Wait until the preview is updated.
-  time.sleep(0.1)
+  _wait_until_preview_is_updated()
 
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-  
   take_and_process_screenshot(
     SCREENSHOTS_DIRPATH,
     SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME,
@@ -215,40 +282,13 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   gui.procedure_list.browser.widget.hide()
 
 
-def take_screenshots_for_edit_layers(gui, dialog, settings):
-  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
-
-  # Wait until the preview is updated.
-  time.sleep(0.1)
-
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-
-  dialog.set_focus(None)
-
-  main_background_layer = next(
-    iter(
-      item.raw for item in gui.name_preview.batcher.item_tree
-      if item.raw.get_name() == 'main-background'))
-
-  gui.name_preview.set_selected_items([main_background_layer.get_id()])
-
-  # Wait until the preview is updated.
-  time.sleep(0.1)
-
-  while Gtk.events_pending():
-    Gtk.main_iteration()
-
-  take_and_process_screenshot(
-    SCREENSHOTS_DIRPATH,
-    SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
-    settings,
-    decoration_offsets,
-  )
-
-
 def take_screenshots_for_export_layers_quick(_gui, dialog, settings):
   decoration_offsets = move_dialog_to_corner(dialog)
+
+  while Gtk.events_pending():
+    Gtk.main_iteration()
+
+  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -259,6 +299,30 @@ def take_screenshots_for_export_layers_quick(_gui, dialog, settings):
     settings,
     decoration_offsets,
     crop_to=dialog.get_size(),
+  )
+
+
+def take_screenshots_for_edit_layers(gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+
+  _wait_until_preview_is_updated(n_repetitions=2)
+
+  dialog.set_focus(None)
+
+  selected_item = next(
+    iter(
+      item.raw for item in gui.name_preview.batcher.item_tree
+      if item.raw.get_name() == 'main-background'))
+
+  gui.name_preview.set_selected_items([selected_item.get_id()])
+
+  _wait_until_preview_is_updated()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME,
+    settings,
+    decoration_offsets,
   )
 
 
@@ -335,3 +399,12 @@ def crop_to_dialog(image, size_setting_or_tuple, decoration_offsets):
   image.crop(width, height + decoration_offsets[1], 0, 0)
   
   image.autocrop(image.get_selected_layers()[0])
+
+
+def _wait_until_preview_is_updated(n_repetitions=1):
+  for unused_ in range(n_repetitions):
+    # Wait until the preview is updated.
+    time.sleep(_WAIT_TIME_FOR_PREVIEW_SECONDS)
+
+    while Gtk.events_pending():
+      Gtk.main_iteration()

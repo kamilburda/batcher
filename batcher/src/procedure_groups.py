@@ -12,10 +12,12 @@ These names can be used, for example, for the following purposes:
 
 PROCEDURE_GROUPS = (
   CONVERT_GROUP,
+  EXPORT_IMAGES_GROUP,
   EXPORT_LAYERS_GROUP,
   EDIT_LAYERS_GROUP,
 ) = (
   'plug-in-batch-convert',
+  'plug-in-batch-export-images',
   'plug-in-batch-export-layers',
   'plug-in-batch-edit-layers',
 )

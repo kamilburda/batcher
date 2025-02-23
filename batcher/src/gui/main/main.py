@@ -13,6 +13,8 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
+from src.procedure_groups import *
+
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
@@ -110,7 +112,7 @@ class BatchProcessingGui:
       self._item_tree,
       previews_top_label,
       lock_previews=True,
-      manage_items=self._item_type == 'image',
+      manage_items=pg.config.PROCEDURE_GROUP == CONVERT_GROUP,
       display_message_func=self._display_inline_message,
       current_image=self._current_image,
     )
@@ -150,7 +152,7 @@ class BatchProcessingGui:
     self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
     self._button_run.hide()
-    if self._mode == 'export' and self._item_type == 'layer':
+    if self._mode == 'export' and pg.config.PROCEDURE_GROUP != CONVERT_GROUP:
       self._button_run.set_label(_('_Export'))
     else:
       self._button_run.set_label(_('_Run'))
@@ -460,7 +462,7 @@ class BatchProcessingQuickGui:
 
       self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
 
-      if self._item_type == 'layer':
+      if self._mode == 'export' and pg.config.PROCEDURE_GROUP != CONVERT_GROUP:
         button_run_label = _('_Export')
       else:
         button_run_label = _('_Run')

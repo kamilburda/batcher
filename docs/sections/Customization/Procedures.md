@@ -4,7 +4,7 @@ Press the `Add Procedure...` button and select one of the available procedures, 
 For each procedure, you may:
 * enable/disable the procedure,
 * move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
-* [edit the procedure](Editing Procedures and Constraints.md),
+* [edit the procedure](Editing%20Procedures%20and%20Constraints.md),
 * remove the procedure.
 
 You can add the same procedure multiple times.
@@ -39,7 +39,7 @@ You can add this procedure multiple times to export to multiple file formats at 
 Options:
 * *Output folder*: Folder to export the output image(s) to.
 * *File extension*: File extension of the output image(s).
-* All options specified in [Export Options](Export Options.md).
+* All options specified in [Export Options](Export%20Options.md).
 
 The name of the Export procedure is automatically updated as you modify the file extension.
 
@@ -103,7 +103,6 @@ If there is no background layer inserted, this procedure has no effect.
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
-
 ### Merge foreground
 
 *Only available if `Insert foreground` is added*
@@ -118,7 +117,7 @@ Merges all visible filters (layer effects) in the specified layer.
 
 ### Merge visible layers
 
-*Only available for: Batch Convert*
+*Only available for: Batch Convert, Export Images*
 
 Merges all visible layers within the image into a single layer. Invisible layers are removed.
 
@@ -126,11 +125,12 @@ This is useful if the image contains multiple layers and you want to apply filte
 
 ### Remove folder structure
 
+*Only available for: Batch Convert, Export Layers, Edit Layers*
+
 Exports all images to the output folder on the same level, i.e. subfolders are not created.
 
 Options:
 * (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
-
 
 ### Rename
 
@@ -141,6 +141,17 @@ This procedure uses the same text entry as the one in Batch Convert or Export La
 For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
 Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+
+### Resize to layer size
+
+*Only available for: Batch Convert, Export Images, Export Layers*
+
+If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
+
+This procedure is enabled by default for Export Layers.
+
+To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
+Note that in that case the layers will be cut off if they are partially outside the image canvas.
 
 ### Scale
 
@@ -161,16 +172,6 @@ Options:
 * *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
-### Resize to layer size
-
-If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
-
-This procedure is enabled by default for Export Layers.
-
-To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
-Note that in that case the layers will be cut off if they are partially outside the image canvas.
-
-
 ## Adding Custom Procedures
 
 You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`. Both built-in and any third-party plug-ins and layer effects are supported.
@@ -180,7 +181,7 @@ You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP proc
 You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
-You can [edit the procedure](Editing Procedures and Constraints.md) anytime after adding it.
+You can [edit the procedure](Editing%20Procedures%20and%20Constraints.md) anytime after adding it.
 
 All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
 * *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).

@@ -1,5 +1,7 @@
 ## Upcoming
 
+**New major feature: Export of images opened in GIMP**. You can perform image export via `File → Export Images...` or `File → Export Images (Quick)`. As with other plug-in procedures, you may make use of procedures and constraints (such as "only images with unsaved changes"). Note that this feature exports images to another file format, i.e. it does not mass-save XCF images in their original locations.
+
 General changes:
 * When exporting each image/layer individually, layers are no longer automatically merged into one. This allows preserving layers when exporting to a multi-layer format such as PSD.
 * Batch Convert is now guaranteed to be accessible in GIMP even if no image is opened.

@@ -21,6 +21,14 @@ def is_nonempty_group(item, _layer_batcher):
   return item.type == pg.itemtree.TYPE_GROUP and item.raw.get_children()
 
 
+def is_imported(item, _image_batcher):
+  return item.raw.get_imported_file() is not None
+
+
+def is_not_imported(item, _image_batcher):
+  return not is_imported(item, _image_batcher)
+
+
 def has_matching_file_extension(item, batcher):
   return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
 
@@ -63,6 +71,14 @@ def has_recognized_file_format(item, _image_batcher):
   )
 
 
+def is_saved_or_exported(item, _image_batcher):
+  return item.raw.get_file() is not None
+
+
+def is_not_saved_or_exported(item, _image_batcher):
+  return not is_saved_or_exported(item, _image_batcher)
+
+
 def is_item_in_items_selected_in_gimp(item, _layer_batcher):
   image = item.raw.get_image()
   return image.is_valid() and item.raw in image.get_selected_layers()
@@ -100,6 +116,14 @@ def has_no_color_tags(item, _layer_batcher, color_tags=None):
   return not has_color_tags(item, _layer_batcher, color_tags)
 
 
+def has_unsaved_changes(item, _image_batcher):
+  return item.raw.is_dirty()
+
+
+def has_no_unsaved_changes(item, _image_batcher):
+  return not has_unsaved_changes(item, _image_batcher)
+
+
 class MatchModes:
   MATCH_MODES = (
     STARTS_WITH,
@@ -128,6 +152,20 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_nonempty_group,
     'display_name': _('Group layers'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  },
+  {
+    'name': 'imported',
+    'type': 'constraint',
+    'function': is_imported,
+    'display_name': _('Imported'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'not_imported',
+    'type': 'constraint',
+    'function': is_not_imported,
+    'display_name': _('Not imported'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_background',
@@ -185,7 +223,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'matching_text',
@@ -193,7 +231,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
     'display_name': _('Matching text...'),
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'display_options_on_create': True,
     'arguments': [
       {
@@ -229,6 +267,20 @@ _BUILTIN_CONSTRAINTS_LIST = [
     # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
     'display_name': _('Recognized file format'),
     'additional_tags': [CONVERT_GROUP],
+  },
+  {
+    'name': 'saved_or_exported',
+    'type': 'constraint',
+    'function': is_saved_or_exported,
+    'display_name': _('Saved or exported'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'not_saved_or_exported',
+    'type': 'constraint',
+    'function': is_not_saved_or_exported,
+    'display_name': _('Not saved or exported'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'selected_in_gimp',
@@ -293,6 +345,22 @@ _BUILTIN_CONSTRAINTS_LIST = [
         'default_value': (),
       },
     ],
+  },
+  {
+    'name': 'with_unsaved_changes',
+    'type': 'constraint',
+    'function': has_unsaved_changes,
+    # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
+    'display_name': _('With unsaved changes'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'with_no_unsaved_changes',
+    'type': 'constraint',
+    'function': has_no_unsaved_changes,
+    # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
+    'display_name': _('With no unsaved changes'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
   },
 ]
 
