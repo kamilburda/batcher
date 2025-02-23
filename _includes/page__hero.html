@@ -39,7 +39,23 @@
       {% if page.header.actions %}
         <p>
         {% for action in page.header.actions %}
-          <a href="{{ action.url | relative_url }}" class="btn btn--light-outline btn--large">{% if action.image %}{{ action.image }}{% endif %}{{ action.label | default: site.data.ui-text[site.locale].more_label | default: "Learn More" }}</a>
+          {% if site.is_local_build %}
+            {% if action.remote_only %}
+              {% assign display_action = false %}
+            {% else %}
+              {% assign display_action = true %}
+            {% endif %}
+          {% else %}
+            {% if action.local_only %}
+              {% assign display_action = false %}
+            {% else %}
+              {% assign display_action = true %}
+            {% endif %}
+          {% endif %}
+        
+          {% if display_action %}
+            <a href="{{ action.url | relative_url }}" class="btn btn--light-outline btn--large">{% if action.image %}{{ action.image }}{% endif %}{{ action.label | default: site.data.ui-text[site.locale].more_label | default: "Learn More" }}</a>
+          {% endif %}
         {% endfor %}
         </p>
       {% endif %}
