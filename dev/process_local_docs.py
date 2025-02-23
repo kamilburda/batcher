@@ -81,9 +81,11 @@ def main(site_dirpath, page_config_filepath):
     parser = get_html_parser(html_filepath)
     html_relative_filepath = os.path.relpath(html_filepath, site_dirpath)
 
+    remove_meta_and_script_elements_containing_localhost_url(parser.tree)
+
     adjust_boolean_attributes_to_be_valid_xml(parser.tree)
 
-    remove_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
+    remove_localhost_url_and_baseurl_in_url_attributes(html_relative_filepath, parser.tree)
 
     with open(html_filepath, 'wb') as f:
       write_to_html_file(parser.tree, f)
@@ -91,8 +93,31 @@ def main(site_dirpath, page_config_filepath):
   reorganize_files(site_dirpath)
 
 
-def adjust_boolean_attributes_to_be_valid_xml(root):
-  for elem in root.iter():
+def remove_meta_and_script_elements_containing_localhost_url(html_tree):
+  elements_to_traverse_and_parents = [html_tree.getroot()]
+  elements_to_remove_and_parents = []
+
+  while elements_to_traverse_and_parents:
+    element, parent = elements_to_traverse_and_parents.pop(0)
+
+    if element.tag == 'meta' and 'href' in element.attrib or 'content' in element.attrib:
+      attrib = element.attrib.get('href', element.attrib.get('content'))
+
+      if re.match(r'https?://localhost', attrib):
+        elements_to_remove_and_parents.append((element, parent))
+    elif element.tag == 'script' and 'json' in element.attrib['type']:
+      match = re.search(r'"url": *"https?://localhost', element.text)
+      if match:
+        elements_to_remove_and_parents.append((element, parent))
+
+    elements_to_traverse_and_parents.extend([(child, element) for child in element])
+
+  for element, parent in reversed(elements_to_remove_and_parents):
+    parent.remove(element)
+
+
+def adjust_boolean_attributes_to_be_valid_xml(html_tree):
+  for elem in html_tree.iter():
     for attribute_name in elem.attrib:
       if elem.attrib[attribute_name] is None:
         elem.attrib[attribute_name] = ''
@@ -161,34 +186,51 @@ def remove_redundant_files(site_dirpath):
       shutil.rmtree(filepath_to_remove)
 
 
-def remove_baseurl_in_url_attributes(html_relative_filepath, html_tree):
-  html_relative_filepath_components = pathlib.Path(html_relative_filepath).parts
-  
-  if len(html_relative_filepath_components) == 0:
+def remove_localhost_url_and_baseurl_in_url_attributes(html_relative_filepath, html_tree):
+  new_baseurl = _get_new_baseurl(html_relative_filepath)
+
+  if new_baseurl is None:
     return
-  
-  if len(html_relative_filepath_components) == 1:
+
+  modify_url_attributes(
+    html_tree,
+    lambda url_attribute_value: _get_relative_url(url_attribute_value, new_baseurl))
+
+
+def _get_new_baseurl(relative_filepath):
+  relative_filepath_components = pathlib.Path(relative_filepath).parts
+
+  if len(relative_filepath_components) == 0:
+    return None
+
+  if len(relative_filepath_components) == 1:
     new_baseurl = '.'
   else:
-    new_baseurl = '../' * (len(html_relative_filepath_components) - 1)
+    new_baseurl = '../' * (len(relative_filepath_components) - 1)
     new_baseurl = new_baseurl.rstrip('/')
-  
-  def _get_relative_url_without_baseurl(url_attribute_value):
-    new_url_attribute_value = url_attribute_value
-    new_url_attribute_value = re.sub(
-      r'^' + re.escape(PAGE_CONFIG['baseurl']), new_baseurl, new_url_attribute_value)
-    if re.match(r'.*/[^/]+#[^/]*$', new_url_attribute_value):
-      new_url_attribute_value = re.sub(
-        r'(.*)/([^/]+)#([^/]*)$', rf'\1/\2/{INDEX_HTML}#\3', new_url_attribute_value)
-    elif re.match(r'.*/#[^/]*$', new_url_attribute_value):
-      new_url_attribute_value = re.sub(
-        r'(.*)/#([^/]*)$', rf'\1/{INDEX_HTML}#\2', new_url_attribute_value)
-    else:
-      new_url_attribute_value = re.sub(r'/$', rf'/{INDEX_HTML}', new_url_attribute_value)
 
-    return new_url_attribute_value
-  
-  modify_url_attributes(html_tree, _get_relative_url_without_baseurl)
+  return new_baseurl
+
+
+def _get_relative_url(url_attribute_value, new_baseurl_):
+  new_url_attribute_value = url_attribute_value
+
+  new_url_attribute_value = re.sub(
+    '^https?://localhost(?::[0-9]+)?', r'', new_url_attribute_value)
+
+  new_url_attribute_value = re.sub(
+    r'^' + re.escape(PAGE_CONFIG['baseurl']), new_baseurl_, new_url_attribute_value)
+
+  if re.match(r'.*/[^/]+#[^/]*$', new_url_attribute_value):
+    new_url_attribute_value = re.sub(
+      r'(.*)/([^/]+)#([^/]*)$', rf'\1/\2/{INDEX_HTML}#\3', new_url_attribute_value)
+  elif re.match(r'.*/#[^/]*$', new_url_attribute_value):
+    new_url_attribute_value = re.sub(
+      r'(.*)/#([^/]*)$', rf'\1/{INDEX_HTML}#\2', new_url_attribute_value)
+  else:
+    new_url_attribute_value = re.sub(r'/$', rf'/{INDEX_HTML}', new_url_attribute_value)
+
+  return new_url_attribute_value
 
 
 def modify_url_attributes(html_tree, get_new_url_attribute_value_func):
