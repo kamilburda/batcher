@@ -4,7 +4,7 @@ Press the `Add Procedure...` button and select one of the available procedures, 
 For each procedure, you may:
 * enable/disable the procedure,
 * move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
-* [edit the procedure](Editing%20Procedures%20and%20Constraints.md),
+* [edit the procedure](Editing Procedures and Constraints.md),
 * remove the procedure.
 
 You can add the same procedure multiple times.
@@ -39,7 +39,7 @@ You can add this procedure multiple times to export to multiple file formats at 
 Options:
 * *Output folder*: Folder to export the output image(s) to.
 * *File extension*: File extension of the output image(s).
-* All options specified in [Export Options](Export%20Options.md).
+* All options specified in [Export Options](Export Options.md).
 
 The name of the Export procedure is automatically updated as you modify the file extension.
 
@@ -181,7 +181,7 @@ You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP proc
 You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
-You can [edit the procedure](Editing%20Procedures%20and%20Constraints.md) anytime after adding it.
+You can [edit the procedure](Editing Procedures and Constraints.md) anytime after adding it.
 
 All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
 * *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).
