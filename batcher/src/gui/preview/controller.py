@@ -453,7 +453,7 @@ class PreviewsController:
             or item.type == pg.itemtree.TYPE_FOLDER):
           self._image_preview.item = item
 
-      self._image_preview.update()
+      self._update_image_preview()
 
     self._is_initial_selection_set = True
 
