@@ -155,7 +155,7 @@ Pressing the `Options...` button reveals additional export options, particularly
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
 
-All options are described in [Export Options](Customization/Export%20Options.md).
+All options are described in [Export Options](Customization/Export Options.md).
 
 
 ## Procedures and Constraints
