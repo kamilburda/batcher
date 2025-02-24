@@ -23,7 +23,7 @@ feature_row_main:
     btn_label: "Read More"
     btn_class: "btn--primary"
   - title: "Export Layers"
-    image_path: "/assets/images/feature_export_layers.svg"
+    image_path: "/assets/images/feature_export_layers_images.svg"
     excerpt: "Exports each layer as separate images from an image opened in GIMP. Can also export group layers."
     url: "/docs/usage#exporting-layers"
     btn_label: "Read More"

@@ -5,7 +5,7 @@ permalink: /docs/constraints/
 
 To exclude certain images/layers from processing and export, press the `Add Constraint...` button and select one of the available constraints.
 
-Just like [procedures](Procedures.md), you may enable/disable, reorder, [edit](Editing Procedures and Constraints.md) or remove constraints.
+Just like [procedures](Procedures.md), you may enable/disable, reorder, [edit](Editing%20Procedures%20and%20Constraints.md) or remove constraints.
 
 
 ## Built-in Constraints

@@ -33,6 +33,7 @@ You can remove input images and folders by selecting them and pressing Delete or
 By default, the renamed images (as they would be named on export) are displayed. To show their original names, simply check `Show Original Names`.
 
 
+
 ## Exporting Layers
 
 Open an image in GIMP and select `File → Export Layers...`.
@@ -44,8 +45,6 @@ A dialog appears that allows you to adjust export settings, such as the output f
 To export layers, simply press the `Export` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-Layer names are used as filenames by default.
-
 For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
 
 
@@ -69,6 +68,35 @@ When you select multiple layers in GIMP, you can right-click and select `Export 
 In this case, any constraints set in the [main dialog](#exporting-layers) will be ignored.
 
 ![Menu Entry for Export Selected Layers](../assets/images/screenshot_menu_export_selected_layers.png){: .align-center}
+
+
+## Exporting Images Opened in GIMP
+
+Open an image in GIMP and select `File → Export Images...`.
+
+A dialog appears that allows you to adjust export settings, such as the output folder, filenames and the file extension.
+
+![Dialog of Export Images](../assets/images/screenshot_dialog_export_images.png){: .align-center}
+
+To export images, simply press the `Export` button.
+
+Note that this feature exports images to another file format. It does not mass-save XCF images in their original locations.
+
+For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
+For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
+
+
+### Quick Export of Images
+
+If you made changes to your images, and you want to export them again with the same settings, or you need a simple export without customization, you can run `File → Export Images (Quick)`.
+
+For the first time, a small dialog with only export settings is displayed, where you can adjust the basic export settings.
+
+![Dialog of Export Images (Quick)](../assets/images/screenshot_dialog_export_images_quick.png){: .align-center}
+
+This dialog can be skipped by simply unchecking `Show this dialog`.
+
+Note that even procedures and constraints set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
 
 
 ## Editing Layers
@@ -127,7 +155,7 @@ Pressing the `Options...` button reveals additional export options, particularly
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
 
-All options are described in [Export Options](Customization/Export Options.md).
+All options are described in [Export Options](Customization/Export%20Options.md).
 
 
 ## Procedures and Constraints
