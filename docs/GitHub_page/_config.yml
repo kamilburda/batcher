@@ -192,6 +192,7 @@ exclude:
   - tmp
   - /docs # ignore Minimal Mistakes /docs
   - /test # ignore Minimal Mistakes /test
+  - /dev # custom folder for development versions
 keep_files:
   - .git
   - .svn
