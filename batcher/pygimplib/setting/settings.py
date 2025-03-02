@@ -3415,11 +3415,18 @@ def get_setting_type_and_kwargs(
             default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
             items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
       elif gtype == Gio.File.__gtype__:
+        if isinstance(pdb_param_info, Gimp.ParamFile):
+          file_action = Gimp.param_spec_file_get_action(pdb_param_info)
+          file_none_ok = Gimp.param_spec_file_none_allowed(pdb_param_info)
+        else:
+          file_action = Gimp.FileChooserAction.ANY
+          file_none_ok = True
+
         return (
           FileSetting,
           dict(
-            action=Gimp.param_spec_file_get_action(pdb_param_info),
-            none_ok=Gimp.param_spec_file_none_allowed(pdb_param_info)))
+            action=file_action,
+            none_ok=file_none_ok))
       elif gtype == Gimp.Image.__gtype__:
         return ImageSetting, dict(none_ok=Gimp.param_spec_image_none_allowed(pdb_param_info))
       elif gtype in [
@@ -3444,9 +3451,14 @@ def get_setting_type_and_kwargs(
           DisplaySetting,
           dict(none_ok=Gimp.param_spec_display_none_allowed(pdb_param_info)))
       elif gtype == Gegl.Color.__gtype__:
+        if isinstance(pdb_param_info, Gimp.ParamColor):
+          color_has_alpha = Gimp.param_spec_color_has_alpha(pdb_param_info)
+        else:
+          color_has_alpha = True
+
         return (
           ColorSetting,
-          dict(has_alpha=Gimp.param_spec_color_has_alpha(pdb_param_info)))
+          dict(has_alpha=color_has_alpha))
       elif gtype.parent == Gimp.Resource.__gtype__:
         return (
           _get_setting_type_from_mapping(gtype),
