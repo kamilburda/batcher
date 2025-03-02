@@ -246,10 +246,10 @@ def _run_noninteractive(settings, item_tree, config, mode):
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
 
-  settings_filepath = config.get_property('settings-file')
+  settings_file = config.get_property('settings-file')
 
-  if settings_filepath:
-    gimp_status, message = _load_settings_from_file(settings, settings_filepath)
+  if settings_file is not None and settings_file.get_path() is not None:
+    gimp_status, message = _load_settings_from_file(settings, settings_file.get_path())
     if gimp_status != Gimp.PDBStatusType.SUCCESS:
       return gimp_status, message
   else:
