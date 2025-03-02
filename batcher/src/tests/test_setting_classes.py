@@ -464,15 +464,15 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     mock_isfile.side_effect = [True, True, True, True, False, False]
 
     self.setting.set_value([
-      ('Layer', ['item_1'], '', image_1_filepath),
-      ('Layer', ['item_4', 'item_3'], '', image_1_filepath),
-      ('GroupLayer', ['item_4'], 'folder', image_1_filepath),
-      ('Layer', ['item_7', 'item_5'], '', image_2_filepath),
-      ('GroupLayer', ['item_6'], 'folder', image_2_filepath),
-      ('GroupLayer', ['item_7'], 'folder', image_2_filepath),
-      ('Layer', ['item_8'], '', image_2_filepath),
-      ('Layer', ['item_9'], '', image_3_filepath),
-      ('Layer', ['item_10'], '', image_3_filepath),
+      ['Layer', ['item_1'], '', image_1_filepath],
+      ['Layer', ['item_4', 'item_3'], '', image_1_filepath],
+      ['GroupLayer', ['item_4'], 'folder', image_1_filepath],
+      ['Layer', ['item_7', 'item_5'], '', image_2_filepath],
+      ['GroupLayer', ['item_6'], 'folder', image_2_filepath],
+      ['GroupLayer', ['item_7'], 'folder', image_2_filepath],
+      ['Layer', ['item_8'], '', image_2_filepath],
+      ['Layer', ['item_9'], '', image_3_filepath],
+      ['Layer', ['item_10'], '', image_3_filepath],
     ])
 
     expected_dict = {
