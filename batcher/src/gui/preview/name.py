@@ -302,7 +302,7 @@ class NamePreview(preview_base_.Preview):
       self._color_tags_and_icons}
 
   def _get_color_tag_pixbuf(self, color_tag):
-    if color_tag != Gimp.ColorTag.NONE and color_tag in Gimp.ColorTag.__enum_values__:
+    if color_tag != Gimp.ColorTag.NONE and color_tag in pg.utils.get_enum_values(Gimp.ColorTag):
       icon_size = Gtk.icon_size_lookup(Gtk.IconSize.MENU)
 
       color_tag_pixbuf = GdkPixbuf.Pixbuf.new(

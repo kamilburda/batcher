@@ -434,8 +434,8 @@ def _get_output_directory(
 def _get_tags(_renamer, _layer_batcher, item, _field_value, *args):
   color_tag = item.raw.get_color_tag()
   color_tag_default_names = {
-    value: value.value_name[len('GIMP_COLOR_TAG_'):].lower()
-    for value in Gimp.ColorTag.__enum_values__.values()}
+    value: value.value_nick
+    for value in pg.utils.get_enum_values(Gimp.ColorTag)}
 
   # Make sure items without tags produce an empty string.
   del color_tag_default_names[Gimp.ColorTag.NONE]

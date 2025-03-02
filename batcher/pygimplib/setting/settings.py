@@ -1202,7 +1202,7 @@ class EnumSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.enum_combo_box]
 
   # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
-  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self.enum_type.__enum_values__.values()), 0)
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(pgutils.get_enum_values(self.enum_type)), 0)
 
   _SUPPORTED_MODULES_WITH_ENUMS = {
     'Gimp': 'gi.repository.Gimp',
@@ -1302,8 +1302,11 @@ class EnumSetting(Setting):
     self._value = self.enum_type(value)
 
   def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, int) and raw_value in self.enum_type.__enum_values__:
-      return self.enum_type(raw_value)
+    if isinstance(raw_value, int):
+      try:
+        return self.enum_type(raw_value)
+      except Exception:
+        return raw_value
     else:
       return raw_value
 
@@ -2419,8 +2422,11 @@ class FileSetting(Setting):
 
   @staticmethod
   def _process_action(action):
-    if isinstance(action, int) and action in Gimp.FileChooserAction.__enum_values__:
-      return Gimp.FileChooserAction.__enum_values__[action]
+    if isinstance(action, int):
+      try:
+        return Gimp.FileChooserAction(action)
+      except Exception:
+        return action
     else:
       return action
 

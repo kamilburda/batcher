@@ -784,7 +784,7 @@ class TestCreateEnumSetting(SettingTestCase):
   def test_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
 
-    self.assertEqual(setting.default_value, next(iter(Gimp.Precision.__enum_values__.values())))
+    self.assertEqual(setting.default_value, next(iter(pgutils.get_enum_values(Gimp.Precision))))
     self.assertEqual(setting.enum_type, Gimp.Precision)
     self.assertEqual(setting.pdb_type, Gimp.Precision)
 
@@ -966,7 +966,7 @@ class TestEnumSetting(SettingTestCase):
         'Precision',
         'Precision',
         Gimp.Precision,
-        next(iter(Gimp.Precision.__enum_values__.values())),
+        next(iter(pgutils.get_enum_values(Gimp.Precision))),
         GObject.ParamFlags.READWRITE,
       ])
 

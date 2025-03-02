@@ -450,7 +450,7 @@ class GeglProcedure(PDBProcedure):
       #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
       if should_transform_enum_to_choice:
         processed_value = (
-          self._properties[arg_name].get_default_value().__enum_values__[arg_value].value_nick)
+          type(self._properties[arg_name].get_default_value())(arg_value).value_nick)
       else:
         processed_value = arg_value
 

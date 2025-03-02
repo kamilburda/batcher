@@ -298,3 +298,15 @@ def get_pictures_directory():
     return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES)
   except Exception:
     return ''
+
+
+def get_enum_values(enum_type):
+  """Returns an iterable of values for the specified enumerated type.
+
+  This is a wrapper function providing compatibility across multiple PyGObject
+  versions as enums were reworked in PyGObject 3.51.0.
+  """
+  if hasattr(enum_type, '__members__'):
+    return enum_type.__members__.values()
+  elif hasattr(enum_type, '__enum_values__'):
+    return enum_type.__enum_values__.values()
