@@ -37,7 +37,7 @@ feature_row_main:
 feature_row_customization:
   - image_path: /assets/images/feature_procedures_and_constraints.png
     title: "Highly customizable, too."
-    excerpt: "Apply any filter to each image/layer during batch processing, including third-party scripts and plug-ins. Process only images/layers that match the specified criteria."
+    excerpt: "Apply any filter to each image/layer during batch processing, including third-party scripts and plug-ins. Process only images/layers matching your criteria."
     url: "/docs/customization/"
     btn_label: "Read More"
     btn_class: "btn--primary"
