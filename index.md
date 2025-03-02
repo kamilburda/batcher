@@ -22,9 +22,9 @@ feature_row_main:
     url: "/docs/usage#batch-image-conversion"
     btn_label: "Read More"
     btn_class: "btn--primary"
-  - title: "Export Layers"
+  - title: "Export Layers/Images"
     image_path: "/assets/images/feature_export_layers_images.svg"
-    excerpt: "Exports each layer as separate images from an image opened in GIMP. Can also export group layers."
+    excerpt: "Exports each layer as separate images from an image opened in GIMP. Can also export group layers. Exports all opened images."
     url: "/docs/usage#exporting-layers"
     btn_label: "Read More"
     btn_class: "btn--primary"
@@ -37,7 +37,7 @@ feature_row_main:
 feature_row_customization:
   - image_path: /assets/images/feature_procedures_and_constraints.png
     title: "Highly customizable, too."
-    excerpt: "Apply any filter to each image/layer during batch processing, including third-party scripts and plug-ins. Process only images/layers that match the specified criteria."
+    excerpt: "Apply any filter to each image/layer during batch processing, including third-party scripts and plug-ins. Process only images/layers matching your criteria."
     url: "/docs/customization/"
     btn_label: "Read More"
     btn_class: "btn--primary"
