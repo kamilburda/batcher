@@ -1513,7 +1513,7 @@ class ChoiceSetting(Setting):
       procedure:
         A `pypdb.PDBProcedure` instance, or name thereof, whose PDB parameter
         having the name ``name`` contains possible choices. This is ignored if
-        ``items`` is not ``None``.
+        ``items`` is a non-empty list.
     """
     self._items, self._items_by_value, self._items_display_names, self._items_help, self._choice = (
       self._create_item_attributes(items))
@@ -1628,7 +1628,7 @@ class ChoiceSetting(Setting):
 
   @staticmethod
   def _process_procedure(procedure, raw_items) -> Union[pypdb.PDBProcedure, str, None]:
-    if procedure is None or raw_items is not None:
+    if procedure is None or raw_items:
       return None
     elif isinstance(procedure, pypdb.PDBProcedure):
       return procedure
