@@ -1480,6 +1480,7 @@ class ChoiceSetting(Setting):
   _ALLOWED_GUI_TYPES = [
     _SETTING_GUI_TYPES.combo_box,
     _SETTING_GUI_TYPES.radio_button_box,
+    _SETTING_GUI_TYPES.prop_choice_combo_box,
   ]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(self._items), '')
@@ -1494,6 +1495,7 @@ class ChoiceSetting(Setting):
             List[Tuple[str, str, int, str]],
             Gimp.Choice]
         ] = None,
+        procedure: Optional[Union[pypdb.PDBProcedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1506,11 +1508,19 @@ class ChoiceSetting(Setting):
         assigned automatically, starting with 0. Use 3-element tuples to
         assign explicit item values. Values must be unique and specified in
         each tuple. Use only 2- or only 3-element tuples, they cannot be
-        combined.
+        combined. If ``items`` is ``None`` or an empty list, any string can
+        be assigned to this setting.
+      procedure:
+        A `pypdb.PDBProcedure` instance, or name thereof, whose PDB parameter
+        having the name ``name`` contains possible choices. This is ignored if
+        ``items`` is not ``None``.
     """
     self._items, self._items_by_value, self._items_display_names, self._items_help, self._choice = (
       self._create_item_attributes(items))
-    
+
+    self._procedure = self._process_procedure(procedure, items)
+    self._procedure_config = self._create_procedure_config(self._procedure)
+
     super().__init__(name, **kwargs)
   
   @property
@@ -1539,6 +1549,20 @@ class ChoiceSetting(Setting):
     """
     return self._items_help
 
+  @property
+  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
+    """A `pypdb.PDBProcedure` instance allowing to obtain the `Gimp.Choice`
+    instance for this setting.
+    """
+    return self._procedure
+
+  @property
+  def procedure_config(self) -> Union[Gimp.ConfigInterface, None]:
+    """A procedure config allowing to obtain the `Gimp.Choice` instance for this
+    setting.
+    """
+    return self._procedure_config
+
   def to_dict(self):
     settings_dict = super().to_dict()
 
@@ -1557,6 +1581,10 @@ class ChoiceSetting(Setting):
         ]
       else:
         settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
+
+    if 'procedure' in settings_dict:
+      if settings_dict['procedure'] is not None:
+        settings_dict['procedure'] = self._procedure.name
 
     return settings_dict
 
@@ -1582,18 +1610,42 @@ class ChoiceSetting(Setting):
       # method) and thus the default value is valid.
       return super()._resolve_default_value(default_value)
     else:
-      if default_value in self._items:
-        return default_value
+      if self._items:
+        if default_value in self._items:
+          return default_value
+        else:
+          self._handle_failed_validation(
+            f'invalid default value "{default_value}"; must be one of {list(self._items)}',
+            'invalid_default_value',
+            prepend_value=False,
+          )
       else:
-        self._handle_failed_validation(
-          f'invalid default value "{default_value}"; must be one of {list(self._items)}',
-          'invalid_default_value',
-          prepend_value=False,
-        )
+        return default_value
 
   def _validate(self, item_name):
     if self._items and item_name not in self._items:
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
+
+  @staticmethod
+  def _process_procedure(procedure, raw_items) -> Union[pypdb.PDBProcedure, str, None]:
+    if procedure is None or raw_items is not None:
+      return None
+    elif isinstance(procedure, pypdb.PDBProcedure):
+      return procedure
+    elif isinstance(procedure, str):
+      if procedure in pdb:
+        return pdb[procedure]
+      else:
+        return None
+    else:
+      raise TypeError('procedure must be None, a string or a pypdb.PDBProcedure instance')
+
+  @staticmethod
+  def _create_procedure_config(procedure):
+    if procedure is not None:
+      return procedure.create_config()
+    else:
+      return None
 
   @staticmethod
   def _create_item_attributes(input_items):
@@ -3411,13 +3463,13 @@ def get_setting_type_and_kwargs(
       if isinstance(pdb_param_info, Gimp.ParamChoice):
         return (
           ChoiceSetting,
-          dict(
-            default_value=Gimp.param_spec_choice_get_default(pdb_param_info),
-            items=Gimp.param_spec_choice_get_choice(pdb_param_info)))
+          _get_choice_setting_init_arguments(pdb_param_info, pdb_procedure))
       elif gtype == Gio.File.__gtype__:
         if isinstance(pdb_param_info, Gimp.ParamFile):
-          file_action = Gimp.param_spec_file_get_action(pdb_param_info)
-          file_none_ok = Gimp.param_spec_file_none_allowed(pdb_param_info)
+          file_action = _get_param_spec_attribute(
+            Gimp.param_spec_file_get_action, pdb_param_info, Gimp.FileChooserAction.ANY)
+          file_none_ok = _get_param_spec_attribute(
+            Gimp.param_spec_file_none_allowed, pdb_param_info, True)
         else:
           file_action = Gimp.FileChooserAction.ANY
           file_none_ok = True
@@ -3428,7 +3480,10 @@ def get_setting_type_and_kwargs(
             action=file_action,
             none_ok=file_none_ok))
       elif gtype == Gimp.Image.__gtype__:
-        return ImageSetting, dict(none_ok=Gimp.param_spec_image_none_allowed(pdb_param_info))
+        return (
+          ImageSetting,
+          dict(none_ok=_get_param_spec_attribute(
+            Gimp.param_spec_image_none_allowed, pdb_param_info, True)))
       elif gtype in [
             Gimp.Item.__gtype__,
             Gimp.Drawable.__gtype__,
@@ -3441,18 +3496,22 @@ def get_setting_type_and_kwargs(
             Gimp.Path.__gtype__]:
         return (
           _get_setting_type_from_mapping(gtype),
-          dict(none_ok=Gimp.param_spec_item_none_allowed(pdb_param_info)))
+          dict(none_ok=_get_param_spec_attribute(
+            Gimp.param_spec_item_none_allowed, pdb_param_info, True)))
       elif gtype == Gimp.DrawableFilter.__gtype__:
         return (
           DrawableFilterSetting,
-          dict(none_ok=Gimp.param_spec_drawable_filter_none_allowed(pdb_param_info)))
+          dict(none_ok=_get_param_spec_attribute(
+            Gimp.param_spec_drawable_filter_none_allowed, pdb_param_info, True)))
       elif gtype == Gimp.Display.__gtype__:
         return (
           DisplaySetting,
-          dict(none_ok=Gimp.param_spec_display_none_allowed(pdb_param_info)))
+          dict(none_ok=_get_param_spec_attribute(
+            Gimp.param_spec_display_none_allowed, pdb_param_info, True)))
       elif gtype == Gegl.Color.__gtype__:
         if isinstance(pdb_param_info, Gimp.ParamColor):
-          color_has_alpha = Gimp.param_spec_color_has_alpha(pdb_param_info)
+          color_has_alpha = _get_param_spec_attribute(
+            Gimp.param_spec_color_has_alpha, pdb_param_info, True)
         else:
           color_has_alpha = True
 
@@ -3463,14 +3522,18 @@ def get_setting_type_and_kwargs(
         return (
           _get_setting_type_from_mapping(gtype),
           dict(
-            none_ok=Gimp.param_spec_resource_none_allowed(pdb_param_info),
-            default_to_context=Gimp.param_spec_resource_defaults_to_context(pdb_param_info)))
+            none_ok=_get_param_spec_attribute(
+              Gimp.param_spec_resource_none_allowed, pdb_param_info, True),
+            default_to_context=_get_param_spec_attribute(
+              Gimp.param_spec_resource_defaults_to_context, pdb_param_info, True)))
       elif gtype == Gimp.Unit.__gtype__:
         return (
           UnitSetting,
           dict(
-            show_pixels=Gimp.param_spec_unit_pixel_allowed(pdb_param_info),
-            show_percent=Gimp.param_spec_unit_percent_allowed(pdb_param_info)))
+            show_pixels=_get_param_spec_attribute(
+              Gimp.param_spec_unit_pixel_allowed, pdb_param_info, True),
+            show_percent=_get_param_spec_attribute(
+              Gimp.param_spec_unit_percent_allowed, pdb_param_info, True)))
 
     # Explicitly pass `gtype` as a `pdb_type` so that e.g. an `IntSetting`
     # instance can have its minimum and maximum values properly adjusted.
@@ -3490,13 +3553,67 @@ def get_setting_type_and_kwargs(
     return None
 
 
+def _get_param_spec_attribute(func, param_spec, default_value):
+  """This is a compatibility wrapper for PyGObject < 3.50.0 where calls to
+  ``Gimp.param_spec_*`` functions fail.
+
+  The default value should not limit the choices of the parameter. For example,
+  if the function is `Gimp.param_spec_item_none_allowed`, it should return
+  ``True`` on failure even if the parameter does not support ``None`` as a valid
+  value. The rationale is that there is no other way to determine whether the
+  value is allowed or not, and we need to present the user with all options,
+  even if some of them will not always be applicable.
+  """
+  try:
+    return func(param_spec)
+  except TypeError:
+    return default_value
+
+
+def _get_choice_setting_init_arguments(param_spec, procedure):
+  try:
+    choice = Gimp.param_spec_choice_get_choice(param_spec)
+  except TypeError:
+    return dict(
+      items=None,
+      procedure=procedure,
+      gui_type='prop_choice_combo_box',
+    )
+  else:
+    return dict(
+      default_value=Gimp.param_spec_choice_get_default(param_spec),
+      items=choice)
+
+
 def get_array_setting_type_from_gimp_core_object_array(
       pdb_param_info: GObject.ParamSpec,
 ) -> Union[Tuple[Type[ArraySetting], Dict[str, Any]], None]:
-  array_element_gtype = Gimp.param_spec_core_object_array_get_object_type(pdb_param_info)
+  try:
+    array_element_gtype = Gimp.param_spec_core_object_array_get_object_type(pdb_param_info)
+  except TypeError:
+    return _infer_array_setting_element_type_from_name(pdb_param_info.name)
+  else:
+    if array_element_gtype in meta_.GTYPES_AND_SETTING_TYPES:
+      return ArraySetting, dict(element_type=_get_setting_type_from_mapping(array_element_gtype))
+    else:
+      return None
 
-  if array_element_gtype in meta_.GTYPES_AND_SETTING_TYPES:
-    return ArraySetting, dict(element_type=_get_setting_type_from_mapping(array_element_gtype))
+
+def _infer_array_setting_element_type_from_name(name):
+  if name == 'images':
+    return ArraySetting, dict(element_type=ImageSetting)
+  elif name == 'drawables':
+    return ArraySetting, dict(element_type=DrawableSetting)
+  elif name == 'layers':
+    return ArraySetting, dict(element_type=LayerSetting)
+  elif name == 'channels':
+    return ArraySetting, dict(element_type=ChannelSetting)
+  elif name == 'paths':
+    return ArraySetting, dict(element_type=PathSetting)
+  elif name == 'children':
+    return ArraySetting, dict(element_type=ItemSetting)
+  elif name == 'filters':
+    return ArraySetting, dict(element_type=DrawableFilterSetting)
   else:
     return None
 

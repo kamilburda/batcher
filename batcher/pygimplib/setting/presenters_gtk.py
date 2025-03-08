@@ -297,6 +297,33 @@ class RadioButtonBoxPresenter(GtkPresenter):
     self._widget.set_active(self._name_to_row_index_mapping[value])
 
 
+class PropChoiceComboBoxPresenter(GtkPresenter):
+  """`setting.Presenter` subclass for `GimpUi.StringComboBox` widgets displaying
+  a set of string choices.
+
+  This presenter updates the underlying setting on initialization as these
+  `GimpUi` combo boxes are set to a valid value when they are created.
+
+  Value: Item selected in the combo box.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.update_setting_value(force=True)
+
+  def _create_widget(self, setting, **kwargs):
+    return GimpUi.prop_choice_combo_box_new(setting.procedure_config, setting.name)
+
+  def get_value(self):
+    return self._widget.get_active()
+
+  def _set_value(self, value):
+    self._widget.set_active(value)
+
+
 class GimpUiIntComboBoxPresenter(GtkPresenter):
   """Abstract `setting.Presenter` subclass for widget classes inheriting from
   `GimpUi.IntComboBox` .

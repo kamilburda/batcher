@@ -1229,8 +1229,6 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _rename_setting(arguments_list, 'image_filepath', 'image_file')
 
-        _update_choice_arguments_for_1_0_rc2(arguments_list)
-
         _update_file_arguments_for_1_0_rc2(arguments_list)
 
         _update_filepath_and_dirpath_arguments_for_1_0_rc2(arguments_list)
@@ -1242,17 +1240,9 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
 
         arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
-        _update_choice_arguments_for_1_0_rc2(arguments_list)
-
         _update_file_arguments_for_1_0_rc2(arguments_list)
 
         _update_filepath_and_dirpath_arguments_for_1_0_rc2(arguments_list)
-
-
-def _update_choice_arguments_for_1_0_rc2(arguments_list):
-  for argument_dict in arguments_list:
-    if argument_dict['type'] == 'choice':
-      argument_dict.pop('procedure', None)
 
 
 def _update_file_arguments_for_1_0_rc2(arguments_list):
