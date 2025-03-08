@@ -12,6 +12,7 @@ Changes to procedures:
 Bug fixes:
 * Fixed a crash on startup for macOS installation packages.
 * Fixed a crash in non-interactive mode if the settings file is not specified.
+* Fixed a warning message displayed when exporting or editing layers of an imported (i.e. non-XCF) image.
 * Fixed console warnings when opening the custom procedure browser.
 
 
