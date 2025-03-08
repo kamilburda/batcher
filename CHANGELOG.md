@@ -7,7 +7,12 @@ General changes:
 * Batch Convert is now guaranteed to be accessible in GIMP even if no image is opened.
 
 Changes to procedures:
-* The `Rename` procedure is now automatically renamed based on the specified pattern (e.g. `Rename to "image[001]""`).
+* The `Rename` procedure is now automatically renamed based on the specified pattern (e.g. `Rename to "image[001]"`).
+
+Bug fixes:
+* Fixed a crash on startup for macOS installation packages.
+* Fixed a crash in non-interactive mode if the settings file is not specified.
+* Fixed console warnings when opening the custom procedure browser.
 
 
 ## 1.0-RC3
