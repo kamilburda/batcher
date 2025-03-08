@@ -260,55 +260,48 @@ class SettingsManager:
   def _get_setting_file_and_options(self, action, add_file_extension_if_missing=True):
     if action == 'load':
       dialog_action = Gtk.FileChooserAction.OPEN
-      button_ok = _('_Open')
       title = _('Load Settings from File')
     elif action == 'save':
       dialog_action = Gtk.FileChooserAction.SAVE
-      button_ok = _('_Save')
       title = _('Save Settings to File')
     else:
       raise ValueError('invalid action; valid values: "load", "save"')
 
-    file_dialog = Gtk.FileChooserDialog(
+    file_dialog = Gtk.FileChooserNative(
       title=title,
-      parent=self._dialog,
       action=dialog_action,
       do_overwrite_confirmation=True,
+      modal=True,
+      transient_for=pg.gui.get_toplevel_window(self._dialog),
     )
-
-    file_dialog.add_buttons(
-      button_ok, Gtk.ResponseType.OK,
-      _('_Cancel'), Gtk.ResponseType.CANCEL)
 
     if action == 'load':
       check_button_load_size_settings = Gtk.CheckButton(
         label=_('Load size-related settings'),
-        border_width=self._LOAD_SETTINGS_FROM_FILE_CUSTOM_WIDGETS_BORDER_WIDTH,
       )
-      file_dialog.vbox.pack_start(check_button_load_size_settings, False, False, 0)
+      file_dialog.set_extra_widget(check_button_load_size_settings)
     else:
       check_button_load_size_settings = None
 
     json_file_ext = '.json'
 
     filter_json = Gtk.FileFilter()
-    filter_json.set_name(_('JSON file ({})').format(json_file_ext))
-    filter_json.add_mime_type('application/json')
+    filter_json.set_name(_('JSON file'))
+    filter_json.add_pattern(f'*{json_file_ext}')
     file_dialog.add_filter(filter_json)
 
     default_file_ext = json_file_ext
     default_file_format = json_file_ext[1:]
 
-    filter_any = Gtk.FileFilter()
-    filter_any.set_name(_('Any file'))
-    filter_any.add_pattern('*')
-    file_dialog.add_filter(filter_any)
-
-    file_dialog.show_all()
+    if action == 'load':
+      filter_any = Gtk.FileFilter()
+      filter_any.set_name(_('Any file'))
+      filter_any.add_pattern('*')
+      file_dialog.add_filter(filter_any)
 
     response_id = file_dialog.run()
 
-    if response_id == Gtk.ResponseType.OK:
+    if response_id == Gtk.ResponseType.ACCEPT:
       filepath = file_dialog.get_filename() if file_dialog.get_filename() is not None else ''
 
       file_ext = os.path.splitext(filepath)[1]

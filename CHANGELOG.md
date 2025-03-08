@@ -1,3 +1,8 @@
+## Upcoming
+
+* Native file dialogs are displayed, if possible, when opening/saving settings files or adding files/folders for Batch Convert.
+
+
 ## 1.0-RC4
 
 ### March 08, 2025

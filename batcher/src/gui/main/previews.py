@@ -447,24 +447,19 @@ class Previews:
     return response_id == Gtk.ResponseType.YES
 
   def _get_paths(self, file_chooser_action, title):
-    file_dialog = Gtk.FileChooserDialog(
+    file_dialog = Gtk.FileChooserNative(
       title=title,
       action=file_chooser_action,
       select_multiple=True,
       modal=True,
-      parent=pg.gui.get_toplevel_window(self._vbox_previews),
       transient_for=pg.gui.get_toplevel_window(self._vbox_previews),
     )
-
-    file_dialog.add_buttons(
-      _('_Add'), Gtk.ResponseType.OK,
-      _('_Cancel'), Gtk.ResponseType.CANCEL)
 
     paths = []
 
     response_id = file_dialog.run()
 
-    if response_id == Gtk.ResponseType.OK:
+    if response_id == Gtk.ResponseType.ACCEPT:
       paths = file_dialog.get_filenames()
 
     file_dialog.destroy()
