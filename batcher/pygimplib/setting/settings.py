@@ -1289,7 +1289,7 @@ class EnumSetting(Setting):
     settings_dict = super().to_dict()
 
     if self._procedure is not None and self._procedure_param is not None:
-      settings_dict['enum_type'] = [self._procedure.name, self._procedure_param.get_name()]
+      settings_dict['enum_type'] = [self._procedure.name, self._procedure_param.name]
     else:
       settings_dict['enum_type'] = self.enum_type.__gtype__.name
 
@@ -1374,7 +1374,7 @@ class EnumSetting(Setting):
           procedure_param = enum_type[1]
 
       if procedure_param is not None:
-        processed_enum_type = type(procedure_param.get_default_value())
+        processed_enum_type = type(procedure_param.default_value)
       else:
         raise TypeError(
           f'procedure "{enum_type[0]}" or its property "{enum_type[1]}"'
@@ -3460,12 +3460,12 @@ def get_setting_type_and_kwargs(
   """
   if gtype in meta_.GTYPES_AND_SETTING_TYPES:
     if pdb_param_info is not None:
-      if isinstance(pdb_param_info, Gimp.ParamChoice):
+      if pdb_param_info.__gtype__ == Gimp.ParamChoice.__gtype__:
         return (
           ChoiceSetting,
           _get_choice_setting_init_arguments(pdb_param_info, pdb_procedure))
       elif gtype == Gio.File.__gtype__:
-        if isinstance(pdb_param_info, Gimp.ParamFile):
+        if pdb_param_info.__gtype__ ==  Gimp.ParamFile.__gtype__:
           file_action = _get_param_spec_attribute(
             Gimp.param_spec_file_get_action, pdb_param_info, Gimp.FileChooserAction.ANY)
           file_none_ok = _get_param_spec_attribute(
@@ -3509,7 +3509,7 @@ def get_setting_type_and_kwargs(
           dict(none_ok=_get_param_spec_attribute(
             Gimp.param_spec_display_none_allowed, pdb_param_info, True)))
       elif gtype == Gegl.Color.__gtype__:
-        if isinstance(pdb_param_info, Gimp.ParamColor):
+        if pdb_param_info.__gtype__ ==  Gimp.ParamColor.__gtype__:
           color_has_alpha = _get_param_spec_attribute(
             Gimp.param_spec_color_has_alpha, pdb_param_info, True)
         else:

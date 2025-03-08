@@ -375,7 +375,7 @@ class GeglProcedure(PDBProcedure):
       'name-', 'Filter name', 'Filter name', '', GObject.ParamFlags.READWRITE)
 
     self._keys = {key: None for key in Gegl.Operation.list_keys(name)}
-    self._properties = {prop.get_name(): prop for prop in self._get_properties()}
+    self._properties = {prop.name: prop for prop in self._get_properties()}
 
     super().__init__(pypdb_instance, name)
 
@@ -429,7 +429,7 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
-    properties_from_config = {prop.get_name(): prop for prop in config.list_properties()}
+    properties_from_config = {prop.name: prop for prop in config.list_properties()}
 
     for arg_name, arg_value in processed_kwargs.items():
       if arg_name not in self._properties:
@@ -443,14 +443,15 @@ class GeglProcedure(PDBProcedure):
         continue
 
       should_transform_enum_to_choice = (
-        isinstance(self._properties[arg_name], GObject.ParamSpecEnum)
-        and isinstance(properties_from_config[arg_name], Gimp.ParamChoice))
+        (self._properties[arg_name].__gtype__ == Gegl.ParamEnum.__gtype__
+         or self._properties[arg_name].__gtype__ == GObject.ParamSpecEnum.__gtype__.parent)
+        and properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__)
 
       # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
       #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
       if should_transform_enum_to_choice:
         processed_value = (
-          type(self._properties[arg_name].get_default_value())(arg_value).value_nick)
+          type(self._properties[arg_name].default_value)(arg_value).value_nick)
       else:
         processed_value = arg_value
 
