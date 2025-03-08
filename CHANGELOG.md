@@ -1,4 +1,6 @@
-## Upcoming
+## 1.0-RC4
+
+### March 08, 2025
 
 **New major feature: Export of images opened in GIMP**. You can perform image export via `File → Export Images...` or `File → Export Images (Quick)`. As with other plug-in procedures, you may make use of procedures and constraints (such as "only images with unsaved changes"). Note that this feature exports images to another file format, i.e. it does not mass-save XCF images in their original locations.
 
