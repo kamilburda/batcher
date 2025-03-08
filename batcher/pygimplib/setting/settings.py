@@ -668,7 +668,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         else:
           raise TypeError(f'"pdb_type" does not have a valid value: "{val}"')
       elif key == 'default_value':
-        settings_dict[key] = self._value_to_raw(val)
+        settings_dict[key] = self._do_value_to_raw(val)
       elif key == 'tags':
         settings_dict[key] = list(val)
       else:
@@ -676,7 +676,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     settings_dict.update({
       'name': self.name,
-      'value': self._value_to_raw(self.value),
+      'value': self._do_value_to_raw(self.value),
       'type': _SETTING_TYPES[type(self)],
     })
     
@@ -747,7 +747,13 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     `default_value` properties.
     """
     return value
-  
+
+  def _do_value_to_raw(self, value):
+    try:
+      return self._value_to_raw(value)
+    except Exception as e:
+      raise type(e)(f'{str(e)}; setting: "{self.get_path()}"') from e
+
   def _validate_and_assign_value(self, value):
     self._validate_value(value)
     self._assign_value(value)
