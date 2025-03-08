@@ -1211,7 +1211,17 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
 
   if main_settings_list is not None:
     output_directory_dict, _index = _get_child_setting(main_settings_list, 'output_directory')
-    _update_filepath_or_dirpath_setting(output_directory_dict)
+    if output_directory_dict is not None:
+      _update_filepath_or_dirpath_setting(output_directory_dict)
+
+    export_settings_list, _index = _get_child_group_list(main_settings_list, 'export')
+    if export_settings_list is not None:
+      file_format_export_options_dict, _index = _get_child_setting(
+        export_settings_list, 'file_format_export_options')
+      if file_format_export_options_dict is not None:
+        for name, format_options in file_format_export_options_dict['value'].items():
+          if name != '_active':
+            _update_choice_arguments_for_1_0_rc2(format_options)
 
     procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
     if procedures_list is not None:
@@ -1229,6 +1239,8 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _rename_setting(arguments_list, 'image_filepath', 'image_file')
 
+        _update_choice_arguments_for_1_0_rc2(arguments_list)
+
         _update_file_arguments_for_1_0_rc2(arguments_list)
 
         _update_filepath_and_dirpath_arguments_for_1_0_rc2(arguments_list)
@@ -1240,9 +1252,22 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
 
         arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
+        _update_choice_arguments_for_1_0_rc2(arguments_list)
+
         _update_file_arguments_for_1_0_rc2(arguments_list)
 
         _update_filepath_and_dirpath_arguments_for_1_0_rc2(arguments_list)
+
+
+def _update_choice_arguments_for_1_0_rc2(arguments_list):
+  for argument_dict in arguments_list:
+    if argument_dict['type'] == 'choice':
+      _update_choice_setting_for_1_0_rc2(argument_dict)
+
+
+def _update_choice_setting_for_1_0_rc2(setting_dict):
+  if 'gui_type' in setting_dict and setting_dict['gui_type'] == 'choice_combo_box':
+    setting_dict['gui_type'] = 'prop_choice_combo_box'
 
 
 def _update_file_arguments_for_1_0_rc2(arguments_list):

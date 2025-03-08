@@ -1,6 +1,7 @@
 ## Upcoming
 
 * Native file dialogs are displayed, if possible, when opening/saving settings files or adding files/folders for Batch Convert.
+* Fixed update of settings from 1.0-RC1 to later versions.
 
 
 ## 1.0-RC4
