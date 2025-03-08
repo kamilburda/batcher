@@ -1316,10 +1316,10 @@ def _update_filepath_or_dirpath_setting(setting_dict):
     setting_dict['gui_type'] = 'file_chooser'
 
   if setting_dict['value'] is not None:
-    setting_dict['value'] = Gio.file_new_for_path(setting_dict['value'])
+    setting_dict['value'] = Gio.file_new_for_path(setting_dict['value']).get_uri()
 
   if setting_dict['default_value'] is not None:
-    setting_dict['default_value'] = Gio.file_new_for_path(setting_dict['default_value'])
+    setting_dict['default_value'] = Gio.file_new_for_path(setting_dict['default_value']).get_uri()
 
   if setting_dict['type'] == 'filepath':
     setting_dict['action'] = int(Gimp.FileChooserAction.OPEN)
