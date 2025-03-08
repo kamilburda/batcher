@@ -13,7 +13,7 @@ permalink: /docs/installation/
 
 Batcher can currently be installed only manually by copying files from a ZIP archive.
 
-**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.0-RC3) (1.0-RC3, February 13, 2025)**
+**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.0-RC4) (1.0-RC4, March 08, 2025)**
 
 
 ## Windows

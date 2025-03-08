@@ -108,7 +108,6 @@ If there is no background layer inserted, this procedure has no effect.
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
-
 ### Merge foreground
 
 *Only available if `Insert foreground` is added*
@@ -123,7 +122,7 @@ Merges all visible filters (layer effects) in the specified layer.
 
 ### Merge visible layers
 
-*Only available for: Batch Convert*
+*Only available for: Batch Convert, Export Images*
 
 Merges all visible layers within the image into a single layer. Invisible layers are removed.
 
@@ -131,11 +130,12 @@ This is useful if the image contains multiple layers and you want to apply filte
 
 ### Remove folder structure
 
+*Only available for: Batch Convert, Export Layers, Edit Layers*
+
 Exports all images to the output folder on the same level, i.e. subfolders are not created.
 
 Options:
 * (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
-
 
 ### Rename
 
@@ -146,6 +146,17 @@ This procedure uses the same text entry as the one in Batch Convert or Export La
 For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
 Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+
+### Resize to layer size
+
+*Only available for: Batch Convert, Export Images, Export Layers*
+
+If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
+
+This procedure is enabled by default for Export Layers.
+
+To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
+Note that in that case the layers will be cut off if they are partially outside the image canvas.
 
 ### Scale
 
@@ -164,18 +175,6 @@ Options:
 * *Scale to fit*: If checked, the image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the image/layer will be fit.
 * *Keep aspect ratio*: If checked, the image/layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
 * *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
-
-
-### Resize to layer size
-
-*Only available for: Export Layers, Edit Layers*
-
-If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
-
-This procedure is enabled by default for Export Layers.
-
-To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
-Note that in that case the layers will be cut off if they are partially outside the image canvas.
 
 
 ## Adding Custom Procedures
