@@ -450,8 +450,14 @@ class GeglProcedure(PDBProcedure):
       # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
       #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
       if should_transform_enum_to_choice:
-        processed_value = (
-          type(self._properties[arg_name].default_value)(arg_value).value_nick)
+        # For PyGObject >= 3.50.0, `default_value` returns an int rather than
+        # an enum value. `get_default_value()` is not available in < 3.50.0.
+        if hasattr(self._properties[arg_name], 'get_default_value'):
+          enum_default_value = self._properties[arg_name].get_default_value()
+        else:
+          enum_default_value = self._properties[arg_name].default_value
+
+        processed_value = type(enum_default_value)(arg_value).value_nick
       else:
         processed_value = arg_value
 

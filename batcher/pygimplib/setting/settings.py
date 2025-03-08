@@ -1380,7 +1380,14 @@ class EnumSetting(Setting):
           procedure_param = enum_type[1]
 
       if procedure_param is not None:
-        processed_enum_type = type(procedure_param.default_value)
+        # For PyGObject >= 3.50.0, `default_value` returns an int rather than
+        # an enum value. `get_default_value()` is not available in < 3.50.0.
+        if hasattr(procedure_param, 'get_default_value'):
+          enum_default_value = procedure_param.get_default_value()
+        else:
+          enum_default_value = procedure_param.default_value
+
+        processed_enum_type = type(enum_default_value)
       else:
         raise TypeError(
           f'procedure "{enum_type[0]}" or its property "{enum_type[1]}"'
