@@ -2,6 +2,7 @@
 
 import abc
 import collections
+import os.path
 from collections.abc import Iterable
 import contextlib
 import traceback
@@ -1139,11 +1140,13 @@ class ImageBatcher(Batcher):
     self._current_image = None
     self._current_layer = None
 
-  @staticmethod
-  def _load_image(image_filepath):
-    return pdb.gimp_file_load(
-      run_mode=Gimp.RunMode.NONINTERACTIVE,
-      file=Gio.file_new_for_path(image_filepath))
+  def _load_image(self, image_filepath):
+    if os.path.isfile(image_filepath):
+      return pdb.gimp_file_load(
+        run_mode=Gimp.RunMode.NONINTERACTIVE,
+        file=Gio.file_new_for_path(image_filepath))
+    else:
+      raise exceptions.BatcherFileLoadError(_('File not found'), self._current_item)
 
   @staticmethod
   def _get_current_layer(image):

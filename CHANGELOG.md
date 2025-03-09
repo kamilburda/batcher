@@ -1,6 +1,10 @@
 ## Upcoming
 
+User interface changes:
+* Batch Convert: If a file is not found, an appropriate label will be displayed below the preview rather than a popup.
 * Native file dialogs are displayed, if possible, when opening/saving settings files or adding files/folders for Batch Convert.
+
+Bug fixes:
 * Fixed update of settings from 1.0-RC1 to later versions.
 
 

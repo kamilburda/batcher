@@ -11,6 +11,18 @@ class BatcherCancelError(BatcherError):
   pass
 
 
+class BatcherFileLoadError(BatcherError):
+
+  def __init__(self, message, item):
+    super().__init__(message)
+
+    self.message = message
+    self.item = item
+
+  def __str__(self):
+    return f'{self.message}: {self.item.id}'
+
+
 class ActionError(BatcherError):
   
   def __init__(self, message, action, item, traceback=None):

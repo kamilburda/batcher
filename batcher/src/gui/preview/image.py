@@ -129,13 +129,16 @@ class ImagePreview(preview_base_.Preview):
       self._set_pixbuf(self._folder_icon)
       self.set_item_name_label(self.item)
   
-  def clear(self, use_item_name=False):
+  def clear(self, use_item_name=False, error=None):
     self.item = None
 
     self._set_pixbuf(self._no_selection_icon)
 
     if not use_item_name:
-      self._set_no_selection_label()
+      if error is None:
+        self._set_no_selection_label()
+      else:
+        self._set_label(str(error), sensitive=False)
   
   def resize(self):
     """Resizes the preview if the widget is smaller than the previewed image so
@@ -170,6 +173,10 @@ class ImagePreview(preview_base_.Preview):
     self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
     self._label_item_name.set_sensitive(False)
 
+  def _set_label(self, text, sensitive=True):
+    self._label_item_name.set_markup(f'<i>{text}</i>')
+    self._label_item_name.set_sensitive(sensitive)
+
   def _set_contents(self):
     # Sanity check in case `item` changes before 'size-allocate' is emitted.
     if self.item is None:
@@ -178,13 +185,16 @@ class ImagePreview(preview_base_.Preview):
     self._update_duration_seconds = 0.0
 
     with pg.pdbutils.redirect_messages():
-      self._preview_pixbuf, error = self._get_in_memory_preview()
+      self._preview_pixbuf, error, display_error_message_as_label = self._get_in_memory_preview()
     
     if self._preview_pixbuf is not None:
       self._preview_pixbuf_to_draw = self._preview_pixbuf
       self._preview_image.queue_draw()
     else:
-      self.clear(use_item_name=True)
+      if error is None or not display_error_message_as_label:
+        self.clear(use_item_name=True)
+      else:
+        self.clear(use_item_name=False, error=error)
     
     self._is_updating = False
 
@@ -261,21 +271,21 @@ class ImagePreview(preview_base_.Preview):
     self._set_update_duration_action_id = self._batcher.add_procedure(
       self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
 
-    image_copies, error = self._get_image_preview()
+    image_copies, error, display_error_message_as_label = self._get_image_preview()
 
     if not image_copies:
-      return None, None
+      return None, error, display_error_message_as_label
 
     image_preview = image_copies[0]
 
     if image_preview is None or not image_preview.is_valid():
-      return None, error
+      return None, error, display_error_message_as_label
 
     image_layers = image_preview.get_layers()
 
     if not image_layers:
       pg.pdbutils.try_delete_image(image_preview)
-      return None, error
+      return None, error, display_error_message_as_label
 
     preview_width, preview_height = self._get_preview_size(
       image_preview.get_width(), image_preview.get_height())
@@ -285,7 +295,7 @@ class ImagePreview(preview_base_.Preview):
     for image in image_copies:
       pg.pdbutils.try_delete_image(image)
     
-    return preview_pixbuf, error
+    return preview_pixbuf, error, display_error_message_as_label
 
   def _set_update_duration(self, _batcher, start_update_time):
     self._update_duration_seconds = time.time() - start_update_time
@@ -299,6 +309,7 @@ class ImagePreview(preview_base_.Preview):
     tree_for_preview.add([self.item.id], with_folders=False)
 
     error = None
+    display_error_message_as_label = False
 
     try:
       self._batcher.run(
@@ -310,8 +321,11 @@ class ImagePreview(preview_base_.Preview):
         process_names=False,
         process_export=False,
         **utils_.get_settings_for_batcher(self._settings['main']))
-    except exceptions.BatcherCancelError as e:
+    except exceptions.BatcherCancelError:
       pass
+    except exceptions.BatcherFileLoadError as e:
+      error = e
+      display_error_message_as_label = True
     except exceptions.ActionError as e:
       messages_.display_failure_message(
         messages_.get_failing_action_message(e),
@@ -329,7 +343,7 @@ class ImagePreview(preview_base_.Preview):
       
       error = e
 
-    return self._batcher.image_copies, error
+    return self._batcher.image_copies, error, display_error_message_as_label
 
   @staticmethod
   def _get_preview_pixbuf(image, preview_width, preview_height):
