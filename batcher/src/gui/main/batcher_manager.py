@@ -53,15 +53,15 @@ class BatcherManager:
     except exceptions.BatcherCancelError:
       should_quit = False
     except exceptions.ActionError as e:
+      should_quit = False
       messages_.display_failure_message(
         messages_.get_failing_action_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=parent_widget)
-      should_quit = False
     except exceptions.BatcherError as e:
-      messages_.display_processing_failure_message(e, parent=parent_widget)
       should_quit = False
+      messages_.display_processing_failure_message(e, parent=parent_widget)
     except Exception as e:
       should_quit = False
       messages_.display_invalid_image_failure_message(e, parent=parent_widget)
