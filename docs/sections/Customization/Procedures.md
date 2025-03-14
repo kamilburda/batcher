@@ -28,7 +28,7 @@ Options:
 * *Additional Y-offset*: Moves the layers vertically by the specified amount.
 * *Unit for the additional Y-offset*: Can be pixels or percentages of image/another layer width/height.
 
-### Export**/**Also export as...
+### Export/Also export as...
 
 Exports an image/layer to the specified file format.
 
