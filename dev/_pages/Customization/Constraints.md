@@ -54,11 +54,11 @@ Processes only layers that are not inserted as foreground via `Insert foreground
 
 ### Matching file extension
 
-Processes only images/layers having the file extension typed in the main dialog.
+Processes only images/layers whose names match the file extension typed in the main dialog.
 
 ### Matching text...
 
-Processes only images/layers matching the specified text.
+Processes only images/layers whose names match the specified text.
 
 You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching file extension` constraint).
 

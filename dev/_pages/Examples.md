@@ -26,7 +26,7 @@ Yes! You may apply any GIMP filter or plug-in:
 
 You can think of watermarks as foreground, i.e. a layer added on top of your images.
 
-For Batch Convert:
+For Batch Convert and Export Images:
 1. Add the `Insert foreground` procedure and specify an image file serving as the foreground.
 2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
 
