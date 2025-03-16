@@ -3478,7 +3478,7 @@ def get_setting_type_and_kwargs(
           ChoiceSetting,
           _get_choice_setting_init_arguments(pdb_param_info, pdb_procedure))
       elif gtype == Gio.File.__gtype__:
-        if pdb_param_info.__gtype__ ==  Gimp.ParamFile.__gtype__:
+        if pdb_param_info.__gtype__ == Gimp.ParamFile.__gtype__:
           file_action = _get_param_spec_attribute(
             Gimp.param_spec_file_get_action, pdb_param_info, Gimp.FileChooserAction.ANY)
           file_none_ok = _get_param_spec_attribute(
@@ -3522,7 +3522,7 @@ def get_setting_type_and_kwargs(
           dict(none_ok=_get_param_spec_attribute(
             Gimp.param_spec_display_none_allowed, pdb_param_info, True)))
       elif gtype == Gegl.Color.__gtype__:
-        if pdb_param_info.__gtype__ ==  Gimp.ParamColor.__gtype__:
+        if pdb_param_info.__gtype__ == Gimp.ParamColor.__gtype__:
           color_has_alpha = _get_param_spec_attribute(
             Gimp.param_spec_color_has_alpha, pdb_param_info, True)
         else:
