@@ -6,7 +6,7 @@ For easier usage, you may use a translation tool such as [Poedit](https://poedit
 ## How do I translate the plug-in?
 
 First, make sure you use the `batcher.pot` file for the latest version of the plug-in.
-Use the .pot file in the `batcher/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/batcher/blob/main/batcher/locale/batcher.pot).
+Use the .pot file in the `batcher/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version from GitHub](https://github.com/kamilburda/batcher/blob/main/batcher/locale/batcher.pot).
 
 
 ### Poedit
