@@ -31,6 +31,12 @@ Make sure to check the current issues first before submitting a report.
 You can also ask questions or discuss ideas related to Batcher on the [GitHub Discussions page](https://github.com/kamilburda/batcher/discussions).
 
 
+## Translations
+
+To provide translations for Batcher, see [TRANSLATIONS](TRANSLATIONS.md) for instructions.
+Thank you for your contribution. 😊
+
+
 ## Example screenshots
 
 ![](docs/images/screenshot_dialog_convert.png)
