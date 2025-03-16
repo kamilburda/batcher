@@ -1,12 +1,12 @@
-# Batcher - Translations
+# Providing Translations for Batcher
 
-If you want to provide translations for Batcher, it is recommended to use a translation tool such as [Poedit](https://poedit.net) for easier usage.
+For easier usage, you may use a translation tool such as [Poedit](https://poedit.net).
 
 
 ## How do I translate the plug-in?
 
-First, make sure you use the `batcher.pot` file for the latest plug-in version.
-Either use the .pot file in the `batcher/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/batcher/blob/main/batcher/locale/batcher.pot).
+First, make sure you use the `batcher.pot` file for the latest version of the plug-in.
+Use the .pot file in the `batcher/locale` folder (inside the folder with the installed plug-in), or, if in doubt, [download the latest version](https://github.com/kamilburda/batcher/blob/main/batcher/locale/batcher.pot).
 
 
 ### Poedit
@@ -28,7 +28,7 @@ To create a new translation for your language:
 
 #### Updating an Existing Translation
 
-If you spotted some translation errors in your .po file or the plug-in was updated since the last translation was made, you may need to update the translation:
+If you spotted some errors in your .po file or the plug-in was updated since the last translation was made, you may need to update the translation:
 
 1. Open your .po file, select `Translation → Update from POT file...` and select the `batcher.pot` file for the latest plug-in version.
 2. Update the translated strings.
@@ -41,7 +41,7 @@ If you spotted some translation errors in your .po file or the plug-in was updat
 
 ### Terminal
 
-If you do not wish to use Poedit, you may use the terminal on Unix-based systems (Linux, etc.) or Windows Subsystem for Linux (WSL) on Windows.
+If you cannot/do not wish to use Poedit, you may use the terminal on Unix-based systems (Linux, macOS, etc.) or Windows Subsystem for Linux (WSL) on Windows.
 
 
 #### Creating a New Translation
@@ -75,7 +75,7 @@ To create a new translation for your language:
 
 #### Updating an Existing Translation
 
-If you spotted some translation errors in the .po file or the plug-in is updated since the last translation was made, you may need to update the translation:
+If you spotted some errors in the .po file or the plug-in is updated since the last translation was made, you may need to update the translation:
 
 1. Run the following commands:
    
@@ -97,7 +97,7 @@ If you spotted some translation errors in the .po file or the plug-in is updated
 
 You may want to test your translation first to make sure it works correctly, as described in the next section.
 
-You may also want share your translation with the rest of the world.
+You may also want share your translation with the rest of the world. 😉
 You can do so by submitting your translated .po file as follows:
 
 1. Open a git pull request for the [plug-in repository](https://github.com/kamilburda/batcher).
@@ -105,7 +105,7 @@ You can do so by submitting your translated .po file as follows:
   
       [repository root]/batcher/locale/[language]/LC_MESSAGES/batcher.po
   
-  If you aree updating your translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
+  If you are updating a translation, name your commit message `Update [full language name] translation ([language])` (e.g. `Update French translation (fr_FR)`).
 
 
 ## How can I test my translation?
@@ -136,13 +136,20 @@ Generate the .mo file as follows:
 
 ### Running GIMP
 
-With the .mo file properly renamed and in the proper folder, you can now test your translation in GIMP.
+Now that the .mo file is renamed and placed in the proper folder, you can proceed to test your translation in GIMP.
 
-#### Linux
+#### Linux or macOS
 
-Run GIMP from the terminal as follows:
-   
-    LANG="[language].UTF-8" gimp
+Run GIMP from the terminal. If you use the official GIMP AppImage for Linux distributions or the macOS disk image, you can run GIMP with a specific language as follows:
+    
+    export LANG="[language].UTF-8"
+    [path to GIMP AppImage/disk image]
+
+If you use the Flatpak installation on Linux:
+
+    export LANG="[language].UTF-8"
+    flatpak run org.gimp.GIMP//stable
+
 
 #### Windows
 
@@ -151,8 +158,6 @@ Run GIMP from the Windows command line as follows:
     set lang=[language].UTF-8
     gimp.exe
 
-If Windows does not recognize the GIMP executable, specify the full path.
-
-For example, if GIMP 3.0 is installed, the full path by default will be
+If Windows does not recognize the GIMP executable, specify the full path. For example, if GIMP 3.0 is installed using the official GIMP installer, the full path by default will be
     
-   "C:\Program Files\GIMP 3\bin\gimp.exe"
+    "C:\Program Files\GIMP 3\bin\gimp.exe"
