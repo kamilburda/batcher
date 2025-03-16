@@ -106,7 +106,7 @@ If this is not what you desire, you may uncheck this procedure.
 If there is no background layer inserted, this procedure has no effect.
 
 Options:
-* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
+* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
 ### Merge foreground
 
