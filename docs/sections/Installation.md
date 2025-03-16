@@ -1,6 +1,6 @@
 ## Requirements
 
-* [GIMP 3.0.0-RC3](https://www.gimp.org/downloads/devel/) or later
+Batcher requires [GIMP 3.0.0](https://www.gimp.org/downloads/) or later.
 
 
 ## Download
