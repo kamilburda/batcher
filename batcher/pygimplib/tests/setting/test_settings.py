@@ -2754,7 +2754,10 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
     choice_default_value = 'auto'
 
     param_spec = stubs_gimp.ChoiceParamStub(
-      GObject.TYPE_STRING, 'output-format', default_value=choice_default_value, choice=choice)
+      Gimp.ParamChoice.__gtype__,
+      'output-format',
+      default_value=choice_default_value,
+      choice=choice)
 
     settings_module_path = f'{pgutils.get_pygimplib_module_path()}.setting.settings'
 

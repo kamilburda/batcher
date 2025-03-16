@@ -166,6 +166,8 @@ class Choice:
 
 class GParamStub:
 
+  __gtype__ = GObject.ParamSpec.__gtype__
+
   def __init__(self, value_type, name, blurb='', default_value=None, **additional_kwargs):
     self.value_type = value_type
     self.name = name
@@ -186,7 +188,8 @@ class GParamStub:
 
 
 class ChoiceParamStub(GParamStub):
-  pass
+
+  __gtype__ = Gimp.ParamChoice.__gtype__
 
 
 class ParasiteFunctionsStubMixin:

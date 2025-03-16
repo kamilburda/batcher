@@ -27,7 +27,7 @@ _MOCK_PNG_CHOICE = Gimp.Choice.new()
 _MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
 _MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
 
-_LATEST_PLUGIN_VERSION = '1.0-RC2'
+_LATEST_PLUGIN_VERSION = '1.0'
 
 
 @mock.patch(
