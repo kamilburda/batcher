@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.0-RC4\n"
+"Project-Id-Version: 'batcher' 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-08 17:22+0100\n"
+"POT-Creation-Date: 2025-03-16 12:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -784,21 +784,25 @@ msgstr ""
 msgid "Resizes the image canvas to fit the specified layer(s)."
 msgstr ""
 
-#: ../../batcher/src/core.py:807
+#: ../../batcher/src/core.py:808
 msgid ""
 "An error occurred. Please check the GIMP error message or the error console "
 "for details, if any."
 msgstr ""
 
-#: ../../batcher/src/core.py:869
+#: ../../batcher/src/core.py:870
 msgid "Processing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/exceptions.py:47
+#: ../../batcher/src/core.py:1149
+msgid "File not found"
+msgstr ""
+
+#: ../../batcher/src/exceptions.py:59
 msgid "Item:"
 msgstr ""
 
-#: ../../batcher/src/exceptions.py:49
+#: ../../batcher/src/exceptions.py:61
 msgid "File extension:"
 msgstr ""
 
@@ -855,7 +859,6 @@ msgid "Select a procedure"
 msgstr ""
 
 #: ../../batcher/src/gui/actions/browser.py:472
-#: ../../batcher/src/gui/main/previews.py:460
 msgid "_Add"
 msgstr ""
 
@@ -1038,8 +1041,6 @@ msgstr ""
 
 #: ../../batcher/src/gui/main/main.py:352
 #: ../../batcher/src/gui/main/main.py:474
-#: ../../batcher/src/gui/main/previews.py:461
-#: ../../batcher/src/gui/main/settings_manager.py:281
 msgid "_Cancel"
 msgstr ""
 
@@ -1102,7 +1103,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:596
+#: ../../batcher/src/gui/main/previews.py:591
 msgid ""
 "The preview no longer updates automatically as rendering takes too long."
 msgstr ""
@@ -1156,34 +1157,26 @@ msgid "Settings successfully saved."
 msgstr ""
 
 #: ../../batcher/src/gui/main/settings_manager.py:263
-msgid "_Open"
-msgstr ""
-
-#: ../../batcher/src/gui/main/settings_manager.py:264
 msgid "Load Settings from File"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:267
-msgid "_Save"
-msgstr ""
-
-#: ../../batcher/src/gui/main/settings_manager.py:268
+#: ../../batcher/src/gui/main/settings_manager.py:266
 msgid "Save Settings to File"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:285
+#: ../../batcher/src/gui/main/settings_manager.py:280
 msgid "Load size-related settings"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:295
-msgid "JSON file ({})"
+#: ../../batcher/src/gui/main/settings_manager.py:289
+msgid "JSON file"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:303
+#: ../../batcher/src/gui/main/settings_manager.py:298
 msgid "Any file"
 msgstr ""
 
-#: ../../batcher/src/gui/main/settings_manager.py:348
+#: ../../batcher/src/gui/main/settings_manager.py:341
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the file and the text in the details to one of the "
@@ -1292,23 +1285,23 @@ msgstr ""
 msgid "Cannot be modified"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:170
+#: ../../batcher/src/gui/preview/image.py:173
 msgid "No selection"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:200
+#: ../../batcher/src/gui/preview/image.py:210
 msgid "Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:211
+#: ../../batcher/src/gui/preview/image.py:221
 msgid "Update Automatically"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:222
+#: ../../batcher/src/gui/preview/image.py:232
 msgid "Update Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:325
+#: ../../batcher/src/gui/preview/image.py:339
 msgid "There was a problem with updating the image preview:"
 msgstr ""
 
