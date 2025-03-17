@@ -154,10 +154,7 @@ If you use the Flatpak installation on Linux:
 #### Windows
 
 Run GIMP from the Windows command line as follows:
-   
+
+    cd [path to GIMP installation directory]\bin
     set lang=[language].UTF-8
     gimp.exe
-
-If Windows does not recognize the GIMP executable, specify the full path. For example, if GIMP 3.0 is installed using the official GIMP installer, the full path by default will be
-    
-    "C:\Program Files\GIMP 3\bin\gimp.exe"
