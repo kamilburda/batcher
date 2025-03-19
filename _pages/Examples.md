@@ -26,7 +26,7 @@ Yes! You may apply any GIMP filter or plug-in:
 
 You can think of watermarks as foreground, i.e. a layer added on top of your images.
 
-For Batch Convert:
+For Batch Convert and Export Images:
 1. Add the `Insert foreground` procedure and specify an image file serving as the foreground.
 2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
 
@@ -93,3 +93,9 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 1. Uncheck the `Layers` constraint.
 2. Add the `Group layers` constraint.
 3. Add the `Top-level` constraint.
+
+
+## How do I reverse the order of the exported images/layers?
+
+In the text entry next to `Name`, you can type e.g. `image[000, %d]`.
+This results in the exported image/layer names having a descending number.

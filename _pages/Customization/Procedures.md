@@ -33,7 +33,7 @@ Options:
 * *Additional Y-offset*: Moves the layers vertically by the specified amount.
 * *Unit for the additional Y-offset*: Can be pixels or percentages of image/another layer width/height.
 
-### Export**/**Also export as...
+### Export/Also export as...
 
 Exports an image/layer to the specified file format.
 
@@ -52,7 +52,7 @@ For Batch Convert and Export Layers, when this procedure is added, the values of
 For example, the output folder will be identical to the one currently selected in the main dialog.
 This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
 
-When exporting each image separately (the default, which can be changed via the *Perform export* option), the Export procedure usually makes sense to be applied as the last procedure since procedures after Export would have no effect on the current layer being processed.
+When exporting each image separately (the default, which can be changed via the *Perform export* option), it usually makes sense to apply the Export procedure as the last one since procedures after Export would have no effect on the current image/layer being processed.
 
 ### Apply opacity from group layers
 
@@ -106,7 +106,7 @@ If this is not what you desire, you may uncheck this procedure.
 If there is no background layer inserted, this procedure has no effect.
 
 Options:
-* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/2.10/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
+* *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
 ### Merge foreground
 
