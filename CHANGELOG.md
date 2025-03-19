@@ -1,4 +1,6 @@
-## Upcoming
+## 1.0
+
+### March 19, 2025
 
 User interface changes:
 * Batch Convert: If a file is not found, an appropriate label will be displayed below the preview rather than a popup.
