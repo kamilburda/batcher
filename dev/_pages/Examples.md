@@ -93,3 +93,9 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 1. Uncheck the `Layers` constraint.
 2. Add the `Group layers` constraint.
 3. Add the `Top-level` constraint.
+
+
+## How do I reverse the order of the exported images/layers?
+
+In the text entry next to `Name`, you can type e.g. `image[000, %d]`.
+This results in the exported image/layer names having a descending number.
