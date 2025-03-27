@@ -1,4 +1,4 @@
-On Windows, if you installed GIMP 3.0.0 before March 19, 2025, you will need to download and install GIMP again (or update if GIMP offers you the option). If the installer from gimp.org is not updated yet, install GIMP via Microsoft Store. There was originally an issue that prevented several plug-ins, including Batcher, from working.
+On Windows, if you downloaded GIMP 3 before March 19, 2025, you will need to update GIMP (or download and install GIMP again if GIMP does not offer an update). There was originally an issue that prevented several plug-ins, including Batcher, from working.
 
 If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
 In that case, the file format dialog may be displayed behind GIMP.
