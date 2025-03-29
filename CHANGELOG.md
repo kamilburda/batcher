@@ -1,3 +1,9 @@
+## Upcoming
+
+Bug fixes:
+* Fixed a bug that caused the same custom procedure added multiple times to be saved only once. 
+
+
 ## 1.0
 
 ### March 19, 2025
