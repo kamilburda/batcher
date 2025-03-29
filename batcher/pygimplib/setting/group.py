@@ -681,11 +681,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     
     if 'tags' in group_dict:
       group_dict['tags'] = list(group_dict['tags'])
-    
-    if 'name' not in group_dict:
-      # Make sure `name` is always included (which it should be anyway as it is
-      # a required parameter in `__init__()`).
-      group_dict['name'] = self.name
+
+    # Make sure the most recent name is used as it could be modified via
+    # `uniquify_name()`.
+    group_dict['name'] = self.name
     
     return group_dict
 
