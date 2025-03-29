@@ -1,6 +1,6 @@
 ## Upcoming
 
-Bug fixes:
+* Updated German translation (thanks to @ChrisLauinger77).
 * Fixed a bug that caused the same custom procedure added multiple times to be saved only once. 
 
 
