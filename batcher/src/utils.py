@@ -75,10 +75,10 @@ def get_messages_from_persistor_statuses(
         messages[source] = formatted_message
     elif status == pg.setting.Persistor.SOURCE_NOT_FOUND:
       if hasattr(source, 'filepath'):
-        messages[source] = _('Count not locate settings in file "{}" in "{}".').format(
+        messages[source] = _('Could not locate settings in file "{}" in "{}".').format(
           source.filepath, source.name)
       else:
-        messages[source] = _('Count not locate settings in "{}".').format(source.name)
+        messages[source] = _('Could not locate settings in "{}".').format(source.name)
     else:
       messages[source] = ''
 

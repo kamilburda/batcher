@@ -1794,9 +1794,9 @@ msgid "More information: {}"
 msgstr "Weitere Informationen: {}"
 
 #: ../../batcher/src/utils.py:78
-msgid "Count not locate settings in file \"{}\" in \"{}\"."
+msgid "Could not locate settings in file \"{}\" in \"{}\"."
 msgstr "Konnte die Einstellungen in der Datei \"{}\" in \"{}\" nicht finden."
 
 #: ../../batcher/src/utils.py:81
-msgid "Count not locate settings in \"{}\"."
+msgid "Could not locate settings in \"{}\"."
 msgstr "Konnte die Einstellungen in \"{}\" nicht finden."
