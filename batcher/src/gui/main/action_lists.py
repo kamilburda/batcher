@@ -478,7 +478,8 @@ def _handle_export_procedure_item_added(item):
     lambda _entry, setting: export_settings_.apply_file_extension_gui_to_setting_if_valid(setting),
     item.action['arguments/file_extension'])
 
-  export_settings_.revert_file_extension_gui_to_last_valid_value(item.action['arguments/file_extension'])
+  export_settings_.revert_file_extension_gui_to_last_valid_value(
+    item.action['arguments/file_extension'])
 
   item.action['arguments/file_extension'].gui.widget.connect(
     'focus-out-event',
