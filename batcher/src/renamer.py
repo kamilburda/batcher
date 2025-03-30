@@ -405,7 +405,7 @@ def _get_output_directory(
       wrapper = '{}'
 
   if batcher.output_directory is not None and batcher.output_directory.get_path() is not None:
-    output_dirpath = batcher.output_directory
+    output_dirpath = batcher.output_directory.get_path()
   else:
     output_dirpath = ''
 
