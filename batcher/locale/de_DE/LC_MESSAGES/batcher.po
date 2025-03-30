@@ -1799,4 +1799,4 @@ msgstr "Konnte die Einstellungen in der Datei \"{}\" in \"{}\" nicht finden."
 
 #: ../../batcher/src/utils.py:81
 msgid "Count not locate settings in \"{}\"."
-msgstr "Konnte die Einstellungen in d\"{}\" nicht finden."
+msgstr "Konnte die Einstellungen in \"{}\" nicht finden."
