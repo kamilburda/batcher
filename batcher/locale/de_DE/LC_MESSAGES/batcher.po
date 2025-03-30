@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: 'batcher' 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-19 19:06+0100\n"
-"PO-Revision-Date: 2025-03-29 16:38+0100\n"
+"PO-Revision-Date: 2025-03-30 19:36+0200\n"
 "Last-Translator: Christian Lauinger <christian@lauinger-clan.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -796,10 +796,8 @@ msgstr "Ordner umbenennen"
 
 #: ../../batcher/src/builtin_procedures.py:1167
 #: ../../batcher/src/plugin_settings.py:370
-#, fuzzy
-#| msgid "Layer name pattern"
 msgid "Layer filename pattern"
-msgstr "Muster für Ebenennamen"
+msgstr "Ebene Dateinamenmuster"
 
 #: ../../batcher/src/builtin_procedures.py:1174
 #: ../../batcher/src/builtin_procedures.py:1204
@@ -908,7 +906,7 @@ msgstr "_Hinzufügen"
 #: ../../batcher/src/gui/main/main.py:165
 #: ../../batcher/src/gui/main/main.py:354 ../../batcher/src/gui/messages.py:40
 msgid "_Close"
-msgstr ""
+msgstr "_Schliessen"
 
 #: ../../batcher/src/gui/actions/editor.py:49
 #: ../../batcher/src/gui/actions/editor.py:172
@@ -1800,7 +1798,5 @@ msgid "Count not locate settings in file \"{}\" in \"{}\"."
 msgstr "Konnte die Einstellungen in der Datei \"{}\" in \"{}\" nicht finden."
 
 #: ../../batcher/src/utils.py:81
-#, fuzzy
-#| msgid "Count not locate settings in file \"{}\" in \"{}\"."
 msgid "Count not locate settings in \"{}\"."
-msgstr "Konnte die Einstellungen in der Datei \"{}\" in \"{}\" nicht finden."
+msgstr "Konnte die Einstellungen in d\"{}\" nicht finden."
