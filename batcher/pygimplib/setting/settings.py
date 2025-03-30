@@ -805,7 +805,14 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       
       return default_default_value
     else:
-      return self._raw_to_value(default_value)
+      resolved_default_value = self._raw_to_value(default_value)
+
+      # This ensures that the processed value is used in `to_dict()` rather than
+      # the raw value to avoid errors when persisting the setting.
+      if 'default_value' in self._dict_on_init:
+        self._dict_on_init['default_value'] = resolved_default_value
+
+      return resolved_default_value
   
   def _get_pdb_type(self, pdb_type):
     if isinstance(pdb_type, str):
@@ -2465,11 +2472,7 @@ class FileSetting(Setting):
 
   def _value_to_raw(self, value):
     if value is not None:
-      if isinstance(value, str):
-        # The default value could be loaded or passed to `__init__()` as a string.
-        return value
-      else:
-        return value.get_uri()
+      return value.get_uri()
     else:
       return value
 
