@@ -2465,7 +2465,11 @@ class FileSetting(Setting):
 
   def _value_to_raw(self, value):
     if value is not None:
-      return value.get_uri()
+      if isinstance(value, str):
+        # The default value could be loaded or passed to `__init__()` as a string.
+        return value
+      else:
+        return value.get_uri()
     else:
       return value
 

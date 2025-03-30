@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed a crash when saving `Export`/`Also export as...` procedures (#37).
+
+
 ## 1.0.1
 
 ### March 29, 2025
