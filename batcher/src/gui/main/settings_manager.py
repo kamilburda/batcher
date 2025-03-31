@@ -243,8 +243,8 @@ class SettingsManager:
 
     if status == update.TERMINATE:
       display_load_save_settings_failure_message(
-        _(('Failed to load settings from file "{}".'
-           ' Settings must be reset completely.')).format(filepath),
+        _('Failed to load settings from file "{}".'
+          ' Settings must be reset completely.').format(filepath),
         details=message,
         parent=self._dialog)
 

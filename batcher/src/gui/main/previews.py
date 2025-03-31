@@ -385,9 +385,9 @@ class Previews:
         warned_on_count_second_threshold = True
 
         can_continue = self._warn_on_adding_items(
-          _(('<b>WARNING:</b> You are about to add more than {} files.'
-             ' To be on the safe side, check if you added the files or folders you really wanted.'
-             ' Do you want to continue?')).format(
+          _('<b>WARNING:</b> You are about to add more than {} files.'
+            ' To be on the safe side, check if you added the files or folders you really wanted.'
+            ' Do you want to continue?').format(
             self._FILE_COUNT_SECOND_THRESHOLD))
 
         if not can_continue:
