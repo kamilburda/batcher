@@ -1,6 +1,10 @@
 ## Upcoming
 
+* Added Dutch translation (thanks to @DiGro).
+* Updated German translation (thanks to @ChrisLauinger77).
 * Fixed a crash when saving `Export`/`Also export as...` procedures (#37).
+* Fixed a crash on startup if the `Pictures` user folder as the default folder is not available (#41).
+* Fixed several typos in translatable strings.
 
 
 ## 1.0.1
