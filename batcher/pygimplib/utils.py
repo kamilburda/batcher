@@ -3,6 +3,7 @@
 import ast
 import contextlib
 import inspect
+import os
 import struct
 import sys
 import traceback as traceback_
@@ -290,14 +291,22 @@ def _showwarning_with_traceback(traceback=None):
   return _showwarning
 
 
-def get_pictures_directory():
-  """Returns the ``Pictures`` user directory if the platform defines the
-  directory, and empty string otherwise.
+def get_default_dirpath():
+  """Returns a directory path that can be used as a default value for directory
+  settings.
+
+  The ``Pictures`` user folder is returned by default. If that is not available,
+  the current working directory is returned instead.
   """
   try:
-    return GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES)
+    dirpath = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES)
   except Exception:
-    return ''
+    dirpath = None
+
+  if dirpath is not None:
+    return dirpath
+  else:
+    return os.getcwd()
 
 
 def get_enum_values(enum_type):

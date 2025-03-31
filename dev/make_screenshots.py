@@ -40,7 +40,7 @@ TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
 TEST_IMAGE_FOR_LAYERS_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
 
-OUTPUT_DIRPATH = os.path.join(pg.utils.get_pictures_directory(), 'Loading Screens', 'Components')
+OUTPUT_DIRPATH = os.path.join(pg.utils.get_default_dirpath(), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_CONVERT_FILENAME = 'screenshot_dialog_convert.png'

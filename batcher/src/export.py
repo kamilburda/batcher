@@ -43,7 +43,7 @@ class ExportModes:
 
 def export(
       batcher: 'src.core.Batcher',
-      output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       file_extension: str = 'png',
       file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_export_options: Optional[Dict] = None,

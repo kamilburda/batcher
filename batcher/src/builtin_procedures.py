@@ -516,7 +516,7 @@ _EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_pictures_directory()),
+      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
     },
