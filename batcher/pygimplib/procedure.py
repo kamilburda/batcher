@@ -56,7 +56,7 @@ def register_procedure(
 
   The description of parameters is provided below. For more detailed information
   about the parameters, consult the `Gimp.Procedure` class (namely functions
-  starting with ``add_`` or ``set__``).
+  starting with ``add_`` or ``set_``).
 
   Args:
     procedure: The function to register.
