@@ -27,6 +27,7 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+5. If you have GIMP opened, you must restart GIMP.
 
 
 ## Linux
@@ -56,6 +57,7 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+3. If you have GIMP opened, you must restart GIMP.
 
 
 ## macOS
@@ -69,3 +71,4 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+3. If you have GIMP opened, you must restart GIMP.
