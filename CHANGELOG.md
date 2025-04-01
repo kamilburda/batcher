@@ -5,6 +5,7 @@
 * Fixed a crash when saving `Export`/`Also export as...` procedures (#37).
 * Fixed a crash on startup if the `Pictures` user folder as the default folder is not available (#41).
 * Fixed several typos in translatable strings.
+* Updated installation instructions for Flatpak users.
 
 
 ## 1.0.1
