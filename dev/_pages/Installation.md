@@ -16,7 +16,7 @@ If you installed GIMP from an unofficial source (i.e. outside gimp.org), you mig
 
 Batcher can currently be installed only manually by copying files from a ZIP archive.
 
-**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.0.1) (1.0.1, March 29, 2025)**
+**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.0.2) (1.0.2, April 01, 2025)**
 
 
 ## Windows
