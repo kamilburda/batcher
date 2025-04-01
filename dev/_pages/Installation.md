@@ -32,11 +32,28 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+5. If you have GIMP opened, you must restart GIMP.
 
 
 ## Linux
 
-1. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder. 
+### Flatpak installation
+
+1. Open GIMP, go to `Edit → Preferences → Folders → Plug-Ins` and add a custom folder. While there are existing folders where you can insert plug-ins, these may or may not work.
+2. Copy the `batcher` folder from the downloaded archive to the folder created in the previous step. The folder hierarchy should look like this:
+    ```
+    plug-ins/
+        ...other plug-in folders...
+        batcher/
+            ...other Batcher files and folders...
+            batcher.py
+    ```
+3. If you have GIMP opened, you must restart GIMP.
+
+
+### AppImage and other installers
+
+1. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder.
 2. Copy the `batcher` folder from the downloaded archive to one of the folders chosen in the previous step. The folder hierarchy should look like this:
     ```
     plug-ins/
@@ -45,6 +62,7 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+3. If you have GIMP opened, you must restart GIMP.
 
 
 ## macOS
@@ -58,3 +76,4 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
             ...other Batcher files and folders...
             batcher.py
     ```
+3. If you have GIMP opened, you must restart GIMP.
