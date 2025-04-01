@@ -1,4 +1,6 @@
-## Upcoming
+## 1.0.2
+
+### April 01, 2025
 
 * Added Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
