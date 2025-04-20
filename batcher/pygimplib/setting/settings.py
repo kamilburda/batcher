@@ -2476,8 +2476,8 @@ class FileSetting(Setting):
     else:
       return value
 
-  def _validate(self, file_):
-    if not self._none_ok and not isinstance(file_, Gio.File):
+  def _validate(self, file):
+    if not self._none_ok and not isinstance(file, Gio.File):
       return 'invalid file', 'invalid_value'
 
   def _get_pdb_param(self):
@@ -2555,8 +2555,8 @@ class BytesSetting(Setting):
   def _value_to_raw(self, value):
     return list(value.get_data())
 
-  def _validate(self, file_):
-    if not isinstance(file_, GLib.Bytes):
+  def _validate(self, file):
+    if not isinstance(file, GLib.Bytes):
       return 'invalid byte sequence', 'invalid_value'
 
   def _get_pdb_param(self):

@@ -117,18 +117,18 @@ class FileChooser(Gtk.Box):
 
   def set_file(self, file_or_path: Union[Gio.File, str, None]):
     if file_or_path is None:
-      file_ = Gio.file_new_for_path('')
+      file = Gio.file_new_for_path('')
     elif isinstance(file_or_path, str):
-      file_ = Gio.file_new_for_path(file_or_path)
+      file = Gio.file_new_for_path(file_or_path)
     else:
-      file_ = file_or_path
+      file = file_or_path
 
     if self._widget_type == 'text_entry':
-      self._text_entry.set_text(file_.get_path() if file_.get_path() is not None else '')
+      self._text_entry.set_text(file.get_path() if file.get_path() is not None else '')
       # Place the cursor at the end of the text entry.
       self._text_entry.set_position(-1)
     else:
-      self._file_chooser.set_file(file_)
+      self._file_chooser.set_file(file)
 
 
 GObject.type_register(FileChooser)

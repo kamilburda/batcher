@@ -246,8 +246,8 @@ class Tee:
 
     setattr(sys, self._stream_name, self._orig_stream)
 
-    for file_ in self._files:
-      file_.close()
+    for file in self._files:
+      file.close()
 
     self._files = []
     self._is_running = False
@@ -265,8 +265,8 @@ class Tee:
     first output.
     """
     if self.log_header_title:
-      for file_ in self._files:
-        file_.write(get_log_header(self.log_header_title))
+      for file in self._files:
+        file.write(get_log_header(self.log_header_title))
 
     self._write_with_flush(data)
 
@@ -276,24 +276,24 @@ class Tee:
       self.write = self._write_with_flush
 
   def _write(self, data):
-    for file_ in self._files:
-      file_.write(data)
+    for file in self._files:
+      file.write(data)
 
     if self._orig_stream is not None:
       self._orig_stream.write(data)
 
   def _write_with_flush(self, data):
-    for file_ in self._files:
-      file_.write(data)
-      file_.flush()
+    for file in self._files:
+      file.write(data)
+      file.flush()
 
     if self._orig_stream is not None:
       self._orig_stream.write(data)
       self._orig_stream.flush()
 
   def flush(self):
-    for file_ in self._files:
-      file_.flush()
+    for file in self._files:
+      file.flush()
 
     if self._orig_stream is not None:
       self._orig_stream.flush()
