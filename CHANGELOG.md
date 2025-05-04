@@ -3,6 +3,9 @@
 General changes:
 * Added Japanese translation (thanks to @re-unknown).
 
+Changes to the user interface:
+* Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
+
 Changes to procedures and constraints:
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 

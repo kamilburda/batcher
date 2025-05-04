@@ -226,14 +226,27 @@ class Previews:
     self._name_preview_overlay.set_overlay_pass_through(self._name_preview_placeholder_label, True)
     self._name_preview_overlay.add(self._name_preview)
 
-    self._button_add_files = Gtk.Button(
-      label=_('Add _Files...'), use_underline=True, hexpand=True)
-    self._button_add_folders = Gtk.Button(
-      label=_('Add Fol_ders...'), use_underline=True, hexpand=True)
-    self._button_remove_items = Gtk.Button(
-      label=_('R_emove'), use_underline=True, hexpand=True)
-    self._button_remove_all_items = Gtk.Button(
-      label=_('Re_move All'), use_underline=True, hexpand=True)
+    self._menu_item_add_files = Gtk.MenuItem(label=_('Add Files...'), use_underline=False)
+    self._menu_item_add_folders = Gtk.MenuItem(label=_('Add Folders...'), use_underline=False)
+
+    self._menu_add = Gtk.Menu()
+    self._menu_add.append(self._menu_item_add_files)
+    self._menu_add.append(self._menu_item_add_folders)
+    self._menu_add.show_all()
+
+    self._button_add = Gtk.Button(
+      label=_('_Add...'), use_underline=True, hexpand=True)
+
+    self._menu_item_remove_selected = Gtk.MenuItem(label=_('Remove Selected'), use_underline=False)
+    self._menu_item_remove_all = Gtk.MenuItem(label=_('Remove All'), use_underline=False)
+
+    self._menu_remove = Gtk.Menu()
+    self._menu_remove.append(self._menu_item_remove_selected)
+    self._menu_remove.append(self._menu_item_remove_all)
+    self._menu_remove.show_all()
+
+    self._button_remove = Gtk.Button(
+      label=_('Re_move...'), use_underline=True, hexpand=True)
 
     self._grid_buttons = Gtk.Grid(
       row_spacing=self._BUTTONS_GRID_ROW_SPACING,
@@ -241,10 +254,8 @@ class Previews:
       column_homogeneous=True,
       hexpand=True,
     )
-    self._grid_buttons.attach(self._button_add_files, 0, 0, 1, 1)
-    self._grid_buttons.attach(self._button_add_folders, 1, 0, 1, 1)
-    self._grid_buttons.attach(self._button_remove_items, 0, 1, 1, 1)
-    self._grid_buttons.attach(self._button_remove_all_items, 1, 1, 1, 1)
+    self._grid_buttons.attach(self._button_add, 0, 0, 1, 1)
+    self._grid_buttons.attach(self._button_remove, 1, 0, 1, 1)
 
     self._vbox_name_preview_and_options = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -261,14 +272,16 @@ class Previews:
 
     self._show_hide_name_preview_placeholder_label()
 
-    self._button_add_files.connect(
-      'clicked', self._on_button_add_files_clicked, _('Add Files'))
-    self._button_add_folders.connect(
-      'clicked', self._on_button_add_folders_clicked, _('Add Folders'))
-    self._button_remove_items.connect(
-      'clicked', self._on_button_remove_items_clicked)
-    self._button_remove_all_items.connect(
-      'clicked', self._on_button_remove_all_items_clicked)
+    self._button_add.connect('clicked', self._on_button_add_clicked)
+    self._menu_item_add_files.connect(
+      'activate', self._on_menu_item_add_files_activate, _('Add Files'))
+    self._menu_item_add_folders.connect(
+      'activate', self._on_menu_item_add_folders_activate, _('Add Folders'))
+    self._button_remove.connect('clicked', self._on_button_remove_clicked)
+    self._menu_item_remove_selected.connect(
+      'activate', self._on_menu_item_remove_selected_clicked)
+    self._menu_item_remove_all.connect(
+      'activate', self._on_menu_item_remove_all_clicked)
 
     self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
@@ -285,20 +298,26 @@ class Previews:
       ],
       Gdk.DragAction.MOVE)
 
-  def _on_button_add_files_clicked(self, _button, title):
+  def _on_button_add_clicked(self, button):
+    pg.gui.menu_popup_below_widget(self._menu_add, button)
+
+  def _on_menu_item_add_files_activate(self, _menu_item, title):
     filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
     if filepaths:
       self._add_items_to_name_preview(filepaths)
 
-  def _on_button_add_folders_clicked(self, _button, title):
+  def _on_menu_item_add_folders_activate(self, _menu_item, title):
     dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
     if dirpaths:
       self._add_items_to_name_preview(dirpaths)
 
-  def _on_button_remove_items_clicked(self, _button):
+  def _on_button_remove_clicked(self, button):
+    pg.gui.menu_popup_below_widget(self._menu_remove, button)
+
+  def _on_menu_item_remove_selected_clicked(self, _menu_item):
     self._name_preview.remove_selected_items()
 
-  def _on_button_remove_all_items_clicked(self, _button):
+  def _on_menu_item_remove_all_clicked(self, _menu_item):
     self._name_preview.remove_all_items()
 
   def _on_name_preview_key_press_event(self, _tree_view, event):
