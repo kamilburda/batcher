@@ -548,12 +548,18 @@ def create_settings_for_edit_layers():
   visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
 
+  selected_in_gimp_constraint_dict = utils.semi_deep_copy(
+    builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
+  selected_in_gimp_constraint_dict['enabled'] = False
+
   settings['main'].add([
     actions_.create(
       name='constraints',
       initial_actions=[
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
-        visible_constraint_dict]),
+        visible_constraint_dict,
+        selected_in_gimp_constraint_dict,
+      ]),
   ])
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_align_procedure)

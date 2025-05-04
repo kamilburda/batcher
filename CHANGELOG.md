@@ -1,6 +1,7 @@
 ## Upcoming
 
 * Added Japanese translation (thanks to @re-unknown).
+* For Edit Layers, the `Selected in GIMP` constraint is now added on the first run/after reset.
 
 
 ## 1.0.2
