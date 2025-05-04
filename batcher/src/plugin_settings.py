@@ -143,7 +143,7 @@ def create_settings_for_convert():
       dialog_position=(),
       dialog_size=(640, 640),
       paned_outside_previews_position=330,
-      paned_between_previews_position=330,
+      paned_between_previews_position=300,
     )
   )
 
