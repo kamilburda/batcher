@@ -174,27 +174,27 @@ def align_and_offset_layers(
 
     if x_offset:
       if x_offset_unit == Units.PIXELS:
-        new_x += int(x_offset)
+        new_x += round(x_offset)
       elif x_offset_unit == Units.PERCENT_IMAGE_WIDTH:
-        new_x += int(round((image_width * x_offset) / 100))
+        new_x += round((image_width * x_offset) / 100)
       elif x_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
-        new_x += int(round((image_height * x_offset) / 100))
+        new_x += round((image_height * x_offset) / 100)
       elif x_offset_unit == Units.PERCENT_LAYER_WIDTH:
-        new_x += int(round((ref_layer_width * x_offset) / 100))
+        new_x += round((ref_layer_width * x_offset) / 100)
       elif x_offset_unit == Units.PERCENT_LAYER_HEIGHT:
-        new_x += int(round((ref_layer_height * x_offset) / 100))
+        new_x += round((ref_layer_height * x_offset) / 100)
 
     if y_offset:
       if y_offset_unit == Units.PIXELS:
-        new_y += int(y_offset)
+        new_y += round(y_offset)
       elif y_offset_unit == Units.PERCENT_IMAGE_WIDTH:
-        new_y += int(round((image_width * y_offset) / 100))
+        new_y += round((image_width * y_offset) / 100)
       elif y_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
-        new_y += int(round((image_height * y_offset) / 100))
+        new_y += round((image_height * y_offset) / 100)
       elif y_offset_unit == Units.PERCENT_LAYER_WIDTH:
-        new_y += int(round((ref_layer_width * y_offset) / 100))
+        new_y += round((ref_layer_width * y_offset) / 100)
       elif y_offset_unit == Units.PERCENT_LAYER_HEIGHT:
-        new_y += int(round((ref_layer_height * y_offset) / 100))
+        new_y += round((ref_layer_height * y_offset) / 100)
 
     layer.set_offsets(new_x, new_y)
 
@@ -385,7 +385,7 @@ def _convert_to_pixels(image, layer, dimension, dimension_unit):
   else:
     pixels = dimension
 
-  int_pixels = int(pixels)
+  int_pixels = round(pixels)
 
   if int_pixels <= 0:
     int_pixels = 1
@@ -401,12 +401,12 @@ def _get_keep_aspect_ratio_values(
       new_height_pixels):
   if dimension_to_keep == Dimensions.WIDTH:
     processed_new_width_pixels = new_width_pixels
-    processed_new_height_pixels = int(
-      round(orig_height_pixels * (processed_new_width_pixels / orig_width_pixels)))
+    processed_new_height_pixels = round(
+      orig_height_pixels * (processed_new_width_pixels / orig_width_pixels))
   elif dimension_to_keep == Dimensions.HEIGHT:
     processed_new_height_pixels = new_height_pixels
-    processed_new_width_pixels = int(
-      round(orig_width_pixels * (processed_new_height_pixels / orig_height_pixels)))
+    processed_new_width_pixels = round(
+      orig_width_pixels * (processed_new_height_pixels / orig_height_pixels))
   else:
     raise ValueError('invalid value for dimension_to_keep; must be "width" or "height"')
 
@@ -416,13 +416,13 @@ def _get_keep_aspect_ratio_values(
 def _get_scale_to_fit_values(
       orig_width_pixels, orig_height_pixels, new_width_pixels, new_height_pixels):
   processed_new_width_pixels = new_width_pixels
-  processed_new_height_pixels = int(
-    round(orig_height_pixels * (new_width_pixels / orig_width_pixels)))
+  processed_new_height_pixels = round(
+    orig_height_pixels * (new_width_pixels / orig_width_pixels))
 
   if processed_new_height_pixels > new_height_pixels:
     processed_new_height_pixels = new_height_pixels
-    processed_new_width_pixels = int(
-      round(orig_width_pixels * (new_height_pixels / orig_height_pixels)))
+    processed_new_width_pixels = round(
+      orig_width_pixels * (new_height_pixels / orig_height_pixels))
 
   return processed_new_width_pixels, processed_new_height_pixels
 
