@@ -17,13 +17,13 @@ You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
 * Copy and paste images and folders from a file explorer application to the area under `Input Images`. Note that you must click on the area first.
 * Copy and paste images and folders from a text file, each on a separate line to the area under `Input Images`. Note that you must click on the area first. Any files and folders that do not exist are ignored.
-* Press the `Add Files...` or `Add Folders...` button to select and add files or folders, respectively.
+* Press the `Add...` button to add files or folders.
 
 Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck `Recognized file formats`.
 
 You will be warned if you add folder(s) containing too many files or e.g. an entire drive. This is a safeguard against accidentally adding an undesired folder.
 
-You can remove input images and folders by selecting them and pressing Delete or the `Remove` button. You can clear the entire input list by pressing the `Remove All` button or selecting everything with Ctrl + A and then pressing Delete.
+You can remove input images and folders by selecting them and pressing Delete or by pressing `Remove... → Remove Selected`. You can clear the entire input list by pressing `Remove... → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
 
 By default, the renamed images (as they would be named on export) are displayed. To show their original names, simply check `Show Original Names`.
 
