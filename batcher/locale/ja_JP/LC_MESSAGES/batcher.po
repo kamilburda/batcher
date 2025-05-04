@@ -27,7 +27,7 @@ msgstr "画像をエクスポート"
 
 #: ../../batcher/batcher.py:121
 msgid "Export Images (Quick)"
-msgstr "画像を最後に処理した設定でエクスポート"
+msgstr "画像をエクスポート(クイック)"
 
 #: ../../batcher/batcher.py:138
 msgid "Export Layers"
