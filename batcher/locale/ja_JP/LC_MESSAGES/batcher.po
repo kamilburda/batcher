@@ -19,7 +19,7 @@ msgstr ""
 
 #: ../../batcher/batcher.py:67
 msgid "Batch Convert"
-msgstr "一括変換"
+msgstr "バッチ処理"
 
 #: ../../batcher/batcher.py:95
 msgid "Export Images"
@@ -27,7 +27,7 @@ msgstr "画像をエクスポート"
 
 #: ../../batcher/batcher.py:121
 msgid "Export Images (Quick)"
-msgstr "画像を素早くエクスポート"
+msgstr "画像を最後に処理した設定でエクスポート"
 
 #: ../../batcher/batcher.py:138
 msgid "Export Layers"
@@ -89,7 +89,7 @@ msgstr "ファイル\"{}\"から設定をインポートできませんでした
 
 #: ../../batcher/batcher.py:451
 msgid "_Batch Convert..."
-msgstr "一括変換..."
+msgstr "バッチ処理..."
 
 #: ../../batcher/batcher.py:456
 msgid "Batch-process image files"
@@ -112,11 +112,11 @@ msgstr "GIMPで開いた画像をエクスポート"
 
 #: ../../batcher/batcher.py:482
 msgid "E_xport Images (Quick)"
-msgstr "画像を素早くエクスポート"
+msgstr "画像をエクスポート(クイック)"
 
 #: ../../batcher/batcher.py:486
 msgid "Quickly export images opened in GIMP"
-msgstr "GIMPで開いた画像を素早くエクスポート"
+msgstr "GIMPで開いた画像を最後に処理した設定でエクスポート"
 
 #: ../../batcher/batcher.py:494
 msgid "E_xport Layers..."
