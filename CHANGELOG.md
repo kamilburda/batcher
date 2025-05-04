@@ -11,6 +11,7 @@ Changes to procedures and constraints:
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 
 Bug fixes:
+* Fixed the `Scale` procedure always considering the layer size when keeping aspect ratio or scaling to fit dimensions.
 * Fixed the output folder button not filling the empty space when increasing the dialog width.
 
 

@@ -331,19 +331,36 @@ def scale(
       keep_aspect_ratio,
       dimension_to_keep,
 ):
-  width_pixels = _convert_to_pixels(image, layer, new_width, width_unit)
-  height_pixels = _convert_to_pixels(image, layer, new_height, height_unit)
+  new_width_pixels = _convert_to_pixels(image, layer, new_width, width_unit)
+  new_height_pixels = _convert_to_pixels(image, layer, new_height, height_unit)
+
+  if object_to_scale == ScaleObjects.LAYER:
+    orig_width_pixels = layer.get_width()
+    orig_height_pixels = layer.get_height()
+  else:
+    orig_width_pixels = image.get_width()
+    orig_height_pixels = image.get_height()
+
+  if orig_width_pixels == 0:
+    orig_width_pixels = 1
+
+  if orig_height_pixels == 0:
+    orig_height_pixels = 1
 
   if scale_to_fit and not keep_aspect_ratio:
     processed_width_pixels, processed_height_pixels = _get_scale_to_fit_values(
-      layer, width_pixels, height_pixels)
+      orig_width_pixels, orig_height_pixels, new_width_pixels, new_height_pixels)
   else:
     if keep_aspect_ratio:
       processed_width_pixels, processed_height_pixels = _get_keep_aspect_ratio_values(
-        dimension_to_keep, layer, width_pixels, height_pixels)
+        dimension_to_keep,
+        orig_width_pixels,
+        orig_height_pixels,
+        new_width_pixels,
+        new_height_pixels)
     else:
-      processed_width_pixels = width_pixels
-      processed_height_pixels = height_pixels
+      processed_width_pixels = new_width_pixels
+      processed_height_pixels = new_height_pixels
 
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
@@ -376,43 +393,38 @@ def _convert_to_pixels(image, layer, dimension, dimension_unit):
   return int_pixels
 
 
-def _get_keep_aspect_ratio_values(dimension_to_keep, layer, width_pixels, height_pixels):
-  layer_width = layer.get_width()
-  if layer_width == 0:
-    layer_width = 1
-
-  layer_height = layer.get_height()
-  if layer_height == 0:
-    layer_height = 1
-
+def _get_keep_aspect_ratio_values(
+      dimension_to_keep,
+      orig_width_pixels,
+      orig_height_pixels,
+      new_width_pixels,
+      new_height_pixels):
   if dimension_to_keep == Dimensions.WIDTH:
-    processed_width_pixels = width_pixels
-    processed_height_pixels = int(round(layer_height * (processed_width_pixels / layer_width)))
+    processed_new_width_pixels = new_width_pixels
+    processed_new_height_pixels = int(
+      round(orig_height_pixels * (processed_new_width_pixels / orig_width_pixels)))
   elif dimension_to_keep == Dimensions.HEIGHT:
-    processed_height_pixels = height_pixels
-    processed_width_pixels = int(round(layer_width * (processed_height_pixels / layer_height)))
+    processed_new_height_pixels = new_height_pixels
+    processed_new_width_pixels = int(
+      round(orig_width_pixels * (processed_new_height_pixels / orig_height_pixels)))
   else:
     raise ValueError('invalid value for dimension_to_keep; must be "width" or "height"')
 
-  return processed_width_pixels, processed_height_pixels
+  return processed_new_width_pixels, processed_new_height_pixels
 
 
-def _get_scale_to_fit_values(layer, width_pixels, height_pixels):
-  layer_width = layer.get_width()
-  if layer_width == 0:
-    layer_width = 1
+def _get_scale_to_fit_values(
+      orig_width_pixels, orig_height_pixels, new_width_pixels, new_height_pixels):
+  processed_new_width_pixels = new_width_pixels
+  processed_new_height_pixels = int(
+    round(orig_height_pixels * (new_width_pixels / orig_width_pixels)))
 
-  layer_height = layer.get_height()
-  if layer_height == 0:
-    layer_height = 1
+  if processed_new_height_pixels > new_height_pixels:
+    processed_new_height_pixels = new_height_pixels
+    processed_new_width_pixels = int(
+      round(orig_width_pixels * (new_height_pixels / orig_height_pixels)))
 
-  processed_width_pixels = width_pixels
-  processed_height_pixels = int(round(layer_height * (width_pixels / layer_width)))
-  if processed_height_pixels > height_pixels:
-    processed_height_pixels = height_pixels
-    processed_width_pixels = int(round(layer_width * (height_pixels / layer_height)))
-
-  return processed_width_pixels, processed_height_pixels
+  return processed_new_width_pixels, processed_new_height_pixels
 
 
 class Units:
