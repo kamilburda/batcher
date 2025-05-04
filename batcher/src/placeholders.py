@@ -191,8 +191,14 @@ class PlaceholderGimpObjectSetting(PlaceholderSetting):
       self._placeholder_names.append('none')
 
 
-class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
+class PlaceholderImageOrLayerSetting(PlaceholderGimpObjectSetting):
   
+  _DEFAULT_DEFAULT_VALUE = 'current_image'
+  _DEFAULT_PLACEHOLDERS = ['current_image', 'current_layer', 'background_layer', 'foreground_layer']
+
+
+class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
+
   _DEFAULT_DEFAULT_VALUE = 'current_image'
   _DEFAULT_PLACEHOLDERS = ['current_image']
 
