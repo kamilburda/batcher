@@ -1,3 +1,8 @@
+## Upcoming
+
+* Added Japanese translation (thanks to @re-unknown).
+
+
 ## 1.0.2
 
 ### April 01, 2025
