@@ -1,5 +1,6 @@
 """Background and foreground insertion and manipulation."""
-import os.path
+
+import os
 
 import gi
 gi.require_version('Gimp', '3.0')

@@ -2,9 +2,9 @@
 
 import abc
 import collections
-import os.path
 from collections.abc import Iterable
 import contextlib
+import os
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, Union
 
