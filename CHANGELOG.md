@@ -2,6 +2,7 @@
 
 * Added Japanese translation (thanks to @re-unknown).
 * For Edit Layers, the `Selected in GIMP` constraint is now added on the first run/after reset.
+* Fixed the output folder button not filling the empty space when increasing the dialog width.
 
 
 ## 1.0.2

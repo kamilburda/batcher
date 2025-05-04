@@ -55,7 +55,7 @@ class FileChooser(Gtk.Box):
 
       self._text_entry.connect('notify::text', self._emit_changed_event)
 
-      self.pack_start(self._text_entry, False, False, 0)
+      self.pack_start(self._text_entry, True, True, 0)
     else:
       self._widget_type = 'file_chooser'
 
@@ -70,7 +70,12 @@ class FileChooser(Gtk.Box):
           child for child in self._file_chooser.get_children()
           if isinstance(child, Gtk.Entry)),
         None)
+
       if entry is not None:
+        entry_packing = self._file_chooser.query_child_packing(entry)
+        self._file_chooser.set_child_packing(
+          entry, True, True, entry_packing.padding, entry_packing.pack_type)
+
         entry.connect('notify::text', self._emit_changed_event)
 
       button = next(
@@ -80,11 +85,15 @@ class FileChooser(Gtk.Box):
         None)
 
       if button is not None:
+        button_packing = self._file_chooser.query_child_packing(button)
+        self._file_chooser.set_child_packing(
+          button, True, True, button_packing.padding, button_packing.pack_type)
+
         self._set_width_chars(button, width_chars)
         if isinstance(button, Gtk.FileChooserButton):
           button.connect('selection-changed', self._emit_changed_event)
 
-      self.pack_start(self._file_chooser, False, False, 0)
+      self.pack_start(self._file_chooser, True, True, 0)
 
     self.show_all()
 
