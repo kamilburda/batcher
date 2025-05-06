@@ -14,8 +14,10 @@ from gi.repository import Gio
 import pygimplib as pg
 
 from src import file_formats as file_formats_
+from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
+from src.gui import dimension_box as dimension_box_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -154,6 +156,93 @@ class NamePatternSetting(pg.setting.StringSetting):
       self._value = self._default_value
     else:
       self._value = value
+
+
+class DimensionBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.DimensionBox` widgets.
+
+  Value: A dictionary representing data obtained from a `gui.DimensionBox`.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'value-changed'
+
+  def _create_widget(self, setting, **kwargs):
+    percent_placeholder_labels = [
+      placeholders_.PLACEHOLDERS[name].display_name for name in setting.percent_placeholder_names]
+
+    dimension_box = dimension_box_.DimensionBox(
+      default_value=setting.default_value['value'],
+      min_value=setting.min_value,
+      max_value=setting.max_value,
+      default_unit=setting.default_value['unit'],
+      percent_unit=Gimp.Unit.percent(),
+      percent_placeholder_names=setting.percent_placeholder_names,
+      percent_placeholder_labels=percent_placeholder_labels,
+    )
+
+    return dimension_box
+
+  def get_value(self):
+    return self._widget.get_value()
+
+  def _set_value(self, value):
+    self._widget.set_value(value)
+
+
+class DimensionSetting(pg.setting.NumericSetting):
+  """Class for settings representing a dimension (e.g. width of an image).
+
+  In this setting, a dimension is a dictionary consisting of a value, a unit
+  (e.g. pixels or a percentage) and additional data required to further specify
+  a particular unit (e.g. an image or layer dimension to take a percentage
+  from).
+
+  Default value: A dictionary representing 0 pixels.
+  """
+
+  _ALLOWED_PDB_TYPES = []
+
+  _ALLOWED_GUI_TYPES = [DimensionBoxPresenter]
+
+  _DEFAULT_DEFAULT_VALUE = lambda self: {'value': 0.0, 'unit': Gimp.Unit.pixel()}
+
+  def __init__(self, name, percent_placeholder_names: Iterable[str], **kwargs):
+    """Additional parameters:
+
+    percent_placeholder_names:
+      List of strings representing placeholders available for the percentage
+      unit.
+    """
+    self._percent_placeholder_names = percent_placeholder_names
+    self._built_in_units = pg.setting.UnitSetting.get_built_in_units()
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def percent_placeholder_names(self):
+    return self._percent_placeholder_names
+
+  def _validate(self, value):
+    super()._validate(value['value'])
+
+  def _raw_to_value(self, raw_value):
+    if not isinstance(raw_value, dict):
+      return raw_value
+
+    if 'unit' in raw_value:
+      raw_value['unit'] = pg.setting.UnitSetting.raw_data_to_unit(raw_value['unit'])
+    else:
+      raw_value['unit'] = self._default_value['unit']
+
+    return raw_value
+
+  def _value_to_raw(self, value):
+    processed_value = utils.semi_deep_copy(value)
+    if 'unit' in processed_value:
+      processed_value['unit'] = pg.setting.UnitSetting.unit_to_raw_data(
+        processed_value['unit'], self._built_in_units)
+
+    return processed_value
 
 
 class ItemTreeItemsSetting(pg.setting.Setting):
