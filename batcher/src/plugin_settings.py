@@ -886,25 +886,22 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
     _set_sensitive_for_dimension_to_ignore(
       procedure['arguments/dimension_to_keep'],
       procedure['arguments/new_width'],
-      procedure['arguments/width_unit'],
       procedure['arguments/new_height'],
-      procedure['arguments/height_unit'])
+    )
 
     procedure['arguments/dimension_to_keep'].connect_event(
       'value-changed',
       _set_sensitive_for_dimension_to_ignore,
       procedure['arguments/new_width'],
-      procedure['arguments/width_unit'],
       procedure['arguments/new_height'],
-      procedure['arguments/height_unit'])
+    )
 
     procedure['arguments/dimension_to_keep'].connect_event(
       'gui-sensitive-changed',
       _set_sensitive_for_dimension_to_ignore,
       procedure['arguments/new_width'],
-      procedure['arguments/width_unit'],
       procedure['arguments/new_height'],
-      procedure['arguments/height_unit'])
+    )
 
 
 def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
@@ -925,18 +922,14 @@ def _set_sensitive_for_scale_to_fit_and_dimension_to_ignore(
 def _set_sensitive_for_dimension_to_ignore(
       dimension_to_keep_setting,
       new_width_setting,
-      width_unit_setting,
       new_height_setting,
-      height_unit_setting,
 ):
   is_sensitive = dimension_to_keep_setting.gui.get_sensitive()
   is_width = dimension_to_keep_setting.value == builtin_procedures.Dimensions.WIDTH
   is_height = dimension_to_keep_setting.value == builtin_procedures.Dimensions.HEIGHT
 
   new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
-  width_unit_setting.gui.set_sensitive(is_width or not is_sensitive)
   new_height_setting.gui.set_sensitive(is_height or not is_sensitive)
-  height_unit_setting.gui.set_sensitive(is_height or not is_sensitive)
 
 
 def _on_after_add_insert_background_foreground_for_layers(

@@ -289,14 +289,6 @@ class TestUpdateHandlers(unittest.TestCase):
       self.settings['main/procedures/scale/arguments/new_height'].gui_type,
       pg.setting.DoubleSpinButtonPresenter)
 
-    self.assertEqual(
-      self.settings['main/procedures/scale/arguments/width_unit'].value,
-      'percentage_of_layer_width')
-
-    self.assertEqual(
-      self.settings['main/procedures/scale/arguments/height_unit'].value,
-      'percentage_of_layer_height')
-
     self.assertNotIn(
       'drawable',
       self.settings['main/procedures/script-fu-addborder/arguments'])

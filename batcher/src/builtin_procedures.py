@@ -11,6 +11,7 @@ from src import background_foreground
 from src import builtin_actions_common
 from src import export as export_
 from src import overwrite
+from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
 from src.procedure_groups import *
@@ -317,22 +318,20 @@ def resize_to_layer_size(_batcher, layers):
 
 
 def scale(
-      _batcher,
+      batcher,
       image,
       layer,
       object_to_scale,
       new_width,
-      width_unit,
       new_height,
-      height_unit,
       interpolation,
       local_origin,
       scale_to_fit,
       keep_aspect_ratio,
       dimension_to_keep,
 ):
-  new_width_pixels = _convert_to_pixels(image, layer, new_width, width_unit)
-  new_height_pixels = _convert_to_pixels(image, layer, new_height, height_unit)
+  new_width_pixels = _unit_to_pixels(batcher, new_width, 'width')
+  new_height_pixels = _unit_to_pixels(batcher, new_height, 'height')
 
   if object_to_scale == ScaleObjects.LAYER:
     orig_width_pixels = layer.get_width()
@@ -373,17 +372,31 @@ def scale(
   Gimp.context_pop()
 
 
-def _convert_to_pixels(image, layer, dimension, dimension_unit):
-  if dimension_unit == Units.PERCENT_IMAGE_WIDTH:
-    pixels = (dimension / 100) * image.get_width()
-  elif dimension_unit == Units.PERCENT_IMAGE_HEIGHT:
-    pixels = (dimension / 100) * image.get_height()
-  elif dimension_unit == Units.PERCENT_LAYER_WIDTH:
-    pixels = (dimension / 100) * layer.get_width()
-  elif dimension_unit == Units.PERCENT_LAYER_HEIGHT:
-    pixels = (dimension / 100) * layer.get_height()
+def _unit_to_pixels(batcher, dimension, dimension_name):
+  if dimension['unit'] == Gimp.Unit.percent():
+    placeholder_object = placeholders_.PLACEHOLDERS[dimension['percent_object']]
+    gimp_object = placeholder_object.replace_args(None, batcher)
+
+    if dimension_name == 'width':
+      gimp_object_dimension = gimp_object.get_width()
+    elif dimension_name == 'height':
+      gimp_object_dimension = gimp_object.get_height()
+    else:
+      raise ValueError('value for dimension_name not valid')
+
+    pixels = (dimension['value'] / 100) * gimp_object_dimension
+  elif dimension['unit'] == Gimp.Unit.pixel():
+    pixels = dimension['value']
   else:
-    pixels = dimension
+    image_resolution = batcher.current_image.get_resolution()
+    if dimension_name == 'width':
+      image_resolution_for_dimension = image_resolution.xresolution
+    elif dimension_name == 'height':
+      image_resolution_for_dimension = image_resolution.yresolution
+    else:
+      raise ValueError('value for dimension_name not valid')
+
+    pixels = dimension['value'] / dimension['unit'].get_factor() * image_resolution_for_dimension
 
   int_pixels = round(pixels)
 
@@ -692,42 +705,24 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'display_name': _('Object to scale'),
     },
     {
-      'type': 'double',
+      'type': 'dimension',
       'name': 'new_width',
-      'default_value': 100.0,
+      'default_value': {
+        'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_image'},
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('New width'),
     },
     {
-      'type': 'choice',
-      'name': 'width_unit',
-      'default_value': Units.PERCENT_IMAGE_WIDTH,
-      'items': [
-        (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (Units.PIXELS, _('Pixels')),
-      ],
-      'display_name': _('Unit for width'),
-    },
-    {
-      'type': 'double',
+      'type': 'dimension',
       'name': 'new_height',
-      'default_value': 100.0,
+      'default_value': {
+        'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_image'},
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('New height'),
-    },
-    {
-      'type': 'choice',
-      'name': 'height_unit',
-      'default_value': Units.PERCENT_IMAGE_HEIGHT,
-      'items': [
-        (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-        (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-        (Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
-        (Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-        (Units.PIXELS, _('Pixels')),
-      ],
-      'display_name': _('Unit for height'),
     },
     {
       'type': 'enum',
@@ -776,8 +771,10 @@ _SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 _SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = ScaleObjects.LAYER
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = Units.PERCENT_LAYER_WIDTH
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][6]['default_value'] = Units.PERCENT_LAYER_HEIGHT
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][3]['default_value'] = {
+  'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_layer'}
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = {
+  'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_layer'}
 
 
 _BUILTIN_PROCEDURES_LIST = [
