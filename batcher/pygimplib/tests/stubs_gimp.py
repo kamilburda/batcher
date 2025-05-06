@@ -660,7 +660,8 @@ class Pattern(Resource):
 
 class Unit(GObject.GObject):
 
-  def __init__(self, name=None, factor=None, digits=None, symbol=None, abbreviation=None):
+  def __init__(self, name=None, factor=None, digits=None, symbol=None, abbreviation=None, id_=None):
+    self._id = id_
     self._name = name
     self._factor = factor
     self._digits = digits
@@ -701,6 +702,9 @@ class Unit(GObject.GObject):
     # noinspection PyProtectedMember
     return Unit._point
 
+  def get_id(self):
+    return self._id
+
   def get_name(self):
     return self._name
 
@@ -720,12 +724,12 @@ class Unit(GObject.GObject):
     pass
 
 
-Unit._inch = Unit('inch')
-Unit._mm = Unit('mm')
-Unit._percent = Unit('percent')
-Unit._pica = Unit('pica')
-Unit._pixel = Unit('pixel')
-Unit._point = Unit('point')
+Unit._inch = Unit(name='inch', id_=0)
+Unit._mm = Unit(name='mm', id_=1)
+Unit._percent = Unit(name='percent', id_=2)
+Unit._pica = Unit(name='pica', id_=3)
+Unit._pixel = Unit(name='pixel', id_=4)
+Unit._point = Unit(name='point', id_=5)
 
 
 class CoreObjectArray:
