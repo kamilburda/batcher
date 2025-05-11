@@ -94,7 +94,7 @@ class Source(metaclass=abc.ABCMeta):
     """
     data = self.read_data_from_source()
     if data is None:
-      raise SourceNotFoundError
+      raise SourceNotFoundError(f'could not read settings from source "{self.name}"')
 
     self._settings_not_loaded = []
 
