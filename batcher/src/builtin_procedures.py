@@ -384,9 +384,9 @@ def _unit_to_pixels(batcher, dimension, dimension_name):
     else:
       raise ValueError('value for dimension_name not valid')
 
-    pixels = (dimension['value'] / 100) * gimp_object_dimension
+    pixels = (dimension['percent_value'] / 100) * gimp_object_dimension
   elif dimension['unit'] == Gimp.Unit.pixel():
-    pixels = dimension['value']
+    pixels = dimension['pixel_value']
   else:
     image_resolution = batcher.current_image.get_resolution()
     if dimension_name == 'width':
@@ -396,7 +396,8 @@ def _unit_to_pixels(batcher, dimension, dimension_name):
     else:
       raise ValueError('value for dimension_name not valid')
 
-    pixels = dimension['value'] / dimension['unit'].get_factor() * image_resolution_for_dimension
+    pixels = (
+      dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_dimension)
 
   int_pixels = round(pixels)
 
