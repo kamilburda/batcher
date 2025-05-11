@@ -155,16 +155,14 @@ Note that in that case the layers will be cut off if they are partially outside 
 
 ### Scale
 
-Scales the entire image or a layer, using absolute (pixels) or relative (percentages) measures.
+Scales the entire image or a layer.
 
 Options:
 * *Image*: Image to scale and/or to use for computing the new width or height.
 * *Layer*: Layer to scale and/or to use for computing the new width or height.
 * *Object to scale*: Whether to scale the entire *Image* or the *Layer* within the image.
-* *New width*: The new width.
-* *Unit for width*: Unit for the new width - pixels or percentages of image/layer width/height.
-* *New height*: The new height.
-* *Unit for height*: Unit for the new height - pixels or percentages of image/layer width/height.
+* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and *Object to scale* is set to *Layer*, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 * *Scale to fit*: If checked, the image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the image/layer will be fit.
