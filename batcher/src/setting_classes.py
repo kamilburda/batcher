@@ -171,10 +171,13 @@ class DimensionBoxPresenter(pg.setting.GtkPresenter):
       placeholders_.PLACEHOLDERS[name].display_name for name in setting.percent_placeholder_names]
 
     dimension_box = dimension_box_.DimensionBox(
-      default_value=setting.default_value['value'],
+      default_pixel_value=setting.value['pixel_value'],
+      default_percent_value=setting.value['percent_value'],
+      default_other_value=setting.value['other_value'],
       min_value=setting.min_value,
       max_value=setting.max_value,
-      default_unit=setting.default_value['unit'],
+      default_unit=setting.value['unit'],
+      pixel_unit=Gimp.Unit.pixel(),
       percent_unit=Gimp.Unit.percent(),
       percent_placeholder_names=setting.percent_placeholder_names,
       percent_placeholder_labels=percent_placeholder_labels,
@@ -204,7 +207,12 @@ class DimensionSetting(pg.setting.NumericSetting):
 
   _ALLOWED_GUI_TYPES = [DimensionBoxPresenter]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: {'value': 0.0, 'unit': Gimp.Unit.pixel()}
+  _DEFAULT_DEFAULT_VALUE = lambda self: {
+    'pixel_value': 100.0,
+    'percent_value': 100.0,
+    'other_value': 1.0,
+    'unit': Gimp.Unit.pixel(),
+  }
 
   def __init__(self, name, percent_placeholder_names: Iterable[str], **kwargs):
     """Additional parameters:
@@ -223,7 +231,20 @@ class DimensionSetting(pg.setting.NumericSetting):
     return self._percent_placeholder_names
 
   def _validate(self, value):
-    super()._validate(value['value'])
+    if 'pixel_value' in value:
+      result_pixel_value = super()._validate(value['pixel_value'])
+      if result_pixel_value is not None:
+        return result_pixel_value
+
+    if 'percent_value' in value:
+      result_percent_value = super()._validate(value['percent_value'])
+      if result_percent_value is not None:
+        return result_percent_value
+
+    if 'other_value' in value:
+      result_other_value = super()._validate(value['other_value'])
+      if result_other_value is not None:
+        return result_other_value
 
   def _raw_to_value(self, raw_value):
     if not isinstance(raw_value, dict):

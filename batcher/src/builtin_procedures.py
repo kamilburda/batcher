@@ -708,7 +708,12 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'type': 'dimension',
       'name': 'new_width',
       'default_value': {
-        'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_image'},
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+      },
       'min_value': 0.0,
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
@@ -718,7 +723,12 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'type': 'dimension',
       'name': 'new_height',
       'default_value': {
-        'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_image'},
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+      },
       'min_value': 0.0,
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
@@ -771,10 +781,10 @@ _SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 _SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = ScaleObjects.LAYER
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][3]['default_value'] = {
-  'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_layer'}
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value'] = {
-  'value': 100.0, 'unit': Gimp.Unit.percent(), 'percent_object': 'current_layer'}
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][3]['default_value']['percent_object'] = (
+  'current_layer')
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value']['percent_object'] = (
+  'current_layer')
 
 
 _BUILTIN_PROCEDURES_LIST = [

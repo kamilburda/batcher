@@ -20,10 +20,13 @@ class DimensionBox(Gtk.Box):
 
   def __init__(
         self,
-        default_value,
+        default_pixel_value,
+        default_percent_value,
+        default_other_value,
         min_value,
         max_value,
         default_unit,
+        pixel_unit,
         percent_unit,
         percent_placeholder_names,
         percent_placeholder_labels,
@@ -31,16 +34,58 @@ class DimensionBox(Gtk.Box):
   ):
     super().__init__()
 
-    self._default_value = default_value
+    self._default_pixel_value = default_pixel_value
+    self._default_percent_value = default_percent_value
+    self._default_other_value = default_other_value
     self._min_value = min_value
     self._max_value = max_value
     self._default_unit = default_unit
+    self._pixel_unit = pixel_unit
     self._percent_unit = percent_unit
     self._percent_placeholder_names = percent_placeholder_names
     self._percent_placeholder_labels = percent_placeholder_labels
     self._widget_spacing = widget_spacing
 
+    self._current_pixel_value = self._default_pixel_value
+    self._current_percent_value = self._default_percent_value
+    self._current_other_value = self._default_other_value
+
+    self._previous_other_unit = None
+
     self._init_gui()
+
+  def get_value(self):
+    return {
+      'pixel_value': self._current_pixel_value,
+      'percent_value': self._current_percent_value,
+      'other_value': self._current_other_value,
+      'unit': self._unit_combo_box.get_active(),
+      'percent_object': self._percent_object_combo_box.get_active_id(),
+    }
+
+  def set_value(self, data):
+    if data.get('unit') is not None:
+      with GObject.signal_handler_block(
+            self._unit_combo_box, self._on_unit_combo_box_changed_handler_id):
+        self._unit_combo_box.set_active(data['unit'])
+
+    if 'pixel_value' in data:
+      self._current_pixel_value = data['pixel_value']
+
+    if 'percent_value' in data:
+      self._current_percent_value = data['percent_value']
+
+    if 'other_value' in data:
+      self._current_other_value = data['other_value']
+
+    self._set_spin_button_value(recalculate_other_value=False)
+
+    self._previous_other_unit = self._unit_combo_box.get_active()
+
+    if data.get('percent_object') is not None:
+      with GObject.signal_handler_block(
+            self._percent_object_combo_box, self._on_percent_object_combo_box_changed_handler_id):
+        self._percent_object_combo_box.set_active_id(data['percent_object'])
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -48,7 +93,7 @@ class DimensionBox(Gtk.Box):
 
     self._spin_button = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
-        value=self._default_value,
+        value=self._default_pixel_value,
         lower=self._min_value if self._min_value is not None else -GLib.MAXDOUBLE,
         upper=self._max_value if self._max_value is not None else GLib.MAXDOUBLE,
         step_increment=1,
@@ -100,19 +145,36 @@ class DimensionBox(Gtk.Box):
     if len(self._percent_object_model) > 0:
       self._percent_object_combo_box.set_active(0)
 
-    self._spin_button.connect('value-changed', self._on_spin_button_changed)
-    self._unit_combo_box.connect('changed', self._on_unit_combo_box_changed)
-    self._percent_object_combo_box.connect('changed', self._on_percent_object_combo_box_changed)
+    self._on_spin_button_changed_handler_id = self._spin_button.connect(
+      'value-changed', self._on_spin_button_changed)
+    self._on_unit_combo_box_changed_handler_id = self._unit_combo_box.connect(
+      'changed', self._on_unit_combo_box_changed)
+    self._on_percent_object_combo_box_changed_handler_id = self._percent_object_combo_box.connect(
+      'changed', self._on_percent_object_combo_box_changed)
 
     self.pack_start(self._spin_button, False, False, 0)
     self.pack_start(self._unit_combo_box, False, False, 0)
     self.pack_start(self._percent_object_box, False, False, 0)
 
   def _on_spin_button_changed(self, _spin_button):
+    active_unit = self._unit_combo_box.get_active()
+    value = self._spin_button.get_value()
+
+    if active_unit == self._percent_unit:
+      self._current_percent_value = value
+    elif active_unit == self._pixel_unit:
+      self._current_pixel_value = value
+    else:
+      self._current_other_value = value
+
     self.emit('value-changed')
 
   def _on_unit_combo_box_changed(self, _combo_box):
     self._show_hide_percent_object_box()
+
+    self._set_spin_button_value()
+
+    self._previous_other_unit = self._unit_combo_box.get_active()
 
     self.emit('value-changed')
 
@@ -125,19 +187,33 @@ class DimensionBox(Gtk.Box):
     else:
       self._percent_object_box.hide()
 
-  def get_value(self):
-    return {
-      'value': self._spin_button.get_value(),
-      'unit': self._unit_combo_box.get_active(),
-      'percent_object': self._percent_object_combo_box.get_active_id(),
-    }
+  def _set_spin_button_value(self, recalculate_other_value=True):
+    with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
+      active_unit = self._unit_combo_box.get_active()
 
-  def set_value(self, data):
-    if 'value' in data:
-      self._spin_button.set_value(data['value'])
+      if active_unit == self._percent_unit:
+        self._spin_button.set_value(self._current_percent_value)
+      elif active_unit == self._pixel_unit:
+        self._spin_button.set_value(self._current_pixel_value)
+      else:
+        if self._previous_other_unit is not None and recalculate_other_value:
+          inch_value = self._other_value_to_inch(
+            self._current_other_value, self._previous_other_unit)
+          self._current_other_value = self._inch_to_other_value(inch_value, active_unit)
 
-    if data.get('unit') is not None:
-      self._unit_combo_box.set_active(data['unit'])
+          self._spin_button.set_value(self._current_other_value)
+        else:
+          self._spin_button.set_value(self._current_other_value)
 
-    if data.get('percent_object') is not None:
-      self._percent_object_combo_box.set_active_id(data['percent_object'])
+  @staticmethod
+  def _other_value_to_inch(other_value, unit):
+    factor = unit.get_factor()
+
+    if factor != 0.0:
+      return other_value / factor
+    else:
+      return other_value
+
+  @staticmethod
+  def _inch_to_other_value(inch_value, unit):
+    return inch_value * unit.get_factor()
