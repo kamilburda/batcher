@@ -202,9 +202,11 @@ def _set_setting_attribute_value(group_list, setting_name, attrib_name, new_attr
 
 
 def _remove_setting(group_list, setting_name):
-  _setting_dict, index = _get_child_setting(group_list, setting_name)
+  setting_dict, index = _get_child_setting(group_list, setting_name)
   if index is not None:
     del group_list[index]
+
+  return setting_dict, index
 
 
 def _update_to_0_3(data, settings, procedure_groups):
@@ -1332,6 +1334,84 @@ def _update_filepath_or_dirpath_setting(setting_dict):
     setting_dict['none_ok'] = setting_dict.pop('nullable')
 
 
+def _update_to_1_1(data, _settings, _procedure_groups):
+  main_settings_list, _index = _get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+
+    if procedures_list is not None:
+      for procedure_dict in procedures_list:
+        procedure_list = procedure_dict['settings']
+
+        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+
+        if (orig_name_setting_dict['default_value'].startswith('scale_for_')
+            and arguments_list is not None):
+          width_unit_setting_dict, _index = _remove_setting(arguments_list, 'width_unit')
+          width_setting_dict, _index = _get_child_setting(arguments_list, 'new_width')
+          width_setting_dict['type'] = 'dimension'
+          width_setting_dict['value'], width_setting_dict['default_value'] = _get_dimension(
+            width_setting_dict['value'],
+            width_unit_setting_dict['value'],
+            'width',
+            orig_name_setting_dict['value'],
+          )
+          width_setting_dict['percent_placeholder_names'] = [
+            'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+          width_setting_dict['min_value'] = 0.0
+
+          height_unit_setting_dict, _index = _remove_setting(arguments_list, 'height_unit')
+          height_setting_dict, _index = _get_child_setting(arguments_list, 'new_height')
+          height_setting_dict['type'] = 'dimension'
+          height_setting_dict['value'], height_setting_dict['default_value'] = _get_dimension(
+            height_setting_dict['value'],
+            height_unit_setting_dict['value'],
+            'height',
+            orig_name_setting_dict['value'],
+          )
+          height_setting_dict['percent_placeholder_names'] = [
+            'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+          height_setting_dict['min_value'] = 0.0
+
+
+def _get_dimension(orig_value, orig_unit, orig_dimension, action_orig_name):
+  dimension_default_value = {
+    'pixel_value': 100.0,
+    'percent_value': 100.0,
+    'other_value': 1.0,
+    'unit': 'percent',
+    'percent_object': 'current_image',
+  }
+
+  if action_orig_name == 'scale_for_images':
+    dimension_default_value['percent_object'] = 'current_image'
+  elif action_orig_name == 'scale_for_layers':
+    dimension_default_value['percent_object'] = 'current_layer'
+
+  dimension_value = dict(dimension_default_value)
+
+  if orig_unit == 'pixels':
+    dimension_value['unit'] = 'pixel'
+    dimension_value['pixel_value'] = orig_value
+  elif orig_unit.startswith('percentage_of_'):
+    dimension_value['unit'] = 'percent'
+
+    if orig_unit.startswith('percentage_of_image_'):
+      dimension_value['percent_object'] = 'current_image'
+    elif orig_unit.startswith('percentage_of_layer_'):
+      dimension_value['percent_object'] = 'current_layer'
+
+    if orig_unit.endswith('_width') and orig_dimension == 'width':
+      dimension_value['percent_value'] = orig_value
+
+    if orig_unit.endswith('_height') and orig_dimension == 'height':
+      dimension_value['percent_value'] = orig_value
+
+  return dimension_value, dimension_default_value
+
+
 _UPDATE_HANDLERS = {
   '0.3': _update_to_0_3,
   '0.4': _update_to_0_4,
@@ -1341,4 +1421,5 @@ _UPDATE_HANDLERS = {
   '0.8': _update_to_0_8,
   '1.0-RC1': _update_to_1_0_rc1,
   '1.0-RC2': _update_to_1_0_rc2,
+  '1.1': _update_to_1_1,
 }
