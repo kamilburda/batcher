@@ -561,12 +561,12 @@ def _update_to_0_5(data, _settings, procedure_groups):
             'default_value': 'ask',
             'value': 6,
             'items': [
-              ('ask', _('Ask'), 6),
-              ('replace', _('Replace'), 0),
-              ('skip', _('Skip'), 1),
-              ('rename_new', _('Rename new file'), 2),
-              ('rename_existing', _('Rename existing file'), 3)],
-            'display_name': _('If a file already exists:'),
+              ('ask', 'Ask', 6),
+              ('replace', 'Replace', 0),
+              ('skip', 'Skip', 1),
+              ('rename_new', 'Rename new file', 2),
+              ('rename_existing', 'Rename existing file', 3)],
+            'display_name': 'If a file already exists:',
           })
 
         arguments_list.insert(
@@ -581,7 +581,7 @@ def _update_to_0_5(data, _settings, procedure_groups):
             'import_or_export': 'export',
             'initial_file_format': 'png',
             'gui_type': 'file_format_options',
-            'display_name': _('File format options')
+            'display_name': 'File format options'
           })
 
         arguments_list.insert(
@@ -592,10 +592,10 @@ def _update_to_0_5(data, _settings, procedure_groups):
             'default_value': 'use_explicit_values',
             'value': 1,
             'items': [
-              ('use_native_plugin_values', _('Interactively'), 0),
-              ('use_explicit_values', _('Use options below'), 1)],
-            'display_name': _('How to adjust file format options:'),
-            'description': _(
+              ('use_native_plugin_values', 'Interactively', 0),
+              ('use_explicit_values', 'Use options below', 1)],
+            'display_name': 'How to adjust file format options:',
+            'description': (
               'Native dialogs usually allow you to adjust more options such as image metadata,'
               ' while adjusting options in place is more convenient as no extra dialog is displayed'
               ' before the export.'),
@@ -911,7 +911,7 @@ def _update_to_0_7(data, _settings, procedure_groups):
               'type': 'bool',
               'name': 'scale_to_fit',
               'default_value': False,
-              'display_name': _('Scale to fit'),
+              'display_name': 'Scale to fit',
               'gui_type': 'check_button',
               'value': False,
             },
@@ -919,7 +919,7 @@ def _update_to_0_7(data, _settings, procedure_groups):
               'type': 'bool',
               'name': 'keep_aspect_ratio',
               'default_value': False,
-              'display_name': _('Keep aspect ratio'),
+              'display_name': 'Keep aspect ratio',
               'gui_type': 'check_button',
               'value': False,
             },
@@ -928,10 +928,10 @@ def _update_to_0_7(data, _settings, procedure_groups):
               'default_value': builtin_procedures.Dimensions.WIDTH,
               'name': 'dimension_to_keep',
               'items': [
-                (builtin_procedures.Dimensions.WIDTH, _('Width')),
-                (builtin_procedures.Dimensions.HEIGHT, _('Height')),
+                (builtin_procedures.Dimensions.WIDTH, 'Width'),
+                (builtin_procedures.Dimensions.HEIGHT, 'Height'),
               ],
-              'display_name': _('Dimension to keep'),
+              'display_name': 'Dimension to keep',
               'value': builtin_procedures.Dimensions.WIDTH,
             },
           ])
@@ -1150,29 +1150,29 @@ def _update_to_1_0_rc1(data, _settings, procedure_groups):
             {
               'type': 'choice',
               'name': 'object_to_scale',
-              'default_value': builtin_procedures.ScaleObjects.LAYER,
-              'value': builtin_procedures.ScaleObjects.LAYER,
+              'default_value': 'layer',
+              'value': 'layer',
               'items': [
-                (builtin_procedures.ScaleObjects.IMAGE, _('Image')),
-                (builtin_procedures.ScaleObjects.LAYER, _('Layer')),
+                ('image', 'Image'),
+                ('layer', 'Layer'),
               ],
-              'display_name': _('Object to scale'),
+              'display_name': 'Object to scale',
             })
 
           arguments_list[4]['items'] = [
-            (builtin_procedures.Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-            (builtin_procedures.Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-            (builtin_procedures.Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
-            (builtin_procedures.Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-            (builtin_procedures.Units.PIXELS, _('Pixels')),
+            (builtin_procedures.Units.PERCENT_IMAGE_WIDTH, '% of image width'),
+            (builtin_procedures.Units.PERCENT_IMAGE_HEIGHT, '% of image height'),
+            (builtin_procedures.Units.PERCENT_LAYER_WIDTH, '% of layer width'),
+            (builtin_procedures.Units.PERCENT_LAYER_HEIGHT, '% of layer height'),
+            (builtin_procedures.Units.PIXELS, 'Pixels'),
           ]
 
           arguments_list[6]['items'] = [
-            (builtin_procedures.Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-            (builtin_procedures.Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-            (builtin_procedures.Units.PERCENT_LAYER_WIDTH, _('% of layer width')),
-            (builtin_procedures.Units.PERCENT_LAYER_HEIGHT, _('% of layer height')),
-            (builtin_procedures.Units.PIXELS, _('Pixels')),
+            (builtin_procedures.Units.PERCENT_IMAGE_WIDTH, '% of image width'),
+            (builtin_procedures.Units.PERCENT_IMAGE_HEIGHT, '% of image height'),
+            (builtin_procedures.Units.PERCENT_LAYER_WIDTH, '% of layer width'),
+            (builtin_procedures.Units.PERCENT_LAYER_HEIGHT, '% of layer height'),
+            (builtin_procedures.Units.PIXELS, 'Pixels'),
           ]
 
         if (orig_name_setting_dict['default_value'] == 'use_layer_size'
@@ -1187,7 +1187,7 @@ def _update_to_1_0_rc1(data, _settings, procedure_groups):
               'default_value': 'current_layer_for_array',
               'value': 'current_layer_for_array',
               'element_type': 'layer',
-              'display_name': _('Layers'),
+              'display_name': 'Layers',
             },
           )
 
