@@ -1347,33 +1347,66 @@ def _update_to_1_1(data, _settings, _procedure_groups):
         orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
-        if (orig_name_setting_dict['default_value'].startswith('scale_for_')
+        if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
-          width_unit_setting_dict, _index = _remove_setting(arguments_list, 'width_unit')
-          width_setting_dict, _index = _get_child_setting(arguments_list, 'new_width')
-          width_setting_dict['type'] = 'dimension'
-          width_setting_dict['value'], width_setting_dict['default_value'] = _get_dimension(
-            width_setting_dict['value'],
-            width_unit_setting_dict['value'],
-            'width',
-            orig_name_setting_dict['value'],
+          _scale_1_1_merge_image_layer_object_to_scale(
+            arguments_list,
+            orig_name_setting_dict,
           )
-          width_setting_dict['percent_placeholder_names'] = [
-            'current_image', 'current_layer', 'background_layer', 'foreground_layer']
-          width_setting_dict['min_value'] = 0.0
+          _scale_1_1_merge_dimensions_and_units(
+            arguments_list,
+            orig_name_setting_dict,
+          )
 
-          height_unit_setting_dict, _index = _remove_setting(arguments_list, 'height_unit')
-          height_setting_dict, _index = _get_child_setting(arguments_list, 'new_height')
-          height_setting_dict['type'] = 'dimension'
-          height_setting_dict['value'], height_setting_dict['default_value'] = _get_dimension(
-            height_setting_dict['value'],
-            height_unit_setting_dict['value'],
-            'height',
-            orig_name_setting_dict['value'],
-          )
-          height_setting_dict['percent_placeholder_names'] = [
-            'current_image', 'current_layer', 'background_layer', 'foreground_layer']
-          height_setting_dict['min_value'] = 0.0
+
+def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
+  _remove_setting(arguments_list, 'image')
+  _remove_setting(arguments_list, 'layer')
+  _remove_setting(arguments_list, 'object_to_scale')
+
+  object_to_scale_default_value = 'current_image'
+  if orig_name_setting_dict['value'] == 'scale_for_layers':
+    object_to_scale_default_value = 'current_layer'
+
+  arguments_list.insert(
+    0,
+    {
+      'type': 'placeholder_image_or_layer',
+      'name': 'object_to_scale',
+      'default_value': object_to_scale_default_value,
+      'value': object_to_scale_default_value,
+      'display_name': 'Apply to (image or layer):',
+    })
+
+
+def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict):
+  width_unit_setting_dict, _index = _remove_setting(arguments_list, 'width_unit')
+  width_setting_dict, _index = _get_child_setting(arguments_list, 'new_width')
+  width_setting_dict['type'] = 'dimension'
+  width_setting_dict['value'], width_setting_dict[
+    'default_value'] = _get_dimension(
+    width_setting_dict['value'],
+    width_unit_setting_dict['value'],
+    'width',
+    orig_name_setting_dict['value'],
+  )
+  width_setting_dict['percent_placeholder_names'] = [
+    'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+  width_setting_dict['min_value'] = 0.0
+
+  height_unit_setting_dict, _index = _remove_setting(arguments_list, 'height_unit')
+  height_setting_dict, _index = _get_child_setting(arguments_list, 'new_height')
+  height_setting_dict['type'] = 'dimension'
+  height_setting_dict['value'], height_setting_dict[
+    'default_value'] = _get_dimension(
+    height_setting_dict['value'],
+    height_unit_setting_dict['value'],
+    'height',
+    orig_name_setting_dict['value'],
+  )
+  height_setting_dict['percent_placeholder_names'] = [
+    'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+  height_setting_dict['min_value'] = 0.0
 
 
 def _get_dimension(orig_value, orig_unit, orig_dimension, action_orig_name):

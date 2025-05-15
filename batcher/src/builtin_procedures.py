@@ -319,8 +319,6 @@ def resize_to_layer_size(_batcher, layers):
 
 def scale(
       batcher,
-      image,
-      layer,
       object_to_scale,
       new_width,
       new_height,
@@ -333,12 +331,8 @@ def scale(
   new_width_pixels = _unit_to_pixels(batcher, new_width, 'width')
   new_height_pixels = _unit_to_pixels(batcher, new_height, 'height')
 
-  if object_to_scale == ScaleObjects.LAYER:
-    orig_width_pixels = layer.get_width()
-    orig_height_pixels = layer.get_height()
-  else:
-    orig_width_pixels = image.get_width()
-    orig_height_pixels = image.get_height()
+  orig_width_pixels = object_to_scale.get_width()
+  orig_height_pixels = object_to_scale.get_height()
 
   if orig_width_pixels == 0:
     orig_width_pixels = 1
@@ -364,10 +358,10 @@ def scale(
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
 
-  if object_to_scale == ScaleObjects.LAYER:
-    layer.scale(processed_width_pixels, processed_height_pixels, local_origin)
+  if isinstance(object_to_scale, Gimp.Image):
+    object_to_scale.scale(processed_width_pixels, processed_height_pixels)
   else:
-    image.scale(processed_width_pixels, processed_height_pixels)
+    object_to_scale.scale(processed_width_pixels, processed_height_pixels, local_origin)
 
   Gimp.context_pop()
 
@@ -497,16 +491,6 @@ class VerticalAlignments:
 
 class AlignReferenceObjects:
   ALIGN_REFERENCE_OBJECTS = (
-    IMAGE,
-    LAYER,
-  ) = (
-    'image',
-    'layer',
-  )
-
-
-class ScaleObjects:
-  SCALE_OBJECTS = (
     IMAGE,
     LAYER,
   ) = (
@@ -686,24 +670,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
   'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
-      'type': 'placeholder_image',
-      'name': 'image',
-      'display_name': _('Image'),
-    },
-    {
-      'type': 'placeholder_layer',
-      'name': 'layer',
-      'display_name': _('Layer'),
-    },
-    {
-      'type': 'choice',
+      'type': 'placeholder_image_or_layer',
       'name': 'object_to_scale',
-      'default_value': ScaleObjects.IMAGE,
-      'items': [
-        (ScaleObjects.IMAGE, _('Image')),
-        (ScaleObjects.LAYER, _('Layer')),
-      ],
-      'display_name': _('Object to scale'),
+      'default_value': 'current_image',
+      'display_name': _('Apply to (image or layer):'),
     },
     {
       'type': 'dimension',
@@ -781,10 +751,10 @@ _SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'name': 'scale_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value'] = ScaleObjects.LAYER
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][3]['default_value']['percent_object'] = (
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][0]['default_value'] = 'current_layer'
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][1]['default_value']['percent_object'] = (
   'current_layer')
-_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][4]['default_value']['percent_object'] = (
+_SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value']['percent_object'] = (
   'current_layer')
 
 

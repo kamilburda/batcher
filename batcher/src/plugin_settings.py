@@ -905,8 +905,7 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
 
 
 def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
-  local_origin_setting.gui.set_sensitive(
-    object_to_scale_setting.value == builtin_procedures.ScaleObjects.LAYER)
+  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
 
 
 def _set_sensitive_for_keep_aspect_ratio(scale_to_fit_setting, keep_aspect_ratio_setting):

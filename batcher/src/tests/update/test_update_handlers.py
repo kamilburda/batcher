@@ -377,7 +377,7 @@ class TestUpdateHandlers(unittest.TestCase):
     )
     self.assertEqual(
       settings['main/procedures/scale/arguments/object_to_scale'].value,
-      builtin_procedures.ScaleObjects.LAYER,
+      'layer',
     )
 
     self.assertIn('layers', settings['main/procedures/use_layer_size/arguments'])
@@ -391,6 +391,17 @@ class TestUpdateHandlers(unittest.TestCase):
 
   def _assert_correct_contents_for_update_to_1_1(self, settings):
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
+
+    self.assertNotIn('image', settings[scale_arguments_path])
+    self.assertNotIn('layer', settings[scale_arguments_path])
+    self.assertIsInstance(
+      settings[f'{scale_arguments_path}/object_to_scale'],
+      placeholders.PlaceholderImageOrLayerSetting,
+    )
+    self.assertEqual(
+      settings[f'{scale_arguments_path}/object_to_scale'].value,
+      'current_image',
+    )
 
     self.assertNotIn('width_unit', settings[scale_arguments_path])
     self.assertIsInstance(
