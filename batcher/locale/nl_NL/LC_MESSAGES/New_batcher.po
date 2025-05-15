@@ -1,0 +1,1748 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Kamil Burda
+# This file is distributed under the same license as the 'batcher' package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr "Project-Id-Version: 'batcher' 1.0.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-01 20:58+0100\n"
+"PO-Revision-Date: 2025-05-14 16:51+0200\n"
+"Last-Translator: Dick Groskamp <dikgro@yahoo.co.uk>\n"
+"Language-Team: none\n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 3.15.3\n"
+
+#: ../../batcher/batcher.py:67
+msgid "Batch Convert"
+msgstr "Batch converteren"
+
+#: ../../batcher/batcher.py:95
+msgid "Export Images"
+msgstr "Afbeeldingen exporteren"
+
+#: ../../batcher/batcher.py:121
+msgid "Export Images (Quick)"
+msgstr "Afbeeldingen exporteren (Snel)"
+
+#: ../../batcher/batcher.py:138
+msgid "Export Layers"
+msgstr "Lagen exporteren"
+
+#: ../../batcher/batcher.py:157
+msgid "Export Layers (Quick)"
+msgstr "Lagen exporteren (Snel)"
+
+#: ../../batcher/batcher.py:174
+msgid "Export Selected Layers"
+msgstr "Geselecteerde lagen exporteren"
+
+#: ../../batcher/batcher.py:196
+msgid "Edit Layers"
+msgstr "Lagen bewerken"
+
+#: ../../batcher/batcher.py:215
+msgid "Edit Layers (Quick)"
+msgstr "Lagen bewerken (Snel)"
+
+#: ../../batcher/batcher.py:232
+msgid "Edit Selected Layers"
+msgstr "Geselecteerde lagen bewerken"
+
+#: ../../batcher/batcher.py:376
+msgid ""
+"Settings for this plug-in could not be updated to the latest version and "
+"must be reset."
+msgstr "Instellingen voor deze plug-in zouden niet bijgewerkt kunnen zijn naar de laatste versie en moeten worden hersteld."
+
+#: ../../batcher/batcher.py:379
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text under the details."
+msgstr "Als u denkt dat dit een fout in de plug-in is, kunt u helpen die te repareren door een rapport te sturen met de tekst onder de details."
+
+#: ../../batcher/batcher.py:384
+msgid ""
+"Send a report with the text in the details above to one of the following "
+"sites"
+msgstr "Verstuur een rapport met de tekst in de details hierboven naar een van de volgende sites"
+
+#: ../../batcher/batcher.py:397
+msgid "Settings could not be loaded and had to be reset."
+msgstr "Instellingen konden niet worden geladen en moeten worden hersteld."
+
+#: ../../batcher/batcher.py:399 ../../batcher/batcher.py:418
+msgid "Details: {}"
+msgstr "Details: {}"
+
+#: ../../batcher/batcher.py:408
+msgid "\"{}\" is not a valid file with settings"
+msgstr "\"{}\" is geen geldig bestand met instellingen"
+
+#: ../../batcher/batcher.py:415
+msgid "Failed to import settings from file \"{}\"."
+msgstr "Importeren van instellingen uit bestand \"{}\" mislukt."
+
+#: ../../batcher/batcher.py:451
+msgid "_Batch Convert..."
+msgstr "_Batch converteren..."
+
+#: ../../batcher/batcher.py:456
+msgid "Batch-process image files"
+msgstr "In batch verwerken van afbeeldingsbestanden"
+
+#: ../../batcher/batcher.py:457
+msgid ""
+"This procedure performs batch conversion of image files to the specified "
+"file format, optionally applying arbitrary procedures to each item and "
+"ignoring items according to the specified constraints."
+msgstr "Deze procedure voert een batch-conversie uit van afbeeldingsbestanden naar de gespecificeerde bestandsindeling, past optioneel willekeurige procedures toe op elk item en negeert items overeenkomstig de gespecificeerde beperkingen."
+
+#: ../../batcher/batcher.py:469
+msgid "E_xport Images..."
+msgstr "Afbeeldingen e_xporteren…"
+
+#: ../../batcher/batcher.py:473
+msgid "Exports images opened in GIMP"
+msgstr "Exporteert afbeeldingen die werden geopend in GIMP"
+
+#: ../../batcher/batcher.py:482
+msgid "E_xport Images (Quick)"
+msgstr "Afbeeldingen e_xporteren (Snel)"
+
+#: ../../batcher/batcher.py:486
+msgid "Quickly export images opened in GIMP"
+msgstr "Snel afbeeldingen exporteren die werden geopend in GIMP"
+
+#: ../../batcher/batcher.py:494
+msgid "E_xport Layers..."
+msgstr "Lagen e_xporteren..."
+
+#: ../../batcher/batcher.py:501
+msgid "Export layers as separate images"
+msgstr "Lagen exporteren als afzonderlijke afbeeldingen"
+
+#: ../../batcher/batcher.py:508
+msgid "E_xport Layers (Quick)"
+msgstr "Lagen e_xporteren (Snel)"
+
+#: ../../batcher/batcher.py:515
+msgid "Quickly export layers as separate images"
+msgstr "Snel lagen exporteren als afzonderlijke afbeeldingen"
+
+#: ../../batcher/batcher.py:522
+msgid "E_xport Selected Layers"
+msgstr "Geselecteerde lagen e_xporteren"
+
+#: ../../batcher/batcher.py:528
+msgid "Quickly export selected layers as separate images"
+msgstr "Snel geselecteerde lagen exporteren als afzonderlijke afbeeldingen"
+
+#: ../../batcher/batcher.py:536
+msgid "E_dit Layers..."
+msgstr "Lagen be_werken..."
+
+#: ../../batcher/batcher.py:543
+msgid "Batch-edit layers"
+msgstr "Meerdere lagen tegelijk bewerken"
+
+#: ../../batcher/batcher.py:550
+msgid "E_dit Layers (Quick)"
+msgstr "Lagen be_werken (Snel)"
+
+#: ../../batcher/batcher.py:557
+msgid "Batch-edit layers instantly"
+msgstr "Direct meerdere lagen tegelijk bewerken"
+
+#: ../../batcher/batcher.py:564
+msgid "E_dit Selected Layers"
+msgstr "Geselecteerde lagen be_werken"
+
+#: ../../batcher/batcher.py:570
+msgid "Batch-edit selected layers instantly"
+msgstr "Direct meerdere geselecteerde lagen tegelijk bewerken"
+
+#: ../../batcher/config/config.py:16 ../../batcher/config/config_dev.py:16
+msgid "Batcher"
+msgstr "Batcher"
+
+#: ../../batcher/src/actions.py:427
+msgid "Built-in"
+msgstr "Ingebouwd"
+
+#: ../../batcher/src/actions.py:428
+msgid "GIMP PDB procedure"
+msgstr "GIMP PDB-procedure"
+
+#: ../../batcher/src/actions.py:429
+msgid "GEGL operation"
+msgstr "GEGL-bewerking"
+
+#: ../../batcher/src/actions.py:476
+msgid "_More options"
+msgstr "_Meer opties"
+
+#: ../../batcher/src/actions.py:486
+msgid "Enable for previews"
+msgstr "Inschakelen voor voorbeelden"
+
+#: ../../batcher/src/actions.py:549
+msgid "Also apply to parent folders"
+msgstr "Ook van toepassing op ouder-mappen"
+
+#: ../../batcher/src/background_foreground.py:177
+msgid "There are no background layers."
+msgstr "Er zijn geen achtergrondlagen."
+
+#: ../../batcher/src/background_foreground.py:186
+msgid "There are no foreground layers."
+msgstr "Er zijn geen voorgrondlagen."
+
+#: ../../batcher/src/builtin_constraints.py:146
+#: ../../batcher/src/builtin_procedures.py:1230
+#: ../../batcher/src/update.py:1188
+msgid "Layers"
+msgstr "Lagen"
+
+#: ../../batcher/src/builtin_constraints.py:153
+msgid "Group layers"
+msgstr "Lagen groeperen"
+
+#: ../../batcher/src/builtin_constraints.py:160
+msgid "Imported"
+msgstr "Geïmporteerd"
+
+#: ../../batcher/src/builtin_constraints.py:167
+msgid "Not imported"
+msgstr "Niet geïmporteerd"
+
+#. FOR TRANSLATORS: Think of "Only items that are not background" when translating this
+#: ../../batcher/src/builtin_constraints.py:175
+msgid "Not background"
+msgstr "Geen achtergrond"
+
+#. FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
+#: ../../batcher/src/builtin_constraints.py:200
+msgid "Not foreground"
+msgstr "Geen voorgrond"
+
+#. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
+#: ../../batcher/src/builtin_constraints.py:225
+msgid "Matching file extension"
+msgstr "Overeenkomende bestandsextensie"
+
+#. FOR TRANSLATORS: Think of "Only items matching text" when translating this
+#: ../../batcher/src/builtin_constraints.py:233
+msgid "Matching text..."
+msgstr "Overeenkomende tekst…"
+
+#: ../../batcher/src/builtin_constraints.py:242
+msgid "Starts with text"
+msgstr "Begint met tekst"
+
+#: ../../batcher/src/builtin_constraints.py:243
+msgid "Contains text"
+msgstr "Bevat tekst"
+
+#: ../../batcher/src/builtin_constraints.py:244
+msgid "Ends with text"
+msgstr "Eindigt met tekst"
+
+#: ../../batcher/src/builtin_constraints.py:245
+msgid "Matches regular expression"
+msgstr "Komt overeen met reguliere expressie"
+
+#: ../../batcher/src/builtin_constraints.py:247
+msgid "How to perform matching"
+msgstr "Hoe overeenkomen uit te voeren"
+
+#: ../../batcher/src/builtin_constraints.py:253
+msgid "Text to match"
+msgstr "Overeen te komen tekst"
+
+#: ../../batcher/src/builtin_constraints.py:259
+msgid "Ignore case sensitivity"
+msgstr "Hoofdlettergevoeligheid negeren"
+
+#. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
+#: ../../batcher/src/builtin_constraints.py:268
+msgid "Recognized file format"
+msgstr "Herkende bestandsindeling"
+
+#: ../../batcher/src/builtin_constraints.py:275
+msgid "Saved or exported"
+msgstr "Opgeslagen of geëxporteerd"
+
+#: ../../batcher/src/builtin_constraints.py:282
+msgid "Not saved or exported"
+msgstr "Niet opgeslagen of geëxporteerd"
+
+#. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
+#: ../../batcher/src/builtin_constraints.py:290
+msgid "Selected in GIMP"
+msgstr "Geselecteerd in GIMP"
+
+#. FOR TRANSLATORS: Think of "Only top-level items" when translating this
+#: ../../batcher/src/builtin_constraints.py:298
+msgid "Top-level"
+msgstr "Bovenste niveau"
+
+#. FOR TRANSLATORS: Think of "Only visible items" when translating this
+#: ../../batcher/src/builtin_constraints.py:306
+msgid "Visible"
+msgstr "Zichtbaar"
+
+#. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
+#: ../../batcher/src/builtin_constraints.py:314
+msgid "With color tags"
+msgstr "Met kleurtags"
+
+#: ../../batcher/src/builtin_constraints.py:320
+#: ../../batcher/src/builtin_constraints.py:340
+msgid "Color tags"
+msgstr "Kleurtags"
+
+#. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
+#: ../../batcher/src/builtin_constraints.py:334
+msgid "Without color tags"
+msgstr "Zonder kleurtags"
+
+#. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
+#: ../../batcher/src/builtin_constraints.py:354
+msgid "With unsaved changes"
+msgstr "Met niet opgeslagen wijzigingen"
+
+#. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
+#: ../../batcher/src/builtin_constraints.py:362
+msgid "With no unsaved changes"
+msgstr "Zonder niet opgeslagen wijzigingen"
+
+#: ../../batcher/src/builtin_procedures.py:493 ../../batcher/src/renamer.py:783
+#: ../../batcher/src/renamer.py:800 ../../batcher/src/update.py:563
+msgid "Replace"
+msgstr "Vervangen"
+
+#: ../../batcher/src/builtin_procedures.py:494 ../../batcher/src/update.py:564
+msgid "Skip"
+msgstr "Overslaan"
+
+#: ../../batcher/src/builtin_procedures.py:495 ../../batcher/src/update.py:565
+msgid "Rename new file"
+msgstr "Nieuwe bestand hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:496 ../../batcher/src/update.py:566
+msgid "Rename existing file"
+msgstr "Bestaand bestand hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:503 ../../batcher/src/update.py:562
+msgid "Ask"
+msgstr "Vragen"
+
+#: ../../batcher/src/builtin_procedures.py:511
+msgid "Also export as..."
+msgstr "Ook exporteren als…"
+
+#: ../../batcher/src/builtin_procedures.py:512
+msgid "Exports an image to another file format."
+msgstr "Exporteert een afbeelding naar een andere bestandsindeling."
+
+#: ../../batcher/src/builtin_procedures.py:521
+#: ../../batcher/src/plugin_settings.py:78
+#: ../../batcher/src/plugin_settings.py:225
+#: ../../batcher/src/plugin_settings.py:364 ../../batcher/src/renamer.py:707
+msgid "Output folder"
+msgstr "Map voor uitvoer"
+
+#: ../../batcher/src/builtin_procedures.py:527
+#: ../../batcher/src/plugin_settings.py:68
+#: ../../batcher/src/plugin_settings.py:215
+#: ../../batcher/src/plugin_settings.py:354
+msgid "File extension"
+msgstr "Bestandsextensie"
+
+#: ../../batcher/src/builtin_procedures.py:537 ../../batcher/src/update.py:593
+msgid "Interactively"
+msgstr "Interactief"
+
+#: ../../batcher/src/builtin_procedures.py:538 ../../batcher/src/update.py:594
+msgid "Use options below"
+msgstr "Opties hieronder gebruiken"
+
+#: ../../batcher/src/builtin_procedures.py:540 ../../batcher/src/update.py:595
+msgid "How to adjust file format options:"
+msgstr "Hoe de opties voor bestandsindeling aan te passen:"
+
+#: ../../batcher/src/builtin_procedures.py:542 ../../batcher/src/update.py:597
+msgid ""
+"Native dialogs usually allow you to adjust more options such as image "
+"metadata, while adjusting options in place is more convenient as no extra "
+"dialog is displayed before the export."
+msgstr "Eigen dialoogvensters stellen u gewoonlijk in staat om meer opties aan te passen, zoals metadata voor een afbeelding, terwijl het aanpassen van opties op een plaats handiger is, omdat geen extra dialoogvenster hoeft te worden weergegeven voor het exporteren."
+
+#: ../../batcher/src/builtin_procedures.py:553 ../../batcher/src/update.py:582
+msgid "File format options"
+msgstr "Opties bestandsindeling"
+
+#: ../../batcher/src/builtin_procedures.py:560 ../../batcher/src/update.py:567
+msgid "If a file already exists:"
+msgstr "Als een bestand al bestaat:"
+
+#: ../../batcher/src/builtin_procedures.py:567
+msgid "For each image"
+msgstr "Voor elke afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:569
+msgid "For each top-level image or folder"
+msgstr "Voor elke afbeelding of map op het bovenste niveau"
+
+#: ../../batcher/src/builtin_procedures.py:570
+#: ../../batcher/src/builtin_procedures.py:628
+#: ../../batcher/src/builtin_procedures.py:647
+msgid "As a single image"
+msgstr "Als een enkele afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:572
+msgid "Perform export:"
+msgstr "Exporteren uitvoeren:"
+
+#: ../../batcher/src/builtin_procedures.py:577
+#: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:292
+msgid "Untitled"
+msgstr "Naamloos"
+
+#: ../../batcher/src/builtin_procedures.py:578
+#: ../../batcher/src/builtin_procedures.py:1114
+#: ../../batcher/src/builtin_procedures.py:1144
+#: ../../batcher/src/plugin_settings.py:84
+#: ../../batcher/src/plugin_settings.py:231
+msgid "Image filename pattern"
+msgstr "Patroon bestandsnaam afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:585
+msgid "Use original file extension"
+msgstr "Originele bestandsextensie gebruiken"
+
+#: ../../batcher/src/builtin_procedures.py:592
+msgid "Convert file extension to lowercase"
+msgstr "Bestandsextensie naar kleine letters converteren"
+
+#: ../../batcher/src/builtin_procedures.py:599
+msgid "Use original modification date"
+msgstr "Originele datum van aanpassen gebruiken"
+
+#: ../../batcher/src/builtin_procedures.py:622
+msgid "Exports a layer to another file format."
+msgstr "Exporteert een laag naar een andere bestandsindeling."
+
+#: ../../batcher/src/builtin_procedures.py:626
+#: ../../batcher/src/builtin_procedures.py:645
+msgid "For each layer"
+msgstr "Voor elke laag"
+
+#: ../../batcher/src/builtin_procedures.py:627
+#: ../../batcher/src/builtin_procedures.py:646
+msgid "For each top-level layer or group"
+msgstr "Voor elke laag of groep op het bovenste niveau"
+
+#: ../../batcher/src/builtin_procedures.py:632
+#: ../../batcher/src/builtin_procedures.py:651
+msgid "Use file extension in layer name"
+msgstr "Bestandsextensie in naam laag gebruiken"
+
+#: ../../batcher/src/builtin_procedures.py:640
+msgid "Export"
+msgstr "Exporteren"
+
+#: ../../batcher/src/builtin_procedures.py:641
+msgid "Exports a layer to the specified file format."
+msgstr "Exporteert een laag naar de gespecificeerde bestandsindeling."
+
+#: ../../batcher/src/builtin_procedures.py:658
+msgid "Scale"
+msgstr "Schaal"
+
+#: ../../batcher/src/builtin_procedures.py:665
+#: ../../batcher/src/builtin_procedures.py:677
+#: ../../batcher/src/builtin_procedures.py:801
+#: ../../batcher/src/builtin_procedures.py:888
+#: ../../batcher/src/builtin_procedures.py:949 ../../batcher/src/update.py:1154
+msgid "Image"
+msgstr "Afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:670
+#: ../../batcher/src/builtin_procedures.py:678
+#: ../../batcher/src/builtin_procedures.py:1058
+#: ../../batcher/src/update.py:1155
+msgid "Layer"
+msgstr "Laag"
+
+#: ../../batcher/src/builtin_procedures.py:680 ../../batcher/src/update.py:1157
+msgid "Object to scale"
+msgstr "Te schalen object"
+
+#: ../../batcher/src/builtin_procedures.py:686
+msgid "New width"
+msgstr "Nieuwe breedte"
+
+#: ../../batcher/src/builtin_procedures.py:693
+#: ../../batcher/src/builtin_procedures.py:712
+#: ../../batcher/src/builtin_procedures.py:846
+#: ../../batcher/src/builtin_procedures.py:865 ../../batcher/src/update.py:1161
+#: ../../batcher/src/update.py:1169
+#, python-format
+msgid "% of image width"
+msgstr "% van breedte afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:694
+#: ../../batcher/src/builtin_procedures.py:713
+#: ../../batcher/src/builtin_procedures.py:847
+#: ../../batcher/src/builtin_procedures.py:866 ../../batcher/src/update.py:1162
+#: ../../batcher/src/update.py:1170
+#, python-format
+msgid "% of image height"
+msgstr "% van hoogte afbeelding"
+
+#: ../../batcher/src/builtin_procedures.py:695
+#: ../../batcher/src/builtin_procedures.py:714 ../../batcher/src/update.py:1163
+#: ../../batcher/src/update.py:1171
+#, python-format
+msgid "% of layer width"
+msgstr "% van breedte laag"
+
+#: ../../batcher/src/builtin_procedures.py:696
+#: ../../batcher/src/builtin_procedures.py:715 ../../batcher/src/update.py:1164
+#: ../../batcher/src/update.py:1172
+#, python-format
+msgid "% of layer height"
+msgstr "% van hoogte laag"
+
+#: ../../batcher/src/builtin_procedures.py:697
+#: ../../batcher/src/builtin_procedures.py:716
+#: ../../batcher/src/builtin_procedures.py:850
+#: ../../batcher/src/builtin_procedures.py:869 ../../batcher/src/update.py:1165
+#: ../../batcher/src/update.py:1173
+msgid "Pixels"
+msgstr "Pixels"
+
+#: ../../batcher/src/builtin_procedures.py:699
+msgid "Unit for width"
+msgstr "Eenheid voor breedte"
+
+#: ../../batcher/src/builtin_procedures.py:705
+msgid "New height"
+msgstr "Nieuwe hoogte"
+
+#: ../../batcher/src/builtin_procedures.py:718
+msgid "Unit for height"
+msgstr "Eenheid voor hoogte"
+
+#: ../../batcher/src/builtin_procedures.py:724
+msgid "Interpolation"
+msgstr "Interpolatie"
+
+#: ../../batcher/src/builtin_procedures.py:730
+msgid "Use local origin"
+msgstr "Lokaal origine gebruiken"
+
+#: ../../batcher/src/builtin_procedures.py:737 ../../batcher/src/update.py:912
+msgid "Scale to fit"
+msgstr "Passend maken"
+
+#: ../../batcher/src/builtin_procedures.py:744 ../../batcher/src/update.py:920
+msgid "Keep aspect ratio"
+msgstr "Verhoudingen behouden"
+
+#: ../../batcher/src/builtin_procedures.py:752 ../../batcher/src/update.py:929
+msgid "Width"
+msgstr "Breedte"
+
+#: ../../batcher/src/builtin_procedures.py:753 ../../batcher/src/update.py:930
+msgid "Height"
+msgstr "Hoogte"
+
+#: ../../batcher/src/builtin_procedures.py:755 ../../batcher/src/update.py:932
+msgid "Dimension to keep"
+msgstr "Te behouden dimensie"
+
+#: ../../batcher/src/builtin_procedures.py:775
+msgid "Apply opacity from group layers"
+msgstr "Dekking van laaggroep toepassen"
+
+#: ../../batcher/src/builtin_procedures.py:776
+msgid "Combines opacity from all parent group layers and the current layer."
+msgstr "Combineert dekking van alle ouder-laaggroepen en de huidige laag."
+
+#: ../../batcher/src/builtin_procedures.py:782
+msgid "Align and offset"
+msgstr "Uitlijnen en verschuiving"
+
+#: ../../batcher/src/builtin_procedures.py:784
+msgid ""
+"Aligns layer(s) with the image or, if specified, another layer.\n"
+"\n"
+"You may specify additional offsets after the alignment is applied."
+msgstr "La(a)g(en) uitlijnen met de afbeelding of, indien gespecificeerd, een andere laag.\n"
+"\n"
+"U kunt aanvullende verschuivingen specificeren nadat het uitlijnen is toegepast."
+
+#: ../../batcher/src/builtin_procedures.py:794
+msgid "Layers to align"
+msgstr "Uit te lijnen lagen"
+
+#: ../../batcher/src/builtin_procedures.py:802
+msgid "Another layer"
+msgstr "Een andere laag"
+
+#: ../../batcher/src/builtin_procedures.py:804
+msgid "Object to align layers with"
+msgstr "Object waaraan lagen moeten worden uitgelijnd"
+
+#: ../../batcher/src/builtin_procedures.py:809
+msgid "Another layer to align layers with"
+msgstr "Een andere laag om lagen mee uit te lijnen"
+
+#: ../../batcher/src/builtin_procedures.py:816
+#: ../../batcher/src/builtin_procedures.py:828
+msgid "Keep"
+msgstr "Behouden"
+
+#: ../../batcher/src/builtin_procedures.py:817
+msgid "Left"
+msgstr "Links"
+
+#: ../../batcher/src/builtin_procedures.py:818
+#: ../../batcher/src/builtin_procedures.py:830
+msgid "Center"
+msgstr "Midden"
+
+#: ../../batcher/src/builtin_procedures.py:819
+msgid "Right"
+msgstr "Rechts"
+
+#: ../../batcher/src/builtin_procedures.py:821
+msgid "Horizontal alignment"
+msgstr "Horizontale uitlijning"
+
+#: ../../batcher/src/builtin_procedures.py:829
+msgid "Top"
+msgstr "Boven"
+
+#: ../../batcher/src/builtin_procedures.py:831
+msgid "Bottom"
+msgstr "Onder"
+
+#: ../../batcher/src/builtin_procedures.py:833
+msgid "Vertical alignment"
+msgstr "Verticale uitlijning"
+
+#: ../../batcher/src/builtin_procedures.py:839
+msgid "Additional X-offset"
+msgstr "Aanvullende verschuiving X"
+
+#: ../../batcher/src/builtin_procedures.py:848
+#: ../../batcher/src/builtin_procedures.py:867
+#, python-format
+msgid "% of another layer width"
+msgstr "% van de breedte van een andere laag"
+
+#: ../../batcher/src/builtin_procedures.py:849
+#: ../../batcher/src/builtin_procedures.py:868
+#, python-format
+msgid "% of another layer height"
+msgstr "% van de hoogte van een andere laag"
+
+#: ../../batcher/src/builtin_procedures.py:852
+msgid "Unit for the additional X-offset"
+msgstr "Eenheid voor de aanvullende verschuiving X"
+
+#: ../../batcher/src/builtin_procedures.py:858
+msgid "Additional Y-offset"
+msgstr "Aanvullende verschuiving Y"
+
+#: ../../batcher/src/builtin_procedures.py:871
+msgid "Unit for the additional Y-offset"
+msgstr "Eenheid voor de aanvullende verschuiving Y"
+
+#: ../../batcher/src/builtin_procedures.py:878
+#: ../../batcher/src/builtin_procedures.py:902
+msgid "Insert background"
+msgstr "Op achtergrond invoegen"
+
+#: ../../batcher/src/builtin_procedures.py:879
+msgid "Inserts the specified image behind the current layer."
+msgstr "Voegt de gespecificeerde afbeelding achter de huidige laag in."
+
+#: ../../batcher/src/builtin_procedures.py:903
+msgid "Inserts layers having the specified color tag behind the current layer."
+msgstr "Voegt lagen, die de gespecificeerde kleurtag hebben, achter de huidige laag in."
+
+#: ../../batcher/src/builtin_procedures.py:912
+#: ../../batcher/src/builtin_procedures.py:974
+msgid "Color tag"
+msgstr "Kleurtag"
+
+#: ../../batcher/src/builtin_procedures.py:939
+#: ../../batcher/src/builtin_procedures.py:963
+msgid "Insert foreground"
+msgstr "Op voorgrond invoegen"
+
+#: ../../batcher/src/builtin_procedures.py:940
+msgid "Inserts the specified image in front of the current layer."
+msgstr "Voegt de gespecificeerde afbeelding voor de huidige laag in."
+
+#: ../../batcher/src/builtin_procedures.py:965
+msgid ""
+"Inserts layers having the specified color tag in front of the current layer."
+msgstr "Voegt lagen, die de gespecificeerde kleurtag hebben, voor de huidige laag in."
+
+#: ../../batcher/src/builtin_procedures.py:1005
+msgid "Merge background"
+msgstr "Achtergrond samenvoegen"
+
+#: ../../batcher/src/builtin_procedures.py:1015
+#: ../../batcher/src/builtin_procedures.py:1038
+#: ../../batcher/src/builtin_procedures.py:1078
+msgid "Merge type"
+msgstr "Type samenvoegen"
+
+#: ../../batcher/src/builtin_procedures.py:1028
+msgid "Merge foreground"
+msgstr "Voorgrond samenvoegen"
+
+#: ../../batcher/src/builtin_procedures.py:1051
+msgid "Merge filters"
+msgstr "Filters samenvoegen"
+
+#: ../../batcher/src/builtin_procedures.py:1052
+msgid "Merges all visible filters (layer effects) in the specified layer."
+msgstr "Alle zichtbare filters samenvoegen (laageffecten) in de gespecificeerde laag."
+
+#: ../../batcher/src/builtin_procedures.py:1065
+msgid "Merge visible layers"
+msgstr "Zichtbare lagen samenvoegen"
+
+#: ../../batcher/src/builtin_procedures.py:1067
+msgid ""
+"Merges all visible layers within the image into a single layer. Invisible "
+"layers are removed.\n"
+"\n"
+"This is useful if the image contains multiple layers and you want to apply "
+"filters (layer effects) or other procedures on the entire image."
+msgstr "Voegt alle zichtbare lagen in de afbeelding samen tot een enkele laag. Onzichtbare lagen worden verwijderd.\n"
+"\n"
+"Dit is nuttig als de afbeelding meerdere lagen bevat en u filters (laageffecten) wilt toepassen, of andere procedures, op de gehele afbeelding."
+
+#: ../../batcher/src/builtin_procedures.py:1085
+#: ../../batcher/src/builtin_procedures.py:1091
+msgid "Remove folder structure"
+msgstr "Mappenstructuur verwijderen"
+
+#: ../../batcher/src/builtin_procedures.py:1098
+msgid "Consider visibility of parent folders"
+msgstr "Zichtbaarheid van ouder-mappen overwegen"
+
+#: ../../batcher/src/builtin_procedures.py:1106
+#: ../../batcher/src/builtin_procedures.py:1136
+#: ../../batcher/src/builtin_procedures.py:1159
+#: ../../batcher/src/builtin_procedures.py:1189
+msgid "Rename"
+msgstr "Hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:1121
+#: ../../batcher/src/builtin_procedures.py:1151
+msgid "Rename images"
+msgstr "Afbeeldingen hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:1128
+#: ../../batcher/src/builtin_procedures.py:1181
+msgid "Rename folders"
+msgstr "Mappen hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:1167
+#: ../../batcher/src/plugin_settings.py:370
+msgid "Layer filename pattern"
+msgstr "Patroon bestandsnaam laag"
+
+#: ../../batcher/src/builtin_procedures.py:1174
+#: ../../batcher/src/builtin_procedures.py:1204
+msgid "Rename layers"
+msgstr "Lagen hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:1197
+msgid "Layer name pattern"
+msgstr "Patroon naam laag"
+
+#: ../../batcher/src/builtin_procedures.py:1211
+msgid "Rename group layers"
+msgstr "Laaggroep hernoemen"
+
+#: ../../batcher/src/builtin_procedures.py:1221
+msgid "Resize to layer size"
+msgstr "Grootte aanpassen aan grootte laag"
+
+#: ../../batcher/src/builtin_procedures.py:1222
+msgid "Resizes the image canvas to fit the specified layer(s)."
+msgstr "Wijzigt de grootte van het canvas van de afbeelding om te passen op de gespecificeerde la(a)g(en)."
+
+#: ../../batcher/src/core.py:808
+msgid ""
+"An error occurred. Please check the GIMP error message or the error console "
+"for details, if any."
+msgstr "Er trad een fout op. Controleer het foutbericht van GIMP of de foutenconsole voor de details, als die er zijn."
+
+#: ../../batcher/src/core.py:870
+msgid "Processing \"{}\""
+msgstr "Verwerken \"{}\""
+
+#: ../../batcher/src/core.py:1149
+msgid "File not found"
+msgstr "Bestand niet gevonden"
+
+#: ../../batcher/src/exceptions.py:59
+msgid "Item:"
+msgstr "Item:"
+
+#: ../../batcher/src/exceptions.py:61
+msgid "File extension:"
+msgstr "Bestandsextensie:"
+
+#: ../../batcher/src/export.py:375
+msgid "Saving \"{}\""
+msgstr "Opslaan \"{}\""
+
+#: ../../batcher/src/file_formats.py:158
+msgid "{} image"
+msgstr "{} afbeelding"
+
+#: ../../batcher/src/gui/actions/browser.py:79
+msgid "Filters, Effects"
+msgstr "Filters, effecten"
+
+#: ../../batcher/src/gui/actions/browser.py:80
+msgid "Plug-ins"
+msgstr "Plug-ins"
+
+#: ../../batcher/src/gui/actions/browser.py:81
+msgid "GIMP Procedures"
+msgstr "GIMP-procedures"
+
+#: ../../batcher/src/gui/actions/browser.py:82
+msgid "Other"
+msgstr "Anders"
+
+#: ../../batcher/src/gui/actions/browser.py:337
+msgid "Name"
+msgstr "Naam"
+
+#: ../../batcher/src/gui/actions/browser.py:353
+msgid "Menu Name"
+msgstr "Naam menu"
+
+#: ../../batcher/src/gui/actions/browser.py:382
+msgid "Search"
+msgstr "Zoeken"
+
+#: ../../batcher/src/gui/actions/browser.py:397
+msgid "by name"
+msgstr "op naam"
+
+#: ../../batcher/src/gui/actions/browser.py:401
+msgid "by menu name"
+msgstr "op naam menu"
+
+#: ../../batcher/src/gui/actions/browser.py:405
+msgid "by description"
+msgstr "op beschrijving"
+
+#: ../../batcher/src/gui/actions/browser.py:447
+msgid "Select a procedure"
+msgstr "Selecteer een procedure"
+
+#: ../../batcher/src/gui/actions/browser.py:472
+msgid "_Add"
+msgstr "_Toevoegen"
+
+#: ../../batcher/src/gui/actions/browser.py:473
+#: ../../batcher/src/gui/actions/editor.py:52
+#: ../../batcher/src/gui/main/export_settings.py:251
+#: ../../batcher/src/gui/main/main.py:165
+#: ../../batcher/src/gui/main/main.py:354 ../../batcher/src/gui/messages.py:40
+msgid "_Close"
+msgstr "_Sluiten"
+
+#: ../../batcher/src/gui/actions/editor.py:49
+#: ../../batcher/src/gui/actions/editor.py:172
+#: ../../batcher/src/gui/main/export_settings.py:246
+msgid "_Reset"
+msgstr "_Herstellen"
+
+#: ../../batcher/src/gui/actions/editor.py:169
+msgid "_Preview"
+msgstr "_Voorbeeld"
+
+#: ../../batcher/src/gui/actions/editor.py:231
+msgid "Edit Name"
+msgstr "Naam bewerken"
+
+#: ../../batcher/src/gui/actions/editor.py:288
+msgid "Show More Information"
+msgstr "Meer informatie weergeven"
+
+#: ../../batcher/src/gui/actions/item.py:139
+msgid "Edit"
+msgstr "Bewerken"
+
+#: ../../batcher/src/gui/actions/item.py:149
+msgid "Remove"
+msgstr "Verwijderen"
+
+#: ../../batcher/src/gui/file_format_options_box.py:47
+msgid "{} options"
+msgstr "{} opties"
+
+#: ../../batcher/src/gui/file_format_options_box.py:50
+msgid "File format not recognized"
+msgstr "Bestandsindeling niet herkend"
+
+#: ../../batcher/src/gui/file_format_options_box.py:58
+msgid "File format has no options"
+msgstr "Bestandsindeling heeft geen opties"
+
+#: ../../batcher/src/gui/main/action_lists.py:35
+msgid "Add P_rocedure..."
+msgstr "P_rocedure toevoegen…"
+
+#: ../../batcher/src/gui/main/action_lists.py:37
+msgid "Add Custom Procedure..."
+msgstr "Aangepaste procedure toevoegen…"
+
+#: ../../batcher/src/gui/main/action_lists.py:38
+msgid "Add Custom Procedure"
+msgstr "Aangepaste procedure toevoegen"
+
+#: ../../batcher/src/gui/main/action_lists.py:48
+msgid "Add C_onstraint..."
+msgstr "Be_perking toevoegen…"
+
+#: ../../batcher/src/gui/main/action_lists.py:82
+msgid "This procedure is skipped. Reason: {}"
+msgstr "Deze procedure is overgeslagen. Reden: {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:88
+msgid "This constraint is skipped. Reason: {}"
+msgstr "Deze beperking is overgeslagen. Reden: {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:124
+msgid "Procedures"
+msgstr "Procedures"
+
+#: ../../batcher/src/gui/main/action_lists.py:138
+msgid "Constraints"
+msgstr "Beperkingen"
+
+#: ../../batcher/src/gui/main/action_lists.py:469
+msgid "Rename to \"{}\""
+msgstr "Hernoemen naar \"{}\""
+
+<<<<<<< HEAD
+#: ../../batcher/src/gui/main/action_lists.py:505
+msgid "Export as {}"
+msgstr "Exporteren als {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:507
+msgid "Also export as {}"
+msgstr "Ook exporteren als {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:582
+msgid "Starting with \"{}\""
+msgstr "Beginnen met \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:584
+msgid "Starting with any text"
+msgstr "Beginnend met elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:587
+msgid "Containing \"{}\""
+msgstr "Bevat \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:589
+msgid "Containing any text"
+msgstr "Bevat elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:592
+msgid "Ending with \"{}\""
+msgstr "Eindigend op \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:594
+msgid "Ending with any text"
+msgstr "Eindigend met elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:596
+=======
+#: ../../batcher/src/gui/main/action_lists.py:504
+msgid "Export as {}"
+msgstr "Exporteren als {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:506
+msgid "Also export as {}"
+msgstr "Ook exporteren als {}"
+
+#: ../../batcher/src/gui/main/action_lists.py:581
+msgid "Starting with \"{}\""
+msgstr "Beginnen met \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:583
+msgid "Starting with any text"
+msgstr "Beginnend met elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:586
+msgid "Containing \"{}\""
+msgstr "Bevat \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:588
+msgid "Containing any text"
+msgstr "Bevat elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:591
+msgid "Ending with \"{}\""
+msgstr "Eindigend op \"{}\""
+
+#: ../../batcher/src/gui/main/action_lists.py:593
+msgid "Ending with any text"
+msgstr "Eindigend met elke tekst"
+
+#: ../../batcher/src/gui/main/action_lists.py:595
+>>>>>>> bb70305361788c3792cd0f7b1ee7badb34ba95e1
+msgid "Matching pattern \"{}\""
+msgstr "Overeenkomend patroon \"{}\""
+
+#. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+<<<<<<< HEAD
+#: ../../batcher/src/gui/main/action_lists.py:601
+=======
+#: ../../batcher/src/gui/main/action_lists.py:600
+>>>>>>> bb70305361788c3792cd0f7b1ee7badb34ba95e1
+msgid " (case-insensitive)"
+msgstr " (niet hoofdlettergevoelig)"
+
+#: ../../batcher/src/gui/main/batcher_manager.py:208
+msgid "No images were processed."
+msgstr "Er werden geen afbeeldingen verwerkt."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:210
+msgid "No layers were processed."
+msgstr "Er werden geen lagen verwerkt."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:212
+msgid "No items were processed."
+msgstr "Er werden geen items verwerkt."
+
+#: ../../batcher/src/gui/main/export_settings.py:57
+msgid "Folder:"
+msgstr "Map:"
+
+#: ../../batcher/src/gui/main/export_settings.py:80
+msgid "Name:"
+msgstr "Naam:"
+
+#: ../../batcher/src/gui/main/export_settings.py:112
+msgid "O_ptions..."
+msgstr "O_pties…"
+
+#: ../../batcher/src/gui/main/export_settings.py:240
+msgid "Export Options"
+msgstr "Opties voor exporteren"
+
+#: ../../batcher/src/gui/main/main.py:102
+msgid "Input Images"
+msgstr "Afbeeldingen voor invoer"
+
+#: ../../batcher/src/gui/main/main.py:104
+msgid "Input Layers"
+msgstr "Lagen voor invoer"
+
+#: ../../batcher/src/gui/main/main.py:106
+msgid "Input Items"
+msgstr "Items voor invoer"
+
+#: ../../batcher/src/gui/main/main.py:156
+#: ../../batcher/src/gui/main/main.py:466
+msgid "_Export"
+msgstr "_Exporteren"
+
+#: ../../batcher/src/gui/main/main.py:158
+#: ../../batcher/src/gui/main/main.py:468
+msgid "_Run"
+msgstr "_Uitvoeren"
+
+#: ../../batcher/src/gui/main/main.py:167
+msgid "_Stop"
+msgstr "_Stoppen"
+
+#: ../../batcher/src/gui/main/main.py:352
+#: ../../batcher/src/gui/main/main.py:474
+msgid "_Cancel"
+msgstr "_Annuleren"
+
+#: ../../batcher/src/gui/main/main.py:365
+msgid "_Help"
+msgstr "_Help"
+
+#: ../../batcher/src/gui/main/main.py:460
+msgid "Show this dialog"
+msgstr "Dit dialoogvenster weergeven"
+
+#: ../../batcher/src/gui/main/previews.py:206
+msgid "Drop or paste files and folders here, or add them via buttons below"
+msgstr "Zet bestanden of mappen hier neer, of plak ze, of voeg ze toe met de knoppen hieronder"
+
+#: ../../batcher/src/gui/main/previews.py:230
+msgid "Add _Files..."
+msgstr "_Bestanden toevoegen…"
+
+#: ../../batcher/src/gui/main/previews.py:232
+msgid "Add Fol_ders..."
+msgstr "Map_pen toevoegen…"
+
+#: ../../batcher/src/gui/main/previews.py:234
+msgid "R_emove"
+msgstr "V_erwijderen"
+
+#: ../../batcher/src/gui/main/previews.py:236
+msgid "Re_move All"
+msgstr "_Alles verwijderen"
+
+#: ../../batcher/src/gui/main/previews.py:265
+msgid "Add Files"
+msgstr "Bestanden toevoegen"
+
+#: ../../batcher/src/gui/main/previews.py:267
+msgid "Add Folders"
+msgstr "Mappen toevoegen"
+
+#: ../../batcher/src/gui/main/previews.py:325
+msgid "Copied the selected images and folders as text."
+msgstr "De geselecteerde afbeeldingen en mappen als tekst gekopieerd."
+
+#: ../../batcher/src/gui/main/previews.py:366
+msgid ""
+"You are about to add a top-level folder named \"{}\". Are you sure you want "
+"to continue?"
+msgstr "U staat op het punt een map op het bovenste niveau toe te voegen, genaamd \"{}\". Weet u zeker dat u wilt doorgaan?"
+
+#: ../../batcher/src/gui/main/previews.py:378
+msgid ""
+"You are about to add more than {} files. Are you sure you want to continue?"
+msgstr "U staat op het punt meer dan {} bestanden toe te voegen. Weet u zeker dat u wilt doorgaan?"
+
+<<<<<<< HEAD
+#: ../../batcher/src/gui/main/previews.py:388
+msgid ""
+"<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
+"side, check if you added the files or folders you really wanted. Do you want "
+"to continue?"
+msgstr "<b>WAARSCHUWING:</b> U staat op het punt om meer dan {} bestanden toe te voegen. Controleer, om het veilig te houden, of u de bestanden of mappen hebt toegevoegd die u echt wilde. Wilt u toch doorgaan?"
+
+=======
+>>>>>>> bb70305361788c3792cd0f7b1ee7badb34ba95e1
+#: ../../batcher/src/gui/main/previews.py:443
+msgid "Yes"
+msgstr "Ja"
+
+#: ../../batcher/src/gui/main/previews.py:443
+msgid "No"
+msgstr "Nee"
+
+#: ../../batcher/src/gui/main/previews.py:591
+msgid ""
+"The preview no longer updates automatically as rendering takes too long."
+msgstr "Het voorbeeld wordt niet langer bijgewerkt omdat het renderen te lang duurt."
+
+#: ../../batcher/src/gui/main/settings_manager.py:47
+msgid "_Settings"
+msgstr "_Instellingen"
+
+#: ../../batcher/src/gui/main/settings_manager.py:69
+msgid "Save Settings"
+msgstr "Instellingen opslaan"
+
+#: ../../batcher/src/gui/main/settings_manager.py:70
+msgid "Load Settings from File..."
+msgstr "Instellingen laden uit bestand…"
+
+#: ../../batcher/src/gui/main/settings_manager.py:71
+msgid "Save Settings to File..."
+msgstr "Instellingen opslaan naar bestand…"
+
+#: ../../batcher/src/gui/main/settings_manager.py:72
+msgid "Reset Settings"
+msgstr "Instellingen herstellen"
+
+#: ../../batcher/src/gui/main/settings_manager.py:110
+msgid "Failed to save settings."
+msgstr "Instellingen opslaan mislukt"
+
+#: ../../batcher/src/gui/main/settings_manager.py:112
+msgid "Failed to save settings to file \"{}\"."
+msgstr "Instellingen opslaan mislukt voor bestand\"{}\"."
+
+#: ../../batcher/src/gui/main/settings_manager.py:140
+msgid "Settings successfully loaded."
+msgstr "Instellingen met succes geladen."
+
+#: ../../batcher/src/gui/main/settings_manager.py:151
+msgid "Settings successfully saved to \"{}\"."
+msgstr "Instellingen met succes opgeslagen naar \"{}\"."
+
+#: ../../batcher/src/gui/main/settings_manager.py:167
+msgid "Settings reset."
+msgstr "Instellingen herstellen."
+
+#: ../../batcher/src/gui/main/settings_manager.py:179
+msgid "Are you sure you want to reset settings?"
+msgstr "Weet u zeker dat u de instellingen wilt herstellen?"
+
+#: ../../batcher/src/gui/main/settings_manager.py:205
+msgid "Settings successfully saved."
+msgstr "Instellingen met succes opgeslagen."
+
+<<<<<<< HEAD
+#: ../../batcher/src/gui/main/settings_manager.py:246
+msgid ""
+"Failed to load settings from file \"{}\". Settings must be reset completely."
+msgstr "Laden van instellingen uit bestand \"{}\" is mislukt. Instellingen moeten volledig worden hersteld."
+
+=======
+>>>>>>> bb70305361788c3792cd0f7b1ee7badb34ba95e1
+#: ../../batcher/src/gui/main/settings_manager.py:263
+msgid "Load Settings from File"
+msgstr "Instellingen laden uit bestand"
+
+#: ../../batcher/src/gui/main/settings_manager.py:266
+msgid "Save Settings to File"
+msgstr "Instellingen opslaan naar bestand"
+
+#: ../../batcher/src/gui/main/settings_manager.py:280
+msgid "Load size-related settings"
+msgstr "Aan grootte gerelateerde instellingen laden"
+
+#: ../../batcher/src/gui/main/settings_manager.py:289
+msgid "JSON file"
+msgstr "JSON-bestand"
+
+#: ../../batcher/src/gui/main/settings_manager.py:298
+msgid "Any file"
+msgstr "Elk bestand"
+
+#: ../../batcher/src/gui/main/settings_manager.py:341
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the file and the text in the details to one of the "
+"sites below"
+msgstr "Als u denkt dat dit een fout in de plug-in is, kunt u helpen die te repareren door een rapport te sturen met het bestand en de tekst in de details naar een van de sites hieronder."
+
+#: ../../batcher/src/gui/messages.py:86
+msgid "Oops. Something went wrong."
+msgstr "Oeps. Er ging iets mis."
+
+#: ../../batcher/src/gui/messages.py:90
+msgid ""
+"An unexpected error occurred and the plug-in has to close. Sorry about that!"
+msgstr "Er trad een onverwachte fout op en de plug-in moet worden afgesloten. Sorry daarvoor!"
+
+#: ../../batcher/src/gui/messages.py:94
+msgid ""
+"You can help fix this error by sending a report with the text in the details "
+"above to one of the following sites"
+msgstr "U kunt helpen deze fout te repareren door een rapport te sturen met de tekst in de details erboven naar een van de sites hieronder."
+
+#: ../../batcher/src/gui/messages.py:156
+msgid "Details"
+msgstr "Details"
+
+#: ../../batcher/src/gui/messages.py:281
+msgid "Copy details to clipboard"
+msgstr "Details naar klembord kopiëren"
+
+#: ../../batcher/src/gui/messages.py:541
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr "Als u denkt dat dit een fout in de plug-in is, kunt u helpen die te repareren door een rapport te sturen met de tekst in de details naar een van de volgende sites."
+
+#: ../../batcher/src/gui/messages.py:560 ../../batcher/src/gui/messages.py:571
+msgid "There was a problem during processing:"
+msgstr "Er trad een probleem op bij het verwerken:"
+
+#: ../../batcher/src/gui/messages.py:574
+msgid ""
+"If you closed an image during processing, do not close it and instead keep "
+"it open until the processing is finished successfully.\n"
+"\n"
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr "Als u een afbeelding sloot tijdens de verwerking, sluit die dan niet af en houdt het open totdat de verwerking volledig met succes is voltooid.\n"
+"\n"
+"Als u denkt dat dit een fout in de plug-in is, kunt u helpen die te repareren door een rapport te sturen met de tekst in de details naar een van de volgende sites."
+
+#: ../../batcher/src/gui/messages.py:599
+msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
+msgstr "Toepassen van procedure \"{}\" op \"{}\" mislukt, omdat:"
+
+#: ../../batcher/src/gui/messages.py:601
+msgid "Failed to apply constraint \"{}\" on \"{}\" because:"
+msgstr "Toepassen van beperking \"{}\" op \"{}\" mislukt, omdat:"
+
+#: ../../batcher/src/gui/messages.py:607
+msgid "Failed to apply procedure \"{}\" because:"
+msgstr "Toepassen van procedure \"{}\" mislukt, omdat:"
+
+#: ../../batcher/src/gui/messages.py:609
+msgid "Failed to apply constraint \"{}\" because:"
+msgstr "Toepassen van beperking \"{}\" mislukt, omdat:"
+
+#: ../../batcher/src/gui/message_box.py:52
+msgid "Plug-in errors occurred"
+msgstr "Er traden fouten van de plug-in op"
+
+#: ../../batcher/src/gui/message_box.py:75
+msgid "The plug-in encountered one or more errors."
+msgstr "De plug-in kwam een of meer fouten tegen."
+
+#: ../../batcher/src/gui/message_box.py:77
+msgid ""
+"The errors should not cause crashes, but you should exercise caution "
+"nonetheless."
+msgstr "De fouten zouden geen crashes moeten veroorzaken, maar u zou toch voorzichtig moeten zijn."
+
+#: ../../batcher/src/gui/message_box.py:81
+msgid ""
+"You can help fix these errors by sending a report with the text in the "
+"details above to one of the following sites"
+msgstr "U kunt helpen deze fout te repareren door een rapport te sturen met de tekst in de details erboven naar een van de volgende sites."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:74
+msgid "_Apply action to all files"
+msgstr "_Actie toepassen op alle bestanden"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:115
+msgid "A file named \"{}\" already exists in \"{}\"."
+msgstr "Er bestaat al een bestand, genaamd \"{}\", in \"{}\"."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:119
+msgid "A file named \"{}\" already exists."
+msgstr "Er bestaat al een bestand, genaamd \"{}\"."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:122
+msgid "A file with the same name already exists."
+msgstr "Er bestaat al een bestand met dezelfde naam."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:125
+msgid "What would you like to do?"
+msgstr "Wat wilt u doen?"
+
+#: ../../batcher/src/gui/placeholders.py:81
+msgid "Cannot be modified"
+msgstr "Kan niet worden aangepast"
+
+#: ../../batcher/src/gui/preview/image.py:173
+msgid "No selection"
+msgstr "Geen selectie"
+
+#: ../../batcher/src/gui/preview/image.py:210
+msgid "Preview"
+msgstr "Voorbeeld"
+
+#: ../../batcher/src/gui/preview/image.py:221
+msgid "Update Automatically"
+msgstr "Automatisch bijwerken"
+
+#: ../../batcher/src/gui/preview/image.py:232
+msgid "Update Preview"
+msgstr "Voorbeeld bijwerken"
+
+#: ../../batcher/src/gui/preview/image.py:339
+msgid "There was a problem with updating the image preview:"
+msgstr "Er was een probleem met het bijwerken van het voorbeeld van de afbeelding:"
+
+#: ../../batcher/src/gui/preview/name.py:392
+msgid "There was a problem with updating the name preview:"
+msgstr "Er was een probleem met het bijwerken van de naam van het voorbeeld:"
+
+#: ../../batcher/src/path/validators.py:82
+msgid "Filename is not specified."
+msgstr "Bestandsnaam is niet gespecificeerd."
+
+#: ../../batcher/src/path/validators.py:84
+msgid "Filename contains invalid characters."
+msgstr "Bestandsnaam bevat ongeldige tekens."
+
+#: ../../batcher/src/path/validators.py:86
+msgid "Filename cannot end with spaces."
+msgstr "Bestandsnaam mag niet eindigen met spaties."
+
+#: ../../batcher/src/path/validators.py:88
+msgid "Filename cannot end with a period."
+msgstr "Bestandsnaam mag niet eindigen met een punt."
+
+#: ../../batcher/src/path/validators.py:90
+msgid "\"{}\" is a reserved name that cannot be used in filenames.\n"
+msgstr "\"{}\" is een gereserveerde naam die niet in bestandsnamen gebruikt mag worden.\n"
+
+#: ../../batcher/src/path/validators.py:164
+msgid "File path is not specified."
+msgstr "Bestandspad is niet gespecificeerd."
+
+#: ../../batcher/src/path/validators.py:166
+#: ../../batcher/src/path/validators.py:265
+msgid "Drive letter contains invalid characters."
+msgstr "Schijfletter bevat ongeldige tekens."
+
+#: ../../batcher/src/path/validators.py:168
+msgid "File path contains invalid characters."
+msgstr "Bestandspad bevat ongeldige tekens."
+
+#: ../../batcher/src/path/validators.py:170
+msgid "Path components in the file path cannot end with spaces."
+msgstr "Componenten van paden in het bestandspad mogen niet eindigen met spaties."
+
+#: ../../batcher/src/path/validators.py:172
+msgid "Path components in the file path cannot end with a period."
+msgstr "Componenten van paden in het bestandspad mogen niet eindigen met een punt."
+
+#: ../../batcher/src/path/validators.py:174
+msgid "\"{}\" is a reserved name that cannot be used in file paths.\n"
+msgstr "\"{}\" is een gereserveerde naam die niet in bestandspaden gebruikt mag worden.\n"
+
+#: ../../batcher/src/path/validators.py:263
+msgid "Directory path is not specified."
+msgstr "Pad voor de map is niet gespecificeerd."
+
+#: ../../batcher/src/path/validators.py:267
+msgid "Directory path contains invalid characters."
+msgstr "Pad voor de map bevat ongeldige tekens."
+
+#: ../../batcher/src/path/validators.py:269
+msgid "Path components in the directory path cannot end with spaces."
+msgstr "Componenten van paden in het pad voor de map mogen niet eindigen met spaties."
+
+#: ../../batcher/src/path/validators.py:271
+msgid "Path components in the directory path cannot end with a period."
+msgstr "Componenten van paden in het pad voor de map mogen niet eindigen met een punt."
+
+#: ../../batcher/src/path/validators.py:273
+msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
+msgstr "\"{}\" is een gereserveerde naam die niet in paden voor mappen gebruikt mag worden.\n"
+
+#: ../../batcher/src/path/validators.py:275
+msgid "Specified path is not a directory path."
+msgstr "Gespecificeerde pad is geen pad voor een map."
+
+#: ../../batcher/src/path/validators.py:308
+msgid "File extension is not specified."
+msgstr "Bestandsextensie is niet gespecificeerd."
+
+#: ../../batcher/src/path/validators.py:310
+msgid "File extension contains invalid characters."
+msgstr "Bestandsextensie bevat ongeldige tekens."
+
+#: ../../batcher/src/path/validators.py:312
+msgid "File extension cannot end with spaces."
+msgstr "Bestandsextensie mag niet eindigen met spaties."
+
+#: ../../batcher/src/path/validators.py:314
+msgid "File extension cannot end with a period."
+msgstr "Bestandsextensie mag niet eindigen met een punt."
+
+#: ../../batcher/src/placeholders.py:78
+msgid "Current Image"
+msgstr "Huidige afbeelding"
+
+#: ../../batcher/src/placeholders.py:79 ../../batcher/src/placeholders.py:80
+msgid "Current Layer"
+msgstr "Huidige laag"
+
+#: ../../batcher/src/placeholders.py:81 ../../batcher/src/placeholders.py:82
+msgid "Background Layer"
+msgstr "Achtergrondlaag"
+
+#: ../../batcher/src/placeholders.py:83 ../../batcher/src/placeholders.py:84
+msgid "Foreground Layer"
+msgstr "Voorgrondlaag"
+
+#: ../../batcher/src/placeholders.py:85
+msgid "All Layers"
+msgstr "Alle lagen"
+
+#: ../../batcher/src/placeholders.py:86
+msgid "None"
+msgstr "Geen"
+
+#: ../../batcher/src/plugin_settings.py:38
+#: ../../batcher/src/plugin_settings.py:206
+msgid "Run mode"
+msgstr "Modus Uitvoeren"
+
+#: ../../batcher/src/plugin_settings.py:39
+#: ../../batcher/src/plugin_settings.py:207
+msgid "The run mode"
+msgstr "De modus Uitvoeren"
+
+#: ../../batcher/src/plugin_settings.py:50
+msgid ""
+"Text file containing input files and folders on each line (non-interactive "
+"run mode only)"
+msgstr "Tekstbestand dat op elke regel bestanden en mappen voor invoer bevat (alleen niet-interactieve modus Uitvoeren)"
+
+#: ../../batcher/src/plugin_settings.py:60
+msgid ""
+"Maximum number of input files to process (set to 0 to remove this "
+"restriction; non-interactive run mode only)"
+msgstr "Maximale aantal invoerbestanden om te verwerken (stel in op 0 om deze beperking te verwijderen; alleen niet-interactieve modus Uitvoeren)"
+
+#: ../../batcher/src/plugin_settings.py:85
+#: ../../batcher/src/plugin_settings.py:232
+msgid "Image filename pattern (empty string = image name)"
+msgstr "Patroon bestandsnaam afbeelding (lege tekenreeks = naam afbeelding)"
+
+#: ../../batcher/src/plugin_settings.py:93
+#: ../../batcher/src/plugin_settings.py:240
+#: ../../batcher/src/plugin_settings.py:379
+msgid "How to handle conflicting files (non-interactive run mode only)"
+msgstr "Hoe conflicterende bestanden af te handelen (alleen niet-interactieve modus Uitvoeren)"
+
+#: ../../batcher/src/plugin_settings.py:102
+#: ../../batcher/src/plugin_settings.py:249
+#: ../../batcher/src/plugin_settings.py:388
+#: ../../batcher/src/plugin_settings.py:497
+msgid "File with saved settings"
+msgstr "Bestand met opgeslagen instellingen"
+
+#: ../../batcher/src/plugin_settings.py:103
+#: ../../batcher/src/plugin_settings.py:250
+#: ../../batcher/src/plugin_settings.py:389
+#: ../../batcher/src/plugin_settings.py:498
+msgid "File with saved settings (optional)"
+msgstr "Bestand met opgeslagen instellingen (optioneel)"
+
+#: ../../batcher/src/plugin_settings.py:136
+msgid "Keep Input Images"
+msgstr "Afbeeldingen voor invoer behouden"
+
+#: ../../batcher/src/plugin_settings.py:371
+msgid "Layer filename pattern (empty string = layer name)"
+msgstr "Patroon bestandsnaam laag (lege tekenreeks = naam laag)"
+
+#: ../../batcher/src/plugin_settings.py:675
+msgid "Input files and folders"
+msgstr "Bestanden en mappen voor invoer"
+
+#: ../../batcher/src/plugin_settings.py:686
+msgid "Show Original Names"
+msgstr "Originele namen weergeven"
+
+#: ../../batcher/src/plugin_settings.py:705
+msgid "Close when Done"
+msgstr "Afsluiten indien voltooid"
+
+#: ../../batcher/src/renamer.py:113
+msgid "Examples"
+msgstr "Voorbeelden"
+
+#: ../../batcher/src/renamer.py:560
+msgid "Suppose that the output folder is \"C:\\Users\\username\\Pictures\"."
+msgstr "Veronderstel dat de map voor de uitvoer is \"C:\\Users\\username\\Pictures\"."
+
+#: ../../batcher/src/renamer.py:571
+msgid "Suppose that the output folder is \"/home/username/Pictures\"."
+msgstr "Veronderstel dat de map voor de uitvoer is \"/home/username/Pictures\"."
+
+#. FOR TRANSLATORS: Translate only the "image" part
+#: ../../batcher/src/renamer.py:591
+msgid "image001"
+msgstr "image001"
+
+#: ../../batcher/src/renamer.py:597
+msgid "To continue numbering across group layers, use %n."
+msgstr "Doorlopend nummeren van laaggroepen, gebruik %n."
+
+#: ../../batcher/src/renamer.py:599
+#, python-format
+msgid "To use descending numbers, use %d."
+msgstr "Aflopende getallen gebruiken, gebruik %d."
+
+#: ../../batcher/src/renamer.py:600
+msgid "Suppose that the number of layers is 5:"
+msgstr "Veronderstel dat het aantal lagen 5 is:"
+
+#: ../../batcher/src/renamer.py:611 ../../batcher/src/renamer.py:676
+msgid "Image name"
+msgstr "Naam afbeelding"
+
+#: ../../batcher/src/renamer.py:614
+msgid ""
+"Suppose that an image is named \"Image.png\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een afbeelding is genaamd \"Image.png\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:619
+msgid ""
+"Suppose that an image is named \"Image.jpg\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een afbeelding is genaamd \"Image.jpg\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:630
+msgid "Image path"
+msgstr "Pad voor de afbeelding"
+
+#: ../../batcher/src/renamer.py:633
+msgid ""
+"Suppose that an image named \"Left\" has parent folders named \"Hands\" and "
+"\"Body\"."
+msgstr "Veronderstel dat een afbeelding, genaamd \"Left\", ouder-mappen heeft die zijn genaamd \"Hands\" en \"Body\"."
+
+#: ../../batcher/src/renamer.py:637
+msgid ""
+"Suppose that an image is named \"Left.jpg\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een afbeelding is genaamd \"Left.jpg\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:648
+msgid "Layer name"
+msgstr "Naam laag"
+
+#: ../../batcher/src/renamer.py:651
+msgid ""
+"Suppose that a layer is named \"Frame.png\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een laag is genaamd \"Frame.png\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:656
+msgid ""
+"Suppose that a layer is named \"Frame.jpg\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een laag is genaamd \"Frame.jpg\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:667
+msgid "Full layer name"
+msgstr "Volledige naam laag"
+
+#: ../../batcher/src/renamer.py:679
+msgid "Suppose that the image is named \"Image.xcf\"."
+msgstr "Veronderstel dat een afbeelding is genaamd \"Image.xcf\"."
+
+#: ../../batcher/src/renamer.py:689
+msgid "Layer path"
+msgstr "Pad laag"
+
+#: ../../batcher/src/renamer.py:692
+msgid ""
+"Suppose that a layer named \"Left\" has parent groups named \"Hands\" and "
+"\"Body\"."
+msgstr "Veronderstel dat een laag, genaamd \"Left\", ouder-groepen heeft, genaamd \"Hands\" en \"Body\"."
+
+#: ../../batcher/src/renamer.py:696
+msgid ""
+"Suppose that the layer is named \"Left.jpg\" and the file extension is "
+"\"png\"."
+msgstr "Veronderstel dat een laag is genaamd \"Left.jpg\" en de bestandsextensie is \"png\"."
+
+#: ../../batcher/src/renamer.py:717
+msgid "Tags"
+msgstr "Tags"
+
+#: ../../batcher/src/renamer.py:720
+msgid "Suppose that a layer has a green color tag."
+msgstr "Veronderstel dat een laag een kleurtag groen heeft."
+
+#: ../../batcher/src/renamer.py:722
+msgid "You can map a color to another name."
+msgstr "U kunt een kleur aan een andere naam toewijzen."
+
+#: ../../batcher/src/renamer.py:725
+msgid "Missing tags are ignored."
+msgstr "Ontbrekende tags worden genegeerd."
+
+#: ../../batcher/src/renamer.py:735
+msgid "Current date"
+msgstr "Huidige datum"
+
+#: ../../batcher/src/renamer.py:739
+msgid ""
+"Custom date format uses formatting as per the \"strftime\" function in "
+"Python."
+msgstr "Aangepaste datumindeling gebruikt de opmaak als die van de functie \"strftime\" in Python."
+
+#: ../../batcher/src/renamer.py:749 ../../batcher/src/renamer.py:766
+msgid "Attributes"
+msgstr "Attributen"
+
+#: ../../batcher/src/renamer.py:752
+msgid ""
+"Suppose that an image has width and height of 1000 and 500 pixels, "
+"respectively,and the current layer has width, height, <i>x</i>-offset and "
+"<i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively."
+msgstr "Veronderstel dat een afbeelding een breedte en hoogte heeft van respectievelijk 1000 en 500 pixels en de huidige laag heeft de respectievelijke breedte, hoogte, verschuiving <i>X</i> en verschuiving <i>Y</i> van 1000, 270, 0 en 40 pixels."
+
+#: ../../batcher/src/renamer.py:769
+msgid ""
+"Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively,\n"
+"and the image has width and height of 1000 and 500 pixels, respectively."
+msgstr "Veronderstel dat een laag de respectievelijke breedte, hoogte, verschuiving <i>X</i> en verschuiving <i>Y</i> van 1000, 270, 0 en 40 pixels heeft en de afbeelding heeft een breedte en hoogte van respectievelijk 1000 en 500 pixels."
+
+#: ../../batcher/src/renamer.py:786
+msgid "Suppose that an image is named \"Animal copy #1\"."
+msgstr "Veronderstel dat een afbeelding is genaamd \"Animal kopie #1\"."
+
+#: ../../batcher/src/renamer.py:788 ../../batcher/src/renamer.py:805
+msgid ""
+"You can use the regular expression syntax as defined in the \"re\" module "
+"for Python."
+msgstr "U mag de syntaxis voor reguliere expressies gebruiken, zoals die is gedefinieerd in de module \"re\" voor Python."
+
+#: ../../batcher/src/renamer.py:790 ../../batcher/src/renamer.py:807
+msgid ""
+"You can specify the number of replacements and flags as defined in the "
+"\"re\" module for Python."
+msgstr "U mag het aantal vervangingen en vlaggen specificeren, zoals gedefinieerd in de module \"re\" voor Python."
+
+#: ../../batcher/src/renamer.py:803
+msgid "Suppose that a layer is named \"Animal copy #1\"."
+msgstr "Veronderstel dat een laag is genaamd \"Animal kopie #1\"."
+
+#: ../../batcher/src/update.py:73
+msgid "Failed to obtain the previous plug-in version."
+msgstr "Verkrijgen van de vorige versie van de plug-in is mislukt."
+
+#: ../../batcher/src/utils.py:63
+msgid ""
+"Settings stored in \"{}\" may be corrupt. This could happen if the file was "
+"edited manually. To fix this, save the settings again."
+msgstr "Instellingen die zijn opgeslagen in \"{}\" zouden corrupt kunnen zijn. Dat zou kunnen gebeuren als het bestand handmatig werd bewerkt. Sla, om dit te repareren, de instellingen nogmaals op."
+
+#: ../../batcher/src/utils.py:67
+msgid " More information: {}"
+msgstr " Meer informatie: {}"
+
+#: ../../batcher/src/utils.py:71
+msgid ""
+"Settings for this plug-in may be corrupt. To fix this, save the settings "
+"again or reset them."
+msgstr "Instellingen voor deze plug-in zouden corrupt kunnen zijn. Sla, om dit te repareren, de instellingen nogmaals op of herstel ze."
+
+#: ../../batcher/src/utils.py:74
+msgid "More information: {}"
+msgstr "Meer informatie: {}"
+
+#: ../../batcher/src/utils.py:78
+msgid "Could not locate settings in file \"{}\" in \"{}\"."
+msgstr "Kon de instellingen niet vinden in bestand \"{}\" in \"{}\"."
+
+#: ../../batcher/src/utils.py:81
+msgid "Could not locate settings in \"{}\"."
+msgstr "Kon de instellingen niet vinden in bestand \"{}\"."
