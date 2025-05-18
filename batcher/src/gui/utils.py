@@ -28,8 +28,7 @@ def attach_label_to_grid(
       max_width_chars=40,
       set_name_as_tooltip=True,
 ):
-  if isinstance(
-        setting.gui, (pg.setting.CheckButtonPresenter, setting_classes.FileFormatOptionsPresenter)):
+  if not _should_display_setting_display_name_in_grid(setting):
     return
 
   label = Gtk.Label(
@@ -79,8 +78,7 @@ def attach_widget_to_grid(
 
   widget_to_attach.set_hexpand(True)
 
-  if not isinstance(
-        setting.gui, (pg.setting.CheckButtonPresenter, setting_classes.FileFormatOptionsPresenter)):
+  if _should_display_setting_display_name_in_grid(setting):
     final_column_index = column_index
     final_width = width
   else:
@@ -94,6 +92,16 @@ def attach_widget_to_grid(
       widget_to_attach.get_child().set_width_chars(width_chars_for_check_button_labels)
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
+
+
+def _should_display_setting_display_name_in_grid(setting):
+  presenters_with_no_label = (
+    pg.setting.CheckButtonPresenter,
+    setting_classes.FileFormatOptionsPresenter,
+    setting_classes.ResolutionBoxPresenter,
+  )
+
+  return not isinstance(setting.gui, presenters_with_no_label)
 
 
 def _has_setting_display_name(setting):

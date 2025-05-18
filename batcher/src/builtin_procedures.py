@@ -327,7 +327,15 @@ def scale(
       scale_to_fit,
       keep_aspect_ratio,
       dimension_to_keep,
+      set_image_resolution,
+      image_resolution,
 ):
+  if set_image_resolution:
+    if isinstance(object_to_scale, Gimp.Image):
+      object_to_scale.set_resolution(image_resolution['x'], image_resolution['y'])
+    elif isinstance(object_to_scale, Gimp.Item):
+      object_to_scale.get_image().set_resolution(image_resolution['x'], image_resolution['y'])
+
   new_width_pixels = _unit_to_pixels(batcher, new_width, 'width')
   new_height_pixels = _unit_to_pixels(batcher, new_height, 'height')
 
@@ -735,6 +743,20 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
         (Dimensions.HEIGHT, _('Height')),
       ],
       'display_name': _('Dimension to keep'),
+    },
+    {
+      'type': 'bool',
+      'name': 'set_image_resolution',
+      'default_value': False,
+      'display_name': _('Set image resolution in DPI'),
+    },
+    {
+      'type': 'resolution',
+      'name': 'image_resolution',
+      'default_value': {
+        'x': 72.0,
+        'y': 72.0,
+      },
     },
   ],
 }

@@ -1357,6 +1357,9 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             arguments_list,
             orig_name_setting_dict,
           )
+          _scale_1_1_add_image_resolution(
+            arguments_list,
+          )
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
@@ -1443,6 +1446,31 @@ def _get_dimension(orig_value, orig_unit, orig_dimension, action_orig_name):
       dimension_value['percent_value'] = orig_value
 
   return dimension_value, dimension_default_value
+
+
+def _scale_1_1_add_image_resolution(arguments_list):
+  arguments_list.append(
+    {
+      'type': 'bool',
+      'name': 'set_image_resolution',
+      'default_value': False,
+      'value': False,
+    },
+  )
+  arguments_list.append(
+    {
+      'type': 'resolution',
+      'name': 'image_resolution',
+      'default_value': {
+        'x': 72.0,
+        'y': 72.0,
+      },
+      'value': {
+        'x': 72.0,
+        'y': 72.0,
+      },
+    },
+  )
 
 
 _UPDATE_HANDLERS = {

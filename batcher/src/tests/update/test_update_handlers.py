@@ -37,6 +37,7 @@ class TestUpdateHandlers(unittest.TestCase):
   
   def setUp(self):
     self.orig_plugin_version = pg.config.PLUGIN_VERSION
+    pg.config.PLUGIN_VERSION = _LATEST_PLUGIN_VERSION
 
   def tearDown(self):
     pg.config.PLUGIN_VERSION = self.orig_plugin_version
@@ -50,23 +51,22 @@ class TestUpdateHandlers(unittest.TestCase):
   @mock.patch(
     f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_core_object_array_get_object_type',
     return_value=Gimp.Drawable.__gtype__)
-  def test_update_0_2_to_1_0_rc2(self, *_mocks):
-    pg.config.PLUGIN_VERSION = '1.0-RC2'
-
+  def test_update_export_layers(self, *_mocks):
     settings = plugin_settings.create_settings_for_export_layers()
+    source_name = 'plug-in-batch-export-layers'
 
     source = pg.setting.sources.JsonFileSource(
-      'plug-in-batch-export-layers', os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_0-2.json'))
+      source_name, os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_0-2.json'))
 
     orig_setting_values_for_0_2 = self._get_orig_setting_values_for_0_2(settings)
 
-    status, _message = update.load_and_update(
+    status, message = update.load_and_update(
       settings,
       sources={'persistent': source},
       update_sources=False,
     )
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UPDATE, msg=message)
 
     self._assert_correct_contents_for_update_to_0_3(settings, orig_setting_values_for_0_2)
     self._assert_correct_contents_for_update_to_0_4(settings)
@@ -86,13 +86,12 @@ class TestUpdateHandlers(unittest.TestCase):
   @mock.patch(
     f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_core_object_array_get_object_type',
     return_value=Gimp.Drawable.__gtype__)
-  def test_update_1_0_onwards(self, *_mocks):
-    pg.config.PLUGIN_VERSION = _LATEST_PLUGIN_VERSION
-
+  def test_update_batch_convert(self, *_mocks):
     settings = plugin_settings.create_settings_for_convert()
+    source_name = 'plug-in-batch-convert'
 
     source = pg.setting.sources.JsonFileSource(
-      'plug-in-batch-convert', os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_1-0.json'))
+      source_name, os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_1-0.json'))
 
     status, message = update.load_and_update(
       settings,
@@ -304,20 +303,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(
       settings['main/procedures/insert_background_2/arguments/tagged_items'].value, [])
 
-    self.assertIsInstance(
-      settings['main/procedures/scale/arguments/new_width'],
-      pg.setting.DoubleSetting)
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/new_width'].gui_type,
-      pg.setting.DoubleSpinButtonPresenter)
-
-    self.assertIsInstance(
-      settings['main/procedures/scale/arguments/new_height'],
-      pg.setting.DoubleSetting)
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/new_height'].gui_type,
-      pg.setting.DoubleSpinButtonPresenter)
-
     self.assertNotIn(
       'drawable',
       settings['main/procedures/script-fu-addborder/arguments'])
@@ -370,15 +355,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertNotIn('selected_items', settings['main'])
     self.assertNotIn('selected_layers', settings['main'])
     self.assertIn('selected_items', settings['gui'])
-
-    self.assertEqual(
-      list(settings['main/procedures/scale/arguments'])[2].name,
-      'object_to_scale',
-    )
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/object_to_scale'].value,
-      'layer',
-    )
 
     self.assertIn('layers', settings['main/procedures/use_layer_size/arguments'])
 
@@ -436,3 +412,19 @@ class TestUpdateHandlers(unittest.TestCase):
       },
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
+
+    self.assertIn('set_image_resolution', settings[scale_arguments_path])
+    self.assertEqual(settings[f'{scale_arguments_path}/set_image_resolution'].value, False)
+
+    self.assertIn('image_resolution', settings[scale_arguments_path])
+    self.assertIsInstance(
+      settings[f'{scale_arguments_path}/image_resolution'],
+      setting_classes.ResolutionSetting,
+    )
+    self.assertEqual(
+      settings[f'{scale_arguments_path}/image_resolution'].value,
+      {
+        'x': 72.0,
+        'y': 72.0,
+      },
+    )

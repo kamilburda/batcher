@@ -903,6 +903,17 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/new_height'],
     )
 
+    _set_sensitive_for_resolution(
+      procedure['arguments/set_image_resolution'],
+      procedure['arguments/image_resolution'],
+    )
+
+    procedure['arguments/set_image_resolution'].connect_event(
+      'value-changed',
+      _set_sensitive_for_resolution,
+      procedure['arguments/image_resolution'],
+    )
+
 
 def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
   local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
@@ -929,6 +940,10 @@ def _set_sensitive_for_dimension_to_ignore(
 
   new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
   new_height_setting.gui.set_sensitive(is_height or not is_sensitive)
+
+
+def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):
+  image_resolution_setting.gui.set_sensitive(set_image_resolution_setting.value)
 
 
 def _on_after_add_insert_background_foreground_for_layers(

@@ -18,6 +18,7 @@ from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
 from src.gui import dimension_box as dimension_box_
+from src.gui import resolution_box as resolution_box_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -264,6 +265,46 @@ class DimensionSetting(pg.setting.NumericSetting):
         processed_value['unit'], self._built_in_units)
 
     return processed_value
+
+
+class ResolutionBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.ResolutionBox` widgets.
+
+  Value: A dictionary representing data obtained from a `gui.ResolutionBox`.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'value-changed'
+
+  def _create_widget(self, setting, **kwargs):
+    return resolution_box_.ResolutionBox(
+      default_x=setting.value['x'],
+      default_y=setting.value['y'],
+    )
+
+  def get_value(self):
+    return self._widget.get_value()
+
+  def _set_value(self, value):
+    self._widget.set_value(value)
+
+
+class ResolutionSetting(pg.setting.DictSetting):
+  """Class for settings representing image resolution.
+
+  In this setting, resolution is represented as a dictionary consisting of
+  X- and Y-resolution.
+
+  Default value: A dictionary containing the default X- and Y-resolution.
+  """
+
+  _ALLOWED_PDB_TYPES = []
+
+  _ALLOWED_GUI_TYPES = [ResolutionBoxPresenter]
+
+  _DEFAULT_DEFAULT_VALUE = lambda self: {
+    'x': 72.0,
+    'y': 72.0,
+  }
 
 
 class ItemTreeItemsSetting(pg.setting.Setting):
