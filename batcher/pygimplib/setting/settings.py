@@ -2223,15 +2223,22 @@ class DrawableFilterSetting(Setting):
 
 
 class ColorSetting(Setting):
-  """Class for settings holding `Gegl.Color` instances.
-  
+  """Class for settings holding `Gegl.Color` instances or a list of values
+  representing `Gegl.Color`.
+
+  If you need to instantiate a `ColorSetting` before registering a plug-in
+  procedure, pass a list of values. Otherwise, you may experience crashes due to
+  a missing call to `Gegl.init()`, or warnings about already registered GEGL
+  operations when calling `Gegl.init()` prematurely.
+
   Allowed GIMP PDB types:
   * `Gegl.Color`
   
-  Default value: `Gegl.Color` instance with RGBA color `(0.0, 0.0, 0.0, 1.0)`.
+  Default value: `[0.0, 0.0, 0.0, 1.0]` (black color).
 
   Message IDs for invalid values:
-  * ``'invalid_value'``: The color assigned is not valid.
+  * ``'invalid_value'``:
+    The color assigned is not a `Gegl.Color` instance or a list/tuple.
   """
 
   _ALLOWED_PDB_TYPES = [Gegl.Color]
@@ -2240,8 +2247,8 @@ class ColorSetting(Setting):
 
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.color_button]
 
-  # Create default value dynamically to avoid potential errors on GIMP startup.
-  _DEFAULT_DEFAULT_VALUE = lambda self: Gegl.Color.new('black')
+  # Return the list in a function to ensure returning a copy.
+  _DEFAULT_DEFAULT_VALUE = lambda self: [0.0, 0.0, 0.0, 1.0]
 
   def __init__(
         self,
@@ -2258,23 +2265,33 @@ class ColorSetting(Setting):
     """Returns ``True`` if this color setting supports the alpha channel."""
     return self._has_alpha
 
-  def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, list):
+  @property
+  def value_for_pdb(self):
+    """Setting value converted to a `Gegl.Color` instance."""
+    return self.get_value_as_color(self._value)
+
+  @staticmethod
+  def get_value_as_color(value):
+    """Returns the specified value converted to a `Gegl.Color` instance."""
+    if isinstance(value, (list, tuple)):
       color = Gegl.Color()
 
-      if len(raw_value) >= 4:
-        color.set_rgba(*raw_value[:4])
+      if len(value) >= 4:
+        color.set_rgba(*value[:4])
 
       return color
     else:
-      return raw_value
-  
+      return value
+
   def _value_to_raw(self, value):
-    color = value.get_rgba()
-    return [color.red, color.green, color.blue, color.alpha]
+    if isinstance(value, Gegl.Color):
+      color = value.get_rgba()
+      return [color.red, color.green, color.blue, color.alpha]
+    else:
+      return value
   
   def _validate(self, color):
-    if not isinstance(color, Gegl.Color):
+    if not isinstance(color, (Gegl.Color, list, tuple)):
       return 'invalid color', 'invalid_value'
 
   def _get_pdb_param(self):

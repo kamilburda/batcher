@@ -639,13 +639,18 @@ class ColorButtonPresenter(GtkPresenter):
   
   def _create_widget(self, setting, width=100, height=20):
     return GimpUi.ColorButton.new(
-      setting.display_name, width, height, setting.value, GimpUi.ColorAreaType.SMALL_CHECKS)
+      setting.display_name,
+      width,
+      height,
+      self.setting.get_value_as_color(setting.value),
+      GimpUi.ColorAreaType.SMALL_CHECKS,
+    )
   
   def get_value(self):
     return self._widget.get_color()
   
   def _set_value(self, value):
-    self._widget.set_color(value)
+    self._widget.set_color(self.setting.get_value_as_color(value))
 
 
 class ParasiteBoxPresenter(GtkPresenter):
