@@ -83,9 +83,9 @@ class ResolutionBox(Gtk.Box):
     )
 
     self.pack_start(self._label_x, False, False, 0)
-    self.pack_start(self._spin_button_x, True, True, 0)
+    self.pack_start(self._spin_button_x, False, False, 0)
     self.pack_start(self._label_y, False, False, 0)
-    self.pack_start(self._spin_button_y, True, True, 0)
+    self.pack_start(self._spin_button_y, False, False, 0)
 
     self._on_spin_button_x_value_changed_handler_id = self._spin_button_x.connect(
       'value-changed', self._on_spin_button_value_changed)

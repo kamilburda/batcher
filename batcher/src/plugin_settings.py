@@ -903,6 +903,11 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/new_height'],
     )
 
+    procedure['arguments/image_resolution'].connect_event(
+      'after-set-gui',
+      _set_left_margin_for_resolution,
+    )
+
     _set_sensitive_for_resolution(
       procedure['arguments/set_image_resolution'],
       procedure['arguments/image_resolution'],
@@ -940,6 +945,11 @@ def _set_sensitive_for_dimension_to_ignore(
 
   new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
   new_height_setting.gui.set_sensitive(is_height or not is_sensitive)
+
+
+def _set_left_margin_for_resolution(image_resolution_setting):
+  if not isinstance(image_resolution_setting.gui, pg.setting.NullPresenter):
+    image_resolution_setting.gui.widget.set_margin_start(15)
 
 
 def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):
