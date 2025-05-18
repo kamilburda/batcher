@@ -217,3 +217,6 @@ class DimensionBox(Gtk.Box):
   @staticmethod
   def _inch_to_other_value(inch_value, unit):
     return inch_value * unit.get_factor()
+
+
+GObject.type_register(DimensionBox)
