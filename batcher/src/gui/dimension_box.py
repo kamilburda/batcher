@@ -127,7 +127,7 @@ class DimensionBox(Gtk.Box):
     self._percent_object_combo_box.show_all()
 
     # FOR TRANSLATORS: Think of e.g. "x% from the current image" when translating this.
-    self._percent_object_label = Gtk.Label(label='from')
+    self._percent_object_label = Gtk.Label(label=_('from'))
     self._percent_object_label.show_all()
 
     self._percent_object_box = Gtk.Box(
