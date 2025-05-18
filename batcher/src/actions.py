@@ -141,7 +141,7 @@ def create(
 
   * ``'enabled_for_previews'``: If ``True``, this indicates that the action can
     be applied in the preview.
-  
+
   Each dictionary in the ``initial_actions`` list may contain the following
   fields:
 
@@ -150,28 +150,13 @@ def create(
 
   * ``'type'``: Action type. See below for details.
 
-  * ``'function'``
-
-  * ``'origin'``
-
   * ``'arguments'``: Specified as list of dictionaries defining settings. Each
     dictionary must contain required attributes and can contain optional
     attributes as stated in `setting.Group.add()`.
 
-  * ``'enabled'``
+  * any other field matching one of the names of child settings or groups of the
+    created action (described above), except ``'orig_name'``.
 
-  * ``'display_name'``
-
-  * ``'action_group'``
-
-  * ``'tags'``
-
-  * ``'display_options_on_create'``
-
-  * ``'more_options_expanded'``
-
-  * ``'enabled_for_previews'``
-  
   Depending on the specified ``'type'``, the dictionary may contain additional
   fields and `create()` may generate additional settings.
   
