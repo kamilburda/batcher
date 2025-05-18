@@ -324,9 +324,7 @@ def scale(
       new_height,
       interpolation,
       local_origin,
-      scale_to_fit,
-      keep_aspect_ratio,
-      dimension_to_keep,
+      aspect_ratio,
       set_image_resolution,
       image_resolution,
 ):
@@ -348,20 +346,21 @@ def scale(
   if orig_height_pixels == 0:
     orig_height_pixels = 1
 
-  if scale_to_fit and not keep_aspect_ratio:
+  if aspect_ratio in [AspectRatios.KEEP_ADJUST_WIDTH, AspectRatios.KEEP_ADJUST_HEIGHT]:
+    processed_width_pixels, processed_height_pixels = _get_keep_aspect_ratio_values(
+      aspect_ratio,
+      orig_width_pixels,
+      orig_height_pixels,
+      new_width_pixels,
+      new_height_pixels)
+  elif aspect_ratio == AspectRatios.FIT:
     processed_width_pixels, processed_height_pixels = _get_scale_to_fit_values(
       orig_width_pixels, orig_height_pixels, new_width_pixels, new_height_pixels)
+  elif aspect_ratio == AspectRatios.FIT_WITH_PADDING:
+    raise NotImplementedError
   else:
-    if keep_aspect_ratio:
-      processed_width_pixels, processed_height_pixels = _get_keep_aspect_ratio_values(
-        dimension_to_keep,
-        orig_width_pixels,
-        orig_height_pixels,
-        new_width_pixels,
-        new_height_pixels)
-    else:
-      processed_width_pixels = new_width_pixels
-      processed_height_pixels = new_height_pixels
+    processed_width_pixels = new_width_pixels
+    processed_height_pixels = new_height_pixels
 
   Gimp.context_push()
   Gimp.context_set_interpolation(interpolation)
@@ -410,16 +409,16 @@ def _unit_to_pixels(batcher, dimension, dimension_name):
 
 
 def _get_keep_aspect_ratio_values(
-      dimension_to_keep,
+      aspect_ratio,
       orig_width_pixels,
       orig_height_pixels,
       new_width_pixels,
       new_height_pixels):
-  if dimension_to_keep == Dimensions.WIDTH:
+  if aspect_ratio == AspectRatios.KEEP_ADJUST_WIDTH:
     processed_new_width_pixels = new_width_pixels
     processed_new_height_pixels = round(
       orig_height_pixels * (processed_new_width_pixels / orig_width_pixels))
-  elif dimension_to_keep == Dimensions.HEIGHT:
+  elif aspect_ratio == AspectRatios.KEEP_ADJUST_HEIGHT:
     processed_new_height_pixels = new_height_pixels
     processed_new_width_pixels = round(
       orig_width_pixels * (processed_new_height_pixels / orig_height_pixels))
@@ -443,6 +442,22 @@ def _get_scale_to_fit_values(
   return processed_new_width_pixels, processed_new_height_pixels
 
 
+class AspectRatios:
+  ASPECT_RATIOS = (
+    STRETCH,
+    KEEP_ADJUST_WIDTH,
+    KEEP_ADJUST_HEIGHT,
+    FIT,
+    FIT_WITH_PADDING,
+  ) = (
+    'stretch',
+    'keep_adjust_width',
+    'keep_adjust_height',
+    'fit',
+    'fit_with_padding',
+  )
+
+
 class Units:
   UNITS = (
     PERCENT_IMAGE_WIDTH,
@@ -456,16 +471,6 @@ class Units:
     'percentage_of_layer_width',
     'percentage_of_layer_height',
     'pixels',
-  )
-
-
-class Dimensions:
-  DIMENSIONS = (
-    WIDTH,
-    HEIGHT,
-  ) = (
-    'width',
-    'height',
   )
 
 
@@ -723,26 +728,17 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'display_name': _('Use local origin'),
     },
     {
-      'type': 'bool',
-      'name': 'scale_to_fit',
-      'default_value': False,
-      'display_name': _('Scale to fit'),
-    },
-    {
-      'type': 'bool',
-      'name': 'keep_aspect_ratio',
-      'default_value': False,
-      'display_name': _('Keep aspect ratio'),
-    },
-    {
       'type': 'choice',
-      'name': 'dimension_to_keep',
-      'default_value': Dimensions.WIDTH,
+      'name': 'aspect_ratio',
+      'default_value': AspectRatios.STRETCH,
       'items': [
-        (Dimensions.WIDTH, _('Width')),
-        (Dimensions.HEIGHT, _('Height')),
+        (AspectRatios.STRETCH, _('None (Stretch)')),
+        (AspectRatios.KEEP_ADJUST_WIDTH, _('Keep, adjust width')),
+        (AspectRatios.KEEP_ADJUST_HEIGHT, _('Keep, adjust height')),
+        (AspectRatios.FIT, _('Fit')),
+        (AspectRatios.FIT_WITH_PADDING, _('Fit with padding')),
       ],
-      'display_name': _('Dimension to keep'),
+      'display_name': _('Aspect ratio'),
     },
     {
       'type': 'bool',

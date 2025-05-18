@@ -19,6 +19,9 @@ from src import setting_classes
 from src import utils
 
 
+_RELATED_WIDGETS_LEFT_MARGIN = 15
+
+
 def create_settings_for_convert():
   settings = pg.setting.create_groups({
     'name': 'all_settings',
@@ -861,44 +864,15 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       _set_sensitive_for_local_origin,
       procedure['arguments/local_origin'])
 
-    _set_sensitive_for_keep_aspect_ratio(
-      procedure['arguments/scale_to_fit'],
-      procedure['arguments/keep_aspect_ratio'],
-    )
-
-    procedure['arguments/scale_to_fit'].connect_event(
-      'value-changed',
-      _set_sensitive_for_keep_aspect_ratio,
-      procedure['arguments/keep_aspect_ratio'])
-
-    _set_sensitive_for_scale_to_fit_and_dimension_to_ignore(
-      procedure['arguments/keep_aspect_ratio'],
-      procedure['arguments/scale_to_fit'],
-      procedure['arguments/dimension_to_keep'],
-    )
-
-    procedure['arguments/keep_aspect_ratio'].connect_event(
-      'value-changed',
-      _set_sensitive_for_scale_to_fit_and_dimension_to_ignore,
-      procedure['arguments/scale_to_fit'],
-      procedure['arguments/dimension_to_keep'])
-
-    _set_sensitive_for_dimension_to_ignore(
-      procedure['arguments/dimension_to_keep'],
+    _set_sensitive_for_dimensions_given_aspect_ratio(
+      procedure['arguments/aspect_ratio'],
       procedure['arguments/new_width'],
       procedure['arguments/new_height'],
     )
 
-    procedure['arguments/dimension_to_keep'].connect_event(
+    procedure['arguments/aspect_ratio'].connect_event(
       'value-changed',
-      _set_sensitive_for_dimension_to_ignore,
-      procedure['arguments/new_width'],
-      procedure['arguments/new_height'],
-    )
-
-    procedure['arguments/dimension_to_keep'].connect_event(
-      'gui-sensitive-changed',
-      _set_sensitive_for_dimension_to_ignore,
+      _set_sensitive_for_dimensions_given_aspect_ratio,
       procedure['arguments/new_width'],
       procedure['arguments/new_height'],
     )
@@ -924,32 +898,21 @@ def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_settin
   local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
 
 
-def _set_sensitive_for_keep_aspect_ratio(scale_to_fit_setting, keep_aspect_ratio_setting):
-  keep_aspect_ratio_setting.gui.set_sensitive(not scale_to_fit_setting.value)
-
-
-def _set_sensitive_for_scale_to_fit_and_dimension_to_ignore(
-      keep_aspect_ratio_setting, scale_to_fit_setting, dimension_to_keep_setting):
-  scale_to_fit_setting.gui.set_sensitive(not keep_aspect_ratio_setting.value)
-  dimension_to_keep_setting.gui.set_sensitive(keep_aspect_ratio_setting.value)
-
-
-def _set_sensitive_for_dimension_to_ignore(
-      dimension_to_keep_setting,
+def _set_sensitive_for_dimensions_given_aspect_ratio(
+      aspect_ratio_setting,
       new_width_setting,
       new_height_setting,
 ):
-  is_sensitive = dimension_to_keep_setting.gui.get_sensitive()
-  is_width = dimension_to_keep_setting.value == builtin_procedures.Dimensions.WIDTH
-  is_height = dimension_to_keep_setting.value == builtin_procedures.Dimensions.HEIGHT
+  adjust_width = aspect_ratio_setting.value == builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH
+  adjust_height = aspect_ratio_setting.value == builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT
 
-  new_width_setting.gui.set_sensitive(is_width or not is_sensitive)
-  new_height_setting.gui.set_sensitive(is_height or not is_sensitive)
+  new_width_setting.gui.set_sensitive(not adjust_height)
+  new_height_setting.gui.set_sensitive(not adjust_width)
 
 
 def _set_left_margin_for_resolution(image_resolution_setting):
   if not isinstance(image_resolution_setting.gui, pg.setting.NullPresenter):
-    image_resolution_setting.gui.widget.set_margin_start(15)
+    image_resolution_setting.gui.widget.set_margin_start(_RELATED_WIDGETS_LEFT_MARGIN)
 
 
 def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):

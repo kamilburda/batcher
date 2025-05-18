@@ -925,14 +925,14 @@ def _update_to_0_7(data, _settings, procedure_groups):
             },
             {
               'type': 'choice',
-              'default_value': builtin_procedures.Dimensions.WIDTH,
+              'default_value': 'width',
               'name': 'dimension_to_keep',
               'items': [
-                (builtin_procedures.Dimensions.WIDTH, 'Width'),
-                (builtin_procedures.Dimensions.HEIGHT, 'Height'),
+                ('width', 'Width'),
+                ('height', 'Height'),
               ],
               'display_name': 'Dimension to keep',
-              'value': builtin_procedures.Dimensions.WIDTH,
+              'value': 'width',
             },
           ])
 
@@ -1357,9 +1357,8 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             arguments_list,
             orig_name_setting_dict,
           )
-          _scale_1_1_add_image_resolution(
-            arguments_list,
-          )
+          _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list)
+          _scale_1_1_add_image_resolution(arguments_list)
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
@@ -1446,6 +1445,39 @@ def _get_dimension(orig_value, orig_unit, orig_dimension, action_orig_name):
       dimension_value['percent_value'] = orig_value
 
   return dimension_value, dimension_default_value
+
+
+def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list):
+  scale_to_fit_setting_dict, _index = _remove_setting(arguments_list, 'scale_to_fit')
+  keep_aspect_ratio_setting_dict, _index = _remove_setting(arguments_list, 'keep_aspect_ratio')
+  dimension_to_keep_setting_dict, _index = _remove_setting(arguments_list, 'dimension_to_keep')
+
+  value = builtin_procedures.AspectRatios.STRETCH
+
+  if scale_to_fit_setting_dict['value']:
+    value = builtin_procedures.AspectRatios.FIT
+  elif keep_aspect_ratio_setting_dict['value']:
+    if dimension_to_keep_setting_dict['value'] == 'width':
+      value = builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH
+    else:
+      value = builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT
+
+  arguments_list.append(
+    {
+      'type': 'choice',
+      'name': 'aspect_ratio',
+      'default_value': value,
+      'value': value,
+      'items': [
+        (builtin_procedures.AspectRatios.STRETCH, _('None (Stretch)')),
+        (builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH, _('Keep, adjust width')),
+        (builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT, _('Keep, adjust height')),
+        (builtin_procedures.AspectRatios.FIT, _('Fit')),
+        (builtin_procedures.AspectRatios.FIT_WITH_PADDING, _('Fit with padding')),
+      ],
+      'display_name': _('Aspect ratio'),
+    },
+  )
 
 
 def _scale_1_1_add_image_resolution(arguments_list):

@@ -72,7 +72,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_0_4(settings)
     self._assert_correct_contents_for_update_to_0_5(settings)
     self._assert_correct_contents_for_update_to_0_6(settings)
-    self._assert_correct_contents_for_update_to_0_7(settings)
     self._assert_correct_contents_for_update_to_0_8(settings)
     self._assert_correct_contents_for_update_to_1_0_rc1(settings)
     self._assert_correct_contents_for_update_to_1_0_rc2(settings)
@@ -326,17 +325,6 @@ class TestUpdateHandlers(unittest.TestCase):
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
 
-  def _assert_correct_contents_for_update_to_0_7(self, settings):
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/scale_to_fit'].value,
-      False)
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/keep_aspect_ratio'].value,
-      False)
-    self.assertEqual(
-      settings['main/procedures/scale/arguments/dimension_to_keep'].value,
-      'width')
-
   def _assert_correct_contents_for_update_to_0_8(self, settings):
     self.assertEqual(settings['main/export/export_mode'].value, 'each_item')
     self.assertEqual(settings['main/export/export_mode'].default_value, 'each_item')
@@ -412,6 +400,15 @@ class TestUpdateHandlers(unittest.TestCase):
       },
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
+
+    self.assertNotIn('scale_to_fit', settings[scale_arguments_path])
+    self.assertNotIn('keep_aspect_ratio', settings[scale_arguments_path])
+    self.assertNotIn('dimension_to_keep', settings[scale_arguments_path])
+
+    self.assertIn('aspect_ratio', settings[scale_arguments_path])
+    self.assertEqual(
+      settings[f'{scale_arguments_path}/aspect_ratio'].value,
+      builtin_procedures.AspectRatios.STRETCH)
 
     self.assertIn('set_image_resolution', settings[scale_arguments_path])
     self.assertEqual(settings[f'{scale_arguments_path}/set_image_resolution'].value, False)
