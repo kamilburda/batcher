@@ -1378,7 +1378,7 @@ def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setti
       'name': 'object_to_scale',
       'default_value': object_to_scale_default_value,
       'value': object_to_scale_default_value,
-      'display_name': 'Apply to (image or layer):',
+      'display_name': _('Apply to (image or layer):'),
     })
 
 
@@ -1455,6 +1455,7 @@ def _scale_1_1_add_image_resolution(arguments_list):
       'name': 'set_image_resolution',
       'default_value': False,
       'value': False,
+      'display_name': _('Set image resolution in DPI'),
     },
   )
   arguments_list.append(
