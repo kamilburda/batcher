@@ -39,6 +39,7 @@ def register_procedure(
       auxiliary_arguments: Optional[Iterable[List]] = None,
       run_data: Optional[Iterable] = None,
       init_ui: bool = True,
+      init_gegl: bool = True,
       pdb_procedure_type: Gimp.PDBProcType = Gimp.PDBProcType.PLUGIN,
       additional_init: Optional[Callable] = None,
 ):
@@ -115,6 +116,9 @@ def register_procedure(
       ``run_data`` is not ``None``.
     init_ui: If ``True``, user interface is initialized via `GimpUi.init`.
       See `GimpUi.init` for more information.
+    init_gegl:
+      If ``True``, GEGL (library providing layer effects) is initialized via
+      `Gegl.init`. See `Gegl.init` for more information.
     pdb_procedure_type: One of the values of the `Gimp.PDBProcType` enum.
     additional_init: Function allowing customization of procedure registration.
       The function accepts a single argument - a ``Gimp.Procedure`` instance
@@ -189,6 +193,7 @@ def register_procedure(
   proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
   proc_dict['run_data'] = run_data
   proc_dict['init_ui'] = init_ui
+  proc_dict['init_gegl'] = init_gegl
   proc_dict['pdb_procedure_type'] = pdb_procedure_type
   proc_dict['additional_init'] = additional_init
 
@@ -317,7 +322,11 @@ def _do_create_procedure(plugin_instance, proc_name):
     proc_name,
     proc_dict['pdb_procedure_type'],
     _get_procedure_wrapper(
-      proc_dict['procedure'], proc_dict['procedure_type'], proc_dict['init_ui']),
+      proc_dict['procedure'],
+      proc_dict['procedure_type'],
+      proc_dict['init_ui'],
+      proc_dict['init_gegl'],
+    ),
     proc_dict['run_data'])
 
   if proc_dict['arguments'] is not None:
@@ -382,7 +391,7 @@ def _disable_locale(_plugin_instance, _name):
   return False
 
 
-def _get_procedure_wrapper(func, procedure_type, init_ui):
+def _get_procedure_wrapper(func, procedure_type, init_ui, init_gegl):
   @functools.wraps(func)
   def func_wrapper(*procedure_and_args):
     procedure = procedure_and_args[0]
@@ -399,7 +408,8 @@ def _get_procedure_wrapper(func, procedure_type, init_ui):
     if init_ui and run_mode == Gimp.RunMode.INTERACTIVE:
       GimpUi.init(procedure.get_name())
 
-    Gegl.init()
+    if init_gegl:
+      Gegl.init()
 
     pginitnotifier.notifier.emit('start-procedure')
 
