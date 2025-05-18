@@ -8,6 +8,12 @@ Changes to the user interface:
 * Batch Convert: Increased initial preview height.
 
 Changes to procedures and constraints:
+* Scale:
+    * Merged `Object to scale`, `Image` and `Layer` to a single widget.
+    * Units for width and height are moved next to the width and height widgets, respectively.
+    * More units beside pixels and percentages can be chosen from (the same ones available in GIMP). These units are recalculated automatically.
+    * Switching between pixels, percentages and other units will now restore the last value for that unit.
+    * Added a new option to change the image resolution.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 
 Bug fixes:
