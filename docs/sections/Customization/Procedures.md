@@ -155,19 +155,23 @@ Note that in that case the layers will be cut off if they are partially outside 
 
 ### Scale
 
-Scales the entire image or a layer.
+Scales (resizes) the entire image or a layer.
 
 Options:
-* *Image*: Image to scale and/or to use for computing the new width or height.
-* *Layer*: Layer to scale and/or to use for computing the new width or height.
-* *Object to scale*: Whether to scale the entire *Image* or the *Layer* within the image.
+* *Object to scale*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
 * *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
 * *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
+  * *None (Stretch)*: The aspect ratio is ignored (i.e. the image/layer is stretched).
+  * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
+  * *Keep, adjust height*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
+  * *Fit*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller.
+  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with *Padding color*.
+* *Padding color*: The color to fill the empty space with if the *Fit with padding* option is selected.
 * *Interpolation*: Type of interpolation to use.
-* *Use local origin*: If checked and *Object to scale* is set to *Layer*, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
-* *Scale to fit*: If checked, the image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the image/layer will be fit.
-* *Keep aspect ratio*: If checked, the image/layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
-* *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
+* *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
+* *Set image resolution in DPI*: Whether to set a new resolution for the current image.
+* *X* and *Y*: The new image resolution in DPI. Only applicable if *Set image resolution in DPI* is checked.
 
 
 ## Adding Custom Procedures
