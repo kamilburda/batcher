@@ -17,6 +17,8 @@ Changes to procedures and constraints:
     * Merged `Scale to fit`, `Keep aspect ratio` and `Dimension to keep` to a single widget.
     * Added a new option `Fit with padding` under `Aspect ratio` that fits the image/layer to the specified dimensions and fills the empty space with the specified color (transparent by default).
     * Added a new option to change the image resolution.
+* Align and offset:
+  * Merged `Another layer to align layers with` into `Object to align layers with`.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 
 Bug fixes:

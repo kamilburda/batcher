@@ -117,7 +117,6 @@ def align_and_offset_layers(
       batcher,
       layers_to_align,
       reference_object,
-      reference_layer,
       horizontal_align,
       vertical_align,
       x_offset,
@@ -128,10 +127,15 @@ def align_and_offset_layers(
   image_width = batcher.current_image.get_width()
   image_height = batcher.current_image.get_height()
 
-  if reference_layer is not None:
-    ref_layer_x, ref_layer_y = reference_layer.get_offsets()[1:]
-    ref_layer_width = reference_layer.get_width()
-    ref_layer_height = reference_layer.get_height()
+  if isinstance(reference_object, Gimp.Image):
+    reference_object_type = 'image'
+  else:
+    reference_object_type = 'layer'
+
+  if reference_object_type == 'layer':
+    ref_layer_x, ref_layer_y = reference_object.get_offsets()[1:]
+    ref_layer_width = reference_object.get_width()
+    ref_layer_height = reference_object.get_height()
   else:
     ref_layer_x = 0
     ref_layer_y = 0
@@ -142,35 +146,35 @@ def align_and_offset_layers(
     new_x, new_y = layer.get_offsets()[1:]
 
     if horizontal_align == HorizontalAlignments.LEFT:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_x = 0
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_x = ref_layer_x
     elif horizontal_align == HorizontalAlignments.CENTER:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_x = (image_width - layer.get_width()) // 2
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_x = ref_layer_x + (ref_layer_width - layer.get_width()) // 2
     elif horizontal_align == HorizontalAlignments.RIGHT:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_x = image_width - layer.get_width()
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_x = ref_layer_x + ref_layer_width - layer.get_width()
 
     if vertical_align == VerticalAlignments.TOP:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_y = 0
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_y = ref_layer_y
     elif vertical_align == VerticalAlignments.CENTER:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_y = (image_height - layer.get_height()) // 2
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_y = ref_layer_y + (ref_layer_height - layer.get_height()) // 2
     elif vertical_align == VerticalAlignments.BOTTOM:
-      if reference_object == AlignReferenceObjects.IMAGE:
+      if reference_object_type == 'image':
         new_y = image_height - layer.get_height()
-      elif reference_object == AlignReferenceObjects.LAYER:
+      elif reference_object_type == 'layer':
         new_y = ref_layer_y + ref_layer_height - layer.get_height()
 
     if x_offset:
@@ -625,16 +629,6 @@ class VerticalAlignments:
   )
 
 
-class AlignReferenceObjects:
-  ALIGN_REFERENCE_OBJECTS = (
-    IMAGE,
-    LAYER,
-  ) = (
-    'image',
-    'layer',
-  )
-
-
 INTERACTIVE_OVERWRITE_MODES_LIST = [
   (overwrite.OverwriteModes.REPLACE, _('Replace')),
   (overwrite.OverwriteModes.SKIP, _('Skip')),
@@ -912,7 +906,7 @@ _BUILTIN_PROCEDURES_LIST = [
     'function': align_and_offset_layers,
     'display_name': _('Align and offset'),
     'description': _(
-      'Aligns layer(s) with the image or, if specified, another layer.'
+      'Aligns layer(s) with the image or another layer.'
       '\n\nYou may specify additional offsets after the alignment is applied.'),
     'display_options_on_create': True,
     'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
@@ -925,19 +919,10 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Layers to align'),
       },
       {
-        'type': 'choice',
+        'type': 'placeholder_image_or_layer',
         'name': 'reference_object',
-        'default_value': AlignReferenceObjects.IMAGE,
-        'items': [
-          (AlignReferenceObjects.IMAGE, _('Image')),
-          (AlignReferenceObjects.LAYER, _('Another layer')),
-        ],
+        'default_value': 'current_image',
         'display_name': _('Object to align layers with'),
-      },
-      {
-        'type': 'placeholder_layer',
-        'name': 'reference_layer',
-        'display_name': _('Another layer to align layers with'),
       },
       {
         'type': 'choice',

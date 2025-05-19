@@ -1361,6 +1361,10 @@ def _update_to_1_1(data, _settings, _procedure_groups):
           _scale_1_1_add_padding_color_argument(arguments_list)
           _scale_1_1_add_image_resolution(arguments_list)
 
+        if (orig_name_setting_dict['value'].startswith('align_and_offset_layers')
+            and arguments_list is not None):
+          _align_1_1_merge_reference_object_and_layer(arguments_list)
+
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
   _remove_setting(arguments_list, 'image')
@@ -1517,6 +1521,27 @@ def _scale_1_1_add_image_resolution(arguments_list):
         'x': 72.0,
         'y': 72.0,
       },
+    },
+  )
+
+
+def _align_1_1_merge_reference_object_and_layer(arguments_list):
+  reference_object_setting_dict, _index = _remove_setting(arguments_list, 'reference_object')
+  reference_layer_setting_dict, _index = _remove_setting(arguments_list, 'reference_layer')
+
+  if reference_object_setting_dict['value'] == 'image':
+    reference_object_value = 'current_image'
+  else:
+    reference_object_value = reference_layer_setting_dict['value']
+
+  arguments_list.insert(
+    1,
+    {
+      'type': 'placeholder_image_or_layer',
+      'name': 'reference_object',
+      'default_value': 'current_image',
+      'value': reference_object_value,
+      'display_name': _('Object to align layers with'),
     },
   )
 

@@ -833,6 +833,313 @@
                                     "setting_attributes": {
                                         "pdb_type": null
                                     }
+                                },
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ],
+                                                [
+                                                    "gegl",
+                                                    "GEGL operation"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "builtin",
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "layers_to_align",
+                                                    "element_type": "layer",
+                                                    "default_value": "current_layer_for_array",
+                                                    "display_name": "Layers to align",
+                                                    "pdb_type": null,
+                                                    "value": "current_layer_for_array",
+                                                    "type": "placeholder_layer_array"
+                                                },
+                                                {
+                                                    "name": "reference_object",
+                                                    "default_value": "image",
+                                                    "items": [
+                                                        [
+                                                            "image",
+                                                            "Image"
+                                                        ],
+                                                        [
+                                                            "layer",
+                                                            "Another layer"
+                                                        ]
+                                                    ],
+                                                    "display_name": "Object to align layers with",
+                                                    "pdb_type": null,
+                                                    "value": "layer",
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "name": "reference_layer",
+                                                    "display_name": "Another layer to align layers with",
+                                                    "pdb_type": null,
+                                                    "value": "background_layer",
+                                                    "type": "placeholder_layer"
+                                                },
+                                                {
+                                                    "name": "horizontal_align",
+                                                    "default_value": "keep",
+                                                    "items": [
+                                                        [
+                                                            "keep",
+                                                            "Keep"
+                                                        ],
+                                                        [
+                                                            "left",
+                                                            "Left"
+                                                        ],
+                                                        [
+                                                            "center",
+                                                            "Center"
+                                                        ],
+                                                        [
+                                                            "right",
+                                                            "Right"
+                                                        ]
+                                                    ],
+                                                    "display_name": "Horizontal alignment",
+                                                    "pdb_type": null,
+                                                    "value": "left",
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "name": "vertical_align",
+                                                    "default_value": "keep",
+                                                    "items": [
+                                                        [
+                                                            "keep",
+                                                            "Keep"
+                                                        ],
+                                                        [
+                                                            "top",
+                                                            "Top"
+                                                        ],
+                                                        [
+                                                            "center",
+                                                            "Center"
+                                                        ],
+                                                        [
+                                                            "bottom",
+                                                            "Bottom"
+                                                        ]
+                                                    ],
+                                                    "display_name": "Vertical alignment",
+                                                    "pdb_type": null,
+                                                    "value": "center",
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "name": "x_offset",
+                                                    "default_value": 0.0,
+                                                    "display_name": "Additional X-offset",
+                                                    "pdb_type": null,
+                                                    "value": 10.0,
+                                                    "type": "double"
+                                                },
+                                                {
+                                                    "name": "x_offset_unit",
+                                                    "default_value": "pixels",
+                                                    "items": [
+                                                        [
+                                                            "percentage_of_image_width",
+                                                            "% of image width"
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_height",
+                                                            "% of image height"
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_width",
+                                                            "% of another layer width"
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_height",
+                                                            "% of another layer height"
+                                                        ],
+                                                        [
+                                                            "pixels",
+                                                            "Pixels"
+                                                        ]
+                                                    ],
+                                                    "display_name": "Unit for the additional X-offset",
+                                                    "pdb_type": null,
+                                                    "value": "percentage_of_image_width",
+                                                    "type": "choice"
+                                                },
+                                                {
+                                                    "name": "y_offset",
+                                                    "default_value": 0.0,
+                                                    "display_name": "Additional Y-offset",
+                                                    "pdb_type": null,
+                                                    "value": 20.0,
+                                                    "type": "double"
+                                                },
+                                                {
+                                                    "name": "y_offset_unit",
+                                                    "default_value": "pixels",
+                                                    "items": [
+                                                        [
+                                                            "percentage_of_image_width",
+                                                            "% of image width"
+                                                        ],
+                                                        [
+                                                            "percentage_of_image_height",
+                                                            "% of image height"
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_width",
+                                                            "% of another layer width"
+                                                        ],
+                                                        [
+                                                            "percentage_of_layer_height",
+                                                            "% of another layer height"
+                                                        ],
+                                                        [
+                                                            "pixels",
+                                                            "Pixels"
+                                                        ]
+                                                    ],
+                                                    "display_name": "Unit for the additional Y-offset",
+                                                    "pdb_type": null,
+                                                    "value": "pixels",
+                                                    "type": "choice"
+                                                }
+                                            ],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": true,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Align and offset",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Align and offset",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": "Aligns layer(s) with the image or, if specified, another layer.\n\nYou may specify additional offsets after the alignment is applied.",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "Aligns layer(s) with the image or, if specified, another layer.\n\nYou may specify additional offsets after the alignment is applied.",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_procedures"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_procedures"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "enabled_for_previews",
+                                                    "default_value": true,
+                                                    "display_name": "Enable for previews",
+                                                    "pdb_type": null,
+                                                    "value": true,
+                                                    "type": "bool"
+                                                }
+                                            ],
+                                            "name": "more_options",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "align_and_offset_layers",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "align_and_offset_layers",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "name": "align_and_offset_layers",
+                                    "tags": [
+                                        "action",
+                                        "procedure",
+                                        "plug-in-batch-convert",
+                                        "plug-in-batch-export-images",
+                                        "plug-in-batch-edit-layers",
+                                        "plug-in-batch-export-layers"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
                                 }
                             ],
                             "name": "procedures",

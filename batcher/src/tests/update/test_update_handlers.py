@@ -429,3 +429,24 @@ class TestUpdateHandlers(unittest.TestCase):
         'y': 72.0,
       },
     )
+
+    align_arguments_path = 'main/procedures/align_and_offset_layers/arguments'
+
+    self.assertListEqual(
+      [setting.name for setting in settings[align_arguments_path]],
+      [
+        'layers_to_align',
+        'reference_object',
+        'horizontal_align',
+        'vertical_align',
+        'x_offset',
+        'x_offset_unit',
+        'y_offset',
+        'y_offset_unit',
+      ],
+    )
+
+    self.assertIsInstance(
+      settings[f'{align_arguments_path}/reference_object'],
+      placeholders.PlaceholderImageOrLayerSetting,
+    )

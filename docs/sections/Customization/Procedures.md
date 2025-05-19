@@ -14,13 +14,12 @@ You can add the same procedure multiple times.
 
 ### Align and offset
 
-Aligns layer(s) with the current image or, if specified, another layer within the image.
+Aligns layer(s) with the current image or another layer.
 You may specify additional offsets after the alignment is applied.
 
 Options:
 * *Layers to align*: Layers to align. This can be a single layer (e.g. the current layer, background, foreground) or all layers inserted in the currently processed image.
 * *Object to align layers with*: Whether to align with the entire image or another layer.
-* *Another layer to align layers with*
 * *Horizontal alignment*: Left, center or right alignment, or *Keep* the horizontal position intact.
 * *Vertical alignment*: Top, center or bottom alignment, or *Keep* the vertical position intact.
 * *Additional X-offset*: Moves the layers horizontally by the specified amount.
