@@ -2260,18 +2260,8 @@ class ColorSetting(Setting):
 
     super().__init__(name, **kwargs)
 
-  @property
-  def has_alpha(self) -> bool:
-    """Returns ``True`` if this color setting supports the alpha channel."""
-    return self._has_alpha
-
-  @property
-  def value_for_pdb(self):
-    """Setting value converted to a `Gegl.Color` instance."""
-    return self.get_value_as_color(self._value)
-
-  @staticmethod
-  def get_value_as_color(value):
+  @classmethod
+  def get_value_as_color(cls, value):
     """Returns the specified value converted to a `Gegl.Color` instance."""
     if isinstance(value, (list, tuple)):
       color = Gegl.Color()
@@ -2282,6 +2272,16 @@ class ColorSetting(Setting):
       return color
     else:
       return value
+
+  @property
+  def has_alpha(self) -> bool:
+    """Returns ``True`` if this color setting supports the alpha channel."""
+    return self._has_alpha
+
+  @property
+  def value_for_pdb(self):
+    """Setting value converted to a `Gegl.Color` instance."""
+    return self.get_value_as_color(self._value)
 
   def _value_to_raw(self, value):
     if isinstance(value, Gegl.Color):
