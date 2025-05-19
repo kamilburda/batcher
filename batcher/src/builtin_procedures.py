@@ -839,18 +839,6 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'display_name': _('New height'),
     },
     {
-      'type': 'enum',
-      'enum_type': Gimp.InterpolationType,
-      'name': 'interpolation',
-      'display_name': _('Interpolation'),
-    },
-    {
-      'type': 'bool',
-      'name': 'local_origin',
-      'default_value': False,
-      'display_name': _('Use local origin'),
-    },
-    {
       'type': 'choice',
       'name': 'aspect_ratio',
       'default_value': AspectRatios.STRETCH,
@@ -868,6 +856,18 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'name': 'padding_color',
       'default_value': [0.0, 0.0, 0.0, 0.0],
       'display_name': _('Padding color'),
+    },
+    {
+      'type': 'enum',
+      'enum_type': Gimp.InterpolationType,
+      'name': 'interpolation',
+      'display_name': _('Interpolation'),
+    },
+    {
+      'type': 'bool',
+      'name': 'local_origin',
+      'default_value': False,
+      'display_name': _('Use local origin'),
     },
     {
       'type': 'bool',

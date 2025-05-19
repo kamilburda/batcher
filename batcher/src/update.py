@@ -1358,6 +1358,7 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             orig_name_setting_dict,
           )
           _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list)
+          _scale_1_1_add_padding_color_argument(arguments_list)
           _scale_1_1_add_image_resolution(arguments_list)
 
 
@@ -1462,7 +1463,8 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
     else:
       value = builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT
 
-  arguments_list.append(
+  arguments_list.insert(
+    -2,
     {
       'type': 'choice',
       'name': 'aspect_ratio',
@@ -1476,6 +1478,19 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
         (builtin_procedures.AspectRatios.FIT_WITH_PADDING, _('Fit with padding')),
       ],
       'display_name': _('Aspect ratio'),
+    },
+  )
+
+
+def _scale_1_1_add_padding_color_argument(arguments_list):
+  arguments_list.insert(
+    -2,
+    {
+      'type': 'color',
+      'name': 'padding_color',
+      'default_value': [0.0, 0.0, 0.0, 0.0],
+      'value': [0.0, 0.0, 0.0, 0.0],
+      'display_name': _('Padding color'),
     },
   )
 
