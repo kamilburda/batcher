@@ -5,7 +5,7 @@ General changes:
 
 Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
-* Batch Convert: Increased initial preview height.
+* Batch Convert: Increased the initial preview height.
 
 Changes to procedures and constraints:
 * Scale:
