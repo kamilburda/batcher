@@ -14,6 +14,7 @@ Changes to procedures and constraints:
     * More units beside pixels and percentages can be chosen from (the same ones available in GIMP). These units are recalculated automatically.
     * Switching between pixels, percentages and other units will now restore the last value for that unit.
     * Merged `Scale to fit`, `Keep aspect ratio` and `Dimension to keep` to a single widget.
+    * Added a new option `Fit with padding` under `Aspect ratio` that fits the image/layer to the specified dimensions and fills the empty space with the specified color (transparent by default).
     * Added a new option to change the image resolution.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 

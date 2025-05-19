@@ -877,6 +877,17 @@ def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/new_height'],
     )
 
+    _set_sensitive_for_padding_color_given_aspect_ratio(
+      procedure['arguments/aspect_ratio'],
+      procedure['arguments/padding_color'],
+    )
+
+    procedure['arguments/aspect_ratio'].connect_event(
+      'value-changed',
+      _set_sensitive_for_padding_color_given_aspect_ratio,
+      procedure['arguments/padding_color'],
+    )
+
     procedure['arguments/image_resolution'].connect_event(
       'after-set-gui',
       _set_left_margin_for_resolution,
@@ -908,6 +919,14 @@ def _set_sensitive_for_dimensions_given_aspect_ratio(
 
   new_width_setting.gui.set_sensitive(not adjust_height)
   new_height_setting.gui.set_sensitive(not adjust_width)
+
+
+def _set_sensitive_for_padding_color_given_aspect_ratio(
+      aspect_ratio_setting,
+      padding_color_setting,
+):
+  padding_color_setting.gui.set_sensitive(
+    aspect_ratio_setting.value == builtin_procedures.AspectRatios.FIT_WITH_PADDING)
 
 
 def _set_left_margin_for_resolution(image_resolution_setting):
