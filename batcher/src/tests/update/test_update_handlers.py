@@ -356,8 +356,21 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_1_1(self, settings):
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 
-    self.assertNotIn('image', settings[scale_arguments_path])
-    self.assertNotIn('layer', settings[scale_arguments_path])
+    self.assertListEqual(
+      [setting.name for setting in settings[scale_arguments_path]],
+      [
+        'object_to_scale',
+        'new_width',
+        'new_height',
+        'aspect_ratio',
+        'padding_color',
+        'interpolation',
+        'local_origin',
+        'set_image_resolution',
+        'image_resolution',
+      ],
+    )
+
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/object_to_scale'],
       placeholders.PlaceholderImageOrLayerSetting,
@@ -367,7 +380,6 @@ class TestUpdateHandlers(unittest.TestCase):
       'current_image',
     )
 
-    self.assertNotIn('width_unit', settings[scale_arguments_path])
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/new_width'],
       setting_classes.DimensionSetting,
@@ -384,7 +396,6 @@ class TestUpdateHandlers(unittest.TestCase):
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_width'].min_value, 0.0)
 
-    self.assertNotIn('height_unit', settings[scale_arguments_path])
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/new_height'],
       setting_classes.DimensionSetting,
@@ -401,19 +412,12 @@ class TestUpdateHandlers(unittest.TestCase):
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
 
-    self.assertNotIn('scale_to_fit', settings[scale_arguments_path])
-    self.assertNotIn('keep_aspect_ratio', settings[scale_arguments_path])
-    self.assertNotIn('dimension_to_keep', settings[scale_arguments_path])
-
-    self.assertIn('aspect_ratio', settings[scale_arguments_path])
     self.assertEqual(
       settings[f'{scale_arguments_path}/aspect_ratio'].value,
       builtin_procedures.AspectRatios.STRETCH)
 
-    self.assertIn('set_image_resolution', settings[scale_arguments_path])
     self.assertEqual(settings[f'{scale_arguments_path}/set_image_resolution'].value, False)
 
-    self.assertIn('image_resolution', settings[scale_arguments_path])
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/image_resolution'],
       setting_classes.ResolutionSetting,
