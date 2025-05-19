@@ -1618,7 +1618,7 @@ class TestDrawableFilterSetting(SettingTestCase):
 class TestColorSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
-    self._assert_color_equal(settings_.ColorSetting('color').default_value, Gegl.Color.new('black'))
+    self.assertEqual(settings_.ColorSetting('color').default_value, [0.0, 0.0, 0.0, 1.0])
   
   def test_set_value_with_object(self):
     color = Gegl.Color()
@@ -1633,10 +1633,7 @@ class TestColorSetting(SettingTestCase):
     setting = settings_.ColorSetting('color')
     setting.set_value([0.5, 0.2, 0.8, 0.4])
 
-    expected_color = Gegl.Color()
-    expected_color.set_rgba(0.5, 0.2, 0.8, 0.4)
-
-    self._assert_color_equal(setting.value, expected_color)
+    self.assertEqual(setting.value, [0.5, 0.2, 0.8, 0.4])
   
   def test_to_dict(self):
     setting = settings_.ColorSetting('color')
