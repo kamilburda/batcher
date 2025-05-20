@@ -20,6 +20,7 @@ Changes to procedures and constraints:
 * Align and offset:
   * Merged `Another layer to align layers with` into `Object to align layers with`.
   * Units for x- and y-offsets are moved next to the x- and y-offset widgets, respectively.
+  * More units beside pixels and percentages can be chosen from (the same ones available in GIMP). These units are recalculated automatically.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 
 Bug fixes:
