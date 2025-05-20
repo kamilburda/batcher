@@ -520,7 +520,9 @@ def _fill_with_padding(
       layer_to_fill_end_offset_x = drawable_with_padding_offsets.offset_x
       layer_to_fill_end_offset_y = drawable_with_padding_offsets.offset_y + object_height + offset_y
 
-    gimp_object.transform_translate(offset_x, offset_y)
+    gimp_object.set_offsets(
+      drawable_with_padding_offsets.offset_x + offset_x,
+      drawable_with_padding_offsets.offset_y + offset_y)
 
   Gimp.context_set_foreground(pg.setting.ColorSetting.get_value_as_color(padding_color))
   Gimp.context_set_opacity(
