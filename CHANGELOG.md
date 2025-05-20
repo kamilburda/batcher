@@ -19,6 +19,7 @@ Changes to procedures and constraints:
   * Added a new option to change the image resolution.
 * Align and offset:
   * Merged `Another layer to align layers with` into `Object to align layers with`.
+  * Units for x- and y-offsets are moved next to the x- and y-offset widgets, respectively.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
 
 Bug fixes:

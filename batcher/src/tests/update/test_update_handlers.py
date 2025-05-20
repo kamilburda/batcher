@@ -440,13 +440,41 @@ class TestUpdateHandlers(unittest.TestCase):
         'horizontal_align',
         'vertical_align',
         'x_offset',
-        'x_offset_unit',
         'y_offset',
-        'y_offset_unit',
       ],
     )
 
     self.assertIsInstance(
       settings[f'{align_arguments_path}/reference_object'],
       placeholders.PlaceholderImageOrLayerSetting,
+    )
+
+    self.assertIsInstance(
+      settings[f'{align_arguments_path}/x_offset'],
+      setting_classes.DimensionSetting,
+    )
+    self.assertEqual(
+      settings[f'{align_arguments_path}/x_offset'].value,
+      {
+        'pixel_value': 0.0,
+        'percent_value': 10.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+      },
+    )
+
+    self.assertIsInstance(
+      settings[f'{align_arguments_path}/y_offset'],
+      setting_classes.DimensionSetting,
+    )
+    self.assertEqual(
+      settings[f'{align_arguments_path}/y_offset'].value,
+      {
+        'pixel_value': 20.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_layer',
+      },
     )

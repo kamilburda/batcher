@@ -120,9 +120,7 @@ def align_and_offset_layers(
       horizontal_align,
       vertical_align,
       x_offset,
-      x_offset_unit,
       y_offset,
-      y_offset_unit,
 ):
   image_width = batcher.current_image.get_width()
   image_height = batcher.current_image.get_height()
@@ -177,29 +175,8 @@ def align_and_offset_layers(
       elif reference_object_type == 'layer':
         new_y = ref_layer_y + ref_layer_height - layer.get_height()
 
-    if x_offset:
-      if x_offset_unit == Units.PIXELS:
-        new_x += round(x_offset)
-      elif x_offset_unit == Units.PERCENT_IMAGE_WIDTH:
-        new_x += round((image_width * x_offset) / 100)
-      elif x_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
-        new_x += round((image_height * x_offset) / 100)
-      elif x_offset_unit == Units.PERCENT_LAYER_WIDTH:
-        new_x += round((ref_layer_width * x_offset) / 100)
-      elif x_offset_unit == Units.PERCENT_LAYER_HEIGHT:
-        new_x += round((ref_layer_height * x_offset) / 100)
-
-    if y_offset:
-      if y_offset_unit == Units.PIXELS:
-        new_y += round(y_offset)
-      elif y_offset_unit == Units.PERCENT_IMAGE_WIDTH:
-        new_y += round((image_width * y_offset) / 100)
-      elif y_offset_unit == Units.PERCENT_IMAGE_HEIGHT:
-        new_y += round((image_height * y_offset) / 100)
-      elif y_offset_unit == Units.PERCENT_LAYER_WIDTH:
-        new_y += round((ref_layer_width * y_offset) / 100)
-      elif y_offset_unit == Units.PERCENT_LAYER_HEIGHT:
-        new_y += round((ref_layer_height * y_offset) / 100)
+    new_x += _unit_to_pixels(batcher, x_offset, 'x_offset')
+    new_y += _unit_to_pixels(batcher, y_offset, 'y_offset')
 
     layer.set_offsets(new_x, new_y)
 
@@ -340,14 +317,18 @@ def scale(
       object_to_scale.get_image().set_resolution(image_resolution['x'], image_resolution['y'])
 
   new_width_pixels = _unit_to_pixels(batcher, new_width, 'width')
+  if new_width_pixels <= 0:
+    new_width_pixels = 1
+
   new_height_pixels = _unit_to_pixels(batcher, new_height, 'height')
+  if new_height_pixels <= 0:
+    new_height_pixels = 1
 
   orig_width_pixels = object_to_scale.get_width()
-  orig_height_pixels = object_to_scale.get_height()
-
   if orig_width_pixels == 0:
     orig_width_pixels = 1
 
+  orig_height_pixels = object_to_scale.get_height()
   if orig_height_pixels == 0:
     orig_height_pixels = 1
 
@@ -391,37 +372,44 @@ def scale(
   Gimp.context_pop()
 
 
-def _unit_to_pixels(batcher, dimension, dimension_name):
+def _unit_to_pixels(batcher, dimension, percent_object_attribute):
   if dimension['unit'] == Gimp.Unit.percent():
     placeholder_object = placeholders_.PLACEHOLDERS[dimension['percent_object']]
     gimp_object = placeholder_object.replace_args(None, batcher)
 
-    if dimension_name == 'width':
+    if percent_object_attribute == 'width':
       gimp_object_dimension = gimp_object.get_width()
-    elif dimension_name == 'height':
+    elif percent_object_attribute == 'height':
       gimp_object_dimension = gimp_object.get_height()
+    elif percent_object_attribute == 'x_offset':
+      if isinstance(gimp_object, Gimp.Image):
+        gimp_object_dimension = 0
+      else:
+        gimp_object_dimension = gimp_object.get_offsets().offset_x
+    elif percent_object_attribute == 'y_offset':
+      if isinstance(gimp_object, Gimp.Image):
+        gimp_object_dimension = 0
+      else:
+        gimp_object_dimension = gimp_object.get_offsets().offset_y
     else:
-      raise ValueError('value for dimension_name not valid')
+      raise ValueError('value for percent_object_attribute not valid')
 
     pixels = (dimension['percent_value'] / 100) * gimp_object_dimension
   elif dimension['unit'] == Gimp.Unit.pixel():
     pixels = dimension['pixel_value']
   else:
     image_resolution = batcher.current_image.get_resolution()
-    if dimension_name == 'width':
+    if percent_object_attribute in ['width', 'x_offset']:
       image_resolution_for_dimension = image_resolution.xresolution
-    elif dimension_name == 'height':
+    elif percent_object_attribute in ['height', 'y_offset']:
       image_resolution_for_dimension = image_resolution.yresolution
     else:
-      raise ValueError('value for dimension_name not valid')
+      raise ValueError('value for percent_object_attribute not valid')
 
     pixels = (
       dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_dimension)
 
   int_pixels = round(pixels)
-
-  if int_pixels <= 0:
-    int_pixels = 1
 
   return int_pixels
 
@@ -584,22 +572,6 @@ class AspectRatios:
     'keep_adjust_height',
     'fit',
     'fit_with_padding',
-  )
-
-
-class Units:
-  UNITS = (
-    PERCENT_IMAGE_WIDTH,
-    PERCENT_IMAGE_HEIGHT,
-    PERCENT_LAYER_WIDTH,
-    PERCENT_LAYER_HEIGHT,
-    PIXELS,
-  ) = (
-    'percentage_of_image_width',
-    'percentage_of_image_height',
-    'percentage_of_layer_width',
-    'percentage_of_layer_height',
-    'pixels',
   )
 
 
@@ -951,42 +923,32 @@ _BUILTIN_PROCEDURES_LIST = [
         'display_name': _('Vertical alignment'),
       },
       {
-        'type': 'double',
+        'type': 'dimension',
         'name': 'x_offset',
-        'default_value': 0.0,
+        'default_value': {
+          'pixel_value': 0.0,
+          'percent_value': 0.0,
+          'other_value': 0.0,
+          'unit': Gimp.Unit.pixel(),
+          'percent_object': 'current_layer',
+        },
+        'percent_placeholder_names': [
+          'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
         'display_name': _('Additional X-offset'),
       },
       {
-        'type': 'choice',
-        'name': 'x_offset_unit',
-        'default_value': Units.PIXELS,
-        'items': [
-          (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-          (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-          (Units.PERCENT_LAYER_WIDTH, _('% of another layer width')),
-          (Units.PERCENT_LAYER_HEIGHT, _('% of another layer height')),
-          (Units.PIXELS, _('Pixels')),
-        ],
-        'display_name': _('Unit for the additional X-offset'),
-      },
-      {
-        'type': 'double',
+        'type': 'dimension',
         'name': 'y_offset',
-        'default_value': 0.0,
+        'default_value': {
+          'pixel_value': 0.0,
+          'percent_value': 0.0,
+          'other_value': 0.0,
+          'unit': Gimp.Unit.pixel(),
+          'percent_object': 'current_layer',
+        },
+        'percent_placeholder_names': [
+          'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
         'display_name': _('Additional Y-offset'),
-      },
-      {
-        'type': 'choice',
-        'name': 'y_offset_unit',
-        'default_value': Units.PIXELS,
-        'items': [
-          (Units.PERCENT_IMAGE_WIDTH, _('% of image width')),
-          (Units.PERCENT_IMAGE_HEIGHT, _('% of image height')),
-          (Units.PERCENT_LAYER_WIDTH, _('% of another layer width')),
-          (Units.PERCENT_LAYER_HEIGHT, _('% of another layer height')),
-          (Units.PIXELS, _('Pixels')),
-        ],
-        'display_name': _('Unit for the additional Y-offset'),
       },
     ],
   },

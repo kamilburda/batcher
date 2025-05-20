@@ -22,10 +22,8 @@ Options:
 * *Object to align layers with*: Whether to align with the entire image or another layer.
 * *Horizontal alignment*: Left, center or right alignment, or *Keep* the horizontal position intact.
 * *Vertical alignment*: Top, center or bottom alignment, or *Keep* the vertical position intact.
-* *Additional X-offset*: Moves the layers horizontally by the specified amount.
-* *Unit for the additional X-offset*: Can be pixels or percentages of image/another layer width/height.
-* *Additional Y-offset*: Moves the layers vertically by the specified amount.
-* *Unit for the additional Y-offset*: Can be pixels or percentages of image/another layer width/height.
+* *Additional X-offset*: Moves the layers horizontally by the specified amount, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *Additional Y-offset*: Moves the layers vertically by the specified amount, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
 
 ### Export/Also export as...
 
