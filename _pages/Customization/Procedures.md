@@ -174,7 +174,6 @@ Options:
 * *Use local origin*: If checked and *Object to scale* is set to *Layer*, the layer will be scaled around its center. If not checked, the layer will be placed to the upper left corner of the image.
 * *Scale to fit*: If checked, the image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller, while also preserving the aspect ratio. You can imagine a canvas having the dimensions *New width* and *New height* to which the image/layer will be fit.
 * *Keep aspect ratio*: If checked, the image/layer is scaled such that the ratio between the width and height is preserved. You can choose the dimension to be fixed via the *Dimension to keep* option.
-* *Dimension to keep*: The dimension - width or height - to be considered fixed when scaling with the *Keep aspect ratio* option checked.
 
 
 ## Adding Custom Procedures
