@@ -1,4 +1,4 @@
-"""Built-in plug-in constraints."""
+"""Built-in constraints."""
 
 import re
 
