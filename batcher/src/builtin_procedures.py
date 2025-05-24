@@ -945,7 +945,7 @@ _BUILTIN_PROCEDURES_LIST = [
           'percent_object': 'current_layer',
           'percent_property': {
             ('current_image',): 'width',
-            ('current_layer', 'background_layer', 'foreground_layer'): 'x_offset',
+            ('current_layer', 'background_layer', 'foreground_layer'): 'width',
           },
         },
         'percent_placeholder_names': [
@@ -963,7 +963,7 @@ _BUILTIN_PROCEDURES_LIST = [
           'percent_object': 'current_layer',
           'percent_property': {
             ('current_image',): 'height',
-            ('current_layer', 'background_layer', 'foreground_layer'): 'y_offset',
+            ('current_layer', 'background_layer', 'foreground_layer'): 'height',
           },
         },
         'percent_placeholder_names': [
