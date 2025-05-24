@@ -13,6 +13,7 @@ from src import export as export_
 from src import overwrite
 from src import placeholders as placeholders_
 from src import renamer as renamer_
+from src import setting_classes as setting_classes_
 from src import utils
 from src.procedure_groups import *
 
@@ -175,8 +176,8 @@ def align_and_offset_layers(
       elif reference_object_type == 'layer':
         new_y = ref_layer_y + ref_layer_height - layer.get_height()
 
-    new_x += _unit_to_pixels(batcher, x_offset, 'x_offset')
-    new_y += _unit_to_pixels(batcher, y_offset, 'y_offset')
+    new_x += _unit_to_pixels(batcher, x_offset, 'x')
+    new_y += _unit_to_pixels(batcher, y_offset, 'y')
 
     layer.set_offsets(new_x, new_y)
 
@@ -316,11 +317,11 @@ def scale(
     elif isinstance(object_to_scale, Gimp.Item):
       object_to_scale.get_image().set_resolution(image_resolution['x'], image_resolution['y'])
 
-  new_width_pixels = _unit_to_pixels(batcher, new_width, 'width')
+  new_width_pixels = _unit_to_pixels(batcher, new_width, 'x')
   if new_width_pixels <= 0:
     new_width_pixels = 1
 
-  new_height_pixels = _unit_to_pixels(batcher, new_height, 'height')
+  new_height_pixels = _unit_to_pixels(batcher, new_height, 'y')
   if new_height_pixels <= 0:
     new_height_pixels = 1
 
@@ -372,39 +373,42 @@ def scale(
   Gimp.context_pop()
 
 
-def _unit_to_pixels(batcher, dimension, percent_object_attribute):
+def _unit_to_pixels(batcher, dimension, resolution_axis):
   if dimension['unit'] == Gimp.Unit.percent():
     placeholder_object = placeholders_.PLACEHOLDERS[dimension['percent_object']]
     gimp_object = placeholder_object.replace_args(None, batcher)
 
-    if percent_object_attribute == 'width':
+    percent_property = setting_classes_.DimensionSetting.get_percent_property_value(
+      dimension['percent_property'], dimension['percent_object'])
+
+    if percent_property == 'width':
       gimp_object_dimension = gimp_object.get_width()
-    elif percent_object_attribute == 'height':
+    elif percent_property == 'height':
       gimp_object_dimension = gimp_object.get_height()
-    elif percent_object_attribute == 'x_offset':
+    elif percent_property == 'x_offset':
       if isinstance(gimp_object, Gimp.Image):
         gimp_object_dimension = 0
       else:
         gimp_object_dimension = gimp_object.get_offsets().offset_x
-    elif percent_object_attribute == 'y_offset':
+    elif percent_property == 'y_offset':
       if isinstance(gimp_object, Gimp.Image):
         gimp_object_dimension = 0
       else:
         gimp_object_dimension = gimp_object.get_offsets().offset_y
     else:
-      raise ValueError('value for percent_object_attribute not valid')
+      raise ValueError(f'unrecognized percent property: {percent_property}')
 
     pixels = (dimension['percent_value'] / 100) * gimp_object_dimension
   elif dimension['unit'] == Gimp.Unit.pixel():
     pixels = dimension['pixel_value']
   else:
     image_resolution = batcher.current_image.get_resolution()
-    if percent_object_attribute in ['width', 'x_offset']:
+    if resolution_axis == 'x':
       image_resolution_for_dimension = image_resolution.xresolution
-    elif percent_object_attribute in ['height', 'y_offset']:
+    elif resolution_axis == 'y':
       image_resolution_for_dimension = image_resolution.yresolution
     else:
-      raise ValueError('value for percent_object_attribute not valid')
+      raise ValueError(f'unrecognized value for resolution_dimension: {resolution_axis}')
 
     pixels = (
       dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_dimension)
@@ -785,6 +789,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
         'other_value': 1.0,
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
@@ -800,6 +808,10 @@ _SCALE_PROCEDURE_DICT_FOR_IMAGES = {
         'other_value': 1.0,
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
@@ -931,6 +943,10 @@ _BUILTIN_PROCEDURES_LIST = [
           'other_value': 0.0,
           'unit': Gimp.Unit.pixel(),
           'percent_object': 'current_layer',
+          'percent_property': {
+            ('current_image',): 'width',
+            ('current_layer', 'background_layer', 'foreground_layer'): 'x_offset',
+          },
         },
         'percent_placeholder_names': [
           'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
@@ -945,6 +961,10 @@ _BUILTIN_PROCEDURES_LIST = [
           'other_value': 0.0,
           'unit': Gimp.Unit.pixel(),
           'percent_object': 'current_layer',
+          'percent_property': {
+            ('current_image',): 'height',
+            ('current_layer', 'background_layer', 'foreground_layer'): 'y_offset',
+          },
         },
         'percent_placeholder_names': [
           'current_image', 'current_layer', 'background_layer', 'foreground_layer'],

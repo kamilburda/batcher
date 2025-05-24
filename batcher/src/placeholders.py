@@ -130,6 +130,27 @@ The following placeholder objects are defined:
 """
 
 
+ATTRIBUTES = {
+  'width': _('Width'),
+  'height': _('Height'),
+  'x_offset': _('X-offset'),
+  'y_offset': _('Y-offset'),
+}
+"""Attributes that can be obtained from objects substituted for placeholders.
+
+Not all attributes can be obtained from all objects. `PLACEHOLDER_ATTRIBUTE_MAP`
+specifies the allowed objects per a group of attributes.
+"""
+
+
+PLACEHOLDER_ATTRIBUTE_MAP = {
+  ('current_image',): ('width', 'height'),
+  ('current_layer', 'background_layer', 'foreground_layer'): (
+    'width', 'height', 'x_offset', 'y_offset'),
+}
+"""Mapping of placeholders to applicable attributes."""
+
+
 class PlaceholderSetting(pg.setting.Setting):
    
   _ALLOWED_GUI_TYPES = [gui_placeholders.PlaceholdersComboBoxPresenter]

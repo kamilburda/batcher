@@ -168,12 +168,10 @@ class DimensionBoxPresenter(pg.setting.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
-    percent_placeholder_labels = [
-      placeholders_.PLACEHOLDERS[name].display_name for name in setting.percent_placeholder_names]
-
     dimension_box = dimension_box_.DimensionBox(
       default_pixel_value=setting.value['pixel_value'],
       default_percent_value=setting.value['percent_value'],
+      default_percent_property=setting.value['percent_property'],
       default_other_value=setting.value['other_value'],
       min_value=setting.min_value,
       max_value=setting.max_value,
@@ -181,7 +179,12 @@ class DimensionBoxPresenter(pg.setting.GtkPresenter):
       pixel_unit=Gimp.Unit.pixel(),
       percent_unit=Gimp.Unit.percent(),
       percent_placeholder_names=setting.percent_placeholder_names,
-      percent_placeholder_labels=percent_placeholder_labels,
+      percent_placeholder_labels=[
+        placeholders_.PLACEHOLDERS[name].display_name for name in setting.percent_placeholder_names
+      ],
+      percent_property_names=list(placeholders_.ATTRIBUTES),
+      percent_property_labels=list(placeholders_.ATTRIBUTES.values()),
+      percent_placeholder_attribute_map=setting.placeholder_attribute_map,
     )
 
     return dimension_box
@@ -198,8 +201,8 @@ class DimensionSetting(pg.setting.NumericSetting):
 
   In this setting, a dimension is a dictionary consisting of a value, a unit
   (e.g. pixels or a percentage) and additional data required to further specify
-  a particular unit (e.g. an image or layer dimension to take a percentage
-  from).
+  a particular unit (e.g. an object (image, layer, ...) and a dimension (width,
+  X-offset, ...) to take a percentage from).
 
   Default value: A dictionary representing 0 pixels.
   """
@@ -213,6 +216,11 @@ class DimensionSetting(pg.setting.NumericSetting):
     'percent_value': 100.0,
     'other_value': 1.0,
     'unit': Gimp.Unit.pixel(),
+    'percent_object': 'current_image',
+    'percent_property': {
+      ('current_image',): 'width',
+      ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+    },
   }
 
   def __init__(self, name, percent_placeholder_names: Iterable[str], **kwargs):
@@ -225,11 +233,28 @@ class DimensionSetting(pg.setting.NumericSetting):
     self._percent_placeholder_names = percent_placeholder_names
     self._built_in_units = pg.setting.UnitSetting.get_built_in_units()
 
+    self._placeholder_attribute_map = utils.semi_deep_copy(placeholders_.PLACEHOLDER_ATTRIBUTE_MAP)
+
     super().__init__(name, **kwargs)
+
+  @classmethod
+  def get_percent_property_value(cls, percent_property, percent_object):
+    """Returns the property (e.g. width, X-offset) for the current value of
+    ``'percent_object'`` within the setting value's ``percent_property`` entry.
+    """
+    for key in percent_property:
+      if percent_object in key:
+        return percent_property[key]
+
+    return None
 
   @property
   def percent_placeholder_names(self):
     return self._percent_placeholder_names
+
+  @property
+  def placeholder_attribute_map(self):
+    return self._placeholder_attribute_map
 
   def _validate(self, value):
     if 'pixel_value' in value:
