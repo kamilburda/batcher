@@ -392,6 +392,10 @@ class TestUpdateHandlers(unittest.TestCase):
         'other_value': 1.0,
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
       },
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_width'].min_value, 0.0)
@@ -408,6 +412,10 @@ class TestUpdateHandlers(unittest.TestCase):
         'other_value': 1.0,
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_layer',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
       },
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
@@ -461,6 +469,10 @@ class TestUpdateHandlers(unittest.TestCase):
         'other_value': 0.0,
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
       },
     )
 
@@ -476,5 +488,9 @@ class TestUpdateHandlers(unittest.TestCase):
         'other_value': 0.0,
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_layer',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
       },
     )

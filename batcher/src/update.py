@@ -1388,6 +1388,10 @@ def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict
     'other_value': 1.0,
     'unit': 'percent',
     'percent_object': 'current_image',
+    'percent_property': {
+      ('current_image',): 'width',
+      ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+    },
   }
 
   if orig_name_setting_dict['value'] == 'scale_for_images':
@@ -1401,7 +1405,7 @@ def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict
   width_setting_dict['value'], width_setting_dict['default_value'] = _get_dimension(
     width_setting_dict['value'],
     width_unit_setting_dict['value'],
-    'width',
+    'x',
     dimension_default_value,
   )
   width_setting_dict['percent_placeholder_names'] = [
@@ -1414,7 +1418,7 @@ def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict
   height_setting_dict['value'], height_setting_dict['default_value'] = _get_dimension(
     height_setting_dict['value'],
     height_unit_setting_dict['value'],
-    'height',
+    'y',
     dimension_default_value,
   )
   height_setting_dict['percent_placeholder_names'] = [
@@ -1523,6 +1527,10 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
     'other_value': 0.0,
     'unit': 'pixel',
     'percent_object': 'current_layer',
+    'percent_property': {
+      ('current_image',): 'width',
+      ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+    },
   }
 
   x_offset_unit_setting_dict, _index = _remove_setting(arguments_list, 'x_offset_unit')
@@ -1531,7 +1539,7 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
   x_offset_setting_dict['value'], x_offset_setting_dict['default_value'] = _get_dimension(
     x_offset_setting_dict['value'],
     x_offset_unit_setting_dict['value'],
-    'width',
+    'x',
     dimension_default_value,
   )
   x_offset_setting_dict['percent_placeholder_names'] = [
@@ -1543,32 +1551,45 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
   y_offset_setting_dict['value'], y_offset_setting_dict['default_value'] = _get_dimension(
     y_offset_setting_dict['value'],
     y_offset_unit_setting_dict['value'],
-    'height',
+    'y',
     dimension_default_value,
   )
   y_offset_setting_dict['percent_placeholder_names'] = [
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
 
 
-def _get_dimension(orig_value, orig_unit, orig_dimension, dimension_default_value):
-  dimension_value = dict(dimension_default_value)
+def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):
+  dimension_value = utils_.semi_deep_copy(dimension_default_value)
 
   if orig_unit == 'pixels':
     dimension_value['unit'] = 'pixel'
     dimension_value['pixel_value'] = orig_value
+
+    if axis == 'x':
+      dimension_value['percent_property'][('current_image',)] = 'width'
+      dimension_value['percent_property'][
+        ('current_layer', 'background_layer', 'foreground_layer')] = 'width'
+    else:
+      dimension_value['percent_property'][('current_image',)] = 'height'
+      dimension_value['percent_property'][
+        ('current_layer', 'background_layer', 'foreground_layer')] = 'height'
+
   elif orig_unit.startswith('percentage_of_'):
     dimension_value['unit'] = 'percent'
-
+    dimension_value['percent_value'] = orig_value
     if orig_unit.startswith('percentage_of_image_'):
       dimension_value['percent_object'] = 'current_image'
     elif orig_unit.startswith('percentage_of_layer_'):
       dimension_value['percent_object'] = 'current_layer'
 
-    if orig_unit.endswith('_width') and orig_dimension == 'width':
-      dimension_value['percent_value'] = orig_value
-
-    if orig_unit.endswith('_height') and orig_dimension == 'height':
-      dimension_value['percent_value'] = orig_value
+    if orig_unit.endswith('_width'):
+      dimension_value['percent_property'][('current_image',)] = 'width'
+      dimension_value['percent_property'][
+        ('current_layer', 'background_layer', 'foreground_layer')] = 'width'
+    else:
+      dimension_value['percent_property'][('current_image',)] = 'height'
+      dimension_value['percent_property'][
+        ('current_layer', 'background_layer', 'foreground_layer')] = 'height'
 
   return dimension_value, dimension_default_value
 
