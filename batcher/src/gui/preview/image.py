@@ -23,8 +23,8 @@ import pygimplib as pg
 
 from . import base as preview_base_
 
+from src import builtin_procedures
 from src import exceptions
-from src import export as export_
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -161,7 +161,7 @@ class ImagePreview(preview_base_.Preview):
 
   def set_item_name_label(self, item: pg.itemtree.Item):
     if not self._batcher.edit_mode:
-      item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
+      item_state = item.get_named_state(builtin_procedures.EXPORT_NAME_ITEM_STATE)
       item_name = item_state['name'] if item_state is not None else item.name
     else:
       item_name = item.name

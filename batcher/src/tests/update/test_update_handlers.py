@@ -419,11 +419,7 @@ class TestUpdateHandlers(unittest.TestCase):
       },
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
-
-    self.assertEqual(
-      settings[f'{scale_arguments_path}/aspect_ratio'].value,
-      builtin_procedures.AspectRatios.STRETCH)
-
+    self.assertEqual(settings[f'{scale_arguments_path}/aspect_ratio'].value, 'stretch')
     self.assertEqual(settings[f'{scale_arguments_path}/set_image_resolution'].value, False)
 
     self.assertIsInstance(

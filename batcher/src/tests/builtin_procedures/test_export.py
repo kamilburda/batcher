@@ -12,7 +12,7 @@ import pygimplib as pg
 from pygimplib import pdb
 from pygimplib.tests import stubs_gimp
 
-from src import export as export_
+from src import builtin_procedures
 from src import file_formats as file_formats_
 
 
@@ -84,7 +84,7 @@ class TestExport(unittest.TestCase):
     )
     self.procedure = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
 
-    export_.pdb.remove_from_cache(self.procedure_name)
+    builtin_procedures._export.pdb.remove_from_cache(self.procedure_name)
     file_formats_.pdb.remove_from_cache(self.procedure_name)
 
   def test_get_export_function(self, mock_get_setting_data_from_pdb_procedure, mock_gimp):
@@ -107,8 +107,8 @@ class TestExport(unittest.TestCase):
     file_format_options = {}
 
     # noinspection PyTypeChecker
-    proc, kwargs = export_.get_export_function(
-      'png', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
+    proc, kwargs = builtin_procedures.get_export_function(
+      'png', builtin_procedures.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.file_png_export)
     mock_get_setting_data_from_pdb_procedure.assert_called_once()
@@ -127,8 +127,8 @@ class TestExport(unittest.TestCase):
     file_format_options = {}
 
     # noinspection PyTypeChecker
-    proc, kwargs = export_.get_export_function(
-      'unknown', export_.FileFormatModes.USE_NATIVE_PLUGIN_VALUES, file_format_options)
+    proc, kwargs = builtin_procedures.get_export_function(
+      'unknown', builtin_procedures.FileFormatModes.USE_NATIVE_PLUGIN_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
@@ -141,8 +141,8 @@ class TestExport(unittest.TestCase):
     file_format_options = {}
 
     # noinspection PyTypeChecker
-    proc, kwargs = export_.get_export_function(
-      'unknown', export_.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
+    proc, kwargs = builtin_procedures.get_export_function(
+      'unknown', builtin_procedures.FileFormatModes.USE_EXPLICIT_VALUES, file_format_options)
 
     self.assertIs(proc, pdb.gimp_file_save)
     mock_get_setting_data_from_pdb_procedure.assert_not_called()

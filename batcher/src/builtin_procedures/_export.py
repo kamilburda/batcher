@@ -1,4 +1,4 @@
-"""Built-in procedure to export a given item as an image."""
+"""Built-in "Export"/"Also export as..." procedure."""
 
 import collections
 import os
@@ -12,16 +12,40 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import builtin_actions_common
 from src import exceptions
 from src import file_formats as file_formats_
 from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
+from src import utils
 from src.path import fileext
 from src.path import validators as validators_
+from src.procedure_groups import *
+
+
+__all__ = [
+  'EXPORT_NAME_ITEM_STATE',
+  'INTERACTIVE_OVERWRITE_MODES_LIST',
+  'INTERACTIVE_OVERWRITE_MODES',
+  'FileFormatModes',
+  'ExportModes',
+  'ExportStatuses',
+  'export',
+  'get_export_function',
+]
 
 
 EXPORT_NAME_ITEM_STATE = 'export_name'
+
+INTERACTIVE_OVERWRITE_MODES_LIST = [
+  (overwrite.OverwriteModes.REPLACE, _('Replace')),
+  (overwrite.OverwriteModes.SKIP, _('Skip')),
+  (overwrite.OverwriteModes.RENAME_NEW, _('Rename new file')),
+  (overwrite.OverwriteModes.RENAME_EXISTING, _('Rename existing file'))
+]
+
+INTERACTIVE_OVERWRITE_MODES = dict(INTERACTIVE_OVERWRITE_MODES_LIST)
 
 
 class FileFormatModes:
@@ -39,6 +63,12 @@ class ExportModes:
     EACH_TOP_LEVEL_ITEM_OR_FOLDER,
     SINGLE_IMAGE,
   ) = 'each_item', 'each_top_level_item_or_folder', 'single_image'
+
+
+class ExportStatuses:
+  EXPORT_STATUSES = (
+    NOT_EXPORTED_YET, EXPORT_SUCCESSFUL, FORCE_INTERACTIVE, USE_DEFAULT_FILE_EXTENSION
+  ) = (0, 1, 2, 3)
 
 
 def export(
@@ -81,7 +111,7 @@ def export(
 
     if export_mode != ExportModes.EACH_ITEM and batcher.process_export:
       if not multi_layer_images:
-        multi_layer_image = create_empty_image_copy(batcher.current_image)
+        multi_layer_image = utils.create_empty_image_copy(batcher.current_image)
         multi_layer_images.append(multi_layer_image)
       else:
         multi_layer_image = multi_layer_images[-1]
@@ -626,13 +656,6 @@ def _remove_multi_layer_images(images):
   images.clear()
 
 
-def create_empty_image_copy(orig_image):
-  image_copy = pg.pdbutils.duplicate_image_without_contents(orig_image)
-  image_copy.undo_freeze()
-
-  return image_copy
-
-
 class _FileExtension:
   """Class holding properties for a file extension."""
   
@@ -694,7 +717,145 @@ class _NameOnlyItem(pg.itemtree.Item):
     return None
 
 
-class ExportStatuses:
-  EXPORT_STATUSES = (
-    NOT_EXPORTED_YET, EXPORT_SUCCESSFUL, FORCE_INTERACTIVE, USE_DEFAULT_FILE_EXTENSION
-  ) = (0, 1, 2, 3)
+_EXPORT_OVERWRITE_MODES_LIST = [
+  (overwrite.OverwriteModes.ASK, _('Ask')),
+  *INTERACTIVE_OVERWRITE_MODES_LIST
+]
+
+EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
+  'name': 'export_for_convert',
+  'function': export,
+  'display_name': _('Also export as...'),
+  'description': _('Exports an image to another file format.'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP],
+  'display_options_on_create': True,
+  'arguments': [
+    {
+      'type': 'file',
+      'name': 'output_directory',
+      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'display_name': _('Output folder'),
+    },
+    {
+      'type': 'file_extension',
+      'name': 'file_extension',
+      'default_value': 'png',
+      'display_name': _('File extension'),
+      'gui_type': 'file_extension_entry',
+      'adjust_value': True,
+      'auto_update_gui_to_setting': False,
+    },
+    {
+      'type': 'choice',
+      'name': 'file_format_mode',
+      'default_value': 'use_explicit_values',
+      'items': [
+        (FileFormatModes.USE_NATIVE_PLUGIN_VALUES, _('Interactively')),
+        (FileFormatModes.USE_EXPLICIT_VALUES, _('Use options below')),
+      ],
+      'display_name': _('How to adjust file format options:'),
+      'description': _(
+        'Native dialogs usually allow you to adjust more options such as image metadata,'
+        ' while adjusting options in place is more convenient as no extra dialog is displayed'
+        ' before the export.'),
+      'gui_type': 'radio_button_box',
+    },
+    {
+      'type': 'file_format_options',
+      'name': 'file_format_export_options',
+      'import_or_export': 'export',
+      'initial_file_format': 'png',
+      'gui_type': 'file_format_options',
+      'display_name': _('File format options')
+    },
+    {
+      'type': 'choice',
+      'name': 'overwrite_mode',
+      'default_value': 'ask',
+      'items': _EXPORT_OVERWRITE_MODES_LIST,
+      'display_name': _('If a file already exists:'),
+    },
+    {
+      'type': 'choice',
+      'name': 'export_mode',
+      'default_value': 'each_item',
+      'items': [
+        (ExportModes.EACH_ITEM, _('For each image')),
+        (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
+         _('For each top-level image or folder')),
+        (ExportModes.SINGLE_IMAGE, _('As a single image')),
+      ],
+      'display_name': _('Perform export:'),
+    },
+    {
+      'type': 'name_pattern',
+      'name': 'single_image_name_pattern',
+      'default_value': _('Untitled'),
+      'display_name': _('Image filename pattern'),
+      'gui_type': 'name_pattern_entry',
+    },
+    {
+      'type': 'bool',
+      'name': 'use_file_extension_in_item_name',
+      'default_value': False,
+      'display_name': _('Use original file extension'),
+    },
+    {
+      'type': 'bool',
+      'name': 'convert_file_extension_to_lowercase',
+      'default_value': False,
+      'display_name': _('Convert file extension to lowercase'),
+    },
+    {
+      'type': 'bool',
+      'name': 'use_original_modification_date',
+      'default_value': False,
+      'display_name': _('Use original modification date'),
+    },
+  ],
+}
+
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES.update({
+  'name': 'export_for_export_images',
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
+})
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][5]['items'].pop(1)
+del EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][9]
+del EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][7]
+
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS.update({
+  'name': 'export_for_export_layers',
+  'description': _('Exports a layer to another file format.'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
+})
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5]['items'] = [
+  (ExportModes.EACH_ITEM, _('For each layer')),
+  (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
+   _('For each top-level layer or group')),
+  (ExportModes.SINGLE_IMAGE, _('As a single image')),
+]
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6]['default_value'] = '[image name]'
+EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][7]['display_name'] = _(
+  'Use file extension in layer name')
+del EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][9]
+
+EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
+EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
+  'name': 'export_for_edit_layers',
+  'display_name': _('Export'),
+  'description': _('Exports a layer to the specified file format.'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
+})
+EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5]['items'] = [
+  (ExportModes.EACH_ITEM, _('For each layer')),
+  (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
+   _('For each top-level layer or group')),
+  (ExportModes.SINGLE_IMAGE, _('As a single image')),
+]
+EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6]['default_value'] = '[image name]'
+EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
+  'Use file extension in layer name')
+del EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][9]

@@ -11,7 +11,7 @@ from gi.repository import GObject
 
 import pygimplib as pg
 
-from src import background_foreground
+from src import exceptions
 from src.gui import placeholders as gui_placeholders
 
 
@@ -34,57 +34,125 @@ class Placeholder:
     return self._replacement_func(*args)
 
 
-def _get_current_image(_setting, batcher):
+def get_current_image(_setting, batcher):
   return batcher.current_image
 
 
-def _get_current_layer(_setting, batcher):
+def get_current_layer(_setting, batcher):
   return batcher.current_layer
 
 
-def _get_current_layer_for_array(setting, batcher):
-  return (_get_current_layer(setting, batcher),)
+def get_current_layer_for_array(setting, batcher):
+  return (get_current_layer(setting, batcher),)
 
 
-def _get_background_layer(_setting, batcher):
-  return background_foreground.get_background_layer(batcher)
+def get_background_layer(_setting, batcher):
+  return _get_adjacent_layer(
+    batcher,
+    lambda position, num_layers: position < num_layers - 1,
+    1,
+    ['insert_background_for_images', 'insert_background_for_layers'],
+    _('There are no background layers.'))
 
 
-def _get_background_layer_for_array(_setting, batcher):
-  return (background_foreground.get_background_layer(batcher),)
+def get_background_layer_for_array(setting, batcher):
+  return (get_background_layer(setting, batcher),)
 
 
-def _get_foreground_layer(_setting, batcher):
-  return background_foreground.get_foreground_layer(batcher)
+def get_foreground_layer(_setting, batcher):
+  return _get_adjacent_layer(
+    batcher,
+    lambda position, num_layers: position > 0,
+    -1,
+    ['insert_foreground_for_images', 'insert_foreground_for_layers'],
+    _('There are no foreground layers.'))
 
 
-def _get_foreground_layer_for_array(_setting, batcher):
-  return (background_foreground.get_foreground_layer(batcher),)
+def get_foreground_layer_for_array(setting, batcher):
+  return (get_foreground_layer(setting, batcher),)
 
 
-def _get_none_object(_setting, _batcher):
+def get_none_object(_setting, _batcher):
   return None
 
 
-def _get_all_top_level_layers(_setting, batcher):
+def get_all_top_level_layers(_setting, batcher):
   return batcher.current_image.get_layers()
 
 
-def _get_value_for_unsupported_parameter(setting, _batcher):
+def get_value_for_unsupported_parameter(setting, _batcher):
   return getattr(setting, 'default_param_value', None)
 
 
+def _get_adjacent_layer(
+      batcher,
+      position_cond_func,
+      adjacent_position_increment,
+      insert_layers_procedure_names,
+      skip_message,
+):
+  image = batcher.current_image
+  layer = batcher.current_layer
+
+  if layer.get_parent() is None:
+    children = image.get_layers()
+  else:
+    children = layer.get_parent().get_children()
+
+  adjacent_layer = None
+
+  num_layers = len(children)
+
+  if num_layers > 1:
+    position = image.get_item_position(layer)
+    if position_cond_func(position, num_layers):
+      next_layer = children[position + adjacent_position_increment]
+      # A `None` element represents a background/foreground layer inserted
+      # via other means than color tags (e.g. from a file). If there are no
+      # matching color tags and `None` is present at least once, we always
+      # consider `next_layer` to be the background/foreground.
+      color_tags = [
+        procedure['arguments/color_tag'].value
+        if 'color_tag' in procedure['arguments'] else None
+        for procedure in _get_previous_enabled_procedures(
+          batcher, batcher.current_procedure, insert_layers_procedure_names)]
+
+      if next_layer.get_color_tag() in color_tags or None in color_tags:
+        adjacent_layer = next_layer
+
+  if adjacent_layer is not None:
+    # This is necessary for some procedures relying on selected layers.
+    image.set_selected_layers([adjacent_layer])
+    return adjacent_layer
+  else:
+    raise exceptions.SkipAction(skip_message)
+
+
+def _get_previous_enabled_procedures(batcher, current_action, action_orig_names_to_match):
+  previous_enabled_procedures = []
+
+  for procedure in batcher.procedures:
+    if procedure == current_action:
+      return previous_enabled_procedures
+
+    if any(procedure['enabled'].value and procedure['orig_name'].value == orig_name
+           for orig_name in action_orig_names_to_match):
+      previous_enabled_procedures.append(procedure)
+
+  return previous_enabled_procedures
+
+
 _PLACEHOLDERS_LIST = [
-  ('current_image', _('Current Image'), _get_current_image),
-  ('current_layer', _('Current Layer'), _get_current_layer),
-  ('current_layer_for_array', _('Current Layer'), _get_current_layer_for_array),
-  ('background_layer', _('Background Layer'), _get_background_layer),
-  ('background_layer_for_array', _('Background Layer'), _get_background_layer_for_array),
-  ('foreground_layer', _('Foreground Layer'), _get_foreground_layer),
-  ('foreground_layer_for_array', _('Foreground Layer'), _get_foreground_layer_for_array),
-  ('all_top_level_layers', _('All Layers'), _get_all_top_level_layers),
-  ('none', _('None'), _get_none_object),
-  ('unsupported_parameter', '', _get_value_for_unsupported_parameter),
+  ('current_image', _('Current Image'), get_current_image),
+  ('current_layer', _('Current Layer'), get_current_layer),
+  ('current_layer_for_array', _('Current Layer'), get_current_layer_for_array),
+  ('background_layer', _('Background Layer'), get_background_layer),
+  ('background_layer_for_array', _('Background Layer'), get_background_layer_for_array),
+  ('foreground_layer', _('Foreground Layer'), get_foreground_layer),
+  ('foreground_layer_for_array', _('Foreground Layer'), get_foreground_layer_for_array),
+  ('all_top_level_layers', _('All Layers'), get_all_top_level_layers),
+  ('none', _('None'), get_none_object),
+  ('unsupported_parameter', '', get_value_for_unsupported_parameter),
 ]
 
 

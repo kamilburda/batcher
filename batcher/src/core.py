@@ -21,11 +21,11 @@ from src import builtin_actions_common
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
-from src import export as export_
 from src import invoker as invoker_
 from src import overwrite
 from src import placeholders
 from src import progress as progress_
+from src import utils
 
 
 _BATCHER_ARG_POSITION_IN_ACTIONS = 0
@@ -1069,10 +1069,12 @@ class ImageBatcher(Batcher):
     super()._add_actions_before_initial_invoker()
 
     self._invoker.add(
-      builtin_procedures.set_selected_and_current_layer, [actions.DEFAULT_PROCEDURES_GROUP])
+      _set_selected_and_current_layer,
+      [actions.DEFAULT_PROCEDURES_GROUP],
+    )
 
     self._invoker.add(
-      builtin_procedures.set_selected_and_current_layer_after_action,
+      _set_selected_and_current_layer_after_action,
       [actions.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
@@ -1102,7 +1104,7 @@ class ImageBatcher(Batcher):
   def _add_default_export_procedure(self, action_groups):
     if not self._edit_mode:
       self._invoker.add(
-        export_.export,
+        builtin_procedures.export,
         groups=action_groups,
         args=[
           self._output_directory,
@@ -1207,21 +1209,23 @@ class LayerBatcher(Batcher):
     super()._add_actions_before_initial_invoker()
 
     self._invoker.add(
-      builtin_procedures.set_selected_and_current_layer, [actions.DEFAULT_PROCEDURES_GROUP])
+      _set_selected_and_current_layer,
+      [actions.DEFAULT_PROCEDURES_GROUP],
+    )
 
     self._invoker.add(
-      builtin_procedures.set_selected_and_current_layer_after_action,
+      _set_selected_and_current_layer_after_action,
       [actions.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
     self._invoker.add(
-      builtin_procedures.sync_item_name_and_layer_name,
+      _sync_item_name_and_layer_name,
       [actions.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
     if self._edit_mode:
       self._invoker.add(
-        builtin_procedures.preserve_layer_locks_between_actions,
+        _preserve_layer_locks_between_actions,
         [actions.DEFAULT_PROCEDURES_GROUP],
         foreach=True)
 
@@ -1251,7 +1255,7 @@ class LayerBatcher(Batcher):
   def _add_default_export_procedure(self, action_groups):
     if not self._edit_mode:
       self._invoker.add(
-        export_.export,
+        builtin_procedures.export,
         groups=action_groups,
         args=[
           self._output_directory,
@@ -1291,7 +1295,7 @@ class LayerBatcher(Batcher):
     self._current_layer = None
 
   def create_copy(self, image, layer):
-    image_copy = export_.create_empty_image_copy(image)
+    image_copy = utils.create_empty_image_copy(image)
 
     layer_copy = pg.pdbutils.copy_and_paste_layer(
       layer,
@@ -1306,3 +1310,100 @@ class LayerBatcher(Batcher):
     layer_copy.set_name(layer.get_name())
 
     return image_copy, layer_copy
+
+
+def _set_selected_and_current_layer(batcher):
+  # If an image has no layers, there is nothing we do here. An exception may
+  # be raised if a procedure requires at least one layer. An empty image
+  # could occur e.g. if all layers were removed by the previous procedures.
+
+  image = batcher.current_image
+
+  if image is None or not image.is_valid():
+    # The image does not exist anymore and there is nothing we can do.
+    return
+
+  if batcher.current_layer.is_valid():
+    image.set_selected_layers([batcher.current_layer])
+  else:
+    selected_layers = image.get_selected_layers()
+
+    if selected_layers:
+      # There is no way to know which layer is the "right" one, so we resort to
+      # taking the first.
+      selected_layer = selected_layers[0]
+
+      if selected_layer.is_valid():
+        # The selected layer(s) may have been set by the procedure.
+        batcher.current_layer = selected_layer
+      else:
+        image_layers = image.get_layers()
+        if image_layers:
+          # There is no way to know which layer is the "right" one, so we resort
+          # to taking the first.
+          batcher.current_layer = image_layers[0]
+          image.set_selected_layers([image_layers[0]])
+
+
+def _set_selected_and_current_layer_after_action(batcher):
+  action_applied = yield
+
+  if action_applied or action_applied is None:
+    _set_selected_and_current_layer(batcher)
+
+
+def _sync_item_name_and_layer_name(layer_batcher):
+  yield
+
+  if layer_batcher.process_names and not layer_batcher.is_preview:
+    layer_batcher.current_item.name = layer_batcher.current_layer.get_name()
+
+
+def _preserve_layer_locks_between_actions(layer_batcher):
+  # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`.
+  # We need to use `Item.raw` for parents as well.
+  item = layer_batcher.current_item
+  locks_content = {}
+  locks_visibility = {}
+
+  for item_or_parent in [item] + item.parents:
+    if item_or_parent.raw.is_valid():
+      locks_content[item_or_parent] = item_or_parent.raw.get_lock_content()
+      locks_visibility[
+        item_or_parent] = item_or_parent.raw.get_lock_visibility()
+
+  if item.raw.is_valid():
+    lock_position = item.raw.get_lock_position()
+    lock_alpha = item.raw.get_lock_alpha()
+  else:
+    lock_position = None
+    lock_alpha = None
+
+  for item_or_parent, lock_content in locks_content.items():
+    if lock_content:
+      item_or_parent.raw.set_lock_content(False)
+
+  for item_or_parent, lock_visibility in locks_visibility.items():
+    if lock_visibility:
+      item_or_parent.raw.set_lock_visibility(False)
+
+  if lock_position:
+    item.raw.set_lock_position(False)
+  if lock_alpha:
+    item.raw.set_lock_alpha(False)
+
+  yield
+
+  for item_or_parent, lock_content in locks_content.items():
+    if lock_content and item_or_parent.raw.is_valid():
+      item_or_parent.raw.set_lock_content(lock_content)
+
+  for item_or_parent, lock_visibility in locks_visibility.items():
+    if lock_visibility and item_or_parent.raw.is_valid():
+      item_or_parent.raw.set_lock_visibility(lock_visibility)
+
+  if item.raw.is_valid():
+    if lock_position:
+      item.raw.set_lock_position(lock_position)
+    if lock_alpha:
+      item.raw.set_lock_alpha(lock_alpha)

@@ -18,8 +18,8 @@ import pygimplib as pg
 
 from . import base as preview_base_
 
+from src import builtin_procedures
 from src import exceptions
-from src import export as export_
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -365,7 +365,7 @@ class NamePreview(preview_base_.Preview):
     # The performance hit of doing this is negligible.
     for item in self._batcher.item_tree.iter_all():
       item.reset()
-      item.delete_named_state(export_.EXPORT_NAME_ITEM_STATE)
+      item.delete_named_state(builtin_procedures.EXPORT_NAME_ITEM_STATE)
 
     error = None
 
@@ -588,7 +588,7 @@ class NamePreview(preview_base_.Preview):
   def _get_item_name(self, item):
     if not self._show_original_name:
       if not self._batcher.edit_mode:
-        item_state = item.get_named_state(export_.EXPORT_NAME_ITEM_STATE)
+        item_state = item.get_named_state(builtin_procedures.EXPORT_NAME_ITEM_STATE)
         return item_state['name'] if item_state is not None else item.name
       else:
         return item.name

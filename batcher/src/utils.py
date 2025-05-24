@@ -138,3 +138,18 @@ def add_objects_to_item_tree(item_tree: pg.itemtree.ItemTree, objects_and_parent
 
     if added_items and added_items[0].type == pg.itemtree.TYPE_FOLDER:
       parent_items[object_] = added_items[0]
+
+
+def create_empty_image_copy(orig_image):
+  """Creates a copy of ``orig_image`` without any contents.
+
+  The image copy will have the same attributes as ``orig_image`` (width, height,
+  resolution, precision, guides, ...).
+
+  The image copy is intended to be used temporarily. The undo stack is therefore
+  frozen.
+  """
+  image_copy = pg.pdbutils.duplicate_image_without_contents(orig_image)
+  image_copy.undo_freeze()
+
+  return image_copy

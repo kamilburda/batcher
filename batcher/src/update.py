@@ -1431,15 +1431,15 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
   keep_aspect_ratio_setting_dict, _index = _remove_setting(arguments_list, 'keep_aspect_ratio')
   dimension_to_keep_setting_dict, _index = _remove_setting(arguments_list, 'dimension_to_keep')
 
-  value = builtin_procedures.AspectRatios.STRETCH
+  value = 'stretch'
 
   if scale_to_fit_setting_dict['value']:
-    value = builtin_procedures.AspectRatios.FIT
+    value = 'fit'
   elif keep_aspect_ratio_setting_dict['value']:
     if dimension_to_keep_setting_dict['value'] == 'width':
-      value = builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH
+      value = 'keep_adjust_width'
     else:
-      value = builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT
+      value = 'keep_adjust_height'
 
   arguments_list.insert(
     -2,
@@ -1449,11 +1449,11 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
       'default_value': value,
       'value': value,
       'items': [
-        (builtin_procedures.AspectRatios.STRETCH, _('None (Stretch)')),
-        (builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH, _('Keep, adjust width')),
-        (builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT, _('Keep, adjust height')),
-        (builtin_procedures.AspectRatios.FIT, _('Fit')),
-        (builtin_procedures.AspectRatios.FIT_WITH_PADDING, _('Fit with padding')),
+        ('stretch', _('None (Stretch)')),
+        ('keep_adjust_width', _('Keep, adjust width')),
+        ('keep_adjust_height', _('Keep, adjust height')),
+        ('fit', _('Fit')),
+        ('fit_with_padding', _('Fit with padding')),
       ],
       'display_name': _('Aspect ratio'),
     },
