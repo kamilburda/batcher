@@ -256,6 +256,12 @@ class DimensionSetting(pg.setting.NumericSetting):
   def placeholder_attribute_map(self):
     return self._placeholder_attribute_map
 
+  def _copy_value(self, value):
+    if isinstance(value, Iterable) and not isinstance(value, str):
+      return utils.semi_deep_copy(value)
+    else:
+      return value
+
   def _validate(self, value):
     if 'pixel_value' in value:
       result_pixel_value = super()._validate(value['pixel_value'])
@@ -330,6 +336,12 @@ class ResolutionSetting(pg.setting.DictSetting):
     'x': 72.0,
     'y': 72.0,
   }
+
+  def _copy_value(self, value):
+    if isinstance(value, Iterable) and not isinstance(value, str):
+      return utils.semi_deep_copy(value)
+    else:
+      return value
 
 
 class ItemTreeItemsSetting(pg.setting.Setting):
