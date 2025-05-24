@@ -22,8 +22,8 @@ Options:
 * *Object to align layers with*: Whether to align with the entire image or another layer.
 * *Horizontal alignment*: Left, center or right alignment, or *Keep* the horizontal position intact.
 * *Vertical alignment*: Top, center or bottom alignment, or *Keep* the vertical position intact.
-* *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
-* *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 
 ### Export/Also export as...
 
@@ -156,8 +156,8 @@ Scales (resizes) the entire image or a layer.
 
 Options:
 * *Object to scale*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
-* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
-* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
   * *None (Stretch)*: The aspect ratio is ignored (i.e. the image/layer is stretched).
   * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
