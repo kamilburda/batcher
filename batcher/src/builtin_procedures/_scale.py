@@ -327,6 +327,7 @@ SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       'type': 'enum',
       'enum_type': Gimp.InterpolationType,
       'name': 'interpolation',
+      'default_value': Gimp.InterpolationType.NONE,
       'display_name': _('Interpolation'),
     },
     {
