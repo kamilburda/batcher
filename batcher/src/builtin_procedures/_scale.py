@@ -446,7 +446,5 @@ SCALE_FOR_LAYERS_DICT.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 SCALE_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
-SCALE_FOR_LAYERS_DICT['arguments'][1]['default_value']['percent_object'] = (
-  'current_layer')
-SCALE_FOR_LAYERS_DICT['arguments'][2]['default_value']['percent_object'] = (
-  'current_layer')
+SCALE_FOR_LAYERS_DICT['arguments'][1]['default_value']['percent_object'] = 'current_layer'
+SCALE_FOR_LAYERS_DICT['arguments'][2]['default_value']['percent_object'] = 'current_layer'
