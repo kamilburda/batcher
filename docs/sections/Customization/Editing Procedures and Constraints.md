@@ -17,6 +17,8 @@ For layer/drawable/item arguments, you may select one of the following:
 * `None`: ignores the layer. Only available if a procedure/constraint allows omitting it (i.e. if the layer is optional).
 * `All Layers`: applies the procedure/constraint to all layers within the currently processed image. This option is available usually only for procedures/constraints having the `The input drawables` argument. Note that a procedure/constraint may not work on multiple layers at once and thus may yield an error if this option is chosen.
 
+For several built-in procedures (such as `Scale` or `Rotate and flip`), numeric arguments representing dimensions, coordinates, etc. are specified using a particular unit, such as pixels, percentages (e.g. of width of the current image), inches and others. Percentages are converted to pixels. Inches and other units are converted to pixels based on the current image's resolution (in case of Edit Layers and Export Layers, the image of the processed layer).
+
 
 ## More Options
 
