@@ -297,7 +297,7 @@ ROTATE_AND_FLIP_FOR_IMAGES_DICT = {
       'enum_type': Gimp.TransformResize,
       'name': 'rotation_transform_resize',
       'default_value': Gimp.TransformResize.ADJUST,
-      'display_name': _('Rotation mode'),
+      'display_name': _('How to handle boundaries'),
     },
     {
       'type': 'enum',
