@@ -282,8 +282,7 @@ SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer',
-        'foreground_layer'],
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('New width'),
     },
     {
@@ -302,8 +301,7 @@ SCALE_PROCEDURE_DICT_FOR_IMAGES = {
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer',
-        'foreground_layer'],
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('New height'),
     },
     {
@@ -355,7 +353,6 @@ SCALE_PROCEDURE_DICT_FOR_IMAGES = {
 }
 
 SCALE_PROCEDURE_DICT_FOR_LAYERS = utils.semi_deep_copy(SCALE_PROCEDURE_DICT_FOR_IMAGES)
-
 SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
   'name': 'scale_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],

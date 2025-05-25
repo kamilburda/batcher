@@ -134,8 +134,7 @@ class DimensionBox(Gtk.Box):
 
     self._percent_object_model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
 
-    for index, (name, label) in enumerate(
-          zip(self._percent_placeholder_names, self._percent_placeholder_labels)):
+    for name, label in zip(self._percent_placeholder_names, self._percent_placeholder_labels):
       self._percent_object_model.append((name, label if label is not None else ''))
 
     self._percent_object_combo_box = Gtk.ComboBox(
@@ -199,8 +198,7 @@ class DimensionBox(Gtk.Box):
     for percent_placeholder_group, properties in self._percent_placeholder_attribute_map.items():
       model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
 
-      for index, (name, label) in enumerate(
-            zip(self._percent_property_names, self._percent_property_labels)):
+      for name, label in zip(self._percent_property_names, self._percent_property_labels):
         if name in properties:
           model.append((name, label if label is not None else ''))
 
