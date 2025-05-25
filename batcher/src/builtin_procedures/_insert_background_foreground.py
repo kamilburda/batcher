@@ -20,6 +20,7 @@ __all__ = [
   'insert_foreground_from_color_tags',
   'merge_background',
   'merge_foreground',
+  'on_after_add_insert_background_foreground_for_layers',
 ]
 
 
@@ -186,6 +187,28 @@ def _merge_layer(batcher, merge_type, get_inserted_layer_func, layer_to_merge_st
 
       batcher.current_layer.set_visible(visible)
       batcher.current_layer.set_color_tag(orig_color_tag)
+
+
+def on_after_add_insert_background_foreground_for_layers(
+      _procedures,
+      procedure,
+      _orig_procedure_dict,
+      tagged_items_setting,
+):
+  if procedure['orig_name'].value in [
+       'insert_background_for_layers', 'insert_foreground_for_layers']:
+    procedure['arguments/tagged_items'].gui.set_visible(False)
+    _sync_tagged_items_with_procedure(tagged_items_setting, procedure)
+
+
+def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
+
+  def _on_tagged_items_changed(tagged_items_setting_, procedure_):
+    procedure_['arguments/tagged_items'].set_value(tagged_items_setting_.value)
+
+  _on_tagged_items_changed(tagged_items_setting, procedure)
+
+  tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
 
 
 INSERT_BACKGROUND_FOR_IMAGES_DICT = {

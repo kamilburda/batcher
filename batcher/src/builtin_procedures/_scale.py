@@ -16,6 +16,7 @@ from . import _utils as builtin_procedures_utils
 __all__ = [
   'AspectRatios',
   'scale',
+  'on_after_add_scale_procedure',
 ]
 
 
@@ -251,6 +252,92 @@ def _fill_with_padding(
     layer_to_fill_end.edit_fill(Gimp.FillType.FOREGROUND)
     image_of_drawable_with_padding.merge_down(
       merged_drawable_with_padding, Gimp.MergeType.EXPAND_AS_NECESSARY)
+
+
+def on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value.startswith('scale_for_'):
+    _set_sensitive_for_local_origin(
+      procedure['arguments/object_to_scale'],
+      procedure['arguments/local_origin'],
+    )
+
+    procedure['arguments/object_to_scale'].connect_event(
+      'value-changed',
+      _set_sensitive_for_local_origin,
+      procedure['arguments/local_origin'])
+
+    _set_sensitive_for_dimensions_given_aspect_ratio(
+      procedure['arguments/aspect_ratio'],
+      procedure['arguments/new_width'],
+      procedure['arguments/new_height'],
+    )
+
+    procedure['arguments/aspect_ratio'].connect_event(
+      'value-changed',
+      _set_sensitive_for_dimensions_given_aspect_ratio,
+      procedure['arguments/new_width'],
+      procedure['arguments/new_height'],
+    )
+
+    _set_sensitive_for_padding_color_given_aspect_ratio(
+      procedure['arguments/aspect_ratio'],
+      procedure['arguments/padding_color'],
+    )
+
+    procedure['arguments/aspect_ratio'].connect_event(
+      'value-changed',
+      _set_sensitive_for_padding_color_given_aspect_ratio,
+      procedure['arguments/padding_color'],
+    )
+
+    procedure['arguments/image_resolution'].connect_event(
+      'after-set-gui',
+      _set_left_margin_for_resolution,
+    )
+
+    _set_sensitive_for_resolution(
+      procedure['arguments/set_image_resolution'],
+      procedure['arguments/image_resolution'],
+    )
+
+    procedure['arguments/set_image_resolution'].connect_event(
+      'value-changed',
+      _set_sensitive_for_resolution,
+      procedure['arguments/image_resolution'],
+    )
+
+
+def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
+  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
+
+
+def _set_sensitive_for_dimensions_given_aspect_ratio(
+      aspect_ratio_setting,
+      new_width_setting,
+      new_height_setting,
+):
+  adjust_width = aspect_ratio_setting.value == AspectRatios.KEEP_ADJUST_WIDTH
+  adjust_height = aspect_ratio_setting.value == AspectRatios.KEEP_ADJUST_HEIGHT
+
+  new_width_setting.gui.set_sensitive(not adjust_height)
+  new_height_setting.gui.set_sensitive(not adjust_width)
+
+
+def _set_sensitive_for_padding_color_given_aspect_ratio(
+      aspect_ratio_setting,
+      padding_color_setting,
+):
+  padding_color_setting.gui.set_sensitive(
+    aspect_ratio_setting.value == AspectRatios.FIT_WITH_PADDING)
+
+
+def _set_left_margin_for_resolution(image_resolution_setting):
+  if not isinstance(image_resolution_setting.gui, pg.setting.NullPresenter):
+    image_resolution_setting.gui.widget.set_margin_start(pg.constants.RELATED_WIDGETS_LEFT_MARGIN)
+
+
+def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):
+  image_resolution_setting.gui.set_sensitive(set_image_resolution_setting.value)
 
 
 SCALE_PROCEDURE_DICT_FOR_IMAGES = {

@@ -33,6 +33,9 @@ __all__ = [
   'ExportStatuses',
   'export',
   'get_export_function',
+  'on_after_add_export_procedure',
+  'set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure',
+  'set_file_extension_options_for_default_export_procedure',
 ]
 
 
@@ -715,6 +718,110 @@ class _NameOnlyItem(pg.itemtree.Item):
 
   def _get_id_from_object(self):
     return None
+
+
+def on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value.startswith('export_for_'):
+    _set_sensitive_for_image_name_pattern_in_export(
+      procedure['arguments/export_mode'],
+      procedure['arguments/single_image_name_pattern'])
+
+    procedure['arguments/export_mode'].connect_event(
+      'value-changed',
+      _set_sensitive_for_image_name_pattern_in_export,
+      procedure['arguments/single_image_name_pattern'])
+
+    _show_hide_file_format_export_options(
+      procedure['arguments/file_format_mode'],
+      procedure['arguments/file_format_export_options'])
+
+    procedure['arguments/file_format_mode'].connect_event(
+      'value-changed',
+      _show_hide_file_format_export_options,
+      procedure['arguments/file_format_export_options'])
+
+    _set_file_format_export_options(
+      procedure['arguments/file_extension'],
+      procedure['arguments/file_format_export_options'])
+
+    procedure['arguments/file_extension'].connect_event(
+      'value-changed',
+      _set_file_format_export_options,
+      procedure['arguments/file_format_export_options'])
+
+    # This is needed in case settings are reset, since the file extension is
+    # reset first and the options, after resetting, would contain values for
+    # the default file extension, which could be different.
+    procedure['arguments/file_format_export_options'].connect_event(
+      'after-reset',
+      _set_file_format_export_options_from_extension,
+      procedure['arguments/file_extension'])
+
+
+def set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+      main_settings):
+  _set_sensitive_for_image_name_pattern_in_export(
+    main_settings['export/export_mode'],
+    main_settings['export/single_image_name_pattern'])
+
+  main_settings['export/export_mode'].connect_event(
+    'value-changed',
+    _set_sensitive_for_image_name_pattern_in_export,
+    main_settings['export/single_image_name_pattern'])
+
+
+def set_file_extension_options_for_default_export_procedure(main_settings):
+  _show_hide_file_format_export_options(
+    main_settings['export/file_format_mode'],
+    main_settings['export/file_format_export_options'])
+
+  main_settings['export/file_format_mode'].connect_event(
+    'value-changed',
+    _show_hide_file_format_export_options,
+    main_settings['export/file_format_export_options'])
+
+  pg.notifier.connect(
+    'start-procedure',
+    lambda _notifier: _set_file_format_export_options(
+      main_settings['file_extension'],
+      main_settings['export/file_format_export_options']))
+
+  main_settings['file_extension'].connect_event(
+    'value-changed',
+    _set_file_format_export_options,
+    main_settings['export/file_format_export_options'])
+
+  # This is needed in case settings are reset, since the file extension is
+  # reset first and the options, after resetting, would contain values for
+  # the default file extension, which could be different.
+  main_settings['export/file_format_export_options'].connect_event(
+    'after-reset',
+    _set_file_format_export_options_from_extension,
+    main_settings['file_extension'])
+
+
+def _set_sensitive_for_image_name_pattern_in_export(
+      export_mode_setting, single_image_name_pattern_setting):
+  if export_mode_setting.value == ExportModes.SINGLE_IMAGE:
+    single_image_name_pattern_setting.gui.set_sensitive(True)
+  else:
+    single_image_name_pattern_setting.gui.set_sensitive(False)
+
+
+def _set_file_format_export_options(
+      file_extension_setting, file_format_export_options_setting):
+  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
+
+
+def _set_file_format_export_options_from_extension(
+      file_format_export_options_setting, file_extension_setting):
+  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
+
+
+def _show_hide_file_format_export_options(
+      file_format_mode_setting, file_format_export_options_setting):
+  file_format_export_options_setting.gui.set_visible(
+    file_format_mode_setting.value == 'use_explicit_values')
 
 
 _EXPORT_OVERWRITE_MODES_LIST = [

@@ -18,9 +18,6 @@ from src import setting_classes
 from src import utils
 
 
-_RELATED_WIDGETS_LEFT_MARGIN = 15
-
-
 def create_settings_for_convert():
   settings = pg.setting.create_groups({
     'name': 'all_settings',
@@ -179,11 +176,14 @@ def create_settings_for_convert():
         builtin_constraints.BUILTIN_CONSTRAINTS['recognized_file_format']]),
   ])
 
-  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
-  _set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_procedures.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+    settings['main'])
+  builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
   settings['main/procedures'].connect_event(
     'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
@@ -329,11 +329,14 @@ def create_settings_for_export_images():
       ]),
   ])
 
-  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
-  _set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_procedures.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+    settings['main'])
+  builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
   settings['main/procedures'].connect_event(
     'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
@@ -465,17 +468,20 @@ def create_settings_for_export_layers():
         visible_constraint_dict]),
   ])
 
-  _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(settings['main'])
-  _set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_procedures.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+    settings['main'])
+  builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
   settings['main/procedures'].connect_event(
     'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
-    _on_after_add_insert_background_foreground_for_layers,
+    builtin_procedures.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
 
@@ -567,14 +573,16 @@ def create_settings_for_edit_layers():
       ]),
   ])
 
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
-  settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
   settings['main/procedures'].connect_event(
     'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
-    _on_after_add_insert_background_foreground_for_layers,
+    builtin_procedures.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
 
@@ -733,213 +741,3 @@ def _create_images_and_directories_setting_dict():
     'type': 'images_and_directories',
     'name': 'images_and_directories',
   }
-
-
-def _set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(main_settings):
-  _set_sensitive_for_image_name_pattern_in_export(
-    main_settings['export/export_mode'],
-    main_settings['export/single_image_name_pattern'])
-
-  main_settings['export/export_mode'].connect_event(
-    'value-changed',
-    _set_sensitive_for_image_name_pattern_in_export,
-    main_settings['export/single_image_name_pattern'])
-
-
-def _set_file_extension_options_for_default_export_procedure(main_settings):
-  _show_hide_file_format_export_options(
-    main_settings['export/file_format_mode'],
-    main_settings['export/file_format_export_options'])
-
-  main_settings['export/file_format_mode'].connect_event(
-    'value-changed',
-    _show_hide_file_format_export_options,
-    main_settings['export/file_format_export_options'])
-
-  pg.notifier.connect(
-    'start-procedure',
-    lambda _notifier: _set_file_format_export_options(
-      main_settings['file_extension'],
-      main_settings['export/file_format_export_options']))
-
-  main_settings['file_extension'].connect_event(
-    'value-changed',
-    _set_file_format_export_options,
-    main_settings['export/file_format_export_options'])
-
-  # This is needed in case settings are reset, since the file extension is
-  # reset first and the options, after resetting, would contain values for
-  # the default file extension, which could be different.
-  main_settings['export/file_format_export_options'].connect_event(
-    'after-reset',
-    _set_file_format_export_options_from_extension,
-    main_settings['file_extension'])
-
-
-def _on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('export_for_'):
-    _set_sensitive_for_image_name_pattern_in_export(
-      procedure['arguments/export_mode'],
-      procedure['arguments/single_image_name_pattern'])
-    
-    procedure['arguments/export_mode'].connect_event(
-      'value-changed',
-      _set_sensitive_for_image_name_pattern_in_export,
-      procedure['arguments/single_image_name_pattern'])
-
-    _show_hide_file_format_export_options(
-      procedure['arguments/file_format_mode'],
-      procedure['arguments/file_format_export_options'])
-
-    procedure['arguments/file_format_mode'].connect_event(
-      'value-changed',
-      _show_hide_file_format_export_options,
-      procedure['arguments/file_format_export_options'])
-
-    _set_file_format_export_options(
-      procedure['arguments/file_extension'],
-      procedure['arguments/file_format_export_options'])
-
-    procedure['arguments/file_extension'].connect_event(
-      'value-changed',
-      _set_file_format_export_options,
-      procedure['arguments/file_format_export_options'])
-
-    # This is needed in case settings are reset, since the file extension is
-    # reset first and the options, after resetting, would contain values for
-    # the default file extension, which could be different.
-    procedure['arguments/file_format_export_options'].connect_event(
-      'after-reset',
-      _set_file_format_export_options_from_extension,
-      procedure['arguments/file_extension'])
-
-
-def _set_sensitive_for_image_name_pattern_in_export(
-      export_mode_setting, single_image_name_pattern_setting):
-  if export_mode_setting.value == builtin_procedures.ExportModes.SINGLE_IMAGE:
-    single_image_name_pattern_setting.gui.set_sensitive(True)
-  else:
-    single_image_name_pattern_setting.gui.set_sensitive(False)
-
-
-def _set_file_format_export_options(file_extension_setting, file_format_export_options_setting):
-  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
-
-
-def _set_file_format_export_options_from_extension(
-      file_format_export_options_setting, file_extension_setting):
-  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
-
-
-def _show_hide_file_format_export_options(
-      file_format_mode_setting, file_format_export_options_setting):
-  file_format_export_options_setting.gui.set_visible(
-    file_format_mode_setting.value == 'use_explicit_values')
-
-
-def _on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('scale_for_'):
-    _set_sensitive_for_local_origin(
-      procedure['arguments/object_to_scale'],
-      procedure['arguments/local_origin'],
-    )
-
-    procedure['arguments/object_to_scale'].connect_event(
-      'value-changed',
-      _set_sensitive_for_local_origin,
-      procedure['arguments/local_origin'])
-
-    _set_sensitive_for_dimensions_given_aspect_ratio(
-      procedure['arguments/aspect_ratio'],
-      procedure['arguments/new_width'],
-      procedure['arguments/new_height'],
-    )
-
-    procedure['arguments/aspect_ratio'].connect_event(
-      'value-changed',
-      _set_sensitive_for_dimensions_given_aspect_ratio,
-      procedure['arguments/new_width'],
-      procedure['arguments/new_height'],
-    )
-
-    _set_sensitive_for_padding_color_given_aspect_ratio(
-      procedure['arguments/aspect_ratio'],
-      procedure['arguments/padding_color'],
-    )
-
-    procedure['arguments/aspect_ratio'].connect_event(
-      'value-changed',
-      _set_sensitive_for_padding_color_given_aspect_ratio,
-      procedure['arguments/padding_color'],
-    )
-
-    procedure['arguments/image_resolution'].connect_event(
-      'after-set-gui',
-      _set_left_margin_for_resolution,
-    )
-
-    _set_sensitive_for_resolution(
-      procedure['arguments/set_image_resolution'],
-      procedure['arguments/image_resolution'],
-    )
-
-    procedure['arguments/set_image_resolution'].connect_event(
-      'value-changed',
-      _set_sensitive_for_resolution,
-      procedure['arguments/image_resolution'],
-    )
-
-
-def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
-  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
-
-
-def _set_sensitive_for_dimensions_given_aspect_ratio(
-      aspect_ratio_setting,
-      new_width_setting,
-      new_height_setting,
-):
-  adjust_width = aspect_ratio_setting.value == builtin_procedures.AspectRatios.KEEP_ADJUST_WIDTH
-  adjust_height = aspect_ratio_setting.value == builtin_procedures.AspectRatios.KEEP_ADJUST_HEIGHT
-
-  new_width_setting.gui.set_sensitive(not adjust_height)
-  new_height_setting.gui.set_sensitive(not adjust_width)
-
-
-def _set_sensitive_for_padding_color_given_aspect_ratio(
-      aspect_ratio_setting,
-      padding_color_setting,
-):
-  padding_color_setting.gui.set_sensitive(
-    aspect_ratio_setting.value == builtin_procedures.AspectRatios.FIT_WITH_PADDING)
-
-
-def _set_left_margin_for_resolution(image_resolution_setting):
-  if not isinstance(image_resolution_setting.gui, pg.setting.NullPresenter):
-    image_resolution_setting.gui.widget.set_margin_start(_RELATED_WIDGETS_LEFT_MARGIN)
-
-
-def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):
-  image_resolution_setting.gui.set_sensitive(set_image_resolution_setting.value)
-
-
-def _on_after_add_insert_background_foreground_for_layers(
-      _procedures,
-      procedure,
-      _orig_procedure_dict,
-      tagged_items_setting,
-):
-  if procedure['orig_name'].value in [
-       'insert_background_for_layers', 'insert_foreground_for_layers']:
-    procedure['arguments/tagged_items'].gui.set_visible(False)
-    _sync_tagged_items_with_procedure(tagged_items_setting, procedure)
-
-
-def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
-
-  def _on_tagged_items_changed(tagged_items_setting_, procedure_):
-    procedure_['arguments/tagged_items'].set_value(tagged_items_setting_.value)
-
-  _on_tagged_items_changed(tagged_items_setting, procedure)
-
-  tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
