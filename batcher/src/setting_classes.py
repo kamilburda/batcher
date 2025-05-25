@@ -13,10 +13,12 @@ from gi.repository import Gio
 
 import pygimplib as pg
 
+from src import builtin_procedures as builtin_procedures_
 from src import file_formats as file_formats_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
+from src.gui import angle_box as angle_box_
 from src.gui import dimension_box as dimension_box_
 from src.gui import resolution_box as resolution_box_
 from src.gui import file_format_options_box as file_format_options_box_
@@ -237,17 +239,6 @@ class DimensionSetting(pg.setting.NumericSetting):
 
     super().__init__(name, **kwargs)
 
-  @classmethod
-  def get_percent_property_value(cls, percent_property, percent_object):
-    """Returns the property (e.g. width, X-offset) for the current value of
-    ``'percent_object'`` within the setting value's ``percent_property`` entry.
-    """
-    for key in percent_property:
-      if percent_object in key:
-        return percent_property[key]
-
-    return None
-
   @property
   def percent_placeholder_names(self):
     return self._percent_placeholder_names
@@ -296,6 +287,53 @@ class DimensionSetting(pg.setting.NumericSetting):
         processed_value['unit'], self._built_in_units)
 
     return processed_value
+
+
+class AngleBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.AngleBox` widgets.
+
+  Value: A dictionary representing data obtained from a `gui.AngleBox`.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'value-changed'
+
+  def _create_widget(self, setting, **kwargs):
+    return angle_box_.AngleBox(
+      default_value=setting.value['value'],
+      default_unit=setting.value['unit'],
+      units=dict(builtin_procedures_.UNITS),
+    )
+
+  def get_value(self):
+    return self._widget.get_value()
+
+  def _set_value(self, value):
+    self._widget.set_value(value)
+
+
+class AngleSetting(pg.setting.DictSetting):
+  """Class for settings representing an angle.
+
+  In this setting, a dimension is a dictionary consisting of a value and a unit
+  (degrees or radians).
+
+  Default value: A dictionary representing 0 degrees.
+  """
+
+  _ALLOWED_PDB_TYPES = []
+
+  _ALLOWED_GUI_TYPES = [AngleBoxPresenter]
+
+  _DEFAULT_DEFAULT_VALUE = lambda self: {
+    'value': 0.0,
+    'unit': 'degree',
+  }
+
+  def _copy_value(self, value):
+    if isinstance(value, Iterable) and not isinstance(value, str):
+      return utils.semi_deep_copy(value)
+    else:
+      return value
 
 
 class ResolutionBoxPresenter(pg.setting.GtkPresenter):

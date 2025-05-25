@@ -14,6 +14,8 @@ from src.builtin_procedures import _rename
 from src.builtin_procedures._rename import *
 from src.builtin_procedures import _resize_canvas
 from src.builtin_procedures._resize_canvas import *
+from src.builtin_procedures import _rotate_and_flip
+from src.builtin_procedures._rotate_and_flip import *
 from src.builtin_procedures import _scale
 from src.builtin_procedures._scale import *
 
@@ -40,6 +42,8 @@ _BUILTIN_PROCEDURES_LIST = [
   _rename.RENAME_FOR_EXPORT_LAYERS_DICT,
   _rename.RENAME_FOR_EDIT_LAYERS_DICT,
   _resize_canvas.RESIZE_TO_LAYER_SIZE_DICT,
+  _rotate_and_flip.ROTATE_AND_FLIP_FOR_IMAGES_DICT,
+  _rotate_and_flip.ROTATE_AND_FLIP_FOR_LAYERS_DICT,
   _scale.SCALE_PROCEDURE_DICT_FOR_IMAGES,
   _scale.SCALE_PROCEDURE_DICT_FOR_LAYERS,
 ]

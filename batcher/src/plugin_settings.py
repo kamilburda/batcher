@@ -184,6 +184,8 @@ def create_settings_for_convert():
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   return settings
 
@@ -332,6 +334,8 @@ def create_settings_for_export_images():
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   return settings
 
@@ -466,6 +470,8 @@ def create_settings_for_export_layers():
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
@@ -563,6 +569,8 @@ def create_settings_for_edit_layers():
 
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_export_procedure)
   settings['main/procedures'].connect_event('after-add-action', _on_after_add_scale_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
 
   settings['main/procedures'].connect_event(
     'after-add-action',

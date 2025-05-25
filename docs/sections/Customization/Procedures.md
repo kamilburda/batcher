@@ -150,6 +150,23 @@ This procedure is enabled by default for Export Layers.
 To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 
+### Rotate and flip
+
+Rotates and/or flips the entire image or a layer.
+
+Options:
+* *Apply to (image or layer)*: Whether to rotate and flip the current image, current layer, or other objects (e.g. background/foreground).
+* *Rotation angle*: Rotate by 0, 90, 180 or 270 degrees, or use a *Custom* angle.
+* *Custom rotation angle*: Rotation angle in degrees or radians. Applies only if *Rotation angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
+* *Rotation mode*: How to handle the extents of layers after rotation - resize the layer, clip or crop.
+* *Interpolation*: Interpolation for rotated layers. Has effect only if *Rotation angle* is set to *Custom*.
+* *Rotate around the center*: If checked, the layer is rotated around their center.
+* *Horizontal position of rotation center*: The X-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.
+* *Vertical position of rotation center*: The Y-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.  
+* *Flip horizontally*: Flips the image/layer horizontally.
+* *Flip vertically*: Flips the image/layer vertically.
+
+
 ### Scale
 
 Scales (resizes) the entire image or a layer.

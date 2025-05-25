@@ -4,6 +4,9 @@ General changes:
 * Added Japanese translation (thanks to @re-unknown).
 * Updated Dutch translation (thanks to @DiGro).
 
+New features:
+* Added a new procedure named `Rotate and flip`. You may rotate the entire image or a layer, along with several options such as the angle, or whether to rotate from the center or from a fixed point.
+
 Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
 * Batch Convert: Increased the initial preview height.

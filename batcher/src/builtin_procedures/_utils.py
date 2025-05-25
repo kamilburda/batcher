@@ -6,7 +6,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import placeholders as placeholders_
-from src import setting_classes as setting_classes_
 
 
 def unit_to_pixels(batcher, dimension, resolution_axis):
@@ -22,7 +21,7 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
     placeholder_object = placeholders_.PLACEHOLDERS[dimension['percent_object']]
     gimp_object = placeholder_object.replace_args(None, batcher)
 
-    percent_property = setting_classes_.DimensionSetting.get_percent_property_value(
+    percent_property = _get_percent_property_value(
       dimension['percent_property'], dimension['percent_object'])
 
     if percent_property == 'width':
@@ -61,3 +60,15 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   int_pixels = round(pixels)
 
   return int_pixels
+
+
+def _get_percent_property_value(percent_property, percent_object):
+  """Returns the property (e.g. width, X-offset) for the current value of
+  ``'percent_object'`` within the `DimensionSetting` value's
+  ``percent_property`` entry.
+  """
+  for key in percent_property:
+    if percent_object in key:
+      return percent_property[key]
+
+  return None
