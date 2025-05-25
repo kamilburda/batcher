@@ -113,7 +113,7 @@ def align_and_offset_layers(
     layer.set_offsets(new_x, new_y)
 
 
-ALIGN_AND_OFFSET_PROCEDURE_DICT = {
+ALIGN_AND_OFFSET_DICT = {
   'name': 'align_and_offset_layers',
   'function': align_and_offset_layers,
   'display_name': _('Align and offset'),

@@ -21,11 +21,11 @@ from src.builtin_procedures._scale import *
 
 
 _BUILTIN_PROCEDURES_LIST = [
-  _align_and_offset.ALIGN_AND_OFFSET_PROCEDURE_DICT,
-  _export.EXPORT_PROCEDURE_DICT_FOR_CONVERT,
-  _export.EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES,
-  _export.EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS,
-  _export.EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS,
+  _align_and_offset.ALIGN_AND_OFFSET_DICT,
+  _export.EXPORT_FOR_CONVERT_DICT,
+  _export.EXPORT_FOR_EXPORT_IMAGES_DICT,
+  _export.EXPORT_FOR_EXPORT_LAYERS_DICT,
+  _export.EXPORT_FOR_EDIT_LAYERS_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_LAYERS_DICT,
   _insert_background_foreground.INSERT_FOREGROUND_FOR_IMAGES_DICT,
@@ -36,7 +36,7 @@ _BUILTIN_PROCEDURES_LIST = [
   _misc.MERGE_FILTERS_DICT,
   _misc.MERGE_VISIBLE_LAYERS_DICT,
   _remove_folder_structure.REMOVE_FOLDER_STRUCTURE_DICT,
-  _remove_folder_structure.REMOVE_FOLDER_STRUCTURE_DICT_FOR_EDIT_LAYERS,
+  _remove_folder_structure.REMOVE_FOLDER_STRUCTURE_FOR_EDIT_LAYERS_DICT,
   _rename.RENAME_FOR_CONVERT_DICT,
   _rename.RENAME_FOR_EXPORT_IMAGES_DICT,
   _rename.RENAME_FOR_EXPORT_LAYERS_DICT,
@@ -44,8 +44,8 @@ _BUILTIN_PROCEDURES_LIST = [
   _resize_canvas.RESIZE_TO_LAYER_SIZE_DICT,
   _rotate_and_flip.ROTATE_AND_FLIP_FOR_IMAGES_DICT,
   _rotate_and_flip.ROTATE_AND_FLIP_FOR_LAYERS_DICT,
-  _scale.SCALE_PROCEDURE_DICT_FOR_IMAGES,
-  _scale.SCALE_PROCEDURE_DICT_FOR_LAYERS,
+  _scale.SCALE_FOR_IMAGES_DICT,
+  _scale.SCALE_FOR_LAYERS_DICT,
 ]
 
 # Translated display names could be displayed out of alphabetical order,

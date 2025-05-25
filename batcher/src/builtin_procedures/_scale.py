@@ -340,7 +340,7 @@ def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution
   image_resolution_setting.gui.set_sensitive(set_image_resolution_setting.value)
 
 
-SCALE_PROCEDURE_DICT_FOR_IMAGES = {
+SCALE_FOR_IMAGES_DICT = {
   'name': 'scale_for_images',
   'function': scale,
   'display_name': _('Scale'),
@@ -440,13 +440,13 @@ SCALE_PROCEDURE_DICT_FOR_IMAGES = {
   ],
 }
 
-SCALE_PROCEDURE_DICT_FOR_LAYERS = utils.semi_deep_copy(SCALE_PROCEDURE_DICT_FOR_IMAGES)
-SCALE_PROCEDURE_DICT_FOR_LAYERS.update({
+SCALE_FOR_LAYERS_DICT = utils.semi_deep_copy(SCALE_FOR_IMAGES_DICT)
+SCALE_FOR_LAYERS_DICT.update({
   'name': 'scale_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][0]['default_value'] = 'current_layer'
-SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][1]['default_value']['percent_object'] = (
+SCALE_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
+SCALE_FOR_LAYERS_DICT['arguments'][1]['default_value']['percent_object'] = (
   'current_layer')
-SCALE_PROCEDURE_DICT_FOR_LAYERS['arguments'][2]['default_value']['percent_object'] = (
+SCALE_FOR_LAYERS_DICT['arguments'][2]['default_value']['percent_object'] = (
   'current_layer')

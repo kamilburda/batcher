@@ -829,7 +829,7 @@ _EXPORT_OVERWRITE_MODES_LIST = [
   *INTERACTIVE_OVERWRITE_MODES_LIST
 ]
 
-EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
+EXPORT_FOR_CONVERT_DICT = {
   'name': 'export_for_convert',
   'function': export,
   'display_name': _('Also export as...'),
@@ -923,46 +923,46 @@ EXPORT_PROCEDURE_DICT_FOR_CONVERT = {
   ],
 }
 
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES.update({
+EXPORT_FOR_EXPORT_IMAGES_DICT = utils.semi_deep_copy(EXPORT_FOR_CONVERT_DICT)
+EXPORT_FOR_EXPORT_IMAGES_DICT.update({
   'name': 'export_for_export_images',
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
 })
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][5]['items'].pop(1)
-del EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][9]
-del EXPORT_PROCEDURE_DICT_FOR_EXPORT_IMAGES['arguments'][7]
+EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][5]['items'].pop(1)
+del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][9]
+del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][7]
 
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS.update({
+EXPORT_FOR_EXPORT_LAYERS_DICT = utils.semi_deep_copy(EXPORT_FOR_CONVERT_DICT)
+EXPORT_FOR_EXPORT_LAYERS_DICT.update({
   'name': 'export_for_export_layers',
   'description': _('Exports a layer to another file format.'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
 })
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][5]['items'] = [
+EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][5]['items'] = [
   (ExportModes.EACH_ITEM, _('For each layer')),
   (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
    _('For each top-level layer or group')),
   (ExportModes.SINGLE_IMAGE, _('As a single image')),
 ]
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][6]['default_value'] = '[image name]'
-EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][7]['display_name'] = _(
+EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][6]['default_value'] = '[image name]'
+EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][7]['display_name'] = _(
   'Use file extension in layer name')
-del EXPORT_PROCEDURE_DICT_FOR_EXPORT_LAYERS['arguments'][9]
+del EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][9]
 
-EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS = utils.semi_deep_copy(EXPORT_PROCEDURE_DICT_FOR_CONVERT)
-EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS.update({
+EXPORT_FOR_EDIT_LAYERS_DICT = utils.semi_deep_copy(EXPORT_FOR_CONVERT_DICT)
+EXPORT_FOR_EDIT_LAYERS_DICT.update({
   'name': 'export_for_edit_layers',
   'display_name': _('Export'),
   'description': _('Exports a layer to the specified file format.'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
 })
-EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][5]['items'] = [
+EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][5]['items'] = [
   (ExportModes.EACH_ITEM, _('For each layer')),
   (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
    _('For each top-level layer or group')),
   (ExportModes.SINGLE_IMAGE, _('As a single image')),
 ]
-EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][6]['default_value'] = '[image name]'
-EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][7]['display_name'] = _(
+EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][6]['default_value'] = '[image name]'
+EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][7]['display_name'] = _(
   'Use file extension in layer name')
-del EXPORT_PROCEDURE_DICT_FOR_EDIT_LAYERS['arguments'][9]
+del EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][9]

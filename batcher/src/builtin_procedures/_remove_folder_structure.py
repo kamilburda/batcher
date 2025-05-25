@@ -48,7 +48,7 @@ REMOVE_FOLDER_STRUCTURE_DICT = {
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP, EXPORT_LAYERS_GROUP],
 }
 
-REMOVE_FOLDER_STRUCTURE_DICT_FOR_EDIT_LAYERS = {
+REMOVE_FOLDER_STRUCTURE_FOR_EDIT_LAYERS_DICT = {
   'name': 'remove_folder_structure_for_edit_layers',
   'function': remove_folder_structure_from_item_for_edit_layers,
   'display_name': _('Remove folder structure'),
