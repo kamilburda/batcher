@@ -172,7 +172,7 @@ Options:
 Scales (resizes) the entire image or a layer.
 
 Options:
-* *Object to scale*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
+* *Apply to (image or layer)*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
 * *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
