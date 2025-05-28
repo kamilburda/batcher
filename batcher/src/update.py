@@ -1,6 +1,5 @@
 """Updating the plug-in to the latest version."""
 
-import pathlib
 import re
 import traceback
 from typing import Dict, List, Optional, Tuple, Union
@@ -1336,8 +1335,6 @@ def _update_filepath_or_dirpath_setting(setting_dict):
 
 
 def _update_to_1_1(data, _settings, _procedure_groups):
-  _remove_obsolete_modules_1_1()
-
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
@@ -1362,27 +1359,6 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _align_1_1_merge_reference_object_and_layer(arguments_list)
           _align_1_1_merge_dimensions_and_units(arguments_list)
-
-
-def _remove_obsolete_modules_1_1():
-  src_module_dirpath = pathlib.Path(pg.utils.get_current_module_filepath()).parents[0]
-
-  _safe_remove_module(src_module_dirpath, 'builtin_procedures')
-  _safe_remove_module(src_module_dirpath, 'background_foreground')
-  _safe_remove_module(src_module_dirpath, 'export')
-
-
-def _safe_remove_module(dirpath: pathlib.Path, module_name: str):
-  module_filepaths = [
-    (dirpath / f'{module_name}.py'),
-    (dirpath / f'{module_name}.pyc'),
-  ]
-
-  for module_filepath in module_filepaths:
-    try:
-      module_filepath.unlink()
-    except Exception:
-      pass
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
