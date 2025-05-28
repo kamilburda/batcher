@@ -72,7 +72,7 @@ def crop(
       object_to_crop_height,
     )
 
-    _do_crop(object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.CROP_TO_AREA:
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
@@ -89,7 +89,7 @@ def crop(
     y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
     y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
 
-    _do_crop(object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.REMOVE_EMPTY_BORDERS:
     if isinstance(object_to_crop, Gimp.Image):
       object_to_crop.autocrop(None)
@@ -104,27 +104,15 @@ def crop(
       image.set_selected_layers(orig_selected_layers)
 
 
-def _do_crop(object_to_crop, x, y, width, height):
+def _do_crop(batcher, object_to_crop, x, y, width, height):
   if isinstance(object_to_crop, Gimp.Image):
     # An image can end up with no layers if cropping in an empty space.
     # We insert an empty layer after cropping to ensure that subsequent
     # procedures work properly.
-    # We take attributes from the first selected layer, or the first layer if
-    # there are no selected layers.
-    selected_layers = object_to_crop.get_selected_layers()
-    if selected_layers:
-      first_layer = object_to_crop.get_selected_layers()[0]
-    else:
-      layers = object_to_crop.get_layers()
-      if layers:
-        first_layer = layers[0]
-      else:
-        # Rather than inserting an empty layer, we skip this procedure. An image
-        # having no layers points to a problem outside this procedure.
-        raise exceptions.SkipAction(_('The image has no layers.'))
+    matching_layer = _get_best_matching_layer_from_image(batcher, object_to_crop)
 
-    first_layer_name = first_layer.get_name()
-    first_layer_type = first_layer.type()
+    matching_layer_name = matching_layer.get_name()
+    matching_layer_type = matching_layer.type()
 
     object_to_crop.crop(
       width,
@@ -136,10 +124,10 @@ def _do_crop(object_to_crop, x, y, width, height):
     if not object_to_crop.get_layers():
       empty_layer = Gimp.Layer.new(
         object_to_crop,
-        first_layer_name,
+        matching_layer_name,
         object_to_crop.get_width(),
         object_to_crop.get_width(),
-        first_layer_type,
+        matching_layer_type,
         100.0,
         Gimp.LayerMode.NORMAL,
       )
@@ -153,6 +141,24 @@ def _do_crop(object_to_crop, x, y, width, height):
       height=height,
       merge_filter_=True,
     )
+
+
+def _get_best_matching_layer_from_image(batcher, image):
+  if image == batcher.current_image:
+    if batcher.current_layer.is_valid():
+      return batcher.current_layer
+
+  selected_layers = image.get_selected_layers()
+  if selected_layers:
+    return image.get_selected_layers()[0]
+  else:
+    layers = image.get_layers()
+    if layers:
+      return layers[0]
+    else:
+      # Rather than returning no layer, we skip this procedure. An image
+      # having no layers points to a problem outside this procedure.
+      raise exceptions.SkipAction(_('The image has no layers.'))
 
 
 def _clamp_crop_amount(value, allow_zero_value, max_value):
