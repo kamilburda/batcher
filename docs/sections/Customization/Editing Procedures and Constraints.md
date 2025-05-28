@@ -12,8 +12,8 @@ For image arguments, you may select one of the following:
 
 For layer/drawable/item arguments, you may select one of the following:
 * `Current Layer` (default): the currently processed layer. For Batch Convert, an input image usually contains a single layer, which will be considered the current layer. In case of multi-layer images, the first layer is considered, or the first selected layer if the stored image file contains information on the selected layers (e.g. XCF or PSD).
-* `Background Layer`: the layer representing background, inserted via the `Insert background` procedure. If there is no such layer, the entire procedure/constraint will be skipped.
-* `Foreground Layer`: the layer representing foreground, inserted via the `Insert foreground` procedure. If there is no such layer, the entire procedure/constraint will be skipped.
+* `Background Layer`: a layer placed directly before `Current Layer`, representing background. This layer is inserted via the `Insert background` procedure or by a custom procedure. If there is no such layer, the entire procedure/constraint will be skipped.
+* `Foreground Layer`: a layer placed directly after `Current Layer`, representing foreground. This layer is inserted via the `Insert foreground` procedure or by a custom procedure (e.g. `gimp-text-font` which renders a text layer). If there is no such layer, the entire procedure/constraint will be skipped.
 * `None`: ignores the layer. Only available if a procedure/constraint allows omitting it (i.e. if the layer is optional).
 * `All Layers`: applies the procedure/constraint to all layers within the currently processed image. This option is available usually only for procedures/constraints having the `The input drawables` argument. Note that a procedure/constraint may not work on multiple layers at once and thus may yield an error if this option is chosen.
 

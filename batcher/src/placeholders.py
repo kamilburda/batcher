@@ -52,6 +52,7 @@ def get_background_layer(_setting, batcher):
     lambda position, num_layers: position < num_layers - 1,
     1,
     ['insert_background_for_images', 'insert_background_for_layers'],
+    'color_tag',
     _('There are no background layers.'))
 
 
@@ -65,6 +66,7 @@ def get_foreground_layer(_setting, batcher):
     lambda position, num_layers: position > 0,
     -1,
     ['insert_foreground_for_images', 'insert_foreground_for_layers'],
+    'color_tag',
     _('There are no foreground layers.'))
 
 
@@ -88,7 +90,8 @@ def _get_adjacent_layer(
       batcher,
       position_cond_func,
       adjacent_position_increment,
-      insert_layers_procedure_names,
+      insert_builtin_procedure_names,
+      color_tag_argument_name_for_builtin_procedures,
       skip_message,
 ):
   image = batcher.current_image
@@ -111,13 +114,17 @@ def _get_adjacent_layer(
       # via other means than color tags (e.g. from a file). If there are no
       # matching color tags and `None` is present at least once, we always
       # consider `next_layer` to be the background/foreground.
-      color_tags = [
-        procedure['arguments/color_tag'].value
-        if 'color_tag' in procedure['arguments'] else None
-        for procedure in _get_previous_enabled_procedures(
-          batcher, batcher.current_procedure, insert_layers_procedure_names)]
+      color_tags = []
+      for procedure in _get_previous_enabled_procedures(batcher, batcher.current_procedure):
+        if any(procedure['orig_name'].value == orig_name
+               for orig_name in insert_builtin_procedure_names):
+          if color_tag_argument_name_for_builtin_procedures in procedure['arguments']:
+            color_tags.append(
+              procedure[f'arguments/{color_tag_argument_name_for_builtin_procedures}'].value)
+        else:
+          color_tags.append(None)
 
-      if next_layer.get_color_tag() in color_tags or None in color_tags:
+      if None in color_tags or next_layer.get_color_tag() in color_tags:
         adjacent_layer = next_layer
 
   if adjacent_layer is not None:
@@ -128,15 +135,14 @@ def _get_adjacent_layer(
     raise exceptions.SkipAction(skip_message)
 
 
-def _get_previous_enabled_procedures(batcher, current_action, action_orig_names_to_match):
+def _get_previous_enabled_procedures(batcher, current_action):
   previous_enabled_procedures = []
 
   for procedure in batcher.procedures:
     if procedure == current_action:
       return previous_enabled_procedures
 
-    if any(procedure['enabled'].value and procedure['orig_name'].value == orig_name
-           for orig_name in action_orig_names_to_match):
+    if procedure['enabled'].value:
       previous_enabled_procedures.append(procedure)
 
   return previous_enabled_procedures
