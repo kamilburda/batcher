@@ -24,12 +24,12 @@ __all__ = [
 class CropModes:
   CROP_MODES = (
     CROP_FROM_EACH_SIDE_INDIVIDUALLY,
-    SET_POSITION_WIDTH_HEIGHT,
-    AUTOCROP,
+    CROP_TO_AREA,
+    REMOVE_EMPTY_BORDERS,
   ) = (
     'crop_from_each_side_individually',
-    'set_position_width_height',
-    'autocrop',
+    'crop_to_area',
+    'remove_empty_borders',
   )
 
 
@@ -41,10 +41,10 @@ def crop(
       crop_from_side_bottom,
       crop_from_side_left,
       crop_from_side_right,
-      set_bounds_x,
-      set_bounds_y,
-      set_bounds_width,
-      set_bounds_height,
+      crop_to_area_x,
+      crop_to_area_y,
+      crop_to_area_width,
+      crop_to_area_height,
 ):
   if crop_mode == CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY:
     crop_from_side_top_pixels = builtin_procedures_utils.unit_to_pixels(
@@ -73,24 +73,24 @@ def crop(
     )
 
     _do_crop(object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
-  elif crop_mode == CropModes.SET_POSITION_WIDTH_HEIGHT:
+  elif crop_mode == CropModes.CROP_TO_AREA:
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
 
-    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, set_bounds_width, 'x')
+    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
     width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
 
-    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, set_bounds_height, 'y')
+    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
     height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
 
-    x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, set_bounds_x, 'x')
+    x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_x, 'x')
     x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
 
-    y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, set_bounds_y, 'y')
+    y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
     y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
 
     _do_crop(object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
-  elif crop_mode == CropModes.AUTOCROP:
+  elif crop_mode == CropModes.REMOVE_EMPTY_BORDERS:
     if isinstance(object_to_crop, Gimp.Image):
       object_to_crop.autocrop(None)
     else:
@@ -192,11 +192,11 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group)
     crop_arguments_group['crop_from_side_bottom'].gui.set_visible(True)
     crop_arguments_group['crop_from_side_left'].gui.set_visible(True)
     crop_arguments_group['crop_from_side_right'].gui.set_visible(True)
-  elif crop_mode_setting.value == CropModes.SET_POSITION_WIDTH_HEIGHT:
-    crop_arguments_group['set_bounds_x'].gui.set_visible(True)
-    crop_arguments_group['set_bounds_y'].gui.set_visible(True)
-    crop_arguments_group['set_bounds_width'].gui.set_visible(True)
-    crop_arguments_group['set_bounds_height'].gui.set_visible(True)
+  elif crop_mode_setting.value == CropModes.CROP_TO_AREA:
+    crop_arguments_group['crop_to_area_x'].gui.set_visible(True)
+    crop_arguments_group['crop_to_area_y'].gui.set_visible(True)
+    crop_arguments_group['crop_to_area_width'].gui.set_visible(True)
+    crop_arguments_group['crop_to_area_height'].gui.set_visible(True)
 
 
 CROP_FOR_IMAGES_DICT = {
@@ -218,8 +218,8 @@ CROP_FOR_IMAGES_DICT = {
       'default_value': CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY,
       'items': [
         (CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY, _('Crop from each side individually')),
-        (CropModes.SET_POSITION_WIDTH_HEIGHT, _('Set position, width and height')),
-        (CropModes.AUTOCROP, _('Remove empty borders')),
+        (CropModes.CROP_TO_AREA, _('Crop to area')),
+        (CropModes.REMOVE_EMPTY_BORDERS, _('Remove empty borders')),
       ],
       'display_name': _('How to crop'),
     },
@@ -301,7 +301,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'set_bounds_x',
+      'name': 'crop_to_area_x',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -320,7 +320,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'set_bounds_y',
+      'name': 'crop_to_area_y',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -339,7 +339,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'set_bounds_width',
+      'name': 'crop_to_area_width',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 100.0,
@@ -358,7 +358,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'set_bounds_height',
+      'name': 'crop_to_area_height',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 100.0,
