@@ -23,11 +23,11 @@ __all__ = [
 
 class CropModes:
   CROP_MODES = (
-    CROP_FROM_EACH_SIDE_INDIVIDUALLY,
+    CROP_FROM_EDGES,
     CROP_TO_AREA,
     REMOVE_EMPTY_BORDERS,
   ) = (
-    'crop_from_each_side_individually',
+    'crop_from_edges',
     'crop_to_area',
     'remove_empty_borders',
   )
@@ -37,37 +37,45 @@ def crop(
       batcher,
       object_to_crop,
       crop_mode,
-      crop_from_side_top,
-      crop_from_side_bottom,
-      crop_from_side_left,
-      crop_from_side_right,
+      crop_from_edges_same_amount_for_each_side,
+      crop_from_edges_amount,
+      crop_from_edges_top,
+      crop_from_edges_bottom,
+      crop_from_edges_left,
+      crop_from_edges_right,
       crop_to_area_x,
       crop_to_area_y,
       crop_to_area_width,
       crop_to_area_height,
 ):
-  if crop_mode == CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY:
-    crop_from_side_top_pixels = builtin_procedures_utils.unit_to_pixels(
-      batcher, crop_from_side_top, 'y')
-    crop_from_side_bottom_pixels = builtin_procedures_utils.unit_to_pixels(
-      batcher, crop_from_side_bottom, 'y')
-    crop_from_side_left_pixels = builtin_procedures_utils.unit_to_pixels(
-      batcher, crop_from_side_left, 'x')
-    crop_from_side_right_pixels = builtin_procedures_utils.unit_to_pixels(
-      batcher, crop_from_side_right, 'x')
+  if crop_mode == CropModes.CROP_FROM_EDGES:
+    if crop_from_edges_same_amount_for_each_side:
+      crop_from_edges_top = crop_from_edges_amount
+      crop_from_edges_bottom = crop_from_edges_amount
+      crop_from_edges_left = crop_from_edges_amount
+      crop_from_edges_right = crop_from_edges_amount
+
+    crop_from_edges_top_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, crop_from_edges_top, 'y')
+    crop_from_edges_bottom_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, crop_from_edges_bottom, 'y')
+    crop_from_edges_left_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, crop_from_edges_left, 'x')
+    crop_from_edges_right_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, crop_from_edges_right, 'x')
 
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
 
-    x_pixels = _clamp_crop_amount(crop_from_side_left_pixels, True, object_to_crop_width - 1)
-    y_pixels = _clamp_crop_amount(crop_from_side_top_pixels, True, object_to_crop_height - 1)
+    x_pixels = _clamp_crop_amount(crop_from_edges_left_pixels, True, object_to_crop_width - 1)
+    y_pixels = _clamp_crop_amount(crop_from_edges_top_pixels, True, object_to_crop_height - 1)
     width_pixels = _clamp_crop_amount(
-      object_to_crop_width - crop_from_side_left_pixels - crop_from_side_right_pixels,
+      object_to_crop_width - crop_from_edges_left_pixels - crop_from_edges_right_pixels,
       False,
       object_to_crop_width,
     )
     height_pixels = _clamp_crop_amount(
-      object_to_crop_height - crop_from_side_top_pixels - crop_from_side_bottom_pixels,
+      object_to_crop_height - crop_from_edges_top_pixels - crop_from_edges_bottom_pixels,
       False,
       object_to_crop_height,
     )
@@ -185,6 +193,17 @@ def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments'],
     )
 
+    _set_visible_for_crop_from_edges_settings(
+      procedure['arguments/crop_from_edges_same_amount_for_each_side'],
+      procedure['arguments'],
+    )
+
+    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+      'value-changed',
+      _set_visible_for_crop_from_edges_settings,
+      procedure['arguments'],
+    )
+
 
 def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group):
   for setting in crop_arguments_group:
@@ -193,16 +212,30 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group)
 
     setting.gui.set_visible(False)
 
-  if crop_mode_setting.value == CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY:
-    crop_arguments_group['crop_from_side_top'].gui.set_visible(True)
-    crop_arguments_group['crop_from_side_bottom'].gui.set_visible(True)
-    crop_arguments_group['crop_from_side_left'].gui.set_visible(True)
-    crop_arguments_group['crop_from_side_right'].gui.set_visible(True)
+  if crop_mode_setting.value == CropModes.CROP_FROM_EDGES:
+    crop_arguments_group['crop_from_edges_same_amount_for_each_side'].gui.set_visible(True)
+    _set_visible_for_crop_from_edges_settings(
+      crop_arguments_group['crop_from_edges_same_amount_for_each_side'],
+      crop_arguments_group,
+    )
   elif crop_mode_setting.value == CropModes.CROP_TO_AREA:
     crop_arguments_group['crop_to_area_x'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_y'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_width'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_height'].gui.set_visible(True)
+
+
+def _set_visible_for_crop_from_edges_settings(
+      crop_from_edges_same_amount_for_each_side_setting,
+      crop_arguments_group,
+):
+  is_same_amount = crop_from_edges_same_amount_for_each_side_setting.value
+
+  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_same_amount)
+  crop_arguments_group['crop_from_edges_top'].gui.set_visible(not is_same_amount)
+  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(not is_same_amount)
+  crop_arguments_group['crop_from_edges_left'].gui.set_visible(not is_same_amount)
+  crop_arguments_group['crop_from_edges_right'].gui.set_visible(not is_same_amount)
 
 
 CROP_FOR_IMAGES_DICT = {
@@ -221,17 +254,42 @@ CROP_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'crop_mode',
-      'default_value': CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY,
+      'default_value': CropModes.CROP_FROM_EDGES,
       'items': [
-        (CropModes.CROP_FROM_EACH_SIDE_INDIVIDUALLY, _('Crop from each side individually')),
+        (CropModes.CROP_FROM_EDGES, _('Crop from edges')),
         (CropModes.CROP_TO_AREA, _('Crop to area')),
         (CropModes.REMOVE_EMPTY_BORDERS, _('Remove empty borders')),
       ],
       'display_name': _('How to crop'),
     },
     {
+      'type': 'bool',
+      'name': 'crop_from_edges_same_amount_for_each_side',
+      'default_value': True,
+      'display_name': _('Crop by the same amount from each side'),
+    },
+    {
       'type': 'dimension',
-      'name': 'crop_from_side_top',
+      'name': 'crop_from_edges_amount',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Amount'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'crop_from_edges_top',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -250,7 +308,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'crop_from_side_bottom',
+      'name': 'crop_from_edges_bottom',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -269,7 +327,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'crop_from_side_left',
+      'name': 'crop_from_edges_left',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -288,7 +346,7 @@ CROP_FOR_IMAGES_DICT = {
     },
     {
       'type': 'dimension',
-      'name': 'crop_from_side_right',
+      'name': 'crop_from_edges_right',
       'default_value': {
         'pixel_value': 0.0,
         'percent_value': 0.0,
@@ -390,7 +448,6 @@ CROP_FOR_LAYERS_DICT.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 CROP_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][2]['default_value']['percent_object'] = 'current_layer'
 CROP_FOR_LAYERS_DICT['arguments'][3]['default_value']['percent_object'] = 'current_layer'
 CROP_FOR_LAYERS_DICT['arguments'][4]['default_value']['percent_object'] = 'current_layer'
 CROP_FOR_LAYERS_DICT['arguments'][5]['default_value']['percent_object'] = 'current_layer'
@@ -398,3 +455,5 @@ CROP_FOR_LAYERS_DICT['arguments'][6]['default_value']['percent_object'] = 'curre
 CROP_FOR_LAYERS_DICT['arguments'][7]['default_value']['percent_object'] = 'current_layer'
 CROP_FOR_LAYERS_DICT['arguments'][8]['default_value']['percent_object'] = 'current_layer'
 CROP_FOR_LAYERS_DICT['arguments'][9]['default_value']['percent_object'] = 'current_layer'
+CROP_FOR_LAYERS_DICT['arguments'][10]['default_value']['percent_object'] = 'current_layer'
+CROP_FOR_LAYERS_DICT['arguments'][11]['default_value']['percent_object'] = 'current_layer'
