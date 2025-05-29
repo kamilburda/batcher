@@ -24,10 +24,12 @@ __all__ = [
 class CropModes:
   CROP_MODES = (
     CROP_FROM_EDGES,
+    CROP_FROM_POSITION,
     CROP_TO_AREA,
     REMOVE_EMPTY_BORDERS,
   ) = (
     'crop_from_edges',
+    'crop_from_position',
     'crop_to_area',
     'remove_empty_borders',
   )
@@ -43,6 +45,9 @@ def crop(
       crop_from_edges_bottom,
       crop_from_edges_left,
       crop_from_edges_right,
+      crop_from_position_anchor,
+      crop_from_position_width,
+      crop_from_position_height,
       crop_to_area_x,
       crop_to_area_y,
       crop_to_area_width,
@@ -81,20 +86,38 @@ def crop(
     )
 
     _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
+  elif crop_mode == CropModes.CROP_FROM_POSITION:
+    object_to_crop_width = object_to_crop.get_width()
+    object_to_crop_height = object_to_crop.get_height()
+
+    x_pixels, y_pixels, width_pixels, height_pixels = _get_crop_from_position_area_pixels(
+      batcher,
+      object_to_crop_width,
+      object_to_crop_height,
+      crop_from_position_anchor,
+      crop_from_position_width,
+      crop_from_position_height,
+    )
+
+    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
+
+    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
+    y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
+
+    _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.CROP_TO_AREA:
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
 
-    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
-    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
-
-    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
-    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
-
     x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_x, 'x')
-    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
-
     y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
+    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
+    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
+
+    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
+    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
     y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
 
     _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
@@ -110,6 +133,65 @@ def crop(
       image.autocrop_selected_layers(object_to_crop)
 
       image.set_selected_layers(orig_selected_layers)
+
+
+def _get_crop_from_position_area_pixels(
+      batcher,
+      object_to_crop_width,
+      object_to_crop_height,
+      crop_from_position_anchor,
+      width,
+      height,
+):
+  width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, width, 'x')
+  height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, height, 'y')
+
+  position = [0, 0]
+
+  if crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_LEFT:
+    position = [0, 0]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP:
+    position = [
+      round((object_to_crop_width - width_pixels) / 2),
+      0,
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_RIGHT:
+    position = [
+      object_to_crop_width - width_pixels,
+      0,
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.LEFT:
+    position = [
+      0,
+      round((object_to_crop_height - height_pixels) / 2),
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.CENTER:
+    position = [
+      round((object_to_crop_width - width_pixels) / 2),
+      round((object_to_crop_height - height_pixels) / 2),
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.RIGHT:
+    position = [
+      object_to_crop_width - width_pixels,
+      round((object_to_crop_height - height_pixels) / 2),
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT:
+    position = [
+      0,
+      object_to_crop_height - height_pixels,
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM:
+    position = [
+      round((object_to_crop_width - width_pixels) / 2),
+      object_to_crop_height - height_pixels,
+    ]
+  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT:
+    position = [
+      object_to_crop_width - width_pixels,
+      object_to_crop_height - height_pixels,
+    ]
+
+  return position[0], position[1], width_pixels, height_pixels
 
 
 def _do_crop(batcher, object_to_crop, x, y, width, height):
@@ -170,7 +252,10 @@ def _get_best_matching_layer_from_image(batcher, image):
 
 
 def _clamp_crop_amount(value, allow_zero_value, max_value):
-  if not allow_zero_value:
+  if allow_zero_value:
+    if value < 0:
+      value = 0
+  else:
     if value <= 0:
       value = 1
 
@@ -218,6 +303,10 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group)
       crop_arguments_group['crop_from_edges_same_amount_for_each_side'],
       crop_arguments_group,
     )
+  elif crop_mode_setting.value == CropModes.CROP_FROM_POSITION:
+    crop_arguments_group['crop_from_position_anchor'].gui.set_visible(True)
+    crop_arguments_group['crop_from_position_width'].gui.set_visible(True)
+    crop_arguments_group['crop_from_position_height'].gui.set_visible(True)
   elif crop_mode_setting.value == CropModes.CROP_TO_AREA:
     crop_arguments_group['crop_to_area_x'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_y'].gui.set_visible(True)
@@ -257,6 +346,7 @@ CROP_FOR_IMAGES_DICT = {
       'default_value': CropModes.CROP_FROM_EDGES,
       'items': [
         (CropModes.CROP_FROM_EDGES, _('Crop from edges')),
+        (CropModes.CROP_FROM_POSITION, _('Crop from position')),
         (CropModes.CROP_TO_AREA, _('Crop to area')),
         (CropModes.REMOVE_EMPTY_BORDERS, _('Remove empty borders')),
       ],
@@ -364,6 +454,61 @@ CROP_FOR_IMAGES_DICT = {
       'display_name': _('Right'),
     },
     {
+      'type': 'anchor',
+      'name': 'crop_from_position_anchor',
+      'default_value': builtin_procedures_utils.AnchorPoints.CENTER,
+      'items': [
+        (builtin_procedures_utils.AnchorPoints.TOP_LEFT, _('Top left')),
+        (builtin_procedures_utils.AnchorPoints.TOP, _('Top')),
+        (builtin_procedures_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
+        (builtin_procedures_utils.AnchorPoints.LEFT, _('Left')),
+        (builtin_procedures_utils.AnchorPoints.CENTER, _('Center')),
+        (builtin_procedures_utils.AnchorPoints.RIGHT, _('Right')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM, _('Bottom')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'crop_from_position_width',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'crop_from_position_height',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Height'),
+    },
+    {
       'type': 'dimension',
       'name': 'crop_to_area_x',
       'default_value': {
@@ -448,12 +593,9 @@ CROP_FOR_LAYERS_DICT.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 CROP_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][3]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][4]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][5]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][6]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][7]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][8]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][9]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][10]['default_value']['percent_object'] = 'current_layer'
-CROP_FOR_LAYERS_DICT['arguments'][11]['default_value']['percent_object'] = 'current_layer'
+
+_CROP_DIMENSION_ARGUMENT_INDEXES = [
+  index for index, dict_ in enumerate(CROP_FOR_LAYERS_DICT['arguments'])
+  if dict_['type'] == 'dimension']
+for index in _CROP_DIMENSION_ARGUMENT_INDEXES:
+  CROP_FOR_LAYERS_DICT['arguments'][index]['default_value']['percent_object'] = 'current_layer'

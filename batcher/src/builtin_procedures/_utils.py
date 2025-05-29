@@ -8,6 +8,30 @@ from gi.repository import Gimp
 from src import placeholders as placeholders_
 
 
+class AnchorPoints:
+  ANCHOR_POINTS = (
+    TOP_LEFT,
+    TOP,
+    TOP_RIGHT,
+    LEFT,
+    CENTER,
+    RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM,
+    BOTTOM_RIGHT,
+  ) = (
+    'top_left',
+    'top',
+    'top_right',
+    'left',
+    'center',
+    'right',
+    'bottom_left',
+    'bottom',
+    'bottom_right',
+  )
+
+
 def unit_to_pixels(batcher, dimension, resolution_axis):
   """Converts the value of a `setting_classes.DimensionSetting` to pixels.
 

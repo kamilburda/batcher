@@ -18,6 +18,7 @@ from src import file_formats as file_formats_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
+from src.gui import anchor_box as anchor_box_
 from src.gui import angle_box as angle_box_
 from src.gui import dimension_box as dimension_box_
 from src.gui import resolution_box as resolution_box_
@@ -334,6 +335,40 @@ class AngleSetting(pg.setting.DictSetting):
       return utils.semi_deep_copy(value)
     else:
       return value
+
+
+class AnchorBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.AnchorBox` widgets.
+
+  Value: A value representing an anchor point.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'value-changed'
+
+  def _create_widget(self, setting, **kwargs):
+    return anchor_box_.AnchorBox(
+      anchor_names_and_display_names=setting.items_display_names,
+      default_anchor_name=setting.default_value,
+    )
+
+  def get_value(self):
+    return self._widget.get_value()
+
+  def _set_value(self, value):
+    self._widget.set_value(value)
+
+
+class AnchorSetting(pg.setting.ChoiceSetting):
+  """Class for settings representing an anchor point.
+
+  Default value: ''
+  """
+
+  _ALLOWED_PDB_TYPES = []
+
+  _ALLOWED_GUI_TYPES = [AnchorBoxPresenter]
+
+  _DEFAULT_DEFAULT_VALUE = ''
 
 
 class ResolutionBoxPresenter(pg.setting.GtkPresenter):
