@@ -12,7 +12,7 @@ Changes to the user interface:
 * Batch Convert: Increased the initial preview height.
 
 Changes to procedures and constraints:
-* You can now apply procedures to layers not inserted via `Insert background` or `Insert foreground`, e.g. `gimp-text-font` (which renders a text layer), by selecting `Background Layer` or `Foreground Layer` (depending on whether the layer is inserted before or after the current layer).
+* You can now apply procedures to layers inserted by procedures other than `Insert background` or `Insert foreground`, e.g. `gimp-text-font` (which renders a text layer), by selecting `Background Layer` or `Foreground Layer` (depending on whether the layer is inserted before or after the current layer).
 * Scale:
   * Merged `Object to scale`, `Image` and `Layer` to a single widget.
   * Units for width and height are moved next to the width and height widgets, respectively.
