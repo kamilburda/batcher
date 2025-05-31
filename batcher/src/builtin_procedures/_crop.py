@@ -267,6 +267,18 @@ def _clamp_crop_amount(value, allow_zero_value, max_value):
 
 def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('crop_for_'):
+    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+      'value-changed',
+      _set_visible_for_crop_from_edges_settings,
+      procedure['arguments'],
+    )
+
+    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+      'gui-visible-changed',
+      _set_visible_for_crop_from_edges_settings,
+      procedure['arguments'],
+    )
+
     _set_visible_for_crop_mode_settings(
       procedure['arguments/crop_mode'],
       procedure['arguments'],
@@ -275,17 +287,6 @@ def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
     procedure['arguments/crop_mode'].connect_event(
       'value-changed',
       _set_visible_for_crop_mode_settings,
-      procedure['arguments'],
-    )
-
-    _set_visible_for_crop_from_edges_settings(
-      procedure['arguments/crop_from_edges_same_amount_for_each_side'],
-      procedure['arguments'],
-    )
-
-    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
-      'value-changed',
-      _set_visible_for_crop_from_edges_settings,
       procedure['arguments'],
     )
 
@@ -299,10 +300,6 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group)
 
   if crop_mode_setting.value == CropModes.CROP_FROM_EDGES:
     crop_arguments_group['crop_from_edges_same_amount_for_each_side'].gui.set_visible(True)
-    _set_visible_for_crop_from_edges_settings(
-      crop_arguments_group['crop_from_edges_same_amount_for_each_side'],
-      crop_arguments_group,
-    )
   elif crop_mode_setting.value == CropModes.CROP_FROM_POSITION:
     crop_arguments_group['crop_from_position_anchor'].gui.set_visible(True)
     crop_arguments_group['crop_from_position_width'].gui.set_visible(True)
@@ -318,13 +315,14 @@ def _set_visible_for_crop_from_edges_settings(
       crop_from_edges_same_amount_for_each_side_setting,
       crop_arguments_group,
 ):
-  is_same_amount = crop_from_edges_same_amount_for_each_side_setting.value
+  is_visible = crop_from_edges_same_amount_for_each_side_setting.gui.get_visible()
+  is_checked = crop_from_edges_same_amount_for_each_side_setting.value
 
-  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_same_amount)
-  crop_arguments_group['crop_from_edges_top'].gui.set_visible(not is_same_amount)
-  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(not is_same_amount)
-  crop_arguments_group['crop_from_edges_left'].gui.set_visible(not is_same_amount)
-  crop_arguments_group['crop_from_edges_right'].gui.set_visible(not is_same_amount)
+  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_visible and is_checked)
+  crop_arguments_group['crop_from_edges_top'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_left'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_right'].gui.set_visible(is_visible and not is_checked)
 
 
 CROP_FOR_IMAGES_DICT = {
