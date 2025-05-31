@@ -25,13 +25,29 @@ class CropModes:
   CROP_MODES = (
     CROP_FROM_EDGES,
     CROP_FROM_POSITION,
+    CROP_TO_ASPECT_RATIO,
     CROP_TO_AREA,
     REMOVE_EMPTY_BORDERS,
   ) = (
     'crop_from_edges',
     'crop_from_position',
+    'crop_to_aspect_ratio',
     'crop_to_area',
     'remove_empty_borders',
+  )
+
+
+class CropToAspectRatioPositions:
+  CROP_TO_ASPECT_RATIO_POSITIONS = (
+    START,
+    CENTER,
+    END,
+    CUSTOM,
+  ) = (
+    'start',
+    'center',
+    'end',
+    'custom',
   )
 
 
@@ -48,6 +64,9 @@ def crop(
       crop_from_position_anchor,
       crop_from_position_width,
       crop_from_position_height,
+      crop_to_aspect_ratio_ratio,
+      crop_to_aspect_ratio_position,
+      crop_to_aspect_ratio_position_custom,
       crop_to_area_x,
       crop_to_area_y,
       crop_to_area_width,
@@ -102,6 +121,25 @@ def crop(
     width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
     height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
 
+    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
+    y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
+
+    _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
+  elif crop_mode == CropModes.CROP_TO_ASPECT_RATIO:
+    object_to_crop_width = object_to_crop.get_width()
+    object_to_crop_height = object_to_crop.get_height()
+
+    x_pixels, y_pixels, width_pixels, height_pixels = _get_crop_to_aspect_ratio_pixels(
+      batcher,
+      object_to_crop_width,
+      object_to_crop_height,
+      crop_to_aspect_ratio_ratio,
+      crop_to_aspect_ratio_position,
+      crop_to_aspect_ratio_position_custom,
+    )
+
+    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
     x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
     y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
 
@@ -194,6 +232,54 @@ def _get_crop_from_position_area_pixels(
   return position[0], position[1], width_pixels, height_pixels
 
 
+def _get_crop_to_aspect_ratio_pixels(
+      batcher,
+      object_to_crop_width,
+      object_to_crop_height,
+      crop_to_aspect_ratio_ratio,
+      crop_to_aspect_ratio_position,
+      crop_to_aspect_ratio_position_custom,
+):
+  ratio_width = crop_to_aspect_ratio_ratio['x']
+  ratio_height = crop_to_aspect_ratio_ratio['y']
+
+  width_unit_length = object_to_crop_width / ratio_width
+  height_pixels = width_unit_length * ratio_height
+  if height_pixels <= object_to_crop_height:
+    width_pixels = object_to_crop_width
+    height_pixels = round(height_pixels)
+    x_pixels = 0
+
+    y_pixels = 0
+    if crop_to_aspect_ratio_position == CropToAspectRatioPositions.START:
+      y_pixels = 0
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CENTER:
+      y_pixels = round((object_to_crop_height - height_pixels) / 2)
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.END:
+      y_pixels = object_to_crop_height - height_pixels
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CUSTOM:
+      y_pixels = builtin_procedures_utils.unit_to_pixels(
+        batcher, crop_to_aspect_ratio_position_custom, 'y')
+  else:
+    height_unit_length = object_to_crop_height / ratio_height
+    width_pixels = round(height_unit_length * ratio_width)
+    height_pixels = object_to_crop_height
+    y_pixels = 0
+
+    x_pixels = 0
+    if crop_to_aspect_ratio_position == CropToAspectRatioPositions.START:
+      x_pixels = 0
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CENTER:
+      x_pixels = round((object_to_crop_width - width_pixels) / 2)
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.END:
+      x_pixels = object_to_crop_width - width_pixels
+    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CUSTOM:
+      x_pixels = builtin_procedures_utils.unit_to_pixels(
+        batcher, crop_to_aspect_ratio_position_custom, 'x')
+
+  return x_pixels, y_pixels, width_pixels, height_pixels
+
+
 def _do_crop(batcher, object_to_crop, x, y, width, height):
   if isinstance(object_to_crop, Gimp.Image):
     # An image can end up with no layers if cropping in an empty space.
@@ -279,6 +365,18 @@ def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments'],
     )
 
+    procedure['arguments/crop_to_aspect_ratio_position'].connect_event(
+      'value-changed',
+      _set_visible_for_crop_to_aspect_ratio_position_custom,
+      procedure['arguments/crop_to_aspect_ratio_position_custom'],
+    )
+
+    procedure['arguments/crop_to_aspect_ratio_position'].connect_event(
+      'gui-visible-changed',
+      _set_visible_for_crop_to_aspect_ratio_position_custom,
+      procedure['arguments/crop_to_aspect_ratio_position_custom'],
+    )
+
     _set_visible_for_crop_mode_settings(
       procedure['arguments/crop_mode'],
       procedure['arguments'],
@@ -289,6 +387,30 @@ def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
       _set_visible_for_crop_mode_settings,
       procedure['arguments'],
     )
+
+
+def _set_visible_for_crop_from_edges_settings(
+      crop_from_edges_same_amount_for_each_side_setting,
+      crop_arguments_group,
+):
+  is_visible = crop_from_edges_same_amount_for_each_side_setting.gui.get_visible()
+  is_checked = crop_from_edges_same_amount_for_each_side_setting.value
+
+  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_visible and is_checked)
+  crop_arguments_group['crop_from_edges_top'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_left'].gui.set_visible(is_visible and not is_checked)
+  crop_arguments_group['crop_from_edges_right'].gui.set_visible(is_visible and not is_checked)
+
+
+def _set_visible_for_crop_to_aspect_ratio_position_custom(
+      crop_to_aspect_ratio_position_setting,
+      crop_to_aspect_ratio_position_custom_setting,
+):
+  is_visible = crop_to_aspect_ratio_position_setting.gui.get_visible()
+  is_selected = crop_to_aspect_ratio_position_setting.value == CropToAspectRatioPositions.CUSTOM
+
+  crop_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
 
 def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group):
@@ -304,25 +426,14 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group)
     crop_arguments_group['crop_from_position_anchor'].gui.set_visible(True)
     crop_arguments_group['crop_from_position_width'].gui.set_visible(True)
     crop_arguments_group['crop_from_position_height'].gui.set_visible(True)
+  elif crop_mode_setting.value == CropModes.CROP_TO_ASPECT_RATIO:
+    crop_arguments_group['crop_to_aspect_ratio_ratio'].gui.set_visible(True)
+    crop_arguments_group['crop_to_aspect_ratio_position'].gui.set_visible(True)
   elif crop_mode_setting.value == CropModes.CROP_TO_AREA:
     crop_arguments_group['crop_to_area_x'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_y'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_width'].gui.set_visible(True)
     crop_arguments_group['crop_to_area_height'].gui.set_visible(True)
-
-
-def _set_visible_for_crop_from_edges_settings(
-      crop_from_edges_same_amount_for_each_side_setting,
-      crop_arguments_group,
-):
-  is_visible = crop_from_edges_same_amount_for_each_side_setting.gui.get_visible()
-  is_checked = crop_from_edges_same_amount_for_each_side_setting.value
-
-  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_visible and is_checked)
-  crop_arguments_group['crop_from_edges_top'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_left'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_right'].gui.set_visible(is_visible and not is_checked)
 
 
 CROP_FOR_IMAGES_DICT = {
@@ -345,6 +456,7 @@ CROP_FOR_IMAGES_DICT = {
       'items': [
         (CropModes.CROP_FROM_EDGES, _('Crop from edges')),
         (CropModes.CROP_FROM_POSITION, _('Crop from position')),
+        (CropModes.CROP_TO_ASPECT_RATIO, _('Crop to aspect ratio')),
         (CropModes.CROP_TO_AREA, _('Crop to area')),
         (CropModes.REMOVE_EMPTY_BORDERS, _('Remove empty borders')),
       ],
@@ -505,6 +617,48 @@ CROP_FOR_IMAGES_DICT = {
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('Height'),
+    },
+    {
+      'type': 'coordinates',
+      'name': 'crop_to_aspect_ratio_ratio',
+      'default_value': {
+        'x': 1.0,
+        'y': 1.0,
+      },
+      'min_x': 1.0,
+      'min_y': 1.0,
+      'display_name': _('Aspect ratio (width:height)'),
+    },
+    {
+      'type': 'choice',
+      'name': 'crop_to_aspect_ratio_position',
+      'default_value': CropToAspectRatioPositions.CENTER,
+      'items': [
+        (CropToAspectRatioPositions.START, _('Start')),
+        (CropToAspectRatioPositions.CENTER, _('Center')),
+        (CropToAspectRatioPositions.END, _('End')),
+        (CropToAspectRatioPositions.CUSTOM, _('Custom')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'crop_to_aspect_ratio_position_custom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Custom start position'),
     },
     {
       'type': 'dimension',
