@@ -22,6 +22,10 @@ class CoordinatesBox(Gtk.Box):
         self,
         default_x,
         default_y,
+        min_x=-GLib.MAXDOUBLE,
+        min_y=-GLib.MAXDOUBLE,
+        max_x=GLib.MAXDOUBLE,
+        max_y=GLib.MAXDOUBLE,
         label_x=None,
         label_y=None,
         widget_spacing=7,
@@ -30,6 +34,10 @@ class CoordinatesBox(Gtk.Box):
 
     self._default_x = default_x
     self._default_y = default_y
+    self._min_x = min_x
+    self._min_y = min_y
+    self._max_x = max_x
+    self._max_y = max_y
     self._label_x = label_x
     self._label_y = label_y
     self._widget_spacing = widget_spacing
@@ -62,8 +70,8 @@ class CoordinatesBox(Gtk.Box):
     self._spin_button_x = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=self._default_x,
-        lower=0.0,
-        upper=GLib.MAXDOUBLE,
+        lower=self._min_x,
+        upper=self._max_x,
         step_increment=1,
         page_increment=10,
       ),
@@ -74,8 +82,8 @@ class CoordinatesBox(Gtk.Box):
     self._spin_button_y = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=self._default_y,
-        lower=0.0,
-        upper=GLib.MAXDOUBLE,
+        lower=self._min_y,
+        upper=self._max_y,
         step_increment=1,
         page_increment=10,
       ),

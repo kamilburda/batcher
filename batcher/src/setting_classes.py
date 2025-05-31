@@ -10,6 +10,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
+from gi.repository import GLib
 
 import pygimplib as pg
 
@@ -383,6 +384,10 @@ class CoordinatesBoxPresenter(pg.setting.GtkPresenter):
     return coordinates_box_.CoordinatesBox(
       default_x=setting.value['x'],
       default_y=setting.value['y'],
+      min_x=setting.min_x,
+      min_y=setting.min_y,
+      max_x=setting.max_x,
+      max_y=setting.max_y,
       label_x=label_x,
       label_y=label_y,
     )
@@ -412,15 +417,48 @@ class CoordinatesSetting(pg.setting.DictSetting):
     'y': 0.0,
   }
 
-  def __init__(self, name, show_display_name: bool = True, **kwargs):
+  def __init__(
+        self,
+        name,
+        min_x: float = -GLib.MAXDOUBLE,
+        min_y: float = -GLib.MAXDOUBLE,
+        max_x: float = GLib.MAXDOUBLE,
+        max_y: float = GLib.MAXDOUBLE,
+        show_display_name: bool = True,
+        **kwargs,
+  ):
     super().__init__(name, **kwargs)
 
+    self._min_x = min_x
+    self._min_y = min_y
+    self._max_x = max_x
+    self._max_y = max_y
     self._show_display_name = show_display_name
 
   @property
+  def min_x(self) -> float:
+    """The minimum value along the X-axis."""
+    return self._min_x
+
+  @property
+  def min_y(self) -> float:
+    """The minimum value along the Y-axis."""
+    return self._min_y
+
+  @property
+  def max_x(self) -> float:
+    """The maximum value along the X-axis."""
+    return self._max_x
+
+  @property
+  def max_y(self) -> float:
+    """The maximum value along the Y-axis."""
+    return self._max_y
+
+  @property
   def show_display_name(self) -> bool:
-    """Returns ``True`` if the `display_name` property should be shown in the
-    GUI, ``False`` otherwise.
+    """``True`` if the `display_name` property should be shown in the GUI,
+    ``False`` otherwise.
     """
     return self._show_display_name
 
