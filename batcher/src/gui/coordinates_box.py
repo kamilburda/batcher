@@ -10,11 +10,11 @@ from gi.repository import Gtk
 
 
 __all__ = [
-  'CoordinateBox',
+  'CoordinatesBox',
 ]
 
 
-class CoordinateBox(Gtk.Box):
+class CoordinatesBox(Gtk.Box):
 
   __gsignals__ = {'value-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
 
@@ -99,4 +99,4 @@ class CoordinateBox(Gtk.Box):
     self.emit('value-changed')
 
 
-GObject.type_register(CoordinateBox)
+GObject.type_register(CoordinatesBox)

@@ -21,7 +21,7 @@ from src import utils
 from src.gui import anchor_box as anchor_box_
 from src.gui import angle_box as angle_box_
 from src.gui import dimension_box as dimension_box_
-from src.gui import coordinate_box as coordinate_box_
+from src.gui import coordinates_box as coordinates_box_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -371,16 +371,16 @@ class AnchorSetting(pg.setting.ChoiceSetting):
   _DEFAULT_DEFAULT_VALUE = ''
 
 
-class CoordinateBoxPresenter(pg.setting.GtkPresenter):
-  """`setting.Presenter` subclass for `gui.CoordinateBox` widgets.
+class CoordinatesBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.CoordinatesBox` widgets.
 
-  Value: A dictionary representing data obtained from a `gui.CoordinateBox`.
+  Value: A dictionary representing data obtained from a `gui.CoordinatesBox`.
   """
 
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, label_x=None, label_y=None, **kwargs):
-    return coordinate_box_.CoordinateBox(
+    return coordinates_box_.CoordinatesBox(
       default_x=setting.value['x'],
       default_y=setting.value['y'],
       label_x=label_x,
@@ -405,7 +405,7 @@ class CoordinatesSetting(pg.setting.DictSetting):
 
   _ALLOWED_PDB_TYPES = []
 
-  _ALLOWED_GUI_TYPES = [CoordinateBoxPresenter]
+  _ALLOWED_GUI_TYPES = [CoordinatesBoxPresenter]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: {
     'x': 0.0,
