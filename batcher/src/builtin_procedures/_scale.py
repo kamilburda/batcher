@@ -436,6 +436,7 @@ SCALE_FOR_IMAGES_DICT = {
         'x': 72.0,
         'y': 72.0,
       },
+      'show_display_name': False,
       'gui_type_kwargs': {
         # FOR TRANSLATORS: "X" represents the X-axis.
         'label_x': _('X'),

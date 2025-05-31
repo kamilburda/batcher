@@ -1495,6 +1495,7 @@ def _scale_1_1_add_image_resolution(arguments_list):
         'x': 72.0,
         'y': 72.0,
       },
+      'show_display_name': False,
       'gui_type_kwargs': {
         'label_x': _('X'),
         'label_y': _('Y'),

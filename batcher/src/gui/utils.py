@@ -98,10 +98,14 @@ def _should_display_setting_display_name_in_grid(setting):
   presenters_with_no_label = (
     pg.setting.CheckButtonPresenter,
     setting_classes.FileFormatOptionsPresenter,
-    setting_classes.CoordinateBoxPresenter,
   )
 
-  return not isinstance(setting.gui, presenters_with_no_label)
+  if isinstance(setting.gui, presenters_with_no_label):
+    return False
+  elif isinstance(setting, setting_classes.CoordinatesSetting):
+    return setting.show_display_name
+  else:
+    return True
 
 
 def _has_setting_display_name(setting):

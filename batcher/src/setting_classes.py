@@ -412,6 +412,18 @@ class CoordinatesSetting(pg.setting.DictSetting):
     'y': 0.0,
   }
 
+  def __init__(self, name, show_display_name: bool = True, **kwargs):
+    super().__init__(name, **kwargs)
+
+    self._show_display_name = show_display_name
+
+  @property
+  def show_display_name(self) -> bool:
+    """Returns ``True`` if the `display_name` property should be shown in the
+    GUI, ``False`` otherwise.
+    """
+    return self._show_display_name
+
   def _copy_value(self, value):
     if isinstance(value, Iterable) and not isinstance(value, str):
       return utils.semi_deep_copy(value)
