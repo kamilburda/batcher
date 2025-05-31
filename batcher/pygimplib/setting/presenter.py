@@ -71,7 +71,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
     """Initializes a `Presenter` instance.
 
     You should not instantiate a `Presenter` class directly. A `Presenter`
-    instance is accessible via the `setting.Setting.gui` propperty.
+    instance is accessible via the `setting.Setting.gui` property.
 
     Args:
       setting:
