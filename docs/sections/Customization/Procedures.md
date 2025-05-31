@@ -193,8 +193,7 @@ Options:
   * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
   * *Keep, adjust height*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
   * *Fit*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller.
-  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with *Padding color*.
-* *Padding color*: The color to fill the empty space with if the *Fit with padding* option is selected.
+  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with the specified padding color. You can customize where the padding is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
 * *Set image resolution in DPI*: Whether to set a new resolution for the current image.

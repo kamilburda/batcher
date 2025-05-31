@@ -41,12 +41,14 @@ def scale(
       object_to_scale,
       new_width,
       new_height,
+      aspect_ratio,
       interpolation,
       local_origin,
-      aspect_ratio,
-      padding_color,
       set_image_resolution,
       image_resolution,
+      padding_color,
+      padding_position,
+      padding_position_custom,
 ):
   if set_image_resolution:
     processed_resolution_x = image_resolution['x'] if image_resolution['x'] > 0 else 1.0
@@ -108,6 +110,8 @@ def scale(
       new_width_pixels,
       new_height_pixels,
       padding_color,
+      padding_position,
+      padding_position_custom,
     )
 
   Gimp.context_pop()
@@ -153,6 +157,8 @@ def _fill_with_padding(
       new_width_pixels,
       new_height_pixels,
       padding_color,
+      padding_position,
+      padding_position_custom,
 ):
   if isinstance(gimp_object, Gimp.Image):
     drawable_with_padding = batcher.current_layer
@@ -165,19 +171,37 @@ def _fill_with_padding(
   object_height = gimp_object.get_height()
 
   if new_width_pixels > object_width:
-    offset_x = (new_width_pixels - object_width) // 2
+    offset_x = 0
+    if padding_position == builtin_procedures_utils.Positions.START:
+      offset_x = 0
+    elif padding_position == builtin_procedures_utils.Positions.CENTER:
+      offset_x = round((new_width_pixels - object_width) / 2)
+    elif padding_position == builtin_procedures_utils.Positions.END:
+      offset_x = new_width_pixels - object_width
+    elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
+      offset_x = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'x')
+
     offset_y = 0
     layer_to_fill_start_width = offset_x
     layer_to_fill_start_height = new_height_pixels
-    layer_to_fill_end_width = offset_x + (new_width_pixels - object_width) % 2
+    layer_to_fill_end_width = new_width_pixels - object_width - layer_to_fill_start_width
     layer_to_fill_end_height = new_height_pixels
   else:
+    offset_y = 0
+    if padding_position == builtin_procedures_utils.Positions.START:
+      offset_y = 0
+    elif padding_position == builtin_procedures_utils.Positions.CENTER:
+      offset_y = round((new_height_pixels - object_height) / 2)
+    elif padding_position == builtin_procedures_utils.Positions.END:
+      offset_y = new_height_pixels - object_height
+    elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
+      offset_y = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'y')
+
     offset_x = 0
-    offset_y = (new_height_pixels - object_height) // 2
     layer_to_fill_start_width = new_width_pixels
     layer_to_fill_start_height = offset_y
     layer_to_fill_end_width = new_width_pixels
-    layer_to_fill_end_height = offset_y + (new_height_pixels - object_height) % 2
+    layer_to_fill_end_height = new_height_pixels - object_height - layer_to_fill_start_height
 
   if isinstance(gimp_object, Gimp.Image):
     if new_width_pixels > object_width:
@@ -214,7 +238,7 @@ def _fill_with_padding(
   Gimp.context_set_opacity(
     pg.setting.ColorSetting.get_value_as_color(padding_color).get_rgba().alpha * 100)
 
-  if layer_to_fill_start_width != 0 and layer_to_fill_start_height != 0:
+  if layer_to_fill_start_width > 0 and layer_to_fill_start_height > 0:
     layer_to_fill_start = Gimp.Layer.new(
       image_of_drawable_with_padding,
       drawable_with_padding.get_name(),
@@ -236,7 +260,7 @@ def _fill_with_padding(
   else:
     merged_drawable_with_padding = drawable_with_padding
 
-  if layer_to_fill_end_width != 0 and layer_to_fill_end_height != 0:
+  if layer_to_fill_end_width > 0 and layer_to_fill_end_height > 0:
     layer_to_fill_end = Gimp.Layer.new(
       image_of_drawable_with_padding,
       merged_drawable_with_padding.get_name(),
@@ -282,15 +306,29 @@ def on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/new_height'],
     )
 
-    _set_sensitive_for_padding_color_given_aspect_ratio(
+    procedure['arguments/padding_position'].connect_event(
+      'value-changed',
+      _set_visible_for_padding_custom_position,
+      procedure['arguments/padding_position_custom'],
+    )
+
+    procedure['arguments/padding_position'].connect_event(
+      'gui-visible-changed',
+      _set_visible_for_padding_custom_position,
+      procedure['arguments/padding_position_custom'],
+    )
+
+    _set_visible_for_padding_color_and_position(
       procedure['arguments/aspect_ratio'],
       procedure['arguments/padding_color'],
+      procedure['arguments/padding_position'],
     )
 
     procedure['arguments/aspect_ratio'].connect_event(
       'value-changed',
-      _set_sensitive_for_padding_color_given_aspect_ratio,
+      _set_visible_for_padding_color_and_position,
       procedure['arguments/padding_color'],
+      procedure['arguments/padding_position'],
     )
 
     procedure['arguments/image_resolution'].connect_event(
@@ -326,11 +364,23 @@ def _set_sensitive_for_dimensions_given_aspect_ratio(
   new_height_setting.gui.set_sensitive(not adjust_width)
 
 
-def _set_sensitive_for_padding_color_given_aspect_ratio(
+def _set_visible_for_padding_custom_position(
+      padding_position_setting,
+      padding_position_custom_setting,
+):
+  padding_position_custom_setting.gui.set_visible(
+    padding_position_setting.gui.get_visible()
+    and padding_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
+
+
+def _set_visible_for_padding_color_and_position(
       aspect_ratio_setting,
       padding_color_setting,
+      padding_position_setting,
 ):
-  padding_color_setting.gui.set_sensitive(
+  padding_color_setting.gui.set_visible(
+    aspect_ratio_setting.value == AspectRatios.FIT_WITH_PADDING)
+  padding_position_setting.gui.set_visible(
     aspect_ratio_setting.value == AspectRatios.FIT_WITH_PADDING)
 
 
@@ -408,12 +458,6 @@ SCALE_FOR_IMAGES_DICT = {
       'display_name': _('Aspect ratio'),
     },
     {
-      'type': 'color',
-      'name': 'padding_color',
-      'default_value': [0.0, 0.0, 0.0, 0.0],
-      'display_name': _('Padding color'),
-    },
-    {
       'type': 'enum',
       'enum_type': Gimp.InterpolationType,
       'name': 'interpolation',
@@ -449,6 +493,43 @@ SCALE_FOR_IMAGES_DICT = {
         'label_y': _('Y'),
       },
     },
+    {
+      'type': 'color',
+      'name': 'padding_color',
+      'default_value': [0.0, 0.0, 0.0, 0.0],
+      'display_name': _('Padding color'),
+    },
+    {
+      'type': 'choice',
+      'name': 'padding_position',
+      'default_value': builtin_procedures_utils.Positions.CENTER,
+      'items': [
+        (builtin_procedures_utils.Positions.START, _('Start')),
+        (builtin_procedures_utils.Positions.CENTER, _('Center')),
+        (builtin_procedures_utils.Positions.END, _('End')),
+        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'padding_position_custom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Custom start position'),
+    },
   ],
 }
 
@@ -458,5 +539,9 @@ SCALE_FOR_LAYERS_DICT.update({
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
 SCALE_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
-SCALE_FOR_LAYERS_DICT['arguments'][1]['default_value']['percent_object'] = 'current_layer'
-SCALE_FOR_LAYERS_DICT['arguments'][2]['default_value']['percent_object'] = 'current_layer'
+
+_SCALE_DIMENSION_ARGUMENT_INDEXES = [
+  index for index, dict_ in enumerate(SCALE_FOR_LAYERS_DICT['arguments'])
+  if dict_['type'] == 'dimension']
+for index in _SCALE_DIMENSION_ARGUMENT_INDEXES:
+  SCALE_FOR_LAYERS_DICT['arguments'][index]['default_value']['percent_object'] = 'current_layer'

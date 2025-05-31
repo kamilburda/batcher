@@ -363,11 +363,13 @@ class TestUpdateHandlers(unittest.TestCase):
         'new_width',
         'new_height',
         'aspect_ratio',
-        'padding_color',
         'interpolation',
         'local_origin',
         'set_image_resolution',
         'image_resolution',
+        'padding_color',
+        'padding_position',
+        'padding_position_custom',
       ],
     )
 
@@ -420,6 +422,22 @@ class TestUpdateHandlers(unittest.TestCase):
     )
     self.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
     self.assertEqual(settings[f'{scale_arguments_path}/aspect_ratio'].value, 'stretch')
+    self.assertEqual(settings[f'{scale_arguments_path}/padding_color'].value, [0.0, 0.0, 0.0, 0.0])
+    self.assertEqual(settings[f'{scale_arguments_path}/padding_position'].value, 'center')
+    self.assertEqual(
+      settings[f'{scale_arguments_path}/padding_position_custom'].value,
+      {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+    )
     self.assertEqual(settings[f'{scale_arguments_path}/set_image_resolution'].value, False)
 
     self.assertIsInstance(

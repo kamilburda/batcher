@@ -37,20 +37,6 @@ class CropModes:
   )
 
 
-class CropToAspectRatioPositions:
-  CROP_TO_ASPECT_RATIO_POSITIONS = (
-    START,
-    CENTER,
-    END,
-    CUSTOM,
-  ) = (
-    'start',
-    'center',
-    'end',
-    'custom',
-  )
-
-
 def crop(
       batcher,
       object_to_crop,
@@ -251,13 +237,13 @@ def _get_crop_to_aspect_ratio_pixels(
     x_pixels = 0
 
     y_pixels = 0
-    if crop_to_aspect_ratio_position == CropToAspectRatioPositions.START:
+    if crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
       y_pixels = 0
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CENTER:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
       y_pixels = round((object_to_crop_height - height_pixels) / 2)
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.END:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
       y_pixels = object_to_crop_height - height_pixels
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CUSTOM:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
       y_pixels = builtin_procedures_utils.unit_to_pixels(
         batcher, crop_to_aspect_ratio_position_custom, 'y')
   else:
@@ -267,13 +253,13 @@ def _get_crop_to_aspect_ratio_pixels(
     y_pixels = 0
 
     x_pixels = 0
-    if crop_to_aspect_ratio_position == CropToAspectRatioPositions.START:
+    if crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
       x_pixels = 0
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CENTER:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
       x_pixels = round((object_to_crop_width - width_pixels) / 2)
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.END:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
       x_pixels = object_to_crop_width - width_pixels
-    elif crop_to_aspect_ratio_position == CropToAspectRatioPositions.CUSTOM:
+    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
       x_pixels = builtin_procedures_utils.unit_to_pixels(
         batcher, crop_to_aspect_ratio_position_custom, 'x')
 
@@ -408,7 +394,8 @@ def _set_visible_for_crop_to_aspect_ratio_position_custom(
       crop_to_aspect_ratio_position_custom_setting,
 ):
   is_visible = crop_to_aspect_ratio_position_setting.gui.get_visible()
-  is_selected = crop_to_aspect_ratio_position_setting.value == CropToAspectRatioPositions.CUSTOM
+  is_selected = (
+    crop_to_aspect_ratio_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
 
   crop_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
@@ -632,12 +619,12 @@ CROP_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'crop_to_aspect_ratio_position',
-      'default_value': CropToAspectRatioPositions.CENTER,
+      'default_value': builtin_procedures_utils.Positions.CENTER,
       'items': [
-        (CropToAspectRatioPositions.START, _('Start')),
-        (CropToAspectRatioPositions.CENTER, _('Center')),
-        (CropToAspectRatioPositions.END, _('End')),
-        (CropToAspectRatioPositions.CUSTOM, _('Custom')),
+        (builtin_procedures_utils.Positions.START, _('Start')),
+        (builtin_procedures_utils.Positions.CENTER, _('Center')),
+        (builtin_procedures_utils.Positions.END, _('End')),
+        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
       ],
       'display_name': _('Position'),
     },

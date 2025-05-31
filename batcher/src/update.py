@@ -1352,8 +1352,8 @@ def _update_to_1_1(data, _settings, _procedure_groups):
           _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict)
           _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict)
           _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list)
-          _scale_1_1_add_padding_color_argument(arguments_list)
           _scale_1_1_add_image_resolution(arguments_list)
+          _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_dict)
 
         if (orig_name_setting_dict['value'].startswith('align_and_offset_layers')
             and arguments_list is not None):
@@ -1442,7 +1442,7 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
       value = 'keep_adjust_height'
 
   arguments_list.insert(
-    -2,
+    3,
     {
       'type': 'choice',
       'name': 'aspect_ratio',
@@ -1456,19 +1456,6 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
         ('fit_with_padding', _('Fit with padding')),
       ],
       'display_name': _('Aspect ratio'),
-    },
-  )
-
-
-def _scale_1_1_add_padding_color_argument(arguments_list):
-  arguments_list.insert(
-    -2,
-    {
-      'type': 'color',
-      'name': 'padding_color',
-      'default_value': [0.0, 0.0, 0.0, 0.0],
-      'value': [0.0, 0.0, 0.0, 0.0],
-      'display_name': _('Padding color'),
     },
   )
 
@@ -1500,6 +1487,61 @@ def _scale_1_1_add_image_resolution(arguments_list):
         'label_x': _('X'),
         'label_y': _('Y'),
       },
+    },
+  )
+
+
+def _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_dict):
+  arguments_list.append(
+    {
+      'type': 'color',
+      'name': 'padding_color',
+      'default_value': [0.0, 0.0, 0.0, 0.0],
+      'value': [0.0, 0.0, 0.0, 0.0],
+      'display_name': _('Padding color'),
+    },
+  )
+  arguments_list.append(
+    {
+      'type': 'choice',
+      'name': 'padding_position',
+      'default_value': 'center',
+      'value': 'center',
+      'items': [
+        ('start', _('Start')),
+        ('center', _('Center')),
+        ('end', _('End')),
+        ('custom', _('Custom')),
+      ],
+      'display_name': _('Position'),
+    },
+  )
+
+  dimension_default_value = {
+    'pixel_value': 0.0,
+    'percent_value': 0.0,
+    'other_value': 0.0,
+    'unit': Gimp.Unit.pixel(),
+    'percent_object': 'current_image',
+    'percent_property': {
+      ('current_image',): 'width',
+      ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+    },
+  }
+  if orig_name_setting_dict['value'] == 'scale_for_images':
+    dimension_default_value['percent_object'] = 'current_image'
+  elif orig_name_setting_dict['value'] == 'scale_for_layers':
+    dimension_default_value['percent_object'] = 'current_layer'
+  arguments_list.append(
+    {
+      'type': 'dimension',
+      'name': 'padding_position_custom',
+      'default_value': dimension_default_value,
+      'value': utils_.semi_deep_copy(dimension_default_value),
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Custom start position'),
     },
   )
 

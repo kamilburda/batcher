@@ -32,6 +32,20 @@ class AnchorPoints:
   )
 
 
+class Positions:
+  POSITIONS = (
+    START,
+    CENTER,
+    END,
+    CUSTOM,
+  ) = (
+    'start',
+    'center',
+    'end',
+    'custom',
+  )
+
+
 def unit_to_pixels(batcher, dimension, resolution_axis):
   """Converts the value of a `setting_classes.DimensionSetting` to pixels.
 
