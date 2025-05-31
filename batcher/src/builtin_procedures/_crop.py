@@ -513,7 +513,7 @@ CROP_FOR_IMAGES_DICT = {
         'pixel_value': 0.0,
         'percent_value': 0.0,
         'other_value': 0.0,
-        'unit': Gimp.Unit.percent(),
+        'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'width',
@@ -532,7 +532,7 @@ CROP_FOR_IMAGES_DICT = {
         'pixel_value': 0.0,
         'percent_value': 0.0,
         'other_value': 0.0,
-        'unit': Gimp.Unit.percent(),
+        'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'height',
@@ -548,10 +548,10 @@ CROP_FOR_IMAGES_DICT = {
       'type': 'dimension',
       'name': 'crop_to_area_width',
       'default_value': {
-        'pixel_value': 0.0,
+        'pixel_value': 100.0,
         'percent_value': 100.0,
-        'other_value': 0.0,
-        'unit': Gimp.Unit.percent(),
+        'other_value': 1.0,
+        'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'width',
@@ -567,10 +567,10 @@ CROP_FOR_IMAGES_DICT = {
       'type': 'dimension',
       'name': 'crop_to_area_height',
       'default_value': {
-        'pixel_value': 0.0,
+        'pixel_value': 100.0,
         'percent_value': 100.0,
-        'other_value': 0.0,
-        'unit': Gimp.Unit.percent(),
+        'other_value': 1.0,
+        'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'height',
