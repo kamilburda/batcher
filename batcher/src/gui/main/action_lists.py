@@ -176,15 +176,20 @@ class ActionLists:
       self._constraint_list,
     )
 
-    _set_up_existing_export_procedures(self._procedure_list)
+    _set_up_existing_crop_procedures(self._procedure_list)
     self._procedure_list.actions.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
+      lambda _procedures: _set_up_existing_crop_procedures(self._procedure_list))
 
     _set_up_existing_rename_procedures(self._procedure_list)
     self._procedure_list.actions.connect_event(
       'after-load',
       lambda _procedures: _set_up_existing_rename_procedures(self._procedure_list))
+
+    _set_up_existing_export_procedures(self._procedure_list)
+    self._procedure_list.actions.connect_event(
+      'after-load',
+      lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
 
     _set_up_existing_insert_back_foreground_and_related_actions(
       self._procedure_list, self._constraint_list)
@@ -232,6 +237,9 @@ class ActionLists:
 
 
 def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
+  if item.action['orig_name'].value.startswith('crop_for_'):
+    _handle_crop_procedure_item_added(item)
+
   if item.action['orig_name'].value.startswith('rename_for_'):
     _handle_rename_procedure_item_added(item)
 
@@ -244,6 +252,12 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if any(item.action['orig_name'].value.startswith(prefix) for prefix in [
        'insert_background_for_', 'insert_foreground_for_']):
     _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
+
+
+def _set_up_existing_crop_procedures(procedure_list: action_list_.ActionList):
+  for item in procedure_list.items:
+    if item.action['orig_name'].value.startswith('crop_for_'):
+      _handle_crop_procedure_item_added(item)
 
 
 def _set_up_existing_rename_procedures(procedure_list: action_list_.ActionList):
@@ -452,6 +466,25 @@ def _on_insert_background_foreground_procedure_removed(
       procedure_list.remove_item(merge_item)
     if constraint_item is not None and constraint_item in constraint_list.items:
       constraint_list.remove_item(constraint_item)
+
+
+def _handle_crop_procedure_item_added(item):
+  _set_display_name_for_crop_procedure(
+    item.action['arguments/crop_mode'],
+    item.action)
+
+  item.action['arguments/crop_mode'].connect_event(
+    'value-changed',
+    _set_display_name_for_crop_procedure,
+    item.action)
+
+
+def _set_display_name_for_crop_procedure(crop_mode_setting, crop_procedure):
+  if crop_mode_setting.value == builtin_procedures.CropModes.REMOVE_EMPTY_BORDERS:
+    crop_procedure['display_name'].set_value(_('Crop to remove empty borders'))
+  else:
+    crop_procedure['display_name'].set_value(
+      crop_mode_setting.items_display_names[crop_mode_setting.value])
 
 
 def _handle_rename_procedure_item_added(item):
