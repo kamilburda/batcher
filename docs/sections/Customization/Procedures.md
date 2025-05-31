@@ -55,6 +55,19 @@ This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
+### Crop
+
+Crops the specified image or layer. There are multiple ways you can perform cropping based on your needs.
+
+Options:
+* *How to crop*:
+  * *Crop from edges*: Removes the specified amount from all edges. You can alternatively specify individual amounts for each edge. The amount can be specified in a variety of units (pixels, percentages, inches, ...).
+  * *Crop from position*: Crops to the specified width and height from the specified position, e.g. starting from the upper left corner, from the center, etc.
+  * *Crop to aspect ratio*: Crops to the specified aspect ratio (width:height), e.g. to 4:3 or 16:9 or any ratio of your choice. You can customize where the cropping starts (from the start, center, end or from a custom starting position).
+  * *Crop to area*: Crops to the area bounded by the starting position (X, Y), width and height.
+  * *Remove empty borders*: Automatically removes empty areas along the edges of the image/layer.
+
+
 ### Insert background
 
 Inserts a new layer behind the current layer.
