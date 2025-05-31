@@ -49,10 +49,13 @@ def scale(
       image_resolution,
 ):
   if set_image_resolution:
+    processed_resolution_x = image_resolution['x'] if image_resolution['x'] > 0 else 1.0
+    processed_resolution_y = image_resolution['y'] if image_resolution['y'] > 0 else 1.0
+    
     if isinstance(object_to_scale, Gimp.Image):
-      object_to_scale.set_resolution(image_resolution['x'], image_resolution['y'])
+      object_to_scale.set_resolution(processed_resolution_x, processed_resolution_y)
     elif isinstance(object_to_scale, Gimp.Item):
-      object_to_scale.get_image().set_resolution(image_resolution['x'], image_resolution['y'])
+      object_to_scale.get_image().set_resolution(processed_resolution_x, processed_resolution_y)
 
   new_width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, new_width, 'x')
   if new_width_pixels <= 0:
