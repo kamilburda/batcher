@@ -21,7 +21,7 @@ from src import utils
 from src.gui import anchor_box as anchor_box_
 from src.gui import angle_box as angle_box_
 from src.gui import dimension_box as dimension_box_
-from src.gui import resolution_box as resolution_box_
+from src.gui import coordinate_box as coordinate_box_
 from src.gui import file_format_options_box as file_format_options_box_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -371,16 +371,16 @@ class AnchorSetting(pg.setting.ChoiceSetting):
   _DEFAULT_DEFAULT_VALUE = ''
 
 
-class ResolutionBoxPresenter(pg.setting.GtkPresenter):
-  """`setting.Presenter` subclass for `gui.ResolutionBox` widgets.
+class CoordinateBoxPresenter(pg.setting.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.CoordinateBox` widgets.
 
-  Value: A dictionary representing data obtained from a `gui.ResolutionBox`.
+  Value: A dictionary representing data obtained from a `gui.CoordinateBox`.
   """
 
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
-    return resolution_box_.ResolutionBox(
+    return coordinate_box_.CoordinateBox(
       default_x=setting.value['x'],
       default_y=setting.value['y'],
     )
@@ -392,22 +392,22 @@ class ResolutionBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_value(value)
 
 
-class ResolutionSetting(pg.setting.DictSetting):
-  """Class for settings representing image resolution.
+class CoordinatesSetting(pg.setting.DictSetting):
+  """Class for settings representing values along the X- and Y-axis (e.g.
+  position or resolution).
 
-  In this setting, resolution is represented as a dictionary consisting of
-  X- and Y-resolution.
+  The values are stored in a dictionary.
 
-  Default value: A dictionary containing the default X- and Y-resolution.
+  Default value: A dictionary containing default values along the X- and Y-axis.
   """
 
   _ALLOWED_PDB_TYPES = []
 
-  _ALLOWED_GUI_TYPES = [ResolutionBoxPresenter]
+  _ALLOWED_GUI_TYPES = [CoordinateBoxPresenter]
 
   _DEFAULT_DEFAULT_VALUE = lambda self: {
-    'x': 72.0,
-    'y': 72.0,
+    'x': 0.0,
+    'y': 0.0,
   }
 
   def _copy_value(self, value):

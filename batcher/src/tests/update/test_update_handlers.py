@@ -424,7 +424,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/image_resolution'],
-      setting_classes.ResolutionSetting,
+      setting_classes.CoordinatesSetting,
     )
     self.assertEqual(
       settings[f'{scale_arguments_path}/image_resolution'].value,

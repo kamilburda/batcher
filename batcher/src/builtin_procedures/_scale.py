@@ -430,7 +430,7 @@ SCALE_FOR_IMAGES_DICT = {
       'display_name': _('Set image resolution in DPI'),
     },
     {
-      'type': 'resolution',
+      'type': 'coordinates',
       'name': 'image_resolution',
       'default_value': {
         'x': 72.0,

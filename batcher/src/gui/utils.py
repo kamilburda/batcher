@@ -98,7 +98,7 @@ def _should_display_setting_display_name_in_grid(setting):
   presenters_with_no_label = (
     pg.setting.CheckButtonPresenter,
     setting_classes.FileFormatOptionsPresenter,
-    setting_classes.ResolutionBoxPresenter,
+    setting_classes.CoordinateBoxPresenter,
   )
 
   return not isinstance(setting.gui, presenters_with_no_label)

@@ -1,4 +1,6 @@
-"""Widget for setting image resolution in DPI."""
+"""Widget for setting values along the X- and Y-axis (e.g. position or
+resolution).
+"""
 
 import gi
 from gi.repository import GLib
@@ -8,11 +10,11 @@ from gi.repository import Gtk
 
 
 __all__ = [
-  'ResolutionBox',
+  'CoordinateBox',
 ]
 
 
-class ResolutionBox(Gtk.Box):
+class CoordinateBox(Gtk.Box):
 
   __gsignals__ = {'value-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
 
@@ -96,4 +98,4 @@ class ResolutionBox(Gtk.Box):
     self.emit('value-changed')
 
 
-GObject.type_register(ResolutionBox)
+GObject.type_register(CoordinateBox)

@@ -1485,7 +1485,7 @@ def _scale_1_1_add_image_resolution(arguments_list):
   )
   arguments_list.append(
     {
-      'type': 'resolution',
+      'type': 'coordinates',
       'name': 'image_resolution',
       'default_value': {
         'x': 72.0,

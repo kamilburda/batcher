@@ -71,15 +71,14 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   else:
     image_resolution = batcher.current_image.get_resolution()
     if resolution_axis == 'x':
-      image_resolution_for_dimension = image_resolution.xresolution
+      image_resolution_for_axis = image_resolution.xresolution
     elif resolution_axis == 'y':
-      image_resolution_for_dimension = image_resolution.yresolution
+      image_resolution_for_axis = image_resolution.yresolution
     else:
-      raise ValueError(
-        f'unrecognized value for resolution_dimension: {resolution_axis}')
+      raise ValueError(f'unrecognized value for resolution_axis: {resolution_axis}')
 
     pixels = (
-      dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_dimension)
+      dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_axis)
 
   int_pixels = round(pixels)
 
