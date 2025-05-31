@@ -5,6 +5,7 @@ General changes:
 * Updated Dutch translation (thanks to @DiGro).
 
 New features:
+* Added a new procedure named `Crop`. You may crop the entire image or a layer in a variety of ways - cropping from edges, from a fixed position (top left, center, ...), to the specified aspect ratio, to the specified area (bounding box), or to remove empty borders.
 * Added a new procedure named `Rotate and flip`. You may rotate the entire image or a layer, along with several options such as the angle, or whether to rotate from the center or from a fixed point.
 
 Changes to the user interface:
