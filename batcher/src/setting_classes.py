@@ -379,10 +379,12 @@ class CoordinateBoxPresenter(pg.setting.GtkPresenter):
 
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
-  def _create_widget(self, setting, **kwargs):
+  def _create_widget(self, setting, label_x=None, label_y=None, **kwargs):
     return coordinate_box_.CoordinateBox(
       default_x=setting.value['x'],
       default_y=setting.value['y'],
+      label_x=label_x,
+      label_y=label_y,
     )
 
   def get_value(self):

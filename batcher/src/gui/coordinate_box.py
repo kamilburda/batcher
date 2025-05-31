@@ -22,12 +22,16 @@ class CoordinateBox(Gtk.Box):
         self,
         default_x,
         default_y,
+        label_x=None,
+        label_y=None,
         widget_spacing=7,
   ):
     super().__init__()
 
     self._default_x = default_x
     self._default_y = default_y
+    self._label_x = label_x
+    self._label_y = label_y
     self._widget_spacing = widget_spacing
 
     self._init_gui()
@@ -55,11 +59,6 @@ class CoordinateBox(Gtk.Box):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
     self.set_spacing(self._widget_spacing)
 
-    # FOR TRANSLATORS: "X" represents the X-axis.
-    self._label_x = Gtk.Label(label=_('X'))
-    # FOR TRANSLATORS: "Y" represents the Y-axis.
-    self._label_y = Gtk.Label(label=_('Y'))
-
     self._spin_button_x = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=self._default_x,
@@ -84,9 +83,11 @@ class CoordinateBox(Gtk.Box):
       numeric=True,
     )
 
-    self.pack_start(self._label_x, False, False, 0)
+    if self._label_x is not None:
+      self.pack_start(Gtk.Label(label=self._label_x), False, False, 0)
     self.pack_start(self._spin_button_x, False, False, 0)
-    self.pack_start(self._label_y, False, False, 0)
+    if self._label_y is not None:
+      self.pack_start(Gtk.Label(label=self._label_y), False, False, 0)
     self.pack_start(self._spin_button_y, False, False, 0)
 
     self._on_spin_button_x_value_changed_handler_id = self._spin_button_x.connect(
