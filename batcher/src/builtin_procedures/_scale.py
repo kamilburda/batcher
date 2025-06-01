@@ -6,6 +6,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 import pygimplib as pg
+from pygimplib import pdb
 
 from src import utils
 from src.procedure_groups import *
@@ -180,12 +181,9 @@ def _fill_with_padding(
       offset_x = new_width_pixels - object_width
     elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
       offset_x = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'x')
+      offset_x = min(offset_x, new_width_pixels - object_width)
 
     offset_y = 0
-    layer_to_fill_start_width = offset_x
-    layer_to_fill_start_height = new_height_pixels
-    layer_to_fill_end_width = new_width_pixels - object_width - layer_to_fill_start_width
-    layer_to_fill_end_height = new_height_pixels
   else:
     offset_y = 0
     if padding_position == builtin_procedures_utils.Positions.START:
@@ -196,89 +194,68 @@ def _fill_with_padding(
       offset_y = new_height_pixels - object_height
     elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
       offset_y = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'y')
+      offset_y = min(offset_y, new_height_pixels - object_height)
 
     offset_x = 0
-    layer_to_fill_start_width = new_width_pixels
-    layer_to_fill_start_height = offset_y
-    layer_to_fill_end_width = new_width_pixels
-    layer_to_fill_end_height = new_height_pixels - object_height - layer_to_fill_start_height
 
   if isinstance(gimp_object, Gimp.Image):
-    if new_width_pixels > object_width:
-      layer_to_fill_start_offset_x = 0
-      layer_to_fill_start_offset_y = 0
-      layer_to_fill_end_offset_x = offset_x + object_width
-      layer_to_fill_end_offset_y = offset_y
-    else:
-      layer_to_fill_start_offset_x = 0
-      layer_to_fill_start_offset_y = 0
-      layer_to_fill_end_offset_x = offset_x
-      layer_to_fill_end_offset_y = offset_y + object_height
+    color_layer_offset_x = 0
+    color_layer_offset_y = 0
+
+    new_object_offset_x = offset_x
+    new_object_offset_y = offset_y
 
     gimp_object.resize(new_width_pixels, new_height_pixels, offset_x, offset_y)
   else:
     drawable_with_padding_offsets = gimp_object.get_offsets()
 
-    if new_width_pixels > object_width:
-      layer_to_fill_start_offset_x = drawable_with_padding_offsets.offset_x
-      layer_to_fill_start_offset_y = drawable_with_padding_offsets.offset_y
-      layer_to_fill_end_offset_x = drawable_with_padding_offsets.offset_x + object_width + offset_x
-      layer_to_fill_end_offset_y = drawable_with_padding_offsets.offset_y
-    else:
-      layer_to_fill_start_offset_x = drawable_with_padding_offsets.offset_x
-      layer_to_fill_start_offset_y = drawable_with_padding_offsets.offset_y
-      layer_to_fill_end_offset_x = drawable_with_padding_offsets.offset_x
-      layer_to_fill_end_offset_y = drawable_with_padding_offsets.offset_y + object_height + offset_y
+    color_layer_offset_x = drawable_with_padding_offsets.offset_x
+    color_layer_offset_y = drawable_with_padding_offsets.offset_y
 
-    gimp_object.set_offsets(
-      drawable_with_padding_offsets.offset_x + offset_x,
-      drawable_with_padding_offsets.offset_y + offset_y)
+    new_object_offset_x = drawable_with_padding_offsets.offset_x + offset_x
+    new_object_offset_y = drawable_with_padding_offsets.offset_y + offset_y
+
+    gimp_object.set_offsets(new_object_offset_x, new_object_offset_y)
 
   Gimp.context_set_foreground(pg.setting.ColorSetting.get_value_as_color(padding_color))
   Gimp.context_set_opacity(
     pg.setting.ColorSetting.get_value_as_color(padding_color).get_rgba().alpha * 100)
 
-  if layer_to_fill_start_width > 0 and layer_to_fill_start_height > 0:
-    layer_to_fill_start = Gimp.Layer.new(
+  object_matches_new_dimensions_exactly = (
+    object_width == new_width_pixels and object_height == new_height_pixels)
+
+  if not object_matches_new_dimensions_exactly:
+    color_layer = Gimp.Layer.new(
       image_of_drawable_with_padding,
       drawable_with_padding.get_name(),
-      layer_to_fill_start_width,
-      layer_to_fill_start_height,
+      new_width_pixels,
+      new_height_pixels,
       Gimp.ImageType.RGBA_IMAGE,
       100.0,
       Gimp.LayerMode.NORMAL,
     )
-    layer_to_fill_start.set_offsets(layer_to_fill_start_offset_x, layer_to_fill_start_offset_y)
+    color_layer.set_offsets(color_layer_offset_x, color_layer_offset_y)
     image_of_drawable_with_padding.insert_layer(
-      layer_to_fill_start,
+      color_layer,
       drawable_with_padding.get_parent(),
       image_of_drawable_with_padding.get_item_position(drawable_with_padding) + 1,
     )
-    layer_to_fill_start.edit_fill(Gimp.FillType.FOREGROUND)
-    merged_drawable_with_padding = image_of_drawable_with_padding.merge_down(
-      drawable_with_padding, Gimp.MergeType.EXPAND_AS_NECESSARY)
-  else:
-    merged_drawable_with_padding = drawable_with_padding
 
-  if layer_to_fill_end_width > 0 and layer_to_fill_end_height > 0:
-    layer_to_fill_end = Gimp.Layer.new(
-      image_of_drawable_with_padding,
-      merged_drawable_with_padding.get_name(),
-      layer_to_fill_end_width,
-      layer_to_fill_end_height,
-      Gimp.ImageType.RGBA_IMAGE,
-      100.0,
-      Gimp.LayerMode.NORMAL,
+    channel = pdb.gimp_selection_save(image=image_of_drawable_with_padding)
+    image_of_drawable_with_padding.select_rectangle(
+      Gimp.ChannelOps.REPLACE,
+      new_object_offset_x,
+      new_object_offset_y,
+      object_width,
+      object_height,
     )
-    layer_to_fill_end.set_offsets(layer_to_fill_end_offset_x, layer_to_fill_end_offset_y)
-    image_of_drawable_with_padding.insert_layer(
-      layer_to_fill_end,
-      merged_drawable_with_padding.get_parent(),
-      image_of_drawable_with_padding.get_item_position(merged_drawable_with_padding) + 1,
-    )
-    layer_to_fill_end.edit_fill(Gimp.FillType.FOREGROUND)
+    pdb.gimp_selection_invert(image=image_of_drawable_with_padding)
+    color_layer.edit_fill(Gimp.FillType.FOREGROUND)
+    image_of_drawable_with_padding.select_item(Gimp.ChannelOps.REPLACE, channel)
+    image_of_drawable_with_padding.remove_channel(channel)
+
     image_of_drawable_with_padding.merge_down(
-      merged_drawable_with_padding, Gimp.MergeType.EXPAND_AS_NECESSARY)
+      drawable_with_padding, Gimp.MergeType.EXPAND_AS_NECESSARY)
 
 
 def on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
