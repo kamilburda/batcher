@@ -519,5 +519,6 @@ class TestUpdateHandlers(unittest.TestCase):
         'object_to_resize',
         'resize_mode',
         'resize_to_layer_size_layers',
+        'resize_to_image_size_image',
       ],
     )

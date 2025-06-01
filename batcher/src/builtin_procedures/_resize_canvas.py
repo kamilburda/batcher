@@ -1,5 +1,10 @@
 """Built-in "Resize canvas" procedure."""
 
+import gi
+
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 from src import utils
 from src.procedure_groups import *
 
@@ -18,12 +23,14 @@ class ResizeModes:
     RESIZE_TO_ASPECT_RATIO,
     RESIZE_TO_AREA,
     RESIZE_TO_LAYER_SIZE,
+    RESIZE_TO_IMAGE_SIZE,
   ) = (
     'resize_from_edges',
     'resize_from_position',
     'resize_to_aspect_ratio',
     'resize_to_area',
     'resize_to_layer_size',
+    'resize_to_image_size',
   )
 
 
@@ -32,6 +39,7 @@ def resize_canvas(
       object_to_resize,
       resize_mode,
       resize_to_layer_size_layers,
+      resize_to_image_size_image,
 ):
   if resize_mode == ResizeModes.RESIZE_FROM_EDGES:
     # TODO
@@ -70,6 +78,21 @@ def resize_canvas(
         offset.offset_y + layer.get_height() for layer, offset in zip(layers, layer_offset_list))
 
       object_to_resize.resize(max_x - min_x, max_y - min_y, -min_x, -min_y)
+  elif resize_mode == ResizeModes.RESIZE_TO_IMAGE_SIZE:
+    if isinstance(object_to_resize, Gimp.Image):
+      offset_x = 0
+      offset_y = 0
+    else:
+      offsets = object_to_resize.get_offsets()
+      offset_x = offsets.offset_x
+      offset_y = offsets.offset_y
+
+    object_to_resize.resize(
+      resize_to_image_size_image.get_width(),
+      resize_to_image_size_image.get_height(),
+      offset_x,
+      offset_y,
+    )
 
 
 def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure_dict):
@@ -110,6 +133,8 @@ def _set_visible_for_resize_mode_settings(
     pass
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_LAYER_SIZE:
     resize_canvas_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
+  elif resize_mode_setting.value == ResizeModes.RESIZE_TO_IMAGE_SIZE:
+    resize_canvas_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
 
 
 RESIZE_CANVAS_FOR_IMAGES_DICT = {
@@ -137,6 +162,7 @@ RESIZE_CANVAS_FOR_IMAGES_DICT = {
         (ResizeModes.RESIZE_TO_ASPECT_RATIO, _('Resize to aspect ratio')),
         (ResizeModes.RESIZE_TO_AREA, _('Resize to area')),
         (ResizeModes.RESIZE_TO_LAYER_SIZE, _('Resize to layer size')),
+        (ResizeModes.RESIZE_TO_IMAGE_SIZE, _('Resize to image size')),
       ],
       'display_name': _('How to resize'),
     },
@@ -146,6 +172,13 @@ RESIZE_CANVAS_FOR_IMAGES_DICT = {
       'element_type': 'layer',
       'default_value': 'current_layer_for_array',
       'display_name': _('Layers'),
+    },
+    {
+      'type': 'placeholder_image',
+      'name': 'resize_to_image_size_image',
+      'element_type': 'image',
+      'default_value': 'current_image',
+      'display_name': _('Image'),
     },
   ],
 }

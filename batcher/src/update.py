@@ -1652,6 +1652,16 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       'display_name': _('How to resize'),
     },
   )
+  arguments_list.append(
+    {
+      'type': 'placeholder_image',
+      'name': 'resize_to_image_size_image',
+      'element_type': 'image',
+      'default_value': 'current_image',
+      'value': 'current_image',
+      'display_name': _('Image'),
+    },
+  )
 
 
 def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):
