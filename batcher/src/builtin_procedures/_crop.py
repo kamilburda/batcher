@@ -77,14 +77,14 @@ def crop(
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
 
-    x_pixels = _clamp_crop_amount(crop_from_edges_left_pixels, True, object_to_crop_width - 1)
-    y_pixels = _clamp_crop_amount(crop_from_edges_top_pixels, True, object_to_crop_height - 1)
-    width_pixels = _clamp_crop_amount(
+    x_pixels = _clamp_value(crop_from_edges_left_pixels, True, object_to_crop_width - 1)
+    y_pixels = _clamp_value(crop_from_edges_top_pixels, True, object_to_crop_height - 1)
+    width_pixels = _clamp_value(
       object_to_crop_width - crop_from_edges_left_pixels - crop_from_edges_right_pixels,
       False,
       object_to_crop_width,
     )
-    height_pixels = _clamp_crop_amount(
+    height_pixels = _clamp_value(
       object_to_crop_height - crop_from_edges_top_pixels - crop_from_edges_bottom_pixels,
       False,
       object_to_crop_height,
@@ -104,11 +104,11 @@ def crop(
       crop_from_position_height,
     )
 
-    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
-    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
+    width_pixels = _clamp_value(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_value(height_pixels, False, object_to_crop_height)
 
-    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
-    y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
+    x_pixels = _clamp_value(x_pixels, True, object_to_crop_width - width_pixels)
+    y_pixels = _clamp_value(y_pixels, True, object_to_crop_height - height_pixels)
 
     _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.CROP_TO_ASPECT_RATIO:
@@ -124,10 +124,10 @@ def crop(
       crop_to_aspect_ratio_position_custom,
     )
 
-    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
-    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
-    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
-    y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
+    width_pixels = _clamp_value(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_value(height_pixels, False, object_to_crop_height)
+    x_pixels = _clamp_value(x_pixels, True, object_to_crop_width - width_pixels)
+    y_pixels = _clamp_value(y_pixels, True, object_to_crop_height - height_pixels)
 
     _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.CROP_TO_AREA:
@@ -139,10 +139,10 @@ def crop(
     width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
     height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
 
-    width_pixels = _clamp_crop_amount(width_pixels, False, object_to_crop_width)
-    height_pixels = _clamp_crop_amount(height_pixels, False, object_to_crop_height)
-    x_pixels = _clamp_crop_amount(x_pixels, True, object_to_crop_width - width_pixels)
-    y_pixels = _clamp_crop_amount(y_pixels, True, object_to_crop_height - height_pixels)
+    width_pixels = _clamp_value(width_pixels, False, object_to_crop_width)
+    height_pixels = _clamp_value(height_pixels, False, object_to_crop_height)
+    x_pixels = _clamp_value(x_pixels, True, object_to_crop_width - width_pixels)
+    y_pixels = _clamp_value(y_pixels, True, object_to_crop_height - height_pixels)
 
     _do_crop(batcher, object_to_crop, x_pixels, y_pixels, width_pixels, height_pixels)
   elif crop_mode == CropModes.REMOVE_EMPTY_BORDERS:
@@ -323,7 +323,7 @@ def _get_best_matching_layer_from_image(batcher, image):
       raise exceptions.SkipAction(_('The image has no layers.'))
 
 
-def _clamp_crop_amount(value, allow_zero_value, max_value):
+def _clamp_value(value, allow_zero_value, max_value):
   if allow_zero_value:
     if value < 0:
       value = 0
