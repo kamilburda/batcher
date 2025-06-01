@@ -53,7 +53,7 @@ RESIZE_CANVAS_FOR_LAYERS_DICT.update({
   'name': 'resize_canvas_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
+RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer_for_array'
 
 _RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES = [
   index for index, dict_ in enumerate(RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'])
