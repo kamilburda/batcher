@@ -1,14 +1,15 @@
-"""Built-in "Resize to layer size" procedure."""
+"""Built-in "Resize canvas" procedure."""
 
+from src import utils
 from src.procedure_groups import *
 
 
 __all__ = [
-  'resize_to_layer_size',
+  'resize_canvas',
 ]
 
 
-def resize_to_layer_size(_batcher, layers):
+def resize_canvas(_batcher, layers):
   if len(layers) == 1:
     layer = layers[0]
 
@@ -29,12 +30,13 @@ def resize_to_layer_size(_batcher, layers):
     image.resize(max_x - min_x, max_y - min_y, -min_x, -min_y)
 
 
-RESIZE_TO_LAYER_SIZE_DICT = {
-  'name': 'resize_to_layer_size',
-  'function': resize_to_layer_size,
-  'display_name': _('Resize to layer size'),
-  'description': _('Resizes the image canvas to fit the specified layer(s).'),
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP],
+RESIZE_CANVAS_FOR_IMAGES_DICT = {
+  'name': 'resize_canvas_for_images',
+  'function': resize_canvas,
+  'display_name': _('Resize canvas'),
+  'description': _('Resizes the image or layer extents.'),
+  'display_options_on_create': True,
+  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'placeholder_layer_array',
@@ -43,5 +45,19 @@ RESIZE_TO_LAYER_SIZE_DICT = {
       'default_value': 'current_layer_for_array',
       'display_name': _('Layers'),
     },
-  ]
+  ],
 }
+
+RESIZE_CANVAS_FOR_LAYERS_DICT = utils.semi_deep_copy(RESIZE_CANVAS_FOR_IMAGES_DICT)
+RESIZE_CANVAS_FOR_LAYERS_DICT.update({
+  'name': 'resize_canvas_for_layers',
+  'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+})
+RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer'
+
+_RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES = [
+  index for index, dict_ in enumerate(RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'])
+  if dict_['type'] == 'dimension']
+for index in _RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES:
+  RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][index]['default_value']['percent_object'] = (
+    'current_layer')

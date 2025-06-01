@@ -79,8 +79,8 @@ The _blue_ color tag is used for background by default.
 You may set a different color tag by adjusting the `Color tag` option.
 
 This procedure is inserted at the first position.
-This prevents potential confusion when `Resize to layer size` is not present and the background is offset relative to the layer rather than the image canvas.
-If this is your intention, you can always move this procedure below `Resize to layer size`.
+This prevents potential confusion when other procedures are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
+You can always move this procedure lower as needed.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
@@ -152,14 +152,17 @@ For Batch Convert and Export Layers, this procedure performs renaming on top of 
 
 Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
 
-### Resize to layer size
+### Resize canvas
 
-*Only available for: Batch Convert, Export Images, Export Layers*
+Resizes the image or layer extents, i.e. adds empty space from the edges. There are multiple ways you can perform resizing based on your needs. You may optionally fill the added space with a color.
 
-If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
+Note that this procedure does not upscale/downscale the image/layer. For that purpose, use the `Scale` procedure.
 
-This procedure is enabled by default for Export Layers.
+Options:
+* *Resize to layer size*: If enabled, the image canvas will be resized to fit the layers.
 
+For Export Layers, the *Resize to layer size* option is enabled by default.
+This means that the exported image will have the same dimensions as the layer to export.
 To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 

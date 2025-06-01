@@ -28,7 +28,7 @@ For Batch Convert and Export Images:
 For Export Layers and Edit Layers:
 1. In GIMP, assign a color tag to the layer(s) you want to consider foreground (right-click on a layer → `Color Tags` → choose your color).
 2. Add the `Insert foreground` procedure and adjust the color tag as necessary.
-3. (optional) If you want the foreground to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
+3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
 4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
 
 
@@ -62,7 +62,7 @@ Each time you add this procedure, adjust the file extension, file format options
 
 ## I want to export all layers using the image size, not the layer size.
 
-Uncheck or remove the `Resize to layer size` procedure.
+Uncheck the `Resize to layer size` procedure if it exists.
 
 
 ## I want to export only visible layers.
