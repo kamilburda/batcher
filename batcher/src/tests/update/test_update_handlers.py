@@ -345,8 +345,6 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertNotIn('selected_layers', settings['main'])
     self.assertIn('selected_items', settings['gui'])
 
-    self.assertIn('layers', settings['main/procedures/use_layer_size/arguments'])
-
   def _assert_correct_contents_for_update_to_1_0_rc2(self, settings):
     self.assertEqual(
       settings['main/output_directory'].gui_type, pg.setting.FileChooserPresenter)
@@ -518,6 +516,8 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertListEqual(
       [setting.name for setting in settings[resize_canvas_arguments_path]],
       [
-        'layers',
+        'object_to_resize',
+        'resize_mode',
+        'resize_to_layer_size_layers',
       ],
     )

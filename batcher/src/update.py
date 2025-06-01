@@ -1363,6 +1363,8 @@ def _update_to_1_1(data, _settings, procedure_groups):
         if (orig_name_setting_dict['value'] == 'resize_to_layer_size'
             and arguments_list is not None):
           _resize_canvas_1_1_rename_procedure(orig_name_setting_dict, procedure_groups)
+          _resize_canvas_1_1_rename_layers_argument(arguments_list)
+          _resize_canvas_1_1_add_new_arguments(arguments_list)
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
@@ -1616,6 +1618,40 @@ def _resize_canvas_1_1_rename_procedure(orig_name_setting_dict, procedure_groups
   else:
     orig_name_setting_dict['value'] = 'resize_canvas_for_images'
     orig_name_setting_dict['default_value'] = 'resize_canvas_for_images'
+
+
+def _resize_canvas_1_1_rename_layers_argument(arguments_list):
+  _rename_setting(arguments_list, 'layers', 'resize_to_layer_size_layers')
+
+
+def _resize_canvas_1_1_add_new_arguments(arguments_list):
+  arguments_list.insert(
+    0,
+    {
+      'type': 'placeholder_image_or_layer',
+      'name': 'object_to_resize',
+      'default_value': 'current_image',
+      'value': 'current_image',
+      'display_name': _('Apply to (image or layer):'),
+    },
+  )
+  arguments_list.insert(
+    1,
+    {
+      'type': 'choice',
+      'name': 'resize_mode',
+      'default_value': 'resize_from_edges',
+      'value': 'resize_from_edges',
+      'items': [
+        ('resize_from_edges', _('Resize from edges')),
+        ('resize_from_position', _('Resize from position')),
+        ('resize_to_aspect_ratio', _('Resize to aspect ratio')),
+        ('resize_to_area', _('Resize to area')),
+        ('resize_to_layer_size', _('Resize to layer size')),
+      ],
+      'display_name': _('How to resize'),
+    },
+  )
 
 
 def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):

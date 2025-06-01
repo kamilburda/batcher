@@ -5,42 +5,144 @@ from src.procedure_groups import *
 
 
 __all__ = [
+  'ResizeModes',
   'resize_canvas',
+  'on_after_add_resize_canvas_procedure',
 ]
 
 
-def resize_canvas(_batcher, layers):
-  if len(layers) == 1:
-    layer = layers[0]
+class ResizeModes:
+  RESIZE_MODES = (
+    RESIZE_FROM_EDGES,
+    RESIZE_FROM_POSITION,
+    RESIZE_TO_ASPECT_RATIO,
+    RESIZE_TO_AREA,
+    RESIZE_TO_LAYER_SIZE,
+  ) = (
+    'resize_from_edges',
+    'resize_from_position',
+    'resize_to_aspect_ratio',
+    'resize_to_area',
+    'resize_to_layer_size',
+  )
 
-    layer_offset_x, layer_offset_y = layer.get_offsets()[1:]
-    layer.get_image().resize(
-      layer.get_width(), layer.get_height(), -layer_offset_x, -layer_offset_y)
-  elif len(layers) > 1:
-    image = layers[0].get_image()
 
-    layer_offset_list = [layer.get_offsets()[1:] for layer in layers]
+def resize_canvas(
+      _batcher,
+      object_to_resize,
+      resize_mode,
+      resize_to_layer_size_layers,
+):
+  if resize_mode == ResizeModes.RESIZE_FROM_EDGES:
+    # TODO
+    pass
+  elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
+    # TODO
+    pass
+  elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
+    # TODO
+    pass
+  elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
+    # TODO
+    pass
+  elif resize_mode == ResizeModes.RESIZE_TO_AREA:
+    # TODO
+    pass
+  elif resize_mode == ResizeModes.RESIZE_TO_LAYER_SIZE:
+    layers = resize_to_layer_size_layers
 
-    min_x = min(offset[0] for offset in layer_offset_list)
-    min_y = min(offset[1] for offset in layer_offset_list)
+    if len(layers) == 1:
+      layer = layers[0]
 
-    max_x = max(offset[0] + layer.get_width() for layer, offset in zip(layers, layer_offset_list))
-    max_y = max(offset[1] + layer.get_height() for layer, offset in zip(layers, layer_offset_list))
+      layer_offsets = layer.get_offsets()
 
-    image.resize(max_x - min_x, max_y - min_y, -min_x, -min_y)
+      object_to_resize.resize(
+        layer.get_width(), layer.get_height(), -layer_offsets.offset_x, -layer_offsets.offset_y)
+    elif len(layers) > 1:
+      layer_offset_list = [layer.get_offsets() for layer in layers]
+
+      min_x = min(offset.offset_x for offset in layer_offset_list)
+      min_y = min(offset.offset_y for offset in layer_offset_list)
+
+      max_x = max(
+        offset.offset_x + layer.get_width() for layer, offset in zip(layers, layer_offset_list))
+      max_y = max(
+        offset.offset_y + layer.get_height() for layer, offset in zip(layers, layer_offset_list))
+
+      object_to_resize.resize(max_x - min_x, max_y - min_y, -min_x, -min_y)
+
+
+def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure_dict):
+  if procedure['orig_name'].value.startswith('resize_canvas_for_'):
+    _set_visible_for_resize_mode_settings(
+      procedure['arguments/resize_mode'],
+      procedure['arguments'],
+    )
+
+    procedure['arguments/resize_mode'].connect_event(
+      'value-changed',
+      _set_visible_for_resize_mode_settings,
+      procedure['arguments'],
+    )
+
+
+def _set_visible_for_resize_mode_settings(
+      resize_mode_setting,
+      resize_canvas_arguments_group,
+):
+  for setting in resize_canvas_arguments_group:
+    if setting.name in ['object_to_resize', 'resize_mode']:
+      continue
+
+    setting.gui.set_visible(False)
+
+  if resize_mode_setting.value == ResizeModes.RESIZE_FROM_EDGES:
+    # TODO
+    pass
+  elif resize_mode_setting.value == ResizeModes.RESIZE_FROM_POSITION:
+    # TODO
+    pass
+  elif resize_mode_setting.value == ResizeModes.RESIZE_TO_ASPECT_RATIO:
+    # TODO
+    pass
+  elif resize_mode_setting.value == ResizeModes.RESIZE_TO_AREA:
+    # TODO
+    pass
+  elif resize_mode_setting.value == ResizeModes.RESIZE_TO_LAYER_SIZE:
+    resize_canvas_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
 
 
 RESIZE_CANVAS_FOR_IMAGES_DICT = {
   'name': 'resize_canvas_for_images',
   'function': resize_canvas,
   'display_name': _('Resize canvas'),
-  'description': _('Resizes the image or layer extents.'),
+  'description': _(
+    'Resizes the image or layer extents, optionally filling the newly added space with a color.'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
+      'type': 'placeholder_image_or_layer',
+      'name': 'object_to_resize',
+      'default_value': 'current_image',
+      'display_name': _('Apply to (image or layer):'),
+    },
+    {
+      'type': 'choice',
+      'name': 'resize_mode',
+      'default_value': ResizeModes.RESIZE_FROM_EDGES,
+      'items': [
+        (ResizeModes.RESIZE_FROM_EDGES, _('Resize from edges')),
+        (ResizeModes.RESIZE_FROM_POSITION, _('Resize from position')),
+        (ResizeModes.RESIZE_TO_ASPECT_RATIO, _('Resize to aspect ratio')),
+        (ResizeModes.RESIZE_TO_AREA, _('Resize to area')),
+        (ResizeModes.RESIZE_TO_LAYER_SIZE, _('Resize to layer size')),
+      ],
+      'display_name': _('How to resize'),
+    },
+    {
       'type': 'placeholder_layer_array',
-      'name': 'layers',
+      'name': 'resize_to_layer_size_layers',
       'element_type': 'layer',
       'default_value': 'current_layer_for_array',
       'display_name': _('Layers'),
@@ -53,7 +155,6 @@ RESIZE_CANVAS_FOR_LAYERS_DICT.update({
   'name': 'resize_canvas_for_layers',
   'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
 })
-RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][0]['default_value'] = 'current_layer_for_array'
 
 _RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES = [
   index for index, dict_ in enumerate(RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'])
