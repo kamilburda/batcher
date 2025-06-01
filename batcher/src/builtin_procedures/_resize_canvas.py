@@ -5,8 +5,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from src import utils
 from src.procedure_groups import *
+
+from . import _utils as builtin_procedures_utils
 
 
 __all__ = [
@@ -35,15 +36,54 @@ class ResizeModes:
 
 
 def resize_canvas(
-      _batcher,
+      batcher,
       object_to_resize,
       resize_mode,
+      resize_from_edges_same_amount_for_each_side,
+      resize_from_edges_amount,
+      resize_from_edges_top,
+      resize_from_edges_bottom,
+      resize_from_edges_left,
+      resize_from_edges_right,
       resize_to_layer_size_layers,
       resize_to_image_size_image,
 ):
   if resize_mode == ResizeModes.RESIZE_FROM_EDGES:
-    # TODO
-    pass
+    if resize_from_edges_same_amount_for_each_side:
+      resize_from_edges_top = resize_from_edges_amount
+      resize_from_edges_bottom = resize_from_edges_amount
+      resize_from_edges_left = resize_from_edges_amount
+      resize_from_edges_right = resize_from_edges_amount
+
+    resize_from_edges_top_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, resize_from_edges_top, 'y')
+    resize_from_edges_bottom_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, resize_from_edges_bottom, 'y')
+    resize_from_edges_left_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, resize_from_edges_left, 'x')
+    resize_from_edges_right_pixels = builtin_procedures_utils.unit_to_pixels(
+      batcher, resize_from_edges_right, 'x')
+
+    object_to_resize_width = object_to_resize.get_width()
+    object_to_resize_height = object_to_resize.get_height()
+
+    if isinstance(object_to_resize, Gimp.Image):
+      x_pixels = resize_from_edges_left_pixels
+      y_pixels = resize_from_edges_top_pixels
+    else:
+      object_to_resize_offsets = object_to_resize.get_offsets()
+      x_pixels = object_to_resize_offsets.offset_x + resize_from_edges_left_pixels
+      y_pixels = object_to_resize_offsets.offset_y + resize_from_edges_top_pixels
+
+    width_pixels = (
+      object_to_resize_width + resize_from_edges_left_pixels + resize_from_edges_right_pixels)
+    width_pixels = _clamp_value(width_pixels, 1, None)
+
+    height_pixels = (
+      object_to_resize_height + resize_from_edges_top_pixels + resize_from_edges_bottom_pixels)
+    height_pixels = _clamp_value(height_pixels, 1, None)
+
+    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
     # TODO
     pass
@@ -95,8 +135,36 @@ def resize_canvas(
     )
 
 
+def _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels):
+  object_to_resize.resize(width_pixels, height_pixels, x_pixels, y_pixels)
+
+
+def _clamp_value(value, min_value=None, max_value=None):
+  if min_value is not None:
+    if value < min_value:
+      value = min_value
+
+  if max_value is not None:
+    if value > max_value:
+      value = max_value
+
+  return value
+
+
 def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value == 'resize_canvas':
+    procedure['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
+      'value-changed',
+      _set_visible_for_resize_from_edges_settings,
+      procedure['arguments'],
+    )
+
+    procedure['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
+      'gui-visible-changed',
+      _set_visible_for_resize_from_edges_settings,
+      procedure['arguments'],
+    )
+
     _set_visible_for_resize_mode_settings(
       procedure['arguments/resize_mode'],
       procedure['arguments'],
@@ -109,19 +177,32 @@ def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure
     )
 
 
+def _set_visible_for_resize_from_edges_settings(
+      resize_from_edges_same_amount_for_each_side_setting,
+      resize_arguments_group,
+):
+  is_visible = resize_from_edges_same_amount_for_each_side_setting.gui.get_visible()
+  is_checked = resize_from_edges_same_amount_for_each_side_setting.value
+
+  resize_arguments_group['resize_from_edges_amount'].gui.set_visible(is_visible and is_checked)
+  resize_arguments_group['resize_from_edges_top'].gui.set_visible(is_visible and not is_checked)
+  resize_arguments_group['resize_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
+  resize_arguments_group['resize_from_edges_left'].gui.set_visible(is_visible and not is_checked)
+  resize_arguments_group['resize_from_edges_right'].gui.set_visible(is_visible and not is_checked)
+
+
 def _set_visible_for_resize_mode_settings(
       resize_mode_setting,
-      resize_canvas_arguments_group,
+      resize_arguments_group,
 ):
-  for setting in resize_canvas_arguments_group:
+  for setting in resize_arguments_group:
     if setting.name in ['object_to_resize', 'resize_mode']:
       continue
 
     setting.gui.set_visible(False)
 
   if resize_mode_setting.value == ResizeModes.RESIZE_FROM_EDGES:
-    # TODO
-    pass
+    resize_arguments_group['resize_from_edges_same_amount_for_each_side'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_FROM_POSITION:
     # TODO
     pass
@@ -132,9 +213,9 @@ def _set_visible_for_resize_mode_settings(
     # TODO
     pass
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_LAYER_SIZE:
-    resize_canvas_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
+    resize_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_IMAGE_SIZE:
-    resize_canvas_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
+    resize_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
 
 
 RESIZE_CANVAS_DICT = {
@@ -157,7 +238,7 @@ RESIZE_CANVAS_DICT = {
       'name': 'resize_mode',
       'default_value': ResizeModes.RESIZE_FROM_EDGES,
       'items': [
-        (ResizeModes.RESIZE_FROM_EDGES, _('Resize from edges')),
+        (ResizeModes.RESIZE_FROM_EDGES, _('Resize from edges (add borders)')),
         (ResizeModes.RESIZE_FROM_POSITION, _('Resize from position')),
         (ResizeModes.RESIZE_TO_ASPECT_RATIO, _('Resize to aspect ratio')),
         (ResizeModes.RESIZE_TO_AREA, _('Resize to area')),
@@ -165,6 +246,102 @@ RESIZE_CANVAS_DICT = {
         (ResizeModes.RESIZE_TO_IMAGE_SIZE, _('Resize to image size')),
       ],
       'display_name': _('How to resize'),
+    },
+    {
+      'type': 'bool',
+      'name': 'resize_from_edges_same_amount_for_each_side',
+      'default_value': True,
+      'display_name': _('Resize by the same amount from each side'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_amount',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Amount'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_top',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Top'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_bottom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Bottom'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_left',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Left'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_right',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Right'),
     },
     {
       'type': 'placeholder_layer_array',
