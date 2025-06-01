@@ -96,6 +96,7 @@ class TestUpdateHandlers(unittest.TestCase):
       settings,
       sources={'persistent': source},
       update_sources=False,
+      procedure_group=source_name,
     )
 
     self.assertEqual(status, update.UPDATE, msg=message)
@@ -507,4 +508,16 @@ class TestUpdateHandlers(unittest.TestCase):
           ('current_layer', 'background_layer', 'foreground_layer'): 'height',
         },
       },
+    )
+
+    self.assertEqual(
+      settings['main/procedures/resize_to_layer_size/orig_name'].value, 'resize_canvas_for_images')
+
+    resize_canvas_arguments_path = 'main/procedures/resize_to_layer_size/arguments'
+
+    self.assertListEqual(
+      [setting.name for setting in settings[resize_canvas_arguments_path]],
+      [
+        'layers',
+      ],
     )

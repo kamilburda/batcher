@@ -1140,6 +1140,159 @@
                                     "setting_attributes": {
                                         "pdb_type": null
                                     }
+                                },
+                                {
+                                    "settings": [
+                                        {
+                                            "name": "function",
+                                            "default_value": "",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "origin",
+                                            "default_value": "builtin",
+                                            "items": [
+                                                [
+                                                    "builtin",
+                                                    "Built-in"
+                                                ],
+                                                [
+                                                    "gimp_pdb",
+                                                    "GIMP PDB procedure"
+                                                ],
+                                                [
+                                                    "gegl",
+                                                    "GEGL operation"
+                                                ]
+                                            ],
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "builtin",
+                                            "type": "choice"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "layers",
+                                                    "element_type": "layer",
+                                                    "default_value": "current_layer_for_array",
+                                                    "display_name": "Layers",
+                                                    "pdb_type": null,
+                                                    "value": "all_top_level_layers",
+                                                    "type": "placeholder_layer_array"
+                                                }
+                                            ],
+                                            "name": "arguments",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "enabled",
+                                            "default_value": true,
+                                            "pdb_type": null,
+                                            "value": true,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "display_name",
+                                            "default_value": "Resize to layer size",
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": "Resize to layer size",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "menu_path",
+                                            "default_value": null,
+                                            "gui_type": null,
+                                            "tags": [
+                                                "ignore_initialize_gui"
+                                            ],
+                                            "pdb_type": null,
+                                            "value": null,
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "description",
+                                            "default_value": "Resizes the image canvas to fit the specified layer(s).",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "Resizes the image canvas to fit the specified layer(s).",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "name": "action_groups",
+                                            "default_value": [
+                                                "default_procedures"
+                                            ],
+                                            "nullable": true,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": [
+                                                "default_procedures"
+                                            ],
+                                            "type": "list"
+                                        },
+                                        {
+                                            "name": "display_options_on_create",
+                                            "default_value": false,
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "settings": [
+                                                {
+                                                    "name": "enabled_for_previews",
+                                                    "default_value": true,
+                                                    "display_name": "Enable for previews",
+                                                    "pdb_type": null,
+                                                    "value": true,
+                                                    "type": "bool"
+                                                }
+                                            ],
+                                            "name": "more_options",
+                                            "setting_attributes": {
+                                                "pdb_type": null
+                                            }
+                                        },
+                                        {
+                                            "name": "more_options_expanded",
+                                            "default_value": false,
+                                            "display_name": "_More options",
+                                            "gui_type": "expander",
+                                            "pdb_type": null,
+                                            "value": false,
+                                            "type": "bool"
+                                        },
+                                        {
+                                            "name": "orig_name",
+                                            "default_value": "resize_to_layer_size",
+                                            "gui_type": null,
+                                            "pdb_type": null,
+                                            "value": "resize_to_layer_size",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "name": "resize_to_layer_size",
+                                    "tags": [
+                                        "action",
+                                        "procedure",
+                                        "plug-in-batch-convert",
+                                        "plug-in-batch-export-images",
+                                        "plug-in-batch-export-layers"
+                                    ],
+                                    "setting_attributes": {
+                                        "pdb_type": null
+                                    }
                                 }
                             ],
                             "name": "procedures",
@@ -1339,7 +1492,9 @@
                         },
                         {
                             "name": "selected_items",
-                            "value": [],
+                            "value": [
+                                "C:\\Users\\username\\AppData\\Roaming\\GIMP\\3.0\\batcher\\batcher\\src\\tests\\tests_requiring_gimp\\test_images\\convert_inputs\\main-background.xcf"
+                            ],
                             "type": "image_file_tree_items"
                         },
                         {
@@ -1461,8 +1616,8 @@
                                     "name": "dialog_position",
                                     "default_value": [],
                                     "value": [
-                                        647,
-                                        148
+                                        659,
+                                        159
                                     ],
                                     "type": "tuple"
                                 },

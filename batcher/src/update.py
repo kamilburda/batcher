@@ -1334,7 +1334,7 @@ def _update_filepath_or_dirpath_setting(setting_dict):
     setting_dict['none_ok'] = setting_dict.pop('nullable')
 
 
-def _update_to_1_1(data, _settings, _procedure_groups):
+def _update_to_1_1(data, _settings, procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
@@ -1359,6 +1359,10 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _align_1_1_merge_reference_object_and_layer(arguments_list)
           _align_1_1_merge_dimensions_and_units(arguments_list)
+
+        if (orig_name_setting_dict['value'] == 'resize_to_layer_size'
+            and arguments_list is not None):
+          _resize_canvas_1_1_rename_procedure(orig_name_setting_dict, procedure_groups)
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
@@ -1603,6 +1607,15 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
   )
   y_offset_setting_dict['percent_placeholder_names'] = [
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+
+
+def _resize_canvas_1_1_rename_procedure(orig_name_setting_dict, procedure_groups):
+  if EXPORT_LAYERS_GROUP in procedure_groups or EDIT_LAYERS_GROUP in procedure_groups:
+    orig_name_setting_dict['value'] = 'resize_canvas_for_layers'
+    orig_name_setting_dict['default_value'] = 'resize_canvas_for_layers'
+  else:
+    orig_name_setting_dict['value'] = 'resize_canvas_for_images'
+    orig_name_setting_dict['default_value'] = 'resize_canvas_for_images'
 
 
 def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):
