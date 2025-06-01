@@ -509,7 +509,7 @@ class TestUpdateHandlers(unittest.TestCase):
     )
 
     self.assertEqual(
-      settings['main/procedures/resize_to_layer_size/orig_name'].value, 'resize_canvas_for_images')
+      settings['main/procedures/resize_to_layer_size/orig_name'].value, 'resize_canvas')
 
     resize_canvas_arguments_path = 'main/procedures/resize_to_layer_size/arguments'
 

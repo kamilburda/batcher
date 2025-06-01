@@ -96,7 +96,7 @@ def resize_canvas(
 
 
 def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('resize_canvas_for_'):
+  if procedure['orig_name'].value == 'resize_canvas':
     _set_visible_for_resize_mode_settings(
       procedure['arguments/resize_mode'],
       procedure['arguments'],
@@ -137,14 +137,14 @@ def _set_visible_for_resize_mode_settings(
     resize_canvas_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
 
 
-RESIZE_CANVAS_FOR_IMAGES_DICT = {
-  'name': 'resize_canvas_for_images',
+RESIZE_CANVAS_DICT = {
+  'name': 'resize_canvas',
   'function': resize_canvas,
   'display_name': _('Resize canvas'),
   'description': _(
     'Resizes the image or layer extents, optionally filling the newly added space with a color.'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
   'arguments': [
     {
       'type': 'placeholder_image_or_layer',
@@ -182,16 +182,3 @@ RESIZE_CANVAS_FOR_IMAGES_DICT = {
     },
   ],
 }
-
-RESIZE_CANVAS_FOR_LAYERS_DICT = utils.semi_deep_copy(RESIZE_CANVAS_FOR_IMAGES_DICT)
-RESIZE_CANVAS_FOR_LAYERS_DICT.update({
-  'name': 'resize_canvas_for_layers',
-  'additional_tags': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
-})
-
-_RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES = [
-  index for index, dict_ in enumerate(RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'])
-  if dict_['type'] == 'dimension']
-for index in _RESIZE_CANVAS_DIMENSION_ARGUMENT_INDEXES:
-  RESIZE_CANVAS_FOR_LAYERS_DICT['arguments'][index]['default_value']['percent_object'] = (
-    'current_layer')

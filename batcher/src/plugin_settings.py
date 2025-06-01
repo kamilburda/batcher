@@ -461,7 +461,7 @@ def create_settings_for_export_layers():
 
   # TODO: Set "Resize to layer size" option once the procedure is refactored
   resize_canvas_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['resize_canvas_for_layers'])
+    builtin_procedures.BUILTIN_PROCEDURES['resize_canvas'])
 
   settings['main'].add([
     actions_.create(
