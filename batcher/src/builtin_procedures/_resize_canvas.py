@@ -324,7 +324,7 @@ RESIZE_CANVAS_DICT = {
     {
       'type': 'bool',
       'name': 'resize_from_edges_same_amount_for_each_side',
-      'default_value': True,
+      'default_value': False,
       'display_name': _('Resize by the same amount from each side'),
     },
     {
