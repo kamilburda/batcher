@@ -51,6 +51,10 @@ def resize_canvas(
       resize_to_aspect_ratio_ratio,
       resize_to_aspect_ratio_position,
       resize_to_aspect_ratio_position_custom,
+      resize_to_area_x,
+      resize_to_area_y,
+      resize_to_area_width,
+      resize_to_area_height,
       resize_to_layer_size_layers,
       resize_to_image_size_image,
 ):
@@ -83,11 +87,11 @@ def resize_canvas(
 
     width_pixels = (
       object_to_resize_width + resize_from_edges_left_pixels + resize_from_edges_right_pixels)
-    width_pixels = _clamp_value(width_pixels, 1, None)
+    width_pixels = _clamp_value(width_pixels, min_value=1)
 
     height_pixels = (
       object_to_resize_height + resize_from_edges_top_pixels + resize_from_edges_bottom_pixels)
-    height_pixels = _clamp_value(height_pixels, 1, None)
+    height_pixels = _clamp_value(height_pixels, min_value=1)
 
     _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
@@ -103,8 +107,8 @@ def resize_canvas(
       resize_from_position_height,
     )
 
-    width_pixels = _clamp_value(width_pixels, 1, None)
-    height_pixels = _clamp_value(height_pixels, 1, None)
+    width_pixels = _clamp_value(width_pixels, min_value=1)
+    height_pixels = _clamp_value(height_pixels, min_value=1)
 
     _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
@@ -120,13 +124,20 @@ def resize_canvas(
       resize_to_aspect_ratio_position_custom,
     )
 
-    width_pixels = _clamp_value(width_pixels, 1, None)
-    height_pixels = _clamp_value(height_pixels, 1, None)
+    width_pixels = _clamp_value(width_pixels, min_value=1)
+    height_pixels = _clamp_value(height_pixels, min_value=1)
 
     _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
-    # TODO
-    pass
+    x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
+    y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
+    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_width, 'x')
+    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_height, 'y')
+
+    width_pixels = _clamp_value(width_pixels, min_value=1)
+    height_pixels = _clamp_value(height_pixels, min_value=1)
+
+    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_LAYER_SIZE:
     layers = resize_to_layer_size_layers
 
@@ -372,8 +383,10 @@ def _set_visible_for_resize_mode_settings(
     resize_arguments_group['resize_to_aspect_ratio_ratio'].gui.set_visible(True)
     resize_arguments_group['resize_to_aspect_ratio_position'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_AREA:
-    # TODO
-    pass
+    resize_arguments_group['resize_to_area_x'].gui.set_visible(True)
+    resize_arguments_group['resize_to_area_y'].gui.set_visible(True)
+    resize_arguments_group['resize_to_area_width'].gui.set_visible(True)
+    resize_arguments_group['resize_to_area_height'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_LAYER_SIZE:
     resize_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_IMAGE_SIZE:
@@ -597,10 +610,83 @@ RESIZE_CANVAS_DICT = {
           ('current_layer', 'background_layer', 'foreground_layer'): 'width',
         },
       },
-      'min_value': 0.0,
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('Custom start position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_x',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Offset X'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_y',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Offset Y'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_width',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_height',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Height'),
     },
     {
       'type': 'placeholder_layer_array',
