@@ -2,6 +2,7 @@
 
 General changes:
 * Added Japanese translation (thanks to @re-unknown).
+* Added Spanish translation (thanks to @ikizgz).
 * Updated Dutch translation (thanks to @DiGro).
 
 New features:
