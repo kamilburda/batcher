@@ -574,7 +574,7 @@ CROP_FOR_IMAGES_DICT = {
         'pixel_value': 100.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'width',
@@ -593,7 +593,7 @@ CROP_FOR_IMAGES_DICT = {
         'pixel_value': 100.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
         'percent_property': {
           ('current_image',): 'height',

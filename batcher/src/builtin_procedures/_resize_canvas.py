@@ -45,6 +45,9 @@ def resize_canvas(
       resize_from_edges_bottom,
       resize_from_edges_left,
       resize_from_edges_right,
+      resize_from_position_anchor,
+      resize_from_position_width,
+      resize_from_position_height,
       resize_to_layer_size_layers,
       resize_to_image_size_image,
 ):
@@ -85,11 +88,22 @@ def resize_canvas(
 
     _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
-    # TODO
-    pass
-  elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
-    # TODO
-    pass
+    object_to_resize_width = object_to_resize.get_width()
+    object_to_resize_height = object_to_resize.get_height()
+
+    x_pixels, y_pixels, width_pixels, height_pixels = _get_resize_from_position_area_pixels(
+      batcher,
+      object_to_resize_width,
+      object_to_resize_height,
+      resize_from_position_anchor,
+      resize_from_position_width,
+      resize_from_position_height,
+    )
+
+    width_pixels = _clamp_value(width_pixels, 1, None)
+    height_pixels = _clamp_value(height_pixels, 1, None)
+
+    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
     # TODO
     pass
@@ -133,6 +147,65 @@ def resize_canvas(
       offset_x,
       offset_y,
     )
+
+
+def _get_resize_from_position_area_pixels(
+      batcher,
+      object_to_resize_width,
+      object_to_resize_height,
+      resize_from_position_anchor,
+      width,
+      height,
+):
+  width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, width, 'x')
+  height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, height, 'y')
+
+  position = [0, 0]
+
+  if resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_LEFT:
+    position = [0, 0]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP:
+    position = [
+      round((width_pixels - object_to_resize_width) / 2),
+      0,
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_RIGHT:
+    position = [
+      width_pixels - object_to_resize_width,
+      0,
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.LEFT:
+    position = [
+      0,
+      round((height_pixels - object_to_resize_height) / 2),
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.CENTER:
+    position = [
+      round((width_pixels - object_to_resize_width) / 2),
+      round((height_pixels - object_to_resize_height) / 2),
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.RIGHT:
+    position = [
+      width_pixels - object_to_resize_width,
+      round((height_pixels - object_to_resize_height) / 2),
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT:
+    position = [
+      0,
+      height_pixels - object_to_resize_height,
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM:
+    position = [
+      round((width_pixels - object_to_resize_width) / 2),
+      height_pixels - object_to_resize_height,
+    ]
+  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT:
+    position = [
+      width_pixels - object_to_resize_width,
+      height_pixels - object_to_resize_height,
+    ]
+
+  return position[0], position[1], width_pixels, height_pixels
 
 
 def _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels):
@@ -204,8 +277,9 @@ def _set_visible_for_resize_mode_settings(
   if resize_mode_setting.value == ResizeModes.RESIZE_FROM_EDGES:
     resize_arguments_group['resize_from_edges_same_amount_for_each_side'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_FROM_POSITION:
-    # TODO
-    pass
+    resize_arguments_group['resize_from_position_anchor'].gui.set_visible(True)
+    resize_arguments_group['resize_from_position_width'].gui.set_visible(True)
+    resize_arguments_group['resize_from_position_height'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_ASPECT_RATIO:
     # TODO
     pass
@@ -342,6 +416,61 @@ RESIZE_CANVAS_DICT = {
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('Right'),
+    },
+    {
+      'type': 'anchor',
+      'name': 'resize_from_position_anchor',
+      'default_value': builtin_procedures_utils.AnchorPoints.CENTER,
+      'items': [
+        (builtin_procedures_utils.AnchorPoints.TOP_LEFT, _('Top left')),
+        (builtin_procedures_utils.AnchorPoints.TOP, _('Top')),
+        (builtin_procedures_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
+        (builtin_procedures_utils.AnchorPoints.LEFT, _('Left')),
+        (builtin_procedures_utils.AnchorPoints.CENTER, _('Center')),
+        (builtin_procedures_utils.AnchorPoints.RIGHT, _('Right')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM, _('Bottom')),
+        (builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_position_width',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_position_height',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Height'),
     },
     {
       'type': 'placeholder_layer_array',
