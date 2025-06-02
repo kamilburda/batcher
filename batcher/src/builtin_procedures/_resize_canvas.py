@@ -48,6 +48,9 @@ def resize_canvas(
       resize_from_position_anchor,
       resize_from_position_width,
       resize_from_position_height,
+      resize_to_aspect_ratio_ratio,
+      resize_to_aspect_ratio_position,
+      resize_to_aspect_ratio_position_custom,
       resize_to_layer_size_layers,
       resize_to_image_size_image,
 ):
@@ -105,8 +108,22 @@ def resize_canvas(
 
     _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
-    # TODO
-    pass
+    object_to_resize_width = object_to_resize.get_width()
+    object_to_resize_height = object_to_resize.get_height()
+
+    x_pixels, y_pixels, width_pixels, height_pixels = _get_resize_to_aspect_ratio_pixels(
+      batcher,
+      object_to_resize_width,
+      object_to_resize_height,
+      resize_to_aspect_ratio_ratio,
+      resize_to_aspect_ratio_position,
+      resize_to_aspect_ratio_position_custom,
+    )
+
+    width_pixels = _clamp_value(width_pixels, 1, None)
+    height_pixels = _clamp_value(height_pixels, 1, None)
+
+    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
     # TODO
     pass
@@ -208,6 +225,54 @@ def _get_resize_from_position_area_pixels(
   return position[0], position[1], width_pixels, height_pixels
 
 
+def _get_resize_to_aspect_ratio_pixels(
+      batcher,
+      object_to_resize_width,
+      object_to_resize_height,
+      resize_to_aspect_ratio_ratio,
+      resize_to_aspect_ratio_position,
+      resize_to_aspect_ratio_position_custom,
+):
+  ratio_width = resize_to_aspect_ratio_ratio['x']
+  ratio_height = resize_to_aspect_ratio_ratio['y']
+
+  width_unit_length = object_to_resize_width / ratio_width
+  height_pixels = width_unit_length * ratio_height
+  if height_pixels > object_to_resize_height:
+    width_pixels = object_to_resize_width
+    height_pixels = round(height_pixels)
+    x_pixels = 0
+
+    y_pixels = 0
+    if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+      y_pixels = 0
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+      y_pixels = round((height_pixels - object_to_resize_height) / 2)
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+      y_pixels = height_pixels - object_to_resize_height
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
+      y_pixels = builtin_procedures_utils.unit_to_pixels(
+        batcher, resize_to_aspect_ratio_position_custom, 'y')
+  else:
+    height_unit_length = object_to_resize_height / ratio_height
+    width_pixels = round(height_unit_length * ratio_width)
+    height_pixels = object_to_resize_height
+    y_pixels = 0
+
+    x_pixels = 0
+    if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+      x_pixels = 0
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+      x_pixels = round((width_pixels - object_to_resize_width) / 2)
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+      x_pixels = width_pixels - object_to_resize_width
+    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
+      x_pixels = builtin_procedures_utils.unit_to_pixels(
+        batcher, resize_to_aspect_ratio_position_custom, 'x')
+
+  return x_pixels, y_pixels, width_pixels, height_pixels
+
+
 def _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels):
   object_to_resize.resize(width_pixels, height_pixels, x_pixels, y_pixels)
 
@@ -238,6 +303,18 @@ def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure
       procedure['arguments'],
     )
 
+    procedure['arguments/resize_to_aspect_ratio_position'].connect_event(
+      'value-changed',
+      _set_visible_for_resize_to_aspect_ratio_position_custom,
+      procedure['arguments/resize_to_aspect_ratio_position_custom'],
+    )
+
+    procedure['arguments/resize_to_aspect_ratio_position'].connect_event(
+      'gui-visible-changed',
+      _set_visible_for_resize_to_aspect_ratio_position_custom,
+      procedure['arguments/resize_to_aspect_ratio_position_custom'],
+    )
+
     _set_visible_for_resize_mode_settings(
       procedure['arguments/resize_mode'],
       procedure['arguments'],
@@ -264,6 +341,17 @@ def _set_visible_for_resize_from_edges_settings(
   resize_arguments_group['resize_from_edges_right'].gui.set_visible(is_visible and not is_checked)
 
 
+def _set_visible_for_resize_to_aspect_ratio_position_custom(
+      resize_to_aspect_ratio_position_setting,
+      resize_to_aspect_ratio_position_custom_setting,
+):
+  is_visible = resize_to_aspect_ratio_position_setting.gui.get_visible()
+  is_selected = (
+    resize_to_aspect_ratio_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
+
+  resize_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
+
+
 def _set_visible_for_resize_mode_settings(
       resize_mode_setting,
       resize_arguments_group,
@@ -281,8 +369,8 @@ def _set_visible_for_resize_mode_settings(
     resize_arguments_group['resize_from_position_width'].gui.set_visible(True)
     resize_arguments_group['resize_from_position_height'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_ASPECT_RATIO:
-    # TODO
-    pass
+    resize_arguments_group['resize_to_aspect_ratio_ratio'].gui.set_visible(True)
+    resize_arguments_group['resize_to_aspect_ratio_position'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_AREA:
     # TODO
     pass
@@ -471,6 +559,48 @@ RESIZE_CANVAS_DICT = {
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('Height'),
+    },
+    {
+      'type': 'coordinates',
+      'name': 'resize_to_aspect_ratio_ratio',
+      'default_value': {
+        'x': 1.0,
+        'y': 1.0,
+      },
+      'min_x': 1.0,
+      'min_y': 1.0,
+      'display_name': _('Aspect ratio (width:height)'),
+    },
+    {
+      'type': 'choice',
+      'name': 'resize_to_aspect_ratio_position',
+      'default_value': builtin_procedures_utils.Positions.CENTER,
+      'items': [
+        (builtin_procedures_utils.Positions.START, _('Start')),
+        (builtin_procedures_utils.Positions.CENTER, _('Center')),
+        (builtin_procedures_utils.Positions.END, _('End')),
+        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_aspect_ratio_position_custom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Custom start position'),
     },
     {
       'type': 'placeholder_layer_array',
