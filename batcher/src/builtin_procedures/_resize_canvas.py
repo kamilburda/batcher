@@ -180,8 +180,16 @@ def resize_canvas(
 
       layer_offsets = layer.get_offsets()
 
-      object_to_resize.resize(
-        layer.get_width(), layer.get_height(), -layer_offsets.offset_x, -layer_offsets.offset_y)
+      _do_resize(
+        batcher,
+        object_to_resize,
+        -layer_offsets.offset_x,
+        -layer_offsets.offset_y,
+        layer.get_width(),
+        layer.get_height(),
+        set_padding,
+        padding_color,
+      )
     elif len(layers) > 1:
       layer_offset_list = [layer.get_offsets() for layer in layers]
 
@@ -193,7 +201,16 @@ def resize_canvas(
       max_y = max(
         offset.offset_y + layer.get_height() for layer, offset in zip(layers, layer_offset_list))
 
-      object_to_resize.resize(max_x - min_x, max_y - min_y, -min_x, -min_y)
+      _do_resize(
+        batcher,
+        object_to_resize,
+        -min_x,
+        -min_y,
+        max_x - min_x,
+        max_y - min_y,
+        set_padding,
+        padding_color,
+      )
   elif resize_mode == ResizeModes.RESIZE_TO_IMAGE_SIZE:
     if isinstance(object_to_resize, Gimp.Image):
       offset_x = 0
@@ -203,11 +220,15 @@ def resize_canvas(
       offset_x = offsets.offset_x
       offset_y = offsets.offset_y
 
-    object_to_resize.resize(
-      resize_to_image_size_image.get_width(),
-      resize_to_image_size_image.get_height(),
+    _do_resize(
+      batcher,
+      object_to_resize,
       offset_x,
       offset_y,
+      resize_to_image_size_image.get_width(),
+      resize_to_image_size_image.get_height(),
+      set_padding,
+      padding_color,
     )
 
 
