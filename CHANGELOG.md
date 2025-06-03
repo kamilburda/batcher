@@ -4,7 +4,7 @@ General changes:
 * Added Japanese translation (thanks to @re-unknown).
 * Added Spanish translation (thanks to @ikizgz).
 * Updated Dutch translation (thanks to @DiGro).
-* In Edit Layers, procedures are no longer applied to copies of group layers (inserted as regular layers), but rather their original counterparts. This was previously done to avoid plug-ins failing on group layers. However, given that many plug-ins in GIMP 3 were removed in place of layer effects (filters) achieving the same result, which can be applied on group layers, there is little need to work on group layer copies now. This change also fixes a bug where creating a group layer would create extra entries in the undo history.
+* In Edit Layers, procedures are no longer applied to copies of group layers (inserted as regular layers), but rather to their original counterparts. This was previously done to avoid plug-ins failing on group layers. However, many plug-ins in GIMP 3 were removed in place of layer effects (filters) achieving the same result, the latter of which can be applied on group layers. Thus, there is little need to work on group layer copies now. This change also fixes a bug where creating a layer copy would create extra entries in the undo history.
 
 New features:
 * Added a new procedure named `Crop`. You may crop the entire image or a layer in a variety of ways - cropping from edges, from a fixed position (top left, center, ...), to the specified aspect ratio, to the specified area (bounding box), or to remove empty borders.
