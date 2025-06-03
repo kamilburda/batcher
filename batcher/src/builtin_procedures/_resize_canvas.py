@@ -39,8 +39,8 @@ def resize_canvas(
       batcher,
       object_to_resize,
       resize_mode,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
       resize_from_edges_same_amount_for_each_side,
       resize_from_edges_amount,
       resize_from_edges_top,
@@ -96,8 +96,8 @@ def resize_canvas(
       offset_y_pixels,
       width_pixels,
       height_pixels,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
     )
   elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
     object_to_resize_width = object_to_resize.get_width()
@@ -123,8 +123,8 @@ def resize_canvas(
       offset_y_pixels,
       width_pixels,
       height_pixels,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
     )
   elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
     object_to_resize_width = object_to_resize.get_width()
@@ -150,8 +150,8 @@ def resize_canvas(
       offset_y_pixels,
       width_pixels,
       height_pixels,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
     )
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
     offset_x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
@@ -169,8 +169,8 @@ def resize_canvas(
       offset_y_pixels,
       width_pixels,
       height_pixels,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
     )
   elif resize_mode == ResizeModes.RESIZE_TO_LAYER_SIZE:
     layers = resize_to_layer_size_layers
@@ -187,8 +187,8 @@ def resize_canvas(
         -layer_offsets.offset_y,
         layer.get_width(),
         layer.get_height(),
-        set_padding,
-        padding_color,
+        set_fill_color,
+        fill_color,
       )
     elif len(layers) > 1:
       layer_offset_list = [layer.get_offsets() for layer in layers]
@@ -208,8 +208,8 @@ def resize_canvas(
         -min_y,
         max_x - min_x,
         max_y - min_y,
-        set_padding,
-        padding_color,
+        set_fill_color,
+        fill_color,
       )
   elif resize_mode == ResizeModes.RESIZE_TO_IMAGE_SIZE:
     if isinstance(object_to_resize, Gimp.Image):
@@ -227,8 +227,8 @@ def resize_canvas(
       offset_y,
       resize_to_image_size_image.get_width(),
       resize_to_image_size_image.get_height(),
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
     )
 
 
@@ -346,8 +346,8 @@ def _do_resize(
       offset_y_pixels,
       width_pixels,
       height_pixels,
-      set_padding,
-      padding_color,
+      set_fill_color,
+      fill_color,
 ):
   if isinstance(object_to_resize, Gimp.Image):
     orig_object_x = offset_x_pixels
@@ -362,11 +362,11 @@ def _do_resize(
 
   object_to_resize.resize(width_pixels, height_pixels, offset_x_pixels, offset_y_pixels)
 
-  if set_padding:
-    _fill_with_padding(
+  if set_fill_color:
+    _fill_with_color(
       batcher,
       object_to_resize,
-      padding_color,
+      fill_color,
       orig_object_x,
       orig_object_y,
       orig_object_width,
@@ -374,10 +374,10 @@ def _do_resize(
     )
 
 
-def _fill_with_padding(
+def _fill_with_color(
       batcher,
       object_to_resize,
-      padding_color,
+      fill_color,
       selection_x,
       selection_y,
       selection_width,
@@ -392,17 +392,17 @@ def _fill_with_padding(
     color_layer_offset_y = color_layer_offsets.offset_y
 
   if isinstance(object_to_resize, Gimp.Image):
-    drawable_with_padding = builtin_procedures_utils.get_best_matching_layer_from_image(
+    drawable_to_fill = builtin_procedures_utils.get_best_matching_layer_from_image(
       batcher, object_to_resize)
-    image_of_drawable_with_padding = object_to_resize
+    image_of_drawable_to_fill = object_to_resize
   else:
-    drawable_with_padding = object_to_resize
-    image_of_drawable_with_padding = object_to_resize.get_image()
+    drawable_to_fill = object_to_resize
+    image_of_drawable_to_fill = object_to_resize.get_image()
 
   builtin_procedures_utils.add_color_layer(
-    padding_color,
-    image_of_drawable_with_padding,
-    drawable_with_padding,
+    fill_color,
+    image_of_drawable_to_fill,
+    drawable_to_fill,
     color_layer_offset_x,
     color_layer_offset_y,
     object_to_resize.get_width(),
@@ -452,15 +452,15 @@ def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure
       procedure['arguments/resize_to_aspect_ratio_position_custom'],
     )
 
-    _set_sensitive_for_padding_color(
-      procedure['arguments/set_padding'],
-      procedure['arguments/padding_color'],
+    _set_sensitive_for_fill_color(
+      procedure['arguments/set_fill_color'],
+      procedure['arguments/fill_color'],
     )
 
-    procedure['arguments/set_padding'].connect_event(
+    procedure['arguments/set_fill_color'].connect_event(
       'value-changed',
-      _set_sensitive_for_padding_color,
-      procedure['arguments/padding_color'],
+      _set_sensitive_for_fill_color,
+      procedure['arguments/fill_color'],
     )
 
     _set_visible_for_resize_mode_settings(
@@ -500,11 +500,11 @@ def _set_visible_for_resize_to_aspect_ratio_position_custom(
   resize_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
 
-def _set_sensitive_for_padding_color(
-      set_padding_setting,
-      padding_color_setting,
+def _set_sensitive_for_fill_color(
+      set_fill_color_setting,
+      fill_color_setting,
 ):
-  padding_color_setting.gui.set_sensitive(set_padding_setting.value)
+  fill_color_setting.gui.set_sensitive(set_fill_color_setting.value)
 
 
 def _set_visible_for_resize_mode_settings(
@@ -512,7 +512,7 @@ def _set_visible_for_resize_mode_settings(
       resize_arguments_group,
 ):
   for setting in resize_arguments_group:
-    if setting.name in ['object_to_resize', 'resize_mode', 'set_padding', 'padding_color']:
+    if setting.name in ['object_to_resize', 'resize_mode', 'set_fill_color', 'fill_color']:
       continue
 
     setting.gui.set_visible(False)
@@ -568,13 +568,13 @@ RESIZE_CANVAS_DICT = {
     },
     {
       'type': 'bool',
-      'name': 'set_padding',
+      'name': 'set_fill_color',
       'default_value': False,
       'display_name': _('Fill added space with color'),
     },
     {
       'type': 'color',
-      'name': 'padding_color',
+      'name': 'fill_color',
       'default_value': [0.0, 0.0, 0.0, 0.0],
       'display_name': _('Color for added space'),
     },
