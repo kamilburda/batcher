@@ -648,16 +648,31 @@ def _set_display_name_for_matching_text_constraint(
       display_name = _('Starting with "{}"').format(text_setting.value)
     else:
       display_name = _('Starting with any text')
+  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_START_WITH:
+    if text_setting.value:
+      display_name = _('Not starting with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not starting with any text')
   elif match_mode_setting.value == builtin_constraints.MatchModes.CONTAINS:
     if text_setting.value:
       display_name = _('Containing "{}"').format(text_setting.value)
     else:
       display_name = _('Containing any text')
+  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_CONTAIN:
+    if text_setting.value:
+      display_name = _('Not containing "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not containing any text')
   elif match_mode_setting.value == builtin_constraints.MatchModes.ENDS_WITH:
     if text_setting.value:
       display_name = _('Ending with "{}"').format(text_setting.value)
     else:
       display_name = _('Ending with any text')
+  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_END_WITH:
+    if text_setting.value:
+      display_name = _('Not ending with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not ending with any text')
   elif match_mode_setting.value == builtin_constraints.MatchModes.REGEX:
     display_name = _('Matching pattern "{}"').format(text_setting.value)
 

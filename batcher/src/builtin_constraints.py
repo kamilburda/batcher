@@ -46,10 +46,16 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
 
   if match_mode == MatchModes.STARTS_WITH:
     return processed_item_name.startswith(processed_text)
+  elif match_mode == MatchModes.DOES_NOT_START_WITH:
+    return not processed_item_name.startswith(processed_text)
   elif match_mode == MatchModes.CONTAINS:
     return processed_text in processed_item_name
+  elif match_mode == MatchModes.DOES_NOT_CONTAIN:
+    return processed_text not in processed_item_name
   elif match_mode == MatchModes.ENDS_WITH:
     return processed_item_name.endswith(processed_text)
+  elif match_mode == MatchModes.DOES_NOT_END_WITH:
+    return not processed_item_name.endswith(processed_text)
   elif match_mode == MatchModes.REGEX:
     try:
       match = re.search(processed_text, processed_item_name)
@@ -127,13 +133,19 @@ def has_no_unsaved_changes(item, _image_batcher):
 class MatchModes:
   MATCH_MODES = (
     STARTS_WITH,
+    DOES_NOT_START_WITH,
     CONTAINS,
+    DOES_NOT_CONTAIN,
     ENDS_WITH,
+    DOES_NOT_END_WITH,
     REGEX,
   ) = (
     'starts_with',
+    'does_not_start_with',
     'contains',
+    'does_not_contain',
     'ends_with',
+    'does_not_end_with',
     'regex',
   )
 
@@ -240,8 +252,11 @@ _BUILTIN_CONSTRAINTS_LIST = [
         'default_value': MatchModes.CONTAINS,
         'items': [
           (MatchModes.STARTS_WITH, _('Starts with text')),
+          (MatchModes.DOES_NOT_START_WITH, _('Does not start with text')),
           (MatchModes.CONTAINS, _('Contains text')),
+          (MatchModes.DOES_NOT_CONTAIN, _('Does not contain text')),
           (MatchModes.ENDS_WITH, _('Ends with text')),
+          (MatchModes.DOES_NOT_END_WITH, _('Does not end with text')),
           (MatchModes.REGEX, _('Matches regular expression')),
         ],
         'display_name': _('How to perform matching'),

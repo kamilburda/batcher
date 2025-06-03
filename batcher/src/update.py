@@ -1366,6 +1366,18 @@ def _update_to_1_1(data, _settings, _procedure_groups):
           _resize_canvas_1_1_rename_layers_argument(arguments_list)
           _resize_canvas_1_1_add_new_arguments(arguments_list)
 
+    constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
+    if constraints_list is not None:
+      for constraint_dict in constraints_list:
+        constraint_list = constraint_dict['settings']
+
+        orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
+
+        if (orig_name_setting_dict['value'] == 'matching_text'
+            and arguments_list is not None):
+          _matching_text_1_1_add_new_options(arguments_list)
+
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
   _remove_setting(arguments_list, 'image')
@@ -2073,6 +2085,18 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       'display_name': _('Image'),
     },
   )
+
+
+def _matching_text_1_1_add_new_options(arguments_list):
+  arguments_list[0]['items'] = [
+    ('starts_with', _('Starts with text')),
+    ('does_not_start_with', _('Does not start with text')),
+    ('contains', _('Contains text')),
+    ('does_not_contain', _('Does not contain text')),
+    ('ends_with', _('Ends with text')),
+    ('does_not_end_with', _('Does not end with text')),
+    ('regex', _('Matches regular expression')),
+  ]
 
 
 def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):
