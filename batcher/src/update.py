@@ -1527,7 +1527,7 @@ def _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_d
     'pixel_value': 0.0,
     'percent_value': 0.0,
     'other_value': 0.0,
-    'unit': Gimp.Unit.pixel(),
+    'unit': 'pixel',
     'percent_object': 'current_image',
     'percent_property': {
       ('current_image',): 'width',
@@ -1621,8 +1621,7 @@ def _resize_canvas_1_1_rename_layers_argument(arguments_list):
 
 
 def _resize_canvas_1_1_add_new_arguments(arguments_list):
-  arguments_list.insert(
-    0,
+  arguments_list[0:0] = [
     {
       'type': 'placeholder_image_or_layer',
       'name': 'object_to_resize',
@@ -1630,9 +1629,6 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       'value': 'current_image',
       'display_name': _('Apply to (image or layer):'),
     },
-  )
-  arguments_list.insert(
-    1,
     {
       'type': 'choice',
       'name': 'resize_mode',
@@ -1647,7 +1643,426 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       ],
       'display_name': _('How to resize'),
     },
-  )
+    {
+      'type': 'bool',
+      'name': 'set_fill_color',
+      'default_value': False,
+      'value': False,
+      'display_name': _('Fill added space with color'),
+    },
+    {
+      'type': 'color',
+      'name': 'fill_color',
+      'default_value': [0.0, 0.0, 0.0, 0.0],
+      'value': [0.0, 0.0, 0.0, 0.0],
+      'display_name': _('Color for added space'),
+    },
+    {
+      'type': 'bool',
+      'name': 'resize_from_edges_same_amount_for_each_side',
+      'default_value': False,
+      'value': False,
+      'display_name': _('Resize by the same amount from each side'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_amount',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Amount'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_top',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Top'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_bottom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Bottom'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_left',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Left'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_edges_right',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Right'),
+    },
+    {
+      'type': 'anchor',
+      'name': 'resize_from_position_anchor',
+      'default_value': 'center',
+      'value': 'center',
+      'items': [
+        ('top_left', _('Top left')),
+        ('top', _('Top')),
+        ('top_right', _('Top right')),
+        ('left', _('Left')),
+        ('center', _('Center')),
+        ('right', _('Right')),
+        ('bottom_left', _('Bottom left')),
+        ('bottom', _('Bottom')),
+        ('bottom_right', _('Bottom right')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_position_width',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_from_position_height',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Height'),
+    },
+    {
+      'type': 'coordinates',
+      'name': 'resize_to_aspect_ratio_ratio',
+      'default_value': {
+        'x': 1.0,
+        'y': 1.0,
+      },
+      'value': {
+        'x': 1.0,
+        'y': 1.0,
+      },
+      'min_x': 1.0,
+      'min_y': 1.0,
+      'display_name': _('Aspect ratio (width:height)'),
+    },
+    {
+      'type': 'choice',
+      'name': 'resize_to_aspect_ratio_position',
+      'default_value': 'center',
+      'value': 'center',
+      'items': [
+        ('start', _('Start')),
+        ('center', _('Center')),
+        ('end', _('End')),
+        ('custom', _('Custom')),
+      ],
+      'display_name': _('Position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_aspect_ratio_position_custom',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Custom start position'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_x',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Offset X'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_y',
+      'default_value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'value': {
+        'pixel_value': 0.0,
+        'percent_value': 0.0,
+        'other_value': 0.0,
+        'unit': 'pixel',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Offset Y'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_width',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'resize_to_area_height',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': 'percent',
+        'percent_object': 'current_image',
+        'percent_property': {
+          ('current_image',): 'height',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+      'display_name': _('Height'),
+    },
+  ]
   arguments_list.append(
     {
       'type': 'placeholder_image',
