@@ -27,8 +27,8 @@ Options:
 * *Object to align layers with*: Whether to align with the entire image or another layer.
 * *Horizontal alignment*: Left, center or right alignment, or *Keep* the horizontal position intact.
 * *Vertical alignment*: Top, center or bottom alignment, or *Keep* the vertical position intact.
-* *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
-* *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 
 ### Export/Also export as...
 
@@ -60,6 +60,19 @@ This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
+### Crop
+
+Crops the specified image or layer. There are multiple ways you can perform cropping based on your needs.
+
+Options:
+* *How to crop*:
+  * *Crop from edges*: Removes the specified amount from each edge. The amount can be specified in a variety of units (pixels, percentages, inches, ...).
+  * *Crop from position*: Crops to the specified width and height from the specified position, e.g. starting from the upper left corner, from the center, etc.
+  * *Crop to aspect ratio*: Crops to the specified aspect ratio (width:height), e.g. to 4:3 or 16:9 or any ratio of your choice. You can customize where the cropping starts (from the start, center, end or from a custom starting position).
+  * *Crop to area*: Crops to the area bounded by the starting position (X, Y), width and height.
+  * *Remove empty borders*: Automatically removes empty areas along the edges of the image/layer.
+
+
 ### Insert background
 
 Inserts a new layer behind the current layer.
@@ -71,8 +84,8 @@ The _blue_ color tag is used for background by default.
 You may set a different color tag by adjusting the `Color tag` option.
 
 This procedure is inserted at the first position.
-This prevents potential confusion when `Resize to layer size` is not present and the background is offset relative to the layer rather than the image canvas.
-If this is your intention, you can always move this procedure below `Resize to layer size`.
+This prevents potential confusion when other procedures are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
+You can always move this procedure lower as needed.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
@@ -144,32 +157,59 @@ For Batch Convert and Export Layers, this procedure performs renaming on top of 
 
 Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
 
-### Resize to layer size
+### Resize canvas
 
-*Only available for: Batch Convert, Export Images, Export Layers*
+Resizes the image or layer extents, i.e. adds empty space from the edges. There are multiple ways you can perform resizing based on your needs. You may optionally fill the added space with a color.
 
-If enabled, the image canvas will be resized to fit the layers. For Export Layers, this means that the exported image will have the same dimensions as the layer to export.
+Note that this procedure does not upscale/downscale the image/layer. For that purpose, use the `Scale` procedure.
 
-This procedure is enabled by default for Export Layers.
+Options:
+* *How to resize*:
+  * *Resize from edges (add borders)*: Adds the specified amount at each edge. The amount can be specified in a variety of units (pixels, percentages, inches, ...). You can also remove content by specifying negative values.
+  * *Resize from position*: Resizes to the specified width and height from the specified position, e.g. starting from the upper left corner, from the center, etc.
+  * *Resize to aspect ratio*: Resizes to the specified aspect ratio (width:height), e.g. to 4:3 or 16:9 or any ratio of your choice. You can customize where the resizing starts (from the start, center, end or from a custom starting position).
+  * *Resize to area*: Resizes to the area specified by offsets, width and height.
+  * *Resize to layer size*: Resizes the image/layer to fit the specified layer(s).
+  * *Resize to image size*: Resizes the image/layer to fit the specified image.
+* *Fill added space with color*: If checked the newly added space will be filled with the color specified by *Color for added space*.
+* *Color for added space*: The color to fill the newly added space with. If the image is resized, the currently processed layer is resized as well and is filled with this color.
 
+For Export Layers, the *Resize to layer size* option is enabled by default.
+This means that the exported image will have the same dimensions as the layer to export.
 To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
+
+### Rotate and flip
+
+Rotates and/or flips the entire image or a layer.
+
+Options:
+* *Apply to (image or layer)*: Whether to rotate and flip the current image, current layer, or other objects (e.g. background/foreground).
+* *Rotation angle*: Rotate by 0, 90, 180 or 270 degrees, or use a *Custom* angle.
+* *Custom rotation angle*: Rotation angle in degrees or radians. Applies only if *Rotation angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
+* *Rotation mode*: How to handle the extents of layers after rotation - resize the layer, clip or crop.
+* *Interpolation*: Interpolation for rotated layers. Has effect only if *Rotation angle* is set to *Custom*.
+* *Rotate around the center*: If checked, the layer is rotated around their center.
+* *Horizontal position of rotation center*: The X-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.
+* *Vertical position of rotation center*: The Y-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.  
+* *Flip horizontally*: Flips the image/layer horizontally.
+* *Flip vertically*: Flips the image/layer vertically.
+
 
 ### Scale
 
 Scales (resizes) the entire image or a layer.
 
 Options:
-* *Object to scale*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
-* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
-* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (from the current image, layer, ...).
+* *Apply to (image or layer)*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
+* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
   * *None (Stretch)*: The aspect ratio is ignored (i.e. the image/layer is stretched).
   * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
   * *Keep, adjust height*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
   * *Fit*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller.
-  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with *Padding color*.
-* *Padding color*: The color to fill the empty space with if the *Fit with padding* option is selected.
+  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with the specified padding color. You can customize where the padding is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
 * *Set image resolution in DPI*: Whether to set a new resolution for the current image.
