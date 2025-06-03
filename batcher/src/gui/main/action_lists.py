@@ -181,6 +181,11 @@ class ActionLists:
       'after-load',
       lambda _procedures: _set_up_existing_crop_procedures(self._procedure_list))
 
+    _set_up_existing_resize_canvas_procedures(self._procedure_list)
+    self._procedure_list.actions.connect_event(
+      'after-load',
+      lambda _procedures: _set_up_existing_resize_canvas_procedures(self._procedure_list))
+
     _set_up_existing_rename_procedures(self._procedure_list)
     self._procedure_list.actions.connect_event(
       'after-load',
@@ -240,6 +245,9 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if item.action['orig_name'].value.startswith('crop_for_'):
     _handle_crop_procedure_item_added(item)
 
+  if item.action['orig_name'].value == 'resize_canvas':
+    _handle_resize_canvas_procedure_item_added(item)
+
   if item.action['orig_name'].value.startswith('rename_for_'):
     _handle_rename_procedure_item_added(item)
 
@@ -258,6 +266,12 @@ def _set_up_existing_crop_procedures(procedure_list: action_list_.ActionList):
   for item in procedure_list.items:
     if item.action['orig_name'].value.startswith('crop_for_'):
       _handle_crop_procedure_item_added(item)
+
+
+def _set_up_existing_resize_canvas_procedures(procedure_list: action_list_.ActionList):
+  for item in procedure_list.items:
+    if item.action['orig_name'].value == 'resize_canvas':
+      _handle_resize_canvas_procedure_item_added(item)
 
 
 def _set_up_existing_rename_procedures(procedure_list: action_list_.ActionList):
@@ -483,8 +497,27 @@ def _set_display_name_for_crop_procedure(crop_mode_setting, crop_procedure):
   if crop_mode_setting.value == builtin_procedures.CropModes.REMOVE_EMPTY_BORDERS:
     crop_procedure['display_name'].set_value(_('Crop to remove empty borders'))
   else:
-    crop_procedure['display_name'].set_value(
-      crop_mode_setting.items_display_names[crop_mode_setting.value])
+    if crop_mode_setting.value in crop_mode_setting.items_display_names:
+      crop_procedure['display_name'].set_value(
+        crop_mode_setting.items_display_names[crop_mode_setting.value])
+
+
+def _handle_resize_canvas_procedure_item_added(item):
+  _set_display_name_for_resize_canvas_procedure(
+    item.action['arguments/resize_mode'],
+    item.action)
+
+  item.action['arguments/resize_mode'].connect_event(
+    'value-changed',
+    _set_display_name_for_resize_canvas_procedure,
+    item.action)
+
+
+def _set_display_name_for_resize_canvas_procedure(
+      resize_mode_setting, resize_canvas_procedure):
+  if resize_mode_setting.value in resize_mode_setting.items_display_names:
+    resize_canvas_procedure['display_name'].set_value(
+      resize_mode_setting.items_display_names[resize_mode_setting.value])
 
 
 def _handle_rename_procedure_item_added(item):
