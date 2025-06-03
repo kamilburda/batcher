@@ -159,7 +159,15 @@ Resizes the image or layer extents, i.e. adds empty space from the edges. There 
 Note that this procedure does not upscale/downscale the image/layer. For that purpose, use the `Scale` procedure.
 
 Options:
-* *Resize to layer size*: If enabled, the image canvas will be resized to fit the layers.
+* *How to resize*:
+  * *Resize from edges (add borders)*: Adds the specified amount at each edge. The amount can be specified in a variety of units (pixels, percentages, inches, ...). You can also remove content by specifying negative values.
+  * *Resize from position*: Resizes to the specified width and height from the specified position, e.g. starting from the upper left corner, from the center, etc.
+  * *Resize to aspect ratio*: Resizes to the specified aspect ratio (width:height), e.g. to 4:3 or 16:9 or any ratio of your choice. You can customize where the resizing starts (from the start, center, end or from a custom starting position).
+  * *Resize to area*: Resizes to the area specified by offsets, width and height.
+  * *Resize to layer size*: Resizes the image/layer to fit the specified layer(s).
+  * *Resize to image size*: Resizes the image/layer to fit the specified image.
+* *Fill added space with color*: If checked the newly added space will be filled with the color specified by *Color for added space*.
+* *Color for added space*: The color to fill the newly added space with. If the image is resized, the currently processed layer is resized as well and is filled with this color.
 
 For Export Layers, the *Resize to layer size* option is enabled by default.
 This means that the exported image will have the same dimensions as the layer to export.
