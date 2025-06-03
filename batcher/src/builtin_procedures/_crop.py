@@ -7,7 +7,6 @@ from gi.repository import Gimp
 
 from pygimplib import pdb
 
-from src import exceptions
 from src import utils
 from src.procedure_groups import *
 
@@ -271,7 +270,8 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
     # An image can end up with no layers if cropping in an empty space.
     # We insert an empty layer after cropping to ensure that subsequent
     # procedures work properly.
-    matching_layer = _get_best_matching_layer_from_image(batcher, object_to_crop)
+    matching_layer = builtin_procedures_utils.get_best_matching_layer_from_image(
+      batcher, object_to_crop)
 
     matching_layer_name = matching_layer.get_name()
     matching_layer_type = matching_layer.type()
@@ -303,24 +303,6 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
       height=height,
       merge_filter_=True,
     )
-
-
-def _get_best_matching_layer_from_image(batcher, image):
-  if image == batcher.current_image:
-    if batcher.current_layer.is_valid():
-      return batcher.current_layer
-
-  selected_layers = image.get_selected_layers()
-  if selected_layers:
-    return image.get_selected_layers()[0]
-  else:
-    layers = image.get_layers()
-    if layers:
-      return layers[0]
-    else:
-      # Rather than returning no layer, we skip this procedure. An image
-      # having no layers points to a problem outside this procedure.
-      raise exceptions.SkipAction(_('The image has no layers.'))
 
 
 def _clamp_value(value, allow_zero_value, max_value):

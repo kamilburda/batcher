@@ -5,6 +5,10 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+import pygimplib as pg
+from pygimplib import pdb
+
+from src import exceptions
 from src import placeholders as placeholders_
 
 
@@ -109,3 +113,78 @@ def _get_percent_property_value(percent_property, percent_object):
       return percent_property[key]
 
   return None
+
+
+def add_color_layer(
+      padding_color,
+      image,
+      drawable,
+      color_layer_offset_x,
+      color_layer_offset_y,
+      color_layer_width,
+      color_layer_height,
+      selection_x,
+      selection_y,
+      selection_width,
+      selection_height,
+):
+  Gimp.context_push()
+  Gimp.context_set_foreground(pg.setting.ColorSetting.get_value_as_color(padding_color))
+  Gimp.context_set_opacity(
+    pg.setting.ColorSetting.get_value_as_color(padding_color).get_rgba().alpha * 100)
+
+  channel = pdb.gimp_selection_save(image=image)
+  image.select_rectangle(
+    Gimp.ChannelOps.REPLACE,
+    selection_x,
+    selection_y,
+    selection_width,
+    selection_height,
+  )
+
+  pdb.gimp_selection_invert(image=image)
+
+  selection_is_non_empty = pdb.gimp_selection_bounds(image=image)[0]
+  if selection_is_non_empty:
+    color_layer = Gimp.Layer.new(
+      image,
+      drawable.get_name(),
+      color_layer_width,
+      color_layer_height,
+      Gimp.ImageType.RGBA_IMAGE,
+      100.0,
+      Gimp.LayerMode.NORMAL,
+    )
+    color_layer.set_offsets(color_layer_offset_x, color_layer_offset_y)
+    image.insert_layer(
+      color_layer,
+      drawable.get_parent(),
+      image.get_item_position(drawable) + 1,
+    )
+
+    color_layer.edit_fill(Gimp.FillType.FOREGROUND)
+
+    image.merge_down(drawable, Gimp.MergeType.EXPAND_AS_NECESSARY)
+
+  image.select_item(Gimp.ChannelOps.REPLACE, channel)
+  image.remove_channel(channel)
+
+  Gimp.context_pop()
+
+
+def get_best_matching_layer_from_image(batcher, image):
+  if image == batcher.current_image:
+    if batcher.current_layer.is_valid():
+      return batcher.current_layer
+
+  selected_layers = image.get_selected_layers()
+  if selected_layers:
+    return image.get_selected_layers()[0]
+  else:
+    layers = image.get_layers()
+    if layers:
+      return layers[0]
+    else:
+      # Rather than returning no layer, we skip the current procedure. An image
+      # having no layers points to a problem outside the procedure.
+      raise exceptions.SkipAction(_('The image has no layers.'))

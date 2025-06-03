@@ -39,6 +39,8 @@ def resize_canvas(
       batcher,
       object_to_resize,
       resize_mode,
+      set_padding,
+      padding_color,
       resize_from_edges_same_amount_for_each_side,
       resize_from_edges_amount,
       resize_from_edges_top,
@@ -87,51 +89,89 @@ def resize_canvas(
       object_to_resize_height + resize_from_edges_top_pixels + resize_from_edges_bottom_pixels)
     height_pixels = _clamp_value(height_pixels, min_value=1)
 
-    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_resize(
+      batcher,
+      object_to_resize,
+      offset_x_pixels,
+      offset_y_pixels,
+      width_pixels,
+      height_pixels,
+      set_padding,
+      padding_color,
+    )
   elif resize_mode == ResizeModes.RESIZE_FROM_POSITION:
     object_to_resize_width = object_to_resize.get_width()
     object_to_resize_height = object_to_resize.get_height()
 
-    x_pixels, y_pixels, width_pixels, height_pixels = _get_resize_from_position_area_pixels(
-      batcher,
-      object_to_resize_width,
-      object_to_resize_height,
-      resize_from_position_anchor,
-      resize_from_position_width,
-      resize_from_position_height,
-    )
+    offset_x_pixels, offset_y_pixels, width_pixels, height_pixels = (
+      _get_resize_from_position_area_pixels(
+        batcher,
+        object_to_resize_width,
+        object_to_resize_height,
+        resize_from_position_anchor,
+        resize_from_position_width,
+        resize_from_position_height,
+      ))
 
     width_pixels = _clamp_value(width_pixels, min_value=1)
     height_pixels = _clamp_value(height_pixels, min_value=1)
 
-    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_resize(
+      batcher,
+      object_to_resize,
+      offset_x_pixels,
+      offset_y_pixels,
+      width_pixels,
+      height_pixels,
+      set_padding,
+      padding_color,
+    )
   elif resize_mode == ResizeModes.RESIZE_TO_ASPECT_RATIO:
     object_to_resize_width = object_to_resize.get_width()
     object_to_resize_height = object_to_resize.get_height()
 
-    x_pixels, y_pixels, width_pixels, height_pixels = _get_resize_to_aspect_ratio_pixels(
-      batcher,
-      object_to_resize_width,
-      object_to_resize_height,
-      resize_to_aspect_ratio_ratio,
-      resize_to_aspect_ratio_position,
-      resize_to_aspect_ratio_position_custom,
-    )
+    offset_x_pixels, offset_y_pixels, width_pixels, height_pixels = (
+      _get_resize_to_aspect_ratio_pixels(
+        batcher,
+        object_to_resize_width,
+        object_to_resize_height,
+        resize_to_aspect_ratio_ratio,
+        resize_to_aspect_ratio_position,
+        resize_to_aspect_ratio_position_custom,
+      ))
 
     width_pixels = _clamp_value(width_pixels, min_value=1)
     height_pixels = _clamp_value(height_pixels, min_value=1)
 
-    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_resize(
+      batcher,
+      object_to_resize,
+      offset_x_pixels,
+      offset_y_pixels,
+      width_pixels,
+      height_pixels,
+      set_padding,
+      padding_color,
+    )
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
-    x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
-    y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
+    offset_x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
+    offset_y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
     width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_width, 'x')
     height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_height, 'y')
 
     width_pixels = _clamp_value(width_pixels, min_value=1)
     height_pixels = _clamp_value(height_pixels, min_value=1)
 
-    _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels)
+    _do_resize(
+      batcher,
+      object_to_resize,
+      offset_x_pixels,
+      offset_y_pixels,
+      width_pixels,
+      height_pixels,
+      set_padding,
+      padding_color,
+    )
   elif resize_mode == ResizeModes.RESIZE_TO_LAYER_SIZE:
     layers = resize_to_layer_size_layers
 
@@ -246,40 +286,111 @@ def _get_resize_to_aspect_ratio_pixels(
   if height_pixels > object_to_resize_height:
     width_pixels = object_to_resize_width
     height_pixels = round(height_pixels)
-    x_pixels = 0
+    offset_x_pixels = 0
 
-    y_pixels = 0
+    offset_y_pixels = 0
     if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
-      y_pixels = 0
+      offset_y_pixels = 0
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
-      y_pixels = round((height_pixels - object_to_resize_height) / 2)
+      offset_y_pixels = round((height_pixels - object_to_resize_height) / 2)
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
-      y_pixels = height_pixels - object_to_resize_height
+      offset_y_pixels = height_pixels - object_to_resize_height
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      y_pixels = builtin_procedures_utils.unit_to_pixels(
+      offset_y_pixels = builtin_procedures_utils.unit_to_pixels(
         batcher, resize_to_aspect_ratio_position_custom, 'y')
   else:
     height_unit_length = object_to_resize_height / ratio_height
     width_pixels = round(height_unit_length * ratio_width)
     height_pixels = object_to_resize_height
-    y_pixels = 0
+    offset_y_pixels = 0
 
-    x_pixels = 0
+    offset_x_pixels = 0
     if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
-      x_pixels = 0
+      offset_x_pixels = 0
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
-      x_pixels = round((width_pixels - object_to_resize_width) / 2)
+      offset_x_pixels = round((width_pixels - object_to_resize_width) / 2)
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
-      x_pixels = width_pixels - object_to_resize_width
+      offset_x_pixels = width_pixels - object_to_resize_width
     elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      x_pixels = builtin_procedures_utils.unit_to_pixels(
+      offset_x_pixels = builtin_procedures_utils.unit_to_pixels(
         batcher, resize_to_aspect_ratio_position_custom, 'x')
 
-  return x_pixels, y_pixels, width_pixels, height_pixels
+  return offset_x_pixels, offset_y_pixels, width_pixels, height_pixels
 
 
-def _do_resize(object_to_resize, x_pixels, y_pixels, width_pixels, height_pixels):
-  object_to_resize.resize(width_pixels, height_pixels, x_pixels, y_pixels)
+def _do_resize(
+      batcher,
+      object_to_resize,
+      offset_x_pixels,
+      offset_y_pixels,
+      width_pixels,
+      height_pixels,
+      set_padding,
+      padding_color,
+):
+  if isinstance(object_to_resize, Gimp.Image):
+    orig_object_x = offset_x_pixels
+    orig_object_y = offset_y_pixels
+  else:
+    offsets = object_to_resize.get_offsets()
+    orig_object_x = offsets.offset_x
+    orig_object_y = offsets.offset_y
+
+  orig_object_width = object_to_resize.get_width()
+  orig_object_height = object_to_resize.get_height()
+
+  object_to_resize.resize(width_pixels, height_pixels, offset_x_pixels, offset_y_pixels)
+
+  if set_padding:
+    _fill_with_padding(
+      batcher,
+      object_to_resize,
+      padding_color,
+      orig_object_x,
+      orig_object_y,
+      orig_object_width,
+      orig_object_height,
+    )
+
+
+def _fill_with_padding(
+      batcher,
+      object_to_resize,
+      padding_color,
+      selection_x,
+      selection_y,
+      selection_width,
+      selection_height,
+):
+  if isinstance(object_to_resize, Gimp.Image):
+    color_layer_offset_x = 0
+    color_layer_offset_y = 0
+  else:
+    color_layer_offsets = object_to_resize.get_offsets()
+    color_layer_offset_x = color_layer_offsets.offset_x
+    color_layer_offset_y = color_layer_offsets.offset_y
+
+  if isinstance(object_to_resize, Gimp.Image):
+    drawable_with_padding = builtin_procedures_utils.get_best_matching_layer_from_image(
+      batcher, object_to_resize)
+    image_of_drawable_with_padding = object_to_resize
+  else:
+    drawable_with_padding = object_to_resize
+    image_of_drawable_with_padding = object_to_resize.get_image()
+
+  builtin_procedures_utils.add_color_layer(
+    padding_color,
+    image_of_drawable_with_padding,
+    drawable_with_padding,
+    color_layer_offset_x,
+    color_layer_offset_y,
+    object_to_resize.get_width(),
+    object_to_resize.get_height(),
+    selection_x,
+    selection_y,
+    selection_width,
+    selection_height,
+  )
 
 
 def _clamp_value(value, min_value=None, max_value=None):
@@ -320,6 +431,17 @@ def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure
       procedure['arguments/resize_to_aspect_ratio_position_custom'],
     )
 
+    _set_sensitive_for_padding_color(
+      procedure['arguments/set_padding'],
+      procedure['arguments/padding_color'],
+    )
+
+    procedure['arguments/set_padding'].connect_event(
+      'value-changed',
+      _set_sensitive_for_padding_color,
+      procedure['arguments/padding_color'],
+    )
+
     _set_visible_for_resize_mode_settings(
       procedure['arguments/resize_mode'],
       procedure['arguments'],
@@ -357,12 +479,19 @@ def _set_visible_for_resize_to_aspect_ratio_position_custom(
   resize_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
 
+def _set_sensitive_for_padding_color(
+      set_padding_setting,
+      padding_color_setting,
+):
+  padding_color_setting.gui.set_sensitive(set_padding_setting.value)
+
+
 def _set_visible_for_resize_mode_settings(
       resize_mode_setting,
       resize_arguments_group,
 ):
   for setting in resize_arguments_group:
-    if setting.name in ['object_to_resize', 'resize_mode']:
+    if setting.name in ['object_to_resize', 'resize_mode', 'set_padding', 'padding_color']:
       continue
 
     setting.gui.set_visible(False)
@@ -415,6 +544,18 @@ RESIZE_CANVAS_DICT = {
         (ResizeModes.RESIZE_TO_IMAGE_SIZE, _('Resize to image size')),
       ],
       'display_name': _('How to resize'),
+    },
+    {
+      'type': 'bool',
+      'name': 'set_padding',
+      'default_value': False,
+      'display_name': _('Fill added space with color'),
+    },
+    {
+      'type': 'color',
+      'name': 'padding_color',
+      'default_value': [0.0, 0.0, 0.0, 0.0],
+      'display_name': _('Color for added space'),
     },
     {
       'type': 'bool',
