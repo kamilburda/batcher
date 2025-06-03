@@ -1272,23 +1272,6 @@ class LayerBatcher(Batcher):
       self._current_layer = layer_copy
       self._image_copies.append(image_copy)
 
-    if self._edit_mode and not self._is_preview and self._current_layer.is_group_layer():
-      # Group layers must be copied and inserted as layers as some procedures
-      # do not work on group layers.
-      layer_copy = pg.pdbutils.copy_and_paste_layer(
-        self._current_layer,
-        self._current_image,
-        self._current_layer.get_parent(),
-        self._current_image.get_item_position(self._current_layer) + 1,
-        True,
-        True,
-        True)
-
-      orig_layer_name = self._current_layer.get_name()
-      self._current_layer = layer_copy
-      # This eliminates the " copy" suffix appended by GIMP after creating a copy.
-      self._current_layer.set_name(orig_layer_name)
-
     super()._process_item_with_actions()
 
     self._current_image = None
