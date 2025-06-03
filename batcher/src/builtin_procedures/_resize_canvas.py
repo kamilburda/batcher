@@ -76,14 +76,8 @@ def resize_canvas(
 
     object_to_resize_width = object_to_resize.get_width()
     object_to_resize_height = object_to_resize.get_height()
-
-    if isinstance(object_to_resize, Gimp.Image):
-      x_pixels = resize_from_edges_left_pixels
-      y_pixels = resize_from_edges_top_pixels
-    else:
-      object_to_resize_offsets = object_to_resize.get_offsets()
-      x_pixels = object_to_resize_offsets.offset_x + resize_from_edges_left_pixels
-      y_pixels = object_to_resize_offsets.offset_y + resize_from_edges_top_pixels
+    offset_x_pixels = resize_from_edges_left_pixels
+    offset_y_pixels = resize_from_edges_top_pixels
 
     width_pixels = (
       object_to_resize_width + resize_from_edges_left_pixels + resize_from_edges_right_pixels)
