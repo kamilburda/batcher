@@ -10,7 +10,7 @@ These names can be used, for example, for the following purposes:
 * filtering name pattern fields applicable only to specific procedures.
 """
 
-PROCEDURE_GROUPS = (
+ALL_PROCEDURE_GROUPS = (
   CONVERT_GROUP,
   EXPORT_IMAGES_GROUP,
   EXPORT_LAYERS_GROUP,

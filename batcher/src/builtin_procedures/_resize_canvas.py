@@ -544,7 +544,7 @@ RESIZE_CANVAS_DICT = {
   'description': _(
     'Resizes the image or layer extents, optionally filling the newly added space with a color.'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
     {
       'type': 'placeholder_image_or_layer',

@@ -82,7 +82,7 @@ def load_and_update(
     sources = pg.setting.Persistor.get_default_setting_sources()
 
   if procedure_group is None:
-    procedure_groups = PROCEDURE_GROUPS
+    procedure_groups = ALL_PROCEDURE_GROUPS
   else:
     procedure_groups = [procedure_group]
 
