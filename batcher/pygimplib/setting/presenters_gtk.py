@@ -83,8 +83,8 @@ class DoubleSpinButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'value-changed'
   
-  def _create_widget(self, setting, digits=None, **kwargs):
-    return _create_spin_button(setting, digits=digits)
+  def _create_widget(self, setting, digits=None, step_increment=None, **kwargs):
+    return _create_spin_button(setting, digits=digits, step_increment=step_increment)
   
   def get_value(self):
     return self._widget.get_value()
@@ -991,7 +991,7 @@ class PanedPositionPresenter(GtkPresenter):
     self._widget.set_position(value)
 
 
-def _create_spin_button(setting, digits=None):
+def _create_spin_button(setting, digits=None, step_increment=None):
   if digits is None:
     digits = 2
 
@@ -1016,14 +1016,15 @@ def _create_spin_button(setting, digits=None):
   else:
     spin_button_class = Gtk.SpinButton
 
-  step_increment = 1
-  page_increment = 10
+  if step_increment is None:
+    if digits > 0 and 0 < value_range <= 1:
+      digits_in_value_range = -math.floor(math.log10(value_range))
 
-  if digits > 0 and 0 < value_range <= 1:
-    digits_in_value_range = -math.floor(math.log10(value_range))
+      step_increment = 10 ** -(digits_in_value_range + 1)
+    else:
+      step_increment = 1
 
-    step_increment = 10 ** -(digits_in_value_range + 1)
-    page_increment = 10 ** -digits_in_value_range
+  page_increment = 10 * step_increment
 
   return spin_button_class(
     adjustment=Gtk.Adjustment(
