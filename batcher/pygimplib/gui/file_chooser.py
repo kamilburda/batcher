@@ -31,7 +31,16 @@ class FileChooser(Gtk.Box):
 
   __gsignals__ = {'changed': (GObject.SignalFlags.RUN_FIRST, None, (Gio.File,))}
 
-  def __init__(self, file_action, initial_value=None, title='', width_chars=30, *args, **kwargs):
+  def __init__(
+        self,
+        file_action,
+        initial_value=None,
+        title='',
+        width_chars=30,
+        spacing=5,
+        *args,
+        **kwargs,
+  ):
     super().__init__(*args, **kwargs)
 
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -93,7 +102,16 @@ class FileChooser(Gtk.Box):
         if isinstance(button, Gtk.FileChooserButton):
           button.connect('selection-changed', self._emit_changed_event)
 
+      self._button_clear = Gtk.Button.new_from_icon_name(
+        GimpUi.ICON_EDIT_CLEAR, Gtk.IconSize.BUTTON)
+      self._button_clear.set_tooltip_text(_('Clear'))
+
+      self._button_clear.connect('clicked', self._on_button_clear_clicked)
+
+      self.set_spacing(spacing)
+
       self.pack_start(self._file_chooser, True, True, 0)
+      self.pack_start(self._button_clear, False, False, 0)
 
     self.show_all()
 
@@ -117,6 +135,9 @@ class FileChooser(Gtk.Box):
 
   def _emit_changed_event(self, *_args, **_kwargs):
     self.emit('changed', self.get_file())
+
+  def _on_button_clear_clicked(self, _button):
+    self.set_file(None)
 
   def get_file(self) -> Union[Gio.File, None]:
     if self._widget_type == 'text_entry':

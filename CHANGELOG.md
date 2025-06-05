@@ -32,6 +32,7 @@ Changes to procedures and constraints:
   * More units beside pixels and percentages can be chosen from (the same ones available in GIMP). These units are recalculated automatically.
 * `Matching text...`: Added `Does not start with text`, `Does not contain text` and `Does not end with text` options.
 * Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
+* File arguments can now be cleared (set to an empty value). This is useful if a procedure allows omitting a file.
 
 Bug fixes:
 * Fixed preview and export of images with linear precision.
