@@ -22,8 +22,7 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
   """
   # The code is taken from:
   # https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/core/gimpimage-duplicate.c
-  new_image = Gimp.Image.new_with_precision(
-    image.get_width(), image.get_height(), image.get_base_type(), image.get_precision())
+  new_image = Gimp.Image.new(image.get_width(), image.get_height(), image.get_base_type())
 
   new_image.undo_disable()
 
