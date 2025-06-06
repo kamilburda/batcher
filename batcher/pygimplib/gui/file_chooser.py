@@ -37,6 +37,7 @@ class FileChooser(Gtk.Box):
         initial_value=None,
         title='',
         width_chars=30,
+        show_clear_button=True,
         spacing=5,
         *args,
         **kwargs,
@@ -102,16 +103,20 @@ class FileChooser(Gtk.Box):
         if isinstance(button, Gtk.FileChooserButton):
           button.connect('selection-changed', self._emit_changed_event)
 
-      self._button_clear = Gtk.Button.new_from_icon_name(
-        GimpUi.ICON_EDIT_CLEAR, Gtk.IconSize.BUTTON)
-      self._button_clear.set_tooltip_text(_('Clear'))
+      if show_clear_button:
+        self._button_clear = Gtk.Button.new_from_icon_name(
+          GimpUi.ICON_EDIT_CLEAR, Gtk.IconSize.BUTTON)
+        self._button_clear.set_tooltip_text(_('Clear'))
 
-      self._button_clear.connect('clicked', self._on_button_clear_clicked)
+        self._button_clear.connect('clicked', self._on_button_clear_clicked)
+      else:
+        self._button_clear = None
 
       self.set_spacing(spacing)
 
       self.pack_start(self._file_chooser, True, True, 0)
-      self.pack_start(self._button_clear, False, False, 0)
+      if self._button_clear is not None:
+        self.pack_start(self._button_clear, False, False, 0)
 
     self.show_all()
 

@@ -710,8 +710,14 @@ class FileChooserPresenter(GtkPresenter):
 
   _VALUE_CHANGED_SIGNAL = 'changed'
 
-  def _create_widget(self, setting, width_chars=30, **kwargs):
-    return pggui.FileChooser(setting.action, setting.value, setting.display_name, width_chars)
+  def _create_widget(self, setting, width_chars=30, show_clear_button=True, **kwargs):
+    return pggui.FileChooser(
+      setting.action,
+      setting.value,
+      setting.display_name,
+      width_chars=width_chars,
+      show_clear_button=show_clear_button,
+    )
 
   def get_value(self):
     return self._widget.get_file()

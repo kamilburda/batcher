@@ -843,6 +843,9 @@ EXPORT_FOR_CONVERT_DICT = {
       'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'show_clear_button': False,
+      },
     },
     {
       'type': 'file_extension',

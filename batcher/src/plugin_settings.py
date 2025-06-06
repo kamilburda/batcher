@@ -75,6 +75,9 @@ def create_settings_for_convert():
       'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'show_clear_button': False,
+      },
     },
     {
       'type': 'name_pattern',
@@ -230,6 +233,9 @@ def create_settings_for_export_images():
       'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'show_clear_button': False,
+      },
     },
     {
       'type': 'name_pattern',
@@ -377,6 +383,9 @@ def create_settings_for_export_layers():
       'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'show_clear_button': False,
+      },
     },
     {
       'type': 'name_pattern',
