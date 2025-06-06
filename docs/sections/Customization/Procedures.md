@@ -55,6 +55,15 @@ This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
+### Color correction
+
+Adjusts colors via brightness, contrast, levels and/or curves.
+
+For levels and curves, you need to specify a saved preset file. Both GIMP and Photoshop (.alv for levels, .acv for curves) file formats are supported.
+
+You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.
+
+
 ### Crop
 
 Crops the specified image or layer. There are multiple ways you can perform cropping based on your needs.

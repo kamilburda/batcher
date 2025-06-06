@@ -2,6 +2,8 @@
 
 from src.builtin_procedures import _align_and_offset
 from src.builtin_procedures._align_and_offset import *
+from src.builtin_procedures import _color_correction
+from src.builtin_procedures._color_correction import *
 from src.builtin_procedures import _crop
 from src.builtin_procedures._crop import *
 from src.builtin_procedures import _export
@@ -24,6 +26,7 @@ from src.builtin_procedures._scale import *
 
 _BUILTIN_PROCEDURES_LIST = [
   _align_and_offset.ALIGN_AND_OFFSET_DICT,
+  _color_correction.COLOR_CORRECTION_DICT,
   _crop.CROP_FOR_IMAGES_DICT,
   _crop.CROP_FOR_LAYERS_DICT,
   _export.EXPORT_FOR_CONVERT_DICT,

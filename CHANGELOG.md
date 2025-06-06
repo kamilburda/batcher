@@ -7,6 +7,7 @@ General changes:
 * In Edit Layers, procedures are no longer applied to copies of group layers (inserted as regular layers), but rather to their original counterparts. This was previously done to avoid plug-ins failing on group layers. However, many plug-ins in GIMP 3 were removed in place of layer effects (filters) achieving the same result, the latter of which can be applied on group layers. Thus, there is little need to work on group layer copies now. This change also fixes a bug where creating a layer copy would create extra entries in the undo history.
 
 New features:
+* Added a new procedure named `Color correction`. You can adjust brightness, contrast, or apply levels or curves from a saved preset file. Both GIMP and Photoshop formats (.alv, .acv) for preset files are supported.
 * Added a new procedure named `Crop`. You may crop the entire image or a layer in a variety of ways - cropping from edges, from a fixed position (top left, center, ...), to the specified aspect ratio, to the specified area (bounding box), or to remove empty borders.
 * Replaced `Resize to layer size` with a more generic procedure named `Resize canvas` that allows several more resize modes (add borders, resize from position/area, resize to aspect ratio, resize to image size) and filling the newly added space with a color.
 * Added a new procedure named `Rotate and flip`. You may rotate the entire image or a layer, along with several options such as the angle, or whether to rotate from the center or from a fixed point.
