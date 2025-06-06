@@ -89,14 +89,7 @@ def _apply_correction(
     _apply_func(layer, trc, curve_data)
 
 
-def _apply_levels(layer, trc, levels_data):
-  image = layer.get_image()
-
-  orig_precision, new_precision = _get_orig_and_new_precision(image, trc)
-
-  if orig_precision != new_precision:
-    image.convert_precision(new_precision)
-
+def _apply_levels(layer, _trc, levels_data):
   for levels_data_for_channel in levels_data.values():
     if not levels_data_for_channel.has_default_values():
       layer.levels(
@@ -110,19 +103,8 @@ def _apply_levels(layer, trc, levels_data):
         levels_data_for_channel.clamp_output,
       )
 
-  if orig_precision != new_precision:
-    image.convert_precision(orig_precision)
 
-
-def _apply_curves(layer, trc, curve_data):
-  image = layer.get_image()
-  is_indexed = image.get_base_type() == Gimp.ImageBaseType.INDEXED
-
-  orig_precision, new_precision = _get_orig_and_new_precision(image, trc)
-
-  if not is_indexed and orig_precision != new_precision:
-    image.convert_precision(new_precision)
-
+def _apply_curves(layer, _trc, curve_data):
   for curve_data_for_channel in curve_data.values():
     if curve_data_for_channel.samples is not None:
       layer.curves_explicit(curve_data_for_channel.channel, curve_data_for_channel.samples)
@@ -130,32 +112,6 @@ def _apply_curves(layer, trc, curve_data):
       layer.curves_spline(curve_data_for_channel.channel, curve_data_for_channel.points)
     else:
       raise ValueError('failed to obtain curve points from file')
-
-  if not is_indexed and orig_precision != new_precision:
-    image.convert_precision(orig_precision)
-
-
-def _get_orig_and_new_precision(image, trc):
-  orig_precision = image.get_precision()
-
-  precision_name_components = re.split(
-    r'_(LINEAR|NON_LINEAR|PERCEPTUAL)$', orig_precision.name)
-  if len(precision_name_components) <= 1:
-    raise ValueError(f'image precision not supported: {orig_precision}')
-
-  if trc == 'linear':
-    new_precision_trc = 'LINEAR'
-  elif trc == 'non-linear':
-    new_precision_trc = 'NON_LINEAR'
-  elif trc == 'perceptual':
-    new_precision_trc = 'PERCEPTUAL'
-  else:
-    raise ValueError(f'value for "trc" not valid or supported: {trc}')
-
-  new_precision_name = '_'.join([precision_name_components[0], new_precision_trc])
-  new_precision = getattr(Gimp.Precision, new_precision_name)
-
-  return orig_precision, new_precision
 
 
 def _parse_gimp_levels_preset(data):
