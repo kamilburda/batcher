@@ -11,6 +11,7 @@ New features:
 * Added a new procedure named `Crop`. You may crop the entire image or a layer in a variety of ways - cropping from edges, from a fixed position (top left, center, ...), to the specified aspect ratio, to the specified area (bounding box), or to remove empty borders.
 * Replaced `Resize to layer size` with a more generic procedure named `Resize canvas` that allows several more resize modes (add borders, resize from position/area, resize to aspect ratio, resize to image size) and filling the newly added space with a color.
 * Added a new procedure named `Rotate and flip`. You may rotate the entire image or a layer, along with several options such as the angle, or whether to rotate from the center or from a fixed point.
+* Added a new constraint named `XCF (native GIMP) file` that applies only to opened images associated with a native XCF file.
 
 Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.

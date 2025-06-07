@@ -130,6 +130,10 @@ def has_no_unsaved_changes(item, _image_batcher):
   return not has_unsaved_changes(item, _image_batcher)
 
 
+def has_xcf_file(item, _image_batcher):
+  return item.raw.get_xcf_file() is not None
+
+
 class MatchModes:
   MATCH_MODES = (
     STARTS_WITH,
@@ -375,6 +379,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
     'display_name': _('With no unsaved changes'),
+    'additional_tags': [EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'xcf_file',
+    'type': 'constraint',
+    'function': has_xcf_file,
+    # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
+    'display_name': _('XCF (native GIMP) file'),
     'additional_tags': [EXPORT_IMAGES_GROUP],
   },
 ]

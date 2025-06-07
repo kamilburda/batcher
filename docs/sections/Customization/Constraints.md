@@ -134,3 +134,9 @@ Processes only images with unsaved changes ("dirty" images).
 *Only available for: Export Images*
 
 Processes only images with no unsaved changes ("clean" images).
+
+### XCF (native GIMP) file
+
+*Only available for: Export Images*
+
+Processes only images associated with an XCF file.
