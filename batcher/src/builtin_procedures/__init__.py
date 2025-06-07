@@ -20,8 +20,11 @@ from src.builtin_procedures import _resize_canvas
 from src.builtin_procedures._resize_canvas import *
 from src.builtin_procedures import _rotate_and_flip
 from src.builtin_procedures._rotate_and_flip import *
+from src.builtin_procedures import _save
+from src.builtin_procedures._save import *
 from src.builtin_procedures import _scale
 from src.builtin_procedures._scale import *
+from src.builtin_procedures._utils import *
 
 
 _BUILTIN_PROCEDURES_LIST = [
@@ -31,6 +34,7 @@ _BUILTIN_PROCEDURES_LIST = [
   _crop.CROP_FOR_LAYERS_DICT,
   _export.EXPORT_FOR_CONVERT_DICT,
   _export.EXPORT_FOR_EXPORT_IMAGES_DICT,
+  _export.EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT,
   _export.EXPORT_FOR_EXPORT_LAYERS_DICT,
   _export.EXPORT_FOR_EDIT_LAYERS_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
@@ -51,6 +55,7 @@ _BUILTIN_PROCEDURES_LIST = [
   _resize_canvas.RESIZE_CANVAS_DICT,
   _rotate_and_flip.ROTATE_AND_FLIP_FOR_IMAGES_DICT,
   _rotate_and_flip.ROTATE_AND_FLIP_FOR_LAYERS_DICT,
+  _save.SAVE_DICT,
   _scale.SCALE_FOR_IMAGES_DICT,
   _scale.SCALE_FOR_LAYERS_DICT,
 ]

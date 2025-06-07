@@ -410,7 +410,7 @@ CROP_FOR_IMAGES_DICT = {
   'function': crop,
   'display_name': _('Crop'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'placeholder_image_or_layer',

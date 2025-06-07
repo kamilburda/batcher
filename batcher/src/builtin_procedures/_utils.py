@@ -1,15 +1,34 @@
 """Utility functions used within the `builtin_procedures` package."""
 
+import os
+
 import gi
 
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 import pygimplib as pg
 from pygimplib import pdb
 
 from src import exceptions
 from src import placeholders as placeholders_
+
+
+__all__ = [
+  'EXPORT_NAME_ITEM_STATE',
+  'AnchorPoints',
+  'Positions',
+  'get_item_export_name',
+  'set_item_export_name',
+  'get_item_filepath',
+  'unit_to_pixels',
+  'add_color_layer',
+  'get_best_matching_layer_from_image',
+]
+
+
+EXPORT_NAME_ITEM_STATE = 'export_name'
 
 
 class AnchorPoints:
@@ -48,6 +67,43 @@ class Positions:
     'end',
     'custom',
   )
+
+
+def get_item_export_name(item):
+  item_state = item.get_named_state(EXPORT_NAME_ITEM_STATE)
+  return item_state['name'] if item_state is not None else item.name
+
+
+def set_item_export_name(item, name):
+  item.get_named_state(EXPORT_NAME_ITEM_STATE)['name'] = name
+
+
+def get_item_filepath(item, directory: Gio.File):
+  """Returns a file path based on the specified directory and the name of
+  the item and its parents.
+
+  The file path created has the following format:
+
+    <directory path>/<item path components>/<item name>
+
+  If the directory path is not an absolute path or is ``None``, the
+  current working directory is prepended.
+
+  Item path components consist of parents' item names, starting with the
+  topmost parent.
+  """
+  if directory is None or directory.get_path() is None:
+    dirpath = ''
+  else:
+    dirpath = directory.get_path()
+
+  dirpath = os.path.abspath(dirpath)
+
+  path_components = [get_item_export_name(parent) for parent in item.parents]
+  if path_components:
+    dirpath = os.path.join(dirpath, os.path.join(*path_components))
+
+  return os.path.join(dirpath, get_item_export_name(item))
 
 
 def unit_to_pixels(batcher, dimension, resolution_axis):

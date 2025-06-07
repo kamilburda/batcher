@@ -54,7 +54,7 @@ MERGE_FILTERS_DICT = {
   'function': merge_filters,
   'display_name': _('Merge filters'),
   'description': _('Merges all visible filters (layer effects) in the specified layer.'),
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
     {
       'type': 'placeholder_layer',
@@ -72,7 +72,7 @@ MERGE_VISIBLE_LAYERS_DICT = {
     'Merges all visible layers within the image into a single layer. Invisible layers are'
     ' removed.\n\nThis is useful if the image contains multiple layers and you want to apply'
     ' filters (layer effects) or other procedures on the entire image.'),
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'enum',

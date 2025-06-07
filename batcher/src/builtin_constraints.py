@@ -174,14 +174,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'type': 'constraint',
     'function': is_imported,
     'display_name': _('Imported'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_imported',
     'type': 'constraint',
     'function': is_not_imported,
     'display_name': _('Not imported'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_background',
@@ -247,7 +247,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
     'display_name': _('Matching text...'),
-    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': ALL_PROCEDURE_GROUPS,
     'display_options_on_create': True,
     'arguments': [
       {
@@ -292,14 +292,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'type': 'constraint',
     'function': is_saved_or_exported,
     'display_name': _('Saved or exported'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_saved_or_exported',
     'type': 'constraint',
     'function': is_not_saved_or_exported,
     'display_name': _('Not saved or exported'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'selected_in_gimp',
@@ -371,7 +371,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
     'display_name': _('With unsaved changes'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'with_no_unsaved_changes',
@@ -379,7 +379,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
     'display_name': _('With no unsaved changes'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'xcf_file',
@@ -387,7 +387,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
     'display_name': _('XCF (native GIMP) file'),
-    'additional_tags': [EXPORT_IMAGES_GROUP],
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
 ]
 

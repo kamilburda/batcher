@@ -262,7 +262,7 @@ ROTATE_AND_FLIP_FOR_IMAGES_DICT = {
   'function': rotate_and_flip,
   'display_name': _('Rotate and flip'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'placeholder_image_or_layer',

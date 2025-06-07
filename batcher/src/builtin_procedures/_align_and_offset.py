@@ -121,7 +121,7 @@ ALIGN_AND_OFFSET_DICT = {
     'Aligns layer(s) with the image or another layer.'
     '\n\nYou may specify additional offsets after the alignment is applied.'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
     {
       'type': 'placeholder_layer_array',

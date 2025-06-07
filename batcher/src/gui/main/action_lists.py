@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List
 
 import gi
@@ -196,6 +197,11 @@ class ActionLists:
       'after-load',
       lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
 
+    _set_up_existing_save_procedures(self._procedure_list)
+    self._procedure_list.actions.connect_event(
+      'after-load',
+      lambda _procedures: _set_up_existing_save_procedures(self._procedure_list))
+
     _set_up_existing_insert_back_foreground_and_related_actions(
       self._procedure_list, self._constraint_list)
     self._procedure_list.actions.connect_event(
@@ -254,8 +260,15 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
   if item.action['orig_name'].value.startswith('export_for_'):
     _handle_export_procedure_item_added(item)
 
-    if item.action['orig_name'].value != 'export_for_edit_layers':
+    if item.action['orig_name'].value not in [
+          'export_for_edit_and_save_images', 'export_for_edit_layers']:
       _handle_export_procedure_item_added_for_export_mode(item, settings)
+
+  if item.action['orig_name'].value == 'save':
+    _handle_save_procedure_item_added(item)
+
+  if item.action['orig_name'].value != 'save':
+    _reorder_procedure_before_first_save_procedure(procedure_list, item)
 
   if any(item.action['orig_name'].value.startswith(prefix) for prefix in [
        'insert_background_for_', 'insert_foreground_for_']):
@@ -284,6 +297,12 @@ def _set_up_existing_export_procedures(procedure_list: action_list_.ActionList):
   for item in procedure_list.items:
     if item.action['orig_name'].value.startswith('export_for_'):
       _handle_export_procedure_item_added(item)
+
+
+def _set_up_existing_save_procedures(procedure_list: action_list_.ActionList):
+  for item in procedure_list.items:
+    if item.action['orig_name'].value == 'save':
+      _handle_save_procedure_item_added(item)
 
 
 def _handle_insert_background_foreground_procedure_item_added(
@@ -567,7 +586,8 @@ def _set_display_name_for_export_procedure(file_extension_setting, export_proced
   file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
 
   export_procedure_name = None
-  if export_procedure['orig_name'].value == 'export_for_edit_layers':
+  if export_procedure['orig_name'].value in [
+        'export_for_edit_and_save_images', 'export_for_edit_layers']:
     export_procedure_name = _('Export as {}')
   elif export_procedure['orig_name'].value.startswith('export_for_'):
     export_procedure_name = _('Also export as {}')
@@ -593,6 +613,72 @@ def _copy_setting_values_from_default_export_procedure(main_settings, export_pro
 
 def _set_buttons_for_action_item_sensitive(item, sensitive):
   item.button_remove.set_sensitive(sensitive)
+
+
+def _handle_save_procedure_item_added(item):
+  _set_display_name_for_save_procedure(
+    item.action['arguments/save_existing_image_to_its_original_location'],
+    item.action['arguments/output_directory'],
+    item.action,
+  )
+
+  item.action['arguments/save_existing_image_to_its_original_location'].connect_event(
+    'value-changed',
+    _set_display_name_for_save_procedure,
+    item.action['arguments/output_directory'],
+    item.action,
+  )
+
+  item.action['arguments/output_directory'].connect_event(
+    'value-changed',
+    _set_display_name_for_save_procedure_for_output_directory,
+    item.action['arguments/save_existing_image_to_its_original_location'],
+    item.action,
+  )
+
+
+def _set_display_name_for_save_procedure(
+      save_existing_image_to_its_original_location_setting,
+      output_directory_setting,
+      save_procedure,
+):
+  if (output_directory_setting.value is not None
+      and output_directory_setting.value.get_path() is not None):
+    output_dirname = os.path.basename(output_directory_setting.value.get_path())
+
+    if save_existing_image_to_its_original_location_setting.value:
+      save_procedure['display_name'].set_value(
+        _('Save (imported images to "{}")').format(output_dirname))
+    else:
+      save_procedure['display_name'].set_value(_('Save to "{}"').format(output_dirname))
+  else:
+      save_procedure['display_name'].set_value(_('Save'))
+
+
+def _set_display_name_for_save_procedure_for_output_directory(
+      output_directory_setting,
+      save_existing_image_to_its_original_location_setting,
+      save_procedure,
+):
+  _set_display_name_for_save_procedure(
+    save_existing_image_to_its_original_location_setting,
+    output_directory_setting,
+    save_procedure,
+  )
+
+
+def _reorder_procedure_before_first_save_procedure(
+      procedure_list: action_list_.ActionList,
+      item,
+):
+  first_save_procedure_position = next(
+    iter(
+      index for index, item_ in enumerate(procedure_list.items)
+      if item_.action['orig_name'].value == 'save'),
+    None)
+
+  if first_save_procedure_position is not None:
+    procedure_list.reorder_item(item, first_save_procedure_position)
 
 
 def _on_constraint_item_added(_constraint_list, item, _settings):

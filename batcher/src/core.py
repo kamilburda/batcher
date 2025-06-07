@@ -1005,6 +1005,11 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._do_cleanup_contents(exception_occurred)
 
+    self._invoker.invoke(
+      ['after_cleanup_contents'],
+      [self],
+      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+
     self._current_item = None
     self._current_image = None
     self._current_layer = None
@@ -1128,8 +1133,6 @@ class ImageBatcher(Batcher):
 
         self._current_image = image_copy
         self._image_copies.append(image_copy)
-    else:
-      raise NotImplementedError('edit mode for batch image processing is currently not supported')
 
     self._current_layer = self._get_current_layer(self._current_image)
 

@@ -217,7 +217,7 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'display_name': _('Insert background'),
   'description': _('Inserts the specified image behind the current layer.'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'file',
@@ -282,7 +282,7 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'description': _(
     'Inserts the specified image in front of the current layer.'),
   'display_options_on_create': True,
-  'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'file',

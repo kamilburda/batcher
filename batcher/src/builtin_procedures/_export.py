@@ -23,9 +23,10 @@ from src.path import fileext
 from src.path import validators as validators_
 from src.procedure_groups import *
 
+from . import _utils as builtin_procedures_utils
+
 
 __all__ = [
-  'EXPORT_NAME_ITEM_STATE',
   'INTERACTIVE_OVERWRITE_MODES_LIST',
   'INTERACTIVE_OVERWRITE_MODES',
   'FileFormatModes',
@@ -38,8 +39,6 @@ __all__ = [
   'set_file_extension_options_for_default_export_procedure',
 ]
 
-
-EXPORT_NAME_ITEM_STATE = 'export_name'
 
 INTERACTIVE_OVERWRITE_MODES_LIST = [
   (overwrite.OverwriteModes.REPLACE, _('Replace')),
@@ -168,7 +167,7 @@ def export(
         item_to_process = current_top_level_item
 
     if batcher.process_names:
-      item_to_process.save_state(EXPORT_NAME_ITEM_STATE)
+      item_to_process.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
 
       if use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
@@ -234,7 +233,9 @@ def export(
       
       if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
-          fileext.get_file_extension(_get_item_export_name(item_to_process))].processed_count += 1
+          fileext.get_file_extension(
+            builtin_procedures_utils.get_item_export_name(item_to_process))
+        ].processed_count += 1
         # Append the original raw item
         # noinspection PyProtectedMember
         batcher._exported_items.append(item_to_process)
@@ -270,7 +271,7 @@ def _get_next_item(batcher, item):
 def _process_parent_names(item, item_uniquifier, processed_parents):
   for parent in item.parents:
     if parent not in processed_parents:
-      parent.save_state(EXPORT_NAME_ITEM_STATE)
+      parent.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
 
       _validate_name(parent)
       _uniquify_name(item_uniquifier, parent)
@@ -285,13 +286,13 @@ def _process_item_name(
       default_file_extension,
       force_default_file_extension,
 ):
-  item_name = _get_item_export_name(item)
+  item_name = builtin_procedures_utils.get_item_export_name(item)
 
   processed_item_name = item_name
 
   if not force_default_file_extension:
     if current_file_extension == default_file_extension:
-      processed_item_name = item_name + f'.{default_file_extension}'
+      processed_item_name = f'{item_name}.{default_file_extension}'
     else:
       processed_item_name = fileext.get_filename_with_new_file_extension(
         item_name, current_file_extension, keep_extra_trailing_periods=True)
@@ -299,14 +300,15 @@ def _process_item_name(
     processed_item_name = fileext.get_filename_with_new_file_extension(
       item_name, default_file_extension, keep_extra_trailing_periods=True)
 
-  _set_item_export_name(item, processed_item_name)
+  builtin_procedures_utils.set_item_export_name(item, processed_item_name)
 
   _validate_name(item)
   _uniquify_name(
     item_uniquifier,
     item,
     position=_get_unique_substring_position(
-      _get_item_export_name(item), fileext.get_file_extension(_get_item_export_name(item))),
+      builtin_procedures_utils.get_item_export_name(item),
+      fileext.get_file_extension(builtin_procedures_utils.get_item_export_name(item))),
   )
 
 
@@ -346,7 +348,8 @@ def _copy_layer(layer, dest_image, item):
   layer_copy = pg.pdbutils.copy_and_paste_layer(
     layer, dest_image, None, len(dest_image.get_layers()), True, True, True)
 
-  # We use `item.name` instead of `_get_item_export_name()` so that the original
+  # We use `item.name` instead of
+  # `builtin_procedures_utils.get_item_export_name()` so that the original
   # layer name is used in case of multi-layer export.
   layer_copy.set_name(item.name)
   
@@ -354,26 +357,17 @@ def _copy_layer(layer, dest_image, item):
 
 
 def _validate_name(item):
-  _set_item_export_name(
+  builtin_procedures_utils.set_item_export_name(
     item,
-    validators_.FilenameValidator.validate(_get_item_export_name(item)))
+    validators_.FilenameValidator.validate(builtin_procedures_utils.get_item_export_name(item)))
 
 
 def _uniquify_name(item_uniquifier, item, position=None):
-  item_name = _get_item_export_name(item)
+  item_name = builtin_procedures_utils.get_item_export_name(item)
 
   uniquified_item_name = item_uniquifier.uniquify(item, item_name=item_name, position=position)
 
-  _set_item_export_name(item, uniquified_item_name)
-
-
-def _get_item_export_name(item):
-  item_state = item.get_named_state(EXPORT_NAME_ITEM_STATE)
-  return item_state['name'] if item_state is not None else item.name
-
-
-def _set_item_export_name(item, name):
-  item.get_named_state(EXPORT_NAME_ITEM_STATE)['name'] = name
+  builtin_procedures_utils.set_item_export_name(item, uniquified_item_name)
 
 
 def _get_unique_substring_position(str_, file_extension):
@@ -393,8 +387,8 @@ def _export_item(
       overwrite_chooser,
       use_original_modification_date,
 ):
-  output_filepath = _get_item_filepath(item, output_directory)
-  file_extension = fileext.get_file_extension(_get_item_export_name(item))
+  output_filepath = builtin_procedures_utils.get_item_filepath(item, output_directory)
+  file_extension = fileext.get_file_extension(builtin_procedures_utils.get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
   try:
@@ -403,7 +397,11 @@ def _export_item(
       overwrite_chooser,
       _get_unique_substring_position(output_filepath, file_extension))
   except OSError as e:
-    raise exceptions.ExportError(str(e), _get_item_export_name(item), file_extension)
+    raise exceptions.ExportError(
+      str(e),
+      builtin_procedures_utils.get_item_export_name(item),
+      file_extension,
+    )
 
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
@@ -447,34 +445,6 @@ def _export_item(
   return chosen_overwrite_mode, export_status
 
 
-def _get_item_filepath(item, directory: Gio.File):
-  """Returns a file path based on the specified directory and the name of
-  the item and its parents.
-  
-  The file path created has the following format:
-    
-    <directory path>/<item path components>/<item name>
-  
-  If the directory path is not an absolute path or is ``None``, the
-  current working directory is prepended.
-  
-  Item path components consist of parents' item names, starting with the
-  topmost parent.
-  """
-  if directory is None or directory.get_path() is None:
-    dirpath = ''
-  else:
-    dirpath = directory.get_path()
-  
-  dirpath = os.path.abspath(dirpath)
-  
-  path_components = [_get_item_export_name(parent) for parent in item.parents]
-  if path_components:
-    dirpath = os.path.join(dirpath, os.path.join(*path_components))
-  
-  return os.path.join(dirpath, _get_item_export_name(item))
-
-
 def _make_dirs(item, dirpath, default_file_extension):
   try:
     os.makedirs(dirpath, exist_ok=True)
@@ -485,9 +455,9 @@ def _make_dirs(item, dirpath, default_file_extension):
         message += f': "{e.filename}"'
     except (IndexError, AttributeError):
       message = str(e)
-    
+
     raise exceptions.InvalidOutputDirectoryError(
-      message, _get_item_export_name(item), default_file_extension)
+      message, builtin_procedures_utils.get_item_export_name(item), default_file_extension)
 
 
 def _export_item_once_wrapper(
@@ -548,7 +518,7 @@ def _export_item_once(
 ):
   def _raise_export_error(exception):
     raise exceptions.ExportError(
-      str(exception), _get_item_export_name(item), default_file_extension)
+      str(exception), builtin_procedures_utils.get_item_export_name(item), default_file_extension)
 
   try:
     _export_image(
@@ -934,6 +904,14 @@ EXPORT_FOR_EXPORT_IMAGES_DICT.update({
 EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][5]['items'].pop(1)
 del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][9]
 del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][7]
+
+EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT = utils.semi_deep_copy(EXPORT_FOR_EXPORT_IMAGES_DICT)
+EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT.update({
+  'name': 'export_for_edit_and_save_images',
+  'display_name': _('Export'),
+  'description': _('Exports an image to the specified file format.'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
+})
 
 EXPORT_FOR_EXPORT_LAYERS_DICT = utils.semi_deep_copy(EXPORT_FOR_CONVERT_DICT)
 EXPORT_FOR_EXPORT_LAYERS_DICT.update({

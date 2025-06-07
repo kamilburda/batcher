@@ -601,8 +601,7 @@ _FIELDS_LIST = [
       ['[000, %d]', '005, 004, ...'],
       ['[10, %d2]', '10, 09, ...'],
     ],
-    'procedure_groups': [
-      CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+    'procedure_groups': ALL_PROCEDURE_GROUPS,
   },
   {
     'type': Field,
@@ -621,7 +620,7 @@ _FIELDS_LIST = [
       ['[image name, %i]', 'Image'],
       ['[image name, %n]', 'Image.jpg'],
     ],
-    'procedure_groups': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+    'procedure_groups': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'type': Field,
@@ -707,8 +706,7 @@ _FIELDS_LIST = [
     'display_name': _('Output folder'),
     'str_to_insert': '[output folder]',
     'examples_lines': _examples_lines_for_output_folder_field,
-    'procedure_groups': [
-      CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+    'procedure_groups': ALL_PROCEDURE_GROUPS,
   },
   {
     'type': Field,
@@ -739,8 +737,7 @@ _FIELDS_LIST = [
       [_('Custom date format uses formatting as per the "strftime" function in Python.')],
       ['[current date, %m.%d.%Y_%H-%M]', '28.01.2019_19-04'],
     ],
-    'procedure_groups': [
-      CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+    'procedure_groups': ALL_PROCEDURE_GROUPS,
   },
   {
     'type': Field,
@@ -757,7 +754,7 @@ _FIELDS_LIST = [
       ['[attributes, %lw-%lh-%lx-%ly, %pc]', '1.0-0.54-0.0-0.08'],
       ['[attributes, %lw-%lh-%lx-%ly, %pc1]', '1.0-0.5-0.0-0.1'],
     ],
-    'procedure_groups': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+    'procedure_groups': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'type': Field,
@@ -791,7 +788,7 @@ _FIELDS_LIST = [
          ' in the "re" module for Python.')],
       ['[replace, [image name], [a], [b], 1, ignorecase]', 'bnimal copy #1'],
     ],
-    'procedure_groups': [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+    'procedure_groups': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'type': Field,

@@ -183,16 +183,7 @@ def create_settings_for_convert():
     settings['main'])
   builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_export_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
+  _connect_events_for_added_built_in_procedures(settings)
 
   return settings
 
@@ -343,16 +334,100 @@ def create_settings_for_export_images():
     settings['main'])
   builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_export_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
+  _connect_events_for_added_built_in_procedures(settings)
+
+  return settings
+
+
+def create_settings_for_edit_and_save_images():
+  settings = pg.setting.create_groups({
+    'name': 'all_settings',
+    'groups': [
+      {
+        'name': 'main',
+      }
+    ]
+  })
+
+  settings['main'].add([
+    {
+      'type': 'enum',
+      'name': 'run_mode',
+      'enum_type': Gimp.RunMode,
+      'default_value': Gimp.RunMode.NONINTERACTIVE,
+      'display_name': _('Run mode'),
+      'description': _('The run mode'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'file',
+      'name': 'settings_file',
+      'default_value': None,
+      'action': Gimp.FileChooserAction.OPEN,
+      'none_ok': True,
+      'display_name': _('File with saved settings'),
+      'description': _('File with saved settings (optional)'),
+      'gui_type': None,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'string',
+      'name': 'plugin_version',
+      'default_value': pg.config.PLUGIN_VERSION,
+      'pdb_type': None,
+      'gui_type': None,
+    },
+  ])
+
+  gui_settings = _create_gui_settings('gimp_image_tree_items')
+  gui_settings.add([_create_auto_close_setting_dict(True)])
+
+  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings.add(
+    _create_size_gui_settings(
+      dialog_position=(),
+      dialog_size=(570, 500),
+      paned_outside_previews_position=300,
+      paned_between_previews_position=220,
+    )
+  )
+
+  gui_settings.add([size_gui_settings])
+
+  settings.add([gui_settings])
+
+  save_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['save'])
+  save_procedure_dict['enabled'] = False
+  save_procedure_dict['display_options_on_create'] = False
+
+  settings['main'].add([
+    actions_.create(
+      name='procedures',
+      initial_actions=[
+        save_procedure_dict,
+      ]),
+  ])
+
+  xcf_file_constraint_dict = utils.semi_deep_copy(
+    builtin_constraints.BUILTIN_CONSTRAINTS['xcf_file'])
+  xcf_file_constraint_dict['enabled'] = False
+
+  with_unsaved_changes_constraint_dict = utils.semi_deep_copy(
+    builtin_constraints.BUILTIN_CONSTRAINTS['with_unsaved_changes'])
+  with_unsaved_changes_constraint_dict['enabled'] = False
+
+  settings['main'].add([
+    actions_.create(
+      name='constraints',
+      initial_actions=[
+        xcf_file_constraint_dict,
+        with_unsaved_changes_constraint_dict,
+      ]),
+  ])
+
+  _connect_events_for_added_built_in_procedures(settings)
 
   return settings
 
@@ -496,16 +571,7 @@ def create_settings_for_export_layers():
     settings['main'])
   builtin_procedures.set_file_extension_options_for_default_export_procedure(settings['main'])
 
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_export_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
+  _connect_events_for_added_built_in_procedures(settings)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
@@ -601,16 +667,7 @@ def create_settings_for_edit_layers():
       ]),
   ])
 
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_export_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
-  settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
+  _connect_events_for_added_built_in_procedures(settings)
 
   settings['main/procedures'].connect_event(
     'after-add-action',
@@ -773,3 +830,16 @@ def _create_images_and_directories_setting_dict():
     'type': 'images_and_directories',
     'name': 'images_and_directories',
   }
+
+
+def _connect_events_for_added_built_in_procedures(settings):
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
+  settings['main/procedures'].connect_event(
+    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
