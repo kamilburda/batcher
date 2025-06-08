@@ -1102,7 +1102,7 @@ class ImageBatcher(Batcher):
   def _add_default_rename_procedure(self, action_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_procedures.rename_image,
+        builtin_procedures.rename_image_for_convert,
         groups=action_groups,
         args=[self._name_pattern])
 

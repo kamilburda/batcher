@@ -397,6 +397,11 @@ def create_settings_for_edit_and_save_images():
 
   settings.add([gui_settings])
 
+  rename_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_and_save_images'])
+  rename_procedure_dict['enabled'] = True
+  rename_procedure_dict['display_options_on_create'] = False
+
   save_procedure_dict = utils.semi_deep_copy(
     builtin_procedures.BUILTIN_PROCEDURES['save'])
   save_procedure_dict['enabled'] = False
@@ -406,6 +411,7 @@ def create_settings_for_edit_and_save_images():
     actions_.create(
       name='procedures',
       initial_actions=[
+        rename_procedure_dict,
         save_procedure_dict,
       ]),
   ])

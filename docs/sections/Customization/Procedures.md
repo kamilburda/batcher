@@ -159,9 +159,11 @@ Renames images/layers according to the specified pattern.
 
 This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
 
+Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+
 For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
-Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+For Edit and Save Images, renaming will have no effect unless the images are saved via the `Save` procedure.
 
 ### Resize canvas
 

@@ -549,9 +549,31 @@ def _handle_rename_procedure_item_added(item):
     _set_display_name_for_rename_procedure,
     item.action)
 
+  if item.action['orig_name'].value == 'rename_for_edit_and_save_images':
+    item.action['arguments/rename_only_new_images'].connect_event(
+      'value-changed',
+      _set_display_name_for_rename_procedure_for_rename_only_new_images,
+      item.action['arguments/pattern'],
+      item.action)
+
 
 def _set_display_name_for_rename_procedure(pattern_setting, rename_procedure):
-  rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+  if rename_procedure['orig_name'].value != 'rename_for_edit_and_save_images':
+    rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+  else:
+    if rename_procedure['arguments/rename_only_new_images'].value:
+      rename_procedure['display_name'].set_value(
+        _('Rename new images to "{}"').format(pattern_setting.value))
+    else:
+      rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+
+
+def _set_display_name_for_rename_procedure_for_rename_only_new_images(
+      _rename_only_new_images_setting,
+      pattern_setting,
+      rename_procedure,
+):
+  _set_display_name_for_rename_procedure(pattern_setting, rename_procedure)
 
 
 def _handle_export_procedure_item_added(item):

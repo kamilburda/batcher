@@ -6,12 +6,19 @@ from src.procedure_groups import *
 
 
 __all__ = [
-  'rename_image',
+  'rename_image_for_convert',
+  'rename_image_for_export_images',
+  'rename_image_for_edit_and_save_images',
   'rename_layer',
 ]
 
 
-def rename_image(image_batcher, pattern, rename_images=True, rename_folders=False):
+def rename_image_for_convert(
+      image_batcher,
+      pattern,
+      rename_images=True,
+      rename_folders=False,
+):
   renamer = renamer_.ItemRenamer(pattern, rename_images, rename_folders)
   renamed_parents = set()
 
@@ -23,6 +30,28 @@ def rename_image(image_batcher, pattern, rename_images=True, rename_folders=Fals
           renamed_parents.add(parent)
 
     if rename_images:
+      image_batcher.current_item.name = renamer.rename(image_batcher)
+
+    yield
+
+
+def rename_image_for_export_images(image_batcher, pattern):
+  renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
+
+  while True:
+    image_batcher.current_item.name = renamer.rename(image_batcher)
+
+    yield
+
+
+def rename_image_for_edit_and_save_images(image_batcher, pattern, rename_only_new_images=True):
+  renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
+
+  while True:
+    image = image_batcher.current_item.raw
+    is_new_image = image.get_file() is None
+
+    if not rename_only_new_images or is_new_image:
       image_batcher.current_item.name = renamer.rename(image_batcher)
 
     yield
@@ -55,7 +84,7 @@ def rename_layer(layer_batcher, pattern, rename_layers=True, rename_folders=Fals
 
 RENAME_FOR_CONVERT_DICT = {
   'name': 'rename_for_convert',
-  'function': rename_image,
+  'function': rename_image_for_convert,
   'display_name': _('Rename'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
@@ -84,7 +113,7 @@ RENAME_FOR_CONVERT_DICT = {
 
 RENAME_FOR_EXPORT_IMAGES_DICT = {
   'name': 'rename_for_export_images',
-  'function': rename_image,
+  'function': rename_image_for_export_images,
   'display_name': _('Rename'),
   'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
   'display_options_on_create': True,
@@ -95,6 +124,29 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
       'default_value': '[image name]',
       'display_name': _('Image filename pattern'),
       'gui_type': 'name_pattern_entry',
+    },
+  ],
+}
+
+RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
+  'name': 'rename_for_edit_and_save_images',
+  'function': rename_image_for_edit_and_save_images,
+  'display_name': _('Rename'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
+  'display_options_on_create': True,
+  'arguments': [
+    {
+      'type': 'name_pattern',
+      'name': 'pattern',
+      'default_value': 'image[001]',
+      'display_name': _('Image filename pattern'),
+      'gui_type': 'name_pattern_entry',
+    },
+    {
+      'type': 'bool',
+      'name': 'rename_only_new_images',
+      'default_value': True,
+      'display_name': _('Rename only new images'),
     },
   ],
 }
