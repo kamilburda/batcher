@@ -1366,6 +1366,10 @@ def _update_to_1_1(data, _settings, _procedure_groups):
           _resize_canvas_1_1_rename_layers_argument(arguments_list)
           _resize_canvas_1_1_add_new_arguments(arguments_list)
 
+        if (orig_name_setting_dict['value'].startswith('rename_for_export_images')
+            and arguments_list is not None):
+          _rename_for_export_images_1_1_remove_rename_images_argument(arguments_list)
+
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
     if constraints_list is not None:
       for constraint_dict in constraints_list:
@@ -2085,6 +2089,10 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       'display_name': _('Image'),
     },
   )
+
+
+def _rename_for_export_images_1_1_remove_rename_images_argument(arguments_list):
+  _remove_setting(arguments_list, 'rename_images')
 
 
 def _matching_text_1_1_add_new_options(arguments_list):

@@ -96,12 +96,6 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
       'display_name': _('Image filename pattern'),
       'gui_type': 'name_pattern_entry',
     },
-    {
-      'type': 'bool',
-      'name': 'rename_images',
-      'default_value': True,
-      'display_name': _('Rename images'),
-    },
   ],
 }
 
