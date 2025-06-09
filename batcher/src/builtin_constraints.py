@@ -239,7 +239,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
-    'additional_tags': [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'additional_tags': ALL_PROCEDURE_GROUPS,
   },
   {
     'name': 'matching_text',
