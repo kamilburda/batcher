@@ -60,6 +60,17 @@ This corresponds to how the layer is actually displayed in GIMP.
 
 For example, if a layer has 50% opacity and its parent group also has 50% opacity, the resulting opacity of the layer will be 25%.
 
+### Color correction
+
+Adjusts colors via brightness, contrast, levels and/or curves.
+
+For levels and curves, you need to specify a saved preset file. Both GIMP and Photoshop (.alv for levels, .acv for curves) file formats are supported.
+
+You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.
+
+At the moment, Batcher only supports applying levels or curves in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), it will still be applied as if the mode was set to linear.
+
+
 ### Crop
 
 Crops the specified image or layer. There are multiple ways you can perform cropping based on your needs.
@@ -132,11 +143,18 @@ Merges all visible filters (layer effects) in the specified layer.
 
 ### Merge visible layers
 
-*Only available for: Batch Convert, Export Images*
+*Only available for: Batch Convert, Export Images, Edit and Save Images*
 
 Merges all visible layers within the image into a single layer. Invisible layers are removed.
 
 This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other procedures on the entire image.
+
+### Remove file extension from imported images
+
+*Only available for: Edit and Save Images*
+
+Removes the file extension from images opened in GIMP that were imported from a non-native file format (i.e. not XCF). Native XCF files and new images are kept intact.
+
 
 ### Remove folder structure
 
@@ -153,9 +171,11 @@ Renames images/layers according to the specified pattern.
 
 This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
 
+Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+
 For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
 
-Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+For Edit and Save Images, renaming will have no effect unless the images are saved via the `Save` procedure.
 
 ### Resize canvas
 
@@ -195,6 +215,21 @@ Options:
 * *Flip horizontally*: Flips the image/layer horizontally.
 * *Flip vertically*: Flips the image/layer vertically.
 
+### Save
+
+*Only available for: Edit and Save Images*
+
+Saves the images in the native GIMP (XCF) file format.
+
+If the image already exists, it is overwritten.
+
+Images that were imported or created within GIMP are renamed in the GIMP title bar to contain the `.xcf` file extension. The images are marked as having no unsaved changes.
+
+To export the image in another file format, use the "Export Images" menu.
+
+Options:
+* *Output folder*: Folder to save images to.
+* *Save existing XCF image to its original location (ignore "Output folder")*: If checked, existing XCF images will be saved to their respective folders. If an existing image was renamed via the `Rename` procedure, it will be saved to the same folder under the new name. If unchecked, all images are saved to *Output folder*. 
 
 ### Scale
 

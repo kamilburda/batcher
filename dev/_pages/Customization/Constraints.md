@@ -26,13 +26,13 @@ You need to disable the `Layers` constraint since having both enabled will resul
 
 ### Imported
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images imported from a non-native (non-XCF) file format.
 
 ### Not Imported
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images that are native (XCF) images or are unsaved images without a file.
 
@@ -76,13 +76,13 @@ If you use third-party file load plug-ins with their own file extension, uncheck
 
 ### Saved or exported
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images that are saved as native (XCF) files or exported to another file format.
 
 ### Not Saved or exported
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images created in GIMP not yet saved to a file.
 
@@ -130,12 +130,18 @@ To also exclude group layers with color tags, click on `More options` and check 
 
 ### With unsaved changes
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images with unsaved changes ("dirty" images).
 
 ### With no unsaved changes
 
-*Only available for: Export Images*
+*Only available for: Export Images, Edit and Save Images*
 
 Processes only images with no unsaved changes ("clean" images).
+
+### XCF (native GIMP) file
+
+*Only available for: Export Images, Edit and Save Images*
+
+Processes only images associated with an XCF file.

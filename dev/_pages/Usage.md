@@ -11,7 +11,7 @@ A dialog appears that allows you to add input files and folders and adjust expor
 
 ![Dialog of Batch Convert](../assets/images/screenshot_dialog_convert.png){: .align-center}
 
-To start batch conversion, simply press the `Run` button.
+To start batch conversion, press the `Run` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings) below.
 Image names are used as filenames by default.
@@ -30,7 +30,7 @@ You will be warned if you add folder(s) containing too many files or e.g. an ent
 
 You can remove input images and folders by selecting them and pressing Delete or by pressing `Remove... → Remove Selected`. You can clear the entire input list by pressing `Remove... → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
 
-By default, the renamed images (as they would be named on export) are displayed. To show their original names, simply check `Show Original Names`.
+By default, the renamed images (as they would be named on export) are displayed. To show their original names, check `Show Original Names`.
 
 
 
@@ -42,7 +42,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 
 ![Dialog of Export Layers](../assets/images/screenshot_dialog_export_layers.png){: .align-center}
 
-To export layers, simply press the `Export` button.
+To export layers, press the `Export` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
 For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
@@ -56,7 +56,7 @@ For the first time, a small dialog with only export settings is displayed, where
 
 ![Dialog of Export Layers (Quick)](../assets/images/screenshot_dialog_export_layers_quick.png){: .align-center}
 
-This dialog can be skipped by simply unchecking `Show this dialog`.
+This dialog can be skipped by unchecking `Show this dialog`.
 
 Note that even procedures and constraints set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
@@ -72,15 +72,15 @@ In this case, any constraints set in the [main dialog](#exporting-layers) will b
 
 ## Exporting Images Opened in GIMP
 
-Open an image in GIMP and select `File → Export Images...`.
+If you have multiple images opened in GIMP, you can use `File → Export Images...` to export them to the specified file format.
 
 A dialog appears that allows you to adjust export settings, such as the output folder, filenames and the file extension.
 
 ![Dialog of Export Images](../assets/images/screenshot_dialog_export_images.png){: .align-center}
 
-To export images, simply press the `Export` button.
+To export images, press the `Export` button.
 
-Note that this feature exports images to another file format. It does not mass-save XCF images in their original locations.
+Note that this feature exports images to another file format. If you intend to batch-save XCF images in their original locations, use `File → Edit and Save Images...` instead.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
 For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
@@ -94,9 +94,31 @@ For the first time, a small dialog with only export settings is displayed, where
 
 ![Dialog of Export Images (Quick)](../assets/images/screenshot_dialog_export_images_quick.png){: .align-center}
 
-This dialog can be skipped by simply unchecking `Show this dialog`.
+This dialog can be skipped by unchecking `Show this dialog`.
 
 Note that even procedures and constraints set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
+
+
+## Editing and Saving Images Opened in GIMP
+
+`File → Edit and Save Images...` allows you to batch-edit and save all opened images in place.
+
+![Dialog of Edit ans Save Images](../assets/images/screenshot_dialog_edit_and_save_images.png){: .align-center}
+
+Both editing and saving are optional, i.e. you can perform only saving, or only editing as needed.
+If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
+
+To edit and/or save images, press the `Run` button.
+
+If you intend to batch-export images to another file format, use `File → Export Images...` instead.
+
+If you intend to edit each layer within an image individually instead of images as a whole, use `File → Edit Layers...` instead.
+
+
+### Quick Image Editing and Saving
+
+You can quickly run batch editing and saving of images via `File → Edit and Save Images (Quick)`.
+This can be useful if you e.g. made changes to your images and you want to save them all with the same settings.
 
 
 ## Editing Layers
@@ -105,17 +127,17 @@ Open an image in GIMP and select `File → Edit Layers...`.
 
 ![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
 
-To run batch editing, simply press the `Run` button.
+To run batch editing, press the `Run` button.
 This will apply procedures to each layer satisfying the activated constraints.
 
 You can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
 
-If the `Layers` constraint is unchecked, group layers will also be processed. The group layers will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on group layers.
+If the `Layers` constraint is unchecked, group layers will also be processed.
 
 
 ### Quick Layer Editing
 
-You can run batch editing in a single click by running `File → Edit Layers (Quick)`.
+You can quickly run batch editing via `File → Edit Layers (Quick)`.
 This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
 
 
