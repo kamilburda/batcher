@@ -2,7 +2,7 @@ On Windows, if you downloaded GIMP 3 before March 19, 2025, you will need to upd
 
 If the *How to adjust file format options* export option is set to `Interactively`, and you press the Export button, it may seem as though nothing happens.
 In that case, the file format dialog may be displayed behind GIMP.
-If so, simply select the dialog in the taskbar to bring it up.
+If so, select the dialog in the taskbar to bring it up.
 
 For the `Color Correction` procedure, Batcher currently supports applying levels or curves in the linear mode only. If you saved your preset in a different mode (e.g. non-linear or perceptual), it will still be applied as if the mode was set to linear.
 
