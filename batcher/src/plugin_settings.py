@@ -387,8 +387,8 @@ def create_settings_for_edit_and_save_images():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(570, 500),
-      paned_outside_previews_position=300,
+      dialog_size=(680, 500),
+      paned_outside_previews_position=365,
       paned_between_previews_position=220,
     )
   )
