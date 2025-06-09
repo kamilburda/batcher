@@ -23,6 +23,9 @@ __all__ = [
 ]
 
 
+_XCF_FILE_EXTENSION = '.xcf'
+
+
 def save(
       batcher,
       output_directory,
@@ -45,15 +48,36 @@ def save(
     item = batcher.current_item
 
     image_xcf_file = image.get_xcf_file()
-    should_keep_original_file = (
-      image_xcf_file is not None and save_existing_image_to_its_original_location)
 
-    if should_keep_original_file:
+    save_to_original_folder = (
+      image_xcf_file is not None and save_existing_image_to_its_original_location)
+    should_set_new_image_file = not save_to_original_folder
+
+    if save_to_original_folder:
       image_file = image_xcf_file
+
+      if not item.name.endswith(_XCF_FILE_EXTENSION):
+        image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
+      else:
+        image_filename = item.name
+
+      item.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
+      builtin_procedures_utils.set_item_export_name(item, image_filename)
+      _validate_name(item)
+
+      new_image_file = Gio.file_new_for_path(
+        builtin_procedures_utils.get_item_filepath(
+          item,
+          Gio.file_new_for_path(os.path.dirname(image_file.get_path())),
+        ))
+
+      if not image_file.equal(new_image_file):
+        image_file = new_image_file
+        should_set_new_image_file = True
     else:
       item.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
 
-      image_filename = f'{item.name}.xcf'
+      image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
 
       builtin_procedures_utils.set_item_export_name(item, image_filename)
       _validate_name(item)
@@ -65,7 +89,7 @@ def save(
 
     pdb.gimp_xcf_save(run_mode=Gimp.RunMode.NONINTERACTIVE, image=image, file=image_file)
 
-    if not should_keep_original_file:
+    if should_set_new_image_file:
       image.set_file(image_file)
 
     images_to_reset_dirty_state_for.append(image)
@@ -112,7 +136,8 @@ SAVE_DICT = {
       'type': 'bool',
       'name': 'save_existing_image_to_its_original_location',
       'default_value': True,
-      'display_name': _('Save existing image to its original location (ignore "Output folder")'),
+      'display_name': _(
+        'Save existing XCF image to its original location (ignore "Output folder")'),
     },
   ],
 }
