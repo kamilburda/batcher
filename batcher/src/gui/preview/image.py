@@ -75,7 +75,7 @@ class ImagePreview(preview_base_.Preview):
     self._is_updating = False
     self._is_preview_image_allocated_size = False
 
-    self._set_update_duration_action_id = None
+    self._set_update_duration_command_id = None
     self._update_duration_seconds = 0.0
     
     self._init_gui()
@@ -267,8 +267,8 @@ class ImagePreview(preview_base_.Preview):
     start_update_time = time.time()
 
     self._batcher.remove_action(
-      self._set_update_duration_action_id, groups='all', ignore_if_not_exists=True)
-    self._set_update_duration_action_id = self._batcher.add_procedure(
+      self._set_update_duration_command_id, groups='all', ignore_if_not_exists=True)
+    self._set_update_duration_command_id = self._batcher.add_procedure(
       self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
 
     image_copies, error, display_error_message_as_label = self._get_image_preview()

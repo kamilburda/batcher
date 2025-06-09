@@ -43,7 +43,7 @@ class TestBatcherInitialActions(unittest.TestCase):
       process_export=False,
       **utils_.get_settings_for_batcher(settings['main']))
     
-    added_action_items = batcher.invoker.list_actions(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_action_items = batcher.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
     
     # Includes built-in procedures added by default
     self.assertEqual(len(added_action_items), 6)
@@ -51,7 +51,7 @@ class TestBatcherInitialActions(unittest.TestCase):
     initial_invoker = added_action_items[1]
     self.assertIsInstance(initial_invoker, invoker_.Invoker)
     
-    actions_in_initial_invoker = initial_invoker.list_actions(
+    actions_in_initial_invoker = initial_invoker.list_commands(
       group=actions_.DEFAULT_PROCEDURES_GROUP)
     self.assertEqual(len(actions_in_initial_invoker), 1)
     self.assertEqual(actions_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
@@ -101,7 +101,7 @@ class TestAddActionFromSettings(unittest.TestCase):
     
     self.batcher._add_action_from_settings(procedure)
     
-    added_action_items = self.invoker.list_actions(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_action_items = self.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
     
     self.assertEqual(len(added_action_items), 1)
     self.assertEqual(
@@ -131,7 +131,7 @@ class TestAddActionFromSettings(unittest.TestCase):
 
     self.batcher._add_action_from_settings(procedure)
     
-    added_action_items = self.invoker.list_actions(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_action_items = self.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
     
     added_action_item_names_and_values = [
       (setting.name, setting.value) for setting in added_action_items[0][1][:-1]

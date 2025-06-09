@@ -11,44 +11,44 @@ from typing import Callable, Dict, List, Optional, Union
 
 class Invoker:
   """Class to invoke (call) a sequence of functions or nested instances,
-  hereinafter "actions".
+  hereinafter "commands".
   
   Features include:
-  * adding and removing actions,
-  * reordering actions,
-  * grouping actions and invoking only actions in specified groups,
-  * adding actions to be invoked before or after each action, hereinafter
-    "for-each actions",
-  * adding another `Invoker` instance as an action (i.e. nesting the current
+  * adding and removing commands,
+  * reordering commands,
+  * grouping commands and invoking only commands in specified groups,
+  * adding commands to be invoked before or after each command, hereinafter
+    "for-each commands",
+  * adding another `Invoker` instance as an command (i.e. nesting the current
     instance inside another instance).
   """
   
-  _ACTION_TYPES = _TYPE_ACTION, _TYPE_FOREACH_ACTION, _TYPE_INVOKER = (0, 1, 2)
+  _COMMAND_TYPES = _TYPE_COMMAND, _TYPE_FOREACH_COMMAND, _TYPE_INVOKER = (0, 1, 2)
   
-  _action_id_counter = itertools.count(start=1)
+  _command_id_counter = itertools.count(start=1)
   
   def __init__(self):
-    # key: action group; value: list of `_ActionItem` instances
-    self._actions = {}
+    # key: command group; value: list of `_CommandItem` instances
+    self._commands = {}
     
-    # key: action group; value: list of `_ActionItem` instances
-    self._foreach_actions = {}
+    # key: command group; value: list of `_CommandItem` instances
+    self._foreach_commands = {}
     
-    # key: action group; value: dict of (action function: count) pairs
-    self._action_functions = collections.defaultdict(lambda: collections.defaultdict(int))
+    # key: command group; value: dict of (command function: count) pairs
+    self._command_functions = collections.defaultdict(lambda: collections.defaultdict(int))
     
-    # key: action group; value: dict of (action function: count) pairs
-    self._foreach_action_functions = collections.defaultdict(lambda: collections.defaultdict(int))
+    # key: command group; value: dict of (command function: count) pairs
+    self._foreach_command_functions = collections.defaultdict(lambda: collections.defaultdict(int))
     
-    # key: action group; value: dict of (`Invoker` instance: count) pairs
+    # key: command group; value: dict of (`Invoker` instance: count) pairs
     self._invokers = collections.defaultdict(lambda: collections.defaultdict(int))
     
-    # key: action ID; value: `_ActionItem` instance
-    self._action_items = {}
+    # key: command ID; value: `_CommandItem` instance
+    self._command_items = {}
   
   def add(
         self,
-        action: Union[Callable, Invoker],
+        command: Union[Callable, Invoker],
         groups: Union[None, str, List[str]] = None,
         args: Optional[Iterable] = None,
         kwargs: Optional[Dict] = None,
@@ -57,33 +57,33 @@ class Invoker:
         position: Optional[int] = None,
         run_generator: bool = True,
   ) -> Optional[int]:
-    """Adds an action to be invoked by `invoke()`.
+    """Adds an command to be invoked by `invoke()`.
 
-    The ID of the newly added action is returned.
+    The ID of the newly added command is returned.
     
-    An action can be:
+    An command can be:
     * a function, in which case optional arguments (``args``) and
       keyword arguments (``kwargs``) can be specified,
     * another `Invoker` instance.
     
-    To control which actions are invoked, you may want to group them.
+    To control which commands are invoked, you may want to group them.
     
-    If ``groups`` is ``None`` or ``'default'``, the action is added to a
+    If ``groups`` is ``None`` or ``'default'``, the command is added to a
     default group appropriately named ``'default'``.
     
-    If ``groups`` is a list of group names (strings), the action is added to
+    If ``groups`` is a list of group names (strings), the command is added to
     the specified groups. Groups are created automatically if they previously
     did not exist.
     
-    If ``groups`` is ``'all'``, the action is added to all existing groups.
-    The action will not be added to the default group if it does not exist.
+    If ``groups`` is ``'all'``, the command is added to all existing groups.
+    The command will not be added to the default group if it does not exist.
     
-    By default, the action is added at the end of the list of actions in the
+    By default, the command is added at the end of the list of commands in the
     specified group(s). Pass an integer to the ``position`` parameter to
     customize the insertion position. A negative value represents an n-th to
     last position.
     
-    Action as a function can also be a generator function or return a generator.
+    Command as a function can also be a generator function or return a generator.
     This allows customizing which parts of the code of the function are called
     on each invocation. For example:
     
@@ -105,18 +105,18 @@ class Invoker:
     
     To make sure the generator can be called an arbitrary number of times, place
     a ``yield`` statement in an infinite loop. To limit the number of calls,
-    simply do not use an infinite loop. In such a case, the action is
+    simply do not use an infinite loop. In such a case, the command is
     permanently removed for the group(s) `invoke()` was called for once no more
     yield statements are encountered.
     
     To prevent activating generators and to treat generator functions as regular
     functions, pass ``run_generator=False``.
     
-    If ``foreach`` is ``True`` and the action is a function, the action is
-    treated as a "for-each" action. By default, a for-each action is
-    invoked after each regular action (function or `Invoker` instance). To
-    customize this behavior, use the ``yield`` statement in the for-each action
-    to specify where it is desired to invoke each action.
+    If ``foreach`` is ``True`` and the command is a function, the command is
+    treated as a "for-each" command. By default, a for-each command is
+    invoked after each regular command (function or `Invoker` instance). To
+    customize this behavior, use the ``yield`` statement in the for-each command
+    to specify where it is desired to invoke each command.
     For example:
     
       def foo():
@@ -124,11 +124,11 @@ class Invoker:
         yield
         print('baz')
     
-    first prints ``'bar'``, then invokes the action and finally prints
+    first prints ``'bar'``, then invokes the command and finally prints
     ``'baz'``. Multiple ``yield`` statements can be specified to invoke the
-    wrapped action multiple times.
+    wrapped command multiple times.
     
-    If multiple for-each actions are added, they are invoked in the order
+    If multiple for-each commands are added, they are invoked in the order
     they were added by this method. For example:
       
       def foo1():
@@ -141,36 +141,36 @@ class Invoker:
         yield
         print('baz2')
     
-    will print ``'bar1'``, ``'bar2'``, then invoke the action (only once), and
+    will print ``'bar1'``, ``'bar2'``, then invoke the command (only once), and
     then print ``'baz1'`` and ``'baz2'``.
     
-    To make an `Invoker` instance behave as a for-each action, wrap
+    To make an `Invoker` instance behave as a for-each command, wrap
     the instance in a function as shown above. For example:
       
-      def invoke_before_each_action():
+      def invoke_before_each_command():
         invoker.invoke()
         yield
 
-    If ``ignore_if_exists`` is ``True``, the action is not added if the same
+    If ``ignore_if_exists`` is ``True``, the command is not added if the same
     function or `Invoker` instance is already added in at least one of the
     specified groups. In this case, ``None`` is returned. Note that the same
     function with different arguments is still treated as one function.
     """
-    if ignore_if_exists and self.contains(action, groups, foreach):
+    if ignore_if_exists and self.contains(command, groups, foreach):
       return None
     
-    action_id = self._get_action_id()
+    command_id = self._get_command_id()
     
-    if callable(action):
+    if callable(command):
       if not foreach:
-        add_action_func = self._add_action
+        add_command_func = self._add_command
       else:
-        add_action_func = self._add_foreach_action
+        add_command_func = self._add_foreach_command
       
       for group in self._process_groups_arg(groups):
-        add_action_func(
-          action_id,
-          action,
+        add_command_func(
+          command_id,
+          command,
           group,
           args if args is not None else (),
           kwargs if kwargs is not None else {},
@@ -178,9 +178,9 @@ class Invoker:
           run_generator)
     else:
       for group in self._process_groups_arg(groups):
-        self._add_invoker(action_id, action, group, position)
+        self._add_invoker(command_id, command, group, position)
     
-    return action_id
+    return command_id
   
   def invoke(
         self,
@@ -188,22 +188,22 @@ class Invoker:
         additional_args: Optional[Iterable] = None,
         additional_kwargs: Optional[Dict] = None,
         additional_args_position: Optional[int] = None):
-    """Invokes actions.
+    """Invokes commands.
     
-    If ``groups`` is ``None`` or ``'default'``, actions in the default group
+    If ``groups`` is ``None`` or ``'default'``, commands in the default group
     are invoked.
     
-    If ``groups`` is a list of group names (strings), invoke actions in the
+    If ``groups`` is a list of group names (strings), invoke commands in the
     specified groups.
     
-    If ``groups`` is ``'all'``, actions in all existing groups are invoked.
+    If ``groups`` is ``'all'``, commands in all existing groups are invoked.
     
     If any of the ``groups`` do not exist, ``ValueError`` is raised.
     
-    If ``action`` is an `Invoker` instance, the instance will invoke
-    actions in the specified groups.
+    If ``command`` is an `Invoker` instance, the instance will invoke
+    commands in the specified groups.
     
-    Additional arguments and keyword arguments to all actions in the group
+    Additional arguments and keyword arguments to all commands in the group
     are given by ``additional_args`` and ``additional_kwargs``, respectively.
     If some keyword arguments appear in both the ``kwargs`` parameter in `add()`
     and in ``additional_kwargs``, values from the latter override the values in
@@ -215,12 +215,12 @@ class Invoker:
     applies to nested `Invoker` instances.
     """
     
-    def _invoke_action(item_, group_):
-      action, action_args, action_kwargs = item_.action
-      args = _get_args(action_args)
-      kwargs = dict(action_kwargs, **additional_kwargs)
+    def _invoke_command(item_, group_):
+      command, command_args, command_kwargs = item_.command
+      args = _get_args(command_args)
+      kwargs = dict(command_kwargs, **additional_kwargs)
       
-      result = action(*args, **kwargs)
+      result = command(*args, **kwargs)
       
       if inspect.isgenerator(result):
         item_.is_generator = True
@@ -237,46 +237,46 @@ class Invoker:
           except StopIteration:
             item_.should_be_removed_from_group = True
     
-    def _prepare_foreach_action(action, action_args, action_kwargs):
-      args = _get_args(action_args)
-      kwargs = dict(action_kwargs, **additional_kwargs)
-      return action(*args, **kwargs)
+    def _prepare_foreach_command(command, command_args, command_kwargs):
+      args = _get_args(command_args)
+      kwargs = dict(command_kwargs, **additional_kwargs)
+      return command(*args, **kwargs)
     
-    def _get_args(action_args):
+    def _get_args(command_args):
       if additional_args_position is None:
-        return tuple(action_args) + tuple(additional_args)
+        return tuple(command_args) + tuple(additional_args)
       else:
-        args = list(action_args)
+        args = list(command_args)
         args[additional_args_position:additional_args_position] = additional_args
         return tuple(args)
     
-    def _invoke_action_with_foreach_actions(item_, group_):
-      action_generators = [
-        _prepare_foreach_action(*foreach_item.action)
-        for foreach_item in self._foreach_actions[group_]]
+    def _invoke_command_with_foreach_commands(item_, group_):
+      command_generators = [
+        _prepare_foreach_command(*foreach_item.command)
+        for foreach_item in self._foreach_commands[group_]]
       
-      _invoke_foreach_actions_once(action_generators)
+      _invoke_foreach_commands_once(command_generators)
       
-      while action_generators:
-        result_from_action = _invoke_action(item_, group_)
-        _invoke_foreach_actions_once(action_generators, result_from_action)
+      while command_generators:
+        result_from_command = _invoke_command(item_, group_)
+        _invoke_foreach_commands_once(command_generators, result_from_command)
         
         if item_.should_be_removed_from_group:
-          self.remove(item_.action_id, [group_])
+          self.remove(item_.command_id, [group_])
           item_.should_be_removed_from_group = False
           return
     
-    def _invoke_foreach_actions_once(action_generators, result_from_action=None):
-      action_generators_to_remove = []
+    def _invoke_foreach_commands_once(command_generators, result_from_command=None):
+      command_generators_to_remove = []
       
-      for action_generator in action_generators:
+      for command_generator in command_generators:
         try:
-          action_generator.send(result_from_action)
+          command_generator.send(result_from_command)
         except StopIteration:
-          action_generators_to_remove.append(action_generator)
+          command_generators_to_remove.append(command_generator)
       
-      for action_generator_to_remove in action_generators_to_remove:
-        action_generators.remove(action_generator_to_remove)
+      for command_generator_to_remove in command_generators_to_remove:
+        command_generators.remove(command_generator_to_remove)
 
     def _invoke_invoker(invoker, group_):
       invoker.invoke([group_], additional_args, additional_kwargs, additional_args_position)
@@ -285,114 +285,114 @@ class Invoker:
     additional_kwargs = additional_kwargs if additional_kwargs is not None else {}
     
     for group in self._process_groups_arg(groups):
-      if group not in self._actions:
+      if group not in self._commands:
         self._init_group(group)
       
-      # An action could be removed during invocation, hence create a list and
+      # An command could be removed during invocation, hence create a list and
       # later check for validity.
-      items = list(self._actions[group])
+      items = list(self._commands[group])
       
       for item in items:
-        if item not in self._actions[group]:
+        if item not in self._commands[group]:
           continue
         
-        if item.action_type != self._TYPE_INVOKER:
-          if self._foreach_actions[group]:
-            _invoke_action_with_foreach_actions(item, group)
+        if item.command_type != self._TYPE_INVOKER:
+          if self._foreach_commands[group]:
+            _invoke_command_with_foreach_commands(item, group)
           else:
-            _invoke_action(item, group)
+            _invoke_command(item, group)
             
             if item.should_be_removed_from_group:
-              self.remove(item.action_id, [group])
+              self.remove(item.command_id, [group])
               item.should_be_removed_from_group = False
         else:
-          _invoke_invoker(item.action, group)
+          _invoke_invoker(item.command, group)
   
   def add_to_groups(
         self,
-        action_id: int,
+        command_id: int,
         groups: Union[None, str, List[str]] = None,
         position: Optional[int] = None):
-    """Adds an existing action specified by its ID to the specified groups.
+    """Adds an existing command specified by its ID to the specified groups.
 
     For more information about the ``groups`` parameter, see `add()`.
     
-    If the action was already added to one of the specified groups, it will
+    If the command was already added to one of the specified groups, it will
     not be added again (call `add()` for that purpose).
     
-    By default, the action is added at the end of the list of actions in the
+    By default, the command is added at the end of the list of commands in the
     specified group(s). Pass an integer to the ``position`` parameter to
     customize the insertion position. A negative value represents an
     n-th-to-last position.
     
-    If the action ID is not valid, `ValueError` is raised.
+    If the command ID is not valid, `ValueError` is raised.
     """
-    self._check_action_id_is_valid(action_id)
+    self._check_command_id_is_valid(command_id)
     
     for group in self._process_groups_arg(groups):
-      if group not in self._action_items[action_id].groups:
-        self._add_action_to_group(self._action_items[action_id], group, position)
+      if group not in self._command_items[command_id].groups:
+        self._add_command_to_group(self._command_items[command_id], group, position)
   
   def contains(
         self,
-        action: Union[Callable, Invoker],
+        command: Union[Callable, Invoker],
         groups: Union[None, str, List[str]] = None,
         foreach: bool = False,
   ) -> bool:
-    """Returns ``True`` if the specified action exists, ``False`` otherwise.
+    """Returns ``True`` if the specified command exists, ``False`` otherwise.
 
-    ``action`` can be a function or `Invoker` instance.
+    ``command`` can be a function or `Invoker` instance.
     
-    For information about the ``groups`` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_command()`.
     
-    If ``foreach`` is ``True``, the action is treated as a for-each action.
+    If ``foreach`` is ``True``, the command is treated as a for-each command.
     """
-    action_functions = self._get_action_lists_and_functions(
-      self._get_action_type(action, foreach))[1]
+    command_functions = self._get_command_lists_and_functions(
+      self._get_command_type(command, foreach))[1]
     
     for group in self._process_groups_arg(groups):
-      if action in action_functions[group]:
+      if command in command_functions[group]:
         return True
     
     return False
   
   def find(
         self,
-        action: Union[Callable, Invoker],
+        command: Union[Callable, Invoker],
         groups: Union[None, str, List[str]] = None,
         foreach: bool = False,
   ) -> List[int]:
-    """Returns action IDs matching the specified action.
+    """Returns command IDs matching the specified command.
 
-    ``action`` can be a function or `Invoker` instance.
+    ``command`` can be a function or `Invoker` instance.
     
-    For information about the ``groups`` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_command()`.
     
-    If ``foreach`` is ``True``, the action is treated as a for-each action.
+    If ``foreach`` is ``True``, the command is treated as a for-each command.
     """
-    action_type = self._get_action_type(action, foreach)
-    action_lists = self._get_action_lists_and_functions(action_type)[0]
+    command_type = self._get_command_type(command, foreach)
+    command_lists = self._get_command_lists_and_functions(command_type)[0]
     
     processed_groups = [
       group for group in self._process_groups_arg(groups)
       if group in self.list_groups()]
     
-    found_action_ids = []
+    found_command_ids = []
     
     for group in processed_groups:
-      found_action_ids.extend([
-        action_item.action_id
-        for action_item in action_lists[group]
-        if (action_item.action_function == action and action_item.action_type == action_type)
+      found_command_ids.extend([
+        command_item.command_id
+        for command_item in command_lists[group]
+        if (command_item.command_function == command and command_item.command_type == command_type)
       ])
     
-    return found_action_ids
+    return found_command_ids
   
-  def has_action(self, action_id: int, groups: Union[None, str, List[str]] = None) -> bool:
-    """Returns ``True`` if an action exists in at least one of the specified
+  def has_command(self, command_id: int, groups: Union[None, str, List[str]] = None) -> bool:
+    """Returns ``True`` if an command exists in at least one of the specified
     groups, ``False`` otherwise.
 
-    The action is specified by its ID returned from `add()`.
+    The command is specified by its ID returned from `add()`.
     
     ``groups`` can have one of the following values:
      * ``None`` or ``'default'`` - the default group,
@@ -400,154 +400,154 @@ class Invoker:
      * ``'all'`` - all existing groups.
     """
     return (
-      action_id in self._action_items
-      and any(group in self._action_items[action_id].groups
+          command_id in self._command_items
+          and any(group in self._command_items[command_id].groups
               for group in self._process_groups_arg(groups)))
   
-  def get_action(self, action_id: int) -> Union[Callable, Invoker, None]:
-    """Returns an action specified by its ID.
+  def get_command(self, command_id: int) -> Union[Callable, Invoker, None]:
+    """Returns an command specified by its ID.
 
     If the ID is not valid, ``None`` is returned.
     """
-    if action_id in self._action_items:
-      return self._action_items[action_id].action
+    if command_id in self._command_items:
+      return self._command_items[command_id].command
     else:
       return None
   
-  def get_position(self, action_id: int, group: Union[None, str, List[str]] = None) -> int:
-    """Returns the position of the action specified by its ID in the specified
+  def get_position(self, command_id: int, group: Union[None, str, List[str]] = None) -> int:
+    """Returns the position of the command specified by its ID in the specified
     group.
 
     If ``group`` is ``None`` or ``'default'``, use the default group.
     
-    If the ID is not valid or the action is not in the group, `ValueError` is
+    If the ID is not valid or the command is not in the group, `ValueError` is
     raised.
     """
     if group is None:
       group = 'default'
     
-    self._check_action_id_is_valid(action_id)
-    self._check_action_in_group(action_id, group)
+    self._check_command_id_is_valid(command_id)
+    self._check_command_in_group(command_id, group)
     
-    action_item = self._action_items[action_id]
-    action_lists, _unused = self._get_action_lists_and_functions(action_item.action_type)
+    command_item = self._command_items[command_id]
+    command_lists, _unused = self._get_command_lists_and_functions(command_item.command_type)
 
-    return action_lists[group].index(action_item)
+    return command_lists[group].index(command_item)
   
-  def list_actions(
+  def list_commands(
         self, group: Optional[str] = None, foreach: bool = False,
   ) -> Optional[List[Union[Callable, Invoker]]]:
-    """Returns all actions for the specified group in the order they would be
+    """Returns all commands for the specified group in the order they would be
     invoked.
 
-    Actions are returned along with their arguments and keyword arguments.
+    Commands are returned along with their arguments and keyword arguments.
 
     If the group does not exist, ``None`` is returned.
 
-    If ``foreach`` is ``True``, for-each actions are returned instead.
+    If ``foreach`` is ``True``, for-each commands are returned instead.
     """
     if group is None:
       group = 'default'
     
     if not foreach:
-      action_items = self._actions
+      command_items = self._commands
     else:
-      action_items = self._foreach_actions
+      command_items = self._foreach_commands
     
-    if group in self._actions:
-      return [item.action for item in action_items[group]]
+    if group in self._commands:
+      return [item.command for item in command_items[group]]
     else:
       return None
   
   def list_groups(self, include_empty_groups: bool = True) -> List[str]:
     """Returns a list of all groups in the invoker.
     
-    If ``include_empty_groups`` is ``False``, groups with no actions are not
+    If ``include_empty_groups`` is ``False``, groups with no commands are not
     included.
     """
     if include_empty_groups:
-      return list(self._actions)
+      return list(self._commands)
     else:
       def _is_group_non_empty(group):
         return any(
-          (group in action_lists and action_lists[group])
-          for action_lists in [self._actions, self._foreach_actions])
+          (group in command_lists and command_lists[group])
+          for command_lists in [self._commands, self._foreach_commands])
       
-      return [group for group in self._actions if _is_group_non_empty(group)]
+      return [group for group in self._commands if _is_group_non_empty(group)]
   
-  def reorder(self, action_id: int, position: int, group: Optional[str] = None):
-    """Change the order in which an action is invoked.
+  def reorder(self, command_id: int, position: int, group: Optional[str] = None):
+    """Change the order in which an command is invoked.
     
-    The action is specified by its ID (as returned by `add()`).
+    The command is specified by its ID (as returned by `add()`).
     
     If ``group`` is ``None`` or ``'default'``, the default group is used.
     
-    A position of 0 moves the action to the beginning.
-    Negative numbers move the action to the n-th to last position, i.e. -1
+    A position of 0 moves the command to the beginning.
+    Negative numbers move the command to the n-th to last position, i.e. -1
     for the last position, -2 for the second to last position, etc.
     
     `ValueError` is raised if:
-    * ``action_id`` is not valid
+    * ``command_id`` is not valid
     * ``group`` does not exist
-    * the action having ``action_id`` is not in ``group``
+    * the command having ``command_id`` is not in ``group``
     """
     if group is None:
       group = 'default'
     
-    self._check_action_id_is_valid(action_id)
+    self._check_command_id_is_valid(command_id)
     self._check_group_exists(group)
-    self._check_action_in_group(action_id, group)
+    self._check_command_in_group(command_id, group)
     
-    action_item = self._action_items[action_id]
-    action_lists, _unused = self._get_action_lists_and_functions(action_item.action_type)
+    command_item = self._command_items[command_id]
+    command_lists, _unused = self._get_command_lists_and_functions(command_item.command_type)
     
-    action_lists[group].pop(action_lists[group].index(action_item))
+    command_lists[group].pop(command_lists[group].index(command_item))
     
     if position < 0:
-      position = max(len(action_lists[group]) + position + 1, 0)
+      position = max(len(command_lists[group]) + position + 1, 0)
     
-    action_lists[group].insert(position, action_item)
+    command_lists[group].insert(position, command_item)
   
   def remove(
         self,
-        action_id: int,
+        command_id: int,
         groups: Union[None, str, List[str]] = None,
         ignore_if_not_exists: bool = False):
-    """Removes an action specified by its ID from the specified groups.
+    """Removes an command specified by its ID from the specified groups.
     
-    For information about the ``groups`` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_command()`.
     
-    For existing groups where the action is not added, nothing is removed.
+    For existing groups where the command is not added, nothing is removed.
     
     If ``ignore_if_not_exists`` is ``True``, ``ValueError`` is not raised if
-    ``action_id`` does not match any added action.
+    ``command_id`` does not match any added command.
     
     `ValueError` is raised if:
-    * ``action_id`` is invalid and ``ignore_if_not_exists`` is ``False``
+    * ``command_id`` is invalid and ``ignore_if_not_exists`` is ``False``
     * at least one of the specified groups does not exist
     """
     if ignore_if_not_exists:
-      if action_id not in self._action_items:
+      if command_id not in self._command_items:
         return
     else:
-      self._check_action_id_is_valid(action_id)
+      self._check_command_id_is_valid(command_id)
     
-    action_list, action_functions = self._get_action_lists_and_functions(
-      self._action_items[action_id].action_type)
+    command_list, command_functions = self._get_command_lists_and_functions(
+      self._command_items[command_id].command_type)
     
     for group in self._process_groups_arg(groups):
       self._check_group_exists(group)
       
-      if group in self._action_items[action_id].groups:
-        self._remove_action(action_id, group, action_list, action_functions)
-        if action_id not in self._action_items:
+      if group in self._command_items[command_id].groups:
+        self._remove_command(command_id, group, command_list, command_functions)
+        if command_id not in self._command_items:
           break
   
   def remove_groups(self, groups: Union[None, str, List[str]] = None):
-    """Removes the specified groups and their actions (including for-each
-    actions).
+    """Removes the specified groups and their commands (including for-each
+    commands).
     
-    For information about the ``groups`` parameter, see `has_action()`.
+    For information about the ``groups`` parameter, see `has_command()`.
     
     Non-existent groups in ``groups`` are ignored.
     """
@@ -556,149 +556,150 @@ class Invoker:
       if group in self.list_groups()]
     
     for group in processed_groups:
-      for action_item in self._actions[group]:
-        if action_item.action_type == self._TYPE_ACTION:
-          self._remove_action(action_item.action_id, group, self._actions, self._action_functions)
+      for command_item in self._commands[group]:
+        if command_item.command_type == self._TYPE_COMMAND:
+          self._remove_command(
+            command_item.command_id, group, self._commands, self._command_functions)
         else:
-          self._remove_action(action_item.action_id, group, self._actions, self._invokers)
+          self._remove_command(command_item.command_id, group, self._commands, self._invokers)
       
-      for action_item in self._foreach_actions[group]:
-        self._remove_action(
-          action_item.action_id, group, self._foreach_actions, self._foreach_action_functions)
+      for command_item in self._foreach_commands[group]:
+        self._remove_command(
+          command_item.command_id, group, self._foreach_commands, self._foreach_command_functions)
       
-      del self._actions[group]
-      del self._foreach_actions[group]
+      del self._commands[group]
+      del self._foreach_commands[group]
   
   def _init_group(self, group):
-    if group not in self._actions:
-      self._actions[group] = []
-      self._foreach_actions[group] = []
+    if group not in self._commands:
+      self._commands[group] = []
+      self._foreach_commands[group] = []
   
-  def _add_action_to_group(self, action_item, group, position):
-    if action_item.action_type == self._TYPE_ACTION:
-      self._add_action(
-        action_item.action_id,
-        action_item.action[0],
+  def _add_command_to_group(self, command_item, group, position):
+    if command_item.command_type == self._TYPE_COMMAND:
+      self._add_command(
+        command_item.command_id,
+        command_item.command[0],
         group,
-        action_item.action[1],
-        action_item.action[2],
+        command_item.command[1],
+        command_item.command[2],
         position,
-        action_item.run_generator)
-    elif action_item.action_type == self._TYPE_FOREACH_ACTION:
-      self._add_foreach_action(
-        action_item.action_id,
-        action_item.action[0],
+        command_item.run_generator)
+    elif command_item.command_type == self._TYPE_FOREACH_COMMAND:
+      self._add_foreach_command(
+        command_item.command_id,
+        command_item.command[0],
         group,
-        action_item.action[1],
-        action_item.action[2],
+        command_item.command[1],
+        command_item.command[2],
         position,
-        action_item.run_generator)
-    elif action_item.action_type == self._TYPE_INVOKER:
-      self._add_invoker(action_item.action_id, action_item.action, group, position)
+        command_item.run_generator)
+    elif command_item.command_type == self._TYPE_INVOKER:
+      self._add_invoker(command_item.command_id, command_item.command, group, position)
   
-  def _add_action(
-        self, action_id, action, group, action_args, action_kwargs, position, run_generator):
+  def _add_command(
+        self, command_id, command, group, command_args, command_kwargs, position, run_generator):
     self._init_group(group)
     
-    action_item = self._set_action_item(
-      action_id,
+    command_item = self._set_command_item(
+      command_id,
       group,
-      (action, action_args, action_kwargs),
-      self._TYPE_ACTION,
-      action,
+      (command, command_args, command_kwargs),
+      self._TYPE_COMMAND,
+      command,
       run_generator)
     
     if position is None:
-      self._actions[group].append(action_item)
+      self._commands[group].append(command_item)
     else:
-      self._actions[group].insert(position, action_item)
+      self._commands[group].insert(position, command_item)
     
-    self._action_functions[group][action] += 1
+    self._command_functions[group][command] += 1
   
-  def _add_foreach_action(
+  def _add_foreach_command(
         self,
-        action_id,
-        foreach_action,
+        command_id,
+        foreach_command,
         group,
-        foreach_action_args,
-        foreach_action_kwargs,
+        foreach_command_args,
+        foreach_command_kwargs,
         position,
         run_generator):
     self._init_group(group)
     
-    if not inspect.isgeneratorfunction(foreach_action):
-      def invoke_foreach_action_after_action(*args, **kwargs):
+    if not inspect.isgeneratorfunction(foreach_command):
+      def invoke_foreach_command_after_command(*args, **kwargs):
         yield
-        foreach_action(*args, **kwargs)
+        foreach_command(*args, **kwargs)
       
-      foreach_action_generator_function = invoke_foreach_action_after_action
+      foreach_command_generator_function = invoke_foreach_command_after_command
     else:
-      foreach_action_generator_function = foreach_action
+      foreach_command_generator_function = foreach_command
     
-    action_item = self._set_action_item(
-      action_id,
+    command_item = self._set_command_item(
+      command_id,
       group,
-      (foreach_action_generator_function,
-       foreach_action_args,
-       foreach_action_kwargs),
-      self._TYPE_FOREACH_ACTION,
-      foreach_action,
+      (foreach_command_generator_function,
+       foreach_command_args,
+       foreach_command_kwargs),
+      self._TYPE_FOREACH_COMMAND,
+      foreach_command,
       run_generator)
     
     if position is None:
-      self._foreach_actions[group].append(action_item)
+      self._foreach_commands[group].append(command_item)
     else:
-      self._foreach_actions[group].insert(position, action_item)
+      self._foreach_commands[group].insert(position, command_item)
     
-    self._foreach_action_functions[group][foreach_action] += 1
+    self._foreach_command_functions[group][foreach_command] += 1
   
-  def _add_invoker(self, action_id, invoker, group, position):
+  def _add_invoker(self, command_id, invoker, group, position):
     self._init_group(group)
     
-    action_item = self._set_action_item(
-      action_id, group, invoker, self._TYPE_INVOKER, invoker, False)
+    command_item = self._set_command_item(
+      command_id, group, invoker, self._TYPE_INVOKER, invoker, False)
     
     if position is None:
-      self._actions[group].append(action_item)
+      self._commands[group].append(command_item)
     else:
-      self._actions[group].insert(position, action_item)
+      self._commands[group].insert(position, command_item)
     
     self._invokers[group][invoker] += 1
   
-  def _get_action_id(self):
-    return next(self._action_id_counter)
+  def _get_command_id(self):
+    return next(self._command_id_counter)
   
-  def _set_action_item(
+  def _set_command_item(
         self,
-        action_id,
+        command_id,
         group,
-        action,
-        action_type,
-        action_function,
+        command,
+        command_type,
+        command_function,
         run_generator):
-    if action_id not in self._action_items:
-      self._action_items[action_id] = _ActionItem(
-        action, action_id, None, action_type, action_function, run_generator)
+    if command_id not in self._command_items:
+      self._command_items[command_id] = _CommandItem(
+        command, command_id, None, command_type, command_function, run_generator)
     
-    self._action_items[action_id].groups.add(group)
+    self._command_items[command_id].groups.add(group)
     
-    return self._action_items[action_id]
+    return self._command_items[command_id]
   
-  def _remove_action(self, action_id, group, action_lists, action_functions):
-    action_item = self._action_items[action_id]
-    action_lists[group].remove(action_item)
+  def _remove_command(self, command_id, group, command_lists, command_functions):
+    command_item = self._command_items[command_id]
+    command_lists[group].remove(command_item)
     
-    action_functions[group][action_item.action_function] -= 1
-    if action_functions[group][action_item.action_function] == 0:
-      del action_functions[group][action_item.action_function]
+    command_functions[group][command_item.command_function] -= 1
+    if command_functions[group][command_item.command_function] == 0:
+      del command_functions[group][command_item.command_function]
     
-    self._remove_action_item(action_id, group)
+    self._remove_command_item(command_id, group)
   
-  def _remove_action_item(self, action_id, group):
-    self._action_items[action_id].groups.remove(group)
+  def _remove_command_item(self, command_id, group):
+    self._command_items[command_id].groups.remove(group)
     
-    if not self._action_items[action_id].groups:
-      del self._action_items[action_id]
+    if not self._command_items[command_id].groups:
+      del self._command_items[command_id]
   
   def _process_groups_arg(self, groups):
     if groups is None or groups == 'default':
@@ -708,29 +709,29 @@ class Invoker:
     else:
       return groups
   
-  def _get_action_type(self, action, is_foreach):
+  def _get_command_type(self, command, is_foreach):
     if is_foreach:
-      return self._TYPE_FOREACH_ACTION
+      return self._TYPE_FOREACH_COMMAND
     else:
-      if callable(action):
-        return self._TYPE_ACTION
+      if callable(command):
+        return self._TYPE_COMMAND
       else:
         return self._TYPE_INVOKER
   
-  def _get_action_lists_and_functions(self, action_type):
-    if action_type == self._TYPE_ACTION:
-      return self._actions, self._action_functions
-    elif action_type == self._TYPE_FOREACH_ACTION:
-      return self._foreach_actions, self._foreach_action_functions
-    elif action_type == self._TYPE_INVOKER:
-      return self._actions, self._invokers
+  def _get_command_lists_and_functions(self, command_type):
+    if command_type == self._TYPE_COMMAND:
+      return self._commands, self._command_functions
+    elif command_type == self._TYPE_FOREACH_COMMAND:
+      return self._foreach_commands, self._foreach_command_functions
+    elif command_type == self._TYPE_INVOKER:
+      return self._commands, self._invokers
     else:
       raise ValueError(
-        f'invalid action type {action_type}; must be one of {self._ACTION_TYPES}')
+        f'invalid command type {command_type}; must be one of {self._COMMAND_TYPES}')
   
-  def _check_action_id_is_valid(self, action_id):
-    if action_id not in self._action_items:
-      raise ValueError(f'action with ID {action_id} does not exist')
+  def _check_command_id_is_valid(self, command_id):
+    if command_id not in self._command_items:
+      raise ValueError(f'command with ID {command_id} does not exist')
   
   def _check_group_exists(self, group, groups=None):
     if groups is None:
@@ -739,20 +740,20 @@ class Invoker:
     if group not in groups:
       raise ValueError(f'group "{group}" does not exist')
   
-  def _check_action_in_group(self, action_id, group):
-    if group not in self._action_items[action_id].groups:
-      raise ValueError(f'action with ID {action_id} is not in group "{group}"')
+  def _check_command_in_group(self, command_id, group):
+    if group not in self._command_items[command_id].groups:
+      raise ValueError(f'command with ID {command_id} is not in group "{group}"')
 
 
-class _ActionItem:
+class _CommandItem:
   
-  def __init__(self, action, action_id, groups, action_type, action_function, run_generator):
-    self.action = action
-    self.action_id = action_id
+  def __init__(self, command, command_id, groups, command_type, command_function, run_generator):
+    self.command = command
+    self.command_id = command_id
     self.groups = groups if groups is not None else set()
     # noinspection PyProtectedMember
-    self.action_type = action_type if action_type is not None else Invoker._TYPE_ACTION
-    self.action_function = action_function
+    self.command_type = command_type if command_type is not None else Invoker._TYPE_COMMAND
+    self.command_function = command_function
     self.run_generator = run_generator
     
     self.is_generator = False
