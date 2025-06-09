@@ -134,6 +134,10 @@ def has_xcf_file(item, _image_batcher):
   return item.raw.get_xcf_file() is not None
 
 
+def has_no_xcf_file(item, image_batcher):
+  return not has_xcf_file(item, image_batcher)
+
+
 class MatchModes:
   MATCH_MODES = (
     STARTS_WITH,
@@ -387,6 +391,14 @@ _BUILTIN_CONSTRAINTS_LIST = [
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
     'display_name': _('XCF (native GIMP) file'),
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'not_xcf_file',
+    'type': 'constraint',
+    'function': has_no_xcf_file,
+    # FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
+    'display_name': _('Not XCF (native GIMP) file'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
 ]

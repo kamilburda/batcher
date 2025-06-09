@@ -140,3 +140,10 @@ Processes only images with no unsaved changes ("clean" images).
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images associated with an XCF file.
+
+### Not XCF (native GIMP) file
+
+*Only available for: Export Images, Edit and Save Images*
+
+Processes only images not associated with an XCF file.
+This includes imported images or new images created in GIMP.
