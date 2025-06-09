@@ -5,6 +5,8 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_actions_common
+from src.path import fileext
 from src.procedure_groups import *
 
 
@@ -38,6 +40,13 @@ def merge_visible_layers(image_batcher, merge_type):
   for layer in image.get_layers():
     if not layer.get_visible():
       image.remove_layer(layer)
+
+
+def remove_file_extension_from_imported_images(image_batcher):
+  image = image_batcher.current_item.raw
+
+  if image.get_imported_file() is not None and image.get_xcf_file() is None:
+    image_batcher.current_item.name = fileext.get_filename_root(image_batcher.current_item.name)
 
 
 APPLY_OPACITY_FROM_GROUP_LAYERS_DICT = {
@@ -83,4 +92,12 @@ MERGE_VISIBLE_LAYERS_DICT = {
       'display_name': _('Merge type'),
     },
   ],
+}
+
+REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT = {
+  'name': 'remove_file_extension_from_imported_images',
+  'function': remove_file_extension_from_imported_images,
+  'display_name': _('Remove file extension from imported images'),
+  'description': _('Imported images represent non-native GIMP files (i.e. not XCF).'),
+  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
 }

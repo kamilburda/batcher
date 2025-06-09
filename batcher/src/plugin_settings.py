@@ -397,6 +397,11 @@ def create_settings_for_edit_and_save_images():
 
   settings.add([gui_settings])
 
+  remove_file_extension_from_imported_images_procedure_dict = utils.semi_deep_copy(
+    builtin_procedures.BUILTIN_PROCEDURES['remove_file_extension_from_imported_images'])
+  remove_file_extension_from_imported_images_procedure_dict['enabled'] = True
+  remove_file_extension_from_imported_images_procedure_dict['display_options_on_create'] = False
+
   rename_procedure_dict = utils.semi_deep_copy(
     builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_and_save_images'])
   rename_procedure_dict['enabled'] = True
@@ -411,6 +416,7 @@ def create_settings_for_edit_and_save_images():
     actions_.create(
       name='procedures',
       initial_actions=[
+        remove_file_extension_from_imported_images_procedure_dict,
         rename_procedure_dict,
         save_procedure_dict,
       ]),
