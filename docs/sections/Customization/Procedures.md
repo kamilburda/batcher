@@ -138,11 +138,18 @@ Merges all visible filters (layer effects) in the specified layer.
 
 ### Merge visible layers
 
-*Only available for: Batch Convert, Export Images*
+*Only available for: Batch Convert, Export Images, Edit and Save Images*
 
 Merges all visible layers within the image into a single layer. Invisible layers are removed.
 
 This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other procedures on the entire image.
+
+### Remove file extension from imported images
+
+*Only available for: Edit and Save Images*
+
+Removes the file extension from images opened in GIMP that were imported from a non-native file format (i.e. not XCF). Native XCF files and new images are kept intact.
+
 
 ### Remove folder structure
 
@@ -203,6 +210,21 @@ Options:
 * *Flip horizontally*: Flips the image/layer horizontally.
 * *Flip vertically*: Flips the image/layer vertically.
 
+### Save
+
+*Only available for: Edit and Save Images*
+
+Saves the images in the native GIMP (XCF) file format.
+
+If the image already exists, it is overwritten.
+
+Images that were imported or created within GIMP are renamed in the GIMP title bar to contain the `.xcf` file extension. The images are marked as having no unsaved changes.
+
+To export the image in another file format, use the "Export Images" menu.
+
+Options:
+* *Output folder*: Folder to save images to.
+* *Save existing XCF image to its original location (ignore "Output folder")*: If checked, existing XCF images will be saved to their respective folders. If an existing image was renamed via the `Rename` procedure, it will be saved to the same folder under the new name. If unchecked, all images are saved to *Output folder*. 
 
 ### Scale
 

@@ -67,7 +67,7 @@ In this case, any constraints set in the [main dialog](#exporting-layers) will b
 
 ## Exporting Images Opened in GIMP
 
-Open an image in GIMP and select `File → Export Images...`.
+If you have multiple images opened in GIMP, you can use `File → Export Images...` to export them to the specified file format.
 
 A dialog appears that allows you to adjust export settings, such as the output folder, filenames and the file extension.
 
@@ -75,7 +75,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 
 To export images, simply press the `Export` button.
 
-Note that this feature exports images to another file format. It does not mass-save XCF images in their original locations.
+Note that this feature exports images to another file format. If you intend to batch-save XCF images in their original locations, use `File → Edit and Save Images...` instead.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
 For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
@@ -94,6 +94,28 @@ This dialog can be skipped by simply unchecking `Show this dialog`.
 Note that even procedures and constraints set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
 
 
+## Editing and Saving Images Opened in GIMP
+
+`File → Edit and Save Images...` allows you to batch-edit and save all opened images in place.
+
+![Dialog of Edit ans Save Images](../assets/images/screenshot_dialog_edit_and_save_images.png){: .align-center}
+
+Both editing and saving are optional, i.e. you can perform only saving, or only editing as needed.
+If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
+
+To edit and/or save images, press the `Run` button.
+
+If you intend to batch-export images to another file format, use `File → Export Images...` instead.
+
+If you intend to edit each layer within an image individually instead of images as a whole, use `File → Edit Layers...` instead.
+
+
+### Quick Image Editing and Saving
+
+You can quickly run batch editing and saving of images via `File → Edit and Save Images (Quick)`.
+This can be useful if you e.g. made changes to your images and you want to save them all with the same settings.
+
+
 ## Editing Layers
 
 Open an image in GIMP and select `File → Edit Layers...`.
@@ -105,7 +127,7 @@ This will apply procedures to each layer satisfying the activated constraints.
 
 You can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
 
-If the `Layers` constraint is unchecked, group layers will also be processed. The group layers will be copied and inserted as regular layers to work around the fact that some procedures cannot be applied on group layers.
+If the `Layers` constraint is unchecked, group layers will also be processed.
 
 
 ### Quick Layer Editing

@@ -46,10 +46,11 @@ SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_CONVERT_FILENAME = 'screenshot_dialog_convert.png'
 SCREENSHOT_DIALOG_EXPORT_IMAGES_FILENAME = 'screenshot_dialog_export_images.png'
 SCREENSHOT_DIALOG_EXPORT_IMAGES_QUICK_FILENAME = 'screenshot_dialog_export_images_quick.png'
+SCREENSHOT_DIALOG_EDIT_AND_SAVE_IMAGES_FILENAME = 'screenshot_dialog_edit_and_save_images.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME = 'screenshot_dialog_export_layers_quick.png'
-SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
+SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
 
 _WAIT_TIME_FOR_PREVIEW_SECONDS = 0.2
 
@@ -112,6 +113,17 @@ def main():
     'image',
     title='Export Images (Quick)',
     run_gui_func=take_screenshots_for_export_images_quick,
+  )
+
+  pg.config.PROCEDURE_GROUP = EDIT_AND_SAVE_IMAGES_GROUP
+
+  gui_main.BatchProcessingGui(
+    gimp_image_tree,
+    plugin_settings.create_settings_for_edit_and_save_images(),
+    'edit',
+    'image',
+    title='Edit and Save Images',
+    run_gui_func=take_screenshots_for_edit_and_save_images,
   )
 
   for image in images:
@@ -228,6 +240,30 @@ def take_screenshots_for_export_images_quick(_gui, dialog, settings):
     settings,
     decoration_offsets,
     crop_to=dialog.get_size(),
+  )
+
+
+def take_screenshots_for_edit_and_save_images(gui, dialog, settings):
+  decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
+
+  _wait_until_preview_is_updated(n_repetitions=2)
+
+  dialog.set_focus(None)
+
+  selected_item = next(
+    iter(
+      item.raw for item in gui.name_preview.batcher.item_tree
+      if item.raw.get_name().startswith('main-background')))
+
+  gui.name_preview.set_selected_items([selected_item.get_id()])
+
+  _wait_until_preview_is_updated()
+
+  take_and_process_screenshot(
+    SCREENSHOTS_DIRPATH,
+    SCREENSHOT_DIALOG_EDIT_AND_SAVE_IMAGES_FILENAME,
+    settings,
+    decoration_offsets,
   )
 
 
