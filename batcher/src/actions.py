@@ -252,7 +252,8 @@ def add(
   if action_dict is not None:
     _check_required_fields(action_dict)
 
-    action_dict['orig_name'] = action_dict['name']
+    if 'orig_name' not in action_dict:
+      action_dict['orig_name'] = action_dict['name']
 
     orig_action_dict = utils.semi_deep_copy(action_dict)
 
@@ -586,6 +587,7 @@ def get_action_dict_from_pdb_procedure(
   action_dict = {
     'name': _sanitize_pdb_procedure_name(pdb_procedure_name),
     'function': pdb_procedure_name,
+    'orig_name': pdb_procedure_name,
     'origin': origin,
     'arguments': arguments,
     'display_name': _get_pdb_procedure_display_name(pdb_procedure),
