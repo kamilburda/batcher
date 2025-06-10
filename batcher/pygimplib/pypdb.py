@@ -40,34 +40,46 @@ class _PyPDB:
     return self._last_error
 
   def __getattr__(self, name: str) -> 'PDBProcedure':
-    proc_name = self.python_name_to_canonical_name(name)
+    canonical_name = self.python_name_to_canonical_name(name)
 
-    if proc_name not in self._proc_cache:
-      self._proc_cache[proc_name] = self._create_proc(proc_name)
+    if canonical_name in self._proc_cache:
+      return self._proc_cache[canonical_name]
+    elif name in self._proc_cache:
+      return self._proc_cache[name]
+    else:
+      proc, proc_name = self._create_proc(canonical_name, name)
+      self._proc_cache[proc_name] = proc
 
-    return self._proc_cache[proc_name]
+      return self._proc_cache[proc_name]
 
   def __getitem__(self, name: str) -> 'PDBProcedure':
-    proc_name = self.python_name_to_canonical_name(name)
+    canonical_name = self.python_name_to_canonical_name(name)
 
-    if proc_name not in self._proc_cache:
-      self._proc_cache[proc_name] = self._create_proc(proc_name)
+    if canonical_name in self._proc_cache:
+      return self._proc_cache[canonical_name]
+    elif name in self._proc_cache:
+      return self._proc_cache[name]
+    else:
+      proc, proc_name = self._create_proc(canonical_name, name)
+      self._proc_cache[proc_name] = proc
 
-    return self._proc_cache[proc_name]
+      return self._proc_cache[proc_name]
 
   def __contains__(self, name: Optional[str]) -> bool:
     if name is None:
       return False
 
-    proc_name = self.python_name_to_canonical_name(name)
+    canonical_name = self.python_name_to_canonical_name(name)
 
-    if proc_name not in self._proc_cache:
+    if canonical_name not in self._proc_cache or name not in self._proc_cache:
       try:
-        self._proc_cache[proc_name] = self._create_proc(proc_name)
+        proc, proc_name = self._create_proc(canonical_name, name)
       except AttributeError:
         return False
 
-    return proc_name in self._proc_cache
+      self._proc_cache[proc_name] = proc
+
+    return True
 
   @staticmethod
   def list_all_gegl_operations():
@@ -95,13 +107,15 @@ class _PyPDB:
     except KeyError:
       pass
 
-  def _create_proc(self, proc_name):
-    if self._gimp_pdb_procedure_exists(proc_name):
-      return GimpPDBProcedure(self, proc_name)
-    elif self._gegl_operation_exists(proc_name):
-      return GeglProcedure(self, proc_name)
+  def _create_proc(self, canonical_name, orig_name):
+    if self._gimp_pdb_procedure_exists(canonical_name):
+      return GimpPDBProcedure(self, canonical_name), canonical_name
+    elif self._gegl_operation_exists(orig_name):
+      return GeglProcedure(self, orig_name), orig_name
+    elif self._gegl_operation_exists(canonical_name):
+      return GeglProcedure(self, canonical_name), canonical_name
     else:
-      raise AttributeError(f'procedure "{proc_name}" does not exist')
+      raise AttributeError(f'procedure "{orig_name}" does not exist')
 
   @staticmethod
   def python_name_to_canonical_name(name):
