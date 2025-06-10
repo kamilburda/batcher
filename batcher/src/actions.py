@@ -584,7 +584,7 @@ def get_action_dict_from_pdb_procedure(
     _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments)
 
   action_dict = {
-    'name': pdb_procedure_name,
+    'name': _sanitize_pdb_procedure_name(pdb_procedure_name),
     'function': pdb_procedure_name,
     'origin': origin,
     'arguments': arguments,
@@ -611,6 +611,14 @@ def _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments):
         argument_dict['tags'] = []
 
       argument_dict['tags'].append(MORE_OPTIONS_TAG)
+
+
+def _sanitize_pdb_procedure_name(pdb_procedure_name):
+  return (
+    pdb_procedure_name
+      .replace(pg.setting.SETTING_PATH_SEPARATOR, '_')
+      .replace(pg.setting.SETTING_ATTRIBUTE_SEPARATOR, '_')
+  )
 
 
 def _get_pdb_procedure_display_name(pdb_procedure):
