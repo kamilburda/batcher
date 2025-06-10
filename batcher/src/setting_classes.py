@@ -227,6 +227,8 @@ class DimensionSetting(pg.setting.NumericSetting):
     },
   }
 
+  _PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR = ','
+
   def __init__(self, name, percent_placeholder_names: Iterable[str], **kwargs):
     """Additional parameters:
 
@@ -280,6 +282,18 @@ class DimensionSetting(pg.setting.NumericSetting):
     else:
       raw_value['unit'] = self._default_value['unit']
 
+    if 'percent_property' in raw_value:
+      new_percent_property_dict = {}
+
+      for key, value in raw_value['percent_property'].items():
+        if isinstance(key, str):
+          new_percent_property_dict[
+            tuple(key.split(self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR))] = value
+        else:
+          new_percent_property_dict[key] = value
+
+      raw_value['percent_property'] = new_percent_property_dict
+
     return raw_value
 
   def _value_to_raw(self, value):
@@ -287,6 +301,17 @@ class DimensionSetting(pg.setting.NumericSetting):
     if 'unit' in processed_value:
       processed_value['unit'] = pg.setting.UnitSetting.unit_to_raw_data(
         processed_value['unit'], self._built_in_units)
+
+    if 'percent_property' in processed_value:
+      new_percent_property_dict = {}
+      for key, value in processed_value['percent_property'].items():
+        if isinstance(key, str):
+          new_percent_property_dict[key] = value
+        else:
+          new_percent_property_dict[
+            self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR.join(key)] = value
+
+      processed_value['percent_property'] = new_percent_property_dict
 
     return processed_value
 
