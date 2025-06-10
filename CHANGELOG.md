@@ -44,6 +44,7 @@ Bug fixes:
 * Fixed the `Scale` procedure always considering the layer size when keeping aspect ratio or scaling to fit dimensions.
 * Fixed the output folder button not filling the empty space when increasing the dialog width.
 * Fixed warnings when exporting layers or images opened in GIMP that are not native GIMP images (XCF).
+* Fixed URL to the Batcher user guide via the Help button.
 
 
 ## 1.0.2
