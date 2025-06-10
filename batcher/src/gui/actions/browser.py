@@ -195,7 +195,12 @@ class ActionBrowser(GObject.GObject):
       actions_.get_action_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
 
     for procedure, action_dict in zip(pdb_procedures, action_dicts):
-      procedure_name = action_dict['name']
+      if isinstance(action_dict['function'], str):
+        # We are sanitizing the action name as it can contain characters not
+        # allowed in `pygimplib.setting.Setting`.
+        procedure_name = action_dict['function']
+      else:
+        procedure_name = action_dict['name']
 
       if isinstance(procedure, pg.pypdb.GeglProcedure):
         if not is_gegl_operation_hidden(procedure_name):
