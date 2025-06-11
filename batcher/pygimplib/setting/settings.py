@@ -2448,10 +2448,12 @@ class FileSetting(Setting):
         name: str,
         action: Union[Gimp.FileChooserAction, int],
         none_ok: bool = True,
+        set_default_if_not_exists: bool = False,
         **kwargs,
   ):
     self._action = self._process_action(action)
     self._none_ok = none_ok
+    self._set_default_if_not_exists = set_default_if_not_exists
 
     super().__init__(name, **kwargs)
 
@@ -2468,6 +2470,14 @@ class FileSetting(Setting):
   def none_ok(self):
     """If ``True``, ``None`` is allowed as a valid value for this setting."""
     return self._none_ok
+
+  @property
+  def set_default_if_not_exists(self):
+    """If ``True`` and the file is not valid (does not exist), it will be
+    replaced by the default value. Applies only when interacting with the
+    setting via GUI.
+    """
+    return self._set_default_if_not_exists
 
   def to_dict(self):
     settings_dict = super().to_dict()

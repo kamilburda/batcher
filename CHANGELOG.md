@@ -18,6 +18,7 @@ New features:
 Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
 * Batch Convert: Increased the initial preview height.
+* If the output directory no longer exists and Batcher is started, the output directory is set to the Pictures folder (or another folder that is guaranteed to exist). Previously, "(None)" was displayed, which was confusing.
 
 Changes to procedures and constraints:
 * You can now apply procedures to layers inserted by procedures other than `Insert background` or `Insert foreground`, e.g. `gimp-text-font` (which renders a text layer), by selecting `Layer Below (Background)` or `Layer Above (Foreground)` (depending on whether the layer is inserted before or after the current layer).

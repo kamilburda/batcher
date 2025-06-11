@@ -353,6 +353,8 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/output_directory'].action, Gimp.FileChooserAction.SELECT_FOLDER)
 
   def _assert_correct_contents_for_update_to_1_1(self, settings):
+    self.assertEqual(settings['main/output_directory'].set_default_if_not_exists, True)
+
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 
     self.assertListEqual(

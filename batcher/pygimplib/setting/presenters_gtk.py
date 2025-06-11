@@ -2,6 +2,7 @@
 
 import inspect
 import math
+import os
 import sys
 
 import gi
@@ -9,6 +10,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
@@ -723,7 +725,17 @@ class FileChooserPresenter(GtkPresenter):
     return self._widget.get_file()
 
   def _set_value(self, value):
-    self._widget.set_file(value)
+    if not self.setting.set_default_if_not_exists:
+      self._widget.set_file(value)
+    else:
+      if value is not None and os.path.isdir(value.get_path()):
+        self._widget.set_file(value)
+      else:
+        default_directory = self.setting.default_value
+        if default_directory is not None and os.path.isdir(default_directory.get_path()):
+          self._widget.set_file(default_directory)
+        else:
+          self._widget.set_file(Gio.file_new_for_uri(''))
 
 
 class GBytesEntryPresenter(GtkPresenter):

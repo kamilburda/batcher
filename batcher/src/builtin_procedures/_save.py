@@ -128,6 +128,7 @@ SAVE_DICT = {
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'none_ok': False,
+      'set_default_if_not_exists': True,
       'gui_type_kwargs': {
         'show_clear_button': False,
       },
