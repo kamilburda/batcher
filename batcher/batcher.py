@@ -373,7 +373,10 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
 
 
 def _load_inputs(item_tree, filepath, max_num_inputs):
-  if not os.path.isfile(filepath):
+  if filepath is None:
+    return (
+      Gimp.PDBStatusType.EXECUTION_ERROR, f'File containing inputs is not specified')
+  elif not os.path.isfile(filepath):
     return (
       Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
 
