@@ -364,6 +364,7 @@ class TestUpdateHandlers(unittest.TestCase):
       self.assertNotIn('action_groups', command)
       self.assertIn('command_groups', command)
       self.assertIn('command', command.tags)
+      self.assertNotIn('action', command.tags)
 
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 
