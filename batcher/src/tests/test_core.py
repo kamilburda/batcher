@@ -9,7 +9,7 @@ from gi.repository import GObject
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-from src import actions as actions_
+from src import commands as commands_
 from src import core
 from src import builtin_procedures
 from src import invoker as invoker_
@@ -17,9 +17,9 @@ from src import plugin_settings
 from src import utils as utils_
 
 
-class TestBatcherInitialActions(unittest.TestCase):
+class TestBatcherInitialCommands(unittest.TestCase):
   
-  def test_add_procedure_added_procedure_is_first_in_action_list(self):
+  def test_add_procedure_added_procedure_is_first_in_command_list(self):
     settings = plugin_settings.create_settings_for_export_layers()
     settings['main/file_extension'].set_value('xcf')
     
@@ -30,11 +30,11 @@ class TestBatcherInitialActions(unittest.TestCase):
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
-    actions_.add(
+    commands_.add(
       settings['main/procedures'],
       builtin_procedures.BUILTIN_PROCEDURES['insert_background_for_layers'])
     
-    batcher.add_procedure(pg.utils.empty_func, [actions_.DEFAULT_PROCEDURES_GROUP])
+    batcher.add_procedure(pg.utils.empty_func, [commands_.DEFAULT_PROCEDURES_GROUP])
     
     batcher.run(
       is_preview=True,
@@ -43,25 +43,25 @@ class TestBatcherInitialActions(unittest.TestCase):
       process_export=False,
       **utils_.get_settings_for_batcher(settings['main']))
     
-    added_action_items = batcher.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
     
     # Includes built-in procedures added by default
-    self.assertEqual(len(added_action_items), 6)
+    self.assertEqual(len(added_command_items), 6)
     
-    initial_invoker = added_action_items[1]
+    initial_invoker = added_command_items[1]
     self.assertIsInstance(initial_invoker, invoker_.Invoker)
     
-    actions_in_initial_invoker = initial_invoker.list_commands(
-      group=actions_.DEFAULT_PROCEDURES_GROUP)
-    self.assertEqual(len(actions_in_initial_invoker), 1)
-    self.assertEqual(actions_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
+    commands_in_initial_invoker = initial_invoker.list_commands(
+      group=commands_.DEFAULT_PROCEDURES_GROUP)
+    self.assertEqual(len(commands_in_initial_invoker), 1)
+    self.assertEqual(commands_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
 
 
 @mock.patch(
   f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
   return_value=pg.tests.stubs_gimp.PdbStub,
 )
-class TestAddActionFromSettings(unittest.TestCase):
+class TestAddCommandFromSettings(unittest.TestCase):
   
   def setUp(self):
     self.batcher = core.LayerBatcher(
@@ -76,7 +76,7 @@ class TestAddActionFromSettings(unittest.TestCase):
     
     self.batcher._invoker = self.invoker
     
-    self.procedures = actions_.create('procedures')
+    self.procedures = commands_.create('procedures')
 
     self.procedure_name = 'file-png-export'
 
@@ -93,54 +93,54 @@ class TestAddActionFromSettings(unittest.TestCase):
           value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
       blurb='Saves files in PNG file format')
 
-    actions_.pdb.remove_from_cache(self.procedure_name)
+    commands_.pdb.remove_from_cache(self.procedure_name)
   
-  def test_add_action_from_settings(self, mock_get_pdb):
-    procedure = actions_.add(
+  def test_add_command_from_settings(self, mock_get_pdb):
+    procedure = commands_.add(
       self.procedures, builtin_procedures.BUILTIN_PROCEDURES['insert_background_for_layers'])
     
-    self.batcher._add_action_from_settings(procedure)
+    self.batcher._add_command_from_settings(procedure)
     
-    added_action_items = self.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
     
-    self.assertEqual(len(added_action_items), 1)
+    self.assertEqual(len(added_command_items), 1)
     self.assertEqual(
-      added_action_items[0][1],
+      added_command_items[0][1],
       list(procedure['arguments'])
       + [builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS['insert_background_for_layers']])
-    self.assertEqual(added_action_items[0][2], {})
+    self.assertEqual(added_command_items[0][2], {})
   
-  def test_add_pdb_proc_as_action_without_run_mode(self, mock_get_pdb):
+  def test_add_pdb_proc_as_command_without_run_mode(self, mock_get_pdb):
     self.procedure_stub_kwargs['arguments_spec'] = self.procedure_stub_kwargs['arguments_spec'][1:]
 
     procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
-    self._test_add_pdb_proc_as_action(procedure_stub, [('save-options', ()), ('filename', '')], {})
+    self._test_add_pdb_proc_as_command(procedure_stub, [('save-options', ()), ('filename', '')], {})
   
-  def test_add_pdb_proc_as_action_with_run_mode(self, mock_get_pdb):
+  def test_add_pdb_proc_as_command_with_run_mode(self, mock_get_pdb):
     procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
-    self._test_add_pdb_proc_as_action(
+    self._test_add_pdb_proc_as_command(
       procedure_stub, [('run-mode', 0), ('save-options', ()), ('filename', '')], {})
   
-  def _test_add_pdb_proc_as_action(
+  def _test_add_pdb_proc_as_command(
         self, pdb_procedure, expected_arg_names_and_values, expected_kwargs):
-    procedure = actions_.add(self.procedures, pdb_procedure.get_name())
+    procedure = commands_.add(self.procedures, pdb_procedure.get_name())
 
-    self.batcher._add_action_from_settings(procedure)
+    self.batcher._add_command_from_settings(procedure)
     
-    added_action_items = self.invoker.list_commands(group=actions_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
     
-    added_action_item_names_and_values = [
-      (setting.name, setting.value) for setting in added_action_items[0][1][:-1]
+    added_command_item_names_and_values = [
+      (setting.name, setting.value) for setting in added_command_items[0][1][:-1]
     ]
     
-    self.assertEqual(len(added_action_items), 1)
-    self.assertEqual(added_action_item_names_and_values, added_action_item_names_and_values)
-    self.assertEqual(added_action_items[0][1][-1], pg.pdb[pdb_procedure.get_name()])
-    self.assertDictEqual(added_action_items[0][2], expected_kwargs)
+    self.assertEqual(len(added_command_items), 1)
+    self.assertEqual(added_command_item_names_and_values, added_command_item_names_and_values)
+    self.assertEqual(added_command_items[0][1][-1], pg.pdb[pdb_procedure.get_name()])
+    self.assertDictEqual(added_command_items[0][2], expected_kwargs)
 
 
 class TestGetReplacedArgsAndKwargs(unittest.TestCase):
@@ -162,14 +162,14 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     batcher.current_image = image
     batcher.current_layer = layer
 
-    actions = actions_.create('procedures')
-    actions_.add(actions, {
+    commands = commands_.create('procedures')
+    commands_.add(commands, {
       'name': 'autocrop',
       'type': 'procedure',
       'function': '',
       'enabled': True,
       'display_name': 'Autocrop',
-      'action_groups': ['basic'],
+      'command_groups': ['basic'],
       'arguments': [
         {
           'type': 'enum',
@@ -211,7 +211,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
       ],
     })
     
-    replaced_args, replaced_kwargs = batcher._get_replaced_args(actions['autocrop/arguments'], True)
+    replaced_args, replaced_kwargs = batcher._get_replaced_args(commands['autocrop/arguments'], True)
 
     self.assertFalse(replaced_args)
 

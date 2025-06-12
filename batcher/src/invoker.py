@@ -19,7 +19,7 @@ class Invoker:
   * grouping commands and invoking only commands in specified groups,
   * adding commands to be invoked before or after each command, hereinafter
     "for-each commands",
-  * adding another `Invoker` instance as an command (i.e. nesting the current
+  * adding another `Invoker` instance as a command (i.e. nesting the current
     instance inside another instance).
   """
   
@@ -57,7 +57,7 @@ class Invoker:
         position: Optional[int] = None,
         run_generator: bool = True,
   ) -> Optional[int]:
-    """Adds an command to be invoked by `invoke()`.
+    """Adds a command to be invoked by `invoke()`.
 
     The ID of the newly added command is returned.
     
@@ -389,7 +389,7 @@ class Invoker:
     return found_command_ids
   
   def has_command(self, command_id: int, groups: Union[None, str, List[str]] = None) -> bool:
-    """Returns ``True`` if an command exists in at least one of the specified
+    """Returns ``True`` if a command exists in at least one of the specified
     groups, ``False`` otherwise.
 
     The command is specified by its ID returned from `add()`.
@@ -405,7 +405,7 @@ class Invoker:
               for group in self._process_groups_arg(groups)))
   
   def get_command(self, command_id: int) -> Union[Callable, Invoker, None]:
-    """Returns an command specified by its ID.
+    """Returns a command specified by its ID.
 
     If the ID is not valid, ``None`` is returned.
     """
@@ -476,7 +476,7 @@ class Invoker:
       return [group for group in self._commands if _is_group_non_empty(group)]
   
   def reorder(self, command_id: int, position: int, group: Optional[str] = None):
-    """Change the order in which an command is invoked.
+    """Change the order in which a command is invoked.
     
     The command is specified by its ID (as returned by `add()`).
     
@@ -513,7 +513,7 @@ class Invoker:
         command_id: int,
         groups: Union[None, str, List[str]] = None,
         ignore_if_not_exists: bool = False):
-    """Removes an command specified by its ID from the specified groups.
+    """Removes a command specified by its ID from the specified groups.
     
     For information about the ``groups`` parameter, see `has_command()`.
     

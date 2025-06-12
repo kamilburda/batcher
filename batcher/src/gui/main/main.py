@@ -19,7 +19,7 @@ from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
 
-from src.gui.main import action_lists as action_lists_
+from src.gui.main import command_lists as command_lists_
 from src.gui.main import batcher_manager as batcher_manager_
 from src.gui.main import export_settings as export_settings_
 from src.gui.main import previews as previews_
@@ -80,11 +80,11 @@ class BatchProcessingGui:
 
   @property
   def procedure_list(self):
-    return self._action_lists.procedure_list
+    return self._command_lists.procedure_list
 
   @property
   def constraint_list(self):
-    return self._action_lists.constraint_list
+    return self._command_lists.constraint_list
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
@@ -129,7 +129,7 @@ class BatchProcessingGui:
     else:
       self._export_settings = None
 
-    self._action_lists = action_lists_.ActionLists(
+    self._command_lists = command_lists_.CommandLists(
       self._settings,
       self._dialog,
     )
@@ -139,8 +139,8 @@ class BatchProcessingGui:
       spacing=self._VBOX_SETTINGS_SPACING,
     )
 
-    self._vbox_settings.pack_start(self._action_lists.vbox_procedures, False, False, 0)
-    self._vbox_settings.pack_start(self._action_lists.vbox_constraints, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_procedures, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_constraints, False, False, 0)
 
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -221,7 +221,7 @@ class BatchProcessingGui:
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
     self._dialog.connect('delete-event', self._on_dialog_delete_event)
 
-    self._previews.connect_events(self._action_lists, self._hpaned_settings_and_previews)
+    self._previews.connect_events(self._command_lists, self._hpaned_settings_and_previews)
 
   def _finish_init_and_show(self):
     self._previews.controller.initialize_inputs_in_name_preview()
@@ -233,7 +233,7 @@ class BatchProcessingGui:
     if self._mode == 'export':
       self._dialog.set_focus(self._export_settings.file_extension_entry)
     else:
-      self._dialog.set_focus(self._action_lists.procedure_list.button_add)
+      self._dialog.set_focus(self._command_lists.procedure_list.button_add)
 
     self._button_run.grab_default()
 
@@ -284,7 +284,7 @@ class BatchProcessingGui:
     should_quit = self._batcher_manager.run_batcher(
       self._mode,
       self._item_type,
-      self._action_lists,
+      self._command_lists,
       self._previews,
       self._settings_manager,
       self._dialog,
@@ -299,8 +299,8 @@ class BatchProcessingGui:
   def _set_up_gui_before_run(self):
     self._display_inline_message(None)
 
-    self._action_lists.reset_action_tooltips_and_indicators()
-    self._action_lists.close_action_edit_dialogs()
+    self._command_lists.reset_command_tooltips_and_indicators()
+    self._command_lists.close_command_edit_dialogs()
 
     self._set_gui_enabled(False)
 

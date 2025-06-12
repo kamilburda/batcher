@@ -109,8 +109,8 @@ class PreviewsController:
       self._name_preview.update)
 
   def connect_setting_changes_to_previews(self):
-    self._connect_actions_changed(self._settings['main/procedures'])
-    self._connect_actions_changed(self._settings['main/constraints'])
+    self._connect_commands_changed(self._settings['main/procedures'])
+    self._connect_commands_changed(self._settings['main/constraints'])
 
     self._connect_setting_show_original_item_names_changed_in_name_preview()
     self._connect_setting_load_save_inputs_interactive_in_name_preview()
@@ -124,61 +124,61 @@ class PreviewsController:
 
     self._connect_focus_changes_for_plugin_windows()
 
-  def _connect_actions_changed(self, actions):
-    # We store event IDs in lists in case the same action is added multiple times.
+  def _connect_commands_changed(self, commands):
+    # We store event IDs in lists in case the same command is added multiple times.
     settings_and_event_ids = collections.defaultdict(lambda: collections.defaultdict(list))
 
-    def _on_after_add_action(_actions, action_, _action_dict):
-      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
+    def _on_after_add_command(_commands, command_, _command_dict):
+      self._update_previews_on_setting_change_if_enabled(command_['enabled'], command_)
 
-      settings_and_event_ids[action_]['enabled'].append(
-        action_['enabled'].connect_event(
-          'value-changed', self._update_previews_on_setting_change, action_))
+      settings_and_event_ids[command_]['enabled'].append(
+        command_['enabled'].connect_event(
+          'value-changed', self._update_previews_on_setting_change, command_))
 
-      for setting in action_['arguments']:
-        settings_and_event_ids[action_][f'arguments/{setting.name}'].append(
+      for setting in command_['arguments']:
+        settings_and_event_ids[command_][f'arguments/{setting.name}'].append(
           setting.connect_event(
-            'value-changed', self._update_previews_on_setting_change_if_enabled, action_))
+            'value-changed', self._update_previews_on_setting_change_if_enabled, command_))
 
-      for setting in action_['more_options']:
-        settings_and_event_ids[action_][f'more_options/{setting.name}'].append(
+      for setting in command_['more_options']:
+        settings_and_event_ids[command_][f'more_options/{setting.name}'].append(
           setting.connect_event(
-            'value-changed', self._update_previews_on_setting_change_if_enabled, action_))
+            'value-changed', self._update_previews_on_setting_change_if_enabled, command_))
     
-    def _on_after_reorder_action(_actions, action_, *_args, **_kwargs):
-      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
+    def _on_after_reorder_command(_commands, command_, *_args, **_kwargs):
+      self._update_previews_on_setting_change_if_enabled(command_['enabled'], command_)
     
-    def _on_before_remove_action(_actions, action_, *_args, **_kwargs):
-      self._update_previews_on_setting_change_if_enabled(action_['enabled'], action_)
+    def _on_before_remove_command(_commands, command_, *_args, **_kwargs):
+      self._update_previews_on_setting_change_if_enabled(command_['enabled'], command_)
 
-      should_remove_action_from_event_ids = False
+      should_remove_command_from_event_ids = False
 
-      for setting_path, event_ids in settings_and_event_ids[action_].items():
+      for setting_path, event_ids in settings_and_event_ids[command_].items():
         if event_ids:
-          action_[setting_path].remove_event(event_ids[-1])
+          command_[setting_path].remove_event(event_ids[-1])
           event_ids.pop()
           # We do not have to separately check if each list is empty as they are all updated at
           # once.
-          should_remove_action_from_event_ids = True
+          should_remove_command_from_event_ids = True
 
-      if should_remove_action_from_event_ids:
-        del settings_and_event_ids[action_]
+      if should_remove_command_from_event_ids:
+        del settings_and_event_ids[command_]
     
-    actions.connect_event('after-add-action', _on_after_add_action)
+    commands.connect_event('after-add-command', _on_after_add_command)
 
-    # Activate event for existing actions
-    for action in actions:
-      _on_after_add_action(actions, action, None)
+    # Activate event for existing commands
+    for command in commands:
+      _on_after_add_command(commands, command, None)
 
-    actions.connect_event('after-reorder-action', _on_after_reorder_action)
-    actions.connect_event('before-remove-action', _on_before_remove_action)
+    commands.connect_event('after-reorder-command', _on_after_reorder_command)
+    commands.connect_event('before-remove-command', _on_before_remove_command)
 
-  def _update_previews_on_setting_change_if_enabled(self, setting, action):
-    if action['enabled'].value:
-      self._update_previews_on_setting_change(setting, action)
+  def _update_previews_on_setting_change_if_enabled(self, setting, command):
+    if command['enabled'].value:
+      self._update_previews_on_setting_change(setting, command)
 
-  def _update_previews_on_setting_change(self, setting, action):
-    if (not action['more_options/enabled_for_previews'].value
+  def _update_previews_on_setting_change(self, setting, command):
+    if (not command['more_options/enabled_for_previews'].value
         and setting.name != 'enabled_for_previews'):
       return
 

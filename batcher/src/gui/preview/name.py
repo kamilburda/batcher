@@ -379,9 +379,9 @@ class NamePreview(preview_base_.Preview):
         **utils_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
-    except exceptions.ActionError as e:
+    except exceptions.CommandError as e:
       messages_.display_failure_message(
-        messages_.get_failing_action_message(e),
+        messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=pg.gui.get_toplevel_window(self))

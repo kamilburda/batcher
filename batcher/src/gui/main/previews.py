@@ -485,7 +485,7 @@ class Previews:
 
     return paths
 
-  def connect_events(self, action_lists, paned_outside_previews):
+  def connect_events(self, command_lists, paned_outside_previews):
     self._vpaned_previews.connect(
       'notify::position',
       self._on_paned_between_previews_notify_position)
@@ -494,8 +494,8 @@ class Previews:
       'notify::position',
       self._on_paned_outside_previews_notify_position)
 
-    self._image_preview.connect('preview-updated', self._on_image_preview_updated, action_lists)
-    self._name_preview.connect('preview-updated', self._on_name_preview_updated, action_lists)
+    self._image_preview.connect('preview-updated', self._on_image_preview_updated, command_lists)
+    self._name_preview.connect('preview-updated', self._on_name_preview_updated, command_lists)
 
     self._previews_controller.connect_setting_changes_to_previews()
 
@@ -597,8 +597,8 @@ class Previews:
     preview.set_sensitive(False)
     preview_sensitive_setting.set_value(False)
 
-  def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, action_lists):
-    action_lists.display_warnings_and_tooltips_for_actions_and_deactivate_failing_actions(
+  def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, command_lists):
+    command_lists.display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
       self._batcher_for_image_preview)
 
     if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
@@ -610,11 +610,11 @@ class Previews:
         _('The preview no longer updates automatically as rendering takes too long.'),
         Gtk.MessageType.INFO)
 
-  def _on_name_preview_updated(self, _preview, _error, action_lists):
+  def _on_name_preview_updated(self, _preview, _error, command_lists):
     if self._manage_items:
       self._show_hide_name_preview_placeholder_label()
 
-    action_lists.display_warnings_and_tooltips_for_actions_and_deactivate_failing_actions(
+    command_lists.display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
       self._batcher_for_name_preview, clear_previous=False)
 
   def _show_hide_name_preview_placeholder_label(self):

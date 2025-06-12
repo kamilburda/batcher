@@ -132,14 +132,14 @@ def _get_adjacent_layer(
     image.set_selected_layers([adjacent_layer])
     return adjacent_layer
   else:
-    raise exceptions.SkipAction(skip_message)
+    raise exceptions.SkipCommand(skip_message)
 
 
-def _get_previous_enabled_procedures(batcher, current_action):
+def _get_previous_enabled_procedures(batcher, current_command):
   previous_enabled_procedures = []
 
   for procedure in batcher.procedures:
-    if procedure == current_action:
+    if procedure == current_command:
       return previous_enabled_procedures
 
     if procedure['enabled'].value:

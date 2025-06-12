@@ -124,7 +124,7 @@ def handle_overwrite(
   modes specified in `OverwriteModes`. See `OverwriteModes` for information
   about the possible values and their meanings.
 
-  If ``filepath`` does not exist, there is no need to perform any action, hence
+  If ``filepath`` does not exist, there is no need to perform any command, hence
   `OverwriteModes.DO_NOTHING` is returned.
 
   If the chosen overwrite mode is `OverwriteModes.RENAME_NEW` or

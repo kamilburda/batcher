@@ -23,18 +23,18 @@ class BatcherFileLoadError(BatcherError):
     return f'{self.message}: {self.item.id}'
 
 
-class ActionError(BatcherError):
+class CommandError(BatcherError):
   
-  def __init__(self, message, action, item, traceback=None):
+  def __init__(self, message, command, item, traceback=None):
     super().__init__(message)
     
     self.message = message
-    self.action = action
+    self.command = command
     self.item = item
     self.traceback = traceback
 
 
-class SkipAction(BatcherError):
+class SkipCommand(BatcherError):
   pass
 
 

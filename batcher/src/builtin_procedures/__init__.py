@@ -71,13 +71,13 @@ _BUILTIN_PROCEDURES_LIST.sort(
 # to a persistent source. Saving them as strings would not be reliable as
 # function names and paths may change when refactoring or adding/modifying features.
 # The 'function' setting is set to an empty value as the function can be inferred
-# via the action's 'orig_name' setting.
+# via the command's 'orig_name' setting.
 BUILTIN_PROCEDURES = {}
 BUILTIN_PROCEDURES_FUNCTIONS = {}
 
-for action_dict in _BUILTIN_PROCEDURES_LIST:
-  function = action_dict['function']
-  action_dict['function'] = ''
+for command_dict in _BUILTIN_PROCEDURES_LIST:
+  function = command_dict['function']
+  command_dict['function'] = ''
 
-  BUILTIN_PROCEDURES[action_dict['name']] = action_dict
-  BUILTIN_PROCEDURES_FUNCTIONS[action_dict['name']] = function
+  BUILTIN_PROCEDURES[command_dict['name']] = command_dict
+  BUILTIN_PROCEDURES_FUNCTIONS[command_dict['name']] = function

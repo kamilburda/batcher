@@ -95,7 +95,7 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
 
   @property
   def undo_context(self) -> entry_undo_.EntryUndoContext:
-    """`entry_undo.EntryUndoContext` instance to handle undo/redo actions."""
+    """`entry_undo.EntryUndoContext` instance to handle undo/redo steps."""
     return self._undo_context
 
   # HACK: Instead of connecting an 'insert-text' signal handler, we override the

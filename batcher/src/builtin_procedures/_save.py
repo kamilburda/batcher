@@ -11,7 +11,7 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import builtin_actions_common
+from src import builtin_commands_common
 from src.path import validators as validators_
 from src.procedure_groups import *
 
@@ -119,7 +119,7 @@ SAVE_DICT = {
     'Saves the image in the native GIMP format (XCF). If the image already exists, it is'
     ' overwritten. To export the image in another file format, use the "Export Images" menu.'),
   'display_options_on_create': True,
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'file',

@@ -62,11 +62,11 @@ Setting persistence
 * no setting source
 * persistent source
 
-Built-in actions
+Built-in commands
 * procedures
 * constraints
 
-Custom actions
+Custom commands
 * add
 * edit
   * adjust argument values

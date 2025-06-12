@@ -6,7 +6,7 @@ procedures.
 
 These names can be used, for example, for the following purposes:
 * saving separate settings for each plug-in procedure,
-* filtering actions applicable only to specific procedures,
+* filtering commands applicable only to specific procedures,
 * filtering name pattern fields applicable only to specific procedures.
 """
 

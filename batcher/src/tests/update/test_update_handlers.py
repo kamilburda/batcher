@@ -114,17 +114,17 @@ class TestUpdateHandlers(unittest.TestCase):
     }
 
   def _assert_correct_contents_for_update_to_0_3(self, settings, orig_setting_values_for_0_2):
-    for action in settings['main/procedures']:
-      self.assertIn('more_options', action)
-      self.assertIn('enabled_for_previews', action['more_options'])
-      self.assertNotIn('enabled_for_previews', action)
+    for command in settings['main/procedures']:
+      self.assertIn('more_options', command)
+      self.assertIn('enabled_for_previews', command['more_options'])
+      self.assertNotIn('enabled_for_previews', command)
 
-    for action in settings['main/constraints']:
-      self.assertIn('more_options', action)
-      self.assertIn('enabled_for_previews', action['more_options'])
-      self.assertNotIn('enabled_for_previews', action)
-      self.assertIn('also_apply_to_parent_folders', action['more_options'])
-      self.assertNotIn('also_apply_to_parent_folders', action)
+    for command in settings['main/constraints']:
+      self.assertIn('more_options', command)
+      self.assertIn('enabled_for_previews', command['more_options'])
+      self.assertNotIn('enabled_for_previews', command)
+      self.assertIn('also_apply_to_parent_folders', command['more_options'])
+      self.assertNotIn('also_apply_to_parent_folders', command)
 
     for setting_path, orig_value in orig_setting_values_for_0_2.items():
       self.assertEqual(settings[setting_path].value, orig_value)
@@ -354,6 +354,16 @@ class TestUpdateHandlers(unittest.TestCase):
 
   def _assert_correct_contents_for_update_to_1_1(self, settings):
     self.assertEqual(settings['main/output_directory'].set_default_if_not_exists, True)
+
+    for command in settings['main/procedures']:
+      self.assertNotIn('action_groups', command)
+      self.assertIn('command_groups', command)
+      self.assertIn('command', command.tags)
+
+    for command in settings['main/constraints']:
+      self.assertNotIn('action_groups', command)
+      self.assertIn('command_groups', command)
+      self.assertIn('command', command.tags)
 
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 

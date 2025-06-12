@@ -13,7 +13,7 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import actions
+from src import commands
 from src import core
 from src import builtin_procedures
 from src import plugin_settings
@@ -145,15 +145,15 @@ class TestConvertCompareContents(unittest.TestCase):
       procedure_names_to_remove = []
     
     for procedure_name, order in procedure_names_to_add.items():
-      actions.add(
+      commands.add(
         settings['main/procedures'],
         builtin_procedures.BUILTIN_PROCEDURES[procedure_name])
       if order is not None:
-        actions.reorder(settings['main/procedures'], procedure_name, order)
+        commands.reorder(settings['main/procedures'], procedure_name, order)
     
     for procedure_name in procedure_names_to_remove:
       if procedure_name in settings['main/procedures']:
-        actions.remove(settings['main/procedures'], procedure_name)
+        commands.remove(settings['main/procedures'], procedure_name)
 
     item_tree = pg.itemtree.ImageFileTree()
     item_tree.add(self.test_images_filepaths)
@@ -168,7 +168,7 @@ class TestConvertCompareContents(unittest.TestCase):
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))
     
     for procedure_name in procedure_names_to_add:
-      actions.remove(settings['main/procedures'], procedure_name)
+      commands.remove(settings['main/procedures'], procedure_name)
   
   def _compare_images(self, actual_image, expected_image, settings, test_case_name):
     actual_layer = actual_image.get_layers()[0]

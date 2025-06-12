@@ -13,26 +13,25 @@ from gi.repository import Gtk
 class EntryUndoContext:
   """Class adding undo/redo capabilities to a `Gtk.Entry` instance."""
   
-  _ActionData = collections.namedtuple(
-    '_ActionData', ['action_type', 'position', 'text'])
+  _StepData = collections.namedtuple('_StepData', ['step_type', 'position', 'text'])
   
-  _ACTION_TYPES = ['insert', 'delete']
+  _STEP_TYPES = ['insert', 'delete']
 
   def __init__(self, entry: Gtk.Entry):
     self._entry = entry
 
     self.undo_enabled = True
-    """If ``True``, user actions (insert text, delete text) are added to the
-    undo history.
+    """If ``True``, user steps (insert text, delete text) are added to the undo
+    history.
     """
     
     self._undo_stack = []
     self._redo_stack = []
     
-    self._last_action_group = []
-    self._last_action_type = None
+    self._last_step_group = []
+    self._last_step_type = None
     
-    self._cursor_changed_by_action = False
+    self._cursor_changed_by_step = False
 
   def enable(self):
     self._entry.connect('notify::cursor-position', self._on_entry_notify_cursor_position)
@@ -40,7 +39,7 @@ class EntryUndoContext:
 
   def handle_insert_text(self, new_text, new_text_length, position):
     if self.undo_enabled and new_text:
-      self._on_entry_action(self._entry.get_position(), new_text, 'insert')
+      self._on_entry_step(self._entry.get_position(), new_text, 'insert')
 
     self._entry.get_buffer().insert_text(position, new_text, new_text_length)
 
@@ -50,7 +49,7 @@ class EntryUndoContext:
     if self.undo_enabled:
       text_to_delete = self._entry.get_text()[start_pos:end_pos]
       if text_to_delete:
-        self._on_entry_action(start_pos, text_to_delete, 'delete')
+        self._on_entry_step(start_pos, text_to_delete, 'delete')
 
     self._entry.get_buffer().delete_text(start_pos, end_pos - start_pos)
 
@@ -58,30 +57,30 @@ class EntryUndoContext:
     self._undo_redo(
       self._undo_stack,
       self._redo_stack,
-      action_handlers={
-        'insert': lambda action_data: self._entry.delete_text(
-          action_data.position, action_data.position + len(action_data.text)),
-        'delete': lambda action_data: self._entry.insert_text(
-          action_data.text, action_data.position)},
-      action_handlers_get_cursor_position={
-        'insert': lambda last_action_data: last_action_data.position,
-        'delete': lambda last_action_data: (
-          last_action_data.position + len(last_action_data.text))},
-      actions_iterator=reversed)
+      step_handlers={
+        'insert': lambda step_data: self._entry.delete_text(
+          step_data.position, step_data.position + len(step_data.text)),
+        'delete': lambda step_data: self._entry.insert_text(
+          step_data.text, step_data.position)},
+      step_handlers_get_cursor_position={
+        'insert': lambda last_step_data: last_step_data.position,
+        'delete': lambda last_step_data: (
+          last_step_data.position + len(last_step_data.text))},
+      steps_iterator=reversed)
   
   def redo(self):
     self._undo_redo(
       self._redo_stack,
       self._undo_stack,
-      action_handlers={
-        'insert': lambda action_data: self._entry.insert_text(
-          action_data.text, action_data.position),
-        'delete': lambda action_data: self._entry.delete_text(
-          action_data.position, action_data.position + len(action_data.text))},
-      action_handlers_get_cursor_position={
-        'insert': lambda last_action_data: (
-          last_action_data.position + len(last_action_data.text)),
-        'delete': lambda last_action_data: last_action_data.position})
+      step_handlers={
+        'insert': lambda step_data: self._entry.insert_text(
+          step_data.text, step_data.position),
+        'delete': lambda step_data: self._entry.delete_text(
+          step_data.position, step_data.position + len(step_data.text))},
+      step_handlers_get_cursor_position={
+        'insert': lambda last_step_data: (
+          last_step_data.position + len(last_step_data.text)),
+        'delete': lambda last_step_data: last_step_data.position})
   
   def undo_push(self, undo_push_list: List[Tuple[str, int, str]]):
     """Manually adds changes to the undo history.
@@ -97,25 +96,25 @@ class EntryUndoContext:
     
     Args:
       undo_push_list:
-        List of ``(action_type, position, text)`` tuples to add as one undo
-        action. ``action_type`` can be ``'insert'`` for text insertion or
+        List of ``(step_type, position, text)`` tuples to add as one undo
+        step. ``step_type`` can be ``'insert'`` for text insertion or
         ``'delete'`` for text deletion (other values raise ``ValueError``).
         ``position`` is the starting entry cursor position of the changed
         text. ``text`` is the changed text.
     
     Raises:
       ValueError:
-        The action type as the first element of the ``undo_push_list`` tuple
+        The step type as the first element of the ``undo_push_list`` tuple
         is not valid.
     """
     self._redo_stack = []
     
     self._undo_stack_push()
     
-    for action_type, position, text in undo_push_list:
-      if action_type not in self._ACTION_TYPES:
-        raise ValueError(f'invalid action type "{action_type}"')
-      self._last_action_group.append(self._ActionData(action_type, position, text))
+    for step_type, position, text in undo_push_list:
+      if step_type not in self._STEP_TYPES:
+        raise ValueError(f'invalid step type "{step_type}"')
+      self._last_step_group.append(self._StepData(step_type, position, text))
     
     self._undo_stack_push()
   
@@ -126,8 +125,8 @@ class EntryUndoContext:
     return bool(self._redo_stack)
   
   def _on_entry_notify_cursor_position(self, entry, property_spec):
-    if self._cursor_changed_by_action:
-      self._cursor_changed_by_action = False
+    if self._cursor_changed_by_step:
+      self._cursor_changed_by_step = False
     else:
       self._undo_stack_push()
   
@@ -143,49 +142,49 @@ class EntryUndoContext:
 
     return False
   
-  def _on_entry_action(self, position, text, action_type):
+  def _on_entry_step(self, position, text, step_type):
     self._redo_stack = []
     
-    if self._last_action_type != action_type:
+    if self._last_step_type != step_type:
       self._undo_stack_push()
     
-    self._last_action_group.append(self._ActionData(action_type, position, text))
-    self._last_action_type = action_type
+    self._last_step_group.append(self._StepData(step_type, position, text))
+    self._last_step_type = step_type
     
-    self._cursor_changed_by_action = True
+    self._cursor_changed_by_step = True
   
   def _undo_redo(
         self,
         stack_to_pop_from,
         stack_to_push_to,
-        action_handlers,
-        action_handlers_get_cursor_position,
-        actions_iterator=None):
+        step_handlers,
+        step_handlers_get_cursor_position,
+        steps_iterator=None):
     self._undo_stack_push()
     
     if not stack_to_pop_from:
       return
     
-    actions = stack_to_pop_from.pop()
+    steps = stack_to_pop_from.pop()
     
-    if actions_iterator is None:
-      action_list = actions
+    if steps_iterator is None:
+      step_list = steps
     else:
-      action_list = list(actions_iterator(actions))
+      step_list = list(steps_iterator(steps))
     
-    stack_to_push_to.append(actions)
+    stack_to_push_to.append(steps)
     
     self.undo_enabled = False
     
-    for action in action_list:
-      action_handlers[action.action_type](action)
+    for step in step_list:
+      step_handlers[step.step_type](step)
     
     self._entry.set_position(
-      action_handlers_get_cursor_position[action_list[-1].action_type](action_list[-1]))
+      step_handlers_get_cursor_position[step_list[-1].step_type](step_list[-1]))
     
     self.undo_enabled = True
   
   def _undo_stack_push(self):
-    if self._last_action_group:
-      self._undo_stack.append(self._last_action_group)
-      self._last_action_group = []
+    if self._last_step_group:
+      self._undo_stack.append(self._last_step_group)
+      self._last_step_group = []

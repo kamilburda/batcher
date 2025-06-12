@@ -12,7 +12,7 @@ from gi.repository import Gio
 
 import pygimplib as pg
 
-from src import actions
+from src import commands
 from src import core
 from src import builtin_procedures
 from src import plugin_settings
@@ -173,15 +173,15 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       procedure_names_to_remove = []
     
     for procedure_name, order in procedure_names_to_add.items():
-      actions.add(
+      commands.add(
         settings['main/procedures'],
         builtin_procedures.BUILTIN_PROCEDURES[procedure_name])
       if order is not None:
-        actions.reorder(settings['main/procedures'], procedure_name, order)
+        commands.reorder(settings['main/procedures'], procedure_name, order)
     
     for procedure_name in procedure_names_to_remove:
       if procedure_name in settings['main/procedures']:
-        actions.remove(settings['main/procedures'], procedure_name)
+        commands.remove(settings['main/procedures'], procedure_name)
 
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
@@ -199,7 +199,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))
     
     for procedure_name in procedure_names_to_add:
-      actions.remove(settings['main/procedures'], procedure_name)
+      commands.remove(settings['main/procedures'], procedure_name)
   
   def _compare_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):

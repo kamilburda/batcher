@@ -1,6 +1,6 @@
 """Built-in "Remove folder structure" procedure."""
 
-from src import builtin_actions_common
+from src import builtin_commands_common
 from src.procedure_groups import *
 
 
@@ -45,14 +45,14 @@ REMOVE_FOLDER_STRUCTURE_DICT = {
   'name': 'remove_folder_structure',
   'function': remove_folder_structure_from_item,
   'display_name': _('Remove folder structure'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP, EXPORT_LAYERS_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP, EXPORT_LAYERS_GROUP],
 }
 
 REMOVE_FOLDER_STRUCTURE_FOR_EDIT_LAYERS_DICT = {
   'name': 'remove_folder_structure_for_edit_layers',
   'function': remove_folder_structure_from_item_for_edit_layers,
   'display_name': _('Remove folder structure'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'arguments': [
     {
       'type': 'bool',

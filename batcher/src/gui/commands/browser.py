@@ -1,4 +1,4 @@
-"""Widget displaying a list of available actions (procedures/constraints).
+"""Widget displaying a list of available commands (procedures/constraints).
 
 The list includes GIMP PDB procedures.
 """
@@ -18,14 +18,14 @@ from gi.repository import Pango
 import pygimplib as pg
 from pygimplib import pdb
 
-from . import editor as action_editor_
+from . import editor as command_editor_
 
-from src import actions as actions_
+from src import commands as commands_
 from src import placeholders as placeholders_
 from src.gui.entry import entries as entries_
 
 
-class ActionBrowser(GObject.GObject):
+class CommandBrowser(GObject.GObject):
 
   _DIALOG_SIZE = 675, 450
   _HPANED_POSITION = 325
@@ -36,17 +36,17 @@ class ActionBrowser(GObject.GObject):
 
   _ARROW_ICON_PIXEL_SIZE = 12
 
-  _ACTION_NAME_WIDTH_CHARS = 25
+  _COMMAND_NAME_WIDTH_CHARS = 25
 
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
 
   _COLUMNS = (
-    _COLUMN_ACTION_NAME,
-    _COLUMN_ACTION_MENU_NAME,
-    _COLUMN_ACTION_DESCRIPTION,
-    _COLUMN_ACTION_TYPE,
-    _COLUMN_ACTION_DICT,
-    _COLUMN_ACTION_EDITOR_WIDGET) = (
+    _COLUMN_COMMAND_NAME,
+    _COLUMN_COMMAND_MENU_NAME,
+    _COLUMN_COMMAND_DESCRIPTION,
+    _COLUMN_COMMAND_TYPE,
+    _COLUMN_COMMAND_DICT,
+    _COLUMN_COMMAND_EDITOR_WIDGET) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
@@ -55,11 +55,11 @@ class ActionBrowser(GObject.GObject):
     [5, GObject.TYPE_PYOBJECT])
 
   __gsignals__ = {
-    'action-selected': (
+    'command-selected': (
       GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
-    'confirm-add-action': (
+    'confirm-add-command': (
       GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
-    'cancel-add-action': (GObject.SignalFlags.RUN_FIRST, None, ()),
+    'cancel-add-command': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
 
   def __init__(self, title=None, *args, **kwargs):
@@ -109,7 +109,7 @@ class ActionBrowser(GObject.GObject):
   def paned(self):
     return self._hpaned
 
-  def select_action(self, name):
+  def select_command(self, name):
     parents = [self._tree_model_sorted]
 
     while parents:
@@ -191,48 +191,49 @@ class ActionBrowser(GObject.GObject):
       if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     )
 
-    action_dicts = [
-      actions_.get_action_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
+    command_dicts = [
+      commands_.get_command_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
 
-    for procedure, action_dict in zip(pdb_procedures, action_dicts):
-      if isinstance(action_dict['function'], str):
-        # We are sanitizing the action name as it can contain characters not
-        # allowed in `pygimplib.setting.Setting`.
-        procedure_name = action_dict['function']
+    for procedure, command_dict in zip(pdb_procedures, command_dicts):
+      # We are sanitizing the command name as it can contain characters not
+      # allowed in `pygimplib.setting.Setting`. We therefore prefer 'function'
+      # if it is a string as that is kept unprocessed.
+      if isinstance(command_dict['function'], str):
+        procedure_name = command_dict['function']
       else:
-        procedure_name = action_dict['name']
+        procedure_name = command_dict['name']
 
       if isinstance(procedure, pg.pypdb.GeglProcedure):
         if not is_gegl_operation_hidden(procedure_name):
-          action_type = 'filters'
+          command_type = 'filters'
         else:
-          action_type = 'other'
+          command_type = 'other'
       elif procedure_name.startswith('file-'):
-        action_type = 'other'
+        command_type = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
-        if self._has_plugin_procedure_image_or_drawable_arguments(action_dict):
-          action_type = 'plug_ins'
+        if self._has_plugin_procedure_image_or_drawable_arguments(command_dict):
+          command_type = 'plug_ins'
         else:
-          action_type = 'other'
+          command_type = 'other'
       else:
-        action_type = 'gimp_procedures'
+        command_type = 'gimp_procedures'
 
-      if action_dict['display_name'] != procedure_name:
-        display_name = action_dict['display_name']
+      if command_dict['display_name'] != procedure_name:
+        display_name = command_dict['display_name']
       else:
         display_name = ''
 
       # This prevents certain procedures from triggering undesired behavior
       #  (e.g. displaying a layer copy as a new image).
-      action_dict['enabled'] = False
+      command_dict['enabled'] = False
 
       self._tree_model.append(
-        self._parent_tree_iters[action_type],
+        self._parent_tree_iters[command_type],
         [procedure_name,
          display_name,
-         action_dict.get('description', ''),
-         action_type,
-         action_dict,
+         command_dict.get('description', ''),
+         command_type,
+         command_dict,
          None])
 
     self._tree_view.expand_row(
@@ -248,27 +249,27 @@ class ActionBrowser(GObject.GObject):
 
     self._currently_filling_contents = False
 
-  def _get_selected_action(self, model=None, selected_iter=None):
+  def _get_selected_command(self, model=None, selected_iter=None):
     if model is None and selected_iter is None:
       model, selected_iter = self._tree_view.get_selection().get_selected()
 
     if selected_iter is not None:
       row = Gtk.TreeModelRow(model, selected_iter)
 
-      action_dict = row[self._COLUMN_ACTION_DICT[0]]
-      action_editor_widget = row[self._COLUMN_ACTION_EDITOR_WIDGET[0]]
+      command_dict = row[self._COLUMN_COMMAND_DICT[0]]
+      command_editor_widget = row[self._COLUMN_COMMAND_EDITOR_WIDGET[0]]
 
       selected_child_iter = model.convert_iter_to_child_iter(selected_iter)
 
-      if action_dict is not None:
-        if action_editor_widget is None:
-          action_editor_widget = self._add_action_editor_widget_to_model(
-            action_dict, model, selected_child_iter)
+      if command_dict is not None:
+        if command_editor_widget is None:
+          command_editor_widget = self._add_command_editor_widget_to_model(
+            command_dict, model, selected_child_iter)
 
         return (
-          action_dict,
-          action_editor_widget.action,
-          action_editor_widget,
+          command_dict,
+          command_editor_widget.command,
+          command_editor_widget,
           model,
           selected_child_iter,
         )
@@ -277,32 +278,32 @@ class ActionBrowser(GObject.GObject):
     else:
       return None, None, None, model, None
 
-  def _has_plugin_procedure_image_or_drawable_arguments(self, action_dict):
-    if not action_dict['arguments']:
+  def _has_plugin_procedure_image_or_drawable_arguments(self, command_dict):
+    if not command_dict['arguments']:
       return False
 
-    if len(action_dict['arguments']) == 1:
-      return self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][0])
+    if len(command_dict['arguments']) == 1:
+      return self._is_command_argument_image_drawable_or_drawables(command_dict['arguments'][0])
 
-    if (self._is_action_argument_run_mode(action_dict['arguments'][0])
-        and self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][1])):
+    if (self._is_command_argument_run_mode(command_dict['arguments'][0])
+        and self._is_command_argument_image_drawable_or_drawables(command_dict['arguments'][1])):
       return True
 
-    if self._is_action_argument_image_drawable_or_drawables(action_dict['arguments'][0]):
+    if self._is_command_argument_image_drawable_or_drawables(command_dict['arguments'][0]):
       return True
 
     return False
 
   @staticmethod
-  def _is_action_argument_run_mode(action_argument):
+  def _is_command_argument_run_mode(command_argument):
     return (
-      action_argument['type'] == pg.setting.EnumSetting
-      and action_argument['name'] == 'run-mode')
+      command_argument['type'] == pg.setting.EnumSetting
+      and command_argument['name'] == 'run-mode')
 
   @staticmethod
-  def _is_action_argument_image_drawable_or_drawables(action_argument):
+  def _is_command_argument_image_drawable_or_drawables(command_argument):
     return (
-      action_argument['type'] in [
+      command_argument['type'] in [
         pg.setting.ImageSetting,
         pg.setting.LayerSetting,
         pg.setting.DrawableSetting,
@@ -314,8 +315,8 @@ class ActionBrowser(GObject.GObject):
         placeholders_.PlaceholderDrawableArraySetting,
         placeholders_.PlaceholderLayerArraySetting,
         placeholders_.PlaceholderItemArraySetting]
-      or (action_argument['type'] == pg.setting.ArraySetting
-          and action_argument['element_type'] in [
+      or (command_argument['type'] == pg.setting.ArraySetting
+          and command_argument['element_type'] in [
               pg.setting.ImageSetting,
               pg.setting.LayerSetting,
               pg.setting.DrawableSetting,
@@ -340,32 +341,32 @@ class ActionBrowser(GObject.GObject):
     column_name = Gtk.TreeViewColumn()
     column_name.set_resizable(True)
     column_name.set_title(_('Name'))
-    column_name.set_sort_column_id(self._COLUMN_ACTION_NAME[0])
+    column_name.set_sort_column_id(self._COLUMN_COMMAND_NAME[0])
 
-    cell_renderer_action_name = Gtk.CellRendererText(
-      width_chars=self._ACTION_NAME_WIDTH_CHARS,
+    cell_renderer_command_name = Gtk.CellRendererText(
+      width_chars=self._COMMAND_NAME_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
-    column_name.pack_start(cell_renderer_action_name, False)
+    column_name.pack_start(cell_renderer_command_name, False)
     column_name.set_attributes(
-      cell_renderer_action_name,
-      text=self._COLUMN_ACTION_NAME[0])
+      cell_renderer_command_name,
+      text=self._COLUMN_COMMAND_NAME[0])
 
     self._tree_view.append_column(column_name)
 
     column_menu_name = Gtk.TreeViewColumn()
     column_menu_name.set_resizable(True)
     column_menu_name.set_title(_('Menu Name'))
-    column_menu_name.set_sort_column_id(self._COLUMN_ACTION_MENU_NAME[0])
+    column_menu_name.set_sort_column_id(self._COLUMN_COMMAND_MENU_NAME[0])
 
-    cell_renderer_action_menu_name = Gtk.CellRendererText(
-      width_chars=self._ACTION_NAME_WIDTH_CHARS,
+    cell_renderer_command_menu_name = Gtk.CellRendererText(
+      width_chars=self._COMMAND_NAME_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
-    column_menu_name.pack_start(cell_renderer_action_menu_name, False)
+    column_menu_name.pack_start(cell_renderer_command_menu_name, False)
     column_menu_name.set_attributes(
-      cell_renderer_action_menu_name,
-      text=self._COLUMN_ACTION_MENU_NAME[0])
+      cell_renderer_command_menu_name,
+      text=self._COLUMN_COMMAND_MENU_NAME[0])
 
     self._tree_view.append_column(column_menu_name)
 
@@ -374,11 +375,11 @@ class ActionBrowser(GObject.GObject):
 
     self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model_filter)
     self._tree_model_sorted.set_sort_func(
-      self._COLUMN_ACTION_NAME[0], self._sort_actions_by_name)
+      self._COLUMN_COMMAND_NAME[0], self._sort_commands_by_name)
     self._tree_model_sorted.set_sort_func(
-      self._COLUMN_ACTION_MENU_NAME[0], self._sort_actions_by_menu_name)
+      self._COLUMN_COMMAND_MENU_NAME[0], self._sort_commands_by_menu_name)
     self._tree_model_sorted.set_sort_column_id(
-      self._COLUMN_ACTION_MENU_NAME[0], Gtk.SortType.ASCENDING)
+      self._COLUMN_COMMAND_MENU_NAME[0], Gtk.SortType.ASCENDING)
 
     self._tree_view.set_model(self._tree_model_sorted)
 
@@ -424,29 +425,29 @@ class ActionBrowser(GObject.GObject):
     self._hbox_search_bar.pack_start(self._entry_search, True, True, 0)
     self._hbox_search_bar.pack_start(self._button_search_settings, False, False, 0)
 
-    self._scrolled_window_action_list = Gtk.ScrolledWindow(
+    self._scrolled_window_command_list = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       propagate_natural_width=True,
       propagate_natural_height=True,
     )
-    self._scrolled_window_action_list.add(self._tree_view)
+    self._scrolled_window_command_list.add(self._tree_view)
 
     self._vbox_browser = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._VBOX_BROWSER_SPACING,
     )
     self._vbox_browser.pack_start(self._hbox_search_bar, False, False, 0)
-    self._vbox_browser.pack_start(self._scrolled_window_action_list, True, True, 0)
+    self._vbox_browser.pack_start(self._scrolled_window_command_list, True, True, 0)
 
-    self._scrolled_window_action_arguments = Gtk.ScrolledWindow(
+    self._scrolled_window_command_arguments = Gtk.ScrolledWindow(
       hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
       propagate_natural_width=True,
       propagate_natural_height=True,
     )
-    self._scrolled_window_action_arguments_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
-    self._scrolled_window_action_arguments.add(self._scrolled_window_action_arguments_viewport)
+    self._scrolled_window_command_arguments_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
+    self._scrolled_window_command_arguments.add(self._scrolled_window_command_arguments_viewport)
 
     self._label_no_selection = Gtk.Label(
       label='<i>{}</i>'.format(_('Select a procedure')),
@@ -457,11 +458,11 @@ class ActionBrowser(GObject.GObject):
     self._label_no_selection.show()
     self._label_no_selection.set_no_show_all(True)
 
-    self._hbox_action = Gtk.Box(
+    self._hbox_command = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
-    self._hbox_action.pack_start(self._scrolled_window_action_arguments, True, True, 0)
-    self._hbox_action.pack_start(self._label_no_selection, True, True, 0)
+    self._hbox_command.pack_start(self._scrolled_window_command_arguments, True, True, 0)
+    self._hbox_command.pack_start(self._label_no_selection, True, True, 0)
 
     self._hpaned = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -470,7 +471,7 @@ class ActionBrowser(GObject.GObject):
       position=self._HPANED_POSITION,
     )
     self._hpaned.pack1(self._vbox_browser, True, False)
-    self._hpaned.pack2(self._hbox_action, True, True)
+    self._hpaned.pack2(self._hbox_command, True, True)
 
     self._dialog.vbox.pack_start(self._hpaned, True, True, 0)
 
@@ -504,14 +505,14 @@ class ActionBrowser(GObject.GObject):
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
 
-  def _sort_actions_by_name(self, model, first_iter, second_iter, _user_data):
+  def _sort_commands_by_name(self, model, first_iter, second_iter, _user_data):
     first_row = Gtk.TreeModelRow(model, first_iter)
-    first_name = first_row[self._COLUMN_ACTION_NAME[0]]
-    first_type = first_row[self._COLUMN_ACTION_TYPE[0]]
+    first_name = first_row[self._COLUMN_COMMAND_NAME[0]]
+    first_type = first_row[self._COLUMN_COMMAND_TYPE[0]]
 
     second_row = Gtk.TreeModelRow(model, second_iter)
-    second_name = second_row[self._COLUMN_ACTION_NAME[0]]
-    second_type = second_row[self._COLUMN_ACTION_TYPE[0]]
+    second_name = second_row[self._COLUMN_COMMAND_NAME[0]]
+    second_type = second_row[self._COLUMN_COMMAND_TYPE[0]]
 
     if first_type == second_type:
       if first_name < second_name:
@@ -524,14 +525,14 @@ class ActionBrowser(GObject.GObject):
       # Keep order of parents intact
       return 0
 
-  def _sort_actions_by_menu_name(self, model, first_iter, second_iter, _user_data):
+  def _sort_commands_by_menu_name(self, model, first_iter, second_iter, _user_data):
     first_row = Gtk.TreeModelRow(model, first_iter)
-    first_name = first_row[self._COLUMN_ACTION_MENU_NAME[0]]
-    first_type = first_row[self._COLUMN_ACTION_TYPE[0]]
+    first_name = first_row[self._COLUMN_COMMAND_MENU_NAME[0]]
+    first_type = first_row[self._COLUMN_COMMAND_TYPE[0]]
 
     second_row = Gtk.TreeModelRow(model, second_iter)
-    second_name = second_row[self._COLUMN_ACTION_MENU_NAME[0]]
-    second_type = second_row[self._COLUMN_ACTION_TYPE[0]]
+    second_name = second_row[self._COLUMN_COMMAND_MENU_NAME[0]]
+    second_type = second_row[self._COLUMN_COMMAND_TYPE[0]]
 
     if first_type == second_type:
       # Treat empty menu name as lower in order
@@ -577,89 +578,89 @@ class ActionBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      _action_dict, action, action_editor_widget, _model, _iter = self._get_selected_action(
+      _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
         model, selected_iter)
 
       if not self._currently_filling_contents:
-        self.emit('action-selected', action)
+        self.emit('command-selected', command)
 
       self._label_no_selection.hide()
 
-      self._detach_action_editor_widget()
+      self._detach_command_editor_widget()
 
-      self._attach_action_editor_widget(action_editor_widget)
+      self._attach_command_editor_widget(command_editor_widget)
 
-      self._scrolled_window_action_arguments.show()
+      self._scrolled_window_command_arguments.show()
     else:
       self._label_no_selection.show()
-      self._scrolled_window_action_arguments.hide()
+      self._scrolled_window_command_arguments.hide()
 
       if not self._currently_filling_contents:
-        self.emit('action-selected', None)
+        self.emit('command-selected', None)
 
   def _on_dialog_show(self, _dialog):
     model, selected_iter = self._tree_view.get_selection().get_selected()
 
     if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      _action_dict, action, action_editor_widget, _model, _iter = self._get_selected_action(
+      _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
         model, selected_iter)
 
-      self.emit('action-selected', action)
+      self.emit('command-selected', command)
     else:
-      self.emit('action-selected', None)
+      self.emit('command-selected', None)
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      action_dict, action, action_editor_widget, model, selected_child_iter = (
-        self._get_selected_action())
+      command_dict, command, command_editor_widget, model, selected_child_iter = (
+        self._get_selected_command())
 
-      if action is not None:
-        self._detach_action_editor_widget()
-        self._remove_action_editor_widget_from_model(model, selected_child_iter)
+      if command is not None:
+        self._detach_command_editor_widget()
+        self._remove_command_editor_widget_from_model(model, selected_child_iter)
 
-        self.emit('confirm-add-action', action, action_editor_widget)
+        self.emit('confirm-add-command', command, command_editor_widget)
 
-        new_action_editor_widget = self._add_action_editor_widget_to_model(
-          action_dict, model, selected_child_iter)
-        self._attach_action_editor_widget(new_action_editor_widget)
+        new_command_editor_widget = self._add_command_editor_widget_to_model(
+          command_dict, model, selected_child_iter)
+        self._attach_command_editor_widget(new_command_editor_widget)
 
         dialog.hide()
     else:
-      self.emit('cancel-add-action')
+      self.emit('cancel-add-command')
       dialog.hide()
 
-  def _attach_action_editor_widget(self, action_editor_widget):
-    action_editor_widget.widget.show_all()
-    self._scrolled_window_action_arguments_viewport.add(action_editor_widget.widget)
+  def _attach_command_editor_widget(self, command_editor_widget):
+    command_editor_widget.widget.show_all()
+    self._scrolled_window_command_arguments_viewport.add(command_editor_widget.widget)
 
-  def _detach_action_editor_widget(self):
-    viewport_child = self._scrolled_window_action_arguments_viewport.get_child()
+  def _detach_command_editor_widget(self):
+    viewport_child = self._scrolled_window_command_arguments_viewport.get_child()
 
     if viewport_child is not None:
-      self._scrolled_window_action_arguments_viewport.remove(viewport_child)
+      self._scrolled_window_command_arguments_viewport.remove(viewport_child)
 
-  def _add_action_editor_widget_to_model(self, action_dict, model, selected_child_iter):
-    action = actions_.create_action(action_dict)
+  def _add_command_editor_widget_to_model(self, command_dict, model, selected_child_iter):
+    command = commands_.create_command(command_dict)
 
-    action.initialize_gui(only_null=True)
+    command.initialize_gui(only_null=True)
 
-    action_editor_widget = action_editor_.ActionEditorWidget(
-      action, self.widget, show_additional_settings=True)
+    command_editor_widget = command_editor_.CommandEditorWidget(
+      command, self.widget, show_additional_settings=True)
 
     model.get_model().set_value(
       selected_child_iter,
-      self._COLUMN_ACTION_EDITOR_WIDGET[0],
-      action_editor_widget,
+      self._COLUMN_COMMAND_EDITOR_WIDGET[0],
+      command_editor_widget,
     )
 
-    return action_editor_widget
+    return command_editor_widget
 
-  def _remove_action_editor_widget_from_model(self, model, selected_child_iter):
+  def _remove_command_editor_widget_from_model(self, model, selected_child_iter):
     model.get_model().set_value(
       selected_child_iter,
-      self._COLUMN_ACTION_EDITOR_WIDGET[0],
+      self._COLUMN_COMMAND_EDITOR_WIDGET[0],
       None,
     )
 
 
-GObject.type_register(ActionBrowser)
+GObject.type_register(CommandBrowser)

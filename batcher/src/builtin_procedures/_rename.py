@@ -1,6 +1,6 @@
 """Built-in "Rename" procedure."""
 
-from src import builtin_actions_common
+from src import builtin_commands_common
 from src import renamer as renamer_
 from src.procedure_groups import *
 
@@ -86,7 +86,7 @@ RENAME_FOR_CONVERT_DICT = {
   'name': 'rename_for_convert',
   'function': rename_image_for_convert,
   'display_name': _('Rename'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, CONVERT_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {
@@ -115,7 +115,7 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
   'name': 'rename_for_export_images',
   'function': rename_image_for_export_images,
   'display_name': _('Rename'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {
@@ -132,7 +132,7 @@ RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
   'name': 'rename_for_edit_and_save_images',
   'function': rename_image_for_edit_and_save_images,
   'display_name': _('Rename'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {
@@ -155,7 +155,7 @@ RENAME_FOR_EXPORT_LAYERS_DICT = {
   'name': 'rename_for_export_layers',
   'function': rename_layer,
   'display_name': _('Rename'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {
@@ -184,7 +184,7 @@ RENAME_FOR_EDIT_LAYERS_DICT = {
   'name': 'rename_for_edit_layers',
   'function': rename_layer,
   'display_name': _('Rename'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'display_options_on_create': True,
   'arguments': [
     {

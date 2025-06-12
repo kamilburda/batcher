@@ -7,7 +7,7 @@ from gi.repository import Gio
 
 import pygimplib as pg
 
-from src import actions as actions_
+from src import commands as commands_
 from src import builtin_constraints
 from src import builtin_procedures
 # Despite being unused, `setting_classes` must be imported so that the
@@ -165,18 +165,18 @@ def create_settings_for_convert():
   scale_procedure_dict['display_options_on_create'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='procedures',
-      initial_actions=[
+      initial_commands=[
         remove_folder_structure_procedure_dict,
         scale_procedure_dict,
       ]),
   ])
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='constraints',
-      initial_actions=[
+      initial_commands=[
         builtin_constraints.BUILTIN_CONSTRAINTS['recognized_file_format']]),
   ])
 
@@ -308,9 +308,9 @@ def create_settings_for_export_images():
   scale_procedure_dict['display_options_on_create'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='procedures',
-      initial_actions=[
+      initial_commands=[
         scale_procedure_dict,
       ]),
   ])
@@ -324,9 +324,9 @@ def create_settings_for_export_images():
   with_unsaved_changes_constraint_dict['enabled'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='constraints',
-      initial_actions=[
+      initial_commands=[
         not_saved_or_exported_constraint_dict,
         with_unsaved_changes_constraint_dict,
       ]),
@@ -415,9 +415,9 @@ def create_settings_for_edit_and_save_images():
   save_procedure_dict['display_options_on_create'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='procedures',
-      initial_actions=[
+      initial_commands=[
         remove_file_extension_from_imported_images_procedure_dict,
         rename_procedure_dict,
         save_procedure_dict,
@@ -433,9 +433,9 @@ def create_settings_for_edit_and_save_images():
   with_unsaved_changes_constraint_dict['enabled'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='constraints',
-      initial_actions=[
+      initial_commands=[
         xcf_file_constraint_dict,
         with_unsaved_changes_constraint_dict,
       ]),
@@ -566,18 +566,18 @@ def create_settings_for_export_layers():
     builtin_procedures.ResizeModes.RESIZE_TO_LAYER_SIZE)
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='procedures',
-      initial_actions=[resize_canvas_procedure_dict]),
+      initial_commands=[resize_canvas_procedure_dict]),
   ])
 
   visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
   visible_constraint_dict['enabled'] = False
   
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='constraints',
-      initial_actions=[
+      initial_commands=[
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
         visible_constraint_dict]),
   ])
@@ -589,7 +589,7 @@ def create_settings_for_export_layers():
   _connect_events_for_added_built_in_procedures(settings)
 
   settings['main/procedures'].connect_event(
-    'after-add-action',
+    'after-add-command',
     builtin_procedures.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
@@ -660,9 +660,9 @@ def create_settings_for_edit_layers():
   rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='procedures',
-      initial_actions=[rename_procedure_dict]),
+      initial_commands=[rename_procedure_dict]),
   ])
 
   visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
@@ -673,9 +673,9 @@ def create_settings_for_edit_layers():
   selected_in_gimp_constraint_dict['enabled'] = False
 
   settings['main'].add([
-    actions_.create(
+    commands_.create(
       name='constraints',
-      initial_actions=[
+      initial_commands=[
         builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
         visible_constraint_dict,
         selected_in_gimp_constraint_dict,
@@ -685,7 +685,7 @@ def create_settings_for_edit_layers():
   _connect_events_for_added_built_in_procedures(settings)
 
   settings['main/procedures'].connect_event(
-    'after-add-action',
+    'after-add-command',
     builtin_procedures.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
   )
@@ -849,12 +849,12 @@ def _create_images_and_directories_setting_dict():
 
 def _connect_events_for_added_built_in_procedures(settings):
   settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_crop_procedure)
+    'after-add-command', builtin_procedures.on_after_add_crop_procedure)
   settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_export_procedure)
+    'after-add-command', builtin_procedures.on_after_add_export_procedure)
   settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_resize_canvas_procedure)
+    'after-add-command', builtin_procedures.on_after_add_resize_canvas_procedure)
   settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_rotate_and_flip_procedure)
+    'after-add-command', builtin_procedures.on_after_add_rotate_and_flip_procedure)
   settings['main/procedures'].connect_event(
-    'after-add-action', builtin_procedures.on_after_add_scale_procedure)
+    'after-add-command', builtin_procedures.on_after_add_scale_procedure)

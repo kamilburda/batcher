@@ -11,7 +11,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
-from src import actions as actions_
+from src import commands as commands_
 from src import update
 from src import utils as utils_
 
@@ -155,8 +155,8 @@ class SettingsManager:
     response_id = self._display_reset_prompt()
 
     if response_id == Gtk.ResponseType.YES:
-      actions_.clear(self._settings['main/procedures'])
-      actions_.clear(self._settings['main/constraints'])
+      commands_.clear(self._settings['main/procedures'])
+      commands_.clear(self._settings['main/constraints'])
 
       self.reset_settings()
 
@@ -207,8 +207,8 @@ class SettingsManager:
   def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
     source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
 
-    actions_.clear(self._settings['main/procedures'], add_initial_actions=False)
-    actions_.clear(self._settings['main/constraints'], add_initial_actions=False)
+    commands_.clear(self._settings['main/procedures'], add_initial_commands=False)
+    commands_.clear(self._settings['main/constraints'], add_initial_commands=False)
 
     settings_to_ignore_for_reset = []
     for setting in self._settings.walk(lambda s: 'ignore_reset' not in s.tags):
@@ -249,8 +249,8 @@ class SettingsManager:
         parent=self._dialog)
 
       self.reset_settings()
-      actions_.clear(self._settings['main/procedures'])
-      actions_.clear(self._settings['main/constraints'])
+      commands_.clear(self._settings['main/procedures'])
+      commands_.clear(self._settings['main/constraints'])
 
     if self._previews_controller is not None:
       self._previews_controller.unlock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)

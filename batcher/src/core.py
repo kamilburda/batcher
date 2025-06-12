@@ -16,8 +16,8 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import actions
-from src import builtin_actions_common
+from src import commands
+from src import builtin_commands_common
 from src import builtin_constraints
 from src import builtin_procedures
 from src import exceptions
@@ -28,12 +28,12 @@ from src import progress as progress_
 from src import utils
 
 
-_BATCHER_ARG_POSITION_IN_ACTIONS = 0
-_NAME_ONLY_ACTION_GROUP = 'name'
+_BATCHER_ARG_POSITION_IN_COMMANDS = 0
+_NAME_ONLY_COMMAND_GROUP = 'name'
 
 
 class Batcher(metaclass=abc.ABCMeta):
-  """Abstract class for batch-processing items with a sequence of actions
+  """Abstract class for batch-processing items with a sequence of commands
   (resize, rename, export, ...).
   """
 
@@ -117,12 +117,12 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def procedures(self) -> pg.setting.Group:
-    """Action group containing procedures."""
+    """Command group containing procedures."""
     return self._procedures
 
   @property
   def constraints(self) -> pg.setting.Group:
-    """Action group containing constraints."""
+    """Command group containing constraints."""
     return self._constraints
 
   @property
@@ -241,7 +241,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     If `is_preview` is ``True`` and `process_names` is ``True``, built-in
     procedures modifying item names only are also invoked (particularly those
-    with the `builtin_actions_common.NAME_ONLY_TAG` tag).
+    with the `builtin_commands_common.NAME_ONLY_TAG` tag).
     """
     return self._process_names
 
@@ -414,16 +414,16 @@ class Batcher(metaclass=abc.ABCMeta):
     The signature is the same as for `pygimplib.invoker.Invoker.add()`.
 
     Procedures added by this method are placed before procedures added by
-    `actions.add()`.
+    `commands.add()`.
 
     Procedures are added immediately before the start of processing. Thus,
     calling this method during processing will have no effect.
 
-    Unlike `actions.add()`, procedures added by this method do not act as
+    Unlike `commands.add()`, procedures added by this method do not act as
     settings, i.e. they are merely functions without GUI, are not saved
     persistently and are always enabled.
 
-    This class recognizes several action groups that are invoked at certain
+    This class recognizes several command groups that are invoked at certain
     places when `run()` is called:
 
     * ``'before_process_items'`` - invoked before starting processing the first
@@ -470,15 +470,15 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     return self._initial_invoker.add(self._get_constraint_func(func), *args, **kwargs)
 
-  def remove_action(self, *args, **kwargs):
-    """Removes an action originally scheduled to be applied during `run()`.
+  def remove_command(self, *args, **kwargs):
+    """Removes a command originally scheduled to be applied during `run()`.
 
     The signature is the same as for `pygimplib.invoker.Invoker.remove()`.
     """
     self._initial_invoker.remove(*args, **kwargs)
 
-  def reorder_action(self, *args, **kwargs):
-    """Reorders an action to be applied during `run()`.
+  def reorder_command(self, *args, **kwargs):
+    """Reorders a command to be applied during `run()`.
 
     The signature is the same as for `pygimplib.invoker.Invoker.reorder()`.
     """
@@ -566,70 +566,70 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._invoker = invoker_.Invoker()
 
-    self._add_actions()
-    self._add_name_only_actions()
+    self._add_commands()
+    self._add_name_only_commands()
 
     self._set_constraints()
 
     self._progress_updater.reset()
 
-  def _add_actions(self):
-    self._add_actions_before_initial_invoker()
+  def _add_commands(self):
+    self._add_commands_before_initial_invoker()
 
     self._invoker.add(
       self._initial_invoker,
       self._initial_invoker.list_groups(include_empty_groups=True))
 
-    self._add_actions_before_procedures_from_settings()
+    self._add_commands_before_procedures_from_settings()
 
     for procedure in self._procedures:
-      self._add_action_from_settings(procedure)
+      self._add_command_from_settings(procedure)
 
-    self._add_actions_after_procedures_from_settings()
+    self._add_commands_after_procedures_from_settings()
 
     for constraint in self._constraints:
-      self._add_action_from_settings(constraint)
+      self._add_command_from_settings(constraint)
 
-  def _add_actions_before_initial_invoker(self):
+  def _add_commands_before_initial_invoker(self):
     pass
 
-  def _add_actions_before_procedures_from_settings(self):
+  def _add_commands_before_procedures_from_settings(self):
     pass
 
-  def _add_actions_after_procedures_from_settings(self):
+  def _add_commands_after_procedures_from_settings(self):
     pass
 
-  def _add_name_only_actions(self):
-    self._add_name_only_actions_before_procedures_from_settings()
+  def _add_name_only_commands(self):
+    self._add_name_only_commands_before_procedures_from_settings()
 
     for procedure in self._procedures:
-      self._add_action_from_settings(
+      self._add_command_from_settings(
         procedure,
-        [builtin_actions_common.NAME_ONLY_TAG],
-        [_NAME_ONLY_ACTION_GROUP])
+        [builtin_commands_common.NAME_ONLY_TAG],
+        [_NAME_ONLY_COMMAND_GROUP])
 
-    self._add_name_only_actions_after_procedures_from_settings()
+    self._add_name_only_commands_after_procedures_from_settings()
 
     for constraint in self._constraints:
-      self._add_action_from_settings(
+      self._add_command_from_settings(
         constraint,
-        [builtin_actions_common.NAME_ONLY_TAG],
-        [_NAME_ONLY_ACTION_GROUP])
+        [builtin_commands_common.NAME_ONLY_TAG],
+        [_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_actions_before_procedures_from_settings(self):
+  def _add_name_only_commands_before_procedures_from_settings(self):
     pass
 
-  def _add_name_only_actions_after_procedures_from_settings(self):
+  def _add_name_only_commands_after_procedures_from_settings(self):
     pass
 
-  def _add_action_from_settings(
+  def _add_command_from_settings(
         self,
-        action: pg.setting.Group,
+        command: pg.setting.Group,
         tags: Optional[Iterable[str]] = None,
-        action_groups: Union[str, List[str], None] = None,
+        command_groups: Union[str, List[str], None] = None,
   ):
-    """Adds an action and wraps/processes the action's function according to the
-    action's settings.
+    """Adds a command and wraps/processes the command's function according to the
+    command's settings.
 
     For PDB procedures, the function name is converted to a proper function
     object. For constraints, the function is wrapped to act as a proper filter
@@ -637,119 +637,119 @@ class Batcher(metaclass=abc.ABCMeta):
     as function arguments are replaced with real objects during processing of
     each item.
 
-    If ``tags`` is not ``None``, the action will not be added if it does not
+    If ``tags`` is not ``None``, the command will not be added if it does not
     contain any of the specified tags.
 
-    If ``action_groups`` is not ``None``, the action will be added to the
-    specified action groups instead of the groups defined in ``action[
-    'action_groups']``.
+    If ``command_groups`` is not ``None``, the command will be added to the
+    specified command groups instead of the groups defined in ``command[
+    'command_groups']``.
     """
-    if action['origin'].value == 'builtin':
-      if 'procedure' in action.tags:
+    if command['origin'].value == 'builtin':
+      if 'procedure' in command.tags:
         function = builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS[
-          action['orig_name'].value]
-      elif 'constraint' in action.tags:
+          command['orig_name'].value]
+      elif 'constraint' in command.tags:
         function = builtin_constraints.BUILTIN_CONSTRAINTS_FUNCTIONS[
-          action['orig_name'].value]
+          command['orig_name'].value]
       else:
-        raise exceptions.ActionError(
-          f'invalid action "{action.name}" - must contain "procedure" or "constraint" in tags',
-          action,
+        raise exceptions.CommandError(
+          f'invalid command "{command.name}" - must contain "procedure" or "constraint" in tags',
+          command,
           None,
           None)
-    elif action['origin'].value in ['gimp_pdb', 'gegl']:
-      if action['function'].value in pdb:
-        function = pdb[action['function'].value]
+    elif command['origin'].value in ['gimp_pdb', 'gegl']:
+      if command['function'].value in pdb:
+        function = pdb[command['function'].value]
       else:
-        if action['enabled'].value:
-          message = f'PDB procedure "{action["function"].value}" not found'
+        if command['enabled'].value:
+          message = f'PDB procedure "{command["function"].value}" not found'
 
-          if 'procedure' in action.tags:
-            self._failed_procedures[action.name].append((None, message, None))
-          if 'constraint' in action.tags:
-            self._failed_constraints[action.name].append((None, message, None))
+          if 'procedure' in command.tags:
+            self._failed_procedures[command.name].append((None, message, None))
+          if 'constraint' in command.tags:
+            self._failed_constraints[command.name].append((None, message, None))
 
-          raise exceptions.ActionError(message, action, None, None)
+          raise exceptions.CommandError(message, command, None, None)
         else:
           return
     else:
-      raise exceptions.ActionError(
-        f'invalid origin {action["origin"].value} for action "{action.name}"',
-        action,
+      raise exceptions.CommandError(
+        f'invalid origin {command["origin"].value} for command "{command.name}"',
+        command,
         None,
         None)
 
     if function is None:
       return
 
-    if tags is not None and not any(tag in action.tags for tag in tags):
+    if tags is not None and not any(tag in command.tags for tag in tags):
       return
 
-    processed_function = self._get_processed_function(action)
+    processed_function = self._get_processed_function(command)
 
-    processed_function = self._handle_exceptions_from_action(processed_function, action)
+    processed_function = self._handle_exceptions_from_command(processed_function, command)
 
-    if action_groups is None:
-      action_groups = action['action_groups'].value
+    if command_groups is None:
+      command_groups = command['command_groups'].value
 
-    invoker_args = list(action['arguments']) + [function]
+    invoker_args = list(command['arguments']) + [function]
 
-    self._invoker.add(processed_function, action_groups, invoker_args)
+    self._invoker.add(processed_function, command_groups, invoker_args)
 
-  def _get_processed_function(self, action):
+  def _get_processed_function(self, command):
 
-    def _function_wrapper(*action_args_and_function):
-      action_args, function = action_args_and_function[:-1], action_args_and_function[-1]
+    def _function_wrapper(*command_args_and_function):
+      command_args, function = command_args_and_function[:-1], command_args_and_function[-1]
 
-      if not self._is_enabled(action):
+      if not self._is_enabled(command):
         return False
 
-      self._set_current_procedure_and_constraint(action)
+      self._set_current_procedure_and_constraint(command)
 
-      args, kwargs = self._get_action_args_and_kwargs(action, action_args)
+      args, kwargs = self._get_command_args_and_kwargs(command, command_args)
 
-      if 'constraint' in action.tags:
-        function = self._set_apply_constraint_to_folders(function, action)
-        function = self._get_constraint_func(function, action['orig_name'].value)
+      if 'constraint' in command.tags:
+        function = self._set_apply_constraint_to_folders(function, command)
+        function = self._get_constraint_func(function, command['orig_name'].value)
 
       return function(*args, **kwargs)
 
     return _function_wrapper
 
-  def _is_enabled(self, action):
+  def _is_enabled(self, command):
     if self._is_preview:
-      if not (action['enabled'].value and action['more_options/enabled_for_previews'].value):
+      if not (command['enabled'].value and command['more_options/enabled_for_previews'].value):
         return False
     else:
-      if not action['enabled'].value:
+      if not command['enabled'].value:
         return False
 
     return True
 
-  def _set_current_procedure_and_constraint(self, action):
-    if 'procedure' in action.tags:
-      self._current_procedure = action
+  def _set_current_procedure_and_constraint(self, command):
+    if 'procedure' in command.tags:
+      self._current_procedure = command
 
-    if 'constraint' in action.tags:
-      self._last_constraint = action
+    if 'constraint' in command.tags:
+      self._last_constraint = command
 
-  def _get_action_args_and_kwargs(self, action, action_args):
+  def _get_command_args_and_kwargs(self, command, command_args):
     args, kwargs = self._get_replaced_args(
-      action_args, action['origin'].value in ['gimp_pdb', 'gegl'])
+      command_args, command['origin'].value in ['gimp_pdb', 'gegl'])
 
-    if action['origin'].value in ['gimp_pdb', 'gegl']:
-      args.pop(_BATCHER_ARG_POSITION_IN_ACTIONS)
+    if command['origin'].value in ['gimp_pdb', 'gegl']:
+      args.pop(_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     return args, kwargs
 
-  def _get_replaced_args(self, action_arguments, is_function_pdb_procedure):
-    """Returns positional and keyword arguments for an action, replacing any
+  def _get_replaced_args(self, command_arguments, is_function_pdb_procedure):
+    """Returns positional and keyword arguments for a command, replacing any
     placeholder values with real values.
     """
     replaced_args = []
     replaced_kwargs = {}
 
-    for argument in action_arguments:
+    for argument in command_arguments:
       if isinstance(argument, placeholders.PlaceholderArraySetting):
         replaced_arg = placeholders.get_replaced_value(argument, self)
         if is_function_pdb_procedure:
@@ -770,14 +770,14 @@ class Batcher(metaclass=abc.ABCMeta):
     return replaced_args, replaced_kwargs
 
   @staticmethod
-  def _set_apply_constraint_to_folders(function, action):
-    if action['more_options/also_apply_to_parent_folders'].value:
+  def _set_apply_constraint_to_folders(function, command):
+    if command['more_options/also_apply_to_parent_folders'].value:
 
-      def _function_wrapper(*action_args, **action_kwargs):
-        item = action_args[0]
+      def _function_wrapper(*command_args, **command_kwargs):
+        item = command_args[0]
         result = True
         for item_or_parent in [item] + item.parents[::-1]:
-          result = result and function(item_or_parent, *action_args[1:], **action_kwargs)
+          result = result and function(item_or_parent, *command_args[1:], **command_kwargs)
           if not result:
             break
 
@@ -794,13 +794,13 @@ class Batcher(metaclass=abc.ABCMeta):
 
     return _function_wrapper
 
-  def _handle_exceptions_from_action(self, function, action):
+  def _handle_exceptions_from_command(self, function, command):
     def _handle_exceptions(*args, **kwargs):
       try:
         retval = function(*args, **kwargs)
-      except exceptions.SkipAction as e:
-        # Log skipped actions and continue processing.
-        self._set_skipped_actions(action, str(e))
+      except exceptions.SkipCommand as e:
+        # Log skipped commands and continue processing.
+        self._set_skipped_commands(command, str(e))
       except pg.PDBProcedureError as e:
         error_message = e.message
         if error_message is None:
@@ -808,40 +808,40 @@ class Batcher(metaclass=abc.ABCMeta):
             'An error occurred. Please check the GIMP error message'
             ' or the error console for details, if any.')
 
-        # Log failed action, but raise error as this may result in unexpected
+        # Log failed command, but raise error as this may result in unexpected
         # behavior.
-        self._set_failed_actions(action, error_message)
+        self._set_failed_commands(command, error_message)
 
-        raise exceptions.ActionError(error_message, action, self._current_item)
+        raise exceptions.CommandError(error_message, command, self._current_item)
       except Exception as e:
         trace = traceback.format_exc()
-        # Log failed action, but raise error as this may result in unexpected
+        # Log failed command, but raise error as this may result in unexpected
         # behavior.
-        self._set_failed_actions(action, str(e), trace)
+        self._set_failed_commands(command, str(e), trace)
 
-        raise exceptions.ActionError(str(e), action, self._current_item, trace)
+        raise exceptions.CommandError(str(e), command, self._current_item, trace)
       else:
         return retval
 
     return _handle_exceptions
 
-  def _set_skipped_actions(self, action, error_message):
-    if 'procedure' in action.tags:
-      self._skipped_procedures[action.name].append((self._current_item, error_message))
-    if 'constraint' in action.tags:
-      self._skipped_constraints[action.name].append((self._current_item, error_message))
+  def _set_skipped_commands(self, command, error_message):
+    if 'procedure' in command.tags:
+      self._skipped_procedures[command.name].append((self._current_item, error_message))
+    if 'constraint' in command.tags:
+      self._skipped_constraints[command.name].append((self._current_item, error_message))
 
-  def _set_failed_actions(self, action, error_message, trace=None):
-    if 'procedure' in action.tags:
-      self._failed_procedures[action.name].append((self._current_item, error_message, trace))
-    if 'constraint' in action.tags:
-      self._failed_constraints[action.name].append((self._current_item, error_message, trace))
+  def _set_failed_commands(self, command, error_message, trace=None):
+    if 'procedure' in command.tags:
+      self._failed_procedures[command.name].append((self._current_item, error_message, trace))
+    if 'constraint' in command.tags:
+      self._failed_constraints[command.name].append((self._current_item, error_message, trace))
 
   def _set_constraints(self):
     self._invoker.invoke(
-      [actions.DEFAULT_CONSTRAINTS_GROUP],
+      [commands.DEFAULT_CONSTRAINTS_GROUP],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
   def _setup_contents(self):
     Gimp.context_push()
@@ -854,13 +854,13 @@ class Batcher(metaclass=abc.ABCMeta):
     self._invoker.invoke(
       ['before_process_items'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     if self._process_contents:
       self._invoker.invoke(
         ['before_process_items_contents'],
         [self],
-        additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+        additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     for item in self._matching_items:
       if self._should_stop:
@@ -875,12 +875,12 @@ class Batcher(metaclass=abc.ABCMeta):
       self._invoker.invoke(
         ['after_process_items_contents'],
         [self],
-        additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+        additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
       ['after_process_items'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
   def _get_items_matching_constraints(self):
     def _get_matching_items_and_next_items(matching_items_list_):
@@ -920,58 +920,58 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_layer = self._get_initial_current_layer()
 
     if self._is_preview and self._process_names:
-      self._process_item_with_name_only_actions()
+      self._process_item_with_name_only_commands()
 
     if self._process_contents:
-      self._process_item_with_actions()
+      self._process_item_with_commands()
 
     self._progress_updater.update_tasks()
 
-  def _process_item_with_name_only_actions(self):
+  def _process_item_with_name_only_commands(self):
     self._invoker.invoke(
       ['before_process_item'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
-      [_NAME_ONLY_ACTION_GROUP],
+      [_NAME_ONLY_COMMAND_GROUP],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
       ['after_process_item'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
-  def _process_item_with_actions(self):
+  def _process_item_with_commands(self):
     self._store_selected_layers_in_current_image_and_start_undo_group()
 
     self._invoker.invoke(
       ['before_process_item'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     if self._process_contents:
       self._invoker.invoke(
         ['before_process_item_contents'],
         [self],
-        additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+        additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_PROCEDURES_GROUP],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     if self._process_contents:
       self._invoker.invoke(
         ['after_process_item_contents'],
         [self],
-        additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+        additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
       ['after_process_item'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     if not self._edit_mode and not self._keep_image_copies:
       self._remove_image_copies()
@@ -1001,14 +1001,14 @@ class Batcher(metaclass=abc.ABCMeta):
     self._invoker.invoke(
       ['cleanup_contents'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._do_cleanup_contents(exception_occurred)
 
     self._invoker.invoke(
       ['after_cleanup_contents'],
       [self],
-      additional_args_position=_BATCHER_ARG_POSITION_IN_ACTIONS)
+      additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._current_item = None
     self._current_image = None
@@ -1056,7 +1056,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
 class ImageBatcher(Batcher):
   """Class for batch-processing files and opened GIMP images with a sequence of
-  actions (resize, rename, export, ...).
+  commands (resize, rename, export, ...).
   """
 
   def __init__(self, *args, **kwargs):
@@ -1070,47 +1070,47 @@ class ImageBatcher(Batcher):
   def _get_initial_current_layer(self):
     return None
 
-  def _add_actions_before_initial_invoker(self):
-    super()._add_actions_before_initial_invoker()
+  def _add_commands_before_initial_invoker(self):
+    super()._add_commands_before_initial_invoker()
 
     self._invoker.add(
       _set_selected_and_current_layer,
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_PROCEDURES_GROUP],
     )
 
     self._invoker.add(
-      _set_selected_and_current_layer_after_action,
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      _set_selected_and_current_layer_after_command,
+      [commands.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
-  def _add_actions_before_procedures_from_settings(self):
-    super()._add_actions_before_procedures_from_settings()
+  def _add_commands_before_procedures_from_settings(self):
+    super()._add_commands_before_procedures_from_settings()
 
-    self._add_default_rename_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_rename_procedure([commands.DEFAULT_PROCEDURES_GROUP])
 
-  def _add_actions_after_procedures_from_settings(self):
-    super()._add_actions_after_procedures_from_settings()
+  def _add_commands_after_procedures_from_settings(self):
+    super()._add_commands_after_procedures_from_settings()
 
-    self._add_default_export_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_export_procedure([commands.DEFAULT_PROCEDURES_GROUP])
 
-  def _add_name_only_actions_before_procedures_from_settings(self):
-    self._add_default_rename_procedure([_NAME_ONLY_ACTION_GROUP])
+  def _add_name_only_commands_before_procedures_from_settings(self):
+    self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_actions_after_procedures_from_settings(self):
-    self._add_default_export_procedure([_NAME_ONLY_ACTION_GROUP])
+  def _add_name_only_commands_after_procedures_from_settings(self):
+    self._add_default_export_procedure([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_default_rename_procedure(self, action_groups):
+  def _add_default_rename_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_procedures.rename_image_for_convert,
-        groups=action_groups,
+        groups=command_groups,
         args=[self._name_pattern])
 
-  def _add_default_export_procedure(self, action_groups):
+  def _add_default_export_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_procedures.export,
-        groups=action_groups,
+        groups=command_groups,
         args=[
           self._output_directory,
           self._file_extension,
@@ -1118,7 +1118,7 @@ class ImageBatcher(Batcher):
         kwargs=self._more_export_options,
       )
 
-  def _process_item_with_actions(self):
+  def _process_item_with_commands(self):
     self._should_load_image = self._current_image is None
 
     if not self._edit_mode or self._is_preview:
@@ -1137,7 +1137,7 @@ class ImageBatcher(Batcher):
     self._current_layer = self._get_current_layer(self._current_image)
 
     if self._current_image is not None:
-      super()._process_item_with_actions()
+      super()._process_item_with_commands()
 
     if self._should_load_image:
       self._current_item.raw = None
@@ -1193,7 +1193,7 @@ class ImageBatcher(Batcher):
 
 class LayerBatcher(Batcher):
   """Class for batch-processing layers in the specified image with a sequence of
-  actions (resize, rename, export, ...).
+  commands (resize, rename, export, ...).
 
   If ``edit_mode`` is ``False``, batch-processing and export of layers is
   performed. The processing and export is applied on a copy of the layer
@@ -1208,58 +1208,58 @@ class LayerBatcher(Batcher):
   def _get_initial_current_layer(self):
     return self._current_item.raw
 
-  def _add_actions_before_initial_invoker(self):
-    super()._add_actions_before_initial_invoker()
+  def _add_commands_before_initial_invoker(self):
+    super()._add_commands_before_initial_invoker()
 
     self._invoker.add(
       _set_selected_and_current_layer,
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_PROCEDURES_GROUP],
     )
 
     self._invoker.add(
-      _set_selected_and_current_layer_after_action,
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      _set_selected_and_current_layer_after_command,
+      [commands.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
     self._invoker.add(
       _sync_item_name_and_layer_name,
-      [actions.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_PROCEDURES_GROUP],
       foreach=True)
 
     if self._edit_mode:
       self._invoker.add(
-        _preserve_layer_locks_between_actions,
-        [actions.DEFAULT_PROCEDURES_GROUP],
+        _preserve_layer_locks_between_commands,
+        [commands.DEFAULT_PROCEDURES_GROUP],
         foreach=True)
 
-  def _add_actions_before_procedures_from_settings(self):
-    super()._add_actions_before_procedures_from_settings()
+  def _add_commands_before_procedures_from_settings(self):
+    super()._add_commands_before_procedures_from_settings()
 
-    self._add_default_rename_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_rename_procedure([commands.DEFAULT_PROCEDURES_GROUP])
 
-  def _add_actions_after_procedures_from_settings(self):
-    super()._add_actions_after_procedures_from_settings()
+  def _add_commands_after_procedures_from_settings(self):
+    super()._add_commands_after_procedures_from_settings()
 
-    self._add_default_export_procedure([actions.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_export_procedure([commands.DEFAULT_PROCEDURES_GROUP])
 
-  def _add_name_only_actions_before_procedures_from_settings(self):
-    self._add_default_rename_procedure([_NAME_ONLY_ACTION_GROUP])
+  def _add_name_only_commands_before_procedures_from_settings(self):
+    self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_actions_after_procedures_from_settings(self):
-    self._add_default_export_procedure([_NAME_ONLY_ACTION_GROUP])
+  def _add_name_only_commands_after_procedures_from_settings(self):
+    self._add_default_export_procedure([_NAME_ONLY_COMMAND_GROUP])
   
-  def _add_default_rename_procedure(self, action_groups):
+  def _add_default_rename_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_procedures.rename_layer,
-        groups=action_groups,
+        groups=command_groups,
         args=[self._name_pattern])
   
-  def _add_default_export_procedure(self, action_groups):
+  def _add_default_export_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_procedures.export,
-        groups=action_groups,
+        groups=command_groups,
         args=[
           self._output_directory,
           self._file_extension,
@@ -1267,7 +1267,7 @@ class LayerBatcher(Batcher):
         kwargs=self._more_export_options,
       )
   
-  def _process_item_with_actions(self):
+  def _process_item_with_commands(self):
     if not self._edit_mode or self._is_preview:
       image_copy, layer_copy = self.create_copy(self._current_image, self._current_layer)
 
@@ -1275,7 +1275,7 @@ class LayerBatcher(Batcher):
       self._current_layer = layer_copy
       self._image_copies.append(image_copy)
 
-    super()._process_item_with_actions()
+    super()._process_item_with_commands()
 
     self._current_image = None
     self._current_layer = None
@@ -1331,10 +1331,10 @@ def _set_selected_and_current_layer(batcher):
           image.set_selected_layers([image_layers[0]])
 
 
-def _set_selected_and_current_layer_after_action(batcher):
-  action_applied = yield
+def _set_selected_and_current_layer_after_command(batcher):
+  command_applied = yield
 
-  if action_applied or action_applied is None:
+  if command_applied or command_applied is None:
     _set_selected_and_current_layer(batcher)
 
 
@@ -1345,7 +1345,7 @@ def _sync_item_name_and_layer_name(layer_batcher):
     layer_batcher.current_item.name = layer_batcher.current_layer.get_name()
 
 
-def _preserve_layer_locks_between_actions(layer_batcher):
+def _preserve_layer_locks_between_commands(layer_batcher):
   # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`.
   # We need to use `Item.raw` for parents as well.
   item = layer_batcher.current_item

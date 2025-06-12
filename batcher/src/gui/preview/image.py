@@ -266,7 +266,7 @@ class ImagePreview(preview_base_.Preview):
   def _get_in_memory_preview(self):
     start_update_time = time.time()
 
-    self._batcher.remove_action(
+    self._batcher.remove_command(
       self._set_update_duration_command_id, groups='all', ignore_if_not_exists=True)
     self._set_update_duration_command_id = self._batcher.add_procedure(
       self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
@@ -326,9 +326,9 @@ class ImagePreview(preview_base_.Preview):
     except exceptions.BatcherFileLoadError as e:
       error = e
       display_error_message_as_label = True
-    except exceptions.ActionError as e:
+    except exceptions.CommandError as e:
       messages_.display_failure_message(
-        messages_.get_failing_action_message(e),
+        messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=pg.gui.get_toplevel_window(self))

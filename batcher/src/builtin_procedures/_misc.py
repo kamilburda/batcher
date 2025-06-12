@@ -5,7 +5,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from src import builtin_actions_common
+from src import builtin_commands_common
 from src.path import fileext
 from src.procedure_groups import *
 
@@ -99,5 +99,5 @@ REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT = {
   'function': remove_file_extension_from_imported_images,
   'display_name': _('Remove file extension from imported images'),
   'description': _('Imported images represent non-native GIMP files (i.e. not XCF).'),
-  'additional_tags': [builtin_actions_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
+  'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
 }

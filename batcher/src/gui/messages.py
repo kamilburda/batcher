@@ -580,35 +580,35 @@ def display_invalid_image_failure_message(
     parent=parent)
 
 
-def get_failing_action_message(
-      action_and_item_or_action_error: Union[
-        Tuple[pg.setting.Group, pg.itemtree.Item], exceptions.ActionError],
+def get_failing_command_message(
+      command_and_item_or_command_error: Union[
+        Tuple[pg.setting.Group, pg.itemtree.Item], exceptions.CommandError],
 ):
-  if isinstance(action_and_item_or_action_error, exceptions.ActionError):
-    action, item = action_and_item_or_action_error.action, action_and_item_or_action_error.item
+  if isinstance(command_and_item_or_command_error, exceptions.CommandError):
+    command, item = command_and_item_or_command_error.command, command_and_item_or_command_error.item
   else:
-    action, item = action_and_item_or_action_error
+    command, item = command_and_item_or_command_error
   
-  if 'procedure' not in action.tags and 'constraint' not in action.tags:
-    raise ValueError('an action must have the "procedure" or "constraint" tag')
+  if 'procedure' not in command.tags and 'constraint' not in command.tags:
+    raise ValueError('a command must have the "procedure" or "constraint" tag')
 
   message_template = None
 
   if item is not None:
-    if 'procedure' in action.tags:
+    if 'procedure' in command.tags:
       message_template = _('Failed to apply procedure "{}" on "{}" because:')
-    elif 'constraint' in action.tags:
+    elif 'constraint' in command.tags:
       message_template = _('Failed to apply constraint "{}" on "{}" because:')
 
     if message_template is not None:
-      return message_template.format(action['display_name'].value, item.orig_name)
+      return message_template.format(command['display_name'].value, item.orig_name)
   else:
-    if 'procedure' in action.tags:
+    if 'procedure' in command.tags:
       message_template = _('Failed to apply procedure "{}" because:')
-    elif 'constraint' in action.tags:
+    elif 'constraint' in command.tags:
       message_template = _('Failed to apply constraint "{}" because:')
 
     if message_template is not None:
-      return message_template.format(action['display_name'].value)
+      return message_template.format(command['display_name'].value)
 
-  return action['display_name'].value
+  return command['display_name'].value

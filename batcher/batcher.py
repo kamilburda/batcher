@@ -18,7 +18,7 @@ gettext.textdomain('batcher')
 
 builtins._ = gettext.gettext
 
-from src import actions as actions_
+from src import commands as commands_
 from src import builtin_constraints
 from src.gui import messages as messages_
 
@@ -430,8 +430,8 @@ def _load_and_update_settings(settings, run_mode):
       report_uri_list=pg.config.BUG_REPORT_URL_LIST)
 
     pg.setting.Persistor.clear()
-    actions_.clear(settings['main/procedures'])
-    actions_.clear(settings['main/constraints'])
+    commands_.clear(settings['main/procedures'])
+    commands_.clear(settings['main/constraints'])
 
     return True, ''
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
@@ -483,9 +483,9 @@ def _set_settings_from_args(settings, config):
 
 
 def _set_constraints_to_only_selected_layers(settings):
-  actions_.clear(settings['main/constraints'], add_initial_actions=False)
+  commands_.clear(settings['main/constraints'], add_initial_commands=False)
 
-  actions_.add(
+  commands_.add(
     settings['main/constraints'], builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
 
 

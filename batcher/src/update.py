@@ -12,7 +12,7 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import actions as actions_
+from src import commands as commands_
 from src import builtin_constraints
 from src import builtin_procedures
 from src import setting_classes as setting_classes_
@@ -216,8 +216,8 @@ def _update_to_0_3(data, settings, procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
-    _update_actions_to_0_3(main_settings_list, 'procedures')
-    _update_actions_to_0_3(main_settings_list, 'constraints')
+    _update_commands_to_0_3(main_settings_list, 'procedures')
+    _update_commands_to_0_3(main_settings_list, 'constraints')
 
     setting_dict, _index = _get_child_setting(main_settings_list, 'file_extension')
     if setting_dict is not None:
@@ -261,22 +261,22 @@ def _update_to_0_3(data, settings, procedure_groups):
           settings['gui/size/paned_between_previews_position'].default_value)
 
 
-def _update_actions_to_0_3(main_settings_list, action_type):
-  actions_list, _index = _get_child_group_list(main_settings_list, action_type)
+def _update_commands_to_0_3(main_settings_list, command_type):
+  commands_list, _index = _get_child_group_list(main_settings_list, command_type)
 
-  if actions_list is None:
+  if commands_list is None:
     return
 
-  for action_dict in actions_list:
-    action_list = action_dict['settings']
+  for command_dict in commands_list:
+    command_list = command_dict['settings']
 
     display_options_on_create_dict, _index = (
-      _get_child_setting(action_list, 'display_options_on_create'))
+      _get_child_setting(command_list, 'display_options_on_create'))
     if display_options_on_create_dict:
       display_options_on_create_dict['value'] = False
       display_options_on_create_dict['default_value'] = False
 
-    more_options_list, _index = _get_child_group_list(action_list, 'more_options')
+    more_options_list, _index = _get_child_group_list(command_list, 'more_options')
 
     if more_options_list is None:
       more_options_dict = {
@@ -286,25 +286,25 @@ def _update_actions_to_0_3(main_settings_list, action_type):
         },
         'settings': [],
       }
-      action_list.insert(-2, more_options_dict)
+      command_list.insert(-2, more_options_dict)
 
       more_options_list = more_options_dict['settings']
 
     enabled_for_previews_in_more_options_dict, _index = (
       _get_child_setting(more_options_list, 'enabled_for_previews'))
     if enabled_for_previews_in_more_options_dict is None:
-      enabled_for_previews_dict, index = _get_child_setting(action_list, 'enabled_for_previews')
+      enabled_for_previews_dict, index = _get_child_setting(command_list, 'enabled_for_previews')
       if enabled_for_previews_dict is not None:
-        action_list.pop(index)
+        command_list.pop(index)
         more_options_list.append(enabled_for_previews_dict)
 
     also_apply_to_parent_folders_in_more_options_dict, _index = (
       _get_child_setting(more_options_list, 'also_apply_to_parent_folders'))
     if also_apply_to_parent_folders_in_more_options_dict is None:
       also_apply_to_parent_folders_dict, index = (
-        _get_child_setting(action_list, 'also_apply_to_parent_folders'))
+        _get_child_setting(command_list, 'also_apply_to_parent_folders'))
       if also_apply_to_parent_folders_dict is not None:
-        action_list.pop(index)
+        command_list.pop(index)
         more_options_list.append(also_apply_to_parent_folders_dict)
 
 
@@ -326,7 +326,7 @@ def _update_to_0_4(data, _settings, procedure_groups):
     if procedures_list is None or constraints_list is None:
       return
 
-    _handle_background_foreground_actions(procedures_list, constraints_list)
+    _handle_background_foreground_commands(procedures_list, constraints_list)
 
     for procedure_dict in procedures_list:
       procedure_list = procedure_dict['settings']
@@ -352,29 +352,29 @@ def _update_to_0_4(data, _settings, procedure_groups):
         orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
 
 
-def _handle_background_foreground_actions(procedures_list, constraints_list):
-  _remove_action_by_orig_names(procedures_list, ['merge_background', 'merge_foreground'])
+def _handle_background_foreground_commands(procedures_list, constraints_list):
+  _remove_command_by_orig_names(procedures_list, ['merge_background', 'merge_foreground'])
 
   merge_procedure_mapping = {
     'insert_background': 'merge_background',
     'insert_foreground': 'merge_foreground',
   }
-  procedure_names = {action_dict['name'] for action_dict in procedures_list}
+  procedure_names = {command_dict['name'] for command_dict in procedures_list}
   procedure_display_names = {
-    _get_child_setting(action_dict['settings'], 'display_name')[0]['value']
-    for action_dict in procedures_list
-    if _get_child_setting(action_dict['settings'], 'display_name')[0] is not None
+    _get_child_setting(command_dict['settings'], 'display_name')[0]['value']
+    for command_dict in procedures_list
+    if _get_child_setting(command_dict['settings'], 'display_name')[0] is not None
   }
 
   constraint_mapping = {
     'insert_background': 'not_background',
     'insert_foreground': 'not_foreground',
   }
-  constraint_names = {action_dict['name'] for action_dict in constraints_list}
+  constraint_names = {command_dict['name'] for command_dict in constraints_list}
   constraint_display_names = {
-    _get_child_setting(action_dict['settings'], 'display_name')[0]['value']
-    for action_dict in constraints_list
-    if _get_child_setting(action_dict['settings'], 'display_name')[0] is not None
+    _get_child_setting(command_dict['settings'], 'display_name')[0]['value']
+    for command_dict in constraints_list
+    if _get_child_setting(command_dict['settings'], 'display_name')[0] is not None
   }
 
   merge_group_dicts = []
@@ -402,10 +402,10 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
         })
 
       merge_procedure_name = merge_procedure_mapping[orig_name_setting_dict['default_value']]
-      merge_group_dict = _create_action_as_saved_dict(
+      merge_group_dict = _create_command_as_saved_dict(
         builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
 
-      unique_merge_procedure_name = _uniquify_action_name(merge_procedure_name, procedure_names)
+      unique_merge_procedure_name = _uniquify_command_name(merge_procedure_name, procedure_names)
       merge_group_dict['name'] = unique_merge_procedure_name
       arguments_list[-2]['value'] = unique_merge_procedure_name
       arguments_list[-2]['default_value'] = unique_merge_procedure_name
@@ -413,17 +413,17 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       merge_procedure_display_name_dict, _index = _get_child_setting(
         merge_group_dict['settings'], 'display_name')
       if merge_procedure_display_name_dict is not None:
-        unique_merge_procedure_display_name = _uniquify_action_display_name(
+        unique_merge_procedure_display_name = _uniquify_command_display_name(
           merge_procedure_display_name_dict['value'], procedure_display_names)
         merge_procedure_display_name_dict['value'] = unique_merge_procedure_display_name
 
       merge_group_dicts.append(merge_group_dict)
 
       constraint_name = constraint_mapping[orig_name_setting_dict['default_value']]
-      constraint_group_dict = _create_action_as_saved_dict(
+      constraint_group_dict = _create_command_as_saved_dict(
         builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
 
-      unique_constraint_name = _uniquify_action_name(constraint_name, constraint_names)
+      unique_constraint_name = _uniquify_command_name(constraint_name, constraint_names)
       constraint_group_dict['name'] = unique_constraint_name
       arguments_list[-1]['value'] = unique_constraint_name
       arguments_list[-1]['default_value'] = unique_constraint_name
@@ -431,7 +431,7 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
       constraint_display_name_dict, _index = _get_child_setting(
         constraint_group_dict['settings'], 'display_name')
       if constraint_display_name_dict is not None:
-        unique_constraint_display_name = _uniquify_action_display_name(
+        unique_constraint_display_name = _uniquify_command_display_name(
           constraint_display_name_dict['value'], constraint_display_names)
         constraint_display_name_dict['value'] = unique_constraint_display_name
 
@@ -444,58 +444,58 @@ def _handle_background_foreground_actions(procedures_list, constraints_list):
     constraints_list.append(constraint_group_dict)
 
 
-def _remove_action_by_orig_names(actions_list, action_orig_names):
+def _remove_command_by_orig_names(commands_list, command_orig_names):
   indexes = []
-  for index, action_dict in enumerate(actions_list):
-    orig_name_setting_dict, _index = _get_child_setting(action_dict['settings'], 'orig_name')
-    if orig_name_setting_dict['default_value'] in action_orig_names:
+  for index, command_dict in enumerate(commands_list):
+    orig_name_setting_dict, _index = _get_child_setting(command_dict['settings'], 'orig_name')
+    if orig_name_setting_dict['default_value'] in command_orig_names:
       indexes.append(index)
 
   for index in reversed(indexes):
-    actions_list.pop(index)
+    commands_list.pop(index)
 
 
-def _create_action_as_saved_dict(action_dict):
-  action = actions_.create_action(action_dict)
+def _create_command_as_saved_dict(command_dict):
+  command = commands_.create_command(command_dict)
 
   source = pg.setting.SimpleInMemorySource('')
-  source.write(action)
+  source.write(command)
 
   return source.data[0]
 
 
-def _uniquify_action_name(name, existing_names):
+def _uniquify_command_name(name, existing_names):
   """Returns ``name`` modified to be unique, i.e. to not match the name of any
-  existing action in ``actions``.
+  existing command in ``commands``.
   """
 
-  def _generate_unique_action_name():
+  def _generate_unique_command_name():
     i = 2
     while True:
       yield f'_{i}'
       i += 1
 
   uniquified_name = uniquify.uniquify_string(
-    name, existing_names, generator=_generate_unique_action_name())
+    name, existing_names, generator=_generate_unique_command_name())
 
   existing_names.add(uniquified_name)
 
   return uniquified_name
 
 
-def _uniquify_action_display_name(display_name, existing_display_names):
+def _uniquify_command_display_name(display_name, existing_display_names):
   """Returns ``display_name`` modified to be unique, i.e. to not match the
-  display name of any existing action in ``actions``.
+  display name of any existing command in ``commands``.
   """
 
-  def _generate_unique_action_display_name():
+  def _generate_unique_command_display_name():
     i = 2
     while True:
       yield f' ({i})'
       i += 1
 
   uniquified_display_name = uniquify.uniquify_string(
-    display_name, existing_display_names, generator=_generate_unique_action_display_name())
+    display_name, existing_display_names, generator=_generate_unique_command_display_name())
 
   existing_display_names.add(uniquified_display_name)
 
@@ -973,7 +973,7 @@ def _update_to_0_8(data, _settings, procedure_groups):
       for procedure_dict in procedures_list:
         procedure_list = procedure_dict['settings']
 
-        _replace_action_tags_with_plug_in_procedure_groups(procedure_dict)
+        _replace_command_tags_with_plug_in_procedure_groups(procedure_dict)
 
         orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
@@ -1008,22 +1008,22 @@ def _update_to_0_8(data, _settings, procedure_groups):
 
     constraints_list, _index = _get_child_group_list(main_settings_list, 'constraints')
     if constraints_list is not None:
-      _remove_action_by_orig_names(constraints_list, ['selected_in_preview'])
+      _remove_command_by_orig_names(constraints_list, ['selected_in_preview'])
       for constraint_dict in constraints_list:
-        _replace_action_tags_with_plug_in_procedure_groups(constraint_dict)
+        _replace_command_tags_with_plug_in_procedure_groups(constraint_dict)
 
 
-def _replace_action_tags_with_plug_in_procedure_groups(action_dict):
+def _replace_command_tags_with_plug_in_procedure_groups(command_dict):
   tags_new_name_mapping = {
     'convert': 'plug-in-batch-convert',
     'export_layers': 'plug-in-batch-export-layers',
     'edit_layers': 'plug-in-batch-edit-layers',
   }
 
-  if 'tags' in action_dict:
-    action_dict['tags'] = [
+  if 'tags' in command_dict:
+    command_dict['tags'] = [
       tags_new_name_mapping[tag] if tag in tags_new_name_mapping else tag
-      for tag in action_dict['tags']]
+      for tag in command_dict['tags']]
 
 
 def _update_items_setting_for_0_8(settings_list, setting_name, new_type_name):
@@ -1346,6 +1346,8 @@ def _update_to_1_1(data, _settings, _procedure_groups):
       for procedure_dict in procedures_list:
         procedure_list = procedure_dict['settings']
 
+        _rename_command_attributes_1_1(procedure_dict)
+
         orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
 
@@ -1381,12 +1383,26 @@ def _update_to_1_1(data, _settings, _procedure_groups):
       for constraint_dict in constraints_list:
         constraint_list = constraint_dict['settings']
 
+        _rename_command_attributes_1_1(constraint_dict)
+
         orig_name_setting_dict, _index = _get_child_setting(constraint_list, 'orig_name')
         arguments_list, _index = _get_child_group_list(constraint_list, 'arguments')
 
         if (orig_name_setting_dict['value'] == 'matching_text'
             and arguments_list is not None):
           _matching_text_1_1_add_new_options(arguments_list)
+
+
+def _rename_command_attributes_1_1(command_dict):
+  if 'tags' in command_dict:
+    if 'action' in command_dict['tags']:
+      previous_tag_index = command_dict['tags'].index('action')
+      command_dict['tags'].remove('action')
+      command_dict['tags'].insert(previous_tag_index, 'command')
+
+  command_groups_dict, _index = _get_child_setting(command_dict['settings'], 'action_groups')
+  if command_groups_dict is not None:
+    command_groups_dict['name'] = 'command_groups'
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):

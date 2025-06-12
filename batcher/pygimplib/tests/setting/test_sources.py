@@ -40,11 +40,11 @@ def _test_settings_for_read_write():
     'groups': [
       {
         'name': 'resize_to_layer_size',
-        'tags': ['action', 'procedure'],
+        'tags': ['command', 'procedure'],
       },
       {
         'name': 'insert_background',
-        'tags': ['action', 'procedure'],
+        'tags': ['command', 'procedure'],
       },
     ]
   })
@@ -122,7 +122,7 @@ def _test_data_for_read_write():
               'settings': [
                 {
                   'name': 'resize_to_layer_size',
-                  'tags': ['action', 'procedure'],
+                  'tags': ['command', 'procedure'],
                   'settings': [
                     {
                       'type': 'bool',
@@ -139,7 +139,7 @@ def _test_data_for_read_write():
                 },
                 {
                   'name': 'insert_background',
-                  'tags': ['action', 'procedure'],
+                  'tags': ['command', 'procedure'],
                   'settings': [
                     {
                       'type': 'bool',
@@ -310,7 +310,7 @@ class TestSourceRead(unittest.TestCase):
     # Add 'main/constraints/visible'
     visible_constraint = {
       'name': 'visible',
-      'tags': ['action', 'constraint'],
+      'tags': ['command', 'constraint'],
       'setting_attributes': {'gui_type': None},
       'settings': [
         {
@@ -351,7 +351,7 @@ class TestSourceRead(unittest.TestCase):
         'gui_type': None,
       })
     self.assertSetEqual(
-      self.settings['main/constraints/visible'].tags, {'action', 'constraint'})
+      self.settings['main/constraints/visible'].tags, {'command', 'constraint'})
     self.assertDictEqual(
       self.settings['main/constraints/visible/enabled'].to_dict(),
       {

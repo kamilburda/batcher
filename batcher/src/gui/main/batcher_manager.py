@@ -33,7 +33,7 @@ class BatcherManager:
         self,
         mode,
         item_type,
-        action_lists,
+        command_lists,
         previews,
         settings_manager,
         parent_widget,
@@ -52,10 +52,10 @@ class BatcherManager:
       self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       should_quit = False
-    except exceptions.ActionError as e:
+    except exceptions.CommandError as e:
       should_quit = False
       messages_.display_failure_message(
-        messages_.get_failing_action_message(e),
+        messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=parent_widget)
@@ -77,7 +77,7 @@ class BatcherManager:
         previews.image_preview.update()
         previews.name_preview.update()
 
-      action_lists.set_warnings_and_deactivate_failed_actions(self._batcher)
+      command_lists.set_warnings_and_deactivate_failed_commands(self._batcher)
 
       self._batcher = None
 
