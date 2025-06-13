@@ -71,7 +71,7 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       self._dialog_label_event_box, False, False, 0)
     
     self._checkbutton_apply_to_all = Gtk.CheckButton(
-      label=_('_Apply action to all files'),
+      label=_('_Apply option to all files'),
       use_underline=True,
     )
 
