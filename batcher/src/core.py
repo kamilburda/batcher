@@ -18,7 +18,7 @@ from pygimplib import pdb
 
 from src import commands
 from src import builtin_commands_common
-from src import builtin_constraints
+from src import builtin_conditions
 from src import builtin_procedures
 from src import exceptions
 from src import invoker as invoker_
@@ -41,7 +41,7 @@ class Batcher(metaclass=abc.ABCMeta):
         self,
         item_tree: pg.itemtree.ItemTree,
         procedures: pg.setting.Group,
-        constraints: pg.setting.Group,
+        conditions: pg.setting.Group,
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
@@ -63,7 +63,7 @@ class Batcher(metaclass=abc.ABCMeta):
   ):
     self._item_tree = item_tree
     self._procedures = procedures
-    self._constraints = constraints
+    self._conditions = conditions
     self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode
     self._initial_export_run_mode = initial_export_run_mode
@@ -87,7 +87,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_image = None
     self._current_layer = None
     self._current_procedure = None
-    self._last_constraint = None
+    self._last_condition = None
 
     self._matching_items = None
     self._matching_items_and_parents = None
@@ -97,9 +97,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._orig_images_and_selected_layers = {}
 
     self._skipped_procedures = collections.defaultdict(list)
-    self._skipped_constraints = collections.defaultdict(list)
+    self._skipped_conditions = collections.defaultdict(list)
     self._failed_procedures = collections.defaultdict(list)
-    self._failed_constraints = collections.defaultdict(list)
+    self._failed_conditions = collections.defaultdict(list)
 
     self._should_stop = False
 
@@ -110,7 +110,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def item_tree(self) -> pg.itemtree.ItemTree:
     """`pygimplib.itemtree.ItemTree` instance containing items to be processed.
 
-    If the item tree has filters (constraints) set, they will be reset on each
+    If the item tree has filters (conditions) set, they will be reset on each
     call to `run()`.
     """
     return self._item_tree
@@ -121,9 +121,9 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._procedures
 
   @property
-  def constraints(self) -> pg.setting.Group:
-    """Command group containing constraints."""
-    return self._constraints
+  def conditions(self) -> pg.setting.Group:
+    """Command group containing conditions."""
+    return self._conditions
 
   @property
   def refresh_item_tree(self) -> bool:
@@ -219,7 +219,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def is_preview(self) -> bool:
-    """If ``True``, only procedures and constraints that are marked as
+    """If ``True``, only procedures and conditions that are marked as
     "enabled for previews" will be applied for previews. If ``False``, this
     property has no effect (and effectively allows performing real processing).
     """
@@ -317,17 +317,17 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._current_procedure
 
   @property
-  def last_constraint(self) -> pg.setting.Group:
-    """The most recent constraint that was evaluated."""
-    return self._last_constraint
+  def last_condition(self) -> pg.setting.Group:
+    """The most recent condition that was evaluated."""
+    return self._last_condition
 
   @property
   def matching_items(self) -> Optional[Dict[pg.itemtree.Item, Optional[pg.itemtree.Item]]]:
-    """A dictionary of (item, next item or None) pairs matching the constraints,
+    """A dictionary of (item, next item or None) pairs matching the conditions,
     or ``None`` if not initialized.
 
-    This is useful if you need to work with items matching constraints at the
-    start of processing as some items may no longer match these constraints
+    This is useful if you need to work with items matching conditions at the
+    start of processing as some items may no longer match these conditions
     at the end of processing.
     """
     return self._matching_items
@@ -336,11 +336,11 @@ class Batcher(metaclass=abc.ABCMeta):
   def matching_items_and_parents(
         self,
   ) -> Optional[Dict[pg.itemtree.Item, Optional[pg.itemtree.Item]]]:
-    """A dictionary of (item, next item or None) pairs matching the constraints,
+    """A dictionary of (item, next item or None) pairs matching the conditions,
     including the parents of the matching items, or ``None`` if not initialized.
 
-    This is useful if you need to work with items matching constraints at the
-    start of processing as some items may no longer match these constraints
+    This is useful if you need to work with items matching conditions at the
+    start of processing as some items may no longer match these conditions
     at the end of processing.
     """
     return self._matching_items_and_parents
@@ -373,13 +373,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return dict(self._skipped_procedures)
 
   @property
-  def skipped_constraints(self) -> Dict[str, List]:
-    """Constraints that were skipped during processing.
+  def skipped_conditions(self) -> Dict[str, List]:
+    """Conditions that were skipped during processing.
 
-    A skipped constraint was not evaluated for one or more items and causes no
+    A skipped condition was not evaluated for one or more items and causes no
     adverse effects further during processing.
     """
-    return dict(self._skipped_constraints)
+    return dict(self._skipped_conditions)
 
   @property
   def failed_procedures(self) -> Dict[str, List]:
@@ -391,17 +391,17 @@ class Batcher(metaclass=abc.ABCMeta):
     return dict(self._failed_procedures)
 
   @property
-  def failed_constraints(self) -> Dict[str, List]:
-    """Constraints that caused an error during processing.
+  def failed_conditions(self) -> Dict[str, List]:
+    """Conditions that caused an error during processing.
 
-    Failed constraints indicate a problem with the constraint parameters or
+    Failed conditions indicate a problem with the condition parameters or
     potentially a bug.
     """
-    return dict(self._failed_constraints)
+    return dict(self._failed_conditions)
 
   @property
   def invoker(self) -> invoker_.Invoker:
-    """`pygimplib.invoker.Invoker` instance to manage procedures and constraints
+    """`pygimplib.invoker.Invoker` instance to manage procedures and conditions
     applied on items.
 
     This property is reset on each call of `run()`.
@@ -459,8 +459,8 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     return self._initial_invoker.add(*args, **kwargs)
 
-  def add_constraint(self, func, *args, **kwargs) -> Union[int, None]:
-    """Adds a constraint to be applied during `run()`.
+  def add_condition(self, func, *args, **kwargs) -> Union[int, None]:
+    """Adds a condition to be applied during `run()`.
 
     The first argument is the function to act as a filter (returning ``True``
     or ``False``). The rest of the signature is the same as for
@@ -468,7 +468,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     For more information, see `add_procedure()`.
     """
-    return self._initial_invoker.add(self._get_constraint_func(func), *args, **kwargs)
+    return self._initial_invoker.add(self._get_condition_func(func), *args, **kwargs)
 
   def remove_command(self, *args, **kwargs):
     """Removes a command originally scheduled to be applied during `run()`.
@@ -548,7 +548,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_image = None
     self._current_layer = None
     self._current_procedure = None
-    self._last_constraint = None
+    self._last_condition = None
 
     self._should_stop = False
 
@@ -560,16 +560,16 @@ class Batcher(metaclass=abc.ABCMeta):
     self._orig_images_and_selected_layers = {}
 
     self._skipped_procedures = collections.defaultdict(list)
-    self._skipped_constraints = collections.defaultdict(list)
+    self._skipped_conditions = collections.defaultdict(list)
     self._failed_procedures = collections.defaultdict(list)
-    self._failed_constraints = collections.defaultdict(list)
+    self._failed_conditions = collections.defaultdict(list)
 
     self._invoker = invoker_.Invoker()
 
     self._add_commands()
     self._add_name_only_commands()
 
-    self._set_constraints()
+    self._set_conditions()
 
     self._progress_updater.reset()
 
@@ -587,8 +587,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._add_commands_after_procedures_from_settings()
 
-    for constraint in self._constraints:
-      self._add_command_from_settings(constraint)
+    for condition in self._conditions:
+      self._add_command_from_settings(condition)
 
   def _add_commands_before_initial_invoker(self):
     pass
@@ -610,9 +610,9 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._add_name_only_commands_after_procedures_from_settings()
 
-    for constraint in self._constraints:
+    for condition in self._conditions:
       self._add_command_from_settings(
-        constraint,
+        condition,
         [builtin_commands_common.NAME_ONLY_TAG],
         [_NAME_ONLY_COMMAND_GROUP])
 
@@ -632,7 +632,7 @@ class Batcher(metaclass=abc.ABCMeta):
     command's settings.
 
     For PDB procedures, the function name is converted to a proper function
-    object. For constraints, the function is wrapped to act as a proper filter
+    object. For conditions, the function is wrapped to act as a proper filter
     rule for `item_tree.filter`. Any placeholder objects (e.g. "current image")
     as function arguments are replaced with real objects during processing of
     each item.
@@ -648,12 +648,12 @@ class Batcher(metaclass=abc.ABCMeta):
       if 'procedure' in command.tags:
         function = builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS[
           command['orig_name'].value]
-      elif 'constraint' in command.tags:
-        function = builtin_constraints.BUILTIN_CONSTRAINTS_FUNCTIONS[
+      elif 'condition' in command.tags:
+        function = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
           command['orig_name'].value]
       else:
         raise exceptions.CommandError(
-          f'invalid command "{command.name}" - must contain "procedure" or "constraint" in tags',
+          f'invalid command "{command.name}" - must contain "procedure" or "condition" in tags',
           command,
           None,
           None)
@@ -666,8 +666,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
           if 'procedure' in command.tags:
             self._failed_procedures[command.name].append((None, message, None))
-          if 'constraint' in command.tags:
-            self._failed_constraints[command.name].append((None, message, None))
+          if 'condition' in command.tags:
+            self._failed_conditions[command.name].append((None, message, None))
 
           raise exceptions.CommandError(message, command, None, None)
         else:
@@ -704,13 +704,13 @@ class Batcher(metaclass=abc.ABCMeta):
       if not self._is_enabled(command):
         return False
 
-      self._set_current_procedure_and_constraint(command)
+      self._set_current_procedure_and_condition(command)
 
       args, kwargs = self._get_command_args_and_kwargs(command, command_args)
 
-      if 'constraint' in command.tags:
-        function = self._set_apply_constraint_to_folders(function, command)
-        function = self._get_constraint_func(function, command['orig_name'].value)
+      if 'condition' in command.tags:
+        function = self._set_apply_condition_to_folders(function, command)
+        function = self._get_condition_func(function, command['orig_name'].value)
 
       return function(*args, **kwargs)
 
@@ -726,12 +726,12 @@ class Batcher(metaclass=abc.ABCMeta):
 
     return True
 
-  def _set_current_procedure_and_constraint(self, command):
+  def _set_current_procedure_and_condition(self, command):
     if 'procedure' in command.tags:
       self._current_procedure = command
 
-    if 'constraint' in command.tags:
-      self._last_constraint = command
+    if 'condition' in command.tags:
+      self._last_condition = command
 
   def _get_command_args_and_kwargs(self, command, command_args):
     args, kwargs = self._get_replaced_args(
@@ -770,7 +770,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return replaced_args, replaced_kwargs
 
   @staticmethod
-  def _set_apply_constraint_to_folders(function, command):
+  def _set_apply_condition_to_folders(function, command):
     if command['more_options/also_apply_to_parent_folders'].value:
 
       def _function_wrapper(*command_args, **command_kwargs):
@@ -787,7 +787,7 @@ class Batcher(metaclass=abc.ABCMeta):
     else:
       return function
 
-  def _get_constraint_func(self, func, name=''):
+  def _get_condition_func(self, func, name=''):
 
     def _function_wrapper(*args, **kwargs):
       self._item_tree.filter.add(func, args, kwargs, name=name)
@@ -828,18 +828,18 @@ class Batcher(metaclass=abc.ABCMeta):
   def _set_skipped_commands(self, command, error_message):
     if 'procedure' in command.tags:
       self._skipped_procedures[command.name].append((self._current_item, error_message))
-    if 'constraint' in command.tags:
-      self._skipped_constraints[command.name].append((self._current_item, error_message))
+    if 'condition' in command.tags:
+      self._skipped_conditions[command.name].append((self._current_item, error_message))
 
   def _set_failed_commands(self, command, error_message, trace=None):
     if 'procedure' in command.tags:
       self._failed_procedures[command.name].append((self._current_item, error_message, trace))
-    if 'constraint' in command.tags:
-      self._failed_constraints[command.name].append((self._current_item, error_message, trace))
+    if 'condition' in command.tags:
+      self._failed_conditions[command.name].append((self._current_item, error_message, trace))
 
-  def _set_constraints(self):
+  def _set_conditions(self):
     self._invoker.invoke(
-      [commands.DEFAULT_CONSTRAINTS_GROUP],
+      [commands.DEFAULT_CONDITIONS_GROUP],
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
@@ -847,7 +847,7 @@ class Batcher(metaclass=abc.ABCMeta):
     Gimp.context_push()
 
   def _process_items(self):
-    self._matching_items, self._matching_items_and_parents = self._get_items_matching_constraints()
+    self._matching_items, self._matching_items_and_parents = self._get_items_matching_conditions()
 
     self._progress_updater.num_total_tasks = len(self._matching_items)
 
@@ -882,7 +882,7 @@ class Batcher(metaclass=abc.ABCMeta):
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
-  def _get_items_matching_constraints(self):
+  def _get_items_matching_conditions(self):
     def _get_matching_items_and_next_items(matching_items_list_):
       matching_items_ = {}
 
@@ -1014,7 +1014,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_image = None
     self._current_layer = None
     self._current_procedure = None
-    self._last_constraint = None
+    self._last_condition = None
 
   def _do_cleanup_contents(self, exception_occurred):
     if not self._edit_mode or self._is_preview:

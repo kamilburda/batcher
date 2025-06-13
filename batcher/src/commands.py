@@ -1,4 +1,4 @@
-"""Creation and management of plug-in commands - procedures and constraints.
+"""Creation and management of plug-in commands - procedures and conditions.
 
 Most functions take a `pygimplib.setting.Group` instance containing commands
 as its first argument.
@@ -73,7 +73,7 @@ from src.path import uniquify
 
 
 DEFAULT_PROCEDURES_GROUP = 'default_procedures'
-DEFAULT_CONSTRAINTS_GROUP = 'default_constraints'
+DEFAULT_CONDITIONS_GROUP = 'default_conditions'
 
 MORE_OPTIONS_TAG = 'more_options'
 
@@ -165,14 +165,14 @@ def create(
   * ``'procedure'`` (default): Represents a procedure. ``'command_group'``
     defaults to `DEFAULT_PROCEDURES_GROUP` if not defined.
 
-  * ``'constraint'``: Represents a constraint. ``'command_group'`` defaults to
-    `DEFAULT_CONSTRAINTS_GROUP` if not defined.
+  * ``'condition'``: Represents a condition. ``'command_group'`` defaults to
+    `DEFAULT_CONDITIONS_GROUP` if not defined.
   
-  Additional allowed fields for type ``'constraint'`` include:
+  Additional allowed fields for type ``'condition'`` include:
 
-  * ``'also_apply_to_parent_folders'``: If ``True``, apply the constraint to
-    parent groups (folders) as well. The constraint is then satisfied only if
-    the item and all of its parents satisfy the constraint.
+  * ``'also_apply_to_parent_folders'``: If ``True``, apply the condition to
+    parent groups (folders) as well. The condition is then satisfied only if
+    the item and all of its parents satisfy the condition.
   
   Custom fields are accepted as well. For each field, a separate setting is
   created, using the field name as the setting name.
@@ -339,7 +339,7 @@ def create_command(command_dict):
 
   * ``'name'`` - represents the command name,
   * ``'type'`` - represents the command type. Only the following values are
-    allowed: ``'procedure'``, ``'constraint'``.
+    allowed: ``'procedure'``, ``'condition'``.
 
   For the list of available key-value pairs beside ``name`` and ``type``, see
   `create()`.
@@ -508,27 +508,27 @@ def _create_procedure(
     **kwargs)
 
 
-def _create_constraint(
+def _create_condition(
       name,
       additional_tags=None,
-      command_groups=(DEFAULT_CONSTRAINTS_GROUP,),
+      command_groups=(DEFAULT_CONDITIONS_GROUP,),
       also_apply_to_parent_folders=False,
       **kwargs,
 ):
-  tags = ['command', 'constraint']
+  tags = ['command', 'condition']
   if additional_tags is not None:
     tags += additional_tags
   
   if command_groups is not None:
     command_groups = list(command_groups)
   
-  constraint = _create_command(
+  condition = _create_command(
     name,
     command_groups=command_groups,
     tags=tags,
     **kwargs)
   
-  constraint['more_options'].add([
+  condition['more_options'].add([
     {
       'type': 'bool',
       'name': 'also_apply_to_parent_folders',
@@ -537,7 +537,7 @@ def _create_constraint(
     },
   ])
   
-  return constraint
+  return condition
 
 
 def _set_up_command_post_creation(command):
@@ -715,5 +715,5 @@ def clear(commands: pg.setting.Group, add_initial_commands: bool = True):
 
 _COMMAND_TYPES_AND_FUNCTIONS = {
   'procedure': _create_procedure,
-  'constraint': _create_constraint,
+  'condition': _create_condition,
 }

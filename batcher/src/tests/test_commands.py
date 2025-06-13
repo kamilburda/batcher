@@ -51,17 +51,17 @@ test_procedures = [
   },
 ]
 
-test_constraints = [
+test_conditions = [
   {
     'name': 'layers',
-    'type': 'constraint',
+    'type': 'condition',
     'function': '',
     'enabled': True,
     'display_name': 'Layers',
   },
   {
     'name': 'visible',
-    'type': 'constraint',
+    'type': 'condition',
     'function': '',
     'enabled': False,
     'display_name': 'Visible',
@@ -97,12 +97,12 @@ class TestCreateCommands(unittest.TestCase):
      ['command', 'procedure'],
      {'command_groups': ['basic']}),
     
-    ('constraint',
-     'constraints',
-     test_constraints,
+    ('condition',
+     'conditions',
+     test_conditions,
      'visible',
-     ['command', 'constraint'],
-     {'command_groups': [commands_.DEFAULT_CONSTRAINTS_GROUP]}),
+     ['command', 'condition'],
+     {'command_groups': [commands_.DEFAULT_CONDITIONS_GROUP]}),
   ])
   def test_create_initial_commands_are_added(
         self,

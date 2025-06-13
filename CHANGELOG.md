@@ -5,6 +5,7 @@ General changes:
 * Added Spanish translation (thanks to @ikizgz).
 * Updated Dutch translation (thanks to @DiGro).
 * In Edit Layers, procedures are no longer applied to copies of group layers (inserted as regular layers), but rather to their original counterparts. This was previously done to avoid plug-ins failing on group layers. However, many plug-ins in GIMP 3 were removed in place of layer effects (filters) achieving the same result, the latter of which can be applied on group layers. Thus, there is little need to work on group layer copies now. This change also fixes a bug where creating a layer copy would create extra entries in the undo history.
+* "Constraints" are now referred to as "conditions". "Condition" is more intuitive.
 
 New features:
 * **New major feature: Batch-editing and saving images opened in GIMP as XCF**, available in `File -> Edit and Save Images` and `File -> Edit and Save Images (Quick)`. Existing GIMP images are saved to their respective locations, while new images are saved to the specified output folder.
@@ -12,15 +13,15 @@ New features:
 * Added a new procedure named `Crop`. You may crop the entire image or a layer in a variety of ways - cropping from edges, from a fixed position (top left, center, ...), to the specified aspect ratio, to the specified area (bounding box), or to remove empty borders.
 * Replaced `Resize to layer size` with a more generic procedure named `Resize canvas` that allows several more resize modes (add borders, resize from position/area, resize to aspect ratio, resize to image size) and filling the newly added space with a color.
 * Added a new procedure named `Rotate and flip`. You may rotate the entire image or a layer, along with several options such as the angle, or whether to rotate from the center or from a fixed point.
-* Added a new constraint named `XCF (native GIMP) file` that applies only to opened images associated with a native XCF file.
-* Added a new constraint named `Not XCF (native GIMP) file` acting as the inverse of `XCF (native GIMP) file`.
+* Added a new condition named `XCF (native GIMP) file` that applies only to opened images associated with a native XCF file.
+* Added a new condition named `Not XCF (native GIMP) file` acting as the inverse of `XCF (native GIMP) file`.
 
 Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
 * Batch Convert: Increased the initial preview height.
 * If the output directory no longer exists and Batcher is started, the output directory is set to the Pictures folder (or another folder that is guaranteed to exist). Previously, "(None)" was displayed, which was confusing.
 
-Changes to procedures and constraints:
+Changes to procedures and conditions:
 * You can now apply procedures to layers inserted by procedures other than `Insert background` or `Insert foreground`, e.g. `gimp-text-font` (which renders a text layer), by selecting `Layer Below (Background)` or `Layer Above (Foreground)` (depending on whether the layer is inserted before or after the current layer).
 * Renamed `Background Layer` to `Layer Below (Background)` and `Foreground Layer` to `Layer Above (Foreground)` to make this feature more discoverable as per the change above.
 * Scale:
@@ -37,7 +38,7 @@ Changes to procedures and constraints:
   * More units beside pixels and percentages can be chosen from (the same ones available in GIMP). These units are recalculated automatically.
 * Rename: Removed the `Rename images` option in Export Images due to being redundant there.
 * `Matching text...`: Added `Does not start with text`, `Does not contain text` and `Does not end with text` options.
-* Edit Layers: The `Selected in GIMP` constraint is now added on the first run/after reset.
+* Edit Layers: The `Selected in GIMP` condition is now added on the first run/after reset.
 * File arguments can now be cleared (set to an empty value). This is useful if a procedure allows omitting a file.
 
 Bug fixes:

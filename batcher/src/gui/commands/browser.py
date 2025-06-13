@@ -1,4 +1,4 @@
-"""Widget displaying a list of available commands (procedures/constraints).
+"""Widget displaying a list of available commands (procedures/conditions).
 
 The list includes GIMP PDB procedures.
 """

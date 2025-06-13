@@ -103,7 +103,7 @@ class BatcherManager:
     batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
-      constraints=self._settings['main/constraints'],
+      conditions=self._settings['main/conditions'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=overwrite_chooser,
@@ -176,7 +176,7 @@ class BatcherManagerQuick:
     batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
-      constraints=self._settings['main/constraints'],
+      conditions=self._settings['main/conditions'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=initial_export_run_mode,
       overwrite_chooser=overwrite_chooser,

@@ -110,7 +110,7 @@ class PreviewsController:
 
   def connect_setting_changes_to_previews(self):
     self._connect_commands_changed(self._settings['main/procedures'])
-    self._connect_commands_changed(self._settings['main/constraints'])
+    self._connect_commands_changed(self._settings['main/conditions'])
 
     self._connect_setting_show_original_item_names_changed_in_name_preview()
     self._connect_setting_load_save_inputs_interactive_in_name_preview()
@@ -391,7 +391,7 @@ class PreviewsController:
 
     # There could be a rapid sequence of 'preview-selection-changed' signals
     # invoked if a selected item and preceding items are removed from the name
-    # preview due to not matching constraints. Therefore, we delay the image
+    # preview due to not matching conditions. Therefore, we delay the image
     # preview update when the selection changes.
     pg.invocation.timeout_add_strict(
       self._DELAY_IMAGE_PREVIEW_SELECTION_CHANGED_UPDATE_MILLISECONDS,

@@ -4,7 +4,7 @@ Press the `Add Procedure...` button and select one of the available procedures, 
 For each procedure, you may:
 * enable/disable the procedure,
 * move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
-* [edit the procedure](Editing Procedures and Constraints.md),
+* [edit the procedure](Editing Procedures and Conditions.md),
 * remove the procedure.
 
 You can add the same procedure multiple times.
@@ -95,7 +95,7 @@ You can always move this procedure lower as needed.
 
 The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
 
-For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` constraint is automatically added and enabled.
+For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` condition is automatically added and enabled.
 
 ### Insert foreground
 
@@ -103,7 +103,7 @@ Inserts a new layer in front of the current layer.
 
 For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
 
-The `Merge foreground` procedure is added automatically. For Export Layers and Edit Layers, the `Not foreground` constraint is added automatically.
+The `Merge foreground` procedure is added automatically. For Export Layers and Edit Layers, the `Not foreground` condition is added automatically.
 
 For more information, see `Insert background` above.
 
@@ -255,7 +255,7 @@ You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP proc
 You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
-You can [edit the procedure](Editing Procedures and Constraints.md) anytime after adding it.
+You can [edit the procedure](Editing Procedures and Conditions.md) anytime after adding it.
 
 All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
 * *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).

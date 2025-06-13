@@ -413,7 +413,7 @@ class NamePreview(preview_base_.Preview):
 
     for item in item_tree_items:
       # We also explicitly insert parents as they would be omitted due to not
-      # matching constraints.
+      # matching conditions.
       for parent_item in item.parents:
         if parent_item not in visited_parents:
           items[parent_item.key] = parent_item

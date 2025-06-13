@@ -1,4 +1,4 @@
-"""List of commands (procedures/constraints) that can be edited interactively."""
+"""List of commands (procedures/conditions) that can be edited interactively."""
 
 from typing import Any, Dict, Optional, Union
 
@@ -21,7 +21,7 @@ class CommandList(pg.gui.ItemBox):
   """A scrollable vertical list that allows the user to add, edit and remove
   commands interactively.
 
-  An command represents a procedure or constraint that can be applied to a
+  An command represents a procedure or condition that can be applied to a
   GIMP item (image, layer, ...). Commands can be created via the `src.commands`
   module.
 

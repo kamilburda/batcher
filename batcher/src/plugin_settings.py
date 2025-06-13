@@ -8,7 +8,7 @@ from gi.repository import Gio
 import pygimplib as pg
 
 from src import commands as commands_
-from src import builtin_constraints
+from src import builtin_conditions
 from src import builtin_procedures
 # Despite being unused, `setting_classes` must be imported so that the
 # setting and GUI classes defined there are properly registered (via respective
@@ -175,9 +175,9 @@ def create_settings_for_convert():
 
   settings['main'].add([
     commands_.create(
-      name='constraints',
+      name='conditions',
       initial_commands=[
-        builtin_constraints.BUILTIN_CONSTRAINTS['recognized_file_format']]),
+        builtin_conditions.BUILTIN_CONDITIONS['recognized_file_format']]),
   ])
 
   builtin_procedures.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
@@ -315,20 +315,20 @@ def create_settings_for_export_images():
       ]),
   ])
 
-  not_saved_or_exported_constraint_dict = utils.semi_deep_copy(
-    builtin_constraints.BUILTIN_CONSTRAINTS['not_saved_or_exported'])
-  not_saved_or_exported_constraint_dict['enabled'] = False
+  not_saved_or_exported_condition_dict = utils.semi_deep_copy(
+    builtin_conditions.BUILTIN_CONDITIONS['not_saved_or_exported'])
+  not_saved_or_exported_condition_dict['enabled'] = False
 
-  with_unsaved_changes_constraint_dict = utils.semi_deep_copy(
-    builtin_constraints.BUILTIN_CONSTRAINTS['with_unsaved_changes'])
-  with_unsaved_changes_constraint_dict['enabled'] = False
+  with_unsaved_changes_condition_dict = utils.semi_deep_copy(
+    builtin_conditions.BUILTIN_CONDITIONS['with_unsaved_changes'])
+  with_unsaved_changes_condition_dict['enabled'] = False
 
   settings['main'].add([
     commands_.create(
-      name='constraints',
+      name='conditions',
       initial_commands=[
-        not_saved_or_exported_constraint_dict,
-        with_unsaved_changes_constraint_dict,
+        not_saved_or_exported_condition_dict,
+        with_unsaved_changes_condition_dict,
       ]),
   ])
 
@@ -424,20 +424,20 @@ def create_settings_for_edit_and_save_images():
       ]),
   ])
 
-  xcf_file_constraint_dict = utils.semi_deep_copy(
-    builtin_constraints.BUILTIN_CONSTRAINTS['xcf_file'])
-  xcf_file_constraint_dict['enabled'] = False
+  xcf_file_condition_dict = utils.semi_deep_copy(
+    builtin_conditions.BUILTIN_CONDITIONS['xcf_file'])
+  xcf_file_condition_dict['enabled'] = False
 
-  with_unsaved_changes_constraint_dict = utils.semi_deep_copy(
-    builtin_constraints.BUILTIN_CONSTRAINTS['with_unsaved_changes'])
-  with_unsaved_changes_constraint_dict['enabled'] = False
+  with_unsaved_changes_condition_dict = utils.semi_deep_copy(
+    builtin_conditions.BUILTIN_CONDITIONS['with_unsaved_changes'])
+  with_unsaved_changes_condition_dict['enabled'] = False
 
   settings['main'].add([
     commands_.create(
-      name='constraints',
+      name='conditions',
       initial_commands=[
-        xcf_file_constraint_dict,
-        with_unsaved_changes_constraint_dict,
+        xcf_file_condition_dict,
+        with_unsaved_changes_condition_dict,
       ]),
   ])
 
@@ -571,15 +571,15 @@ def create_settings_for_export_layers():
       initial_commands=[resize_canvas_procedure_dict]),
   ])
 
-  visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
-  visible_constraint_dict['enabled'] = False
+  visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
+  visible_condition_dict['enabled'] = False
   
   settings['main'].add([
     commands_.create(
-      name='constraints',
+      name='conditions',
       initial_commands=[
-        builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
-        visible_constraint_dict]),
+        builtin_conditions.BUILTIN_CONDITIONS['layers'],
+        visible_condition_dict]),
   ])
 
   builtin_procedures.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
@@ -665,20 +665,20 @@ def create_settings_for_edit_layers():
       initial_commands=[rename_procedure_dict]),
   ])
 
-  visible_constraint_dict = utils.semi_deep_copy(builtin_constraints.BUILTIN_CONSTRAINTS['visible'])
-  visible_constraint_dict['enabled'] = False
+  visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
+  visible_condition_dict['enabled'] = False
 
-  selected_in_gimp_constraint_dict = utils.semi_deep_copy(
-    builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
-  selected_in_gimp_constraint_dict['enabled'] = False
+  selected_in_gimp_condition_dict = utils.semi_deep_copy(
+    builtin_conditions.BUILTIN_CONDITIONS['selected_in_gimp'])
+  selected_in_gimp_condition_dict['enabled'] = False
 
   settings['main'].add([
     commands_.create(
-      name='constraints',
+      name='conditions',
       initial_commands=[
-        builtin_constraints.BUILTIN_CONSTRAINTS['layers'],
-        visible_constraint_dict,
-        selected_in_gimp_constraint_dict,
+        builtin_conditions.BUILTIN_CONDITIONS['layers'],
+        visible_condition_dict,
+        selected_in_gimp_condition_dict,
       ]),
   ])
 

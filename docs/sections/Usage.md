@@ -11,7 +11,7 @@ To start batch conversion, press the `Run` button.
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings) below.
 Image names are used as filenames by default.
 
-For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
+For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
 
 You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
@@ -40,7 +40,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 To export layers, press the `Export` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
+For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
 
 
 ### Quick Export of Layers
@@ -53,14 +53,14 @@ For the first time, a small dialog with only export settings is displayed, where
 
 This dialog can be skipped by unchecking `Show this dialog`.
 
-Note that even procedures and constraints set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
+Note that even procedures and conditions set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
 
 ### Quick Export of Selected Layers
 
 When you select multiple layers in GIMP, you can right-click and select `Export Selected Layers` to quickly export the selected layers.
 
-In this case, any constraints set in the [main dialog](#exporting-layers) will be ignored.
+In this case, any conditions set in the [main dialog](#exporting-layers) will be ignored.
 
 ![Menu Entry for Export Selected Layers](../assets/images/screenshot_menu_export_selected_layers.png){: .align-center}
 
@@ -78,7 +78,7 @@ To export images, press the `Export` button.
 Note that this feature exports images to another file format. If you intend to batch-save XCF images in their original locations, use `File → Edit and Save Images...` instead.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and constraints, see [Procedures and Constraints](#procedures-and-constraints) below.
+For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
 
 
 ### Quick Export of Images
@@ -91,7 +91,7 @@ For the first time, a small dialog with only export settings is displayed, where
 
 This dialog can be skipped by unchecking `Show this dialog`.
 
-Note that even procedures and constraints set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
+Note that even procedures and conditions set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
 
 
 ## Editing and Saving Images Opened in GIMP
@@ -101,7 +101,7 @@ Note that even procedures and constraints set up in the `Export Images` dialog w
 ![Dialog of Edit ans Save Images](../assets/images/screenshot_dialog_edit_and_save_images.png){: .align-center}
 
 Both editing and saving are optional, i.e. you can perform only saving, or only editing as needed.
-If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
+If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [procedures and conditions](#procedures-and-conditions).
 
 To edit and/or save images, press the `Run` button.
 
@@ -123,11 +123,11 @@ Open an image in GIMP and select `File → Edit Layers...`.
 ![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
 
 To run batch editing, press the `Run` button.
-This will apply procedures to each layer satisfying the activated constraints.
+This will apply procedures to each layer satisfying the activated conditions.
 
-You can take a look at a few [examples](Examples.md) to get started with [procedures and constraints](#procedures-and-constraints).
+You can take a look at a few [examples](Examples.md) to get started with [procedures and conditions](#procedures-and-conditions).
 
-If the `Layers` constraint is unchecked, group layers will also be processed.
+If the `Layers` condition is unchecked, group layers will also be processed.
 
 
 ### Quick Layer Editing
@@ -140,7 +140,7 @@ This can be useful if you made changes to your image and you want to run batch e
 
 When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
 
-In this case, any constraints set in the [main dialog](#batch-editing-layers) will be ignored.
+In this case, any conditions set in the [main dialog](#batch-editing-layers) will be ignored.
 
 ![Menu Entry for Edit Selected Layers](../assets/images/screenshot_menu_edit_selected_layers.png){: .align-center}
 
@@ -175,25 +175,25 @@ You will be prompted to set the file format options right after you start batch 
 All options are described in [Export Options](Customization/Export Options.md).
 
 
-## Procedures and Constraints
+## Procedures and Conditions
 
 Before the start of batch processing, you can apply a multitude of *procedures* to each image/layer, such as scaling, background insertion, any layer effect or GIMP plug-in.
 
-You can exclude images/layers from being processed/exported based on one or more *constraints* (only filenames matching a suffix, only visible layers, ...).
+You can exclude images/layers from being processed/exported based on one or more *conditions* (only filenames matching a suffix, only visible layers, ...).
 
-Procedures and constraints can be a powerful way to adjust batch processing to your heart's content.
+Procedures and conditions can be a powerful way to adjust batch processing to your heart's content.
 You can take a look at a few [examples](Examples.md) to get started.
 
-The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the procedures and constraints.
+The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the procedures and conditions.
 
-For details, see [Procedures](Customization/Procedures.md) and [Constraints](Customization/Constraints.md).
+For details, see [Procedures](Customization/Procedures.md) and [Conditions](Customization/Conditions.md).
 
 
 ## Preview
 
 The image preview displays the contents of the selected image/layer.
 
-You can adjust the width of the entire pane containing the input list and the preview by dragging the separator between the preview and the procedures/constraints.
+You can adjust the width of the entire pane containing the input list and the preview by dragging the separator between the preview and the procedures/conditions.
 You can also adjust the height of the previewed image by dragging the separator above the image.
 
 If the previewed image takes too long to render, the preview is no longer updated automatically.
@@ -206,7 +206,7 @@ For example, for the JPEG format, which does not support transparency and may re
 
 ## Managing Settings
 
-Once batch processing is done successfully, your settings (output folder, file extension, dialog size, procedures, constraints, etc.) are automatically saved.
+Once batch processing is done successfully, your settings (output folder, file extension, dialog size, procedures, conditions, etc.) are automatically saved.
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
 

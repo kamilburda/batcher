@@ -268,7 +268,7 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
     },
     {
       'type': 'string',
-      'name': 'constraint_name',
+      'name': 'condition_name',
       'default_value': '',
       'gui_type': None,
     },
@@ -333,7 +333,7 @@ INSERT_FOREGROUND_FOR_LAYERS_DICT = {
     },
     {
       'type': 'string',
-      'name': 'constraint_name',
+      'name': 'condition_name',
       'default_value': '',
       'gui_type': None,
     },

@@ -1,4 +1,4 @@
-"""Widget for editing the contents of a command (procedure/constraint)."""
+"""Widget for editing the contents of a command (procedure/condition)."""
 
 import gi
 gi.require_version('Gdk', '3.0')

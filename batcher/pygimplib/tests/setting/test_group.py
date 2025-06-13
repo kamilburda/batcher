@@ -215,7 +215,7 @@ class TestGroupCreateGroupsFromDict(unittest.TestCase):
           'name': 'procedures'
         },
         {
-          'name': 'constraints',
+          'name': 'conditions',
           'groups': [
             {
               'name': 'include'
@@ -228,10 +228,10 @@ class TestGroupCreateGroupsFromDict(unittest.TestCase):
     self.assertEqual(settings.name, 'main')
     self.assertEqual(len(settings), 2)
     self.assertIn('procedures', settings)
-    self.assertIn('constraints', settings)
-    self.assertIn('constraints/include', settings)
-    self.assertIn('include', settings['constraints'])
-    self.assertEqual(len(settings['constraints']), 1)
+    self.assertIn('conditions', settings)
+    self.assertIn('conditions/include', settings)
+    self.assertIn('include', settings['conditions'])
+    self.assertEqual(len(settings['conditions']), 1)
     self.assertNotIn('include', settings)
   
   def test_create_group_invalid_key(self):

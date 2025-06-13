@@ -156,7 +156,7 @@ class SettingsManager:
 
     if response_id == Gtk.ResponseType.YES:
       commands_.clear(self._settings['main/procedures'])
-      commands_.clear(self._settings['main/constraints'])
+      commands_.clear(self._settings['main/conditions'])
 
       self.reset_settings()
 
@@ -208,7 +208,7 @@ class SettingsManager:
     source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
 
     commands_.clear(self._settings['main/procedures'], add_initial_commands=False)
-    commands_.clear(self._settings['main/constraints'], add_initial_commands=False)
+    commands_.clear(self._settings['main/conditions'], add_initial_commands=False)
 
     settings_to_ignore_for_reset = []
     for setting in self._settings.walk(lambda s: 'ignore_reset' not in s.tags):
@@ -250,7 +250,7 @@ class SettingsManager:
 
       self.reset_settings()
       commands_.clear(self._settings['main/procedures'])
-      commands_.clear(self._settings['main/constraints'])
+      commands_.clear(self._settings['main/conditions'])
 
     if self._previews_controller is not None:
       self._previews_controller.unlock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)

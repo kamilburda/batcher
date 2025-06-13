@@ -16,7 +16,7 @@ def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
 
   settings_for_batcher = {
     'procedures': main_settings['procedures'],
-    'constraints': main_settings['constraints'],
+    'conditions': main_settings['conditions'],
   }
 
   for setting_name in setting_names:

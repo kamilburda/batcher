@@ -9,7 +9,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from src import builtin_commands_common
-from src import builtin_constraints
+from src import builtin_conditions
 from src import builtin_procedures
 
 from src.gui import messages as messages_
@@ -21,13 +21,13 @@ class CommandLists:
 
   _COMMAND_LABEL_BOX_SPACING = 5
 
-  _CONSTRAINTS_TOP_MARGIN = 5
+  _CONDITIONS_TOP_MARGIN = 5
 
   def __init__(self, settings, dialog):
     self._settings = settings
     self._dialog = dialog
 
-    self._procedures_or_constraints_loaded = False
+    self._procedures_or_conditions_loaded = False
 
     self._procedure_list = command_list_.CommandList(
       self._settings['main/procedures'],
@@ -42,11 +42,11 @@ class CommandLists:
       hscrollbar_policy=Gtk.PolicyType.NEVER,
     )
 
-    self._constraint_list = command_list_.CommandList(
-      self._settings['main/constraints'],
+    self._condition_list = command_list_.CommandList(
+      self._settings['main/conditions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_constraints.BUILTIN_CONSTRAINTS, [pg.config.PROCEDURE_GROUP]),
-      add_command_text=_('Add C_onstraint...'),
+        builtin_conditions.BUILTIN_CONDITIONS, [pg.config.PROCEDURE_GROUP]),
+      add_command_text=_('Add C_ondition...'),
       allow_custom_commands=False,
       propagate_natural_height=True,
       propagate_natural_width=True,
@@ -62,16 +62,16 @@ class CommandLists:
     return self._procedure_list
 
   @property
-  def constraint_list(self):
-    return self._constraint_list
+  def condition_list(self):
+    return self._condition_list
 
   @property
   def vbox_procedures(self):
     return self._vbox_procedures
 
   @property
-  def vbox_constraints(self):
-    return self._vbox_constraints
+  def vbox_conditions(self):
+    return self._vbox_conditions
 
   def display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
         self, batcher, clear_previous=True):
@@ -84,14 +84,14 @@ class CommandLists:
       clear_previous=clear_previous)
 
     self._set_command_skipped_tooltips(
-      self._constraint_list,
-      batcher.skipped_constraints,
-      _('This constraint is skipped. Reason: {}'),
+      self._condition_list,
+      batcher.skipped_conditions,
+      _('This condition is skipped. Reason: {}'),
       clear_previous=clear_previous)
 
   def set_warnings_and_deactivate_failed_commands(self, batcher, clear_previous=True):
-    command_lists = [self._procedure_list, self._constraint_list]
-    failed_commands_dict = [batcher.failed_procedures, batcher.failed_constraints]
+    command_lists = [self._procedure_list, self._condition_list]
+    failed_commands_dict = [batcher.failed_procedures, batcher.failed_conditions]
 
     for command_list, failed_commands in zip(command_lists, failed_commands_dict):
       for command_item in command_list.items:
@@ -110,13 +110,13 @@ class CommandLists:
             command_item.set_warning(False)
 
   def reset_command_tooltips_and_indicators(self):
-    for command_list in [self._procedure_list, self._constraint_list]:
+    for command_list in [self._procedure_list, self._condition_list]:
       for command_item in command_list.items:
         command_item.reset_tooltip()
         command_item.set_warning(False)
 
   def close_command_edit_dialogs(self):
-    for command_list in [self._procedure_list, self._constraint_list]:
+    for command_list in [self._procedure_list, self._condition_list]:
       for command_item in command_list.items:
         command_item.editor.hide()
 
@@ -135,20 +135,20 @@ class CommandLists:
     self._vbox_procedures.pack_start(self._label_procedures, False, False, 0)
     self._vbox_procedures.pack_start(self._procedure_list, True, True, 0)
 
-    self._label_constraints = Gtk.Label(
-      label='<b>{}</b>'.format(_('Constraints')),
+    self._label_conditions = Gtk.Label(
+      label='<b>{}</b>'.format(_('Conditions')),
       use_markup=True,
       xalign=0.0,
       yalign=0.5,
     )
 
-    self._vbox_constraints = Gtk.Box(
+    self._vbox_conditions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._COMMAND_LABEL_BOX_SPACING,
-      margin_top=self._CONSTRAINTS_TOP_MARGIN,
+      margin_top=self._CONDITIONS_TOP_MARGIN,
     )
-    self._vbox_constraints.pack_start(self._label_constraints, False, False, 0)
-    self._vbox_constraints.pack_start(self._constraint_list, True, True, 0)
+    self._vbox_conditions.pack_start(self._label_conditions, False, False, 0)
+    self._vbox_conditions.pack_start(self._condition_list, True, True, 0)
 
   def _init_setting_gui(self):
     self._settings['gui/procedure_browser/paned_position'].set_gui(
@@ -174,7 +174,7 @@ class CommandLists:
       'command-list-item-added-interactive',
       _on_procedure_item_added,
       self._settings,
-      self._constraint_list,
+      self._condition_list,
     )
 
     _set_up_existing_crop_procedures(self._procedure_list)
@@ -203,32 +203,32 @@ class CommandLists:
       lambda _procedures: _set_up_existing_save_procedures(self._procedure_list))
 
     _set_up_existing_insert_back_foreground_and_related_commands(
-      self._procedure_list, self._constraint_list)
+      self._procedure_list, self._condition_list)
     self._procedure_list.commands.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
-    self._constraint_list.commands.connect_event(
+    self._condition_list.commands.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
 
-    self._constraint_list.connect(
+    self._condition_list.connect(
       'command-list-item-added-interactive',
-      _on_constraint_item_added,
+      _on_condition_item_added,
       self._settings,
     )
 
-    _set_up_existing_matching_text_constraints(self._constraint_list)
-    self._constraint_list.commands.connect_event(
+    _set_up_existing_matching_text_conditions(self._condition_list)
+    self._condition_list.commands.connect_event(
       'after-load',
-      lambda _constraints: _set_up_existing_matching_text_constraints(self._constraint_list))
+      lambda _conditions: _set_up_existing_matching_text_conditions(self._condition_list))
 
   def _set_up_existing_insert_back_foreground_and_related_commands_on_load(self, _commands):
-    if self._procedures_or_constraints_loaded:
+    if self._procedures_or_conditions_loaded:
       _set_up_existing_insert_back_foreground_and_related_commands(
-        self._procedure_list, self._constraint_list)
+        self._procedure_list, self._condition_list)
 
       # This allows setting up the commands again when loading again.
-      self._procedures_or_constraints_loaded = False
+      self._procedures_or_conditions_loaded = False
 
-    self._procedures_or_constraints_loaded = True
+    self._procedures_or_conditions_loaded = True
 
   @staticmethod
   def _set_command_skipped_tooltips(
@@ -247,7 +247,7 @@ class CommandLists:
             command_item.reset_tooltip()
 
 
-def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
+def _on_procedure_item_added(procedure_list, item, settings, condition_list):
   if item.command['orig_name'].value.startswith('crop_for_'):
     _handle_crop_procedure_item_added(item)
 
@@ -272,7 +272,7 @@ def _on_procedure_item_added(procedure_list, item, settings, constraint_list):
 
   if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
        'insert_background_for_', 'insert_foreground_for_']):
-    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, constraint_list)
+    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, condition_list)
 
 
 def _set_up_existing_crop_procedures(procedure_list: command_list_.CommandList):
@@ -306,30 +306,30 @@ def _set_up_existing_save_procedures(procedure_list: command_list_.CommandList):
 
 
 def _handle_insert_background_foreground_procedure_item_added(
-      procedure_list, item, constraint_list):
+      procedure_list, item, condition_list):
   procedure_list.reorder_item(item, 0)
 
   merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
 
-  constraint_item = _add_not_background_foreground_constraint(item, constraint_list)
+  condition_item = _add_not_background_foreground_condition(item, condition_list)
 
   _hide_internal_arguments_for_insert_background_foreground_procedure(item)
   _set_up_merge_background_foreground_procedure(merge_item)
-  _set_up_not_background_foreground_constraint(item, constraint_item)
+  _set_up_not_background_foreground_condition(item, condition_item)
 
-  if merge_item is not None or constraint_item is not None:
+  if merge_item is not None or condition_item is not None:
     _set_up_insert_background_foreground_procedure(
-      item, merge_item, constraint_item, procedure_list, constraint_list)
+      item, merge_item, condition_item, procedure_list, condition_list)
 
   if merge_item is not None:
     item.command['arguments/merge_procedure_name'].set_value(merge_item.command.name)
-  if constraint_item is not None:
-    item.command['arguments/constraint_name'].set_value(constraint_item.command.name)
+  if condition_item is not None:
+    item.command['arguments/condition_name'].set_value(condition_item.command.name)
 
 
 def _set_up_existing_insert_back_foreground_and_related_commands(
       procedure_list: command_list_.CommandList,
-      constraint_list: command_list_.CommandList,
+      condition_list: command_list_.CommandList,
 ):
   for item in procedure_list.items:
     if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
@@ -345,44 +345,44 @@ def _set_up_existing_insert_back_foreground_and_related_commands(
       else:
         merge_item = None
 
-      constraint_name = (
-        item.command['arguments/constraint_name'].value
-        if 'constraint_name' in item.command['arguments'] else None)
-      if constraint_name is not None and constraint_name in constraint_list.commands:
-        constraint_item = next(
-          iter(item_ for item_ in constraint_list.items if item_.command.name == constraint_name),
+      condition_name = (
+        item.command['arguments/condition_name'].value
+        if 'condition_name' in item.command['arguments'] else None)
+      if condition_name is not None and condition_name in condition_list.commands:
+        condition_item = next(
+          iter(item_ for item_ in condition_list.items if item_.command.name == condition_name),
           None)
       else:
-        constraint_item = None
+        condition_item = None
 
       _hide_internal_arguments_for_insert_background_foreground_procedure(item)
       _set_up_merge_background_foreground_procedure(merge_item)
-      _set_up_not_background_foreground_constraint(item, constraint_item)
+      _set_up_not_background_foreground_condition(item, condition_item)
 
-      if merge_item is not None or constraint_item is not None:
+      if merge_item is not None or condition_item is not None:
         _set_up_insert_background_foreground_procedure(
-          item, merge_item, constraint_item, procedure_list, constraint_list)
+          item, merge_item, condition_item, procedure_list, condition_list)
 
 
 def _hide_internal_arguments_for_insert_background_foreground_procedure(item):
   if 'merge_procedure_name' in item.command['arguments']:
     item.command['arguments/merge_procedure_name'].gui.set_visible(False)
-  if 'constraint_name' in item.command['arguments']:
-    item.command['arguments/constraint_name'].gui.set_visible(False)
+  if 'condition_name' in item.command['arguments']:
+    item.command['arguments/condition_name'].gui.set_visible(False)
 
 
 def _set_up_insert_background_foreground_procedure(
       item,
       merge_item,
-      constraint_item,
+      condition_item,
       procedure_list: command_list_.CommandList,
-      constraint_list: command_list_.CommandList,
+      condition_list: command_list_.CommandList,
 ):
   item.command['enabled'].connect_event(
     'value-changed',
     _on_insert_background_foreground_procedure_enabled_changed,
     merge_item.command if merge_item is not None else None,
-    constraint_item.command if constraint_item is not None else None,
+    condition_item.command if condition_item is not None else None,
   )
 
   procedure_list.connect(
@@ -390,8 +390,8 @@ def _set_up_insert_background_foreground_procedure(
     _on_insert_background_foreground_procedure_removed,
     item,
     merge_item,
-    constraint_list,
-    constraint_item,
+    condition_list,
+    condition_item,
   )
 
 
@@ -427,35 +427,35 @@ def _set_up_merge_background_foreground_procedure(merge_item):
     merge_item.command['arguments/last_enabled_value'].gui.set_visible(False)
 
 
-def _add_not_background_foreground_constraint(item, constraint_list):
-  constraint_orig_name_mapping = {
+def _add_not_background_foreground_condition(item, condition_list):
+  condition_orig_name_mapping = {
     'insert_background_for_layers': 'not_background',
     'insert_foreground_for_layers': 'not_foreground',
   }
 
-  if item.command['orig_name'].value not in constraint_orig_name_mapping:
+  if item.command['orig_name'].value not in condition_orig_name_mapping:
     return None
 
-  constraint_name = constraint_orig_name_mapping[item.command['orig_name'].value]
+  condition_name = condition_orig_name_mapping[item.command['orig_name'].value]
 
-  constraint_item = constraint_list.add_item(
-    builtin_constraints.BUILTIN_CONSTRAINTS[constraint_name])
+  condition_item = condition_list.add_item(
+    builtin_conditions.BUILTIN_CONDITIONS[condition_name])
 
-  return constraint_item
+  return condition_item
 
 
-def _set_up_not_background_foreground_constraint(item, constraint_item):
-  if constraint_item is None:
+def _set_up_not_background_foreground_condition(item, condition_item):
+  if condition_item is None:
     return
 
   def _on_insert_background_foreground_color_tag_changed(color_tag_setting):
-    constraint_item.command['arguments/color_tag'].set_value(color_tag_setting.value)
+    condition_item.command['arguments/color_tag'].set_value(color_tag_setting.value)
 
-  if constraint_item is not None:
-    _set_buttons_for_command_item_sensitive(constraint_item, False)
+  if condition_item is not None:
+    _set_buttons_for_command_item_sensitive(condition_item, False)
 
-  constraint_item.command['arguments/color_tag'].gui.set_visible(False)
-  constraint_item.command['arguments/last_enabled_value'].gui.set_visible(False)
+  condition_item.command['arguments/color_tag'].gui.set_visible(False)
+  condition_item.command['arguments/last_enabled_value'].gui.set_visible(False)
 
   item.command['arguments/color_tag'].connect_event(
     'value-changed', _on_insert_background_foreground_color_tag_changed)
@@ -465,26 +465,26 @@ def _set_up_not_background_foreground_constraint(item, constraint_item):
 def _on_insert_background_foreground_procedure_enabled_changed(
       enabled_setting,
       merge_procedure,
-      constraint,
+      condition,
 ):
   if not enabled_setting.value:
     if merge_procedure is not None:
       merge_procedure['arguments/last_enabled_value'].set_value(merge_procedure['enabled'].value)
       merge_procedure['enabled'].set_value(False)
 
-    if constraint is not None:
-      constraint['arguments/last_enabled_value'].set_value(constraint['enabled'].value)
-      constraint['enabled'].set_value(False)
+    if condition is not None:
+      condition['arguments/last_enabled_value'].set_value(condition['enabled'].value)
+      condition['enabled'].set_value(False)
   else:
     if merge_procedure is not None:
       merge_procedure['enabled'].set_value(merge_procedure['arguments/last_enabled_value'].value)
-    if constraint is not None:
-      constraint['enabled'].set_value(constraint['arguments/last_enabled_value'].value)
+    if condition is not None:
+      condition['enabled'].set_value(condition['arguments/last_enabled_value'].value)
 
   if merge_procedure is not None:
     merge_procedure['enabled'].gui.set_sensitive(enabled_setting.value)
-  if constraint is not None:
-    constraint['enabled'].gui.set_sensitive(enabled_setting.value)
+  if condition is not None:
+    condition['enabled'].gui.set_sensitive(enabled_setting.value)
 
 
 def _on_insert_background_foreground_procedure_removed(
@@ -492,13 +492,13 @@ def _on_insert_background_foreground_procedure_removed(
       removed_item,
       insert_back_foreground_item,
       merge_item,
-      constraint_list,
-      constraint_item):
+      condition_list,
+      condition_item):
   if removed_item == insert_back_foreground_item:
     if merge_item is not None and merge_item in procedure_list.items:
       procedure_list.remove_item(merge_item)
-    if constraint_item is not None and constraint_item in constraint_list.items:
-      constraint_list.remove_item(constraint_item)
+    if condition_item is not None and condition_item in condition_list.items:
+      condition_list.remove_item(condition_item)
 
 
 def _handle_crop_procedure_item_added(item):
@@ -703,19 +703,19 @@ def _reorder_procedure_before_first_save_procedure(
     procedure_list.reorder_item(item, first_save_procedure_position)
 
 
-def _on_constraint_item_added(_constraint_list, item, _settings):
+def _on_condition_item_added(_condition_list, item, _settings):
   if item.command['orig_name'].value == 'matching_text':
-    _handle_matching_text_constraint_item_added(item)
+    _handle_matching_text_condition_item_added(item)
 
 
-def _set_up_existing_matching_text_constraints(constraint_list: command_list_.CommandList):
-  for item in constraint_list.items:
+def _set_up_existing_matching_text_conditions(condition_list: command_list_.CommandList):
+  for item in condition_list.items:
     if item.command['orig_name'].value == 'matching_text':
-      _handle_matching_text_constraint_item_added(item)
+      _handle_matching_text_condition_item_added(item)
 
 
-def _handle_matching_text_constraint_item_added(item):
-  _set_display_name_for_matching_text_constraint(
+def _handle_matching_text_condition_item_added(item):
+  _set_display_name_for_matching_text_condition(
     item.command['arguments/match_mode'],
     item.command['arguments/text'],
     item.command['arguments/ignore_case_sensitivity'],
@@ -723,65 +723,65 @@ def _handle_matching_text_constraint_item_added(item):
 
   item.command['arguments/match_mode'].connect_event(
     'value-changed',
-    _set_display_name_for_matching_text_constraint,
+    _set_display_name_for_matching_text_condition,
     item.command['arguments/text'],
     item.command['arguments/ignore_case_sensitivity'],
     item.command)
 
   item.command['arguments/text'].connect_event(
     'value-changed',
-    lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, constraint: (
-      _set_display_name_for_matching_text_constraint(
-        match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint)),
+    lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, condition: (
+      _set_display_name_for_matching_text_condition(
+        match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition)),
     item.command['arguments/match_mode'],
     item.command['arguments/ignore_case_sensitivity'],
     item.command)
 
   item.command['arguments/ignore_case_sensitivity'].connect_event(
     'value-changed',
-    lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, constraint: (
-      _set_display_name_for_matching_text_constraint(
-        match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint)),
+    lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, condition: (
+      _set_display_name_for_matching_text_condition(
+        match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition)),
     item.command['arguments/match_mode'],
     item.command['arguments/text'],
     item.command)
 
 
-def _set_display_name_for_matching_text_constraint(
-      match_mode_setting, text_setting, ignore_case_sensitivity_setting, constraint):
+def _set_display_name_for_matching_text_condition(
+      match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition):
   display_name = None
 
-  if match_mode_setting.value == builtin_constraints.MatchModes.STARTS_WITH:
+  if match_mode_setting.value == builtin_conditions.MatchModes.STARTS_WITH:
     if text_setting.value:
       display_name = _('Starting with "{}"').format(text_setting.value)
     else:
       display_name = _('Starting with any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_START_WITH:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_START_WITH:
     if text_setting.value:
       display_name = _('Not starting with "{}"').format(text_setting.value)
     else:
       display_name = _('Not starting with any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.CONTAINS:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.CONTAINS:
     if text_setting.value:
       display_name = _('Containing "{}"').format(text_setting.value)
     else:
       display_name = _('Containing any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_CONTAIN:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_CONTAIN:
     if text_setting.value:
       display_name = _('Not containing "{}"').format(text_setting.value)
     else:
       display_name = _('Not containing any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.ENDS_WITH:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.ENDS_WITH:
     if text_setting.value:
       display_name = _('Ending with "{}"').format(text_setting.value)
     else:
       display_name = _('Ending with any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.DOES_NOT_END_WITH:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_END_WITH:
     if text_setting.value:
       display_name = _('Not ending with "{}"').format(text_setting.value)
     else:
       display_name = _('Not ending with any text')
-  elif match_mode_setting.value == builtin_constraints.MatchModes.REGEX:
+  elif match_mode_setting.value == builtin_conditions.MatchModes.REGEX:
     display_name = _('Matching pattern "{}"').format(text_setting.value)
 
   if display_name is not None:
@@ -789,4 +789,4 @@ def _set_display_name_for_matching_text_constraint(
       # FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
       display_name += _(' (case-insensitive)')
 
-    constraint['display_name'].set_value(display_name)
+    condition['display_name'].set_value(display_name)

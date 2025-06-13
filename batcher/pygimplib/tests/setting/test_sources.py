@@ -77,9 +77,9 @@ def _test_settings_for_read_write():
     }
   ])
   
-  constraints = group_.Group(name='constraints')
+  conditions = group_.Group(name='conditions')
   
-  settings['main'].add([constraints])
+  settings['main'].add([conditions])
   
   settings['gui'].add([
     {
@@ -165,7 +165,7 @@ def _test_data_for_read_write():
               ],
             },
             {
-              'name': 'constraints',
+              'name': 'conditions',
               'settings': [],
             },
           ],
@@ -269,7 +269,7 @@ class TestSourceRead(unittest.TestCase):
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]
     # 'main/procedures/insert_background'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][1]
-    # 'main/constraints'
+    # 'main/conditions'
     del self.source.data[0]['settings'][0]['settings'][2]
     # 'main/file_extension'
     del self.source.data[0]['settings'][0]['settings'][0]
@@ -290,9 +290,9 @@ class TestSourceRead(unittest.TestCase):
        self.settings['main/procedures/resize_to_layer_size/arguments']])
     
     # Test if `settings_not_loaded` is reset on each call to `read()`
-    self.source.read([self.settings['main/constraints']])
+    self.source.read([self.settings['main/conditions']])
     
-    self.assertListEqual(self.source.settings_not_loaded, [self.settings['main/constraints']])
+    self.assertListEqual(self.source.settings_not_loaded, [self.settings['main/conditions']])
   
   def test_read_creates_new_child_groups_and_settings_if_missing(self):
     self.source.data = _test_data_for_read_write()
@@ -307,10 +307,10 @@ class TestSourceRead(unittest.TestCase):
     self.source.data[0]['settings'][0]['settings'][1]['settings'][0][
       'settings'][1]['settings'].append(tag_argument)
     
-    # Add 'main/constraints/visible'
-    visible_constraint = {
+    # Add 'main/conditions/visible'
+    visible_condition = {
       'name': 'visible',
-      'tags': ['command', 'constraint'],
+      'tags': ['command', 'condition'],
       'setting_attributes': {'gui_type': None},
       'settings': [
         {
@@ -333,7 +333,7 @@ class TestSourceRead(unittest.TestCase):
         },
       ],
     }
-    self.source.data[0]['settings'][0]['settings'][2]['settings'].append(visible_constraint)
+    self.source.data[0]['settings'][0]['settings'][2]['settings'].append(visible_condition)
     
     expected_num_settings_and_groups = len(list(self.settings.walk(include_groups=True))) + 5
     
@@ -351,9 +351,9 @@ class TestSourceRead(unittest.TestCase):
         'gui_type': None,
       })
     self.assertSetEqual(
-      self.settings['main/constraints/visible'].tags, {'command', 'constraint'})
+      self.settings['main/conditions/visible'].tags, {'command', 'condition'})
     self.assertDictEqual(
-      self.settings['main/constraints/visible/enabled'].to_dict(),
+      self.settings['main/conditions/visible/enabled'].to_dict(),
       {
         'type': 'bool',
         'name': 'enabled',
@@ -362,7 +362,7 @@ class TestSourceRead(unittest.TestCase):
         'gui_type': None,
       })
     self.assertDictEqual(
-      self.settings['main/constraints/visible/arguments/tag'].to_dict(),
+      self.settings['main/conditions/visible/arguments/tag'].to_dict(),
       {
         'type': 'string',
         'name': 'tag',
@@ -387,7 +387,7 @@ class TestSourceRead(unittest.TestCase):
     
     # 'main/file_extension'
     self.source.data[0]['settings'][0]['settings'][0]['tags'] = ['ignore_load']
-    # A new setting inside 'main/constraints' to be ignored
+    # A new setting inside 'main/conditions' to be ignored
     self.source.data[0]['settings'][0]['settings'][2]['settings'].append(
       {'name': 'enabled', 'type': 'bool', 'value': False})
     # A new group inside 'main/procedures' to be ignored
@@ -408,7 +408,7 @@ class TestSourceRead(unittest.TestCase):
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
     self.settings['main/procedures/insert_background/arguments/tag'].set_value('fg')
     
-    self.settings['main/constraints'].tags.add('ignore_load')
+    self.settings['main/conditions'].tags.add('ignore_load')
     
     self.source.read([self.settings])
     
@@ -428,7 +428,7 @@ class TestSourceRead(unittest.TestCase):
     # Setting does not exist in the code, exists in the source but is not loaded
     self.assertNotIn('new_setting', self.settings['main/procedures'])
     # The tag exists in a group in the code and any child in the source is ignored
-    self.assertFalse(list(self.settings['main/constraints']))
+    self.assertFalse(list(self.settings['main/conditions']))
   
   def test_read_order_of_settings_in_source_has_no_effect_if_settings_exist_in_memory(self):
     self.settings['main/procedures'].reorder('resize_to_layer_size', 1)
@@ -739,9 +739,9 @@ class TestSourceWrite(unittest.TestCase):
     self.settings['main/procedures/insert_background/enabled'].set_value(False)
     self.settings['main/procedures/insert_background/arguments/tag'].set_value('fg')
     
-    self.settings['main/constraints'].tags.add('ignore_save')
-    self.settings['main/constraints'].add([{'name': 'enabled', 'type': 'bool'}])
-    self.settings['main/constraints/enabled'].set_value(False)
+    self.settings['main/conditions'].tags.add('ignore_save')
+    self.settings['main/conditions'].add([{'name': 'enabled', 'type': 'bool'}])
+    self.settings['main/conditions/enabled'].set_value(False)
     
     self.source.write([self.settings])
     

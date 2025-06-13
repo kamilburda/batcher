@@ -64,7 +64,7 @@ Setting persistence
 
 Built-in commands
 * procedures
-* constraints
+* conditions
 
 Custom commands
 * add
@@ -78,7 +78,7 @@ Custom commands
 Preview
 * layer names
   * layers are organized in folder structure, names are properly uniquified
-  * selected and not selected layers for the "Selected in preview" constraint
+  * selected and not selected layers for the "Selected in preview" condition
 * image
   * properly scaled image and procedures applied on the image
     * e.g. paintbrush coordinates must be made relative to the previewed image

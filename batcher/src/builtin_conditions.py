@@ -1,4 +1,4 @@
-"""Built-in constraints."""
+"""Built-in conditions."""
 
 import re
 
@@ -158,42 +158,42 @@ class MatchModes:
   )
 
 
-_BUILTIN_CONSTRAINTS_LIST = [
+_BUILTIN_CONDITIONS_LIST = [
   {
     'name': 'layers',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_layer,
     'display_name': _('Layers'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'group_layers',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_nonempty_group,
     'display_name': _('Group layers'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
     'name': 'imported',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_imported,
     'display_name': _('Imported'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_imported',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_not_imported,
     'display_name': _('Not imported'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_background',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
     'display_name': _('Not background'),
-    # This constraint is added/removed automatically alongside `insert_background_for_layers`.
+    # This condition is added/removed automatically alongside `insert_background_for_layers`.
     'additional_tags': [],
     'arguments': [
       {
@@ -214,11 +214,11 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'not_foreground',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
     'display_name': _('Not foreground'),
-    # This constraint is added/removed automatically alongside `insert_foreground_for_layers`.
+    # This condition is added/removed automatically alongside `insert_foreground_for_layers`.
     'additional_tags': [],
     'arguments': [
       {
@@ -239,7 +239,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'matching_file_extension',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching file extension'),
@@ -247,7 +247,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'matching_text',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
     'display_name': _('Matching text...'),
@@ -285,7 +285,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'recognized_file_format',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_recognized_file_format,
     # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
     'display_name': _('Recognized file format'),
@@ -293,21 +293,21 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'saved_or_exported',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_saved_or_exported,
     'display_name': _('Saved or exported'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'not_saved_or_exported',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_not_saved_or_exported,
     'display_name': _('Not saved or exported'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'selected_in_gimp',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_item_in_items_selected_in_gimp,
     # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
@@ -315,7 +315,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'top_level',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level items" when translating this
     'display_name': _('Top-level'),
@@ -323,7 +323,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'visible',
-    'type': 'constraint',
+    'type': 'condition',
     'function': is_visible,
     # FOR TRANSLATORS: Think of "Only visible items" when translating this
     'display_name': _('Visible'),
@@ -331,7 +331,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'with_color_tags',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_color_tags,
     # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
     'display_name': _('With color tags'),
@@ -351,7 +351,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'without_color_tags',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_no_color_tags,
     # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
     'display_name': _('Without color tags'),
@@ -371,7 +371,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'with_unsaved_changes',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
     'display_name': _('With unsaved changes'),
@@ -379,7 +379,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'with_no_unsaved_changes',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
     'display_name': _('With no unsaved changes'),
@@ -387,7 +387,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'xcf_file',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
     'display_name': _('XCF (native GIMP) file'),
@@ -395,7 +395,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
   },
   {
     'name': 'not_xcf_file',
-    'type': 'constraint',
+    'type': 'condition',
     'function': has_no_xcf_file,
     # FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
     'display_name': _('Not XCF (native GIMP) file'),
@@ -405,7 +405,7 @@ _BUILTIN_CONSTRAINTS_LIST = [
 
 # Translated display names could be displayed out of alphabetical order,
 # hence the sorting.
-_BUILTIN_CONSTRAINTS_LIST.sort(
+_BUILTIN_CONDITIONS_LIST.sort(
   key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
 
 # Create a separate dictionary for functions since objects cannot be saved
@@ -413,12 +413,12 @@ _BUILTIN_CONSTRAINTS_LIST.sort(
 # function names and paths may change when refactoring or adding/modifying features.
 # The 'function' setting is set to an empty value as the function can be inferred
 # via the command's 'orig_name' setting.
-BUILTIN_CONSTRAINTS = {}
-BUILTIN_CONSTRAINTS_FUNCTIONS = {}
+BUILTIN_CONDITIONS = {}
+BUILTIN_CONDITIONS_FUNCTIONS = {}
 
-for command_dict in _BUILTIN_CONSTRAINTS_LIST:
+for command_dict in _BUILTIN_CONDITIONS_LIST:
   function = command_dict['function']
   command_dict['function'] = ''
   
-  BUILTIN_CONSTRAINTS[command_dict['name']] = command_dict
-  BUILTIN_CONSTRAINTS_FUNCTIONS[command_dict['name']] = function
+  BUILTIN_CONDITIONS[command_dict['name']] = command_dict
+  BUILTIN_CONDITIONS_FUNCTIONS[command_dict['name']] = function

@@ -26,7 +26,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     batcher = core.LayerBatcher(
       item_tree=pg.itemtree.LayerTree(),
       procedures=settings['main/procedures'],
-      constraints=settings['main/constraints'],
+      conditions=settings['main/conditions'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
@@ -67,7 +67,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     self.batcher = core.LayerBatcher(
       item_tree=pg.itemtree.LayerTree(),
       procedures=mock.MagicMock(),
-      constraints=mock.MagicMock(),
+      conditions=mock.MagicMock(),
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())
@@ -149,7 +149,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     batcher = core.LayerBatcher(
       item_tree=pg.itemtree.LayerTree(),
       procedures=mock.MagicMock(),
-      constraints=mock.MagicMock(),
+      conditions=mock.MagicMock(),
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
       overwrite_chooser=mock.MagicMock(),
       progress_updater=mock.MagicMock())

@@ -12,7 +12,7 @@ import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import builtin_procedures
-from src import builtin_constraints
+from src import builtin_conditions
 from src import placeholders
 from src import plugin_settings
 from src import setting_classes
@@ -119,7 +119,7 @@ class TestUpdateHandlers(unittest.TestCase):
       self.assertIn('enabled_for_previews', command['more_options'])
       self.assertNotIn('enabled_for_previews', command)
 
-    for command in settings['main/constraints']:
+    for command in settings['main/conditions']:
       self.assertIn('more_options', command)
       self.assertIn('enabled_for_previews', command['more_options'])
       self.assertNotIn('enabled_for_previews', command)
@@ -144,7 +144,7 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/procedures/insert_background/arguments/merge_procedure_name'].value,
       'merge_background')
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/constraint_name'].value,
+      settings['main/procedures/insert_background/arguments/condition_name'].value,
       'not_background')
     self.assertIn('merge_background', settings['main/procedures'])
     self.assertEqual(
@@ -153,13 +153,13 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('merge_type', settings['main/procedures/merge_background/arguments'])
     self.assertTrue(
       settings['main/procedures/merge_background/arguments/last_enabled_value'].value)
-    self.assertIn('not_background', settings['main/constraints'])
+    self.assertIn('not_background', settings['main/conditions'])
     self.assertEqual(
-      settings['main/constraints/not_background/display_name'].value,
+      settings['main/conditions/not_background/display_name'].value,
       'Not background')
-    self.assertIn('color_tag', settings['main/constraints/not_background/arguments'])
+    self.assertIn('color_tag', settings['main/conditions/not_background/arguments'])
     self.assertTrue(
-      settings['main/constraints/not_background/arguments/last_enabled_value'].value)
+      settings['main/conditions/not_background/arguments/last_enabled_value'].value)
 
     self.assertIn('insert_background_2', settings['main/procedures'])
     self.assertIn('color_tag', settings['main/procedures/insert_background_2/arguments'])
@@ -167,7 +167,7 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/procedures/insert_background_2/arguments/merge_procedure_name'].value,
       'merge_background_2')
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/constraint_name'].value,
+      settings['main/procedures/insert_background_2/arguments/condition_name'].value,
       'not_background_2')
     self.assertIn('merge_background_2', settings['main/procedures'])
     self.assertEqual(
@@ -176,13 +176,13 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('merge_type', settings['main/procedures/merge_background_2/arguments'])
     self.assertTrue(
       settings['main/procedures/merge_background_2/arguments/last_enabled_value'].value)
-    self.assertIn('not_background_2', settings['main/constraints'])
+    self.assertIn('not_background_2', settings['main/conditions'])
     self.assertEqual(
-      settings['main/constraints/not_background/display_name'].value,
+      settings['main/conditions/not_background/display_name'].value,
       'Not background')
-    self.assertIn('color_tag', settings['main/constraints/not_background_2/arguments'])
+    self.assertIn('color_tag', settings['main/conditions/not_background_2/arguments'])
     self.assertTrue(
-      settings['main/constraints/not_background_2/arguments/last_enabled_value'].value)
+      settings['main/conditions/not_background_2/arguments/last_enabled_value'].value)
 
     self.assertIn('export', settings['main/procedures'])
     self.assertNotIn(
@@ -259,13 +259,13 @@ class TestUpdateHandlers(unittest.TestCase):
       [Gimp.ColorTag.NONE])
 
     self.assertIsInstance(
-      settings['main/constraints/not_background/arguments/color_tag'],
+      settings['main/conditions/not_background/arguments/color_tag'],
       pg.setting.EnumSetting)
     self.assertEqual(
-      settings['main/constraints/not_background/arguments/color_tag'].enum_type,
+      settings['main/conditions/not_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
     self.assertEqual(
-      settings['main/constraints/not_background/arguments/color_tag'].excluded_values,
+      settings['main/conditions/not_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
   def _assert_correct_contents_for_update_to_0_6(self, settings):
@@ -320,8 +320,8 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/procedures/script-fu-addborder/arguments/color'].pdb_type.name,
       'GeglColor')
 
-    for procedure in settings['main/constraints']:
-      if procedure['orig_name'].value in builtin_constraints.BUILTIN_CONSTRAINTS:
+    for procedure in settings['main/conditions']:
+      if procedure['orig_name'].value in builtin_conditions.BUILTIN_CONDITIONS:
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')
@@ -360,11 +360,13 @@ class TestUpdateHandlers(unittest.TestCase):
       self.assertIn('command_groups', command)
       self.assertIn('command', command.tags)
 
-    for command in settings['main/constraints']:
+    for command in settings['main/conditions']:
       self.assertNotIn('action_groups', command)
       self.assertIn('command_groups', command)
       self.assertIn('command', command.tags)
       self.assertNotIn('action', command.tags)
+      self.assertIn('condition', command.tags)
+      self.assertNotIn('constraint', command.tags)
 
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 

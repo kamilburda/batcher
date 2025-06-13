@@ -1,4 +1,4 @@
-"""Common constants and functions for built-in procedures and constraints."""
+"""Common constants and functions for built-in procedures and conditions."""
 
 NAME_ONLY_TAG = 'name'
 """Tag indicating that a built-in command is executed for the name preview."""

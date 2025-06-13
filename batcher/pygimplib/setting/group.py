@@ -708,7 +708,7 @@ def create_groups(setting_dict: Dict) -> Group:
           'name': 'procedures'
         },
         {
-          'name': 'constraints'
+          'name': 'conditions'
         }
       ]
     })

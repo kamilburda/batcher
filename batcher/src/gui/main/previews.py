@@ -75,7 +75,7 @@ class Previews:
     self._batcher_for_name_preview = gui_utils_.get_batcher_class(self._item_type)(
       item_tree=self._item_tree,
       procedures=self._settings['main/procedures'],
-      constraints=self._settings['main/constraints'],
+      conditions=self._settings['main/conditions'],
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser)
@@ -97,7 +97,7 @@ class Previews:
       # This is an empty tree that will be replaced during the preview anyway.
       item_tree=type(self._item_tree)(),
       procedures=self._settings['main/procedures'],
-      constraints=self._settings['main/constraints'],
+      conditions=self._settings['main/conditions'],
       edit_mode=self._batcher_mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
       overwrite_chooser=overwrite_chooser)

@@ -19,7 +19,7 @@ gettext.textdomain('batcher')
 builtins._ = gettext.gettext
 
 from src import commands as commands_
-from src import builtin_constraints
+from src import builtin_conditions
 from src.gui import messages as messages_
 
 messages_.set_gui_excepthook(
@@ -214,13 +214,13 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
       gui_main.BatchProcessingQuickGui,
       gui_class_kwargs=dict(
         mode='export', item_type='layer', title=_('Export Selected Layers'), current_image=image),
-      process_loaded_settings_func=_set_constraints_to_only_selected_layers)
+      process_loaded_settings_func=_set_conditions_to_only_selected_layers)
   else:
     return _run_with_last_vals(
       SETTINGS_EXPORT_LAYERS,
       layer_tree,
       mode='export',
-      process_loaded_settings_func=_set_constraints_to_only_selected_layers)
+      process_loaded_settings_func=_set_conditions_to_only_selected_layers)
 
 
 def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _data):
@@ -272,13 +272,13 @@ def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, 
       gui_main.BatchProcessingQuickGui,
       gui_class_kwargs=dict(
         mode='edit', item_type='layer', title=_('Edit Selected Layers'), current_image=image),
-      process_loaded_settings_func=_set_constraints_to_only_selected_layers)
+      process_loaded_settings_func=_set_conditions_to_only_selected_layers)
   else:
     return _run_with_last_vals(
       SETTINGS_EDIT_LAYERS,
       layer_tree,
       mode='edit',
-      process_loaded_settings_func=_set_constraints_to_only_selected_layers)
+      process_loaded_settings_func=_set_conditions_to_only_selected_layers)
 
 
 def _run_noninteractive(settings, item_tree, config, mode):
@@ -355,7 +355,7 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
   batcher = batcher_class(
     item_tree=item_tree,
     procedures=settings['main/procedures'],
-    constraints=settings['main/constraints'],
+    conditions=settings['main/conditions'],
     refresh_item_tree=False,
     initial_export_run_mode=run_mode,
     edit_mode=mode == 'edit',
@@ -431,7 +431,7 @@ def _load_and_update_settings(settings, run_mode):
 
     pg.setting.Persistor.clear()
     commands_.clear(settings['main/procedures'])
-    commands_.clear(settings['main/constraints'])
+    commands_.clear(settings['main/conditions'])
 
     return True, ''
   elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
@@ -482,11 +482,11 @@ def _set_settings_from_args(settings, config):
     setting.set_value(arg)
 
 
-def _set_constraints_to_only_selected_layers(settings):
-  commands_.clear(settings['main/constraints'], add_initial_commands=False)
+def _set_conditions_to_only_selected_layers(settings):
+  commands_.clear(settings['main/conditions'], add_initial_commands=False)
 
   commands_.add(
-    settings['main/constraints'], builtin_constraints.BUILTIN_CONSTRAINTS['selected_in_gimp'])
+    settings['main/conditions'], builtin_conditions.BUILTIN_CONDITIONS['selected_in_gimp'])
 
 
 pg.register_procedure(
@@ -501,7 +501,7 @@ pg.register_procedure(
     _('Batch-process image files'),
     _('This procedure performs batch conversion of image files'
       ' to the specified file format, optionally applying arbitrary procedures'
-      ' to each item and ignoring items according to the specified constraints.'),
+      ' to each item and ignoring items according to the specified conditions.'),
   ),
   attribution=(pg.config.AUTHOR_NAME, pg.config.AUTHOR_NAME, pg.config.COPYRIGHT_YEARS),
 )

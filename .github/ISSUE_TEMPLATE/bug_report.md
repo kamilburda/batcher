@@ -26,7 +26,7 @@ Version of GIMP:
 Operating system: 
 Installer<!-- Specify the installation package (For Windows, specify "Microsoft Store" or "installer from gimp.org"; for Linux, specify "Flatpak" or "AppImage"; for macOS, you can leave this empty. If you use an unofficial GIMP installation, specify the name and link to the installer. -->: 
 
-<!-- Provide any additional details below, such as the procedures and constraints used. -->
+<!-- Provide any additional details below, such as the procedures and conditions used. -->
 
 **Additional information**
 <!-- Add any other context about the problem here, if any. -->

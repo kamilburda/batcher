@@ -161,7 +161,7 @@ class TestConvertCompareContents(unittest.TestCase):
     batcher = core.ImageBatcher(
       item_tree=item_tree,
       procedures=settings['main/procedures'],
-      constraints=settings['main/constraints'],
+      conditions=settings['main/conditions'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     

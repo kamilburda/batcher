@@ -83,8 +83,8 @@ class BatchProcessingGui:
     return self._command_lists.procedure_list
 
   @property
-  def constraint_list(self):
-    return self._command_lists.constraint_list
+  def condition_list(self):
+    return self._command_lists.condition_list
 
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
@@ -140,7 +140,7 @@ class BatchProcessingGui:
     )
 
     self._vbox_settings.pack_start(self._command_lists.vbox_procedures, False, False, 0)
-    self._vbox_settings.pack_start(self._command_lists.vbox_constraints, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
 
     self._hpaned_settings_and_previews = Gtk.Paned(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -501,8 +501,8 @@ class BatchProcessingQuickGui:
         self._settings['main/export'],
       ])
 
-    # Save only select settings as e.g. constraints are modified by Export/Edit
-    # Selected Layers. We cannot use 'ignore_save' on procedures or constraints
+    # Save only select settings as e.g. conditions are modified by Export/Edit
+    # Selected Layers. We cannot use 'ignore_save' on procedures or conditions
     # as that would save empty groups, effectively erasing them.
     pg.setting.Persistor.save(settings_to_save)
 
