@@ -411,7 +411,7 @@ def _handle_background_foreground_commands(procedures_list, conditions_list):
 
       merge_procedure_name = merge_procedure_mapping[orig_name_setting_dict['default_value']]
       merge_group_dict = _create_command_as_saved_dict(
-        builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
+        builtin_procedures.BUILTIN_ACTIONS[merge_procedure_name])
 
       unique_merge_procedure_name = _uniquify_command_name(merge_procedure_name, procedure_names)
       merge_group_dict['name'] = unique_merge_procedure_name
@@ -743,15 +743,15 @@ def _update_to_0_6(data, _settings, procedure_groups):
           orig_name_setting_dict['default_value'] = 'apply_opacity_from_group_layers'
 
           if display_name_setting_dict is not None:
-            display_name_setting_dict['value'] = builtin_procedures.BUILTIN_PROCEDURES[
+            display_name_setting_dict['value'] = builtin_procedures.BUILTIN_ACTIONS[
               'apply_opacity_from_group_layers']['display_name']
-            display_name_setting_dict['default_value'] = builtin_procedures.BUILTIN_PROCEDURES[
+            display_name_setting_dict['default_value'] = builtin_procedures.BUILTIN_ACTIONS[
               'apply_opacity_from_group_layers']['display_name']
 
           if description_setting_dict is not None:
-            description_setting_dict['value'] = builtin_procedures.BUILTIN_PROCEDURES[
+            description_setting_dict['value'] = builtin_procedures.BUILTIN_ACTIONS[
               'apply_opacity_from_group_layers']['description']
-            description_setting_dict['default_value'] = builtin_procedures.BUILTIN_PROCEDURES[
+            description_setting_dict['default_value'] = builtin_procedures.BUILTIN_ACTIONS[
               'apply_opacity_from_group_layers']['description']
 
         if (orig_name_setting_dict['default_value'] == 'rename_for_edit_layers'
@@ -759,7 +759,7 @@ def _update_to_0_6(data, _settings, procedure_groups):
           for argument_dict in arguments_list:
             if argument_dict['name'] == 'rename_layer_groups':
               argument_dict['name'] = 'rename_group_layers'
-              argument_dict['display_name'] = builtin_procedures.BUILTIN_PROCEDURES[
+              argument_dict['display_name'] = builtin_procedures.BUILTIN_ACTIONS[
                 orig_name_setting_dict['default_value']]['arguments'][2]['display_name']
 
     conditions_list, _index = _get_child_group_list(main_settings_list, 'constraints')

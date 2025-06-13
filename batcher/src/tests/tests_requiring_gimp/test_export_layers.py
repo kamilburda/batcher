@@ -175,7 +175,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     for procedure_name, order in procedure_names_to_add.items():
       commands.add(
         settings['main/procedures'],
-        builtin_procedures.BUILTIN_PROCEDURES[procedure_name])
+        builtin_procedures.BUILTIN_ACTIONS[procedure_name])
       if order is not None:
         commands.reorder(settings['main/procedures'], procedure_name, order)
     

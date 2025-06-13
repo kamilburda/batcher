@@ -32,9 +32,9 @@ class TestBatcherInitialCommands(unittest.TestCase):
     
     commands_.add(
       settings['main/procedures'],
-      builtin_procedures.BUILTIN_PROCEDURES['insert_background_for_layers'])
+      builtin_procedures.BUILTIN_ACTIONS['insert_background_for_layers'])
     
-    batcher.add_procedure(pg.utils.empty_func, [commands_.DEFAULT_PROCEDURES_GROUP])
+    batcher.add_procedure(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
     
     batcher.run(
       is_preview=True,
@@ -43,7 +43,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
       process_export=False,
       **utils_.get_settings_for_batcher(settings['main']))
     
-    added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
     # Includes built-in procedures added by default
     self.assertEqual(len(added_command_items), 6)
@@ -52,7 +52,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     self.assertIsInstance(initial_invoker, invoker_.Invoker)
     
     commands_in_initial_invoker = initial_invoker.list_commands(
-      group=commands_.DEFAULT_PROCEDURES_GROUP)
+      group=commands_.DEFAULT_ACTIONS_GROUP)
     self.assertEqual(len(commands_in_initial_invoker), 1)
     self.assertEqual(commands_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
 
@@ -97,17 +97,17 @@ class TestAddCommandFromSettings(unittest.TestCase):
   
   def test_add_command_from_settings(self, mock_get_pdb):
     procedure = commands_.add(
-      self.procedures, builtin_procedures.BUILTIN_PROCEDURES['insert_background_for_layers'])
+      self.procedures, builtin_procedures.BUILTIN_ACTIONS['insert_background_for_layers'])
     
     self.batcher._add_command_from_settings(procedure)
     
-    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
     self.assertEqual(len(added_command_items), 1)
     self.assertEqual(
       added_command_items[0][1],
       list(procedure['arguments'])
-      + [builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS['insert_background_for_layers']])
+      + [builtin_procedures.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers']])
     self.assertEqual(added_command_items[0][2], {})
   
   def test_add_pdb_proc_as_command_without_run_mode(self, mock_get_pdb):
@@ -131,7 +131,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
 
     self.batcher._add_command_from_settings(procedure)
     
-    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_PROCEDURES_GROUP)
+    added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
     added_command_item_names_and_values = [
       (setting.name, setting.value) for setting in added_command_items[0][1][:-1]

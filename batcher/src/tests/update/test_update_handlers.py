@@ -292,7 +292,7 @@ class TestUpdateHandlers(unittest.TestCase):
       'ask')
 
     for procedure in settings['main/procedures']:
-      if procedure['orig_name'].value in builtin_procedures.BUILTIN_PROCEDURES:
+      if procedure['orig_name'].value in builtin_procedures.BUILTIN_ACTIONS:
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')

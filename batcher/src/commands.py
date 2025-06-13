@@ -72,7 +72,7 @@ from src import utils
 from src.path import uniquify
 
 
-DEFAULT_PROCEDURES_GROUP = 'default_procedures'
+DEFAULT_ACTIONS_GROUP = 'default_procedures'
 DEFAULT_CONDITIONS_GROUP = 'default_conditions'
 
 MORE_OPTIONS_TAG = 'more_options'
@@ -163,7 +163,7 @@ def create(
   Allowed values for ``'type'``:
 
   * ``'procedure'`` (default): Represents a procedure. ``'command_group'``
-    defaults to `DEFAULT_PROCEDURES_GROUP` if not defined.
+    defaults to `DEFAULT_ACTIONS_GROUP` if not defined.
 
   * ``'condition'``: Represents a condition. ``'command_group'`` defaults to
     `DEFAULT_CONDITIONS_GROUP` if not defined.
@@ -491,7 +491,7 @@ def _create_command(
 def _create_procedure(
       name,
       additional_tags=None,
-      command_groups=(DEFAULT_PROCEDURES_GROUP,),
+      command_groups=(DEFAULT_ACTIONS_GROUP,),
       **kwargs,
 ):
   tags = ['command', 'procedure']

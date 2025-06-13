@@ -27,7 +27,7 @@ from src.builtin_procedures._scale import *
 from src.builtin_procedures._utils import *
 
 
-_BUILTIN_PROCEDURES_LIST = [
+_BUILTIN_ACTIONS_LIST = [
   _align_and_offset.ALIGN_AND_OFFSET_DICT,
   _color_correction.COLOR_CORRECTION_DICT,
   _crop.CROP_FOR_IMAGES_DICT,
@@ -64,7 +64,7 @@ _BUILTIN_PROCEDURES_LIST = [
 
 # Translated display names could be displayed out of alphabetical order,
 # hence the sorting.
-_BUILTIN_PROCEDURES_LIST.sort(
+_BUILTIN_ACTIONS_LIST.sort(
   key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
 
 # Create a separate dictionary for functions since objects cannot be saved
@@ -72,12 +72,12 @@ _BUILTIN_PROCEDURES_LIST.sort(
 # function names and paths may change when refactoring or adding/modifying features.
 # The 'function' setting is set to an empty value as the function can be inferred
 # via the command's 'orig_name' setting.
-BUILTIN_PROCEDURES = {}
-BUILTIN_PROCEDURES_FUNCTIONS = {}
+BUILTIN_ACTIONS = {}
+BUILTIN_ACTIONS_FUNCTIONS = {}
 
-for command_dict in _BUILTIN_PROCEDURES_LIST:
+for command_dict in _BUILTIN_ACTIONS_LIST:
   function = command_dict['function']
   command_dict['function'] = ''
 
-  BUILTIN_PROCEDURES[command_dict['name']] = command_dict
-  BUILTIN_PROCEDURES_FUNCTIONS[command_dict['name']] = function
+  BUILTIN_ACTIONS[command_dict['name']] = command_dict
+  BUILTIN_ACTIONS_FUNCTIONS[command_dict['name']] = function

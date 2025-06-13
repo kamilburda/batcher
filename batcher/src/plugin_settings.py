@@ -124,7 +124,7 @@ def create_settings_for_convert():
   )
 
   export_arguments = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['export_for_convert']['arguments'])
+    builtin_procedures.BUILTIN_ACTIONS['export_for_convert']['arguments'])
   # Remove settings already present in the main settings.
   export_arguments = export_arguments[2:]
 
@@ -155,12 +155,12 @@ def create_settings_for_convert():
   settings.add([gui_settings])
 
   remove_folder_structure_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['remove_folder_structure'])
+    builtin_procedures.BUILTIN_ACTIONS['remove_folder_structure'])
   remove_folder_structure_procedure_dict['enabled'] = False
   remove_folder_structure_procedure_dict['display_options_on_create'] = False
 
   scale_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['scale_for_images'])
+    builtin_procedures.BUILTIN_ACTIONS['scale_for_images'])
   scale_procedure_dict['enabled'] = False
   scale_procedure_dict['display_options_on_create'] = False
 
@@ -274,7 +274,7 @@ def create_settings_for_export_images():
   )
 
   export_arguments = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['export_for_export_images']['arguments'])
+    builtin_procedures.BUILTIN_ACTIONS['export_for_export_images']['arguments'])
   # Remove settings already present in the main settings.
   export_arguments = export_arguments[2:]
 
@@ -303,7 +303,7 @@ def create_settings_for_export_images():
   settings.add([gui_settings])
 
   scale_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['scale_for_images'])
+    builtin_procedures.BUILTIN_ACTIONS['scale_for_images'])
   scale_procedure_dict['enabled'] = False
   scale_procedure_dict['display_options_on_create'] = False
 
@@ -400,17 +400,17 @@ def create_settings_for_edit_and_save_images():
   settings.add([gui_settings])
 
   remove_file_extension_from_imported_images_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['remove_file_extension_from_imported_images'])
+    builtin_procedures.BUILTIN_ACTIONS['remove_file_extension_from_imported_images'])
   remove_file_extension_from_imported_images_procedure_dict['enabled'] = True
   remove_file_extension_from_imported_images_procedure_dict['display_options_on_create'] = False
 
   rename_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_and_save_images'])
+    builtin_procedures.BUILTIN_ACTIONS['rename_for_edit_and_save_images'])
   rename_procedure_dict['enabled'] = True
   rename_procedure_dict['display_options_on_create'] = False
 
   save_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['save'])
+    builtin_procedures.BUILTIN_ACTIONS['save'])
   save_procedure_dict['enabled'] = False
   save_procedure_dict['display_options_on_create'] = False
 
@@ -529,7 +529,7 @@ def create_settings_for_export_layers():
   )
 
   export_arguments = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['export_for_export_layers']['arguments'])
+    builtin_procedures.BUILTIN_ACTIONS['export_for_export_layers']['arguments'])
   # Remove settings already present in the main settings.
   export_arguments = export_arguments[2:]
 
@@ -559,7 +559,7 @@ def create_settings_for_export_layers():
   settings.add([gui_settings])
 
   resize_canvas_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['resize_canvas'])
+    builtin_procedures.BUILTIN_ACTIONS['resize_canvas'])
   resize_canvas_procedure_dict['enabled'] = True
   resize_canvas_procedure_dict['display_options_on_create'] = False
   resize_canvas_procedure_dict['arguments'][1]['default_value'] = (
@@ -654,7 +654,7 @@ def create_settings_for_edit_layers():
   settings.add([gui_settings])
 
   rename_procedure_dict = utils.semi_deep_copy(
-    builtin_procedures.BUILTIN_PROCEDURES['rename_for_edit_layers'])
+    builtin_procedures.BUILTIN_ACTIONS['rename_for_edit_layers'])
   rename_procedure_dict['enabled'] = False
   rename_procedure_dict['display_options_on_create'] = False
   rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'

@@ -32,7 +32,7 @@ class CommandLists:
     self._procedure_list = command_list_.CommandList(
       self._settings['main/procedures'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_procedures.BUILTIN_PROCEDURES, [pg.config.PROCEDURE_GROUP]),
+        builtin_procedures.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
       add_command_text=_('Add P_rocedure...'),
       allow_custom_commands=True,
       add_custom_command_text=_('Add Custom Procedure...'),
@@ -408,7 +408,7 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
 
   merge_procedure_name = merge_procedure_orig_name_mapping[item.command['orig_name'].value]
 
-  merge_item = procedure_list.add_item(builtin_procedures.BUILTIN_PROCEDURES[merge_procedure_name])
+  merge_item = procedure_list.add_item(builtin_procedures.BUILTIN_ACTIONS[merge_procedure_name])
 
   export_procedure_index = next(
     iter(index for index, item in enumerate(procedure_list.items)

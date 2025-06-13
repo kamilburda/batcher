@@ -88,7 +88,7 @@ class TestCreateCommands(unittest.TestCase):
      test_procedures,
      'autocrop_background',
      ['command', 'procedure'],
-     {'command_groups': [commands_.DEFAULT_PROCEDURES_GROUP]}),
+     {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
     ('procedure_with_custom_group',
      'procedures',
@@ -575,7 +575,7 @@ class TestManagePdbProceduresAsCommands(unittest.TestCase):
     self.assertEqual(command['origin'].value, 'gimp_pdb')
     self.assertEqual(command['enabled'].value, True)
     self.assertEqual(command['display_name'].value, 'Save as PNG')
-    self.assertEqual(command['command_groups'].value, [commands_.DEFAULT_PROCEDURES_GROUP])
+    self.assertEqual(command['command_groups'].value, [commands_.DEFAULT_ACTIONS_GROUP])
     
     self.assertEqual(command['arguments/run-mode'].gui.get_visible(), False)
 

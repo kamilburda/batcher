@@ -646,7 +646,7 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     if command['origin'].value == 'builtin':
       if 'procedure' in command.tags:
-        function = builtin_procedures.BUILTIN_PROCEDURES_FUNCTIONS[
+        function = builtin_procedures.BUILTIN_ACTIONS_FUNCTIONS[
           command['orig_name'].value]
       elif 'condition' in command.tags:
         function = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
@@ -958,7 +958,7 @@ class Batcher(metaclass=abc.ABCMeta):
         additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     self._invoker.invoke(
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
       [self],
       additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
@@ -1075,23 +1075,23 @@ class ImageBatcher(Batcher):
 
     self._invoker.add(
       _set_selected_and_current_layer,
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
     )
 
     self._invoker.add(
       _set_selected_and_current_layer_after_command,
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
       foreach=True)
 
   def _add_commands_before_procedures_from_settings(self):
     super()._add_commands_before_procedures_from_settings()
 
-    self._add_default_rename_procedure([commands.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_rename_procedure([commands.DEFAULT_ACTIONS_GROUP])
 
   def _add_commands_after_procedures_from_settings(self):
     super()._add_commands_after_procedures_from_settings()
 
-    self._add_default_export_procedure([commands.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_export_procedure([commands.DEFAULT_ACTIONS_GROUP])
 
   def _add_name_only_commands_before_procedures_from_settings(self):
     self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
@@ -1213,34 +1213,34 @@ class LayerBatcher(Batcher):
 
     self._invoker.add(
       _set_selected_and_current_layer,
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
     )
 
     self._invoker.add(
       _set_selected_and_current_layer_after_command,
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
       foreach=True)
 
     self._invoker.add(
       _sync_item_name_and_layer_name,
-      [commands.DEFAULT_PROCEDURES_GROUP],
+      [commands.DEFAULT_ACTIONS_GROUP],
       foreach=True)
 
     if self._edit_mode:
       self._invoker.add(
         _preserve_layer_locks_between_commands,
-        [commands.DEFAULT_PROCEDURES_GROUP],
+        [commands.DEFAULT_ACTIONS_GROUP],
         foreach=True)
 
   def _add_commands_before_procedures_from_settings(self):
     super()._add_commands_before_procedures_from_settings()
 
-    self._add_default_rename_procedure([commands.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_rename_procedure([commands.DEFAULT_ACTIONS_GROUP])
 
   def _add_commands_after_procedures_from_settings(self):
     super()._add_commands_after_procedures_from_settings()
 
-    self._add_default_export_procedure([commands.DEFAULT_PROCEDURES_GROUP])
+    self._add_default_export_procedure([commands.DEFAULT_ACTIONS_GROUP])
 
   def _add_name_only_commands_before_procedures_from_settings(self):
     self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
