@@ -35,7 +35,7 @@ feature_row_main:
     btn_label: "Read More"
     btn_class: "btn--primary"
 feature_row_customization:
-  - image_path: /assets/images/feature_procedures_and_constraints.png
+  - image_path: /assets/images/feature_actions_and_conditions.png
     title: "Highly customizable, too."
     excerpt: "Apply any filter to each image/layer during batch processing, including third-party plug-ins. Process only images/layers matching your criteria."
     url: "/docs/customization/"

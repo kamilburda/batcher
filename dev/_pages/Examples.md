@@ -72,13 +72,13 @@ Uncheck the `Resize to layer size` procedure if it exists.
 
 ## I want to export only visible layers.
 
-Check the `Visible` constraint (or add one if not already via `Add Constraint... → Visible`).
+Check the `Visible` condition (or add one if not already via `Add Condition... → Visible`).
 
 
 ## I want to export only visible layers. However, I also want to exclude those that have invisible parent group layers.
 
-1. Check the `Visible` constraint (or add one if not already).
-2. Edit the `Visible` constraint (press the icon to the right of the constraint name).
+1. Check the `Visible` condition (or add one if not already).
+2. Edit the `Visible` condition (press the icon to the right of the condition name).
    In the dialog, click on `More options` and then check `Also apply to parent folders`.
 
 
@@ -90,9 +90,9 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 
 ## How do I export only group layers at the top level?
 
-1. Uncheck the `Layers` constraint.
-2. Add the `Group layers` constraint.
-3. Add the `Top-level` constraint.
+1. Uncheck the `Layers` condition.
+2. Add the `Group layers` condition.
+3. Add the `Top-level` condition.
 
 
 ## How do I reverse the order of the exported images/layers?
