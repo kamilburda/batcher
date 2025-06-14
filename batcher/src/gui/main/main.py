@@ -79,7 +79,7 @@ class BatchProcessingGui:
     return self._previews.image_preview
 
   @property
-  def procedure_list(self):
+  def action_list(self):
     return self._command_lists.action_list
 
   @property

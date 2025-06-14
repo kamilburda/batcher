@@ -292,14 +292,14 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
     decoration_offsets,
   )
 
-  gui.procedure_list.browser.fill_contents_if_empty()
-  gui.procedure_list.browser.widget.show_all()
-  gui.procedure_list.browser.select_command('gegl:gaussian-blur')
+  gui.action_list.browser.fill_contents_if_empty()
+  gui.action_list.browser.widget.show_all()
+  gui.action_list.browser.select_command('gegl:gaussian-blur')
 
   while Gtk.events_pending():
     Gtk.main_iteration()
 
-  gui.procedure_list.browser.widget.set_focus(None)
+  gui.action_list.browser.widget.set_focus(None)
 
   move_dialog_to_corner(
     dialog, settings['gui/procedure_browser/dialog_position'], *decoration_offsets)
@@ -315,7 +315,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
     crop_to='browser_dialog',
   )
 
-  gui.procedure_list.browser.widget.hide()
+  gui.action_list.browser.widget.hide()
 
 
 def take_screenshots_for_export_layers_quick(_gui, dialog, settings):
