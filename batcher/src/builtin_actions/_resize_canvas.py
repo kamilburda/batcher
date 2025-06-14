@@ -541,8 +541,7 @@ RESIZE_CANVAS_DICT = {
   'name': 'resize_canvas',
   'function': resize_canvas,
   'display_name': _('Resize canvas'),
-  'description': _(
-    'Resizes the image or layer extents, optionally filling the newly added space with a color.'),
+  'description': _('Resizes the image or layer extents.'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
