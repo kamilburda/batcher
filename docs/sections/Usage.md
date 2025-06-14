@@ -11,7 +11,7 @@ To start batch conversion, press the `Run` button.
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings) below.
 Image names are used as filenames by default.
 
-For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
+For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
 
 You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
@@ -40,7 +40,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 To export layers, press the `Export` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
+For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
 
 
 ### Quick Export of Layers
@@ -78,7 +78,7 @@ To export images, press the `Export` button.
 Note that this feature exports images to another file format. If you intend to batch-save XCF images in their original locations, use `File → Edit and Save Images...` instead.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and conditions, see [Procedures and Conditions](#procedures-and-conditions) below.
+For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
 
 
 ### Quick Export of Images
@@ -175,18 +175,18 @@ You will be prompted to set the file format options right after you start batch 
 All options are described in [Export Options](Customization/Export Options.md).
 
 
-## Procedures and Conditions
+## Actions and Conditions
 
 Before the start of batch processing, you can apply a multitude of *procedures* to each image/layer, such as scaling, background insertion, any layer effect or GIMP plug-in.
 
 You can exclude images/layers from being processed/exported based on one or more *conditions* (only filenames matching a suffix, only visible layers, ...).
 
-Procedures and conditions can be a powerful way to adjust batch processing to your heart's content.
+Actions and conditions can be a powerful way to adjust batch processing to your heart's content.
 You can take a look at a few [examples](Examples.md) to get started.
 
 The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the procedures and conditions.
 
-For details, see [Procedures](Customization/Procedures.md) and [Conditions](Customization/Conditions.md).
+For details, see [Actions](Customization/Actions.md) and [Conditions](Customization/Conditions.md).
 
 
 ## Preview

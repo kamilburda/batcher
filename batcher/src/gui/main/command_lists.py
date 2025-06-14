@@ -33,10 +33,10 @@ class CommandLists:
       self._settings['main/procedures'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
         builtin_actions.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
-      add_command_text=_('Add P_rocedure...'),
+      add_command_text=_('Add _Action...'),
       allow_custom_commands=True,
-      add_custom_command_text=_('Add Custom Procedure...'),
-      command_browser_text=_('Add Custom Procedure'),
+      add_custom_command_text=_('Add Custom Action...'),
+      command_browser_text=_('Add Custom Action'),
       propagate_natural_height=True,
       propagate_natural_width=True,
       hscrollbar_policy=Gtk.PolicyType.NEVER,
@@ -122,7 +122,7 @@ class CommandLists:
 
   def _init_gui(self):
     self._label_procedures = Gtk.Label(
-      label='<b>{}</b>'.format(_('Procedures')),
+      label='<b>{}</b>'.format(_('Actions')),
       use_markup=True,
       xalign=0.0,
       yalign=0.5,

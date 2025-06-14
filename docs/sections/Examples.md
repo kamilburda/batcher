@@ -1,6 +1,6 @@
 ## I don't want to preserve folder hierarchy when exporting.
 
-Add and check the `Remove folder structure` procedure if not already (`Add Procedure... → Remove folder structure`).
+Add and check the `Remove folder structure` procedure if not already (`Add Action... → Remove folder structure`).
 
 
 ## How do I rename the images to form a sequence of numbers, e.g. "image001", "image002", ...?
@@ -11,7 +11,7 @@ Click on the text entry next to `Name` and choose `image001`, or type `image[001
 ## I want to adjust brightness in the images. Can this be done?
 
 Yes! You may apply any GIMP filter or plug-in:
-1. Select `Add Procedure... → Add Custom Procedure...`
+1. Select `Add Action... → Add Custom Action...`
 2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
 3. Adjust the options as desired.
 4. Select `Add` to add the procedure.

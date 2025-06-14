@@ -1,16 +1,16 @@
-Procedures allow you to apply image filters to each image/layer.
-Press the `Add Procedure...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
+Actions allow you to apply image filters to each image/layer.
+Press the `Add Action...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
 
 For each procedure, you may:
 * enable/disable the procedure,
 * move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
-* [edit the procedure](Editing Procedures and Conditions.md),
+* [edit the procedure](Editing Actions and Conditions.md),
 * remove the procedure.
 
 You can add the same procedure multiple times.
 
 
-## Built-in Procedures
+## Built-in Actions
 
 ### Align and offset
 
@@ -246,16 +246,16 @@ Options:
 * *X* and *Y*: The new image resolution in DPI. Only applicable if *Set image resolution in DPI* is checked.
 
 
-## Adding Custom Procedures
+## Adding Custom Actions
 
-You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Procedure...` and then selecting `Add Custom Procedure...`. Both built-in and any third-party plug-ins and layer effects are supported.
+You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Action...` and then selecting `Add Custom Action...`. Both built-in and any third-party plug-ins and layer effects are supported.
 
-![Procedure browser dialog](../../assets/images/screenshot_procedure_browser_dialog.png){: .align-center}
+![Action browser dialog](../../assets/images/screenshot_procedure_browser_dialog.png){: .align-center}
 
 You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 
 Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
-You can [edit the procedure](Editing Procedures and Conditions.md) anytime after adding it.
+You can [edit the procedure](Editing Actions and Conditions.md) anytime after adding it.
 
 All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
 * *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).

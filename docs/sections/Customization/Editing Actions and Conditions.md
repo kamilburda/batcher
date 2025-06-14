@@ -1,6 +1,6 @@
-To edit a [procedure](Procedures.md) or a [condition](Conditions.md), press the icon to the right of the procedure/condition name and adjust the options in the displayed dialog.
+To edit a [procedure](Actions.md) or a [condition](Conditions.md), press the icon to the right of the procedure/condition name and adjust the options in the displayed dialog.
 
-The dialog will be automatically displayed for most [built-in procedures](Procedures.md#built-in-procedures) and some [built-in conditions](Conditions.md#built-in-conditions) when added.
+The dialog will be automatically displayed for most [built-in procedures](Actions.md#built-in-procedures) and some [built-in conditions](Conditions.md#built-in-conditions) when added.
 
 ## Placeholder Values
 

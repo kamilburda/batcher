@@ -365,7 +365,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def skipped_procedures(self) -> Dict[str, List]:
-    """Procedures that were skipped during processing.
+    """Actions that were skipped during processing.
 
     A skipped procedure was not applied to one or more items and causes no
     adverse effects further during processing.
@@ -383,7 +383,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def failed_procedures(self) -> Dict[str, List]:
-    """Procedures that caused an error during processing.
+    """Actions that caused an error during processing.
 
     Failed procedures indicate a problem with the procedure parameters or
     potentially a bug.
@@ -413,10 +413,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
     The signature is the same as for `pygimplib.invoker.Invoker.add()`.
 
-    Procedures added by this method are placed before procedures added by
+    Actions added by this method are placed before procedures added by
     `commands.add()`.
 
-    Procedures are added immediately before the start of processing. Thus,
+    Actions are added immediately before the start of processing. Thus,
     calling this method during processing will have no effect.
 
     Unlike `commands.add()`, procedures added by this method do not act as
