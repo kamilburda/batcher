@@ -1,4 +1,4 @@
-"""Built-in "Rotate and flip" procedure."""
+"""Built-in "Rotate and flip" action."""
 
 import math
 
@@ -181,47 +181,47 @@ def _angle_to_radians(angle):
     return angle['value']
 
 
-def on_after_add_rotate_and_flip_action(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('rotate_and_flip_for_'):
+def on_after_add_rotate_and_flip_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value.startswith('rotate_and_flip_for_'):
     _set_sensitive_for_custom_rotation_angle(
-      procedure['arguments/angle'],
-      procedure['arguments/custom_rotation_angle'],
+      action['arguments/angle'],
+      action['arguments/custom_rotation_angle'],
     )
 
-    procedure['arguments/angle'].connect_event(
+    action['arguments/angle'].connect_event(
       'value-changed',
       _set_sensitive_for_custom_rotation_angle,
-      procedure['arguments/custom_rotation_angle'],
+      action['arguments/custom_rotation_angle'],
     )
 
     _set_value_and_sensitive_for_rotation_center_settings(
-      procedure['arguments/object_to_rotate_and_flip'],
-      procedure['arguments/rotate_around_center'],
-      procedure['arguments/rotation_center_x'],
-      procedure['arguments/rotation_center_y'],
+      action['arguments/object_to_rotate_and_flip'],
+      action['arguments/rotate_around_center'],
+      action['arguments/rotation_center_x'],
+      action['arguments/rotation_center_y'],
     )
 
-    procedure['arguments/object_to_rotate_and_flip'].connect_event(
+    action['arguments/object_to_rotate_and_flip'].connect_event(
       'value-changed',
       _set_value_and_sensitive_for_rotation_center_settings,
-      procedure['arguments/rotate_around_center'],
-      procedure['arguments/rotation_center_x'],
-      procedure['arguments/rotation_center_y'],
+      action['arguments/rotate_around_center'],
+      action['arguments/rotation_center_x'],
+      action['arguments/rotation_center_y'],
     )
 
     _set_sensitive_for_rotation_center_x_y(
-      procedure['arguments/rotate_around_center'],
-      procedure['arguments/object_to_rotate_and_flip'],
-      procedure['arguments/rotation_center_x'],
-      procedure['arguments/rotation_center_y'],
+      action['arguments/rotate_around_center'],
+      action['arguments/object_to_rotate_and_flip'],
+      action['arguments/rotation_center_x'],
+      action['arguments/rotation_center_y'],
     )
 
-    procedure['arguments/rotate_around_center'].connect_event(
+    action['arguments/rotate_around_center'].connect_event(
       'value-changed',
       _set_sensitive_for_rotation_center_x_y,
-      procedure['arguments/object_to_rotate_and_flip'],
-      procedure['arguments/rotation_center_x'],
-      procedure['arguments/rotation_center_y'],
+      action['arguments/object_to_rotate_and_flip'],
+      action['arguments/rotation_center_x'],
+      action['arguments/rotation_center_y'],
     )
 
 

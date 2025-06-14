@@ -1,4 +1,4 @@
-"""Built-in "Crop" procedure."""
+"""Built-in "Crop" action."""
 
 import gi
 
@@ -269,7 +269,7 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
   if isinstance(object_to_crop, Gimp.Image):
     # An image can end up with no layers if cropping in an empty space.
     # We insert an empty layer after cropping to ensure that subsequent
-    # procedures work properly.
+    # actions work properly.
     matching_layer = builtin_actions_utils.get_best_matching_layer_from_image(
       batcher, object_to_crop)
 
@@ -319,41 +319,41 @@ def _clamp_value(value, allow_zero_value, max_value):
   return value
 
 
-def on_after_add_crop_action(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('crop_for_'):
-    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+def on_after_add_crop_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value.startswith('crop_for_'):
+    action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
       'value-changed',
       _set_visible_for_crop_from_edges_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
-    procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+    action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
       'gui-visible-changed',
       _set_visible_for_crop_from_edges_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
-    procedure['arguments/crop_to_aspect_ratio_position'].connect_event(
+    action['arguments/crop_to_aspect_ratio_position'].connect_event(
       'value-changed',
       _set_visible_for_crop_to_aspect_ratio_position_custom,
-      procedure['arguments/crop_to_aspect_ratio_position_custom'],
+      action['arguments/crop_to_aspect_ratio_position_custom'],
     )
 
-    procedure['arguments/crop_to_aspect_ratio_position'].connect_event(
+    action['arguments/crop_to_aspect_ratio_position'].connect_event(
       'gui-visible-changed',
       _set_visible_for_crop_to_aspect_ratio_position_custom,
-      procedure['arguments/crop_to_aspect_ratio_position_custom'],
+      action['arguments/crop_to_aspect_ratio_position_custom'],
     )
 
     _set_visible_for_crop_mode_settings(
-      procedure['arguments/crop_mode'],
-      procedure['arguments'],
+      action['arguments/crop_mode'],
+      action['arguments'],
     )
 
-    procedure['arguments/crop_mode'].connect_event(
+    action['arguments/crop_mode'].connect_event(
       'value-changed',
       _set_visible_for_crop_mode_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
 

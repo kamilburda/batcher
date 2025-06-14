@@ -1,4 +1,4 @@
-"""Built-in "Resize canvas" procedure."""
+"""Built-in "Resize canvas" action."""
 
 import gi
 
@@ -426,52 +426,52 @@ def _clamp_value(value, min_value=None, max_value=None):
   return value
 
 
-def on_after_add_resize_canvas_action(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value == 'resize_canvas':
-    procedure['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
+def on_after_add_resize_canvas_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'resize_canvas':
+    action['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
       'value-changed',
       _set_visible_for_resize_from_edges_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
-    procedure['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
+    action['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
       'gui-visible-changed',
       _set_visible_for_resize_from_edges_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
-    procedure['arguments/resize_to_aspect_ratio_position'].connect_event(
+    action['arguments/resize_to_aspect_ratio_position'].connect_event(
       'value-changed',
       _set_visible_for_resize_to_aspect_ratio_position_custom,
-      procedure['arguments/resize_to_aspect_ratio_position_custom'],
+      action['arguments/resize_to_aspect_ratio_position_custom'],
     )
 
-    procedure['arguments/resize_to_aspect_ratio_position'].connect_event(
+    action['arguments/resize_to_aspect_ratio_position'].connect_event(
       'gui-visible-changed',
       _set_visible_for_resize_to_aspect_ratio_position_custom,
-      procedure['arguments/resize_to_aspect_ratio_position_custom'],
+      action['arguments/resize_to_aspect_ratio_position_custom'],
     )
 
     _set_sensitive_for_fill_color(
-      procedure['arguments/set_fill_color'],
-      procedure['arguments/fill_color'],
+      action['arguments/set_fill_color'],
+      action['arguments/fill_color'],
     )
 
-    procedure['arguments/set_fill_color'].connect_event(
+    action['arguments/set_fill_color'].connect_event(
       'value-changed',
       _set_sensitive_for_fill_color,
-      procedure['arguments/fill_color'],
+      action['arguments/fill_color'],
     )
 
     _set_visible_for_resize_mode_settings(
-      procedure['arguments/resize_mode'],
-      procedure['arguments'],
+      action['arguments/resize_mode'],
+      action['arguments'],
     )
 
-    procedure['arguments/resize_mode'].connect_event(
+    action['arguments/resize_mode'].connect_event(
       'value-changed',
       _set_visible_for_resize_mode_settings,
-      procedure['arguments'],
+      action['arguments'],
     )
 
 

@@ -1,4 +1,4 @@
-"""Built-in "Export"/"Also export as..." procedure."""
+"""Built-in "Export"/"Also export as..." action."""
 
 import collections
 import os
@@ -690,42 +690,42 @@ class _NameOnlyItem(pg.itemtree.Item):
     return None
 
 
-def on_after_add_export_action(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('export_for_'):
+def on_after_add_export_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value.startswith('export_for_'):
     _set_sensitive_for_image_name_pattern_in_export(
-      procedure['arguments/export_mode'],
-      procedure['arguments/single_image_name_pattern'])
+      action['arguments/export_mode'],
+      action['arguments/single_image_name_pattern'])
 
-    procedure['arguments/export_mode'].connect_event(
+    action['arguments/export_mode'].connect_event(
       'value-changed',
       _set_sensitive_for_image_name_pattern_in_export,
-      procedure['arguments/single_image_name_pattern'])
+      action['arguments/single_image_name_pattern'])
 
     _show_hide_file_format_export_options(
-      procedure['arguments/file_format_mode'],
-      procedure['arguments/file_format_export_options'])
+      action['arguments/file_format_mode'],
+      action['arguments/file_format_export_options'])
 
-    procedure['arguments/file_format_mode'].connect_event(
+    action['arguments/file_format_mode'].connect_event(
       'value-changed',
       _show_hide_file_format_export_options,
-      procedure['arguments/file_format_export_options'])
+      action['arguments/file_format_export_options'])
 
     _set_file_format_export_options(
-      procedure['arguments/file_extension'],
-      procedure['arguments/file_format_export_options'])
+      action['arguments/file_extension'],
+      action['arguments/file_format_export_options'])
 
-    procedure['arguments/file_extension'].connect_event(
+    action['arguments/file_extension'].connect_event(
       'value-changed',
       _set_file_format_export_options,
-      procedure['arguments/file_format_export_options'])
+      action['arguments/file_format_export_options'])
 
     # This is needed in case settings are reset, since the file extension is
     # reset first and the options, after resetting, would contain values for
     # the default file extension, which could be different.
-    procedure['arguments/file_format_export_options'].connect_event(
+    action['arguments/file_format_export_options'].connect_event(
       'after-reset',
       _set_file_format_export_options_from_extension,
-      procedure['arguments/file_extension'])
+      action['arguments/file_extension'])
 
 
 def set_sensitive_for_image_name_pattern_in_export_for_default_export_action(

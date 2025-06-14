@@ -1,4 +1,4 @@
-"""Built-in "Insert background" and "Insert foreground" procedures."""
+"""Built-in "Insert background" and "Insert foreground" actions."""
 
 import os
 
@@ -138,7 +138,7 @@ def _insert_layers(image, layers, parent, position):
     # The merged-down layer does not possess the attributes of the original
     # layers, including the color tag, so we set it explicitly. This ensures
     # that tagged group layers are merged properly in "Merge back-/foreground"
-    # procedures.
+    # actions.
     merged_tagged_layer.set_color_tag(merged_color_tag)
 
   return merged_tagged_layer
@@ -190,25 +190,25 @@ def _merge_layer(batcher, merge_type, get_inserted_layer_func, layer_to_merge_st
 
 
 def on_after_add_insert_background_foreground_for_layers(
-      _procedures,
-      procedure,
-      _orig_procedure_dict,
+      _actions,
+      action,
+      _orig_action_dict,
       tagged_items_setting,
 ):
-  if procedure['orig_name'].value in [
+  if action['orig_name'].value in [
        'insert_background_for_layers', 'insert_foreground_for_layers']:
-    procedure['arguments/tagged_items'].gui.set_visible(False)
-    _sync_tagged_items_with_procedure(tagged_items_setting, procedure)
+    action['arguments/tagged_items'].gui.set_visible(False)
+    _sync_tagged_items_with_action(tagged_items_setting, action)
 
 
-def _sync_tagged_items_with_procedure(tagged_items_setting, procedure):
+def _sync_tagged_items_with_action(tagged_items_setting, action):
 
-  def _on_tagged_items_changed(tagged_items_setting_, procedure_):
-    procedure_['arguments/tagged_items'].set_value(tagged_items_setting_.value)
+  def _on_tagged_items_changed(tagged_items_setting_, action_):
+    action_['arguments/tagged_items'].set_value(tagged_items_setting_.value)
 
-  _on_tagged_items_changed(tagged_items_setting, procedure)
+  _on_tagged_items_changed(tagged_items_setting, action)
 
-  tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, procedure)
+  tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, action)
 
 
 INSERT_BACKGROUND_FOR_IMAGES_DICT = {
@@ -344,7 +344,7 @@ MERGE_BACKGROUND_DICT = {
   'name': 'merge_background',
   'function': merge_background,
   'display_name': _('Merge background'),
-  # This procedure is added/removed automatically alongside `insert_background_for_*`.
+  # This action is added/removed automatically alongside `insert_background_for_*`.
   'additional_tags': [],
   'arguments': [
     {
@@ -368,7 +368,7 @@ MERGE_FOREGROUND_DICT = {
   'name': 'merge_foreground',
   'function': merge_foreground,
   'display_name': _('Merge foreground'),
-  # This procedure is added/removed automatically alongside `insert_foreground_for_*`.
+  # This action is added/removed automatically alongside `insert_foreground_for_*`.
   'additional_tags': [],
   'arguments': [
     {

@@ -1,4 +1,4 @@
-"""Built-in "Scale" procedure."""
+"""Built-in "Scale" action."""
 
 import gi
 
@@ -231,70 +231,70 @@ def _fill_with_padding(
   )
 
 
-def on_after_add_scale_action(_procedures, procedure, _orig_procedure_dict):
-  if procedure['orig_name'].value.startswith('scale_for_'):
+def on_after_add_scale_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value.startswith('scale_for_'):
     _set_sensitive_for_local_origin(
-      procedure['arguments/object_to_scale'],
-      procedure['arguments/local_origin'],
+      action['arguments/object_to_scale'],
+      action['arguments/local_origin'],
     )
 
-    procedure['arguments/object_to_scale'].connect_event(
+    action['arguments/object_to_scale'].connect_event(
       'value-changed',
       _set_sensitive_for_local_origin,
-      procedure['arguments/local_origin'])
+      action['arguments/local_origin'])
 
     _set_sensitive_for_dimensions_given_aspect_ratio(
-      procedure['arguments/aspect_ratio'],
-      procedure['arguments/new_width'],
-      procedure['arguments/new_height'],
+      action['arguments/aspect_ratio'],
+      action['arguments/new_width'],
+      action['arguments/new_height'],
     )
 
-    procedure['arguments/aspect_ratio'].connect_event(
+    action['arguments/aspect_ratio'].connect_event(
       'value-changed',
       _set_sensitive_for_dimensions_given_aspect_ratio,
-      procedure['arguments/new_width'],
-      procedure['arguments/new_height'],
+      action['arguments/new_width'],
+      action['arguments/new_height'],
     )
 
-    procedure['arguments/padding_position'].connect_event(
+    action['arguments/padding_position'].connect_event(
       'value-changed',
       _set_visible_for_padding_custom_position,
-      procedure['arguments/padding_position_custom'],
+      action['arguments/padding_position_custom'],
     )
 
-    procedure['arguments/padding_position'].connect_event(
+    action['arguments/padding_position'].connect_event(
       'gui-visible-changed',
       _set_visible_for_padding_custom_position,
-      procedure['arguments/padding_position_custom'],
+      action['arguments/padding_position_custom'],
     )
 
     _set_visible_for_padding_color_and_position(
-      procedure['arguments/aspect_ratio'],
-      procedure['arguments/padding_color'],
-      procedure['arguments/padding_position'],
+      action['arguments/aspect_ratio'],
+      action['arguments/padding_color'],
+      action['arguments/padding_position'],
     )
 
-    procedure['arguments/aspect_ratio'].connect_event(
+    action['arguments/aspect_ratio'].connect_event(
       'value-changed',
       _set_visible_for_padding_color_and_position,
-      procedure['arguments/padding_color'],
-      procedure['arguments/padding_position'],
+      action['arguments/padding_color'],
+      action['arguments/padding_position'],
     )
 
-    procedure['arguments/image_resolution'].connect_event(
+    action['arguments/image_resolution'].connect_event(
       'after-set-gui',
       _set_left_margin_for_resolution,
     )
 
     _set_sensitive_for_resolution(
-      procedure['arguments/set_image_resolution'],
-      procedure['arguments/image_resolution'],
+      action['arguments/set_image_resolution'],
+      action['arguments/image_resolution'],
     )
 
-    procedure['arguments/set_image_resolution'].connect_event(
+    action['arguments/set_image_resolution'].connect_event(
       'value-changed',
       _set_sensitive_for_resolution,
-      procedure['arguments/image_resolution'],
+      action['arguments/image_resolution'],
     )
 
 
