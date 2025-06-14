@@ -344,7 +344,7 @@ def create_command(command_dict):
   For the list of available key-value pairs beside ``name`` and ``type``, see
   `create()`.
 
-  An command created by this function is not added to a group of commands. Use
+  A command created by this function is not added to a group of commands. Use
   `add()` to add an existing command to an existing command group.
   """
   command_dict_copy = utils.semi_deep_copy(command_dict)

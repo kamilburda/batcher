@@ -61,7 +61,7 @@ class CommandEditor(GimpUi.Dialog):
 
   def attach_editor_widget(self, widget):
     if self._command_editor_widget is not None:
-      raise ValueError('an CommandEditorWidget is already attached to this CommandEditor')
+      raise ValueError('a CommandEditorWidget is already attached to this CommandEditor')
 
     self._command_editor_widget = widget
     self._command_editor_widget.set_parent(self)

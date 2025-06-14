@@ -61,7 +61,7 @@ class Invoker:
 
     The ID of the newly added command is returned.
     
-    An command can be:
+    A command can be:
     * a function, in which case optional arguments (``args``) and
       keyword arguments (``kwargs``) can be specified,
     * another `Invoker` instance.
@@ -288,7 +288,7 @@ class Invoker:
       if group not in self._commands:
         self._init_group(group)
       
-      # An command could be removed during invocation, hence create a list and
+      # A command could be removed during invocation, hence create a list and
       # later check for validity.
       items = list(self._commands[group])
       

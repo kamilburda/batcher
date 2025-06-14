@@ -21,7 +21,7 @@ class CommandList(pg.gui.ItemBox):
   """A scrollable vertical list that allows the user to add, edit and remove
   commands interactively.
 
-  An command represents a procedure or condition that can be applied to a
+  A command represents an action or a condition that can be applied to a
   GIMP item (image, layer, ...). Commands can be created via the `src.commands`
   module.
 
