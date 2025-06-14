@@ -235,7 +235,7 @@ class Previews:
     self._menu_add.show_all()
 
     self._button_add = Gtk.Button(
-      label=_('_Add...'), use_underline=True, hexpand=True)
+      label=_('A_dd...'), use_underline=True, hexpand=True)
 
     self._menu_item_remove_selected = Gtk.MenuItem(label=_('Remove Selected'), use_underline=False)
     self._menu_item_remove_all = Gtk.MenuItem(label=_('Remove All'), use_underline=False)
