@@ -325,7 +325,7 @@ def _merge_and_resize_image(batcher, image, layer):
   """Merges all layers in the current image into one.
   
   Merging is necessary for:
-  * custom procedures inserting layers (background, foreground). Some file
+  * custom actions inserting layers (background, foreground). Some file
     formats may discard all but one layer.
   * multi-layer images, with each layer containing background or foreground
     which are originally separate layers.

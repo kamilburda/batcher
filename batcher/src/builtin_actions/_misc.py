@@ -1,4 +1,4 @@
-"""An assorted collection of simple built-in procedures."""
+"""An assorted collection of simple built-in actions."""
 
 import gi
 

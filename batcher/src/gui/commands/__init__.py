@@ -1,1 +1,1 @@
-"""Widgets to interactively edit commands (procedures/conditions)."""
+"""Widgets to interactively edit commands (actions/conditions)."""

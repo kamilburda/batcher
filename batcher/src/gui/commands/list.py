@@ -1,4 +1,4 @@
-"""List of commands (procedures/conditions) that can be edited interactively."""
+"""List of commands (actions/conditions) that can be edited interactively."""
 
 from typing import Any, Dict, Optional, Union
 

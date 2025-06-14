@@ -241,6 +241,6 @@ def get_best_matching_layer_from_image(batcher, image):
     if layers:
       return layers[0]
     else:
-      # Rather than returning no layer, we skip the current procedure. An image
-      # having no layers points to a problem outside the procedure.
+      # Rather than returning no layer, we skip the current action. An image
+      # having no layers points to a problem outside the action.
       raise exceptions.SkipCommand(_('The image has no layers.'))

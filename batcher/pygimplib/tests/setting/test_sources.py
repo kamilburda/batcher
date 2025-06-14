@@ -263,11 +263,11 @@ class TestSourceRead(unittest.TestCase):
   def test_read_not_all_settings_found(self):
     self.source.data = _test_data_for_read_write()
     
-    # 'main/procedures/resize_to_layer_size/arguments'
+    # 'main/actions/resize_to_layer_size/arguments'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
-    # 'main/procedures/resize_to_layer_size/enabled'
+    # 'main/actions/resize_to_layer_size/enabled'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]
-    # 'main/procedures/insert_background'
+    # 'main/actions/insert_background'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][1]
     # 'main/conditions'
     del self.source.data[0]['settings'][0]['settings'][2]
@@ -297,7 +297,7 @@ class TestSourceRead(unittest.TestCase):
   def test_read_creates_new_child_groups_and_settings_if_missing(self):
     self.source.data = _test_data_for_read_write()
     
-    # Add 'main/procedures/resize_to_layer_size/arguments/tag'
+    # Add 'main/actions/resize_to_layer_size/arguments/tag'
     tag_argument = {
       'type': 'string',
       'name': 'tag',
@@ -390,12 +390,12 @@ class TestSourceRead(unittest.TestCase):
     # A new setting inside 'main/conditions' to be ignored
     self.source.data[0]['settings'][0]['settings'][2]['settings'].append(
       {'name': 'enabled', 'type': 'bool', 'value': False})
-    # A new group inside 'main/procedures' to be ignored
+    # A new group inside 'main/actions' to be ignored
     self.source.data[0]['settings'][0]['settings'][1]['settings'].append(
       {'name': 'rename',
        'tags': ['ignore_load'],
        'settings': [{'name': 'enabled', 'type': 'bool', 'value': False}]})
-    # A new setting inside 'main/procedures' to be ignored
+    # A new setting inside 'main/actions' to be ignored
     self.source.data[0]['settings'][0]['settings'][1]['settings'].append(
       {'name': 'new_setting', 'type': 'string', 'value': 'new', 'tags': ['ignore_load']})
     
@@ -662,7 +662,7 @@ class TestSourceWrite(unittest.TestCase):
   def test_write_adds_groups_which_are_not_present_in_source(self):
     expected_data = _test_data_for_read_write()
     
-    # Keep only 'main/procedures/resize_to_layer_size/enabled' and 'standalone_setting'
+    # Keep only 'main/actions/resize_to_layer_size/enabled' and 'standalone_setting'
     del expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
     del expected_data[0]['settings'][0]['settings'][1]['settings'][1]
     del expected_data[0]['settings'][0]['settings'][2]
@@ -747,10 +747,10 @@ class TestSourceWrite(unittest.TestCase):
     
     self.assertEqual(
       self.source.data[0]['settings'][0]['settings'][0]['value'], 'jpg')
-    # 'main/procedures/resize_to_layer_size/enabled' setting is not saved
+    # 'main/actions/resize_to_layer_size/enabled' setting is not saved
     self.assertFalse(
       self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['settings'])
-    # 'main/procedures/insert_background' group is not saved
+    # 'main/actions/insert_background' group is not saved
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings'][1]['settings']), 1)
     # Child not present in data and the tag exists in the parent
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings']), 2)

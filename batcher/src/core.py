@@ -117,7 +117,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def actions(self) -> pg.setting.Group:
-    """Command group containing procedures."""
+    """Command group containing actions."""
     return self._actions
 
   @property
@@ -219,7 +219,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def is_preview(self) -> bool:
-    """If ``True``, only procedures and conditions that are marked as
+    """If ``True``, only actions and conditions that are marked as
     "enabled for previews" will be applied for previews. If ``False``, this
     property has no effect (and effectively allows performing real processing).
     """
@@ -227,7 +227,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def process_contents(self) -> bool:
-    """If ``True``, procedures are invoked on items.
+    """If ``True``, actions are invoked on items.
 
     Setting this to ``False`` is useful if you require only item names to be
     processed.
@@ -240,7 +240,7 @@ class Batcher(metaclass=abc.ABCMeta):
     save to disk (in particular to remove characters invalid for a file system).
 
     If `is_preview` is ``True`` and `process_names` is ``True``, built-in
-    procedures modifying item names only are also invoked (particularly those
+    actions modifying item names only are also invoked (particularly those
     with the `builtin_commands_common.NAME_ONLY_TAG` tag).
     """
     return self._process_names
@@ -313,7 +313,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def current_action(self) -> pg.setting.Group:
-    """The procedure currently being applied to `current_item`."""
+    """The action currently being applied to `current_item`."""
     return self._current_action
 
   @property
@@ -367,7 +367,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def skipped_actions(self) -> Dict[str, List]:
     """Actions that were skipped during processing.
 
-    A skipped procedure was not applied to one or more items and causes no
+    A skipped action was not applied to one or more items and causes no
     adverse effects further during processing.
     """
     return dict(self._skipped_actions)
@@ -385,7 +385,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def failed_actions(self) -> Dict[str, List]:
     """Actions that caused an error during processing.
 
-    Failed procedures indicate a problem with the procedure parameters or
+    Failed actions indicate a problem with the action parameters or
     potentially a bug.
     """
     return dict(self._failed_actions)
@@ -401,7 +401,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def invoker(self) -> invoker_.Invoker:
-    """`pygimplib.invoker.Invoker` instance to manage procedures and conditions
+    """`pygimplib.invoker.Invoker` instance to manage actions and conditions
     applied on items.
 
     This property is reset on each call of `run()`.
@@ -409,17 +409,17 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._invoker
 
   def add_action(self, *args, **kwargs) -> Union[int, None]:
-    """Adds a procedure to be applied during `run()`.
+    """Adds an action to be applied during `run()`.
 
     The signature is the same as for `pygimplib.invoker.Invoker.add()`.
 
-    Actions added by this method are placed before procedures added by
+    Actions added by this method are placed before actions added by
     `commands.add()`.
 
     Actions are added immediately before the start of processing. Thus,
     calling this method during processing will have no effect.
 
-    Unlike `commands.add()`, procedures added by this method do not act as
+    Unlike `commands.add()`, actions added by this method do not act as
     settings, i.e. they are merely functions without GUI, are not saved
     persistently and are always enabled.
 
@@ -438,13 +438,13 @@ class Batcher(metaclass=abc.ABCMeta):
     * ``'after_process_items_contents'`` - same as ``'after_process_items'``,
       but applied only if `process_contents` is ``True``.
 
-    * ``'before_process_item'`` - invoked immediately before applying procedures
+    * ``'before_process_item'`` - invoked immediately before applying actions
       on an item. One argument is required - a `Batcher` instance.
 
     * ``'before_process_item_contents'`` - same as ``'before_process_item'``,
       but applied only if `process_contents` is ``True``.
 
-    * ``'after_process_item'`` - invoked immediately after all procedures have
+    * ``'after_process_item'`` - invoked immediately after all actions have
       been applied to an item. One argument is required - a `Batcher` instance.
 
     * ``'after_process_item_contents'`` - same as ``'after_process_item'``, but
@@ -466,7 +466,7 @@ class Batcher(metaclass=abc.ABCMeta):
     or ``False``). The rest of the signature is the same as for
     `pygimplib.invoker.Invoker.add()`.
 
-    For more information, see `add_procedure()`.
+    For more information, see `add_action()`.
     """
     return self._initial_invoker.add(self._get_condition_func(func), *args, **kwargs)
 
@@ -1300,8 +1300,8 @@ class LayerBatcher(Batcher):
 
 def _set_selected_and_current_layer(batcher):
   # If an image has no layers, there is nothing we do here. An exception may
-  # be raised if a procedure requires at least one layer. An empty image
-  # could occur e.g. if all layers were removed by the previous procedures.
+  # be raised if an action requires at least one layer. An empty image
+  # could occur e.g. if all layers were removed by the previous actions.
 
   image = batcher.current_image
 
@@ -1320,7 +1320,7 @@ def _set_selected_and_current_layer(batcher):
       selected_layer = selected_layers[0]
 
       if selected_layer.is_valid():
-        # The selected layer(s) may have been set by the procedure.
+        # The selected layer(s) may have been set by the action.
         batcher.current_layer = selected_layer
       else:
         image_layers = image.get_layers()

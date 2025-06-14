@@ -1,4 +1,4 @@
-"""Built-in "Save" procedure."""
+"""Built-in "Save" action."""
 
 import os
 

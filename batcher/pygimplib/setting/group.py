@@ -705,7 +705,7 @@ def create_groups(setting_dict: Dict) -> Group:
       'name': 'main',
       'groups': [
         {
-          'name': 'procedures'
+          'name': 'actions'
         },
         {
           'name': 'conditions'

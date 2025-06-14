@@ -1,4 +1,4 @@
-"""Built-in "Rename" procedure."""
+"""Built-in "Rename" action."""
 
 from src import builtin_commands_common
 from src import renamer as renamer_

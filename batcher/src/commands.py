@@ -1,4 +1,4 @@
-"""Creation and management of plug-in commands - procedures and conditions.
+"""Creation and management of plug-in commands - actions and conditions.
 
 Most functions take a `pygimplib.setting.Group` instance containing commands
 as its first argument.
@@ -162,7 +162,7 @@ def create(
   
   Allowed values for ``'type'``:
 
-  * ``'procedure'`` (default): Represents a procedure. ``'command_group'``
+  * ``'action'`` (default): Represents an action. ``'command_group'``
     defaults to `DEFAULT_ACTIONS_GROUP` if not defined.
 
   * ``'condition'``: Represents a condition. ``'command_group'`` defaults to
@@ -339,7 +339,7 @@ def create_command(command_dict):
 
   * ``'name'`` - represents the command name,
   * ``'type'`` - represents the command type. Only the following values are
-    allowed: ``'procedure'``, ``'condition'``.
+    allowed: ``'action'``, ``'condition'``.
 
   For the list of available key-value pairs beside ``name`` and ``type``, see
   `create()`.

@@ -502,7 +502,7 @@ class BatchProcessingQuickGui:
       ])
 
     # Save only select settings as e.g. conditions are modified by Export/Edit
-    # Selected Layers. We cannot use 'ignore_save' on procedures or conditions
+    # Selected Layers. We cannot use 'ignore_save' on actions or conditions
     # as that would save empty groups, effectively erasing them.
     pg.setting.Persistor.save(settings_to_save)
 

@@ -1,4 +1,4 @@
-"""Built-in "Color correction" procedure."""
+"""Built-in "Color correction" action."""
 
 import re
 import struct

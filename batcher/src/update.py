@@ -551,7 +551,7 @@ def _update_to_0_5(data, _settings, procedure_groups):
 
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         # We retain `name` and only modify `orig_name` as only the latter is
-        # used in the code to check if a procedure is an export procedure.
+        # used in the code to check if an action is an export action.
         if EXPORT_LAYERS_GROUP in procedure_groups:
           orig_name_setting_dict['value'] = 'export_for_export_layers'
           orig_name_setting_dict['default_value'] = 'export_for_export_layers'

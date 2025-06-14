@@ -1,4 +1,4 @@
-"""Widget displaying a list of available commands (procedures/conditions).
+"""Widget displaying a list of available commands (actions/conditions).
 
 The list includes GIMP PDB procedures.
 """
@@ -450,7 +450,7 @@ class CommandBrowser(GObject.GObject):
     self._scrolled_window_command_arguments.add(self._scrolled_window_command_arguments_viewport)
 
     self._label_no_selection = Gtk.Label(
-      label='<i>{}</i>'.format(_('Select a procedure')),
+      label='<i>{}</i>'.format(_('Select an action')),
       xalign=0.5,
       yalign=0.5,
       use_markup=True,

@@ -1,4 +1,4 @@
-"""Built-in "Align and offset" procedure."""
+"""Built-in "Align and offset" action."""
 
 import gi
 

@@ -1,4 +1,4 @@
-"""Built-in procedures."""
+"""Built-in actions."""
 
 from src.builtin_actions import _align_and_offset
 from src.builtin_actions._align_and_offset import *

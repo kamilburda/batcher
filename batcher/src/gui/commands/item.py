@@ -1,4 +1,4 @@
-"""Widget representing a single command (procedure/condition) in the GUI."""
+"""Widget representing a single command (action/condition) in the GUI."""
 
 import gi
 gi.require_version('GimpUi', '3.0')

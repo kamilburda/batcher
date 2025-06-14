@@ -1,4 +1,4 @@
-"""Built-in "Remove folder structure" procedure."""
+"""Built-in "Remove folder structure" action."""
 
 from src import builtin_commands_common
 from src.procedure_groups import *
