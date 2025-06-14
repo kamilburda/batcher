@@ -70,6 +70,35 @@ In this case, any conditions set in the [main dialog](#exporting-layers) will be
 ![Menu Entry for Export Selected Layers](../assets/images/screenshot_menu_export_selected_layers.png){: .align-center}
 
 
+## Editing Layers
+
+Open an image in GIMP and select `File → Edit Layers...`.
+
+![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
+
+To run batch editing, press the `Run` button.
+This will apply actions to each layer satisfying the activated conditions.
+
+You can take a look at a few [examples](Examples.md) to get started with [actions and conditions](#actions-and-conditions).
+
+If the `Layers` condition is unchecked, group layers will also be processed.
+
+
+### Quick Layer Editing
+
+You can quickly run batch editing via `File → Edit Layers (Quick)`.
+This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
+
+
+### Quick Editing of Selected Layers
+
+When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
+
+In this case, any conditions set in the [main dialog](#batch-editing-layers) will be ignored.
+
+![Menu Entry for Edit Selected Layers](../assets/images/screenshot_menu_edit_selected_layers.png){: .align-center}
+
+
 ## Exporting Images Opened in GIMP
 
 If you have multiple images opened in GIMP, you can use `File → Export Images...` to export them to the specified file format.
@@ -119,35 +148,6 @@ If you intend to edit each layer within an image individually instead of images 
 
 You can quickly run batch editing and saving of images via `File → Edit and Save Images (Quick)`.
 This can be useful if you e.g. made changes to your images and you want to save them all with the same settings.
-
-
-## Editing Layers
-
-Open an image in GIMP and select `File → Edit Layers...`.
-
-![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
-
-To run batch editing, press the `Run` button.
-This will apply actions to each layer satisfying the activated conditions.
-
-You can take a look at a few [examples](Examples.md) to get started with [actions and conditions](#actions-and-conditions).
-
-If the `Layers` condition is unchecked, group layers will also be processed.
-
-
-### Quick Layer Editing
-
-You can quickly run batch editing via `File → Edit Layers (Quick)`.
-This can be useful if you made changes to your image and you want to run batch editing again with the same settings.
-
-
-### Quick Editing of Selected Layers
-
-When you select multiple layers in GIMP, you can right-click and select `Edit Selected Layers` to quickly edit the selected layers.
-
-In this case, any conditions set in the [main dialog](#batch-editing-layers) will be ignored.
-
-![Menu Entry for Edit Selected Layers](../assets/images/screenshot_menu_edit_selected_layers.png){: .align-center}
 
 
 ## Adjusting Export Settings
