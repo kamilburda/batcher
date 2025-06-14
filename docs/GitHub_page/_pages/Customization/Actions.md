@@ -1,6 +1,6 @@
 ---
 title: Actions
-permalink: /docs/procedures/
+permalink: /docs/actions/
 ---
 
 {% include-section '../../../sections/Customization/Actions.md' %}

@@ -11,7 +11,7 @@ To start batch conversion, press the `Run` button.
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings) below.
 Image names are used as filenames by default.
 
-For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
+For information on actions and conditions, see [Actions and Conditions](#actions-and-conditions) below.
 
 You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
@@ -40,7 +40,7 @@ A dialog appears that allows you to adjust export settings, such as the output f
 To export layers, press the `Export` button.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
+For information on actions and conditions, see [Actions and Conditions](#actions-and-conditions) below.
 
 
 ### Quick Export of Layers
@@ -53,7 +53,7 @@ For the first time, a small dialog with only export settings is displayed, where
 
 This dialog can be skipped by unchecking `Show this dialog`.
 
-Note that even procedures and conditions set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
+Note that even actions and conditions set up in the `Export Layers` dialog will be applied for `Export Layers (Quick)`, even if they are not shown.
 
 
 ### Quick Export of Selected Layers
@@ -78,7 +78,7 @@ To export images, press the `Export` button.
 Note that this feature exports images to another file format. If you intend to batch-save XCF images in their original locations, use `File → Edit and Save Images...` instead.
 
 For information on the export settings, see [Adjusting Export Settings](#adjusting-export-settings).
-For information on procedures and conditions, see [Actions and Conditions](#procedures-and-conditions) below.
+For information on actions and conditions, see [Actions and Conditions](#actions-and-conditions) below.
 
 
 ### Quick Export of Images
@@ -91,7 +91,7 @@ For the first time, a small dialog with only export settings is displayed, where
 
 This dialog can be skipped by unchecking `Show this dialog`.
 
-Note that even procedures and conditions set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
+Note that even actions and conditions set up in the `Export Images` dialog will be applied for `Export Images (Quick)`, even if they are not shown.
 
 
 ## Editing and Saving Images Opened in GIMP
@@ -101,7 +101,7 @@ Note that even procedures and conditions set up in the `Export Images` dialog wi
 ![Dialog of Edit ans Save Images](../assets/images/screenshot_dialog_edit_and_save_images.png){: .align-center}
 
 Both editing and saving are optional, i.e. you can perform only saving, or only editing as needed.
-If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [procedures and conditions](#procedures-and-conditions).
+If you intend to edit images, you can take a look at a few [examples](Examples.md) to get started with [actions and conditions](#actions-and-conditions).
 
 To edit and/or save images, press the `Run` button.
 
@@ -123,9 +123,9 @@ Open an image in GIMP and select `File → Edit Layers...`.
 ![Dialog of Edit Layers](../assets/images/screenshot_dialog_edit_layers.png){: .align-center}
 
 To run batch editing, press the `Run` button.
-This will apply procedures to each layer satisfying the activated conditions.
+This will apply actions to each layer satisfying the activated conditions.
 
-You can take a look at a few [examples](Examples.md) to get started with [procedures and conditions](#procedures-and-conditions).
+You can take a look at a few [examples](Examples.md) to get started with [actions and conditions](#actions-and-conditions).
 
 If the `Layers` condition is unchecked, group layers will also be processed.
 
@@ -177,14 +177,14 @@ All options are described in [Export Options](Customization/Export Options.md).
 
 ## Actions and Conditions
 
-Before the start of batch processing, you can apply a multitude of *procedures* to each image/layer, such as scaling, background insertion, any layer effect or GIMP plug-in.
+Before the start of batch processing, you can apply a multitude of *actions* to each image/layer, such as scaling, background insertion, any layer effect or GIMP plug-in.
 
 You can exclude images/layers from being processed/exported based on one or more *conditions* (only filenames matching a suffix, only visible layers, ...).
 
 Actions and conditions can be a powerful way to adjust batch processing to your heart's content.
 You can take a look at a few [examples](Examples.md) to get started.
 
-The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the procedures and conditions.
+The names under Input Images/Input Layers and the image preview are automatically updated as you adjust the actions and conditions.
 
 For details, see [Actions](Customization/Actions.md) and [Conditions](Customization/Conditions.md).
 
@@ -193,7 +193,7 @@ For details, see [Actions](Customization/Actions.md) and [Conditions](Customizat
 
 The image preview displays the contents of the selected image/layer.
 
-You can adjust the width of the entire pane containing the input list and the preview by dragging the separator between the preview and the procedures/conditions.
+You can adjust the width of the entire pane containing the input list and the preview by dragging the separator between the preview and the actions/conditions.
 You can also adjust the height of the previewed image by dragging the separator above the image.
 
 If the previewed image takes too long to render, the preview is no longer updated automatically.
@@ -206,7 +206,7 @@ For example, for the JPEG format, which does not support transparency and may re
 
 ## Managing Settings
 
-Once batch processing is done successfully, your settings (output folder, file extension, dialog size, procedures, conditions, etc.) are automatically saved.
+Once batch processing is done successfully, your settings (output folder, file extension, dialog size, actions, conditions, etc.) are automatically saved.
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
 

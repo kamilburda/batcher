@@ -1,7 +1,7 @@
 Batcher offers renaming each image/layer using several built-in *fields*.
 For example, `image[001]` renames the images/layers to `image001`, `image002` and so on. You can combine multiple fields, for example `[layer name]-[001]`.
 
-Renaming is available via the text entry next to `Name` or via the `Rename` procedure.
+Renaming is available via the text entry next to `Name` or via the `Rename` action.
 Press the Down button or click anywhere on the entry to display the list of available fields.
 The text entry can show you examples of how each field is used if you place the text cursor inside a field (e.g. inside `[001]`).
 

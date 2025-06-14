@@ -1,13 +1,13 @@
 Actions allow you to apply image filters to each image/layer.
-Press the `Add Action...` button and select one of the available procedures, or add a [custom procedure](#adding-custom-procedures).
+Press the `Add Action...` button and select one of the available actions, or add a [custom action](#adding-custom-actions).
 
-For each procedure, you may:
-* enable/disable the procedure,
-* move the procedure up/down by dragging the procedure with mouse or by pressing Alt + Up/Down on your keyboard,
-* [edit the procedure](Editing Actions and Conditions.md),
-* remove the procedure.
+For each action, you may:
+* enable/disable the action,
+* move the action up/down by dragging the action with mouse or by pressing Alt + Up/Down on your keyboard,
+* [edit the action](Editing Actions and Conditions.md),
+* remove the action.
 
-You can add the same procedure multiple times.
+You can add the same action multiple times.
 
 
 ## Built-in Actions
@@ -31,20 +31,20 @@ Exports an image/layer to the specified file format.
 
 For Batch Convert and Export Layers, this performs export to another file format.
 
-You can add this procedure multiple times to export to multiple file formats at once.
+You can add this action multiple times to export to multiple file formats at once.
 
 Options:
 * *Output folder*: Folder to export the output image(s) to.
 * *File extension*: File extension of the output image(s).
 * All options specified in [Export Options](Export Options.md).
 
-The name of the Export procedure is automatically updated as you modify the file extension.
+The name of the Export action is automatically updated as you modify the file extension.
 
-For Batch Convert and Export Layers, when this procedure is added, the values of the options are copied from the default export options.
+For Batch Convert and Export Layers, when this action is added, the values of the options are copied from the default export options.
 For example, the output folder will be identical to the one currently selected in the main dialog.
-This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added procedures.
+This simplifies setting up export to multiple file formats without the hassle of manually adjusting the export options in all added actions.
 
-When exporting each image separately (the default, which can be changed via the *Perform export* option), it usually makes sense to apply the Export procedure as the last one since procedures after Export would have no effect on the current image/layer being processed.
+When exporting each image separately (the default, which can be changed via the *Perform export* option), it usually makes sense to apply the Export action as the last one since actions after Export would have no effect on the current image/layer being processed.
 
 ### Apply opacity from group layers
 
@@ -89,11 +89,11 @@ For Export Layers and Edit Layers, mark layers in your opened image with a color
 The _blue_ color tag is used for background by default.
 You may set a different color tag by adjusting the `Color tag` option.
 
-This procedure is inserted at the first position.
-This prevents potential confusion when other procedures are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
-You can always move this procedure lower as needed.
+This action is inserted at the first position.
+This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
+You can always move this action lower as needed.
 
-The background is merged automatically at the end of processing as the `Merge background` procedure is automatically added. See `Merge background` below for more information.
+The background is merged automatically at the end of processing as the `Merge background` action is automatically added. See `Merge background` below for more information.
 
 For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` condition is automatically added and enabled.
 
@@ -103,7 +103,7 @@ Inserts a new layer in front of the current layer.
 
 For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
 
-The `Merge foreground` procedure is added automatically. For Export Layers and Edit Layers, the `Not foreground` condition is added automatically.
+The `Merge foreground` action is added automatically. For Export Layers and Edit Layers, the `Not foreground` condition is added automatically.
 
 For more information, see `Insert background` above.
 
@@ -114,12 +114,12 @@ For more information, see `Insert background` above.
 Merges already inserted background (via `Insert background`, see above) into the current layer.
 
 When exporting, the background is merged automatically.
-However, if needed, you can reorder this procedure to perform the merge earlier and then apply procedures on the current layer, now merged with the background.
+However, if needed, you can reorder this action to perform the merge earlier and then apply actions on the current layer, now merged with the background.
 
-For [Edit Layers](../Usage.md#editing-layers), this procedure ensures that you have a single merged layer rather than having the background as a separate layer.
-If this is not what you desire, you may uncheck this procedure.
+For [Edit Layers](../Usage.md#editing-layers), this action ensures that you have a single merged layer rather than having the background as a separate layer.
+If this is not what you desire, you may uncheck this action.
 
-If there is no background layer inserted, this procedure has no effect.
+If there is no background layer inserted, this action has no effect.
 
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
@@ -142,7 +142,7 @@ Merges all visible filters (layer effects) in the specified layer.
 
 Merges all visible layers within the image into a single layer. Invisible layers are removed.
 
-This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other procedures on the entire image.
+This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other actions on the entire image.
 
 ### Remove file extension from imported images
 
@@ -164,19 +164,19 @@ Options:
 
 Renames images/layers according to the specified pattern.
 
-This procedure uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
+This action uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
 
-Additionally, this procedure allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
+Additionally, this action allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
 
-For Batch Convert and Export Layers, this procedure performs renaming on top of the entry next to `Name`.
+For Batch Convert and Export Layers, this action performs renaming on top of the entry next to `Name`.
 
-For Edit and Save Images, renaming will have no effect unless the images are saved via the `Save` procedure.
+For Edit and Save Images, renaming will have no effect unless the images are saved via the `Save` action.
 
 ### Resize canvas
 
 Resizes the image or layer extents, i.e. adds empty space from the edges. There are multiple ways you can perform resizing based on your needs. You may optionally fill the added space with a color.
 
-Note that this procedure does not upscale/downscale the image/layer. For that purpose, use the `Scale` procedure.
+Note that this action does not upscale/downscale the image/layer. For that purpose, use the `Scale` action.
 
 Options:
 * *How to resize*:
@@ -191,7 +191,7 @@ Options:
 
 For Export Layers, the *Resize to layer size* option is enabled by default.
 This means that the exported image will have the same dimensions as the layer to export.
-To keep the image canvas intact (thus keeping the layer position within the image), uncheck this procedure.
+To keep the image canvas intact (thus keeping the layer position within the image), uncheck this action.
 Note that in that case the layers will be cut off if they are partially outside the image canvas.
 
 ### Rotate and flip
@@ -224,7 +224,7 @@ To export the image in another file format, use the "Export Images" menu.
 
 Options:
 * *Output folder*: Folder to save images to.
-* *Save existing XCF image to its original location (ignore "Output folder")*: If checked, existing XCF images will be saved to their respective folders. If an existing image was renamed via the `Rename` procedure, it will be saved to the same folder under the new name. If unchecked, all images are saved to *Output folder*. 
+* *Save existing XCF image to its original location (ignore "Output folder")*: If checked, existing XCF images will be saved to their respective folders. If an existing image was renamed via the `Rename` action, it will be saved to the same folder under the new name. If unchecked, all images are saved to *Output folder*. 
 
 ### Scale
 
@@ -248,16 +248,16 @@ Options:
 
 ## Adding Custom Actions
 
-You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Action...` and then selecting `Add Custom Action...`. Both built-in and any third-party plug-ins and layer effects are supported.
+You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP action by pressing `Add Action...` and then selecting `Add Custom Action...`. Both built-in and any third-party plug-ins and layer effects are supported.
 
 ![Action browser dialog](../../assets/images/screenshot_action_browser_dialog.png){: .align-center}
 
-You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
+You can preview how the selected action affects the resulting image (by pressing `Preview`) and adjust action options.
 
-Once you are settled on the procedure, press `Add` to permanently add it to the list of procedures.
-You can [edit the procedure](Editing Actions and Conditions.md) anytime after adding it.
+Once you are settled on the action, press `Add` to permanently add it to the list of actions.
+You can [edit the action](Editing Actions and Conditions.md) anytime after adding it.
 
-All layer effects (procedures under the `Filters, Effects` category) have the following common parameters:
+All layer effects (actions under the `Filters, Effects` category) have the following common parameters:
 * *Blend mode* - blend mode for the effect (default, dodge, burn, hard light, ...).
 * *Opacity* - the opacity of the effect.
 * *Merge filter* - the effect will be applied destructively, i.e. will be merged into the layer.

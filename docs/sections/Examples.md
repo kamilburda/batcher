@@ -1,6 +1,6 @@
 ## I don't want to preserve folder hierarchy when exporting.
 
-Add and check the `Remove folder structure` procedure if not already (`Add Action... → Remove folder structure`).
+Add and check the `Remove folder structure` action if not already (`Add Action... → Remove folder structure`).
 
 
 ## How do I rename the images to form a sequence of numbers, e.g. "image001", "image002", ...?
@@ -12,9 +12,9 @@ Click on the text entry next to `Name` and choose `image001`, or type `image[001
 
 Yes! You may apply any GIMP filter or plug-in:
 1. Select `Add Action... → Add Custom Action...`
-2. Find `gimp-drawable-brightness-contrast` in the procedure browser.
+2. Find `gimp-drawable-brightness-contrast` in the action browser.
 3. Adjust the options as desired.
-4. Select `Add` to add the procedure.
+4. Select `Add` to add the action.
 
 
 ## How can I insert watermarks?
@@ -22,47 +22,47 @@ Yes! You may apply any GIMP filter or plug-in:
 You can think of watermarks as foreground, i.e. a layer added on top of your images.
 
 For Batch Convert and Export Images:
-1. Add the `Insert foreground` procedure and specify an image file serving as the foreground.
-2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
+1. Add the `Insert foreground` action and specify an image file serving as the foreground.
+2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` action that was added automatically.
 
 For Export Layers and Edit Layers:
 1. In GIMP, assign a color tag to the layer(s) you want to consider foreground (right-click on a layer → `Color Tags` → choose your color).
-2. Add the `Insert foreground` procedure and adjust the color tag as necessary.
-3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this procedure after `Resize to layer size` by dragging it onto `Resize to layer size`.
-4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` procedure that was added automatically.
+2. Add the `Insert foreground` action and adjust the color tag as necessary.
+3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this action after `Resize to layer size` by dragging it onto `Resize to layer size`.
+4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` action that was added automatically.
 
 
 ## I need every image to have the same background.
 
-You can follow the same steps as in the example above, except that you add the `Insert background` procedure (and adjust `Merge background` as needed).
+You can follow the same steps as in the example above, except that you add the `Insert background` action (and adjust `Merge background` as needed).
 
 
 ## I want to create a single multipage PDF file.
 
-While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom procedures before the export or export each folder/group layer as separate PDFs.
+While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom actions before the export or export each folder/group layer as separate PDFs.
 
 1. Select or type `pdf` as the file extension.
 2. Press the `Options...` button and select an option in `Perform export:`. To export a single image, select `As a single image`.
 3. If you selected `As a single image`, adjust `Image filename pattern` as seen fit.
-4. For Export Layers, you may want to uncheck the `Resize to layer size` procedure to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
+4. For Export Layers, you may want to uncheck the `Resize to layer size` action to use the image size (since PDF pages have the same dimensions), otherwise you might obtain unexpected results.
 
 
 ## I want to be able to export to multiple file formats at once.
 
-You can achieve this by adding the `Also export as...` (or `Export`) procedure.
+You can achieve this by adding the `Also export as...` (or `Export`) action.
 
-Each time you add this procedure, adjust the file extension, file format options and other settings as needed.
+Each time you add this action, adjust the file extension, file format options and other settings as needed.
 
 
-## I want to apply procedure(s) on image files (such as scaling), but I also want to export them using their original file format.
+## I want to apply action(s) on image files (such as scaling), but I also want to export them using their original file format.
 
 1. Press the `Options...` button and check `Use original file extension`.
-2. Add and adjust your desired procedures.
+2. Add and adjust your desired actions.
 
 
 ## I want to export all layers using the image size, not the layer size.
 
-Uncheck the `Resize to layer size` procedure if it exists.
+Uncheck the `Resize to layer size` action if it exists.
 
 
 ## I want to export only visible layers.

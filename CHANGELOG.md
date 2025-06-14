@@ -40,7 +40,7 @@ Changes to actions and conditions:
 * Rename: Removed the `Rename images` option in Export Images due to being redundant there.
 * `Matching text...`: Added `Does not start with text`, `Does not contain text` and `Does not end with text` options.
 * Edit Layers: The `Selected in GIMP` condition is now added on the first run/after reset.
-* File arguments can now be cleared (set to an empty value). This is useful if a action allows omitting a file.
+* File arguments can now be cleared (set to an empty value). This is useful if an action allows omitting a file.
 
 Bug fixes:
 * Fixed preview and export of images with linear precision.

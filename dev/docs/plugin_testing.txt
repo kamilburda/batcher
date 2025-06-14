@@ -63,7 +63,7 @@ Setting persistence
 * persistent source
 
 Built-in commands
-* procedures
+* actions
 * conditions
 
 Custom commands
@@ -80,6 +80,6 @@ Preview
   * layers are organized in folder structure, names are properly uniquified
   * selected and not selected layers for the "Selected in preview" condition
 * image
-  * properly scaled image and procedures applied on the image
+  * properly scaled image and actions applied on the image
     * e.g. paintbrush coordinates must be made relative to the previewed image
   * dragging panes properly scales/downsizes image without artifacts
