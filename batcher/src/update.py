@@ -12,9 +12,9 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import commands as commands_
-from src import builtin_conditions
 from src import builtin_actions
+from src import builtin_conditions
+from src import commands as commands_
 from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_

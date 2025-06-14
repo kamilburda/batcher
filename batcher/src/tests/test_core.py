@@ -9,9 +9,9 @@ from gi.repository import GObject
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from src import builtin_actions
 from src import commands as commands_
 from src import core
-from src import builtin_actions
 from src import invoker as invoker_
 from src import plugin_settings
 from src import utils as utils_

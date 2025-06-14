@@ -7,9 +7,9 @@ from gi.repository import Gio
 
 import pygimplib as pg
 
-from src import commands as commands_
-from src import builtin_conditions
 from src import builtin_actions
+from src import builtin_conditions
+from src import commands as commands_
 # Despite being unused, `setting_classes` must be imported so that the
 # setting and GUI classes defined there are properly registered (via respective
 # metaclasses in `pg.setting.meta`).

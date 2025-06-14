@@ -18,8 +18,8 @@ gettext.textdomain('batcher')
 
 builtins._ = gettext.gettext
 
-from src import commands as commands_
 from src import builtin_conditions
+from src import commands as commands_
 from src.gui import messages as messages_
 
 messages_.set_gui_excepthook(

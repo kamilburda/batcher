@@ -16,10 +16,10 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
-from src import commands
+from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
-from src import builtin_actions
+from src import commands
 from src import exceptions
 from src import invoker as invoker_
 from src import overwrite

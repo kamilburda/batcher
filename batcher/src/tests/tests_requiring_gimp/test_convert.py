@@ -13,9 +13,9 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import builtin_actions
 from src import commands
 from src import core
-from src import builtin_actions
 from src import plugin_settings
 from src import utils as utils_
 from src.procedure_groups import *

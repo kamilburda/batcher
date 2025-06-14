@@ -8,9 +8,9 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
-from src import builtin_actions
 
 from src.gui import messages as messages_
 from src.gui.commands import list as command_list_
