@@ -22,12 +22,12 @@ docs:
         url: /docs/export-options/
       - title: Renaming
         url: /docs/renaming/
-      - title: Procedures
-        url: /docs/procedures/
-      - title: Constraints
-        url: /docs/constraints/
-      - title: Editing Procedures and Constraints
-        url: /docs/editing-procedures-and-constraints/
+      - title: Actions
+        url: /docs/actions/
+      - title: Conditions
+        url: /docs/conditions/
+      - title: Editing Actions and Conditions
+        url: /docs/editing-actions-and-conditions/
   - title: Running via Command Line
     url: /docs/running-via-command-line/
   - title: Known Issues
