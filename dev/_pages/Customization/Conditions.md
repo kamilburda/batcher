@@ -5,7 +5,7 @@ permalink: /docs/conditions/
 
 To exclude certain images/layers from processing and export, press the `Add Condition...` button and select one of the available conditions.
 
-Just like [procedures](Procedures.md), you may enable/disable, reorder, [edit](Editing Procedures and Conditions.md) or remove conditions.
+Just like [actions](Actions.md), you may enable/disable, reorder, [edit](Editing Actions and Conditions.md) or remove conditions.
 
 
 ## Built-in Conditions
