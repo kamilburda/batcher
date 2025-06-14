@@ -72,12 +72,12 @@ from src import utils
 from src.path import uniquify
 
 
-DEFAULT_ACTIONS_GROUP = 'default_procedures'
+DEFAULT_ACTIONS_GROUP = 'default_actions'
 DEFAULT_CONDITIONS_GROUP = 'default_conditions'
 
 MORE_OPTIONS_TAG = 'more_options'
 
-_DEFAULT_COMMAND_TYPE = 'procedure'
+_DEFAULT_COMMAND_TYPE = 'action'
 _REQUIRED_COMMAND_FIELDS = ['name']
 
 _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
@@ -714,6 +714,6 @@ def clear(commands: pg.setting.Group, add_initial_commands: bool = True):
 
 
 _COMMAND_TYPES_AND_FUNCTIONS = {
-  'procedure': _create_action,
+  'action': _create_action,
   'condition': _create_condition,
 }

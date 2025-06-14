@@ -212,7 +212,7 @@ class TestGroupCreateGroupsFromDict(unittest.TestCase):
       'name': 'main',
       'groups': [
         {
-          'name': 'procedures'
+          'name': 'actions'
         },
         {
           'name': 'conditions',
@@ -227,7 +227,7 @@ class TestGroupCreateGroupsFromDict(unittest.TestCase):
     
     self.assertEqual(settings.name, 'main')
     self.assertEqual(len(settings), 2)
-    self.assertIn('procedures', settings)
+    self.assertIn('actions', settings)
     self.assertIn('conditions', settings)
     self.assertIn('conditions/include', settings)
     self.assertIn('include', settings['conditions'])

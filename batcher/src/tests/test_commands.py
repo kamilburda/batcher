@@ -17,7 +17,7 @@ from src import commands as commands_
 test_actions = [
   {
     'name': 'autocrop',
-    'type': 'procedure',
+    'type': 'action',
     'function': '',
     'enabled': True,
     'display_name': 'Autocrop',
@@ -37,14 +37,14 @@ test_actions = [
   },
   {
     'name': 'autocrop_background',
-    'type': 'procedure',
+    'type': 'action',
     'function': '',
     'enabled': False,
     'display_name': 'Autocrop background layers',
   },
   {
     'name': 'autocrop_foreground',
-    'type': 'procedure',
+    'type': 'action',
     'function': '',
     'enabled': False,
     'display_name': 'Autocrop foreground layers',
@@ -84,14 +84,14 @@ class TestCreateCommands(unittest.TestCase):
   
   @parameterized.parameterized.expand([
     ('procedure_with_default_group',
-     'procedures',
+     'actions',
      test_actions,
      'autocrop_background',
      ['command', 'procedure'],
      {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
     ('procedure_with_custom_group',
-     'procedures',
+     'actions',
      test_actions,
      'autocrop',
      ['command', 'procedure'],

@@ -1421,19 +1421,27 @@ def _update_to_1_1(data, _settings, _procedure_groups):
 
 def _rename_command_attributes_1_1(command_dict):
   if 'tags' in command_dict:
-    if 'action' in command_dict['tags']:
-      previous_tag_index = command_dict['tags'].index('action')
-      command_dict['tags'].remove('action')
-      command_dict['tags'].insert(previous_tag_index, 'command')
+    _replace_item_in_list(command_dict, 'tags', 'action', 'command')
+    _replace_item_in_list(command_dict, 'tags', 'constraint', 'condition')
 
-    if 'constraint' in command_dict['tags']:
-      previous_tag_index = command_dict['tags'].index('constraint')
-      command_dict['tags'].remove('constraint')
-      command_dict['tags'].insert(previous_tag_index, 'condition')
+  command_groups_setting_dict, _index = _get_child_setting(command_dict['settings'], 'action_groups')
+  if command_groups_setting_dict is not None:
+    command_groups_setting_dict['name'] = 'command_groups'
+    _replace_item_in_list(
+      command_groups_setting_dict, 'default_value', 'default_procedures', 'default_actions')
+    _replace_item_in_list(
+      command_groups_setting_dict, 'value', 'default_procedures', 'default_actions')
+    _replace_item_in_list(
+      command_groups_setting_dict, 'default_value', 'default_constraints', 'default_conditions')
+    _replace_item_in_list(
+      command_groups_setting_dict, 'value', 'default_constraints', 'default_conditions')
 
-  command_groups_dict, _index = _get_child_setting(command_dict['settings'], 'action_groups')
-  if command_groups_dict is not None:
-    command_groups_dict['name'] = 'command_groups'
+
+def _replace_item_in_list(setting_dict, attribute_name, previous_value, new_value):
+  if previous_value in setting_dict[attribute_name]:
+    previous_value_index = setting_dict[attribute_name].index(previous_value)
+    setting_dict[attribute_name].remove(previous_value)
+    setting_dict[attribute_name].insert(previous_value_index, new_value)
 
 
 def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):

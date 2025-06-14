@@ -360,13 +360,24 @@ class TestUpdateHandlers(unittest.TestCase):
       self.assertIn('command_groups', command)
       self.assertIn('command', command.tags)
 
+      self.assertNotIn('default_procedures', command['command_groups'].default_value)
+      self.assertIn('default_actions', command['command_groups'].default_value)
+      self.assertNotIn('default_procedures', command['command_groups'].value)
+      self.assertIn('default_actions', command['command_groups'].value)
+
     for command in settings['main/conditions']:
       self.assertNotIn('action_groups', command)
       self.assertIn('command_groups', command)
+
       self.assertIn('command', command.tags)
       self.assertNotIn('action', command.tags)
       self.assertIn('condition', command.tags)
       self.assertNotIn('constraint', command.tags)
+
+      self.assertNotIn('default_constraints', command['command_groups'].default_value)
+      self.assertIn('default_conditions', command['command_groups'].default_value)
+      self.assertNotIn('default_constraints', command['command_groups'].value)
+      self.assertIn('default_conditions', command['command_groups'].value)
 
     scale_arguments_path = 'main/procedures/scale_for_images/arguments'
 

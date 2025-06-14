@@ -94,7 +94,7 @@ class TestSemiDeepCopy(unittest.TestCase):
           'name': 'output_directory',
         },
       ],
-      'type': 'procedure',
+      'type': 'action',
     }
 
     input_copy = utils.semi_deep_copy(input_)
