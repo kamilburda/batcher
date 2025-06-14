@@ -53,17 +53,17 @@ def save(
       image_xcf_file is not None and save_existing_image_to_its_original_location)
     should_set_new_image_file = not save_to_original_folder
 
+    if not item.name.endswith(_XCF_FILE_EXTENSION):
+      image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
+    else:
+      image_filename = item.name
+
+    item.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
+    builtin_actions_utils.set_item_export_name(item, image_filename)
+    _validate_name(item)
+
     if save_to_original_folder:
       image_file = image_xcf_file
-
-      if not item.name.endswith(_XCF_FILE_EXTENSION):
-        image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
-      else:
-        image_filename = item.name
-
-      item.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
-      builtin_actions_utils.set_item_export_name(item, image_filename)
-      _validate_name(item)
 
       new_image_file = Gio.file_new_for_path(
         builtin_actions_utils.get_item_filepath(
@@ -75,18 +75,11 @@ def save(
         image_file = new_image_file
         should_set_new_image_file = True
     else:
-      item.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
-
-      image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
-
-      builtin_actions_utils.set_item_export_name(item, image_filename)
-      _validate_name(item)
-
       image_file = Gio.file_new_for_path(
         builtin_actions_utils.get_item_filepath(item, output_directory))
 
-      os.makedirs(output_directory.get_path(), exist_ok=True)
-
+    if image_file.get_path() is not None:
+      os.makedirs(os.path.dirname(image_file.get_path()), exist_ok=True)
     pdb.gimp_xcf_save(run_mode=Gimp.RunMode.NONINTERACTIVE, image=image, file=image_file)
 
     if should_set_new_image_file:
