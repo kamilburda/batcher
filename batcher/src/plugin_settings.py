@@ -154,22 +154,22 @@ def create_settings_for_convert():
 
   settings.add([gui_settings])
 
-  remove_folder_structure_procedure_dict = utils.semi_deep_copy(
+  remove_folder_structure_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['remove_folder_structure'])
-  remove_folder_structure_procedure_dict['enabled'] = False
-  remove_folder_structure_procedure_dict['display_options_on_create'] = False
+  remove_folder_structure_action_dict['enabled'] = False
+  remove_folder_structure_action_dict['display_options_on_create'] = False
 
-  scale_procedure_dict = utils.semi_deep_copy(
+  scale_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['scale_for_images'])
-  scale_procedure_dict['enabled'] = False
-  scale_procedure_dict['display_options_on_create'] = False
+  scale_action_dict['enabled'] = False
+  scale_action_dict['display_options_on_create'] = False
 
   settings['main'].add([
     commands_.create(
       name='procedures',
       initial_commands=[
-        remove_folder_structure_procedure_dict,
-        scale_procedure_dict,
+        remove_folder_structure_action_dict,
+        scale_action_dict,
       ]),
   ])
 
@@ -180,11 +180,11 @@ def create_settings_for_convert():
         builtin_conditions.BUILTIN_CONDITIONS['recognized_file_format']]),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_procedures(settings)
+  _connect_events_for_added_built_in_actions(settings)
 
   return settings
 
@@ -302,16 +302,16 @@ def create_settings_for_export_images():
 
   settings.add([gui_settings])
 
-  scale_procedure_dict = utils.semi_deep_copy(
+  scale_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['scale_for_images'])
-  scale_procedure_dict['enabled'] = False
-  scale_procedure_dict['display_options_on_create'] = False
+  scale_action_dict['enabled'] = False
+  scale_action_dict['display_options_on_create'] = False
 
   settings['main'].add([
     commands_.create(
       name='procedures',
       initial_commands=[
-        scale_procedure_dict,
+        scale_action_dict,
       ]),
   ])
 
@@ -332,11 +332,11 @@ def create_settings_for_export_images():
       ]),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_procedures(settings)
+  _connect_events_for_added_built_in_actions(settings)
 
   return settings
 
@@ -399,28 +399,28 @@ def create_settings_for_edit_and_save_images():
 
   settings.add([gui_settings])
 
-  remove_file_extension_from_imported_images_procedure_dict = utils.semi_deep_copy(
+  remove_file_extension_from_imported_images_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['remove_file_extension_from_imported_images'])
-  remove_file_extension_from_imported_images_procedure_dict['enabled'] = True
-  remove_file_extension_from_imported_images_procedure_dict['display_options_on_create'] = False
+  remove_file_extension_from_imported_images_action_dict['enabled'] = True
+  remove_file_extension_from_imported_images_action_dict['display_options_on_create'] = False
 
-  rename_procedure_dict = utils.semi_deep_copy(
+  rename_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['rename_for_edit_and_save_images'])
-  rename_procedure_dict['enabled'] = True
-  rename_procedure_dict['display_options_on_create'] = False
+  rename_action_dict['enabled'] = True
+  rename_action_dict['display_options_on_create'] = False
 
-  save_procedure_dict = utils.semi_deep_copy(
+  save_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['save'])
-  save_procedure_dict['enabled'] = False
-  save_procedure_dict['display_options_on_create'] = False
+  save_action_dict['enabled'] = False
+  save_action_dict['display_options_on_create'] = False
 
   settings['main'].add([
     commands_.create(
       name='procedures',
       initial_commands=[
-        remove_file_extension_from_imported_images_procedure_dict,
-        rename_procedure_dict,
-        save_procedure_dict,
+        remove_file_extension_from_imported_images_action_dict,
+        rename_action_dict,
+        save_action_dict,
       ]),
   ])
 
@@ -441,7 +441,7 @@ def create_settings_for_edit_and_save_images():
       ]),
   ])
 
-  _connect_events_for_added_built_in_procedures(settings)
+  _connect_events_for_added_built_in_actions(settings)
 
   return settings
 
@@ -558,17 +558,17 @@ def create_settings_for_export_layers():
 
   settings.add([gui_settings])
 
-  resize_canvas_procedure_dict = utils.semi_deep_copy(
+  resize_canvas_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['resize_canvas'])
-  resize_canvas_procedure_dict['enabled'] = True
-  resize_canvas_procedure_dict['display_options_on_create'] = False
-  resize_canvas_procedure_dict['arguments'][1]['default_value'] = (
+  resize_canvas_action_dict['enabled'] = True
+  resize_canvas_action_dict['display_options_on_create'] = False
+  resize_canvas_action_dict['arguments'][1]['default_value'] = (
     builtin_actions.ResizeModes.RESIZE_TO_LAYER_SIZE)
 
   settings['main'].add([
     commands_.create(
       name='procedures',
-      initial_commands=[resize_canvas_procedure_dict]),
+      initial_commands=[resize_canvas_action_dict]),
   ])
 
   visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
@@ -582,11 +582,11 @@ def create_settings_for_export_layers():
         visible_condition_dict]),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_procedure(settings['main'])
+  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_procedures(settings)
+  _connect_events_for_added_built_in_actions(settings)
 
   settings['main/procedures'].connect_event(
     'after-add-command',
@@ -653,16 +653,16 @@ def create_settings_for_edit_layers():
 
   settings.add([gui_settings])
 
-  rename_procedure_dict = utils.semi_deep_copy(
+  rename_action_dict = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['rename_for_edit_layers'])
-  rename_procedure_dict['enabled'] = False
-  rename_procedure_dict['display_options_on_create'] = False
-  rename_procedure_dict['arguments'][0]['default_value'] = 'image[001]'
+  rename_action_dict['enabled'] = False
+  rename_action_dict['display_options_on_create'] = False
+  rename_action_dict['arguments'][0]['default_value'] = 'image[001]'
 
   settings['main'].add([
     commands_.create(
       name='procedures',
-      initial_commands=[rename_procedure_dict]),
+      initial_commands=[rename_action_dict]),
   ])
 
   visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
@@ -682,7 +682,7 @@ def create_settings_for_edit_layers():
       ]),
   ])
 
-  _connect_events_for_added_built_in_procedures(settings)
+  _connect_events_for_added_built_in_actions(settings)
 
   settings['main/procedures'].connect_event(
     'after-add-command',
@@ -696,9 +696,9 @@ def create_settings_for_edit_layers():
 def _create_gui_settings(item_tree_items_setting_type):
   gui_settings = pg.setting.Group(name='gui')
 
-  procedure_browser_settings = pg.setting.Group(name='procedure_browser')
+  action_browser_settings = pg.setting.Group(name='procedure_browser')
 
-  procedure_browser_settings.add([
+  action_browser_settings.add([
     {
       'type': 'integer',
       'name': 'paned_position',
@@ -754,7 +754,7 @@ def _create_gui_settings(item_tree_items_setting_type):
       'type': item_tree_items_setting_type,
       'name': 'image_preview_displayed_items',
     },
-    procedure_browser_settings,
+    action_browser_settings,
   ])
 
   return gui_settings
@@ -847,14 +847,14 @@ def _create_images_and_directories_setting_dict():
   }
 
 
-def _connect_events_for_added_built_in_procedures(settings):
+def _connect_events_for_added_built_in_actions(settings):
   settings['main/procedures'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_crop_procedure)
+    'after-add-command', builtin_actions.on_after_add_crop_action)
   settings['main/procedures'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_export_procedure)
+    'after-add-command', builtin_actions.on_after_add_export_action)
   settings['main/procedures'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_resize_canvas_procedure)
+    'after-add-command', builtin_actions.on_after_add_resize_canvas_action)
   settings['main/procedures'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_rotate_and_flip_procedure)
+    'after-add-command', builtin_actions.on_after_add_rotate_and_flip_action)
   settings['main/procedures'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_scale_procedure)
+    'after-add-command', builtin_actions.on_after_add_scale_action)

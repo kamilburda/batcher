@@ -16,7 +16,7 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'AspectRatios',
   'scale',
-  'on_after_add_scale_procedure',
+  'on_after_add_scale_action',
 ]
 
 
@@ -231,7 +231,7 @@ def _fill_with_padding(
   )
 
 
-def on_after_add_scale_procedure(_procedures, procedure, _orig_procedure_dict):
+def on_after_add_scale_action(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('scale_for_'):
     _set_sensitive_for_local_origin(
       procedure['arguments/object_to_scale'],

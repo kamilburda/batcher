@@ -20,7 +20,7 @@ __all__ = [
   'UNIT_RADIAN',
   'UNITS',
   'rotate_and_flip',
-  'on_after_add_rotate_and_flip_procedure',
+  'on_after_add_rotate_and_flip_action',
 ]
 
 
@@ -181,7 +181,7 @@ def _angle_to_radians(angle):
     return angle['value']
 
 
-def on_after_add_rotate_and_flip_procedure(_procedures, procedure, _orig_procedure_dict):
+def on_after_add_rotate_and_flip_action(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('rotate_and_flip_for_'):
     _set_sensitive_for_custom_rotation_angle(
       procedure['arguments/angle'],

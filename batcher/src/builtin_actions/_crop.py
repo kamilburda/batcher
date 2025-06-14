@@ -16,7 +16,7 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'CropModes',
   'crop',
-  'on_after_add_crop_procedure',
+  'on_after_add_crop_action',
 ]
 
 
@@ -319,7 +319,7 @@ def _clamp_value(value, allow_zero_value, max_value):
   return value
 
 
-def on_after_add_crop_procedure(_procedures, procedure, _orig_procedure_dict):
+def on_after_add_crop_action(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('crop_for_'):
     procedure['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
       'value-changed',

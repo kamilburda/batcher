@@ -34,9 +34,9 @@ __all__ = [
   'ExportStatuses',
   'export',
   'get_export_function',
-  'on_after_add_export_procedure',
-  'set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure',
-  'set_file_extension_options_for_default_export_procedure',
+  'on_after_add_export_action',
+  'set_sensitive_for_image_name_pattern_in_export_for_default_export_action',
+  'set_file_extension_options_for_default_export_action',
 ]
 
 
@@ -690,7 +690,7 @@ class _NameOnlyItem(pg.itemtree.Item):
     return None
 
 
-def on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
+def on_after_add_export_action(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value.startswith('export_for_'):
     _set_sensitive_for_image_name_pattern_in_export(
       procedure['arguments/export_mode'],
@@ -728,7 +728,7 @@ def on_after_add_export_procedure(_procedures, procedure, _orig_procedure_dict):
       procedure['arguments/file_extension'])
 
 
-def set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
+def set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
       main_settings):
   _set_sensitive_for_image_name_pattern_in_export(
     main_settings['export/export_mode'],
@@ -740,7 +740,7 @@ def set_sensitive_for_image_name_pattern_in_export_for_default_export_procedure(
     main_settings['export/single_image_name_pattern'])
 
 
-def set_file_extension_options_for_default_export_procedure(main_settings):
+def set_file_extension_options_for_default_export_action(main_settings):
   _show_hide_file_format_export_options(
     main_settings['export/file_format_mode'],
     main_settings['export/file_format_export_options'])

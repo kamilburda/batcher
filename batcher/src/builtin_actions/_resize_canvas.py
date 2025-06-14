@@ -13,7 +13,7 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'ResizeModes',
   'resize_canvas',
-  'on_after_add_resize_canvas_procedure',
+  'on_after_add_resize_canvas_action',
 ]
 
 
@@ -426,7 +426,7 @@ def _clamp_value(value, min_value=None, max_value=None):
   return value
 
 
-def on_after_add_resize_canvas_procedure(_procedures, procedure, _orig_procedure_dict):
+def on_after_add_resize_canvas_action(_procedures, procedure, _orig_procedure_dict):
   if procedure['orig_name'].value == 'resize_canvas':
     procedure['arguments/resize_from_edges_same_amount_for_each_side'].connect_event(
       'value-changed',
