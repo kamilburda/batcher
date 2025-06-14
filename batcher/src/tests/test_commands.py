@@ -14,7 +14,7 @@ from pygimplib.tests import stubs_gimp
 from src import commands as commands_
 
 
-test_procedures = [
+test_actions = [
   {
     'name': 'autocrop',
     'type': 'procedure',
@@ -85,14 +85,14 @@ class TestCreateCommands(unittest.TestCase):
   @parameterized.parameterized.expand([
     ('procedure_with_default_group',
      'procedures',
-     test_procedures,
+     test_actions,
      'autocrop_background',
      ['command', 'procedure'],
      {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
     ('procedure_with_custom_group',
      'procedures',
-     test_procedures,
+     test_actions,
      'autocrop',
      ['command', 'procedure'],
      {'command_groups': ['basic']}),
@@ -126,14 +126,14 @@ class TestCreateCommands(unittest.TestCase):
     self.assertNotIn('type', commands[initial_command_name])
   
   def test_create_initial_command_with_invalid_type_raises_error(self):
-    initial_command_dict = get_command_data(test_procedures)['autocrop']
+    initial_command_dict = get_command_data(test_actions)['autocrop']
     initial_command_dict['type'] = 'invalid_type'
     
     with self.assertRaises(ValueError):
       commands_.create('procedures', [initial_command_dict])
   
   def test_create_missing_name_raises_error(self):
-    initial_command_dict = get_command_data(test_procedures)['autocrop']
+    initial_command_dict = get_command_data(test_actions)['autocrop']
     del initial_command_dict['name']
     
     with self.assertRaises(ValueError):
@@ -147,46 +147,46 @@ class TestCreateCommands(unittest.TestCase):
 class TestManageCommands(unittest.TestCase):
   
   def setUp(self):
-    self.test_procedures = get_command_data(test_procedures)
-    self.autocrop_dict = self.test_procedures['autocrop']
-    self.procedures = commands_.create('procedures')
+    self.test_actions = get_command_data(test_actions)
+    self.autocrop_dict = self.test_actions['autocrop']
+    self.actions = commands_.create('procedures')
     
     self.expected_dict = dict({'orig_name': 'autocrop'}, **self.autocrop_dict)
   
   def test_add_command_as_dict(self, mock_get_pdb):
-    command = commands_.add(self.procedures, self.autocrop_dict)
+    command = commands_.add(self.actions, self.autocrop_dict)
     
-    self.assertEqual(len(self.procedures), 1)
-    self.assertEqual(command, self.procedures['autocrop'])
+    self.assertEqual(len(self.actions), 1)
+    self.assertEqual(command, self.actions['autocrop'])
 
   def test_add_command_as_instance(self, mock_get_pdb):
     autocrop_command = commands_.create_command(self.autocrop_dict)
 
-    commands_.add(self.procedures, autocrop_command)
+    commands_.add(self.actions, autocrop_command)
 
-    self.assertEqual(len(self.procedures), 1)
-    self.assertEqual(autocrop_command, self.procedures['autocrop'])
+    self.assertEqual(len(self.actions), 1)
+    self.assertEqual(autocrop_command, self.actions['autocrop'])
 
   def test_add_command_as_instance_with_the_same_name(self, mock_get_pdb):
     autocrop_command = commands_.create_command(self.autocrop_dict)
     autocrop_command_2 = commands_.create_command(self.autocrop_dict)
 
-    commands_.add(self.procedures, autocrop_command)
-    commands_.add(self.procedures, autocrop_command_2)
+    commands_.add(self.actions, autocrop_command)
+    commands_.add(self.actions, autocrop_command_2)
 
-    self.assertEqual(len(self.procedures), 2)
-    self.assertEqual(autocrop_command, self.procedures['autocrop'])
-    self.assertEqual(autocrop_command_2, self.procedures['autocrop_2'])
+    self.assertEqual(len(self.actions), 2)
+    self.assertEqual(autocrop_command, self.actions['autocrop'])
+    self.assertEqual(autocrop_command_2, self.actions['autocrop_2'])
     self.assertEqual(autocrop_command['display_name'].value, 'Autocrop')
     self.assertEqual(autocrop_command_2['display_name'].value, 'Autocrop (2)')
 
   def test_add_passing_invalid_object_raises_error(self, mock_get_pdb):
     with self.assertRaises(TypeError):
-      commands_.add(self.procedures, 'invalid_object')
+      commands_.add(self.actions, 'invalid_object')
   
   def test_add_existing_name_is_uniquified(self, mock_get_pdb):
     added_commands = [
-      commands_.add(self.procedures, self.autocrop_dict) for _unused in range(3)]
+      commands_.add(self.actions, self.autocrop_dict) for _unused in range(3)]
     
     orig_name = 'autocrop'
     expected_names = ['autocrop', 'autocrop_2', 'autocrop_3']
@@ -194,26 +194,26 @@ class TestManageCommands(unittest.TestCase):
     
     for command, expected_name, expected_display_name in zip(
           added_commands, expected_names, expected_display_names):
-      self.assertEqual(command, self.procedures[expected_name])
+      self.assertEqual(command, self.actions[expected_name])
       self.assertEqual(
-        self.procedures[f'{expected_name}/display_name'].value, expected_display_name)
+        self.actions[f'{expected_name}/display_name'].value, expected_display_name)
       self.assertEqual(
-        self.procedures[f'{expected_name}/orig_name'].value, orig_name)
+        self.actions[f'{expected_name}/orig_name'].value, orig_name)
     
-    self.assertEqual(len(self.procedures), 3)
+    self.assertEqual(len(self.actions), 3)
   
   def test_add_invokes_before_add_command_event(self, mock_get_pdb):
     invoked_event_args = []
     
     def on_before_add_command(commands, command_dict):
       invoked_event_args.append((commands, command_dict))
-      self.assertNotIn('autocrop', self.procedures)
+      self.assertNotIn('autocrop', self.actions)
     
-    self.procedures.connect_event('before-add-command', on_before_add_command)
+    self.actions.connect_event('before-add-command', on_before_add_command)
     
-    commands_.add(self.procedures, self.autocrop_dict)
+    commands_.add(self.actions, self.autocrop_dict)
 
-    self.assertIs(invoked_event_args[0][0], self.procedures)
+    self.assertIs(invoked_event_args[0][0], self.actions)
     self.assertDictEqual(invoked_event_args[0][1], self.expected_dict)
     self.assertIsNot(invoked_event_args[0][1], self.autocrop_dict)
   
@@ -231,18 +231,18 @@ class TestManageCommands(unittest.TestCase):
     def on_after_add_command(commands, command_, orig_command_dict):
       invoked_event_args.append((commands, command_, orig_command_dict))
     
-    self.procedures.connect_event('after-add-command', on_after_add_command)
+    self.actions.connect_event('after-add-command', on_after_add_command)
     
     for command_name in command_names_to_add:
-      command = commands_.add(self.procedures, self.test_procedures[command_name])
+      command = commands_.add(self.actions, self.test_actions[command_name])
       
-      self.assertIs(invoked_event_args[-1][0], self.procedures)
+      self.assertIs(invoked_event_args[-1][0], self.actions)
       self.assertIs(invoked_event_args[-1][1], command)
       self.assertDictEqual(invoked_event_args[-1][2], self.expected_dict)
       self.assertIsNot(invoked_event_args[-1][2], self.autocrop_dict)
   
   def test_add_modifying_added_command_modifies_nothing_else(self, mock_get_pdb):
-    command = commands_.add(self.procedures, self.autocrop_dict)
+    command = commands_.add(self.actions, self.autocrop_dict)
     command['enabled'].set_value(False)
     command['arguments/offset_x'].set_value(20)
     command['arguments/offset_y'].set_value(10)
@@ -270,10 +270,10 @@ class TestManageCommands(unittest.TestCase):
         test_case_suffix,
         command_name,
         expected_position):
-    for command_dict in self.test_procedures.values():
-      commands_.add(self.procedures, command_dict)
+    for command_dict in self.test_actions.values():
+      commands_.add(self.actions, command_dict)
     
-    self.assertEqual(commands_.get_index(self.procedures, command_name), expected_position)
+    self.assertEqual(commands_.get_index(self.actions, command_name), expected_position)
   
   @parameterized.parameterized.expand([
     ('middle_to_first',
@@ -318,16 +318,16 @@ class TestManageCommands(unittest.TestCase):
         command_name,
         new_position,
         expected_ordered_command_names):
-    for command_dict in self.test_procedures.values():
-      commands_.add(self.procedures, command_dict)
+    for command_dict in self.test_actions.values():
+      commands_.add(self.actions, command_dict)
     
-    commands_.reorder(self.procedures, command_name, new_position)
+    commands_.reorder(self.actions, command_name, new_position)
     
-    self.assertEqual([command.name for command in self.procedures], expected_ordered_command_names)
+    self.assertEqual([command.name for command in self.actions], expected_ordered_command_names)
   
-  def test_reorder_nonexisting_command_name(self, mock_get_pdb):
+  def test_reorder_nonexistent_command_name(self, mock_get_pdb):
     with self.assertRaises(ValueError):
-      commands_.reorder(self.procedures, 'invalid_command', 0)
+      commands_.reorder(self.actions, 'invalid_command', 0)
   
   @parameterized.parameterized.expand([
     ('single_setting',
@@ -353,56 +353,56 @@ class TestManageCommands(unittest.TestCase):
         names_to_remove,
         names_to_keep):
     for command_name in command_names_to_add:
-      commands_.add(self.procedures, self.test_procedures[command_name])
+      commands_.add(self.actions, self.test_actions[command_name])
     
     for command_name in names_to_remove:
-      commands_.remove(self.procedures, command_name)
+      commands_.remove(self.actions, command_name)
       
-      self.assertNotIn(command_name, self.procedures)
+      self.assertNotIn(command_name, self.actions)
     
     for command_name in names_to_keep:
-      self.assertIn(command_name, self.procedures)
+      self.assertIn(command_name, self.actions)
     
-    self.assertEqual(len(self.procedures), len(names_to_keep))
+    self.assertEqual(len(self.actions), len(names_to_keep))
   
-  def test_remove_nonexisting_command_name(self, mock_get_pdb):
+  def test_remove_nonexistent_command_name(self, mock_get_pdb):
     with self.assertRaises(ValueError):
-      commands_.remove(self.procedures, 'invalid_command')
+      commands_.remove(self.actions, 'invalid_command')
   
   def test_clear(self, mock_get_pdb):
-    for command_dict in self.test_procedures.values():
-      commands_.add(self.procedures, command_dict)
+    for command_dict in self.test_actions.values():
+      commands_.add(self.actions, command_dict)
     
-    commands_.clear(self.procedures)
+    commands_.clear(self.actions)
     
-    self.assertFalse(self.procedures)
-    self.assertTrue(self.test_procedures)
+    self.assertFalse(self.actions)
+    self.assertTrue(self.test_actions)
   
   def test_clear_resets_to_initial_commands(self, mock_get_pdb):
-    procedures = commands_.create('procedures', [self.autocrop_dict])
+    actions = commands_.create('procedures', [self.autocrop_dict])
     
-    commands_.add(procedures, self.test_procedures['autocrop_background'])
-    commands_.clear(procedures)
+    commands_.add(actions, self.test_actions['autocrop_background'])
+    commands_.clear(actions)
     
-    self.assertEqual(len(procedures), 1)
-    self.assertIn('autocrop', procedures)
-    self.assertNotIn('autocrop_background', procedures)
+    self.assertEqual(len(actions), 1)
+    self.assertIn('autocrop', actions)
+    self.assertNotIn('autocrop_background', actions)
   
   def test_clear_triggers_events(self, mock_get_pdb):
-    procedures = commands_.create('procedures', [self.autocrop_dict])
+    actions = commands_.create('procedures', [self.autocrop_dict])
     
     for command_name in ['autocrop_background', 'autocrop_foreground']:
-      commands_.add(procedures, self.test_procedures[command_name])
+      commands_.add(actions, self.test_actions[command_name])
     
     before_add_command_list = []
     after_add_command_list = []
     
-    procedures.connect_event(
+    actions.connect_event(
       'before-add-command', lambda group, dict_: before_add_command_list.append(dict_))
-    procedures.connect_event(
+    actions.connect_event(
       'after-add-command', lambda group, command, dict_: after_add_command_list.append(dict_))
     
-    commands_.clear(procedures, add_initial_commands=True)
+    commands_.clear(actions, add_initial_commands=True)
     
     self.assertEqual(len(before_add_command_list), 1)
     self.assertEqual(before_add_command_list[0]['name'], 'autocrop')
@@ -416,113 +416,113 @@ class TestManageCommands(unittest.TestCase):
 class TestLoadSaveCommands(unittest.TestCase):
   
   def setUp(self):
-    self.test_procedures = get_command_data(test_procedures)
-    self.procedures = commands_.create('procedures')
+    self.test_actions = get_command_data(test_actions)
+    self.actions = commands_.create('procedures')
   
   @parameterized.parameterized.expand([
     ('', False),
     ('with_explicit_clearing', True),
   ])
   def test_save_load_commands(self, test_case_suffix, remove_before_load, mock_gimp_module):
-    for command_dict in self.test_procedures.values():
-      commands_.add(self.procedures, command_dict)
+    for command_dict in self.test_actions.values():
+      commands_.add(self.actions, command_dict)
     
-    self.procedures['autocrop_background/enabled'].set_value(True)
-    self.procedures['autocrop_background/command_groups'].set_value(
+    self.actions['autocrop_background/enabled'].set_value(True)
+    self.actions['autocrop_background/command_groups'].set_value(
       ['background'])
-    self.procedures['autocrop_foreground/enabled'].set_value(True)
-    self.procedures['autocrop_foreground/command_groups'].set_value(
+    self.actions['autocrop_foreground/enabled'].set_value(True)
+    self.actions['autocrop_foreground/command_groups'].set_value(
       ['foreground'])
-    self.procedures['autocrop/arguments/offset_x'].set_value(20)
-    self.procedures['autocrop/arguments/offset_y'].set_value(10)
+    self.actions['autocrop/arguments/offset_x'].set_value(20)
+    self.actions['autocrop/arguments/offset_y'].set_value(10)
     
-    self.procedures.save()
+    self.actions.save()
     
     if remove_before_load:
-      self.procedures.remove([child.name for child in self.procedures])
+      self.actions.remove([child.name for child in self.actions])
     
-    self.procedures.load()
+    self.actions.load()
     
-    self.assertEqual(len(self.procedures), len(self.test_procedures))
+    self.assertEqual(len(self.actions), len(self.test_actions))
     self.assertListEqual(
-      list(self.test_procedures.keys()), [child.name for child in self.procedures])
+      list(self.test_actions.keys()), [child.name for child in self.actions])
     
     self.assertEqual(
-      self.procedures['autocrop_background/enabled'].value, True)
+      self.actions['autocrop_background/enabled'].value, True)
     self.assertEqual(
-      self.procedures['autocrop_background/command_groups'].value, ['background'])
+      self.actions['autocrop_background/command_groups'].value, ['background'])
     self.assertEqual(
-      self.procedures['autocrop_foreground/enabled'].value, True)
+      self.actions['autocrop_foreground/enabled'].value, True)
     self.assertEqual(
-      self.procedures['autocrop_foreground/command_groups'].value, ['foreground'])
-    self.assertEqual(self.procedures['autocrop/arguments/offset_x'].value, 20)
-    self.assertEqual(self.procedures['autocrop/arguments/offset_y'].value, 10)
+      self.actions['autocrop_foreground/command_groups'].value, ['foreground'])
+    self.assertEqual(self.actions['autocrop/arguments/offset_x'].value, 20)
+    self.assertEqual(self.actions['autocrop/arguments/offset_y'].value, 10)
   
   def test_save_load_commands_preserves_uniquified_names_after_load(self, mock_gimp_module):
     input_names = ['autocrop', 'autocrop', 'autocrop_background', 'autocrop_foreground']
     expected_names = ['autocrop', 'autocrop_2', 'autocrop_background', 'autocrop_foreground']
     
     for command_name in input_names:
-      commands_.add(self.procedures, self.test_procedures[command_name])
+      commands_.add(self.actions, self.test_actions[command_name])
     
-    self.procedures.save()
+    self.actions.save()
     
-    self.procedures.remove([child.name for child in self.procedures])
+    self.actions.remove([child.name for child in self.actions])
     
-    self.procedures.load()
+    self.actions.load()
     
-    self.assertEqual(len(self.procedures), len(input_names))
-    self.assertListEqual(expected_names, [child.name for child in self.procedures])
+    self.assertEqual(len(self.actions), len(input_names))
+    self.assertListEqual(expected_names, [child.name for child in self.actions])
   
   def test_load_with_no_saved_commands(self, mock_gimp_module):
-    procedures = commands_.create('procedures', [self.test_procedures['autocrop']])
+    actions = commands_.create('procedures', [self.test_actions['autocrop']])
     
     for command_name in ['autocrop_background', 'autocrop_foreground']:
-      commands_.add(procedures, self.test_procedures[command_name])
+      commands_.add(actions, self.test_actions[command_name])
     
-    procedures.load()
+    actions.load()
     
-    self.assertEqual(len(procedures), 0)
+    self.assertEqual(len(actions), 0)
   
   def test_load_initial_commands(self, mock_gimp_module):
-    procedures = commands_.create('procedures', [self.test_procedures['autocrop']])
+    actions = commands_.create('procedures', [self.test_actions['autocrop']])
     
-    procedures.save()
-    procedures.load()
+    actions.save()
+    actions.load()
     
-    self.assertEqual(len(procedures), 1)
-    self.assertIn('autocrop', procedures)
+    self.assertEqual(len(actions), 1)
+    self.assertIn('autocrop', actions)
   
   def test_load_overrides_initial_commands(self, mock_gimp_module):
-    procedures = commands_.create('procedures', [self.test_procedures['autocrop']])
+    actions = commands_.create('procedures', [self.test_actions['autocrop']])
     
     for command_name in ['autocrop_background', 'autocrop_foreground']:
-      commands_.add(procedures, self.test_procedures[command_name])
+      commands_.add(actions, self.test_actions[command_name])
     
-    commands_.remove(procedures, 'autocrop')
+    commands_.remove(actions, 'autocrop')
     
-    procedures.save()
-    procedures.load()
+    actions.save()
+    actions.load()
     
-    self.assertEqual(len(procedures), 2)
-    self.assertNotIn('autocrop', procedures)
-    self.assertIn('autocrop_background', procedures)
-    self.assertIn('autocrop_foreground', procedures)
+    self.assertEqual(len(actions), 2)
+    self.assertNotIn('autocrop', actions)
+    self.assertIn('autocrop_background', actions)
+    self.assertIn('autocrop_foreground', actions)
   
   def test_load_triggers_after_add_command_events(self, mock_gimp_module):
-    procedures = commands_.create('procedures')
+    actions = commands_.create('procedures')
     
     for command_name in ['autocrop_background', 'autocrop_foreground']:
-      commands_.add(procedures, self.test_procedures[command_name])
+      commands_.add(actions, self.test_actions[command_name])
     
     after_add_command_list = []
     
-    procedures.connect_event(
+    actions.connect_event(
       'after-add-command',
       lambda group, command, dict_: after_add_command_list.append((command, dict_)))
     
-    procedures.save()
-    procedures.load()
+    actions.save()
+    actions.load()
     
     self.assertEqual(len(after_add_command_list), 2)
     self.assertIn(after_add_command_list[0][0].name, 'autocrop_background')
@@ -538,7 +538,7 @@ class TestLoadSaveCommands(unittest.TestCase):
 class TestManagePdbProceduresAsCommands(unittest.TestCase):
   
   def setUp(self):
-    self.procedures = commands_.create('procedures')
+    self.actions = commands_.create('procedures')
 
     self.procedure_name = 'file-png-export'
 
@@ -566,9 +566,9 @@ class TestManagePdbProceduresAsCommands(unittest.TestCase):
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
   
   def test_add_pdb_procedure(self, mock_get_pdb):
-    command = commands_.add(self.procedures, self.procedure_name)
+    command = commands_.add(self.actions, self.procedure_name)
     
-    self.assertIn('file-png-export', self.procedures)
+    self.assertIn('file-png-export', self.actions)
     
     self.assertEqual(command.name, 'file-png-export')
     self.assertEqual(command['function'].value, 'file-png-export')
@@ -588,13 +588,13 @@ class TestManagePdbProceduresAsCommands(unittest.TestCase):
     f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp',
     new_callable=stubs_gimp.GimpModuleStub)
   def test_load_save_pdb_procedure_as_command(self, mock_gimp_module, mock_get_pdb):
-    command = commands_.add(self.procedures, self.procedure_name)
+    command = commands_.add(self.actions, self.procedure_name)
     
     command['enabled'].set_value(False)
     command['arguments/filename'].set_value('image.png')
     
-    self.procedures.save()
-    self.procedures.load()
+    self.actions.save()
+    self.actions.load()
     
     self.assertEqual(command.name, 'file-png-export')
     self.assertEqual(command['function'].value, 'file-png-export')

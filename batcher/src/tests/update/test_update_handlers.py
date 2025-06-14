@@ -291,11 +291,11 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/procedures/export/arguments/overwrite_mode'].value,
       'ask')
 
-    for procedure in settings['main/procedures']:
-      if procedure['orig_name'].value in builtin_actions.BUILTIN_ACTIONS:
-        self.assertEqual(procedure['origin'].value, 'builtin')
+    for action in settings['main/procedures']:
+      if action['orig_name'].value in builtin_actions.BUILTIN_ACTIONS:
+        self.assertEqual(action['origin'].value, 'builtin')
       else:
-        self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+        self.assertEqual(action['origin'].value, 'gimp_pdb')
 
     self.assertEqual(
       settings['main/procedures/insert_background/arguments/tagged_items'].value, [])
@@ -320,11 +320,11 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/procedures/script-fu-addborder/arguments/color'].pdb_type.name,
       'GeglColor')
 
-    for procedure in settings['main/conditions']:
-      if procedure['orig_name'].value in builtin_conditions.BUILTIN_CONDITIONS:
-        self.assertEqual(procedure['origin'].value, 'builtin')
+    for condition in settings['main/conditions']:
+      if condition['orig_name'].value in builtin_conditions.BUILTIN_CONDITIONS:
+        self.assertEqual(condition['origin'].value, 'builtin')
       else:
-        self.assertEqual(procedure['origin'].value, 'gimp_pdb')
+        self.assertEqual(condition['origin'].value, 'gimp_pdb')
 
   def _assert_correct_contents_for_update_to_0_8(self, settings):
     self.assertEqual(settings['main/export/export_mode'].value, 'each_item')

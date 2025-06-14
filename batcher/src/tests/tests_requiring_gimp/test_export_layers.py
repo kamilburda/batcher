@@ -90,13 +90,13 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_use_image_size(self):
     self.compare(
-      procedure_names_to_remove=['resize_canvas'],
+      action_names_to_remove=['resize_canvas'],
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'use_image_size'),
     )
   
   def test_background(self):
     self.compare(
-      procedure_names_to_add={'insert_background_for_layers': 0},
+      action_names_to_add={'insert_background_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'background'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.BLUE)),
@@ -104,7 +104,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def test_foreground(self):
     self.compare(
-      procedure_names_to_add={'insert_foreground_for_layers': 0},
+      action_names_to_add={'insert_foreground_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'foreground'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.GREEN)),
@@ -120,8 +120,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
 
   def compare(
         self,
-        procedure_names_to_add=None,
-        procedure_names_to_remove=None,
+        action_names_to_add=None,
+        action_names_to_remove=None,
         different_results_and_expected_layers=None,
         expected_results_dirpath=None,
         additional_init_before_run=None,
@@ -142,7 +142,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         for layer in self.expected_images[expected_results_dirpath].get_layers()}
     
     self._export(
-      settings, procedure_names_to_add, procedure_names_to_remove, additional_init_before_run)
+      settings, action_names_to_add, action_names_to_remove, additional_init_before_run)
     
     self.image_with_results, layers = self._load_layers_from_dirpath(self.output_dirpath)
 
@@ -162,26 +162,26 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   def _export(
         self,
         settings,
-        procedure_names_to_add,
-        procedure_names_to_remove,
+        action_names_to_add,
+        action_names_to_remove,
         additional_init_before_run,
   ):
-    if procedure_names_to_add is None:
-      procedure_names_to_add = {}
+    if action_names_to_add is None:
+      action_names_to_add = {}
     
-    if procedure_names_to_remove is None:
-      procedure_names_to_remove = []
+    if action_names_to_remove is None:
+      action_names_to_remove = []
     
-    for procedure_name, order in procedure_names_to_add.items():
+    for action_name, order in action_names_to_add.items():
       commands.add(
         settings['main/procedures'],
-        builtin_actions.BUILTIN_ACTIONS[procedure_name])
+        builtin_actions.BUILTIN_ACTIONS[action_name])
       if order is not None:
-        commands.reorder(settings['main/procedures'], procedure_name, order)
+        commands.reorder(settings['main/procedures'], action_name, order)
     
-    for procedure_name in procedure_names_to_remove:
-      if procedure_name in settings['main/procedures']:
-        commands.remove(settings['main/procedures'], procedure_name)
+    for action_name in action_names_to_remove:
+      if action_name in settings['main/procedures']:
+        commands.remove(settings['main/procedures'], action_name)
 
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
@@ -198,8 +198,8 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))
     
-    for procedure_name in procedure_names_to_add:
-      commands.remove(settings['main/procedures'], procedure_name)
+    for action_name in action_names_to_add:
+      commands.remove(settings['main/procedures'], action_name)
   
   def _compare_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):

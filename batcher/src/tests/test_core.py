@@ -19,7 +19,7 @@ from src import utils as utils_
 
 class TestBatcherInitialCommands(unittest.TestCase):
   
-  def test_add_procedure_added_procedure_is_first_in_command_list(self):
+  def test_add_action_added_action_is_first_in_command_list(self):
     settings = plugin_settings.create_settings_for_export_layers()
     settings['main/file_extension'].set_value('xcf')
     
@@ -45,7 +45,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     
     added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
-    # Includes built-in procedures added by default
+    # Includes built-in actions added by default
     self.assertEqual(len(added_command_items), 6)
     
     initial_invoker = added_command_items[1]
@@ -76,7 +76,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     
     self.batcher._invoker = self.invoker
     
-    self.procedures = commands_.create('procedures')
+    self.actions = commands_.create('procedures')
 
     self.procedure_name = 'file-png-export'
 
@@ -96,17 +96,17 @@ class TestAddCommandFromSettings(unittest.TestCase):
     commands_.pdb.remove_from_cache(self.procedure_name)
   
   def test_add_command_from_settings(self, mock_get_pdb):
-    procedure = commands_.add(
-      self.procedures, builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
+    action = commands_.add(
+      self.actions, builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
-    self.batcher._add_command_from_settings(procedure)
+    self.batcher._add_command_from_settings(action)
     
     added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
     self.assertEqual(len(added_command_items), 1)
     self.assertEqual(
       added_command_items[0][1],
-      list(procedure['arguments'])
+      list(action['arguments'])
       + [builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers']])
     self.assertEqual(added_command_items[0][2], {})
   
@@ -127,9 +127,9 @@ class TestAddCommandFromSettings(unittest.TestCase):
   
   def _test_add_pdb_proc_as_command(
         self, pdb_procedure, expected_arg_names_and_values, expected_kwargs):
-    procedure = commands_.add(self.procedures, pdb_procedure.get_name())
+    action = commands_.add(self.actions, pdb_procedure.get_name())
 
-    self.batcher._add_command_from_settings(procedure)
+    self.batcher._add_command_from_settings(action)
     
     added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     

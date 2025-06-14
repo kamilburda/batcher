@@ -78,15 +78,15 @@ class TestConvertCompareContents(unittest.TestCase):
   
   def test_remove_folder_structure(self):
     self.compare(
-      procedure_names_to_add={'remove_folder_structure': None},
+      action_names_to_add={'remove_folder_structure': None},
       expected_results_dirpath=os.path.join(
         self.expected_results_root_dirpath, 'remove_folder_structure'),
     )
 
   def compare(
         self,
-        procedure_names_to_add=None,
-        procedure_names_to_remove=None,
+        action_names_to_add=None,
+        action_names_to_remove=None,
         expected_results_dirpath=None,
   ):
     settings = plugin_settings.create_settings_for_convert()
@@ -106,7 +106,7 @@ class TestConvertCompareContents(unittest.TestCase):
       for filepath in expected_image_filepaths
     }
 
-    self._export(settings, procedure_names_to_add, procedure_names_to_remove)
+    self._export(settings, action_names_to_add, action_names_to_remove)
 
     actual_image_filepaths = sorted(
       os.path.join(root, filename)
@@ -135,25 +135,25 @@ class TestConvertCompareContents(unittest.TestCase):
   def _export(
         self,
         settings,
-        procedure_names_to_add,
-        procedure_names_to_remove,
+        action_names_to_add,
+        action_names_to_remove,
   ):
-    if procedure_names_to_add is None:
-      procedure_names_to_add = {}
+    if action_names_to_add is None:
+      action_names_to_add = {}
     
-    if procedure_names_to_remove is None:
-      procedure_names_to_remove = []
+    if action_names_to_remove is None:
+      action_names_to_remove = []
     
-    for procedure_name, order in procedure_names_to_add.items():
+    for action_name, order in action_names_to_add.items():
       commands.add(
         settings['main/procedures'],
-        builtin_actions.BUILTIN_ACTIONS[procedure_name])
+        builtin_actions.BUILTIN_ACTIONS[action_name])
       if order is not None:
-        commands.reorder(settings['main/procedures'], procedure_name, order)
+        commands.reorder(settings['main/procedures'], action_name, order)
     
-    for procedure_name in procedure_names_to_remove:
-      if procedure_name in settings['main/procedures']:
-        commands.remove(settings['main/procedures'], procedure_name)
+    for action_name in action_names_to_remove:
+      if action_name in settings['main/procedures']:
+        commands.remove(settings['main/procedures'], action_name)
 
     item_tree = pg.itemtree.ImageFileTree()
     item_tree.add(self.test_images_filepaths)
@@ -167,8 +167,8 @@ class TestConvertCompareContents(unittest.TestCase):
     
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))
     
-    for procedure_name in procedure_names_to_add:
-      commands.remove(settings['main/procedures'], procedure_name)
+    for action_name in action_names_to_add:
+      commands.remove(settings['main/procedures'], action_name)
   
   def _compare_images(self, actual_image, expected_image, settings, test_case_name):
     actual_layer = actual_image.get_layers()[0]
