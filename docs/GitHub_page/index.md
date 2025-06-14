@@ -31,7 +31,7 @@ feature_row_main:
   - title: "Export/Edit Images"
     image_path: "/assets/images/feature_export_edit_images.svg"
     excerpt: "Exports images opened in GIMP to the specified file format. Also allows in-place editing and saving to the native GIMP format."
-    url: "/docs/usage#editing-layers"
+    url: "/docs/usage##exporting-images-opened-in-gimp"
     btn_label: "Read More"
     btn_class: "btn--primary"
 feature_row_customization:
