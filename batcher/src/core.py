@@ -653,7 +653,7 @@ class Batcher(metaclass=abc.ABCMeta):
           command['orig_name'].value]
       else:
         raise exceptions.CommandError(
-          f'invalid command "{command.name}" - must contain "procedure" or "condition" in tags',
+          f'invalid command "{command.name}" - must contain "action" or "condition" in tags',
           command,
           None,
           None)

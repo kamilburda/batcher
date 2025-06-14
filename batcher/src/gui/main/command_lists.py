@@ -80,7 +80,7 @@ class CommandLists:
     self._set_command_skipped_tooltips(
       self._action_list,
       batcher.skipped_actions,
-      _('This procedure is skipped. Reason: {}'),
+      _('This action is skipped. Reason: {}'),
       clear_previous=clear_previous)
 
     self._set_command_skipped_tooltips(

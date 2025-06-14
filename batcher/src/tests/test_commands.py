@@ -83,14 +83,14 @@ class TestCreateCommands(unittest.TestCase):
     self.assertEqual(len(commands), 0)
   
   @parameterized.parameterized.expand([
-    ('procedure_with_default_group',
+    ('action_with_default_group',
      'actions',
      test_actions,
      'autocrop_background',
      ['command', 'action'],
      {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
-    ('procedure_with_custom_group',
+    ('action_with_custom_group',
      'actions',
      test_actions,
      'autocrop',
