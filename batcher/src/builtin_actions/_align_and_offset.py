@@ -7,7 +7,7 @@ from gi.repository import Gimp
 
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -107,8 +107,8 @@ def align_and_offset_layers(
       elif reference_object_type == 'layer':
         new_y = ref_layer_y + ref_layer_height - layer.get_height()
 
-    new_x += builtin_procedures_utils.unit_to_pixels(batcher, x_offset, 'x')
-    new_y += builtin_procedures_utils.unit_to_pixels(batcher, y_offset, 'y')
+    new_x += builtin_actions_utils.unit_to_pixels(batcher, x_offset, 'x')
+    new_y += builtin_actions_utils.unit_to_pixels(batcher, y_offset, 'y')
 
     layer.set_offsets(new_x, new_y)
 

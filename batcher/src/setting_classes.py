@@ -14,7 +14,7 @@ from gi.repository import GLib
 
 import pygimplib as pg
 
-from src import builtin_procedures as builtin_procedures_
+from src import builtin_actions as builtin_actions_
 from src import file_formats as file_formats_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
@@ -328,7 +328,7 @@ class AngleBoxPresenter(pg.setting.GtkPresenter):
     return angle_box_.AngleBox(
       default_value=setting.value['value'],
       default_unit=setting.value['unit'],
-      units=dict(builtin_procedures_.UNITS),
+      units=dict(builtin_actions_.UNITS),
     )
 
   def get_value(self):

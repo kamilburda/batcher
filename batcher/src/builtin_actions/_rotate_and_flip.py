@@ -10,7 +10,7 @@ from gi.repository import Gimp
 from src import utils
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -97,12 +97,12 @@ def rotate_and_flip(
   Gimp.context_set_interpolation(rotation_interpolation)
   Gimp.context_set_transform_direction(Gimp.TransformDirection.FORWARD)
 
-  rotation_center_x_pixels = builtin_procedures_utils.unit_to_pixels(
+  rotation_center_x_pixels = builtin_actions_utils.unit_to_pixels(
     batcher,
     rotation_center_x,
     'x',
   )
-  rotation_center_y_pixels = builtin_procedures_utils.unit_to_pixels(
+  rotation_center_y_pixels = builtin_actions_utils.unit_to_pixels(
     batcher,
     rotation_center_y,
     'y',

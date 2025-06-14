@@ -10,7 +10,7 @@ import pygimplib as pg
 
 from src import builtin_commands_common
 from src import builtin_conditions
-from src import builtin_procedures
+from src import builtin_actions
 
 from src.gui import messages as messages_
 from src.gui.commands import list as command_list_
@@ -32,7 +32,7 @@ class CommandLists:
     self._procedure_list = command_list_.CommandList(
       self._settings['main/procedures'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_procedures.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
+        builtin_actions.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
       add_command_text=_('Add P_rocedure...'),
       allow_custom_commands=True,
       add_custom_command_text=_('Add Custom Procedure...'),
@@ -408,7 +408,7 @@ def _add_merge_background_foreground_procedure(procedure_list, item):
 
   merge_procedure_name = merge_procedure_orig_name_mapping[item.command['orig_name'].value]
 
-  merge_item = procedure_list.add_item(builtin_procedures.BUILTIN_ACTIONS[merge_procedure_name])
+  merge_item = procedure_list.add_item(builtin_actions.BUILTIN_ACTIONS[merge_procedure_name])
 
   export_procedure_index = next(
     iter(index for index, item in enumerate(procedure_list.items)
@@ -513,7 +513,7 @@ def _handle_crop_procedure_item_added(item):
 
 
 def _set_display_name_for_crop_procedure(crop_mode_setting, crop_procedure):
-  if crop_mode_setting.value == builtin_procedures.CropModes.REMOVE_EMPTY_BORDERS:
+  if crop_mode_setting.value == builtin_actions.CropModes.REMOVE_EMPTY_BORDERS:
     crop_procedure['display_name'].set_value(_('Crop to remove empty borders'))
   else:
     if crop_mode_setting.value in crop_mode_setting.items_display_names:

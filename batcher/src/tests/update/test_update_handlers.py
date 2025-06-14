@@ -11,7 +11,7 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
-from src import builtin_procedures
+from src import builtin_actions
 from src import builtin_conditions
 from src import placeholders
 from src import plugin_settings
@@ -292,7 +292,7 @@ class TestUpdateHandlers(unittest.TestCase):
       'ask')
 
     for procedure in settings['main/procedures']:
-      if procedure['orig_name'].value in builtin_procedures.BUILTIN_ACTIONS:
+      if procedure['orig_name'].value in builtin_actions.BUILTIN_ACTIONS:
         self.assertEqual(procedure['origin'].value, 'builtin')
       else:
         self.assertEqual(procedure['origin'].value, 'gimp_pdb')

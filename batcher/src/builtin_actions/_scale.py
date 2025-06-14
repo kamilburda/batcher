@@ -10,7 +10,7 @@ import pygimplib as pg
 from src import utils
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -59,11 +59,11 @@ def scale(
     elif isinstance(object_to_scale, Gimp.Item):
       object_to_scale.get_image().set_resolution(processed_resolution_x, processed_resolution_y)
 
-  new_width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, new_width, 'x')
+  new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, new_width, 'x')
   if new_width_pixels <= 0:
     new_width_pixels = 1
 
-  new_height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, new_height, 'y')
+  new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, new_height, 'y')
   if new_height_pixels <= 0:
     new_height_pixels = 1
 
@@ -172,27 +172,27 @@ def _fill_with_padding(
 
   if new_width_pixels > object_width:
     offset_x = 0
-    if padding_position == builtin_procedures_utils.Positions.START:
+    if padding_position == builtin_actions_utils.Positions.START:
       offset_x = 0
-    elif padding_position == builtin_procedures_utils.Positions.CENTER:
+    elif padding_position == builtin_actions_utils.Positions.CENTER:
       offset_x = round((new_width_pixels - object_width) / 2)
-    elif padding_position == builtin_procedures_utils.Positions.END:
+    elif padding_position == builtin_actions_utils.Positions.END:
       offset_x = new_width_pixels - object_width
-    elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
-      offset_x = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'x')
+    elif padding_position == builtin_actions_utils.Positions.CUSTOM:
+      offset_x = builtin_actions_utils.unit_to_pixels(batcher, padding_position_custom, 'x')
       offset_x = min(offset_x, new_width_pixels - object_width)
 
     offset_y = 0
   else:
     offset_y = 0
-    if padding_position == builtin_procedures_utils.Positions.START:
+    if padding_position == builtin_actions_utils.Positions.START:
       offset_y = 0
-    elif padding_position == builtin_procedures_utils.Positions.CENTER:
+    elif padding_position == builtin_actions_utils.Positions.CENTER:
       offset_y = round((new_height_pixels - object_height) / 2)
-    elif padding_position == builtin_procedures_utils.Positions.END:
+    elif padding_position == builtin_actions_utils.Positions.END:
       offset_y = new_height_pixels - object_height
-    elif padding_position == builtin_procedures_utils.Positions.CUSTOM:
-      offset_y = builtin_procedures_utils.unit_to_pixels(batcher, padding_position_custom, 'y')
+    elif padding_position == builtin_actions_utils.Positions.CUSTOM:
+      offset_y = builtin_actions_utils.unit_to_pixels(batcher, padding_position_custom, 'y')
       offset_y = min(offset_y, new_height_pixels - object_height)
 
     offset_x = 0
@@ -216,7 +216,7 @@ def _fill_with_padding(
 
     gimp_object.set_offsets(new_object_offset_x, new_object_offset_y)
 
-  builtin_procedures_utils.add_color_layer(
+  builtin_actions_utils.add_color_layer(
     padding_color,
     image_of_drawable_with_padding,
     drawable_with_padding,
@@ -320,7 +320,7 @@ def _set_visible_for_padding_custom_position(
 ):
   padding_position_custom_setting.gui.set_visible(
     padding_position_setting.gui.get_visible()
-    and padding_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
+    and padding_position_setting.value == builtin_actions_utils.Positions.CUSTOM)
 
 
 def _set_visible_for_padding_color_and_position(
@@ -452,12 +452,12 @@ SCALE_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'padding_position',
-      'default_value': builtin_procedures_utils.Positions.CENTER,
+      'default_value': builtin_actions_utils.Positions.CENTER,
       'items': [
-        (builtin_procedures_utils.Positions.START, _('Start')),
-        (builtin_procedures_utils.Positions.CENTER, _('Center')),
-        (builtin_procedures_utils.Positions.END, _('End')),
-        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
+        (builtin_actions_utils.Positions.START, _('Start')),
+        (builtin_actions_utils.Positions.CENTER, _('Center')),
+        (builtin_actions_utils.Positions.END, _('End')),
+        (builtin_actions_utils.Positions.CUSTOM, _('Custom')),
       ],
       'display_name': _('Position'),
     },

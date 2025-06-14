@@ -15,7 +15,7 @@ from pygimplib import pdb
 
 from src import commands
 from src import core
-from src import builtin_procedures
+from src import builtin_actions
 from src import plugin_settings
 from src import utils as utils_
 from src.procedure_groups import *
@@ -147,7 +147,7 @@ class TestConvertCompareContents(unittest.TestCase):
     for procedure_name, order in procedure_names_to_add.items():
       commands.add(
         settings['main/procedures'],
-        builtin_procedures.BUILTIN_ACTIONS[procedure_name])
+        builtin_actions.BUILTIN_ACTIONS[procedure_name])
       if order is not None:
         commands.reorder(settings['main/procedures'], procedure_name, order)
     

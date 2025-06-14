@@ -15,7 +15,7 @@ from src import builtin_commands_common
 from src.path import validators as validators_
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -61,12 +61,12 @@ def save(
       else:
         image_filename = item.name
 
-      item.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
-      builtin_procedures_utils.set_item_export_name(item, image_filename)
+      item.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
+      builtin_actions_utils.set_item_export_name(item, image_filename)
       _validate_name(item)
 
       new_image_file = Gio.file_new_for_path(
-        builtin_procedures_utils.get_item_filepath(
+        builtin_actions_utils.get_item_filepath(
           item,
           Gio.file_new_for_path(os.path.dirname(image_file.get_path())),
         ))
@@ -75,15 +75,15 @@ def save(
         image_file = new_image_file
         should_set_new_image_file = True
     else:
-      item.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
+      item.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
 
       image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
 
-      builtin_procedures_utils.set_item_export_name(item, image_filename)
+      builtin_actions_utils.set_item_export_name(item, image_filename)
       _validate_name(item)
 
       image_file = Gio.file_new_for_path(
-        builtin_procedures_utils.get_item_filepath(item, output_directory))
+        builtin_actions_utils.get_item_filepath(item, output_directory))
 
       os.makedirs(output_directory.get_path(), exist_ok=True)
 
@@ -98,9 +98,9 @@ def save(
 
 
 def _validate_name(item):
-  builtin_procedures_utils.set_item_export_name(
+  builtin_actions_utils.set_item_export_name(
     item,
-    validators_.FilenameValidator.validate(builtin_procedures_utils.get_item_export_name(item)))
+    validators_.FilenameValidator.validate(builtin_actions_utils.get_item_export_name(item)))
 
 
 def _reset_dirty_state_of_images_after_cleanup(_batcher, images_to_reset_dirty_state_for):

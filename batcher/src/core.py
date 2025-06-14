@@ -19,7 +19,7 @@ from pygimplib import pdb
 from src import commands
 from src import builtin_commands_common
 from src import builtin_conditions
-from src import builtin_procedures
+from src import builtin_actions
 from src import exceptions
 from src import invoker as invoker_
 from src import overwrite
@@ -646,7 +646,7 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     if command['origin'].value == 'builtin':
       if 'procedure' in command.tags:
-        function = builtin_procedures.BUILTIN_ACTIONS_FUNCTIONS[
+        function = builtin_actions.BUILTIN_ACTIONS_FUNCTIONS[
           command['orig_name'].value]
       elif 'condition' in command.tags:
         function = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
@@ -1102,14 +1102,14 @@ class ImageBatcher(Batcher):
   def _add_default_rename_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_procedures.rename_image_for_convert,
+        builtin_actions.rename_image_for_convert,
         groups=command_groups,
         args=[self._name_pattern])
 
   def _add_default_export_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_procedures.export,
+        builtin_actions.export,
         groups=command_groups,
         args=[
           self._output_directory,
@@ -1251,14 +1251,14 @@ class LayerBatcher(Batcher):
   def _add_default_rename_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_procedures.rename_layer,
+        builtin_actions.rename_layer,
         groups=command_groups,
         args=[self._name_pattern])
   
   def _add_default_export_procedure(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_procedures.export,
+        builtin_actions.export,
         groups=command_groups,
         args=[
           self._output_directory,

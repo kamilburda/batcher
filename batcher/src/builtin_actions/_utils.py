@@ -1,4 +1,4 @@
-"""Utility functions used within the `builtin_procedures` package."""
+"""Utility functions used within the `builtin_actions` package."""
 
 import os
 

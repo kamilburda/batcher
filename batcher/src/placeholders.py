@@ -91,7 +91,7 @@ def _get_adjacent_layer(
       position_cond_func,
       adjacent_position_increment,
       insert_builtin_procedure_names,
-      color_tag_argument_name_for_builtin_procedures,
+      color_tag_argument_name_for_builtin_actions,
       skip_message,
 ):
   image = batcher.current_image
@@ -118,9 +118,9 @@ def _get_adjacent_layer(
       for procedure in _get_previous_enabled_procedures(batcher, batcher.current_procedure):
         if any(procedure['orig_name'].value == orig_name
                for orig_name in insert_builtin_procedure_names):
-          if color_tag_argument_name_for_builtin_procedures in procedure['arguments']:
+          if color_tag_argument_name_for_builtin_actions in procedure['arguments']:
             color_tags.append(
-              procedure[f'arguments/{color_tag_argument_name_for_builtin_procedures}'].value)
+              procedure[f'arguments/{color_tag_argument_name_for_builtin_actions}'].value)
         else:
           color_tags.append(None)
 

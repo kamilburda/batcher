@@ -23,7 +23,7 @@ from src.path import fileext
 from src.path import validators as validators_
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -167,7 +167,7 @@ def export(
         item_to_process = current_top_level_item
 
     if batcher.process_names:
-      item_to_process.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
+      item_to_process.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
 
       if use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
@@ -234,7 +234,7 @@ def export(
       if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
         file_extension_properties[
           fileext.get_file_extension(
-            builtin_procedures_utils.get_item_export_name(item_to_process))
+            builtin_actions_utils.get_item_export_name(item_to_process))
         ].processed_count += 1
         # Append the original raw item
         # noinspection PyProtectedMember
@@ -271,7 +271,7 @@ def _get_next_item(batcher, item):
 def _process_parent_names(item, item_uniquifier, processed_parents):
   for parent in item.parents:
     if parent not in processed_parents:
-      parent.save_state(builtin_procedures_utils.EXPORT_NAME_ITEM_STATE)
+      parent.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
 
       _validate_name(parent)
       _uniquify_name(item_uniquifier, parent)
@@ -286,7 +286,7 @@ def _process_item_name(
       default_file_extension,
       force_default_file_extension,
 ):
-  item_name = builtin_procedures_utils.get_item_export_name(item)
+  item_name = builtin_actions_utils.get_item_export_name(item)
 
   processed_item_name = item_name
 
@@ -300,15 +300,15 @@ def _process_item_name(
     processed_item_name = fileext.get_filename_with_new_file_extension(
       item_name, default_file_extension, keep_extra_trailing_periods=True)
 
-  builtin_procedures_utils.set_item_export_name(item, processed_item_name)
+  builtin_actions_utils.set_item_export_name(item, processed_item_name)
 
   _validate_name(item)
   _uniquify_name(
     item_uniquifier,
     item,
     position=_get_unique_substring_position(
-      builtin_procedures_utils.get_item_export_name(item),
-      fileext.get_file_extension(builtin_procedures_utils.get_item_export_name(item))),
+      builtin_actions_utils.get_item_export_name(item),
+      fileext.get_file_extension(builtin_actions_utils.get_item_export_name(item))),
   )
 
 
@@ -349,7 +349,7 @@ def _copy_layer(layer, dest_image, item):
     layer, dest_image, None, len(dest_image.get_layers()), True, True, True)
 
   # We use `item.name` instead of
-  # `builtin_procedures_utils.get_item_export_name()` so that the original
+  # `builtin_actions_utils.get_item_export_name()` so that the original
   # layer name is used in case of multi-layer export.
   layer_copy.set_name(item.name)
   
@@ -357,17 +357,17 @@ def _copy_layer(layer, dest_image, item):
 
 
 def _validate_name(item):
-  builtin_procedures_utils.set_item_export_name(
+  builtin_actions_utils.set_item_export_name(
     item,
-    validators_.FilenameValidator.validate(builtin_procedures_utils.get_item_export_name(item)))
+    validators_.FilenameValidator.validate(builtin_actions_utils.get_item_export_name(item)))
 
 
 def _uniquify_name(item_uniquifier, item, position=None):
-  item_name = builtin_procedures_utils.get_item_export_name(item)
+  item_name = builtin_actions_utils.get_item_export_name(item)
 
   uniquified_item_name = item_uniquifier.uniquify(item, item_name=item_name, position=position)
 
-  builtin_procedures_utils.set_item_export_name(item, uniquified_item_name)
+  builtin_actions_utils.set_item_export_name(item, uniquified_item_name)
 
 
 def _get_unique_substring_position(str_, file_extension):
@@ -387,8 +387,8 @@ def _export_item(
       overwrite_chooser,
       use_original_modification_date,
 ):
-  output_filepath = builtin_procedures_utils.get_item_filepath(item, output_directory)
-  file_extension = fileext.get_file_extension(builtin_procedures_utils.get_item_export_name(item))
+  output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory)
+  file_extension = fileext.get_file_extension(builtin_actions_utils.get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
   try:
@@ -399,7 +399,7 @@ def _export_item(
   except OSError as e:
     raise exceptions.ExportError(
       str(e),
-      builtin_procedures_utils.get_item_export_name(item),
+      builtin_actions_utils.get_item_export_name(item),
       file_extension,
     )
 
@@ -457,7 +457,7 @@ def _make_dirs(item, dirpath, default_file_extension):
       message = str(e)
 
     raise exceptions.InvalidOutputDirectoryError(
-      message, builtin_procedures_utils.get_item_export_name(item), default_file_extension)
+      message, builtin_actions_utils.get_item_export_name(item), default_file_extension)
 
 
 def _export_item_once_wrapper(
@@ -518,7 +518,7 @@ def _export_item_once(
 ):
   def _raise_export_error(exception):
     raise exceptions.ExportError(
-      str(exception), builtin_procedures_utils.get_item_export_name(item), default_file_extension)
+      str(exception), builtin_actions_utils.get_item_export_name(item), default_file_extension)
 
   try:
     _export_image(

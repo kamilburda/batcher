@@ -1,30 +1,30 @@
 """Built-in procedures."""
 
-from src.builtin_procedures import _align_and_offset
-from src.builtin_procedures._align_and_offset import *
-from src.builtin_procedures import _color_correction
-from src.builtin_procedures._color_correction import *
-from src.builtin_procedures import _crop
-from src.builtin_procedures._crop import *
-from src.builtin_procedures import _export
-from src.builtin_procedures._export import *
-from src.builtin_procedures import _insert_background_foreground
-from src.builtin_procedures._insert_background_foreground import *
-from src.builtin_procedures import _misc
-from src.builtin_procedures._misc import *
-from src.builtin_procedures import _remove_folder_structure
-from src.builtin_procedures._remove_folder_structure import *
-from src.builtin_procedures import _rename
-from src.builtin_procedures._rename import *
-from src.builtin_procedures import _resize_canvas
-from src.builtin_procedures._resize_canvas import *
-from src.builtin_procedures import _rotate_and_flip
-from src.builtin_procedures._rotate_and_flip import *
-from src.builtin_procedures import _save
-from src.builtin_procedures._save import *
-from src.builtin_procedures import _scale
-from src.builtin_procedures._scale import *
-from src.builtin_procedures._utils import *
+from src.builtin_actions import _align_and_offset
+from src.builtin_actions._align_and_offset import *
+from src.builtin_actions import _color_correction
+from src.builtin_actions._color_correction import *
+from src.builtin_actions import _crop
+from src.builtin_actions._crop import *
+from src.builtin_actions import _export
+from src.builtin_actions._export import *
+from src.builtin_actions import _insert_background_foreground
+from src.builtin_actions._insert_background_foreground import *
+from src.builtin_actions import _misc
+from src.builtin_actions._misc import *
+from src.builtin_actions import _remove_folder_structure
+from src.builtin_actions._remove_folder_structure import *
+from src.builtin_actions import _rename
+from src.builtin_actions._rename import *
+from src.builtin_actions import _resize_canvas
+from src.builtin_actions._resize_canvas import *
+from src.builtin_actions import _rotate_and_flip
+from src.builtin_actions._rotate_and_flip import *
+from src.builtin_actions import _save
+from src.builtin_actions._save import *
+from src.builtin_actions import _scale
+from src.builtin_actions._scale import *
+from src.builtin_actions._utils import *
 
 
 _BUILTIN_ACTIONS_LIST = [

@@ -10,7 +10,7 @@ from pygimplib import pdb
 from src import utils
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -64,13 +64,13 @@ def crop(
       crop_from_edges_left = crop_from_edges_amount
       crop_from_edges_right = crop_from_edges_amount
 
-    crop_from_edges_top_pixels = builtin_procedures_utils.unit_to_pixels(
+    crop_from_edges_top_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, crop_from_edges_top, 'y')
-    crop_from_edges_bottom_pixels = builtin_procedures_utils.unit_to_pixels(
+    crop_from_edges_bottom_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, crop_from_edges_bottom, 'y')
-    crop_from_edges_left_pixels = builtin_procedures_utils.unit_to_pixels(
+    crop_from_edges_left_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, crop_from_edges_left, 'x')
-    crop_from_edges_right_pixels = builtin_procedures_utils.unit_to_pixels(
+    crop_from_edges_right_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, crop_from_edges_right, 'x')
 
     object_to_crop_width = object_to_crop.get_width()
@@ -133,10 +133,10 @@ def crop(
     object_to_crop_width = object_to_crop.get_width()
     object_to_crop_height = object_to_crop.get_height()
 
-    x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_x, 'x')
-    y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
-    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
-    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
+    x_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_x, 'x')
+    y_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
+    width_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
+    height_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
 
     width_pixels = _clamp_value(width_pixels, False, object_to_crop_width)
     height_pixels = _clamp_value(height_pixels, False, object_to_crop_height)
@@ -166,49 +166,49 @@ def _get_crop_from_position_area_pixels(
       width,
       height,
 ):
-  width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, width, 'x')
-  height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, height, 'y')
+  width_pixels = builtin_actions_utils.unit_to_pixels(batcher, width, 'x')
+  height_pixels = builtin_actions_utils.unit_to_pixels(batcher, height, 'y')
 
   position = [0, 0]
 
-  if crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_LEFT:
+  if crop_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP_LEFT:
     position = [0, 0]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP:
     position = [
       round((object_to_crop_width - width_pixels) / 2),
       0,
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_RIGHT:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP_RIGHT:
     position = [
       object_to_crop_width - width_pixels,
       0,
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.LEFT:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.LEFT:
     position = [
       0,
       round((object_to_crop_height - height_pixels) / 2),
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.CENTER:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.CENTER:
     position = [
       round((object_to_crop_width - width_pixels) / 2),
       round((object_to_crop_height - height_pixels) / 2),
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.RIGHT:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.RIGHT:
     position = [
       object_to_crop_width - width_pixels,
       round((object_to_crop_height - height_pixels) / 2),
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM_LEFT:
     position = [
       0,
       object_to_crop_height - height_pixels,
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM:
     position = [
       round((object_to_crop_width - width_pixels) / 2),
       object_to_crop_height - height_pixels,
     ]
-  elif crop_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT:
+  elif crop_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT:
     position = [
       object_to_crop_width - width_pixels,
       object_to_crop_height - height_pixels,
@@ -236,14 +236,14 @@ def _get_crop_to_aspect_ratio_pixels(
     x_pixels = 0
 
     y_pixels = 0
-    if crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+    if crop_to_aspect_ratio_position == builtin_actions_utils.Positions.START:
       y_pixels = 0
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.CENTER:
       y_pixels = round((object_to_crop_height - height_pixels) / 2)
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.END:
       y_pixels = object_to_crop_height - height_pixels
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      y_pixels = builtin_procedures_utils.unit_to_pixels(
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.CUSTOM:
+      y_pixels = builtin_actions_utils.unit_to_pixels(
         batcher, crop_to_aspect_ratio_position_custom, 'y')
   else:
     height_unit_length = object_to_crop_height / ratio_height
@@ -252,14 +252,14 @@ def _get_crop_to_aspect_ratio_pixels(
     y_pixels = 0
 
     x_pixels = 0
-    if crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+    if crop_to_aspect_ratio_position == builtin_actions_utils.Positions.START:
       x_pixels = 0
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.CENTER:
       x_pixels = round((object_to_crop_width - width_pixels) / 2)
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.END:
       x_pixels = object_to_crop_width - width_pixels
-    elif crop_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      x_pixels = builtin_procedures_utils.unit_to_pixels(
+    elif crop_to_aspect_ratio_position == builtin_actions_utils.Positions.CUSTOM:
+      x_pixels = builtin_actions_utils.unit_to_pixels(
         batcher, crop_to_aspect_ratio_position_custom, 'x')
 
   return x_pixels, y_pixels, width_pixels, height_pixels
@@ -270,7 +270,7 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
     # An image can end up with no layers if cropping in an empty space.
     # We insert an empty layer after cropping to ensure that subsequent
     # procedures work properly.
-    matching_layer = builtin_procedures_utils.get_best_matching_layer_from_image(
+    matching_layer = builtin_actions_utils.get_best_matching_layer_from_image(
       batcher, object_to_crop)
 
     matching_layer_name = matching_layer.get_name()
@@ -377,7 +377,7 @@ def _set_visible_for_crop_to_aspect_ratio_position_custom(
 ):
   is_visible = crop_to_aspect_ratio_position_setting.gui.get_visible()
   is_selected = (
-    crop_to_aspect_ratio_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
+    crop_to_aspect_ratio_position_setting.value == builtin_actions_utils.Positions.CUSTOM)
 
   crop_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
@@ -535,17 +535,17 @@ CROP_FOR_IMAGES_DICT = {
     {
       'type': 'anchor',
       'name': 'crop_from_position_anchor',
-      'default_value': builtin_procedures_utils.AnchorPoints.CENTER,
+      'default_value': builtin_actions_utils.AnchorPoints.CENTER,
       'items': [
-        (builtin_procedures_utils.AnchorPoints.TOP_LEFT, _('Top left')),
-        (builtin_procedures_utils.AnchorPoints.TOP, _('Top')),
-        (builtin_procedures_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
-        (builtin_procedures_utils.AnchorPoints.LEFT, _('Left')),
-        (builtin_procedures_utils.AnchorPoints.CENTER, _('Center')),
-        (builtin_procedures_utils.AnchorPoints.RIGHT, _('Right')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM, _('Bottom')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
+        (builtin_actions_utils.AnchorPoints.TOP_LEFT, _('Top left')),
+        (builtin_actions_utils.AnchorPoints.TOP, _('Top')),
+        (builtin_actions_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
+        (builtin_actions_utils.AnchorPoints.LEFT, _('Left')),
+        (builtin_actions_utils.AnchorPoints.CENTER, _('Center')),
+        (builtin_actions_utils.AnchorPoints.RIGHT, _('Right')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM, _('Bottom')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
       ],
       'display_name': _('Position'),
     },
@@ -601,12 +601,12 @@ CROP_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'crop_to_aspect_ratio_position',
-      'default_value': builtin_procedures_utils.Positions.CENTER,
+      'default_value': builtin_actions_utils.Positions.CENTER,
       'items': [
-        (builtin_procedures_utils.Positions.START, _('Start')),
-        (builtin_procedures_utils.Positions.CENTER, _('Center')),
-        (builtin_procedures_utils.Positions.END, _('End')),
-        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
+        (builtin_actions_utils.Positions.START, _('Start')),
+        (builtin_actions_utils.Positions.CENTER, _('Center')),
+        (builtin_actions_utils.Positions.END, _('End')),
+        (builtin_actions_utils.Positions.CUSTOM, _('Custom')),
       ],
       'display_name': _('Position'),
     },

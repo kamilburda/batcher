@@ -8,7 +8,7 @@ from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from src import builtin_procedures
+from src import builtin_actions
 from src import exceptions
 from src import overwrite
 from src import utils as utils_
@@ -189,7 +189,7 @@ class BatcherManagerQuick:
 
 def _get_interactive_overwrite_chooser(parent_widget):
   return overwrite_chooser_.GtkDialogOverwriteChooser(
-    builtin_procedures.INTERACTIVE_OVERWRITE_MODES,
+    builtin_actions.INTERACTIVE_OVERWRITE_MODES,
     default_value=overwrite.OverwriteModes.RENAME_NEW,
     default_response=overwrite.OverwriteModes.CANCEL,
     parent=parent_widget)

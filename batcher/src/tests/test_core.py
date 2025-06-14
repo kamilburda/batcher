@@ -11,7 +11,7 @@ from pygimplib.tests import stubs_gimp
 
 from src import commands as commands_
 from src import core
-from src import builtin_procedures
+from src import builtin_actions
 from src import invoker as invoker_
 from src import plugin_settings
 from src import utils as utils_
@@ -32,7 +32,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     
     commands_.add(
       settings['main/procedures'],
-      builtin_procedures.BUILTIN_ACTIONS['insert_background_for_layers'])
+      builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
     batcher.add_procedure(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
     
@@ -97,7 +97,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
   
   def test_add_command_from_settings(self, mock_get_pdb):
     procedure = commands_.add(
-      self.procedures, builtin_procedures.BUILTIN_ACTIONS['insert_background_for_layers'])
+      self.procedures, builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
     self.batcher._add_command_from_settings(procedure)
     
@@ -107,7 +107,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     self.assertEqual(
       added_command_items[0][1],
       list(procedure['arguments'])
-      + [builtin_procedures.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers']])
+      + [builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers']])
     self.assertEqual(added_command_items[0][2], {})
   
   def test_add_pdb_proc_as_command_without_run_mode(self, mock_get_pdb):

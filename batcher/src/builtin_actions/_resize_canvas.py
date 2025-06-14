@@ -7,7 +7,7 @@ from gi.repository import Gimp
 
 from src.procedure_groups import *
 
-from . import _utils as builtin_procedures_utils
+from . import _utils as builtin_actions_utils
 
 
 __all__ = [
@@ -67,13 +67,13 @@ def resize_canvas(
       resize_from_edges_left = resize_from_edges_amount
       resize_from_edges_right = resize_from_edges_amount
 
-    resize_from_edges_top_pixels = builtin_procedures_utils.unit_to_pixels(
+    resize_from_edges_top_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, resize_from_edges_top, 'y')
-    resize_from_edges_bottom_pixels = builtin_procedures_utils.unit_to_pixels(
+    resize_from_edges_bottom_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, resize_from_edges_bottom, 'y')
-    resize_from_edges_left_pixels = builtin_procedures_utils.unit_to_pixels(
+    resize_from_edges_left_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, resize_from_edges_left, 'x')
-    resize_from_edges_right_pixels = builtin_procedures_utils.unit_to_pixels(
+    resize_from_edges_right_pixels = builtin_actions_utils.unit_to_pixels(
       batcher, resize_from_edges_right, 'x')
 
     object_to_resize_width = object_to_resize.get_width()
@@ -154,10 +154,10 @@ def resize_canvas(
       fill_color,
     )
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
-    offset_x_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
-    offset_y_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
-    width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_width, 'x')
-    height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, resize_to_area_height, 'y')
+    offset_x_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
+    offset_y_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
+    width_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_width, 'x')
+    height_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_height, 'y')
 
     width_pixels = _clamp_value(width_pixels, min_value=1)
     height_pixels = _clamp_value(height_pixels, min_value=1)
@@ -240,49 +240,49 @@ def _get_resize_from_position_area_pixels(
       width,
       height,
 ):
-  width_pixels = builtin_procedures_utils.unit_to_pixels(batcher, width, 'x')
-  height_pixels = builtin_procedures_utils.unit_to_pixels(batcher, height, 'y')
+  width_pixels = builtin_actions_utils.unit_to_pixels(batcher, width, 'x')
+  height_pixels = builtin_actions_utils.unit_to_pixels(batcher, height, 'y')
 
   position = [0, 0]
 
-  if resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_LEFT:
+  if resize_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP_LEFT:
     position = [0, 0]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP:
     position = [
       round((width_pixels - object_to_resize_width) / 2),
       0,
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.TOP_RIGHT:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.TOP_RIGHT:
     position = [
       width_pixels - object_to_resize_width,
       0,
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.LEFT:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.LEFT:
     position = [
       0,
       round((height_pixels - object_to_resize_height) / 2),
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.CENTER:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.CENTER:
     position = [
       round((width_pixels - object_to_resize_width) / 2),
       round((height_pixels - object_to_resize_height) / 2),
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.RIGHT:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.RIGHT:
     position = [
       width_pixels - object_to_resize_width,
       round((height_pixels - object_to_resize_height) / 2),
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM_LEFT:
     position = [
       0,
       height_pixels - object_to_resize_height,
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM:
     position = [
       round((width_pixels - object_to_resize_width) / 2),
       height_pixels - object_to_resize_height,
     ]
-  elif resize_from_position_anchor == builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT:
+  elif resize_from_position_anchor == builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT:
     position = [
       width_pixels - object_to_resize_width,
       height_pixels - object_to_resize_height,
@@ -310,14 +310,14 @@ def _get_resize_to_aspect_ratio_pixels(
     offset_x_pixels = 0
 
     offset_y_pixels = 0
-    if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+    if resize_to_aspect_ratio_position == builtin_actions_utils.Positions.START:
       offset_y_pixels = 0
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.CENTER:
       offset_y_pixels = round((height_pixels - object_to_resize_height) / 2)
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.END:
       offset_y_pixels = height_pixels - object_to_resize_height
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      offset_y_pixels = builtin_procedures_utils.unit_to_pixels(
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.CUSTOM:
+      offset_y_pixels = builtin_actions_utils.unit_to_pixels(
         batcher, resize_to_aspect_ratio_position_custom, 'y')
   else:
     height_unit_length = object_to_resize_height / ratio_height
@@ -326,14 +326,14 @@ def _get_resize_to_aspect_ratio_pixels(
     offset_y_pixels = 0
 
     offset_x_pixels = 0
-    if resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.START:
+    if resize_to_aspect_ratio_position == builtin_actions_utils.Positions.START:
       offset_x_pixels = 0
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CENTER:
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.CENTER:
       offset_x_pixels = round((width_pixels - object_to_resize_width) / 2)
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.END:
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.END:
       offset_x_pixels = width_pixels - object_to_resize_width
-    elif resize_to_aspect_ratio_position == builtin_procedures_utils.Positions.CUSTOM:
-      offset_x_pixels = builtin_procedures_utils.unit_to_pixels(
+    elif resize_to_aspect_ratio_position == builtin_actions_utils.Positions.CUSTOM:
+      offset_x_pixels = builtin_actions_utils.unit_to_pixels(
         batcher, resize_to_aspect_ratio_position_custom, 'x')
 
   return offset_x_pixels, offset_y_pixels, width_pixels, height_pixels
@@ -392,14 +392,14 @@ def _fill_with_color(
     color_layer_offset_y = color_layer_offsets.offset_y
 
   if isinstance(object_to_resize, Gimp.Image):
-    drawable_to_fill = builtin_procedures_utils.get_best_matching_layer_from_image(
+    drawable_to_fill = builtin_actions_utils.get_best_matching_layer_from_image(
       batcher, object_to_resize)
     image_of_drawable_to_fill = object_to_resize
   else:
     drawable_to_fill = object_to_resize
     image_of_drawable_to_fill = object_to_resize.get_image()
 
-  builtin_procedures_utils.add_color_layer(
+  builtin_actions_utils.add_color_layer(
     fill_color,
     image_of_drawable_to_fill,
     drawable_to_fill,
@@ -495,7 +495,7 @@ def _set_visible_for_resize_to_aspect_ratio_position_custom(
 ):
   is_visible = resize_to_aspect_ratio_position_setting.gui.get_visible()
   is_selected = (
-    resize_to_aspect_ratio_position_setting.value == builtin_procedures_utils.Positions.CUSTOM)
+    resize_to_aspect_ratio_position_setting.value == builtin_actions_utils.Positions.CUSTOM)
 
   resize_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
@@ -677,17 +677,17 @@ RESIZE_CANVAS_DICT = {
     {
       'type': 'anchor',
       'name': 'resize_from_position_anchor',
-      'default_value': builtin_procedures_utils.AnchorPoints.CENTER,
+      'default_value': builtin_actions_utils.AnchorPoints.CENTER,
       'items': [
-        (builtin_procedures_utils.AnchorPoints.TOP_LEFT, _('Top left')),
-        (builtin_procedures_utils.AnchorPoints.TOP, _('Top')),
-        (builtin_procedures_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
-        (builtin_procedures_utils.AnchorPoints.LEFT, _('Left')),
-        (builtin_procedures_utils.AnchorPoints.CENTER, _('Center')),
-        (builtin_procedures_utils.AnchorPoints.RIGHT, _('Right')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM, _('Bottom')),
-        (builtin_procedures_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
+        (builtin_actions_utils.AnchorPoints.TOP_LEFT, _('Top left')),
+        (builtin_actions_utils.AnchorPoints.TOP, _('Top')),
+        (builtin_actions_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
+        (builtin_actions_utils.AnchorPoints.LEFT, _('Left')),
+        (builtin_actions_utils.AnchorPoints.CENTER, _('Center')),
+        (builtin_actions_utils.AnchorPoints.RIGHT, _('Right')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM, _('Bottom')),
+        (builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
       ],
       'display_name': _('Position'),
     },
@@ -743,12 +743,12 @@ RESIZE_CANVAS_DICT = {
     {
       'type': 'choice',
       'name': 'resize_to_aspect_ratio_position',
-      'default_value': builtin_procedures_utils.Positions.CENTER,
+      'default_value': builtin_actions_utils.Positions.CENTER,
       'items': [
-        (builtin_procedures_utils.Positions.START, _('Start')),
-        (builtin_procedures_utils.Positions.CENTER, _('Center')),
-        (builtin_procedures_utils.Positions.END, _('End')),
-        (builtin_procedures_utils.Positions.CUSTOM, _('Custom')),
+        (builtin_actions_utils.Positions.START, _('Start')),
+        (builtin_actions_utils.Positions.CENTER, _('Center')),
+        (builtin_actions_utils.Positions.END, _('End')),
+        (builtin_actions_utils.Positions.CUSTOM, _('Custom')),
       ],
       'display_name': _('Position'),
     },
