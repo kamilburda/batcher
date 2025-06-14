@@ -405,7 +405,7 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
       arguments_list.append(
         {
           'type': 'string',
-          'name': 'merge_procedure_name',
+          'name': 'merge_action_name',
           'gui_type': None,
         })
       arguments_list.append(
@@ -2168,6 +2168,7 @@ def _add_new_attributes_to_output_directory(group_list):
 
 
 def _insert_1_1_rename_arguments(arguments_list):
+  _rename_setting(arguments_list, 'merge_procedure_name', 'merge_action_name')
   _rename_setting(arguments_list, 'constraint_name', 'condition_name')
 
 

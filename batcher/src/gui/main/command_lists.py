@@ -322,7 +322,7 @@ def _handle_insert_background_foreground_action_item_added(
       item, merge_item, condition_item, action_list, condition_list)
 
   if merge_item is not None:
-    item.command['arguments/merge_procedure_name'].set_value(merge_item.command.name)
+    item.command['arguments/merge_action_name'].set_value(merge_item.command.name)
   if condition_item is not None:
     item.command['arguments/condition_name'].set_value(condition_item.command.name)
 
@@ -335,8 +335,8 @@ def _set_up_existing_insert_back_foreground_and_related_commands(
     if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
          'insert_background_for_', 'insert_foreground_for_']):
       merge_action_name = (
-        item.command['arguments/merge_procedure_name'].value
-        if 'merge_procedure_name' in item.command['arguments'] else None)
+        item.command['arguments/merge_action_name'].value
+        if 'merge_action_name' in item.command['arguments'] else None)
       if merge_action_name is not None and merge_action_name in action_list.commands:
         merge_item = next(
           iter(
@@ -365,8 +365,8 @@ def _set_up_existing_insert_back_foreground_and_related_commands(
 
 
 def _hide_internal_arguments_for_insert_background_foreground_action(item):
-  if 'merge_procedure_name' in item.command['arguments']:
-    item.command['arguments/merge_procedure_name'].gui.set_visible(False)
+  if 'merge_action_name' in item.command['arguments']:
+    item.command['arguments/merge_action_name'].gui.set_visible(False)
   if 'condition_name' in item.command['arguments']:
     item.command['arguments/condition_name'].gui.set_visible(False)
 

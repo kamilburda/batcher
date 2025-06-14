@@ -229,7 +229,7 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
     },
     {
       'type': 'string',
-      'name': 'merge_procedure_name',
+      'name': 'merge_action_name',
       'default_value': '',
       'gui_type': None,
     },
@@ -262,7 +262,7 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
     },
     {
       'type': 'string',
-      'name': 'merge_procedure_name',
+      'name': 'merge_action_name',
       'default_value': '',
       'gui_type': None,
     },
@@ -294,7 +294,7 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
     },
     {
       'type': 'string',
-      'name': 'merge_procedure_name',
+      'name': 'merge_action_name',
       'default_value': '',
       'gui_type': None,
     },
@@ -327,7 +327,7 @@ INSERT_FOREGROUND_FOR_LAYERS_DICT = {
     },
     {
       'type': 'string',
-      'name': 'merge_procedure_name',
+      'name': 'merge_action_name',
       'default_value': '',
       'gui_type': None,
     },

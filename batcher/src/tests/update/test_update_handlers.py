@@ -141,7 +141,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('insert_background', settings['main/procedures'])
     self.assertIn('color_tag', settings['main/procedures/insert_background/arguments'])
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/merge_procedure_name'].value,
+      settings['main/procedures/insert_background/arguments/merge_action_name'].value,
       'merge_background')
     self.assertEqual(
       settings['main/procedures/insert_background/arguments/condition_name'].value,
@@ -164,7 +164,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('insert_background_2', settings['main/procedures'])
     self.assertIn('color_tag', settings['main/procedures/insert_background_2/arguments'])
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/merge_procedure_name'].value,
+      settings['main/procedures/insert_background_2/arguments/merge_action_name'].value,
       'merge_background_2')
     self.assertEqual(
       settings['main/procedures/insert_background_2/arguments/condition_name'].value,
