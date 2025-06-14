@@ -250,7 +250,7 @@ Options:
 
 You can add any GIMP plug-in, layer effect (filter, GEGL operation) or GIMP procedure by pressing `Add Action...` and then selecting `Add Custom Action...`. Both built-in and any third-party plug-ins and layer effects are supported.
 
-![Action browser dialog](../../assets/images/screenshot_procedure_browser_dialog.png){: .align-center}
+![Action browser dialog](../../assets/images/screenshot_action_browser_dialog.png){: .align-center}
 
 You can preview how the selected procedure affects the resulting image (by pressing `Preview`) and adjust procedure options.
 

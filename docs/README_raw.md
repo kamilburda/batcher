@@ -43,7 +43,7 @@ Thank you for your contribution. 😊
 
 ![](docs/images/screenshot_menu_export_selected_layers.png)
 
-![](docs/images/screenshot_procedure_browser_dialog.png)
+![](docs/images/screenshot_action_browser_dialog.png)
 
 
 ## License

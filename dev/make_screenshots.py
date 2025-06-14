@@ -50,7 +50,7 @@ SCREENSHOT_DIALOG_EDIT_AND_SAVE_IMAGES_FILENAME = 'screenshot_dialog_edit_and_sa
 SCREENSHOT_DIALOG_EXPORT_LAYERS_FILENAME = 'screenshot_dialog_export_layers.png'
 SCREENSHOT_DIALOG_EXPORT_LAYERS_QUICK_FILENAME = 'screenshot_dialog_export_layers_quick.png'
 SCREENSHOT_DIALOG_EDIT_LAYERS_FILENAME = 'screenshot_dialog_edit_layers.png'
-SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_procedure_browser_dialog.png'
+SCREENSHOT_DIALOG_BROWSER_DIALOG_FILENAME = 'screenshot_action_browser_dialog.png'
 
 _WAIT_TIME_FOR_PREVIEW_SECONDS = 0.2
 
