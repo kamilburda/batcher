@@ -589,13 +589,13 @@ def get_failing_command_message(
   else:
     command, item = command_and_item_or_command_error
   
-  if 'procedure' not in command.tags and 'condition' not in command.tags:
+  if 'action' not in command.tags and 'condition' not in command.tags:
     raise ValueError('a command must have the "procedure" or "condition" tag')
 
   message_template = None
 
   if item is not None:
-    if 'procedure' in command.tags:
+    if 'action' in command.tags:
       message_template = _('Failed to apply procedure "{}" on "{}" because:')
     elif 'condition' in command.tags:
       message_template = _('Failed to apply condition "{}" on "{}" because:')
@@ -603,7 +603,7 @@ def get_failing_command_message(
     if message_template is not None:
       return message_template.format(command['display_name'].value, item.orig_name)
   else:
-    if 'procedure' in command.tags:
+    if 'action' in command.tags:
       message_template = _('Failed to apply procedure "{}" because:')
     elif 'condition' in command.tags:
       message_template = _('Failed to apply condition "{}" because:')

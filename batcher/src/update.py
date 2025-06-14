@@ -1422,6 +1422,7 @@ def _update_to_1_1(data, _settings, _procedure_groups):
 def _rename_command_attributes_1_1(command_dict):
   if 'tags' in command_dict:
     _replace_item_in_list(command_dict, 'tags', 'action', 'command')
+    _replace_item_in_list(command_dict, 'tags', 'procedure', 'action')
     _replace_item_in_list(command_dict, 'tags', 'constraint', 'condition')
 
   command_groups_setting_dict, _index = _get_child_setting(command_dict['settings'], 'action_groups')

@@ -645,7 +645,7 @@ class Batcher(metaclass=abc.ABCMeta):
     'command_groups']``.
     """
     if command['origin'].value == 'builtin':
-      if 'procedure' in command.tags:
+      if 'action' in command.tags:
         function = builtin_actions.BUILTIN_ACTIONS_FUNCTIONS[
           command['orig_name'].value]
       elif 'condition' in command.tags:
@@ -664,7 +664,7 @@ class Batcher(metaclass=abc.ABCMeta):
         if command['enabled'].value:
           message = f'PDB procedure "{command["function"].value}" not found'
 
-          if 'procedure' in command.tags:
+          if 'action' in command.tags:
             self._failed_actions[command.name].append((None, message, None))
           if 'condition' in command.tags:
             self._failed_conditions[command.name].append((None, message, None))
@@ -727,7 +727,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return True
 
   def _set_current_action_and_condition(self, command):
-    if 'procedure' in command.tags:
+    if 'action' in command.tags:
       self._current_action = command
 
     if 'condition' in command.tags:
@@ -826,13 +826,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return _handle_exceptions
 
   def _set_skipped_commands(self, command, error_message):
-    if 'procedure' in command.tags:
+    if 'action' in command.tags:
       self._skipped_actions[command.name].append((self._current_item, error_message))
     if 'condition' in command.tags:
       self._skipped_conditions[command.name].append((self._current_item, error_message))
 
   def _set_failed_commands(self, command, error_message, trace=None):
-    if 'procedure' in command.tags:
+    if 'action' in command.tags:
       self._failed_actions[command.name].append((self._current_item, error_message, trace))
     if 'condition' in command.tags:
       self._failed_conditions[command.name].append((self._current_item, error_message, trace))

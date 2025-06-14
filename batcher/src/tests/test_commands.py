@@ -87,14 +87,14 @@ class TestCreateCommands(unittest.TestCase):
      'actions',
      test_actions,
      'autocrop_background',
-     ['command', 'procedure'],
+     ['command', 'action'],
      {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
     ('procedure_with_custom_group',
      'actions',
      test_actions,
      'autocrop',
-     ['command', 'procedure'],
+     ['command', 'action'],
      {'command_groups': ['basic']}),
     
     ('condition',

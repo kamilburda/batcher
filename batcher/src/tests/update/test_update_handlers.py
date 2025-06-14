@@ -358,7 +358,11 @@ class TestUpdateHandlers(unittest.TestCase):
     for command in settings['main/procedures']:
       self.assertNotIn('action_groups', command)
       self.assertIn('command_groups', command)
+
       self.assertIn('command', command.tags)
+      self.assertNotIn('procedure', command.tags)
+      self.assertIn('action', command.tags)
+      self.assertNotIn('condition', command.tags)
 
       self.assertNotIn('default_procedures', command['command_groups'].default_value)
       self.assertIn('default_actions', command['command_groups'].default_value)

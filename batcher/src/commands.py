@@ -494,7 +494,7 @@ def _create_action(
       command_groups=(DEFAULT_ACTIONS_GROUP,),
       **kwargs,
 ):
-  tags = ['command', 'procedure']
+  tags = ['command', 'action']
   if additional_tags is not None:
     tags += additional_tags
   
