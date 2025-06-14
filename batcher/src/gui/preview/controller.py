@@ -109,7 +109,7 @@ class PreviewsController:
       self._name_preview.update)
 
   def connect_setting_changes_to_previews(self):
-    self._connect_commands_changed(self._settings['main/procedures'])
+    self._connect_commands_changed(self._settings['main/actions'])
     self._connect_commands_changed(self._settings['main/conditions'])
 
     self._connect_setting_show_original_item_names_changed_in_name_preview()

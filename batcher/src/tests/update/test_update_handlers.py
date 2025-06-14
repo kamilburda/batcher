@@ -114,7 +114,7 @@ class TestUpdateHandlers(unittest.TestCase):
     }
 
   def _assert_correct_contents_for_update_to_0_3(self, settings, orig_setting_values_for_0_2):
-    for command in settings['main/procedures']:
+    for command in settings['main/actions']:
       self.assertIn('more_options', command)
       self.assertIn('enabled_for_previews', command['more_options'])
       self.assertNotIn('enabled_for_previews', command)
@@ -138,21 +138,21 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIsInstance(
       settings['main/name_pattern'], setting_classes.NamePatternSetting)
 
-    self.assertIn('insert_background', settings['main/procedures'])
-    self.assertIn('color_tag', settings['main/procedures/insert_background/arguments'])
+    self.assertIn('insert_background', settings['main/actions'])
+    self.assertIn('color_tag', settings['main/actions/insert_background/arguments'])
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/merge_action_name'].value,
+      settings['main/actions/insert_background/arguments/merge_action_name'].value,
       'merge_background')
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/condition_name'].value,
+      settings['main/actions/insert_background/arguments/condition_name'].value,
       'not_background')
-    self.assertIn('merge_background', settings['main/procedures'])
+    self.assertIn('merge_background', settings['main/actions'])
     self.assertEqual(
-      settings['main/procedures/merge_background/display_name'].value,
+      settings['main/actions/merge_background/display_name'].value,
       'Merge background')
-    self.assertIn('merge_type', settings['main/procedures/merge_background/arguments'])
+    self.assertIn('merge_type', settings['main/actions/merge_background/arguments'])
     self.assertTrue(
-      settings['main/procedures/merge_background/arguments/last_enabled_value'].value)
+      settings['main/actions/merge_background/arguments/last_enabled_value'].value)
     self.assertIn('not_background', settings['main/conditions'])
     self.assertEqual(
       settings['main/conditions/not_background/display_name'].value,
@@ -161,21 +161,21 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertTrue(
       settings['main/conditions/not_background/arguments/last_enabled_value'].value)
 
-    self.assertIn('insert_background_2', settings['main/procedures'])
-    self.assertIn('color_tag', settings['main/procedures/insert_background_2/arguments'])
+    self.assertIn('insert_background_2', settings['main/actions'])
+    self.assertIn('color_tag', settings['main/actions/insert_background_2/arguments'])
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/merge_action_name'].value,
+      settings['main/actions/insert_background_2/arguments/merge_action_name'].value,
       'merge_background_2')
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/condition_name'].value,
+      settings['main/actions/insert_background_2/arguments/condition_name'].value,
       'not_background_2')
-    self.assertIn('merge_background_2', settings['main/procedures'])
+    self.assertIn('merge_background_2', settings['main/actions'])
     self.assertEqual(
-      settings['main/procedures/merge_background_2/display_name'].value,
+      settings['main/actions/merge_background_2/display_name'].value,
       'Merge background (2)')
-    self.assertIn('merge_type', settings['main/procedures/merge_background_2/arguments'])
+    self.assertIn('merge_type', settings['main/actions/merge_background_2/arguments'])
     self.assertTrue(
-      settings['main/procedures/merge_background_2/arguments/last_enabled_value'].value)
+      settings['main/actions/merge_background_2/arguments/last_enabled_value'].value)
     self.assertIn('not_background_2', settings['main/conditions'])
     self.assertEqual(
       settings['main/conditions/not_background/display_name'].value,
@@ -184,25 +184,25 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertTrue(
       settings['main/conditions/not_background_2/arguments/last_enabled_value'].value)
 
-    self.assertIn('export', settings['main/procedures'])
+    self.assertIn('export', settings['main/actions'])
     self.assertNotIn(
-      'single_image_filename_pattern', settings['main/procedures/export/arguments'])
-    self.assertIn('single_image_name_pattern', settings['main/procedures/export/arguments'])
+      'single_image_filename_pattern', settings['main/actions/export/arguments'])
+    self.assertIn('single_image_name_pattern', settings['main/actions/export/arguments'])
     self.assertIsInstance(
-      settings['main/procedures/export/arguments/single_image_name_pattern'],
+      settings['main/actions/export/arguments/single_image_name_pattern'],
       setting_classes.NamePatternSetting,
     )
     self.assertEqual(
-      settings['main/procedures/export/arguments/single_image_name_pattern'].gui_type,
+      settings['main/actions/export/arguments/single_image_name_pattern'].gui_type,
       setting_classes.NamePatternEntryPresenter,
     )
 
     self.assertIsInstance(
-      settings['main/procedures/rename/arguments/pattern'],
+      settings['main/actions/rename/arguments/pattern'],
       setting_classes.NamePatternSetting,
     )
     self.assertEqual(
-      settings['main/procedures/rename/arguments/pattern'].gui_type,
+      settings['main/actions/rename/arguments/pattern'].gui_type,
       setting_classes.NamePatternEntryPresenter,
     )
 
@@ -212,50 +212,50 @@ class TestUpdateHandlers(unittest.TestCase):
       pg.setting.NullPresenter,
     )
 
-    self.assertIn('export', settings['main/procedures'])
+    self.assertIn('export', settings['main/actions'])
     self.assertEqual(
-      settings['main/procedures/export/orig_name'].value, 'export_for_export_layers')
+      settings['main/actions/export/orig_name'].value, 'export_for_export_layers')
 
     self.assertNotIn(
-      'preserve_layer_name_after_export', settings['main/procedures/export/arguments'])
-    self.assertIn('overwrite_mode', settings['main/procedures/export/arguments'])
+      'preserve_layer_name_after_export', settings['main/actions/export/arguments'])
+    self.assertIn('overwrite_mode', settings['main/actions/export/arguments'])
     # This checks whether `overwrite_mode` is the third argument.
     self.assertEqual(
-      list(settings['main/procedures/export/arguments']),
+      list(settings['main/actions/export/arguments']),
       [
-        settings['main/procedures/export/arguments/output_directory'],
-        settings['main/procedures/export/arguments/file_extension'],
-        settings['main/procedures/export/arguments/file_format_mode'],
-        settings['main/procedures/export/arguments/file_format_export_options'],
-        settings['main/procedures/export/arguments/overwrite_mode'],
-        settings['main/procedures/export/arguments/export_mode'],
-        settings['main/procedures/export/arguments/single_image_name_pattern'],
-        settings['main/procedures/export/arguments/use_file_extension_in_item_name'],
-        settings['main/procedures/export/arguments/convert_file_extension_to_lowercase'],
+        settings['main/actions/export/arguments/output_directory'],
+        settings['main/actions/export/arguments/file_extension'],
+        settings['main/actions/export/arguments/file_format_mode'],
+        settings['main/actions/export/arguments/file_format_export_options'],
+        settings['main/actions/export/arguments/overwrite_mode'],
+        settings['main/actions/export/arguments/export_mode'],
+        settings['main/actions/export/arguments/single_image_name_pattern'],
+        settings['main/actions/export/arguments/use_file_extension_in_item_name'],
+        settings['main/actions/export/arguments/convert_file_extension_to_lowercase'],
       ])
 
     self.assertIsInstance(
-      settings['main/procedures/insert_background/arguments/color_tag'],
+      settings['main/actions/insert_background/arguments/color_tag'],
       pg.setting.EnumSetting)
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/color_tag'].enum_type,
+      settings['main/actions/insert_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/color_tag'].excluded_values,
+      settings['main/actions/insert_background/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
     self.assertEqual(
-      settings['main/procedures/merge_background/arguments/merge_type'].excluded_values,
+      settings['main/actions/merge_background/arguments/merge_type'].excluded_values,
       [Gimp.MergeType.FLATTEN_IMAGE])
 
     self.assertIsInstance(
-      settings['main/procedures/insert_background_2/arguments/color_tag'],
+      settings['main/actions/insert_background_2/arguments/color_tag'],
       pg.setting.EnumSetting)
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/color_tag'].enum_type,
+      settings['main/actions/insert_background_2/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/color_tag'].excluded_values,
+      settings['main/actions/insert_background_2/arguments/color_tag'].excluded_values,
       [Gimp.ColorTag.NONE])
 
     self.assertIsInstance(
@@ -285,39 +285,39 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['gui/size/paned_between_previews_position'], pg.setting.IntSetting)
 
     self.assertEqual(
-      settings['main/procedures/export/arguments/file_format_mode'].value,
+      settings['main/actions/export/arguments/file_format_mode'].value,
       'use_explicit_values')
     self.assertEqual(
-      settings['main/procedures/export/arguments/overwrite_mode'].value,
+      settings['main/actions/export/arguments/overwrite_mode'].value,
       'ask')
 
-    for action in settings['main/procedures']:
+    for action in settings['main/actions']:
       if action['orig_name'].value in builtin_actions.BUILTIN_ACTIONS:
         self.assertEqual(action['origin'].value, 'builtin')
       else:
         self.assertEqual(action['origin'].value, 'gimp_pdb')
 
     self.assertEqual(
-      settings['main/procedures/insert_background/arguments/tagged_items'].value, [])
+      settings['main/actions/insert_background/arguments/tagged_items'].value, [])
 
     self.assertEqual(
-      settings['main/procedures/insert_background_2/arguments/tagged_items'].value, [])
+      settings['main/actions/insert_background_2/arguments/tagged_items'].value, [])
 
     self.assertNotIn(
       'drawable',
-      settings['main/procedures/script-fu-addborder/arguments'])
+      settings['main/actions/script-fu-addborder/arguments'])
     self.assertIsInstance(
-      settings['main/procedures/script-fu-addborder/arguments/drawables'],
+      settings['main/actions/script-fu-addborder/arguments/drawables'],
       placeholders.PlaceholderDrawableArraySetting)
 
     self.assertIsInstance(
-      settings['main/procedures/script-fu-addborder/arguments/color'],
+      settings['main/actions/script-fu-addborder/arguments/color'],
       pg.setting.ColorSetting)
     self.assertEqual(
-      settings['main/procedures/script-fu-addborder/arguments/color'].gui_type,
+      settings['main/actions/script-fu-addborder/arguments/color'].gui_type,
       pg.setting.ColorButtonPresenter)
     self.assertEqual(
-      settings['main/procedures/script-fu-addborder/arguments/color'].pdb_type.name,
+      settings['main/actions/script-fu-addborder/arguments/color'].pdb_type.name,
       'GeglColor')
 
     for condition in settings['main/conditions']:
@@ -330,14 +330,14 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(settings['main/export/export_mode'].value, 'each_item')
     self.assertEqual(settings['main/export/export_mode'].default_value, 'each_item')
 
-    self.assertNotIn('remove_folder_structure_for_export_layers', settings['main/procedures'])
-    self.assertIn('remove_folder_structure', settings['main/procedures'])
+    self.assertNotIn('remove_folder_structure_for_export_layers', settings['main/actions'])
+    self.assertIn('remove_folder_structure', settings['main/actions'])
 
     self.assertEqual(
-      settings['main/procedures/export/arguments/export_mode'].value,
+      settings['main/actions/export/arguments/export_mode'].value,
       'each_item')
     self.assertEqual(
-      settings['main/procedures/export/arguments/export_mode'].default_value,
+      settings['main/actions/export/arguments/export_mode'].default_value,
       'each_item')
 
   def _assert_correct_contents_for_update_to_1_0_rc1(self, settings):
@@ -353,9 +353,12 @@ class TestUpdateHandlers(unittest.TestCase):
       settings['main/output_directory'].action, Gimp.FileChooserAction.SELECT_FOLDER)
 
   def _assert_correct_contents_for_update_to_1_1(self, settings):
+    self.assertNotIn('procedures', settings['main'])
+    self.assertNotIn('constraints', settings['main'])
+
     self.assertEqual(settings['main/output_directory'].set_default_if_not_exists, True)
 
-    for command in settings['main/procedures']:
+    for command in settings['main/actions']:
       self.assertNotIn('action_groups', command)
       self.assertIn('command_groups', command)
 
@@ -383,7 +386,7 @@ class TestUpdateHandlers(unittest.TestCase):
       self.assertNotIn('default_constraints', command['command_groups'].value)
       self.assertIn('default_conditions', command['command_groups'].value)
 
-    scale_arguments_path = 'main/procedures/scale_for_images/arguments'
+    scale_arguments_path = 'main/actions/scale_for_images/arguments'
 
     self.assertListEqual(
       [setting.name for setting in settings[scale_arguments_path]],
@@ -481,7 +484,7 @@ class TestUpdateHandlers(unittest.TestCase):
       },
     )
 
-    align_arguments_path = 'main/procedures/align_and_offset_layers/arguments'
+    align_arguments_path = 'main/actions/align_and_offset_layers/arguments'
 
     self.assertListEqual(
       [setting.name for setting in settings[align_arguments_path]],
@@ -539,9 +542,9 @@ class TestUpdateHandlers(unittest.TestCase):
     )
 
     self.assertEqual(
-      settings['main/procedures/resize_to_layer_size/orig_name'].value, 'resize_canvas')
+      settings['main/actions/resize_to_layer_size/orig_name'].value, 'resize_canvas')
 
-    resize_canvas_arguments_path = 'main/procedures/resize_to_layer_size/arguments'
+    resize_canvas_arguments_path = 'main/actions/resize_to_layer_size/arguments'
 
     self.assertListEqual(
       [setting.name for setting in settings[resize_canvas_arguments_path]],

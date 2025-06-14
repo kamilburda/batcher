@@ -25,13 +25,13 @@ class TestBatcherInitialCommands(unittest.TestCase):
     
     batcher = core.LayerBatcher(
       item_tree=pg.itemtree.LayerTree(),
-      actions=settings['main/procedures'],
+      actions=settings['main/actions'],
       conditions=settings['main/conditions'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
     commands_.add(
-      settings['main/procedures'],
+      settings['main/actions'],
       builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
     batcher.add_action(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
@@ -76,7 +76,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     
     self.batcher._invoker = self.invoker
     
-    self.actions = commands_.create('procedures')
+    self.actions = commands_.create('actions')
 
     self.procedure_name = 'file-png-export'
 
@@ -162,7 +162,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     batcher.current_image = image
     batcher.current_layer = layer
 
-    commands = commands_.create('procedures')
+    commands = commands_.create('actions')
     commands_.add(commands, {
       'name': 'autocrop',
       'type': 'action',

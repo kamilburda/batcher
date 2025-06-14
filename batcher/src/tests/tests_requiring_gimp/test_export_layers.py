@@ -174,14 +174,14 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     
     for action_name, order in action_names_to_add.items():
       commands.add(
-        settings['main/procedures'],
+        settings['main/actions'],
         builtin_actions.BUILTIN_ACTIONS[action_name])
       if order is not None:
-        commands.reorder(settings['main/procedures'], action_name, order)
+        commands.reorder(settings['main/actions'], action_name, order)
     
     for action_name in action_names_to_remove:
-      if action_name in settings['main/procedures']:
-        commands.remove(settings['main/procedures'], action_name)
+      if action_name in settings['main/actions']:
+        commands.remove(settings['main/actions'], action_name)
 
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
@@ -191,7 +191,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
 
     batcher = core.LayerBatcher(
       item_tree=item_tree,
-      actions=settings['main/procedures'],
+      actions=settings['main/actions'],
       conditions=settings['main/conditions'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
@@ -199,7 +199,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     batcher.run(**utils_.get_settings_for_batcher(settings['main']))
     
     for action_name in action_names_to_add:
-      commands.remove(settings['main/procedures'], action_name)
+      commands.remove(settings['main/actions'], action_name)
   
   def _compare_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):

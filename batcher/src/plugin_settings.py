@@ -166,7 +166,7 @@ def create_settings_for_convert():
 
   settings['main'].add([
     commands_.create(
-      name='procedures',
+      name='actions',
       initial_commands=[
         remove_folder_structure_action_dict,
         scale_action_dict,
@@ -309,7 +309,7 @@ def create_settings_for_export_images():
 
   settings['main'].add([
     commands_.create(
-      name='procedures',
+      name='actions',
       initial_commands=[
         scale_action_dict,
       ]),
@@ -416,7 +416,7 @@ def create_settings_for_edit_and_save_images():
 
   settings['main'].add([
     commands_.create(
-      name='procedures',
+      name='actions',
       initial_commands=[
         remove_file_extension_from_imported_images_action_dict,
         rename_action_dict,
@@ -567,7 +567,7 @@ def create_settings_for_export_layers():
 
   settings['main'].add([
     commands_.create(
-      name='procedures',
+      name='actions',
       initial_commands=[resize_canvas_action_dict]),
   ])
 
@@ -588,7 +588,7 @@ def create_settings_for_export_layers():
 
   _connect_events_for_added_built_in_actions(settings)
 
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command',
     builtin_actions.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
@@ -661,7 +661,7 @@ def create_settings_for_edit_layers():
 
   settings['main'].add([
     commands_.create(
-      name='procedures',
+      name='actions',
       initial_commands=[rename_action_dict]),
   ])
 
@@ -684,7 +684,7 @@ def create_settings_for_edit_layers():
 
   _connect_events_for_added_built_in_actions(settings)
 
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command',
     builtin_actions.on_after_add_insert_background_foreground_for_layers,
     settings['main/tagged_items'],
@@ -848,13 +848,13 @@ def _create_images_and_directories_setting_dict():
 
 
 def _connect_events_for_added_built_in_actions(settings):
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_crop_action)
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_export_action)
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_resize_canvas_action)
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_rotate_and_flip_action)
-  settings['main/procedures'].connect_event(
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_scale_action)

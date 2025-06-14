@@ -102,7 +102,7 @@ class BatcherManager:
 
     batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
-      actions=self._settings['main/procedures'],
+      actions=self._settings['main/actions'],
       conditions=self._settings['main/conditions'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
@@ -175,7 +175,7 @@ class BatcherManagerQuick:
 
     batcher = gui_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
-      actions=self._settings['main/procedures'],
+      actions=self._settings['main/actions'],
       conditions=self._settings['main/conditions'],
       edit_mode=mode == 'edit',
       initial_export_run_mode=initial_export_run_mode,

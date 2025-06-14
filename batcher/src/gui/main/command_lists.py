@@ -30,7 +30,7 @@ class CommandLists:
     self._actions_or_conditions_loaded = False
 
     self._action_list = command_list_.CommandList(
-      self._settings['main/procedures'],
+      self._settings['main/actions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
         builtin_actions.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
       add_command_text=_('Add _Action...'),

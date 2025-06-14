@@ -155,7 +155,7 @@ class SettingsManager:
     response_id = self._display_reset_prompt()
 
     if response_id == Gtk.ResponseType.YES:
-      commands_.clear(self._settings['main/procedures'])
+      commands_.clear(self._settings['main/actions'])
       commands_.clear(self._settings['main/conditions'])
 
       self.reset_settings()
@@ -207,7 +207,7 @@ class SettingsManager:
   def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
     source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
 
-    commands_.clear(self._settings['main/procedures'], add_initial_commands=False)
+    commands_.clear(self._settings['main/actions'], add_initial_commands=False)
     commands_.clear(self._settings['main/conditions'], add_initial_commands=False)
 
     settings_to_ignore_for_reset = []
@@ -249,7 +249,7 @@ class SettingsManager:
         parent=self._dialog)
 
       self.reset_settings()
-      commands_.clear(self._settings['main/procedures'])
+      commands_.clear(self._settings['main/actions'])
       commands_.clear(self._settings['main/conditions'])
 
     if self._previews_controller is not None:

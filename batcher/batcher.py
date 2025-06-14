@@ -354,7 +354,7 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
 
   batcher = batcher_class(
     item_tree=item_tree,
-    actions=settings['main/procedures'],
+    actions=settings['main/actions'],
     conditions=settings['main/conditions'],
     refresh_item_tree=False,
     initial_export_run_mode=run_mode,
@@ -430,7 +430,7 @@ def _load_and_update_settings(settings, run_mode):
       report_uri_list=pg.config.BUG_REPORT_URL_LIST)
 
     pg.setting.Persistor.clear()
-    commands_.clear(settings['main/procedures'])
+    commands_.clear(settings['main/actions'])
     commands_.clear(settings['main/conditions'])
 
     return True, ''

@@ -1352,11 +1352,12 @@ def _update_to_1_1(data, _settings, _procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    _rename_group(main_settings_list, 'procedures', 'actions')
     _rename_group(main_settings_list, 'constraints', 'conditions')
 
     _add_new_attributes_to_output_directory(main_settings_list)
 
-    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'actions')
 
     if actions_list is not None:
       for action_dict in actions_list:
