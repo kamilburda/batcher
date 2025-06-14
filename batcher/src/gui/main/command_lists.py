@@ -151,19 +151,19 @@ class CommandLists:
     self._vbox_conditions.pack_start(self._condition_list, True, True, 0)
 
   def _init_setting_gui(self):
-    self._settings['gui/procedure_browser/paned_position'].set_gui(
+    self._settings['gui/action_browser/paned_position'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
       widget=self._action_list.browser.paned,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-    self._settings['gui/procedure_browser/dialog_position'].set_gui(
+    self._settings['gui/action_browser/dialog_position'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
       widget=self._action_list.browser.widget,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
-    self._settings['gui/procedure_browser/dialog_size'].set_gui(
+    self._settings['gui/action_browser/dialog_size'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
       widget=self._action_list.browser.widget,
       copy_previous_visible=False,

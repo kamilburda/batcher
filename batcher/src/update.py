@@ -203,6 +203,12 @@ def _rename_setting(group_list, previous_setting_name, new_setting_name):
     setting_dict['name'] = new_setting_name
 
 
+def _rename_group(group_list, previous_group_name, new_group_name):
+  group_dict, _index = _get_child_group_dict(group_list, previous_group_name)
+  if group_dict is not None:
+    group_dict['name'] = new_group_name
+
+
 def _set_setting_attribute_value(group_list, setting_name, attrib_name, new_attrib_value):
   setting_dict, _index = _get_child_setting(group_list, setting_name)
   if setting_dict is not None:
@@ -1346,7 +1352,7 @@ def _update_to_1_1(data, _settings, _procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
-    _rename_group_for_conditions_1_1(main_settings_list)
+    _rename_group(main_settings_list, 'constraints', 'conditions')
 
     _add_new_attributes_to_output_directory(main_settings_list)
 
@@ -1407,12 +1413,10 @@ def _update_to_1_1(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _matching_text_1_1_add_new_options(arguments_list)
 
+  gui_settings_list, _index = _get_top_level_group_list(data, 'gui')
 
-def _rename_group_for_conditions_1_1(main_settings_list):
-  conditions_dict, _index = _get_child_group_dict(main_settings_list, 'constraints')
-
-  if conditions_dict is not None:
-    conditions_dict['name'] = 'conditions'
+  if gui_settings_list is not None:
+    _rename_group(gui_settings_list, 'procedure_browser', 'action_browser')
 
 
 def _rename_command_attributes_1_1(command_dict):

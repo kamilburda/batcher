@@ -302,7 +302,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
   gui.action_list.browser.widget.set_focus(None)
 
   move_dialog_to_corner(
-    dialog, settings['gui/procedure_browser/dialog_position'], *decoration_offsets)
+    dialog, settings['gui/action_browser/dialog_position'], *decoration_offsets)
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -376,7 +376,7 @@ def take_and_process_screenshot(
 
   if crop_to == 'browser_dialog':
     crop_to_dialog(
-      screenshot_image, settings['gui/procedure_browser/dialog_size'], decoration_offsets)
+      screenshot_image, settings['gui/action_browser/dialog_size'], decoration_offsets)
   elif crop_to == 'main_dialog':
     crop_to_dialog(
       screenshot_image, settings['gui/size/dialog_size'], decoration_offsets)

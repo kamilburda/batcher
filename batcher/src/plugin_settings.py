@@ -696,7 +696,7 @@ def create_settings_for_edit_layers():
 def _create_gui_settings(item_tree_items_setting_type):
   gui_settings = pg.setting.Group(name='gui')
 
-  action_browser_settings = pg.setting.Group(name='procedure_browser')
+  action_browser_settings = pg.setting.Group(name='action_browser')
 
   action_browser_settings.add([
     {

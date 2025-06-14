@@ -555,3 +555,6 @@ class TestUpdateHandlers(unittest.TestCase):
         'resize_to_image_size_image',
       ],
     )
+
+    self.assertNotIn('procedure_browser', settings['gui'])
+    self.assertIn('action_browser', settings['gui'])
