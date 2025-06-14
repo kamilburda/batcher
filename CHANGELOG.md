@@ -21,6 +21,8 @@ Changes to the user interface:
 * Batch Convert: Changed `Add Files...` and `Add Folders...` to menu entries displayed when clicking the new `Add...` button. Likewise, `Remove Selected` and `Remove All` were moved under the new `Remove...` button.
 * Batch Convert: Increased the initial preview height.
 * If the output directory no longer exists and Batcher is started, the output directory is set to the Pictures folder (or another folder that is guaranteed to exist). Previously, "(None)" was displayed, which was confusing.
+* Increased the default size of the main dialog.
+* Increased the default size of the preview. For historical reasons, the preview was kept small to be consistent with the GIMP's Export menu. However, given that Batcher allows applying arbitrary filters, inspecting changes in a small preview can be difficult and the user is forced to manually resize the preview (this also assumes that the user is aware the preview size can be changed).
 
 Changes to actions and conditions:
 * You can now apply actions to layers inserted by actions other than `Insert background` or `Insert foreground`, e.g. `gimp-text-font` (which renders a text layer), by selecting `Layer Below (Background)` or `Layer Above (Foreground)` (depending on whether the layer is inserted before or after the current layer).
