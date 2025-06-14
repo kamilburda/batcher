@@ -40,7 +40,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def __init__(
         self,
         item_tree: pg.itemtree.ItemTree,
-        procedures: pg.setting.Group,
+        actions: pg.setting.Group,
         conditions: pg.setting.Group,
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
@@ -62,7 +62,7 @@ class Batcher(metaclass=abc.ABCMeta):
         keep_image_copies: bool = False,
   ):
     self._item_tree = item_tree
-    self._procedures = procedures
+    self._procedures = actions
     self._conditions = conditions
     self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode

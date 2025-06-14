@@ -354,7 +354,7 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
 
   batcher = batcher_class(
     item_tree=item_tree,
-    procedures=settings['main/procedures'],
+    actions=settings['main/procedures'],
     conditions=settings['main/conditions'],
     refresh_item_tree=False,
     initial_export_run_mode=run_mode,
