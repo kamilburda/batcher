@@ -80,7 +80,7 @@ class BatchProcessingGui:
 
   @property
   def procedure_list(self):
-    return self._command_lists.procedure_list
+    return self._command_lists.action_list
 
   @property
   def condition_list(self):
@@ -139,7 +139,7 @@ class BatchProcessingGui:
       spacing=self._VBOX_SETTINGS_SPACING,
     )
 
-    self._vbox_settings.pack_start(self._command_lists.vbox_procedures, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_actions, False, False, 0)
     self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
 
     self._hpaned_settings_and_previews = Gtk.Paned(
@@ -233,7 +233,7 @@ class BatchProcessingGui:
     if self._mode == 'export':
       self._dialog.set_focus(self._export_settings.file_extension_entry)
     else:
-      self._dialog.set_focus(self._command_lists.procedure_list.button_add)
+      self._dialog.set_focus(self._command_lists.action_list.button_add)
 
     self._button_run.grab_default()
 

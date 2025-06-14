@@ -27,9 +27,9 @@ class CommandLists:
     self._settings = settings
     self._dialog = dialog
 
-    self._procedures_or_conditions_loaded = False
+    self._actions_or_conditions_loaded = False
 
-    self._procedure_list = command_list_.CommandList(
+    self._action_list = command_list_.CommandList(
       self._settings['main/procedures'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
         builtin_actions.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
@@ -58,16 +58,16 @@ class CommandLists:
     self._init_setting_gui()
 
   @property
-  def procedure_list(self):
-    return self._procedure_list
+  def action_list(self):
+    return self._action_list
 
   @property
   def condition_list(self):
     return self._condition_list
 
   @property
-  def vbox_procedures(self):
-    return self._vbox_procedures
+  def vbox_actions(self):
+    return self._vbox_actions
 
   @property
   def vbox_conditions(self):
@@ -78,7 +78,7 @@ class CommandLists:
     self.set_warnings_and_deactivate_failed_commands(batcher, clear_previous=clear_previous)
 
     self._set_command_skipped_tooltips(
-      self._procedure_list,
+      self._action_list,
       batcher.skipped_actions,
       _('This procedure is skipped. Reason: {}'),
       clear_previous=clear_previous)
@@ -90,7 +90,7 @@ class CommandLists:
       clear_previous=clear_previous)
 
   def set_warnings_and_deactivate_failed_commands(self, batcher, clear_previous=True):
-    command_lists = [self._procedure_list, self._condition_list]
+    command_lists = [self._action_list, self._condition_list]
     failed_commands_dict = [batcher.failed_actions, batcher.failed_conditions]
 
     for command_list, failed_commands in zip(command_lists, failed_commands_dict):
@@ -110,30 +110,30 @@ class CommandLists:
             command_item.set_warning(False)
 
   def reset_command_tooltips_and_indicators(self):
-    for command_list in [self._procedure_list, self._condition_list]:
+    for command_list in [self._action_list, self._condition_list]:
       for command_item in command_list.items:
         command_item.reset_tooltip()
         command_item.set_warning(False)
 
   def close_command_edit_dialogs(self):
-    for command_list in [self._procedure_list, self._condition_list]:
+    for command_list in [self._action_list, self._condition_list]:
       for command_item in command_list.items:
         command_item.editor.hide()
 
   def _init_gui(self):
-    self._label_procedures = Gtk.Label(
+    self._label_actions = Gtk.Label(
       label='<b>{}</b>'.format(_('Actions')),
       use_markup=True,
       xalign=0.0,
       yalign=0.5,
     )
 
-    self._vbox_procedures = Gtk.Box(
+    self._vbox_actions = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._COMMAND_LABEL_BOX_SPACING,
     )
-    self._vbox_procedures.pack_start(self._label_procedures, False, False, 0)
-    self._vbox_procedures.pack_start(self._procedure_list, True, True, 0)
+    self._vbox_actions.pack_start(self._label_actions, False, False, 0)
+    self._vbox_actions.pack_start(self._action_list, True, True, 0)
 
     self._label_conditions = Gtk.Label(
       label='<b>{}</b>'.format(_('Conditions')),
@@ -153,58 +153,58 @@ class CommandLists:
   def _init_setting_gui(self):
     self._settings['gui/procedure_browser/paned_position'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
-      widget=self._procedure_list.browser.paned,
+      widget=self._action_list.browser.paned,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['gui/procedure_browser/dialog_position'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
-      widget=self._procedure_list.browser.widget,
+      widget=self._action_list.browser.widget,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['gui/procedure_browser/dialog_size'].set_gui(
       gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
-      widget=self._procedure_list.browser.widget,
+      widget=self._action_list.browser.widget,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
 
-    self._procedure_list.connect(
+    self._action_list.connect(
       'command-list-item-added-interactive',
-      _on_procedure_item_added,
+      _on_action_item_added,
       self._settings,
       self._condition_list,
     )
 
-    _set_up_existing_crop_procedures(self._procedure_list)
-    self._procedure_list.commands.connect_event(
+    _set_up_existing_crop_actions(self._action_list)
+    self._action_list.commands.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_crop_procedures(self._procedure_list))
+      lambda _actions: _set_up_existing_crop_actions(self._action_list))
 
-    _set_up_existing_resize_canvas_procedures(self._procedure_list)
-    self._procedure_list.commands.connect_event(
+    _set_up_existing_resize_canvas_actions(self._action_list)
+    self._action_list.commands.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_resize_canvas_procedures(self._procedure_list))
+      lambda _actions: _set_up_existing_resize_canvas_actions(self._action_list))
 
-    _set_up_existing_rename_procedures(self._procedure_list)
-    self._procedure_list.commands.connect_event(
+    _set_up_existing_rename_actions(self._action_list)
+    self._action_list.commands.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_rename_procedures(self._procedure_list))
+      lambda _actions: _set_up_existing_rename_actions(self._action_list))
 
-    _set_up_existing_export_procedures(self._procedure_list)
-    self._procedure_list.commands.connect_event(
+    _set_up_existing_export_actions(self._action_list)
+    self._action_list.commands.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_export_procedures(self._procedure_list))
+      lambda _actions: _set_up_existing_export_actions(self._action_list))
 
-    _set_up_existing_save_procedures(self._procedure_list)
-    self._procedure_list.commands.connect_event(
+    _set_up_existing_save_actions(self._action_list)
+    self._action_list.commands.connect_event(
       'after-load',
-      lambda _procedures: _set_up_existing_save_procedures(self._procedure_list))
+      lambda _actions: _set_up_existing_save_actions(self._action_list))
 
     _set_up_existing_insert_back_foreground_and_related_commands(
-      self._procedure_list, self._condition_list)
-    self._procedure_list.commands.connect_event(
+      self._action_list, self._condition_list)
+    self._action_list.commands.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
     self._condition_list.commands.connect_event(
       'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
@@ -221,14 +221,14 @@ class CommandLists:
       lambda _conditions: _set_up_existing_matching_text_conditions(self._condition_list))
 
   def _set_up_existing_insert_back_foreground_and_related_commands_on_load(self, _commands):
-    if self._procedures_or_conditions_loaded:
+    if self._actions_or_conditions_loaded:
       _set_up_existing_insert_back_foreground_and_related_commands(
-        self._procedure_list, self._condition_list)
+        self._action_list, self._condition_list)
 
       # This allows setting up the commands again when loading again.
-      self._procedures_or_conditions_loaded = False
+      self._actions_or_conditions_loaded = False
 
-    self._procedures_or_conditions_loaded = True
+    self._actions_or_conditions_loaded = True
 
   @staticmethod
   def _set_command_skipped_tooltips(
@@ -247,79 +247,79 @@ class CommandLists:
             command_item.reset_tooltip()
 
 
-def _on_procedure_item_added(procedure_list, item, settings, condition_list):
+def _on_action_item_added(action_list, item, settings, condition_list):
   if item.command['orig_name'].value.startswith('crop_for_'):
-    _handle_crop_procedure_item_added(item)
+    _handle_crop_action_item_added(item)
 
   if item.command['orig_name'].value == 'resize_canvas':
-    _handle_resize_canvas_procedure_item_added(item)
+    _handle_resize_canvas_action_item_added(item)
 
   if item.command['orig_name'].value.startswith('rename_for_'):
-    _handle_rename_procedure_item_added(item)
+    _handle_rename_action_item_added(item)
 
   if item.command['orig_name'].value.startswith('export_for_'):
-    _handle_export_procedure_item_added(item)
+    _handle_export_action_item_added(item)
 
     if item.command['orig_name'].value not in [
           'export_for_edit_and_save_images', 'export_for_edit_layers']:
-      _handle_export_procedure_item_added_for_export_mode(item, settings)
+      _handle_export_action_item_added_for_export_mode(item, settings)
 
   if item.command['orig_name'].value == 'save':
-    _handle_save_procedure_item_added(item)
+    _handle_save_action_item_added(item)
 
   if item.command['orig_name'].value != 'save':
-    _reorder_procedure_before_first_save_procedure(procedure_list, item)
+    _reorder_action_before_first_save_action(action_list, item)
 
   if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
        'insert_background_for_', 'insert_foreground_for_']):
-    _handle_insert_background_foreground_procedure_item_added(procedure_list, item, condition_list)
+    _handle_insert_background_foreground_action_item_added(action_list, item, condition_list)
 
 
-def _set_up_existing_crop_procedures(procedure_list: command_list_.CommandList):
-  for item in procedure_list.items:
+def _set_up_existing_crop_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
     if item.command['orig_name'].value.startswith('crop_for_'):
-      _handle_crop_procedure_item_added(item)
+      _handle_crop_action_item_added(item)
 
 
-def _set_up_existing_resize_canvas_procedures(procedure_list: command_list_.CommandList):
-  for item in procedure_list.items:
+def _set_up_existing_resize_canvas_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
     if item.command['orig_name'].value == 'resize_canvas':
-      _handle_resize_canvas_procedure_item_added(item)
+      _handle_resize_canvas_action_item_added(item)
 
 
-def _set_up_existing_rename_procedures(procedure_list: command_list_.CommandList):
-  for item in procedure_list.items:
+def _set_up_existing_rename_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
     if item.command['orig_name'].value.startswith('rename_for_'):
-      _handle_rename_procedure_item_added(item)
+      _handle_rename_action_item_added(item)
 
 
-def _set_up_existing_export_procedures(procedure_list: command_list_.CommandList):
-  for item in procedure_list.items:
+def _set_up_existing_export_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
     if item.command['orig_name'].value.startswith('export_for_'):
-      _handle_export_procedure_item_added(item)
+      _handle_export_action_item_added(item)
 
 
-def _set_up_existing_save_procedures(procedure_list: command_list_.CommandList):
-  for item in procedure_list.items:
+def _set_up_existing_save_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
     if item.command['orig_name'].value == 'save':
-      _handle_save_procedure_item_added(item)
+      _handle_save_action_item_added(item)
 
 
-def _handle_insert_background_foreground_procedure_item_added(
-      procedure_list, item, condition_list):
-  procedure_list.reorder_item(item, 0)
+def _handle_insert_background_foreground_action_item_added(
+      action_list, item, condition_list):
+  action_list.reorder_item(item, 0)
 
-  merge_item = _add_merge_background_foreground_procedure(procedure_list, item)
+  merge_item = _add_merge_background_foreground_action(action_list, item)
 
   condition_item = _add_not_background_foreground_condition(item, condition_list)
 
-  _hide_internal_arguments_for_insert_background_foreground_procedure(item)
-  _set_up_merge_background_foreground_procedure(merge_item)
+  _hide_internal_arguments_for_insert_background_foreground_action(item)
+  _set_up_merge_background_foreground_action(merge_item)
   _set_up_not_background_foreground_condition(item, condition_item)
 
   if merge_item is not None or condition_item is not None:
-    _set_up_insert_background_foreground_procedure(
-      item, merge_item, condition_item, procedure_list, condition_list)
+    _set_up_insert_background_foreground_action(
+      item, merge_item, condition_item, action_list, condition_list)
 
   if merge_item is not None:
     item.command['arguments/merge_procedure_name'].set_value(merge_item.command.name)
@@ -328,19 +328,19 @@ def _handle_insert_background_foreground_procedure_item_added(
 
 
 def _set_up_existing_insert_back_foreground_and_related_commands(
-      procedure_list: command_list_.CommandList,
+      action_list: command_list_.CommandList,
       condition_list: command_list_.CommandList,
 ):
-  for item in procedure_list.items:
+  for item in action_list.items:
     if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
          'insert_background_for_', 'insert_foreground_for_']):
-      merge_procedure_name = (
+      merge_action_name = (
         item.command['arguments/merge_procedure_name'].value
         if 'merge_procedure_name' in item.command['arguments'] else None)
-      if merge_procedure_name is not None and merge_procedure_name in procedure_list.commands:
+      if merge_action_name is not None and merge_action_name in action_list.commands:
         merge_item = next(
           iter(
-            item_ for item_ in procedure_list.items if item_.command.name == merge_procedure_name),
+            item_ for item_ in action_list.items if item_.command.name == merge_action_name),
           None)
       else:
         merge_item = None
@@ -355,39 +355,39 @@ def _set_up_existing_insert_back_foreground_and_related_commands(
       else:
         condition_item = None
 
-      _hide_internal_arguments_for_insert_background_foreground_procedure(item)
-      _set_up_merge_background_foreground_procedure(merge_item)
+      _hide_internal_arguments_for_insert_background_foreground_action(item)
+      _set_up_merge_background_foreground_action(merge_item)
       _set_up_not_background_foreground_condition(item, condition_item)
 
       if merge_item is not None or condition_item is not None:
-        _set_up_insert_background_foreground_procedure(
-          item, merge_item, condition_item, procedure_list, condition_list)
+        _set_up_insert_background_foreground_action(
+          item, merge_item, condition_item, action_list, condition_list)
 
 
-def _hide_internal_arguments_for_insert_background_foreground_procedure(item):
+def _hide_internal_arguments_for_insert_background_foreground_action(item):
   if 'merge_procedure_name' in item.command['arguments']:
     item.command['arguments/merge_procedure_name'].gui.set_visible(False)
   if 'condition_name' in item.command['arguments']:
     item.command['arguments/condition_name'].gui.set_visible(False)
 
 
-def _set_up_insert_background_foreground_procedure(
+def _set_up_insert_background_foreground_action(
       item,
       merge_item,
       condition_item,
-      procedure_list: command_list_.CommandList,
+      action_list: command_list_.CommandList,
       condition_list: command_list_.CommandList,
 ):
   item.command['enabled'].connect_event(
     'value-changed',
-    _on_insert_background_foreground_procedure_enabled_changed,
+    _on_insert_background_foreground_action_enabled_changed,
     merge_item.command if merge_item is not None else None,
     condition_item.command if condition_item is not None else None,
   )
 
-  procedure_list.connect(
+  action_list.connect(
     'command-list-item-removed',
-    _on_insert_background_foreground_procedure_removed,
+    _on_insert_background_foreground_action_removed,
     item,
     merge_item,
     condition_list,
@@ -395,32 +395,32 @@ def _set_up_insert_background_foreground_procedure(
   )
 
 
-def _add_merge_background_foreground_procedure(procedure_list, item):
-  merge_procedure_orig_name_mapping = {
+def _add_merge_background_foreground_action(action_list, item):
+  merge_action_orig_name_mapping = {
     'insert_background_for_images': 'merge_background',
     'insert_background_for_layers': 'merge_background',
     'insert_foreground_for_images': 'merge_foreground',
     'insert_foreground_for_layers': 'merge_foreground',
   }
 
-  if item.command['orig_name'].value not in merge_procedure_orig_name_mapping:
+  if item.command['orig_name'].value not in merge_action_orig_name_mapping:
     return None
 
-  merge_procedure_name = merge_procedure_orig_name_mapping[item.command['orig_name'].value]
+  merge_action_name = merge_action_orig_name_mapping[item.command['orig_name'].value]
 
-  merge_item = procedure_list.add_item(builtin_actions.BUILTIN_ACTIONS[merge_procedure_name])
+  merge_item = action_list.add_item(builtin_actions.BUILTIN_ACTIONS[merge_action_name])
 
-  export_procedure_index = next(
-    iter(index for index, item in enumerate(procedure_list.items)
+  export_action_index = next(
+    iter(index for index, item in enumerate(action_list.items)
          if item.command['orig_name'].value.startswith('export_for_')),
     None)
-  if export_procedure_index is not None:
-    procedure_list.reorder_item(merge_item, export_procedure_index)
+  if export_action_index is not None:
+    action_list.reorder_item(merge_item, export_action_index)
 
   return merge_item
 
 
-def _set_up_merge_background_foreground_procedure(merge_item):
+def _set_up_merge_background_foreground_action(merge_item):
   if merge_item is not None:
     _set_buttons_for_command_item_sensitive(merge_item, False)
 
@@ -462,121 +462,121 @@ def _set_up_not_background_foreground_condition(item, condition_item):
   _on_insert_background_foreground_color_tag_changed(item.command['arguments/color_tag'])
 
 
-def _on_insert_background_foreground_procedure_enabled_changed(
+def _on_insert_background_foreground_action_enabled_changed(
       enabled_setting,
-      merge_procedure,
+      merge_action,
       condition,
 ):
   if not enabled_setting.value:
-    if merge_procedure is not None:
-      merge_procedure['arguments/last_enabled_value'].set_value(merge_procedure['enabled'].value)
-      merge_procedure['enabled'].set_value(False)
+    if merge_action is not None:
+      merge_action['arguments/last_enabled_value'].set_value(merge_action['enabled'].value)
+      merge_action['enabled'].set_value(False)
 
     if condition is not None:
       condition['arguments/last_enabled_value'].set_value(condition['enabled'].value)
       condition['enabled'].set_value(False)
   else:
-    if merge_procedure is not None:
-      merge_procedure['enabled'].set_value(merge_procedure['arguments/last_enabled_value'].value)
+    if merge_action is not None:
+      merge_action['enabled'].set_value(merge_action['arguments/last_enabled_value'].value)
     if condition is not None:
       condition['enabled'].set_value(condition['arguments/last_enabled_value'].value)
 
-  if merge_procedure is not None:
-    merge_procedure['enabled'].gui.set_sensitive(enabled_setting.value)
+  if merge_action is not None:
+    merge_action['enabled'].gui.set_sensitive(enabled_setting.value)
   if condition is not None:
     condition['enabled'].gui.set_sensitive(enabled_setting.value)
 
 
-def _on_insert_background_foreground_procedure_removed(
-      procedure_list,
+def _on_insert_background_foreground_action_removed(
+      action_list,
       removed_item,
       insert_back_foreground_item,
       merge_item,
       condition_list,
       condition_item):
   if removed_item == insert_back_foreground_item:
-    if merge_item is not None and merge_item in procedure_list.items:
-      procedure_list.remove_item(merge_item)
+    if merge_item is not None and merge_item in action_list.items:
+      action_list.remove_item(merge_item)
     if condition_item is not None and condition_item in condition_list.items:
       condition_list.remove_item(condition_item)
 
 
-def _handle_crop_procedure_item_added(item):
-  _set_display_name_for_crop_procedure(
+def _handle_crop_action_item_added(item):
+  _set_display_name_for_crop_action(
     item.command['arguments/crop_mode'],
     item.command)
 
   item.command['arguments/crop_mode'].connect_event(
     'value-changed',
-    _set_display_name_for_crop_procedure,
+    _set_display_name_for_crop_action,
     item.command)
 
 
-def _set_display_name_for_crop_procedure(crop_mode_setting, crop_procedure):
+def _set_display_name_for_crop_action(crop_mode_setting, crop_action):
   if crop_mode_setting.value == builtin_actions.CropModes.REMOVE_EMPTY_BORDERS:
-    crop_procedure['display_name'].set_value(_('Crop to remove empty borders'))
+    crop_action['display_name'].set_value(_('Crop to remove empty borders'))
   else:
     if crop_mode_setting.value in crop_mode_setting.items_display_names:
-      crop_procedure['display_name'].set_value(
+      crop_action['display_name'].set_value(
         crop_mode_setting.items_display_names[crop_mode_setting.value])
 
 
-def _handle_resize_canvas_procedure_item_added(item):
-  _set_display_name_for_resize_canvas_procedure(
+def _handle_resize_canvas_action_item_added(item):
+  _set_display_name_for_resize_canvas_action(
     item.command['arguments/resize_mode'],
     item.command)
 
   item.command['arguments/resize_mode'].connect_event(
     'value-changed',
-    _set_display_name_for_resize_canvas_procedure,
+    _set_display_name_for_resize_canvas_action,
     item.command)
 
 
-def _set_display_name_for_resize_canvas_procedure(
-      resize_mode_setting, resize_canvas_procedure):
+def _set_display_name_for_resize_canvas_action(
+      resize_mode_setting, resize_canvas_action):
   if resize_mode_setting.value in resize_mode_setting.items_display_names:
-    resize_canvas_procedure['display_name'].set_value(
+    resize_canvas_action['display_name'].set_value(
       resize_mode_setting.items_display_names[resize_mode_setting.value])
 
 
-def _handle_rename_procedure_item_added(item):
-  _set_display_name_for_rename_procedure(
+def _handle_rename_action_item_added(item):
+  _set_display_name_for_rename_action(
     item.command['arguments/pattern'],
     item.command)
 
   item.command['arguments/pattern'].connect_event(
     'value-changed',
-    _set_display_name_for_rename_procedure,
+    _set_display_name_for_rename_action,
     item.command)
 
   if item.command['orig_name'].value == 'rename_for_edit_and_save_images':
     item.command['arguments/rename_only_new_images'].connect_event(
       'value-changed',
-      _set_display_name_for_rename_procedure_for_rename_only_new_images,
+      _set_display_name_for_rename_action_for_rename_only_new_images,
       item.command['arguments/pattern'],
       item.command)
 
 
-def _set_display_name_for_rename_procedure(pattern_setting, rename_procedure):
-  if rename_procedure['orig_name'].value != 'rename_for_edit_and_save_images':
-    rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+def _set_display_name_for_rename_action(pattern_setting, rename_action):
+  if rename_action['orig_name'].value != 'rename_for_edit_and_save_images':
+    rename_action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
   else:
-    if rename_procedure['arguments/rename_only_new_images'].value:
-      rename_procedure['display_name'].set_value(
+    if rename_action['arguments/rename_only_new_images'].value:
+      rename_action['display_name'].set_value(
         _('Rename new images to "{}"').format(pattern_setting.value))
     else:
-      rename_procedure['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+      rename_action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
 
 
-def _set_display_name_for_rename_procedure_for_rename_only_new_images(
+def _set_display_name_for_rename_action_for_rename_only_new_images(
       _rename_only_new_images_setting,
       pattern_setting,
-      rename_procedure,
+      rename_action,
 ):
-  _set_display_name_for_rename_procedure(pattern_setting, rename_procedure)
+  _set_display_name_for_rename_action(pattern_setting, rename_action)
 
 
-def _handle_export_procedure_item_added(item):
+def _handle_export_action_item_added(item):
   pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
     item.command['arguments/file_extension'])
 
@@ -594,51 +594,51 @@ def _handle_export_procedure_item_added(item):
       export_settings_.revert_file_extension_gui_to_last_valid_value(setting)),
     item.command['arguments/file_extension'])
 
-  _set_display_name_for_export_procedure(
+  _set_display_name_for_export_action(
     item.command['arguments/file_extension'],
     item.command)
 
   item.command['arguments/file_extension'].connect_event(
     'value-changed',
-    _set_display_name_for_export_procedure,
+    _set_display_name_for_export_action,
     item.command)
 
 
-def _set_display_name_for_export_procedure(file_extension_setting, export_procedure):
+def _set_display_name_for_export_action(file_extension_setting, export_action):
   file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
 
-  export_procedure_name = None
-  if export_procedure['orig_name'].value in [
+  export_action_name = None
+  if export_action['orig_name'].value in [
         'export_for_edit_and_save_images', 'export_for_edit_layers']:
-    export_procedure_name = _('Export as {}')
-  elif export_procedure['orig_name'].value.startswith('export_for_'):
-    export_procedure_name = _('Also export as {}')
+    export_action_name = _('Export as {}')
+  elif export_action['orig_name'].value.startswith('export_for_'):
+    export_action_name = _('Also export as {}')
 
-  if export_procedure_name is not None:
-    export_procedure['display_name'].set_value(export_procedure_name.format(file_extension))
-
-
-def _handle_export_procedure_item_added_for_export_mode(item, settings):
-  _copy_setting_values_from_default_export_procedure(settings['main'], item.command)
+  if export_action_name is not None:
+    export_action['display_name'].set_value(export_action_name.format(file_extension))
 
 
-def _copy_setting_values_from_default_export_procedure(main_settings, export_procedure):
+def _handle_export_action_item_added_for_export_mode(item, settings):
+  _copy_setting_values_from_default_export_action(settings['main'], item.command)
+
+
+def _copy_setting_values_from_default_export_action(main_settings, export_action):
   if main_settings['output_directory'].value:
-    export_procedure['arguments/output_directory'].set_value(
+    export_action['arguments/output_directory'].set_value(
       main_settings['output_directory'].value)
 
-  export_procedure['arguments/file_extension'].set_value(main_settings['file_extension'].value)
+  export_action['arguments/file_extension'].set_value(main_settings['file_extension'].value)
 
   for setting in main_settings['export']:
-    export_procedure[f'arguments/{setting.name}'].set_value(setting.value)
+    export_action[f'arguments/{setting.name}'].set_value(setting.value)
 
 
 def _set_buttons_for_command_item_sensitive(item, sensitive):
   item.button_remove.set_sensitive(sensitive)
 
 
-def _handle_save_procedure_item_added(item):
-  _set_display_name_for_save_procedure(
+def _handle_save_action_item_added(item):
+  _set_display_name_for_save_action(
     item.command['arguments/save_existing_image_to_its_original_location'],
     item.command['arguments/output_directory'],
     item.command,
@@ -646,61 +646,61 @@ def _handle_save_procedure_item_added(item):
 
   item.command['arguments/save_existing_image_to_its_original_location'].connect_event(
     'value-changed',
-    _set_display_name_for_save_procedure,
+    _set_display_name_for_save_action,
     item.command['arguments/output_directory'],
     item.command,
   )
 
   item.command['arguments/output_directory'].connect_event(
     'value-changed',
-    _set_display_name_for_save_procedure_for_output_directory,
+    _set_display_name_for_save_action_for_output_directory,
     item.command['arguments/save_existing_image_to_its_original_location'],
     item.command,
   )
 
 
-def _set_display_name_for_save_procedure(
+def _set_display_name_for_save_action(
       save_existing_image_to_its_original_location_setting,
       output_directory_setting,
-      save_procedure,
+      save_action,
 ):
   if (output_directory_setting.value is not None
       and output_directory_setting.value.get_path() is not None):
     output_dirname = os.path.basename(output_directory_setting.value.get_path())
 
     if save_existing_image_to_its_original_location_setting.value:
-      save_procedure['display_name'].set_value(
+      save_action['display_name'].set_value(
         _('Save (imported images to "{}")').format(output_dirname))
     else:
-      save_procedure['display_name'].set_value(_('Save to "{}"').format(output_dirname))
+      save_action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
   else:
-      save_procedure['display_name'].set_value(_('Save'))
+      save_action['display_name'].set_value(_('Save'))
 
 
-def _set_display_name_for_save_procedure_for_output_directory(
+def _set_display_name_for_save_action_for_output_directory(
       output_directory_setting,
       save_existing_image_to_its_original_location_setting,
-      save_procedure,
+      save_action,
 ):
-  _set_display_name_for_save_procedure(
+  _set_display_name_for_save_action(
     save_existing_image_to_its_original_location_setting,
     output_directory_setting,
-    save_procedure,
+    save_action,
   )
 
 
-def _reorder_procedure_before_first_save_procedure(
-      procedure_list: command_list_.CommandList,
+def _reorder_action_before_first_save_action(
+      action_list: command_list_.CommandList,
       item,
 ):
-  first_save_procedure_position = next(
+  first_save_action_position = next(
     iter(
-      index for index, item_ in enumerate(procedure_list.items)
+      index for index, item_ in enumerate(action_list.items)
       if item_.command['orig_name'].value == 'save'),
     None)
 
-  if first_save_procedure_position is not None:
-    procedure_list.reorder_item(item, first_save_procedure_position)
+  if first_save_action_position is not None:
+    action_list.reorder_item(item, first_save_action_position)
 
 
 def _on_condition_item_added(_condition_list, item, _settings):
