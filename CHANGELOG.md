@@ -1,4 +1,6 @@
-## Upcoming
+## 1.1
+
+### June 14, 2025
 
 General changes:
 * Added Japanese translation (thanks to @re-unknown).
