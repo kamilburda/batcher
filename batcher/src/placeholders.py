@@ -1,5 +1,4 @@
-"""Placeholder objects replaced with real GIMP objects when calling GIMP PDB
-procedures during batch processing.
+"""Placeholder objects replaced with real GIMP objects during batch processing.
 
 The placeholder objects are defined in the `PLACEHOLDERS` dictionary.
 """
@@ -90,7 +89,7 @@ def _get_adjacent_layer(
       batcher,
       position_cond_func,
       adjacent_position_increment,
-      insert_builtin_procedure_names,
+      insert_builtin_action_names,
       color_tag_argument_name_for_builtin_actions,
       skip_message,
 ):
@@ -115,12 +114,12 @@ def _get_adjacent_layer(
       # matching color tags and `None` is present at least once, we always
       # consider `next_layer` to be the background/foreground.
       color_tags = []
-      for procedure in _get_previous_enabled_procedures(batcher, batcher.current_action):
-        if any(procedure['orig_name'].value == orig_name
-               for orig_name in insert_builtin_procedure_names):
-          if color_tag_argument_name_for_builtin_actions in procedure['arguments']:
+      for action in _get_previous_enabled_actions(batcher, batcher.current_action):
+        if any(action['orig_name'].value == orig_name
+               for orig_name in insert_builtin_action_names):
+          if color_tag_argument_name_for_builtin_actions in action['arguments']:
             color_tags.append(
-              procedure[f'arguments/{color_tag_argument_name_for_builtin_actions}'].value)
+              action[f'arguments/{color_tag_argument_name_for_builtin_actions}'].value)
         else:
           color_tags.append(None)
 
@@ -128,24 +127,24 @@ def _get_adjacent_layer(
         adjacent_layer = next_layer
 
   if adjacent_layer is not None:
-    # This is necessary for some procedures relying on selected layers.
+    # This is necessary for some commands relying on selected layers.
     image.set_selected_layers([adjacent_layer])
     return adjacent_layer
   else:
     raise exceptions.SkipCommand(skip_message)
 
 
-def _get_previous_enabled_procedures(batcher, current_command):
-  previous_enabled_procedures = []
+def _get_previous_enabled_actions(batcher, current_command):
+  previous_enabled_actions = []
 
-  for procedure in batcher.actions:
-    if procedure == current_command:
-      return previous_enabled_procedures
+  for action in batcher.actions:
+    if action == current_command:
+      return previous_enabled_actions
 
-    if procedure['enabled'].value:
-      previous_enabled_procedures.append(procedure)
+    if action['enabled'].value:
+      previous_enabled_actions.append(action)
 
-  return previous_enabled_procedures
+  return previous_enabled_actions
 
 
 _PLACEHOLDERS_LIST = [
@@ -170,11 +169,11 @@ The following placeholder objects are defined:
 * ``PLACEHOLDERS['current_image']``: The image currently being processed.
 
 * ``PLACEHOLDERS['current_layer']``: The layer currently being processed in the
-  current image. This placeholder is used for PDB procedures containing
+  current image. This placeholder is used for commands containing
   `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item` parameters.
 
 * ``PLACEHOLDERS['current_layer_for_array']``: The layer currently being
-  processed in the current image. This placeholder is used for PDB procedures
+  processed in the current image. This placeholder is used for commands
   containing the `Gimp.CoreObjectArray` parameter whose object type is
   `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
 
@@ -183,19 +182,19 @@ The following placeholder objects are defined:
 
 * ``PLACEHOLDERS['background_layer_for_array']``: The layer positioned 
   immediately after the currently processed layer. This placeholder is used for 
-  PDB procedures containing the `Gimp.CoreObjectArray` parameter whose object 
+  commands containing the `Gimp.CoreObjectArray` parameter whose object 
   type is `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
 
 * ``PLACEHOLDERS['foreground_layer']``: The layer positioned immediately before
   the currently processed layer.
 
-* ``PLACEHOLDERS['background_layer_for_array']``: The layer positioned 
+* ``PLACEHOLDERS['foreground_layer_for_array']``: The layer positioned 
   immediately before the currently processed layer. This placeholder is used 
-  for PDB procedures containing the `Gimp.CoreObjectArray` parameter whose 
+  for commands containing the `Gimp.CoreObjectArray` parameter whose 
   object type is `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
 
 * ``PLACEHOLDERS['all_top_level_layers']``: All layers in the currently 
-  processed image. This placeholder is used for PDB procedures containing the 
+  processed image. This placeholder is used for commands containing the 
   `Gimp.CoreObjectArray` parameter whose object type is `Gimp.Layer`, 
   `Gimp.Drawable` or `Gimp.Item`.
 
