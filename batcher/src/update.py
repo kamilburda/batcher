@@ -328,20 +328,20 @@ def _update_to_0_4(data, _settings, procedure_groups):
     _rename_setting(main_settings_list, 'layer_filename_pattern', 'name_pattern')
     _set_setting_attribute_value(main_settings_list, 'name_pattern', 'type', 'name_pattern')
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
     conditions_list, _index = _get_child_group_list(main_settings_list, 'constraints')
 
-    if procedures_list is None or conditions_list is None:
+    if actions_list is None or conditions_list is None:
       return
 
-    _handle_background_foreground_commands(procedures_list, conditions_list)
+    _handle_background_foreground_commands(actions_list, conditions_list)
 
-    for procedure_dict in procedures_list:
-      procedure_list = procedure_dict['settings']
+    for action_dict in actions_list:
+      action_list = action_dict['settings']
 
-      orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+      orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
 
-      arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+      arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
       if orig_name_setting_dict['default_value'] == 'export' and arguments_list is not None:
         arguments_list[3]['name'] = 'single_image_name_pattern'
@@ -360,17 +360,17 @@ def _update_to_0_4(data, _settings, procedure_groups):
         orig_name_setting_dict['default_value'] = 'remove_folder_structure_for_export_layers'
 
 
-def _handle_background_foreground_commands(procedures_list, conditions_list):
-  _remove_command_by_orig_names(procedures_list, ['merge_background', 'merge_foreground'])
+def _handle_background_foreground_commands(actions_list, conditions_list):
+  _remove_command_by_orig_names(actions_list, ['merge_background', 'merge_foreground'])
 
-  merge_procedure_mapping = {
+  merge_action_mapping = {
     'insert_background': 'merge_background',
     'insert_foreground': 'merge_foreground',
   }
-  procedure_names = {command_dict['name'] for command_dict in procedures_list}
-  procedure_display_names = {
+  action_names = {command_dict['name'] for command_dict in actions_list}
+  action_display_names = {
     _get_child_setting(command_dict['settings'], 'display_name')[0]['value']
-    for command_dict in procedures_list
+    for command_dict in actions_list
     if _get_child_setting(command_dict['settings'], 'display_name')[0] is not None
   }
 
@@ -388,11 +388,11 @@ def _handle_background_foreground_commands(procedures_list, conditions_list):
   merge_group_dicts = []
   condition_group_dicts = []
 
-  for procedure_dict in procedures_list:
-    procedure_list = procedure_dict['settings']
-    orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+  for action_dict in actions_list:
+    action_list = action_dict['settings']
+    orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
 
-    arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+    arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
     if (orig_name_setting_dict['default_value'] in ['insert_background', 'insert_foreground']
         and arguments_list is not None):
@@ -409,21 +409,21 @@ def _handle_background_foreground_commands(procedures_list, conditions_list):
           'gui_type': None,
         })
 
-      merge_procedure_name = merge_procedure_mapping[orig_name_setting_dict['default_value']]
+      merge_action_name = merge_action_mapping[orig_name_setting_dict['default_value']]
       merge_group_dict = _create_command_as_saved_dict(
-        builtin_actions.BUILTIN_ACTIONS[merge_procedure_name])
+        builtin_actions.BUILTIN_ACTIONS[merge_action_name])
 
-      unique_merge_procedure_name = _uniquify_command_name(merge_procedure_name, procedure_names)
-      merge_group_dict['name'] = unique_merge_procedure_name
-      arguments_list[-2]['value'] = unique_merge_procedure_name
-      arguments_list[-2]['default_value'] = unique_merge_procedure_name
+      unique_merge_action_name = _uniquify_command_name(merge_action_name, action_names)
+      merge_group_dict['name'] = unique_merge_action_name
+      arguments_list[-2]['value'] = unique_merge_action_name
+      arguments_list[-2]['default_value'] = unique_merge_action_name
 
-      merge_procedure_display_name_dict, _index = _get_child_setting(
+      merge_action_display_name_dict, _index = _get_child_setting(
         merge_group_dict['settings'], 'display_name')
-      if merge_procedure_display_name_dict is not None:
-        unique_merge_procedure_display_name = _uniquify_command_display_name(
-          merge_procedure_display_name_dict['value'], procedure_display_names)
-        merge_procedure_display_name_dict['value'] = unique_merge_procedure_display_name
+      if merge_action_display_name_dict is not None:
+        unique_merge_action_display_name = _uniquify_command_display_name(
+          merge_action_display_name_dict['value'], action_display_names)
+        merge_action_display_name_dict['value'] = unique_merge_action_display_name
 
       merge_group_dicts.append(merge_group_dict)
 
@@ -446,7 +446,7 @@ def _handle_background_foreground_commands(procedures_list, conditions_list):
       condition_group_dicts.append(condition_group_dict)
 
   for merge_group_dict in merge_group_dicts:
-    procedures_list.append(merge_group_dict)
+    actions_list.append(merge_group_dict)
 
   for condition_group_dict in condition_group_dicts:
     conditions_list.append(condition_group_dict)
@@ -529,17 +529,17 @@ def _update_to_0_5(data, _settings, procedure_groups):
     if name_pattern_dict is not None and 'auto_update_gui_to_setting' in name_pattern_dict:
       del name_pattern_dict['auto_update_gui_to_setting']
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is None:
+    if actions_list is None:
       return
 
-    for procedure_dict in procedures_list:
-      procedure_list = procedure_dict['settings']
+    for action_dict in actions_list:
+      action_list = action_dict['settings']
 
-      orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
+      orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
 
-      arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+      arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
       if arguments_list is not None:
         for argument_dict in arguments_list:
@@ -705,18 +705,18 @@ def _update_to_0_6(data, _settings, procedure_groups):
         if 'settings' not in setting_dict and setting_dict['type'] == 'choice':
           _update_choice_setting_for_0_6(setting_dict)
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        function_setting_dict, _index = _get_child_setting(procedure_list, 'function')
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        display_name_setting_dict, _index = _get_child_setting(procedure_list, 'display_name')
-        description_setting_dict, _index = _get_child_setting(procedure_list, 'description')
-        origin_setting_dict, _index = _get_child_setting(procedure_list, 'origin')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        function_setting_dict, _index = _get_child_setting(action_list, 'function')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        display_name_setting_dict, _index = _get_child_setting(action_list, 'display_name')
+        description_setting_dict, _index = _get_child_setting(action_list, 'description')
+        origin_setting_dict, _index = _get_child_setting(action_list, 'origin')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         _update_origin_setting_for_0_6(origin_setting_dict)
         _update_arguments_list_for_0_6(arguments_list)
@@ -904,14 +904,14 @@ def _update_to_0_7(data, _settings, procedure_groups):
   main_settings_list, _index = _get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
           arguments_list.extend([
@@ -975,16 +975,16 @@ def _update_to_0_8(data, _settings, procedure_groups):
     if export_settings_list is not None:
       _update_export_mode_setting(export_settings_list)
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        _replace_command_tags_with_plug_in_procedure_groups(procedure_dict)
+        _replace_command_tags_with_plug_in_procedure_groups(action_dict)
 
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         gimp_item_setting_types = [
           'item', 'drawable', 'layer', 'group_layer', 'text_layer',
@@ -1140,14 +1140,14 @@ def _update_to_1_0_rc1(data, _settings, procedure_groups):
   if main_settings_list is not None:
     _remove_setting(main_settings_list, 'selected_items')
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         if orig_name_setting_dict['default_value'] == 'scale' and arguments_list is not None:
           orig_name_setting_dict['value'] = 'scale_for_layers'
@@ -1233,13 +1233,13 @@ def _update_to_1_0_rc2(data, _settings, _procedure_groups):
           if name != '_active':
             _update_choice_arguments_for_1_0_rc2(format_options)
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         if (orig_name_setting_dict['default_value'] == 'insert_background_for_images'
             and arguments_list is not None):
@@ -1350,16 +1350,16 @@ def _update_to_1_1(data, _settings, _procedure_groups):
 
     _add_new_attributes_to_output_directory(main_settings_list)
 
-    procedures_list, _index = _get_child_group_list(main_settings_list, 'procedures')
+    actions_list, _index = _get_child_group_list(main_settings_list, 'procedures')
 
-    if procedures_list is not None:
-      for procedure_dict in procedures_list:
-        procedure_list = procedure_dict['settings']
+    if actions_list is not None:
+      for action_dict in actions_list:
+        action_list = action_dict['settings']
 
-        _rename_command_attributes_1_1(procedure_dict)
+        _rename_command_attributes_1_1(action_dict)
 
-        orig_name_setting_dict, _index = _get_child_setting(procedure_list, 'orig_name')
-        arguments_list, _index = _get_child_group_list(procedure_list, 'arguments')
+        orig_name_setting_dict, _index = _get_child_setting(action_list, 'orig_name')
+        arguments_list, _index = _get_child_group_list(action_list, 'arguments')
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
@@ -1376,7 +1376,7 @@ def _update_to_1_1(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'] == 'resize_to_layer_size'
             and arguments_list is not None):
-          _resize_canvas_1_1_rename_procedure(orig_name_setting_dict)
+          _resize_canvas_1_1_rename_action(orig_name_setting_dict)
           _resize_canvas_1_1_rename_layers_argument(arguments_list)
           _resize_canvas_1_1_add_new_arguments(arguments_list)
 
@@ -1676,7 +1676,7 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
 
 
-def _resize_canvas_1_1_rename_procedure(orig_name_setting_dict):
+def _resize_canvas_1_1_rename_action(orig_name_setting_dict):
   orig_name_setting_dict['value'] = 'resize_canvas'
   orig_name_setting_dict['default_value'] = 'resize_canvas'
 
