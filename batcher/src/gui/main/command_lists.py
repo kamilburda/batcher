@@ -79,7 +79,7 @@ class CommandLists:
 
     self._set_command_skipped_tooltips(
       self._procedure_list,
-      batcher.skipped_procedures,
+      batcher.skipped_actions,
       _('This procedure is skipped. Reason: {}'),
       clear_previous=clear_previous)
 
@@ -91,7 +91,7 @@ class CommandLists:
 
   def set_warnings_and_deactivate_failed_commands(self, batcher, clear_previous=True):
     command_lists = [self._procedure_list, self._condition_list]
-    failed_commands_dict = [batcher.failed_procedures, batcher.failed_conditions]
+    failed_commands_dict = [batcher.failed_actions, batcher.failed_conditions]
 
     for command_list, failed_commands in zip(command_lists, failed_commands_dict):
       for command_item in command_list.items:

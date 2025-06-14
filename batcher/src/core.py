@@ -62,7 +62,7 @@ class Batcher(metaclass=abc.ABCMeta):
         keep_image_copies: bool = False,
   ):
     self._item_tree = item_tree
-    self._procedures = actions
+    self._actions = actions
     self._conditions = conditions
     self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode
@@ -86,7 +86,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_item = None
     self._current_image = None
     self._current_layer = None
-    self._current_procedure = None
+    self._current_action = None
     self._last_condition = None
 
     self._matching_items = None
@@ -96,9 +96,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._image_copies = []
     self._orig_images_and_selected_layers = {}
 
-    self._skipped_procedures = collections.defaultdict(list)
+    self._skipped_actions = collections.defaultdict(list)
     self._skipped_conditions = collections.defaultdict(list)
-    self._failed_procedures = collections.defaultdict(list)
+    self._failed_actions = collections.defaultdict(list)
     self._failed_conditions = collections.defaultdict(list)
 
     self._should_stop = False
@@ -116,9 +116,9 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._item_tree
 
   @property
-  def procedures(self) -> pg.setting.Group:
+  def actions(self) -> pg.setting.Group:
     """Command group containing procedures."""
-    return self._procedures
+    return self._actions
 
   @property
   def conditions(self) -> pg.setting.Group:
@@ -312,9 +312,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_layer = value
 
   @property
-  def current_procedure(self) -> pg.setting.Group:
+  def current_action(self) -> pg.setting.Group:
     """The procedure currently being applied to `current_item`."""
-    return self._current_procedure
+    return self._current_action
 
   @property
   def last_condition(self) -> pg.setting.Group:
@@ -364,13 +364,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return list(self._image_copies)
 
   @property
-  def skipped_procedures(self) -> Dict[str, List]:
+  def skipped_actions(self) -> Dict[str, List]:
     """Actions that were skipped during processing.
 
     A skipped procedure was not applied to one or more items and causes no
     adverse effects further during processing.
     """
-    return dict(self._skipped_procedures)
+    return dict(self._skipped_actions)
 
   @property
   def skipped_conditions(self) -> Dict[str, List]:
@@ -382,13 +382,13 @@ class Batcher(metaclass=abc.ABCMeta):
     return dict(self._skipped_conditions)
 
   @property
-  def failed_procedures(self) -> Dict[str, List]:
+  def failed_actions(self) -> Dict[str, List]:
     """Actions that caused an error during processing.
 
     Failed procedures indicate a problem with the procedure parameters or
     potentially a bug.
     """
-    return dict(self._failed_procedures)
+    return dict(self._failed_actions)
 
   @property
   def failed_conditions(self) -> Dict[str, List]:
@@ -408,7 +408,7 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     return self._invoker
 
-  def add_procedure(self, *args, **kwargs) -> Union[int, None]:
+  def add_action(self, *args, **kwargs) -> Union[int, None]:
     """Adds a procedure to be applied during `run()`.
 
     The signature is the same as for `pygimplib.invoker.Invoker.add()`.
@@ -547,7 +547,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_item = None
     self._current_image = None
     self._current_layer = None
-    self._current_procedure = None
+    self._current_action = None
     self._last_condition = None
 
     self._should_stop = False
@@ -559,9 +559,9 @@ class Batcher(metaclass=abc.ABCMeta):
     self._image_copies = []
     self._orig_images_and_selected_layers = {}
 
-    self._skipped_procedures = collections.defaultdict(list)
+    self._skipped_actions = collections.defaultdict(list)
     self._skipped_conditions = collections.defaultdict(list)
-    self._failed_procedures = collections.defaultdict(list)
+    self._failed_actions = collections.defaultdict(list)
     self._failed_conditions = collections.defaultdict(list)
 
     self._invoker = invoker_.Invoker()
@@ -580,12 +580,12 @@ class Batcher(metaclass=abc.ABCMeta):
       self._initial_invoker,
       self._initial_invoker.list_groups(include_empty_groups=True))
 
-    self._add_commands_before_procedures_from_settings()
+    self._add_commands_before_actions_from_settings()
 
-    for procedure in self._procedures:
-      self._add_command_from_settings(procedure)
+    for action in self._actions:
+      self._add_command_from_settings(action)
 
-    self._add_commands_after_procedures_from_settings()
+    self._add_commands_after_actions_from_settings()
 
     for condition in self._conditions:
       self._add_command_from_settings(condition)
@@ -593,22 +593,22 @@ class Batcher(metaclass=abc.ABCMeta):
   def _add_commands_before_initial_invoker(self):
     pass
 
-  def _add_commands_before_procedures_from_settings(self):
+  def _add_commands_before_actions_from_settings(self):
     pass
 
-  def _add_commands_after_procedures_from_settings(self):
+  def _add_commands_after_actions_from_settings(self):
     pass
 
   def _add_name_only_commands(self):
-    self._add_name_only_commands_before_procedures_from_settings()
+    self._add_name_only_commands_before_actions_from_settings()
 
-    for procedure in self._procedures:
+    for action in self._actions:
       self._add_command_from_settings(
-        procedure,
+        action,
         [builtin_commands_common.NAME_ONLY_TAG],
         [_NAME_ONLY_COMMAND_GROUP])
 
-    self._add_name_only_commands_after_procedures_from_settings()
+    self._add_name_only_commands_after_actions_from_settings()
 
     for condition in self._conditions:
       self._add_command_from_settings(
@@ -616,10 +616,10 @@ class Batcher(metaclass=abc.ABCMeta):
         [builtin_commands_common.NAME_ONLY_TAG],
         [_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_commands_before_procedures_from_settings(self):
+  def _add_name_only_commands_before_actions_from_settings(self):
     pass
 
-  def _add_name_only_commands_after_procedures_from_settings(self):
+  def _add_name_only_commands_after_actions_from_settings(self):
     pass
 
   def _add_command_from_settings(
@@ -665,7 +665,7 @@ class Batcher(metaclass=abc.ABCMeta):
           message = f'PDB procedure "{command["function"].value}" not found'
 
           if 'procedure' in command.tags:
-            self._failed_procedures[command.name].append((None, message, None))
+            self._failed_actions[command.name].append((None, message, None))
           if 'condition' in command.tags:
             self._failed_conditions[command.name].append((None, message, None))
 
@@ -704,7 +704,7 @@ class Batcher(metaclass=abc.ABCMeta):
       if not self._is_enabled(command):
         return False
 
-      self._set_current_procedure_and_condition(command)
+      self._set_current_action_and_condition(command)
 
       args, kwargs = self._get_command_args_and_kwargs(command, command_args)
 
@@ -726,9 +726,9 @@ class Batcher(metaclass=abc.ABCMeta):
 
     return True
 
-  def _set_current_procedure_and_condition(self, command):
+  def _set_current_action_and_condition(self, command):
     if 'procedure' in command.tags:
-      self._current_procedure = command
+      self._current_action = command
 
     if 'condition' in command.tags:
       self._last_condition = command
@@ -827,13 +827,13 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _set_skipped_commands(self, command, error_message):
     if 'procedure' in command.tags:
-      self._skipped_procedures[command.name].append((self._current_item, error_message))
+      self._skipped_actions[command.name].append((self._current_item, error_message))
     if 'condition' in command.tags:
       self._skipped_conditions[command.name].append((self._current_item, error_message))
 
   def _set_failed_commands(self, command, error_message, trace=None):
     if 'procedure' in command.tags:
-      self._failed_procedures[command.name].append((self._current_item, error_message, trace))
+      self._failed_actions[command.name].append((self._current_item, error_message, trace))
     if 'condition' in command.tags:
       self._failed_conditions[command.name].append((self._current_item, error_message, trace))
 
@@ -1013,7 +1013,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_item = None
     self._current_image = None
     self._current_layer = None
-    self._current_procedure = None
+    self._current_action = None
     self._last_condition = None
 
   def _do_cleanup_contents(self, exception_occurred):
@@ -1083,30 +1083,30 @@ class ImageBatcher(Batcher):
       [commands.DEFAULT_ACTIONS_GROUP],
       foreach=True)
 
-  def _add_commands_before_procedures_from_settings(self):
-    super()._add_commands_before_procedures_from_settings()
+  def _add_commands_before_actions_from_settings(self):
+    super()._add_commands_before_actions_from_settings()
 
-    self._add_default_rename_procedure([commands.DEFAULT_ACTIONS_GROUP])
+    self._add_default_rename_action([commands.DEFAULT_ACTIONS_GROUP])
 
-  def _add_commands_after_procedures_from_settings(self):
-    super()._add_commands_after_procedures_from_settings()
+  def _add_commands_after_actions_from_settings(self):
+    super()._add_commands_after_actions_from_settings()
 
-    self._add_default_export_procedure([commands.DEFAULT_ACTIONS_GROUP])
+    self._add_default_export_action([commands.DEFAULT_ACTIONS_GROUP])
 
-  def _add_name_only_commands_before_procedures_from_settings(self):
-    self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
+  def _add_name_only_commands_before_actions_from_settings(self):
+    self._add_default_rename_action([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_commands_after_procedures_from_settings(self):
-    self._add_default_export_procedure([_NAME_ONLY_COMMAND_GROUP])
+  def _add_name_only_commands_after_actions_from_settings(self):
+    self._add_default_export_action([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_default_rename_procedure(self, command_groups):
+  def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_actions.rename_image_for_convert,
         groups=command_groups,
         args=[self._name_pattern])
 
-  def _add_default_export_procedure(self, command_groups):
+  def _add_default_export_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_actions.export,
@@ -1232,30 +1232,30 @@ class LayerBatcher(Batcher):
         [commands.DEFAULT_ACTIONS_GROUP],
         foreach=True)
 
-  def _add_commands_before_procedures_from_settings(self):
-    super()._add_commands_before_procedures_from_settings()
+  def _add_commands_before_actions_from_settings(self):
+    super()._add_commands_before_actions_from_settings()
 
-    self._add_default_rename_procedure([commands.DEFAULT_ACTIONS_GROUP])
+    self._add_default_rename_action([commands.DEFAULT_ACTIONS_GROUP])
 
-  def _add_commands_after_procedures_from_settings(self):
-    super()._add_commands_after_procedures_from_settings()
+  def _add_commands_after_actions_from_settings(self):
+    super()._add_commands_after_actions_from_settings()
 
-    self._add_default_export_procedure([commands.DEFAULT_ACTIONS_GROUP])
+    self._add_default_export_action([commands.DEFAULT_ACTIONS_GROUP])
 
-  def _add_name_only_commands_before_procedures_from_settings(self):
-    self._add_default_rename_procedure([_NAME_ONLY_COMMAND_GROUP])
+  def _add_name_only_commands_before_actions_from_settings(self):
+    self._add_default_rename_action([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_commands_after_procedures_from_settings(self):
-    self._add_default_export_procedure([_NAME_ONLY_COMMAND_GROUP])
+  def _add_name_only_commands_after_actions_from_settings(self):
+    self._add_default_export_action([_NAME_ONLY_COMMAND_GROUP])
   
-  def _add_default_rename_procedure(self, command_groups):
+  def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_actions.rename_layer,
         groups=command_groups,
         args=[self._name_pattern])
   
-  def _add_default_export_procedure(self, command_groups):
+  def _add_default_export_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
         builtin_actions.export,

@@ -115,7 +115,7 @@ def _get_adjacent_layer(
       # matching color tags and `None` is present at least once, we always
       # consider `next_layer` to be the background/foreground.
       color_tags = []
-      for procedure in _get_previous_enabled_procedures(batcher, batcher.current_procedure):
+      for procedure in _get_previous_enabled_procedures(batcher, batcher.current_action):
         if any(procedure['orig_name'].value == orig_name
                for orig_name in insert_builtin_procedure_names):
           if color_tag_argument_name_for_builtin_actions in procedure['arguments']:
@@ -138,7 +138,7 @@ def _get_adjacent_layer(
 def _get_previous_enabled_procedures(batcher, current_command):
   previous_enabled_procedures = []
 
-  for procedure in batcher.procedures:
+  for procedure in batcher.actions:
     if procedure == current_command:
       return previous_enabled_procedures
 

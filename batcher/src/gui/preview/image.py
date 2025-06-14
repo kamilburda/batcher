@@ -268,7 +268,7 @@ class ImagePreview(preview_base_.Preview):
 
     self._batcher.remove_command(
       self._set_update_duration_command_id, groups='all', ignore_if_not_exists=True)
-    self._set_update_duration_command_id = self._batcher.add_procedure(
+    self._set_update_duration_command_id = self._batcher.add_action(
       self._set_update_duration, ['cleanup_contents'], [start_update_time], ignore_if_exists=True)
 
     image_copies, error, display_error_message_as_label = self._get_image_preview()

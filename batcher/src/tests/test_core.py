@@ -34,7 +34,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
       settings['main/procedures'],
       builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
-    batcher.add_procedure(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
+    batcher.add_action(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
     
     batcher.run(
       is_preview=True,

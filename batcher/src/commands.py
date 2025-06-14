@@ -488,7 +488,7 @@ def _create_command(
   return command
 
 
-def _create_procedure(
+def _create_action(
       name,
       additional_tags=None,
       command_groups=(DEFAULT_ACTIONS_GROUP,),
@@ -714,6 +714,6 @@ def clear(commands: pg.setting.Group, add_initial_commands: bool = True):
 
 
 _COMMAND_TYPES_AND_FUNCTIONS = {
-  'procedure': _create_procedure,
+  'procedure': _create_action,
   'condition': _create_condition,
 }
