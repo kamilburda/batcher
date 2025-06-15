@@ -34,6 +34,7 @@ from gi.repository import Gimp
 from src import core
 from src import exceptions
 from src import plugin_settings
+from src import procedure as procedure_
 from src import update
 from src import utils as utils_
 from src.gui import main as gui_main
@@ -490,7 +491,7 @@ def _set_conditions_to_only_selected_layers(settings):
     settings['main/conditions'], builtin_conditions.BUILTIN_CONDITIONS['selected_in_gimp'])
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_convert,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_CONVERT['main']),
@@ -508,7 +509,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_export_images,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_EXPORT_IMAGES['main']),
@@ -521,7 +522,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_export_images_quick,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_EXPORT_IMAGES['main/run_mode']),
@@ -534,7 +535,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_edit_and_save_images,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_EDIT_AND_SAVE_IMAGES['main']),
@@ -547,7 +548,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_edit_and_save_images_quick,
   procedure_type=Gimp.Procedure,
   arguments=pg.setting.create_params(SETTINGS_EDIT_AND_SAVE_IMAGES['main/run_mode']),
@@ -560,7 +561,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_export_layers,
   arguments=pg.setting.create_params(SETTINGS_EXPORT_LAYERS['main']),
   menu_label=_('E_xport Layers...'),
@@ -575,7 +576,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_export_layers_quick,
   menu_label=_('E_xport Layers (Quick)'),
   menu_path='<Image>/File/[Export]',
@@ -589,7 +590,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_export_selected_layers,
   menu_label=_('E_xport Selected Layers'),
   menu_path='<Layers>/Layers Menu/[Batch]',
@@ -602,7 +603,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_edit_layers,
   arguments=pg.setting.create_params(SETTINGS_EDIT_LAYERS['main']),
   menu_label=_('E_dit Layers...'),
@@ -617,7 +618,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_edit_layers_quick,
   menu_label=_('E_dit Layers (Quick)'),
   menu_path='<Image>/File/[Export]',
@@ -631,7 +632,7 @@ pg.register_procedure(
 )
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_batch_edit_selected_layers,
   menu_label=_('E_dit Selected Layers'),
   menu_path='<Layers>/Layers Menu/[Batch]',
@@ -644,4 +645,4 @@ pg.register_procedure(
 )
 
 
-pg.main()
+procedure_.main()

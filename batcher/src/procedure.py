@@ -17,7 +17,7 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
 
-from . import initnotifier as pginitnotifier
+from src import initnotifier
 
 
 _PROCEDURE_NAMES_AND_DATA = {}
@@ -190,8 +190,7 @@ def register_procedure(
 
   Example:
 
-    >>> import pygimplib as pg
-    >>> pg.register_procedure(
+    >>> register_procedure(
     ...   plug_in_awesome_filter,
     ...   arguments=[
     ...     [
@@ -306,10 +305,6 @@ def _parse_and_check_parameters(parameters):
 
 def set_use_locale(enabled):
   """If ``True``, enables plug-in localization, ``False`` otherwise.
-
-  You do not need to call this function explicitly as pygimplib will call it
-  automatically. If the `locale` directory under the main plug-in directory
-  exists, localization will be enabled.
 
   You can call this function explicitly to enable localization if you use a
   custom localization approach that does not rely on the presence of the
@@ -522,7 +517,7 @@ def _get_procedure_wrapper(func, procedure_type, init_ui, init_gegl):
     if init_gegl:
       Gegl.init()
 
-    pginitnotifier.notifier.emit('start-procedure')
+    initnotifier.notifier.emit('start-procedure')
 
     return_values = func(*procedure_and_args)
 

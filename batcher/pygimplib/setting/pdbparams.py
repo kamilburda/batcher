@@ -19,7 +19,7 @@ def create_params(
   and `setting.Group` instances.
 
   A PDB parameter is represented as a list of values. See the ``arguments``
-  parameter in `pygimplib.procedure.register_procedure()` for more information.
+  parameter in `procedure.register_procedure()` for more information.
 
   If ``recursive`` is ``True``, groups are traversed recursively. Otherwise,
   only top-level settings within each group from ``settings_or_groups`` are

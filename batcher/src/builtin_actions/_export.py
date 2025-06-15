@@ -15,6 +15,7 @@ from pygimplib import pdb
 from src import builtin_commands_common
 from src import exceptions
 from src import file_formats as file_formats_
+from src import initnotifier
 from src import itemtree
 from src import overwrite
 from src import renamer as renamer_
@@ -751,7 +752,7 @@ def set_file_extension_options_for_default_export_action(main_settings):
     _show_hide_file_format_export_options,
     main_settings['export/file_format_export_options'])
 
-  pg.notifier.connect(
+  initnotifier.notifier.connect(
     'start-procedure',
     lambda _notifier: _set_file_format_export_options(
       main_settings['file_extension'],

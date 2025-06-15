@@ -28,10 +28,11 @@ GIMP API is properly initialized.
 
 In client code, you would use this singleton as follows:
 
-  import pygimplib as pg
+  import initnotifier
 
   def do_stuff_after_plugin_initialization(_notifier):
     print('initialized')
   
-  pg.notifier.connect('start-procedure', do_stuff_after_plugin_initialization)
+  initnotifier.notifier.connect(
+    'start-procedure', do_stuff_after_plugin_initialization)
 """

@@ -8,8 +8,7 @@ from gi.repository import Gimp
 from gi.repository import GLib
 from gi.repository import GObject
 
-from .. import procedure as pgprocedure
-from .. import utils as pgutils
+from src import procedure as procedure_
 
 
 def sample_procedure(*_args, **_kwargs):
@@ -20,16 +19,16 @@ def sample_procedure_2(*_args, **_kwargs):
   pass
 
 
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.Gimp')
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.inspect.isclass', return_value=True)
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.procedure.issubclass', return_value=False)
+@mock.patch('src.procedure.Gimp')
+@mock.patch('src.procedure.inspect.isclass', return_value=True)
+@mock.patch('src.procedure.issubclass', return_value=False)
 class TestProcedure(unittest.TestCase):
 
   def setUp(self):
-    pgprocedure._PROCEDURE_NAMES_AND_DATA = {}
-    pgprocedure._PLUGIN_PROPERTIES = {}
+    procedure_._PROCEDURE_NAMES_AND_DATA = {}
+    procedure_._PLUGIN_PROPERTIES = {}
 
-    pgprocedure.set_use_locale(False)
+    procedure_.set_use_locale(False)
 
     self.run_mode_argument = [
       'enum',
@@ -73,13 +72,13 @@ class TestProcedure(unittest.TestCase):
   def tearDown(self):
     # Clear the global variables here as well in the marginal case
     # other test modules make use of `procedure`.
-    pgprocedure._PROCEDURE_NAMES_AND_DATA = {}
-    pgprocedure._PLUGIN_PROPERTIES = {}
+    procedure_._PROCEDURE_NAMES_AND_DATA = {}
+    procedure_._PLUGIN_PROPERTIES = {}
 
-    pgprocedure.set_use_locale(False)
+    procedure_.set_use_locale(False)
 
   def test_register_single_procedure(self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       # We pass an explicit `procedure_type` argument since the default
       # argument value would have to be mocked (the default value is the
@@ -107,7 +106,7 @@ class TestProcedure(unittest.TestCase):
 
     # Do not instantiate with `Gimp.PlugIn` as the parent class as objects of
     # these classes should not be instantiated outside `Gimp.main()`.
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
 
     mock_procedure = plugin.do_create_procedure('sample-procedure')
 
@@ -131,29 +130,29 @@ class TestProcedure(unittest.TestCase):
     self.assertTrue(hasattr(plugin, 'do_set_i18n'))
 
   def test_create_procedure_no_matching_name(self, *_mocks):
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
     self.assertIsNone(plugin.do_create_procedure('nonexistent-procedure'))
 
   def test_register_procedure_with_locale(self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.set_use_locale(True)
-    pgprocedure.register_procedure(
+    procedure_.set_use_locale(True)
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
 
     self.assertFalse(hasattr(plugin, 'do_set_i18n'))
 
   def test_register_procedure_with_multiple_menu_paths(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       menu_path=['<Image>/Filters', '<Image>/Colors'],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
     mock_procedure = plugin.do_create_procedure('sample-procedure')
 
     self.assertListEqual(
@@ -163,14 +162,14 @@ class TestProcedure(unittest.TestCase):
 
   def test_register_procedure_with_documentation_of_3_elements(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       documentation=(
         'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc'),
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
     mock_procedure = plugin.do_create_procedure('sample-procedure')
 
     mock_procedure.set_documentation.assert_called_once_with(
@@ -183,7 +182,7 @@ class TestProcedure(unittest.TestCase):
       mock.Mock(),
     ]
 
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
@@ -195,7 +194,7 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure_2,
       procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
@@ -207,7 +206,7 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
     mock_procedure = plugin.do_create_procedure('sample-procedure')
     mock_procedure_2 = plugin.do_create_procedure('sample-procedure-2')
 
@@ -226,7 +225,7 @@ class TestProcedure(unittest.TestCase):
 
   def test_register_procedure_raises_error_if_type_is_not_string(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
@@ -242,14 +241,14 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
 
     with self.assertRaises(TypeError):
       plugin.do_create_procedure('sample-procedure')
 
   def test_register_procedure_raises_error_if_multiple_arguments_have_same_name(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
@@ -274,14 +273,14 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
 
     with self.assertRaises(ValueError):
       plugin.do_create_procedure('sample-procedure')
 
   def test_register_procedure_raises_error_if_missing_mandatory_args(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    pgprocedure.register_procedure(
+    procedure_.register_procedure(
       sample_procedure,
       procedure_type=mock_gimp_module.ImageProcedure,
       arguments=[
@@ -291,12 +290,12 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = pgprocedure._create_plugin_class(bases=())()
+    plugin = procedure_._create_plugin_class(bases=())()
 
     with self.assertRaises(ValueError):
       plugin.do_create_procedure('sample-procedure')
 
   def test_register_procedure_raises_error_if_proc_with_same_name_already_exists(self, *_mocks):
-    pgprocedure.register_procedure(sample_procedure)
+    procedure_.register_procedure(sample_procedure)
     with self.assertRaises(ValueError):
-      pgprocedure.register_procedure(sample_procedure)
+      procedure_.register_procedure(sample_procedure)

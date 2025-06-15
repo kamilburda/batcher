@@ -34,12 +34,20 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
-PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(
-  inspect.getfile(inspect.currentframe()))))
+
+PLUGIN_DIRPATH = (
+  os.path.dirname(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))))
 if PLUGIN_DIRPATH not in sys.path:
   sys.path.append(PLUGIN_DIRPATH)
 
+BATCHER_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'batcher')
+if BATCHER_DIRPATH not in sys.path:
+  sys.path.append(BATCHER_DIRPATH)
+
+
 from batcher import pygimplib as pg
+
+from src import procedure as procedure_
 
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
@@ -191,7 +199,7 @@ class _Stream:
     pass
 
 
-pg.register_procedure(
+procedure_.register_procedure(
   plug_in_run_tests,
   procedure_type=Gimp.Procedure,
   arguments=[
@@ -257,4 +265,4 @@ pg.register_procedure(
 )
 
 
-pg.main()
+procedure_.main()
