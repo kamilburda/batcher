@@ -6,9 +6,9 @@ list of file extensions. The list can be used for:
 * obtaining file format options (arguments).
 """
 
-import pygimplib as pg
 from pygimplib import pdb
 
+from src import setting as setting_
 from src import settings_from_pdb as settings_from_pdb_
 
 
@@ -51,7 +51,7 @@ def _remove_common_file_format_options(file_format_options_list, common_argument
 
 
 def create_file_format_options_settings(file_format_options_list):
-  group = pg.setting.Group('file_format_options')
+  group = setting_.Group('file_format_options')
 
   processed_file_format_options_list = []
   file_format_options_values = {}

@@ -1,8 +1,8 @@
 import unittest
 
-from ...setting import meta as meta_
-from ...setting import settings as settings_
-from ...setting import presenters_gtk
+from src.setting import meta as meta_
+from src.setting import settings as settings_
+from src.setting import presenters_gtk
 
 
 class TestSettingTypeFunctions(unittest.TestCase):

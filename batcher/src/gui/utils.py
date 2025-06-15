@@ -11,10 +11,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import core
+from src import setting as setting_
 from src import setting_classes
 from src.gui import placeholders as gui_placeholders_
-
-import pygimplib as pg
 
 
 def attach_label_to_grid(
@@ -69,10 +68,10 @@ def attach_widget_to_grid(
 ):
   widget_to_attach = setting.gui.widget
 
-  if isinstance(setting.gui, pg.setting.SETTING_GUI_TYPES.null):
+  if isinstance(setting.gui, setting_.SETTING_GUI_TYPES.null):
     widget_to_attach = gui_placeholders_.create_placeholder_widget()
   else:
-    if (isinstance(setting, pg.setting.ArraySetting)
+    if (isinstance(setting, setting_.ArraySetting)
         and not setting.element_type.get_allowed_gui_types()):
       widget_to_attach = gui_placeholders_.create_placeholder_widget()
 
@@ -88,7 +87,7 @@ def attach_widget_to_grid(
     if set_name_as_tooltip and _has_setting_display_name(setting):
       widget_to_attach.set_tooltip_text(setting.name)
 
-    if isinstance(setting.gui, pg.setting.CheckButtonPresenter):
+    if isinstance(setting.gui, setting_.CheckButtonPresenter):
       widget_to_attach.get_child().set_width_chars(width_chars_for_check_button_labels)
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
@@ -96,7 +95,7 @@ def attach_widget_to_grid(
 
 def _should_display_setting_display_name_in_grid(setting):
   presenters_with_no_label = (
-    pg.setting.CheckButtonPresenter,
+    setting_.CheckButtonPresenter,
     setting_classes.FileFormatOptionsPresenter,
   )
 

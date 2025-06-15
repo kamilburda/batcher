@@ -10,8 +10,8 @@ from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from ...setting import meta as meta_
-from ...setting import settings as settings_
+from src.setting import meta as meta_
+from src.setting import settings as settings_
 
 
 _SETTING_WIDGET_WIDTH = 450

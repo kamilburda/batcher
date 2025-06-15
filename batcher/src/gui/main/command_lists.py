@@ -6,12 +6,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
+from src import setting as setting_
 
+from src.config import CONFIG
 from src.gui import messages as messages_
 from src.gui.commands import list as command_list_
 from src.gui.main import export_settings as export_settings_
@@ -32,7 +32,7 @@ class CommandLists:
     self._action_list = command_list_.CommandList(
       self._settings['main/actions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_actions.BUILTIN_ACTIONS, [pg.config.PROCEDURE_GROUP]),
+        builtin_actions.BUILTIN_ACTIONS, [CONFIG.PROCEDURE_GROUP]),
       add_command_text=_('Add _Action...'),
       allow_custom_commands=True,
       add_custom_command_text=_('Add Custom Action...'),
@@ -45,7 +45,7 @@ class CommandLists:
     self._condition_list = command_list_.CommandList(
       self._settings['main/conditions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_conditions.BUILTIN_CONDITIONS, [pg.config.PROCEDURE_GROUP]),
+        builtin_conditions.BUILTIN_CONDITIONS, [CONFIG.PROCEDURE_GROUP]),
       add_command_text=_('Add C_ondition...'),
       allow_custom_commands=False,
       propagate_natural_height=True,
@@ -152,19 +152,19 @@ class CommandLists:
 
   def _init_setting_gui(self):
     self._settings['gui/action_browser/paned_position'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+      gui_type=setting_.SETTING_GUI_TYPES.paned_position,
       widget=self._action_list.browser.paned,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['gui/action_browser/dialog_position'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
+      gui_type=setting_.SETTING_GUI_TYPES.window_position,
       widget=self._action_list.browser.widget,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['gui/action_browser/dialog_size'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
+      gui_type=setting_.SETTING_GUI_TYPES.window_size,
       widget=self._action_list.browser.widget,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
@@ -577,7 +577,7 @@ def _set_display_name_for_rename_action_for_rename_only_new_images(
 
 
 def _handle_export_action_item_added(item):
-  pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
+  CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
     item.command['arguments/file_extension'])
 
   item.command['arguments/file_extension'].gui.widget.connect(

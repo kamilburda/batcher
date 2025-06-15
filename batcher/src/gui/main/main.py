@@ -13,17 +13,17 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
-from src.procedure_groups import *
-
+from src import setting as setting_
+from src.config import CONFIG
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
-
 from src.gui.main import command_lists as command_lists_
 from src.gui.main import batcher_manager as batcher_manager_
 from src.gui.main import export_settings as export_settings_
 from src.gui.main import previews as previews_
 from src.gui.main import settings_manager as settings_manager_
+from src.procedure_groups import *
 
 
 class BatchProcessingGui:
@@ -87,7 +87,7 @@ class BatchProcessingGui:
     return self._command_lists.condition_list
 
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
+    self._dialog = GimpUi.Dialog(title=self._title, role=CONFIG.PLUGIN_NAME)
     if self._settings['gui/size/dialog_size'].value:
       self._dialog.set_default_size(*self._settings['gui/size/dialog_size'].value)
     self._dialog.set_default_response(Gtk.ResponseType.CANCEL)
@@ -112,7 +112,7 @@ class BatchProcessingGui:
       self._item_tree,
       previews_top_label,
       lock_previews=True,
-      manage_items=pg.config.PROCEDURE_GROUP == CONVERT_GROUP,
+      manage_items=CONFIG.PROCEDURE_GROUP == CONVERT_GROUP,
       display_message_func=self._display_inline_message,
       current_image=self._current_image,
     )
@@ -152,7 +152,7 @@ class BatchProcessingGui:
     self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
     self._button_run.hide()
-    if self._mode == 'export' and pg.config.PROCEDURE_GROUP != CONVERT_GROUP:
+    if self._mode == 'export' and CONFIG.PROCEDURE_GROUP != CONVERT_GROUP:
       self._button_run.set_label(_('_Export'))
     else:
       self._button_run.set_label(_('_Run'))
@@ -264,13 +264,13 @@ class BatchProcessingGui:
     self._settings.initialize_gui(
       {
         'gui/size/dialog_position': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.window_position,
+          gui_type=setting_.SETTING_GUI_TYPES.window_position,
           widget=self._dialog),
         'gui/size/dialog_size': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.window_size,
+          gui_type=setting_.SETTING_GUI_TYPES.window_size,
           widget=self._dialog),
         'gui/size/paned_outside_previews_position': dict(
-          gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+          gui_type=setting_.SETTING_GUI_TYPES.paned_position,
           widget=self._hpaned_settings_and_previews),
       },
       only_null=True,
@@ -360,8 +360,8 @@ class BatchProcessingGui:
   def _get_help_button(reference_button):
     button_help = Gtk.LinkButton(
       uri=(
-        pg.config.LOCAL_DOCS_PATH if os.path.isfile(pg.config.LOCAL_DOCS_PATH)
-        else pg.config.DOCS_URL),
+        CONFIG.LOCAL_DOCS_PATH if os.path.isfile(CONFIG.LOCAL_DOCS_PATH)
+        else CONFIG.DOCS_URL),
       label=_('_Help'),
       use_underline=True,
     )
@@ -435,7 +435,7 @@ class BatchProcessingQuickGui:
     return self._dialog
 
   def _init_gui(self):
-    self._dialog = GimpUi.Dialog(title=self._title, role=pg.config.PLUGIN_NAME)
+    self._dialog = GimpUi.Dialog(title=self._title, role=CONFIG.PLUGIN_NAME)
     self._dialog.set_border_width(self._BORDER_WIDTH)
     self._dialog.set_default_size(self._DEFAULT_DIALOG_WIDTH, -1)
 
@@ -462,7 +462,7 @@ class BatchProcessingQuickGui:
 
       self._dialog.vbox.pack_start(self._check_button_show_this_dialog, False, False, 0)
 
-      if self._mode == 'export' and pg.config.PROCEDURE_GROUP != CONVERT_GROUP:
+      if self._mode == 'export' and CONFIG.PROCEDURE_GROUP != CONVERT_GROUP:
         button_run_label = _('_Export')
       else:
         button_run_label = _('_Run')
@@ -504,7 +504,7 @@ class BatchProcessingQuickGui:
     # Save only select settings as e.g. conditions are modified by Export/Edit
     # Selected Layers. We cannot use 'ignore_save' on actions or conditions
     # as that would save empty groups, effectively erasing them.
-    pg.setting.Persistor.save(settings_to_save)
+    setting_.Persistor.save(settings_to_save)
 
     Gtk.main_quit()
 

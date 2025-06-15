@@ -18,6 +18,7 @@ from src import core
 from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
+from src.config import CONFIG
 from src.procedure_groups import *
 
 
@@ -34,7 +35,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+    CONFIG.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
     Gimp.context_push()
 

@@ -324,7 +324,7 @@ def _update_gtypes(namespace, cls, gtypes_and_setting_types):
 
 
 def process_setting_type(
-      setting_type_or_name: Union[Type['setting.Setting'], str]) -> Type['setting.Setting']:
+      setting_type_or_name: Union[Type['src.setting.Setting'], str]) -> Type['src.setting.Setting']:
   """Returns a `setting.Setting` class based on the input type or name.
 
   ``setting_type_or_name`` can be a `setting.Setting` class or a string
@@ -336,13 +336,13 @@ def process_setting_type(
     setting_type_or_name,
     SETTING_TYPES,
     (f'setting type "{setting_type_or_name}" is not recognized; refer to'
-     ' pygimplib.setting.SETTING_TYPES for the supported setting types and their'
+     ' setting.SETTING_TYPES for the supported setting types and their'
      ' aliases'))
 
 
 def process_setting_gui_type(
-      setting_gui_type_or_name: Union[Type['setting.Presenter'], str],
-) -> Type['setting.Presenter']:
+      setting_gui_type_or_name: Union[Type['src.setting.Presenter'], str],
+) -> Type['src.setting.Presenter']:
   """Returns a `setting.Presenter` class based on the input type or name.
 
   ``setting_gui_type_or_name`` can be a `setting.Presenter` class or a string
@@ -356,7 +356,7 @@ def process_setting_gui_type(
     SETTING_GUI_TYPES,
     (
       f'setting GUI type "{setting_gui_type_or_name}" is not recognized; refer to'
-      ' pygimplib.setting.SETTING_GUI_TYPES for the supported setting GUI types'
+      ' setting.SETTING_GUI_TYPES for the supported setting GUI types'
       ' and their aliases'))
 
 

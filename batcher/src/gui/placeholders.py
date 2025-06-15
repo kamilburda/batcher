@@ -9,11 +9,11 @@ from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
+from src import setting as setting_
 
 
-class PlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
-  """`pygimplib.setting.presenter.Presenter` subclass for `Gtk.ComboBoxText`
+class PlaceholdersComboBoxPresenter(setting_.GtkPresenter):
+  """`setting.presenter.Presenter` subclass for `Gtk.ComboBoxText`
   representing `placeholders.Placeholder` instances.
   
   Value: `placeholders.Placeholder` instance selected in the combo box.
@@ -47,7 +47,7 @@ class PlaceholdersComboBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_active(self._placeholder_names_and_indexes[value])
 
 
-class UnsupportedParameterPresenter(pg.setting.GtkPresenter):
+class UnsupportedParameterPresenter(setting_.GtkPresenter):
 
   def __init__(self, *args, **kwargs):
     self._value = None

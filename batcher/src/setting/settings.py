@@ -19,10 +19,8 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 
-from .. import pdbutils as pgpdbutils
-from .. import pypdb
-from ..pypdb import pdb
-from .. import utils as pgutils
+import pygimplib as pg
+from pygimplib import pdb
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -391,12 +389,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return [meta_.process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
   
   def __str__(self) -> str:
-    return pgutils.stringify_object(self, self.name)
+    return pg.utils.stringify_object(self, self.name)
   
   def __repr__(self) -> str:
-    return pgutils.reprify_object(self, self.name)
+    return pg.utils.reprify_object(self, self.name)
 
-  def get_path(self, relative_path_group: Union['setting.Group', str, None] = None) -> str:
+  def get_path(self, relative_path_group: Union['src.setting.Group', str, None] = None) -> str:
     """Returns the full path of this setting.
 
     This is a wrapper method for `setting.utils.get_setting_path()`. Consult
@@ -514,11 +512,11 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         subclass. If ``None``, the ``gui_type_kwargs`` parameter specified in
         `__init__()` is used instead.
       copy_previous_value:
-        See `pygimplib.setting.Presenter.__init__()`.
+        See `setting.Presenter.__init__()`.
       copy_previous_visible:
-        See `pygimplib.setting.Presenter.__init__()`.
+        See `setting.Presenter.__init__()`.
       copy_previous_sensitive:
-        See `pygimplib.setting.Presenter.__init__()`.
+        See `setting.Presenter.__init__()`.
     """
     if gui_type != 'automatic' and widget is None:
       raise ValueError('widget cannot be None if gui_type is not "automatic"')
@@ -553,11 +551,11 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self.invoke_event('after-set-gui')
 
-  def uniquify_name(self, group: 'setting.Group'):
+  def uniquify_name(self, group: 'src.setting.Group'):
     """Modifies the ``name`` attribute to be unique within all immediate
     children of the specified ``group``.
 
-    See `pygimplib.setting.utils.get_unique_setting_name` for more information.
+    See `setting.utils.get_unique_setting_name` for more information.
     """
     self._name = utils_.get_unique_setting_name(self.name, group)
 
@@ -773,7 +771,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         self, message, message_id, prepend_value=True, value=None):
     self._is_valid = False
 
-    formatted_traceback = pgutils.get_traceback(stack_levels_to_keep=-2)
+    formatted_traceback = pg.utils.get_traceback(stack_levels_to_keep=-2)
 
     if prepend_value:
       processed_message = f'"{value}": {message}'
@@ -1215,7 +1213,7 @@ class EnumSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.enum_combo_box]
 
   # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
-  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(pgutils.get_enum_values(self.enum_type)), 0)
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(pg.utils.get_enum_values(self.enum_type)), 0)
 
   _SUPPORTED_MODULES_WITH_ENUMS = {
     'Gimp': 'gi.repository.Gimp',
@@ -1233,7 +1231,7 @@ class EnumSetting(Setting):
           Type[GObject.GEnum],
           GObject.GType,
           str,
-          Tuple[pypdb.PDBProcedure, GObject.ParamSpec],
+          Tuple[pg.pypdb.PDBProcedure, GObject.ParamSpec],
           Tuple[str, str],
         ],
         excluded_values: Optional[Iterable[GObject.GEnum]] = None,
@@ -1280,7 +1278,7 @@ class EnumSetting(Setting):
     return self._enum_type
 
   @property
-  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
+  def procedure(self) -> Union[pg.pypdb.PDBProcedure, None]:
     """A PDB procedure containing the enum in this setting, or ``None`` if not
     specified.
     """
@@ -1515,7 +1513,7 @@ class ChoiceSetting(Setting):
             List[Tuple[str, str, int, str]],
             Gimp.Choice]
         ] = None,
-        procedure: Optional[Union[pypdb.PDBProcedure, str]] = None,
+        procedure: Optional[Union[pg.pypdb.PDBProcedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1570,7 +1568,7 @@ class ChoiceSetting(Setting):
     return self._items_help
 
   @property
-  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
+  def procedure(self) -> Union[pg.pypdb.PDBProcedure, None]:
     """A `pypdb.PDBProcedure` instance allowing to obtain the `Gimp.Choice`
     instance for this setting.
     """
@@ -1647,10 +1645,10 @@ class ChoiceSetting(Setting):
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
 
   @staticmethod
-  def _process_procedure(procedure, raw_items) -> Union[pypdb.PDBProcedure, str, None]:
+  def _process_procedure(procedure, raw_items) -> Union[pg.pypdb.PDBProcedure, str, None]:
     if procedure is None or raw_items:
       return None
-    elif isinstance(procedure, pypdb.PDBProcedure):
+    elif isinstance(procedure, pg.pypdb.PDBProcedure):
       return procedure
     elif isinstance(procedure, str):
       if procedure in pdb:
@@ -1785,7 +1783,7 @@ class ImageSetting(Setting):
     if isinstance(raw_value, int):
       value = Gimp.Image.get_by_id(raw_value)
     elif isinstance(raw_value, str):
-      value = pgpdbutils.find_image_by_filepath(raw_value)
+      value = pg.pdbutils.find_image_by_filepath(raw_value)
     
     return value
   
@@ -1865,15 +1863,15 @@ class GimpItemSetting(Setting):
 
   def _get_item_from_image_and_item_path(
         self, item_type_name, item_path_components, image_filepath):
-    image = pgpdbutils.find_image_by_filepath(image_filepath)
+    image = pg.pdbutils.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None
 
-    return pgpdbutils.get_item_from_image_and_item_path(item_type_name, item_path_components, image)
+    return pg.pdbutils.get_item_from_image_and_item_path(item_type_name, item_path_components, image)
 
   def _item_to_path(self, item):
-    return pgpdbutils.get_item_as_path(item)
+    return pg.pdbutils.get_item_as_path(item)
 
   def _get_pdb_param(self):
     return [
@@ -2179,7 +2177,7 @@ class DrawableFilterSetting(Setting):
     except ValueError:
       return None
 
-    drawable_as_path = pgpdbutils.get_item_as_path(self.drawable)
+    drawable_as_path = pg.pdbutils.get_item_as_path(self.drawable)
 
     if drawable_as_path is None:
       return None
@@ -2198,12 +2196,12 @@ class DrawableFilterSetting(Setting):
     drawable_filter_position = path_list[-2]
     drawable_filter_name = path_list[-1]
 
-    image = pgpdbutils.find_image_by_filepath(image_filepath)
+    image = pg.pdbutils.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None, None
 
-    drawable = pgpdbutils.get_item_from_image_and_item_path(
+    drawable = pg.pdbutils.get_item_from_image_and_item_path(
       drawable_type_name, drawable_path_components, image)
 
     if drawable is None:
@@ -2568,7 +2566,7 @@ class BytesSetting(Setting):
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
-      return GLib.Bytes.new(pgutils.escaped_string_to_bytes(raw_value, remove_overflow=True))
+      return GLib.Bytes.new(pg.utils.escaped_string_to_bytes(raw_value, remove_overflow=True))
     elif isinstance(raw_value, bytes):
       return GLib.Bytes.new(raw_value)
     elif isinstance(raw_value, list):  # Presumably list of valid integers
@@ -3090,7 +3088,7 @@ class ArraySetting(Setting):
         self._element_kwargs['default_value'])
 
     for key, value in self._element_kwargs.items():
-      pgutils.create_read_only_property(self, f'element_{key}', value)
+      pg.utils.create_read_only_property(self, f'element_{key}', value)
     
     self._elements = []
     
@@ -3491,7 +3489,7 @@ class DictSetting(ContainerSetting):
 def get_setting_type_and_kwargs(
       gtype: GObject.GType,
       pdb_param_info: Optional[GObject.ParamSpec] = None,
-      pdb_procedure: Optional[pypdb.PDBProcedure] = None,
+      pdb_procedure: Optional[pg.pypdb.PDBProcedure] = None,
 ) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
   """Given a GIMP PDB parameter type, returns the corresponding `Setting`
   subclass and keyword arguments passable to its ``__init__()`` method.

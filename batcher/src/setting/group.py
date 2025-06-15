@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import inspect
 from typing import Any, Callable, Dict, Generator, List, Optional, Set, Union
 
-from .. import utils as pgutils
+import pygimplib as pg
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -117,10 +117,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     return self._recurse_setting_attributes
   
   def __str__(self) -> str:
-    return pgutils.stringify_object(self, self.name)
+    return pg.utils.stringify_object(self, self.name)
   
   def __repr__(self) -> str:
-    return pgutils.reprify_object(self, self.name)
+    return pg.utils.reprify_object(self, self.name)
   
   def __getitem__(self, setting_name_or_path: str) -> Union[settings_.Setting, Group]:
     """Returns a setting or group given its name or full path.
@@ -506,7 +506,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     `GroupWalkCallbacks` class.
     """
     if include_setting_func is None:
-      include_setting_func = pgutils.create_empty_func(return_value=True)
+      include_setting_func = pg.utils.create_empty_func(return_value=True)
     
     if walk_callbacks is None:
       walk_callbacks = GroupWalkCallbacks()
@@ -560,17 +560,17 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
 
     Child settings with the ``'ignore_reset'`` tag are ignored.
     """
-    def _has_ignore_reset_tag(setting_):
-      return 'ignore_reset' not in setting_.tags
+    def _has_ignore_reset_tag(s):
+      return 'ignore_reset' not in s.tags
     
     for setting in self.walk(include_setting_func=_has_ignore_reset_tag):
       setting.reset()
 
-  def uniquify_name(self, group: 'setting.Group'):
+  def uniquify_name(self, group: 'src.setting.Group'):
     """Modifies the ``name`` attribute to be unique within all immediate
     children of the specified ``group``.
 
-    See `pygimplib.setting.utils.get_unique_setting_name` for more information.
+    See `setting.utils.get_unique_setting_name` for more information.
     """
     self._name = utils_.get_unique_setting_name(self.name, group)
   
@@ -632,8 +632,8 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
         },
         copy_previous_visible=False)
     """
-    def _should_not_ignore(setting_):
-      return 'ignore_initialize_gui' not in setting_.tags
+    def _should_not_ignore(s):
+      return 'ignore_initialize_gui' not in s.tags
     
     if custom_gui is None:
       custom_gui = {}
@@ -659,8 +659,8 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     are internally assigned a valid value on instantiation while the
     corresponding settings retain their own value.
     """
-    def _should_not_ignore(setting_):
-      return 'ignore_apply_gui_value_to_setting' not in setting_.tags
+    def _should_not_ignore(s):
+      return 'ignore_apply_gui_value_to_setting' not in s.tags
     
     for setting in self.walk(include_setting_func=_should_not_ignore):
       setting.gui.update_setting_value(force=force)
@@ -738,6 +738,6 @@ class GroupWalkCallbacks:
   """
   
   def __init__(self):
-    self.on_visit_setting = pgutils.empty_func
-    self.on_visit_group = pgutils.empty_func
-    self.on_end_group_walk = pgutils.empty_func
+    self.on_visit_setting = pg.utils.empty_func
+    self.on_visit_group = pg.utils.empty_func
+    self.on_end_group_walk = pg.utils.empty_func

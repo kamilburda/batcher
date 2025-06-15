@@ -48,6 +48,8 @@ import sys
 
 import batcher.pygimplib as pg
 
+from src.config import CONFIG
+
 
 def main(source_and_dest_filepaths):
   preprocess_contents(source_and_dest_filepaths)
@@ -350,7 +352,7 @@ class IncludeConfigTag(CustomLiquidTag):
     self.args = args
   
   def get_contents(self):
-    return getattr(pg.config, self.args[0], '') if self.args else ''
+    return getattr(CONFIG, self.args[0], '') if self.args else ''
 
 
 _TAGS = {

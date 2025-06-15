@@ -10,16 +10,18 @@ import pygimplib as pg
 from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
+from src import setting as setting_
 # Despite being unused, `setting_classes` must be imported so that the
 # setting and GUI classes defined there are properly registered (via respective
-# metaclasses in `pg.setting.meta`).
+# metaclasses in `setting_.meta`).
 # noinspection PyUnresolvedReferences
 from src import setting_classes
 from src import utils
+from src.config import CONFIG
 
 
 def create_settings_for_convert():
-  settings = pg.setting.create_groups({
+  settings = setting_.create_groups({
     'name': 'all_settings',
     'groups': [
       {
@@ -110,13 +112,13 @@ def create_settings_for_convert():
     {
       'type': 'string',
       'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
+      'default_value': CONFIG.PLUGIN_VERSION,
       'pdb_type': None,
       'gui_type': None,
     },
   ])
 
-  export_settings = pg.setting.Group(
+  export_settings = setting_.Group(
     name='export',
     setting_attributes={
       'pdb_type': None,
@@ -140,7 +142,7 @@ def create_settings_for_convert():
     _create_auto_close_setting_dict(False),
   ])
 
-  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
@@ -190,7 +192,7 @@ def create_settings_for_convert():
 
 
 def create_settings_for_export_images():
-  settings = pg.setting.create_groups({
+  settings = setting_.create_groups({
     'name': 'all_settings',
     'groups': [
       {
@@ -260,13 +262,13 @@ def create_settings_for_export_images():
     {
       'type': 'string',
       'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
+      'default_value': CONFIG.PLUGIN_VERSION,
       'pdb_type': None,
       'gui_type': None,
     },
   ])
 
-  export_settings = pg.setting.Group(
+  export_settings = setting_.Group(
     name='export',
     setting_attributes={
       'pdb_type': None,
@@ -288,7 +290,7 @@ def create_settings_for_export_images():
     _create_show_quick_settings_setting_dict(),
   ])
 
-  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
@@ -342,7 +344,7 @@ def create_settings_for_export_images():
 
 
 def create_settings_for_edit_and_save_images():
-  settings = pg.setting.create_groups({
+  settings = setting_.create_groups({
     'name': 'all_settings',
     'groups': [
       {
@@ -376,7 +378,7 @@ def create_settings_for_edit_and_save_images():
     {
       'type': 'string',
       'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
+      'default_value': CONFIG.PLUGIN_VERSION,
       'pdb_type': None,
       'gui_type': None,
     },
@@ -385,7 +387,7 @@ def create_settings_for_edit_and_save_images():
   gui_settings = _create_gui_settings('gimp_image_tree_items')
   gui_settings.add([_create_auto_close_setting_dict(True)])
 
-  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
@@ -447,7 +449,7 @@ def create_settings_for_edit_and_save_images():
 
 
 def create_settings_for_export_layers():
-  settings = pg.setting.create_groups({
+  settings = setting_.create_groups({
     'name': 'all_settings',
     'groups': [
       {
@@ -515,13 +517,13 @@ def create_settings_for_export_layers():
     {
       'type': 'string',
       'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
+      'default_value': CONFIG.PLUGIN_VERSION,
       'pdb_type': None,
       'gui_type': None,
     },
   ])
 
-  export_settings = pg.setting.Group(
+  export_settings = setting_.Group(
     name='export',
     setting_attributes={
       'pdb_type': None,
@@ -544,7 +546,7 @@ def create_settings_for_export_layers():
     _create_images_and_directories_setting_dict(),
   ])
 
-  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
@@ -598,7 +600,7 @@ def create_settings_for_export_layers():
 
 
 def create_settings_for_edit_layers():
-  settings = pg.setting.create_groups({
+  settings = setting_.create_groups({
     'name': 'all_settings',
     'groups': [
       {
@@ -630,7 +632,7 @@ def create_settings_for_edit_layers():
     {
       'type': 'string',
       'name': 'plugin_version',
-      'default_value': pg.config.PLUGIN_VERSION,
+      'default_value': CONFIG.PLUGIN_VERSION,
       'pdb_type': None,
       'gui_type': None,
     },
@@ -639,7 +641,7 @@ def create_settings_for_edit_layers():
   gui_settings = _create_gui_settings('gimp_item_tree_items')
   gui_settings.add([_create_auto_close_setting_dict(False)])
 
-  size_gui_settings = pg.setting.Group(name='size')
+  size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
@@ -694,9 +696,9 @@ def create_settings_for_edit_layers():
 
 
 def _create_gui_settings(item_tree_items_setting_type):
-  gui_settings = pg.setting.Group(name='gui')
+  gui_settings = setting_.Group(name='gui')
 
-  action_browser_settings = pg.setting.Group(name='action_browser')
+  action_browser_settings = setting_.Group(name='action_browser')
 
   action_browser_settings.add([
     {

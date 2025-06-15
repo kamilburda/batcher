@@ -1,9 +1,9 @@
 """Creation and management of plug-in commands - actions and conditions.
 
-Most functions take a `pygimplib.setting.Group` instance containing commands
+Most functions take a `setting.Group` instance containing commands
 as its first argument.
 
-Many functions define events invoked on the `pygimplib.setting.Group`
+Many functions define events invoked on the `setting.Group`
 containing commands. These events include:
 
 * ``'before-add-command'``: invoked when:
@@ -67,6 +67,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 from pygimplib.pypdb import pdb
 
+from src import setting as setting_
 from src import settings_from_pdb
 from src import utils
 from src.path import uniquify
@@ -85,10 +86,10 @@ _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
 
 def create(
       name: str, initial_commands: Optional[List[Dict[str, Any]]] = None,
-) -> pg.setting.Group:
-  """Creates a `pygimplib.setting.Group` instance containing a group of commands.
+) -> setting_.Group:
+  """Creates a `setting.Group` instance containing a group of commands.
 
-  Each command is a nested `pygimplib.setting.Group` instance.
+  Each command is a nested `setting.Group` instance.
   
   Args:
     name:
@@ -98,7 +99,7 @@ def create(
       `clear()` will reset the commands returned by this function to the
       initial commands. By default, no initial commands are added.
   
-  Each created command in the returned group is a `pygimplib.setting.Group`
+  Each created command in the returned group is a `setting.Group`
   instance. Each command contains the following settings or child groups:
 
   * ``'function'``: Name of the function to call. If ``'origin'`` is
@@ -112,7 +113,7 @@ def create(
     among other things, can be used to provide an appropriate wrapper during
     processing in a `core.Batcher` instance.
 
-  * ``'arguments'``: Arguments to ``'function'`` as a `pygimplib.setting.Group`
+  * ``'arguments'``: Arguments to ``'function'`` as a `setting.Group`
     instance containing arguments as separate `Setting` instances.
 
   * ``'enabled'``: Whether the command should be applied or not.
@@ -131,7 +132,7 @@ def create(
     ``'orig_name'`` is equal to ``'name'``.
 
   * ``'tags'``: Additional tags added to each command (the
-    `pygimplib.setting.Group` instance).
+    `setting.Group` instance).
 
   * ``'display_options_on_create'``: If ``True``, a command edit dialog is
     displayed upon adding a command interactively.
@@ -178,13 +179,13 @@ def create(
   created, using the field name as the setting name.
 
   Returns:
-    A `pygimplib.setting.Group` instance representing a command group.
+    A `setting.Group` instance representing a command group.
 
   Raises:
     ValueError:
       Invalid ``'type'`` or missing required fields in ``initial_commands``.
   """
-  commands = pg.setting.Group(
+  commands = setting_.Group(
     name=name,
     setting_attributes={
       'pdb_type': None,
@@ -213,15 +214,15 @@ def _set_up_command_after_loading(commands):
 
 
 def add(
-      commands: pg.setting.Group,
-      command_dict_or_pdb_proc_name_or_command: Union[Dict[str, Any], str, pg.setting.Group],
-) -> pg.setting.Group:
+      commands: setting_.Group,
+      command_dict_or_pdb_proc_name_or_command: Union[Dict[str, Any], str, setting_.Group],
+) -> setting_.Group:
   """Adds a new or existing command to ``commands``.
 
   ``command_dict_or_pdb_proc_name_or_command`` can be one of the following:
   * a dictionary - see `create()` for the required and accepted fields,
   * a PDB procedure name,
-  * an existing `pygimplib.setting.Group` instance representing a command,
+  * an existing `setting.Group` instance representing a command,
     created via `create_command()`.
 
   The same command can be added multiple times. Each command will be
@@ -240,7 +241,7 @@ def add(
 
   if isinstance(command_dict_or_pdb_proc_name_or_command, dict):
     command_dict = utils.semi_deep_copy(command_dict_or_pdb_proc_name_or_command)
-  elif isinstance(command_dict_or_pdb_proc_name_or_command, pg.setting.Group):
+  elif isinstance(command_dict_or_pdb_proc_name_or_command, setting_.Group):
     command = command_dict_or_pdb_proc_name_or_command
   else:
     if command_dict_or_pdb_proc_name_or_command in pdb:
@@ -377,20 +378,20 @@ def _create_command(
       enabled_for_previews=True,
       orig_name=None,
 ):
-  command = pg.setting.Group(
+  command = setting_.Group(
     name,
     tags=tags,
     setting_attributes={
       'pdb_type': None,
     })
   
-  arguments_group = pg.setting.Group(
+  arguments_group = setting_.Group(
     'arguments',
     setting_attributes={
       'pdb_type': None,
     })
 
-  more_options_group = pg.setting.Group(
+  more_options_group = setting_.Group(
     'more_options',
     setting_attributes={
       'pdb_type': None,
@@ -559,7 +560,7 @@ def _set_display_name_for_enabled_gui(setting_enabled, setting_display_name):
 def _hide_gui_for_first_run_mode_arguments(command):
   first_argument = next(iter(command['arguments']), None)
   if (first_argument is not None
-      and isinstance(first_argument, pg.setting.EnumSetting)
+      and isinstance(first_argument, setting_.EnumSetting)
       and first_argument.enum_type == Gimp.RunMode):
     first_argument.gui.set_visible(False)
 
@@ -573,8 +574,8 @@ def get_command_dict_from_pdb_procedure(
   
   If the procedure contains arguments with the same name, each subsequent
   identical name is made unique (since arguments are internally represented as
-  `pygimplib.setting.Setting` instances, whose names must be unique within a
-  `pygimplib.setting.Group` instance).
+  `setting.Setting` instances, whose names must be unique within a
+  `setting.Group` instance).
   """
 
   pdb_procedure, pdb_procedure_name, arguments = (
@@ -619,8 +620,8 @@ def _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments):
 def _sanitize_pdb_procedure_name(pdb_procedure_name):
   return (
     pdb_procedure_name
-      .replace(pg.setting.SETTING_PATH_SEPARATOR, '_')
-      .replace(pg.setting.SETTING_ATTRIBUTE_SEPARATOR, '_')
+      .replace(setting_.SETTING_PATH_SEPARATOR, '_')
+      .replace(setting_.SETTING_ATTRIBUTE_SEPARATOR, '_')
   )
 
 
@@ -641,7 +642,7 @@ def _get_pdb_procedure_description(pdb_procedure):
   return blurb if blurb is not None else ''
 
 
-def reorder(commands: pg.setting.Group, command_name: str, new_position: int):
+def reorder(commands: setting_.Group, command_name: str, new_position: int):
   """Modifies the position a command to the new position.
 
   The command is specified by its name and must exist within the ``commands``
@@ -667,7 +668,7 @@ def reorder(commands: pg.setting.Group, command_name: str, new_position: int):
   commands.invoke_event('after-reorder-command', command, current_position, new_position)
 
 
-def remove(commands: pg.setting.Group, command_name: str):
+def remove(commands: setting_.Group, command_name: str):
   """Removes a command specified by its name from ``commands``.
   
   Raises:
@@ -685,7 +686,7 @@ def remove(commands: pg.setting.Group, command_name: str):
   commands.invoke_event('after-remove-command', command_name)
 
 
-def get_index(commands: pg.setting.Group, command_name: str) -> Union[int, None]:
+def get_index(commands: setting_.Group, command_name: str) -> Union[int, None]:
   """Returns the index of the command matching ``command_name``.
   
   If there is no such command, ``None`` is returned.
@@ -696,7 +697,7 @@ def get_index(commands: pg.setting.Group, command_name: str) -> Union[int, None]
     None)
 
 
-def clear(commands: pg.setting.Group, add_initial_commands: bool = True):
+def clear(commands: setting_.Group, add_initial_commands: bool = True):
   """Removes all added commands.
   
   If ``add_initial_commands`` is ``True``, commands specified in

@@ -11,7 +11,8 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from src import renamer as renamer_
-
+from src import setting as setting_
+from src.config import CONFIG
 from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 
@@ -125,13 +126,13 @@ class ExportSettings:
 
   def _init_setting_gui(self):
     self._settings['main/name_pattern'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
+      gui_type=setting_.SETTING_GUI_TYPES.extended_entry,
       widget=self._name_pattern_entry,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['main/file_extension'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.extended_entry,
+      gui_type=setting_.SETTING_GUI_TYPES.extended_entry,
       widget=self._file_extension_entry,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
@@ -174,7 +175,7 @@ class ExportSettings:
         self._name_preview.update)
 
   def _set_up_file_extension(self):
-    pg.config.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
+    CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
       self._settings['main/file_extension'])
 
     self._file_extension_entry.connect(

@@ -22,6 +22,7 @@ from pygimplib import pdb
 
 from src import itemtree
 from src import utils as utils_
+from src.config import CONFIG
 from src.procedure_groups import *
 
 
@@ -66,7 +67,7 @@ def main():
     os.path.join(input_files_dirpath, filename)
     for filename in os.listdir(input_files_dirpath)])
 
-  pg.config.PROCEDURE_GROUP = CONVERT_GROUP
+  CONFIG.PROCEDURE_GROUP = CONVERT_GROUP
 
   convert_settings = plugin_settings.create_settings_for_convert()
   convert_settings['gui/inputs_interactive'].set_value(
@@ -81,7 +82,7 @@ def main():
     run_gui_func=take_screenshots_for_convert,
   )
 
-  pg.config.PROCEDURE_GROUP = EXPORT_IMAGES_GROUP
+  CONFIG.PROCEDURE_GROUP = EXPORT_IMAGES_GROUP
 
   image_filepaths = [
     os.path.join(root_dirpath, filename)
@@ -116,7 +117,7 @@ def main():
     run_gui_func=take_screenshots_for_export_images_quick,
   )
 
-  pg.config.PROCEDURE_GROUP = EDIT_AND_SAVE_IMAGES_GROUP
+  CONFIG.PROCEDURE_GROUP = EDIT_AND_SAVE_IMAGES_GROUP
 
   gui_main.BatchProcessingGui(
     gimp_image_tree,
@@ -130,7 +131,7 @@ def main():
   for image in images:
     image.delete()
 
-  pg.config.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+  CONFIG.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
 
   image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGE_FOR_LAYERS_FILEPATH))
 
@@ -155,7 +156,7 @@ def main():
     run_gui_func=take_screenshots_for_export_layers_quick,
   )
 
-  pg.config.PROCEDURE_GROUP = EDIT_LAYERS_GROUP
+  CONFIG.PROCEDURE_GROUP = EDIT_LAYERS_GROUP
 
   gui_main.BatchProcessingGui(
     layer_tree,

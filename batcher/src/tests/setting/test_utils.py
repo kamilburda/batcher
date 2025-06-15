@@ -1,10 +1,10 @@
 import unittest
 
-from ...setting import group as group_
-from ...setting import settings as settings_
-from ...setting import utils as utils_
+from src.setting import group as group_
+from src.setting import settings as settings_
+from src.setting import utils as utils_
 
-from . import stubs_setting
+from src.tests.setting import stubs_setting
 
 
 class TestGetUniqueSettingName(unittest.TestCase):

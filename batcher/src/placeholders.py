@@ -11,6 +11,7 @@ from gi.repository import GObject
 import pygimplib as pg
 
 from src import exceptions
+from src import setting as setting_
 from src.gui import placeholders as gui_placeholders
 
 
@@ -224,7 +225,7 @@ PLACEHOLDER_ATTRIBUTE_MAP = {
 """Mapping of placeholders to applicable attributes."""
 
 
-class PlaceholderSetting(pg.setting.Setting):
+class PlaceholderSetting(setting_.Setting):
    
   _ALLOWED_GUI_TYPES = [gui_placeholders.PlaceholdersComboBoxPresenter]
 
@@ -320,16 +321,16 @@ class PlaceholderArraySetting(PlaceholderSetting):
   def __init__(self, name, element_type, **kwargs):
     super().__init__(name, **kwargs)
 
-    self._element_type = pg.setting.process_setting_type(element_type)
+    self._element_type = setting_.process_setting_type(element_type)
 
   @property
-  def element_type(self) -> Type[pg.setting.Setting]:
+  def element_type(self) -> Type[setting_.Setting]:
     return self._element_type
 
   def to_dict(self):
     settings_dict = super().to_dict()
 
-    settings_dict['element_type'] = pg.setting.SETTING_TYPES[self._element_type]
+    settings_dict['element_type'] = setting_.SETTING_TYPES[self._element_type]
 
     return settings_dict
 
@@ -408,7 +409,7 @@ def get_placeholder_type_name_from_pdb_type(
       pdb_type: Union[GObject.GType, Type[GObject.GObject]],
       pdb_param_info: Optional[GObject.ParamSpec] = None,
 ) -> Union[str, None]:
-  """Returns the name of a `pygimplib.setting.Setting` subclass representing a
+  """Returns the name of a `setting.Setting` subclass representing a
   placeholder from the given GIMP PDB parameter type.
 
   Args:
@@ -421,7 +422,7 @@ def get_placeholder_type_name_from_pdb_type(
       for an object array argument (images, layers, etc.).
 
   Returns:
-    String as a human-readable name of a `pygimplib.setting.Setting` subclass
+    String as a human-readable name of a `setting.Setting` subclass
     representing a placeholder if ``pdb_type`` matches an identifier, or
     ``None`` otherwise.
   """
@@ -437,7 +438,7 @@ def get_placeholder_type_name_from_pdb_type(
 
   if pdb_type_name == 'GimpCoreObjectArray' and pdb_param_info is not None:
     _array_type, setting_dict = (
-      pg.setting.get_array_setting_type_from_gimp_core_object_array(pdb_param_info))
+      setting_.get_array_setting_type_from_gimp_core_object_array(pdb_param_info))
     key = (pdb_type_name, setting_dict['element_type'])
   else:
     key = pdb_type_name
@@ -451,14 +452,14 @@ def get_placeholder_type_name_from_pdb_type(
 
 
 _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
-  'GimpImage': pg.setting.SETTING_TYPES[PlaceholderImageSetting],
-  'GimpItem': pg.setting.SETTING_TYPES[PlaceholderItemSetting],
-  'GimpDrawable': pg.setting.SETTING_TYPES[PlaceholderDrawableSetting],
-  'GimpLayer': pg.setting.SETTING_TYPES[PlaceholderLayerSetting],
-  ('GimpCoreObjectArray', pg.setting.LayerSetting): (
-    pg.setting.SETTING_TYPES[PlaceholderLayerArraySetting]),
-  ('GimpCoreObjectArray', pg.setting.DrawableSetting): (
-    pg.setting.SETTING_TYPES[PlaceholderDrawableArraySetting]),
-  ('GimpCoreObjectArray', pg.setting.ItemSetting): (
-    pg.setting.SETTING_TYPES[PlaceholderItemArraySetting]),
+  'GimpImage': setting_.SETTING_TYPES[PlaceholderImageSetting],
+  'GimpItem': setting_.SETTING_TYPES[PlaceholderItemSetting],
+  'GimpDrawable': setting_.SETTING_TYPES[PlaceholderDrawableSetting],
+  'GimpLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
+  ('GimpCoreObjectArray', setting_.LayerSetting): (
+    setting_.SETTING_TYPES[PlaceholderLayerArraySetting]),
+  ('GimpCoreObjectArray', setting_.DrawableSetting): (
+    setting_.SETTING_TYPES[PlaceholderDrawableArraySetting]),
+  ('GimpCoreObjectArray', setting_.ItemSetting): (
+    setting_.SETTING_TYPES[PlaceholderItemArraySetting]),
 }

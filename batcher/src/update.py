@@ -9,26 +9,27 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
 from pygimplib import pdb
 
 from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
 from src import itemtree
+from src import setting as setting_
 from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_
 from src.path import pattern as pattern_
 from src.path import uniquify
+from src.config import CONFIG
 from src.procedure_groups import *
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
 
 
 def load_and_update(
-      settings: pg.setting.Group,
-      sources: Optional[Dict[str, Union[pg.setting.Source, List[pg.setting.Source]]]] = None,
+      settings: setting_.Group,
+      sources: Optional[Dict[str, Union[setting_.Source, List[setting_.Source]]]] = None,
       update_sources: bool = True,
       procedure_group: Optional[str] = None,
 ) -> Tuple[int, str]:
@@ -62,7 +63,7 @@ def load_and_update(
   def _handle_update(data):
     nonlocal current_version, previous_version
 
-    current_version = version_.Version.parse(pg.config.PLUGIN_VERSION)
+    current_version = version_.Version.parse(CONFIG.PLUGIN_VERSION)
 
     previous_version = _get_plugin_version(data)
     _update_plugin_version(data, current_version)
@@ -71,7 +72,7 @@ def load_and_update(
       return data
 
     if previous_version is None:
-      raise pg.setting.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
+      raise setting_.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
 
     for version_str, update_handler in _UPDATE_HANDLERS.items():
       if previous_version < version_.Version.parse(version_str) <= current_version:
@@ -80,7 +81,7 @@ def load_and_update(
     return data
 
   if sources is None:
-    sources = pg.setting.Persistor.get_default_setting_sources()
+    sources = setting_.Persistor.get_default_setting_sources()
 
   if procedure_group is None:
     procedure_groups = ALL_PROCEDURE_GROUPS
@@ -108,7 +109,7 @@ def load_and_update(
 
   load_message = utils_.format_message_from_persistor_statuses(load_result)
 
-  if any(status == pg.setting.Persistor.FAIL
+  if any(status == setting_.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):
     return TERMINATE, load_message
 
@@ -473,7 +474,7 @@ def _remove_command_by_orig_names(commands_list, command_orig_names):
 def _create_command_as_saved_dict(command_dict):
   command = commands_.create_command(command_dict)
 
-  source = pg.setting.SimpleInMemorySource('')
+  source = setting_.SimpleInMemorySource('')
   source.write(command)
 
   return source.data[0]

@@ -5,8 +5,8 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
 
-from ...setting import presenter as presenter_
-from ...setting import settings as settings_
+from src.setting import presenter as presenter_
+from src.setting import settings as settings_
 
 
 class GuiWidgetStub:

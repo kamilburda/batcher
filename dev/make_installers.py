@@ -10,13 +10,12 @@ DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 
 ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
 PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
-PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   DEV_DIRPATH,
   ROOT_DIRPATH,
   PLUGIN_DIRPATH,
-  PYGIMPLIB_DIRPATH])
+])
 
 import argparse
 import pathlib
@@ -31,11 +30,13 @@ import pathspec
 
 import batcher.pygimplib as pg
 
+from src.config import CONFIG
+
 from dev import create_user_docs
 from dev import process_local_docs
 
-pg.config.STDOUT_LOG_HANDLES = []
-pg.config.STDERR_LOG_HANDLES = []
+CONFIG.STDOUT_LOG_HANDLES = []
+CONFIG.STDERR_LOG_HANDLES = []
 
 
 INSTALLERS_DIRPATH = os.path.join(ROOT_DIRPATH, 'installers')
@@ -108,7 +109,7 @@ def make_installers(
   _create_temp_dirpath(temp_dirpath)
   
   if generate_docs:
-    _create_user_docs(os.path.join(temp_dirpath, pg.config.PLUGIN_NAME))
+    _create_user_docs(os.path.join(temp_dirpath, CONFIG.PLUGIN_NAME))
   
   input_filepaths = _get_filtered_filepaths(input_dirpath, INCLUDE_LIST_FILEPATH)
   user_docs_filepaths = _get_filtered_filepaths(temp_dirpath, INCLUDE_LIST_FILEPATH)
@@ -286,10 +287,10 @@ def _create_installers(
 
 def _create_zip_archive(
       installer_dirpath, input_dirpath, input_filepaths, output_filepaths):
-  archive_filename = f'{pg.config.PLUGIN_NAME}-{pg.config.PLUGIN_VERSION}.zip'
+  archive_filename = f'{CONFIG.PLUGIN_NAME}-{CONFIG.PLUGIN_VERSION}.zip'
   archive_filepath = os.path.join(installer_dirpath, archive_filename)
   
-  readme_filepath = os.path.join(input_dirpath, pg.config.PLUGIN_NAME, README_RELATIVE_FILEPATH)
+  readme_filepath = os.path.join(input_dirpath, CONFIG.PLUGIN_NAME, README_RELATIVE_FILEPATH)
   
   can_create_toplevel_readme = readme_filepath in input_filepaths
   

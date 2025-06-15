@@ -2,14 +2,14 @@ import io
 import unittest
 import unittest.mock as mock
 
-from ... import utils as pgutils
+import pygimplib as pg
 
-from ...setting import group as group_
-from ...setting import settings as settings_
-from ...setting import sources as sources_
+from src.setting import group as group_
+from src.setting import settings as settings_
+from src.setting import sources as sources_
 
-from .. import stubs_gimp
-from . import stubs_group
+from pygimplib.tests import stubs_gimp
+from src.tests.setting import stubs_group
 
 
 def _test_settings_for_read_write():
@@ -841,12 +841,10 @@ class TestSourceWrite(unittest.TestCase):
       self.source.write([self.settings], modify_data_func=12)
 
 
-@mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp',
-  new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpParasiteSource(unittest.TestCase):
   
-  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.setting.sources.Gimp')
+  @mock.patch('src.setting.sources.Gimp')
   def setUp(self, mock_gimp_module):
     mock_gimp_module.directory.return_value = 'gimp_directory'
 
@@ -854,7 +852,7 @@ class TestGimpParasiteSource(unittest.TestCase):
     self.source = sources_.GimpParasiteSource(self.source_name)
     self.settings = stubs_group.create_test_settings()
   
-  def test_write_read(self, mock_gimp_module):
+  def test_write_read(self, _mock_gimp_module):
     self.settings['file_extension'].set_value('jpg')
     self.settings['flatten'].set_value(True)
     
@@ -868,31 +866,30 @@ class TestGimpParasiteSource(unittest.TestCase):
     self.assertEqual(self.settings['file_extension'].value, 'jpg')
     self.assertEqual(self.settings['flatten'].value, True)
   
-  def test_read_source_not_found(self, mock_gimp_module):
+  def test_read_source_not_found(self, _mock_gimp_module):
     with self.assertRaises(sources_.SourceNotFoundError):
       self.source.read([self.settings])
   
-  def test_read_settings_invalid_format(self, mock_gimp_module):
+  def test_read_settings_invalid_format(self, _mock_gimp_module):
     self.source.write([self.settings])
 
-    with mock.patch(
-           pgutils.get_pygimplib_module_path() + '.setting.sources.pickle') as temp_mock_pickle:
+    with mock.patch('src.setting.sources.pickle') as temp_mock_pickle:
       temp_mock_pickle.loads.side_effect = ValueError
 
       with self.assertRaises(sources_.SourceInvalidFormatError):
         self.source.read([self.settings])
   
-  def test_clear(self, mock_gimp_module):
+  def test_clear(self, _mock_gimp_module):
     self.source.write([self.settings])
     self.source.clear()
     
     with self.assertRaises(sources_.SourceNotFoundError):
       self.source.read([self.settings])
   
-  def test_has_data_with_no_data(self, mock_gimp_module):
+  def test_has_data_with_no_data(self, _mock_gimp_module):
     self.assertFalse(self.source.has_data())
   
-  def test_has_data_with_data(self, mock_gimp_module):
+  def test_has_data_with_data(self, _mock_gimp_module):
     self.source.write([self.settings['file_extension']])
     self.assertTrue(self.source.has_data())
 
@@ -969,7 +966,7 @@ class _FileSourceTests:
     self.assertEqual(self.source.write_data_to_source.call_count, 1)
     self.assertEqual(source_2.write_data_to_source.call_count, 1)
   
-  def test_has_data_no_data(self, mock_os_path_isfile, mock_open):
+  def test_has_data_no_data(self, _mock_os_path_isfile, mock_open):
     self._set_up_mock_open(mock_open)
 
     self.assertFalse(self.source.has_data())
@@ -995,7 +992,7 @@ class _FileSourceTests:
     
     self.assertEqual(self.source.has_data(), 'invalid_format')
   
-  def test_clear_no_data(self, mock_os_path_isfile, mock_open):
+  def test_clear_no_data(self, _mock_os_path_isfile, mock_open):
     self._set_up_mock_open(mock_open)
     self.source.write_data_to_source = mock.Mock(wraps=self.source.write_data_to_source)
     
@@ -1045,10 +1042,8 @@ class _FileSourceTests:
     return string_io
 
 
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.setting.sources.open')
-@mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.setting.sources.os.path.isfile',
-  return_value=False)
+@mock.patch('src.setting.sources.open')
+@mock.patch('src.setting.sources.os.path.isfile', return_value=False)
 class TestJsonFileSource(unittest.TestCase, _FileSourceTests):
   
   def __init__(self, *args, **kwargs):

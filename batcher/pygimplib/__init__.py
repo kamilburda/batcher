@@ -1,21 +1,10 @@
 """Library initialization."""
 import builtins
-import inspect
 import os
 
-PYGIMPLIB_DIRPATH = os.path.dirname(os.path.abspath(__file__))
 
+_ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-def _get_root_plugin_dirpath():
-  frame_stack = inspect.stack()
-
-  if frame_stack:
-    return os.path.dirname(os.path.abspath(frame_stack[-1][1]))
-  else:
-    return None
-
-
-ROOT_PLUGIN_DIRPATH = _get_root_plugin_dirpath()
 
 from . import logging
 
@@ -23,9 +12,9 @@ from . import logging
 # as missing modules) before pygimplib is fully initialized.
 logging.log_output(
   stderr_handles=['file'],
-  log_dirpaths=[ROOT_PLUGIN_DIRPATH, os.path.dirname(PYGIMPLIB_DIRPATH), PYGIMPLIB_DIRPATH],
+  log_dirpaths=[_ROOT_PLUGIN_DIRPATH],
   log_error_filename='error.log',
-  log_header_title=ROOT_PLUGIN_DIRPATH)
+  log_header_title=_ROOT_PLUGIN_DIRPATH)
 
 
 try:
@@ -52,7 +41,6 @@ else:
   _gimp_modules_available = True
 
 
-from . import configbase
 from . import utils
 
 from .constants import *
@@ -61,33 +49,22 @@ __all__ = [
   # Modules
   'logging',
   'utils',
-  # Global elements imported to or defined in this module
-  'config',
 ]
 
 if _gimp_modules_available:
   from . import gui
   from . import invocation
   from . import pdbutils
-  from . import setting
 
   from .pypdb import pdb
   from .pypdb import PDBProcedureError
-  from .setting import SETTING_GUI_TYPES
-  from .setting import SETTING_TYPES
 
   __all__.extend([
     # Modules
     'gui',
     'invocation',
     'pdbutils',
-    'setting',
     # Global elements imported to or defined in this module
     'pdb',
     'PDBProcedureError',
-    'SETTING_GUI_TYPES',
-    'SETTING_TYPES',
   ])
-
-
-config = configbase.create_config(PYGIMPLIB_DIRPATH, ROOT_PLUGIN_DIRPATH)

@@ -8,10 +8,10 @@ from gi.repository import GObject
 
 import parameterized
 
-import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import placeholders as placeholders_
+from src import setting as setting_
 
 
 class _BatcherStub:
@@ -46,7 +46,7 @@ class TestGetReplacedArg(unittest.TestCase):
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker
       placeholders_.get_replaced_value(
-        pg.setting.StringSetting('placeholder', default_value='invalid_placeholder'), batcher)
+        setting_.StringSetting('placeholder', default_value='invalid_placeholder'), batcher)
 
 
 class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
@@ -67,9 +67,7 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
   def test_with_invalid_object_type(self):
     self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(object))
 
-  @mock.patch(
-    f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
-    new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   def test_with_layer_array(self, _mock_gimp):
     param = stubs_gimp.GParamStub(
       GObject.GType.from_name('GimpCoreObjectArray'), 'layers', object_type=Gimp.Layer.__gtype__)
@@ -81,9 +79,7 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
       'placeholder_layer_array',
     )
 
-  @mock.patch(
-    f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
-    new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   def test_image_array_is_unsupported(self, _mock_gimp):
     param = stubs_gimp.GParamStub(
       GObject.GType.from_name('GimpCoreObjectArray'), 'images', object_type=Gimp.Image.__gtype__)

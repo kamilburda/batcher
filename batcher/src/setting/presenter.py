@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from typing import Dict, Optional
 
-from .. import utils as pgutils
+import pygimplib as pg
 
 from . import meta as meta_
 
@@ -21,8 +21,8 @@ class SettingValueSynchronizer:
   """
   
   def __init__(self):
-    self.apply_setting_value_to_gui = pgutils.empty_func
-    self.apply_gui_value_to_setting = pgutils.empty_func
+    self.apply_setting_value_to_gui = pg.utils.empty_func
+    self.apply_gui_value_to_setting = pg.utils.empty_func
 
 
 class Presenter(metaclass=meta_.PresenterMeta):
@@ -58,7 +58,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
   
   def __init__(
         self,
-        setting: 'setting.Setting',
+        setting: 'src.setting.Setting',
         widget=None,
         setting_value_synchronizer: Optional[SettingValueSynchronizer] = None,
         auto_update_gui_to_setting: bool = True,
@@ -219,7 +219,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
       self._value_changed_signal = None
       self._disconnect_value_changed_event()
   
-  def _create_widget(self, setting: 'setting.Setting', **kwargs):
+  def _create_widget(self, setting: 'src.setting.Setting', **kwargs):
     """Instantiates and returns a new GUI widget using the attributes in the
     specified `setting.Setting` instance (e.g. display name as GUI label).
     

@@ -2,15 +2,13 @@ import unittest
 
 import parameterized
 
-from gi.repository import GObject
+from src.setting import group as group_
+from src.setting import presenter as presenter_
+from src.setting import settings as settings_
+from src.setting import utils as utils_
 
-from ...setting import group as group_
-from ...setting import presenter as presenter_
-from ...setting import settings as settings_
-from ...setting import utils as utils_
-
-from . import stubs_setting
-from . import stubs_group
+from src.tests.setting import stubs_setting
+from src.tests.setting import stubs_group
 
 
 class TestGroupAttributes(unittest.TestCase):

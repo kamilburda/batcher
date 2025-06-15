@@ -12,9 +12,10 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from src import commands as commands_
+from src import setting as setting_
 from src import update
 from src import utils as utils_
-
+from src.config import CONFIG
 from src.gui import messages as messages_
 
 
@@ -102,10 +103,10 @@ class SettingsManager:
     if filepath is None:
       save_result = self._settings.save()
     else:
-      source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
+      source = setting_.sources.JsonFileSource(CONFIG.PROCEDURE_GROUP, filepath)
       save_result = self._settings.save({'persistent': source})
 
-    if pg.setting.Persistor.FAIL in save_result.statuses_per_source.values():
+    if setting_.Persistor.FAIL in save_result.statuses_per_source.values():
       if filepath is None:
         main_message = _('Failed to save settings.')
       else:
@@ -160,7 +161,7 @@ class SettingsManager:
 
       self.reset_settings()
 
-      pg.setting.Persistor.clear()
+      setting_.Persistor.clear()
 
       self.save_settings()
 
@@ -205,7 +206,7 @@ class SettingsManager:
       self._display_message_func(_('Settings successfully saved.'), Gtk.MessageType.INFO)
 
   def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
-    source = pg.setting.sources.JsonFileSource(pg.config.PROCEDURE_GROUP, filepath)
+    source = setting_.sources.JsonFileSource(CONFIG.PROCEDURE_GROUP, filepath)
 
     commands_.clear(self._settings['main/actions'], add_initial_commands=False)
     commands_.clear(self._settings['main/conditions'], add_initial_commands=False)
@@ -235,7 +236,7 @@ class SettingsManager:
       self._settings,
       sources={'persistent': source},
       update_sources=False,
-      procedure_group=pg.config.PROCEDURE_GROUP,
+      procedure_group=CONFIG.PROCEDURE_GROUP,
     )
 
     for setting in size_settings_to_ignore_for_load:

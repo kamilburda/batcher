@@ -22,6 +22,7 @@ from . import editor as command_editor_
 
 from src import commands as commands_
 from src import placeholders as placeholders_
+from src import setting as setting_
 from src.gui.entry import entries as entries_
 
 
@@ -196,7 +197,7 @@ class CommandBrowser(GObject.GObject):
 
     for procedure, command_dict in zip(pdb_procedures, command_dicts):
       # We are sanitizing the command name as it can contain characters not
-      # allowed in `pygimplib.setting.Setting`. We therefore prefer 'function'
+      # allowed in `setting.Setting`. We therefore prefer 'function'
       # if it is a string as that is kept unprocessed.
       if isinstance(command_dict['function'], str):
         procedure_name = command_dict['function']
@@ -297,17 +298,17 @@ class CommandBrowser(GObject.GObject):
   @staticmethod
   def _is_command_argument_run_mode(command_argument):
     return (
-      command_argument['type'] == pg.setting.EnumSetting
+      command_argument['type'] == setting_.EnumSetting
       and command_argument['name'] == 'run-mode')
 
   @staticmethod
   def _is_command_argument_image_drawable_or_drawables(command_argument):
     return (
       command_argument['type'] in [
-        pg.setting.ImageSetting,
-        pg.setting.LayerSetting,
-        pg.setting.DrawableSetting,
-        pg.setting.ItemSetting,
+        setting_.ImageSetting,
+        setting_.LayerSetting,
+        setting_.DrawableSetting,
+        setting_.ItemSetting,
         placeholders_.PlaceholderImageSetting,
         placeholders_.PlaceholderLayerSetting,
         placeholders_.PlaceholderDrawableSetting,
@@ -315,12 +316,12 @@ class CommandBrowser(GObject.GObject):
         placeholders_.PlaceholderDrawableArraySetting,
         placeholders_.PlaceholderLayerArraySetting,
         placeholders_.PlaceholderItemArraySetting]
-      or (command_argument['type'] == pg.setting.ArraySetting
+      or (command_argument['type'] == setting_.ArraySetting
           and command_argument['element_type'] in [
-              pg.setting.ImageSetting,
-              pg.setting.LayerSetting,
-              pg.setting.DrawableSetting,
-              pg.setting.ItemSetting])
+              setting_.ImageSetting,
+              setting_.LayerSetting,
+              setting_.DrawableSetting,
+              setting_.ItemSetting])
     )
 
   def _init_gui(self):

@@ -3,7 +3,6 @@
 import builtins
 import os
 import sys
-from typing import Optional
 
 try:
   import gi
@@ -14,10 +13,10 @@ except (ValueError, ImportError):
 else:
   _gimp_modules_available = True
 
-from . import logging as pglogging
+import pygimplib as pg
 
 if _gimp_modules_available:
-  from . import setting as pgsetting
+  from src import setting as setting_
 
 
 class _Config:
@@ -43,21 +42,19 @@ class _Config:
     return name in self._config
 
 
-def create_config(pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]) -> _Config:
+def create_config() -> _Config:
   """Creates plug-in configuration.
 
   The configuration object contains plug-in-wide variables such as plug-in
-  identifier (by default equivalent to the main plug-in directory name) or
-  title.
+  title, version, author information or documentation-related metadata.
 
-  Plug-ins can contain a ``config.py`` file in the ``config`` subdirectory
-  under the main plug-in directory to customize the configuration variables.
-  Additionally, developers may also include a ``config_dev.py`` file acting as
-  a local configuration file for testing purposes.
+  The release-type configuration is located in the ``config.py`` file. For
+  development purposes, you can create a ``config_dev.py`` file which will
+  take precedence.
   """
   config = _Config()
 
-  _init_config_initial(config, pygimplib_dirpath, root_plugin_dirpath)
+  _init_config_initial(config, _get_root_plugin_dirpath())
 
   _init_config_logging(config)
 
@@ -68,21 +65,16 @@ def create_config(pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]) ->
   return config
 
 
-def _init_config_initial(
-      config: _Config, pygimplib_dirpath: str, root_plugin_dirpath: Optional[str]):
-  config.PYGIMPLIB_DIRPATH = pygimplib_dirpath
+def _get_root_plugin_dirpath():
+  # This depends on the location of the `configbase.py` file.
+  return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-  if root_plugin_dirpath is not None:
-    config._DEFAULT_PLUGIN_NAME = os.path.basename(root_plugin_dirpath)
-    config.PLUGIN_DIRPATH = root_plugin_dirpath
-    config.PLUGINS_DIRPATH = os.path.dirname(root_plugin_dirpath)
-    config.DEFAULT_LOGS_DIRPATH = lambda: config.PLUGIN_DIRPATH
-  else:
-    # Fallback in case root_plugin_dirpath is `None` for some reason
-    config._DEFAULT_PLUGIN_NAME = None
-    config.PLUGIN_DIRPATH = os.path.dirname(pygimplib_dirpath)
-    config.PLUGINS_DIRPATH = os.path.dirname(config.PLUGIN_DIRPATH)
-    config.DEFAULT_LOGS_DIRPATH = os.path.dirname(pygimplib_dirpath)
+
+def _init_config_initial(config: _Config, root_plugin_dirpath: str):
+  config._DEFAULT_PLUGIN_NAME = os.path.basename(root_plugin_dirpath)
+  config.PLUGIN_DIRPATH = root_plugin_dirpath
+  config.PLUGINS_DIRPATH = os.path.dirname(root_plugin_dirpath)
+  config.DEFAULT_LOGS_DIRPATH = lambda: config.PLUGIN_DIRPATH
 
   # noinspection PyProtectedMember
   config.PLUGIN_NAME = config._DEFAULT_PLUGIN_NAME
@@ -132,10 +124,10 @@ def _init_config_from_file(config: _Config):
     # Prefer a development version of config if it exists. This is handy if you
     # need to keep a clean config in the remote repository and a local config
     # for development purposes.
-    from config import config_dev as plugin_config
+    from src.config import config_dev as plugin_config
   except ImportError:
     try:
-      from config import config as plugin_config
+      from src.config import config as plugin_config
     except ImportError:
       pass
 
@@ -149,15 +141,15 @@ def _init_config_per_procedure(config: _Config):
   config.PROCEDURE_GROUP = config.PLUGIN_NAME
 
   if _gimp_modules_available:
-    config.DEFAULT_SOURCE = pgsetting.GimpParasiteSource(config.PROCEDURE_GROUP)
+    config.DEFAULT_SOURCE = setting_.GimpParasiteSource(config.PROCEDURE_GROUP)
 
-    pgsetting.persistor.Persistor.set_default_setting_sources({
+    setting_.persistor.Persistor.set_default_setting_sources({
       'persistent': config.DEFAULT_SOURCE,
     })
   else:
     config.DEFAULT_SOURCE = None
 
-  pglogging.log_output(
+  pg.logging.log_output(
     config.STDOUT_LOG_HANDLES,
     config.STDERR_LOG_HANDLES,
     config.PLUGINS_LOG_DIRPATHS,
@@ -167,7 +159,7 @@ def _init_config_per_procedure(config: _Config):
   )
 
   if _gimp_modules_available:
-    pgsetting.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid, config)
+    setting_.Setting.connect_event_global('value-not-valid', _on_setting_value_not_valid, config)
 
 
 def _on_setting_value_not_valid(setting, message, _message_id, _details, config):

@@ -31,7 +31,7 @@ class Persistor:
   @classmethod
   def get_default_setting_sources(
         cls,
-  ) -> Dict[str, Union['setting.Source', List['setting.Source']]]:
+  ) -> Dict[str, Union['src.setting.Source', List['src.setting.Source']]]:
     """Returns a dictionary containing default setting sources.
 
     The returned dictionary is a copy of an internally stored dictionary to
@@ -44,7 +44,7 @@ class Persistor:
   
   @classmethod
   def set_default_setting_sources(
-        cls, sources: Optional[Dict[str, Union['setting.Source', List['setting.Source']]]]):
+        cls, sources: Optional[Dict[str, Union['src.setting.Source', List['src.setting.Source']]]]):
     """Sets the dictionary of setting sources to use in methods of this class if
     no other setting sources in these methods are specified.
     
@@ -67,9 +67,9 @@ class Persistor:
   @classmethod
   def load(
         cls,
-        settings_or_groups: Iterable[Union['setting.Setting', 'setting.Group']],
+        settings_or_groups: Iterable[Union['src.setting.Setting', 'src.setting.Group']],
         setting_sources: Union[
-          Dict[str, Union['setting.Source', List['setting.Source']]],
+          Dict[str, Union['src.setting.Source', List['src.setting.Source']]],
           List[str],
           None,
         ] = None,
@@ -128,7 +128,7 @@ class Persistor:
         for each setting. If ``False``, these events are not triggered.
       modify_data_func:
         See the ``modify_data_func`` parameter in
-        `pygimplib.setting.Source.read()`. This function is applied to each
+        `setting.Source.read()`. This function is applied to each
         source separately.
 
     Returns:
@@ -189,9 +189,9 @@ class Persistor:
   @classmethod
   def save(
         cls,
-        settings_or_groups: Iterable[Union['setting.Setting', 'setting.Group']],
+        settings_or_groups: Iterable[Union['src.setting.Setting', 'src.setting.Group']],
         setting_sources: Union[
-          Dict[str, Union['setting.Source', List['setting.Source']]],
+          Dict[str, Union['src.setting.Source', List['src.setting.Source']]],
           List[str],
           None,
         ] = None,
@@ -221,7 +221,7 @@ class Persistor:
         for each setting. If ``False``, these events are not triggered.
       modify_data_func:
         See the ``modify_data_func`` parameter in
-        `pygimplib.setting.Source.write()`. This function is applied to each
+        `setting.Source.write()`. This function is applied to each
         source separately.
     
     Returns:
@@ -273,7 +273,7 @@ class Persistor:
   def clear(
         cls,
         setting_sources: Union[
-          Dict[str, Union['setting.Source', List['setting.Source']]],
+          Dict[str, Union['src.setting.Source', List['src.setting.Source']]],
           List[str],
           None,
         ] = None

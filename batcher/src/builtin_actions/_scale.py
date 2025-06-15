@@ -7,6 +7,7 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src import setting as setting_
 from src import utils
 from src.procedure_groups import *
 
@@ -335,7 +336,7 @@ def _set_visible_for_padding_color_and_position(
 
 
 def _set_left_margin_for_resolution(image_resolution_setting):
-  if not isinstance(image_resolution_setting.gui, pg.setting.NullPresenter):
+  if not isinstance(image_resolution_setting.gui, setting_.NullPresenter):
     image_resolution_setting.gui.widget.set_margin_start(pg.constants.RELATED_WIDGETS_LEFT_MARGIN)
 
 

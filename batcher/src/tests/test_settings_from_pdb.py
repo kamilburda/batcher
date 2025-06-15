@@ -9,14 +9,12 @@ from gi.repository import GObject
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from src import setting as setting_
 from src import settings_from_pdb as settings_from_pdb_
 from src import placeholders as placeholders_
 
 
-@mock.patch(
-  f'{pg.utils.get_pygimplib_module_path()}.setting.settings.Gimp',
-  new_callable=stubs_gimp.GimpModuleStub,
-)
+@mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch(
   f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
   return_value=pg.tests.stubs_gimp.PdbStub,
@@ -79,7 +77,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       [
         {
           'name': 'run-mode',
-          'type': pg.setting.EnumSetting,
+          'type': setting_.EnumSetting,
           'default_value': Gimp.RunMode.NONINTERACTIVE,
           'enum_type': (procedure, procedure.arguments[0]),
           'display_name': 'The run mode',
@@ -87,31 +85,31 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         {
           'name': 'drawables',
           'type': placeholders_.PlaceholderDrawableArraySetting,
-          'element_type': pg.setting.DrawableSetting,
+          'element_type': setting_.DrawableSetting,
           'display_name': 'Drawables',
         },
         {
           'name': 'filename',
-          'type': pg.setting.StringSetting,
+          'type': setting_.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
           'display_name': 'Filename to save the image in',
         },
         {
           'name': 'drawables-2',
           'type': placeholders_.PlaceholderDrawableArraySetting,
-          'element_type': pg.setting.DrawableSetting,
+          'element_type': setting_.DrawableSetting,
           'display_name': 'More drawables',
         },
         {
           'name': 'filename-2',
-          'type': pg.setting.StringSetting,
+          'type': setting_.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
           'display_name': 'Another filename',
         },
         {
           'name': 'brushes',
-          'type': pg.setting.ArraySetting,
-          'element_type': pg.setting.StringSetting,
+          'type': setting_.ArraySetting,
+          'element_type': setting_.StringSetting,
           'display_name': 'Brush names',
         },
       ]

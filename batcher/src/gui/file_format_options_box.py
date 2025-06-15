@@ -32,7 +32,7 @@ class FileFormatOptionsBox(Gtk.Box):
     self._left_margin = left_margin
 
     self._grids_per_file_format = {}
-    # We use this to detect if a `pygimplib.setting.Group` instance holding
+    # We use this to detect if a `setting.Group` instance holding
     # file format options changed, in which case we need to create a new
     # `Gtk.Grid`.
     self._file_format_options_dict = {}

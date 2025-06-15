@@ -17,10 +17,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-
 from src import exceptions
 from src import itemtree
+from src import setting as setting_
+from src.config import CONFIG
 
 
 ERROR_EXIT_STATUS = 1
@@ -549,7 +549,7 @@ def display_failure_message(
     message_secondary_markup=failure_message,
     details=details,
     display_details_initially=display_details_initially,
-    report_uri_list=pg.config.BUG_REPORT_URL_LIST,
+    report_uri_list=CONFIG.BUG_REPORT_URL_LIST,
     report_description=report_description)
 
 
@@ -583,7 +583,7 @@ def display_invalid_image_failure_message(
 
 def get_failing_command_message(
       command_and_item_or_command_error: Union[
-        Tuple[pg.setting.Group, itemtree.Item], exceptions.CommandError],
+        Tuple[setting_.Group, itemtree.Item], exceptions.CommandError],
 ):
   if isinstance(command_and_item_or_command_error, exceptions.CommandError):
     command, item = command_and_item_or_command_error.command, command_and_item_or_command_error.item

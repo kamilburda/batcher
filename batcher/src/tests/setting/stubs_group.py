@@ -1,6 +1,6 @@
 """Stubs primarily to be used in the `test_group` module."""
 
-from ...setting import group as group_
+from src.setting import group as group_
 
 
 def create_test_settings():

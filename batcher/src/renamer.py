@@ -18,6 +18,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 
 from src import itemtree
+from src.config import CONFIG
 from src.path import fileext
 from src.path import pattern as pattern_
 from src.procedure_groups import *
@@ -813,7 +814,7 @@ _FIELDS_LIST = [
 
 def get_fields(tags=None):
   if tags is None:
-    tags = [pg.config.PROCEDURE_GROUP]
+    tags = [CONFIG.PROCEDURE_GROUP]
 
   return {
     field['regex']: field

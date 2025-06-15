@@ -148,9 +148,10 @@ Use the following conventions for terms and variables:
 Import modules at the beginning of a module.
 
 Avoid importing individual objects, classes or functions.
-Notable exceptions:
+Exceptions:
 * types from the `typing` and `collections.abc` modules
-* `pdb` object in `pygimplib`
+* `pdb` object from the `pypdb` module
+* `CONFIG` object from the `config` module
 
 Do not use wildcard imports.
 Exceptions:

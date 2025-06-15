@@ -14,6 +14,7 @@ from gi.repository import Pango
 import pygimplib as pg
 
 from src import overwrite
+from src import setting as setting_
 
 from src.gui import messages as messages_
 from src.gui import utils as gui_utils_
@@ -160,13 +161,13 @@ class Previews:
 
   def _init_setting_gui(self):
     self._settings['gui/image_preview_automatic_update'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.check_menu_item,
+      gui_type=setting_.SETTING_GUI_TYPES.check_menu_item,
       widget=self._image_preview.menu_item_update_automatically,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
     self._settings['gui/size/paned_between_previews_position'].set_gui(
-      gui_type=pg.setting.SETTING_GUI_TYPES.paned_position,
+      gui_type=setting_.SETTING_GUI_TYPES.paned_position,
       widget=self._vpaned_previews,
       copy_previous_visible=False,
       copy_previous_sensitive=False,
@@ -577,7 +578,7 @@ class Previews:
   def _enable_preview_on_paned_drag(
         self,
         preview: preview_base_.Preview,
-        preview_sensitive_setting: pg.setting.Setting,
+        preview_sensitive_setting: setting_.Setting,
         update_lock_key: str,
   ):
     preview.lock_update(False, update_lock_key)
@@ -590,7 +591,7 @@ class Previews:
   def _disable_preview_on_paned_drag(
         self,
         preview: preview_base_.Preview,
-        preview_sensitive_setting: pg.setting.Setting,
+        preview_sensitive_setting: setting_.Setting,
         update_lock_key: str,
   ):
     preview.lock_update(True, update_lock_key)

@@ -6,9 +6,10 @@ from typing import Any, Dict
 import pygimplib as pg
 
 from src import itemtree
+from src import setting as setting_
 
 
-def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
+def get_settings_for_batcher(main_settings: setting_.Group) -> Dict[str, Any]:
   setting_names = [
     'output_directory',
     'name_pattern',
@@ -35,7 +36,7 @@ def get_settings_for_batcher(main_settings: pg.setting.Group) -> Dict[str, Any]:
 
 
 def format_message_from_persistor_statuses(
-      persistor_result: pg.setting.PersistorResult,
+      persistor_result: setting_.PersistorResult,
       separator: str = '\n',
 ) -> str:
   messages = get_messages_from_persistor_statuses(persistor_result).values()
@@ -44,8 +45,8 @@ def format_message_from_persistor_statuses(
 
 
 def get_messages_from_persistor_statuses(
-      persistor_result: pg.setting.PersistorResult,
-) -> Dict[pg.setting.Source, str]:
+      persistor_result: setting_.PersistorResult,
+) -> Dict[setting_.Source, str]:
   messages = {}
 
   if not persistor_result.statuses_per_source:
@@ -59,7 +60,7 @@ def get_messages_from_persistor_statuses(
   for source, status in persistor_result.statuses_per_source.items():
     message = messages_per_source.get(source, '')
 
-    if status == pg.setting.Persistor.FAIL:
+    if status == setting_.Persistor.FAIL:
       if hasattr(source, 'filepath'):
         formatted_message = _(
           'Settings stored in "{}" may be corrupt.'
@@ -75,7 +76,7 @@ def get_messages_from_persistor_statuses(
         if message:
           formatted_message += _('More information: {}').format(message)
         messages[source] = formatted_message
-    elif status == pg.setting.Persistor.SOURCE_NOT_FOUND:
+    elif status == setting_.Persistor.SOURCE_NOT_FOUND:
       if hasattr(source, 'filepath'):
         messages[source] = _('Could not locate settings in file "{}" in "{}".').format(
           source.filepath, source.name)

@@ -41,14 +41,14 @@ class SettingParentMixin:
     self._parent = None
   
   @property
-  def parent(self) -> 'setting.Group':
+  def parent(self) -> 'src.setting.Group':
     """The immediate parent (`setting.Group` instance) of the current setting or
     group.
     """
     return self._parent
   
   @property
-  def parents(self) -> List['setting.Group']:
+  def parents(self) -> List['src.setting.Group']:
     """Returns a list of parents (`setting.Group` instances), starting from the
     topmost parent.
     """
@@ -286,7 +286,7 @@ def check_setting_name(setting_name: str):
     raise ValueError(f'setting name "{setting_name}" is not valid')
 
 
-def get_unique_setting_name(setting_name: str, group: 'setting.Group') -> str:
+def get_unique_setting_name(setting_name: str, group: 'src.setting.Group') -> str:
   """Returns a setting name modified to be unique within all immediate children
   of the specified ``group``.
 
@@ -362,8 +362,8 @@ def generate_description(display_name: str) -> str:
 
 
 def get_setting_path(
-      setting: 'setting.Setting',
-      relative_path_group: Union['setting.Group', str, None] = None,
+      setting: 'src.setting.Setting',
+      relative_path_group: Union['src.setting.Group', str, None] = None,
       separator: str = SETTING_PATH_SEPARATOR,
 ) -> str:
   """Returns the full path of a setting.
@@ -384,7 +384,7 @@ def get_setting_path(
   parent, the topmost parent is omitted.
   """
   def _get_setting_path(path_components):
-    return separator.join(setting_.name for setting_ in path_components)
+    return separator.join(s.name for s in path_components)
   
   if relative_path_group == 'root':
     if setting.parents:

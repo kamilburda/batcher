@@ -26,6 +26,7 @@ from src import itemtree
 from src import overwrite
 from src import placeholders
 from src import progress as progress_
+from src import setting as setting_
 from src import utils
 
 
@@ -41,8 +42,8 @@ class Batcher(metaclass=abc.ABCMeta):
   def __init__(
         self,
         item_tree: itemtree.ItemTree,
-        actions: pg.setting.Group,
-        conditions: pg.setting.Group,
+        actions: setting_.Group,
+        conditions: setting_.Group,
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
@@ -117,12 +118,12 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._item_tree
 
   @property
-  def actions(self) -> pg.setting.Group:
+  def actions(self) -> setting_.Group:
     """Command group containing actions."""
     return self._actions
 
   @property
-  def conditions(self) -> pg.setting.Group:
+  def conditions(self) -> setting_.Group:
     """Command group containing conditions."""
     return self._conditions
 
@@ -312,12 +313,12 @@ class Batcher(metaclass=abc.ABCMeta):
     self._current_layer = value
 
   @property
-  def current_action(self) -> pg.setting.Group:
+  def current_action(self) -> setting_.Group:
     """The action currently being applied to `current_item`."""
     return self._current_action
 
   @property
-  def last_condition(self) -> pg.setting.Group:
+  def last_condition(self) -> setting_.Group:
     """The most recent condition that was evaluated."""
     return self._last_condition
 
@@ -624,7 +625,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _add_command_from_settings(
         self,
-        command: pg.setting.Group,
+        command: setting_.Group,
         tags: Optional[Iterable[str]] = None,
         command_groups: Union[str, List[str], None] = None,
   ):
@@ -753,12 +754,12 @@ class Batcher(metaclass=abc.ABCMeta):
       if isinstance(argument, placeholders.PlaceholderArraySetting):
         replaced_arg = placeholders.get_replaced_value(argument, self)
         if is_function_pdb_procedure:
-          replaced_kwargs[argument.name] = pg.setting.array_as_pdb_compatible_type(replaced_arg)
+          replaced_kwargs[argument.name] = setting_.array_as_pdb_compatible_type(replaced_arg)
         else:
           replaced_kwargs[argument.name] = replaced_arg
       elif isinstance(argument, placeholders.PlaceholderSetting):
         replaced_kwargs[argument.name] = placeholders.get_replaced_value(argument, self)
-      elif isinstance(argument, pg.setting.Setting):
+      elif isinstance(argument, setting_.Setting):
         if is_function_pdb_procedure:
           replaced_kwargs[argument.name] = argument.value_for_pdb
         else:

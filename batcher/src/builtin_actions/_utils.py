@@ -13,6 +13,7 @@ from pygimplib import pdb
 
 from src import exceptions
 from src import placeholders as placeholders_
+from src import setting as setting_
 
 
 __all__ = [
@@ -185,9 +186,9 @@ def add_color_layer(
       selection_height,
 ):
   Gimp.context_push()
-  Gimp.context_set_foreground(pg.setting.ColorSetting.get_value_as_color(padding_color))
+  Gimp.context_set_foreground(setting_.ColorSetting.get_value_as_color(padding_color))
   Gimp.context_set_opacity(
-    pg.setting.ColorSetting.get_value_as_color(padding_color).get_rgba().alpha * 100)
+    setting_.ColorSetting.get_value_as_color(padding_color).get_rgba().alpha * 100)
 
   channel = pdb.gimp_selection_save(image=image)
   image.select_rectangle(

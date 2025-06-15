@@ -15,13 +15,15 @@ from src import builtin_actions
 from src import builtin_conditions
 from src import placeholders
 from src import plugin_settings
+from src import setting as setting_
 from src import setting_classes
 from src import update
+from src.config import CONFIG
 
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
 
-_SETTINGS_MODULE_PATH = f'{pg.utils.get_pygimplib_module_path()}.setting.settings'
+_SETTINGS_MODULE_PATH = 'src.setting.settings'
 
 _MOCK_PNG_CHOICE = Gimp.Choice.new()
 _MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
@@ -30,17 +32,15 @@ _MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
 _LATEST_PLUGIN_VERSION = '1.1'
 
 
-@mock.patch(
-  f'{pg.utils.get_pygimplib_module_path()}.setting.sources.Gimp',
-  new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestUpdateHandlers(unittest.TestCase):
   
   def setUp(self):
-    self.orig_plugin_version = pg.config.PLUGIN_VERSION
-    pg.config.PLUGIN_VERSION = _LATEST_PLUGIN_VERSION
+    self.orig_plugin_version = CONFIG.PLUGIN_VERSION
+    CONFIG.PLUGIN_VERSION = _LATEST_PLUGIN_VERSION
 
   def tearDown(self):
-    pg.config.PLUGIN_VERSION = self.orig_plugin_version
+    CONFIG.PLUGIN_VERSION = self.orig_plugin_version
 
   @mock.patch(
     f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_default',
@@ -55,7 +55,7 @@ class TestUpdateHandlers(unittest.TestCase):
     settings = plugin_settings.create_settings_for_export_layers()
     source_name = 'plug-in-batch-export-layers'
 
-    source = pg.setting.sources.JsonFileSource(
+    source = setting_.sources.JsonFileSource(
       source_name, os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_0-2.json'))
 
     orig_setting_values_for_0_2 = self._get_orig_setting_values_for_0_2(settings)
@@ -89,7 +89,7 @@ class TestUpdateHandlers(unittest.TestCase):
     settings = plugin_settings.create_settings_for_convert()
     source_name = 'plug-in-batch-convert'
 
-    source = pg.setting.sources.JsonFileSource(
+    source = setting_.sources.JsonFileSource(
       source_name, os.path.join(_CURRENT_MODULE_DIRPATH, 'settings_1-0.json'))
 
     status, message = update.load_and_update(
@@ -209,7 +209,7 @@ class TestUpdateHandlers(unittest.TestCase):
   def _assert_correct_contents_for_update_to_0_5(self, settings):
     self.assertEqual(
       settings['main/file_extension'].gui_type,
-      pg.setting.NullPresenter,
+      setting_.NullPresenter,
     )
 
     self.assertIn('export', settings['main/actions'])
@@ -236,7 +236,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings['main/actions/insert_background/arguments/color_tag'],
-      pg.setting.EnumSetting)
+      setting_.EnumSetting)
     self.assertEqual(
       settings['main/actions/insert_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
@@ -250,7 +250,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings['main/actions/insert_background_2/arguments/color_tag'],
-      pg.setting.EnumSetting)
+      setting_.EnumSetting)
     self.assertEqual(
       settings['main/actions/insert_background_2/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
@@ -260,7 +260,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings['main/conditions/not_background/arguments/color_tag'],
-      pg.setting.EnumSetting)
+      setting_.EnumSetting)
     self.assertEqual(
       settings['main/conditions/not_background/arguments/color_tag'].enum_type,
       Gimp.ColorTag)
@@ -282,7 +282,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('images_and_directories', settings['gui'])
 
     self.assertIsInstance(
-      settings['gui/size/paned_between_previews_position'], pg.setting.IntSetting)
+      settings['gui/size/paned_between_previews_position'], setting_.IntSetting)
 
     self.assertEqual(
       settings['main/actions/export/arguments/file_format_mode'].value,
@@ -312,10 +312,10 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings['main/actions/script-fu-addborder/arguments/color'],
-      pg.setting.ColorSetting)
+      setting_.ColorSetting)
     self.assertEqual(
       settings['main/actions/script-fu-addborder/arguments/color'].gui_type,
-      pg.setting.ColorButtonPresenter)
+      setting_.ColorButtonPresenter)
     self.assertEqual(
       settings['main/actions/script-fu-addborder/arguments/color'].pdb_type.name,
       'GeglColor')
@@ -347,7 +347,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
   def _assert_correct_contents_for_update_to_1_0_rc2(self, settings):
     self.assertEqual(
-      settings['main/output_directory'].gui_type, pg.setting.FileChooserPresenter)
+      settings['main/output_directory'].gui_type, setting_.FileChooserPresenter)
     self.assertIsInstance(settings['main/output_directory'].value, Gio.File)
     self.assertEqual(
       settings['main/output_directory'].action, Gimp.FileChooserAction.SELECT_FOLDER)

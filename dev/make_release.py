@@ -22,17 +22,17 @@ DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 
 ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
 PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
-PYGIMPLIB_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'pygimplib')
 
 sys.path.extend([
   DEV_DIRPATH,
   ROOT_DIRPATH,
   PLUGIN_DIRPATH,
-  PYGIMPLIB_DIRPATH])
+])
 
 import batcher.pygimplib as pg
 
 from batcher.src import version as version_
+from batcher.src.config import CONFIG
 
 from dev import make_installers
 from dev import preprocess_document_contents
@@ -68,10 +68,10 @@ def make_release(**kwargs):
   release_metadata = _ReleaseMetadata(
     repo,
     gh_pages_repo,
-    current_version=pg.config.PLUGIN_VERSION,
+    current_version=CONFIG.PLUGIN_VERSION,
     released_versions=repo.git.tag('-l').strip('\n').split('\n'),
-    username=pg.config.REPOSITORY_USERNAME,
-    remote_repo_name=pg.config.REPOSITORY_NAME,
+    username=CONFIG.REPOSITORY_USERNAME,
+    remote_repo_name=CONFIG.REPOSITORY_NAME,
     **kwargs)
   
   def handle_sigint(_signal, _frame):
@@ -242,8 +242,8 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
 
 
 def _update_version_and_release_date_in_config(release_metadata, plugin_config_filepath):
-  pg.config.PLUGIN_VERSION = release_metadata.new_version
-  pg.config.PLUGIN_VERSION_RELEASE_DATE = release_metadata.new_version_release_date
+  CONFIG.PLUGIN_VERSION = release_metadata.new_version
+  CONFIG.PLUGIN_VERSION_RELEASE_DATE = release_metadata.new_version_release_date
   
   entries_to_modify = {
     'PLUGIN_VERSION': release_metadata.new_version,
@@ -294,8 +294,8 @@ def _generate_page_post_with_release_notes(release_metadata):
   new_post_contents = f"""
 ---
 layout: posts
-title: "{pg.config.PLUGIN_TITLE} {release_metadata.new_version} Released"
-author: "{pg.config.AUTHOR_NAME}"
+title: "{CONFIG.PLUGIN_TITLE} {release_metadata.new_version} Released"
+author: "{CONFIG.AUTHOR_NAME}"
 category: news
 ---
 
@@ -303,7 +303,7 @@ category: news
 
 {release_metadata.new_version_release_notes}
 
-[Download at GitHub]({pg.config.REPOSITORY_URL}/releases/tag/{release_metadata.new_version})
+[Download at GitHub]({CONFIG.REPOSITORY_URL}/releases/tag/{release_metadata.new_version})
 """.strip()
 
   with open(new_post_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
@@ -321,10 +321,10 @@ def _generate_translation_file(release_metadata):
   
   subprocess.call([
     './generate_pot.sh',
-    pg.config.PLUGIN_NAME,
+    CONFIG.PLUGIN_NAME,
     release_metadata.new_version,
-    pg.config.DOMAIN_NAME,
-    pg.config.AUTHOR_NAME,
+    CONFIG.DOMAIN_NAME,
+    CONFIG.AUTHOR_NAME,
   ])
   
   os.chdir(orig_cwd)

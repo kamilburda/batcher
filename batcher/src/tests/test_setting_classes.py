@@ -10,6 +10,7 @@ from gi.repository import Gimp
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from src import setting as setting_
 from src import setting_classes
 
 
@@ -944,24 +945,24 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.common_options = [
       {
         'name': 'run-mode',
-        'type': pg.setting.EnumSetting,
+        'type': setting_.EnumSetting,
         'default_value': Gimp.RunMode.NONINTERACTIVE,
         'enum_type': Gimp.RunMode.__gtype__,
         'display_name': 'run-mode',
       },
       {
         'name': 'image',
-        'type': pg.setting.ImageSetting,
+        'type': setting_.ImageSetting,
         'default_value': None,
         'display_name': 'image',
       },
       {
         'name': 'file',
-        'type': pg.setting.FileSetting,
+        'type': setting_.FileSetting,
       },
       {
         'name': 'options',
-        'type': pg.setting.ExportOptionsSetting,
+        'type': setting_.ExportOptionsSetting,
         'display_name': 'options',
       },
     ]
@@ -970,13 +971,13 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       *self.common_options,
       {
         'name': 'interlaced',
-        'type': pg.setting.BoolSetting,
+        'type': setting_.BoolSetting,
         'display_name': 'interlaced',
         'default_value': False,
       },
       {
         'name': 'compression',
-        'type': pg.setting.IntSetting,
+        'type': setting_.IntSetting,
         'display_name': 'compression',
         'default_value': 9,
       },
@@ -986,7 +987,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       *self.common_options,
       {
         'name': 'quality',
-        'type': pg.setting.DoubleSetting,
+        'type': setting_.DoubleSetting,
         'display_name': 'quality',
         'default_value': 0.9,
       },
@@ -1064,7 +1065,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     )
 
   def test_set_value_from_settings(self, *_mocks):
-    png_group = pg.setting.Group('file_format_options')
+    png_group = setting_.Group('file_format_options')
     png_group.add([
       {
         'name': 'interlaced',
@@ -1074,11 +1075,11 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       },
     ])
 
-    jpeg_group = pg.setting.Group('file_format_options')
+    jpeg_group = setting_.Group('file_format_options')
     jpeg_group.add([
       {
         'name': 'quality',
-        'type': pg.setting.DoubleSetting,
+        'type': setting_.DoubleSetting,
         'display_name': 'quality',
         'default_value': 0.9,
       },
@@ -1135,7 +1136,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value['gif']['loop'].value, True)
 
   def test_validate_value_with_missing_none_key(self, *_mocks):
-    png_group = pg.setting.Group('file_format_options')
+    png_group = setting_.Group('file_format_options')
     png_group.add([
       {
         'name': 'interlaced',
@@ -1145,4 +1146,4 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       },
     ])
 
-    self.assertIsInstance(self.setting.validate({'png': png_group}), pg.setting.ValueNotValidData)
+    self.assertIsInstance(self.setting.validate({'png': png_group}), setting_.ValueNotValidData)

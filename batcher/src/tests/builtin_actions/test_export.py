@@ -14,6 +14,7 @@ from pygimplib.tests import stubs_gimp
 
 from src import builtin_actions
 from src import file_formats as file_formats_
+from src import setting as setting_
 
 
 @mock.patch(
@@ -26,24 +27,24 @@ class TestExport(unittest.TestCase):
     self.common_options = [
       {
         'name': 'run-mode',
-        'type': pg.setting.EnumSetting,
+        'type': setting_.EnumSetting,
         'default_value': Gimp.RunMode.NONINTERACTIVE,
         'enum_type': Gimp.RunMode.__gtype__,
         'display_name': 'run-mode',
       },
       {
         'name': 'image',
-        'type': pg.setting.ImageSetting,
+        'type': setting_.ImageSetting,
         'default_value': None,
         'display_name': 'image',
       },
       {
         'name': 'file',
-        'type': pg.setting.FileSetting,
+        'type': setting_.FileSetting,
       },
       {
         'name': 'options',
-        'type': pg.setting.ExportOptionsSetting,
+        'type': setting_.ExportOptionsSetting,
         'default_value': None,
         'display_name': 'options',
       },
@@ -52,14 +53,14 @@ class TestExport(unittest.TestCase):
     self.png_options = [
       {
         'name': 'offsets',
-        'type': pg.setting.ArraySetting,
-        'element_type': pg.setting.IntSetting,
+        'type': setting_.ArraySetting,
+        'element_type': setting_.IntSetting,
         'display_name': 'Offsets',
         'default_value': (7, 11),
       },
       {
         'name': 'is-interlaced',
-        'type': pg.setting.BoolSetting,
+        'type': setting_.BoolSetting,
         'display_name': 'interlaced',
         'default_value': False,
       },

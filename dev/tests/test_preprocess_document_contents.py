@@ -3,7 +3,7 @@ import unittest.mock as mock
 
 import parameterized
 
-from batcher import pygimplib as pg
+from src.config import CONFIG
 
 from dev import preprocess_document_contents
 
@@ -191,8 +191,8 @@ class TestIncludeConfigTag(unittest.TestCase):
     ['invalid_config_entry', ['ENTRY_THAT_DOES_NOT_EXIST'], ''],
   ])
   def test_include_config(self, test_case_name, args, expected_contents):
-    if args and hasattr(pg.config, args[0]):
-      setattr(pg.config, args[0], expected_contents)
+    if args and hasattr(CONFIG, args[0]):
+      setattr(CONFIG, args[0], expected_contents)
     
     tag = preprocess_document_contents.IncludeConfigTag(
       self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)

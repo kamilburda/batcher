@@ -21,7 +21,6 @@ To repeat the tests, simply call the procedure again.
 """
 
 import importlib
-import inspect
 import os
 import pkgutil
 import sys
@@ -35,8 +34,7 @@ from gi.repository import Gio
 from gi.repository import GObject
 
 
-PLUGIN_DIRPATH = (
-  os.path.dirname(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))))
+PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PLUGIN_DIRPATH not in sys.path:
   sys.path.append(PLUGIN_DIRPATH)
 
@@ -45,16 +43,7 @@ if BATCHER_DIRPATH not in sys.path:
   sys.path.append(BATCHER_DIRPATH)
 
 
-from batcher import pygimplib as pg
-
 from src import procedure as procedure_
-
-
-_CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
-_ROOT_DIRPATH = os.path.join(os.path.dirname(_CURRENT_MODULE_DIRPATH), 'batcher')
-
-if _ROOT_DIRPATH not in sys.path:
-  sys.path.append(_ROOT_DIRPATH)
 
 
 def plug_in_run_tests(

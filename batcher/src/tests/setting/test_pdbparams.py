@@ -5,10 +5,10 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
 
-from ...setting import pdbparams as pdbparams_
-from ...setting import settings as settings_
+from src.setting import pdbparams as pdbparams_
+from src.setting import settings as settings_
 
-from . import stubs_group
+from src.tests.setting import stubs_group
 
 
 class TestCreateParams(unittest.TestCase):

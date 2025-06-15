@@ -11,6 +11,7 @@ import pygimplib as pg
 from pygimplib.pypdb import pdb
 
 from src import placeholders
+from src import setting as setting_
 from src.path import uniquify
 
 
@@ -20,12 +21,12 @@ def get_setting_data_from_pdb_procedure(
   """Given the input, returns a PDB procedure, its name and arguments.
 
   The returned arguments are a list of dictionaries. From each dictionary,
-  `pygimplib.setting.Setting` instances can be created.
+  `setting.Setting` instances can be created.
 
   If the procedure contains arguments with the same name, each subsequent
   identical name is made unique (since arguments are internally represented as
-  `pygimplib.setting.Setting` instances, whose names must be unique within a
-  `pygimplib.setting.Group` instance).
+  `setting.Setting` instances, whose names must be unique within a
+  `setting.Group` instance).
   """
 
   if isinstance(pdb_procedure_or_name, str):
@@ -39,7 +40,7 @@ def get_setting_data_from_pdb_procedure(
   arguments = []
 
   for proc_arg in pdb_procedure.arguments:
-    retval = pg.setting.get_setting_type_and_kwargs(proc_arg.value_type, proc_arg, pdb_procedure)
+    retval = setting_.get_setting_type_and_kwargs(proc_arg.value_type, proc_arg, pdb_procedure)
 
     if retval is not None:
       setting_type, setting_type_init_kwargs = retval
@@ -50,11 +51,11 @@ def get_setting_data_from_pdb_procedure(
       if placeholder_type_name is not None:
         setting_type_init_kwargs = _remove_invalid_init_arguments_for_placeholder_settings(
           setting_type, placeholder_type_name, setting_type_init_kwargs)
-        setting_type = pg.setting.SETTING_TYPES[placeholder_type_name]
+        setting_type = setting_.SETTING_TYPES[placeholder_type_name]
     else:
       setting_type = placeholders.PlaceholderUnsupportedParameterSetting
       setting_type_init_kwargs = {}
-      placeholder_type_name = pg.setting.SETTING_TYPES[setting_type]
+      placeholder_type_name = setting_.SETTING_TYPES[setting_type]
 
     unique_pdb_param_name = uniquify.uniquify_string(
       proc_arg.name,
@@ -76,10 +77,10 @@ def get_setting_data_from_pdb_procedure(
       elif setting_type == placeholders.PlaceholderUnsupportedParameterSetting:
         argument_dict['default_param_value'] = proc_arg.default_value
 
-    if setting_type == pg.setting.BoolSetting:
+    if setting_type == setting_.BoolSetting:
       argument_dict['gui_type'] = 'check_button'
 
-    if inspect.isclass(setting_type) and issubclass(setting_type, pg.setting.NumericSetting):
+    if inspect.isclass(setting_type) and issubclass(setting_type, setting_.NumericSetting):
       if hasattr(proc_arg, 'minimum'):
         argument_dict['min_value'] = proc_arg.minimum
       if hasattr(proc_arg, 'maximum'):
@@ -96,9 +97,9 @@ def get_setting_data_from_pdb_procedure(
 def _remove_invalid_init_arguments_for_placeholder_settings(
       setting_type, placeholder_type_name, setting_type_init_kwargs):
   if isinstance(setting_type, str):
-    setting_type = pg.SETTING_TYPES[setting_type]
+    setting_type = setting_.SETTING_TYPES[setting_type]
 
-  placeholder_type = pg.SETTING_TYPES[placeholder_type_name]
+  placeholder_type = setting_.SETTING_TYPES[placeholder_type_name]
 
   setting_init_params = inspect.signature(setting_type.__init__).parameters
   placeholder_setting_init_params = inspect.signature(placeholder_type.__init__).parameters

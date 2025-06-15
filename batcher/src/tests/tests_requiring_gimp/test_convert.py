@@ -19,6 +19,7 @@ from src import core
 from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
+from src.config import CONFIG
 from src.procedure_groups import *
 
 
@@ -35,7 +36,7 @@ class TestConvertCompareContents(unittest.TestCase):
   
   @classmethod
   def setUpClass(cls):
-    pg.config.PROCEDURE_GROUP = CONVERT_GROUP
+    CONFIG.PROCEDURE_GROUP = CONVERT_GROUP
 
     Gimp.context_push()
 
@@ -66,7 +67,7 @@ class TestConvertCompareContents(unittest.TestCase):
   def tearDownClass(cls):
     Gimp.context_pop()
 
-    pg.config.PROCEDURE_GROUP = pg.config.PLUGIN_NAME
+    CONFIG.PROCEDURE_GROUP = CONFIG.PLUGIN_NAME
   
   def tearDown(self):
     if os.path.exists(self.output_dirpath):

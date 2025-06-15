@@ -15,6 +15,7 @@ from . import browser as command_browser_
 from . import item as command_item_
 
 from src import commands as commands_
+from src import setting as setting_
 
 
 class CommandList(pg.gui.ItemBox):
@@ -83,7 +84,7 @@ class CommandList(pg.gui.ItemBox):
 
   def __init__(
         self,
-        commands: pg.setting.Group,
+        commands: setting_.Group,
         builtin_commands: Optional[Dict[str, Any]] = None,
         add_command_text: Optional[str] = None,
         allow_custom_commands: bool = True,
@@ -150,7 +151,7 @@ class CommandList(pg.gui.ItemBox):
 
   def add_item(
         self,
-        command_dict_or_pdb_proc_name_or_command: Union[Dict[str, Any], str, pg.setting.Group],
+        command_dict_or_pdb_proc_name_or_command: Union[Dict[str, Any], str, setting_.Group],
         attach_editor_widget=True,
   ) -> command_item_.CommandItem:
     self._commands.set_event_enabled(self._after_add_command_event_id, False)

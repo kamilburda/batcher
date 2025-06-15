@@ -11,8 +11,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from .. import constants as pgconstants
-from .. import utils as pgutils
+import pygimplib as pg
 
 from . import group as group_
 from . import settings as settings_
@@ -599,7 +598,7 @@ class GimpParasiteSource(Source):
     if parasite is None:
       return None
 
-    parasite_data = pgutils.signed_bytes_to_bytes(parasite.get_data())
+    parasite_data = pg.utils.signed_bytes_to_bytes(parasite.get_data())
     try:
       data = pickle.loads(parasite_data)
     except Exception:
@@ -612,7 +611,7 @@ class GimpParasiteSource(Source):
       Gimp.Parasite.new(
         self.name,
         Gimp.PARASITE_PERSISTENT,
-        pgutils.bytes_to_signed_bytes(pickle.dumps(data))))
+        pg.utils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
 class JsonFileSource(Source):
@@ -687,7 +686,7 @@ class JsonFileSource(Source):
     all_data = {}
 
     try:
-      with open(self._filepath, 'r', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'r', encoding=pg.constants.TEXT_FILE_ENCODING) as f:
         all_data = json.load(f)
     except Exception as e:
       raise SourceReadError from e
@@ -700,7 +699,7 @@ class JsonFileSource(Source):
     ``all_data`` is a dictionary of (source name, contents) pairs.
     """
     try:
-      with open(self._filepath, 'w', encoding=pgconstants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'w', encoding=pg.constants.TEXT_FILE_ENCODING) as f:
         json.dump(all_data, f, indent=4)
     except Exception as e:
       raise SourceWriteError from e

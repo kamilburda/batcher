@@ -201,7 +201,7 @@ class PreviewsController:
     ignore_reset_tag_added = False
     should_reset_inputs = False
 
-    def _set_up_loading_of_inputs(setting_):
+    def _set_up_loading_of_inputs(setting):
       nonlocal orig_keep_inputs_value
       nonlocal ignore_load_tag_added
 
@@ -211,11 +211,11 @@ class PreviewsController:
         # changes.
         orig_keep_inputs_value = self._settings['gui/keep_inputs'].value
 
-      if orig_keep_inputs_value and 'ignore_load' not in setting_.tags:
+      if orig_keep_inputs_value and 'ignore_load' not in setting.tags:
         ignore_load_tag_added = True
-        setting_.tags.add('ignore_load')
+        setting.tags.add('ignore_load')
 
-    def _add_inputs_to_name_preview(setting_):
+    def _add_inputs_to_name_preview(setting):
       nonlocal orig_keep_inputs_value
       nonlocal ignore_load_tag_added
 
@@ -225,24 +225,24 @@ class PreviewsController:
       orig_keep_inputs_value = None
 
       if ignore_load_tag_added:
-        setting_.tags.discard('ignore_load')
+        setting.tags.discard('ignore_load')
         ignore_load_tag_added = False
 
-    def _get_inputs_from_name_preview(setting_):
+    def _get_inputs_from_name_preview(setting):
       if self._settings['gui/keep_inputs'].value:
-        setting_.set_value(utils_.item_tree_items_to_objects(self._name_preview.batcher.item_tree))
+        setting.set_value(utils_.item_tree_items_to_objects(self._name_preview.batcher.item_tree))
       else:
-        setting_.set_value([])
+        setting.set_value([])
 
-    def _set_up_reset_and_loading_from_file(setting_):
+    def _set_up_reset_and_loading_from_file(setting):
       nonlocal ignore_reset_tag_added
       nonlocal should_reset_inputs
       nonlocal orig_keep_inputs_value
 
       if self._settings['gui/keep_inputs'].value:
-        if 'ignore_reset' not in setting_.tags:
+        if 'ignore_reset' not in setting.tags:
           ignore_reset_tag_added = True
-          setting_.tags.add('ignore_reset')
+          setting.tags.add('ignore_reset')
       else:
         should_reset_inputs = True
 
@@ -252,12 +252,12 @@ class PreviewsController:
         # feasible.
         orig_keep_inputs_value = self._settings['gui/keep_inputs'].value
 
-    def _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs(setting_):
+    def _remove_ignore_reset_tag_and_clear_preview_if_not_keep_inputs(setting):
       nonlocal ignore_reset_tag_added
       nonlocal should_reset_inputs
 
       if ignore_reset_tag_added:
-        setting_.tags.discard('ignore_reset')
+        setting.tags.discard('ignore_reset')
         ignore_reset_tag_added = False
 
       if should_reset_inputs:

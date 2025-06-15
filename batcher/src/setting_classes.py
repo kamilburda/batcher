@@ -19,6 +19,7 @@ from src import file_formats as file_formats_
 from src import itemtree
 from src import placeholders as placeholders_
 from src import renamer as renamer_
+from src import setting as setting_
 from src import utils
 from src.gui import anchor_box as anchor_box_
 from src.gui import angle_box as angle_box_
@@ -29,7 +30,7 @@ from src.gui.entry import entries as entries_
 from src.path import validators as validators_
 
 
-class ValidatableStringSetting(pg.setting.StringSetting):
+class ValidatableStringSetting(setting_.StringSetting):
   """Abstract class for string settings which are meant to be validated with one
   of the `path.validators.StringValidator` subclasses.
 
@@ -84,7 +85,7 @@ class ValidatableStringSetting(pg.setting.StringSetting):
         return status_message, status
 
 
-class ExtendedEntryPresenter(pg.setting.GtkPresenter):
+class ExtendedEntryPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.ExtendedEntry` widgets.
 
   Value: Text in the entry.
@@ -118,7 +119,7 @@ class FileExtensionSetting(ValidatableStringSetting):
   """
 
   _ALLOWED_GUI_TYPES = [
-    pg.SETTING_GUI_TYPES.entry,
+    setting_.SETTING_GUI_TYPES.entry,
     FileExtensionEntryPresenter,
   ]
 
@@ -139,7 +140,7 @@ class FileExtensionSetting(ValidatableStringSetting):
 
 
 class NamePatternEntryPresenter(ExtendedEntryPresenter):
-  """`pygimplib.setting.Presenter` subclass for
+  """`setting.Presenter` subclass for
   `gui.entries.NamePatternEntry` widgets.
 
   Value: Text in the entry.
@@ -149,12 +150,12 @@ class NamePatternEntryPresenter(ExtendedEntryPresenter):
     return entries_.NamePatternEntry(renamer_.get_field_descriptions())
 
 
-class NamePatternSetting(pg.setting.StringSetting):
+class NamePatternSetting(setting_.StringSetting):
 
   _ALLOWED_GUI_TYPES = [
     NamePatternEntryPresenter,
-    pg.SETTING_GUI_TYPES.extended_entry,
-    pg.SETTING_GUI_TYPES.entry,
+    setting_.SETTING_GUI_TYPES.extended_entry,
+    setting_.SETTING_GUI_TYPES.entry,
   ]
 
   def _assign_value(self, value):
@@ -164,7 +165,7 @@ class NamePatternSetting(pg.setting.StringSetting):
       self._value = value
 
 
-class DimensionBoxPresenter(pg.setting.GtkPresenter):
+class DimensionBoxPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.DimensionBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.DimensionBox`.
@@ -201,7 +202,7 @@ class DimensionBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_value(value)
 
 
-class DimensionSetting(pg.setting.NumericSetting):
+class DimensionSetting(setting_.NumericSetting):
   """Class for settings representing a dimension (e.g. width of an image).
 
   In this setting, a dimension is a dictionary consisting of a value, a unit
@@ -238,7 +239,7 @@ class DimensionSetting(pg.setting.NumericSetting):
       unit.
     """
     self._percent_placeholder_names = percent_placeholder_names
-    self._built_in_units = pg.setting.UnitSetting.get_built_in_units()
+    self._built_in_units = setting_.UnitSetting.get_built_in_units()
 
     self._placeholder_attribute_map = utils.semi_deep_copy(placeholders_.PLACEHOLDER_ATTRIBUTE_MAP)
 
@@ -279,7 +280,7 @@ class DimensionSetting(pg.setting.NumericSetting):
       return raw_value
 
     if 'unit' in raw_value:
-      raw_value['unit'] = pg.setting.UnitSetting.raw_data_to_unit(raw_value['unit'])
+      raw_value['unit'] = setting_.UnitSetting.raw_data_to_unit(raw_value['unit'])
     else:
       raw_value['unit'] = self._default_value['unit']
 
@@ -300,7 +301,7 @@ class DimensionSetting(pg.setting.NumericSetting):
   def _value_to_raw(self, value):
     processed_value = utils.semi_deep_copy(value)
     if 'unit' in processed_value:
-      processed_value['unit'] = pg.setting.UnitSetting.unit_to_raw_data(
+      processed_value['unit'] = setting_.UnitSetting.unit_to_raw_data(
         processed_value['unit'], self._built_in_units)
 
     if 'percent_property' in processed_value:
@@ -317,7 +318,7 @@ class DimensionSetting(pg.setting.NumericSetting):
     return processed_value
 
 
-class AngleBoxPresenter(pg.setting.GtkPresenter):
+class AngleBoxPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.AngleBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.AngleBox`.
@@ -339,7 +340,7 @@ class AngleBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_value(value)
 
 
-class AngleSetting(pg.setting.DictSetting):
+class AngleSetting(setting_.DictSetting):
   """Class for settings representing an angle.
 
   In this setting, a dimension is a dictionary consisting of a value and a unit
@@ -364,7 +365,7 @@ class AngleSetting(pg.setting.DictSetting):
       return value
 
 
-class AnchorBoxPresenter(pg.setting.GtkPresenter):
+class AnchorBoxPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.AnchorBox` widgets.
 
   Value: A value representing an anchor point.
@@ -385,7 +386,7 @@ class AnchorBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_value(value)
 
 
-class AnchorSetting(pg.setting.ChoiceSetting):
+class AnchorSetting(setting_.ChoiceSetting):
   """Class for settings representing an anchor point.
 
   Default value: ''
@@ -398,7 +399,7 @@ class AnchorSetting(pg.setting.ChoiceSetting):
   _DEFAULT_DEFAULT_VALUE = ''
 
 
-class CoordinatesBoxPresenter(pg.setting.GtkPresenter):
+class CoordinatesBoxPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.CoordinatesBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.CoordinatesBox`.
@@ -425,7 +426,7 @@ class CoordinatesBoxPresenter(pg.setting.GtkPresenter):
     self._widget.set_value(value)
 
 
-class CoordinatesSetting(pg.setting.DictSetting):
+class CoordinatesSetting(setting_.DictSetting):
   """Class for settings representing values along the X- and Y-axis (e.g.
   position or resolution).
 
@@ -495,7 +496,7 @@ class CoordinatesSetting(pg.setting.DictSetting):
       return value
 
 
-class ItemTreeItemsSetting(pg.setting.Setting):
+class ItemTreeItemsSetting(setting_.Setting):
   """Abstract class for settings representing `itemtree.Item` instances,
   specifically a list of values of the `itemtree.Item.key` property.
 
@@ -817,7 +818,7 @@ class ImageFileTreeItemsSetting(ItemTreeItemsSetting):
     return item_key
 
 
-class ImagesAndDirectoriesSetting(pg.setting.Setting):
+class ImagesAndDirectoriesSetting(setting_.Setting):
   """Class for settings the list of currently opened images and their import
   directory paths.
   
@@ -906,7 +907,7 @@ class ImagesAndDirectoriesSetting(pg.setting.Setting):
       return 'value must be a dictionary', 'value_must_be_dict'
 
 
-class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
+class FileFormatOptionsPresenter(setting_.GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.Grid` widgets representing
   dictionaries of (string, value) pairs.
 
@@ -940,7 +941,7 @@ class FileFormatOptionsPresenter(pg.setting.GtkPresenter):
       value[active_file_format_key], value.get(value[active_file_format_key], None))
 
 
-class FileFormatOptionsSetting(pg.setting.DictSetting):
+class FileFormatOptionsSetting(setting_.DictSetting):
   """Class for settings storing file format-specific options.
 
   The options are stored in a dictionary as pairs of (file extension,
@@ -986,7 +987,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
       if key != self.ACTIVE_FILE_FORMAT_KEY:
         processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(key, key)
         if file_formats_.file_format_procedure_exists(processed_file_format, self.import_or_export):
-          if isinstance(group_or_active_file_format, pg.setting.Group):
+          if isinstance(group_or_active_file_format, setting_.Group):
             # We need to create new settings to avoid the same setting to be
             # a part of multiple instances of `FileFormatOptionsSetting`.
             value[key] = file_formats_.create_file_format_options_settings(
@@ -1036,7 +1037,7 @@ class FileFormatOptionsSetting(pg.setting.DictSetting):
     return [setting.to_dict() for setting in file_format_options]
 
 
-class TaggedItemsSetting(pg.setting.ListSetting):
+class TaggedItemsSetting(setting_.ListSetting):
   """Class for settings storing a list of items with color tags.
 
   This class disallows saving setting values by always returning an empty list.
