@@ -1,4 +1,6 @@
-## Upcoming
+## 1.1.1
+
+### June 15, 2025
 
 * Fixed the former `Resize to layer size` action being incorrectly updated when upgrading Batcher to 1.1.
 
