@@ -43,7 +43,7 @@ if BATCHER_DIRPATH not in sys.path:
   sys.path.append(BATCHER_DIRPATH)
 
 
-from src import procedure as procedure_
+from batcher.src import procedure as procedure_
 
 
 def plug_in_run_tests(
