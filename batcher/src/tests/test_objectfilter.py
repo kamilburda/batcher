@@ -1,6 +1,6 @@
 import unittest
 
-from .. import objectfilter as pgobjectfilter
+from src import objectfilter
 
 
 class FilterableObject:
@@ -45,7 +45,7 @@ class FilterRules:
 class TestObjectFilter(unittest.TestCase):
   
   def setUp(self):
-    self.filter = pgobjectfilter.ObjectFilter(pgobjectfilter.ObjectFilter.MATCH_ALL)
+    self.filter = objectfilter.ObjectFilter(objectfilter.ObjectFilter.MATCH_ALL)
   
   def test_is_filter_nonempty(self):
     self.assertFalse(bool(self.filter))
@@ -63,7 +63,7 @@ class TestObjectFilter(unittest.TestCase):
     self.assertEqual(self.filter[rule.id], rule)
   
   def test_getitem_nested_filter(self):
-    nested_filter = pgobjectfilter.ObjectFilter(name='item_types')
+    nested_filter = objectfilter.ObjectFilter(name='item_types')
     nested_filter_id = self.filter.add(nested_filter)
     
     self.assertEqual(self.filter[nested_filter_id], nested_filter)
@@ -75,7 +75,7 @@ class TestObjectFilter(unittest.TestCase):
   
   def test_len(self):
     self.filter.add(FilterRules.has_uppercase_letters)
-    nested_filter = pgobjectfilter.ObjectFilter()
+    nested_filter = objectfilter.ObjectFilter()
     nested_filter.add(FilterRules.is_object_id_even)
     nested_filter.add(FilterRules.is_empty)
     nested_filter.add(FilterRules.has_red_color)
@@ -116,7 +116,7 @@ class TestObjectFilter(unittest.TestCase):
     rule_2 = self.filter.add(FilterRules.has_uppercase_letters, name='another_name')
     rule_3 = self.filter.add(FilterRules.is_empty, name='another_name')
     
-    obj_properties_filter = pgobjectfilter.ObjectFilter(name='custom_name')
+    obj_properties_filter = objectfilter.ObjectFilter(name='custom_name')
     obj_properties_filter_id = self.filter.add(obj_properties_filter)
     
     rules, rule_ids = self.filter.remove(
@@ -142,7 +142,7 @@ class TestObjectFilter(unittest.TestCase):
   def test_list_rules(self):
     self.filter.add(FilterRules.has_uppercase_letters)
     
-    nested_filter = pgobjectfilter.ObjectFilter(name='item_types')
+    nested_filter = objectfilter.ObjectFilter(name='item_types')
     self.filter.add(nested_filter)
     rules = list(self.filter.list_rules().values())
     
@@ -173,7 +173,7 @@ class TestObjectFilter(unittest.TestCase):
     self.assertNotIn(rule_2.id, self.filter)
   
   def test_add_temp_nested_filter(self):
-    with self.filter.add_temp(pgobjectfilter.ObjectFilter(name='item_types')) as filter_id:
+    with self.filter.add_temp(objectfilter.ObjectFilter(name='item_types')) as filter_id:
       self.assertIn(filter_id, self.filter)
     self.assertNotIn(filter_id, self.filter)
   
@@ -219,7 +219,7 @@ class TestObjectFilter(unittest.TestCase):
     rule_2 = self.filter.add(FilterRules.has_uppercase_letters, name='another_name')
     self.filter.add(FilterRules.is_empty, name='another_name')
     
-    obj_properties_filter = pgobjectfilter.ObjectFilter(name='custom_name')
+    obj_properties_filter = objectfilter.ObjectFilter(name='custom_name')
     obj_properties_filter_id = self.filter.add(obj_properties_filter)
     
     with self.filter.remove_temp(
@@ -245,7 +245,7 @@ class TestObjectFilter(unittest.TestCase):
     self.assertFalse(self.filter.is_match(FilterableObject(1, 'hi there')))
   
   def test_match_any(self):
-    filter_match_any = pgobjectfilter.ObjectFilter(pgobjectfilter.ObjectFilter.MATCH_ANY)
+    filter_match_any = objectfilter.ObjectFilter(objectfilter.ObjectFilter.MATCH_ANY)
     filter_match_any.add(FilterRules.has_uppercase_letters)
     filter_match_any.add(FilterRules.is_object_id_even)
     
@@ -255,7 +255,7 @@ class TestObjectFilter(unittest.TestCase):
     self.assertFalse(filter_match_any.is_match(FilterableObject(1, 'hi there')))
   
   def test_match_empty_filter(self):
-    filter_match_any = pgobjectfilter.ObjectFilter(pgobjectfilter.ObjectFilter.MATCH_ANY)
+    filter_match_any = objectfilter.ObjectFilter(objectfilter.ObjectFilter.MATCH_ANY)
     
     self.assertTrue(self.filter.is_match(FilterableObject(2, 'Hi There')))
     self.assertTrue(filter_match_any.is_match(FilterableObject(2, 'Hi There')))
@@ -295,7 +295,7 @@ class TestObjectFilter(unittest.TestCase):
     #   * rule
     #   * rule
     
-    obj_properties_filter_id = self.filter.add(pgobjectfilter.ObjectFilter(
+    obj_properties_filter_id = self.filter.add(objectfilter.ObjectFilter(
       self.filter.MATCH_ANY, name='obj_properties'))
     self.filter[obj_properties_filter_id].add(FilterRules.is_empty)
     self.filter[obj_properties_filter_id].add(FilterRules.is_object_id_even)
@@ -324,13 +324,13 @@ class TestObjectFilter(unittest.TestCase):
     #       * rule
     
     self.filter.add(FilterRules.is_object_id_even)
-    obj_properties_filter_id = self.filter.add(pgobjectfilter.ObjectFilter(
+    obj_properties_filter_id = self.filter.add(objectfilter.ObjectFilter(
       self.filter.MATCH_ANY, name='obj_properties'))
     
     obj_properties_nested_filter = self.filter[obj_properties_filter_id]
     obj_properties_nested_filter.add(FilterRules.is_empty)
     colors_filter_id = obj_properties_nested_filter.add(
-      pgobjectfilter.ObjectFilter(name='colors'))
+      objectfilter.ObjectFilter(name='colors'))
     
     color_nested_filter = obj_properties_nested_filter[colors_filter_id]
     color_nested_filter.add(FilterRules.has_red_color)
@@ -353,7 +353,7 @@ class TestObjectFilter(unittest.TestCase):
     rule = self.filter.add(FilterRules.has_uppercase_letters, name='custom_name')
     self.filter.add(FilterRules.is_empty, name='another_name')
     
-    obj_properties_filter = pgobjectfilter.ObjectFilter(name='custom_name')
+    obj_properties_filter = objectfilter.ObjectFilter(name='custom_name')
     obj_properties_filter_id = self.filter.add(obj_properties_filter)
     self.filter[obj_properties_filter_id].add(FilterRules.is_empty)
     
@@ -370,7 +370,7 @@ class TestObjectFilter(unittest.TestCase):
     rule = self.filter.add(FilterRules.has_uppercase_letters, name='custom_name')
     rule_2 = self.filter.add(FilterRules.has_uppercase_letters, name='another_name')
     
-    self.filter.add(pgobjectfilter.ObjectFilter(name='custom_name'))
+    self.filter.add(objectfilter.ObjectFilter(name='custom_name'))
     
     rule_ids = self.filter.find(func_or_filter=FilterRules.has_uppercase_letters)
     self.assertEqual(len(rule_ids), 2)
@@ -386,7 +386,7 @@ class TestObjectFilter(unittest.TestCase):
     rule_2 = self.filter.add(FilterRules.has_uppercase_letters, name='another_name')
     self.filter.add(FilterRules.is_empty, name='another_name')
     
-    obj_properties_filter = pgobjectfilter.ObjectFilter(name='custom_name')
+    obj_properties_filter = objectfilter.ObjectFilter(name='custom_name')
     obj_properties_filter_id = self.filter.add(obj_properties_filter)
     self.filter[obj_properties_filter_id].add(FilterRules.is_empty)
     
@@ -407,7 +407,7 @@ class TestObjectFilter(unittest.TestCase):
     self.filter.add(FilterRules.has_uppercase_letters, name='custom_name')
     self.filter.add(FilterRules.is_empty, name='another_name')
     
-    obj_properties_filter_id = self.filter.add(pgobjectfilter.ObjectFilter(name='custom_name'))
+    obj_properties_filter_id = self.filter.add(objectfilter.ObjectFilter(name='custom_name'))
     self.filter[obj_properties_filter_id].add(FilterRules.is_empty)
     
     rule_ids = self.filter.find(name='no_matching_name')

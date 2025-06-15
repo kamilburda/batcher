@@ -53,7 +53,6 @@ else:
 
 
 from . import configbase
-from . import objectfilter
 from . import utils
 
 from .constants import *
@@ -61,7 +60,6 @@ from .constants import *
 __all__ = [
   # Modules
   'logging',
-  'objectfilter',
   'utils',
   # Global elements imported to or defined in this module
   'config',

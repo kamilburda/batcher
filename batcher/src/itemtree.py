@@ -20,6 +20,8 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src import objectfilter
+
 
 TYPE_ITEM, TYPE_GROUP, TYPE_FOLDER = (0, 1, 2)
 
@@ -472,7 +474,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   def __init__(
         self,
         is_filtered: bool = True,
-        filter_match_type: int = pg.objectfilter.ObjectFilter.MATCH_ALL,
+        filter_match_type: int = objectfilter.ObjectFilter.MATCH_ALL,
   ):
     self.is_filtered = is_filtered
     """If ``True``, ignore items that do not match the filter
@@ -481,7 +483,7 @@ class ItemTree(metaclass=abc.ABCMeta):
     
     self._filter_match_type = filter_match_type
 
-    self.filter = pg.objectfilter.ObjectFilter(self._filter_match_type)
+    self.filter = objectfilter.ObjectFilter(self._filter_match_type)
     """`objectfilter.ObjectFilter` instance that allows filtering items based
     on rules.
     """
@@ -922,7 +924,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   
   def reset_filter(self):
     """Resets the filter, creating a new empty `objectfilter.ObjectFilter`."""
-    self.filter = pg.objectfilter.ObjectFilter(self._filter_match_type)
+    self.filter = objectfilter.ObjectFilter(self._filter_match_type)
 
   @abc.abstractmethod
   def refresh(self):
