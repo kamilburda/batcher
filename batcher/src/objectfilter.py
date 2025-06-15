@@ -274,7 +274,7 @@ class ObjectFilter:
     elif self._match_type == self.MATCH_ANY:
       return self._is_match_any(obj)
   
-  def _is_match_all(self, obj):
+  def _is_match_all(self, obj) -> bool:
     is_match = True
     
     for value in self._rules.values():
@@ -288,7 +288,7 @@ class ObjectFilter:
     
     return is_match
   
-  def _is_match_any(self, obj):
+  def _is_match_any(self, obj) -> bool:
     is_match = False
     
     for value in self._rules.values():
@@ -372,4 +372,3 @@ class ObjectFilter:
     The match type is preserved.
     """
     self._rules.clear()
-
