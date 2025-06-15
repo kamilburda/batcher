@@ -1712,7 +1712,7 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
       'type': 'choice',
       'name': 'resize_mode',
       'default_value': 'resize_from_edges',
-      'value': 'resize_from_edges',
+      'value': 'resize_to_layer_size',
       'items': [
         ('resize_from_edges', _('Resize from edges')),
         ('resize_from_position', _('Resize from position')),

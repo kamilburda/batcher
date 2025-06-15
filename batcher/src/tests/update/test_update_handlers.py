@@ -546,6 +546,9 @@ class TestUpdateHandlers(unittest.TestCase):
 
     resize_canvas_arguments_path = 'main/actions/resize_to_layer_size/arguments'
 
+    self.assertEqual(
+      settings[f'{resize_canvas_arguments_path}/resize_mode'].value, 'resize_to_layer_size')
+
     self.assertListEqual(
       [setting.name for setting in settings[resize_canvas_arguments_path]],
       [
