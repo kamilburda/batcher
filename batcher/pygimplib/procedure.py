@@ -3,6 +3,7 @@
 
 from collections.abc import Iterable
 import functools
+import inspect
 import sys
 from typing import Callable, List, Optional, Tuple, Type, Union
 
@@ -28,20 +29,24 @@ _QUIT_FUNC = None
 def register_procedure(
       procedure: Callable,
       procedure_type: Type[Gimp.Procedure] = Gimp.ImageProcedure,
-      arguments: Optional[Iterable[List]] = None,
-      return_values: Optional[Iterable[List]] = None,
+      arguments: Optional[Union[Iterable[List], Callable[[], Iterable[List]]]] = None,
+      return_values: Optional[Union[Iterable[List], Callable[[], Iterable[List]]]] = None,
       menu_label: Optional[str] = None,
       menu_path: Optional[Union[str, Iterable[str]]] = None,
       image_types: Optional[str] = None,
       sensitivity_mask: Optional[Gimp.ProcedureSensitivityMask] = None,
       documentation: Optional[Union[Tuple[str, str], Tuple[str, str, str]]] = None,
       attribution: Optional[Tuple[str, str, str]] = None,
-      auxiliary_arguments: Optional[Iterable[List]] = None,
+      auxiliary_arguments: Optional[Union[Iterable[List], Callable[[], Iterable[List]]]] = None,
       run_data: Optional[Iterable] = None,
       init_ui: bool = True,
       init_gegl: bool = True,
       pdb_procedure_type: Gimp.PDBProcType = Gimp.PDBProcType.PLUGIN,
       additional_init: Optional[Callable] = None,
+      export_metadata: bool = False,
+      interpreter_name: Optional[str] = None,
+      extract_func: Optional[Callable] = None,
+      extract_data: Optional[Iterable] = None,
 ):
   # noinspection PyUnresolvedReferences
   """Registers a function as a GIMP procedure.
@@ -67,7 +72,8 @@ def register_procedure(
       registered. If ``procedure_type`` is `Gimp.ImageProcedure`, several PDB
       arguments will be pre-filled (see the documentation for
       `Gimp.ImageProcedure` for more information).
-    arguments: List of arguments (procedure parameters).
+    arguments: List of arguments (procedure parameters), or a function returning
+      a list of arguments.
       Each argument must be a list containing the following elements in this
       order:
       * argument type. The type corresponds to one of the
@@ -79,7 +85,41 @@ def register_procedure(
 
       Underscores in argument names (``_``) are automatically replaced with
       hyphens (``-``).
-    return_values: List of return values.
+
+      If your argument list contains arguments of type e.g. `Gegl.Color`, you
+      will have to pass a function taking no parameters, for example:
+      >>> def get_arguments():
+      >>>   _default_foreground_color = Gegl.Color.new('black')
+      >>>   _default_foreground_color.set_rgba(0.65, 0.6, 0.3, 1.0)
+      >>>
+      >>>   _default_background_color = Gegl.Color.new('black')
+      >>>   _default_background_color.set_rgba(0.1, 0.4, 0.15, 1.0)
+      >>>
+      >>>   return [
+      >>>     [
+      >>>       'color',
+      >>>       'foreground-color',
+      >>>       'Foreground color',
+      >>>       'Foreground color',
+      >>>       True,
+      >>>       _default_foreground_color,
+      >>>       GObject.ParamFlags.READWRITE,
+      >>>     ],
+      >>>     [
+      >>>       'color',
+      >>>       'background-color',
+      >>>       'Background color',
+      >>>       'Background color',
+      >>>       True,
+      >>>       _default_background_color,
+      >>>       GObject.ParamFlags.READWRITE,
+      >>>     ],
+      >>>   ]
+
+      For documentation on the ``Gimp.Procedure.add_*_argument`` functions, see:
+      https://lazka.github.io/pgi-docs/#Gimp-3.0/classes/Procedure.html
+    return_values: List of return values, or a function returning a list of
+      return values.
       See ``arguments`` for more information about the contents and format of
       the list.
 
@@ -87,6 +127,9 @@ def register_procedure(
       one of the ``Gimp.Procedure.add_*_return_value`` functions (e.g. the
       ``'boolean'`` type corresponds to the
       `Gimp.Procedure.add_boolean_return_value` function).
+
+      For documentation on the ``Gimp.Procedure.add_*_return_value`` functions,
+      see: https://lazka.github.io/pgi-docs/#Gimp-3.0/classes/Procedure.html
     menu_label: Name of the menu entry in the GIMP user interface.
     menu_path: Path of the menu entry in the GIMP user interface.
       This can be a single string or a list of strings if you want your
@@ -103,7 +146,8 @@ def register_procedure(
       specify it explicitly.
     attribution: Plug-in authors, copyright notice and date.
       This is a tuple of (authors, copyright notice, date) strings.
-    auxiliary_arguments: List of auxiliary arguments.
+    auxiliary_arguments: List of auxiliary arguments, or a function returning
+      a list of auxiliary arguments.
       See ``arguments`` for more information about the contentsn and format of
       the list.
 
@@ -111,6 +155,9 @@ def register_procedure(
       corresponds to one of the ``Gimp.Procedure.add_*_aux_argument``
       functions (e.g. the ``'boolean'`` type corresponds to the
       `Gimp.Procedure.add_boolean_aux_argument` function).
+
+      For documentation on the ``Gimp.Procedure.add_*_aux_argument`` functions,
+      see: https://lazka.github.io/pgi-docs/#Gimp-3.0/classes/Procedure.html
     run_data: Custom parameters passed to ``procedure`` as its last argument.
       ``procedure`` should only contain the run data as its last argument if
       ``run_data`` is not ``None``.
@@ -126,6 +173,20 @@ def register_procedure(
       You can use this function to call registration-related functions not
       available via this function, e.g. `Gimp.Procedure.set_argument_sync`
       on individual procedure arguments.
+    export_metadata: Indicates whether GIMP should handle metadata exporting.
+      Applicable only if ``procedure_type`` is `Gimp.ExportProcedure` and
+      otherwise ignored.
+      See the documentation for `Gimp.ExportProcedure` for more information.
+    interpreter_name: Name of the batch interpreter to be registered.
+      Applicable only if ``procedure_type`` is `Gimp.BatchProcedure` and
+      otherwise ignored.
+      See the documentation for `Gimp.BatchProcedure` for more information.
+    extract_func: See `Gimp.VectorLoadProcedure.new()` for more information.
+      Applicable only if ``procedure_type`` is `Gimp.VectorLoadProcedure` and
+      otherwise ignored.
+    extract_data: See `Gimp.VectorLoadProcedure.new()` for more information.
+      Applicable only if ``procedure_type`` is `Gimp.VectorLoadProcedure` and
+      otherwise ignored.
 
   Example:
 
@@ -182,32 +243,41 @@ def register_procedure(
   proc_dict = _PROCEDURE_NAMES_AND_DATA[proc_name]
   proc_dict['procedure'] = procedure
   proc_dict['procedure_type'] = procedure_type
-  proc_dict['arguments'] = _parse_and_check_parameters(arguments)
-  proc_dict['return_values'] = _parse_and_check_parameters(return_values)
+  proc_dict['arguments'] = arguments
+  proc_dict['return_values'] = return_values
   proc_dict['menu_label'] = menu_label
   proc_dict['menu_path'] = menu_path
   proc_dict['image_types'] = image_types
   proc_dict['sensitivity_mask'] = sensitivity_mask
   proc_dict['documentation'] = documentation
   proc_dict['attribution'] = attribution
-  proc_dict['auxiliary_arguments'] = _parse_and_check_parameters(auxiliary_arguments)
+  proc_dict['auxiliary_arguments'] = auxiliary_arguments
   proc_dict['run_data'] = run_data
   proc_dict['init_ui'] = init_ui
   proc_dict['init_gegl'] = init_gegl
   proc_dict['pdb_procedure_type'] = pdb_procedure_type
   proc_dict['additional_init'] = additional_init
+  proc_dict['export_metadata'] = export_metadata
+  proc_dict['interpreter_name'] = interpreter_name
+  proc_dict['extract_func'] = extract_func
+  proc_dict['extract_data'] = extract_data
 
 
 def _parse_and_check_parameters(parameters):
   if parameters is None:
     return None
 
-  if not isinstance(parameters, Iterable):
+  if callable(parameters):
+    processed_parameters = parameters()
+  else:
+    processed_parameters = parameters
+
+  if not isinstance(processed_parameters, Iterable):
     raise TypeError('Arguments and return values must be specified as a list-like iterable')
 
-  processed_parameters = {}
+  parsed_parameters = {}
 
-  for param in parameters:
+  for param in processed_parameters:
     processed_param = list(param)
 
     if isinstance(processed_param, list):
@@ -224,14 +294,14 @@ def _parse_and_check_parameters(parameters):
 
       name = processed_param.pop(1).replace('_', '-')
 
-      if name in processed_parameters:
+      if name in parsed_parameters:
         raise ValueError(f'Argument or return value named "{name}" was already specified')
 
-      processed_parameters[name] = processed_param
+      parsed_parameters[name] = processed_param
     else:
       raise TypeError('Only lists are allowed when specifying an argument or return value')
 
-  return processed_parameters
+  return parsed_parameters
 
 
 def set_use_locale(enabled):
@@ -317,30 +387,71 @@ def _do_create_procedure(plugin_instance, proc_name):
   else:
     return None
 
-  procedure = proc_dict['procedure_type'].new(
-    plugin_instance,
-    proc_name,
-    proc_dict['pdb_procedure_type'],
-    _get_procedure_wrapper(
-      proc_dict['procedure'],
-      proc_dict['procedure_type'],
-      proc_dict['init_ui'],
-      proc_dict['init_gegl'],
-    ),
-    proc_dict['run_data'])
+  if not inspect.isclass(proc_dict['procedure_type']):
+    raise TypeError('procedure_type is not a valid class type')
+
+  procedure_wrapper = _get_procedure_wrapper(
+    proc_dict['procedure'],
+    proc_dict['procedure_type'],
+    proc_dict['init_ui'],
+    proc_dict['init_gegl'],
+  )
+
+  if issubclass(proc_dict['procedure_type'], Gimp.ExportProcedure):
+    procedure = proc_dict['procedure_type'].new(
+      plugin_instance,
+      proc_name,
+      proc_dict['pdb_procedure_type'],
+      proc_dict['export_metadata'],
+      procedure_wrapper,
+      proc_dict['run_data'],
+    )
+  elif issubclass(proc_dict['procedure_type'], Gimp.BatchProcedure):
+    procedure = proc_dict['procedure_type'].new(
+      plugin_instance,
+      proc_name,
+      proc_dict['interpreter_name'],
+      proc_dict['pdb_procedure_type'],
+      procedure_wrapper,
+      proc_dict['run_data'],
+    )
+  elif issubclass(proc_dict['procedure_type'], Gimp.VectorLoadProcedure):
+    procedure = proc_dict['procedure_type'].new(
+      plugin_instance,
+      proc_name,
+      proc_dict['pdb_procedure_type'],
+      proc_dict['extract_func'],
+      proc_dict['extract_data'],
+      procedure_wrapper,
+      proc_dict['run_data'],
+    )
+  else:
+    procedure = proc_dict['procedure_type'].new(
+      plugin_instance,
+      proc_name,
+      proc_dict['pdb_procedure_type'],
+      procedure_wrapper,
+      proc_dict['run_data'],
+    )
 
   if proc_dict['arguments'] is not None:
-    for name, params in proc_dict['arguments'].items():
+    parsed_arguments = _parse_and_check_parameters(proc_dict['arguments'])
+
+    for name, params in parsed_arguments.items():
       param_type = params.pop(0)
       _get_add_param_func(procedure, param_type, 'argument')(name, *params)
 
   if proc_dict['return_values'] is not None:
-    for name, params in proc_dict['return_values'].items():
+    parsed_return_values = _parse_and_check_parameters(proc_dict['return_values'])
+
+    for name, params in parsed_return_values.items():
       param_type = params.pop(0)
       _get_add_param_func(procedure, param_type, 'return_value')(name, *params)
 
   if proc_dict['auxiliary_arguments'] is not None:
-    for name, params in proc_dict['auxiliary_arguments'].items():
+    parsed_auxiliary_arguments = _parse_and_check_parameters(proc_dict['auxiliary_arguments'])
+
+    for name, params in parsed_auxiliary_arguments.items():
       param_type = params.pop(0)
       _get_add_param_func(procedure, param_type, 'aux_argument')(name, *params)
 
