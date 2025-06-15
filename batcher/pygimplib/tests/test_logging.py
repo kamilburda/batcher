@@ -1,4 +1,3 @@
-import sys
 import io
 
 import unittest
