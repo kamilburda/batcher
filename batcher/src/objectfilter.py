@@ -273,6 +273,8 @@ class ObjectFilter:
       return self._is_match_all(obj)
     elif self._match_type == self.MATCH_ANY:
       return self._is_match_any(obj)
+    else:
+      raise ValueError(f'match type {self._match_type} not valid')
   
   def _is_match_all(self, obj) -> bool:
     is_match = True
