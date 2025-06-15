@@ -388,7 +388,7 @@ def _do_create_procedure(plugin_instance, proc_name):
     return None
 
   if not inspect.isclass(proc_dict['procedure_type']):
-    raise TypeError('procedure_type is not a valid class type')
+    raise TypeError(f"{proc_dict['procedure_type']} is not a valid class type")
 
   procedure_wrapper = _get_procedure_wrapper(
     proc_dict['procedure'],
