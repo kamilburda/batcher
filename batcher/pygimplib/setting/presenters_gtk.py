@@ -664,7 +664,7 @@ class ParasiteBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'parasite-changed'
   
   def _create_widget(self, setting, **kwargs):
-    return pggui.ParasiteBox(setting.value)
+    return pggui.ParasiteBox(setting.value, setting.DEFAULT_PARASITE_NAME)
   
   def get_value(self):
     return self._widget.get_parasite()

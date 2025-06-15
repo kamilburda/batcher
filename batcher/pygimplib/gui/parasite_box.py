@@ -10,7 +10,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 
-from ..setting import settings as pgsettings
 from .. import utils as pgutils
 
 __all__ = [
@@ -35,10 +34,11 @@ class ParasiteBox(Gtk.Box):
   
   _HBOX_SPACING = 5
   
-  def __init__(self, parasite: Gimp.Parasite):
+  def __init__(self, parasite: Gimp.Parasite, default_parasite_name: str):
     super().__init__()
 
     self._should_invoke_parasite_changed_signal = True
+    self._default_parasite_name = default_parasite_name
     
     self._init_gui(parasite)
 
@@ -119,7 +119,7 @@ class ParasiteBox(Gtk.Box):
     parasite_name = self._parasite_name_entry.get_text()
 
     return (
-      parasite_name if parasite_name else pgsettings.ParasiteSetting.DEFAULT_PARASITE_NAME,
+      parasite_name if parasite_name else self._default_parasite_name,
       self._parasite_flags_spin_button.get_value_as_int(),
       pgutils.bytes_to_signed_bytes(
         pgutils.escaped_string_to_bytes(
