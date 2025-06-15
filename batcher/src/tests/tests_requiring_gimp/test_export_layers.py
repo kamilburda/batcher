@@ -15,6 +15,7 @@ import pygimplib as pg
 from src import builtin_actions
 from src import commands
 from src import core
+from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
 from src.procedure_groups import *
@@ -186,7 +187,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     if additional_init_before_run is not None:
       additional_init_before_run(self.test_image)
 
-    item_tree = pg.itemtree.LayerTree()
+    item_tree = itemtree.LayerTree()
     item_tree.add_from_image(self.test_image)
 
     batcher = core.LayerBatcher(

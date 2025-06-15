@@ -1,15 +1,14 @@
-"""Making item names in `pygimplib.itemtree.ItemTree` unique."""
+"""Making item names in `itemtree.ItemTree` unique."""
 
 from typing import Generator, Optional
 
-import pygimplib as pg
-
+from src import itemtree
 from src.path import uniquify
 
 
 class ItemUniquifier:
-  """Class renaming `pygimplib.ItemTree.Item` instances to be unique under the
-  same parent.
+  """Class renaming `itemtree.Item` instances to be unique under the same
+  parent.
   """
   
   def __init__(self, generator: Optional[Generator[str, None, None]] = None):
@@ -25,7 +24,7 @@ class ItemUniquifier:
   
   def uniquify(
         self,
-        item: pg.itemtree.Item,
+        item: itemtree.Item,
         item_name: Optional[str] = None,
         position: Optional[int] = None,
   ):

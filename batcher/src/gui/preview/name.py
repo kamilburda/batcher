@@ -20,6 +20,7 @@ from . import base as preview_base_
 
 from src import builtin_actions
 from src import exceptions
+from src import itemtree
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -458,7 +459,7 @@ class NamePreview(preview_base_.Preview):
           # works within the same parent. Hence, we remove and insert the
           # item under a new parent.
 
-          if new_item.type != pg.itemtree.TYPE_FOLDER:
+          if new_item.type != itemtree.TYPE_FOLDER:
             self._remove_item_by_key(new_item_key)
           else:
             # We cannot remove a parent from the `Gtk.TreeStore` at this
@@ -532,7 +533,7 @@ class NamePreview(preview_base_.Preview):
     return tree_iter
 
   def _expand_folder_item(self, tree_iter, item):
-    if tree_iter is not None and item.type == pg.itemtree.TYPE_FOLDER:
+    if tree_iter is not None and item.type == itemtree.TYPE_FOLDER:
       self._row_expand_collapse_interactive = False
       self._tree_view.expand_row(self._tree_model[tree_iter].path, True)
       self._row_expand_collapse_interactive = True
@@ -569,7 +570,7 @@ class NamePreview(preview_base_.Preview):
       ])
 
   def _get_icon_from_item(self, item):
-    if item.type == pg.itemtree.TYPE_FOLDER:
+    if item.type == itemtree.TYPE_FOLDER:
       return self._folder_icon
     else:
       return None

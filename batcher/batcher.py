@@ -20,6 +20,7 @@ builtins._ = gettext.gettext
 
 from src import builtin_conditions
 from src import commands as commands_
+from src import itemtree
 from src.gui import messages as messages_
 
 messages_.set_gui_excepthook(
@@ -51,7 +52,7 @@ def plug_in_batch_convert(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.ImageFileTree()
+  image_tree = itemtree.ImageFileTree()
 
   def _fill_image_tree_with_loaded_inputs(settings):
     if run_mode == Gimp.RunMode.NONINTERACTIVE:
@@ -84,7 +85,7 @@ def plug_in_batch_export_images(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.GimpImageTree()
+  image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -110,7 +111,7 @@ def plug_in_batch_export_images_quick(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.GimpImageTree()
+  image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -129,7 +130,7 @@ def plug_in_batch_edit_and_save_images(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.GimpImageTree()
+  image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -151,7 +152,7 @@ def plug_in_batch_edit_and_save_images_quick(_procedure, config, _data):
 
   run_mode = config.get_property('run-mode')
 
-  image_tree = pg.itemtree.GimpImageTree()
+  image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -168,7 +169,7 @@ def plug_in_batch_edit_and_save_images_quick(_procedure, config, _data):
 def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
   _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -187,7 +188,7 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
 def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
   _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -204,7 +205,7 @@ def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _
 def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
   _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -226,7 +227,7 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
 def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _data):
   _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -245,7 +246,7 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
 def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
   _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -262,7 +263,7 @@ def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _co
 def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
   _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:

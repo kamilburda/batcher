@@ -3,11 +3,11 @@ import unittest.mock as mock
 
 import parameterized
 
-import pygimplib as pg
-from pygimplib.tests import utils_itemtree
-
+from src import itemtree
 from src import renamer as renamer_
 from src.procedure_groups import *
+
+from src.tests import utils_itemtree
 
 
 class TestNumberField(unittest.TestCase):
@@ -170,9 +170,9 @@ class TestRenameWithNumberField(unittest.TestCase):
      """),
   ])
   def test_rename(self, test_case_suffix, pattern, expected_layer_names_str):
-    layer_tree = pg.itemtree.LayerTree()
+    layer_tree = itemtree.LayerTree()
     layer_tree.add_from_image(self.image)
-    layer_tree.filter.add(lambda item_: item_.type == pg.itemtree.TYPE_ITEM)
+    layer_tree.filter.add(lambda item_: item_.type == itemtree.TYPE_ITEM)
     
     batcher_mock = mock.Mock()
     batcher_mock.item_tree = layer_tree
@@ -185,7 +185,7 @@ class TestRenameWithNumberField(unittest.TestCase):
       batcher_mock.current_item = item
       item.name = renamer.rename(batcher_mock)
     
-    expected_layer_tree = pg.itemtree.LayerTree()
+    expected_layer_tree = itemtree.LayerTree()
     expected_layer_tree.add_from_image(utils_itemtree.parse_layers(expected_layer_names_str)[0])
     
     self.assertListEqual(

@@ -16,6 +16,7 @@ import pygimplib as pg
 
 from src import builtin_actions as builtin_actions_
 from src import file_formats as file_formats_
+from src import itemtree
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import utils
@@ -495,9 +496,8 @@ class CoordinatesSetting(pg.setting.DictSetting):
 
 
 class ItemTreeItemsSetting(pg.setting.Setting):
-  """Abstract class for settings representing `pygimplib.itemtree.Item`
-  instances, specifically a list of values of the
-  `pygimplib.itemtree.Item.key` property.
+  """Abstract class for settings representing `itemtree.Item` instances,
+  specifically a list of values of the `itemtree.Item.key` property.
 
   The persistent format of settings of this class depends on the subclass of
   `ItemTreeItemsSetting`. For more information, see the documentation for the
@@ -610,7 +610,7 @@ class ItemTreeItemsSetting(pg.setting.Setting):
 
 
 class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
-  """Class for settings representing `pygimplib.itemtree.GimpItem` instances.
+  """Class for settings representing `itemtree.GimpItem` instances.
 
   The persistent format for each item for settings of this subclass is the
   following:
@@ -619,9 +619,9 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
   The ``class name`` corresponds to one of the GIMP item classes,
   e.g. ``'Layer'`` or ``'Channel'``. ``item path components`` is a list of
   path components from the topmost parent to the item itself. ``folder key``
-  is either ``''`` or `pygimplib.itemtree.FOLDER_KEY`, signifying that an
-  item is either a regular item or a folder, respectively. ``image file
-  path`` is a file path to the image containing the corresponding item.
+  is either ``''`` or `itemtree.FOLDER_KEY`, signifying that an item is
+  either a regular item or a folder, respectively. ``image file path`` is a
+  file path to the image containing the corresponding item.
   """
 
   def _do_set_active_items(self, item_keys: Iterable):
@@ -676,8 +676,8 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
             item_object = pg.pdbutils.get_item_from_image_and_item_path(
               item_data[0], item_data[1], image)
             if item_object is not None:
-              if item_data[2] == pg.itemtree.FOLDER_KEY:
-                item_key = (item_object.get_id(), pg.itemtree.FOLDER_KEY)
+              if item_data[2] == itemtree.FOLDER_KEY:
+                item_key = (item_object.get_id(), itemtree.FOLDER_KEY)
               else:
                 item_key = item_object.get_id()
 
@@ -701,7 +701,7 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
       folder_key = ''
     else:  # (item ID, folder key)
       item_id = item_key[0]
-      folder_key = pg.itemtree.FOLDER_KEY
+      folder_key = itemtree.FOLDER_KEY
 
     if not Gimp.Item.id_is_valid(item_id):
       return None
@@ -715,8 +715,7 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
 
 
 class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
-  """Class for settings representing `pygimplib.itemtree.GimpImageItem`
-  instances.
+  """Class for settings representing `itemtree.GimpImageItem` instances.
 
   The persistent format for each item for settings of this subclass is simply
   ``image file path``, representing a file path to the image.
@@ -781,13 +780,12 @@ class GimpImageTreeItemsSetting(ItemTreeItemsSetting):
 
 
 class ImageFileTreeItemsSetting(ItemTreeItemsSetting):
-  """Class for settings representing `pygimplib.itemtree.ImageFileItem`
-  instances.
+  """Class for settings representing `itemtree.ImageFileItem` instances.
 
   The persistent format for each item for settings of this subclass is
   ``[file path, folder key]``. ``folder key`` is either ``''`` or
-  `pygimplib.itemtree.FOLDER_KEY`, signifying that an item is either a
-  regular file or a folder, respectively.
+  `itemtree.FOLDER_KEY`, signifying that an item is either a regular file or
+  a folder, respectively.
 
   The `inactive_items` property is always empty for this subclass.
   """

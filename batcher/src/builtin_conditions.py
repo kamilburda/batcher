@@ -6,19 +6,18 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-
 from src import file_formats as file_formats_
+from src import itemtree
 from src.path import fileext
 from src.procedure_groups import *
 
 
 def is_layer(item, _layer_batcher):
-  return item.type == pg.itemtree.TYPE_ITEM
+  return item.type == itemtree.TYPE_ITEM
 
 
 def is_nonempty_group(item, _layer_batcher):
-  return item.type == pg.itemtree.TYPE_GROUP and item.raw.get_children()
+  return item.type == itemtree.TYPE_GROUP and item.raw.get_children()
 
 
 def is_imported(item, _image_batcher):

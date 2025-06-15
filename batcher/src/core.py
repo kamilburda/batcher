@@ -22,6 +22,7 @@ from src import builtin_conditions
 from src import commands
 from src import exceptions
 from src import invoker as invoker_
+from src import itemtree
 from src import overwrite
 from src import placeholders
 from src import progress as progress_
@@ -39,7 +40,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def __init__(
         self,
-        item_tree: pg.itemtree.ItemTree,
+        item_tree: itemtree.ItemTree,
         actions: pg.setting.Group,
         conditions: pg.setting.Group,
         refresh_item_tree: bool = True,
@@ -107,8 +108,8 @@ class Batcher(metaclass=abc.ABCMeta):
     self._initial_invoker = invoker_.Invoker()
 
   @property
-  def item_tree(self) -> pg.itemtree.ItemTree:
-    """`pygimplib.itemtree.ItemTree` instance containing items to be processed.
+  def item_tree(self) -> itemtree.ItemTree:
+    """`itemtree.ItemTree` instance containing items to be processed.
 
     If the item tree has filters (conditions) set, they will be reset on each
     call to `run()`.
@@ -130,8 +131,7 @@ class Batcher(metaclass=abc.ABCMeta):
     """If ``True``, `item_tree` is refreshed on each call to `run()`.
 
     Specifically, `item_tree.refresh()` is invoked before the start of
-    processing. See `pygimplib.itemtree.ItemTree.refresh()` for more
-    information.
+    processing. See `itemtree.ItemTree.refresh()` for more information.
     """
     return self._refresh_item_tree
 
@@ -283,8 +283,8 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._keep_image_copies
 
   @property
-  def current_item(self) -> pg.itemtree.Item:
-    """A `pygimplib.itemtree.Item` instance currently being processed."""
+  def current_item(self) -> itemtree.Item:
+    """A `itemtree.Item` instance currently being processed."""
     return self._current_item
 
   @property
@@ -322,7 +322,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._last_condition
 
   @property
-  def matching_items(self) -> Optional[Dict[pg.itemtree.Item, Optional[pg.itemtree.Item]]]:
+  def matching_items(self) -> Optional[Dict[itemtree.Item, Optional[itemtree.Item]]]:
     """A dictionary of (item, next item or None) pairs matching the conditions,
     or ``None`` if not initialized.
 
@@ -335,7 +335,7 @@ class Batcher(metaclass=abc.ABCMeta):
   @property
   def matching_items_and_parents(
         self,
-  ) -> Optional[Dict[pg.itemtree.Item, Optional[pg.itemtree.Item]]]:
+  ) -> Optional[Dict[itemtree.Item, Optional[itemtree.Item]]]:
     """A dictionary of (item, next item or None) pairs matching the conditions,
     including the parents of the matching items, or ``None`` if not initialized.
 
@@ -346,7 +346,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._matching_items_and_parents
 
   @property
-  def exported_items(self) -> List[pg.itemtree.Item]:
+  def exported_items(self) -> List[itemtree.Item]:
     """List of successfully exported items.
 
     This list does not include items skipped by the user (when files with the

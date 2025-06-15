@@ -23,15 +23,17 @@ import unittest.mock as mock
 
 import parameterized
 
-from . import stubs_gimp
+import pygimplib as pg
+from pygimplib.tests import stubs_gimp
+
 from . import utils_itemtree
-from .. import itemtree as pgitemtree
-from .. import utils as pgutils
+
+from src import itemtree
 
 
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.path.isdir')
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.listdir')
-@mock.patch(f'{pgutils.get_pygimplib_module_path()}.itemtree.os.path.abspath')
+@mock.patch('src.itemtree.os.path.isdir')
+@mock.patch('src.itemtree.os.listdir')
+@mock.patch('src.itemtree.os.path.abspath')
 class TestImageFileTree(unittest.TestCase):
 
   def setUp(self):
@@ -65,9 +67,9 @@ class TestImageFileTree(unittest.TestCase):
 
     self.root_path = 'some_path'
 
-    self.FOLDER_KEY = pgitemtree.FOLDER_KEY
+    self.FOLDER_KEY = itemtree.FOLDER_KEY
 
-    self.tree = pgitemtree.ImageFileTree()
+    self.tree = itemtree.ImageFileTree()
 
   def test_add(self, mock_abspath, mock_listdir, mock_isdir):
     self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
@@ -341,7 +343,7 @@ class TestImageFileTree(unittest.TestCase):
 
     self.tree.add(self.paths[0])
 
-    another_tree = pgitemtree.ImageFileTree()
+    another_tree = itemtree.ImageFileTree()
 
     parent_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
 
@@ -365,7 +367,7 @@ class TestImageFileTree(unittest.TestCase):
 
     self.tree.add(self.paths[0])
 
-    another_tree = pgitemtree.ImageFileTree()
+    another_tree = itemtree.ImageFileTree()
 
     insert_after_item = self.tree[(os.path.join(self.root_path, 'Corners'), self.FOLDER_KEY)]
 
@@ -550,16 +552,16 @@ class TestLayerTree(unittest.TestCase):
     
     self.image, self.path_to_id = utils_itemtree.parse_layers(items_string)
 
-    self.tree = pgitemtree.LayerTree()
+    self.tree = itemtree.LayerTree()
 
     # noinspection PyTypeChecker
     self.tree.add_from_image(self.image)
     
-    self.ITEM = pgitemtree.TYPE_ITEM
-    self.GROUP = pgitemtree.TYPE_GROUP
-    self.FOLDER = pgitemtree.TYPE_FOLDER
+    self.ITEM = itemtree.TYPE_ITEM
+    self.GROUP = itemtree.TYPE_GROUP
+    self.FOLDER = itemtree.TYPE_FOLDER
     
-    self.FOLDER_KEY = pgitemtree.FOLDER_KEY
+    self.FOLDER_KEY = itemtree.FOLDER_KEY
     
     self.item_properties = [
       ('Corners',
@@ -824,11 +826,8 @@ class TestLayerTree(unittest.TestCase):
   def test_add_from_item_id(self):
     item_id = self.path_to_id[('main-background.jpg',)]
 
-    tree = pgitemtree.LayerTree()
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp.Item',
-          new=stubs_gimp.Item,
-    ):
+    tree = itemtree.LayerTree()
+    with mock.patch('src.itemtree.Gimp.Item', new=stubs_gimp.Item):
       tree.add([item_id])
 
     self.assertEqual(len(tree), 1)
@@ -837,11 +836,8 @@ class TestLayerTree(unittest.TestCase):
   def test_add_invalid_item_id_is_ignored(self):
     item_id = -1
 
-    tree = pgitemtree.LayerTree()
-    with mock.patch(
-          f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp.Item',
-          new=stubs_gimp.Item,
-    ):
+    tree = itemtree.LayerTree()
+    with mock.patch('src.itemtree.Gimp.Item', new=stubs_gimp.Item):
       tree.add([item_id])
 
     self.assertEqual(len(tree), 0)
@@ -870,12 +866,11 @@ class TestLayerTree(unittest.TestCase):
     self._test_item_attributes()
 
 
-@mock.patch(
-  f'{pgutils.get_pygimplib_module_path()}.itemtree.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.itemtree.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpImageTree(unittest.TestCase):
 
   def setUp(self):
-    self.tree = pgitemtree.GimpImageTree()
+    self.tree = itemtree.GimpImageTree()
 
   def test_add_by_object(self, _mock_gimp_module):
     image = stubs_gimp.Image(name='some_image')
@@ -935,7 +930,7 @@ class TestImageFileItem(unittest.TestCase):
     self.path = os.path.join('some_path', 'Corners')
 
     # noinspection PyTypeChecker
-    self.item = pgitemtree.ImageFileItem(self.path, pgitemtree.TYPE_ITEM)
+    self.item = itemtree.ImageFileItem(self.path, itemtree.TYPE_ITEM)
 
   def test_name(self):
     self.assertEqual(self.item.name, 'Corners')
@@ -951,8 +946,8 @@ class TestGimpItem(unittest.TestCase):
 
   def setUp(self):
     # noinspection PyTypeChecker
-    self.item = pgitemtree.GimpItem(
-      stubs_gimp.Layer(name='main-background.jpg'), pgitemtree.TYPE_ITEM)
+    self.item = itemtree.GimpItem(
+      stubs_gimp.Layer(name='main-background.jpg'), itemtree.TYPE_ITEM)
   
   def test_str(self):
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
@@ -961,12 +956,11 @@ class TestGimpItem(unittest.TestCase):
     
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
 
-  @mock.patch(f'{pgutils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
+  @mock.patch(f'{pg.utils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
   def test_repr(self, _mock_id):
     self.assertEqual(
       repr(self.item),
-      '<{}.itemtree.GimpItem "main-background.jpg {}" at 0x0000002023b009130>'.format(
-        pgutils.get_pygimplib_module_path(),
+      '<src.itemtree.GimpItem "main-background.jpg {}" at 0x0000002023b009130>'.format(
         type(self.item.raw),
       ),
     )

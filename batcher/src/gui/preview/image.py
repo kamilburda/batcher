@@ -25,6 +25,7 @@ from . import base as preview_base_
 
 from src import builtin_actions
 from src import exceptions
+from src import itemtree
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -118,7 +119,7 @@ class ImagePreview(preview_base_.Preview):
       self.clear()
       return
 
-    if self.item.type != pg.itemtree.TYPE_FOLDER:
+    if self.item.type != itemtree.TYPE_FOLDER:
       self._is_updating = True
 
       self.set_item_name_label(self.item)
@@ -159,7 +160,7 @@ class ImagePreview(preview_base_.Preview):
       and allocation.width > self._preview_pixbuf.get_width()
       and allocation.height > self._preview_pixbuf.get_height())
 
-  def set_item_name_label(self, item: pg.itemtree.Item):
+  def set_item_name_label(self, item: itemtree.Item):
     if not self._batcher.edit_mode:
       item_state = item.get_named_state(builtin_actions.EXPORT_NAME_ITEM_STATE)
       item_name = item_state['name'] if item_state is not None else item.name
@@ -301,7 +302,7 @@ class ImagePreview(preview_base_.Preview):
     self._update_duration_seconds = time.time() - start_update_time
 
   def _get_image_preview(self):
-    # We use a separate `pygimplib.ItemTree` with just the item to be previewed.
+    # We use a separate `itemtree` with just the item to be previewed.
     # A new item wrapping the original object is created to avoid introducing
     # any changes to the item from other sources (e.g. the item could be
     # renamed via the name preview).

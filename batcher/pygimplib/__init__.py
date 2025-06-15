@@ -70,7 +70,6 @@ __all__ = [
 if _gimp_modules_available:
   from . import gui
   from . import invocation
-  from . import itemtree
   from . import pdbutils
   from . import setting
 
@@ -87,7 +86,6 @@ if _gimp_modules_available:
     # Modules
     'gui',
     'invocation',
-    'itemtree',
     'pdbutils',
     'setting',
     # Global elements imported to or defined in this module

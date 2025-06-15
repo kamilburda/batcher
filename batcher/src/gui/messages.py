@@ -20,6 +20,7 @@ from gi.repository import Pango
 import pygimplib as pg
 
 from src import exceptions
+from src import itemtree
 
 
 ERROR_EXIT_STATUS = 1
@@ -582,7 +583,7 @@ def display_invalid_image_failure_message(
 
 def get_failing_command_message(
       command_and_item_or_command_error: Union[
-        Tuple[pg.setting.Group, pg.itemtree.Item], exceptions.CommandError],
+        Tuple[pg.setting.Group, itemtree.Item], exceptions.CommandError],
 ):
   if isinstance(command_and_item_or_command_error, exceptions.CommandError):
     command, item = command_and_item_or_command_error.command, command_and_item_or_command_error.item

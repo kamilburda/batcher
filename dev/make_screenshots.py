@@ -20,6 +20,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 from pygimplib import pdb
 
+from src import itemtree
 from src import utils as utils_
 from src.procedure_groups import *
 
@@ -60,7 +61,7 @@ def main():
 
   input_files_dirpath = os.path.join(TEST_IMAGES_DIRPATH, 'convert_inputs')
 
-  image_file_tree = pg.itemtree.ImageFileTree()
+  image_file_tree = itemtree.ImageFileTree()
   image_file_tree.add([
     os.path.join(input_files_dirpath, filename)
     for filename in os.listdir(input_files_dirpath)])
@@ -93,7 +94,7 @@ def main():
     pdb.gimp_file_load(file=Gio.file_new_for_path(filepath))
     for filepath in image_filepaths]
 
-  gimp_image_tree = pg.itemtree.GimpImageTree()
+  gimp_image_tree = itemtree.GimpImageTree()
   gimp_image_tree.add_opened_images()
   gimp_image_tree.remove([gimp_image_tree[image.get_id()] for image in existing_images])
 
@@ -133,7 +134,7 @@ def main():
 
   image = pdb.gimp_file_load(file=Gio.file_new_for_path(TEST_IMAGE_FOR_LAYERS_FILEPATH))
 
-  layer_tree = pg.itemtree.LayerTree()
+  layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
 
   gui_main.BatchProcessingGui(

@@ -17,6 +17,7 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from src import itemtree
 from src.path import fileext
 from src.path import pattern as pattern_
 from src.procedure_groups import *
@@ -55,7 +56,7 @@ class ItemRenamer:
   def rename_folders(self):
     return self._rename_folders
 
-  def rename(self, batcher: 'src.core.Batcher', item: Optional[pg.itemtree.Item] = None):
+  def rename(self, batcher: 'src.core.Batcher', item: Optional[itemtree.Item] = None):
     if item is None:
       item = batcher.current_item
     
@@ -241,7 +242,7 @@ class NumberField(Field):
         elif not renamer.rename_items and renamer.rename_folders:
           tree_items = [
             item for item in batcher.matching_items_and_parents
-            if item.type == pg.itemtree.TYPE_FOLDER]
+            if item.type == itemtree.TYPE_FOLDER]
         else:
           tree_items = batcher.matching_items
       else:

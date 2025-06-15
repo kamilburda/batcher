@@ -1,9 +1,9 @@
 import unittest
 
-import pygimplib as pg
-from pygimplib.tests import utils_itemtree
-
+from src import itemtree
 from src import uniquifier
+
+from src.tests import utils_itemtree
 
 
 class TestUniquify(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestUniquify(unittest.TestCase):
     
     image, self.path_to_id = utils_itemtree.parse_layers(items_string)
 
-    self.item_tree = pg.itemtree.LayerTree()
+    self.item_tree = itemtree.LayerTree()
     self.item_tree.add_from_image(image)
 
   def test_uniquify(self):
@@ -100,7 +100,7 @@ class TestUniquify(unittest.TestCase):
       item = self.item_tree[key]
       
       self._preprocess_name(item)
-      if item.type == pg.itemtree.TYPE_FOLDER:
+      if item.type == itemtree.TYPE_FOLDER:
         item.name = self.uniquifier.uniquify(item)
       else:
         item.name = self.uniquifier.uniquify(

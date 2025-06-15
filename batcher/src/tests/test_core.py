@@ -13,6 +13,7 @@ from src import builtin_actions
 from src import commands as commands_
 from src import core
 from src import invoker as invoker_
+from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
 
@@ -24,7 +25,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     settings['main/file_extension'].set_value('xcf')
     
     batcher = core.LayerBatcher(
-      item_tree=pg.itemtree.LayerTree(),
+      item_tree=itemtree.LayerTree(),
       actions=settings['main/actions'],
       conditions=settings['main/conditions'],
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
@@ -65,7 +66,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
   
   def setUp(self):
     self.batcher = core.LayerBatcher(
-      item_tree=pg.itemtree.LayerTree(),
+      item_tree=itemtree.LayerTree(),
       actions=mock.MagicMock(),
       conditions=mock.MagicMock(),
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,
@@ -147,7 +148,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
   
   def test_get_replaced_args(self):
     batcher = core.LayerBatcher(
-      item_tree=pg.itemtree.LayerTree(),
+      item_tree=itemtree.LayerTree(),
       actions=mock.MagicMock(),
       conditions=mock.MagicMock(),
       initial_export_run_mode=Gimp.RunMode.INTERACTIVE,

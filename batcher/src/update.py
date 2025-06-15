@@ -15,6 +15,7 @@ from pygimplib import pdb
 from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
+from src import itemtree
 from src import setting_classes as setting_classes_
 from src import utils as utils_
 from src import version as version_
@@ -1054,7 +1055,7 @@ def _update_items_setting_for_0_8(settings_list, setting_name, new_type_name):
         new_value.append([
           item_data[0],
           item_data[1].split('/'),
-          pg.itemtree.FOLDER_KEY if len(item_data) >= 3 else '',
+          itemtree.FOLDER_KEY if len(item_data) >= 3 else '',
           image_filepath,
         ])
 

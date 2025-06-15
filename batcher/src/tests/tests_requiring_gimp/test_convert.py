@@ -16,6 +16,7 @@ from pygimplib import pdb
 from src import builtin_actions
 from src import commands
 from src import core
+from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
 from src.procedure_groups import *
@@ -155,7 +156,7 @@ class TestConvertCompareContents(unittest.TestCase):
       if action_name in settings['main/actions']:
         commands.remove(settings['main/actions'], action_name)
 
-    item_tree = pg.itemtree.ImageFileTree()
+    item_tree = itemtree.ImageFileTree()
     item_tree.add(self.test_images_filepaths)
 
     batcher = core.ImageBatcher(

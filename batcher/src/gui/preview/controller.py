@@ -13,6 +13,7 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from src import itemtree
 from src import utils as utils_
 
 
@@ -450,7 +451,7 @@ class PreviewsController:
       if item_key_to_display in batcher.item_tree:
         item = batcher.item_tree[item_key_to_display]
         if ((batcher.matching_items is not None and item in batcher.matching_items)
-            or item.type == pg.itemtree.TYPE_FOLDER):
+            or item.type == itemtree.TYPE_FOLDER):
           self._image_preview.item = item
 
       self._update_image_preview()
@@ -470,7 +471,7 @@ class PreviewsController:
     ]
     # Remove folders to avoid inserting tagged group items twice.
     self._settings['main/tagged_items'].set_value(
-      [item for item in tagged_items if item.type != pg.itemtree.TYPE_FOLDER])
+      [item for item in tagged_items if item.type != itemtree.TYPE_FOLDER])
 
     self._name_preview.set_tagged_items(set(item.key for item in tagged_items))
 

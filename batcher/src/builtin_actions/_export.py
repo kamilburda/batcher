@@ -15,6 +15,7 @@ from pygimplib import pdb
 from src import builtin_commands_common
 from src import exceptions
 from src import file_formats as file_formats_
+from src import itemtree
 from src import overwrite
 from src import renamer as renamer_
 from src import uniquifier
@@ -146,7 +147,7 @@ def export(
         yield
         continue
       else:
-        item_to_process = _NameOnlyItem(None, pg.itemtree.TYPE_ITEM, [], [], None, None)
+        item_to_process = _NameOnlyItem(None, itemtree.TYPE_ITEM, [], [], None, None)
         if single_image_name_pattern is not None:
           item_to_process.name = renamer_for_single_image.rename(batcher, item_to_process)
         else:
@@ -553,7 +554,7 @@ def _export_item_once(
 
 def _export_image(
       run_mode: Gimp.RunMode,
-      item: pg.itemtree.Item,
+      item: itemtree.Item,
       image: Gimp.Image,
       filepath: Union[str, Gio.File],
       file_extension: str,
@@ -583,7 +584,7 @@ def _export_image(
 
 
 def _set_original_modification_date(item, filepath):
-  if isinstance(item, pg.itemtree.ImageFileItem) and os.path.isfile(item.id):
+  if isinstance(item, itemtree.ImageFileItem) and os.path.isfile(item.id):
     orig_filepath_stat = os.stat(item.id)
     os.utime(filepath, times=(orig_filepath_stat.st_atime, orig_filepath_stat.st_mtime))
 
@@ -673,8 +674,8 @@ class _FileExtensionProperties:
     return self._properties[key.lower()]
 
 
-class _NameOnlyItem(pg.itemtree.Item):
-  """`pygimplib.itemtree.Item` subclass used to store the item name only."""
+class _NameOnlyItem(itemtree.Item):
+  """`itemtree.Item` subclass used to store the item name only."""
 
   @property
   def raw(self):
