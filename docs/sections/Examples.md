@@ -37,6 +37,14 @@ For Export Layers and Edit Layers:
 You can follow the same steps as in the example above, except that you add the `Insert background` action (and adjust `Merge background` as needed).
 
 
+## How can I add borders to an image?
+
+1. Add the `Resize canvas` action.
+2. Set `How to resize` to `Resize from edges (add borders)` if not already.
+3. Adjust the `Amount` (border thickness).
+4. If you want the border to have a particular color, check `Fill added space with color` and adjust `Color for added space` as desired.
+
+
 ## I want to create a single multipage PDF file.
 
 While multipage PDF export is already possible in GIMP without any third-party plug-ins, Batcher allows you to apply custom actions before the export or export each folder/group layer as separate PDFs.
