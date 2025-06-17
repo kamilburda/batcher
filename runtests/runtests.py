@@ -105,7 +105,8 @@ def run_tests(
   for importer, module_name, is_package in pkgutil.walk_packages(path=[dirpath]):
     if should_append(module_name):
       if is_package:
-        sys.path.append(importer.path)
+        if importer.path not in sys.path:
+          sys.path.append(importer.path)
 
       module_names.append(module_name)
 
