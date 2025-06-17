@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Running automated tests.
 
 By default, all modules starting with the `'test_'` prefix will be run.
@@ -33,17 +31,12 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
-
-PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PLUGIN_DIRPATH not in sys.path:
-  sys.path.append(PLUGIN_DIRPATH)
-
-BATCHER_DIRPATH = os.path.join(PLUGIN_DIRPATH, 'batcher')
-if BATCHER_DIRPATH not in sys.path:
-  sys.path.append(BATCHER_DIRPATH)
+from src import procedure as procedure_
 
 
-from batcher.src import procedure as procedure_
+PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(__file__))
+
+_MAIN_MODULE = 'batcher'
 
 
 def plug_in_run_tests(
@@ -52,7 +45,7 @@ def plug_in_run_tests(
       _data: Optional[bytes],
 ):
   run_tests(
-    config.get_property('dirpath'),
+    config.get_property('directory'),
     config.get_property('prefix'),
     config.get_property('modules'),
     config.get_property('ignored-modules'),
@@ -62,14 +55,14 @@ def plug_in_run_tests(
 
 
 def run_tests(
-      dirpath: str,
+      directory: Gio.File,
       test_module_name_prefix: str = 'test_',
       modules: Optional[List[str]] = None,
       ignored_modules: Optional[List[str]] = None,
       output_stream: str = 'stderr',
       verbose: bool = False,
 ):
-  """Runs all modules containing tests located in the specified directory path.
+  """Runs all modules containing tests located in the specified directory.
 
   Modules containing tests are considered those that contain the
   ``test_module_name_prefix`` prefix.
@@ -92,7 +85,7 @@ def run_tests(
 
   if not ignored_modules:
     ignored_modules = []
-  
+
   if not modules:
     should_append = (
       lambda name: not any(name.startswith(ignored_module) for ignored_module in ignored_modules))
@@ -102,7 +95,7 @@ def run_tests(
         any(name.startswith(module_) for module_ in modules)
         and not any(name.startswith(ignored_module) for ignored_module in ignored_modules)))
 
-  for importer, module_name, is_package in pkgutil.walk_packages(path=[dirpath]):
+  for importer, module_name, is_package in pkgutil.walk_packages(path=[directory.get_path()]):
     if should_append(module_name):
       if is_package:
         if importer.path not in sys.path:
@@ -189,70 +182,68 @@ class _Stream:
     pass
 
 
-procedure_.register_procedure(
-  plug_in_run_tests,
-  procedure_type=Gimp.Procedure,
-  arguments=[
-    [
-      'enum',
-      'run-mode',
-      'Run mode',
-      'The run mode',
-      Gimp.RunMode,
-      Gimp.RunMode.NONINTERACTIVE,
-      GObject.ParamFlags.READWRITE,
+def register():
+  procedure_.register_procedure(
+    plug_in_run_tests,
+    procedure_type=Gimp.Procedure,
+    arguments=[
+      [
+        'enum',
+        'run-mode',
+        'Run mode',
+        'The run mode',
+        Gimp.RunMode,
+        Gimp.RunMode.NONINTERACTIVE,
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'file',
+        'directory',
+        '_Directory',
+        'Directory path containing test modules',
+        Gimp.FileChooserAction.SELECT_FOLDER,
+        False,
+        Gio.file_new_for_path(PLUGIN_DIRPATH),
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'string',
+        'prefix',
+        '_Prefix of test modules',
+        'Prefix of test modules',
+        'test_',
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'string_array',
+        'modules',
+        'Modules to _include',
+        'Modules to include',
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'string_array',
+        'ignored_modules',
+        'Modules to i_gnore',
+        'Modules to ignore',
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'string',
+        'output_stream',
+        '_Output stream',
+        'Output stream or file path to write output to',
+        'stderr',
+        GObject.ParamFlags.READWRITE,
+      ],
+      [
+        'boolean',
+        'verbose',
+        '_Verbose',
+        'If True, writes more detailed output',
+        False,
+        GObject.ParamFlags.READWRITE,
+      ],
     ],
-    [
-      'file',
-      'dirpath',
-      '_Directory',
-      'Directory path containing test modules',
-      Gimp.FileChooserAction.SELECT_FOLDER,
-      False,
-      Gio.file_new_for_path(PLUGIN_DIRPATH),
-      GObject.ParamFlags.READWRITE,
-    ],
-    [
-      'string',
-      'prefix',
-      '_Prefix of test modules',
-      'Prefix of test modules',
-      'test_',
-      GObject.ParamFlags.READWRITE,
-    ],
-    [
-      'string_array',
-      'modules',
-      'Modules to _include',
-      'Modules to include',
-      GObject.ParamFlags.READWRITE,
-    ],
-    [
-      'string_array',
-      'ignored_modules',
-      'Modules to i_gnore',
-      'Modules to ignore',
-      GObject.ParamFlags.READWRITE,
-    ],
-    [
-      'string',
-      'output_stream',
-      '_Output stream',
-      'Output stream or file path to write output to',
-      'stderr',
-      GObject.ParamFlags.READWRITE,
-    ],
-    [
-      'boolean',
-      'verbose',
-      '_Verbose',
-      'If True, writes more detailed output',
-      False,
-      GObject.ParamFlags.READWRITE,
-    ],
-  ],
-  documentation=('Runs automated tests in the specified directory path', ''),
-)
-
-
-procedure_.main()
+    documentation=('Runs automated tests in the specified directory path', ''),
+  )

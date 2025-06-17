@@ -42,6 +42,13 @@ from src import utils as utils_
 from src.gui import main as gui_main
 from src.procedure_groups import *
 
+try:
+  import runtests
+except ImportError:
+  _runtests_module_imported = False
+else:
+  _runtests_module_imported = True
+
 
 SETTINGS_CONVERT = plugin_settings.create_settings_for_convert()
 SETTINGS_EXPORT_IMAGES = plugin_settings.create_settings_for_export_images()
@@ -645,6 +652,10 @@ procedure_.register_procedure(
   documentation=(_('Batch-edit selected layers instantly'), ''),
   attribution=(CONFIG.AUTHOR_NAME, CONFIG.AUTHOR_NAME, CONFIG.COPYRIGHT_YEARS),
 )
+
+
+if _runtests_module_imported:
+  runtests.register()
 
 
 procedure_.main()
