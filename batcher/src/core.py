@@ -24,6 +24,7 @@ from src import exceptions
 from src import invoker as invoker_
 from src import itemtree
 from src import overwrite
+from src import pdbutils
 from src import placeholders
 from src import progress as progress_
 from src import setting as setting_
@@ -994,7 +995,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _remove_image_copies(self):
     for image in self._image_copies:
-      pg.pdbutils.try_delete_image(image)
+      pdbutils.try_delete_image(image)
 
     self._image_copies = []
 
@@ -1284,7 +1285,7 @@ class LayerBatcher(Batcher):
   def create_copy(self, image, layer):
     image_copy = utils.create_empty_image_copy(image)
 
-    layer_copy = pg.pdbutils.copy_and_paste_layer(
+    layer_copy = pdbutils.copy_and_paste_layer(
       layer,
       image_copy,
       None,

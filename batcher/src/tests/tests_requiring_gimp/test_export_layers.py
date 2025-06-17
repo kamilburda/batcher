@@ -17,6 +17,7 @@ from src import builtin_actions
 from src import commands
 from src import core
 from src import itemtree
+from src import pdbutils
 from src import plugin_settings
 from src import utils as utils_
 from src.procedure_groups import *
@@ -205,7 +206,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
   
   def _compare_layers(
         self, layer, expected_layer, settings, test_case_name, expected_results_dirpath):
-    comparison_result = pg.pdbutils.compare_layers([layer, expected_layer])
+    comparison_result = pdbutils.compare_layers([layer, expected_layer])
 
     if not comparison_result:
       self._save_incorrect_layers(
@@ -262,7 +263,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
     """Loads layers from the specified file paths into a new image. Returns the
     image and a dictionary of (layer name: Gimp.Layer instance) pairs.
     """
-    image = pg.pdbutils.load_layers(
+    image = pdbutils.load_layers(
       layer_filepaths, image=None, strip_file_extension=True)
     return image, {layer.get_name(): layer for layer in image.get_layers()}
   

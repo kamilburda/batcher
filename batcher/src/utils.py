@@ -3,9 +3,8 @@
 import collections
 from typing import Any, Dict
 
-import pygimplib as pg
-
 from src import itemtree
+from src import pdbutils
 from src import setting as setting_
 
 
@@ -152,7 +151,7 @@ def create_empty_image_copy(orig_image):
   The image copy is intended to be used temporarily. The undo stack is therefore
   frozen.
   """
-  image_copy = pg.pdbutils.duplicate_image_without_contents(orig_image)
+  image_copy = pdbutils.duplicate_image_without_contents(orig_image)
   image_copy.undo_freeze()
 
   return image_copy

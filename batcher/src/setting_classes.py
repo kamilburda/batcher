@@ -17,6 +17,7 @@ import pygimplib as pg
 from src import builtin_actions as builtin_actions_
 from src import file_formats as file_formats_
 from src import itemtree
+from src import pdbutils
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import setting as setting_
@@ -674,7 +675,7 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
           if item_data[3] in opened_images:
             image = opened_images[item_data[3]]
 
-            item_object = pg.pdbutils.get_item_from_image_and_item_path(
+            item_object = pdbutils.get_item_from_image_and_item_path(
               item_data[0], item_data[1], image)
             if item_object is not None:
               if item_data[2] == itemtree.FOLDER_KEY:
@@ -707,7 +708,7 @@ class GimpItemTreeItemsSetting(ItemTreeItemsSetting):
     if not Gimp.Item.id_is_valid(item_id):
       return None
 
-    item_as_path = pg.pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_id))
+    item_as_path = pdbutils.get_item_as_path(Gimp.Item.get_by_id(item_id))
     if item_as_path is not None:
       item_class_name, item_path_components, image_filepath = item_as_path
       return [item_class_name, item_path_components, folder_key, image_filepath]
@@ -880,7 +881,7 @@ class ImagesAndDirectoriesSetting(setting_.Setting):
         if isinstance(image_key, int):
           image = Gimp.Image.get_by_id(image_key)
         elif isinstance(image_key, str):
-          image = pg.pdbutils.find_image_by_filepath(image_key)
+          image = pdbutils.find_image_by_filepath(image_key)
         else:
           image = image_key
 

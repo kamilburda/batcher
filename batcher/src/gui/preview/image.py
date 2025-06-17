@@ -26,6 +26,7 @@ from . import base as preview_base_
 from src import builtin_actions
 from src import exceptions
 from src import itemtree
+from src import pdbutils
 from src import utils as utils_
 from src.gui import messages as messages_
 
@@ -185,7 +186,7 @@ class ImagePreview(preview_base_.Preview):
 
     self._update_duration_seconds = 0.0
 
-    with pg.pdbutils.redirect_messages():
+    with pdbutils.redirect_messages():
       self._preview_pixbuf, error, display_error_message_as_label = self._get_in_memory_preview()
     
     if self._preview_pixbuf is not None:
@@ -285,7 +286,7 @@ class ImagePreview(preview_base_.Preview):
     image_layers = image_preview.get_layers()
 
     if not image_layers:
-      pg.pdbutils.try_delete_image(image_preview)
+      pdbutils.try_delete_image(image_preview)
       return None, error, display_error_message_as_label
 
     preview_width, preview_height = self._get_preview_size(
@@ -294,7 +295,7 @@ class ImagePreview(preview_base_.Preview):
     preview_pixbuf = self._get_preview_pixbuf(image_preview, preview_width, preview_height)
 
     for image in image_copies:
-      pg.pdbutils.try_delete_image(image)
+      pdbutils.try_delete_image(image)
     
     return preview_pixbuf, error, display_error_message_as_label
 

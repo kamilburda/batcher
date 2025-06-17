@@ -1161,11 +1161,11 @@ class TestChoiceSetting(SettingTestCase):
       })
 
 
-@mock.patch('pygimplib.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestImageSetting(SettingTestCase):
 
-  @mock.patch('pygimplib.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
   @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
@@ -1193,7 +1193,7 @@ class TestImageSetting(SettingTestCase):
   def test_set_value_with_file_path(self):
     self.image.set_file(Gio.file_new_for_path('file_path'))
     
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.return_value = [self.image]
 
       self.setting.set_value(os.path.abspath('file_path'))
@@ -1201,7 +1201,7 @@ class TestImageSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.image)
   
   def test_set_value_with_non_matching_file_path(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.return_value = []
       
       self.setting.set_value(os.path.abspath('file_path'))
@@ -1242,7 +1242,7 @@ class TestImageSetting(SettingTestCase):
   def test_default_value_with_raw_type(self):
     self.image.set_file(Gio.file_new_for_path('file_path'))
     
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.return_value = [self.image]
       
       setting = settings_.ImageSetting('image', default_value=os.path.abspath('file_path'))
@@ -1285,7 +1285,7 @@ class TestImageSetting(SettingTestCase):
 
 
 @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-@mock.patch('pygimplib.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestGimpItemSetting(SettingTestCase):
   
   class StubItemSetting(settings_.GimpItemSetting):
@@ -1317,10 +1317,8 @@ class TestGimpItemSetting(SettingTestCase):
     self.assertEqual(self.setting.value, layer)
   
   def test_set_value_with_list(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
@@ -1333,10 +1331,8 @@ class TestGimpItemSetting(SettingTestCase):
     self.layer.parent = None
     self.image.layers = [self.layer]
     
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
@@ -1349,10 +1345,8 @@ class TestGimpItemSetting(SettingTestCase):
       self.setting.set_value(['image_filepath'])
   
   def test_set_value_with_list_no_matching_image_returns_none(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = []
         temp_mock_get_children_from_image.return_value = []
 
@@ -1362,10 +1356,8 @@ class TestGimpItemSetting(SettingTestCase):
     self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_layer_returns_none(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
@@ -1375,10 +1367,8 @@ class TestGimpItemSetting(SettingTestCase):
     self.assertIsNone(self.setting.value)
   
   def test_set_value_with_list_no_matching_parent_returns_none(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
@@ -1450,7 +1440,7 @@ class TestGimpItemSetting(SettingTestCase):
 
 
 @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-@mock.patch('pygimplib.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestLayerMaskSetting(SettingTestCase):
 
   def setUp(self):
@@ -1483,10 +1473,8 @@ class TestLayerMaskSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.mask)
 
   def test_set_value_with_list_containing_layer_path(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 
@@ -1512,7 +1500,7 @@ class TestLayerMaskSetting(SettingTestCase):
 
 
 @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
-@mock.patch('pygimplib.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.pdbutils.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestDrawableFilterSetting(SettingTestCase):
 
   def setUp(self):
@@ -1549,10 +1537,8 @@ class TestDrawableFilterSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.drawable_filter)
 
   def test_set_value_with_list_containing_layer_path(self):
-    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
-      with mock.patch(
-            'pygimplib.pdbutils._get_children_from_image'
-      ) as temp_mock_get_children_from_image:
+    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+      with mock.patch('src.pdbutils._get_children_from_image') as temp_mock_get_children_from_image:
         temp_mock_gimp_module.get_images.return_value = [self.image]
         temp_mock_get_children_from_image.return_value = self.image.get_layers()
 

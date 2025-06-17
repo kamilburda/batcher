@@ -19,7 +19,6 @@ __all__ = [
 
 if _gimp_modules_available:
   from . import gui
-  from . import pdbutils
 
   from .pypdb import pdb
   from .pypdb import PDBProcedureError
@@ -27,7 +26,6 @@ if _gimp_modules_available:
   __all__.extend([
     # Modules
     'gui',
-    'pdbutils',
     # Global elements imported to or defined in this module
     'pdb',
     'PDBProcedureError',
