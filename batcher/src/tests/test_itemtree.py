@@ -23,7 +23,6 @@ import unittest.mock as mock
 
 import parameterized
 
-import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from . import utils_itemtree
@@ -956,7 +955,7 @@ class TestGimpItem(unittest.TestCase):
     
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
 
-  @mock.patch(f'{pg.utils.get_pygimplib_module_path()}.utils.id', return_value=2208603083056)
+  @mock.patch('pygimplib.utils.id', return_value=2208603083056)
   def test_repr(self, _mock_id):
     self.assertEqual(
       repr(self.item),

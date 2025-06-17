@@ -7,7 +7,6 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
 from src import setting as setting_
@@ -904,8 +903,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       {self.image_list[0]: 'dirpath1', self.image_list[1]: 'dirpath2'})
 
   def test_set_value_from_image_paths(self):
-    with mock.patch(
-          f'{pg.utils.get_pygimplib_module_path()}.pdbutils.Gimp') as temp_mock_gimp_module:
+    with mock.patch('pygimplib.pdbutils.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.side_effect = [[self.image_list[1]], [self.image_list[2]]]
 
       self.setting.set_value(

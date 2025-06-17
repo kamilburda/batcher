@@ -28,7 +28,7 @@ _UPDATE_HANDLERS = {
 
 @mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch(
-  'batcher.src.tests.update.test_update.update._UPDATE_HANDLERS',
+  'src.tests.update.test_update.update._UPDATE_HANDLERS',
   new_callable=lambda: dict(_UPDATE_HANDLERS))
 class TestUpdate(unittest.TestCase):
   

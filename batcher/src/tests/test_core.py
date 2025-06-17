@@ -58,10 +58,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     self.assertEqual(commands_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
 
 
-@mock.patch(
-  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
-  return_value=pg.tests.stubs_gimp.PdbStub,
-)
+@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
 class TestAddCommandFromSettings(unittest.TestCase):
   
   def setUp(self):

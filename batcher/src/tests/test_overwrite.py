@@ -57,7 +57,7 @@ class TestHandleOverwrite(unittest.TestCase):
     self.overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.REPLACE)
   
-  @mock.patch('batcher.src.overwrite.os.path.exists')
+  @mock.patch('src.overwrite.os.path.exists')
   def test_handle_overwrite_file_exists(self, mock_os_path_exists):
     mock_os_path_exists.return_value = True
     
@@ -65,7 +65,7 @@ class TestHandleOverwrite(unittest.TestCase):
       overwrite.handle_overwrite(self.filepath, self.overwrite_chooser),
       (self.overwrite_chooser.overwrite_mode, self.filepath))
   
-  @mock.patch('batcher.src.overwrite.os.path.exists')
+  @mock.patch('src.overwrite.os.path.exists')
   def test_handle_overwrite_file_does_not_exist(self, mock_os_path_exists):
     mock_os_path_exists.return_value = False
     

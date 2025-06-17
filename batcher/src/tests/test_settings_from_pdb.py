@@ -15,16 +15,10 @@ from src import placeholders as placeholders_
 
 
 @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-@mock.patch(
-  f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
-  return_value=pg.tests.stubs_gimp.PdbStub,
-)
+@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
 class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
-  @mock.patch(
-    f'{pg.utils.get_pygimplib_module_path()}.pypdb.Gimp.get_pdb',
-    return_value=pg.tests.stubs_gimp.PdbStub,
-  )
+  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
   def setUp(self, mock_get_pdb):
     self.procedure_name = 'file-png-export'
 
