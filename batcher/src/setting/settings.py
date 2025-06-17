@@ -31,7 +31,7 @@ from . import presenter as presenter_
 from . import presenters_gtk
 from . import utils as utils_
 
-from src import pdbutils
+from src import utils_pdb
 
 
 _SETTING_TYPES = meta_.SETTING_TYPES
@@ -1785,7 +1785,7 @@ class ImageSetting(Setting):
     if isinstance(raw_value, int):
       value = Gimp.Image.get_by_id(raw_value)
     elif isinstance(raw_value, str):
-      value = pdbutils.find_image_by_filepath(raw_value)
+      value = utils_pdb.find_image_by_filepath(raw_value)
     
     return value
   
@@ -1865,15 +1865,15 @@ class GimpItemSetting(Setting):
 
   def _get_item_from_image_and_item_path(
         self, item_type_name, item_path_components, image_filepath):
-    image = pdbutils.find_image_by_filepath(image_filepath)
+    image = utils_pdb.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None
 
-    return pdbutils.get_item_from_image_and_item_path(item_type_name, item_path_components, image)
+    return utils_pdb.get_item_from_image_and_item_path(item_type_name, item_path_components, image)
 
   def _item_to_path(self, item):
-    return pdbutils.get_item_as_path(item)
+    return utils_pdb.get_item_as_path(item)
 
   def _get_pdb_param(self):
     return [
@@ -2179,7 +2179,7 @@ class DrawableFilterSetting(Setting):
     except ValueError:
       return None
 
-    drawable_as_path = pdbutils.get_item_as_path(self.drawable)
+    drawable_as_path = utils_pdb.get_item_as_path(self.drawable)
 
     if drawable_as_path is None:
       return None
@@ -2198,12 +2198,12 @@ class DrawableFilterSetting(Setting):
     drawable_filter_position = path_list[-2]
     drawable_filter_name = path_list[-1]
 
-    image = pdbutils.find_image_by_filepath(image_filepath)
+    image = utils_pdb.find_image_by_filepath(image_filepath)
 
     if image is None:
       return None, None
 
-    drawable = pdbutils.get_item_from_image_and_item_path(
+    drawable = utils_pdb.get_item_from_image_and_item_path(
       drawable_type_name, drawable_path_components, image)
 
     if drawable is None:

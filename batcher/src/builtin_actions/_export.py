@@ -18,10 +18,10 @@ from src import file_formats as file_formats_
 from src import initnotifier
 from src import itemtree
 from src import overwrite
-from src import pdbutils
 from src import renamer as renamer_
 from src import uniquifier
 from src import utils
+from src import utils_pdb
 from src.path import fileext
 from src.path import validators as validators_
 from src.procedure_groups import *
@@ -254,7 +254,7 @@ def export(
 def _delete_images_on_cleanup(batcher, images):
   if batcher.process_export:
     for image in images:
-      pdbutils.try_delete_image(image)
+      utils_pdb.try_delete_image(image)
 
 
 def _get_top_level_item(item):
@@ -348,7 +348,7 @@ def _merge_and_resize_image(batcher, image, layer):
 
 
 def _copy_layer(layer, dest_image, item):
-  layer_copy = pdbutils.copy_and_paste_layer(
+  layer_copy = utils_pdb.copy_and_paste_layer(
     layer, dest_image, None, len(dest_image.get_layers()), True, True, True)
 
   # We use `item.name` instead of
@@ -622,13 +622,13 @@ def get_export_function(
 def _remove_image_copies_for_edit_mode(batcher, image_copies):
   if batcher.edit_mode and batcher.process_export:
     for image in image_copies:
-      pdbutils.try_delete_image(image)
+      utils_pdb.try_delete_image(image)
     image_copies.clear()
 
 
 def _remove_multi_layer_images(images):
   for image in images:
-    pdbutils.try_delete_image(image)
+    utils_pdb.try_delete_image(image)
   images.clear()
 
 

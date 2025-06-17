@@ -18,9 +18,9 @@ from src import builtin_actions
 from src import commands
 from src import core
 from src import itemtree
-from src import pdbutils
 from src import plugin_settings
 from src import utils as utils_
+from src import utils_pdb
 from src.procedure_groups import *
 
 
@@ -177,7 +177,7 @@ class TestConvertCompareContents(unittest.TestCase):
     actual_layer = actual_image.get_layers()[0]
     expected_layer = actual_image.get_layers()[0]
 
-    comparison_result = pdbutils.compare_layers([actual_layer, expected_layer])
+    comparison_result = utils_pdb.compare_layers([actual_layer, expected_layer])
 
     if not comparison_result:
       self._save_incorrect_image(actual_image, expected_image, settings, test_case_name)

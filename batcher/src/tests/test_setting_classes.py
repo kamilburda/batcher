@@ -903,7 +903,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       {self.image_list[0]: 'dirpath1', self.image_list[1]: 'dirpath2'})
 
   def test_set_value_from_image_paths(self):
-    with mock.patch('src.pdbutils.Gimp') as temp_mock_gimp_module:
+    with mock.patch('src.utils_pdb.Gimp') as temp_mock_gimp_module:
       temp_mock_gimp_module.get_images.side_effect = [[self.image_list[1]], [self.image_list[2]]]
 
       self.setting.set_value(

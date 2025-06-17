@@ -10,7 +10,7 @@ from src import placeholders as placeholders_
 from src.procedure_groups import *
 
 from pygimplib import pdb
-from src import pdbutils
+from src import utils_pdb
 
 
 __all__ = [
@@ -67,7 +67,7 @@ def _insert_layer_from_file(image_batcher, image_file, insert_mode):
 
 def _delete_images_on_cleanup(_batcher, images):
   for image in images:
-    pdbutils.try_delete_image(image)
+    utils_pdb.try_delete_image(image)
 
   images.clear()
 
@@ -113,7 +113,7 @@ def _insert_layers(image, layers, parent, position):
   first_tagged_layer_position = position
   
   for i, layer in enumerate(layers):
-    layer_copy = pdbutils.copy_and_paste_layer(
+    layer_copy = utils_pdb.copy_and_paste_layer(
       layer, image, parent, first_tagged_layer_position + i, True, True, True)
     layer_copy.set_visible(True)
 
