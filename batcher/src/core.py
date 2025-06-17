@@ -1283,7 +1283,7 @@ class LayerBatcher(Batcher):
     self._current_layer = None
 
   def create_copy(self, image, layer):
-    image_copy = utils.create_empty_image_copy(image)
+    image_copy = utils_pdb.create_empty_image_copy(image)
 
     layer_copy = utils_pdb.copy_and_paste_layer(
       layer,

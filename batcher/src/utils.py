@@ -5,7 +5,6 @@ from typing import Any, Dict
 
 from src import itemtree
 from src import setting as setting_
-from src import utils_pdb
 
 
 def get_settings_for_batcher(main_settings: setting_.Group) -> Dict[str, Any]:
@@ -141,17 +140,3 @@ def add_objects_to_item_tree(item_tree: itemtree.ItemTree, objects_and_parent_ob
     if added_items and added_items[0].type == itemtree.TYPE_FOLDER:
       parent_items[object_] = added_items[0]
 
-
-def create_empty_image_copy(orig_image):
-  """Creates a copy of ``orig_image`` without any contents.
-
-  The image copy will have the same attributes as ``orig_image`` (width, height,
-  resolution, precision, guides, ...).
-
-  The image copy is intended to be used temporarily. The undo stack is therefore
-  frozen.
-  """
-  image_copy = utils_pdb.duplicate_image_without_contents(orig_image)
-  image_copy.undo_freeze()
-
-  return image_copy

@@ -116,7 +116,7 @@ def export(
 
     if export_mode != ExportModes.EACH_ITEM and batcher.process_export:
       if not multi_layer_images:
-        multi_layer_image = utils.create_empty_image_copy(batcher.current_image)
+        multi_layer_image = utils_pdb.create_empty_image_copy(batcher.current_image)
         multi_layer_images.append(multi_layer_image)
       else:
         multi_layer_image = multi_layer_images[-1]
