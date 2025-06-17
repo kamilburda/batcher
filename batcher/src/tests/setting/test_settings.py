@@ -21,7 +21,7 @@ from config import CONFIG
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
 
-from pygimplib.tests import stubs_gimp
+from src.tests import stubs_gimp
 from src.tests.setting import stubs_setting
 
 

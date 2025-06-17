@@ -10,7 +10,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
-from .. import pypdb
+from pygimplib import pypdb
 
 
 def _get_result_tuple_type(arg_name) -> collections.namedtuple:

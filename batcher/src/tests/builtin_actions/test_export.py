@@ -9,11 +9,12 @@ from gi.repository import Gio
 from gi.repository import GObject
 
 from pygimplib import pdb
-from pygimplib.tests import stubs_gimp
 
 from src import builtin_actions
 from src import file_formats as file_formats_
 from src import setting as setting_
+
+from src.tests import stubs_gimp
 
 
 @mock.patch('pygimplib.pypdb.Gimp', new_callable=stubs_gimp.GimpModuleStub)

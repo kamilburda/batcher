@@ -2,7 +2,7 @@
 
 from typing import Dict, Tuple, Union
 
-from pygimplib.tests import stubs_gimp
+from src.tests import stubs_gimp
 
 
 def parse_layers(

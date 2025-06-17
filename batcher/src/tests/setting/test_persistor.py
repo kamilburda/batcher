@@ -1,14 +1,12 @@
 import unittest
 import unittest.mock as mock
 
-import pygimplib as pg
-
 from src.setting import group as group_
 from src.setting import persistor as persistor_
 from src.setting import settings as settings_
 from src.setting import sources as sources_
 
-from pygimplib.tests import stubs_gimp
+from src.tests import stubs_gimp
 from src.tests.setting import stubs_group
 from src.tests.setting import stubs_setting
 

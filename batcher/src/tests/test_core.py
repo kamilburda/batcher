@@ -7,7 +7,7 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 import pygimplib as pg
-from pygimplib.tests import stubs_gimp
+from src.tests import stubs_gimp
 
 from src import builtin_actions
 from src import commands as commands_
@@ -58,7 +58,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     self.assertEqual(commands_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
 
 
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
+@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestAddCommandFromSettings(unittest.TestCase):
   
   def setUp(self):

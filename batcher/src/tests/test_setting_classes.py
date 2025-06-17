@@ -7,10 +7,10 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from pygimplib.tests import stubs_gimp
-
 from src import setting as setting_
 from src import setting_classes
+
+from src.tests import stubs_gimp
 
 
 def _get_images_and_items():

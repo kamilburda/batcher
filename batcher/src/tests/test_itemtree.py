@@ -23,11 +23,10 @@ import unittest.mock as mock
 
 import parameterized
 
-from pygimplib.tests import stubs_gimp
-
-from . import utils_itemtree
-
 from src import itemtree
+
+from src.tests import stubs_gimp
+from src.tests import utils_itemtree
 
 
 @mock.patch('src.itemtree.os.path.isdir')

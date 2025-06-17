@@ -8,11 +8,11 @@ from gi.repository import GObject
 
 import parameterized
 
-from pygimplib.tests import stubs_gimp
-
 from config import CONFIG
 from src import placeholders as placeholders_
 from src import setting as setting_
+
+from src.tests import stubs_gimp
 
 
 class _BatcherStub:

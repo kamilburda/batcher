@@ -7,18 +7,19 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 import pygimplib as pg
-from pygimplib.tests import stubs_gimp
 
 from src import setting as setting_
 from src import settings_from_pdb as settings_from_pdb_
 from src import placeholders as placeholders_
 
+from src.tests import stubs_gimp
+
 
 @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
+@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
-  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=pg.tests.stubs_gimp.PdbStub)
+  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def setUp(self, mock_get_pdb):
     self.procedure_name = 'file-png-export'
 
