@@ -11,11 +11,11 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from config import CONFIG
 from src import commands as commands_
 from src import setting as setting_
 from src import update
 from src import utils as utils_
-from src.config import CONFIG
 from src.gui import messages as messages_
 
 

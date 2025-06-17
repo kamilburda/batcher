@@ -11,6 +11,7 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
 from src import placeholders
@@ -18,7 +19,6 @@ from src import plugin_settings
 from src import setting as setting_
 from src import setting_classes
 from src import update
-from src.config import CONFIG
 
 
 _CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))

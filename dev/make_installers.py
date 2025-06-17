@@ -30,7 +30,7 @@ import pathspec
 
 import batcher.pygimplib as pg
 
-from src.config import CONFIG
+from config import CONFIG
 
 from dev import create_user_docs
 from dev import process_local_docs

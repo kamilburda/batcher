@@ -17,10 +17,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
+from config import CONFIG
 from src import exceptions
 from src import itemtree
 from src import setting as setting_
-from src.config import CONFIG
 
 
 ERROR_EXIT_STATUS = 1

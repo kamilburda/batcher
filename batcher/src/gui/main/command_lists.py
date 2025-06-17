@@ -6,12 +6,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from config import CONFIG
 from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
 from src import setting as setting_
-
-from src.config import CONFIG
 from src.gui import messages as messages_
 from src.gui.commands import list as command_list_
 from src.gui.main import export_settings as export_settings_

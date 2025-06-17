@@ -48,7 +48,7 @@ import sys
 
 import batcher.pygimplib as pg
 
-from src.config import CONFIG
+from config import CONFIG
 
 
 def main(source_and_dest_filepaths):

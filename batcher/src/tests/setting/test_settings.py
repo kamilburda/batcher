@@ -17,7 +17,7 @@ import parameterized
 
 import pygimplib as pg
 
-from src.config import CONFIG
+from config import CONFIG
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
 

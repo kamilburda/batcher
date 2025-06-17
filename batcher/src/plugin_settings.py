@@ -7,6 +7,7 @@ from gi.repository import Gio
 
 import pygimplib as pg
 
+from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
@@ -17,7 +18,6 @@ from src import setting as setting_
 # noinspection PyUnresolvedReferences
 from src import setting_classes
 from src import utils
-from src.config import CONFIG
 
 
 def create_settings_for_convert():

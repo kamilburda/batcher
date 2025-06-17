@@ -20,9 +20,9 @@ from gi.repository import Gtk
 import pygimplib as pg
 from pygimplib import pdb
 
+from config import CONFIG
 from src import itemtree
 from src import utils as utils_
-from src.config import CONFIG
 from src.procedure_groups import *
 
 

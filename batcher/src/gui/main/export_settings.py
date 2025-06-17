@@ -10,9 +10,9 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from config import CONFIG
 from src import renamer as renamer_
 from src import setting as setting_
-from src.config import CONFIG
 from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 

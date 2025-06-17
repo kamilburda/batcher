@@ -4,7 +4,7 @@
 
 *.log
 *.pyi
-batcher/src/config/config_dev.py
+batcher/config/config_dev.py
 batcher/src/tests/tests_requiring_gimp/test_images/incorrect_results/
 batcher/src/tests/tests_requiring_gimp/test_images/temp_output/
 docs/gh-pages/

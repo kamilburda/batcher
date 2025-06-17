@@ -1,12 +1,11 @@
 import unittest
 import unittest.mock as mock
 
-import pygimplib as pg
 from pygimplib.tests import stubs_gimp
 
+from config import CONFIG
 from src import setting as setting_
 from src import update
-from src.config import CONFIG
 
 
 def _update_to_0_3(data, _settings, _procedure_groups):

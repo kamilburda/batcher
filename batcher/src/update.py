@@ -11,6 +11,7 @@ from gi.repository import Gio
 
 from pygimplib import pdb
 
+from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
@@ -21,7 +22,6 @@ from src import utils as utils_
 from src import version as version_
 from src.path import pattern as pattern_
 from src.path import uniquify
-from src.config import CONFIG
 from src.procedure_groups import *
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2

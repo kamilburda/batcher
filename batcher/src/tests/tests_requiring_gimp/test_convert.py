@@ -13,13 +13,13 @@ from gi.repository import Gio
 import pygimplib as pg
 from pygimplib import pdb
 
+from config import CONFIG
 from src import builtin_actions
 from src import commands
 from src import core
 from src import itemtree
 from src import plugin_settings
 from src import utils as utils_
-from src.config import CONFIG
 from src.procedure_groups import *
 
 

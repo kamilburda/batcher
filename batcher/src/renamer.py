@@ -17,8 +17,8 @@ from gi.repository import Gimp
 
 import pygimplib as pg
 
+from config import CONFIG
 from src import itemtree
-from src.config import CONFIG
 from src.path import fileext
 from src.path import pattern as pattern_
 from src.procedure_groups import *

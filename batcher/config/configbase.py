@@ -124,10 +124,10 @@ def _init_config_from_file(config: _Config):
     # Prefer a development version of config if it exists. This is handy if you
     # need to keep a clean config in the remote repository and a local config
     # for development purposes.
-    from src.config import config_dev as plugin_config
+    from config import config_dev as plugin_config
   except ImportError:
     try:
-      from src.config import config as plugin_config
+      from config import config as plugin_config
     except ImportError:
       pass
 

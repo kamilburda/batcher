@@ -9,8 +9,8 @@ from gi.repository import Gtk
 
 import pygimplib as pg
 
+from config import CONFIG
 from src import setting as setting_
-from src.config import CONFIG
 from src.gui import messages
 
 

@@ -3,7 +3,7 @@ import unittest.mock as mock
 
 import parameterized
 
-from src.config import CONFIG
+from config import CONFIG
 
 from dev import preprocess_document_contents
 
