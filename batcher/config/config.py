@@ -1,29 +1,27 @@
-"""Plug-in configuration.
-
-Use `c` to access, create or modify configuration entries.
-"""
+"""Plug-in configuration."""
 
 import os
 
 
-c.STDOUT_LOG_HANDLES = []
-c.STDERR_LOG_HANDLES = ['file']
+def initialize_config(config):
+  config.STDOUT_LOG_HANDLES = []
+  config.STDERR_LOG_HANDLES = ['file']
 
-c.WARN_ON_INVALID_SETTING_VALUES = True
+  config.WARN_ON_INVALID_SETTING_VALUES = True
 
-c.PLUGIN_NAME = 'batcher'
-c.DOMAIN_NAME = 'batcher'
-c.PLUGIN_TITLE = lambda: _('Batcher')
-c.PLUGIN_VERSION = '1.1.1'
-c.PLUGIN_VERSION_RELEASE_DATE = 'June 15, 2025'
-c.AUTHOR_NAME = 'Kamil Burda'
-c.COPYRIGHT_YEARS = '2023-2025'
-c.PAGE_URL = 'https://kamilburda.github.io/batcher'
-c.DOCS_URL = f'{c.PAGE_URL}/docs/usage'
-c.LOCAL_DOCS_PATH = os.path.join(c.PLUGIN_DIRPATH, 'docs', 'usage', 'index.html')
-c.REPOSITORY_USERNAME = 'kamilburda'
-c.REPOSITORY_NAME = 'batcher'
-c.REPOSITORY_URL = 'https://github.com/kamilburda/batcher'
-c.BUG_REPORT_URL_LIST = [
-  ('GitHub', 'https://github.com/kamilburda/batcher/issues')
-]
+  config.PLUGIN_NAME = 'batcher'
+  config.DOMAIN_NAME = 'batcher'
+  config.PLUGIN_TITLE = lambda: _('Batcher')
+  config.PLUGIN_VERSION = '1.1.1'
+  config.PLUGIN_VERSION_RELEASE_DATE = 'June 15, 2025'
+  config.AUTHOR_NAME = 'Kamil Burda'
+  config.COPYRIGHT_YEARS = '2023-2025'
+  config.PAGE_URL = 'https://kamilburda.github.io/batcher'
+  config.DOCS_URL = f'{config.PAGE_URL}/docs/usage'
+  config.LOCAL_DOCS_PATH = os.path.join(config.PLUGIN_DIRPATH, 'docs', 'usage', 'index.html')
+  config.REPOSITORY_USERNAME = 'kamilburda'
+  config.REPOSITORY_NAME = 'batcher'
+  config.REPOSITORY_URL = 'https://github.com/kamilburda/batcher'
+  config.BUG_REPORT_URL_LIST = [
+    ('GitHub', 'https://github.com/kamilburda/batcher/issues')
+  ]

@@ -1,6 +1,5 @@
 """Class for creating plug-in-wide configuration."""
 
-import builtins
 import os
 import sys
 
@@ -114,27 +113,23 @@ def _init_config_logging(config: _Config):
 
 
 def _init_config_from_file(config: _Config):
-  orig_builtin_c = None
-  if hasattr(builtins, 'c'):
-    orig_builtin_c = builtins.c
-
-  builtins.c = config
-
   try:
-    # Prefer a development version of config if it exists. This is handy if you
-    # need to keep a clean config in the remote repository and a local config
-    # for development purposes.
+    # Prefer a development version of config if it exists. This keeps the
+    # config for releases clean.
     from config import config_dev as plugin_config
   except ImportError:
-    try:
-      from config import config as plugin_config
-    except ImportError:
-      pass
-
-  if orig_builtin_c is None:
-    del builtins.c
+    pass
   else:
-    builtins.c = orig_builtin_c
+    plugin_config.initialize_config(config)
+    return
+
+  try:
+    from config import config as plugin_config
+  except ImportError:
+    pass
+  else:
+    plugin_config.initialize_config(config)
+    return
 
 
 def _init_config_per_procedure(config: _Config):

@@ -31,9 +31,6 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="_" />
-          <option value="builtins.c" />
-          <option value="src.config.config_dev.c" />
-          <option value="src.config.config.c" />
         </list>
       </option>
     </inspection_tool>
