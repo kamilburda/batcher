@@ -2,12 +2,12 @@
 # Copyright (C) 2025 Kamil Burda
 # This file is distributed under the same license as the 'batcher' package.
 # Automatically generated, 2025.
-#
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.0.2\n"
+"Project-Id-Version: 'batcher' 1.1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-01 20:58+0200\n"
+"POT-Creation-Date: 2025-06-15 09:36+0200\n"
 "PO-Revision-Date: 2025-04-01 20:58+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,152 +17,190 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../../batcher/batcher.py:67
+#: ../../batcher/batcher.py:68
 msgid "Batch Convert"
 msgstr "バッチ処理"
 
-#: ../../batcher/batcher.py:95
+#: ../../batcher/batcher.py:96
 msgid "Export Images"
 msgstr "画像をエクスポート"
 
-#: ../../batcher/batcher.py:121
+#: ../../batcher/batcher.py:122
 msgid "Export Images (Quick)"
 msgstr "画像をエクスポート(クイック)"
 
-#: ../../batcher/batcher.py:138
+#: ../../batcher/batcher.py:141
+msgid "Edit and Save Images"
+msgstr "画像を編集して保存"
+
+#: ../../batcher/batcher.py:163
+#
+msgid "Edit and Save Images (Quick)"
+msgstr "編集して保存(クイック)"
+
+#: ../../batcher/batcher.py:180
 msgid "Export Layers"
 msgstr "レイヤーをエクスポート"
 
-#: ../../batcher/batcher.py:157
+#: ../../batcher/batcher.py:199
 msgid "Export Layers (Quick)"
-msgstr "レイヤーを素早くエクスポート"
+msgstr "レイヤーをエクスポート(クイック)"
 
-#: ../../batcher/batcher.py:174
+#: ../../batcher/batcher.py:216
 msgid "Export Selected Layers"
 msgstr "選択したレイヤーをエクスポート"
 
-#: ../../batcher/batcher.py:196
+#: ../../batcher/batcher.py:238
 msgid "Edit Layers"
 msgstr "レイヤーを編集"
 
-#: ../../batcher/batcher.py:215
+#: ../../batcher/batcher.py:257
 msgid "Edit Layers (Quick)"
-msgstr "レイヤーを素早く編集"
+msgstr "レイヤーを編集(クイック)"
 
-#: ../../batcher/batcher.py:232
+#: ../../batcher/batcher.py:274
 msgid "Edit Selected Layers"
 msgstr "選択したレイヤーを編集"
 
-#: ../../batcher/batcher.py:376
+#: ../../batcher/batcher.py:421
 msgid ""
 "Settings for this plug-in could not be updated to the latest version and "
 "must be reset."
-msgstr "このプラグインの設定を最新バージョンに更新できなかったため、リセットする必要があります。"
+msgstr ""
+"このプラグインの設定を最新バージョンに更新できなかったため、リセットする必要"
+"があります。"
 
-#: ../../batcher/batcher.py:379
+#: ../../batcher/batcher.py:424
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the text under the details."
-msgstr "これがプラグインのエラーであると思われる場合は、詳細の下にあるテキストを含むレポートを送信することで修正に協力できます。"
+msgstr ""
+"これがプラグインのエラーであると思われる場合は、詳細の下にあるテキストを含む"
+"レポートを送信することで修正に協力できます。"
 
-#: ../../batcher/batcher.py:384
+#: ../../batcher/batcher.py:429
 msgid ""
 "Send a report with the text in the details above to one of the following "
 "sites"
-msgstr "上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信してください"
+msgstr ""
+"上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信してくだ"
+"さい"
 
-#: ../../batcher/batcher.py:397
+#: ../../batcher/batcher.py:442
 msgid "Settings could not be loaded and had to be reset."
 msgstr "設定を読み込めず、リセットする必要がありました。"
 
-#: ../../batcher/batcher.py:399 ../../batcher/batcher.py:418
+#: ../../batcher/batcher.py:444 ../../batcher/batcher.py:463
 msgid "Details: {}"
 msgstr "詳細: {}"
 
-#: ../../batcher/batcher.py:408
+#: ../../batcher/batcher.py:453
 msgid "\"{}\" is not a valid file with settings"
 msgstr "\"{}\"は設定を含む有効なファイルではありません"
 
-#: ../../batcher/batcher.py:415
+#: ../../batcher/batcher.py:460
 msgid "Failed to import settings from file \"{}\"."
 msgstr "ファイル\"{}\"から設定をインポートできませんでした。"
 
-#: ../../batcher/batcher.py:451
+#: ../../batcher/batcher.py:496
 msgid "_Batch Convert..."
 msgstr "バッチ処理..."
 
-#: ../../batcher/batcher.py:456
+#: ../../batcher/batcher.py:501
 msgid "Batch-process image files"
 msgstr "画像ファイルを一括処理"
 
-#: ../../batcher/batcher.py:457
+#: ../../batcher/batcher.py:502
+#
 msgid ""
 "This procedure performs batch conversion of image files to the specified "
 "file format, optionally applying arbitrary procedures to each item and "
-"ignoring items according to the specified constraints."
-msgstr "この処理は、画像ファイルを指定されたファイル形式に一括変換し、オプションで各項目に任意の処理を適用し、指定された条件に従って項目を無視します。"
+"ignoring items according to the specified conditions."
+msgstr ""
+"この手続きは、画像ファイルを指定されたファイル形式に一括変換するもので、オプションとして、"
+"各項目に任意の手続きを適用したり、指定された条件に従って項目を無視したりすることができる。"
 
-#: ../../batcher/batcher.py:469
+#: ../../batcher/batcher.py:514
 msgid "E_xport Images..."
 msgstr "画像をエクスポート..."
 
-#: ../../batcher/batcher.py:473
+#: ../../batcher/batcher.py:518
 msgid "Exports images opened in GIMP"
 msgstr "GIMPで開いた画像をエクスポート"
 
-#: ../../batcher/batcher.py:482
+#: ../../batcher/batcher.py:527
 msgid "E_xport Images (Quick)"
 msgstr "画像をエクスポート(クイック)"
 
-#: ../../batcher/batcher.py:486
+#: ../../batcher/batcher.py:531
 msgid "Quickly export images opened in GIMP"
-msgstr "GIMPで開いた画像を最後に処理した設定でエクスポート"
+msgstr "GIMPで開いてる画像を最後に処理した設定でエクスポート"
 
-#: ../../batcher/batcher.py:494
+#: ../../batcher/batcher.py:540
+#
+msgid "E_dit and Save Images..."
+msgstr "画像を編集・保存..."
+
+#: ../../batcher/batcher.py:544
+#
+msgid "Edits and saves images opened in GIMP as XCF"
+msgstr "GIMPで開いた画像をXCFとして編集・保存"
+
+#: ../../batcher/batcher.py:553
+#
+msgid "E_dit and Save Images (Quick)"
+msgstr "画像を素早く編集・保存"
+
+#: ../../batcher/batcher.py:557
+#
+msgid "Edits and saves images opened in GIMP as XCF instantly"
+msgstr "GIMPで開いた画像をXCFとして即座に編集・保存"
+
+#: ../../batcher/batcher.py:565
 msgid "E_xport Layers..."
 msgstr "レイヤーをエクスポート..."
 
-#: ../../batcher/batcher.py:501
+#: ../../batcher/batcher.py:572
 msgid "Export layers as separate images"
 msgstr "レイヤーを個別の画像としてエクスポート"
 
-#: ../../batcher/batcher.py:508
+#: ../../batcher/batcher.py:579
 msgid "E_xport Layers (Quick)"
 msgstr "レイヤーを素早くエクスポート"
 
-#: ../../batcher/batcher.py:515
+#: ../../batcher/batcher.py:586
 msgid "Quickly export layers as separate images"
 msgstr "レイヤーを個別の画像として素早くエクスポート"
 
-#: ../../batcher/batcher.py:522
+#: ../../batcher/batcher.py:593
 msgid "E_xport Selected Layers"
 msgstr "選択したレイヤーをエクスポート"
 
-#: ../../batcher/batcher.py:528
+#: ../../batcher/batcher.py:599
 msgid "Quickly export selected layers as separate images"
 msgstr "選択したレイヤーを個別の画像として素早くエクスポート"
 
-#: ../../batcher/batcher.py:536
+#: ../../batcher/batcher.py:607
 msgid "E_dit Layers..."
 msgstr "レイヤーを編集..."
 
-#: ../../batcher/batcher.py:543
+#: ../../batcher/batcher.py:614
 msgid "Batch-edit layers"
 msgstr "レイヤーを一括編集"
 
-#: ../../batcher/batcher.py:550
+#: ../../batcher/batcher.py:621
 msgid "E_dit Layers (Quick)"
 msgstr "レイヤーを素早く編集"
 
-#: ../../batcher/batcher.py:557
+#: ../../batcher/batcher.py:628
 msgid "Batch-edit layers instantly"
 msgstr "レイヤーを即座に一括編集"
 
-#: ../../batcher/batcher.py:564
+#: ../../batcher/batcher.py:635
 msgid "E_dit Selected Layers"
 msgstr "選択したレイヤーを編集"
 
-#: ../../batcher/batcher.py:570
+#: ../../batcher/batcher.py:641
 msgid "Batch-edit selected layers instantly"
 msgstr "選択したレイヤーを即座に一括編集"
 
@@ -170,628 +208,993 @@ msgstr "選択したレイヤーを即座に一括編集"
 msgid "Batcher"
 msgstr "バッチャー"
 
-#: ../../batcher/src/actions.py:427
-msgid "Built-in"
-msgstr "内蔵"
+#: ../../batcher/pygimplib/gui/file_chooser.py:109
+msgid "Clear"
+msgstr "クリア"
 
-#: ../../batcher/src/actions.py:428
-msgid "GIMP PDB procedure"
-msgstr "GIMP PDB処理"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:119
+msgid "Align and offset"
+msgstr "整列とオフセット"
 
-#: ../../batcher/src/actions.py:429
-msgid "GEGL operation"
-msgstr "GEGL操作"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:121
+#
+msgid ""
+"Aligns layer(s) with the image or another layer.\n"
+"\n"
+"You may specify additional offsets after the alignment is applied."
+msgstr ""
+"レイヤーを画像または別のレイヤーに整列させます。\n"
+"\n"
+"整列後に追加のオフセットを指定できます。"
 
-#: ../../batcher/src/actions.py:476
-msgid "_More options"
-msgstr "その他のオプション"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:131
+msgid "Layers to align"
+msgstr "整列させるレイヤー"
 
-#: ../../batcher/src/actions.py:486
-msgid "Enable for previews"
-msgstr "プレビュー用に有効化"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:137
+#: ../../batcher/src/update.py:1650
+msgid "Object to align layers with"
+msgstr "レイヤーを整列させるオブジェクト"
 
-#: ../../batcher/src/actions.py:549
-msgid "Also apply to parent folders"
-msgstr "親フォルダーにも適用"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:144
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:156
+msgid "Keep"
+msgstr "保持"
 
-#: ../../batcher/src/background_foreground.py:177
-msgid "There are no background layers."
-msgstr "背景レイヤーがありません。"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:145
+#: ../../batcher/src/builtin_actions/_crop.py:514
+#: ../../batcher/src/builtin_actions/_crop.py:543
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:656
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:684
+#: ../../batcher/src/update.py:1860 ../../batcher/src/update.py:1900
+msgid "Left"
+msgstr "左"
 
-#: ../../batcher/src/background_foreground.py:186
-msgid "There are no foreground layers."
-msgstr "前景レイヤーがありません。"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:146
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:158
+#: ../../batcher/src/builtin_actions/_crop.py:544
+#: ../../batcher/src/builtin_actions/_crop.py:607
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:685
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:748
+#: ../../batcher/src/builtin_actions/_scale.py:458
+#: ../../batcher/src/update.py:1597 ../../batcher/src/update.py:1901
+#: ../../batcher/src/update.py:1991
+msgid "Center"
+msgstr "中央"
 
-#: ../../batcher/src/builtin_constraints.py:146
-#: ../../batcher/src/builtin_procedures.py:1230
-#: ../../batcher/src/update.py:1188
-msgid "Layers"
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:147
+#: ../../batcher/src/builtin_actions/_crop.py:533
+#: ../../batcher/src/builtin_actions/_crop.py:545
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:674
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:686
+#: ../../batcher/src/update.py:1889 ../../batcher/src/update.py:1902
+msgid "Right"
+msgstr "右"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:149
+msgid "Horizontal alignment"
+msgstr "水平整列"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:157
+#: ../../batcher/src/builtin_actions/_crop.py:476
+#: ../../batcher/src/builtin_actions/_crop.py:541
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:620
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:682
+#: ../../batcher/src/update.py:1802 ../../batcher/src/update.py:1898
+msgid "Top"
+msgstr "上"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:159
+#: ../../batcher/src/builtin_actions/_crop.py:495
+#: ../../batcher/src/builtin_actions/_crop.py:547
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:638
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:688
+#: ../../batcher/src/update.py:1831 ../../batcher/src/update.py:1904
+msgid "Bottom"
+msgstr "下"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:161
+msgid "Vertical alignment"
+msgstr "垂直整列"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:180
+msgid "Additional X-offset"
+msgstr "追加のXオフセット"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:199
+msgid "Additional Y-offset"
+msgstr "追加のYオフセット"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:336
+msgid "Color correction"
+msgstr "色補正"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:343
+#: ../../batcher/src/builtin_actions/_misc.py:71
+msgid "Layer"
 msgstr "レイヤー"
 
-#: ../../batcher/src/builtin_constraints.py:153
-msgid "Group layers"
-msgstr "レイヤーをグループ化"
+#: ../../batcher/src/builtin_actions/_color_correction.py:349
+msgid "Brightness"
+msgstr "明るさ"
 
-#: ../../batcher/src/builtin_constraints.py:160
-msgid "Imported"
-msgstr "インポート済み"
+#: ../../batcher/src/builtin_actions/_color_correction.py:360
+#
+msgid "Contrast"
+msgstr "コントラスト"
 
-#: ../../batcher/src/builtin_constraints.py:167
-msgid "Not imported"
-msgstr "未インポート"
+#: ../../batcher/src/builtin_actions/_color_correction.py:372
+msgid "Levels (preset file)"
+msgstr "レベル（プリセットファイル）"
 
-#. FOR TRANSLATORS: Think of "Only items that are not background" when translating this
-#: ../../batcher/src/builtin_constraints.py:175
-msgid "Not background"
-msgstr "背景ではない"
+#: ../../batcher/src/builtin_actions/_color_correction.py:380
+msgid "Curves (preset file)"
+msgstr "カーブ（プリセットファイル）"
 
-#. FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
-#: ../../batcher/src/builtin_constraints.py:200
-msgid "Not foreground"
-msgstr "前景ではない"
+#: ../../batcher/src/builtin_actions/_crop.py:411
+msgid "Crop"
+msgstr "切り抜き"
 
-#. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
-#: ../../batcher/src/builtin_constraints.py:225
-msgid "Matching file extension"
-msgstr "一致するファイル拡張子"
+#: ../../batcher/src/builtin_actions/_crop.py:419
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:552
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:271
+#: ../../batcher/src/builtin_actions/_scale.py:357
+#: ../../batcher/src/update.py:1465 ../../batcher/src/update.py:1709
+msgid "Apply to (image or layer):"
+msgstr "適用先（画像またはレイヤー）:"
 
-#. FOR TRANSLATORS: Think of "Only items matching text" when translating this
-#: ../../batcher/src/builtin_constraints.py:233
-msgid "Matching text..."
-msgstr "一致するテキスト..."
+#: ../../batcher/src/builtin_actions/_crop.py:426
+msgid "Crop from edges"
+msgstr "端から切り抜く"
 
-#: ../../batcher/src/builtin_constraints.py:242
-msgid "Starts with text"
-msgstr "テキストで始まる"
+#: ../../batcher/src/builtin_actions/_crop.py:427
+msgid "Crop from position"
+msgstr "位置から切り抜く"
 
-#: ../../batcher/src/builtin_constraints.py:243
-msgid "Contains text"
-msgstr "テキストを含む"
+#: ../../batcher/src/builtin_actions/_crop.py:428
+#
+msgid "Crop to aspect ratio"
+msgstr "アスペクト比に切り抜く"
 
-#: ../../batcher/src/builtin_constraints.py:244
-msgid "Ends with text"
-msgstr "テキストで終わる"
+#: ../../batcher/src/builtin_actions/_crop.py:429
+msgid "Crop to area"
+msgstr "領域に切り抜く"
 
-#: ../../batcher/src/builtin_constraints.py:245
-msgid "Matches regular expression"
-msgstr "正規表現に一致"
+#: ../../batcher/src/builtin_actions/_crop.py:430
+msgid "Remove empty borders"
+msgstr "空の境界を削除"
 
-#: ../../batcher/src/builtin_constraints.py:247
-msgid "How to perform matching"
-msgstr "一致の方法"
+#: ../../batcher/src/builtin_actions/_crop.py:432
+msgid "How to crop"
+msgstr "切り抜き方法"
 
-#: ../../batcher/src/builtin_constraints.py:253
-msgid "Text to match"
-msgstr "一致させるテキスト"
+#: ../../batcher/src/builtin_actions/_crop.py:438
+msgid "Crop by the same amount from each side"
+msgstr "各辺から同じ量を切り抜く"
 
-#: ../../batcher/src/builtin_constraints.py:259
-msgid "Ignore case sensitivity"
-msgstr "大文字小文字を無視"
+#: ../../batcher/src/builtin_actions/_crop.py:457
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:602
+#: ../../batcher/src/update.py:1773
+msgid "Amount"
+msgstr "量"
 
-#. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
-#: ../../batcher/src/builtin_constraints.py:268
-msgid "Recognized file format"
-msgstr "認識されたファイル形式"
+#: ../../batcher/src/builtin_actions/_crop.py:540
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:681
+#: ../../batcher/src/update.py:1897
+msgid "Top left"
+msgstr "左上"
 
-#: ../../batcher/src/builtin_constraints.py:275
-msgid "Saved or exported"
-msgstr "保存またはエクスポート済み"
+#: ../../batcher/src/builtin_actions/_crop.py:542
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:683
+#: ../../batcher/src/update.py:1899
+msgid "Top right"
+msgstr "右上"
 
-#: ../../batcher/src/builtin_constraints.py:282
-msgid "Not saved or exported"
-msgstr "未保存または未エクスポート"
+#: ../../batcher/src/builtin_actions/_crop.py:546
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:687
+#: ../../batcher/src/update.py:1903
+#
+msgid "Bottom left"
+msgstr "左下"
 
-#. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
-#: ../../batcher/src/builtin_constraints.py:290
-msgid "Selected in GIMP"
-msgstr "GIMPで選択"
+#: ../../batcher/src/builtin_actions/_crop.py:548
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:689
+#: ../../batcher/src/update.py:1905
+#
+msgid "Bottom right"
+msgstr "右下"
 
-#. FOR TRANSLATORS: Think of "Only top-level items" when translating this
-#: ../../batcher/src/builtin_constraints.py:298
-msgid "Top-level"
-msgstr "トップレベル"
+#: ../../batcher/src/builtin_actions/_crop.py:550
+#: ../../batcher/src/builtin_actions/_crop.py:611
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:691
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:752
+#: ../../batcher/src/builtin_actions/_scale.py:462
+#: ../../batcher/src/update.py:1601 ../../batcher/src/update.py:1907
+#: ../../batcher/src/update.py:1995
+#
+msgid "Position"
+msgstr "位置"
 
-#. FOR TRANSLATORS: Think of "Only visible items" when translating this
-#: ../../batcher/src/builtin_constraints.py:306
-msgid "Visible"
-msgstr "表示"
+#: ../../batcher/src/builtin_actions/_crop.py:569
+#: ../../batcher/src/builtin_actions/_crop.py:687
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:710
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:825
+#: ../../batcher/src/placeholders.py:207 ../../batcher/src/update.py:1937
+#: ../../batcher/src/update.py:2112
+msgid "Width"
+msgstr "幅"
 
-#. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
-#: ../../batcher/src/builtin_constraints.py:314
-msgid "With color tags"
-msgstr "カラータグ付き"
+#: ../../batcher/src/builtin_actions/_crop.py:588
+#: ../../batcher/src/builtin_actions/_crop.py:706
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:729
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:844
+#: ../../batcher/src/placeholders.py:208 ../../batcher/src/update.py:1967
+#: ../../batcher/src/update.py:2142
+msgid "Height"
+msgstr "高さ"
 
-#: ../../batcher/src/builtin_constraints.py:320
-#: ../../batcher/src/builtin_constraints.py:340
-msgid "Color tags"
-msgstr "カラータグ"
+#: ../../batcher/src/builtin_actions/_crop.py:599
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:740
+#: ../../batcher/src/update.py:1982
+msgid "Aspect ratio (width:height)"
+msgstr "アスペクト比（幅:高さ）"
 
-#. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
-#: ../../batcher/src/builtin_constraints.py:334
-msgid "Without color tags"
-msgstr "カラータグなし"
+#: ../../batcher/src/builtin_actions/_crop.py:606
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:747
+#: ../../batcher/src/builtin_actions/_scale.py:457
+#: ../../batcher/src/update.py:1596 ../../batcher/src/update.py:1990
+msgid "Start"
+msgstr "開始"
 
-#. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
-#: ../../batcher/src/builtin_constraints.py:354
-msgid "With unsaved changes"
-msgstr "未保存の変更あり"
+#: ../../batcher/src/builtin_actions/_crop.py:608
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:749
+#: ../../batcher/src/builtin_actions/_scale.py:459
+#: ../../batcher/src/update.py:1598 ../../batcher/src/update.py:1992
+msgid "End"
+msgstr "終了"
 
-#. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
-#: ../../batcher/src/builtin_constraints.py:362
-msgid "With no unsaved changes"
-msgstr "未保存の変更なし"
+#: ../../batcher/src/builtin_actions/_crop.py:609
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:750
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:282
+#: ../../batcher/src/builtin_actions/_scale.py:460
+#: ../../batcher/src/update.py:1599 ../../batcher/src/update.py:1993
+msgid "Custom"
+msgstr "カスタム"
 
-#: ../../batcher/src/builtin_procedures.py:493 ../../batcher/src/renamer.py:783
-#: ../../batcher/src/renamer.py:800 ../../batcher/src/update.py:563
+#: ../../batcher/src/builtin_actions/_crop.py:630
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:770
+#: ../../batcher/src/builtin_actions/_scale.py:481
+#: ../../batcher/src/update.py:1629 ../../batcher/src/update.py:2024
+msgid "Custom start position"
+msgstr "カスタム開始位置"
+
+#: ../../batcher/src/builtin_actions/_crop.py:649
+msgid "Start X"
+msgstr "開始X"
+
+#: ../../batcher/src/builtin_actions/_crop.py:668
+msgid "Start Y"
+msgstr "開始Y"
+
+#: ../../batcher/src/builtin_actions/_export.py:44
+#: ../../batcher/src/renamer.py:780 ../../batcher/src/renamer.py:797
 msgid "Replace"
 msgstr "置換"
 
-#: ../../batcher/src/builtin_procedures.py:494 ../../batcher/src/update.py:564
+#: ../../batcher/src/builtin_actions/_export.py:45
 msgid "Skip"
 msgstr "スキップ"
 
-#: ../../batcher/src/builtin_procedures.py:495 ../../batcher/src/update.py:565
+#: ../../batcher/src/builtin_actions/_export.py:46
 msgid "Rename new file"
 msgstr "新しいファイルをリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:496 ../../batcher/src/update.py:566
+#: ../../batcher/src/builtin_actions/_export.py:47
 msgid "Rename existing file"
 msgstr "既存のファイルをリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:503 ../../batcher/src/update.py:562
+#: ../../batcher/src/builtin_actions/_export.py:406
+msgid "Saving \"{}\""
+msgstr "\"{}\"を保存中"
+
+#: ../../batcher/src/builtin_actions/_export.py:798
 msgid "Ask"
 msgstr "確認"
 
-#: ../../batcher/src/builtin_procedures.py:511
+#: ../../batcher/src/builtin_actions/_export.py:805
 msgid "Also export as..."
 msgstr "別の形式でもエクスポート..."
 
-#: ../../batcher/src/builtin_procedures.py:512
+#: ../../batcher/src/builtin_actions/_export.py:806
 msgid "Exports an image to another file format."
 msgstr "画像を別のファイル形式にエクスポートします。"
 
-#: ../../batcher/src/builtin_procedures.py:521
-#: ../../batcher/src/plugin_settings.py:78
-#: ../../batcher/src/plugin_settings.py:225
-#: ../../batcher/src/plugin_settings.py:364 ../../batcher/src/renamer.py:707
+#: ../../batcher/src/builtin_actions/_export.py:815
+#: ../../batcher/src/builtin_actions/_save.py:122
+#: ../../batcher/src/plugin_settings.py:77
+#: ../../batcher/src/plugin_settings.py:227
+#: ../../batcher/src/plugin_settings.py:474 ../../batcher/src/renamer.py:706
 msgid "Output folder"
 msgstr "出力フォルダー"
 
-#: ../../batcher/src/builtin_procedures.py:527
-#: ../../batcher/src/plugin_settings.py:68
-#: ../../batcher/src/plugin_settings.py:215
-#: ../../batcher/src/plugin_settings.py:354
+#: ../../batcher/src/builtin_actions/_export.py:825
+#: ../../batcher/src/plugin_settings.py:67
+#: ../../batcher/src/plugin_settings.py:217
+#: ../../batcher/src/plugin_settings.py:464
 msgid "File extension"
 msgstr "ファイル拡張子"
 
-#: ../../batcher/src/builtin_procedures.py:537 ../../batcher/src/update.py:593
+#: ../../batcher/src/builtin_actions/_export.py:835
 msgid "Interactively"
 msgstr "対話的に"
 
-#: ../../batcher/src/builtin_procedures.py:538 ../../batcher/src/update.py:594
+#: ../../batcher/src/builtin_actions/_export.py:836
 msgid "Use options below"
 msgstr "以下のオプションを使用"
 
-#: ../../batcher/src/builtin_procedures.py:540 ../../batcher/src/update.py:595
+#: ../../batcher/src/builtin_actions/_export.py:838
 msgid "How to adjust file format options:"
 msgstr "ファイル形式オプションの調整方法:"
 
-#: ../../batcher/src/builtin_procedures.py:542 ../../batcher/src/update.py:597
-msgid "Native dialogs usually allow you to adjust more options such as image metadata, while adjusting options in place is more convenient as no extra dialog is displayed before the export."
-msgstr "ネイティブダイアログでは通常、画像メタデータなどのオプションを調整できますが、エクスポート前に追加のダイアログが表示されないため、インプレースでオプションを調整する方が便利です。"
+#: ../../batcher/src/builtin_actions/_export.py:840
+msgid ""
+"Native dialogs usually allow you to adjust more options such as image "
+"metadata, while adjusting options in place is more convenient as no extra "
+"dialog is displayed before the export."
+msgstr ""
+"ネイティブダイアログでは通常、画像メタデータなどのオプションを調整できます"
+"が、エクスポート前に追加のダイアログが表示されないため、インプレースでオプ"
+"ションを調整する方が便利です。"
 
-#: ../../batcher/src/builtin_procedures.py:553 ../../batcher/src/update.py:582
+#: ../../batcher/src/builtin_actions/_export.py:851
 msgid "File format options"
 msgstr "ファイル形式オプション"
 
-#: ../../batcher/src/builtin_procedures.py:560 ../../batcher/src/update.py:567
+#: ../../batcher/src/builtin_actions/_export.py:858
 msgid "If a file already exists:"
 msgstr "ファイルが既に存在する場合:"
 
-#: ../../batcher/src/builtin_procedures.py:567
+#: ../../batcher/src/builtin_actions/_export.py:865
 msgid "For each image"
 msgstr "各画像に対して"
 
-#: ../../batcher/src/builtin_procedures.py:569
+#: ../../batcher/src/builtin_actions/_export.py:867
 msgid "For each top-level image or folder"
 msgstr "各トップレベルの画像またはフォルダーに対して"
 
-#: ../../batcher/src/builtin_procedures.py:570
-#: ../../batcher/src/builtin_procedures.py:628
-#: ../../batcher/src/builtin_procedures.py:647
+#: ../../batcher/src/builtin_actions/_export.py:868
+#: ../../batcher/src/builtin_actions/_export.py:927
+#: ../../batcher/src/builtin_actions/_export.py:945
 msgid "As a single image"
 msgstr "単一の画像として"
 
-#: ../../batcher/src/builtin_procedures.py:572
+#: ../../batcher/src/builtin_actions/_export.py:870
 msgid "Perform export:"
 msgstr "エクスポートを実行:"
 
-#: ../../batcher/src/builtin_procedures.py:577
+#: ../../batcher/src/builtin_actions/_export.py:875
 #: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:292
 msgid "Untitled"
 msgstr "無題"
 
-#: ../../batcher/src/builtin_procedures.py:578
-#: ../../batcher/src/builtin_procedures.py:1114
-#: ../../batcher/src/builtin_procedures.py:1144
-#: ../../batcher/src/plugin_settings.py:84
-#: ../../batcher/src/plugin_settings.py:231
+#: ../../batcher/src/builtin_actions/_export.py:876
+#: ../../batcher/src/builtin_actions/_rename.py:96
+#: ../../batcher/src/builtin_actions/_rename.py:125
+#: ../../batcher/src/builtin_actions/_rename.py:142
+#: ../../batcher/src/plugin_settings.py:87
+#: ../../batcher/src/plugin_settings.py:237
 msgid "Image filename pattern"
 msgstr "画像ファイル名パターン"
 
-#: ../../batcher/src/builtin_procedures.py:585
+#: ../../batcher/src/builtin_actions/_export.py:883
 msgid "Use original file extension"
 msgstr "元のファイル拡張子を使用"
 
-#: ../../batcher/src/builtin_procedures.py:592
+#: ../../batcher/src/builtin_actions/_export.py:889
 msgid "Convert file extension to lowercase"
 msgstr "ファイル拡張子を小文字に変換"
 
-#: ../../batcher/src/builtin_procedures.py:599
+#: ../../batcher/src/builtin_actions/_export.py:895
 msgid "Use original modification date"
 msgstr "元の変更日を使用"
 
-#: ../../batcher/src/builtin_procedures.py:622
-msgid "Exports a layer to another file format."
-msgstr "レイヤーを別のファイル形式にエクスポートします。"
-
-#: ../../batcher/src/builtin_procedures.py:626
-#: ../../batcher/src/builtin_procedures.py:645
-msgid "For each layer"
-msgstr "各レイヤーに対して"
-
-#: ../../batcher/src/builtin_procedures.py:627
-#: ../../batcher/src/builtin_procedures.py:646
-msgid "For each top-level layer or group"
-msgstr "各トップレベルのレイヤーまたはグループに対して"
-
-#: ../../batcher/src/builtin_procedures.py:632
-#: ../../batcher/src/builtin_procedures.py:651
-msgid "Use file extension in layer name"
-msgstr "レイヤー名にファイル拡張子を使用"
-
-#: ../../batcher/src/builtin_procedures.py:640
+#: ../../batcher/src/builtin_actions/_export.py:912
+#: ../../batcher/src/builtin_actions/_export.py:937
 msgid "Export"
 msgstr "エクスポート"
 
-#: ../../batcher/src/builtin_procedures.py:641
+#: ../../batcher/src/builtin_actions/_export.py:913
+#
+msgid "Exports an image to the specified file format."
+msgstr "画像を指定されたファイル形式にエクスポートします。"
+
+#: ../../batcher/src/builtin_actions/_export.py:920
+msgid "Exports a layer to another file format."
+msgstr "レイヤーを別のファイル形式にエクスポートします。"
+
+#: ../../batcher/src/builtin_actions/_export.py:924
+#: ../../batcher/src/builtin_actions/_export.py:942
+msgid "For each layer"
+msgstr "各レイヤーに対して"
+
+#: ../../batcher/src/builtin_actions/_export.py:926
+#: ../../batcher/src/builtin_actions/_export.py:944
+msgid "For each top-level layer or group"
+msgstr "各トップレベルのレイヤーまたはグループに対して"
+
+#: ../../batcher/src/builtin_actions/_export.py:931
+#: ../../batcher/src/builtin_actions/_export.py:949
+msgid "Use file extension in layer name"
+msgstr "レイヤー名にファイル拡張子を使用"
+
+#: ../../batcher/src/builtin_actions/_export.py:938
 msgid "Exports a layer to the specified file format."
 msgstr "レイヤーを指定されたファイル形式にエクスポートします。"
 
-#: ../../batcher/src/builtin_procedures.py:658
-msgid "Scale"
-msgstr "スケール"
-
-#: ../../batcher/src/builtin_procedures.py:665
-#: ../../batcher/src/builtin_procedures.py:677
-#: ../../batcher/src/builtin_procedures.py:801
-#: ../../batcher/src/builtin_procedures.py:888
-#: ../../batcher/src/builtin_procedures.py:949 ../../batcher/src/update.py:1154
-msgid "Image"
-msgstr "画像"
-
-#: ../../batcher/src/builtin_procedures.py:670
-#: ../../batcher/src/builtin_procedures.py:678
-#: ../../batcher/src/builtin_procedures.py:1058
-#: ../../batcher/src/update.py:1155
-msgid "Layer"
-msgstr "レイヤー"
-
-#: ../../batcher/src/builtin_procedures.py:680 ../../batcher/src/update.py:1157
-msgid "Object to scale"
-msgstr "スケールするオブジェクト"
-
-#: ../../batcher/src/builtin_procedures.py:686
-msgid "New width"
-msgstr "新しい幅"
-
-#: ../../batcher/src/builtin_procedures.py:693
-#: ../../batcher/src/builtin_procedures.py:712
-#: ../../batcher/src/builtin_procedures.py:846
-#: ../../batcher/src/builtin_procedures.py:865 ../../batcher/src/update.py:1161
-#: ../../batcher/src/update.py:1169
-#, python-format
-msgid "% of image width"
-msgstr "画像幅の%"
-
-#: ../../batcher/src/builtin_procedures.py:694
-#: ../../batcher/src/builtin_procedures.py:713
-#: ../../batcher/src/builtin_procedures.py:847
-#: ../../batcher/src/builtin_procedures.py:866 ../../batcher/src/update.py:1162
-#: ../../batcher/src/update.py:1170
-#, python-format
-msgid "% of image height"
-msgstr "画像高さの%"
-
-#: ../../batcher/src/builtin_procedures.py:695
-#: ../../batcher/src/builtin_procedures.py:714 ../../batcher/src/update.py:1163
-#: ../../batcher/src/update.py:1171
-#, python-format
-msgid "% of layer width"
-msgstr "レイヤー幅の%"
-
-#: ../../batcher/src/builtin_procedures.py:696
-#: ../../batcher/src/builtin_procedures.py:715 ../../batcher/src/update.py:1164
-#: ../../batcher/src/update.py:1172
-#, python-format
-msgid "% of layer height"
-msgstr "レイヤー高さの%"
-
-#: ../../batcher/src/builtin_procedures.py:697
-#: ../../batcher/src/builtin_procedures.py:716
-#: ../../batcher/src/builtin_procedures.py:850
-#: ../../batcher/src/builtin_procedures.py:869 ../../batcher/src/update.py:1165
-#: ../../batcher/src/update.py:1173
-msgid "Pixels"
-msgstr "ピクセル"
-
-#: ../../batcher/src/builtin_procedures.py:699
-msgid "Unit for width"
-msgstr "幅の単位"
-
-#: ../../batcher/src/builtin_procedures.py:705
-msgid "New height"
-msgstr "新しい高さ"
-
-#: ../../batcher/src/builtin_procedures.py:718
-msgid "Unit for height"
-msgstr "高さの単位"
-
-#: ../../batcher/src/builtin_procedures.py:724
-msgid "Interpolation"
-msgstr "補間"
-
-#: ../../batcher/src/builtin_procedures.py:730
-msgid "Use local origin"
-msgstr "ローカル原点を使用"
-
-#: ../../batcher/src/builtin_procedures.py:737 ../../batcher/src/update.py:912
-msgid "Scale to fit"
-msgstr "フィットするようにスケール"
-
-#: ../../batcher/src/builtin_procedures.py:744 ../../batcher/src/update.py:920
-msgid "Keep aspect ratio"
-msgstr "アスペクト比を保持"
-
-#: ../../batcher/src/builtin_procedures.py:752 ../../batcher/src/update.py:929
-msgid "Width"
-msgstr "幅"
-
-#: ../../batcher/src/builtin_procedures.py:753 ../../batcher/src/update.py:930
-msgid "Height"
-msgstr "高さ"
-
-#: ../../batcher/src/builtin_procedures.py:755 ../../batcher/src/update.py:932
-msgid "Dimension to keep"
-msgstr "保持する寸法"
-
-#: ../../batcher/src/builtin_procedures.py:775
-msgid "Apply opacity from group layers"
-msgstr "グループレイヤーから不透明度を適用"
-
-#: ../../batcher/src/builtin_procedures.py:776
-msgid "Combines opacity from all parent group layers and the current layer."
-msgstr "すべての親グループレイヤーと現在のレイヤーの不透明度を組み合わせます。"
-
-#: ../../batcher/src/builtin_procedures.py:782
-msgid "Align and offset"
-msgstr "整列とオフセット"
-
-#: ../../batcher/src/builtin_procedures.py:784
-msgid ""
-"Aligns layer(s) with the image or, if specified, another layer.\n"
-"\n"
-"You may specify additional offsets after the alignment is applied."
-msgstr "レイヤーを画像または指定された場合は別のレイヤーに整列させます。\n\n整列が適用された後に追加のオフセットを指定できます。"
-
-#: ../../batcher/src/builtin_procedures.py:794
-msgid "Layers to align"
-msgstr "整列させるレイヤー"
-
-#: ../../batcher/src/builtin_procedures.py:802
-msgid "Another layer"
-msgstr "別のレイヤー"
-
-#: ../../batcher/src/builtin_procedures.py:804
-msgid "Object to align layers with"
-msgstr "レイヤーを整列させるオブジェクト"
-
-#: ../../batcher/src/builtin_procedures.py:809
-msgid "Another layer to align layers with"
-msgstr "レイヤーを整列させる別のレイヤー"
-
-#: ../../batcher/src/builtin_procedures.py:816
-#: ../../batcher/src/builtin_procedures.py:828
-msgid "Keep"
-msgstr "保持"
-
-#: ../../batcher/src/builtin_procedures.py:817
-msgid "Left"
-msgstr "左"
-
-#: ../../batcher/src/builtin_procedures.py:818
-#: ../../batcher/src/builtin_procedures.py:830
-msgid "Center"
-msgstr "中央"
-
-#: ../../batcher/src/builtin_procedures.py:819
-msgid "Right"
-msgstr "右"
-
-#: ../../batcher/src/builtin_procedures.py:821
-msgid "Horizontal alignment"
-msgstr "水平整列"
-
-#: ../../batcher/src/builtin_procedures.py:829
-msgid "Top"
-msgstr "上"
-
-#: ../../batcher/src/builtin_procedures.py:831
-msgid "Bottom"
-msgstr "下"
-
-#: ../../batcher/src/builtin_procedures.py:833
-msgid "Vertical alignment"
-msgstr "垂直整列"
-
-#: ../../batcher/src/builtin_procedures.py:839
-msgid "Additional X-offset"
-msgstr "追加のXオフセット"
-
-#: ../../batcher/src/builtin_procedures.py:848
-#: ../../batcher/src/builtin_procedures.py:867
-#, python-format
-msgid "% of another layer width"
-msgstr "別のレイヤー幅の%"
-
-#: ../../batcher/src/builtin_procedures.py:849
-#: ../../batcher/src/builtin_procedures.py:868
-#, python-format
-msgid "% of another layer height"
-msgstr "別のレイヤー高さの%"
-
-#: ../../batcher/src/builtin_procedures.py:852
-msgid "Unit for the additional X-offset"
-msgstr "追加のXオフセットの単位"
-
-#: ../../batcher/src/builtin_procedures.py:858
-msgid "Additional Y-offset"
-msgstr "追加のYオフセット"
-
-#: ../../batcher/src/builtin_procedures.py:871
-msgid "Unit for the additional Y-offset"
-msgstr "追加のYオフセットの単位"
-
-#: ../../batcher/src/builtin_procedures.py:878
-#: ../../batcher/src/builtin_procedures.py:902
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
 msgid "Insert background"
 msgstr "背景を挿入"
 
-#: ../../batcher/src/builtin_procedures.py:879
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
 msgid "Inserts the specified image behind the current layer."
 msgstr "指定された画像を現在のレイヤーの後ろに挿入します。"
 
-#: ../../batcher/src/builtin_procedures.py:903
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:858
+#: ../../batcher/src/update.py:2152
+msgid "Image"
+msgstr "画像"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
 msgid "Inserts layers having the specified color tag behind the current layer."
 msgstr "指定されたカラータグを持つレイヤーを現在のレイヤーの後ろに挿入します。"
 
-#: ../../batcher/src/builtin_procedures.py:912
-#: ../../batcher/src/builtin_procedures.py:974
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
 msgid "Color tag"
 msgstr "カラータグ"
 
-#: ../../batcher/src/builtin_procedures.py:939
-#: ../../batcher/src/builtin_procedures.py:963
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
 msgid "Insert foreground"
 msgstr "前景を挿入"
 
-#: ../../batcher/src/builtin_procedures.py:940
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
 msgid "Inserts the specified image in front of the current layer."
 msgstr "指定された画像を現在のレイヤーの前に挿入します。"
 
-#: ../../batcher/src/builtin_procedures.py:965
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
 msgid ""
 "Inserts layers having the specified color tag in front of the current layer."
 msgstr "指定されたカラータグを持つレイヤーを現在のレイヤーの前に挿入します。"
 
-#: ../../batcher/src/builtin_procedures.py:1005
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
 msgid "Merge background"
 msgstr "背景を統合"
 
-#: ../../batcher/src/builtin_procedures.py:1015
-#: ../../batcher/src/builtin_procedures.py:1038
-#: ../../batcher/src/builtin_procedures.py:1078
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_misc.py:92
 msgid "Merge type"
 msgstr "統合タイプ"
 
-#: ../../batcher/src/builtin_procedures.py:1028
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
 msgid "Merge foreground"
 msgstr "前景を統合"
 
-#: ../../batcher/src/builtin_procedures.py:1051
+#: ../../batcher/src/builtin_actions/_misc.py:55
+msgid "Apply opacity from group layers"
+msgstr "グループレイヤーから不透明度を適用"
+
+#: ../../batcher/src/builtin_actions/_misc.py:57
+msgid "Combines opacity from all parent group layers and the current layer."
+msgstr "すべての親グループレイヤーと現在のレイヤーの不透明度を組み合わせます。"
+
+#: ../../batcher/src/builtin_actions/_misc.py:64
 msgid "Merge filters"
 msgstr "フィルターを統合"
 
-#: ../../batcher/src/builtin_procedures.py:1052
+#: ../../batcher/src/builtin_actions/_misc.py:65
 msgid "Merges all visible filters (layer effects) in the specified layer."
-msgstr "指定されたレイヤー内のすべての可視フィルター（レイヤー効果）を統合します。"
+msgstr ""
+"指定されたレイヤー内のすべての可視フィルター（レイヤー効果）を統合します。"
 
-#: ../../batcher/src/builtin_procedures.py:1065
+#: ../../batcher/src/builtin_actions/_misc.py:79
 msgid "Merge visible layers"
 msgstr "可視レイヤーを統合"
 
-#: ../../batcher/src/builtin_procedures.py:1067
+#: ../../batcher/src/builtin_actions/_misc.py:81
+#
 msgid ""
 "Merges all visible layers within the image into a single layer. Invisible "
 "layers are removed.\n"
 "\n"
 "This is useful if the image contains multiple layers and you want to apply "
-"filters (layer effects) or other procedures on the entire image."
-msgstr "画像内のすべての可視レイヤーを単一のレイヤーに統合します。不可視レイヤーは削除されます。\n\nこれは、画像に複数のレイヤーが含まれており、フィルター（レイヤー効果）やその他の処理を画像全体に適用したい場合に便利です。"
+"filters (layer effects) or other actions on the entire image."
+msgstr ""
+"画像内のすべての可視レイヤーを1つのレイヤーに統合します。不可視レイヤーは削除されます。\n"
+"\n"
+"画像に複数のレイヤーがある場合、フィルター（レイヤー効果）やその他の処理を画像全体に適用したいときに便利です。"
 
-#: ../../batcher/src/builtin_procedures.py:1085
-#: ../../batcher/src/builtin_procedures.py:1091
+#: ../../batcher/src/builtin_actions/_misc.py:100
+#
+msgid "Remove file extension from imported images"
+msgstr "インポートした画像からファイル拡張子を削除"
+
+#: ../../batcher/src/builtin_actions/_misc.py:101
+msgid "Imported images represent non-native GIMP files (i.e. not XCF)."
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:47
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:54
 msgid "Remove folder structure"
 msgstr "フォルダー構造を削除"
 
-#: ../../batcher/src/builtin_procedures.py:1098
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:61
 msgid "Consider visibility of parent folders"
 msgstr "親フォルダーの可視性を考慮"
 
-#: ../../batcher/src/builtin_procedures.py:1106
-#: ../../batcher/src/builtin_procedures.py:1136
-#: ../../batcher/src/builtin_procedures.py:1159
-#: ../../batcher/src/builtin_procedures.py:1189
+#: ../../batcher/src/builtin_actions/_rename.py:88
+#: ../../batcher/src/builtin_actions/_rename.py:117
+#: ../../batcher/src/builtin_actions/_rename.py:134
+#: ../../batcher/src/builtin_actions/_rename.py:157
+#: ../../batcher/src/builtin_actions/_rename.py:186
 msgid "Rename"
 msgstr "リネーム"
 
-#: ../../batcher/src/builtin_procedures.py:1121
-#: ../../batcher/src/builtin_procedures.py:1151
+#: ../../batcher/src/builtin_actions/_rename.py:103
 msgid "Rename images"
 msgstr "画像をリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:1128
-#: ../../batcher/src/builtin_procedures.py:1181
+#: ../../batcher/src/builtin_actions/_rename.py:109
+#: ../../batcher/src/builtin_actions/_rename.py:178
 msgid "Rename folders"
 msgstr "フォルダーをリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:1167
-#: ../../batcher/src/plugin_settings.py:370
+#: ../../batcher/src/builtin_actions/_rename.py:149
+#
+msgid "Rename only new images"
+msgstr "新しい画像のみリネーム"
+
+#: ../../batcher/src/builtin_actions/_rename.py:165
+#: ../../batcher/src/plugin_settings.py:484
 msgid "Layer filename pattern"
 msgstr "レイヤーファイル名パターン"
 
-#: ../../batcher/src/builtin_procedures.py:1174
-#: ../../batcher/src/builtin_procedures.py:1204
+#: ../../batcher/src/builtin_actions/_rename.py:172
+#: ../../batcher/src/builtin_actions/_rename.py:201
 msgid "Rename layers"
 msgstr "レイヤーをリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:1197
+#: ../../batcher/src/builtin_actions/_rename.py:194
 msgid "Layer name pattern"
 msgstr "レイヤー名パターン"
 
-#: ../../batcher/src/builtin_procedures.py:1211
+#: ../../batcher/src/builtin_actions/_rename.py:207
 msgid "Rename group layers"
 msgstr "グループレイヤーをリネーム"
 
-#: ../../batcher/src/builtin_procedures.py:1221
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:543
+msgid "Resize canvas"
+msgstr "キャンバスをリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:544
+#
+msgid "Resizes the image or layer extents."
+msgstr "画像またはレイヤーの範囲をリサイズします。"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:559
+msgid "Resize from edges (add borders)"
+msgstr "端からリサイズ（境界線を追加）"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:560
+#: ../../batcher/src/update.py:1718
+#
+msgid "Resize from position"
+msgstr "位置からリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:561
+#: ../../batcher/src/update.py:1719
+#
+msgid "Resize to aspect ratio"
+msgstr "アスペクト比にリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:562
+#: ../../batcher/src/update.py:1720
+#
+msgid "Resize to area"
+msgstr "領域サイズにリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:563
+#: ../../batcher/src/update.py:1721
 msgid "Resize to layer size"
 msgstr "レイヤーサイズにリサイズ"
 
-#: ../../batcher/src/builtin_procedures.py:1222
-msgid "Resizes the image canvas to fit the specified layer(s)."
-msgstr "指定されたレイヤーに合わせて画像キャンバスをリサイズします。"
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:564
+#
+msgid "Resize to image size"
+msgstr "画像サイズにリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:566
+#: ../../batcher/src/update.py:1723
+msgid "How to resize"
+msgstr "リサイズ方法"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:572
+#: ../../batcher/src/update.py:1730
+msgid "Fill added space with color"
+msgstr "追加された領域を色で塗りつぶす"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:578
+#: ../../batcher/src/update.py:1737
+msgid "Color for added space"
+msgstr "追加領域の色"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:584
+#: ../../batcher/src/update.py:1744
+msgid "Resize by the same amount from each side"
+msgstr "各辺から同じ量でリサイズ"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:788
+#: ../../batcher/src/update.py:2053
+msgid "Offset X"
+msgstr "Xオフセット"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:806
+#: ../../batcher/src/update.py:2082
+msgid "Offset Y"
+msgstr "Yオフセット"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:851
+#: ../../batcher/src/builtin_conditions.py:166
+msgid "Layers"
+msgstr "レイヤー"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:73
+msgid "degrees"
+msgstr "度"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:74
+msgid "radians"
+msgstr "ラジアン"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:263
+msgid "Rotate and flip"
+msgstr "回転と反転"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:278
+#: ../../batcher/src/placeholders.py:159
+msgid "None"
+msgstr "なし"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:279
+msgid "90° (clockwise)"
+msgstr "90°（時計回り）"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:280
+msgid "180°"
+msgstr "180°"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:281
+msgid "270° (counter-clockwise)"
+msgstr "270°（反時計回り）"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:284
+msgid "Rotation angle"
+msgstr "回転角度"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:293
+msgid "Custom rotation angle"
+msgstr "カスタム回転角度"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:300
+msgid "How to handle boundaries"
+msgstr "境界の処理方法"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:307
+#: ../../batcher/src/builtin_actions/_scale.py:415
+msgid "Interpolation"
+msgstr "補間"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:313
+msgid "Rotate around the center"
+msgstr "中心を基準に回転"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:331
+msgid "Horizontal position of rotation center"
+msgstr "回転中心の水平位置"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:349
+msgid "Vertical position of rotation center"
+msgstr "回転中心の垂直位置"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:355
+msgid "Flip horizontally"
+msgstr "水平方向に反転"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:361
+msgid "Flip vertically"
+msgstr "垂直方向に反転"
+
+#: ../../batcher/src/builtin_actions/_save.py:110
+#: ../../batcher/src/gui/main/command_lists.py:677
+msgid "Save"
+msgstr "保存"
+
+#: ../../batcher/src/builtin_actions/_save.py:112
+msgid ""
+"Saves the image in the native GIMP format (XCF). If the image already "
+"exists, it is overwritten. To export the image in another file format, use "
+"the \"Export Images\" menu."
+msgstr ""
+"画像をGIMPのネイティブ形式（XCF）で保存します。画像が既に存在する場合は上書きされます。"
+"別のファイル形式で画像をエクスポートするには、「画像をエクスポート」メニューを使用してください。"
+
+#: ../../batcher/src/builtin_actions/_save.py:134
+msgid ""
+"Save existing XCF image to its original location (ignore \"Output folder\")"
+msgstr ""
+"既存のXCF画像を元の場所に保存（「出力フォルダー」を無視）"
+
+#: ../../batcher/src/builtin_actions/_scale.py:349
+msgid "Scale"
+msgstr "スケール"
+
+#: ../../batcher/src/builtin_actions/_scale.py:376
+msgid "New width"
+msgstr "新しい幅"
+
+#: ../../batcher/src/builtin_actions/_scale.py:395
+msgid "New height"
+msgstr "新しい高さ"
+
+#: ../../batcher/src/builtin_actions/_scale.py:402
+#: ../../batcher/src/update.py:1537
+msgid "None (Stretch)"
+msgstr "なし（伸縮）"
+
+#: ../../batcher/src/builtin_actions/_scale.py:403
+#: ../../batcher/src/update.py:1538
+msgid "Keep, adjust width"
+msgstr "幅を調整して保持"
+
+#: ../../batcher/src/builtin_actions/_scale.py:404
+#: ../../batcher/src/update.py:1539
+msgid "Keep, adjust height"
+msgstr "高さを調整して保持"
+
+#: ../../batcher/src/builtin_actions/_scale.py:405
+#: ../../batcher/src/update.py:1540
+msgid "Fit"
+msgstr "フィット"
+
+#: ../../batcher/src/builtin_actions/_scale.py:406
+#: ../../batcher/src/update.py:1541
+#
+msgid "Fit with padding"
+msgstr "パディング付きフィット"
+
+#: ../../batcher/src/builtin_actions/_scale.py:408
+#: ../../batcher/src/update.py:1543
+#
+msgid "Aspect ratio"
+msgstr "アスペクト比"
+
+#: ../../batcher/src/builtin_actions/_scale.py:421
+msgid "Use local origin"
+msgstr "ローカル原点を使用"
+
+#: ../../batcher/src/builtin_actions/_scale.py:427
+#: ../../batcher/src/update.py:1555
+msgid "Set image resolution in DPI"
+msgstr "画像の解像度をDPIで設定"
+
+#. FOR TRANSLATORS: "X" represents the X-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:441
+#: ../../batcher/src/update.py:1572
+msgid "X"
+msgstr "X"
+
+#. FOR TRANSLATORS: "Y" represents the Y-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:443
+#: ../../batcher/src/update.py:1573
+msgid "Y"
+msgstr "Y"
+
+#: ../../batcher/src/builtin_actions/_scale.py:450
+#: ../../batcher/src/update.py:1586
+msgid "Padding color"
+msgstr "パディングの色"
+
+#: ../../batcher/src/builtin_actions/_utils.py:246
+#
+msgid "The image has no layers."
+msgstr "画像にレイヤーがありません。"
+
+#: ../../batcher/src/builtin_conditions.py:173
+msgid "Group layers"
+msgstr "レイヤーをグループ化"
+
+#: ../../batcher/src/builtin_conditions.py:180
+msgid "Imported"
+msgstr "インポート済み"
+
+#: ../../batcher/src/builtin_conditions.py:187
+msgid "Not imported"
+msgstr "未インポート"
+
+#. FOR TRANSLATORS: Think of "Only items that are not background" when translating this
+#: ../../batcher/src/builtin_conditions.py:195
+msgid "Not background"
+msgstr "背景ではない"
+
+#. FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
+#: ../../batcher/src/builtin_conditions.py:220
+msgid "Not foreground"
+msgstr "前景ではない"
+
+#. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
+#: ../../batcher/src/builtin_conditions.py:245
+msgid "Matching file extension"
+msgstr "一致するファイル拡張子"
+
+#. FOR TRANSLATORS: Think of "Only items matching text" when translating this
+#: ../../batcher/src/builtin_conditions.py:253
+msgid "Matching text..."
+msgstr "一致するテキスト..."
+
+#: ../../batcher/src/builtin_conditions.py:262
+#: ../../batcher/src/update.py:2178
+msgid "Starts with text"
+msgstr "テキストで始まる"
+
+#: ../../batcher/src/builtin_conditions.py:263
+#: ../../batcher/src/update.py:2179
+#
+msgid "Does not start with text"
+msgstr "テキストで始まらない"
+
+#: ../../batcher/src/builtin_conditions.py:264
+#: ../../batcher/src/update.py:2180
+msgid "Contains text"
+msgstr "テキストを含む"
+
+#: ../../batcher/src/builtin_conditions.py:265
+#: ../../batcher/src/update.py:2181
+#
+msgid "Does not contain text"
+msgstr "テキストを含まない"
+
+#: ../../batcher/src/builtin_conditions.py:266
+#: ../../batcher/src/update.py:2182
+msgid "Ends with text"
+msgstr "テキストで終わる"
+
+#: ../../batcher/src/builtin_conditions.py:267
+#: ../../batcher/src/update.py:2183
+#
+msgid "Does not end with text"
+msgstr "テキストで終わらない"
+
+#: ../../batcher/src/builtin_conditions.py:268
+#: ../../batcher/src/update.py:2184
+msgid "Matches regular expression"
+msgstr "正規表現に一致"
+
+#: ../../batcher/src/builtin_conditions.py:270
+msgid "How to perform matching"
+msgstr "一致の方法"
+
+#: ../../batcher/src/builtin_conditions.py:276
+msgid "Text to match"
+msgstr "一致させるテキスト"
+
+#: ../../batcher/src/builtin_conditions.py:282
+msgid "Ignore case sensitivity"
+msgstr "大文字小文字を無視"
+
+#. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
+#: ../../batcher/src/builtin_conditions.py:291
+msgid "Recognized file format"
+msgstr "認識されたファイル形式"
+
+#: ../../batcher/src/builtin_conditions.py:298
+msgid "Saved or exported"
+msgstr "保存またはエクスポート済み"
+
+#: ../../batcher/src/builtin_conditions.py:305
+msgid "Not saved or exported"
+msgstr "未保存または未エクスポート"
+
+#. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
+#: ../../batcher/src/builtin_conditions.py:313
+msgid "Selected in GIMP"
+msgstr "GIMPで選択"
+
+#. FOR TRANSLATORS: Think of "Only top-level items" when translating this
+#: ../../batcher/src/builtin_conditions.py:321
+msgid "Top-level"
+msgstr "トップレベル"
+
+#. FOR TRANSLATORS: Think of "Only visible items" when translating this
+#: ../../batcher/src/builtin_conditions.py:329
+msgid "Visible"
+msgstr "表示"
+
+#. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:337
+msgid "With color tags"
+msgstr "カラータグ付き"
+
+#: ../../batcher/src/builtin_conditions.py:343
+#: ../../batcher/src/builtin_conditions.py:363
+msgid "Color tags"
+msgstr "カラータグ"
+
+#. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:357
+msgid "Without color tags"
+msgstr "カラータグなし"
+
+#. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:377
+msgid "With unsaved changes"
+msgstr "未保存の変更あり"
+
+#. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:385
+msgid "With no unsaved changes"
+msgstr "未保存の変更なし"
+
+#. FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
+#: ../../batcher/src/builtin_conditions.py:393
+msgid "XCF (native GIMP) file"
+msgstr "XCF（GIMPネイティブ）ファイル"
+
+#. FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
+#: ../../batcher/src/builtin_conditions.py:401
+msgid "Not XCF (native GIMP) file"
+msgstr "XCF（GIMPネイティブ）ファイル以外"
+
+#: ../../batcher/src/commands.py:414
+msgid "Built-in"
+msgstr "内蔵"
+
+#: ../../batcher/src/commands.py:415
+msgid "GIMP PDB procedure"
+msgstr "GIMP PDB処理"
+
+#: ../../batcher/src/commands.py:416
+msgid "GEGL operation"
+msgstr "GEGL操作"
+
+#: ../../batcher/src/commands.py:463
+msgid "_More options"
+msgstr "その他のオプション"
+
+#: ../../batcher/src/commands.py:473
+msgid "Enable for previews"
+msgstr "プレビュー用に有効化"
+
+#: ../../batcher/src/commands.py:536
+msgid "Also apply to parent folders"
+msgstr "親フォルダーにも適用"
 
 #: ../../batcher/src/core.py:808
 msgid ""
 "An error occurred. Please check the GIMP error message or the error console "
 "for details, if any."
-msgstr "エラーが発生しました。詳細については、GIMPのエラーメッセージまたはエラーコンソールを確認してください。"
+msgstr ""
+"エラーが発生しました。詳細については、GIMPのエラーメッセージまたはエラーコン"
+"ソールを確認してください。"
 
 #: ../../batcher/src/core.py:870
 msgid "Processing \"{}\""
 msgstr "\"{}\"を処理中"
 
-#: ../../batcher/src/core.py:1149
+#: ../../batcher/src/core.py:1154
 msgid "File not found"
 msgstr "ファイルが見つかりません"
 
@@ -803,95 +1206,95 @@ msgstr "項目:"
 msgid "File extension:"
 msgstr "ファイル拡張子:"
 
-#: ../../batcher/src/export.py:375
-msgid "Saving \"{}\""
-msgstr "\"{}\"を保存中"
-
 #: ../../batcher/src/file_formats.py:158
 msgid "{} image"
 msgstr "{} 画像"
 
-#: ../../batcher/src/gui/actions/browser.py:79
+#: ../../batcher/src/gui/commands/browser.py:79
 msgid "Filters, Effects"
 msgstr "フィルター、効果"
 
-#: ../../batcher/src/gui/actions/browser.py:80
+#: ../../batcher/src/gui/commands/browser.py:80
 msgid "Plug-ins"
 msgstr "プラグイン"
 
-#: ../../batcher/src/gui/actions/browser.py:81
+#: ../../batcher/src/gui/commands/browser.py:81
 msgid "GIMP Procedures"
 msgstr "GIMP処理"
 
-#: ../../batcher/src/gui/actions/browser.py:82
+#: ../../batcher/src/gui/commands/browser.py:82
 msgid "Other"
 msgstr "その他"
 
-#: ../../batcher/src/gui/actions/browser.py:337
+#: ../../batcher/src/gui/commands/browser.py:343
 msgid "Name"
 msgstr "名前"
 
-#: ../../batcher/src/gui/actions/browser.py:353
+#: ../../batcher/src/gui/commands/browser.py:359
 msgid "Menu Name"
 msgstr "メニュー名"
 
-#: ../../batcher/src/gui/actions/browser.py:382
+#: ../../batcher/src/gui/commands/browser.py:388
 msgid "Search"
 msgstr "検索"
 
-#: ../../batcher/src/gui/actions/browser.py:397
+#: ../../batcher/src/gui/commands/browser.py:403
 msgid "by name"
 msgstr "名前で"
 
-#: ../../batcher/src/gui/actions/browser.py:401
+#: ../../batcher/src/gui/commands/browser.py:407
 msgid "by menu name"
 msgstr "メニュー名で"
 
-#: ../../batcher/src/gui/actions/browser.py:405
+#: ../../batcher/src/gui/commands/browser.py:411
 msgid "by description"
 msgstr "説明で"
 
-#: ../../batcher/src/gui/actions/browser.py:447
-msgid "Select a procedure"
-msgstr "処理を選択"
+#: ../../batcher/src/gui/commands/browser.py:453
+msgid "Select an action"
+msgstr "アクションを選択"
 
-#: ../../batcher/src/gui/actions/browser.py:472
+#: ../../batcher/src/gui/commands/browser.py:478
 msgid "_Add"
 msgstr "追加"
 
-#: ../../batcher/src/gui/actions/browser.py:473
-#: ../../batcher/src/gui/actions/editor.py:52
+#: ../../batcher/src/gui/commands/browser.py:479
+#: ../../batcher/src/gui/commands/editor.py:52
 #: ../../batcher/src/gui/main/export_settings.py:251
 #: ../../batcher/src/gui/main/main.py:165
 #: ../../batcher/src/gui/main/main.py:354 ../../batcher/src/gui/messages.py:40
 msgid "_Close"
 msgstr "閉じる"
 
-#: ../../batcher/src/gui/actions/editor.py:49
-#: ../../batcher/src/gui/actions/editor.py:172
+#: ../../batcher/src/gui/commands/editor.py:49
+#: ../../batcher/src/gui/commands/editor.py:172
 #: ../../batcher/src/gui/main/export_settings.py:246
 msgid "_Reset"
 msgstr "リセット"
 
-#: ../../batcher/src/gui/actions/editor.py:169
+#: ../../batcher/src/gui/commands/editor.py:169
 msgid "_Preview"
 msgstr "プレビュー"
 
-#: ../../batcher/src/gui/actions/editor.py:231
+#: ../../batcher/src/gui/commands/editor.py:231
 msgid "Edit Name"
 msgstr "名前を編集"
 
-#: ../../batcher/src/gui/actions/editor.py:288
+#: ../../batcher/src/gui/commands/editor.py:288
 msgid "Show More Information"
 msgstr "詳細を表示"
 
-#: ../../batcher/src/gui/actions/item.py:139
+#: ../../batcher/src/gui/commands/item.py:139
 msgid "Edit"
 msgstr "編集"
 
-#: ../../batcher/src/gui/actions/item.py:149
+#: ../../batcher/src/gui/commands/item.py:149
 msgid "Remove"
 msgstr "削除"
+
+#: ../../batcher/src/gui/dimension_box.py:152
+msgid "Property:"
+msgstr "プロパティ"
 
 #: ../../batcher/src/gui/file_format_options_box.py:47
 msgid "{} options"
@@ -905,83 +1308,6 @@ msgstr "ファイル形式が認識されません"
 msgid "File format has no options"
 msgstr "ファイル形式にオプションがありません"
 
-#: ../../batcher/src/gui/main/action_lists.py:35
-msgid "Add P_rocedure..."
-msgstr "処理を追加..."
-
-#: ../../batcher/src/gui/main/action_lists.py:37
-msgid "Add Custom Procedure..."
-msgstr "カスタム処理を追加..."
-
-#: ../../batcher/src/gui/main/action_lists.py:38
-msgid "Add Custom Procedure"
-msgstr "カスタム処理を追加"
-
-#: ../../batcher/src/gui/main/action_lists.py:48
-msgid "Add C_onstraint..."
-msgstr "条件を追加..."
-
-#: ../../batcher/src/gui/main/action_lists.py:82
-msgid "This procedure is skipped. Reason: {}"
-msgstr "この処理はスキップされました。理由: {}"
-
-#: ../../batcher/src/gui/main/action_lists.py:88
-msgid "This constraint is skipped. Reason: {}"
-msgstr "この条件はスキップされました。理由: {}"
-
-#: ../../batcher/src/gui/main/action_lists.py:124
-msgid "Procedures"
-msgstr "処理"
-
-#: ../../batcher/src/gui/main/action_lists.py:138
-msgid "Constraints"
-msgstr "条件"
-
-#: ../../batcher/src/gui/main/action_lists.py:469
-msgid "Rename to \"{}\""
-msgstr "\"{}\"にリネーム"
-
-#: ../../batcher/src/gui/main/action_lists.py:505
-msgid "Export as {}"
-msgstr "{}としてエクスポート"
-
-#: ../../batcher/src/gui/main/action_lists.py:507
-msgid "Also export as {}"
-msgstr "{}としてもエクスポート"
-
-#: ../../batcher/src/gui/main/action_lists.py:582
-msgid "Starting with \"{}\""
-msgstr "\"{}\"で始まる"
-
-#: ../../batcher/src/gui/main/action_lists.py:584
-msgid "Starting with any text"
-msgstr "任意のテキストで始まる"
-
-#: ../../batcher/src/gui/main/action_lists.py:587
-msgid "Containing \"{}\""
-msgstr "\"{}\"を含む"
-
-#: ../../batcher/src/gui/main/action_lists.py:589
-msgid "Containing any text"
-msgstr "任意のテキストを含む"
-
-#: ../../batcher/src/gui/main/action_lists.py:592
-msgid "Ending with \"{}\""
-msgstr "\"{}\"で終わる"
-
-#: ../../batcher/src/gui/main/action_lists.py:594
-msgid "Ending with any text"
-msgstr "任意のテキストで終わる"
-
-#: ../../batcher/src/gui/main/action_lists.py:596
-msgid "Matching pattern \"{}\""
-msgstr "\"{}\"に一致するパターン"
-
-#. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-#: ../../batcher/src/gui/main/action_lists.py:601
-msgid " (case-insensitive)"
-msgstr "（大文字小文字を区別しない）"
-
 #: ../../batcher/src/gui/main/batcher_manager.py:208
 msgid "No images were processed."
 msgstr "画像は処理されませんでした。"
@@ -993,6 +1319,139 @@ msgstr "レイヤーは処理されませんでした。"
 #: ../../batcher/src/gui/main/batcher_manager.py:212
 msgid "No items were processed."
 msgstr "項目は処理されませんでした。"
+
+#: ../../batcher/src/gui/main/command_lists.py:36
+#
+msgid "Add _Action..."
+msgstr "アクションを追加..."
+
+#: ../../batcher/src/gui/main/command_lists.py:38
+#
+msgid "Add Custom Action..."
+msgstr "カスタムアクションを追加..."
+
+#: ../../batcher/src/gui/main/command_lists.py:39
+#
+msgid "Add Custom Action"
+msgstr "カスタムアクションを追加"
+
+#: ../../batcher/src/gui/main/command_lists.py:49
+#
+msgid "Add C_ondition..."
+msgstr "条件を追加..."
+
+#: ../../batcher/src/gui/main/command_lists.py:83
+#
+msgid "This action is skipped. Reason: {}"
+msgstr "このアクションはスキップされました。理由: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:89
+#
+msgid "This condition is skipped. Reason: {}"
+msgstr "この条件はスキップされました。理由: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:125
+msgid "Actions"
+msgstr "アクション"
+
+#: ../../batcher/src/gui/main/command_lists.py:139
+#
+msgid "Conditions"
+msgstr "条件"
+
+#: ../../batcher/src/gui/main/command_lists.py:517
+msgid "Crop to remove empty borders"
+msgstr "空の境界線を削除するために切り抜く"
+
+#: ../../batcher/src/gui/main/command_lists.py:562
+#: ../../batcher/src/gui/main/command_lists.py:568
+msgid "Rename to \"{}\""
+msgstr "\"{}\"にリネーム"
+
+#: ../../batcher/src/gui/main/command_lists.py:566
+#
+msgid "Rename new images to \"{}\""
+msgstr "新しい画像を\"{}\"にリネーム"
+
+#: ../../batcher/src/gui/main/command_lists.py:613
+msgid "Export as {}"
+msgstr "{}としてエクスポート"
+
+#: ../../batcher/src/gui/main/command_lists.py:615
+msgid "Also export as {}"
+msgstr "{}としてもエクスポート"
+
+#: ../../batcher/src/gui/main/command_lists.py:673
+msgid "Save (imported images to \"{}\")"
+msgstr "インポートした画像を\"{}\"に保存"
+
+#: ../../batcher/src/gui/main/command_lists.py:675
+#
+msgid "Save to \"{}\""
+msgstr "\"{}\"に保存"
+
+#: ../../batcher/src/gui/main/command_lists.py:756
+msgid "Starting with \"{}\""
+msgstr "\"{}\"で始まる"
+
+#: ../../batcher/src/gui/main/command_lists.py:758
+msgid "Starting with any text"
+msgstr "任意のテキストで始まる"
+
+#: ../../batcher/src/gui/main/command_lists.py:761
+#
+msgid "Not starting with \"{}\""
+msgstr "\"{}\"で始まらない"
+
+#: ../../batcher/src/gui/main/command_lists.py:763
+#
+msgid "Not starting with any text"
+msgstr "任意のテキストで始まらない"
+
+#: ../../batcher/src/gui/main/command_lists.py:766
+msgid "Containing \"{}\""
+msgstr "\"{}\"を含む"
+
+#: ../../batcher/src/gui/main/command_lists.py:768
+msgid "Containing any text"
+msgstr "任意のテキストを含む"
+
+#: ../../batcher/src/gui/main/command_lists.py:771
+#
+msgid "Not containing \"{}\""
+msgstr "\"{}\"を含まない"
+
+#: ../../batcher/src/gui/main/command_lists.py:773
+#
+msgid "Not containing any text"
+msgstr "任意のテキストを含まない"
+
+#: ../../batcher/src/gui/main/command_lists.py:776
+msgid "Ending with \"{}\""
+msgstr "\"{}\"で終わる"
+
+#: ../../batcher/src/gui/main/command_lists.py:778
+msgid "Ending with any text"
+msgstr "任意のテキストで終わる"
+
+#: ../../batcher/src/gui/main/command_lists.py:781
+#
+msgid "Not ending with \"{}\""
+msgstr "\"{}\"で終わらない"
+
+#: ../../batcher/src/gui/main/command_lists.py:783
+#
+msgid "Not ending with any text"
+msgstr "任意のテキストで終わらない"
+
+#: ../../batcher/src/gui/main/command_lists.py:785
+msgid "Matching pattern \"{}\""
+msgstr "\"{}\"に一致するパターン"
+
+#. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+#: ../../batcher/src/gui/main/command_lists.py:790
+msgid " (case-insensitive)"
+msgstr "（大文字小文字を区別しない）"
 
 #: ../../batcher/src/gui/main/export_settings.py:57
 msgid "Folder:"
@@ -1051,66 +1510,86 @@ msgstr "このダイアログを表示"
 
 #: ../../batcher/src/gui/main/previews.py:206
 msgid "Drop or paste files and folders here, or add them via buttons below"
-msgstr "ここにファイルやフォルダーをドロップまたは貼り付けるか、下のボタンで追加してください"
+msgstr ""
+"ここにファイルやフォルダーをドロップまたは貼り付けるか、下のボタンで追加して"
+"ください"
 
-#: ../../batcher/src/gui/main/previews.py:230
-msgid "Add _Files..."
+#: ../../batcher/src/gui/main/previews.py:229
+#
+msgid "Add Files..."
 msgstr "ファイルを追加..."
 
-#: ../../batcher/src/gui/main/previews.py:232
-msgid "Add Fol_ders..."
+#: ../../batcher/src/gui/main/previews.py:230
+#
+msgid "Add Folders..."
 msgstr "フォルダーを追加..."
 
-#: ../../batcher/src/gui/main/previews.py:234
-msgid "R_emove"
-msgstr "削除"
+#: ../../batcher/src/gui/main/previews.py:238
+msgid "A_dd..."
+msgstr "追加..."
 
-#: ../../batcher/src/gui/main/previews.py:236
-msgid "Re_move All"
+#: ../../batcher/src/gui/main/previews.py:240
+#
+msgid "Remove Selected"
+msgstr "選択したものを削除"
+
+#: ../../batcher/src/gui/main/previews.py:241
+#
+msgid "Remove All"
 msgstr "すべて削除"
 
-#: ../../batcher/src/gui/main/previews.py:265
+#: ../../batcher/src/gui/main/previews.py:249
+#
+msgid "Re_move..."
+msgstr "削除"
+
+#: ../../batcher/src/gui/main/previews.py:277
 msgid "Add Files"
 msgstr "ファイルを追加"
 
-#: ../../batcher/src/gui/main/previews.py:267
+#: ../../batcher/src/gui/main/previews.py:279
 msgid "Add Folders"
 msgstr "フォルダーを追加"
 
-#: ../../batcher/src/gui/main/previews.py:325
+#: ../../batcher/src/gui/main/previews.py:344
 msgid "Copied the selected images and folders as text."
 msgstr "選択した画像とフォルダーをテキストとしてコピーしました。"
 
-#: ../../batcher/src/gui/main/previews.py:366
+#: ../../batcher/src/gui/main/previews.py:385
 msgid ""
 "You are about to add a top-level folder named \"{}\". Are you sure you want "
 "to continue?"
-msgstr "トップレベルのフォルダー\"{}\"を追加しようとしています。続行してもよろしいですか？"
+msgstr ""
+"トップレベルのフォルダー\"{}\"を追加しようとしています。続行してもよろしいで"
+"すか？"
 
-#: ../../batcher/src/gui/main/previews.py:378
+#: ../../batcher/src/gui/main/previews.py:397
 msgid ""
 "You are about to add more than {} files. Are you sure you want to continue?"
 msgstr "{}以上のファイルを追加しようとしています。続行してもよろしいですか？"
 
-#: ../../batcher/src/gui/main/previews.py:388
+#: ../../batcher/src/gui/main/previews.py:407
 msgid ""
 "<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
 "side, check if you added the files or folders you really wanted. Do you want "
 "to continue?"
-msgstr "<b>警告:</b> {}以上のファイルを追加しようとしています。安全のために、本当に追加したいファイルやフォルダーを追加したか確認してください。続行しますか？"
+msgstr ""
+"<b>警告:</b> {}以上のファイルを追加しようとしています。安全のために、本当に追"
+"加したいファイルやフォルダーを追加したか確認してください。続行しますか？"
 
-#: ../../batcher/src/gui/main/previews.py:443
+#: ../../batcher/src/gui/main/previews.py:462
 msgid "Yes"
 msgstr "はい"
 
-#: ../../batcher/src/gui/main/previews.py:443
+#: ../../batcher/src/gui/main/previews.py:462
 msgid "No"
 msgstr "いいえ"
 
-#: ../../batcher/src/gui/main/previews.py:591
+#: ../../batcher/src/gui/main/previews.py:610
 msgid ""
 "The preview no longer updates automatically as rendering takes too long."
-msgstr "レンダリングに時間がかかるため、プレビューは自動的に更新されなくなりました。"
+msgstr ""
+"レンダリングに時間がかかるため、プレビューは自動的に更新されなくなりました。"
 
 #: ../../batcher/src/gui/main/settings_manager.py:47
 msgid "_Settings"
@@ -1163,7 +1642,9 @@ msgstr "設定が正常に保存されました。"
 #: ../../batcher/src/gui/main/settings_manager.py:246
 msgid ""
 "Failed to load settings from file \"{}\". Settings must be reset completely."
-msgstr "ファイル\"{}\"から設定を読み込めませんでした。設定を完全にリセットする必要があります。"
+msgstr ""
+"ファイル\"{}\"から設定を読み込めませんでした。設定を完全にリセットする必要が"
+"あります。"
 
 #: ../../batcher/src/gui/main/settings_manager.py:263
 msgid "Load Settings from File"
@@ -1190,7 +1671,9 @@ msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the file and the text in the details to one of the "
 "sites below"
-msgstr "これがプラグインのエラーであると思われる場合は、ファイルと詳細のテキストを含むレポートを以下のサイトのいずれかに送信することで修正に協力できます。"
+msgstr ""
+"これがプラグインのエラーであると思われる場合は、ファイルと詳細のテキストを含"
+"むレポートを以下のサイトのいずれかに送信することで修正に協力できます。"
 
 #: ../../batcher/src/gui/messages.py:86
 msgid "Oops. Something went wrong."
@@ -1199,13 +1682,17 @@ msgstr "おっと。何かがうまくいきませんでした。"
 #: ../../batcher/src/gui/messages.py:90
 msgid ""
 "An unexpected error occurred and the plug-in has to close. Sorry about that!"
-msgstr "予期しないエラーが発生し、プラグインを閉じる必要があります。申し訳ありません！"
+msgstr ""
+"予期しないエラーが発生し、プラグインを閉じる必要があります。申し訳ありませ"
+"ん！"
 
 #: ../../batcher/src/gui/messages.py:94
 msgid ""
 "You can help fix this error by sending a report with the text in the details "
 "above to one of the following sites"
-msgstr "上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信することで、このエラーの修正に協力できます。"
+msgstr ""
+"上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信すること"
+"で、このエラーの修正に協力できます。"
 
 #: ../../batcher/src/gui/messages.py:156
 msgid "Details"
@@ -1219,7 +1706,9 @@ msgstr "詳細をクリップボードにコピー"
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the text in the details to one of the sites below"
-msgstr "これがプラグインのエラーであると思われる場合は、詳細のテキストを含むレポートを以下のサイトのいずれかに送信することで修正に協力できます。"
+msgstr ""
+"これがプラグインのエラーであると思われる場合は、詳細のテキストを含むレポート"
+"を以下のサイトのいずれかに送信することで修正に協力できます。"
 
 #: ../../batcher/src/gui/messages.py:560 ../../batcher/src/gui/messages.py:571
 msgid "There was a problem during processing:"
@@ -1232,22 +1721,31 @@ msgid ""
 "\n"
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the text in the details to one of the sites below"
-msgstr "処理中に画像を閉じた場合は、閉じずに処理が正常に完了するまで開いたままにしてください。\n\nこれがプラグインのエラーであると思われる場合は、詳細のテキストを含むレポートを以下のサイトのいずれかに送信することで修正に協力できます。"
+msgstr ""
+"処理中に画像を閉じた場合は、閉じずに処理が正常に完了するまで開いたままにして"
+"ください。\n"
+"\n"
+"これがプラグインのエラーであると思われる場合は、詳細のテキストを含むレポート"
+"を以下のサイトのいずれかに送信することで修正に協力できます。"
 
 #: ../../batcher/src/gui/messages.py:599
-msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
-msgstr "\"{}\"に処理\"{}\"を適用できませんでした。理由:"
+#
+msgid "Failed to apply action \"{}\" on \"{}\" because:"
+msgstr "\"{}\"にアクション\"{}\"を適用できませんでした。理由:"
 
 #: ../../batcher/src/gui/messages.py:601
-msgid "Failed to apply constraint \"{}\" on \"{}\" because:"
+#
+msgid "Failed to apply condition \"{}\" on \"{}\" because:"
 msgstr "\"{}\"に条件\"{}\"を適用できませんでした。理由:"
 
 #: ../../batcher/src/gui/messages.py:607
-msgid "Failed to apply procedure \"{}\" because:"
-msgstr "処理\"{}\"を適用できませんでした。理由:"
+#
+msgid "Failed to apply action \"{}\" because:"
+msgstr "アクション\"{}\"を適用できませんでした。理由:"
 
 #: ../../batcher/src/gui/messages.py:609
-msgid "Failed to apply constraint \"{}\" because:"
+#
+msgid "Failed to apply condition \"{}\" because:"
 msgstr "条件\"{}\"を適用できませんでした。理由:"
 
 #: ../../batcher/src/gui/message_box.py:52
@@ -1262,17 +1760,22 @@ msgstr "プラグインで1つ以上のエラーが発生しました。"
 msgid ""
 "The errors should not cause crashes, but you should exercise caution "
 "nonetheless."
-msgstr "エラーはクラッシュを引き起こすべきではありませんが、それでも注意を払うべきです。"
+msgstr ""
+"エラーはクラッシュを引き起こすべきではありませんが、それでも注意を払うべきで"
+"す。"
 
 #: ../../batcher/src/gui/message_box.py:81
 msgid ""
 "You can help fix these errors by sending a report with the text in the "
 "details above to one of the following sites"
-msgstr "上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信することで、これらのエラーの修正に協力できます。"
+msgstr ""
+"上記の詳細にあるテキストを含むレポートを以下のサイトのいずれかに送信すること"
+"で、これらのエラーの修正に協力できます。"
 
 #: ../../batcher/src/gui/overwrite_chooser.py:74
-msgid "_Apply action to all files"
-msgstr "すべてのファイルにアクションを適用"
+#
+msgid "_Apply option to all files"
+msgstr "すべてのファイルにオプションを適用"
 
 #: ../../batcher/src/gui/overwrite_chooser.py:115
 msgid "A file named \"{}\" already exists in \"{}\"."
@@ -1373,11 +1876,13 @@ msgstr "ディレクトリパスに無効な文字が含まれています。"
 
 #: ../../batcher/src/path/validators.py:269
 msgid "Path components in the directory path cannot end with spaces."
-msgstr "ディレクトリパスのパスコンポーネントはスペースで終わることはできません。"
+msgstr ""
+"ディレクトリパスのパスコンポーネントはスペースで終わることはできません。"
 
 #: ../../batcher/src/path/validators.py:271
 msgid "Path components in the directory path cannot end with a period."
-msgstr "ディレクトリパスのパスコンポーネントはピリオドで終わることはできません。"
+msgstr ""
+"ディレクトリパスのパスコンポーネントはピリオドで終わることはできません。"
 
 #: ../../batcher/src/path/validators.py:273
 msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
@@ -1403,94 +1908,116 @@ msgstr "ファイル拡張子はスペースで終わることはできません
 msgid "File extension cannot end with a period."
 msgstr "ファイル拡張子はピリオドで終わることはできません。"
 
-#: ../../batcher/src/placeholders.py:78
+#: ../../batcher/src/placeholders.py:55
+msgid "There are no background layers."
+msgstr "背景レイヤーがありません。"
+
+#: ../../batcher/src/placeholders.py:69
+msgid "There are no foreground layers."
+msgstr "前景レイヤーがありません。"
+
+#: ../../batcher/src/placeholders.py:151
 msgid "Current Image"
 msgstr "現在の画像"
 
-#: ../../batcher/src/placeholders.py:79 ../../batcher/src/placeholders.py:80
+#: ../../batcher/src/placeholders.py:152 ../../batcher/src/placeholders.py:153
 msgid "Current Layer"
 msgstr "現在のレイヤー"
 
-#: ../../batcher/src/placeholders.py:81 ../../batcher/src/placeholders.py:82
-msgid "Background Layer"
-msgstr "背景レイヤー"
+#: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
+#
+msgid "Layer Below (Background)"
+msgstr "下のレイヤー（背景）"
 
-#: ../../batcher/src/placeholders.py:83 ../../batcher/src/placeholders.py:84
-msgid "Foreground Layer"
-msgstr "前景レイヤー"
+#: ../../batcher/src/placeholders.py:156 ../../batcher/src/placeholders.py:157
+#
+msgid "Layer Above (Foreground)"
+msgstr "上のレイヤー（前景）"
 
-#: ../../batcher/src/placeholders.py:85
+#: ../../batcher/src/placeholders.py:158
 msgid "All Layers"
 msgstr "すべてのレイヤー"
 
-#: ../../batcher/src/placeholders.py:86
-msgid "None"
-msgstr "なし"
+#: ../../batcher/src/placeholders.py:209
+msgid "X-offset"
+msgstr "Xオフセット"
 
-#: ../../batcher/src/plugin_settings.py:38
-#: ../../batcher/src/plugin_settings.py:206
+#: ../../batcher/src/placeholders.py:210
+msgid "Y-offset"
+msgstr "Yオフセット"
+
+#: ../../batcher/src/plugin_settings.py:37
+#: ../../batcher/src/plugin_settings.py:208
+#: ../../batcher/src/plugin_settings.py:360
 msgid "Run mode"
 msgstr "実行モード"
 
-#: ../../batcher/src/plugin_settings.py:39
-#: ../../batcher/src/plugin_settings.py:207
+#: ../../batcher/src/plugin_settings.py:38
+#: ../../batcher/src/plugin_settings.py:209
+#: ../../batcher/src/plugin_settings.py:361
 msgid "The run mode"
 msgstr "実行モード"
 
-#: ../../batcher/src/plugin_settings.py:50
+#: ../../batcher/src/plugin_settings.py:49
 msgid ""
 "Text file containing input files and folders on each line (non-interactive "
 "run mode only)"
-msgstr "各行に入力ファイルとフォルダーを含むテキストファイル（非対話的実行モードのみ）"
+msgstr ""
+"各行に入力ファイルとフォルダーを含むテキストファイル（非対話的実行モードの"
+"み）"
 
-#: ../../batcher/src/plugin_settings.py:60
+#: ../../batcher/src/plugin_settings.py:59
 msgid ""
 "Maximum number of input files to process (set to 0 to remove this "
 "restriction; non-interactive run mode only)"
-msgstr "処理する入力ファイルの最大数（この制限を解除するには0に設定; 非対話的実行モードのみ）"
+msgstr ""
+"処理する入力ファイルの最大数（この制限を解除するには0に設定; 非対話的実行モー"
+"ドのみ）"
 
-#: ../../batcher/src/plugin_settings.py:85
-#: ../../batcher/src/plugin_settings.py:232
+#: ../../batcher/src/plugin_settings.py:88
+#: ../../batcher/src/plugin_settings.py:238
 msgid "Image filename pattern (empty string = image name)"
 msgstr "画像ファイル名パターン（空文字列 = 画像名）"
 
-#: ../../batcher/src/plugin_settings.py:93
-#: ../../batcher/src/plugin_settings.py:240
-#: ../../batcher/src/plugin_settings.py:379
+#: ../../batcher/src/plugin_settings.py:96
+#: ../../batcher/src/plugin_settings.py:246
+#: ../../batcher/src/plugin_settings.py:493
 msgid "How to handle conflicting files (non-interactive run mode only)"
 msgstr "競合するファイルの処理方法（非対話的実行モードのみ）"
 
-#: ../../batcher/src/plugin_settings.py:102
-#: ../../batcher/src/plugin_settings.py:249
-#: ../../batcher/src/plugin_settings.py:388
-#: ../../batcher/src/plugin_settings.py:497
+#: ../../batcher/src/plugin_settings.py:105
+#: ../../batcher/src/plugin_settings.py:255
+#: ../../batcher/src/plugin_settings.py:371
+#: ../../batcher/src/plugin_settings.py:502
+#: ../../batcher/src/plugin_settings.py:617
 msgid "File with saved settings"
 msgstr "保存された設定を含むファイル"
 
-#: ../../batcher/src/plugin_settings.py:103
-#: ../../batcher/src/plugin_settings.py:250
-#: ../../batcher/src/plugin_settings.py:389
-#: ../../batcher/src/plugin_settings.py:498
+#: ../../batcher/src/plugin_settings.py:106
+#: ../../batcher/src/plugin_settings.py:256
+#: ../../batcher/src/plugin_settings.py:372
+#: ../../batcher/src/plugin_settings.py:503
+#: ../../batcher/src/plugin_settings.py:618
 msgid "File with saved settings (optional)"
 msgstr "保存された設定を含むファイル（オプション）"
 
-#: ../../batcher/src/plugin_settings.py:136
+#: ../../batcher/src/plugin_settings.py:139
 msgid "Keep Input Images"
 msgstr "入力画像を保持"
 
-#: ../../batcher/src/plugin_settings.py:371
+#: ../../batcher/src/plugin_settings.py:485
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr "レイヤーファイル名パターン（空文字列 = レイヤー名）"
 
-#: ../../batcher/src/plugin_settings.py:675
+#: ../../batcher/src/plugin_settings.py:799
 msgid "Input files and folders"
 msgstr "入力ファイルとフォルダー"
 
-#: ../../batcher/src/plugin_settings.py:686
+#: ../../batcher/src/plugin_settings.py:810
 msgid "Show Original Names"
 msgstr "元の名前を表示"
 
-#: ../../batcher/src/plugin_settings.py:705
+#: ../../batcher/src/plugin_settings.py:829
 msgid "Close when Done"
 msgstr "完了時に閉じる"
 
@@ -1524,140 +2051,160 @@ msgstr "降順の番号を使用するには、%dを使用します。"
 msgid "Suppose that the number of layers is 5:"
 msgstr "レイヤーの数が5であると仮定します:"
 
-#: ../../batcher/src/renamer.py:611 ../../batcher/src/renamer.py:676
+#: ../../batcher/src/renamer.py:610 ../../batcher/src/renamer.py:675
 msgid "Image name"
 msgstr "画像名"
 
-#: ../../batcher/src/renamer.py:614
+#: ../../batcher/src/renamer.py:613
 msgid ""
 "Suppose that an image is named \"Image.png\" and the file extension is "
 "\"png\"."
-msgstr "画像が\"Image.png\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"画像が\"Image.png\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
 
-#: ../../batcher/src/renamer.py:619
+#: ../../batcher/src/renamer.py:618
 msgid ""
 "Suppose that an image is named \"Image.jpg\" and the file extension is "
 "\"png\"."
-msgstr "画像が\"Image.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"画像が\"Image.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
 
-#: ../../batcher/src/renamer.py:630
+#: ../../batcher/src/renamer.py:629
 msgid "Image path"
 msgstr "画像パス"
 
-#: ../../batcher/src/renamer.py:633
+#: ../../batcher/src/renamer.py:632
 msgid ""
 "Suppose that an image named \"Left\" has parent folders named \"Hands\" and "
 "\"Body\"."
-msgstr "画像\"Left\"が\"Hands\"と\"Body\"という親フォルダーを持っていると仮定します。"
+msgstr ""
+"画像\"Left\"が\"Hands\"と\"Body\"という親フォルダーを持っていると仮定します。"
 
-#: ../../batcher/src/renamer.py:637
+#: ../../batcher/src/renamer.py:636
 msgid ""
 "Suppose that an image is named \"Left.jpg\" and the file extension is "
 "\"png\"."
-msgstr "画像が\"Left.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"画像が\"Left.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
 
-#: ../../batcher/src/renamer.py:648
+#: ../../batcher/src/renamer.py:647
 msgid "Layer name"
 msgstr "レイヤー名"
 
-#: ../../batcher/src/renamer.py:651
+#: ../../batcher/src/renamer.py:650
 msgid ""
 "Suppose that a layer is named \"Frame.png\" and the file extension is "
 "\"png\"."
-msgstr "レイヤーが\"Frame.png\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"レイヤーが\"Frame.png\"という名前で、ファイル拡張子が\"png\"であると仮定しま"
+"す。"
 
-#: ../../batcher/src/renamer.py:656
+#: ../../batcher/src/renamer.py:655
 msgid ""
 "Suppose that a layer is named \"Frame.jpg\" and the file extension is "
 "\"png\"."
-msgstr "レイヤーが\"Frame.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"レイヤーが\"Frame.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定しま"
+"す。"
 
-#: ../../batcher/src/renamer.py:667
+#: ../../batcher/src/renamer.py:666
 msgid "Full layer name"
 msgstr "完全なレイヤー名"
 
-#: ../../batcher/src/renamer.py:679
+#: ../../batcher/src/renamer.py:678
 msgid "Suppose that the image is named \"Image.xcf\"."
 msgstr "画像が\"Image.xcf\"という名前であると仮定します。"
 
-#: ../../batcher/src/renamer.py:689
+#: ../../batcher/src/renamer.py:688
 msgid "Layer path"
 msgstr "レイヤーパス"
 
-#: ../../batcher/src/renamer.py:692
+#: ../../batcher/src/renamer.py:691
 msgid ""
 "Suppose that a layer named \"Left\" has parent groups named \"Hands\" and "
 "\"Body\"."
-msgstr "レイヤー\"Left\"が\"Hands\"と\"Body\"という親グループを持っていると仮定します。"
+msgstr ""
+"レイヤー\"Left\"が\"Hands\"と\"Body\"という親グループを持っていると仮定しま"
+"す。"
 
-#: ../../batcher/src/renamer.py:696
+#: ../../batcher/src/renamer.py:695
 msgid ""
 "Suppose that the layer is named \"Left.jpg\" and the file extension is "
 "\"png\"."
-msgstr "レイヤーが\"Left.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定します。"
+msgstr ""
+"レイヤーが\"Left.jpg\"という名前で、ファイル拡張子が\"png\"であると仮定しま"
+"す。"
 
-#: ../../batcher/src/renamer.py:717
+#: ../../batcher/src/renamer.py:715
 msgid "Tags"
 msgstr "タグ"
 
-#: ../../batcher/src/renamer.py:720
+#: ../../batcher/src/renamer.py:718
 msgid "Suppose that a layer has a green color tag."
 msgstr "レイヤーに緑色のカラータグがあると仮定します。"
 
-#: ../../batcher/src/renamer.py:722
+#: ../../batcher/src/renamer.py:720
 msgid "You can map a color to another name."
 msgstr "色を別の名前にマッピングできます。"
 
-#: ../../batcher/src/renamer.py:725
+#: ../../batcher/src/renamer.py:723
 msgid "Missing tags are ignored."
 msgstr "欠落しているタグは無視されます。"
 
-#: ../../batcher/src/renamer.py:735
+#: ../../batcher/src/renamer.py:733
 msgid "Current date"
 msgstr "現在の日付"
 
-#: ../../batcher/src/renamer.py:739
+#: ../../batcher/src/renamer.py:737
 msgid ""
 "Custom date format uses formatting as per the \"strftime\" function in "
 "Python."
-msgstr "カスタム日付形式はPythonの\"strftime\"関数に従ったフォーマットを使用します。"
+msgstr ""
+"カスタム日付形式はPythonの\"strftime\"関数に従ったフォーマットを使用します。"
 
-#: ../../batcher/src/renamer.py:749 ../../batcher/src/renamer.py:766
+#: ../../batcher/src/renamer.py:746 ../../batcher/src/renamer.py:763
 msgid "Attributes"
 msgstr "属性"
 
-#: ../../batcher/src/renamer.py:752
+#: ../../batcher/src/renamer.py:749
 msgid ""
 "Suppose that an image has width and height of 1000 and 500 pixels, "
 "respectively,and the current layer has width, height, <i>x</i>-offset and "
 "<i>y</i>-offset\n"
 "of 1000, 270, 0 and 40 pixels, respectively."
-msgstr "画像の幅と高さがそれぞれ1000と500ピクセルであり、現在のレイヤーの幅、高さ、<i>x</i>-オフセット、<i>y</i>-オフセットがそれぞれ1000、270、0、40ピクセルであると仮定します。"
+msgstr ""
+"画像の幅と高さがそれぞれ1000と500ピクセルであり、現在のレイヤーの幅、高さ、"
+"<i>x</i>-オフセット、<i>y</i>-オフセットがそれぞれ1000、270、0、40ピクセルで"
+"あると仮定します。"
 
-#: ../../batcher/src/renamer.py:769
+#: ../../batcher/src/renamer.py:766
 msgid ""
 "Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
 "of 1000, 270, 0 and 40 pixels, respectively,\n"
 "and the image has width and height of 1000 and 500 pixels, respectively."
-msgstr "レイヤーの幅、高さ、<i>x</i>-オフセット、<i>y</i>-オフセットがそれぞれ1000、270、0、40ピクセルであり、画像の幅と高さがそれぞれ1000と500ピクセルであると仮定します。"
+msgstr ""
+"レイヤーの幅、高さ、<i>x</i>-オフセット、<i>y</i>-オフセットがそれぞれ1000、"
+"270、0、40ピクセルであり、画像の幅と高さがそれぞれ1000と500ピクセルであると仮"
+"定します。"
 
-#: ../../batcher/src/renamer.py:786
+#: ../../batcher/src/renamer.py:783
 msgid "Suppose that an image is named \"Animal copy #1\"."
 msgstr "画像が\"Animal copy #1\"という名前であると仮定します。"
 
-#: ../../batcher/src/renamer.py:788 ../../batcher/src/renamer.py:805
+#: ../../batcher/src/renamer.py:785 ../../batcher/src/renamer.py:802
 msgid ""
 "You can use the regular expression syntax as defined in the \"re\" module "
 "for Python."
 msgstr "Pythonの\"re\"モジュールで定義されている正規表現の構文を使用できます。"
 
-#: ../../batcher/src/renamer.py:790 ../../batcher/src/renamer.py:807
+#: ../../batcher/src/renamer.py:787 ../../batcher/src/renamer.py:804
 msgid ""
 "You can specify the number of replacements and flags as defined in the "
 "\"re\" module for Python."
-msgstr "Pythonの\"re\"モジュールで定義されている置換の数とフラグを指定できます。"
+msgstr ""
+"Pythonの\"re\"モジュールで定義されている置換の数とフラグを指定できます。"
 
-#: ../../batcher/src/renamer.py:803
+#: ../../batcher/src/renamer.py:800
 msgid "Suppose that a layer is named \"Animal copy #1\"."
 msgstr "レイヤーが\"Animal copy #1\"という名前であると仮定します。"
 
@@ -1665,11 +2212,18 @@ msgstr "レイヤーが\"Animal copy #1\"という名前であると仮定しま
 msgid "Failed to obtain the previous plug-in version."
 msgstr "以前のプラグインバージョンを取得できませんでした。"
 
+#: ../../batcher/src/update.py:1717
+msgid "Resize from edges"
+msgstr "端からリサイズ"
+
 #: ../../batcher/src/utils.py:63
 msgid ""
 "Settings stored in \"{}\" may be corrupt. This could happen if the file was "
 "edited manually. To fix this, save the settings again."
-msgstr "\"{}\"に保存された設定が破損している可能性があります。これはファイルが手動で編集された場合に発生する可能性があります。これを修正するには、設定を再度保存してください。"
+msgstr ""
+"\"{}\"に保存された設定が破損している可能性があります。これはファイルが手動で"
+"編集された場合に発生する可能性があります。これを修正するには、設定を再度保存"
+"してください。"
 
 #: ../../batcher/src/utils.py:67
 msgid " More information: {}"
@@ -1679,7 +2233,9 @@ msgstr " 詳細情報: {}"
 msgid ""
 "Settings for this plug-in may be corrupt. To fix this, save the settings "
 "again or reset them."
-msgstr "このプラグインの設定が破損している可能性があります。これを修正するには、設定を再度保存するかリセットしてください。"
+msgstr ""
+"このプラグインの設定が破損している可能性があります。これを修正するには、設定"
+"を再度保存するかリセットしてください。"
 
 #: ../../batcher/src/utils.py:74
 msgid "More information: {}"
@@ -1692,3 +2248,90 @@ msgstr "\"{}\"のファイル\"{}\"に設定を見つけることができませ
 #: ../../batcher/src/utils.py:81
 msgid "Could not locate settings in \"{}\"."
 msgstr "\"{}\"に設定を見つけることができませんでした。"
+
+#~ msgid "Object to scale"
+#~ msgstr "スケールするオブジェクト"
+
+#, python-format
+#~ msgid "% of image width"
+#~ msgstr "画像幅の%"
+
+#, python-format
+#~ msgid "% of image height"
+#~ msgstr "画像高さの%"
+
+#, python-format
+#~ msgid "% of layer width"
+#~ msgstr "レイヤー幅の%"
+
+#, python-format
+#~ msgid "% of layer height"
+#~ msgstr "レイヤー高さの%"
+
+#~ msgid "Pixels"
+#~ msgstr "ピクセル"
+
+#~ msgid "Unit for width"
+#~ msgstr "幅の単位"
+
+#~ msgid "Unit for height"
+#~ msgstr "高さの単位"
+
+#~ msgid "Scale to fit"
+#~ msgstr "フィットするようにスケール"
+
+#~ msgid "Dimension to keep"
+#~ msgstr "保持する寸法"
+
+#~ msgid "Another layer"
+#~ msgstr "別のレイヤー"
+
+#~ msgid "Another layer to align layers with"
+#~ msgstr "レイヤーを整列させる別のレイヤー"
+
+#, python-format
+#~ msgid "% of another layer width"
+#~ msgstr "別のレイヤー幅の%"
+
+#, python-format
+#~ msgid "% of another layer height"
+#~ msgstr "別のレイヤー高さの%"
+
+#~ msgid "Unit for the additional X-offset"
+#~ msgstr "追加のXオフセットの単位"
+
+#~ msgid "Unit for the additional Y-offset"
+#~ msgstr "追加のYオフセットの単位"
+
+#~ msgid "Resizes the image canvas to fit the specified layer(s)."
+#~ msgstr "指定されたレイヤーに合わせて画像キャンバスをリサイズします。"
+
+#~ msgid "Select a procedure"
+#~ msgstr "処理を選択"
+
+#~ msgid "Add P_rocedure..."
+#~ msgstr "処理を追加..."
+
+#~ msgid "This procedure is skipped. Reason: {}"
+#~ msgstr "この処理はスキップされました。理由: {}"
+
+#~ msgid "Procedures"
+#~ msgstr "処理"
+
+#~ msgid "Constraints"
+#~ msgstr "条件"
+
+#~ msgid "R_emove"
+#~ msgstr "削除"
+
+#~ msgid "Failed to apply procedure \"{}\" on \"{}\" because:"
+#~ msgstr "\"{}\"に処理\"{}\"を適用できませんでした。理由:"
+
+#~ msgid "Failed to apply procedure \"{}\" because:"
+#~ msgstr "処理\"{}\"を適用できませんでした。理由:"
+
+#~ msgid "Background Layer"
+#~ msgstr "背景レイヤー"
+
+#~ msgid "Foreground Layer"
+#~ msgstr "前景レイヤー"
