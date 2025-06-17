@@ -10,6 +10,7 @@ import parameterized
 
 from pygimplib.tests import stubs_gimp
 
+from config import CONFIG
 from src import placeholders as placeholders_
 from src import setting as setting_
 
@@ -91,23 +92,33 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
 
 
 class TestPlaceholderSetting(unittest.TestCase):
-  
+
+  @classmethod
+  def setUpClass(cls):
+    cls.orig_warn_on_invalid_setting_values = CONFIG.WARN_ON_INVALID_SETTING_VALUES
+
+    CONFIG.WARN_ON_INVALID_SETTING_VALUES = False
+
+  @classmethod
+  def tearDownClass(cls):
+    CONFIG.WARN_ON_INVALID_SETTING_VALUES = cls.orig_warn_on_invalid_setting_values
+
   @parameterized.parameterized.expand([
     ('placeholder', placeholders_.PlaceholderSetting, []),
     ('image_placeholder', placeholders_.PlaceholderImageSetting, ['current_image']),
   ])
   def test_get_placeholder_names(
-        self, test_case_suffix, placeholder_setting_type, expected_result):
+        self, _test_case_suffix, placeholder_setting_type, expected_result):
     placeholder_setting = placeholder_setting_type('setting')
     self.assertListEqual(
       placeholder_setting.get_placeholder_names(), expected_result)
-  
+
   @parameterized.parameterized.expand([
     ('placeholder', placeholders_.PlaceholderSetting, 0),
     ('image_placeholder', placeholders_.PlaceholderImageSetting, 1),
   ])
   def test_get_placeholders(
-        self, test_case_suffix, placeholder_setting_type, expected_length):
+        self, _test_case_suffix, placeholder_setting_type, expected_length):
     placeholder_setting = placeholder_setting_type('setting')
     self.assertEqual(len(placeholder_setting.get_placeholders()), expected_length)
 
