@@ -19,6 +19,8 @@ from . import utils as utils_
 
 from ._sources_errors import *
 
+from src import constants
+
 __all__ = [
   'Source',
   'GimpParasiteSource',
@@ -686,7 +688,7 @@ class JsonFileSource(Source):
     all_data = {}
 
     try:
-      with open(self._filepath, 'r', encoding=pg.constants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
         all_data = json.load(f)
     except Exception as e:
       raise SourceReadError from e
@@ -699,7 +701,7 @@ class JsonFileSource(Source):
     ``all_data`` is a dictionary of (source name, contents) pairs.
     """
     try:
-      with open(self._filepath, 'w', encoding=pg.constants.TEXT_FILE_ENCODING) as f:
+      with open(self._filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
         json.dump(all_data, f, indent=4)
     except Exception as e:
       raise SourceWriteError from e

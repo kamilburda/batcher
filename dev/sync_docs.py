@@ -12,6 +12,7 @@ import shutil
 
 import batcher.pygimplib as pg
 
+from src import constants
 from dev import preprocess_document_contents
 
 
@@ -59,7 +60,7 @@ def get_filepaths(file_list_filepath):
     processed_path = os.path.join(path_root_, processed_path)
     return processed_path
   
-  with open(file_list_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(file_list_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     lines = f.readlines()
   
   lines = [line.strip() for line in lines if line.strip()]

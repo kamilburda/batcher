@@ -28,9 +28,8 @@ import zipfile
 import git
 import pathspec
 
-import batcher.pygimplib as pg
-
 from config import CONFIG
+from src import constants
 
 from dev import create_user_docs
 from dev import process_local_docs
@@ -205,7 +204,7 @@ def _get_path_specs_with_git_filters_from_gitattributes(repository_dirpath):
   path_specs = []
   gitattributes_filepath = os.path.join(repository_dirpath, '.gitattributes')
   
-  with open(gitattributes_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(gitattributes_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     for line in f:
       match = re.search(r'\s*(.*?)\s+filter=', line)
       if match:
@@ -215,7 +214,7 @@ def _get_path_specs_with_git_filters_from_gitattributes(repository_dirpath):
 
 
 def _get_filtered_filepaths(dirpath, pattern_filepath):
-  with open(pattern_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(pattern_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     spec_obj = pathspec.PathSpec.from_lines(
       pathspec.patterns.gitwildmatch.GitWildMatchPattern, f)
   

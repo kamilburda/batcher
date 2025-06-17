@@ -11,6 +11,7 @@ from gi.repository import Gtk
 import pygimplib as pg
 
 from config import CONFIG
+from src import invocation
 from src import renamer as renamer_
 from src import setting as setting_
 from src.gui import utils as gui_utils_
@@ -170,7 +171,7 @@ class ExportSettings:
 
   def _on_name_pattern_changed(self, _setting):
     if self._name_preview is not None:
-      pg.invocation.timeout_add_strict(
+      invocation.timeout_add_strict(
         self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._name_preview.update)
 
@@ -192,7 +193,7 @@ class ExportSettings:
     apply_file_extension_gui_to_setting_if_valid(setting)
 
     if self._name_preview is not None:
-      pg.invocation.timeout_add_strict(
+      invocation.timeout_add_strict(
         self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._name_preview.update)
 
@@ -211,12 +212,12 @@ class ExportSettings:
 
   def _update_previews_on_export_options_change(self, _setting):
     if self._name_preview is not None:
-      pg.invocation.timeout_add_strict(
+      invocation.timeout_add_strict(
         self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._name_preview.update)
 
     if self._image_preview is not None:
-      pg.invocation.timeout_add_strict(
+      invocation.timeout_add_strict(
         self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._image_preview.update)
 

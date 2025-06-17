@@ -33,6 +33,7 @@ import batcher.pygimplib as pg
 
 from batcher.config import CONFIG
 from batcher.src import version as version_
+from src import constants
 
 from dev import make_installers
 from dev import preprocess_document_contents
@@ -196,7 +197,7 @@ def _should_proceed_based_on_yes_no_prompt(prompt):
 
 
 def _get_release_notes_and_modify_changelog_first_header(release_metadata):
-  with open(CHANGELOG_FILEPATH, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(CHANGELOG_FILEPATH, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     changelog_contents = f.read()
   
   header_raw, release_notes = (
@@ -237,7 +238,7 @@ def _get_release_notes_and_modify_changelog_first_header(release_metadata):
         changelog_contents,
         count=1)
   
-    with open(CHANGELOG_FILEPATH, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+    with open(CHANGELOG_FILEPATH, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
       f.write(changelog_contents)
 
 
@@ -256,7 +257,7 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
   if release_metadata.dry_run:
     return
   
-  with open(plugin_config_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(plugin_config_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     lines = f.readlines()
   
   def get_entry_pattern(entry):
@@ -279,7 +280,7 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
       (f'Error: missing the following entries in file "{plugin_config_filepath}":'
        f' {", ".join(entries_to_find)}'))
   
-  with open(plugin_config_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(plugin_config_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
     f.writelines(lines)
 
 
@@ -306,7 +307,7 @@ category: news
 [Download at GitHub]({CONFIG.REPOSITORY_URL}/releases/tag/{release_metadata.new_version})
 """.strip()
 
-  with open(new_post_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+  with open(new_post_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
     f.write(new_post_contents + '\n')
 
 

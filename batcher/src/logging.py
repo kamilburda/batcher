@@ -6,20 +6,18 @@ import os
 import sys
 from typing import IO, List, Optional
 
-
 try:
   import gi
   gi.require_version('Gimp', '3.0')
   from gi.repository import Gimp
 
-  from . import invocation as pginvocation
+  from src import invocation
 except (ImportError, ValueError):
   _gobject_dependent_modules_imported = False
 else:
   _gobject_dependent_modules_imported = True
 
-
-from . import constants as pgconstants
+from . import constants
 
 _HANDLES = ('file', 'gimp_message')
 
@@ -146,7 +144,7 @@ def create_log_file(log_dirpaths: Iterable[str], log_filename: str, mode: str = 
 
     try:
       log_file = open(
-        os.path.join(log_dirpath, log_filename), mode, encoding=pgconstants.TEXT_FILE_ENCODING)
+        os.path.join(log_dirpath, log_filename), mode, encoding=constants.TEXT_FILE_ENCODING)
     except IOError:
       continue
     else:
@@ -180,7 +178,7 @@ if _gobject_dependent_modules_imported:
     def write(self, data):
       self._buffer += str(data)
 
-      pginvocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
+      invocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
 
     def flush(self):
       pass

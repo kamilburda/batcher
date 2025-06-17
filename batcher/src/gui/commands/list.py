@@ -14,6 +14,7 @@ import pygimplib as pg
 from . import browser as command_browser_
 from . import item as command_item_
 
+from src import constants
 from src import commands as commands_
 from src import setting as setting_
 
@@ -326,7 +327,7 @@ class CommandList(pg.gui.ItemBox):
     if command_dict.get('menu_path') is None:
       current_parent_menu = self._commands_menu
     else:
-      parent_names = tuple(command_dict['menu_path'].split(pg.MENU_PATH_SEPARATOR))
+      parent_names = tuple(command_dict['menu_path'].split(constants.MENU_PATH_SEPARATOR))
 
       current_parent_menu = self._commands_menu
       for i in range(len(parent_names)):

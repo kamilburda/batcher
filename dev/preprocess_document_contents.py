@@ -46,9 +46,8 @@ import os
 import re
 import sys
 
-import batcher.pygimplib as pg
-
 from config import CONFIG
+from src import constants
 
 
 def main(source_and_dest_filepaths):
@@ -61,7 +60,7 @@ def preprocess_contents(source_and_dest_filepaths):
       print(f'Warning: Input path "{source_filepath}" does not exist or is not a file')
       continue
     
-    with open(source_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    with open(source_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
       source_file_contents = f.read()
     
     preprocessed_contents = source_file_contents
@@ -73,7 +72,7 @@ def preprocess_contents(source_and_dest_filepaths):
       except DocumentNotFoundError as e:
         print(str(e))
     
-    with open(dest_filepath, 'w', encoding=pg.TEXT_FILE_ENCODING) as f:
+    with open(dest_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
       f.writelines(preprocessed_contents)
 
 
@@ -204,7 +203,7 @@ class IncludeSectionTag(CustomLiquidTag):
         (f'Document path "{document_filepath}" inside "{self.source_filepath}" does not'
          ' exist or is not a file'))
     
-    with open(document_filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    with open(document_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
       document_contents = f.read()
       if section_name:
         section_header, section_contents = find_section(document_contents, section_name)

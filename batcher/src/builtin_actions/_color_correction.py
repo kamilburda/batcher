@@ -8,9 +8,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
 from pygimplib import pdb
 
+from src import constants
 from src.procedure_groups import *
 
 
@@ -63,7 +63,7 @@ def _apply_correction(
     return
 
   try:
-    with open(preset_file.get_path(), 'r', encoding=pg.TEXT_FILE_ENCODING) as f:
+    with open(preset_file.get_path(), 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
       preset_data = f.readlines()
   except Exception:
     file_successfully_read = False

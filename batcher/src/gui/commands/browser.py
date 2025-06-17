@@ -21,6 +21,7 @@ from pygimplib import pdb
 from . import editor as command_editor_
 
 from src import commands as commands_
+from src import invocation
 from src import placeholders as placeholders_
 from src import setting as setting_
 from src.gui.entry import entries as entries_
@@ -560,7 +561,7 @@ class CommandBrowser(GObject.GObject):
     self._update_search_results()
 
   def _update_search_results(self, *args):
-    pg.invocation.timeout_add_strict(
+    invocation.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
       lambda: self._tree_model_filter.refilter(),  # Wrap `gi.FunctionInfo` as it is unhashable
     )

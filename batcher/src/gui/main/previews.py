@@ -13,9 +13,9 @@ from gi.repository import Pango
 
 import pygimplib as pg
 
+from src import invocation
 from src import overwrite
 from src import setting as setting_
-
 from src.gui import messages as messages_
 from src.gui import utils as gui_utils_
 from src.gui.preview import controller as previews_controller_
@@ -526,11 +526,11 @@ class Previews:
         self._PREVIEWS_SENSITIVE_KEY)
     elif current_position != self._paned_outside_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
+        invocation.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove(self._image_preview.update)
+        invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
 
     self._paned_outside_previews_previous_position = current_position
@@ -566,11 +566,11 @@ class Previews:
         self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif current_position != self._paned_between_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        pg.invocation.timeout_add_strict(
+        invocation.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        pg.invocation.timeout_remove(self._image_preview.update)
+        invocation.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
 
     self._paned_between_previews_previous_position = current_position

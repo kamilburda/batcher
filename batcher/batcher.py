@@ -4,23 +4,33 @@
 
 import builtins
 import gettext
+import inspect
 import os
+
+_ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+gettext.bindtextdomain('batcher', os.path.join(_ROOT_PLUGIN_DIRPATH, 'locale'))
+gettext.textdomain('batcher')
+
+builtins._ = gettext.gettext
+
+from src import logging
+
+# Initialize logging as early as possible to capture any module-level errors.
+logging.log_output(
+  stderr_handles=['file'],
+  log_dirpaths=[_ROOT_PLUGIN_DIRPATH],
+  log_error_filename='error.log',
+  log_header_title=_ROOT_PLUGIN_DIRPATH)
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
-gettext.bindtextdomain(
-  'batcher', os.path.join(os.path.dirname(pg.utils.get_current_module_filepath()), 'locale'))
-gettext.textdomain('batcher')
-
-builtins._ = gettext.gettext
-
 from config import CONFIG
 from src import builtin_conditions
 from src import commands as commands_
+from src import constants
 from src import itemtree
 from src import setting as setting_
 from src.gui import messages as messages_
@@ -392,7 +402,7 @@ def _load_inputs(item_tree, filepath, max_num_inputs):
       Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
 
   try:
-    with open(filepath, 'r', encoding=pg.TEXT_FILE_ENCODING) as inputs_file:
+    with open(filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as inputs_file:
       inputs = [path for path in inputs_file.read().splitlines() if path]
   except Exception as e:
     return (

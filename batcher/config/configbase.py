@@ -12,7 +12,7 @@ except (ValueError, ImportError):
 else:
   _gimp_modules_available = True
 
-import pygimplib as pg
+from src import logging
 
 if _gimp_modules_available:
   from src import setting as setting_
@@ -144,7 +144,7 @@ def _init_config_per_procedure(config: _Config):
   else:
     config.DEFAULT_SOURCE = None
 
-  pg.logging.log_output(
+  logging.log_output(
     config.STDOUT_LOG_HANDLES,
     config.STDERR_LOG_HANDLES,
     config.PLUGINS_LOG_DIRPATHS,
