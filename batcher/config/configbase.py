@@ -67,7 +67,7 @@ def create_config() -> _Config:
 
 def _get_root_plugin_dirpath():
   # This depends on the location of the `configbase.py` file.
-  return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+  return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _init_config_initial(config: _Config, root_plugin_dirpath: str):
