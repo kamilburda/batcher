@@ -703,7 +703,7 @@ class DisplaySpinButtonPresenter(GtkPresenter):
 
 
 class FileChooserPresenter(GtkPresenter):
-  """`setting.Presenter` subclass for `pygimplib.gui.FileChooser` widgets used
+  """`setting.Presenter` subclass for `gui.FileChooser` widgets used
   to store file or folder paths as `Gio.File` instances.
 
   Value: Current file or folder path as a `Gio.File` instance.

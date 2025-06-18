@@ -28,48 +28,43 @@ class TestGetModuleRoot(unittest.TestCase):
 
   def test_get_module_root(self):
     self.assertEqual(
-      pgutils.get_module_root(
-        'batcher.pygimplib.tests.test_utils', 'batcher'),
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'batcher'),
       'batcher')
     self.assertEqual(
-      pgutils.get_module_root('batcher.pygimplib.tests.test_utils', 'pygimplib'),
-      'batcher.pygimplib')
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'src'),
+      'batcher.src')
     self.assertEqual(
-      pgutils.get_module_root('batcher.pygimplib.tests.test_utils', 'tests'),
-      'batcher.pygimplib.tests')
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'tests'),
+      'batcher.src.tests')
     self.assertEqual(
-      pgutils.get_module_root(
-        'batcher.pygimplib.tests.test_utils', 'test_utils'),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'test_utils'),
+      'batcher.src.tests.test_utils')
   
   def test_get_module_root_nonexistent_name_component(self):
     self.assertEqual(
-      pgutils.get_module_root(
-        'batcher.pygimplib.tests.test_utils', 'nonexistent_name_component'),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'nonexistent_name_component'),
+      'batcher.src.tests.test_utils')
     
     self.assertEqual(
-      pgutils.get_module_root(
-        'batcher.pygimplib.tests.test_utils', '.pygimplib'),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', '.src'),
+      'batcher.src.tests.test_utils')
     
     self.assertEqual(
-      pgutils.get_module_root(
-        'batcher.pygimplib.tests.test_utils', 'batcher.pygimplib'),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', 'batcher.src'),
+      'batcher.src.tests.test_utils')
   
   def test_get_module_root_empty_module_name(self):
-    self.assertEqual(pgutils.get_module_root('', 'pygimplib'), '')
-    self.assertEqual(pgutils.get_module_root('.', 'pygimplib'), '.')
+    self.assertEqual(pgutils.get_module_root('', 'src'), '')
+    self.assertEqual(pgutils.get_module_root('.', 'src'), '.')
   
   def test_get_module_root_empty_name_component(self):
     self.assertEqual(
-      pgutils.get_module_root('batcher.pygimplib.tests.test_utils', ''),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', ''),
+      'batcher.src.tests.test_utils')
 
     self.assertEqual(
-      pgutils.get_module_root('batcher.pygimplib.tests.test_utils', '.'),
-      'batcher.pygimplib.tests.test_utils')
+      pgutils.get_module_root('batcher.src.tests.test_utils', '.'),
+      'batcher.src.tests.test_utils')
 
 
 class TestGetCurrentModuleFilepath(unittest.TestCase):

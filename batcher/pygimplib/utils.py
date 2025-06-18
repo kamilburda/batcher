@@ -63,9 +63,7 @@ def stringify_object(object_, name: Optional[str] = None) -> str:
 def reprify_object(object_, name: Optional[str] = None) -> str:
   """Returns a string representation of the object useful for ``repr()`` calls.
   
-  The first part of the string, the class path, starts from the
-  ``'pygimplib'`` package. If the full class path is not available, only the
-  class name is given.
+  If the full class path is not available, only the class name is given.
 
   A custom ``name``, if not ``None``, replaces the default ``'object'``
   substring inserted in the string.

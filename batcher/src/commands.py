@@ -124,7 +124,7 @@ def create(
      The menu path components are separated by ``'/'``.
 
   * ``'command_group'``: List of groups the command belongs to, used in
-    `pygimplib.invoker.Invoker` and `core.Batcher`.
+    `invoker.Invoker` and `core.Batcher`.
 
   * ``'orig_name'``: The original name of the command. If a command with the
     same ``'name'`` field (see below) was previously added, the name of the new

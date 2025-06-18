@@ -242,7 +242,7 @@ class PlaceholderSetting(setting_.Setting):
     parent_class_parameters = inspect.signature(super().__init__).parameters
 
     # This ensures that extra arguments not specified in
-    # `pygimplib.Setting.__init__` are not passed there.
+    # `setting.Setting.__init__` are not passed there.
     keys_to_delete = []
     for key, value in kwargs.items():
       if key not in parent_class_parameters:

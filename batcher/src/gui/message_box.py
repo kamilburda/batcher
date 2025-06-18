@@ -16,7 +16,7 @@ from src.gui import messages
 
 class SettingValueNotValidMessageBox(Gtk.Box):
   """Class displaying a button containing warnings if an invalid value was
-  assigned to any `pygimplib.Setting` instance.
+  assigned to any `setting.Setting` instance.
   """
 
   def __init__(self, message_type=Gtk.MessageType.WARNING, *args, **kwargs):

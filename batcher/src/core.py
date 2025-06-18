@@ -27,7 +27,6 @@ from src import overwrite
 from src import placeholders
 from src import progress as progress_
 from src import setting as setting_
-from src import utils
 from src import utils_pdb
 
 
@@ -186,17 +185,17 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def overwrite_mode(self) -> str:
-    """One of the `pygimplib.overwrite.OverwriteModes` values indicating how to
+    """One of the `overwrite.OverwriteModes` values indicating how to
     handle files with the same name.
     """
     return self._overwrite_mode
 
   @property
   def overwrite_chooser(self) -> overwrite.OverwriteChooser:
-    """`pygimplib.overwrite.OverwriteChooser` instance that is invoked during
-    export if a file with the same name already exists.
+    """`overwrite.OverwriteChooser` instance that is invoked during export if a
+    file with the same name already exists.
 
-    By default, `pygimplib.overwrite.NoninteractiveOverwriteChooser` is used.
+    By default, `overwrite.NoninteractiveOverwriteChooser` is used.
     """
     return self._overwrite_chooser
 
@@ -403,8 +402,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def invoker(self) -> invoker_.Invoker:
-    """`pygimplib.invoker.Invoker` instance to manage actions and conditions
-    applied on items.
+    """`invoker.Invoker` instance to manage actions and conditions applied on
+    items.
 
     This property is reset on each call of `run()`.
     """
@@ -413,7 +412,7 @@ class Batcher(metaclass=abc.ABCMeta):
   def add_action(self, *args, **kwargs) -> Union[int, None]:
     """Adds an action to be applied during `run()`.
 
-    The signature is the same as for `pygimplib.invoker.Invoker.add()`.
+    The signature is the same as for `invoker.Invoker.add()`.
 
     Actions added by this method are placed before actions added by
     `commands.add()`.
@@ -466,7 +465,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     The first argument is the function to act as a filter (returning ``True``
     or ``False``). The rest of the signature is the same as for
-    `pygimplib.invoker.Invoker.add()`.
+    `invoker.Invoker.add()`.
 
     For more information, see `add_action()`.
     """
@@ -475,14 +474,14 @@ class Batcher(metaclass=abc.ABCMeta):
   def remove_command(self, *args, **kwargs):
     """Removes a command originally scheduled to be applied during `run()`.
 
-    The signature is the same as for `pygimplib.invoker.Invoker.remove()`.
+    The signature is the same as for `invoker.Invoker.remove()`.
     """
     self._initial_invoker.remove(*args, **kwargs)
 
   def reorder_command(self, *args, **kwargs):
     """Reorders a command to be applied during `run()`.
 
-    The signature is the same as for `pygimplib.invoker.Invoker.reorder()`.
+    The signature is the same as for `invoker.Invoker.reorder()`.
     """
     self._initial_invoker.reorder(*args, **kwargs)
 
