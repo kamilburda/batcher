@@ -365,10 +365,10 @@ def initialize_i18n(dirpath=None, domain=None):
 
     builtins._ = gettext.gettext
   else:
-    builtins._ = return_string
+    builtins._ = _return_string
 
 
-def return_string(string):
+def _return_string(string):
   return string
 
 
