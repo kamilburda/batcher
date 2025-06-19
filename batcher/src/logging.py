@@ -11,7 +11,7 @@ try:
   gi.require_version('Gimp', '3.0')
   from gi.repository import Gimp
 
-  from src import invocation
+  from src import utils
 except (ImportError, ValueError):
   _gobject_dependent_modules_imported = False
 else:
@@ -178,7 +178,7 @@ if _gobject_dependent_modules_imported:
     def write(self, data):
       self._buffer += str(data)
 
-      invocation.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
+      utils.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
 
     def flush(self):
       pass

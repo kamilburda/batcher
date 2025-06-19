@@ -11,7 +11,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from src import invocation
 from src import overwrite
 from src import setting as setting_
 from src import utils
@@ -527,11 +526,11 @@ class Previews:
         self._PREVIEWS_SENSITIVE_KEY)
     elif current_position != self._paned_outside_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        invocation.timeout_add_strict(
+        utils.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        invocation.timeout_remove(self._image_preview.update)
+        utils.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
 
     self._paned_outside_previews_previous_position = current_position
@@ -567,11 +566,11 @@ class Previews:
         self._VPANED_PREVIEW_SENSITIVE_KEY)
     elif current_position != self._paned_between_previews_previous_position:
       if self._image_preview.is_larger_than_image():
-        invocation.timeout_add_strict(
+        utils.timeout_add_strict(
           self._DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS,
           self._image_preview.update)
       else:
-        invocation.timeout_remove(self._image_preview.update)
+        utils.timeout_remove(self._image_preview.update)
         self._image_preview.resize()
 
     self._paned_between_previews_previous_position = current_position

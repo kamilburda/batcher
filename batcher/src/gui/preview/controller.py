@@ -11,9 +11,8 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from src import invocation
 from src import itemtree
-from src import utils as utils_
+from src import utils
 from src import utils_itemtree as utils_itemtree_
 from src.gui import utils as gui_utils_
 
@@ -65,7 +64,7 @@ class PreviewsController:
       if name_preview_update_kwargs is None:
         name_preview_update_kwargs = {}
 
-      invocation.timeout_add_strict(
+      utils.timeout_add_strict(
         self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
         self._name_preview.update,
         *name_preview_update_args,
@@ -78,7 +77,7 @@ class PreviewsController:
       if image_preview_update_kwargs is None:
         image_preview_update_kwargs = {}
 
-      invocation.timeout_add_strict(
+      utils.timeout_add_strict(
         self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
         self._update_image_preview,
         *image_preview_update_args,
@@ -99,14 +98,14 @@ class PreviewsController:
     utils_itemtree_.add_objects_to_item_tree(
       self._name_preview.batcher.item_tree, self._settings['gui/inputs_interactive'].value)
 
-    invocation.timeout_add_strict(
+    utils.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
       self._name_preview.update)
 
   def _show_original_or_processed_item_names(self):
     self._name_preview.set_show_original_name(self._settings['gui/show_original_item_names'].value)
 
-    invocation.timeout_add_strict(
+    utils.timeout_add_strict(
       self._DELAY_PREVIEWS_SETTING_UPDATE_MILLISECONDS,
       self._name_preview.update)
 
@@ -344,10 +343,10 @@ class PreviewsController:
     return True
 
   def _perform_full_preview_update(self):
-    invocation.timeout_remove(self._name_preview.update)
+    utils.timeout_remove(self._name_preview.update)
 
-    invocation.timeout_remove(self._update_image_preview)
-    invocation.timeout_remove(self._image_preview.update)
+    utils.timeout_remove(self._update_image_preview)
+    utils.timeout_remove(self._image_preview.update)
 
     self._name_preview.update(full_update=True)
 
@@ -396,7 +395,7 @@ class PreviewsController:
     # invoked if a selected item and preceding items are removed from the name
     # preview due to not matching conditions. Therefore, we delay the image
     # preview update when the selection changes.
-    invocation.timeout_add_strict(
+    utils.timeout_add_strict(
       self._DELAY_IMAGE_PREVIEW_SELECTION_CHANGED_UPDATE_MILLISECONDS,
       self._update_image_preview,
       **dict(update_on_identical_item=False),
@@ -407,12 +406,12 @@ class PreviewsController:
       self._name_preview.collapsed_items)
 
   def _on_name_preview_added_items(self, _preview, _added_items):
-    invocation.timeout_remove(self._name_preview.update)
+    utils.timeout_remove(self._name_preview.update)
 
     self._name_preview.update()
 
   def _on_name_preview_removed_items(self, _preview, _removed_items):
-    invocation.timeout_remove(self._name_preview.update)
+    utils.timeout_remove(self._name_preview.update)
 
     self._name_preview.update()
 
@@ -446,7 +445,7 @@ class PreviewsController:
       # with a delay. We need to update the image preview immediately to
       # avoid a "glitch" when there is a very short time period displaying a
       # placeholder icon.
-      invocation.timeout_remove(self._update_image_preview)
+      utils.timeout_remove(self._update_image_preview)
       self._update_image_preview()
     else:
       batcher = self._name_preview.batcher

@@ -9,7 +9,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from src import invocation
+from src import utils
 from src.gui import utils as gui_utils_
 
 
@@ -76,11 +76,11 @@ class MessageLabel(Gtk.Box):
   
   def _timeout_add_strict(self, delay, func, *args, **kwargs):
     if self._should_clear_text_after_delay(delay):
-      invocation.timeout_add_strict(delay, func, *args, **kwargs)
+      utils.timeout_add_strict(delay, func, *args, **kwargs)
   
   def _timeout_remove(self, delay, func):
     if self._should_clear_text_after_delay(delay):
-      invocation.timeout_remove(func)
+      utils.timeout_remove(func)
   
   @staticmethod
   def _should_clear_text_after_delay(clear_delay):

@@ -14,6 +14,9 @@ import warnings
 from gi.repository import GLib
 
 
+_TIMEOUT_FUNCTIONS_TIMER_IDS = {}
+
+
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
   """Returns a context manager that does nothing.
 
@@ -351,3 +354,57 @@ def _copy_dict(dict_, initial_object=None):
     copied_children[key_copy] = value_copy
 
   return copied_children
+
+
+def timeout_add_strict(
+      interval: int, callback: Callable, *callback_args, **callback_kwargs,
+) -> int:
+  """Wrapper of `GLib.timeout_add()` that cancels the callback if this function
+  is called again with the same callback before the timeout.
+
+  Otherwise, this function has the same behavior as `GLib.timeout_add()`.
+  Different callbacks before the timeout are invoked normally.
+
+  The same callback with different arguments is still treated as the same
+  callback.
+
+  This function also supports keyword arguments to the callback.
+
+  Args:
+    interval: Timeout interval in milliseconds.
+    callback: The callable to invoke with a delay.
+    callback_args: Positional arguments to ``callback``.
+    callback_kwargs: Keyword arguments to ``callback``.
+
+  Returns:
+    ID as returned by `GLib.timeout_add()`. The ID can be used by, for example,
+    `GLib.source_remove()` to cancel invoking the callback. The invocation can
+    also be canceled via `timeout_remove()` by specifying the ``callback``
+    instead of the ID.
+  """
+  global _TIMEOUT_FUNCTIONS_TIMER_IDS
+
+  def _callback_wrapper(args, kwargs):
+    retval = callback(*args, **kwargs)
+    if callback in _TIMEOUT_FUNCTIONS_TIMER_IDS:
+      del _TIMEOUT_FUNCTIONS_TIMER_IDS[callback]
+
+    return retval
+
+  timeout_remove(callback)
+
+  _TIMEOUT_FUNCTIONS_TIMER_IDS[callback] = GLib.timeout_add(
+    interval, _callback_wrapper, callback_args, callback_kwargs)
+
+  return _TIMEOUT_FUNCTIONS_TIMER_IDS[callback]
+
+
+def timeout_remove(callback: Callable):
+  """Removes a callback scheduled by `timeout_add_strict()`.
+
+  If no such callback exists or the callback was already invoked, nothing is
+  performed.
+  """
+  if callback in _TIMEOUT_FUNCTIONS_TIMER_IDS:
+    GLib.source_remove(_TIMEOUT_FUNCTIONS_TIMER_IDS[callback])
+    del _TIMEOUT_FUNCTIONS_TIMER_IDS[callback]

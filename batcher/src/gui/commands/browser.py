@@ -18,10 +18,10 @@ from gi.repository import Pango
 from . import editor as command_editor_
 
 from src import commands as commands_
-from src import invocation
 from src import placeholders as placeholders_
 from src import pypdb
 from src import setting as setting_
+from src import utils
 from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 from src.pypdb import pdb
@@ -561,7 +561,7 @@ class CommandBrowser(GObject.GObject):
     self._update_search_results()
 
   def _update_search_results(self, *args):
-    invocation.timeout_add_strict(
+    utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
       lambda: self._tree_model_filter.refilter(),  # Wrap `gi.FunctionInfo` as it is unhashable
     )
