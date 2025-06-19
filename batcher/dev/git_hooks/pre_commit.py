@@ -11,10 +11,11 @@ import sys
 import git
 
 GIT_HOOKS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-ROOT_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
+PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
+ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 
 sys.path.append(ROOT_DIRPATH)
-sys.path.append(os.path.join(ROOT_DIRPATH, 'batcher'))
+sys.path.append(PLUGIN_DIRPATH)
 
 from src import utils
 
