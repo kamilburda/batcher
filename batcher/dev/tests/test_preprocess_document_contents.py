@@ -59,7 +59,7 @@ class TestParseArgs(unittest.TestCase):
      {'args': ['My README.md', 'CHANGELOG.md'],
       'optional_args': {'section': 'Known Issues', 'sentences': '0'}}],
   ])
-  def test_parse_args(self, test_case_name, args_str, expected_parsed_args):
+  def test_parse_args(self, _test_case_suffix, args_str, expected_parsed_args):
     parsed_args = preprocess_document_contents.parse_args(args_str)
     self.assertDictEqual(parsed_args, expected_parsed_args)
 
@@ -161,7 +161,7 @@ plug-in."""
   @mock.patch('dev.preprocess_document_contents.open')
   def test_include_section(
         self,
-        test_case_name,
+        _test_case_suffix,
         optional_args,
         expected_contents,
         mock_open,
@@ -189,10 +189,10 @@ class TestIncludeConfigTag(unittest.TestCase):
     ['valid_config_entry', ['PLUGIN_VERSION'], '1.0'],
     ['invalid_config_entry', ['ENTRY_THAT_DOES_NOT_EXIST'], ''],
   ])
-  def test_include_config(self, test_case_name, args, expected_contents):
+  def test_include_config(self, _test_case_suffix, args, expected_contents):
     if args and hasattr(CONFIG, args[0]):
       setattr(CONFIG, args[0], expected_contents)
-    
+
     tag = preprocess_document_contents.IncludeConfigTag(
       self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)
     

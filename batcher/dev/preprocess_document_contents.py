@@ -72,7 +72,7 @@ def preprocess_contents(source_and_dest_filepaths):
     for tag_name, tag_class in _TAGS.items():
       tag = tag_class(source_filepath, _TAG_MATCHING_REGEXES[tag_name])
       try:
-        preprocessed_contents = _preprocess_contents(source_filepath, tag, preprocessed_contents)
+        preprocessed_contents = _preprocess_contents(tag, preprocessed_contents)
       except DocumentNotFoundError as e:
         print(str(e))
     
@@ -80,7 +80,7 @@ def preprocess_contents(source_and_dest_filepaths):
       f.writelines(preprocessed_contents)
 
 
-def _preprocess_contents(source_filepath, tag, file_contents):
+def _preprocess_contents(tag, file_contents):
   for match in list(re.finditer(tag.matching_regex, file_contents)):
     tag_args = parse_args(tag.get_args_from_match(match))
     tag.process_args(tag_args['args'], tag_args['optional_args'])
