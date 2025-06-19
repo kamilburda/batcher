@@ -9,9 +9,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-
 from src import invocation
+from src.gui import utils as gui_utils_
 
 
 class MessageLabel(Gtk.Box):
@@ -57,7 +56,7 @@ class MessageLabel(Gtk.Box):
     if text:
       self._label_message.set_markup(f'<b>{GLib.markup_escape_text(text)}</b>')
 
-      if not pg.gui.label_fits_text(self._label_message):
+      if not gui_utils_.label_fits_text(self._label_message):
         self._label_message.set_tooltip_text(text)
       else:
         self._label_message.set_tooltip_text(None)

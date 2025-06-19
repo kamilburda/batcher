@@ -11,12 +11,13 @@ from gi.repository import Gtk
 from src import builtin_actions
 from src import exceptions
 from src import overwrite
-from src import utils as utils_
+from src import utils_setting as utils_setting_
 
 from src.gui import messages as messages_
 from src.gui import overwrite_chooser as overwrite_chooser_
 from src.gui import progress_updater as progress_updater_
-from src.gui import utils as gui_utils_
+
+from . import _utils as gui_main_utils_
 
 
 class BatcherManager:
@@ -49,7 +50,7 @@ class BatcherManager:
     previews.lock(self._PREVIEWS_BATCHER_RUN_KEY)
 
     try:
-      self._batcher.run(**utils_.get_settings_for_batcher(self._settings['main']))
+      self._batcher.run(**utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       should_quit = False
     except exceptions.CommandError as e:
@@ -100,7 +101,7 @@ class BatcherManager:
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = gui_utils_.get_batcher_class(item_type)(
+    batcher = gui_main_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       actions=self._settings['main/actions'],
       conditions=self._settings['main/conditions'],
@@ -138,7 +139,7 @@ class BatcherManagerQuick:
     try:
       self._batcher.run(
         item_tree=item_tree,
-        **utils_.get_settings_for_batcher(self._settings['main']))
+        **utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
     except exceptions.BatcherError as e:
@@ -173,7 +174,7 @@ class BatcherManagerQuick:
 
     progress_updater = progress_updater_.GtkProgressUpdater(progress_bar)
 
-    batcher = gui_utils_.get_batcher_class(item_type)(
+    batcher = gui_main_utils_.get_batcher_class(item_type)(
       item_tree=self._item_tree,
       actions=self._settings['main/actions'],
       conditions=self._settings['main/conditions'],

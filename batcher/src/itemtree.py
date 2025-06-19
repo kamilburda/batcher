@@ -18,9 +18,8 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-
 from src import objectfilter
+from src import utils
 
 
 TYPE_ITEM, TYPE_GROUP, TYPE_FOLDER = (0, 1, 2)
@@ -214,10 +213,10 @@ class Item(metaclass=abc.ABCMeta):
     return iter(self._orig_children)
 
   def __str__(self) -> str:
-    return pg.utils.stringify_object(self, self.orig_name)
+    return utils.stringify_object(self, self.orig_name)
 
   def __repr__(self) -> str:
-    return pg.utils.reprify_object(self, f'{self.orig_name} {type(self.raw)}')
+    return utils.reprify_object(self, f'{self.orig_name} {type(self.raw)}')
 
   def get_all_children(self) -> List[Item]:
     """Returns a list of all child items, including items from child folders

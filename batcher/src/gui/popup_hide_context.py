@@ -7,7 +7,7 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
+from src.gui import utils as gui_utils_
 
 
 class PopupHideContext:
@@ -79,7 +79,7 @@ class PopupHideContext:
       'button-press-event',
       self._on_emission_hook_button_press_event)
 
-    toplevel = pg.gui.utils.get_toplevel_window(self._popup_owner_widget)
+    toplevel = gui_utils_.get_toplevel_window(self._popup_owner_widget)
     if toplevel is not None:
       toplevel.get_group().add_window(self._popup_to_hide)
       # Button presses on the window decoration cannot be intercepted via the
@@ -89,7 +89,7 @@ class PopupHideContext:
       self._toplevel_position = toplevel.get_position()
 
   def _disconnect_button_press_events_for_hiding(self):
-    toplevel = pg.gui.utils.get_toplevel_window(self._popup_owner_widget)
+    toplevel = gui_utils_.get_toplevel_window(self._popup_owner_widget)
     if (toplevel is not None
         and self._toplevel_configure_event_id is not None
         and toplevel.handler_is_connected(self._toplevel_configure_event_id)):

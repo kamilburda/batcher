@@ -9,8 +9,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-from pygimplib import pdb
-
 from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
@@ -19,10 +17,12 @@ from src import itemtree
 from src import setting as setting_
 from src import setting_classes as setting_classes_
 from src import utils as utils_
+from src import utils_setting as utils_setting_
 from src import version as version_
 from src.path import pattern as pattern_
 from src.path import uniquify
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 _UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
 
@@ -107,7 +107,7 @@ def load_and_update(
     # completely.
     return TERMINATE, traceback.format_exc()
 
-  load_message = utils_.format_message_from_persistor_statuses(load_result)
+  load_message = utils_setting_.format_message_from_persistor_statuses(load_result)
 
   if any(status == setting_.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):

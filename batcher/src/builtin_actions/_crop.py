@@ -5,10 +5,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-from pygimplib import pdb
-
 from src import utils
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 from . import _utils as builtin_actions_utils
 

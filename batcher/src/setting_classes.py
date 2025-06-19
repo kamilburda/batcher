@@ -12,8 +12,6 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GLib
 
-import pygimplib as pg
-
 from src import builtin_actions as builtin_actions_
 from src import file_formats as file_formats_
 from src import itemtree
@@ -829,7 +827,7 @@ class ImagesAndDirectoriesSetting(setting_.Setting):
   Default value: `collections.defaultdict(lambda: None)`
   """
   
-  _DEFAULT_DEFAULT_VALUE = lambda self: collections.defaultdict(pg.utils.return_none_func)
+  _DEFAULT_DEFAULT_VALUE = lambda self: collections.defaultdict(utils.return_none_func)
   
   @property
   def value(self):
@@ -875,7 +873,7 @@ class ImagesAndDirectoriesSetting(setting_.Setting):
     value = raw_value
 
     if isinstance(value, dict):
-      value = collections.defaultdict(pg.utils.return_none_func)
+      value = collections.defaultdict(utils.return_none_func)
 
       for image_key, dirpath in raw_value.items():
         if isinstance(image_key, int):

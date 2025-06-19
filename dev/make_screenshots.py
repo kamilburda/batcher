@@ -17,17 +17,16 @@ from gi.repository import Gio
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from config import CONFIG
 from src import itemtree
-from src import utils as utils_
+from src import utils
+from src import utils_itemtree as utils_itemtree_
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 
 ROOT_DIRPATH = os.path.abspath(
-  os.path.dirname(os.path.dirname(pg.utils.get_current_module_filepath())))
+  os.path.dirname(os.path.dirname(utils.get_current_module_filepath())))
 
 PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 
@@ -42,7 +41,7 @@ TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')
 TEST_IMAGE_FOR_LAYERS_FILEPATH = os.path.join(TEST_IMAGES_DIRPATH, 'test_contents.xcf')
 
-OUTPUT_DIRPATH = os.path.join(pg.utils.get_default_dirpath(), 'Loading Screens', 'Components')
+OUTPUT_DIRPATH = os.path.join(utils.get_default_dirpath(), 'Loading Screens', 'Components')
 
 SCREENSHOTS_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'images')
 SCREENSHOT_DIALOG_CONVERT_FILENAME = 'screenshot_dialog_convert.png'
@@ -71,7 +70,7 @@ def main():
 
   convert_settings = plugin_settings.create_settings_for_convert()
   convert_settings['gui/inputs_interactive'].set_value(
-    utils_.item_tree_items_to_objects(image_file_tree))
+    utils_itemtree_.item_tree_items_to_objects(image_file_tree))
 
   gui_main.BatchProcessingGui(
     image_file_tree,

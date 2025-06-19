@@ -9,17 +9,17 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from . import browser as command_browser_
 from . import item as command_item_
 
 from src import constants
 from src import commands as commands_
 from src import setting as setting_
+from src.gui import utils as gui_utils_
+from src.gui import widgets as gui_widgets_
 
 
-class CommandList(pg.gui.ItemBox):
+class CommandList(gui_widgets_.ItemBox):
   """A scrollable vertical list that allows the user to add, edit and remove
   commands interactively.
 
@@ -91,7 +91,7 @@ class CommandList(pg.gui.ItemBox):
         allow_custom_commands: bool = True,
         add_custom_command_text: Optional[str] = None,
         command_browser_text: Optional[str] = None,
-        item_spacing: int = pg.gui.ItemBox.ITEM_SPACING,
+        item_spacing: int = gui_widgets_.ItemBox.ITEM_SPACING,
         **kwargs):
     super().__init__(item_spacing=item_spacing, **kwargs)
 
@@ -184,7 +184,7 @@ class CommandList(pg.gui.ItemBox):
     self.emit('command-list-item-removed', item)
 
   def _on_command_browser_realize(self, dialog):
-    dialog.set_attached_to(pg.gui.get_toplevel_window(self))
+    dialog.set_attached_to(gui_utils_.get_toplevel_window(self))
 
   def _on_command_browser_command_selected(self, _browser, command):
     if command is not None:
@@ -321,7 +321,7 @@ class CommandList(pg.gui.ItemBox):
     self._commands_menu.show_all()
 
   def _on_button_add_clicked(self, button):
-    pg.gui.menu_popup_below_widget(self._commands_menu, button)
+    gui_utils_.menu_popup_below_widget(self._commands_menu, button)
 
   def _add_command_to_menu_popup(self, command_dict):
     if command_dict.get('menu_path') is None:

@@ -19,7 +19,7 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from .. import utils as pgutils
+from src import utils
 
 from . import drag_and_drop_context as drag_and_drop_context_
 
@@ -341,7 +341,7 @@ class ArrayBox(ItemBox):
     else:
       self._max_size = max_size if max_size >= min_size else min_size
     
-    self.on_add_item = pgutils.empty_func
+    self.on_add_item = utils.empty_func
     """Callback that creates a `Gtk.Widget` when calling `add_item`.
     
     The callback must accept two arguments - value for the new widget and
@@ -350,14 +350,14 @@ class ArrayBox(ItemBox):
     The callback must return a single argument - the new `Gtk.Widget` instance.
     """
 
-    self.on_reorder_item = pgutils.empty_func
+    self.on_reorder_item = utils.empty_func
     """Callback triggered when calling `reorder_item`.
     
     The callback must accept two arguments - original and new index (position
     starting from 0).
     """
 
-    self.on_remove_item = pgutils.empty_func
+    self.on_remove_item = utils.empty_func
     """Callback triggered when calling `remove_item`.
     
     The callback must accept one argument - the index (position starting from 0)
@@ -444,7 +444,7 @@ class ArrayBox(ItemBox):
     self._locker.lock('prevent_removal_below_min_size')
     
     orig_on_remove_item = self.on_remove_item
-    self.on_remove_item = pgutils.empty_func
+    self.on_remove_item = utils.empty_func
     
     self.clear()
     

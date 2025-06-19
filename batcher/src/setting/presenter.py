@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from typing import Dict, Optional
 
-import pygimplib as pg
+from src import utils
 
 from . import meta as meta_
 
@@ -21,8 +21,8 @@ class SettingValueSynchronizer:
   """
   
   def __init__(self):
-    self.apply_setting_value_to_gui = pg.utils.empty_func
-    self.apply_gui_value_to_setting = pg.utils.empty_func
+    self.apply_setting_value_to_gui = utils.empty_func
+    self.apply_gui_value_to_setting = utils.empty_func
 
 
 class Presenter(metaclass=meta_.PresenterMeta):

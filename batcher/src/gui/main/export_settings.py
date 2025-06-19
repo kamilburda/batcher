@@ -8,13 +8,12 @@ from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import invocation
 from src import renamer as renamer_
 from src import setting as setting_
 from src.gui import utils as gui_utils_
+from src.gui import utils_grid as gui_utils_grid_
 from src.gui.entry import entries as entries_
 
 
@@ -261,9 +260,9 @@ class ExportOptionsDialog:
     self._settings['main/export'].initialize_gui(only_null=True)
 
     for row_index, setting in enumerate(self._settings['main/export']):
-      gui_utils_.attach_label_to_grid(
+      gui_utils_grid_.attach_label_to_grid(
         self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
-      gui_utils_.attach_widget_to_grid(
+      gui_utils_grid_.attach_widget_to_grid(
         self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
 
     self._scrolled_window_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
@@ -300,8 +299,8 @@ class ExportOptionsDialog:
 
   def _on_export_options_dialog_realize(self, _dialog):
     if self._parent is not None:
-      self._dialog.set_transient_for(pg.gui.get_toplevel_window(self._parent))
-      self._dialog.set_attached_to(pg.gui.get_toplevel_window(self._parent))
+      self._dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
+      self._dialog.set_attached_to(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_export_options_dialog_button_reset_clicked(self, _button):
     self._settings['main/export'].reset()

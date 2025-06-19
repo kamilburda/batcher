@@ -8,12 +8,11 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from src import builtin_commands_common
+from src import utils
 from src.path import validators as validators_
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 from . import _utils as builtin_actions_utils
 
@@ -117,7 +116,7 @@ SAVE_DICT = {
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'none_ok': False,

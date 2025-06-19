@@ -1,9 +1,8 @@
 import collections
 
-from pygimplib import pdb
-
 from src import commands
 from src import placeholders
+from src.pypdb import pdb
 
 
 def test_add_all_pdb_procedures_as_commands():

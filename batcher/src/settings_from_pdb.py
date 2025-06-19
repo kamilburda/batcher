@@ -7,17 +7,16 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-from pygimplib.pypdb import pdb
-
 from src import placeholders
+from src import pypdb
 from src import setting as setting_
 from src.path import uniquify
+from src.pypdb import pdb
 
 
 def get_setting_data_from_pdb_procedure(
-      pdb_procedure_or_name: Union[pg.pypdb.PDBProcedure, str],
-) -> Tuple[pg.pypdb.PDBProcedure, str, List]:
+      pdb_procedure_or_name: Union[pypdb.PDBProcedure, str],
+) -> Tuple[pypdb.PDBProcedure, str, List]:
   """Given the input, returns a PDB procedure, its name and arguments.
 
   The returned arguments are a list of dictionaries. From each dictionary,

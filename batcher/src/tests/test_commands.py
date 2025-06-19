@@ -139,7 +139,7 @@ class TestCreateCommands(unittest.TestCase):
       commands_.create('actions', [initial_command_dict])
 
 
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+@mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestManageCommands(unittest.TestCase):
   
   def setUp(self):
@@ -525,7 +525,7 @@ class TestLoadSaveCommands(unittest.TestCase):
     self.assertIsNone(after_add_command_list[1][1])
 
 
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+@mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestManagePdbProceduresAsCommands(unittest.TestCase):
   
   def setUp(self):
@@ -592,10 +592,10 @@ class TestManagePdbProceduresAsCommands(unittest.TestCase):
     self.assertEqual(command['arguments/filename'].value, 'image.png')
 
 
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+@mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestGetCommandDictFromPdbProcedure(unittest.TestCase):
 
-  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+  @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def setUp(self, _mock_get_pdb):
     self.procedure_name = 'file-png-export'
 

@@ -11,7 +11,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
+from src import utils
 
 from . import group as group_
 from . import settings as settings_
@@ -600,7 +600,7 @@ class GimpParasiteSource(Source):
     if parasite is None:
       return None
 
-    parasite_data = pg.utils.signed_bytes_to_bytes(parasite.get_data())
+    parasite_data = utils.signed_bytes_to_bytes(parasite.get_data())
     try:
       data = pickle.loads(parasite_data)
     except Exception:
@@ -613,7 +613,7 @@ class GimpParasiteSource(Source):
       Gimp.Parasite.new(
         self.name,
         Gimp.PARASITE_PERSISTENT,
-        pg.utils.bytes_to_signed_bytes(pickle.dumps(data))))
+        utils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
 class JsonFileSource(Source):

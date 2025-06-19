@@ -9,8 +9,8 @@ from gi.repository import Gimp
 from src import placeholders as placeholders_
 from src.procedure_groups import *
 
-from pygimplib import pdb
 from src import utils_pdb
+from src.pypdb import pdb
 
 
 __all__ = [

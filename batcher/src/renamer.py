@@ -15,10 +15,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import itemtree
+from src import utils
 from src.path import fileext
 from src.path import pattern as pattern_
 from src.procedure_groups import *
@@ -437,7 +436,7 @@ def _get_tags(_renamer, _layer_batcher, item, _field_value, *args):
   color_tag = item.raw.get_color_tag()
   color_tag_default_names = {
     value: value.value_nick
-    for value in pg.utils.get_enum_values(Gimp.ColorTag)}
+    for value in utils.get_enum_values(Gimp.ColorTag)}
 
   # Make sure items without tags produce an empty string.
   del color_tag_default_names[Gimp.ColorTag.NONE]

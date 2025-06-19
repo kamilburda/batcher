@@ -19,8 +19,7 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 
-import pygimplib as pg
-from pygimplib import pdb
+from src import utils
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -32,6 +31,8 @@ from . import presenters_gtk
 from . import utils as utils_
 
 from src import utils_pdb
+from src import pypdb
+from src.pypdb import pdb
 
 
 _SETTING_TYPES = meta_.SETTING_TYPES
@@ -391,10 +392,10 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     return [meta_.process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
   
   def __str__(self) -> str:
-    return pg.utils.stringify_object(self, self.name)
+    return utils.stringify_object(self, self.name)
   
   def __repr__(self) -> str:
-    return pg.utils.reprify_object(self, self.name)
+    return utils.reprify_object(self, self.name)
 
   def get_path(self, relative_path_group: Union['src.setting.Group', str, None] = None) -> str:
     """Returns the full path of this setting.
@@ -773,7 +774,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         self, message, message_id, prepend_value=True, value=None):
     self._is_valid = False
 
-    formatted_traceback = pg.utils.get_traceback(stack_levels_to_keep=-2)
+    formatted_traceback = utils.get_traceback(stack_levels_to_keep=-2)
 
     if prepend_value:
       processed_message = f'"{value}": {message}'
@@ -1215,7 +1216,7 @@ class EnumSetting(Setting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.enum_combo_box]
 
   # `0` acts as a fallback in case `enum_type` has no values, which should not occur.
-  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(pg.utils.get_enum_values(self.enum_type)), 0)
+  _DEFAULT_DEFAULT_VALUE = lambda self: next(iter(utils.get_enum_values(self.enum_type)), 0)
 
   _SUPPORTED_MODULES_WITH_ENUMS = {
     'Gimp': 'gi.repository.Gimp',
@@ -1233,7 +1234,7 @@ class EnumSetting(Setting):
           Type[GObject.GEnum],
           GObject.GType,
           str,
-          Tuple[pg.pypdb.PDBProcedure, GObject.ParamSpec],
+          Tuple[pypdb.PDBProcedure, GObject.ParamSpec],
           Tuple[str, str],
         ],
         excluded_values: Optional[Iterable[GObject.GEnum]] = None,
@@ -1280,7 +1281,7 @@ class EnumSetting(Setting):
     return self._enum_type
 
   @property
-  def procedure(self) -> Union[pg.pypdb.PDBProcedure, None]:
+  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
     """A PDB procedure containing the enum in this setting, or ``None`` if not
     specified.
     """
@@ -1515,7 +1516,7 @@ class ChoiceSetting(Setting):
             List[Tuple[str, str, int, str]],
             Gimp.Choice]
         ] = None,
-        procedure: Optional[Union[pg.pypdb.PDBProcedure, str]] = None,
+        procedure: Optional[Union[pypdb.PDBProcedure, str]] = None,
         **kwargs,
   ):
     """Initializes a `ChoiceSetting` instance.
@@ -1570,7 +1571,7 @@ class ChoiceSetting(Setting):
     return self._items_help
 
   @property
-  def procedure(self) -> Union[pg.pypdb.PDBProcedure, None]:
+  def procedure(self) -> Union[pypdb.PDBProcedure, None]:
     """A `pypdb.PDBProcedure` instance allowing to obtain the `Gimp.Choice`
     instance for this setting.
     """
@@ -1647,10 +1648,10 @@ class ChoiceSetting(Setting):
       return f'invalid item name; valid values: {list(self._items)}', 'invalid_value'
 
   @staticmethod
-  def _process_procedure(procedure, raw_items) -> Union[pg.pypdb.PDBProcedure, str, None]:
+  def _process_procedure(procedure, raw_items) -> Union[pypdb.PDBProcedure, str, None]:
     if procedure is None or raw_items:
       return None
-    elif isinstance(procedure, pg.pypdb.PDBProcedure):
+    elif isinstance(procedure, pypdb.PDBProcedure):
       return procedure
     elif isinstance(procedure, str):
       if procedure in pdb:
@@ -2568,7 +2569,7 @@ class BytesSetting(Setting):
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
-      return GLib.Bytes.new(pg.utils.escaped_string_to_bytes(raw_value, remove_overflow=True))
+      return GLib.Bytes.new(utils.escaped_string_to_bytes(raw_value, remove_overflow=True))
     elif isinstance(raw_value, bytes):
       return GLib.Bytes.new(raw_value)
     elif isinstance(raw_value, list):  # Presumably list of valid integers
@@ -3090,7 +3091,7 @@ class ArraySetting(Setting):
         self._element_kwargs['default_value'])
 
     for key, value in self._element_kwargs.items():
-      pg.utils.create_read_only_property(self, f'element_{key}', value)
+      utils.create_read_only_property(self, f'element_{key}', value)
     
     self._elements = []
     
@@ -3491,7 +3492,7 @@ class DictSetting(ContainerSetting):
 def get_setting_type_and_kwargs(
       gtype: GObject.GType,
       pdb_param_info: Optional[GObject.ParamSpec] = None,
-      pdb_procedure: Optional[pg.pypdb.PDBProcedure] = None,
+      pdb_procedure: Optional[pypdb.PDBProcedure] = None,
 ) -> Union[Tuple[Type[Setting], Dict[str, Any]], None]:
   """Given a GIMP PDB parameter type, returns the corresponding `Setting`
   subclass and keyword arguments passable to its ``__init__()`` method.

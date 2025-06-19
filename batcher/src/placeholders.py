@@ -8,10 +8,9 @@ from typing import Callable, List, Optional, Union, Type
 
 from gi.repository import GObject
 
-import pygimplib as pg
-
 from src import exceptions
 from src import setting as setting_
+from src import utils
 from src.gui import placeholders as gui_placeholders
 
 
@@ -246,7 +245,7 @@ class PlaceholderSetting(setting_.Setting):
     keys_to_delete = []
     for key, value in kwargs.items():
       if key not in parent_class_parameters:
-        pg.utils.create_read_only_property(self, key, value)
+        utils.create_read_only_property(self, key, value)
         keys_to_delete.append(key)
 
     for key in keys_to_delete:

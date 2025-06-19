@@ -10,12 +10,12 @@ import psutil
 import requests
 import yaml
 
-import batcher.pygimplib as pg
+from src import utils
 
 from dev import process_local_docs
 
 
-MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))
+MODULE_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
 
 FILE_ENCODING = 'utf-8'
 

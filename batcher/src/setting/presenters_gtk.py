@@ -17,8 +17,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-from pygimplib import pdb
+from src import utils
+from src.gui import widgets as gui_widgets_
+from src.pypdb import pdb
 
 from . import presenter as presenter_
 
@@ -280,7 +281,7 @@ class RadioButtonBoxPresenter(GtkPresenter):
     self._name_to_row_index_mapping = {}
     self._row_index_to_name_mapping = {}
 
-    self._widget = pg.gui.RadioButtonBox(**kwargs)
+    self._widget = gui_widgets_.RadioButtonBox(**kwargs)
     self._widget.set_tooltip_text(setting.description)
 
     for index, (name, label) in enumerate(zip(setting.items, setting.items_display_names.values())):
@@ -419,7 +420,7 @@ class ItemComboBoxPresenter(GimpObjectComboBoxPresenter):
     GtkPresenter._connect_value_changed_event(self)
   
   def _create_widget(self, setting, **kwargs):
-    return pg.gui.GimpItemComboBox()
+    return gui_widgets_.GimpItemComboBox()
   
   def get_value(self):
     return Gimp.Item.get_by_id(self._widget.get_active().value)
@@ -612,7 +613,7 @@ class DrawableFilterComboBoxPresenter(GimpObjectComboBoxPresenter):
     GtkPresenter._connect_value_changed_event(self)
 
   def _create_widget(self, setting, **kwargs):
-    return pg.gui.GimpDrawableFilterComboBox()
+    return gui_widgets_.GimpDrawableFilterComboBox()
 
   def get_value(self):
     self._setting.drawable = self._widget.get_active_drawable()
@@ -663,7 +664,7 @@ class ParasiteBoxPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'parasite-changed'
   
   def _create_widget(self, setting, **kwargs):
-    return pg.gui.ParasiteBox(setting.value, setting.DEFAULT_PARASITE_NAME)
+    return gui_widgets_.ParasiteBox(setting.value, setting.DEFAULT_PARASITE_NAME)
   
   def get_value(self):
     return self._widget.get_parasite()
@@ -712,7 +713,7 @@ class FileChooserPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, width_chars=30, show_clear_button=True, **kwargs):
-    return pg.gui.FileChooser(
+    return gui_widgets_.FileChooser(
       setting.action,
       setting.value,
       setting.display_name,
@@ -747,17 +748,17 @@ class GBytesEntryPresenter(GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, **kwargs):
-    widget = Gtk.Entry(text=pg.utils.bytes_to_escaped_string(setting.value.get_data()))
+    widget = Gtk.Entry(text=utils.bytes_to_escaped_string(setting.value.get_data()))
     widget.set_position(-1)
 
     return widget
 
   def get_value(self):
     return GLib.Bytes.new(
-      pg.utils.escaped_string_to_bytes(self._widget.get_text(), remove_overflow=True))
+      utils.escaped_string_to_bytes(self._widget.get_text(), remove_overflow=True))
 
   def _set_value(self, value):
-    self._widget.set_text(pg.utils.bytes_to_escaped_string(value.get_data()))
+    self._widget.set_text(utils.bytes_to_escaped_string(value.get_data()))
     # Place the cursor at the end of the text entry.
     self._widget.set_position(-1)
 
@@ -909,7 +910,7 @@ class ArrayBoxPresenter(GtkPresenter):
       self._array_elements_with_events.remove(setting[position])
       del setting[position]
 
-    array_box = pg.gui.ArrayBox(
+    array_box = gui_widgets_.ArrayBox(
       setting.element_default_value,
       setting.min_size,
       setting.max_size,

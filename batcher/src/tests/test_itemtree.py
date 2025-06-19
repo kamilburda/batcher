@@ -954,7 +954,7 @@ class TestGimpItem(unittest.TestCase):
     
     self.assertEqual(str(self.item), '<GimpItem "main-background.jpg">')
 
-  @mock.patch('pygimplib.utils.id', return_value=2208603083056)
+  @mock.patch('src.utils.id', return_value=2208603083056)
   def test_repr(self, _mock_id):
     self.assertEqual(
       repr(self.item),

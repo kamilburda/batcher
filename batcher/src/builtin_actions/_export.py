@@ -9,15 +9,13 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from src import builtin_commands_common
 from src import exceptions
 from src import file_formats as file_formats_
 from src import initnotifier
 from src import itemtree
 from src import overwrite
+from src import pypdb
 from src import renamer as renamer_
 from src import uniquifier
 from src import utils
@@ -25,6 +23,7 @@ from src import utils_pdb
 from src.path import fileext
 from src.path import validators as validators_
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 from . import _utils as builtin_actions_utils
 
@@ -78,7 +77,7 @@ class ExportStatuses:
 
 def export(
       batcher: 'src.core.Batcher',
-      output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
       file_extension: str = 'png',
       file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
       file_format_export_options: Optional[Dict] = None,
@@ -534,7 +533,7 @@ def _export_item_once(
       file_format_export_options,
       use_original_modification_date,
     )
-  except pg.PDBProcedureError as e:
+  except pypdb.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
       raise exceptions.BatcherCancelError('cancelled')
     elif e.status == Gimp.PDBStatusType.CALLING_ERROR:
@@ -813,7 +812,7 @@ EXPORT_FOR_CONVERT_DICT = {
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'set_default_if_not_exists': True,

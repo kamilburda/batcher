@@ -48,7 +48,8 @@ from src import exceptions
 from src import plugin_settings
 from src import procedure as procedure_
 from src import update
-from src import utils as utils_
+from src import utils_itemtree as utils_itemtree_
+from src import utils_setting as utils_setting_
 from src.gui import main as gui_main
 from src.procedure_groups import *
 
@@ -78,7 +79,7 @@ def plug_in_batch_convert(_procedure, config, _data):
     if run_mode == Gimp.RunMode.NONINTERACTIVE:
       image_tree.add(settings['main/inputs'].value)
     else:
-      utils_.add_objects_to_item_tree(image_tree, settings['gui/inputs_interactive'].value)
+      utils_itemtree_.add_objects_to_item_tree(image_tree, settings['gui/inputs_interactive'].value)
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
     return _run_interactive(
@@ -384,7 +385,7 @@ def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
 
   try:
     batcher.run(
-      **utils_.get_settings_for_batcher(settings['main']))
+      **utils_setting_.get_settings_for_batcher(settings['main']))
   except exceptions.BatcherCancelError:
     return Gimp.PDBStatusType.SUCCESS, 'canceled'
   except Exception as e:

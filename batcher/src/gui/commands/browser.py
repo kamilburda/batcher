@@ -15,16 +15,16 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from . import editor as command_editor_
 
 from src import commands as commands_
 from src import invocation
 from src import placeholders as placeholders_
+from src import pypdb
 from src import setting as setting_
+from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
+from src.pypdb import pdb
 
 
 class CommandBrowser(GObject.GObject):
@@ -173,7 +173,7 @@ class CommandBrowser(GObject.GObject):
 
     def is_procedure_gimp_plugin(procedure_):
       return (
-        isinstance(procedure_, pg.pypdb.GimpPDBProcedure)
+        isinstance(procedure_, pypdb.GimpPDBProcedure)
         and procedure_.proc.get_proc_type() in [
           Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.PERSISTENT, Gimp.PDBProcType.TEMPORARY]
       )
@@ -205,7 +205,7 @@ class CommandBrowser(GObject.GObject):
       else:
         procedure_name = command_dict['name']
 
-      if isinstance(procedure, pg.pypdb.GeglProcedure):
+      if isinstance(procedure, pypdb.GeglProcedure):
         if not is_gegl_operation_hidden(procedure_name):
           command_type = 'filters'
         else:
@@ -574,7 +574,7 @@ class CommandBrowser(GObject.GObject):
     self._entry_search.set_text('')
 
   def _on_button_search_settings_clicked(self, button):
-    pg.gui.menu_popup_below_widget(self._menu_search_settings, button)
+    gui_utils_.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
     model, selected_iter = selection.get_selected()

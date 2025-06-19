@@ -6,16 +6,17 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
 
-import pygimplib as pg
-from src.tests import stubs_gimp
-
 from src import builtin_actions
 from src import commands as commands_
 from src import core
 from src import invoker as invoker_
 from src import itemtree
 from src import plugin_settings
-from src import utils as utils_
+from src import utils
+from src import utils_setting as utils_setting_
+from src.pypdb import pdb
+
+from src.tests import stubs_gimp
 
 
 class TestBatcherInitialCommands(unittest.TestCase):
@@ -35,14 +36,14 @@ class TestBatcherInitialCommands(unittest.TestCase):
       settings['main/actions'],
       builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
-    batcher.add_action(pg.utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
+    batcher.add_action(utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
     
     batcher.run(
       is_preview=True,
       process_contents=False,
       process_names=False,
       process_export=False,
-      **utils_.get_settings_for_batcher(settings['main']))
+      **utils_setting_.get_settings_for_batcher(settings['main']))
     
     added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
@@ -55,10 +56,10 @@ class TestBatcherInitialCommands(unittest.TestCase):
     commands_in_initial_invoker = initial_invoker.list_commands(
       group=commands_.DEFAULT_ACTIONS_GROUP)
     self.assertEqual(len(commands_in_initial_invoker), 1)
-    self.assertEqual(commands_in_initial_invoker[0], (pg.utils.empty_func, (), {}))
+    self.assertEqual(commands_in_initial_invoker[0], (utils.empty_func, (), {}))
 
 
-@mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+@mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestAddCommandFromSettings(unittest.TestCase):
   
   def setUp(self):
@@ -137,7 +138,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     
     self.assertEqual(len(added_command_items), 1)
     self.assertEqual(added_command_item_names_and_values, added_command_item_names_and_values)
-    self.assertEqual(added_command_items[0][1][-1], pg.pdb[pdb_procedure.get_name()])
+    self.assertEqual(added_command_items[0][1][-1], pdb[pdb_procedure.get_name()])
     self.assertDictEqual(added_command_items[0][2], expected_kwargs)
 
 

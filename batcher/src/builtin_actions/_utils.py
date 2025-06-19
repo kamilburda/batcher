@@ -8,12 +8,10 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from src import exceptions
 from src import placeholders as placeholders_
 from src import setting as setting_
+from src.pypdb import pdb
 
 
 __all__ = [

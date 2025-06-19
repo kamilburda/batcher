@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import inspect
 from typing import Any, Callable, Dict, Generator, List, Optional, Set, Union
 
-import pygimplib as pg
+from src import utils
 
 from . import meta as meta_
 from . import persistor as persistor_
@@ -117,10 +117,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     return self._recurse_setting_attributes
   
   def __str__(self) -> str:
-    return pg.utils.stringify_object(self, self.name)
+    return utils.stringify_object(self, self.name)
   
   def __repr__(self) -> str:
-    return pg.utils.reprify_object(self, self.name)
+    return utils.reprify_object(self, self.name)
   
   def __getitem__(self, setting_name_or_path: str) -> Union[settings_.Setting, Group]:
     """Returns a setting or group given its name or full path.
@@ -506,7 +506,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     `GroupWalkCallbacks` class.
     """
     if include_setting_func is None:
-      include_setting_func = pg.utils.create_empty_func(return_value=True)
+      include_setting_func = utils.create_empty_func(return_value=True)
     
     if walk_callbacks is None:
       walk_callbacks = GroupWalkCallbacks()
@@ -738,6 +738,6 @@ class GroupWalkCallbacks:
   """
   
   def __init__(self):
-    self.on_visit_setting = pg.utils.empty_func
-    self.on_visit_group = pg.utils.empty_func
-    self.on_end_group_walk = pg.utils.empty_func
+    self.on_visit_setting = utils.empty_func
+    self.on_visit_group = utils.empty_func
+    self.on_end_group_walk = utils.empty_func

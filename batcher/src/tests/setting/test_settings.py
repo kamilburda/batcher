@@ -15,9 +15,8 @@ from gi.repository import GObject
 
 import parameterized
 
-import pygimplib as pg
-
 from config import CONFIG
+from src import utils
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
 
@@ -784,7 +783,7 @@ class TestCreateEnumSetting(SettingTestCase):
   def test_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
 
-    self.assertEqual(setting.default_value, next(iter(pg.utils.get_enum_values(Gimp.Precision))))
+    self.assertEqual(setting.default_value, next(iter(utils.get_enum_values(Gimp.Precision))))
     self.assertEqual(setting.enum_type, Gimp.Precision)
     self.assertEqual(setting.pdb_type, Gimp.Precision)
 
@@ -833,7 +832,7 @@ class TestCreateEnumSetting(SettingTestCase):
     self.assertEqual(setting.procedure, procedure)
     self.assertEqual(setting.procedure_param, procedure_param)
 
-  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+  @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def test_with_enum_type_as_procedure_and_param_spec_as_strings(self, _mock_get_pdb):
     procedure_param_dict = dict(
       value_type=Gegl.DistanceMetric.__gtype__,
@@ -858,7 +857,7 @@ class TestCreateEnumSetting(SettingTestCase):
 
     settings_.pdb.remove_from_cache('some-procedure')
 
-  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+  @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def test_with_enum_type_as_unrecognized_procedure_raises_error(self, _mock_get_pdb):
     procedure_param_dict = dict(
       value_type=Gegl.DistanceMetric.__gtype__,
@@ -878,7 +877,7 @@ class TestCreateEnumSetting(SettingTestCase):
 
     settings_.pdb.remove_from_cache('some-procedure')
 
-  @mock.patch('pygimplib.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
+  @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def test_with_enum_type_as_unrecognized_procedure_parameter_raises_error(self, _mock_get_pdb):
     procedure_param_dict = dict(
       value_type=Gegl.DistanceMetric.__gtype__,
@@ -960,7 +959,7 @@ class TestEnumSetting(SettingTestCase):
         'Precision',
         'Precision',
         Gimp.Precision,
-        next(iter(pg.utils.get_enum_values(Gimp.Precision))),
+        next(iter(utils.get_enum_values(Gimp.Precision))),
         GObject.ParamFlags.READWRITE,
       ])
 

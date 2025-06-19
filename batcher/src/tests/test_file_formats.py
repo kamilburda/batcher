@@ -5,10 +5,9 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-
 from src import file_formats as file_formats_
 from src import setting as setting_
+from src import utils
 
 
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')

@@ -5,7 +5,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from src.gui import utils as gui_utils_
+from src.gui import utils_grid as gui_utils_grid_
 
 
 __all__ = [
@@ -109,8 +109,8 @@ class FileFormatOptionsBox(Gtk.Box):
     file_format_options.initialize_gui(only_null=True)
 
     for row_index, setting in enumerate(file_format_options):
-      gui_utils_.attach_label_to_grid(grid, setting, row_index)
-      gui_utils_.attach_widget_to_grid(grid, setting, row_index)
+      gui_utils_grid_.attach_label_to_grid(grid, setting, row_index)
+      gui_utils_grid_.attach_widget_to_grid(grid, setting, row_index)
 
     grid.show_all()
 

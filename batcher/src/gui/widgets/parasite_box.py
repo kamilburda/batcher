@@ -10,7 +10,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 
-from .. import utils as pgutils
+from src import utils
 
 __all__ = [
   'ParasiteBox',
@@ -121,8 +121,8 @@ class ParasiteBox(Gtk.Box):
     return (
       parasite_name if parasite_name else self._default_parasite_name,
       self._parasite_flags_spin_button.get_value_as_int(),
-      pgutils.bytes_to_signed_bytes(
-        pgutils.escaped_string_to_bytes(
+      utils.bytes_to_signed_bytes(
+        utils.escaped_string_to_bytes(
           self._parasite_data_entry.get_text(), remove_overflow=True)))
   
   def _set_values(self, parasite):
@@ -131,7 +131,7 @@ class ParasiteBox(Gtk.Box):
     self._parasite_name_entry.set_text(parasite.get_name())
     self._parasite_flags_spin_button.set_value(parasite.get_flags())
     self._parasite_data_entry.set_text(
-      pgutils.bytes_to_escaped_string(pgutils.signed_bytes_to_bytes(parasite.get_data())))
+      utils.bytes_to_escaped_string(utils.signed_bytes_to_bytes(parasite.get_data())))
     
     self._should_invoke_parasite_changed_signal = True
   

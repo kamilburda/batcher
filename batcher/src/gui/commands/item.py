@@ -7,14 +7,14 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-
 from . import editor as command_editor_
 
 from src.gui import messages as gui_messages_
+from src.gui import utils as gui_utils_
+from src.gui import widgets as gui_widgets_
 
 
-class CommandItem(pg.gui.ItemBoxItem):
+class CommandItem(gui_widgets_.ItemBoxItem):
 
   _LABEL_COMMAND_NAME_MAX_WIDTH_CHARS = 50
 
@@ -155,11 +155,11 @@ class CommandItem(pg.gui.ItemBoxItem):
     self._set_tooltip_if_label_does_not_fit_text(label_command_name)
 
   def _on_command_widget_realize(self, _dialog):
-    self.editor.set_transient_for(pg.gui.get_toplevel_window(self.widget))
-    self.editor.set_attached_to(pg.gui.get_toplevel_window(self.widget))
+    self.editor.set_transient_for(gui_utils_.get_toplevel_window(self.widget))
+    self.editor.set_attached_to(gui_utils_.get_toplevel_window(self.widget))
 
   def _set_tooltip_if_label_does_not_fit_text(self, label_command_name):
-    if pg.gui.label_fits_text(label_command_name):
+    if gui_utils_.label_fits_text(label_command_name):
       self.widget.set_tooltip_text(None)
     else:
       self.widget.set_tooltip_text(label_command_name.get_text())

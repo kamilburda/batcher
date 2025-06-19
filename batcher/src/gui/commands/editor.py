@@ -10,13 +10,12 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from src import commands as commands_
 from src.gui import editable_label as editable_label_
 from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import utils as gui_utils_
+from src.gui import utils_grid as gui_utils_grid_
+from src.pypdb import pdb
 
 
 class CommandEditor(GimpUi.Dialog):
@@ -307,7 +306,7 @@ class CommandEditorWidget:
 
   def _update_info_popup_position(self):
     if self._button_info is not None:
-      position = pg.gui.utils.get_position_below_widget(self._button_info)
+      position = gui_utils_.get_position_below_widget(self._button_info)
       if position is not None:
         self._info_popup.move(*position)
 
@@ -328,7 +327,7 @@ class CommandEditorWidget:
         row_index_for_arguments += 1
         row_index = row_index_for_arguments
 
-      gui_utils_.attach_label_to_grid(
+      gui_utils_grid_.attach_label_to_grid(
         grid,
         setting,
         row_index,
@@ -336,7 +335,7 @@ class CommandEditorWidget:
         set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
-      gui_utils_.attach_widget_to_grid(
+      gui_utils_grid_.attach_widget_to_grid(
         grid,
         setting,
         row_index,
@@ -352,7 +351,7 @@ class CommandEditorWidget:
       if not setting.gui.get_visible():
         continue
 
-      gui_utils_.attach_label_to_grid(
+      gui_utils_grid_.attach_label_to_grid(
         self._grid_more_options,
         setting,
         row_index,
@@ -360,7 +359,7 @@ class CommandEditorWidget:
         set_name_as_tooltip=False,
       )
 
-      gui_utils_.attach_widget_to_grid(
+      gui_utils_grid_.attach_widget_to_grid(
         self._grid_more_options,
         setting,
         row_index,
@@ -449,7 +448,7 @@ class CommandEditorWidget:
     grid.show_all()
 
   def _attach_command_argument_to_grid(self, setting, grid, row_index):
-    gui_utils_.attach_label_to_grid(
+    gui_utils_grid_.attach_label_to_grid(
       grid,
       setting,
       row_index,
@@ -457,7 +456,7 @@ class CommandEditorWidget:
       set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
     )
 
-    gui_utils_.attach_widget_to_grid(
+    gui_utils_grid_.attach_widget_to_grid(
       grid,
       setting,
       row_index,
@@ -544,7 +543,7 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=100,
 
   parent_widget_realize_event_id = parent_widget.connect(
     'realize',
-    lambda *args: info_popup.set_transient_for(pg.gui.utils.get_toplevel_window(parent_widget)))
+    lambda *args: info_popup.set_transient_for(gui_utils_.get_toplevel_window(parent_widget)))
 
   info_popup_text = Gtk.Label(
     label=command_info,

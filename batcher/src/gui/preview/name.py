@@ -14,15 +14,15 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from . import base as preview_base_
 
 from src import builtin_actions
 from src import exceptions
 from src import itemtree
-from src import utils as utils_
+from src import utils
+from src import utils_setting as utils_setting_
 from src.gui import messages as messages_
+from src.gui import utils as gui_utils_
 
 
 class NamePreview(preview_base_.Preview):
@@ -92,7 +92,7 @@ class NamePreview(preview_base_.Preview):
     
     # key: `Item.key`
     # value: `Gtk.TreeIter` instance
-    self._tree_iters = collections.defaultdict(pg.utils.return_none_func)
+    self._tree_iters = collections.defaultdict(utils.return_none_func)
     
     self._row_expand_collapse_interactive = True
     self._clearing_preview = False
@@ -283,7 +283,8 @@ class NamePreview(preview_base_.Preview):
     self._tree_view.get_selection().connect('changed', self._on_tree_selection_changed)
   
   def _init_icons(self):
-    self._folder_icon = pg.gui.utils.get_icon_pixbuf('folder', self._tree_view, Gtk.IconSize.MENU)
+    self._folder_icon = gui_utils_.get_icon_pixbuf(
+      'folder', self._tree_view, Gtk.IconSize.MENU)
 
     # Colors taken from:
     #  https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpwidgets-utils.c
@@ -303,7 +304,7 @@ class NamePreview(preview_base_.Preview):
       self._color_tags_and_icons}
 
   def _get_color_tag_pixbuf(self, color_tag):
-    if color_tag != Gimp.ColorTag.NONE and color_tag in pg.utils.get_enum_values(Gimp.ColorTag):
+    if color_tag != Gimp.ColorTag.NONE and color_tag in utils.get_enum_values(Gimp.ColorTag):
       icon_size = Gtk.icon_size_lookup(Gtk.IconSize.MENU)
 
       color_tag_pixbuf = GdkPixbuf.Pixbuf.new(
@@ -377,7 +378,7 @@ class NamePreview(preview_base_.Preview):
         process_contents=False,
         process_names=True,
         process_export=False,
-        **utils_.get_settings_for_batcher(self._settings['main']))
+        **utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
     except exceptions.CommandError as e:
@@ -385,7 +386,7 @@ class NamePreview(preview_base_.Preview):
         messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
-        parent=pg.gui.get_toplevel_window(self))
+        parent=gui_utils_.get_toplevel_window(self))
       
       error = e
     except Exception as e:
@@ -393,7 +394,7 @@ class NamePreview(preview_base_.Preview):
         _('There was a problem with updating the name preview:'),
         failure_message=str(e),
         details=traceback.format_exc(),
-        parent=pg.gui.get_toplevel_window(self))
+        parent=gui_utils_.get_toplevel_window(self))
       
       error = e
     

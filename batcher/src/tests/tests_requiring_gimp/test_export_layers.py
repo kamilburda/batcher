@@ -10,20 +10,19 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import builtin_actions
 from src import commands
 from src import core
 from src import itemtree
 from src import plugin_settings
-from src import utils as utils_
+from src import utils
 from src import utils_pdb
+from src import utils_setting as utils_setting_
 from src.procedure_groups import *
 
 
-_CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(pg.utils.get_current_module_filepath()))
+_CURRENT_MODULE_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
 TEST_IMAGES_DIRPATH = os.path.join(_CURRENT_MODULE_DIRPATH, 'test_images')
 
 DEFAULT_EXPECTED_RESULTS_DIRPATH = os.path.join(
@@ -199,7 +198,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       initial_export_run_mode=Gimp.RunMode.NONINTERACTIVE,
     )
     
-    batcher.run(**utils_.get_settings_for_batcher(settings['main']))
+    batcher.run(**utils_setting_.get_settings_for_batcher(settings['main']))
     
     for action_name in action_names_to_add:
       commands.remove(settings['main/actions'], action_name)

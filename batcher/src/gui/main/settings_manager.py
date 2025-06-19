@@ -9,14 +9,14 @@ from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import commands as commands_
 from src import setting as setting_
 from src import update
-from src import utils as utils_
+from src import utils
+from src import utils_setting as utils_setting_
 from src.gui import messages as messages_
+from src.gui import utils as gui_utils_
 
 
 class SettingsManager:
@@ -39,7 +39,7 @@ class SettingsManager:
     self._dialog = dialog
     self._previews_controller = previews_controller
     self._display_message_func = (
-      display_message_func if display_message_func is not None else pg.utils.empty_func)
+      display_message_func if display_message_func is not None else utils.empty_func)
 
     self._init_gui()
 
@@ -114,7 +114,7 @@ class SettingsManager:
 
       display_load_save_settings_failure_message(
         main_message,
-        details=utils_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
+        details=utils_setting_.format_message_from_persistor_statuses(save_result, separator='\n\n'),
         parent=self._dialog)
       return False
     else:
@@ -124,7 +124,7 @@ class SettingsManager:
     self._settings.reset()
 
   def _on_button_settings_clicked(self, button):
-    pg.gui.menu_popup_below_widget(self._menu_settings, button)
+    gui_utils_.menu_popup_below_widget(self._menu_settings, button)
 
   def _on_save_settings_activate(self, _menu_item):
     self._save_settings_to_default_location()
@@ -273,7 +273,7 @@ class SettingsManager:
       action=dialog_action,
       do_overwrite_confirmation=True,
       modal=True,
-      transient_for=pg.gui.get_toplevel_window(self._dialog),
+      transient_for=gui_utils_.get_toplevel_window(self._dialog),
     )
 
     if action == 'load':

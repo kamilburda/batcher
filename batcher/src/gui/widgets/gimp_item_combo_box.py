@@ -13,7 +13,7 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from . import utils as utils_
+from src.gui import utils as gui_utils_
 
 __all__ = [
   'GimpItemComboBox',
@@ -88,7 +88,7 @@ class GimpItemComboBox(Gtk.Box):
       combo_box.widget.set_no_show_all(True)
 
       self._item_model.append(
-        (utils_.get_icon_pixbuf(combo_box.icon_name, self, Gtk.IconSize.BUTTON), index))
+        (gui_utils_.get_icon_pixbuf(combo_box.icon_name, self, Gtk.IconSize.BUTTON), index))
 
       self.pack_start(combo_box.widget, True, True, 0)
 

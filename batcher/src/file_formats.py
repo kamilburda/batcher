@@ -6,10 +6,9 @@ list of file extensions. The list can be used for:
 * obtaining file format options (arguments).
 """
 
-from pygimplib import pdb
-
 from src import setting as setting_
 from src import settings_from_pdb as settings_from_pdb_
+from src.pypdb import pdb
 
 
 def fill_file_format_options(file_format_options, file_format, import_or_export):

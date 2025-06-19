@@ -10,13 +10,12 @@ because any previous updates to such files are discarded.
 import os
 import shutil
 
-import batcher.pygimplib as pg
-
 from src import constants
 from dev import preprocess_document_contents
+from src import utils
 
 
-MODULE_DIRPATH = os.path.abspath(os.path.dirname(pg.utils.get_current_module_filepath()))
+MODULE_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
 ROOT_DIRPATH = os.path.dirname(MODULE_DIRPATH)
 
 PATHS_TO_PREPROCESS_FILEPATH = os.path.join(MODULE_DIRPATH, 'sync_docs_files_to_preprocess.txt')

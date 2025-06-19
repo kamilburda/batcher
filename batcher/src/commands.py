@@ -64,12 +64,11 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-from pygimplib.pypdb import pdb
-
+from src import pypdb
 from src import setting as setting_
 from src import settings_from_pdb
 from src import utils
+from src.pypdb import pdb
 from src.path import uniquify
 
 
@@ -566,7 +565,7 @@ def _hide_gui_for_first_run_mode_arguments(command):
 
 
 def get_command_dict_from_pdb_procedure(
-      pdb_procedure_or_name: Union[pg.pypdb.PDBProcedure, str]) -> Dict[str, Any]:
+      pdb_procedure_or_name: Union[pypdb.PDBProcedure, str]) -> Dict[str, Any]:
   """Returns a dictionary representing the specified GIMP PDB procedure that can
   be added as a command via `add()`.
   
@@ -600,9 +599,9 @@ def get_command_dict_from_pdb_procedure(
 
 
 def _get_pdb_procedure_origin(pdb_procedure):
-  if isinstance(pdb_procedure, pg.pypdb.GimpPDBProcedure):
+  if isinstance(pdb_procedure, pypdb.GimpPDBProcedure):
     return 'gimp_pdb'
-  elif isinstance(pdb_procedure, pg.pypdb.GeglProcedure):
+  elif isinstance(pdb_procedure, pypdb.GeglProcedure):
     return 'gegl'
   else:
     raise TypeError(f'unsupported PDB procedure type {type(pdb_procedure)} for {pdb_procedure}')

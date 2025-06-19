@@ -7,11 +7,10 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import setting as setting_
 from src.gui import messages
+from src.gui import utils as gui_utils_
 
 
 class SettingValueNotValidMessageBox(Gtk.Box):
@@ -72,7 +71,7 @@ class SettingValueNotValidMessageBox(Gtk.Box):
 
     messages.display_alert_message(
       title=CONFIG.PLUGIN_TITLE,
-      parent=pg.gui.get_toplevel_window(self),
+      parent=gui_utils_.get_toplevel_window(self),
       message_type=self._message_type,
       message_markup=_('The plug-in encountered one or more errors.'),
       message_secondary_markup=_(

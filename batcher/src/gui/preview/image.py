@@ -19,16 +19,15 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
-import pygimplib as pg
-
 from . import base as preview_base_
 
 from src import builtin_actions
 from src import exceptions
 from src import itemtree
-from src import utils as utils_
+from src import utils_setting as utils_setting_
 from src import utils_pdb
 from src.gui import messages as messages_
+from src.gui import utils as gui_utils_
 
 
 class ImagePreview(preview_base_.Preview):
@@ -249,10 +248,10 @@ class ImagePreview(preview_base_.Preview):
       vexpand=True,
     )
 
-    self._no_selection_icon = pg.gui.utils.get_icon_pixbuf(
+    self._no_selection_icon = gui_utils_.get_icon_pixbuf(
       GimpUi.ICON_IMAGE, self, Gtk.IconSize.DIALOG)
 
-    self._folder_icon = pg.gui.utils.get_icon_pixbuf('folder', self, Gtk.IconSize.DIALOG)
+    self._folder_icon = gui_utils_.get_icon_pixbuf('folder', self, Gtk.IconSize.DIALOG)
     
     self._label_item_name = Gtk.Label(ellipsize=Pango.EllipsizeMode.MIDDLE)
     
@@ -322,7 +321,7 @@ class ImagePreview(preview_base_.Preview):
         process_contents=True,
         process_names=False,
         process_export=False,
-        **utils_.get_settings_for_batcher(self._settings['main']))
+        **utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
     except exceptions.BatcherFileLoadError as e:
@@ -333,7 +332,7 @@ class ImagePreview(preview_base_.Preview):
         messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
-        parent=pg.gui.get_toplevel_window(self))
+        parent=gui_utils_.get_toplevel_window(self))
       
       error = e
     except Exception as e:
@@ -341,7 +340,7 @@ class ImagePreview(preview_base_.Preview):
         _('There was a problem with updating the image preview:'),
         failure_message=str(e),
         details=traceback.format_exc(),
-        parent=pg.gui.get_toplevel_window(self))
+        parent=gui_utils_.get_toplevel_window(self))
       
       error = e
 
@@ -437,7 +436,7 @@ class ImagePreview(preview_base_.Preview):
     return pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
 
   def _on_button_menu_clicked(self, button):
-    pg.gui.menu_popup_below_widget(self._menu_settings, button)
+    gui_utils_.menu_popup_below_widget(self._menu_settings, button)
   
   def _on_menu_item_update_automatically_toggled(self, menu_item):
     if self._menu_item_update_automatically.get_active():

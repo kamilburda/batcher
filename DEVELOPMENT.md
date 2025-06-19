@@ -169,7 +169,7 @@ Do not call code directly on the module or class level.
 Exceptions to this rule include:
 * initializing module- or class-level variables or constants,
 * initializing application configuration,
-* initializing a package or a library,
+* initializing a package,
 * standalone scripts such as test runners or git hooks.
 
 Avoid calling functions from the GIMP API and GTK API on the module or class level.

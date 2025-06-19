@@ -13,9 +13,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-from pygimplib import pdb
-
 from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
@@ -26,8 +23,11 @@ from src import itemtree
 from src import overwrite
 from src import placeholders
 from src import progress as progress_
+from src import pypdb
 from src import setting as setting_
+from src import utils
 from src import utils_pdb
+from src.pypdb import pdb
 
 
 _BATCHER_ARG_POSITION_IN_COMMANDS = 0
@@ -47,7 +47,7 @@ class Batcher(metaclass=abc.ABCMeta):
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
-        output_directory: Gio.File = Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+        output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
         name_pattern: str = '',
         file_extension: str = 'png',
         overwrite_mode: str = overwrite.OverwriteModes.RENAME_NEW,
@@ -528,7 +528,7 @@ class Batcher(metaclass=abc.ABCMeta):
       self._progress_updater = progress_.ProgressUpdater(None)
 
     if self._export_context_manager is None:
-      self._export_context_manager = pg.utils.empty_context
+      self._export_context_manager = utils.empty_context
 
     if self._export_context_manager_args is None:
       self._export_context_manager_args = ()
@@ -802,7 +802,7 @@ class Batcher(metaclass=abc.ABCMeta):
       except exceptions.SkipCommand as e:
         # Log skipped commands and continue processing.
         self._set_skipped_commands(command, str(e))
-      except pg.PDBProcedureError as e:
+      except pypdb.PDBProcedureError as e:
         error_message = e.message
         if error_message is None:
           error_message = _(

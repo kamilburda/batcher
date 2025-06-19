@@ -11,11 +11,11 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import pygimplib as pg
-
 from src import invocation
 from src import itemtree
 from src import utils as utils_
+from src import utils_itemtree as utils_itemtree_
+from src.gui import utils as gui_utils_
 
 
 class PreviewsController:
@@ -96,7 +96,7 @@ class PreviewsController:
   def _add_inputs_to_name_preview(self):
     self._name_preview.remove_all_items()
 
-    utils_.add_objects_to_item_tree(
+    utils_itemtree_.add_objects_to_item_tree(
       self._name_preview.batcher.item_tree, self._settings['gui/inputs_interactive'].value)
 
     invocation.timeout_add_strict(
@@ -231,7 +231,8 @@ class PreviewsController:
 
     def _get_inputs_from_name_preview(setting):
       if self._settings['gui/keep_inputs'].value:
-        setting.set_value(utils_.item_tree_items_to_objects(self._name_preview.batcher.item_tree))
+        setting.set_value(
+          utils_itemtree_.item_tree_items_to_objects(self._name_preview.batcher.item_tree))
       else:
         setting.set_value([])
 
@@ -320,14 +321,14 @@ class PreviewsController:
   def _on_related_window_window_state_event(self, widget, event):
     if not isinstance(widget, Gtk.Window):
       # This handles widgets such as `Gtk.Menu` that display menu popups.
-      window = pg.gui.get_toplevel_window(widget)
+      window = gui_utils_.get_toplevel_window(widget)
     else:
       window = widget
 
     if (event.type != Gdk.EventType.WINDOW_STATE   # Safeguard, should not happen
         or window.get_window_type() != Gtk.WindowType.TOPLEVEL   # Popup windows
         or not (event.window_state.new_window_state & Gdk.WindowState.FOCUSED)):
-      if pg.gui.has_any_window_focus(windows_to_ignore=[window]):
+      if gui_utils_.has_any_window_focus(windows_to_ignore=[window]):
         self._previously_focused_on_related_window = True
       else:
         self._previously_focused_on_related_window = False

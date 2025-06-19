@@ -29,11 +29,10 @@ sys.path.extend([
   PLUGIN_DIRPATH,
 ])
 
-import batcher.pygimplib as pg
-
-from batcher.config import CONFIG
-from batcher.src import version as version_
+from config import CONFIG
+from src import version as version_
 from src import constants
+from src import utils
 
 from dev import make_installers
 from dev import preprocess_document_contents
@@ -520,7 +519,7 @@ class _ReleaseMetadata:
           (f'keyword argument "{name}" already exists in class {type(self).__qualname__};'
            ' to prevent name clashes, rename conflicting script options'))
       
-      pg.utils.create_read_only_property(self, name, value)
+      utils.create_read_only_property(self, name, value)
   
   @property
   def repo(self):

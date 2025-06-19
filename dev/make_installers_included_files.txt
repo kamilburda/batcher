@@ -15,5 +15,5 @@
 !.git/
 !/batcher/config/config_dev.py
 !/batcher/locale/generate_pot.sh
-!/batcher/pygimplib/tests/
+!/batcher/runtests.py
 !/batcher/src/tests/

@@ -5,8 +5,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-import pygimplib as pg
-
 from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
@@ -74,7 +72,7 @@ def create_settings_for_convert():
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'set_default_if_not_exists': True,
@@ -224,7 +222,7 @@ def create_settings_for_export_images():
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'set_default_if_not_exists': True,
@@ -471,7 +469,7 @@ def create_settings_for_export_layers():
     {
       'type': 'file',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(pg.utils.get_default_dirpath()),
+      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
       'action': Gimp.FileChooserAction.SELECT_FOLDER,
       'display_name': _('Output folder'),
       'set_default_if_not_exists': True,

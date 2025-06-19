@@ -8,16 +8,15 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
-from pygimplib import pdb
-
 from src import builtin_actions
 from src import file_formats as file_formats_
 from src import setting as setting_
+from src.pypdb import pdb
 
 from src.tests import stubs_gimp
 
 
-@mock.patch('pygimplib.pypdb.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.pypdb.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
 class TestExport(unittest.TestCase):
 
