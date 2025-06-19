@@ -5,7 +5,9 @@
 SCRIPT_NAME="${0##*/}"
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-pages_dirpath="$(dirname "$SCRIPT_DIRECTORY")"'/docs/gh-pages'
+plugin_dirpath="$(dirname "$SCRIPT_DIRECTORY")"
+
+pages_dirpath="$(dirname "$plugin_dirpath")"'/docs/gh-pages'
 config_filename='_config.yml'
 local_config_filename='_config_local.yml'
 

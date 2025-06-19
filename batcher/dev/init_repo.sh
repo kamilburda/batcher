@@ -116,8 +116,8 @@ git clone --recurse-submodules -- "$repo_url" "$repo_dirpath"
 cd "$repo_dirpath"
 
 echo 'Setting up git hooks'
-ln -s 'dev/git_hooks/commit_msg.py' '.git/hooks/commit-msg'
-ln -s 'dev/git_hooks/pre_commit.py' '.git/hooks/pre-commit'
+ln -s 'batcher/dev/git_hooks/commit_msg.py' '.git/hooks/commit-msg'
+ln -s 'batcher/dev/git_hooks/pre_commit.py' '.git/hooks/pre-commit'
 
 echo 'Enabling core.autocrlf in git config'
 git config --local 'core.autocrlf' 'true'
@@ -130,7 +130,7 @@ git clone --branch "$plugin_page_branch_name" -- "$repo_url" "$plugin_page_branc
 cd "$plugin_page_branch_name"
 
 echo 'Setting up git hooks for branch '"$plugin_page_branch_name"
-ln -s "$repo_dirpath"'/dev/git_hooks/commit_msg.py' '.git/hooks/commit-msg'
+ln -s "$repo_dirpath"'/batcher/dev/git_hooks/commit_msg.py' '.git/hooks/commit-msg'
 
 echo 'Enabling core.autocrlf in git config for branch '"$plugin_page_branch_name"
 git config --local 'core.autocrlf' 'true'

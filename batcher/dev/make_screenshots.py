@@ -5,7 +5,6 @@ documentation purposes.
 """
 
 import os
-import sys
 import time
 
 import gi
@@ -17,25 +16,21 @@ from gi.repository import Gio
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from src import utils
+
+utils.initialize_i18n()
+
 from config import CONFIG
 from src import itemtree
-from src import utils
+from src import plugin_settings
 from src import utils_itemtree as utils_itemtree_
+from src.gui import main as gui_main
 from src.procedure_groups import *
 from src.pypdb import pdb
 
 
 ROOT_DIRPATH = os.path.abspath(
-  os.path.dirname(os.path.dirname(utils.get_current_module_filepath())))
-
-PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
-
-sys.path.append(PLUGIN_DIRPATH)
-
-
-from src import plugin_settings
-from src.gui import main as gui_main
-
+  os.path.dirname(os.path.dirname(os.path.dirname(utils.get_current_module_filepath()))))
 
 TEST_IMAGES_DIRPATH = os.path.join(
   ROOT_DIRPATH, 'batcher', 'src', 'tests', 'tests_requiring_gimp', 'test_images')

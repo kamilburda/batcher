@@ -6,7 +6,7 @@ import sys
 root_dirpath = os.path.join(Gimp.directory(), 'batcher')
 sys.path.append(os.path.join(root_dirpath, 'batcher'))
 sys.path.append(root_dirpath)
-sys.path.append(os.path.join(root_dirpath, 'dev'))
+sys.path.append(os.path.join(root_dirpath, 'batcher', 'dev'))
 
 import make_screenshots
 

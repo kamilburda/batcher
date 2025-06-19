@@ -2,17 +2,14 @@
 
 """Main plug-in file."""
 
-import builtins
-import gettext
 import inspect
 import os
 
+from src import utils
+
 _ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
-gettext.bindtextdomain('batcher', os.path.join(_ROOT_PLUGIN_DIRPATH, 'locale'))
-gettext.textdomain('batcher')
-
-builtins._ = gettext.gettext
+utils.initialize_i18n(os.path.join(_ROOT_PLUGIN_DIRPATH, 'locale'), 'batcher')
 
 from src import logging
 

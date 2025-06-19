@@ -28,11 +28,14 @@ import zipfile
 import git
 import pathspec
 
-from config import CONFIG
-from src import constants
+from src import utils
 
+utils.initialize_i18n()
+
+from config import CONFIG
 from dev import create_user_docs
 from dev import process_local_docs
+from src import constants
 
 CONFIG.STDOUT_LOG_HANDLES = []
 CONFIG.STDERR_LOG_HANDLES = []

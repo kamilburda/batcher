@@ -17,7 +17,7 @@
 
 This section explains how to set up development environment for Batcher.
 
-If you are using a Linux-based environment, the easiest to get set up is to download and run the [bash script](dev/init_repo.sh) that automatically installs any required dependencies and sets up the environment.
+If you are using a Linux-based environment, the easiest to get set up is to download and run the [bash script](batcher/dev/init_repo.sh) that automatically installs any required dependencies and sets up the environment.
 Users of Windows 10 and above may use e.g. the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) to run the script.
 
 If you cannot run the script, perform manual setup as per the instructions below.
@@ -51,10 +51,10 @@ To set up GitHub page locally:
 
 ### Git Hooks
 
-Set up git hooks located in `dev/git_hooks` by creating symbolic links:
+Set up git hooks located in `batcher/dev/git_hooks` by creating symbolic links:
 
-    ln -s dev/git_hooks/commig_msg.py .git/hooks/commit-msg
-    ln -s dev/git_hooks/pre_commit.py .git/hooks/pre-commit
+    ln -s batcher/dev/git_hooks/commig_msg.py .git/hooks/commit-msg
+    ln -s batcher/dev/git_hooks/pre_commit.py .git/hooks/pre-commit
 
 The `commit-msg` hook enforces several [conventions for commit messages](#Writing-Commit-Messages).
 
@@ -70,7 +70,7 @@ Among other things, the configuration suppresses several formatting warnings and
 
 ## Creating a Release
 
-Run `dev/make_installers.sh` to create installer(s).
+Run `batcher/dev/make_installers.sh` to create installer(s).
 Use the `-i` option to specify platform(s) for which to create installers.
 The installers will be created in the `installers/output` directory.
 
@@ -85,7 +85,7 @@ For Python modules, follow PEP 8 conventions unless specified otherwise below.
 Plug-in-related Python modules must be placed under the `batcher/src` directory.
 This avoids a problem where Python attempts to import modules from the top-level module (`batcher.py`) rather than the package with the same name (`batcher`).
 
-Development-related modules (such as documentation generation) must be placed under the `dev` directory.
+Development-related modules (such as documentation generation) must be placed under the `src/dev` directory.
 
 
 ### Line length

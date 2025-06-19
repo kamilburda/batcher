@@ -1,8 +1,10 @@
 """Generic utility functions and classes used in other modules."""
 
 import ast
+import builtins
 import collections
 import contextlib
+import gettext
 import inspect
 import os
 import struct
@@ -354,6 +356,20 @@ def _copy_dict(dict_, initial_object=None):
     copied_children[key_copy] = value_copy
 
   return copied_children
+
+
+def initialize_i18n(dirpath=None, domain=None):
+  if dirpath is not None and domain is not None:
+    gettext.bindtextdomain(domain, dirpath)
+    gettext.textdomain(domain)
+
+    builtins._ = gettext.gettext
+  else:
+    builtins._ = return_string
+
+
+def return_string(string):
+  return string
 
 
 def timeout_add_strict(

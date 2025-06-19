@@ -46,6 +46,10 @@ import os
 import re
 import sys
 
+from src import utils
+
+utils.initialize_i18n()
+
 from config import CONFIG
 from src import constants
 

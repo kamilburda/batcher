@@ -12,6 +12,8 @@ import yaml
 
 from src import utils
 
+utils.initialize_i18n()
+
 from dev import process_local_docs
 
 

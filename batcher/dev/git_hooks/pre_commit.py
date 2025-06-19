@@ -16,6 +16,10 @@ ROOT_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
 sys.path.append(ROOT_DIRPATH)
 sys.path.append(os.path.join(ROOT_DIRPATH, 'batcher'))
 
+from src import utils
+
+utils.initialize_i18n()
+
 from dev import sync_docs
 
 

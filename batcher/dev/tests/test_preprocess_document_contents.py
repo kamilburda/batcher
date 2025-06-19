@@ -4,7 +4,6 @@ import unittest.mock as mock
 import parameterized
 
 from config import CONFIG
-
 from dev import preprocess_document_contents
 
 

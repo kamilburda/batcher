@@ -10,16 +10,19 @@ because any previous updates to such files are discarded.
 import os
 import shutil
 
-from src import constants
-from dev import preprocess_document_contents
 from src import utils
 
+utils.initialize_i18n()
 
-MODULE_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
-ROOT_DIRPATH = os.path.dirname(MODULE_DIRPATH)
+from dev import preprocess_document_contents
+from src import constants
 
-PATHS_TO_PREPROCESS_FILEPATH = os.path.join(MODULE_DIRPATH, 'sync_docs_files_to_preprocess.txt')
-PATHS_TO_COPY_FILEPATH = os.path.join(MODULE_DIRPATH, 'sync_docs_files_to_copy.txt')
+
+DEV_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
+ROOT_DIRPATH = os.path.dirname(os.path.dirname(DEV_DIRPATH))
+
+PATHS_TO_PREPROCESS_FILEPATH = os.path.join(DEV_DIRPATH, 'sync_docs_files_to_preprocess.txt')
+PATHS_TO_COPY_FILEPATH = os.path.join(DEV_DIRPATH, 'sync_docs_files_to_copy.txt')
 
 
 def main():

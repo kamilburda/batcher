@@ -18,25 +18,20 @@ import traceback
 
 import git
 
-DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
-ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
-PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
-
-sys.path.extend([
-  DEV_DIRPATH,
-  ROOT_DIRPATH,
-  PLUGIN_DIRPATH,
-])
-
-from config import CONFIG
-from src import version as version_
-from src import constants
 from src import utils
 
+utils.initialize_i18n()
+
+from config import CONFIG
 from dev import make_installers
 from dev import preprocess_document_contents
+from src import version as version_
+from src import constants
 
+
+DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PLUGIN_DIRPATH = os.path.dirname(DEV_DIRPATH)
+ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 
 GITHUB_PAGES_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
 GITHUB_PAGES_BRANCH = 'gh-pages'
