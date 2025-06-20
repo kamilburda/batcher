@@ -2,12 +2,11 @@
 
 """Main plug-in file."""
 
-import inspect
 import os
 
 from src import utils
 
-_ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+_ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
 
 utils.initialize_i18n(os.path.join(_ROOT_PLUGIN_DIRPATH, 'locale'), 'batcher')
 
