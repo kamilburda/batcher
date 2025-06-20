@@ -104,7 +104,7 @@ def _prepare_log_files(handles, log_dirpaths, log_filename):
         if _gobject_dependent_modules_imported:
           log_files.append(GimpMessageFile())
       else:
-        raise ValueError(f'handle not valid; valid handles: {", ".join(_HANDLES)}')
+        raise ValueError(f'handle "{handle}" not valid; valid handles: {", ".join(_HANDLES)}')
 
   return log_files
 
