@@ -13,6 +13,7 @@ else:
   _gimp_modules_available = True
 
 from src import logging
+from src import utils
 
 if _gimp_modules_available:
   from src import setting as setting_
@@ -53,7 +54,7 @@ def create_config() -> _Config:
   """
   config = _Config()
 
-  _init_config_initial(config, _get_root_plugin_dirpath())
+  _init_config_initial(config, _get_plugin_dirpath())
 
   _init_config_logging(config)
 
@@ -64,15 +65,15 @@ def create_config() -> _Config:
   return config
 
 
-def _get_root_plugin_dirpath():
+def _get_plugin_dirpath():
   # This depends on the location of the `configbase.py` file.
-  return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  return os.path.dirname(os.path.dirname(os.path.abspath(utils.get_current_module_filepath())))
 
 
-def _init_config_initial(config: _Config, root_plugin_dirpath: str):
-  config._DEFAULT_PLUGIN_NAME = os.path.basename(root_plugin_dirpath)
-  config.PLUGIN_DIRPATH = root_plugin_dirpath
-  config.PLUGINS_DIRPATH = os.path.dirname(root_plugin_dirpath)
+def _init_config_initial(config: _Config, plugin_dirpath: str):
+  config._DEFAULT_PLUGIN_NAME = os.path.basename(plugin_dirpath)
+  config.PLUGIN_DIRPATH = plugin_dirpath
+  config.PLUGINS_DIRPATH = os.path.dirname(plugin_dirpath)
   config.DEFAULT_LOGS_DIRPATH = lambda: config.PLUGIN_DIRPATH
 
   # noinspection PyProtectedMember

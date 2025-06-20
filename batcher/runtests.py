@@ -32,9 +32,10 @@ from gi.repository import Gio
 from gi.repository import GObject
 
 from src import procedure as procedure_
+from src import utils
 
 
-PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(__file__))
+PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
 
 _MAIN_MODULE = 'batcher'
 

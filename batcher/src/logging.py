@@ -17,7 +17,7 @@ except (ImportError, ValueError):
 else:
   _gobject_dependent_modules_imported = True
 
-from . import constants
+from src import constants
 
 _HANDLES = ('file', 'gimp_message')
 
@@ -36,7 +36,8 @@ def log_output(
       log_output_filename: Optional[str] = None,
       log_error_filename: Optional[str] = None,
       log_header_title: str = '',
-      flush_output: bool = False):
+      flush_output: bool = False,
+):
   """Duplicates output from `sys.stdout` and `sys.stderr` to files.
 
   You may duplicate output to sources specified via `stdout_handles` and error

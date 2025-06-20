@@ -14,7 +14,6 @@ GIT_HOOKS_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.curr
 PLUGIN_DIRPATH = os.path.dirname(os.path.dirname(GIT_HOOKS_DIRPATH))
 ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 
-sys.path.append(ROOT_DIRPATH)
 sys.path.append(PLUGIN_DIRPATH)
 
 from src import utils
