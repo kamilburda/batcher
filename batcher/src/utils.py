@@ -359,6 +359,12 @@ def _copy_dict(dict_, initial_object=None):
 
 
 def initialize_i18n(dirpath=None, domain=None):
+  """Installs `_` as a built-in function to translate strings to a locale
+  located under the specified `dirpath` and using the specified `domain`.
+
+  If `dirpath` or `domain` is ``None``, strings are not translated and `_`
+  merely returns the input string unchanged.
+  """
   if dirpath is not None and domain is not None:
     gettext.bindtextdomain(domain, dirpath)
     gettext.textdomain(domain)
