@@ -1,3 +1,9 @@
+## Upcoming
+
+* Updated Japanese translation (thanks to @re-unknown).
+* Updated German translation (thanks to @ChrisLauinger77).
+
+
 ## 1.1.1
 
 ### June 15, 2025
