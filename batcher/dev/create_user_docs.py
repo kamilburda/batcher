@@ -17,7 +17,7 @@ utils.initialize_i18n()
 from dev import process_local_docs
 
 
-MODULE_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
+DEV_DIRPATH = os.path.abspath(os.path.dirname(utils.get_current_module_filepath()))
 
 FILE_ENCODING = 'utf-8'
 
@@ -34,7 +34,7 @@ def main(github_page_dirpath, output_dirpath):
 
 def run_github_page_locally(github_page_dirpath):
   run_github_page_locally_process = psutil.Popen(
-    [os.path.join(MODULE_DIRPATH, 'run_github_page_locally.sh'), '--release'])
+    [os.path.join(DEV_DIRPATH, 'run_github_page_locally.sh'), '--release'])
   
   page_config_filepath = os.path.join(github_page_dirpath, PAGE_CONFIG_FILENAME)
   

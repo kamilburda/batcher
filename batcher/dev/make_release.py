@@ -4,7 +4,6 @@
 
 import argparse
 import getpass
-import inspect
 import json
 import os
 import re
@@ -29,7 +28,10 @@ from src import version as version_
 from src import constants
 
 
-DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+CONFIG.STDOUT_LOG_HANDLES = []
+CONFIG.STDERR_LOG_HANDLES = []
+
+DEV_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
 PLUGIN_DIRPATH = os.path.dirname(DEV_DIRPATH)
 ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 

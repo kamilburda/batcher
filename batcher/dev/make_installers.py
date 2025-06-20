@@ -2,20 +2,12 @@
 
 """Creating installers for releases from the plug-in source."""
 
-import inspect
 import os
 import sys
 
-DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+from src import utils
 
-ROOT_DIRPATH = os.path.dirname(DEV_DIRPATH)
-PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
-
-sys.path.extend([
-  DEV_DIRPATH,
-  ROOT_DIRPATH,
-  PLUGIN_DIRPATH,
-])
+utils.initialize_i18n()
 
 import argparse
 import pathlib
@@ -28,18 +20,18 @@ import zipfile
 import git
 import pathspec
 
-from src import utils
-
-utils.initialize_i18n()
-
 from config import CONFIG
 from dev import create_user_docs
 from dev import process_local_docs
 from src import constants
 
+
 CONFIG.STDOUT_LOG_HANDLES = []
 CONFIG.STDERR_LOG_HANDLES = []
 
+DEV_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
+PLUGIN_DIRPATH = os.path.dirname(DEV_DIRPATH)
+ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 
 INSTALLERS_DIRPATH = os.path.join(ROOT_DIRPATH, 'installers')
 
