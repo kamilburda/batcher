@@ -20,11 +20,8 @@ from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
 from src import utils_pdb
-from src.gui import anchor_box as anchor_box_
-from src.gui import angle_box as angle_box_
-from src.gui import dimension_box as dimension_box_
-from src.gui import coordinates_box as coordinates_box_
 from src.gui import file_format_options_box as file_format_options_box_
+from src.gui import widgets as gui_widgets_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
 
@@ -173,7 +170,7 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
-    dimension_box = dimension_box_.DimensionBox(
+    dimension_box = gui_widgets_.DimensionBox(
       default_pixel_value=setting.value['pixel_value'],
       default_percent_value=setting.value['percent_value'],
       default_percent_property=setting.value['percent_property'],
@@ -326,7 +323,7 @@ class AngleBoxPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
-    return angle_box_.AngleBox(
+    return gui_widgets_.AngleBox(
       default_value=setting.value['value'],
       default_unit=setting.value['unit'],
       units=dict(builtin_actions_.UNITS),
@@ -373,7 +370,7 @@ class AnchorBoxPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
-    return anchor_box_.AnchorBox(
+    return gui_widgets_.AnchorBox(
       anchor_names_and_display_names=setting.items_display_names,
       default_anchor_name=setting.default_value,
     )
@@ -407,7 +404,7 @@ class CoordinatesBoxPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, label_x=None, label_y=None, **kwargs):
-    return coordinates_box_.CoordinatesBox(
+    return gui_widgets_.CoordinatesBox(
       default_x=setting.value['x'],
       default_y=setting.value['y'],
       min_x=setting.min_x,

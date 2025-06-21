@@ -11,10 +11,9 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 from src import commands as commands_
-from src.gui import editable_label as editable_label_
-from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import utils as gui_utils_
 from src.gui import utils_grid as gui_utils_grid_
+from src.gui import widgets as gui_widgets_
 from src.pypdb import pdb
 
 
@@ -218,7 +217,7 @@ class CommandEditorWidget:
     self._show_hide_additional_settings()
 
   def _set_up_editable_name(self, command):
-    self._label_editable_command_name = editable_label_.EditableLabel()
+    self._label_editable_command_name = gui_widgets_.EditableLabel()
 
     self._label_editable_command_name.label.set_use_markup(True)
     self._label_editable_command_name.label.set_ellipsize(Pango.EllipsizeMode.END)
@@ -560,7 +559,7 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=100,
   )
   info_popup_hbox.pack_start(info_popup_text, True, True, 0)
 
-  info_popup_hide_context = popup_hide_context_.PopupHideContext(
+  info_popup_hide_context = gui_widgets_.PopupHideContext(
     info_popup,
     parent_widget,
     widgets_to_exclude_from_triggering_hiding=[

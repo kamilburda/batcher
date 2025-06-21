@@ -9,8 +9,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import utils
-from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import utils as gui_utils_
+from src.gui import widgets as gui_widgets_
 
 
 class EntryPopup:
@@ -58,7 +58,7 @@ class EntryPopup:
 
     self._init_gui(column_types, rows)
     
-    self._popup_hide_context = popup_hide_context_.PopupHideContext(
+    self._popup_hide_context = gui_widgets_.PopupHideContext(
       self._popup,
       self._entry,
       hide_callback=self.hide,

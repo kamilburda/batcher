@@ -6,6 +6,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 
+__all__ = [
+  'CellRendererTextList',
+]
+
+
 class CellRendererTextList(Gtk.CellRendererText):
   """Custom text-based cell renderer that can accept a list of strings."""
   

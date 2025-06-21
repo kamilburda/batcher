@@ -17,9 +17,8 @@ from . import popup as entry_popup_
 from . import undo as entry_undo_
 
 from src import file_formats as file_formats_
-from src.gui import cell_renderers as cell_renderers_
-from src.gui import popup_hide_context as popup_hide_context_
 from src.gui import utils as gui_utils_
+from src.gui import widgets as gui_widgets_
 from src.path import pattern as pattern_
 
 
@@ -270,7 +269,7 @@ class NamePatternEntry(ExtendedEntry):
     
     self._add_columns()
 
-    self._field_tooltip_hide_context = popup_hide_context_.PopupHideContext(
+    self._field_tooltip_hide_context = gui_widgets_.PopupHideContext(
       self._field_tooltip_window,
       self,
       widgets_to_exclude_from_triggering_hiding=[
@@ -555,7 +554,7 @@ class FileExtensionEntry(ExtendedEntry):
       ))
     
     self._cell_renderer_description = Gtk.CellRendererText()
-    self._cell_renderer_extensions = cell_renderers_.CellRendererTextList()
+    self._cell_renderer_extensions = gui_widgets_.CellRendererTextList()
     _add_column(self._cell_renderer_description, 'text', self._COLUMN_DESCRIPTION)
     _add_column(self._cell_renderer_extensions, 'markup-list', self._COLUMN_EXTENSIONS)
   

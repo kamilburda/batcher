@@ -10,6 +10,11 @@ from gi.repository import Gtk
 from src.gui import utils as gui_utils_
 
 
+__all__ = [
+  'PopupHideContext',
+]
+
+
 class PopupHideContext:
   """Class providing a simplified interface for connecting events to hide a
   popup window.

@@ -10,6 +10,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 
+__all__ = [
+  'EditableLabel',
+]
+
+
 class EditableLabel(Gtk.Box):
   """Class that displays a label and an edit button to allow editing the label.
 
