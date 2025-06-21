@@ -19,7 +19,7 @@ from src.tests import stubs_gimp
 class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 
   @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
-  def setUp(self, mock_get_pdb):
+  def setUp(self, *_mocks):
     self.procedure_name = 'file-png-export'
 
     self.procedure_stub_kwargs = dict(

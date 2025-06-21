@@ -6,18 +6,18 @@ import os
 
 from src import utils
 
-_ROOT_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
+_PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
 
-utils.initialize_i18n(os.path.join(_ROOT_PLUGIN_DIRPATH, 'locale'), 'batcher')
+utils.initialize_i18n(os.path.join(_PLUGIN_DIRPATH, 'locale'), 'batcher')
 
 from src import logging
 
 # Initialize logging as early as possible to capture any module-level errors.
 logging.log_output(
   stderr_handles=['file'],
-  log_dirpaths=[_ROOT_PLUGIN_DIRPATH],
+  log_dirpaths=[_PLUGIN_DIRPATH],
   log_error_filename='error.log',
-  log_header_title=_ROOT_PLUGIN_DIRPATH)
+  log_header_title=_PLUGIN_DIRPATH)
 
 import gi
 gi.require_version('Gtk', '3.0')
