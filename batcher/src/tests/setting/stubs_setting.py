@@ -1,12 +1,11 @@
 """Stubs primarily to be used in the `test_setting` module."""
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 from gi.repository import GObject
 
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
+
+from src.tests import stubs_gimp
 
 
 class GuiWidgetStub:
@@ -113,7 +112,7 @@ class StubWithCallableDefaultDefaultValueSetting(StubSetting):
 
 class StubRegistrableSetting(StubSetting):
 
-  _ALLOWED_PDB_TYPES = [GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, Gimp.RunMode.__gtype__]
+  _ALLOWED_PDB_TYPES = [stubs_gimp.StubGObjectType.__gtype__]
 
   _REGISTRABLE_TYPE_NAME = 'stub_registrable'
 

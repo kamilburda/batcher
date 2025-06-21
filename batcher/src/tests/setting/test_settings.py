@@ -103,7 +103,7 @@ class TestSetting(SettingTestCase):
   def test_pdb_type_automatic_is_usable(self):
     setting = stubs_setting.StubRegistrableSetting('file_extension', default_value='png')
 
-    self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
+    self.assertEqual(setting.pdb_type, stubs_gimp.StubGObjectType.__gtype__)
     self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_none(self):
@@ -115,23 +115,23 @@ class TestSetting(SettingTestCase):
 
   def test_pdb_type_as_gobject_subclass(self):
     setting = stubs_setting.StubRegistrableSetting(
-      'file_extension', default_value='png', pdb_type=Gimp.RunMode)
+      'file_extension', default_value='png', pdb_type=stubs_gimp.StubGObjectType)
 
-    self.assertEqual(setting.pdb_type, Gimp.RunMode)
+    self.assertEqual(setting.pdb_type, stubs_gimp.StubGObjectType)
     self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_gtype(self):
     setting = stubs_setting.StubRegistrableSetting(
-      'file_extension', default_value='png', pdb_type=Gimp.RunMode.__gtype__)
+      'file_extension', default_value='png', pdb_type=stubs_gimp.StubGObjectType.__gtype__)
 
-    self.assertEqual(setting.pdb_type, Gimp.RunMode.__gtype__)
+    self.assertEqual(setting.pdb_type, stubs_gimp.StubGObjectType.__gtype__)
     self.assertTrue(setting.can_be_used_in_pdb())
 
   def test_pdb_type_as_gtype_name(self):
     setting = stubs_setting.StubRegistrableSetting(
-      'file_extension', default_value='png', pdb_type='gchararray')
+      'file_extension', default_value='png', pdb_type='StubGObjectType')
 
-    self.assertEqual(setting.pdb_type, GObject.TYPE_STRING)
+    self.assertEqual(setting.pdb_type, stubs_gimp.StubGObjectType.__gtype__)
     self.assertTrue(setting.can_be_used_in_pdb())
   
   def test_invalid_pdb_type(self):
@@ -237,7 +237,7 @@ class TestSetting(SettingTestCase):
 
   def test_to_dict_with_pdb_type_as_gtype(self):
     setting = stubs_setting.StubRegistrableSetting(
-      'file_extension', default_value='png', pdb_type=GObject.TYPE_STRING)
+      'file_extension', default_value='png', pdb_type=stubs_gimp.StubGObjectType.__gtype__)
 
     self.assertDictEqual(
       setting.to_dict(),
@@ -246,12 +246,12 @@ class TestSetting(SettingTestCase):
         'value': 'png',
         'type': 'stub_registrable',
         'default_value': 'png',
-        'pdb_type': 'gchararray',
+        'pdb_type': 'StubGObjectType',
       })
 
   def test_to_dict_with_pdb_type_as_gobject_subclass(self):
     setting = stubs_setting.StubRegistrableSetting(
-      'file_extension', default_value='png', pdb_type=Gimp.RunMode)
+      'file_extension', default_value='png', pdb_type=stubs_gimp.StubGObjectType)
 
     self.assertDictEqual(
       setting.to_dict(),
@@ -260,7 +260,7 @@ class TestSetting(SettingTestCase):
         'value': 'png',
         'type': 'stub_registrable',
         'default_value': 'png',
-        'pdb_type': 'GimpRunMode',
+        'pdb_type': 'StubGObjectType',
       })
 
 

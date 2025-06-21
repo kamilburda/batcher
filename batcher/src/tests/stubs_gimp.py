@@ -826,3 +826,11 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   @classmethod
   def param_spec_core_object_array_get_object_type(cls, param_spec):
     return param_spec.object_type if hasattr(param_spec, 'object_type') else None
+
+
+class StubGObjectType(GObject.GObject):
+
+  __gtype_name__ = 'StubGObjectType'
+
+
+GObject.type_register(StubGObjectType)
