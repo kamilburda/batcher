@@ -6,7 +6,7 @@ from gi.repository import Gtk
 
 from src import setting as setting_
 from src import setting_classes
-from src.gui import placeholders as gui_placeholders_
+from src.gui import utils as gui_utils_
 
 
 def attach_label_to_grid(
@@ -62,11 +62,11 @@ def attach_widget_to_grid(
   widget_to_attach = setting.gui.widget
 
   if isinstance(setting.gui, setting_.SETTING_GUI_TYPES.null):
-    widget_to_attach = gui_placeholders_.create_placeholder_widget()
+    widget_to_attach = gui_utils_.create_placeholder_widget()
   else:
     if (isinstance(setting, setting_.ArraySetting)
         and not setting.element_type.get_allowed_gui_types()):
-      widget_to_attach = gui_placeholders_.create_placeholder_widget()
+      widget_to_attach = gui_utils_.create_placeholder_widget()
 
   widget_to_attach.set_hexpand(True)
 

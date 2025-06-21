@@ -12,6 +12,8 @@ import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -221,3 +223,27 @@ def _get_paths_from_text_uri_list(selection_data):
       return paths
 
   return None
+
+
+def create_placeholder_widget(spacing=5):
+  hbox = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    spacing=spacing,
+  )
+
+  hbox.pack_start(
+    Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_WARNING, Gtk.IconSize.BUTTON),
+    False,
+    False,
+    0)
+
+  label = Gtk.Label(
+    use_markup=True,
+    label=_('Cannot be modified'),
+    xalign=0.0,
+    yalign=0.5,
+  )
+
+  hbox.pack_start(label, False, False, 0)
+
+  return hbox
