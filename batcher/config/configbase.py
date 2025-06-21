@@ -171,9 +171,6 @@ def _init_config_logging(config: _Config):
       # create log files there.
       config.PLUGINS_LOG_DIRPATHS.append(plugins_dirpath_alternate)
 
-  config.PLUGINS_LOG_STDOUT_DIRPATH = config.DEFAULT_LOGS_DIRPATH
-  config.PLUGINS_LOG_STDERR_DIRPATH = config.DEFAULT_LOGS_DIRPATH
-
   config.PLUGINS_LOG_OUTPUT_FILENAME = 'output.log'
   config.PLUGINS_LOG_ERROR_FILENAME = 'error.log'
 
