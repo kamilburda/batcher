@@ -1,4 +1,69 @@
-"""Class for creating plug-in-wide configuration."""
+"""Class for creating plug-in-wide configuration.
+
+Once a configuration object is instantiated, existing entries can be modified
+and new entries can be created at any time.
+
+Configuration entries can also be made dynamic, i.e. resolve dynamically at
+the time of accessing the entry, by wrapping the entry in a function accepting
+no parameters and returning a single value. For example, suppose that a
+``translate`` function takes an input string and returns a translated version
+of the string. You can then assign an entry as follows:
+
+  config.PLUGIN_TITLE = lambda: translate('Batcher')
+
+Every time you access `config.PLUGIN_TITLE`, the input string will be processed
+and the output will be a translated version of the string.
+
+Dynamic entries are also useful when you need to keep some entries up-to-date
+when they depend on the value of other entries, which may be modified.
+
+The following configuration entries are provided by default:
+
+  PLUGIN_DIRPATH:
+    Path to the directory containing the main plug-in file and other files
+    required to run the plug-in.
+  PLUGINS_DIRPATH:
+    Path to the directory containing plug-ins where this plug-in is installed.
+  PLUGIN_NAME: Name of the plug-in usable as an identifier.
+  PLUGIN_TITLE: Human-readable title of the plug-in.
+  PLUGIN_VERSION:
+    The plug-in version, used predominantly to check if a newer version is
+    detected (in that case, settings will be updated to ensure compatibility
+    with the newer version).
+  LOCALE_DIRPATH:
+    Path to the ``'locale'`` directory containing translation files.
+  DOMAIN_NAME:
+    Domain name used when initializing plug-in internationalization.
+  BUG_REPORT_URL_LIST: List of URLs where users can submit bug reports.
+  STDOUT_LOG_HANDLES:
+    List of strings describing destination sources where standard output will be
+    logged. See the `logging` module for possible types.
+  STDERR_LOG_HANDLES:
+    List of strings describing destination sources where error output will be
+    logged. See the `logging` module for possible types.
+  DEFAULT_LOGS_DIRPATH:
+    Default path to a directory where messages will be logged.
+  PLUGINS_LOG_DIRPATHS:
+    List of possible directories where messages will be logged. The earliest
+    directory in the list takes precedence, if messages can be logged there.
+  PLUGINS_LOG_OUTPUT_FILENAME:
+    Name of the file to write standard output to.
+  PLUGINS_LOG_ERROR_FILENAME:
+    Name of the file to write error output to.
+  PROCEDURE_GROUP:
+    String identifying a group of related plug-in procedures. This is used to
+    e.g. filter built-in actions. conditions or name pattern fields that are
+    not applicable for particular procedures.
+  DEFAULT_SOURCE:
+    Default source where settings will be loaded from or saved to.
+  WARN_ON_INVALID_SETTING_VALUES:
+    If ``True``, warning messages will be issued when a setting is assigned
+    a value that is not valid.
+  SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE:
+    Set of `setting.Setting` instances for which warning messages will not be
+    issued if assigning a value that is not valid, even if
+    ``WARN_ON_INVALID_SETTING_VALUES`` is set to ``True``.
+"""
 
 import os
 import sys
