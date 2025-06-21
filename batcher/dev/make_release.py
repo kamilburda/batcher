@@ -4,6 +4,7 @@
 
 import argparse
 import getpass
+import inspect
 import json
 import os
 import re
@@ -16,6 +17,13 @@ import time
 import traceback
 
 import git
+
+DEV_DIRPATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+PLUGIN_DIRPATH = os.path.dirname(DEV_DIRPATH)
+ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
+
+if PLUGIN_DIRPATH not in sys.path:
+  sys.path.append(PLUGIN_DIRPATH)
 
 from src import utils
 
@@ -30,10 +38,6 @@ from src import constants
 
 CONFIG.STDOUT_LOG_HANDLES = []
 CONFIG.STDERR_LOG_HANDLES = []
-
-DEV_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filepath()))
-PLUGIN_DIRPATH = os.path.dirname(DEV_DIRPATH)
-ROOT_DIRPATH = os.path.dirname(PLUGIN_DIRPATH)
 
 GITHUB_PAGES_DIRPATH = os.path.join(ROOT_DIRPATH, 'docs', 'gh-pages')
 GITHUB_PAGES_BRANCH = 'gh-pages'
