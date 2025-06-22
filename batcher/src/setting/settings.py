@@ -162,6 +162,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         display_name: Optional[str] = None,
         description: Optional[str] = None,
         pdb_type: Union[GObject.GType, Type[GObject.GObject], str, None] = 'automatic',
+        gui_kwargs: Optional[Dict] = None,
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         gui_type_kwargs: Optional[Dict] = None,
         auto_update_gui_to_setting: bool = True,
@@ -189,6 +190,10 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         types for a particular `Setting` subclass is chosen. If no allowed
         PDB types are defined for that subclass, the setting cannot be
         registered as a PDB parameter ( ``None`` is assigned).
+      gui_kwargs:
+        Keyword arguments when instantiating a `setting.Presenter` associated
+        with this setting. ``gui_kwargs`` is used within `Setting.__init__()`
+        and every time `set_gui()` is called.
       gui_type:
         Type of GUI widget to be created by `set_gui()`. Each subclass allows
         only specific GUI types. The list of accepted GUI types per subclass
@@ -236,16 +241,20 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     
     self._setting_value_synchronizer = presenter_.SettingValueSynchronizer()
     self._setting_value_synchronizer.apply_gui_value_to_setting = self._apply_gui_value_to_setting
-    
+
+    self._gui_kwargs = gui_kwargs
     self._gui_type = self._get_gui_type(gui_type)
     self._gui_type_kwargs = gui_type_kwargs
 
-    self._gui = presenter_.NullPresenter(
-      self,
-      None,
-      self._setting_value_synchronizer,
+    null_presenter_kwargs = dict(
+      widget=None,
+      setting_value_synchronizer=self._setting_value_synchronizer,
       auto_update_gui_to_setting=auto_update_gui_to_setting,
     )
+    if self._gui_kwargs:
+      null_presenter_kwargs.update(self._gui_kwargs)
+
+    self._gui = presenter_.NullPresenter(self, **null_presenter_kwargs)
     
     self._tags = set(tags) if tags is not None else set()
 
@@ -469,6 +478,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         gui_type: Union[Type[presenter_.Presenter], str, None] = 'automatic',
         widget=None,
         auto_update_gui_to_setting: bool = True,
+        gui_kwargs: Optional[Dict] = None,
         gui_type_kwargs: Optional[Dict] = None,
         copy_previous_value: bool = True,
         copy_previous_visible: bool = True,
@@ -505,10 +515,14 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
         `ValueError` is raised.
       auto_update_gui_to_setting:
         See the ``auto_update_gui_to_setting`` parameter in `__init__()`.
+      gui_kwargs:
+        Keyword arguments when instantiating a `setting.Presenter` associated
+        with this setting. If ``None``, the ``gui_kwargs`` parameter specified
+        in `__init__()` is used instead.
       gui_type_kwargs:
-        Keyword arguments for instantiating a particular `setting.Presenter`
-        subclass. If ``None``, the ``gui_type_kwargs`` parameter specified in
-        `__init__()` is used instead.
+        Keyword arguments for instantiating a widget associated with a
+        `setting.Presenter` subclass. If ``None``, the ``gui_type_kwargs``
+        parameter specified in `__init__()` is used instead.
       copy_previous_value:
         See `setting.Presenter.__init__()`.
       copy_previous_visible:
@@ -532,12 +546,14 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     else:
       processed_gui_type = meta_.process_setting_gui_type(gui_type)
 
+    if gui_kwargs is None:
+      gui_kwargs = self._gui_kwargs
+
     if gui_type_kwargs is None:
       gui_type_kwargs = self._gui_type_kwargs
 
-    self._gui = processed_gui_type(
-      self,
-      widget,
+    processed_gui_kwargs = dict(
+      widget=widget,
       setting_value_synchronizer=self._setting_value_synchronizer,
       auto_update_gui_to_setting=auto_update_gui_to_setting,
       create_widget_kwargs=gui_type_kwargs,
@@ -546,6 +562,10 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       copy_previous_visible=copy_previous_visible,
       copy_previous_sensitive=copy_previous_sensitive,
     )
+    if gui_kwargs:
+      processed_gui_kwargs.update(gui_kwargs)
+
+    self._gui = processed_gui_type(self, **processed_gui_kwargs)
     
     self.invoke_event('after-set-gui')
 

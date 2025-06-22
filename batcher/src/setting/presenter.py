@@ -67,6 +67,7 @@ class Presenter(metaclass=meta_.PresenterMeta):
         copy_previous_value: bool = True,
         copy_previous_visible: bool = True,
         copy_previous_sensitive: bool = True,
+        show_display_name: bool = True,
   ):
     """Initializes a `Presenter` instance.
 
@@ -109,9 +110,14 @@ class Presenter(metaclass=meta_.PresenterMeta):
         If ``True``, the visible state from ``previous_presenter`` is copied.
       copy_previous_sensitive:
         If ``True``, the sensitive state from ``previous_presenter`` is copied.
+      show_display_name:
+        If ``True``, this indicates that the setting's display name should be
+        visible (e.g. by displaying it as a label).
     """
     self._setting = setting
     self._widget = widget
+
+    self._show_display_name = show_display_name
 
     if setting_value_synchronizer is not None:
       self._setting_value_synchronizer = setting_value_synchronizer
@@ -157,13 +163,20 @@ class Presenter(metaclass=meta_.PresenterMeta):
   def widget(self):
     """The underlying GUI widget."""
     return self._widget
-  
+
   @property
   def gui_update_enabled(self) -> bool:
     """Returns ``True`` if this presenter can be automatically synchronized with
     ``setting.value``, ``False`` otherwise.
     """
     return self._value_changed_signal is not None
+
+  @property
+  def show_display_name(self) -> bool:
+    """Returns ``True`` if the setting's display name should be visible (e.g.
+    by displaying it as a label).
+    """
+    return self._show_display_name
   
   @abc.abstractmethod
   def get_sensitive(self) -> bool:

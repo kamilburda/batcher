@@ -447,7 +447,6 @@ class CoordinatesSetting(setting_.DictSetting):
         min_y: float = -GLib.MAXDOUBLE,
         max_x: float = GLib.MAXDOUBLE,
         max_y: float = GLib.MAXDOUBLE,
-        show_display_name: bool = True,
         **kwargs,
   ):
     super().__init__(name, **kwargs)
@@ -456,7 +455,6 @@ class CoordinatesSetting(setting_.DictSetting):
     self._min_y = min_y
     self._max_x = max_x
     self._max_y = max_y
-    self._show_display_name = show_display_name
 
   @property
   def min_x(self) -> float:
@@ -477,13 +475,6 @@ class CoordinatesSetting(setting_.DictSetting):
   def max_y(self) -> float:
     """The maximum value along the Y-axis."""
     return self._max_y
-
-  @property
-  def show_display_name(self) -> bool:
-    """``True`` if the `display_name` property should be shown in the GUI,
-    ``False`` otherwise.
-    """
-    return self._show_display_name
 
   def _copy_value(self, value):
     if isinstance(value, Iterable) and not isinstance(value, str):
@@ -910,6 +901,9 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
   Value: Dictionary of (string, value) pairs where the value is obtained from
     each widget.
   """
+
+  def __init__(self, *args, show_display_name=False, **kwargs):
+    super().__init__(*args, show_display_name=show_display_name, **kwargs)
 
   def _create_widget(self, setting, **kwargs):
     file_format_options_box = file_format_options_box_.FileFormatOptionsBox(

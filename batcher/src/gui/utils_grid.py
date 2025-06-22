@@ -5,7 +5,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import setting as setting_
-from src import setting_classes
 from src.gui import utils as gui_utils_
 
 
@@ -20,7 +19,7 @@ def attach_label_to_grid(
       max_width_chars=40,
       set_name_as_tooltip=True,
 ):
-  if not _should_display_setting_display_name_in_grid(setting):
+  if not setting.gui.show_display_name:
     return
 
   label = Gtk.Label(
@@ -66,7 +65,7 @@ def attach_widget_to_grid(
 
   widget_to_attach.set_hexpand(True)
 
-  if _should_display_setting_display_name_in_grid(setting):
+  if setting.gui.show_display_name:
     final_column_index = column_index
     final_width = width
   else:
@@ -80,20 +79,6 @@ def attach_widget_to_grid(
       widget_to_attach.get_child().set_width_chars(width_chars_for_check_button_labels)
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
-
-
-def _should_display_setting_display_name_in_grid(setting):
-  presenters_with_no_label = (
-    setting_.CheckButtonPresenter,
-    setting_classes.FileFormatOptionsPresenter,
-  )
-
-  if isinstance(setting.gui, presenters_with_no_label):
-    return False
-  elif isinstance(setting, setting_classes.CoordinatesSetting):
-    return setting.show_display_name
-  else:
-    return True
 
 
 def _has_setting_display_name(setting):

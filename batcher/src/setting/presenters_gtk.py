@@ -102,7 +102,10 @@ class CheckButtonPresenter(GtkPresenter):
   """
   
   _VALUE_CHANGED_SIGNAL = 'clicked'
-  
+
+  def __init__(self, *args, show_display_name=False, **kwargs):
+    super().__init__(*args, show_display_name=show_display_name, **kwargs)
+
   def _create_widget(self, setting, width_chars=20, max_width_chars=40, **kwargs):
     check_button = Gtk.CheckButton(
       label=setting.display_name,

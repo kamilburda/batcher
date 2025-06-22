@@ -446,6 +446,29 @@ class TestSettingGui(SettingTestCase):
     with self.assertRaises(ValueError):
       setting.set_gui()
 
+  def test_create_gui_with_gui_kwargs_on_init(self):
+    setting = stubs_setting.StubWithGuiSetting(
+      'flatten',
+      default_value=False,
+      gui_kwargs={'show_display_name': False},
+      gui_type=stubs_setting.StubWithCustomKwargsInCreateWidgetPresenter,
+      gui_type_kwargs=dict(width=200, height=15),
+    )
+
+    self.assertFalse(setting.gui.show_display_name)
+
+  def test_create_gui_with_gui_kwargs_on_set_gui(self):
+    setting = stubs_setting.StubWithGuiSetting(
+      'flatten',
+      default_value=False,
+      gui_type=stubs_setting.StubWithCustomKwargsInCreateWidgetPresenter,
+      gui_type_kwargs=dict(width=200, height=15),
+    )
+
+    setting.set_gui(gui_kwargs={'show_display_name': False})
+
+    self.assertFalse(setting.gui.show_display_name)
+
   def test_create_gui_with_gui_type_kwargs_on_init(self):
     setting = stubs_setting.StubWithGuiSetting(
       'flatten',
