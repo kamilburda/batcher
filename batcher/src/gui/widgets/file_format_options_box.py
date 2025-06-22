@@ -1,6 +1,7 @@
 """Widget for updating file format-specific options."""
 
 import gi
+from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -115,3 +116,6 @@ class FileFormatOptionsBox(Gtk.Box):
     grid.show_all()
 
     return grid
+
+
+GObject.type_register(FileFormatOptionsBox)

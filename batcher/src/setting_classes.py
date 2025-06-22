@@ -20,7 +20,6 @@ from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
 from src import utils_pdb
-from src.gui import file_format_options_box as file_format_options_box_
 from src.gui import widgets as gui_widgets_
 from src.gui.entry import entries as entries_
 from src.path import validators as validators_
@@ -906,7 +905,7 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
     super().__init__(*args, show_display_name=show_display_name, **kwargs)
 
   def _create_widget(self, setting, **kwargs):
-    file_format_options_box = file_format_options_box_.FileFormatOptionsBox(
+    file_format_options_box = gui_widgets_.FileFormatOptionsBox(
       initial_header_title=setting.display_name,
       **kwargs,
     )
