@@ -103,8 +103,18 @@ class CheckButtonPresenter(GtkPresenter):
   
   _VALUE_CHANGED_SIGNAL = 'clicked'
 
-  def __init__(self, *args, show_display_name=False, **kwargs):
+  def __init__(
+        self,
+        *args,
+        show_display_name=False,
+        width_chars_when_attached_to_grid=25,
+        **kwargs,
+  ):
     super().__init__(*args, show_display_name=show_display_name, **kwargs)
+
+    self._width_chars_when_attached_to_grid = width_chars_when_attached_to_grid
+
+    self.setting.connect_event('gui-attached-to-grid', self._on_attached_to_grid)
 
   def _create_widget(self, setting, width_chars=20, max_width_chars=40, **kwargs):
     check_button = Gtk.CheckButton(
@@ -124,6 +134,10 @@ class CheckButtonPresenter(GtkPresenter):
   
   def _set_value(self, value):
     self._widget.set_active(value)
+
+  def _on_attached_to_grid(self, _setting):
+    if not self.show_display_name:
+      self._widget.get_child().set_width_chars(self._width_chars_when_attached_to_grid)
 
 
 class CheckButtonLabelPresenter(GtkPresenter):

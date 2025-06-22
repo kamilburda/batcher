@@ -137,6 +137,9 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   * ``'gui-sensitive-changed'``: invoked after `Setting.gui.set_sensitive()` is
     called.
 
+  * ``'gui-attached-to-grid'``: invoked after the setting GUI is attached to a
+    `Gtk.Grid` (such as via `gui.utils_grid.attach_widget_to_grid()`).
+
   If you need to create a custom `Setting` subclass and your plug-in is
   composed of multiple modules, you must ensure that the module where your
   subclass is defined is imported (i.e. the module is kept in the memory).

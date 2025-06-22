@@ -4,7 +4,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from src import setting as setting_
 from src.gui import utils as gui_utils_
 
 
@@ -56,7 +55,6 @@ def attach_widget_to_grid(
       column_index_for_widget_without_label=0,
       width_for_widget_without_label=2,
       set_name_as_tooltip=True,
-      width_chars_for_check_button_labels=25,
 ):
   widget_to_attach = setting.gui.widget
 
@@ -75,8 +73,7 @@ def attach_widget_to_grid(
     if set_name_as_tooltip and _has_setting_display_name(setting):
       widget_to_attach.set_tooltip_text(setting.name)
 
-    if isinstance(setting.gui, setting_.CheckButtonPresenter):
-      widget_to_attach.get_child().set_width_chars(width_chars_for_check_button_labels)
+  setting.invoke_event('gui-attached-to-grid')
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
 
