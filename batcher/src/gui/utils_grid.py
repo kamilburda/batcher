@@ -60,7 +60,7 @@ def attach_widget_to_grid(
 ):
   widget_to_attach = setting.gui.widget
 
-  if isinstance(setting.gui, setting_.SETTING_GUI_TYPES.null):
+  if setting.gui.is_null():
     widget_to_attach = gui_utils_.create_placeholder_widget()
 
   widget_to_attach.set_hexpand(True)

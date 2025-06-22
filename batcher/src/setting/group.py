@@ -11,7 +11,6 @@ from src import utils
 from . import meta as meta_
 from . import persistor as persistor_
 from . import settings as settings_
-from . import presenter as presenter_
 from . import utils as utils_
 
 __all__ = [
@@ -640,10 +639,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     
     for setting in self.walk(include_setting_func=_should_not_ignore):
       if setting.get_path('root') not in custom_gui:
-        if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
+        if not only_null or setting.gui.is_null():
           setting.set_gui(**set_gui_kwargs)
       else:
-        if not only_null or isinstance(setting.gui, presenter_.NullPresenter):
+        if not only_null or setting.gui.is_null():
           setting.set_gui(**dict(set_gui_kwargs, **custom_gui[setting.get_path('root')]))
   
   def apply_gui_values_to_settings(self, force: bool = False):

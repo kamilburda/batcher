@@ -335,7 +335,7 @@ def _set_visible_for_padding_color_and_position(
 
 
 def _set_left_margin_for_resolution(image_resolution_setting):
-  if not isinstance(image_resolution_setting.gui, setting_.NullPresenter):
+  if not image_resolution_setting.gui.is_null():
     image_resolution_setting.gui.widget.set_margin_start(constants.RELATED_WIDGETS_LEFT_MARGIN)
 
 

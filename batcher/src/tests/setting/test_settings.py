@@ -2291,7 +2291,7 @@ class TestArraySetting(SettingTestCase):
 
     setting.set_gui()
 
-    self.assertNotIsInstance(setting.gui, presenter_.NullPresenter)
+    self.assertFalse(setting.gui.is_null())
 
   def test_get_allowed_gui_types_is_empty_if_element_type_has_no_allowed_gui_types(self):
     setting = settings_.ArraySetting('palettes', element_type=stubs_setting.StubRegistrableSetting)
@@ -2300,7 +2300,7 @@ class TestArraySetting(SettingTestCase):
 
     setting.set_gui()
 
-    self.assertIsInstance(setting.gui, presenter_.NullPresenter)
+    self.assertTrue(setting.gui.is_null())
 
   def test_to_dict(self):
     self.assertDictEqual(

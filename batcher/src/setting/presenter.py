@@ -231,7 +231,13 @@ class Presenter(metaclass=meta_.PresenterMeta):
     else:
       self._value_changed_signal = None
       self._disconnect_value_changed_event()
-  
+
+  def is_null(self):
+    """Returns ``True`` if this `Presenter` is not initialized with a proper
+    widget, i.e. whether this `Presenter` is a `NullPresenter`.
+    """
+    return isinstance(self, NullPresenter)
+
   def _create_widget(self, setting: 'src.setting.Setting', **kwargs):
     """Instantiates and returns a new GUI widget using the attributes in the
     specified `setting.Setting` instance (e.g. display name as GUI label).
