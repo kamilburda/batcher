@@ -385,12 +385,7 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def get_allowed_pdb_types(cls):
     """Returns the list of allowed PDB types for this setting type."""
     return list(cls._ALLOWED_PDB_TYPES)
-  
-  @classmethod
-  def get_allowed_gui_types(cls) -> List[Type[presenter_.Presenter]]:
-    """Returns the list of allowed GUI types for this setting type."""
-    return [meta_.process_setting_gui_type(type_or_name) for type_or_name in cls._ALLOWED_GUI_TYPES]
-  
+
   def __str__(self) -> str:
     return utils.stringify_object(self, self.name)
   
@@ -630,7 +625,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       return self._get_pdb_param()
     else:
       return None
-  
+
+  def get_allowed_gui_types(self) -> List[Type[presenter_.Presenter]]:
+    """Returns the list of allowed GUI types for this setting type."""
+    return [
+      meta_.process_setting_gui_type(type_or_name) for type_or_name in self._ALLOWED_GUI_TYPES]
+
   def to_dict(self) -> Dict:
     """Returns a dictionary representing the setting, appropriate for saving the
     setting (e.g. via `Setting.save()`).
@@ -3167,6 +3167,17 @@ class ArraySetting(Setting):
         return None
     else:
       return None
+
+  def get_allowed_gui_types(self) -> List[Type[presenter_.Presenter]]:
+    """Returns the list of allowed GUI types for this setting type.
+
+    If the element type has no allowed GUI types, this setting type will not
+    have any allowed GUI types either.
+    """
+    if self._reference_element.get_allowed_gui_types():
+      return super().get_allowed_gui_types()
+    else:
+      return []
 
   def to_dict(self) -> Dict:
     settings_dict = super().to_dict()

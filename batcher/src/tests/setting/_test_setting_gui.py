@@ -29,8 +29,9 @@ def test_settings_and_gui():
   for item in setting_data.values():
     setting_type_name = item.pop('type')
     setting_type = meta_.SETTING_TYPES[setting_type_name]
-    
-    for gui_type in setting_type.get_allowed_gui_types():
+
+    # noinspection PyProtectedMember
+    for gui_type in setting_type._ALLOWED_GUI_TYPES:
       item['gui_type'] = gui_type
       settings.append(setting_type(**item))
   

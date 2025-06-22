@@ -2260,7 +2260,25 @@ class TestArraySetting(SettingTestCase):
     self.setting.reset()
     self.assertEqual(self.setting.value, (1.0, 5.0, 10.0))
     self.assertEqual(self.setting.default_value, (1.0, 5.0, 10.0))
-  
+
+  def test_get_allowed_gui_types_if_element_type_has_allowed_gui_types(self):
+    setting = settings_.ArraySetting('palettes', element_type=settings_.IntSetting)
+
+    self.assertTrue(setting.get_allowed_gui_types())
+
+    setting.set_gui()
+
+    self.assertNotIsInstance(setting.gui, presenter_.NullPresenter)
+
+  def test_get_allowed_gui_types_is_empty_if_element_type_has_no_allowed_gui_types(self):
+    setting = settings_.ArraySetting('palettes', element_type=stubs_setting.StubRegistrableSetting)
+
+    self.assertFalse(setting.get_allowed_gui_types())
+
+    setting.set_gui()
+
+    self.assertIsInstance(setting.gui, presenter_.NullPresenter)
+
   def test_to_dict(self):
     self.assertDictEqual(
       self.setting.to_dict(),

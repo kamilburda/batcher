@@ -63,10 +63,6 @@ def attach_widget_to_grid(
 
   if isinstance(setting.gui, setting_.SETTING_GUI_TYPES.null):
     widget_to_attach = gui_utils_.create_placeholder_widget()
-  else:
-    if (isinstance(setting, setting_.ArraySetting)
-        and not setting.element_type.get_allowed_gui_types()):
-      widget_to_attach = gui_utils_.create_placeholder_widget()
 
   widget_to_attach.set_hexpand(True)
 
