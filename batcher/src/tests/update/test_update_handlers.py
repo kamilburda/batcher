@@ -29,7 +29,7 @@ _MOCK_PNG_CHOICE = Gimp.Choice.new()
 _MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
 _MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
 
-_LATEST_PLUGIN_VERSION = '1.1'
+_LATEST_PLUGIN_VERSION = '1.2'
 
 
 @mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
@@ -102,6 +102,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(status, update.UPDATE, msg=message)
 
     self._assert_correct_contents_for_update_to_1_1(settings)
+    self._assert_correct_contents_for_update_to_1_2(settings)
 
   @staticmethod
   def _get_orig_setting_values_for_0_2(settings):
@@ -579,3 +580,8 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertNotIn('procedure_browser', settings['gui'])
     self.assertIn('action_browser', settings['gui'])
+
+  def _assert_correct_contents_for_update_to_1_2(self, settings):
+    scale_arguments_path = 'main/actions/scale_for_images/arguments'
+
+    self.assertFalse(settings[f'{scale_arguments_path}/image_resolution'].gui.show_display_name)
