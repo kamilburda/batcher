@@ -14,7 +14,7 @@ from src import pypdb
 from src.tests import stubs_gimp
 
 
-@mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting.settings._gimp_objects.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
 class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
 

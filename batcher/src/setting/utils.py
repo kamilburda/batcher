@@ -16,6 +16,7 @@ __all__ = [
   'generate_description',
   'get_setting_path',
   'check_setting_name',
+  'ValueNotValidData',
 ]
 
 SETTING_PATH_SEPARATOR = '/'
@@ -401,3 +402,10 @@ def get_setting_path(
         return setting_path[len(root_path + separator):]
     
     return setting_path
+
+
+class ValueNotValidData:
+
+  def __init__(self, message, id_):
+    self.message = message
+    self.id = id_

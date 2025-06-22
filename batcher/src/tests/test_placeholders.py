@@ -68,7 +68,7 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
   def test_with_invalid_object_type(self):
     self.assertIsNone(placeholders_.get_placeholder_type_name_from_pdb_type(object))
 
-  @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.setting.settings._array.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   def test_with_layer_array(self, _mock_gimp):
     param = stubs_gimp.GParamStub(
       GObject.GType.from_name('GimpCoreObjectArray'), 'layers', object_type=Gimp.Layer.__gtype__)
@@ -80,7 +80,7 @@ class TestGetPlaceholderNameFromPdbType(unittest.TestCase):
       'placeholder_layer_array',
     )
 
-  @mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.setting.settings._array.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   def test_image_array_is_unsupported(self, _mock_gimp):
     param = stubs_gimp.GParamStub(
       GObject.GType.from_name('GimpCoreObjectArray'), 'images', object_type=Gimp.Image.__gtype__)

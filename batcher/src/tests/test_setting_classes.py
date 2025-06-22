@@ -1144,4 +1144,5 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       },
     ])
 
-    self.assertIsInstance(self.setting.validate({'png': png_group}), setting_.ValueNotValidData)
+    self.assertIsInstance(
+      self.setting.validate({'png': png_group}), setting_.ValueNotValidData)

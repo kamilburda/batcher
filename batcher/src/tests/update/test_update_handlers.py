@@ -43,13 +43,13 @@ class TestUpdateHandlers(unittest.TestCase):
     CONFIG.PLUGIN_VERSION = self.orig_plugin_version
 
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_default',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_choice_get_default',
     return_value=_MOCK_PNG_CHOICE_DEFAULT_VALUE)
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_choice',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_choice_get_choice',
     return_value=_MOCK_PNG_CHOICE)
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_core_object_array_get_object_type',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_core_object_array_get_object_type',
     return_value=Gimp.Drawable.__gtype__)
   def test_update_export_layers(self, *_mocks):
     settings = plugin_settings.create_settings_for_export_layers()
@@ -77,13 +77,13 @@ class TestUpdateHandlers(unittest.TestCase):
     self._assert_correct_contents_for_update_to_1_0_rc2(settings)
 
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_default',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_choice_get_default',
     return_value=_MOCK_PNG_CHOICE_DEFAULT_VALUE)
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_choice_get_choice',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_choice_get_choice',
     return_value=_MOCK_PNG_CHOICE)
   @mock.patch(
-    f'{_SETTINGS_MODULE_PATH}.Gimp.param_spec_core_object_array_get_object_type',
+    f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_core_object_array_get_object_type',
     return_value=Gimp.Drawable.__gtype__)
   def test_update_batch_convert(self, *_mocks):
     settings = plugin_settings.create_settings_for_convert()

@@ -19,6 +19,7 @@ from config import CONFIG
 from src import utils
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
+from src.setting import utils as setting_utils_
 
 from src.tests import stubs_gimp
 from src.tests.setting import stubs_setting
@@ -76,7 +77,7 @@ class TestSetting(SettingTestCase):
     self.assertIsNone(self.setting.validate('jpg'))
 
   def test_validate_for_invalid_value(self):
-    self.assertIsInstance(self.setting.validate(None), settings_.ValueNotValidData)
+    self.assertIsInstance(self.setting.validate(None), setting_utils_.ValueNotValidData)
   
   def test_get_generated_display_name(self):
     self.assertEqual(self.setting.display_name, 'File extension')
@@ -878,7 +879,7 @@ class TestCreateEnumSetting(SettingTestCase):
     self.assertEqual(setting.procedure.proc, stub_procedure)
     self.assertEqual(setting.procedure_param, stub_procedure.get_arguments()[0])
 
-    settings_.pdb.remove_from_cache('some-procedure')
+    settings_._enum.pdb.remove_from_cache('some-procedure')
 
   @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def test_with_enum_type_as_unrecognized_procedure_raises_error(self, _mock_get_pdb):
@@ -898,7 +899,7 @@ class TestCreateEnumSetting(SettingTestCase):
         ('unrecognized-procedure', 'distance-metric'),
         default_value=Gegl.DistanceMetric.EUCLIDEAN)
 
-    settings_.pdb.remove_from_cache('some-procedure')
+    settings_._enum.pdb.remove_from_cache('some-procedure')
 
   @mock.patch('src.pypdb.Gimp.get_pdb', return_value=stubs_gimp.PdbStub)
   def test_with_enum_type_as_unrecognized_procedure_parameter_raises_error(self, _mock_get_pdb):
@@ -918,7 +919,7 @@ class TestCreateEnumSetting(SettingTestCase):
         ('some-procedure', 'unrecognized-parameter'),
         default_value=Gegl.DistanceMetric.EUCLIDEAN)
 
-    settings_.pdb.remove_from_cache('some-procedure')
+    settings_._enum.pdb.remove_from_cache('some-procedure')
 
   def test_string_enum_type_has_invalid_format_raises_error(self):
     with self.assertRaises(TypeError):
@@ -1184,11 +1185,11 @@ class TestChoiceSetting(SettingTestCase):
 
 
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._gimp_objects.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestImageSetting(SettingTestCase):
 
   @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._gimp_objects.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
     self.image = stubs_gimp.Image(width=2, height=2, base_type=Gimp.ImageBaseType.RGB)
     
@@ -1233,7 +1234,7 @@ class TestImageSetting(SettingTestCase):
   def test_set_value_with_id(self):
     self.image.id_ = 2
 
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Image.get_by_id.return_value = self.image
 
       self.setting.set_value(2)
@@ -1243,7 +1244,7 @@ class TestImageSetting(SettingTestCase):
   def test_set_value_with_invalid_id(self):
     self.image.id_ = 2
 
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Image.get_by_id.return_value = None
 
       self.setting.set_value(3)
@@ -1306,7 +1307,7 @@ class TestImageSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._gimp_objects.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestGimpItemSetting(SettingTestCase):
   
@@ -1400,7 +1401,7 @@ class TestGimpItemSetting(SettingTestCase):
     self.assertIsNone(self.setting.value)
   
   def test_set_value_with_id(self):
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Item.get_by_id.return_value = self.layer
       
       self.setting.set_value(2)
@@ -1408,7 +1409,7 @@ class TestGimpItemSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.layer)
   
   def test_set_value_with_invalid_id(self):
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Item.get_by_id.return_value = None
     
       self.setting.set_value(2)
@@ -1461,7 +1462,7 @@ class TestGimpItemSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._gimp_objects.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestLayerMaskSetting(SettingTestCase):
 
@@ -1487,7 +1488,7 @@ class TestLayerMaskSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.mask)
 
   def test_set_value_with_id(self):
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Item.get_by_id.return_value = self.mask
 
       self.setting.set_value(2)
@@ -1507,7 +1508,7 @@ class TestLayerMaskSetting(SettingTestCase):
   def test_to_dict(self):
     self.setting.set_value(self.mask)
 
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.Layer.from_mask.return_value = self.layer
 
       setting_dict = self.setting.to_dict()
@@ -1521,7 +1522,7 @@ class TestLayerMaskSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._gimp_objects.Gimp', new=stubs_gimp.GimpModuleStub())
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestDrawableFilterSetting(SettingTestCase):
 
@@ -1551,7 +1552,7 @@ class TestDrawableFilterSetting(SettingTestCase):
     self.assertEqual(self.setting.value, self.drawable_filter)
 
   def test_set_value_with_id(self):
-    with mock.patch('src.setting.settings.Gimp') as mock_gimp_module:
+    with mock.patch('src.setting.settings._gimp_objects.Gimp') as mock_gimp_module:
       mock_gimp_module.DrawableFilter.get_by_id.return_value = self.drawable_filter
 
       self.setting.set_value(2)
@@ -1637,7 +1638,7 @@ class TestColorSetting(SettingTestCase):
     )
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._display.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestDisplaySetting(SettingTestCase):
 
   def setUp(self):
@@ -1656,7 +1657,7 @@ class TestDisplaySetting(SettingTestCase):
       self.setting.to_dict(), {'name': 'display', 'value': None, 'type': 'display'})
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._parasite.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestParasiteSetting(SettingTestCase):
   
   def test_create_with_default_default_value(self):
@@ -1777,10 +1778,10 @@ class TestBytesSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestBrushSetting(SettingTestCase):
 
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
     self.setting = settings_.BrushSetting('brush')
     self.brush = stubs_gimp.Brush(name='Star')
@@ -1891,10 +1892,10 @@ class TestBrushSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestPaletteSetting(SettingTestCase):
 
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
     self.setting = settings_.PaletteSetting('palette')
     self.palette = stubs_gimp.Palette(name='Standard')
@@ -1958,10 +1959,10 @@ class TestPaletteSetting(SettingTestCase):
       })
 
 
-@mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+@mock.patch('src.setting.settings._unit.Gimp', new=stubs_gimp.GimpModuleStub())
 class TestUnitSetting(SettingTestCase):
 
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._unit.Gimp', new=stubs_gimp.GimpModuleStub())
   def setUp(self):
     self.setting = settings_.UnitSetting('unit')
 
@@ -2262,7 +2263,7 @@ class TestArraySetting(SettingTestCase):
     for i, expected_element_value in enumerate(expected_value):
       self.assertEqual(self.setting[i].value, expected_element_value)
 
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
   def test_set_value_with_list_of_type_having_custom_set_value(self):
     palette = stubs_gimp.Palette(name='Standard')
     palette2 = stubs_gimp.Palette(name='Standard2')
@@ -2315,7 +2316,7 @@ class TestArraySetting(SettingTestCase):
         'element_min_value': -100.0,
       })
 
-  @mock.patch('src.setting.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
   def test_to_dict_with_type_having_custom_to_dict(self):
     # While we do not use these objects, the `name`s are registered so they can
     # be looked up via the `Palette.get_by_name()` class method.
@@ -2731,14 +2732,15 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
 
     settings_module_path = 'src.setting.settings'
 
-    with mock.patch(f'{settings_module_path}.isinstance') as mock_isinstance:
+    with mock.patch(f'{settings_module_path}._choice.isinstance') as mock_isinstance:
       mock_isinstance.return_value = True
-      with mock.patch(f'{settings_module_path}.Gimp', new_callable=stubs_gimp.GimpModuleStub):
+      with mock.patch(
+            f'{settings_module_path}._functions.Gimp', new_callable=stubs_gimp.GimpModuleStub):
         # noinspection PyTypeChecker
         setting_type, kwargs = settings_.get_setting_type_and_kwargs(
           GObject.TYPE_STRING, param_spec, procedure)
 
-    settings_.pdb.remove_from_cache('some-procedure')
+    settings_._choice.pdb.remove_from_cache('some-procedure')
 
     self.assertEqual(setting_type, settings_.ChoiceSetting)
     self.assertDictEqual(
@@ -2775,7 +2777,7 @@ class TestGetSettingTypeAndKwargs(unittest.TestCase):
     param_spec = stubs_gimp.GParamStub(
       GObject.TYPE_BOXED, name='drawables', object_type=Gimp.Drawable.__gtype__)
 
-    with mock.patch('src.setting.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub):
+    with mock.patch('src.setting.settings._array.Gimp', new_callable=stubs_gimp.GimpModuleStub):
       # noinspection PyTypeChecker
       self.assertEqual(
         settings_.get_setting_type_and_kwargs(
