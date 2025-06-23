@@ -4,12 +4,12 @@ from . import _base
 
 
 __all__ = [
-  'ParasiteBoxPresenter',
+  'ParasiteEditorPresenter',
 ]
 
 
-class ParasiteBoxPresenter(_base.GtkPresenter):
-  """`setting.Presenter` subclass for `gui.ParasiteBox` widgets.
+class ParasiteEditorPresenter(_base.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.ParasiteEditor` widgets.
 
   Value: `Gimp.Parasite` instance.
   """
@@ -17,7 +17,7 @@ class ParasiteBoxPresenter(_base.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'parasite-changed'
 
   def _create_widget(self, setting, **kwargs):
-    return gui_widgets_.ParasiteBox(setting.value, setting.DEFAULT_PARASITE_NAME)
+    return gui_widgets_.ParasiteEditor(setting.value, setting.DEFAULT_PARASITE_NAME)
 
   def get_value(self):
     return self._widget.get_parasite()

@@ -38,7 +38,7 @@ class ParasiteSetting(_base.Setting):
 
   _REGISTRABLE_TYPE_NAME = 'parasite'
 
-  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_box]
+  _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.parasite_editor]
 
   # Create default value dynamically to avoid potential errors on GIMP startup.
   _DEFAULT_DEFAULT_VALUE = (

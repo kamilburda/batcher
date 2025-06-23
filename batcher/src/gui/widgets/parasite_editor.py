@@ -13,12 +13,12 @@ from gi.repository import GLib
 from src import utils
 
 __all__ = [
-  'ParasiteBox',
+  'ParasiteEditor',
 ]
 
 
-class ParasiteBox(Gtk.Box):
-  """Subclass of `Gtk.Box` to edit `Gimp.Parasite` instances interactively.
+class ParasiteEditor(Gtk.Grid):
+  """Subclass of `Gtk.Grid` to edit `Gimp.Parasite` instances interactively.
 
   The class allows adjusting the following `Gimp.Parasite` attributes: name,
   flags and data. In the text box provided by this class, the data attribute is
@@ -32,7 +32,8 @@ class ParasiteBox(Gtk.Box):
   
   __gsignals__ = {'parasite-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
   
-  _HBOX_SPACING = 5
+  _ROW_SPACING = 5
+  _COLUMN_SPACING = 5
   
   def __init__(self, parasite: Gimp.Parasite, default_parasite_name: str):
     super().__init__()
@@ -57,12 +58,24 @@ class ParasiteBox(Gtk.Box):
     self._set_values(parasite)
 
   def _init_gui(self, parasite):
-    self.set_property('orientation', Gtk.Orientation.VERTICAL)
-    self.set_homogeneous(False)
-    self.set_spacing(self._HBOX_SPACING)
+    self.set_row_spacing(self._ROW_SPACING)
+    self.set_column_spacing(self._COLUMN_SPACING)
 
-    self._parasite_name_entry = Gtk.Entry()
-    
+    self._label_name = Gtk.Label(
+      label=_('Name'),
+    )
+    self.attach(self._label_name, 0, 0, 1, 1)
+
+    self._parasite_name_entry = Gtk.Entry(
+      hexpand=True,
+    )
+    self.attach(self._parasite_name_entry, 1, 0, 1, 1)
+
+    self._label_flags = Gtk.Label(
+      label=_('Flags'),
+    )
+    self.attach(self._label_flags, 0, 1, 1, 1)
+
     self._parasite_flags_spin_button = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=parasite.get_flags(),
@@ -73,45 +86,20 @@ class ParasiteBox(Gtk.Box):
       ),
       digits=0,
       numeric=True,
+      hexpand=True,
     )
-    
-    self._parasite_data_entry = Gtk.Entry()
-    
-    self._icon_name = Gtk.Image.new_from_icon_name(GimpUi.ICON_TOOL_TEXT, Gtk.IconSize.BUTTON)
-    
-    self._hbox_name = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      homogeneous=False,
-      spacing=self._HBOX_SPACING,
-    )
-    self._hbox_name.pack_start(self._icon_name, False, False, 0)
-    self._hbox_name.pack_start(self._parasite_name_entry, True, True, 0)
-    
-    self._icon_flags = Gtk.Image.new_from_icon_name(GimpUi.ICON_MARKER, Gtk.IconSize.BUTTON)
+    self.attach(self._parasite_flags_spin_button, 1, 1, 1, 1)
 
-    self._hbox_flags = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      homogeneous=False,
-      spacing=self._HBOX_SPACING,
+    self._label_data = Gtk.Label(
+      label=_('Data'),
     )
-    self._hbox_flags.pack_start(self._icon_flags, False, False, 0)
-    self._hbox_flags.pack_start(self._parasite_flags_spin_button, True, True, 0)
-    
-    self._icon_data = Gtk.Image.new_from_icon_name(
-      GimpUi.ICON_FORMAT_INDENT_MORE, Gtk.IconSize.BUTTON)
-    
-    self._hbox_data = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      homogeneous=False,
-      spacing=self._HBOX_SPACING,
-    )
-    self._hbox_data.pack_start(self._icon_data, False, False, 0)
-    self._hbox_data.pack_start(self._parasite_data_entry, True, True, 0)
+    self.attach(self._label_data, 0, 2, 1, 1)
 
-    self.pack_start(self._hbox_name, False, False, 0)
-    self.pack_start(self._hbox_flags, False, False, 0)
-    self.pack_start(self._hbox_data, False, False, 0)
-    
+    self._parasite_data_entry = Gtk.Entry(
+      hexpand=True,
+    )
+    self.attach(self._parasite_data_entry, 1, 2, 1, 1)
+
     self._set_values(parasite)
     self._connect_changed_events()
   
@@ -145,4 +133,4 @@ class ParasiteBox(Gtk.Box):
       self.emit('parasite-changed')
 
 
-GObject.type_register(ParasiteBox)
+GObject.type_register(ParasiteEditor)
