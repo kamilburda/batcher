@@ -2,6 +2,7 @@
 
 * Updated Japanese translation (thanks to @re-unknown).
 * Updated German translation (thanks to @ChrisLauinger77).
+* Marked names of common layer effect arguments as translatable.
 
 
 ## 1.1.1
