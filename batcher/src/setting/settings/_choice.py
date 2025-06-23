@@ -165,7 +165,7 @@ class ChoiceSetting(_base.Setting):
         settings_dict['items'] = [list(elements) for elements in settings_dict['items']]
 
     if 'procedure' in settings_dict:
-      if settings_dict['procedure'] is not None:
+      if settings_dict['procedure'] is not None and self._procedure is not None:
         settings_dict['procedure'] = self._procedure.name
 
     return settings_dict
