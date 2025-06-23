@@ -12,6 +12,14 @@ from gi.repository import Gimp
 from gi.repository import GObject
 
 
+try:
+  # noinspection PyUnboundLocalVariable
+  _
+except Exception:
+  def _(string):
+    return string
+
+
 __all__ = [
   'pdb',
   'GeglProcedure',
@@ -373,23 +381,23 @@ class GeglProcedure(PDBProcedure):
     self._filter_properties = Gegl.Operation.list_properties(name)
 
     self._drawable_param = Gimp.param_spec_drawable(
-      'drawable-', 'Drawable', 'Drawable', False, GObject.ParamFlags.READWRITE)
+      'drawable-', _('Drawable'), _('Drawable'), False, GObject.ParamFlags.READWRITE)
     self._blend_mode_param = GObject.param_spec_enum(
       'blend-mode-',
-      'Blend mode',
-      'Blend mode',
+      _('Blend mode'),
+      _('Blend mode'),
       Gimp.LayerMode.__gtype__,
       Gimp.LayerMode.REPLACE,
       GObject.ParamFlags.READWRITE,
     )
     self._opacity_param = GObject.param_spec_double(
-      'opacity-', 'Opacity', 'Opacity', 0.0, 1.0, 1.0, GObject.ParamFlags.READWRITE)
+      'opacity-', _('Opacity'), _('Opacity'), 0.0, 1.0, 1.0, GObject.ParamFlags.READWRITE)
     self._merge_filter_param = GObject.param_spec_boolean(
-      'merge-filter-', 'Merge filter', 'Merge filter', False, GObject.ParamFlags.READWRITE)
+      'merge-filter-', _('Merge filter'), _('Merge filter'), False, GObject.ParamFlags.READWRITE)
     self._visible_param = GObject.param_spec_boolean(
-      'visible-', 'Visible', 'Visible', True, GObject.ParamFlags.READWRITE)
+      'visible-', _('Visible'), _('Visible'), True, GObject.ParamFlags.READWRITE)
     self._filter_name_param = GObject.param_spec_string(
-      'name-', 'Filter name', 'Filter name', '', GObject.ParamFlags.READWRITE)
+      'name-', _('Filter name'), _('Filter name'), '', GObject.ParamFlags.READWRITE)
 
     self._keys = {key: None for key in Gegl.Operation.list_keys(name)}
     self._properties = {prop.name: prop for prop in self._get_properties()}
