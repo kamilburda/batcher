@@ -106,7 +106,7 @@ def get_item_filepath(item, directory: Gio.File):
 
 
 def unit_to_pixels(batcher, dimension, resolution_axis):
-  """Converts the value of a `setting_classes.DimensionSetting` to pixels.
+  """Converts the value of a `setting_additional.DimensionSetting` to pixels.
 
   ``resolution_axis`` is either ``'x'`` or ``'y'`` and represents the image
   resolution along the x- or y-axis, respectively. The resolution is used to

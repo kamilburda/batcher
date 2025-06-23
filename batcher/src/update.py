@@ -15,7 +15,7 @@ from src import builtin_conditions
 from src import commands as commands_
 from src import itemtree
 from src import setting as setting_
-from src import setting_classes as setting_classes_
+from src import setting_additional as setting_additional_
 from src import utils as utils_
 from src import utils_setting as utils_setting_
 from src import version as version_
@@ -591,9 +591,9 @@ def _update_to_0_5(data, _settings, procedure_groups):
             'type': 'file_format_options',
             'name': 'file_format_export_options',
             'default_value': {
-              setting_classes_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
+              setting_additional_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
             'value': {
-              setting_classes_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
+              setting_additional_.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY: 'png'},
             'import_or_export': 'export',
             'initial_file_format': 'png',
             'gui_type': 'file_format_options',

@@ -10,11 +10,11 @@ from src import builtin_actions
 from src import builtin_conditions
 from src import commands as commands_
 from src import setting as setting_
-# Despite being unused, `setting_classes` must be imported so that the
+# Despite being unused, `setting_additional` must be imported so that the
 # setting and GUI classes defined there are properly registered (via respective
 # metaclasses in `setting_.meta`).
 # noinspection PyUnresolvedReferences
-from src import setting_classes
+from src import setting_additional
 from src import utils
 
 

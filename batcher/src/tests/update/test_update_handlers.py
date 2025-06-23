@@ -14,7 +14,7 @@ from src import builtin_conditions
 from src import placeholders
 from src import plugin_settings
 from src import setting as setting_
-from src import setting_classes
+from src import setting_additional
 from src import update
 from src import utils
 
@@ -137,7 +137,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertNotIn('layer_filename_pattern', settings['main'])
 
     self.assertIsInstance(
-      settings['main/name_pattern'], setting_classes.NamePatternSetting)
+      settings['main/name_pattern'], setting_additional.NamePatternSetting)
 
     self.assertIn('insert_background', settings['main/actions'])
     self.assertIn('color_tag', settings['main/actions/insert_background/arguments'])
@@ -191,20 +191,20 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertIn('single_image_name_pattern', settings['main/actions/export/arguments'])
     self.assertIsInstance(
       settings['main/actions/export/arguments/single_image_name_pattern'],
-      setting_classes.NamePatternSetting,
+      setting_additional.NamePatternSetting,
     )
     self.assertEqual(
       settings['main/actions/export/arguments/single_image_name_pattern'].gui_type,
-      setting_classes.NamePatternEntryPresenter,
+      setting_additional.NamePatternEntryPresenter,
     )
 
     self.assertIsInstance(
       settings['main/actions/rename/arguments/pattern'],
-      setting_classes.NamePatternSetting,
+      setting_additional.NamePatternSetting,
     )
     self.assertEqual(
       settings['main/actions/rename/arguments/pattern'].gui_type,
-      setting_classes.NamePatternEntryPresenter,
+      setting_additional.NamePatternEntryPresenter,
     )
 
   def _assert_correct_contents_for_update_to_0_5(self, settings):
@@ -417,7 +417,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/new_width'],
-      setting_classes.DimensionSetting,
+      setting_additional.DimensionSetting,
     )
     self.assertEqual(
       settings[f'{scale_arguments_path}/new_width'].value,
@@ -437,7 +437,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/new_height'],
-      setting_classes.DimensionSetting,
+      setting_additional.DimensionSetting,
     )
     self.assertEqual(
       settings[f'{scale_arguments_path}/new_height'].value,
@@ -475,7 +475,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{scale_arguments_path}/image_resolution'],
-      setting_classes.CoordinatesSetting,
+      setting_additional.CoordinatesSetting,
     )
     self.assertEqual(
       settings[f'{scale_arguments_path}/image_resolution'].value,
@@ -506,7 +506,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{align_arguments_path}/x_offset'],
-      setting_classes.DimensionSetting,
+      setting_additional.DimensionSetting,
     )
     self.assertEqual(
       settings[f'{align_arguments_path}/x_offset'].value,
@@ -525,7 +525,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     self.assertIsInstance(
       settings[f'{align_arguments_path}/y_offset'],
-      setting_classes.DimensionSetting,
+      setting_additional.DimensionSetting,
     )
     self.assertEqual(
       settings[f'{align_arguments_path}/y_offset'].value,

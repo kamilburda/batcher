@@ -8,7 +8,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import setting as setting_
-from src import setting_classes
+from src import setting_additional
 
 from src.tests import stubs_gimp
 
@@ -38,10 +38,10 @@ def _get_images_and_items():
 class TestFileExtensionSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.FileExtensionSetting('file_ext', default_value='png')
+    self.setting = setting_additional.FileExtensionSetting('file_ext', default_value='png')
 
   def test_with_adjust_value(self):
-    setting = setting_classes.FileExtensionSetting(
+    setting = setting_additional.FileExtensionSetting(
       'file_ext', adjust_value=True, default_value='png')
 
     setting.set_value('.jpg')
@@ -49,11 +49,11 @@ class TestFileExtensionSetting(unittest.TestCase):
     self.assertEqual(setting.value, 'jpg')
 
 
-@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpItemTreeItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.GimpItemTreeItemsSetting('selected_items')
+    self.setting = setting_additional.GimpItemTreeItemsSetting('selected_items')
 
     self.maxDiff = None
 
@@ -121,7 +121,7 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, expected_value)
     self.assertEqual(self.setting.active_items, expected_value_and_active_items)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_set_value_from_paths_items_without_loaded_image_are_ignored(
         self, mock_isfile, gimp_module_stub):
     images, items = _get_images_and_items()
@@ -171,7 +171,7 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.active_items, expected_active_items)
     self.assertEqual(self.setting.inactive_items, expected_inactive_items)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_set_value_from_paths_overrides_previous_active_items_and_inactive_items(
         self, mock_isfile, gimp_module_stub):
     images, items = _get_images_and_items()
@@ -366,7 +366,7 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, expected_value)
     self.assertEqual(self.setting.active_items, expected_active_items)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_set_active_items_inactive_items_are_kept_intact(self, mock_isfile, gimp_module_stub):
     images, items = _get_images_and_items()
 
@@ -450,7 +450,7 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
 
     self.assertEqual(self.setting.to_dict(), expected_dict)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_to_dict_with_image_without_filepath(self, mock_isfile, gimp_module_stub):
     images, items = _get_images_and_items()
 
@@ -492,11 +492,11 @@ class TestGimpItemTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.to_dict(), expected_dict)
 
 
-@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestGimpImageTreeItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.GimpImageTreeItemsSetting('selected_items')
+    self.setting = setting_additional.GimpImageTreeItemsSetting('selected_items')
 
     self.images = [
       stubs_gimp.Image(filepath='filename_1'),
@@ -524,7 +524,7 @@ class TestGimpImageTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, expected_value)
     self.assertEqual(self.setting.active_items, expected_value_and_active_items)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_set_value_from_paths(self, mock_isfile, gimp_module_stub):
     image_1_filepath = os.path.abspath('filename_1')
     image_2_filepath = os.path.abspath('filename_2')
@@ -638,7 +638,7 @@ class TestGimpImageTreeItemsSetting(unittest.TestCase):
     self.assertEqual(self.setting.value, expected_value)
     self.assertEqual(self.setting.active_items, expected_active_items)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_set_active_items_inactive_items_are_kept_intact(self, mock_isfile, gimp_module_stub):
     image_1_filepath = os.path.abspath('filename_1')
     image_2_filepath = os.path.abspath('filename_2')
@@ -697,7 +697,7 @@ class TestGimpImageTreeItemsSetting(unittest.TestCase):
 
     self.assertEqual(self.setting.to_dict(), expected_dict)
 
-  @mock.patch('src.setting_classes.os.path.isfile')
+  @mock.patch('src.setting_additional.settings.os.path.isfile')
   def test_to_dict_with_image_without_filepath(self, mock_isfile, gimp_module_stub):
     image_1_filepath = os.path.abspath('filename_1')
 
@@ -725,7 +725,7 @@ class TestGimpImageTreeItemsSetting(unittest.TestCase):
 class TestImageFileTreeItemsSetting(unittest.TestCase):
 
   def setUp(self):
-    self.setting = setting_classes.ImageFileTreeItemsSetting('selected_items')
+    self.setting = setting_additional.ImageFileTreeItemsSetting('selected_items')
 
     self.image_filepaths = [
       os.path.abspath('filename_1'),
@@ -858,14 +858,14 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
     self.image_list = self._create_image_list(self.image_ids_and_filepaths)
     self.images_and_directories = self._create_images_and_directories(self.image_list)
 
-    self.setting = setting_classes.ImagesAndDirectoriesSetting('images_and_directories')
+    self.setting = setting_additional.ImagesAndDirectoriesSetting('images_and_directories')
     self.setting.set_value(self.images_and_directories)
 
   def test_update_images_and_dirpaths_add_new_images(self):
     self.image_list.extend(
       self._create_image_list([(5, 'new_image.png'), (6, None)]))
     
-    with mock.patch('src.setting_classes.Gimp.get_images', new=self.get_image_list):
+    with mock.patch('src.setting_additional.settings.Gimp.get_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -874,7 +874,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
   def test_update_images_and_dirpaths_remove_closed_images(self):
     self.image_list.pop(1)
 
-    with mock.patch('src.setting_classes.Gimp.get_images', new=self.get_image_list):
+    with mock.patch('src.setting_additional.settings.Gimp.get_images', new=self.get_image_list):
       self.setting.update_images_and_dirpaths()
     
     self.assertEqual(
@@ -893,7 +893,7 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       self.images_and_directories[image_to_test])
 
   def test_set_value_from_image_ids(self):
-    with mock.patch('src.setting_classes.Gimp') as temp_mock_gimp_module_src:
+    with mock.patch('src.setting_additional.settings.Gimp') as temp_mock_gimp_module_src:
       temp_mock_gimp_module_src.Image.get_by_id.side_effect = self.image_list
 
       self.setting.set_value({0: 'dirpath1', 1: 'dirpath2'})
@@ -933,11 +933,11 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
     return images_and_directories
 
 
-@mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+@mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
 class TestFileFormatOptionsSetting(unittest.TestCase):
 
-  @mock.patch('src.setting_classes.Gimp', new_callable=stubs_gimp.GimpModuleStub)
+  @mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
   @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
   def setUp(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
     self.common_options = [
@@ -991,10 +991,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
       },
     ]
 
-    self.setting = setting_classes.FileFormatOptionsSetting(
+    self.setting = setting_additional.FileFormatOptionsSetting(
       'file_format_export_options', 'export', 'png')
 
-    self._ACTIVE_KEY = setting_classes.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
+    self._ACTIVE_KEY = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
 
   def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
     mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
