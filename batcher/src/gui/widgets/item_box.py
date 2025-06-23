@@ -308,14 +308,17 @@ class ArrayBox(ItemBox):
   __gsignals__ = {
     'array-box-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'array-box-item-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
-  
+
+  _SIZE_LABEL_SPACING = 8
+
   def __init__(
         self,
         new_item_default_value,
         min_size: int = 0,
         max_size: Optional[int] = None,
         item_spacing: int = ItemBox.ITEM_SPACING,
-        **kwargs):
+        **kwargs,
+  ):
     """Initializes an `ArrayBox` instance.
 
     Args:
@@ -384,8 +387,20 @@ class ArrayBox(ItemBox):
       numeric=True,
     )
 
-    self._vbox.pack_start(self._size_spin_button, False, False, 0)
-    self._vbox.reorder_child(self._size_spin_button, 0)
+    self._size_label = Gtk.Label(
+      label=_('Size'),
+    )
+
+    self._size_hbox = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._SIZE_LABEL_SPACING,
+    )
+
+    self._size_hbox.pack_start(self._size_label, False, False, 0)
+    self._size_hbox.pack_start(self._size_spin_button, True, True, 0)
+
+    self._vbox.pack_start(self._size_hbox, False, False, 0)
+    self._vbox.reorder_child(self._size_hbox, 0)
 
     separator = Gtk.Separator.new(Gtk.Orientation.HORIZONTAL)
     self._vbox.pack_start(separator, False, False, 0)
