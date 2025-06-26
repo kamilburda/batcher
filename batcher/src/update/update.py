@@ -24,7 +24,24 @@ from src.path import uniquify
 from src.procedure_groups import *
 from src.pypdb import pdb
 
-_UPDATE_STATUSES = FRESH_START, UPDATE, TERMINATE = 0, 1, 2
+
+__all__ = [
+  'load_and_update',
+  'UpdateStatuses',
+]
+
+
+class UpdateStatuses:
+
+  UPDATE_STATUSES = (
+    FRESH_START,
+    UPDATE,
+    TERMINATE,
+  ) = (
+    'fresh_start',
+    'update',
+    'terminate',
+  )
 
 
 def load_and_update(
@@ -45,13 +62,16 @@ def load_and_update(
   
   Status can have one of the following integer values:
   
-  * `FRESH_START` - The plug-in was never used before or has no settings stored.
+  * `UpdateStatuses.FRESH_START`:
+      The plug-in was never used before or has no settings stored.
   
-  * `UPDATE` - The plug-in was successfully updated to the latest version, or no
-    update was performed as the plug-in version remains the same.
+  * `UpdateStatuses.UPDATE`:
+      The plug-in was successfully updated to the latest version, or no
+      update was performed as the plug-in version remains the same.
   
-  * `TERMINATE` - No update was performed. This value is returned if the update
-    failed (e.g. because of a malformed setting source).
+  * `UpdateStatuses.TERMINATE`:
+      No update was performed. This value is returned if the update
+      failed (e.g. because of a malformed setting source).
 
   If ``update_sources`` is ``True``, the contents of ``sources`` are updated
   (overwritten), otherwise they are kept intact.
@@ -92,7 +112,7 @@ def load_and_update(
     if update_sources:
       _update_sources(settings, sources)
 
-    return FRESH_START, ''
+    return UpdateStatuses.FRESH_START, ''
 
   current_version = None
   previous_version = None
@@ -105,20 +125,20 @@ def load_and_update(
     # This should be handled as early as possible in the client code to avoid
     # disrupting the plug-in functionality. Ideally, settings should be reset
     # completely.
-    return TERMINATE, traceback.format_exc()
+    return UpdateStatuses.TERMINATE, traceback.format_exc()
 
   load_message = utils_setting_.format_message_from_persistor_statuses(load_result)
 
   if any(status == setting_.Persistor.FAIL
          for status in load_result.statuses_per_source.values()):
-    return TERMINATE, load_message
+    return UpdateStatuses.TERMINATE, load_message
 
   if (update_sources
       and current_version is not None and previous_version is not None
       and previous_version < current_version):
     _update_sources(settings, sources)
 
-  return UPDATE, load_message
+  return UpdateStatuses.UPDATE, load_message
 
 
 def _get_plugin_version(data) -> Union[version_.Version, None]:

@@ -28,7 +28,7 @@ _UPDATE_HANDLERS = {
 
 @mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch(
-  'src.tests.update.test_update.update._UPDATE_HANDLERS',
+  'src.tests.update.test_update.update.update._UPDATE_HANDLERS',
   new_callable=lambda: dict(_UPDATE_HANDLERS))
 class TestUpdate(unittest.TestCase):
   
@@ -108,7 +108,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings)
     
-    self.assertEqual(status, update.FRESH_START)
+    self.assertEqual(status, update.UpdateStatuses.FRESH_START)
 
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
 
@@ -124,7 +124,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, update_sources=False)
 
-    self.assertEqual(status, update.FRESH_START)
+    self.assertEqual(status, update.UpdateStatuses.FRESH_START)
 
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
 
@@ -139,7 +139,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.1')
 
@@ -157,7 +157,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.2')
 
@@ -178,7 +178,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.2')
 
@@ -195,7 +195,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.3')
 
@@ -214,7 +214,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.4')
 
@@ -234,7 +234,7 @@ class TestUpdate(unittest.TestCase):
     status, _message = update.load_and_update(
       self.settings, sources={'persistent': self.source}, update_sources=False)
 
-    self.assertEqual(status, update.UPDATE)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, '0.4')
 
@@ -254,7 +254,7 @@ class TestUpdate(unittest.TestCase):
 
     status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
 
-    self.assertEqual(status, update.TERMINATE)
+    self.assertEqual(status, update.UpdateStatuses.TERMINATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
 
@@ -276,7 +276,7 @@ class TestUpdate(unittest.TestCase):
     status, _message = update.load_and_update(
       self.settings, sources={'persistent': self.source}, update_sources=False)
 
-    self.assertEqual(status, update.TERMINATE)
+    self.assertEqual(status, update.UpdateStatuses.TERMINATE)
 
     self.assertEqual(self.settings['main/plugin_version'].value, self.current_version)
 

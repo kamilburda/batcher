@@ -66,7 +66,7 @@ class TestUpdateHandlers(unittest.TestCase):
       update_sources=False,
     )
 
-    self.assertEqual(status, update.UPDATE, msg=message)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE, msg=message)
 
     self._assert_correct_contents_for_update_to_0_3(settings, orig_setting_values_for_0_2)
     self._assert_correct_contents_for_update_to_0_4(settings)
@@ -99,7 +99,7 @@ class TestUpdateHandlers(unittest.TestCase):
       procedure_group=source_name,
     )
 
-    self.assertEqual(status, update.UPDATE, msg=message)
+    self.assertEqual(status, update.UpdateStatuses.UPDATE, msg=message)
 
     self._assert_correct_contents_for_update_to_1_1(settings)
     self._assert_correct_contents_for_update_to_1_2(settings)

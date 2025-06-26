@@ -242,7 +242,7 @@ class SettingsManager:
     for setting in size_settings_to_ignore_for_load:
       setting.tags.discard('ignore_load')
 
-    if status == update.TERMINATE:
+    if status == update.UpdateStatuses.TERMINATE:
       display_load_save_settings_failure_message(
         _('Failed to load settings from file "{}".'
           ' Settings must be reset completely.').format(filepath),
@@ -256,7 +256,7 @@ class SettingsManager:
     if self._previews_controller is not None:
       self._previews_controller.unlock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
 
-    return status != update.TERMINATE
+    return status != update.UpdateStatuses.TERMINATE
 
   def _get_setting_file_and_options(self, action, add_file_extension_if_missing=True):
     if action == 'load':

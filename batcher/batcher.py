@@ -421,7 +421,7 @@ def _set_procedure_group_and_default_setting_source(procedure_group):
 def _load_and_update_settings(settings, run_mode):
   status, load_message = update.load_and_update(settings, procedure_group=CONFIG.PROCEDURE_GROUP)
 
-  if status != update.TERMINATE:
+  if status != update.UpdateStatuses.TERMINATE:
     return True, ''
 
   if run_mode == Gimp.RunMode.INTERACTIVE:
@@ -467,7 +467,7 @@ def _load_settings_from_file(settings, settings_filepath):
 
   status, message = update.load_and_update(
     settings, sources={'persistent': setting_source}, procedure_group=CONFIG.PROCEDURE_GROUP)
-  if status == update.TERMINATE:
+  if status == update.UpdateStatuses.TERMINATE:
     error_message = _('Failed to import settings from file "{}".').format(settings_filepath)
 
     if message:
