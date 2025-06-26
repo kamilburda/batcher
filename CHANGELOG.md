@@ -1,7 +1,8 @@
 ## Upcoming
 
-* Updated Japanese translation (thanks to @re-unknown).
+* Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
+* Updated Japanese translation (thanks to @re-unknown).
 * Marked names of common layer effect arguments as translatable.
 
 
