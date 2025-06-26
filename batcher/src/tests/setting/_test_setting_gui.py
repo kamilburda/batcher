@@ -4,11 +4,18 @@ The GUI also exercises 'setting value changed' events connected to the GUI
 elements.
 """
 
+import os
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('Gtk', '3.0')
+from gi.repository import Gio
 from gi.repository import Gtk
+
+from src import utils
+
+utils.initialize_i18n()
 
 from src.setting import meta as meta_
 from src.setting import settings as settings_
@@ -16,6 +23,12 @@ from src.setting import settings as settings_
 
 _SETTING_WIDGET_WIDTH = 450
 _SETTING_VALUE_LABEL_WIDTH = 150
+
+_SETTING_TYPES_TO_HANDLE_SEPARATELY = [
+  'array',
+  'choice',
+  'file',
+]
 
 
 def test_settings_and_gui():
@@ -29,11 +42,7 @@ def test_settings_and_gui():
   for item in setting_data.values():
     setting_type_name = item.pop('type')
     setting_type = meta_.SETTING_TYPES[setting_type_name]
-
-    # noinspection PyProtectedMember
-    for gui_type in setting_type._ALLOWED_GUI_TYPES:
-      item['gui_type'] = gui_type
-      settings.append(setting_type(**item))
+    settings.append(setting_type(**item))
   
   dialog = Gtk.Dialog(
     border_width=5,
@@ -140,7 +149,7 @@ def _get_setting_data():
 
   added_types = set()
 
-  for name, setting_type in meta_.SETTING_TYPES.items():
+  for type_name, setting_type in meta_.SETTING_TYPES.items():
     # Prevent the same setting type from being created multiple times (which can
     # occur if a setting type name has aliases).
     if setting_type not in added_types:
@@ -149,29 +158,36 @@ def _get_setting_data():
       continue
 
     # Arrays are handled separately.
-    if name == 'array':
+    if type_name in _SETTING_TYPES_TO_HANDLE_SEPARATELY:
       continue
 
     # Skip stub settings that could theoretically have been registered.
-    if name.startswith('stub_'):
+    if type_name.startswith('stub_'):
       continue
 
-    setting_data[name] = {
-      'name': name,
-      'type': name,
-    }
+    # noinspection PyProtectedMember
+    for index, gui_type in enumerate(setting_type._ALLOWED_GUI_TYPES):
+      setting_name = f'{type_name}_{index + 1}'
 
-  setting_data['choice']['items'] = [
-    ('skip', 'Skip'),
-    ('overwrite', 'Overwrite'),
-  ]
-  setting_data['choice']['default_value'] = 'skip'
+      setting_data[setting_name] = {
+        'name': setting_name,
+        'type': type_name,
+        'gui_type': gui_type,
+      }
 
-  setting_data['enum']['enum_type'] = Gimp.RunMode
+  # noinspection PyProtectedMember
+  for index, gui_type in enumerate(settings_.StringSetting._ALLOWED_GUI_TYPES):
+    setting_data[f'string_{index + 1}']['default_value'] = 'Test'
 
-  setting_data['string']['default_value'] = 'Test'
+  # noinspection PyProtectedMember
+  for index, gui_type in enumerate(settings_.EnumSetting._ALLOWED_GUI_TYPES):
+    setting_data[f'enum_{index + 1}']['enum_type'] = Gimp.RunMode
 
   setting_data.update(**_get_array_settings())
+
+  setting_data.update(**_get_choice_settings())
+
+  setting_data.update(**_get_file_settings())
 
   return setting_data
 
@@ -215,6 +231,59 @@ def _get_array_settings():
      'type': 'array',
      'element_type': 'layer',
     },
+  }
+
+
+def _get_choice_settings():
+  return {
+    'choice_with_items': {
+      'name': 'choice_with_items',
+      'type': 'choice',
+      'default_value': 'skip',
+      'items': [
+        ('skip', 'Skip'),
+        ('overwrite', 'Overwrite'),
+        ('rename_new', 'Rename new file'),
+        ('rename_existing', 'Rename existing file'),
+      ],
+    },
+    'choice_with_items_with_radio_buttons': {
+      'name': 'choice_with_items',
+      'type': 'choice',
+      'default_value': 'skip',
+      'items': [
+        ('skip', 'Skip'),
+        ('overwrite', 'Overwrite'),
+      ],
+      'gui_type': 'radio_button_box',
+    },
+    'choice_with_procedure': {
+      'name': 'format',
+      'type': 'choice',
+      'default_value': 'auto',
+      'items': None,
+      'procedure': 'file-png-export',
+      'gui_type': 'prop_choice_combo_box',
+    }
+  }
+
+
+def _get_file_settings():
+  file_chooser_actions_and_default_values = {
+    Gimp.FileChooserAction.SELECT_FOLDER: Gimp.directory(),
+    Gimp.FileChooserAction.CREATE_FOLDER: Gimp.directory(),
+    Gimp.FileChooserAction.OPEN: os.path.join(Gimp.directory(), 'gimprc'),
+    Gimp.FileChooserAction.SAVE: os.path.join(Gimp.directory(), 'gimprc'),
+  }
+
+  return {
+    f'file_{index + 1}': {
+      'name': f'file_{index + 1}',
+      'type': 'file',
+      'default_value': Gio.file_new_for_path(default_value),
+      'action': action,
+    }
+    for index, (action, default_value) in enumerate(file_chooser_actions_and_default_values.items())
   }
 
 
