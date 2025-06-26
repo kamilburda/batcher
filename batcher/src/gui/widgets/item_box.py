@@ -185,23 +185,16 @@ class ItemBoxItem:
     self._event_box = Gtk.EventBox()
     self._event_box.add(self._vbox)
     
-    self._has_hbox_buttons_focus = False
-
     self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
-
-    self._is_event_box_allocated_size = False
-    self._buttons_allocation = None
 
     if self._button_display_mode == 'on_hover':
       self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
       self._event_box.connect('leave-notify-event', self._on_event_box_leave_notify_event)
-      self._event_box.connect('size-allocate', self._on_event_box_size_allocate)
-      self._event_box_buttons.connect('size-allocate', self._on_event_box_buttons_size_allocate)
-    
+
     self._event_box.show_all()
 
     if self._button_display_mode == 'on_hover':
-      self._hbox_buttons.set_no_show_all(True)
+      self._hbox_buttons.set_opacity(0.0)
       self._hbox_indicator_buttons.set_no_show_all(True)
   
   @property
@@ -262,32 +255,11 @@ class ItemBoxItem:
   
   def _on_event_box_enter_notify_event(self, _event_box, event):
     if event.detail != Gdk.NotifyType.INFERIOR:
-      self._hbox_buttons.show()
+      self._hbox_buttons.set_opacity(1.0)
   
   def _on_event_box_leave_notify_event(self, _event_box, event):
     if event.detail != Gdk.NotifyType.INFERIOR:
-      self._hbox_buttons.hide()
-  
-  def _on_event_box_size_allocate(self, _event_box, allocation):
-    if not self._is_event_box_allocated_size and self._buttons_allocation is not None:
-      self._is_event_box_allocated_size = True
-      
-      # Assign enough height to the box to make sure it does not resize when showing buttons.
-      if self._buttons_allocation.height >= allocation.height:
-        self._hbox.set_property('height-request', allocation.height)
-  
-  def _on_event_box_buttons_size_allocate(self, _event_box, allocation):
-    # Checking for 1-pixel width and height prevents wrong size from being allocated
-    # when parent widgets are resized.
-    if self._buttons_allocation is None and allocation.width > 1 and allocation.height > 1:
-      self._buttons_allocation = allocation
-      
-      # Make sure the width allocated to the buttons remains the same even if
-      # buttons are hidden. This avoids a problem with unreachable buttons when
-      # the horizontal scrollbar is displayed.
-      self._event_box_buttons.set_property('width-request', self._buttons_allocation.width)
-      
-      self._hbox_buttons.hide()
+      self._hbox_buttons.set_opacity(0.0)
 
 
 class ArrayBox(ItemBox):
