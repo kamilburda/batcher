@@ -1,4 +1,4 @@
-from src import utils as utils_
+from src import utils
 
 from .. import _utils as update_utils_
 
@@ -281,7 +281,7 @@ def _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_d
       'type': 'dimension',
       'name': 'padding_position_custom',
       'default_value': dimension_default_value,
-      'value': utils_.semi_deep_copy(dimension_default_value),
+      'value': utils.semi_deep_copy(dimension_default_value),
       'min_value': 0.0,
       'percent_placeholder_names': [
         'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
@@ -847,7 +847,7 @@ def _matching_text_1_1_add_new_options(arguments_list):
 
 
 def _get_dimension(orig_value, orig_unit, axis, dimension_default_value):
-  dimension_value = utils_.semi_deep_copy(dimension_default_value)
+  dimension_value = utils.semi_deep_copy(dimension_default_value)
 
   if orig_unit == 'pixels':
     dimension_value['unit'] = 'pixel'
