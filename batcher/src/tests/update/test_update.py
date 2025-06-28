@@ -27,9 +27,6 @@ _UPDATE_HANDLERS = {
 
 
 @mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
-@mock.patch(
-  'src.tests.update.test_update.update._main._UPDATE_HANDLERS',
-  new_callable=lambda: dict(_UPDATE_HANDLERS))
 class TestUpdate(unittest.TestCase):
   
   def setUp(self):
@@ -99,7 +96,7 @@ class TestUpdate(unittest.TestCase):
   def tearDown(self):
     CONFIG.PLUGIN_VERSION = self.orig_config_version
   
-  def test_fresh_start_saves_all_settings(self, *mocks):
+  def test_fresh_start_saves_all_settings(self, *_mocks):
     source = setting_.Persistor.get_default_setting_sources()['persistent']
 
     self.assertFalse(source.has_data())
@@ -115,7 +112,7 @@ class TestUpdate(unittest.TestCase):
     source.write.assert_called_once()
     source.clear.assert_called_once()
 
-  def test_fresh_start_without_updating_sources(self, *mocks):
+  def test_fresh_start_without_updating_sources(self, *_mocks):
     source = setting_.Persistor.get_default_setting_sources()['persistent']
 
     self.assertFalse(source.has_data())
@@ -131,13 +128,18 @@ class TestUpdate(unittest.TestCase):
     source.write.assert_not_called()
     source.clear.assert_not_called()
 
-  def test_update_unchanged_plugin_version_does_not_trigger_update(self, update_handlers, *mocks):
+  def test_update_unchanged_plugin_version_does_not_trigger_update(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('0.1')
     self.set_current_version('0.1')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -149,13 +151,18 @@ class TestUpdate(unittest.TestCase):
     self.source.clear.assert_not_called()
 
   def test_update_changed_plugin_version_with_no_handler_does_not_trigger_update_and_updates_source(
-        self, update_handlers, *mocks):
+        self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('0.1')
     self.set_current_version('0.2')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -169,14 +176,15 @@ class TestUpdate(unittest.TestCase):
     update_handlers['0.3'].assert_not_called()
     update_handlers['0.4'].assert_not_called()
 
-  def test_update_plugin_version_with_no_handler_does_not_trigger_update(
-        self, update_handlers, *mocks):
-    update_handlers.clear()
-
+  def test_update_plugin_version_with_no_handler_does_not_trigger_update(self, *_mocks):
     self.set_previous_version('0.1')
     self.set_current_version('0.2')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers={},
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -187,13 +195,18 @@ class TestUpdate(unittest.TestCase):
     self.source.write.assert_called_once()
     self.source.clear.assert_called_once()
 
-  def test_update_with_one_handler(self, update_handlers, *mocks):
+  def test_update_with_one_handler(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('0.1')
     self.set_current_version('0.3')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -206,13 +219,18 @@ class TestUpdate(unittest.TestCase):
     update_handlers['0.3'].assert_called_once()
     update_handlers['0.4'].assert_not_called()
 
-  def test_update_with_multiple_handlers(self, update_handlers, *mocks):
+  def test_update_with_multiple_handlers(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('0.1')
     self.set_current_version('0.4')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -225,14 +243,19 @@ class TestUpdate(unittest.TestCase):
     update_handlers['0.3'].assert_called_once()
     update_handlers['0.4'].assert_called_once()
 
-  def test_update_without_updating_sources(self, update_handlers, *mocks):
+  def test_update_without_updating_sources(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('0.1')
     self.set_current_version('0.4')
 
     status, _message = update.load_and_update(
-      self.settings, sources={'persistent': self.source}, update_sources=False)
+      self.settings,
+      sources={'persistent': self.source},
+      update_sources=False,
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.UPDATE)
 
@@ -245,14 +268,18 @@ class TestUpdate(unittest.TestCase):
     update_handlers['0.3'].assert_called_once()
     update_handlers['0.4'].assert_called_once()
 
-  def test_update_failing_to_parse_previous_version_returns_terminate(
-        self, update_handlers, *mocks):
+  def test_update_failing_to_parse_previous_version_returns_terminate(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     self._spy_on_update_handlers(update_handlers)
 
     self.set_previous_version('invalid_version')
     self.set_current_version('0.4')
 
-    status, _message = update.load_and_update(self.settings, sources={'persistent': self.source})
+    status, _message = update.load_and_update(
+      self.settings,
+      sources={'persistent': self.source},
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.TERMINATE)
 
@@ -265,7 +292,8 @@ class TestUpdate(unittest.TestCase):
     update_handlers['0.3'].assert_not_called()
     update_handlers['0.4'].assert_not_called()
 
-  def test_update_any_failure_in_update_handling_returns_terminate(self, update_handlers, *mocks):
+  def test_update_any_failure_in_update_handling_returns_terminate(self, *_mocks):
+    update_handlers = dict(_UPDATE_HANDLERS)
     update_handlers['0.3'] = _update_to_0_3_with_error
 
     self._spy_on_update_handlers(update_handlers)
@@ -274,7 +302,11 @@ class TestUpdate(unittest.TestCase):
     self.set_current_version('0.4')
 
     status, _message = update.load_and_update(
-      self.settings, sources={'persistent': self.source}, update_sources=False)
+      self.settings,
+      sources={'persistent': self.source},
+      update_sources=False,
+      update_handlers=update_handlers,
+    )
 
     self.assertEqual(status, update.UpdateStatuses.TERMINATE)
 

@@ -1,7 +1,7 @@
 """Main logic of updating settings to the latest version."""
 
 import traceback
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 
 from config import CONFIG
@@ -47,6 +47,7 @@ def load_and_update(
       sources: Optional[Dict[str, Union[setting_.Source, List[setting_.Source]]]] = None,
       update_sources: bool = True,
       procedure_group: Optional[str] = None,
+      update_handlers: Optional[Dict[str, Callable]] = None,
 ) -> Tuple[int, str]:
   """Loads and updates settings and setting sources to the latest version of the
   plug-in.
@@ -77,6 +78,11 @@ def load_and_update(
   Some parts of the update may be skipped if the parts can only be applied to
   the setting sources whose name match ``procedure_group``. If
   ``procedure_group`` is ``None``, all parts of the update apply.
+
+  If ``update_handlers`` is ``None`` (the default), update will be performed
+  from the earliest version to the latest version. You can override
+  ``update_handlers`` to specify a custom dictionary of (version, function)
+  pairs. This is usually utilized for testing purposes.
   """
   def _handle_update(data):
     nonlocal current_version, previous_version
@@ -86,13 +92,18 @@ def load_and_update(
     previous_version = _get_plugin_version(data)
     _update_plugin_version(data, current_version)
 
-    if not _UPDATE_HANDLERS:
+    if update_handlers is None:
+      processed_update_handlers = _get_update_handlers()
+    else:
+      processed_update_handlers = update_handlers
+
+    if not processed_update_handlers:
       return data
 
     if previous_version is None:
       raise setting_.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
 
-    for version_str, update_handler in _UPDATE_HANDLERS.items():
+    for version_str, update_handler in processed_update_handlers.items():
       if previous_version < version_.Version.parse(version_str) <= current_version:
         update_handler(data, settings, procedure_groups)
 
@@ -183,6 +194,10 @@ def _get_plugin_version_dict(data) -> Union[dict, None]:
     return update_utils_.get_child_setting(main_settings_list, 'plugin_version')[0]
   else:
     return None
+
+
+def _get_update_handlers() -> Dict[str, Callable]:
+  return _UPDATE_HANDLERS
 
 
 _UPDATE_HANDLERS = {
