@@ -1,2 +1,3 @@
+"""Updating the plug-in to the latest version."""
 
-from .update import *
+from ._main import *
