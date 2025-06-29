@@ -20,5 +20,6 @@ def update(data, _settings, _procedure_groups):
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
-  del arguments_list[7]['show_display_name']
-  arguments_list[7]['gui_kwargs'] = {'show_display_name': False}
+  if 'show_display_name' in arguments_list[7]:
+    del arguments_list[7]['show_display_name']
+    arguments_list[7]['gui_kwargs'] = {'show_dis`play_name': False}
