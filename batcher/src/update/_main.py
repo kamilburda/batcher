@@ -1,5 +1,9 @@
 """Main logic of updating settings to the latest version."""
 
+import importlib
+import os
+import pkgutil
+import sys
 import traceback
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
@@ -7,20 +11,11 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 from config import CONFIG
 from src import setting as setting_
 from src import utils_setting as utils_setting_
+from src import utils
 from src import version as version_
 from src.procedure_groups import *
 
 from . import _utils as update_utils_
-from ._handlers import update_0_3
-from ._handlers import update_0_4
-from ._handlers import update_0_5
-from ._handlers import update_0_6
-from ._handlers import update_0_7
-from ._handlers import update_0_8
-from ._handlers import update_1_0_rc1
-from ._handlers import update_1_0_rc2
-from ._handlers import update_1_1
-from ._handlers import update_1_2
 
 
 __all__ = [
@@ -40,6 +35,10 @@ class UpdateStatuses:
     'update',
     'terminate',
   )
+
+
+_UPDATE_HANDLER_MODULE_PREFIX = 'update_'
+_HANDLERS_PACKAGE_NAME = '_handlers'
 
 
 def load_and_update(
@@ -93,19 +92,21 @@ def load_and_update(
     _update_plugin_version(data, current_version)
 
     if update_handlers is None:
-      processed_update_handlers = _get_update_handlers()
+      processed_update_handlers = _get_update_handlers(previous_version, current_version)
     else:
-      processed_update_handlers = update_handlers
-
-    if not processed_update_handlers:
-      return data
+      processed_update_handlers = [
+        handler for version_str, handler in update_handlers.items()
+        if previous_version < version_.Version.parse(version_str) <= current_version
+      ]
 
     if previous_version is None:
       raise setting_.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
 
-    for version_str, update_handler in processed_update_handlers.items():
-      if previous_version < version_.Version.parse(version_str) <= current_version:
-        update_handler(data, settings, procedure_groups)
+    if not processed_update_handlers:
+      return data
+
+    for update_handler in processed_update_handlers:
+      update_handler(data, settings, procedure_groups)
 
     return data
 
@@ -196,19 +197,75 @@ def _get_plugin_version_dict(data) -> Union[dict, None]:
     return None
 
 
-def _get_update_handlers() -> Dict[str, Callable]:
-  return _UPDATE_HANDLERS
+def _get_update_handlers(previous_version, current_version) -> List[Callable]:
+  update_handlers_list = []
+
+  module_filepath = utils.get_current_module_filepath()
+  handlers_package_dirpath = os.path.join(os.path.dirname(module_filepath), _HANDLERS_PACKAGE_NAME)
+
+  current_package = sys.modules[__name__].__package__
+
+  for _module_info, module_name, is_package in pkgutil.walk_packages(
+        path=[handlers_package_dirpath]):
+    if is_package:
+      continue
+
+    if module_name.startswith(_UPDATE_HANDLER_MODULE_PREFIX):
+      module_path = f'{current_package}.{_HANDLERS_PACKAGE_NAME}.{module_name}'
+
+      # TODO: Handle module named 'next'
+      try:
+        handler_version = _get_version_from_module_name(module_name)
+      except Exception as e:
+        print(f'could not parse version from module {module_name}; reason: {e}', file=sys.stderr)
+      else:
+        if previous_version < handler_version <= current_version:
+          if module_path not in sys.modules:
+            module = importlib.import_module(module_path)
+          else:
+            module = sys.modules[module_path]
+
+          update_handlers_list.append((module.update, handler_version))
+
+  update_handlers_list.sort(key=lambda item: item[1])
+
+  return [item[0] for item in update_handlers_list]
 
 
-_UPDATE_HANDLERS = {
-  '0.3': update_0_3.update,
-  '0.4': update_0_4.update,
-  '0.5': update_0_5.update,
-  '0.6': update_0_6.update,
-  '0.7': update_0_7.update,
-  '0.8': update_0_8.update,
-  '1.0-RC1': update_1_0_rc1.update,
-  '1.0-RC2': update_1_0_rc2.update,
-  '1.1': update_1_1.update,
-  '1.2': update_1_2.update,
-}
+def _get_version_from_module_name(module_name: str) -> version_.Version:
+  version_str = module_name[len(_UPDATE_HANDLER_MODULE_PREFIX):]
+
+  version_numbers_and_prerelease_components = version_str.split('__')
+  if len(version_numbers_and_prerelease_components) > 1:
+    version_numbers_str, prerelease_str = version_numbers_and_prerelease_components[:2]
+  else:
+    version_numbers_str = version_numbers_and_prerelease_components[0]
+    prerelease_str = None
+
+  version_number_components_str = version_numbers_str.split('_')
+  major_number = int(version_number_components_str[0])
+  minor_number = None
+  patch_number = None
+  prerelease = None
+  prerelease_patch_number = None
+
+  if len(version_number_components_str) == 2:
+    minor_number = int(version_number_components_str[1])
+  elif len(version_number_components_str) > 2:
+    minor_number = int(version_number_components_str[1])
+    patch_number = int(version_number_components_str[2])
+
+  if prerelease_str is not None:
+    prerelease_components_str = prerelease_str.split('_')
+    prerelease = prerelease_components_str[0]
+
+    if len(prerelease_components_str) > 1:
+      prerelease_patch_number = int(prerelease_components_str[1])
+
+  return version_.Version(
+    major=major_number,
+    minor=minor_number,
+    patch=patch_number,
+    prerelease=prerelease,
+    prerelease_patch=prerelease_patch_number,
+  )
