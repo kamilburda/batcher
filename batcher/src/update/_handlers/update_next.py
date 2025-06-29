@@ -16,9 +16,9 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
-          _scale_1_2_change_show_display_name_to_gui_kwargs(arguments_list)
+          _scale_change_show_display_name_to_gui_kwargs(arguments_list)
 
 
-def _scale_1_2_change_show_display_name_to_gui_kwargs(arguments_list):
+def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
   del arguments_list[7]['show_display_name']
   arguments_list[7]['gui_kwargs'] = {'show_display_name': False}

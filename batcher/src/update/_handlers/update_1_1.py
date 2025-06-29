@@ -18,33 +18,33 @@ def update(data, _settings, _procedure_groups):
       for action_dict in actions_list:
         action_list = action_dict['settings']
 
-        _rename_command_attributes_1_1(action_dict)
+        _rename_command_attributes(action_dict)
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
-          _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict)
-          _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict)
-          _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list)
-          _scale_1_1_add_image_resolution(arguments_list)
-          _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_dict)
+          _scale_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict)
+          _scale_merge_dimensions_and_units(arguments_list, orig_name_setting_dict)
+          _scale_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list)
+          _scale_add_image_resolution(arguments_list)
+          _scale_add_padding_related_arguments(arguments_list, orig_name_setting_dict)
 
         if (orig_name_setting_dict['value'] == 'align_and_offset_layers'
             and arguments_list is not None):
-          _align_1_1_merge_reference_object_and_layer(arguments_list)
-          _align_1_1_merge_dimensions_and_units(arguments_list)
+          _align_merge_reference_object_and_layer(arguments_list)
+          _align_merge_dimensions_and_units(arguments_list)
 
         if (orig_name_setting_dict['value'] == 'resize_to_layer_size'
             and arguments_list is not None):
-          _resize_canvas_1_1_rename_action(orig_name_setting_dict)
-          _resize_canvas_1_1_rename_layers_argument(arguments_list)
-          _resize_canvas_1_1_add_new_arguments(arguments_list)
+          _resize_canvas_rename_action(orig_name_setting_dict)
+          _resize_canvas_rename_layers_argument(arguments_list)
+          _resize_canvas_add_new_arguments(arguments_list)
 
         if (orig_name_setting_dict['value'] == 'rename_for_export_images'
             and arguments_list is not None):
-          _rename_for_export_images_1_1_remove_rename_images_argument(arguments_list)
+          _rename_for_export_images_remove_rename_images_argument(arguments_list)
 
         if (orig_name_setting_dict['value'].startswith('export_for_')
             and arguments_list is not None):
@@ -53,14 +53,14 @@ def update(data, _settings, _procedure_groups):
         if ((orig_name_setting_dict['value'].startswith('insert_background_for_')
              or orig_name_setting_dict['value'].startswith('insert_foreground_for_'))
             and arguments_list is not None):
-          _insert_1_1_rename_arguments(arguments_list)
+          _insert_rename_arguments(arguments_list)
 
     conditions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'conditions')
     if conditions_list is not None:
       for condition_dict in conditions_list:
         condition_list = condition_dict['settings']
 
-        _rename_command_attributes_1_1(condition_dict)
+        _rename_command_attributes(condition_dict)
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(
           condition_list, 'orig_name')
@@ -68,7 +68,7 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'] == 'matching_text'
             and arguments_list is not None):
-          _matching_text_1_1_add_new_options(arguments_list)
+          _matching_text_add_new_options(arguments_list)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
@@ -76,7 +76,7 @@ def update(data, _settings, _procedure_groups):
     update_utils_.rename_group(gui_settings_list, 'procedure_browser', 'action_browser')
 
 
-def _rename_command_attributes_1_1(command_dict):
+def _rename_command_attributes(command_dict):
   if 'tags' in command_dict:
     _replace_item_in_list(command_dict, 'tags', 'action', 'command')
     _replace_item_in_list(command_dict, 'tags', 'procedure', 'action')
@@ -103,7 +103,7 @@ def _replace_item_in_list(setting_dict, attribute_name, previous_value, new_valu
     setting_dict[attribute_name].insert(previous_value_index, new_value)
 
 
-def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
+def _scale_merge_image_layer_object_to_scale(arguments_list, orig_name_setting_dict):
   update_utils_.remove_setting(arguments_list, 'image')
   update_utils_.remove_setting(arguments_list, 'layer')
   update_utils_.remove_setting(arguments_list, 'object_to_scale')
@@ -123,7 +123,7 @@ def _scale_1_1_merge_image_layer_object_to_scale(arguments_list, orig_name_setti
     })
 
 
-def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict):
+def _scale_merge_dimensions_and_units(arguments_list, orig_name_setting_dict):
   dimension_default_value = {
     'pixel_value': 100.0,
     'percent_value': 100.0,
@@ -168,7 +168,7 @@ def _scale_1_1_merge_dimensions_and_units(arguments_list, orig_name_setting_dict
   height_setting_dict['min_value'] = 0.0
 
 
-def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list):
+def _scale_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(arguments_list):
   scale_to_fit_setting_dict, _index = update_utils_.remove_setting(arguments_list, 'scale_to_fit')
   keep_aspect_ratio_setting_dict, _index = update_utils_.remove_setting(
     arguments_list, 'keep_aspect_ratio')
@@ -204,7 +204,7 @@ def _scale_1_1_merge_scale_to_fit_keep_aspect_ratio_and_dimension_to_keep(argume
   )
 
 
-def _scale_1_1_add_image_resolution(arguments_list):
+def _scale_add_image_resolution(arguments_list):
   arguments_list.append(
     {
       'type': 'bool',
@@ -235,7 +235,7 @@ def _scale_1_1_add_image_resolution(arguments_list):
   )
 
 
-def _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_dict):
+def _scale_add_padding_related_arguments(arguments_list, orig_name_setting_dict):
   arguments_list.append(
     {
       'type': 'color',
@@ -290,7 +290,7 @@ def _scale_1_1_add_padding_related_arguments(arguments_list, orig_name_setting_d
   )
 
 
-def _align_1_1_merge_reference_object_and_layer(arguments_list):
+def _align_merge_reference_object_and_layer(arguments_list):
   reference_object_setting_dict, _index = update_utils_.remove_setting(
     arguments_list, 'reference_object')
   reference_layer_setting_dict, _index = update_utils_.remove_setting(
@@ -313,7 +313,7 @@ def _align_1_1_merge_reference_object_and_layer(arguments_list):
   )
 
 
-def _align_1_1_merge_dimensions_and_units(arguments_list):
+def _align_merge_dimensions_and_units(arguments_list):
   dimension_default_value = {
     'pixel_value': 0.0,
     'percent_value': 0.0,
@@ -351,16 +351,16 @@ def _align_1_1_merge_dimensions_and_units(arguments_list):
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
 
 
-def _resize_canvas_1_1_rename_action(orig_name_setting_dict):
+def _resize_canvas_rename_action(orig_name_setting_dict):
   orig_name_setting_dict['value'] = 'resize_canvas'
   orig_name_setting_dict['default_value'] = 'resize_canvas'
 
 
-def _resize_canvas_1_1_rename_layers_argument(arguments_list):
+def _resize_canvas_rename_layers_argument(arguments_list):
   update_utils_.rename_setting(arguments_list, 'layers', 'resize_to_layer_size_layers')
 
 
-def _resize_canvas_1_1_add_new_arguments(arguments_list):
+def _resize_canvas_add_new_arguments(arguments_list):
   arguments_list[0:0] = [
     {
       'type': 'placeholder_image_or_layer',
@@ -815,7 +815,7 @@ def _resize_canvas_1_1_add_new_arguments(arguments_list):
   )
 
 
-def _rename_for_export_images_1_1_remove_rename_images_argument(arguments_list):
+def _rename_for_export_images_remove_rename_images_argument(arguments_list):
   update_utils_.remove_setting(arguments_list, 'rename_images')
 
 
@@ -829,12 +829,12 @@ def _add_new_attributes_to_output_directory(group_list):
     }
 
 
-def _insert_1_1_rename_arguments(arguments_list):
+def _insert_rename_arguments(arguments_list):
   update_utils_.rename_setting(arguments_list, 'merge_procedure_name', 'merge_action_name')
   update_utils_.rename_setting(arguments_list, 'constraint_name', 'condition_name')
 
 
-def _matching_text_1_1_add_new_options(arguments_list):
+def _matching_text_add_new_options(arguments_list):
   arguments_list[0]['items'] = [
     ('starts_with', _('Starts with text')),
     ('does_not_start_with', _('Does not start with text')),
