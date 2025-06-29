@@ -83,7 +83,11 @@ class Version:
   
   def __ge__(self, other_version):
     return not self.__lt__(other_version)
-  
+
+  def __iter__(self):
+    for component in [self.major, self.minor, self.patch, self.prerelease, self.prerelease_patch]:
+      yield component
+
   def increment(self, component_to_increment: str, prerelease: Optional[str] = None):
     """Increments the version.
     
@@ -94,15 +98,15 @@ class Version:
     will be assigned (e.g. ``'3.3'`` becomes ``'3.3.1'``).
     
     If the ``prerelease`` string is not ``None`` and non-empty,
-    the pre-release is appended. For example, ``'3.3'`` with ``'major'``
-    component and ``'alpha'`` as the pre-release string becomes ``'4.0-alpha'``.
+    the prerelease is appended. For example, ``'3.3'`` with ``'major'``
+    component and ``'alpha'`` as the prerelease string becomes ``'4.0-alpha'``.
     
-    If the version already has the same pre-release, a number to the
-    pre-release is appended (e.g. ``'4.0-alpha'`` becomes ``'4.0-alpha.2'``).
+    If the version already has the same prerelease, a number to the
+    prerelease is appended (e.g. ``'4.0-alpha'`` becomes ``'4.0-alpha.2'``).
     
-    If the version already has a different pre-release (lexically earlier than
-    ``prerelease``), replace the existing pre-release with ``prerelease`` (e.g.
-    ``'4.0-alpha'`` with the ``'beta'`` pre-release becomes ``'4.0-beta'``).
+    If the version already has a different prerelease (lexically earlier than
+    ``prerelease``), replace the existing prerelease with ``prerelease`` (e.g.
+    ``'4.0-alpha'`` with the ``'beta'`` prerelease becomes ``'4.0-beta'``).
     
     Raises:
       ValueError:
@@ -117,12 +121,12 @@ class Version:
     
     if prerelease:
       if not re.search(r'^[a-zA-Z0-9]+$', prerelease):
-        raise ValueError(f'invalid pre-release format "{prerelease}"')
+        raise ValueError(f'invalid prerelease format "{prerelease}"')
       
       if self.prerelease is not None and prerelease < self.prerelease:
         raise ValueError(
-          f'the specified pre-release "{prerelease}" is lexically earlier than'
-          f' the existing pre-release "{self.prerelease}"')
+          f'the specified prerelease "{prerelease}" is lexically earlier than'
+          f' the existing prerelease "{self.prerelease}"')
 
     if component_to_increment == 'release':
       if prerelease:
