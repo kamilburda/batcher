@@ -38,6 +38,7 @@ class UpdateStatuses:
 
 
 _UPDATE_HANDLER_MODULE_PREFIX = 'update_'
+_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX = '_next'
 _HANDLERS_PACKAGE_NAME = '_handlers'
 
 
@@ -199,6 +200,7 @@ def _get_plugin_version_dict(data) -> Union[dict, None]:
 
 def _get_update_handlers(previous_version, current_version) -> List[Callable]:
   update_handlers_list = []
+  next_update_handler = None
 
   module_filepath = utils.get_current_module_filepath()
   handlers_package_dirpath = os.path.join(os.path.dirname(module_filepath), _HANDLERS_PACKAGE_NAME)
@@ -213,23 +215,27 @@ def _get_update_handlers(previous_version, current_version) -> List[Callable]:
     if module_name.startswith(_UPDATE_HANDLER_MODULE_PREFIX):
       module_path = f'{current_package}.{_HANDLERS_PACKAGE_NAME}.{module_name}'
 
-      # TODO: Handle module named 'next'
-      try:
-        handler_version = _get_version_from_module_name(module_name)
-      except Exception as e:
-        print(f'could not parse version from module {module_name}; reason: {e}', file=sys.stderr)
+      if module_name.endswith(_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX):
+        next_module = importlib.import_module(module_path)
+        next_update_handler = next_module.update
       else:
-        if previous_version < handler_version <= current_version:
-          if module_path not in sys.modules:
+        try:
+          handler_version = _get_version_from_module_name(module_name)
+        except Exception as e:
+          print(f'could not parse version from module {module_name}; reason: {e}', file=sys.stderr)
+        else:
+          if previous_version < handler_version <= current_version:
             module = importlib.import_module(module_path)
-          else:
-            module = sys.modules[module_path]
 
-          update_handlers_list.append((module.update, handler_version))
+            update_handlers_list.append((module.update, handler_version))
 
   update_handlers_list.sort(key=lambda item: item[1])
+  update_handlers = [item[0] for item in update_handlers_list]
 
-  return [item[0] for item in update_handlers_list]
+  if next_update_handler is not None:
+    update_handlers.append(next_update_handler)
+
+  return update_handlers
 
 
 def _get_version_from_module_name(module_name: str) -> version_.Version:

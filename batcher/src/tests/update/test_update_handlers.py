@@ -8,7 +8,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
-from config import CONFIG
 from src import builtin_actions
 from src import builtin_conditions
 from src import placeholders
@@ -29,18 +28,9 @@ _MOCK_PNG_CHOICE = Gimp.Choice.new()
 _MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
 _MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
 
-_LATEST_PLUGIN_VERSION = '1.2'
-
 
 @mock.patch('src.setting.sources.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 class TestUpdateHandlers(unittest.TestCase):
-  
-  def setUp(self):
-    self.orig_plugin_version = CONFIG.PLUGIN_VERSION
-    CONFIG.PLUGIN_VERSION = _LATEST_PLUGIN_VERSION
-
-  def tearDown(self):
-    CONFIG.PLUGIN_VERSION = self.orig_plugin_version
 
   @mock.patch(
     f'{_SETTINGS_MODULE_PATH}._functions.Gimp.param_spec_choice_get_default',
@@ -102,7 +92,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertEqual(status, update.UpdateStatuses.UPDATE, msg=message)
 
     self._assert_correct_contents_for_update_to_1_1(settings)
-    self._assert_correct_contents_for_update_to_1_2(settings)
+    self._assert_correct_contents_for_update_to_next(settings)
 
   @staticmethod
   def _get_orig_setting_values_for_0_2(settings):
@@ -581,7 +571,7 @@ class TestUpdateHandlers(unittest.TestCase):
     self.assertNotIn('procedure_browser', settings['gui'])
     self.assertIn('action_browser', settings['gui'])
 
-  def _assert_correct_contents_for_update_to_1_2(self, settings):
+  def _assert_correct_contents_for_update_to_next(self, settings):
     scale_arguments_path = 'main/actions/scale_for_images/arguments'
 
     self.assertFalse(settings[f'{scale_arguments_path}/image_resolution'].gui.show_display_name)
