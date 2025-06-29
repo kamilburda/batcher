@@ -190,12 +190,19 @@ class TestIncludeConfigTag(unittest.TestCase):
     ['invalid_config_entry', ['ENTRY_THAT_DOES_NOT_EXIST'], ''],
   ])
   def test_include_config(self, _test_case_suffix, args, expected_contents):
+    orig_config_entries = {}
+
     if args and hasattr(CONFIG, args[0]):
+      orig_config_entries[args[0]] = getattr(CONFIG, args[0])
       setattr(CONFIG, args[0], expected_contents)
 
-    tag = preprocess_document_contents.IncludeConfigTag(
-      self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)
-    
-    tag.process_args(args, {})
-    
-    self.assertEqual(tag.get_contents(), expected_contents)
+    try:
+      tag = preprocess_document_contents.IncludeConfigTag(
+        self._TEST_SOURCE_FILEPATH, self._TEST_MATCHING_REGEX)
+
+      tag.process_args(args, {})
+
+      self.assertEqual(tag.get_contents(), expected_contents)
+    finally:
+      for name, value in orig_config_entries.items():
+        setattr(CONFIG, name, value)
