@@ -15,6 +15,6 @@
 !.git/
 !/batcher/config/config_dev.py
 !/batcher/locale/generate_pot.sh
-!/batcher/runtests.py
 !/batcher/src/tests/
 !/batcher/dev/
+!/runtests/runtests.py
