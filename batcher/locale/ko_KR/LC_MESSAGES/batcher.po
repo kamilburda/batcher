@@ -1,0 +1,2141 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Kamil Burda
+# This file is distributed under the same license as the 'batcher' package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr "Project-Id-Version: 'batcher' 1.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-30 09:36+0900\n"
+"PO-Revision-Date: 2025-07-01 01:03+0900\n"
+"Last-Translator: Ma Guk-Bong <mgb10004@gmail.com>\n"
+"Language-Team: none\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: AcroEdit 18.12\n"
+
+#: ../../batcher/batcher.py:68
+msgid "Batch Convert"
+msgstr "일괄 변환"
+
+#: ../../batcher/batcher.py:96
+msgid "Export Images"
+msgstr "이미지 내보내기"
+
+#: ../../batcher/batcher.py:122
+msgid "Export Images (Quick)"
+msgstr "이미지 내보내기(간편)"
+
+#: ../../batcher/batcher.py:141
+msgid "Edit and Save Images"
+msgstr "이미지 편집 및 저장"
+
+#: ../../batcher/batcher.py:163
+msgid "Edit and Save Images (Quick)"
+msgstr "이미지 편집 및 저장(간편)"
+
+#: ../../batcher/batcher.py:180
+msgid "Export Layers"
+msgstr "레이어 내보내기"
+
+#: ../../batcher/batcher.py:199
+msgid "Export Layers (Quick)"
+msgstr "레이어 내보내기(간편)"
+
+#: ../../batcher/batcher.py:216
+msgid "Export Selected Layers"
+msgstr "선택한 레이어 내보내기"
+
+#: ../../batcher/batcher.py:238
+msgid "Edit Layers"
+msgstr "레이어 편집"
+
+#: ../../batcher/batcher.py:257
+msgid "Edit Layers (Quick)"
+msgstr "레이어 편집(간편)"
+
+#: ../../batcher/batcher.py:274
+msgid "Edit Selected Layers"
+msgstr "선택한 레이어 편집"
+
+#: ../../batcher/batcher.py:421
+msgid ""
+"Settings for this plug-in could not be updated to the latest version and "
+"must be reset."
+msgstr "이 플러그인의 설정을 최신 버전으로 업데이트할 수 없어 초기화해야 합니다."
+
+#: ../../batcher/batcher.py:424
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text under the details."
+msgstr "이 문제가 플러그인 오류라고 생각되면, 아래의 내용을 포함한 세부 정보를 보내 오류 수정에 도움을 줄 수 있습니다."
+
+#: ../../batcher/batcher.py:429
+msgid ""
+"Send a report with the text in the details above to one of the following "
+"sites"
+msgstr "위의 세부 정보에 있는 텍스트와 함께 다음 사이트 중 하나로 보내주세요."
+
+#: ../../batcher/batcher.py:442
+msgid "Settings could not be loaded and had to be reset."
+msgstr "설정을 불러올 수 없어 초기화되었습니다."
+
+#: ../../batcher/batcher.py:444 ../../batcher/batcher.py:463
+msgid "Details: {}"
+msgstr "세부 정보: {}"
+
+#: ../../batcher/batcher.py:453
+msgid "\"{}\" is not a valid file with settings"
+msgstr "\"{}\"은(는) 설정이 포함된 올바른 파일이 아닙니다."
+
+#: ../../batcher/batcher.py:460
+msgid "Failed to import settings from file \"{}\"."
+msgstr "파일 \"{}\"에서 설정을 가져오는 데 실패했습니다."
+
+#: ../../batcher/batcher.py:496
+msgid "_Batch Convert..."
+msgstr "_일괄 변환..."
+
+#: ../../batcher/batcher.py:501
+msgid "Batch-process image files"
+msgstr "이미지 파일 일괄 처리"
+
+#: ../../batcher/batcher.py:502
+msgid ""
+"This procedure performs batch conversion of image files to the specified "
+"file format, optionally applying arbitrary procedures to each item and "
+"ignoring items according to the specified conditions."
+msgstr ""
+"이 절차는 이미지 파일을 지정된 파일 형식으로 일괄 변환하며,"
+"각 항목에 임의의 동작을 선택적으로 적용하고"
+"지정된 조건에 따라 항목을 무시할 수 있습니다."
+
+#: ../../batcher/batcher.py:514
+msgid "E_xport Images..."
+msgstr "이미지 내보내기(_X)..."
+
+#: ../../batcher/batcher.py:518
+msgid "Exports images opened in GIMP"
+msgstr "GIMP에서 열려 있는 이미지를 내보냅니다"
+
+#: ../../batcher/batcher.py:527
+msgid "E_xport Images (Quick)"
+msgstr "이미지 내보내기(간편)(_X)"
+
+#: ../../batcher/batcher.py:531
+msgid "Quickly export images opened in GIMP"
+msgstr "GIMP에서 열려 있는 이미지를 간편하게 내보냅니다"
+
+#: ../../batcher/batcher.py:540
+msgid "E_dit and Save Images..."
+msgstr "이미지 편집 및 저장(_D)..."
+
+#: ../../batcher/batcher.py:544
+msgid "Edits and saves images opened in GIMP as XCF"
+msgstr "GIMP에서 열려 있는 이미지를 XCF 형식으로 편집 및 저장합니다"
+
+#: ../../batcher/batcher.py:553
+msgid "E_dit and Save Images (Quick)"
+msgstr "이미지 편집 및 저장(간편)(_D)"
+
+#: ../../batcher/batcher.py:557
+msgid "Edits and saves images opened in GIMP as XCF instantly"
+msgstr "GIMP에서 열려 있는 이미지를 즉시 XCF 형식으로 편집 및 저장합니다"
+
+#: ../../batcher/batcher.py:565
+msgid "E_xport Layers..."
+msgstr "레이어 내보내기(_X)..."
+
+#: ../../batcher/batcher.py:572
+msgid "Export layers as separate images"
+msgstr "레이어를 개별 이미지로 내보냅니다"
+
+#: ../../batcher/batcher.py:579
+msgid "E_xport Layers (Quick)"
+msgstr "레이어 내보내기(간편)(_X)"
+
+#: ../../batcher/batcher.py:586
+msgid "Quickly export layers as separate images"
+msgstr "레이어를 개별 이미지로 간편하게 내보냅니다"
+
+#: ../../batcher/batcher.py:593
+msgid "E_xport Selected Layers"
+msgstr "선택한 레이어 내보내기(_X)"
+
+#: ../../batcher/batcher.py:599
+msgid "Quickly export selected layers as separate images"
+msgstr "선택한 레이어를 개별 이미지로 간편하게 내보냅니다"
+
+#: ../../batcher/batcher.py:607
+msgid "E_dit Layers..."
+msgstr "레이어 편집(_D)..."
+
+#: ../../batcher/batcher.py:614
+msgid "Batch-edit layers"
+msgstr "레이어 일괄 편집"
+
+#: ../../batcher/batcher.py:621
+msgid "E_dit Layers (Quick)"
+msgstr "레이어 편집(간편)(_D)"
+
+#: ../../batcher/batcher.py:628
+msgid "Batch-edit layers instantly"
+msgstr "레이어를 즉시 일괄 편집합니다"
+
+#: ../../batcher/batcher.py:635
+msgid "E_dit Selected Layers"
+msgstr "선택한 레이어 편집(_D)"
+
+#: ../../batcher/batcher.py:641
+msgid "Batch-edit selected layers instantly"
+msgstr "선택한 레이어를 즉시 일괄 편집합니다"
+
+#: ../../batcher/config/config.py:16 ../../batcher/config/config_dev.py:16
+msgid "Batcher"
+msgstr "Batcher"
+
+#: ../../batcher/pygimplib/gui/file_chooser.py:109
+msgid "Clear"
+msgstr "지우기"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:119
+msgid "Align and offset"
+msgstr "정렬 및 오프셋"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:121
+msgid ""
+"Aligns layer(s) with the image or another layer.\n"
+"\n"
+"You may specify additional offsets after the alignment is applied."
+msgstr ""
+"레이어를 이미지 또는 다른 레이어에 맞춰 정렬합니다.\n"
+"\n"
+"정렬 후 추가 오프셋 값을 지정할 수 있습니다."
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:131
+msgid "Layers to align"
+msgstr "정렬할 레이어"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:137
+#: ../../batcher/src/update.py:1650
+msgid "Object to align layers with"
+msgstr "레이어를 정렬할 기준 객체"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:144
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:156
+msgid "Keep"
+msgstr "유지"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:145
+#: ../../batcher/src/builtin_actions/_crop.py:514
+#: ../../batcher/src/builtin_actions/_crop.py:543
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:656
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:684
+#: ../../batcher/src/update.py:1860 ../../batcher/src/update.py:1900
+msgid "Left"
+msgstr "왼쪽"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:146
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:158
+#: ../../batcher/src/builtin_actions/_crop.py:544
+#: ../../batcher/src/builtin_actions/_crop.py:607
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:685
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:748
+#: ../../batcher/src/builtin_actions/_scale.py:458
+#: ../../batcher/src/update.py:1597 ../../batcher/src/update.py:1901
+#: ../../batcher/src/update.py:1991
+msgid "Center"
+msgstr "중앙"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:147
+#: ../../batcher/src/builtin_actions/_crop.py:533
+#: ../../batcher/src/builtin_actions/_crop.py:545
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:674
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:686
+#: ../../batcher/src/update.py:1889 ../../batcher/src/update.py:1902
+msgid "Right"
+msgstr "오른쪽"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:149
+msgid "Horizontal alignment"
+msgstr "수평 정렬"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:157
+#: ../../batcher/src/builtin_actions/_crop.py:476
+#: ../../batcher/src/builtin_actions/_crop.py:541
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:620
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:682
+#: ../../batcher/src/update.py:1802 ../../batcher/src/update.py:1898
+msgid "Top"
+msgstr "위쪽"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:159
+#: ../../batcher/src/builtin_actions/_crop.py:495
+#: ../../batcher/src/builtin_actions/_crop.py:547
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:638
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:688
+#: ../../batcher/src/update.py:1831 ../../batcher/src/update.py:1904
+msgid "Bottom"
+msgstr "아래쪽"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:161
+msgid "Vertical alignment"
+msgstr "수직 정렬"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:180
+msgid "Additional X-offset"
+msgstr "X축 기준 추가 오프셋"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:199
+msgid "Additional Y-offset"
+msgstr "Y축 기준 추가 오프셋"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:336
+msgid "Color correction"
+msgstr "색상 보정"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:343
+#: ../../batcher/src/builtin_actions/_misc.py:71
+msgid "Layer"
+msgstr "레이어"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:349
+msgid "Brightness"
+msgstr "밝기"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:360
+msgid "Contrast"
+msgstr "대비"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:372
+msgid "Levels (preset file)"
+msgstr "레벨 (프리셋 파일)"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:380
+msgid "Curves (preset file)"
+msgstr "커브 (프리셋 파일)"
+
+#: ../../batcher/src/builtin_actions/_crop.py:411
+msgid "Crop"
+msgstr "잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:419
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:552
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:271
+#: ../../batcher/src/builtin_actions/_scale.py:357
+#: ../../batcher/src/update.py:1465 ../../batcher/src/update.py:1709
+msgid "Apply to (image or layer):"
+msgstr "적용 대상 (이미지 또는 레이어):"
+
+#: ../../batcher/src/builtin_actions/_crop.py:426
+msgid "Crop from edges"
+msgstr "가장자리에서 잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:427
+msgid "Crop from position"
+msgstr "지정한 위치에서 잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:428
+msgid "Crop to aspect ratio"
+msgstr "화면 비율에 맞게 잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:429
+msgid "Crop to area"
+msgstr "영역에 맞게 잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:430
+msgid "Remove empty borders"
+msgstr "빈 가장자리 제거"
+
+#: ../../batcher/src/builtin_actions/_crop.py:432
+msgid "How to crop"
+msgstr "잘라내기 방식"
+
+#: ../../batcher/src/builtin_actions/_crop.py:438
+msgid "Crop by the same amount from each side"
+msgstr "모든 가장자리 동일하게 잘라내기"
+
+#: ../../batcher/src/builtin_actions/_crop.py:457
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:602
+#: ../../batcher/src/update.py:1773
+msgid "Amount"
+msgstr "수치"
+
+#: ../../batcher/src/builtin_actions/_crop.py:540
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:681
+#: ../../batcher/src/update.py:1897
+msgid "Top left"
+msgstr "왼쪽 위"
+
+#: ../../batcher/src/builtin_actions/_crop.py:542
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:683
+#: ../../batcher/src/update.py:1899
+msgid "Top right"
+msgstr "오른쪽 위"
+
+#: ../../batcher/src/builtin_actions/_crop.py:546
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:687
+#: ../../batcher/src/update.py:1903
+msgid "Bottom left"
+msgstr "왼쪽 아래"
+
+#: ../../batcher/src/builtin_actions/_crop.py:548
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:689
+#: ../../batcher/src/update.py:1905
+msgid "Bottom right"
+msgstr "오른쪽 아래"
+
+#: ../../batcher/src/builtin_actions/_crop.py:550
+#: ../../batcher/src/builtin_actions/_crop.py:611
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:691
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:752
+#: ../../batcher/src/builtin_actions/_scale.py:462
+#: ../../batcher/src/update.py:1601 ../../batcher/src/update.py:1907
+#: ../../batcher/src/update.py:1995
+msgid "Position"
+msgstr "위치"
+
+#: ../../batcher/src/builtin_actions/_crop.py:569
+#: ../../batcher/src/builtin_actions/_crop.py:687
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:710
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:825
+#: ../../batcher/src/placeholders.py:207 ../../batcher/src/update.py:1937
+#: ../../batcher/src/update.py:2112
+msgid "Width"
+msgstr "너비"
+
+#: ../../batcher/src/builtin_actions/_crop.py:588
+#: ../../batcher/src/builtin_actions/_crop.py:706
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:729
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:844
+#: ../../batcher/src/placeholders.py:208 ../../batcher/src/update.py:1967
+#: ../../batcher/src/update.py:2142
+msgid "Height"
+msgstr "높이"
+
+#: ../../batcher/src/builtin_actions/_crop.py:599
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:740
+#: ../../batcher/src/update.py:1982
+msgid "Aspect ratio (width:height)"
+msgstr "종횡비 (너비:높이)"
+
+#: ../../batcher/src/builtin_actions/_crop.py:606
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:747
+#: ../../batcher/src/builtin_actions/_scale.py:457
+#: ../../batcher/src/update.py:1596 ../../batcher/src/update.py:1990
+msgid "Start"
+msgstr "시작"
+
+#: ../../batcher/src/builtin_actions/_crop.py:608
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:749
+#: ../../batcher/src/builtin_actions/_scale.py:459
+#: ../../batcher/src/update.py:1598 ../../batcher/src/update.py:1992
+msgid "End"
+msgstr "끝"
+
+#: ../../batcher/src/builtin_actions/_crop.py:609
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:750
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:282
+#: ../../batcher/src/builtin_actions/_scale.py:460
+#: ../../batcher/src/update.py:1599 ../../batcher/src/update.py:1993
+msgid "Custom"
+msgstr "사용자 정의"
+
+#: ../../batcher/src/builtin_actions/_crop.py:630
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:770
+#: ../../batcher/src/builtin_actions/_scale.py:481
+#: ../../batcher/src/update.py:1629 ../../batcher/src/update.py:2024
+msgid "Custom start position"
+msgstr "사용자 정의 시작 위치"
+
+#: ../../batcher/src/builtin_actions/_crop.py:649
+msgid "Start X"
+msgstr "시작 X 좌표"
+
+#: ../../batcher/src/builtin_actions/_crop.py:668
+msgid "Start Y"
+msgstr "시작 Y 좌표"
+
+#: ../../batcher/src/builtin_actions/_export.py:44
+#: ../../batcher/src/renamer.py:780 ../../batcher/src/renamer.py:797
+msgid "Replace"
+msgstr "교체"
+
+#: ../../batcher/src/builtin_actions/_export.py:45
+msgid "Skip"
+msgstr "건너뛰기"
+
+#: ../../batcher/src/builtin_actions/_export.py:46
+msgid "Rename new file"
+msgstr "새 파일 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_export.py:47
+msgid "Rename existing file"
+msgstr "기존 파일 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_export.py:406
+msgid "Saving \"{}\""
+msgstr "저장 중 \"{}\""
+
+#: ../../batcher/src/builtin_actions/_export.py:798
+msgid "Ask"
+msgstr "확인 요청"
+
+#: ../../batcher/src/builtin_actions/_export.py:805
+msgid "Also export as..."
+msgstr "다른 형식으로도 내보내기..."
+
+#: ../../batcher/src/builtin_actions/_export.py:806
+msgid "Exports an image to another file format."
+msgstr "이미지를 다른 파일 형식으로 내보냅니다."
+
+#: ../../batcher/src/builtin_actions/_export.py:815
+#: ../../batcher/src/builtin_actions/_save.py:122
+#: ../../batcher/src/plugin_settings.py:77
+#: ../../batcher/src/plugin_settings.py:227
+#: ../../batcher/src/plugin_settings.py:474 ../../batcher/src/renamer.py:706
+msgid "Output folder"
+msgstr "출력 폴더"
+
+#: ../../batcher/src/builtin_actions/_export.py:825
+#: ../../batcher/src/plugin_settings.py:67
+#: ../../batcher/src/plugin_settings.py:217
+#: ../../batcher/src/plugin_settings.py:464
+msgid "File extension"
+msgstr "파일 확장자"
+
+#: ../../batcher/src/builtin_actions/_export.py:835
+msgid "Interactively"
+msgstr "대화형으로"
+
+#: ../../batcher/src/builtin_actions/_export.py:836
+msgid "Use options below"
+msgstr "아래 옵션 사용"
+
+#: ../../batcher/src/builtin_actions/_export.py:838
+msgid "How to adjust file format options:"
+msgstr "파일 형식 옵션을 조정하는 방법:"
+
+#: ../../batcher/src/builtin_actions/_export.py:840
+msgid ""
+"Native dialogs usually allow you to adjust more options such as image "
+"metadata, while adjusting options in place is more convenient as no extra "
+"dialog is displayed before the export."
+msgstr ""
+"기본 대화 상자를 사용하면 이미지 메타데이터와 같은 추가 옵션을 조정할 수 있지만,"
+"내장 방식으로 조정하면 내보내기 전에 별도의 대화 상자가 표시되지 않아 더 편리합니다."
+
+#: ../../batcher/src/builtin_actions/_export.py:851
+msgid "File format options"
+msgstr "파일 형식 옵션"
+
+#: ../../batcher/src/builtin_actions/_export.py:858
+msgid "If a file already exists:"
+msgstr "동일한 파일이 이미 존재하는 경우:"
+
+#: ../../batcher/src/builtin_actions/_export.py:865
+msgid "For each image"
+msgstr "각 이미지마다"
+
+#: ../../batcher/src/builtin_actions/_export.py:867
+msgid "For each top-level image or folder"
+msgstr "각 최상위 이미지 또는 폴더마다"
+
+#: ../../batcher/src/builtin_actions/_export.py:868
+#: ../../batcher/src/builtin_actions/_export.py:927
+#: ../../batcher/src/builtin_actions/_export.py:945
+msgid "As a single image"
+msgstr "단일 이미지로"
+
+#: ../../batcher/src/builtin_actions/_export.py:870
+msgid "Perform export:"
+msgstr "내보내기 수행:"
+
+#: ../../batcher/src/builtin_actions/_export.py:875
+#: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:292
+msgid "Untitled"
+msgstr "이름 없음"
+
+#: ../../batcher/src/builtin_actions/_export.py:876
+#: ../../batcher/src/builtin_actions/_rename.py:96
+#: ../../batcher/src/builtin_actions/_rename.py:125
+#: ../../batcher/src/builtin_actions/_rename.py:142
+#: ../../batcher/src/plugin_settings.py:87
+#: ../../batcher/src/plugin_settings.py:237
+msgid "Image filename pattern"
+msgstr "이미지 파일 이름 패턴"
+
+#: ../../batcher/src/builtin_actions/_export.py:883
+msgid "Use original file extension"
+msgstr "원본 파일 확장자 사용"
+
+#: ../../batcher/src/builtin_actions/_export.py:889
+msgid "Convert file extension to lowercase"
+msgstr "파일 확장자를 소문자로 변환"
+
+#: ../../batcher/src/builtin_actions/_export.py:895
+msgid "Use original modification date"
+msgstr "원본 파일 수정 일자 사용"
+
+#: ../../batcher/src/builtin_actions/_export.py:912
+#: ../../batcher/src/builtin_actions/_export.py:937
+msgid "Export"
+msgstr "내보내기"
+
+#: ../../batcher/src/builtin_actions/_export.py:913
+msgid "Exports an image to the specified file format."
+msgstr "이미지를 지정한 파일 형식으로 내보냅니다."
+
+#: ../../batcher/src/builtin_actions/_export.py:920
+msgid "Exports a layer to another file format."
+msgstr "레이어를 다른 파일 형식으로 내보냅니다."
+
+#: ../../batcher/src/builtin_actions/_export.py:924
+#: ../../batcher/src/builtin_actions/_export.py:942
+msgid "For each layer"
+msgstr "각 레이어마다"
+
+#: ../../batcher/src/builtin_actions/_export.py:926
+#: ../../batcher/src/builtin_actions/_export.py:944
+msgid "For each top-level layer or group"
+msgstr "각 최상위 레이어 또는 그룹마다"
+
+#: ../../batcher/src/builtin_actions/_export.py:931
+#: ../../batcher/src/builtin_actions/_export.py:949
+msgid "Use file extension in layer name"
+msgstr "레이어 이름에 파일 확장자 포함"
+
+#: ../../batcher/src/builtin_actions/_export.py:938
+msgid "Exports a layer to the specified file format."
+msgstr "레이어를 지정한 파일 형식으로 내보냅니다."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
+msgid "Insert background"
+msgstr "배경 삽입"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
+msgid "Inserts the specified image behind the current layer."
+msgstr "지정한 이미지를 현재 레이어 뒤에 삽입합니다."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:858
+#: ../../batcher/src/update.py:2152
+msgid "Image"
+msgstr "이미지"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
+msgid "Inserts layers having the specified color tag behind the current layer."
+msgstr "지정된 색상 태그가 있는 레이어들을 현재 레이어 뒤에 삽입합니다."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
+msgid "Color tag"
+msgstr "색상 태크"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
+msgid "Insert foreground"
+msgstr "전경 삽입"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
+msgid "Inserts the specified image in front of the current layer."
+msgstr "지정한 이미지를 현재 레이어 앞에 삽입합니다."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
+msgid ""
+"Inserts layers having the specified color tag in front of the current layer."
+msgstr "지정된 색상 태그가 있는 레이어들을 현재 레이어 앞에 삽입합니다."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
+msgid "Merge background"
+msgstr "배경 병합"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_misc.py:92
+msgid "Merge type"
+msgstr "병합 유형"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
+msgid "Merge foreground"
+msgstr "전경 병합"
+
+#: ../../batcher/src/builtin_actions/_misc.py:55
+msgid "Apply opacity from group layers"
+msgstr "그룹 레이어의 불투명도 적용"
+
+#: ../../batcher/src/builtin_actions/_misc.py:57
+msgid "Combines opacity from all parent group layers and the current layer."
+msgstr "모든 상위 그룹 레이어와 현재 레이어의 불투명도를 결합합니다."
+
+#: ../../batcher/src/builtin_actions/_misc.py:64
+msgid "Merge filters"
+msgstr "필터 병합"
+
+#: ../../batcher/src/builtin_actions/_misc.py:65
+msgid "Merges all visible filters (layer effects) in the specified layer."
+msgstr "지정한 레이어에서 모든 표시된 필터(레이어 효과)를 병합합니다."
+
+#: ../../batcher/src/builtin_actions/_misc.py:79
+msgid "Merge visible layers"
+msgstr "보이는 레이어 병합"
+
+#: ../../batcher/src/builtin_actions/_misc.py:81
+msgid ""
+"Merges all visible layers within the image into a single layer. Invisible "
+"layers are removed.\n"
+"\n"
+"This is useful if the image contains multiple layers and you want to apply "
+"filters (layer effects) or other actions on the entire image."
+msgstr ""
+"이미지 내 모든 보이는 레이어를 하나의 레이어로 병합합니다."
+" 보이지 않는 레이어는 제거됩니다.\n"
+"\n"
+"이미지에 여러 레이어가 있을 때 전체 이미지에 필터(레이어 효과)나 다른 작업을 적용하려는 경우에 유용합니다."
+
+#: ../../batcher/src/builtin_actions/_misc.py:100
+msgid "Remove file extension from imported images"
+msgstr "가져온 이미지에서 파일 확장자 제거"
+
+#: ../../batcher/src/builtin_actions/_misc.py:101
+msgid "Imported images represent non-native GIMP files (i.e. not XCF)."
+msgstr "가져온 이미지는 GIMP 고유 형식(XCF)이 아닌 파일을 나타냅니다."
+
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:47
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:54
+msgid "Remove folder structure"
+msgstr "폴더 구조 제거"
+
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:61
+msgid "Consider visibility of parent folders"
+msgstr "상위 폴더의 가시성 고려"
+
+#: ../../batcher/src/builtin_actions/_rename.py:88
+#: ../../batcher/src/builtin_actions/_rename.py:117
+#: ../../batcher/src/builtin_actions/_rename.py:134
+#: ../../batcher/src/builtin_actions/_rename.py:157
+#: ../../batcher/src/builtin_actions/_rename.py:186
+msgid "Rename"
+msgstr "이름 변경"
+
+#: ../../batcher/src/builtin_actions/_rename.py:103
+msgid "Rename images"
+msgstr "이미지 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_rename.py:109
+#: ../../batcher/src/builtin_actions/_rename.py:178
+msgid "Rename folders"
+msgstr "폴더 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_rename.py:149
+msgid "Rename only new images"
+msgstr "새 이미지만 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_rename.py:165
+#: ../../batcher/src/plugin_settings.py:484
+msgid "Layer filename pattern"
+msgstr "레이어 파일 이름 패턴"
+
+#: ../../batcher/src/builtin_actions/_rename.py:172
+#: ../../batcher/src/builtin_actions/_rename.py:201
+msgid "Rename layers"
+msgstr "레이어 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_rename.py:194
+msgid "Layer name pattern"
+msgstr "레이어 이름 패턴"
+
+#: ../../batcher/src/builtin_actions/_rename.py:207
+msgid "Rename group layers"
+msgstr "그룹 레이어 이름 변경"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:543
+msgid "Resize canvas"
+msgstr "캔버스 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:544
+msgid "Resizes the image or layer extents."
+msgstr "이미지 또는 레이어 영역의 크기를 조정합니다."
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:559
+msgid "Resize from edges (add borders)"
+msgstr "가장자리부터 크기 조정 (테두리 추가)"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:560
+#: ../../batcher/src/update.py:1718
+msgid "Resize from position"
+msgstr "지정 위치부터 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:561
+#: ../../batcher/src/update.py:1719
+msgid "Resize to aspect ratio"
+msgstr "종횡비에 맞춰 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:562
+#: ../../batcher/src/update.py:1720
+msgid "Resize to area"
+msgstr "영역에 맞춰 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:563
+#: ../../batcher/src/update.py:1721
+msgid "Resize to layer size"
+msgstr "레이어 크기에 맞춰 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:564
+msgid "Resize to image size"
+msgstr "이미지 크기에 맞춰 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:566
+#: ../../batcher/src/update.py:1723
+msgid "How to resize"
+msgstr "크기 조정 방법"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:572
+#: ../../batcher/src/update.py:1730
+msgid "Fill added space with color"
+msgstr "추가된 공간을 색상으로 채우기"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:578
+#: ../../batcher/src/update.py:1737
+msgid "Color for added space"
+msgstr "추가된 공간 색상"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:584
+#: ../../batcher/src/update.py:1744
+msgid "Resize by the same amount from each side"
+msgstr "모든 가장자리 동일하게 크기 조정"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:788
+#: ../../batcher/src/update.py:2053
+msgid "Offset X"
+msgstr "X축 오프셋"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:806
+#: ../../batcher/src/update.py:2082
+msgid "Offset Y"
+msgstr "Y축 오프셋"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:851
+#: ../../batcher/src/builtin_conditions.py:166
+msgid "Layers"
+msgstr "레이어"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:73
+msgid "degrees"
+msgstr "도"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:74
+msgid "radians"
+msgstr "라디안"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:263
+msgid "Rotate and flip"
+msgstr "회전 및 반전"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:278
+#: ../../batcher/src/placeholders.py:159
+msgid "None"
+msgstr "없음"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:279
+msgid "90° (clockwise)"
+msgstr "90° (시계 방향)"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:280
+msgid "180°"
+msgstr "180°"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:281
+msgid "270° (counter-clockwise)"
+msgstr "270° (반시계 방향)"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:284
+msgid "Rotation angle"
+msgstr "회전 각도"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:293
+msgid "Custom rotation angle"
+msgstr "사용자 정의 회전 각도"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:300
+msgid "How to handle boundaries"
+msgstr "경계 처리 방법"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:307
+#: ../../batcher/src/builtin_actions/_scale.py:415
+msgid "Interpolation"
+msgstr "보간법"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:313
+msgid "Rotate around the center"
+msgstr "중심을 기준으로 회전"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:331
+msgid "Horizontal position of rotation center"
+msgstr "회전 중심의 수평 위치"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:349
+msgid "Vertical position of rotation center"
+msgstr "회전 중심의 수직 위치"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:355
+msgid "Flip horizontally"
+msgstr "수평 반전"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:361
+msgid "Flip vertically"
+msgstr "수직 반전"
+
+#: ../../batcher/src/builtin_actions/_save.py:110
+#: ../../batcher/src/gui/main/command_lists.py:677
+msgid "Save"
+msgstr "저장"
+
+#: ../../batcher/src/builtin_actions/_save.py:112
+msgid ""
+"Saves the image in the native GIMP format (XCF). If the image already "
+"exists, it is overwritten. To export the image in another file format, use "
+"the \"Export Images\" menu."
+msgstr ""
+"GIMP 고유 형식(XCF)으로 이미지를 저장합니다. 이미지가 이미 존재하면 덮어씁니다. "
+"다른 파일 형식으로 이미지를 내보내려면 \"이미지 내보내기\" 메뉴를 사용하세요."
+
+#: ../../batcher/src/builtin_actions/_save.py:134
+msgid ""
+"Save existing XCF image to its original location (ignore \"Output folder\")"
+msgstr "기존 XCF 이미지를 원래 위치에 저장 (\"출력 폴더\" 무시)"
+
+#: ../../batcher/src/builtin_actions/_scale.py:349
+msgid "Scale"
+msgstr "비율 조정"
+
+#: ../../batcher/src/builtin_actions/_scale.py:376
+msgid "New width"
+msgstr "새 너비"
+
+#: ../../batcher/src/builtin_actions/_scale.py:395
+msgid "New height"
+msgstr "새 높이"
+
+#: ../../batcher/src/builtin_actions/_scale.py:402
+#: ../../batcher/src/update.py:1537
+msgid "None (Stretch)"
+msgstr "없음 (늘이기)"
+
+#: ../../batcher/src/builtin_actions/_scale.py:403
+#: ../../batcher/src/update.py:1538
+msgid "Keep, adjust width"
+msgstr "유지, 너비 조정"
+
+#: ../../batcher/src/builtin_actions/_scale.py:404
+#: ../../batcher/src/update.py:1539
+msgid "Keep, adjust height"
+msgstr "유지, 높이 조정"
+
+#: ../../batcher/src/builtin_actions/_scale.py:405
+#: ../../batcher/src/update.py:1540
+msgid "Fit"
+msgstr "맞춤"
+
+#: ../../batcher/src/builtin_actions/_scale.py:406
+#: ../../batcher/src/update.py:1541
+msgid "Fit with padding"
+msgstr "여백 포함 맞춤"
+
+#: ../../batcher/src/builtin_actions/_scale.py:408
+#: ../../batcher/src/update.py:1543
+msgid "Aspect ratio"
+msgstr "종횡비"
+
+#: ../../batcher/src/builtin_actions/_scale.py:421
+msgid "Use local origin"
+msgstr "로컬 원점 사용"
+
+#: ../../batcher/src/builtin_actions/_scale.py:427
+#: ../../batcher/src/update.py:1555
+msgid "Set image resolution in DPI"
+msgstr "이미지 해상도를 DPI 단위로 설정"
+
+#. FOR TRANSLATORS: "X" represents the X-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:441
+#: ../../batcher/src/update.py:1572
+msgid "X"
+msgstr "X"
+
+#. FOR TRANSLATORS: "Y" represents the Y-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:443
+#: ../../batcher/src/update.py:1573
+msgid "Y"
+msgstr "Y"
+
+#: ../../batcher/src/builtin_actions/_scale.py:450
+#: ../../batcher/src/update.py:1586
+msgid "Padding color"
+msgstr "여백 색상"
+
+#: ../../batcher/src/builtin_actions/_utils.py:246
+msgid "The image has no layers."
+msgstr "이미지에 레이어가 없습니다."
+
+#: ../../batcher/src/builtin_conditions.py:173
+msgid "Group layers"
+msgstr "그룹 레이어"
+
+#: ../../batcher/src/builtin_conditions.py:180
+msgid "Imported"
+msgstr "가져옴"
+
+#: ../../batcher/src/builtin_conditions.py:187
+msgid "Not imported"
+msgstr "가져오지 못함"
+
+#. FOR TRANSLATORS: Think of "Only items that are not background" when translating this
+#: ../../batcher/src/builtin_conditions.py:195
+msgid "Not background"
+msgstr "배경 없음"
+
+#. FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
+#: ../../batcher/src/builtin_conditions.py:220
+msgid "Not foreground"
+msgstr "전경 없음"
+
+#. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
+#: ../../batcher/src/builtin_conditions.py:245
+msgid "Matching file extension"
+msgstr "파일 확장자 일치"
+
+#. FOR TRANSLATORS: Think of "Only items matching text" when translating this
+#: ../../batcher/src/builtin_conditions.py:253
+msgid "Matching text..."
+msgstr "일치하는 텍스트…"
+
+#: ../../batcher/src/builtin_conditions.py:262 ../../batcher/src/update.py:2178
+msgid "Starts with text"
+msgstr "텍스트로 시작함"
+
+#: ../../batcher/src/builtin_conditions.py:263 ../../batcher/src/update.py:2179
+msgid "Does not start with text"
+msgstr "텍스트로 시작하지 않음"
+
+#: ../../batcher/src/builtin_conditions.py:264 ../../batcher/src/update.py:2180
+msgid "Contains text"
+msgstr "텍스트 포함"
+
+#: ../../batcher/src/builtin_conditions.py:265 ../../batcher/src/update.py:2181
+msgid "Does not contain text"
+msgstr "텍스트를 포함하지 않음"
+
+#: ../../batcher/src/builtin_conditions.py:266 ../../batcher/src/update.py:2182
+msgid "Ends with text"
+msgstr "텍스트로 끝남"
+
+#: ../../batcher/src/builtin_conditions.py:267 ../../batcher/src/update.py:2183
+msgid "Does not end with text"
+msgstr "텍스트로 끝나지 않음"
+
+#: ../../batcher/src/builtin_conditions.py:268 ../../batcher/src/update.py:2184
+msgid "Matches regular expression"
+msgstr "정규 표현식과 일치함"
+
+#: ../../batcher/src/builtin_conditions.py:270
+msgid "How to perform matching"
+msgstr "일치시키는 방법"
+
+#: ../../batcher/src/builtin_conditions.py:276
+msgid "Text to match"
+msgstr "일치시킬 텍스트"
+
+#: ../../batcher/src/builtin_conditions.py:282
+msgid "Ignore case sensitivity"
+msgstr "대소문자 구분 무시"
+
+#. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
+#: ../../batcher/src/builtin_conditions.py:291
+msgid "Recognized file format"
+msgstr "인식된 파일 형식"
+
+#: ../../batcher/src/builtin_conditions.py:298
+msgid "Saved or exported"
+msgstr "저장 또는 내보내기됨"
+
+#: ../../batcher/src/builtin_conditions.py:305
+msgid "Not saved or exported"
+msgstr "저장 또는 내보내기되지 않음"
+
+#. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
+#: ../../batcher/src/builtin_conditions.py:313
+msgid "Selected in GIMP"
+msgstr "GIMP에서 선택됨"
+
+#. FOR TRANSLATORS: Think of "Only top-level items" when translating this
+#: ../../batcher/src/builtin_conditions.py:321
+msgid "Top-level"
+msgstr "최상위"
+
+#. FOR TRANSLATORS: Think of "Only visible items" when translating this
+#: ../../batcher/src/builtin_conditions.py:329
+msgid "Visible"
+msgstr "표시됨"
+
+#. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:337
+msgid "With color tags"
+msgstr "색상 태그가 있음"
+
+#: ../../batcher/src/builtin_conditions.py:343
+#: ../../batcher/src/builtin_conditions.py:363
+msgid "Color tags"
+msgstr "색상 태그"
+
+#. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:357
+msgid "Without color tags"
+msgstr "색상 태그가 없음"
+
+#. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:377
+msgid "With unsaved changes"
+msgstr "저장되지 않은 변경 사항이 있음"
+
+#. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:385
+msgid "With no unsaved changes"
+msgstr "저장되지 않은 변경 사항이 없음"
+
+#. FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
+#: ../../batcher/src/builtin_conditions.py:393
+msgid "XCF (native GIMP) file"
+msgstr "XCF (GIMP 고유) 파일"
+
+#. FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
+#: ../../batcher/src/builtin_conditions.py:401
+msgid "Not XCF (native GIMP) file"
+msgstr "XCF (GIMP 고유) 파일 아님"
+
+#: ../../batcher/src/commands.py:414
+msgid "Built-in"
+msgstr "내장"
+
+#: ../../batcher/src/commands.py:415
+msgid "GIMP PDB procedure"
+msgstr "GIMP PDB 프로시저"
+
+#: ../../batcher/src/commands.py:416
+msgid "GEGL operation"
+msgstr "GEGL 연산"
+
+#: ../../batcher/src/commands.py:463
+msgid "_More options"
+msgstr "추가 옵션(_M)"
+
+#: ../../batcher/src/commands.py:473
+msgid "Enable for previews"
+msgstr "미리보기 활성화"
+
+#: ../../batcher/src/commands.py:536
+msgid "Also apply to parent folders"
+msgstr "상위 폴더에도 적용"
+
+#: ../../batcher/src/core.py:808
+msgid ""
+"An error occurred. Please check the GIMP error message or the error console "
+"for details, if any."
+msgstr "오류가 발생했습니다. 자세한 내용은 GIMP 오류 메시지나 오류 콘솔을 확인하세요."
+
+#: ../../batcher/src/core.py:870
+msgid "Processing \"{}\""
+msgstr "처리중 \"{}\""
+
+#: ../../batcher/src/core.py:1154
+msgid "File not found"
+msgstr "파일을 찾을 수 없음"
+
+#: ../../batcher/src/exceptions.py:59
+msgid "항목:"
+msgstr "Item:"
+
+#: ../../batcher/src/exceptions.py:61
+msgid "File extension:"
+msgstr "파일 확장자:"
+
+#: ../../batcher/src/file_formats.py:158
+msgid "{} image"
+msgstr "{} 이미지"
+
+#: ../../batcher/src/gui/commands/browser.py:79
+msgid "Filters, Effects"
+msgstr "필터, 효과"
+
+#: ../../batcher/src/gui/commands/browser.py:80
+msgid "Plug-ins"
+msgstr "플러그인"
+
+#: ../../batcher/src/gui/commands/browser.py:81
+msgid "GIMP Procedures"
+msgstr "GIMP 프로시저"
+
+#: ../../batcher/src/gui/commands/browser.py:82
+msgid "Other"
+msgstr "기타"
+
+#: ../../batcher/src/gui/commands/browser.py:343
+msgid "Name"
+msgstr "이름"
+
+#: ../../batcher/src/gui/commands/browser.py:359
+msgid "Menu Name"
+msgstr "메뉴 이름"
+
+#: ../../batcher/src/gui/commands/browser.py:388
+msgid "Search"
+msgstr "검색"
+
+#: ../../batcher/src/gui/commands/browser.py:403
+msgid "by name"
+msgstr "이름으로"
+
+#: ../../batcher/src/gui/commands/browser.py:407
+msgid "by menu name"
+msgstr "메뉴 이름으로"
+
+#: ../../batcher/src/gui/commands/browser.py:411
+msgid "by description"
+msgstr "설명으로"
+
+#: ../../batcher/src/gui/commands/browser.py:453
+msgid "Select an action"
+msgstr "작업 선택"
+
+#: ../../batcher/src/gui/commands/browser.py:478
+msgid "_Add"
+msgstr "추가(_A)"
+
+#: ../../batcher/src/gui/commands/browser.py:479
+#: ../../batcher/src/gui/commands/editor.py:52
+#: ../../batcher/src/gui/main/export_settings.py:251
+#: ../../batcher/src/gui/main/main.py:165
+#: ../../batcher/src/gui/main/main.py:354 ../../batcher/src/gui/messages.py:40
+msgid "_Close"
+msgstr "닫기(_C)"
+
+#: ../../batcher/src/gui/commands/editor.py:49
+#: ../../batcher/src/gui/commands/editor.py:172
+#: ../../batcher/src/gui/main/export_settings.py:246
+msgid "_Reset"
+msgstr "초기화(_R)"
+
+#: ../../batcher/src/gui/commands/editor.py:169
+msgid "_Preview"
+msgstr "미리보기(_P)"
+
+#: ../../batcher/src/gui/commands/editor.py:231
+msgid "Edit Name"
+msgstr "이름 편집"
+
+#: ../../batcher/src/gui/commands/editor.py:288
+msgid "Show More Information"
+msgstr "자세한 정보 표시"
+
+#: ../../batcher/src/gui/commands/item.py:139
+msgid "Edit"
+msgstr "편집"
+
+#: ../../batcher/src/gui/commands/item.py:149
+msgid "Remove"
+msgstr "삭제"
+
+#: ../../batcher/src/gui/dimension_box.py:152
+msgid "Property:"
+msgstr "속성:"
+
+#: ../../batcher/src/gui/file_format_options_box.py:47
+msgid "{} options"
+msgstr "{} 옵션"
+
+#: ../../batcher/src/gui/file_format_options_box.py:50
+msgid "File format not recognized"
+msgstr "파일 형식을 인식할 수 없음"
+
+#: ../../batcher/src/gui/file_format_options_box.py:58
+msgid "File format has no options"
+msgstr "파일 형식에 사용할 수 있는 옵션이 없음"
+
+#: ../../batcher/src/gui/main/batcher_manager.py:208
+msgid "No images were processed."
+msgstr "처리된 이미지가 없습니다."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:210
+msgid "No layers were processed."
+msgstr "처리된 레이어가 없습니다."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:212
+msgid "No items were processed."
+msgstr "처리된 항목이 없습니다."
+
+#: ../../batcher/src/gui/main/command_lists.py:36
+msgid "Add _Action..."
+msgstr "작업 추가(_A)..."
+
+#: ../../batcher/src/gui/main/command_lists.py:38
+msgid "Add Custom Action..."
+msgstr "사용자 지정 작업 추가..."
+
+#: ../../batcher/src/gui/main/command_lists.py:39
+msgid "Add Custom Action"
+msgstr "사용자 지정 작업 추가"
+
+#: ../../batcher/src/gui/main/command_lists.py:49
+msgid "Add C_ondition..."
+msgstr "조건 추가(_C)..."
+
+#: ../../batcher/src/gui/main/command_lists.py:83
+msgid "This action is skipped. Reason: {}"
+msgstr "이 작업은 건너뜀. 이유: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:89
+msgid "This condition is skipped. Reason: {}"
+msgstr "이 조건은 건너뜀. 이유: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:125
+msgid "Actions"
+msgstr "작업"
+
+#: ../../batcher/src/gui/main/command_lists.py:139
+msgid "Conditions"
+msgstr "조건"
+
+#: ../../batcher/src/gui/main/command_lists.py:517
+msgid "Crop to remove empty borders"
+msgstr "빈 여백 제거를 위해 잘라내기"
+
+#: ../../batcher/src/gui/main/command_lists.py:562
+#: ../../batcher/src/gui/main/command_lists.py:568
+msgid "Rename to \"{}\""
+msgstr "\"{}\"(으)로 이름 변경"
+
+#: ../../batcher/src/gui/main/command_lists.py:566
+msgid "Rename new images to \"{}\""
+msgstr "새 이미지의 이름을 \"{}\"(으)로 변경"
+
+#: ../../batcher/src/gui/main/command_lists.py:613
+msgid "Export as {}"
+msgstr "{} 형식으로 내보내기"
+
+#: ../../batcher/src/gui/main/command_lists.py:615
+msgid "Also export as {}"
+msgstr "{} 형식으로도 내보내기"
+
+#: ../../batcher/src/gui/main/command_lists.py:673
+msgid "Save (imported images to \"{}\")"
+msgstr "저장 (가져온 이미지를 \"{}\"에 저장)"
+
+#: ../../batcher/src/gui/main/command_lists.py:675
+msgid "Save to \"{}\""
+msgstr "\"{}\"에 저장"
+
+#: ../../batcher/src/gui/main/command_lists.py:756
+msgid "Starting with \"{}\""
+msgstr "\"{}\"(으)로 시작"
+
+#: ../../batcher/src/gui/main/command_lists.py:758
+msgid "Starting with any text"
+msgstr "임의의 텍스트로 시작"
+
+#: ../../batcher/src/gui/main/command_lists.py:761
+msgid "Not starting with \"{}\""
+msgstr "\"{}\"(으)로 시작하지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:763
+msgid "Not starting with any text"
+msgstr "어떤 텍스트로도 시작하지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:766
+msgid "Containing \"{}\""
+msgstr "\"{}\" 포함"
+
+#: ../../batcher/src/gui/main/command_lists.py:768
+msgid "Containing any text"
+msgstr "임의의 텍스트 포함"
+
+#: ../../batcher/src/gui/main/command_lists.py:771
+msgid "Not containing \"{}\""
+msgstr "\"{}\" 포함하지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:773
+msgid "Not containing any text"
+msgstr "어떤 텍스트도 포함하지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:776
+msgid "Ending with \"{}\""
+msgstr "\"{}\"(으)로 끝남"
+
+#: ../../batcher/src/gui/main/command_lists.py:778
+msgid "Ending with any text"
+msgstr "임의의 텍스트로 끝남"
+
+#: ../../batcher/src/gui/main/command_lists.py:781
+msgid "Not ending with \"{}\""
+msgstr "\"{}\"(으)로 끝나지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:783
+msgid "Not ending with any text"
+msgstr "어떤 텍스트로도 끝나지 않음"
+
+#: ../../batcher/src/gui/main/command_lists.py:785
+msgid "Matching pattern \"{}\""
+msgstr "\"{}\" 패턴과 일치"
+
+#. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+#: ../../batcher/src/gui/main/command_lists.py:790
+msgid " (case-insensitive)"
+msgstr " (대소문자 구분 안 함)"
+
+#: ../../batcher/src/gui/main/export_settings.py:57
+msgid "Folder:"
+msgstr "폴더:"
+
+#: ../../batcher/src/gui/main/export_settings.py:80
+msgid "Name:"
+msgstr "이름:"
+
+#: ../../batcher/src/gui/main/export_settings.py:112
+msgid "O_ptions..."
+msgstr "옵션(_P)…"
+
+#: ../../batcher/src/gui/main/export_settings.py:240
+msgid "Export Options"
+msgstr "내보내기 옵션"
+
+#: ../../batcher/src/gui/main/main.py:102
+msgid "Input Images"
+msgstr "입력 이미지"
+
+#: ../../batcher/src/gui/main/main.py:104
+msgid "Input Layers"
+msgstr "입력 레이어"
+
+#: ../../batcher/src/gui/main/main.py:106
+msgid "Input Items"
+msgstr "입력 항목"
+
+#: ../../batcher/src/gui/main/main.py:156
+#: ../../batcher/src/gui/main/main.py:466
+msgid "_Export"
+msgstr "내보내기(_E)"
+
+#: ../../batcher/src/gui/main/main.py:158
+#: ../../batcher/src/gui/main/main.py:468
+msgid "_Run"
+msgstr "실행(_R)"
+
+#: ../../batcher/src/gui/main/main.py:167
+msgid "_Stop"
+msgstr "중지(_S)"
+
+#: ../../batcher/src/gui/main/main.py:352
+#: ../../batcher/src/gui/main/main.py:474
+msgid "_Cancel"
+msgstr "취소(_C)"
+
+#: ../../batcher/src/gui/main/main.py:365
+msgid "_Help"
+msgstr "도움말(_H)"
+
+#: ../../batcher/src/gui/main/main.py:460
+msgid "Show this dialog"
+msgstr "대화 상자 표시"
+
+#: ../../batcher/src/gui/main/previews.py:206
+msgid "Drop or paste files and folders here, or add them via buttons below"
+msgstr "파일과 폴더를 여기로 끌어오거나 붙여넣고, 아래 버튼으로 추가할 수 있습니다"
+
+#: ../../batcher/src/gui/main/previews.py:229
+msgid "Add Files..."
+msgstr "파일 추가…"
+
+#: ../../batcher/src/gui/main/previews.py:230
+msgid "Add Folders..."
+msgstr "폴더 추가…"
+
+#: ../../batcher/src/gui/main/previews.py:238
+msgid "A_dd..."
+msgstr "추가(_D)…"
+
+#: ../../batcher/src/gui/main/previews.py:240
+msgid "Remove Selected"
+msgstr "선택 항목 제거"
+
+#: ../../batcher/src/gui/main/previews.py:241
+msgid "Remove All"
+msgstr "모두 제거"
+
+#: ../../batcher/src/gui/main/previews.py:249
+msgid "Re_move..."
+msgstr "제거(_M)…"
+
+#: ../../batcher/src/gui/main/previews.py:277
+msgid "Add Files"
+msgstr "파일 추가"
+
+#: ../../batcher/src/gui/main/previews.py:279
+msgid "Add Folders"
+msgstr "폴더 추가"
+
+#: ../../batcher/src/gui/main/previews.py:344
+msgid "Copied the selected images and folders as text."
+msgstr "선택한 이미지와 폴더를 텍스트로 복사했습니다."
+
+#: ../../batcher/src/gui/main/previews.py:385
+msgid ""
+"You are about to add a top-level folder named \"{}\". Are you sure you want "
+"to continue?"
+msgstr "\"{}\"라는 최상위 폴더를 추가하려고 합니다. 계속하시겠습니까?"
+
+#: ../../batcher/src/gui/main/previews.py:397
+msgid ""
+"You are about to add more than {} files. Are you sure you want to continue?"
+msgstr "{}개 이상의 파일을 추가하려고 합니다. 계속하시겠습니까?"
+
+#: ../../batcher/src/gui/main/previews.py:407
+msgid ""
+"<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
+"side, check if you added the files or folders you really wanted. Do you want "
+"to continue?"
+msgstr ""
+"<b>경고:</b> {}개 이상의 파일을 추가하려고 합니다. 실수 방지를 위해 정말로 추가하려는 "
+"파일이나 폴더가 맞는지 확인하세요. 계속하시겠습니까?"
+
+#: ../../batcher/src/gui/main/previews.py:462
+msgid "Yes"
+msgstr "예"
+
+#: ../../batcher/src/gui/main/previews.py:462
+msgid "No"
+msgstr "아니요"
+
+#: ../../batcher/src/gui/main/previews.py:610
+msgid ""
+"The preview no longer updates automatically as rendering takes too long."
+msgstr "렌더링 시간이 너무 오래 걸려 미리보기가 자동으로 업데이트되지 않습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:47
+msgid "_Settings"
+msgstr "설정(_S)"
+
+#: ../../batcher/src/gui/main/settings_manager.py:69
+msgid "Save Settings"
+msgstr "설정 저장"
+
+#: ../../batcher/src/gui/main/settings_manager.py:70
+msgid "Load Settings from File..."
+msgstr "파일에서 설정 불러오기..."
+
+#: ../../batcher/src/gui/main/settings_manager.py:71
+msgid "Save Settings to File..."
+msgstr "설정을 파일로 저장..."
+
+#: ../../batcher/src/gui/main/settings_manager.py:72
+msgid "Reset Settings"
+msgstr "설정 초기화"
+
+#: ../../batcher/src/gui/main/settings_manager.py:110
+msgid "Failed to save settings."
+msgstr "설정 저장에 실패했습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:112
+msgid "Failed to save settings to file \"{}\"."
+msgstr "\"{}\" 파일에 설정을 저장하는 데 실패했습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:140
+msgid "Settings successfully loaded."
+msgstr "설정을 성공적으로 불러왔습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:151
+msgid "Settings successfully saved to \"{}\"."
+msgstr "설정을 \"{}\"에 성공적으로 저장했습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:167
+msgid "Settings reset."
+msgstr "설정이 초기화되었습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:179
+msgid "Are you sure you want to reset settings?"
+msgstr "정말로 설정을 초기화하시겠습니까?"
+
+#: ../../batcher/src/gui/main/settings_manager.py:205
+msgid "Settings successfully saved."
+msgstr "설정을 성공적으로 저장했습니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:246
+msgid ""
+"Failed to load settings from file \"{}\". Settings must be reset completely."
+msgstr "\"{}\" 파일에서 설정을 불러오는 데 실패했습니다. 설정을 완전히 초기화해야 합니다."
+
+#: ../../batcher/src/gui/main/settings_manager.py:263
+msgid "Load Settings from File"
+msgstr "파일에서 설정 불러오기"
+
+#: ../../batcher/src/gui/main/settings_manager.py:266
+msgid "Save Settings to File"
+msgstr "설정을 파일로 저장"
+
+#: ../../batcher/src/gui/main/settings_manager.py:280
+msgid "Load size-related settings"
+msgstr "크기 관련 설정 불러오기"
+
+#: ../../batcher/src/gui/main/settings_manager.py:289
+msgid "JSON file"
+msgstr "JSON 파일"
+
+#: ../../batcher/src/gui/main/settings_manager.py:298
+msgid "Any file"
+msgstr "모든 파일"
+
+#: ../../batcher/src/gui/main/settings_manager.py:341
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the file and the text in the details to one of the "
+"sites below"
+msgstr ""
+"플러그인의 오류라고 생각되면, 아래 사이트 중 하나에 파일과 상세 정보의 텍스트를 포함한 "
+"보고서를 보내 오류 수정에 도움을 줄 수 있습니다"
+
+#: ../../batcher/src/gui/messages.py:86
+msgid "Oops. Something went wrong."
+msgstr "문제가 발생했습니다."
+
+#: ../../batcher/src/gui/messages.py:90
+msgid ""
+"An unexpected error occurred and the plug-in has to close. Sorry about that!"
+msgstr "예기치 않은 오류가 발생하여 플러그인을 종료해야 합니다. 불편을 드려 죄송합니다!"
+
+#: ../../batcher/src/gui/messages.py:94
+msgid ""
+"You can help fix this error by sending a report with the text in the details "
+"above to one of the following sites"
+msgstr ""
+"위의 상세 정보에 있는 텍스트를 포함한 보고서를 아래 사이트 중 하나에 보내면 이 오류를 해결하는 데 도움이 됩니다"
+
+#: ../../batcher/src/gui/messages.py:156
+msgid "Details"
+msgstr "세부 정보"
+
+#: ../../batcher/src/gui/messages.py:281
+msgid "Copy details to clipboard"
+msgstr "세부 정보를 클립보드에 복사"
+
+#: ../../batcher/src/gui/messages.py:541
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr ""
+"플러그인의 오류라고 생각되면, 아래 사이트 중 하나에 세부 정보의 텍스트를 포함한 "
+"보고서를 보내 오류 수정에 도움을 줄 수 있습니다"
+
+#: ../../batcher/src/gui/messages.py:560 ../../batcher/src/gui/messages.py:571
+msgid "There was a problem during processing:"
+msgstr "처리 중 문제가 발생했습니다:"
+
+#: ../../batcher/src/gui/messages.py:574
+msgid ""
+"If you closed an image during processing, do not close it and instead keep "
+"it open until the processing is finished successfully.\n"
+"\n"
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr ""
+"처리 중에 이미지를 닫지 말고 처리가 성공적으로 완료될 때까지 열어 두세요.\n"
+"\n"
+"플러그인의 오류라고 생각되면, 아래 사이트 중 하나에 세부 정보의 텍스트를 포함한 "
+"보고서를 보내 오류 수정에 도움을 줄 수 있습니다"
+
+#: ../../batcher/src/gui/messages.py:599
+msgid "Failed to apply action \"{}\" on \"{}\" because:"
+msgstr "\"{}\"에 작업 \"{}\"을(를) 적용하지 못했습니다. 이유:"
+
+#: ../../batcher/src/gui/messages.py:601
+msgid "Failed to apply condition \"{}\" on \"{}\" because:"
+msgstr "\"{}\"에 조건 \"{}\"을(를) 적용하지 못했습니다. 이유:"
+
+#: ../../batcher/src/gui/messages.py:607
+msgid "Failed to apply action \"{}\" because:"
+msgstr "작업 \"{}\"을(를) 적용하지 못했습니다. 이유:"
+
+#: ../../batcher/src/gui/messages.py:609
+msgid "Failed to apply condition \"{}\" because:"
+msgstr "조건 \"{}\"을(를) 적용하지 못했습니다. 이유:"
+
+#: ../../batcher/src/gui/message_box.py:52
+msgid "Plug-in errors occurred"
+msgstr "플러그인 오류가 발생했습니다"
+
+#: ../../batcher/src/gui/message_box.py:75
+msgid "The plug-in encountered one or more errors."
+msgstr "플러그인에서 하나 이상의 오류가 발생했습니다."
+
+#: ../../batcher/src/gui/message_box.py:77
+msgid ""
+"The errors should not cause crashes, but you should exercise caution "
+"nonetheless."
+msgstr "이 오류가 크래시를 일으키지는 않지만, 주의해서 사용하시기 바랍니다."
+
+#: ../../batcher/src/gui/message_box.py:81
+msgid ""
+"You can help fix these errors by sending a report with the text in the "
+"details above to one of the following sites"
+msgstr ""
+"위의 세부 정보에 있는 텍스트를 포함한 보고서를 아래 사이트 중 하나에 보내면 "
+"이 오류들을 해결하는 데 도움이 됩니다"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:74
+msgid "_Apply option to all files"
+msgstr "모든 파일에 옵션 적용(_A)"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:115
+msgid "A file named \"{}\" already exists in \"{}\"."
+msgstr "\"{}\"라는 이름의 파일이 \"{}\"  폴더에 이미 존재합니다."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:119
+msgid "A file named \"{}\" already exists."
+msgstr "\"{}\"라는 이름의 파일이 이미 존재합니다."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:122
+msgid "A file with the same name already exists."
+msgstr "같은 이름의 파일이 이미 존재합니다."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:125
+msgid "What would you like to do?"
+msgstr "어떻게 하시겠습니까?"
+
+#: ../../batcher/src/gui/placeholders.py:81
+msgid "Cannot be modified"
+msgstr "수정할 수 없음"
+
+#: ../../batcher/src/gui/preview/image.py:173
+msgid "No selection"
+msgstr "선택 없음"
+
+#: ../../batcher/src/gui/preview/image.py:210
+msgid "Preview"
+msgstr "미리보기"
+
+#: ../../batcher/src/gui/preview/image.py:221
+msgid "Update Automatically"
+msgstr "자동 업데이트"
+
+#: ../../batcher/src/gui/preview/image.py:232
+msgid "Update Preview"
+msgstr "미리보기 업데이트"
+
+#: ../../batcher/src/gui/preview/image.py:339
+msgid "There was a problem with updating the image preview:"
+msgstr "이미지 미리보기를 업데이트하는 중 문제가 발생했습니다:"
+
+#: ../../batcher/src/gui/preview/name.py:392
+msgid "There was a problem with updating the name preview:"
+msgstr "이름 미리보기를 업데이트하는 중 문제가 발생했습니다:"
+
+#: ../../batcher/src/path/validators.py:82
+msgid "Filename is not specified."
+msgstr "파일 이름이 지정되지 않았습니다."
+
+#: ../../batcher/src/path/validators.py:84
+msgid "Filename contains invalid characters."
+msgstr "파일 이름에 잘못된 문자가 포함되어 있습니다."
+
+#: ../../batcher/src/path/validators.py:86
+msgid "Filename cannot end with spaces."
+msgstr "파일 이름은 공백으로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:88
+msgid "Filename cannot end with a period."
+msgstr "파일 이름은 마침표로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:90
+msgid "\"{}\" is a reserved name that cannot be used in filenames.\n"
+msgstr "\"{}\"은(는) 파일 이름에 사용할 수 없는 예약된 이름입니다.\n"
+
+
+#: ../../batcher/src/path/validators.py:164
+msgid "File path is not specified."
+msgstr "파일 경로가 지정되지 않았습니다."
+
+#: ../../batcher/src/path/validators.py:166
+#: ../../batcher/src/path/validators.py:265
+msgid "Drive letter contains invalid characters."
+msgstr "드라이브 문자가 잘못된 문자를 포함하고 있습니다."
+
+#: ../../batcher/src/path/validators.py:168
+msgid "File path contains invalid characters."
+msgstr "파일 경로에 잘못된 문자가 포함되어 있습니다."
+
+#: ../../batcher/src/path/validators.py:170
+msgid "Path components in the file path cannot end with spaces."
+msgstr "파일 경로 내의 경로 구성요소는 공백으로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:172
+msgid "Path components in the file path cannot end with a period."
+msgstr "파일 경로 내의 경로 구성요소는 마침표로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:174
+msgid "\"{}\" is a reserved name that cannot be used in file paths.\n"
+msgstr "\"{}\"은(는) 파일 경로에 사용할 수 없는 예약된 이름입니다.\n"
+
+#: ../../batcher/src/path/validators.py:263
+msgid "Directory path is not specified."
+msgstr "디렉터리 경로가 지정되지 않았습니다."
+
+#: ../../batcher/src/path/validators.py:267
+msgid "Directory path contains invalid characters."
+msgstr "디렉터리 경로에 잘못된 문자가 포함되어 있습니다."
+
+#: ../../batcher/src/path/validators.py:269
+msgid "Path components in the directory path cannot end with spaces."
+msgstr "디렉터리 경로의 경로 구성요소는 공백으로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:271
+msgid "Path components in the directory path cannot end with a period."
+msgstr "디렉터리 경로의 경로 구성요소는 마침표로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:273
+msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
+msgstr "\"{}\"은(는) 디렉터리 경로에 사용할 수 없는 예약된 이름입니다.\n"
+
+#: ../../batcher/src/path/validators.py:275
+msgid "Specified path is not a directory path."
+msgstr "지정된 경로는 디렉터리 경로가 아닙니다."
+
+#: ../../batcher/src/path/validators.py:308
+msgid "File extension is not specified."
+msgstr "파일 확장자가 지정되지 않았습니다."
+
+#: ../../batcher/src/path/validators.py:310
+msgid "File extension contains invalid characters."
+msgstr "파일 확장자에 잘못된 문자가 포함되어 있습니다."
+
+#: ../../batcher/src/path/validators.py:312
+msgid "File extension cannot end with spaces."
+msgstr "파일 확장자는 공백으로 끝날 수 없습니다."
+
+#: ../../batcher/src/path/validators.py:314
+msgid "File extension cannot end with a period."
+msgstr "파일 확장자는 마침표로 끝날 수 없습니다."
+
+#: ../../batcher/src/placeholders.py:55
+msgid "There are no background layers."
+msgstr "배경 레이어가 없습니다."
+
+#: ../../batcher/src/placeholders.py:69
+msgid "There are no foreground layers."
+msgstr "전경 레이어가 없습니다."
+
+#: ../../batcher/src/placeholders.py:151
+msgid "Current Image"
+msgstr "현재 이미지"
+
+#: ../../batcher/src/placeholders.py:152 ../../batcher/src/placeholders.py:153
+msgid "Current Layer"
+msgstr "현재 레이어"
+
+#: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
+msgid "Layer Below (Background)"
+msgstr "아래 레이어 (배경)"
+
+#: ../../batcher/src/placeholders.py:156 ../../batcher/src/placeholders.py:157
+msgid "Layer Above (Foreground)"
+msgstr "위 레이어 (전경)"
+
+#: ../../batcher/src/placeholders.py:158
+msgid "All Layers"
+msgstr "모든 레이어"
+
+#: ../../batcher/src/placeholders.py:209
+msgid "X-offset"
+msgstr "X축 오프셋"
+
+#: ../../batcher/src/placeholders.py:210
+msgid "Y-offset"
+msgstr "Y축 오프셋"
+
+#: ../../batcher/src/plugin_settings.py:37
+#: ../../batcher/src/plugin_settings.py:208
+#: ../../batcher/src/plugin_settings.py:360
+msgid "Run mode"
+msgstr "실행 모드"
+
+#: ../../batcher/src/plugin_settings.py:38
+#: ../../batcher/src/plugin_settings.py:209
+#: ../../batcher/src/plugin_settings.py:361
+msgid "The run mode"
+msgstr "실행 모드"
+
+#: ../../batcher/src/plugin_settings.py:49
+msgid ""
+"Text file containing input files and folders on each line (non-interactive "
+"run mode only)"
+msgstr "각 줄에 입력 파일 및 폴더가 포함된 텍스트 파일 (비대화형 실행 모드에서만 사용)"
+
+#: ../../batcher/src/plugin_settings.py:59
+msgid ""
+"Maximum number of input files to process (set to 0 to remove this "
+"restriction; non-interactive run mode only)"
+msgstr "처리할 최대 입력 파일 수 (0으로 설정하면 제한 없음; 비대화형 실행 모드에서만 사용)"
+
+#: ../../batcher/src/plugin_settings.py:88
+#: ../../batcher/src/plugin_settings.py:238
+msgid "Image filename pattern (empty string = image name)"
+msgstr "이미지 파일 이름 패턴 (빈 문자열 = 이미지 이름 사용)"
+
+#: ../../batcher/src/plugin_settings.py:96
+#: ../../batcher/src/plugin_settings.py:246
+#: ../../batcher/src/plugin_settings.py:493
+msgid "How to handle conflicting files (non-interactive run mode only)"
+msgstr "파일 충돌 처리 방법 (비대화형 실행 모드에서만 사용)"
+
+#: ../../batcher/src/plugin_settings.py:105
+#: ../../batcher/src/plugin_settings.py:255
+#: ../../batcher/src/plugin_settings.py:371
+#: ../../batcher/src/plugin_settings.py:502
+#: ../../batcher/src/plugin_settings.py:617
+msgid "File with saved settings"
+msgstr "저장된 설정 파일"
+
+#: ../../batcher/src/plugin_settings.py:106
+#: ../../batcher/src/plugin_settings.py:256
+#: ../../batcher/src/plugin_settings.py:372
+#: ../../batcher/src/plugin_settings.py:503
+#: ../../batcher/src/plugin_settings.py:618
+msgid "File with saved settings (optional)"
+msgstr "저장된 설정 파일 (선택 사항)"
+
+#: ../../batcher/src/plugin_settings.py:139
+msgid "Keep Input Images"
+msgstr "입력 이미지 유지"
+
+#: ../../batcher/src/plugin_settings.py:485
+msgid "Layer filename pattern (empty string = layer name)"
+msgstr "레이어 파일 이름 패턴 (빈 문자열 = 레이어 이름 사용)"
+
+#: ../../batcher/src/plugin_settings.py:799
+msgid "Input files and folders"
+msgstr "입력 파일 및 폴더"
+
+#: ../../batcher/src/plugin_settings.py:810
+msgid "Show Original Names"
+msgstr "원래 이름 표시"
+
+#: ../../batcher/src/plugin_settings.py:829
+msgid "Close when Done"
+msgstr "완료 시 닫기"
+
+#: ../../batcher/src/renamer.py:113
+msgid "Examples"
+msgstr "예시"
+
+#: ../../batcher/src/renamer.py:560
+msgid "Suppose that the output folder is \"C:\\Users\\username\\Pictures\"."
+msgstr "출력 폴더가 \"C:\\Users\\username\\Pictures\"라고 가정합니다."
+
+#: ../../batcher/src/renamer.py:571
+msgid "Suppose that the output folder is \"/home/username/Pictures\"."
+msgstr "출력 폴더가 \"/home/username/Pictures\"라고 가정합니다."
+
+#. FOR TRANSLATORS: Translate only the "image" part
+#: ../../batcher/src/renamer.py:591
+msgid "image001"
+msgstr "image001"
+
+#: ../../batcher/src/renamer.py:597
+msgid "To continue numbering across group layers, use %n."
+msgstr "그룹 레이어 전체에서 번호를 이어가려면 %n을 사용하세요."
+
+#: ../../batcher/src/renamer.py:599
+#, python-format
+msgid "To use descending numbers, use %d."
+msgstr "내림차순 번호를 사용하려면 %d를 사용하세요."
+
+#: ../../batcher/src/renamer.py:600
+msgid "Suppose that the number of layers is 5:"
+msgstr "레이어 수가 5개라고 가정해 보겠습니다:"
+
+#: ../../batcher/src/renamer.py:610 ../../batcher/src/renamer.py:675
+msgid "Image name"
+msgstr "이미지 이름"
+
+#: ../../batcher/src/renamer.py:613
+msgid ""
+"Suppose that an image is named \"Image.png\" and the file extension is "
+"\"png\"."
+msgstr "이미지 이름이 \"Image.png\"이고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:618
+msgid ""
+"Suppose that an image is named \"Image.jpg\" and the file extension is "
+"\"png\"."
+msgstr "이미지 이름이 \"Image.jpg\"이고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:629
+msgid "Image path"
+msgstr "이미지 경로"
+
+#: ../../batcher/src/renamer.py:632
+msgid ""
+"Suppose that an image named \"Left\" has parent folders named \"Hands\" and "
+"\"Body\"."
+msgstr "\"Left\"라는 이미지가 \"Hands\"와 \"Body\"라는 상위 폴더에 포함되어 있다고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:636
+msgid ""
+"Suppose that an image is named \"Left.jpg\" and the file extension is "
+"\"png\"."
+msgstr "이미지 이름이 \"Left.jpg\"이고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:647
+msgid "Layer name"
+msgstr "레이어 이름"
+
+#: ../../batcher/src/renamer.py:650
+msgid ""
+"Suppose that a layer is named \"Frame.png\" and the file extension is "
+"\"png\"."
+msgstr "\"Frame.png\"이라는 레이어가 있고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:655
+msgid ""
+"Suppose that a layer is named \"Frame.jpg\" and the file extension is "
+"\"png\"."
+msgstr "\"Frame.jpg\"이라는 레이어가 있고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:666
+msgid "Full layer name"
+msgstr "전체 레이어 이름"
+
+#: ../../batcher/src/renamer.py:678
+msgid "Suppose that the image is named \"Image.xcf\"."
+msgstr "이미지 이름이 \"Image.xcf\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:688
+msgid "Layer path"
+msgstr "레이어 경로"
+
+#: ../../batcher/src/renamer.py:691
+msgid ""
+"Suppose that a layer named \"Left\" has parent groups named \"Hands\" and "
+"\"Body\"."
+msgstr "\"Left\"라는 레이어가 \"Hands\"와 \"Body\"라는 상위 그룹에 속해 있다고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:695
+msgid ""
+"Suppose that the layer is named \"Left.jpg\" and the file extension is "
+"\"png\"."
+msgstr "\"Left.jpg\"라는 레이어가 있고 파일 확장자가 \"png\"라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:715
+msgid "Tags"
+msgstr "태그"
+
+#: ../../batcher/src/renamer.py:718
+msgid "Suppose that a layer has a green color tag."
+msgstr "레이어에 녹색 컬러 태그가 있다고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:720
+msgid "You can map a color to another name."
+msgstr "색상을 다른 이름으로 매핑할 수 있습니다."
+
+#: ../../batcher/src/renamer.py:723
+msgid "Missing tags are ignored."
+msgstr "누락된 태그는 무시됩니다."
+
+#: ../../batcher/src/renamer.py:733
+msgid "Current date"
+msgstr "현재 날짜"
+
+#: ../../batcher/src/renamer.py:737
+msgid ""
+"Custom date format uses formatting as per the \"strftime\" function in "
+"Python."
+msgstr "사용자 정의 날짜 형식은 Python의 \"strftime\" 함수 형식을 따릅니다."
+
+#: ../../batcher/src/renamer.py:746 ../../batcher/src/renamer.py:763
+msgid "Attributes"
+msgstr "속성"
+
+#: ../../batcher/src/renamer.py:749
+msgid ""
+"Suppose that an image has width and height of 1000 and 500 pixels, "
+"respectively,and the current layer has width, height, <i>x</i>-offset and "
+"<i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively."
+msgstr ""
+"이미지의 너비와 높이가 각각 1000픽셀, 500픽셀이고, "
+"현재 레이어의 너비, 높이, <i>x</i> 오프셋, <i>y</i> 오프셋이\n"
+"각각 1000픽셀, 270픽셀, 0픽셀, 40픽셀이라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:766
+msgid ""
+"Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively,\n"
+"and the image has width and height of 1000 and 500 pixels, respectively."
+msgstr ""
+"레이어의 너비, 높이, <i>x</i> 오프셋, <i>y</i> 오프셋이 각각 1000픽셀, 270픽셀, 0픽셀, 40픽셀이며,\n"
+"이미지의 너비와 높이가 각각 1000픽셀, 500픽셀이라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:783
+msgid "Suppose that an image is named \"Animal copy #1\"."
+msgstr "이미지 이름이 \"Animal copy #1\"이라고 가정해 보겠습니다."
+
+#: ../../batcher/src/renamer.py:785 ../../batcher/src/renamer.py:802
+msgid ""
+"You can use the regular expression syntax as defined in the \"re\" module "
+"for Python."
+msgstr "Python의 \"re\" 모듈에서 정의된 정규 표현식 문법을 사용할 수 있습니다."
+
+#: ../../batcher/src/renamer.py:787 ../../batcher/src/renamer.py:804
+msgid ""
+"You can specify the number of replacements and flags as defined in the "
+"\"re\" module for Python."
+msgstr "Python의 \"re\" 모듈에서 정의된 대체 횟수와 플래그를 지정할 수 있습니다."
+
+#: ../../batcher/src/renamer.py:800
+msgid "Suppose that a layer is named \"Animal copy #1\"."
+msgstr "\"Animal copy #1\"이라는 이름의 레이어가 있다고 가정해 보겠습니다."
+
+#: ../../batcher/src/update.py:73
+msgid "Failed to obtain the previous plug-in version."
+msgstr "이전 플러그인 버전을 가져오는 데 실패했습니다."
+
+#: ../../batcher/src/update.py:1717
+msgid "Resize from edges"
+msgstr "가장자리에서 크기 조정"
+
+#: ../../batcher/src/utils.py:63
+msgid ""
+"Settings stored in \"{}\" may be corrupt. This could happen if the file was "
+"edited manually. To fix this, save the settings again."
+msgstr "\"{}\"에 저장된 설정이 손상되었을 수 있습니다. 수동으로 파일을 편집한 경우 발생할 수 있습니다. 이 문제를 해결하려면 설정을 다시 저장하십시오."
+
+#: ../../batcher/src/utils.py:67
+msgid " More information: {}"
+msgstr " 추가 정보: {}"
+
+#: ../../batcher/src/utils.py:71
+msgid ""
+"Settings for this plug-in may be corrupt. To fix this, save the settings "
+"again or reset them."
+msgstr "이 플러그인의 설정이 손상되었을 수 있습니다. 설정을 다시 저장하거나 재설정하여 문제를 해결하십시오."
+
+#: ../../batcher/src/utils.py:74
+msgid "More information: {}"
+msgstr "추가 정보: {}"
+
+#: ../../batcher/src/utils.py:78
+msgid "Could not locate settings in file \"{}\" in \"{}\"."
+msgstr "\"{}\"의 \"{}\" 파일에서 설정을 찾을 수 없습니다."
+
+#: ../../batcher/src/utils.py:81
+msgid "Could not locate settings in \"{}\"."
+msgstr "\"{}\"에서 설정을 찾을 수 없습니다."

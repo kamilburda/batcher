@@ -1,5 +1,6 @@
 ## Upcoming
 
+* Added Korean translation (thanks to @Maguk-Bong).
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
