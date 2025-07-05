@@ -21,6 +21,10 @@ from . import _utils as update_utils_
 __all__ = [
   'load_and_update',
   'UpdateStatuses',
+  'get_versions_and_functions',
+  'HANDLERS_PACKAGE_NAME',
+  'UPDATE_HANDLER_MODULE_PREFIX',
+  'UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX',
 ]
 
 
@@ -37,9 +41,9 @@ class UpdateStatuses:
   )
 
 
-_UPDATE_HANDLER_MODULE_PREFIX = 'update_'
-_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX = '_next'
-_HANDLERS_PACKAGE_NAME = '_handlers'
+HANDLERS_PACKAGE_NAME = '_handlers'
+UPDATE_HANDLER_MODULE_PREFIX = 'update_'
+UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX = '_next'
 
 
 def load_and_update(
@@ -198,48 +202,81 @@ def _get_plugin_version_dict(data) -> Union[dict, None]:
     return None
 
 
-def _get_update_handlers(previous_version, current_version) -> List[Callable]:
-  update_handlers_list = []
-  next_update_handler = None
-
+def _get_update_handlers(
+      minimum_version: version_.Version,
+      maximum_version: version_.Version,
+) -> List[Callable]:
   module_filepath = utils.get_current_module_filepath()
-  handlers_package_dirpath = os.path.join(os.path.dirname(module_filepath), _HANDLERS_PACKAGE_NAME)
+  handlers_package_dirpath = os.path.join(os.path.dirname(module_filepath), HANDLERS_PACKAGE_NAME)
+  handlers_package_path = f'{sys.modules[__name__].__package__}.{HANDLERS_PACKAGE_NAME}'
 
-  current_package = sys.modules[__name__].__package__
+  return get_versions_and_functions(
+    minimum_version,
+    maximum_version,
+    handlers_package_dirpath,
+    handlers_package_path,
+    UPDATE_HANDLER_MODULE_PREFIX,
+    UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
+    'update',
+    include_next=True,
+  )
 
-  for _module_info, module_name, is_package in pkgutil.walk_packages(
-        path=[handlers_package_dirpath]):
+
+def get_versions_and_functions(
+      minimum_version: version_.Version,
+      maximum_version: version_.Version,
+      package_dirpath: str,
+      package_path: str,
+      module_prefix: str,
+      next_version_suffix: str,
+      function_name: str,
+      include_next: bool,
+      match_minimum_version: bool = False,
+):
+  functions_and_versions = []
+  next_function = None
+
+  for _module_info, module_name, is_package in pkgutil.walk_packages(path=[package_dirpath]):
     if is_package:
       continue
 
-    if module_name.startswith(_UPDATE_HANDLER_MODULE_PREFIX):
-      module_path = f'{current_package}.{_HANDLERS_PACKAGE_NAME}.{module_name}'
+    if module_name.startswith(module_prefix):
+      module_path = f'{package_path}.{module_name}'
 
-      if module_name.endswith(_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX):
-        next_module = importlib.import_module(module_path)
-        next_update_handler = next_module.update
+      if module_name.endswith(next_version_suffix):
+        if include_next:
+          next_module = importlib.import_module(module_path)
+          next_function = getattr(next_module, function_name)
       else:
         try:
-          handler_version = _get_version_from_module_name(module_name)
+          version_from_module = _get_version_from_module_name(module_name, module_prefix)
         except Exception as e:
           print(f'could not parse version from module {module_name}; reason: {e}', file=sys.stderr)
         else:
-          if previous_version < handler_version <= current_version:
+          if match_minimum_version:
+            matches_version = minimum_version <= version_from_module <= maximum_version
+          else:
+            matches_version = minimum_version < version_from_module <= maximum_version
+
+          if matches_version:
             module = importlib.import_module(module_path)
 
-            update_handlers_list.append((module.update, handler_version))
+            functions_and_versions.append((getattr(module, function_name), version_from_module))
 
-  update_handlers_list.sort(key=lambda item: item[1])
-  update_handlers = [item[0] for item in update_handlers_list]
+  functions_and_versions.sort(key=lambda item: item[1])
+  functions = [item[0] for item in functions_and_versions]
 
-  if next_update_handler is not None:
-    update_handlers.append(next_update_handler)
+  if next_function is not None:
+    functions.append(next_function)
 
-  return update_handlers
+  return functions
 
 
-def _get_version_from_module_name(module_name: str) -> version_.Version:
-  version_str = module_name[len(_UPDATE_HANDLER_MODULE_PREFIX):]
+def _get_version_from_module_name(
+      module_name: str,
+      module_prefix: str,
+) -> version_.Version:
+  version_str = module_name[len(module_prefix):]
 
   version_numbers_and_prerelease_components = version_str.split('__')
   if len(version_numbers_and_prerelease_components) > 1:
