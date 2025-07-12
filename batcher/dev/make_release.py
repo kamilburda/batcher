@@ -377,10 +377,10 @@ def _create_empty_update_next_module(
       update_next_module_filepath,
       empty_next_update_handler_text,
 ):
-  with open(update_next_module_filepath, 'w') as f:
+  with open(update_next_module_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
     # We only take the first line (the function signature) and ignore the rest
-    f.write(empty_next_update_handler_text.splitlines()[0])
-    f.write(f'{PYTHON_MODULE_TAB_WIDTH}pass\n')
+    f.write(f'{empty_next_update_handler_text.splitlines()[0]}\n')
+    f.write(f'{" " * PYTHON_MODULE_TAB_WIDTH}pass\n')
 
 
 def _update_test_assert_update_next_handler(release_metadata):
