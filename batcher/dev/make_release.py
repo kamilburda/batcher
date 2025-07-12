@@ -2,6 +2,7 @@
 
 """Creating a new plug-in release."""
 
+import ast
 import argparse
 import getpass
 import inspect
@@ -32,8 +33,9 @@ utils.initialize_i18n()
 from config import CONFIG
 from dev import make_installers
 from dev import preprocess_document_contents
-from src import version as version_
 from src import constants
+from src import utils_update
+from src import version as version_
 
 
 CONFIG.STDOUT_LOG_HANDLES = []
@@ -55,6 +57,8 @@ FILE_EXTENSIONS_AND_MIME_TYPES = {
 }
 
 PROMPT_NO_EXIT_STATUS = 2
+
+PYTHON_MODULE_TAB_WIDTH = 2
 
 
 def main():
@@ -111,6 +115,10 @@ def _make_release(release_metadata):
   _update_version_and_release_date_in_config(release_metadata, PLUGIN_CONFIG_FILEPATH)
   if os.path.isfile(PLUGIN_CONFIG_DEV_FILEPATH):
     _update_version_and_release_date_in_config(release_metadata, PLUGIN_CONFIG_DEV_FILEPATH)
+
+  _update_update_next_handler(release_metadata)
+
+  _update_test_assert_update_next_handler(release_metadata)
 
   _generate_page_post_with_release_notes(release_metadata)
 
@@ -282,6 +290,102 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
   
   with open(plugin_config_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as f:
     f.writelines(lines)
+
+
+def _update_update_next_handler(release_metadata):
+  update_next_module_filepath = _get_update_next_module_filepath(
+    os.path.join(PLUGIN_DIRPATH, 'src', 'update', utils_update.HANDLERS_PACKAGE_NAME),
+    utils_update.UPDATE_HANDLER_MODULE_PREFIX,
+    utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
+  )
+
+  if update_next_module_filepath is not None:
+    with open(update_next_module_filepath, 'r') as f:
+      update_next_module_contents = f.read()
+
+    next_handler_node = _get_update_next_handler_node(
+      update_next_module_contents, utils_update.UPDATE_HANDLER_FUNC_NAME)
+
+    if _is_update_next_module_empty(next_handler_node):
+      return
+
+    new_update_module_file_ext = os.path.splitext(update_next_module_filepath)[1]
+    new_update_module_filepath = os.path.join(
+      os.path.dirname(update_next_module_filepath),
+      (f'{_get_new_update_module_name(release_metadata, utils_update.UPDATE_HANDLER_MODULE_PREFIX)}'
+       f'{new_update_module_file_ext}'),
+    )
+
+    print(f'Renaming update handler for the new version to {new_update_module_filepath}')
+
+    if release_metadata.dry_run:
+      return
+
+    empty_next_update_handler_text = _get_empty_next_update_handler_text(next_handler_node)
+
+    try:
+      os.rename(update_next_module_filepath, new_update_module_filepath)
+    except OSError as e:
+      _print_error_and_exit(
+        f'Error: could not rename "{update_next_module_filepath}"'
+        f' to "{new_update_module_filepath}": {e}')
+
+    _create_empty_update_next_module(
+      update_next_module_filepath,
+      empty_next_update_handler_text,
+    )
+
+
+def _get_update_next_module_filepath(package_dirpath, filename_prefix, filename_suffix):
+  return next(
+    iter(
+      os.path.join(package_dirpath, filename) for filename in os.listdir(package_dirpath)
+      if filename_prefix in filename and filename_suffix in filename
+    ),
+    None
+  )
+
+
+def _get_update_next_handler_node(next_module_contents, handler_func_name):
+  root_node = ast.parse(next_module_contents)
+
+  for child in root_node.body:
+    if isinstance(child, ast.FunctionDef) and child.name == handler_func_name:
+      return child
+
+  raise ValueError(
+    f'update handler for the next version does not contain the function "{handler_func_name}"')
+
+
+def _is_update_next_module_empty(next_handler_node):
+  return len(next_handler_node.body) == 1 and isinstance(next_handler_node.body[0], ast.Pass)
+
+
+def _get_new_update_module_name(release_metadata, filename_prefix):
+  return f'{filename_prefix}{_version_str_to_module_str(release_metadata.new_version)}'
+
+
+def _version_str_to_module_str(version_str):
+  return version_str.replace('.', '_').replace('-', '__')
+
+
+def _get_empty_next_update_handler_text(next_handler_node):
+  return ast.unparse(next_handler_node)
+
+
+def _create_empty_update_next_module(
+      update_next_module_filepath,
+      empty_next_update_handler_text,
+):
+  with open(update_next_module_filepath, 'w') as f:
+    # We only take the first line (the function signature) and ignore the rest
+    f.write(empty_next_update_handler_text.splitlines()[0])
+    f.write(f'{PYTHON_MODULE_TAB_WIDTH}pass\n')
+
+
+def _update_test_assert_update_next_handler(release_metadata):
+  # TODO
+  pass
 
 
 def _generate_page_post_with_release_notes(release_metadata):
