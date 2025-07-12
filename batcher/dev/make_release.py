@@ -368,6 +368,8 @@ def _version_str_to_module_str(version_str):
 
 
 def _get_next_update_handler_text(next_handler_node):
+  # We must dynamically obtain the function signature as the signature may
+  # change anytime later.
   return ast.unparse(next_handler_node)
 
 
