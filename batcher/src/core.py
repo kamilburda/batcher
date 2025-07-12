@@ -33,6 +33,8 @@ from src.pypdb import pdb
 _BATCHER_ARG_POSITION_IN_COMMANDS = 0
 _NAME_ONLY_COMMAND_GROUP = 'name'
 
+COMMAND_NOT_APPLIED = type('CommandNotApplied', (), {})()
+
 
 class Batcher(metaclass=abc.ABCMeta):
   """Abstract class for batch-processing items with a sequence of commands
@@ -700,13 +702,12 @@ class Batcher(metaclass=abc.ABCMeta):
   def _get_processed_function(self, command):
 
     def _function_wrapper(*command_args_and_function):
-      command_args, function = command_args_and_function[:-1], command_args_and_function[-1]
-
-      if not self._is_enabled(command):
-        return False
-
       self._set_current_action_and_condition(command)
 
+      if not self._is_enabled(command):
+        return COMMAND_NOT_APPLIED
+
+      command_args, function = command_args_and_function[:-1], command_args_and_function[-1]
       args, kwargs = self._get_command_args_and_kwargs(command, command_args)
 
       if 'condition' in command.tags:
@@ -1333,9 +1334,9 @@ def _set_selected_and_current_layer(batcher):
 
 
 def _set_selected_and_current_layer_after_command(batcher):
-  command_applied = yield
+  yield
 
-  if command_applied or command_applied is None:
+  if batcher.current_action is not None and batcher.current_action['enabled'].value:
     _set_selected_and_current_layer(batcher)
 
 
