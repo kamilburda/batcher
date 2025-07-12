@@ -18,6 +18,7 @@ UPDATE_HANDLER_MODULE_PREFIX = 'update_'
 UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX = '_next'
 UPDATE_HANDLER_FUNC_NAME = 'update'
 ASSERT_UPDATE_HANDLER_MODULE_PREFIX = 'assert_update_'
+ASSERT_UPDATE_HANDLER_FUNC_NAME = 'assert_contents'
 
 
 def get_versions_and_functions(

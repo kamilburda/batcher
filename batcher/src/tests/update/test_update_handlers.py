@@ -48,7 +48,7 @@ def _get_assert_update_handlers(
     handlers_package_path,
     utils_update.ASSERT_UPDATE_HANDLER_MODULE_PREFIX,
     utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
-    'assert_contents',
+    utils_update.ASSERT_UPDATE_HANDLER_FUNC_NAME,
     include_next=include_next,
     match_minimum_version=match_minimum_version,
   )
