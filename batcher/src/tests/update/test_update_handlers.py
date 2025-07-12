@@ -86,7 +86,7 @@ class TestUpdateHandlers(unittest.TestCase):
 
     assert_handlers = _get_assert_update_handlers(
       version_.Version.parse('0.2'),
-      version_.Version.parse('1.0-rc4'),
+      version_.Version.parse('1.0-RC4'),
       include_next=False,
     )
 
