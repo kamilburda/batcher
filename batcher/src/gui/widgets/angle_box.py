@@ -2,8 +2,8 @@
 
 import gi
 from gi.repository import GLib
-gi.require_version('Gtk', '3.0')
 from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 
