@@ -14,6 +14,7 @@ from src import plugin_settings
 from src import setting as setting_
 from src import update
 from src import utils
+from src import utils_update
 from src import version as version_
 
 from src.tests import stubs_gimp
@@ -27,10 +28,6 @@ _MOCK_PNG_CHOICE = Gimp.Choice.new()
 _MOCK_PNG_CHOICE.add('auto', 0, 'Automatic', '')
 _MOCK_PNG_CHOICE_DEFAULT_VALUE = 'auto'
 
-HANDLERS_PACKAGE_NAME = '_handlers'
-ASSERT_UPDATE_HANDLER_MODULE_PREFIX = 'assert_update_'
-ASSERT_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX = '_next'
-
 
 def _get_assert_update_handlers(
       minimum_version: version_.Version,
@@ -38,17 +35,19 @@ def _get_assert_update_handlers(
       include_next: bool,
       match_minimum_version: bool = False,
 ) -> List[Callable]:
-  module_filepath = utils.get_current_module_filepath()
-  handlers_package_dirpath = os.path.join(os.path.dirname(module_filepath), HANDLERS_PACKAGE_NAME)
-  handlers_package_path = f'{sys.modules[__name__].__package__}.{HANDLERS_PACKAGE_NAME}'
+  test_update_package_dirpath = os.path.dirname(utils.get_current_module_filepath())
+  handlers_package_dirpath = os.path.join(
+    test_update_package_dirpath, utils_update.HANDLERS_PACKAGE_NAME)
+  handlers_package_path = (
+    f'{sys.modules[__name__].__package__}.{utils_update.HANDLERS_PACKAGE_NAME}')
 
-  return update.get_versions_and_functions(
+  return utils_update.get_versions_and_functions(
     minimum_version,
     maximum_version,
     handlers_package_dirpath,
     handlers_package_path,
-    ASSERT_UPDATE_HANDLER_MODULE_PREFIX,
-    ASSERT_UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
+    utils_update.ASSERT_UPDATE_HANDLER_MODULE_PREFIX,
+    utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
     'assert_contents',
     include_next=include_next,
     match_minimum_version=match_minimum_version,
