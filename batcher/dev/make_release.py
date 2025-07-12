@@ -299,41 +299,39 @@ def _update_update_next_handler(release_metadata):
     utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
   )
 
-  if update_next_module_filepath is not None:
-    with open(update_next_module_filepath, 'r') as f:
-      update_next_module_contents = f.read()
+  if update_next_module_filepath is None:
+    _print_error_and_exit(f'Error: file "{update_next_module_filepath}" must exist')
 
-    next_handler_node = _get_update_next_handler_node(
-      update_next_module_contents, utils_update.UPDATE_HANDLER_FUNC_NAME)
+  with open(update_next_module_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
+    update_next_module_contents = f.read()
 
-    if _is_update_next_module_empty(next_handler_node):
-      return
+  next_handler_node = _get_update_next_handler_node(
+    update_next_module_contents, utils_update.UPDATE_HANDLER_FUNC_NAME)
 
-    new_update_module_file_ext = os.path.splitext(update_next_module_filepath)[1]
-    new_update_module_filepath = os.path.join(
-      os.path.dirname(update_next_module_filepath),
-      (f'{_get_new_update_module_name(release_metadata, utils_update.UPDATE_HANDLER_MODULE_PREFIX)}'
-       f'{new_update_module_file_ext}'),
-    )
+  if _is_update_next_module_empty(next_handler_node):
+    return
 
-    print(f'Renaming update handler for the new version to {new_update_module_filepath}')
+  new_update_module_file_ext = os.path.splitext(update_next_module_filepath)[1]
+  new_update_module_name = _get_new_update_module_name(
+    release_metadata, utils_update.UPDATE_HANDLER_MODULE_PREFIX)
+  new_update_module_filepath = os.path.join(
+    os.path.dirname(update_next_module_filepath),
+    f'{new_update_module_name}{new_update_module_file_ext}',
+  )
 
-    if release_metadata.dry_run:
-      return
+  print(f'Renaming update handler for the new version to {new_update_module_filepath}')
 
-    empty_next_update_handler_text = _get_empty_next_update_handler_text(next_handler_node)
+  if release_metadata.dry_run:
+    return
 
-    try:
-      os.rename(update_next_module_filepath, new_update_module_filepath)
-    except OSError as e:
-      _print_error_and_exit(
-        f'Error: could not rename "{update_next_module_filepath}"'
-        f' to "{new_update_module_filepath}": {e}')
+  next_update_handler_text = _get_next_update_handler_text(next_handler_node)
 
-    _create_empty_update_next_module(
-      update_next_module_filepath,
-      empty_next_update_handler_text,
-    )
+  os.rename(update_next_module_filepath, new_update_module_filepath)
+
+  _create_empty_update_next_module(
+    update_next_module_filepath,
+    next_update_handler_text,
+  )
 
 
 def _get_update_next_module_filepath(package_dirpath, filename_prefix, filename_suffix):
@@ -353,8 +351,8 @@ def _get_update_next_handler_node(next_module_contents, handler_func_name):
     if isinstance(child, ast.FunctionDef) and child.name == handler_func_name:
       return child
 
-  raise ValueError(
-    f'update handler for the next version does not contain the function "{handler_func_name}"')
+  _print_error_and_exit(
+    f'Error: Update handler for the next version does not contain function "{handler_func_name}"')
 
 
 def _is_update_next_module_empty(next_handler_node):
@@ -369,7 +367,7 @@ def _version_str_to_module_str(version_str):
   return version_str.replace('.', '_').replace('-', '__')
 
 
-def _get_empty_next_update_handler_text(next_handler_node):
+def _get_next_update_handler_text(next_handler_node):
   return ast.unparse(next_handler_node)
 
 
