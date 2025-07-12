@@ -293,10 +293,36 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
 
 
 def _update_update_next_handler(release_metadata):
-  update_next_module_filepath = _get_update_next_module_filepath(
+  _update_next_handler_common(
+    release_metadata,
     os.path.join(PLUGIN_DIRPATH, 'src', 'update', utils_update.HANDLERS_PACKAGE_NAME),
     utils_update.UPDATE_HANDLER_MODULE_PREFIX,
     utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
+    utils_update.UPDATE_HANDLER_FUNC_NAME,
+  )
+
+
+def _update_test_assert_update_next_handler(release_metadata):
+  _update_next_handler_common(
+    release_metadata,
+    os.path.join(PLUGIN_DIRPATH, 'src', 'tests', 'update', utils_update.HANDLERS_PACKAGE_NAME),
+    utils_update.ASSERT_UPDATE_HANDLER_MODULE_PREFIX,
+    utils_update.UPDATE_HANDLER_MODULE_NEXT_VERSION_SUFFIX,
+    utils_update.ASSERT_UPDATE_HANDLER_FUNC_NAME,
+  )
+
+
+def _update_next_handler_common(
+      release_metadata,
+      handlers_package_dirpath,
+      handler_module_prefix,
+      handler_next_module_suffix,
+      handler_func_name,
+):
+  update_next_module_filepath = _get_update_next_module_filepath(
+    handlers_package_dirpath,
+    handler_module_prefix,
+    handler_next_module_suffix,
   )
 
   if update_next_module_filepath is None:
@@ -305,15 +331,13 @@ def _update_update_next_handler(release_metadata):
   with open(update_next_module_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
     update_next_module_contents = f.read()
 
-  next_handler_node = _get_update_next_handler_node(
-    update_next_module_contents, utils_update.UPDATE_HANDLER_FUNC_NAME)
+  next_handler_node = _get_update_next_handler_node(update_next_module_contents, handler_func_name)
 
   if _is_update_next_module_empty(next_handler_node):
     return
 
   new_update_module_file_ext = os.path.splitext(update_next_module_filepath)[1]
-  new_update_module_name = _get_new_update_module_name(
-    release_metadata, utils_update.UPDATE_HANDLER_MODULE_PREFIX)
+  new_update_module_name = _get_new_update_module_name(release_metadata, handler_module_prefix)
   new_update_module_filepath = os.path.join(
     os.path.dirname(update_next_module_filepath),
     f'{new_update_module_name}{new_update_module_file_ext}',
@@ -381,11 +405,6 @@ def _create_empty_update_next_module(
     # We only take the first line (the function signature) and ignore the rest
     f.write(f'{empty_next_update_handler_text.splitlines()[0]}\n')
     f.write(f'{" " * PYTHON_MODULE_TAB_WIDTH}pass\n')
-
-
-def _update_test_assert_update_next_handler(release_metadata):
-  # TODO
-  pass
 
 
 def _generate_page_post_with_release_notes(release_metadata):
