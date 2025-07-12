@@ -10,10 +10,10 @@ _PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filep
 
 utils.initialize_i18n(os.path.join(_PLUGIN_DIRPATH, 'locale'), 'batcher')
 
-from src import logging
+from src import loglib
 
 # Initialize logging as early as possible to capture any module-level errors.
-logging.log_output(
+loglib.log_output(
   stderr_handles=['file'],
   log_dirpaths=[_PLUGIN_DIRPATH],
   log_error_filename='error.log',

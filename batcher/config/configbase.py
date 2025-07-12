@@ -37,10 +37,10 @@ The following configuration entries are provided by default:
   BUG_REPORT_URL_LIST: List of URLs where users can submit bug reports.
   STDOUT_LOG_HANDLES:
     List of strings describing destination sources where standard output will be
-    logged. See the `logging` module for possible types.
+    logged. See the `loglib` module for possible types.
   STDERR_LOG_HANDLES:
     List of strings describing destination sources where error output will be
-    logged. See the `logging` module for possible types.
+    logged. See the `loglib` module for possible types.
   DEFAULT_LOGS_DIRPATH:
     Default path to a directory where messages will be logged.
   PLUGINS_LOG_DIRPATHS:
@@ -77,7 +77,7 @@ except (ValueError, ImportError):
 else:
   _gimp_modules_available = True
 
-from src import logging
+from src import loglib
 from src import utils
 
 if _gimp_modules_available:
@@ -207,7 +207,7 @@ def _init_config_per_procedure(config: _Config):
   else:
     config.DEFAULT_SOURCE = None
 
-  logging.log_output(
+  loglib.log_output(
     config.STDOUT_LOG_HANDLES,
     config.STDERR_LOG_HANDLES,
     config.PLUGINS_LOG_DIRPATHS,

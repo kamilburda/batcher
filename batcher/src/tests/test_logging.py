@@ -5,7 +5,7 @@ import unittest.mock as mock
 
 import parameterized
 
-from src import logging
+from src import loglib
 
 
 class TestCreateLogFile(unittest.TestCase):
@@ -26,8 +26,8 @@ class TestCreateLogFile(unittest.TestCase):
     ('invalid_file',
      IOError(), [None, None], None, 2),
   ])
-  @mock.patch('src.logging.os.makedirs')
-  @mock.patch('src.logging.open')
+  @mock.patch('src.loglib.os.makedirs')
+  @mock.patch('src.loglib.open')
   def test_create_log_file(
         self,
         _test_case_suffix,
@@ -43,7 +43,7 @@ class TestCreateLogFile(unittest.TestCase):
     mock_io_open.side_effect = io_open_side_effect
     mock_makedirs.side_effect = makedirs_side_effect
 
-    log_file = logging.create_log_file(log_dirpaths, log_filename)
+    log_file = loglib.create_log_file(log_dirpaths, log_filename)
     
     self.assertEqual(log_file, expected_result)
     self.assertEqual(mock_makedirs.call_count, expected_num_calls_makedirs)
@@ -56,7 +56,7 @@ class TestTee(unittest.TestCase):
     self.string_files = [io.StringIO()]
 
   def test_write(self):
-    tee = logging.Tee('stdout', log_header_title='Test Header')
+    tee = loglib.Tee('stdout', log_header_title='Test Header')
     tee.start(self.string_files)
 
     print('Hello')
@@ -67,7 +67,7 @@ class TestTee(unittest.TestCase):
     self.assertTrue(self.string_files[0].getvalue().endswith('Hello\nHi There Again\n'))
 
   def test_stop(self):
-    tee_stdout = logging.Tee(
+    tee_stdout = loglib.Tee(
       'stdout',
       log_header_title='Test Header')
 
@@ -87,4 +87,4 @@ class TestTee(unittest.TestCase):
 
   def test_invalid_stream(self):
     with self.assertRaises(ValueError):
-      logging.Tee('invalid_stream', log_header_title='Test Header')
+      loglib.Tee('invalid_stream', log_header_title='Test Header')
