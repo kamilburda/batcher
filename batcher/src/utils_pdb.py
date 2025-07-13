@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import contextlib
 import inspect
 import os
-from typing import List, Optional, Tuple, Union
+from typing import Any, Generator, List, Optional, Tuple, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -521,7 +521,7 @@ def compare_layers(
 @contextlib.contextmanager
 def redirect_messages(
       message_handler: Gimp.MessageHandlerType = Gimp.MessageHandlerType.MESSAGE_BOX
-) -> contextlib.AbstractContextManager:
+) -> Generator[None, Any, None]:
   """Temporarily redirects GIMP messages to the specified message handler.
   
   Use this function as a context manager:

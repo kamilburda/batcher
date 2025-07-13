@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
-from typing import Optional
+from typing import Any, Generator, Optional
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -490,7 +490,7 @@ class _ActionLocker:
     self._tokens = collections.defaultdict(int)
   
   @contextlib.contextmanager
-  def lock_temp(self, key: str) -> contextlib.AbstractContextManager:
+  def lock_temp(self, key: str) -> Generator[None, Any, None]:
     self.lock(key)
     try:
       yield
