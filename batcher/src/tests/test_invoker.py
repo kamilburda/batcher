@@ -1,3 +1,4 @@
+import contextlib
 import unittest
 
 import parameterized
@@ -43,35 +44,33 @@ def append_to_list_via_generator_finite(list_, arg):
   list_.append(arg)
 
 
+@contextlib.contextmanager
 def append_to_list_before(list_, arg):
   list_.append(arg)
   yield
 
 
+@contextlib.contextmanager
 def append_to_list_before_and_after(list_, arg):
   list_.append(arg)
-  yield
-  list_.append(arg)
+  try:
+    yield
+  finally:
+    list_.append(arg)
 
 
-def append_to_list_before_and_after_invoke_twice(list_, arg):
-  list_.append(arg)
-  yield
-  yield
-  list_.append(arg)
+class AppendToListBeforeAndAfterContextManager:
 
+  def __init__(self, list_, arg):
+    self._list = list_
+    self._arg = arg
 
-def append_to_list_before_middle_after_invoke_twice(list_, arg):
-  list_.append(arg)
-  yield
-  list_.append(arg)
-  yield
-  list_.append(arg)
+  def __enter__(self):
+    self._list.append(self._arg)
 
-
-def append_to_list_again(list_):
-  arg = yield
-  list_.append(arg)
+  def __exit__(self, exc_type, exc_val, exc_tb):
+    self._list.append(self._arg)
+    return False
 
 
 class InvokerTestCase(unittest.TestCase):
@@ -96,7 +95,7 @@ class TestInvoker(InvokerTestCase):
      ['main', 'additional']
      ),
   ])
-  def test_add(self, test_case_suffix, groups, list_commands_groups):
+  def test_add(self, _test_case_suffix, groups, list_commands_groups):
     test_list = []
     
     self.invoker.add(append_test, groups, args=[test_list])
@@ -250,9 +249,6 @@ class TestInvoker(InvokerTestCase):
     additional_invoker = invoker_.Invoker()
     self.invoker.add(additional_invoker)
     self.assertTrue(self.invoker.contains(additional_invoker))
-    
-    self.invoker.add(append_to_list_again, args=[test_list], foreach=True)
-    self.assertTrue(self.invoker.contains(append_to_list_again, foreach=True))
   
   def test_list_commands_non_existing_group(self):
     self.assertIsNone(self.invoker.list_commands('non_existing_group'))
@@ -627,7 +623,7 @@ class TestInvokerInvokeCommands(InvokerTestCase):
   ])
   def test_invoke_single_command(
         self,
-        test_case_suffix,
+        _test_case_suffix,
         command,
         add_args,
         invoke_args,
@@ -805,10 +801,6 @@ class TestInvokerInvokeCommands(InvokerTestCase):
 class TestInvokerInvokeForeachCommands(InvokerTestCase):
   
   @parameterized.parameterized.expand([
-    ('default',
-     append_to_list, append_to_list, [[1], [2]], [3],
-     [1, 3, 2, 3]),
-    
     ('before_command',
      append_to_list, append_to_list_before, [[1], [2]], [3],
      [3, 1, 3, 2]),
@@ -816,14 +808,14 @@ class TestInvokerInvokeForeachCommands(InvokerTestCase):
     ('before_and_after_command',
      append_to_list, append_to_list_before_and_after, [[1], [2]], [3],
      [3, 1, 3, 3, 2, 3]),
-    
-    ('before_and_after_command_multiple_times',
-     append_to_list, append_to_list_before_and_after_invoke_twice, [[1], [2]], [3],
-     [3, 1, 1, 3, 3, 2, 2, 3]),
+
+    ('before_and_after_command_with_class',
+     append_to_list, AppendToListBeforeAndAfterContextManager, [[1], [2]], [3],
+     [3, 1, 3, 3, 2, 3]),
   ])
-  def test_invoke_single_foreach(
+  def test_invoke_single_foreach_command(
         self,
-        test_case_suffix,
+        _test_case_suffix,
         command,
         foreach_command,
         commands_args,
@@ -841,28 +833,23 @@ class TestInvokerInvokeForeachCommands(InvokerTestCase):
     self.assertListEqual(test_list, expected_result)
   
   @parameterized.parameterized.expand([
-    ('simple',
-     append_to_list, [append_to_list_before, append_to_list],
-     [[1], [2]], [[3], [4]],
-     [3, 1, 4, 3, 2, 4]),
-    
-    ('complex',
+    ('before_twice_after_once',
      append_to_list,
-     [append_to_list_before_and_after, append_to_list_before_and_after_invoke_twice],
-     [[1], [2]], [[3], [4]],
-     [3, 4, 1, 3, 1, 4,
-      3, 4, 2, 3, 2, 4]),
-    
-    ('even_more_complex',
+     [append_to_list_before, append_to_list_before_and_after],
+     [[1], [2]],
+     [[3], [4]],
+     [3, 4, 1, 4, 3, 4, 2, 4]),
+
+    ('before_twice_after_once_with_class',
      append_to_list,
-     [append_to_list_before_and_after, append_to_list_before_middle_after_invoke_twice],
-     [[1], [2]], [[3], [4]],
-     [3, 4, 1, 3, 4, 1, 4,
-      3, 4, 2, 3, 4, 2, 4]),
+     [append_to_list_before, AppendToListBeforeAndAfterContextManager],
+     [[1], [2]],
+     [[3], [4]],
+     [3, 4, 1, 4, 3, 4, 2, 4]),
   ])
-  def test_invoke_multiple_foreachs(
+  def test_invoke_multiple_foreach_commands(
         self,
-        test_case_suffix,
+        _test_case_suffix,
         command,
         foreach_commands,
         commands_args,
@@ -881,17 +868,7 @@ class TestInvokerInvokeForeachCommands(InvokerTestCase):
     
     self.assertListEqual(test_list, expected_result)
   
-  def test_invoke_foreach_use_return_value_from_command(self):
-    test_list = []
-    self.invoker.add(append_to_list, args=[test_list, 1])
-    self.invoker.add(append_to_list, args=[test_list, 2])
-    self.invoker.add(append_to_list_again, args=[test_list], foreach=True)
-    
-    self.invoker.invoke()
-    
-    self.assertListEqual(test_list, [1, 1, 2, 2])
-  
-  def test_invoke_foreach_does_nothing_in_another_invoker(self):
+  def test_invoke_foreach_command_does_nothing_in_another_invoker(self):
     test_list = []
     another_invoker = invoker_.Invoker()
     another_invoker.add(append_to_list, args=[test_list, 1])
@@ -899,15 +876,17 @@ class TestInvokerInvokeForeachCommands(InvokerTestCase):
     
     self.invoker.add(another_invoker)
     self.invoker.add(append_to_list, args=[test_list, 3])
-    self.invoker.add(append_to_list_again, args=[test_list], foreach=True)
-    
+    self.invoker.add(append_to_list, args=[test_list, 4])
+    self.invoker.add(append_to_list_before, args=[test_list, 2], foreach=True)
+
     self.invoker.invoke()
     
-    self.assertListEqual(test_list, [1, 2, 3, 3])
+    self.assertListEqual(test_list, [1, 2, 2, 3, 2, 4])
   
   def test_invoke_foreach_invoker(self):
     test_list = []
-    
+
+    @contextlib.contextmanager
     def append_to_list_before_from_invoker():
       another_invoker.invoke()
       yield
@@ -924,6 +903,33 @@ class TestInvokerInvokeForeachCommands(InvokerTestCase):
     self.invoker.invoke()
     
     self.assertListEqual(test_list, [3, 4, 1, 3, 4, 2])
+
+  def test_invoke_foreach_command_is_still_finished_on_error(self):
+    test_list = []
+
+    def raise_error():
+      raise ValueError
+
+    self.invoker.add(append_to_list, args=[test_list, 1])
+    self.invoker.add(raise_error)
+    self.invoker.add(append_to_list, args=[test_list, 3])
+    self.invoker.add(append_to_list_before_and_after, args=[test_list, 2], foreach=True)
+
+    try:
+      self.invoker.invoke()
+    except ValueError:
+      pass
+
+    self.assertListEqual(test_list, [2, 1, 2, 2, 2])
+
+  def test_invoke_foreach_command_not_as_context_manager_raises_error(self):
+    test_list = []
+
+    self.invoker.add(append_to_list, args=[test_list, 1])
+    self.invoker.add(append_to_list, args=[test_list, 1], foreach=True)
+
+    with self.assertRaises(TypeError):
+      self.invoker.invoke()
 
 
 class TestInvokerInvokeWithInvoker(InvokerTestCase):

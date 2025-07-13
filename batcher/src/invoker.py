@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import collections
 from collections.abc import Iterable
+import contextlib
 import inspect
 import itertools
-from typing import Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Generator, List, Optional, Union
 
 
 class Invoker:
@@ -48,7 +49,9 @@ class Invoker:
   
   def add(
         self,
-        command: Union[Callable, Invoker],
+        command: Union[
+          Callable, Invoker, contextlib.AbstractContextManager, Generator[None, Any, None],
+        ],
         groups: Union[None, str, List[str]] = None,
         args: Optional[Iterable] = None,
         kwargs: Optional[Dict] = None,
@@ -112,41 +115,49 @@ class Invoker:
     To prevent activating generators and to treat generator functions as regular
     functions, pass ``run_generator=False``.
     
-    If ``foreach`` is ``True`` and the command is a function, the command is
-    treated as a "for-each" command. By default, a for-each command is
-    invoked after each regular command (function or `Invoker` instance). To
-    customize this behavior, use the ``yield`` statement in the for-each command
-    to specify where it is desired to invoke each command.
-    For example:
-    
+    If ``foreach`` is ``True``, the command is a "for-each" command
+    containing code executed before/after each command. A for-each command
+    must be a context manager (e.g. a class defining ``__enter__()`` and
+    ``__exit__()`` methods or a function decorated with
+    `contextlib.contextmanager`) or an `Invoker` instance. For example:
+
+      @contextlib.contextmanager
       def foo():
         print('bar')
-        yield
-        print('baz')
+        try:
+          yield
+        finally:
+          print('baz')
     
-    first prints ``'bar'``, then invokes the command and finally prints
-    ``'baz'``. Multiple ``yield`` statements can be specified to invoke the
-    wrapped command multiple times.
+    first prints ``'bar'``, then invokes the command and then prints
+    ``'baz'``.
     
     If multiple for-each commands are added, they are invoked in the order
     they were added by this method. For example:
-      
+
+      @contextlib.contextmanager
       def foo1():
         print('bar1')
-        yield
-        print('baz1')
-      
+        try:
+          yield
+        finally:
+          print('baz1')
+
+      @contextlib.contextmanager
       def foo2():
         print('bar2')
-        yield
-        print('baz2')
+        try:
+          yield
+        finally:
+          print('baz2')
     
     will print ``'bar1'``, ``'bar2'``, then invoke the command (only once), and
     then print ``'baz1'`` and ``'baz2'``.
     
     To make an `Invoker` instance behave as a for-each command, wrap
-    the instance in a function as shown above. For example:
-      
+    the instance in a context manager as shown above. For example:
+
+      @contextlib.contextmanager
       def invoke_before_each_command():
         invoker.invoke()
         yield
@@ -163,7 +174,7 @@ class Invoker:
     
     if callable(command):
       if not foreach:
-        add_command_func = self._add_command
+        add_command_func = self._add_regular_command
       else:
         add_command_func = self._add_foreach_command
       
@@ -251,32 +262,15 @@ class Invoker:
         return tuple(args)
     
     def _invoke_command_with_foreach_commands(item_, group_):
-      command_generators = [
-        _prepare_foreach_command(*foreach_item.command)
-        for foreach_item in self._foreach_commands[group_]]
-      
-      _invoke_foreach_commands_once(command_generators)
-      
-      while command_generators:
-        result_from_command = _invoke_command(item_, group_)
-        _invoke_foreach_commands_once(command_generators, result_from_command)
-        
-        if item_.should_be_removed_from_group:
-          self.remove(item_.command_id, [group_])
-          item_.should_be_removed_from_group = False
-          return
-    
-    def _invoke_foreach_commands_once(command_generators, result_from_command=None):
-      command_generators_to_remove = []
-      
-      for command_generator in command_generators:
-        try:
-          command_generator.send(result_from_command)
-        except StopIteration:
-          command_generators_to_remove.append(command_generator)
-      
-      for command_generator_to_remove in command_generators_to_remove:
-        command_generators.remove(command_generator_to_remove)
+      with contextlib.ExitStack() as stack:
+        for foreach_item in self._foreach_commands[group_]:
+          try:
+            stack.enter_context(_prepare_foreach_command(*foreach_item.command))
+          except Exception as e:
+            raise TypeError(
+              f'for-each command {foreach_item.command[0]} is not a context manager') from e
+
+        return _invoke_command(item_, group_)
 
     def _invoke_invoker(invoker, group_):
       invoker.invoke([group_], additional_args, additional_kwargs, additional_args_position)
@@ -577,7 +571,7 @@ class Invoker:
   
   def _add_command_to_group(self, command_item, group, position):
     if command_item.command_type == self._TYPE_COMMAND:
-      self._add_command(
+      self._add_regular_command(
         command_item.command_id,
         command_item.command[0],
         group,
@@ -596,63 +590,67 @@ class Invoker:
         command_item.run_generator)
     elif command_item.command_type == self._TYPE_INVOKER:
       self._add_invoker(command_item.command_id, command_item.command, group, position)
-  
-  def _add_command(
+
+  def _add_regular_command(
         self, command_id, command, group, command_args, command_kwargs, position, run_generator):
+    self._add_command(
+      command_id,
+      command,
+      group,
+      command_args,
+      command_kwargs,
+      position,
+      run_generator,
+      self._TYPE_COMMAND,
+      self._commands,
+      self._command_functions,
+    )
+  
+  def _add_foreach_command(
+        self, command_id, command, group, command_args, command_kwargs, position, run_generator):
+    self._add_command(
+      command_id,
+      command,
+      group,
+      command_args,
+      command_kwargs,
+      position,
+      run_generator,
+      self._TYPE_FOREACH_COMMAND,
+      self._foreach_commands,
+      self._foreach_command_functions,
+    )
+
+  def _add_command(
+        self,
+        command_id,
+        command,
+        group,
+        command_args,
+        command_kwargs,
+        position,
+        run_generator,
+        command_type,
+        commands_dict,
+        command_functions_dict,
+  ):
     self._init_group(group)
-    
+
     command_item = self._set_command_item(
       command_id,
       group,
       (command, command_args, command_kwargs),
-      self._TYPE_COMMAND,
+      command_type,
       command,
       run_generator)
-    
+
     if position is None:
-      self._commands[group].append(command_item)
+      commands_dict[group].append(command_item)
     else:
-      self._commands[group].insert(position, command_item)
-    
-    self._command_functions[group][command] += 1
-  
-  def _add_foreach_command(
-        self,
-        command_id,
-        foreach_command,
-        group,
-        foreach_command_args,
-        foreach_command_kwargs,
-        position,
-        run_generator):
-    self._init_group(group)
-    
-    if not inspect.isgeneratorfunction(foreach_command):
-      def invoke_foreach_command_after_command(*args, **kwargs):
-        yield
-        foreach_command(*args, **kwargs)
-      
-      foreach_command_generator_function = invoke_foreach_command_after_command
-    else:
-      foreach_command_generator_function = foreach_command
-    
-    command_item = self._set_command_item(
-      command_id,
-      group,
-      (foreach_command_generator_function,
-       foreach_command_args,
-       foreach_command_kwargs),
-      self._TYPE_FOREACH_COMMAND,
-      foreach_command,
-      run_generator)
-    
-    if position is None:
-      self._foreach_commands[group].append(command_item)
-    else:
-      self._foreach_commands[group].insert(position, command_item)
-    
-    self._foreach_command_functions[group][foreach_command] += 1
-  
+      commands_dict[group].insert(position, command_item)
+
+    command_functions_dict[group][command] += 1
+
   def _add_invoker(self, command_id, invoker, group, position):
     self._init_group(group)
     

@@ -1333,20 +1333,25 @@ def _set_selected_and_current_layer(batcher):
           image.set_selected_layers([image_layers[0]])
 
 
+@contextlib.contextmanager
 def _set_selected_and_current_layer_after_command(batcher):
-  yield
+  try:
+    yield
+  finally:
+    if batcher.current_action is not None and batcher.current_action['enabled'].value:
+      _set_selected_and_current_layer(batcher)
 
-  if batcher.current_action is not None and batcher.current_action['enabled'].value:
-    _set_selected_and_current_layer(batcher)
 
-
+@contextlib.contextmanager
 def _sync_item_name_and_layer_name(layer_batcher):
-  yield
+  try:
+    yield
+  finally:
+    if layer_batcher.process_names and not layer_batcher.is_preview:
+      layer_batcher.current_item.name = layer_batcher.current_layer.get_name()
 
-  if layer_batcher.process_names and not layer_batcher.is_preview:
-    layer_batcher.current_item.name = layer_batcher.current_layer.get_name()
 
-
+@contextlib.contextmanager
 def _preserve_layer_locks_between_commands(layer_batcher):
   # We assume `edit_mode` is `True`, we can therefore safely use `Item.raw`.
   # We need to use `Item.raw` for parents as well.
@@ -1380,18 +1385,19 @@ def _preserve_layer_locks_between_commands(layer_batcher):
   if lock_alpha:
     item.raw.set_lock_alpha(False)
 
-  yield
+  try:
+    yield
+  finally:
+    for item_or_parent, lock_content in locks_content.items():
+      if lock_content and item_or_parent.raw.is_valid():
+        item_or_parent.raw.set_lock_content(lock_content)
 
-  for item_or_parent, lock_content in locks_content.items():
-    if lock_content and item_or_parent.raw.is_valid():
-      item_or_parent.raw.set_lock_content(lock_content)
+    for item_or_parent, lock_visibility in locks_visibility.items():
+      if lock_visibility and item_or_parent.raw.is_valid():
+        item_or_parent.raw.set_lock_visibility(lock_visibility)
 
-  for item_or_parent, lock_visibility in locks_visibility.items():
-    if lock_visibility and item_or_parent.raw.is_valid():
-      item_or_parent.raw.set_lock_visibility(lock_visibility)
-
-  if item.raw.is_valid():
-    if lock_position:
-      item.raw.set_lock_position(lock_position)
-    if lock_alpha:
-      item.raw.set_lock_alpha(lock_alpha)
+    if item.raw.is_valid():
+      if lock_position:
+        item.raw.set_lock_position(lock_position)
+      if lock_alpha:
+        item.raw.set_lock_alpha(lock_alpha)
