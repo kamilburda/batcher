@@ -29,19 +29,13 @@ def update_dict(dict_, **kwargs):
   dict_.update(kwargs)
 
 
-def append_to_list_via_generator(list_, arg):
-  list_.append(1)
-  
-  while True:
-    (list_, arg), _unused = yield
+class AppendToListCommand(invoker_.CallableCommand):
+
+  def _initialize(self, list_, arg):
+    list_.append(1)
+
+  def _process(self, list_, arg):
     list_.append(arg)
-
-
-def append_to_list_via_generator_finite(list_, arg):
-  list_.append(1)
-  
-  (list_, arg), _unused = yield
-  list_.append(arg)
 
 
 @contextlib.contextmanager
@@ -739,63 +733,15 @@ class TestInvokerInvokeCommands(InvokerTestCase):
     
     self.assertEqual(test_list, ['one', 'two', 'four'])
   
-  def test_invoke_with_generator(self):
+  def test_invoke_with_callable_command_and_initialization(self):
     test_list = []
     
-    self.invoker.add(append_to_list_via_generator, args=[test_list])
-    self.invoker.invoke(additional_args=[2])  # Should be ignored for this (first) call
-    self.invoker.invoke(additional_args=[2])
+    self.invoker.add(AppendToListCommand(), args=[test_list])
     self.invoker.invoke(additional_args=[3])
-    
-    self.assertEqual(test_list, [1, 2, 3])
-  
-  def test_invoke_with_generator_without_running_generator(self):
-    test_list = []
-    
-    self.invoker.add(append_to_list_via_generator, args=[test_list], run_generator=False)
     self.invoker.invoke(additional_args=[2])
-    self.invoker.invoke(additional_args=[2])
-    self.invoker.invoke(additional_args=[3])
+    self.invoker.invoke(additional_args=[4])
     
-    self.assertEqual(test_list, [])
-  
-  def test_invoke_with_generator_wrapped_in_regular_function(self):
-    def _func(*args):
-      return append_to_list_via_generator(*args)
-    
-    test_list = []
-    
-    self.invoker.add(_func, args=[test_list])
-    self.invoker.invoke(additional_args=[2])  # Should be ignored for this (first) call
-    self.invoker.invoke(additional_args=[2])
-    self.invoker.invoke(additional_args=[3])
-    
-    self.assertEqual(test_list, [1, 2, 3])
-  
-  def test_invoke_with_generator_finite(self):
-    test_list = []
-    
-    self.invoker.add(append_to_list_via_generator_finite, args=[test_list])
-    self.invoker.invoke(additional_args=[2])  # Should be ignored for this (first) call
-    self.invoker.invoke(additional_args=[2])
-    self.invoker.invoke(additional_args=[3])  # Should do nothing
-    
-    self.assertEqual(test_list, [1, 2])
-  
-  def test_invoke_with_generator_finite_multiple_groups(self):
-    test_list = []
-    
-    self.invoker.add(append_to_list_via_generator_finite, groups=['a', 'b'], args=[test_list])
-    self.invoker.invoke(['a'], additional_args=[2])
-    self.invoker.invoke(['a'], additional_args=[2])
-    self.invoker.invoke(['a'], additional_args=[3])  # Should do nothing
-    
-    # Should do nothing - generator is "finished" regardless of the group
-    self.invoker.invoke(['b'], additional_args=[4])
-    self.invoker.invoke(['b'], additional_args=[5])
-    self.invoker.invoke(['b'], additional_args=[5])
-    
-    self.assertEqual(test_list, [1, 2, 1, 5])
+    self.assertEqual(test_list, [1, 3, 2, 4])
 
 
 class TestInvokerInvokeForeachCommands(InvokerTestCase):

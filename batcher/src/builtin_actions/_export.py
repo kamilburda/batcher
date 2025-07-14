@@ -2,7 +2,7 @@
 
 import collections
 import os
-from typing import Callable, Dict, Generator, Optional, Union, Tuple
+from typing import Callable, Dict, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -13,6 +13,7 @@ from src import builtin_commands_common
 from src import exceptions
 from src import file_formats as file_formats_
 from src import initnotifier
+from src import invoker as invoker_
 from src import itemtree
 from src import overwrite
 from src import pypdb
@@ -34,7 +35,7 @@ __all__ = [
   'FileFormatModes',
   'ExportModes',
   'ExportStatuses',
-  'export',
+  'ExportCommand',
   'get_export_function',
   'on_after_add_export_action',
   'set_sensitive_for_image_name_pattern_in_export_for_default_export_action',
@@ -75,56 +76,60 @@ class ExportStatuses:
   ) = (0, 1, 2, 3)
 
 
-def export(
-      batcher: 'src.core.Batcher',
-      output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
-      file_extension: str = 'png',
-      file_format_mode: str = FileFormatModes.USE_EXPLICIT_VALUES,
-      file_format_export_options: Optional[Dict] = None,
-      overwrite_mode: str = overwrite.OverwriteModes.ASK,
-      export_mode: str = ExportModes.EACH_ITEM,
-      single_image_name_pattern: Optional[str] = None,
-      use_file_extension_in_item_name: bool = False,
-      convert_file_extension_to_lowercase: bool = False,
-      use_original_modification_date: bool = False,
-) -> Generator[None, None, None]:
-  if file_format_export_options is None:
-    file_format_export_options = {}
+class ExportCommand(invoker_.CallableCommand):
 
-  item_uniquifier = uniquifier.ItemUniquifier()
-  file_extension_properties = _FileExtensionProperties('export')
-  processed_parents = set()
-  default_file_extension = file_extension
-  image_copies = []
-  multi_layer_images = []
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, batcher: 'src.core.Batcher', **kwargs):
+    self._output_directory = Gio.file_new_for_path(utils.get_default_dirpath())
+    self._file_extension = 'png'
+    self._file_format_mode = FileFormatModes.USE_EXPLICIT_VALUES
+    self._file_format_export_options = {}
+    self._overwrite_mode = overwrite.OverwriteModes.ASK
+    self._export_mode = ExportModes.EACH_ITEM
+    self._single_image_name_pattern = None
+    self._use_file_extension_in_item_name = False
+    self._convert_file_extension_to_lowercase = False
+    self._use_original_modification_date = False
 
-  if export_mode == ExportModes.SINGLE_IMAGE and single_image_name_pattern is not None:
-    renamer_for_single_image = renamer_.ItemRenamer(single_image_name_pattern)
-  else:
-    renamer_for_single_image = None
+    self._assign_to_attributes_from_kwargs(kwargs)
 
-  batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [multi_layer_images])
-  batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
+    self._item_uniquifier = uniquifier.ItemUniquifier()
+    self._file_extension_properties = _FileExtensionProperties('export')
+    self._processed_parents = set()
+    self._default_file_extension = self._file_extension
+    self._image_copies = []
+    self._multi_layer_images = []
 
-  while True:
+    if (self._export_mode == ExportModes.SINGLE_IMAGE
+        and self._single_image_name_pattern is not None):
+      self._renamer_for_single_image = renamer_.ItemRenamer(self._single_image_name_pattern)
+    else:
+      self._renamer_for_single_image = None
+
+    batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._multi_layer_images])
+    batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
+
+  def _process(self, batcher: 'src.core.Batcher', **kwargs):
+    self._assign_to_attributes_from_kwargs(kwargs)
+
     item = batcher.current_item
-    current_file_extension = default_file_extension
+    current_file_extension = self._default_file_extension
 
     item_to_process = item
     layer_to_process = batcher.current_layer
 
-    if export_mode != ExportModes.EACH_ITEM and batcher.process_export:
-      if not multi_layer_images:
+    if self._export_mode != ExportModes.EACH_ITEM and batcher.process_export:
+      if not self._multi_layer_images:
         multi_layer_image = utils_pdb.create_empty_image_copy(batcher.current_image)
-        multi_layer_images.append(multi_layer_image)
+        self._multi_layer_images.append(multi_layer_image)
       else:
-        multi_layer_image = multi_layer_images[-1]
+        multi_layer_image = self._multi_layer_images[-1]
     else:
       multi_layer_image = None
 
     if batcher.edit_mode and batcher.process_export:
       image_copy, layer_to_process = batcher.create_copy(batcher.current_image, layer_to_process)
-      image_copies.append(image_copy)
+      self._image_copies.append(image_copy)
 
       if layer_to_process is None:
         layer_to_process = batcher.current_layer
@@ -137,117 +142,120 @@ def export(
       image_to_process = image_copy
     else:
       image_to_process = multi_layer_image
-    
-    if export_mode == ExportModes.SINGLE_IMAGE:
+
+    if self._export_mode == ExportModes.SINGLE_IMAGE:
       if batcher.process_export:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
         layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
 
       if _get_next_item(batcher, item) is not None:
-        _remove_image_copies_for_edit_mode(batcher, image_copies)
-        yield
-        continue
+        _remove_image_copies_for_edit_mode(batcher, self._image_copies)
+        return
       else:
         item_to_process = _NameOnlyItem(None, itemtree.TYPE_ITEM, [], [], None, None)
-        if single_image_name_pattern is not None:
-          item_to_process.name = renamer_for_single_image.rename(batcher, item_to_process)
+        if self._single_image_name_pattern is not None:
+          item_to_process.name = self._renamer_for_single_image.rename(batcher, item_to_process)
         else:
           item_to_process.name = item.name
-    elif export_mode == ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER:
+    elif self._export_mode == ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER:
       if batcher.process_export:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
         layer_to_process = _copy_layer(layer_to_process, image_to_process, item)
-      
+
       current_top_level_item = _get_top_level_item(item)
       next_top_level_item = _get_top_level_item(_get_next_item(batcher, item))
-      
+
       if current_top_level_item == next_top_level_item:
-        _remove_image_copies_for_edit_mode(batcher, image_copies)
-        yield
-        continue
+        _remove_image_copies_for_edit_mode(batcher, self._image_copies)
+        return
       else:
         item_to_process = current_top_level_item
 
     if batcher.process_names:
       item_to_process.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
 
-      if use_file_extension_in_item_name:
+      if self._use_file_extension_in_item_name:
         current_file_extension = _get_current_file_extension(
-          item_to_process, default_file_extension, file_extension_properties)
+          item_to_process, self._default_file_extension, self._file_extension_properties)
 
-      if convert_file_extension_to_lowercase:
+      if self._convert_file_extension_to_lowercase:
         current_file_extension = current_file_extension.lower()
-      
-      _process_parent_names(item_to_process, item_uniquifier, processed_parents)
+
+      _process_parent_names(item_to_process, self._item_uniquifier, self._processed_parents)
       _process_item_name(
         item_to_process,
-        item_uniquifier,
+        self._item_uniquifier,
         current_file_extension,
-        default_file_extension,
+        self._default_file_extension,
         force_default_file_extension=False)
-    
+
     if batcher.process_export:
-      if export_mode != ExportModes.EACH_ITEM:
+      if self._export_mode != ExportModes.EACH_ITEM:
         image_to_process.resize_to_layers()
 
-      if overwrite_mode == overwrite.OverwriteModes.ASK:
+      if self._overwrite_mode == overwrite.OverwriteModes.ASK:
         overwrite_chooser = batcher.overwrite_chooser
       else:
-        overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(overwrite_mode)
+        overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
 
       chosen_overwrite_mode, export_status = _export_item(
         batcher,
         item_to_process,
         image_to_process,
         layer_to_process,
-        output_directory,
-        file_format_mode,
-        file_format_export_options,
-        default_file_extension,
-        file_extension_properties,
+        self._output_directory,
+        self._file_format_mode,
+        self._file_format_export_options,
+        self._default_file_extension,
+        self._file_extension_properties,
         overwrite_chooser,
-        use_original_modification_date,
+        self._use_original_modification_date,
       )
-      
+
       if export_status == ExportStatuses.USE_DEFAULT_FILE_EXTENSION:
         if batcher.process_names:
           _process_item_name(
             item_to_process,
-            item_uniquifier,
+            self._item_uniquifier,
             current_file_extension,
-            default_file_extension,
+            self._default_file_extension,
             force_default_file_extension=True)
-        
+
         if batcher.process_export:
           chosen_overwrite_mode, _unused = _export_item(
             batcher,
             item_to_process,
             image_to_process,
             layer_to_process,
-            output_directory,
-            file_format_mode,
-            file_format_export_options,
-            default_file_extension,
-            file_extension_properties,
+            self._output_directory,
+            self._file_format_mode,
+            self._file_format_export_options,
+            self._default_file_extension,
+            self._file_extension_properties,
             overwrite_chooser,
-            use_original_modification_date,
+            self._use_original_modification_date,
           )
-      
+
       if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
-        file_extension_properties[
+        self._file_extension_properties[
           fileext.get_file_extension(
             builtin_actions_utils.get_item_export_name(item_to_process))
         ].processed_count += 1
         # Append the original raw item
         # noinspection PyProtectedMember
         batcher._exported_items.append(item_to_process)
-    
+
     if multi_layer_image is not None:
-      _remove_multi_layer_images(multi_layer_images)
-    
-    _remove_image_copies_for_edit_mode(batcher, image_copies)
-    
-    yield
+      _remove_multi_layer_images(self._multi_layer_images)
+
+    _remove_image_copies_for_edit_mode(batcher, self._image_copies)
+
+  def _assign_to_attributes_from_kwargs(self, kwargs):
+    for name, value in kwargs.items():
+      if not hasattr(self, f'_{name}'):
+        raise ValueError(f'{type(self)}: attribute "_{name}" is not defined')
+
+      setattr(self, f'_{name}', value)
 
 
 def _delete_images_on_cleanup(batcher, images):
@@ -803,7 +811,7 @@ _EXPORT_OVERWRITE_MODES_LIST = [
 
 EXPORT_FOR_CONVERT_DICT = {
   'name': 'export_for_convert',
-  'function': export,
+  'function': ExportCommand,
   'display_name': _('Also export as...'),
   'description': _('Exports an image to another file format.'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],

@@ -4,6 +4,7 @@ import abc
 import collections
 from collections.abc import Iterable
 import contextlib
+import inspect
 import os
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -649,10 +650,10 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     if command['origin'].value == 'builtin':
       if 'action' in command.tags:
-        function = builtin_actions.BUILTIN_ACTIONS_FUNCTIONS[
+        function_or_class = builtin_actions.BUILTIN_ACTIONS_FUNCTIONS[
           command['orig_name'].value]
       elif 'condition' in command.tags:
-        function = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
+        function_or_class = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
           command['orig_name'].value]
       else:
         raise exceptions.CommandError(
@@ -662,7 +663,7 @@ class Batcher(metaclass=abc.ABCMeta):
           None)
     elif command['origin'].value in ['gimp_pdb', 'gegl']:
       if command['function'].value in pdb:
-        function = pdb[command['function'].value]
+        function_or_class = pdb[command['function'].value]
       else:
         if command['enabled'].value:
           message = f'PDB procedure "{command["function"].value}" not found'
@@ -682,11 +683,17 @@ class Batcher(metaclass=abc.ABCMeta):
         None,
         None)
 
-    if function is None:
+    if function_or_class is None:
       return
 
     if tags is not None and not any(tag in command.tags for tag in tags):
       return
+
+    if (inspect.isclass(function_or_class)
+        and issubclass(function_or_class, invoker_.CallableCommand)):
+      function = function_or_class()
+    else:
+      function = function_or_class
 
     processed_function = self._get_processed_function(command)
 
@@ -1104,20 +1111,22 @@ class ImageBatcher(Batcher):
   def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_actions.rename_image_for_convert,
+        builtin_actions.RenameImageForConvertCommand(),
         groups=command_groups,
         args=[self._name_pattern])
 
   def _add_default_export_action(self, command_groups):
     if not self._edit_mode:
+      export_kwargs = dict(
+        output_directory=self._output_directory,
+        file_extension=self._file_extension,
+      )
+      export_kwargs.update(self._more_export_options)
+
       self._invoker.add(
-        builtin_actions.export,
+        builtin_actions.ExportCommand(),
         groups=command_groups,
-        args=[
-          self._output_directory,
-          self._file_extension,
-        ],
-        kwargs=self._more_export_options,
+        kwargs=export_kwargs,
       )
 
   def _process_item_with_commands(self):
@@ -1253,20 +1262,22 @@ class LayerBatcher(Batcher):
   def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_actions.rename_layer,
+        builtin_actions.RenameLayerCommand(),
         groups=command_groups,
         args=[self._name_pattern])
   
   def _add_default_export_action(self, command_groups):
     if not self._edit_mode:
+      export_kwargs = dict(
+        output_directory=self._output_directory,
+        file_extension=self._file_extension,
+      )
+      export_kwargs.update(self._more_export_options)
+
       self._invoker.add(
-        builtin_actions.export,
+        builtin_actions.ExportCommand(),
         groups=command_groups,
-        args=[
-          self._output_directory,
-          self._file_extension,
-        ],
-        kwargs=self._more_export_options,
+        kwargs=export_kwargs,
       )
   
   def _process_item_with_commands(self):

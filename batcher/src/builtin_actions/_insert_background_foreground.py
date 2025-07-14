@@ -6,6 +6,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import invoker as invoker_
 from src import placeholders as placeholders_
 from src.procedure_groups import *
 
@@ -14,44 +15,38 @@ from src.pypdb import pdb
 
 
 __all__ = [
-  'insert_background_from_file',
-  'insert_foreground_from_file',
-  'insert_background_from_color_tags',
-  'insert_foreground_from_color_tags',
+  'InsertBackgroundFromFileCommand',
+  'InsertForegroundFromFileCommand',
+  'InsertBackgroundFromColorTagsCommand',
+  'InsertForegroundFromColorTagsCommand',
   'merge_background',
   'merge_foreground',
   'on_after_add_insert_background_foreground_for_layers',
 ]
 
 
-def insert_background_from_file(image_batcher, image_file, *_args, **_kwargs):
-  return _insert_layer_from_file(image_batcher, image_file, 'after')
+class InsertLayerFromFileCommand(invoker_.CallableCommand):
 
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, image_batcher, image_file, insert_mode):
+    self._image_copies = []
 
-def insert_foreground_from_file(image_batcher, image_file, *_args, **_kwargs):
-  return _insert_layer_from_file(image_batcher, image_file, 'before')
+    image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
 
+    if (image_file is not None
+        and image_file.get_path() is not None
+        and os.path.exists(image_file.get_path())):
+      self._image_to_insert = pdb.gimp_file_load(
+        run_mode=Gimp.RunMode.NONINTERACTIVE,
+        file=image_file)
 
-def _insert_layer_from_file(image_batcher, image_file, insert_mode):
-  image_copies = []
+      self._image_copies.append(self._image_to_insert)
+    else:
+      self._image_to_insert = None
 
-  image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [image_copies])
-
-  if (image_file is not None
-      and image_file.get_path() is not None
-      and os.path.exists(image_file.get_path())):
-    image_to_insert = pdb.gimp_file_load(
-      run_mode=Gimp.RunMode.NONINTERACTIVE,
-      file=image_file)
-
-    image_copies.append(image_to_insert)
-  else:
-    image_to_insert = None
-
-  while True:
-    if image_to_insert is None:
-      yield
-      continue
+  def _process(self, image_batcher, image_file, insert_mode):
+    if self._image_to_insert is None:
+      return
 
     image = image_batcher.current_image
     current_parent = image_batcher.current_layer.get_parent()
@@ -60,9 +55,25 @@ def _insert_layer_from_file(image_batcher, image_file, insert_mode):
     if insert_mode == 'after':
       position += 1
 
-    _insert_layers(image, image_to_insert.get_layers(), current_parent, position)
+    _insert_layers(image, self._image_to_insert.get_layers(), current_parent, position)
 
-    yield
+
+class InsertBackgroundFromFileCommand(InsertLayerFromFileCommand):
+
+  def _initialize(self, image_batcher, image_file, *_args, **_kwargs):
+    return super()._initialize(image_batcher, image_file, 'after')
+
+  def _process(self, image_batcher, image_file, *_args, **_kwargs):
+    return super()._process(image_batcher, image_file, 'after')
+
+
+class InsertForegroundFromFileCommand(InsertLayerFromFileCommand):
+
+  def _initialize(self, image_batcher, image_file, *_args, **_kwargs):
+    return super()._initialize(image_batcher, image_file, 'before')
+
+  def _process(self, image_batcher, image_file, *_args, **_kwargs):
+    return super()._process(image_batcher, image_file, 'before')
 
 
 def _delete_images_on_cleanup(_batcher, images):
@@ -72,30 +83,22 @@ def _delete_images_on_cleanup(_batcher, images):
   images.clear()
 
 
-def insert_background_from_color_tags(
-      layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
-  return _insert_tagged_layers(layer_batcher, color_tag, tagged_items, 'after')
+class InsertTaggedLayersCommand(invoker_.CallableCommand):
 
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, layer_batcher, tag, tagged_items_for_preview, insert_mode):
+    if layer_batcher.is_preview:
+      tagged_items = tagged_items_for_preview
+    else:
+      tagged_items = layer_batcher.item_tree.iter(with_folders=False, filtered=False)
 
-def insert_foreground_from_color_tags(
-      layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
-  return _insert_tagged_layers(layer_batcher, color_tag, tagged_items, 'before')
+    self._processed_tagged_items = [
+      item for item in tagged_items
+      if tag != Gimp.ColorTag.NONE and item.raw.is_valid() and item.raw.get_color_tag() == tag]
 
-
-def _insert_tagged_layers(layer_batcher, tag, tagged_items_for_preview, insert_mode):
-  if layer_batcher.is_preview:
-    tagged_items = tagged_items_for_preview
-  else:
-    tagged_items = layer_batcher.item_tree.iter(with_folders=False, filtered=False)
-
-  processed_tagged_items = [
-    item for item in tagged_items
-    if tag != Gimp.ColorTag.NONE and item.raw.is_valid() and item.raw.get_color_tag() == tag]
-  
-  while True:
-    if not processed_tagged_items:
-      yield
-      continue
+  def _process(self, layer_batcher, tag, tagged_items_for_preview, insert_mode):
+    if not self._processed_tagged_items:
+      return
 
     image = layer_batcher.current_image
     current_parent = layer_batcher.current_layer.get_parent()
@@ -104,9 +107,26 @@ def _insert_tagged_layers(layer_batcher, tag, tagged_items_for_preview, insert_m
     if insert_mode == 'after':
       position += 1
 
-    _insert_layers(image, [item.raw for item in processed_tagged_items], current_parent, position)
+    _insert_layers(
+       image, [item.raw for item in self._processed_tagged_items], current_parent, position)
 
-    yield
+
+class InsertBackgroundFromColorTagsCommand(InsertTaggedLayersCommand):
+
+  def _initialize(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+    return super()._initialize(layer_batcher, color_tag, tagged_items, 'after')
+
+  def _process(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+    return super()._process(layer_batcher, color_tag, tagged_items, 'after')
+
+
+class InsertForegroundFromColorTagsCommand(InsertTaggedLayersCommand):
+
+  def _initialize(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+    return super()._initialize(layer_batcher, color_tag, tagged_items, 'before')
+
+  def _process(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
+    return super()._process(layer_batcher, color_tag, tagged_items, 'before')
 
 
 def _insert_layers(image, layers, parent, position):
@@ -213,7 +233,7 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
 
 INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_background_for_images',
-  'function': insert_background_from_file,
+  'function': InsertBackgroundFromFileCommand,
   'display_name': _('Insert background'),
   'description': _('Inserts the specified image behind the current layer.'),
   'display_options_on_create': True,
@@ -238,7 +258,7 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
 
 INSERT_BACKGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_background_for_layers',
-  'function': insert_background_from_color_tags,
+  'function': InsertBackgroundFromColorTagsCommand,
   'display_name': _('Insert background'),
   'description': _(
     'Inserts layers having the specified color tag behind the current layer.'),
@@ -277,7 +297,7 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
 
 INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_foreground_for_images',
-  'function': insert_foreground_from_file,
+  'function': InsertForegroundFromFileCommand,
   'display_name': _('Insert foreground'),
   'description': _(
     'Inserts the specified image in front of the current layer.'),
@@ -303,7 +323,7 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
 
 INSERT_FOREGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_foreground_for_layers',
-  'function': insert_foreground_from_color_tags,
+  'function': InsertForegroundFromColorTagsCommand,
   'display_name': _('Insert foreground'),
   'description': _(
     'Inserts layers having the specified color tag in front of the current layer.'),

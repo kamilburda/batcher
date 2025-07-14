@@ -1,72 +1,86 @@
 """Built-in "Rename" action."""
 
 from src import builtin_commands_common
+from src import invoker as invoker_
 from src import renamer as renamer_
 from src.procedure_groups import *
 
 
 __all__ = [
-  'rename_image_for_convert',
-  'rename_image_for_export_images',
-  'rename_image_for_edit_and_save_images',
-  'rename_layer',
+  'RenameImageForConvertCommand',
+  'RenameImageForExportImagesCommand',
+  'RenameImageForEditAndSaveImagesCommand',
+  'RenameLayerCommand',
 ]
 
 
-def rename_image_for_convert(
-      image_batcher,
-      pattern,
-      rename_images=True,
-      rename_folders=False,
-):
-  renamer = renamer_.ItemRenamer(pattern, rename_images, rename_folders)
-  renamed_parents = set()
+class RenameImageForConvertCommand(invoker_.CallableCommand):
 
-  while True:
+  # noinspection PyAttributeOutsideInit
+  def _initialize(
+        self,
+        image_batcher,
+        pattern,
+        rename_images=True,
+        rename_folders=False,
+  ):
+    self._renamer = renamer_.ItemRenamer(pattern, rename_images, rename_folders)
+    self._renamed_parents = set()
+
+  def _process(
+        self,
+        image_batcher,
+        pattern,
+        rename_images=True,
+        rename_folders=False,
+  ):
     if rename_folders:
       for parent in image_batcher.current_item.parents:
-        if parent not in renamed_parents:
-          parent.name = renamer.rename(image_batcher, item=parent)
-          renamed_parents.add(parent)
+        if parent not in self._renamed_parents:
+          parent.name = self._renamer.rename(image_batcher, item=parent)
+          self._renamed_parents.add(parent)
 
     if rename_images:
-      image_batcher.current_item.name = renamer.rename(image_batcher)
-
-    yield
+      image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-def rename_image_for_export_images(image_batcher, pattern):
-  renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
+class RenameImageForExportImagesCommand(invoker_.CallableCommand):
 
-  while True:
-    image_batcher.current_item.name = renamer.rename(image_batcher)
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, image_batcher, pattern):
+    self._renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
 
-    yield
+  def _process(self, image_batcher, pattern):
+    image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-def rename_image_for_edit_and_save_images(image_batcher, pattern, rename_only_new_images=True):
-  renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
+class RenameImageForEditAndSaveImagesCommand(invoker_.CallableCommand):
 
-  while True:
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, image_batcher, pattern, rename_only_new_images=True):
+    self._renamer = renamer_.ItemRenamer(pattern, rename_items=True, rename_folders=False)
+
+  def _process(self, image_batcher, pattern, rename_only_new_images=True):
     image = image_batcher.current_item.raw
     is_new_image = image.get_file() is None
 
     if not rename_only_new_images or is_new_image:
-      image_batcher.current_item.name = renamer.rename(image_batcher)
-
-    yield
+      image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-def rename_layer(layer_batcher, pattern, rename_layers=True, rename_folders=False):
-  renamer = renamer_.ItemRenamer(pattern, rename_layers, rename_folders)
-  renamed_parents = set()
+class RenameLayerCommand(invoker_.CallableCommand):
 
-  while True:
+  # noinspection PyAttributeOutsideInit
+  def _initialize(self, layer_batcher, pattern, rename_layers=True, rename_folders=False):
+    self._renamer = renamer_.ItemRenamer(pattern, rename_layers, rename_folders)
+    self._renamed_parents = set()
+
+  def _process(self, layer_batcher, pattern, rename_layers=True, rename_folders=False):
     if rename_folders:
       for parent in layer_batcher.current_item.parents:
-        if parent not in renamed_parents:
-          parent.name = renamer.rename(layer_batcher, item=parent)
-          renamed_parents.add(parent)
+        if parent not in self._renamed_parents:
+          parent.name = self._renamer.rename(layer_batcher, item=parent)
+          self._renamed_parents.add(parent)
 
           if (layer_batcher.edit_mode
               and layer_batcher.process_names
@@ -74,17 +88,15 @@ def rename_layer(layer_batcher, pattern, rename_layers=True, rename_folders=Fals
             parent.raw.set_name(parent.name)
 
     if rename_layers:
-      layer_batcher.current_item.name = renamer.rename(layer_batcher)
+      layer_batcher.current_item.name = self._renamer.rename(layer_batcher)
 
       if layer_batcher.process_names and not layer_batcher.is_preview:
         layer_batcher.current_layer.set_name(layer_batcher.current_item.name)
 
-    yield
-
 
 RENAME_FOR_CONVERT_DICT = {
   'name': 'rename_for_convert',
-  'function': rename_image_for_convert,
+  'function': RenameImageForConvertCommand,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
@@ -113,7 +125,7 @@ RENAME_FOR_CONVERT_DICT = {
 
 RENAME_FOR_EXPORT_IMAGES_DICT = {
   'name': 'rename_for_export_images',
-  'function': rename_image_for_export_images,
+  'function': RenameImageForExportImagesCommand,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
   'display_options_on_create': True,
@@ -130,7 +142,7 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
 
 RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
   'name': 'rename_for_edit_and_save_images',
-  'function': rename_image_for_edit_and_save_images,
+  'function': RenameImageForEditAndSaveImagesCommand,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'display_options_on_create': True,
@@ -153,7 +165,7 @@ RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
 
 RENAME_FOR_EXPORT_LAYERS_DICT = {
   'name': 'rename_for_export_layers',
-  'function': rename_layer,
+  'function': RenameLayerCommand,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
   'display_options_on_create': True,
@@ -182,7 +194,7 @@ RENAME_FOR_EXPORT_LAYERS_DICT = {
 
 RENAME_FOR_EDIT_LAYERS_DICT = {
   'name': 'rename_for_edit_layers',
-  'function': rename_layer,
+  'function': RenameLayerCommand,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'display_options_on_create': True,

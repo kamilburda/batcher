@@ -9,6 +9,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from src import builtin_commands_common
+from src import invoker as invoker_
 from src import utils
 from src.path import validators as validators_
 from src.procedure_groups import *
@@ -18,30 +19,38 @@ from . import _utils as builtin_actions_utils
 
 
 __all__ = [
-  'save',
+  'SaveCommand',
 ]
 
 
 _XCF_FILE_EXTENSION = '.xcf'
 
 
-def save(
-      batcher,
-      output_directory,
-      save_existing_image_to_its_original_location,
-):
-  images_to_reset_dirty_state_for = []
+class SaveCommand(invoker_.CallableCommand):
 
-  batcher.invoker.add(
-    _reset_dirty_state_of_images_after_cleanup,
-    ['after_cleanup_contents'],
-    [images_to_reset_dirty_state_for],
-  )
+  # noinspection PyAttributeOutsideInit
+  def _initialize(
+        self,
+        batcher,
+        output_directory,
+        save_existing_image_to_its_original_location,
+  ):
+    self._images_to_reset_dirty_state_for = []
 
-  while True:
+    batcher.invoker.add(
+      _reset_dirty_state_of_images_after_cleanup,
+      ['after_cleanup_contents'],
+      [self._images_to_reset_dirty_state_for],
+    )
+
+  def _process(
+        self,
+        batcher,
+        output_directory,
+        save_existing_image_to_its_original_location,
+  ):
     if not batcher.process_export:
-      yield
-      continue
+      return
 
     image = batcher.current_image
     item = batcher.current_item
@@ -84,9 +93,7 @@ def save(
     if should_set_new_image_file:
       image.set_file(image_file)
 
-    images_to_reset_dirty_state_for.append(image)
-
-    yield
+    self._images_to_reset_dirty_state_for.append(image)
 
 
 def _validate_name(item):
@@ -105,7 +112,7 @@ def _reset_dirty_state_of_images_after_cleanup(_batcher, images_to_reset_dirty_s
 
 SAVE_DICT = {
   'name': 'save',
-  'function': save,
+  'function': SaveCommand,
   'display_name': _('Save'),
   'description': _(
     'Saves the image in the native GIMP format (XCF). If the image already exists, it is'

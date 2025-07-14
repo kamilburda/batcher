@@ -5,7 +5,6 @@ from __future__ import annotations
 import collections
 from collections.abc import Iterable
 import contextlib
-import inspect
 import itertools
 from typing import Any, Callable, Dict, Generator, List, Optional, Union
 
@@ -50,7 +49,10 @@ class Invoker:
   def add(
         self,
         command: Union[
-          Callable, Invoker, contextlib.AbstractContextManager, Generator[None, Any, None],
+          Callable,
+          Invoker,
+          contextlib.AbstractContextManager,
+          Generator[None, Any, None],
         ],
         groups: Union[None, str, List[str]] = None,
         args: Optional[Iterable] = None,
@@ -58,15 +60,14 @@ class Invoker:
         foreach: bool = False,
         ignore_if_exists: bool = False,
         position: Optional[int] = None,
-        run_generator: bool = True,
   ) -> Optional[int]:
     """Adds a command to be invoked by `invoke()`.
 
     The ID of the newly added command is returned.
     
     A command can be:
-    * a function, in which case optional arguments (``args``) and
-      keyword arguments (``kwargs``) can be specified,
+    * a function or a callable, in which case optional arguments (``args``)
+      and keyword arguments (``kwargs``) can be specified,
     * another `Invoker` instance.
     
     To control which commands are invoked, you may want to group them.
@@ -85,36 +86,7 @@ class Invoker:
     specified group(s). Pass an integer to the ``position`` parameter to
     customize the insertion position. A negative value represents an n-th to
     last position.
-    
-    Command as a function can also be a generator function or return a generator.
-    This allows customizing which parts of the code of the function are called
-    on each invocation. For example:
-    
-      def foo():
-        print('bar')
-        while True:
-          args, kwargs = yield
-          print('baz')
-    
-    prints ``'bar'`` the first time the function is called and ``'baz'`` all
-    subsequent times. This allows to e.g. initialize objects to an initial state
-    in the first part and then use that state in subsequent invocations of this
-    function, effectively eliminating the need for global variables for the same
-    purpose.
-    
-    The generator must contain at least one ``yield`` statement. If you pass
-    arguments and want to use the arguments in the function, the yield statement
-    must be in the form ``args, kwargs = yield``.
-    
-    To make sure the generator can be called an arbitrary number of times, place
-    a ``yield`` statement in an infinite loop. To limit the number of calls,
-    simply do not use an infinite loop. In such a case, the command is
-    permanently removed for the group(s) `invoke()` was called for once no more
-    yield statements are encountered.
-    
-    To prevent activating generators and to treat generator functions as regular
-    functions, pass ``run_generator=False``.
-    
+
     If ``foreach`` is ``True``, the command is a "for-each" command
     containing code executed before/after each command. A for-each command
     must be a context manager (e.g. a class defining ``__enter__()`` and
@@ -171,7 +143,7 @@ class Invoker:
       return None
     
     command_id = self._get_command_id()
-    
+
     if callable(command):
       if not foreach:
         add_command_func = self._add_regular_command
@@ -186,7 +158,7 @@ class Invoker:
           args if args is not None else (),
           kwargs if kwargs is not None else {},
           position,
-          run_generator)
+        )
     else:
       for group in self._process_groups_arg(groups):
         self._add_invoker(command_id, command, group, position)
@@ -226,33 +198,11 @@ class Invoker:
     applies to nested `Invoker` instances.
     """
     
-    def _invoke_command(item_, group_):
-      command, command_args, command_kwargs = item_.command
-      args = _get_args(command_args)
-      kwargs = dict(command_kwargs, **additional_kwargs)
-      
-      result = command(*args, **kwargs)
-      
-      if inspect.isgenerator(result):
-        item_.is_generator = True
-      
-      if not (item_.is_generator and item_.run_generator):
-        return result
-      else:
-        if group_ not in item_.generators_per_group:
-          item_.generators_per_group[group_] = result
-          return next(item_.generators_per_group[group_])
-        else:
-          try:
-            return item_.generators_per_group[group_].send([args, kwargs])
-          except StopIteration:
-            item_.should_be_removed_from_group = True
-    
-    def _prepare_foreach_command(command, command_args, command_kwargs):
+    def _invoke_command(command, command_args, command_kwargs):
       args = _get_args(command_args)
       kwargs = dict(command_kwargs, **additional_kwargs)
       return command(*args, **kwargs)
-    
+
     def _get_args(command_args):
       if additional_args_position is None:
         return tuple(command_args) + tuple(additional_args)
@@ -265,12 +215,12 @@ class Invoker:
       with contextlib.ExitStack() as stack:
         for foreach_item in self._foreach_commands[group_]:
           try:
-            stack.enter_context(_prepare_foreach_command(*foreach_item.command))
+            stack.enter_context(_invoke_command(*foreach_item.command))
           except Exception as e:
             raise TypeError(
               f'for-each command {foreach_item.command[0]} is not a context manager') from e
 
-        return _invoke_command(item_, group_)
+        return _invoke_command(*item_.command)
 
     def _invoke_invoker(invoker, group_):
       invoker.invoke([group_], additional_args, additional_kwargs, additional_args_position)
@@ -294,11 +244,7 @@ class Invoker:
           if self._foreach_commands[group]:
             _invoke_command_with_foreach_commands(item, group)
           else:
-            _invoke_command(item, group)
-            
-            if item.should_be_removed_from_group:
-              self.remove(item.command_id, [group])
-              item.should_be_removed_from_group = False
+            _invoke_command(*item.command)
         else:
           _invoke_invoker(item.command, group)
   
@@ -396,7 +342,7 @@ class Invoker:
     return (
           command_id in self._command_items
           and any(group in self._command_items[command_id].groups
-              for group in self._process_groups_arg(groups)))
+                  for group in self._process_groups_arg(groups)))
   
   def get_command(self, command_id: int) -> Union[Callable, Invoker, None]:
     """Returns a command specified by its ID.
@@ -578,7 +524,7 @@ class Invoker:
         command_item.command[1],
         command_item.command[2],
         position,
-        command_item.run_generator)
+      )
     elif command_item.command_type == self._TYPE_FOREACH_COMMAND:
       self._add_foreach_command(
         command_item.command_id,
@@ -587,12 +533,12 @@ class Invoker:
         command_item.command[1],
         command_item.command[2],
         position,
-        command_item.run_generator)
+      )
     elif command_item.command_type == self._TYPE_INVOKER:
       self._add_invoker(command_item.command_id, command_item.command, group, position)
 
   def _add_regular_command(
-        self, command_id, command, group, command_args, command_kwargs, position, run_generator):
+        self, command_id, command, group, command_args, command_kwargs, position):
     self._add_command(
       command_id,
       command,
@@ -600,14 +546,13 @@ class Invoker:
       command_args,
       command_kwargs,
       position,
-      run_generator,
       self._TYPE_COMMAND,
       self._commands,
       self._command_functions,
     )
   
   def _add_foreach_command(
-        self, command_id, command, group, command_args, command_kwargs, position, run_generator):
+        self, command_id, command, group, command_args, command_kwargs, position):
     self._add_command(
       command_id,
       command,
@@ -615,7 +560,6 @@ class Invoker:
       command_args,
       command_kwargs,
       position,
-      run_generator,
       self._TYPE_FOREACH_COMMAND,
       self._foreach_commands,
       self._foreach_command_functions,
@@ -629,7 +573,6 @@ class Invoker:
         command_args,
         command_kwargs,
         position,
-        run_generator,
         command_type,
         commands_dict,
         command_functions_dict,
@@ -642,7 +585,7 @@ class Invoker:
       (command, command_args, command_kwargs),
       command_type,
       command,
-      run_generator)
+    )
 
     if position is None:
       commands_dict[group].append(command_item)
@@ -655,7 +598,7 @@ class Invoker:
     self._init_group(group)
     
     command_item = self._set_command_item(
-      command_id, group, invoker, self._TYPE_INVOKER, invoker, False)
+      command_id, group, invoker, self._TYPE_INVOKER, invoker)
     
     if position is None:
       self._commands[group].append(command_item)
@@ -674,10 +617,10 @@ class Invoker:
         command,
         command_type,
         command_function,
-        run_generator):
+  ):
     if command_id not in self._command_items:
       self._command_items[command_id] = _CommandItem(
-        command, command_id, None, command_type, command_function, run_generator)
+        command, command_id, None, command_type, command_function)
     
     self._command_items[command_id].groups.add(group)
     
@@ -743,17 +686,53 @@ class Invoker:
       raise ValueError(f'command with ID {command_id} is not in group "{group}"')
 
 
+class CallableCommand:
+  """A convenience wrapper usable as commands for `Invoker.add()` that allows
+  keeping a state.
+
+  You can use instances as the ``command`` parameter for `Invoker.add()`.
+
+  The `_initialize()` method is called only once before processing the first
+  item.
+
+  The `_process()` method contains the main code that processes each item
+  (much like a regular function).
+  """
+
+  def __init__(self):
+    self.__initialize_called = False
+
+  def __call__(self, *args, **kwargs):
+    if not self.__initialize_called:
+      self._initialize(*args, **kwargs)
+      self.__initialize_called = True
+
+    self._process(*args, **kwargs)
+
+  def _initialize(self, *args, **kwargs):
+    """Performs initialization steps.
+
+    This method is invoked only once before processing the first item.
+
+    The positional and keyword arguments are identical to the first call to
+    the `_process()` method.
+    """
+    pass
+
+  def _process(self, *args, **kwargs):
+    """Processes an item.
+
+    This method is called for each item.
+    """
+    pass
+
+
 class _CommandItem:
   
-  def __init__(self, command, command_id, groups, command_type, command_function, run_generator):
+  def __init__(self, command, command_id, groups, command_type, command_function):
     self.command = command
     self.command_id = command_id
     self.groups = groups if groups is not None else set()
     # noinspection PyProtectedMember
     self.command_type = command_type if command_type is not None else Invoker._TYPE_COMMAND
     self.command_function = command_function
-    self.run_generator = run_generator
-    
-    self.is_generator = False
-    self.generators_per_group = {}
-    self.should_be_removed_from_group = False
