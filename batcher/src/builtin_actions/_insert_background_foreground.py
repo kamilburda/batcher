@@ -6,6 +6,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import exceptions
 from src import invoker as invoker_
 from src import placeholders as placeholders_
 from src.procedure_groups import *
@@ -46,7 +47,7 @@ class InsertLayerFromFileCommand(invoker_.CallableCommand):
 
   def _process(self, image_batcher, image_file, insert_mode):
     if self._image_to_insert is None:
-      return
+      raise exceptions.SkipCommand(_('Image file not specified.'))
 
     image = image_batcher.current_image
     current_parent = image_batcher.current_layer.get_parent()
