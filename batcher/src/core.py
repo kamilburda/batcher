@@ -49,6 +49,7 @@ class Batcher(metaclass=abc.ABCMeta):
         conditions: setting_.Group,
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
+        continue_on_error: bool = False,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
         output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
         name_pattern: str = '',
@@ -71,6 +72,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._conditions = conditions
     self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode
+    self._continue_on_error = continue_on_error
     self._initial_export_run_mode = initial_export_run_mode
     self._output_directory = output_directory
     self._name_pattern = name_pattern
@@ -150,6 +152,18 @@ class Batcher(metaclass=abc.ABCMeta):
     on the copies. The original items are kept intact.
     """
     return self._edit_mode
+
+  @property
+  def continue_on_error(self) -> bool:
+    """Determines whether to continue processing on error or stop processing
+    immediately.
+
+    If ``True``, processing is continued even if an exception was raised
+    during processing.
+
+    If ``False``, processing is stopped immediately.
+    """
+    return self._continue_on_error
 
   @property
   def initial_export_run_mode(self) -> Gimp.RunMode:
@@ -808,7 +822,7 @@ class Batcher(metaclass=abc.ABCMeta):
       try:
         retval = function(*args, **kwargs)
       except exceptions.SkipCommand as e:
-        # Log skipped commands and continue processing.
+        # Log skipped commands and continue processing unconditionally.
         self._set_skipped_commands(command, str(e))
       except pypdb.PDBProcedureError as e:
         error_message = e.message
@@ -817,18 +831,16 @@ class Batcher(metaclass=abc.ABCMeta):
             'An error occurred. Please check the GIMP error message'
             ' or the error console for details, if any.')
 
-        # Log failed command, but raise error as this may result in unexpected
-        # behavior.
         self._set_failed_commands(command, error_message)
 
-        raise exceptions.CommandError(error_message, command, self._current_item)
+        if not self._continue_on_error:
+          raise exceptions.CommandError(error_message, command, self._current_item)
       except Exception as e:
         trace = traceback.format_exc()
-        # Log failed command, but raise error as this may result in unexpected
-        # behavior.
         self._set_failed_commands(command, str(e), trace)
 
-        raise exceptions.CommandError(str(e), command, self._current_item, trace)
+        if not self._continue_on_error:
+          raise exceptions.CommandError(str(e), command, self._current_item, trace)
       else:
         return retval
 
@@ -1162,7 +1174,8 @@ class ImageBatcher(Batcher):
         run_mode=Gimp.RunMode.NONINTERACTIVE,
         file=Gio.file_new_for_path(image_filepath))
     else:
-      raise exceptions.BatcherFileLoadError(_('File not found'), self._current_item)
+      if not self._continue_on_error or self._is_preview:
+        raise exceptions.BatcherFileLoadError(_('File not found'), self._current_item)
 
   @staticmethod
   def _get_current_layer(image):

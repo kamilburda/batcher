@@ -73,8 +73,12 @@ class SettingsManager:
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset Settings'))
 
     self._menu_settings = Gtk.Menu()
-    self._settings['gui/auto_close'].set_gui()
-    self._menu_settings.append(self._settings['gui/auto_close'].gui.widget)
+    if 'auto_close' in self._settings['gui']:
+      self._settings['gui/auto_close'].set_gui()
+      self._menu_settings.append(self._settings['gui/auto_close'].gui.widget)
+    if 'continue_on_error' in self._settings['main']:
+      self._settings['main/continue_on_error'].set_gui()
+      self._menu_settings.append(self._settings['main/continue_on_error'].gui.widget)
     if 'keep_inputs' in self._settings['gui']:
       self._settings['gui/keep_inputs'].set_gui()
       self._menu_settings.append(self._settings['gui/keep_inputs'].gui.widget)

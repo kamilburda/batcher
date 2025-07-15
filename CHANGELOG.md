@@ -4,6 +4,7 @@
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
+* If an action or condition causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action/condition can safely be skipped for a particular item. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again.
 * Marked names of common layer effect arguments as translatable.
 
 

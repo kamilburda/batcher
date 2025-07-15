@@ -96,6 +96,7 @@ def create_settings_for_convert():
       'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
+    _create_continue_on_error_setting_dict(),
     {
       'type': 'file',
       'name': 'settings_file',
@@ -246,6 +247,7 @@ def create_settings_for_export_images():
       'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
+    _create_continue_on_error_setting_dict(),
     {
       'type': 'file',
       'name': 'settings_file',
@@ -362,6 +364,7 @@ def create_settings_for_edit_and_save_images():
       'gui_type': None,
       'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
+    _create_continue_on_error_setting_dict(),
     {
       'type': 'file',
       'name': 'settings_file',
@@ -493,6 +496,7 @@ def create_settings_for_export_layers():
       'display_name': _('How to handle conflicting files (non-interactive run mode only)'),
       'gui_type': None,
     },
+    _create_continue_on_error_setting_dict(),
     {
       'type': 'file',
       'name': 'settings_file',
@@ -608,6 +612,7 @@ def create_settings_for_edit_layers():
   })
 
   settings['main'].add([
+    _create_continue_on_error_setting_dict(),
     {
       'type': 'file',
       'name': 'settings_file',
@@ -790,6 +795,17 @@ def _create_size_gui_settings(
       'gui_type': None,
     },
   ]
+
+
+def _create_continue_on_error_setting_dict():
+  return {
+    'type': 'bool',
+    'name': 'continue_on_error',
+    'default_value': False,
+    'display_name': _('Continue on Error'),
+    'description': _('Continue processing on error'),
+    'gui_type': 'check_menu_item',
+  }
 
 
 def _create_inputs_interactive_setting_dict():

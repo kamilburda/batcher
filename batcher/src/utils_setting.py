@@ -11,6 +11,7 @@ def get_settings_for_batcher(main_settings: setting_.Group) -> Dict[str, Any]:
     'name_pattern',
     'file_extension',
     'overwrite_mode',
+    'continue_on_error',
   ]
 
   settings_for_batcher = {

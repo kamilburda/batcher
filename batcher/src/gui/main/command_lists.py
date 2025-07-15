@@ -103,7 +103,8 @@ class CommandLists:
             failed_commands[command_item.command.name][0][2],
             parent=self._dialog)
 
-          command_item.command['enabled'].set_value(False)
+          if not batcher.continue_on_error:
+            command_item.command['enabled'].set_value(False)
         else:
           if clear_previous and command_item.command['enabled'].value:
             command_item.set_warning(False)

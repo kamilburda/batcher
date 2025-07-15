@@ -206,6 +206,10 @@ For example, for the JPEG format, which does not support transparency and may re
 
 ## Managing Settings
 
+You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
+
+You can check `Settings → Continue on Error` to continue processing if you determine that error(s) occurring during processing are harmless.
+
 Once batch processing is done successfully, your settings (output folder, file extension, dialog size, actions, conditions, etc.) are automatically saved.
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
@@ -213,7 +217,5 @@ To reset settings to their default values, select `Settings → Reset Settings`.
 You may also save settings to a custom file by selecting `Settings → Save Settings to File...`.
 This allows swapping between different plug-in configurations or sharing them.
 To load settings from a file, select `Settings → Load Settings from File...` and select the file.
-
-You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
 
 For Batch Convert, you can optionally turn off saving input images by unchecking `Settings → Keep Input Images`. When this setting is checked, `Reset Settings` will not remove the input images. When loading settings from a file and this setting is checked, the input images will be preserved and any input images stored in the file will be ignored. If you want to load the input images from the file, uncheck this setting.
