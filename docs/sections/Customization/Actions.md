@@ -164,11 +164,11 @@ Options:
 
 Renames images/layers according to the specified pattern.
 
-This action uses the same text entry as the one in Batch Convert or Export Layers next to `Name`, described in [Renaming](Renaming.md).
+This action uses the same text entry as the one in Batch Convert or Export Layers next to `File Name`, described in [Renaming](Renaming.md).
 
 Additionally, this action allows customizing whether to rename both images/layers and folders (by checking `Rename folders`/`Rename group layers`) or rename folders only (by checking `Rename folders`/`Rename group layers` and unchecking `Rename images`/`Rename layers`).
 
-For Batch Convert and Export Layers, this action performs renaming on top of the entry next to `Name`.
+For Batch Convert and Export Layers, this action performs renaming on top of the entry next to `File Name`.
 
 For Edit and Save Images, renaming will have no effect unless the images are saved via the `Save` action.
 

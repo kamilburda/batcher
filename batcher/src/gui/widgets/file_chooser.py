@@ -74,6 +74,10 @@ class FileChooser(Gtk.Box):
         title=title,
         file=initial_value,
       )
+      self._file_chooser.set_label(None)
+      # Apparently, the child label is not hidden, so we remove spacing to
+      # avoid the widget appearing with empty space to the left.
+      self._file_chooser.set_spacing(0)
 
       entry = next(
         iter(

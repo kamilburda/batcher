@@ -137,6 +137,8 @@ class BatchProcessingGui:
       spacing=self._VBOX_SETTINGS_SPACING,
     )
 
+    if self._mode == 'export':
+      self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
     self._vbox_settings.pack_start(self._command_lists.vbox_actions, False, False, 0)
     self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
 
@@ -203,8 +205,6 @@ class BatchProcessingGui:
 
     self._dialog.vbox.set_spacing(self._DIALOG_VBOX_SPACING)
     self._dialog.vbox.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
-    if self._mode == 'export':
-      self._dialog.vbox.pack_start(self._export_settings.widget, False, False, 0)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
     self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)

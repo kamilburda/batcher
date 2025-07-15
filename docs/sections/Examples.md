@@ -5,7 +5,7 @@ Add and check the `Remove folder structure` action if not already (`Add Action..
 
 ## How do I rename the images to form a sequence of numbers, e.g. "image001", "image002", ...?
 
-Click on the text entry next to `Name` and choose `image001`, or type `image[001]` in the entry.
+Click on the text entry next to `File Name` and choose `image001`, or type `image[001]` in the entry.
 
 
 ## I want to adjust brightness in the images. Can this be done?
@@ -87,7 +87,7 @@ Check the `Visible` condition (or add one if not already via `Add Condition... â
 
 ## My layers contain a '.'. All characters after the '.' are replaced with the file extension. How do I prevent this?
 
-In the text entry next to `Name`, choose `Full layer name` or type `[layer name, %e]`.
+In the text entry next to `File Name`, choose `Full layer name` or type `[layer name, %e]`.
 This ensures that the resulting image name will be e.g. `some.layer.png` instead of `some.png` (the default behavior).
 
 
@@ -100,5 +100,5 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 
 ## How do I reverse the order of the exported images/layers?
 
-In the text entry next to `Name`, you can type e.g. `image[000, %d]`.
+In the text entry next to `File Name`, you can type e.g. `image[000, %d]`.
 This results in the exported image/layer names having a descending number.

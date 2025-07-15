@@ -149,14 +149,14 @@ This can be useful if you e.g. made changes to your images and you want to save 
 
 ### Filename Pattern
 
-The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
+The text entry next to `File Name` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
 
-### File Extension
+### File Format
 
-Type or choose your desired file extension next to the filename entry (`png` by default).
+Type or choose your desired file extension next to `File Format`.
 
 The dropdown list displays available file formats alongside their associated file extensions.
 If a file format contains multiple file extensions, the first is selected by default, but you may also choose a different extension (by clicking on it or pressing Tab).
@@ -167,7 +167,7 @@ However, you can still enter a file extension not in the list in case you use a 
 
 ### Export Options
 
-Pressing the `Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
+Pressing the `Export Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
 
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
