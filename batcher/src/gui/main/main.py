@@ -132,23 +132,6 @@ class BatchProcessingGui:
       self._dialog,
     )
 
-    self._vbox_settings = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._VBOX_SETTINGS_SPACING,
-    )
-
-    if self._mode == 'export':
-      self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
-    self._vbox_settings.pack_start(self._command_lists.vbox_actions, False, False, 0)
-    self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
-
-    self._hpaned_settings_and_previews = Gtk.Paned(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      wide_handle=True,
-    )
-    self._hpaned_settings_and_previews.pack1(self._vbox_settings, True, False)
-    self._hpaned_settings_and_previews.pack2(self._previews.vbox_previews, True, True)
-
     self._button_run = self._dialog.add_button('', Gtk.ResponseType.OK)
     self._button_run.set_can_default(True)
     self._button_run.hide()
@@ -198,6 +181,29 @@ class BatchProcessingGui:
     self._hbox_messages.pack_start(self._box_warning_messages, False, False, 0)
     self._hbox_messages.pack_start(self._label_message, True, True, 0)
 
+    self._vbox_settings = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._VBOX_SETTINGS_SPACING,
+    )
+    if self._mode == 'export':
+      self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_actions, False, False, 0)
+    self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
+
+    self._vbox_settings_with_messages = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._VBOX_SETTINGS_SPACING,
+    )
+    self._vbox_settings_with_messages.pack_start(self._vbox_settings, True, True, 0)
+    self._vbox_settings_with_messages.pack_start(self._hbox_messages, False, False, 0)
+
+    self._hpaned_settings_and_previews = Gtk.Paned(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      wide_handle=True,
+    )
+    self._hpaned_settings_and_previews.pack1(self._vbox_settings_with_messages, True, False)
+    self._hpaned_settings_and_previews.pack2(self._previews.vbox_previews, True, True)
+
     self._hbox_contents = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
     )
@@ -207,7 +213,6 @@ class BatchProcessingGui:
     self._dialog.vbox.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
-    self._dialog.vbox.pack_end(self._hbox_messages, False, False, 0)
 
   def _connect_events(self):
     self._button_run.connect('clicked', self._on_button_run_clicked)

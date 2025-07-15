@@ -9,6 +9,7 @@ General changes:
 
 User interface changes:
 * Export settings are now arranged vertically. Clarified labels describing the settings.
+* The message area at the bottom now only spans the left part of the dialog to make more room for the preview. 
 * Marked names of common layer effect arguments as translatable.
 
 

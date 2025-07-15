@@ -7,7 +7,6 @@ from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Pango
 
 from src import utils
 from src.gui import utils as gui_utils_
@@ -21,6 +20,7 @@ class MessageLabel(Gtk.Box):
   """
 
   _SPACING = 2
+  _LABEL_WIDTH_CHARS = 30
   
   def __init__(self):
     super().__init__()
@@ -68,7 +68,8 @@ class MessageLabel(Gtk.Box):
     self._label_message = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
-      ellipsize=Pango.EllipsizeMode.END,
+      width_chars=self._LABEL_WIDTH_CHARS,
+      wrap=True,
     )
 
     self.set_spacing(self._SPACING)
