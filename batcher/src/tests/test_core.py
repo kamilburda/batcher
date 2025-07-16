@@ -101,12 +101,15 @@ class TestAddCommandFromSettings(unittest.TestCase):
     self.batcher._add_command_from_settings(action)
     
     added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
-    
+
+    self.maxDiff = None
+
     self.assertEqual(len(added_command_items), 1)
-    self.assertEqual(
-      added_command_items[0][1],
-      list(action['arguments'])
-      + [builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers']])
+    self.assertListEqual(added_command_items[0][1][:-1], list(action['arguments']))
+    self.assertIsInstance(
+      added_command_items[0][1][-1],
+      builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers'],
+    )
     self.assertEqual(added_command_items[0][2], {})
   
   def test_add_pdb_proc_as_command_without_run_mode(self, mock_get_pdb):
