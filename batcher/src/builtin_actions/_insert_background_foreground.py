@@ -16,17 +16,17 @@ from src.pypdb import pdb
 
 
 __all__ = [
-  'InsertBackgroundFromFileCommand',
-  'InsertForegroundFromFileCommand',
-  'InsertBackgroundFromColorTagsCommand',
-  'InsertForegroundFromColorTagsCommand',
+  'InsertBackgroundFromFileAction',
+  'InsertForegroundFromFileAction',
+  'InsertBackgroundFromColorTagsAction',
+  'InsertForegroundFromColorTagsAction',
   'merge_background',
   'merge_foreground',
   'on_after_add_insert_background_foreground_for_layers',
 ]
 
 
-class InsertLayerFromFileCommand(invoker_.CallableCommand):
+class InsertLayerFromFileAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, image_batcher, image_file, insert_mode):
@@ -59,7 +59,7 @@ class InsertLayerFromFileCommand(invoker_.CallableCommand):
     _insert_layers(image, self._image_to_insert.get_layers(), current_parent, position)
 
 
-class InsertBackgroundFromFileCommand(InsertLayerFromFileCommand):
+class InsertBackgroundFromFileAction(InsertLayerFromFileAction):
 
   def _initialize(self, image_batcher, image_file, *_args, **_kwargs):
     return super()._initialize(image_batcher, image_file, 'after')
@@ -68,7 +68,7 @@ class InsertBackgroundFromFileCommand(InsertLayerFromFileCommand):
     return super()._process(image_batcher, image_file, 'after')
 
 
-class InsertForegroundFromFileCommand(InsertLayerFromFileCommand):
+class InsertForegroundFromFileAction(InsertLayerFromFileAction):
 
   def _initialize(self, image_batcher, image_file, *_args, **_kwargs):
     return super()._initialize(image_batcher, image_file, 'before')
@@ -84,7 +84,7 @@ def _delete_images_on_cleanup(_batcher, images):
   images.clear()
 
 
-class InsertTaggedLayersCommand(invoker_.CallableCommand):
+class InsertTaggedLayersAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, layer_batcher, tag, tagged_items_for_preview, insert_mode):
@@ -112,7 +112,7 @@ class InsertTaggedLayersCommand(invoker_.CallableCommand):
        image, [item.raw for item in self._processed_tagged_items], current_parent, position)
 
 
-class InsertBackgroundFromColorTagsCommand(InsertTaggedLayersCommand):
+class InsertBackgroundFromColorTagsAction(InsertTaggedLayersAction):
 
   def _initialize(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
     return super()._initialize(layer_batcher, color_tag, tagged_items, 'after')
@@ -121,7 +121,7 @@ class InsertBackgroundFromColorTagsCommand(InsertTaggedLayersCommand):
     return super()._process(layer_batcher, color_tag, tagged_items, 'after')
 
 
-class InsertForegroundFromColorTagsCommand(InsertTaggedLayersCommand):
+class InsertForegroundFromColorTagsAction(InsertTaggedLayersAction):
 
   def _initialize(self, layer_batcher, color_tag, tagged_items, *_args, **_kwargs):
     return super()._initialize(layer_batcher, color_tag, tagged_items, 'before')
@@ -234,7 +234,7 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
 
 INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_background_for_images',
-  'function': InsertBackgroundFromFileCommand,
+  'function': InsertBackgroundFromFileAction,
   'display_name': _('Insert background'),
   'description': _('Inserts the specified image behind the current layer.'),
   'display_options_on_create': True,
@@ -259,7 +259,7 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
 
 INSERT_BACKGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_background_for_layers',
-  'function': InsertBackgroundFromColorTagsCommand,
+  'function': InsertBackgroundFromColorTagsAction,
   'display_name': _('Insert background'),
   'description': _(
     'Inserts layers having the specified color tag behind the current layer.'),
@@ -298,7 +298,7 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
 
 INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_foreground_for_images',
-  'function': InsertForegroundFromFileCommand,
+  'function': InsertForegroundFromFileAction,
   'display_name': _('Insert foreground'),
   'description': _(
     'Inserts the specified image in front of the current layer.'),
@@ -324,7 +324,7 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
 
 INSERT_FOREGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_foreground_for_layers',
-  'function': InsertForegroundFromColorTagsCommand,
+  'function': InsertForegroundFromColorTagsAction,
   'display_name': _('Insert foreground'),
   'description': _(
     'Inserts layers having the specified color tag in front of the current layer.'),

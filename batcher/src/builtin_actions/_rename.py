@@ -7,14 +7,14 @@ from src.procedure_groups import *
 
 
 __all__ = [
-  'RenameImageForConvertCommand',
-  'RenameImageForExportImagesCommand',
-  'RenameImageForEditAndSaveImagesCommand',
-  'RenameLayerCommand',
+  'RenameImageForConvertAction',
+  'RenameImageForExportImagesAction',
+  'RenameImageForEditAndSaveImagesAction',
+  'RenameLayerAction',
 ]
 
 
-class RenameImageForConvertCommand(invoker_.CallableCommand):
+class RenameImageForConvertAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(
@@ -44,7 +44,7 @@ class RenameImageForConvertCommand(invoker_.CallableCommand):
       image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-class RenameImageForExportImagesCommand(invoker_.CallableCommand):
+class RenameImageForExportImagesAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, image_batcher, pattern):
@@ -54,7 +54,7 @@ class RenameImageForExportImagesCommand(invoker_.CallableCommand):
     image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-class RenameImageForEditAndSaveImagesCommand(invoker_.CallableCommand):
+class RenameImageForEditAndSaveImagesAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, image_batcher, pattern, rename_only_new_images=True):
@@ -68,7 +68,7 @@ class RenameImageForEditAndSaveImagesCommand(invoker_.CallableCommand):
       image_batcher.current_item.name = self._renamer.rename(image_batcher)
 
 
-class RenameLayerCommand(invoker_.CallableCommand):
+class RenameLayerAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, layer_batcher, pattern, rename_layers=True, rename_folders=False):
@@ -96,7 +96,7 @@ class RenameLayerCommand(invoker_.CallableCommand):
 
 RENAME_FOR_CONVERT_DICT = {
   'name': 'rename_for_convert',
-  'function': RenameImageForConvertCommand,
+  'function': RenameImageForConvertAction,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
@@ -125,7 +125,7 @@ RENAME_FOR_CONVERT_DICT = {
 
 RENAME_FOR_EXPORT_IMAGES_DICT = {
   'name': 'rename_for_export_images',
-  'function': RenameImageForExportImagesCommand,
+  'function': RenameImageForExportImagesAction,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
   'display_options_on_create': True,
@@ -142,7 +142,7 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
 
 RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
   'name': 'rename_for_edit_and_save_images',
-  'function': RenameImageForEditAndSaveImagesCommand,
+  'function': RenameImageForEditAndSaveImagesAction,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'display_options_on_create': True,
@@ -165,7 +165,7 @@ RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
 
 RENAME_FOR_EXPORT_LAYERS_DICT = {
   'name': 'rename_for_export_layers',
-  'function': RenameLayerCommand,
+  'function': RenameLayerAction,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
   'display_options_on_create': True,
@@ -194,7 +194,7 @@ RENAME_FOR_EXPORT_LAYERS_DICT = {
 
 RENAME_FOR_EDIT_LAYERS_DICT = {
   'name': 'rename_for_edit_layers',
-  'function': RenameLayerCommand,
+  'function': RenameLayerAction,
   'display_name': _('Rename'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'display_options_on_create': True,

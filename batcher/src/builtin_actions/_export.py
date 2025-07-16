@@ -35,7 +35,7 @@ __all__ = [
   'FileFormatModes',
   'ExportModes',
   'ExportStatuses',
-  'ExportCommand',
+  'ExportAction',
   'get_export_function',
   'on_after_add_export_action',
   'set_sensitive_for_image_name_pattern_in_export_for_default_export_action',
@@ -76,7 +76,7 @@ class ExportStatuses:
   ) = (0, 1, 2, 3)
 
 
-class ExportCommand(invoker_.CallableCommand):
+class ExportAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, batcher: 'src.core.Batcher', **kwargs):
@@ -811,7 +811,7 @@ _EXPORT_OVERWRITE_MODES_LIST = [
 
 EXPORT_FOR_CONVERT_DICT = {
   'name': 'export_for_convert',
-  'function': ExportCommand,
+  'function': ExportAction,
   'display_name': _('Also export as...'),
   'description': _('Exports an image to another file format.'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],

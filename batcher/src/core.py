@@ -1123,7 +1123,7 @@ class ImageBatcher(Batcher):
   def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_actions.RenameImageForConvertCommand(),
+        builtin_actions.RenameImageForConvertAction(),
         groups=command_groups,
         args=[self._name_pattern])
 
@@ -1136,7 +1136,7 @@ class ImageBatcher(Batcher):
       export_kwargs.update(self._more_export_options)
 
       self._invoker.add(
-        builtin_actions.ExportCommand(),
+        builtin_actions.ExportAction(),
         groups=command_groups,
         kwargs=export_kwargs,
       )
@@ -1275,7 +1275,7 @@ class LayerBatcher(Batcher):
   def _add_default_rename_action(self, command_groups):
     if not self._edit_mode:
       self._invoker.add(
-        builtin_actions.RenameLayerCommand(),
+        builtin_actions.RenameLayerAction(),
         groups=command_groups,
         args=[self._name_pattern])
   
@@ -1288,7 +1288,7 @@ class LayerBatcher(Batcher):
       export_kwargs.update(self._more_export_options)
 
       self._invoker.add(
-        builtin_actions.ExportCommand(),
+        builtin_actions.ExportAction(),
         groups=command_groups,
         kwargs=export_kwargs,
       )

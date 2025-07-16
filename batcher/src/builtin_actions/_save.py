@@ -19,14 +19,14 @@ from . import _utils as builtin_actions_utils
 
 
 __all__ = [
-  'SaveCommand',
+  'SaveAction',
 ]
 
 
 _XCF_FILE_EXTENSION = '.xcf'
 
 
-class SaveCommand(invoker_.CallableCommand):
+class SaveAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(
@@ -112,7 +112,7 @@ def _reset_dirty_state_of_images_after_cleanup(_batcher, images_to_reset_dirty_s
 
 SAVE_DICT = {
   'name': 'save',
-  'function': SaveCommand,
+  'function': SaveAction,
   'display_name': _('Save'),
   'description': _(
     'Saves the image in the native GIMP format (XCF). If the image already exists, it is'
