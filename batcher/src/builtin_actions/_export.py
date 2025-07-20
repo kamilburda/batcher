@@ -416,7 +416,7 @@ def _export_item(
   batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
   
   if chosen_overwrite_mode == overwrite.OverwriteModes.CANCEL:
-    raise exceptions.BatcherCancelError('cancelled')
+    raise exceptions.BatcherCancelError('canceled')
   
   if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
@@ -543,7 +543,7 @@ def _export_item_once(
     )
   except pypdb.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
-      raise exceptions.BatcherCancelError('cancelled')
+      raise exceptions.BatcherCancelError('canceled')
     elif e.status == Gimp.PDBStatusType.CALLING_ERROR:
       if run_mode != Gimp.RunMode.INTERACTIVE:
         return ExportStatuses.FORCE_INTERACTIVE
