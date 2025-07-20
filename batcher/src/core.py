@@ -824,6 +824,10 @@ class Batcher(metaclass=abc.ABCMeta):
       except exceptions.SkipCommand as e:
         # Log skipped commands and continue processing unconditionally.
         self._set_skipped_commands(command, str(e))
+      except exceptions.BatcherCancelError:
+        # Stop processing unconditionally at this point. This may occur if e.g.
+        # the user canceled interactive export.
+        raise
       except pypdb.PDBProcedureError as e:
         error_message = e.message
         if error_message is None:
