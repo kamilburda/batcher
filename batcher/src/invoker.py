@@ -702,12 +702,12 @@ class CallableCommand:
   def __init__(self):
     self.__initialize_called = False
 
-  def __call__(self, *args, **kwargs):
+  def __call__(self, *args, **kwargs) -> Any:
     if not self.__initialize_called:
       self._initialize(*args, **kwargs)
       self.__initialize_called = True
 
-    self._process(*args, **kwargs)
+    return self._process(*args, **kwargs)
 
   def _initialize(self, *args, **kwargs):
     """Performs initialization steps.
