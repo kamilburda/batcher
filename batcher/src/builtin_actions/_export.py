@@ -1,6 +1,5 @@
 """Built-in "Export"/"Also export as..." action."""
 
-import collections
 import os
 from typing import Callable, Dict, Union, Tuple
 
@@ -94,7 +93,7 @@ class ExportAction(invoker_.CallableCommand):
     self._assign_to_attributes_from_kwargs(kwargs)
 
     self._item_uniquifier = uniquifier.ItemUniquifier()
-    self._file_extension_properties = _FileExtensionProperties('export')
+    self._file_extension_properties = builtin_actions_utils.FileExtensionProperties('export')
     self._processed_parents = set()
     self._default_file_extension = self._file_extension
     self._image_copies = []
@@ -407,7 +406,7 @@ def _export_item(
       overwrite_chooser,
       _get_unique_substring_position(output_filepath, file_extension))
   except OSError as e:
-    raise exceptions.ExportError(
+    raise exceptions.ImageExportError(
       str(e),
       builtin_actions_utils.get_item_export_name(item),
       file_extension,
@@ -526,8 +525,8 @@ def _export_item_once(
       file_extension_properties,
       use_original_modification_date,
 ):
-  def _raise_export_error(exception):
-    raise exceptions.ExportError(
+  def _raise_image_export_error(exception):
+    raise exceptions.ImageExportError(
       str(exception), builtin_actions_utils.get_item_export_name(item), default_file_extension)
 
   try:
@@ -548,15 +547,15 @@ def _export_item_once(
       if run_mode != Gimp.RunMode.INTERACTIVE:
         return ExportStatuses.FORCE_INTERACTIVE
       else:
-        _raise_export_error(e)
+        _raise_image_export_error(e)
     elif e.status == Gimp.PDBStatusType.EXECUTION_ERROR:
       if file_extension != default_file_extension:
         file_extension_properties[file_extension].is_valid = False
         return ExportStatuses.USE_DEFAULT_FILE_EXTENSION
       else:
-        _raise_export_error(e)
+        _raise_image_export_error(e)
     else:
-      _raise_export_error(e)
+      _raise_image_export_error(e)
   else:
     return ExportStatuses.EXPORT_SUCCESSFUL
 
@@ -637,50 +636,6 @@ def _remove_multi_layer_images(images):
   for image in images:
     utils_pdb.try_delete_image(image)
   images.clear()
-
-
-class _FileExtension:
-  """Class holding properties for a file extension."""
-  
-  def __init__(self):
-    self.is_valid = True
-    """If ``True``, the file extension is valid and can be used in filenames
-    for file export procedures.
-    """
-    self.processed_count = 0
-    """Number of items with the file extension that have been exported."""
-
-
-class _FileExtensionProperties:
-  """Mapping of file extensions from `file_formats.FILE_FORMATS` to
-  `_FileExtension` instances.
-  
-  File extension as a key is always converted to lowercase.
-  """
-  def __init__(self, import_or_export):
-    if import_or_export not in ['import', 'export']:
-      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
-
-    self._import_or_export = import_or_export
-
-    self._properties = collections.defaultdict(_FileExtension)
-
-    for file_format in file_formats_.FILE_FORMATS:
-      if self._import_or_export == 'import' and not file_format.has_import_proc():
-        continue
-
-      if self._import_or_export == 'export' and not file_format.has_export_proc():
-        continue
-
-      # This ensures that the file format dialog will be displayed only once per
-      # file format if multiple file extensions for the same format are used
-      # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).
-      extension_properties = _FileExtension()
-      for file_extension in file_format.file_extensions:
-        self._properties[file_extension.lower()] = extension_properties
-  
-  def __getitem__(self, key):
-    return self._properties[key.lower()]
 
 
 class _NameOnlyItem(itemtree.Item):

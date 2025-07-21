@@ -113,6 +113,7 @@ class BatchProcessingGui:
       manage_items=CONFIG.PROCEDURE_GROUP == CONVERT_GROUP,
       display_message_func=self._display_inline_message,
       current_image=self._current_image,
+      parent=self._dialog,
     )
 
     if self._mode == 'export':

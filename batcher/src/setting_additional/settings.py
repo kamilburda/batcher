@@ -772,8 +772,8 @@ class FileFormatOptionsSetting(setting_.DictSetting):
   options are displayed when running the plug-in interactively).
   """
 
-  # Ideally, we would use `None` to represent the active file format to avoid
-  # the slightest possibility of a string being used as a file extension.
+  # HACK: Ideally, we would use `None` to represent the active file format to
+  # avoid the slightest possibility of a string being used as a file extension.
   # However, JSON only allows strings as keys, so this will have to do.
   ACTIVE_FILE_FORMAT_KEY = '_active'
 

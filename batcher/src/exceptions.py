@@ -38,7 +38,7 @@ class SkipCommand(BatcherError):
   pass
 
 
-class ExportError(BatcherError):
+class ImageExportError(BatcherError):
   
   def __init__(
         self,
@@ -63,5 +63,5 @@ class ExportError(BatcherError):
     return str_
 
 
-class InvalidOutputDirectoryError(ExportError):
+class InvalidOutputDirectoryError(ImageExportError):
   pass

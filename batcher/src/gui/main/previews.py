@@ -58,6 +58,7 @@ class Previews:
         manage_items=False,
         display_message_func=None,
         current_image=None,
+        parent=None,
   ):
     self._settings = settings
     self._batcher_mode = batcher_mode
@@ -69,6 +70,7 @@ class Previews:
       display_message_func if display_message_func is not None else utils.empty_func)
 
     self._current_image = current_image
+    self._parent = parent
 
     overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(
       overwrite.OverwriteModes.RENAME_NEW)
@@ -258,6 +260,22 @@ class Previews:
     self._grid_buttons.attach(self._button_add, 0, 0, 1, 1)
     self._grid_buttons.attach(self._button_remove, 1, 0, 1, 1)
 
+    self._hbox_input_options = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._BUTTONS_GRID_COLUMN_SPACING,
+    )
+
+    self._button_import_options = Gtk.Button(
+      label=_('_Import Options...'),
+      use_underline=True,
+    )
+
+    self._hbox_input_options.pack_start(self._button_import_options, True, True, 0)
+    if 'show_original_item_names' in self._settings['gui']:
+      self._settings['gui/show_original_item_names'].set_gui()
+      self._hbox_input_options.pack_start(
+        self._settings['gui/show_original_item_names'].gui.widget, True, True, 0)
+
     self._vbox_name_preview_and_options = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
@@ -265,11 +283,7 @@ class Previews:
     )
     self._vbox_name_preview_and_options.pack_start(self._name_preview_overlay, True, True, 0)
     self._vbox_name_preview_and_options.pack_start(self._grid_buttons, False, False, 0)
-
-    if 'show_original_item_names' in self._settings['gui']:
-      self._settings['gui/show_original_item_names'].set_gui()
-      self._vbox_name_preview_and_options.pack_start(
-        self._settings['gui/show_original_item_names'].gui.widget, False, False, 0)
+    self._vbox_name_preview_and_options.pack_start(self._hbox_input_options, False, False, 0)
 
     self._show_hide_name_preview_placeholder_label()
 
@@ -283,6 +297,8 @@ class Previews:
       'activate', self._on_menu_item_remove_selected_clicked)
     self._menu_item_remove_all.connect(
       'activate', self._on_menu_item_remove_all_clicked)
+
+    self._button_import_options.connect('clicked', self._on_button_import_options_clicked)
 
     self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
@@ -298,6 +314,8 @@ class Previews:
         Gtk.TargetEntry.new('CF_HDROP', 0, 0),
       ],
       Gdk.DragAction.MOVE)
+
+    self._import_options_dialog = None
 
   def _on_button_add_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_add, button)
@@ -320,6 +338,19 @@ class Previews:
 
   def _on_menu_item_remove_all_clicked(self, _menu_item):
     self._name_preview.remove_all_items()
+
+  def _on_button_import_options_clicked(self, _button):
+    if self._import_options_dialog is None:
+      self._import_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
+        self._settings['main/import'],
+        title=_('Import Options'),
+        parent=self._parent,
+      )
+
+      self._import_options_dialog.widget.show()
+    else:
+      self._import_options_dialog.widget.show()
+      self._import_options_dialog.widget.present()
 
   def _on_name_preview_key_press_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)

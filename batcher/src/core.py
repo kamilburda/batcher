@@ -5,7 +5,6 @@ import collections
 from collections.abc import Iterable
 import contextlib
 import inspect
-import os
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -50,6 +49,7 @@ class Batcher(metaclass=abc.ABCMeta):
         refresh_item_tree: bool = True,
         edit_mode: bool = False,
         continue_on_error: bool = False,
+        import_options: Dict[str, Any] = None,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
         output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
         name_pattern: str = '',
@@ -73,6 +73,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._refresh_item_tree = refresh_item_tree
     self._edit_mode = edit_mode
     self._continue_on_error = continue_on_error
+    self._import_options = import_options
     self._initial_export_run_mode = initial_export_run_mode
     self._output_directory = output_directory
     self._name_pattern = name_pattern
@@ -166,6 +167,22 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._continue_on_error
 
   @property
+  def import_options(self) -> Dict[str, Any]:
+    """Dictionary containing import options for each file extension as a key.
+
+    See `builtin_actions.BUILTIN_ACTIONS['import']` for allowed arguments.
+    The ``image_file`` argument cannot be specified as that is inserted by this
+    class (it represents the file to be loaded as the currently processed item).
+
+    If import is not applicable (i.e. no file is loaded), this property is
+    ignored.
+
+    This property returns a shallow copy of the original dictionary to avoid
+    modifying the original.
+    """
+    return dict(self._import_options) if self._import_options is not None else {}
+
+  @property
   def initial_export_run_mode(self) -> Gimp.RunMode:
     """The run mode to use for the first item when exporting if using the
     native file format dialog.
@@ -173,12 +190,6 @@ class Batcher(metaclass=abc.ABCMeta):
     If ``initial_export_run_mode`` is `Gimp.RunMode.INTERACTIVE`, a native
     file format GUI is displayed for the first item. For subsequent items,
     the same settings are applied and `Gimp.RunMode.WITH_LAST_VALS` is used.
-
-    Instead of using the native file format dialog, one can pass explicit
-    file format arguments. This can be done by including
-    ``file_format_mode=export.FileFormatModes.USE_EXPLICIT_VALUES`` and
-    ``file_format_options=<dictionary of file format-specific options>``
-    in the ``more_export_options`` dictionary.
 
     If the file format cannot handle `Gimp.RunMode.WITH_LAST_VALS`,
     `Gimp.RunMode.INTERACTIVE` is forced for each item.
@@ -532,6 +543,9 @@ class Batcher(metaclass=abc.ABCMeta):
         setattr(self, f'_{name}', value)
       else:
         raise ValueError(f'argument "{name}" is not recognized')
+
+    if self._import_options is None:
+      self._import_options = {}
 
     if self._overwrite_chooser is None:
       self._overwrite_chooser = overwrite.NoninteractiveOverwriteChooser(self._overwrite_mode)
@@ -1086,8 +1100,14 @@ class ImageBatcher(Batcher):
 
   def __init__(self, *args, **kwargs):
     self._should_load_image = False
+    self._import_action = None
 
     super().__init__(*args, **kwargs)
+
+  def _prepare_for_processing(self):
+    super()._prepare_for_processing()
+
+    self._import_action = builtin_actions.ImportAction()
 
   def _get_initial_current_image(self):
     return self._current_item.raw
@@ -1150,7 +1170,11 @@ class ImageBatcher(Batcher):
 
     if not self._edit_mode or self._is_preview:
       if self._should_load_image:
-        loaded_image = self._load_image(self._current_item.id)
+        loaded_image = self._import_action(
+          self,
+          Gio.file_new_for_path(self._current_item.id),
+          **self._import_options,
+        )
         if loaded_image is not None:
           self._current_image = loaded_image
           self._current_item.raw = loaded_image
@@ -1171,15 +1195,6 @@ class ImageBatcher(Batcher):
 
     self._current_image = None
     self._current_layer = None
-
-  def _load_image(self, image_filepath):
-    if os.path.isfile(image_filepath):
-      return pdb.gimp_file_load(
-        run_mode=Gimp.RunMode.NONINTERACTIVE,
-        file=Gio.file_new_for_path(image_filepath))
-    else:
-      if not self._continue_on_error or self._is_preview:
-        raise exceptions.BatcherFileLoadError(_('File not found'), self._current_item)
 
   @staticmethod
   def _get_current_layer(image):

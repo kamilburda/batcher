@@ -1,8 +1,6 @@
 import os
 
 import gi
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
 from gi.repository import Gio
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
@@ -12,9 +10,9 @@ from config import CONFIG
 from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
-from src.gui import utils as gui_utils_
-from src.gui import utils_grid as gui_utils_grid_
 from src.gui.entry import entries as entries_
+
+from . import _utils as gui_main_utils_
 
 
 class ExportSettings:
@@ -192,7 +190,11 @@ class ExportSettings:
 
   def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
-      self._export_options_dialog = ExportOptionsDialog(self._settings, parent=self._parent)
+      self._export_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
+        self._settings['main/export'],
+        title=_('Export Options'),
+        parent=self._parent,
+      )
 
       self._export_options_dialog.widget.show()
     else:
@@ -209,91 +211,6 @@ class ExportSettings:
       utils.timeout_add_strict(
         self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
         self._image_preview.update)
-
-
-class ExportOptionsDialog:
-
-  _MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR = 650
-
-  _CONTENTS_BORDER_WIDTH = 6
-
-  _GRID_ROW_SPACING = 3
-  _GRID_COLUMN_SPACING = 8
-
-  def __init__(self, settings, parent=None):
-    self._settings = settings
-    self._parent = parent
-
-    self._init_gui()
-
-  def _init_gui(self):
-    self._dialog = GimpUi.Dialog(
-      title=_('Export Options'),
-      parent=self._parent,
-      resizable=False,
-    )
-
-    self._button_reset_response_id = 1
-    self._button_reset = self._dialog.add_button(_('_Reset'), self._button_reset_response_id)
-
-    self._button_reset.connect('clicked', self._on_export_options_dialog_button_reset_clicked)
-
-    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
-    self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
-
-    self._grid_export_options = Gtk.Grid(
-      row_spacing=self._GRID_ROW_SPACING,
-      column_spacing=self._GRID_COLUMN_SPACING,
-    )
-    self._grid_export_options.show()
-
-    self._settings['main/export'].initialize_gui(only_null=True)
-
-    for row_index, setting in enumerate(self._settings['main/export']):
-      gui_utils_grid_.attach_label_to_grid(
-        self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
-      gui_utils_grid_.attach_widget_to_grid(
-        self._grid_export_options, setting, row_index, set_name_as_tooltip=False)
-
-    self._scrolled_window_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
-    self._scrolled_window_viewport.add(self._grid_export_options)
-    self._scrolled_window_viewport.show()
-
-    self._scrolled_window = Gtk.ScrolledWindow(
-      hscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-      propagate_natural_width=True,
-      propagate_natural_height=True,
-      max_content_height=self._MAX_HEIGHT_BEFORE_DISPLAYING_SCROLLBAR,
-    )
-    self._scrolled_window.add(self._scrolled_window_viewport)
-    self._scrolled_window.show()
-
-    self._dialog.vbox.pack_start(self._scrolled_window, False, False, 0)
-    self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
-
-    self._dialog.connect('realize', self._on_export_options_dialog_realize)
-    self._dialog.connect('close', self._on_export_options_dialog_close)
-    self._dialog.connect('response', self._on_export_options_dialog_response)
-
-  @property
-  def widget(self):
-    return self._dialog
-
-  def _on_export_options_dialog_close(self, _dialog):
-    self._dialog.hide()
-
-  def _on_export_options_dialog_response(self, _dialog, response_id):
-    if response_id == Gtk.ResponseType.CLOSE:
-      self._dialog.hide()
-
-  def _on_export_options_dialog_realize(self, _dialog):
-    if self._parent is not None:
-      self._dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
-      self._dialog.set_attached_to(gui_utils_.get_toplevel_window(self._parent))
-
-  def _on_export_options_dialog_button_reset_clicked(self, _button):
-    self._settings['main/export'].reset()
 
 
 def apply_file_extension_gui_to_setting_if_valid(setting):

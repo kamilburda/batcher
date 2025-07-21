@@ -8,6 +8,8 @@ from src.builtin_actions import _crop
 from src.builtin_actions._crop import *
 from src.builtin_actions import _export
 from src.builtin_actions._export import *
+from src.builtin_actions import _import
+from src.builtin_actions._import import *
 from src.builtin_actions import _insert_background_foreground
 from src.builtin_actions._insert_background_foreground import *
 from src.builtin_actions import _misc
@@ -37,6 +39,7 @@ _BUILTIN_ACTIONS_LIST = [
   _export.EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT,
   _export.EXPORT_FOR_EXPORT_LAYERS_DICT,
   _export.EXPORT_FOR_EDIT_LAYERS_DICT,
+  _import.IMPORT_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_LAYERS_DICT,
   _insert_background_foreground.INSERT_FOREGROUND_FOR_IMAGES_DICT,

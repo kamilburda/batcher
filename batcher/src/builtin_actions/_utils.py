@@ -1,5 +1,6 @@
 """Utility functions used within the `builtin_actions` package."""
 
+import collections
 import os
 
 import gi
@@ -9,6 +10,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from src import exceptions
+from src import file_formats as file_formats_
 from src import placeholders as placeholders_
 from src import setting as setting_
 from src.pypdb import pdb
@@ -243,3 +245,47 @@ def get_best_matching_layer_from_image(batcher, image):
       # Rather than returning no layer, we skip the current action. An image
       # having no layers points to a problem outside the action.
       raise exceptions.SkipCommand(_('The image has no layers.'))
+
+
+class _FileExtension:
+  """Class holding properties for a file extension."""
+
+  def __init__(self):
+    self.is_valid = True
+    """If ``True``, the file extension is valid and can be used in filenames
+    for file export procedures.
+    """
+    self.processed_count = 0
+    """Number of items with the file extension that have been exported."""
+
+
+class FileExtensionProperties:
+  """Mapping of file extensions from `file_formats.FILE_FORMATS` to
+  `_FileExtension` instances.
+
+  File extension as a key is always converted to lowercase.
+  """
+  def __init__(self, import_or_export):
+    if import_or_export not in ['import', 'export']:
+      raise ValueError('invalid value for import_or_export; must be either "import" or "export"')
+
+    self._import_or_export = import_or_export
+
+    self._properties = collections.defaultdict(_FileExtension)
+
+    for file_format in file_formats_.FILE_FORMATS:
+      if self._import_or_export == 'import' and not file_format.has_import_proc():
+        continue
+
+      if self._import_or_export == 'export' and not file_format.has_export_proc():
+        continue
+
+      # This ensures that the file format dialog will be displayed only once per
+      # file format if multiple file extensions for the same format are used
+      # (e.g. 'jpg', 'jpeg' or 'jpe' for the JPEG format).
+      extension_properties = _FileExtension()
+      for file_extension in file_format.file_extensions:
+        self._properties[file_extension.lower()] = extension_properties
+
+  def __getitem__(self, key):
+    return self._properties[key.lower()]

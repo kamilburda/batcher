@@ -23,6 +23,12 @@ def get_settings_for_batcher(main_settings: setting_.Group) -> Dict[str, Any]:
     if setting_name in main_settings:
       settings_for_batcher[setting_name] = main_settings[setting_name].value
 
+  if 'import' in main_settings:
+    settings_for_batcher['import_options'] = {}
+
+    for setting in main_settings['import']:
+      settings_for_batcher['import_options'][setting.name] = setting.value
+
   if 'export' in main_settings:
     settings_for_batcher['more_export_options'] = {}
 

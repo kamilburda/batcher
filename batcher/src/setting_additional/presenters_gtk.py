@@ -44,8 +44,8 @@ class FileExtensionEntryPresenter(ExtendedEntryPresenter):
   Value: Text in the entry.
   """
 
-  def _create_widget(self, setting, **kwargs):
-    return entries_.FileExtensionEntry()
+  def _create_widget(self, setting, import_or_export='export', **kwargs):
+    return entries_.FileExtensionEntry(import_or_export=import_or_export)
 
 
 class NamePatternEntryPresenter(ExtendedEntryPresenter):

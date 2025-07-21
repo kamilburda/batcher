@@ -18,6 +18,6 @@ def test_export_for_all_file_formats(batcher, settings, output_dirpath):
           output_directory=Gio.file_new_for_path(os.path.join(output_dirpath, file_extension)),
           file_extension=file_extension,
           **utils_setting_.get_settings_for_batcher(settings['main']))
-      except exceptions.ExportError:
+      except exceptions.ImageExportError:
         # Do not stop if one file format causes an error.
         continue

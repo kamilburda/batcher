@@ -117,20 +117,32 @@ def create_settings_for_convert():
     },
   ])
 
-  export_settings = setting_.Group(
-    name='export',
+  import_arguments = utils.semi_deep_copy(
+    builtin_actions.BUILTIN_ACTIONS['import']['arguments'])
+  # Remove settings already present in the main settings.
+  import_arguments = import_arguments[1:]
+
+  import_settings = setting_.Group(
+    name='import',
     setting_attributes={
       'pdb_type': None,
     },
   )
+  import_settings.add(import_arguments)
+  settings['main'].add([import_settings])
 
   export_arguments = utils.semi_deep_copy(
     builtin_actions.BUILTIN_ACTIONS['export_for_convert']['arguments'])
   # Remove settings already present in the main settings.
   export_arguments = export_arguments[2:]
 
+  export_settings = setting_.Group(
+    name='export',
+    setting_attributes={
+      'pdb_type': None,
+    },
+  )
   export_settings.add(export_arguments)
-
   settings['main'].add([export_settings])
 
   gui_settings = _create_gui_settings('image_file_tree_items')
