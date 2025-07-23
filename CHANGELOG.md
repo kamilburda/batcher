@@ -5,13 +5,13 @@ General changes:
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
-* If an action or condition causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action/condition can safely be skipped for a particular item. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again.
+* If an action causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action can safely be skipped for a particular image/layer. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable.
 
 User interface changes:
 * Export settings are now arranged vertically. Clarified labels describing the settings.
-* The message area at the bottom now only spans the left part of the dialog to make more room for the preview. 
+* Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
+* The message area at the bottom now only spans the left part of the dialog to make more room for the preview.
 * Marked names of common layer effect arguments as translatable.
-* Adjusted default size of the main dialog and its individual parts for each plug-in procedure.
 
 
 ## 1.1.1
