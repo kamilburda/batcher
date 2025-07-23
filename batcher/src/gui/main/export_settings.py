@@ -61,12 +61,12 @@ class ExportSettings:
     self._settings['main/output_directory'].set_gui()
     self._settings['main/output_directory'].gui.widget.set_hexpand(True)
 
-    self._name_pattern_label = Gtk.Label(
+    self._label_filename = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
     )
-    self._name_pattern_label.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(_('File Name:'))))
+    self._label_filename.set_markup(
+      '<b>{}</b>'.format(GLib.markup_escape_text(_('Name and Format:'))))
 
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(),
@@ -75,14 +75,6 @@ class ExportSettings:
       max_width_chars=self._NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
     )
     self._name_pattern_entry.set_activates_default(True)
-    self._name_pattern_entry.set_hexpand(True)
-
-    self._file_extension_label = Gtk.Label(
-      xalign=0.0,
-      yalign=0.5,
-    )
-    self._file_extension_label.set_markup(
-      '<b>{}</b>'.format(_('File Format:')))
 
     self._file_extension_entry = entries_.FileExtensionEntry(
       width_chars=self._FILE_EXTENSION_ENTRY_WIDTH_CHARS,
@@ -90,18 +82,17 @@ class ExportSettings:
       activates_default=True,
     )
 
-    self._export_options_button = Gtk.Button(
-      label=_('Export O_ptions...'),
-      use_underline=True,
-      hexpand=True,
-    )
+    self._file_format_options_button = Gtk.Button()
+    self._file_format_options_button.set_image(
+      Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON))
 
-    self._hbox_file_format_options = Gtk.Box(
+    self._hbox_filename = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._FILE_FORMAT_OPTIONS_SPACING,
     )
-    self._hbox_file_format_options.pack_start(self._file_extension_entry, False, False, 0)
-    self._hbox_file_format_options.pack_start(self._export_options_button, True, True, 0)
+    self._hbox_filename.pack_start(self._name_pattern_entry, True, True, 0)
+    self._hbox_filename.pack_start(self._file_extension_entry, False, False, 0)
+    self._hbox_filename.pack_start(self._file_format_options_button, False, False, 0)
 
     self._grid = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -109,10 +100,8 @@ class ExportSettings:
     )
     self._grid.attach(self._folder_chooser_label, 0, 0, 1, 1)
     self._grid.attach(self._settings['main/output_directory'].gui.widget, 1, 0, 1, 1)
-    self._grid.attach(self._name_pattern_label, 0, 1, 1, 1)
-    self._grid.attach(self._name_pattern_entry, 1, 1, 1, 1)
-    self._grid.attach(self._file_extension_label, 0, 2, 1, 1)
-    self._grid.attach(self._hbox_file_format_options, 1, 2, 1, 1)
+    self._grid.attach(self._label_filename, 0, 1, 1, 1)
+    self._grid.attach(self._hbox_filename, 1, 1, 1, 1)
 
     self._export_options_dialog = None
 
@@ -133,7 +122,7 @@ class ExportSettings:
     self._set_up_name_pattern()
     self._set_up_file_extension()
 
-    self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
+    self._file_format_options_button.connect('clicked', self._on_export_options_button_clicked)
 
     for setting in self._settings['main/export']:
       setting.connect_event('value-changed', self._update_previews_on_export_options_change)
