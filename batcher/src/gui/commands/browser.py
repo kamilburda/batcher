@@ -386,7 +386,6 @@ class CommandBrowser(GObject.GObject):
     self._tree_view.set_model(self._tree_model_sorted)
 
     self._entry_search = entries_.ExtendedEntry(
-      expandable=False,
       placeholder_text=_('Search'),
     )
     self._entry_search.set_icon_from_icon_name(

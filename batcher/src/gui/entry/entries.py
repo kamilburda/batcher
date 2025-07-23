@@ -12,7 +12,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from . import expander as entry_expander_
 from . import popup as entry_popup_
 from . import undo as entry_undo_
 
@@ -28,32 +27,18 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
   Additional features include:
     * undo/redo of text,
     * placeholder text,
-    * optional expandable width of the entry.
   """
 
   _PLACEHOLDER_STYLE_CLASS_NAME = 'placeholder'
   
   def __init__(
         self,
-        expandable: bool = True,
-        minimum_width_chars: int = -1,
-        maximum_width_chars: int = -1,
         placeholder_text: Optional[str] = None,
         **kwargs,
   ):
     """Initializes an `ExtendedEntry` instance.
 
     Args:
-      expandable:
-        If ``True``, the entry width is made expandable. If ``False``, the entry
-        will not expand automatically, and ``minimum_width_chars`` and
-        ``maximum_width_chars`` will thus have no effect.
-      minimum_width_chars:
-        Minimum width specified as a number of characters. The entry will not
-        shrink below this width if ``expandable`` is ``True``.
-      maximum_width_chars:
-        Maximum width specified as a number of characters. The entry will not
-        expand above this width if ``expandable`` is ``True``.
       placeholder_text:
         Text to display as a placeholder if the entry is empty. If ``None``,
         do not display any placeholder.
@@ -63,19 +48,10 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
     """
     Gtk.Entry.__init__(self, **kwargs)
 
-    self._expandable = expandable
-    self._minimum_width_chars = minimum_width_chars
-    self._maximum_width_chars = maximum_width_chars
     self._placeholder_text = placeholder_text
 
     self._undo_context = entry_undo_.EntryUndoContext(self)
     self._undo_context.enable()
-
-    if self._expandable:
-      self._entry_expander = entry_expander_.EntryExpander(
-        self, self._minimum_width_chars, self._maximum_width_chars)
-    else:
-      self._entry_expander = None
 
     self._popup = None
 

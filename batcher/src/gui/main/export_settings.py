@@ -21,8 +21,11 @@ class ExportSettings:
   _GRID_COLUMN_SPACING = 7
   _FILE_FORMAT_OPTIONS_SPACING = 3
 
-  _FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS = 5
-  _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 8
+  _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 15
+  _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 15
+
+  _FILE_EXTENSION_ENTRY_WIDTH_CHARS = 5
+  _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 5
 
   _DELAY_PREVIEW_UPDATE_MILLISECONDS = 100
 
@@ -67,8 +70,9 @@ class ExportSettings:
 
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(),
-      expandable=False,
       default_item=self._settings['main/name_pattern'].default_value,
+      width_chars=self._NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
+      max_width_chars=self._NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
     )
     self._name_pattern_entry.set_activates_default(True)
     self._name_pattern_entry.set_hexpand(True)
@@ -81,8 +85,8 @@ class ExportSettings:
       '<b>{}</b>'.format(_('File Format:')))
 
     self._file_extension_entry = entries_.FileExtensionEntry(
-      minimum_width_chars=self._FILE_EXTENSION_ENTRY_MIN_WIDTH_CHARS,
-      maximum_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
+      width_chars=self._FILE_EXTENSION_ENTRY_WIDTH_CHARS,
+      max_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
       activates_default=True,
     )
 
