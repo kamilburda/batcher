@@ -26,7 +26,8 @@ class ExtendedEntry(Gtk.Entry, Gtk.Editable):
 
   Additional features include:
     * undo/redo of text,
-    * placeholder text,
+    * custom solution for placeholder text,
+    * support for displaying a popup with items provided by subclasses.
   """
 
   _PLACEHOLDER_STYLE_CLASS_NAME = 'placeholder'
