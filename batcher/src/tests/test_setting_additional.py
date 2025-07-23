@@ -996,38 +996,41 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
 
     self._ACTIVE_KEY = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
 
-  def test_set_active_file_format(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
+  def test_set_active_file_formats(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = (
+      None, 'file-jpeg-export', self.jpg_options)
 
-    self.setting.set_active_file_format('jpg')
+    self.setting.set_active_file_formats(['jpg'])
 
     mock_get_setting_data_from_pdb_procedure.assert_called_once()
 
-    self.assertEqual(self.setting.value[self._ACTIVE_KEY], 'jpg')
+    self.assertEqual(self.setting.value[self._ACTIVE_KEY], ['jpg'])
     self.assertIn('jpg', self.setting.value)
 
-  def test_set_active_file_format_with_alias(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-jpeg-export', self.jpg_options
+  def test_set_active_file_formats_with_alias(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
+    mock_get_setting_data_from_pdb_procedure.return_value = (
+      None, 'file-jpeg-export', self.jpg_options)
 
-    self.setting.set_active_file_format('jpeg')
+    self.setting.set_active_file_formats(['jpeg'])
 
-    self.assertEqual(self.setting.value[self._ACTIVE_KEY], 'jpg')
+    self.assertEqual(self.setting.value[self._ACTIVE_KEY], ['jpg'])
     self.assertIn('jpg', self.setting.value)
 
-  def test_set_active_file_format_to_unrecognized_format(
+  def test_set_active_file_formats_to_unrecognized_format(
         self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    self.setting.set_active_file_format('unknown')
+    self.setting.set_active_file_formats(['unknown'])
 
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
 
-    self.assertEqual(self.setting.value[self._ACTIVE_KEY], 'unknown')
+    self.assertEqual(self.setting.value[self._ACTIVE_KEY], ['unknown'])
     self.assertNotIn('unknown', self.setting.value)
 
   def test_to_dict(self, mock_get_setting_data_from_pdb_procedure, *_mocks):
-    mock_get_setting_data_from_pdb_procedure.return_value = None, 'file-png-export', self.png_options
+    mock_get_setting_data_from_pdb_procedure.return_value = (
+      None, 'file-png-export', self.png_options)
 
-    self.setting.set_active_file_format('png')
-    self.setting.set_active_file_format('unknown')
+    self.setting.set_active_file_formats(['png'])
+    self.setting.set_active_file_formats(['unknown'])
 
     self.setting.value['png']['compression'].set_value(7)
 
@@ -1041,7 +1044,7 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'import_or_export': 'export',
         'initial_file_format': 'png',
         'value': {
-          self._ACTIVE_KEY: 'unknown',
+          self._ACTIVE_KEY: ['unknown'],
           'png': [
             {
               'name': 'interlaced',
@@ -1092,10 +1095,10 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.setting.set_value({
       'png': png_group,
       'jpg': jpeg_group,
-      self._ACTIVE_KEY: 'jpg',
+      self._ACTIVE_KEY: ['jpg'],
     })
 
-    self.assertEqual(self.setting.value[self._ACTIVE_KEY], 'jpg')
+    self.assertEqual(self.setting.value[self._ACTIVE_KEY], ['jpg'])
     self.assertNotIn('compression', self.setting.value['png'])
     self.assertEqual(self.setting.value['png']['interlaced'].value, False)
     self.assertEqual(self.setting.value['jpg']['quality'].value, 0.9)
@@ -1122,12 +1125,12 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
           'default_value': True,
         },
       ],
-      self._ACTIVE_KEY: 'jpg',
+      self._ACTIVE_KEY: ['jpg'],
     })
 
     mock_get_setting_data_from_pdb_procedure.assert_not_called()
 
-    self.assertEqual(self.setting.value[self._ACTIVE_KEY], 'jpg')
+    self.assertEqual(self.setting.value[self._ACTIVE_KEY], ['jpg'])
     self.assertNotIn('png', self.setting.value)
     self.assertNotIn('quality', self.setting.value['jpg'])
     self.assertEqual(self.setting.value['jpg']['optimize'].value, False)

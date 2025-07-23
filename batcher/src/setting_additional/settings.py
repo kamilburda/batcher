@@ -779,7 +779,9 @@ class FileFormatOptionsSetting(setting_.DictSetting):
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.file_format_options]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: {self.ACTIVE_FILE_FORMAT_KEY: self._initial_file_format}
+  _DEFAULT_DEFAULT_VALUE = lambda self: {
+    self.ACTIVE_FILE_FORMAT_KEY: [self._initial_file_format]
+  }
 
   def __init__(self, name: str, import_or_export: str, initial_file_format: str, **kwargs):
     self._import_or_export = import_or_export
@@ -791,16 +793,19 @@ class FileFormatOptionsSetting(setting_.DictSetting):
   def import_or_export(self):
     return self._import_or_export
 
-  def set_active_file_format(self, file_format: str):
-    processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
+  def set_active_file_formats(self, file_formats: List[str]):
+    processed_file_formats = [
+      file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
+      for file_format in file_formats
+    ]
 
-    self._value[self.ACTIVE_FILE_FORMAT_KEY] = processed_file_format
+    self._value[self.ACTIVE_FILE_FORMAT_KEY] = processed_file_formats
 
-    file_formats_.fill_file_format_options(
-      self._value, self._value[self.ACTIVE_FILE_FORMAT_KEY], self._import_or_export)
+    for file_format in self._value[self.ACTIVE_FILE_FORMAT_KEY]:
+      file_formats_.fill_file_format_options(self._value, file_format, self._import_or_export)
 
-    if hasattr(self.gui, 'set_active_file_format'):
-      self.gui.set_active_file_format(processed_file_format)
+    if hasattr(self.gui, 'set_active_file_formats'):
+      self.gui.set_active_file_formats(processed_file_formats)
 
   def _raw_to_value(self, raw_value):
     value = {}
@@ -852,7 +857,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
     if (orig_active_file_format is not None
         and self.ACTIVE_FILE_FORMAT_KEY in value
         and value[self.ACTIVE_FILE_FORMAT_KEY] != orig_active_file_format):
-      self.set_active_file_format(value[self.ACTIVE_FILE_FORMAT_KEY])
+      self.set_active_file_formats(value[self.ACTIVE_FILE_FORMAT_KEY])
 
   @staticmethod
   def _file_format_options_to_dict(file_format_options):

@@ -1,4 +1,14 @@
+from src import setting_additional
+
+
 def assert_contents(test_case, settings, _orig_setting_values):
   scale_arguments_path = 'main/actions/scale_for_images/arguments'
 
   test_case.assertFalse(settings[f'{scale_arguments_path}/image_resolution'].gui.show_display_name)
+
+  active_file_format_key = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
+
+  test_case.assertEqual(
+    settings['main/export/file_format_export_options'].value[active_file_format_key],
+    ['png'],
+  )

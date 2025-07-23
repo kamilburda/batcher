@@ -1,10 +1,18 @@
 from .. import _utils as update_utils_
 
+from src import setting_additional
+
 
 def update(data, _settings, _procedure_groups):
   main_settings_list, _index = update_utils_.get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    export_settings_list, _index = update_utils_.get_child_group_list(main_settings_list, 'export')
+    if export_settings_list is not None:
+      _change_active_file_format_to_dict(export_settings_list)
+
+    _change_active_file_format_to_dict(main_settings_list)
+
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
     if actions_list is not None:
@@ -17,6 +25,24 @@ def update(data, _settings, _procedure_groups):
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
           _scale_change_show_display_name_to_gui_kwargs(arguments_list)
+
+        if (orig_name_setting_dict['value'].startswith('export_for_')
+            and arguments_list is not None):
+          _change_active_file_format_to_dict(arguments_list)
+
+
+def _change_active_file_format_to_dict(export_settings_list):
+  file_format_export_options_dict, _index = update_utils_.get_child_setting(
+    export_settings_list, 'file_format_export_options')
+
+  active_key = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
+
+  if file_format_export_options_dict is not None:
+    if ('value' in file_format_export_options_dict
+        and active_key in file_format_export_options_dict['value']
+        and not isinstance(file_format_export_options_dict['value'][active_key], (list, tuple))):
+      file_format_export_options_dict['value'][active_key] = [
+        file_format_export_options_dict['value'][active_key]]
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):

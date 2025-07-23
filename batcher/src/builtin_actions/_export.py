@@ -745,12 +745,12 @@ def _set_sensitive_for_image_name_pattern_in_export(
 
 def _set_file_format_export_options(
       file_extension_setting, file_format_export_options_setting):
-  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
+  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
 
 
 def _set_file_format_export_options_from_extension(
       file_format_export_options_setting, file_extension_setting):
-  file_format_export_options_setting.set_active_file_format(file_extension_setting.value)
+  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
 
 
 def _show_hide_file_format_export_options(

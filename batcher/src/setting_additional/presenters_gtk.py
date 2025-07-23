@@ -178,26 +178,25 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
     super().__init__(*args, show_display_name=show_display_name, **kwargs)
 
   def _create_widget(self, setting, **kwargs):
-    file_format_options_box = gui_widgets_.FileFormatOptionsBox(
-      initial_header_title=setting.display_name,
-      **kwargs,
-    )
+    return gui_widgets_.FileFormatOptionsBox(**kwargs)
 
-    return file_format_options_box
+  def set_active_file_formats(self, file_formats):
+    file_format_options = [
+      self.setting.value.get(file_format, None) for file_format in file_formats]
 
-  def set_active_file_format(self, file_format):
-    self._widget.set_active_file_format(file_format, self.setting.value.get(file_format, None))
+    self._widget.set_active_file_formats(file_formats, file_format_options)
 
   def get_value(self):
     if self.setting.ACTIVE_FILE_FORMAT_KEY in self.setting.value:
-      active_file_format = self.setting.value[self.setting.ACTIVE_FILE_FORMAT_KEY]
-      if active_file_format in self.setting.value:
-        self.setting.value[active_file_format].apply_gui_values_to_settings()
+      active_file_formats = self.setting.value[self.setting.ACTIVE_FILE_FORMAT_KEY]
+      for active_file_format in active_file_formats:
+        if active_file_format in self.setting.value:
+          self.setting.value[active_file_format].apply_gui_values_to_settings()
 
     return self.setting.value
 
   def _set_value(self, value):
-    active_file_format_key = self.setting.ACTIVE_FILE_FORMAT_KEY
+    file_formats = value[self.setting.ACTIVE_FILE_FORMAT_KEY]
+    file_format_options = [value.get(file_format, None) for file_format in file_formats]
 
-    self._widget.set_active_file_format(
-      value[active_file_format_key], value.get(value[active_file_format_key], None))
+    self._widget.set_active_file_formats(file_formats, file_format_options)
