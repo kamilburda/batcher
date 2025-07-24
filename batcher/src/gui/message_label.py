@@ -9,15 +9,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import utils
-from src.gui import utils as gui_utils_
 
 
 class MessageLabel(Gtk.Box):
-  """A widget to display a label, optionally being cleared after a delay.
-
-  A tooltip is displayed if the label text does not fit the width of the parent
-  widget.
-  """
+  """A widget to display a label, optionally being cleared after a delay."""
 
   _SPACING = 2
   _LABEL_WIDTH_CHARS = 30
@@ -35,9 +30,6 @@ class MessageLabel(Gtk.Box):
   ):
     """Sets the text of the label. The text is displayed in bold style.
 
-    If the text is too wide to fit the label, the label is ellipsized and a
-    tooltip is displayed containing the full text.
-    
     If ``clear_delay`` is not ``None`` and ``message_type`` is not
     `Gtk.MessageType.ERROR`, the message automatically disappears after the
     specified delay in milliseconds.
@@ -56,13 +48,11 @@ class MessageLabel(Gtk.Box):
     if text:
       self._label_message.set_markup(f'<b>{GLib.markup_escape_text(text)}</b>')
 
-      if not gui_utils_.label_fits_text(self._label_message):
-        self._label_message.set_tooltip_text(text)
-      else:
-        self._label_message.set_tooltip_text(None)
+      self.show()
     else:
+      self.hide()
+
       self._label_message.set_text('')
-      self._label_message.set_tooltip_text(None)
 
   def _init_gui(self):
     self._label_message = Gtk.Label(
@@ -71,9 +61,12 @@ class MessageLabel(Gtk.Box):
       width_chars=self._LABEL_WIDTH_CHARS,
       wrap=True,
     )
+    self._label_message.show()
 
     self.set_spacing(self._SPACING)
     self.pack_start(self._label_message, True, True, 0)
+
+    self.set_no_show_all(True)
   
   def _timeout_add_strict(self, delay, func, *args, **kwargs):
     if self._should_clear_text_after_delay(delay):
