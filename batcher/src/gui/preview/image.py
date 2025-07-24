@@ -57,9 +57,9 @@ class ImagePreview(preview_base_.Preview):
   _MANUAL_UPDATE_LOCK = '_manual_update'
   
   _WIDGET_SPACING = 5
-  _HBOX_SPACING = 4
-  _ARROW_ICON_PIXEL_SIZE = 12
-  
+  _HBOX_BUTTONS_SPACING = 3
+  _HBOX_LABEL_BUTTONS_SPACING = 8
+
   def __init__(self, batcher, settings):
     super().__init__()
     
@@ -231,14 +231,20 @@ class ImagePreview(preview_base_.Preview):
     self._button_refresh.show_all()
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)
-    
-    self._hbox = Gtk.Box(
+
+    self._hbox_buttons = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._HBOX_SPACING,
+      spacing=self._HBOX_BUTTONS_SPACING,
     )
-    self._hbox.pack_start(self._preview_label, False, False, 0)
-    self._hbox.pack_start(self._button_menu, False, False, 0)
-    self._hbox.pack_start(self._button_refresh, False, False, 0)
+    self._hbox_buttons.pack_start(self._button_menu, False, False, 0)
+    self._hbox_buttons.pack_start(self._button_refresh, False, False, 0)
+
+    self._hbox_label_buttons = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_LABEL_BUTTONS_SPACING,
+    )
+    self._hbox_label_buttons.pack_start(self._preview_label, False, False, 0)
+    self._hbox_label_buttons.pack_start(self._hbox_buttons, False, False, 0)
 
     self._preview_image = Gtk.DrawingArea(
       hexpand=True,
@@ -254,7 +260,7 @@ class ImagePreview(preview_base_.Preview):
     
     self.set_spacing(self._WIDGET_SPACING)
     
-    self.pack_start(self._hbox, False, False, 0)
+    self.pack_start(self._hbox_label_buttons, False, False, 0)
     self.pack_start(self._preview_image, True, True, 0)
     self.pack_start(self._label_item_name, False, False, 0)
 
