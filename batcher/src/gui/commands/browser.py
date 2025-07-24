@@ -36,8 +36,6 @@ class CommandBrowser(GObject.GObject):
   _VBOX_BROWSER_SPACING = 6
   _HBOX_SEARCH_BAR_SPACING = 6
 
-  _ARROW_ICON_PIXEL_SIZE = 12
-
   _COMMAND_NAME_WIDTH_CHARS = 25
 
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
@@ -392,11 +390,8 @@ class CommandBrowser(GObject.GObject):
       Gtk.EntryIconPosition.SECONDARY, GimpUi.ICON_EDIT_CLEAR)
     self._entry_search.set_icon_activatable(Gtk.EntryIconPosition.SECONDARY, True)
 
-    self._image_drop_down = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
-    self._image_drop_down.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
-
     self._button_search_settings = Gtk.Button(
-      image=self._image_drop_down,
+      image=Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON),
       relief=Gtk.ReliefStyle.NONE,
     )
 

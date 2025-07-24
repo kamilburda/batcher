@@ -210,11 +210,8 @@ class ImagePreview(preview_base_.Preview):
     )
     self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
 
-    self._image_arrow = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
-    self._image_arrow.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
-
     self._button_menu = Gtk.Button(
-      image=self._image_arrow,
+      image=Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON),
       relief=Gtk.ReliefStyle.NONE,
     )
 
