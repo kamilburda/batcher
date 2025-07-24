@@ -19,7 +19,7 @@ class ExportSettings:
 
   _GRID_ROW_SPACING = 7
   _GRID_COLUMN_SPACING = 7
-  _FILE_FORMAT_OPTIONS_SPACING = 3
+  _EXPORT_OPTIONS_SPACING = 3
 
   _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 15
   _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 15
@@ -82,17 +82,17 @@ class ExportSettings:
       activates_default=True,
     )
 
-    self._file_format_options_button = Gtk.Button()
-    self._file_format_options_button.set_image(
+    self._export_options_button = Gtk.Button()
+    self._export_options_button.set_image(
       Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON))
 
     self._hbox_filename = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._FILE_FORMAT_OPTIONS_SPACING,
+      spacing=self._EXPORT_OPTIONS_SPACING,
     )
     self._hbox_filename.pack_start(self._name_pattern_entry, True, True, 0)
     self._hbox_filename.pack_start(self._file_extension_entry, False, False, 0)
-    self._hbox_filename.pack_start(self._file_format_options_button, False, False, 0)
+    self._hbox_filename.pack_start(self._export_options_button, False, False, 0)
 
     self._grid = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -122,7 +122,7 @@ class ExportSettings:
     self._set_up_name_pattern()
     self._set_up_file_extension()
 
-    self._file_format_options_button.connect('clicked', self._on_file_format_options_button_clicked)
+    self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
     for setting in self._settings['main/export']:
       setting.connect_event('value-changed', self._update_previews_on_export_options_change)
@@ -181,7 +181,7 @@ class ExportSettings:
   def _on_file_extension_entry_focus_out_event(_entry, _event, setting):
     revert_file_extension_gui_to_last_valid_value(setting)
 
-  def _on_file_format_options_button_clicked(self, _button):
+  def _on_export_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
       self._export_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
         self._settings['main/export'],
