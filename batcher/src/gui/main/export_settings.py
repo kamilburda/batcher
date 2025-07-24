@@ -122,7 +122,7 @@ class ExportSettings:
     self._set_up_name_pattern()
     self._set_up_file_extension()
 
-    self._file_format_options_button.connect('clicked', self._on_export_options_button_clicked)
+    self._file_format_options_button.connect('clicked', self._on_file_format_options_button_clicked)
 
     for setting in self._settings['main/export']:
       setting.connect_event('value-changed', self._update_previews_on_export_options_change)
@@ -181,7 +181,7 @@ class ExportSettings:
   def _on_file_extension_entry_focus_out_event(_entry, _event, setting):
     revert_file_extension_gui_to_last_valid_value(setting)
 
-  def _on_export_options_button_clicked(self, _button):
+  def _on_file_format_options_button_clicked(self, _button):
     if self._export_options_dialog is None:
       self._export_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
         self._settings['main/export'],
