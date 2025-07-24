@@ -148,7 +148,6 @@ def create_settings_for_convert():
   gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([
     _create_inputs_interactive_setting_dict(),
-    _create_show_original_item_names_setting_dict(False),
     _create_keep_inputs_setting_dict(True, _('Keep Input Images')),
     _create_auto_close_setting_dict(False),
   ])
@@ -157,7 +156,7 @@ def create_settings_for_convert():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 680),
+      dialog_size=(710, 640),
       paned_outside_previews_position=350,
       paned_between_previews_position=300,
     )
@@ -398,7 +397,9 @@ def create_settings_for_edit_and_save_images():
   ])
 
   gui_settings = _create_gui_settings('gimp_image_tree_items')
-  gui_settings.add([_create_auto_close_setting_dict(True)])
+  gui_settings.add([
+    _create_auto_close_setting_dict(True),
+  ])
 
   size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
@@ -654,7 +655,9 @@ def create_settings_for_edit_layers():
   ])
 
   gui_settings = _create_gui_settings('gimp_item_tree_items')
-  gui_settings.add([_create_auto_close_setting_dict(False)])
+  gui_settings.add([
+    _create_auto_close_setting_dict(False),
+  ])
 
   size_gui_settings = setting_.Group(name='size')
   size_gui_settings.add(
@@ -735,6 +738,13 @@ def _create_gui_settings(item_tree_items_setting_type):
   ])
 
   gui_settings.add([
+    {
+      'type': 'bool',
+      'name': 'show_original_item_names',
+      'default_value': False,
+      'display_name': _('Show Original Names'),
+      'gui_type': 'check_menu_item',
+    },
     {
       'type': 'bool',
       'name': 'name_preview_sensitive',
@@ -827,15 +837,6 @@ def _create_inputs_interactive_setting_dict():
     'display_name': _('Input files and folders'),
     'pdb_type': None,
     'gui_type': None,
-  }
-
-
-def _create_show_original_item_names_setting_dict(default_value):
-  return {
-    'type': 'bool',
-    'name': 'show_original_item_names',
-    'default_value': default_value,
-    'display_name': _('Show Original Names'),
   }
 
 

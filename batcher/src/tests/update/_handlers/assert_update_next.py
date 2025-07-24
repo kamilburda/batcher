@@ -1,3 +1,4 @@
+from src import setting as setting_
 from src import setting_additional
 
 
@@ -12,3 +13,6 @@ def assert_contents(test_case, settings, _orig_setting_values):
     settings['main/export/file_format_export_options'].value[active_file_format_key],
     ['png'],
   )
+
+  test_case.assertEqual(
+    settings['gui/show_original_item_names'].gui_type, setting_.CheckMenuItemPresenter)

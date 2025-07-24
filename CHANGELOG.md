@@ -8,7 +8,9 @@ General changes:
 * If an action causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action can safely be skipped for a particular image/layer. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable.
 
 User interface changes:
-* Export settings are now arranged vertically. Clarified labels describing the settings.
+* Export settings are now arranged vertically in the upper left part of the dialog. Clarified labels describing the settings.
+* Batch Convert: Buttons for adding and removing files and folders are moved to the top and changed them to icons.
+* The `Show Original Names` button shown in Batch Convert is now available for all plug-in procedures among the options at the top of the input list.
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview.
 * Marked names of common layer effect arguments as translatable.

@@ -30,6 +30,10 @@ def update(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _change_active_file_format_to_dict(arguments_list)
 
+  gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
+
+  _change_gui_type_for_show_original_item_names(gui_settings_list)
+
 
 def _change_active_file_format_to_dict(export_settings_list):
   file_format_export_options_dict, _index = update_utils_.get_child_setting(
@@ -49,3 +53,11 @@ def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
   if 'show_display_name' in arguments_list[7]:
     del arguments_list[7]['show_display_name']
     arguments_list[7]['gui_kwargs'] = {'show_display_name': False}
+
+
+def _change_gui_type_for_show_original_item_names(gui_settings_list):
+  show_original_item_names_dict, _index = update_utils_.get_child_setting(
+    gui_settings_list, 'show_original_item_names')
+
+  if show_original_item_names_dict is not None:
+    show_original_item_names_dict['gui_type'] = 'check_menu_item'

@@ -6,6 +6,8 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -37,14 +39,10 @@ class Previews:
   _FILE_COUNT_FIRST_THRESHOLD = 1000
   _FILE_COUNT_SECOND_THRESHOLD = 10000
 
-  _PREVIEWS_LEFT_MARGIN = 4
-  _LABEL_TOP_BOTTOM_MARGIN = 4
-
-  _NAME_PREVIEW_BUTTONS_SPACING = 4
-  _BUTTONS_GRID_ROW_SPACING = 3
-  _BUTTONS_GRID_COLUMN_SPACING = 3
-  _NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN = 4
-
+  _PREVIEWS_LEFT_MARGIN = 6
+  _LABEL_TOP_BUTTONS_SPACING = 8
+  _IMPORT_OPTIONS_ICON_LABEL_SPACING = 6
+  _NAME_PREVIEW_BUTTONS_SPACING = 3
   _NAME_PREVIEW_PLACEHOLDER_LABEL_PAD = 8
 
   def __init__(
@@ -179,13 +177,38 @@ class Previews:
     self._label_top = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
-      margin_bottom=self._LABEL_TOP_BOTTOM_MARGIN,
     )
     self._label_top.set_markup('<b>{}</b>'.format(self._top_label))
 
+    self._button_input_options = Gtk.Button(
+      relief=Gtk.ReliefStyle.NONE,
+      tooltip_text=_('Options'),
+    )
+    self._button_input_options.set_image(
+      Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON))
+
+    self._menu_input_options = Gtk.Menu()
+
+    self._settings['gui/show_original_item_names'].set_gui()
+    self._menu_input_options.append(self._settings['gui/show_original_item_names'].gui.widget)
+
+    self._hbox_input_options = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
+    )
+
+    self._hbox_input_options.pack_end(self._button_input_options, False, False, 0)
+
+    self._hbox_top = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._LABEL_TOP_BUTTONS_SPACING,
+    )
+    self._hbox_top.pack_start(self._label_top, False, False, 0)
+    self._hbox_top.pack_start(self._hbox_input_options, False, False, 0)
+
     if self._manage_items:
       self._set_up_managing_items()
-      upper_widget = self._vbox_name_preview_and_options
+      upper_widget = self._name_preview_overlay
     else:
       upper_widget = self._name_preview
 
@@ -200,13 +223,15 @@ class Previews:
       orientation=Gtk.Orientation.VERTICAL,
       margin_start=self._PREVIEWS_LEFT_MARGIN,
     )
-    self._vbox_previews.pack_start(self._label_top, False, False, 0)
+    self._vbox_previews.pack_start(self._hbox_top, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
+
+    self._button_input_options.connect('clicked', self._on_button_input_options_clicked)
 
   def _set_up_managing_items(self):
     self._name_preview_placeholder_label = Gtk.Label(
-      label=(
-        '<i>' + _('Drop or paste files and folders here, or add them via buttons below') + '</i>'),
+      label='<i>{}</i>'.format(
+        _('Drop or paste files and folders here, or add them via the "+" button above')),
       use_markup=True,
       xalign=0.5,
       yalign=0.5,
@@ -238,7 +263,11 @@ class Previews:
     self._menu_add.show_all()
 
     self._button_add = Gtk.Button(
-      label=_('A_dd...'), use_underline=True, hexpand=True)
+      relief=Gtk.ReliefStyle.NONE,
+      tooltip_text=_('Add'),
+    )
+    self._button_add.set_image(
+      Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_ADD, Gtk.IconSize.BUTTON))
 
     self._menu_item_remove_selected = Gtk.MenuItem(label=_('Remove Selected'), use_underline=False)
     self._menu_item_remove_all = Gtk.MenuItem(label=_('Remove All'), use_underline=False)
@@ -249,41 +278,34 @@ class Previews:
     self._menu_remove.show_all()
 
     self._button_remove = Gtk.Button(
-      label=_('Re_move...'), use_underline=True, hexpand=True)
-
-    self._grid_buttons = Gtk.Grid(
-      row_spacing=self._BUTTONS_GRID_ROW_SPACING,
-      column_spacing=self._BUTTONS_GRID_COLUMN_SPACING,
-      column_homogeneous=True,
-      hexpand=True,
+      relief=Gtk.ReliefStyle.NONE,
+      tooltip_text=_('Remove'),
     )
-    self._grid_buttons.attach(self._button_add, 0, 0, 1, 1)
-    self._grid_buttons.attach(self._button_remove, 1, 0, 1, 1)
+    self._button_remove.set_image(
+      Gtk.Image.new_from_icon_name(GimpUi.ICON_LIST_REMOVE, Gtk.IconSize.BUTTON))
 
-    self._hbox_input_options = Gtk.Box(
+    self._hbox_input_options.pack_start(self._button_add, False, False, 0)
+    self._hbox_input_options.pack_start(self._button_remove, False, False, 0)
+
+    self._menu_item_import_options = Gtk.MenuItem()
+    self._hbox_menu_item_import_options = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._BUTTONS_GRID_COLUMN_SPACING,
+      spacing=self._IMPORT_OPTIONS_ICON_LABEL_SPACING,
     )
-
-    self._button_import_options = Gtk.Button(
-      label=_('_Import Options...'),
-      use_underline=True,
+    self._hbox_menu_item_import_options.add(
+      Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.MENU)
     )
-
-    self._hbox_input_options.pack_start(self._button_import_options, True, True, 0)
-    if 'show_original_item_names' in self._settings['gui']:
-      self._settings['gui/show_original_item_names'].set_gui()
-      self._hbox_input_options.pack_start(
-        self._settings['gui/show_original_item_names'].gui.widget, True, True, 0)
-
-    self._vbox_name_preview_and_options = Gtk.Box(
-      orientation=Gtk.Orientation.VERTICAL,
-      spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
-      margin_bottom=self._NAME_PREVIEW_BUTTONS_BOTTOM_MARGIN,
+    self._hbox_menu_item_import_options.add(
+      Gtk.Label(
+        label=_('Import Options...'),
+        use_underline=False,
+      ),
     )
-    self._vbox_name_preview_and_options.pack_start(self._name_preview_overlay, True, True, 0)
-    self._vbox_name_preview_and_options.pack_start(self._grid_buttons, False, False, 0)
-    self._vbox_name_preview_and_options.pack_start(self._hbox_input_options, False, False, 0)
+    self._menu_item_import_options.add(self._hbox_menu_item_import_options)
+    self._menu_item_import_options.show_all()
+
+    self._menu_input_options.insert(self._menu_item_import_options, 0)
+    self._menu_input_options.show_all()
 
     self._show_hide_name_preview_placeholder_label()
 
@@ -297,8 +319,7 @@ class Previews:
       'activate', self._on_menu_item_remove_selected_clicked)
     self._menu_item_remove_all.connect(
       'activate', self._on_menu_item_remove_all_clicked)
-
-    self._button_import_options.connect('clicked', self._on_button_import_options_clicked)
+    self._menu_item_import_options.connect('activate', self._on_menu_item_import_options_clicked)
 
     self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
@@ -339,7 +360,7 @@ class Previews:
   def _on_menu_item_remove_all_clicked(self, _menu_item):
     self._name_preview.remove_all_items()
 
-  def _on_button_import_options_clicked(self, _button):
+  def _on_menu_item_import_options_clicked(self, _menu_item):
     if self._import_options_dialog is None:
       self._import_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
         self._settings['main/import'],
@@ -351,6 +372,9 @@ class Previews:
     else:
       self._import_options_dialog.widget.show()
       self._import_options_dialog.widget.present()
+
+  def _on_button_input_options_clicked(self, button):
+    gui_utils_.menu_popup_below_widget(self._menu_input_options, button)
 
   def _on_name_preview_key_press_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
