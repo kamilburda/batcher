@@ -24,6 +24,8 @@ class FileFormatOptionsBox(Gtk.Box):
         column_spacing=8,
         spacing_between_file_formats=8,
         left_margin=12,
+        placeholder_label=None,
+        placeholder_label_padding=8,
   ):
     super().__init__()
 
@@ -31,6 +33,8 @@ class FileFormatOptionsBox(Gtk.Box):
     self._column_spacing = column_spacing
     self._spacing_between_file_formats = spacing_between_file_formats
     self._left_margin = left_margin
+    self._placeholder_label = placeholder_label
+    self._placeholder_label_padding = placeholder_label_padding
 
     self._widgets_per_file_format = {}
     # We use this to detect if a `setting.Group` instance holding
@@ -44,6 +48,12 @@ class FileFormatOptionsBox(Gtk.Box):
     for child in self.get_children():
       self.remove(child)
 
+    if active_file_formats:
+      self._create_and_display_active_file_formats(active_file_formats, file_format_options)
+    else:
+      self._display_placeholder_label_if_specified()
+
+  def _create_and_display_active_file_formats(self, active_file_formats, file_format_options):
     for active_file_format, file_format_options_item in (
           zip(active_file_formats, file_format_options)):
       if self._should_create_new_widget(
@@ -54,9 +64,32 @@ class FileFormatOptionsBox(Gtk.Box):
 
       self.pack_start(self._widgets_per_file_format[active_file_format], False, False, 0)
 
+  def _display_placeholder_label_if_specified(self):
+    if self._label_placeholder_text is not None:
+      self.pack_start(self._label_placeholder_text, False, False, 0)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
     self.set_spacing(self._spacing_between_file_formats)
+
+    if self._placeholder_label is not None:
+      self._label_placeholder_text = Gtk.Label(
+        label=f'<i>{self._placeholder_label}</i>',
+        use_markup=True,
+        use_underline=False,
+        xalign=0.5,
+        yalign=0.5,
+        wrap=True,
+        width_chars=self._LABELS_WIDTH_CHARS,
+        max_width_chars=self._LABELS_MAX_WIDTH_CHARS,
+        margin_start=self._placeholder_label_padding,
+        margin_end=self._placeholder_label_padding,
+        margin_top=self._placeholder_label_padding,
+        margin_bottom=self._placeholder_label_padding,
+      )
+      self._label_placeholder_text.show()
+    else:
+      self._label_placeholder_text = None
 
     self.show_all()
 

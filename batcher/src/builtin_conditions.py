@@ -29,7 +29,7 @@ def is_not_imported(item, _image_batcher):
 
 
 def has_matching_file_extension(item, batcher):
-  return fileext.get_file_extension(item.name).lower() == batcher.file_extension.lower()
+  return fileext.get_file_extension(item.orig_name).lower() == batcher.file_extension.lower()
 
 
 def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
@@ -37,10 +37,10 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
     return True
 
   if ignore_case_sensitivity:
-    processed_item_name = item.name.lower()
+    processed_item_name = item.orig_name.lower()
     processed_text = text.lower()
   else:
-    processed_item_name = item.name
+    processed_item_name = item.orig_name
     processed_text = text
 
   if match_mode == MatchModes.STARTS_WITH:
@@ -68,7 +68,7 @@ def is_matching_text(item, _batcher, match_mode, text, ignore_case_sensitivity):
 
 
 def has_recognized_file_format(item, _image_batcher):
-  file_extension = fileext.get_file_extension(item.name).lower()
+  file_extension = fileext.get_file_extension(item.orig_name).lower()
   return (
     file_extension
     and file_extension in file_formats_.FILE_FORMATS_DICT

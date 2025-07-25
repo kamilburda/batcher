@@ -811,9 +811,8 @@ EXPORT_FOR_CONVERT_DICT = {
       'type': 'file_format_options',
       'name': 'file_format_export_options',
       'import_or_export': 'export',
-      'initial_file_format': 'png',
       'gui_type': 'file_format_options',
-      'display_name': _('File format options')
+      'display_name': _('File format options'),
     },
     {
       'type': 'choice',

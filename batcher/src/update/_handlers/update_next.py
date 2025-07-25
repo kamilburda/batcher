@@ -43,6 +43,7 @@ def _change_active_file_format_to_dict(export_settings_list):
 
   if file_format_export_options_dict is not None:
     if ('value' in file_format_export_options_dict
+        and file_format_export_options_dict['value']
         and active_key in file_format_export_options_dict['value']
         and not isinstance(file_format_export_options_dict['value'][active_key], (list, tuple))):
       file_format_export_options_dict['value'][active_key] = [

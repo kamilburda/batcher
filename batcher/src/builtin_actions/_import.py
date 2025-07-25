@@ -1,5 +1,7 @@
 """Built-in action for loading image files."""
 
+from typing import Dict, Optional
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -22,6 +24,7 @@ class ImportAction(invoker_.CallableCommand):
         self,
         batcher: 'src.core.Batcher',
         image_file: Gio.File,
+        file_format_import_options: Optional[Dict] = None,
   ):
     pass
 
@@ -29,6 +32,7 @@ class ImportAction(invoker_.CallableCommand):
         self,
         batcher: 'src.core.Batcher',
         image_file: Gio.File,
+        file_format_import_options: Optional[Dict] = None,
   ):
     if not image_file.query_exists():
       if not batcher.continue_on_error or batcher.is_preview:
@@ -72,6 +76,16 @@ IMPORT_DICT = {
       'action': Gimp.FileChooserAction.OPEN,
       'display_name': _('Image'),
       'none_ok': True,
+    },
+    {
+      'type': 'file_format_options',
+      'name': 'file_format_import_options',
+      'import_or_export': 'import',
+      'gui_type': 'file_format_options',
+      'display_name': _('File format options'),
+      'gui_type_kwargs': {
+        'placeholder_label': _('No recognized image formats in added files'),
+      },
     },
   ],
 }

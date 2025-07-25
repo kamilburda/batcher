@@ -196,7 +196,10 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
     return self.setting.value
 
   def _set_value(self, value):
-    file_formats = value[self.setting.ACTIVE_FILE_FORMAT_KEY]
-    file_format_options = [value.get(file_format, None) for file_format in file_formats]
+    file_formats = value.get(self.setting.ACTIVE_FILE_FORMAT_KEY, None)
 
-    self._widget.set_active_file_formats(file_formats, file_format_options)
+    if file_formats is not None:
+      file_format_options = [value.get(file_format, None) for file_format in file_formats]
+      self._widget.set_active_file_formats(file_formats, file_format_options)
+    else:
+      self._widget.set_active_file_formats([], [])

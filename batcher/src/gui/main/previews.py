@@ -22,6 +22,7 @@ from src.gui.preview import controller as previews_controller_
 from src.gui.preview import base as preview_base_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
+from src.path import fileext
 
 from . import _utils as gui_main_utils_
 
@@ -669,6 +670,7 @@ class Previews:
   def _on_name_preview_updated(self, _preview, _error, command_lists):
     if self._manage_items:
       self._show_hide_name_preview_placeholder_label()
+      self._update_file_format_import_options()
 
     command_lists.display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
       self._batcher_for_name_preview, clear_previous=False)
@@ -678,3 +680,16 @@ class Previews:
       self._name_preview_placeholder_label.show()
     else:
       self._name_preview_placeholder_label.hide()
+
+  def _update_file_format_import_options(self):
+    file_extensions = set(
+      fileext.get_file_extension(item.orig_name).lower()
+      for item in self._name_preview.batcher.item_tree.iter(with_folders=False)
+    )
+
+    # Ignore files with no extension
+    file_extensions.discard('')
+    file_extensions = sorted(file_extensions)
+
+    self._settings['main/import/file_format_import_options'].set_active_file_formats(
+      file_extensions)

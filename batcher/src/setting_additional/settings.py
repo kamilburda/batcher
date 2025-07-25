@@ -779,13 +779,15 @@ class FileFormatOptionsSetting(setting_.DictSetting):
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.file_format_options]
 
-  _DEFAULT_DEFAULT_VALUE = lambda self: {
-    self.ACTIVE_FILE_FORMAT_KEY: [self._initial_file_format]
-  }
+  _DEFAULT_DEFAULT_VALUE = lambda self: {}
 
-  def __init__(self, name: str, import_or_export: str, initial_file_format: str, **kwargs):
+  def __init__(
+        self,
+        name: str,
+        import_or_export: str,
+        **kwargs,
+  ):
     self._import_or_export = import_or_export
-    self._initial_file_format = initial_file_format
 
     super().__init__(name, **kwargs)
 
@@ -839,9 +841,9 @@ class FileFormatOptionsSetting(setting_.DictSetting):
     return raw_value
 
   def _validate(self, value):
-    if self.ACTIVE_FILE_FORMAT_KEY not in value:
+    if value and self.ACTIVE_FILE_FORMAT_KEY not in value:
       return (
-        f'the value must contain {self.ACTIVE_FILE_FORMAT_KEY} as the dictionary key',
+        f'if not empty, the value must contain {self.ACTIVE_FILE_FORMAT_KEY} as the dictionary key',
         'value_does_not_contain_active_file_format_key',
         False,
       )
