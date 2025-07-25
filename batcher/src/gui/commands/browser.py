@@ -391,7 +391,7 @@ class CommandBrowser(GObject.GObject):
     self._entry_search.set_icon_activatable(Gtk.EntryIconPosition.SECONDARY, True)
 
     self._button_search_settings = Gtk.Button(
-      image=Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON),
+      image=Gtk.Image.new_from_icon_name('pan-down', Gtk.IconSize.BUTTON),
       relief=Gtk.ReliefStyle.NONE,
     )
 

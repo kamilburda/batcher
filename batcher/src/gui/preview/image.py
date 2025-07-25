@@ -211,7 +211,7 @@ class ImagePreview(preview_base_.Preview):
     self._preview_label.set_markup('<b>{}</b>'.format(_('Preview')))
 
     self._button_menu = Gtk.Button(
-      image=Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON),
+      image=Gtk.Image.new_from_icon_name('pan-down', Gtk.IconSize.BUTTON),
       relief=Gtk.ReliefStyle.NONE,
     )
 

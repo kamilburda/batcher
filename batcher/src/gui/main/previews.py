@@ -185,7 +185,7 @@ class Previews:
       tooltip_text=_('Options'),
     )
     self._button_input_options.set_image(
-      Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON))
+      Gtk.Image.new_from_icon_name('pan-down', Gtk.IconSize.BUTTON))
 
     self._menu_input_options = Gtk.Menu()
 

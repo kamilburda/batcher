@@ -22,7 +22,6 @@ from src.gui import utils as gui_utils_
 class SettingsManager:
 
   _BUTTON_SETTINGS_SPACING = 3
-  _ARROW_ICON_PIXEL_SIZE = 12
 
   _LOAD_SETTINGS_FROM_FILE_CUSTOM_WIDGETS_BORDER_WIDTH = 3
 
@@ -49,15 +48,13 @@ class SettingsManager:
       use_underline=True,
     )
 
-    self._image_arrow_settings = Gtk.Image.new_from_icon_name('go-down', Gtk.IconSize.BUTTON)
-    self._image_arrow_settings.set_pixel_size(self._ARROW_ICON_PIXEL_SIZE)
-
     self._hbox_button_settings_components = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._BUTTON_SETTINGS_SPACING,
     )
     self._hbox_button_settings_components.pack_start(self._label_button_settings, False, False, 0)
-    self._hbox_button_settings_components.pack_start(self._image_arrow_settings, False, False, 0)
+    self._hbox_button_settings_components.pack_start(
+      Gtk.Image.new_from_icon_name('pan-down', Gtk.IconSize.BUTTON), False, False, 0)
 
     self._hbox_button_settings = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
