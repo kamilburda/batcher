@@ -9,9 +9,7 @@ def update(data, _settings, _procedure_groups):
   if main_settings_list is not None:
     export_settings_list, _index = update_utils_.get_child_group_list(main_settings_list, 'export')
     if export_settings_list is not None:
-      _change_active_file_format_to_dict(export_settings_list)
-
-    _change_active_file_format_to_dict(main_settings_list)
+      _update_file_format_export_options_setting(export_settings_list)
 
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
@@ -28,26 +26,36 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'].startswith('export_for_')
             and arguments_list is not None):
-          _change_active_file_format_to_dict(arguments_list)
+          _update_file_format_export_options_setting(arguments_list)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
   _change_gui_type_for_show_original_item_names(gui_settings_list)
 
 
-def _change_active_file_format_to_dict(export_settings_list):
+def _update_file_format_export_options_setting(export_settings_list):
   file_format_export_options_dict, _index = update_utils_.get_child_setting(
     export_settings_list, 'file_format_export_options')
 
+  if file_format_export_options_dict is not None:
+    _change_active_file_format_to_dict(file_format_export_options_dict)
+    _remove_initial_file_format_argument(file_format_export_options_dict)
+
+
+def _change_active_file_format_to_dict(file_format_export_options_dict):
   active_key = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
 
-  if file_format_export_options_dict is not None:
-    if ('value' in file_format_export_options_dict
-        and file_format_export_options_dict['value']
-        and active_key in file_format_export_options_dict['value']
-        and not isinstance(file_format_export_options_dict['value'][active_key], (list, tuple))):
-      file_format_export_options_dict['value'][active_key] = [
-        file_format_export_options_dict['value'][active_key]]
+  if ('value' in file_format_export_options_dict
+      and file_format_export_options_dict['value']
+      and active_key in file_format_export_options_dict['value']
+      and not isinstance(file_format_export_options_dict['value'][active_key], (list, tuple))):
+    file_format_export_options_dict['value'][active_key] = [
+      file_format_export_options_dict['value'][active_key]]
+
+
+def _remove_initial_file_format_argument(file_format_export_options_dict):
+  if 'initial_file_format' in file_format_export_options_dict:
+    del file_format_export_options_dict['initial_file_format']
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
