@@ -32,7 +32,7 @@ class ChoiceSetting(_base.Setting):
   Default value: Name of the first item passed to the ``items`` parameter in
   `ChoiceSetting.__init__()`.
 
-  To access an item value:
+  To access a numeric identifier for an item (item's value):
 
     setting.items[item name]
 
@@ -97,7 +97,7 @@ class ChoiceSetting(_base.Setting):
         having the name ``name`` contains possible choices. This is ignored if
         ``items`` is a non-empty list.
     """
-    self._items, self._items_by_value, self._items_display_names, self._items_help, self._choice = (
+    self._items, self._items_display_names, self._items_help, self._choice = (
       self._create_item_attributes(items))
 
     self._procedure = self._process_procedure(procedure, items)
@@ -109,11 +109,6 @@ class ChoiceSetting(_base.Setting):
   def items(self) -> Dict[str, int]:
     """A dictionary of (item name, item value) pairs."""
     return self._items
-
-  @property
-  def items_by_value(self) -> Dict[int, str]:
-    """A dictionary of (item value, item name) pairs."""
-    return self._items_by_value
 
   @property
   def items_display_names(self) -> Dict[str, str]:
@@ -170,15 +165,6 @@ class ChoiceSetting(_base.Setting):
 
     return settings_dict
 
-  def get_name(self) -> str:
-    """Returns the item name corresponding to the current setting value.
-
-    This is a more convenient and less verbose alternative to
-
-      setting.items_by_value(setting.value)
-    """
-    return self._items_by_value[self.value]
-
   def get_item_display_names_and_values(self) -> List[Tuple[str, int]]:
     """Returns a list of (item display name, item value) tuples."""
     display_names_and_values = []
@@ -232,18 +218,16 @@ class ChoiceSetting(_base.Setting):
   @staticmethod
   def _create_item_attributes(input_items):
     items = {}
-    items_by_value = {}
     items_display_names = {}
     items_help = {}
 
     if not input_items:
-      return items, items_by_value, items_display_names, items_help, Gimp.Choice.new()
+      return items, items_display_names, items_help, Gimp.Choice.new()
 
     if isinstance(input_items, Gimp.Choice):
       for name in input_items.list_nicks():
         value = input_items.get_id(name)
         items[name] = value
-        items_by_value[value] = name
 
         item_label = input_items.get_label(name)
         items_display_names[name] = item_label if item_label is not None else ''
@@ -251,7 +235,7 @@ class ChoiceSetting(_base.Setting):
         item_help = input_items.get_help(name)
         items_help[name] = item_help if item_help is not None else ''
 
-      return items, items_by_value, items_display_names, items_help, input_items
+      return items, items_display_names, items_help, input_items
 
     if all(len(elem) == 2 for elem in input_items):
       for i, (item_name, item_display_name) in enumerate(input_items):
@@ -259,7 +243,6 @@ class ChoiceSetting(_base.Setting):
           raise ValueError('cannot use the same name for multiple items - they must be unique')
 
         items[item_name] = i
-        items_by_value[i] = item_name
         items_display_names[item_name] = item_display_name
         items_help[item_name] = ''
     elif all(len(elem) in [3, 4] for elem in input_items):
@@ -273,11 +256,7 @@ class ChoiceSetting(_base.Setting):
         if item_name in items:
           raise ValueError('cannot use the same name for multiple items - they must be unique')
 
-        if item_value in items_by_value:
-          raise ValueError('cannot set the same value for multiple items - they must be unique')
-
         items[item_name] = item_value
-        items_by_value[item_value] = item_name
         items_display_names[item_name] = item_display_name
         items_help[item_name] = item_help
     else:
@@ -289,7 +268,7 @@ class ChoiceSetting(_base.Setting):
       (name, value), display_name, help_ = item
       choice.add(name, value, display_name, help_)
 
-    return items, items_by_value, items_display_names, items_help, choice
+    return items, items_display_names, items_help, choice
 
   def _get_pdb_param(self):
     return [

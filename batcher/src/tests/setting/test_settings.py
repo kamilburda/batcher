@@ -1128,11 +1128,6 @@ class TestChoiceSetting(SettingTestCase):
     with self.assertRaises(KeyError):
       # noinspection PyStatementEffect
       self.setting.items['invalid_item']
-
-  def test_get_invalid_item_value(self):
-    with self.assertRaises(KeyError):
-      # noinspection PyStatementEffect
-      self.setting.items_by_value[5]
   
   def test_get_item_display_names_and_values(self):
     self.assertEqual(
