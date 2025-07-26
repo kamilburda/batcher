@@ -992,7 +992,9 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     ]
 
     self.setting = setting_additional.FileFormatOptionsSetting(
-      'file_format_export_options', 'export', 'png')
+      name='file_format_export_options',
+      import_or_export='export',
+    )
 
     self._ACTIVE_KEY = setting_additional.FileFormatOptionsSetting.ACTIVE_FILE_FORMAT_KEY
 
@@ -1042,7 +1044,6 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
         'name': 'file_format_export_options',
         'type': 'file_format_options',
         'import_or_export': 'export',
-        'initial_file_format': 'png',
         'value': {
           self._ACTIVE_KEY: ['unknown'],
           'png': [

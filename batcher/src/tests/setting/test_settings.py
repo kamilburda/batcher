@@ -1064,6 +1064,14 @@ class TestCreateChoiceSetting(SettingTestCase):
     self.assertEqual(setting.items['skip'], 5)
     self.assertEqual(setting.items['replace'], 6)
 
+  def test_explicit_item_values_with_identical_value(self):
+    setting = settings_.ChoiceSetting(
+      'overwrite_mode',
+      [('skip', 'Skip', 6), ('replace', 'Replace', 6)],
+      default_value='replace')
+    self.assertEqual(setting.items['skip'], 6)
+    self.assertEqual(setting.items['replace'], 6)
+
   def test_with_help(self):
     setting = settings_.ChoiceSetting(
       'overwrite_mode',
@@ -1084,11 +1092,6 @@ class TestCreateChoiceSetting(SettingTestCase):
         'overwrite_mode',
         [('skip', 'Skip', 4), ('replace', 'Replace')], default_value='replace')
 
-  def test_same_explicit_item_value_multiple_times_raises_error(self):
-    with self.assertRaises(ValueError):
-      settings_.ChoiceSetting(
-        'overwrite_mode', [('skip', 'Skip', 4), ('replace', 'Replace', 4)])
-
   def test_same_item_name_multiple_times_raises_error(self):
     with self.assertRaises(ValueError):
       settings_.ChoiceSetting(
@@ -1098,7 +1101,7 @@ class TestCreateChoiceSetting(SettingTestCase):
     with self.assertRaises(ValueError):
       # noinspection PyTypeChecker
       settings_.ChoiceSetting(
-        'overwrite_mode', [('skip', 'Skip', 1, 1), ('replace', 'Replace', 1, 1)])
+        'overwrite_mode', [('skip', 'Skip', 1, '', ''), ('replace', 'Replace', 1, '', '')])
   
   def test_too_few_elements_in_items_raises_error(self):
     with self.assertRaises(ValueError):
