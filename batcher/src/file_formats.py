@@ -210,7 +210,7 @@ FILE_FORMATS = _create_file_formats([
    'export_procedure_name': 'file-aa-export'},
   {'file_extensions': ['ani'],
    'import_procedure_name': 'file-ani-load',
-   'export_procedure_name': 'file-ani-export',},
+   'export_procedure_name': 'file-ani-export'},
   {'file_extensions': ['bmp'],
    'import_procedure_name': 'file-bmp-load',
    'export_procedure_name': 'file-bmp-export'},

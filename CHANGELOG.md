@@ -14,6 +14,7 @@ User interface changes:
 * The `Show Original Names` button shown in Batch Convert is now available for all plug-in procedures among the options at the top of the input list.
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
+* Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
 * Marked names of common layer effect arguments as translatable.
 
 
