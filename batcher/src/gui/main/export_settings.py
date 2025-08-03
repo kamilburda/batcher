@@ -56,7 +56,7 @@ class ExportSettings:
       yalign=0.5,
     )
     self._folder_chooser_label.set_markup(
-      '<b>{}</b>'.format(_('Output Folder:')))
+      '<b>{}</b>'.format(_('Folder:')))
 
     self._settings['main/output_directory'].set_gui()
     self._settings['main/output_directory'].gui.widget.set_hexpand(True)
@@ -66,7 +66,7 @@ class ExportSettings:
       yalign=0.5,
     )
     self._label_filename.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(_('Name and Format:'))))
+      '<b>{}</b>'.format(GLib.markup_escape_text(_('Filename:'))))
 
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(),
