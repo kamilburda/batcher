@@ -13,14 +13,14 @@ class BatcherCancelError(BatcherError):
 
 class BatcherFileLoadError(BatcherError):
 
-  def __init__(self, message, item):
+  def __init__(self, message, filepath):
     super().__init__(message)
 
     self.message = message
-    self.item = item
+    self.filepath = filepath
 
   def __str__(self):
-    return f'{self.message}: {self.item.id}'
+    return f'{self.message}: {self.filepath}'
 
 
 class CommandError(BatcherError):
