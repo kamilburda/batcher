@@ -213,6 +213,7 @@ class ImagePreview(preview_base_.Preview):
     self._button_menu = Gtk.Button(
       image=Gtk.Image.new_from_icon_name('pan-down', Gtk.IconSize.BUTTON),
       relief=Gtk.ReliefStyle.NONE,
+      tooltip_text=_('Options'),
     )
 
     self._menu_item_update_automatically = Gtk.CheckMenuItem(

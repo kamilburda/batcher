@@ -82,9 +82,10 @@ class ExportSettings:
       activates_default=True,
     )
 
-    self._export_options_button = Gtk.Button()
-    self._export_options_button.set_image(
-      Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON))
+    self._export_options_button = Gtk.Button(
+      image=Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON),
+      tooltip_text=_('Export Options'),
+    )
 
     self._hbox_filename = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
