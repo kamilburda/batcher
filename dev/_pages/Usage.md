@@ -22,15 +22,15 @@ You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
 * Copy and paste images and folders from a file explorer application to the area under `Input Images`. Note that you must click on the area first.
 * Copy and paste images and folders from a text file, each on a separate line to the area under `Input Images`. Note that you must click on the area first. Any files and folders that do not exist are ignored.
-* Press the `Add...` button to add files or folders.
+* Press the `+` button to add files or folders.
 
-Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck `Recognized file formats`.
+Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized file formats` condition.
 
 You will be warned if you add folder(s) containing too many files or e.g. an entire drive. This is a safeguard against accidentally adding an undesired folder.
 
-You can remove input images and folders by selecting them and pressing Delete or by pressing `Remove... → Remove Selected`. You can clear the entire input list by pressing `Remove... → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
+You can remove input images and folders by selecting them and pressing Delete or by pressing `- → Remove Selected`. You can clear the entire input list by pressing `- → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
 
-By default, the renamed images (as they would be named on export) are displayed. To show their original names, check `Show Original Names`.
+By default, the renamed images (as they would be named on export) are displayed. To show their original names, press the arrow button and check `Show Original Names`.
 
 
 
@@ -154,14 +154,14 @@ This can be useful if you e.g. made changes to your images and you want to save 
 
 ### Filename Pattern
 
-The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
+The text entry next to `File Name` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
 
-### File Extension
+### File Format
 
-Type or choose your desired file extension next to the filename entry (`png` by default).
+Type or choose your desired file extension next to `File Format`.
 
 The dropdown list displays available file formats alongside their associated file extensions.
 If a file format contains multiple file extensions, the first is selected by default, but you may also choose a different extension (by clicking on it or pressing Tab).
@@ -172,7 +172,7 @@ However, you can still enter a file extension not in the list in case you use a 
 
 ### Export Options
 
-Pressing the `Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
+Pressing the `Export Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
 
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
