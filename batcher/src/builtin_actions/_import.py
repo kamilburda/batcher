@@ -11,6 +11,7 @@ from src import exceptions
 from src import file_formats as file_formats_
 from src import invoker as invoker_
 from src import pypdb
+from src import utils_pdb
 from src.path import fileext
 from src.pypdb import pdb
 
@@ -45,11 +46,16 @@ class ImportAction(invoker_.CallableCommand):
     if file_format_import_options is None:
       file_format_import_options = {}
 
-    return _load_image(
+    image = _load_image(
       image_file,
       fileext.get_file_extension(batcher.current_item.orig_name.lower()),
       file_format_import_options,
     )
+
+    if batcher.is_preview:
+      utils_pdb.rotate_or_flip_image_based_on_exif_metadata(image)
+
+    return image
 
 
 def _load_image(

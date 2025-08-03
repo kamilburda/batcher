@@ -7,6 +7,7 @@ import contextlib
 import inspect
 import os
 from typing import Any, Generator, List, Optional, Tuple, Union
+import xml.etree.ElementTree as ElementTree
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -536,3 +537,40 @@ def redirect_messages(
     yield
   finally:
     Gimp.message_set_handler(orig_message_handler_type)
+
+
+def rotate_or_flip_image_based_on_exif_metadata(image):
+  metadata = image.get_metadata()
+
+  if metadata is None:
+    return
+
+  serialized_metadata = metadata.serialize()
+  metadata_tree = ElementTree.fromstring(serialized_metadata)
+  orientation_elem = metadata_tree.find('.//tag[@name="Exif.Image.Orientation"]')
+
+  if orientation_elem is None:
+    return
+
+  try:
+    orientation = int(orientation_elem.text)
+  except Exception:
+    return
+
+  # Based on: https://gitlab.gnome.org/GNOME/gexiv2/-/blob/master/gexiv2/gexiv2-metadata.h
+  if orientation == 2:
+    image.flip(Gimp.OrientationType.HORIZONTAL)
+  elif orientation == 3:
+    image.rotate(Gimp.RotationType.DEGREES180)
+  elif orientation == 4:
+    image.flip(Gimp.OrientationType.VERTICAL)
+  elif orientation == 5:
+    image.rotate(Gimp.RotationType.DEGREES90)
+    image.flip(Gimp.OrientationType.HORIZONTAL)
+  elif orientation == 6:
+    image.rotate(Gimp.RotationType.DEGREES90)
+  elif orientation == 7:
+    image.rotate(Gimp.RotationType.DEGREES90)
+    image.flip(Gimp.OrientationType.VERTICAL)
+  elif orientation == 8:
+    image.rotate(Gimp.RotationType.DEGREES270)

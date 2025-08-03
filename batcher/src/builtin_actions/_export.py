@@ -89,6 +89,7 @@ class ExportAction(invoker_.CallableCommand):
     self._use_file_extension_in_item_name = False
     self._convert_file_extension_to_lowercase = False
     self._use_original_modification_date = False
+    self._rotate_flip_image_based_on_exif_metadata = True
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
@@ -136,6 +137,9 @@ class ExportAction(invoker_.CallableCommand):
         layer_to_process.set_name(item.name)
     else:
       image_copy = batcher.current_image
+
+    if batcher.process_export and self._rotate_flip_image_based_on_exif_metadata:
+      utils_pdb.rotate_or_flip_image_based_on_exif_metadata(image_copy)
 
     if multi_layer_image is None:
       image_to_process = image_copy
@@ -857,6 +861,12 @@ EXPORT_FOR_CONVERT_DICT = {
       'name': 'use_original_modification_date',
       'default_value': False,
       'display_name': _('Use original modification date'),
+    },
+    {
+      'type': 'bool',
+      'name': 'rotate_flip_image_based_on_exif_metadata',
+      'default_value': True,
+      'display_name': _('Rotate or flip image based on Exif metadata'),
     },
   ],
 }

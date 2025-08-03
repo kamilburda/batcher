@@ -33,6 +33,11 @@ def update(data, _settings, _procedure_groups):
   _change_gui_type_for_show_original_item_names(gui_settings_list)
 
 
+def _update_export_procedure(export_settings_list):
+  _update_file_format_export_options_setting(export_settings_list)
+  _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
+
+
 def _update_file_format_export_options_setting(export_settings_list):
   file_format_export_options_dict, _index = update_utils_.get_child_setting(
     export_settings_list, 'file_format_export_options')
@@ -40,6 +45,22 @@ def _update_file_format_export_options_setting(export_settings_list):
   if file_format_export_options_dict is not None:
     _change_active_file_format_to_dict(file_format_export_options_dict)
     _remove_initial_file_format_argument(file_format_export_options_dict)
+
+
+def _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list):
+  setting_dict, _index = update_utils_.get_child_setting(
+    export_settings_list, 'rotate_flip_image_based_on_exif_metadata')
+
+  if setting_dict is not None:
+    return
+
+  export_settings_list.append({
+    'type': 'bool',
+    'name': 'rotate_flip_image_based_on_exif_metadata',
+    'default_value': True,
+    'value': True,
+    'display_name': _('Rotate and flip image based on Exif metadata'),
+  })
 
 
 def _change_active_file_format_to_dict(file_format_export_options_dict):
