@@ -7,6 +7,7 @@ General changes:
 * Updated Japanese translation (thanks to @re-unknown).
 * If an action causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action can safely be skipped for a particular image/layer. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable.
 * Added an export option named `Rotate or flip image based on Exif metadata`. This allows correcting the orientation of images with Exif metadata before export if you choose to not save Exif metadata, e.g. for the JPEG format (#91).
+* Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 
 User interface changes:
 * Export settings are now arranged vertically in the upper left part of the dialog. Clarified labels describing the settings.
