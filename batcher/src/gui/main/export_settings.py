@@ -125,10 +125,7 @@ class ExportSettings:
 
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
-    for setting in self._settings['main/export']:
-      setting.connect_event('value-changed', self._update_previews_on_export_options_change)
-    self._settings['main/output_directory'].connect_event(
-      'value-changed', self._update_previews_on_export_options_change)
+    self._connect_setting_events()
 
   @property
   def widget(self):
@@ -145,6 +142,13 @@ class ExportSettings:
   @property
   def name_pattern_entry(self):
     return self._name_pattern_entry
+
+  def _connect_setting_events(self):
+    for setting in self._settings['main/export']:
+      setting.connect_event('value-changed', self._update_previews_on_export_options_change)
+
+    self._settings['main/output_directory'].connect_event(
+      'value-changed', self._update_previews_on_export_options_change)
 
   def _set_up_name_pattern(self):
     self._settings['main/name_pattern'].connect_event(
