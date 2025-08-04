@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Dict, List, Optional, Union, Tuple, Type
+from typing import Any, Dict, List, Optional, Union, Tuple, Type
 
 import gi
 gi.require_version('Gimp', '3.0')
