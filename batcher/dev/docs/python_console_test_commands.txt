@@ -32,24 +32,3 @@ import sys
 sys.path.append(os.path.join(Gimp.directory(), 'batcher', 'batcher'))
 from src.tests.setting import _test_setting_gui
 _test_setting_gui.test_settings_and_gui()
-
-
-import importlib
-import os
-import sys
-sys.path.append(os.path.join(Gimp.directory(), 'batcher', 'batcher'))
-
-
-from dev import make_screenshots
-make_screenshots.main()
-
-
-from dev import sync_docs
-sync_docs.main()
-
-
-from dev import preprocess_document_contents
-root_dirpath = os.path.join(Gimp.directory(), 'batcher')
-preprocess_document_contents.main([
-  (os.path.join(root_dirpath, 'docs', 'README_raw.md'), os.path.join(root_dirpath, 'README.md'))
-])
