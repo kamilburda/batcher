@@ -4,7 +4,7 @@ import abc
 import collections
 from collections.abc import Iterable
 import os
-from typing import Dict, List, Type, Union
+from typing import Callable, Dict, List, Type, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -767,14 +767,14 @@ class FileFormatOptionsSetting(setting_.DictSetting):
   """Class for settings storing file format-specific options.
 
   The options are stored in a dictionary as pairs of (file extension,
-  settings representing options). The `ACTIVE_FILE_FORMAT_KEY` key,
-  if exists, indicates the currently active file format (the format whose
-  options are displayed when running the plug-in interactively).
+  settings representing options).
+
+  The `ACTIVE_FILE_FORMAT_KEY` key, if exists, indicates the currently active
+  file format (the format whose options are displayed when running the
+  plug-in interactively).
   """
 
-  # HACK: Ideally, we would use `None` to represent the active file format to
-  # avoid the slightest possibility of a string being used as a file extension.
-  # However, JSON only allows strings as keys, so this will have to do.
+  # HACK: Use a leading '_' to avoid clashing with file extensions.
   ACTIVE_FILE_FORMAT_KEY = '_active'
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.file_format_options]
@@ -788,12 +788,35 @@ class FileFormatOptionsSetting(setting_.DictSetting):
         **kwargs,
   ):
     self._import_or_export = import_or_export
+    self._connected_events = []
 
     super().__init__(name, **kwargs)
 
   @property
   def import_or_export(self):
     return self._import_or_export
+
+  def connect_event(
+        self,
+        event_type: str,
+        event_handler: Callable,
+        *event_handler_args,
+        **event_handler_kwargs,
+  ):
+    if event_type == 'value-changed':
+      for key, group_or_active_file_format in self._value.items():
+        if key == self.ACTIVE_FILE_FORMAT_KEY:
+          continue
+
+        for setting in group_or_active_file_format:
+          setting.connect_event(
+            event_type, event_handler, *event_handler_args, **event_handler_kwargs)
+
+      self._connected_events.append(
+        (event_type, event_handler, event_handler_args, event_handler_kwargs))
+
+    return super().connect_event(
+      event_type, event_handler, *event_handler_args, **event_handler_kwargs)
 
   def set_active_file_formats(self, file_formats: List[str]):
     processed_file_formats = [
@@ -805,6 +828,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
 
     for file_format in self._value[self.ACTIVE_FILE_FORMAT_KEY]:
       file_formats_.fill_file_format_options(self._value, file_format, self._import_or_export)
+      self._connect_events_for_new_file_format_options(file_format)
 
     if hasattr(self.gui, 'set_active_file_formats'):
       self.gui.set_active_file_formats(processed_file_formats)
@@ -813,7 +837,9 @@ class FileFormatOptionsSetting(setting_.DictSetting):
     value = {}
 
     for key, group_or_active_file_format in raw_value.items():
-      if key != self.ACTIVE_FILE_FORMAT_KEY:
+      if key == self.ACTIVE_FILE_FORMAT_KEY:
+        value[key] = group_or_active_file_format
+      else:
         processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(key, key)
         if file_formats_.file_format_procedure_exists(processed_file_format, self.import_or_export):
           if isinstance(group_or_active_file_format, setting_.Group):
@@ -824,8 +850,8 @@ class FileFormatOptionsSetting(setting_.DictSetting):
           else:
             value[key] = file_formats_.create_file_format_options_settings(
               group_or_active_file_format)
-      else:
-        value[key] = group_or_active_file_format
+
+          self._connect_events_for_new_file_format_options(processed_file_format)
 
     return value
 
@@ -833,20 +859,12 @@ class FileFormatOptionsSetting(setting_.DictSetting):
     raw_value = {}
 
     for key, group_or_active_file_format in value.items():
-      if key != self.ACTIVE_FILE_FORMAT_KEY:
-        raw_value[key] = self._file_format_options_to_dict(group_or_active_file_format)
-      else:
+      if key == self.ACTIVE_FILE_FORMAT_KEY:
         raw_value[key] = group_or_active_file_format
+      else:
+        raw_value[key] = self._file_format_options_to_dict(group_or_active_file_format)
 
     return raw_value
-
-  def _validate(self, value):
-    if value and self.ACTIVE_FILE_FORMAT_KEY not in value:
-      return (
-        f'if not empty, the value must contain {self.ACTIVE_FILE_FORMAT_KEY} as the dictionary key',
-        'value_does_not_contain_active_file_format_key',
-        False,
-      )
 
   def _assign_value(self, value):
     if self.ACTIVE_FILE_FORMAT_KEY in self._value:
@@ -860,6 +878,16 @@ class FileFormatOptionsSetting(setting_.DictSetting):
         and self.ACTIVE_FILE_FORMAT_KEY in value
         and value[self.ACTIVE_FILE_FORMAT_KEY] != orig_active_file_format):
       self.set_active_file_formats(value[self.ACTIVE_FILE_FORMAT_KEY])
+
+  def _connect_events_for_new_file_format_options(self, file_format):
+    processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
+
+    if processed_file_format is None or processed_file_format not in self._value:
+      return
+
+    for setting in self._value[processed_file_format]:
+      for event_type, event_handler, args, kwargs in self._connected_events:
+        setting.connect_event(event_type, event_handler, *args, **kwargs)
 
   @staticmethod
   def _file_format_options_to_dict(file_format_options):

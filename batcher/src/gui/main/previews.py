@@ -33,6 +33,7 @@ class Previews:
   _PREVIEWS_SENSITIVE_KEY = 'previews_sensitive'
   _VPANED_PREVIEW_SENSITIVE_KEY = 'vpaned_preview_sensitive'
 
+  _DELAY_PREVIEW_UPDATE_MILLISECONDS = 100
   _DELAY_PREVIEWS_PANE_DRAG_UPDATE_MILLISECONDS = 500
 
   _MAXIMUM_IMAGE_PREVIEW_AUTOMATIC_UPDATE_DURATION_SECONDS = 1.0
@@ -338,6 +339,23 @@ class Previews:
       Gdk.DragAction.MOVE)
 
     self._import_options_dialog = None
+
+    self._connect_import_setting_events()
+
+  def _connect_import_setting_events(self):
+    for setting in self._settings['main/import']:
+      setting.connect_event('value-changed', self._update_previews_on_import_options_change)
+
+  def _update_previews_on_import_options_change(self, _setting):
+    if self._name_preview is not None:
+      utils.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._name_preview.update)
+
+    if self._image_preview is not None:
+      utils.timeout_add_strict(
+        self._DELAY_PREVIEW_UPDATE_MILLISECONDS,
+        self._image_preview.update)
 
   def _on_button_add_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_add, button)

@@ -1136,17 +1136,3 @@ class TestFileFormatOptionsSetting(unittest.TestCase):
     self.assertNotIn('quality', self.setting.value['jpg'])
     self.assertEqual(self.setting.value['jpg']['optimize'].value, False)
     self.assertEqual(self.setting.value['gif']['loop'].value, True)
-
-  def test_validate_value_with_missing_none_key(self, *_mocks):
-    png_group = setting_.Group('file_format_options')
-    png_group.add([
-      {
-        'name': 'interlaced',
-        'type': 'bool',
-        'display_name': 'interlaced',
-        'default_value': False,
-      },
-    ])
-
-    self.assertIsInstance(
-      self.setting.validate({'png': png_group}), setting_.ValueNotValidData)
