@@ -41,24 +41,26 @@ class ImportAction(invoker_.CallableCommand):
       if not batcher.continue_on_error or batcher.is_preview:
         raise exceptions.BatcherFileLoadError(_('File not found'), image_file.get_path())
       else:
-        return
+        return None
 
     if file_format_import_options is None:
       file_format_import_options = {}
 
     image = _load_image(
+      batcher,
       image_file,
       fileext.get_file_extension(batcher.current_item.orig_name.lower()),
       file_format_import_options,
     )
 
-    if batcher.is_preview:
+    if image is not None and batcher.is_preview:
       utils_pdb.rotate_or_flip_image_based_on_exif_metadata(image)
 
     return image
 
 
 def _load_image(
+      batcher,
       image_file,
       file_extension,
       file_format_import_options,
@@ -70,10 +72,13 @@ def _load_image(
       file_format_import_options,
     )
   except pypdb.PDBProcedureError as e:
-    if e.status == Gimp.PDBStatusType.CANCEL:
-      raise exceptions.BatcherCancelError('canceled')
+    if not batcher.continue_on_error or batcher.is_preview:
+      if e.status == Gimp.PDBStatusType.CANCEL:
+        raise exceptions.BatcherCancelError('canceled')
+      else:
+        raise exceptions.BatcherError(f'{str(e)}: {image_file.get_path()}') from e
     else:
-      raise
+      return None
   else:
     return image
 

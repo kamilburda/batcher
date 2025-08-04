@@ -328,9 +328,6 @@ class ImagePreview(preview_base_.Preview):
         **utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
       pass
-    except exceptions.BatcherFileLoadError as e:
-      error = e
-      display_error_message_as_label = True
     except exceptions.CommandError as e:
       messages_.display_failure_message(
         messages_.get_failing_command_message(e),
@@ -339,6 +336,9 @@ class ImagePreview(preview_base_.Preview):
         parent=gui_utils_.get_toplevel_window(self))
       
       error = e
+    except exceptions.BatcherError as e:
+      error = e
+      display_error_message_as_label = True
     except Exception as e:
       messages_.display_failure_message(
         _('There was a problem with updating the image preview:'),
