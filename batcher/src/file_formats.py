@@ -154,6 +154,7 @@ class _FileFormat:
       if menu_label and len(menu_label) <= max_char_length_for_inferred_description:
         return menu_label
       else:
+        # FOR TRANSLATORS: Think of e.g. "PNG image" when translating this.
         return _('{} image').format(self.file_extensions[0].upper())
 
   def has_import_proc(self):
