@@ -332,7 +332,13 @@ class TestGroup(unittest.TestCase):
         default_value,
         expected_value):
     self.assertEqual(self.settings.get_value(setting_name_or_path, default_value), expected_value)
-  
+
+  def test_get_value_raises_error_if_path_does_not_point_to_setting(self):
+    settings = stubs_group.create_test_settings_hierarchical()
+
+    with self.assertRaises(TypeError):
+      settings.get_value('advanced')
+
   def test_get_attributes(self):
     setting_attributes_and_values = self.settings.get_attributes([
       'file_extension',

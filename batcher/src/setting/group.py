@@ -362,7 +362,10 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     except KeyError:
       return default_value
     else:
-      return setting.value
+      if isinstance(setting, settings_.Setting):
+        return setting.value
+      else:
+        raise TypeError(f'{setting_name_or_path} is not a Setting instance')
   
   def get_attributes(self, setting_attributes: List[str]) -> Dict[str, Any]:
     """Returns a dictionary of ``(setting_path.attribute_name, value)`` pairs
