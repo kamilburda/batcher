@@ -169,14 +169,21 @@ if _gobject_dependent_modules_imported:
   class GimpMessageFile:
 
     def __init__(self, handler_type=Gimp.MessageHandlerType.ERROR_CONSOLE, delay_milliseconds=50):
-      self._orig_handler = Gimp.message_get_handler()
+      self._handler_type = handler_type
       self._delay_milliseconds = delay_milliseconds
 
-      Gimp.message_set_handler(handler_type)
-
+      self._orig_handler = None
       self._buffer = ''
 
     def write(self, data):
+      self._orig_handler = Gimp.message_get_handler()
+      Gimp.message_set_handler(self._handler_type)
+
+      self._write(data)
+
+      self.write = self._write
+
+    def _write(self, data):
       self._buffer += str(data)
 
       utils.timeout_add_strict(self._delay_milliseconds, self._display_data_and_flush)
@@ -185,7 +192,8 @@ if _gobject_dependent_modules_imported:
       pass
 
     def close(self):
-      Gimp.message_set_handler(self._orig_handler)
+      if self._orig_handler is not None:
+        Gimp.message_set_handler(self._orig_handler)
 
     def _display_data_and_flush(self):
       Gimp.message(self._buffer)
