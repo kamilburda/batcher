@@ -6,6 +6,7 @@ from collections.abc import Iterable
 import contextlib
 import inspect
 import os
+import re
 from typing import Any, Generator, List, Optional, Tuple, Union
 import xml.etree.ElementTree as ElementTree
 
@@ -546,14 +547,17 @@ def rotate_or_flip_image_based_on_exif_metadata(image):
     return
 
   serialized_metadata = metadata.serialize()
-  metadata_tree = ElementTree.fromstring(serialized_metadata)
-  orientation_elem = metadata_tree.find('.//tag[@name="Exif.Image.Orientation"]')
 
-  if orientation_elem is None:
+  orientation_str = _get_orientation_str_via_xml(serialized_metadata)
+
+  if orientation_str is None:
+    orientation_str = _get_orientation_str_via_regex(serialized_metadata)
+
+  if orientation_str is None:
     return
 
   try:
-    orientation = int(orientation_elem.text)
+    orientation = int(orientation_str)
   except Exception:
     return
 
@@ -574,3 +578,22 @@ def rotate_or_flip_image_based_on_exif_metadata(image):
     image.flip(Gimp.OrientationType.VERTICAL)
   elif orientation == 8:
     image.rotate(Gimp.RotationType.DEGREES270)
+
+
+def _get_orientation_str_via_xml(serialized_metadata):
+  try:
+    metadata_tree = ElementTree.fromstring(serialized_metadata)
+    return metadata_tree.find('.//tag[@name="Exif.Image.Orientation"]').text
+  except Exception:
+    # The serialized XML may contain invalid characters causing deserialization
+    # to fail.
+    return None
+
+
+def _get_orientation_str_via_regex(serialized_metadata):
+  match = re.search(r'[\'"]Exif.Image.Orientation[\'"]>\s*(.*?)\s*<', serialized_metadata)
+
+  if match:
+    return match.group(1)
+  else:
+    return None
