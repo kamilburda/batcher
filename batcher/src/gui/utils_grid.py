@@ -30,12 +30,10 @@ def attach_label_to_grid(
   )
   label.show()
 
-  if _has_setting_display_name(setting):
-    label.set_text(setting.display_name)
-    if set_name_as_tooltip:
-      label.set_tooltip_text(setting.name)
-  else:
-    label.set_text(setting.name)
+  label.set_text(_get_label_from_setting(setting))
+
+  if _has_setting_display_name(setting) and set_name_as_tooltip:
+    label.set_tooltip_text(setting.name)
 
   label.set_sensitive(setting.gui.get_sensitive())
 
@@ -76,6 +74,24 @@ def attach_widget_to_grid(
   setting.invoke_event('gui-attached-to-grid')
 
   grid.attach(widget_to_attach, final_column_index, row_index, final_width, height)
+
+
+def get_max_label_width_from_settings(settings, width_if_settings_are_empty=20, max_width=40):
+  lengths = [
+    len(_get_label_from_setting(setting)) for setting in settings if setting.gui.show_display_name
+  ]
+
+  if lengths:
+    return min(max(lengths), max_width)
+  else:
+    return width_if_settings_are_empty
+
+
+def _get_label_from_setting(setting):
+  if _has_setting_display_name(setting):
+    return setting.display_name
+  else:
+    return setting.name
 
 
 def _has_setting_display_name(setting):

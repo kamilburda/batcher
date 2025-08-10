@@ -152,8 +152,17 @@ class FileFormatOptionsBox(Gtk.Box):
 
     file_format_options.initialize_gui(only_null=True)
 
+    label_width_chars = gui_utils_grid_.get_max_label_width_from_settings(file_format_options)
+
     for row_index, setting in enumerate(file_format_options):
-      gui_utils_grid_.attach_label_to_grid(grid, setting, row_index)
+      gui_utils_grid_.attach_label_to_grid(
+        grid,
+        setting,
+        row_index,
+        width_chars=label_width_chars,
+        max_width_chars=label_width_chars,
+      )
+
       gui_utils_grid_.attach_widget_to_grid(grid, setting, row_index)
 
     return grid

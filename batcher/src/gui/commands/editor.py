@@ -98,7 +98,7 @@ class CommandEditorWidget:
   _COMMAND_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_COMMAND_INFO = 6
   _COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_COMMAND_INFO = 60
   _COMMAND_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
-  _COMMAND_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS = 40
+  _COMMAND_ARGUMENT_LABEL_WIDTH_CHARS = 20
 
   def __init__(self, command, parent, show_additional_settings=False):
     self._command = command
@@ -119,6 +119,8 @@ class CommandEditorWidget:
 
     self._command_argument_indexes_in_grid = {}
     self._command_more_options_indexes_in_grid = {}
+
+    self._label_width_chars_for_arguments = self._COMMAND_ARGUMENT_LABEL_WIDTH_CHARS
 
     self._init_gui()
 
@@ -313,6 +315,9 @@ class CommandEditorWidget:
     row_index_for_arguments = -1
     row_index_for_more_options = -1
 
+    self._label_width_chars_for_arguments = gui_utils_grid_.get_max_label_width_from_settings(
+      command['arguments'])
+
     for setting in command['arguments']:
       if not setting.gui.get_visible():
         continue
@@ -330,7 +335,8 @@ class CommandEditorWidget:
         grid,
         setting,
         row_index,
-        max_width_chars=self._COMMAND_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+        width_chars=self._label_width_chars_for_arguments,
+        max_width_chars=self._label_width_chars_for_arguments,
         set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
@@ -346,6 +352,8 @@ class CommandEditorWidget:
   def _set_more_options(self, command):
     row_index = len(self._command_more_options_indexes_in_grid)
 
+    label_width_chars = gui_utils_grid_.get_max_label_width_from_settings(command['more_options'])
+
     for setting in command['more_options']:
       if not setting.gui.get_visible():
         continue
@@ -354,7 +362,8 @@ class CommandEditorWidget:
         self._grid_more_options,
         setting,
         row_index,
-        max_width_chars=self._COMMAND_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+        width_chars=label_width_chars,
+        max_width_chars=label_width_chars,
         set_name_as_tooltip=False,
       )
 
@@ -451,7 +460,8 @@ class CommandEditorWidget:
       grid,
       setting,
       row_index,
-      max_width_chars=self._COMMAND_ARGUMENT_DESCRIPTION_MAX_WIDTH_CHARS,
+      width_chars=self._label_width_chars_for_arguments,
+      max_width_chars=self._label_width_chars_for_arguments,
       set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
     )
 

@@ -7,6 +7,7 @@ General changes:
 * Updated Japanese translation (thanks to @re-unknown).
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 * If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
+* Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` button. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
@@ -18,8 +19,8 @@ User interface changes:
 * Batch Convert: Buttons for adding and removing files and folders are moved to the top and changed them to icons.
 * The `Show Original Names` button shown in Batch Convert is now available for all plug-in procedures among the options at the top of the input list.
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
+* Adjusted widths of action/condition argument names to avoid extra empty vertical space (most notably in the Export Options dialog).
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
-* Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
 * Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
 * Marked names of common layer effect arguments as translatable.
 

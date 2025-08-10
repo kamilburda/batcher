@@ -64,9 +64,19 @@ class ImportExportOptionsDialog:
 
     self._import_export_settings.initialize_gui(only_null=True)
 
+    label_width_chars = gui_utils_grid_.get_max_label_width_from_settings(
+      self._import_export_settings)
+
     for row_index, setting in enumerate(self._import_export_settings):
       gui_utils_grid_.attach_label_to_grid(
-        self._grid, setting, row_index, set_name_as_tooltip=False)
+        self._grid,
+        setting,
+        row_index,
+        width_chars=label_width_chars,
+        max_width_chars=label_width_chars,
+        set_name_as_tooltip=False,
+      )
+
       gui_utils_grid_.attach_widget_to_grid(
         self._grid, setting, row_index, set_name_as_tooltip=False)
 
