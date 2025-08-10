@@ -5,9 +5,12 @@ General changes:
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
-* If an action causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action can safely be skipped for a particular image/layer. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable.
-* Added an export option named `Rotate or flip image based on Exif metadata`. This allows correcting the orientation of images with Exif metadata before export if you choose to not save Exif metadata, e.g. for the JPEG format (#91).
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
+
+New features:
+* Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` button. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
+* Added an export option named `Rotate or flip image based on Exif metadata`. This allows correcting the orientation of images with Exif metadata before export if you choose to not save Exif metadata, e.g. for the JPEG format (#91).
+* If an action causes an error during processing or if a file does not exist, you may choose to continue processing if you determine the error is harmless and that the action can safely be skipped for a particular image/layer. This is available under `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable.
 
 User interface changes:
 * Export settings are now arranged vertically in the upper left part of the dialog. Clarified labels describing the settings.
@@ -16,6 +19,7 @@ User interface changes:
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
 * Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
+* Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
 * Marked names of common layer effect arguments as translatable.
 
 
