@@ -184,7 +184,11 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
     file_format_options = [
       self.setting.value.get(file_format, None) for file_format in file_formats]
 
-    self._widget.set_active_file_formats(file_formats, file_format_options)
+    if self.setting.EXPANDED_KEY not in self.setting.value:
+      self.setting.value[self.setting.EXPANDED_KEY] = {}
+
+    self._widget.set_active_file_formats(
+      file_formats, file_format_options, self.setting.value[self.setting.EXPANDED_KEY])
 
   def get_value(self):
     if self.setting.ACTIVE_FILE_FORMAT_KEY in self.setting.value:
@@ -196,10 +200,14 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
     return self.setting.value
 
   def _set_value(self, value):
+    if self.setting.EXPANDED_KEY not in value:
+      value[self.setting.EXPANDED_KEY] = {}
+
     file_formats = value.get(self.setting.ACTIVE_FILE_FORMAT_KEY, None)
 
     if file_formats is not None:
       file_format_options = [value.get(file_format, None) for file_format in file_formats]
-      self._widget.set_active_file_formats(file_formats, file_format_options)
+      self._widget.set_active_file_formats(
+        file_formats, file_format_options, value[self.setting.EXPANDED_KEY])
     else:
-      self._widget.set_active_file_formats([], [])
+      self._widget.set_active_file_formats([], [], value[self.setting.EXPANDED_KEY])

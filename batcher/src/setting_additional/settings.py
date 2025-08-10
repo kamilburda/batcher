@@ -776,6 +776,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
 
   # HACK: Use a leading '_' to avoid clashing with file extensions.
   ACTIVE_FILE_FORMAT_KEY = '_active'
+  EXPANDED_KEY = '_expanded'
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.file_format_options]
 
@@ -804,11 +805,11 @@ class FileFormatOptionsSetting(setting_.DictSetting):
         **event_handler_kwargs,
   ):
     if event_type == 'value-changed':
-      for key, group_or_active_file_format in self._value.items():
-        if key == self.ACTIVE_FILE_FORMAT_KEY:
+      for key, group_or_metadata in self._value.items():
+        if key in [self.ACTIVE_FILE_FORMAT_KEY, self.EXPANDED_KEY]:
           continue
 
-        for setting in group_or_active_file_format:
+        for setting in group_or_metadata:
           setting.connect_event(
             event_type, event_handler, *event_handler_args, **event_handler_kwargs)
 
@@ -840,20 +841,19 @@ class FileFormatOptionsSetting(setting_.DictSetting):
   def _raw_to_value(self, raw_value):
     value = {}
 
-    for key, group_or_active_file_format in raw_value.items():
-      if key == self.ACTIVE_FILE_FORMAT_KEY:
-        value[key] = group_or_active_file_format
+    for key, group_or_metadata in raw_value.items():
+      if key in [self.ACTIVE_FILE_FORMAT_KEY, self.EXPANDED_KEY]:
+        value[key] = group_or_metadata
       else:
         processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(key, key)
         if file_formats_.file_format_procedure_exists(processed_file_format, self.import_or_export):
-          if isinstance(group_or_active_file_format, setting_.Group):
+          if isinstance(group_or_metadata, setting_.Group):
             # We need to create new settings to avoid the same setting to be
             # a part of multiple instances of `FileFormatOptionsSetting`.
             value[key] = file_formats_.create_file_format_options_settings(
-              self._file_format_options_to_dict(group_or_active_file_format))
+              self._file_format_options_to_dict(group_or_metadata))
           else:
-            value[key] = file_formats_.create_file_format_options_settings(
-              group_or_active_file_format)
+            value[key] = file_formats_.create_file_format_options_settings(group_or_metadata)
 
           self._connect_events_for_new_file_format_options(value, processed_file_format)
 
@@ -863,7 +863,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
     raw_value = {}
 
     for key, group_or_active_file_format in value.items():
-      if key == self.ACTIVE_FILE_FORMAT_KEY:
+      if key in [self.ACTIVE_FILE_FORMAT_KEY, self.EXPANDED_KEY]:
         raw_value[key] = group_or_active_file_format
       else:
         raw_value[key] = self._file_format_options_to_dict(group_or_active_file_format)
