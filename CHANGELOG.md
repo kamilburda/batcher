@@ -23,7 +23,7 @@ User interface changes:
 * Marked names of common layer effect arguments as translatable.
 
 Changes to actions and conditions:
-* Color correction: Reduced the range of allowed brightness values to -1.0-1.0. 
+* Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
 
 
 ## 1.1.1
