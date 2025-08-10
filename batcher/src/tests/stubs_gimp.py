@@ -10,6 +10,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
+from src import constants
 from src import pypdb
 
 
@@ -776,8 +777,6 @@ class GimpModuleStub(ParasiteFunctionsStubMixin):
   PDBStatusType = Gimp.PDBStatusType
 
   ParamChoice = ChoiceParamStub
-
-  PARASITE_PERSISTENT = Gimp.PARASITE_PERSISTENT
 
   _PDB_INSTANCE = PdbStub()
 

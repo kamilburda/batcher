@@ -612,7 +612,7 @@ class GimpParasiteSource(Source):
     Gimp.attach_parasite(
       Gimp.Parasite.new(
         self.name,
-        Gimp.PARASITE_PERSISTENT,
+        constants.PARASITE_PERSISTENT_FLAG,
         utils.bytes_to_signed_bytes(pickle.dumps(data))))
 
 
