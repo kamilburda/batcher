@@ -218,17 +218,62 @@ class TestSettingEventsMixin(unittest.TestCase):
     with self.assertRaises(ValueError):
       self.file_extension.remove_event(-1)
 
-  def test_has_event(self):
+  def test_has_event_by_id(self):
     event_id = self.file_extension.connect_event(
       'test-event', stubs_setting.on_file_extension_changed, self.flatten)
 
-    self.assertTrue(self.file_extension.has_event(event_id))
+    self.assertTrue(self.file_extension.has_event(event_id=event_id))
 
     self.file_extension.remove_event(event_id)
-    self.assertFalse(self.file_extension.has_event(event_id))
+    self.assertFalse(self.file_extension.has_event(event_id=event_id))
 
-  def test_has_event_returns_false_on_no_events(self):
-    self.assertFalse(self.file_extension.has_event(-1))
+  def test_has_event_by_id_returns_false_on_no_events(self):
+    self.assertFalse(self.file_extension.has_event(event_id=-1))
+
+  def test_has_event_by_type_and_handler(self):
+    self.file_extension.connect_event(
+      'test-event', stubs_setting.on_file_extension_changed, self.flatten)
+
+    self.assertTrue(
+      self.file_extension.has_event(
+        event_type='test-event',
+        event_handler=stubs_setting.on_file_extension_changed,
+      ))
+
+  def test_has_event_by_type_handler_and_args(self):
+    self.file_extension.connect_event(
+      'test-event', stubs_setting.on_file_extension_changed, self.flatten)
+
+    self.assertTrue(
+      self.file_extension.has_event(
+        event_type='test-event',
+        event_handler=stubs_setting.on_file_extension_changed,
+        event_handler_args=(self.flatten,),
+      ))
+
+  def test_has_event_by_type_handler_args_and_kwargs(self):
+    self.file_extension.connect_event(
+      'test-event', stubs_setting.on_file_extension_changed, self.flatten, expand=True)
+
+    self.assertTrue(
+      self.file_extension.has_event(
+        event_type='test-event',
+        event_handler=stubs_setting.on_file_extension_changed,
+        event_handler_args=(self.flatten,),
+        event_handler_kwargs={'expand': True},
+      ))
+
+  def test_has_event_missing_id_or_type_and_handler_raises_error(self):
+    with self.assertRaises(ValueError):
+      self.file_extension.has_event()
+
+  def test_has_event_by_handler_missing_type_raises_error(self):
+    with self.assertRaises(ValueError):
+      self.file_extension.has_event(event_handler=stubs_setting.on_file_extension_changed)
+
+  def test_has_event_by_handler_missing_handler_raises_error(self):
+    with self.assertRaises(ValueError):
+      self.file_extension.has_event(event_type='test-event')
 
   def test_set_event_enabled(self):
     event_id = self.file_extension.connect_event(

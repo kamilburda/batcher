@@ -2,7 +2,7 @@
 
 import collections
 import itertools
-from typing import Callable, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union, Tuple
 
 __all__ = [
   'SETTING_PATH_SEPARATOR',
@@ -228,14 +228,51 @@ class SettingEventsMixin:
     event_type = cls._global_event_handler_ids_and_types[event_id]
     cls._global_event_handlers[event_type][event_id][3] = enabled
   
-  def has_event(self, event_id: int) -> bool:
-    """Returns ``True`` if the event handler specified by its ID exists,
-    ``False`` otherwise.
+  def has_event(
+        self,
+        event_id: Optional[int] = None,
+        event_type: Optional[str] = None,
+        event_handler: Optional[Callable] = None,
+        event_handler_args: Optional[Union[List, Tuple]] = None,
+        event_handler_kwargs: Optional[Dict] = None,
+  ) -> bool:
+    """Returns ``True`` if the specified event handler exists, ``False``
+    otherwise.
+
+    Either ``event_id`` must be specified (not ``None``), or ``event_type`` and
+    ``event_handler``. For the latter, positional and keyword arguments for
+    ``event_handler`` can be specified.
+
+    Note that matching by ``event_handler`` and optionally the arguments may
+    result in multiple matches, in which case ``True`` is still returned.
     """
-    return (
-      event_id in self._event_handler_ids_and_types
-      or event_id in self._global_event_handler_ids_and_types
-    )
+    if event_id is not None:
+      return (
+        event_id in self._event_handler_ids_and_types
+        or event_id in self._global_event_handler_ids_and_types
+      )
+    else:
+      if event_type is None or event_handler is None:
+        raise ValueError('event_type and event_handler must be specified if event_id is None')
+
+      events_from_type = self._event_handlers[event_type]
+      if event_handler_args is not None and event_handler_kwargs is not None:
+        is_match = lambda event_data: (
+          event_data[:3] == [event_handler, event_handler_args, event_handler_kwargs])
+      elif event_handler_args is not None and event_handler_kwargs is None:
+        is_match = lambda event_data: (
+          event_data[0] == event_handler and event_data[1] == event_handler_args)
+      elif event_handler_args is None and event_handler_kwargs is not None:
+        is_match = lambda event_data: (
+          event_data[0] == event_handler and event_data[2] == event_handler_kwargs)
+      else:
+        is_match = lambda event_data: event_data[0] == event_handler
+
+      for event_id, event_data in events_from_type.items():
+        if is_match(event_data):
+          return True
+
+      return False
   
   def invoke_event(self, event_type: str, *additional_args, **additional_kwargs):
     """Manually calls all connected event handlers of the specified event type.
