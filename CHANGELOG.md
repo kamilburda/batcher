@@ -28,6 +28,7 @@ User interface changes:
 
 Changes to actions and conditions:
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
+* Color correction: GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
 
 
 ## 1.1.1

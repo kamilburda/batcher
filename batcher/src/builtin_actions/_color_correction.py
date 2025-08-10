@@ -84,6 +84,9 @@ def _apply_correction(
       except Exception as e:
         raise ValueError(_FAILED_TO_READ_DATA_MESSAGE) from e
 
+  if trc != 'linear':
+    raise NotImplementedError(_('Only presets with the linear mode are currently supported.'))
+
   if trc is not None and curve_data is not None:
     _apply_func(layer, trc, curve_data)
 
@@ -169,7 +172,7 @@ def _parse_photoshop_levels_preset(file):
       clamp_output=True,
     )
 
-  trc = 'non-linear'
+  trc = 'linear'
 
   return trc, levels_data
 
@@ -260,7 +263,7 @@ def _parse_photoshop_curves_preset(file):
   for channel, points in zip(_HISTOGRAM_CHANNELS.values(), points_per_channel):
     curve_data[channel] = CurveData(channel=channel, points=points)
 
-  trc = 'non-linear'
+  trc = 'linear'
 
   return trc, curve_data
 
