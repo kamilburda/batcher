@@ -368,7 +368,7 @@ COLOR_CORRECTION_DICT = {
       'name': 'levels_preset_file',
       'default_value': None,
       'action': Gimp.FileChooserAction.OPEN,
-      'display_name': _('Levels (preset file)'),
+      'display_name': _('Levels (preset saved in GIMP or Photoshop)'),
       'none_ok': True,
     },
     {
@@ -376,7 +376,7 @@ COLOR_CORRECTION_DICT = {
       'name': 'curves_preset_file',
       'default_value': None,
       'action': Gimp.FileChooserAction.OPEN,
-      'display_name': _('Curves (preset file)'),
+      'display_name': _('Curves (preset saved in GIMP or Photoshop)'),
       'none_ok': True,
     },
   ],
