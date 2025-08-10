@@ -828,7 +828,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
 
     for file_format in self._value[self.ACTIVE_FILE_FORMAT_KEY]:
       file_formats_.fill_file_format_options(self._value, file_format, self._import_or_export)
-      self._connect_events_for_new_file_format_options(file_format)
+      self._connect_events_for_new_file_format_options(self._value, file_format)
 
     if hasattr(self.gui, 'set_active_file_formats'):
       self.gui.set_active_file_formats(processed_file_formats)
@@ -851,7 +851,7 @@ class FileFormatOptionsSetting(setting_.DictSetting):
             value[key] = file_formats_.create_file_format_options_settings(
               group_or_active_file_format)
 
-          self._connect_events_for_new_file_format_options(processed_file_format)
+          self._connect_events_for_new_file_format_options(value, processed_file_format)
 
     return value
 
@@ -879,15 +879,21 @@ class FileFormatOptionsSetting(setting_.DictSetting):
         and value[self.ACTIVE_FILE_FORMAT_KEY] != orig_active_file_format):
       self.set_active_file_formats(value[self.ACTIVE_FILE_FORMAT_KEY])
 
-  def _connect_events_for_new_file_format_options(self, file_format):
+  def _connect_events_for_new_file_format_options(self, value, file_format):
     processed_file_format = file_formats_.FILE_FORMAT_ALIASES.get(file_format, file_format)
 
-    if processed_file_format is None or processed_file_format not in self._value:
+    if processed_file_format is None or processed_file_format not in value:
       return
 
-    for setting in self._value[processed_file_format]:
+    for setting in value[processed_file_format]:
       for event_type, event_handler, args, kwargs in self._connected_events:
-        setting.connect_event(event_type, event_handler, *args, **kwargs)
+        if not setting.has_event(
+          event_type=event_type,
+          event_handler=event_handler,
+          event_handler_args=args,
+          event_handler_kwargs=kwargs,
+        ):
+          setting.connect_event(event_type, event_handler, *args, **kwargs)
 
   @staticmethod
   def _file_format_options_to_dict(file_format_options):
