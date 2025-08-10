@@ -68,7 +68,7 @@ For levels and curves, you need to specify a saved preset file. Both GIMP and Ph
 
 You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.
 
-At the moment, Batcher only supports applying levels or curves in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), it will still be applied as if the mode was set to linear.
+At the moment, Batcher only supports applying levels or curves in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
 
 
 ### Crop

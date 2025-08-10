@@ -30,6 +30,8 @@ You will be warned if you add folder(s) containing too many files or e.g. an ent
 
 You can remove input images and folders by selecting them and pressing Delete or by pressing `- → Remove Selected`. You can clear the entire input list by pressing `- → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
 
+You can adjust import options for each file format detected in the input list by pressing the arrow button and selecting `Import Options...`.
+
 By default, the renamed images (as they would be named on export) are displayed. To show their original names, press the arrow button and check `Show Original Names`.
 
 

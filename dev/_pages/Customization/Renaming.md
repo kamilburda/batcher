@@ -80,6 +80,8 @@ Examples:
 * `[image path, _, (%c)]` → `(Body)_(Hands)_(Left)`
 * `[image path, _, (%c), %e]` → `Body-Hands-Left.png` (if the image name is `Left.png` and the file extension is `png`)
 
+If for the separator or the `%c` option you intend to use characters such as space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
+
 ### \[layer name\]
 
 *Only available for: Export Layers, Edit Layers*
@@ -129,6 +131,8 @@ Examples:
 * `[layer path, _, (%c)]` → `(Body)_(Hands)_(Left)`
 * `[layer path, _, (%c), %e]` → `Body-Hands-Left.png` (if the layer name is `Left.png` and the file extension is `png`)
 
+If for the separator or the `%c` option you intend to use characters such as space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
+
 ### \[output folder\]
 
 The output folder selected in the plug-in dialog.
@@ -151,6 +155,8 @@ Examples for a folder with the path `C:\Users\username\Pictures`:
 * `[output folder, %b2, _]` → `username_Pictures`
 * `[output folder, %b2, _, (%c)]` → `(username)_(Pictures)`
 * `[output folder, %f2]` → `C-Users`
+
+If for the separator or the `%c` option you intend to use characters such as a space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
 
 ### \[replace\]
 
@@ -180,6 +186,19 @@ Examples:
 * `[replace, [image name], [a], [b], 1, ignorecase]` → `bnimal copy #1`
 * `[replace, [image name], [ copy(?: #[[0-9]]+)*$], [] ]` → `Animal`
 
+If you intend to use characters such as space, these [require special treatment]((#inserting-reserved-characters-in-options)).
+
+In case you need to replace literal `[` or `]` characters, you must, [in addition to doubling the square brackets](#inserting-reserved-characters-in-options), also insert a `\` before the brackets. If the image is named `[Animal`, the following will remove the bracket:
+
+* `[replace, [image name], [\[[], [] ]` → `Animal`
+
+To remove both `[` and `]` given the image name `[Animal]`:
+
+* `[replace, [image name], [[[\[[\]]]]], [] ]` → `Animal`
+
+The `[[` preceding `\[[` and the `]]` succeeding `\]]` represent the special `[` and `]` characters in regular expressions, respectively, which must be [doubled](#inserting-reserved-characters-in-options).
+
+
 ### \[tags\]
 
 *Only available for: Export Layers, Edit Layers*
@@ -200,6 +219,8 @@ Examples:
 * `[tags, %t, blue, foreground]` → *(empty string)*
 * `[tags, %t, green, background, blue, foreground]` → `background`
 
+If for the `%t` option you intend to use characters such as space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
+
 ### \[current date\]
 
 The current date.
@@ -211,6 +232,8 @@ Options:
 Examples:
 * `[current date]` → `2019-01-28`
 * `[current date, %m.%d.%Y_%H-%M]` → `28.01.2019_19-04`
+
+If for you intend to use characters such as space, these [require special treatment]((#inserting-reserved-characters-in-options)).
 
 ### \[attributes\]
 
@@ -239,10 +262,11 @@ Examples:
 * `[attributes, %lw-%lh-%lx-%ly, %pc1]` → `1.0-0.5-0.0-0.1`
 * `[attributes, %iw-%ih]` → `1000-500`
 
+If for you intend to use characters such as space, these [require special treatment]((#inserting-reserved-characters-in-options)).
 
 ## Inserting reserved characters in options
 
-To insert a literal space or comma in a field option, enclose the option with square brackets.
+To insert a literal space (` `) or comma (`,`) in a field option, enclose the option with square brackets.
 To insert a literal square bracket (`[` or `]`), double the bracket and enclose the option with square brackets (e.g. `[[[]` to insert a literal `[`).
 
 If the last option is enclosed in square brackets, leave a single space between the last and the second to last closing square bracket.

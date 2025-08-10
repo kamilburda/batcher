@@ -67,7 +67,7 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
 
 ## macOS
 
-1. Locate the folder containing GIMP plug-ins - open GIMP and go to `GIMP → Preferences → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder. 
+1. Locate the folder containing GIMP plug-ins - open GIMP and go to `GIMP → Preferences (or Settings) → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder. 
 2. Copy the `batcher` folder from the downloaded archive to one of the folders chosen in the previous step. The folder hierarchy should look like this:
     ```
     plug-ins/
