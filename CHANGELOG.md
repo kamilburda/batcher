@@ -22,6 +22,9 @@ User interface changes:
 * Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
 * Marked names of common layer effect arguments as translatable.
 
+Changes to actions and conditions:
+* Color correction: Reduced the range of allowed brightness values to -1.0-1.0. 
+
 
 ## 1.1.1
 

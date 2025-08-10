@@ -346,8 +346,8 @@ COLOR_CORRECTION_DICT = {
       'name': 'brightness',
       'default_value': 0.0,
       'display_name': _('Brightness'),
-      'min_value': -3.0,
-      'max_value': 3.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
       'gui_type_kwargs': {
         'step_increment': 0.01,
       },
