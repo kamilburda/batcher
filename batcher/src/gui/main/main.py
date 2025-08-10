@@ -306,6 +306,11 @@ class BatchProcessingGui:
     self._command_lists.reset_command_tooltips_and_indicators()
     self._command_lists.close_command_edit_dialogs()
 
+    self._previews.close_import_options_dialog()
+
+    if self._export_settings is not None:
+      self._export_settings.close_export_options_dialog()
+
     self._set_gui_enabled(False)
 
   def _restore_gui_after_batch_run(self):

@@ -50,6 +50,10 @@ class ExportSettings:
     if self._current_image is not None:
       _set_up_output_directory_settings(self._settings, self._current_image)
 
+  def close_export_options_dialog(self):
+    if self._export_options_dialog is not None:
+      self._export_options_dialog.widget.hide()
+
   def _init_gui(self):
     self._folder_chooser_label = Gtk.Label(
       xalign=0.0,

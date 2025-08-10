@@ -161,6 +161,10 @@ class Previews:
       image_preview_update_kwargs=image_preview_update_kwargs,
     )
 
+  def close_import_options_dialog(self):
+    if self._import_options_dialog is not None:
+      self._import_options_dialog.widget.hide()
+
   def _init_setting_gui(self):
     self._settings['gui/image_preview_automatic_update'].set_gui(
       gui_type=setting_.SETTING_GUI_TYPES.check_menu_item,
@@ -207,6 +211,8 @@ class Previews:
     )
     self._hbox_top.pack_start(self._label_top, False, False, 0)
     self._hbox_top.pack_start(self._hbox_input_options, False, False, 0)
+
+    self._import_options_dialog = None
 
     if self._manage_items:
       self._set_up_managing_items()
@@ -337,8 +343,6 @@ class Previews:
         Gtk.TargetEntry.new('CF_HDROP', 0, 0),
       ],
       Gdk.DragAction.MOVE)
-
-    self._import_options_dialog = None
 
     self._connect_import_setting_events()
 
