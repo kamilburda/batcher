@@ -6,6 +6,7 @@ General changes:
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
+* If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` button. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
