@@ -693,6 +693,39 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     return item
 
+  def reorder(
+        self,
+        item: Item,
+        insertion_mode: str = 'after',
+        reference_item: Optional[Item] = None,
+        parent_item: Optional[Item] = None,
+  ):
+    """Moves ``item`` after ``reference_item``.
+
+    An item can also be moved outside its parent folder.
+
+    Args:
+      item: The `Item` to reorder.
+      insertion_mode:
+        If ``'after'``, ``item`` is inserted after ``reference_item``.
+        If ``'before'``, ``item`` is inserted before ``reference_item``.
+      reference_item:
+        The `Item` before/after which ``item`` will be placed. If ``None``
+        and `insertion_mode`` is ``'before'``, ``item`` is placed as the last
+        item within ``parent_item``. If ``None`` and `insertion_mode`` is
+        ``'after'``, ``item`` is placed as the first item within
+        ``parent_item``.
+      parent_item:
+        The parent `Item` under which to reorder ``item``. If ``None``, the
+        item will be moved to the top level. If ``reference_item`` is not
+        under ``parent_item``, ``item`` will be moved to the last position
+        within ``parent_item``.
+    """
+    print('item:', item.key)
+    print('mode:', insertion_mode)
+    print('reference item:', reference_item.key if reference_item is not None else None)
+    print('parent:', parent_item.key if parent_item is not None else None)
+
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
 

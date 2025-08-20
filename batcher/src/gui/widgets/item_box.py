@@ -61,8 +61,9 @@ class ItemBox(Gtk.ScrolledWindow):
     self._vbox.pack_start(self._vbox_items, False, False, 0)
 
     self.add(self._vbox)
+    self.set_shadow_type(Gtk.ShadowType.NONE)
     self.get_child().set_shadow_type(Gtk.ShadowType.NONE)
-  
+
   @property
   def items(self):
     return self._items
@@ -112,7 +113,7 @@ class ItemBox(Gtk.ScrolledWindow):
     self._drag_and_drop_context.setup_drag(
       item.widget,
       self._get_drag_data,
-      self._on_drag_data_received,
+      self._drag_data_received,
       [item],
       [item],
     )
@@ -123,7 +124,8 @@ class ItemBox(Gtk.ScrolledWindow):
   def _get_drag_data(self, dragged_item):
     return bytes([self._items.index(dragged_item)])
   
-  def _on_drag_data_received(self, dragged_item_index_as_bytes, destination_item):
+  def _drag_data_received(self, selection_data, destination_item):
+    dragged_item_index_as_bytes = selection_data.get_data()
     dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
 

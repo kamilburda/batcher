@@ -2,7 +2,7 @@
 
 import collections
 from collections.abc import Iterable
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -16,25 +16,28 @@ __all__ = [
 
 
 class DragAndDropContext:
-  """Class adding drag-and-drop capability to a `Gtk.Widget`."""
-  
+  """Simplified means to add drag-and-drop capability to a `Gtk.Widget`."""
+
   def __init__(self):
     self._drag_type = self._get_unique_drag_type()
 
     self._widgets_and_event_ids = collections.defaultdict(dict)
-  
+
   def setup_drag(
         self,
         widget: Gtk.Widget,
         get_drag_data_func: Callable,
-        drag_data_receive_func: Callable,
+        drag_data_received_func: Callable,
         get_drag_data_args: Optional[Iterable] = None,
-        drag_data_receive_args: Optional[Iterable] = None,
+        drag_data_received_args: Optional[Iterable] = None,
         get_drag_icon_func: Callable = None,
         get_drag_icon_func_args: Optional[Iterable] = None,
         destroy_drag_icon_func: Callable = None,
         destroy_drag_icon_func_args: Optional[Iterable] = None,
         dest_widget: Optional[Gtk.Widget] = None,
+        dest_defaults: Gtk.DestDefaults = Gtk.DestDefaults.ALL,
+        target_flags: Gtk.TargetFlags = 0,
+        additional_dest_targets: Optional[List] = None,
   ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
@@ -45,12 +48,12 @@ class DragAndDropContext:
         Widget to enable dragging for.
       get_drag_data_func:
         Function returning data as a string describing the dragged widget.
-      drag_data_receive_func:
+      drag_data_received_func:
         Function processing the data returned by ``get_drag_data_func``.
       get_drag_data_args:
         Optional positional arguments for ``get_drag_data_func``.
-      drag_data_receive_args:
-        Optional positional arguments for ``drag_data_receive_func``.
+      drag_data_received_args:
+        Optional positional arguments for ``drag_data_received_func``.
       get_drag_icon_func:
         Function to generate an icon when the dragging begins. If omitted, the
         default icon assigned by the application will be used.
@@ -68,12 +71,24 @@ class DragAndDropContext:
         Optional different widget to use as the drag destination. You may e.g.
         use a child of ``widget`` as a drag destination to limit the area where
         ``widget`` can be dropped.
+      dest_defaults:
+        `Gtk.DestDefaults` used for the drag destination.
+      target_flags:
+        `Gtk.TargetFlags` used for both drag source and destination.
+      additional_dest_targets:
+        Additional `Gtk.TargetEntry` instances for the drag destination.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
-    
-    if drag_data_receive_args is None:
-      drag_data_receive_args = ()
+
+    if drag_data_received_args is None:
+      drag_data_received_args = ()
+
+    if dest_widget is None:
+      dest_widget = widget
+
+    if additional_dest_targets is None:
+      additional_dest_targets = []
 
     self._widgets_and_event_ids[widget]['drag-data-get'] = widget.connect(
       'drag-data-get',
@@ -82,20 +97,20 @@ class DragAndDropContext:
       get_drag_data_args)
     widget.drag_source_set(
       Gdk.ModifierType.BUTTON1_MASK,
-      [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
+      [Gtk.TargetEntry.new(self._drag_type, target_flags, 0)],
       Gdk.DragAction.MOVE)
-
-    if dest_widget is None:
-      dest_widget = widget
 
     self._widgets_and_event_ids[widget]['drag-data-received'] = dest_widget.connect(
       'drag-data-received',
       self._on_widget_drag_data_received,
-      drag_data_receive_func,
-      *drag_data_receive_args)
+      drag_data_received_func,
+      *drag_data_received_args)
     dest_widget.drag_dest_set(
-      Gtk.DestDefaults.ALL,
-      [Gtk.TargetEntry.new(self._drag_type, 0, 0)],
+      dest_defaults,
+      [
+        Gtk.TargetEntry.new(self._drag_type, target_flags, 0),
+        *additional_dest_targets,
+      ],
       Gdk.DragAction.MOVE)
 
     if get_drag_icon_func is not None:
@@ -139,7 +154,7 @@ class DragAndDropContext:
 
   def _get_unique_drag_type(self):
     return f'{type(self).__qualname__}_{id(self)}'
-  
+
   @staticmethod
   def _on_widget_drag_data_get(
         _widget,
@@ -150,7 +165,7 @@ class DragAndDropContext:
         get_drag_data_func,
         get_drag_data_args):
     selection_data.set(selection_data.get_target(), 8, get_drag_data_func(*get_drag_data_args))
-  
+
   @staticmethod
   def _on_widget_drag_data_received(
         _widget,
@@ -160,6 +175,6 @@ class DragAndDropContext:
         selection_data,
         _info,
         _timestamp,
-        drag_data_receive_func,
-        *drag_data_receive_args):
-    drag_data_receive_func(selection_data.get_data(), *drag_data_receive_args)
+        drag_data_received_func,
+        *drag_data_received_args):
+    drag_data_received_func(selection_data, *drag_data_received_args)

@@ -206,6 +206,16 @@ class NamePreview(preview_base_.Preview):
     else:
       return None
 
+  def get_tree_view_column(self):
+    return self._tree_view.get_column(0)
+
+  def get_item_from_path(self, tree_path):
+    item_key = self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
+    if item_key in self._batcher.item_tree:
+      return self._batcher.item_tree[item_key]
+    else:
+      return None
+
   def set_show_original_name(self, show_original_name):
     self._show_original_name = show_original_name
 
