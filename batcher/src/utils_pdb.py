@@ -583,10 +583,15 @@ def rotate_or_flip_image_based_on_exif_metadata(image):
 def _get_orientation_str_via_xml(serialized_metadata):
   try:
     metadata_tree = ElementTree.fromstring(serialized_metadata)
-    return metadata_tree.find('.//tag[@name="Exif.Image.Orientation"]').text
   except Exception:
     # The serialized XML may contain invalid characters causing deserialization
     # to fail.
+    return None
+
+  match = metadata_tree.find('.//tag[@name="Exif.Image.Orientation"]')
+  if match:
+    return match.text
+  else:
     return None
 
 
