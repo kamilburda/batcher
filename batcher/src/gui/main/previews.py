@@ -410,7 +410,11 @@ class Previews:
 
       selected_item_keys = pickle.loads(selection_data.get_data())
       for item_key in selected_item_keys:
-        item_tree.reorder(item_tree[item_key], insertion_mode, reference_item, parent_item)
+        try:
+          item_tree.reorder(item_tree[item_key], insertion_mode, reference_item, parent_item)
+        except ValueError:
+          # Ignore attempts to reorder folders to one of its children.
+          pass
 
   def _name_preview_get_drag_icon(self, _widget, drag_context):
     if self._name_preview.selected_items:
@@ -433,6 +437,11 @@ class Previews:
       reference_item = self._name_preview.get_item_from_path(self._name_preview_drag_dest_row)
 
       if reference_item is None or reference_item.key in self._name_preview.selected_items:
+        return True
+
+      reference_item_parents_keys = [item.key for item in reference_item.parents]
+      if any(item_key in reference_item_parents_keys
+             for item_key in self._name_preview.selected_items):
         return True
 
       name_preview_style_context = self._name_preview.tree_view.get_style_context()

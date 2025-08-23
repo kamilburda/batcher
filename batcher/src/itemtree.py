@@ -720,11 +720,19 @@ class ItemTree(metaclass=abc.ABCMeta):
         item will be moved to the top level. If ``reference_item`` is not
         under ``parent_item``, ``item`` will be moved to the last position
         within ``parent_item``.
+
+    Raises:
+      ValueError:
+        * If ``item`` is not present in this `ItemTree` instance.
+        * If attempting to move ``item`` inside one of its children, i.e. if
+        ``item`` is found in ``reference_item.parents`` and ``reference_item``
+        is not ``None``.
     """
-    print('item:', item.key)
-    print('mode:', insertion_mode)
-    print('reference item:', reference_item.key if reference_item is not None else None)
-    print('parent:', parent_item.key if parent_item is not None else None)
+    if item.key not in self._items:
+      raise ValueError(f'item {item} not found in this ItemTree')
+
+    if reference_item is not None and item in reference_item.parents:
+      raise ValueError(f'cannot reorder item {item} inside one of its children ({reference_item})')
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
