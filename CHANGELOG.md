@@ -21,6 +21,7 @@ User interface changes:
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * Adjusted widths of action/condition argument names to avoid extra empty vertical space (most notably in the Export Options dialog).
 * Increased the default width of the custom action browser to ensure that the right part can be displayed in its entirety without the need for horizontal scrolling.
+* Reduced the width of the quick dialogs given the vertical rearrangement of the export settings.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
 * Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
 * Marked names of common layer effect arguments as translatable.
