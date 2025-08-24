@@ -696,43 +696,130 @@ class ItemTree(metaclass=abc.ABCMeta):
   def reorder(
         self,
         item: Item,
+        reference_item: Item,
         insertion_mode: str = 'after',
-        reference_item: Optional[Item] = None,
-        parent_item: Optional[Item] = None,
   ):
     """Moves ``item`` after ``reference_item``.
 
-    An item can also be moved outside its parent folder.
+    An item can also be moved outside its parent folder to another parent.
 
     Args:
       item: The `Item` to reorder.
+      reference_item:
+        The `Item` before/after which ``item`` will be placed.
       insertion_mode:
         If ``'after'``, ``item`` is inserted after ``reference_item``.
         If ``'before'``, ``item`` is inserted before ``reference_item``.
-      reference_item:
-        The `Item` before/after which ``item`` will be placed. If ``None``
-        and `insertion_mode`` is ``'before'``, ``item`` is placed as the last
-        item within ``parent_item``. If ``None`` and `insertion_mode`` is
-        ``'after'``, ``item`` is placed as the first item within
-        ``parent_item``.
-      parent_item:
-        The parent `Item` under which to reorder ``item``. If ``None``, the
-        item will be moved to the top level. If ``reference_item`` is not
-        under ``parent_item``, ``item`` will be moved to the last position
-        within ``parent_item``.
 
     Raises:
       ValueError:
         * If ``item`` is not present in this `ItemTree` instance.
         * If attempting to move ``item`` inside one of its children, i.e. if
-        ``item`` is found in ``reference_item.parents`` and ``reference_item``
-        is not ``None``.
+          ``item`` is found in ``reference_item.parents`` and ``reference_item``
+          is not ``None``.
+        * If ``insertion_mode`` is not a valid value.
     """
     if item.key not in self._items:
       raise ValueError(f'item {item} not found in this ItemTree')
 
-    if reference_item is not None and item in reference_item.parents:
+    if item in reference_item.parents:
       raise ValueError(f'cannot reorder item {item} inside one of its children ({reference_item})')
+
+    if insertion_mode not in ['before', 'after']:
+      raise ValueError(f'value for insertion_mode is not valid')
+
+    if item == reference_item:
+      return
+
+    next_item = item.next
+    previous_item = item.prev
+
+    if previous_item is not None:
+      # noinspection PyProtectedMember
+      previous_item._next_item = next_item
+
+    if next_item is not None:
+      # noinspection PyProtectedMember
+      next_item._prev_item = previous_item
+
+    if insertion_mode == 'before':
+      self._update_parents_and_children_when_reordering_item(item, reference_item, insertion_mode)
+
+      previous_reference_item = reference_item.prev
+      # noinspection PyProtectedMember
+      reference_item._prev_item = item
+      # noinspection PyProtectedMember
+      item._prev_item = previous_reference_item
+      # noinspection PyProtectedMember
+      item._next_item = reference_item
+      if previous_reference_item is not None:
+        # noinspection PyProtectedMember
+        previous_reference_item._next_item = item
+      else:
+        self._first_item = item
+    elif insertion_mode == 'after':
+      self._update_parents_and_children_when_reordering_item(item, reference_item, insertion_mode)
+
+      next_reference_item = reference_item.next
+      # noinspection PyProtectedMember
+      reference_item._next_item = item
+      # noinspection PyProtectedMember
+      item._prev_item = reference_item
+      # noinspection PyProtectedMember
+      item._next_item = next_reference_item
+      if next_reference_item is not None:
+        # noinspection PyProtectedMember
+        next_reference_item._prev_item = item
+      else:
+        self._last_item = item
+
+  @staticmethod
+  def _update_parents_and_children_when_reordering_item(item, reference_item, insertion_mode):
+    if item.parent == reference_item.parent:
+      if insertion_mode == 'before' or reference_item.type != TYPE_FOLDER:
+        return
+
+    if item.parent is not None:
+      try:
+        # noinspection PyProtectedMember
+        item.parent._children.remove(item)
+      except ValueError:
+        pass
+
+    if insertion_mode == 'after' and reference_item.type == TYPE_FOLDER:
+      # noinspection PyProtectedMember
+      item._parents = reference_item.parents + [reference_item]
+    else:
+      # noinspection PyProtectedMember
+      item._parents = reference_item.parents
+
+    if item.parent is not None:
+      if item not in item.parent.children:
+        # We disregard item position among the children as we do not make use
+        # of the `children` property for iteration.
+        # noinspection PyProtectedMember
+        item.parent._children.append(item)
+
+    if item.orig_parent is not None:
+      try:
+        # noinspection PyProtectedMember
+        item.orig_parent._orig_children.remove(item)
+      except ValueError:
+        pass
+
+    if insertion_mode == 'after' and reference_item.type == TYPE_FOLDER:
+      # noinspection PyProtectedMember
+      item._orig_parents = reference_item._orig_parents + [reference_item]
+    else:
+      # noinspection PyProtectedMember
+      item._orig_parents = reference_item._orig_parents
+
+    if item.orig_parent is not None:
+      if item not in item.orig_parent.orig_children:
+        # We disregard item position among the children as we do not make use
+        # of the `orig_children` property for iteration.
+        # noinspection PyProtectedMember
+        item.parent._orig_children.append(item)
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
@@ -787,7 +874,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
           try:
             # noinspection PyProtectedMember
-            item_to_remove.parent._orig_children.remove(item_to_remove)
+            item_to_remove.orig_parent._orig_children.remove(item_to_remove)
           except ValueError:
             pass
 

@@ -426,10 +426,7 @@ class TestImageFileTree(unittest.TestCase):
 
     self.tree.add(self.paths[0])
 
-    keys_to_remove = [
-      os.path.join(self.root_path, *path[0])
-      if not path[1] else (os.path.join(self.root_path, *path[0]), self.FOLDER_KEY)
-      for path in paths_to_remove]
+    keys_to_remove = [self._get_key(path) for path in paths_to_remove]
     items_to_remove = [
       self.tree[key]
       for key in keys_to_remove
@@ -444,10 +441,7 @@ class TestImageFileTree(unittest.TestCase):
 
     expected_keys = self._get_keys_from_expected_paths()
 
-    expected_removed_keys = [
-      os.path.join(self.root_path, *path[0])
-      if not path[1] else (os.path.join(self.root_path, *path[0]), self.FOLDER_KEY)
-      for path in removed_paths]
+    expected_removed_keys = [self._get_key(path) for path in removed_paths]
     expected_removed_keys = [
       item_key for item_key in expected_removed_keys if item_key in self.tree]
 
@@ -509,6 +503,207 @@ class TestImageFileTree(unittest.TestCase):
     # noinspection PyProtectedMember
     self.assertIsNone(self.tree._last_item)
 
+  @parameterized.parameterized.expand([
+    ('before_same_level_parent',
+     [('Corners', 'top-right.png')],
+     [('Corners', 'top-left2'), True],
+     'before',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left2'), True],
+     [('Corners',), True],
+     ),
+
+    ('before_at_start_of_parent',
+     [('Corners', 'top-right.png')],
+     [('Corners', 'top-left.png')],
+     'before',
+     [('Corners',), True],
+     [('Corners', 'top-left.png')],
+     [('Corners',), True],
+     ),
+
+    ('before_into_different_parent',
+     [('Corners', 'top-left3', 'bottom-left.png')],
+     [('Corners', 'top-left2'), True],
+     'before',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left2'), True],
+     [('Corners',), True],
+     ),
+
+    ('before_equivalent_item_and_reference_item_does_nothing',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left.png')],
+     'before',
+     [('Corners',), True],
+     [('Corners', 'top-left2'), True],
+     [('Corners',), True],
+     ),
+
+    ('before_at_top_level',
+     [('main-background.jpg',)],
+     [('Frames',), True],
+     'before',
+     [('Corners', 'top-right.png'),],
+     [('Frames',), True],
+     None,
+     ),
+
+    ('before_as_first_item',
+     [('Corners', 'top-left.png')],
+     [('Corners',), True],
+     'before',
+     None,
+     [('Corners',), True],
+     None,
+     True,
+     False,
+     ),
+
+    ('after_into_parent',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left2'), True],
+     'after',
+     [('Corners', 'top-left2'), True],
+     [('Corners', 'top-left3'), True],
+     [('Corners', 'top-left2'), True],
+     ),
+
+    ('after_at_end_of_parent',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-right.png')],
+     'after',
+     [('Corners', 'top-right.png')],
+     [('Frames',), True],
+     [('Corners',), True],
+     ),
+
+    ('after_into_different_parent',
+     [('Corners', 'top-left3', 'bottom-left.png')],
+     [('Corners', 'top-left.png')],
+     'after',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left2'), True],
+     [('Corners',), True],
+     ),
+
+    ('after_equivalent_item_and_reference_item_does_nothing',
+     [('Corners', 'top-left.png')],
+     [('Corners', 'top-left.png')],
+     'after',
+     [('Corners',), True],
+     [('Corners', 'top-left2'), True],
+     [('Corners',), True],
+     ),
+
+    ('after_at_top_level',
+     [('Frames',), True],
+     [('main-background.jpg',)],
+     'after',
+     [('main-background.jpg',)],
+     [('Overlay',), True],
+     None,
+     ),
+
+    ('after_as_last_item',
+     [('Corners', 'top-left.png')],
+     [('Overlay',), True],
+     'after',
+     [('Overlay',), True],
+     None,
+     [('Overlay',), True],
+     False,
+     True,
+     ),
+  ])
+  def test_reorder(
+        self,
+        mock_abspath,
+        mock_listdir,
+        mock_isdir,
+        _test_case_name_suffix,
+        item_key_to_reorder,
+        reference_item_key,
+        insertion_mode,
+        expected_previous_item_key,
+        expected_next_item_key,
+        expected_parent_item_key,
+        is_reordered_as_first_item=False,
+        is_reordered_as_last_item=False,
+  ):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    item_to_reorder = self._get_item(item_key_to_reorder)
+    reference_item = self._get_item(reference_item_key)
+
+    self.tree.reorder(
+      item_to_reorder,
+      reference_item,
+      insertion_mode,
+    )
+
+    expected_previous_item = self._get_item(expected_previous_item_key)
+    expected_next_item = self._get_item(expected_next_item_key)
+    expected_parent_item = self._get_item(expected_parent_item_key)
+
+    self.assertEqual(item_to_reorder.prev, expected_previous_item)
+    self.assertEqual(item_to_reorder.next, expected_next_item)
+    if insertion_mode == 'before':
+      if item_to_reorder != reference_item:
+        self.assertEqual(reference_item, expected_next_item)
+        self.assertEqual(reference_item.prev, item_to_reorder)
+      else:
+        self.assertEqual(reference_item.next, expected_next_item)
+
+      if expected_previous_item is not None:
+        self.assertEqual(expected_previous_item.next, item_to_reorder)
+    elif insertion_mode == 'after':
+      if item_to_reorder != reference_item:
+        self.assertEqual(reference_item, expected_previous_item)
+        self.assertEqual(reference_item.next, item_to_reorder)
+      else:
+        self.assertEqual(reference_item.prev, expected_previous_item)
+
+      if expected_next_item is not None:
+        self.assertEqual(expected_next_item.prev, item_to_reorder)
+
+    self.assertEqual(item_to_reorder.parent, expected_parent_item)
+    self.assertEqual(item_to_reorder.orig_parent, expected_parent_item)
+    if expected_parent_item is not None:
+      self.assertIn(item_to_reorder, expected_parent_item.children)
+      self.assertIn(item_to_reorder, expected_parent_item.orig_children)
+
+    if is_reordered_as_first_item:
+      # noinspection PyProtectedMember
+      self.assertEqual(item_to_reorder, self.tree._first_item)
+
+    if is_reordered_as_last_item:
+      # noinspection PyProtectedMember
+      self.assertEqual(item_to_reorder, self.tree._last_item)
+
+  def test_reorder_item_not_found_raises_error(self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    item_outside_tree = itemtree.ImageFileItem('some_path', itemtree.TYPE_ITEM)
+
+    with self.assertRaises(ValueError):
+      self.tree.reorder(item_outside_tree, self._get_item([('Corners', 'top-left.png',)]))
+
+  def test_reorder_item_into_its_child_raises_error(self, mock_abspath, mock_listdir, mock_isdir):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    with self.assertRaises(ValueError):
+      self.tree.reorder(
+        self._get_item([('Corners',), True]),
+        self._get_item([('Corners', 'top-left.png',)]),
+      )
+
   def _set_up_tree_before_add(self, mock_abspath, mock_listdir, mock_isdir):
     mock_abspath.side_effect = (
       lambda path_: (
@@ -518,12 +713,19 @@ class TestImageFileTree(unittest.TestCase):
     mock_isdir.side_effect = self.mock_isdir_return_values
 
   def _get_keys_from_expected_paths(self):
-    return [
-      (os.path.join(self.root_path, *path[0]), self.FOLDER_KEY)
-      if path[1]
-      else os.path.join(self.root_path, *path[0])
-      for path in self.expected_keys_and_paths.values()
-    ]
+    return [self._get_key(path) for path in self.expected_keys_and_paths.values()]
+
+  def _get_key(self, path):
+    if len(path) == 1 or not path[1]:
+      return os.path.join(self.root_path, *path[0])
+    else:
+      return os.path.join(self.root_path, *path[0]), self.FOLDER_KEY
+
+  def _get_item(self, path):
+    if path is not None:
+      return self.tree[self._get_key(path)]
+    else:
+      return None
 
 
 class TestLayerTree(unittest.TestCase):

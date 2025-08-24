@@ -392,28 +392,22 @@ class Previews:
       if reference_item is None:
         return
 
-      parent_item = None
       insertion_mode = 'after'
 
       if self._name_preview_row_drop_position is not None:
         if (self._name_preview_row_drop_position in [
               Gtk.TreeViewDropPosition.BEFORE, Gtk.TreeViewDropPosition.INTO_OR_BEFORE]):
           insertion_mode = 'before'
-          parent_item = reference_item.parent
         elif (self._name_preview_row_drop_position in [
               Gtk.TreeViewDropPosition.AFTER, Gtk.TreeViewDropPosition.INTO_OR_AFTER]):
           insertion_mode = 'after'
-          if reference_item.type == itemtree.TYPE_FOLDER:
-            parent_item = reference_item
-          else:
-            parent_item = reference_item.parent
 
       selected_item_keys = pickle.loads(selection_data.get_data())
       for item_key in selected_item_keys:
         try:
-          item_tree.reorder(item_tree[item_key], insertion_mode, reference_item, parent_item)
+          item_tree.reorder(item_tree[item_key], reference_item, insertion_mode)
         except ValueError:
-          # Ignore attempts to reorder folders to one of its children.
+          # Ignore errors such as reordering folders to one of its children.
           pass
 
   def _name_preview_get_drag_icon(self, _widget, drag_context):
