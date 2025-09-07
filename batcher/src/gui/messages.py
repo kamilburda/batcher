@@ -160,11 +160,21 @@ def display_alert_message(
 
     vbox_details = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
-      spacing=3,
+      spacing=6,
+      margin_top=6,
     )
 
     details_widget = _get_details_widget(details)
     vbox_details.pack_start(details_widget, True, True, 0)
+
+    label_plugin_version = Gtk.Label(
+      label=_('Version of {}: {}').format(CONFIG.PLUGIN_TITLE, CONFIG.PLUGIN_VERSION),
+      xalign=0.0,
+      yalign=0.5,
+      selectable=True,
+    )
+
+    vbox_details.pack_start(label_plugin_version, False, False, 0)
 
     if report_uri_list:
       vbox_labels_report = _get_report_link_buttons_and_copy_icon(
@@ -252,14 +262,14 @@ def _get_details_widget(details_text):
   return scrolled_window
 
 
-def _get_report_link_buttons_and_copy_icon(report_uri_list, report_description,
-                                           details):
+def _get_report_link_buttons_and_copy_icon(report_uri_list, report_description, details):
   if not report_uri_list:
     return None
 
   vbox = Gtk.Box(
     orientation=Gtk.Orientation.VERTICAL,
     homogeneous=False,
+    spacing=6,
   )
 
   if report_description:
@@ -270,8 +280,6 @@ def _get_report_link_buttons_and_copy_icon(report_uri_list, report_description,
       label=label_report_text,
       xalign=0,
       yalign=0.5,
-      xpad=3,
-      ypad=6,
       wrap=True,
       wrap_mode=Pango.WrapMode.WORD,
       max_width_chars=50,
