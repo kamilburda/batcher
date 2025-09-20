@@ -237,6 +237,8 @@ class NamePreview(preview_base_.Preview):
     self.emit('preview-added-items', added_items)
 
   def reorder_items(self, item_keys, reference_item, insertion_mode):
+    self._row_select_interactive = False
+
     items_to_reorder = [self._batcher.item_tree[item_key] for item_key in item_keys]
 
     for item in items_to_reorder:
@@ -259,6 +261,13 @@ class NamePreview(preview_base_.Preview):
         else:
           self._move_item_outside_parent(
             item, reference_item_for_tree_model, insertion_mode, orig_item_parent)
+
+    # A different row would get automatically selected otherwise, and we only
+    # intend to restore the selection of the row(s) that were moved. The
+    # selection is restored upon the next call to `update()`.
+    self._tree_view.get_selection().unselect_all()
+
+    self._row_select_interactive = True
 
     self.emit('preview-reordered-items', items_to_reorder)
 
