@@ -363,6 +363,7 @@ class PreviewsController:
     self._name_preview.connect(
       'preview-collapsed-items-changed', self._on_name_preview_collapsed_items_changed)
     self._name_preview.connect('preview-added-items', self._on_name_preview_added_items)
+    self._name_preview.connect('preview-reordered-items', self._on_name_preview_reordered_items)
     self._name_preview.connect('preview-removed-items', self._on_name_preview_removed_items)
 
   def _on_name_preview_updated(self, _preview, error):
@@ -409,6 +410,11 @@ class PreviewsController:
     utils.timeout_remove(self._name_preview.update)
 
     self._name_preview.update()
+
+  def _on_name_preview_reordered_items(self, _preview, _reordered_items):
+    utils.timeout_remove(self._name_preview.update)
+
+    self._name_preview.update(scroll_to_first_selected_item=False)
 
   def _on_name_preview_removed_items(self, _preview, _removed_items):
     utils.timeout_remove(self._name_preview.update)
