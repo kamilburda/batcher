@@ -43,8 +43,6 @@ class Item(metaclass=abc.ABCMeta):
         object_: Any,
         item_type: int,
         parents: Optional[Iterable[Any]] = None,
-        # TODO: Remove this
-        children: Optional[Iterable[Any]] = None,
         prev_item: Optional[Any] = None,
         next_item: Optional[Any] = None):
     self._object = object_
@@ -1098,10 +1096,10 @@ class ImageFileTree(ItemTree):
     if os.path.isdir(object_):
       if with_folders:
         path = os.path.abspath(object_)
-        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
+        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, None, None))
     else:
       path = os.path.abspath(object_)
-      child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, None, None))
 
 
 class GimpImageTree(ItemTree):
@@ -1131,9 +1129,9 @@ class GimpImageTree(ItemTree):
     if isinstance(object_, int):
       if Gimp.Image.id_is_valid(object_):
         gimp_object = Gimp.Image.get_by_id(object_)
-        child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
+        child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, None, None))
     else:  # GIMP image
-      child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, None, None))
 
 
 class GimpItemTree(ItemTree):
@@ -1198,11 +1196,11 @@ class GimpItemTree(ItemTree):
 
     if gimp_object.is_group():
       if with_folders:
-        child_items.append(GimpItem(gimp_object, TYPE_FOLDER, parents_for_child, [], None, None))
+        child_items.append(GimpItem(gimp_object, TYPE_FOLDER, parents_for_child, None, None))
       # Make sure each item keeps its own list of parents.
-      child_items.append(GimpItem(gimp_object, TYPE_GROUP, list(parents_for_child), [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_GROUP, list(parents_for_child), None, None))
     else:
-      child_items.append(GimpItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_ITEM, parents_for_child, None, None))
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):
