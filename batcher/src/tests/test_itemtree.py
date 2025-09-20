@@ -404,9 +404,9 @@ class TestImageFileTree(unittest.TestCase):
       (('Corners', 'top-left.png'), False),
       (('Corners', 'top-left2'), True),
       (('Corners', 'top-left3'), True),
-      (('Corners', 'top-right.png'), False),
       (('Corners', 'top-left3', 'bottom-left.png'), False),
-      (('Corners', 'top-left3', 'bottom-right.png'), False)],
+      (('Corners', 'top-left3', 'bottom-right.png'), False),
+      (('Corners', 'top-right.png'), False)],
      ),
 
     ('invalid_items_are_skipped',
@@ -451,12 +451,6 @@ class TestImageFileTree(unittest.TestCase):
 
     for key in keys_to_remove:
       self.assertNotIn(key, self.tree)
-
-    for item in items_to_remove:
-      if item.parent is not None:
-        self.assertNotIn(item, item.parent.children)
-        # noinspection PyProtectedMember
-        self.assertNotIn(item, item.parent._orig_children)
 
     self.assertListEqual(
       [item for item in self.tree.iter_all()],
@@ -601,7 +595,7 @@ class TestImageFileTree(unittest.TestCase):
      [('main-background.jpg',)],
      'after',
      [('main-background.jpg',)],
-     [('Overlay',), True],
+     [('Frames', 'top.png')],
      None,
      ),
 
@@ -671,9 +665,6 @@ class TestImageFileTree(unittest.TestCase):
 
     self.assertEqual(item_to_reorder.parent, expected_parent_item)
     self.assertEqual(item_to_reorder.orig_parent, expected_parent_item)
-    if expected_parent_item is not None:
-      self.assertIn(item_to_reorder, expected_parent_item.children)
-      self.assertIn(item_to_reorder, expected_parent_item.orig_children)
 
     if is_reordered_as_first_item:
       # noinspection PyProtectedMember
@@ -766,37 +757,28 @@ class TestLayerTree(unittest.TestCase):
     self.item_properties = [
       ('Corners',
        self.FOLDER,
-       [],
-       [('top-left-corner', self.ITEM),
-        ('top-right-corner', self.ITEM),
-        ('top-left-corner:', self.FOLDER),
-        ('top-left-corner:', self.GROUP),
-        ('top-left-corner::', self.FOLDER),
-        ('top-left-corner::', self.GROUP)]),
-      ('top-left-corner', self.ITEM, [('Corners', self.FOLDER)], []),
-      ('top-right-corner', self.ITEM, [('Corners', self.FOLDER)], []),
-      ('top-left-corner:', self.FOLDER, [('Corners', self.FOLDER)], []),
-      ('top-left-corner:', self.GROUP, [('Corners', self.FOLDER)], []),
+       []),
+      ('top-left-corner', self.ITEM, [('Corners', self.FOLDER)]),
+      ('top-right-corner', self.ITEM, [('Corners', self.FOLDER)]),
+      ('top-left-corner:', self.FOLDER, [('Corners', self.FOLDER)]),
+      ('top-left-corner:', self.GROUP, [('Corners', self.FOLDER)]),
       ('top-left-corner::',
        self.FOLDER,
-       [('Corners', self.FOLDER)],
-       [('bottom-right-corner', self.ITEM), ('bottom-left-corner', self.ITEM)]),
+       [('Corners', self.FOLDER)]),
       ('bottom-right-corner',
        self.ITEM,
-       [('Corners', self.FOLDER), ('top-left-corner::', self.FOLDER)],
-       []),
+       [('Corners', self.FOLDER), ('top-left-corner::', self.FOLDER)]),
       ('bottom-left-corner',
        self.ITEM,
-       [('Corners', self.FOLDER), ('top-left-corner::', self.FOLDER)],
-       []),
-      ('top-left-corner::', self.GROUP, [('Corners', self.FOLDER)], []),
-      ('Corners', self.GROUP, [], []),
-      ('Frames', self.FOLDER, [], [('top-frame', self.ITEM)]),
-      ('top-frame', self.ITEM, [('Frames', self.FOLDER)], []),
-      ('Frames', self.GROUP, [], []),
-      ('main-background.jpg', self.ITEM, [], []),
-      ('Overlay', self.FOLDER, [], []),
-      ('Overlay', self.GROUP, [], []),
+       [('Corners', self.FOLDER), ('top-left-corner::', self.FOLDER)]),
+      ('top-left-corner::', self.GROUP, [('Corners', self.FOLDER)]),
+      ('Corners', self.GROUP, []),
+      ('Frames', self.FOLDER, []),
+      ('top-frame', self.ITEM, [('Frames', self.FOLDER)]),
+      ('Frames', self.GROUP, []),
+      ('main-background.jpg', self.ITEM, []),
+      ('Overlay', self.FOLDER, []),
+      ('Overlay', self.GROUP, []),
     ]
 
   def test_getitem(self):
@@ -824,18 +806,12 @@ class TestLayerTree(unittest.TestCase):
       self.assertEqual(item.type, properties[1])
 
       parents = properties[2]
-      children = properties[3]
 
       for (expected_parent_name, expected_parent_type), parent in zip(parents, item.parents):
         self.assertEqual(parent.orig_name, expected_parent_name)
         self.assertEqual(parent.type, expected_parent_type)
 
-      for (expected_child_name, expected_child_type), child in zip(children, item.children):
-        self.assertEqual(child.orig_name, expected_child_name)
-        self.assertEqual(child.type, expected_child_type)
-
       self.assertEqual(item.parents, list(item.orig_parents))
-      self.assertEqual(item.children, list(item.orig_children))
 
   def test_iter_with_different_item_types_excluded(self):
     limited_item_properties = [properties[:2] for properties in self.item_properties]
@@ -1018,9 +994,9 @@ class TestLayerTree(unittest.TestCase):
         self.tree[self.path_to_id[('Corners', 'top-left-corner:')], self.FOLDER_KEY],
         self.tree[self.path_to_id[('Corners', 'top-left-corner:')]],
         self.tree[self.path_to_id[('Corners', 'top-left-corner::')], self.FOLDER_KEY],
-        self.tree[self.path_to_id[('Corners', 'top-left-corner::')]],
         self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-right-corner')]],
         self.tree[self.path_to_id[('Corners', 'top-left-corner::', 'bottom-left-corner')]],
+        self.tree[self.path_to_id[('Corners', 'top-left-corner::')]],
       ])
 
   def test_add_from_item_id(self):
@@ -1168,54 +1144,45 @@ class TestGimpItem(unittest.TestCase):
   def test_reset(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
-    
+
     self.item.reset()
     
     self.assertEqual(self.item.name, 'main-background.jpg')
     self.assertEqual(self.item.parents, [])
-    self.assertEqual(self.item.children, [])
-  
+
   def test_push_and_pop_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
-    
+
     self.item.push_state()
     self.item.reset()
     self.item.pop_state()
     
     self.assertEqual(self.item.name, 'main')
     self.assertEqual(self.item.parents, ['one', 'two'])
-    self.assertEqual(self.item.children, ['three', 'four'])
-  
+
   def test_pop_state_with_no_saved_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
-    
+
     self.item.pop_state()
     
     self.assertEqual(self.item.name, 'main')
     self.assertEqual(self.item.parents, ['one', 'two'])
-    self.assertEqual(self.item.children, ['three', 'four'])
 
   def test_save_and_get_named_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
 
     self.item.save_state('export')
 
     named_state = self.item.get_named_state('export')
 
-    self.assertDictEqual(
-      named_state, {'name': 'main', 'parents': ['one', 'two'], 'children': ['three', 'four']})
+    self.assertDictEqual(named_state, {'name': 'main', 'parents': ['one', 'two']})
 
   def test_save_and_get_named_state_for_the_same_name_overrides_previous_calls(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
 
     self.item.save_state('export')
 
@@ -1225,12 +1192,10 @@ class TestGimpItem(unittest.TestCase):
 
     named_state = self.item.get_named_state('export')
 
-    self.assertDictEqual(
-      named_state, {'name': 'advanced', 'parents': ['one', 'two'], 'children': ['three', 'four']})
+    self.assertDictEqual(named_state, {'name': 'advanced', 'parents': ['one', 'two']})
 
   def test_get_named_state_for_no_saved_state(self):
     self.item.name = 'main'
     self.item.parents = ['one', 'two']
-    self.item.children = ['three', 'four']
 
     self.assertIsNone(self.item.get_named_state('export'))

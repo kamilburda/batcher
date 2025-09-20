@@ -14,7 +14,6 @@ def remove_folder_structure_from_item(batcher):
   item = batcher.current_item
 
   item.parents = []
-  item.children = []
 
 
 def remove_folder_structure_from_item_for_edit_layers(
@@ -38,7 +37,6 @@ def remove_folder_structure_from_item_for_edit_layers(
         item.raw.set_visible(all(parent.raw.get_visible() for parent in item.parents))
 
   item.parents = []
-  item.children = []
 
 
 REMOVE_FOLDER_STRUCTURE_DICT = {
