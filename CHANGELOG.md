@@ -32,6 +32,7 @@ Changes to actions and conditions:
 
 Bug fixes:
 * Fixed a crash when saving settings (including when processing is finished) for GIMP 3.1.x (development versions).
+* Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
 
 
 ## 1.1.1

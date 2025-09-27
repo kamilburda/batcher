@@ -38,6 +38,7 @@ messages_.set_gui_excepthook(
 
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
 from src import core
 from src import exceptions
@@ -387,23 +388,35 @@ def _load_inputs(item_tree, filepath, max_num_inputs):
   if filepath is None:
     return (
       Gimp.PDBStatusType.EXECUTION_ERROR, f'File containing inputs is not specified')
-  elif not os.path.isfile(filepath):
+
+  if isinstance(filepath, Gio.File):
+    processed_filepath = filepath.get_path()
+  else:
+    processed_filepath = filepath
+
+  if processed_filepath is None:
     return (
-      Gimp.PDBStatusType.EXECUTION_ERROR, f'File "{filepath}" does not exist or is not a file')
+      Gimp.PDBStatusType.EXECUTION_ERROR, f'File containing inputs is not specified')
+
+  if not os.path.isfile(processed_filepath):
+    return (
+      Gimp.PDBStatusType.EXECUTION_ERROR,
+      f'File "{processed_filepath}" does not exist or is not a file')
 
   try:
-    with open(filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as inputs_file:
+    with open(processed_filepath, 'r', encoding=constants.TEXT_FILE_ENCODING) as inputs_file:
       inputs = [path for path in inputs_file.read().splitlines() if path]
   except Exception as e:
     return (
-      Gimp.PDBStatusType.EXECUTION_ERROR, f'Error obtaining inputs from file "{filepath}": {e}')
+      Gimp.PDBStatusType.EXECUTION_ERROR,
+      f'Error obtaining inputs from file "{processed_filepath}": {e}')
 
   item_tree.add(inputs)
 
   if max_num_inputs != 0 and len(item_tree) > max_num_inputs:
     return (
       Gimp.PDBStatusType.EXECUTION_ERROR,
-      (f'File "{filepath}" contains more than {max_num_inputs} files to process'
+      (f'File "{processed_filepath}" contains more than {max_num_inputs} files to process'
        ' (including files in folders).'
        ' Check if you specified the files and folders you truly wish to process.'
        ' To remove this restriction, set "max-num-inputs" to 0.'))
