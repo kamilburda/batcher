@@ -397,9 +397,13 @@ class Previews:
         if (self._name_preview_row_drop_position in [
               Gtk.TreeViewDropPosition.BEFORE, Gtk.TreeViewDropPosition.INTO_OR_BEFORE]):
           insertion_mode = 'before'
-        elif (self._name_preview_row_drop_position in [
-              Gtk.TreeViewDropPosition.AFTER, Gtk.TreeViewDropPosition.INTO_OR_AFTER]):
+        elif self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
           insertion_mode = 'after'
+        elif self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.AFTER:
+          if self._name_preview.batcher.item_tree.next(reference_item) is not None:
+            insertion_mode = 'after'
+          else:
+            insertion_mode = 'last_top_level'
 
       selected_item_keys = pickle.loads(selection_data.get_data())
       self._name_preview.reorder_items(selected_item_keys, reference_item, insertion_mode)
@@ -454,22 +458,27 @@ class Previews:
       )
       cairo_context.set_line_width(line_width)
 
-      if self._name_preview_row_drop_position in [
-            Gtk.TreeViewDropPosition.AFTER, Gtk.TreeViewDropPosition.INTO_OR_AFTER]:
+      is_drop_into_or_after = (
+        self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER)
+      is_drop_after = self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.AFTER
+
+      if is_drop_into_or_after or is_drop_after:
         line_y += rectangle.height - 1
+
+      is_reference_item_last = self._name_preview.batcher.item_tree.next(reference_item) is None
+      if is_reference_item_last and is_drop_after:
+        line_y += 1
 
       cairo_context.move_to(line_start_x, line_y)
       cairo_context.line_to(line_end_x, line_y)
       cairo_context.stroke()
 
-      if (reference_item.type == itemtree.TYPE_FOLDER
-          and self._name_preview_row_drop_position in [
-              Gtk.TreeViewDropPosition.AFTER, Gtk.TreeViewDropPosition.INTO_OR_AFTER]):
-          upper_line_y = line_y - (rectangle.height - 1)
+      if reference_item.type == itemtree.TYPE_FOLDER and (is_drop_into_or_after or is_drop_after):
+        upper_line_y = line_y - (rectangle.height - 1)
 
-          cairo_context.move_to(line_start_x, upper_line_y)
-          cairo_context.line_to(line_end_x, upper_line_y)
-          cairo_context.stroke()
+        cairo_context.move_to(line_start_x, upper_line_y)
+        cairo_context.line_to(line_end_x, upper_line_y)
+        cairo_context.stroke()
 
       return True
     else:

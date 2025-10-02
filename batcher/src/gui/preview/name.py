@@ -251,16 +251,21 @@ class NamePreview(preview_base_.Preview):
         pass
       else:
         reference_item_for_tree_model = reference_item
+        insertion_mode_for_tree_model = insertion_mode
 
         if insertion_mode == 'after':
           if reference_item.parent != item.parent:
             reference_item_for_tree_model = None
+        elif insertion_mode == 'last_top_level':
+          reference_item_for_tree_model = None
+          insertion_mode_for_tree_model = 'before'
 
         if orig_item_parent == item.parent:
-          self._move_item_within_parent(item, reference_item_for_tree_model, insertion_mode)
+          self._move_item_within_parent(
+            item, reference_item_for_tree_model, insertion_mode_for_tree_model)
         else:
           self._move_item_outside_parent(
-            item, reference_item_for_tree_model, insertion_mode, orig_item_parent)
+            item, reference_item_for_tree_model, insertion_mode_for_tree_model, orig_item_parent)
 
     # A different row would get automatically selected otherwise, and we only
     # intend to restore the selection of the row(s) that were moved. The

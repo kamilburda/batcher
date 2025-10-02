@@ -609,6 +609,17 @@ class TestImageFileTree(unittest.TestCase):
      False,
      True,
      ),
+
+    ('last_top_level',
+     [('Corners', 'top-left3', 'bottom-left.png')],
+     [('Corners', 'top-left.png')],
+     'last_top_level',
+     [('Overlay',), True],
+     None,
+     None,
+     False,
+     True,
+     ),
   ])
   def test_reorder(
         self,

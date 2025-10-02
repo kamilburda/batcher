@@ -691,25 +691,26 @@ class ItemTree(metaclass=abc.ABCMeta):
       insertion_mode:
         If ``'after'``, ``item`` is inserted after ``reference_item``.
         If ``'before'``, ``item`` is inserted before ``reference_item``.
+        If ``'last_top_level'``, ``item`` is inserted as the last item as the
+        top level. In this case, ``reference_item`` is ignored.
 
     Raises:
       ValueError:
         * If ``item`` is not present in this `ItemTree` instance.
         * If attempting to move ``item`` inside one of its children, i.e. if
-          ``item`` is found in ``reference_item.parents`` and ``reference_item``
-          is not ``None``.
+          ``item`` is found in ``reference_item.parents``.
         * If ``insertion_mode`` is not a valid value.
     """
     if item.key not in self._items:
       raise ValueError(f'item {item} not found in this ItemTree')
 
-    if item in reference_item.parents:
+    if insertion_mode != 'last_top_level' and item in reference_item.parents:
       raise ValueError(f'cannot reorder item {item} inside one of its children ({reference_item})')
 
-    if insertion_mode not in ['before', 'after']:
+    if insertion_mode not in ['before', 'after', 'last_top_level']:
       raise ValueError(f'value for insertion_mode is not valid')
 
-    if item == reference_item:
+    if insertion_mode != 'last_top_level' and item == reference_item:
       return
 
     children = item.get_all_children()
@@ -752,14 +753,20 @@ class ItemTree(metaclass=abc.ABCMeta):
         previous_reference_item._next_item = item
       else:
         self._first_item = item
-    elif insertion_mode == 'after':
-      self._update_parents_when_reordering_item(item, children, reference_item, insertion_mode)
+    elif insertion_mode in ['after', 'last_top_level']:
+      if insertion_mode == 'last_top_level':
+        processed_reference_item = self._last_item
+      else:
+        processed_reference_item = reference_item
 
-      next_reference_item = reference_item.next
+      self._update_parents_when_reordering_item(
+        item, children, processed_reference_item, insertion_mode)
+
+      next_reference_item = processed_reference_item.next
       # noinspection PyProtectedMember
-      reference_item._next_item = item
+      processed_reference_item._next_item = item
       # noinspection PyProtectedMember
-      item._prev_item = reference_item
+      item._prev_item = processed_reference_item
 
       if last_child_item is not None:
         item_to_relink = last_child_item
@@ -782,23 +789,32 @@ class ItemTree(metaclass=abc.ABCMeta):
       return item.next, None
 
   def _update_parents_when_reordering_item(self, item, children, reference_item, insertion_mode):
-    if item.parent == reference_item.parent:
-      if not (insertion_mode == 'after' and reference_item.type == TYPE_FOLDER):
-        return
-
-    if insertion_mode == 'after' and reference_item.type == TYPE_FOLDER:
+    if insertion_mode == 'last_top_level':
+      parent_item = None
+      parents = []
+      orig_parents = []
+      should_insert_into_folder = False
+    else:
+      parent_item = reference_item.parent
+      parents = reference_item.parents
       # noinspection PyProtectedMember
-      item._parents = reference_item.parents + [reference_item]
+      orig_parents = reference_item._orig_parents
+      should_insert_into_folder = insertion_mode == 'after' and reference_item.type == TYPE_FOLDER
+
+    if item.parent == parent_item and not should_insert_into_folder:
+      return
+
+    if should_insert_into_folder:
+      # noinspection PyProtectedMember
+      item._parents = parents + [reference_item]
     else:
       # noinspection PyProtectedMember
-      item._parents = reference_item.parents
+      item._parents = parents
 
-    if insertion_mode == 'after' and reference_item.type == TYPE_FOLDER:
-      # noinspection PyProtectedMember
-      item._orig_parents = reference_item._orig_parents + [reference_item]
+    if should_insert_into_folder:
+      item._orig_parents = orig_parents + [reference_item]
     else:
-      # noinspection PyProtectedMember
-      item._orig_parents = reference_item._orig_parents
+      item._orig_parents = orig_parents
 
     for child in children:
       child_parents_up_to_item = self._get_child_parents_up_to_item(child, item)
