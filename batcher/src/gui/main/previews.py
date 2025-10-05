@@ -49,7 +49,6 @@ class Previews:
   _IMPORT_OPTIONS_ICON_LABEL_SPACING = 6
   _NAME_PREVIEW_BUTTONS_SPACING = 3
   _NAME_PREVIEW_PLACEHOLDER_LABEL_PAD = 8
-  _NAME_PREVIEW_DRAG_ICON_OFFSET = -8
 
   def __init__(
         self,
@@ -411,17 +410,11 @@ class Previews:
 
   def _name_preview_get_drag_icon(self, _widget, drag_context):
     if self._name_preview.selected_items:
-      # TODO: Replace with a proper widget
-      #  * For multiple selected items, display all rows
-      icon = Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON)
-      icon.show_all()
+      _model, tree_paths = self._name_preview.tree_view.get_selection().get_selected_rows()
 
-      Gtk.drag_set_icon_widget(
-        drag_context,
-        icon,
-        self._NAME_PREVIEW_DRAG_ICON_OFFSET,
-        self._NAME_PREVIEW_DRAG_ICON_OFFSET,
-      )
+      if tree_paths:
+        surface = self._name_preview.tree_view.create_row_drag_icon(tree_paths[0])
+        Gtk.drag_set_icon_surface(drag_context, surface)
 
   def _on_name_preview_draw(self, _tree_view, cairo_context):
     if self._name_preview_drag_dest_row:
