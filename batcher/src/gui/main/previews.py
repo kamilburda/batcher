@@ -218,8 +218,7 @@ class Previews:
     self._import_options_dialog = None
 
     self._name_preview_drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
-    self._name_preview_drag_dest_row = None
-    self._name_preview_row_drop_position = None
+    self._name_preview_current_cursor_position = None
 
     if self._manage_items:
       self._set_up_managing_items()
@@ -383,23 +382,31 @@ class Previews:
     if selection_data.get_target().name() in gui_utils_.get_external_drag_data_sources():
       self._add_paths_from_drag_data_to_name_preview_if_any(selection_data)
     else:
-      if self._name_preview_drag_dest_row is None:
+      if self._name_preview_current_cursor_position is None:
         return
 
-      reference_item = self._name_preview.get_item_from_path(self._name_preview_drag_dest_row)
+      result = self._name_preview.tree_view.get_dest_row_at_pos(
+        *self._name_preview_current_cursor_position)
+
+      if result is None:
+        return
+
+      drag_dest_row, row_drop_position = result
+
+      reference_item = self._name_preview.get_item_from_path(drag_dest_row)
 
       if reference_item is None:
         return
 
       insertion_mode = 'after'
 
-      if self._name_preview_row_drop_position is not None:
-        if (self._name_preview_row_drop_position in [
+      if row_drop_position is not None:
+        if (row_drop_position in [
               Gtk.TreeViewDropPosition.BEFORE, Gtk.TreeViewDropPosition.INTO_OR_BEFORE]):
           insertion_mode = 'before'
-        elif self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+        elif row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
           insertion_mode = 'after'
-        elif self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.AFTER:
+        elif row_drop_position == Gtk.TreeViewDropPosition.AFTER:
           if self._name_preview.batcher.item_tree.next(reference_item) is not None:
             insertion_mode = 'after'
           else:
@@ -417,79 +424,81 @@ class Previews:
         Gtk.drag_set_icon_surface(drag_context, surface)
 
   def _on_name_preview_draw(self, _tree_view, cairo_context):
-    if self._name_preview_drag_dest_row:
-      Gtk.TreeView.do_draw(self._name_preview.tree_view, cairo_context)
-
-      reference_item = self._name_preview.get_item_from_path(self._name_preview_drag_dest_row)
-
-      if reference_item is None or reference_item.key in self._name_preview.selected_items:
-        return True
-
-      reference_item_parents_keys = [item.key for item in reference_item.parents]
-      if any(item_key in reference_item_parents_keys
-             for item_key in self._name_preview.selected_items):
-        return True
-
-      name_preview_style_context = self._name_preview.tree_view.get_style_context()
-      drag_highlight_color = name_preview_style_context.get_color(Gtk.StateFlags.DROP_ACTIVE)
-
-      rectangle = self._name_preview.tree_view.get_background_area(
-        self._name_preview_drag_dest_row, self._name_preview.get_tree_view_column())
-
-      line_width = 0.5
-      # This makes the drag highlight line crispier.
-      line_offset = 0.5 * line_width
-
-      line_start_x = rectangle.x + line_offset
-      line_end_x = line_start_x + rectangle.width
-      line_y = rectangle.y + line_offset
-
-      cairo_context.set_source_rgba(
-        drag_highlight_color.red,
-        drag_highlight_color.green,
-        drag_highlight_color.blue,
-        drag_highlight_color.alpha,
-      )
-      cairo_context.set_line_width(line_width)
-
-      is_drop_into_or_after = (
-        self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER)
-      is_drop_after = self._name_preview_row_drop_position == Gtk.TreeViewDropPosition.AFTER
-
-      if is_drop_into_or_after or is_drop_after:
-        line_y += rectangle.height - 1
-
-      is_reference_item_last = self._name_preview.batcher.item_tree.next(reference_item) is None
-      if is_reference_item_last and is_drop_after:
-        line_y += 1
-
-      cairo_context.move_to(line_start_x, line_y)
-      cairo_context.line_to(line_end_x, line_y)
-      cairo_context.stroke()
-
-      if reference_item.type == itemtree.TYPE_FOLDER and (is_drop_into_or_after or is_drop_after):
-        upper_line_y = line_y - (rectangle.height - 1)
-
-        cairo_context.move_to(line_start_x, upper_line_y)
-        cairo_context.line_to(line_end_x, upper_line_y)
-        cairo_context.stroke()
-
-      return True
-    else:
+    if self._name_preview_current_cursor_position is None:
       return False
 
+    result = self._name_preview.tree_view.get_dest_row_at_pos(
+      *self._name_preview_current_cursor_position)
+
+    if result is None:
+      return False
+
+    drag_dest_row, row_drop_position = result
+
+    Gtk.TreeView.do_draw(self._name_preview.tree_view, cairo_context)
+
+    reference_item = self._name_preview.get_item_from_path(drag_dest_row)
+
+    if reference_item is None or reference_item.key in self._name_preview.selected_items:
+      return True
+
+    reference_item_parents_keys = [item.key for item in reference_item.parents]
+    if any(item_key in reference_item_parents_keys
+           for item_key in self._name_preview.selected_items):
+      return True
+
+    name_preview_style_context = self._name_preview.tree_view.get_style_context()
+    drag_highlight_color = name_preview_style_context.get_color(Gtk.StateFlags.DROP_ACTIVE)
+
+    rectangle = self._name_preview.tree_view.get_background_area(
+      drag_dest_row, self._name_preview.get_tree_view_column())
+
+    line_width = 0.5
+    # This makes the drag highlight line crispier.
+    line_offset = 0.5 * line_width
+
+    line_start_x = rectangle.x + line_offset
+    line_end_x = line_start_x + rectangle.width
+    line_y = rectangle.y + line_offset
+
+    cairo_context.set_source_rgba(
+      drag_highlight_color.red,
+      drag_highlight_color.green,
+      drag_highlight_color.blue,
+      drag_highlight_color.alpha,
+    )
+    cairo_context.set_line_width(line_width)
+
+    is_drop_into_or_after = row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER
+    is_drop_after = row_drop_position == Gtk.TreeViewDropPosition.AFTER
+
+    if is_drop_into_or_after or is_drop_after:
+      line_y += rectangle.height - 1
+
+    is_reference_item_last = self._name_preview.batcher.item_tree.next(reference_item) is None
+    if is_reference_item_last and is_drop_after:
+      line_y += 1
+
+    cairo_context.move_to(line_start_x, line_y)
+    cairo_context.line_to(line_end_x, line_y)
+    cairo_context.stroke()
+
+    if reference_item.type == itemtree.TYPE_FOLDER and (is_drop_into_or_after or is_drop_after):
+      upper_line_y = line_y - (rectangle.height - 1)
+
+      cairo_context.move_to(line_start_x, upper_line_y)
+      cairo_context.line_to(line_end_x, upper_line_y)
+      cairo_context.stroke()
+
+    return True
+
   def _on_name_preview_drag_motion(self, _widget, _context, x, y, _timestamp):
-    result = self._name_preview.tree_view.get_dest_row_at_pos(x, y)
+    self._name_preview_current_cursor_position = (x, y)
 
-    if result is not None:
-      self._name_preview_drag_dest_row = result[0]
-      self._name_preview_row_drop_position = result[1]
-
-      self._name_preview.tree_view.queue_draw()
+    self._name_preview.tree_view.queue_draw()
 
   def _on_name_preview_drag_end(self, _tree_view, _drag_context):
-    self._name_preview_drag_dest_row = None
-    self._name_preview_row_drop_position = None
+    self._name_preview_current_cursor_position = None
 
     self._name_preview.tree_view.queue_draw()
 
