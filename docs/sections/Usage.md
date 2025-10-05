@@ -29,6 +29,7 @@ You can adjust import options for each file format detected in the input list by
 
 By default, the renamed images (as they would be named on export) are displayed. To show their original names, press the arrow button and check `Show Original Names`.
 
+You can move around individual files or folders by dragging and dropping them anywhere within the input list. This is useful if, for example, you intend rename the images with a numbered sequence.
 
 
 ## Exporting Layers
