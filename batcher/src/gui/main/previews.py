@@ -355,6 +355,7 @@ class Previews:
         Gtk.TargetEntry.new(target_name, 0, 0)
         for target_name in gui_utils_.get_external_drag_data_sources()
       ],
+      scrollable_or_scrolled_window_for_auto_scroll=self._name_preview.tree_view,
     )
 
     self._name_preview.tree_view.connect('drag-end', self._on_name_preview_drag_end)

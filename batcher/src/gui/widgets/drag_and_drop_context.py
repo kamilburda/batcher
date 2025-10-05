@@ -2,11 +2,12 @@
 
 import collections
 from collections.abc import Iterable
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -18,10 +19,18 @@ __all__ = [
 class DragAndDropContext:
   """Simplified means to add drag-and-drop capability to a `Gtk.Widget`."""
 
+  _AUTOSCROLL_DISTANCE_PIXELS = 30
+  _AUTOSCROLL_AMOUNT_PIXELS = 10
+  _AUTOSCROLL_BASE_TIMEOUT_INTERVAL = 5
+
   def __init__(self):
     self._drag_type = self._get_unique_drag_type()
 
     self._widgets_and_event_ids = collections.defaultdict(dict)
+
+    self._autoscroll_event_id = None
+    self._scroll_timeout_interval = 1000
+    self._should_scroll_upwards = True
 
   def setup_drag(
         self,
@@ -38,6 +47,8 @@ class DragAndDropContext:
         dest_defaults: Gtk.DestDefaults = Gtk.DestDefaults.ALL,
         target_flags: Gtk.TargetFlags = 0,
         additional_dest_targets: Optional[List] = None,
+        scrollable_or_scrolled_window_for_auto_scroll: Union[
+          Gtk.Scrollable, Gtk.ScrolledWindow, None] = None,
   ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
@@ -77,6 +88,10 @@ class DragAndDropContext:
         `Gtk.TargetFlags` used for both drag source and destination.
       additional_dest_targets:
         Additional `Gtk.TargetEntry` instances for the drag destination.
+      scrollable_or_scrolled_window_for_auto_scroll:
+        Optional `Gtk.Scrollable` or `Gtk.ScrolledWindow` related to
+        ``widget`` which will be auto-scrolled vertically when the cursor is
+        placed near the scrollable's edges while a widget is being dragged.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -124,6 +139,27 @@ class DragAndDropContext:
           destroy_drag_icon_func,
           *(destroy_drag_icon_func_args if destroy_drag_icon_func_args is not None else ()))
 
+    # Implementation taken from:
+    # https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpcontainertreeview-dnd.c
+    if scrollable_or_scrolled_window_for_auto_scroll is not None:
+      self._widgets_and_event_ids[widget]['drag-motion'] = widget.connect(
+        'drag-motion',
+        self._on_scrollable_drag_motion,
+        scrollable_or_scrolled_window_for_auto_scroll,
+      )
+      self._widgets_and_event_ids[widget]['drag-failed'] = widget.connect(
+        'drag-failed',
+        self._on_scrollable_drag_failed,
+      )
+      self._widgets_and_event_ids[widget]['drag-leave'] = widget.connect(
+        'drag-leave',
+        self._on_scrollable_drag_leave,
+      )
+      self._widgets_and_event_ids[widget]['drag-drop'] = widget.connect(
+        'drag-drop',
+        self._on_scrollable_drag_drop,
+      )
+
   def remove_drag(self, widget: Gtk.Widget):
     """Removes drag-and-drop capability from the specified `Gtk.widget`
     instance.
@@ -163,7 +199,8 @@ class DragAndDropContext:
         _info,
         _timestamp,
         get_drag_data_func,
-        get_drag_data_args):
+        get_drag_data_args,
+  ):
     selection_data.set(selection_data.get_target(), 8, get_drag_data_func(*get_drag_data_args))
 
   @staticmethod
@@ -176,5 +213,81 @@ class DragAndDropContext:
         _info,
         _timestamp,
         drag_data_received_func,
-        *drag_data_received_args):
+        *drag_data_received_args,
+  ):
     drag_data_received_func(selection_data, *drag_data_received_args)
+
+  def _on_scrollable_drag_motion(
+        self,
+        widget,
+        _drag_context,
+        _cursor_x,
+        cursor_y,
+        _timestamp,
+        scrollable,
+  ):
+    allocation = widget.get_allocation()
+
+    if (cursor_y < self._AUTOSCROLL_DISTANCE_PIXELS
+        or cursor_y > (allocation.height - self._AUTOSCROLL_DISTANCE_PIXELS)):
+      if cursor_y < self._AUTOSCROLL_DISTANCE_PIXELS:
+        distance = min(-cursor_y, -1)
+      else:
+        distance = max(allocation.height - cursor_y, 1)
+
+      self._scroll_timeout_interval = self._AUTOSCROLL_BASE_TIMEOUT_INTERVAL * abs(distance)
+      self._should_scroll_upwards = distance < 0
+
+      if self._autoscroll_event_id is None:
+        self._autoscroll_event_id = GLib.timeout_add(
+          self._scroll_timeout_interval,
+          self._scroll_by_distance,
+          scrollable,
+        )
+    else:
+      if self._autoscroll_event_id is not None:
+        GLib.source_remove(self._autoscroll_event_id)
+        self._autoscroll_event_id = None
+
+  def _on_scrollable_drag_failed(self, _widget, _drag_context, _drag_result):
+    if self._autoscroll_event_id is not None:
+      GLib.source_remove(self._autoscroll_event_id)
+      self._autoscroll_event_id = None
+
+  def _on_scrollable_drag_leave(self, _widget, _drag_context, _timestamp):
+    if self._autoscroll_event_id is not None:
+      GLib.source_remove(self._autoscroll_event_id)
+      self._autoscroll_event_id = None
+
+  def _on_scrollable_drag_drop(
+        self,
+        _widget,
+        _drag_context,
+        _cursor_x,
+        _cursor_y,
+        _timestamp,
+  ):
+    if self._autoscroll_event_id is not None:
+      GLib.source_remove(self._autoscroll_event_id)
+      self._autoscroll_event_id = None
+
+  def _scroll_by_distance(self, scrollable):
+    adjustment = scrollable.get_vadjustment()
+
+    if self._should_scroll_upwards:
+      new_value = adjustment.get_value() - self._AUTOSCROLL_AMOUNT_PIXELS
+    else:
+      new_value = adjustment.get_value() + self._AUTOSCROLL_AMOUNT_PIXELS
+
+    new_value = min(max(new_value, adjustment.get_lower()), adjustment.get_upper())
+
+    adjustment.set_value(new_value)
+
+    if self._autoscroll_event_id is not None:
+      GLib.source_remove(self._autoscroll_event_id)
+
+      self._autoscroll_event_id = GLib.timeout_add(
+        self._scroll_timeout_interval,
+        self._scroll_by_distance,
+        scrollable,
+      )
