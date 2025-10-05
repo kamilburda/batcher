@@ -247,7 +247,7 @@ class Previews:
   def _set_up_managing_items(self):
     self._name_preview_placeholder_label = Gtk.Label(
       label='<i>{}</i>'.format(
-        _('Drop or paste files and folders here, or add them via the "+" button above')),
+        _('Drop or paste files and folders here, or use the button above to add them')),
       use_markup=True,
       xalign=0.5,
       yalign=0.5,
