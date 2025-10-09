@@ -357,6 +357,7 @@ class Previews:
     )
 
     self._name_preview.tree_view.connect('drag-end', self._on_name_preview_drag_end)
+    self._name_preview.tree_view.connect('drag-drop', self._on_name_preview_drag_drop)
     self._name_preview.tree_view.connect('drag-motion', self._on_name_preview_drag_motion)
     self._name_preview.tree_view.connect('draw', self._on_name_preview_draw)
 
@@ -498,6 +499,11 @@ class Previews:
     self._name_preview.tree_view.queue_draw()
 
   def _on_name_preview_drag_end(self, _tree_view, _drag_context):
+    self._name_preview_current_cursor_position = None
+
+    self._name_preview.tree_view.queue_draw()
+
+  def _on_name_preview_drag_drop(self, _tree_view, _drag_context, _x, _y, _timestamp):
     self._name_preview_current_cursor_position = None
 
     self._name_preview.tree_view.queue_draw()
