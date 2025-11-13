@@ -46,6 +46,8 @@ class ItemBox(Gtk.ScrolledWindow):
     
     self._drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
     self._items = []
+
+    self._pointer = Gdk.Display.get_default().get_default_seat().get_pointer()
     
     self._vbox_items = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -116,6 +118,8 @@ class ItemBox(Gtk.ScrolledWindow):
       self._drag_data_received,
       [item],
       [item],
+      scrollable_for_auto_scroll=self,
+      process_cursor_position_for_scrollable_func=self._get_cursor_position_in_scrolled_window,
     )
 
   def _remove_drag(self, item):
@@ -128,6 +132,10 @@ class ItemBox(Gtk.ScrolledWindow):
     dragged_item_index_as_bytes = selection_data.get_data()
     dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
+
+  def _get_cursor_position_in_scrolled_window(self, *args):
+    _window, x, y, _mask = self.get_window().get_device_position(self._pointer)
+    return x, y
 
   def _on_item_widget_key_press_event(self, widget, event, item):
     if event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key

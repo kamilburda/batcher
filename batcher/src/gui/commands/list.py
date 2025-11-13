@@ -368,6 +368,8 @@ class CommandList(gui_widgets_.ItemBox):
       [item],
       self._get_drag_icon,
       [item],
+      scrollable_for_auto_scroll=self,
+      process_cursor_position_for_scrollable_func=self._get_cursor_position_in_scrolled_window,
     )
 
   def _remove_drag(self, item):

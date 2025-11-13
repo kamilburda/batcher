@@ -47,8 +47,9 @@ class DragAndDropContext:
         dest_defaults: Gtk.DestDefaults = Gtk.DestDefaults.ALL,
         target_flags: Gtk.TargetFlags = 0,
         additional_dest_targets: Optional[List] = None,
-        scrollable_or_scrolled_window_for_auto_scroll: Union[
+        scrollable_for_auto_scroll: Union[
           Gtk.Scrollable, Gtk.ScrolledWindow, None] = None,
+        process_cursor_position_for_scrollable_func: Optional[Callable] = None,
   ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
@@ -88,10 +89,15 @@ class DragAndDropContext:
         `Gtk.TargetFlags` used for both drag source and destination.
       additional_dest_targets:
         Additional `Gtk.TargetEntry` instances for the drag destination.
-      scrollable_or_scrolled_window_for_auto_scroll:
+      scrollable_for_auto_scroll:
         Optional `Gtk.Scrollable` or `Gtk.ScrolledWindow` related to
         ``widget`` which will be auto-scrolled vertically when the cursor is
         placed near the scrollable's edges while a widget is being dragged.
+      process_cursor_position_for_scrollable_func:
+        Optional function that processes (or replaces) the x- and y-coordinates
+        returned by the ``drag-motion`` signal. The function accepts all
+        arguments passed to a ``drag-motion`` signal handler, plus
+        ``scrollable_for_auto_scroll``.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -141,11 +147,12 @@ class DragAndDropContext:
 
     # Implementation taken from:
     # https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpcontainertreeview-dnd.c
-    if scrollable_or_scrolled_window_for_auto_scroll is not None:
+    if scrollable_for_auto_scroll is not None:
       self._widgets_and_event_ids[widget]['drag-motion'] = widget.connect(
         'drag-motion',
         self._on_scrollable_drag_motion,
-        scrollable_or_scrolled_window_for_auto_scroll,
+        scrollable_for_auto_scroll,
+        process_cursor_position_for_scrollable_func,
       )
       self._widgets_and_event_ids[widget]['drag-failed'] = widget.connect(
         'drag-failed',
@@ -220,13 +227,29 @@ class DragAndDropContext:
   def _on_scrollable_drag_motion(
         self,
         widget,
-        _drag_context,
-        _cursor_x,
+        drag_context,
+        cursor_x,
         cursor_y,
-        _timestamp,
+        timestamp,
         scrollable,
+        process_cursor_position_func,
   ):
-    allocation = widget.get_allocation()
+    allocation = scrollable.get_allocation()
+
+    if process_cursor_position_func is not None:
+      cursor_x, cursor_y = process_cursor_position_func(
+        widget,
+        drag_context,
+        cursor_x,
+        cursor_y,
+        timestamp,
+        scrollable,
+      )
+
+    if cursor_y is None:
+      # This can happen if `process_cursor_position_func` was not able to
+      # process/replace the coordinates for some reason.
+      return
 
     if (cursor_y < self._AUTOSCROLL_DISTANCE_PIXELS
         or cursor_y > (allocation.height - self._AUTOSCROLL_DISTANCE_PIXELS)):
