@@ -145,11 +145,11 @@ class ItemBox(Gtk.ScrolledWindow):
     dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
 
-  def _get_cursor_position_in_scrolled_window(self, *args):
+  def _get_cursor_position_in_scrolled_window(self, *_args):
     _window, x, y, _mask = self.get_window().get_device_position(self._pointer)
     return x, y
 
-  def _on_item_widget_key_press_event(self, widget, event, item):
+  def _on_item_widget_key_press_event(self, _widget, event, item):
     if event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
       key_name = Gdk.keyval_name(event.keyval)
       if key_name in ['Up', 'KP_Up']:
