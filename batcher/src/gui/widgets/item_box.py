@@ -369,9 +369,6 @@ class ArrayBox(ItemBox):
     of the removed item.
     """
     
-    self._items_total_width = None
-    self._items_total_height = None
-    self._items_allocations = {}
     self._locker = _ActionLocker()
     
     self._init_gui()
@@ -449,10 +446,6 @@ class ArrayBox(ItemBox):
     item_position = self._get_item_position(item)
     
     super().remove_item(item)
-    
-    if item in self._items_allocations:
-      self._update_height(-(self._items_allocations[item].height + self._item_spacing))
-      del self._items_allocations[item]
     
     self.on_remove_item(item_position)
   
