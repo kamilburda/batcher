@@ -356,19 +356,3 @@ class CommandList(gui_widgets_.ItemBox):
   def _on_add_custom_command_menu_item_activate(self, _menu_item):
     self._browser.fill_contents_if_empty()
     self._browser.widget.show_all()
-
-  def _setup_drag(self, item):
-    self._drag_and_drop_context.setup_drag(
-      item.item_widget,
-      self._get_drag_data,
-      self._drag_data_received,
-      [item],
-      [item],
-      self._get_drag_icon,
-      [item],
-      scrollable_for_auto_scroll=self,
-      process_cursor_position_for_scrollable_func=self._get_cursor_position_in_scrolled_window,
-    )
-
-  def _remove_drag(self, item):
-    self._drag_and_drop_context.remove_drag(item.item_widget)

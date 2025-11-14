@@ -115,7 +115,7 @@ class ItemBox(Gtk.ScrolledWindow):
 
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(
-      item.widget,
+      item.item_widget,
       self._get_drag_data,
       self._drag_data_received,
       [item],
@@ -127,7 +127,7 @@ class ItemBox(Gtk.ScrolledWindow):
     )
 
   def _remove_drag(self, item):
-    self._drag_and_drop_context.remove_drag(item.widget)
+    self._drag_and_drop_context.remove_drag(item.item_widget)
 
   def _get_drag_data(self, dragged_item):
     return bytes([self._items.index(dragged_item)])
