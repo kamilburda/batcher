@@ -50,6 +50,7 @@ class DragAndDropContext:
         scrollable_for_auto_scroll: Union[
           Gtk.Scrollable, Gtk.ScrolledWindow, None] = None,
         process_cursor_position_for_scrollable_func: Optional[Callable] = None,
+        suppress_existing_widget_drag_and_drop: bool = True,
   ):
     """Enables dragging for the specified `Gtk.widget` instance.
 
@@ -98,6 +99,11 @@ class DragAndDropContext:
         returned by the ``drag-motion`` signal. The function accepts all
         arguments passed to a ``drag-motion`` signal handler, plus
         ``scrollable_for_auto_scroll``.
+      suppress_existing_widget_drag_and_drop:
+        If ``True``, any existing signal handlers related to drag-and-drop
+        connected to ``widget`` or its children are ignored. This may be
+        necessary if the existing handlers cause this function to incorrectly
+        handle drag-and-drop.
     """
     if get_drag_data_args is None:
       get_drag_data_args = ()
@@ -114,8 +120,11 @@ class DragAndDropContext:
     self._widgets_and_event_ids[widget]['drag-data-get'] = widget.connect(
       'drag-data-get',
       self._on_widget_drag_data_get,
+      suppress_existing_widget_drag_and_drop,
       get_drag_data_func,
-      get_drag_data_args)
+      get_drag_data_args,
+    )
+
     widget.drag_source_set(
       Gdk.ModifierType.BUTTON1_MASK,
       [Gtk.TargetEntry.new(self._drag_type, target_flags, 0)],
@@ -124,8 +133,11 @@ class DragAndDropContext:
     self._widgets_and_event_ids[widget]['drag-data-received'] = dest_widget.connect(
       'drag-data-received',
       self._on_widget_drag_data_received,
+      suppress_existing_widget_drag_and_drop,
       drag_data_received_func,
-      *drag_data_received_args)
+      *drag_data_received_args,
+    )
+
     dest_widget.drag_dest_set(
       dest_defaults,
       [
@@ -165,6 +177,7 @@ class DragAndDropContext:
       self._widgets_and_event_ids[widget]['drag-drop'] = widget.connect(
         'drag-drop',
         self._on_scrollable_drag_drop,
+        suppress_existing_widget_drag_and_drop,
       )
 
   def remove_drag(self, widget: Gtk.Widget):
@@ -205,10 +218,13 @@ class DragAndDropContext:
         selection_data,
         _info,
         _timestamp,
+        suppress_existing_widget_drag_and_drop,
         get_drag_data_func,
         get_drag_data_args,
   ):
     selection_data.set(selection_data.get_target(), 8, get_drag_data_func(*get_drag_data_args))
+
+    return suppress_existing_widget_drag_and_drop
 
   @staticmethod
   def _on_widget_drag_data_received(
@@ -219,10 +235,13 @@ class DragAndDropContext:
         selection_data,
         _info,
         _timestamp,
+        suppress_existing_widget_drag_and_drop,
         drag_data_received_func,
         *drag_data_received_args,
   ):
     drag_data_received_func(selection_data, *drag_data_received_args)
+
+    return suppress_existing_widget_drag_and_drop
 
   def _on_scrollable_drag_motion(
         self,
@@ -289,10 +308,13 @@ class DragAndDropContext:
         _cursor_x,
         _cursor_y,
         _timestamp,
+        suppress_existing_widget_drag_and_drop,
   ):
     if self._autoscroll_event_id is not None:
       GLib.source_remove(self._autoscroll_event_id)
       self._autoscroll_event_id = None
+
+    return suppress_existing_widget_drag_and_drop
 
   def _scroll_by_distance(self, scrollable):
     adjustment = scrollable.get_vadjustment()
