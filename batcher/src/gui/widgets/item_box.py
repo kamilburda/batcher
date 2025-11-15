@@ -38,6 +38,8 @@ class ItemBox(Gtk.ScrolledWindow):
   
   ITEM_SPACING = 3
   VBOX_SPACING = 4
+
+  DRAG_ICON_OFFSET = -8
   
   def __init__(self, item_spacing: int = ITEM_SPACING, **kwargs):
     super().__init__(**kwargs)
@@ -46,6 +48,8 @@ class ItemBox(Gtk.ScrolledWindow):
     
     self._drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
     self._items = []
+
+    self._pointer = Gdk.Display.get_default().get_default_seat().get_pointer()
     
     self._vbox_items = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
@@ -61,8 +65,9 @@ class ItemBox(Gtk.ScrolledWindow):
     self._vbox.pack_start(self._vbox_items, False, False, 0)
 
     self.add(self._vbox)
+    self.set_shadow_type(Gtk.ShadowType.NONE)
     self.get_child().set_shadow_type(Gtk.ShadowType.NONE)
-  
+
   @property
   def items(self):
     return self._items
@@ -107,27 +112,44 @@ class ItemBox(Gtk.ScrolledWindow):
   def clear(self):
     for _unused in range(len(self._items)):
       self.remove_item(self._items[0])
-  
+
   def _setup_drag(self, item):
     self._drag_and_drop_context.setup_drag(
-      item.widget,
+      item.item_widget,
       self._get_drag_data,
-      self._on_drag_data_received,
+      self._drag_data_received,
       [item],
       [item],
+      self._get_drag_icon,
+      [item],
+      scrollable_for_auto_scroll=self,
+      process_cursor_position_for_scrollable_func=self._get_cursor_position_in_scrolled_window,
     )
 
   def _remove_drag(self, item):
-    self._drag_and_drop_context.remove_drag(item.widget)
+    self._drag_and_drop_context.remove_drag(item.item_widget)
 
   def _get_drag_data(self, dragged_item):
     return bytes([self._items.index(dragged_item)])
-  
-  def _on_drag_data_received(self, dragged_item_index_as_bytes, destination_item):
+
+  def _get_drag_icon(self, _widget, drag_context, item):
+    Gtk.drag_set_icon_widget(
+      drag_context,
+      item.create_drag_icon(),
+      self.DRAG_ICON_OFFSET,
+      self.DRAG_ICON_OFFSET,
+    )
+
+  def _drag_data_received(self, selection_data, destination_item):
+    dragged_item_index_as_bytes = selection_data.get_data()
     dragged_item = self._items[list(dragged_item_index_as_bytes)[0]]
     self.reorder_item(dragged_item, self._get_item_position(destination_item))
 
-  def _on_item_widget_key_press_event(self, widget, event, item):
+  def _get_cursor_position_in_scrolled_window(self, *_args):
+    _window, x, y, _mask = self.get_window().get_device_position(self._pointer)
+    return x, y
+
+  def _on_item_widget_key_press_event(self, _widget, event, item):
     if event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
       key_name = Gdk.keyval_name(event.keyval)
       if key_name in ['Up', 'KP_Up']:
@@ -150,6 +172,8 @@ class ItemBoxItem:
   def __init__(self, item_widget: Gtk.Widget, button_display_mode='on_hover'):
     self._item_widget = item_widget
     self._button_display_mode = button_display_mode
+
+    self._drag_icon_window = None
 
     self._hbox_indicator_buttons = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
@@ -252,7 +276,13 @@ class ItemBoxItem:
     button.show_all()
 
     return button
-  
+
+  def create_drag_icon(self):
+    image = Gtk.Image.new_from_icon_name(GimpUi.ICON_OBJECT_DUPLICATE, Gtk.IconSize.BUTTON)
+    image.show_all()
+
+    return image
+
   def _on_event_box_enter_notify_event(self, _event_box, event):
     if event.detail != Gdk.NotifyType.INFERIOR:
       self._hbox_buttons.set_opacity(1.0)
@@ -339,9 +369,6 @@ class ArrayBox(ItemBox):
     of the removed item.
     """
     
-    self._items_total_width = None
-    self._items_total_height = None
-    self._items_allocations = {}
     self._locker = _ActionLocker()
     
     self._init_gui()
@@ -419,10 +446,6 @@ class ArrayBox(ItemBox):
     item_position = self._get_item_position(item)
     
     super().remove_item(item)
-    
-    if item in self._items_allocations:
-      self._update_height(-(self._items_allocations[item].height + self._item_spacing))
-      del self._items_allocations[item]
     
     self.on_remove_item(item_position)
   

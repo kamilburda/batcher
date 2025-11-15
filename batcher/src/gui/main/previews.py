@@ -1,5 +1,6 @@
 import os
 import pathlib
+import pickle
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -13,6 +14,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
+from src import itemtree
 from src import overwrite
 from src import setting as setting_
 from src import utils
@@ -22,6 +24,7 @@ from src.gui.preview import controller as previews_controller_
 from src.gui.preview import base as preview_base_
 from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
+from src.gui.widgets import drag_and_drop_context as drag_and_drop_context_
 from src.path import fileext
 
 from . import _utils as gui_main_utils_
@@ -214,6 +217,9 @@ class Previews:
 
     self._import_options_dialog = None
 
+    self._name_preview_drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
+    self._name_preview_current_cursor_position = None
+
     if self._manage_items:
       self._set_up_managing_items()
       upper_widget = self._name_preview_overlay
@@ -239,7 +245,7 @@ class Previews:
   def _set_up_managing_items(self):
     self._name_preview_placeholder_label = Gtk.Label(
       label='<i>{}</i>'.format(
-        _('Drop or paste files and folders here, or add them via the "+" button above')),
+        _('Drop or paste files and folders here, or use the button above to add them')),
       use_markup=True,
       xalign=0.5,
       yalign=0.5,
@@ -334,17 +340,190 @@ class Previews:
     self._name_preview.tree_view.connect(
       'key-release-event', self._on_name_preview_key_release_event)
 
+    self._name_preview_drag_and_drop_context.setup_drag(
+      self._name_preview.tree_view,
+      self._name_preview_get_drag_data,
+      self._name_preview_drag_data_received,
+      get_drag_icon_func=self._name_preview_get_drag_icon,
+      # We must remove the default drag highlight as otherwise the empty space
+      # would be highlighted while drag-and-dropping.
+      dest_defaults=Gtk.DestDefaults.ALL & ~Gtk.DestDefaults.HIGHLIGHT,
+      target_flags=Gtk.TargetFlags.SAME_WIDGET,
+      additional_dest_targets=[
+        Gtk.TargetEntry.new(target_name, 0, 0)
+        for target_name in gui_utils_.get_external_drag_data_sources()
+      ],
+      scrollable_for_auto_scroll=self._name_preview.tree_view,
+    )
+
+    self._name_preview.tree_view.connect('drag-end', self._on_name_preview_drag_end)
+    self._name_preview.tree_view.connect('drag-drop', self._on_name_preview_drag_drop)
+    self._name_preview.tree_view.connect('drag-motion', self._on_name_preview_drag_motion)
+    self._name_preview.tree_view.connect('draw', self._on_name_preview_draw)
+
+    # We also need to set up the drag destination for external data sources
+    # for the overlay, presumably because the overlay, if displayed, prevents
+    # the underlying widget from receiving drag data.
     self._name_preview_overlay.connect(
-      'drag-data-received', self._on_name_preview_drag_data_received)
+      'drag-data-received', self._on_name_preview_overlay_drag_data_received)
     self._name_preview_overlay.drag_dest_set(
       Gtk.DestDefaults.ALL,
       [
-        Gtk.TargetEntry.new('text/uri-list', 0, 0),
-        Gtk.TargetEntry.new('CF_HDROP', 0, 0),
+        Gtk.TargetEntry.new(target_name, 0, 0)
+        for target_name in gui_utils_.get_external_drag_data_sources()
       ],
       Gdk.DragAction.MOVE)
 
     self._connect_import_setting_events()
+
+  def _name_preview_get_drag_data(self):
+    return pickle.dumps(self._name_preview.selected_items)
+
+  def _name_preview_drag_data_received(self, selection_data):
+    if selection_data.get_target().name() in gui_utils_.get_external_drag_data_sources():
+      self._add_paths_from_drag_data_to_name_preview_if_any(selection_data)
+    else:
+      if self._name_preview_current_cursor_position is None:
+        return
+
+      result = self._name_preview.tree_view.get_dest_row_at_pos(
+        *self._name_preview_current_cursor_position)
+
+      if result is None:
+        return
+
+      drag_dest_row, row_drop_position = result
+
+      reference_item = self._name_preview.get_item_from_path(drag_dest_row)
+
+      if reference_item is None:
+        return
+
+      insertion_mode = 'after'
+
+      if row_drop_position is not None:
+        if (row_drop_position in [
+              Gtk.TreeViewDropPosition.BEFORE, Gtk.TreeViewDropPosition.INTO_OR_BEFORE]):
+          insertion_mode = 'before'
+        elif row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER:
+          insertion_mode = 'after'
+        elif row_drop_position == Gtk.TreeViewDropPosition.AFTER:
+          if self._name_preview.batcher.item_tree.next(reference_item) is not None:
+            insertion_mode = 'after'
+          else:
+            insertion_mode = 'last_top_level'
+
+      selected_item_keys = pickle.loads(selection_data.get_data())
+      self._name_preview.reorder_items(selected_item_keys, reference_item, insertion_mode)
+
+  def _name_preview_get_drag_icon(self, _widget, drag_context):
+    if self._name_preview.selected_items:
+      _model, tree_paths = self._name_preview.tree_view.get_selection().get_selected_rows()
+
+      if tree_paths:
+        surface = self._name_preview.tree_view.create_row_drag_icon(tree_paths[0])
+        Gtk.drag_set_icon_surface(drag_context, surface)
+
+  def _on_name_preview_draw(self, _tree_view, cairo_context):
+    if self._name_preview_current_cursor_position is None:
+      return False
+
+    result = self._name_preview.tree_view.get_dest_row_at_pos(
+      *self._name_preview_current_cursor_position)
+
+    if result is None:
+      return False
+
+    drag_dest_row, row_drop_position = result
+
+    Gtk.TreeView.do_draw(self._name_preview.tree_view, cairo_context)
+
+    reference_item = self._name_preview.get_item_from_path(drag_dest_row)
+
+    if reference_item is None or reference_item.key in self._name_preview.selected_items:
+      return True
+
+    reference_item_parents_keys = [item.key for item in reference_item.parents]
+    if any(item_key in reference_item_parents_keys
+           for item_key in self._name_preview.selected_items):
+      return True
+
+    name_preview_style_context = self._name_preview.tree_view.get_style_context()
+    drag_highlight_color = name_preview_style_context.get_color(Gtk.StateFlags.DROP_ACTIVE)
+
+    rectangle = self._name_preview.tree_view.get_background_area(
+      drag_dest_row, self._name_preview.get_tree_view_column())
+
+    line_width = 0.5
+    # This makes the drag highlight line crispier.
+    line_offset = 0.5 * line_width
+
+    line_start_x = rectangle.x + line_offset
+    line_end_x = line_start_x + rectangle.width
+    line_y = rectangle.y + line_offset
+
+    cairo_context.set_source_rgba(
+      drag_highlight_color.red,
+      drag_highlight_color.green,
+      drag_highlight_color.blue,
+      drag_highlight_color.alpha,
+    )
+    cairo_context.set_line_width(line_width)
+
+    is_drop_into_or_after = row_drop_position == Gtk.TreeViewDropPosition.INTO_OR_AFTER
+    is_drop_after = row_drop_position == Gtk.TreeViewDropPosition.AFTER
+
+    if is_drop_into_or_after or is_drop_after:
+      line_y += rectangle.height - 1
+
+    is_reference_item_last = self._name_preview.batcher.item_tree.next(reference_item) is None
+    if is_reference_item_last and is_drop_after:
+      line_y += 1
+
+    cairo_context.move_to(line_start_x, line_y)
+    cairo_context.line_to(line_end_x, line_y)
+    cairo_context.stroke()
+
+    if reference_item.type == itemtree.TYPE_FOLDER and (is_drop_into_or_after or is_drop_after):
+      upper_line_y = line_y - (rectangle.height - 1)
+
+      cairo_context.move_to(line_start_x, upper_line_y)
+      cairo_context.line_to(line_end_x, upper_line_y)
+      cairo_context.stroke()
+
+    return True
+
+  def _on_name_preview_drag_motion(self, _widget, _context, x, y, _timestamp):
+    self._name_preview_current_cursor_position = (x, y)
+
+    self._name_preview.tree_view.queue_draw()
+
+  def _on_name_preview_drag_end(self, _tree_view, _drag_context):
+    self._name_preview_current_cursor_position = None
+
+    self._name_preview.tree_view.queue_draw()
+
+  def _on_name_preview_drag_drop(self, _tree_view, _drag_context, _x, _y, _timestamp):
+    self._name_preview_current_cursor_position = None
+
+    self._name_preview.tree_view.queue_draw()
+
+  def _on_name_preview_overlay_drag_data_received(
+        self,
+        _widget,
+        _drag_context,
+        _drop_x,
+        _drop_y,
+        selection_data,
+        _info,
+        _timestamp,
+  ):
+    self._add_paths_from_drag_data_to_name_preview_if_any(selection_data)
+
+  def _add_paths_from_drag_data_to_name_preview_if_any(self, selection_data):
+    paths = gui_utils_.get_paths_from_drag_data(selection_data)
+    if paths:
+      self._add_items_to_name_preview(paths)
 
   def _connect_import_setting_events(self):
     for setting in self._settings['main/import']:
@@ -432,19 +611,6 @@ class Previews:
 
       if not (event.state & modifiers_not_allowed_for_delete):
         self._name_preview.remove_selected_items()
-
-  def _on_name_preview_drag_data_received(
-        self,
-        _widget,
-        _drag_context,
-        _drop_x,
-        _drop_y,
-        selection_data,
-        _info,
-        _timestamp):
-      paths = gui_utils_.get_paths_from_drag_data(selection_data)
-      if paths:
-        self._add_items_to_name_preview(paths)
 
   def _add_items_to_name_preview(self, paths):
     can_add = self._check_files_and_warn_if_needed(paths)

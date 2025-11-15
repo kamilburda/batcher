@@ -81,8 +81,6 @@ class CommandList(gui_widgets_.ItemBox):
 
   _ADD_BUTTON_HBOX_SPACING = 6
 
-  _DRAG_ICON_OFFSET = -8
-
   def __init__(
         self,
         commands: setting_.Group,
@@ -358,25 +356,3 @@ class CommandList(gui_widgets_.ItemBox):
   def _on_add_custom_command_menu_item_activate(self, _menu_item):
     self._browser.fill_contents_if_empty()
     self._browser.widget.show_all()
-
-  def _setup_drag(self, item):
-    self._drag_and_drop_context.setup_drag(
-      item.item_widget,
-      self._get_drag_data,
-      self._on_drag_data_received,
-      [item],
-      [item],
-      self._get_drag_icon,
-      [item],
-    )
-
-  def _remove_drag(self, item):
-    self._drag_and_drop_context.remove_drag(item.item_widget)
-
-  def _get_drag_icon(self, _widget, drag_context, item):
-    Gtk.drag_set_icon_widget(
-      drag_context,
-      item.create_drag_icon(),
-      self._DRAG_ICON_OFFSET,
-      self._DRAG_ICON_OFFSET,
-    )

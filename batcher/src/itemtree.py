@@ -43,13 +43,11 @@ class Item(metaclass=abc.ABCMeta):
         object_: Any,
         item_type: int,
         parents: Optional[Iterable[Any]] = None,
-        children: Optional[Iterable[Any]] = None,
         prev_item: Optional[Any] = None,
         next_item: Optional[Any] = None):
     self._object = object_
     self._type = item_type
     self._parents = parents if parents is not None else []
-    self._children = children if children is not None else []
     self._prev_item = prev_item
     self._next_item = next_item
 
@@ -68,9 +66,8 @@ class Item(metaclass=abc.ABCMeta):
 
     self._orig_name = self.name
     self._orig_parents = list(self._parents)
-    self._orig_children = list(self._children)
 
-    self._item_attributes = ['name', '_parents', '_children']
+    self._item_attributes = ['name', '_parents']
 
     self._saved_states = []
     self._saved_named_states = {}
@@ -141,15 +138,6 @@ class Item(metaclass=abc.ABCMeta):
     self._parents = parents
 
   @property
-  def children(self) -> List[Item]:
-    """List of `Item` children for this item."""
-    return self._children
-
-  @children.setter
-  def children(self, children: List[Item]):
-    self._children = children
-
-  @property
   def depth(self) -> int:
     """The depth of the item in the item tree.
 
@@ -203,15 +191,6 @@ class Item(metaclass=abc.ABCMeta):
     """
     return iter(self._orig_parents)
 
-  @property
-  def orig_children(self) -> Iterator[Item]:
-    """The initial value of the ``children`` attribute of this item.
-
-    Note that this property will not be kept up-to-date if changes to the
-    children of the underlying object were made externally.
-    """
-    return iter(self._orig_children)
-
   def __str__(self) -> str:
     return utils.stringify_object(self, self.orig_name)
 
@@ -228,18 +207,26 @@ class Item(metaclass=abc.ABCMeta):
     if self.type != TYPE_FOLDER:
       return []
 
-    all_children = []
+    children_to_return = []
 
-    items = list(self._children)
-    while items:
-      item = items.pop(0)
+    current_item = self.next
+    while current_item is not None and self in current_item.parents:
+      children_to_return.append(current_item)
 
-      all_children.append(item)
+      current_item = current_item.next
 
-      if item.type == TYPE_FOLDER:
-        items.extend(item.children)
+    return children_to_return
 
-    return all_children
+  def has_children(self) -> bool:
+    """Returns ``True`` if the item has at least one child, ``False`` otherwise.
+    """
+    if self.type != TYPE_FOLDER:
+      return False
+
+    if self.next is not None and self in self.next.parents:
+      return True
+
+    return False
 
   def push_state(self):
     """Saves the current values of item's attributes that can be modified.
@@ -299,7 +286,6 @@ class Item(metaclass=abc.ABCMeta):
     """Resets the item's attributes to the values upon its instantiation."""
     self.name = self._orig_name
     self._parents = list(self._orig_parents)
-    self._children = list(self._orig_children)
 
   @abc.abstractmethod
   def _list_child_objects(self) -> List:
@@ -585,7 +571,7 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     if (parent_item is not None
         and insert_after_item is not None
-        and not (parent_item == insert_after_item or insert_after_item in parent_item.children)):
+        and not (insert_after_item == parent_item or insert_after_item.parent == parent_item)):
       raise ValueError(
         'insert_after_item, if specified, must be a child of parent_item or equal to parent_item')
 
@@ -605,8 +591,8 @@ class ItemTree(metaclass=abc.ABCMeta):
       if parent_item is None:
         processed_insert_after_item = self._last_item
       else:
-        if parent_item.children:
-          processed_insert_after_item = parent_item.children[-1]
+        if parent_item.has_children():
+          processed_insert_after_item = parent_item.get_all_children()[-1]
         else:
           processed_insert_after_item = parent_item
     else:
@@ -686,12 +672,170 @@ class ItemTree(metaclass=abc.ABCMeta):
 
     added_items.append(item)
 
-    if item.parent is not None:
-      # noinspection PyProtectedMember
-      item.parent._orig_children.append(item)
-      item.parent.children.append(item)
-
     return item
+
+  def reorder(
+        self,
+        item: Item,
+        reference_item: Item,
+        insertion_mode: str = 'after',
+  ):
+    """Moves ``item`` after ``reference_item``.
+
+    An item can also be moved outside its parent folder to another parent.
+
+    Args:
+      item: The `Item` to reorder.
+      reference_item:
+        The `Item` before/after which ``item`` will be placed.
+      insertion_mode:
+        If ``'after'``, ``item`` is inserted after ``reference_item``.
+        If ``'before'``, ``item`` is inserted before ``reference_item``.
+        If ``'last_top_level'``, ``item`` is inserted as the last item as the
+        top level. In this case, ``reference_item`` is ignored.
+
+    Raises:
+      ValueError:
+        * If ``item`` is not present in this `ItemTree` instance.
+        * If attempting to move ``item`` inside one of its children, i.e. if
+          ``item`` is found in ``reference_item.parents``.
+        * If ``insertion_mode`` is not a valid value.
+    """
+    if item.key not in self._items:
+      raise ValueError(f'item {item} not found in this ItemTree')
+
+    if insertion_mode != 'last_top_level' and item in reference_item.parents:
+      raise ValueError(f'cannot reorder item {item} inside one of its children ({reference_item})')
+
+    if insertion_mode not in ['before', 'after', 'last_top_level']:
+      raise ValueError(f'value for insertion_mode is not valid')
+
+    if insertion_mode != 'last_top_level' and item == reference_item:
+      return
+
+    children = item.get_all_children()
+    next_item, last_child_item = self._get_next_and_last_child_item_when_reordering_item(
+      item, children)
+    previous_item = item.prev
+
+    if previous_item is not None:
+      # noinspection PyProtectedMember
+      previous_item._next_item = next_item
+    else:
+      self._first_item = next_item
+
+    if next_item is not None:
+      # noinspection PyProtectedMember
+      next_item._prev_item = previous_item
+    else:
+      self._last_item = previous_item
+
+    if insertion_mode == 'before':
+      self._update_parents_when_reordering_item(item, children, reference_item, insertion_mode)
+
+      previous_reference_item = reference_item.prev
+
+      if last_child_item is not None:
+        # noinspection PyProtectedMember
+        reference_item._prev_item = last_child_item
+        # noinspection PyProtectedMember
+        last_child_item._next_item = reference_item
+      else:
+        # noinspection PyProtectedMember
+        reference_item._prev_item = item
+        # noinspection PyProtectedMember
+        item._next_item = reference_item
+
+      # noinspection PyProtectedMember
+      item._prev_item = previous_reference_item
+      if previous_reference_item is not None:
+        # noinspection PyProtectedMember
+        previous_reference_item._next_item = item
+      else:
+        self._first_item = item
+    elif insertion_mode in ['after', 'last_top_level']:
+      if insertion_mode == 'last_top_level':
+        processed_reference_item = self._last_item
+      else:
+        processed_reference_item = reference_item
+
+      self._update_parents_when_reordering_item(
+        item, children, processed_reference_item, insertion_mode)
+
+      next_reference_item = processed_reference_item.next
+      # noinspection PyProtectedMember
+      processed_reference_item._next_item = item
+      # noinspection PyProtectedMember
+      item._prev_item = processed_reference_item
+
+      if last_child_item is not None:
+        item_to_relink = last_child_item
+      else:
+        item_to_relink = item
+
+      # noinspection PyProtectedMember
+      item_to_relink._next_item = next_reference_item
+      if next_reference_item is not None:
+        # noinspection PyProtectedMember
+        next_reference_item._prev_item = item_to_relink
+      else:
+        self._last_item = item_to_relink
+
+  @staticmethod
+  def _get_next_and_last_child_item_when_reordering_item(item, children):
+    if children:
+      return children[-1].next, children[-1]
+    else:
+      return item.next, None
+
+  def _update_parents_when_reordering_item(self, item, children, reference_item, insertion_mode):
+    if insertion_mode == 'last_top_level':
+      parent_item = None
+      parents = []
+      orig_parents = []
+      should_insert_into_folder = False
+    else:
+      parent_item = reference_item.parent
+      parents = reference_item.parents
+      # noinspection PyProtectedMember
+      orig_parents = reference_item._orig_parents
+      should_insert_into_folder = insertion_mode == 'after' and reference_item.type == TYPE_FOLDER
+
+    if item.parent == parent_item and not should_insert_into_folder:
+      return
+
+    if should_insert_into_folder:
+      # noinspection PyProtectedMember
+      item._parents = parents + [reference_item]
+    else:
+      # noinspection PyProtectedMember
+      item._parents = parents
+
+    if should_insert_into_folder:
+      item._orig_parents = orig_parents + [reference_item]
+    else:
+      item._orig_parents = orig_parents
+
+    for child in children:
+      child_parents_up_to_item = self._get_child_parents_up_to_item(child, item)
+      # noinspection PyProtectedMember
+      child._parents = item._parents + child_parents_up_to_item
+
+      child_orig_parents_up_to_item = self._get_child_parents_up_to_item(child, item, 'orig_parent')
+      # noinspection PyProtectedMember
+      child._orig_parents = item._orig_parents + child_orig_parents_up_to_item
+
+  @staticmethod
+  def _get_child_parents_up_to_item(child, item, parent_property_name='parent'):
+    child_parents_up_to_item = []
+    current_parent = getattr(child, parent_property_name)
+    while current_parent != item and current_parent is not None:
+      child_parents_up_to_item.insert(0, current_parent)
+      current_parent = getattr(current_parent, parent_property_name)
+
+    child_parents_up_to_item.insert(0, item)
+
+    return child_parents_up_to_item
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
@@ -737,18 +881,6 @@ class ItemTree(metaclass=abc.ABCMeta):
         if next_item is not None:
           # noinspection PyProtectedMember
           next_item._prev_item = previous_item
-
-        if item_to_remove.parent is not None:
-          try:
-            item_to_remove.parent.children.remove(item_to_remove)
-          except ValueError:
-            pass
-
-          try:
-            # noinspection PyProtectedMember
-            item_to_remove.parent._orig_children.remove(item_to_remove)
-          except ValueError:
-            pass
 
         if item_to_remove == self._first_item:
           self._first_item = next_item
@@ -980,10 +1112,10 @@ class ImageFileTree(ItemTree):
     if os.path.isdir(object_):
       if with_folders:
         path = os.path.abspath(object_)
-        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, [], None, None))
+        child_items.append(ImageFileItem(path, TYPE_FOLDER, parents_for_child, None, None))
     else:
       path = os.path.abspath(object_)
-      child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(ImageFileItem(path, TYPE_ITEM, parents_for_child, None, None))
 
 
 class GimpImageTree(ItemTree):
@@ -1013,9 +1145,9 @@ class GimpImageTree(ItemTree):
     if isinstance(object_, int):
       if Gimp.Image.id_is_valid(object_):
         gimp_object = Gimp.Image.get_by_id(object_)
-        child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
+        child_items.append(GimpImageItem(gimp_object, TYPE_ITEM, parents_for_child, None, None))
     else:  # GIMP image
-      child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpImageItem(object_, TYPE_ITEM, parents_for_child, None, None))
 
 
 class GimpItemTree(ItemTree):
@@ -1080,11 +1212,11 @@ class GimpItemTree(ItemTree):
 
     if gimp_object.is_group():
       if with_folders:
-        child_items.append(GimpItem(gimp_object, TYPE_FOLDER, parents_for_child, [], None, None))
+        child_items.append(GimpItem(gimp_object, TYPE_FOLDER, parents_for_child, None, None))
       # Make sure each item keeps its own list of parents.
-      child_items.append(GimpItem(gimp_object, TYPE_GROUP, list(parents_for_child), [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_GROUP, list(parents_for_child), None, None))
     else:
-      child_items.append(GimpItem(gimp_object, TYPE_ITEM, parents_for_child, [], None, None))
+      child_items.append(GimpItem(gimp_object, TYPE_ITEM, parents_for_child, None, None))
 
   @abc.abstractmethod
   def _get_children_from_image(self, image: Gimp.Image):

@@ -48,6 +48,7 @@ class NamePreview(preview_base_.Preview):
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-added-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-reordered-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'preview-removed-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
@@ -69,7 +70,7 @@ class NamePreview(preview_base_.Preview):
   _COLOR_TAG_BORDER_WIDTH = 1
   _COLOR_TAG_BORDER_COLOR = 0xdcdcdcff
   _COLOR_TAG_DEFAULT_COLOR = 0x7f7f7fff
-  
+
   def __init__(
         self,
         batcher,
@@ -93,11 +94,11 @@ class NamePreview(preview_base_.Preview):
     # key: `Item.key`
     # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(utils.return_none_func)
-    
+
     self._row_expand_collapse_interactive = True
     self._clearing_preview = False
     self._row_select_interactive = True
-    
+
     self._init_gui()
   
   @property
@@ -116,7 +117,7 @@ class NamePreview(preview_base_.Preview):
   def selected_items(self):
     return self._selected_items
   
-  def update(self, full_update=False):
+  def update(self, full_update=False, scroll_to_first_selected_item=True):
     """Updates the preview (add/remove item, move item to a different parent
     group, etc.).
 
@@ -126,6 +127,9 @@ class NamePreview(preview_base_.Preview):
 
     If ``full_update`` is ``True``, the item tree is refreshed based on changes
     outside of this application (addition, removal, update of items).
+
+    If ``scroll_to_first_selected_item`` is ``True``, the preview is scrolled
+    to the first selected item.
     """
     update_locked = super().update()
     if update_locked:
@@ -143,7 +147,7 @@ class NamePreview(preview_base_.Preview):
 
     self._set_expanded_items()
 
-    self._set_selection()
+    self._set_selection(scroll_to_first_selected_item)
 
     self._tree_view.columns_autosize()
 
@@ -168,10 +172,18 @@ class NamePreview(preview_base_.Preview):
     self._set_expanded_items()
     self.emit('preview-collapsed-items-changed')
 
-  def set_selected_items(self, selected_items: Iterable):
-    """Sets the selection of items in the preview."""
+  def set_selected_items(
+        self,
+        selected_items: Iterable,
+        scroll_to_first_selected_item: bool = True,
+  ):
+    """Sets the selection of items in the preview.
+
+    If ``scroll_to_first_selected_item`` is ``True``, the preview is scrolled
+    to the first selected item.
+    """
     self._selected_items = list(selected_items)
-    self._set_selection()
+    self._set_selection(scroll_to_first_selected_item)
     self.emit('preview-selection-changed')
 
   def set_tagged_items(self, tagged_items: Set):
@@ -206,6 +218,16 @@ class NamePreview(preview_base_.Preview):
     else:
       return None
 
+  def get_tree_view_column(self):
+    return self._tree_view.get_column(0)
+
+  def get_item_from_path(self, tree_path):
+    item_key = self._get_key_from_tree_iter(self._tree_model.get_iter(tree_path))
+    if item_key in self._batcher.item_tree:
+      return self._batcher.item_tree[item_key]
+    else:
+      return None
+
   def set_show_original_name(self, show_original_name):
     self._show_original_name = show_original_name
 
@@ -213,6 +235,46 @@ class NamePreview(preview_base_.Preview):
     added_items = self._batcher.item_tree.add(objects)
 
     self.emit('preview-added-items', added_items)
+
+  def reorder_items(self, item_keys, reference_item, insertion_mode):
+    self._row_select_interactive = False
+
+    items_to_reorder = [self._batcher.item_tree[item_key] for item_key in item_keys]
+
+    for item in items_to_reorder:
+      orig_item_parent = item.parent
+
+      try:
+        self._batcher.item_tree.reorder(item, reference_item, insertion_mode)
+      except ValueError:
+        # Ignore errors such as reordering folders to one of its children.
+        pass
+      else:
+        reference_item_for_tree_model = reference_item
+        insertion_mode_for_tree_model = insertion_mode
+
+        if insertion_mode == 'after':
+          if reference_item.parent != item.parent:
+            reference_item_for_tree_model = None
+        elif insertion_mode == 'last_top_level':
+          reference_item_for_tree_model = None
+          insertion_mode_for_tree_model = 'before'
+
+        if orig_item_parent == item.parent:
+          self._move_item_within_parent(
+            item, reference_item_for_tree_model, insertion_mode_for_tree_model)
+        else:
+          self._move_item_outside_parent(
+            item, reference_item_for_tree_model, insertion_mode_for_tree_model, orig_item_parent)
+
+    # A different row would get automatically selected otherwise, and we only
+    # intend to restore the selection of the row(s) that were moved. The
+    # selection is restored upon the next call to `update()`.
+    self._tree_view.get_selection().unselect_all()
+
+    self._row_select_interactive = True
+
+    self.emit('preview-reordered-items', items_to_reorder)
 
   def remove_selected_items(self):
     removed_items = self._batcher.item_tree.remove(
@@ -459,18 +521,8 @@ class NamePreview(preview_base_.Preview):
           # We cannot use `Gtk.TreeStore.move_after()` here as that method only
           # works within the same parent. Hence, we remove and insert the
           # item under a new parent.
-
-          if new_item.type != itemtree.TYPE_FOLDER:
-            self._remove_item_by_key(new_item_key)
-          else:
-            # We cannot remove a parent from the `Gtk.TreeStore` at this
-            # point as all child `Gtk.TreeIter`s would be removed as well. We
-            # remove all obsoleted parents at tne end.
-            parent_iter = self._tree_iters.pop(new_item_key, None)
-            if parent_iter is not None:
-              parents_to_remove[new_item_key] = parent_iter
-
-          self._insert_item(new_item, previous_new_item)
+          self._move_item_outside_parent_when_syncing(
+            new_item, new_item_key, previous_new_item, parents_to_remove)
         else:
           previous_items_are_equal = (
             (previous_new_item is None and previous_existing_item is None)
@@ -480,14 +532,14 @@ class NamePreview(preview_base_.Preview):
               and previous_new_item.key == previous_existing_item.key))
 
           if not previous_items_are_equal:
-            self._move_item(new_item, previous_new_item)
+            self._move_item_within_parent(new_item, previous_new_item, 'after')
             self._update_item(new_item)
           else:
             self._update_item(new_item)
 
         del existing_items[new_item_key]
       else:
-        self._insert_item(new_item, previous_new_item)
+        self._insert_item(new_item, previous_new_item, 'after')
 
         if new_item_key in existing_items:
           del existing_items[new_item_key]
@@ -500,7 +552,7 @@ class NamePreview(preview_base_.Preview):
     for tree_iter in reversed(parents_to_remove.values()):
       self._remove_item_by_iter(tree_iter)
   
-  def _insert_item(self, item, previous_item):
+  def _insert_item(self, item, reference_item, insertion_mode):
     if item.key in self._tree_iters:
       return None
 
@@ -509,17 +561,24 @@ class NamePreview(preview_base_.Preview):
     else:
       parent_tree_iter = None
 
-    if previous_item:
-      previous_tree_iter = self._tree_iters[previous_item.key]
+    if reference_item:
+      reference_tree_iter = self._tree_iters[reference_item.key]
     else:
-      previous_tree_iter = None
+      reference_tree_iter = None
 
     item_icon = self._get_icon_from_item(item)
     color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
 
-    tree_iter = self._tree_model.insert_after(
+    if insertion_mode == 'before':
+      insert_func = self._tree_model.insert_before
+    elif insertion_mode == 'after':
+      insert_func = self._tree_model.insert_after
+    else:
+      raise ValueError(f'insertion mode {insertion_mode} is not valid')
+
+    tree_iter = insert_func(
       parent_tree_iter,
-      previous_tree_iter,
+      reference_tree_iter,
       [item_icon,
        item_icon is not None,
        color_tag_icon,
@@ -603,14 +662,86 @@ class NamePreview(preview_base_.Preview):
       self._COLUMN_ITEM_NAME[0],
       self._get_item_name(item))
 
-  def _move_item(self, item, previous_item):
+  def _move_item_within_parent(self, item, reference_item, insertion_mode):
     item_tree_iter = self._tree_iters[item.key]
-    if previous_item is not None:
-      previous_item_tree_iter = self._tree_iters[previous_item.key]
+    if reference_item is not None:
+      reference_item_tree_iter = self._tree_iters[reference_item.key]
     else:
-      previous_item_tree_iter = None
+      reference_item_tree_iter = None
 
-    self._tree_model.move_after(item_tree_iter, previous_item_tree_iter)
+    if insertion_mode == 'before':
+      self._tree_model.move_before(item_tree_iter, reference_item_tree_iter)
+    elif insertion_mode == 'after':
+      self._tree_model.move_after(item_tree_iter, reference_item_tree_iter)
+    else:
+      raise ValueError(f'insertion mode {insertion_mode} is not valid')
+
+  def _move_item_outside_parent(self, item, reference_item, insertion_mode, orig_item_parent):
+    tree_iters_to_remove = []
+
+    if item.key in self._tree_iters:
+      tree_iters_to_remove.append(self._tree_iters.pop(item.key))
+
+    self._insert_item(item, reference_item, insertion_mode)
+
+    item_children = item.get_all_children()
+
+    if item_children:
+      for child in item_children:
+        if child.key in self._tree_iters:
+          tree_iters_to_remove.append(self._tree_iters.pop(child.key))
+
+          # We only insert children that are displayed. Empty folders and
+          # filtered items should not be displayed (the latter will be added
+          # automatically via `update()` if no longer filtered).
+          self._insert_item(child, None, 'before')
+
+    # We need to remove the innermost children first to avoid crashes since
+    # removing a parent tree iter would also result in removing all its
+    # children.
+    for tree_iter in reversed(tree_iters_to_remove):
+      self._tree_model.remove(tree_iter)
+
+    if orig_item_parent is not None:
+      self._remove_empty_folders_from_tree_model(orig_item_parent)
+
+  def _remove_empty_folders_from_tree_model(self, item):
+    if item.type != itemtree.TYPE_FOLDER:
+      return
+
+    current_item = item
+    while True:
+      if current_item is None:
+        break
+
+      current_iter = self._tree_iters.get(current_item.key, None)
+
+      if current_iter is not None and not self._tree_model.iter_has_child(current_iter):
+        del self._tree_iters[current_item.key]
+        self._tree_model.remove(current_iter)
+      else:
+        break
+
+      current_item = current_item.parent
+
+  def _move_item_outside_parent_when_syncing(
+        self,
+        new_item,
+        new_item_key,
+        previous_new_item,
+        parents_to_remove,
+  ):
+    if new_item.type != itemtree.TYPE_FOLDER:
+      self._remove_item_by_key(new_item_key)
+    else:
+      # We cannot remove a parent from the `Gtk.TreeStore` at this
+      # point as all child `Gtk.TreeIter`s would be removed as well. We
+      # remove all obsoleted parents later.
+      parent_iter = self._tree_iters.pop(new_item_key, None)
+      if parent_iter is not None:
+        parents_to_remove[new_item_key] = parent_iter
+
+    self._insert_item(new_item, previous_new_item, 'after')
 
   def _remove_item_by_key(self, item_key):
     tree_iter = self._tree_iters.pop(item_key, None)
@@ -651,7 +782,7 @@ class NamePreview(preview_base_.Preview):
     self._collapsed_items = set(
       item_key for item_key in self._collapsed_items if item_key in self._batcher.item_tree)
   
-  def _set_selection(self):
+  def _set_selection(self, scroll_to_first_selected_item=True):
     self._row_select_interactive = False
 
     self._selected_items = [
@@ -662,7 +793,7 @@ class NamePreview(preview_base_.Preview):
       if tree_iter is not None:
         self._tree_view.get_selection().select_iter(tree_iter)
 
-    if self._selected_items:
+    if scroll_to_first_selected_item and self._selected_items:
       if self._initial_cursor_item is None:
         first_selected_tree_iter = self._tree_iters.get(self._selected_items[0], None)
         if first_selected_tree_iter is not None:
@@ -677,7 +808,9 @@ class NamePreview(preview_base_.Preview):
           if tree_path is not None:
             tree_path_with_cursor = self._set_cursor_to_item_if_not_set(tree_path)
             self._scroll_to_cursor(tree_path_with_cursor)
-        self._initial_cursor_item = None
+
+    if self._selected_items and self._initial_cursor_item is not None:
+      self._initial_cursor_item = None
 
     self._row_select_interactive = True
 

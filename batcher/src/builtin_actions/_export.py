@@ -155,7 +155,7 @@ class ExportAction(invoker_.CallableCommand):
         _remove_image_copies_for_edit_mode(batcher, self._image_copies)
         return
       else:
-        item_to_process = _NameOnlyItem(None, itemtree.TYPE_ITEM, [], [], None, None)
+        item_to_process = _NameOnlyItem(None, itemtree.TYPE_ITEM, [], None, None)
         if self._single_image_name_pattern is not None:
           item_to_process.name = self._renamer_for_single_image.rename(batcher, item_to_process)
         else:

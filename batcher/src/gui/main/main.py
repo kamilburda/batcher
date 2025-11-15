@@ -399,7 +399,7 @@ class BatchProcessingQuickGui:
   _BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 8
 
-  _DEFAULT_DIALOG_WIDTH = 500
+  _DEFAULT_DIALOG_WIDTH = 350
 
   def __init__(
         self,

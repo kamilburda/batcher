@@ -153,6 +153,10 @@ def has_any_window_focus(windows_to_ignore: Iterable[Gtk.Window] = None):
   )
 
 
+def get_external_drag_data_sources():
+  return ['text/uri-list', 'CF_HDROP']
+
+
 def get_paths_from_clipboard(clipboard):
   text = clipboard.wait_for_text()
   if text is not None:
