@@ -615,7 +615,6 @@ class Previews:
           if reference_item is not None:
             self._name_preview.reorder_item(item_key, reference_item, 'before')
       elif key_name in ['Down', 'KP_Down']:
-        # TODO: Also handle 'last_top_level'?
         for item_key in reversed(selected_item_keys):
           item = item_tree[item_key]
           if item.has_children():
