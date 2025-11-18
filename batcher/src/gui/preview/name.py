@@ -48,7 +48,7 @@ class NamePreview(preview_base_.Preview):
     'preview-selection-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-added-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
-    'preview-reordered-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-reordered-item': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'preview-removed-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
@@ -236,36 +236,34 @@ class NamePreview(preview_base_.Preview):
 
     self.emit('preview-added-items', added_items)
 
-  def reorder_items(self, item_keys, reference_item, insertion_mode):
+  def reorder_item(self, item_key, reference_item, insertion_mode):
     self._row_select_interactive = False
 
-    items_to_reorder = [self._batcher.item_tree[item_key] for item_key in item_keys]
+    item = self._batcher.item_tree[item_key]
+    orig_item_parent = item.parent
 
-    for item in items_to_reorder:
-      orig_item_parent = item.parent
+    try:
+      self._batcher.item_tree.reorder(item, reference_item, insertion_mode)
+    except ValueError:
+      # Ignore errors such as reordering folders to one of its children.
+      pass
+    else:
+      reference_item_for_tree_model = reference_item
+      insertion_mode_for_tree_model = insertion_mode
 
-      try:
-        self._batcher.item_tree.reorder(item, reference_item, insertion_mode)
-      except ValueError:
-        # Ignore errors such as reordering folders to one of its children.
-        pass
-      else:
-        reference_item_for_tree_model = reference_item
-        insertion_mode_for_tree_model = insertion_mode
-
-        if insertion_mode == 'after':
-          if reference_item.parent != item.parent:
-            reference_item_for_tree_model = None
-        elif insertion_mode == 'last_top_level':
+      if insertion_mode == 'after':
+        if reference_item.parent != item.parent:
           reference_item_for_tree_model = None
-          insertion_mode_for_tree_model = 'before'
+      elif insertion_mode == 'last_top_level':
+        reference_item_for_tree_model = None
+        insertion_mode_for_tree_model = 'before'
 
-        if orig_item_parent == item.parent:
-          self._move_item_within_parent(
-            item, reference_item_for_tree_model, insertion_mode_for_tree_model)
-        else:
-          self._move_item_outside_parent(
-            item, reference_item_for_tree_model, insertion_mode_for_tree_model, orig_item_parent)
+      if orig_item_parent == item.parent:
+        self._move_item_within_parent(
+          item, reference_item_for_tree_model, insertion_mode_for_tree_model)
+      else:
+        self._move_item_outside_parent(
+          item, reference_item_for_tree_model, insertion_mode_for_tree_model, orig_item_parent)
 
     # A different row would get automatically selected otherwise, and we only
     # intend to restore the selection of the row(s) that were moved. The
@@ -274,7 +272,7 @@ class NamePreview(preview_base_.Preview):
 
     self._row_select_interactive = True
 
-    self.emit('preview-reordered-items', items_to_reorder)
+    self.emit('preview-reordered-item', item)
 
   def remove_selected_items(self):
     removed_items = self._batcher.item_tree.remove(
@@ -792,6 +790,10 @@ class NamePreview(preview_base_.Preview):
       tree_iter = self._tree_iters[item_key]
       if tree_iter is not None:
         self._tree_view.get_selection().select_iter(tree_iter)
+
+    # We obtain the selected items again as there is no guarantee that the input
+    # items are sorted according to their position in the tree.
+    self._selected_items = self._get_keys_from_current_selection()
 
     if scroll_to_first_selected_item and self._selected_items:
       if self._initial_cursor_item is None:

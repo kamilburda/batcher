@@ -414,7 +414,8 @@ class Previews:
             insertion_mode = 'last_top_level'
 
       selected_item_keys = pickle.loads(selection_data.get_data())
-      self._name_preview.reorder_items(selected_item_keys, reference_item, insertion_mode)
+      for item_key in selected_item_keys:
+        self._name_preview.reorder_item(item_key, reference_item, insertion_mode)
 
   def _name_preview_get_drag_icon(self, _widget, drag_context):
     if self._name_preview.selected_items:
@@ -581,13 +582,13 @@ class Previews:
   def _on_name_preview_key_press_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
 
-    if key_name == 'v' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # ctrl + V
+    if key_name == 'v' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # Ctrl + V
       clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
       paths = gui_utils_.get_paths_from_clipboard(clipboard)
       if paths:
         self._add_items_to_name_preview(paths)
-    elif key_name == 'c' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # ctrl + C
+    elif key_name == 'c' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # Ctrl + C
       clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
       item_tree = self._name_preview.batcher.item_tree
@@ -601,6 +602,35 @@ class Previews:
       self._display_message_func(
         _('Copied the selected images and folders as text.'),
         Gtk.MessageType.INFO)
+    elif event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
+      item_tree = self._name_preview.batcher.item_tree
+      selected_item_keys = [
+        item_key for item_key in self._name_preview.selected_items if item_key in item_tree
+      ]
+
+      key_name = Gdk.keyval_name(event.keyval)
+      if key_name in ['Up', 'KP_Up']:
+        for item_key in selected_item_keys:
+          reference_item = item_tree.prev(item_tree[item_key])
+          if reference_item is not None:
+            self._name_preview.reorder_item(item_key, reference_item, 'before')
+      elif key_name in ['Down', 'KP_Down']:
+        # TODO: Also handle 'last_top_level'?
+        for item_key in reversed(selected_item_keys):
+          item = item_tree[item_key]
+          if item.has_children():
+            children = item.get_all_children()
+            if children:
+              reference_item = item_tree.next(children[-1])
+            else:
+              reference_item = item_tree.next(item)
+          else:
+            reference_item = item_tree.next(item)
+
+          if reference_item is not None:
+            self._name_preview.reorder_item(item_key, reference_item, 'after')
+          else:
+            self._name_preview.reorder_item(item_key, None, 'last_top_level')
 
   def _on_name_preview_key_release_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)

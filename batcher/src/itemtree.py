@@ -592,7 +592,11 @@ class ItemTree(metaclass=abc.ABCMeta):
         processed_insert_after_item = self._last_item
       else:
         if parent_item.has_children():
-          processed_insert_after_item = parent_item.get_all_children()[-1]
+          children = parent_item.get_all_children()
+          if children:
+            processed_insert_after_item = children[-1]
+          else:
+            processed_insert_after_item = parent_item
         else:
           processed_insert_after_item = parent_item
     else:
@@ -677,7 +681,7 @@ class ItemTree(metaclass=abc.ABCMeta):
   def reorder(
         self,
         item: Item,
-        reference_item: Item,
+        reference_item: Optional[Item],
         insertion_mode: str = 'after',
   ):
     """Moves ``item`` after ``reference_item``.
@@ -687,7 +691,8 @@ class ItemTree(metaclass=abc.ABCMeta):
     Args:
       item: The `Item` to reorder.
       reference_item:
-        The `Item` before/after which ``item`` will be placed.
+        The `Item` before/after which ``item`` will be placed. This parameter
+        can be ``None`` only if ``insertion_mode`` is ``'last_top_level'``.
       insertion_mode:
         If ``'after'``, ``item`` is inserted after ``reference_item``.
         If ``'before'``, ``item`` is inserted before ``reference_item``.
