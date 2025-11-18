@@ -347,7 +347,7 @@ class Previews:
       get_drag_icon_func=self._name_preview_get_drag_icon,
       # We must remove the default drag highlight as otherwise the empty space
       # would be highlighted while drag-and-dropping.
-      dest_defaults=Gtk.DestDefaults.ALL & ~Gtk.DestDefaults.HIGHLIGHT,
+      dest_defaults=Gtk.DestDefaults(Gtk.DestDefaults.ALL & ~Gtk.DestDefaults.HIGHLIGHT),
       target_flags=Gtk.TargetFlags.SAME_WIDGET,
       additional_dest_targets=[
         Gtk.TargetEntry.new(target_name, 0, 0)
