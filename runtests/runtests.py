@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Running automated tests.
 
 By default, all modules starting with the `'test_'` prefix will be run.
