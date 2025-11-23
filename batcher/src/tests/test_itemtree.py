@@ -729,6 +729,93 @@ class TestImageFileTree(unittest.TestCase):
     else:
       return None
 
+  @parameterized.parameterized.expand([
+    ('by_item_name_ascending',
+     [
+       'Corners',
+       'top-left.png',
+       'top-left2',
+       'top-left3',
+       'bottom-left.png',
+       'bottom-right.png',
+       'top-right.png',
+       'Frames',
+       'top.png',
+       'Overlay',
+       'main-background.jpg',
+     ],
+     ),
+
+    ('by_item_name_ascending_case_insensitive',
+     [
+       'Corners',
+       'top-left.png',
+       'top-left2',
+       'top-left3',
+       'bottom-left.png',
+       'bottom-right.png',
+       'top-right.png',
+       'Frames',
+       'top.png',
+       'main-background.jpg',
+       'Overlay',
+     ],
+     True,
+     lambda item: item.name.lower(),
+     ),
+
+    ('by_item_name_descending',
+     [
+       'main-background.jpg',
+       'Overlay',
+       'Frames',
+       'top.png',
+       'Corners',
+       'top-right.png',
+       'top-left3',
+       'bottom-right.png',
+       'bottom-left.png',
+       'top-left2',
+       'top-left.png',
+     ],
+     False,
+     ),
+  ])
+  def test_sort(
+        self,
+        mock_abspath,
+        mock_listdir,
+        mock_isdir,
+        _test_case_name_suffix,
+        expected_item_names,
+        ascending=True,
+        key=None,
+  ):
+    self._set_up_tree_before_add(mock_abspath, mock_listdir, mock_isdir)
+
+    self.tree.add(self.paths[0])
+
+    self.tree.sort(key=key, ascending=ascending)
+
+    previous_expected_item_names = [None] + expected_item_names[:-1]
+    next_expected_item_names = expected_item_names[1:] + [None]
+
+    for item, name, prev_name, next_name in zip(
+          self.tree.iter(with_empty_groups=True),
+          expected_item_names,
+          previous_expected_item_names,
+          next_expected_item_names):
+      self.assertEqual(item.name, name)
+      if item.prev is not None:
+        self.assertEqual(item.prev.name, prev_name)
+      else:
+        self.assertIsNone(item.prev)
+
+      if item.next is not None:
+        self.assertEqual(item.next.name, next_name)
+      else:
+        self.assertIsNone(item.next)
+
 
 class TestLayerTree(unittest.TestCase):
 

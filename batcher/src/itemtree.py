@@ -9,10 +9,11 @@ structure.
 from __future__ import annotations
 
 import abc
+import collections
 from collections.abc import Iterable, Iterator
 import pathlib
 import os
-from typing import Any, Dict, Generator, List, Optional, Union
+from typing import Any, Callable, Dict, Generator, List, Optional, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -841,6 +842,66 @@ class ItemTree(metaclass=abc.ABCMeta):
     child_parents_up_to_item.insert(0, item)
 
     return child_parents_up_to_item
+
+  def sort(self, key: Optional[Callable] = None, ascending: bool = True):
+    """Sorts the tree.
+
+    All items are sorted, including filtered items (which are, by default, not
+    returned when iterating the tree via `iter`).
+
+    The optional ``key`` function takes an `Item` instance and returns a value
+    used to sort the tree by. By default, the `name` property is returned, i.e.
+    items are sorted by their name (case-sensitive matching).
+
+    Items are sorted in the ascending order if ``ascending`` is ``True``, and
+    descending otherwise.
+    """
+    if not self._items:
+      return
+
+    if key is None:
+      key = self._sort_by_item_name
+
+    parents_and_items = collections.defaultdict(list)
+
+    for item in self._items.values():
+      parents_and_items[tuple(item.parents)].append(item)
+
+    for items in parents_and_items.values():
+      items.sort(key=key, reverse=not ascending)
+
+    top_level_items = parents_and_items[()]
+
+    assert len(top_level_items) > 0
+
+    self._first_item = parents_and_items[()][0]
+    self._last_item = parents_and_items[()][-1]
+
+    # noinspection PyProtectedMember
+    self._first_item._prev_item = None
+
+    visited_items = list(top_level_items)
+    while visited_items:
+      current_item = visited_items.pop(0)
+
+      if current_item.type == TYPE_FOLDER:
+        for item in reversed(parents_and_items[tuple(current_item.parents + [current_item])]):
+          visited_items.insert(0, item)
+
+      if visited_items:
+        next_item = visited_items[0]
+      else:
+        next_item = None
+
+      # noinspection PyProtectedMember
+      current_item._next_item = next_item
+      if next_item is not None:
+        # noinspection PyProtectedMember
+        next_item._prev_item = current_item
+
+  @staticmethod
+  def _sort_by_item_name(item):
+    return item.name
 
   def remove(self, items: Iterable[Item]):
     """Removes items from the tree.
