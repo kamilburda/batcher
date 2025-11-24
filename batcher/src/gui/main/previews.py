@@ -50,6 +50,9 @@ class Previews:
   _NAME_PREVIEW_BUTTONS_SPACING = 3
   _NAME_PREVIEW_PLACEHOLDER_LABEL_PAD = 8
 
+  _SORT_ITEM_TYPE_FOLDER = 0
+  _SORT_ITEM_TYPE_OTHER_ITEMS = 1
+
   def __init__(
         self,
         settings,
@@ -198,9 +201,6 @@ class Previews:
 
     self._menu_input_options = Gtk.Menu()
 
-    self._settings['gui/show_original_item_names'].set_gui()
-    self._menu_input_options.append(self._settings['gui/show_original_item_names'].gui.widget)
-
     self._hbox_input_options = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._NAME_PREVIEW_BUTTONS_SPACING,
@@ -239,6 +239,11 @@ class Previews:
     )
     self._vbox_previews.pack_start(self._hbox_top, False, False, 0)
     self._vbox_previews.pack_start(self._vpaned_previews, True, True, 0)
+
+    self._settings['gui/show_original_item_names'].set_gui()
+    self._menu_input_options.append(self._settings['gui/show_original_item_names'].gui.widget)
+
+    self._menu_input_options.show_all()
 
     self._button_input_options.connect('clicked', self._on_button_input_options_clicked)
 
@@ -319,7 +324,8 @@ class Previews:
     self._menu_item_import_options.show_all()
 
     self._menu_input_options.insert(self._menu_item_import_options, 0)
-    self._menu_input_options.show_all()
+
+    self._add_sort_menu_options()
 
     self._show_hide_name_preview_placeholder_label()
 
@@ -330,10 +336,10 @@ class Previews:
       'activate', self._on_menu_item_add_folders_activate, _('Add Folders'))
     self._button_remove.connect('clicked', self._on_button_remove_clicked)
     self._menu_item_remove_selected.connect(
-      'activate', self._on_menu_item_remove_selected_clicked)
+      'activate', self._on_menu_item_remove_selected_activate)
     self._menu_item_remove_all.connect(
-      'activate', self._on_menu_item_remove_all_clicked)
-    self._menu_item_import_options.connect('activate', self._on_menu_item_import_options_clicked)
+      'activate', self._on_menu_item_remove_all_activate)
+    self._menu_item_import_options.connect('activate', self._on_menu_item_import_options_activate)
 
     self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
@@ -375,6 +381,51 @@ class Previews:
       Gdk.DragAction.MOVE)
 
     self._connect_import_setting_events()
+
+  def _add_sort_menu_options(self):
+    self._menu_item_sort = Gtk.MenuItem(label=_('Sort'))
+    self._menu_input_options.append(self._menu_item_sort)
+
+    self._menu_sort_options = Gtk.Menu()
+    self._menu_item_sort.set_submenu(self._menu_sort_options)
+
+    self._menu_item_sort_by_original_name = Gtk.MenuItem(label=_('Original name'))
+    self._menu_sort_options.append(self._menu_item_sort_by_original_name)
+    self._menu_item_sort_by_original_name.connect(
+      'activate', self._on_menu_item_sort_by_original_name_activate)
+
+    self._menu_item_sort_by_new_name = Gtk.MenuItem(label=_('New name'))
+    self._menu_sort_options.append(self._menu_item_sort_by_new_name)
+    self._menu_item_sort_by_new_name.connect(
+      'activate', self._on_menu_item_sort_by_new_name_activate)
+
+    self._menu_item_sort_by_modification_date = Gtk.MenuItem(label=_('Modification date'))
+    self._menu_sort_options.append(self._menu_item_sort_by_modification_date)
+    self._menu_item_sort_by_modification_date.connect(
+      'activate', self._on_menu_item_sort_by_modification_date_activate)
+
+    if hasattr(os.stat_result, 'st_birthtime'):
+      self._menu_item_sort_by_creation_date = Gtk.MenuItem(label=_('Creation date'))
+      self._menu_sort_options.append(self._menu_item_sort_by_creation_date)
+      self._menu_item_sort_by_creation_date.connect(
+        'activate', self._on_menu_item_sort_by_creation_date_activate)
+
+    self._menu_item_sort_by_file_size = Gtk.MenuItem(label=_('File size'))
+    self._menu_sort_options.append(self._menu_item_sort_by_file_size)
+    self._menu_item_sort_by_file_size.connect(
+      'activate', self._on_menu_item_sort_by_file_size_activate)
+
+    self._menu_item_folders_first = Gtk.CheckMenuItem(label=_('Folders first'))
+    self._menu_item_folders_first.set_active(True)
+    self._menu_sort_options.append(self._menu_item_folders_first)
+
+    self._menu_item_sort_ascending = Gtk.CheckMenuItem(label=_('Ascending order'))
+    self._menu_item_sort_ascending.set_active(True)
+    self._menu_sort_options.append(self._menu_item_sort_ascending)
+
+    self._menu_item_sort_case_sensitive = Gtk.CheckMenuItem(label=_('Case-sensitive'))
+    self._menu_item_sort_case_sensitive.set_active(True)
+    self._menu_sort_options.append(self._menu_item_sort_case_sensitive)
 
   def _name_preview_get_drag_data(self):
     return pickle.dumps(self._name_preview.selected_items)
@@ -557,13 +608,13 @@ class Previews:
   def _on_button_remove_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_remove, button)
 
-  def _on_menu_item_remove_selected_clicked(self, _menu_item):
+  def _on_menu_item_remove_selected_activate(self, _menu_item):
     self._name_preview.remove_selected_items()
 
-  def _on_menu_item_remove_all_clicked(self, _menu_item):
+  def _on_menu_item_remove_all_activate(self, _menu_item):
     self._name_preview.remove_all_items()
 
-  def _on_menu_item_import_options_clicked(self, _menu_item):
+  def _on_menu_item_import_options_activate(self, _menu_item):
     if self._import_options_dialog is None:
       self._import_options_dialog = gui_main_utils_.ImportExportOptionsDialog(
         self._settings['main/import'],
@@ -578,6 +629,53 @@ class Previews:
 
   def _on_button_input_options_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_input_options, button)
+
+  def _on_menu_item_sort_by_original_name_activate(self, _menu_item):
+    case_sensitive = self._menu_item_sort_case_sensitive.get_active()
+    self._sort_items(lambda item: self._get_name_key(item, 'orig_name', case_sensitive))
+
+  def _on_menu_item_sort_by_new_name_activate(self, _menu_item):
+    case_sensitive = self._menu_item_sort_case_sensitive.get_active()
+    self._sort_items(lambda item: self._get_name_key(item, 'name', case_sensitive))
+
+  def _on_menu_item_sort_by_modification_date_activate(self, _menu_item):
+    self._sort_items(lambda item: self._get_file_specific_key(item, 'st_mtime'))
+
+  def _on_menu_item_sort_by_creation_date_activate(self, _menu_item):
+    self._sort_items(lambda item: self._get_file_specific_key(item, 'st_birthtime'))
+
+  def _on_menu_item_sort_by_file_size_activate(self, _menu_item):
+    self._sort_items(lambda item: self._get_file_specific_key(item, 'st_size'))
+
+  def _sort_items(self, key):
+    folders_first = self._menu_item_folders_first.get_active()
+
+    if folders_first:
+      processed_key = lambda item: self._get_folders_first_key(item, key)
+    else:
+      processed_key = key
+
+    self._name_preview.sort_items(
+      processed_key, ascending=self._menu_item_sort_ascending.get_active())
+
+  def _get_folders_first_key(self, item, key):
+    if item.type == itemtree.TYPE_FOLDER:
+      return self._SORT_ITEM_TYPE_FOLDER, key(item)
+    else:
+      return self._SORT_ITEM_TYPE_OTHER_ITEMS, key(item)
+
+  @staticmethod
+  def _get_name_key(item, attribute, case_sensitive):
+    item_name = getattr(item, attribute)
+
+    return item_name if case_sensitive else item_name.lower()
+
+  @staticmethod
+  def _get_file_specific_key(item, attribute):
+    try:
+      return getattr(os.stat(item.id), attribute)
+    except Exception:
+      return -1
 
   def _on_name_preview_key_press_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)

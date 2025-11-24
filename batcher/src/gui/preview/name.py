@@ -49,6 +49,7 @@ class NamePreview(preview_base_.Preview):
     'preview-collapsed-items-changed': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-added-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
     'preview-reordered-item': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
+    'preview-sorted-items': (GObject.SignalFlags.RUN_FIRST, None, ()),
     'preview-removed-items': (GObject.SignalFlags.RUN_FIRST, None, (GObject.TYPE_PYOBJECT,)),
   }
   
@@ -273,6 +274,11 @@ class NamePreview(preview_base_.Preview):
     self._row_select_interactive = True
 
     self.emit('preview-reordered-item', item)
+
+  def sort_items(self, key, ascending):
+    self._batcher.item_tree.sort(key=key, ascending=ascending)
+
+    self.emit('preview-sorted-items')
 
   def remove_selected_items(self):
     removed_items = self._batcher.item_tree.remove(

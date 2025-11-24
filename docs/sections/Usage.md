@@ -31,6 +31,8 @@ By default, the renamed images (as they would be named on export) are displayed.
 
 You can move around individual files or folders by dragging and dropping them anywhere within the input list, or by pressing Alt + Up/Down. This is useful if, for example, you intend rename the images with a numbered sequence.
 
+Files and folders can be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
+
 
 ## Exporting Layers
 
