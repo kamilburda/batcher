@@ -1,8 +1,9 @@
 """Preview widget displaying the names of items to be batch-processed."""
 
 from collections.abc import Iterable
-from typing import Set
+from typing import List, Optional, Set
 
+import bisect
 import collections
 import traceback
 
@@ -59,13 +60,15 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ICON_COLOR_TAG,
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
     _COLUMN_ITEM_NAME,
-    _COLUMN_ITEM_KEY) = (
+    _COLUMN_ITEM_KEY,
+  ) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
     [2, GdkPixbuf.Pixbuf],
     [3, GObject.TYPE_BOOLEAN],
     [4, GObject.TYPE_STRING],
-    [5, GObject.TYPE_PYOBJECT])
+    [5, GObject.TYPE_PYOBJECT],
+  )
 
   _ICON_XPAD = 2
   _COLOR_TAG_BORDER_WIDTH = 1
@@ -95,6 +98,9 @@ class NamePreview(preview_base_.Preview):
     # key: `Item.key`
     # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(utils.return_none_func)
+    # key: tuple of `Item.key` representing parents of an item
+    # value: dict of (`Item.key`, index) pairs having the same parents (the key)
+    self._cached_parent_and_item_keys = {}
 
     self._row_expand_collapse_interactive = True
     self._clearing_preview = False
@@ -136,15 +142,13 @@ class NamePreview(preview_base_.Preview):
     if update_locked:
       return
 
-    existing_items_parents_and_previous = self._get_items()
-
     error = self._process_items(full_update)
 
     if error:
       self.emit('preview-updated', error)
       return
 
-    self._sync_new_items_with_tree_view(existing_items_parents_and_previous)
+    self._sync_new_items_with_tree_view()
 
     self._set_expanded_items()
 
@@ -241,30 +245,12 @@ class NamePreview(preview_base_.Preview):
     self._row_select_interactive = False
 
     item = self._batcher.item_tree[item_key]
-    orig_item_parent = item.parent
 
     try:
       self._batcher.item_tree.reorder(item, reference_item, insertion_mode)
     except ValueError:
       # Ignore errors such as reordering folders to one of its children.
       pass
-    else:
-      reference_item_for_tree_model = reference_item
-      insertion_mode_for_tree_model = insertion_mode
-
-      if insertion_mode == 'after':
-        if reference_item.parent != item.parent:
-          reference_item_for_tree_model = None
-      elif insertion_mode == 'last_top_level':
-        reference_item_for_tree_model = None
-        insertion_mode_for_tree_model = 'before'
-
-      if orig_item_parent == item.parent:
-        self._move_item_within_parent(
-          item, reference_item_for_tree_model, insertion_mode_for_tree_model)
-      else:
-        self._move_item_outside_parent(
-          item, reference_item_for_tree_model, insertion_mode_for_tree_model, orig_item_parent)
 
     # A different row would get automatically selected otherwise, and we only
     # intend to restore the selection of the row(s) that were moved. The
@@ -466,109 +452,147 @@ class NamePreview(preview_base_.Preview):
     
     return error
 
-  def _get_items(self):
-    items = {}
-    previous_items = {}
-    parents = {}
+  def _sync_new_items_with_tree_view(self):
+    new_parent_and_item_keys = self._get_parent_and_item_keys()
 
-    previous_item_per_parent = collections.defaultdict(lambda: None)
-    visited_parents = set()
+    # Remove no longer existing folders or items moved to a different parent.
+    # We are iterating in reverse so that we remove the innermost child iters
+    # first. Iterating from the top would result in crashes when attempting
+    # to remove a child iter whose parent was already removed.
+    for original_parent_keys, original_item_keys in reversed(
+          self._cached_parent_and_item_keys.items()):
+      if original_parent_keys not in new_parent_and_item_keys:
+        for key in original_item_keys:
+          self._remove_item_if_exists(key)
 
-    if self._batcher.matching_items is not None:
-      item_tree_items = self._batcher.matching_items
-    else:
-      item_tree_items = self._batcher.item_tree
+    # Remove no longer existing items.
+    for new_parent_keys, new_item_keys in reversed(new_parent_and_item_keys.items()):
+      original_item_keys = self._cached_parent_and_item_keys.get(new_parent_keys, None)
+      if original_item_keys:
+        item_keys_to_remove = [key for key in original_item_keys if key not in new_item_keys]
+        for item_key in item_keys_to_remove:
+          self._remove_item_if_exists(item_key)
+          del original_item_keys[item_key]
 
-    for item in item_tree_items:
-      # We also explicitly insert parents as they would be omitted due to not
-      # matching conditions.
-      for parent_item in item.parents:
-        if parent_item not in visited_parents:
-          items[parent_item.key] = parent_item
-          previous_items[parent_item.key] = previous_item_per_parent[parent_item.parent]
-          parents[parent_item.key] = parent_item.parent
+    # Move existing items within the same parent, add new items or re-add
+    # existing items under a different parent.
+    # We need to iterate in the normal order here so that we insert parents
+    # first and then correctly insert children under the newly created parents.
+    for new_parent_keys, new_item_keys in new_parent_and_item_keys.items():
+      original_item_keys = self._cached_parent_and_item_keys.get(new_parent_keys, {})
+      original_item_keys_list = list(original_item_keys)
+      previous_item_key = None
 
-          previous_item_per_parent[parent_item.parent] = parent_item
-          visited_parents.add(parent_item)
+      # Update existing items and add new items.
+      for item_key in new_item_keys:
+        item = self._batcher.item_tree[item_key]
 
-      items[item.key] = item
-      previous_items[item.key] = previous_item_per_parent[item.parent]
-      parents[item.key] = item.parent
+        if item_key in original_item_keys:
+          iter_from_item = self._tree_iters[item_key]
 
-      previous_item_per_parent[item.parent] = item
-
-    return items, previous_items, parents
-
-  def _sync_new_items_with_tree_view(self, existing_items_parents_and_previous):
-    existing_items, previous_existing_items, existing_parents = existing_items_parents_and_previous
-    new_items, previous_new_items, new_parents = self._get_items()
-
-    parents_to_remove = {}
-
-    for new_item_key, new_item in new_items.items():
-      previous_new_item = previous_new_items[new_item_key]
-
-      if new_item_key in existing_items and new_item_key in self._tree_iters:
-        previous_existing_item = previous_existing_items[new_item_key]
-        existing_parent = existing_parents[new_item_key]
-        new_parent = new_parents[new_item_key]
-
-        parents_are_equal = (
-          (new_parent is None and existing_parent is None)
-          or (
-            new_parent is not None
-            and existing_parent is not None
-            and new_parent.key not in parents_to_remove
-            and new_parent.key == existing_parent.key))
-
-        if not parents_are_equal:
-          # We cannot use `Gtk.TreeStore.move_after()` here as that method only
-          # works within the same parent. Hence, we remove and insert the
-          # item under a new parent.
-          self._move_item_outside_parent_when_syncing(
-            new_item, new_item_key, previous_new_item, parents_to_remove)
+          self._update_item(iter_from_item, item)
         else:
-          previous_items_are_equal = (
-            (previous_new_item is None and previous_existing_item is None)
-            or (
-              previous_new_item is not None
-              and previous_existing_item is not None
-              and previous_new_item.key == previous_existing_item.key))
+          reference_iter = (
+            self._tree_iters[previous_item_key] if previous_item_key is not None else None)
 
-          if not previous_items_are_equal:
-            self._move_item_within_parent(new_item, previous_new_item, 'after')
-            self._update_item(new_item)
-          else:
-            self._update_item(new_item)
+          self._insert_item(item, reference_iter, 'after')
 
-        del existing_items[new_item_key]
+          original_item_keys_list.append(item_key)
+
+        previous_item_key = item_key
+
+      # Move items to the correct order. We are attempting to minimize the
+      # number of moves to reduce the number of API calls to the GUI.
+      for index, item_key in enumerate(new_item_keys):
+        new_item_keys[item_key] = index
+
+      new_item_indexes_and_keys = {index: item_key for item_key, index in new_item_keys.items()}
+      original_item_key_indexes = [new_item_keys[item_key] for item_key in original_item_keys]
+
+      longest_increasing_subsequence = self._find_longest_increasing_subsequence(
+        original_item_key_indexes)
+      key_indexes_to_move = set(original_item_key_indexes) - set(longest_increasing_subsequence)
+
+      for index in key_indexes_to_move:
+        item_key = original_item_keys_list[index]
+        iter_from_item = self._tree_iters[item_key]
+
+        new_index = new_item_keys[item_key]
+        if new_index == 0:
+          reference_iter = None
+        else:
+          reference_iter = self._tree_iters[new_item_indexes_and_keys[new_index - 1]]
+
+        self._move_item_within_parent(iter_from_item, reference_iter, 'after')
+
+    self._cached_parent_and_item_keys = new_parent_and_item_keys
+
+  @staticmethod
+  def _find_longest_increasing_subsequence(values):
+    if not values:
+      return []
+
+    tail_values = []
+    tail_indexes = []
+    previous_indexes: List[Optional[int]] = [None] * len(values)
+
+    for index, value in enumerate(values):
+      index_of_leftmost_lowest_value = bisect.bisect_left(tail_values, value)
+
+      if index_of_leftmost_lowest_value > 0:
+        previous_indexes[index] = tail_indexes[index_of_leftmost_lowest_value - 1]
       else:
-        self._insert_item(new_item, previous_new_item, 'after')
+        previous_indexes[index] = None
 
-        if new_item_key in existing_items:
-          del existing_items[new_item_key]
+      if index_of_leftmost_lowest_value == len(tail_values):
+        tail_values.append(value)
+        tail_indexes.append(index)
+      else:
+        tail_values[index_of_leftmost_lowest_value] = value
+        tail_indexes[index_of_leftmost_lowest_value] = index
 
-    # We need to delete children first to avoid crashes (accessing child
-    # `Gtk.TreeIter`s that no longer exist), hence the reversed iteration.
-    for no_longer_existing_item_key in reversed(existing_items):
-      self._remove_item_by_key(no_longer_existing_item_key)
+    longest_increasing_subsequence = []
+    current_index = tail_indexes[len(tail_indexes) - 1]
 
-    for tree_iter in reversed(parents_to_remove.values()):
-      self._remove_item_by_iter(tree_iter)
-  
-  def _insert_item(self, item, reference_item, insertion_mode):
+    while current_index is not None:
+      longest_increasing_subsequence.insert(0, current_index)
+      current_index = previous_indexes[current_index]
+
+    return longest_increasing_subsequence
+
+  def _get_parent_and_item_keys(self):
+    if self._batcher.matching_items_and_parents is not None:
+      # We create the data structure below using `Batcher.matching_items`
+      # rather than `Batcher.matching_items_and_parents` as the latter may
+      # contain empty folders, which we do not want to display.
+      new_items = self._batcher.matching_items
+    else:
+      new_items = self._batcher.item_tree
+
+    # We use dictionaries instead of lists so that checking for the existence
+    # of the original keys in the new keys is faster.
+    visited_parents = set()
+    parent_and_item_keys = collections.defaultdict(dict)
+    for new_item in new_items:
+      for parent in new_item.parents:
+        if parent not in visited_parents:
+          parent_keys = tuple(parent.key for parent in parent.parents)
+          parent_and_item_keys[parent_keys][parent.key] = None
+          visited_parents.add(parent)
+
+      parent_keys = tuple(parent.key for parent in new_item.parents)
+      parent_and_item_keys[parent_keys][new_item.key] = None
+
+    return parent_and_item_keys
+
+  def _insert_item(self, item, reference_iter, insertion_mode):
     if item.key in self._tree_iters:
-      return None
+      raise AssertionError(f'attempting to add the same item twice to the input list: {item.key}')
 
     if item.parent:
       parent_tree_iter = self._tree_iters[item.parent.key]
     else:
       parent_tree_iter = None
-
-    if reference_item:
-      reference_tree_iter = self._tree_iters[reference_item.key]
-    else:
-      reference_tree_iter = None
 
     item_icon = self._get_icon_from_item(item)
     color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
@@ -582,13 +606,16 @@ class NamePreview(preview_base_.Preview):
 
     tree_iter = insert_func(
       parent_tree_iter,
-      reference_tree_iter,
-      [item_icon,
-       item_icon is not None,
-       color_tag_icon,
-       color_tag_icon is not None,
-       self._get_item_name(item),
-       item.key])
+      reference_iter,
+      [
+        item_icon,
+        item_icon is not None,
+        color_tag_icon,
+        color_tag_icon is not None,
+        self._get_item_name(item),
+        item.key,
+      ],
+    )
 
     self._expand_folder_item(tree_iter, item)
 
@@ -660,100 +687,25 @@ class NamePreview(preview_base_.Preview):
     else:
       return item.orig_name
 
-  def _update_item(self, item):
+  def _update_item(self, tree_iter, item):
     self._tree_model.set_value(
-      self._tree_iters[item.key],
+      tree_iter,
       self._COLUMN_ITEM_NAME[0],
       self._get_item_name(item))
 
-  def _move_item_within_parent(self, item, reference_item, insertion_mode):
-    item_tree_iter = self._tree_iters[item.key]
-    if reference_item is not None:
-      reference_item_tree_iter = self._tree_iters[reference_item.key]
-    else:
-      reference_item_tree_iter = None
-
+  def _move_item_within_parent(self, tree_iter, reference_iter, insertion_mode):
     if insertion_mode == 'before':
-      self._tree_model.move_before(item_tree_iter, reference_item_tree_iter)
+      self._tree_model.move_before(tree_iter, reference_iter)
     elif insertion_mode == 'after':
-      self._tree_model.move_after(item_tree_iter, reference_item_tree_iter)
+      self._tree_model.move_after(tree_iter, reference_iter)
     else:
       raise ValueError(f'insertion mode {insertion_mode} is not valid')
 
-  def _move_item_outside_parent(self, item, reference_item, insertion_mode, orig_item_parent):
-    tree_iters_to_remove = []
+  def _remove_item_if_exists(self, item_key):
+    iter_to_remove = self._tree_iters.pop(item_key, None)
 
-    if item.key in self._tree_iters:
-      tree_iters_to_remove.append(self._tree_iters.pop(item.key))
-
-    self._insert_item(item, reference_item, insertion_mode)
-
-    item_children = item.get_all_children()
-
-    if item_children:
-      for child in item_children:
-        if child.key in self._tree_iters:
-          tree_iters_to_remove.append(self._tree_iters.pop(child.key))
-
-          # We only insert children that are displayed. Empty folders and
-          # filtered items should not be displayed (the latter will be added
-          # automatically via `update()` if no longer filtered).
-          self._insert_item(child, None, 'before')
-
-    # We need to remove the innermost children first to avoid crashes since
-    # removing a parent tree iter would also result in removing all its
-    # children.
-    for tree_iter in reversed(tree_iters_to_remove):
-      self._tree_model.remove(tree_iter)
-
-    if orig_item_parent is not None:
-      self._remove_empty_folders_from_tree_model(orig_item_parent)
-
-  def _remove_empty_folders_from_tree_model(self, item):
-    if item.type != itemtree.TYPE_FOLDER:
-      return
-
-    current_item = item
-    while True:
-      if current_item is None:
-        break
-
-      current_iter = self._tree_iters.get(current_item.key, None)
-
-      if current_iter is not None and not self._tree_model.iter_has_child(current_iter):
-        del self._tree_iters[current_item.key]
-        self._tree_model.remove(current_iter)
-      else:
-        break
-
-      current_item = current_item.parent
-
-  def _move_item_outside_parent_when_syncing(
-        self,
-        new_item,
-        new_item_key,
-        previous_new_item,
-        parents_to_remove,
-  ):
-    if new_item.type != itemtree.TYPE_FOLDER:
-      self._remove_item_by_key(new_item_key)
-    else:
-      # We cannot remove a parent from the `Gtk.TreeStore` at this
-      # point as all child `Gtk.TreeIter`s would be removed as well. We
-      # remove all obsoleted parents later.
-      parent_iter = self._tree_iters.pop(new_item_key, None)
-      if parent_iter is not None:
-        parents_to_remove[new_item_key] = parent_iter
-
-    self._insert_item(new_item, previous_new_item, 'after')
-
-  def _remove_item_by_key(self, item_key):
-    tree_iter = self._tree_iters.pop(item_key, None)
-    if tree_iter is not None:
-      self._tree_model.remove(tree_iter)
-
-  def _remove_item_by_iter(self, tree_iter):
-    self._tree_model.remove(tree_iter)
+    if iter_to_remove is not None:
+      self._tree_model.remove(iter_to_remove)
 
   def _set_expanded_items(self, tree_path=None):
     """Sets the expanded state of items in the tree view.
