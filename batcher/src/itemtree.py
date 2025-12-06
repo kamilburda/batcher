@@ -865,17 +865,17 @@ class ItemTree(metaclass=abc.ABCMeta):
     parents_and_items = collections.defaultdict(list)
 
     for item in self._items.values():
-      parents_and_items[tuple(item.parents)].append(item)
+      parents_and_items[item.parent].append(item)
 
     for items in parents_and_items.values():
       items.sort(key=key, reverse=not ascending)
 
-    top_level_items = parents_and_items[()]
+    top_level_items = parents_and_items[None]
 
     assert len(top_level_items) > 0
 
-    self._first_item = parents_and_items[()][0]
-    self._last_item = parents_and_items[()][-1]
+    self._first_item = parents_and_items[None][0]
+    self._last_item = parents_and_items[None][-1]
 
     # noinspection PyProtectedMember
     self._first_item._prev_item = None
@@ -885,7 +885,7 @@ class ItemTree(metaclass=abc.ABCMeta):
       current_item = visited_items.pop(0)
 
       if current_item.type == TYPE_FOLDER:
-        for item in reversed(parents_and_items[tuple(current_item.parents + [current_item])]):
+        for item in reversed(parents_and_items[current_item]):
           visited_items.insert(0, item)
 
       if visited_items:
