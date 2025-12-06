@@ -503,21 +503,20 @@ class NamePreview(preview_base_.Preview):
 
       # Move items to the correct order. We are attempting to minimize the
       # number of moves to reduce the number of API calls to the GUI.
-      for index, item_key in enumerate(new_item_keys):
-        new_item_keys[item_key] = index
-
-      new_item_indexes_and_keys = {index: item_key for item_key, index in new_item_keys.items()}
-      original_item_key_indexes = [new_item_keys[item_key] for item_key in original_item_keys]
+      new_item_keys_with_indexes = {item_key: index for index, item_key in enumerate(new_item_keys)}
+      new_item_indexes_and_keys = {index: item_key for index, item_key in enumerate(new_item_keys)}
+      original_item_key_indexes = [
+        new_item_keys_with_indexes[item_key] for item_key in original_item_keys_list]
 
       longest_increasing_subsequence = self._find_longest_increasing_subsequence(
         original_item_key_indexes)
       key_indexes_to_move = set(original_item_key_indexes) - set(longest_increasing_subsequence)
 
       for index in key_indexes_to_move:
-        item_key = original_item_keys_list[index]
+        item_key = new_item_indexes_and_keys[index]
         iter_from_item = self._tree_iters[item_key]
 
-        new_index = new_item_keys[item_key]
+        new_index = new_item_keys_with_indexes[item_key]
         if new_index == 0:
           reference_iter = None
         else:
@@ -552,10 +551,9 @@ class NamePreview(preview_base_.Preview):
         tail_indexes[index_of_leftmost_lowest_value] = index
 
     longest_increasing_subsequence = []
-    current_index = tail_indexes[len(tail_indexes) - 1]
-
+    current_index = tail_indexes[len(tail_values) - 1]
     while current_index is not None:
-      longest_increasing_subsequence.insert(0, current_index)
+      longest_increasing_subsequence.insert(0, values[current_index])
       current_index = previous_indexes[current_index]
 
     return longest_increasing_subsequence
