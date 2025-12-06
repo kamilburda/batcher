@@ -503,10 +503,10 @@ class NamePreview(preview_base_.Preview):
 
       # Move items to the correct order. We are attempting to minimize the
       # number of moves to reduce the number of API calls to the GUI.
-      new_item_keys_with_indexes = {item_key: index for index, item_key in enumerate(new_item_keys)}
+      new_item_keys_and_indexes = {item_key: index for index, item_key in enumerate(new_item_keys)}
       new_item_indexes_and_keys = {index: item_key for index, item_key in enumerate(new_item_keys)}
       original_item_key_indexes = [
-        new_item_keys_with_indexes[item_key] for item_key in original_item_keys_list]
+        new_item_keys_and_indexes[item_key] for item_key in original_item_keys_list]
 
       longest_increasing_subsequence = self._find_longest_increasing_subsequence(
         original_item_key_indexes)
@@ -516,11 +516,10 @@ class NamePreview(preview_base_.Preview):
         item_key = new_item_indexes_and_keys[index]
         iter_from_item = self._tree_iters[item_key]
 
-        new_index = new_item_keys_with_indexes[item_key]
-        if new_index == 0:
+        if index == 0:
           reference_iter = None
         else:
-          reference_iter = self._tree_iters[new_item_indexes_and_keys[new_index - 1]]
+          reference_iter = self._tree_iters[new_item_indexes_and_keys[index - 1]]
 
         self._move_item_within_parent(iter_from_item, reference_iter, 'after')
 
