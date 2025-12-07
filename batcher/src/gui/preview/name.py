@@ -99,7 +99,7 @@ class NamePreview(preview_base_.Preview):
     # value: `Gtk.TreeIter` instance
     self._tree_iters = collections.defaultdict(utils.return_none_func)
     # key: tuple of `Item.key` representing parents of an item
-    # value: dict of (`Item.key`, index) pairs having the same parents (the key)
+    # value: dict of (`Item.key`, None) pairs having the same parents (the key)
     self._cached_parent_and_item_keys = {}
 
     self._row_expand_collapse_interactive = True
