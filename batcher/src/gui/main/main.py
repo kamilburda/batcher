@@ -285,7 +285,7 @@ class BatchProcessingGui:
   def _on_button_run_clicked(self, _button):
     self._set_up_gui_before_run()
 
-    should_quit = self._batcher_manager.run_batcher(
+    success = self._batcher_manager.run_batcher(
       self._mode,
       self._item_type,
       self._command_lists,
@@ -297,7 +297,7 @@ class BatchProcessingGui:
 
     self._restore_gui_after_batch_run()
 
-    if should_quit and self._settings['gui/auto_close'].value:
+    if success and self._settings['gui/auto_close'].value:
       Gtk.main_quit()
 
   def _set_up_gui_before_run(self):
