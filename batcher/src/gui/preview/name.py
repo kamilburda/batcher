@@ -242,8 +242,6 @@ class NamePreview(preview_base_.Preview):
     self.emit('preview-added-items', added_items)
 
   def reorder_item(self, item_key, reference_item, insertion_mode):
-    self._row_select_interactive = False
-
     item = self._batcher.item_tree[item_key]
 
     try:
@@ -251,13 +249,6 @@ class NamePreview(preview_base_.Preview):
     except ValueError:
       # Ignore errors such as reordering folders to one of its children.
       pass
-
-    # A different row would get automatically selected otherwise, and we only
-    # intend to restore the selection of the row(s) that were moved. The
-    # selection is restored upon the next call to `update()`.
-    self._tree_view.get_selection().unselect_all()
-
-    self._row_select_interactive = True
 
     self.emit('preview-reordered-item', item)
 
@@ -453,6 +444,8 @@ class NamePreview(preview_base_.Preview):
     return error
 
   def _sync_new_items_with_tree_view(self):
+    self._row_select_interactive = False
+
     new_parent_and_item_keys = self._get_parent_and_item_keys()
 
     # Remove no longer existing folders or items moved to a different parent.
@@ -519,6 +512,8 @@ class NamePreview(preview_base_.Preview):
         self._move_item_within_parent(iter_from_item, reference_iter, 'after')
 
     self._cached_parent_and_item_keys = new_parent_and_item_keys
+
+    self._row_select_interactive = True
 
   @staticmethod
   def _find_longest_increasing_subsequence(values):
@@ -732,6 +727,8 @@ class NamePreview(preview_base_.Preview):
   
   def _set_selection(self, scroll_to_first_selected_item=True):
     self._row_select_interactive = False
+
+    self._tree_view.get_selection().unselect_all()
 
     self._selected_items = [
       item_key for item_key in self._selected_items if item_key in self._tree_iters]
