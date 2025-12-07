@@ -45,30 +45,30 @@ class BatcherManager:
     self._batcher, overwrite_chooser, progress_updater = self._set_up_batcher(
       mode, item_type, parent_widget, progress_bar)
 
-    should_quit = True
+    success = True
 
     previews.lock(self._PREVIEWS_BATCHER_RUN_KEY)
 
     try:
       self._batcher.run(**utils_setting_.get_settings_for_batcher(self._settings['main']))
     except exceptions.BatcherCancelError:
-      should_quit = False
+      success = False
     except exceptions.CommandError as e:
-      should_quit = False
+      success = False
       messages_.display_failure_message(
         messages_.get_failing_command_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=parent_widget)
     except exceptions.BatcherError as e:
-      should_quit = False
+      success = False
       messages_.display_processing_failure_message(e, parent=parent_widget)
     except Exception as e:
-      should_quit = False
+      success = False
       messages_.display_invalid_image_failure_message(e, parent=parent_widget)
     else:
       if mode == 'export' and not self._batcher.exported_items:
-        should_quit = False
+        success = False
         messages_.display_message(
           _get_no_items_processed_message(item_type), Gtk.MessageType.INFO, parent=parent_widget)
     finally:
@@ -91,7 +91,7 @@ class BatcherManager:
 
     progress_updater.reset()
 
-    return should_quit
+    return success
 
   def stop_batcher(self):
     _stop_batcher(self._batcher)
