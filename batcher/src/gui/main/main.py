@@ -285,7 +285,7 @@ class BatchProcessingGui:
   def _on_button_run_clicked(self, _button):
     self._set_up_gui_before_run()
 
-    success = self._batcher_manager.run_batcher(
+    success, num_processed_items, num_total_items = self._batcher_manager.run_batcher(
       self._mode,
       self._item_type,
       self._command_lists,
@@ -299,6 +299,8 @@ class BatchProcessingGui:
 
     if success and self._settings['gui/auto_close'].value:
       Gtk.main_quit()
+    else:
+      self._display_message_after_processing(num_processed_items, num_total_items)
 
   def _set_up_gui_before_run(self):
     self._display_inline_message(None)
@@ -331,6 +333,22 @@ class BatchProcessingGui:
 
     self._dialog.set_focus(self._button_stop)
 
+  def _display_message_after_processing(self, num_processed_items, num_total_items):
+    if self._item_type == 'layer':
+      if num_processed_items == num_total_items:
+        text = _('Done. {} layers processed.').format(num_processed_items)
+      else:
+        text = _('Done. {} out of {} layers processed.').format(
+          num_processed_items, num_total_items)
+    else:
+      if num_processed_items == num_total_items:
+        text = _('Done. {} images processed.').format(num_processed_items)
+      else:
+        text = _('Done. {} out of {} images processed.').format(
+          num_processed_items, num_total_items)
+
+    self._display_inline_message(text)
+
   def _on_dialog_key_press_event(self, dialog, event):
     if not dialog.get_mapped():
       return False
@@ -362,7 +380,7 @@ class BatchProcessingGui:
     else:
       self._button_close.set_label(_('_Close'))
 
-  def _display_inline_message(self, text, message_type=Gtk.MessageType.ERROR):
+  def _display_inline_message(self, text, message_type=Gtk.MessageType.INFO):
     self._label_message.set_text(text, message_type, self._DELAY_CLEAR_LABEL_MESSAGE_MILLISECONDS)
 
   @staticmethod

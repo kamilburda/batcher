@@ -80,6 +80,9 @@ class BatcherManager:
 
       command_lists.set_warnings_and_deactivate_failed_commands(self._batcher)
 
+      num_processed_items = self._batcher.num_processed_items
+      num_total_items = self._batcher.num_total_items
+
       self._batcher = None
 
     if (mode == 'export'
@@ -91,7 +94,7 @@ class BatcherManager:
 
     progress_updater.reset()
 
-    return success
+    return success, num_processed_items, num_total_items
 
   def stop_batcher(self):
     _stop_batcher(self._batcher)

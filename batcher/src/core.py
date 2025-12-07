@@ -100,6 +100,8 @@ class Batcher(metaclass=abc.ABCMeta):
     self._matching_items = None
     self._matching_items_and_parents = None
     self._exported_items = []
+    self._num_processed_items = 0
+    self._num_total_items = 0
 
     self._image_copies = []
     self._orig_images_and_selected_layers = {}
@@ -384,6 +386,20 @@ class Batcher(metaclass=abc.ABCMeta):
     return list(self._exported_items)
 
   @property
+  def num_processed_items(self) -> int:
+    """The number of successfully processed items after the last call to
+    `run()`.
+    """
+    return self._num_processed_items
+
+  @property
+  def num_total_items(self) -> int:
+    """The total number of items to be processed after the last call to
+    `run()`.
+    """
+    return self._num_total_items
+
+  @property
   def image_copies(self) -> List[Gimp.Image]:
     """`Gimp.Image` instances as copies of original images.
 
@@ -587,6 +603,8 @@ class Batcher(metaclass=abc.ABCMeta):
     self._matching_items = None
     self._matching_items_and_parents = None
     self._exported_items = []
+    self._num_processed_items = 0
+    self._num_total_items = 0
 
     self._image_copies = []
     self._orig_images_and_selected_layers = {}
@@ -889,6 +907,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._matching_items, self._matching_items_and_parents = self._get_items_matching_conditions()
 
     self._progress_updater.num_total_tasks = len(self._matching_items)
+    self._num_total_items = len(self._matching_items)
 
     self._invoker.invoke(
       ['before_process_items'],
@@ -902,12 +921,6 @@ class Batcher(metaclass=abc.ABCMeta):
         additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     for item in self._matching_items:
-      if self._should_stop:
-        raise exceptions.BatcherCancelError('stopped by user')
-
-      if self._edit_mode:
-        self._progress_updater.set_text(_('Processing "{}"').format(item.orig_name))
-
       self._process_item(item)
 
     if self._process_contents:
@@ -954,6 +967,12 @@ class Batcher(metaclass=abc.ABCMeta):
     return matching_items, matching_items_and_parents
 
   def _process_item(self, item):
+    if self._should_stop:
+      raise exceptions.BatcherCancelError('stopped by user')
+
+    if self._edit_mode:
+      self._progress_updater.set_text(_('Processing "{}"').format(item.orig_name))
+
     self._current_item = item
     self._current_image = self._get_initial_current_image()
     self._current_layer = self._get_initial_current_layer()
@@ -965,6 +984,8 @@ class Batcher(metaclass=abc.ABCMeta):
       self._process_item_with_commands()
 
     self._progress_updater.update_tasks()
+
+    self._num_processed_items += 1
 
   def _process_item_with_name_only_commands(self):
     self._invoker.invoke(

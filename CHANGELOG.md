@@ -28,6 +28,7 @@ User interface changes:
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
 * Improved visual cues when reordering actions, conditions or array argument elements via drag-and-drop.
 * Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
+* A simple summary message "x images processed" is now displayed after the processing.
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
 

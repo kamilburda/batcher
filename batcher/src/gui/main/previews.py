@@ -697,9 +697,7 @@ class Previews:
         -1,
       )
 
-      self._display_message_func(
-        _('Copied the selected images and folders as text.'),
-        Gtk.MessageType.INFO)
+      self._display_message_func(_('Copied the selected images and folders as text.'))
     elif event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
       item_tree = self._name_preview.batcher.item_tree
       selected_item_keys = [
@@ -979,8 +977,7 @@ class Previews:
       self._settings['gui/image_preview_automatic_update'].set_value(False)
 
       self._display_message_func(
-        _('The preview no longer updates automatically as rendering takes too long.'),
-        Gtk.MessageType.INFO)
+        _('The preview no longer updates automatically as rendering takes too long.'))
 
   def _on_name_preview_updated(self, _preview, _error, command_lists):
     if self._manage_items:

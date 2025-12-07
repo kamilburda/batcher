@@ -25,7 +25,7 @@ class MessageLabel(Gtk.Box):
   def set_text(
         self,
         text: str,
-        message_type: Gtk.MessageType = Gtk.MessageType.ERROR,
+        message_type: Gtk.MessageType = Gtk.MessageType.INFO,
         clear_delay: Optional[int] = None,
   ):
     """Sets the text of the label. The text is displayed in bold style.

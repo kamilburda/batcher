@@ -139,7 +139,7 @@ class SettingsManager:
       self.save_settings()
 
       if load_successful:
-        self._display_message_func(_('Settings successfully loaded.'), Gtk.MessageType.INFO)
+        self._display_message_func(_('Settings successfully loaded.'))
 
   def _on_save_settings_to_file_activate(self, _menu_item):
     filepath, _file_format, _load_size_settings = self._get_setting_file_and_options(action='save')
@@ -150,8 +150,7 @@ class SettingsManager:
       save_successful = self.save_settings(filepath)
       if save_successful:
         self._display_message_func(
-          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)),
-          Gtk.MessageType.INFO)
+          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)))
 
   def _on_reset_settings_activate(self, _menu_item):
     response_id = self._display_reset_prompt()
@@ -166,7 +165,7 @@ class SettingsManager:
 
       self.save_settings()
 
-      self._display_message_func(_('Settings reset.'), Gtk.MessageType.INFO)
+      self._display_message_func(_('Settings reset.'))
 
   def _display_reset_prompt(self):
     dialog = Gtk.MessageDialog(
@@ -204,7 +203,7 @@ class SettingsManager:
 
     save_successful = self.save_settings()
     if save_successful:
-      self._display_message_func(_('Settings successfully saved.'), Gtk.MessageType.INFO)
+      self._display_message_func(_('Settings successfully saved.'))
 
   def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
     source = setting_.sources.JsonFileSource(CONFIG.PROCEDURE_GROUP, filepath)
