@@ -416,7 +416,7 @@ def _export_item(
       file_extension,
     )
 
-  batcher.progress_updater.update_text(_('Saving "{}"').format(output_filepath))
+  batcher.progress_updater.set_text(_('Saving "{}"').format(output_filepath))
   
   if chosen_overwrite_mode == overwrite.OverwriteModes.CANCEL:
     raise exceptions.BatcherCancelError('canceled')

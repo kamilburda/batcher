@@ -45,8 +45,8 @@ class ProgressUpdater:
     
     self._fill_progress_bar()
   
-  def update_text(self, text: Optional[str]):
-    """Updates text in the progress bar.
+  def set_text(self, text: Optional[str]):
+    """Sets text in the progress bar.
 
     Use ``None`` or an empty string to remove the text.
     """

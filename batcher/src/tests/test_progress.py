@@ -34,10 +34,10 @@ class TestProgressUpdater(unittest.TestCase):
     self.assertEqual(
       self.progress_updater.num_finished_tasks, self.num_total_tasks // 2 + 2)
   
-  def test_update_text(self):
-    self.progress_updater.update_text('Hi there')
+  def test_set_text(self):
+    self.progress_updater.set_text('Hi there')
     self.assertEqual(self.progress_updater.progress_bar.text, 'Hi there')
-    self.progress_updater.update_text(None)
+    self.progress_updater.set_text(None)
     self.assertEqual(self.progress_updater.progress_bar.text, '')
   
   def test_update_with_num_finished_tasks_greater_than_num_tasks(self):
@@ -50,7 +50,7 @@ class TestProgressUpdater(unittest.TestCase):
       self.progress_updater.update_tasks(1)
   
   def test_reset(self):
-    self.progress_updater.update_text('Hi there')
+    self.progress_updater.set_text('Hi there')
     self.progress_updater.update_tasks(2)
     self.progress_updater.reset()
     
