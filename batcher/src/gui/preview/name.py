@@ -510,10 +510,12 @@ class NamePreview(preview_base_.Preview):
 
       longest_increasing_subsequence = self._find_longest_increasing_subsequence(
         original_item_key_indexes)
-      key_indexes_to_move = set(original_item_key_indexes) - set(longest_increasing_subsequence)
+      longest_increasing_subsequence_set = set(longest_increasing_subsequence)
 
-      for index in key_indexes_to_move:
-        item_key = new_item_indexes_and_keys[index]
+      for index, item_key in new_item_indexes_and_keys.items():
+        if index in longest_increasing_subsequence_set:
+          continue
+
         iter_from_item = self._tree_iters[item_key]
 
         if index == 0:
