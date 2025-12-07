@@ -1,6 +1,7 @@
 ## Upcoming
 
 General changes:
+* Added Brazilian Portuguese translation (thanks to @romrocha333).
 * Added Korean translation (thanks to @Maguk-Bong).
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
