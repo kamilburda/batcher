@@ -481,7 +481,6 @@ class NamePreview(preview_base_.Preview):
     for new_parent_keys, new_item_keys in new_parent_and_item_keys.items():
       original_item_keys = self._cached_parent_and_item_keys.get(new_parent_keys, {})
       original_item_keys_list = list(original_item_keys)
-      previous_item_key = None
 
       # Update existing items and add new items.
       for item_key in new_item_keys:
@@ -492,14 +491,8 @@ class NamePreview(preview_base_.Preview):
 
           self._update_item(iter_from_item, item)
         else:
-          reference_iter = (
-            self._tree_iters[previous_item_key] if previous_item_key is not None else None)
-
-          self._insert_item(item, reference_iter, 'after')
-
+          self._insert_item(item, None, 'before')
           original_item_keys_list.append(item_key)
-
-        previous_item_key = item_key
 
       # Move items to the correct order. We are attempting to minimize the
       # number of moves to reduce the number of API calls to the GUI.
