@@ -338,13 +338,13 @@ class BatchProcessingGui:
       if num_processed_items == num_total_items:
         text = _('Done. {} layers processed.').format(num_processed_items)
       else:
-        text = _('Done. {} out of {} layers processed.').format(
+        text = _('Done. {} out of {} layers successfully processed.').format(
           num_processed_items, num_total_items)
     else:
       if num_processed_items == num_total_items:
         text = _('Done. {} images processed.').format(num_processed_items)
       else:
-        text = _('Done. {} out of {} images processed.').format(
+        text = _('Done. {} out of {} images successfully processed.').format(
           num_processed_items, num_total_items)
 
     self._display_inline_message(text)
