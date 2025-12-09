@@ -699,8 +699,8 @@ class Batcher(metaclass=abc.ABCMeta):
         tags: Optional[Iterable[str]] = None,
         command_groups: Union[str, List[str], None] = None,
   ):
-    """Adds a command and wraps/processes the command's function according to the
-    command's settings.
+    """Adds a command and wraps/processes the command's function according to
+    the command's settings.
 
     For PDB procedures, the function name is converted to a proper function
     object. For conditions, the function is wrapped to act as a proper filter
