@@ -79,6 +79,7 @@ class NamePreview(preview_base_.Preview):
         self,
         batcher,
         settings,
+        item_type,
         collapsed_items=None,
         selected_items=None,
         initial_cursor_item=None,
@@ -88,6 +89,7 @@ class NamePreview(preview_base_.Preview):
     
     self._batcher = batcher
     self._settings = settings
+    self._item_type = item_type
     self._collapsed_items = collapsed_items if collapsed_items is not None else set()
     self._selected_items = selected_items if selected_items is not None else []
     self._initial_cursor_item = initial_cursor_item
@@ -433,8 +435,13 @@ class NamePreview(preview_base_.Preview):
       
       error = e
     except Exception as e:
+      if self._item_type == 'layer':
+        message = _('There was a problem with updating the list of input layers:')
+      else:
+        message = _('There was a problem with updating the list of input images:')
+
       messages_.display_failure_message(
-        _('There was a problem with updating the name preview:'),
+        message,
         failure_message=str(e),
         details=traceback.format_exc(),
         parent=gui_utils_.get_toplevel_window(self))

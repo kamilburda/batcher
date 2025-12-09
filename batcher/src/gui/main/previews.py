@@ -92,6 +92,7 @@ class Previews:
     self._name_preview = preview_name_.NamePreview(
       self._batcher_for_name_preview,
       self._settings,
+      self._item_type,
       set(self._settings['gui/name_preview_items_collapsed_state'].active_items),
       list(self._settings['gui/selected_items'].active_items),
       initial_cursor_item=(
