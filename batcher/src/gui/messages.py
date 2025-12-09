@@ -38,8 +38,8 @@ def display_alert_message(
       display_details_initially: bool = True,
       report_uri_list: Optional[Iterable[Tuple[str, str]]] = None,
       report_description: Optional[str] = None,
-      button_texts_and_responses=((_('_Close'), Gtk.ResponseType.CLOSE),),
-      response_id_of_button_to_focus=None,
+      button_texts_and_responses: Optional[Iterable[Tuple[str, Gtk.ResponseType]]] = None,
+      response_id_of_button_to_focus: Optional[Gtk.ResponseType] = None,
 ) -> int:
   """Displays a message to alert the user about an error or an exception that
   occurred in the application.
@@ -94,6 +94,9 @@ def display_alert_message(
     report_description = _(
       'You can help fix this error by sending a report with the text'
       ' in the details above to one of the following sites')
+
+  if button_texts_and_responses is None:
+    button_texts_and_responses = [(_('_Close'), Gtk.ResponseType.CLOSE)]
 
   dialog = GimpUi.Dialog(
     parent=parent,
@@ -544,13 +547,15 @@ def display_failure_message(
       parent: Optional[Gtk.Window] = None,
       report_description: Optional[str] = None,
       display_details_initially: bool = False,
-):
+      button_texts_and_responses: Optional[Iterable[Tuple[str, Gtk.ResponseType]]] = None,
+      response_id_of_button_to_focus: Optional[Gtk.ResponseType] = None,
+) -> int:
   if report_description is None:
     report_description = _(
       'If you believe this is an error in the plug-in, you can help fix it'
       ' by sending a report with the text in the details to one of the sites below')
   
-  display_alert_message(
+  response_id = display_alert_message(
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,
@@ -558,7 +563,12 @@ def display_failure_message(
     details=details,
     display_details_initially=display_details_initially,
     report_uri_list=CONFIG.BUG_REPORT_URL_LIST,
-    report_description=report_description)
+    report_description=report_description,
+    button_texts_and_responses=button_texts_and_responses,
+    response_id_of_button_to_focus=response_id_of_button_to_focus,
+  )
+
+  return response_id
 
 
 def display_processing_failure_message(

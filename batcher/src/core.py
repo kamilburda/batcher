@@ -6,7 +6,7 @@ from collections.abc import Iterable
 import contextlib
 import inspect
 import traceback
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -65,6 +65,7 @@ class Batcher(metaclass=abc.ABCMeta):
         export_context_manager: Optional[contextlib.AbstractContextManager] = None,
         export_context_manager_args: Optional[Union[List, Tuple]] = None,
         export_context_manager_kwargs: Optional[Dict] = None,
+        prompt_to_continue_on_error_func: Optional[Callable] = None,
         keep_image_copies: bool = False,
   ):
     self._item_tree = item_tree
@@ -89,6 +90,7 @@ class Batcher(metaclass=abc.ABCMeta):
     self._export_context_manager = export_context_manager
     self._export_context_manager_args = export_context_manager_args
     self._export_context_manager_kwargs = export_context_manager_kwargs
+    self._prompt_to_continue_on_error_func = prompt_to_continue_on_error_func
     self._keep_image_copies = keep_image_copies
 
     self._current_item = None
@@ -400,6 +402,22 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._num_total_items
 
   @property
+  def prompt_to_continue_on_error_func(self):
+    """Function that prompts the user whether to continue processing on error.
+
+    The function requires one positional parameter - an
+    `exceptions.CommandError` instance.
+
+    If the function's return value is ``True``, processing will continue until
+    the end even if subsequent errors occur. If ``False``, the processing will
+    stop immediately on error.
+
+    If this property is ``None``, it will be replaced with a function always
+    returning ``False``. This is useful for non-interactive processing.
+    """
+    return self._prompt_to_continue_on_error_func
+
+  @property
   def image_copies(self) -> List[Gimp.Image]:
     """`Gimp.Image` instances as copies of original images.
 
@@ -584,6 +602,9 @@ class Batcher(metaclass=abc.ABCMeta):
 
     if self._export_context_manager_kwargs is None:
       self._export_context_manager_kwargs = {}
+
+    if self._prompt_to_continue_on_error_func is None:
+      self._prompt_to_continue_on_error_func = utils.create_empty_func(return_value=False)
 
   def _set_up_item_tree(self):
     if self._refresh_item_tree:
@@ -869,14 +890,12 @@ class Batcher(metaclass=abc.ABCMeta):
 
         self._set_failed_commands(command, error_message)
 
-        if not self._continue_on_error:
-          raise exceptions.CommandError(error_message, command, self._current_item)
+        raise exceptions.CommandError(error_message, command, self._current_item)
       except Exception as e:
         trace = traceback.format_exc()
         self._set_failed_commands(command, str(e), trace)
 
-        if not self._continue_on_error:
-          raise exceptions.CommandError(str(e), command, self._current_item, trace)
+        raise exceptions.CommandError(str(e), command, self._current_item, trace)
       else:
         return retval
 
@@ -921,7 +940,23 @@ class Batcher(metaclass=abc.ABCMeta):
         additional_args_position=_BATCHER_ARG_POSITION_IN_COMMANDS)
 
     for item in self._matching_items:
-      self._process_item(item)
+      if self._should_stop:
+        raise exceptions.BatcherCancelError('stopped by user')
+
+      if self._edit_mode:
+        self._progress_updater.set_text(_('Processing "{}"').format(item.orig_name))
+
+      try:
+        self._process_item(item)
+      except exceptions.CommandError as e:
+        if not self._continue_on_error:
+          self._continue_on_error = self._prompt_to_continue_on_error_func(e)
+          if not self._continue_on_error:
+            raise
+      else:
+        self._num_processed_items += 1
+      finally:
+        self._progress_updater.update_tasks()
 
     if self._process_contents:
       self._invoker.invoke(
@@ -967,12 +1002,6 @@ class Batcher(metaclass=abc.ABCMeta):
     return matching_items, matching_items_and_parents
 
   def _process_item(self, item):
-    if self._should_stop:
-      raise exceptions.BatcherCancelError('stopped by user')
-
-    if self._edit_mode:
-      self._progress_updater.set_text(_('Processing "{}"').format(item.orig_name))
-
     self._current_item = item
     self._current_image = self._get_initial_current_image()
     self._current_layer = self._get_initial_current_layer()
@@ -982,10 +1011,6 @@ class Batcher(metaclass=abc.ABCMeta):
 
     if self._process_contents:
       self._process_item_with_commands()
-
-    self._progress_updater.update_tasks()
-
-    self._num_processed_items += 1
 
   def _process_item_with_name_only_commands(self):
     self._invoker.invoke(
