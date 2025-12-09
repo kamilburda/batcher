@@ -1,7 +1,9 @@
 """Common constants and functions for built-in actions and conditions."""
 
 NAME_ONLY_TAG = 'name'
-"""Tag indicating that a built-in command is executed for the name preview."""
+"""Tag indicating that a built-in command is executed for the input list (name
+preview).
+"""
 
 
 def get_filtered_builtin_commands(builtin_commands, tags=None):
