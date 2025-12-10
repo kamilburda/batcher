@@ -13,6 +13,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
+from config import CONFIG
 from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
@@ -651,56 +652,123 @@ class Batcher(metaclass=abc.ABCMeta):
       self._initial_invoker,
       self._initial_invoker.list_groups(include_empty_groups=True))
 
-    self._add_commands_before_actions_from_settings()
+    invoker_groups_and_last_positions = collections.defaultdict(
+      lambda: 0,
+      {group: len(self._invoker.list_commands(group)) for group in self._invoker.list_groups()},
+    )
 
     for action in self._actions:
-      self._add_command_from_settings(action)
+      self._add_command(action)
 
-    self._add_commands_after_actions_from_settings()
+    self._add_default_actions(invoker_groups_and_last_positions)
 
     for condition in self._conditions:
-      self._add_command_from_settings(condition)
+      self._add_command(condition)
 
   def _add_commands_before_initial_invoker(self):
     pass
 
-  def _add_commands_before_actions_from_settings(self):
-    pass
-
-  def _add_commands_after_actions_from_settings(self):
-    pass
-
   def _add_name_only_commands(self):
-    self._add_name_only_commands_before_actions_from_settings()
+    invoker_groups_and_last_positions = collections.defaultdict(
+      lambda: 0,
+      {group: len(self._invoker.list_commands(group)) for group in self._invoker.list_groups()},
+    )
 
     for action in self._actions:
-      self._add_command_from_settings(
+      self._add_command(
         action,
         [builtin_commands_common.NAME_ONLY_TAG],
         [_NAME_ONLY_COMMAND_GROUP])
 
-    self._add_name_only_commands_after_actions_from_settings()
+    self._add_name_only_default_actions(invoker_groups_and_last_positions)
 
     for condition in self._conditions:
-      self._add_command_from_settings(
+      self._add_command(
         condition,
         [builtin_commands_common.NAME_ONLY_TAG],
         [_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_name_only_commands_before_actions_from_settings(self):
-    pass
+  def _add_default_actions(self, invoker_groups_and_last_positions):
+    self._add_default_rename_action(
+      [commands.DEFAULT_ACTIONS_GROUP],
+      invoker_groups_and_last_positions[commands.DEFAULT_ACTIONS_GROUP],
+    )
+    self._add_default_export_action([commands.DEFAULT_ACTIONS_GROUP])
 
-  def _add_name_only_commands_after_actions_from_settings(self):
-    pass
+  def _add_name_only_default_actions(self, invoker_groups_and_last_positions):
+    self._add_default_rename_action(
+      [_NAME_ONLY_COMMAND_GROUP],
+      invoker_groups_and_last_positions[_NAME_ONLY_COMMAND_GROUP],
+    )
+    self._add_default_export_action([_NAME_ONLY_COMMAND_GROUP])
 
-  def _add_command_from_settings(
+  def _add_default_rename_action(self, command_groups, position):
+    """Adds a default Rename action (always available and enabled).
+
+    The default rename action must precede the user-added actions, but must
+    also be added after actions required to make the processing/preview work 
+    properly.
+    """
+    if not self._edit_mode:
+      rename_action_dict = next(
+        iter(
+          action_dict for action_dict in builtin_actions.BUILTIN_ACTIONS.values()
+          if (action_dict['name'].startswith('rename_for_')
+              and CONFIG.PROCEDURE_GROUP in action_dict['additional_tags'])
+        ),
+        None,
+      )
+
+      if rename_action_dict is None:
+        raise AssertionError('could not find a default rename action')
+
+      rename_action_dict['arguments'][0]['default_value'] = self._name_pattern
+
+      rename_action = commands.create_command(rename_action_dict)
+      rename_action.uniquify_name(self._actions)
+
+      self._add_command(rename_action, command_groups=command_groups, position=position)
+
+  def _add_default_export_action(self, command_groups):
+    if not self._edit_mode:
+      export_action_dict = next(
+        iter(
+          action_dict for action_dict in builtin_actions.BUILTIN_ACTIONS.values()
+          if (action_dict['name'].startswith('export_for_')
+              and CONFIG.PROCEDURE_GROUP in action_dict['additional_tags'])
+        ),
+        None,
+      )
+
+      if export_action_dict is None:
+        raise AssertionError('could not find a default export action')
+
+      export_kwargs = dict(
+        output_directory=self._output_directory,
+        file_extension=self._file_extension,
+      )
+      export_kwargs.update(self._more_export_options)
+
+      export_action_arguments_dict = {
+        arg['name']: index for index, arg in enumerate(export_action_dict['arguments'])}
+
+      for arg_name, value in export_kwargs.items():
+        index = export_action_arguments_dict[arg_name]
+        export_action_dict['arguments'][index]['default_value'] = value
+
+      export_action = commands.create_command(export_action_dict)
+      export_action.uniquify_name(self._actions)
+
+      self._add_command(export_action, command_groups=command_groups)
+
+  def _add_command(
         self,
         command: setting_.Group,
         tags: Optional[Iterable[str]] = None,
         command_groups: Union[str, List[str], None] = None,
+        position: Optional[int] = None,
   ):
-    """Adds a command and wraps/processes the command's function according to
-    the command's settings.
+    """Adds a command and wraps/processes the command's function.
 
     For PDB procedures, the function name is converted to a proper function
     object. For conditions, the function is wrapped to act as a proper filter
@@ -714,6 +782,9 @@ class Batcher(metaclass=abc.ABCMeta):
     If ``command_groups`` is not ``None``, the command will be added to the
     specified command groups instead of the groups defined in ``command[
     'command_groups']``.
+
+    For the ``position`` parameter, see `invoker.Invoker.add()` for more
+    information.
     """
     if command['origin'].value == 'builtin':
       if 'action' in command.tags:
@@ -771,7 +842,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
     invoker_args = list(command['arguments']) + [function]
 
-    self._invoker.add(processed_function, command_groups, invoker_args)
+    self._invoker.add(processed_function, command_groups, invoker_args, position=position)
 
   def _get_processed_function(self, command):
 
@@ -1174,43 +1245,6 @@ class ImageBatcher(Batcher):
       [commands.DEFAULT_ACTIONS_GROUP],
       foreach=True)
 
-  def _add_commands_before_actions_from_settings(self):
-    super()._add_commands_before_actions_from_settings()
-
-    self._add_default_rename_action([commands.DEFAULT_ACTIONS_GROUP])
-
-  def _add_commands_after_actions_from_settings(self):
-    super()._add_commands_after_actions_from_settings()
-
-    self._add_default_export_action([commands.DEFAULT_ACTIONS_GROUP])
-
-  def _add_name_only_commands_before_actions_from_settings(self):
-    self._add_default_rename_action([_NAME_ONLY_COMMAND_GROUP])
-
-  def _add_name_only_commands_after_actions_from_settings(self):
-    self._add_default_export_action([_NAME_ONLY_COMMAND_GROUP])
-
-  def _add_default_rename_action(self, command_groups):
-    if not self._edit_mode:
-      self._invoker.add(
-        builtin_actions.RenameImageForConvertAction(),
-        groups=command_groups,
-        args=[self._name_pattern])
-
-  def _add_default_export_action(self, command_groups):
-    if not self._edit_mode:
-      export_kwargs = dict(
-        output_directory=self._output_directory,
-        file_extension=self._file_extension,
-      )
-      export_kwargs.update(self._more_export_options)
-
-      self._invoker.add(
-        builtin_actions.ExportAction(),
-        groups=command_groups,
-        kwargs=export_kwargs,
-      )
-
   def _process_item_with_commands(self):
     self._should_load_image = self._current_image is None
 
@@ -1321,43 +1355,6 @@ class LayerBatcher(Batcher):
         [commands.DEFAULT_ACTIONS_GROUP],
         foreach=True)
 
-  def _add_commands_before_actions_from_settings(self):
-    super()._add_commands_before_actions_from_settings()
-
-    self._add_default_rename_action([commands.DEFAULT_ACTIONS_GROUP])
-
-  def _add_commands_after_actions_from_settings(self):
-    super()._add_commands_after_actions_from_settings()
-
-    self._add_default_export_action([commands.DEFAULT_ACTIONS_GROUP])
-
-  def _add_name_only_commands_before_actions_from_settings(self):
-    self._add_default_rename_action([_NAME_ONLY_COMMAND_GROUP])
-
-  def _add_name_only_commands_after_actions_from_settings(self):
-    self._add_default_export_action([_NAME_ONLY_COMMAND_GROUP])
-  
-  def _add_default_rename_action(self, command_groups):
-    if not self._edit_mode:
-      self._invoker.add(
-        builtin_actions.RenameLayerAction(),
-        groups=command_groups,
-        args=[self._name_pattern])
-  
-  def _add_default_export_action(self, command_groups):
-    if not self._edit_mode:
-      export_kwargs = dict(
-        output_directory=self._output_directory,
-        file_extension=self._file_extension,
-      )
-      export_kwargs.update(self._more_export_options)
-
-      self._invoker.add(
-        builtin_actions.ExportAction(),
-        groups=command_groups,
-        kwargs=export_kwargs,
-      )
-  
   def _process_item_with_commands(self):
     if not self._edit_mode or self._is_preview:
       image_copy, layer_copy = self.create_copy(self._current_image, self._current_layer)

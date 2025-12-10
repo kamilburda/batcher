@@ -94,11 +94,11 @@ class TestAddCommandFromSettings(unittest.TestCase):
 
     commands_.pdb.remove_from_cache(self.procedure_name)
   
-  def test_add_command_from_settings(self, mock_get_pdb):
+  def test_add_command(self, mock_get_pdb):
     action = commands_.add(
       self.actions, builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
     
-    self.batcher._add_command_from_settings(action)
+    self.batcher._add_command(action)
     
     added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
 
@@ -131,7 +131,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
         self, pdb_procedure, expected_arg_names_and_values, expected_kwargs):
     action = commands_.add(self.actions, pdb_procedure.get_name())
 
-    self.batcher._add_command_from_settings(action)
+    self.batcher._add_command(action)
     
     added_command_items = self.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
