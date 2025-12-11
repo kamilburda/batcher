@@ -1267,14 +1267,15 @@ class ImageBatcher(Batcher):
 
     self._current_layer = self._get_current_layer(self._current_image)
 
-    if self._current_image is not None:
-      super()._process_item_with_commands()
+    try:
+      if self._current_image is not None:
+        super()._process_item_with_commands()
+    finally:
+      if self._should_load_image:
+        self._current_item.raw = None
 
-    if self._should_load_image:
-      self._current_item.raw = None
-
-    self._current_image = None
-    self._current_layer = None
+      self._current_image = None
+      self._current_layer = None
 
   @staticmethod
   def _get_current_layer(image):
@@ -1363,10 +1364,11 @@ class LayerBatcher(Batcher):
       self._current_layer = layer_copy
       self._image_copies.append(image_copy)
 
-    super()._process_item_with_commands()
-
-    self._current_image = None
-    self._current_layer = None
+    try:
+      super()._process_item_with_commands()
+    finally:
+      self._current_image = None
+      self._current_layer = None
 
   def create_copy(self, image, layer):
     image_copy = utils_pdb.create_empty_image_copy(image)
