@@ -26,8 +26,9 @@ User interface changes:
 * Increased the default width of the custom action browser to ensure that the right part can be displayed in its entirety without the need for horizontal scrolling.
 * Reduced the width of the quick dialogs given the vertical rearrangement of the export settings.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
-* Improved visual cues when reordering actions, conditions or array argument elements via drag-and-drop.
+* Error message dialogs issued by GIMP are now always redirected to the GIMP's error console (https://docs.gimp.org/en/gimp-errors-dialog.html). This avoids spamming the same dialog when attempting to close the dialog and focusing back on the Batcher main dialog (#107).
 * Batch Convert: Loading files that are not recognized as images now displays a message in the preview rather than a warning. You may still obtain warnings issued by GIMP.
+* Improved visual cues when reordering actions, conditions or array argument elements via drag-and-drop.
 * A simple summary message indicating the number of successfully processed images/layers is now displayed after the processing.
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
