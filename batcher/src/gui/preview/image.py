@@ -185,8 +185,7 @@ class ImagePreview(preview_base_.Preview):
 
     self._update_duration_seconds = 0.0
 
-    with utils_pdb.redirect_messages():
-      self._preview_pixbuf, error, display_error_message_as_label = self._get_in_memory_preview()
+    self._preview_pixbuf, error, display_error_message_as_label = self._get_in_memory_preview()
     
     if self._preview_pixbuf is not None:
       self._preview_pixbuf_to_draw = self._preview_pixbuf

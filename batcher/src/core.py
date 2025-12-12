@@ -561,16 +561,18 @@ class Batcher(metaclass=abc.ABCMeta):
 
     exception_occurred = False
 
-    if self._process_contents:
-      self._setup_contents()
-    try:
-      self._process_items()
-    except Exception:
-      exception_occurred = True
-      raise
-    finally:
+    with utils_pdb.redirect_messages(Gimp.MessageHandlerType.ERROR_CONSOLE):
       if self._process_contents:
-        self._cleanup_contents(exception_occurred)
+        self._setup_contents()
+
+      try:
+        self._process_items()
+      except Exception:
+        exception_occurred = True
+        raise
+      finally:
+        if self._process_contents:
+          self._cleanup_contents(exception_occurred)
 
   def _set_attributes(self, **kwargs):
     for name, value in kwargs.items():
@@ -956,8 +958,10 @@ class Batcher(metaclass=abc.ABCMeta):
         error_message = e.message
         if error_message is None:
           error_message = _(
-            'An error occurred. Please check the GIMP error message'
-            ' or the error console for details, if any.')
+            'An error occurred. Please check the error console for details, if any.'
+            ' You can access the error console in GIMP via'
+            ' Windows → Dockable Dialogs → Error Console.'
+          )
 
         self._set_failed_commands(command, error_message)
 
