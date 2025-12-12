@@ -278,7 +278,7 @@ def _get_item_parents(item):
 
 def try_delete_image(image: Gimp.Image):
   """Deletes the specified image if it exists and is valid."""
-  if image.is_valid():
+  if image is not None and image.is_valid():
     image.delete()
 
 
