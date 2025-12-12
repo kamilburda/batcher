@@ -38,10 +38,7 @@ class ImportAction(invoker_.CallableCommand):
         file_format_import_options: Optional[Dict] = None,
   ):
     if not image_file.query_exists():
-      if not batcher.continue_on_error or batcher.is_preview:
-        raise exceptions.BatcherFileLoadError(_('File not found'), image_file.get_path())
-      else:
-        return None
+      raise exceptions.BatcherFileNotFoundError(_('File not found'), image_file.get_path())
 
     if file_format_import_options is None:
       file_format_import_options = {}
@@ -49,7 +46,6 @@ class ImportAction(invoker_.CallableCommand):
     image = _load_image(
       batcher,
       image_file,
-      fileext.get_file_extension(batcher.current_item.orig_name.lower()),
       file_format_import_options,
     )
 
@@ -62,9 +58,10 @@ class ImportAction(invoker_.CallableCommand):
 def _load_image(
       batcher,
       image_file,
-      file_extension,
       file_format_import_options,
 ):
+  file_extension = fileext.get_file_extension(batcher.current_item.orig_name.lower())
+
   try:
     image = _import_image(
       image_file,
@@ -72,13 +69,10 @@ def _load_image(
       file_format_import_options,
     )
   except pypdb.PDBProcedureError as e:
-    if not batcher.continue_on_error or batcher.is_preview:
-      if e.status == Gimp.PDBStatusType.CANCEL:
-        raise exceptions.BatcherCancelError('canceled')
-      else:
-        raise exceptions.BatcherError(f'{str(e)}: {image_file.get_path()}') from e
+    if e.status == Gimp.PDBStatusType.CANCEL:
+      raise exceptions.BatcherCancelError('canceled')
     else:
-      return None
+      raise exceptions.BatcherFileLoadError(str(e), image_file.get_path()) from e
   else:
     return image
 

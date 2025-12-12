@@ -20,7 +20,11 @@ class BatcherFileLoadError(BatcherError):
     self.filepath = filepath
 
   def __str__(self):
-    return f'{self.message}: {self.filepath}'
+    return self.message
+
+
+class BatcherFileNotFoundError(BatcherFileLoadError):
+  pass
 
 
 class CommandError(BatcherError):

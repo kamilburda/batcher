@@ -1019,7 +1019,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
       try:
         self._process_item(item)
-      except exceptions.CommandError as e:
+      except (exceptions.CommandError, exceptions.BatcherFileLoadError) as e:
+        if isinstance(e, exceptions.BatcherFileLoadError) and self._is_preview:
+          raise
+
         if not self._continue_on_error:
           self._continue_on_error = self._prompt_to_continue_on_error_func(e)
           if not self._continue_on_error:

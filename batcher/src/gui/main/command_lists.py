@@ -97,7 +97,7 @@ class CommandLists:
         if command_item.command.name in failed_commands:
           command_item.set_warning(
             True,
-            messages_.get_failing_command_message(
+            messages_.get_failing_message(
               (command_item.command, failed_commands[command_item.command.name][0][0])),
             failed_commands[command_item.command.name][0][1],
             failed_commands[command_item.command.name][0][2],

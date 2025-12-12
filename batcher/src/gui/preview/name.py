@@ -428,7 +428,7 @@ class NamePreview(preview_base_.Preview):
       pass
     except exceptions.CommandError as e:
       messages_.display_failure_message(
-        messages_.get_failing_command_message(e),
+        messages_.get_failing_message(e),
         failure_message=str(e),
         details=e.traceback,
         parent=gui_utils_.get_toplevel_window(self))

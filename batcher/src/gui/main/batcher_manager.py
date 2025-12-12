@@ -1,4 +1,5 @@
 import contextlib
+import traceback
 
 import gi
 
@@ -35,9 +36,9 @@ class BatcherInteractiveMixin:
     )
 
     response_id = messages_.display_failure_message(
-      messages_.get_failing_command_message(exc),
+      messages_.get_failing_message(exc),
       failure_message=failure_message,
-      details=exc.traceback,
+      details=exc.traceback if hasattr(exc, 'traceback') else traceback.format_exc(),
       parent=parent_widget,
       button_texts_and_responses=[
         (_('Continue'), Gtk.ResponseType.YES), (_('Stop'), Gtk.ResponseType.NO)],
@@ -110,7 +111,7 @@ class BatcherManager(BatcherInteractiveMixin):
       success = False
       if not self._prompted_to_continue_on_error:
         messages_.display_failure_message(
-          messages_.get_failing_command_message(e),
+          messages_.get_failing_message(e),
           failure_message=str(e),
           details=e.traceback,
           parent=parent_widget)

@@ -599,15 +599,18 @@ def display_invalid_image_failure_message(
     parent=parent)
 
 
-def get_failing_command_message(
-      command_and_item_or_command_error: Union[
-        Tuple[setting_.Group, itemtree.Item], exceptions.CommandError],
+def get_failing_message(
+      command_and_item_or_error: Union[Tuple[setting_.Group, itemtree.Item], Exception],
 ):
-  if isinstance(command_and_item_or_command_error, exceptions.CommandError):
-    command, item = command_and_item_or_command_error.command, command_and_item_or_command_error.item
+  if isinstance(command_and_item_or_error, exceptions.CommandError):
+    command, item = command_and_item_or_error.command, command_and_item_or_error.item
+  elif isinstance(command_and_item_or_error, (tuple, list)):
+    command, item = command_and_item_or_error
+  elif isinstance(command_and_item_or_error, exceptions.BatcherFileLoadError):
+    return _('Failed to load image file "{}":').format(command_and_item_or_error.filepath)
   else:
-    command, item = command_and_item_or_command_error
-  
+    return _('There was a problem during processing:')
+
   if 'action' not in command.tags and 'condition' not in command.tags:
     raise ValueError('a command must have the "action" or "condition" tag')
 
