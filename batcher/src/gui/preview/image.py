@@ -7,6 +7,8 @@ import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
@@ -14,10 +16,6 @@ from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
-
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 
 from . import base as preview_base_
 
@@ -59,6 +57,10 @@ class ImagePreview(preview_base_.Preview):
   _WIDGET_SPACING = 5
   _HBOX_BUTTONS_SPACING = 3
   _HBOX_LABEL_BUTTONS_SPACING = 8
+  _HBOX_ITEM_NAME_AND_MESSAGE_SPACING = 8
+  _LABEL_MESSAGE_PADDING = 4
+
+  _LABEL_MESSAGE_WIDTH_CHARS = 60
 
   def __init__(self, batcher, settings):
     super().__init__()
@@ -115,6 +117,8 @@ class ImagePreview(preview_base_.Preview):
     if self.item is None:
       return
 
+    self._hide_button_message()
+
     if self.item.raw is not None and not self.item.raw.is_valid():
       self.clear()
       return
@@ -139,8 +143,8 @@ class ImagePreview(preview_base_.Preview):
       if error is None:
         self._set_no_selection_label()
       else:
-        self._set_label(str(error), sensitive=False)
-  
+        self._set_label(str(error), sensitive=False, is_error=True)
+
   def resize(self):
     """Resizes the preview if the widget is smaller than the previewed image so
     that the image fits the widget.
@@ -174,9 +178,18 @@ class ImagePreview(preview_base_.Preview):
     self._label_item_name.set_markup('<i>{}</i>'.format(_('No selection')))
     self._label_item_name.set_sensitive(False)
 
-  def _set_label(self, text, sensitive=True):
-    self._label_item_name.set_markup(f'<i>{text}</i>')
-    self._label_item_name.set_sensitive(sensitive)
+  def _set_label(self, text, sensitive=True, is_error=False):
+    if not is_error or len(text) <= self._LABEL_MESSAGE_WIDTH_CHARS or len(text.splitlines()) <= 1:
+      self._label_item_name.set_markup(f'<i>{text}</i>')
+      self._label_item_name.set_sensitive(sensitive)
+    else:
+      summary_text = _('Could not preview image')
+
+      self._label_item_name.set_markup(f'<i>{summary_text}</i>')
+      self._label_item_name.set_sensitive(sensitive)
+
+      self._button_message.show()
+      self._label_message.set_text(text)
 
   def _set_contents(self):
     # Sanity check in case `item` changes before 'size-allocate' is emitted.
@@ -255,17 +268,57 @@ class ImagePreview(preview_base_.Preview):
       GimpUi.ICON_IMAGE, self, Gtk.IconSize.DIALOG)
 
     self._folder_icon = gui_utils_.get_icon_pixbuf('folder', self, Gtk.IconSize.DIALOG)
-    
+
     self._label_item_name = Gtk.Label(ellipsize=Pango.EllipsizeMode.MIDDLE)
-    
+
+    self._button_message = Gtk.Button(
+      relief=Gtk.ReliefStyle.NONE,
+      tooltip_text=_('View Message'),
+    )
+    self._button_message.set_image(
+      Gtk.Image.new_from_icon_name('dialog-information', Gtk.IconSize.BUTTON))
+    self._button_message.show_all()
+    self._button_message.set_no_show_all(True)
+    self._button_message.hide()
+
+    self._label_message = Gtk.Label(
+      xalign=0.5,
+      yalign=0.5,
+      max_width_chars=self._LABEL_MESSAGE_WIDTH_CHARS,
+      wrap=True,
+      margin_start=self._LABEL_MESSAGE_PADDING,
+      margin_end=self._LABEL_MESSAGE_PADDING,
+      margin_top=self._LABEL_MESSAGE_PADDING,
+      margin_bottom=self._LABEL_MESSAGE_PADDING,
+      selectable=True,
+      can_focus=False,
+    )
+    self._label_message.show()
+
+    self._popover_message = Gtk.Popover()
+    self._popover_message.add(self._label_message)
+    self._popover_message.set_constrain_to(Gtk.PopoverConstraint.NONE)
+    self._popover_message.set_relative_to(self._button_message)
+
+    self._hbox_item_name_and_message = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._HBOX_ITEM_NAME_AND_MESSAGE_SPACING,
+      halign=Gtk.Align.CENTER,
+    )
+
+    self._hbox_item_name_and_message.pack_start(self._label_item_name, False, False, 0)
+    self._hbox_item_name_and_message.pack_start(self._button_message, False, False, 0)
+
     self.set_spacing(self._WIDGET_SPACING)
     
     self.pack_start(self._hbox_label_buttons, False, False, 0)
     self.pack_start(self._preview_image, True, True, 0)
-    self.pack_start(self._label_item_name, False, False, 0)
+    self.pack_start(self._hbox_item_name_and_message, False, False, 0)
 
     self._set_pixbuf(self._no_selection_icon)
     self._set_no_selection_label()
+
+    self._button_message.connect('clicked', self._on_button_message_clicked)
   
   def _get_in_memory_preview(self):
     start_update_time = time.time()
@@ -404,6 +457,9 @@ class ImagePreview(preview_base_.Preview):
     self._previous_preview_pixbuf_width = scaled_preview_width
     self._previous_preview_pixbuf_height = scaled_preview_height
 
+  def _hide_button_message(self):
+    self._button_message.hide()
+
   def _on_preview_image_draw(self, image, cairo_context):
     if self._preview_pixbuf_to_draw is None:
       return
@@ -440,6 +496,9 @@ class ImagePreview(preview_base_.Preview):
 
   def _on_button_menu_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_settings, button)
+
+  def _on_button_message_clicked(self, _button):
+    self._popover_message.show_all()
   
   def _on_menu_item_update_automatically_toggled(self, menu_item):
     if self._menu_item_update_automatically.get_active():
