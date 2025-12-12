@@ -148,8 +148,7 @@ def has_any_window_focus(windows_to_ignore: Iterable[Gtk.Window] = None):
   return any(
     (w.get_window().get_state() & Gdk.WindowState.FOCUSED)
     for w in Gtk.Window.list_toplevels()
-    if
-    w.get_window() is not None and w not in windows_to_ignore and w.get_mapped()
+    if w.get_window() is not None and w not in windows_to_ignore and w.get_mapped()
   )
 
 
