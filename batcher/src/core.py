@@ -66,8 +66,8 @@ class Batcher(metaclass=abc.ABCMeta):
         export_context_manager: Optional[contextlib.AbstractContextManager] = None,
         export_context_manager_args: Optional[Union[List, Tuple]] = None,
         export_context_manager_kwargs: Optional[Dict] = None,
-        prompt_to_continue_on_error_func: Optional[Callable] = None,
         keep_image_copies: bool = False,
+        prompt_to_continue_on_error_func: Optional[Callable] = None,
   ):
     self._item_tree = item_tree
     self._actions = actions
@@ -91,8 +91,8 @@ class Batcher(metaclass=abc.ABCMeta):
     self._export_context_manager = export_context_manager
     self._export_context_manager_args = export_context_manager_args
     self._export_context_manager_kwargs = export_context_manager_kwargs
-    self._prompt_to_continue_on_error_func = prompt_to_continue_on_error_func
     self._keep_image_copies = keep_image_copies
+    self._prompt_to_continue_on_error_func = prompt_to_continue_on_error_func
 
     self._current_item = None
     self._current_image = None
