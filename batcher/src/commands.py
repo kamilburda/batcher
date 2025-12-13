@@ -595,6 +595,8 @@ def get_command_dict_from_pdb_procedure(
     'description': _get_pdb_procedure_description(pdb_procedure),
   }
 
+  command_dict.update(_get_hard_coded_command_attributes(command_dict['name']))
+
   return command_dict
 
 
@@ -639,6 +641,10 @@ def _get_pdb_procedure_display_name(pdb_procedure):
 def _get_pdb_procedure_description(pdb_procedure):
   blurb = pdb_procedure.blurb
   return blurb if blurb is not None else ''
+
+
+def _get_hard_coded_command_attributes(sanitized_pdb_procedure_name):
+  return _PDB_PROCEDURES_AND_CUSTOM_ATTRIBUTES.get(sanitized_pdb_procedure_name, {})
 
 
 def reorder(commands: setting_.Group, command_name: str, new_position: int):
@@ -716,4 +722,19 @@ def clear(commands: setting_.Group, add_initial_commands: bool = True):
 _COMMAND_TYPES_AND_FUNCTIONS = {
   'action': _create_action,
   'condition': _create_condition,
+}
+
+
+_PDB_PROCEDURES_AND_CUSTOM_ATTRIBUTES = {
+  'plug-in-batch-convert': {'enabled_for_previews': False},
+  'plug-in-batch-edit-and-save-images': {'enabled_for_previews': False},
+  'plug-in-batch-edit-and-save-images-quick': {'enabled_for_previews': False},
+  'plug-in-batch-edit-layers': {'enabled_for_previews': False},
+  'plug-in-batch-edit-layers-quick': {'enabled_for_previews': False},
+  'plug-in-batch-edit-selected-layers': {'enabled_for_previews': False},
+  'plug-in-batch-export-images': {'enabled_for_previews': False},
+  'plug-in-batch-export-images-quick': {'enabled_for_previews': False},
+  'plug-in-batch-export-layers': {'enabled_for_previews': False},
+  'plug-in-batch-export-layers-quick': {'enabled_for_previews': False},
+  'plug-in-batch-export-selected-layers': {'enabled_for_previews': False},
 }

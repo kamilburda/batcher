@@ -36,6 +36,7 @@ User interface changes:
 Changes to actions and conditions:
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
 * Color correction: GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
+* Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
