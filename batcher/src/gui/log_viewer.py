@@ -1,7 +1,5 @@
 """Widget for displaying messages logged during batch processing."""
 
-import logging
-
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
