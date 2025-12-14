@@ -1,4 +1,4 @@
-"""Logging-related classes."""
+"""Logging-related functions and classes."""
 
 from collections.abc import Iterable
 import datetime
