@@ -408,7 +408,7 @@ class Batcher(metaclass=abc.ABCMeta):
 
   @property
   def prompt_to_continue_on_error_func(self):
-    """Function that prompts the user whether to continue processing on error.
+    """Callback that prompts the user whether to continue processing on error.
 
     The function requires one positional parameter - an
     `exceptions.CommandError` instance.
