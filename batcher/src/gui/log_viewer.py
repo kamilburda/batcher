@@ -16,6 +16,8 @@ class LogViewer:
   _CONTENTS_MIN_WIDTH = 600
   _CONTENTS_MIN_HEIGHT = 300
 
+  _MAX_MESSAGE_LINES = 20_000
+
   def __init__(self, parent):
     self._parent = parent
 
@@ -70,6 +72,13 @@ class LogViewer:
 
   def add_message(self, message):
     self._text_buffer.insert(self._text_buffer.get_end_iter(), message, -1)
+
+    num_lines = self._text_buffer.get_line_count()
+
+    if num_lines > self._MAX_MESSAGE_LINES:
+      self._text_buffer.delete(
+        self._text_buffer.get_iter_at_line(0),
+        self._text_buffer.get_iter_at_line(num_lines - self._MAX_MESSAGE_LINES))
 
   def _on_text_view_size_allocate(self, _text_view, _allocation):
     self._text_view.scroll_to_iter(
