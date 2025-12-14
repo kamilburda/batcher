@@ -60,6 +60,8 @@ class LogViewer:
     self._dialog.add_button(_('_Save to File'), Gtk.ResponseType.OK)
     self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
 
+    self._text_view.connect('size-allocate', self._on_text_view_size_allocate)
+
     self._dialog.connect('realize', self._on_dialog_realize)
     self._dialog.connect('close', self._on_dialog_close)
     self._dialog.connect('response', self._on_dialog_response)
@@ -70,6 +72,15 @@ class LogViewer:
 
   def add_message(self, message):
     self._text_buffer.insert(self._text_buffer.get_end_iter(), message, -1)
+
+  def _on_text_view_size_allocate(self, _text_view, _allocation):
+    self._text_view.scroll_to_iter(
+      self._text_buffer.get_end_iter(),
+      0.0,
+      False,
+      0.0,
+      0.0,
+    )
 
   def _on_dialog_realize(self, _dialog):
     if self._parent is not None:
