@@ -117,18 +117,3 @@ class LogViewer:
           )
 
     file_dialog.destroy()
-
-
-class LogHandler(logging.Handler):
-
-  def __init__(self, log_viewer, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
-    self._log_viewer = log_viewer
-
-    self._formatter = logging.Formatter('%(asctime)s %(message)s')
-
-    self.setFormatter(self._formatter)
-
-  def emit(self, record):
-    self._log_viewer.add_message(f'{self.format(record)}\n')

@@ -226,10 +226,10 @@ class BatchProcessingGui:
     self._logger = logging.getLogger(constants.LOGGER_NAME)
 
     for handler in self._logger.handlers:
-      if isinstance(handler, log_viewer_.LogHandler):
+      if isinstance(handler, GuiLogHandler):
         break
     else:
-      self._logger.addHandler(log_viewer_.LogHandler(self._log_viewer))
+      self._logger.addHandler(GuiLogHandler(self._log_viewer))
 
   def _connect_events(self):
     self._button_run.connect('clicked', self._on_button_run_clicked)
@@ -567,3 +567,18 @@ class BatchProcessingQuickGui:
     self._batcher_manager.stop_batcher()
 
     Gtk.main_quit()
+
+
+class GuiLogHandler(logging.Handler):
+
+  def __init__(self, log_viewer, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self._log_viewer = log_viewer
+
+    self._formatter = logging.Formatter('%(asctime)s %(message)s')
+
+    self.setFormatter(self._formatter)
+
+  def emit(self, record):
+    self._log_viewer.add_message(f'{self.format(record)}\n')
