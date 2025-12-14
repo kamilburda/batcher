@@ -33,12 +33,14 @@ class SettingsManager:
         dialog,
         previews_controller=None,
         display_message_func=None,
+        log_viewer=None,
   ):
     self._settings = settings
     self._dialog = dialog
     self._previews_controller = previews_controller
     self._display_message_func = (
       display_message_func if display_message_func is not None else utils.empty_func)
+    self._log_viewer = log_viewer
 
     self._init_gui()
 
@@ -68,6 +70,8 @@ class SettingsManager:
     self._menu_item_load_settings_from_file = Gtk.MenuItem(label=_('Load Settings from File...'))
     self._menu_item_save_settings_to_file = Gtk.MenuItem(label=_('Save Settings to File...'))
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset Settings'))
+    if self._log_viewer is not None:
+      self._menu_item_view_logs = Gtk.MenuItem(label=_('View Logs'))
 
     self._menu_settings = Gtk.Menu()
     if 'auto_close' in self._settings['gui']:
@@ -83,6 +87,8 @@ class SettingsManager:
     self._menu_settings.append(self._menu_item_load_settings_from_file)
     self._menu_settings.append(self._menu_item_save_settings_to_file)
     self._menu_settings.append(self._menu_item_reset_settings)
+    if self._log_viewer is not None:
+      self._menu_settings.append(self._menu_item_view_logs)
     self._menu_settings.show_all()
 
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
@@ -93,6 +99,8 @@ class SettingsManager:
     self._menu_item_save_settings_to_file.connect(
       'activate', self._on_save_settings_to_file_activate)
     self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
+    if self._log_viewer is not None:
+      self._menu_item_view_logs.connect('activate', self._on_view_logs_activate)
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
 
@@ -166,6 +174,9 @@ class SettingsManager:
       self.save_settings()
 
       self._display_message_func(_('Settings reset.'))
+
+  def _on_view_logs_activate(self, _menu_item):
+    self._log_viewer.widget.show_all()
 
   def _display_reset_prompt(self):
     dialog = Gtk.MessageDialog(

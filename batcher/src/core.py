@@ -5,6 +5,7 @@ import collections
 from collections.abc import Iterable
 import contextlib
 import inspect
+import logging
 import traceback
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -18,6 +19,7 @@ from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
 from src import commands
+from src import constants
 from src import exceptions
 from src import invoker as invoker_
 from src import itemtree
@@ -118,6 +120,8 @@ class Batcher(metaclass=abc.ABCMeta):
 
     self._invoker = None
     self._initial_invoker = invoker_.Invoker()
+
+    self._logger = logging.getLogger(constants.LOGGER_NAME)
 
   @property
   def item_tree(self) -> itemtree.ItemTree:
@@ -548,6 +552,16 @@ class Batcher(metaclass=abc.ABCMeta):
     """
     self._initial_invoker.reorder(*args, **kwargs)
 
+  @abc.abstractmethod
+  def get_finished_processing_message(self):
+    """Returns a string indicating that the processing was finished.
+
+    The message contains the number of successfully processed items. If
+    error(s) occurred and some items were not processed as a result,
+    the message also contains the total number of processed items.
+    """
+    pass
+
   def run(self, **kwargs):
     """Batch-processes and exports items.
 
@@ -565,12 +579,18 @@ class Batcher(metaclass=abc.ABCMeta):
       if self._process_contents:
         self._setup_contents()
 
+      if not self._is_preview:
+        self._logger.info(_('Processing started'))
+
       try:
         self._process_items()
       except Exception:
         exception_occurred = True
         raise
       finally:
+        if not self._is_preview:
+          self._logger.info(self.get_finished_processing_message())
+
         if self._process_contents:
           self._cleanup_contents(exception_occurred)
 
@@ -1016,14 +1036,22 @@ class Batcher(metaclass=abc.ABCMeta):
 
     for item in self._matching_items:
       if self._should_stop:
-        raise exceptions.BatcherCancelError('stopped by user')
+        self._logger.info(_('Stopped'))
+        raise exceptions.BatcherCancelError(_('Stopped'))
+
+      processing_message = _('Processing "{}"').format(item.orig_name)
 
       if self._edit_mode:
-        self._progress_updater.set_text(_('Processing "{}"').format(item.orig_name))
+        self._progress_updater.set_text(processing_message)
+
+      if not self._is_preview:
+        self._logger.info(processing_message)
 
       try:
         self._process_item(item)
       except (exceptions.CommandError, exceptions.BatcherFileLoadError) as e:
+        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_traceback(e)))
+
         if isinstance(e, exceptions.BatcherFileLoadError) and self._is_preview:
           raise
 
@@ -1031,6 +1059,12 @@ class Batcher(metaclass=abc.ABCMeta):
           self._continue_on_error = self._prompt_to_continue_on_error_func(e)
           if not self._continue_on_error:
             raise
+      except exceptions.BatcherCancelError as e:
+        self._logger.info(str(e))
+        raise
+      except Exception as e:
+        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_traceback(e)))
+        raise
       else:
         self._num_processed_items += 1
       finally:
@@ -1199,6 +1233,13 @@ class Batcher(metaclass=abc.ABCMeta):
 
     Gimp.context_pop()
 
+  @staticmethod
+  def _get_traceback(exc):
+    if hasattr(exc, 'traceback'):
+      return exc.traceback
+    else:
+      return traceback.format_exc()
+
   def queue_stop(self):
     """Instructs `Batcher` to terminate batch processing prematurely.
 
@@ -1227,6 +1268,13 @@ class ImageBatcher(Batcher):
     self._import_action = None
 
     super().__init__(*args, **kwargs)
+
+  def get_finished_processing_message(self):
+    if self._num_processed_items == self._num_total_items:
+      return _('Done. {} images processed.').format(self._num_processed_items)
+    else:
+      return _('Done. {} out of {} images successfully processed.').format(
+        self._num_processed_items, self._num_total_items)
 
   def _prepare_for_processing(self):
     super()._prepare_for_processing()
@@ -1332,6 +1380,13 @@ class LayerBatcher(Batcher):
   once the processing of the layer is done. To keep the image and layer
   copies, pass ``keep_image_copies=True`` to `__init__()` or `run()`.
   """
+
+  def get_finished_processing_message(self):
+    if self._num_processed_items == self._num_total_items:
+      return _('Done. {} layers processed.').format(self._num_processed_items)
+    else:
+      return _('Done. {} out of {} layers successfully processed.').format(
+        self._num_processed_items, self._num_total_items)
 
   def _get_initial_current_image(self):
     return self._current_item.raw.get_image()

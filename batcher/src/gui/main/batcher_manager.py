@@ -132,8 +132,7 @@ class BatcherManager(BatcherInteractiveMixin):
 
       command_lists.set_warnings_and_deactivate_failed_commands(self._batcher)
 
-      num_processed_items = self._batcher.num_processed_items
-      num_total_items = self._batcher.num_total_items
+      message = self._batcher.get_finished_processing_message()
 
       self._batcher = None
 
@@ -146,7 +145,7 @@ class BatcherManager(BatcherInteractiveMixin):
 
     progress_updater.reset()
 
-    return success, num_processed_items, num_total_items
+    return success, message
 
   def stop_batcher(self):
     self._stop_batcher(self._batcher)

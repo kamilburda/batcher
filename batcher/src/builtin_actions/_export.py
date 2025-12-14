@@ -1,5 +1,6 @@
 """Built-in "Export"/"Also export as..." action."""
 
+import logging
 import os
 from typing import Callable, Dict, Union, Tuple
 
@@ -9,6 +10,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from src import builtin_commands_common
+from src import constants
 from src import exceptions
 from src import file_formats as file_formats_
 from src import initnotifier
@@ -105,6 +107,8 @@ class ExportAction(invoker_.CallableCommand):
       self._renamer_for_single_image = renamer_.ItemRenamer(self._single_image_name_pattern)
     else:
       self._renamer_for_single_image = None
+
+    self._logger = logging.getLogger(constants.LOGGER_NAME)
 
     batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._multi_layer_images])
     batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
@@ -213,6 +217,7 @@ class ExportAction(invoker_.CallableCommand):
         self._file_extension_properties,
         overwrite_chooser,
         self._use_original_modification_date,
+        self._logger,
       )
 
       if export_status == ExportStatuses.USE_DEFAULT_FILE_EXTENSION:
@@ -237,6 +242,7 @@ class ExportAction(invoker_.CallableCommand):
             self._file_extension_properties,
             overwrite_chooser,
             self._use_original_modification_date,
+            self._logger,
           )
 
       if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
@@ -399,6 +405,7 @@ def _export_item(
       file_extension_properties,
       overwrite_chooser,
       use_original_modification_date,
+      logger,
 ):
   output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory)
   file_extension = fileext.get_file_extension(builtin_actions_utils.get_item_export_name(item))
@@ -416,12 +423,14 @@ def _export_item(
       file_extension,
     )
 
-  batcher.progress_updater.set_text(_('Saving "{}"').format(output_filepath))
-  
   if chosen_overwrite_mode == overwrite.OverwriteModes.CANCEL:
-    raise exceptions.BatcherCancelError('canceled')
+    raise exceptions.BatcherCancelError(_('Canceled'))
   
   if chosen_overwrite_mode != overwrite.OverwriteModes.SKIP:
+    batcher.progress_updater.set_text(_('Saving "{}"').format(output_filepath))
+
+    logger.info(_('Saving "{}"').format(output_filepath))
+
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
     
     export_status = _export_item_once_wrapper(
@@ -454,6 +463,8 @@ def _export_item(
         file_extension_properties,
         use_original_modification_date,
       )
+  else:
+    logger.info(_('Skipping "{}"').format(output_filepath))
   
   return chosen_overwrite_mode, export_status
 
@@ -546,7 +557,7 @@ def _export_item_once(
     )
   except pypdb.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
-      raise exceptions.BatcherCancelError('canceled')
+      raise exceptions.BatcherCancelError(_('Canceled'))
     elif e.status == Gimp.PDBStatusType.CALLING_ERROR:
       if run_mode != Gimp.RunMode.INTERACTIVE:
         return ExportStatuses.FORCE_INTERACTIVE

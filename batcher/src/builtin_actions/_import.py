@@ -70,7 +70,7 @@ def _load_image(
     )
   except pypdb.PDBProcedureError as e:
     if e.status == Gimp.PDBStatusType.CANCEL:
-      raise exceptions.BatcherCancelError('canceled')
+      raise exceptions.BatcherCancelError(_('Canceled'))
     else:
       raise exceptions.BatcherFileLoadError(str(e), image_file.get_path()) from e
   else:

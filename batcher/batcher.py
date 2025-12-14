@@ -2,6 +2,7 @@
 
 """Main plug-in file."""
 
+import logging
 import os
 
 from src import utils
@@ -10,6 +11,7 @@ _PLUGIN_DIRPATH = os.path.dirname(os.path.abspath(utils.get_current_module_filep
 
 utils.initialize_i18n(os.path.join(_PLUGIN_DIRPATH, 'locale'), 'batcher')
 
+from src import constants
 from src import loglib
 
 # Initialize logging as early as possible to capture any module-level errors.
@@ -19,6 +21,8 @@ loglib.log_output(
   log_error_filename='error.log',
   log_header_title=_PLUGIN_DIRPATH)
 
+logging.getLogger(constants.LOGGER_NAME).setLevel(logging.INFO)
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -26,7 +30,6 @@ from gi.repository import Gtk
 from config import CONFIG
 from src import builtin_conditions
 from src import commands as commands_
-from src import constants
 from src import itemtree
 from src import setting as setting_
 from src.gui import messages as messages_

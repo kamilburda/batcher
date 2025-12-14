@@ -1,5 +1,6 @@
 """Main GUI dialog classes for each plug-in procedure."""
 
+import logging
 import os
 
 import gi
@@ -13,6 +14,8 @@ from gi.repository import Pango
 
 from config import CONFIG
 from src import setting as setting_
+from src import constants
+from src.gui import log_viewer as log_viewer_
 from src.gui import message_box as message_box_
 from src.gui import message_label as message_label_
 from src.gui import messages as messages_
@@ -58,6 +61,7 @@ class BatchProcessingGui:
     self._batcher_manager = batcher_manager_.BatcherManager(self._item_tree, self._settings)
 
     self._init_gui()
+    self._init_gui_logging()
     self._assign_gui_to_settings()
     self._connect_events()
 
@@ -151,11 +155,14 @@ class BatchProcessingGui:
     self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
 
+    self._log_viewer = log_viewer_.LogViewer(parent=self._dialog)
+
     self._settings_manager = settings_manager_.SettingsManager(
       self._settings,
       self._dialog,
       previews_controller=self._previews.controller,
       display_message_func=self._display_inline_message,
+      log_viewer=self._log_viewer,
     )
 
     self._dialog.action_area.pack_end(self._button_stop, False, False, 0)
@@ -214,6 +221,15 @@ class BatchProcessingGui:
     self._dialog.vbox.set_border_width(self._DIALOG_CONTENTS_BORDER_WIDTH)
     self._dialog.vbox.pack_start(self._hbox_contents, True, True, 0)
     self._dialog.vbox.pack_end(self._progress_bar, False, False, 0)
+
+  def _init_gui_logging(self):
+    self._logger = logging.getLogger(constants.LOGGER_NAME)
+
+    for handler in self._logger.handlers:
+      if isinstance(handler, log_viewer_.LogHandler):
+        break
+    else:
+      self._logger.addHandler(log_viewer_.LogHandler(self._log_viewer))
 
   def _connect_events(self):
     self._button_run.connect('clicked', self._on_button_run_clicked)
@@ -285,7 +301,7 @@ class BatchProcessingGui:
   def _on_button_run_clicked(self, _button):
     self._set_up_gui_before_run()
 
-    success, num_processed_items, num_total_items = self._batcher_manager.run_batcher(
+    success, message = self._batcher_manager.run_batcher(
       self._mode,
       self._item_type,
       self._command_lists,
@@ -300,7 +316,7 @@ class BatchProcessingGui:
     if success and self._settings['gui/auto_close'].value:
       Gtk.main_quit()
     else:
-      self._display_message_after_processing(num_processed_items, num_total_items)
+      self._display_inline_message(message)
 
   def _set_up_gui_before_run(self):
     self._display_inline_message(None)
@@ -332,22 +348,6 @@ class BatchProcessingGui:
     self._button_run.set_sensitive(enabled)
 
     self._dialog.set_focus(self._button_stop)
-
-  def _display_message_after_processing(self, num_processed_items, num_total_items):
-    if self._item_type == 'layer':
-      if num_processed_items == num_total_items:
-        text = _('Done. {} layers processed.').format(num_processed_items)
-      else:
-        text = _('Done. {} out of {} layers successfully processed.').format(
-          num_processed_items, num_total_items)
-    else:
-      if num_processed_items == num_total_items:
-        text = _('Done. {} images processed.').format(num_processed_items)
-      else:
-        text = _('Done. {} out of {} images successfully processed.').format(
-          num_processed_items, num_total_items)
-
-    self._display_inline_message(text)
 
   def _on_dialog_key_press_event(self, dialog, event):
     if not dialog.get_mapped():

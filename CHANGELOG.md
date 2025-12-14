@@ -16,6 +16,7 @@ New features:
 * If an action causes an error during processing or if a file does not exist, you may choose to skip the current image/layer and continue processing subsequent images/layers. This can be enabled permanently via `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable (#21).
 * Batch Convert: You can now move around individual files or folders by dragging and dropping them anywhere within the input list, or by pressing Alt + Up/Down. This is useful if, for example, you intend rename the images with a numbered sequence.
 * Batch Convert: Files and folders can now be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
+* You can now view message logs recorded during processing via `Settings → View Logs` and save them to a file.
 
 User interface changes:
 * Export settings are now arranged vertically in the upper left part of the dialog. Clarified labels describing the settings.
