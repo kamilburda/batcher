@@ -6,6 +6,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
 
+from config import CONFIG
 from src import builtin_actions
 from src import commands as commands_
 from src import core
@@ -14,13 +15,20 @@ from src import itemtree
 from src import plugin_settings
 from src import utils
 from src import utils_setting as utils_setting_
+from src.procedure_groups import *
 from src.pypdb import pdb
 
 from src.tests import stubs_gimp
 
 
 class TestBatcherInitialCommands(unittest.TestCase):
-  
+
+  def setUp(self):
+    CONFIG.PROCEDURE_GROUP = EXPORT_LAYERS_GROUP
+
+  def tearDown(self):
+    CONFIG.PROCEDURE_GROUP = CONFIG.PLUGIN_NAME
+
   def test_add_action_added_action_is_first_in_command_list(self):
     settings = plugin_settings.create_settings_for_export_layers()
     settings['main/file_extension'].set_value('xcf')
