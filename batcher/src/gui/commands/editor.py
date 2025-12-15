@@ -337,14 +337,14 @@ class CommandEditorWidget:
         row_index,
         width_chars=self._label_width_chars_for_arguments,
         max_width_chars=self._label_width_chars_for_arguments,
-        set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
+        include_name_in_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
       gui_utils_grid_.attach_widget_to_grid(
         grid,
         setting,
         row_index,
-        set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
+        include_name_in_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
       )
 
       indexes_in_grid[setting] = row_index
@@ -364,14 +364,14 @@ class CommandEditorWidget:
         row_index,
         width_chars=label_width_chars,
         max_width_chars=label_width_chars,
-        set_name_as_tooltip=False,
+        include_name_in_tooltip=False,
       )
 
       gui_utils_grid_.attach_widget_to_grid(
         self._grid_more_options,
         setting,
         row_index,
-        set_name_as_tooltip=False,
+        include_name_in_tooltip=False,
       )
 
       row_index += 1
@@ -462,14 +462,14 @@ class CommandEditorWidget:
       row_index,
       width_chars=self._label_width_chars_for_arguments,
       max_width_chars=self._label_width_chars_for_arguments,
-      set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
+      include_name_in_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
     )
 
     gui_utils_grid_.attach_widget_to_grid(
       grid,
       setting,
       row_index,
-      set_name_as_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
+      include_name_in_tooltip=self._command['origin'].value in ['gimp_pdb', 'gegl'],
     )
 
   def _remove_command_argument_from_grid(self, setting):

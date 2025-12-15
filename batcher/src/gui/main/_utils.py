@@ -74,11 +74,11 @@ class ImportExportOptionsDialog:
         row_index,
         width_chars=label_width_chars,
         max_width_chars=label_width_chars,
-        set_name_as_tooltip=False,
+        include_name_in_tooltip=False,
       )
 
       gui_utils_grid_.attach_widget_to_grid(
-        self._grid, setting, row_index, set_name_as_tooltip=False)
+        self._grid, setting, row_index, include_name_in_tooltip=False)
 
     self._scrolled_window_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
     self._scrolled_window_viewport.add(self._grid)
