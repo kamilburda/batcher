@@ -7,7 +7,6 @@ from gi.repository import Gimp
 
 from src import file_formats as file_formats_
 from src import setting as setting_
-from src import utils
 
 
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
