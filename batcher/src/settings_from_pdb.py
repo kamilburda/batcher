@@ -66,7 +66,8 @@ def get_setting_data_from_pdb_procedure(
     argument_dict = {
       'type': setting_type,
       'name': unique_pdb_param_name,
-      'display_name': proc_arg.blurb,
+      'display_name': _get_arg_display_name(proc_arg),
+      'description': _get_arg_description(proc_arg),
       **setting_type_init_kwargs,
     }
 
@@ -124,6 +125,14 @@ def _get_arg_default_value(pdb_procedure_name, proc_arg):
       return proc_args_with_custom_defaults[proc_arg.name]
 
   return proc_arg.default_value
+
+
+def _get_arg_display_name(proc_arg):
+  return proc_arg.nick.replace('_', '')
+
+
+def _get_arg_description(proc_arg):
+  return proc_arg.blurb
 
 
 _PDB_PROCEDURES_AND_CUSTOM_DEFAULT_ARGUMENT_VALUES = {

@@ -32,8 +32,9 @@ def attach_label_to_grid(
 
   label.set_text(_get_label_from_setting(setting))
 
-  if _has_setting_display_name(setting) and set_name_as_tooltip:
-    label.set_tooltip_text(setting.name)
+  tooltip_text = _get_tooltip_from_setting(setting, set_name_as_tooltip)
+  if tooltip_text is not None:
+    label.set_tooltip_text(tooltip_text)
 
   label.set_sensitive(setting.gui.get_sensitive())
 
@@ -68,8 +69,9 @@ def attach_widget_to_grid(
     final_column_index = column_index_for_widget_without_label
     final_width = width_for_widget_without_label
 
-    if set_name_as_tooltip and _has_setting_display_name(setting):
-      widget_to_attach.set_tooltip_text(setting.name)
+    tooltip_text = _get_tooltip_from_setting(setting, set_name_as_tooltip)
+    if tooltip_text is not None:
+      widget_to_attach.set_tooltip_text(tooltip_text)
 
   setting.invoke_event('gui-attached-to-grid')
 
@@ -92,6 +94,23 @@ def _get_label_from_setting(setting):
     return setting.display_name
   else:
     return setting.name
+
+
+def _get_tooltip_from_setting(setting, set_name_as_tooltip):
+  if set_name_as_tooltip:
+    if setting.description is not None and setting.description.strip():
+      return f'\u2068{setting.description}\u2069 (\u2068{setting.name}\u2069)'
+    else:
+      if _has_setting_display_name(setting):
+        return setting.name
+      else:
+        # `setting.name` is already used as the label in this case.
+        return None
+  else:
+    if setting.description is not None and setting.description.strip():
+      return setting.description
+    else:
+      return None
 
 
 def _has_setting_display_name(setting):

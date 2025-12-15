@@ -28,18 +28,25 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         dict(
           value_type=Gimp.RunMode.__gtype__,
           name='run-mode',
+          nick='Run mode',
           blurb='The run mode',
           default_value=Gimp.RunMode.NONINTERACTIVE,
         ),
         dict(
           value_type=GObject.GType.from_name('GimpCoreObjectArray'),
           name='drawables',
-          blurb='Drawables',
+          nick='Drawables',
+          blurb='The input drawables',
           object_type=Gimp.Drawable.__gtype__,
         ),
         dict(
-          value_type=GObject.TYPE_STRING, name='filename', blurb='Filename to save the image in')],
-      blurb='Saves files in PNG file format')
+          value_type=GObject.TYPE_STRING,
+          name='filename',
+          nick='Filename',
+          blurb='Filename to save the image in',
+        )],
+      blurb='Saves files in PNG file format',
+    )
 
     settings_from_pdb_.pdb.remove_from_cache(self.procedure_name)
 
@@ -48,18 +55,29 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
       dict(
         value_type=GObject.GType.from_name('GimpCoreObjectArray'),
         name='drawables',
-        blurb='More drawables',
+        nick='More drawables',
+        blurb='More input drawables',
         object_type=Gimp.Drawable.__gtype__,
       ),
-      dict(value_type=GObject.TYPE_STRING, name='filename', blurb='Another filename'),
-      dict(value_type=GObject.TYPE_STRV, name='brushes', blurb='Brush names'),
+      dict(
+        value_type=GObject.TYPE_STRING,
+        name='filename',
+        nick='Another filename',
+        blurb='Another filename',
+      ),
+      dict(
+        value_type=GObject.TYPE_STRV,
+        name='brushes',
+        nick='Brush names',
+        blurb='Brush names',
+      ),
     ])
 
     extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    procedure, procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
-      extended_procedure_stub.get_name())
+    procedure, procedure_name, arguments = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(extended_procedure_stub.get_name()))
 
     self.assertIsInstance(procedure, pypdb.PDBProcedure)
     self.assertEqual(procedure_name, self.procedure_name)
@@ -74,37 +92,43 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
           'type': setting_.EnumSetting,
           'default_value': Gimp.RunMode.NONINTERACTIVE,
           'enum_type': (procedure, procedure.arguments[0]),
-          'display_name': 'The run mode',
+          'display_name': 'Run mode',
+          'description': 'The run mode',
         },
         {
           'name': 'drawables',
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': setting_.DrawableSetting,
           'display_name': 'Drawables',
+          'description': 'The input drawables',
         },
         {
           'name': 'filename',
           'type': setting_.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
-          'display_name': 'Filename to save the image in',
+          'display_name': 'Filename',
+          'description': 'Filename to save the image in',
         },
         {
           'name': 'drawables-2',
           'type': placeholders_.PlaceholderDrawableArraySetting,
           'element_type': setting_.DrawableSetting,
           'display_name': 'More drawables',
+          'description': 'More input drawables',
         },
         {
           'name': 'filename-2',
           'type': setting_.StringSetting,
           'pdb_type': GObject.TYPE_STRING,
           'display_name': 'Another filename',
+          'description': 'Another filename',
         },
         {
           'name': 'brushes',
           'type': setting_.ArraySetting,
           'element_type': setting_.StringSetting,
           'display_name': 'Brush names',
+          'description': 'Brush names',
         },
       ]
     )
@@ -115,14 +139,16 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         value_type='unsupported',
         default_value='test',
         name='param-with-unsupported-type',
-        blurb='Test'),
+        nick='Test',
+        blurb='Testing',
+      ),
     ])
 
     extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
-      extended_procedure_stub.get_name())
+    _procedure, _procedure_name, arguments = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(extended_procedure_stub.get_name()))
 
     unsupported_param = arguments[-1]
 
@@ -132,6 +158,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
         'type': placeholders_.PlaceholderUnsupportedParameterSetting,
         'name': 'param-with-unsupported-type',
         'display_name': 'Test',
+        'description': 'Testing',
         'default_param_value': 'test',
       }
     )
@@ -140,22 +167,22 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     self.procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(self.procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
-      self.procedure_name)
+    _procedure, _procedure_name, arguments = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(self.procedure_name))
 
     self.assertEqual(arguments[0]['default_value'], Gimp.RunMode.NONINTERACTIVE)
 
   def test_gimp_object_types_are_replaced_with_placeholders(self, *_mocks):
     self.procedure_stub_kwargs['arguments_spec'].extend([
-      dict(value_type=Gimp.Image.__gtype__, name='image', blurb='The image'),
-      dict(value_type=Gimp.Layer.__gtype__, name='layer', blurb='The layer to process'),
+      dict(value_type=Gimp.Image.__gtype__, name='image', nick='The image'),
+      dict(value_type=Gimp.Layer.__gtype__, name='layer', nick='The layer to process'),
     ])
 
     extended_procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(extended_procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
-      self.procedure_name)
+    _procedure, _procedure_name, arguments = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(self.procedure_name))
 
     self.assertEqual(arguments[-2]['type'], placeholders_.PlaceholderImageSetting)
     self.assertEqual(arguments[-1]['type'], placeholders_.PlaceholderLayerSetting)
@@ -171,7 +198,7 @@ class TestGetSettingDataFromPdbProcedure(unittest.TestCase):
     procedure_stub = stubs_gimp.Procedure(**self.procedure_stub_kwargs)
     stubs_gimp.PdbStub.add_procedure(procedure_stub)
 
-    _procedure, _procedure_name, arguments = settings_from_pdb_.get_setting_data_from_pdb_procedure(
-      self.procedure_name)
+    _procedure, _procedure_name, arguments = (
+      settings_from_pdb_.get_setting_data_from_pdb_procedure(self.procedure_name))
 
     self.assertEqual(arguments[-1]['default_value'], False)

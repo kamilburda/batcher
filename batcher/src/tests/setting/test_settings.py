@@ -843,12 +843,16 @@ class TestCreateEnumSetting(SettingTestCase):
   def test_with_enum_type_as_procedure_and_param_spec(self):
     procedure = stubs_gimp.StubPDBProcedure(stubs_gimp.Procedure('some-procedure'))
     procedure_param = stubs_gimp.GParamStub(
-      GObject.TYPE_ENUM, 'distance-metric', '', Gegl.DistanceMetric.EUCLIDEAN)
+      GObject.TYPE_ENUM,
+      'distance-metric',
+      default_value=Gegl.DistanceMetric.EUCLIDEAN,
+    )
 
     setting = settings_.EnumSetting(
       'distance_metric',
       (procedure, procedure_param),
-      default_value=Gegl.DistanceMetric.EUCLIDEAN)
+      default_value=Gegl.DistanceMetric.EUCLIDEAN,
+    )
 
     self.assertEqual(setting.default_value, Gegl.DistanceMetric.EUCLIDEAN)
     self.assertEqual(setting.enum_type, Gegl.DistanceMetric)
