@@ -16,6 +16,17 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 
+def get_gimp_version() -> Tuple[int, int, int]:
+  """Returns the version of the currently running GIMP instance.
+
+  The return value is a tuple of (major, minor, micro) numbers. This is useful
+  when comparing versions (comparing strings is wrong as e.g. '3.2.4' is
+  greater than '3.2.14', even though the latter should be greater when comparing
+  them as versions).
+  """
+  return Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION
+
+
 def create_empty_image_copy(orig_image):
   """Creates a copy of ``orig_image`` without any contents.
 
@@ -602,3 +613,4 @@ def _get_orientation_str_via_regex(serialized_metadata):
     return match.group(1)
   else:
     return None
+

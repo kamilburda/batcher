@@ -52,7 +52,7 @@ class TestConvertCompareContents(unittest.TestCase):
       shutil.rmtree(INCORRECT_RESULTS_DIRPATH)
 
     gimp_version = '-'.join(
-      str(version_number_part) for version_number_part in cls._get_gimp_version_as_tuple()[:2]
+      str(version_number_part) for version_number_part in utils_pdb.get_gimp_version()[:2]
     )
 
     version_specific_expected_results_dirpath = (
@@ -212,7 +212,3 @@ class TestConvertCompareContents(unittest.TestCase):
   def _load_image(cls, image_filepath):
     return pdb.gimp_file_load(
       run_mode=Gimp.RunMode.NONINTERACTIVE, file=Gio.file_new_for_path(image_filepath))
-
-  @staticmethod
-  def _get_gimp_version_as_tuple():
-    return Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION

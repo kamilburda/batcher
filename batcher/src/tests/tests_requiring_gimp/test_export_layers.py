@@ -52,7 +52,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       shutil.rmtree(INCORRECT_RESULTS_DIRPATH)
 
     gimp_version = '-'.join(
-      str(version_number_part) for version_number_part in cls._get_gimp_version_as_tuple()[:2]
+      str(version_number_part) for version_number_part in utils_pdb.get_gimp_version()[:2]
     )
 
     version_specific_expected_results_dirpath = (
@@ -276,7 +276,3 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         layer_filepaths.append(path)
     
     return layer_filepaths
-
-  @staticmethod
-  def _get_gimp_version_as_tuple():
-    return Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION
