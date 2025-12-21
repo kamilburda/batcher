@@ -77,7 +77,7 @@ class CommandBrowser(GObject.GObject):
     self._title = title
 
     self._command_categories = {
-      'filters': _('Filters'),
+      'filters': _('Filters, Layer Effects'),
       'plug_ins': _('Plug-ins'),
       'gimp_procedures': _('GIMP Procedures'),
       'other': _('Other'),
