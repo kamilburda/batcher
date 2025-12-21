@@ -6,6 +6,7 @@ The list includes GIMP PDB procedures.
 import gi
 gi.require_version('Gegl', '0.4')
 from gi.repository import Gegl
+from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -32,6 +33,8 @@ class CommandBrowser(GObject.GObject):
   _DIALOG_SIZE = 675, 450
   _HPANED_POSITION = 325
 
+  _ICON_XPAD = 2
+
   _CONTENTS_BORDER_WIDTH = 6
   _VBOX_BROWSER_SPACING = 6
   _HBOX_SEARCH_BAR_SPACING = 6
@@ -41,18 +44,24 @@ class CommandBrowser(GObject.GObject):
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
 
   _COLUMNS = (
+    _COLUMN_COMMAND_CATEGORY,
     _COLUMN_COMMAND_NAME,
-    _COLUMN_COMMAND_MENU_NAME,
+    _COLUMN_COMMAND_INTERNAL_NAME,
     _COLUMN_COMMAND_DESCRIPTION,
-    _COLUMN_COMMAND_TYPE,
     _COLUMN_COMMAND_DICT,
-    _COLUMN_COMMAND_EDITOR_WIDGET) = (
+    _COLUMN_COMMAND_EDITOR_WIDGET,
+    _COLUMN_COMMAND_VISIBLE,
+    _COLUMN_ICON_PARENT,
+  ) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_STRING],
     [2, GObject.TYPE_STRING],
     [3, GObject.TYPE_STRING],
     [4, GObject.TYPE_PYOBJECT],
-    [5, GObject.TYPE_PYOBJECT])
+    [5, GObject.TYPE_PYOBJECT],
+    [6, GObject.TYPE_BOOLEAN],
+    [7, GdkPixbuf.Pixbuf],
+  )
 
   __gsignals__ = {
     'command-selected': (
@@ -67,20 +76,17 @@ class CommandBrowser(GObject.GObject):
 
     self._title = title
 
-    self._parent_tree_iters = {}
+    self._command_categories = {
+      'filters': _('Filters'),
+      'plug_ins': _('Plug-ins'),
+      'gimp_procedures': _('GIMP Procedures'),
+      'other': _('Other'),
+    }
 
-    self._predefined_parent_tree_iter_names = [
-      'filters',
-      'plug_ins',
-      'gimp_procedures',
-      'other',
-    ]
-    self._predefined_parent_tree_iter_display_names = [
-      _('Filters, Effects'),
-      _('Plug-ins'),
-      _('GIMP Procedures'),
-      _('Other'),
-    ]
+    self._command_categories_and_numbers = {
+      category: index for index, category in enumerate(self._command_categories)}
+
+    self._command_categories_iters = {}
 
     self._contents_filled = False
     self._currently_filling_contents = False
@@ -109,37 +115,25 @@ class CommandBrowser(GObject.GObject):
   def paned(self):
     return self._hpaned
 
-  def select_command(self, name):
-    parents = [self._tree_model_sorted]
+  def select_command(self, internal_name):
+    current_iter = self._tree_model_sorted.get_iter_first()
 
-    while parents:
-      parent = parents.pop(0)
+    while current_iter is not None:
+      row = self._tree_model_sorted[current_iter]
 
-      for row in parent:
-        if row[0] == name:
-          converted_path = self._tree_model_filter.convert_child_path_to_path(row.path)
-          self._tree_view.get_selection().select_iter(row.iter)
-          self._tree_view.scroll_to_cell(converted_path, None, True, 0.5, 0.0)
-          return
+      if row[0] == internal_name:
+        converted_path = self._tree_model_sorted.convert_child_path_to_path(row.path)
+        self._tree_view.get_selection().select_iter(row.iter)
+        self._tree_view.scroll_to_cell(converted_path, None, True, 0.5, 0.0)
+        return
 
-        parents.append(row.iterchildren())
+      current_iter = self._tree_model_sorted.iter_next(current_iter)
 
   def fill_contents_if_empty(self):
     if self._contents_filled:
       return
 
     self._contents_filled = True
-
-    for name, display_name in zip(
-          self._predefined_parent_tree_iter_names, self._predefined_parent_tree_iter_display_names):
-      self._parent_tree_iters[name] = self._tree_model.append(
-        None,
-        [display_name,
-         '',
-         '',
-         name,
-         None,
-         None])
 
     def is_file_load_procedure(name_):
       return (name_.startswith('file-')
@@ -176,18 +170,27 @@ class CommandBrowser(GObject.GObject):
           Gimp.PDBProcType.PLUGIN, Gimp.PDBProcType.PERSISTENT, Gimp.PDBProcType.TEMPORARY]
       )
 
-    # We pre-sort procedure names so that the column with these names will
-    # appear sorted for entries without a menu name (corresponding to the column
-    # used for sorting by default).
+    for command_category, command_category_display_name in self._command_categories.items():
+      self._command_categories_iters[command_category] = self._tree_model.append([
+          command_category,
+          command_category_display_name,
+          '',
+          '',
+          None,
+          None,
+          True,
+          self._icon_arrow_down,
+      ])
+
     pdb_procedures = [
       pdb[name]
-      for name in sorted(pdb.list_all_gegl_operations())
+      for name in pdb.list_all_gegl_operations()
       if not is_gegl_operation_internal(name)
     ]
 
     pdb_procedures.extend(
       pdb[name]
-      for name in sorted(pdb.list_all_gimp_pdb_procedures())
+      for name in pdb.list_all_gimp_pdb_procedures()
       if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     )
 
@@ -205,43 +208,42 @@ class CommandBrowser(GObject.GObject):
 
       if isinstance(procedure, pypdb.GeglProcedure):
         if not is_gegl_operation_hidden(procedure_name):
-          command_type = 'filters'
+          command_category = 'filters'
         else:
-          command_type = 'other'
+          command_category = 'other'
       elif procedure_name.startswith('file-'):
-        command_type = 'other'
+        command_category = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
         if self._has_plugin_procedure_image_or_drawable_arguments(command_dict):
-          command_type = 'plug_ins'
+          command_category = 'plug_ins'
         else:
-          command_type = 'other'
+          command_category = 'other'
       else:
-        command_type = 'gimp_procedures'
+        command_category = 'gimp_procedures'
 
       if command_dict['display_name'] != procedure_name:
         display_name = command_dict['display_name']
       else:
-        display_name = ''
+        display_name = None
 
       # This prevents certain procedures from triggering undesired behavior
       #  (e.g. displaying a layer copy as a new image).
       command_dict['enabled'] = False
 
-      self._tree_model.append(
-        self._parent_tree_iters[command_type],
-        [procedure_name,
-         display_name,
-         command_dict.get('description', ''),
-         command_type,
-         command_dict,
-         None])
+      self._tree_model.append([
+          command_category,
+          display_name if display_name is not None else procedure_name,
+          procedure_name,
+          command_dict.get('description', ''),
+          command_dict,
+          None,
+          True,
+          None,
+      ])
 
-    self._tree_view.expand_row(
-      self._tree_model[self._predefined_parent_tree_iter_names.index('filters')].path,
-      False)
-
+    # TODO: Select the first non-parent.
+    #  Perhaps use self._tree_model_sorted[0] instead?
     first_selectable_path = self._tree_model[0].path
-    first_selectable_path.down()
 
     self._currently_filling_contents = True
 
@@ -254,7 +256,7 @@ class CommandBrowser(GObject.GObject):
       model, selected_iter = self._tree_view.get_selection().get_selected()
 
     if selected_iter is not None:
-      row = Gtk.TreeModelRow(model, selected_iter)
+      row = model[selected_iter]
 
       command_dict = row[self._COLUMN_COMMAND_DICT[0]]
       command_editor_widget = row[self._COLUMN_COMMAND_EDITOR_WIDGET[0]]
@@ -329,7 +331,7 @@ class CommandBrowser(GObject.GObject):
     )
     self._dialog.set_default_size(*self._DIALOG_SIZE)
 
-    self._tree_model = Gtk.TreeStore(*[column[1] for column in self._COLUMNS])
+    self._tree_model = Gtk.ListStore(*[column[1] for column in self._COLUMNS])
 
     self._tree_view = Gtk.TreeView(
       headers_visible=True,
@@ -341,7 +343,20 @@ class CommandBrowser(GObject.GObject):
     column_name = Gtk.TreeViewColumn()
     column_name.set_resizable(True)
     column_name.set_title(_('Name'))
-    column_name.set_sort_column_id(self._COLUMN_COMMAND_NAME[0])
+
+    self._icon_arrow_down = gui_utils_.get_icon_pixbuf(
+      'pan-down', self._tree_view, Gtk.IconSize.MENU)
+    self._icon_arrow_end = gui_utils_.get_icon_pixbuf(
+      'pan-end', self._tree_view, Gtk.IconSize.MENU)
+
+    cell_renderer_icon_parent = Gtk.CellRendererPixbuf(
+      xpad=self._ICON_XPAD,
+    )
+    column_name.pack_start(cell_renderer_icon_parent, False)
+    column_name.set_attributes(
+      cell_renderer_icon_parent,
+      pixbuf=self._COLUMN_ICON_PARENT[0],
+    )
 
     cell_renderer_command_name = Gtk.CellRendererText(
       width_chars=self._COMMAND_NAME_WIDTH_CHARS,
@@ -350,36 +365,18 @@ class CommandBrowser(GObject.GObject):
     column_name.pack_start(cell_renderer_command_name, False)
     column_name.set_attributes(
       cell_renderer_command_name,
-      text=self._COLUMN_COMMAND_NAME[0])
+      text=self._COLUMN_COMMAND_NAME[0],
+      visible=self._COLUMN_COMMAND_VISIBLE[0],
+    )
+    column_name.set_sort_column_id(self._COLUMN_COMMAND_NAME[0])
 
     self._tree_view.append_column(column_name)
 
-    column_menu_name = Gtk.TreeViewColumn()
-    column_menu_name.set_resizable(True)
-    column_menu_name.set_title(_('Menu Name'))
-    column_menu_name.set_sort_column_id(self._COLUMN_COMMAND_MENU_NAME[0])
-
-    cell_renderer_command_menu_name = Gtk.CellRendererText(
-      width_chars=self._COMMAND_NAME_WIDTH_CHARS,
-      ellipsize=Pango.EllipsizeMode.END,
-    )
-    column_menu_name.pack_start(cell_renderer_command_menu_name, False)
-    column_menu_name.set_attributes(
-      cell_renderer_command_menu_name,
-      text=self._COLUMN_COMMAND_MENU_NAME[0])
-
-    self._tree_view.append_column(column_menu_name)
-
-    self._tree_model_filter = Gtk.TreeModelFilter(child_model=self._tree_model)
-    self._tree_model_filter.set_visible_func(self._get_row_visibility_based_on_search_query)
-
-    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model_filter)
+    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model)
     self._tree_model_sorted.set_sort_func(
       self._COLUMN_COMMAND_NAME[0], self._sort_commands_by_name)
-    self._tree_model_sorted.set_sort_func(
-      self._COLUMN_COMMAND_MENU_NAME[0], self._sort_commands_by_menu_name)
     self._tree_model_sorted.set_sort_column_id(
-      self._COLUMN_COMMAND_MENU_NAME[0], Gtk.SortType.ASCENDING)
+      self._COLUMN_COMMAND_NAME[0], Gtk.SortType.ASCENDING)
 
     self._tree_view.set_model(self._tree_model_sorted)
 
@@ -399,8 +396,8 @@ class CommandBrowser(GObject.GObject):
       label=_('by name'),
       active=True,
     )
-    self._menu_item_by_menu_name = Gtk.CheckMenuItem(
-      label=_('by menu name'),
+    self._menu_item_by_internal_name = Gtk.CheckMenuItem(
+      label=_('by internal name'),
       active=True,
     )
     self._menu_item_by_description = Gtk.CheckMenuItem(
@@ -410,7 +407,7 @@ class CommandBrowser(GObject.GObject):
 
     self._menu_search_settings = Gtk.Menu()
     self._menu_search_settings.append(self._menu_item_by_name)
-    self._menu_search_settings.append(self._menu_item_by_menu_name)
+    self._menu_search_settings.append(self._menu_item_by_internal_name)
     self._menu_search_settings.append(self._menu_item_by_description)
     self._menu_search_settings.show_all()
 
@@ -445,6 +442,10 @@ class CommandBrowser(GObject.GObject):
     self._scrolled_window_command_arguments_viewport = Gtk.Viewport(shadow_type=Gtk.ShadowType.NONE)
     self._scrolled_window_command_arguments.add(self._scrolled_window_command_arguments_viewport)
 
+    self._scrolled_window_command_arguments.show_all()
+    self._scrolled_window_command_arguments.set_no_show_all(True)
+    self._scrolled_window_command_arguments.hide()
+
     self._label_no_selection = Gtk.Label(
       label='<i>{}</i>'.format(_('Select an action')),
       xalign=0.5,
@@ -478,76 +479,58 @@ class CommandBrowser(GObject.GObject):
 
     self._set_search_bar_icon_sensitivity()
 
+  def _sort_commands_by_name(self, model, first_iter, second_iter, _user_data):
+    _column_id, sort_type = self._tree_model_sorted.get_sort_column_id()
+
+    first_category_number, first_name = self._get_sort_column_key(model, first_iter, sort_type)
+    second_category_number, second_name = self._get_sort_column_key(model, second_iter, sort_type)
+
+    if (first_category_number, first_name) > (second_category_number, second_name):
+      return 1
+    elif (first_category_number, first_name) == (second_category_number, second_name):
+      return 0
+    else:
+      return -1
+
+  def _get_sort_column_key(self, model, tree_iter, sort_type):
+    row = model[tree_iter]
+
+    command_dict = row[self._COLUMN_COMMAND_DICT[0]]
+    if command_dict is not None:
+      name = row[self._COLUMN_COMMAND_NAME[0]].lower()
+    else:
+      name = ''
+
+    category = row[self._COLUMN_COMMAND_CATEGORY[0]]
+
+    category_number = self._command_categories_and_numbers[category]
+    if sort_type == Gtk.SortType.DESCENDING:
+      category_number = len(self._command_categories_and_numbers) - category_number - 1
+      if command_dict is None:
+        # Make sure parents precede items in the same category.
+        category_number += 1
+
+    return category_number, name
+
+  # TODO: Transform this to a search function
   def _get_row_visibility_based_on_search_query(self, model, iter_, _data):
-    row = Gtk.TreeModelRow(model, iter_)
+    row = model[iter_]
 
     processed_search_query = self._process_text_for_search(self._entry_search.get_text())
 
-    # Do not filter parents
-    if model.iter_parent(iter_) is None:
-      return True
-
     enabled_search_criteria = []
     if self._menu_item_by_name.get_active():
-      enabled_search_criteria.append(self._process_text_for_search(row[0]))
-    if self._menu_item_by_menu_name.get_active():
       enabled_search_criteria.append(self._process_text_for_search(row[1]))
-    if self._menu_item_by_description.get_active():
+    if self._menu_item_by_internal_name.get_active():
       enabled_search_criteria.append(self._process_text_for_search(row[2]))
+    if self._menu_item_by_description.get_active():
+      enabled_search_criteria.append(self._process_text_for_search(row[3]))
 
     return any(processed_search_query in text for text in enabled_search_criteria)
 
   @staticmethod
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
-
-  def _sort_commands_by_name(self, model, first_iter, second_iter, _user_data):
-    first_row = Gtk.TreeModelRow(model, first_iter)
-    first_name = first_row[self._COLUMN_COMMAND_NAME[0]]
-    first_type = first_row[self._COLUMN_COMMAND_TYPE[0]]
-
-    second_row = Gtk.TreeModelRow(model, second_iter)
-    second_name = second_row[self._COLUMN_COMMAND_NAME[0]]
-    second_type = second_row[self._COLUMN_COMMAND_TYPE[0]]
-
-    if first_type == second_type:
-      if first_name < second_name:
-        return -1
-      elif first_name == second_name:
-        return 0
-      else:
-        return 1
-    else:
-      # Keep order of parents intact
-      return 0
-
-  def _sort_commands_by_menu_name(self, model, first_iter, second_iter, _user_data):
-    first_row = Gtk.TreeModelRow(model, first_iter)
-    first_name = first_row[self._COLUMN_COMMAND_MENU_NAME[0]]
-    first_type = first_row[self._COLUMN_COMMAND_TYPE[0]]
-
-    second_row = Gtk.TreeModelRow(model, second_iter)
-    second_name = second_row[self._COLUMN_COMMAND_MENU_NAME[0]]
-    second_type = second_row[self._COLUMN_COMMAND_TYPE[0]]
-
-    if first_type == second_type:
-      # Treat empty menu name as lower in order
-      if first_name != '' and second_name != '':
-        if first_name < second_name:
-          return -1
-        elif first_name == second_name:
-          return 0
-        else:
-          return 1
-      elif first_name == '' and second_name == '':
-        return 0
-      elif first_name == '' and second_name != '':
-        return 1
-      elif first_name != '' and second_name == '':
-        return -1
-    else:
-      # Keep order of parents intact
-      return 0
 
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
@@ -557,8 +540,12 @@ class CommandBrowser(GObject.GObject):
   def _update_search_results(self, *args):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
-      lambda: self._tree_model_filter.refilter(),  # Wrap `gi.FunctionInfo` as it is unhashable
+      self._filter_search_results,
     )
+
+  def _filter_search_results(self):
+    # TODO
+    return True
 
   def _set_search_bar_icon_sensitivity(self):
     self._entry_search.set_icon_sensitive(
@@ -573,23 +560,25 @@ class CommandBrowser(GObject.GObject):
   def _on_tree_view_selection_changed(self, selection):
     model, selected_iter = selection.get_selected()
 
-    if selected_iter is not None and model.iter_parent(selected_iter) is not None:
+    if selected_iter is not None:
       _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
         model, selected_iter)
 
       if not self._currently_filling_contents:
         self.emit('command-selected', command)
 
-      self._label_no_selection.hide()
-
       self._detach_command_editor_widget()
 
-      self._attach_command_editor_widget(command_editor_widget)
-
-      self._scrolled_window_command_arguments.show()
+      if command_editor_widget is not None:
+        self._label_no_selection.hide()
+        self._attach_command_editor_widget(command_editor_widget)
+        self._scrolled_window_command_arguments.show()
+      else:
+        self._scrolled_window_command_arguments.hide()
+        self._label_no_selection.show()
     else:
-      self._label_no_selection.show()
       self._scrolled_window_command_arguments.hide()
+      self._label_no_selection.show()
 
       if not self._currently_filling_contents:
         self.emit('command-selected', None)
@@ -597,8 +586,8 @@ class CommandBrowser(GObject.GObject):
   def _on_dialog_show(self, _dialog):
     model, selected_iter = self._tree_view.get_selection().get_selected()
 
-    if selected_iter is not None and model.iter_parent(selected_iter) is not None:
-      _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
+    if selected_iter is not None:
+      _command_dict, command, _command_editor_widget, _model, _iter = self._get_selected_command(
         model, selected_iter)
 
       self.emit('command-selected', command)

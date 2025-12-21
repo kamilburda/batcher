@@ -34,6 +34,8 @@ User interface changes:
 * A simple summary message indicating the number of successfully processed images/layers is now displayed after the processing.
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
+* Changes to the custom action browser:
+  * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
 
 Changes to actions and conditions:
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
