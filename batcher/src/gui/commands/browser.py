@@ -381,7 +381,10 @@ class CommandBrowser(GObject.GObject):
 
     self._tree_view.append_column(column_name)
 
-    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model)
+    self._tree_model_filter = Gtk.TreeModelFilter(child_model=self._tree_model)
+    self._tree_model_filter.set_visible_column(self._COLUMN_COMMAND_VISIBLE[0])
+
+    self._tree_model_sorted = Gtk.TreeModelSort.new_with_model(self._tree_model_filter)
     self._tree_model_sorted.set_sort_func(
       self._COLUMN_COMMAND_NAME[0], self._sort_commands_by_name)
     self._tree_model_sorted.set_sort_column_id(
@@ -521,22 +524,6 @@ class CommandBrowser(GObject.GObject):
 
     return category_number, name
 
-  # TODO: Transform this to a search function
-  def _get_row_visibility_based_on_search_query(self, model, iter_, _data):
-    row = model[iter_]
-
-    processed_search_query = self._process_text_for_search(self._entry_search.get_text())
-
-    enabled_search_criteria = []
-    if self._menu_item_by_name.get_active():
-      enabled_search_criteria.append(self._process_text_for_search(row[1]))
-    if self._menu_item_by_internal_name.get_active():
-      enabled_search_criteria.append(self._process_text_for_search(row[2]))
-    if self._menu_item_by_description.get_active():
-      enabled_search_criteria.append(self._process_text_for_search(row[3]))
-
-    return any(processed_search_query in text for text in enabled_search_criteria)
-
   @staticmethod
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
@@ -549,12 +536,31 @@ class CommandBrowser(GObject.GObject):
   def _update_search_results(self, *args):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
-      self._filter_search_results,
+      self._update_row_visibility,
     )
 
-  def _filter_search_results(self):
-    # TODO
-    return True
+  def _update_row_visibility(self):
+    for row in self._tree_model:
+      if row[self._COLUMN_COMMAND_DICT[0]] is None:
+        # Ignore parents
+        continue
+
+      processed_search_query = self._process_text_for_search(self._entry_search.get_text())
+
+      enabled_search_criteria = []
+      if self._menu_item_by_name.get_active():
+        enabled_search_criteria.append(
+          self._process_text_for_search(row[self._COLUMN_COMMAND_NAME[0]]))
+      if self._menu_item_by_internal_name.get_active():
+        enabled_search_criteria.append(
+          self._process_text_for_search(row[self._COLUMN_COMMAND_INTERNAL_NAME[0]]))
+      if self._menu_item_by_description.get_active():
+        enabled_search_criteria.append(
+          self._process_text_for_search(row[self._COLUMN_COMMAND_DESCRIPTION[0]]))
+
+      visible = any(processed_search_query in text for text in enabled_search_criteria)
+
+      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible
 
   def _set_search_bar_icon_sensitivity(self):
     self._entry_search.set_icon_sensitive(

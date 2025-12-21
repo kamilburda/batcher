@@ -43,6 +43,7 @@ Changes to actions and conditions:
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:
+* In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable. There may still be a noticeable delay when the search results are filtered.
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
 
 
