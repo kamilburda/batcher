@@ -558,7 +558,10 @@ class CommandBrowser(GObject.GObject):
         enabled_search_criteria.append(
           self._process_text_for_search(row[self._COLUMN_COMMAND_DESCRIPTION[0]]))
 
-      visible = any(processed_search_query in text for text in enabled_search_criteria)
+      if enabled_search_criteria:
+        visible = any(processed_search_query in text for text in enabled_search_criteria)
+      else:
+        visible = True
 
       row[self._COLUMN_COMMAND_VISIBLE[0]] = visible
 
