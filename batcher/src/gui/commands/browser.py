@@ -533,7 +533,7 @@ class CommandBrowser(GObject.GObject):
 
     self._update_search_results()
 
-  def _update_search_results(self, *args):
+  def _update_search_results(self):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
       self._update_row_visibility,
