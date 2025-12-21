@@ -241,13 +241,22 @@ class CommandBrowser(GObject.GObject):
           None,
       ])
 
-    # TODO: Select the first non-parent.
-    #  Perhaps use self._tree_model_sorted[0] instead?
-    first_selectable_path = self._tree_model[0].path
+    self._set_selection_to_first_command()
 
+  def _set_selection_to_first_command(self):
     self._currently_filling_contents = True
 
-    self._tree_view.set_cursor(first_selectable_path)
+    current_iter = self._tree_model_sorted.get_iter_first()
+    first_command_iter = None
+    while current_iter is not None:
+      row = self._tree_model_sorted[current_iter]
+      if row[self._COLUMN_COMMAND_DICT[0]] is not None:
+        first_command_iter = current_iter
+        break
+
+      current_iter = self._tree_model_sorted.iter_next(current_iter)
+
+    self._tree_view.set_cursor(self._tree_model_sorted[first_command_iter].path)
 
     self._currently_filling_contents = False
 
