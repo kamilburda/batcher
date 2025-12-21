@@ -25,7 +25,6 @@ User interface changes:
 * For action and condition parameters and export options, replaced parameter description with name for consistency with GIMP. The description is now included in the tooltip (if available).
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * Adjusted widths of action/condition argument names to avoid extra empty vertical space (most notably in the Export Options dialog).
-* Increased the default width of the custom action browser to ensure that the right part can be displayed in its entirety without the need for horizontal scrolling.
 * Reduced the width of the quick dialogs given the vertical rearrangement of the export settings.
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
 * Error message dialogs issued by GIMP are now always redirected to the GIMP's error console (https://docs.gimp.org/en/gimp-errors-dialog.html). This avoids spamming the same dialog when attempting to close the dialog and focusing back on the Batcher main dialog (#107).
@@ -35,6 +34,7 @@ User interface changes:
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
 * Changes to the custom action browser:
+  * Adjusted the default width to ensure that the right part can be displayed in its entirety without the need for horizontal scrolling.
   * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
 
 Changes to actions and conditions:

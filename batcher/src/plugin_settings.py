@@ -722,7 +722,7 @@ def _create_gui_settings(item_tree_items_setting_type):
     {
       'type': 'integer',
       'name': 'paned_position',
-      'default_value': 325,
+      'default_value': 275,
       'gui_type': None,
     },
     {
@@ -733,7 +733,7 @@ def _create_gui_settings(item_tree_items_setting_type):
     {
       'type': 'tuple',
       'name': 'dialog_size',
-      'default_value': (890, 450),
+      'default_value': (840, 450),
     },
   ])
 

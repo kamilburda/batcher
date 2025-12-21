@@ -30,8 +30,8 @@ from src.pypdb import pdb
 
 class CommandBrowser(GObject.GObject):
 
-  _DIALOG_SIZE = 675, 450
-  _HPANED_POSITION = 325
+  _DIALOG_SIZE = 840, 450
+  _HPANED_POSITION = 275
 
   _ICON_XPAD = 2
 
