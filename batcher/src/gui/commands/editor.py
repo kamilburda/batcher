@@ -508,11 +508,17 @@ def _get_command_info_from_pdb_procedure(pdb_procedure):
     return None
 
   if pdb_procedure is not None:
-    command_info = ''
+    if pdb_procedure.menu_label is not None and pdb_procedure.menu_label != pdb_procedure.name:
+      command_info = _('Internal name: {}').format(pdb_procedure.name)
+    else:
+      command_info = ''
+
     command_main_info = []
 
     help_text = pdb_procedure.help
     if help_text:
+      if command_info:
+        command_info += '\n\n'
       command_main_info.append(help_text)
 
     command_info += '\n\n'.join(command_main_info)
