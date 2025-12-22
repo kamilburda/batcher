@@ -108,6 +108,8 @@ class CommandBrowser(GObject.GObject):
     self._contents_filled = False
     self._currently_filling_contents = False
 
+    self._row_select_interactive = True
+
     self._init_gui()
 
     self._entry_search.connect('changed', self._on_entry_search_changed)
@@ -561,6 +563,8 @@ class CommandBrowser(GObject.GObject):
     )
 
   def _update_row_visibility(self, *_args):
+    self._row_select_interactive = False
+
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
@@ -570,6 +574,8 @@ class CommandBrowser(GObject.GObject):
       visible_via_expanded = self._get_row_visibility_based_on_category_expanded_state(row)
 
       row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and visible_via_expanded
+
+    self._row_select_interactive = True
 
   def _get_row_visibility_based_on_search(self, row):
     processed_search_query = self._process_text_for_search(self._entry_search.get_text())
@@ -606,6 +612,9 @@ class CommandBrowser(GObject.GObject):
     gui_utils_.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
+    if not self._row_select_interactive:
+      return False
+
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None:
