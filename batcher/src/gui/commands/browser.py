@@ -32,8 +32,15 @@ from src.pypdb import pdb
 
 class _CommandCategory:
 
-  def __init__(self, category='', display_name='', number=0, expanded=True, tree_iter=None):
-    self.category = category
+  def __init__(
+        self,
+        name='',
+        display_name='',
+        number=0,
+        expanded=True,
+        tree_iter=None,
+  ):
+    self.name = name
     self.display_name = display_name
     self.number = number
     self.expanded = expanded
@@ -230,18 +237,18 @@ class CommandBrowser(GObject.GObject):
 
       if isinstance(procedure, pypdb.GeglProcedure):
         if not is_gegl_operation_hidden(procedure_name):
-          command_category = 'filters'
+          category_name = 'filters'
         else:
-          command_category = 'other'
+          category_name = 'other'
       elif procedure_name.startswith('file-'):
-        command_category = 'other'
+        category_name = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
         if self._has_plugin_procedure_image_or_drawable_arguments(command_dict):
-          command_category = 'plug_ins'
+          category_name = 'plug_ins'
         else:
-          command_category = 'other'
+          category_name = 'other'
       else:
-        command_category = 'gimp_procedures'
+        category_name = 'gimp_procedures'
 
       if command_dict['display_name'] != procedure_name:
         display_name = command_dict['display_name']
@@ -254,7 +261,7 @@ class CommandBrowser(GObject.GObject):
 
       self._tree_model.append([
           _CommandBrowserItemTypes.COMMAND,
-          command_category,
+          category_name,
           display_name if display_name is not None else procedure_name,
           procedure_name,
           command_dict.get('description', ''),
@@ -563,15 +570,25 @@ class CommandBrowser(GObject.GObject):
 
     search_queries = self._get_search_queries()
 
+    visible_via_search_counts_per_category = {
+      category: 0 for category in self._command_categories.values()}
+
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
 
+      category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
+
       visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
 
-      visible_via_expanded = self._get_row_visibility_based_on_category_expanded_state(row)
+      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
 
-      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and visible_via_expanded
+      if visible_via_search:
+        visible_via_search_counts_per_category[category] += 1
+
+    for category, count in visible_via_search_counts_per_category.items():
+      self._tree_model.set_value(
+        category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
     self._row_select_interactive = True
 
@@ -598,11 +615,6 @@ class CommandBrowser(GObject.GObject):
       return visible
     else:
       return True
-
-  def _get_row_visibility_based_on_category_expanded_state(self, row):
-    category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
-
-    return category.expanded
 
   def _get_search_queries(self):
     query_str = self._process_text_for_search(self._entry_search.get_text())
