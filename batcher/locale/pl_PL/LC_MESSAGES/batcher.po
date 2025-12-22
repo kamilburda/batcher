@@ -1,0 +1,2192 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Kamil Burda
+# This file is distributed under the same license as the 'batcher' package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 'batcher' 1.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-15 09:36+0200\n"
+"PO-Revision-Date: 2025-12-22 15:08+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pl_PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: ../../batcher/batcher.py:68
+msgid "Batch Convert"
+msgstr "Konwersja wsadowa"
+
+#: ../../batcher/batcher.py:96
+msgid "Export Images"
+msgstr "Eksportuj obrazy"
+
+#: ../../batcher/batcher.py:122
+msgid "Export Images (Quick)"
+msgstr "Eksportuj obrazy (szybkie)"
+
+#: ../../batcher/batcher.py:141
+msgid "Edit and Save Images"
+msgstr "Edytuj i zapisuj obrazy"
+
+#: ../../batcher/batcher.py:163
+msgid "Edit and Save Images (Quick)"
+msgstr "Edytuj i zapisuj obrazy (szybkie)"
+
+#: ../../batcher/batcher.py:180
+msgid "Export Layers"
+msgstr "Eksportuj warstwy"
+
+#: ../../batcher/batcher.py:199
+msgid "Export Layers (Quick)"
+msgstr "Eksportuj warstwy (szybkie)"
+
+#: ../../batcher/batcher.py:216
+msgid "Export Selected Layers"
+msgstr "Eksportuj wybrane warstwy"
+
+#: ../../batcher/batcher.py:238
+msgid "Edit Layers"
+msgstr "Edytuj warstwy"
+
+#: ../../batcher/batcher.py:257
+msgid "Edit Layers (Quick)"
+msgstr "Edytuj warstwy (szybkie)"
+
+#: ../../batcher/batcher.py:274
+msgid "Edit Selected Layers"
+msgstr "Edytuj wybrane warstwy"
+
+#: ../../batcher/batcher.py:421
+msgid ""
+"Settings for this plug-in could not be updated to the latest version and must "
+"be reset."
+msgstr ""
+"Nie można zaktualizować ustawień tej wtyczki do najnowszej wersji i należy je "
+"zresetować."
+
+#: ../../batcher/batcher.py:424
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text under the details."
+msgstr ""
+"Jeśli uważasz, że jest to błąd wtyczki, możesz pomóc go naprawić, wysyłając "
+"raport z tekstem pod szczegółami."
+
+#: ../../batcher/batcher.py:429
+msgid ""
+"Send a report with the text in the details above to one of the following sites"
+msgstr "Wyślij raport z tekstem podanym powyżej do jednej z poniższych witryn"
+
+#: ../../batcher/batcher.py:442
+msgid "Settings could not be loaded and had to be reset."
+msgstr "Nie udało się załadować ustawień i należało je zresetować."
+
+#: ../../batcher/batcher.py:444 ../../batcher/batcher.py:463
+msgid "Details: {}"
+msgstr "Szczegóły: {}"
+
+#: ../../batcher/batcher.py:453
+msgid "\"{}\" is not a valid file with settings"
+msgstr "„{}” nie jest prawidłowym plikiem z ustawieniami"
+
+#: ../../batcher/batcher.py:460
+msgid "Failed to import settings from file \"{}\"."
+msgstr "Nie udało się zaimportować ustawień z pliku „{}”."
+
+#: ../../batcher/batcher.py:496
+msgid "_Batch Convert..."
+msgstr "_Konwersja wsadowa..."
+
+#: ../../batcher/batcher.py:501
+msgid "Batch-process image files"
+msgstr "Pliki obrazów przetwarzane wsadowo"
+
+#: ../../batcher/batcher.py:502
+msgid ""
+"This procedure performs batch conversion of image files to the specified file "
+"format, optionally applying arbitrary procedures to each item and ignoring "
+"items according to the specified conditions."
+msgstr ""
+"Ta procedura wykonuje wsadową konwersję plików obrazów do określonego formatu "
+"pliku, opcjonalnie stosując dowolne procedury do każdego elementu i ignorując "
+"elementy zgodnie z określonymi warunkami."
+
+#: ../../batcher/batcher.py:514
+msgid "E_xport Images..."
+msgstr "Eksportuj obrazy..."
+
+#: ../../batcher/batcher.py:518
+msgid "Exports images opened in GIMP"
+msgstr "Eksportuje obrazy otwarte w GIMP"
+
+#: ../../batcher/batcher.py:527
+msgid "E_xport Images (Quick)"
+msgstr "Obrazy Eksport (szybkie)"
+
+#: ../../batcher/batcher.py:531
+msgid "Quickly export images opened in GIMP"
+msgstr "Szybko eksportuj obrazy otwarte w GIMP"
+
+#: ../../batcher/batcher.py:540
+msgid "E_dit and Save Images..."
+msgstr "Edytuj i zapisuj obrazy..."
+
+#: ../../batcher/batcher.py:544
+msgid "Edits and saves images opened in GIMP as XCF"
+msgstr "Edytuje i zapisuje obrazy otwarte w GIMP jako XCF"
+
+#: ../../batcher/batcher.py:553
+msgid "E_dit and Save Images (Quick)"
+msgstr "Edytuj i zapisuj obrazy (szybkie)"
+
+#: ../../batcher/batcher.py:557
+msgid "Edits and saves images opened in GIMP as XCF instantly"
+msgstr "Natychmiast edytuje i zapisuje obrazy otwarte w GIMP jako XCF"
+
+#: ../../batcher/batcher.py:565
+msgid "E_xport Layers..."
+msgstr "Eksportuj warstwy..."
+
+#: ../../batcher/batcher.py:572
+msgid "Export layers as separate images"
+msgstr "Eksportuj warstwy jako osobne obrazy"
+
+#: ../../batcher/batcher.py:579
+msgid "E_xport Layers (Quick)"
+msgstr "Eksportuj warstwy (szybkie)"
+
+#: ../../batcher/batcher.py:586
+msgid "Quickly export layers as separate images"
+msgstr "Szybko eksportuj warstwy jako osobne obrazy"
+
+#: ../../batcher/batcher.py:593
+msgid "E_xport Selected Layers"
+msgstr "Eksportuj wybrane warstwy"
+
+#: ../../batcher/batcher.py:599
+msgid "Quickly export selected layers as separate images"
+msgstr "Szybko eksportuj warstwy jako osobne obrazy"
+
+#: ../../batcher/batcher.py:607
+msgid "E_dit Layers..."
+msgstr "Eksportuj warstwy..."
+
+#: ../../batcher/batcher.py:614
+msgid "Batch-edit layers"
+msgstr "Warstwy edycji wsadowej"
+
+#: ../../batcher/batcher.py:621
+msgid "E_dit Layers (Quick)"
+msgstr "Edytuj warstwy (szybkie)"
+
+#: ../../batcher/batcher.py:628
+msgid "Batch-edit layers instantly"
+msgstr "Natychmiastowa edycja warstw"
+
+#: ../../batcher/batcher.py:635
+msgid "E_dit Selected Layers"
+msgstr "Edytuj wybrane warstwy"
+
+#: ../../batcher/batcher.py:641
+msgid "Batch-edit selected layers instantly"
+msgstr "Natychmiastowa edycja zbiorcza wybranych warstw"
+
+#: ../../batcher/config/config.py:16 ../../batcher/config/config_dev.py:16
+msgid "Batcher"
+msgstr "Batcher"
+
+#: ../../batcher/pygimplib/gui/file_chooser.py:109
+msgid "Clear"
+msgstr "Czyszczenie"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:119
+msgid "Align and offset"
+msgstr "Wyrównaj i przesuń"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:121
+msgid ""
+"Aligns layer(s) with the image or another layer.\n"
+"\n"
+"You may specify additional offsets after the alignment is applied."
+msgstr ""
+"Wyrównuje warstwy z obrazem lub inną warstwą.\n"
+"\n"
+"Po zastosowaniu wyrównania można określić dodatkowe odsunięcia."
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:131
+msgid "Layers to align"
+msgstr "Warstwy do wyrównania"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:137
+#: ../../batcher/src/update.py:1650
+msgid "Object to align layers with"
+msgstr "Obiekt, do którego mają zostać wyrównane warstwy"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:144
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:156
+msgid "Keep"
+msgstr "Trzymać"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:145
+#: ../../batcher/src/builtin_actions/_crop.py:514
+#: ../../batcher/src/builtin_actions/_crop.py:543
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:656
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:684
+#: ../../batcher/src/update.py:1860 ../../batcher/src/update.py:1900
+msgid "Left"
+msgstr "Lewy"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:146
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:158
+#: ../../batcher/src/builtin_actions/_crop.py:544
+#: ../../batcher/src/builtin_actions/_crop.py:607
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:685
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:748
+#: ../../batcher/src/builtin_actions/_scale.py:458
+#: ../../batcher/src/update.py:1597 ../../batcher/src/update.py:1901
+#: ../../batcher/src/update.py:1991
+msgid "Center"
+msgstr "Centrum"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:147
+#: ../../batcher/src/builtin_actions/_crop.py:533
+#: ../../batcher/src/builtin_actions/_crop.py:545
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:674
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:686
+#: ../../batcher/src/update.py:1889 ../../batcher/src/update.py:1902
+msgid "Right"
+msgstr "Prawy"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:149
+msgid "Horizontal alignment"
+msgstr "Wyrównanie poziome"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:157
+#: ../../batcher/src/builtin_actions/_crop.py:476
+#: ../../batcher/src/builtin_actions/_crop.py:541
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:620
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:682
+#: ../../batcher/src/update.py:1802 ../../batcher/src/update.py:1898
+msgid "Top"
+msgstr "Góra"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:159
+#: ../../batcher/src/builtin_actions/_crop.py:495
+#: ../../batcher/src/builtin_actions/_crop.py:547
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:638
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:688
+#: ../../batcher/src/update.py:1831 ../../batcher/src/update.py:1904
+msgid "Bottom"
+msgstr "Dół"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:161
+msgid "Vertical alignment"
+msgstr "Wyrównanie pionowe"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:180
+msgid "Additional X-offset"
+msgstr "Dodatkowe przesunięcie X"
+
+#: ../../batcher/src/builtin_actions/_align_and_offset.py:199
+msgid "Additional Y-offset"
+msgstr "Dodatkowe przesunięcie Y"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:336
+msgid "Color correction"
+msgstr "Korekta koloru"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:343
+#: ../../batcher/src/builtin_actions/_misc.py:71
+msgid "Layer"
+msgstr "Warstwa"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:349
+msgid "Brightness"
+msgstr "Jasność"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:360
+msgid "Contrast"
+msgstr "Kontrast"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:372
+msgid "Levels (preset file)"
+msgstr "Poziomy (wstępnie  ustawiony plik)"
+
+#: ../../batcher/src/builtin_actions/_color_correction.py:380
+msgid "Curves (preset file)"
+msgstr "Krzywe (wstępnie ustawiony plik)"
+
+#: ../../batcher/src/builtin_actions/_crop.py:411
+msgid "Crop"
+msgstr "Przyciąć"
+
+#: ../../batcher/src/builtin_actions/_crop.py:419
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:552
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:271
+#: ../../batcher/src/builtin_actions/_scale.py:357
+#: ../../batcher/src/update.py:1465 ../../batcher/src/update.py:1709
+msgid "Apply to (image or layer):"
+msgstr "Zastosuj do (obrazu lub warstwy):"
+
+#: ../../batcher/src/builtin_actions/_crop.py:426
+msgid "Crop from edges"
+msgstr "Przytnij od krawędzi"
+
+#: ../../batcher/src/builtin_actions/_crop.py:427
+msgid "Crop from position"
+msgstr "Przytnij z pozycji"
+
+#: ../../batcher/src/builtin_actions/_crop.py:428
+msgid "Crop to aspect ratio"
+msgstr "Przytnij do proporcji obrazu"
+
+#: ../../batcher/src/builtin_actions/_crop.py:429
+msgid "Crop to area"
+msgstr "Przytnij do obszaru"
+
+#: ../../batcher/src/builtin_actions/_crop.py:430
+msgid "Remove empty borders"
+msgstr "Usuń puste obramowania"
+
+#: ../../batcher/src/builtin_actions/_crop.py:432
+msgid "How to crop"
+msgstr "Jak przycinać"
+
+#: ../../batcher/src/builtin_actions/_crop.py:438
+msgid "Crop by the same amount from each side"
+msgstr "Przytnij o tę samą ilość z każdej strony"
+
+#: ../../batcher/src/builtin_actions/_crop.py:457
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:602
+#: ../../batcher/src/update.py:1773
+msgid "Amount"
+msgstr "Kwota"
+
+#: ../../batcher/src/builtin_actions/_crop.py:540
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:681
+#: ../../batcher/src/update.py:1897
+msgid "Top left"
+msgstr "Lewy górny róg"
+
+#: ../../batcher/src/builtin_actions/_crop.py:542
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:683
+#: ../../batcher/src/update.py:1899
+msgid "Top right"
+msgstr "Prawy górny róg"
+
+#: ../../batcher/src/builtin_actions/_crop.py:546
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:687
+#: ../../batcher/src/update.py:1903
+msgid "Bottom left"
+msgstr "Lewy dolny róg"
+
+#: ../../batcher/src/builtin_actions/_crop.py:548
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:689
+#: ../../batcher/src/update.py:1905
+msgid "Bottom right"
+msgstr "Prawy dolny róg"
+
+#: ../../batcher/src/builtin_actions/_crop.py:550
+#: ../../batcher/src/builtin_actions/_crop.py:611
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:691
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:752
+#: ../../batcher/src/builtin_actions/_scale.py:462
+#: ../../batcher/src/update.py:1601 ../../batcher/src/update.py:1907
+#: ../../batcher/src/update.py:1995
+msgid "Position"
+msgstr "Pozycja"
+
+#: ../../batcher/src/builtin_actions/_crop.py:569
+#: ../../batcher/src/builtin_actions/_crop.py:687
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:710
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:825
+#: ../../batcher/src/placeholders.py:207 ../../batcher/src/update.py:1937
+#: ../../batcher/src/update.py:2112
+msgid "Width"
+msgstr "Szerokość"
+
+#: ../../batcher/src/builtin_actions/_crop.py:588
+#: ../../batcher/src/builtin_actions/_crop.py:706
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:729
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:844
+#: ../../batcher/src/placeholders.py:208 ../../batcher/src/update.py:1967
+#: ../../batcher/src/update.py:2142
+msgid "Height"
+msgstr "Wysokość"
+
+#: ../../batcher/src/builtin_actions/_crop.py:599
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:740
+#: ../../batcher/src/update.py:1982
+msgid "Aspect ratio (width:height)"
+msgstr "Proporcje obrazu (szerokość:wysokość)"
+
+#: ../../batcher/src/builtin_actions/_crop.py:606
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:747
+#: ../../batcher/src/builtin_actions/_scale.py:457
+#: ../../batcher/src/update.py:1596 ../../batcher/src/update.py:1990
+msgid "Start"
+msgstr "Start"
+
+#: ../../batcher/src/builtin_actions/_crop.py:608
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:749
+#: ../../batcher/src/builtin_actions/_scale.py:459
+#: ../../batcher/src/update.py:1598 ../../batcher/src/update.py:1992
+msgid "End"
+msgstr "Koniec"
+
+#: ../../batcher/src/builtin_actions/_crop.py:609
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:750
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:282
+#: ../../batcher/src/builtin_actions/_scale.py:460
+#: ../../batcher/src/update.py:1599 ../../batcher/src/update.py:1993
+msgid "Custom"
+msgstr "Zwyczaj"
+
+#: ../../batcher/src/builtin_actions/_crop.py:630
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:770
+#: ../../batcher/src/builtin_actions/_scale.py:481
+#: ../../batcher/src/update.py:1629 ../../batcher/src/update.py:2024
+msgid "Custom start position"
+msgstr "Niestandardowa pozycja startowa"
+
+#: ../../batcher/src/builtin_actions/_crop.py:649
+msgid "Start X"
+msgstr "Start X"
+
+#: ../../batcher/src/builtin_actions/_crop.py:668
+msgid "Start Y"
+msgstr "Start Y"
+
+#: ../../batcher/src/builtin_actions/_export.py:44
+#: ../../batcher/src/renamer.py:780 ../../batcher/src/renamer.py:797
+msgid "Replace"
+msgstr "Zastąpić"
+
+#: ../../batcher/src/builtin_actions/_export.py:45
+msgid "Skip"
+msgstr "Pomiń"
+
+#: ../../batcher/src/builtin_actions/_export.py:46
+msgid "Rename new file"
+msgstr "Zmień nazwę nowego pliku"
+
+#: ../../batcher/src/builtin_actions/_export.py:47
+msgid "Rename existing file"
+msgstr "Zmień nazwę istniejącego pliku"
+
+#: ../../batcher/src/builtin_actions/_export.py:406
+msgid "Saving \"{}\""
+msgstr "Zapisywanie „{}”"
+
+#: ../../batcher/src/builtin_actions/_export.py:798
+msgid "Ask"
+msgstr "Zapytaj"
+
+#: ../../batcher/src/builtin_actions/_export.py:805
+msgid "Also export as..."
+msgstr "Eksportuj również jako..."
+
+#: ../../batcher/src/builtin_actions/_export.py:806
+msgid "Exports an image to another file format."
+msgstr "Eksportuje obraz do innego formatu pliku."
+
+#: ../../batcher/src/builtin_actions/_export.py:815
+#: ../../batcher/src/builtin_actions/_save.py:122
+#: ../../batcher/src/plugin_settings.py:77
+#: ../../batcher/src/plugin_settings.py:227
+#: ../../batcher/src/plugin_settings.py:474 ../../batcher/src/renamer.py:706
+msgid "Output folder"
+msgstr "Folder wyjściowy"
+
+#: ../../batcher/src/builtin_actions/_export.py:825
+#: ../../batcher/src/plugin_settings.py:67
+#: ../../batcher/src/plugin_settings.py:217
+#: ../../batcher/src/plugin_settings.py:464
+msgid "File extension"
+msgstr "Rozszerzenie pliku"
+
+#: ../../batcher/src/builtin_actions/_export.py:835
+msgid "Interactively"
+msgstr "Interaktywnie"
+
+#: ../../batcher/src/builtin_actions/_export.py:836
+msgid "Use options below"
+msgstr "Użyj poniższych opcji"
+
+#: ../../batcher/src/builtin_actions/_export.py:838
+msgid "How to adjust file format options:"
+msgstr "Jak dostosować opcje formatu pliku:"
+
+#: ../../batcher/src/builtin_actions/_export.py:840
+msgid ""
+"Native dialogs usually allow you to adjust more options such as image "
+"metadata, while adjusting options in place is more convenient as no extra "
+"dialog is displayed before the export."
+msgstr ""
+"Zazwyczaj w natywnych oknach dialogowych można dostosować więcej opcji, "
+"takich jak metadane obrazu. Natomiast dostosowywanie opcji na miejscu jest "
+"wygodniejsze, ponieważ przed eksportem nie jest wyświetlane żadne dodatkowe "
+"okno dialogowe."
+
+#: ../../batcher/src/builtin_actions/_export.py:851
+msgid "File format options"
+msgstr "Opcje formatu pliku"
+
+#: ../../batcher/src/builtin_actions/_export.py:858
+msgid "If a file already exists:"
+msgstr "Jeśli plik już istnieje:"
+
+#: ../../batcher/src/builtin_actions/_export.py:865
+msgid "For each image"
+msgstr "Dla każdego obrazu"
+
+#: ../../batcher/src/builtin_actions/_export.py:867
+msgid "For each top-level image or folder"
+msgstr "Dla każdego obrazu lub folderu najwyższego poziomu"
+
+#: ../../batcher/src/builtin_actions/_export.py:868
+#: ../../batcher/src/builtin_actions/_export.py:927
+#: ../../batcher/src/builtin_actions/_export.py:945
+msgid "As a single image"
+msgstr "Jako pojedyńczy obraz"
+
+#: ../../batcher/src/builtin_actions/_export.py:870
+msgid "Perform export:"
+msgstr "Wykonaj eksport:"
+
+#: ../../batcher/src/builtin_actions/_export.py:875
+#: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:292
+msgid "Untitled"
+msgstr "Bz tytułu"
+
+#: ../../batcher/src/builtin_actions/_export.py:876
+#: ../../batcher/src/builtin_actions/_rename.py:96
+#: ../../batcher/src/builtin_actions/_rename.py:125
+#: ../../batcher/src/builtin_actions/_rename.py:142
+#: ../../batcher/src/plugin_settings.py:87
+#: ../../batcher/src/plugin_settings.py:237
+msgid "Image filename pattern"
+msgstr "Wzorzec nazwy pliku obrazu"
+
+#: ../../batcher/src/builtin_actions/_export.py:883
+msgid "Use original file extension"
+msgstr "Użyj oryginalnego rozszerzenia pliku"
+
+#: ../../batcher/src/builtin_actions/_export.py:889
+msgid "Convert file extension to lowercase"
+msgstr "Konwertuj rozszerzenie pliku na małe litery"
+
+#: ../../batcher/src/builtin_actions/_export.py:895
+msgid "Use original modification date"
+msgstr "Użyj oryginalnej daty modyfikacji"
+
+#: ../../batcher/src/builtin_actions/_export.py:912
+#: ../../batcher/src/builtin_actions/_export.py:937
+msgid "Export"
+msgstr "Eksport"
+
+#: ../../batcher/src/builtin_actions/_export.py:913
+msgid "Exports an image to the specified file format."
+msgstr "Eksportuje obraz do określonego formatu pliku."
+
+#: ../../batcher/src/builtin_actions/_export.py:920
+msgid "Exports a layer to another file format."
+msgstr "Eksportuje warstwę do innego formatu pliku."
+
+#: ../../batcher/src/builtin_actions/_export.py:924
+#: ../../batcher/src/builtin_actions/_export.py:942
+msgid "For each layer"
+msgstr "Dla każdej warstwy"
+
+#: ../../batcher/src/builtin_actions/_export.py:926
+#: ../../batcher/src/builtin_actions/_export.py:944
+msgid "For each top-level layer or group"
+msgstr "Dla każdej warstwy lub grupy najwyższego poziomu"
+
+#: ../../batcher/src/builtin_actions/_export.py:931
+#: ../../batcher/src/builtin_actions/_export.py:949
+msgid "Use file extension in layer name"
+msgstr "Użyj rozszerzenia pliku w nazwie warstwy"
+
+#: ../../batcher/src/builtin_actions/_export.py:938
+msgid "Exports a layer to the specified file format."
+msgstr "Eksportuje warstwę do określonego formatu pliku."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
+msgid "Insert background"
+msgstr "Wstaw tło"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
+msgid "Inserts the specified image behind the current layer."
+msgstr "Wstawia określony obraz za bieżącą warstwą."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:858
+#: ../../batcher/src/update.py:2152
+msgid "Image"
+msgstr "Obraz"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
+msgid "Inserts layers having the specified color tag behind the current layer."
+msgstr ""
+"Wstawia warstwy posiadające określony znacznik koloru za bieżącą warstwą."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
+msgid "Color tag"
+msgstr "Etykieta koloru"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
+msgid "Insert foreground"
+msgstr "Wstaw pierwszy plan"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
+msgid "Inserts the specified image in front of the current layer."
+msgstr "Wstawia określony obraz przed bieżącą warstwą."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
+msgid ""
+"Inserts layers having the specified color tag in front of the current layer."
+msgstr ""
+"Wstawia warstwy posiadające określony znacznik koloru przed bieżącą warstwą."
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
+msgid "Merge background"
+msgstr "Połącz tło"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_misc.py:92
+msgid "Merge type"
+msgstr "Typ scalania"
+
+#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
+msgid "Merge foreground"
+msgstr "Połącz pierwszy plan"
+
+#: ../../batcher/src/builtin_actions/_misc.py:55
+msgid "Apply opacity from group layers"
+msgstr "Zastosuj krycie z warstw grupy"
+
+#: ../../batcher/src/builtin_actions/_misc.py:57
+msgid "Combines opacity from all parent group layers and the current layer."
+msgstr "Łączy krycie ze wszystkich warstw grupy nadrzędnej i bieżącej warstwy."
+
+#: ../../batcher/src/builtin_actions/_misc.py:64
+msgid "Merge filters"
+msgstr "Filtry scalania"
+
+#: ../../batcher/src/builtin_actions/_misc.py:65
+msgid "Merges all visible filters (layer effects) in the specified layer."
+msgstr ""
+"Łączy wszystkie widoczne filtry (efekty warstwy) na określonej warstwie."
+
+#: ../../batcher/src/builtin_actions/_misc.py:79
+msgid "Merge visible layers"
+msgstr "Połącz widoczne warstwy"
+
+#: ../../batcher/src/builtin_actions/_misc.py:81
+msgid ""
+"Merges all visible layers within the image into a single layer. Invisible "
+"layers are removed.\n"
+"\n"
+"This is useful if the image contains multiple layers and you want to apply "
+"filters (layer effects) or other actions on the entire image."
+msgstr ""
+"Scala wszystkie widoczne warstwy obrazu w jedną warstwę. Warstwy niewidoczne "
+"są usuwane.\n"
+"\n"
+"Jest to przydatne, jeśli obraz zawiera wiele warstw i chcesz zastosować "
+"filtry (efekty warstw) lub inne działania na całym obrazie."
+
+#: ../../batcher/src/builtin_actions/_misc.py:100
+msgid "Remove file extension from imported images"
+msgstr "Usuń rozszerzenie pliku z importowanych obrazów"
+
+#: ../../batcher/src/builtin_actions/_misc.py:101
+msgid "Imported images represent non-native GIMP files (i.e. not XCF)."
+msgstr ""
+"Zaimportowane obrazy to pliki nienatywne dla programu GIMP (tj. nie XCF)."
+
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:47
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:54
+msgid "Remove folder structure"
+msgstr "Usuń strukturę folderów"
+
+#: ../../batcher/src/builtin_actions/_remove_folder_structure.py:61
+msgid "Consider visibility of parent folders"
+msgstr "Weź pod uwagę widoczność folderów nadrzędnych"
+
+#: ../../batcher/src/builtin_actions/_rename.py:88
+#: ../../batcher/src/builtin_actions/_rename.py:117
+#: ../../batcher/src/builtin_actions/_rename.py:134
+#: ../../batcher/src/builtin_actions/_rename.py:157
+#: ../../batcher/src/builtin_actions/_rename.py:186
+msgid "Rename"
+msgstr "Zmień nazwę"
+
+#: ../../batcher/src/builtin_actions/_rename.py:103
+msgid "Rename images"
+msgstr "Zmień nazwę obrazów"
+
+#: ../../batcher/src/builtin_actions/_rename.py:109
+#: ../../batcher/src/builtin_actions/_rename.py:178
+msgid "Rename folders"
+msgstr "Zmień nazwy folderów"
+
+#: ../../batcher/src/builtin_actions/_rename.py:149
+msgid "Rename only new images"
+msgstr "Zmień nazwy tylko nowych obrazów"
+
+#: ../../batcher/src/builtin_actions/_rename.py:165
+#: ../../batcher/src/plugin_settings.py:484
+msgid "Layer filename pattern"
+msgstr "Wzorzec nazwy pliku warstwy"
+
+#: ../../batcher/src/builtin_actions/_rename.py:172
+#: ../../batcher/src/builtin_actions/_rename.py:201
+msgid "Rename layers"
+msgstr "Zmień nazwy warstw"
+
+#: ../../batcher/src/builtin_actions/_rename.py:194
+msgid "Layer name pattern"
+msgstr "Wzorzec nazwy warstwy"
+
+#: ../../batcher/src/builtin_actions/_rename.py:207
+msgid "Rename group layers"
+msgstr "Zmień nazwę warstw grupy"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:543
+msgid "Resize canvas"
+msgstr "Zmień rozmiar płótna"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:544
+msgid "Resizes the image or layer extents."
+msgstr "Zmienia rozmiar obrazu lub zakres warstwy."
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:559
+msgid "Resize from edges (add borders)"
+msgstr "Zmień rozmiar od krawędzi (dodaj obramowanie)"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:560
+#: ../../batcher/src/update.py:1718
+msgid "Resize from position"
+msgstr "Zmień rozmiar z pozycji"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:561
+#: ../../batcher/src/update.py:1719
+msgid "Resize to aspect ratio"
+msgstr "Zmień rozmiar do proporcji"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:562
+#: ../../batcher/src/update.py:1720
+msgid "Resize to area"
+msgstr "Zmień rozmiar do obszaru"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:563
+#: ../../batcher/src/update.py:1721
+msgid "Resize to layer size"
+msgstr "Zmień rozmiar do rozmiaru warstwy"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:564
+msgid "Resize to image size"
+msgstr "Zmień rozmiar do rozmiaru obrazu"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:566
+#: ../../batcher/src/update.py:1723
+msgid "How to resize"
+msgstr "Jak zmienić rozmiar"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:572
+#: ../../batcher/src/update.py:1730
+msgid "Fill added space with color"
+msgstr "Wypełnij dodatkową przestrzeń kolorem"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:578
+#: ../../batcher/src/update.py:1737
+msgid "Color for added space"
+msgstr "Kolor dla dodatkowej przestrzeni"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:584
+#: ../../batcher/src/update.py:1744
+msgid "Resize by the same amount from each side"
+msgstr "Zmień rozmiar o tę samą wartość z każdej strony"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:788
+#: ../../batcher/src/update.py:2053
+msgid "Offset X"
+msgstr "Przesunięcie X"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:806
+#: ../../batcher/src/update.py:2082
+msgid "Offset Y"
+msgstr "Przesunięcie Y"
+
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:851
+#: ../../batcher/src/builtin_conditions.py:166
+msgid "Layers"
+msgstr "Warstwy"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:73
+msgid "degrees"
+msgstr "stopnie"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:74
+msgid "radians"
+msgstr "radian"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:263
+msgid "Rotate and flip"
+msgstr "Obróć i odwróć"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:278
+#: ../../batcher/src/placeholders.py:159
+msgid "None"
+msgstr "Nic"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:279
+msgid "90° (clockwise)"
+msgstr "90° (zgodnie z ruchem wskazówek zegara)"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:280
+msgid "180°"
+msgstr "180°"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:281
+msgid "270° (counter-clockwise)"
+msgstr "270° (przeciwnie do ruchu wskazówek zegara)"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:284
+msgid "Rotation angle"
+msgstr "Kąt obrotu"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:293
+msgid "Custom rotation angle"
+msgstr "Niestandardowy kąt obrotu"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:300
+msgid "How to handle boundaries"
+msgstr "Jak radzić sobie z granicami"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:307
+#: ../../batcher/src/builtin_actions/_scale.py:415
+msgid "Interpolation"
+msgstr "Interpolacja"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:313
+msgid "Rotate around the center"
+msgstr "Obróć wokół środka"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:331
+msgid "Horizontal position of rotation center"
+msgstr "Pozioma pozycja środka obrotu"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:349
+msgid "Vertical position of rotation center"
+msgstr "Pionowe położenie środka obrotu"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:355
+msgid "Flip horizontally"
+msgstr "Odwróć poziomo"
+
+#: ../../batcher/src/builtin_actions/_rotate_and_flip.py:361
+msgid "Flip vertically"
+msgstr "Odwróć w pionie"
+
+#: ../../batcher/src/builtin_actions/_save.py:110
+#: ../../batcher/src/gui/main/command_lists.py:677
+msgid "Save"
+msgstr "Zapisz"
+
+#: ../../batcher/src/builtin_actions/_save.py:112
+msgid ""
+"Saves the image in the native GIMP format (XCF). If the image already exists, "
+"it is overwritten. To export the image in another file format, use the "
+"\"Export Images\" menu."
+msgstr ""
+"Zapisuje obraz w natywnym formacie GIMP (XCF). Jeśli obraz już istnieje, "
+"zostanie nadpisany. Aby wyeksportować obraz w innym formacie pliku, użyj menu "
+"„Eksportuj obrazy”."
+
+#: ../../batcher/src/builtin_actions/_save.py:134
+msgid ""
+"Save existing XCF image to its original location (ignore \"Output folder\")"
+msgstr ""
+"Zapisz istniejący obraz XCF w jego oryginalnej lokalizacji (ignoruj ​​„Folder "
+"wyjściowy”)"
+
+#: ../../batcher/src/builtin_actions/_scale.py:349
+msgid "Scale"
+msgstr "Skala"
+
+#: ../../batcher/src/builtin_actions/_scale.py:376
+msgid "New width"
+msgstr "Nowa szerokość"
+
+#: ../../batcher/src/builtin_actions/_scale.py:395
+msgid "New height"
+msgstr "Nowa wysokość"
+
+#: ../../batcher/src/builtin_actions/_scale.py:402
+#: ../../batcher/src/update.py:1537
+msgid "None (Stretch)"
+msgstr "Brak (rozciągnięcie)"
+
+#: ../../batcher/src/builtin_actions/_scale.py:403
+#: ../../batcher/src/update.py:1538
+msgid "Keep, adjust width"
+msgstr "Zachowaj, dostosuj szerokość"
+
+#: ../../batcher/src/builtin_actions/_scale.py:404
+#: ../../batcher/src/update.py:1539
+msgid "Keep, adjust height"
+msgstr "Zachowaj, dostosuj wysokość"
+
+#: ../../batcher/src/builtin_actions/_scale.py:405
+#: ../../batcher/src/update.py:1540
+msgid "Fit"
+msgstr "Pasować"
+
+#: ../../batcher/src/builtin_actions/_scale.py:406
+#: ../../batcher/src/update.py:1541
+msgid "Fit with padding"
+msgstr "Dopasowane z wyściółką"
+
+#: ../../batcher/src/builtin_actions/_scale.py:408
+#: ../../batcher/src/update.py:1543
+msgid "Aspect ratio"
+msgstr "Proporcje obrazu"
+
+#: ../../batcher/src/builtin_actions/_scale.py:421
+msgid "Use local origin"
+msgstr "Użyj lokalnego pochodzenia"
+
+#: ../../batcher/src/builtin_actions/_scale.py:427
+#: ../../batcher/src/update.py:1555
+msgid "Set image resolution in DPI"
+msgstr "Ustaw rozdzielczość obrazu w DPI"
+
+#. FOR TRANSLATORS: "X" represents the X-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:441
+#: ../../batcher/src/update.py:1572
+msgid "X"
+msgstr "X"
+
+#. FOR TRANSLATORS: "Y" represents the Y-axis.
+#: ../../batcher/src/builtin_actions/_scale.py:443
+#: ../../batcher/src/update.py:1573
+msgid "Y"
+msgstr "Y"
+
+#: ../../batcher/src/builtin_actions/_scale.py:450
+#: ../../batcher/src/update.py:1586
+msgid "Padding color"
+msgstr "Kolor wypełnienia"
+
+#: ../../batcher/src/builtin_actions/_utils.py:246
+msgid "The image has no layers."
+msgstr "Obraz nie ma żadnych warstw."
+
+#: ../../batcher/src/builtin_conditions.py:173
+msgid "Group layers"
+msgstr "Warstwy grupowe"
+
+#: ../../batcher/src/builtin_conditions.py:180
+msgid "Imported"
+msgstr "Import"
+
+#: ../../batcher/src/builtin_conditions.py:187
+msgid "Not imported"
+msgstr "Nie importowane"
+
+#. FOR TRANSLATORS: Think of "Only items that are not background" when translating this
+#: ../../batcher/src/builtin_conditions.py:195
+msgid "Not background"
+msgstr "Nie tło"
+
+#. FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
+#: ../../batcher/src/builtin_conditions.py:220
+msgid "Not foreground"
+msgstr "Nie na pierwszym planie"
+
+#. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
+#: ../../batcher/src/builtin_conditions.py:245
+msgid "Matching file extension"
+msgstr "Dopasowane rozszerzenie pliku"
+
+#. FOR TRANSLATORS: Think of "Only items matching text" when translating this
+#: ../../batcher/src/builtin_conditions.py:253
+msgid "Matching text..."
+msgstr "Dopasowanie tekstu..."
+
+#: ../../batcher/src/builtin_conditions.py:262 ../../batcher/src/update.py:2178
+msgid "Starts with text"
+msgstr "Zaczyna się od tekstu"
+
+#: ../../batcher/src/builtin_conditions.py:263 ../../batcher/src/update.py:2179
+msgid "Does not start with text"
+msgstr "Nie zaczyna się od tekstu"
+
+#: ../../batcher/src/builtin_conditions.py:264 ../../batcher/src/update.py:2180
+msgid "Contains text"
+msgstr "Zawiera tekst"
+
+#: ../../batcher/src/builtin_conditions.py:265 ../../batcher/src/update.py:2181
+msgid "Does not contain text"
+msgstr "Nie zawiera tekstu"
+
+#: ../../batcher/src/builtin_conditions.py:266 ../../batcher/src/update.py:2182
+msgid "Ends with text"
+msgstr "Kończy się tekstem"
+
+#: ../../batcher/src/builtin_conditions.py:267 ../../batcher/src/update.py:2183
+msgid "Does not end with text"
+msgstr "Nie kończy się tekstem"
+
+#: ../../batcher/src/builtin_conditions.py:268 ../../batcher/src/update.py:2184
+msgid "Matches regular expression"
+msgstr "Dopasowuje wyrażenie regularne"
+
+#: ../../batcher/src/builtin_conditions.py:270
+msgid "How to perform matching"
+msgstr "Jak wykonać dopasowanie"
+
+#: ../../batcher/src/builtin_conditions.py:276
+msgid "Text to match"
+msgstr "Tekst do dopasowania"
+
+#: ../../batcher/src/builtin_conditions.py:282
+msgid "Ignore case sensitivity"
+msgstr "Ignoruj ​​rozróżnianie wielkości liter"
+
+#. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
+#: ../../batcher/src/builtin_conditions.py:291
+msgid "Recognized file format"
+msgstr "Rozpoznany format pliku"
+
+#: ../../batcher/src/builtin_conditions.py:298
+msgid "Saved or exported"
+msgstr "Zapisano lub wyeksportowano"
+
+#: ../../batcher/src/builtin_conditions.py:305
+msgid "Not saved or exported"
+msgstr "Nie zapisano ani nie wyeksportowano"
+
+#. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
+#: ../../batcher/src/builtin_conditions.py:313
+msgid "Selected in GIMP"
+msgstr "Wybrano w programie GIMP"
+
+#. FOR TRANSLATORS: Think of "Only top-level items" when translating this
+#: ../../batcher/src/builtin_conditions.py:321
+msgid "Top-level"
+msgstr "Najwyższego poziomu"
+
+#. FOR TRANSLATORS: Think of "Only visible items" when translating this
+#: ../../batcher/src/builtin_conditions.py:329
+msgid "Visible"
+msgstr "Widoczny"
+
+#. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:337
+msgid "With color tags"
+msgstr "Z kolorowymi etykietami"
+
+#: ../../batcher/src/builtin_conditions.py:343
+#: ../../batcher/src/builtin_conditions.py:363
+msgid "Color tags"
+msgstr "Tagi kolorów"
+
+#. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
+#: ../../batcher/src/builtin_conditions.py:357
+msgid "Without color tags"
+msgstr "Bez kolorowych znaczników"
+
+#. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:377
+msgid "With unsaved changes"
+msgstr "Z niezapisanymi zmianami"
+
+#. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
+#: ../../batcher/src/builtin_conditions.py:385
+msgid "With no unsaved changes"
+msgstr "Bez niezapisanych zmian"
+
+#. FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
+#: ../../batcher/src/builtin_conditions.py:393
+msgid "XCF (native GIMP) file"
+msgstr "Plik XCF (natywny GIMP)"
+
+#. FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
+#: ../../batcher/src/builtin_conditions.py:401
+msgid "Not XCF (native GIMP) file"
+msgstr "Nie jest to plik XCF (natywny GIMP)"
+
+#: ../../batcher/src/commands.py:414
+msgid "Built-in"
+msgstr "Wbudowany"
+
+#: ../../batcher/src/commands.py:415
+msgid "GIMP PDB procedure"
+msgstr "Procedura PDB programu GIMP"
+
+#: ../../batcher/src/commands.py:416
+msgid "GEGL operation"
+msgstr "Operacja GEGL"
+
+#: ../../batcher/src/commands.py:463
+msgid "_More options"
+msgstr "_Więcej opcji"
+
+#: ../../batcher/src/commands.py:473
+msgid "Enable for previews"
+msgstr "Włącz dla podglądów"
+
+#: ../../batcher/src/commands.py:536
+msgid "Also apply to parent folders"
+msgstr "Dotyczy również folderów nadrzędnych"
+
+#: ../../batcher/src/core.py:808
+msgid ""
+"An error occurred. Please check the GIMP error message or the error console "
+"for details, if any."
+msgstr ""
+"Wystąpił błąd. Sprawdź komunikat o błędzie programu GIMP lub konsolę błędów, "
+"aby uzyskać szczegółowe informacje."
+
+#: ../../batcher/src/core.py:870
+msgid "Processing \"{}\""
+msgstr "Przetwarzanie „{}”"
+
+#: ../../batcher/src/core.py:1154
+msgid "File not found"
+msgstr "Plik nie został znaleziony"
+
+#: ../../batcher/src/exceptions.py:59
+msgid "Item:"
+msgstr "Przedmiot:"
+
+#: ../../batcher/src/exceptions.py:61
+msgid "File extension:"
+msgstr "Rozszerzenie pliku:"
+
+#: ../../batcher/src/file_formats.py:158
+msgid "{} image"
+msgstr "{} obraz"
+
+#: ../../batcher/src/gui/commands/browser.py:79
+msgid "Filters, Effects"
+msgstr "Filtry, Efekty"
+
+#: ../../batcher/src/gui/commands/browser.py:80
+msgid "Plug-ins"
+msgstr "Wtyczki"
+
+#: ../../batcher/src/gui/commands/browser.py:81
+msgid "GIMP Procedures"
+msgstr "Procedury GIMP"
+
+#: ../../batcher/src/gui/commands/browser.py:82
+msgid "Other"
+msgstr "Inny"
+
+#: ../../batcher/src/gui/commands/browser.py:343
+msgid "Name"
+msgstr "Nazwa"
+
+#: ../../batcher/src/gui/commands/browser.py:359
+msgid "Menu Name"
+msgstr "Nazwa menu"
+
+#: ../../batcher/src/gui/commands/browser.py:388
+msgid "Search"
+msgstr "Szukaj"
+
+#: ../../batcher/src/gui/commands/browser.py:403
+msgid "by name"
+msgstr "po nzwie"
+
+#: ../../batcher/src/gui/commands/browser.py:407
+msgid "by menu name"
+msgstr "według nazwy menu"
+
+#: ../../batcher/src/gui/commands/browser.py:411
+msgid "by description"
+msgstr "według opisu"
+
+#: ../../batcher/src/gui/commands/browser.py:453
+msgid "Select an action"
+msgstr "Wybierz akcję"
+
+#: ../../batcher/src/gui/commands/browser.py:478
+msgid "_Add"
+msgstr "_Dodaj"
+
+#: ../../batcher/src/gui/commands/browser.py:479
+#: ../../batcher/src/gui/commands/editor.py:52
+#: ../../batcher/src/gui/main/export_settings.py:251
+#: ../../batcher/src/gui/main/main.py:165 ../../batcher/src/gui/main/main.py:354
+#: ../../batcher/src/gui/messages.py:40
+msgid "_Close"
+msgstr "_Zamknij"
+
+#: ../../batcher/src/gui/commands/editor.py:49
+#: ../../batcher/src/gui/commands/editor.py:172
+#: ../../batcher/src/gui/main/export_settings.py:246
+msgid "_Reset"
+msgstr "_Restart"
+
+#: ../../batcher/src/gui/commands/editor.py:169
+msgid "_Preview"
+msgstr "_Podgląd"
+
+#: ../../batcher/src/gui/commands/editor.py:231
+msgid "Edit Name"
+msgstr "Edytuj nazwę"
+
+#: ../../batcher/src/gui/commands/editor.py:288
+msgid "Show More Information"
+msgstr "Pokaż więcej informacji"
+
+#: ../../batcher/src/gui/commands/item.py:139
+msgid "Edit"
+msgstr "Edycja"
+
+#: ../../batcher/src/gui/commands/item.py:149
+msgid "Remove"
+msgstr "Usuń"
+
+#: ../../batcher/src/gui/dimension_box.py:152
+msgid "Property:"
+msgstr "Nieruchomość:"
+
+#: ../../batcher/src/gui/file_format_options_box.py:47
+msgid "{} options"
+msgstr "{} opcje"
+
+#: ../../batcher/src/gui/file_format_options_box.py:50
+msgid "File format not recognized"
+msgstr "Format pliku nie został rozpoznany"
+
+#: ../../batcher/src/gui/file_format_options_box.py:58
+msgid "File format has no options"
+msgstr "Format pliku nie ma opcji"
+
+#: ../../batcher/src/gui/main/batcher_manager.py:208
+msgid "No images were processed."
+msgstr "Nie przetworzono żadnych obrazów."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:210
+msgid "No layers were processed."
+msgstr "Żadna warstwa nie została przetworzona."
+
+#: ../../batcher/src/gui/main/batcher_manager.py:212
+msgid "No items were processed."
+msgstr "Nie przetworzono żadnych elementów."
+
+#: ../../batcher/src/gui/main/command_lists.py:36
+msgid "Add _Action..."
+msgstr "Dodaj _Akcję..."
+
+#: ../../batcher/src/gui/main/command_lists.py:38
+msgid "Add Custom Action..."
+msgstr "Dodaj akcję niestandardową..."
+
+#: ../../batcher/src/gui/main/command_lists.py:39
+msgid "Add Custom Action"
+msgstr "Dodaj akcję niestandardową"
+
+#: ../../batcher/src/gui/main/command_lists.py:49
+msgid "Add C_ondition..."
+msgstr "Dodaj warunek..."
+
+#: ../../batcher/src/gui/main/command_lists.py:83
+msgid "This action is skipped. Reason: {}"
+msgstr "Ta akcja została pominięta. Powód: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:89
+msgid "This condition is skipped. Reason: {}"
+msgstr "Ten warunek jest pomijany. Powód: {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:125
+msgid "Actions"
+msgstr "Akcja"
+
+#: ../../batcher/src/gui/main/command_lists.py:139
+msgid "Conditions"
+msgstr "Warunki"
+
+#: ../../batcher/src/gui/main/command_lists.py:517
+msgid "Crop to remove empty borders"
+msgstr "Przytnij, aby usunąć puste obramowania"
+
+#: ../../batcher/src/gui/main/command_lists.py:562
+#: ../../batcher/src/gui/main/command_lists.py:568
+msgid "Rename to \"{}\""
+msgstr "Zmień nazwę na „{}”"
+
+#: ../../batcher/src/gui/main/command_lists.py:566
+msgid "Rename new images to \"{}\""
+msgstr "Zmień nazwę nowych obrazów na „{}”"
+
+#: ../../batcher/src/gui/main/command_lists.py:613
+msgid "Export as {}"
+msgstr "Eksportuj jako {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:615
+msgid "Also export as {}"
+msgstr "Eksportuj również jako {}"
+
+#: ../../batcher/src/gui/main/command_lists.py:673
+msgid "Save (imported images to \"{}\")"
+msgstr "Zapisz (zaimportowane obrazy do „{}”)"
+
+#: ../../batcher/src/gui/main/command_lists.py:675
+msgid "Save to \"{}\""
+msgstr "Zapisz w „{}”"
+
+#: ../../batcher/src/gui/main/command_lists.py:756
+msgid "Starting with \"{}\""
+msgstr "Zaczynając od \"{}\""
+
+#: ../../batcher/src/gui/main/command_lists.py:758
+msgid "Starting with any text"
+msgstr "Zaczynając od dowolnego tekstu"
+
+#: ../../batcher/src/gui/main/command_lists.py:761
+msgid "Not starting with \"{}\""
+msgstr "Nie zaczyna się od \"{}\""
+
+#: ../../batcher/src/gui/main/command_lists.py:763
+msgid "Not starting with any text"
+msgstr "Nie zaczyna się od żadnego tekstu"
+
+#: ../../batcher/src/gui/main/command_lists.py:766
+msgid "Containing \"{}\""
+msgstr "Zawierający „{}”"
+
+#: ../../batcher/src/gui/main/command_lists.py:768
+msgid "Containing any text"
+msgstr "Zawierający dowolny tekst"
+
+#: ../../batcher/src/gui/main/command_lists.py:771
+msgid "Not containing \"{}\""
+msgstr "Nie zawiera \"{}\""
+
+#: ../../batcher/src/gui/main/command_lists.py:773
+msgid "Not containing any text"
+msgstr "Nie zawiera żadnego tekstu"
+
+#: ../../batcher/src/gui/main/command_lists.py:776
+msgid "Ending with \"{}\""
+msgstr "Kończąc się na \"{}\""
+
+#: ../../batcher/src/gui/main/command_lists.py:778
+msgid "Ending with any text"
+msgstr "Zakończenie dowolnym tekstem"
+
+#: ../../batcher/src/gui/main/command_lists.py:781
+msgid "Not ending with \"{}\""
+msgstr "Nie kończące się na \"{}\""
+
+#: ../../batcher/src/gui/main/command_lists.py:783
+msgid "Not ending with any text"
+msgstr "Nie kończący się żadnym tekstem"
+
+#: ../../batcher/src/gui/main/command_lists.py:785
+msgid "Matching pattern \"{}\""
+msgstr "Pasujący wzorzec „{}”"
+
+#. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+#: ../../batcher/src/gui/main/command_lists.py:790
+msgid " (case-insensitive)"
+msgstr "(bez uwzględniania wielkości liter)"
+
+#: ../../batcher/src/gui/main/export_settings.py:57
+msgid "Folder:"
+msgstr "Folder:"
+
+#: ../../batcher/src/gui/main/export_settings.py:80
+msgid "Name:"
+msgstr "Nazwa\":"
+
+#: ../../batcher/src/gui/main/export_settings.py:112
+msgid "O_ptions..."
+msgstr "Opcje..."
+
+#: ../../batcher/src/gui/main/export_settings.py:240
+msgid "Export Options"
+msgstr "Opcje eksportu"
+
+#: ../../batcher/src/gui/main/main.py:102
+msgid "Input Images"
+msgstr "Obrazy wejściowe"
+
+#: ../../batcher/src/gui/main/main.py:104
+msgid "Input Layers"
+msgstr "Warstwy wejściowe"
+
+#: ../../batcher/src/gui/main/main.py:106
+msgid "Input Items"
+msgstr "Elementy wejściowe"
+
+#: ../../batcher/src/gui/main/main.py:156 ../../batcher/src/gui/main/main.py:466
+msgid "_Export"
+msgstr "_Eksport"
+
+#: ../../batcher/src/gui/main/main.py:158 ../../batcher/src/gui/main/main.py:468
+msgid "_Run"
+msgstr "_Uruchom"
+
+#: ../../batcher/src/gui/main/main.py:167
+msgid "_Stop"
+msgstr "_Stop"
+
+#: ../../batcher/src/gui/main/main.py:352 ../../batcher/src/gui/main/main.py:474
+msgid "_Cancel"
+msgstr "_Anuluj"
+
+#: ../../batcher/src/gui/main/main.py:365
+msgid "_Help"
+msgstr "_Pomoc"
+
+#: ../../batcher/src/gui/main/main.py:460
+msgid "Show this dialog"
+msgstr "Pokaż to okno dialogowe"
+
+#: ../../batcher/src/gui/main/previews.py:206
+msgid "Drop or paste files and folders here, or add them via buttons below"
+msgstr ""
+"Upuść lub wklej pliki i foldery tutaj lub dodaj je za pomocą przycisków "
+"poniżej"
+
+#: ../../batcher/src/gui/main/previews.py:229
+msgid "Add Files..."
+msgstr "Dodaj pliki..."
+
+#: ../../batcher/src/gui/main/previews.py:230
+msgid "Add Folders..."
+msgstr "Dodaj foldery..."
+
+#: ../../batcher/src/gui/main/previews.py:238
+msgid "A_dd..."
+msgstr "Dodać..."
+
+#: ../../batcher/src/gui/main/previews.py:240
+msgid "Remove Selected"
+msgstr "Usuń wybrane"
+
+#: ../../batcher/src/gui/main/previews.py:241
+msgid "Remove All"
+msgstr "Usuń wszystko"
+
+#: ../../batcher/src/gui/main/previews.py:249
+msgid "Re_move..."
+msgstr "Usuń..."
+
+#: ../../batcher/src/gui/main/previews.py:277
+msgid "Add Files"
+msgstr "Dodaj pliki"
+
+#: ../../batcher/src/gui/main/previews.py:279
+msgid "Add Folders"
+msgstr "Dodaj folder"
+
+#: ../../batcher/src/gui/main/previews.py:344
+msgid "Copied the selected images and folders as text."
+msgstr "Skopiowano wybrane obrazy i foldery jako tekst."
+
+#: ../../batcher/src/gui/main/previews.py:385
+msgid ""
+"You are about to add a top-level folder named \"{}\". Are you sure you want "
+"to continue?"
+msgstr ""
+"Zamierzasz dodać folder najwyższego poziomu o nazwie „{}”. Czy na pewno "
+"chcesz kontynuować?"
+
+#: ../../batcher/src/gui/main/previews.py:397
+msgid ""
+"You are about to add more than {} files. Are you sure you want to continue?"
+msgstr "Zamierzasz dodać więcej niż {} plików. Czy na pewno chcesz kontynuować?"
+
+#: ../../batcher/src/gui/main/previews.py:407
+msgid ""
+"<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
+"side, check if you added the files or folders you really wanted. Do you want "
+"to continue?"
+msgstr ""
+"<b>OSTRZEŻENIE:</b> Zamierzasz dodać więcej niż {} plików. Dla bezpieczeństwa "
+"sprawdź, czy dodałeś pliki lub foldery, które naprawdę chciałeś dodać. Czy "
+"chcesz kontynuować?"
+
+#: ../../batcher/src/gui/main/previews.py:462
+msgid "Yes"
+msgstr "Tak"
+
+#: ../../batcher/src/gui/main/previews.py:462
+msgid "No"
+msgstr "Nie"
+
+#: ../../batcher/src/gui/main/previews.py:610
+msgid "The preview no longer updates automatically as rendering takes too long."
+msgstr ""
+"Podgląd nie jest już automatycznie aktualizowany, ponieważ renderowanie trwa "
+"zbyt długo."
+
+#: ../../batcher/src/gui/main/settings_manager.py:47
+msgid "_Settings"
+msgstr "_Ustawienia"
+
+#: ../../batcher/src/gui/main/settings_manager.py:69
+msgid "Save Settings"
+msgstr "Zapisz ustawienia"
+
+#: ../../batcher/src/gui/main/settings_manager.py:70
+msgid "Load Settings from File..."
+msgstr "Załaduj ustawienia z pliku..."
+
+#: ../../batcher/src/gui/main/settings_manager.py:71
+msgid "Save Settings to File..."
+msgstr "Zapisz ustawienia do pliku..."
+
+#: ../../batcher/src/gui/main/settings_manager.py:72
+msgid "Reset Settings"
+msgstr "Resetuj ustawienia"
+
+#: ../../batcher/src/gui/main/settings_manager.py:110
+msgid "Failed to save settings."
+msgstr "Nie udało się zapisać ustawień."
+
+#: ../../batcher/src/gui/main/settings_manager.py:112
+msgid "Failed to save settings to file \"{}\"."
+msgstr "Nie udało się zapisać ustawień w pliku „{}”."
+
+#: ../../batcher/src/gui/main/settings_manager.py:140
+msgid "Settings successfully loaded."
+msgstr "Ustawienia zostały pomyślnie załadowane."
+
+#: ../../batcher/src/gui/main/settings_manager.py:151
+msgid "Settings successfully saved to \"{}\"."
+msgstr "Ustawienia zostały pomyślnie zapisane w „{}”."
+
+#: ../../batcher/src/gui/main/settings_manager.py:167
+msgid "Settings reset."
+msgstr "Ustawienia zostały zresetowane."
+
+#: ../../batcher/src/gui/main/settings_manager.py:179
+msgid "Are you sure you want to reset settings?"
+msgstr "Czy na pewno chcesz zresetować ustawienia?"
+
+#: ../../batcher/src/gui/main/settings_manager.py:205
+msgid "Settings successfully saved."
+msgstr "Ustawienia zostały pomyślnie zapisane."
+
+#: ../../batcher/src/gui/main/settings_manager.py:246
+msgid ""
+"Failed to load settings from file \"{}\". Settings must be reset completely."
+msgstr ""
+"Nie udało się załadować ustawień z pliku „{}”. Ustawienia należy całkowicie "
+"zresetować."
+
+#: ../../batcher/src/gui/main/settings_manager.py:263
+msgid "Load Settings from File"
+msgstr "Załaduj ustawienia z pliku"
+
+#: ../../batcher/src/gui/main/settings_manager.py:266
+msgid "Save Settings to File"
+msgstr "Zapisz ustawienia do pliku"
+
+#: ../../batcher/src/gui/main/settings_manager.py:280
+msgid "Load size-related settings"
+msgstr "Ustawienia związane z rozmiarem ładunku"
+
+#: ../../batcher/src/gui/main/settings_manager.py:289
+msgid "JSON file"
+msgstr "JSON file"
+
+#: ../../batcher/src/gui/main/settings_manager.py:298
+msgid "Any file"
+msgstr "Dowolny plik"
+
+#: ../../batcher/src/gui/main/settings_manager.py:341
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the file and the text in the details to one of the "
+"sites below"
+msgstr ""
+"Jeśli uważasz, że jest to błąd wtyczki, możesz pomóc w jego rozwiązaniu, "
+"wysyłając raport z plikiem i tekstem zawierającym szczegóły na jedną z "
+"poniższych stron"
+
+#: ../../batcher/src/gui/messages.py:86
+msgid "Oops. Something went wrong."
+msgstr "Ups. Coś poszło nie tak."
+
+#: ../../batcher/src/gui/messages.py:90
+msgid ""
+"An unexpected error occurred and the plug-in has to close. Sorry about that!"
+msgstr ""
+"Wystąpił nieoczekiwany błąd i wtyczka musi zostać zamknięta. Przepraszamy!"
+
+#: ../../batcher/src/gui/messages.py:94
+msgid ""
+"You can help fix this error by sending a report with the text in the details "
+"above to one of the following sites"
+msgstr ""
+"Możesz pomóc w naprawieniu tego błędu, wysyłając raport zawierający tekst "
+"podany w szczegółach powyżej na jedną z następujących witryn"
+
+#: ../../batcher/src/gui/messages.py:156
+msgid "Details"
+msgstr "Bliższe dane"
+
+#: ../../batcher/src/gui/messages.py:281
+msgid "Copy details to clipboard"
+msgstr "Kopiuj szczegóły do ​​schowka"
+
+#: ../../batcher/src/gui/messages.py:541
+msgid ""
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr ""
+"Jeśli uważasz, że jest to błąd wtyczki, możesz pomóc w jego rozwiązaniu, "
+"wysyłając raport z tekstem zawierającym szczegóły na jedną z poniższych stron"
+
+#: ../../batcher/src/gui/messages.py:560 ../../batcher/src/gui/messages.py:571
+msgid "There was a problem during processing:"
+msgstr "Wystąpił problem podczas przetwarzania:"
+
+#: ../../batcher/src/gui/messages.py:574
+msgid ""
+"If you closed an image during processing, do not close it and instead keep it "
+"open until the processing is finished successfully.\n"
+"\n"
+"If you believe this is an error in the plug-in, you can help fix it by "
+"sending a report with the text in the details to one of the sites below"
+msgstr ""
+"Jeśli zamknąłeś obraz podczas przetwarzania, nie zamykaj go, tylko pozostaw "
+"otwarty do momentu pomyślnego zakończenia przetwarzania.\n"
+"\n"
+"Jeśli uważasz, że to błąd wtyczki, możesz pomóc w jego rozwiązaniu, wysyłając "
+"raport z tekstem w szczegółach na jedną z poniższych stron."
+
+#: ../../batcher/src/gui/messages.py:599
+msgid "Failed to apply action \"{}\" on \"{}\" because:"
+msgstr "Nie udało się zastosować akcji „{}” do „{}”, ponieważ:"
+
+#: ../../batcher/src/gui/messages.py:601
+msgid "Failed to apply condition \"{}\" on \"{}\" because:"
+msgstr "Nie udało się zastosować warunku „{}” do „{}”, ponieważ:"
+
+#: ../../batcher/src/gui/messages.py:607
+msgid "Failed to apply action \"{}\" because:"
+msgstr "Nie udało się zastosować akcji „{}”, ponieważ:"
+
+#: ../../batcher/src/gui/messages.py:609
+msgid "Failed to apply condition \"{}\" because:"
+msgstr "Nie udało się zastosować warunku „{}”, ponieważ:"
+
+#: ../../batcher/src/gui/message_box.py:52
+msgid "Plug-in errors occurred"
+msgstr "Wystąpiły błędy wtyczki"
+
+#: ../../batcher/src/gui/message_box.py:75
+msgid "The plug-in encountered one or more errors."
+msgstr "Wtyczka napotkała jeden lub więcej błędów."
+
+#: ../../batcher/src/gui/message_box.py:77
+msgid ""
+"The errors should not cause crashes, but you should exercise caution "
+"nonetheless."
+msgstr ""
+"Błędy nie powinny powodować awarii, ale mimo to należy zachować ostrożność."
+
+#: ../../batcher/src/gui/message_box.py:81
+msgid ""
+"You can help fix these errors by sending a report with the text in the "
+"details above to one of the following sites"
+msgstr ""
+"Możesz pomóc w naprawieniu tych błędów, wysyłając raport zawierający tekst "
+"podany w szczegółach powyżej na jedną z następujących witryn"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:74
+msgid "_Apply option to all files"
+msgstr "_Zastosuj opcję do wszystkich plików"
+
+#: ../../batcher/src/gui/overwrite_chooser.py:115
+msgid "A file named \"{}\" already exists in \"{}\"."
+msgstr "Plik o nazwie „{}” już istnieje w „{}”."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:119
+msgid "A file named \"{}\" already exists."
+msgstr "Plik o nazwie „{}” już istnieje."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:122
+msgid "A file with the same name already exists."
+msgstr "Plik o tej nazwie już istnieje."
+
+#: ../../batcher/src/gui/overwrite_chooser.py:125
+msgid "What would you like to do?"
+msgstr "Co chciałbyś zrobić?"
+
+#: ../../batcher/src/gui/placeholders.py:81
+msgid "Cannot be modified"
+msgstr "Nie można modyfikować"
+
+#: ../../batcher/src/gui/preview/image.py:173
+msgid "No selection"
+msgstr "Brak wyboru"
+
+#: ../../batcher/src/gui/preview/image.py:210
+msgid "Preview"
+msgstr "Podgląd"
+
+#: ../../batcher/src/gui/preview/image.py:221
+msgid "Update Automatically"
+msgstr "Aktualizuj automatycznie"
+
+#: ../../batcher/src/gui/preview/image.py:232
+msgid "Update Preview"
+msgstr "Podgląd aktualizuj"
+
+#: ../../batcher/src/gui/preview/image.py:339
+msgid "There was a problem with updating the image preview:"
+msgstr "Wystąpił problem z aktualizacją podglądu obrazu:"
+
+#: ../../batcher/src/gui/preview/name.py:392
+msgid "There was a problem with updating the name preview:"
+msgstr "Wystąpił problem z aktualizacją podglądu nazwy:"
+
+#: ../../batcher/src/path/validators.py:82
+msgid "Filename is not specified."
+msgstr "Nazwa pliku nie jest określona."
+
+#: ../../batcher/src/path/validators.py:84
+msgid "Filename contains invalid characters."
+msgstr "Nazwa pliku zawiera nieprawidłowe znaki."
+
+#: ../../batcher/src/path/validators.py:86
+msgid "Filename cannot end with spaces."
+msgstr "Nazwa pliku nie może kończyć się spacjami."
+
+#: ../../batcher/src/path/validators.py:88
+msgid "Filename cannot end with a period."
+msgstr "Nazwa pliku nie może kończyć się kropką."
+
+#: ../../batcher/src/path/validators.py:90
+msgid "\"{}\" is a reserved name that cannot be used in filenames.\n"
+msgstr ""
+"„{}” jest nazwą zarezerwowaną, której nie można używać w nazwach plików.\n"
+
+#: ../../batcher/src/path/validators.py:164
+msgid "File path is not specified."
+msgstr "Ścieżka dostępu do pliku nie została określona."
+
+#: ../../batcher/src/path/validators.py:166
+#: ../../batcher/src/path/validators.py:265
+msgid "Drive letter contains invalid characters."
+msgstr "Litera dysku zawiera nieprawidłowe znaki."
+
+#: ../../batcher/src/path/validators.py:168
+msgid "File path contains invalid characters."
+msgstr "Ścieżka pliku zawiera nieprawidłowe znaki."
+
+#: ../../batcher/src/path/validators.py:170
+msgid "Path components in the file path cannot end with spaces."
+msgstr "Składniki ścieżki w ścieżce pliku nie mogą kończyć się spacjami."
+
+#: ../../batcher/src/path/validators.py:172
+msgid "Path components in the file path cannot end with a period."
+msgstr "Składniki ścieżki w ścieżce pliku nie mogą kończyć się kropką."
+
+#: ../../batcher/src/path/validators.py:174
+msgid "\"{}\" is a reserved name that cannot be used in file paths.\n"
+msgstr ""
+"{}” jest nazwą zastrzeżoną, której nie można używać w ścieżkach plików.\n"
+
+#: ../../batcher/src/path/validators.py:263
+msgid "Directory path is not specified."
+msgstr "Nie określono ścieżki dostępu do katalogu."
+
+#: ../../batcher/src/path/validators.py:267
+msgid "Directory path contains invalid characters."
+msgstr "Ścieżka katalogu zawiera nieprawidłowe znaki."
+
+#: ../../batcher/src/path/validators.py:269
+msgid "Path components in the directory path cannot end with spaces."
+msgstr "Składniki ścieżki w ścieżce katalogu nie mogą kończyć się spacjami."
+
+#: ../../batcher/src/path/validators.py:271
+msgid "Path components in the directory path cannot end with a period."
+msgstr "Składniki ścieżki w ścieżce katalogu nie mogą kończyć się kropką."
+
+#: ../../batcher/src/path/validators.py:273
+msgid "\"{}\" is a reserved name that cannot be used in directory paths.\n"
+msgstr ""
+"„{}” jest nazwą zastrzeżoną, której nie można używać w ścieżkach katalogów.\n"
+
+#: ../../batcher/src/path/validators.py:275
+msgid "Specified path is not a directory path."
+msgstr "Podana ścieżka nie jest ścieżką katalogu."
+
+#: ../../batcher/src/path/validators.py:308
+msgid "File extension is not specified."
+msgstr "Rozszerzenie pliku nie jest określone."
+
+#: ../../batcher/src/path/validators.py:310
+msgid "File extension contains invalid characters."
+msgstr "Rozszerzenie pliku zawiera nieprawidłowe znaki."
+
+#: ../../batcher/src/path/validators.py:312
+msgid "File extension cannot end with spaces."
+msgstr "Rozszerzenie pliku nie może kończyć się spacjami."
+
+#: ../../batcher/src/path/validators.py:314
+msgid "File extension cannot end with a period."
+msgstr "Rozszerzenie pliku nie może kończyć się kropką."
+
+#: ../../batcher/src/placeholders.py:55
+msgid "There are no background layers."
+msgstr "Brak warstw tła."
+
+#: ../../batcher/src/placeholders.py:69
+msgid "There are no foreground layers."
+msgstr "Brak warstw pierwszego planu."
+
+#: ../../batcher/src/placeholders.py:151
+msgid "Current Image"
+msgstr "Aktualny obraz"
+
+#: ../../batcher/src/placeholders.py:152 ../../batcher/src/placeholders.py:153
+msgid "Current Layer"
+msgstr "Bieżąca warstwa"
+
+#: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
+msgid "Layer Below (Background)"
+msgstr "Warstwa poniżej (tło)"
+
+#: ../../batcher/src/placeholders.py:156 ../../batcher/src/placeholders.py:157
+msgid "Layer Above (Foreground)"
+msgstr "Warstwa powyżej (pierwszy plan)"
+
+#: ../../batcher/src/placeholders.py:158
+msgid "All Layers"
+msgstr "Wszystkie warstwy"
+
+#: ../../batcher/src/placeholders.py:209
+msgid "X-offset"
+msgstr "Przesunięcie X"
+
+#: ../../batcher/src/placeholders.py:210
+msgid "Y-offset"
+msgstr "Przesunięcie Y"
+
+#: ../../batcher/src/plugin_settings.py:37
+#: ../../batcher/src/plugin_settings.py:208
+#: ../../batcher/src/plugin_settings.py:360
+msgid "Run mode"
+msgstr "Tryb pracy"
+
+#: ../../batcher/src/plugin_settings.py:38
+#: ../../batcher/src/plugin_settings.py:209
+#: ../../batcher/src/plugin_settings.py:361
+msgid "The run mode"
+msgstr "Tryb pracy"
+
+#: ../../batcher/src/plugin_settings.py:49
+msgid ""
+"Text file containing input files and folders on each line (non-interactive "
+"run mode only)"
+msgstr ""
+"Plik tekstowy zawierający pliki wejściowe i foldery w każdym wierszu (tylko w "
+"trybie nieinteraktywnym)"
+
+#: ../../batcher/src/plugin_settings.py:59
+msgid ""
+"Maximum number of input files to process (set to 0 to remove this "
+"restriction; non-interactive run mode only)"
+msgstr ""
+"Maksymalna liczba plików wejściowych do przetworzenia (ustaw na 0, aby usunąć "
+"to ograniczenie; dotyczy tylko trybu uruchamiania nieinteraktywnego)"
+
+#: ../../batcher/src/plugin_settings.py:88
+#: ../../batcher/src/plugin_settings.py:238
+msgid "Image filename pattern (empty string = image name)"
+msgstr "Wzorzec nazwy pliku obrazu (pusty ciąg = nazwa obrazu)"
+
+#: ../../batcher/src/plugin_settings.py:96
+#: ../../batcher/src/plugin_settings.py:246
+#: ../../batcher/src/plugin_settings.py:493
+msgid "How to handle conflicting files (non-interactive run mode only)"
+msgstr ""
+"Jak radzić sobie z konfliktowymi plikami (tylko w trybie nieinteraktywnym)"
+
+#: ../../batcher/src/plugin_settings.py:105
+#: ../../batcher/src/plugin_settings.py:255
+#: ../../batcher/src/plugin_settings.py:371
+#: ../../batcher/src/plugin_settings.py:502
+#: ../../batcher/src/plugin_settings.py:617
+msgid "File with saved settings"
+msgstr "Plik z zapisanymi ustawieniami"
+
+#: ../../batcher/src/plugin_settings.py:106
+#: ../../batcher/src/plugin_settings.py:256
+#: ../../batcher/src/plugin_settings.py:372
+#: ../../batcher/src/plugin_settings.py:503
+#: ../../batcher/src/plugin_settings.py:618
+msgid "File with saved settings (optional)"
+msgstr "Plik z zapisanymi ustawieniami (opcjonalnie)"
+
+#: ../../batcher/src/plugin_settings.py:139
+msgid "Keep Input Images"
+msgstr "Zachowaj obrazy wejściowe"
+
+#: ../../batcher/src/plugin_settings.py:485
+msgid "Layer filename pattern (empty string = layer name)"
+msgstr "Wzorzec nazwy pliku warstwy (pusty ciąg = nazwa warstwy)"
+
+#: ../../batcher/src/plugin_settings.py:799
+msgid "Input files and folders"
+msgstr "Pliki i foldery wejściowe"
+
+#: ../../batcher/src/plugin_settings.py:810
+msgid "Show Original Names"
+msgstr "Pokaż oryginalne nazwy"
+
+#: ../../batcher/src/plugin_settings.py:829
+msgid "Close when Done"
+msgstr "Zamknij po zakończeniu"
+
+#: ../../batcher/src/renamer.py:113
+msgid "Examples"
+msgstr "Przykłady"
+
+#: ../../batcher/src/renamer.py:560
+msgid "Suppose that the output folder is \"C:\\Users\\username\\Pictures\"."
+msgstr "Załóżmy, że folder wyjściowy to\"C:\\Users\\username\\Pictures\"."
+
+#: ../../batcher/src/renamer.py:571
+msgid "Suppose that the output folder is \"/home/username/Pictures\"."
+msgstr "Załóżmy, że folder wyjściowy to\"/home/username/Pictures\"."
+
+#. FOR TRANSLATORS: Translate only the "image" part
+#: ../../batcher/src/renamer.py:591
+msgid "image001"
+msgstr "obraz001"
+
+#: ../../batcher/src/renamer.py:597
+msgid "To continue numbering across group layers, use %n."
+msgstr "Aby kontynuować numerację w warstwach grupy, użyj %n."
+
+#: ../../batcher/src/renamer.py:599
+#, python-format
+msgid "To use descending numbers, use %d."
+msgstr "Aby użyć liczb malejących, użyj %d."
+
+#: ../../batcher/src/renamer.py:600
+msgid "Suppose that the number of layers is 5:"
+msgstr "Załóżmy, że liczba warstw wynosi 5:"
+
+#: ../../batcher/src/renamer.py:610 ../../batcher/src/renamer.py:675
+msgid "Image name"
+msgstr "Nazwa obrazu"
+
+#: ../../batcher/src/renamer.py:613
+msgid ""
+"Suppose that an image is named \"Image.png\" and the file extension is "
+"\"png\"."
+msgstr ""
+"Załóżmy, że obraz nazywa się „Image.png”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:618
+msgid ""
+"Suppose that an image is named \"Image.jpg\" and the file extension is "
+"\"png\"."
+msgstr ""
+"Załóżmy, że obraz nazywa się „Image.jpg”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:629
+msgid "Image path"
+msgstr "Ścieżka obrazu"
+
+#: ../../batcher/src/renamer.py:632
+msgid ""
+"Suppose that an image named \"Left\" has parent folders named \"Hands\" and "
+"\"Body\"."
+msgstr ""
+"Załóżmy, że obraz o nazwie „Lewa” ma foldery nadrzędne o nazwach „Ręce” i "
+"„Ciało”."
+
+#: ../../batcher/src/renamer.py:636
+msgid ""
+"Suppose that an image is named \"Left.jpg\" and the file extension is \"png\"."
+msgstr "Załóżmy, że obraz nazywa się „Left.jpg”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:647
+msgid "Layer name"
+msgstr "Nazwa warstwy"
+
+#: ../../batcher/src/renamer.py:650
+msgid ""
+"Suppose that a layer is named \"Frame.png\" and the file extension is \"png\"."
+msgstr ""
+"Załóżmy, że warstwa nazywa się „Frame.png”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:655
+msgid ""
+"Suppose that a layer is named \"Frame.jpg\" and the file extension is \"png\"."
+msgstr ""
+"Załóżmy, że warstwa nazywa się „Frame.jpg”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:666
+msgid "Full layer name"
+msgstr "Pełna nazwa warstwy"
+
+#: ../../batcher/src/renamer.py:678
+msgid "Suppose that the image is named \"Image.xcf\"."
+msgstr "Załóżmy, że obraz nazywa się „Image.xcf”."
+
+#: ../../batcher/src/renamer.py:688
+msgid "Layer path"
+msgstr "Ścieżka warstwy"
+
+#: ../../batcher/src/renamer.py:691
+msgid ""
+"Suppose that a layer named \"Left\" has parent groups named \"Hands\" and "
+"\"Body\"."
+msgstr ""
+"Załóżmy, że warstwa o nazwie „Lewa” ma grupy nadrzędne o nazwach „Ręce” i "
+"„Ciało”."
+
+#: ../../batcher/src/renamer.py:695
+msgid ""
+"Suppose that the layer is named \"Left.jpg\" and the file extension is "
+"\"png\"."
+msgstr ""
+"Załóżmy, że warstwa nazywa się „Left.jpg”, a rozszerzenie pliku to „png”."
+
+#: ../../batcher/src/renamer.py:715
+msgid "Tags"
+msgstr "Tagi"
+
+#: ../../batcher/src/renamer.py:718
+msgid "Suppose that a layer has a green color tag."
+msgstr "Załóżmy, że warstwa ma zielony znacznik koloru."
+
+#: ../../batcher/src/renamer.py:720
+msgid "You can map a color to another name."
+msgstr "Można przypisać kolor do innej nazwy."
+
+#: ../../batcher/src/renamer.py:723
+msgid "Missing tags are ignored."
+msgstr "Brakujące tagi są ignorowane."
+
+#: ../../batcher/src/renamer.py:733
+msgid "Current date"
+msgstr "Aktualna data"
+
+#: ../../batcher/src/renamer.py:737
+msgid ""
+"Custom date format uses formatting as per the \"strftime\" function in Python."
+msgstr ""
+"Niestandardowy format daty wykorzystuje formatowanie zgodnie z funkcją "
+"„strftime” w Pythonie."
+
+#: ../../batcher/src/renamer.py:746 ../../batcher/src/renamer.py:763
+msgid "Attributes"
+msgstr "Atrybuty"
+
+#: ../../batcher/src/renamer.py:749
+msgid ""
+"Suppose that an image has width and height of 1000 and 500 pixels, "
+"respectively,and the current layer has width, height, <i>x</i>-offset and "
+"<i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively."
+msgstr ""
+"Załóżmy, że obraz ma szerokość i wysokość odpowiednio 1000 i 500 pikseli, a "
+"bieżąca warstwa ma szerokość, wysokość, przesunięcie <i>x</i> i przesunięcie "
+"<i>y</i> odpowiednio 1000, 270, 0 i 40 pikseli."
+
+#: ../../batcher/src/renamer.py:766
+msgid ""
+"Suppose that a layer has width, height, <i>x</i>-offset and <i>y</i>-offset\n"
+"of 1000, 270, 0 and 40 pixels, respectively,\n"
+"and the image has width and height of 1000 and 500 pixels, respectively."
+msgstr ""
+"Załóżmy, że warstwa ma szerokość, wysokość, przesunięcie <i>x</i> i "
+"przesunięcie <i>y</i> wynoszące odpowiednio 1000, 270, 0 i 40 pikseli,\n"
+"a obraz ma szerokość i wysokość odpowiednio 1000 i 500 pikseli."
+
+#: ../../batcher/src/renamer.py:783
+msgid "Suppose that an image is named \"Animal copy #1\"."
+msgstr "Załóżmy, że obraz nosi nazwę „Kopia zwierzęcia nr 1”."
+
+#: ../../batcher/src/renamer.py:785 ../../batcher/src/renamer.py:802
+msgid ""
+"You can use the regular expression syntax as defined in the \"re\" module for "
+"Python."
+msgstr ""
+"Można używać składni wyrażeń regularnych zdefiniowanej w module „re” dla "
+"języka Python."
+
+#: ../../batcher/src/renamer.py:787 ../../batcher/src/renamer.py:804
+msgid ""
+"You can specify the number of replacements and flags as defined in the \"re\" "
+"module for Python."
+msgstr ""
+"Możesz określić liczbę zamienników i flag tak, jak zdefiniowano w module „re” "
+"dla języka Python."
+
+#: ../../batcher/src/renamer.py:800
+msgid "Suppose that a layer is named \"Animal copy #1\"."
+msgstr "Załóżmy, że warstwa nosi nazwę „Kopia zwierzęcia nr 1”."
+
+#: ../../batcher/src/update.py:73
+msgid "Failed to obtain the previous plug-in version."
+msgstr "Nie udało się pobrać poprzedniej wersji wtyczki."
+
+#: ../../batcher/src/update.py:1717
+msgid "Resize from edges"
+msgstr "Zmień rozmiar od krawędzi"
+
+#: ../../batcher/src/utils.py:63
+msgid ""
+"Settings stored in \"{}\" may be corrupt. This could happen if the file was "
+"edited manually. To fix this, save the settings again."
+msgstr ""
+"Ustawienia zapisane w pliku „{}” mogą być uszkodzone. Mogło się tak zdarzyć, "
+"jeśli plik został edytowany ręcznie. Aby to naprawić, zapisz ustawienia "
+"ponownie."
+
+#: ../../batcher/src/utils.py:67
+msgid " More information: {}"
+msgstr ""
+
+#: ../../batcher/src/utils.py:71
+msgid ""
+"Settings for this plug-in may be corrupt. To fix this, save the settings "
+"again or reset them."
+msgstr ""
+"Ustawienia tej wtyczki mogą być uszkodzone. Aby to naprawić, zapisz "
+"ustawienia ponownie lub je zresetuj."
+
+#: ../../batcher/src/utils.py:74
+msgid "More information: {}"
+msgstr "Więcej informacji: {}"
+
+#: ../../batcher/src/utils.py:78
+msgid "Could not locate settings in file \"{}\" in \"{}\"."
+msgstr "Nie można zlokalizować ustawień w pliku „{}” w „{}”."
+
+#: ../../batcher/src/utils.py:81
+msgid "Could not locate settings in \"{}\"."
+msgstr "Nie można znaleźć ustawień w „{}”."
