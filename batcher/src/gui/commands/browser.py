@@ -547,10 +547,6 @@ class CommandBrowser(GObject.GObject):
 
     return category_number, name
 
-  @staticmethod
-  def _process_text_for_search(text):
-    return text.replace('_', '-').lower()
-
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
 
@@ -565,11 +561,13 @@ class CommandBrowser(GObject.GObject):
   def _update_row_visibility(self, *_args):
     self._row_select_interactive = False
 
+    search_queries = self._get_search_queries()
+
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
 
-      visible_via_search = self._get_row_visibility_based_on_search(row)
+      visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
 
       visible_via_expanded = self._get_row_visibility_based_on_category_expanded_state(row)
 
@@ -577,8 +575,9 @@ class CommandBrowser(GObject.GObject):
 
     self._row_select_interactive = True
 
-  def _get_row_visibility_based_on_search(self, row):
-    processed_search_query = self._process_text_for_search(self._entry_search.get_text())
+  def _get_row_visibility_based_on_search(self, search_queries, row):
+    if not search_queries:
+      return True
 
     enabled_search_criteria = []
     if self._menu_item_by_name.get_active():
@@ -592,7 +591,11 @@ class CommandBrowser(GObject.GObject):
         self._process_text_for_search(row[self._COLUMN_COMMAND_DESCRIPTION[0]]))
 
     if enabled_search_criteria:
-      return any(processed_search_query in text for text in enabled_search_criteria)
+      visible = False
+      for search_query in search_queries:
+        visible = visible or any(search_query in text for text in enabled_search_criteria)
+
+      return visible
     else:
       return True
 
@@ -600,6 +603,15 @@ class CommandBrowser(GObject.GObject):
     category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
 
     return category.expanded
+
+  def _get_search_queries(self):
+    query_str = self._process_text_for_search(self._entry_search.get_text())
+
+    return query_str.split()
+
+  @staticmethod
+  def _process_text_for_search(text):
+    return text.replace('_', '-').lower()
 
   def _set_search_bar_icon_sensitivity(self):
     self._entry_search.set_icon_sensitive(
