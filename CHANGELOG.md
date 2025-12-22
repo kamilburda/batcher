@@ -1,5 +1,7 @@
 ## Upcoming
 
+This release includes quality-of-life improvements, particularly to the user interface, and resolves most issues reported since the previous version.
+
 General changes:
 * Added Brazilian Portuguese translation (thanks to @romrocha333).
 * Added Korean translation (thanks to @Maguk-Bong).
