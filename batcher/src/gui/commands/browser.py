@@ -121,6 +121,7 @@ class CommandBrowser(GObject.GObject):
 
     self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
+    self._tree_view.connect('key-press-event', self._on_tree_view_key_press_event)
 
     self._dialog.connect('show', self._on_dialog_show)
     self._dialog.connect('response', self._on_dialog_response)
@@ -656,16 +657,51 @@ class CommandBrowser(GObject.GObject):
     if x >= (current_icon.get_width() + self._ICON_XPAD * 2):
       return False
 
-    self._tree_model.set_value(category.tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
-    category.expanded = not category.expanded
+    self._expand_collapse_commands_under_category(
+      self._tree_model, category.tree_iter, category, new_icon)
 
-    self._update_row_visibility()
+    return True
+
+  def _on_tree_view_key_press_event(self, _tree_view, event):
+    if event.type != Gdk.EventType.KEY_PRESS:
+      return False
+
+    if event.keyval not in [Gdk.KEY_space, Gdk.KEY_Return]:
+      return False
+
+    tree_model, tree_iter = self._tree_view.get_selection().get_selected()
+
+    if tree_iter is None:
+      return False
+
+    row = tree_model[tree_iter]
+
+    if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.COMMAND:
+      return False
+
+    category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
+
+    _current_icon, new_icon = self._get_icons_based_on_expanded_state(category)
+
+    converted_iter = tree_model.convert_iter_to_child_iter(tree_iter)
+
+    self._expand_collapse_commands_under_category(
+      tree_model.get_model(), converted_iter, category, new_icon)
+
+    return True
 
   def _get_icons_based_on_expanded_state(self, category):
     if category.expanded:
       return self._icon_arrow_down, self._icon_arrow_end
     else:
       return self._icon_arrow_end, self._icon_arrow_down
+
+  def _expand_collapse_commands_under_category(self, tree_model, tree_iter, category, new_icon):
+    tree_model.set_value(tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+
+    category.expanded = not category.expanded
+
+    self._update_row_visibility()
 
   def _on_dialog_show(self, _dialog):
     model, selected_iter = self._tree_view.get_selection().get_selected()
