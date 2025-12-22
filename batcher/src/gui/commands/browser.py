@@ -117,7 +117,7 @@ class CommandBrowser(GObject.GObject):
 
     for menu_item in self._menu_search_settings.get_children():
       if isinstance(menu_item, Gtk.CheckMenuItem):
-        menu_item.connect('toggled', self._update_search_results)
+        menu_item.connect('toggled', self._update_row_visibility)
 
     self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
@@ -554,13 +554,13 @@ class CommandBrowser(GObject.GObject):
 
     self._update_search_results()
 
-  def _update_search_results(self):
+  def _update_search_results(self, *_args):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
       self._update_row_visibility,
     )
 
-  def _update_row_visibility(self):
+  def _update_row_visibility(self, *_args):
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
