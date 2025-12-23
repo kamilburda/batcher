@@ -143,13 +143,13 @@ class CommandBrowser(GObject.GObject):
   def paned(self):
     return self._hpaned
 
-  def select_command(self, internal_name):
+  def select_command_by_internal_name(self, internal_name):
     current_iter = self._tree_model_sorted.get_iter_first()
 
     while current_iter is not None:
       row = self._tree_model_sorted[current_iter]
 
-      if row[0] == internal_name:
+      if row[self._COLUMN_COMMAND_INTERNAL_NAME[0]] == internal_name:
         converted_path = self._tree_model_sorted.convert_child_path_to_path(row.path)
         self._tree_view.get_selection().select_iter(row.iter)
         self._tree_view.scroll_to_cell(converted_path, None, True, 0.5, 0.0)

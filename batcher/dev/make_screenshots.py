@@ -290,7 +290,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   gui.action_list.browser.fill_contents_if_empty()
   gui.action_list.browser.widget.show_all()
-  gui.action_list.browser.select_command('gegl:gaussian-blur')
+  gui.action_list.browser.select_command_by_internal_name('gegl:gaussian-blur')
 
   while Gtk.events_pending():
     Gtk.main_iteration()
