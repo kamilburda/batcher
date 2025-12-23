@@ -5,6 +5,7 @@ This release includes quality-of-life improvements, particularly to the user int
 General changes:
 * Added Brazilian Portuguese translation (thanks to @romrocha333).
 * Added Korean translation (thanks to @Maguk-Bong).
+* Added Polish translation (thanks to @jghosting764).
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
