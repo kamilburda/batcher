@@ -113,7 +113,6 @@ class CommandBrowser(GObject.GObject):
     }
 
     self._contents_filled = False
-    self._currently_filling_contents = False
 
     self._row_select_interactive = True
 
@@ -271,24 +270,27 @@ class CommandBrowser(GObject.GObject):
           None,
       ])
 
-    self._set_selection_to_first_command()
+    next_command_iter = self._get_next_command_to_select(self._tree_model_sorted)
+    if next_command_iter is not None:
+      self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
 
-  def _set_selection_to_first_command(self):
-    self._currently_filling_contents = True
+  def _get_next_command_to_select(self, tree_model, start_iter=None):
+    if start_iter is not None:
+      current_iter = start_iter
+    else:
+      current_iter = tree_model.get_iter_first()
 
-    current_iter = self._tree_model_sorted.get_iter_first()
-    first_command_iter = None
+    next_command_iter = None
+
     while current_iter is not None:
-      row = self._tree_model_sorted[current_iter]
+      row = tree_model[current_iter]
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.COMMAND:
-        first_command_iter = current_iter
+        next_command_iter = current_iter
         break
 
-      current_iter = self._tree_model_sorted.iter_next(current_iter)
+      current_iter = tree_model.iter_next(current_iter)
 
-    self._tree_view.set_cursor(self._tree_model_sorted[first_command_iter].path)
-
-    self._currently_filling_contents = False
+    return next_command_iter
 
   def _get_selected_command(self, model=None, selected_iter=None):
     if model is None and selected_iter is None:
@@ -559,6 +561,10 @@ class CommandBrowser(GObject.GObject):
 
     self._update_search_results()
 
+  def _set_search_bar_icon_sensitivity(self):
+    self._entry_search.set_icon_sensitive(
+      Gtk.EntryIconPosition.SECONDARY, self._entry_search.get_text())
+
   def _update_search_results(self, *_args):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
@@ -573,15 +579,25 @@ class CommandBrowser(GObject.GObject):
     visible_via_search_counts_per_category = {
       category: 0 for category in self._command_categories.values()}
 
+    tree_model, selected_iter = self._tree_view.get_selection().get_selected()
+    if selected_iter is not None:
+      selected_row = tree_model[selected_iter]
+      selected_category = self._command_categories[selected_row[self._COLUMN_COMMAND_CATEGORY[0]]]
+      visible_via_search = self._get_row_visibility_based_on_search(search_queries, selected_row)
+
+      should_select_different_command = not (visible_via_search and selected_category.expanded)
+    else:
+      should_select_different_command = False
+
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
 
       category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
-
       visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
+      visible = visible_via_search and category.expanded
 
-      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
+      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible
 
       if visible_via_search:
         visible_via_search_counts_per_category[category] += 1
@@ -591,6 +607,33 @@ class CommandBrowser(GObject.GObject):
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
     self._row_select_interactive = True
+
+    if should_select_different_command:
+      # The selection may have changed by now, hence we obtain the selected row
+      # again.
+      tree_model, selected_iter = self._tree_view.get_selection().get_selected()
+
+      # `selected_iter` may be None, in which case we find the first matching
+      # command.
+      next_command_iter = self._get_next_command_to_select(
+        self._tree_model_sorted, start_iter=selected_iter)
+
+      if next_command_iter is not None:
+        self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
+      else:
+        if selected_iter is not None:
+          self._tree_view.get_selection().unselect_all()
+        else:
+          # This means that there was no selection and there is nothing to
+          # select, i.e. the selection did not change and the 'changed' signal
+          # is not emitted. We still need to hide the action editor, which is
+          # done in the 'changed' signal handler. We therefore emit this signal
+          # manually.
+          # While the selection changes during the loop above (and can change
+          # to no selection is there is no row to select), we need to suppress
+          # the signal handler there to avoid rapid selection changes, which
+          # slows down the browser considerably.
+          self._tree_view.get_selection().emit('changed')
 
   def _get_row_visibility_based_on_search(self, search_queries, row):
     if not search_queries:
@@ -625,10 +668,6 @@ class CommandBrowser(GObject.GObject):
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
 
-  def _set_search_bar_icon_sensitivity(self):
-    self._entry_search.set_icon_sensitive(
-      Gtk.EntryIconPosition.SECONDARY, self._entry_search.get_text())
-
   def _on_entry_search_icon_press(self, _entry, _icon_position, _event):
     self._entry_search.set_text('')
 
@@ -645,8 +684,7 @@ class CommandBrowser(GObject.GObject):
       _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
         model, selected_iter)
 
-      if not self._currently_filling_contents:
-        self.emit('command-selected', command)
+      self.emit('command-selected', command)
 
       self._detach_command_editor_widget()
 
@@ -654,15 +692,17 @@ class CommandBrowser(GObject.GObject):
         self._label_no_selection.hide()
         self._attach_command_editor_widget(command_editor_widget)
         self._scrolled_window_command_arguments.show()
+        self._button_add.set_sensitive(True)
       else:
         self._scrolled_window_command_arguments.hide()
         self._label_no_selection.show()
+        self._button_add.set_sensitive(False)
     else:
       self._scrolled_window_command_arguments.hide()
       self._label_no_selection.show()
+      self._button_add.set_sensitive(False)
 
-      if not self._currently_filling_contents:
-        self.emit('command-selected', None)
+      self.emit('command-selected', None)
 
   def _on_tree_view_button_press_event(self, _tree_view, event):
     if event.type != Gdk.EventType.BUTTON_PRESS:
@@ -737,15 +777,7 @@ class CommandBrowser(GObject.GObject):
     self._update_row_visibility()
 
   def _on_dialog_show(self, _dialog):
-    model, selected_iter = self._tree_view.get_selection().get_selected()
-
-    if selected_iter is not None:
-      _command_dict, command, _command_editor_widget, _model, _iter = self._get_selected_command(
-        model, selected_iter)
-
-      self.emit('command-selected', command)
-    else:
-      self.emit('command-selected', None)
+    self._tree_view.get_selection().emit('changed')
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
