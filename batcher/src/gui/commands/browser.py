@@ -114,8 +114,6 @@ class CommandBrowser(GObject.GObject):
 
     self._contents_filled = False
 
-    self._row_select_interactive = True
-
     self._init_gui()
 
     self._entry_search.connect('changed', self._on_entry_search_changed)
@@ -127,7 +125,8 @@ class CommandBrowser(GObject.GObject):
       if isinstance(menu_item, Gtk.CheckMenuItem):
         menu_item.connect('toggled', self._update_row_visibility)
 
-    self._tree_view.get_selection().connect('changed', self._on_tree_view_selection_changed)
+    self._tree_view_selection_changed_event_handler_id = self._tree_view.get_selection().connect(
+      'changed', self._on_tree_view_selection_changed)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
     self._tree_view.connect('key-press-event', self._on_tree_view_key_press_event)
 
@@ -572,7 +571,10 @@ class CommandBrowser(GObject.GObject):
     )
 
   def _update_row_visibility(self, *_args):
-    self._row_select_interactive = False
+    GObject.signal_handler_block(
+      self._tree_view.get_selection(),
+      self._tree_view_selection_changed_event_handler_id,
+    )
 
     search_queries = self._get_search_queries()
 
@@ -606,7 +608,10 @@ class CommandBrowser(GObject.GObject):
       self._tree_model.set_value(
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
-    self._row_select_interactive = True
+    GObject.signal_handler_unblock(
+      self._tree_view.get_selection(),
+      self._tree_view_selection_changed_event_handler_id,
+    )
 
     if should_select_different_command:
       # The selection may have changed by now, hence we obtain the selected row
@@ -675,8 +680,6 @@ class CommandBrowser(GObject.GObject):
     gui_utils_.menu_popup_below_widget(self._menu_search_settings, button)
 
   def _on_tree_view_selection_changed(self, selection):
-    if not self._row_select_interactive:
-      return False
 
     model, selected_iter = selection.get_selected()
 
