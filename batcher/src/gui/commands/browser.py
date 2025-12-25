@@ -78,6 +78,7 @@ class CommandBrowser(GObject.GObject):
     _COLUMN_COMMAND_DESCRIPTION,
     _COLUMN_COMMAND_DICT,
     _COLUMN_COMMAND_EDITOR_WIDGET,
+    _COLUMN_COMMAND_VISIBLE_VIA_SEARCH,
     _COLUMN_COMMAND_VISIBLE,
     _COLUMN_ICON_PARENT,
   ) = (
@@ -89,7 +90,8 @@ class CommandBrowser(GObject.GObject):
     [5, GObject.TYPE_PYOBJECT],
     [6, GObject.TYPE_PYOBJECT],
     [7, GObject.TYPE_BOOLEAN],
-    [8, GdkPixbuf.Pixbuf],
+    [8, GObject.TYPE_BOOLEAN],
+    [9, GdkPixbuf.Pixbuf],
   )
 
   __gsignals__ = {
@@ -206,6 +208,7 @@ class CommandBrowser(GObject.GObject):
           None,
           None,
           True,
+          True,
           self._get_icons_based_on_expanded_state(category)[0],
       ])
 
@@ -265,6 +268,7 @@ class CommandBrowser(GObject.GObject):
           command_dict.get('description', ''),
           command_dict,
           None,
+          True,
           True,
           None,
       ])
@@ -585,12 +589,10 @@ class CommandBrowser(GObject.GObject):
     if origin == 'search':
       if selected_iter is not None:
         selected_row = tree_model[selected_iter]
-
         selected_category = self._command_categories[selected_row[self._COLUMN_COMMAND_CATEGORY[0]]]
         visible_via_search = self._get_row_visibility_based_on_search(search_queries, selected_row)
-        visible = visible_via_search and selected_category.expanded
 
-        should_select_different_command = not visible
+        should_select_different_command = not (visible_via_search and selected_category.expanded)
       else:
         should_select_different_command = True
     else:
@@ -601,10 +603,14 @@ class CommandBrowser(GObject.GObject):
         continue
 
       category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
-      visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
-      visible = visible_via_search and category.expanded
 
-      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible
+      if origin == 'search':
+        visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
+        row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]] = visible_via_search
+      else:
+        visible_via_search = row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]]
+
+      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
 
       if visible_via_search:
         visible_via_search_counts_per_category[category] += 1
