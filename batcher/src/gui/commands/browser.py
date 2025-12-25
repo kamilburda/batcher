@@ -594,7 +594,7 @@ class CommandBrowser(GObject.GObject):
       else:
         should_select_different_command = True
     else:
-      should_select_different_command = False
+      should_select_different_command = True
 
     for row in self._tree_model:
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
