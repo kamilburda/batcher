@@ -570,7 +570,7 @@ class CommandBrowser(GObject.GObject):
       self._update_row_visibility,
     )
 
-  def _update_row_visibility(self, *_args):
+  def _update_row_visibility(self, *_args, origin='search'):
     GObject.signal_handler_block(
       self._tree_view.get_selection(),
       self._tree_view_selection_changed_event_handler_id,
@@ -582,12 +582,17 @@ class CommandBrowser(GObject.GObject):
       category: 0 for category in self._command_categories.values()}
 
     tree_model, selected_iter = self._tree_view.get_selection().get_selected()
-    if selected_iter is not None:
-      selected_row = tree_model[selected_iter]
-      selected_category = self._command_categories[selected_row[self._COLUMN_COMMAND_CATEGORY[0]]]
-      visible_via_search = self._get_row_visibility_based_on_search(search_queries, selected_row)
+    if origin == 'search':
+      if selected_iter is not None:
+        selected_row = tree_model[selected_iter]
 
-      should_select_different_command = not (visible_via_search and selected_category.expanded)
+        selected_category = self._command_categories[selected_row[self._COLUMN_COMMAND_CATEGORY[0]]]
+        visible_via_search = self._get_row_visibility_based_on_search(search_queries, selected_row)
+        visible = visible_via_search and selected_category.expanded
+
+        should_select_different_command = not visible
+      else:
+        should_select_different_command = True
     else:
       should_select_different_command = False
 
@@ -777,7 +782,7 @@ class CommandBrowser(GObject.GObject):
 
     category.expanded = not category.expanded
 
-    self._update_row_visibility()
+    self._update_row_visibility(origin='expand_category')
 
   def _on_dialog_show(self, _dialog):
     self._tree_view.get_selection().emit('changed')
