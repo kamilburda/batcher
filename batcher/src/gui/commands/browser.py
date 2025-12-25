@@ -619,11 +619,6 @@ class CommandBrowser(GObject.GObject):
       self._tree_model.set_value(
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
-    GObject.signal_handler_unblock(
-      self._tree_view.get_selection(),
-      self._tree_view_selection_changed_event_handler_id,
-    )
-
     if should_select_different_command:
       # The selection may have changed by now, hence we obtain the selected row
       # again.
@@ -636,20 +631,16 @@ class CommandBrowser(GObject.GObject):
 
       if next_command_iter is not None:
         self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
-      else:
-        if selected_iter is not None:
-          self._tree_view.get_selection().unselect_all()
-        else:
-          # This means that there was no selection and there is nothing to
-          # select, i.e. the selection did not change and the 'changed' signal
-          # is not emitted. We still need to hide the action editor, which is
-          # done in the 'changed' signal handler. We therefore emit this signal
-          # manually.
-          # While the selection changes during the loop above (and can change
-          # to no selection is there is no row to select), we need to suppress
-          # the signal handler there to avoid rapid selection changes, which
-          # slows down the browser considerably.
-          self._tree_view.get_selection().emit('changed')
+
+    GObject.signal_handler_unblock(
+      self._tree_view.get_selection(),
+      self._tree_view_selection_changed_event_handler_id,
+    )
+
+    # We manually emit the handler here as it was suppressed up to this point.
+    # The handler is emitted regardless of whether the selection needs to be
+    # changed or not.
+    self._tree_view.get_selection().emit('changed')
 
   def _get_row_visibility_based_on_search(self, search_queries, row):
     if not search_queries:
