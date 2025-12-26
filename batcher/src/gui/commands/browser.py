@@ -629,7 +629,10 @@ class CommandBrowser(GObject.GObject):
         self._tree_model_sorted, start_iter=selected_iter)
 
       if next_command_iter is not None:
-        self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
+        if origin == 'search':
+          self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
+        else:
+          self._tree_view.get_selection().select_iter(next_command_iter)
 
     GObject.signal_handler_unblock(
       self._tree_view.get_selection(),
