@@ -174,20 +174,20 @@ class CommandBrowser(GObject.GObject):
                    or name_.endswith('-export-multi')))
 
     def is_gegl_operation_internal(name_):
-      categories = Gegl.Operation.get_key(name_, 'categories')
+      operation_categories = Gegl.Operation.get_key(name_, 'categories')
 
-      if categories:
+      if operation_categories:
         return any(
-          category in ['input', 'output', 'programming']
-          for category in categories.split(':'))
+          operation_category in ['input', 'output', 'programming']
+          for operation_category in operation_categories.split(':'))
       else:
         return False
 
     def is_gegl_operation_hidden(name_):
-      categories = Gegl.Operation.get_key(name_, 'categories')
+      operation_categories = Gegl.Operation.get_key(name_, 'categories')
 
-      if categories:
-        return 'hidden' in categories.split(':')
+      if operation_categories:
+        return 'hidden' in operation_categories.split(':')
       else:
         return False
 
