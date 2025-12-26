@@ -125,7 +125,7 @@ class CommandBrowser(GObject.GObject):
 
     for menu_item in self._menu_search_settings.get_children():
       if isinstance(menu_item, Gtk.CheckMenuItem):
-        menu_item.connect('toggled', self._update_row_visibility)
+        menu_item.connect('toggled', self._update_visibility_and_category_expanded_state)
 
     self._tree_view_selection_changed_event_handler_id = self._tree_view.get_selection().connect(
       'changed', self._on_tree_view_selection_changed)
@@ -571,10 +571,10 @@ class CommandBrowser(GObject.GObject):
   def _update_search_results(self, *_args):
     utils.timeout_add_strict(
       self._SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS,
-      self._update_row_visibility,
+      self._update_visibility_and_category_expanded_state,
     )
 
-  def _update_row_visibility(self, *_args, origin='search'):
+  def _update_visibility_and_category_expanded_state(self, *_args, origin='search'):
     GObject.signal_handler_block(
       self._tree_view.get_selection(),
       self._tree_view_selection_changed_event_handler_id,
@@ -586,13 +586,17 @@ class CommandBrowser(GObject.GObject):
       category: 0 for category in self._command_categories.values()}
 
     tree_model, selected_iter = self._tree_view.get_selection().get_selected()
+    selected_row = None
+
     if origin == 'search':
       if selected_iter is not None:
         selected_row = tree_model[selected_iter]
         selected_category = self._command_categories[selected_row[self._COLUMN_COMMAND_CATEGORY[0]]]
-        visible_via_search = self._get_row_visibility_based_on_search(search_queries, selected_row)
+        selected_visible_via_search = self._get_row_visibility_based_on_search(
+          search_queries, selected_row)
 
-        should_select_different_command = not (visible_via_search and selected_category.expanded)
+        should_select_different_command = (
+          not (selected_visible_via_search and selected_category.expanded))
       else:
         should_select_different_command = True
     else:
@@ -602,18 +606,13 @@ class CommandBrowser(GObject.GObject):
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
 
-      category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
-
-      if origin == 'search':
-        visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
-        row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]] = visible_via_search
-      else:
-        visible_via_search = row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]]
-
-      row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
-
-      if visible_via_search:
-        visible_via_search_counts_per_category[category] += 1
+      self._update_row_and_category_properties(
+        row,
+        origin,
+        search_queries,
+        visible_via_search_counts_per_category,
+        should_select_different_command,
+      )
 
     for category, count in visible_via_search_counts_per_category.items():
       self._tree_model.set_value(
@@ -641,6 +640,40 @@ class CommandBrowser(GObject.GObject):
     # The handler is emitted regardless of whether the selection needs to be
     # changed or not.
     self._tree_view.get_selection().emit('changed')
+
+  def _update_row_and_category_properties(
+        self,
+        row,
+        origin,
+        search_queries,
+        visible_via_search_counts_per_category,
+        should_select_different_command,
+  ):
+    category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
+
+    row_to_select = None
+
+    if origin == 'search':
+      visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
+      row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]] = visible_via_search
+    else:
+      visible_via_search = row[self._COLUMN_COMMAND_VISIBLE_VIA_SEARCH[0]]
+
+    if visible_via_search:
+      visible_via_search_counts_per_category[category] += 1
+
+      if should_select_different_command:
+        row_category = self._tree_model[category.tree_iter]
+        if row_category[self._COLUMN_COMMAND_VISIBLE[0]]:
+          row_to_select = row
+
+          if not category.expanded:
+            # TODO: Expand category
+            pass
+
+    row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
+
+    return row_to_select
 
   def _get_row_visibility_based_on_search(self, search_queries, row):
     if not search_queries:
@@ -779,7 +812,7 @@ class CommandBrowser(GObject.GObject):
 
     category.expanded = not category.expanded
 
-    self._update_row_visibility(origin='expand_category')
+    self._update_visibility_and_category_expanded_state(origin='expand_category')
 
   def _on_dialog_show(self, _dialog):
     self._tree_view.get_selection().emit('changed')
