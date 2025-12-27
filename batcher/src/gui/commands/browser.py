@@ -651,14 +651,9 @@ class CommandBrowser(GObject.GObject):
         (selected_category.number, selected_command_internal_name)]
 
       for category_number, command_internal_name in self._command_internal_names[start_index:]:
-        row = self._tree_model[self._command_internal_names_and_iters[
-          (category_number, command_internal_name)]]
-
-        if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
-          continue
-
         candidate_row_to_select = self._update_row_and_category_properties(
-          row,
+          category_number,
+          command_internal_name,
           origin,
           search_queries,
           visible_via_search_counts_per_category,
@@ -673,14 +668,9 @@ class CommandBrowser(GObject.GObject):
       start_index = None
 
     for category_number, command_internal_name in self._command_internal_names[:start_index]:
-      row = self._tree_model[self._command_internal_names_and_iters[
-        (category_number, command_internal_name)]]
-
-      if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
-        continue
-
       candidate_row_to_select = self._update_row_and_category_properties(
-        row,
+        category_number,
+        command_internal_name,
         origin,
         search_queries,
         visible_via_search_counts_per_category,
@@ -698,7 +688,7 @@ class CommandBrowser(GObject.GObject):
 
     # TODO: Revert expanded state for parents which were expanded due to finding the next command
     #  and which are hidden
-    
+
     if should_select_different_command and row_to_select is not None:
       self._select_next_command(row_to_select, origin)
 
@@ -714,12 +704,19 @@ class CommandBrowser(GObject.GObject):
 
   def _update_row_and_category_properties(
         self,
-        row,
+        category_number,
+        command_internal_name,
         origin,
         search_queries,
         visible_via_search_counts_per_category,
         should_select_different_command,
   ):
+    row = self._tree_model[self._command_internal_names_and_iters[
+      (category_number, command_internal_name)]]
+
+    if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
+      return
+
     category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
 
     row_to_select = None
