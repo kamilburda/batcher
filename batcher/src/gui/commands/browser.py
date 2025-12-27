@@ -686,9 +686,6 @@ class CommandBrowser(GObject.GObject):
       self._tree_model.set_value(
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
-    # TODO: Revert expanded state for parents which were expanded due to finding the next command
-    #  and which are hidden
-
     if should_select_different_command and row_to_select is not None:
       self._select_next_command(row_to_select, origin)
 
