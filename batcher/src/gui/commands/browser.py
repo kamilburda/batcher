@@ -114,6 +114,10 @@ class CommandBrowser(GObject.GObject):
       'other': _CommandCategory('other', _('Other'), 3, False),
     }
 
+    self._command_internal_names = []
+    self._command_internal_names_and_indexes = {}
+    self._command_internal_names_and_iters = {}
+
     self._contents_filled = False
 
     self._init_gui()
@@ -127,6 +131,7 @@ class CommandBrowser(GObject.GObject):
       if isinstance(menu_item, Gtk.CheckMenuItem):
         menu_item.connect('toggled', self._update_visibility_and_category_expanded_state)
 
+    self._tree_model_sorted.connect('sort-column-changed', self._on_tree_model_sort_column_changed)
     self._tree_view_selection_changed_event_handler_id = self._tree_view.get_selection().connect(
       'changed', self._on_tree_view_selection_changed)
     self._tree_view.connect('button-press-event', self._on_tree_view_button_press_event)
@@ -212,6 +217,11 @@ class CommandBrowser(GObject.GObject):
           self._get_icons_based_on_expanded_state(category)[0],
       ])
 
+      category_number = self._command_categories[category_name].number
+
+      self._command_internal_names.append((category_number, ''))
+      self._command_internal_names_and_iters[(category_number, '')] = category.tree_iter
+
     pdb_procedures = [
       pdb[name]
       for name in pdb.list_all_gegl_operations()
@@ -260,7 +270,7 @@ class CommandBrowser(GObject.GObject):
       #  (e.g. displaying a layer copy as a new image).
       command_dict['enabled'] = False
 
-      self._tree_model.append([
+      tree_iter = self._tree_model.append([
           _CommandBrowserItemTypes.COMMAND,
           category_name,
           display_name if display_name is not None else procedure_name,
@@ -273,9 +283,16 @@ class CommandBrowser(GObject.GObject):
           None,
       ])
 
+      category_number = self._command_categories[category_name].number
+
+      self._command_internal_names.append((category_number, procedure_name))
+      self._command_internal_names_and_iters[(category_number, procedure_name)] = tree_iter
+
     next_command_iter = self._get_next_command_to_select(self._tree_model_sorted)
     if next_command_iter is not None:
       self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
+
+    self._sort_command_internal_names()
 
   def _get_next_command_to_select(self, tree_model, start_iter=None):
     if start_iter is not None:
@@ -526,7 +543,7 @@ class CommandBrowser(GObject.GObject):
     self._set_search_bar_icon_sensitivity()
 
   def _sort_commands_by_name(self, model, first_iter, second_iter, _user_data):
-    _column_id, sort_type = self._tree_model_sorted.get_sort_column_id()
+    sort_type = self._get_sort_type()
 
     first_category_number, first_name = self._get_sort_column_key(model, first_iter, sort_type)
     second_category_number, second_name = self._get_sort_column_key(model, second_iter, sort_type)
@@ -559,6 +576,28 @@ class CommandBrowser(GObject.GObject):
 
     return category_number, name
 
+  def _get_sort_column_key_from_internal_name(self, category_number_and_command_internal_name):
+    category_number, command_internal_name = category_number_and_command_internal_name
+
+    return self._get_sort_column_key(
+      self._tree_model,
+      self._command_internal_names_and_iters[(category_number, command_internal_name)],
+      self._get_sort_type(),
+    )
+
+  def _get_sort_type(self):
+    return self._tree_model_sorted.get_sort_column_id()[1]
+
+  def _sort_command_internal_names(self):
+    self._command_internal_names.sort(
+      key=self._get_sort_column_key_from_internal_name,
+      reverse=self._get_sort_type() == Gtk.SortType.DESCENDING,
+    )
+
+    self._command_internal_names_and_indexes = {
+      (category_number, internal_name): index
+      for index, (category_number, internal_name) in enumerate(self._command_internal_names)}
+
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()
 
@@ -587,6 +626,7 @@ class CommandBrowser(GObject.GObject):
 
     tree_model, selected_iter = self._tree_view.get_selection().get_selected()
     selected_row = None
+    selected_category = None
 
     if origin == 'search':
       if selected_iter is not None:
@@ -602,11 +642,44 @@ class CommandBrowser(GObject.GObject):
     else:
       should_select_different_command = True
 
-    for row in self._tree_model:
+    row_to_select = None
+
+    if selected_row is not None:
+      selected_command_internal_name = selected_row[self._COLUMN_COMMAND_INTERNAL_NAME[0]]
+
+      start_index = self._command_internal_names_and_indexes[
+        (selected_category.number, selected_command_internal_name)]
+
+      for category_number, command_internal_name in self._command_internal_names[start_index:]:
+        row = self._tree_model[self._command_internal_names_and_iters[
+          (category_number, command_internal_name)]]
+
+        if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
+          continue
+
+        candidate_row_to_select = self._update_row_and_category_properties(
+          row,
+          origin,
+          search_queries,
+          visible_via_search_counts_per_category,
+          should_select_different_command,
+        )
+
+        if (should_select_different_command
+            and row_to_select is None
+            and candidate_row_to_select is not None):
+          row_to_select = candidate_row_to_select
+    else:
+      start_index = None
+
+    for category_number, command_internal_name in self._command_internal_names[:start_index]:
+      row = self._tree_model[self._command_internal_names_and_iters[
+        (category_number, command_internal_name)]]
+
       if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
         continue
 
-      self._update_row_and_category_properties(
+      candidate_row_to_select = self._update_row_and_category_properties(
         row,
         origin,
         search_queries,
@@ -614,25 +687,20 @@ class CommandBrowser(GObject.GObject):
         should_select_different_command,
       )
 
+      if (should_select_different_command
+          and row_to_select is None
+          and candidate_row_to_select is not None):
+        row_to_select = candidate_row_to_select
+
     for category, count in visible_via_search_counts_per_category.items():
       self._tree_model.set_value(
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], count > 0)
 
-    if should_select_different_command:
-      # The selection may have changed by now, hence we obtain the selected row
-      # again.
-      tree_model, selected_iter = self._tree_view.get_selection().get_selected()
-
-      # `selected_iter` may be None, in which case we find the first matching
-      # command.
-      next_command_iter = self._get_next_command_to_select(
-        self._tree_model_sorted, start_iter=selected_iter)
-
-      if next_command_iter is not None:
-        if origin == 'search':
-          self._tree_view.set_cursor(self._tree_model_sorted[next_command_iter].path)
-        else:
-          self._tree_view.get_selection().select_iter(next_command_iter)
+    # TODO: Revert expanded state for parents which were expanded due to finding the next command
+    #  and which are hidden
+    
+    if should_select_different_command and row_to_select is not None:
+      self._select_next_command(row_to_select, origin)
 
     GObject.signal_handler_unblock(
       self._tree_view.get_selection(),
@@ -666,13 +734,15 @@ class CommandBrowser(GObject.GObject):
       visible_via_search_counts_per_category[category] += 1
 
       if should_select_different_command:
-        row_category = self._tree_model[category.tree_iter]
-        if row_category[self._COLUMN_COMMAND_VISIBLE[0]]:
+        if origin == 'search':
           row_to_select = row
 
           if not category.expanded:
             # TODO: Expand category
             pass
+        else:
+          if category.expanded:
+            row_to_select = row
 
     row[self._COLUMN_COMMAND_VISIBLE[0]] = visible_via_search and category.expanded
 
@@ -711,11 +781,28 @@ class CommandBrowser(GObject.GObject):
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
 
+  def _select_next_command(self, row_to_select, origin):
+    converted_filter_path = self._tree_model_filter.convert_child_path_to_path(row_to_select.path)
+    if converted_filter_path is None:
+      return
+
+    converted_path = self._tree_model_sorted.convert_child_path_to_path(converted_filter_path)
+    if converted_path is None:
+      return
+
+    if origin == 'search':
+      self._tree_view.set_cursor(converted_path)
+    else:
+      self._tree_view.get_selection().select_path(converted_path)
+
   def _on_entry_search_icon_press(self, _entry, _icon_position, _event):
     self._entry_search.set_text('')
 
   def _on_button_search_settings_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_search_settings, button)
+
+  def _on_tree_model_sort_column_changed(self, _tree_model):
+    self._sort_command_internal_names()
 
   def _on_tree_view_selection_changed(self, selection):
     model, selected_iter = selection.get_selected()
