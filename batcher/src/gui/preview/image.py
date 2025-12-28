@@ -498,7 +498,7 @@ class ImagePreview(preview_base_.Preview):
     gui_utils_.menu_popup_below_widget(self._menu_settings, button)
 
   def _on_button_message_clicked(self, _button):
-    self._popover_message.show_all()
+    self._popover_message.popup()
   
   def _on_menu_item_update_automatically_toggled(self, menu_item):
     if self._menu_item_update_automatically.get_active():
