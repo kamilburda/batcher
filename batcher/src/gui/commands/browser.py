@@ -646,41 +646,32 @@ class CommandBrowser(GObject.GObject):
 
     if selected_row is not None:
       selected_command_internal_name = selected_row[self._COLUMN_COMMAND_INTERNAL_NAME[0]]
-
       start_index = self._command_internal_names_and_indexes[
         (selected_category.number, selected_command_internal_name)]
 
       for category_number, command_internal_name in self._command_internal_names[start_index:]:
-        candidate_row_to_select = self._update_row_and_category_properties(
+        row_to_select = self._update_row_and_category_properties(
           category_number,
           command_internal_name,
           origin,
           search_queries,
           visible_via_search_counts_per_category,
           should_select_different_command,
+          row_to_select,
         )
-
-        if (should_select_different_command
-            and row_to_select is None
-            and candidate_row_to_select is not None):
-          row_to_select = candidate_row_to_select
     else:
       start_index = None
 
     for category_number, command_internal_name in self._command_internal_names[:start_index]:
-      candidate_row_to_select = self._update_row_and_category_properties(
+      row_to_select = self._update_row_and_category_properties(
         category_number,
         command_internal_name,
         origin,
         search_queries,
         visible_via_search_counts_per_category,
         should_select_different_command,
+        row_to_select,
       )
-
-      if (should_select_different_command
-          and row_to_select is None
-          and candidate_row_to_select is not None):
-        row_to_select = candidate_row_to_select
 
     for category, count in visible_via_search_counts_per_category.items():
       self._tree_model.set_value(
@@ -707,16 +698,15 @@ class CommandBrowser(GObject.GObject):
         search_queries,
         visible_via_search_counts_per_category,
         should_select_different_command,
+        row_to_select,
   ):
     row = self._tree_model[self._command_internal_names_and_iters[
       (category_number, command_internal_name)]]
 
     if row[self._COLUMN_ITEM_TYPE[0]] == _CommandBrowserItemTypes.PARENT:
-      return
+      return row_to_select
 
     category = self._command_categories[row[self._COLUMN_COMMAND_CATEGORY[0]]]
-
-    row_to_select = None
 
     if origin == 'search':
       visible_via_search = self._get_row_visibility_based_on_search(search_queries, row)
@@ -727,7 +717,7 @@ class CommandBrowser(GObject.GObject):
     if visible_via_search:
       visible_via_search_counts_per_category[category] += 1
 
-      if should_select_different_command:
+      if should_select_different_command and row_to_select is None:
         if origin == 'search':
           row_to_select = row
 
