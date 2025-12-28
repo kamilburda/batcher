@@ -48,6 +48,8 @@ class _CommandCategory:
     self.expanded = expanded
     self.tree_iter = tree_iter
 
+    self.command_rows = []
+
 
 class _CommandBrowserItemTypes:
 
@@ -282,9 +284,11 @@ class CommandBrowser(GObject.GObject):
       #  (e.g. displaying a layer copy as a new image).
       command_dict['enabled'] = False
 
+      category = self._command_categories[category_name]
+
       command_row = _CommandRow(
         type_=_CommandBrowserItemTypes.COMMAND,
-        category=self._command_categories[category_name],
+        category=category,
         internal_name=procedure_name,
         name=display_name if display_name is not None else procedure_name,
         description=command_dict.get('description', ''),
@@ -302,6 +306,7 @@ class CommandBrowser(GObject.GObject):
       command_row.tree_iter = tree_iter
 
       self._command_rows.append(command_row)
+      category.command_rows.append(command_row)
 
     self._sort_command_rows()
 
@@ -634,9 +639,6 @@ class CommandBrowser(GObject.GObject):
 
     search_queries = self._get_search_queries()
 
-    visible_via_search_counts_per_category = {
-      category: 0 for category in self._command_categories.values()}
-
     tree_model, selected_iter = self._tree_view.get_selection().get_selected()
     selected_command_row = None
 
@@ -663,7 +665,6 @@ class CommandBrowser(GObject.GObject):
           command_row,
           origin,
           search_queries,
-          visible_via_search_counts_per_category,
           should_select_different_command,
           row_to_select,
         )
@@ -675,13 +676,14 @@ class CommandBrowser(GObject.GObject):
         command_row,
         origin,
         search_queries,
-        visible_via_search_counts_per_category,
         should_select_different_command,
         row_to_select,
       )
 
-    for category, count in visible_via_search_counts_per_category.items():
-      category.visible = count > 0
+    for category in self._command_categories.values():
+      num_command_rows_visible_via_search_per_category = [
+        command_row.visible_via_search for command_row in category.command_rows].count(True)
+      category.visible = num_command_rows_visible_via_search_per_category > 0
       self._tree_model.set_value(
         category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], category.visible)
 
@@ -703,7 +705,6 @@ class CommandBrowser(GObject.GObject):
         command_row,
         origin,
         search_queries,
-        visible_via_search_counts_per_category,
         should_select_different_command,
         row_to_select,
   ):
@@ -719,8 +720,6 @@ class CommandBrowser(GObject.GObject):
       visible_via_search = command_row.visible_via_search
 
     if visible_via_search:
-      visible_via_search_counts_per_category[command_row.category] += 1
-
       if should_select_different_command and row_to_select is None:
         if origin == 'search':
           row_to_select = row
