@@ -653,7 +653,7 @@ class CommandBrowser(GObject.GObject):
       else:
         should_select_different_command = True
     else:
-      should_select_different_command = True
+      should_select_different_command = False
 
     row_to_select = None
 
