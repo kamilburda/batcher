@@ -42,6 +42,7 @@ User interface changes:
   * You can now search by multiple words. At least one matching word will yield a match. Whitespace characters are no longer considered when finding search results.
   * Categories with no matching search results are now hidden.
   * Several minor UI tweaks (such as different expander arrow icons to be consistent with the GIMP plug-in browser, or the Add button being insensitive when no action is selected).
+  * Optimized search and expanding/collapsing categories.
 
 Changes to actions and conditions:
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
@@ -49,7 +50,7 @@ Changes to actions and conditions:
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:
-* In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable. There may still be a noticeable delay when the search results are filtered.
+* In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable.
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
 
 
