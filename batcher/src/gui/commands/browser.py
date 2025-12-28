@@ -725,8 +725,11 @@ class CommandBrowser(GObject.GObject):
           row_to_select = row
 
           if not command_row.category.expanded:
-            # TODO: Expand category
-            pass
+            _current_icon, new_icon = self._get_icons_based_on_expanded_state(command_row.category)
+            self._tree_model.set_value(
+              command_row.category.tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+
+            command_row.category.expanded = True
         else:
           if command_row.category.expanded:
             row_to_select = row

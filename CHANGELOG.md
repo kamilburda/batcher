@@ -40,6 +40,7 @@ User interface changes:
   * Adjusted the default width to ensure that the right part can be displayed in its entirety without the need for horizontal scrolling.
   * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
   * You can now search by multiple words. At least one matching word will yield a match. Whitespace characters are no longer considered when finding search results.
+  * When searching and the first match is under a collapsed category, that category is expanded automatically.
   * Categories with no matching search results are now hidden.
   * Several minor UI tweaks (such as different expander arrow icons to be consistent with the GIMP plug-in browser, or the Add button being insensitive when no action is selected).
   * Optimized search and expanding/collapsing categories.
