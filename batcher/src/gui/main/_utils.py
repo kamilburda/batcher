@@ -46,6 +46,8 @@ class ImportExportOptionsDialog:
       title=self._title,
       parent=self._parent,
       resizable=False,
+      attached_to=gui_utils_.get_toplevel_window(self._parent),
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
     )
 
     self._button_reset_response_id = 1
@@ -97,7 +99,6 @@ class ImportExportOptionsDialog:
     self._dialog.vbox.pack_start(self._scrolled_window, False, False, 0)
     self._dialog.vbox.set_border_width(self._CONTENTS_BORDER_WIDTH)
 
-    self._dialog.connect('realize', self._on_dialog_realize)
     self._dialog.connect('close', self._on_dialog_close)
     self._dialog.connect('response', self._on_dialog_response)
 
@@ -111,11 +112,6 @@ class ImportExportOptionsDialog:
   def _on_dialog_response(self, _dialog, response_id):
     if response_id == Gtk.ResponseType.CLOSE:
       self._dialog.hide()
-
-  def _on_dialog_realize(self, _dialog):
-    if self._parent is not None:
-      self._dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
-      self._dialog.set_attached_to(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_button_reset_clicked(self, _button):
     self._import_export_settings.reset()

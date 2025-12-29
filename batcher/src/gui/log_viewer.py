@@ -52,6 +52,8 @@ class LogViewer:
       destroy_with_parent=True,
       resizable=True,
       border_width=self._DIALOG_BORDER_WIDTH,
+      attached_to=gui_utils_.get_toplevel_window(self._parent),
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
     )
 
     self._dialog.vbox.pack_start(self._scrolled_window, True, True, 0)
@@ -62,7 +64,6 @@ class LogViewer:
 
     self._text_view.connect('size-allocate', self._on_text_view_size_allocate)
 
-    self._dialog.connect('realize', self._on_dialog_realize)
     self._dialog.connect('close', self._on_dialog_close)
     self._dialog.connect('response', self._on_dialog_response)
 
@@ -88,11 +89,6 @@ class LogViewer:
       0.0,
       0.0,
     )
-
-  def _on_dialog_realize(self, _dialog):
-    if self._parent is not None:
-      self._dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
-      self._dialog.set_attached_to(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_dialog_close(self, _dialog):
     self._dialog.hide()
