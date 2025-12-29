@@ -183,6 +183,11 @@ class CommandBrowser(GObject.GObject):
     if self._contents_filled:
       return
 
+    GObject.signal_handler_block(
+      self._tree_view.get_selection(),
+      self._tree_view_selection_changed_event_handler_id,
+    )
+
     self._contents_filled = True
 
     def is_file_load_procedure(name_):
@@ -312,6 +317,11 @@ class CommandBrowser(GObject.GObject):
       category.command_rows.append(command_row)
 
     self._sort_command_rows()
+
+    GObject.signal_handler_unblock(
+      self._tree_view.get_selection(),
+      self._tree_view_selection_changed_event_handler_id,
+    )
 
     self._select_first_visible_command()
 
