@@ -8,7 +8,6 @@ import traceback
 from typing import Callable, Optional, Tuple, Union
 
 import gi
-from gi.repository import GLib
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
