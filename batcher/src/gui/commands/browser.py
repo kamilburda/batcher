@@ -370,17 +370,11 @@ class CommandBrowser(GObject.GObject):
           command_row.command_editor_widget = self._add_command_editor_widget_to_model(
             command_row.command_dict, tree_model, selected_child_iter)
 
-        return (
-          command_row.command_dict,
-          command_row.command_editor_widget.command,
-          command_row.command_editor_widget,
-          tree_model,
-          selected_child_iter,
-        )
+        return command_row, tree_model, selected_child_iter
       else:
-        return None, None, None, tree_model, selected_child_iter
+        return None, tree_model, selected_child_iter
     else:
-      return None, None, None, tree_model, None
+      return None, tree_model, None
 
   def _has_plugin_procedure_image_or_drawable_arguments(self, command_dict):
     if not command_dict['arguments']:
@@ -830,16 +824,17 @@ class CommandBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None:
-      _command_dict, command, command_editor_widget, _model, _iter = self._get_selected_command(
-        model, selected_iter)
+      command_row, _model, _iter = self._get_selected_command(model, selected_iter)
+
+      command = command_row.command_editor_widget.command
 
       self.emit('command-selected', command)
 
       self._detach_command_editor_widget()
 
-      if command_editor_widget is not None:
+      if command_row.command_editor_widget is not None:
         self._label_no_selection.hide()
-        self._attach_command_editor_widget(command_editor_widget)
+        self._attach_command_editor_widget(command_row.command_editor_widget)
         self._scrolled_window_command_arguments.show()
         self._button_add.set_sensitive(True)
       else:
@@ -926,17 +921,18 @@ class CommandBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      command_dict, command, command_editor_widget, model, selected_child_iter = (
-        self._get_selected_command())
+      command_row, model, selected_child_iter = self._get_selected_command()
+
+      command = command_row.command_editor_widget.command
 
       if command is not None:
         self._detach_command_editor_widget()
         self._remove_command_editor_widget_from_model(model, selected_child_iter)
 
-        self.emit('confirm-add-command', command, command_editor_widget)
+        self.emit('confirm-add-command', command, command_row.command_editor_widget)
 
         new_command_editor_widget = self._add_command_editor_widget_to_model(
-          command_dict, model, selected_child_iter)
+          command_row.command_dict, model, selected_child_iter)
         self._attach_command_editor_widget(new_command_editor_widget)
 
         dialog.hide()
