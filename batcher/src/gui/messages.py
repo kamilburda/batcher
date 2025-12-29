@@ -102,6 +102,8 @@ def display_alert_message(
     parent=parent,
     modal=modal,
     destroy_with_parent=destroy_with_parent,
+    attached_to=parent,
+    transient_for=parent,
   )
 
   if title is not None:

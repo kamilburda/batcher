@@ -11,6 +11,7 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
 from src import overwrite
+from src.gui import utils as gui_utils_
 
 
 class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
@@ -44,7 +45,8 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       parent=self._parent,
       modal=True,
       destroy_with_parent=True,
-      transient_for=self._parent,
+      attached_to=self._parent,
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
       resizable=False,
     )
     

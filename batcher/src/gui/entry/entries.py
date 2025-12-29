@@ -282,6 +282,7 @@ class NamePatternEntry(ExtendedEntry):
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
       attached_to=self,
+      transient_for=gui_utils_.get_toplevel_window(self),
     )
 
     self._field_tooltip_text = Gtk.Label(

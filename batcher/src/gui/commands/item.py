@@ -120,6 +120,8 @@ class CommandItem(gui_widgets_.ItemBoxItem):
       type=Gtk.WindowType.POPUP,
       screen=self.widget.get_screen(),
       width_request=self._DRAG_ICON_WIDTH,
+      attached_to=self.widget,
+      transient_for=gui_utils_.get_toplevel_window(self.widget),
     )
     self._drag_icon_window.add(frame)
     self._drag_icon_window.show_all()
