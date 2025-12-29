@@ -115,7 +115,6 @@ class CommandEditorWidget:
 
     self._info_popup = None
     self._info_popup_text = None
-    self._parent_widget_realize_event_id = None
 
     self._command_argument_indexes_in_grid = {}
     self._command_more_options_indexes_in_grid = {}
@@ -154,12 +153,10 @@ class CommandEditorWidget:
     self._command['more_options'].reset()
 
   def set_parent(self, parent):
-    if self._info_popup is not None and self._parent_widget_realize_event_id is not None:
-      parent_widget = self._info_popup.get_attached_to()
-      parent_widget.disconnect(self._parent_widget_realize_event_id)
+    self._parent = parent
 
-    self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
-      _create_command_info_popup(self._command_info, parent))
+    self._info_popup, self._info_popup_text = (
+      _create_command_info_popup(self._command_info, self._parent))
 
   def _init_gui(self):
     self._set_up_editable_name(self._command)
@@ -278,7 +275,7 @@ class CommandEditorWidget:
     self._command_info_hbox.pack_start(self._label_short_description, True, True, 0)
 
     if self._command_info:
-      self._info_popup, self._info_popup_text, self._parent_widget_realize_event_id = (
+      self._info_popup, self._info_popup_text = (
         _create_command_info_popup(self._command_info, parent))
 
       self._button_info = Gtk.Button(
@@ -547,17 +544,14 @@ def _get_command_info_from_pdb_procedure(pdb_procedure):
     return command_info
 
 
-def _create_command_info_popup(command_info, parent_widget, max_width_chars=100, border_width=3):
+def _create_command_info_popup(command_info, parent_widget, max_width_chars=70, border_width=3):
   info_popup = Gtk.Window(
     type=Gtk.WindowType.POPUP,
     type_hint=Gdk.WindowTypeHint.TOOLTIP,
     resizable=False,
+    attached_to=parent_widget,
+    transient_for=parent_widget,
   )
-  info_popup.set_attached_to(parent_widget)
-
-  parent_widget_realize_event_id = parent_widget.connect(
-    'realize',
-    lambda *args: info_popup.set_transient_for(gui_utils_.get_toplevel_window(parent_widget)))
 
   info_popup_text = Gtk.Label(
     label=command_info,
@@ -597,4 +591,4 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=100,
 
   info_popup.add(info_popup_scrolled_window)
 
-  return info_popup, info_popup_text, parent_widget_realize_event_id
+  return info_popup, info_popup_text

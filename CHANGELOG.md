@@ -53,6 +53,7 @@ Changes to actions and conditions:
 Bug fixes:
 * In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable.
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
+* Fixed the popup containing action/condition details not appearing upon clicking the corresponding icon button in the custom action browser or the action/condition edit dialog.
 
 
 ## 1.1.1
