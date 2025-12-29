@@ -139,6 +139,8 @@ class CommandBrowser(GObject.GObject):
 
     self._contents_filled = False
 
+    self._last_search_text = ''
+
     self._init_gui()
 
     self._dialog.connect('realize', self._on_dialog_realize)
@@ -649,7 +651,14 @@ class CommandBrowser(GObject.GObject):
   def _on_dialog_realize(self, dialog):
     dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
 
-  def _on_entry_search_changed(self, _entry):
+  def _on_entry_search_changed(self, entry):
+    entry_text = entry.get_text()
+
+    if entry_text == self._last_search_text:
+      return
+
+    self._last_search_text = entry_text
+
     self._set_search_bar_icon_sensitivity()
 
     self._update_search_results()
