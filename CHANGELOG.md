@@ -25,7 +25,7 @@ User interface changes:
 * Export settings are now arranged vertically in the upper left part of the dialog. Clarified labels describing the settings.
 * Batch Convert: Buttons for adding and removing files and folders are moved to the top and changed them to icons.
 * The `Show Original Names` button shown in Batch Convert is now available for all plug-in procedures among the options at the top of the input list.
-* For action and condition parameters and export options, replaced parameter description with name for consistency with GIMP. The description is now included in the tooltip (if available).
+* Replaced labels for action and condition parameters and export options with shorter text, just like in filter/plug-in dialogs in GIMP. A label for a parameter now contains the parameter name instead of the (often lengthy) description. The description is now included in the parameter tooltip, if available.
 * Adjusted the default size of the main dialog and its individual parts for each plug-in procedure.
 * Adjusted widths of action/condition argument names to avoid extra empty vertical space (most notably in the Export Options dialog).
 * Reduced the width of the quick dialogs given the vertical rearrangement of the export settings.
