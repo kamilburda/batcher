@@ -281,11 +281,12 @@ class NamePatternEntry(ExtendedEntry):
       type=Gtk.WindowType.POPUP,
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
+      attached_to=self,
     )
-    self._field_tooltip_window.set_attached_to(self)
-    
+
     self._field_tooltip_text = Gtk.Label(
       selectable=True,
+      can_focus=False,
     )
     
     self._field_tooltip_hbox = Gtk.Box(
@@ -342,7 +343,6 @@ class NamePatternEntry(ExtendedEntry):
         tooltip_text = ''
       self._field_tooltip_text.set_markup(tooltip_text)
       self._field_tooltip_window.show()
-      self._field_tooltip_text.select_region(0, 0)  # Prevents selecting the entire text
       self._update_field_tooltip_position()
   
   def _hide_field_tooltip(self):
