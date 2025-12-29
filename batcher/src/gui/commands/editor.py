@@ -299,7 +299,6 @@ class CommandEditorWidget:
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
-    self._info_popup_text.select_region(0, 0)  # Prevents selecting the entire text
     self._update_info_popup_position()
 
   def _on_button_info_focus_out_event(self, _button, _event):
@@ -564,6 +563,7 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=100,
     label=command_info,
     use_markup=False,
     selectable=True,
+    can_focus=False,
     wrap=True,
     max_width_chars=max_width_chars,
   )
