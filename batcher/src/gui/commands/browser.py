@@ -370,11 +370,17 @@ class CommandBrowser(GObject.GObject):
           command_row.command_editor_widget = self._add_command_editor_widget(
             command_row.command_dict, tree_model, selected_child_iter)
 
-        return command_row, tree_model, selected_child_iter
+        return (
+          command_row.command_dict,
+          command_row.command_editor_widget.command,
+          command_row.command_editor_widget,
+          tree_model,
+          selected_child_iter,
+        )
       else:
-        return None, tree_model, selected_child_iter
+        return None, None, None, tree_model, selected_child_iter
     else:
-      return None, tree_model, None
+      return None, None, None, tree_model, None
 
   def _has_plugin_procedure_image_or_drawable_arguments(self, command_dict):
     if not command_dict['arguments']:
@@ -824,10 +830,8 @@ class CommandBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None:
-      command_row, _model, _iter = self._get_selected_command(model, selected_iter)
-
-      command_editor_widget = command_row.command_editor_widget
-      command = command_editor_widget.command
+      _command_dict, command, command_editor_widget, _model, _iter = (
+        self._get_selected_command(model, selected_iter))
 
       self.emit('command-selected', command)
 
@@ -922,11 +926,8 @@ class CommandBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      command_row, model, selected_child_iter = self._get_selected_command()
-
-      command_dict = command_row.command_dict
-      command_editor_widget = command_row.command_editor_widget
-      command = command_editor_widget.command
+      command_dict, command, command_editor_widget, model, selected_child_iter = (
+        self._get_selected_command())
 
       if command is not None:
         self._detach_command_editor_widget()
