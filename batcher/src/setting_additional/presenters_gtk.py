@@ -19,6 +19,7 @@ __all__ = [
   'AnchorBoxPresenter',
   'CoordinatesBoxPresenter',
   'FileFormatOptionsPresenter',
+  'CommandBrowserCategoriesCollapsedStatePresenter',
 ]
 
 
@@ -211,3 +212,18 @@ class FileFormatOptionsPresenter(setting_.GtkPresenter):
         file_formats, file_format_options, value[self.setting.EXPANDED_KEY])
     else:
       self._widget.set_active_file_formats([], [], value[self.setting.EXPANDED_KEY])
+
+
+class CommandBrowserCategoriesCollapsedStatePresenter(setting_.GtkPresenter):
+  """`setting.Presenter` subclass for `gui.commands.browser.CommandBrowser`
+  widgets representing dictionaries of (category name, is category expanded)
+  pairs.
+
+  Value: Dictionary of (category name, is category expanded) pairs.
+  """
+
+  def get_value(self):
+    return self._widget.get_collapsed_state_of_categories()
+
+  def _set_value(self, value):
+    self._widget.set_collapsed_state_of_categories(value)

@@ -44,6 +44,7 @@ User interface changes:
   * Categories with no matching search results are now hidden.
   * Several minor UI tweaks (such as different expander arrow icons to be consistent with the GIMP plug-in browser, or the Add button being insensitive when no action is selected).
   * Optimized search and expanding/collapsing categories.
+  * The expanded/collapsed state of each category is now preserved when saving/loading settings.
 
 Changes to actions and conditions:
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.

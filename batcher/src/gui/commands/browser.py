@@ -417,6 +417,22 @@ class CommandBrowser(GObject.GObject):
               setting_.ItemSetting])
     )
 
+  def get_collapsed_state_of_categories(self):
+    return {category.name: category.expanded for category in self._command_categories.values()}
+
+  def set_collapsed_state_of_categories(self, value):
+    for category_name, expanded in value.items():
+      category = self._command_categories[category_name]
+
+      # If the tree iter is `None`, it means the browser is not filled yet.
+      # The expanded/collapsed state will properly be updated in the GUI once
+      # filled.
+      if category.tree_iter is not None:
+        _current_icon, new_icon = self._get_icons_based_on_expanded_state(category)
+        self._tree_model.set_value(category.tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+
+      category.expanded = expanded
+
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=self._title,

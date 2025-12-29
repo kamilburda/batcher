@@ -735,6 +735,11 @@ def _create_gui_settings(item_tree_items_setting_type):
       'name': 'dialog_size',
       'default_value': (840, 450),
     },
+    {
+      'type': 'dict',
+      'name': 'categories_collapsed_state',
+      'default_value': {},
+    },
   ])
 
   gui_settings.add([

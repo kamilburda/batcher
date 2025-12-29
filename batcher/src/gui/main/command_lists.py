@@ -169,6 +169,12 @@ class CommandLists:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
+    self._settings['gui/action_browser/categories_collapsed_state'].set_gui(
+      gui_type=setting_.SETTING_GUI_TYPES.command_browser_categories_collapsed_state,
+      widget=self._action_list.browser,
+      copy_previous_visible=False,
+      copy_previous_sensitive=False,
+    )
 
     self._action_list.connect(
       'command-list-item-added-interactive',
