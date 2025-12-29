@@ -52,18 +52,18 @@ class LogViewer:
       destroy_with_parent=True,
       resizable=True,
       border_width=self._DIALOG_BORDER_WIDTH,
-      attached_to=gui_utils_.get_toplevel_window(self._parent),
-      transient_for=gui_utils_.get_toplevel_window(self._parent),
+      attached_to=self._parent,
     )
 
     self._dialog.vbox.pack_start(self._scrolled_window, True, True, 0)
 
-    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
     self._dialog.add_button(_('_Save to File'), Gtk.ResponseType.OK)
     self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
 
     self._text_view.connect('size-allocate', self._on_text_view_size_allocate)
 
+    self._dialog.connect('realize', self._on_dialog_realize)
+    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
     self._dialog.connect('close', self._on_dialog_close)
     self._dialog.connect('response', self._on_dialog_response)
 
@@ -89,6 +89,9 @@ class LogViewer:
       0.0,
       0.0,
     )
+
+  def _on_dialog_realize(self, dialog):
+    dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_dialog_close(self, _dialog):
     self._dialog.hide()

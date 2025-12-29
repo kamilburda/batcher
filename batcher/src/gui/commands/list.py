@@ -101,7 +101,7 @@ class CommandList(gui_widgets_.ItemBox):
     self._command_browser_text = command_browser_text
 
     if self._allow_custom_commands:
-      self._browser = command_browser_.CommandBrowser(title=self._command_browser_text)
+      self._browser = command_browser_.CommandBrowser(title=self._command_browser_text, parent=self)
     else:
       self._browser = None
 
@@ -111,7 +111,6 @@ class CommandList(gui_widgets_.ItemBox):
     self._init_gui()
 
     if self._browser is not None:
-      self._browser.widget.connect('realize', self._on_command_browser_realize)
       self._browser.connect('command-selected', self._on_command_browser_command_selected)
       self._browser.connect('confirm-add-command', self._on_command_browser_confirm_add_command)
       self._browser.connect('cancel-add-command', self._on_command_browser_cancel_add_command)
@@ -180,9 +179,6 @@ class CommandList(gui_widgets_.ItemBox):
     self._commands.set_event_enabled(self._before_remove_command_event_id, True)
 
     self.emit('command-list-item-removed', item)
-
-  def _on_command_browser_realize(self, dialog):
-    dialog.set_attached_to(gui_utils_.get_toplevel_window(self))
 
   def _on_command_browser_command_selected(self, _browser, command):
     if command is not None:

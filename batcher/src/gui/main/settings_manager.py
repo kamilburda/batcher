@@ -185,9 +185,10 @@ class SettingsManager:
       modal=True,
       destroy_with_parent=True,
       buttons=Gtk.ButtonsType.YES_NO,
+      attached_to=self._dialog,
+      transient_for=self._dialog,
     )
 
-    dialog.set_transient_for(self._dialog)
     dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
     dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
 

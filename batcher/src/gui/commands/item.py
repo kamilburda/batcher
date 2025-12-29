@@ -143,6 +143,7 @@ class CommandItem(gui_widgets_.ItemBoxItem):
       self.widget,
       attach_editor_widget=self._attach_editor_widget,
       title=self._command['display_name'].value,
+      attached_to=self.widget,
     )
     self.widget.connect('realize', self._on_command_widget_realize)
 
@@ -156,7 +157,6 @@ class CommandItem(gui_widgets_.ItemBoxItem):
 
   def _on_command_widget_realize(self, _dialog):
     self.editor.set_transient_for(gui_utils_.get_toplevel_window(self.widget))
-    self.editor.set_attached_to(gui_utils_.get_toplevel_window(self.widget))
 
   def _set_tooltip_if_label_does_not_fit_text(self, label_command_name):
     if gui_utils_.label_fits_text(label_command_name):

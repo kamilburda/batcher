@@ -46,8 +46,7 @@ class ImportExportOptionsDialog:
       title=self._title,
       parent=self._parent,
       resizable=False,
-      attached_to=gui_utils_.get_toplevel_window(self._parent),
-      transient_for=gui_utils_.get_toplevel_window(self._parent),
+      attached_to=self._parent,
     )
 
     self._button_reset_response_id = 1
@@ -55,8 +54,10 @@ class ImportExportOptionsDialog:
 
     self._button_reset.connect('clicked', self._on_button_reset_clicked)
 
-    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
     self._dialog.add_button(_('_Close'), Gtk.ResponseType.CLOSE)
+
+    self._dialog.connect('realize', self._on_dialog_realize)
+    self._dialog.connect('delete-event', lambda *_args: self._dialog.hide_on_delete())
 
     self._grid = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -105,6 +106,9 @@ class ImportExportOptionsDialog:
   @property
   def widget(self):
     return self._dialog
+
+  def _on_dialog_realize(self, dialog):
+    dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_dialog_close(self, _dialog):
     self._dialog.hide()

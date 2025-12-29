@@ -121,10 +121,11 @@ class CommandBrowser(GObject.GObject):
     'cancel-add-command': (GObject.SignalFlags.RUN_FIRST, None, ()),
   }
 
-  def __init__(self, title=None, *args, **kwargs):
+  def __init__(self, title=None, parent=None, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     self._title = title
+    self._parent = parent
 
     self._command_categories = {
       'filters': _CommandCategory('filters', _('Filters, Layer Effects'), 0, True),
@@ -139,6 +140,8 @@ class CommandBrowser(GObject.GObject):
     self._contents_filled = False
 
     self._init_gui()
+
+    self._dialog.connect('realize', self._on_dialog_realize)
 
     self._entry_search.connect('changed', self._on_entry_search_changed)
     self._entry_search.connect('icon-press', self._on_entry_search_icon_press)
@@ -417,6 +420,7 @@ class CommandBrowser(GObject.GObject):
   def _init_gui(self):
     self._dialog = GimpUi.Dialog(
       title=self._title,
+      attached_to=self._parent,
     )
     self._dialog.set_default_size(*self._DIALOG_SIZE)
 
@@ -615,6 +619,9 @@ class CommandBrowser(GObject.GObject):
 
   def _get_sort_column_key_from_internal_name(self, command_row):
     return self._get_sort_column_key(command_row, self._get_sort_type())
+
+  def _on_dialog_realize(self, dialog):
+    dialog.set_transient_for(gui_utils_.get_toplevel_window(self._parent))
 
   def _on_entry_search_changed(self, _entry):
     self._set_search_bar_icon_sensitivity()

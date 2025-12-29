@@ -550,7 +550,7 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=70, 
     type_hint=Gdk.WindowTypeHint.TOOLTIP,
     resizable=False,
     attached_to=parent_widget,
-    transient_for=parent_widget,
+    transient_for=gui_utils_.get_toplevel_window(parent_widget),
   )
 
   info_popup_text = Gtk.Label(
