@@ -253,8 +253,8 @@ class EntryPopup:
       type=Gtk.WindowType.POPUP,
       type_hint=Gdk.WindowTypeHint.TOOLTIP,
       resizable=False,
+      attached_to=self._entry,
     )
-    self._popup.set_attached_to(self._entry)
     self._popup.add(self._scrolled_window)
     
     self._scrolled_window.show_all()
