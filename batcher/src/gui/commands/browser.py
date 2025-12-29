@@ -367,7 +367,7 @@ class CommandBrowser(GObject.GObject):
 
       if command_row.command_dict is not None:
         if command_row.command_editor_widget is None:
-          command_row.command_editor_widget = self._add_command_editor_widget_to_model(
+          command_row.command_editor_widget = self._add_command_editor_widget(
             command_row.command_dict, tree_model, selected_child_iter)
 
         return command_row, tree_model, selected_child_iter
@@ -826,15 +826,16 @@ class CommandBrowser(GObject.GObject):
     if selected_iter is not None:
       command_row, _model, _iter = self._get_selected_command(model, selected_iter)
 
-      command = command_row.command_editor_widget.command
+      command_editor_widget = command_row.command_editor_widget
+      command = command_editor_widget.command
 
       self.emit('command-selected', command)
 
       self._detach_command_editor_widget()
 
-      if command_row.command_editor_widget is not None:
+      if command_editor_widget is not None:
         self._label_no_selection.hide()
-        self._attach_command_editor_widget(command_row.command_editor_widget)
+        self._attach_command_editor_widget(command_editor_widget)
         self._scrolled_window_command_arguments.show()
         self._button_add.set_sensitive(True)
       else:
@@ -923,16 +924,18 @@ class CommandBrowser(GObject.GObject):
     if response_id == Gtk.ResponseType.OK:
       command_row, model, selected_child_iter = self._get_selected_command()
 
-      command = command_row.command_editor_widget.command
+      command_dict = command_row.command_dict
+      command_editor_widget = command_row.command_editor_widget
+      command = command_editor_widget.command
 
       if command is not None:
         self._detach_command_editor_widget()
-        self._remove_command_editor_widget_from_model(model, selected_child_iter)
+        self._remove_command_editor_widget(model, selected_child_iter)
 
-        self.emit('confirm-add-command', command, command_row.command_editor_widget)
+        self.emit('confirm-add-command', command, command_editor_widget)
 
-        new_command_editor_widget = self._add_command_editor_widget_to_model(
-          command_row.command_dict, model, selected_child_iter)
+        new_command_editor_widget = self._add_command_editor_widget(
+          command_dict, model, selected_child_iter)
         self._attach_command_editor_widget(new_command_editor_widget)
 
         dialog.hide()
@@ -950,7 +953,7 @@ class CommandBrowser(GObject.GObject):
     if viewport_child is not None:
       self._scrolled_window_command_arguments_viewport.remove(viewport_child)
 
-  def _add_command_editor_widget_to_model(self, command_dict, tree_model, selected_child_iter):
+  def _add_command_editor_widget(self, command_dict, tree_model, selected_child_iter):
     command = commands_.create_command(command_dict)
 
     command.initialize_gui(only_null=True)
@@ -962,7 +965,7 @@ class CommandBrowser(GObject.GObject):
 
     return command_row.command_editor_widget
 
-  def _remove_command_editor_widget_from_model(self, tree_model, selected_child_iter):
+  def _remove_command_editor_widget(self, tree_model, selected_child_iter):
     command_row = tree_model.get_model()[selected_child_iter][self._COLUMN_COMMAND_ROW[0]]
 
     command_row.command_editor_widget = None
