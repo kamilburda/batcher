@@ -5,7 +5,7 @@ import os
 import re
 import struct
 import sys
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 import urllib.parse
 
 import gi
@@ -19,10 +19,13 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 
-def get_toplevel_window(widget: Gtk.Widget) -> Union[Gtk.Window, None]:
+def get_toplevel_window(widget: Optional[Gtk.Widget]) -> Union[Gtk.Window, None]:
   """Return the toplevel `Gtk.Window` for the specified widget, or ``None`` if
-  the widget has no such window.
+  the widget has no such window or ``widget`` itself is ``None``.
   """
+  if widget is None:
+    return None
+
   toplevel_widget = widget.get_toplevel()
   if isinstance(toplevel_widget, Gtk.Window):
     return toplevel_widget
