@@ -150,6 +150,7 @@ class _PyPDB:
     return True
 
   def list_all_gegl_operations(self):
+    """Lists all available GEGL operations (filters, layer effects)."""
     self._fill_gegl_operations_and_set_if_empty()
 
     return self._gegl_operations
@@ -193,9 +194,13 @@ class _PyPDB:
 
   @staticmethod
   def list_all_gimp_pdb_procedures():
+    """Lists all available GIMP PDB procedures."""
     return Gimp.get_pdb().query_procedures(*([''] * 8))
 
   def list_all_procedure_names(self):
+    """Lists all available procedures and filters (GEGL operations, layer
+    effects).
+    """
     return self.list_all_gegl_operations() + self.list_all_gimp_pdb_procedures()
 
   def remove_from_cache(self, name: str):
