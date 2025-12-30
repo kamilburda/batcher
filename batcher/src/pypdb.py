@@ -501,10 +501,41 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
-    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
-      self._set_config_properties_post_3_1_4(processed_kwargs, config)
-    else:
-      self._set_config_properties_pre_3_1_4(processed_kwargs, config)
+    properties_from_config = {prop.name: prop for prop in config.list_properties()}
+
+    for arg_name, arg_value in processed_kwargs.items():
+      if arg_name not in self._properties:
+        raise PDBProcedureError(
+          f'argument "{arg_name}" does not exist or is not supported',
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+      # Silently skip properties not supported in GIMP as the procedure
+      # may still finish successfully.
+      if arg_name not in properties_from_config:
+        continue
+
+      should_transform_enum_to_choice = (
+        properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__
+        and not isinstance(arg_value, str)
+        and (self._properties[arg_name].__gtype__ == Gegl.ParamEnum.__gtype__
+             or self._properties[arg_name].__gtype__ == GObject.ParamSpecEnum.__gtype__.parent)
+      )
+
+      # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
+      #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
+      if should_transform_enum_to_choice:
+        # For PyGObject >= 3.50.0, `default_value` returns an int rather than
+        # an enum value. `get_default_value()` is not available in < 3.50.0.
+        if hasattr(self._properties[arg_name], 'get_default_value'):
+          enum_default_value = self._properties[arg_name].get_default_value()
+        else:
+          enum_default_value = self._properties[arg_name].default_value
+
+        processed_value = type(enum_default_value)(arg_value).value_nick
+      else:
+        processed_value = arg_value
+
+      config.set_property(arg_name, processed_value)
 
     drawable_filter.update()
 
@@ -562,54 +593,6 @@ class GeglProcedure(PDBProcedure):
     ``None``.
     """
     return None
-
-  def _set_config_properties_post_3_1_4(self, processed_kwargs, config):
-    for arg_name, arg_value in processed_kwargs.items():
-      if arg_name not in self._properties:
-        raise PDBProcedureError(
-          f'argument "{arg_name}" does not exist or is not supported',
-          Gimp.PDBStatusType.CALLING_ERROR)
-
-      processed_value = arg_value
-
-      config.set_property(arg_name, processed_value)
-
-  def _set_config_properties_pre_3_1_4(self, processed_kwargs, config):
-    properties_from_config = {prop.name: prop for prop in config.list_properties()}
-
-    for arg_name, arg_value in processed_kwargs.items():
-      if arg_name not in self._properties:
-        raise PDBProcedureError(
-          f'argument "{arg_name}" does not exist or is not supported',
-          Gimp.PDBStatusType.CALLING_ERROR)
-
-      # Silently skip properties not supported in GIMP as the procedure
-      # may still finish successfully.
-      if arg_name not in properties_from_config:
-        continue
-
-      should_transform_enum_to_choice = (
-        properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__
-        and not isinstance(arg_value, str)
-        and (self._properties[arg_name].__gtype__ == Gegl.ParamEnum.__gtype__
-             or self._properties[arg_name].__gtype__ == GObject.ParamSpecEnum.__gtype__.parent)
-      )
-
-      # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
-      #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
-      if should_transform_enum_to_choice:
-        # For PyGObject >= 3.50.0, `default_value` returns an int rather than
-        # an enum value. `get_default_value()` is not available in < 3.50.0.
-        if hasattr(self._properties[arg_name], 'get_default_value'):
-          enum_default_value = self._properties[arg_name].get_default_value()
-        else:
-          enum_default_value = self._properties[arg_name].default_value
-
-        processed_value = type(enum_default_value)(arg_value).value_nick
-      else:
-        processed_value = arg_value
-
-      config.set_property(arg_name, processed_value)
 
   @staticmethod
   def _get_filter_properties(name):
