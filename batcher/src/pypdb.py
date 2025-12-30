@@ -31,63 +31,6 @@ __all__ = [
 
 class _PyPDB:
 
-  # Taken from:
-  # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
-  _UNUSED_GEGL_OPERATION_CATEGORIES = {
-    'compositors',
-    'core',
-    'debug',
-    'display',
-    'hidden',
-    'input',
-    'output',
-    'programming',
-    'transform',
-    'video',
-  }
-
-  # Taken from:
-  # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
-  _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
-    'gegl:color',
-    'gegl:contrast-curve',
-    'gegl:convert-format',
-    'gegl:ditto',
-    'gegl:fill-path',
-    'gegl:gray',
-    'gegl:hstack',
-    'gegl:introspect',
-    'gegl:json:dropshadow2',
-    'gegl:json:grey2',
-    'gegl:layer',
-    'gegl:lcms-from-profile',
-    'gegl:linear-gradient',
-    'gegl:map-absolute',
-    'gegl:map-relative',
-    'gegl:matting-global',
-    'gegl:matting-levin',
-    'gegl:opacity',
-    'gegl:pack',
-    'gegl:path',
-    'gegl:posterize',
-    'gegl:radial-gradient',
-    'gegl:rectangle',
-    'gegl:seamless-clone',
-    'gegl:text',
-    'gegl:threshold',
-    'gegl:tile',
-    'gegl:unpremul',
-    'gegl:vector-stroke',
-    'gegl:wavelet-blur',
-  }
-
-  # These are not blocklisted by GIMP, but their 'gimp:*' counterparts can
-  # achieve the same effect.
-  _DUPLICATE_GEGL_OPERATIONS = [
-    'gegl:brightness-contrast',
-    'gegl:levels',
-  ]
-
   def __init__(self):
     self._last_status = None
     self._last_error = None
@@ -159,7 +102,7 @@ class _PyPDB:
     """Lists all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
     and are thus redundant.
     """
-    return list(self._DUPLICATE_GEGL_OPERATIONS)
+    return list(_DUPLICATE_GEGL_OPERATIONS)
 
   def _fill_gegl_operations_and_set_if_empty(self):
     if self._gegl_operations is None:
@@ -182,10 +125,10 @@ class _PyPDB:
 
       if categories_str is not None:
         categories = categories_str.split(':')
-        if any(category in self._UNUSED_GEGL_OPERATION_CATEGORIES for category in categories):
+        if any(category in _UNUSED_GEGL_OPERATION_CATEGORIES for category in categories):
           continue
 
-      if name in self._UNUSED_GEGL_OPERATIONS_PRE_3_1_4:
+      if name in _UNUSED_GEGL_OPERATIONS_PRE_3_1_4:
         continue
 
       operation_names.append(name)
@@ -740,6 +683,66 @@ class PDBProcedureError(Exception):
 
   def __str__(self):
     return str(self.message)
+
+
+# Taken from:
+# https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
+_UNUSED_GEGL_OPERATION_CATEGORIES = {
+  'compositors',
+  'core',
+  'debug',
+  'display',
+  'hidden',
+  'input',
+  'output',
+  'programming',
+  'transform',
+  'video',
+}
+
+
+# Taken from:
+# https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
+_UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
+  'gegl:color',
+  'gegl:contrast-curve',
+  'gegl:convert-format',
+  'gegl:ditto',
+  'gegl:fill-path',
+  'gegl:gray',
+  'gegl:hstack',
+  'gegl:introspect',
+  'gegl:json:dropshadow2',
+  'gegl:json:grey2',
+  'gegl:layer',
+  'gegl:lcms-from-profile',
+  'gegl:linear-gradient',
+  'gegl:map-absolute',
+  'gegl:map-relative',
+  'gegl:matting-global',
+  'gegl:matting-levin',
+  'gegl:opacity',
+  'gegl:pack',
+  'gegl:path',
+  'gegl:posterize',
+  'gegl:radial-gradient',
+  'gegl:rectangle',
+  'gegl:seamless-clone',
+  'gegl:text',
+  'gegl:threshold',
+  'gegl:tile',
+  'gegl:unpremul',
+  'gegl:vector-stroke',
+  'gegl:wavelet-blur',
+}
+
+
+# These are not blocklisted by GIMP, but their 'gimp:*' counterparts can
+# achieve the same effect.
+_DUPLICATE_GEGL_OPERATIONS = [
+  'gegl:brightness-contrast',
+  'gegl:levels',
+]
 
 
 pdb = _PyPDB()
