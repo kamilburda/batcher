@@ -8,8 +8,6 @@ from typing import Dict, Optional
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-gi.require_version('Gegl', '0.4')
-from gi.repository import Gegl
 from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -202,24 +200,6 @@ class CommandBrowser(GObject.GObject):
                    or name_.endswith('-export-internal')
                    or name_.endswith('-export-multi')))
 
-    def is_gegl_operation_internal(name_):
-      operation_categories = Gegl.Operation.get_key(name_, 'categories')
-
-      if operation_categories:
-        return any(
-          operation_category in ['input', 'output', 'programming']
-          for operation_category in operation_categories.split(':'))
-      else:
-        return False
-
-    def is_gegl_operation_hidden(name_):
-      operation_categories = Gegl.Operation.get_key(name_, 'categories')
-
-      if operation_categories:
-        return 'hidden' in operation_categories.split(':')
-      else:
-        return False
-
     def is_procedure_gimp_plugin(procedure_):
       return (
         isinstance(procedure_, pypdb.GimpPDBProcedure)
@@ -247,11 +227,7 @@ class CommandBrowser(GObject.GObject):
 
       self._command_rows.append(command_row)
 
-    pdb_procedures = [
-      pdb[name]
-      for name in pdb.list_all_gegl_operations()
-      if not is_gegl_operation_internal(name)
-    ]
+    pdb_procedures = [pdb[name] for name in pdb.list_all_gegl_operations()]
 
     pdb_procedures.extend(
       pdb[name]
@@ -272,10 +248,7 @@ class CommandBrowser(GObject.GObject):
         procedure_name = command_dict['name']
 
       if isinstance(procedure, pypdb.GeglProcedure):
-        if not is_gegl_operation_hidden(procedure_name):
-          category_name = 'filters'
-        else:
-          category_name = 'other'
+        category_name = 'filters'
       elif procedure_name.startswith('file-'):
         category_name = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):

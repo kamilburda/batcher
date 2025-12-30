@@ -31,6 +31,54 @@ __all__ = [
 
 class _PyPDB:
 
+  # Taken from:
+  # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
+  _UNUSED_GEGL_OPERATION_CATEGORIES = {
+    'compositors',
+    'core',
+    'debug',
+    'display',
+    'hidden',
+    'input',
+    'output',
+    'programming',
+    'transform',
+    'video',
+  }
+
+  _UNUSED_GEGL_OPERATIONS = {
+    'gegl:color',
+    'gegl:contrast-curve',
+    'gegl:convert-format',
+    'gegl:ditto',
+    'gegl:fill-path',
+    'gegl:gray',
+    'gegl:hstack',
+    'gegl:introspect',
+    'gegl:json:dropshadow2',
+    'gegl:json:grey2',
+    'gegl:layer',
+    'gegl:lcms-from-profile',
+    'gegl:linear-gradient',
+    'gegl:map-absolute',
+    'gegl:map-relative',
+    'gegl:matting-global',
+    'gegl:matting-levin',
+    'gegl:opacity',
+    'gegl:pack',
+    'gegl:path',
+    'gegl:posterize',
+    'gegl:radial-gradient',
+    'gegl:rectangle',
+    'gegl:seamless-clone',
+    'gegl:text',
+    'gegl:threshold',
+    'gegl:tile',
+    'gegl:unpremul',
+    'gegl:vector-stroke',
+    'gegl:wavelet-blur',
+  }
+
   def __init__(self):
     self._last_status = None
     self._last_error = None
@@ -89,9 +137,23 @@ class _PyPDB:
 
     return True
 
-  @staticmethod
-  def list_all_gegl_operations():
-    return Gegl.list_operations()
+  def list_all_gegl_operations(self):
+    operation_names = []
+
+    for name in Gegl.list_operations():
+      categories_str = Gegl.Operation.get_key(name, 'categories')
+
+      if categories_str is not None:
+        categories = categories_str.split(':')
+        if any(category in self._UNUSED_GEGL_OPERATION_CATEGORIES for category in categories):
+          continue
+
+      if name in self._UNUSED_GEGL_OPERATIONS:
+        continue
+
+      operation_names.append(name)
+
+    return operation_names
 
   @staticmethod
   def list_all_gimp_pdb_procedures():
