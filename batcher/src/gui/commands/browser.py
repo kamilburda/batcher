@@ -233,6 +233,7 @@ class CommandBrowser(GObject.GObject):
         category=self._command_categories[category_name],
         internal_name=category_name,
         name=category.display_name,
+        visible=True,
       )
 
       category.tree_iter = self._tree_model.append([
@@ -304,6 +305,7 @@ class CommandBrowser(GObject.GObject):
         description=command_dict.get('description', ''),
         command_dict=command_dict,
         command_editor_widget=None,
+        visible=category.expanded,
       )
 
       tree_iter = self._tree_model.append([
