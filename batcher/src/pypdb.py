@@ -98,7 +98,8 @@ class _PyPDB:
 
     return self._gegl_operations
 
-  def get_duplicate_gegl_operations(self):
+  @staticmethod
+  def get_duplicate_gegl_operations():
     """Lists all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
     and are thus redundant.
     """
