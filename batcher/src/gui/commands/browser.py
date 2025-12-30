@@ -235,6 +235,8 @@ class CommandBrowser(GObject.GObject):
       if not is_file_load_procedure(name) and not is_file_export_procedure(name)
     )
 
+    duplicate_gegl_operations = pdb.get_duplicate_gegl_operations()
+
     command_dicts = [
       commands_.get_command_dict_from_pdb_procedure(procedure) for procedure in pdb_procedures]
 
@@ -248,7 +250,10 @@ class CommandBrowser(GObject.GObject):
         procedure_name = command_dict['name']
 
       if isinstance(procedure, pypdb.GeglProcedure):
-        category_name = 'filters'
+        if procedure_name not in duplicate_gegl_operations:
+          category_name = 'filters'
+        else:
+          category_name = 'other'
       elif procedure_name.startswith('file-'):
         category_name = 'other'
       elif procedure_name.startswith('plug-in-') or is_procedure_gimp_plugin(procedure):
