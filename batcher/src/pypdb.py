@@ -46,7 +46,13 @@ class _PyPDB:
     'video',
   }
 
-  _UNUSED_GEGL_OPERATIONS = {
+  _UNUSED_GEGL_OPERATIONS_POST_3_1_4 = {
+    'gegl:levels',   # Not blocklisted by GIMP, but 'gimp:levels' does the same
+  }
+
+  # Taken from:
+  # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
+  _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
     'gegl:color',
     'gegl:contrast-curve',
     'gegl:convert-format',
@@ -82,6 +88,9 @@ class _PyPDB:
   def __init__(self):
     self._last_status = None
     self._last_error = None
+
+    self._gegl_operations = None
+    self._gegl_operations_set = None
 
     self._proc_cache = {}
 
@@ -138,6 +147,26 @@ class _PyPDB:
     return True
 
   def list_all_gegl_operations(self):
+    self._fill_gegl_operations_and_set_if_empty()
+
+    return self._gegl_operations
+
+  def _fill_gegl_operations_and_set_if_empty(self):
+    if self._gegl_operations is None:
+      if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+        self._gegl_operations = self._list_all_gegl_operations_post_3_1_4()
+      else:
+        self._gegl_operations = self._list_all_gegl_operations_pre_3_1_4()
+
+      self._gegl_operations_set = set(self._gegl_operations)
+
+  def _list_all_gegl_operations_post_3_1_4(self):
+    return [
+      name for name in Gimp.DrawableFilter.operation_get_available()
+      if name not in self._UNUSED_GEGL_OPERATIONS_POST_3_1_4
+    ]
+
+  def _list_all_gegl_operations_pre_3_1_4(self):
     operation_names = []
 
     for name in Gegl.list_operations():
@@ -148,7 +177,7 @@ class _PyPDB:
         if any(category in self._UNUSED_GEGL_OPERATION_CATEGORIES for category in categories):
           continue
 
-      if name in self._UNUSED_GEGL_OPERATIONS:
+      if name in self._UNUSED_GEGL_OPERATIONS_PRE_3_1_4:
         continue
 
       operation_names.append(name)
@@ -199,9 +228,10 @@ class _PyPDB:
   def _gimp_pdb_procedure_exists(proc_name):
     return Gimp.is_canonical_identifier(proc_name) and Gimp.get_pdb().procedure_exists(proc_name)
 
-  @staticmethod
-  def _gegl_operation_exists(proc_name):
-    return Gegl.has_operation(proc_name)
+  def _gegl_operation_exists(self, proc_name):
+    self._fill_gegl_operations_and_set_if_empty()
+
+    return proc_name in self._gegl_operations_set
 
 
 class PDBProcedure(metaclass=abc.ABCMeta):
@@ -440,7 +470,7 @@ class GimpPDBProcedure(PDBProcedure):
 class GeglProcedure(PDBProcedure):
 
   def __init__(self, pypdb_instance, name):
-    self._filter_properties = Gegl.Operation.list_properties(name)
+    self._filter_properties = self._get_filter_properties(name)
 
     self._drawable_param = Gimp.param_spec_drawable(
       'drawable-', _('Drawable'), _('Drawable'), False, GObject.ParamFlags.READWRITE)
@@ -461,7 +491,7 @@ class GeglProcedure(PDBProcedure):
     self._filter_name_param = GObject.param_spec_string(
       'name-', _('Filter name'), _('Filter name'), '', GObject.ParamFlags.READWRITE)
 
-    self._keys = {key: None for key in Gegl.Operation.list_keys(name)}
+    self._details = self._get_details(name)
     self._properties = {prop.name: prop for prop in self._get_properties()}
 
     super().__init__(pypdb_instance, name)
@@ -516,6 +546,80 @@ class GeglProcedure(PDBProcedure):
 
     config = drawable_filter.get_config()
 
+    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+      self._set_config_properties_post_3_1_4(processed_kwargs, config)
+    else:
+      self._set_config_properties_pre_3_1_4(processed_kwargs, config)
+
+    drawable_filter.update()
+
+    if merge_filter:
+      drawable.merge_filter(drawable_filter)
+
+      return None
+    else:
+      drawable.append_filter(drawable_filter)
+
+      return drawable_filter
+
+  @property
+  def arguments(self):
+    return list(self._properties.values())
+
+  @property
+  def aux_arguments(self):
+    return []
+
+  @property
+  def return_values(self):
+    return []
+
+  @property
+  def authors(self):
+    return ''
+
+  @property
+  def blurb(self):
+    return self._details['description']
+
+  @property
+  def copyright(self):
+    return ''
+
+  @property
+  def date(self):
+    return ''
+
+  @property
+  def help(self):
+    return ''
+
+  @property
+  def menu_label(self):
+    return self._details['title']
+
+  @property
+  def menu_paths(self):
+    return []
+
+  def create_config(self):
+    """This subclass does not support config creation, hence this method returns
+    ``None``.
+    """
+    return None
+
+  def _set_config_properties_post_3_1_4(self, processed_kwargs, config):
+    for arg_name, arg_value in processed_kwargs.items():
+      if arg_name not in self._properties:
+        raise PDBProcedureError(
+          f'argument "{arg_name}" does not exist or is not supported',
+          Gimp.PDBStatusType.CALLING_ERROR)
+
+      processed_value = arg_value
+
+      config.set_property(arg_name, processed_value)
+
+  def _set_config_properties_pre_3_1_4(self, processed_kwargs, config):
     properties_from_config = {prop.name: prop for prop in config.list_properties()}
 
     for arg_name, arg_value in processed_kwargs.items():
@@ -552,68 +656,46 @@ class GeglProcedure(PDBProcedure):
 
       config.set_property(arg_name, processed_value)
 
-    drawable_filter.update()
-
-    if merge_filter:
-      drawable.merge_filter(drawable_filter)
-
-      return None
+  @staticmethod
+  def _get_filter_properties(name):
+    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+      properties_array = Gimp.DrawableFilter.operation_get_pspecs(name)
+      return [properties_array.index(index) for index in range(properties_array.length())]
     else:
-      drawable.append_filter(drawable_filter)
+      return Gegl.Operation.list_properties(name)
 
-      return drawable_filter
-
-  @property
-  def arguments(self):
-    return list(self._properties.values())
-
-  @property
-  def aux_arguments(self):
-    return []
-
-  @property
-  def return_values(self):
-    return []
-
-  @property
-  def authors(self):
-    return ''
-
-  @property
-  def blurb(self):
-    if 'description' in self._keys:
-      return Gegl.Operation.get_key(self.name, 'description')
+  def _get_details(self, name):
+    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+      return self._get_details_post_3_1_4(name)
     else:
-      return ''
+      return self._get_details_pre_3_1_4(name)
 
-  @property
-  def copyright(self):
-    return ''
+  @staticmethod
+  def _get_details_post_3_1_4(name):
+    success, names, values = Gimp.DrawableFilter.operation_get_details(name)
 
-  @property
-  def date(self):
-    return ''
+    if success:
+      title = values.index(names.index('title'))
+      description = values.index(names.index('description'))
 
-  @property
-  def help(self):
-    return ''
-
-  @property
-  def menu_label(self):
-    if 'title' in self._keys:
-      return Gegl.Operation.get_key(self.name, 'title')
+      return {
+        'title': title if title is not None else '',
+        'description': description if description is not None else '',
+      }
     else:
-      return ''
+      return {
+        'title': '',
+        'description': '',
+      }
 
-  @property
-  def menu_paths(self):
-    return []
+  @staticmethod
+  def _get_details_pre_3_1_4(name):
+    keys = set(Gegl.Operation.list_keys(name))
 
-  def create_config(self):
-    """This subclass does not support config creation, hence this method returns
-    ``None``.
-    """
-    return None
+    return {
+      'title': Gegl.Operation.get_key(name, 'title') if 'title' in keys else '',
+      'description': Gegl.Operation.get_key(name, 'description') if 'description' in keys else '',
+    }
 
   def _get_properties(self):
     return [
