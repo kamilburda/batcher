@@ -46,10 +46,6 @@ class _PyPDB:
     'video',
   }
 
-  _UNUSED_GEGL_OPERATIONS_POST_3_1_4 = {
-    'gegl:levels',   # Not blocklisted by GIMP, but 'gimp:levels' does the same
-  }
-
   # Taken from:
   # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
   _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
@@ -84,6 +80,13 @@ class _PyPDB:
     'gegl:vector-stroke',
     'gegl:wavelet-blur',
   }
+
+  # These are not blocklisted by GIMP, but their 'gimp:*' counterparts can
+  # achieve the same effect.
+  _DUPLICATE_GEGL_OPERATIONS = [
+    'gegl:brightness-contrast',
+    'gegl:levels',
+  ]
 
   def __init__(self):
     self._last_status = None
@@ -151,6 +154,12 @@ class _PyPDB:
 
     return self._gegl_operations
 
+  def get_duplicate_gegl_operations(self):
+    """Lists all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
+    and are thus redundant.
+    """
+    return list(self._DUPLICATE_GEGL_OPERATIONS)
+
   def _fill_gegl_operations_and_set_if_empty(self):
     if self._gegl_operations is None:
       if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
@@ -160,11 +169,9 @@ class _PyPDB:
 
       self._gegl_operations_set = set(self._gegl_operations)
 
-  def _list_all_gegl_operations_post_3_1_4(self):
-    return [
-      name for name in Gimp.DrawableFilter.operation_get_available()
-      if name not in self._UNUSED_GEGL_OPERATIONS_POST_3_1_4
-    ]
+  @staticmethod
+  def _list_all_gegl_operations_post_3_1_4():
+    return Gimp.DrawableFilter.operation_get_available()
 
   def _list_all_gegl_operations_pre_3_1_4(self):
     operation_names = []
