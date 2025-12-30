@@ -118,7 +118,8 @@ class _PyPDB:
   def _list_all_gegl_operations_post_3_1_4():
     return Gimp.DrawableFilter.operation_get_available()
 
-  def _list_all_gegl_operations_pre_3_1_4(self):
+  @staticmethod
+  def _list_all_gegl_operations_pre_3_1_4():
     operation_names = []
 
     for name in Gegl.list_operations():
