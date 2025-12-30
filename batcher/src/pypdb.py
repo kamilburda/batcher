@@ -468,9 +468,11 @@ class GeglProcedure(PDBProcedure):
         continue
 
       should_transform_enum_to_choice = (
-        (self._properties[arg_name].__gtype__ == Gegl.ParamEnum.__gtype__
-         or self._properties[arg_name].__gtype__ == GObject.ParamSpecEnum.__gtype__.parent)
-        and properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__)
+        properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__
+        and not isinstance(arg_value, str)
+        and (self._properties[arg_name].__gtype__ == Gegl.ParamEnum.__gtype__
+             or self._properties[arg_name].__gtype__ == GObject.ParamSpecEnum.__gtype__.parent)
+      )
 
       # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
       #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
