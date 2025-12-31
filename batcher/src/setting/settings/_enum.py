@@ -5,6 +5,9 @@ import importlib
 import inspect
 from typing import List, Optional, Union, Tuple, Type
 
+import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 from gi.repository import GObject
 
 from src import utils
@@ -202,9 +205,29 @@ class EnumSetting(_base.Setting):
 
       if procedure is not None:
         if isinstance(enum_type[1], str):
-          procedure_param = next(
-            iter(prop for prop in procedure.arguments if prop.name == enum_type[1]),
-            None)
+          if isinstance(procedure, pypdb.GeglProcedure) and Gegl.has_operation(enum_type[0]):
+            # This implies that this is a `gegl:*` operation loaded in GIMP
+            # 3.1.4+ from settings saved in GIMP < 3.1.4. We need to resort to
+            # the GEGL API here as the GIMP API introduced in 3.1.4 that we
+            # make use of readily converts GEGL enums to `Gimp.Choice` (meaning
+            # that settings from `gegl:*` operations saved in GIMP 3.1.4+ will
+            # be instances of `setting.settings.ChoiceSetting`).
+            procedure_param = next(
+              iter(
+                prop for prop in Gegl.Operation.list_properties(enum_type[0])
+                if prop.name == enum_type[1]),
+              None)
+
+            if procedure_param is None:
+              # The argument may have been one of the arguments added by `pdb`,
+              # e.g. `blend_mode_`.
+              procedure_param = next(
+                iter(prop for prop in procedure.arguments if prop.name == enum_type[1]),
+                None)
+          else:
+            procedure_param = next(
+              iter(prop for prop in procedure.arguments if prop.name == enum_type[1]),
+              None)
         else:
           procedure_param = enum_type[1]
 
