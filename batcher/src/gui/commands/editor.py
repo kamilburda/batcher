@@ -249,7 +249,7 @@ class CommandEditorWidget:
     self._button_info = None
     self._command_info_hbox = None
 
-    if command['description'].value is None:
+    if not command['description'].value:
       return
 
     self._command_info = _get_command_info_from_pdb_procedure(self._pdb_procedure)
