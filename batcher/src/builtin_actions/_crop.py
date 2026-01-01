@@ -287,7 +287,7 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
         object_to_crop,
         matching_layer_name,
         object_to_crop.get_width(),
-        object_to_crop.get_width(),
+        object_to_crop.get_height(),
         matching_layer_type,
         100.0,
         Gimp.LayerMode.NORMAL,
