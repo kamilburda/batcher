@@ -10,8 +10,8 @@ General changes:
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
-* If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 * Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
+* If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` entry. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
@@ -45,8 +45,12 @@ User interface changes:
   * Several minor UI tweaks (such as different expander arrow icons to be consistent with the GIMP plug-in browser, or the Add button being insensitive when no action is selected).
   * Optimized search and expanding/collapsing categories.
   * The expanded/collapsed state of each category is now preserved when saving/loading settings.
+  * For GIMP 3.1.2 and below, moved the following filters under the Other category as there are alternative filters/plug-ins available in GIMP: `gegl:gray`, `gegl:posterize`, `gegl:threshold`, `gegl:wavelet-blur`.
+  * For GIMP 3.1.4 and above, moved the following filters under the Other category as there are alternative filters available in GIMP: `gegl:brightness-contrast`, `gegl:levels`. These are not removed in case they are being used.
 
 Changes to actions and conditions:
+* Added filters (layer effects, GEGL operations) starting with `gimp:` as custom actions. For GIMP 3.1.4 and later, all of these filters are added. For GIMP 3.1.2 and below, only the following filters are added (others are unsupported or cause GIMP to crash): `gimp:border`, `gimp:colorize`, `gimp:compose-crop`, `gimp:desaturate`, `gimp:flood`, `gimp:grow`, `gimp:posterize`, `gimp:scalar-multiply`, `gimp:semi-flatten`, `gimp:set-alpha`, `gimp:shrink`, `gimp:threshold`, `gimp:threshold-alpha` (#85).
+* Removed filters that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * Color correction: Reduced the range of allowed brightness values to -1.0-1.0.
 * Color correction: GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
