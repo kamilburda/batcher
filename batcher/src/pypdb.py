@@ -104,9 +104,9 @@ class _PyPDB:
     and are thus redundant.
     """
     if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
-      return list(_DUPLICATE_GEGL_OPERATIONS)
+      return list(_DUPLICATE_GEGL_OPERATIONS_POST_3_1_4)
     else:
-      return []
+      return list(_DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4)
 
   def _fill_gegl_operations_and_set_if_empty(self):
     if self._gegl_operations is None:
@@ -739,7 +739,6 @@ _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
   'gegl:convert-format',
   'gegl:ditto',
   'gegl:fill-path',
-  'gegl:gray',
   'gegl:hstack',
   'gegl:introspect',
   'gegl:json:dropshadow2',
@@ -754,22 +753,31 @@ _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
   'gegl:opacity',
   'gegl:pack',
   'gegl:path',
-  'gegl:posterize',
   'gegl:radial-gradient',
   'gegl:rectangle',
   'gegl:seamless-clone',
   'gegl:text',
-  'gegl:threshold',
   'gegl:tile',
   'gegl:unpremul',
   'gegl:vector-stroke',
-  'gegl:wavelet-blur',
 }
 
 
-# These are not blocklisted by GIMP, but their 'gimp:*' counterparts can
-# achieve the same effect.
-_DUPLICATE_GEGL_OPERATIONS = [
+# The 'gimp:*' counterparts of these filters can achieve the same effect. They
+# are kept to maintain backwards compatibility with GIMP < 3.1.4 or because
+# they are not blocklisted by GIMP.
+_DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4 = [
+  'gegl:gray',
+  'gegl:posterize',
+  'gegl:threshold',
+  'gegl:wavelet-blur',
+]
+
+
+# The 'gimp:*' counterparts of these filters can achieve the same effect. They
+# are kept to maintain backwards compatibility with GIMP < 3.1.4 or because
+# they are not blocklisted by GIMP.
+_DUPLICATE_GEGL_OPERATIONS_POST_3_1_4 = [
   'gegl:brightness-contrast',
   'gegl:levels',
 ]
