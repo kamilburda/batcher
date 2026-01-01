@@ -300,6 +300,8 @@ class CommandBrowser(GObject.GObject):
 
     self._sort_command_rows()
 
+    self._set_category_visibility()
+
     GObject.signal_handler_unblock(
       self._tree_view.get_selection(),
       self._tree_view_selection_changed_event_handler_id,
@@ -702,12 +704,7 @@ class CommandBrowser(GObject.GObject):
         row_to_select,
       )
 
-    for category in self._command_categories.values():
-      num_command_rows_visible_via_search_per_category = [
-        command_row.visible_via_search for command_row in category.command_rows].count(True)
-      category.visible = num_command_rows_visible_via_search_per_category > 0
-      self._tree_model.set_value(
-        category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], category.visible)
+    self._set_category_visibility()
 
     if should_select_different_command and row_to_select is not None:
       self._select_command(row_to_select, origin)
@@ -791,6 +788,14 @@ class CommandBrowser(GObject.GObject):
   @staticmethod
   def _process_text_for_search(text):
     return text.replace('_', '-').lower()
+
+  def _set_category_visibility(self):
+    for category in self._command_categories.values():
+      num_command_rows_visible_via_search_per_category = [
+        command_row.visible_via_search for command_row in category.command_rows].count(True)
+      category.visible = num_command_rows_visible_via_search_per_category > 0
+      self._tree_model.set_value(
+        category.tree_iter, self._COLUMN_COMMAND_VISIBLE[0], category.visible)
 
   def _select_command(self, row_to_select, origin):
     converted_filter_path = self._tree_model_filter.convert_child_path_to_path(row_to_select.path)
