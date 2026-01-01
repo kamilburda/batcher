@@ -42,6 +42,7 @@ messages_.set_gui_excepthook(
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
+from gi.repository import GLib
 
 from src import core
 from src import exceptions
@@ -332,7 +333,7 @@ def _run_with_last_vals(
 
   _run_plugin_noninteractive(settings, Gimp.RunMode.WITH_LAST_VALS, item_tree, mode)
 
-  return Gimp.PDBStatusType.SUCCESS, ''
+  return Gimp.PDBStatusType.SUCCESS, message
 
 
 def _run_interactive(
@@ -358,7 +359,7 @@ def _run_interactive(
 
   gui_class(item_tree, settings, *gui_class_args, **gui_class_kwargs)
 
-  return Gimp.PDBStatusType.SUCCESS, ''
+  return Gimp.PDBStatusType.SUCCESS, message
 
 
 def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):
@@ -437,40 +438,52 @@ def _set_procedure_group_and_default_setting_source(procedure_group):
 def _load_and_update_settings(settings, run_mode):
   status, load_message = update.load_and_update(settings, procedure_group=CONFIG.PROCEDURE_GROUP)
 
-  if status != update.UpdateStatuses.TERMINATE:
-    return True, ''
+  if status == update.UpdateStatuses.UPDATE_WITH_REMOVED_COMMANDS:
+    main_message, commands_no_longer_available_str = load_message.split('\n\n')
 
-  if run_mode == Gimp.RunMode.INTERACTIVE:
-    messages_.display_alert_message(
-      title=CONFIG.PLUGIN_TITLE,
-      message_type=Gtk.MessageType.WARNING,
-      message_markup=_(
-        'Settings for this plug-in could not be updated to the latest version'
-        ' and must be reset.'),
-      message_secondary_markup=_(
-        'If you believe this is an error in the plug-in, you can help fix it'
-        ' by sending a report with the text under the details.'),
-      display_details_initially=False,
-      details=load_message,
-      report_description=_(
-        'Send a report with the text in the details above to one of the following sites'),
-      report_uri_list=CONFIG.BUG_REPORT_URL_LIST)
+    if run_mode == Gimp.RunMode.INTERACTIVE:
+      messages_.display_alert_message(
+        title=CONFIG.PLUGIN_TITLE,
+        message_type=Gtk.MessageType.WARNING,
+        message_markup=GLib.markup_escape_text(main_message),
+        message_secondary_markup=GLib.markup_escape_text(commands_no_longer_available_str),
+      )
 
-    setting_.Persistor.clear()
-    commands_.clear(settings['main/actions'])
-    commands_.clear(settings['main/conditions'])
+    return True, load_message
+  elif status == update.UpdateStatuses.TERMINATE:
+    if run_mode == Gimp.RunMode.INTERACTIVE:
+      messages_.display_alert_message(
+        title=CONFIG.PLUGIN_TITLE,
+        message_type=Gtk.MessageType.WARNING,
+        message_markup=_(
+          'Settings for this plug-in could not be updated to the latest version'
+          ' and must be reset.'),
+        message_secondary_markup=_(
+          'If you believe this is an error in the plug-in, you can help fix it'
+          ' by sending a report with the text under the details.'),
+        display_details_initially=False,
+        details=load_message,
+        report_description=_(
+          'Send a report with the text in the details above to one of the following sites'),
+        report_uri_list=CONFIG.BUG_REPORT_URL_LIST)
 
-    return True, ''
-  elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
-    setting_.Persistor.clear()
+      setting_.Persistor.clear()
+      commands_.clear(settings['main/actions'])
+      commands_.clear(settings['main/conditions'])
 
-    return (
-      False,
-      (_('Settings could not be loaded and had to be reset.')
-       + '\n\n'
-       + _('Details: {}').format(load_message)))
+      return True, ''
+    elif run_mode == Gimp.RunMode.WITH_LAST_VALS:
+      setting_.Persistor.clear()
 
-  return False, load_message
+      return (
+        False,
+        (_('Settings could not be loaded and had to be reset.')
+         + '\n\n'
+         + _('Details: {}').format(load_message)))
+    else:
+      return False, load_message
+
+  return True, ''
 
 
 def _load_settings_from_file(settings, settings_filepath):

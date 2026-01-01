@@ -12,6 +12,7 @@ from src import utils
 from src import utils_setting as utils_setting_
 from src import version as version_
 from src.procedure_groups import *
+from src.pypdb import pdb
 
 from . import _utils as update_utils_
 from .. import utils_update
@@ -28,10 +29,12 @@ class UpdateStatuses:
   UPDATE_STATUSES = (
     FRESH_START,
     UPDATE,
+    UPDATE_WITH_REMOVED_COMMANDS,
     TERMINATE,
   ) = (
     'fresh_start',
     'update',
+    'update_with_removed_commands',
     'terminate',
   )
 
@@ -61,7 +64,13 @@ def load_and_update(
   * `UpdateStatuses.UPDATE`:
       The plug-in was successfully updated to the latest version, or no
       update was performed as the plug-in version remains the same.
-  
+
+  * `UpdateStatuses.UPDATE_WITH_REMOVED_COMMANDS`:
+      The plug-in was successfully updated to the latest version, or no
+      update was performed as the plug-in version remains the same. However,
+      some actions or conditions were removed due to no longer being available
+      in GIMP.
+
   * `UpdateStatuses.TERMINATE`:
       No update was performed. This value is returned if the update
       failed (e.g. because of a malformed setting source).
@@ -78,13 +87,17 @@ def load_and_update(
   ``update_handlers`` to specify a custom dictionary of (version, function)
   pairs. This is usually utilized for testing purposes.
   """
+
   def _handle_update(data):
-    nonlocal current_version, previous_version
+    nonlocal current_version, previous_version, commands_no_longer_available
 
     current_version = version_.Version.parse(CONFIG.PLUGIN_VERSION)
 
     previous_version = _get_plugin_version(data)
     _update_plugin_version(data, current_version)
+
+    if previous_version is None:
+      raise setting_.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
 
     if update_handlers is None:
       processed_update_handlers = _get_update_handlers(previous_version, current_version)
@@ -94,14 +107,10 @@ def load_and_update(
         if previous_version < version_.Version.parse(version_str) <= current_version
       ]
 
-    if previous_version is None:
-      raise setting_.SourceModifyDataError(_('Failed to obtain the previous plug-in version.'))
-
-    if not processed_update_handlers:
-      return data
-
     for update_handler in processed_update_handlers:
       update_handler(data, settings, procedure_groups)
+
+    commands_no_longer_available = _remove_no_longer_available_commands(data)
 
     return data
 
@@ -121,6 +130,7 @@ def load_and_update(
 
   current_version = None
   previous_version = None
+  commands_no_longer_available = []
 
   try:
     load_result = settings.load(sources, modify_data_func=_handle_update)
@@ -143,7 +153,11 @@ def load_and_update(
       and previous_version < current_version):
     _update_sources(settings, sources)
 
-  return UpdateStatuses.UPDATE, load_message
+  if not commands_no_longer_available:
+    return UpdateStatuses.UPDATE, load_message
+  else:
+    message = _format_commands_no_longer_available_message(commands_no_longer_available)
+    return UpdateStatuses.UPDATE_WITH_REMOVED_COMMANDS, message
 
 
 def _get_plugin_version(data) -> Union[version_.Version, None]:
@@ -212,3 +226,61 @@ def _get_update_handlers(
     utils_update.UPDATE_HANDLER_FUNC_NAME,
     include_next=True,
   )
+
+
+def _remove_no_longer_available_commands(data):
+  main_settings_list, _index = update_utils_.get_top_level_group_list(data, 'main')
+
+  if main_settings_list is not None:
+    actions_no_longer_available = _remove_no_longer_available_commands_for_group(
+      main_settings_list, 'actions')
+    conditions_no_longer_available = _remove_no_longer_available_commands_for_group(
+      main_settings_list, 'conditions')
+
+    return actions_no_longer_available + conditions_no_longer_available
+  else:
+    return []
+
+
+def _remove_no_longer_available_commands_for_group(main_settings_list, command_group_name):
+  commands_no_longer_available = []
+
+  commands_list, _index = update_utils_.get_child_group_list(main_settings_list, command_group_name)
+
+  if commands_list is not None:
+    for command_dict in commands_list:
+      command_list = command_dict['settings']
+
+      orig_name_setting_dict, _index = update_utils_.get_child_setting(command_list, 'orig_name')
+      origin_setting_dict, _index = update_utils_.get_child_setting(command_list, 'origin')
+
+      orig_name = orig_name_setting_dict['value']
+
+      if origin_setting_dict['value'] in ['gimp_pdb', 'gegl'] and orig_name not in pdb:
+        commands_no_longer_available.append(orig_name)
+
+    for orig_name in commands_no_longer_available:
+      update_utils_.remove_command_by_orig_names(commands_list, orig_name)
+
+  return commands_no_longer_available
+
+
+def _format_commands_no_longer_available_message(commands_no_longer_available):
+  alternative_commands = {
+    'gegl:gray': 'gimp:desaturate',
+    'gegl:posterize': 'gimp:desaturate',
+    'gegl:threshold': 'gimp:threshold',
+    'gegl:wavelet-blur': 'plug-in-wavelet-decompose',
+  }
+
+  processed_commands_no_longer_available = []
+  for name in commands_no_longer_available:
+    if name in alternative_commands:
+      processed_commands_no_longer_available.append(
+        _('{} (you may use "{}")').format(name, alternative_commands[name]))
+    else:
+      processed_commands_no_longer_available.append(name)
+
+  return _(
+    'The following actions or conditions are no longer available and have been removed:\n\n{}'
+  ).format('\n'.join(processed_commands_no_longer_available))

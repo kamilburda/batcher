@@ -254,12 +254,18 @@ class SettingsManager:
     for setting in size_settings_to_ignore_for_load:
       setting.tags.discard('ignore_load')
 
-    if status == update.UpdateStatuses.TERMINATE:
+    if status == update.UpdateStatuses.UPDATE_WITH_REMOVED_COMMANDS:
+      display_commands_no_longer_available_in_loaded_settings_message(
+        message,
+        parent=self._dialog,
+      )
+    elif status == update.UpdateStatuses.TERMINATE:
       display_load_save_settings_failure_message(
         _('Failed to load settings from file "{}".'
           ' Settings must be reset completely.').format(filepath),
         details=message,
-        parent=self._dialog)
+        parent=self._dialog,
+      )
 
       self.reset_settings()
       commands_.clear(self._settings['main/actions'])
@@ -353,3 +359,17 @@ def display_load_save_settings_failure_message(
     report_description=_(
       'If you believe this is an error in the plug-in, you can help fix it'
       ' by sending a report with the file and the text in the details to one of the sites below'))
+
+
+def display_commands_no_longer_available_in_loaded_settings_message(
+      message: str,
+      parent: Optional[Gtk.Window] = None,
+):
+  main_message, commands_no_longer_available_str = message.split('\n\n')
+
+  messages_.display_alert_message(
+    message_type=Gtk.MessageType.WARNING,
+    message_markup=GLib.markup_escape_text(main_message),
+    message_secondary_markup=GLib.markup_escape_text(commands_no_longer_available_str),
+    parent=parent,
+  )
