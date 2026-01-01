@@ -249,30 +249,31 @@ class CommandEditorWidget:
     self._button_info = None
     self._command_info_hbox = None
 
-    if not command['description'].value:
-      return
-
     self._command_info = _get_command_info_from_pdb_procedure(self._pdb_procedure)
+
+    if not command['description'].value and not self._command_info:
+      return
 
     if self._command_info:
       max_width_chars = self._COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_COMMAND_INFO
     else:
       max_width_chars = self._COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_COMMAND_INFO
 
-    self._label_short_description = Gtk.Label(
-      label=command['description'].value,
-      use_markup=False,
-      selectable=True,
-      wrap=True,
-      max_width_chars=max_width_chars,
-      xalign=0.0,
-    )
-
     self._command_info_hbox = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._COMMAND_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING,
     )
-    self._command_info_hbox.pack_start(self._label_short_description, True, True, 0)
+
+    if command['description'].value:
+      self._label_short_description = Gtk.Label(
+        label=command['description'].value,
+        use_markup=False,
+        selectable=True,
+        wrap=True,
+        max_width_chars=max_width_chars,
+        xalign=0.0,
+      )
+      self._command_info_hbox.pack_start(self._label_short_description, True, True, 0)
 
     if self._command_info:
       self._info_popup, self._info_popup_text = (
