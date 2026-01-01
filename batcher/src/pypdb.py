@@ -103,7 +103,10 @@ class _PyPDB:
     """Lists all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
     and are thus redundant.
     """
-    return list(_DUPLICATE_GEGL_OPERATIONS)
+    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+      return list(_DUPLICATE_GEGL_OPERATIONS)
+    else:
+      return []
 
   def _fill_gegl_operations_and_set_if_empty(self):
     if self._gegl_operations is None:
