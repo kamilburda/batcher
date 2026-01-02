@@ -9,13 +9,63 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import constants
+from src import utils_pdb
 from src.procedure_groups import *
 from src.pypdb import pdb
 
 
 __all__ = [
   'color_correction',
+  'BrightnessContrastFilters',
+  'on_after_add_color_correction_action',
 ]
+
+
+class BrightnessContrastFilters:
+  BRIGHTNESS_CONTRAST_FILTERS = (
+    GEGL,
+    GIMP,
+  ) = 'gegl', 'gimp'
+
+
+class CurveData:
+
+  def __init__(self, channel=None, samples=None, points=None):
+    self.channel = channel
+    self.samples = samples
+    self.points = points
+
+
+class LevelsData:
+
+  def __init__(
+        self,
+        channel,
+        low_input=0.0,
+        high_input=1.0,
+        clamp_input=False,
+        gamma=1.0,
+        low_output=0.0,
+        high_output=1.0,
+        clamp_output=False,
+  ):
+    self.channel = channel
+    self.low_input = low_input
+    self.high_input = high_input
+    self.clamp_input = clamp_input
+    self.gamma = gamma
+    self.low_output = low_output
+    self.high_output = high_output
+    self.clamp_output = clamp_output
+
+  def has_default_values(self):
+    return (
+      self.low_input == 0.0
+      and self.high_input == 1.0
+      and self.gamma == 1.0
+      and self.low_output == 0.0
+      and self.high_output == 1.0
+    )
 
 
 def color_correction(
@@ -23,10 +73,11 @@ def color_correction(
       layer,
       brightness,
       contrast,
+      brightness_contrast_filter,
       levels_preset_file,
       curves_preset_file,
 ):
-  pdb.gegl__brightness_contrast(layer, contrast=contrast, brightness=brightness, merge_filter_=True)
+  _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_filter)
 
   image = layer.get_image()
 
@@ -49,6 +100,34 @@ def color_correction(
     _parse_photoshop_curves_preset,
     _apply_curves,
   )
+
+
+def _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_filter):
+  value_range = _MAX_BRIGHTNESS_CONTRAST_VALUE - _MIN_BRIGHTNESS_CONTRAST_VALUE
+
+  if brightness_contrast_filter == BrightnessContrastFilters.GEGL:
+    processed_brightness = (brightness / value_range) * 2
+    processed_contrast = (contrast / value_range) * 2 + 1.0
+
+    pdb.gegl__brightness_contrast(
+      layer,
+      contrast=processed_contrast,
+      brightness=processed_brightness,
+      merge_filter_=True,
+    )
+  elif brightness_contrast_filter == BrightnessContrastFilters.GIMP:
+    if utils_pdb.get_gimp_version() < (3, 1, 4):
+      return
+
+    processed_brightness = (brightness / value_range) * 2
+    processed_contrast = (contrast / value_range) * 2
+
+    pdb.gimp__brightness_contrast(
+      layer,
+      brightness=processed_brightness,
+      contrast=processed_contrast,
+      merge_filter_=True,
+    )
 
 
 def _apply_correction(
@@ -280,48 +359,16 @@ def _read_points(file):
   return curve_points
 
 
-class CurveData:
-
-  def __init__(self, channel=None, samples=None, points=None):
-    self.channel = channel
-    self.samples = samples
-    self.points = points
+def on_after_add_color_correction_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'color_correction':
+    if utils_pdb.get_gimp_version() < (3, 1, 4):
+      action['arguments/brightness_contrast_filter'].gui.set_visible(False)
 
 
-class LevelsData:
-
-  def __init__(
-        self,
-        channel,
-        low_input=0.0,
-        high_input=1.0,
-        clamp_input=False,
-        gamma=1.0,
-        low_output=0.0,
-        high_output=1.0,
-        clamp_output=False,
-  ):
-    self.channel = channel
-    self.low_input = low_input
-    self.high_input = high_input
-    self.clamp_input = clamp_input
-    self.gamma = gamma
-    self.low_output = low_output
-    self.high_output = high_output
-    self.clamp_output = clamp_output
-
-  def has_default_values(self):
-    return (
-      self.low_input == 0.0
-      and self.high_input == 1.0
-      and self.gamma == 1.0
-      and self.low_output == 0.0
-      and self.high_output == 1.0
-    )
-
+_MIN_BRIGHTNESS_CONTRAST_VALUE = -127
+_MAX_BRIGHTNESS_CONTRAST_VALUE = 127
 
 _FAILED_TO_READ_DATA_MESSAGE = 'Failed to obtain data from file. File may be corrupt.'
-
 
 _HISTOGRAM_CHANNELS = {
   'value': Gimp.HistogramChannel.VALUE,
@@ -330,7 +377,6 @@ _HISTOGRAM_CHANNELS = {
   'blue': Gimp.HistogramChannel.BLUE,
   'alpha': Gimp.HistogramChannel.ALPHA,
 }
-
 
 COLOR_CORRECTION_DICT = {
   'name': 'color_correction',
@@ -345,26 +391,30 @@ COLOR_CORRECTION_DICT = {
       'display_name': _('Layer'),
     },
     {
-      'type': 'double',
+      'type': 'int',
       'name': 'brightness',
-      'default_value': 0.0,
+      'default_value': 0,
       'display_name': _('Brightness'),
-      'min_value': -1.0,
-      'max_value': 1.0,
-      'gui_type_kwargs': {
-        'step_increment': 0.01,
-      },
+      'min_value': _MIN_BRIGHTNESS_CONTRAST_VALUE,
+      'max_value': _MAX_BRIGHTNESS_CONTRAST_VALUE,
     },
     {
-      'type': 'double',
+      'type': 'int',
       'name': 'contrast',
-      'default_value': 1.0,
+      'default_value': 0,
       'display_name': _('Contrast'),
-      'min_value': -5.0,
-      'max_value': 5.0,
-      'gui_type_kwargs': {
-        'step_increment': 0.01,
-      },
+      'min_value': _MIN_BRIGHTNESS_CONTRAST_VALUE,
+      'max_value': _MAX_BRIGHTNESS_CONTRAST_VALUE,
+    },
+    {
+      'type': 'choice',
+      'name': 'brightness_contrast_filter',
+      'default_value': BrightnessContrastFilters.GEGL,
+      'items': [
+        (BrightnessContrastFilters.GEGL, _('GEGL')),
+        (BrightnessContrastFilters.GIMP, _('GIMP')),
+      ],
+      'display_name': _('Filter for brightness and contrast'),
     },
     {
       'type': 'file',

@@ -1,5 +1,6 @@
 from .. import _utils as update_utils_
 
+from src import builtin_actions
 from src import setting_additional
 
 
@@ -19,6 +20,10 @@ def update(data, _settings, _procedure_groups):
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
+
+        if (orig_name_setting_dict['value'] == 'color_correction'
+            and arguments_list is not None):
+          _color_correction_update_brightness_contrast_arguments(arguments_list)
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
@@ -77,6 +82,59 @@ def _change_active_file_format_to_dict(file_format_export_options_dict):
 def _remove_initial_file_format_argument(file_format_export_options_dict):
   if 'initial_file_format' in file_format_export_options_dict:
     del file_format_export_options_dict['initial_file_format']
+
+
+def _color_correction_update_brightness_contrast_arguments(arguments_list):
+  if arguments_list[1]['type'] == 'double':
+    brightness_dict = arguments_list[1]
+
+    brightness_dict['type'] = 'int'
+    brightness_dict['default_value'] = 0
+    brightness_dict['min_value'] = -127
+    brightness_dict['max_value'] = 127
+
+    value = brightness_dict['value']
+    processed_value = round(
+      value * (brightness_dict['max_value'] - brightness_dict['min_value'])
+      / 2
+    )
+    processed_value = max(processed_value, brightness_dict['min_value'])
+    processed_value = min(processed_value, brightness_dict['max_value'])
+    brightness_dict['value'] = processed_value
+
+  if arguments_list[2]['type'] == 'double':
+    contrast_dict = arguments_list[2]
+
+    contrast_dict['type'] = 'int'
+    contrast_dict['default_value'] = 0
+    contrast_dict['min_value'] = -127
+    contrast_dict['max_value'] = 127
+
+    value = contrast_dict['value']
+    processed_value = value - 1.0
+    processed_value = round(
+      processed_value * (contrast_dict['max_value'] - contrast_dict['min_value'])
+      / 2
+    )
+    processed_value = max(processed_value, contrast_dict['min_value'])
+    processed_value = min(processed_value, contrast_dict['max_value'])
+    contrast_dict['value'] = processed_value
+
+  if arguments_list[3]['name'] != 'brightness_contrast_filter':
+    arguments_list.insert(
+      3,
+      {
+        'type': 'choice',
+        'name': 'brightness_contrast_filter',
+        'default_value': builtin_actions.BrightnessContrastFilters.GEGL,
+        'value': builtin_actions.BrightnessContrastFilters.GEGL,
+        'items': [
+          (builtin_actions.BrightnessContrastFilters.GEGL, _('GEGL')),
+          (builtin_actions.BrightnessContrastFilters.GIMP, _('GIMP')),
+        ],
+        'display_name': _('Filter for brightness and contrast'),
+      },
+    )
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
