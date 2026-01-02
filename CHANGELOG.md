@@ -60,6 +60,7 @@ Changes to actions and conditions:
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:
+* Fixed `Layer Below (Background)` and `Layer Above (Foreground)` not working for Batch Convert, Export Images and Edit and Save Images.
 * In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable.
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
 * Fixed the popup containing action/condition details not appearing upon clicking the corresponding icon button in the custom action browser or the action/condition edit dialog.

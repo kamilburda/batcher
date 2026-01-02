@@ -115,11 +115,12 @@ def _get_adjacent_layer(
       # consider `next_layer` to be the background/foreground.
       color_tags = []
       for action in _get_previous_enabled_actions(batcher, batcher.current_action):
-        if any(action['orig_name'].value == orig_name
-               for orig_name in insert_builtin_action_names):
+        if any(action['orig_name'].value == orig_name for orig_name in insert_builtin_action_names):
           if color_tag_argument_name_for_builtin_actions in action['arguments']:
             color_tags.append(
               action[f'arguments/{color_tag_argument_name_for_builtin_actions}'].value)
+          else:
+            color_tags.append(None)
         else:
           color_tags.append(None)
 
