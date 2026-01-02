@@ -321,6 +321,8 @@ class CommandEditorWidget:
 
       grid, indexes_in_grid = self._get_grid_and_indexes_in_grid(setting)
 
+      self._set_must_be_merged(setting)
+
       if commands_.MORE_OPTIONS_TAG in setting.tags:
         row_index_for_more_options += 1
         row_index = row_index_for_more_options
@@ -345,6 +347,11 @@ class CommandEditorWidget:
       )
 
       indexes_in_grid[setting] = row_index
+
+  @staticmethod
+  def _set_must_be_merged(setting):
+    if commands_.FILTER_MUST_BE_MERGED_TAG in setting.tags:
+      setting.gui.set_sensitive(False)
 
   def _set_more_options(self, command):
     row_index = len(self._command_more_options_indexes_in_grid)

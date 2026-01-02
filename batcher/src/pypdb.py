@@ -298,6 +298,13 @@ class PDBProcedure(metaclass=abc.ABCMeta):
     """
     return self._name
 
+  @property
+  def must_be_merged(self):
+    """Returns ``True`` if this procedure must always be applied destructively,
+    ``False`` otherwise.
+    """
+    return False
+
   @abc.abstractmethod
   def create_config(self):
     """Creates a procedure config filled with default values."""
@@ -436,6 +443,7 @@ class GeglProcedure(PDBProcedure):
 
   def __init__(self, pypdb_instance, name):
     self._filter_properties = self._get_filter_properties(name)
+    self._must_be_merged = self._get_must_be_merged(name)
 
     self._drawable_param = Gimp.param_spec_drawable(
       'drawable-', _('Drawable'), _('Drawable'), False, GObject.ParamFlags.READWRITE)
@@ -588,6 +596,10 @@ class GeglProcedure(PDBProcedure):
   def menu_paths(self):
     return []
 
+  @property
+  def must_be_merged(self):
+    return self._must_be_merged
+
   def create_config(self):
     """This subclass does not support config creation, hence this method returns
     ``None``.
@@ -605,6 +617,16 @@ class GeglProcedure(PDBProcedure):
         return self._GIMP_GEGL_OPERATIONS_PROPERTIES[name]
       else:
         return Gegl.Operation.list_properties(name)
+
+  @staticmethod
+  def _get_must_be_merged(name):
+    if name in _GIMP_GEGL_OPERATIONS_THAT_MUST_BE_MERGED:
+      return True
+
+    node = Gegl.Node()
+    node.set_property('operation', name)
+
+    return node.has_pad('aux')
 
   def _get_details(self, name):
     if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
@@ -804,6 +826,44 @@ _GIMP_GEGL_OPERATIONS_PRE_3_1_4 = (
 
 
 _GIMP_GEGL_OPERATIONS_SET_PRE_3_1_4 = set(_GIMP_GEGL_OPERATIONS_PRE_3_1_4)
+
+
+# Checking for the presence of the 'aux' pad in `gimp:*` operations does not
+# appear to work and yields console warnings. We therefore list these
+# explicitly.
+_GIMP_GEGL_OPERATIONS_THAT_MUST_BE_MERGED = (
+  'gimp:addition-legacy',
+  'gimp:anti-erase',
+  'gimp:behind',
+  'gimp:burn-legacy',
+  'gimp:compose-crop',
+  'gimp:darken-only-legacy',
+  'gimp:difference-legacy',
+  'gimp:divide-legacy',
+  'gimp:dodge-legacy',
+  'gimp:erase',
+  'gimp:grain-extract-legacy',
+  'gimp:grain-merge-legacy',
+  'gimp:hardlight-legacy',
+  'gimp:hsl-color-legacy',
+  'gimp:hsv-hue-legacy',
+  'gimp:hsv-saturation-legacy',
+  'gimp:hsv-value-legacy',
+  'gimp:layer-mode',
+  'gimp:lighten-only-legacy',
+  'gimp:mask-components',
+  'gimp:merge',
+  'gimp:multiply-legacy',
+  'gimp:normal',
+  'gimp:overwrite',
+  'gimp:pass-through',
+  'gimp:replace',
+  'gimp:screen-legacy',
+  'gimp:set-alpha',
+  'gimp:softlight-legacy',
+  'gimp:split',
+  'gimp:subtract-legacy',
+)
 
 
 pdb = _PyPDB()

@@ -76,6 +76,7 @@ DEFAULT_ACTIONS_GROUP = 'default_actions'
 DEFAULT_CONDITIONS_GROUP = 'default_conditions'
 
 MORE_OPTIONS_TAG = 'more_options'
+FILTER_MUST_BE_MERGED_TAG = 'filter_must_be_merged'
 
 _DEFAULT_COMMAND_TYPE = 'action'
 _REQUIRED_COMMAND_FIELDS = ['name']
@@ -582,9 +583,6 @@ def get_command_dict_from_pdb_procedure(
 
   origin = _get_pdb_procedure_origin(pdb_procedure)
 
-  if origin == 'gegl':
-    _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments)
-
   command_dict = {
     'name': _sanitize_pdb_procedure_name(pdb_procedure_name),
     'function': pdb_procedure_name,
@@ -594,6 +592,10 @@ def get_command_dict_from_pdb_procedure(
     'display_name': _get_pdb_procedure_display_name(pdb_procedure),
     'description': _get_pdb_procedure_description(pdb_procedure),
   }
+
+  if origin == 'gegl':
+    _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments)
+    _mark_gegl_procedure_as_must_be_merged_if_needed(pdb_procedure, command_dict, arguments)
 
   command_dict.update(_get_hard_coded_command_attributes(command_dict['name']))
 
@@ -616,6 +618,34 @@ def _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments):
         argument_dict['tags'] = []
 
       argument_dict['tags'].append(MORE_OPTIONS_TAG)
+
+
+def _mark_gegl_procedure_as_must_be_merged_if_needed(pdb_procedure, command_dict, arguments):
+  if not pdb_procedure.must_be_merged:
+    return
+
+  merge_filter_argument_dict = next(
+    iter(argument_dict for argument_dict in arguments if argument_dict['name'] == 'merge-filter-'),
+    None,
+  )
+
+  if merge_filter_argument_dict is None:
+    return
+
+  merge_filter_argument_dict['default_value'] = True
+
+  if 'tags' not in merge_filter_argument_dict:
+    merge_filter_argument_dict['tags'] = []
+
+  merge_filter_argument_dict['tags'].append(FILTER_MUST_BE_MERGED_TAG)
+
+  must_be_merged_message = _('This filter cannot be applied non-destructively.')
+
+  if command_dict['description']:
+    command_dict['description'] = '{}\n\n{}'.format(
+      command_dict['description'], must_be_merged_message)
+  else:
+    command_dict['description'] = must_be_merged_message
 
 
 def _sanitize_pdb_procedure_name(pdb_procedure_name):
