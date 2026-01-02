@@ -31,7 +31,10 @@ class CommandLists:
     self._action_list = command_list_.CommandList(
       self._settings['main/actions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_actions.BUILTIN_ACTIONS, [CONFIG.PROCEDURE_GROUP]),
+        builtin_actions.BUILTIN_ACTIONS,
+        tags=[CONFIG.PROCEDURE_GROUP],
+        availability_funcs=builtin_actions.BUILTIN_ACTIONS_AVAILABILITY_FUNCTIONS,
+      ),
       add_command_text=_('Add _Action...'),
       allow_custom_commands=True,
       add_custom_command_text=_('Add Custom Action...'),
@@ -44,7 +47,10 @@ class CommandLists:
     self._condition_list = command_list_.CommandList(
       self._settings['main/conditions'],
       builtin_commands=builtin_commands_common.get_filtered_builtin_commands(
-        builtin_conditions.BUILTIN_CONDITIONS, [CONFIG.PROCEDURE_GROUP]),
+        builtin_conditions.BUILTIN_CONDITIONS,
+        tags=[CONFIG.PROCEDURE_GROUP],
+        availability_funcs=builtin_conditions.BUILTIN_CONDITIONS_AVAILABILITY_FUNCTIONS,
+      ),
       add_command_text=_('Add C_ondition...'),
       allow_custom_commands=False,
       propagate_natural_height=True,

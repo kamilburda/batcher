@@ -8,6 +8,8 @@ from src.builtin_actions import _crop
 from src.builtin_actions._crop import *
 from src.builtin_actions import _export
 from src.builtin_actions._export import *
+from src.builtin_actions import _gmic_filter
+from src.builtin_actions._gmic_filter import *
 from src.builtin_actions import _import
 from src.builtin_actions._import import *
 from src.builtin_actions import _insert_background_foreground
@@ -39,6 +41,7 @@ _BUILTIN_ACTIONS_LIST = [
   _export.EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT,
   _export.EXPORT_FOR_EXPORT_LAYERS_DICT,
   _export.EXPORT_FOR_EDIT_LAYERS_DICT,
+  _gmic_filter.GMIC_FILTER_DICT,
   _import.IMPORT_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_LAYERS_DICT,
@@ -70,13 +73,19 @@ _BUILTIN_ACTIONS_LIST = [
 _BUILTIN_ACTIONS_LIST.sort(
   key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
 
-# Create a separate dictionary for functions since objects cannot be saved
-# to a persistent source. Saving them as strings would not be reliable as
-# function names and paths may change when refactoring or adding/modifying features.
-# The 'function' setting is set to an empty value as the function can be inferred
-# via the command's 'orig_name' setting.
+# Create a separate dictionary for functions since objects cannot be saved to
+# a persistent source. Saving them as strings would not be reliable as
+# function names and paths may change when refactoring or adding/modifying
+# features. The 'function' setting is set to an empty value as the function
+# can be inferred via the command's 'orig_name' setting.
 BUILTIN_ACTIONS = {}
 BUILTIN_ACTIONS_FUNCTIONS = {}
+
+# These are functions indicating when a command should be available. This can
+# be useful e.g. to hide a command when a third-party plug-in the command
+# depends on is not present, or to make the command (un)available for
+# particular versions of GIMP.
+BUILTIN_ACTIONS_AVAILABILITY_FUNCTIONS = {}
 
 for command_dict in _BUILTIN_ACTIONS_LIST:
   function = command_dict['function']
@@ -84,3 +93,6 @@ for command_dict in _BUILTIN_ACTIONS_LIST:
 
   BUILTIN_ACTIONS[command_dict['name']] = command_dict
   BUILTIN_ACTIONS_FUNCTIONS[command_dict['name']] = function
+
+  if 'available' in command_dict:
+    BUILTIN_ACTIONS_AVAILABILITY_FUNCTIONS[command_dict['name']] = command_dict.pop('available')

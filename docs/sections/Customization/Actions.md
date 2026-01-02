@@ -83,6 +83,15 @@ Options:
   * *Remove empty borders*: Automatically removes empty areas along the edges of the image/layer.
 
 
+### G'MIC filter
+
+*Only available if [G'MIC](https://gmic.eu/) is installed as a GIMP plug-in*
+
+Applies a [G'MIC](https://gmic.eu/) filter non-interactively.
+
+To apply a filter, select a filter in G'MIC and press Ctrl+C, or click the copy button. Then paste the text into the `Command` text field.
+
+
 ### Insert background
 
 Inserts a new layer behind the current layer.

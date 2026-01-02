@@ -407,17 +407,26 @@ _BUILTIN_CONDITIONS_LIST = [
 _BUILTIN_CONDITIONS_LIST.sort(
   key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
 
-# Create a separate dictionary for functions since objects cannot be saved
-# to a persistent source. Saving them as strings would not be reliable as
-# function names and paths may change when refactoring or adding/modifying features.
-# The 'function' setting is set to an empty value as the function can be inferred
-# via the command's 'orig_name' setting.
+# Create a separate dictionary for functions since objects cannot be saved to
+# a persistent source. Saving them as strings would not be reliable as
+# function names and paths may change when refactoring or adding/modifying
+# features. The 'function' setting is set to an empty value as the function
+# can be inferred via the command's 'orig_name' setting.
 BUILTIN_CONDITIONS = {}
 BUILTIN_CONDITIONS_FUNCTIONS = {}
+
+# A filter is a function indicating when a command should not be available.
+# This can be useful to hide built-in commands that depend on the presence of
+# a third-party plug-in or to make the command (un)available for particular
+# versions of GIMP.
+BUILTIN_CONDITIONS_AVAILABILITY_FUNCTIONS = {}
 
 for command_dict in _BUILTIN_CONDITIONS_LIST:
   function = command_dict['function']
   command_dict['function'] = ''
-  
+
   BUILTIN_CONDITIONS[command_dict['name']] = command_dict
   BUILTIN_CONDITIONS_FUNCTIONS[command_dict['name']] = function
+
+  if 'available' in command_dict:
+    BUILTIN_CONDITIONS_AVAILABILITY_FUNCTIONS[command_dict['name']] = command_dict.pop('available')
