@@ -61,6 +61,8 @@ Adjusts colors via brightness, contrast, levels and/or curves.
 
 For GIMP 3.2 and later, you can choose between two different filters responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
 
+The `White balance` option is equivalent to `Colors → Auto → White Balance` in GIMP. 
+
 For levels and curves, you need to specify a saved preset file. Both GIMP and Photoshop (.alv for levels, .acv for curves) file formats are supported.
 
 You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.

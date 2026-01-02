@@ -74,10 +74,13 @@ def color_correction(
       brightness,
       contrast,
       brightness_contrast_filter,
+      white_balance,
       levels_preset_file,
       curves_preset_file,
 ):
   _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_filter)
+
+  _apply_white_balance(layer, white_balance)
 
   image = layer.get_image()
 
@@ -128,6 +131,11 @@ def _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_
       contrast=processed_contrast,
       merge_filter_=True,
     )
+
+
+def _apply_white_balance(layer, white_balance):
+  if white_balance:
+    layer.levels_stretch()
 
 
 def _apply_correction(
@@ -415,6 +423,12 @@ COLOR_CORRECTION_DICT = {
         (BrightnessContrastFilters.GIMP, _('GIMP')),
       ],
       'display_name': _('Filter for brightness and contrast'),
+    },
+    {
+      'type': 'bool',
+      'name': 'white_balance',
+      'default_value': False,
+      'display_name': _('White balance'),
     },
     {
       'type': 'file',

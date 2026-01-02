@@ -52,9 +52,11 @@ Changes to actions and conditions:
 * Added filters (layer effects, GEGL operations) starting with `gimp:` as custom actions. For GIMP 3.1.4 and later, all of these filters are added. For GIMP 3.1.2 and below, only the following filters are added (others are unsupported or cause GIMP to crash): `gimp:border`, `gimp:colorize`, `gimp:compose-crop`, `gimp:desaturate`, `gimp:flood`, `gimp:grow`, `gimp:posterize`, `gimp:scalar-multiply`, `gimp:semi-flatten`, `gimp:set-alpha`, `gimp:shrink`, `gimp:threshold`, `gimp:threshold-alpha` (#85).
 * Removed filters that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * For filters that can only be applied destructively, `Merge filter` will always be checked and cannot be changed (#43).
-* Color correction: Reduced the range of allowed brightness and contrast values. The value range is now scaled to -127 to 127 for consistency with GIMP.
-* Color correction: For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values.
-* Color correction: GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
+* Color correction:
+  * Reduced the range of allowed brightness and contrast values. The value range is now scaled to -127 to 127 for consistency with GIMP.
+  * For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values.
+  * Added `White balance` option equivalent to `Colors → Auto → White Balance` in GIMP (#85).
+  * GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:

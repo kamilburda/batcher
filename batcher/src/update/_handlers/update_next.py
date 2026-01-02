@@ -136,6 +136,18 @@ def _color_correction_update_brightness_contrast_arguments(arguments_list):
       },
     )
 
+  if arguments_list[4]['name'] != 'white_balance':
+    arguments_list.insert(
+      4,
+      {
+        'type': 'bool',
+        'name': 'white_balance',
+        'default_value': False,
+        'value': False,
+        'display_name': _('White balance'),
+      },
+    )
+
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
   if 'show_display_name' in arguments_list[7]:
