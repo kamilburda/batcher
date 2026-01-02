@@ -14,7 +14,7 @@ For the `Color Correction` action, Batcher currently supports applying levels or
 
 For Batch Convert, import options for unrecognized file formats cannot be adjusted and default values will be used.
 
-In GIMP, some layer effects (filters, GEGL operations) can currently only be applied destructively. If you add such an effect as an action in Batcher, you will obtain an error message saying the effect cannot be applied non-destructively. Batcher currently does not detect whether a layer effect can be applied destructively or not. To avoid the error message, check `Merge filter`.
+If some actions result in errors, notably layer effects, the error message provided by Batcher is rather generic or there is none. A more detailed error message, if any, can be displayed in GIMP via `Windows → Dockable Dialogs → Error Console`. In previous Batcher versions, these messages were displayed as separate popups - however, these popups were often displayed repeatedly and kept obscuring the Batcher dialog.
 
 If you run GIMP using the official AppImage, `None` will be displayed as an option for a `Current Image`/`Current Layer` parameter in an action, even if the parameter does not allow omitting an image/layer. This will be fixed in a future version of GIMP.
 

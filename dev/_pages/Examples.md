@@ -13,11 +13,11 @@ Add and check the `Remove folder structure` action if not already (`Add Action..
 Click on the text entry next to `File Name` and choose `image001`, or type `image[001]` in the entry.
 
 
-## I want to adjust brightness in the images. Can this be done?
+## I want to apply blurring to the image. Can this be done?
 
-Yes! You may apply any GIMP filter or plug-in:
+Absolutely! In fact, you may apply any GIMP filter or plug-in:
 1. Select `Add Action... → Add Custom Action...`
-2. Find `gimp-drawable-brightness-contrast` in the action browser.
+2. In the action browser, type `blur` in the search bar and select one of the filters, such as `Gaussian Blur`.
 3. Adjust the options as desired.
 4. Select `Add` to add the action.
 

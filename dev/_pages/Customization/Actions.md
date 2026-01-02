@@ -64,6 +64,10 @@ For example, if a layer has 50% opacity and its parent group also has 50% opacit
 
 Adjusts colors via brightness, contrast, levels and/or curves.
 
+For GIMP 3.2 and later, you can choose between two different filters responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
+
+The `White balance` option is equivalent to `Colors → Auto → White Balance` in GIMP. 
+
 For levels and curves, you need to specify a saved preset file. Both GIMP and Photoshop (.alv for levels, .acv for curves) file formats are supported.
 
 You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.
@@ -82,6 +86,15 @@ Options:
   * *Crop to aspect ratio*: Crops to the specified aspect ratio (width:height), e.g. to 4:3 or 16:9 or any ratio of your choice. You can customize where the cropping starts (from the start, center, end or from a custom starting position).
   * *Crop to area*: Crops to the area bounded by the starting position (X, Y), width and height.
   * *Remove empty borders*: Automatically removes empty areas along the edges of the image/layer.
+
+
+### G'MIC filter
+
+*Only available if [G'MIC](https://gmic.eu/) is installed as a GIMP plug-in*
+
+Applies a [G'MIC](https://gmic.eu/) filter non-interactively.
+
+To apply a filter, select a filter in G'MIC and press Ctrl+C, or click the copy button. Then paste the text into the `Command` text field.
 
 
 ### Insert background
