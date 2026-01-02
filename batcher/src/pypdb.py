@@ -100,13 +100,13 @@ class _PyPDB:
 
   @staticmethod
   def get_duplicate_gegl_operations():
-    """Lists all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
+    """Returns all ``'gegl:*'`` operations that have a ``'gimp:*'`` counterpart
     and are thus redundant.
     """
     if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
-      return list(_DUPLICATE_GEGL_OPERATIONS_POST_3_1_4)
+      return _DUPLICATE_GEGL_OPERATIONS_POST_3_1_4
     else:
-      return list(_DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4)
+      return _DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4
 
   def _fill_gegl_operations_and_set_if_empty(self):
     if self._gegl_operations is None:
@@ -123,7 +123,7 @@ class _PyPDB:
 
   @staticmethod
   def _list_all_gegl_operations_pre_3_1_4():
-    operation_names = Gegl.list_operations() + _GIMP_GEGL_OPERATIONS_PRE_3_1_4
+    operation_names = Gegl.list_operations() + list(_GIMP_GEGL_OPERATIONS_PRE_3_1_4)
 
     processed_operation_names = []
 
@@ -717,7 +717,7 @@ class PDBProcedureError(Exception):
 
 # Taken from:
 # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
-_UNUSED_GEGL_OPERATION_CATEGORIES = {
+_UNUSED_GEGL_OPERATION_CATEGORIES = frozenset([
   'compositors',
   'core',
   'debug',
@@ -728,12 +728,12 @@ _UNUSED_GEGL_OPERATION_CATEGORIES = {
   'programming',
   'transform',
   'video',
-}
+])
 
 
 # Taken from:
 # https://gitlab.gnome.org/GNOME/gimp/-/blob/GIMP_3_2_0_RC2/app/gegl/gimp-gegl-utils.c
-_UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
+_UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = frozenset([
   'gegl:color',
   'gegl:contrast-curve',
   'gegl:convert-format',
@@ -760,33 +760,33 @@ _UNUSED_GEGL_OPERATIONS_PRE_3_1_4 = {
   'gegl:tile',
   'gegl:unpremul',
   'gegl:vector-stroke',
-}
+])
 
 
 # The 'gimp:*' counterparts of these filters can achieve the same effect. They
 # are kept to maintain backwards compatibility with GIMP < 3.1.4 or because
 # they are not blocklisted by GIMP.
-_DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4 = [
+_DUPLICATE_GEGL_OPERATIONS_PRE_3_1_4 = (
   'gegl:gray',
   'gegl:posterize',
   'gegl:threshold',
   'gegl:wavelet-blur',
-]
+)
 
 
 # The 'gimp:*' counterparts of these filters can achieve the same effect. They
 # are kept to maintain backwards compatibility with GIMP < 3.1.4 or because
 # they are not blocklisted by GIMP.
-_DUPLICATE_GEGL_OPERATIONS_POST_3_1_4 = [
+_DUPLICATE_GEGL_OPERATIONS_POST_3_1_4 = (
   'gegl:brightness-contrast',
   'gegl:levels',
-]
+)
 
 
 # This is not an exhaustive list as many 'gimp:*' operations cause GIMP to
 # crash on some platforms, have unsupported parameter types or otherwise have
 # no effect.
-_GIMP_GEGL_OPERATIONS_PRE_3_1_4 = [
+_GIMP_GEGL_OPERATIONS_PRE_3_1_4 = (
   'gimp:border',
   'gimp:colorize',
   'gimp:compose-crop',
@@ -800,7 +800,7 @@ _GIMP_GEGL_OPERATIONS_PRE_3_1_4 = [
   'gimp:shrink',
   'gimp:threshold',
   'gimp:threshold-alpha',
-]
+)
 
 
 _GIMP_GEGL_OPERATIONS_SET_PRE_3_1_4 = set(_GIMP_GEGL_OPERATIONS_PRE_3_1_4)
