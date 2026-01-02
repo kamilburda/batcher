@@ -11,11 +11,13 @@ General changes:
 * Updated Japanese translation (thanks to @re-unknown).
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 * Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
+* Removed filters (layer effects, GEGL operations) that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` entry. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
 * Added an export option named `Rotate or flip image based on Exif metadata`. This allows correcting the orientation of images with Exif metadata before export if you choose to not save Exif metadata, e.g. for the JPEG format (#91).
+* Added filters (layer effects, GEGL operations) starting with `gimp:` as custom actions. For GIMP 3.1.4 and later, all of these filters are added. For GIMP 3.1.2 and below, only the following filters are added (others are unsupported or cause GIMP to crash): `gimp:border`, `gimp:colorize`, `gimp:compose-crop`, `gimp:desaturate`, `gimp:flood`, `gimp:grow`, `gimp:posterize`, `gimp:scalar-multiply`, `gimp:semi-flatten`, `gimp:set-alpha`, `gimp:shrink`, `gimp:threshold`, `gimp:threshold-alpha` (#85).
 * If an action causes an error during processing or if a file does not exist, you may choose to skip the current image/layer and continue processing subsequent images/layers. This can be enabled permanently via `Settings → Continue on Error`. If you use Batcher non-interactively and you have a previous version of Batcher installed, you must remove Batcher, restart GIMP, install Batcher and restart GIMP again in order for the `continue-on-error` argument to be usable (#21).
 * Batch Convert: You can now move around individual files or folders by dragging and dropping them anywhere within the input list, or by pressing Alt + Up/Down. This is useful if, for example, you intend to rename the images with a numbered sequence.
 * Batch Convert: Files and folders can now be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
@@ -49,8 +51,6 @@ User interface changes:
   * For GIMP 3.1.4 and above, moved the following filters under the Other category as there are alternative filters available in GIMP: `gegl:brightness-contrast`, `gegl:levels`. These are not removed in case they are being used.
 
 Changes to actions and conditions:
-* Added filters (layer effects, GEGL operations) starting with `gimp:` as custom actions. For GIMP 3.1.4 and later, all of these filters are added. For GIMP 3.1.2 and below, only the following filters are added (others are unsupported or cause GIMP to crash): `gimp:border`, `gimp:colorize`, `gimp:compose-crop`, `gimp:desaturate`, `gimp:flood`, `gimp:grow`, `gimp:posterize`, `gimp:scalar-multiply`, `gimp:semi-flatten`, `gimp:set-alpha`, `gimp:shrink`, `gimp:threshold`, `gimp:threshold-alpha` (#85).
-* Removed filters that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * For filters that can only be applied destructively, `Merge filter` will always be checked and cannot be changed (#43).
 * Color correction:
   * Reduced the range of allowed brightness and contrast values. The value range is now scaled to -127 to 127 for consistency with GIMP.
