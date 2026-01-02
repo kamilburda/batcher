@@ -10,7 +10,7 @@ def update(data, _settings, _procedure_groups):
   if main_settings_list is not None:
     export_settings_list, _index = update_utils_.get_child_group_list(main_settings_list, 'export')
     if export_settings_list is not None:
-      _update_file_format_export_options_setting(export_settings_list)
+      _update_export_procedure(export_settings_list)
 
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
@@ -31,7 +31,7 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'].startswith('export_for_')
             and arguments_list is not None):
-          _update_file_format_export_options_setting(arguments_list)
+          _update_export_procedure(arguments_list)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
