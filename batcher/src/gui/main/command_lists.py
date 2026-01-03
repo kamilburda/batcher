@@ -194,6 +194,11 @@ class CommandLists:
       'after-load',
       lambda _actions: _set_up_existing_crop_actions(self._action_list))
 
+    _set_up_existing_gmic_filter_actions(self._action_list)
+    self._action_list.commands.connect_event(
+      'after-load',
+      lambda _actions: _set_up_existing_gmic_filter_actions(self._action_list))
+
     _set_up_existing_resize_canvas_actions(self._action_list)
     self._action_list.commands.connect_event(
       'after-load',
@@ -263,6 +268,9 @@ def _on_action_item_added(action_list, item, settings, condition_list):
   if item.command['orig_name'].value.startswith('crop_for_'):
     _handle_crop_action_item_added(item)
 
+  if item.command['orig_name'].value == 'gmic_filter':
+    _handle_gmic_filter_action_item_added(item)
+
   if item.command['orig_name'].value == 'resize_canvas':
     _handle_resize_canvas_action_item_added(item)
 
@@ -291,6 +299,12 @@ def _set_up_existing_crop_actions(action_list: command_list_.CommandList):
   for item in action_list.items:
     if item.command['orig_name'].value.startswith('crop_for_'):
       _handle_crop_action_item_added(item)
+
+
+def _set_up_existing_gmic_filter_actions(action_list: command_list_.CommandList):
+  for item in action_list.items:
+    if item.command['orig_name'].value == 'gmic_filter':
+      _handle_gmic_filter_action_item_added(item)
 
 
 def _set_up_existing_resize_canvas_actions(action_list: command_list_.CommandList):
@@ -531,6 +545,25 @@ def _set_display_name_for_crop_action(crop_mode_setting, crop_action):
     if crop_mode_setting.value in crop_mode_setting.items_display_names:
       crop_action['display_name'].set_value(
         crop_mode_setting.items_display_names[crop_mode_setting.value])
+
+
+def _handle_gmic_filter_action_item_added(item):
+  _set_display_name_for_gmic_filter_action(
+    item.command['arguments/command'],
+    item.command)
+
+  item.command['arguments/command'].connect_event(
+    'value-changed',
+    _set_display_name_for_gmic_filter_action,
+    item.command)
+
+
+def _set_display_name_for_gmic_filter_action(gmic_command_setting, gmic_filter_action):
+  if gmic_command_setting.value:
+    filter_name = gmic_command_setting.value.strip().split(' ')[0]
+    gmic_filter_action['display_name'].set_value(_("G'MIC filter: {}").format(filter_name))
+  else:
+    gmic_filter_action['display_name'].set_value(_("G'MIC filter"))
 
 
 def _handle_resize_canvas_action_item_added(item):
