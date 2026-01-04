@@ -37,11 +37,13 @@ class FileChooserPresenter(_base.GtkPresenter):
     if not self.setting.set_default_if_not_exists:
       self._widget.set_file(value)
     else:
-      if value is not None and os.path.isdir(value.get_path()):
+      if value is not None and value.get_path() is not None and os.path.isdir(value.get_path()):
         self._widget.set_file(value)
       else:
         default_directory = self.setting.default_value
-        if default_directory is not None and os.path.isdir(default_directory.get_path()):
+        if (default_directory is not None
+            and default_directory.get_path() is not None
+            and os.path.isdir(default_directory.get_path())):
           self._widget.set_file(default_directory)
         else:
           self._widget.set_file(Gio.file_new_for_uri(''))
