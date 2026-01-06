@@ -1,5 +1,6 @@
 """Utility functions used within the `builtin_actions` package."""
 
+from typing import Union
 import collections
 import os
 
@@ -70,7 +71,7 @@ class Positions:
   )
 
 
-def get_item_export_name(item):
+def get_item_export_name(item) -> str:
   item_state = item.get_named_state(EXPORT_NAME_ITEM_STATE)
   return item_state['name'] if item_state is not None else item.name
 
@@ -79,7 +80,7 @@ def set_item_export_name(item, name):
   item.get_named_state(EXPORT_NAME_ITEM_STATE)['name'] = name
 
 
-def get_item_filepath(item, directory: Gio.File):
+def get_item_filepath(item, directory: Union[Gio.File, str, None]) -> str:
   """Returns a file path based on the specified directory and the name of
   the item and its parents.
 
@@ -93,10 +94,15 @@ def get_item_filepath(item, directory: Gio.File):
   Item path components consist of parents' item names, starting with the
   topmost parent.
   """
-  if directory is None or directory.get_path() is None:
+  if directory is None:
     dirpath = ''
+  elif isinstance(directory, Gio.File):
+    if directory.get_path() is not None:
+      dirpath = directory.get_path()
+    else:
+      dirpath = ''
   else:
-    dirpath = directory.get_path()
+    dirpath = directory
 
   dirpath = os.path.abspath(dirpath)
 

@@ -10,6 +10,7 @@ from config import CONFIG
 from src import builtin_actions
 from src import builtin_commands_common
 from src import builtin_conditions
+from src import directory as directory_
 from src import setting as setting_
 from src.gui import messages as messages_
 from src.gui.commands import list as command_list_
@@ -669,8 +670,7 @@ def _handle_export_action_item_added_for_export_mode(item, settings):
 
 def _copy_setting_values_from_default_export_action(main_settings, export_action):
   if main_settings['output_directory'].value:
-    export_action['arguments/output_directory'].set_value(
-      main_settings['output_directory'].value)
+    export_action['arguments/output_directory'].set_value(main_settings['output_directory'].value)
 
   export_action['arguments/file_extension'].set_value(main_settings['file_extension'].value)
 
@@ -709,17 +709,22 @@ def _set_display_name_for_save_action(
       output_directory_setting,
       save_action,
 ):
-  if (output_directory_setting.value is not None
-      and output_directory_setting.value.get_path() is not None):
-    output_dirname = os.path.basename(output_directory_setting.value.get_path())
+  if output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL:
+    special_value_name = output_directory_setting.value.value
+    special_value = directory_.SPECIAL_VALUES.get(special_value_name)
+
+    if special_value is not None:
+      save_action['display_name'].set_value(_('Save using: {}').format(special_value.display_name))
+    else:
+      save_action['display_name'].set_value(_('Save'))
+  else:
+    output_dirname = os.path.basename(output_directory_setting.value.value)
 
     if save_existing_image_to_its_original_location_setting.value:
       save_action['display_name'].set_value(
         _('Save (imported images to "{}")').format(output_dirname))
     else:
       save_action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
-  else:
-      save_action['display_name'].set_value(_('Save'))
 
 
 def _set_display_name_for_save_action_for_output_directory(

@@ -14,6 +14,7 @@ __all__ = [
   'ExtendedEntryPresenter',
   'FileExtensionEntryPresenter',
   'NamePatternEntryPresenter',
+  'DirectoryChooserPresenter',
   'DimensionBoxPresenter',
   'AngleBoxPresenter',
   'AnchorBoxPresenter',
@@ -58,6 +59,25 @@ class NamePatternEntryPresenter(ExtendedEntryPresenter):
 
   def _create_widget(self, setting, **kwargs):
     return entries_.NamePatternEntry(renamer_.get_field_descriptions())
+
+
+class DirectoryChooserPresenter(setting_.GtkPresenter):
+  """`setting.Presenter` subclass for
+  `gui.widgets.directory_chooser.DirectoryChooser` widgets.
+
+  Value: The selected directory.
+  """
+
+  _VALUE_CHANGED_SIGNAL = 'changed'
+
+  def _create_widget(self, setting, **kwargs):
+    return gui_widgets_.DirectoryChooser(initial_directory=setting.value)
+
+  def get_value(self):
+    return self._widget.get_directory()
+
+  def _set_value(self, value):
+    self._widget.set_directory(value)
 
 
 class DimensionBoxPresenter(setting_.GtkPresenter):

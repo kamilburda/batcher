@@ -21,6 +21,7 @@ from src import utils
 utils.initialize_i18n()
 
 from config import CONFIG
+from src import directory as directory_
 from src import itemtree
 from src import plugin_settings
 from src import utils_itemtree as utils_itemtree_
@@ -170,7 +171,7 @@ def main():
 def take_screenshots_for_convert(gui, dialog, settings):
   decoration_offsets = move_dialog_to_corner(dialog, settings['gui/size/dialog_position'])
 
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+  settings['main/output_directory'].set_value(directory_.Directory(OUTPUT_DIRPATH))
 
   _wait_until_preview_is_updated(n_repetitions=2)
 
@@ -198,7 +199,7 @@ def take_screenshots_for_export_images(gui, dialog, settings):
 
   _wait_until_preview_is_updated(n_repetitions=2)
 
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+  settings['main/output_directory'].set_value(directory_.Directory(OUTPUT_DIRPATH))
 
   dialog.set_focus(None)
 
@@ -225,7 +226,7 @@ def take_screenshots_for_export_images_quick(_gui, dialog, settings):
   while Gtk.events_pending():
     Gtk.main_iteration()
 
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+  settings['main/output_directory'].set_value(directory_.Directory(OUTPUT_DIRPATH))
 
   while Gtk.events_pending():
     Gtk.main_iteration()
@@ -268,7 +269,7 @@ def take_screenshots_for_export_layers(gui, dialog, settings):
 
   _wait_until_preview_is_updated(n_repetitions=2)
 
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+  settings['main/output_directory'].set_value(directory_.Directory(OUTPUT_DIRPATH))
 
   dialog.set_focus(None)
 
@@ -320,7 +321,7 @@ def take_screenshots_for_export_layers_quick(_gui, dialog, settings):
   while Gtk.events_pending():
     Gtk.main_iteration()
 
-  settings['main/output_directory'].set_value(Gio.file_new_for_path(OUTPUT_DIRPATH))
+  settings['main/output_directory'].set_value(directory_.Directory(OUTPUT_DIRPATH))
 
   while Gtk.events_pending():
     Gtk.main_iteration()

@@ -5,6 +5,7 @@ from .anchor_box import *
 from .cell_renderers import *
 from .coordinates_box import *
 from .dimension_box import *
+from .directory_chooser import *
 from .drag_and_drop_context import *
 from .editable_label import *
 from .file_chooser import *

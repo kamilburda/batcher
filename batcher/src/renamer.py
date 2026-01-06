@@ -405,12 +405,7 @@ def _get_output_directory(
     else:
       wrapper = '{}'
 
-  if batcher.output_directory is not None and batcher.output_directory.get_path() is not None:
-    output_dirpath = batcher.output_directory.get_path()
-  else:
-    output_dirpath = ''
-
-  path_components = pathlib.Path(output_dirpath).parts
+  path_components = pathlib.Path(batcher.output_directory.resolve(batcher)).parts
 
   if path_component_strip_mode.startswith('%b'):
     num_path_components_from_end = 1

@@ -14,6 +14,7 @@ from config import CONFIG
 from src import builtin_actions
 from src import commands
 from src import core
+from src import directory as directory_
 from src import itemtree
 from src import plugin_settings
 from src import utils
@@ -92,7 +93,7 @@ class TestConvertCompareContents(unittest.TestCase):
         expected_results_dirpath=None,
   ):
     settings = plugin_settings.create_settings_for_convert()
-    settings['main/output_directory'].set_value(Gio.file_new_for_path(self.output_dirpath))
+    settings['main/output_directory'].set_value(directory_.Directory(self.output_dirpath))
     settings['main/file_extension'].set_value('png')
 
     if expected_results_dirpath is None:

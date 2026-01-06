@@ -11,6 +11,7 @@ from gi.repository import Gio
 
 from src import builtin_commands_common
 from src import constants
+from src import directory as directory_
 from src import exceptions
 from src import file_formats as file_formats_
 from src import initnotifier
@@ -81,7 +82,7 @@ class ExportAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, batcher: 'src.core.Batcher', **kwargs):
-    self._output_directory = Gio.file_new_for_path(utils.get_default_dirpath())
+    self._output_directory = directory_.Directory()
     self._file_extension = 'png'
     self._file_format_mode = FileFormatModes.USE_EXPLICIT_VALUES
     self._file_format_export_options = {}
@@ -407,7 +408,7 @@ def _export_item(
       use_original_modification_date,
       logger,
 ):
-  output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory)
+  output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory.resolve(batcher))
   file_extension = fileext.get_file_extension(builtin_actions_utils.get_item_export_name(item))
   export_status = ExportStatuses.NOT_EXPORTED_YET
 
@@ -788,15 +789,10 @@ EXPORT_FOR_CONVERT_DICT = {
   'display_options_on_create': True,
   'arguments': [
     {
-      'type': 'file',
+      'type': 'directory',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
-      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'default_value': None,
       'display_name': _('Output folder'),
-      'set_default_if_not_exists': True,
-      'gui_type_kwargs': {
-        'show_clear_button': False,
-      },
     },
     {
       'type': 'file_extension',

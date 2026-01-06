@@ -11,7 +11,9 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GLib
+from gi.repository import GObject
 
+from src import directory as directory_
 from src import file_formats as file_formats_
 from src import itemtree
 from src import placeholders as placeholders_
@@ -25,6 +27,7 @@ __all__ = [
   'ValidatableStringSetting',
   'FileExtensionSetting',
   'NamePatternSetting',
+  'DirectorySetting',
   'DimensionSetting',
   'AngleSetting',
   'AnchorSetting',
@@ -135,6 +138,99 @@ class NamePatternSetting(setting_.StringSetting):
       self._value = self._default_value
     else:
       self._value = value
+
+
+class DirectorySetting(setting_.Setting):
+  """Class for settings storing directories as `src.directory.Directory`
+  instances.
+
+  Allowed GIMP PDB types:
+  * `Gio.File`
+
+  Default value:
+    A default directory as returned by `src.directory.Directory()`.
+  """
+
+  SPECIAL_VALUE_URI_PREFIX = 'special:///'
+  """Sentinel string used to differentiate special directory values from other
+  paths, such as file system paths or network paths.
+  
+  This string is prepended when saving this setting with a special directory
+  value as the setting value.
+
+  The sentinel string does not match any possible existing file paths as e.g.
+  the ``file:///`` prefix is prepended to file system paths when saving.
+  """
+
+  _DEFAULT_DEFAULT_VALUE = lambda self: directory_.Directory()
+
+  _ALLOWED_PDB_TYPES = [Gio.File]
+
+  _REGISTRABLE_TYPE_NAME = 'file'
+
+  _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.directory_chooser]
+
+  def _raw_to_value(self, raw_value):
+    if raw_value is None:
+      return directory_.Directory()
+    elif isinstance(raw_value, Gio.File):
+      return self._file_to_directory(raw_value)
+    elif isinstance(raw_value, str):
+      return self._str_to_directory(raw_value)
+    else:
+      return raw_value
+
+  def _value_to_raw(self, value):
+    if value.type_ == directory_.DirectoryTypes.SPECIAL:
+      return Gio.file_new_for_uri(f'{self.SPECIAL_VALUE_URI_PREFIX}{value.value}').get_uri()
+    else:
+      return Gio.file_new_for_uri(value.value).get_uri()
+
+  def _validate(self, value):
+    if value is None or not isinstance(value, (directory_.Directory, Gio.File, str)):
+      return 'invalid directory', 'invalid_value'
+
+  def _get_pdb_param(self):
+    return [
+      self._REGISTRABLE_TYPE_NAME,
+      self._pdb_name,
+      self._display_name,
+      self._description,
+      Gimp.FileChooserAction.CREATE_FOLDER,
+      False,
+      self._value_to_raw(self._default_value),
+      GObject.ParamFlags.READWRITE,
+    ]
+
+  def _file_to_directory(self, file):
+    file_uri = file.get_uri()
+
+    if file_uri.startswith(self.SPECIAL_VALUE_URI_PREFIX):
+      special_value = file_uri[len(self.SPECIAL_VALUE_URI_PREFIX):]
+      if special_value in directory_.SPECIAL_VALUES:
+        return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
+      else:
+        return directory_.Directory()
+    else:
+      filepath = file.get_path()
+      if filepath is not None:
+        return directory_.Directory(filepath)
+      else:
+        return directory_.Directory()
+
+  def _str_to_directory(self, str_):
+    if str_.startswith(self.SPECIAL_VALUE_URI_PREFIX):
+      special_value = str_[len(self.SPECIAL_VALUE_URI_PREFIX):]
+      if special_value in directory_.SPECIAL_VALUES:
+        return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
+      else:
+        return directory_.Directory()
+    else:
+      filepath = Gio.file_new_for_uri(str_).get_path()
+      if filepath is not None:
+        return directory_.Directory(filepath)
+      else:
+        return directory_.Directory()
 
 
 class DimensionSetting(setting_.NumericSetting):

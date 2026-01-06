@@ -1,12 +1,12 @@
 import os
 
 import gi
-from gi.repository import Gio
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from config import CONFIG
+from src import directory as directory_
 from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
@@ -280,11 +280,11 @@ def _update_directory(setting, current_image, current_image_dirpath):
   If update was performed, ``True`` is returned, ``False`` otherwise.
   """
   if current_image_dirpath is not None:
-    setting.set_value(Gio.file_new_for_path(current_image_dirpath))
+    setting.set_value(directory_.Directory(current_image_dirpath))
     return True
 
   if current_image.get_file() is not None and current_image.get_file().get_path() is not None:
-    setting.set_value(Gio.file_new_for_path(os.path.dirname(current_image.get_file().get_path())))
+    setting.set_value(directory_.Directory(os.path.dirname(current_image.get_file().get_path())))
     return True
 
   return False
@@ -292,7 +292,8 @@ def _update_directory(setting, current_image, current_image_dirpath):
 
 def _set_up_output_directory_changed(settings, current_image):
   def on_output_directory_changed(output_directory, images_and_directories, current_image_):
-    images_and_directories.update_dirpath(current_image_, output_directory.value)
+    if output_directory.value.type_ == directory_.DirectoryTypes.DIRECTORY:
+      images_and_directories.update_dirpath(current_image_, output_directory.value.value)
 
   settings['main/output_directory'].connect_event(
     'value-changed',

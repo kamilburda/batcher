@@ -14,6 +14,7 @@ from config import CONFIG
 from src import builtin_actions
 from src import commands
 from src import core
+from src import directory as directory_
 from src import itemtree
 from src import plugin_settings
 from src import utils
@@ -129,7 +130,7 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
         additional_init_before_run=None,
   ):
     settings = plugin_settings.create_settings_for_export_layers()
-    settings['main/output_directory'].set_value(Gio.file_new_for_path(self.output_dirpath))
+    settings['main/output_directory'].set_value(directory_.Directory(self.output_dirpath))
     settings['main/file_extension'].set_value('xcf')
     
     if expected_results_dirpath is None:

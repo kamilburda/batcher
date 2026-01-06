@@ -3,7 +3,6 @@
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
-from gi.repository import Gio
 
 from config import CONFIG
 from src import builtin_actions
@@ -70,15 +69,10 @@ def create_settings_for_convert():
       'gui_type': None,
     },
     {
-      'type': 'file',
+      'type': 'directory',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
-      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'default_value': None,
       'display_name': _('Output folder'),
-      'set_default_if_not_exists': True,
-      'gui_type_kwargs': {
-        'show_clear_button': False,
-      },
     },
     {
       'type': 'name_pattern',
@@ -232,15 +226,10 @@ def create_settings_for_export_images():
       'gui_type': None,
     },
     {
-      'type': 'file',
+      'type': 'directory',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
-      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'default_value': None,
       'display_name': _('Output folder'),
-      'set_default_if_not_exists': True,
-      'gui_type_kwargs': {
-        'show_clear_button': False,
-      },
     },
     {
       'type': 'name_pattern',
@@ -483,15 +472,10 @@ def create_settings_for_export_layers():
       'gui_type': None,
     },
     {
-      'type': 'file',
+      'type': 'directory',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
-      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'default_value': None,
       'display_name': _('Output folder'),
-      'set_default_if_not_exists': True,
-      'gui_type_kwargs': {
-        'show_clear_button': False,
-      },
     },
     {
       'type': 'name_pattern',

@@ -10,7 +10,6 @@ from gi.repository import Gio
 
 from src import builtin_commands_common
 from src import invoker as invoker_
-from src import utils
 from src.path import validators as validators_
 from src.procedure_groups import *
 from src.pypdb import pdb
@@ -74,20 +73,18 @@ class SaveAction(invoker_.CallableCommand):
       image_file = image_xcf_file
 
       new_image_file = Gio.file_new_for_path(
-        builtin_actions_utils.get_item_filepath(
-          item,
-          Gio.file_new_for_path(os.path.dirname(image_file.get_path())),
-        ))
+        builtin_actions_utils.get_item_filepath(item, os.path.dirname(image_file.get_path())))
 
       if not image_file.equal(new_image_file):
         image_file = new_image_file
         should_set_new_image_file = True
     else:
       image_file = Gio.file_new_for_path(
-        builtin_actions_utils.get_item_filepath(item, output_directory))
+        builtin_actions_utils.get_item_filepath(item, output_directory.resolve(batcher)))
 
     if image_file.get_path() is not None:
       os.makedirs(os.path.dirname(image_file.get_path()), exist_ok=True)
+
     pdb.gimp_xcf_save(run_mode=Gimp.RunMode.NONINTERACTIVE, image=image, file=image_file)
 
     if should_set_new_image_file:
@@ -121,16 +118,10 @@ SAVE_DICT = {
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'arguments': [
     {
-      'type': 'file',
+      'type': 'directory',
       'name': 'output_directory',
-      'default_value': Gio.file_new_for_path(utils.get_default_dirpath()),
-      'action': Gimp.FileChooserAction.SELECT_FOLDER,
+      'default_value': None,
       'display_name': _('Output folder'),
-      'none_ok': False,
-      'set_default_if_not_exists': True,
-      'gui_type_kwargs': {
-        'show_clear_button': False,
-      },
     },
     {
       'type': 'bool',

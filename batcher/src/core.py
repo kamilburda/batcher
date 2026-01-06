@@ -20,6 +20,7 @@ from src import builtin_commands_common
 from src import builtin_conditions
 from src import commands
 from src import constants
+from src import directory as directory_
 from src import exceptions
 from src import invoker as invoker_
 from src import itemtree
@@ -54,7 +55,7 @@ class Batcher(metaclass=abc.ABCMeta):
         continue_on_error: bool = False,
         import_options: Dict[str, Any] = None,
         initial_export_run_mode: Gimp.RunMode = Gimp.RunMode.WITH_LAST_VALS,
-        output_directory: Gio.File = Gio.file_new_for_path(utils.get_default_dirpath()),
+        output_directory: directory_.Directory = directory_.Directory(),
         name_pattern: str = '',
         file_extension: str = 'png',
         overwrite_mode: str = overwrite.OverwriteModes.RENAME_NEW,
@@ -206,7 +207,7 @@ class Batcher(metaclass=abc.ABCMeta):
     return self._initial_export_run_mode
 
   @property
-  def output_directory(self) -> Gio.File:
+  def output_directory(self) -> directory_.Directory:
     """Output directory to save exported items to."""
     return self._output_directory
 
