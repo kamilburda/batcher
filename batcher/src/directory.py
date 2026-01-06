@@ -96,7 +96,6 @@ def get_special_values():
 
 
 def _get_top_level_directory(batcher):
-  # TODO: Make this work for Export Images
   if batcher.current_item.parents:
     return os.path.dirname(batcher.current_item.parents[0].id)
   else:
@@ -116,6 +115,6 @@ _SPECIAL_VALUES = {
     'match_input_folders',
     _('Match input folders'),
     _get_top_level_directory,
-    [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+    [CONVERT_GROUP],
   ),
 }
