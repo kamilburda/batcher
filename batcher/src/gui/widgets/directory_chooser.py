@@ -119,8 +119,7 @@ class DirectoryChooser(Gtk.Box):
 
     self._button_browse = Gtk.Button(
       image=Gtk.Image.new_from_icon_name('folder', Gtk.IconSize.BUTTON),
-      # TODO: make string translatable
-      tooltip_text='Browse',
+      tooltip_text=_('Browse'),
     )
 
     self.pack_start(self._combo_box, True, True, 0)
@@ -139,8 +138,7 @@ class DirectoryChooser(Gtk.Box):
 
   def _on_button_browse_clicked(self, _button):
     file_dialog = Gtk.FileChooserNative(
-      # TODO: make string translatable
-      title='Select a Folder',
+      title=_('Select a Folder'),
       action=Gtk.FileChooserAction.SELECT_FOLDER,
       do_overwrite_confirmation=True,
       modal=True,
