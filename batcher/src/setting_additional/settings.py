@@ -187,7 +187,7 @@ class DirectorySetting(setting_.Setting):
       return Gio.file_new_for_uri(value.value).get_uri()
 
   def _validate(self, value):
-    if value is None or not isinstance(value, (directory_.Directory, Gio.File, str)):
+    if value is None or not isinstance(value, directory_.Directory):
       return 'invalid directory', 'invalid_value'
 
   def _get_pdb_param(self):
@@ -204,6 +204,9 @@ class DirectorySetting(setting_.Setting):
 
   def _file_to_directory(self, file):
     file_uri = file.get_uri()
+
+    if file_uri is None:
+      return directory_.Directory()
 
     if file_uri.startswith(self.SPECIAL_VALUE_URI_PREFIX):
       special_value = file_uri[len(self.SPECIAL_VALUE_URI_PREFIX):]
