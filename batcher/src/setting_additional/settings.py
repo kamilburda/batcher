@@ -210,10 +210,7 @@ class DirectorySetting(setting_.Setting):
 
     if file_uri.startswith(self.SPECIAL_VALUE_URI_PREFIX):
       special_value = file_uri[len(self.SPECIAL_VALUE_URI_PREFIX):]
-      if special_value in directory_.SPECIAL_VALUES:
-        return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
-      else:
-        return directory_.Directory()
+      return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
     else:
       filepath = file.get_path()
       if filepath is not None:
@@ -224,10 +221,7 @@ class DirectorySetting(setting_.Setting):
   def _str_to_directory(self, str_):
     if str_.startswith(self.SPECIAL_VALUE_URI_PREFIX):
       special_value = str_[len(self.SPECIAL_VALUE_URI_PREFIX):]
-      if special_value in directory_.SPECIAL_VALUES:
-        return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
-      else:
-        return directory_.Directory()
+      return directory_.Directory(special_value, type_=directory_.DirectoryTypes.SPECIAL)
     else:
       filepath = Gio.file_new_for_uri(str_).get_path()
       if filepath is not None:
