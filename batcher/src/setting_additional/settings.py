@@ -148,7 +148,7 @@ class DirectorySetting(setting_.Setting):
   * `Gio.File`
 
   Default value:
-    A default directory as returned by `src.directory.Directory()`.
+    An `src.directory.Directory()` instance, representing a default directory.
   """
 
   SPECIAL_VALUE_URI_PREFIX = 'special:///'
