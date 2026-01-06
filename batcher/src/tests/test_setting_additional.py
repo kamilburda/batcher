@@ -6,9 +6,13 @@ import unittest.mock as mock
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+from gi.repository import Gio
 
+from config import CONFIG
+from src import directory as directory_
 from src import setting as setting_
 from src import setting_additional
+from src.procedure_groups import *
 
 from src.tests import stubs_gimp
 
@@ -47,6 +51,75 @@ class TestFileExtensionSetting(unittest.TestCase):
     setting.set_value('.jpg')
 
     self.assertEqual(setting.value, 'jpg')
+
+
+class TestDirectorySetting(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    CONFIG.PROCEDURE_GROUP = CONVERT_GROUP
+
+  @classmethod
+  def tearDownClass(cls):
+    CONFIG.PROCEDURE_GROUP = CONFIG.PLUGIN_NAME
+
+  def setUp(self):
+    self.setting = setting_additional.DirectorySetting('directory', default_value=None)
+
+  def test_none_on_init_is_changed_to_default_value(self):
+    default_directory = directory_.Directory()
+
+    self.assertEqual(self.setting.value.value, default_directory.value)
+    self.assertEqual(self.setting.value.type_, default_directory.type_)
+
+  def test_set_value_from_none(self):
+    default_directory = directory_.Directory()
+
+    self.setting.set_value(None)
+
+    self.assertEqual(self.setting.value.value, default_directory.value)
+    self.assertEqual(self.setting.value.type_, default_directory.type_)
+
+  def test_set_value_from_directory(self):
+    self.setting.set_value(directory_.Directory('some_directory'))
+
+    self.assertEqual(self.setting.value.value, 'some_directory')
+    self.assertEqual(self.setting.value.type_, directory_.DirectoryTypes.DIRECTORY)
+
+  def test_set_value_from_file(self):
+    file = Gio.file_new_for_path('some_directory')
+
+    self.setting.set_value(file)
+
+    self.assertEqual(self.setting.value.value, file.get_path())
+    self.assertEqual(self.setting.value.type_, directory_.DirectoryTypes.DIRECTORY)
+
+  def test_set_value_from_file_with_special_value(self):
+    file = Gio.file_new_for_uri(
+      f'{setting_additional.DirectorySetting.SPECIAL_VALUE_URI_PREFIX}match_input_folders')
+
+    self.setting.set_value(file)
+
+    self.assertEqual(self.setting.value.value, 'match_input_folders')
+    self.assertEqual(self.setting.value.type_, directory_.DirectoryTypes.SPECIAL)
+
+  def test_set_value_from_string(self):
+    file = Gio.file_new_for_path(os.path.abspath('some_directory'))
+
+    self.setting.set_value(file.get_uri())
+
+    self.assertEqual(self.setting.value.value, file.get_path())
+    self.assertEqual(self.setting.value.type_, directory_.DirectoryTypes.DIRECTORY)
+
+  def test_set_value_from_string_with_special_value(self):
+    file = Gio.file_new_for_uri(
+      f'{setting_additional.DirectorySetting.SPECIAL_VALUE_URI_PREFIX}match_input_folders'
+    )
+
+    self.setting.set_value(file.get_uri())
+
+    self.assertEqual(self.setting.value.value, 'match_input_folders')
+    self.assertEqual(self.setting.value.type_, directory_.DirectoryTypes.SPECIAL)
 
 
 @mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
