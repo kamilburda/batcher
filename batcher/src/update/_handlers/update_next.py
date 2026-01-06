@@ -8,6 +8,8 @@ def update(data, _settings, _procedure_groups):
   main_settings_list, _index = update_utils_.get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    _update_output_directory_setting(main_settings_list)
+
     export_settings_list, _index = update_utils_.get_child_group_list(main_settings_list, 'export')
     if export_settings_list is not None:
       _update_export_procedure(export_settings_list)
@@ -32,10 +34,28 @@ def update(data, _settings, _procedure_groups):
         if (orig_name_setting_dict['value'].startswith('export_for_')
             and arguments_list is not None):
           _update_export_procedure(arguments_list)
+          _update_output_directory_setting(arguments_list)
+
+        if (orig_name_setting_dict['value'] == 'save'
+            and arguments_list is not None):
+          _update_output_directory_setting(arguments_list)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
   _change_gui_type_for_show_original_item_names(gui_settings_list)
+
+
+def _update_output_directory_setting(group_list):
+  output_directory_dict, _index = update_utils_.get_child_setting(group_list, 'output_directory')
+
+  if output_directory_dict is not None:
+    output_directory_dict['type'] = 'directory'
+    output_directory_dict['default_value'] = None
+    output_directory_dict.pop('action', None)
+    output_directory_dict.pop('gui_type', None)
+    output_directory_dict.pop('gui_type_kwargs', None)
+    output_directory_dict.pop('none_ok', None)
+    output_directory_dict.pop('set_default_if_not_exists', None)
 
 
 def _update_export_procedure(export_settings_list):

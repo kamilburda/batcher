@@ -10,8 +10,6 @@ def assert_contents(test_case, settings, _orig_setting_values):
   test_case.assertNotIn('procedures', settings['main'])
   test_case.assertNotIn('constraints', settings['main'])
 
-  test_case.assertEqual(settings['main/output_directory'].set_default_if_not_exists, True)
-
   for command in settings['main/actions']:
     test_case.assertNotIn('action_groups', command)
     test_case.assertIn('command_groups', command)
