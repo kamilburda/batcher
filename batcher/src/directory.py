@@ -4,13 +4,14 @@ The directory defined allows storing special values that can be used in the
 client code to dynamically resolve a directory.
 """
 
-from typing import Callable, Union
+from typing import Callable, List, Union
 import dataclasses
 import os
 
 from gi.repository import Gio
 
 from src import utils
+from src.procedure_groups import *
 
 
 class DirectoryTypes:
@@ -72,17 +73,30 @@ class Directory:
     if self.type_ == DirectoryTypes.DIRECTORY:
       return self.value
     elif self.type_ == DirectoryTypes.SPECIAL:
-      if self.value in SPECIAL_VALUES:
-        return SPECIAL_VALUES[self.value].resolve_func(batcher)
+      special_values = get_special_values()
+      if self.value in special_values:
+        return special_values[self.value].resolve_func(batcher)
       else:
         return self.value
     else:
       raise ValueError(f'unrecognized/unsupported directory type: {self.type_}')
 
 
+def get_special_values():
+  """Returns a list of allowed special values given the currently running
+  plug-in procedure.
+  """
+  # We import `CONFIG` here to avoid circular imports.
+  from config import CONFIG
+
+  return {
+    name: special_value for name, special_value in _SPECIAL_VALUES.items()
+    if CONFIG.PROCEDURE_GROUP in special_value.procedure_groups
+  }
+
+
 def _get_top_level_directory(batcher):
   # TODO: Make this work for Export Images
-  # TODO: Make this work for Edit and Save Images
   if batcher.current_item.parents:
     return os.path.dirname(batcher.current_item.parents[0].id)
   else:
@@ -94,9 +108,14 @@ class SpecialValue:
   name: str
   display_name: str
   resolve_func: Callable
+  procedure_groups: List[str]
 
 
-SPECIAL_VALUES = {
+_SPECIAL_VALUES = {
   'match_input_folders': SpecialValue(
-    'match_input_folders', _('Match input folders'), _get_top_level_directory),
+    'match_input_folders',
+    _('Match input folders'),
+    _get_top_level_directory,
+    [CONVERT_GROUP, EXPORT_IMAGES_GROUP],
+  ),
 }

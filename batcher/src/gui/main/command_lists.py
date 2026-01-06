@@ -711,7 +711,7 @@ def _set_display_name_for_save_action(
 ):
   if output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL:
     special_value_name = output_directory_setting.value.value
-    special_value = directory_.SPECIAL_VALUES.get(special_value_name)
+    special_value = directory_.get_special_values().get(special_value_name)
 
     if special_value is not None:
       save_action['display_name'].set_value(_('Save using: {}').format(special_value.display_name))
