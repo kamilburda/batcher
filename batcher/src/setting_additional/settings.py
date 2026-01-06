@@ -198,7 +198,7 @@ class DirectorySetting(setting_.Setting):
       self._description,
       Gimp.FileChooserAction.CREATE_FOLDER,
       False,
-      self._value_to_raw(self._default_value),
+      Gio.file_new_for_uri(self._value_to_raw(self._default_value)),
       GObject.ParamFlags.READWRITE,
     ]
 
