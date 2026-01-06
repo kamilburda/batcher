@@ -90,8 +90,9 @@ class DirectoryChooser(Gtk.Box):
     self._folder_icon = gui_utils_.get_icon_pixbuf('folder', self._combo_box, Gtk.IconSize.MENU)
 
     special_values = directory_.get_special_values()
+    default_directory = directory_.Directory()
 
-    self._model.append(['', True, self._folder_icon, directory_.Directory()])
+    self._model.append([default_directory.value, True, self._folder_icon, default_directory])
     self._model.append(['', bool(special_values), None, self._ROW_SEPARATOR])
 
     for name, special_value in special_values.items():
