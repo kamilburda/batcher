@@ -14,6 +14,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
 
+from config import CONFIG
 from src import itemtree
 from src import overwrite
 from src import setting as setting_
@@ -26,6 +27,7 @@ from src.gui.preview import image as preview_image_
 from src.gui.preview import name as preview_name_
 from src.gui.widgets import drag_and_drop_context as drag_and_drop_context_
 from src.path import fileext
+from src.procedure_groups import *
 
 from . import _utils as gui_main_utils_
 
@@ -102,6 +104,9 @@ class Previews:
         )
         if self._settings['gui/image_preview_displayed_items'].active_items else None),
     )
+
+    if CONFIG.PROCEDURE_GROUP == CONVERT_GROUP:
+      self._name_preview.set_tooltip()
 
     self._batcher_for_image_preview = gui_main_utils_.get_batcher_class(self._item_type)(
       # This is an empty tree that will be replaced during the preview anyway.

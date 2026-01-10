@@ -121,9 +121,6 @@ class BatchProcessingGui:
       parent=self._dialog,
     )
 
-    if CONFIG.PROCEDURE_GROUP == CONVERT_GROUP:
-      self._previews.name_preview.set_tooltip()
-
     if self._mode == 'export':
       self._export_settings = export_settings_.ExportSettings(
         self._settings,
