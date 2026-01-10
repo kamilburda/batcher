@@ -1,5 +1,6 @@
 """Widget for choosing a directory."""
 
+from collections.abc import Iterable
 from typing import Optional
 
 import gi
@@ -54,10 +55,13 @@ class DirectoryChooser(Gtk.Box):
   def __init__(
         self,
         initial_directory: Optional[directory_.Directory] = None,
+        procedure_groups: Optional[Iterable[str]] = None,
         *args,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
+
+    self._procedure_groups = procedure_groups
 
     self._can_emit_changed_signal = True
 
@@ -89,7 +93,7 @@ class DirectoryChooser(Gtk.Box):
 
     self._folder_icon = gui_utils_.get_icon_pixbuf('folder', self._combo_box, Gtk.IconSize.MENU)
 
-    special_values = directory_.get_special_values()
+    special_values = directory_.get_special_values(self._procedure_groups)
     default_directory = directory_.Directory()
 
     self._model.append([default_directory.value, True, self._folder_icon, default_directory])

@@ -4,9 +4,10 @@ The directory defined allows storing special values that can be used in the
 client code to dynamically resolve a directory.
 """
 
-from typing import Callable, List, Union
+from collections.abc import Iterable
 import dataclasses
 import os
+from typing import Callable, List, Optional, Union
 
 from gi.repository import Gio
 
@@ -82,17 +83,32 @@ class Directory:
       raise ValueError(f'unrecognized/unsupported directory type: {self.type_}')
 
 
-def get_special_values():
+def get_special_values(procedure_groups: Optional[Iterable[str]] = None):
   """Returns a list of allowed special values given the currently running
   plug-in procedure.
+
+  ``procedure_groups`` further limits the list of possible special values
+  with a narrower set of procedure groups. See `src.procedure_groups` for
+  possible values.
+
+  ``procedure_groups`` has no effect in `Directory.resolve()`, but
+  can still be used to hide special values not applicable for a particular
+  group of `Directory` instances from the user.
   """
   # We import `CONFIG` here to avoid circular imports.
   from config import CONFIG
 
-  return {
-    name: special_value for name, special_value in _SPECIAL_VALUES.items()
-    if CONFIG.PROCEDURE_GROUP in special_value.procedure_groups
-  }
+  special_values_to_return = {}
+  for name, special_value in _SPECIAL_VALUES.items():
+    if procedure_groups is None:
+      processed_procedure_groups = special_value.procedure_groups
+    else:
+      processed_procedure_groups = set(special_value.procedure_groups) & set(procedure_groups)
+
+    if CONFIG.PROCEDURE_GROUP in processed_procedure_groups:
+      special_values_to_return[name] = special_value
+
+  return special_values_to_return
 
 
 def _get_top_level_directory(batcher):

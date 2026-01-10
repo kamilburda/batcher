@@ -71,7 +71,10 @@ class DirectoryChooserPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'changed'
 
   def _create_widget(self, setting, **kwargs):
-    return gui_widgets_.DirectoryChooser(initial_directory=setting.value)
+    return gui_widgets_.DirectoryChooser(
+      initial_directory=setting.value,
+      procedure_groups=setting.procedure_groups,
+    )
 
   def get_value(self):
     return self._widget.get_directory()

@@ -4,7 +4,7 @@ import abc
 import collections
 from collections.abc import Iterable
 import os
-from typing import Callable, Dict, List, Type, Union
+from typing import Callable, Dict, List, Optional, Type, Union
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -169,6 +169,24 @@ class DirectorySetting(setting_.Setting):
   _REGISTRABLE_TYPE_NAME = 'file'
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.directory_chooser]
+
+  def __init__(self, name, procedure_groups: Optional[Iterable[str]] = None, **kwargs):
+    """Additional parameters:
+
+    procedure_groups:
+      A list of procedure groups that further limits the plug-in procedures the
+      special values can be applied to. This allows limiting special values on
+      a per-setting basis. See `src.procedure_groups` for possible values.
+      ``None`` indicates that no limitation should be imposed. An empty list
+      indicates that the special values are not allowed in any procedure group.
+    """
+    self._procedure_groups = procedure_groups
+
+    super().__init__(name, **kwargs)
+
+  @property
+  def procedure_groups(self) -> Union[Iterable[str], None]:
+    return self._procedure_groups
 
   def _raw_to_value(self, raw_value):
     if raw_value is None:
