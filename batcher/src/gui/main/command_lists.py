@@ -684,12 +684,12 @@ def _set_buttons_for_command_item_sensitive(item, sensitive):
 
 def _handle_save_action_item_added(item):
   _set_display_name_for_save_action(
-    item.command['arguments/save_existing_image_to_its_original_location'],
+    item.command['arguments/output_directory_for_new_images'],
     item.command['arguments/output_directory'],
     item.command,
   )
 
-  item.command['arguments/save_existing_image_to_its_original_location'].connect_event(
+  item.command['arguments/output_directory_for_new_images'].connect_event(
     'value-changed',
     _set_display_name_for_save_action,
     item.command['arguments/output_directory'],
@@ -699,13 +699,13 @@ def _handle_save_action_item_added(item):
   item.command['arguments/output_directory'].connect_event(
     'value-changed',
     _set_display_name_for_save_action_for_output_directory,
-    item.command['arguments/save_existing_image_to_its_original_location'],
+    item.command['arguments/output_directory_for_new_images'],
     item.command,
   )
 
 
 def _set_display_name_for_save_action(
-      save_existing_image_to_its_original_location_setting,
+      output_directory_for_new_images_setting,
       output_directory_setting,
       save_action,
 ):
@@ -714,26 +714,24 @@ def _set_display_name_for_save_action(
     special_value = directory_.get_special_values().get(special_value_name)
 
     if special_value is not None:
-      save_action['display_name'].set_value(_('Save using: {}').format(special_value.display_name))
+      dirname = os.path.basename(output_directory_for_new_images_setting.value.value)
+      save_action['display_name'].set_value(
+        _('Save (new and imported images to "{}")').format(dirname))
     else:
       save_action['display_name'].set_value(_('Save'))
   else:
     output_dirname = os.path.basename(output_directory_setting.value.value)
 
-    if save_existing_image_to_its_original_location_setting.value:
-      save_action['display_name'].set_value(
-        _('Save (imported images to "{}")').format(output_dirname))
-    else:
-      save_action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
+    save_action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
 
 
 def _set_display_name_for_save_action_for_output_directory(
       output_directory_setting,
-      save_existing_image_to_its_original_location_setting,
+      output_directory_for_new_images_setting,
       save_action,
 ):
   _set_display_name_for_save_action(
-    save_existing_image_to_its_original_location_setting,
+    output_directory_for_new_images_setting,
     output_directory_setting,
     save_action,
   )

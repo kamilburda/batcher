@@ -39,6 +39,7 @@ def update(data, _settings, _procedure_groups):
         if (orig_name_setting_dict['value'] == 'save'
             and arguments_list is not None):
           _update_output_directory_setting(arguments_list)
+          _save_replace_save_existing_image_to_its_original_location_argument(arguments_list)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
@@ -76,16 +77,14 @@ def _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
   setting_dict, _index = update_utils_.get_child_setting(
     export_settings_list, 'rotate_flip_image_based_on_exif_metadata')
 
-  if setting_dict is not None:
-    return
-
-  export_settings_list.append({
-    'type': 'bool',
-    'name': 'rotate_flip_image_based_on_exif_metadata',
-    'default_value': True,
-    'value': True,
-    'display_name': _('Rotate and flip image based on Exif metadata'),
-  })
+  if setting_dict is None:
+    export_settings_list.append({
+      'type': 'bool',
+      'name': 'rotate_flip_image_based_on_exif_metadata',
+      'default_value': True,
+      'value': True,
+      'display_name': _('Rotate and flip image based on Exif metadata'),
+    })
 
 
 def _change_active_file_format_to_dict(file_format_export_options_dict):
@@ -181,3 +180,24 @@ def _change_gui_type_for_show_original_item_names(gui_settings_list):
 
   if show_original_item_names_dict is not None:
     show_original_item_names_dict['gui_type'] = 'check_menu_item'
+
+
+def _save_replace_save_existing_image_to_its_original_location_argument(argument_list):
+  argument_dict, index = update_utils_.get_child_setting(
+    argument_list, 'save_existing_image_to_its_original_location')
+
+  if argument_dict is not None:
+    argument_list.pop(index)
+
+  argument_dict, index = update_utils_.get_child_setting(
+    argument_list, 'output_directory_for_new_images')
+
+  if argument_dict is None:
+    argument_list.append({
+      'type': 'directory',
+      'name': 'output_directory_for_new_images',
+      'default_value': 'special:///use_original_location',
+      'value': 'special:///use_original_location',
+      'display_name': _('Output folder for new images'),
+      'procedure_groups': [],
+    })

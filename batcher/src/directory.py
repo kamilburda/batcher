@@ -118,6 +118,20 @@ def _get_top_level_directory(batcher):
     return os.path.dirname(batcher.current_item.id)
 
 
+def _get_dirpath_from_current_image_xcf_file(batcher):
+  image_xcf_file = batcher.current_image.get_xcf_file()
+
+  if image_xcf_file is None:
+    return None
+
+  image_filepath = image_xcf_file.get_path()
+
+  if image_filepath is None:
+    return None
+
+  return os.path.dirname(image_filepath)
+
+
 @dataclasses.dataclass(frozen=True)
 class SpecialValue:
   name: str
@@ -132,5 +146,11 @@ _SPECIAL_VALUES = {
     _('Match input folders'),
     _get_top_level_directory,
     [CONVERT_GROUP],
+  ),
+  'use_original_location': SpecialValue(
+    'use_original_location',
+    _('Use original location (override)'),
+    _get_dirpath_from_current_image_xcf_file,
+    [EDIT_AND_SAVE_IMAGES_GROUP],
   ),
 }

@@ -9,6 +9,7 @@ from gi.repository import Gimp
 from gi.repository import Gio
 
 from src import builtin_commands_common
+from src import directory as directory_
 from src import invoker as invoker_
 from src.path import validators as validators_
 from src.procedure_groups import *
@@ -19,6 +20,7 @@ from . import _utils as builtin_actions_utils
 
 __all__ = [
   'SaveAction',
+  'on_after_add_save_action',
 ]
 
 
@@ -32,7 +34,7 @@ class SaveAction(invoker_.CallableCommand):
         self,
         batcher,
         output_directory,
-        save_existing_image_to_its_original_location,
+        output_directory_for_new_images,
   ):
     self._images_to_reset_dirty_state_for = []
 
@@ -46,7 +48,7 @@ class SaveAction(invoker_.CallableCommand):
         self,
         batcher,
         output_directory,
-        save_existing_image_to_its_original_location,
+        output_directory_for_new_images,
   ):
     if not batcher.process_export:
       return
@@ -54,11 +56,7 @@ class SaveAction(invoker_.CallableCommand):
     image = batcher.current_image
     item = batcher.current_item
 
-    image_xcf_file = image.get_xcf_file()
-
-    save_to_original_folder = (
-      image_xcf_file is not None and save_existing_image_to_its_original_location)
-    should_set_new_image_file = not save_to_original_folder
+    orig_image_file = image.get_xcf_file()
 
     if not item.name.endswith(_XCF_FILE_EXTENSION):
       image_filename = f'{item.name}{_XCF_FILE_EXTENSION}'
@@ -69,26 +67,23 @@ class SaveAction(invoker_.CallableCommand):
     builtin_actions_utils.set_item_export_name(item, image_filename)
     _validate_name(item)
 
-    if save_to_original_folder:
-      image_file = image_xcf_file
+    output_dirpath = output_directory.resolve(batcher)
 
-      new_image_file = Gio.file_new_for_path(
-        builtin_actions_utils.get_item_filepath(item, os.path.dirname(image_file.get_path())))
+    if output_dirpath is None:
+      # This should always resolve to a fixed directory as this parameter has no
+      # special value allowed.
+      output_dirpath = output_directory_for_new_images.resolve(batcher)
 
-      if not image_file.equal(new_image_file):
-        image_file = new_image_file
-        should_set_new_image_file = True
-    else:
-      image_file = Gio.file_new_for_path(
-        builtin_actions_utils.get_item_filepath(item, output_directory.resolve(batcher)))
+    new_image_file = Gio.file_new_for_path(
+      builtin_actions_utils.get_item_filepath(item, output_dirpath))
 
-    if image_file.get_path() is not None:
-      os.makedirs(os.path.dirname(image_file.get_path()), exist_ok=True)
+    if new_image_file.get_path() is not None:
+      os.makedirs(os.path.dirname(new_image_file.get_path()), exist_ok=True)
 
-    pdb.gimp_xcf_save(run_mode=Gimp.RunMode.NONINTERACTIVE, image=image, file=image_file)
+    pdb.gimp_xcf_save(run_mode=Gimp.RunMode.NONINTERACTIVE, image=image, file=new_image_file)
 
-    if should_set_new_image_file:
-      image.set_file(image_file)
+    if orig_image_file is not None and not orig_image_file.equal(new_image_file):
+      image.set_file(new_image_file)
 
     self._images_to_reset_dirty_state_for.append(image)
 
@@ -107,28 +102,53 @@ def _reset_dirty_state_of_images_after_cleanup(_batcher, images_to_reset_dirty_s
   images_to_reset_dirty_state_for.clear()
 
 
+def on_after_add_save_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'save':
+    action['arguments/output_directory'].connect_event(
+      'value-changed',
+      _set_visible_for_output_directory_for_new_images_setting,
+      action['arguments/output_directory_for_new_images'],
+    )
+
+    _set_visible_for_output_directory_for_new_images_setting(
+      action['arguments/output_directory'],
+      action['arguments/output_directory_for_new_images'],
+    )
+
+
+def _set_visible_for_output_directory_for_new_images_setting(
+      output_directory_setting,
+      output_directory_for_new_images_setting,
+):
+  is_visible = (
+    output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
+    and output_directory_setting.value.value == 'use_original_location')
+
+  output_directory_for_new_images_setting.gui.set_visible(is_visible)
+
+
 SAVE_DICT = {
   'name': 'save',
   'function': SaveAction,
   'display_name': _('Save'),
   'description': _(
-    'Saves the image in the native GIMP format (XCF). If the image already exists, it is'
-    ' overwritten. To export the image in another file format, use the "Export Images" menu.'),
+    'Saves the image in the native GIMP format (XCF). '
+    'To export the image in another file format, use the "Export Images" menu.'),
   'display_options_on_create': True,
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'arguments': [
     {
       'type': 'directory',
       'name': 'output_directory',
-      'default_value': None,
+      'default_value': 'special:///use_original_location',
       'display_name': _('Output folder'),
     },
     {
-      'type': 'bool',
-      'name': 'save_existing_image_to_its_original_location',
-      'default_value': True,
-      'display_name': _(
-        'Save existing XCF image to its original location (ignore "Output folder")'),
+      'type': 'directory',
+      'name': 'output_directory_for_new_images',
+      'default_value': None,
+      'display_name': _('Output folder for new and imported images'),
+      'procedure_groups': [],
     },
   ],
 }
