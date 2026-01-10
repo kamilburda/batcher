@@ -35,6 +35,7 @@ User interface changes:
 * The message area at the bottom now only spans the left part of the dialog to make more room for the preview. Also, the message area no longer takes empty space if no message is displayed.
 * Error message dialogs issued by GIMP are now always redirected to the GIMP's error console (https://docs.gimp.org/en/gimp-errors-dialog.html). This avoids spamming the same dialog when attempting to close the dialog and focusing back on the Batcher main dialog (#107).
 * Batch Convert: When loading a file fails (e.g. due to an unrecognized file format), the text below the preview now shows the message. You may still obtain warnings issued by GIMP (in the error console).
+* Batch Convert: Each row now displays the full path of an input image/folder as a tooltip.
 * Improved visual cues when reordering actions, conditions or array argument elements via drag-and-drop.
 * A simple summary message indicating the number of successfully processed images/layers is now displayed after the processing.
 * Marked names of common layer effect arguments as translatable.

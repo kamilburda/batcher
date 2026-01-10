@@ -61,6 +61,7 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
     _COLUMN_ITEM_NAME,
     _COLUMN_ITEM_KEY,
+    _COLUMN_ITEM_ID,
   ) = (
     [0, GdkPixbuf.Pixbuf],
     [1, GObject.TYPE_BOOLEAN],
@@ -68,6 +69,7 @@ class NamePreview(preview_base_.Preview):
     [3, GObject.TYPE_BOOLEAN],
     [4, GObject.TYPE_STRING],
     [5, GObject.TYPE_PYOBJECT],
+    [6, GObject.TYPE_STRING],
   )
 
   _ICON_XPAD = 2
@@ -269,6 +271,9 @@ class NamePreview(preview_base_.Preview):
     removed_items = self._batcher.item_tree.clear(return_removed=True)
 
     self.emit('preview-removed-items', removed_items)
+
+  def set_tooltip(self):
+    self._tree_view.set_tooltip_column(self._COLUMN_ITEM_ID[0])
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)
@@ -608,6 +613,7 @@ class NamePreview(preview_base_.Preview):
         color_tag_icon is not None,
         self._get_item_name(item),
         item.key,
+        str(item.id),
       ],
     )
 
