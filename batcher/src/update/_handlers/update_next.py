@@ -49,7 +49,7 @@ def update(data, _settings, _procedure_groups):
 def _update_output_directory_setting(group_list):
   output_directory_dict, _index = update_utils_.get_child_setting(group_list, 'output_directory')
 
-  if output_directory_dict is not None:
+  if output_directory_dict is not None and output_directory_dict['type'] == 'file':
     output_directory_dict['type'] = 'directory'
     output_directory_dict['default_value'] = None
     output_directory_dict.pop('action', None)
