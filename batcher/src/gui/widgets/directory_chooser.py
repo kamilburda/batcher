@@ -56,12 +56,14 @@ class DirectoryChooser(Gtk.Box):
         self,
         initial_directory: Optional[directory_.Directory] = None,
         procedure_groups: Optional[Iterable[str]] = None,
+        max_width_chars: Optional[int] = 60,
         *args,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
 
     self._procedure_groups = procedure_groups
+    self._max_width_chars = max_width_chars if max_width_chars is not None else -1
 
     self._can_emit_changed_signal = True
 
@@ -116,6 +118,7 @@ class DirectoryChooser(Gtk.Box):
 
     self._renderer_name = Gtk.CellRendererText(
       ellipsize=Pango.EllipsizeMode.START,
+      max_width_chars=self._max_width_chars,
     )
     self._combo_box.pack_start(self._renderer_name, True)
     self._combo_box.add_attribute(self._renderer_name, 'text', self._COLUMN_NAME[0])
