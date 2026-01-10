@@ -1,6 +1,8 @@
 import os
 
 import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -48,7 +50,10 @@ class ExportSettings:
     self._init_setting_gui()
 
     if self._current_image is not None:
-      _set_up_output_directory_settings(self._settings, self._current_image)
+      _set_up_output_directory_settings_for_sync_with_current_image(
+        self._settings, self._current_image)
+
+    _set_up_output_directory_settings_to_warn_about_special_values(self._settings)
 
   def close_export_options_dialog(self):
     if self._export_options_dialog is not None:
@@ -237,10 +242,10 @@ def revert_file_extension_gui_to_last_valid_value(setting):
       setting.reset()
 
 
-def _set_up_output_directory_settings(settings, current_image):
+def _set_up_output_directory_settings_for_sync_with_current_image(settings, current_image):
   _set_up_images_and_directories_and_initial_output_directory(
     settings, settings['main/output_directory'], current_image)
-  _set_up_output_directory_changed(settings, current_image)
+  _set_up_output_directory_changed_for_sync_with_current_image(settings, current_image)
 
 
 def _set_up_images_and_directories_and_initial_output_directory(
@@ -290,13 +295,57 @@ def _update_directory(setting, current_image, current_image_dirpath):
   return False
 
 
-def _set_up_output_directory_changed(settings, current_image):
-  def on_output_directory_changed(output_directory, images_and_directories, current_image_):
-    if output_directory.value.type_ == directory_.DirectoryTypes.DIRECTORY:
-      images_and_directories.update_dirpath(current_image_, output_directory.value.value)
+def _set_up_output_directory_changed_for_sync_with_current_image(settings, current_image):
+  def on_output_directory_changed(
+        output_directory_setting, images_and_directories_setting, current_image_):
+    if output_directory_setting.value.type_ == directory_.DirectoryTypes.DIRECTORY:
+      images_and_directories_setting.update_dirpath(
+        current_image_, output_directory_setting.value.value)
 
   settings['main/output_directory'].connect_event(
     'value-changed',
     on_output_directory_changed,
     settings['gui/images_and_directories'],
     current_image)
+
+
+def _set_up_output_directory_settings_to_warn_about_special_values(settings):
+  def on_output_directory_changed(output_directory_setting):
+    if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
+        and output_directory_setting.value.value == 'match_input_folders'):
+      _display_warning_popover(
+        output_directory_setting.gui.widget,
+        _('You may overwrite input files permanently.\nExercise caution when using this option.'),
+      )
+
+  settings['main/output_directory'].connect_event(
+    'value-changed',
+    on_output_directory_changed)
+
+
+def _display_warning_popover(widget, text):
+  icon = Gtk.Image(
+    icon_name=GimpUi.ICON_DIALOG_WARNING,
+    icon_size=Gtk.IconSize.LARGE_TOOLBAR,
+  )
+  label = Gtk.Label(
+    label=text,
+    xalign=0.0,
+    yalign=0.5,
+  )
+  hbox = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    spacing=8,
+    border_width=6,
+  )
+
+  hbox.pack_start(icon, False, False, 0)
+  hbox.pack_start(label, False, False, 0)
+  hbox.show_all()
+
+  popover_message = Gtk.Popover()
+  popover_message.add(hbox)
+  popover_message.set_constrain_to(Gtk.PopoverConstraint.NONE)
+  popover_message.set_relative_to(widget)
+
+  popover_message.popup()
