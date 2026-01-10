@@ -202,7 +202,7 @@ class DirectorySetting(setting_.Setting):
     if value.type_ == directory_.DirectoryTypes.SPECIAL:
       return Gio.file_new_for_uri(f'{self.SPECIAL_VALUE_URI_PREFIX}{value.value}').get_uri()
     else:
-      return Gio.file_new_for_uri(value.value).get_uri()
+      return Gio.file_new_for_path(value.value).get_uri()
 
   def _validate(self, value):
     if value is None or not isinstance(value, directory_.Directory):
