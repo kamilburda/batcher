@@ -32,6 +32,7 @@ class BatchProcessingGui:
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
   _VBOX_SETTINGS_SPACING = 10
+  _VBOX_SETTINGS_AND_MESSAGES_RIGHT_MARGIN = 6
   _EXPORT_SETTINGS_BOTTOM_MARGIN = 10
 
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
@@ -204,6 +205,7 @@ class BatchProcessingGui:
     self._vbox_settings_with_messages = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._VBOX_SETTINGS_SPACING,
+      margin_end=self._VBOX_SETTINGS_AND_MESSAGES_RIGHT_MARGIN,
     )
     self._vbox_settings_with_messages.pack_start(self._vbox_settings, True, True, 0)
     self._vbox_settings_with_messages.pack_start(self._hbox_messages, False, False, 0)

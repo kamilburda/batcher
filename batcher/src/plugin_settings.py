@@ -150,7 +150,7 @@ def create_settings_for_convert():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 640),
+      dialog_size=(715, 640),
       paned_outside_previews_position=350,
       paned_between_previews_position=300,
     )
@@ -294,7 +294,7 @@ def create_settings_for_export_images():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 580),
+      dialog_size=(715, 580),
       paned_outside_previews_position=350,
       paned_between_previews_position=230,
     )
@@ -394,7 +394,7 @@ def create_settings_for_edit_and_save_images():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 580),
+      dialog_size=(715, 580),
       paned_outside_previews_position=370,
       paned_between_previews_position=230,
     )
@@ -549,7 +549,7 @@ def create_settings_for_export_layers():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 580),
+      dialog_size=(715, 580),
       paned_outside_previews_position=350,
       paned_between_previews_position=230,
     )
@@ -647,7 +647,7 @@ def create_settings_for_edit_layers():
   size_gui_settings.add(
     _create_size_gui_settings(
       dialog_position=(),
-      dialog_size=(710, 580),
+      dialog_size=(715, 580),
       paned_outside_previews_position=350,
       paned_between_previews_position=230,
     )
