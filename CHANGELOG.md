@@ -16,6 +16,8 @@ General changes:
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` entry. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
+* Batch Convert: You can now choose to export images to the same top-level folder as the input image using the new `Match input folders` option. You will be warned when choosing this option as you may permanently override the original images (#75).
+* Batch Convert, Export Images, Export Layers: The most recently used output folders for processing are now saved (max. 5). Each Batcher menu keeps a separate list of recent folders (#77).
 * Added an export option named `Rotate or flip image based on Exif metadata`. This allows correcting the orientation of images with Exif metadata before export if you choose to not save Exif metadata, e.g. for the JPEG format (#91).
 * Added filters (layer effects, GEGL operations) starting with `gimp:` as custom actions. For GIMP 3.1.4 and later, all of these filters are added. For GIMP 3.1.2 and below, only the following filters are added (others are unsupported or cause GIMP to crash): `gimp:border`, `gimp:colorize`, `gimp:compose-crop`, `gimp:desaturate`, `gimp:flood`, `gimp:grow`, `gimp:posterize`, `gimp:scalar-multiply`, `gimp:semi-flatten`, `gimp:set-alpha`, `gimp:shrink`, `gimp:threshold`, `gimp:threshold-alpha` (#85).
 * If [G'MIC](https://gmic.eu/) is installed as a GIMP plug-in, a built-in action `G'MIC filter` will now be available that simplifies applying a filter from G'MIC non-interactively (#98).
@@ -40,6 +42,7 @@ User interface changes:
 * A simple summary message indicating the number of successfully processed images/layers is now displayed after the processing.
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
+* Replaced the widget for choosing output folder with a custom widget. The folders previously available (such as the home user folder, disk drives, ...) are no longer available.
 * Changes to the custom action browser:
   * Adjusted the default width of the dialog and its individual parts.
   * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
@@ -59,6 +62,7 @@ Changes to actions and conditions:
   * For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values.
   * Added `White balance` option equivalent to `Colors → Auto → White Balance` in GIMP (#85).
   * GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
+* Save: Replaced `Save existing XCF image to its original location` with a folder chooser. This allows saving existing XCF images and new + non-XCF images to different folders if need be.
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:
