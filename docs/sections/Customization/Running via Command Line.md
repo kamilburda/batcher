@@ -42,3 +42,10 @@ gimp -nidfs --quit --batch-interpreter python-fu-eval -b @"
 <insert Python code here>
 "@
 ```
+
+To use the special `Match input folders` value for the `output-directory` parameter:
+```shell
+# ...
+config.set_property('output-directory', Gio.file_new_for_uri('special:///match_input_folders'))
+# ...
+```

@@ -33,6 +33,9 @@ You can move around individual files or folders by dragging and dropping them an
 
 Files and folders can be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
 
+You can export images to the same parent folders as the added input files/folders using the `Match input folders` option in the output folder dropdown.
+You will be warned when selecting this option as you may inadvertently overwrite the original images (when the filenames and file extensions match).
+
 You can view message logs recorded during processing via `Settings → View Logs` and save them to a file.
 
 

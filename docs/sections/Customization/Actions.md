@@ -236,8 +236,8 @@ Images that were imported or created within GIMP are renamed in the GIMP title b
 To export the image in another file format, use the "Export Images" menu.
 
 Options:
-* *Output folder*: Folder to save images to.
-* *Save existing XCF image to its original location (ignore "Output folder")*: If checked, existing XCF images will be saved to their respective folders. If an existing image was renamed via the `Rename` action, it will be saved to the same folder under the new name. If unchecked, all images are saved to *Output folder*. 
+* *Output folder*: Folder to save images to. By default, existing XCF images are saved to their original locations (the `Use original location (override)` option). You may instead specify a folder where all images will be saved, including new and non-XCF images.
+* *Output folder for new and imported images*: Folder where new images or non-XCF images are saved as XCF images.
 
 ### Scale
 
