@@ -12,6 +12,7 @@ from src import directory as directory_
 from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
+from src.gui import messages as messages_
 from src.gui.entry import entries as entries_
 
 from . import _utils as gui_main_utils_
@@ -313,7 +314,7 @@ def _set_up_output_directory_settings_to_warn_about_special_values(settings):
   def on_output_directory_changed(output_directory_setting):
     if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
         and output_directory_setting.value.value == 'match_input_folders'):
-      _display_warning_popover(
+      messages_.display_warning_popover(
         output_directory_setting.gui.widget,
         _('You may overwrite input files permanently.\nExercise caution when using this option.'),
       )
@@ -321,31 +322,3 @@ def _set_up_output_directory_settings_to_warn_about_special_values(settings):
   settings['main/output_directory'].connect_event(
     'value-changed',
     on_output_directory_changed)
-
-
-def _display_warning_popover(widget, text):
-  icon = Gtk.Image(
-    icon_name=GimpUi.ICON_DIALOG_WARNING,
-    icon_size=Gtk.IconSize.LARGE_TOOLBAR,
-  )
-  label = Gtk.Label(
-    label=text,
-    xalign=0.0,
-    yalign=0.5,
-  )
-  hbox = Gtk.Box(
-    orientation=Gtk.Orientation.HORIZONTAL,
-    spacing=8,
-    border_width=6,
-  )
-
-  hbox.pack_start(icon, False, False, 0)
-  hbox.pack_start(label, False, False, 0)
-  hbox.show_all()
-
-  popover_message = Gtk.Popover()
-  popover_message.add(hbox)
-  popover_message.set_constrain_to(Gtk.PopoverConstraint.NONE)
-  popover_message.set_relative_to(widget)
-
-  popover_message.popup()

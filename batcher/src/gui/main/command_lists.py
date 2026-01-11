@@ -649,6 +649,10 @@ def _handle_export_action_item_added(item):
     _set_display_name_for_export_action,
     item.command)
 
+  item.command['arguments/output_directory'].connect_event(
+    'value-changed',
+    _warn_about_output_directory_special_values)
+
 
 def _set_display_name_for_export_action(file_extension_setting, export_action):
   file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
@@ -678,8 +682,13 @@ def _copy_setting_values_from_default_export_action(main_settings, export_action
     export_action[f'arguments/{setting.name}'].set_value(setting.value)
 
 
-def _set_buttons_for_command_item_sensitive(item, sensitive):
-  item.button_remove.set_sensitive(sensitive)
+def _warn_about_output_directory_special_values(output_directory_setting):
+  if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
+      and output_directory_setting.value.value == 'match_input_folders'):
+    messages_.display_warning_popover(
+      output_directory_setting.gui.widget,
+      _('You may overwrite input files permanently.\nExercise caution when using this option.'),
+    )
 
 
 def _handle_save_action_item_added(item):
@@ -838,3 +847,7 @@ def _set_display_name_for_matching_text_condition(
       display_name += _(' (case-insensitive)')
 
     condition['display_name'].set_value(display_name)
+
+
+def _set_buttons_for_command_item_sensitive(item, sensitive):
+  item.button_remove.set_sensitive(sensitive)
