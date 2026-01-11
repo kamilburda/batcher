@@ -39,6 +39,9 @@ _NAME_ONLY_COMMAND_GROUP = 'name'
 
 COMMAND_NOT_APPLIED = type('CommandNotApplied', (), {})()
 
+DEFAULT_EXPORT_ACTION_TAG = 'default_export_action'
+DEFAULT_RENAME_ACTION_TAG = 'default_rename_action'
+
 
 class Batcher(metaclass=abc.ABCMeta):
   """Abstract class for batch-processing items with a sequence of commands
@@ -747,6 +750,10 @@ class Batcher(metaclass=abc.ABCMeta):
 
       rename_action_dict['arguments'][0]['default_value'] = self._name_pattern
 
+      if 'additional_tags' not in rename_action_dict:
+        rename_action_dict['additional_tags'] = []
+      rename_action_dict['additional_tags'].append(DEFAULT_RENAME_ACTION_TAG)
+
       rename_action = commands.create_command(rename_action_dict)
       rename_action.uniquify_name(self._actions)
 
@@ -778,6 +785,10 @@ class Batcher(metaclass=abc.ABCMeta):
       for arg_name, value in export_kwargs.items():
         index = export_action_arguments_dict[arg_name]
         export_action_dict['arguments'][index]['default_value'] = value
+
+      if 'additional_tags' not in export_action_dict:
+        export_action_dict['additional_tags'] = []
+      export_action_dict['additional_tags'].append(DEFAULT_EXPORT_ACTION_TAG)
 
       export_action = commands.create_command(export_action_dict)
       export_action.uniquify_name(self._actions)

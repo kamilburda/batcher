@@ -17,6 +17,7 @@ from gi.repository import Gtk
 from gi.repository import Pango
 
 from config import CONFIG
+from src import core
 from src import exceptions
 from src import itemtree
 from src import setting as setting_
@@ -520,23 +521,25 @@ def get_failing_message(
   if 'action' not in command.tags and 'condition' not in command.tags:
     raise ValueError('a command must have the "action" or "condition" tag')
 
-  message_template = None
-
   if item is not None:
-    if 'action' in command.tags:
+    if core.DEFAULT_EXPORT_ACTION_TAG in command.tags:
+      message_template = _('Could not export "{}" because:')
+      return message_template.format(item.orig_name)
+    elif core.DEFAULT_RENAME_ACTION_TAG in command.tags:
+      message_template = _('Could not rename "{}" because:')
+      return message_template.format(item.orig_name)
+    elif 'action' in command.tags:
       message_template = _('Failed to apply action "{}" on "{}" because:')
+      return message_template.format(command['display_name'].value, item.orig_name)
     elif 'condition' in command.tags:
       message_template = _('Failed to apply condition "{}" on "{}" because:')
-
-    if message_template is not None:
       return message_template.format(command['display_name'].value, item.orig_name)
   else:
     if 'action' in command.tags:
       message_template = _('Failed to apply action "{}" because:')
+      return message_template.format(command['display_name'].value)
     elif 'condition' in command.tags:
       message_template = _('Failed to apply condition "{}" because:')
-
-    if message_template is not None:
       return message_template.format(command['display_name'].value)
 
   return command['display_name'].value
