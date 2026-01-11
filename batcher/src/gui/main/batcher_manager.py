@@ -65,6 +65,17 @@ class BatcherInteractiveMixin:
     else:
       return False
 
+  @staticmethod
+  def _update_output_directory_and_recent_dirpaths(settings):
+    if 'output_directory' in settings['main']:
+      if hasattr(settings['main/output_directory'].gui, 'add_to_recent_dirpaths'):
+        settings['main/output_directory'].gui.add_to_recent_dirpaths()
+
+      if hasattr(
+            settings['main/output_directory'].gui,
+            'set_current_recent_dirpath_as_current_directory'):
+        settings['main/output_directory'].gui.set_current_recent_dirpath_as_current_directory()
+
 
 class BatcherManager(BatcherInteractiveMixin):
 
@@ -88,7 +99,7 @@ class BatcherManager(BatcherInteractiveMixin):
         parent_widget,
         progress_bar,
   ):
-    self._update_output_directory_and_recent_dirpaths()
+    self._update_output_directory_and_recent_dirpaths(self._settings)
 
     self._settings.apply_gui_values_to_settings()
 
@@ -170,17 +181,6 @@ class BatcherManager(BatcherInteractiveMixin):
 
     return batcher, overwrite_chooser, progress_updater
 
-  def _update_output_directory_and_recent_dirpaths(self):
-    if 'output_directory' in self._settings['main']:
-      if hasattr(self._settings['main/output_directory'].gui, 'add_to_recent_dirpaths'):
-        self._settings['main/output_directory'].gui.add_to_recent_dirpaths()
-
-      if hasattr(
-            self._settings['main/output_directory'].gui,
-            'set_current_recent_dirpath_as_current_directory'):
-        self._settings[
-          'main/output_directory'].gui.set_current_recent_dirpath_as_current_directory()
-
 
 class BatcherManagerQuick(BatcherInteractiveMixin):
 
@@ -200,6 +200,8 @@ class BatcherManagerQuick(BatcherInteractiveMixin):
         parent_widget,
         progress_bar,
   ):
+    self._update_output_directory_and_recent_dirpaths(self._settings)
+
     self._settings.apply_gui_values_to_settings()
 
     self._prompted_to_continue_on_error = False
