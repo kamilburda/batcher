@@ -3,6 +3,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import builtin_actions as builtin_actions_
+from src import directory as directory_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import setting as setting_
@@ -81,6 +82,32 @@ class DirectoryChooserPresenter(setting_.GtkPresenter):
 
   def _set_value(self, value):
     self._widget.set_directory(value)
+
+  def add_to_recent_dirpaths(self):
+    if self._setting.value.type_ == directory_.DirectoryTypes.DIRECTORY:
+      self._widget.add_to_recent_dirpaths(self._setting.value.value)
+
+  def set_current_recent_dirpath_as_current_directory(self, set_active=True):
+    if self._setting.value.type_ == directory_.DirectoryTypes.DIRECTORY:
+      self._widget.set_current_recent_dirpath_as_current_directory(set_active=set_active)
+
+  def set_most_recent_dirpath_as_current_directory(self, set_active=True):
+    self._widget.set_most_recent_dirpath_as_current_directory(set_active=set_active)
+
+
+class DirectoryChooserRecentDirpathsPresenter(setting_.GtkPresenter):
+  """`setting.Presenter` subclass for
+  `gui.widgets.directory_chooser.DirectoryChooser` widgets representing the list
+  of recent directory paths.
+
+  Value: The list of recent directory paths.
+  """
+
+  def get_value(self):
+    return self._widget.get_recent_dirpaths()
+
+  def _set_value(self, value):
+    self._widget.set_recent_dirpaths(value)
 
 
 class DimensionBoxPresenter(setting_.GtkPresenter):

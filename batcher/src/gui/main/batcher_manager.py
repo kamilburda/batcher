@@ -88,6 +88,8 @@ class BatcherManager(BatcherInteractiveMixin):
         parent_widget,
         progress_bar,
   ):
+    self._update_output_directory_and_recent_dirpaths()
+
     self._settings.apply_gui_values_to_settings()
 
     self._prompted_to_continue_on_error = False
@@ -167,6 +169,17 @@ class BatcherManager(BatcherInteractiveMixin):
       export_context_manager_args=[parent_widget])
 
     return batcher, overwrite_chooser, progress_updater
+
+  def _update_output_directory_and_recent_dirpaths(self):
+    if 'output_directory' in self._settings['main']:
+      if hasattr(self._settings['main/output_directory'].gui, 'add_to_recent_dirpaths'):
+        self._settings['main/output_directory'].gui.add_to_recent_dirpaths()
+
+      if hasattr(
+            self._settings['main/output_directory'].gui,
+            'set_current_recent_dirpath_as_current_directory'):
+        self._settings[
+          'main/output_directory'].gui.set_current_recent_dirpath_as_current_directory()
 
 
 class BatcherManagerQuick(BatcherInteractiveMixin):

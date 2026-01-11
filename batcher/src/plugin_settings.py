@@ -728,6 +728,12 @@ def _create_gui_settings(item_tree_items_setting_type):
 
   gui_settings.add([
     {
+      'type': 'list',
+      'name': 'recent_output_dirpaths',
+      'default_value': [],
+      'gui_type': None,
+    },
+    {
       'type': 'bool',
       'name': 'show_original_item_names',
       'default_value': False,

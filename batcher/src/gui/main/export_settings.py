@@ -1,8 +1,6 @@
 import os
 
 import gi
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -129,6 +127,12 @@ class ExportSettings:
       copy_previous_visible=False,
       copy_previous_sensitive=False,
     )
+    self._settings['gui/recent_output_dirpaths'].set_gui(
+      gui_type=setting_.SETTING_GUI_TYPES.directory_chooser_recent_dirpaths,
+      widget=self._settings['main/output_directory'].gui.widget,
+    )
+
+    self._set_most_recent_dirpath_as_current_directory_if_current_is_special_value()
 
     self._set_up_name_pattern()
     self._set_up_file_extension()
@@ -136,6 +140,14 @@ class ExportSettings:
     self._export_options_button.connect('clicked', self._on_export_options_button_clicked)
 
     self._connect_setting_events()
+
+  def _set_most_recent_dirpath_as_current_directory_if_current_is_special_value(self):
+    if (self._settings['main/output_directory'].value.type_ == directory_.DirectoryTypes.SPECIAL
+        and hasattr(
+          self._settings['main/output_directory'].gui,
+          'set_most_recent_dirpath_as_current_directory')):
+      self._settings['main/output_directory'].gui.set_most_recent_dirpath_as_current_directory(
+        set_active=False)
 
   @property
   def widget(self):
