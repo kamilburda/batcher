@@ -41,12 +41,14 @@ class DirectoryChooser(Gtk.Box):
     _COLUMN_NAME,
     _COLUMN_VISIBLE,
     _COLUMN_ICON,
+    _COLUMN_ICON_VISIBLE,
     _COLUMN_DIRECTORY,
   ) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_BOOLEAN],
     [2, GdkPixbuf.Pixbuf],
-    [3, GObject.TYPE_PYOBJECT],
+    [3, GObject.TYPE_BOOLEAN],
+    [4, GObject.TYPE_PYOBJECT],
   )
 
   __gsignals__ = {'changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
@@ -99,7 +101,7 @@ class DirectoryChooser(Gtk.Box):
 
     if self._recent_dirpaths and self._recent_dirpaths_separator_tree_iter is None:
       self._recent_dirpaths_separator_tree_iter = self._model.append(
-        ['', True, None, self._ROW_SEPARATOR])
+        ['', True, None, False, self._ROW_SEPARATOR])
 
     for tree_iter in self._recent_dirpaths_tree_iters:
       self._model.remove(tree_iter)
@@ -108,7 +110,7 @@ class DirectoryChooser(Gtk.Box):
 
     for dirpath in self._recent_dirpaths:
       tree_iter = self._model.append(
-        [dirpath, True, self._folder_icon, directory_.Directory(dirpath)])
+        [dirpath, True, self._folder_icon, True, directory_.Directory(dirpath)])
       self._recent_dirpaths_tree_iters.append(tree_iter)
 
     self._can_emit_changed_signal = True
@@ -124,7 +126,7 @@ class DirectoryChooser(Gtk.Box):
 
     if self._recent_dirpaths_separator_tree_iter is None:
       self._recent_dirpaths_separator_tree_iter = self._model.append(
-        ['', True, None, self._ROW_SEPARATOR])
+        ['', True, None, False, self._ROW_SEPARATOR])
 
     if len(self._recent_dirpaths) == self._max_recent_dirpaths:
       dirpath_to_remove_iter = self._recent_dirpaths_tree_iters.pop()
@@ -136,7 +138,7 @@ class DirectoryChooser(Gtk.Box):
 
     tree_iter = self._model.insert_after(
       self._recent_dirpaths_separator_tree_iter,
-      [dirpath, True, self._folder_icon, directory_.Directory(dirpath)],
+      [dirpath, True, self._folder_icon, True, directory_.Directory(dirpath)],
     )
     self._recent_dirpaths_tree_iters.insert(0, tree_iter)
 
@@ -175,16 +177,17 @@ class DirectoryChooser(Gtk.Box):
     special_values = directory_.get_special_values(self._procedure_groups)
     default_directory = directory_.Directory()
 
-    self._model.append([default_directory.value, True, self._folder_icon, default_directory])
+    self._model.append([default_directory.value, True, self._folder_icon, True, default_directory])
 
     if special_values:
-      self._model.append(['', True, None, self._ROW_SEPARATOR])
+      self._model.append(['', True, None, False, self._ROW_SEPARATOR])
 
     for name, special_value in special_values.items():
       self._model.append([
         special_value.display_name,
         True,
         None,
+        False,
         directory_.Directory(name, type_=directory_.DirectoryTypes.SPECIAL),
       ])
       self._special_values_and_indexes[name] = len(self._model) - 1
@@ -194,6 +197,7 @@ class DirectoryChooser(Gtk.Box):
     )
     self._combo_box.pack_start(self._renderer_icon, False)
     self._combo_box.add_attribute(self._renderer_icon, 'pixbuf', self._COLUMN_ICON[0])
+    self._combo_box.add_attribute(self._renderer_icon, 'visible', self._COLUMN_ICON_VISIBLE[0])
 
     self._renderer_name = Gtk.CellRendererText(
       ellipsize=Pango.EllipsizeMode.START,
