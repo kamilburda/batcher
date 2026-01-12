@@ -22,6 +22,8 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
   _DIALOG_CONTENTS_BORDER_WIDTH = 12
   _DIALOG_CONTENTS_SPACING = 12
   _DIALOG_HBOX_ICON_AND_MESSAGE_SPACING = 10
+
+  _DIALOG_LABEL_MAX_WIDTH_CHARS = 100
   
   def __init__(
         self,
@@ -29,7 +31,8 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
         default_value: str,
         default_response: str,
         title: str = '',
-        parent: Optional[Gtk.Window] = None):
+        parent: Optional[Gtk.Window] = None,
+  ):
     super().__init__(values_and_display_names, default_value, default_response)
     
     self._title = title
@@ -51,13 +54,16 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
     )
     
     self._dialog_icon = Gtk.Image(
-      icon_name=GimpUi.ICON_DIALOG_QUESTION,
+      icon_name=GimpUi.ICON_DIALOG_WARNING,
       icon_size=Gtk.IconSize.DIALOG,
     )
     
     self._dialog_label = Gtk.Label(
       wrap=True,
       use_markup=True,
+      xalign=0.0,
+      yalign=0.5,
+      max_width_chars=self._DIALOG_LABEL_MAX_WIDTH_CHARS,
     )
 
     self._dialog_label_event_box = Gtk.EventBox()
@@ -73,7 +79,7 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       self._dialog_label_event_box, False, False, 0)
     
     self._checkbutton_apply_to_all = Gtk.CheckButton(
-      label=_('_Apply option to all files'),
+      label=_('_Apply this choice to all remaining files'),
       use_underline=True,
     )
 
@@ -114,9 +120,9 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       dirpath, filename = os.path.split(filepath)
       if dirpath:
         text_choose = (
-          _('A file named "{}" already exists in "{}".').format(
+          _('A file named "{}" already exists in the folder "{}".').format(
             filename, os.path.basename(dirpath)))
-        text_choose += ' '
+        text_choose += '\n'
       else:
         text_choose = _('A file named "{}" already exists.').format(filename)
         text_choose += '\n'
@@ -124,7 +130,7 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       text_choose = _('A file with the same name already exists.')
       text_choose += '\n'
 
-    text_choose += _('What would you like to do?')
+    text_choose += _('Choose how to handle this file.')
     
     self._dialog_label.set_markup(
       '<span font_size="large"><b>{}</b></span>'.format(GLib.markup_escape_text(text_choose)))

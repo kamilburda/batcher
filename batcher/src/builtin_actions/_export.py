@@ -46,10 +46,10 @@ __all__ = [
 
 
 INTERACTIVE_OVERWRITE_MODES_LIST = [
-  (overwrite.OverwriteModes.REPLACE, _('Replace')),
-  (overwrite.OverwriteModes.SKIP, _('Skip')),
   (overwrite.OverwriteModes.RENAME_NEW, _('Rename new file')),
-  (overwrite.OverwriteModes.RENAME_EXISTING, _('Rename existing file'))
+  (overwrite.OverwriteModes.RENAME_EXISTING, _('Rename existing file')),
+  (overwrite.OverwriteModes.SKIP, _('Skip this file')),
+  (overwrite.OverwriteModes.REPLACE, _('Replace existing file')),
 ]
 
 INTERACTIVE_OVERWRITE_MODES = dict(INTERACTIVE_OVERWRITE_MODES_LIST)

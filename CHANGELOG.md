@@ -44,6 +44,7 @@ User interface changes:
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
 * Replaced the widget for choosing output folder with a custom widget. The folders previously available (such as the home user folder, disk drives, ...) are no longer available.
+* Adjusted wording, button order and icon for the dialog handling conflicting files for clarity.
 * Changes to the custom action browser:
   * Adjusted the default width of the dialog and its individual parts.
   * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
