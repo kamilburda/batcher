@@ -93,6 +93,7 @@ class ExportAction(invoker_.CallableCommand):
     self._convert_file_extension_to_lowercase = False
     self._use_original_modification_date = False
     self._rotate_flip_image_based_on_exif_metadata = True
+    self._merge_filters = True
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
@@ -218,6 +219,7 @@ class ExportAction(invoker_.CallableCommand):
         self._file_extension_properties,
         overwrite_chooser,
         self._use_original_modification_date,
+        self._merge_filters,
         self._logger,
       )
 
@@ -243,6 +245,7 @@ class ExportAction(invoker_.CallableCommand):
             self._file_extension_properties,
             overwrite_chooser,
             self._use_original_modification_date,
+            self._merge_filters,
             self._logger,
           )
 
@@ -406,6 +409,7 @@ def _export_item(
       file_extension_properties,
       overwrite_chooser,
       use_original_modification_date,
+      merge_filters,
       logger,
 ):
   output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory.resolve(batcher))
@@ -433,7 +437,11 @@ def _export_item(
     logger.info(_('Saving "{}"').format(output_filepath))
 
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
-    
+
+    if merge_filters:
+      for layer in image.get_layers():
+        layer.merge_filters()
+
     export_status = _export_item_once_wrapper(
       batcher,
       _get_run_mode(batcher, file_format_mode, file_extension, file_extension_properties),
@@ -874,6 +882,12 @@ EXPORT_FOR_CONVERT_DICT = {
       'name': 'rotate_flip_image_based_on_exif_metadata',
       'default_value': True,
       'display_name': _('Rotate or flip image based on Exif metadata'),
+    },
+    {
+      'type': 'bool',
+      'name': 'merge_filters',
+      'default_value': True,
+      'display_name': _('Merge filters (layer effects)'),
     },
   ],
 }

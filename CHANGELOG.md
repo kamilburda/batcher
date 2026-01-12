@@ -9,9 +9,10 @@ General changes:
 * Updated Dutch translation (thanks to @DiGro).
 * Updated German translation (thanks to @ChrisLauinger77).
 * Updated Japanese translation (thanks to @re-unknown).
-* Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
-* Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
 * Removed filters (layer effects, GEGL operations) that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
+* Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
+* Filters (layer effects) will now be automatically merged before export to avoid exported images unexpectedly growing beyond their original boundaries. You can switch this off by unchecking the new `Merge filters (layer effects)` export option (#115).
+* Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 * If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 
 New features:
