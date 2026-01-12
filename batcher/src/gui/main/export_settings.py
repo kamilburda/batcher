@@ -328,7 +328,8 @@ def _set_up_output_directory_settings_to_warn_about_special_values(settings):
         and output_directory_setting.value.value == 'match_input_folders'):
       messages_.display_warning_popover(
         output_directory_setting.gui.widget,
-        _('You may overwrite input files permanently.\nExercise caution when using this option.'),
+        _('Exporting to input folders can overwrite original images.\n'
+          'Adjust the {} field to avoid losing data.').format(_('Filename')),
       )
 
   settings['main/output_directory'].connect_event(
