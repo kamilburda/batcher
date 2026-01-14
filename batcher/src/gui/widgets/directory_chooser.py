@@ -57,7 +57,7 @@ class DirectoryChooser(Gtk.Box):
         self,
         initial_directory: Optional[directory_.Directory] = None,
         procedure_groups: Optional[Iterable[str]] = None,
-        max_width_chars: Optional[int] = 60,
+        max_width_chars: Optional[int] = None,
         max_recent_dirpaths: int = 5,
         *args,
         **kwargs,

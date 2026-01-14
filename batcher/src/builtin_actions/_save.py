@@ -142,6 +142,9 @@ SAVE_DICT = {
       'name': 'output_directory',
       'default_value': 'special:///use_original_location',
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'max_width_chars': 60,
+      },
     },
     {
       'type': 'directory',
@@ -149,6 +152,9 @@ SAVE_DICT = {
       'default_value': None,
       'display_name': _('Output folder for new and imported images'),
       'procedure_groups': [],
+      'gui_type_kwargs': {
+        'max_width_chars': 60,
+      },
     },
   ],
 }

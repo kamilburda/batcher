@@ -827,6 +827,9 @@ EXPORT_FOR_CONVERT_DICT = {
       'name': 'output_directory',
       'default_value': None,
       'display_name': _('Output folder'),
+      'gui_type_kwargs': {
+        'max_width_chars': 60,
+      },
     },
     {
       'type': 'file_extension',
