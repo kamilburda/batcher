@@ -12,6 +12,7 @@ General changes:
 * Removed filters (layer effects, GEGL operations) that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
 * Filters (layer effects) will now be automatically merged before export to avoid exported images unexpectedly growing beyond their original boundaries. You can switch this off by unchecking the new `Merge filters (layer effects)` export option (#115).
+* Changed the order of buttons in the dialog handling conflicting files for safety, with the most dangerous choice (replacing an existing file) now being the rightmost one.
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 * If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.
 
@@ -44,7 +45,7 @@ User interface changes:
 * Marked names of common layer effect arguments as translatable.
 * The Export Options dialog is now closed before the start of processing.
 * Replaced the widget for choosing output folder with a custom widget. The folders previously available (such as the home user folder, disk drives, ...) are no longer available.
-* Adjusted wording, button order and icon for the dialog handling conflicting files for clarity.
+* Adjusted wording and icon in the dialog handling conflicting files for clarity.
 * Changes to the custom action browser:
   * Adjusted the default width of the dialog and its individual parts.
   * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
