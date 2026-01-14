@@ -688,7 +688,7 @@ def _warn_about_output_directory_special_values(output_directory_setting):
     messages_.display_warning_popover(
       output_directory_setting.gui.widget,
       _('Exporting to input folders can overwrite original images.\n'
-        'Add a {} action before export to avoid losing data.').format(_('Rename')),
+        'Add and adjust a {} action before export to avoid losing data.').format(_('Rename')),
     )
 
 
