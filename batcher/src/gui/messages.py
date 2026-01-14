@@ -555,6 +555,8 @@ def display_warning_popover(widget, text):
     label=text,
     xalign=0.0,
     yalign=0.5,
+    max_width_chars=60,
+    wrap=True,
   )
   hbox = Gtk.Box(
     orientation=Gtk.Orientation.HORIZONTAL,
