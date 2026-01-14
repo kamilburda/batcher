@@ -12,6 +12,7 @@ from src.procedure_groups import *
 
 __all__ = [
   'apply_opacity_from_group_layers',
+  'apply_filters_from_group_layers',
   'merge_filters',
   'merge_visible_layers',
 ]
@@ -26,6 +27,35 @@ def apply_opacity_from_group_layers(layer_batcher):
     raw_parent = raw_parent.get_parent()
 
   layer_batcher.current_layer.set_opacity(new_layer_opacity * 100.0)
+
+
+def apply_filters_from_group_layers(layer_batcher):
+  layer = layer_batcher.current_layer
+
+  raw_parents = []
+
+  current_raw_parent = layer_batcher.current_item.raw.get_parent()
+  while current_raw_parent is not None:
+    raw_parents.append(current_raw_parent)
+    current_raw_parent = current_raw_parent.get_parent()
+
+  for raw_parent in raw_parents:
+    filters = raw_parent.get_filters()
+    for filter_ in reversed(filters):
+      filter_copy = Gimp.DrawableFilter.new(layer, filter_.get_operation_name(), filter_.get_name())
+      filter_copy.set_blend_mode(filter_.get_blend_mode())
+      filter_copy.set_opacity(filter_.get_opacity())
+      filter_copy.set_visible(filter_.get_visible())
+
+      filter_config = filter_.get_config()
+      filter_copy_config = filter_copy.get_config()
+
+      for prop in filter_config.list_properties():
+        filter_copy_config.set_property(prop.name, filter_config.get_property(prop.name))
+
+      filter_copy.update()
+
+      layer.append_filter(filter_copy)
 
 
 def merge_filters(_batcher, layer):
@@ -53,8 +83,19 @@ APPLY_OPACITY_FROM_GROUP_LAYERS_DICT = {
   'name': 'apply_opacity_from_group_layers',
   'function': apply_opacity_from_group_layers,
   'display_name': _('Apply opacity from group layers'),
+  'menu_path': '{}/{}'.format(_('Apply from group layers'), _('Opacity')),
   'description': _(
     'Combines opacity from all parent group layers and the current layer.'),
+  'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+}
+
+APPLY_FILTERS_FROM_GROUP_LAYERS_DICT = {
+  'name': 'apply_filters_from_group_layers',
+  'function': apply_filters_from_group_layers,
+  'display_name': _('Apply filters from group layers'),
+  'menu_path': '{}/{}'.format(_('Apply from group layers'), _('Filters (layer effects)')),
+  'description': _(
+    'Adds filters (layer effects) from all parent group layers to the current layer.'),
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
 }
 

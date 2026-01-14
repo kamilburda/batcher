@@ -46,6 +46,15 @@ This simplifies setting up export to multiple file formats without the hassle of
 
 When exporting each image separately (the default, which can be changed via the *Perform export* option), it usually makes sense to apply the Export action as the last one since actions after Export would have no effect on the current image/layer being processed.
 
+### Apply filters from group layers
+
+*Only available for: Export Layers, Edit Layers*
+
+Adds filters (layer effects) from all parent group layers to the current layer.
+This corresponds to how the layer is actually displayed in GIMP.
+
+Filters are added in the same order they appear in GIMP. 
+
 ### Apply opacity from group layers
 
 *Only available for: Export Layers, Edit Layers*
