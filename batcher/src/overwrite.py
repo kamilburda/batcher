@@ -35,7 +35,11 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
     self._overwrite_mode = value
   
   @abc.abstractmethod
-  def choose(self, filepath: Optional[str] = None) -> str:
+  def choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
     """Returns a value indicating how to handle the conflicting file.
 
     The user is assumed to choose one of the possible overwrite modes. The
@@ -44,6 +48,9 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
     
     ``filepath`` is a file path that points to an existing file. This class uses
     the file path to simply display it to the user.
+
+    ``message`` is an optional custom message displayed to the user. If
+    ``None``, a default message will be used instead.
     """
     pass
 
@@ -57,7 +64,11 @@ class NoninteractiveOverwriteChooser(OverwriteChooser):
   no user interaction.
   """
   
-  def choose(self, filepath: Optional[str] = None) -> str:
+  def choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
     return self._overwrite_mode
 
 
@@ -97,15 +108,23 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
     files. If ``False``, the user's choice applies to current file only.
     """
     return self._apply_to_all
-  
-  def choose(self, filepath: Optional[str] = None) -> str:
+
+  def choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
     if self._overwrite_mode is None or not self._apply_to_all:
-      return self._choose(filepath)
+      return self._choose(filepath, message)
     else:
       return self._overwrite_mode
   
   @abc.abstractmethod
-  def _choose(self, filepath: str):
+  def _choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
     """Allows the user to choose the overwrite mode and return it.
     
     If the choice results in a value that is not in
@@ -115,7 +134,10 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
 
 
 def handle_overwrite(
-      filepath: str, overwrite_chooser: OverwriteChooser, position: Optional[int] = None
+      filepath: str,
+      overwrite_chooser: OverwriteChooser,
+      position: Optional[int] = None,
+      message: Optional[str] = None,
 ) -> Tuple[str, str]:
   """Resolves how to handle an existing file path.
 
@@ -133,6 +155,9 @@ def handle_overwrite(
   name. The position of the substring can be customized via ``position`` (for
   example, to place the substring before the file extension).
 
+  ``message`` is an optional custom message displayed to the user. If
+  ``None``, a default message will be used instead.
+
   Returns:
     A tuple of (chosen overwrite mode, file path).
 
@@ -145,7 +170,7 @@ def handle_overwrite(
     modified file path is returned.
   """
   if os.path.exists(filepath):
-    overwrite_chooser.choose(filepath=os.path.abspath(filepath))
+    overwrite_chooser.choose(filepath=os.path.abspath(filepath), message=message)
 
     if overwrite_chooser.overwrite_mode in (
          OverwriteModes.RENAME_NEW, OverwriteModes.RENAME_EXISTING):

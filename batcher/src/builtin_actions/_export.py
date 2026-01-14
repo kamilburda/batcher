@@ -397,6 +397,30 @@ def _get_unique_substring_position(str_, file_extension):
   return len(str_) - len(f'.{file_extension}')
 
 
+def _get_overwrite_chooser_message(filepath, output_directory):
+  if not (output_directory.type_ == directory_.DirectoryTypes.SPECIAL
+          and output_directory.value == 'match_input_folders'):
+    return None
+
+  if filepath is not None:
+    dirpath, filename = os.path.split(filepath)
+    if dirpath:
+      message = (
+        _('A file named "{}" already exists in the folder "{}".').format(
+          filename, os.path.basename(dirpath)))
+    else:
+      message = _('A file named "{}" already exists.').format(filename)
+  else:
+    message = _('A file with the same name already exists.')
+
+  message += '\n'
+  message += _('Overwriting will permanently replace the original image.')
+  message += '\n'
+  message += _('Choose how to handle this file.')
+
+  return message
+
+
 def _export_item(
       batcher,
       item,
@@ -420,7 +444,9 @@ def _export_item(
     chosen_overwrite_mode, output_filepath = overwrite.handle_overwrite(
       output_filepath,
       overwrite_chooser,
-      _get_unique_substring_position(output_filepath, file_extension))
+      _get_unique_substring_position(output_filepath, file_extension),
+      _get_overwrite_chooser_message(output_filepath, output_directory),
+    )
   except OSError as e:
     raise exceptions.ImageExportError(
       str(e),

@@ -115,25 +115,28 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       self._dialog.action_area, True, False, 0, Gtk.PackType.END)
     self._dialog.action_area.set_center_widget(None)
 
-  def _choose(self, filepath):
-    if filepath is not None:
-      dirpath, filename = os.path.split(filepath)
-      if dirpath:
-        text_choose = (
-          _('A file named "{}" already exists in the folder "{}".').format(
-            filename, os.path.basename(dirpath)))
-        text_choose += '\n'
+  def _choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
+    if message is None:
+      if filepath is not None:
+        dirpath, filename = os.path.split(filepath)
+        if dirpath:
+          message = (
+            _('A file named "{}" already exists in the folder "{}".').format(
+              filename, os.path.basename(dirpath)))
+        else:
+          message = _('A file named "{}" already exists.').format(filename)
       else:
-        text_choose = _('A file named "{}" already exists.').format(filename)
-        text_choose += '\n'
-    else:
-      text_choose = _('A file with the same name already exists.')
-      text_choose += '\n'
+        message = _('A file with the same name already exists.')
 
-    text_choose += _('Choose how to handle this file.')
-    
+      message += '\n'
+      message += _('Choose how to handle this file.')
+
     self._dialog_label.set_markup(
-      '<span font_size="large"><b>{}</b></span>'.format(GLib.markup_escape_text(text_choose)))
+      '<span font_size="large"><b>{}</b></span>'.format(GLib.markup_escape_text(message)))
     
     self._dialog.show_all()
     

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import unittest
 import unittest.mock as mock
 
@@ -11,7 +13,11 @@ class InteractiveOverwriteChooserStub(overwrite.InteractiveOverwriteChooser):
     
     self._values = list(self.values_and_display_names)
   
-  def _choose(self, filepath):
+  def _choose(
+        self,
+        filepath: Optional[str] = None,
+        message: Optional[str] = None,
+  ) -> str:
     if self._overwrite_mode not in self._values:
       self._overwrite_mode = self.default_response
     
