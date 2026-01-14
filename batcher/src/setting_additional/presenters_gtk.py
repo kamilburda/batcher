@@ -16,6 +16,7 @@ __all__ = [
   'FileExtensionEntryPresenter',
   'NamePatternEntryPresenter',
   'DirectoryChooserPresenter',
+  'DirectoryChooserRecentDirpathsPresenter',
   'DimensionBoxPresenter',
   'AngleBoxPresenter',
   'AnchorBoxPresenter',
