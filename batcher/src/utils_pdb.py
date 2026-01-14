@@ -54,11 +54,9 @@ def duplicate_image_without_contents(image: Gimp.Image) -> Gimp.Image:
 
   new_image.undo_disable()
 
-  image_file = image.get_file()
-  if (image_file is not None
-      and image.get_imported_file() is None
-      and image.get_exported_file() is None):
-    new_image.set_file(image_file)
+  image_xcf_file = image.get_xcf_file()
+  if image_xcf_file is not None:
+    new_image.set_file(image_xcf_file)
 
   new_image.set_resolution(*image.get_resolution()[1:])
   new_image.set_unit(image.get_unit())

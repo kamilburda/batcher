@@ -73,6 +73,7 @@ Bug fixes:
 * In the custom action browser, fixed freezing frequently followed by a crash while typing a search query, which rendered the search almost unusable.
 * Fixed a crash when running Batch Convert non-interactively for AppImage installations (#101).
 * Fixed a crash when a widget used for choosing files or folders is not valid (#116).
+* Export Layers: Fixed incorrect image filenames when the `[image name]` field was used for non-XCF images (#108).
 * Fixed the popup containing action/condition details not appearing upon clicking the corresponding icon button in the custom action browser or the action/condition edit dialog.
 
 

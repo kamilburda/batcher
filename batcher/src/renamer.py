@@ -287,8 +287,15 @@ def _get_image_name_for_image_batcher(
 def _get_image_name_for_layer_batcher(
       _renamer, batcher, _item, _field_value, file_extension_strip_mode=''):
   image = batcher.current_image
-  if image is not None and image.get_name() is not None:
-    image_name = image.get_name()
+
+  if image is not None:
+    if image.get_file() is not None:
+      image_name = os.path.basename(image.get_file())
+    else:
+      # Fall back to the original image and try obtaining the imported/exported
+      # filename (which cannot be set when creating a new image from scratch).
+      orig_image = batcher.current_item.raw.get_image()
+      image_name = os.path.basename(orig_image.get_file())
   else:
     image_name = _('Untitled')
 
