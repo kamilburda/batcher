@@ -66,11 +66,22 @@ class CommandItem(gui_widgets_.ItemBoxItem):
   def is_being_edited(self):
     return self.editor.get_mapped()
 
-  def set_tooltip(self, text):
-    self.widget.set_tooltip_text(text)
+  def set_tooltip(self, additional_text=None):
+    if self._command['description'].value:
+      tooltip_text = self._command['description'].value
+    else:
+      tooltip_text = ''
+
+    if additional_text:
+      if tooltip_text:
+        tooltip_text = f'{tooltip_text}\n\n{additional_text}'
+      else:
+        tooltip_text = additional_text
+
+    self.item_widget.set_tooltip_text(tooltip_text)
 
   def reset_tooltip(self):
-    self._set_tooltip_if_label_does_not_fit_text(self._label_command_name)
+    self.set_tooltip()
 
   def has_warning(self):
     return self._button_warning.get_visible()
@@ -135,7 +146,6 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._label_command_name = self._command['display_name'].gui.widget.get_child()
     self._label_command_name.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_command_name.set_max_width_chars(self._LABEL_COMMAND_NAME_MAX_WIDTH_CHARS)
-    self._label_command_name.connect('size-allocate', self._on_label_command_name_size_allocate)
 
     self._button_edit = self._setup_item_button(icon=GimpUi.ICON_EDIT, position=0)
     self._button_edit.set_tooltip_text(_('Edit'))
@@ -154,17 +164,10 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._button_warning = self._setup_item_indicator_button(
       icon=GimpUi.ICON_DIALOG_WARNING, position=0)
 
-  def _on_label_command_name_size_allocate(self, label_command_name, _allocation):
-    self._set_tooltip_if_label_does_not_fit_text(label_command_name)
+    self.set_tooltip()
 
   def _on_command_widget_realize(self, _dialog):
     self.editor.set_transient_for(gui_utils_.get_toplevel_window(self.widget))
-
-  def _set_tooltip_if_label_does_not_fit_text(self, label_command_name):
-    if gui_utils_.label_fits_text(label_command_name):
-      self.widget.set_tooltip_text(None)
-    else:
-      self.widget.set_tooltip_text(label_command_name.get_text())
 
   def _on_button_edit_clicked(self, _button):
     if self.is_being_edited():
