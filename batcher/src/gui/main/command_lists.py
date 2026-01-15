@@ -86,13 +86,13 @@ class CommandLists:
     self._set_command_skipped_tooltips(
       self._action_list,
       batcher.skipped_actions,
-      _('This action is skipped. Reason: {}'),
+      _('Skipped: {}'),
       clear_previous=clear_previous)
 
     self._set_command_skipped_tooltips(
       self._condition_list,
       batcher.skipped_conditions,
-      _('This condition is skipped. Reason: {}'),
+      _('Skipped: {}'),
       clear_previous=clear_previous)
 
   def set_warnings_and_deactivate_failed_commands(self, batcher, clear_previous=True):
