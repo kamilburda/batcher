@@ -213,7 +213,7 @@ class DirectorySetting(setting_.Setting):
       self._REGISTRABLE_TYPE_NAME,
       self._pdb_name,
       self._display_name,
-      self._description,
+      self._pdb_description,
       Gimp.FileChooserAction.CREATE_FOLDER,
       False,
       Gio.file_new_for_uri(self._value_to_raw(self._default_value)),

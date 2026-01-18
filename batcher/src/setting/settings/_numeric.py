@@ -128,7 +128,7 @@ class NumericSetting(_base.Setting):
       self._REGISTRABLE_TYPE_NAME,
       self._pdb_name,
       self._display_name,
-      self._description,
+      self._pdb_description,
       self._min_value if self._min_value is not None else self._pdb_min_value,
       self._max_value if self._max_value is not None else self._pdb_max_value,
       self._default_value,

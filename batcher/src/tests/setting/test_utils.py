@@ -42,7 +42,7 @@ class TestGetUniqueSettingName(unittest.TestCase):
       'resize_to_layer_size_3')
 
 
-class TestGetProcessedSettingAttribute(unittest.TestCase):
+class TestGetProcessedSettingDisplayName(unittest.TestCase):
 
   def test_get_processed_display_name(self):
     self.assertEqual(
@@ -52,12 +52,14 @@ class TestGetProcessedSettingAttribute(unittest.TestCase):
       utils_.get_processed_display_name('My display name', 'my_setting_name'),
       'My display name')
 
+
+class TestGetProcessedSettingPdbDescription(unittest.TestCase):
   def test_get_processed_description(self):
     self.assertEqual(
-      utils_.get_processed_description(None, 'My _Setting Name'),
+      utils_.get_pdb_description(None, 'My _Setting Name'),
       'My Setting Name')
     self.assertEqual(
-      utils_.get_processed_description('My description', 'My _Setting Name'),
+      utils_.get_pdb_description('My description', 'My _Setting Name'),
       'My description')
 
 

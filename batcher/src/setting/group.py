@@ -47,7 +47,7 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     self._name = name
     
     self._display_name = utils_.get_processed_display_name(display_name, self._name)
-    self._description = utils_.get_processed_description(description, self._display_name)
+    self._description = utils_.get_processed_description(description)
     self._tags = set(tags) if tags is not None else set()
     self._setting_attributes = setting_attributes
     self._recurse_setting_attributes = recurse_setting_attributes

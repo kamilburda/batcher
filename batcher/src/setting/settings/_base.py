@@ -222,10 +222,11 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     self._value = self._copy_value(self._default_value)
 
     self._display_name = utils_.get_processed_display_name(display_name, self._name)
-    self._description = utils_.get_processed_description(description, self._display_name)
+    self._description = utils_.get_processed_description(description)
 
     self._pdb_type = self._get_pdb_type(pdb_type)
     self._pdb_name = utils_.get_pdb_name(self._name)
+    self._pdb_description = utils_.get_pdb_description(description, self._display_name)
 
     self._setting_value_synchronizer = presenter_.SettingValueSynchronizer()
     self._setting_value_synchronizer.apply_gui_value_to_setting = self._apply_gui_value_to_setting
@@ -363,6 +364,13 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
   def pdb_name(self) -> str:
     """Setting name as it appears in the GIMP PDB as a PDB parameter name."""
     return self._pdb_name
+
+  @property
+  def pdb_description(self) -> str:
+    """Setting description as it appears in the GIMP PDB as a PDB parameter
+    blurb.
+    """
+    return self._pdb_description
 
   @property
   def tags(self) -> Set[str]:

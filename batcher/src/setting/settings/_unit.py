@@ -106,7 +106,7 @@ class UnitSetting(_base.Setting):
       self._REGISTRABLE_TYPE_NAME,
       self._pdb_name,
       self._display_name,
-      self._description,
+      self._pdb_description,
       self._show_pixels,
       self._show_percent,
       self._default_value,

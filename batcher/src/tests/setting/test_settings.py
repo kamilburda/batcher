@@ -87,7 +87,14 @@ class TestSetting(SettingTestCase):
       'setting', default_value='default value', display_name='_Setting')
     
     self.assertEqual(setting.display_name, '_Setting')
-    self.assertEqual(setting.description, 'Setting')
+    self.assertEqual(setting.description, '')
+
+  def test_get_generated_pdb_description(self):
+    setting = stubs_setting.StubSetting(
+      'setting', default_value='default value', display_name='_Setting')
+
+    self.assertEqual(setting.display_name, '_Setting')
+    self.assertEqual(setting.pdb_description, 'Setting')
   
   def test_get_custom_display_name_and_description(self):
     setting = stubs_setting.StubSetting(

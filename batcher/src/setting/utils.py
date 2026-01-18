@@ -12,6 +12,7 @@ __all__ = [
   'get_pdb_name',
   'get_processed_display_name',
   'generate_display_name',
+  'get_pdb_description',
   'get_processed_description',
   'generate_description',
   'get_setting_path',
@@ -377,7 +378,7 @@ def generate_display_name(setting_name: str) -> str:
   return setting_name.replace('_', ' ').capitalize()
 
 
-def get_processed_description(
+def get_pdb_description(
       setting_description: Optional[str],
       setting_display_name: str,
 ) -> str:
@@ -388,6 +389,16 @@ def get_processed_description(
     return setting_description
   else:
     return generate_description(setting_display_name)
+
+
+def get_processed_description(setting_description: Optional[str]) -> str:
+  """Returns ``setting_description`` if not ``None``, otherwise returns an empty
+  string.
+  """
+  if setting_description is not None:
+    return setting_description
+  else:
+    return ''
 
 
 def generate_description(display_name: str) -> str:

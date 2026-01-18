@@ -28,7 +28,7 @@ class TestGroupAttributes(unittest.TestCase):
   
   def test_get_generated_description(self):
     settings = group_.Group(name='main', display_name='_Main')
-    self.assertEqual(settings.description, 'Main')
+    self.assertEqual(settings.description, '')
   
   def test_get_custom_display_name_and_description(self):
     settings = group_.Group(

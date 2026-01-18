@@ -256,8 +256,8 @@ class TestSourceRead(unittest.TestCase):
     
     self.assertEqual(self.settings['main/file_extension'].value, 'jpg')
     self.assertEqual(self.settings['main/file_extension'].default_value, 'png')
-    self.assertEqual(self.settings['main/file_extension'].description, 'File extension')
-  
+    self.assertEqual(self.settings['main/file_extension'].description, '')
+
   def test_read_not_all_settings_found(self):
     self.source.data = _test_data_for_read_write()
     

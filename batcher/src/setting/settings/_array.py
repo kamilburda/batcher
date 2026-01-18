@@ -239,7 +239,7 @@ class ArraySetting(_base.Setting):
           self._NATIVE_ARRAY_PDB_TYPES[self.element_type][2],
           self._pdb_name,
           self._display_name,
-          self._description,
+          self._pdb_description,
           GObject.ParamFlags.READWRITE,
         ]
       elif self._reference_element.can_be_used_in_pdb():
@@ -247,7 +247,7 @@ class ArraySetting(_base.Setting):
           'core_object_array',
           self._pdb_name,
           self._display_name,
-          self._description,
+          self._pdb_description,
           self._reference_element.pdb_type,
           GObject.ParamFlags.READWRITE,
         ]
