@@ -12,6 +12,7 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -466,7 +467,7 @@ def display_failure_message(
     parent=parent,
     message_type=Gtk.MessageType.WARNING,
     message_markup=main_message,
-    message_secondary_markup=failure_message,
+    message_secondary_markup=GLib.markup_escape_text(failure_message),
     details=details,
     display_details_initially=display_details_initially,
     report_uri_list=CONFIG.BUG_REPORT_URL_LIST,
