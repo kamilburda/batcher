@@ -1062,7 +1062,7 @@ class Batcher(metaclass=abc.ABCMeta):
       try:
         self._process_item(item)
       except (exceptions.CommandError, exceptions.BatcherFileLoadError) as e:
-        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_traceback(e)))
+        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_error_message(e)))
 
         if isinstance(e, exceptions.BatcherFileLoadError) and self._is_preview:
           raise
@@ -1075,7 +1075,7 @@ class Batcher(metaclass=abc.ABCMeta):
         self._logger.info(str(e))
         raise
       except Exception as e:
-        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_traceback(e)))
+        self._logger.error(_('Error: {}: {}').format(item.orig_name, self._get_error_message(e)))
         raise
       else:
         self._num_processed_items += 1
@@ -1246,11 +1246,11 @@ class Batcher(metaclass=abc.ABCMeta):
     Gimp.context_pop()
 
   @staticmethod
-  def _get_traceback(exc):
-    if hasattr(exc, 'traceback'):
+  def _get_error_message(exc):
+    if getattr(exc, 'traceback', None) is not None:
       return exc.traceback
     else:
-      return traceback.format_exc()
+      return exc.message
 
   def queue_stop(self):
     """Instructs `Batcher` to terminate batch processing prematurely.
