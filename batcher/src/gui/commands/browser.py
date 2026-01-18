@@ -13,6 +13,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import GLib
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -96,6 +97,7 @@ class CommandBrowser(GObject.GObject):
   _HBOX_SEARCH_BAR_SPACING = 6
 
   _COMMAND_NAME_WIDTH_CHARS = 25
+  _COMMAND_INTERNAL_NAME_FONT_SIZE_PERCENTAGE = 85
 
   _SEARCH_QUERY_CHANGED_TIMEOUT_MILLISECONDS = 100
 
@@ -138,6 +140,7 @@ class CommandBrowser(GObject.GObject):
     self._contents_filled = False
 
     self._last_search_text = ''
+    self._last_selected_command_row = None
 
     self._init_gui()
 
@@ -217,7 +220,7 @@ class CommandBrowser(GObject.GObject):
       )
 
       category.tree_iter = self._tree_model.append([
-          command_row.name,
+          GLib.markup_escape_text(command_row.name),
           command_row.visible,
           self._get_icons_based_on_expanded_state(category)[0],
           command_row,
@@ -287,7 +290,7 @@ class CommandBrowser(GObject.GObject):
       )
 
       tree_iter = self._tree_model.append([
-          command_row.name,
+          GLib.markup_escape_text(command_row.name),
           command_row.visible,
           None,
           command_row,
@@ -355,6 +358,7 @@ class CommandBrowser(GObject.GObject):
             command_row.command_dict, tree_model, selected_child_iter)
 
         return (
+          command_row,
           command_row.command_dict,
           command_row.command_editor_widget.command,
           command_row.command_editor_widget,
@@ -362,9 +366,9 @@ class CommandBrowser(GObject.GObject):
           selected_child_iter,
         )
       else:
-        return None, None, None, tree_model, selected_child_iter
+        return None, None, None, None, tree_model, selected_child_iter
     else:
-      return None, None, None, tree_model, None
+      return None, None, None, None, tree_model, None
 
   def _has_plugin_procedure_image_or_drawable_arguments(self, command_dict):
     if not command_dict['arguments']:
@@ -468,7 +472,7 @@ class CommandBrowser(GObject.GObject):
     self._column_name.pack_start(cell_renderer_command_name, False)
     self._column_name.set_attributes(
       cell_renderer_command_name,
-      text=self._COLUMN_COMMAND_NAME[0],
+      markup=self._COLUMN_COMMAND_NAME[0],
     )
     self._column_name.set_sort_column_id(self._COLUMN_COMMAND_NAME[0])
 
@@ -824,12 +828,15 @@ class CommandBrowser(GObject.GObject):
     model, selected_iter = selection.get_selected()
 
     if selected_iter is not None:
-      _command_dict, command, command_editor_widget, _model, _iter = (
+      command_row, _command_dict, command, command_editor_widget, _tree_model, _child_iter = (
         self._get_selected_command(model, selected_iter))
 
       self.emit('command-selected', command)
 
       self._detach_command_editor_widget()
+
+      self._hide_command_internal_name(self._last_selected_command_row)
+      self._show_command_internal_name(command_row)
 
       if command_editor_widget is not None:
         self._label_no_selection.hide()
@@ -840,12 +847,42 @@ class CommandBrowser(GObject.GObject):
         self._scrolled_window_command_arguments.hide()
         self._label_no_selection.show()
         self._button_add.set_sensitive(False)
+
+      self._last_selected_command_row = command_row
     else:
       self._scrolled_window_command_arguments.hide()
       self._label_no_selection.show()
       self._button_add.set_sensitive(False)
 
       self.emit('command-selected', None)
+
+      self._hide_command_internal_name(self._last_selected_command_row)
+      self._last_selected_command_row = None
+
+  def _show_command_internal_name(self, command_row):
+    if (command_row is None
+        or command_row.tree_iter is None
+        or command_row.name == command_row.internal_name):
+      return
+
+    self._tree_model.set_value(
+      command_row.tree_iter,
+      self._COLUMN_COMMAND_NAME[0],
+      (f'{GLib.markup_escape_text(command_row.name)}\n'
+       f'<span font_size="{self._COMMAND_INTERNAL_NAME_FONT_SIZE_PERCENTAGE}%">'
+       f'{GLib.markup_escape_text(command_row.internal_name)}'
+       f'</span>'),
+    )
+
+  def _hide_command_internal_name(self, command_row):
+    if command_row is None or command_row.tree_iter is None:
+      return
+
+    self._tree_model.set_value(
+      command_row.tree_iter,
+      self._COLUMN_COMMAND_NAME[0],
+      GLib.markup_escape_text(command_row.name),
+    )
 
   def _on_tree_view_button_press_event(self, _tree_view, event):
     if event.type != Gdk.EventType.BUTTON_PRESS:
@@ -920,17 +957,17 @@ class CommandBrowser(GObject.GObject):
 
   def _on_dialog_response(self, dialog, response_id):
     if response_id == Gtk.ResponseType.OK:
-      command_dict, command, command_editor_widget, model, selected_child_iter = (
+      _command_row, command_dict, command, command_editor_widget, tree_model, child_iter = (
         self._get_selected_command())
 
       if command is not None:
         self._detach_command_editor_widget()
-        self._remove_command_editor_widget(model, selected_child_iter)
+        self._remove_command_editor_widget(tree_model, child_iter)
 
         self.emit('confirm-add-command', command, command_editor_widget)
 
         new_command_editor_widget = self._add_command_editor_widget(
-          command_dict, model, selected_child_iter)
+          command_dict, tree_model, child_iter)
         self._attach_command_editor_widget(new_command_editor_widget)
 
         dialog.hide()

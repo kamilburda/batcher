@@ -51,7 +51,7 @@ User interface changes:
 * An info icon is now displayed for skipped actions for clarity (e.g. actions trying to use foreground layers when there are none).
 * Changes to the custom action browser:
   * Adjusted the default width of the dialog and its individual parts.
-  * Merged the `Menu Name` column into the `Name` column. This means that the browser now only displays a single column, preferably showing the menu name if available. The internal name is always available in the action editor when pressing the icon button containing detailed description of an action.
+  * Merged the `Menu Name` column into the `Name` column. The browser now only displays the menu name if available, or the internal name otherwise. If the menu name is available, the internal name is displayed for the currently selected action with a smaller font.
   * You can now search by multiple words. At least one matching word will yield a match. Whitespace characters are no longer considered when finding search results.
   * When searching and the first match is under a collapsed category, that category is expanded automatically.
   * Categories with no matching search results are now hidden.
