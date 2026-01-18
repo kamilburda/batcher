@@ -143,7 +143,7 @@ class BatcherManager(BatcherInteractiveMixin):
         previews.image_preview.update()
         previews.name_preview.update()
 
-      command_lists.set_warnings_and_deactivate_failed_commands(self._batcher)
+      command_lists.set_command_status_and_deactivate_failed_commands(self._batcher)
 
       message = self._batcher.get_finished_processing_message()
 

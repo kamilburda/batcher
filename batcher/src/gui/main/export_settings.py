@@ -1,6 +1,8 @@
 import os
 
 import gi
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -326,10 +328,11 @@ def _set_up_output_directory_settings_to_warn_about_special_values(settings):
   def on_output_directory_changed(output_directory_setting):
     if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
         and output_directory_setting.value.value == 'match_input_folders'):
-      messages_.display_warning_popover(
+      messages_.display_popover(
         output_directory_setting.gui.widget,
         _('Exporting to input folders can overwrite original images.\n'
           'Adjust the {} field to avoid losing data.').format(_('Filename')),
+        icon_name=GimpUi.ICON_DIALOG_WARNING,
       )
 
   settings['main/output_directory'].connect_event(

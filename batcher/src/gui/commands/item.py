@@ -26,6 +26,7 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._attach_editor_widget = attach_editor_widget
 
     self._display_warning_message_event_id = None
+    self._display_info_message_event_id = None
     self._drag_icon_window = None
 
     self._button_command = self._command['enabled'].gui.widget
@@ -83,9 +84,6 @@ class CommandItem(gui_widgets_.ItemBoxItem):
   def reset_tooltip(self):
     self.set_tooltip()
 
-  def has_warning(self):
-    return self._button_warning.get_visible()
-
   def set_warning(self, show, main_message=None, failure_message=None, details=None, parent=None):
     if show:
       self.set_tooltip(failure_message)
@@ -102,9 +100,31 @@ class CommandItem(gui_widgets_.ItemBoxItem):
       self._button_warning.hide()
 
       self.reset_tooltip()
+
       if self._display_warning_message_event_id is not None:
         self._button_warning.disconnect(self._display_warning_message_event_id)
         self._display_warning_message_event_id = None
+
+  def set_info(self, show, message=None):
+    if show:
+      self.set_tooltip(message)
+
+      if self._display_info_message_event_id is not None:
+        self._button_info.disconnect(self._display_info_message_event_id)
+
+      self._display_info_message_event_id = self._button_info.connect(
+        'clicked', self._on_button_info_clicked, message)
+
+      self._button_info.show()
+    else:
+      self._button_info.hide()
+
+      self.reset_tooltip()
+
+      if self._display_info_message_event_id is not None:
+        self._button_info.disconnect(self._display_info_message_event_id)
+        self._display_info_message_event_id = None
+
 
   def create_drag_icon(self):
     if self._drag_icon_window is not None:
@@ -164,6 +184,9 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._button_warning = self._setup_item_indicator_button(
       icon=GimpUi.ICON_DIALOG_WARNING, position=0)
 
+    self._button_info = self._setup_item_indicator_button(
+      icon=GimpUi.ICON_DIALOG_INFORMATION, position=0)
+
     self.set_tooltip()
 
   def _on_command_widget_realize(self, _dialog):
@@ -178,6 +201,10 @@ class CommandItem(gui_widgets_.ItemBoxItem):
   @staticmethod
   def _on_button_warning_clicked(_button, main_message, short_message, full_message, parent):
     gui_messages_.display_failure_message(main_message, short_message, full_message, parent=parent)
+
+  @staticmethod
+  def _on_button_info_clicked(button, message):
+    gui_messages_.display_popover(button, message)
 
   def _on_command_enabled_changed(self, _setting):
     self._command['arguments'].apply_gui_values_to_settings(force=True)

@@ -974,7 +974,7 @@ class Previews:
     preview_sensitive_setting.set_value(False)
 
   def _on_image_preview_updated(self, _preview, _error, update_duration_seconds, command_lists):
-    command_lists.display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
+    command_lists.display_command_status_and_tooltips_and_deactivate_failing_commands(
       self._batcher_for_image_preview)
 
     if (self._settings['gui/image_preview_automatic_update_if_below_maximum_duration'].value
@@ -990,7 +990,7 @@ class Previews:
       self._show_hide_name_preview_placeholder_label()
       self._update_file_format_import_options()
 
-    command_lists.display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
+    command_lists.display_command_status_and_tooltips_and_deactivate_failing_commands(
       self._batcher_for_name_preview, clear_previous=False)
 
   def _show_hide_name_preview_placeholder_label(self):

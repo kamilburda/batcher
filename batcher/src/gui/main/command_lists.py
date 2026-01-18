@@ -1,8 +1,9 @@
 import os
-from typing import Dict, List
 
 import gi
 
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -79,29 +80,20 @@ class CommandLists:
   def vbox_conditions(self):
     return self._vbox_conditions
 
-  def display_warnings_and_tooltips_for_commands_and_deactivate_failing_commands(
+  def display_command_status_and_tooltips_and_deactivate_failing_commands(
         self, batcher, clear_previous=True):
-    self.set_warnings_and_deactivate_failed_commands(batcher, clear_previous=clear_previous)
+    self.set_command_status_and_deactivate_failed_commands(batcher, clear_previous=clear_previous)
 
-    self._set_command_skipped_tooltips(
-      self._action_list,
-      batcher.skipped_actions,
-      _('Skipped: {}'),
-      clear_previous=clear_previous)
-
-    self._set_command_skipped_tooltips(
-      self._condition_list,
-      batcher.skipped_conditions,
-      _('Skipped: {}'),
-      clear_previous=clear_previous)
-
-  def set_warnings_and_deactivate_failed_commands(self, batcher, clear_previous=True):
+  def set_command_status_and_deactivate_failed_commands(self, batcher, clear_previous=True):
     command_lists = [self._action_list, self._condition_list]
     failed_commands_dict = [batcher.failed_actions, batcher.failed_conditions]
+    skipped_commands_dict = [batcher.skipped_actions, batcher.skipped_conditions]
 
-    for command_list, failed_commands in zip(command_lists, failed_commands_dict):
+    for command_list, failed_commands, skipped_commands in zip(
+          command_lists, failed_commands_dict, skipped_commands_dict):
       for command_item in command_list.items:
         if command_item.command.name in failed_commands:
+          command_item.set_info(False)
           command_item.set_warning(
             True,
             messages_.get_failing_message(
@@ -112,15 +104,22 @@ class CommandLists:
 
           if not batcher.continue_on_error:
             command_item.command['enabled'].set_value(False)
+        elif command_item.command.name in skipped_commands:
+          command_item.set_warning(False)
+          command_item.set_info(
+            True,
+            _('Skipped: {}').format(skipped_commands[command_item.command.name][0][1])
+          )
         else:
           if clear_previous and command_item.command['enabled'].value:
             command_item.set_warning(False)
+            command_item.set_info(False)
 
-  def reset_command_tooltips_and_indicators(self):
+  def reset_command_status(self):
     for command_list in [self._action_list, self._condition_list]:
       for command_item in command_list.items:
-        command_item.reset_tooltip()
         command_item.set_warning(False)
+        command_item.set_info(False)
 
   def close_command_edit_dialogs(self):
     for command_list in [self._action_list, self._condition_list]:
@@ -247,22 +246,6 @@ class CommandLists:
       self._actions_or_conditions_loaded = False
 
     self._actions_or_conditions_loaded = True
-
-  @staticmethod
-  def _set_command_skipped_tooltips(
-        command_list: command_list_.CommandList,
-        skipped_commands: Dict[str, List],
-        message: str,
-        clear_previous: bool = True,
-  ):
-    for command_item in command_list.items:
-      if not command_item.has_warning():
-        if command_item.command.name in skipped_commands:
-          skipped_message = skipped_commands[command_item.command.name][0][1]
-          command_item.set_tooltip(message.format(skipped_message))
-        else:
-          if clear_previous:
-            command_item.reset_tooltip()
 
 
 def _on_action_item_added(action_list, item, settings, condition_list):
@@ -685,10 +668,11 @@ def _copy_setting_values_from_default_export_action(main_settings, export_action
 def _warn_about_output_directory_special_values(output_directory_setting):
   if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
       and output_directory_setting.value.value == 'match_input_folders'):
-    messages_.display_warning_popover(
+    messages_.display_popover(
       output_directory_setting.gui.widget,
       _('Exporting to input folders can overwrite original images.\n'
         'Add and adjust a {} action before export to avoid losing data.').format(_('Rename')),
+      icon_name=GimpUi.ICON_DIALOG_WARNING,
     )
 
 

@@ -323,7 +323,7 @@ class BatchProcessingGui:
   def _set_up_gui_before_run(self):
     self._display_inline_message(None)
 
-    self._command_lists.reset_command_tooltips_and_indicators()
+    self._command_lists.reset_command_status()
     self._command_lists.close_command_edit_dialogs()
 
     self._previews.close_import_options_dialog()

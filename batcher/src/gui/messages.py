@@ -545,12 +545,24 @@ def get_failing_message(
   return command['display_name'].value
 
 
-def display_warning_popover(widget, text):
-  """Displays a simple warning popover attached to ``widget``."""
-  icon = Gtk.Image(
-    icon_name=GimpUi.ICON_DIALOG_WARNING,
-    icon_size=Gtk.IconSize.LARGE_TOOLBAR,
+def display_popover(widget, text, icon_name=None, icon_size=Gtk.IconSize.LARGE_TOOLBAR):
+  """Displays a simple message as a popover attached to ``widget``, optionally
+  with an icon.
+  """
+  hbox = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    spacing=8,
+    border_width=6,
   )
+
+  if icon_name is not None:
+    icon = Gtk.Image(
+      icon_name=icon_name,
+      icon_size=icon_size,
+    )
+
+    hbox.pack_start(icon, False, False, 0)
+
   label = Gtk.Label(
     label=text,
     xalign=0.0,
@@ -558,14 +570,9 @@ def display_warning_popover(widget, text):
     max_width_chars=60,
     wrap=True,
   )
-  hbox = Gtk.Box(
-    orientation=Gtk.Orientation.HORIZONTAL,
-    spacing=8,
-    border_width=6,
-  )
 
-  hbox.pack_start(icon, False, False, 0)
   hbox.pack_start(label, False, False, 0)
+
   hbox.show_all()
 
   popover_message = Gtk.Popover()
