@@ -199,12 +199,14 @@ def _init_config_per_procedure(config: _Config):
   config.PROCEDURE_GROUP = config.PLUGIN_NAME
 
   if _gimp_modules_available:
+    config.RUN_MODE = Gimp.RunMode.NONINTERACTIVE
     config.DEFAULT_SOURCE = setting_.GimpParasiteSource(config.PROCEDURE_GROUP)
 
     setting_.persistor.Persistor.set_default_setting_sources({
       'persistent': config.DEFAULT_SOURCE,
     })
   else:
+    config.RUN_MODE = 0
     config.DEFAULT_SOURCE = None
 
   loglib.log_output(

@@ -63,9 +63,9 @@ SETTINGS_EDIT_LAYERS = plugin_settings.create_settings_for_edit_layers()
 
 
 def plug_in_batch_convert(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(CONVERT_GROUP)
-
   run_mode = config.get_property('run-mode')
+
+  _set_config_entries_for_procedure(CONVERT_GROUP, run_mode)
 
   image_tree = itemtree.ImageFileTree()
 
@@ -96,9 +96,9 @@ def plug_in_batch_convert(_procedure, config, _data):
 
 
 def plug_in_batch_export_images(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(EXPORT_IMAGES_GROUP)
-
   run_mode = config.get_property('run-mode')
+
+  _set_config_entries_for_procedure(EXPORT_IMAGES_GROUP, run_mode)
 
   image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
@@ -122,9 +122,9 @@ def plug_in_batch_export_images(_procedure, config, _data):
 
 
 def plug_in_batch_export_images_quick(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(EXPORT_IMAGES_GROUP)
-
   run_mode = config.get_property('run-mode')
+
+  _set_config_entries_for_procedure(EXPORT_IMAGES_GROUP, run_mode)
 
   image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
@@ -141,9 +141,9 @@ def plug_in_batch_export_images_quick(_procedure, config, _data):
 
 
 def plug_in_batch_edit_and_save_images(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(EDIT_AND_SAVE_IMAGES_GROUP)
-
   run_mode = config.get_property('run-mode')
+
+  _set_config_entries_for_procedure(EDIT_AND_SAVE_IMAGES_GROUP, run_mode)
 
   image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
@@ -163,9 +163,9 @@ def plug_in_batch_edit_and_save_images(_procedure, config, _data):
 
 
 def plug_in_batch_edit_and_save_images_quick(_procedure, config, _data):
-  _set_procedure_group_and_default_setting_source(EDIT_AND_SAVE_IMAGES_GROUP)
-
   run_mode = config.get_property('run-mode')
+
+  _set_config_entries_for_procedure(EDIT_AND_SAVE_IMAGES_GROUP, run_mode)
 
   image_tree = itemtree.GimpImageTree()
   image_tree.add_opened_images()
@@ -182,7 +182,7 @@ def plug_in_batch_edit_and_save_images_quick(_procedure, config, _data):
 
 
 def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config, _data):
-  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EXPORT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -201,7 +201,7 @@ def plug_in_batch_export_layers(_procedure, run_mode, image, _drawables, config,
 
 
 def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EXPORT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -218,7 +218,7 @@ def plug_in_batch_export_layers_quick(_procedure, run_mode, image, _drawables, _
 
 
 def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_procedure_group_and_default_setting_source(EXPORT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EXPORT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -240,7 +240,7 @@ def plug_in_batch_export_selected_layers(_procedure, run_mode, image, _drawables
 
 
 def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _data):
-  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EDIT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -259,7 +259,7 @@ def plug_in_batch_edit_layers(_procedure, run_mode, image, _drawables, config, _
 
 
 def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EDIT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -276,7 +276,7 @@ def plug_in_batch_edit_layers_quick(_procedure, run_mode, image, _drawables, _co
 
 
 def plug_in_batch_edit_selected_layers(_procedure, run_mode, image, _drawables, _config, _data):
-  _set_procedure_group_and_default_setting_source(EDIT_LAYERS_GROUP)
+  _set_config_entries_for_procedure(EDIT_LAYERS_GROUP, run_mode)
 
   layer_tree = itemtree.LayerTree()
   layer_tree.add_from_image(image)
@@ -428,8 +428,9 @@ def _load_inputs(item_tree, filepath, max_num_inputs):
   return Gimp.PDBStatusType.SUCCESS, ''
 
 
-def _set_procedure_group_and_default_setting_source(procedure_group):
+def _set_config_entries_for_procedure(procedure_group, run_mode):
   CONFIG.PROCEDURE_GROUP = procedure_group
+  CONFIG.RUN_MODE = run_mode
 
   setting_.Persistor.set_default_setting_sources(
     {'persistent': setting_.GimpParasiteSource(procedure_group)})
