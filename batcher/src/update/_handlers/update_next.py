@@ -98,7 +98,8 @@ def _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
 
 
 def _add_merge_visible_layers_argument(export_settings_list):
-  setting_dict, _index = update_utils_.get_child_setting(export_settings_list, 'merge_groups')
+  setting_dict, _index = update_utils_.get_child_setting(
+    export_settings_list, 'merge_visible_layers')
 
   if setting_dict is None:
     export_settings_list.append({
