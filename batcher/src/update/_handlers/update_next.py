@@ -17,11 +17,16 @@ def update(data, _settings, _procedure_groups):
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
     if actions_list is not None:
-      for action_dict in actions_list:
+      indexes_of_apply_opacity_from_group_layers_dict = []
+
+      for index, action_dict in enumerate(actions_list):
         action_list = action_dict['settings']
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
+
+        if orig_name_setting_dict['value'] == 'apply_opacity_from_group_layers':
+          indexes_of_apply_opacity_from_group_layers_dict.append(index)
 
         if (orig_name_setting_dict['value'] == 'color_correction'
             and arguments_list is not None):
@@ -40,6 +45,10 @@ def update(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _update_output_directory_setting(arguments_list)
           _save_replace_save_existing_image_to_its_original_location_argument(arguments_list)
+
+      for index in indexes_of_apply_opacity_from_group_layers_dict:
+        _replace_apply_opacity_from_group_layers_with_apply_group_layer_appearance(
+          actions_list, index)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
@@ -115,6 +124,48 @@ def _change_active_file_format_to_dict(file_format_export_options_dict):
 def _remove_initial_file_format_argument(file_format_export_options_dict):
   if 'initial_file_format' in file_format_export_options_dict:
     del file_format_export_options_dict['initial_file_format']
+
+
+def _replace_apply_opacity_from_group_layers_with_apply_group_layer_appearance(
+      actions_list, index):
+  update_utils_.remove_command_by_orig_names(actions_list, ['apply_opacity_from_group_layers'])
+
+  action_names = {command_dict['name'] for command_dict in actions_list}
+  action_display_names = {
+    update_utils_.get_child_setting(command_dict['settings'], 'display_name')[0]['value']
+    for command_dict in actions_list
+    if update_utils_.get_child_setting(command_dict['settings'], 'display_name')[0] is not None
+  }
+
+  new_action_name = 'apply_group_layer_appearance'
+
+  apply_group_layer_appearance_group_dict = update_utils_.create_command_as_saved_dict(
+    builtin_actions.BUILTIN_ACTIONS[new_action_name])
+
+  apply_group_layer_appearance_group_dict['name'] = update_utils_.uniquify_command_name(
+    new_action_name, action_names)
+
+  display_name_dict, _index = update_utils_.get_child_setting(
+    apply_group_layer_appearance_group_dict['settings'], 'display_name')
+  if display_name_dict is not None:
+    display_name_dict['value'] = update_utils_.uniquify_command_display_name(
+      display_name_dict['value'], action_display_names)
+
+  arguments_list, _index = update_utils_.get_child_group_list(
+    apply_group_layer_appearance_group_dict['settings'], 'arguments')
+  if arguments_list is not None:
+    for argument_dict in arguments_list:
+      if argument_dict['name'] in [
+        'apply_filters',
+        'apply_layer_modes',
+        'apply_layer_masks',
+        'apply_blend_space',
+        'apply_composite_mode',
+        'apply_composite_space',
+      ]:
+        argument_dict['value'] = False
+
+  actions_list.insert(index, apply_group_layer_appearance_group_dict)
 
 
 def _color_correction_update_brightness_contrast_arguments(arguments_list):

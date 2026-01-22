@@ -566,10 +566,17 @@ def create_settings_for_export_layers():
   resize_canvas_action_dict['arguments'][1]['default_value'] = (
     builtin_actions.ResizeModes.RESIZE_TO_LAYER_SIZE)
 
+  apply_group_layer_appearance_action_dict = utils.semi_deep_copy(
+    builtin_actions.BUILTIN_ACTIONS['apply_group_layer_appearance'])
+  apply_group_layer_appearance_action_dict['enabled'] = True
+
   settings['main'].add([
     commands_.create(
       name='actions',
-      initial_commands=[resize_canvas_action_dict]),
+      initial_commands=[
+        resize_canvas_action_dict,
+        apply_group_layer_appearance_action_dict,
+      ]),
   ])
 
   visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
@@ -872,6 +879,8 @@ def _create_images_and_directories_setting_dict():
 
 
 def _connect_events_for_added_built_in_actions(settings):
+  settings['main/actions'].connect_event(
+    'after-add-command', builtin_actions.on_after_add_apply_group_layer_appearance_action)
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_color_correction_action)
   settings['main/actions'].connect_event(

@@ -2,6 +2,8 @@
 
 from src.builtin_actions import _align_and_offset
 from src.builtin_actions._align_and_offset import *
+from src.builtin_actions import _apply_group_layer_appearance
+from src.builtin_actions._apply_group_layer_appearance import *
 from src.builtin_actions import _color_correction
 from src.builtin_actions._color_correction import *
 from src.builtin_actions import _crop
@@ -33,6 +35,7 @@ from src.builtin_actions._utils import *
 
 _BUILTIN_ACTIONS_LIST = [
   _align_and_offset.ALIGN_AND_OFFSET_DICT,
+  _apply_group_layer_appearance.APPLY_GROUP_LAYER_APPEARANCE_DICT,
   _color_correction.COLOR_CORRECTION_DICT,
   _crop.CROP_FOR_IMAGES_DICT,
   _crop.CROP_FOR_LAYERS_DICT,
@@ -49,8 +52,6 @@ _BUILTIN_ACTIONS_LIST = [
   _insert_background_foreground.INSERT_FOREGROUND_FOR_LAYERS_DICT,
   _insert_background_foreground.MERGE_BACKGROUND_DICT,
   _insert_background_foreground.MERGE_FOREGROUND_DICT,
-  _misc.APPLY_OPACITY_FROM_GROUP_LAYERS_DICT,
-  _misc.APPLY_FILTERS_FROM_GROUP_LAYERS_DICT,
   _misc.MERGE_FILTERS_DICT,
   _misc.MERGE_VISIBLE_LAYERS_DICT,
   _misc.REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT,

@@ -356,6 +356,7 @@ def copy_and_paste_layer(
       remove_lock_attributes: bool = False,
       set_visible: bool = False,
       merge_group: bool = False,
+      copy_contents: bool = True,
 ) -> Gimp.Layer:
   """Copies the specified layer into the specified image and returns the layer
   copy.
@@ -370,8 +371,16 @@ def copy_and_paste_layer(
   
   If ``merge_group`` is ``True`` and the layer is a group, the group is
   merged into a single layer.
+
+  If ``copy_contents`` is ``True`` and the layer is a group, all underlying
+  layers are copied as well. If ``False``, only the group itself is created
+  without any child layers, filters, masks, etc.
   """
-  layer_copy = Gimp.Layer.new_from_drawable(layer, image)
+  if copy_contents or not layer.is_group_layer():
+    layer_copy = Gimp.Layer.new_from_drawable(layer, image)
+  else:
+    layer_copy = Gimp.GroupLayer.new(image, None)
+
   image.insert_layer(layer_copy, parent, position)
   
   if remove_lock_attributes:

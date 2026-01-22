@@ -56,7 +56,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     added_command_items = batcher.invoker.list_commands(group=commands_.DEFAULT_ACTIONS_GROUP)
     
     # Includes built-in actions added by default
-    self.assertEqual(len(added_command_items), 6)
+    self.assertEqual(len(added_command_items), 7)
     
     initial_invoker = added_command_items[1]
     self.assertIsInstance(initial_invoker, invoker_.Invoker)
