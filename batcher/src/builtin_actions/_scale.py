@@ -6,7 +6,6 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import constants
-from src import setting as setting_
 from src import utils
 from src.procedure_groups import *
 
