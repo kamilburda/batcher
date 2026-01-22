@@ -112,9 +112,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
       merge_action_display_name_dict, _index = update_utils_.get_child_setting(
         merge_group_dict['settings'], 'display_name')
       if merge_action_display_name_dict is not None:
-        unique_merge_action_display_name = update_utils_.uniquify_command_display_name(
+        merge_action_display_name_dict['value'] = update_utils_.uniquify_command_display_name(
           merge_action_display_name_dict['value'], action_display_names)
-        merge_action_display_name_dict['value'] = unique_merge_action_display_name
 
       merge_group_dicts.append(merge_group_dict)
 
@@ -130,9 +129,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
       condition_display_name_dict, _index = update_utils_.get_child_setting(
         condition_group_dict['settings'], 'display_name')
       if condition_display_name_dict is not None:
-        unique_condition_display_name = update_utils_.uniquify_command_display_name(
+        condition_display_name_dict['value'] = update_utils_.uniquify_command_display_name(
           condition_display_name_dict['value'], condition_display_names)
-        condition_display_name_dict['value'] = unique_condition_display_name
 
       condition_group_dicts.append(condition_group_dict)
 
