@@ -93,7 +93,7 @@ class ExportAction(invoker_.CallableCommand):
     self._convert_file_extension_to_lowercase = False
     self._use_original_modification_date = False
     self._rotate_flip_image_based_on_exif_metadata = True
-    self._merge_filters = True
+    self._merge_visible_layers = True
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
@@ -179,6 +179,9 @@ class ExportAction(invoker_.CallableCommand):
         return
       else:
         item_to_process = current_top_level_item
+    else:
+      if batcher.process_export and self._merge_visible_layers:
+        layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
 
     if batcher.process_names:
       item_to_process.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
@@ -219,7 +222,6 @@ class ExportAction(invoker_.CallableCommand):
         self._file_extension_properties,
         overwrite_chooser,
         self._use_original_modification_date,
-        self._merge_filters,
         self._logger,
       )
 
@@ -245,7 +247,6 @@ class ExportAction(invoker_.CallableCommand):
             self._file_extension_properties,
             overwrite_chooser,
             self._use_original_modification_date,
-            self._merge_filters,
             self._logger,
           )
 
@@ -433,7 +434,6 @@ def _export_item(
       file_extension_properties,
       overwrite_chooser,
       use_original_modification_date,
-      merge_filters,
       logger,
 ):
   output_filepath = builtin_actions_utils.get_item_filepath(item, output_directory.resolve(batcher))
@@ -463,10 +463,6 @@ def _export_item(
     logger.info(_('Saving "{}"').format(output_filepath))
 
     _make_dirs(item, os.path.dirname(output_filepath), default_file_extension)
-
-    if merge_filters:
-      for layer in image.get_layers():
-        layer.merge_filters()
 
     export_status = _export_item_once_wrapper(
       batcher,
@@ -914,9 +910,9 @@ EXPORT_FOR_CONVERT_DICT = {
     },
     {
       'type': 'bool',
-      'name': 'merge_filters',
+      'name': 'merge_visible_layers',
       'default_value': True,
-      'display_name': _('Merge filters (layer effects)'),
+      'display_name': _('Merge visible layers'),
     },
   ],
 }

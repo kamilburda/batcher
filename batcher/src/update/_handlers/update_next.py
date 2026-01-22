@@ -71,7 +71,7 @@ def _update_output_directory_setting(group_list):
 def _update_export_procedure(export_settings_list):
   _update_file_format_export_options_setting(export_settings_list)
   _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
-  _add_merge_filters_argument(export_settings_list)
+  _add_merge_visible_layers_argument(export_settings_list)
 
 
 def _update_file_format_export_options_setting(export_settings_list):
@@ -97,16 +97,16 @@ def _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
     })
 
 
-def _add_merge_filters_argument(export_settings_list):
-  setting_dict, _index = update_utils_.get_child_setting(export_settings_list, 'merge_filters')
+def _add_merge_visible_layers_argument(export_settings_list):
+  setting_dict, _index = update_utils_.get_child_setting(export_settings_list, 'merge_groups')
 
   if setting_dict is None:
     export_settings_list.append({
       'type': 'bool',
-      'name': 'merge_filters',
+      'name': 'merge_visible_layers',
       'default_value': True,
       'value': True,
-      'display_name': _('Merge filters (layer effects)'),
+      'display_name': _('Merge visible layers'),
     })
 
 
