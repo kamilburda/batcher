@@ -402,11 +402,6 @@ _BUILTIN_CONDITIONS_LIST = [
   },
 ]
 
-# Translated display names could be displayed out of alphabetical order,
-# hence the sorting.
-_BUILTIN_CONDITIONS_LIST.sort(
-  key=lambda item: item.get('menu_path', item.get('display_name', item['name'])))
-
 # Create a separate dictionary for functions since objects cannot be saved to
 # a persistent source. Saving them as strings would not be reliable as
 # function names and paths may change when refactoring or adding/modifying
