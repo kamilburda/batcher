@@ -168,7 +168,6 @@ class DirectoryChooser(Gtk.Box):
     self._combo_box = Gtk.ComboBox(
       model=self._model,
       active=0,
-      id_column=0,
     )
     self._combo_box.set_row_separator_func(self._is_row_separator)
 
