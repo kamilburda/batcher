@@ -294,7 +294,12 @@ def _do_crop(batcher, object_to_crop, x, y, width, height):
       )
       object_to_crop.insert_layer(empty_layer, None, -1)
   else:
-    pdb.gegl__crop(
+    if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
+      crop_procedure = pdb.gimp__compose_crop
+    else:
+      crop_procedure = pdb.gegl__crop
+
+    crop_procedure(
       object_to_crop,
       x=x,
       y=y,
