@@ -14,6 +14,7 @@ from src import builtin_conditions
 from src import directory as directory_
 from src import setting as setting_
 from src.gui import messages as messages_
+from src.gui import utils as gui_utils_
 from src.gui.commands import list as command_list_
 from src.gui.main import export_settings as export_settings_
 
@@ -668,7 +669,7 @@ def _copy_setting_values_from_default_export_action(main_settings, export_action
 def _warn_about_output_directory_special_values(output_directory_setting):
   if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
       and output_directory_setting.value.value == 'match_input_folders'):
-    messages_.display_popover(
+    gui_utils_.display_popover(
       output_directory_setting.gui.widget,
       _('Exporting to input folders can overwrite original images.\n'
         'Add and adjust a {} action before export to avoid losing data.').format(_('Rename')),

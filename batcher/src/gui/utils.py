@@ -253,3 +253,47 @@ def create_placeholder_widget(spacing=5):
   hbox.pack_start(label, False, False, 0)
 
   return hbox
+
+
+def display_popover(
+      widget,
+      text,
+      icon_name=None,
+      icon_size=Gtk.IconSize.LARGE_TOOLBAR,
+      max_width_chars=60,
+):
+  """Displays a simple message as a popover attached to ``widget``, optionally
+  with an icon.
+  """
+  hbox = Gtk.Box(
+    orientation=Gtk.Orientation.HORIZONTAL,
+    spacing=8,
+    border_width=6,
+  )
+
+  if icon_name is not None:
+    icon = Gtk.Image(
+      icon_name=icon_name,
+      icon_size=icon_size,
+    )
+
+    hbox.pack_start(icon, False, False, 0)
+
+  label = Gtk.Label(
+    label=text,
+    xalign=0.0,
+    yalign=0.5,
+    max_width_chars=max_width_chars,
+    wrap=True,
+  )
+
+  hbox.pack_start(label, False, False, 0)
+
+  hbox.show_all()
+
+  popover_message = Gtk.Popover()
+  popover_message.add(hbox)
+  popover_message.set_constrain_to(Gtk.PopoverConstraint.NONE)
+  popover_message.set_relative_to(widget)
+
+  popover_message.popup()

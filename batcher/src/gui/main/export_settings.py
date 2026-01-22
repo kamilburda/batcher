@@ -12,7 +12,7 @@ from src import directory as directory_
 from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
-from src.gui import messages as messages_
+from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 
 from . import _utils as gui_main_utils_
@@ -328,7 +328,7 @@ def _set_up_output_directory_settings_to_warn_about_special_values(settings):
   def on_output_directory_changed(output_directory_setting):
     if (output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL
         and output_directory_setting.value.value == 'match_input_folders'):
-      messages_.display_popover(
+      gui_utils_.display_popover(
         output_directory_setting.gui.widget,
         _('Exporting to input folders can overwrite original images.\n'
           'Adjust the {} field to avoid losing data.').format(_('Filename')),

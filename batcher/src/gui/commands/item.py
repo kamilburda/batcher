@@ -204,7 +204,7 @@ class CommandItem(gui_widgets_.ItemBoxItem):
 
   @staticmethod
   def _on_button_info_clicked(button, message):
-    gui_messages_.display_popover(button, message)
+    gui_utils_.display_popover(button, message)
 
   def _on_command_enabled_changed(self, _setting):
     self._command['arguments'].apply_gui_values_to_settings(force=True)
