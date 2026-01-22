@@ -175,10 +175,7 @@ def on_after_add_apply_group_layer_appearance_action(_actions, action, _orig_act
 
 def _warn_if_merge_groups_is_not_enabled(merge_groups_setting):
   if CONFIG.RUN_MODE == Gimp.RunMode.INTERACTIVE and not merge_groups_setting.value:
-    # Checking if the widget is mapped prevents the UI from getting
-    # unresponsive for some reason.
-    if (not isinstance(merge_groups_setting.gui, setting_.NullPresenter)
-        and merge_groups_setting.gui.widget.get_mapped()):
+    if not isinstance(merge_groups_setting.gui, setting_.NullPresenter):
       gui_utils_.display_popover(
         merge_groups_setting.gui.widget,
         _('If unchecked, the current layer is turned into a group layer.'

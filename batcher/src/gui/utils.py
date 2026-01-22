@@ -264,7 +264,14 @@ def display_popover(
 ):
   """Displays a simple message as a popover attached to ``widget``, optionally
   with an icon.
+
+  If ``widget`` is not displayed (mapped), the popover will not be displayed.
   """
+  # Checking if the widget is mapped prevents the UI from getting
+  # unresponsive for some reason.
+  if not widget.get_mapped():
+    return
+
   hbox = Gtk.Box(
     orientation=Gtk.Orientation.HORIZONTAL,
     spacing=8,
