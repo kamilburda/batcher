@@ -32,7 +32,7 @@ GMIC_FILTER_DICT = {
   'description': _(
     "Applies a G'MIC filter non-interactively.\n\n"
     "Select a filter in G'MIC and press Ctrl+C, or click the copy button. "
-    "Then paste the text into \"{}\" below."
+    "Then paste the text into the \"{}\" field."
   ).format(_('Command')),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
