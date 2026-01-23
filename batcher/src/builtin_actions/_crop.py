@@ -413,6 +413,7 @@ CROP_FOR_IMAGES_DICT = {
   'name': 'crop_for_images',
   'function': crop,
   'display_name': _('Crop'),
+  'menu_path': _('Resize and transform'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [

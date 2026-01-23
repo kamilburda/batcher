@@ -131,6 +131,7 @@ SAVE_DICT = {
   'name': 'save',
   'function': SaveAction,
   'display_name': _('Save'),
+  'menu_path': _('File and naming'),
   'description': _(
     'Saves the image in the native GIMP format (XCF). '
     'To export the image in another file format, use the "Export Images" menu.'),

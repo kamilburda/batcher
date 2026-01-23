@@ -236,6 +236,7 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_background_for_images',
   'function': InsertBackgroundFromFileAction,
   'display_name': _('Insert background'),
+  'menu_path': _('Layers and composition'),
   'description': _('Inserts the specified image behind the current layer.'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
@@ -261,6 +262,7 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_background_for_layers',
   'function': InsertBackgroundFromColorTagsAction,
   'display_name': _('Insert background'),
+  'menu_path': _('Layers and composition'),
   'description': _(
     'Inserts layers having the specified color tag behind the current layer.'),
   'display_options_on_create': True,
@@ -300,6 +302,7 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_foreground_for_images',
   'function': InsertForegroundFromFileAction,
   'display_name': _('Insert foreground'),
+  'menu_path': _('Layers and composition'),
   'description': _(
     'Inserts the specified image in front of the current layer.'),
   'display_options_on_create': True,
@@ -326,6 +329,7 @@ INSERT_FOREGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_foreground_for_layers',
   'function': InsertForegroundFromColorTagsAction,
   'display_name': _('Insert foreground'),
+  'menu_path': _('Layers and composition'),
   'description': _(
     'Inserts layers having the specified color tag in front of the current layer.'),
   'display_options_on_create': True,
@@ -365,6 +369,7 @@ MERGE_BACKGROUND_DICT = {
   'name': 'merge_background',
   'function': merge_background,
   'display_name': _('Merge background'),
+  'menu_path': _('Layers and composition'),
   # This action is added/removed automatically alongside `insert_background_for_*`.
   'additional_tags': [],
   'arguments': [
@@ -389,6 +394,7 @@ MERGE_FOREGROUND_DICT = {
   'name': 'merge_foreground',
   'function': merge_foreground,
   'display_name': _('Merge foreground'),
+  'menu_path': _('Layers and composition'),
   # This action is added/removed automatically alongside `insert_foreground_for_*`.
   'additional_tags': [],
   'arguments': [

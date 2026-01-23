@@ -41,6 +41,7 @@ MERGE_FILTERS_DICT = {
   'name': 'merge_filters',
   'function': merge_filters,
   'display_name': _('Merge filters'),
+  'menu_path': _('Layers and composition'),
   'description': _('Merges all visible filters (layer effects) in the specified layer.'),
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
@@ -56,6 +57,7 @@ MERGE_VISIBLE_LAYERS_DICT = {
   'name': 'merge_visible_layers',
   'function': merge_visible_layers,
   'display_name': _('Merge visible layers'),
+  'menu_path': _('Layers and composition'),
   'description': _(
     'Merges all visible layers within the image into a single layer. Invisible layers are'
     ' removed.\n\nThis is useful if the image contains multiple layers and you want to apply'
@@ -78,5 +80,6 @@ REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT = {
   'function': remove_file_extension_from_imported_images,
   'display_name': _('Remove file extension from imported images'),
   'description': _('Imported images represent non-native GIMP files (i.e. not XCF).'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
 }

@@ -346,6 +346,7 @@ SCALE_FOR_IMAGES_DICT = {
   'name': 'scale_for_images',
   'function': scale,
   'display_name': _('Scale'),
+  'menu_path': _('Resize and transform'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [

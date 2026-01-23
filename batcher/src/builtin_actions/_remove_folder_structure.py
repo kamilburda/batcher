@@ -43,6 +43,7 @@ REMOVE_FOLDER_STRUCTURE_DICT = {
   'name': 'remove_folder_structure',
   'function': remove_folder_structure_from_item,
   'display_name': _('Remove folder structure'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP, EXPORT_LAYERS_GROUP],
 }
 
@@ -50,6 +51,7 @@ REMOVE_FOLDER_STRUCTURE_FOR_EDIT_LAYERS_DICT = {
   'name': 'remove_folder_structure_for_edit_layers',
   'function': remove_folder_structure_from_item_for_edit_layers,
   'display_name': _('Remove folder structure'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'arguments': [
     {

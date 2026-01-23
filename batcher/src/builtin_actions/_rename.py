@@ -98,6 +98,7 @@ RENAME_FOR_CONVERT_DICT = {
   'name': 'rename_for_convert',
   'function': RenameImageForConvertAction,
   'display_name': _('Rename'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,
   'arguments': [
@@ -127,6 +128,7 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
   'name': 'rename_for_export_images',
   'function': RenameImageForExportImagesAction,
   'display_name': _('Rename'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
   'display_options_on_create': True,
   'arguments': [
@@ -144,6 +146,7 @@ RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
   'name': 'rename_for_edit_and_save_images',
   'function': RenameImageForEditAndSaveImagesAction,
   'display_name': _('Rename'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
   'display_options_on_create': True,
   'arguments': [
@@ -167,6 +170,7 @@ RENAME_FOR_EXPORT_LAYERS_DICT = {
   'name': 'rename_for_export_layers',
   'function': RenameLayerAction,
   'display_name': _('Rename'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_LAYERS_GROUP],
   'display_options_on_create': True,
   'arguments': [
@@ -196,6 +200,7 @@ RENAME_FOR_EDIT_LAYERS_DICT = {
   'name': 'rename_for_edit_layers',
   'function': RenameLayerAction,
   'display_name': _('Rename'),
+  'menu_path': _('File and naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_LAYERS_GROUP],
   'display_options_on_create': True,
   'arguments': [

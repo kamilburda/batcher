@@ -117,6 +117,7 @@ ALIGN_AND_OFFSET_DICT = {
   'name': 'align_and_offset_layers',
   'function': align_and_offset_layers,
   'display_name': _('Align and offset'),
+  'menu_path': _('Resize and transform'),
   'description': _(
     'Aligns layer(s) with the image or another layer.'
     '\n\nYou may specify additional offsets after the alignment is applied.'),

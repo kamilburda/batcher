@@ -541,6 +541,7 @@ RESIZE_CANVAS_DICT = {
   'name': 'resize_canvas',
   'function': resize_canvas,
   'display_name': _('Resize canvas'),
+  'menu_path': _('Resize and transform'),
   'description': _('Resizes the image or layer extents.'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,

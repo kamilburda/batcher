@@ -47,6 +47,7 @@ User interface changes:
 * The Export Options dialog is now closed before the start of processing.
 * Replaced the widget for choosing output folder with a custom widget. The folders previously available (such as the home user folder, disk drives, ...) are no longer available.
 * Adjusted wording and icon in the dialog handling conflicting files for clarity.
+* Actions and conditions are now organized in submenus and have a fixed position in the submenus for easier navigation.
 * Actions and conditions will now display their description (if available) as a tooltip.
 * An info icon is now displayed for skipped actions for clarity (e.g. actions trying to use foreground layers when there are none).
 * Changes to the custom action browser:

@@ -814,6 +814,7 @@ EXPORT_FOR_CONVERT_DICT = {
   'name': 'export_for_convert',
   'function': ExportAction,
   'display_name': _('Also export as...'),
+  'menu_path': _('File and naming'),
   'description': _('Exports an image to another file format.'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,

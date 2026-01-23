@@ -163,6 +163,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': is_layer,
     'display_name': _('Layers'),
+    'menu_path': _('Layer'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
@@ -170,21 +171,68 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': is_nonempty_group,
     'display_name': _('Group layers'),
+    'menu_path': _('Layer'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
-    'name': 'imported',
+    'name': 'visible',
     'type': 'condition',
-    'function': is_imported,
-    'display_name': _('Imported'),
-    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
+    'function': is_visible,
+    # FOR TRANSLATORS: Think of "Only visible items" when translating this
+    'display_name': _('Visible'),
+    'menu_path': _('Layer'),
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
   {
-    'name': 'not_imported',
+    'name': 'selected_in_gimp',
     'type': 'condition',
-    'function': is_not_imported,
-    'display_name': _('Not imported'),
-    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
+    'function': is_item_in_items_selected_in_gimp,
+    # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
+    'display_name': _('Selected in GIMP'),
+    'menu_path': _('Layer'),
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  },
+  {
+    'name': 'with_color_tags',
+    'type': 'condition',
+    'function': has_color_tags,
+    # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
+    'display_name': _('With color tags'),
+    'menu_path': _('Layer'),
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'arguments': [
+      {
+        'type': 'array',
+        'name': 'color_tags',
+        'display_name': _('Color tags'),
+        'element_type': 'enum',
+        'element_enum_type': Gimp.ColorTag,
+        'element_excluded_values': [Gimp.ColorTag.NONE],
+        'element_default_value': Gimp.ColorTag.BLUE,
+        'default_value': (),
+      },
+    ],
+  },
+  {
+    'name': 'without_color_tags',
+    'type': 'condition',
+    'function': has_no_color_tags,
+    # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
+    'display_name': _('Without color tags'),
+    'menu_path': _('Layer'),
+    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+    'arguments': [
+      {
+        'type': 'array',
+        'name': 'color_tags',
+        'display_name': _('Color tags'),
+        'element_type': 'enum',
+        'element_enum_type': Gimp.ColorTag,
+        'element_excluded_values': [Gimp.ColorTag.NONE],
+        'element_default_value': Gimp.ColorTag.BLUE,
+        'default_value': (),
+      },
+    ],
   },
   {
     'name': 'not_background',
@@ -192,6 +240,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
     'display_name': _('Not background'),
+    'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_background_for_layers`.
     'additional_tags': [],
     'arguments': [
@@ -217,6 +266,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
     'display_name': _('Not foreground'),
+    'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_foreground_for_layers`.
     'additional_tags': [],
     'arguments': [
@@ -237,19 +287,12 @@ _BUILTIN_CONDITIONS_LIST = [
     ],
   },
   {
-    'name': 'matching_file_extension',
-    'type': 'condition',
-    'function': has_matching_file_extension,
-    # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
-    'display_name': _('Matching file extension'),
-    'additional_tags': ALL_PROCEDURE_GROUPS,
-  },
-  {
     'name': 'matching_text',
     'type': 'condition',
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
     'display_name': _('Matching text...'),
+    'menu_path': _('Naming'),
     'additional_tags': ALL_PROCEDURE_GROUPS,
     'display_options_on_create': True,
     'arguments': [
@@ -283,18 +326,45 @@ _BUILTIN_CONDITIONS_LIST = [
     ],
   },
   {
+    'name': 'matching_file_extension',
+    'type': 'condition',
+    'function': has_matching_file_extension,
+    # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
+    'display_name': _('Matching file extension'),
+    'menu_path': _('Naming'),
+    'additional_tags': ALL_PROCEDURE_GROUPS,
+  },
+  {
     'name': 'recognized_file_format',
     'type': 'condition',
     'function': has_recognized_file_format,
     # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
     'display_name': _('Recognized file format'),
+    'menu_path': _('Naming'),
     'additional_tags': [CONVERT_GROUP],
+  },
+  {
+    'name': 'imported',
+    'type': 'condition',
+    'function': is_imported,
+    'display_name': _('Imported'),
+    'menu_path': _('File'),
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'not_imported',
+    'type': 'condition',
+    'function': is_not_imported,
+    'display_name': _('Not imported'),
+    'menu_path': _('File'),
+    'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
     'name': 'saved_or_exported',
     'type': 'condition',
     'function': is_saved_or_exported,
     'display_name': _('Saved or exported'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
@@ -302,71 +372,8 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': is_not_saved_or_exported,
     'display_name': _('Not saved or exported'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
-  },
-  {
-    'name': 'selected_in_gimp',
-    'type': 'condition',
-    'function': is_item_in_items_selected_in_gimp,
-    # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
-    'display_name': _('Selected in GIMP'),
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-  },
-  {
-    'name': 'top_level',
-    'type': 'condition',
-    'function': is_top_level,
-    # FOR TRANSLATORS: Think of "Only top-level items" when translating this
-    'display_name': _('Top-level'),
-    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-  },
-  {
-    'name': 'visible',
-    'type': 'condition',
-    'function': is_visible,
-    # FOR TRANSLATORS: Think of "Only visible items" when translating this
-    'display_name': _('Visible'),
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-  },
-  {
-    'name': 'with_color_tags',
-    'type': 'condition',
-    'function': has_color_tags,
-    # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
-    'display_name': _('With color tags'),
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-    'arguments': [
-      {
-        'type': 'array',
-        'name': 'color_tags',
-        'display_name': _('Color tags'),
-        'element_type': 'enum',
-        'element_enum_type': Gimp.ColorTag,
-        'element_excluded_values': [Gimp.ColorTag.NONE],
-        'element_default_value': Gimp.ColorTag.BLUE,
-        'default_value': (),
-      },
-    ],
-  },
-  {
-    'name': 'without_color_tags',
-    'type': 'condition',
-    'function': has_no_color_tags,
-    # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
-    'display_name': _('Without color tags'),
-    'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-    'arguments': [
-      {
-        'type': 'array',
-        'name': 'color_tags',
-        'display_name': _('Color tags'),
-        'element_type': 'enum',
-        'element_enum_type': Gimp.ColorTag,
-        'element_excluded_values': [Gimp.ColorTag.NONE],
-        'element_default_value': Gimp.ColorTag.BLUE,
-        'default_value': (),
-      },
-    ],
   },
   {
     'name': 'with_unsaved_changes',
@@ -374,6 +381,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
     'display_name': _('With unsaved changes'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
@@ -382,6 +390,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
     'display_name': _('With no unsaved changes'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
@@ -390,6 +399,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
     'display_name': _('XCF (native GIMP) file'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
   {
@@ -398,7 +408,16 @@ _BUILTIN_CONDITIONS_LIST = [
     'function': has_no_xcf_file,
     # FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
     'display_name': _('Not XCF (native GIMP) file'),
+    'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
+  },
+  {
+    'name': 'top_level',
+    'type': 'condition',
+    'function': is_top_level,
+    # FOR TRANSLATORS: Think of "Only top-level items" when translating this
+    'display_name': _('Top-level'),
+    'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
 ]
 
