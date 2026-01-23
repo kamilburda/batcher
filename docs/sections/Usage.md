@@ -159,7 +159,7 @@ This can be useful if you e.g. made changes to your images and you want to save 
 
 ### Filename Pattern
 
-The text entry next to `File Name` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
+The text entry next to `Filename` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
