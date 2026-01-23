@@ -320,20 +320,12 @@ class CommandList(gui_widgets_.ItemBox):
   def _add_command_to_menu_popup(self, command_dict):
     if command_dict.get('menu_path') is None:
       current_parent_menu = self._commands_menu
-      menu_name = command_dict['display_name']
     else:
       parent_names = tuple(command_dict['menu_path'].split(constants.MENU_PATH_SEPARATOR))
 
       current_parent_menu = self._commands_menu
 
-      # For multi-level menu paths, use the last path component as the menu
-      # name.
-      if len(parent_names) == 1:
-        range_parents = range(1)
-      else:
-        range_parents = range(len(parent_names) - 1)
-
-      for i in range_parents:
+      for i in range(len(parent_names)):
         current_names = parent_names[:i + 1]
 
         if current_names not in self._builtin_commands_submenus:
@@ -345,12 +337,7 @@ class CommandList(gui_widgets_.ItemBox):
 
         current_parent_menu = self._builtin_commands_submenus[current_names].get_submenu()
 
-      if len(parent_names) == 1:
-        menu_name = command_dict['display_name']
-      else:
-        menu_name = parent_names[-1]
-
-    menu_item = Gtk.MenuItem(label=menu_name, use_underline=False)
+    menu_item = Gtk.MenuItem(label=command_dict['display_name'], use_underline=False)
     menu_item.connect('activate', self._on_commands_menu_item_activate, command_dict)
 
     current_parent_menu.append(menu_item)
