@@ -10,6 +10,9 @@ For Batch Convert, import options for unrecognized file formats cannot be adjust
 
 If some actions result in errors, notably layer effects, the error message provided by Batcher is rather generic or there is none. A more detailed error message, if any, can be displayed in GIMP via `Windows → Dockable Dialogs → Error Console`. In previous Batcher versions, these messages were displayed as separate popups - however, these popups were often displayed repeatedly and kept obscuring the Batcher dialog.
 
+Images created by custom actions (e.g. via `plug-in-decompose`) are currently not usable in Batcher.
+[This will be resolved in a future version](https://github.com/kamilburda/batcher/issues/56).
+
 If you run GIMP using the official AppImage, `None` will be displayed as an option for a `Current Image`/`Current Layer` parameter in an action, even if the parameter does not allow omitting an image/layer. This will be fixed in a future version of GIMP.
 
 The `C source` and `HTML` file formats require displaying a file format dialog for each image to be exported. This will be fixed in a future version of GIMP.
