@@ -456,6 +456,7 @@ _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
   'GimpItem': setting_.SETTING_TYPES[PlaceholderItemSetting],
   'GimpDrawable': setting_.SETTING_TYPES[PlaceholderDrawableSetting],
   'GimpLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
+  'GimpTextLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
   ('GimpCoreObjectArray', setting_.LayerSetting): (
     setting_.SETTING_TYPES[PlaceholderLayerArraySetting]),
   ('GimpCoreObjectArray', setting_.DrawableSetting): (
