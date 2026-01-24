@@ -116,8 +116,8 @@ def get_import_function(
 IMPORT_DICT = {
   'name': 'import',
   'function': ImportAction,
-  'display_name': _('Import image'),
-  'menu_path': _('File and naming'),
+  'display_name': _('Import'),
+  'menu_path': _('File and Naming'),
   'description': _('Loads an image from a file.'),
   # This action is only used internally in `core.ImageBatcher` to load images
   # to be processed.

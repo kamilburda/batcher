@@ -1,4 +1,4 @@
-"""Built-in "G'MIC filter" action."""
+"""Built-in "G'MIC Filter" action."""
 
 from src.procedure_groups import *
 
@@ -28,7 +28,7 @@ def gmic_filter(batcher, layers, command):
 GMIC_FILTER_DICT = {
   'name': 'gmic_filter',
   'function': gmic_filter,
-  'display_name': _("G'MIC filter"),
+  'display_name': _("G'MIC Filter"),
   'description': _(
     "Applies a G'MIC filter non-interactively.\n\n"
     "Select a filter in G'MIC and press Ctrl+C, or click the copy button. "

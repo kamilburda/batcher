@@ -1,4 +1,4 @@
-Export options are available upon pressing the `Options...` button (if available), or when adding the `Export`/`Also export as...` action.
+Export options are available upon pressing the `Options...` button (if available), or when adding the `Export`/`Also Export As...` action.
 
 * *How to adjust file format options*: If set to `Interactively`, a native file format dialog is displayed for the first image to be exported. If set to `Use options below` (the default), you can adjust file format options in place without showing a file format dialog.
 * *File format options*: A list of options specific to the file format typed in the main dialog.

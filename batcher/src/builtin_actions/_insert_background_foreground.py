@@ -1,4 +1,4 @@
-"""Built-in "Insert background" and "Insert foreground" actions."""
+"""Built-in "Insert Background" and "Insert Foreground" actions."""
 
 import os
 
@@ -235,8 +235,8 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
 INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_background_for_images',
   'function': InsertBackgroundFromFileAction,
-  'display_name': _('Insert background'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Insert Background'),
+  'menu_path': _('Layers and Composition'),
   'description': _('Inserts the specified image behind the current layer.'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
@@ -261,8 +261,8 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
 INSERT_BACKGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_background_for_layers',
   'function': InsertBackgroundFromColorTagsAction,
-  'display_name': _('Insert background'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Insert Background'),
+  'menu_path': _('Layers and Composition'),
   'description': _(
     'Inserts layers having the specified color tag behind the current layer.'),
   'display_options_on_create': True,
@@ -301,8 +301,8 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
 INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'name': 'insert_foreground_for_images',
   'function': InsertForegroundFromFileAction,
-  'display_name': _('Insert foreground'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Insert Foreground'),
+  'menu_path': _('Layers and Composition'),
   'description': _(
     'Inserts the specified image in front of the current layer.'),
   'display_options_on_create': True,
@@ -328,8 +328,8 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
 INSERT_FOREGROUND_FOR_LAYERS_DICT = {
   'name': 'insert_foreground_for_layers',
   'function': InsertForegroundFromColorTagsAction,
-  'display_name': _('Insert foreground'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Insert Foreground'),
+  'menu_path': _('Layers and Composition'),
   'description': _(
     'Inserts layers having the specified color tag in front of the current layer.'),
   'display_options_on_create': True,
@@ -368,8 +368,8 @@ INSERT_FOREGROUND_FOR_LAYERS_DICT = {
 MERGE_BACKGROUND_DICT = {
   'name': 'merge_background',
   'function': merge_background,
-  'display_name': _('Merge background'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Merge Background'),
+  'menu_path': _('Layers and Composition'),
   # This action is added/removed automatically alongside `insert_background_for_*`.
   'additional_tags': [],
   'arguments': [
@@ -393,8 +393,8 @@ MERGE_BACKGROUND_DICT = {
 MERGE_FOREGROUND_DICT = {
   'name': 'merge_foreground',
   'function': merge_foreground,
-  'display_name': _('Merge foreground'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Merge Foreground'),
+  'menu_path': _('Layers and Composition'),
   # This action is added/removed automatically alongside `insert_foreground_for_*`.
   'additional_tags': [],
   'arguments': [

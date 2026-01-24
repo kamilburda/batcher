@@ -12,7 +12,7 @@ You can add the same action multiple times.
 
 ## Built-in Actions
 
-### File and naming
+### File and Naming
 
 #### Rename
 
@@ -32,7 +32,7 @@ For Edit and Save Images, renaming will have no effect unless the images are sav
 
 Removes the file extension from images opened in GIMP that were imported from a non-native file format (i.e. not XCF). Native XCF files and new images are kept intact.
 
-#### Remove folder structure
+#### Remove Folder Structure
 
 *Only available for: Batch Convert, Export Layers, Edit Layers*
 
@@ -41,7 +41,7 @@ Exports all images to the output folder on the same level, i.e. subfolders are n
 Options:
 * (Edit Layers only) *Consider visibility of parent folders*: If checked, a layer will become invisible if any of its parents are not visible (even if the layer itself is visible). Having this checked corresponds to how the layers are displayed in the image canvas.
 
-#### Export/Also export as...
+#### Export/Also Export As...
 
 Exports an image/layer to the specified file format.
 
@@ -79,7 +79,7 @@ Options:
 * *Output folder for new and imported images*: Folder where new images or non-XCF images are saved as XCF images.
 
 
-### Resize and transform
+### Resize and Transform
 
 #### Scale
 
@@ -100,7 +100,7 @@ Options:
 * *Set image resolution in DPI*: Whether to set a new resolution for the current image.
 * *X* and *Y*: The new image resolution in DPI. Only applicable if *Set image resolution in DPI* is checked.
 
-#### Resize canvas
+#### Resize Canvas
 
 Resizes the image or layer extents, i.e. adds empty space from the edges. There are multiple ways you can perform resizing based on your needs. You may optionally fill the added space with a color.
 
@@ -134,7 +134,7 @@ Options:
   * *Crop to area*: Crops to the area bounded by the starting position (X, Y), width and height.
   * *Remove empty borders*: Automatically removes empty areas along the edges of the image/layer.
 
-#### Align and offset
+#### Align and Offset
 
 Aligns layer(s) with the current image or another layer.
 You may specify additional offsets after the alignment is applied.
@@ -147,7 +147,7 @@ Options:
 * *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 
-#### Rotate and flip
+#### Rotate and Flip
 
 Rotates and/or flips the entire image or a layer.
 
@@ -164,9 +164,9 @@ Options:
 * *Flip vertically*: Flips the image/layer vertically.
 
 
-### Layers and composition
+### Layers and Composition
 
-#### Insert background
+#### Insert Background
 
 Inserts a new layer behind the current layer.
 
@@ -180,25 +180,25 @@ This action is inserted at the first position.
 This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
 You can always move this action lower as needed.
 
-The background is merged automatically at the end of processing as the `Merge background` action is automatically added. See `Merge background` below for more information.
+The background is merged automatically at the end of processing as the `Merge Background` action is automatically added. See `Merge Background` below for more information.
 
-For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not background` condition is automatically added and enabled.
+For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not Background` condition is automatically added and enabled.
 
-#### Insert foreground
+#### Insert Foreground
 
 Inserts a new layer in front of the current layer.
 
 For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
 
-The `Merge foreground` action is added automatically. For Export Layers and Edit Layers, the `Not foreground` condition is added automatically.
+The `Merge Foreground` action is added automatically. For Export Layers and Edit Layers, the `Not Foreground` condition is added automatically.
 
-For more information, see `Insert background` above.
+For more information, see `Insert Background` above.
 
-#### Merge background
+#### Merge Background
 
-*Only available if `Insert background` is added*
+*Only available if `Insert Background` is added*
 
-Merges already inserted background (via `Insert background`, see above) into the current layer.
+Merges already inserted background (via `Insert Background`, see above) into the current layer.
 
 When exporting, the background is merged automatically.
 However, if needed, you can reorder this action to perform the merge earlier and then apply actions on the current layer, now merged with the background.
@@ -211,15 +211,15 @@ If there is no background layer inserted, this action has no effect.
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
-#### Merge foreground
+#### Merge Foreground
 
-*Only available if `Insert foreground` is added*
+*Only available if `Insert Foreground` is added*
 
-Merges already inserted foreground (via `Insert foreground`, see above) with the current layer.
+Merges already inserted foreground (via `Insert Foreground`, see above) with the current layer.
 
-For more information, see `Merge background` above.
+For more information, see `Merge Background` above.
 
-#### Apply group layer appearance
+#### Apply Group Layer Appearance
 
 *Only available for: Export Layers, Edit Layers*
 
@@ -231,11 +231,11 @@ If *Merge groups with layer* is enabled, the groups are merged into the layer.
 Otherwise, the current layer is turned into a group layer.
 Subsequent actions may in that case fail if they attempt to perform operations not allowed on group layers, e.g. applying layer effects destructively.
 
-#### Merge filters
+#### Merge Filters
 
 Merges all visible filters (layer effects) in the specified layer.
 
-#### Merge visible layers
+#### Merge Visible Layers
 
 *Only available for: Batch Convert, Export Images, Edit and Save Images*
 
@@ -246,7 +246,7 @@ This is useful if the image contains multiple layers and you want to apply filte
 
 ### Color
 
-#### Brightness-contrast
+#### Brightness-Contrast
 
 Adjusts brightness and contrast.
 
@@ -268,12 +268,12 @@ You can save a GIMP preset file by choosing `Export Current Settings to File` in
 
 At the moment, Batcher only supports preset files saved in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
 
-#### White balance
+#### White Balance
 
 Equivalent to `Colors → Auto → White Balance` in GIMP.
 
 
-### G'MIC filter
+### G'MIC Filter
 
 *Only available if [G'MIC](https://gmic.eu/) is installed as a GIMP plug-in*
 

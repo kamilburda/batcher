@@ -546,9 +546,9 @@ def _handle_gmic_filter_action_item_added(item):
 def _set_display_name_for_gmic_filter_action(gmic_command_setting, gmic_filter_action):
   if gmic_command_setting.value:
     filter_name = gmic_command_setting.value.strip().split(' ')[0]
-    gmic_filter_action['display_name'].set_value(_("G'MIC filter: {}").format(filter_name))
+    gmic_filter_action['display_name'].set_value(_("G'MIC Filter: {}").format(filter_name))
   else:
-    gmic_filter_action['display_name'].set_value(_("G'MIC filter"))
+    gmic_filter_action['display_name'].set_value(_("G'MIC Filter"))
 
 
 def _handle_resize_canvas_action_item_added(item):
@@ -646,7 +646,7 @@ def _set_display_name_for_export_action(file_extension_setting, export_action):
         'export_for_edit_and_save_images', 'export_for_edit_layers']:
     export_action_name = _('Export as {}')
   elif export_action['orig_name'].value.startswith('export_for_'):
-    export_action_name = _('Also export as {}')
+    export_action_name = _('Also Export As {}')
 
   if export_action_name is not None:
     export_action['display_name'].set_value(export_action_name.format(file_extension))

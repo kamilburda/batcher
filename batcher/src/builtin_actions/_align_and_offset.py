@@ -1,4 +1,4 @@
-"""Built-in "Align and offset" action."""
+"""Built-in "Align and Offset" action."""
 
 import gi
 
@@ -116,8 +116,8 @@ def align_and_offset_layers(
 ALIGN_AND_OFFSET_DICT = {
   'name': 'align_and_offset_layers',
   'function': align_and_offset_layers,
-  'display_name': _('Align and offset'),
-  'menu_path': _('Resize and transform'),
+  'display_name': _('Align and Offset'),
+  'menu_path': _('Resize and Transform'),
   'description': _(
     'Aligns layer(s) with the image or another layer.'
     '\n\nYou may specify additional offsets after the alignment is applied.'),

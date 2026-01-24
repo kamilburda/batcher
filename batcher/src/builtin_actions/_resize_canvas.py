@@ -1,4 +1,4 @@
-"""Built-in "Resize canvas" action."""
+"""Built-in "Resize Canvas" action."""
 
 import gi
 
@@ -540,8 +540,8 @@ def _set_visible_for_resize_mode_settings(
 RESIZE_CANVAS_DICT = {
   'name': 'resize_canvas',
   'function': resize_canvas,
-  'display_name': _('Resize canvas'),
-  'menu_path': _('Resize and transform'),
+  'display_name': _('Resize Canvas'),
+  'menu_path': _('Resize and Transform'),
   'description': _('Resizes the image or layer extents.'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,

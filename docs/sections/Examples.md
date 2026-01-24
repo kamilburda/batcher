@@ -1,6 +1,6 @@
 ## I don't want to preserve folder hierarchy when exporting.
 
-Add and check the `Remove folder structure` action if not already (`Add Action... → Remove folder structure`).
+Add and check the `Remove Folder Structure` action if not already (`Add Action... → Remove Folder Structure`).
 
 
 ## How do I rename the images to form a sequence of numbers, e.g. "image001", "image002", ...?
@@ -22,24 +22,24 @@ Absolutely! In fact, you may apply any GIMP filter or plug-in:
 You can think of watermarks as foreground, i.e. a layer added on top of your images.
 
 For Batch Convert and Export Images:
-1. Add the `Insert foreground` action and specify an image file serving as the foreground.
-2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` action that was added automatically.
+1. Add the `Insert Foreground` action and specify an image file serving as the foreground.
+2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge Foreground` action that was added automatically.
 
 For Export Layers and Edit Layers:
 1. In GIMP, assign a color tag to the layer(s) you want to consider foreground (right-click on a layer → `Color Tags` → choose your color).
-2. Add the `Insert foreground` action and adjust the color tag as necessary.
+2. Add the `Insert Foreground` action and adjust the color tag as necessary.
 3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this action after `Resize to layer size` by dragging it onto `Resize to layer size`.
-4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge foreground` action that was added automatically.
+4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge Foreground` action that was added automatically.
 
 
 ## I need every image to have the same background.
 
-You can follow the same steps as in the example above, except that you add the `Insert background` action (and adjust `Merge background` as needed).
+You can follow the same steps as in the example above, except that you add the `Insert Background` action (and adjust `Merge Background` as needed).
 
 
 ## How can I add borders to an image?
 
-1. Add the `Resize canvas` action.
+1. Add the `Resize Canvas` action.
 2. Set `How to resize` to `Resize from edges (add borders)` if not already.
 3. Adjust the `Amount` (border thickness).
 4. If you want the border to have a particular color, check `Fill added space with color` and adjust `Color for added space` as desired.
@@ -57,7 +57,7 @@ While multipage PDF export is already possible in GIMP without any third-party p
 
 ## I want to be able to export to multiple file formats at once.
 
-You can achieve this by adding the `Also export as...` (or `Export`) action.
+You can achieve this by adding the `Also Export As...` (or `Export`) action.
 
 Each time you add this action, adjust the file extension, file format options and other settings as needed.
 
@@ -94,8 +94,8 @@ This ensures that the resulting image name will be e.g. `some.layer.png` instead
 ## How do I export only group layers at the top level?
 
 1. Uncheck the `Layers` condition.
-2. Add the `Group layers` condition.
-3. Add the `Top-level` condition.
+2. Add the `Group Layers` condition.
+3. Add the `Top-Level` condition.
 
 
 ## How do I reverse the order of the exported images/layers?

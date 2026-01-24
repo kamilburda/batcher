@@ -13,7 +13,7 @@ Just like [actions](Actions.md), you may enable/disable, reorder, [edit](Editing
 
 Processes only layers (i.e. group layers are not processed).
 
-#### Group layers
+#### Group Layers
 
 *Only available for: Export Layers, Edit Layers*
 
@@ -33,7 +33,7 @@ Processes only visible layers.
 
 Processes only layers selected in GIMP.
 
-#### With color tags
+#### With Color Tags
 
 *Only available for: Export Layers, Edit Layers*
 
@@ -44,7 +44,7 @@ To process only layers with specific color tags, edit this condition and add the
 For example, by adding a blue tag, only layers containing the blue tag will be processed.
 Other tagged or untagged layers will be excluded.
 
-#### Without color tags
+#### Without Color Tags
 
 *Only available for: Export Layers, Edit Layers*
 
@@ -57,40 +57,40 @@ For example, by adding a blue tag, all layers except the ones containing the blu
 If a group layer has a color tag, it will normally not be excluded.
 To also exclude group layers with color tags, click on `More options` and check `Also apply to parent folders`.
 
-#### Not background
+#### Not Background
 
 *Only available for: Export Layers, Edit Layers*
 
-*Only available if `Insert background` is added*
+*Only available if `Insert Background` is added*
 
-Processes only layers that are not inserted as background via `Insert background`.
+Processes only layers that are not inserted as background via `Insert Background`.
 
-#### Not foreground
+#### Not Foreground
 
 *Only available for: Export Layers, Edit Layers*
 
-*Only available if `Insert foreground` is added*
+*Only available if `Insert Foreground` is added*
 
-Processes only layers that are not inserted as foreground via `Insert foreground`.
+Processes only layers that are not inserted as foreground via `Insert Foreground`.
 
 
 ### Naming
 
-#### Matching text...
+#### Matching Text...
 
 Processes only images/layers whose names match the specified text.
 
-You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching file extension` condition).
+You can adjust how to perform matching - whether the image/layer name should start with, contain or end with the specified text to match. For example, with the "Ends with text" option, you can match against an arbitrary file extension instead of the one typed in the main dialog (via the `Matching File Extension` condition).
 
 Matching can be made case-insensitive by checking the *Ignore case sensitivity* option.
 
 You can also specify a regular expression pattern as defined in the [`re` module for Python](https://docs.python.org/3/library/re.html). Errors in the regular expression pattern will result in no matches.
 
-#### Matching file extension
+#### Matching File Extension
 
 Processes only images/layers whose names match the file extension typed in the main dialog.
 
-#### Recognized file format
+#### Recognized File Format
 
 *Only available for: Batch Convert*
 
@@ -113,37 +113,37 @@ Processes only images imported from a non-native (XCF) file.
 
 Processes only images that are native (XCF) images or are unsaved images without a file.
 
-#### Saved or exported
+#### Saved or Exported
 
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images that are saved as native (XCF) files or exported to another file format.
 
-#### Not saved or exported
+#### Not Saved or Exported
 
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images created in GIMP not yet saved to a file.
 
-#### With unsaved changes
+#### With Unsaved Changes
 
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images with unsaved changes ("dirty" images).
 
-#### With no unsaved changes
+#### With No Unsaved Changes
 
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images with no unsaved changes ("clean" images).
 
-#### XCF (native GIMP) file
+#### XCF (Native GIMP) File
 
 *Only available for: Export Images, Edit and Save Images*
 
 Processes only images associated with an XCF file.
 
-#### Not XCF (native GIMP) file
+#### Not XCF (Native GIMP) File
 
 *Only available for: Export Images, Edit and Save Images*
 
@@ -151,7 +151,7 @@ Processes only images not associated with an XCF file.
 This includes imported images or new images created in GIMP.
 
 
-### Top-level
+### Top-Level
 
 *Only available for: Batch Convert, Export Layers, Edit Layers*
 

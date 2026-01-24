@@ -1,4 +1,4 @@
-"""Built-in "Export"/"Also export as..." action."""
+"""Built-in "Export"/"Also Export As..." action."""
 
 import logging
 import os
@@ -813,8 +813,8 @@ _EXPORT_OVERWRITE_MODES_LIST = [
 EXPORT_FOR_CONVERT_DICT = {
   'name': 'export_for_convert',
   'function': ExportAction,
-  'display_name': _('Also export as...'),
-  'menu_path': _('File and naming'),
+  'display_name': _('Also Export As...'),
+  'menu_path': _('File and Naming'),
   'description': _('Exports an image to another file format.'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, CONVERT_GROUP],
   'display_options_on_create': True,

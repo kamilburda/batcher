@@ -1,4 +1,4 @@
-"""Built-in "Apply group layer appearance" action."""
+"""Built-in "Apply Group Layer Appearance" action."""
 
 import gi
 
@@ -188,8 +188,8 @@ def _warn_if_merge_groups_is_not_enabled(merge_groups_setting):
 APPLY_GROUP_LAYER_APPEARANCE_DICT = {
   'name': 'apply_group_layer_appearance',
   'function': apply_group_layer_appearance,
-  'display_name': _('Apply group layer appearance'),
-  'menu_path': _('Layers and composition'),
+  'display_name': _('Apply Group Layer Appearance'),
+  'menu_path': _('Layers and Composition'),
   'description': _(
     'Applies attributes (filters, opacity, mode, ...) from all parent group layers'
     ' to the current layer to match its appearance in GIMP.'),

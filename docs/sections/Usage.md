@@ -19,7 +19,7 @@ You can add files and folders in one of the following ways:
 * Copy and paste images and folders from a text file, each on a separate line to the area under `Input Images`. Note that you must click on the area first. Any files and folders that do not exist are ignored.
 * Press the `+` button to add files or folders.
 
-Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized file formats` condition.
+Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized File Format` condition.
 
 You will be warned if you add folder(s) containing too many files or e.g. an entire drive. This is a safeguard against accidentally adding an undesired folder.
 

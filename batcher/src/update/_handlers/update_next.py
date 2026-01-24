@@ -99,7 +99,7 @@ def _add_rotate_flip_image_based_on_exif_metadata_argument(export_settings_list)
       'name': 'rotate_flip_image_based_on_exif_metadata',
       'default_value': True,
       'value': True,
-      'display_name': _('Rotate and flip image based on Exif metadata'),
+      'display_name': _('Rotate or flip image based on Exif metadata'),
     })
 
 

@@ -1,4 +1,4 @@
-"""Built-in "Rotate and flip" action."""
+"""Built-in "Rotate and Flip" action."""
 
 import math
 
@@ -260,8 +260,8 @@ def _set_sensitive_for_rotation_center_x_y(
 ROTATE_AND_FLIP_FOR_IMAGES_DICT = {
   'name': 'rotate_and_flip_for_images',
   'function': rotate_and_flip,
-  'display_name': _('Rotate and flip'),
-  'menu_path': _('Resize and transform'),
+  'display_name': _('Rotate and Flip'),
+  'menu_path': _('Resize and Transform'),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [

@@ -380,7 +380,7 @@ _HISTOGRAM_CHANNELS = {
 BRIGHTNESS_CONTRAST_DICT = {
   'name': 'brightness_contrast',
   'function': brightness_contrast,
-  'display_name': _('Brightness-contrast'),
+  'display_name': _('Brightness-Contrast'),
   'menu_path': _('Color'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
@@ -483,7 +483,7 @@ CURVES_DICT = {
 WHITE_BALANCE_DICT = {
   'name': 'white_balance',
   'function': white_balance,
-  'display_name': _('White balance'),
+  'display_name': _('White Balance'),
   'menu_path': _('Color'),
   'display_options_on_create': False,
   'additional_tags': ALL_PROCEDURE_GROUPS,

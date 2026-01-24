@@ -170,7 +170,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'name': 'group_layers',
     'type': 'condition',
     'function': is_nonempty_group,
-    'display_name': _('Group layers'),
+    'display_name': _('Group Layers'),
     'menu_path': _('Layer'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
@@ -197,7 +197,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_color_tags,
     # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
-    'display_name': _('With color tags'),
+    'display_name': _('With Color Tags'),
     'menu_path': _('Layer'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
@@ -218,7 +218,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_no_color_tags,
     # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
-    'display_name': _('Without color tags'),
+    'display_name': _('Without Color Tags'),
     'menu_path': _('Layer'),
     'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
     'arguments': [
@@ -239,7 +239,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
-    'display_name': _('Not background'),
+    'display_name': _('Not Background'),
     'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_background_for_layers`.
     'additional_tags': [],
@@ -265,7 +265,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
-    'display_name': _('Not foreground'),
+    'display_name': _('Not Foreground'),
     'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_foreground_for_layers`.
     'additional_tags': [],
@@ -291,7 +291,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
-    'display_name': _('Matching text...'),
+    'display_name': _('Matching Text...'),
     'menu_path': _('Naming'),
     'additional_tags': ALL_PROCEDURE_GROUPS,
     'display_options_on_create': True,
@@ -330,7 +330,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
-    'display_name': _('Matching file extension'),
+    'display_name': _('Matching File Extension'),
     'menu_path': _('Naming'),
     'additional_tags': ALL_PROCEDURE_GROUPS,
   },
@@ -339,7 +339,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_recognized_file_format,
     # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
-    'display_name': _('Recognized file format'),
+    'display_name': _('Recognized File Format'),
     'menu_path': _('Naming'),
     'additional_tags': [CONVERT_GROUP],
   },
@@ -355,7 +355,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'name': 'not_imported',
     'type': 'condition',
     'function': is_not_imported,
-    'display_name': _('Not imported'),
+    'display_name': _('Not Imported'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -363,7 +363,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'name': 'saved_or_exported',
     'type': 'condition',
     'function': is_saved_or_exported,
-    'display_name': _('Saved or exported'),
+    'display_name': _('Saved or Exported'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -371,7 +371,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'name': 'not_saved_or_exported',
     'type': 'condition',
     'function': is_not_saved_or_exported,
-    'display_name': _('Not saved or exported'),
+    'display_name': _('Not Saved or Exported'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -380,7 +380,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
-    'display_name': _('With unsaved changes'),
+    'display_name': _('With Unsaved Changes'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -389,7 +389,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
-    'display_name': _('With no unsaved changes'),
+    'display_name': _('With No Unsaved Changes'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -398,7 +398,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
-    'display_name': _('XCF (native GIMP) file'),
+    'display_name': _('XCF (Native GIMP) File'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -407,7 +407,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': has_no_xcf_file,
     # FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
-    'display_name': _('Not XCF (native GIMP) file'),
+    'display_name': _('Not XCF (Native GIMP) File'),
     'menu_path': _('File'),
     'additional_tags': [EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
@@ -416,7 +416,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'type': 'condition',
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level items" when translating this
-    'display_name': _('Top-level'),
+    'display_name': _('Top-Level'),
     'additional_tags': [CONVERT_GROUP, EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   },
 ]
