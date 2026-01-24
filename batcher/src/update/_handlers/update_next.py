@@ -193,6 +193,8 @@ def _add_brightness_contrast_action(actions_list, arguments_list, index):
   new_arguments_list, _index = update_utils_.get_child_group_list(
     brightness_contrast_group_dict['settings'], 'arguments')
   if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
+
     new_brightness_dict = new_arguments_list[1]
     value = arguments_list[1]['value']
     processed_value = round(
@@ -225,6 +227,7 @@ def _add_levels_action(actions_list, arguments_list, index):
   new_arguments_list, _index = update_utils_.get_child_group_list(
     levels_group_dict['settings'], 'arguments')
   if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
     new_arguments_list[1]['value'] = arguments_list[3]['value']
 
 
@@ -236,6 +239,7 @@ def _add_curves_action(actions_list, arguments_list, index):
   new_arguments_list, _index = update_utils_.get_child_group_list(
     levels_group_dict['settings'], 'arguments')
   if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
     new_arguments_list[1]['value'] = arguments_list[4]['value']
 
 
