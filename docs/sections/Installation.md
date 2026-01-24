@@ -32,7 +32,7 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
 
 ### Flatpak
 
-1. Copy the `batcher` folder from the downloaded archive to `/home/<your username>/.config/GIMP/<GIMP version, e.g. 3.0>/plug-ins`, e.g. `/home/username/.config/GIMP/3.0/plug-ins` for GIMP 3.0.x versions. Create the folder if it does not exist. The folder hierarchy should look like this:
+1. Copy the `batcher` folder from the downloaded archive to `/home/<your username>/.config/GIMP/<GIMP version>/plug-ins`, e.g. `/home/username/.config/GIMP/3.0/plug-ins` for GIMP 3.0.x versions. Create the folder if it does not exist. The folder hierarchy should look like this:
     ```
     plug-ins/
         ...other plug-in folders...
