@@ -21,14 +21,14 @@ def assert_contents(test_case, settings, _orig_setting_values):
   test_case.assertIn('merge_background', settings['main/actions'])
   test_case.assertEqual(
     settings['main/actions/merge_background/display_name'].value,
-    'Merge background')
+    'Merge Background')
   test_case.assertIn('merge_type', settings['main/actions/merge_background/arguments'])
   test_case.assertTrue(
     settings['main/actions/merge_background/arguments/last_enabled_value'].value)
   test_case.assertIn('not_background', settings['main/conditions'])
   test_case.assertEqual(
     settings['main/conditions/not_background/display_name'].value,
-    'Not background')
+    'Not Background')
   test_case.assertIn('color_tag', settings['main/conditions/not_background/arguments'])
   test_case.assertTrue(
     settings['main/conditions/not_background/arguments/last_enabled_value'].value)
@@ -44,14 +44,14 @@ def assert_contents(test_case, settings, _orig_setting_values):
   test_case.assertIn('merge_background_2', settings['main/actions'])
   test_case.assertEqual(
     settings['main/actions/merge_background_2/display_name'].value,
-    'Merge background (2)')
+    'Merge Background (2)')
   test_case.assertIn('merge_type', settings['main/actions/merge_background_2/arguments'])
   test_case.assertTrue(
     settings['main/actions/merge_background_2/arguments/last_enabled_value'].value)
   test_case.assertIn('not_background_2', settings['main/conditions'])
   test_case.assertEqual(
     settings['main/conditions/not_background/display_name'].value,
-    'Not background')
+    'Not Background')
   test_case.assertIn('color_tag', settings['main/conditions/not_background_2/arguments'])
   test_case.assertTrue(
     settings['main/conditions/not_background_2/arguments/last_enabled_value'].value)
