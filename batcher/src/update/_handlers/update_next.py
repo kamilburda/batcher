@@ -18,6 +18,7 @@ def update(data, _settings, _procedure_groups):
 
     if actions_list is not None:
       indexes_of_apply_opacity_from_group_layers_dict = []
+      arguments_and_indexes_of_color_correction_dict = []
 
       for index, action_dict in enumerate(actions_list):
         action_list = action_dict['settings']
@@ -30,7 +31,7 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'] == 'color_correction'
             and arguments_list is not None):
-          _color_correction_update_brightness_contrast_arguments(arguments_list)
+          arguments_and_indexes_of_color_correction_dict.append((arguments_list, index))
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
@@ -49,6 +50,11 @@ def update(data, _settings, _procedure_groups):
       for index in indexes_of_apply_opacity_from_group_layers_dict:
         _replace_apply_opacity_from_group_layers_with_apply_group_layer_appearance(
           actions_list, index)
+
+      num_added_actions = 0
+      for arguments_list, index in arguments_and_indexes_of_color_correction_dict:
+        num_added_actions += _color_correction_split_to_separate_actions(
+          actions_list, arguments_list, index + num_added_actions)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
@@ -131,26 +137,9 @@ def _replace_apply_opacity_from_group_layers_with_apply_group_layer_appearance(
       actions_list, index):
   update_utils_.remove_command_by_orig_names(actions_list, ['apply_opacity_from_group_layers'])
 
-  action_names = {command_dict['name'] for command_dict in actions_list}
-  action_display_names = {
-    update_utils_.get_child_setting(command_dict['settings'], 'display_name')[0]['value']
-    for command_dict in actions_list
-    if update_utils_.get_child_setting(command_dict['settings'], 'display_name')[0] is not None
-  }
-
-  new_action_name = 'apply_group_layer_appearance'
-
-  apply_group_layer_appearance_group_dict = update_utils_.create_command_as_saved_dict(
-    builtin_actions.BUILTIN_ACTIONS[new_action_name])
-
-  apply_group_layer_appearance_group_dict['name'] = update_utils_.uniquify_command_name(
-    new_action_name, action_names)
-
-  display_name_dict, _index = update_utils_.get_child_setting(
-    apply_group_layer_appearance_group_dict['settings'], 'display_name')
-  if display_name_dict is not None:
-    display_name_dict['value'] = update_utils_.uniquify_command_display_name(
-      display_name_dict['value'], action_display_names)
+  apply_group_layer_appearance_group_dict = update_utils_.create_and_add_command(
+    'apply_group_layer_appearance', actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
 
   arguments_list, _index = update_utils_.get_child_group_list(
     apply_group_layer_appearance_group_dict['settings'], 'arguments')
@@ -166,72 +155,77 @@ def _replace_apply_opacity_from_group_layers_with_apply_group_layer_appearance(
       ]:
         argument_dict['value'] = False
 
-  actions_list.insert(index, apply_group_layer_appearance_group_dict)
+
+def _color_correction_split_to_separate_actions(actions_list, arguments_list, index):
+  update_utils_.remove_command_by_orig_names(actions_list, ['color_correction'])
+
+  processed_index = index
+
+  _add_brightness_contrast_action(actions_list, arguments_list, processed_index)
+
+  if arguments_list[3]['value']:
+    processed_index += 1
+    _add_levels_action(actions_list, arguments_list, processed_index)
+
+  if arguments_list[4]['value']:
+    processed_index += 1
+    _add_curves_action(actions_list, arguments_list, processed_index)
+
+  return processed_index
 
 
-def _color_correction_update_brightness_contrast_arguments(arguments_list):
-  if arguments_list[1]['type'] == 'double':
-    brightness_dict = arguments_list[1]
+def _add_brightness_contrast_action(actions_list, arguments_list, index):
+  brightness_contrast_group_dict = update_utils_.create_and_add_command(
+    'brightness_contrast', actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
 
-    brightness_dict['type'] = 'int'
-    brightness_dict['default_value'] = 0
-    brightness_dict['min_value'] = -127
-    brightness_dict['max_value'] = 127
-
-    value = brightness_dict['value']
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    brightness_contrast_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_brightness_dict = new_arguments_list[1]
+    value = arguments_list[1]['value']
     processed_value = round(
-      value * (brightness_dict['max_value'] - brightness_dict['min_value'])
+      value * (new_brightness_dict['max_value'] - new_brightness_dict['min_value'])
       / 2
     )
-    processed_value = max(processed_value, brightness_dict['min_value'])
-    processed_value = min(processed_value, brightness_dict['max_value'])
-    brightness_dict['value'] = processed_value
+    processed_value = max(processed_value, new_brightness_dict['min_value'])
+    processed_value = min(processed_value, new_brightness_dict['max_value'])
+    new_brightness_dict['value'] = processed_value
 
-  if arguments_list[2]['type'] == 'double':
-    contrast_dict = arguments_list[2]
-
-    contrast_dict['type'] = 'int'
-    contrast_dict['default_value'] = 0
-    contrast_dict['min_value'] = -127
-    contrast_dict['max_value'] = 127
-
-    value = contrast_dict['value']
+    new_contrast_dict = new_arguments_list[2]
+    value = arguments_list[2]['value']
     processed_value = value - 1.0
     processed_value = round(
-      processed_value * (contrast_dict['max_value'] - contrast_dict['min_value'])
+      processed_value * (new_contrast_dict['max_value'] - new_contrast_dict['min_value'])
       / 2
     )
-    processed_value = max(processed_value, contrast_dict['min_value'])
-    processed_value = min(processed_value, contrast_dict['max_value'])
-    contrast_dict['value'] = processed_value
+    processed_value = max(processed_value, new_contrast_dict['min_value'])
+    processed_value = min(processed_value, new_contrast_dict['max_value'])
+    new_contrast_dict['value'] = processed_value
 
-  if arguments_list[3]['name'] != 'brightness_contrast_filter':
-    arguments_list.insert(
-      3,
-      {
-        'type': 'choice',
-        'name': 'brightness_contrast_filter',
-        'default_value': builtin_actions.BrightnessContrastFilters.GEGL,
-        'value': builtin_actions.BrightnessContrastFilters.GEGL,
-        'items': [
-          (builtin_actions.BrightnessContrastFilters.GEGL, _('GEGL')),
-          (builtin_actions.BrightnessContrastFilters.GIMP, _('GIMP')),
-        ],
-        'display_name': _('Filter for brightness and contrast'),
-      },
-    )
+    new_arguments_list[3]['value'] = builtin_actions.BrightnessContrastFilters.GEGL
 
-  if arguments_list[4]['name'] != 'white_balance':
-    arguments_list.insert(
-      4,
-      {
-        'type': 'bool',
-        'name': 'white_balance',
-        'default_value': False,
-        'value': False,
-        'display_name': _('White balance'),
-      },
-    )
+
+def _add_levels_action(actions_list, arguments_list, index):
+  levels_group_dict = update_utils_.create_and_add_command(
+    'levels', actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
+
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    levels_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_arguments_list[1]['value'] = arguments_list[3]['value']
+
+
+def _add_curves_action(actions_list, arguments_list, index):
+  levels_group_dict = update_utils_.create_and_add_command(
+    'curves', actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
+
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    levels_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_arguments_list[1]['value'] = arguments_list[4]['value']
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):

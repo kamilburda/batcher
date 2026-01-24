@@ -65,10 +65,11 @@ User interface changes:
 Changes to actions and conditions:
 * For filters that can only be applied destructively, `Merge filter` will always be checked and cannot be changed (#43).
 * Color correction:
+  * Split into separate actions and organized under the `Color` menu.
   * Reduced the range of allowed brightness and contrast values. The value range is now scaled to -127 to 127 for consistency with GIMP.
-  * For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values.
-  * Added `White balance` option equivalent to `Colors → Auto → White Balance` in GIMP (#85).
+  * For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values. The default filter for GIMP 3.1.4 and later is equivalent to the Brightness-Contrast tool in GIMP. For earlier versions, `gegl:brightness-contrast` is the default (and the only option).
   * GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
+  * Added `White balance` action equivalent to `Colors → Auto → White Balance` in GIMP (#85).
 * Save: Replaced `Save existing XCF image to its original location` with a folder chooser. This allows saving existing XCF images and new + non-XCF images to different folders if need be.
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 

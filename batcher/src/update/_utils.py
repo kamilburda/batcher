@@ -119,3 +119,34 @@ def uniquify_command_display_name(display_name, existing_display_names):
   existing_display_names.add(uniquified_display_name)
 
   return uniquified_display_name
+
+
+def create_and_add_command(command_name, commands_list, builtin_commands_dict, index=None):
+  action_names = {command_dict['name'] for command_dict in commands_list}
+  action_display_names = {
+    get_child_setting(command_dict['settings'], 'display_name')[0]['value']
+    for command_dict in commands_list
+    if get_child_setting(command_dict['settings'], 'display_name')[0] is not None
+  }
+
+  created_group_dict = create_command_as_saved_dict(builtin_commands_dict[command_name])
+
+  created_group_dict['name'] = uniquify_command_name(
+    command_name, action_names)
+
+  display_name_dict, _index = get_child_setting(created_group_dict['settings'], 'display_name')
+  if display_name_dict is not None:
+    display_name_dict['value'] = uniquify_command_display_name(
+      display_name_dict['value'], action_display_names)
+
+  display_options_on_create_dict, _index = get_child_setting(
+    created_group_dict['settings'], 'display_options_on_create')
+  if display_options_on_create_dict is not None:
+    display_options_on_create_dict['value'] = False
+
+  if index is not None:
+    commands_list.insert(index, created_group_dict)
+  else:
+    commands_list.append(created_group_dict)
+
+  return created_group_dict

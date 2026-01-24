@@ -1,4 +1,4 @@
-"""Built-in "Color correction" action."""
+"""Built-in actions related to adjusting colors."""
 
 import re
 import struct
@@ -15,9 +15,12 @@ from src.pypdb import pdb
 
 
 __all__ = [
-  'color_correction',
+  'brightness_contrast',
+  'levels',
+  'curves',
+  'white_balance',
   'BrightnessContrastFilters',
-  'on_after_add_color_correction_action',
+  'on_after_add_brightness_contrast_action',
 ]
 
 
@@ -68,47 +71,10 @@ class LevelsData:
     )
 
 
-def color_correction(
-      _batcher,
-      layer,
-      brightness,
-      contrast,
-      brightness_contrast_filter,
-      white_balance,
-      levels_preset_file,
-      curves_preset_file,
-):
-  _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_filter)
-
-  _apply_white_balance(layer, white_balance)
-
-  image = layer.get_image()
-
-  if (image.get_base_type() == Gimp.ImageBaseType.INDEXED
-      and levels_preset_file is not None and levels_preset_file.get_path() is not None):
-    raise ValueError('Levels cannot be applied to indexed images')
-
-  _apply_correction(
-    layer,
-    levels_preset_file,
-    _parse_gimp_levels_preset,
-    _parse_photoshop_levels_preset,
-    _apply_levels,
-  )
-
-  _apply_correction(
-    layer,
-    curves_preset_file,
-    _parse_gimp_curves_preset,
-    _parse_photoshop_curves_preset,
-    _apply_curves,
-  )
-
-
-def _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_filter):
+def brightness_contrast(_batcher, layer, brightness, contrast, filter_):
   value_range = _MAX_BRIGHTNESS_CONTRAST_VALUE - _MIN_BRIGHTNESS_CONTRAST_VALUE
 
-  if brightness_contrast_filter == BrightnessContrastFilters.GEGL:
+  if filter_ == BrightnessContrastFilters.GEGL:
     processed_brightness = (brightness / value_range) * 2
     processed_contrast = (contrast / value_range) * 2 + 1.0
 
@@ -118,7 +84,7 @@ def _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_
       brightness=processed_brightness,
       merge_filter_=True,
     )
-  elif brightness_contrast_filter == BrightnessContrastFilters.GIMP:
+  elif filter_ == BrightnessContrastFilters.GIMP:
     if utils_pdb.get_gimp_version() < (3, 1, 4):
       return
 
@@ -133,9 +99,30 @@ def _apply_brightness_contrast(layer, brightness, contrast, brightness_contrast_
     )
 
 
-def _apply_white_balance(layer, white_balance):
-  if white_balance:
-    layer.levels_stretch()
+def levels(_batcher, layer, preset_file):
+  image = layer.get_image()
+
+  if (image.get_base_type() == Gimp.ImageBaseType.INDEXED
+      and preset_file is not None and preset_file.get_path() is not None):
+    raise ValueError('Levels cannot be applied to indexed images')
+
+  _apply_correction(
+    layer,
+    preset_file,
+    _parse_gimp_levels_preset,
+    _parse_photoshop_levels_preset,
+    _apply_levels,
+  )
+
+
+def curves(_batcher, layer, preset_file):
+  _apply_correction(
+    layer,
+    preset_file,
+    _parse_gimp_curves_preset,
+    _parse_photoshop_curves_preset,
+    _apply_curves,
+  )
 
 
 def _apply_correction(
@@ -367,10 +354,14 @@ def _read_points(file):
   return curve_points
 
 
-def on_after_add_color_correction_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'color_correction':
+def white_balance(_batcher, layer):
+  layer.levels_stretch()
+
+
+def on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'brightness_contrast':
     if utils_pdb.get_gimp_version() < (3, 1, 4):
-      action['arguments/brightness_contrast_filter'].gui.set_visible(False)
+      action['arguments/filter'].gui.set_visible(False)
 
 
 _MIN_BRIGHTNESS_CONTRAST_VALUE = -127
@@ -386,10 +377,11 @@ _HISTOGRAM_CHANNELS = {
   'alpha': Gimp.HistogramChannel.ALPHA,
 }
 
-COLOR_CORRECTION_DICT = {
-  'name': 'color_correction',
-  'function': color_correction,
-  'display_name': _('Color correction'),
+BRIGHTNESS_CONTRAST_DICT = {
+  'name': 'brightness_contrast',
+  'function': brightness_contrast,
+  'display_name': _('Brightness-contrast'),
+  'menu_path': _('Color'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
@@ -416,35 +408,90 @@ COLOR_CORRECTION_DICT = {
     },
     {
       'type': 'choice',
-      'name': 'brightness_contrast_filter',
-      'default_value': BrightnessContrastFilters.GEGL,
+      'name': 'filter_',
+      'default_value': (
+        BrightnessContrastFilters.GEGL
+        if utils_pdb.get_gimp_version() < (3, 1, 4)
+        else BrightnessContrastFilters.GIMP),
       'items': [
         (BrightnessContrastFilters.GEGL, _('GEGL')),
         (BrightnessContrastFilters.GIMP, _('GIMP')),
       ],
-      'display_name': _('Filter for brightness and contrast'),
+      'display_name': _('Filter'),
     },
+  ],
+}
+
+LEVELS_DICT = {
+  'name': 'levels',
+  'function': levels,
+  'display_name': _('Levels'),
+  'menu_path': _('Color'),
+  'description': _(
+    'Applies levels using a preset file saved in GIMP or Photoshop (.alv file).'
+    '\n\nGIMP preset files must be saved in the linear mode.'
+    ' Otherwise, this action will result in an error.'
+  ),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
     {
-      'type': 'bool',
-      'name': 'white_balance',
-      'default_value': False,
-      'display_name': _('White balance'),
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
     },
     {
       'type': 'file',
-      'name': 'levels_preset_file',
+      'name': 'preset_file',
       'default_value': None,
       'action': Gimp.FileChooserAction.OPEN,
-      'display_name': _('Levels (preset saved in GIMP or Photoshop)'),
+      'display_name': _('Preset file'),
       'none_ok': True,
+    },
+  ],
+}
+
+CURVES_DICT = {
+  'name': 'curves',
+  'function': curves,
+  'display_name': _('Curves'),
+  'menu_path': _('Color'),
+  'description': _(
+    'Applies curves using a preset file saved in GIMP or Photoshop (.acv file).'
+    '\n\nGIMP preset files must be saved in the linear mode.'
+    ' Otherwise, this action will result in an error.'
+  ),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
     },
     {
       'type': 'file',
-      'name': 'curves_preset_file',
+      'name': 'preset_file',
       'default_value': None,
       'action': Gimp.FileChooserAction.OPEN,
-      'display_name': _('Curves (preset saved in GIMP or Photoshop)'),
+      'display_name': _('Preset file'),
       'none_ok': True,
+    },
+  ],
+}
+
+WHITE_BALANCE_DICT = {
+  'name': 'white_balance',
+  'function': white_balance,
+  'display_name': _('White balance'),
+  'menu_path': _('Color'),
+  'display_options_on_create': False,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
     },
   ],
 }

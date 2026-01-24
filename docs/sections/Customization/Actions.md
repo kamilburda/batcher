@@ -244,19 +244,33 @@ Merges all visible layers within the image into a single layer. Invisible layers
 This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other actions on the entire image.
 
 
-### Color correction
+### Color
 
-Adjusts colors via brightness, contrast, levels and/or curves.
+#### Brightness-contrast
+
+Adjusts brightness and contrast.
 
 For GIMP 3.2 and later, you can choose between two different filters responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
 
-The `White balance` option is equivalent to `Colors → Auto → White Balance` in GIMP. 
+#### Levels
 
-For levels and curves, you need to specify a saved preset file. Both GIMP and Photoshop (.alv for levels, .acv for curves) file formats are supported.
+Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file formats are supported.
 
-You can save a GIMP preset file for Levels or Curves by choosing `Export Current Settings to File` in the Levels or Curves menu.
+You can save a GIMP preset file by choosing `Export Current Settings to File` in the Levels tool.
 
-At the moment, Batcher only supports applying levels or curves in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
+At the moment, Batcher only supports preset files saved in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
+
+#### Curves
+
+Applies curves from a saved preset file. Both GIMP and Photoshop (.acv) file formats are supported.
+
+You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
+
+At the moment, Batcher only supports preset files saved in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
+
+#### White balance
+
+Equivalent to `Colors → Auto → White Balance` in GIMP.
 
 
 ### G'MIC filter

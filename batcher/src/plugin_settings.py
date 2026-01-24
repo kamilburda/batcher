@@ -882,7 +882,7 @@ def _connect_events_for_added_built_in_actions(settings):
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_apply_group_layer_appearance_action)
   settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_color_correction_action)
+    'after-add-command', builtin_actions.on_after_add_brightness_contrast_action)
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_crop_action)
   settings['main/actions'].connect_event(

@@ -66,7 +66,10 @@ _BUILTIN_ACTIONS_LIST = [
   _apply_group_layer_appearance.APPLY_GROUP_LAYER_APPEARANCE_DICT,
   _misc.MERGE_FILTERS_DICT,
   _misc.MERGE_VISIBLE_LAYERS_DICT,
-  _color_correction.COLOR_CORRECTION_DICT,
+  _color_correction.BRIGHTNESS_CONTRAST_DICT,
+  _color_correction.LEVELS_DICT,
+  _color_correction.CURVES_DICT,
+  _color_correction.WHITE_BALANCE_DICT,
   _gmic_filter.GMIC_FILTER_DICT,
 ]
 
