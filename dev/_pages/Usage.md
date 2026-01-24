@@ -24,7 +24,7 @@ You can add files and folders in one of the following ways:
 * Copy and paste images and folders from a text file, each on a separate line to the area under `Input Images`. Note that you must click on the area first. Any files and folders that do not exist are ignored.
 * Press the `+` button to add files or folders.
 
-Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized file formats` condition.
+Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized File Format` condition.
 
 You will be warned if you add folder(s) containing too many files or e.g. an entire drive. This is a safeguard against accidentally adding an undesired folder.
 
@@ -37,6 +37,9 @@ By default, the renamed images (as they would be named on export) are displayed.
 You can move around individual files or folders by dragging and dropping them anywhere within the input list, or by pressing Alt + Up/Down. This is useful if, for example, you intend rename the images with a numbered sequence.
 
 Files and folders can be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
+
+You can export images to the same parent folders as the added input files/folders using the `Match input folders` option in the output folder dropdown.
+You will be warned when selecting this option as you may inadvertently overwrite the original images (when the filenames and file extensions match).
 
 You can view message logs recorded during processing via `Settings → View Logs` and save them to a file.
 
@@ -161,7 +164,7 @@ This can be useful if you e.g. made changes to your images and you want to save 
 
 ### Filename Pattern
 
-The text entry next to `File Name` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
+The text entry next to `Filename` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
