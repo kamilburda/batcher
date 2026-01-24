@@ -4,8 +4,8 @@ from src.builtin_actions import _align_and_offset
 from src.builtin_actions._align_and_offset import *
 from src.builtin_actions import _apply_group_layer_appearance
 from src.builtin_actions._apply_group_layer_appearance import *
-from src.builtin_actions import _color_correction
-from src.builtin_actions._color_correction import *
+from src.builtin_actions import _color
+from src.builtin_actions._color import *
 from src.builtin_actions import _crop
 from src.builtin_actions._crop import *
 from src.builtin_actions import _export
@@ -72,10 +72,10 @@ _BUILTIN_ACTIONS_LIST = [
   _apply_group_layer_appearance.APPLY_GROUP_LAYER_APPEARANCE_DICT,
   _misc.MERGE_FILTERS_DICT,
   _misc.MERGE_VISIBLE_LAYERS_DICT,
-  _color_correction.BRIGHTNESS_CONTRAST_DICT,
-  _color_correction.LEVELS_DICT,
-  _color_correction.CURVES_DICT,
-  _color_correction.WHITE_BALANCE_DICT,
+  _color.BRIGHTNESS_CONTRAST_DICT,
+  _color.LEVELS_DICT,
+  _color.CURVES_DICT,
+  _color.WHITE_BALANCE_DICT,
   _gmic_filter.GMIC_FILTER_DICT,
 ]
 
