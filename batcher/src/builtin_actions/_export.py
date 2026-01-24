@@ -93,7 +93,7 @@ class ExportAction(invoker_.CallableCommand):
     self._convert_file_extension_to_lowercase = False
     self._use_original_modification_date = False
     self._rotate_flip_image_based_on_exif_metadata = True
-    self._merge_visible_layers = True
+    self._merge_visible_layers_and_rasterize = True
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
@@ -180,7 +180,7 @@ class ExportAction(invoker_.CallableCommand):
       else:
         item_to_process = current_top_level_item
     else:
-      if batcher.process_export and self._merge_visible_layers:
+      if batcher.process_export and self._merge_visible_layers_and_rasterize:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
 
     if batcher.process_names:
@@ -911,9 +911,9 @@ EXPORT_FOR_CONVERT_DICT = {
     },
     {
       'type': 'bool',
-      'name': 'merge_visible_layers',
+      'name': 'merge_visible_layers_and_rasterize',
       'default_value': True,
-      'display_name': _('Merge visible layers'),
+      'display_name': _('Merge visible layers and rasterize'),
     },
   ],
 }

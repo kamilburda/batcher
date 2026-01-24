@@ -11,7 +11,7 @@ General changes:
 * Updated Japanese translation (thanks to @re-unknown).
 * Removed filters (layer effects, GEGL operations) that were either redundant or had no effect. **If you used these filters, they will be automatically removed** (a warning message will appear, including a suggestion for an alternative filter if available).
 * Batch Convert: Loaded images will now have their orientation automatically corrected based on the Exif metadata if present.
-* Layers will now (again) be automatically merged before export to avoid exported images unexpectedly growing beyond their original boundaries. This can happen if layers contain filters (layer effects). You can switch this off by unchecking the new `Merge visible layers` export option (#115).
+* Layers will now (again) be automatically merged before export to avoid exported images unexpectedly growing beyond their original boundaries. This can happen if layers contain filters (layer effects). You can switch this off by unchecking the new `Merge visible layers and rasterize` export option (#115).
 * Changed the order of buttons in the dialog handling conflicting files for safety, with the most dangerous choice (replacing an existing file) now being the rightmost one.
 * Adjusted installation instructions for macOS where the GIMP Preferences are located under a different menu.
 * If you use the latest revision of Batcher (i.e. download the source code rather than the release package), you will no longer receive errors when updating the plug-in to the latest revision.

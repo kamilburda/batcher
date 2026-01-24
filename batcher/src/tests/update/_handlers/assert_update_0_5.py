@@ -32,7 +32,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       settings['main/actions/export/arguments/use_file_extension_in_item_name'],
       settings['main/actions/export/arguments/convert_file_extension_to_lowercase'],
       settings['main/actions/export/arguments/rotate_flip_image_based_on_exif_metadata'],
-      settings['main/actions/export/arguments/merge_visible_layers'],
+      settings['main/actions/export/arguments/merge_visible_layers_and_rasterize'],
     ])
 
   test_case.assertIsInstance(
