@@ -10,6 +10,8 @@ from src.builtin_actions import _crop
 from src.builtin_actions._crop import *
 from src.builtin_actions import _export
 from src.builtin_actions._export import *
+from src.builtin_actions import _flip
+from src.builtin_actions._flip import *
 from src.builtin_actions import _gmic_filter
 from src.builtin_actions._gmic_filter import *
 from src.builtin_actions import _import
@@ -24,8 +26,8 @@ from src.builtin_actions import _rename
 from src.builtin_actions._rename import *
 from src.builtin_actions import _resize_canvas
 from src.builtin_actions._resize_canvas import *
-from src.builtin_actions import _rotate_and_flip
-from src.builtin_actions._rotate_and_flip import *
+from src.builtin_actions import _rotate
+from src.builtin_actions._rotate import *
 from src.builtin_actions import _save
 from src.builtin_actions._save import *
 from src.builtin_actions import _scale
@@ -55,8 +57,12 @@ _BUILTIN_ACTIONS_LIST = [
   _crop.CROP_FOR_IMAGES_DICT,
   _crop.CROP_FOR_LAYERS_DICT,
   _align_and_offset.ALIGN_AND_OFFSET_DICT,
-  _rotate_and_flip.ROTATE_AND_FLIP_FOR_IMAGES_DICT,
-  _rotate_and_flip.ROTATE_AND_FLIP_FOR_LAYERS_DICT,
+  _flip.FLIP_HORIZONTALLY_FOR_IMAGES_DICT,
+  _flip.FLIP_HORIZONTALLY_FOR_LAYERS_DICT,
+  _flip.FLIP_VERTICALLY_FOR_IMAGES_DICT,
+  _flip.FLIP_VERTICALLY_FOR_LAYERS_DICT,
+  _rotate.ROTATE_FOR_IMAGES_DICT,
+  _rotate.ROTATE_FOR_LAYERS_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
   _insert_background_foreground.INSERT_BACKGROUND_FOR_LAYERS_DICT,
   _insert_background_foreground.INSERT_FOREGROUND_FOR_IMAGES_DICT,

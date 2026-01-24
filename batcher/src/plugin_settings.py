@@ -890,7 +890,7 @@ def _connect_events_for_added_built_in_actions(settings):
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_resize_canvas_action)
   settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_rotate_and_flip_action)
+    'after-add-command', builtin_actions.on_after_add_rotate_action)
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_save_action)
   settings['main/actions'].connect_event(

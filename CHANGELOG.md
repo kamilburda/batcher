@@ -47,8 +47,6 @@ User interface changes:
 * The Export Options dialog is now closed before the start of processing.
 * Replaced the widget for choosing output folder with a custom widget. The folders previously available (such as the home user folder, disk drives, ...) are no longer available.
 * Adjusted wording and icon in the dialog handling conflicting files for clarity.
-* Actions and conditions are now organized in submenus and have a fixed position in the submenus for easier navigation.
-* Actions and conditions will now display their description (if available) as a tooltip.
 * An info icon is now displayed for skipped actions for clarity (e.g. actions trying to use foreground layers when there are none).
 * Changes to the custom action browser:
   * Adjusted the default width of the dialog and its individual parts.
@@ -64,14 +62,21 @@ User interface changes:
 
 Changes to actions and conditions:
 * For filters that can only be applied destructively, `Merge filter` will always be checked and cannot be changed (#43).
-* Color correction:
+* Actions and conditions are now organized in submenus and have a fixed position in the submenus for easier navigation.
+* Actions and conditions will now display their description (if available) as a tooltip.
+* Changed names of built-in actions and conditions to title case for consistency with GIMP tools, plug-ins and filters.
+* Color Correction:
   * Split into separate actions and organized under the `Color` menu.
   * Reduced the range of allowed brightness and contrast values. The value range is now scaled to -127 to 127 for consistency with GIMP.
   * For GIMP 3.1.4 and later, you can choose a different filter responsible for adjusting brightness and contrast values. The default filter for GIMP 3.1.4 and later is equivalent to the Brightness-Contrast tool in GIMP. For earlier versions, `gegl:brightness-contrast` is the default (and the only option).
   * GIMP presets for levels or curves in modes other than the linear mode are no longer supported and yield a warning message. This avoids unexpected results as Batcher currently always applies the presets as if they were saved in the linear mode.
   * Added `White Balance` action equivalent to `Colors → Auto → White Balance` in GIMP (#85).
+* Rotate and Flip:
+  * Split into separate actions - `Flip Horizontally`, `Flip Vertically` and `Rotate`.
+  * The default angle for `Rotate` is now 90 degrees. Removed the `None` option.
+  * Arguments not applicable are now hidden rather than made insensitive to reduce clutter.
+  * Renamed arguments for brevity.
 * Save: Replaced `Save existing XCF image to its original location` with a folder chooser. This allows saving existing XCF images and new + non-XCF images to different folders if need be.
-* Changed names of built-in actions and conditions to title case for consistency with GIMP tools, plug-ins and filters.
 * Plug-in procedures added by Batcher (e.g. `plug-in-batch-export-layers`) are not enabled in previews by default to avoid undesired file export or edits of existing images/layers.
 
 Bug fixes:

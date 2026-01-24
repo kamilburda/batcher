@@ -18,7 +18,8 @@ def update(data, _settings, _procedure_groups):
 
     if actions_list is not None:
       indexes_of_apply_opacity_from_group_layers_dict = []
-      arguments_and_indexes_of_color_correction_dict = []
+      data_for_color_correction_dict = []
+      data_for_rotate_and_flip_dict = []
 
       for index, action_dict in enumerate(actions_list):
         action_list = action_dict['settings']
@@ -31,7 +32,12 @@ def update(data, _settings, _procedure_groups):
 
         if (orig_name_setting_dict['value'] == 'color_correction'
             and arguments_list is not None):
-          arguments_and_indexes_of_color_correction_dict.append((arguments_list, index))
+          data_for_color_correction_dict.append((arguments_list, index))
+
+        if (orig_name_setting_dict['value'].startswith('rotate_and_flip_for_')
+            and arguments_list is not None):
+          data_for_rotate_and_flip_dict.append(
+            (arguments_list, index, orig_name_setting_dict))
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
@@ -52,9 +58,14 @@ def update(data, _settings, _procedure_groups):
           actions_list, index)
 
       num_added_actions = 0
-      for arguments_list, index in arguments_and_indexes_of_color_correction_dict:
+      for arguments_list, index in data_for_color_correction_dict:
         num_added_actions += _color_correction_split_to_separate_actions(
           actions_list, arguments_list, index + num_added_actions)
+
+      num_added_actions = 0
+      for arguments_list, index, orig_name_setting_dict in data_for_rotate_and_flip_dict:
+        num_added_actions += _rotate_and_flip_split_to_separate_actions(
+          actions_list, arguments_list, index + num_added_actions, orig_name_setting_dict)
 
   gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
 
@@ -226,6 +237,106 @@ def _add_curves_action(actions_list, arguments_list, index):
     levels_group_dict['settings'], 'arguments')
   if new_arguments_list is not None:
     new_arguments_list[1]['value'] = arguments_list[4]['value']
+
+
+def _rotate_and_flip_split_to_separate_actions(
+      actions_list,
+      arguments_list,
+      index,
+      orig_name_setting_dict,
+):
+  update_utils_.remove_command_by_orig_names(
+    actions_list, ['rotate_and_flip_for_images', 'rotate_and_flip_for_layers'])
+
+  processed_index = index
+
+  _add_rotate_action(actions_list, arguments_list, processed_index, orig_name_setting_dict)
+
+  if arguments_list[8]['value']:
+    processed_index += 1
+    _add_flip_horizontally_action(
+      actions_list, arguments_list, processed_index, orig_name_setting_dict)
+
+  if arguments_list[9]['value']:
+    processed_index += 1
+    _add_flip_vertically_action(
+      actions_list, arguments_list, processed_index, orig_name_setting_dict)
+
+  return processed_index
+
+
+def _add_rotate_action(actions_list, arguments_list, index, orig_name_setting_dict):
+  if orig_name_setting_dict['value'].endswith('_for_images'):
+    action_name = 'rotate_for_images'
+  else:
+    action_name = 'rotate_for_layers'
+
+  rotate_group_dict = update_utils_.create_and_add_command(
+    action_name, actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
+
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    rotate_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
+
+    if arguments_list[1]['value'] != 'none':
+      new_arguments_list[1]['value'] = arguments_list[1]['value']
+      new_arguments_list[2]['value'] = arguments_list[2]['value']
+    else:
+      new_arguments_list[1]['value'] = 'custom'
+      new_arguments_list[2]['value'] = {
+        'value': 0.0,
+        'unit': 'degree',
+      }
+
+    new_arguments_list[3]['value'] = arguments_list[3]['value']
+    new_arguments_list[4]['value'] = arguments_list[4]['value']
+    new_arguments_list[5]['value'] = arguments_list[5]['value']
+    new_arguments_list[6]['value'] = arguments_list[6]['value']
+    new_arguments_list[7]['value'] = arguments_list[7]['value']
+
+
+def _add_flip_horizontally_action(
+      actions_list,
+      arguments_list,
+      index,
+      orig_name_setting_dict,
+):
+  if orig_name_setting_dict['value'].endswith('_for_images'):
+    action_name = 'flip_horizontally_for_images'
+  else:
+    action_name = 'flip_horizontally_for_layers'
+
+  flip_group_dict = update_utils_.create_and_add_command(
+    action_name, actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
+
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    flip_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
+
+
+def _add_flip_vertically_action(
+      actions_list,
+      arguments_list,
+      index,
+      orig_name_setting_dict,
+):
+  if orig_name_setting_dict['value'].endswith('_for_images'):
+    action_name = 'flip_vertically_for_images'
+  else:
+    action_name = 'flip_vertically_for_layers'
+
+  flip_group_dict = update_utils_.create_and_add_command(
+    action_name, actions_list, builtin_actions.BUILTIN_ACTIONS, index,
+  )
+
+  new_arguments_list, _index = update_utils_.get_child_group_list(
+    flip_group_dict['settings'], 'arguments')
+  if new_arguments_list is not None:
+    new_arguments_list[0]['value'] = arguments_list[0]['value']
 
 
 def _scale_change_show_display_name_to_gui_kwargs(arguments_list):
