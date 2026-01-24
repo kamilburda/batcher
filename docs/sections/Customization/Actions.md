@@ -186,6 +186,8 @@ This action is inserted at the first position.
 This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
 You can always move this action lower as needed.
 
+You can apply subsequent actions on the background using `Layer Below (Background)` instead of `Current Layer` (if available).
+
 The background is merged automatically at the end of processing as the `Merge Background` action is automatically added. See `Merge Background` below for more information.
 
 For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not Background` condition is automatically added and enabled.
@@ -195,6 +197,8 @@ For Export Layers and Edit Layers, the background layers are excluded from proce
 Inserts a new layer in front of the current layer.
 
 For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
+
+You can apply subsequent actions on the foreground using `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
 The `Merge Foreground` action is added automatically. For Export Layers and Edit Layers, the `Not Foreground` condition is added automatically.
 

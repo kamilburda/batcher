@@ -237,7 +237,11 @@ INSERT_BACKGROUND_FOR_IMAGES_DICT = {
   'function': InsertBackgroundFromFileAction,
   'display_name': _('Insert Background'),
   'menu_path': _('Layers and Composition'),
-  'description': _('Inserts the specified image behind the current layer.'),
+  'description': _(
+    'Inserts the specified image behind the current layer.'
+    '\n\nYou can apply subsequent actions on the background using'
+    ' "{}" instead of "{}" (if available).'
+  ).format(_('Layer Below (Background)'), _('Current Layer')),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
@@ -264,7 +268,10 @@ INSERT_BACKGROUND_FOR_LAYERS_DICT = {
   'display_name': _('Insert Background'),
   'menu_path': _('Layers and Composition'),
   'description': _(
-    'Inserts layers having the specified color tag behind the current layer.'),
+    'Inserts layers having the specified color tag behind the current layer.'
+    '\n\nYou can apply subsequent actions on the background using'
+    ' "{}" instead of "{}" (if available).'
+  ).format(_('Layer Below (Background)'), _('Current Layer')),
   'display_options_on_create': True,
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   'arguments': [
@@ -304,7 +311,10 @@ INSERT_FOREGROUND_FOR_IMAGES_DICT = {
   'display_name': _('Insert Foreground'),
   'menu_path': _('Layers and Composition'),
   'description': _(
-    'Inserts the specified image in front of the current layer.'),
+    'Inserts the specified image in front of the current layer.'
+    '\n\nYou can apply subsequent actions on the foreground using'
+    ' "{}" instead of "{}" (if available).'
+  ).format(_('Layer Above (Foreground)'), _('Current Layer')),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
@@ -331,7 +341,10 @@ INSERT_FOREGROUND_FOR_LAYERS_DICT = {
   'display_name': _('Insert Foreground'),
   'menu_path': _('Layers and Composition'),
   'description': _(
-    'Inserts layers having the specified color tag in front of the current layer.'),
+    'Inserts layers having the specified color tag in front of the current layer.'
+    '\n\nYou can apply subsequent actions on the foreground using'
+    ' "{}" instead of "{}" (if available).'
+  ).format(_('Layer Above (Foreground)'), _('Current Layer')),
   'display_options_on_create': True,
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   'arguments': [
