@@ -361,7 +361,7 @@ def white_balance(_batcher, layer):
 def on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict):
   if action['orig_name'].value == 'brightness_contrast':
     if utils_pdb.get_gimp_version() < (3, 1, 4):
-      action['arguments/filter'].gui.set_visible(False)
+      action['arguments/filter_'].gui.set_visible(False)
 
 
 _MIN_BRIGHTNESS_CONTRAST_VALUE = -127
