@@ -11,6 +11,7 @@ from gi.repository import GObject
 from src import exceptions
 from src import setting as setting_
 from src import utils
+from src import utils_pdb
 from src.gui import placeholders as gui_placeholders
 
 
@@ -316,6 +317,13 @@ class PlaceholderItemSetting(PlaceholderGimpObjectSetting):
   _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
 
 
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  class PlaceholderRasterizableSetting(PlaceholderGimpObjectSetting):
+
+    _DEFAULT_DEFAULT_VALUE = 'current_layer'
+    _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+
+
 class PlaceholderArraySetting(PlaceholderSetting):
 
   def __init__(self, name, element_type, **kwargs):
@@ -464,3 +472,10 @@ _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
   ('GimpCoreObjectArray', setting_.ItemSetting): (
     setting_.SETTING_TYPES[PlaceholderItemArraySetting]),
 }
+
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES.update({
+    'GimpRasterizable': setting_.SETTING_TYPES[PlaceholderRasterizableSetting],
+    'GimpVectorLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
+    'GimpLinkLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
+  })

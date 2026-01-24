@@ -26,6 +26,7 @@ from src import placeholders as placeholders_
 from src import pypdb
 from src import setting as setting_
 from src import utils
+from src import utils_pdb
 from src.gui import utils as gui_utils_
 from src.gui.entry import entries as entries_
 from src.pypdb import pdb
@@ -394,25 +395,36 @@ class CommandBrowser(GObject.GObject):
 
   @staticmethod
   def _is_command_argument_image_drawable_or_drawables(command_argument):
+    setting_types = [
+      setting_.ImageSetting,
+      setting_.LayerSetting,
+      setting_.DrawableSetting,
+      setting_.ItemSetting,
+      placeholders_.PlaceholderImageSetting,
+      placeholders_.PlaceholderLayerSetting,
+      placeholders_.PlaceholderDrawableSetting,
+      placeholders_.PlaceholderItemSetting,
+      placeholders_.PlaceholderDrawableArraySetting,
+      placeholders_.PlaceholderLayerArraySetting,
+      placeholders_.PlaceholderItemArraySetting,
+    ]
+
+    if utils_pdb.get_gimp_version() >= (3, 1, 4):
+      setting_types.extend([
+        placeholders_.PlaceholderRasterizableSetting,
+      ])
+
+    setting_array_types = [
+      setting_.ImageSetting,
+      setting_.LayerSetting,
+      setting_.DrawableSetting,
+      setting_.ItemSetting,
+    ]
+
     return (
-      command_argument['type'] in [
-        setting_.ImageSetting,
-        setting_.LayerSetting,
-        setting_.DrawableSetting,
-        setting_.ItemSetting,
-        placeholders_.PlaceholderImageSetting,
-        placeholders_.PlaceholderLayerSetting,
-        placeholders_.PlaceholderDrawableSetting,
-        placeholders_.PlaceholderItemSetting,
-        placeholders_.PlaceholderDrawableArraySetting,
-        placeholders_.PlaceholderLayerArraySetting,
-        placeholders_.PlaceholderItemArraySetting]
+      command_argument['type'] in setting_types
       or (command_argument['type'] == setting_.ArraySetting
-          and command_argument['element_type'] in [
-              setting_.ImageSetting,
-              setting_.LayerSetting,
-              setting_.DrawableSetting,
-              setting_.ItemSetting])
+          and command_argument['element_type'] in setting_array_types)
     )
 
   def get_collapsed_state_of_categories(self):

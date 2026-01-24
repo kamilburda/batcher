@@ -30,6 +30,13 @@ __all__ = [
   'DrawableFilterSetting',
 ]
 
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  __all__.extend([
+    'VectorLayerSetting',
+    'LinkLayerSetting',
+    'RasterizableSetting',
+  ])
+
 
 class ImageSetting(_base.Setting):
   """Class for settings holding `Gimp.Image` objects.
@@ -294,6 +301,77 @@ class TextLayerSetting(GimpItemSetting):
   def _validate(self, layer):
     if layer is not None and not layer.is_text_layer():
       return 'invalid text layer', 'invalid_value'
+
+
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  class RasterizableSetting(GimpItemSetting):
+    """Class for settings holding `Gimp.Rasterizable` instances.
+
+    Allowed GIMP PDB types:
+    * `Gimp.Rasterizable`
+
+    Message IDs for invalid values:
+    * ``'invalid_value'``: The rasterizable assigned is not valid.
+    """
+
+    _ALLOWED_PDB_TYPES = [Gimp.Rasterizable]
+
+    _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.rasterizable_combo_box]
+
+    def _copy_value(self, value):
+      return value
+
+    def _validate(self, layer):
+      if layer is not None and not isinstance(layer, Gimp.Rasterizable):
+        return 'invalid rasterizable', 'invalid_value'
+
+
+  class VectorLayerSetting(GimpItemSetting):
+    """Class for settings holding `Gimp.VectorLayer` instances.
+
+    Allowed GIMP PDB types:
+    * `Gimp.VectorLayer`
+
+    Message IDs for invalid values:
+    * ``'invalid_value'``: The vector layer assigned is not valid.
+    """
+
+    _ALLOWED_PDB_TYPES = [Gimp.VectorLayer]
+
+    _REGISTRABLE_TYPE_NAME = 'vector_layer'
+
+    _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.vector_layer_combo_box]
+
+    def _copy_value(self, value):
+      return value
+
+    def _validate(self, layer):
+      if layer is not None and not layer.is_vector_layer():
+        return 'invalid vector layer', 'invalid_value'
+
+
+  class LinkLayerSetting(GimpItemSetting):
+    """Class for settings holding `Gimp.LinkLayer` instances.
+
+    Allowed GIMP PDB types:
+    * `Gimp.LinkLayer`
+
+    Message IDs for invalid values:
+    * ``'invalid_value'``: The link layer assigned is not valid.
+    """
+
+    _ALLOWED_PDB_TYPES = [Gimp.LinkLayer]
+
+    _REGISTRABLE_TYPE_NAME = 'link_layer'
+
+    _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.link_layer_combo_box]
+
+    def _copy_value(self, value):
+      return value
+
+    def _validate(self, layer):
+      if layer is not None and not layer.is_link_layer():
+        return 'invalid link layer', 'invalid_value'
 
 
 class LayerMaskSetting(GimpItemSetting):

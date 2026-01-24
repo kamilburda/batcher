@@ -18,7 +18,7 @@ General changes:
 
 New features:
 * Batch Convert: You can now adjust file format options when loading input files via the new `Import Options...` entry. Import options for file formats not recognized by Batcher (e.g. third-party file format plug-ins) cannot be adjusted and defaults will be used instead.
-* Added support for new import/export file formats introduced between GIMP 3.1.2 and 3.2-RC2.
+* Added support for new features introduced between GIMP 3.1.2 and 3.2-RC2, including new file import/export formats, vector layers and link layers.
 * Batch Convert: You can now choose to export images to the same top-level folder as the input image using the new `Match input folders` option. You will be warned when choosing this option as you may permanently override the original images (#75).
 * Batch Convert, Export Images, Export Layers: The most recently used output folders for processing are now saved (max. 5). Each Batcher menu keeps a separate list of recent folders (#77).
 * Export Layers, Edit Layers: Replaced `Apply opacity from group layers` with a more generic `Apply Group Layer Appearance`, which now also applies layer effects, mode, masks and several other attributes (except color tags and locks) (#87).

@@ -4,6 +4,7 @@ from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
+from src import utils_pdb
 from src.gui import widgets as gui_widgets_
 from src.pypdb import pdb
 
@@ -24,6 +25,13 @@ __all__ = [
   'PathComboBoxPresenter',
   'DrawableFilterComboBoxPresenter',
 ]
+
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  __all__.extend([
+    'RasterizableComboBoxPresenter',
+    'VectorLayerComboBoxPresenter',
+    'LinkLayerComboBoxPresenter',
+  ])
 
 
 class GimpObjectComboBoxPresenter(_enum_choice.GimpUiIntComboBoxPresenter):
@@ -179,6 +187,76 @@ class TextLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
     """
     if value is not None:
       self._widget.set_active(value.get_id())
+
+
+if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  class RasterizableComboBoxPresenter(GimpObjectComboBoxPresenter):
+    """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+    the choices to `Gimp.Rasterizable` instances.
+
+    Value: `Gimp.Rasterizable` selected in the combo box, or ``None`` if there
+    is no rasterizable available.
+    """
+
+    def _create_widget(self, setting, **kwargs):
+      return GimpUi.LayerComboBox.new(lambda image, item: isinstance(item, Gimp.Rasterizable))
+
+    def get_value(self):
+      return Gimp.Item.get_by_id(self._widget.get_active().value)
+
+    def _set_value(self, value):
+      """Sets a `Gimp.Rasterizable` instance to be selected in the combo box.
+
+      Passing ``None`` has no effect.
+      """
+      if value is not None:
+        self._widget.set_active(value.get_id())
+
+
+  class VectorLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
+    """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+    the choices to `Gimp.VectorLayer` instances.
+
+    Value: `Gimp.VectorLayer` selected in the combo box, or ``None`` if there
+    is no vector layer available.
+    """
+
+    def _create_widget(self, setting, **kwargs):
+      return GimpUi.LayerComboBox.new(lambda image, item: item.is_vector_layer())
+
+    def get_value(self):
+      return Gimp.VectorLayer.get_by_id(self._widget.get_active().value)
+
+    def _set_value(self, value):
+      """Sets a `Gimp.VectorLayer` instance to be selected in the combo box.
+
+      Passing ``None`` has no effect.
+      """
+      if value is not None:
+        self._widget.set_active(value.get_id())
+
+
+  class LinkLayerComboBoxPresenter(GimpObjectComboBoxPresenter):
+    """`setting.Presenter` subclass for `GimpUi.LayerComboBox` widgets, limiting
+    the choices to `Gimp.LinkLayer` instances.
+
+    Value: `Gimp.LinkLayer` selected in the combo box, or ``None`` if there
+    is no link layer available.
+    """
+
+    def _create_widget(self, setting, **kwargs):
+      return GimpUi.LayerComboBox.new(lambda image, item: item.is_link_layer())
+
+    def get_value(self):
+      return Gimp.LinkLayer.get_by_id(self._widget.get_active().value)
+
+    def _set_value(self, value):
+      """Sets a `Gimp.LinkLayer` instance to be selected in the combo box.
+
+      Passing ``None`` has no effect.
+      """
+      if value is not None:
+        self._widget.set_active(value.get_id())
 
 
 class LayerMaskComboBoxPresenter(GimpObjectComboBoxPresenter):
