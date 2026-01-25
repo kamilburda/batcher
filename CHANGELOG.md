@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2
+
+### January 25, 2026
 
 This release includes quality-of-life improvements, particularly to the user interface, and resolves most issues reported since the previous version.
 

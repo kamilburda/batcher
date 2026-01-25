@@ -12,8 +12,8 @@ def initialize_config(config):
   config.PLUGIN_NAME = 'batcher'
   config.DOMAIN_NAME = 'batcher'
   config.PLUGIN_TITLE = lambda: _('Batcher')
-  config.PLUGIN_VERSION = '1.1.1'
-  config.PLUGIN_VERSION_RELEASE_DATE = 'June 15, 2025'
+  config.PLUGIN_VERSION = '1.2'
+  config.PLUGIN_VERSION_RELEASE_DATE = 'January 25, 2026'
   config.AUTHOR_NAME = 'Kamil Burda'
   config.COPYRIGHT_YEARS = '2023-2025'
   config.PAGE_URL = 'https://kamilburda.github.io/batcher'
