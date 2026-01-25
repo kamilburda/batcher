@@ -269,7 +269,7 @@ def _update_version_and_release_date_in_config(release_metadata, plugin_config_f
     lines = f.readlines()
   
   def get_entry_pattern(entry):
-    return r'^(c\.' + re.escape(entry) + " = )'(.*)'$"
+    return r'^( *config\.' + re.escape(entry) + " = )'(.*)'$"
   
   entries_to_find = dict(entries_to_modify)
   
