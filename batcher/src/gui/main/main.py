@@ -156,7 +156,10 @@ class BatchProcessingGui:
     self._button_stop = Gtk.Button(label=_('_Stop'), use_underline=True)
     self._button_stop.set_no_show_all(True)
 
-    self._log_viewer = log_viewer_.LogViewer(parent=self._dialog)
+    self._log_viewer = log_viewer_.LogViewer(
+      parent=self._dialog,
+      display_message_func=self._display_inline_message,
+    )
 
     self._settings_manager = settings_manager_.SettingsManager(
       self._settings,

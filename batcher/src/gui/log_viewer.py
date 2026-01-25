@@ -1,5 +1,7 @@
 """Widget for displaying messages logged during batch processing."""
 
+import os
+
 import gi
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
@@ -7,6 +9,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import constants
+from src import utils
 from src.gui import utils as gui_utils_
 
 
@@ -18,8 +21,10 @@ class LogViewer:
 
   _MAX_MESSAGE_LINES = 20_000
 
-  def __init__(self, parent):
+  def __init__(self, parent, display_message_func=None):
     self._parent = parent
+    self._display_message_func = (
+      display_message_func if display_message_func is not None else utils.empty_func)
 
     self._scrolled_window = Gtk.ScrolledWindow(
       width_request=self._CONTENTS_MIN_WIDTH,
@@ -132,5 +137,7 @@ class LogViewer:
               False,
             )
           )
+
+        self._display_message_func(_('Logs saved to "{}".').format(os.path.basename(filepath)))
 
     file_dialog.destroy()
