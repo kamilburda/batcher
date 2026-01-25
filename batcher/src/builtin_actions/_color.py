@@ -9,6 +9,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import constants
+from src import exceptions
 from src import utils_pdb
 from src.procedure_groups import *
 from src.pypdb import pdb
@@ -106,7 +107,7 @@ def levels(_batcher, layer, preset_file):
       and preset_file is not None and preset_file.get_path() is not None):
     raise ValueError('Levels cannot be applied to indexed images')
 
-  _apply_correction(
+  _apply_levels_curves(
     layer,
     preset_file,
     _parse_gimp_levels_preset,
@@ -116,7 +117,7 @@ def levels(_batcher, layer, preset_file):
 
 
 def curves(_batcher, layer, preset_file):
-  _apply_correction(
+  _apply_levels_curves(
     layer,
     preset_file,
     _parse_gimp_curves_preset,
@@ -125,7 +126,7 @@ def curves(_batcher, layer, preset_file):
   )
 
 
-def _apply_correction(
+def _apply_levels_curves(
       layer,
       preset_file,
       _parse_gimp_preset,
@@ -133,7 +134,7 @@ def _apply_correction(
       _apply_func,
 ):
   if preset_file is None or preset_file.get_path() is None:
-    return
+    raise exceptions.SkipCommand(_('Preset file not specified.'))
 
   try:
     with open(preset_file.get_path(), 'r', encoding=constants.TEXT_FILE_ENCODING) as f:
