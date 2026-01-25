@@ -22,16 +22,26 @@ You can add files and folders in one of the following ways:
 * Drag and drop images and folders from a file explorer application to the area under `Input Images`.
 * Copy and paste images and folders from a file explorer application to the area under `Input Images`. Note that you must click on the area first.
 * Copy and paste images and folders from a text file, each on a separate line to the area under `Input Images`. Note that you must click on the area first. Any files and folders that do not exist are ignored.
-* Press the `Add...` button to add files or folders.
+* Press the `+` button to add files or folders.
 
-Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck `Recognized file formats`.
+Files with a file extension not recognized by Batcher will be filtered by default. If you use a third-party file load plug-in, uncheck the `Recognized File Format` condition.
 
 You will be warned if you add folder(s) containing too many files or e.g. an entire drive. This is a safeguard against accidentally adding an undesired folder.
 
-You can remove input images and folders by selecting them and pressing Delete or by pressing `Remove... → Remove Selected`. You can clear the entire input list by pressing `Remove... → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
+You can remove input images and folders by selecting them and pressing Delete or by pressing `- → Remove Selected`. You can clear the entire input list by pressing `- → Remove All` or selecting everything with Ctrl + A and then pressing Delete.
 
-By default, the renamed images (as they would be named on export) are displayed. To show their original names, check `Show Original Names`.
+You can adjust import options for each file format detected in the input list by pressing the arrow button and selecting `Import Options...`.
 
+By default, the renamed images (as they would be named on export) are displayed. To show their original names, press the arrow button and check `Show Original Names`.
+
+You can move around individual files or folders by dragging and dropping them anywhere within the input list, or by pressing Alt + Up/Down. This is useful if, for example, you intend rename the images with a numbered sequence.
+
+Files and folders can be sorted by several criteria: original name, new name, creation date, modification date and file size. By default, sorting is performed in the ascending order, folders are always placed first and name-based sorting is case-sensitive. All these options can be switched off/on as needed.
+
+You can export images to the same parent folders as the added input files/folders using the `Match input folders` option in the output folder dropdown.
+You will be warned when selecting this option as you may inadvertently overwrite the original images (when the filenames and file extensions match).
+
+You can view message logs recorded during processing via `Settings → View Logs` and save them to a file.
 
 
 ## Exporting Layers
@@ -154,14 +164,14 @@ This can be useful if you e.g. made changes to your images and you want to save 
 
 ### Filename Pattern
 
-The text entry next to `Name` lets you customize the filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
+The text entry next to `Filename` lets you customize filenames. A popup offers you several components you can combine to create a filename pattern, such as a numbered sequence.
 
 For details, see [Renaming](Customization/Renaming.md).
 
 
-### File Extension
+### File Format
 
-Type or choose your desired file extension next to the filename entry (`png` by default).
+Type or choose your desired file extension next to `File Format`.
 
 The dropdown list displays available file formats alongside their associated file extensions.
 If a file format contains multiple file extensions, the first is selected by default, but you may also choose a different extension (by clicking on it or pressing Tab).
@@ -172,7 +182,7 @@ However, you can still enter a file extension not in the list in case you use a 
 
 ### Export Options
 
-Pressing the `Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
+Pressing the `Export Options...` button reveals additional export options, particularly file format options (compression for PNG, image quality for JPG, etc.).
 
 If you need to adjust options for a file format not recognized by Batcher, set `How to adjust file format options` to `Interactively`.
 You will be prompted to set the file format options right after you start batch processing.
@@ -211,6 +221,10 @@ For example, for the JPEG format, which does not support transparency and may re
 
 ## Managing Settings
 
+You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
+
+You can check `Settings → Continue on Error` to continue processing if you determine that error(s) occurring during processing are harmless.
+
 Once batch processing is done successfully, your settings (output folder, file extension, dialog size, actions, conditions, etc.) are automatically saved.
 You can save settings manually anytime by selecting `Settings → Save Settings` or pressing Ctrl + S anywhere in the dialog.
 To reset settings to their default values, select `Settings → Reset Settings`.
@@ -218,7 +232,5 @@ To reset settings to their default values, select `Settings → Reset Settings`.
 You may also save settings to a custom file by selecting `Settings → Save Settings to File...`.
 This allows swapping between different plug-in configurations or sharing them.
 To load settings from a file, select `Settings → Load Settings from File...` and select the file.
-
-You can turn auto-closing the main dialog on/off by checking/unchecking `Settings → Close when Done`.
 
 For Batch Convert, you can optionally turn off saving input images by unchecking `Settings → Keep Input Images`. When this setting is checked, `Reset Settings` will not remove the input images. When loading settings from a file and this setting is checked, the input images will be preserved and any input images stored in the file will be ignored. If you want to load the input images from the file, uncheck this setting.
