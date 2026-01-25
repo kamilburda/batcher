@@ -525,7 +525,7 @@ def _handle_crop_action_item_added(item):
 
 def _set_display_name_for_crop_action(crop_mode_setting, crop_action):
   if crop_mode_setting.value == builtin_actions.CropModes.REMOVE_EMPTY_BORDERS:
-    crop_action['display_name'].set_value(_('Crop to remove empty borders'))
+    crop_action['display_name'].set_value(_('Crop to Remove Empty Borders'))
   else:
     if crop_mode_setting.value in crop_mode_setting.items_display_names:
       crop_action['display_name'].set_value(
@@ -593,7 +593,7 @@ def _set_display_name_for_rename_action(pattern_setting, rename_action):
   else:
     if rename_action['arguments/rename_only_new_images'].value:
       rename_action['display_name'].set_value(
-        _('Rename new images to "{}"').format(pattern_setting.value))
+        _('Rename New Images to "{}"').format(pattern_setting.value))
     else:
       rename_action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
 
@@ -644,7 +644,7 @@ def _set_display_name_for_export_action(file_extension_setting, export_action):
   export_action_name = None
   if export_action['orig_name'].value in [
         'export_for_edit_and_save_images', 'export_for_edit_layers']:
-    export_action_name = _('Export as {}')
+    export_action_name = _('Export As {}')
   elif export_action['orig_name'].value.startswith('export_for_'):
     export_action_name = _('Also Export As {}')
 
@@ -711,7 +711,7 @@ def _set_display_name_for_save_action(
     if special_value is not None:
       dirname = os.path.basename(output_directory_for_new_images_setting.value.value)
       save_action['display_name'].set_value(
-        _('Save (new and imported images to "{}")').format(dirname))
+        _('Save (New and Imported Images to "{}")').format(dirname))
     else:
       save_action['display_name'].set_value(_('Save'))
   else:
@@ -798,39 +798,39 @@ def _set_display_name_for_matching_text_condition(
     if text_setting.value:
       display_name = _('Starting with "{}"').format(text_setting.value)
     else:
-      display_name = _('Starting with any text')
+      display_name = _('Starting with Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_START_WITH:
     if text_setting.value:
-      display_name = _('Not starting with "{}"').format(text_setting.value)
+      display_name = _('Not Starting with "{}"').format(text_setting.value)
     else:
-      display_name = _('Not starting with any text')
+      display_name = _('Not Starting with Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.CONTAINS:
     if text_setting.value:
       display_name = _('Containing "{}"').format(text_setting.value)
     else:
-      display_name = _('Containing any text')
+      display_name = _('Containing Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_CONTAIN:
     if text_setting.value:
-      display_name = _('Not containing "{}"').format(text_setting.value)
+      display_name = _('Not Containing "{}"').format(text_setting.value)
     else:
-      display_name = _('Not containing any text')
+      display_name = _('Not Containing Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.ENDS_WITH:
     if text_setting.value:
       display_name = _('Ending with "{}"').format(text_setting.value)
     else:
-      display_name = _('Ending with any text')
+      display_name = _('Ending with Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_END_WITH:
     if text_setting.value:
-      display_name = _('Not ending with "{}"').format(text_setting.value)
+      display_name = _('Not Ending with "{}"').format(text_setting.value)
     else:
-      display_name = _('Not ending with any text')
+      display_name = _('Not Ending with Any Text')
   elif match_mode_setting.value == builtin_conditions.MatchModes.REGEX:
-    display_name = _('Matching pattern "{}"').format(text_setting.value)
+    display_name = _('Matching Pattern "{}"').format(text_setting.value)
 
   if display_name is not None:
     if ignore_case_sensitivity_setting.value:
       # FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-      display_name += _(' (case-insensitive)')
+      display_name += _(' (Case-Insensitive)')
 
     condition['display_name'].set_value(display_name)
 
