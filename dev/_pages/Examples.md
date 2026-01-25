@@ -35,6 +35,7 @@ For Export Layers and Edit Layers:
 2. Add the `Insert Foreground` action and adjust the color tag as necessary.
 3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this action after `Resize to layer size` by dragging it onto `Resize to layer size`.
 4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge Foreground` action that was added automatically.
+5. (optional) You can further adjust the watermark via subsequent actions (e.g. `Rotate`). Instead of `Current Layer` (if available), use `Layer Above (Foreground)`.
 
 
 ## I need every image to have the same background.

@@ -152,21 +152,27 @@ Options:
 * *Additional X-offset*: Moves the layers horizontally by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Additional Y-offset*: Moves the layers vertically by the specified amount, using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 
-#### Rotate and Flip
+#### Flip Horizontally
 
-Rotates and/or flips the entire image or a layer.
+Flips the current image or layer horizontally around its center.
+
+#### Flip Vertically
+
+Flips the current image or layer vertically around its center.
+
+#### Rotate
+
+Rotates the current image or layer.
 
 Options:
-* *Apply to (image or layer)*: Whether to rotate and flip the current image, current layer, or other objects (e.g. background/foreground).
-* *Rotation angle*: Rotate by 0, 90, 180 or 270 degrees, or use a *Custom* angle.
-* *Custom rotation angle*: Rotation angle in degrees or radians. Applies only if *Rotation angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
-* *Rotation mode*: How to handle the extents of layers after rotation - resize the layer, clip or crop.
-* *Interpolation*: Interpolation for rotated layers. Has effect only if *Rotation angle* is set to *Custom*.
+* *Apply to (image or layer)*: Whether to rotate the current image, current layer, or other objects (e.g. background/foreground).
+* *Angle*: Rotate by 90, 180 or 270 degrees, or use a *Custom* angle.
+* *Custom angle*: Rotation angle in degrees or radians. Applies only if *Angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
+* *How to handle boundaries*: How to handle the extents of layers after rotation - resize the layer, clip or crop. If rotation is applied to an image, all layers are handled the same way. Note that resized layers will not cause the image to grow; to achieve that, add the `Resize Canvas` action and use `Resize to layer size`.
+* *Interpolation*: Interpolation for rotated layers. Has effect only if *Angle* is set to *Custom*.
 * *Rotate around the center*: If checked, the layer is rotated around their center.
-* *Horizontal position of rotation center*: The X-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.
-* *Vertical position of rotation center*: The Y-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.  
-* *Flip horizontally*: Flips the image/layer horizontally.
-* *Flip vertically*: Flips the image/layer vertically.
+* *Horizontal position of center*: The X-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.
+* *Vertical position of center*: The Y-coordinate of the point around which the layer is rotated. Applies only if *Rotate around the center* is unchecked.
 
 
 ### Layers and Composition
@@ -185,6 +191,8 @@ This action is inserted at the first position.
 This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
 You can always move this action lower as needed.
 
+You can apply subsequent actions on the background using `Layer Below (Background)` instead of `Current Layer` (if available).
+
 The background is merged automatically at the end of processing as the `Merge Background` action is automatically added. See `Merge Background` below for more information.
 
 For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not Background` condition is automatically added and enabled.
@@ -194,6 +202,8 @@ For Export Layers and Edit Layers, the background layers are excluded from proce
 Inserts a new layer in front of the current layer.
 
 For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
+
+You can apply subsequent actions on the foreground using `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
 The `Merge Foreground` action is added automatically. For Export Layers and Edit Layers, the `Not Foreground` condition is added automatically.
 
