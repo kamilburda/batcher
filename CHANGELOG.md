@@ -1,3 +1,8 @@
+## Upcoming
+
+* Updated German translation (thanks to @ChrisLauinger77).
+
+
 ## 1.2
 
 ### January 25, 2026
