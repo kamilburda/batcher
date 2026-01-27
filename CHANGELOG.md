@@ -1,6 +1,7 @@
 ## Upcoming
 
 * Updated German translation (thanks to @ChrisLauinger77).
+* In the rare event that a folder with the same name exists during export, the overwrite dialog will no longer display the `Replace this file` option as it was causing an error. While the file to be exported could in theory replace the folder by removing the folder and its contents, this would likely not be anticipated by the user, rendering this choice unsafe. If `Apply this choice to all remaining files` is checked or processing is performed non-interactively, the `Rename new file` is used instead (but only if a folder exists rather than a file).
 
 
 ## 1.2

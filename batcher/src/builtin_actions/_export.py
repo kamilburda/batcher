@@ -403,23 +403,13 @@ def _get_overwrite_chooser_message(filepath, output_directory):
           and output_directory.value == 'match_input_folders'):
     return None
 
-  if filepath is not None:
-    dirpath, filename = os.path.split(filepath)
-    if dirpath:
-      message = (
-        _('A file named "{}" already exists in the folder "{}".').format(
-          filename, os.path.basename(dirpath)))
-    else:
-      message = _('A file named "{}" already exists.').format(filename)
-  else:
-    message = _('A file with the same name already exists.')
+  overwrite_messages = overwrite.get_overwrite_strings(filepath)
 
-  message += '\n'
-  message += _('Overwriting will permanently replace the original image.')
-  message += '\n'
-  message += _('Choose how to handle this file.')
-
-  return message
+  return '\n'.join([
+    overwrite_messages[0],
+    _('Overwriting will permanently replace the original image.'),
+    overwrite_messages[1],
+  ])
 
 
 def _export_item(

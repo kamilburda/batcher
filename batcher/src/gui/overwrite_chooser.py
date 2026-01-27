@@ -121,19 +121,12 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
         message: Optional[str] = None,
   ) -> str:
     if message is None:
-      if filepath is not None:
-        dirpath, filename = os.path.split(filepath)
-        if dirpath:
-          message = (
-            _('A file named "{}" already exists in the folder "{}".').format(
-              filename, os.path.basename(dirpath)))
-        else:
-          message = _('A file named "{}" already exists.').format(filename)
-      else:
-        message = _('A file with the same name already exists.')
+      message = '\n'.join(overwrite.get_overwrite_strings(filepath))
 
-      message += '\n'
-      message += _('Choose how to handle this file.')
+    if (os.path.isdir(filepath)
+        and overwrite.OverwriteModes.REPLACE in self.values_and_display_names):
+      self._buttons[overwrite.OverwriteModes.REPLACE].hide()
+      self._buttons[overwrite.OverwriteModes.REPLACE].set_no_show_all(True)
 
     self._dialog_label.set_markup(
       '<span font_size="large"><b>{}</b></span>'.format(GLib.markup_escape_text(message)))
@@ -149,7 +142,11 @@ class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
       self._overwrite_mode = self.default_response
     
     self._dialog.hide()
-    
+
+    if overwrite.OverwriteModes.REPLACE in self.values_and_display_names:
+      self._buttons[overwrite.OverwriteModes.REPLACE].set_no_show_all(False)
+      self._buttons[overwrite.OverwriteModes.REPLACE].show()
+
     return self._overwrite_mode
   
   def _on_checkbutton_apply_to_all_toggled(self, checkbutton):

@@ -51,6 +51,11 @@ class OverwriteChooser(metaclass=abc.ABCMeta):
 
     ``message`` is an optional custom message displayed to the user. If
     ``None``, a default message will be used instead.
+
+    If the existing file is a directory and the overwrite mode is
+    `OverwriteModes.REPLACE`, then `OverwriteModes.RENAME_NEW` must be returned
+    instead. The rationale is that a directory can only be replaced with a file
+    by deleting the entire directory first, which is unsafe.
     """
     pass
 
@@ -69,7 +74,10 @@ class NoninteractiveOverwriteChooser(OverwriteChooser):
         filepath: Optional[str] = None,
         message: Optional[str] = None,
   ) -> str:
-    return self._overwrite_mode
+    if os.path.isdir(filepath) and self._overwrite_mode == OverwriteModes.REPLACE:
+      return OverwriteModes.RENAME_NEW
+    else:
+      return self._overwrite_mode
 
 
 class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
@@ -117,7 +125,10 @@ class InteractiveOverwriteChooser(OverwriteChooser, metaclass=abc.ABCMeta):
     if self._overwrite_mode is None or not self._apply_to_all:
       return self._choose(filepath, message)
     else:
-      return self._overwrite_mode
+      if os.path.isdir(filepath) and self._overwrite_mode == OverwriteModes.REPLACE:
+        return OverwriteModes.RENAME_NEW
+      else:
+        return self._overwrite_mode
   
   @abc.abstractmethod
   def _choose(
@@ -170,17 +181,16 @@ def handle_overwrite(
     modified file path is returned.
   """
   if os.path.exists(filepath):
-    overwrite_chooser.choose(filepath=os.path.abspath(filepath), message=message)
+    overwrite_mode = overwrite_chooser.choose(filepath=os.path.abspath(filepath), message=message)
 
-    if overwrite_chooser.overwrite_mode in (
-         OverwriteModes.RENAME_NEW, OverwriteModes.RENAME_EXISTING):
+    if overwrite_mode in [OverwriteModes.RENAME_NEW, OverwriteModes.RENAME_EXISTING]:
       processed_filepath = uniquify.uniquify_filepath(filepath, position)
-      if overwrite_chooser.overwrite_mode == OverwriteModes.RENAME_NEW:
+      if overwrite_mode == OverwriteModes.RENAME_NEW:
         filepath = processed_filepath
       else:
         os.rename(filepath, processed_filepath)
 
-    return overwrite_chooser.overwrite_mode, filepath
+    return overwrite_mode, filepath
   else:
     return OverwriteModes.DO_NOTHING, filepath
 
@@ -204,13 +214,13 @@ class OverwriteModes:
   """Indicates to rename the existing file path in the file system."""
 
   CANCEL = 'cancel'
-  """This value should be used if the user terminated the overwrite chooser,
-  for example by closing a dialog if an interactive overwrite chooser is used.
+  """Use this value if the user terminated the overwrite chooser, for example 
+  by closing a dialog if an interactive overwrite chooser is used.
   """
 
   DO_NOTHING = 'do_nothing'
-  """This value should if there is no need to display an overwrite chooser, i.e.
-  if a file path does not exist and no action should be taken.
+  """Use this value if there is no need to display an overwrite chooser, 
+  i.e. if a file path does not exist and no action should be taken.
   """
 
   ASK = 'ask'
@@ -221,3 +231,36 @@ class OverwriteModes:
   """
 
   OVERWRITE_MODES = REPLACE, SKIP, RENAME_NEW, RENAME_EXISTING, CANCEL, DO_NOTHING, ASK
+
+
+def get_overwrite_strings(path: str) -> Tuple[str, str]:
+  """Returns strings usable when a user is prompted to handle conflicting
+  files.
+
+  These strings are used by default as a message in e.g. `handle_overwrite()`.
+  You can use this function as a basis to augment the message with
+  additional text and pass that as the ``message`` parameter.
+  """
+  if path is not None:
+    if not os.path.isdir(path):
+      dirpath, filename = os.path.split(path)
+      if dirpath:
+        path_exists_message = (
+          _('A file named "{}" already exists in the folder "{}".').format(
+            filename, os.path.basename(dirpath)))
+      else:
+        path_exists_message = _('A file named "{}" already exists.').format(filename)
+    else:
+      dirpath, dirname = os.path.split(path)
+      if dirpath:
+        path_exists_message = (
+          _('A folder named "{}" already exists in the folder "{}".').format(
+            dirname, os.path.basename(dirpath)))
+      else:
+        path_exists_message = _('A folder named "{}" already exists.').format(dirname)
+  else:
+    path_exists_message = _('A file with the same name already exists.')
+
+  choose_message = _('Choose how to handle this file.')
+
+  return path_exists_message, choose_message
