@@ -8,7 +8,7 @@ Likewise, `plug-in-batch-edit-layers` runs batch editing layers with the specifi
 You can also run `plug-in-batch-convert`, `plug-in-batch-export-layers` or `plug-in-batch-edit-layers` with [settings imported from a file](../Usage.md#managing-settings) by specifying the `settings-file` parameter. In that case, the `run-mode` must be `Gimp.RunMode.NONINTERACTIVE` and all other procedure arguments will be ignored (since these arguments will be assigned values from the settings file). The exception is the `inputs` parameter for `plug-in-batch-convert`, which will always be considered and the saved input images in the settings file will be ignored.
 
 The `plug-in-batch-export-layers-quick` and `plug-in-batch-edit-layers-quick` procedures perform layer export/editing with always the last used settings.
-The `plug-in-batch-export-selected-layers` and `plug-in-batch-edit-selecetged-layers` procedures perform export/editing of selected layers with always the last used settings.
+The `plug-in-batch-export-selected-layers` and `plug-in-batch-edit-selected-layers` procedures perform export/editing of selected layers with always the last used settings.
 
 Example using `plug-in-batch-convert` in Python (e.g. the Python console in GIMP):
 ```
