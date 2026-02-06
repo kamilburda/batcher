@@ -7,8 +7,6 @@ permalink: /docs/installation/
 
 Batcher requires [GIMP 3.0.0](https://www.gimp.org/downloads/) or later.
 
-**On Windows, if you downloaded GIMP 3 before March 19, 2025, you will need to update GIMP (or download and install GIMP again if GIMP does not offer an update). There was originally an issue that prevented several plug-ins, including Batcher, from working.**
-
 
 ## Download
 
