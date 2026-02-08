@@ -4,7 +4,6 @@ from collections.abc import Iterable
 from typing import Optional
 
 import gi
-from gi.repository import GdkPixbuf
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -33,22 +32,19 @@ class DirectoryChooser(Gtk.Box):
   _ROW_SEPARATOR = type('RowSeparator', (), {})()
 
   _HBOX_SPACING = 3
-  _ICON_XPAD = 2
 
   _ROW_CURRENT_DIRECTORY = 0
 
+  _SPECIAL_STYLE_CLASS_NAME = 'special_value'
+
   _COLUMNS = (
     _COLUMN_NAME,
-    _COLUMN_VISIBLE,
-    _COLUMN_ICON,
-    _COLUMN_ICON_VISIBLE,
+    _COLUMN_FONT_STYLE,
     _COLUMN_DIRECTORY,
   ) = (
     [0, GObject.TYPE_STRING],
-    [1, GObject.TYPE_BOOLEAN],
-    [2, GdkPixbuf.Pixbuf],
-    [3, GObject.TYPE_BOOLEAN],
-    [4, GObject.TYPE_PYOBJECT],
+    [1, Pango.Style],
+    [2, GObject.TYPE_PYOBJECT],
   )
 
   __gsignals__ = {'changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
@@ -101,7 +97,7 @@ class DirectoryChooser(Gtk.Box):
 
     if self._recent_dirpaths and self._recent_dirpaths_separator_tree_iter is None:
       self._recent_dirpaths_separator_tree_iter = self._model.append(
-        ['', True, None, False, self._ROW_SEPARATOR])
+        ['', Pango.Style.NORMAL, self._ROW_SEPARATOR])
 
     for tree_iter in self._recent_dirpaths_tree_iters:
       self._model.remove(tree_iter)
@@ -109,14 +105,14 @@ class DirectoryChooser(Gtk.Box):
     self._recent_dirpaths_tree_iters = []
 
     for dirpath in self._recent_dirpaths:
-      tree_iter = self._model.append(
-        [dirpath, True, self._folder_icon, True, directory_.Directory(dirpath)])
+      tree_iter = self._model.append([dirpath, Pango.Style.NORMAL, directory_.Directory(dirpath)])
       self._recent_dirpaths_tree_iters.append(tree_iter)
 
-    self._can_emit_changed_signal = True
-
     if self._combo_box.get_active() == -1:
-      self._combo_box.set_active(self._ROW_CURRENT_DIRECTORY)
+      self._set_text_from_row(self._ROW_CURRENT_DIRECTORY)
+      self.emit('changed')
+
+    self._can_emit_changed_signal = True
 
   def add_to_recent_dirpaths(self, dirpath):
     if dirpath in self._recent_dirpaths:
@@ -126,7 +122,7 @@ class DirectoryChooser(Gtk.Box):
 
     if self._recent_dirpaths_separator_tree_iter is None:
       self._recent_dirpaths_separator_tree_iter = self._model.append(
-        ['', True, None, False, self._ROW_SEPARATOR])
+        ['', Pango.Style.NORMAL, self._ROW_SEPARATOR])
 
     if len(self._recent_dirpaths) == self._max_recent_dirpaths:
       dirpath_to_remove_iter = self._recent_dirpaths_tree_iters.pop()
@@ -138,14 +134,15 @@ class DirectoryChooser(Gtk.Box):
 
     tree_iter = self._model.insert_after(
       self._recent_dirpaths_separator_tree_iter,
-      [dirpath, True, self._folder_icon, True, directory_.Directory(dirpath)],
+      [dirpath, Pango.Style.NORMAL, directory_.Directory(dirpath)],
     )
     self._recent_dirpaths_tree_iters.insert(0, tree_iter)
 
-    self._can_emit_changed_signal = True
-
     if self._combo_box.get_active() == -1:
-      self._combo_box.set_active(self._ROW_CURRENT_DIRECTORY)
+      self._set_text_from_row(self._ROW_CURRENT_DIRECTORY)
+      self.emit('changed')
+
+    self._can_emit_changed_signal = True
 
   def set_current_recent_dirpath_as_current_directory(self, set_active=True):
     if self._combo_box.get_active() != self._ROW_CURRENT_DIRECTORY:
@@ -165,47 +162,41 @@ class DirectoryChooser(Gtk.Box):
 
     self._model = Gtk.ListStore(*[column[1] for column in self._COLUMNS])
 
-    self._combo_box = Gtk.ComboBox(
-      model=self._model,
-      active=0,
-    )
+    self._combo_box = Gtk.ComboBox.new_with_model_and_entry(model=self._model)
     self._combo_box.set_row_separator_func(self._is_row_separator)
+    self._combo_box.set_entry_text_column(self._COLUMN_NAME[0])
 
-    self._folder_icon = gui_utils_.get_icon_pixbuf('folder', self._combo_box, Gtk.IconSize.MENU)
+    self._combo_box.add_attribute(
+      self._combo_box.get_cells()[0],
+      'style',
+      self._COLUMN_FONT_STYLE[0],
+    )
+
+    self._combo_box_entry_css_provider = Gtk.CssProvider()
+    self._combo_box_entry_css_provider.load_from_data(
+      f'entry.{self._SPECIAL_STYLE_CLASS_NAME} {{font-style: italic;}}'.encode())
+
+    self._combo_box_entry_style_context = self._combo_box.get_child().get_style_context()
+    self._combo_box_entry_style_context.add_provider(
+      self._combo_box_entry_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
     special_values = directory_.get_special_values(self._procedure_groups)
     default_directory = directory_.Directory()
 
-    self._model.append([default_directory.value, True, self._folder_icon, True, default_directory])
+    self._model.append([default_directory.value, Pango.Style.NORMAL, default_directory])
 
     if special_values:
-      self._model.append(['', True, None, False, self._ROW_SEPARATOR])
+      self._model.append(['', Pango.Style.NORMAL, self._ROW_SEPARATOR])
 
     for name, special_value in special_values.items():
       self._model.append([
         special_value.display_name,
-        True,
-        None,
-        False,
+        Pango.Style.ITALIC,
         directory_.Directory(name, type_=directory_.DirectoryTypes.SPECIAL),
       ])
       self._special_values_and_indexes[name] = len(self._model) - 1
 
-    self._renderer_icon = Gtk.CellRendererPixbuf(
-      xpad=self._ICON_XPAD,
-    )
-    self._combo_box.pack_start(self._renderer_icon, False)
-    self._combo_box.add_attribute(self._renderer_icon, 'pixbuf', self._COLUMN_ICON[0])
-    self._combo_box.add_attribute(self._renderer_icon, 'visible', self._COLUMN_ICON_VISIBLE[0])
-
-    self._renderer_name = Gtk.CellRendererText(
-      ellipsize=Pango.EllipsizeMode.START,
-      max_width_chars=self._max_width_chars,
-    )
-    self._combo_box.pack_start(self._renderer_name, True)
-    self._combo_box.add_attribute(self._renderer_name, 'text', self._COLUMN_NAME[0])
-
-    self._combo_box.set_active(self._ROW_CURRENT_DIRECTORY)
+    self._set_text_from_row(self._ROW_CURRENT_DIRECTORY)
 
     self._combo_box.show_all()
 
@@ -223,10 +214,20 @@ class DirectoryChooser(Gtk.Box):
     return model[tree_iter][self._COLUMN_DIRECTORY[0]] == self._ROW_SEPARATOR
 
   def _on_combo_box_changed(self, _combo_box):
-    self._set_tooltip()
+    directory = self.get_directory()
 
-    if self._can_emit_changed_signal:
-      self.emit('changed')
+    is_entry_changed = self._combo_box.get_active() < 0
+
+    if is_entry_changed:
+      # TODO
+      pass
+    else:
+      self._set_tooltip(directory)
+
+      self._adjust_entry_appearance(directory)
+
+      if self._can_emit_changed_signal:
+        self.emit('changed')
 
   def _on_button_browse_clicked(self, _button):
     file_dialog = Gtk.FileChooserNative(
@@ -268,10 +269,10 @@ class DirectoryChooser(Gtk.Box):
       self._model[self._ROW_CURRENT_DIRECTORY][self._COLUMN_NAME[0]] = directory.value
 
       if set_active:
-        self._combo_box.set_active(self._ROW_CURRENT_DIRECTORY)
+        self._set_text_from_row(self._ROW_CURRENT_DIRECTORY, directory.value)
     elif directory.type_ == directory_.DirectoryTypes.SPECIAL:
       if set_active:
-        self._combo_box.set_active(self._special_values_and_indexes[directory.value])
+        self._set_text_from_row(self._special_values_and_indexes[directory.value], directory.value)
 
     self._can_emit_changed_signal = can_emit_changed_signal
 
@@ -280,14 +281,49 @@ class DirectoryChooser(Gtk.Box):
 
     self._set_tooltip()
 
-  def _set_tooltip(self):
-    directory = self.get_directory()
+  def _set_text_from_row(self, row_index, text=None):
+    self._can_emit_changed_signal = False
+
+    self._combo_box.set_active(row_index)
+
+    if text is None:
+      text = self._model[row_index][self._COLUMN_NAME[0]]
+
+    self._can_emit_changed_signal = True
+
+    self._combo_box.get_child().set_text(text)
+    self._combo_box.get_child().set_position(-1)
+
+  def _set_tooltip(self, directory=None):
+    if directory is None:
+      directory = self.get_directory()
 
     if directory.type_ == directory_.DirectoryTypes.SPECIAL:
       index = self._special_values_and_indexes[directory.value]
       self._combo_box.set_tooltip_text(self._model[index][self._COLUMN_NAME[0]])
     else:
       self._combo_box.set_tooltip_text(directory.value)
+
+  def _adjust_entry_appearance(self, directory=None):
+    if directory is None:
+      directory = self.get_directory()
+
+    if directory.type_ == directory_.DirectoryTypes.SPECIAL:
+      self._set_italic_font()
+      self._combo_box.get_child().set_editable(False)
+      self._combo_box.get_child().set_can_focus(False)
+    else:
+      self._unset_italic_font()
+      self._combo_box.get_child().set_editable(True)
+      self._combo_box.get_child().set_can_focus(True)
+
+    self._combo_box.get_child().set_position(-1)
+
+  def _set_italic_font(self):
+    self._combo_box_entry_style_context.add_class(self._SPECIAL_STYLE_CLASS_NAME)
+
+  def _unset_italic_font(self):
+    self._combo_box_entry_style_context.remove_class(self._SPECIAL_STYLE_CLASS_NAME)
 
 
 GObject.type_register(DirectoryChooser)
