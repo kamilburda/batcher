@@ -613,6 +613,9 @@ class GeglProcedure(PDBProcedure):
 
       properties = [properties_array.index(index) for index in range(properties_array.length())]
 
+      # Use `Gegl.Operation.list_properties()` as a fallback in case
+      # `Gimp.DrawableFilter.operation_get_pspecs()` returns ``None`` for
+      # some parameters for some reason.
       indexes_of_none_properties = [index for index, prop in enumerate(properties) if prop is None]
       if indexes_of_none_properties:
         properties_from_gegl = Gegl.Operation.list_properties(name)
