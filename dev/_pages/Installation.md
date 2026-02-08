@@ -12,7 +12,7 @@ Batcher requires [GIMP 3.0.0](https://www.gimp.org/downloads/) or later.
 
 Batcher can currently be installed only manually by copying files from a ZIP archive.
 
-**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.2) (1.2, January 25, 2026)**
+**[Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.2.1) (1.2.1, February 08, 2026)**
 
 
 ## Windows
