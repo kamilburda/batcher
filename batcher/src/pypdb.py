@@ -532,11 +532,12 @@ class GeglProcedure(PDBProcedure):
       if arg_name not in properties_from_config:
         continue
 
-      # GIMP internally transforms GEGL enum values to `Gimp.Choice` values:
-      #  https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008
-      # For GIMP 3.1.4+, we make use of the introduced API for obtaining GEGL
-      # operation parameters where no enum-to-choice conversion is necessary as
-      # the arguments are always `Gimp.Choice`.
+      # While GIMP internally transforms GEGL enum values to `Gimp.Choice`
+      # values (https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2008),
+      # this is not the case for GIMP < 3.1.4, or when
+      # `Gimp.DrawableFilter.operation_get_pspecs()` returns ``None`` for some
+      # parameters. We therefore explicitly convert enums to choices in that
+      # case.
       if (properties_from_config[arg_name].__gtype__ == Gimp.ParamChoice.__gtype__
           and isinstance(arg_value, GObject.GEnum)):
         processed_value = arg_value.value_nick
@@ -609,7 +610,17 @@ class GeglProcedure(PDBProcedure):
   def _get_filter_properties(self, name):
     if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
       properties_array = Gimp.DrawableFilter.operation_get_pspecs(name)
-      return [properties_array.index(index) for index in range(properties_array.length())]
+
+      properties = [properties_array.index(index) for index in range(properties_array.length())]
+
+      indexes_of_none_properties = [index for index, prop in enumerate(properties) if prop is None]
+      if indexes_of_none_properties:
+        properties_from_gegl = Gegl.Operation.list_properties(name)
+        if properties_from_gegl:
+          for index in indexes_of_none_properties:
+            properties[index] = properties_from_gegl[index]
+
+      return properties
     else:
       if name in _GIMP_GEGL_OPERATIONS_SET_PRE_3_1_4:
         self._fill_gimp_gegl_operations_attributes_pre_3_1_4()
