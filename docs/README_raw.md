@@ -24,6 +24,8 @@ See the [webpage](https://kamilburda.github.io/batcher).
 
 ## Support
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z71TUHIX)
+
 You can report issues or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
 Make sure to check the current issues first before submitting a report.
 
