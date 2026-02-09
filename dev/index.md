@@ -50,6 +50,8 @@ feature_row_customization:
 
 ## Support
 
+Batcher is largely a one-person open-source project maintained in spare time. If you find it useful, support is a kind way to say thanks and helps keep development going when time allows.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z71TUHIX)
 
 Feel free to [ask questions](https://github.com/kamilburda/batcher/discussions) related to Batcher.
