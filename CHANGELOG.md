@@ -1,3 +1,8 @@
+## Upcoming
+
+* You can now type or paste an output folder (beside choosing a folder from a file dialog or the dropdown). This makes it possible to specify a folder that does not exist (which is automatically created during processing).
+
+
 ## 1.2.1
 
 ### February 08, 2026

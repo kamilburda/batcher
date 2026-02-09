@@ -71,11 +71,6 @@ class BatcherInteractiveMixin:
       if hasattr(settings['main/output_directory'].gui, 'add_to_recent_dirpaths'):
         settings['main/output_directory'].gui.add_to_recent_dirpaths()
 
-      if hasattr(
-            settings['main/output_directory'].gui,
-            'set_current_recent_dirpath_as_current_directory'):
-        settings['main/output_directory'].gui.set_current_recent_dirpath_as_current_directory()
-
 
 class BatcherManager(BatcherInteractiveMixin):
 

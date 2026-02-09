@@ -74,7 +74,6 @@ class DirectoryChooserPresenter(setting_.GtkPresenter):
 
   def _create_widget(self, setting, max_width_chars=None, max_recent_dirpaths=5, **kwargs):
     return gui_widgets_.DirectoryChooser(
-      initial_directory=setting.value,
       procedure_groups=setting.procedure_groups,
       max_width_chars=max_width_chars,
       max_recent_dirpaths=max_recent_dirpaths,
@@ -89,10 +88,6 @@ class DirectoryChooserPresenter(setting_.GtkPresenter):
   def add_to_recent_dirpaths(self):
     if self._setting.value.type_ == directory_.DirectoryTypes.DIRECTORY:
       self._widget.add_to_recent_dirpaths(self._setting.value.value)
-
-  def set_current_recent_dirpath_as_current_directory(self, set_active=True):
-    if self._setting.value.type_ == directory_.DirectoryTypes.DIRECTORY:
-      self._widget.set_current_recent_dirpath_as_current_directory(set_active=set_active)
 
   def set_most_recent_dirpath_as_current_directory(self, set_active=True):
     self._widget.set_most_recent_dirpath_as_current_directory(set_active=set_active)

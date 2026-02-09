@@ -815,7 +815,7 @@ EXPORT_FOR_CONVERT_DICT = {
       'default_value': None,
       'display_name': _('Output folder'),
       'gui_type_kwargs': {
-        'max_width_chars': 60,
+        'max_width_chars': 40,
       },
     },
     {
