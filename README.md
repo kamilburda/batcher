@@ -24,6 +24,8 @@ See the [webpage](https://kamilburda.github.io/batcher).
 
 ## Support
 
+Batcher is largely a one-person open-source project maintained in spare time. If you find it useful, support is a kind way to say thanks and helps keep development going when time allows.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z71TUHIX)
 
 You can report issues or request new features on the [GitHub Issues page](https://github.com/kamilburda/batcher/issues).
