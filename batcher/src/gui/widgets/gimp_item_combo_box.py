@@ -4,7 +4,6 @@ import collections
 from typing import Optional
 
 import gi
-from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -12,8 +11,6 @@ from gi.repository import GimpUi
 from gi.repository import GObject
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
-from src.gui import utils as gui_utils_
 
 __all__ = [
   'GimpItemComboBox',
@@ -76,7 +73,7 @@ class GimpItemComboBox(Gtk.Box):
 
     self._displayed_item_combo_box = self._item_combo_boxes[0]
 
-    self._item_model = Gtk.ListStore(GdkPixbuf.Pixbuf, GObject.TYPE_INT)
+    self._item_model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_INT)
 
     self._item_types_combo_box = Gtk.ComboBox(model=self._item_model)
 
@@ -87,8 +84,7 @@ class GimpItemComboBox(Gtk.Box):
       combo_box.widget.hide()
       combo_box.widget.set_no_show_all(True)
 
-      self._item_model.append(
-        (gui_utils_.get_icon_pixbuf(combo_box.icon_name, self, Gtk.IconSize.BUTTON), index))
+      self._item_model.append((combo_box.icon_name, index))
 
       self.pack_start(combo_box.widget, True, True, 0)
 
@@ -99,7 +95,7 @@ class GimpItemComboBox(Gtk.Box):
     )
 
     self._item_types_combo_box.pack_start(self._icon_cell_renderer, False)
-    self._item_types_combo_box.add_attribute(self._icon_cell_renderer, 'pixbuf', 0)
+    self._item_types_combo_box.add_attribute(self._icon_cell_renderer, 'icon-name', 0)
 
     self._item_types_combo_box.connect('changed', self._on_item_types_combo_box_changed)
 

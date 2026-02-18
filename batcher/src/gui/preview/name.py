@@ -55,7 +55,7 @@ class NamePreview(preview_base_.Preview):
   }
   
   _COLUMNS = (
-    _COLUMN_ICON_ITEM,
+    _COLUMN_ICON_NAME_ITEM,
     _COLUMN_ICON_ITEM_VISIBLE,
     _COLUMN_ICON_COLOR_TAG,
     _COLUMN_ICON_COLOR_TAG_VISIBLE,
@@ -63,7 +63,7 @@ class NamePreview(preview_base_.Preview):
     _COLUMN_ITEM_KEY,
     _COLUMN_ITEM_ID,
   ) = (
-    [0, GdkPixbuf.Pixbuf],
+    [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_BOOLEAN],
     [2, GdkPixbuf.Pixbuf],
     [3, GObject.TYPE_BOOLEAN],
@@ -298,7 +298,7 @@ class NamePreview(preview_base_.Preview):
     column.pack_start(cell_renderer_icon_item, False)
     column.set_attributes(
       cell_renderer_icon_item,
-      pixbuf=self._COLUMN_ICON_ITEM[0],
+      icon_name=self._COLUMN_ICON_NAME_ITEM[0],
       visible=self._COLUMN_ICON_ITEM_VISIBLE[0],
     )
 
@@ -333,8 +333,7 @@ class NamePreview(preview_base_.Preview):
     self._tree_view.get_selection().connect('changed', self._on_tree_selection_changed)
   
   def _init_icons(self):
-    self._folder_icon = gui_utils_.get_icon_pixbuf(
-      'folder', self._tree_view, Gtk.IconSize.MENU)
+    self._folder_icon_name = 'folder'
 
     # Colors taken from:
     #  https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpwidgets-utils.c
@@ -593,7 +592,7 @@ class NamePreview(preview_base_.Preview):
     else:
       parent_tree_iter = None
 
-    item_icon = self._get_icon_from_item(item)
+    item_icon_name = self._get_icon_name_from_item(item)
     color_tag_icon = self._get_color_tag_icon(item) if item.key in self._tagged_items else None
 
     if insertion_mode == 'before':
@@ -607,8 +606,8 @@ class NamePreview(preview_base_.Preview):
       parent_tree_iter,
       reference_iter,
       [
-        item_icon,
-        item_icon is not None,
+        item_icon_name,
+        item_icon_name is not None,
         color_tag_icon,
         color_tag_icon is not None,
         self._get_item_name(item),
@@ -660,9 +659,9 @@ class NamePreview(preview_base_.Preview):
         False,
       ])
 
-  def _get_icon_from_item(self, item):
+  def _get_icon_name_from_item(self, item):
     if item.type == itemtree.TYPE_FOLDER:
-      return self._folder_icon
+      return self._folder_icon_name
     else:
       return None
 

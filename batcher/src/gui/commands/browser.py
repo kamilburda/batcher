@@ -8,7 +8,6 @@ from typing import Dict, Optional
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
-from gi.repository import GdkPixbuf
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
@@ -105,12 +104,12 @@ class CommandBrowser(GObject.GObject):
   _COLUMNS = (
     _COLUMN_COMMAND_NAME,
     _COLUMN_COMMAND_VISIBLE,
-    _COLUMN_ICON_PARENT,
+    _COLUMN_ICON_NAME_PARENT,
     _COLUMN_COMMAND_ROW,
   ) = (
     [0, GObject.TYPE_STRING],
     [1, GObject.TYPE_BOOLEAN],
-    [2, GdkPixbuf.Pixbuf],
+    [2, GObject.TYPE_STRING],
     [3, GObject.TYPE_PYOBJECT],
   )
 
@@ -142,6 +141,8 @@ class CommandBrowser(GObject.GObject):
 
     self._last_search_text = ''
     self._last_selected_command_row = None
+
+    self._max_icon_parent_width = -1
 
     self._init_gui()
 
@@ -223,7 +224,7 @@ class CommandBrowser(GObject.GObject):
       category.tree_iter = self._tree_model.append([
           GLib.markup_escape_text(command_row.name),
           command_row.visible,
-          self._get_icons_based_on_expanded_state(category)[0],
+          self._get_icon_names_based_on_expanded_state(category)[0],
           command_row,
       ])
 
@@ -438,8 +439,9 @@ class CommandBrowser(GObject.GObject):
       # The expanded/collapsed state will properly be updated in the GUI once
       # filled.
       if category.tree_iter is not None:
-        _current_icon, new_icon = self._get_icons_based_on_expanded_state(category)
-        self._tree_model.set_value(category.tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+        _current_icon_name, new_icon_name = self._get_icon_names_based_on_expanded_state(category)
+        self._tree_model.set_value(
+          category.tree_iter, self._COLUMN_ICON_NAME_PARENT[0], new_icon_name)
 
       category.expanded = expanded
 
@@ -463,27 +465,25 @@ class CommandBrowser(GObject.GObject):
     self._column_name.set_resizable(True)
     self._column_name.set_title(_('Name'))
 
-    self._icon_arrow_down = gui_utils_.get_icon_pixbuf(
-      'pan-down', self._tree_view, Gtk.IconSize.MENU)
-    self._icon_arrow_end = gui_utils_.get_icon_pixbuf(
-      'pan-end', self._tree_view, Gtk.IconSize.MENU)
+    self._icon_name_arrow_down = 'pan-down'
+    self._icon_name_arrow_end = 'pan-end'
 
-    cell_renderer_icon_parent = Gtk.CellRendererPixbuf(
+    self._cell_renderer_icon_parent = Gtk.CellRendererPixbuf(
       xpad=self._ICON_XPAD,
     )
-    self._column_name.pack_start(cell_renderer_icon_parent, False)
+    self._column_name.pack_start(self._cell_renderer_icon_parent, False)
     self._column_name.set_attributes(
-      cell_renderer_icon_parent,
-      pixbuf=self._COLUMN_ICON_PARENT[0],
+      self._cell_renderer_icon_parent,
+      icon_name=self._COLUMN_ICON_NAME_PARENT[0],
     )
 
-    cell_renderer_command_name = Gtk.CellRendererText(
+    self._cell_renderer_command_name = Gtk.CellRendererText(
       width_chars=self._COMMAND_NAME_WIDTH_CHARS,
       ellipsize=Pango.EllipsizeMode.END,
     )
-    self._column_name.pack_start(cell_renderer_command_name, False)
+    self._column_name.pack_start(self._cell_renderer_command_name, False)
     self._column_name.set_attributes(
-      cell_renderer_command_name,
+      self._cell_renderer_command_name,
       markup=self._COLUMN_COMMAND_NAME[0],
     )
     self._column_name.set_sort_column_id(self._COLUMN_COMMAND_NAME[0])
@@ -760,9 +760,10 @@ class CommandBrowser(GObject.GObject):
           row_to_select = row
 
           if not command_row.category.expanded:
-            _current_icon, new_icon = self._get_icons_based_on_expanded_state(command_row.category)
+            _current_icon_name, new_icon_name = self._get_icon_names_based_on_expanded_state(
+              command_row.category)
             self._tree_model.set_value(
-              command_row.category.tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+              command_row.category.tree_iter, self._COLUMN_ICON_NAME_PARENT[0], new_icon_name)
 
             command_row.category.expanded = True
         else:
@@ -915,13 +916,19 @@ class CommandBrowser(GObject.GObject):
     if column != self._column_name:
       return False
 
-    current_icon, new_icon = self._get_icons_based_on_expanded_state(command_row.category)
+    current_icon_name, new_icon_name = self._get_icon_names_based_on_expanded_state(
+      command_row.category)
 
-    if x >= (current_icon.get_width() + self._ICON_XPAD * 2):
+    current_icon_width = self._cell_renderer_icon_parent.get_preferred_width(self._tree_view)[1]
+
+    if current_icon_width > self._max_icon_parent_width:
+      self._max_icon_parent_width = current_icon_width
+
+    if x >= (self._max_icon_parent_width + self._cell_renderer_icon_parent.get_padding().xpad * 2):
       return False
 
     self._expand_collapse_commands_under_category(
-      self._tree_model, command_row.category.tree_iter, command_row.category, new_icon)
+      self._tree_model, command_row.category.tree_iter, command_row.category, new_icon_name)
 
     return True
 
@@ -942,23 +949,25 @@ class CommandBrowser(GObject.GObject):
     if command_row.type_ == _CommandBrowserItemTypes.COMMAND:
       return False
 
-    _current_icon, new_icon = self._get_icons_based_on_expanded_state(command_row.category)
+    _current_icon_name, new_icon_name = self._get_icon_names_based_on_expanded_state(
+      command_row.category)
 
     converted_iter = tree_model.convert_iter_to_child_iter(tree_iter)
 
     self._expand_collapse_commands_under_category(
-      tree_model.get_model(), converted_iter, command_row.category, new_icon)
+      tree_model.get_model(), converted_iter, command_row.category, new_icon_name)
 
     return True
 
-  def _get_icons_based_on_expanded_state(self, category):
+  def _get_icon_names_based_on_expanded_state(self, category):
     if category.expanded:
-      return self._icon_arrow_down, self._icon_arrow_end
+      return self._icon_name_arrow_down, self._icon_name_arrow_end
     else:
-      return self._icon_arrow_end, self._icon_arrow_down
+      return self._icon_name_arrow_end, self._icon_name_arrow_down
 
-  def _expand_collapse_commands_under_category(self, tree_model, tree_iter, category, new_icon):
-    tree_model.set_value(tree_iter, self._COLUMN_ICON_PARENT[0], new_icon)
+  def _expand_collapse_commands_under_category(
+        self, tree_model, tree_iter, category, new_icon_name):
+    tree_model.set_value(tree_iter, self._COLUMN_ICON_NAME_PARENT[0], new_icon_name)
 
     category.expanded = not category.expanded
 

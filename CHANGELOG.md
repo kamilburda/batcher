@@ -1,6 +1,7 @@
 ## Upcoming
 
 * You can now type or paste an output folder (beside choosing a folder from a file dialog or the dropdown). This makes it possible to specify a folder that does not exist (which is automatically created during processing).
+* Fixed several icons not changing when selecting a different icon theme in GIMP.
 
 
 ## 1.2.1
