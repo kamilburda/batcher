@@ -65,6 +65,7 @@ Currently not supported. 🥲 Any [help providing a Snap package](https://github
 1. If you installed GIMP and/or Batcher via a package manager, make sure the following dependencies are installed:
    * Python 3.7 or later
    * [Pycairo](https://pycairo.readthedocs.io/en/latest/) library, i.e. Python bindings for the cairo library, including GObject bindings. For example, on Debian-based distributions, `python3-gi-cairo` is required.
+   * GObject bindings for the GExiv2 library. For example, on Debian-based distributions, `gir1.2-gexiv2-0.10` is required.
 2. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder.
 3. Copy the `batcher` folder from the downloaded archive to one of the folders chosen in the previous step. The folder hierarchy should look like this:
     ```
