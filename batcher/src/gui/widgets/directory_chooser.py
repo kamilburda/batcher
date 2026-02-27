@@ -137,6 +137,9 @@ class DirectoryChooser(Gtk.Box):
       directory = self._model[self._recent_dirpaths_tree_iters[0]][self._COLUMN_DIRECTORY[0]]
       self.set_directory(directory_.Directory(directory.value), set_active=set_active)
 
+  def set_entry_position(self, position):
+    self._combo_box.get_child().set_position(position)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
     self.set_spacing(self._HBOX_SPACING)

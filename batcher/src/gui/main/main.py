@@ -258,7 +258,7 @@ class BatchProcessingGui:
     self._dialog.vbox.show_all()
 
     if self._mode == 'export':
-      self._dialog.set_focus(self._export_settings.file_extension_entry)
+      self._dialog.set_focus(self._export_settings.folder_chooser)
     else:
       self._dialog.set_focus(self._command_lists.action_list.button_add)
 
@@ -267,7 +267,7 @@ class BatchProcessingGui:
     self._dialog.show()
 
     if self._mode == 'export':
-      self._export_settings.file_extension_entry.set_position(-1)
+      self._export_settings.folder_chooser.set_entry_position(-1)
 
   def _assign_gui_to_settings(self):
     if self._mode == 'edit':
@@ -451,6 +451,10 @@ class BatchProcessingQuickGui:
     self._init_gui()
 
     self._dialog.show_all()
+
+    if self._mode == 'export':
+      self._dialog.set_focus(self._export_settings.folder_chooser)
+      self._export_settings.folder_chooser.set_entry_position(-1)
 
     if mode == 'export' and self._settings['gui/show_quick_settings'].value:
       self._button_run.connect('clicked', self._on_button_run_clicked)
