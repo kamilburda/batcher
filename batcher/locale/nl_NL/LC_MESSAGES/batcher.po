@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
-msgstr "Project-Id-Version: 'batcher' 1.2\n"
+msgstr "Project-Id-Version: 'batcher' 1.2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 12:50+0100\n"
-"PO-Revision-Date: 2026-02-04 14:11+0100\n"
+"POT-Creation-Date: 2026-02-08 11:47+0100\n"
+"PO-Revision-Date: 2026-02-24 17:01+0100\n"
 "Last-Translator: Dick Groskamp <dikgro@yahoo.co.uk>\n"
 "Language-Team: none\n"
 "Language: nl-NL\n"
 "MIME-Version: .\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 318.5.1\n"
+"X-Generator: Translate Toolkit 3.18.1\n"
 
 #: ../../batcher/batcher.py:84
 msgid "Batch Convert"
@@ -619,53 +619,33 @@ msgid "Replace existing file"
 msgstr "Bestaand bestand vervangen"
 
 #: ../../batcher/src/builtin_actions/_export.py:410
-#: ../../batcher/src/gui/overwrite_chooser.py:128
-msgid "A file named \"{}\" already exists in the folder \"{}\"."
-msgstr "Er bestaat al een bestand genaamd \"{}\" in de map \"{}\"."
-
-#: ../../batcher/src/builtin_actions/_export.py:413
-#: ../../batcher/src/gui/overwrite_chooser.py:131
-msgid "A file named \"{}\" already exists."
-msgstr "Er bestaat al een bestand, genaamd \"{}\"."
-
-#: ../../batcher/src/builtin_actions/_export.py:415
-#: ../../batcher/src/gui/overwrite_chooser.py:133
-msgid "A file with the same name already exists."
-msgstr "Er bestaat al een bestand met dezelfde naam."
-
-#: ../../batcher/src/builtin_actions/_export.py:418
 msgid "Overwriting will permanently replace the original image."
 msgstr "Overschrijven zal de originele afbeelding permanent vervangen."
 
-#: ../../batcher/src/builtin_actions/_export.py:420
-#: ../../batcher/src/gui/overwrite_chooser.py:136
-msgid "Choose how to handle this file."
-msgstr "Kies hoe u dit bestand wilt afhandelen."
-
-#: ../../batcher/src/builtin_actions/_export.py:458
-#: ../../batcher/src/builtin_actions/_export.py:591
+#: ../../batcher/src/builtin_actions/_export.py:448
+#: ../../batcher/src/builtin_actions/_export.py:581
 #: ../../batcher/src/builtin_actions/_import.py:73
 msgid "Canceled"
 msgstr "Geannuleerd"
 
-#: ../../batcher/src/builtin_actions/_export.py:461
-#: ../../batcher/src/builtin_actions/_export.py:463
+#: ../../batcher/src/builtin_actions/_export.py:451
+#: ../../batcher/src/builtin_actions/_export.py:453
 msgid "Saving \"{}\""
 msgstr "Opslaan \"{}\""
 
-#: ../../batcher/src/builtin_actions/_export.py:498
+#: ../../batcher/src/builtin_actions/_export.py:488
 msgid "Skipping \"{}\""
 msgstr "\"{}\" overslaan"
 
-#: ../../batcher/src/builtin_actions/_export.py:809
+#: ../../batcher/src/builtin_actions/_export.py:799
 msgid "Ask"
 msgstr "Vragen"
 
-#: ../../batcher/src/builtin_actions/_export.py:816
+#: ../../batcher/src/builtin_actions/_export.py:806
 msgid "Also Export As..."
 msgstr "Ook exporteren als…"
 
-#: ../../batcher/src/builtin_actions/_export.py:817
+#: ../../batcher/src/builtin_actions/_export.py:807
 #: ../../batcher/src/builtin_actions/_import.py:120
 #: ../../batcher/src/builtin_actions/_misc.py:83
 #: ../../batcher/src/builtin_actions/_remove_folder_structure.py:46
@@ -679,11 +659,11 @@ msgstr "Ook exporteren als…"
 msgid "File and Naming"
 msgstr "Bestand en naamgeving"
 
-#: ../../batcher/src/builtin_actions/_export.py:818
+#: ../../batcher/src/builtin_actions/_export.py:808
 msgid "Exports an image to another file format."
 msgstr "Exporteert een afbeelding naar een andere bestandsindeling."
 
-#: ../../batcher/src/builtin_actions/_export.py:826
+#: ../../batcher/src/builtin_actions/_export.py:816
 #: ../../batcher/src/builtin_actions/_save.py:145
 #: ../../batcher/src/plugin_settings.py:75
 #: ../../batcher/src/plugin_settings.py:232
@@ -691,65 +671,65 @@ msgstr "Exporteert een afbeelding naar een andere bestandsindeling."
 msgid "Output folder"
 msgstr "Map voor uitvoer"
 
-#: ../../batcher/src/builtin_actions/_export.py:835
+#: ../../batcher/src/builtin_actions/_export.py:825
 #: ../../batcher/src/plugin_settings.py:66
 #: ../../batcher/src/plugin_settings.py:223
 #: ../../batcher/src/plugin_settings.py:469
 msgid "File extension"
 msgstr "Bestandsextensie"
 
-#: ../../batcher/src/builtin_actions/_export.py:845
+#: ../../batcher/src/builtin_actions/_export.py:835
 msgid "Interactively"
 msgstr "Interactief"
 
-#: ../../batcher/src/builtin_actions/_export.py:846
+#: ../../batcher/src/builtin_actions/_export.py:836
 msgid "Use options below"
 msgstr "Opties hieronder gebruiken"
 
-#: ../../batcher/src/builtin_actions/_export.py:848
+#: ../../batcher/src/builtin_actions/_export.py:838
 msgid "How to adjust file format options:"
 msgstr "Hoe de opties voor bestandsindeling aan te passen:"
 
-#: ../../batcher/src/builtin_actions/_export.py:850
+#: ../../batcher/src/builtin_actions/_export.py:840
 msgid ""
 "Native dialogs usually allow you to adjust more options such as image "
 "metadata, while adjusting options in place is more convenient as no extra "
 "dialog is displayed before the export."
 msgstr "Eigen dialoogvensters stellen u gewoonlijk in staat om meer opties aan te passen, zoals metadata voor een afbeelding, terwijl het aanpassen van opties op een plaats handiger is, omdat geen extra dialoogvenster hoeft te worden weergegeven voor het exporteren."
 
-#: ../../batcher/src/builtin_actions/_export.py:860
+#: ../../batcher/src/builtin_actions/_export.py:850
 #: ../../batcher/src/builtin_actions/_import.py:140
 msgid "File format options"
 msgstr "Opties bestandsindeling"
 
-#: ../../batcher/src/builtin_actions/_export.py:867
+#: ../../batcher/src/builtin_actions/_export.py:857
 msgid "If a file already exists:"
 msgstr "Als een bestand al bestaat:"
 
-#: ../../batcher/src/builtin_actions/_export.py:874
+#: ../../batcher/src/builtin_actions/_export.py:864
 msgid "For each image"
 msgstr "Voor elke afbeelding"
 
-#: ../../batcher/src/builtin_actions/_export.py:876
+#: ../../batcher/src/builtin_actions/_export.py:866
 msgid "For each top-level image or folder"
 msgstr "Voor elke afbeelding of map op het bovenste niveau"
 
-#: ../../batcher/src/builtin_actions/_export.py:877
-#: ../../batcher/src/builtin_actions/_export.py:948
-#: ../../batcher/src/builtin_actions/_export.py:966
+#: ../../batcher/src/builtin_actions/_export.py:867
+#: ../../batcher/src/builtin_actions/_export.py:938
+#: ../../batcher/src/builtin_actions/_export.py:956
 msgid "As a single image"
 msgstr "Als een enkele afbeelding"
 
-#: ../../batcher/src/builtin_actions/_export.py:879
+#: ../../batcher/src/builtin_actions/_export.py:869
 msgid "Perform export:"
 msgstr "Exporteren uitvoeren:"
 
-#: ../../batcher/src/builtin_actions/_export.py:884
+#: ../../batcher/src/builtin_actions/_export.py:874
 #: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:300
 msgid "Untitled"
 msgstr "Naamloos"
 
-#: ../../batcher/src/builtin_actions/_export.py:885
+#: ../../batcher/src/builtin_actions/_export.py:875
 #: ../../batcher/src/builtin_actions/_rename.py:109
 #: ../../batcher/src/builtin_actions/_rename.py:139
 #: ../../batcher/src/builtin_actions/_rename.py:157
@@ -758,57 +738,57 @@ msgstr "Naamloos"
 msgid "Image filename pattern"
 msgstr "Patroon bestandsnaam afbeelding"
 
-#: ../../batcher/src/builtin_actions/_export.py:892
+#: ../../batcher/src/builtin_actions/_export.py:882
 msgid "Use original file extension"
 msgstr "Originele bestandsextensie gebruiken"
 
-#: ../../batcher/src/builtin_actions/_export.py:898
+#: ../../batcher/src/builtin_actions/_export.py:888
 msgid "Convert file extension to lowercase"
 msgstr "Bestandsextensie naar kleine letters converteren"
 
-#: ../../batcher/src/builtin_actions/_export.py:904
+#: ../../batcher/src/builtin_actions/_export.py:894
 msgid "Use original modification date"
 msgstr "Originele datum van aanpassen gebruiken"
 
-#: ../../batcher/src/builtin_actions/_export.py:910
+#: ../../batcher/src/builtin_actions/_export.py:900
 #: ../../batcher/src/update/_handlers/update_1_2.py:113
 msgid "Rotate or flip image based on Exif metadata"
 msgstr "Draai of spiegel de afbeelding, gebaseerd op Exif-metadata"
 
-#: ../../batcher/src/builtin_actions/_export.py:916
+#: ../../batcher/src/builtin_actions/_export.py:906
 #: ../../batcher/src/update/_handlers/update_1_2.py:127
 msgid "Merge visible layers and rasterize"
 msgstr "Zichtbare lagen samenvoegen en rasteriseren"
 
-#: ../../batcher/src/builtin_actions/_export.py:933
-#: ../../batcher/src/builtin_actions/_export.py:958
+#: ../../batcher/src/builtin_actions/_export.py:923
+#: ../../batcher/src/builtin_actions/_export.py:948
 msgid "Export"
 msgstr "Exporteren"
 
-#: ../../batcher/src/builtin_actions/_export.py:934
+#: ../../batcher/src/builtin_actions/_export.py:924
 msgid "Exports an image to the specified file format."
 msgstr "Exporteert een afbeelding naar de gespecificeerde bestandsindeling."
 
-#: ../../batcher/src/builtin_actions/_export.py:941
+#: ../../batcher/src/builtin_actions/_export.py:931
 msgid "Exports a layer to another file format."
 msgstr "Exporteert een laag naar een andere bestandsindeling."
 
-#: ../../batcher/src/builtin_actions/_export.py:945
-#: ../../batcher/src/builtin_actions/_export.py:963
+#: ../../batcher/src/builtin_actions/_export.py:935
+#: ../../batcher/src/builtin_actions/_export.py:953
 msgid "For each layer"
 msgstr "Voor elke laag"
 
-#: ../../batcher/src/builtin_actions/_export.py:947
-#: ../../batcher/src/builtin_actions/_export.py:965
+#: ../../batcher/src/builtin_actions/_export.py:937
+#: ../../batcher/src/builtin_actions/_export.py:955
 msgid "For each top-level layer or group"
 msgstr "Voor elke laag of groep op het bovenste niveau"
 
-#: ../../batcher/src/builtin_actions/_export.py:952
-#: ../../batcher/src/builtin_actions/_export.py:970
+#: ../../batcher/src/builtin_actions/_export.py:942
+#: ../../batcher/src/builtin_actions/_export.py:960
 msgid "Use file extension in layer name"
 msgstr "Bestandsextensie in naam laag gebruiken"
 
-#: ../../batcher/src/builtin_actions/_export.py:959
+#: ../../batcher/src/builtin_actions/_export.py:949
 msgid "Exports a layer to the specified file format."
 msgstr "Exporteert een laag naar de gespecificeerde bestandsindeling."
 
@@ -2188,6 +2168,30 @@ msgstr "Vlaggen"
 #: ../../batcher/src/gui/widgets/parasite_editor.py:94
 msgid "Data"
 msgstr "Gegevens"
+
+#: ../../batcher/src/overwrite.py:249
+msgid "A file named \"{}\" already exists in the folder \"{}\"."
+msgstr "Er bestaat al een bestand genaamd \"{}\" in de map \"{}\"."
+
+#: ../../batcher/src/overwrite.py:252
+msgid "A file named \"{}\" already exists."
+msgstr "Er bestaat al een bestand, genaamd \"{}\"."
+
+#: ../../batcher/src/overwrite.py:257
+msgid "A folder named \"{}\" already exists in the folder \"{}\"."
+msgstr "Er bestaat al een map \"{}\" in de map \"{}\"."
+
+#: ../../batcher/src/overwrite.py:260
+msgid "A folder named \"{}\" already exists."
+msgstr "Er bestaat al een map \"{}\"."
+
+#: ../../batcher/src/overwrite.py:262
+msgid "A file with the same name already exists."
+msgstr "Er bestaat al een bestand met dezelfde naam."
+
+#: ../../batcher/src/overwrite.py:264
+msgid "Choose how to handle this file."
+msgstr "Kies hoe u dit bestand wilt afhandelen."
 
 #: ../../batcher/src/path/validators.py:82
 msgid "Filename is not specified."
