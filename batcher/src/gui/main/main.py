@@ -31,9 +31,10 @@ class BatchProcessingGui:
 
   _DIALOG_CONTENTS_BORDER_WIDTH = 8
   _DIALOG_VBOX_SPACING = 5
+  _VBOX_SETTINGS_TOP_MARGIN = 5
   _VBOX_SETTINGS_SPACING = 10
   _VBOX_SETTINGS_AND_MESSAGES_RIGHT_MARGIN = 6
-  _EXPORT_SETTINGS_BOTTOM_MARGIN = 10
+  _EXPORT_SETTINGS_BOTTOM_MARGIN = 5
 
   _HBOX_MESSAGE_HORIZONTAL_SPACING = 8
 
@@ -196,6 +197,7 @@ class BatchProcessingGui:
     self._vbox_settings = Gtk.Box(
       orientation=Gtk.Orientation.VERTICAL,
       spacing=self._VBOX_SETTINGS_SPACING,
+      margin_top=self._VBOX_SETTINGS_TOP_MARGIN,
     )
     if self._mode == 'export':
       self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)

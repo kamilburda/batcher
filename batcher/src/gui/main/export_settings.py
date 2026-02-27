@@ -20,8 +20,8 @@ from . import _utils as gui_main_utils_
 
 class ExportSettings:
 
-  _GRID_ROW_SPACING = 7
-  _GRID_COLUMN_SPACING = 7
+  _ROW_SPACING = 5
+  _LABEL_TOP_MARGIN = 5
   _EXPORT_OPTIONS_SPACING = 3
 
   _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 15
@@ -66,17 +66,18 @@ class ExportSettings:
       yalign=0.5,
     )
     self._folder_chooser_label.set_markup(
-      '<b>{}</b>'.format(_('Folder:')))
+      '<b>{}</b>'.format(_('Output Folder:')))
 
     self._settings['main/output_directory'].set_gui()
     self._settings['main/output_directory'].gui.widget.set_hexpand(True)
 
-    self._label_filename = Gtk.Label(
+    self._label_filename_and_format = Gtk.Label(
       xalign=0.0,
       yalign=0.5,
+      margin_top=self._LABEL_TOP_MARGIN,
     )
-    self._label_filename.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(_('Filename:'))))
+    self._label_filename_and_format.set_markup(
+      '<b>{}</b>'.format(GLib.markup_escape_text(_('Filename and Format:'))))
 
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(),
@@ -97,22 +98,22 @@ class ExportSettings:
       tooltip_text=_('Export Options'),
     )
 
-    self._hbox_filename = Gtk.Box(
+    self._hbox_filename_and_format = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._EXPORT_OPTIONS_SPACING,
     )
-    self._hbox_filename.pack_start(self._name_pattern_entry, True, True, 0)
-    self._hbox_filename.pack_start(self._file_extension_entry, False, False, 0)
-    self._hbox_filename.pack_start(self._export_options_button, False, False, 0)
+    self._hbox_filename_and_format.pack_start(self._name_pattern_entry, True, True, 0)
+    self._hbox_filename_and_format.pack_start(self._file_extension_entry, False, False, 0)
+    self._hbox_filename_and_format.pack_start(self._export_options_button, False, False, 0)
 
-    self._grid = Gtk.Grid(
-      row_spacing=self._GRID_ROW_SPACING,
-      column_spacing=self._GRID_COLUMN_SPACING,
+    self._vbox = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._ROW_SPACING,
     )
-    self._grid.attach(self._folder_chooser_label, 0, 0, 1, 1)
-    self._grid.attach(self._settings['main/output_directory'].gui.widget, 1, 0, 1, 1)
-    self._grid.attach(self._label_filename, 0, 1, 1, 1)
-    self._grid.attach(self._hbox_filename, 1, 1, 1, 1)
+    self._vbox.pack_start(self._folder_chooser_label, True, True, 0)
+    self._vbox.pack_start(self._settings['main/output_directory'].gui.widget, True, True, 0)
+    self._vbox.pack_start(self._label_filename_and_format, True, True, 0)
+    self._vbox.pack_start(self._hbox_filename_and_format, True, True, 0)
 
     self._export_options_dialog = None
 
@@ -153,7 +154,7 @@ class ExportSettings:
 
   @property
   def widget(self):
-    return self._grid
+    return self._vbox
 
   @property
   def folder_chooser(self):
