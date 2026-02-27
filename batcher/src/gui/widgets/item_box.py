@@ -37,7 +37,7 @@ class ItemBox(Gtk.ScrolledWindow):
   """
   
   ITEM_SPACING = 3
-  VBOX_SPACING = 4
+  VBOX_SPACING = 3
 
   DRAG_ICON_OFFSET = -8
   
