@@ -2,6 +2,7 @@
 
 * You can now type or paste an output folder (beside choosing a folder from a file dialog or the dropdown). This makes it possible to specify a folder that does not exist (which is automatically created during processing).
 * Moved labels for export settings to separate rows. This makes more room for the folder and filename entries (and particularly when translated labels are longer than their English counterparts). The labels have also been made clearer thanks to the additional space available.
+* Slightly increased width for the file format entry to account for file extensions with more characters.
 * Fixed several icons not changing when selecting a different icon theme in GIMP.
 
 
