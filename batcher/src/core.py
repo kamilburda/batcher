@@ -1249,8 +1249,10 @@ class Batcher(metaclass=abc.ABCMeta):
   def _get_error_message(exc):
     if getattr(exc, 'traceback', None) is not None:
       return exc.traceback
-    else:
+    elif getattr(exc, 'message', None) is not None:
       return exc.message
+    else:
+      return str(exc)
 
   def queue_stop(self):
     """Instructs `Batcher` to terminate batch processing prematurely.
