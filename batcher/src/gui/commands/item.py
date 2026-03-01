@@ -182,7 +182,10 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._button_remove.set_tooltip_text(_('Remove'))
 
     self._button_warning = self._setup_item_indicator_button(
-      icon=GimpUi.ICON_DIALOG_WARNING, position=0)
+      icon=GimpUi.ICON_DIALOG_WARNING,
+      position=0,
+      tooltip_text=_('Show error details'),
+    )
 
     self._button_info = self._setup_item_indicator_button(
       icon=GimpUi.ICON_DIALOG_INFORMATION, position=0)
