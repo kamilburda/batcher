@@ -22,6 +22,7 @@ from . import base as preview_base_
 from src import builtin_actions
 from src import exceptions
 from src import itemtree
+from src import utils
 from src import utils_setting as utils_setting_
 from src import utils_pdb
 from src.gui import messages as messages_
@@ -62,11 +63,18 @@ class ImagePreview(preview_base_.Preview):
 
   _LABEL_MESSAGE_WIDTH_CHARS = 60
 
-  def __init__(self, batcher, settings):
+  def __init__(
+        self,
+        batcher,
+        settings,
+        display_message_func=None,
+  ):
     super().__init__()
     
     self._batcher = batcher
     self._settings = settings
+    self._display_message_func = (
+      display_message_func if display_message_func is not None else utils.empty_func)
     
     self._item = None
     
@@ -381,12 +389,8 @@ class ImagePreview(preview_base_.Preview):
     except exceptions.BatcherCancelError:
       pass
     except exceptions.CommandError as e:
-      messages_.display_failure_message(
-        messages_.get_failing_message(e),
-        failure_message=str(e),
-        details=e.traceback,
-        parent=gui_utils_.get_toplevel_window(self))
-      
+      self._display_message_func(_('Preview completed with errors. See failed actions.'))
+
       error = e
     except exceptions.BatcherError as e:
       error = e
@@ -396,8 +400,9 @@ class ImagePreview(preview_base_.Preview):
         _('There was a problem with updating the image preview:'),
         failure_message=str(e),
         details=traceback.format_exc(),
-        parent=gui_utils_.get_toplevel_window(self))
-      
+        parent=gui_utils_.get_toplevel_window(self),
+      )
+
       error = e
 
     return self._batcher.image_copies, error, display_error_message_as_label

@@ -101,10 +101,8 @@ class CommandLists:
               (command_item.command, failed_commands[command_item.command.name][0][0])),
             failed_commands[command_item.command.name][0][1],
             failed_commands[command_item.command.name][0][2],
-            parent=self._dialog)
-
-          if not batcher.continue_on_error:
-            command_item.command['enabled'].set_value(False)
+            parent=self._dialog,
+          )
         elif command_item.command.name in skipped_commands:
           command_item.set_warning(False)
           command_item.set_info(

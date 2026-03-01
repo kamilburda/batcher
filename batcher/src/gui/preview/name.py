@@ -86,6 +86,7 @@ class NamePreview(preview_base_.Preview):
         selected_items=None,
         initial_cursor_item=None,
         show_original_name=False,
+        display_message_func=None,
   ):
     super().__init__()
     
@@ -96,6 +97,8 @@ class NamePreview(preview_base_.Preview):
     self._selected_items = selected_items if selected_items is not None else []
     self._initial_cursor_item = initial_cursor_item
     self._show_original_name = show_original_name
+    self._display_message_func = (
+      display_message_func if display_message_func is not None else utils.empty_func)
 
     self._tagged_items = set()
     
@@ -431,11 +434,7 @@ class NamePreview(preview_base_.Preview):
     except exceptions.BatcherCancelError:
       pass
     except exceptions.CommandError as e:
-      messages_.display_failure_message(
-        messages_.get_failing_message(e),
-        failure_message=str(e),
-        details=e.traceback,
-        parent=gui_utils_.get_toplevel_window(self))
+      self._display_message_func(_('Preview completed with errors. See failed actions.'))
       
       error = e
     except Exception as e:
@@ -448,7 +447,8 @@ class NamePreview(preview_base_.Preview):
         message,
         failure_message=str(e),
         details=traceback.format_exc(),
-        parent=gui_utils_.get_toplevel_window(self))
+        parent=gui_utils_.get_toplevel_window(self),
+      )
       
       error = e
     

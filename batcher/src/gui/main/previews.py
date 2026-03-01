@@ -103,6 +103,7 @@ class Previews:
           None,
         )
         if self._settings['gui/image_preview_displayed_items'].active_items else None),
+      display_message_func=self._display_message_func,
     )
 
     if CONFIG.PROCEDURE_GROUP == CONVERT_GROUP:
@@ -118,7 +119,10 @@ class Previews:
       overwrite_chooser=overwrite_chooser)
 
     self._image_preview = preview_image_.ImagePreview(
-      self._batcher_for_image_preview, self._settings)
+      self._batcher_for_image_preview,
+      self._settings,
+      display_message_func=self._display_message_func,
+    )
 
     self._previews_controller = previews_controller_.PreviewsController(
       self._name_preview, self._image_preview, self._settings, current_image=self._current_image)

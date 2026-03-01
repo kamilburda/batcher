@@ -590,6 +590,9 @@ class Batcher(metaclass=abc.ABCMeta):
         self._process_items()
       except Exception:
         exception_occurred = True
+
+        self._deactivate_failed_commands()
+
         raise
       finally:
         if not self._is_preview:
@@ -597,6 +600,18 @@ class Batcher(metaclass=abc.ABCMeta):
 
         if self._process_contents:
           self._cleanup_contents(exception_occurred)
+
+  def _deactivate_failed_commands(self):
+    if self.continue_on_error:
+      return
+
+    for action_data_list in self._failed_actions.values():
+      for action_data in action_data_list:
+        action_data[3]['enabled'].set_value(False)
+
+    for condition_data_list in self._failed_conditions.values():
+      for condition_data in condition_data_list:
+        condition_data[3]['enabled'].set_value(False)
 
   def _set_attributes(self, **kwargs):
     for name, value in kwargs.items():
@@ -841,9 +856,9 @@ class Batcher(metaclass=abc.ABCMeta):
           message = f'PDB procedure "{command["function"].value}" not found'
 
           if 'action' in command.tags:
-            self._failed_actions[command.name].append((None, message, None))
+            self._failed_actions[command.name].append((None, message, None, command))
           if 'condition' in command.tags:
-            self._failed_conditions[command.name].append((None, message, None))
+            self._failed_conditions[command.name].append((None, message, None, command))
 
           raise exceptions.CommandError(message, command, None, None)
         else:
@@ -995,12 +1010,12 @@ class Batcher(metaclass=abc.ABCMeta):
             ' Windows → Dockable Dialogs → Error Console.'
           )
 
-        self._set_failed_commands(command, error_message)
+        self._add_to_failed_commands(command, error_message)
 
         raise exceptions.CommandError(error_message, command, self._current_item)
       except Exception as e:
         trace = traceback.format_exc()
-        self._set_failed_commands(command, str(e), trace)
+        self._add_to_failed_commands(command, str(e), trace)
 
         raise exceptions.CommandError(str(e), command, self._current_item, trace)
       else:
@@ -1010,15 +1025,17 @@ class Batcher(metaclass=abc.ABCMeta):
 
   def _set_skipped_commands(self, command, error_message):
     if 'action' in command.tags:
-      self._skipped_actions[command.name].append((self._current_item, error_message))
+      self._skipped_actions[command.name].append((self._current_item, error_message, command))
     if 'condition' in command.tags:
-      self._skipped_conditions[command.name].append((self._current_item, error_message))
+      self._skipped_conditions[command.name].append((self._current_item, error_message, command))
 
-  def _set_failed_commands(self, command, error_message, trace=None):
+  def _add_to_failed_commands(self, command, error_message, trace=None):
     if 'action' in command.tags:
-      self._failed_actions[command.name].append((self._current_item, error_message, trace))
+      self._failed_actions[command.name].append(
+        (self._current_item, error_message, trace, command))
     if 'condition' in command.tags:
-      self._failed_conditions[command.name].append((self._current_item, error_message, trace))
+      self._failed_conditions[command.name].append(
+        (self._current_item, error_message, trace, command))
 
   def _set_conditions(self):
     self._invoker.invoke(
