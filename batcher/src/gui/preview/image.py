@@ -248,7 +248,7 @@ class ImagePreview(preview_base_.Preview):
     self._button_refresh = Gtk.Button(relief=Gtk.ReliefStyle.NONE)
     self._button_refresh.set_image(
       Gtk.Image.new_from_icon_name('view-refresh', Gtk.IconSize.BUTTON))
-    self._button_refresh.set_tooltip_text(_('Update Preview'))
+    self._button_refresh.set_tooltip_text(_('Update preview'))
     self._button_refresh.show_all()
     self._button_refresh.hide()
     self._button_refresh.set_no_show_all(True)
@@ -281,7 +281,7 @@ class ImagePreview(preview_base_.Preview):
 
     self._button_message = Gtk.Button(
       relief=Gtk.ReliefStyle.NONE,
-      tooltip_text=_('View Message'),
+      tooltip_text=_('View message'),
     )
     self._button_message.set_image(
       Gtk.Image.new_from_icon_name('dialog-information', Gtk.IconSize.BUTTON))

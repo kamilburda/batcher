@@ -225,7 +225,7 @@ class CommandEditorWidget:
     self._label_editable_command_name.label.set_max_width_chars(
       self._LABEL_COMMAND_NAME_MAX_WIDTH_CHARS)
 
-    self._label_editable_command_name.button_edit.set_tooltip_text(_('Edit Name'))
+    self._label_editable_command_name.button_edit.set_tooltip_text(_('Edit name'))
 
     self._label_editable_command_name.connect(
       'changed', self._on_label_editable_command_name_changed, command)
@@ -283,7 +283,7 @@ class CommandEditorWidget:
         image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
         relief=Gtk.ReliefStyle.NONE,
       )
-      self._button_info.set_tooltip_text(_('Show More Information'))
+      self._button_info.set_tooltip_text(_('Show more information'))
 
       self._button_info.connect('clicked', self._on_button_info_clicked)
       self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)

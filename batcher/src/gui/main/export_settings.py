@@ -95,7 +95,7 @@ class ExportSettings:
 
     self._export_options_button = Gtk.Button(
       image=Gtk.Image.new_from_icon_name('applications-system', Gtk.IconSize.BUTTON),
-      tooltip_text=_('Export Options'),
+      tooltip_text=_('Export options'),
     )
 
     self._hbox_filename_and_format = Gtk.Box(

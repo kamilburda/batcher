@@ -243,8 +243,13 @@ class ItemBoxItem:
   def _setup_item_button(self, icon=None, text=None, position=None, button_class=Gtk.Button):
     return self._setup_button(self._hbox_buttons, icon, text, position, button_class)
   
-  def _setup_item_indicator_button(self, icon=None, text=None, position=None):
+  def _setup_item_indicator_button(
+        self, icon=None, text=None, position=None, tooltip_text=None):
     button = self._setup_button(self._hbox_indicator_buttons, icon, text, position)
+
+    if tooltip_text is not None:
+      button.set_tooltip_text(tooltip_text)
+
     button.hide()
     button.set_no_show_all(True)
 
