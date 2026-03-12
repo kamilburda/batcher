@@ -205,6 +205,12 @@ class CommandBrowser(GObject.GObject):
                    or name_.endswith('-export-internal')
                    or name_.endswith('-export-multi')))
 
+    def is_procedure_compatible_with_batch_processing(name_):
+      return name_ not in [
+        # Opens a new image even in non-interactive run mode and is redundant
+        'script-fu-unsharp-mask',
+      ]
+
     def is_procedure_gimp_plugin(procedure_):
       return (
         isinstance(procedure_, pypdb.GimpPDBProcedure)
@@ -237,7 +243,9 @@ class CommandBrowser(GObject.GObject):
     pdb_procedures.extend(
       pdb[name]
       for name in pdb.list_all_gimp_pdb_procedures()
-      if not is_file_load_procedure(name) and not is_file_export_procedure(name)
+      if (not is_file_load_procedure(name)
+          and not is_file_export_procedure(name)
+          and is_procedure_compatible_with_batch_processing(name))
     )
 
     duplicate_gegl_operations = pdb.get_duplicate_gegl_operations()

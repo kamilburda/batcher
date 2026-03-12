@@ -13,6 +13,9 @@ User interface changes:
 * Slightly increased width for the file format entry to account for file extensions with more characters.
 * If an action fails during the preview, an inline message is displayed instead of a modal dialog. This can vastly reduce frustration when a user adds and edits an action until the action no longer results in a failure (e.g. replacing default values such as unspecified files or adding coordinates for `gimp-pencil`). Additionally, this prevents message spam when an action fails when starting Batcher, which could result in Batcher getting unresponsive on some platforms (#133).
 
+Changes to actions and conditions:
+* `script-fu-unsharp-mask` is no longer available as a custom action as it opens a new image in GIMP (even when running the procedure non-interactively) and is thus not usable within Batcher. The `gegl:unsharp-mask` filter can be used as a substitute (#138).
+
 Bug fixes:
 * Fixed several icons not changing when selecting a different icon theme in GIMP.
 * Fixed a potential bug preventing Batcher from running on certain platforms for GIMP 3.2-RC3 or later.
