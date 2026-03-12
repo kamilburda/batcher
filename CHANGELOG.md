@@ -1,12 +1,21 @@
 ## Upcoming
 
+General changes:
 * Updated Dutch translation (thanks to @DiGro).
+
+New features:
 * You can now type or paste an output folder (beside choosing a folder from a file dialog or the dropdown). This makes it possible to specify a folder that does not exist (which is automatically created during processing).
+* Levels, Curves: For GIMP 3.2 and later, presets saved with a mode other than linear (non-linear, perceptual) are now allowed.
+
+User interface changes:
 * Batch Convert, Export Images, Export Layers: The default focus when opening the main dialog is now on the output folder entry.
 * Moved labels for export settings to separate rows. This makes more room for the folder and filename entries (and particularly when translated labels are longer than their English counterparts). The labels have also been made clearer thanks to the additional space available.
 * Slightly increased width for the file format entry to account for file extensions with more characters.
 * If an action fails during the preview, an inline message is displayed instead of a modal dialog. This can vastly reduce frustration when a user adds and edits an action until the action no longer results in a failure (e.g. replacing default values such as unspecified files or adding coordinates for `gimp-pencil`). Additionally, this prevents message spam when an action fails when starting Batcher, which could result in Batcher getting unresponsive on some platforms (#133).
+
+Bug fixes:
 * Fixed several icons not changing when selecting a different icon theme in GIMP.
+* Fixed a potential bug preventing Batcher from running on certain platforms for GIMP 3.2-RC3 or later.
 
 
 ## 1.2.1
