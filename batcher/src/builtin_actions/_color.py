@@ -1,5 +1,6 @@
 """Built-in actions related to adjusting colors."""
 
+import collections
 import re
 import struct
 
@@ -34,7 +35,8 @@ class BrightnessContrastFilters:
 
 class CurveData:
 
-  def __init__(self, channel=None, samples=None, points=None):
+  def __init__(self, curve_type=None, channel=None, samples=None, points=None):
+    self.curve_type = curve_type
     self.channel = channel
     self.samples = samples
     self.points = points
@@ -159,36 +161,76 @@ def _apply_levels_curves(
       except Exception as e:
         raise ValueError(_FAILED_TO_READ_DATA_MESSAGE) from e
 
-  if trc != 'linear':
-    raise NotImplementedError(_('Only presets with the linear mode are currently supported.'))
+  if utils_pdb.get_gimp_version() < (3, 2) and trc != 'linear':
+    raise ValueError(
+      _('Only presets with the linear mode are supported for GIMP versions earlier than 3.2.'
+        ' Upgrade to GIMP 3.2 or later if you need to use presets with modes other than linear.'))
 
   if trc is not None and curve_data is not None:
     _apply_func(layer, trc, curve_data)
 
 
-def _apply_levels(layer, _trc, levels_data):
+def _apply_levels(layer, trc, levels_data):
   for levels_data_for_channel in levels_data.values():
     if not levels_data_for_channel.has_default_values():
-      layer.levels(
-        levels_data_for_channel.channel,
-        levels_data_for_channel.low_input,
-        levels_data_for_channel.high_input,
-        levels_data_for_channel.clamp_input,
-        levels_data_for_channel.gamma,
-        levels_data_for_channel.low_output,
-        levels_data_for_channel.high_output,
-        levels_data_for_channel.clamp_output,
-      )
+      if utils_pdb.get_gimp_version() >= (3, 2):
+        pdb.gimp__levels(
+          layer,
+          trc=trc,
+          channel=levels_data_for_channel.channel,
+          low_input=levels_data_for_channel.low_input,
+          high_input=levels_data_for_channel.high_input,
+          clamp_input=levels_data_for_channel.clamp_input,
+          gamma=levels_data_for_channel.gamma,
+          low_output=levels_data_for_channel.low_output,
+          high_output=levels_data_for_channel.high_output,
+          clamp_output=levels_data_for_channel.clamp_output,
+        )
+      else:
+        layer.levels(
+          levels_data_for_channel.channel,
+          levels_data_for_channel.low_input,
+          levels_data_for_channel.high_input,
+          levels_data_for_channel.clamp_input,
+          levels_data_for_channel.gamma,
+          levels_data_for_channel.low_output,
+          levels_data_for_channel.high_output,
+          levels_data_for_channel.clamp_output,
+        )
 
 
-def _apply_curves(layer, _trc, curve_data):
+def _apply_curves(layer, trc, curve_data):
   for curve_data_for_channel in curve_data.values():
-    if curve_data_for_channel.samples is not None:
-      layer.curves_explicit(curve_data_for_channel.channel, curve_data_for_channel.samples)
-    elif curve_data_for_channel.points is not None:
-      layer.curves_spline(curve_data_for_channel.channel, curve_data_for_channel.points)
+    if utils_pdb.get_gimp_version() >= (3, 2):
+      if curve_data_for_channel.channel is None:
+        continue
+
+      curve = Gimp.Curve.new()
+      if curve_data_for_channel.curve_type is not None:
+        curve.set_curve_type(curve_data_for_channel.curve_type)
+
+      if curve_data_for_channel.curve_type == Gimp.CurveType.SMOOTH:
+        for index in range(0, len(curve_data_for_channel.points), 2):
+          points = curve_data_for_channel.points[index:index + 2]
+          if len(points) > 1:
+            curve.add_point(*points)
+      elif curve_data_for_channel.curve_type == Gimp.CurveType.FREE:
+        for index, sample in enumerate(curve_data_for_channel.samples):
+          curve.set_sample(index / 256, sample)
+
+      pdb.gimp__curves(
+        layer,
+        trc=trc,
+        channel=curve_data_for_channel.channel,
+        curve=curve,
+      )
     else:
-      raise ValueError('failed to obtain curve points from file')
+      if curve_data_for_channel.samples is not None:
+        layer.curves_explicit(curve_data_for_channel.channel, curve_data_for_channel.samples)
+      elif curve_data_for_channel.points is not None:
+        layer.curves_spline(curve_data_for_channel.channel, curve_data_for_channel.points)
+      else:
+        raise ValueError('failed to obtain curve points from file')
 
 
 def _parse_gimp_levels_preset(data):
@@ -266,7 +308,7 @@ def _read_levels_parameters(file):
 
 def _parse_gimp_curves_preset(data):
   trc = None
-  curve_data = {}
+  curve_data = collections.defaultdict(CurveData)
   current_channel = None
 
   for line in data:
@@ -277,16 +319,36 @@ def _parse_gimp_curves_preset(data):
     if parsed_channel is not None:
       current_channel = _get_channel_from_str(parsed_channel)
 
+    match = re.match(r'\s*\(curve-type +(.*?)\)+', line)
+    if match and current_channel is not None:
+      curve_type = match.group(1)
+      if utils_pdb.get_gimp_version() >= (3, 2):
+        if curve_type == 'smooth':
+          curve_data[current_channel].curve_type = Gimp.CurveType.SMOOTH
+        elif curve_type == 'free':
+          curve_data[current_channel].curve_type = Gimp.CurveType.FREE
+
     match = re.match(r'\s*\(points +(.*?)\)+', line)
     if match and current_channel is not None:
       points = match.group(1)
-      keep_channel_intact = re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points)
+
+      if utils_pdb.get_gimp_version() >= (3, 2):
+        keep_channel_intact = (
+          (re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points))
+          and curve_data[current_channel].curve_type != Gimp.CurveType.FREE)
+      else:
+        keep_channel_intact = re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points)
+
       if not keep_channel_intact:
-        curve_data[current_channel] = CurveData(channel=current_channel)
+        curve_data[current_channel].channel = current_channel
+        if utils_pdb.get_gimp_version() >= (3, 2):
+          match = re.match(r'\s*\(points +[0-9]+ +(.*?)\)+', line)
+          if match:
+            curve_data[current_channel].points = _parse_samples_or_points(match.group(1))
 
     match = re.match(r'\s*\(samples +[0-9]+ +(.*?)\)+', line)
     if match and current_channel in curve_data:
-      samples = _parse_samples(match.group(1))
+      samples = _parse_samples_or_points(match.group(1))
       if samples is not None:
         curve_data[current_channel].samples = samples
 
@@ -313,11 +375,11 @@ def _get_channel_from_str(channel_str):
   return _HISTOGRAM_CHANNELS.get(channel_str, None)
 
 
-def _parse_samples(samples_str):
-  sample_list_str = re.split(r' +', samples_str)
+def _parse_samples_or_points(str_):
+  number_list_str = re.split(r' +', str_)
 
   try:
-    return [float(sample) for sample in sample_list_str if sample]
+    return [float(number) for number in number_list_str if number]
   except ValueError:
     return None
 
@@ -430,8 +492,7 @@ LEVELS_DICT = {
   'menu_path': _('Color'),
   'description': _(
     'Applies levels using a preset file saved in GIMP or Photoshop (.alv file).'
-    '\n\nGIMP preset files must be saved in the linear mode.'
-    ' Otherwise, this action will result in an error.'
+    '\n\nTo obtain a preset file in GIMP, go to Colors → Levels and export the settings.'
   ),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
@@ -459,8 +520,7 @@ CURVES_DICT = {
   'menu_path': _('Color'),
   'description': _(
     'Applies curves using a preset file saved in GIMP or Photoshop (.acv file).'
-    '\n\nGIMP preset files must be saved in the linear mode.'
-    ' Otherwise, this action will result in an error.'
+    '\n\nTo obtain a preset file in GIMP, go to Colors → Curves and export the settings.'
   ),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,

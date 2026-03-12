@@ -268,15 +268,11 @@ Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file for
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Levels tool.
 
-At the moment, Batcher only supports preset files saved in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
-
 #### Curves
 
 Applies curves from a saved preset file. Both GIMP and Photoshop (.acv) file formats are supported.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
-
-At the moment, Batcher only supports preset files saved in the linear mode. If you saved your preset in a different mode (e.g. non-linear, perceptual), the action will fail with a warning dialog.
 
 #### White Balance
 
