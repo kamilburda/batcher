@@ -104,13 +104,9 @@ class TestProcedure(unittest.TestCase):
       additional_init=lambda proc: proc.set_sensitivity_mask(0),
     )
 
-    # Do not instantiate with `Gimp.PlugIn` as the parent class as objects of
-    # these classes should not be instantiated outside `Gimp.main()`.
-    plugin = procedure_._create_plugin_class(bases=())()
+    mock_procedure = procedure_._do_create_procedure(None, 'sample-procedure')
 
-    mock_procedure = plugin.do_create_procedure('sample-procedure')
-
-    self.assertEqual(plugin.do_query_procedures(), ['sample-procedure'])
+    self.assertEqual(procedure_._do_query_procedures(None), ['sample-procedure'])
 
     mock_procedure.add_enum_argument.assert_called_once_with(*self.run_mode_argument[1:])
     mock_procedure.add_string_argument.assert_called_once_with(*self.output_directory_argument[1:])
@@ -127,22 +123,8 @@ class TestProcedure(unittest.TestCase):
       'Jane Doe, John Doe', 'Jane Doe, John Doe', '2023')
     mock_procedure.set_sensitivity_mask.assert_called_once_with(0)
 
-    self.assertTrue(hasattr(plugin, 'do_set_i18n'))
-
   def test_create_procedure_no_matching_name(self, *_mocks):
-    plugin = procedure_._create_plugin_class(bases=())()
-    self.assertIsNone(plugin.do_create_procedure('nonexistent-procedure'))
-
-  def test_register_procedure_with_locale(self, _mock_issubclass, _mock_isclass, mock_gimp_module):
-    procedure_.set_use_locale(True)
-    procedure_.register_procedure(
-      sample_procedure,
-      procedure_type=mock_gimp_module.ImageProcedure
-    )
-
-    plugin = procedure_._create_plugin_class(bases=())()
-
-    self.assertFalse(hasattr(plugin, 'do_set_i18n'))
+    self.assertIsNone(procedure_._do_create_procedure(None, 'nonexistent-procedure'))
 
   def test_register_procedure_with_multiple_menu_paths(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
@@ -152,8 +134,7 @@ class TestProcedure(unittest.TestCase):
       menu_path=['<Image>/Filters', '<Image>/Colors'],
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-    mock_procedure = plugin.do_create_procedure('sample-procedure')
+    mock_procedure = procedure_._do_create_procedure(None, 'sample-procedure')
 
     self.assertListEqual(
       mock_procedure.add_menu_path.call_args_list,
@@ -169,8 +150,7 @@ class TestProcedure(unittest.TestCase):
         'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc'),
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-    mock_procedure = plugin.do_create_procedure('sample-procedure')
+    mock_procedure = procedure_._do_create_procedure(None, 'sample-procedure')
 
     mock_procedure.set_documentation.assert_called_once_with(
       'A sample procedure.', 'This is a procedure for testing purposes.', 'sample-proc')
@@ -206,11 +186,11 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-    mock_procedure = plugin.do_create_procedure('sample-procedure')
-    mock_procedure_2 = plugin.do_create_procedure('sample-procedure-2')
+    mock_procedure = procedure_._do_create_procedure(None, 'sample-procedure')
+    mock_procedure_2 = procedure_._do_create_procedure(None, 'sample-procedure-2')
 
-    self.assertEqual(plugin.do_query_procedures(), ['sample-procedure', 'sample-procedure-2'])
+    self.assertEqual(
+      procedure_._do_query_procedures(None), ['sample-procedure', 'sample-procedure-2'])
 
     mock_procedure.add_enum_argument.assert_called_once_with(*self.run_mode_argument[1:])
     mock_procedure.add_string_argument.assert_called_once_with(*self.output_directory_argument[1:])
@@ -241,10 +221,8 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-
     with self.assertRaises(TypeError):
-      plugin.do_create_procedure('sample-procedure')
+      procedure_._do_create_procedure(None, 'sample-procedure')
 
   def test_register_procedure_raises_error_if_multiple_arguments_have_same_name(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
@@ -273,10 +251,8 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-
     with self.assertRaises(ValueError):
-      plugin.do_create_procedure('sample-procedure')
+      procedure_._do_create_procedure(None, 'sample-procedure')
 
   def test_register_procedure_raises_error_if_missing_mandatory_args(
         self, _mock_issubclass, _mock_isclass, mock_gimp_module):
@@ -290,10 +266,8 @@ class TestProcedure(unittest.TestCase):
       ],
     )
 
-    plugin = procedure_._create_plugin_class(bases=())()
-
     with self.assertRaises(ValueError):
-      plugin.do_create_procedure('sample-procedure')
+      procedure_._do_create_procedure(None, 'sample-procedure')
 
   def test_register_procedure_raises_error_if_proc_with_same_name_already_exists(self, *_mocks):
     procedure_.register_procedure(sample_procedure)
