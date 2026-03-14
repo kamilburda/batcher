@@ -220,6 +220,9 @@ def _apply_curves(layer, trc, curve_data):
         curve=curve,
       )
     else:
+      if curve_data_for_channel.channel is None:
+        continue
+
       if curve_data_for_channel.samples is not None:
         layer.curves_explicit(curve_data_for_channel.channel, curve_data_for_channel.samples)
       elif curve_data_for_channel.points is not None:
