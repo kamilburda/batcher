@@ -1,6 +1,5 @@
 """Built-in actions related to adjusting colors."""
 
-import collections
 import re
 import struct
 
@@ -46,7 +45,7 @@ class LevelsData:
 
   def __init__(
         self,
-        channel,
+        channel=None,
         low_input=0.0,
         high_input=1.0,
         clamp_input=False,
@@ -230,11 +229,20 @@ def _apply_curves(layer, trc, curve_data):
 
 
 def _parse_gimp_levels_preset(data):
+  # We create empty levels data with a fixed order of channels. When levels are
+  # applied as filters, they are appended. A filter using the VALUE channel
+  # must be appended after other channels so that we obtain a result identical
+  # to the Levels tool in GIMP. Hence, the VALUE channel is created here as the
+  # last channel.
+  levels_data = {
+    channel: LevelsData()
+    for channel in reversed(_HISTOGRAM_CHANNELS.values())
+  }
+
   trc = None
   clamp_input = None
   clamp_output = None
 
-  levels_data = {}
   current_channel = None
 
   for line in data:
@@ -250,11 +258,9 @@ def _parse_gimp_levels_preset(data):
     parsed_channel = _parse_entry(line, 'channel')
     if parsed_channel is not None:
       current_channel = _get_channel_from_str(parsed_channel)
-      levels_data[current_channel] = LevelsData(
-        channel=current_channel,
-        clamp_input=clamp_input,
-        clamp_output=clamp_output,
-      )
+      levels_data[current_channel].channel = current_channel
+      levels_data[current_channel].clamp_input = clamp_input
+      levels_data[current_channel].clamp_output = clamp_output
 
     for entry in [
       'low-input',
