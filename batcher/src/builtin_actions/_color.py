@@ -161,7 +161,7 @@ def _apply_levels_curves(
       except Exception as e:
         raise ValueError(_FAILED_TO_READ_DATA_MESSAGE) from e
 
-  if utils_pdb.get_gimp_version() < (3, 2) and trc != 'linear':
+  if utils_pdb.get_gimp_version() < (3, 2) and trc != _TRC_TYPES['linear']:
     raise ValueError(
       _('Only presets with the linear mode are supported for GIMP versions earlier than 3.2.'
         ' Upgrade to GIMP 3.2 or later if you need to use presets with modes other than linear.'))
@@ -206,17 +206,13 @@ def _apply_curves(layer, trc, curve_data):
         continue
 
       curve = Gimp.Curve.new()
-      if curve_data_for_channel.curve_type is not None:
-        curve.set_curve_type(curve_data_for_channel.curve_type)
 
-      if curve_data_for_channel.curve_type == Gimp.CurveType.SMOOTH:
-        for index in range(0, len(curve_data_for_channel.points), 2):
-          points = curve_data_for_channel.points[index:index + 2]
-          if len(points) > 1:
-            curve.add_point(*points)
-      elif curve_data_for_channel.curve_type == Gimp.CurveType.FREE:
-        for index, sample in enumerate(curve_data_for_channel.samples):
-          curve.set_sample(index / 256, sample)
+      if curve_data_for_channel.curve_type is not None:
+        curve.set_curve_type(Gimp.CurveType.FREE)
+
+      max_index = len(curve_data_for_channel.samples) - 1
+      for index, sample in enumerate(curve_data_for_channel.samples):
+        curve.set_sample(index / max_index, sample)
 
       pdb.gimp__curves(
         layer,
@@ -243,7 +239,7 @@ def _parse_gimp_levels_preset(data):
 
   for line in data:
     if trc is None:
-      trc = _parse_entry(line, 'trc')
+      trc = _get_trc_from_str(_parse_entry(line, 'trc'))
 
     if clamp_input is None:
       clamp_input = _parse_clamp_value(line, 'clamp-input')
@@ -271,6 +267,9 @@ def _parse_gimp_levels_preset(data):
       if parsed_entry is not None:
         setattr(levels_data[current_channel], entry.replace('-', '_'), float(parsed_entry))
 
+  if trc is None:
+    trc = _TRC_TYPES['linear']
+
   return trc, levels_data
 
 
@@ -289,9 +288,7 @@ def _parse_photoshop_levels_preset(file):
       clamp_output=True,
     )
 
-  trc = 'linear'
-
-  return trc, levels_data
+  return _TRC_TYPES['linear'], levels_data
 
 
 def _read_levels_parameters(file):
@@ -307,13 +304,22 @@ def _read_levels_parameters(file):
 
 
 def _parse_gimp_curves_preset(data):
+  # We create empty curve data with a fixed order of channels. When curves are
+  # applied as filters, they are appended. A filter using the VALUE channel
+  # must be appended after other channels so that we obtain a result identical
+  # to the Curves tool in GIMP. Hence, the VALUE channel is created here as the
+  # last channel.
+  curve_data = {
+    channel: CurveData()
+    for channel in reversed(_HISTOGRAM_CHANNELS.values())
+  }
   trc = None
-  curve_data = collections.defaultdict(CurveData)
   current_channel = None
+  current_curve_type_str = None
 
   for line in data:
     if trc is None:
-      trc = _parse_entry(line, 'trc')
+      trc = _get_trc_from_str(_parse_entry(line, 'trc'))
 
     parsed_channel = _parse_entry(line, 'channel')
     if parsed_channel is not None:
@@ -321,36 +327,29 @@ def _parse_gimp_curves_preset(data):
 
     match = re.match(r'\s*\(curve-type +(.*?)\)+', line)
     if match and current_channel is not None:
-      curve_type = match.group(1)
+      current_curve_type_str = match.group(1)
       if utils_pdb.get_gimp_version() >= (3, 2):
-        if curve_type == 'smooth':
-          curve_data[current_channel].curve_type = Gimp.CurveType.SMOOTH
-        elif curve_type == 'free':
-          curve_data[current_channel].curve_type = Gimp.CurveType.FREE
+        curve_data[current_channel].curve_type = _get_curve_type_from_str(current_curve_type_str)
 
     match = re.match(r'\s*\(points +(.*?)\)+', line)
     if match and current_channel is not None:
       points = match.group(1)
 
-      if utils_pdb.get_gimp_version() >= (3, 2):
-        keep_channel_intact = (
-          (re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points))
-          and curve_data[current_channel].curve_type != Gimp.CurveType.FREE)
-      else:
-        keep_channel_intact = re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points)
+      keep_channel_intact = (
+        (re.match(r' *0 *', points) or re.match(r' *4 +0 +0 +1 +1 *', points))
+        and current_curve_type_str != 'free')
 
       if not keep_channel_intact:
         curve_data[current_channel].channel = current_channel
-        if utils_pdb.get_gimp_version() >= (3, 2):
-          match = re.match(r'\s*\(points +[0-9]+ +(.*?)\)+', line)
-          if match:
-            curve_data[current_channel].points = _parse_samples_or_points(match.group(1))
 
     match = re.match(r'\s*\(samples +[0-9]+ +(.*?)\)+', line)
     if match and current_channel in curve_data:
       samples = _parse_samples_or_points(match.group(1))
       if samples is not None:
         curve_data[current_channel].samples = samples
+
+  if trc is None:
+    trc = _TRC_TYPES['linear']
 
   return trc, curve_data
 
@@ -373,6 +372,14 @@ def _parse_clamp_value(line, name):
 
 def _get_channel_from_str(channel_str):
   return _HISTOGRAM_CHANNELS.get(channel_str, None)
+
+
+def _get_curve_type_from_str(curve_type_str):
+  return _CURVE_TYPES.get(curve_type_str, None)
+
+
+def _get_trc_from_str(trc_str):
+  return _TRC_TYPES.get(trc_str, None)
 
 
 def _parse_samples_or_points(str_):
@@ -400,9 +407,7 @@ def _parse_photoshop_curves_preset(file):
   for channel, points in zip(_HISTOGRAM_CHANNELS.values(), points_per_channel):
     curve_data[channel] = CurveData(channel=channel, points=points)
 
-  trc = 'linear'
-
-  return trc, curve_data
+  return _TRC_TYPES['linear'], curve_data
 
 
 def _read_points(file):
@@ -438,6 +443,17 @@ _HISTOGRAM_CHANNELS = {
   'green': Gimp.HistogramChannel.GREEN,
   'blue': Gimp.HistogramChannel.BLUE,
   'alpha': Gimp.HistogramChannel.ALPHA,
+}
+
+_CURVE_TYPES = {
+  'smooth': Gimp.CurveType.SMOOTH,
+  'free': Gimp.CurveType.FREE,
+}
+
+_TRC_TYPES = {
+  'linear': Gimp.TRCType.LINEAR,
+  'non-linear': Gimp.TRCType.NON_LINEAR,
+  'perceptual': Gimp.TRCType.PERCEPTUAL,
 }
 
 BRIGHTNESS_CONTRAST_DICT = {
