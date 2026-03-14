@@ -451,16 +451,29 @@ _HISTOGRAM_CHANNELS = {
   'alpha': Gimp.HistogramChannel.ALPHA,
 }
 
-_CURVE_TYPES = {
-  'smooth': Gimp.CurveType.SMOOTH,
-  'free': Gimp.CurveType.FREE,
-}
+if utils_pdb.get_gimp_version() >= (3, 2):
+  _CURVE_TYPES = {
+    'smooth': Gimp.CurveType.SMOOTH,
+    'free': Gimp.CurveType.FREE,
+  }
+else:
+  _CURVE_TYPES = {
+    'smooth': 0,
+    'free': 1,
+  }
 
-_TRC_TYPES = {
-  'linear': Gimp.TRCType.LINEAR,
-  'non-linear': Gimp.TRCType.NON_LINEAR,
-  'perceptual': Gimp.TRCType.PERCEPTUAL,
-}
+if utils_pdb.get_gimp_version() >= (3, 2):
+  _TRC_TYPES = {
+    'linear': Gimp.TRCType.LINEAR,
+    'non-linear': Gimp.TRCType.NON_LINEAR,
+    'perceptual': Gimp.TRCType.PERCEPTUAL,
+  }
+else:
+  _TRC_TYPES = {
+    'linear': 0,
+    'non-linear': 1,
+    'perceptual': 2,
+  }
 
 BRIGHTNESS_CONTRAST_DICT = {
   'name': 'brightness_contrast',
