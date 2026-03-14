@@ -200,10 +200,10 @@ def _apply_levels(layer, trc, levels_data):
 
 def _apply_curves(layer, trc, curve_data):
   for curve_data_for_channel in curve_data.values():
-    if utils_pdb.get_gimp_version() >= (3, 2):
-      if curve_data_for_channel.channel is None:
-        continue
+    if curve_data_for_channel.channel is None:
+      continue
 
+    if utils_pdb.get_gimp_version() >= (3, 2):
       curve = Gimp.Curve.new()
 
       if curve_data_for_channel.curve_type is not None:
@@ -220,9 +220,6 @@ def _apply_curves(layer, trc, curve_data):
         curve=curve,
       )
     else:
-      if curve_data_for_channel.channel is None:
-        continue
-
       if curve_data_for_channel.samples is not None:
         layer.curves_explicit(curve_data_for_channel.channel, curve_data_for_channel.samples)
       elif curve_data_for_channel.points is not None:
