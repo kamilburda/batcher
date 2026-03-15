@@ -8,6 +8,7 @@ assignees: ''
 ---
 
 **What went wrong?**
+<!-- If you use GIMP 3.2 or later, make sure you use Batcher 1.2.2 or later. -->
 <!-- If Batcher crashed, include the error message here. -->
 
 
