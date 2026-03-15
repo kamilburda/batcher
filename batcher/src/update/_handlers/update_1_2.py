@@ -357,18 +357,18 @@ def _change_gui_type_for_show_original_item_names(gui_settings_list):
     show_original_item_names_dict['gui_type'] = 'check_menu_item'
 
 
-def _save_replace_save_existing_image_to_its_original_location_argument(argument_list):
+def _save_replace_save_existing_image_to_its_original_location_argument(arguments_list):
   argument_dict, index = update_utils_.get_child_setting(
-    argument_list, 'save_existing_image_to_its_original_location')
+    arguments_list, 'save_existing_image_to_its_original_location')
 
   if argument_dict is not None:
-    argument_list.pop(index)
+    arguments_list.pop(index)
 
   argument_dict, index = update_utils_.get_child_setting(
-    argument_list, 'output_directory_for_new_images')
+    arguments_list, 'output_directory_for_new_images')
 
   if argument_dict is None:
-    argument_list.append({
+    arguments_list.append({
       'type': 'directory',
       'name': 'output_directory_for_new_images',
       'default_value': 'special:///use_original_location',
