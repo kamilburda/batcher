@@ -9,6 +9,8 @@ Batcher can currently be installed only manually by copying files from a ZIP arc
 
 **[Download latest release](https://github.com/kamilburda/batcher/releases/tag/{% include-config 'PLUGIN_VERSION' %}) ({% include-config 'PLUGIN_VERSION' %}, {% include-config 'PLUGIN_VERSION_RELEASE_DATE' %})**
 
+If you do not see the downloaded archive, check if your browser blocked the download.
+
 
 ## Windows
 
