@@ -25,7 +25,7 @@ assignees: ''
 Version of Batcher: 
 Version of GIMP: 
 Operating system: 
-Installer<!-- Specify the installation package (For Windows, specify "Microsoft Store" or "installer from gimp.org"; for Linux, specify "Flatpak" or "AppImage"; for macOS, you can leave this empty. If you use an unofficial GIMP installation, specify the name and link to the installer. -->: 
+Installer<!-- Specify the installation package. For Windows, specify "Microsoft Store" or "installer from gimp.org". For Linux, specify "Flatpak", "AppImage" or other. For macOS, you can leave this empty. If you use a GIMP installation from another source, specify the name and link to the installer. -->: 
 
 <!-- Provide any additional details below, such as the actions and conditions used. -->
 
