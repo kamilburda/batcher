@@ -260,17 +260,23 @@ This is useful if the image contains multiple layers and you want to apply filte
 
 Adjusts brightness and contrast.
 
-For GIMP 3.2 and later, you can choose between two different filters responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
+For GIMP 3.2 and later, additional options are provided:
+* Filter responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
+* Whether to apply brightness and contrast non-destructively, blend mode and opacity.
 
 #### Levels
 
 Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file formats are supported.
+
+For GIMP 3.2 and later, you may apply levels non-destructively and adjust blend mode and opacity.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Levels tool.
 
 #### Curves
 
 Applies curves from a saved preset file. Both GIMP and Photoshop (.acv) file formats are supported.
+
+For GIMP 3.2 and later, you may apply curves non-destructively and adjust blend mode and opacity.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
 

@@ -5,16 +5,17 @@ General changes:
 
 New features:
 * You can now type or paste an output folder (beside choosing a folder from a file dialog or the dropdown). This makes it possible to specify a folder that does not exist (which is automatically created during processing).
+
+Changes to actions and conditions:
 * Levels, Curves: For GIMP 3.2 and later, presets saved with a mode other than linear (non-linear, perceptual) are now allowed.
+* Brightness-Contrast, Levels, Curves: For GIMP 3.2 and later, these actions can now optionally be applied non-destructively. Blend mode and opacity can now also be adjusted.
+* `script-fu-unsharp-mask` is no longer available as a custom action as it opens a new image in GIMP (even when running the procedure non-interactively) and is thus not usable within Batcher. The `gegl:unsharp-mask` filter can be used as a substitute (#138).
 
 User interface changes:
 * Batch Convert, Export Images, Export Layers: The default focus when opening the main dialog is now on the output folder entry.
 * Moved labels for export settings to separate rows. This makes more room for the folder and filename entries (and particularly when translated labels are longer than their English counterparts). The labels have also been made clearer thanks to the additional space available.
 * Slightly increased width for the file format entry to account for file extensions with more characters.
 * If an action fails during the preview, an inline message is displayed instead of a modal dialog. This can vastly reduce frustration when a user adds and edits an action until the action no longer results in a failure (e.g. replacing default values such as unspecified files or adding coordinates for `gimp-pencil`). Additionally, this prevents message spam when an action fails when starting Batcher, which could result in Batcher getting unresponsive on some platforms (#133).
-
-Changes to actions and conditions:
-* `script-fu-unsharp-mask` is no longer available as a custom action as it opens a new image in GIMP (even when running the procedure non-interactively) and is thus not usable within Batcher. The `gegl:unsharp-mask` filter can be used as a substitute (#138).
 
 Bug fixes:
 * Fixed several icons not changing when selecting a different icon theme in GIMP.

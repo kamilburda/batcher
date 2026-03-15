@@ -73,7 +73,16 @@ class LevelsData:
     )
 
 
-def brightness_contrast(_batcher, layer, brightness, contrast, filter_):
+def brightness_contrast(
+      _batcher,
+      layer,
+      brightness,
+      contrast,
+      filter_,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
   value_range = _MAX_BRIGHTNESS_CONTRAST_VALUE - _MIN_BRIGHTNESS_CONTRAST_VALUE
 
   if filter_ == BrightnessContrastFilters.GEGL:
@@ -84,7 +93,9 @@ def brightness_contrast(_batcher, layer, brightness, contrast, filter_):
       layer,
       contrast=processed_contrast,
       brightness=processed_brightness,
-      merge_filter_=True,
+      merge_filter_=not apply_non_destructively,
+      blend_mode_=blend_mode,
+      opacity_=opacity / 100.0,
     )
   elif filter_ == BrightnessContrastFilters.GIMP:
     if utils_pdb.get_gimp_version() < (3, 1, 4):
@@ -97,11 +108,20 @@ def brightness_contrast(_batcher, layer, brightness, contrast, filter_):
       layer,
       brightness=processed_brightness,
       contrast=processed_contrast,
-      merge_filter_=True,
+      merge_filter_=not apply_non_destructively,
+      blend_mode_=blend_mode,
+      opacity_=opacity / 100.0,
     )
 
 
-def levels(_batcher, layer, preset_file):
+def levels(
+      _batcher,
+      layer,
+      preset_file,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
   image = layer.get_image()
 
   if (image.get_base_type() == Gimp.ImageBaseType.INDEXED
@@ -114,16 +134,29 @@ def levels(_batcher, layer, preset_file):
     _parse_gimp_levels_preset,
     _parse_photoshop_levels_preset,
     _apply_levels,
+    apply_non_destructively,
+    blend_mode,
+    opacity,
   )
 
 
-def curves(_batcher, layer, preset_file):
+def curves(
+      _batcher,
+      layer,
+      preset_file,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
   _apply_levels_curves(
     layer,
     preset_file,
     _parse_gimp_curves_preset,
     _parse_photoshop_curves_preset,
     _apply_curves,
+    apply_non_destructively,
+    blend_mode,
+    opacity,
   )
 
 
@@ -133,6 +166,9 @@ def _apply_levels_curves(
       _parse_gimp_preset,
       _parse_photoshop_preset,
       _apply_func,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
 ):
   if preset_file is None or preset_file.get_path() is None:
     raise exceptions.SkipCommand(_('Preset file not specified.'))
@@ -166,10 +202,24 @@ def _apply_levels_curves(
         ' Upgrade to GIMP 3.2 or later if you need to use presets with modes other than linear.'))
 
   if trc is not None and curve_data is not None:
-    _apply_func(layer, trc, curve_data)
+    _apply_func(
+      layer,
+      trc,
+      curve_data,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+    )
 
 
-def _apply_levels(layer, trc, levels_data):
+def _apply_levels(
+      layer,
+      trc,
+      levels_data,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
   for levels_data_for_channel in levels_data.values():
     if not levels_data_for_channel.has_default_values():
       if utils_pdb.get_gimp_version() >= (3, 2):
@@ -184,6 +234,9 @@ def _apply_levels(layer, trc, levels_data):
           low_output=levels_data_for_channel.low_output,
           high_output=levels_data_for_channel.high_output,
           clamp_output=levels_data_for_channel.clamp_output,
+          merge_filter_=not apply_non_destructively,
+          blend_mode_=blend_mode,
+          opacity_=opacity / 100.0,
         )
       else:
         layer.levels(
@@ -198,7 +251,14 @@ def _apply_levels(layer, trc, levels_data):
         )
 
 
-def _apply_curves(layer, trc, curve_data):
+def _apply_curves(
+      layer,
+      trc,
+      curve_data,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
   for curve_data_for_channel in curve_data.values():
     if curve_data_for_channel.channel is None:
       continue
@@ -218,6 +278,9 @@ def _apply_curves(layer, trc, curve_data):
         trc=trc,
         channel=curve_data_for_channel.channel,
         curve=curve,
+        merge_filter_=not apply_non_destructively,
+        blend_mode_=blend_mode,
+        opacity_=opacity / 100.0,
       )
     else:
       if curve_data_for_channel.samples is not None:
@@ -437,6 +500,12 @@ def on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict)
     if utils_pdb.get_gimp_version() < (3, 1, 4):
       action['arguments/filter_'].gui.set_visible(False)
 
+  if action['orig_name'].value in ['brightness_contrast', 'levels', 'curves']:
+    if utils_pdb.get_gimp_version() < (3, 2):
+      action['arguments/apply_non_destructively'].gui.set_visible(False)
+      action['arguments/blend_mode'].gui.set_visible(False)
+      action['arguments/opacity'].gui.set_visible(False)
+
 
 _MIN_BRIGHTNESS_CONTRAST_VALUE = -127
 _MAX_BRIGHTNESS_CONTRAST_VALUE = 127
@@ -517,6 +586,27 @@ BRIGHTNESS_CONTRAST_DICT = {
       ],
       'display_name': _('Filter'),
     },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': False,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
   ],
 }
 
@@ -545,6 +635,27 @@ LEVELS_DICT = {
       'display_name': _('Preset file'),
       'none_ok': True,
     },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': False,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
   ],
 }
 
@@ -572,6 +683,27 @@ CURVES_DICT = {
       'action': Gimp.FileChooserAction.OPEN,
       'display_name': _('Preset file'),
       'none_ok': True,
+    },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': False,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
     },
   ],
 }
