@@ -22,8 +22,8 @@ from src import initnotifier
 
 _PROCEDURE_NAMES_AND_DATA = {}
 _USE_LOCALE = False
-_INIT_PROCEDURES_FUNC = None
-_QUIT_FUNC = None
+_INIT_PROCEDURES_FUNC: Optional[Callable] = None
+_QUIT_FUNC: Optional[Callable] = None
 
 
 def register_procedure(
@@ -367,9 +367,17 @@ class PyPlugIn(Gimp.PlugIn):
   def do_set_i18n(self, *args, **kwargs):
     return False
 
-  do_init_procedures = _INIT_PROCEDURES_FUNC
+  def do_init_procedures(self):
+    if _INIT_PROCEDURES_FUNC:
+      return _INIT_PROCEDURES_FUNC(self)
+    else:
+      return super().do_init_procedures()
 
-  do_quit = _QUIT_FUNC
+  def do_quit(self):
+    if _QUIT_FUNC:
+      return _QUIT_FUNC(self)
+    else:
+      return super().do_quit()
 
 
 def _do_query_procedures(_plugin_instance):
