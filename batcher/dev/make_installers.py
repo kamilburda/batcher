@@ -176,7 +176,7 @@ def _move_files_with_filters_to_temporary_location(
       dirpath_with_original_files_with_git_filters, relative_filepath)
     
     os.makedirs(os.path.dirname(dest_filepath), exist_ok=True)
-    shutil.copy2(src_filepath, dest_filepath)
+    shutil.copy(src_filepath, dest_filepath)
     os.remove(src_filepath)
 
 
@@ -190,7 +190,7 @@ def _restore_repo_files(
       repository_dirpath,
       relative_filepaths_with_git_filters):
   for relative_filepath in relative_filepaths_with_git_filters:
-    shutil.copy2(
+    shutil.copy(
       os.path.join(dirpath_with_original_files_with_git_filters, relative_filepath),
       os.path.join(repository_dirpath, relative_filepath))
 
@@ -239,7 +239,7 @@ def _copy_files_to_temp_filepaths(filepaths, temp_filepaths):
     dirpath = os.path.dirname(temp_filepath)
     if not os.path.exists(dirpath):
       os.makedirs(dirpath, exist_ok=True)
-    shutil.copy2(src_filepath, temp_filepath)
+    shutil.copy(src_filepath, temp_filepath)
 
 
 def _create_user_docs(dirpath):
@@ -328,7 +328,7 @@ def _create_toplevel_readme_for_zip_archive(readme_filepath):
   toplevel_readme_filepath = os.path.join(
     TEMP_INPUT_DIRPATH, os.path.basename(readme_filepath))
   
-  shutil.copy2(readme_filepath, toplevel_readme_filepath)
+  shutil.copy(readme_filepath, toplevel_readme_filepath)
   
   process_local_docs.modify_url_attributes_in_file(
     readme_filepath,
