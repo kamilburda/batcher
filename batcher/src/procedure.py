@@ -370,14 +370,10 @@ class PyPlugIn(Gimp.PlugIn):
   def do_init_procedures(self):
     if _INIT_PROCEDURES_FUNC:
       return _INIT_PROCEDURES_FUNC(self)
-    else:
-      return super().do_init_procedures()
 
   def do_quit(self):
     if _QUIT_FUNC:
       return _QUIT_FUNC(self)
-    else:
-      return super().do_quit()
 
 
 def _do_query_procedures(_plugin_instance):
