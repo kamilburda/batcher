@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.2
+
+### March 15, 2026
 
 General changes:
 * Updated Dutch translation (thanks to @DiGro).

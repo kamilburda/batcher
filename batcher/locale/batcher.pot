@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.2.1\n"
+"Project-Id-Version: 'batcher' 1.2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 11:47+0100\n"
+"POT-Creation-Date: 2026-03-15 15:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -358,29 +358,32 @@ msgstr ""
 msgid "Merge groups with layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:137
+#: ../../batcher/src/builtin_actions/_color.py:174
 msgid "Preset file not specified."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:163
-msgid "Only presets with the linear mode are currently supported."
+#: ../../batcher/src/builtin_actions/_color.py:201
+msgid ""
+"Only presets with the linear mode are supported for GIMP versions earlier "
+"than 3.2. Upgrade to GIMP 3.2 or later if you need to use presets with modes "
+"other than linear."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:384
+#: ../../batcher/src/builtin_actions/_color.py:550
 msgid "Brightness-Contrast"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:385
-#: ../../batcher/src/builtin_actions/_color.py:430
-#: ../../batcher/src/builtin_actions/_color.py:459
-#: ../../batcher/src/builtin_actions/_color.py:488
+#: ../../batcher/src/builtin_actions/_color.py:551
+#: ../../batcher/src/builtin_actions/_color.py:617
+#: ../../batcher/src/builtin_actions/_color.py:666
+#: ../../batcher/src/builtin_actions/_color.py:715
 msgid "Color"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:392
-#: ../../batcher/src/builtin_actions/_color.py:442
-#: ../../batcher/src/builtin_actions/_color.py:471
-#: ../../batcher/src/builtin_actions/_color.py:495
+#: ../../batcher/src/builtin_actions/_color.py:558
+#: ../../batcher/src/builtin_actions/_color.py:628
+#: ../../batcher/src/builtin_actions/_color.py:677
+#: ../../batcher/src/builtin_actions/_color.py:722
 #: ../../batcher/src/builtin_actions/_misc.py:51
 #: ../../batcher/src/builtin_conditions.py:166
 #: ../../batcher/src/builtin_conditions.py:174
@@ -393,56 +396,79 @@ msgstr ""
 msgid "Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:398
+#: ../../batcher/src/builtin_actions/_color.py:564
 msgid "Brightness"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:406
+#: ../../batcher/src/builtin_actions/_color.py:572
 msgid "Contrast"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:418
+#: ../../batcher/src/builtin_actions/_color.py:584
 msgid "GEGL"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:419
+#: ../../batcher/src/builtin_actions/_color.py:585
 msgid "GIMP"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:421
+#: ../../batcher/src/builtin_actions/_color.py:587
 msgid "Filter"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:429
+#: ../../batcher/src/builtin_actions/_color.py:593
+#: ../../batcher/src/builtin_actions/_color.py:642
+#: ../../batcher/src/builtin_actions/_color.py:691
+#: ../../batcher/src/update/_handlers/update_1_2_2.py:35
+msgid "Apply non-destructively"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_color.py:600
+#: ../../batcher/src/builtin_actions/_color.py:649
+#: ../../batcher/src/builtin_actions/_color.py:698
+#: ../../batcher/src/pypdb.py:452 ../../batcher/src/pypdb.py:453
+#: ../../batcher/src/update/_handlers/update_1_2_2.py:48
+msgid "Blend mode"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_color.py:608
+#: ../../batcher/src/builtin_actions/_color.py:657
+#: ../../batcher/src/builtin_actions/_color.py:706
+#: ../../batcher/src/pypdb.py:459
+#: ../../batcher/src/update/_handlers/update_1_2_2.py:62
+msgid "Opacity"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_color.py:616
 msgid "Levels"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:432
+#: ../../batcher/src/builtin_actions/_color.py:619
 msgid ""
 "Applies levels using a preset file saved in GIMP or Photoshop (.alv file).\n"
 "\n"
-"GIMP preset files must be saved in the linear mode. Otherwise, this action "
-"will result in an error."
+"To obtain a preset file in GIMP, go to Colors → Levels and export the "
+"settings."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:449
-#: ../../batcher/src/builtin_actions/_color.py:478
+#: ../../batcher/src/builtin_actions/_color.py:635
+#: ../../batcher/src/builtin_actions/_color.py:684
 msgid "Preset file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:458
+#: ../../batcher/src/builtin_actions/_color.py:665
 msgid "Curves"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:461
+#: ../../batcher/src/builtin_actions/_color.py:668
 msgid ""
 "Applies curves using a preset file saved in GIMP or Photoshop (.acv file).\n"
 "\n"
-"GIMP preset files must be saved in the linear mode. Otherwise, this action "
-"will result in an error."
+"To obtain a preset file in GIMP, go to Colors → Curves and export the "
+"settings."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:487
+#: ../../batcher/src/builtin_actions/_color.py:714
 msgid "White Balance"
 msgstr ""
 
@@ -796,7 +822,7 @@ msgid "Flip Vertically"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_gmic_filter.py:31
-#: ../../batcher/src/gui/main/command_lists.py:551
+#: ../../batcher/src/gui/main/command_lists.py:549
 msgid "G'MIC Filter"
 msgstr ""
 
@@ -972,7 +998,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_rename.py:148
 #: ../../batcher/src/builtin_actions/_rename.py:172
 #: ../../batcher/src/builtin_actions/_rename.py:202
-#: ../../batcher/src/gui/main/command_lists.py:675
+#: ../../batcher/src/gui/main/command_lists.py:673
 msgid "Rename"
 msgstr ""
 
@@ -1127,7 +1153,7 @@ msgid "Vertical position of center"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_save.py:133
-#: ../../batcher/src/gui/main/command_lists.py:716
+#: ../../batcher/src/gui/main/command_lists.py:714
 msgid "Save"
 msgstr ""
 
@@ -1404,38 +1430,38 @@ msgstr ""
 msgid "Processing started"
 msgstr ""
 
-#: ../../batcher/src/core.py:993
+#: ../../batcher/src/core.py:1008
 msgid ""
 "An error occurred. Please check the error console for details, if any. You "
 "can access the error console in GIMP via Windows → Dockable Dialogs → Error "
 "Console."
 msgstr ""
 
-#: ../../batcher/src/core.py:1051 ../../batcher/src/core.py:1052
+#: ../../batcher/src/core.py:1068 ../../batcher/src/core.py:1069
 msgid "Stopped"
 msgstr ""
 
-#: ../../batcher/src/core.py:1054
+#: ../../batcher/src/core.py:1071
 msgid "Processing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/core.py:1065 ../../batcher/src/core.py:1078
+#: ../../batcher/src/core.py:1082 ../../batcher/src/core.py:1095
 msgid "Error: {}: {}"
 msgstr ""
 
-#: ../../batcher/src/core.py:1286
+#: ../../batcher/src/core.py:1305
 msgid "Done. {} images processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1288
+#: ../../batcher/src/core.py:1307
 msgid "Done. {} out of {} images successfully processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1398
+#: ../../batcher/src/core.py:1417
 msgid "Done. {} layers processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1400
+#: ../../batcher/src/core.py:1419
 msgid "Done. {} out of {} layers successfully processed."
 msgstr ""
 
@@ -1460,56 +1486,56 @@ msgstr ""
 msgid "{} image"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:132
+#: ../../batcher/src/gui/commands/browser.py:131
 msgid "Filters, Layer Effects"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:133
+#: ../../batcher/src/gui/commands/browser.py:132
 msgid "Plug-ins"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:134
+#: ../../batcher/src/gui/commands/browser.py:133
 msgid "GIMP Procedures"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:135
+#: ../../batcher/src/gui/commands/browser.py:134
 msgid "Other"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:464
+#: ../../batcher/src/gui/commands/browser.py:474
 #: ../../batcher/src/gui/widgets/parasite_editor.py:65
 msgid "Name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:505
+#: ../../batcher/src/gui/commands/browser.py:513
 msgid "Search"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:517
+#: ../../batcher/src/gui/commands/browser.py:525
 msgid "by name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:521
+#: ../../batcher/src/gui/commands/browser.py:529
 msgid "by internal name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:525
+#: ../../batcher/src/gui/commands/browser.py:533
 msgid "by description"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:571
+#: ../../batcher/src/gui/commands/browser.py:579
 msgid "Select an action"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:596
+#: ../../batcher/src/gui/commands/browser.py:604
 msgid "_Add"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:597
+#: ../../batcher/src/gui/commands/browser.py:605
 #: ../../batcher/src/gui/commands/editor.py:50
 #: ../../batcher/src/gui/log_viewer.py:66
-#: ../../batcher/src/gui/main/main.py:154
-#: ../../batcher/src/gui/main/main.py:386
+#: ../../batcher/src/gui/main/main.py:155
+#: ../../batcher/src/gui/main/main.py:388
 #: ../../batcher/src/gui/main/_utils.py:57
 #: ../../batcher/src/gui/messages.py:100
 msgid "_Close"
@@ -1526,11 +1552,11 @@ msgid "_Preview"
 msgstr ""
 
 #: ../../batcher/src/gui/commands/editor.py:228
-msgid "Edit Name"
+msgid "Edit name"
 msgstr ""
 
 #: ../../batcher/src/gui/commands/editor.py:286
-msgid "Show More Information"
+msgid "Show more information"
 msgstr ""
 
 #: ../../batcher/src/gui/commands/item.py:171
@@ -1538,8 +1564,12 @@ msgid "Edit"
 msgstr ""
 
 #: ../../batcher/src/gui/commands/item.py:182
-#: ../../batcher/src/gui/main/previews.py:307
+#: ../../batcher/src/gui/main/previews.py:311
 msgid "Remove"
+msgstr ""
+
+#: ../../batcher/src/gui/commands/item.py:187
+msgid "Show error details"
 msgstr ""
 
 #: ../../batcher/src/gui/log_viewer.py:55
@@ -1597,289 +1627,292 @@ msgstr ""
 msgid "Add C_ondition..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:112
+#: ../../batcher/src/gui/main/command_lists.py:110
 msgid "Skipped: {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:132
+#: ../../batcher/src/gui/main/command_lists.py:130
 msgid "Actions"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:146
+#: ../../batcher/src/gui/main/command_lists.py:144
 msgid "Conditions"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:528
+#: ../../batcher/src/gui/main/command_lists.py:526
 msgid "Crop to Remove Empty Borders"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:549
+#: ../../batcher/src/gui/main/command_lists.py:547
 msgid "G'MIC Filter: {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:592
-#: ../../batcher/src/gui/main/command_lists.py:598
+#: ../../batcher/src/gui/main/command_lists.py:590
+#: ../../batcher/src/gui/main/command_lists.py:596
 msgid "Rename to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:596
+#: ../../batcher/src/gui/main/command_lists.py:594
 msgid "Rename New Images to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:647
+#: ../../batcher/src/gui/main/command_lists.py:645
 msgid "Export As {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:649
+#: ../../batcher/src/gui/main/command_lists.py:647
 msgid "Also Export As {}"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:674
+#: ../../batcher/src/gui/main/command_lists.py:672
 msgid ""
 "Exporting to input folders can overwrite original images.\n"
 "Add and adjust a {} action before export to avoid losing data."
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:714
+#: ../../batcher/src/gui/main/command_lists.py:712
 msgid "Save (New and Imported Images to \"{}\")"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:720
+#: ../../batcher/src/gui/main/command_lists.py:718
 msgid "Save to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:799
+#: ../../batcher/src/gui/main/command_lists.py:797
 msgid "Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:801
+#: ../../batcher/src/gui/main/command_lists.py:799
 msgid "Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:804
+#: ../../batcher/src/gui/main/command_lists.py:802
 msgid "Not Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:806
+#: ../../batcher/src/gui/main/command_lists.py:804
 msgid "Not Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:809
+#: ../../batcher/src/gui/main/command_lists.py:807
 msgid "Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:811
+#: ../../batcher/src/gui/main/command_lists.py:809
 msgid "Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:814
+#: ../../batcher/src/gui/main/command_lists.py:812
 msgid "Not Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:816
+#: ../../batcher/src/gui/main/command_lists.py:814
 msgid "Not Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:819
+#: ../../batcher/src/gui/main/command_lists.py:817
 msgid "Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:821
+#: ../../batcher/src/gui/main/command_lists.py:819
 msgid "Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:824
+#: ../../batcher/src/gui/main/command_lists.py:822
 msgid "Not Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:826
+#: ../../batcher/src/gui/main/command_lists.py:824
 msgid "Not Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:828
+#: ../../batcher/src/gui/main/command_lists.py:826
 msgid "Matching Pattern \"{}\""
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-#: ../../batcher/src/gui/main/command_lists.py:833
+#: ../../batcher/src/gui/main/command_lists.py:831
 msgid " (Case-Insensitive)"
 msgstr ""
 
 #: ../../batcher/src/gui/main/export_settings.py:69
-msgid "Folder:"
+msgid "Output Folder:"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:79
-msgid "Filename:"
+#: ../../batcher/src/gui/main/export_settings.py:80
+msgid "Filename and Format:"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:97
-#: ../../batcher/src/gui/main/export_settings.py:217
+#: ../../batcher/src/gui/main/export_settings.py:98
+msgid "Export options"
+msgstr ""
+
+#: ../../batcher/src/gui/main/export_settings.py:218
 msgid "Export Options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:333
+#: ../../batcher/src/gui/main/export_settings.py:334
 msgid ""
 "Exporting to input folders can overwrite original images.\n"
 "Adjust the {} field to avoid losing data."
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:334
+#: ../../batcher/src/gui/main/export_settings.py:335
 msgid "Filename"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:105
+#: ../../batcher/src/gui/main/main.py:106
 msgid "Input Images"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:107
+#: ../../batcher/src/gui/main/main.py:108
 msgid "Input Layers"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:109
+#: ../../batcher/src/gui/main/main.py:110
 msgid "Input Items"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:145
-#: ../../batcher/src/gui/main/main.py:498
+#: ../../batcher/src/gui/main/main.py:146
+#: ../../batcher/src/gui/main/main.py:504
 msgid "_Export"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:147
-#: ../../batcher/src/gui/main/main.py:500
+#: ../../batcher/src/gui/main/main.py:148
+#: ../../batcher/src/gui/main/main.py:506
 msgid "_Run"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:156
+#: ../../batcher/src/gui/main/main.py:157
 msgid "_Stop"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:384
-#: ../../batcher/src/gui/main/main.py:506
+#: ../../batcher/src/gui/main/main.py:386
+#: ../../batcher/src/gui/main/main.py:512
 msgid "_Cancel"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:397
+#: ../../batcher/src/gui/main/main.py:399
 msgid "_Help"
 msgstr ""
 
-#: ../../batcher/src/gui/main/main.py:492
+#: ../../batcher/src/gui/main/main.py:498
 msgid "Show this dialog"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:203
-#: ../../batcher/src/gui/preview/image.py:228
+#: ../../batcher/src/gui/main/previews.py:207
+#: ../../batcher/src/gui/preview/image.py:236
 msgid "Options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:259
+#: ../../batcher/src/gui/main/previews.py:263
 msgid ""
 "Drop or paste files and folders here, or use the button above to add them"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:282
+#: ../../batcher/src/gui/main/previews.py:286
 msgid "Add Files..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:283
+#: ../../batcher/src/gui/main/previews.py:287
 msgid "Add Folders..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:292
+#: ../../batcher/src/gui/main/previews.py:296
 msgid "Add"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:297
+#: ../../batcher/src/gui/main/previews.py:301
 msgid "Remove Selected"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:298
+#: ../../batcher/src/gui/main/previews.py:302
 msgid "Remove All"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:325
+#: ../../batcher/src/gui/main/previews.py:329
 msgid "Import Options..."
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:340
+#: ../../batcher/src/gui/main/previews.py:344
 msgid "Add Files"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:342
+#: ../../batcher/src/gui/main/previews.py:346
 msgid "Add Folders"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:392
+#: ../../batcher/src/gui/main/previews.py:396
 msgid "Sort"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:398
+#: ../../batcher/src/gui/main/previews.py:402
 msgid "Original name"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:403
+#: ../../batcher/src/gui/main/previews.py:407
 msgid "New name"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:408
+#: ../../batcher/src/gui/main/previews.py:412
 msgid "Modification date"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:414
+#: ../../batcher/src/gui/main/previews.py:418
 msgid "Creation date"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:419
+#: ../../batcher/src/gui/main/previews.py:423
 msgid "File size"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:424
+#: ../../batcher/src/gui/main/previews.py:428
 msgid "Folders first"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:428
+#: ../../batcher/src/gui/main/previews.py:432
 msgid "Ascending order"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:432
+#: ../../batcher/src/gui/main/previews.py:436
 msgid "Case-sensitive"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:627
+#: ../../batcher/src/gui/main/previews.py:631
 msgid "Import Options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:706
+#: ../../batcher/src/gui/main/previews.py:710
 msgid "Copied the selected images and folders as text."
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:761
+#: ../../batcher/src/gui/main/previews.py:765
 msgid ""
 "You are about to add a top-level folder named \"{}\". Are you sure you want "
 "to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:773
+#: ../../batcher/src/gui/main/previews.py:777
 msgid ""
 "You are about to add more than {} files. Are you sure you want to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:783
+#: ../../batcher/src/gui/main/previews.py:787
 msgid ""
 "<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
 "side, check if you added the files or folders you really wanted. Do you want "
 "to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:838
+#: ../../batcher/src/gui/main/previews.py:842
 msgid "Yes"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:838
+#: ../../batcher/src/gui/main/previews.py:842
 msgid "No"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:986
+#: ../../batcher/src/gui/main/previews.py:990
 msgid ""
 "The preview no longer updates automatically as rendering takes too long."
 msgstr ""
@@ -2067,39 +2100,44 @@ msgstr ""
 msgid "_Apply this choice to all remaining files"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:178
+#: ../../batcher/src/gui/preview/image.py:186
 msgid "No selection"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:186
+#: ../../batcher/src/gui/preview/image.py:194
 msgid "Could not preview image"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:223
+#: ../../batcher/src/gui/preview/image.py:231
 msgid "Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:232
+#: ../../batcher/src/gui/preview/image.py:240
 msgid "Update Automatically"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:243
-msgid "Update Preview"
+#: ../../batcher/src/gui/preview/image.py:251
+msgid "Update preview"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:276
-msgid "View Message"
+#: ../../batcher/src/gui/preview/image.py:284
+msgid "View message"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/image.py:396
+#: ../../batcher/src/gui/preview/image.py:392
+#: ../../batcher/src/gui/preview/name.py:437
+msgid "Preview completed with errors. See failed actions."
+msgstr ""
+
+#: ../../batcher/src/gui/preview/image.py:400
 msgid "There was a problem with updating the image preview:"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/name.py:444
+#: ../../batcher/src/gui/preview/name.py:442
 msgid "There was a problem with updating the list of input layers:"
 msgstr ""
 
-#: ../../batcher/src/gui/preview/name.py:446
+#: ../../batcher/src/gui/preview/name.py:444
 msgid "There was a problem with updating the list of input images:"
 msgstr ""
 
@@ -2111,11 +2149,11 @@ msgstr ""
 msgid "Property:"
 msgstr ""
 
-#: ../../batcher/src/gui/widgets/directory_chooser.py:214
+#: ../../batcher/src/gui/widgets/directory_chooser.py:194
 msgid "Browse"
 msgstr ""
 
-#: ../../batcher/src/gui/widgets/directory_chooser.py:233
+#: ../../batcher/src/gui/widgets/directory_chooser.py:227
 msgid "Select a Folder"
 msgstr ""
 
@@ -2136,7 +2174,7 @@ msgstr ""
 msgid "File format has no options"
 msgstr ""
 
-#: ../../batcher/src/gui/widgets/item_box.py:390
+#: ../../batcher/src/gui/widgets/item_box.py:395
 msgid "Size"
 msgstr ""
 
@@ -2362,14 +2400,6 @@ msgstr ""
 
 #: ../../batcher/src/pypdb.py:449
 msgid "Drawable"
-msgstr ""
-
-#: ../../batcher/src/pypdb.py:452 ../../batcher/src/pypdb.py:453
-msgid "Blend mode"
-msgstr ""
-
-#: ../../batcher/src/pypdb.py:459
-msgid "Opacity"
 msgstr ""
 
 #: ../../batcher/src/pypdb.py:461
