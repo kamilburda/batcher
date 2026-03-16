@@ -18,7 +18,7 @@ If you do not see the downloaded archive, check if your browser blocked the down
 
 For GIMP 3.2 or later, make sure you download Batcher 1.2.2 or later.
 
-**On Windows, GIMP 3.0.0-1 or later is required. GIMP 3.0.0 is not supported.** There was originally an issue that prevented several plug-ins, including Batcher, from working. You can check the installed GIMP version in `Help → About GIMP`.
+On Windows, GIMP 3.0.0-1 or later is required. GIMP 3.0.0 is not supported. There was originally an issue that prevented several plug-ins, including Batcher, from working. You can check the installed GIMP version in `Help → About GIMP`.
 
 1. If you installed GIMP from gimp.org, make sure you enabled support for Python plug-ins (this is checked by default). The Microsoft Store version of GIMP enables Python support automatically.
 2. Locate the folder containing GIMP plug-ins - open GIMP and go to `Edit → Preferences → Folders → Plug-Ins`. If you cannot locate any of the folders on your system, you can add a custom folder. 
