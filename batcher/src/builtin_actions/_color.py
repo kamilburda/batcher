@@ -269,9 +269,9 @@ def _apply_curves(
       if curve_data_for_channel.curve_type is not None:
         curve.set_curve_type(Gimp.CurveType.FREE)
 
-      max_index = len(curve_data_for_channel.samples) - 1
+      max_x = len(curve_data_for_channel.samples) - 1
       for index, sample in enumerate(curve_data_for_channel.samples):
-        curve.set_sample(index / max_index, sample)
+        curve.set_sample(index / max_x, sample)
 
       pdb.gimp__curves(
         layer,
