@@ -1,6 +1,7 @@
 """Tests for the `setting.setting` and `setting.presenter` modules."""
 
 import os
+import random
 import unittest
 import unittest.mock as mock
 
@@ -17,6 +18,7 @@ import parameterized
 
 from config import CONFIG
 from src import utils
+from src import utils_pdb
 from src.setting import presenter as presenter_
 from src.setting import settings as settings_
 from src.setting import utils as setting_utils_
@@ -1704,6 +1706,145 @@ class TestParasiteSetting(SettingTestCase):
     self.assertDictEqual(
       setting.to_dict(),
       {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
+
+
+if utils_pdb.get_gimp_version() >= (3, 2):
+  class TestCurveSetting(SettingTestCase):
+
+    def test_create_with_default_default_value(self):
+      setting = settings_.CurveSetting('curve')
+
+      self.assertEqual(setting.value.get_curve_type(), Gimp.CurveType.SMOOTH)
+      self.assertEqual(setting.value.get_n_points(), 2)
+      self.assertEqual(setting.value.get_point(0), (0.0, 0.0))
+      self.assertEqual(setting.value.get_point(1), (1.0, 1.0))
+
+    def test_set_value_by_object(self):
+      setting = settings_.CurveSetting('curve')
+
+      curve = Gimp.Curve.new()
+      curve.add_point(0.4, 0.4)
+
+      setting.set_value(curve)
+
+      self.assertEqual(setting.value, curve)
+
+    def test_set_value_by_dict_with_points(self):
+      setting = settings_.CurveSetting('curve')
+
+      curve_data = {
+        'type': 0,
+        'points': [
+          [0.0, 0.0, 0],
+          [0.2, 0.3, 0],
+          [0.5, 0.4, 1],
+          [0.9, 0.7, 0],
+        ],
+      }
+
+      setting.set_value(curve_data)
+
+      self.assertEqual(setting.value.get_curve_type(), Gimp.CurveType.SMOOTH)
+      self.assertEqual(setting.value.get_point(0), (0.0, 0.0))
+      self.assertEqual(setting.value.get_point_type(0), Gimp.CurvePointType.SMOOTH)
+      self.assertEqual(setting.value.get_point(1), (0.2, 0.3))
+      self.assertEqual(setting.value.get_point_type(1), Gimp.CurvePointType.SMOOTH)
+      self.assertEqual(setting.value.get_point(2), (0.5, 0.4))
+      self.assertEqual(setting.value.get_point_type(2), Gimp.CurvePointType.CORNER)
+      self.assertEqual(setting.value.get_point(3), (0.9, 0.7))
+      self.assertEqual(setting.value.get_point_type(3), Gimp.CurvePointType.SMOOTH)
+
+    def test_set_value_by_dict_with_samples(self):
+      setting = settings_.CurveSetting('curve')
+
+      random.seed(42)
+      samples = sorted(
+        random.uniform(0.0, 1.0) for _index in range(settings_.CurveSetting.NUM_MINIMUM_SAMPLES))
+
+      curve_data = {
+        'type': 1,
+        'samples': samples,
+      }
+
+      setting.set_value(curve_data)
+
+      max_x = len(samples) - 1
+
+      self.assertEqual(setting.value.get_curve_type(), Gimp.CurveType.FREE)
+      for index, sample in enumerate(samples):
+        self.assertEqual(setting.value.get_sample(index / max_x), sample)
+
+    def test_set_value_by_dict_invalid_type_assigns_default_curve(self):
+      setting = settings_.CurveSetting('curve')
+
+      curve_data = {
+        'type': 'not_valid',
+      }
+
+      setting.set_value(curve_data)
+
+      self.assertEqual(setting.value.get_curve_type(), Gimp.CurveType.SMOOTH)
+      self.assertEqual(setting.value.get_n_points(), 2)
+      self.assertEqual(setting.value.get_point(0), (0.0, 0.0))
+      self.assertEqual(setting.value.get_point(1), (1.0, 1.0))
+
+    def test_to_dict_with_points(self):
+      setting = settings_.CurveSetting('curve')
+
+      curve = Gimp.Curve.new()
+
+      point = curve.add_point(0.2, 0.3)
+      curve.set_point_type(point, Gimp.CurvePointType.SMOOTH)
+      point = curve.add_point(0.4, 0.4)
+      curve.set_point_type(point, Gimp.CurvePointType.CORNER)
+      point = curve.add_point(0.7, 0.2)
+      curve.set_point_type(point, Gimp.CurvePointType.SMOOTH)
+
+      setting.set_value(curve)
+
+      self.assertDictEqual(
+        setting.to_dict(),
+        {
+          'name': 'curve',
+          'type': 'curve',
+          'value': {
+            'type': 0,
+            'points': [
+              [0.2, 0.3, 0],
+              [0.4, 0.4, 1],
+              [0.7, 0.2, 0],
+            ],
+          },
+        },
+      )
+
+    def test_to_dict_with_samples(self):
+      setting = settings_.CurveSetting('curve')
+
+      random.seed(42)
+      samples = sorted(
+        random.uniform(0.0, 1.0) for _index in range(settings_.CurveSetting.NUM_MINIMUM_SAMPLES))
+
+      curve = Gimp.Curve.new()
+      curve.set_curve_type(Gimp.CurveType.FREE)
+
+      max_x = len(samples) - 1
+      for index, sample in enumerate(samples):
+        curve.set_sample(index / max_x, sample)
+
+      setting.set_value(curve)
+
+      self.assertDictEqual(
+        setting.to_dict(),
+        {
+          'name': 'curve',
+          'type': 'curve',
+          'value': {
+            'type': 1,
+            'samples': samples,
+          },
+        },
+      )
 
 
 class TestFileSetting(SettingTestCase):

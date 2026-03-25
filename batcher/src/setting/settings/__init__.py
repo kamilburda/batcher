@@ -13,6 +13,7 @@ from ._bytes import *
 from ._choice import *
 from ._color import *
 from ._container import *
+from ._curve import *
 from ._display import *
 from ._enum import *
 from ._export_options import *

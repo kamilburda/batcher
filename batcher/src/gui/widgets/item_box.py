@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
-from typing import Any, Generator, Optional
+from typing import Any, Generator, Optional, Union
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -41,10 +41,16 @@ class ItemBox(Gtk.ScrolledWindow):
 
   DRAG_ICON_OFFSET = -8
   
-  def __init__(self, item_spacing: int = ITEM_SPACING, **kwargs):
+  def __init__(
+        self,
+        item_spacing: int = ITEM_SPACING,
+        enable_reorder: bool = True,
+        **kwargs,
+  ):
     super().__init__(**kwargs)
     
     self._item_spacing = item_spacing
+    self._enable_reorder = enable_reorder
     
     self._drag_and_drop_context = drag_and_drop_context_.DragAndDropContext()
     self._items = []
@@ -74,11 +80,15 @@ class ItemBox(Gtk.ScrolledWindow):
   
   def add_item(self, item: ItemBoxItem) -> ItemBoxItem:
     self._vbox_items.pack_start(item.widget, False, False, 0)
-    
-    item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
-    item.widget.connect('key-press-event', self._on_item_widget_key_press_event, item)
 
-    self._setup_drag(item)
+    if item.button_remove is not None:
+      item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
+
+    if self._enable_reorder:
+      item.widget.connect('key-press-event', self._on_item_widget_key_press_event, item)
+
+    if self._enable_reorder:
+      self._setup_drag(item)
     
     self._items.append(item)
     
@@ -169,9 +179,15 @@ class ItemBoxItem:
   _HBOX_BUTTONS_SPACING = 3
   _HBOX_SPACING = 3
   
-  def __init__(self, item_widget: Gtk.Widget, button_display_mode='on_hover'):
+  def __init__(
+        self,
+        item_widget: Gtk.Widget,
+        button_display_mode: str = 'on_hover',
+        add_button_remove: bool = True,
+  ):
     self._item_widget = item_widget
     self._button_display_mode = button_display_mode
+    self._add_button_remove = add_button_remove
 
     self._drag_icon_window = None
 
@@ -208,8 +224,11 @@ class ItemBoxItem:
 
     self._event_box = Gtk.EventBox()
     self._event_box.add(self._vbox)
-    
-    self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
+
+    if self._add_button_remove:
+      self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
+    else:
+      self._button_remove = None
 
     if self._button_display_mode == 'on_hover':
       self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
@@ -234,7 +253,7 @@ class ItemBoxItem:
     return self._item_widget
 
   @property
-  def button_remove(self) -> Gtk.Button:
+  def button_remove(self) -> Union[Gtk.Button, None]:
     return self._button_remove
 
   def detach_item_widget(self):
@@ -341,23 +360,27 @@ class ArrayBox(ItemBox):
         Additional keyword arguments that can be passed to the
         `Gtk.ScrolledWindow()` constructor.
     """
-    super().__init__(item_spacing=item_spacing, **kwargs)
-    
     self._new_item_default_value = new_item_default_value
     self._min_size = min_size if min_size >= 0 else 0
-    
+
     if max_size is None:
       self._max_size = GLib.MAXINT
     else:
       self._max_size = max_size if max_size >= min_size else min_size
-    
+
+    super().__init__(
+      item_spacing=item_spacing,
+      **kwargs,
+    )
+
     self.on_add_item = utils.empty_func
     """Callback that creates a `Gtk.Widget` when calling `add_item`.
     
     The callback must accept two arguments - value for the new widget and
     index (position starting from 0) at which the new widget will be inserted.
     
-    The callback must return a single argument - the new `Gtk.Widget` instance.
+    The callback must return two arguments - the new `Gtk.Widget` instance, and
+    index (can be the same value as the input parameter, or a modified value).
     """
 
     self.on_reorder_item = utils.empty_func
@@ -379,6 +402,12 @@ class ArrayBox(ItemBox):
     self._init_gui()
   
   def _init_gui(self):
+    if self._min_size != self._max_size:
+      self._create_size_spin_button()
+    else:
+      self._size_spin_button = None
+
+  def _create_size_spin_button(self):
     self._size_spin_button = Gtk.SpinButton(
       adjustment=Gtk.Adjustment(
         value=0,
@@ -416,15 +445,20 @@ class ArrayBox(ItemBox):
     if item_value is None:
       item_value = self._new_item_default_value
 
-    item = ItemBoxItem(self.on_add_item(item_value, index))
+    item_widget, processed_index = self.on_add_item(item_value, index)
+
+    item = ItemBoxItem(
+      item_widget,
+      add_button_remove=self._min_size != self._max_size,
+    )
     
     super().add_item(item)
 
-    if index is not None:
+    if processed_index is not None:
       with self._locker.lock_temp('emit_array_box_changed_on_reorder'):
-        self.reorder_item(item, index)
+        self.reorder_item(item, processed_index)
     
-    if self._locker.is_unlocked('update_spin_button'):
+    if self._size_spin_button is not None and self._locker.is_unlocked('update_spin_button'):
       with self._locker.lock_temp('emit_size_spin_button_value_changed'):
         self._size_spin_button.spin(Gtk.SpinType.STEP_FORWARD, increment=1)
     
@@ -444,7 +478,7 @@ class ArrayBox(ItemBox):
         and len(self._items) == self._min_size):
       return
     
-    if self._locker.is_unlocked('update_spin_button'):
+    if self._size_spin_button is not None and self._locker.is_unlocked('update_spin_button'):
       with self._locker.lock_temp('emit_size_spin_button_value_changed'):
         self._size_spin_button.spin(Gtk.SpinType.STEP_BACKWARD, increment=1)
     
@@ -471,8 +505,9 @@ class ArrayBox(ItemBox):
       self.add_item(value, index)
     
     self.on_remove_item = orig_on_remove_item
-    
-    self._size_spin_button.set_value(len(values))
+
+    if self._size_spin_button is not None:
+      self._size_spin_button.set_value(len(values))
     
     self._locker.unlock('prevent_removal_below_min_size')
     self._locker.unlock('emit_size_spin_button_value_changed')

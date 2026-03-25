@@ -834,4 +834,5 @@ def _set_display_name_for_matching_text_condition(
 
 
 def _set_buttons_for_command_item_sensitive(item, sensitive):
-  item.button_remove.set_sensitive(sensitive)
+  if item.button_remove is not None:
+    item.button_remove.set_sensitive(sensitive)

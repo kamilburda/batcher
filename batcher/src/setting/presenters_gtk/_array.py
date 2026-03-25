@@ -44,11 +44,11 @@ class ArrayBoxPresenter(_base.GtkPresenter):
 
   def _create_widget(self, setting, **kwargs):
     def _add_existing_element(array_element_value, index):
-      return self._add_array_element(setting[index], array_box)
+      return self._add_array_element(setting[index], array_box), index
 
     def _add_new_element(array_element_value, index):
       array_element = setting.add_element(value=array_element_value)
-      return self._add_array_element(array_element, array_box)
+      return self._add_array_element(array_element, array_box), index
 
     def _reorder_element(orig_position, new_position):
       setting.reorder_element(orig_position, new_position)
@@ -82,7 +82,7 @@ class ArrayBoxPresenter(_base.GtkPresenter):
 
   def _set_value(self, value):
     def _add_existing_element(array_element_value, index):
-      return self._add_array_element(self._setting[index], self._widget)
+      return self._add_array_element(self._setting[index], self._widget), index
 
     orig_on_add_item = self._widget.on_add_item
     self._widget.on_add_item = _add_existing_element

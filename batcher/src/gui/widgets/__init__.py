@@ -4,6 +4,7 @@ from .angle_box import *
 from .anchor_box import *
 from .cell_renderers import *
 from .coordinates_box import *
+from .curve_editor import *
 from .dimension_box import *
 from .directory_chooser import *
 from .drag_and_drop_context import *

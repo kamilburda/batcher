@@ -5,6 +5,7 @@ from ._base import *
 from ._bool import *
 from ._bytes import *
 from ._color import *
+from ._curve import *
 from ._display import *
 from ._enum_choice import *
 from ._file import *

@@ -184,15 +184,14 @@ class DragAndDropContext:
     """Removes drag-and-drop capability from the specified `Gtk.widget`
     instance.
 
-    The widget must have its drag-and-drop capability enabled via
-    `setup_drag()`. Otherwise, `ValueError` is raised.
+    This method has no effect if the widget did not have its drag-and-drop
+    capability enabled via `setup_drag()`.
 
     Args:
       widget: Widget to remove drag-and-drop capability from.
     """
     if widget not in self._widgets_and_event_ids:
-      raise ValueError(
-        f'widget {widget} was not set up with this DragAndDropContext instance: {self}')
+      return
 
     widget_events = self._widgets_and_event_ids.pop(widget)
 
