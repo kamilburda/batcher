@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.3
+
+### March 25, 2026
 
 * Fixed a bug causing `Edit and Save Images` to crash on start.
 
