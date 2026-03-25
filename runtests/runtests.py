@@ -24,6 +24,7 @@ import importlib
 import inspect
 import os
 import pkgutil
+import re
 import sys
 import unittest
 from typing import List, Optional
@@ -161,10 +162,17 @@ def _print_failure(failures, stream, header=None):
     processed_header = f'{header}: '
 
   for test_case, message in failures:
+    processed_message = message.strip()
+    processed_message = _remove_terminal_color_characters(processed_message)
+
     print(80 * '=', file=stream)
     print(f'{processed_header}{test_case}', file=stream)
     print(80 * '-', file=stream)
-    print(f'{message.strip()}\n', file=stream)
+    print(f'{processed_message.strip()}\n', file=stream)
+
+
+def _remove_terminal_color_characters(str_):
+  return re.sub(r'\x1B\[([0-9]{1,3}(;[0-9]{1,2};?)?)?[mGK]', '', str_)
 
 
 def _get_output_stream(stream_or_filepath):
