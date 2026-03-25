@@ -78,6 +78,9 @@ def _update_output_directory_setting(group_list):
   if output_directory_dict is not None and output_directory_dict['type'] == 'file':
     output_directory_dict['type'] = 'directory'
     output_directory_dict['default_value'] = None
+    output_directory_dict['gui_type_kwargs'] = {
+      'max_width_chars': 40,
+    }
     output_directory_dict.pop('action', None)
     output_directory_dict.pop('gui_type', None)
     output_directory_dict.pop('gui_type_kwargs', None)
@@ -371,8 +374,11 @@ def _save_replace_save_existing_image_to_its_original_location_argument(argument
     arguments_list.append({
       'type': 'directory',
       'name': 'output_directory_for_new_images',
-      'default_value': 'special:///use_original_location',
-      'value': 'special:///use_original_location',
+      'default_value': None,
+      'value': None,
       'display_name': _('Output folder for new images'),
       'procedure_groups': [],
+      'gui_type_kwargs': {
+        'max_width_chars': 40,
+      },
     })
