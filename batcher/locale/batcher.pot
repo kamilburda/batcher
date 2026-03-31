@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.2.3\n"
+"Project-Id-Version: 'batcher' 1.2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25 20:59+0100\n"
+"POT-Creation-Date: 2026-03-31 21:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -426,7 +426,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_color.py:600
 #: ../../batcher/src/builtin_actions/_color.py:649
 #: ../../batcher/src/builtin_actions/_color.py:698
-#: ../../batcher/src/pypdb.py:452 ../../batcher/src/pypdb.py:453
+#: ../../batcher/src/pypdb.py:453 ../../batcher/src/pypdb.py:454
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:48
 msgid "Blend mode"
 msgstr ""
@@ -434,7 +434,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_color.py:608
 #: ../../batcher/src/builtin_actions/_color.py:657
 #: ../../batcher/src/builtin_actions/_color.py:706
-#: ../../batcher/src/pypdb.py:459
+#: ../../batcher/src/pypdb.py:460
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:62
 msgid "Opacity"
 msgstr ""
@@ -1244,7 +1244,7 @@ msgid "Group Layers"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only visible items" when translating this
-#: ../../batcher/src/builtin_conditions.py:182 ../../batcher/src/pypdb.py:463
+#: ../../batcher/src/builtin_conditions.py:182 ../../batcher/src/pypdb.py:464
 msgid "Visible"
 msgstr ""
 
@@ -2398,15 +2398,15 @@ msgstr ""
 msgid "Close when Done"
 msgstr ""
 
-#: ../../batcher/src/pypdb.py:449
+#: ../../batcher/src/pypdb.py:450
 msgid "Drawable"
 msgstr ""
 
-#: ../../batcher/src/pypdb.py:461
+#: ../../batcher/src/pypdb.py:462
 msgid "Merge filter"
 msgstr ""
 
-#: ../../batcher/src/pypdb.py:465
+#: ../../batcher/src/pypdb.py:466
 msgid "Filter name"
 msgstr ""
 

@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.4
+
+### March 31, 2026
 
 * Fixed a crash for Export Layers (Quick) if `Show this dialog` was checked (#145).
 * Fixed a crash when selecting certain layer effects in the custom action browser for some GIMP installations (specifically those that depend on a version of PyGObject lower than 3.50.0) (#143).
