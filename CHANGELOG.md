@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed a crash for Export Layers (Quick) if `Show this dialog` was checked.
+
+
 ## 1.2.3
 
 ### March 25, 2026

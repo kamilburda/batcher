@@ -199,7 +199,7 @@ class BatchProcessingGui:
       spacing=self._VBOX_SETTINGS_SPACING,
       margin_top=self._VBOX_SETTINGS_TOP_MARGIN,
     )
-    if self._mode == 'export':
+    if self._export_settings is not None:
       self._vbox_settings.pack_start(self._export_settings.widget, False, False, 0)
     self._vbox_settings.pack_start(self._command_lists.vbox_actions, False, False, 0)
     self._vbox_settings.pack_start(self._command_lists.vbox_conditions, False, False, 0)
@@ -257,7 +257,7 @@ class BatchProcessingGui:
 
     self._dialog.vbox.show_all()
 
-    if self._mode == 'export':
+    if self._export_settings is not None:
       self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
     else:
       self._dialog.set_focus(self._command_lists.action_list.button_add)
@@ -266,7 +266,7 @@ class BatchProcessingGui:
 
     self._dialog.show()
 
-    if self._mode == 'export':
+    if self._export_settings is not None:
       self._export_settings.folder_chooser.set_entry_position(-1)
 
   def _assign_gui_to_settings(self):
@@ -452,7 +452,7 @@ class BatchProcessingQuickGui:
 
     self._dialog.show_all()
 
-    if self._mode == 'export':
+    if self._export_settings is not None:
       self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
       self._export_settings.folder_chooser.set_entry_position(-1)
 
