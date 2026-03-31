@@ -1,6 +1,7 @@
 """Wrapper of ``Gimp.get_pdb()`` to simplify invoking GIMP PDB procedures."""
 
 import abc
+import contextlib
 import keyword
 from typing import Optional
 
@@ -602,10 +603,14 @@ class GeglProcedure(PDBProcedure):
     return self._must_be_merged
 
   def create_config(self):
-    """This subclass does not support config creation, hence this method returns
-    ``None``.
+    """Creates a procedure config filled with default values.
+
+    Note that this method is quite slow as it requires creating a temporary
+    filter, which in turn requires creating a temporary empty layer and image.
     """
-    return None
+    with self._create_temp_layer() as temp_layer:
+      drawable_filter = Gimp.DrawableFilter.new(temp_layer, self.name, '')
+      return drawable_filter.get_config()
 
   def _get_filter_properties(self, name):
     if (Gimp.MAJOR_VERSION, Gimp.MINOR_VERSION, Gimp.MICRO_VERSION) >= (3, 1, 4):
@@ -690,21 +695,9 @@ class GeglProcedure(PDBProcedure):
       # filter parameters seems to be to create `Gimp.DrawableFilter`
       # instances for each filter, for which we need to create an image with
       # an empty layer.
-      temp_image = Gimp.Image.new(2, 2, Gimp.ImageBaseType.RGB)
-
-      try:
-        empty_layer = Gimp.Layer.new(
-          temp_image,
-          'layer',
-          temp_image.get_width(),
-          temp_image.get_height(),
-          Gimp.ImageType.RGBA_IMAGE,
-          100.0,
-          Gimp.LayerMode.NORMAL,
-        )
-
+      with cls._create_temp_layer() as temp_layer:
         for operation_name in _GIMP_GEGL_OPERATIONS_PRE_3_1_4:
-          drawable_filter = Gimp.DrawableFilter.new(empty_layer, operation_name, '')
+          drawable_filter = Gimp.DrawableFilter.new(temp_layer, operation_name, '')
 
           config = drawable_filter.get_config()
           cls._GIMP_GEGL_OPERATIONS_PROPERTIES[operation_name] = config.list_properties()
@@ -714,9 +707,30 @@ class GeglProcedure(PDBProcedure):
           }
 
           drawable_filter.delete()
-      finally:
-        if temp_image.is_valid():
-          temp_image.delete()
+
+  @classmethod
+  @contextlib.contextmanager
+  def _create_temp_layer(cls):
+    temp_image = None
+
+    try:
+      temp_image = Gimp.Image.new(2, 2, Gimp.ImageBaseType.RGB)
+
+      empty_layer = Gimp.Layer.new(
+        temp_image,
+        'layer',
+        temp_image.get_width(),
+        temp_image.get_height(),
+        Gimp.ImageType.RGBA_IMAGE,
+        100.0,
+        Gimp.LayerMode.NORMAL,
+      )
+      temp_image.insert_layer(empty_layer, None, 0)
+
+      yield empty_layer
+    finally:
+      if temp_image.is_valid():
+        temp_image.delete()
 
   def _get_properties(self):
     return [
