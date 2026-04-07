@@ -66,8 +66,11 @@ class PopupHideContext:
         self._exclude_widget_from_hiding_with_button_press(widget)
   
   def _exclude_widget_from_hiding_with_button_press(self, widget):
-    widget.connect('enter-notify-event', self._on_widget_enter_notify_event)
-    widget.connect('leave-notify-event', self._on_widget_leave_notify_event)
+    # We use `Gtk.Widget.connect()` instead of `widget.connect()` as a subclass
+    # can override this method with a different signature, e.g.
+    # `GimpUi.IntComboBox.connect()`.
+    Gtk.Widget.connect(widget, 'enter-notify-event', self._on_widget_enter_notify_event)
+    Gtk.Widget.connect(widget, 'leave-notify-event', self._on_widget_leave_notify_event)
   
   def _on_popup_owner_widget_focus_out_event(self, widget, event):
     self._hide_callback()

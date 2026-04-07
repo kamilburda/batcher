@@ -117,7 +117,12 @@ class DragAndDropContext:
     if additional_dest_targets is None:
       additional_dest_targets = []
 
-    self._widgets_and_event_ids[widget]['drag-data-get'] = widget.connect(
+    # We use `Gtk.Widget.connect()` instead of `widget.connect()` as a subclass
+    # can override this method with a different signature, e.g.
+    # `GimpUi.IntComboBox.connect()`.
+
+    self._widgets_and_event_ids[widget]['drag-data-get'] = Gtk.Widget.connect(
+      widget,
       'drag-data-get',
       self._on_widget_drag_data_get,
       suppress_existing_widget_drag_and_drop,
@@ -130,7 +135,8 @@ class DragAndDropContext:
       [Gtk.TargetEntry.new(self._drag_type, target_flags, 0)],
       Gdk.DragAction.MOVE)
 
-    self._widgets_and_event_ids[widget]['drag-data-received'] = dest_widget.connect(
+    self._widgets_and_event_ids[widget]['drag-data-received'] = Gtk.Widget.connect(
+      widget,
       'drag-data-received',
       self._on_widget_drag_data_received,
       suppress_existing_widget_drag_and_drop,
@@ -147,12 +153,14 @@ class DragAndDropContext:
       Gdk.DragAction.MOVE)
 
     if get_drag_icon_func is not None:
-      self._widgets_and_event_ids[widget]['drag-begin'] = widget.connect(
+      self._widgets_and_event_ids[widget]['drag-begin'] = Gtk.Widget.connect(
+        widget,
         'drag-begin',
         get_drag_icon_func,
         *(get_drag_icon_func_args if get_drag_icon_func_args is not None else ()))
       if destroy_drag_icon_func is not None:
-        self._widgets_and_event_ids[widget]['drag-end'] = widget.connect(
+        self._widgets_and_event_ids[widget]['drag-end'] = Gtk.Widget.connect(
+          widget,
           'drag-end',
           destroy_drag_icon_func,
           *(destroy_drag_icon_func_args if destroy_drag_icon_func_args is not None else ()))
@@ -160,21 +168,25 @@ class DragAndDropContext:
     # Implementation taken from:
     # https://gitlab.gnome.org/GNOME/gimp/-/blob/master/app/widgets/gimpcontainertreeview-dnd.c
     if scrollable_for_auto_scroll is not None:
-      self._widgets_and_event_ids[widget]['drag-motion'] = widget.connect(
+      self._widgets_and_event_ids[widget]['drag-motion'] = Gtk.Widget.connect(
+        widget,
         'drag-motion',
         self._on_scrollable_drag_motion,
         scrollable_for_auto_scroll,
         process_cursor_position_for_scrollable_func,
       )
-      self._widgets_and_event_ids[widget]['drag-failed'] = widget.connect(
+      self._widgets_and_event_ids[widget]['drag-failed'] = Gtk.Widget.connect(
+        widget,
         'drag-failed',
         self._on_scrollable_drag_failed,
       )
-      self._widgets_and_event_ids[widget]['drag-leave'] = widget.connect(
+      self._widgets_and_event_ids[widget]['drag-leave'] = Gtk.Widget.connect(
+        widget,
         'drag-leave',
         self._on_scrollable_drag_leave,
       )
-      self._widgets_and_event_ids[widget]['drag-drop'] = widget.connect(
+      self._widgets_and_event_ids[widget]['drag-drop'] = Gtk.Widget.connect(
+        widget,
         'drag-drop',
         self._on_scrollable_drag_drop,
         suppress_existing_widget_drag_and_drop,
