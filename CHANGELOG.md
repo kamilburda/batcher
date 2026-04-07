@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed a crash when adding and editing `With Color Tags` or `Without Color Tags` conditions (#147).
+
+
 ## 1.2.4
 
 ### March 31, 2026
@@ -10,7 +15,7 @@
 
 ### March 25, 2026
 
-* Fixed a bug causing `Edit and Save Images` to crash on start.
+* Fixed a bug causing `Edit and Save Images` to crash on start (#142).
 
 
 ## 1.2.2
