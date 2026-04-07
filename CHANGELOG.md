@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.5
+
+### April 07, 2026
 
 * Fixed a crash when adding and editing `With Color Tags` or `Without Color Tags` conditions (#147).
 
