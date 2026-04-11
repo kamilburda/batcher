@@ -729,7 +729,7 @@ class GeglProcedure(PDBProcedure):
 
       yield empty_layer
     finally:
-      if temp_image.is_valid():
+      if temp_image is not None and temp_image.is_valid():
         temp_image.delete()
 
   def _get_properties(self):
