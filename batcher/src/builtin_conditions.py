@@ -157,6 +157,12 @@ class MatchModes:
   )
 
 
+def on_after_add_not_overlay_condition(_conditions, condition, _orig_condition_dict):
+  if condition['orig_name'].value == 'not_overlay':
+    condition['arguments/color_tag'].gui.set_visible(False)
+    condition['arguments/last_enabled_value'].gui.set_visible(False)
+
+
 _BUILTIN_CONDITIONS_LIST = [
   {
     'name': 'layers',
@@ -235,13 +241,13 @@ _BUILTIN_CONDITIONS_LIST = [
     ],
   },
   {
-    'name': 'not_background',
+    'name': 'not_overlay',
     'type': 'condition',
     'function': has_no_color_tag,
-    # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
-    'display_name': _('Not Background'),
+    # FOR TRANSLATORS: Think of "Only items that are not overlay (watermark)" when translating this
+    'display_name': _('Not Overlay (Watermark)'),
     'menu_path': _('Layer'),
-    # This condition is added/removed automatically alongside `insert_background_for_layers`.
+    # This condition is added/removed automatically alongside `insert_overlay_for_layers`.
     'additional_tags': [],
     'arguments': [
       {
@@ -250,32 +256,6 @@ _BUILTIN_CONDITIONS_LIST = [
         'enum_type': Gimp.ColorTag,
         'excluded_values': [Gimp.ColorTag.NONE],
         'default_value': Gimp.ColorTag.BLUE,
-        'gui_type': None,
-      },
-      {
-        'type': 'bool',
-        'name': 'last_enabled_value',
-        'default_value': True,
-        'gui_type': None,
-      },
-    ],
-  },
-  {
-    'name': 'not_foreground',
-    'type': 'condition',
-    'function': has_no_color_tag,
-    # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
-    'display_name': _('Not Foreground'),
-    'menu_path': _('Layer'),
-    # This condition is added/removed automatically alongside `insert_foreground_for_layers`.
-    'additional_tags': [],
-    'arguments': [
-      {
-        'type': 'enum',
-        'name': 'color_tag',
-        'enum_type': Gimp.ColorTag,
-        'excluded_values': [Gimp.ColorTag.NONE],
-        'default_value': Gimp.ColorTag.GREEN,
         'gui_type': None,
       },
       {

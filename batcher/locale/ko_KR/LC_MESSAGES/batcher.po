@@ -611,56 +611,56 @@ msgstr "레이어 이름에 파일 확장자 포함"
 msgid "Exports a layer to the specified file format."
 msgstr "레이어를 지정한 파일 형식으로 내보냅니다."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:217
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:242
 msgid "Insert background"
 msgstr "배경 삽입"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:218
 msgid "Inserts the specified image behind the current layer."
 msgstr "지정한 이미지를 현재 레이어 뒤에 삽입합니다."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:227
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:292
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:858
 #: ../../batcher/src/update.py:2152
 msgid "Image"
 msgstr "이미지"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
 msgid "Inserts layers having the specified color tag behind the current layer."
 msgstr "지정된 색상 태그가 있는 레이어들을 현재 레이어 뒤에 삽입합니다."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:253
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:318
 msgid "Color tag"
 msgstr "색상 태크"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:281
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:307
 msgid "Insert foreground"
 msgstr "전경 삽입"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:283
 msgid "Inserts the specified image in front of the current layer."
 msgstr "지정한 이미지를 현재 레이어 앞에 삽입합니다."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:309
 msgid ""
 "Inserts layers having the specified color tag in front of the current layer."
 msgstr "지정된 색상 태그가 있는 레이어들을 현재 레이어 앞에 삽입합니다."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:346
 msgid "Merge background"
 msgstr "배경 병합"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:356
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:380
 #: ../../batcher/src/builtin_actions/_misc.py:92
 msgid "Merge type"
 msgstr "병합 유형"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:370
 msgid "Merge foreground"
 msgstr "전경 병합"
 

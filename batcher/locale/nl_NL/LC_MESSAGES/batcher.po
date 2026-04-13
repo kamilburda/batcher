@@ -310,12 +310,12 @@ msgid "Apply Group Layer Appearance"
 msgstr "Uiterlijk laaggroep toepassen"
 
 #: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:192
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:239
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:269
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:312
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:342
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:385
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:410
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:239
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:269
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:312
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:342
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:385
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:410
 #: ../../batcher/src/builtin_actions/_misc.py:44
 #: ../../batcher/src/builtin_actions/_misc.py:60
 msgid "Layers and Composition"
@@ -839,8 +839,8 @@ msgid "Loads an image from a file."
 msgstr "Laadt een afbeelding uit een bestand."
 
 #: ../../batcher/src/builtin_actions/_import.py:132
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:326
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:253
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:326
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:859
 #: ../../batcher/src/update/_handlers/update_1_1.py:813
 msgid "Image"
@@ -850,16 +850,16 @@ msgstr "Afbeelding"
 msgid "No recognized image formats in added files"
 msgstr "Geen herkende afbeeldingsindelingen in toegevoegde bestanden"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:50
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:50
 msgid "Image file not specified."
 msgstr "Afbeeldingsbestand niet gespecificeerd."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:238
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:268
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:238
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:268
 msgid "Insert Background"
 msgstr "Als achtergrond invoegen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:241
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:241
 msgid ""
 "Inserts the specified image behind the current layer.\n"
 "\n"
@@ -869,21 +869,21 @@ msgstr "Voegt de gespecificeerde afbeelding achter de huidige laag in.\n"
 "\n"
 "U kunt op de achtergrond opvolgende acties toepassen met \"{}\" in plaats van met \"{}\" (indien beschikbaar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:274
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:274
 #: ../../batcher/src/placeholders.py:156 ../../batcher/src/placeholders.py:157
 msgid "Layer Below (Background)"
 msgstr "Laag onder (achtergrond)"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:274
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:317
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:347
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:274
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:317
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:347
 #: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
 msgid "Current Layer"
 msgstr "Huidige laag"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:271
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:271
 msgid ""
 "Inserts layers having the specified color tag behind the current layer.\n"
 "\n"
@@ -893,17 +893,17 @@ msgstr "Voegt lagen, die de gespecificeerde kleurtag hebben, achter de huidige l
 "\n"
 "U kunt op de achtergrond opvolgende acties toepassen met \"{}\" in plaats van met \"{}\" (indien beschikbaar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:356
 msgid "Color tag"
 msgstr "Kleurtag"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:311
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:341
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:311
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:341
 msgid "Insert Foreground"
 msgstr "Op voorgrond invoegen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:314
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:314
 msgid ""
 "Inserts the specified image in front of the current layer.\n"
 "\n"
@@ -913,13 +913,13 @@ msgstr "Voegt de gespecificeerde afbeelding voor de huidige laag in.\n"
 "\n"
 "U kunt op de voorgrond opvolgende acties toepassen met \"{}\" in plaats van met \"{}\" (indien beschikbaar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:317
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:347
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:317
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:347
 #: ../../batcher/src/placeholders.py:158 ../../batcher/src/placeholders.py:159
 msgid "Layer Above (Foreground)"
 msgstr "Laag boven (voorgrond)"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:344
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:344
 msgid ""
 "Inserts layers having the specified color tag in front of the current "
 "layer.\n"
@@ -930,17 +930,17 @@ msgstr "Voegt lagen, die de gespecificeerde kleurtag hebben, voor de huidige laa
 "\n"
 "U kunt op de voorgrond opvolgende acties toepassen met \"{}\" in plaats van met \"{}\" (indien beschikbaar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:384
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:384
 msgid "Merge Background"
 msgstr "Achtergrond samenvoegen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:395
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:420
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:395
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:420
 #: ../../batcher/src/builtin_actions/_misc.py:73
 msgid "Merge type"
 msgstr "Type samenvoegen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:409
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:409
 msgid "Merge Foreground"
 msgstr "Voorgrond samenvoegen"
 

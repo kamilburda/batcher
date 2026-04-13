@@ -334,12 +334,12 @@ msgid "Apply Group Layer Appearance"
 msgstr "Gruppenebene-Darstellung anwenden"
 
 #: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:192
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:239
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:269
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:312
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:342
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:385
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:410
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:239
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:269
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:312
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:342
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:385
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:410
 #: ../../batcher/src/builtin_actions/_misc.py:44
 #: ../../batcher/src/builtin_actions/_misc.py:60
 msgid "Layers and Composition"
@@ -897,8 +897,8 @@ msgid "Loads an image from a file."
 msgstr "Lädt ein Bild aus einer Datei."
 
 #: ../../batcher/src/builtin_actions/_import.py:132
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:326
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:253
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:326
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:859
 #: ../../batcher/src/update/_handlers/update_1_1.py:813
 msgid "Image"
@@ -908,16 +908,16 @@ msgstr "Bild"
 msgid "No recognized image formats in added files"
 msgstr "Keine erkannten Bildformate in hinzugefügten Dateien"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:50
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:50
 msgid "Image file not specified."
 msgstr "Bilddatei nicht angegeben."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:238
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:268
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:238
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:268
 msgid "Insert Background"
 msgstr "Hintergrund einfügen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:241
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:241
 msgid ""
 "Inserts the specified image behind the current layer.\n"
 "\n"
@@ -929,21 +929,21 @@ msgstr ""
 "Sie können nachfolgende Aktionen auf den Hintergrund anwenden, indem Sie "
 "„{}“ anstelle von „{}“ verwenden (sofern verfügbar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:274
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:274
 #: ../../batcher/src/placeholders.py:156 ../../batcher/src/placeholders.py:157
 msgid "Layer Below (Background)"
 msgstr "Untere Ebene (Hintergrund)"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:274
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:317
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:347
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:274
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:317
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:347
 #: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
 msgid "Current Layer"
 msgstr "Aktuelle Ebene"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:271
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:271
 msgid ""
 "Inserts layers having the specified color tag behind the current layer.\n"
 "\n"
@@ -955,17 +955,17 @@ msgstr ""
 "Sie können nachfolgende Aktionen auf den Hintergrund anwenden, indem Sie "
 "„{}“ anstelle von „{}“ verwenden (sofern verfügbar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:356
 msgid "Color tag"
 msgstr "Farb-Tag"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:311
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:341
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:311
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:341
 msgid "Insert Foreground"
 msgstr "Vordergrund einfügen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:314
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:314
 msgid ""
 "Inserts the specified image in front of the current layer.\n"
 "\n"
@@ -977,13 +977,13 @@ msgstr ""
 "Sie können nachfolgende Aktionen auf den Vordergrund anwenden, indem Sie "
 "„{}“ anstelle von „{}“ verwenden (sofern verfügbar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:317
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:347
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:317
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:347
 #: ../../batcher/src/placeholders.py:158 ../../batcher/src/placeholders.py:159
 msgid "Layer Above (Foreground)"
 msgstr "Ebene darüber (Vordergrund)"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:344
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:344
 msgid ""
 "Inserts layers having the specified color tag in front of the current "
 "layer.\n"
@@ -996,17 +996,17 @@ msgstr ""
 "Sie können nachfolgende Aktionen auf den Vordergrund anwenden, indem Sie "
 "„{}“ anstelle von „{}“ verwenden (sofern verfügbar)."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:384
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:384
 msgid "Merge Background"
 msgstr "Hintergrund zusammenführen"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:395
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:420
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:395
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:420
 #: ../../batcher/src/builtin_actions/_misc.py:73
 msgid "Merge type"
 msgstr "Zusammenführungstyp"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:409
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:409
 msgid "Merge Foreground"
 msgstr "Vordergrund zusammenführen"
 

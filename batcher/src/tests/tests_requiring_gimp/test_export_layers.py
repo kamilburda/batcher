@@ -96,18 +96,20 @@ class TestExportLayersCompareLayerContents(unittest.TestCase):
       action_names_to_remove=['resize_canvas'],
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'use_image_size'),
     )
-  
+
+  # TODO: Must set the `position` argument to `background`
   def test_background(self):
     self.compare(
-      action_names_to_add={'insert_background_for_layers': 0},
+      action_names_to_add={'insert_overlay_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'background'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.BLUE)),
     )
-  
+
+  # TODO: Must set the `position` argument to `foreground`
   def test_foreground(self):
     self.compare(
-      action_names_to_add={'insert_foreground_for_layers': 0},
+      action_names_to_add={'insert_overlay_for_layers': 0},
       expected_results_dirpath=os.path.join(self.expected_results_root_dirpath, 'foreground'),
       additional_init_before_run=(
         lambda image: self._set_color_tag(image, 'main-background', Gimp.ColorTag.GREEN)),

@@ -33,7 +33,7 @@ def _test_settings_for_read_write():
     },
   ])
   
-  procedures = group_.create_groups({
+  actions = group_.create_groups({
     'name': 'actions',
     'groups': [
       {
@@ -41,15 +41,15 @@ def _test_settings_for_read_write():
         'tags': ['command', 'action'],
       },
       {
-        'name': 'insert_background',
+        'name': 'insert_overlay',
         'tags': ['command', 'action'],
       },
     ]
   })
   
-  settings['main'].add([procedures])
+  settings['main'].add([actions])
   
-  procedures['resize_to_layer_size'].add([
+  actions['resize_to_layer_size'].add([
     {
       'type': 'bool',
       'name': 'enabled',
@@ -58,7 +58,7 @@ def _test_settings_for_read_write():
     group_.Group(name='arguments'),
   ])
   
-  procedures['insert_background'].add([
+  actions['insert_overlay'].add([
     {
       'type': 'bool',
       'name': 'enabled',
@@ -67,7 +67,7 @@ def _test_settings_for_read_write():
     group_.Group(name='arguments'),
   ])
   
-  procedures['insert_background/arguments'].add([
+  actions['insert_overlay/arguments'].add([
     {
       'type': 'str',
       'name': 'tag',
@@ -136,7 +136,7 @@ def _test_data_for_read_write():
                   ],
                 },
                 {
-                  'name': 'insert_background',
+                  'name': 'insert_overlay',
                   'tags': ['command', 'action'],
                   'settings': [
                     {
@@ -235,9 +235,9 @@ class TestSourceRead(unittest.TestCase):
     expected_setting_values = {
       setting.get_path(): setting.value for setting in self.settings.walk()}
     expected_setting_values[
-      'all_settings/main/actions/insert_background/enabled'] = False
+      'all_settings/main/actions/insert_overlay/enabled'] = False
     expected_setting_values[
-      'all_settings/main/actions/insert_background/arguments/tag'] = 'foreground'
+      'all_settings/main/actions/insert_overlay/arguments/tag'] = 'foreground'
     expected_setting_values['all_settings/standalone_setting'] = 'something_else'
     
     self.source.read([self.settings['main/actions'], self.settings['standalone_setting']])
@@ -265,7 +265,7 @@ class TestSourceRead(unittest.TestCase):
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][1]
     # 'main/actions/resize_to_layer_size/enabled'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]
-    # 'main/actions/insert_background'
+    # 'main/actions/insert_overlay'
     del self.source.data[0]['settings'][0]['settings'][1]['settings'][1]
     # 'main/conditions'
     del self.source.data[0]['settings'][0]['settings'][2]
@@ -276,13 +276,13 @@ class TestSourceRead(unittest.TestCase):
     
     self.source.read(
       [self.settings['main/file_extension'],
-       self.settings['main/actions/insert_background'],
+       self.settings['main/actions/insert_overlay'],
        self.settings['main/actions/resize_to_layer_size']])
     
     self.assertListEqual(
       self.source.settings_not_loaded,
       [self.settings['main/file_extension'],
-       self.settings['main/actions/insert_background'],
+       self.settings['main/actions/insert_overlay'],
        # Missing settings and empty groups must be expanded.
        self.settings['main/actions/resize_to_layer_size/enabled'],
        self.settings['main/actions/resize_to_layer_size/arguments']])
@@ -402,9 +402,9 @@ class TestSourceRead(unittest.TestCase):
     self.settings['main/actions/resize_to_layer_size/enabled'].tags.add('ignore_load')
     self.settings['main/actions/resize_to_layer_size/enabled'].set_value(False)
     
-    self.settings['main/actions/insert_background'].tags.add('ignore_load')
-    self.settings['main/actions/insert_background/enabled'].set_value(False)
-    self.settings['main/actions/insert_background/arguments/tag'].set_value('fg')
+    self.settings['main/actions/insert_overlay'].tags.add('ignore_load')
+    self.settings['main/actions/insert_overlay/enabled'].set_value(False)
+    self.settings['main/actions/insert_overlay/arguments/tag'].set_value('fg')
     
     self.settings['main/conditions'].tags.add('ignore_load')
     
@@ -418,9 +418,9 @@ class TestSourceRead(unittest.TestCase):
     self.assertEqual(self.settings['main/actions/resize_to_layer_size/enabled'].value, False)
     # The tag is found in the code for a parent
     self.assertEqual(
-      self.settings['main/actions/insert_background/enabled'].value, False)
+      self.settings['main/actions/insert_overlay/enabled'].value, False)
     self.assertEqual(
-      self.settings['main/actions/insert_background/arguments/tag'].value, 'fg')
+      self.settings['main/actions/insert_overlay/arguments/tag'].value, 'fg')
     # Group does not exist in the code, exists in the source but is not loaded
     self.assertNotIn('rename', self.settings['main/actions'])
     # Setting does not exist in the code, exists in the source but is not loaded
@@ -432,14 +432,14 @@ class TestSourceRead(unittest.TestCase):
     self.settings['main/actions'].reorder('resize_to_layer_size', 1)
     
     self.settings['main/actions/resize_to_layer_size/enabled'].set_value(False)
-    self.settings['main/actions/insert_background/enabled'].set_value(False)
+    self.settings['main/actions/insert_overlay/enabled'].set_value(False)
     
     self.source.data = _test_data_for_read_write()
     
     self.source.read([self.settings])
     
     self.assertEqual(self.settings['main/actions/resize_to_layer_size/enabled'].value, True)
-    self.assertEqual(self.settings['main/actions/insert_background/enabled'].value, True)
+    self.assertEqual(self.settings['main/actions/insert_overlay/enabled'].value, True)
   
   def test_read_invalid_setting_value_retains_the_value(self):
     setting_dict = {
@@ -644,7 +644,7 @@ class TestSourceWrite(unittest.TestCase):
     
     self.settings['main/file_extension'].set_value('jpg')
     self.settings['main/actions/resize_to_layer_size/enabled'].set_value(False)
-    self.settings['main/actions/insert_background/enabled'].set_value(False)
+    self.settings['main/actions/insert_overlay/enabled'].set_value(False)
     self.settings['standalone_setting'].set_value('something_else')
     
     expected_data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['value'] = False
@@ -733,9 +733,9 @@ class TestSourceWrite(unittest.TestCase):
     self.settings['main/actions/resize_to_layer_size/enabled'].tags.add('ignore_save')
     self.settings['main/actions/resize_to_layer_size/enabled'].set_value(False)
     
-    self.settings['main/actions/insert_background'].tags.add('ignore_save')
-    self.settings['main/actions/insert_background/enabled'].set_value(False)
-    self.settings['main/actions/insert_background/arguments/tag'].set_value('fg')
+    self.settings['main/actions/insert_overlay'].tags.add('ignore_save')
+    self.settings['main/actions/insert_overlay/enabled'].set_value(False)
+    self.settings['main/actions/insert_overlay/arguments/tag'].set_value('fg')
     
     self.settings['main/conditions'].tags.add('ignore_save')
     self.settings['main/conditions'].add([{'name': 'enabled', 'type': 'bool'}])
@@ -748,7 +748,7 @@ class TestSourceWrite(unittest.TestCase):
     # 'main/actions/resize_to_layer_size/enabled' setting is not saved
     self.assertFalse(
       self.source.data[0]['settings'][0]['settings'][1]['settings'][0]['settings'][0]['settings'])
-    # 'main/actions/insert_background' group is not saved
+    # 'main/actions/insert_overlay' group is not saved
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings'][1]['settings']), 1)
     # Child not present in data and the tag exists in the parent
     self.assertEqual(len(self.source.data[0]['settings'][0]['settings']), 2)

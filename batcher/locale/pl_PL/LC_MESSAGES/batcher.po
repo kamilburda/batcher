@@ -618,58 +618,58 @@ msgstr "Użyj rozszerzenia pliku w nazwie warstwy"
 msgid "Exports a layer to the specified file format."
 msgstr "Eksportuje warstwę do określonego formatu pliku."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:217
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:242
 msgid "Insert background"
 msgstr "Wstaw tło"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:218
 msgid "Inserts the specified image behind the current layer."
 msgstr "Wstawia określony obraz za bieżącą warstwą."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:227
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:292
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:858
 #: ../../batcher/src/update.py:2152
 msgid "Image"
 msgstr "Obraz"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
 msgid "Inserts layers having the specified color tag behind the current layer."
 msgstr ""
 "Wstawia warstwy posiadające określony znacznik koloru za bieżącą warstwą."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:253
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:318
 msgid "Color tag"
 msgstr "Etykieta koloru"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:281
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:307
 msgid "Insert foreground"
 msgstr "Wstaw pierwszy plan"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:283
 msgid "Inserts the specified image in front of the current layer."
 msgstr "Wstawia określony obraz przed bieżącą warstwą."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:309
 msgid ""
 "Inserts layers having the specified color tag in front of the current layer."
 msgstr ""
 "Wstawia warstwy posiadające określony znacznik koloru przed bieżącą warstwą."
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:346
 msgid "Merge background"
 msgstr "Połącz tło"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:356
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:380
 #: ../../batcher/src/builtin_actions/_misc.py:92
 msgid "Merge type"
 msgstr "Typ scalania"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:370
 msgid "Merge foreground"
 msgstr "Połącz pierwszy plan"
 

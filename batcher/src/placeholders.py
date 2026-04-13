@@ -51,7 +51,7 @@ def get_background_layer(_setting, batcher):
     batcher,
     lambda position, num_layers: position < num_layers - 1,
     1,
-    ['insert_background_for_images', 'insert_background_for_layers'],
+    ['insert_overlay_for_images', 'insert_overlay_for_layers'],
     'color_tag',
     _('There are no background layers.'))
 
@@ -65,7 +65,7 @@ def get_foreground_layer(_setting, batcher):
     batcher,
     lambda position, num_layers: position > 0,
     -1,
-    ['insert_foreground_for_images', 'insert_foreground_for_layers'],
+    ['insert_overlay_for_images', 'insert_overlay_for_layers'],
     'color_tag',
     _('There are no foreground layers.'))
 

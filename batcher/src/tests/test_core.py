@@ -42,7 +42,7 @@ class TestBatcherInitialCommands(unittest.TestCase):
     
     commands_.add(
       settings['main/actions'],
-      builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
+      builtin_actions.BUILTIN_ACTIONS['insert_overlay_for_layers'])
     
     batcher.add_action(utils.empty_func, [commands_.DEFAULT_ACTIONS_GROUP])
     
@@ -104,7 +104,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
   
   def test_add_command(self, mock_get_pdb):
     action = commands_.add(
-      self.actions, builtin_actions.BUILTIN_ACTIONS['insert_background_for_layers'])
+      self.actions, builtin_actions.BUILTIN_ACTIONS['insert_overlay_for_layers'])
     
     self.batcher._add_command(action)
     
@@ -116,7 +116,7 @@ class TestAddCommandFromSettings(unittest.TestCase):
     self.assertListEqual(added_command_items[0][1][:-1], list(action['arguments']))
     self.assertIsInstance(
       added_command_items[0][1][-1],
-      builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_background_for_layers'],
+      builtin_actions.BUILTIN_ACTIONS_FUNCTIONS['insert_overlay_for_layers'],
     )
     self.assertEqual(added_command_items[0][2], {})
   

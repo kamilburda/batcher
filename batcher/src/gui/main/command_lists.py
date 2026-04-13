@@ -218,12 +218,12 @@ class CommandLists:
       'after-load',
       lambda _actions: _set_up_existing_save_actions(self._action_list))
 
-    _set_up_existing_insert_back_foreground_and_related_commands(
+    _set_up_existing_insert_overlay_and_related_commands(
       self._action_list, self._condition_list)
     self._action_list.commands.connect_event(
-      'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
+      'after-load', self._set_up_existing_insert_overlay_and_related_commands_on_load)
     self._condition_list.commands.connect_event(
-      'after-load', self._set_up_existing_insert_back_foreground_and_related_commands_on_load)
+      'after-load', self._set_up_existing_insert_overlay_and_related_commands_on_load)
 
     self._condition_list.connect(
       'command-list-item-added-interactive',
@@ -236,9 +236,9 @@ class CommandLists:
       'after-load',
       lambda _conditions: _set_up_existing_matching_text_conditions(self._condition_list))
 
-  def _set_up_existing_insert_back_foreground_and_related_commands_on_load(self, _commands):
+  def _set_up_existing_insert_overlay_and_related_commands_on_load(self, _commands):
     if self._actions_or_conditions_loaded:
-      _set_up_existing_insert_back_foreground_and_related_commands(
+      _set_up_existing_insert_overlay_and_related_commands(
         self._action_list, self._condition_list)
 
       # This allows setting up the commands again when loading again.
@@ -273,9 +273,8 @@ def _on_action_item_added(action_list, item, settings, condition_list):
   if item.command['orig_name'].value != 'save':
     _reorder_action_before_first_save_action(action_list, item)
 
-  if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
-       'insert_background_for_', 'insert_foreground_for_']):
-    _handle_insert_background_foreground_action_item_added(action_list, item, condition_list)
+  if item.command['orig_name'].value.startswith('insert_overlay_for_'):
+    _handle_insert_overlay_action_item_added(action_list, item, condition_list)
 
 
 def _set_up_existing_crop_actions(action_list: command_list_.CommandList):
@@ -314,21 +313,18 @@ def _set_up_existing_save_actions(action_list: command_list_.CommandList):
       _handle_save_action_item_added(item)
 
 
-def _handle_insert_background_foreground_action_item_added(
-      action_list, item, condition_list):
+def _handle_insert_overlay_action_item_added(action_list, item, condition_list):
   action_list.reorder_item(item, 0)
 
-  merge_item = _add_merge_background_foreground_action(action_list, item)
+  merge_item = _add_merge_overlay_action(action_list, item)
 
-  condition_item = _add_not_background_foreground_condition(item, condition_list)
+  condition_item = _add_not_overlay_condition(item, condition_list)
 
-  _hide_internal_arguments_for_insert_background_foreground_action(item)
-  _set_up_merge_background_foreground_action(merge_item)
-  _set_up_not_background_foreground_condition(item, condition_item)
+  _set_up_merge_overlay_action(merge_item)
+  _set_up_not_overlay_condition(condition_item)
 
   if merge_item is not None or condition_item is not None:
-    _set_up_insert_background_foreground_action(
-      item, merge_item, condition_item, action_list, condition_list)
+    _set_up_insert_overlay_action(item, merge_item, condition_item, action_list, condition_list)
 
   if merge_item is not None:
     item.command['arguments/merge_action_name'].set_value(merge_item.command.name)
@@ -336,13 +332,12 @@ def _handle_insert_background_foreground_action_item_added(
     item.command['arguments/condition_name'].set_value(condition_item.command.name)
 
 
-def _set_up_existing_insert_back_foreground_and_related_commands(
+def _set_up_existing_insert_overlay_and_related_commands(
       action_list: command_list_.CommandList,
       condition_list: command_list_.CommandList,
 ):
   for item in action_list.items:
-    if any(item.command['orig_name'].value.startswith(prefix) for prefix in [
-         'insert_background_for_', 'insert_foreground_for_']):
+    if item.command['orig_name'].value.startswith('insert_overlay_for_'):
       merge_action_name = (
         item.command['arguments/merge_action_name'].value
         if 'merge_action_name' in item.command['arguments'] else None)
@@ -364,39 +359,24 @@ def _set_up_existing_insert_back_foreground_and_related_commands(
       else:
         condition_item = None
 
-      _hide_internal_arguments_for_insert_background_foreground_action(item)
-      _set_up_merge_background_foreground_action(merge_item)
-      _set_up_not_background_foreground_condition(item, condition_item)
+      _set_up_merge_overlay_action(merge_item)
+      _set_up_not_overlay_condition(condition_item)
 
       if merge_item is not None or condition_item is not None:
-        _set_up_insert_background_foreground_action(
+        _set_up_insert_overlay_action(
           item, merge_item, condition_item, action_list, condition_list)
 
 
-def _hide_internal_arguments_for_insert_background_foreground_action(item):
-  if 'merge_action_name' in item.command['arguments']:
-    item.command['arguments/merge_action_name'].gui.set_visible(False)
-  if 'condition_name' in item.command['arguments']:
-    item.command['arguments/condition_name'].gui.set_visible(False)
-
-
-def _set_up_insert_background_foreground_action(
+def _set_up_insert_overlay_action(
       item,
       merge_item,
       condition_item,
       action_list: command_list_.CommandList,
       condition_list: command_list_.CommandList,
 ):
-  item.command['enabled'].connect_event(
-    'value-changed',
-    _on_insert_background_foreground_action_enabled_changed,
-    merge_item.command if merge_item is not None else None,
-    condition_item.command if condition_item is not None else None,
-  )
-
   action_list.connect(
     'command-list-item-removed',
-    _on_insert_background_foreground_action_removed,
+    _on_insert_overlay_action_removed,
     item,
     merge_item,
     condition_list,
@@ -404,20 +384,11 @@ def _set_up_insert_background_foreground_action(
   )
 
 
-def _add_merge_background_foreground_action(action_list, item):
-  merge_action_orig_name_mapping = {
-    'insert_background_for_images': 'merge_background',
-    'insert_background_for_layers': 'merge_background',
-    'insert_foreground_for_images': 'merge_foreground',
-    'insert_foreground_for_layers': 'merge_foreground',
-  }
-
-  if item.command['orig_name'].value not in merge_action_orig_name_mapping:
+def _add_merge_overlay_action(action_list, item):
+  if not item.command['orig_name'].value.startswith('insert_overlay_for_'):
     return None
 
-  merge_action_name = merge_action_orig_name_mapping[item.command['orig_name'].value]
-
-  merge_item = action_list.add_item(builtin_actions.BUILTIN_ACTIONS[merge_action_name])
+  merge_item = action_list.add_item(builtin_actions.BUILTIN_ACTIONS['merge_overlay'])
 
   export_action_index = next(
     iter(index for index, item in enumerate(action_list.items)
@@ -429,81 +400,34 @@ def _add_merge_background_foreground_action(action_list, item):
   return merge_item
 
 
-def _set_up_merge_background_foreground_action(merge_item):
+def _set_up_merge_overlay_action(merge_item):
   if merge_item is not None:
     _set_buttons_for_command_item_sensitive(merge_item, False)
 
-    merge_item.command['arguments/last_enabled_value'].gui.set_visible(False)
 
-
-def _add_not_background_foreground_condition(item, condition_list):
-  condition_orig_name_mapping = {
-    'insert_background_for_layers': 'not_background',
-    'insert_foreground_for_layers': 'not_foreground',
-  }
-
-  if item.command['orig_name'].value not in condition_orig_name_mapping:
+def _add_not_overlay_condition(item, condition_list):
+  if item.command['orig_name'].value != 'insert_overlay_for_layers':
     return None
 
-  condition_name = condition_orig_name_mapping[item.command['orig_name'].value]
-
-  condition_item = condition_list.add_item(
-    builtin_conditions.BUILTIN_CONDITIONS[condition_name])
+  condition_item = condition_list.add_item(builtin_conditions.BUILTIN_CONDITIONS['not_overlay'])
 
   return condition_item
 
 
-def _set_up_not_background_foreground_condition(item, condition_item):
-  if condition_item is None:
-    return
-
-  def _on_insert_background_foreground_color_tag_changed(color_tag_setting):
-    condition_item.command['arguments/color_tag'].set_value(color_tag_setting.value)
-
+def _set_up_not_overlay_condition(condition_item):
   if condition_item is not None:
     _set_buttons_for_command_item_sensitive(condition_item, False)
 
-  condition_item.command['arguments/color_tag'].gui.set_visible(False)
-  condition_item.command['arguments/last_enabled_value'].gui.set_visible(False)
 
-  item.command['arguments/color_tag'].connect_event(
-    'value-changed', _on_insert_background_foreground_color_tag_changed)
-  _on_insert_background_foreground_color_tag_changed(item.command['arguments/color_tag'])
-
-
-def _on_insert_background_foreground_action_enabled_changed(
-      enabled_setting,
-      merge_action,
-      condition,
-):
-  if not enabled_setting.value:
-    if merge_action is not None:
-      merge_action['arguments/last_enabled_value'].set_value(merge_action['enabled'].value)
-      merge_action['enabled'].set_value(False)
-
-    if condition is not None:
-      condition['arguments/last_enabled_value'].set_value(condition['enabled'].value)
-      condition['enabled'].set_value(False)
-  else:
-    if merge_action is not None:
-      merge_action['enabled'].set_value(merge_action['arguments/last_enabled_value'].value)
-    if condition is not None:
-      condition['enabled'].set_value(condition['arguments/last_enabled_value'].value)
-
-  if merge_action is not None:
-    merge_action['enabled'].gui.set_sensitive(enabled_setting.value)
-  if condition is not None:
-    condition['enabled'].gui.set_sensitive(enabled_setting.value)
-
-
-def _on_insert_background_foreground_action_removed(
+def _on_insert_overlay_action_removed(
       action_list,
       removed_item,
-      insert_back_foreground_item,
+      insert_overlay_item,
       merge_item,
       condition_list,
-      condition_item):
-  if removed_item == insert_back_foreground_item:
+      condition_item,
+):
+  if removed_item == insert_overlay_item:
     if merge_item is not None and merge_item in action_list.items:
       action_list.remove_item(merge_item)
     if condition_item is not None and condition_item in condition_list.items:

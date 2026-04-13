@@ -631,56 +631,56 @@ msgstr "レイヤー名にファイル拡張子を使用"
 msgid "Exports a layer to the specified file format."
 msgstr "レイヤーを指定されたファイル形式にエクスポートします。"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:217
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:242
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:217
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:242
 msgid "Insert background"
 msgstr "背景を挿入"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:218
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:218
 msgid "Inserts the specified image behind the current layer."
 msgstr "指定された画像を現在のレイヤーの後ろに挿入します。"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:227
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:292
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:227
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:292
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:858
 #: ../../batcher/src/update.py:2152
 msgid "Image"
 msgstr "画像"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:244
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:244
 msgid "Inserts layers having the specified color tag behind the current layer."
 msgstr "指定されたカラータグを持つレイヤーを現在のレイヤーの後ろに挿入します。"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:253
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:318
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:253
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:318
 msgid "Color tag"
 msgstr "カラータグ"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:281
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:307
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:281
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:307
 msgid "Insert foreground"
 msgstr "前景を挿入"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:283
 msgid "Inserts the specified image in front of the current layer."
 msgstr "指定された画像を現在のレイヤーの前に挿入します。"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:309
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:309
 msgid ""
 "Inserts layers having the specified color tag in front of the current layer."
 msgstr "指定されたカラータグを持つレイヤーを現在のレイヤーの前に挿入します。"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:346
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:346
 msgid "Merge background"
 msgstr "背景を統合"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:356
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:380
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:356
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:380
 #: ../../batcher/src/builtin_actions/_misc.py:92
 msgid "Merge type"
 msgstr "統合タイプ"
 
-#: ../../batcher/src/builtin_actions/_insert_background_foreground.py:370
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:370
 msgid "Merge foreground"
 msgstr "前景を統合"
 

@@ -16,8 +16,8 @@ from src.builtin_actions import _gmic_filter
 from src.builtin_actions._gmic_filter import *
 from src.builtin_actions import _import
 from src.builtin_actions._import import *
-from src.builtin_actions import _insert_background_foreground
-from src.builtin_actions._insert_background_foreground import *
+from src.builtin_actions import _insert_overlay
+from src.builtin_actions._insert_overlay import *
 from src.builtin_actions import _misc
 from src.builtin_actions._misc import *
 from src.builtin_actions import _remove_folder_structure
@@ -63,12 +63,9 @@ _BUILTIN_ACTIONS_LIST = [
   _flip.FLIP_VERTICALLY_FOR_LAYERS_DICT,
   _rotate.ROTATE_FOR_IMAGES_DICT,
   _rotate.ROTATE_FOR_LAYERS_DICT,
-  _insert_background_foreground.INSERT_BACKGROUND_FOR_IMAGES_DICT,
-  _insert_background_foreground.INSERT_BACKGROUND_FOR_LAYERS_DICT,
-  _insert_background_foreground.INSERT_FOREGROUND_FOR_IMAGES_DICT,
-  _insert_background_foreground.INSERT_FOREGROUND_FOR_LAYERS_DICT,
-  _insert_background_foreground.MERGE_BACKGROUND_DICT,
-  _insert_background_foreground.MERGE_FOREGROUND_DICT,
+  _insert_overlay.INSERT_OVERLAY_FOR_IMAGES_DICT,
+  _insert_overlay.INSERT_OVERLAY_FOR_LAYERS_DICT,
+  _insert_overlay.MERGE_OVERLAY_DICT,
   _apply_group_layer_appearance.APPLY_GROUP_LAYER_APPEARANCE_DICT,
   _misc.MERGE_FILTERS_DICT,
   _misc.MERGE_VISIBLE_LAYERS_DICT,

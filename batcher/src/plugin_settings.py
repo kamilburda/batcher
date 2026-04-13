@@ -190,7 +190,7 @@ def create_settings_for_convert():
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_actions(settings)
+  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -338,7 +338,7 @@ def create_settings_for_export_images():
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_actions(settings)
+  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -446,7 +446,7 @@ def create_settings_for_edit_and_save_images():
       ]),
   ])
 
-  _connect_events_for_added_built_in_actions(settings)
+  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -594,13 +594,7 @@ def create_settings_for_export_layers():
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
 
-  _connect_events_for_added_built_in_actions(settings)
-
-  settings['main/actions'].connect_event(
-    'after-add-command',
-    builtin_actions.on_after_add_insert_background_foreground_for_layers,
-    settings['main/tagged_items'],
-  )
+  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -693,13 +687,7 @@ def create_settings_for_edit_layers():
       ]),
   ])
 
-  _connect_events_for_added_built_in_actions(settings)
-
-  settings['main/actions'].connect_event(
-    'after-add-command',
-    builtin_actions.on_after_add_insert_background_foreground_for_layers,
-    settings['main/tagged_items'],
-  )
+  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -878,7 +866,7 @@ def _create_images_and_directories_setting_dict():
   }
 
 
-def _connect_events_for_added_built_in_actions(settings):
+def _connect_events_for_added_built_in_commands(settings):
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_apply_group_layer_appearance_action)
   settings['main/actions'].connect_event(
@@ -895,3 +883,22 @@ def _connect_events_for_added_built_in_actions(settings):
     'after-add-command', builtin_actions.on_after_add_save_action)
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_scale_action)
+
+  if 'tagged_items' in settings['main']:
+    settings['main/actions'].connect_event(
+      'after-add-command',
+      builtin_actions.on_after_add_insert_overlay_for_layers_action,
+      settings['main/tagged_items'],
+    )
+
+  settings['main/actions'].connect_event(
+    'after-add-command',
+    builtin_actions.on_after_add_insert_overlay_action,
+    settings['main/conditions'],
+  )
+
+  settings['main/actions'].connect_event(
+    'after-add-command', builtin_actions.on_after_add_merge_overlay_action)
+
+  settings['main/conditions'].connect_event(
+    'after-add-command', builtin_conditions.on_after_add_not_overlay_condition)

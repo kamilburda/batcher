@@ -830,7 +830,7 @@ EXPORT_FOR_CONVERT_DICT = {
     {
       'type': 'choice',
       'name': 'file_format_mode',
-      'default_value': 'use_explicit_values',
+      'default_value': FileFormatModes.USE_EXPLICIT_VALUES,
       'items': [
         (FileFormatModes.USE_NATIVE_PLUGIN_VALUES, _('Interactively')),
         (FileFormatModes.USE_EXPLICIT_VALUES, _('Use options below')),
@@ -852,14 +852,14 @@ EXPORT_FOR_CONVERT_DICT = {
     {
       'type': 'choice',
       'name': 'overwrite_mode',
-      'default_value': 'ask',
+      'default_value': overwrite.OverwriteModes.ASK,
       'items': _EXPORT_OVERWRITE_MODES_LIST,
       'display_name': _('If a file already exists:'),
     },
     {
       'type': 'choice',
       'name': 'export_mode',
-      'default_value': 'each_item',
+      'default_value': ExportModes.EACH_ITEM,
       'items': [
         (ExportModes.EACH_ITEM, _('For each image')),
         (ExportModes.EACH_TOP_LEVEL_ITEM_OR_FOLDER,
