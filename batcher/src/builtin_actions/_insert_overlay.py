@@ -3,26 +3,40 @@
 import os
 
 import gi
+gi.require_version('Gegl', '0.4')
+from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import exceptions
 from src import invoker as invoker_
+from src import setting as setting_
 from src import placeholders as placeholders_
 from src.procedure_groups import *
 
 from src import utils_pdb
 from src.pypdb import pdb
 
+from . import _utils as builtin_actions_utils
+
 
 __all__ = [
-  'InsertOverlayFromFileAction',
+  'InsertOverlayAction',
   'InsertTaggedLayersAction',
   'merge_overlay',
   'on_after_add_insert_overlay_for_layers_action',
   'on_after_add_insert_overlay_action',
   'on_after_add_merge_overlay_action',
 ]
+
+
+class ContentType:
+
+  CONTENT_TYPES = (
+    FILE,
+    TEXT,
+    LAYERS_WITH_COLOR_TAG,
+  ) = 'file', 'text', 'layers_with_color_tag'
 
 
 class InsertionPositions:
@@ -33,11 +47,27 @@ class InsertionPositions:
   ) = 'background', 'foreground'
 
 
-class InsertOverlayFromFileAction(invoker_.CallableCommand):
+class InsertOverlayAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
   def _initialize(self, image_batcher, **kwargs):
+    self._insert_content = ContentType.FILE
     self._image_file = None
+    self._text = '© Copyright'
+    self._text_font_family = Gimp.Font.get_by_name('Arial Regular')
+    self._text_font_size = {
+      'pixel_value': 14.0,
+      'percent_value': 5.0,
+      'other_value': 1.0,
+      'unit': Gimp.Unit.pixel(),
+      'percent_object': 'current_layer',
+      'percent_property': {
+        ('current_image',): 'width',
+        ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+      },
+    }
+    self._text_font_color = Gegl.Color()
+    self._text_font_color.set_rgba(0.0, 0.0, 0.0, 1.0)
     self._position = InsertionPositions.BACKGROUND
 
     self._assign_to_attributes_from_kwargs(kwargs)
@@ -47,7 +77,8 @@ class InsertOverlayFromFileAction(invoker_.CallableCommand):
     image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
 
     # noinspection PyUnresolvedReferences
-    if (self._image_file is not None
+    if (self._insert_content == ContentType.FILE
+        and self._image_file is not None
         and self._image_file.get_path() is not None
         and os.path.exists(self._image_file.get_path())):
       self._image_to_insert = pdb.gimp_file_load(
@@ -59,7 +90,7 @@ class InsertOverlayFromFileAction(invoker_.CallableCommand):
       self._image_to_insert = None
 
   def _process(self, image_batcher, **kwargs):
-    if self._image_to_insert is None:
+    if self._insert_content == ContentType.FILE and self._image_to_insert is None:
       raise exceptions.SkipCommand(_('Image file not specified.'))
 
     self._assign_to_attributes_from_kwargs(kwargs)
@@ -71,8 +102,24 @@ class InsertOverlayFromFileAction(invoker_.CallableCommand):
     if self._position == 'background':
       index += 1
 
-    inserted_layer = _insert_layers(
-      image, self._image_to_insert.get_layers(), current_parent, index)
+    inserted_layer = None
+
+    if self._insert_content == ContentType.FILE:
+      inserted_layer = _insert_layers(
+        image, self._image_to_insert.get_layers(), current_parent, index)
+    elif self._insert_content == ContentType.TEXT:
+      inserted_layer = _insert_text_layer(
+        image_batcher,
+        image,
+        self._text,
+        self._text_font_family,
+        self._text_font_size,
+        self._text_font_color,
+        current_parent,
+        index,
+      )
+
+    # TODO: Allow adjusting scale, anchor, opacity, rotation, tiling, ...
 
     return inserted_layer
 
@@ -90,6 +137,7 @@ def _delete_images_on_cleanup(_batcher, images):
   images.clear()
 
 
+# TODO: Merge with InsertOverlayAction
 class InsertTaggedLayersAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
@@ -174,6 +222,41 @@ def _insert_layers(image, layers, parent, position):
   return merged_tagged_layer
 
 
+def _insert_text_layer(
+      batcher,
+      image,
+      text,
+      font_family,
+      font_dimension,
+      font_color,
+      parent,
+      position,
+):
+  if font_dimension['unit'] == Gimp.Unit.percent():
+    font_size = builtin_actions_utils.unit_to_pixels(batcher, font_dimension, 'x')
+    font_unit = Gimp.Unit.pixel()
+  elif font_dimension['unit'] == Gimp.Unit.pixel():
+    font_size = font_dimension['pixel_value']
+    font_unit = Gimp.Unit.pixel()
+  else:
+    font_size = font_dimension['other_value']
+    font_unit = font_dimension['unit']
+
+  text_layer = Gimp.TextLayer.new(
+    image,
+    text,
+    font_family,
+    font_size,
+    font_unit,
+  )
+
+  image.insert_layer(text_layer, parent, position)
+
+  text_layer.set_color(setting_.ColorSetting.get_value_as_color(font_color))
+
+  return text_layer
+
+
 def merge_overlay(
       batcher,
       position: str = InsertionPositions.BACKGROUND,
@@ -249,6 +332,28 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
 
 def on_after_add_insert_overlay_action(actions, action, _orig_action_dict, conditions):
   if action['orig_name'].value.startswith('insert_overlay_for_'):
+    _set_visible_for_insert_overlay_arguments(
+      action['arguments/insert_content'],
+      action['arguments'],
+    )
+
+    action['arguments/insert_content'].connect_event(
+      'value-changed',
+      _set_visible_for_insert_overlay_arguments,
+      action['arguments'],
+    )
+
+    _set_display_name_for_insert_overlay(
+      action['arguments/position'],
+      action['display_name'],
+    )
+
+    action['arguments/position'].connect_event(
+      'value-changed',
+      _set_display_name_for_insert_overlay,
+      action['display_name'],
+    )
+
     if 'merge_action_name' in action['arguments']:
       action['arguments/merge_action_name'].gui.set_visible(False)
 
@@ -279,16 +384,20 @@ def on_after_add_insert_overlay_action(actions, action, _orig_action_dict, condi
         action,
       )
 
-    _set_display_name_for_insert_overlay(
-      action['arguments/position'],
-      action['display_name'],
-    )
 
-    action['arguments/position'].connect_event(
-      'value-changed',
-      _set_display_name_for_insert_overlay,
-      action['display_name'],
-    )
+def _set_visible_for_insert_overlay_arguments(
+      insert_content_setting,
+      arguments,
+):
+  is_content_type_file = insert_content_setting.value == ContentType.FILE
+  is_content_type_text = insert_content_setting.value == ContentType.TEXT
+
+  arguments['image_file'].gui.set_visible(is_content_type_file)
+
+  arguments['text'].gui.set_visible(is_content_type_text)
+  arguments['text_font_family'].gui.set_visible(is_content_type_text)
+  arguments['text_font_size'].gui.set_visible(is_content_type_text)
+  arguments['text_font_color'].gui.set_visible(is_content_type_text)
 
 
 def _set_display_name_for_insert_overlay(
@@ -446,7 +555,7 @@ def _set_display_name_for_merge_overlay(position_setting, display_name_setting):
 
 INSERT_OVERLAY_FOR_IMAGES_DICT = {
   'name': 'insert_overlay_for_images',
-  'function': InsertOverlayFromFileAction,
+  'function': InsertOverlayAction,
   'display_name': _('Insert Overlay (Watermark)'),
   'menu_path': _('Layers and Composition'),
   'description': _(
@@ -458,12 +567,59 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
     {
+      'type': 'choice',
+      'name': 'insert_content',
+      'default_value': ContentType.FILE,
+      'display_name': _('Insert content'),
+      'items': [
+        (ContentType.FILE, _('File')),
+        (ContentType.TEXT, _('Text')),
+      ],
+      'gui_type': 'radio_button_box',
+    },
+    {
       'type': 'file',
       'name': 'image_file',
       'default_value': None,
       'action': Gimp.FileChooserAction.OPEN,
       'display_name': _('Image'),
       'none_ok': True,
+    },
+    {
+      'type': 'string',
+      'name': 'text',
+      'default_value': '© Copyright',
+      'display_name': _('Text'),
+    },
+    {
+      'type': 'font',
+      'name': 'text_font_family',
+      'default_value': None,
+      'display_name': _('Font'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'text_font_size',
+      'default_value': {
+        'pixel_value': 14.0,
+        'percent_value': 5.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.pixel(),
+        'percent_object': 'current_layer',
+        'percent_property': {
+          ('current_image',): 'width',
+          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        },
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': ['current_image', 'current_layer'],
+      'display_name': _('Font size'),
+    },
+    {
+      'type': 'color',
+      'name': 'text_font_color',
+      'default_value': [0.0, 0.0, 0.0, 1.0],
+      'display_name': _('Font color'),
     },
     {
       'type': 'choice',
