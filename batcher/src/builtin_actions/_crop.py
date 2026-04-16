@@ -363,16 +363,16 @@ def on_after_add_crop_action(_actions, action, _orig_action_dict):
 
 def _set_visible_for_crop_from_edges_settings(
       crop_from_edges_same_amount_for_each_side_setting,
-      crop_arguments_group,
+      arguments,
 ):
   is_visible = crop_from_edges_same_amount_for_each_side_setting.gui.get_visible()
   is_checked = crop_from_edges_same_amount_for_each_side_setting.value
 
-  crop_arguments_group['crop_from_edges_amount'].gui.set_visible(is_visible and is_checked)
-  crop_arguments_group['crop_from_edges_top'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_left'].gui.set_visible(is_visible and not is_checked)
-  crop_arguments_group['crop_from_edges_right'].gui.set_visible(is_visible and not is_checked)
+  arguments['crop_from_edges_amount'].gui.set_visible(is_visible and is_checked)
+  arguments['crop_from_edges_top'].gui.set_visible(is_visible and not is_checked)
+  arguments['crop_from_edges_bottom'].gui.set_visible(is_visible and not is_checked)
+  arguments['crop_from_edges_left'].gui.set_visible(is_visible and not is_checked)
+  arguments['crop_from_edges_right'].gui.set_visible(is_visible and not is_checked)
 
 
 def _set_visible_for_crop_to_aspect_ratio_position_custom(
@@ -386,27 +386,27 @@ def _set_visible_for_crop_to_aspect_ratio_position_custom(
   crop_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
 
-def _set_visible_for_crop_mode_settings(crop_mode_setting, crop_arguments_group):
-  for setting in crop_arguments_group:
+def _set_visible_for_crop_mode_settings(crop_mode_setting, arguments):
+  for setting in arguments:
     if setting.name in ['object_to_crop', 'crop_mode']:
       continue
 
     setting.gui.set_visible(False)
 
   if crop_mode_setting.value == CropModes.CROP_FROM_EDGES:
-    crop_arguments_group['crop_from_edges_same_amount_for_each_side'].gui.set_visible(True)
+    arguments['crop_from_edges_same_amount_for_each_side'].gui.set_visible(True)
   elif crop_mode_setting.value == CropModes.CROP_FROM_POSITION:
-    crop_arguments_group['crop_from_position_anchor'].gui.set_visible(True)
-    crop_arguments_group['crop_from_position_width'].gui.set_visible(True)
-    crop_arguments_group['crop_from_position_height'].gui.set_visible(True)
+    arguments['crop_from_position_anchor'].gui.set_visible(True)
+    arguments['crop_from_position_width'].gui.set_visible(True)
+    arguments['crop_from_position_height'].gui.set_visible(True)
   elif crop_mode_setting.value == CropModes.CROP_TO_ASPECT_RATIO:
-    crop_arguments_group['crop_to_aspect_ratio_ratio'].gui.set_visible(True)
-    crop_arguments_group['crop_to_aspect_ratio_position'].gui.set_visible(True)
+    arguments['crop_to_aspect_ratio_ratio'].gui.set_visible(True)
+    arguments['crop_to_aspect_ratio_position'].gui.set_visible(True)
   elif crop_mode_setting.value == CropModes.CROP_TO_AREA:
-    crop_arguments_group['crop_to_area_x'].gui.set_visible(True)
-    crop_arguments_group['crop_to_area_y'].gui.set_visible(True)
-    crop_arguments_group['crop_to_area_width'].gui.set_visible(True)
-    crop_arguments_group['crop_to_area_height'].gui.set_visible(True)
+    arguments['crop_to_area_x'].gui.set_visible(True)
+    arguments['crop_to_area_y'].gui.set_visible(True)
+    arguments['crop_to_area_width'].gui.set_visible(True)
+    arguments['crop_to_area_height'].gui.set_visible(True)
 
 
 CROP_FOR_IMAGES_DICT = {
