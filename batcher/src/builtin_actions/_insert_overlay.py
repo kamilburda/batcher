@@ -562,7 +562,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
     'Inserts the specified image behind or in front of the current layer.'
     '\n\nYou can apply subsequent actions on the inserted layer using'
     ' "{}" or "{}".'
-  ).format(_('Layer Below (Background)'), _('Layer Above (Foreground)')),
+  ).format(_('Layer Above (Foreground)'), _('Layer Below (Background)')),
   'display_options_on_create': True,
   'additional_tags': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   'arguments': [
@@ -624,11 +624,11 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'position',
-      'default_value': InsertionPositions.BACKGROUND,
+      'default_value': InsertionPositions.FOREGROUND,
       'display_name': _('Position'),
       'items': [
-        (InsertionPositions.BACKGROUND, _('Background')),
         (InsertionPositions.FOREGROUND, _('Foreground')),
+        (InsertionPositions.BACKGROUND, _('Background')),
       ],
       'gui_type': 'radio_button_box',
     },
@@ -650,7 +650,7 @@ INSERT_OVERLAY_FOR_LAYERS_DICT = {
     'Inserts layers behind or in front of the current layer.'
     '\n\nYou can apply subsequent actions on the inserted layer using'
     ' "{}" or "{}".'
-  ).format(_('Layer Below (Background)'), _('Layer Above (Foreground)')),
+  ).format(_('Layer Above (Foreground)'), _('Layer Below (Background)')),
   'display_options_on_create': True,
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
   'arguments': [
@@ -665,11 +665,11 @@ INSERT_OVERLAY_FOR_LAYERS_DICT = {
     {
       'type': 'choice',
       'name': 'position',
-      'default_value': InsertionPositions.BACKGROUND,
+      'default_value': InsertionPositions.FOREGROUND,
       'display_name': _('Position'),
       'items': [
-        (InsertionPositions.BACKGROUND, _('Background')),
         (InsertionPositions.FOREGROUND, _('Foreground')),
+        (InsertionPositions.BACKGROUND, _('Background')),
       ],
       'gui_type': 'radio_button_box',
     },
