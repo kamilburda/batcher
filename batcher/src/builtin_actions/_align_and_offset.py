@@ -176,8 +176,7 @@ ALIGN_AND_OFFSET_DICT = {
         },
       },
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer',
-        'foreground_layer'],
+        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
       'display_name': _('Additional X-offset'),
     },
     {
