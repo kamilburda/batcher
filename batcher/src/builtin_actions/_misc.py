@@ -6,14 +6,61 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import builtin_commands_common
+from src import exceptions
 from src.path import fileext
 from src.procedure_groups import *
 
 
 __all__ = [
+  'merge_layer',
   'merge_filters',
   'merge_visible_layers',
+  'remove_file_extension_from_imported_images',
+  'on_after_add_merge_layer_action',
 ]
+
+
+def merge_layer(batcher, layer, merge_type):
+  layer_position = batcher.current_image.get_item_position(layer)
+  current_layer_position = batcher.current_image.get_item_position(batcher.current_layer)
+
+  if layer_position == current_layer_position - 1:
+    _merge_layer(batcher, merge_type, layer, batcher.current_layer, batcher.current_layer)
+  elif layer_position == current_layer_position + 1:
+    _merge_layer(batcher, merge_type, batcher.current_layer, layer, batcher.current_layer)
+  else:
+    layers = batcher.current_image.get_layers()
+
+    if layer_position + 1 >= len(layers):
+      raise exceptions.SkipCommand(_('No layer below position {}.').format(layer_position))
+
+    _merge_layer(batcher, merge_type, layer, layers[layer_position + 1], layer)
+
+
+def _merge_layer(
+      batcher,
+      merge_type,
+      layer_to_merge_down,
+      layer_below,
+      reference_layer,
+):
+  name = reference_layer.get_name()
+  visible = reference_layer.get_visible()
+  color_tag = reference_layer.get_color_tag()
+
+  layer_to_merge_down.set_visible(True)
+  layer_below.set_visible(True)
+
+  merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
+
+  # Avoid errors if merging failed for some reason.
+  if merged_layer is not None:
+    merged_layer.set_name(name)
+    merged_layer.set_visible(visible)
+    merged_layer.set_color_tag(color_tag)
+
+    if reference_layer == batcher.current_layer:
+      batcher.current_layer = merged_layer
 
 
 def merge_filters(_batcher, layer):
@@ -35,6 +82,54 @@ def remove_file_extension_from_imported_images(image_batcher):
 
   if image.get_imported_file() is not None and image.get_xcf_file() is None:
     image_batcher.current_item.name = fileext.get_filename_root(image_batcher.current_item.name)
+
+
+def on_after_add_merge_layer_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'merge_layer':
+    _set_display_name_for_merge_layer(
+      action['arguments/layer'],
+      action['display_name'],
+    )
+
+    action['arguments/layer'].connect_event(
+      'value-changed',
+      _set_display_name_for_merge_layer,
+      action['display_name'],
+    )
+
+
+def _set_display_name_for_merge_layer(layer_setting, display_name_setting):
+  if layer_setting.value == 'background_layer':
+    display_name_setting.set_value(_('Merge with Layer Below'))
+  elif layer_setting.value == 'foreground_layer':
+    display_name_setting.set_value(_('Merge with Layer Above'))
+  else:
+    display_name_setting.set_value(_('Merge Layer'))
+
+
+MERGE_LAYER_DICT = {
+  'name': 'merge_layer',
+  'function': merge_layer,
+  'display_name': _('Merge Layer'),
+  'menu_path': _('Layers and Composition'),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer_without_current_layer',
+      'name': 'layer',
+      'display_name': _('Target Layer'),
+    },
+    {
+      'type': 'enum',
+      'name': 'merge_type',
+      'enum_type': Gimp.MergeType,
+      'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+      'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
+      'display_name': _('Merge type'),
+    },
+  ],
+}
 
 
 MERGE_FILTERS_DICT = {

@@ -898,7 +898,7 @@ def _connect_events_for_added_built_in_commands(settings):
   )
 
   settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_merge_overlay_action)
+    'after-add-command', builtin_actions.on_after_add_merge_layer_action)
 
   settings['main/conditions'].connect_event(
     'after-add-command', builtin_conditions.on_after_add_not_overlay_condition)

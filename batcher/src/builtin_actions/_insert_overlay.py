@@ -11,7 +11,6 @@ from gi.repository import Gimp
 from src import exceptions
 from src import invoker as invoker_
 from src import setting as setting_
-from src import placeholders as placeholders_
 from src.procedure_groups import *
 
 from src import utils_pdb
@@ -23,10 +22,8 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'InsertOverlayAction',
   'InsertTaggedLayersAction',
-  'merge_overlay',
   'on_after_add_insert_overlay_for_layers_action',
   'on_after_add_insert_overlay_action',
-  'on_after_add_merge_overlay_action',
 ]
 
 
@@ -257,58 +254,6 @@ def _insert_text_layer(
   return text_layer
 
 
-def merge_overlay(
-      batcher,
-      position: str = InsertionPositions.BACKGROUND,
-      merge_type: Gimp.MergeType = Gimp.MergeType.EXPAND_AS_NECESSARY,
-      *_args,
-      **_kwargs,
-):
-  if position == InsertionPositions.BACKGROUND:
-    _merge_layer(batcher, merge_type, _get_background_layer, 'current_layer')
-  elif position == InsertionPositions.FOREGROUND:
-    _merge_layer(batcher, merge_type, _get_foreground_layer, 'inserted_layer')
-  else:
-    raise ValueError(f'invalid position: {position}')
-
-
-def _get_background_layer(batcher):
-  return placeholders_.get_background_layer(None, batcher)
-
-
-def _get_foreground_layer(batcher):
-  return placeholders_.get_foreground_layer(None, batcher)
-
-
-def _merge_layer(batcher, merge_type, get_inserted_layer_func, layer_to_merge_str):
-  inserted_layer = get_inserted_layer_func(batcher)
-  
-  if inserted_layer is not None:
-    name = batcher.current_layer.get_name()
-    visible = batcher.current_layer.get_visible()
-    orig_color_tag = batcher.current_layer.get_color_tag()
-    
-    if layer_to_merge_str == 'current_layer':
-      layer_to_merge_down = batcher.current_layer
-    elif layer_to_merge_str == 'inserted_layer':
-      layer_to_merge_down = inserted_layer
-    else:
-      raise ValueError('invalid value for "layer_to_merge_str"')
-    
-    batcher.current_layer.set_visible(True)
-    
-    merged_layer = batcher.current_image.merge_down(layer_to_merge_down, merge_type)
-
-    # Avoid errors if merge failed for some reason.
-    if merged_layer is not None:
-      merged_layer.set_name(name)
-
-      batcher.current_layer = merged_layer
-
-      batcher.current_layer.set_visible(visible)
-      batcher.current_layer.set_color_tag(orig_color_tag)
-
-
 def on_after_add_insert_overlay_for_layers_action(
       _actions,
       action,
@@ -354,21 +299,6 @@ def on_after_add_insert_overlay_action(actions, action, _orig_action_dict, condi
       action['display_name'],
     )
 
-    if 'merge_action_name' in action['arguments']:
-      action['arguments/merge_action_name'].gui.set_visible(False)
-
-      _connect_changes_to_linked_merge_overlay_action(
-        action['arguments/merge_action_name'],
-        actions,
-        action,
-      )
-      action['arguments/merge_action_name'].connect_event(
-        'value-changed',
-        _connect_changes_to_linked_merge_overlay_action,
-        actions,
-        action,
-      )
-
     if 'condition_name' in action['arguments']:
       action['arguments/condition_name'].gui.set_visible(False)
 
@@ -410,42 +340,6 @@ def _set_display_name_for_insert_overlay(
     display_name_setting.set_value(_('Insert Foreground'))
   else:
     display_name_setting.set_value(_('Insert Overlay (Watermark)'))
-
-
-def _connect_changes_to_linked_merge_overlay_action(
-      merge_action_name_setting,
-      actions,
-      insert_overlay_action,
-):
-  if merge_action_name_setting.value not in actions:
-    return
-
-  merge_overlay_action = actions[merge_action_name_setting.value]
-
-  # We expect the `merge_action_name` setting to be changed only once (when
-  # the action is added interactively). If it changed multiple times, we
-  # would have to disconnect previous 'value-changed' events.
-
-  _set_position_for_merge_overlay(
-    insert_overlay_action['arguments/position'],
-    merge_overlay_action['arguments/position'],
-  )
-  insert_overlay_action['arguments/position'].connect_event(
-    'value-changed',
-    _set_position_for_merge_overlay,
-    merge_overlay_action['arguments/position'],
-  )
-
-  insert_overlay_action['enabled'].connect_event(
-    'value-changed',
-    _set_enabled_and_sensitive_for_linked_command,
-    merge_overlay_action['enabled'],
-    merge_overlay_action['arguments/last_enabled_value'],
-  )
-
-
-def _set_position_for_merge_overlay(insert_position_setting, merge_position_setting):
-  merge_position_setting.set_value(insert_position_setting.value)
 
 
 def _connect_changes_to_linked_not_overlay_condition(
@@ -527,32 +421,6 @@ def _set_enabled_and_sensitive_for_linked_command(
   linked_command_enabled_setting.gui.set_sensitive(insert_enabled_setting.value)
 
 
-def on_after_add_merge_overlay_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'merge_overlay':
-    action['arguments/position'].gui.set_visible(False)
-    action['arguments/last_enabled_value'].gui.set_visible(False)
-
-    _set_display_name_for_merge_overlay(
-      action['arguments/position'],
-      action['display_name'],
-    )
-
-    action['arguments/position'].connect_event(
-      'value-changed',
-      _set_display_name_for_merge_overlay,
-      action['display_name'],
-    )
-
-
-def _set_display_name_for_merge_overlay(position_setting, display_name_setting):
-  if position_setting.value == InsertionPositions.BACKGROUND:
-    display_name_setting.set_value(_('Merge Background'))
-  elif position_setting.value == InsertionPositions.FOREGROUND:
-    display_name_setting.set_value(_('Merge Foreground'))
-  else:
-    display_name_setting.set_value(_('Merge Overlay (Watermark)'))
-
-
 INSERT_OVERLAY_FOR_IMAGES_DICT = {
   'name': 'insert_overlay_for_images',
   'function': InsertOverlayAction,
@@ -632,12 +500,6 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       ],
       'gui_type': 'radio_button_box',
     },
-    {
-      'type': 'string',
-      'name': 'merge_action_name',
-      'default_value': '',
-      'gui_type': None,
-    },
   ],
 }
 
@@ -682,50 +544,8 @@ INSERT_OVERLAY_FOR_LAYERS_DICT = {
     },
     {
       'type': 'string',
-      'name': 'merge_action_name',
-      'default_value': '',
-      'gui_type': None,
-    },
-    {
-      'type': 'string',
       'name': 'condition_name',
       'default_value': '',
-      'gui_type': None,
-    },
-  ],
-}
-
-
-MERGE_OVERLAY_DICT = {
-  'name': 'merge_overlay',
-  'function': merge_overlay,
-  'display_name': _('Merge Overlay (Watermark)'),
-  'menu_path': _('Layers and Composition'),
-  # This action is added/removed automatically alongside `insert_overlay_for_*`.
-  'additional_tags': [],
-  'arguments': [
-    {
-      'type': 'choice',
-      'name': 'position',
-      'default_value': InsertionPositions.BACKGROUND,
-      'items': [
-        (InsertionPositions.BACKGROUND, _('Background')),
-        (InsertionPositions.FOREGROUND, _('Foreground')),
-      ],
-      'gui_type': None,
-    },
-    {
-      'type': 'enum',
-      'name': 'merge_type',
-      'enum_type': Gimp.MergeType,
-      'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
-      'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
-      'display_name': _('Merge type'),
-    },
-    {
-      'type': 'bool',
-      'name': 'last_enabled_value',
-      'default_value': True,
       'gui_type': None,
     },
   ],

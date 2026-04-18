@@ -3,6 +3,10 @@
 New features:
 * Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`).
 
+Changes to actions and conditions:
+* `Merge Background` and `Merge Foreground` are no longer added automatically when `Insert Overlay (Watermark)` is added.
+* Replaced `Merge Background` and `Merge Foreground` with a single action named `Merge Layer` that can be added by the user.
+
 
 ## 1.2.5
 

@@ -316,18 +316,13 @@ def _set_up_existing_save_actions(action_list: command_list_.CommandList):
 def _handle_insert_overlay_action_item_added(action_list, item, condition_list):
   action_list.reorder_item(item, 0)
 
-  merge_item = _add_merge_overlay_action(action_list, item)
-
   condition_item = _add_not_overlay_condition(item, condition_list)
 
-  _set_up_merge_overlay_action(merge_item)
   _set_up_not_overlay_condition(condition_item)
 
-  if merge_item is not None or condition_item is not None:
-    _set_up_insert_overlay_action(item, merge_item, condition_item, action_list, condition_list)
+  if condition_item is not None:
+    _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
 
-  if merge_item is not None:
-    item.command['arguments/merge_action_name'].set_value(merge_item.command.name)
   if condition_item is not None:
     item.command['arguments/condition_name'].set_value(condition_item.command.name)
 
@@ -338,17 +333,6 @@ def _set_up_existing_insert_overlay_and_related_commands(
 ):
   for item in action_list.items:
     if item.command['orig_name'].value.startswith('insert_overlay_for_'):
-      merge_action_name = (
-        item.command['arguments/merge_action_name'].value
-        if 'merge_action_name' in item.command['arguments'] else None)
-      if merge_action_name is not None and merge_action_name in action_list.commands:
-        merge_item = next(
-          iter(
-            item_ for item_ in action_list.items if item_.command.name == merge_action_name),
-          None)
-      else:
-        merge_item = None
-
       condition_name = (
         item.command['arguments/condition_name'].value
         if 'condition_name' in item.command['arguments'] else None)
@@ -359,17 +343,14 @@ def _set_up_existing_insert_overlay_and_related_commands(
       else:
         condition_item = None
 
-      _set_up_merge_overlay_action(merge_item)
       _set_up_not_overlay_condition(condition_item)
 
-      if merge_item is not None or condition_item is not None:
-        _set_up_insert_overlay_action(
-          item, merge_item, condition_item, action_list, condition_list)
+      if condition_item is not None:
+        _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
 
 
 def _set_up_insert_overlay_action(
       item,
-      merge_item,
       condition_item,
       action_list: command_list_.CommandList,
       condition_list: command_list_.CommandList,
@@ -378,31 +359,9 @@ def _set_up_insert_overlay_action(
     'command-list-item-removed',
     _on_insert_overlay_action_removed,
     item,
-    merge_item,
     condition_list,
     condition_item,
   )
-
-
-def _add_merge_overlay_action(action_list, item):
-  if not item.command['orig_name'].value.startswith('insert_overlay_for_'):
-    return None
-
-  merge_item = action_list.add_item(builtin_actions.BUILTIN_ACTIONS['merge_overlay'])
-
-  export_action_index = next(
-    iter(index for index, item in enumerate(action_list.items)
-         if item.command['orig_name'].value.startswith('export_for_')),
-    None)
-  if export_action_index is not None:
-    action_list.reorder_item(merge_item, export_action_index)
-
-  return merge_item
-
-
-def _set_up_merge_overlay_action(merge_item):
-  if merge_item is not None:
-    _set_buttons_for_command_item_sensitive(merge_item, False)
 
 
 def _add_not_overlay_condition(item, condition_list):
@@ -420,16 +379,13 @@ def _set_up_not_overlay_condition(condition_item):
 
 
 def _on_insert_overlay_action_removed(
-      action_list,
+      _action_list,
       removed_item,
       insert_overlay_item,
-      merge_item,
       condition_list,
       condition_item,
 ):
   if removed_item == insert_overlay_item:
-    if merge_item is not None and merge_item in action_list.items:
-      action_list.remove_item(merge_item)
     if condition_item is not None and condition_item in condition_list.items:
       condition_list.remove_item(condition_item)
 

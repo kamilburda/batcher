@@ -53,7 +53,7 @@ def get_background_layer(_setting, batcher):
     1,
     ['insert_overlay_for_images', 'insert_overlay_for_layers'],
     'color_tag',
-    _('There are no background layers.'))
+    _('No layer below current layer (no background).'))
 
 
 def get_background_layer_for_array(setting, batcher):
@@ -67,7 +67,7 @@ def get_foreground_layer(_setting, batcher):
     -1,
     ['insert_overlay_for_images', 'insert_overlay_for_layers'],
     'color_tag',
-    _('There are no foreground layers.'))
+    _('No layer above current layer (no foreground).'))
 
 
 def get_foreground_layer_for_array(setting, batcher):
@@ -309,6 +309,12 @@ class PlaceholderLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
   _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+
+
+class PlaceholderLayerWithoutCurrentLayerSetting(PlaceholderGimpObjectSetting):
+
+  _DEFAULT_DEFAULT_VALUE = 'foreground_layer'
+  _DEFAULT_PLACEHOLDERS = ['background_layer', 'foreground_layer']
 
 
 class PlaceholderItemSetting(PlaceholderGimpObjectSetting):
