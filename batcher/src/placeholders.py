@@ -47,13 +47,7 @@ def get_current_layer_for_array(setting, batcher):
 
 
 def get_background_layer(_setting, batcher):
-  return _get_adjacent_layer(
-    batcher,
-    lambda position, num_layers: position < num_layers - 1,
-    1,
-    ['insert_overlay_for_images', 'insert_overlay_for_layers'],
-    'color_tag',
-    _('No layer below current layer (no background).'))
+  return _get_adjacent_layer(batcher, 1, _('No layer below current layer (no background).'))
 
 
 def get_background_layer_for_array(setting, batcher):
@@ -61,13 +55,7 @@ def get_background_layer_for_array(setting, batcher):
 
 
 def get_foreground_layer(_setting, batcher):
-  return _get_adjacent_layer(
-    batcher,
-    lambda position, num_layers: position > 0,
-    -1,
-    ['insert_overlay_for_images', 'insert_overlay_for_layers'],
-    'color_tag',
-    _('No layer above current layer (no foreground).'))
+  return _get_adjacent_layer(batcher, -1, _('No layer above current layer (no foreground).'))
 
 
 def get_foreground_layer_for_array(setting, batcher):
@@ -86,14 +74,7 @@ def get_value_for_unsupported_parameter(setting, _batcher):
   return getattr(setting, 'default_param_value', None)
 
 
-def _get_adjacent_layer(
-      batcher,
-      position_cond_func,
-      adjacent_position_increment,
-      insert_builtin_action_names,
-      color_tag_argument_name_for_builtin_actions,
-      skip_message,
-):
+def _get_adjacent_layer(batcher, adjacent_position_increment, skip_message):
   image = batcher.current_image
   layer = batcher.current_layer
 
@@ -102,38 +83,17 @@ def _get_adjacent_layer(
   else:
     children = layer.get_parent().get_children()
 
-  adjacent_layer = None
+  adjacent_layer_position = image.get_item_position(layer) + adjacent_position_increment
 
-  num_layers = len(children)
+  if adjacent_layer_position < 0 or adjacent_layer_position >= len(children):
+    raise exceptions.SkipCommand(skip_message)
+  else:
+    adjacent_layer = children[adjacent_layer_position]
 
-  if num_layers > 1:
-    position = image.get_item_position(layer)
-    if position_cond_func(position, num_layers):
-      next_layer = children[position + adjacent_position_increment]
-      # A `None` element represents a background/foreground layer inserted
-      # via other means than color tags (e.g. from a file). If there are no
-      # matching color tags and `None` is present at least once, we always
-      # consider `next_layer` to be the background/foreground.
-      color_tags = []
-      for action in _get_previous_enabled_actions(batcher, batcher.current_action):
-        if any(action['orig_name'].value == orig_name for orig_name in insert_builtin_action_names):
-          if color_tag_argument_name_for_builtin_actions in action['arguments']:
-            color_tags.append(
-              action[f'arguments/{color_tag_argument_name_for_builtin_actions}'].value)
-          else:
-            color_tags.append(None)
-        else:
-          color_tags.append(None)
-
-      if None in color_tags or next_layer.get_color_tag() in color_tags:
-        adjacent_layer = next_layer
-
-  if adjacent_layer is not None:
     # This is necessary for some commands relying on selected layers.
     image.set_selected_layers([adjacent_layer])
+
     return adjacent_layer
-  else:
-    raise exceptions.SkipCommand(skip_message)
 
 
 def _get_previous_enabled_actions(batcher, current_command):

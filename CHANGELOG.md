@@ -1,5 +1,8 @@
 ## Upcoming
 
+General changes:
+* `Layer Above (Foreground)` and `Layer Below (Background)` will now always consider the layer immediately above or below the current layer, respectively. Previously, if `Insert Foreground/Background` inserted layers with color tags, `Layer Above/Below` would only consider these tagged layers, regardless of other layers that could be inserted by custom actions immediately above/below the current layer. This behavior could cause confusion.
+
 New features:
 * Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`).
 
