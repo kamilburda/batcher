@@ -1,3 +1,9 @@
+## Upcoming
+
+New features:
+* Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`).
+
+
 ## 1.2.5
 
 ### April 07, 2026
