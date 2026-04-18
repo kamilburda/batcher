@@ -172,62 +172,34 @@ Options:
 
 ### Layers and Composition
 
-#### Insert Background
+#### Insert Overlay (Watermark)
 
-Inserts a new layer behind the current layer.
+Inserts an image or text as a layer behind or in front of the current layer.
+You can then apply basic adjustments such as size, position or opacity.
 
-For Batch Convert, specify an image file to be loaded as background.
-
-For Export Layers and Edit Layers, mark layers in your opened image with a color tag.
-The _blue_ color tag is used for background by default.
-You may set a different color tag by adjusting the `Color tag` option.
+For Export Layers and Edit Layers, you can also specify a color tag.
+This will insert layers from the current having the color tag as a single merged layer.
+The tagged layers are excluded from processing by default.
+If this is not desired, deactivate the `With Color Tag` condition that was added automatically.
 
 This action is inserted at the first position.
-This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers).
+This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers) or other properties.
 You can always move this action lower as needed.
 
-You can apply subsequent actions on the background using `Layer Below (Background)` instead of `Current Layer` (if available).
+To further adjust the inserted layer, you can add actions after this action and set the layer to `Layer Below (Background)` or `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
-The background is merged automatically at the end of processing as the `Merge Background` action is automatically added. See `Merge Background` below for more information.
 
-For Export Layers and Edit Layers, the background layers are excluded from processing by default as the `Not Background` condition is automatically added and enabled.
+#### Merge Layer
 
-#### Insert Foreground
+Merges a layer directly above or below the current layer with the current layer.
 
-Inserts a new layer in front of the current layer.
-
-For Export Layers and Edit Layers, the _green_ color tag is used as foreground by default.
-
-You can apply subsequent actions on the foreground using `Layer Above (Foreground)` instead of `Current Layer` (if available).
-
-The `Merge Foreground` action is added automatically. For Export Layers and Edit Layers, the `Not Foreground` condition is added automatically.
-
-For more information, see `Insert Background` above.
-
-#### Merge Background
-
-*Only available if `Insert Background` is added*
-
-Merges already inserted background (via `Insert Background`, see above) into the current layer.
-
-When exporting, the background is merged automatically.
-However, if needed, you can reorder this action to perform the merge earlier and then apply actions on the current layer, now merged with the background.
+This is useful e.g. if you need to apply further actions on a single layer.
 
 For [Edit Layers](../Usage.md#editing-layers), this action ensures that you have a single merged layer rather than having the background as a separate layer.
-If this is not what you desire, you may uncheck this action.
-
-If there is no background layer inserted, this action has no effect.
 
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
 
-#### Merge Foreground
-
-*Only available if `Insert Foreground` is added*
-
-Merges already inserted foreground (via `Insert Foreground`, see above) with the current layer.
-
-For more information, see `Merge Background` above.
 
 #### Apply Group Layer Appearance
 

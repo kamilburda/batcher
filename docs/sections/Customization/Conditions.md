@@ -57,22 +57,6 @@ For example, by adding a blue tag, all layers except the ones containing the blu
 If a group layer has a color tag, it will normally not be excluded.
 To also exclude group layers with color tags, click on `More options` and check `Also apply to parent folders`.
 
-#### Not Background
-
-*Only available for: Export Layers, Edit Layers*
-
-*Only available if `Insert Background` is added*
-
-Processes only layers that are not inserted as background via `Insert Background`.
-
-#### Not Foreground
-
-*Only available for: Export Layers, Edit Layers*
-
-*Only available if `Insert Foreground` is added*
-
-Processes only layers that are not inserted as foreground via `Insert Foreground`.
-
 
 ### Naming
 

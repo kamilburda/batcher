@@ -19,23 +19,15 @@ Absolutely! In fact, you may apply any GIMP filter or plug-in:
 
 ## How can I insert watermarks?
 
-You can think of watermarks as foreground, i.e. a layer added on top of your images.
+1. Add the `Insert Overlay (Watermark)` action and provide an image file or text.
+2. Adjust other options as desired (size, placement, opacity, ...).
 
-For Batch Convert and Export Images:
-1. Add the `Insert Foreground` action and specify an image file serving as the foreground.
-2. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge Foreground` action that was added automatically.
-
-For Export Layers and Edit Layers:
-1. In GIMP, assign a color tag to the layer(s) you want to consider foreground (right-click on a layer → `Color Tags` → choose your color).
-2. Add the `Insert Foreground` action and adjust the color tag as necessary.
-3. (optional) For Export Layers, if you want the foreground to be offset to the current layer rather than the image canvas, place this action after `Resize to layer size` by dragging it onto `Resize to layer size`.
-4. (optional) You can adjust how the foreground is merged by setting the merge type in the `Merge Foreground` action that was added automatically.
-5. (optional) You can further adjust the watermark via subsequent actions (e.g. `Rotate`). Instead of `Current Layer` (if available), use `Layer Above (Foreground)`.
+For Export Layers and Edit Layers, you can also insert layers with the specified color tag beside a file or text.
 
 
 ## I need every image to have the same background.
 
-You can follow the same steps as in the example above, except that you add the `Insert Background` action (and adjust `Merge Background` as needed).
+1. Add the `Insert Overlay (Watermark)` action and provide an image file or text, and set `Position` to `Background`. 
 
 
 ## How can I add borders to an image?
