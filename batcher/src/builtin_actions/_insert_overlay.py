@@ -11,9 +11,9 @@ from gi.repository import Gimp
 from src import exceptions
 from src import invoker as invoker_
 from src import setting as setting_
-from src.procedure_groups import *
-
+from src import utils
 from src import utils_pdb
+from src.procedure_groups import *
 from src.pypdb import pdb
 
 from . import _utils as builtin_actions_utils
@@ -21,7 +21,6 @@ from . import _utils as builtin_actions_utils
 
 __all__ = [
   'InsertOverlayAction',
-  'InsertTaggedLayersAction',
   'on_after_add_insert_overlay_for_layers_action',
   'on_after_add_insert_overlay_action',
 ]
@@ -47,10 +46,11 @@ class InsertionPositions:
 class InsertOverlayAction(invoker_.CallableCommand):
 
   # noinspection PyAttributeOutsideInit
-  def _initialize(self, image_batcher, **kwargs):
+  def _initialize(self, batcher, **kwargs):
     self._insert_content = ContentType.FILE
     self._image_file = None
     self._text = '© Copyright'
+    self._color_tag = Gimp.ColorTag.BLUE
     self._text_font_family = Gimp.Font.get_by_name('Arial Regular')
     self._text_font_size = {
       'pixel_value': 14.0,
@@ -66,12 +66,13 @@ class InsertOverlayAction(invoker_.CallableCommand):
     self._text_font_color = Gegl.Color()
     self._text_font_color.set_rgba(0.0, 0.0, 0.0, 1.0)
     self._position = InsertionPositions.BACKGROUND
+    self._tagged_items = []
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
     self._image_copies = []
 
-    image_batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
+    batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
 
     # noinspection PyUnresolvedReferences
     if (self._insert_content == ContentType.FILE
@@ -86,16 +87,31 @@ class InsertOverlayAction(invoker_.CallableCommand):
     else:
       self._image_to_insert = None
 
-  def _process(self, image_batcher, **kwargs):
+    if self._insert_content == ContentType.LAYERS_WITH_COLOR_TAG:
+      if batcher.is_preview:
+        processed_tagged_items = self._tagged_items
+      else:
+        processed_tagged_items = batcher.item_tree.iter(with_folders=False, filtered=False)
+
+      self._processed_tagged_items = [
+        item for item in processed_tagged_items
+        if (self._color_tag != Gimp.ColorTag.NONE
+            and item.raw.is_valid()
+            and item.raw.get_color_tag() == self._color_tag)
+      ]
+    else:
+      self._processed_tagged_items = []
+
+  def _process(self, batcher, **kwargs):
     if self._insert_content == ContentType.FILE and self._image_to_insert is None:
       raise exceptions.SkipCommand(_('Image file not specified.'))
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
-    image = image_batcher.current_image
-    current_parent = image_batcher.current_layer.get_parent()
+    image = batcher.current_image
+    current_parent = batcher.current_layer.get_parent()
 
-    index = image.get_item_position(image_batcher.current_layer)
+    index = image.get_item_position(batcher.current_layer)
     if self._position == 'background':
       index += 1
 
@@ -103,15 +119,30 @@ class InsertOverlayAction(invoker_.CallableCommand):
 
     if self._insert_content == ContentType.FILE:
       inserted_layer = _insert_layers(
-        image, self._image_to_insert.get_layers(), current_parent, index)
+        image,
+        self._image_to_insert.get_layers(),
+        current_parent,
+        index,
+      )
     elif self._insert_content == ContentType.TEXT:
       inserted_layer = _insert_text_layer(
-        image_batcher,
+        batcher,
         image,
         self._text,
         self._text_font_family,
         self._text_font_size,
         self._text_font_color,
+        current_parent,
+        index,
+      )
+    elif self._insert_content == ContentType.LAYERS_WITH_COLOR_TAG:
+      if not self._processed_tagged_items:
+        raise exceptions.SkipCommand(
+          _('No layers with color tag: {}.').format(self._color_tag.value_nick))
+
+      inserted_layer = _insert_layers(
+        image,
+        [item.raw for item in self._processed_tagged_items],
         current_parent,
         index,
       )
@@ -122,7 +153,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
 
   def _assign_to_attributes_from_kwargs(self, kwargs):
     for name, value in kwargs.items():
-      # Ignore internal arguments not displayed to the user.
+      # Ignore arguments not displayed to the user.
       if hasattr(self, f'_{name}'):
         setattr(self, f'_{name}', value)
 
@@ -134,57 +165,10 @@ def _delete_images_on_cleanup(_batcher, images):
   images.clear()
 
 
-# TODO: Merge with InsertOverlayAction
-class InsertTaggedLayersAction(invoker_.CallableCommand):
-
-  # noinspection PyAttributeOutsideInit
-  def _initialize(
-        self,
-        layer_batcher,
-        color_tag,
-        position,
-        tagged_items,
-        *_args,
-        **_kwargs,
-  ):
-    if layer_batcher.is_preview:
-      processed_tagged_items = tagged_items
-    else:
-      processed_tagged_items = layer_batcher.item_tree.iter(with_folders=False, filtered=False)
-
-    self._tagged_items = [
-      item for item in processed_tagged_items
-      if (color_tag != Gimp.ColorTag.NONE
-          and item.raw.is_valid()
-          and item.raw.get_color_tag() == color_tag)
-    ]
-
-  def _process(
-        self,
-        layer_batcher,
-        color_tag,
-        position,
-        tagged_items,
-        *_args,
-        **_kwargs,
-  ):
-    if not self._tagged_items:
-      return
-
-    image = layer_batcher.current_image
-    current_parent = layer_batcher.current_layer.get_parent()
-
-    index = image.get_item_position(layer_batcher.current_layer)
-    if position == 'background':
-      index += 1
-
-    inserted_layer = _insert_layers(
-      image, [item.raw for item in self._tagged_items], current_parent, index)
-
-    return inserted_layer
-
-
 def _insert_layers(image, layers, parent, position):
+  if not layers:
+    return
+
   first_tagged_layer_position = position
   
   for i, layer in enumerate(layers):
@@ -503,38 +487,28 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
   ],
 }
 
-INSERT_OVERLAY_FOR_LAYERS_DICT = {
+INSERT_OVERLAY_FOR_LAYERS_DICT = utils.semi_deep_copy(INSERT_OVERLAY_FOR_IMAGES_DICT)
+INSERT_OVERLAY_FOR_LAYERS_DICT.update({
   'name': 'insert_overlay_for_layers',
-  'function': InsertTaggedLayersAction,
-  'display_name': _('Insert Overlay (Watermark)'),
-  'menu_path': _('Layers and Composition'),
-  'description': _(
-    'Inserts layers behind or in front of the current layer.'
-    '\n\nYou can apply subsequent actions on the inserted layer using'
-    ' "{}" or "{}".'
-  ).format(_('Layer Above (Foreground)'), _('Layer Below (Background)')),
-  'display_options_on_create': True,
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
-  'arguments': [
-    {
-      'type': 'enum',
-      'name': 'color_tag',
-      'enum_type': Gimp.ColorTag,
-      'excluded_values': [Gimp.ColorTag.NONE],
-      'display_name': _('Color tag'),
-      'default_value': Gimp.ColorTag.BLUE,
-    },
-    {
-      'type': 'choice',
-      'name': 'position',
-      'default_value': InsertionPositions.FOREGROUND,
-      'display_name': _('Position'),
-      'items': [
-        (InsertionPositions.FOREGROUND, _('Foreground')),
-        (InsertionPositions.BACKGROUND, _('Background')),
-      ],
-      'gui_type': 'radio_button_box',
-    },
+})
+INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'][0]['items'] = [
+  (ContentType.FILE, _('File')),
+  (ContentType.TEXT, _('Text')),
+  (ContentType.LAYERS_WITH_COLOR_TAG, _('Layers with color tag')),
+]
+INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'].insert(
+  3,
+  {
+    'type': 'enum',
+    'name': 'color_tag',
+    'enum_type': Gimp.ColorTag,
+    'excluded_values': [Gimp.ColorTag.NONE],
+    'display_name': _('Color tag'),
+    'default_value': Gimp.ColorTag.BLUE,
+  },
+)
+INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'].extend([
     {
       'type': 'tagged_items',
       'name': 'tagged_items',
@@ -548,5 +522,4 @@ INSERT_OVERLAY_FOR_LAYERS_DICT = {
       'default_value': '',
       'gui_type': None,
     },
-  ],
-}
+])
