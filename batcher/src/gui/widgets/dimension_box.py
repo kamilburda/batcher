@@ -69,14 +69,21 @@ class DimensionBox(Gtk.Box):
     self._init_gui()
 
   def get_value(self):
-    return {
+    value = {
       'pixel_value': self._current_pixel_value,
       'percent_value': self._current_percent_value,
       'other_value': self._current_other_value,
       'unit': self._unit_combo_box.get_active(),
-      'percent_object': self._percent_object_combo_box.get_active_id(),
-      'percent_property': self._current_percent_property,
     }
+
+    percent_object = self._percent_object_combo_box.get_active_id()
+    if percent_object is not None:
+      value['percent_object'] = percent_object
+
+    if self._current_percent_property is not None:
+      value['percent_property'] = self._current_percent_property
+
+    return value
 
   def set_value(self, data):
     if data.get('unit') is not None:
@@ -246,6 +253,10 @@ class DimensionBox(Gtk.Box):
 
   def _on_percent_property_combo_box_changed(self, _combo_box):
     percent_object = self._percent_object_combo_box.get_active_id()
+
+    if percent_object is None:
+      return
+
     placeholder_group = self._percent_placeholders_to_groups[percent_object]
 
     self._current_percent_property[placeholder_group] = (
@@ -254,7 +265,8 @@ class DimensionBox(Gtk.Box):
     self.emit('value-changed')
 
   def _show_hide_percent_object_box(self):
-    if self._unit_combo_box.get_active() == self._percent_unit:
+    if (self._unit_combo_box.get_active() == self._percent_unit
+        and len(self._percent_object_model) > 0):
       self._percent_object_box.show()
     else:
       self._percent_object_box.hide()
@@ -280,6 +292,9 @@ class DimensionBox(Gtk.Box):
   def _show_and_set_percent_property_based_on_percent_object(self):
     placeholder_group = self._show_hide_percent_property_combo_boxes()
 
+    if placeholder_group is None or self._current_percent_property is None:
+      return
+
     with GObject.signal_handler_block(
           self._combo_boxes_per_percent_placeholder_group[placeholder_group],
           self._property_combo_box_changed_handler_ids[placeholder_group]):
@@ -288,17 +303,27 @@ class DimensionBox(Gtk.Box):
 
   def _show_hide_percent_property_combo_boxes(self):
     percent_object = self._percent_object_combo_box.get_active_id()
-    percent_placeholder_group = self._percent_placeholders_to_groups[percent_object]
 
-    for key in self._percent_placeholder_attribute_map:
-      if key != percent_placeholder_group:
+    if percent_object is not None:
+      percent_placeholder_group = self._percent_placeholders_to_groups[percent_object]
+
+      for key in self._percent_placeholder_attribute_map:
+        if key != percent_placeholder_group:
+          self._combo_boxes_per_percent_placeholder_group[key].hide()
+
+      self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group].show()
+
+      return percent_placeholder_group
+    else:
+      for key in self._percent_placeholder_attribute_map:
         self._combo_boxes_per_percent_placeholder_group[key].hide()
 
-    self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group].show()
-
-    return percent_placeholder_group
+      return None
 
   def _set_percent_property_values(self):
+    if self._current_percent_property is None:
+      return
+
     for percent_placeholder_group in self._percent_placeholder_attribute_map:
       with GObject.signal_handler_block(
             self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group],

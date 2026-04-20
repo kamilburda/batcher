@@ -120,7 +120,7 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
     dimension_box = gui_widgets_.DimensionBox(
       default_pixel_value=setting.value['pixel_value'],
       default_percent_value=setting.value['percent_value'],
-      default_percent_property=setting.value['percent_property'],
+      default_percent_property=setting.value.get('percent_property'),
       default_other_value=setting.value['other_value'],
       min_value=setting.min_value,
       max_value=setting.max_value,
