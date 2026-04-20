@@ -11,6 +11,9 @@ Changes to actions and conditions:
 * Replaced `Merge Background` and `Merge Foreground` with a single action named `Merge Layer` that can be added by the user.
 * Renamed the automatically added `Not Background/Not Foreground` conditions to `Without Color Tag: <color tag>` given the related changes for clarity.
 
+Bug fixes:
+* Fixed some options in `Crop` and `Resize Canvas` not working for text layers.
+
 
 ## 1.2.5
 

@@ -360,7 +360,10 @@ def _do_resize(
   orig_object_width = object_to_resize.get_width()
   orig_object_height = object_to_resize.get_height()
 
-  object_to_resize.resize(width_pixels, height_pixels, offset_x_pixels, offset_y_pixels)
+  if isinstance(object_to_resize, Gimp.TextLayer):
+    object_to_resize.resize(width_pixels, height_pixels)
+  else:
+    object_to_resize.resize(width_pixels, height_pixels, offset_x_pixels, offset_y_pixels)
 
   if set_fill_color:
     _fill_with_color(

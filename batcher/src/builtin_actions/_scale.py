@@ -203,7 +203,10 @@ def _fill_with_padding(
     new_object_offset_x = offset_x
     new_object_offset_y = offset_y
 
-    gimp_object.resize(new_width_pixels, new_height_pixels, offset_x, offset_y)
+    if isinstance(gimp_object, Gimp.TextLayer):
+      gimp_object.resize(new_width_pixels, new_height_pixels)
+    else:
+      gimp_object.resize(new_width_pixels, new_height_pixels, offset_x, offset_y)
   else:
     drawable_with_padding_offsets = gimp_object.get_offsets()
 
