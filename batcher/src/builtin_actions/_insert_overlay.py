@@ -10,6 +10,7 @@ from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
+from src import commands
 from src import exceptions
 from src import invoker as invoker_
 from src import setting as setting_
@@ -69,6 +70,18 @@ class InsertOverlayAction(invoker_.CallableCommand):
     }
     self._text_font_color = Gegl.Color()
     self._text_font_color.set_rgba(0.0, 0.0, 0.0, 1.0)
+    self._size = {
+      'pixel_value': 100.0,
+      'percent_value': 100.0,
+      'other_value': 1.0,
+      'unit': Gimp.Unit.percent(),
+    }
+    self._opacity = 100.0
+    self._offsets = {
+      'x': 0.0,
+      'y': 0.0,
+    }
+    self._num_tiles = 1
     self._position = InsertionPositions.BACKGROUND
     self._tagged_items = []
 
@@ -120,7 +133,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
     current_parent = batcher.current_layer.get_parent()
 
     index = image.get_item_position(batcher.current_layer)
-    if self._position == 'background':
+    if self._position == InsertionPositions.BACKGROUND:
       index += 1
 
     inserted_layer = None
@@ -156,7 +169,12 @@ class InsertOverlayAction(invoker_.CallableCommand):
         index,
       )
 
-    # TODO: Allow adjusting scale, anchor, opacity, rotation, tiling, ...
+    if inserted_layer is not None:
+      if self._insert_content != ContentType.TEXT:
+        self._scale_to_fit(batcher, inserted_layer)
+      self._set_opacity(inserted_layer)
+      self._set_offsets(inserted_layer)
+      self._tile(batcher, inserted_layer)
 
     return inserted_layer
 
@@ -165,6 +183,84 @@ class InsertOverlayAction(invoker_.CallableCommand):
       # Ignore arguments not displayed to the user.
       if hasattr(self, f'_{name}'):
         setattr(self, f'_{name}', value)
+
+  def _scale_to_fit(self, batcher, inserted_layer):
+    if not (self._size['unit'] == Gimp.Unit.percent() and self._size['percent_value'] == 100.0):
+      size = dict(self._size)
+      size['percent_object'] = f'{self._position}_layer'
+
+      size['percent_property'] = {f'{self._position}_layer': 'width'}
+      new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
+
+      size['percent_property'] = {f'{self._position}_layer': 'height'}
+      new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
+
+      orig_width_pixels = inserted_layer.get_width()
+      if orig_width_pixels == 0:
+        orig_width_pixels = 1
+
+      orig_height_pixels = inserted_layer.get_height()
+      if orig_height_pixels == 0:
+        orig_height_pixels = 1
+
+      inserted_layer.scale(
+        *self._get_scale_fit_values(
+          orig_width_pixels,
+          orig_height_pixels,
+          new_width_pixels,
+          new_height_pixels,
+        ),
+      )
+
+  @staticmethod
+  def _get_scale_fit_values(
+        orig_width_pixels,
+        orig_height_pixels,
+        new_width_pixels,
+        new_height_pixels,
+  ):
+    processed_new_width_pixels = new_width_pixels
+    processed_new_height_pixels = round(
+      orig_height_pixels * (new_width_pixels / orig_width_pixels))
+
+    if processed_new_height_pixels > new_height_pixels:
+      processed_new_height_pixels = new_height_pixels
+      processed_new_width_pixels = round(
+        orig_width_pixels * (new_height_pixels / orig_height_pixels))
+
+    if processed_new_width_pixels == 0:
+      processed_new_width_pixels = 1
+
+    if processed_new_height_pixels == 0:
+      processed_new_height_pixels = 1
+
+    return processed_new_width_pixels, processed_new_height_pixels
+
+  def _set_opacity(self, inserted_layer):
+    if self._opacity < 100.0:
+      inserted_layer.set_opacity(self._opacity)
+
+    orig_offsets = inserted_layer.get_offsets()
+    inserted_layer.set_offsets(
+      orig_offsets.offset_x + self._offsets['x'],
+      orig_offsets.offset_y + self._offsets['y'],
+    )
+
+  def _set_offsets(self, inserted_layer):
+    orig_offsets = inserted_layer.get_offsets()
+    inserted_layer.set_offsets(
+      orig_offsets.offset_x + self._offsets['x'],
+      orig_offsets.offset_y + self._offsets['y'],
+    )
+
+  def _tile(self, batcher, inserted_layer):
+    if self._num_tiles > 1:
+      inserted_layer.resize_to_image_size()
+      pdb.plug_in_small_tiles(
+        image=batcher.current_image,
+        drawables=[inserted_layer],
+        num_tiles=self._num_tiles,
+      )
 
 
 def _delete_images_on_cleanup(_batcher, images):
@@ -359,6 +455,8 @@ def _set_visible_for_insert_overlay_arguments(
 
   if 'color_tag' in arguments:
     arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
+
+  arguments['size'].gui.set_visible(is_content_type_file or is_content_type_layers_for_color_tag)
 
 
 def _set_display_name_for_insert_overlay(
@@ -573,6 +671,54 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'name': 'text_font_color',
       'default_value': [0.0, 0.0, 0.0, 1.0],
       'display_name': _('Font color'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'size',
+      'default_value': {
+        'pixel_value': 100.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': Gimp.Unit.percent(),
+      },
+      'min_value': 0.0,
+      'percent_placeholder_names': [],
+      'display_name': _('Size'),
+      'description': _(
+        'Aspect ratio is preserved.'
+        ' For absolute units, the inserted layer is scaled to fit'
+        ' within the specified size (maximum width or height).'
+      ),
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
+    {
+      'type': 'coordinates',
+      'name': 'offsets',
+      'default_value': {
+        'x': 0.0,
+        'y': 0.0,
+      },
+      'min_x': 0.0,
+      'min_y': 0.0,
+      'display_name': _('Offsets (X and Y)'),
+      'tags': [commands.MORE_OPTIONS_TAG],
+    },
+    {
+      'type': 'int',
+      'name': 'num_tiles',
+      'default_value': 1,
+      'display_name': _('Number of tiles'),
+      'description': _('Set this to a value greater than 1 to enable tiling.'),
+      'min_value': 1,
+      'max_value': 6,
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'choice',
