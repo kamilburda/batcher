@@ -901,4 +901,4 @@ def _connect_events_for_added_built_in_commands(settings):
     'after-add-command', builtin_actions.on_after_add_merge_layer_action)
 
   settings['main/conditions'].connect_event(
-    'after-add-command', builtin_conditions.on_after_add_not_overlay_condition)
+    'after-add-command', builtin_conditions.on_after_add_without_color_tag_condition)

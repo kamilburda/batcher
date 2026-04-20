@@ -7,6 +7,8 @@ gi.require_version('Gegl', '0.4')
 from gi.repository import Gegl
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
 from src import exceptions
 from src import invoker as invoker_
@@ -20,6 +22,8 @@ from . import _utils as builtin_actions_utils
 
 
 __all__ = [
+  'ContentType',
+  'InsertionPositions',
   'InsertOverlayAction',
   'on_after_add_insert_overlay_for_layers_action',
   'on_after_add_insert_overlay_action',
@@ -99,6 +103,10 @@ class InsertOverlayAction(invoker_.CallableCommand):
             and item.raw.is_valid()
             and item.raw.get_color_tag() == self._color_tag)
       ]
+
+      # This is used to obtain the localized display names of color tags.
+      self._color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
+        GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
     else:
       self._processed_tagged_items = []
 
@@ -138,7 +146,8 @@ class InsertOverlayAction(invoker_.CallableCommand):
     elif self._insert_content == ContentType.LAYERS_WITH_COLOR_TAG:
       if not self._processed_tagged_items:
         raise exceptions.SkipCommand(
-          _('No layers with color tag: {}.').format(self._color_tag.value_nick))
+          _('No layers with color tag: {}.').format(
+            _get_color_tag_name(self._color_tag, self._color_tag_tree_model)))
 
       inserted_layer = _insert_layers(
         image,
@@ -259,7 +268,7 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
   tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, action)
 
 
-def on_after_add_insert_overlay_action(actions, action, _orig_action_dict, conditions):
+def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, conditions):
   if action['orig_name'].value.startswith('insert_overlay_for_'):
     _set_visible_for_insert_overlay_arguments(
       action['arguments/insert_content'],
@@ -272,30 +281,63 @@ def on_after_add_insert_overlay_action(actions, action, _orig_action_dict, condi
       action['arguments'],
     )
 
+    color_tag_setting = (
+      action['arguments/color_tag'] if 'color_tag' in action['arguments'] else None)
+
+    color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
+      GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
+
     _set_display_name_for_insert_overlay(
+      action['arguments/insert_content'],
       action['arguments/position'],
+      color_tag_setting,
+      color_tag_tree_model,
+      action['display_name'],
+    )
+
+    action['arguments/insert_content'].connect_event(
+      'value-changed',
+      _set_display_name_for_insert_overlay,
+      action['arguments/position'],
+      color_tag_setting,
+      color_tag_tree_model,
       action['display_name'],
     )
 
     action['arguments/position'].connect_event(
       'value-changed',
-      _set_display_name_for_insert_overlay,
+      _set_display_name_for_insert_overlay_via_position,
+      action['arguments/insert_content'],
+      color_tag_setting,
+      color_tag_tree_model,
       action['display_name'],
     )
+
+    if color_tag_setting is not None:
+      color_tag_setting.connect_event(
+        'value-changed',
+        _set_display_name_for_insert_overlay_via_color_tag,
+        action['arguments/insert_content'],
+        action['arguments/position'],
+        color_tag_tree_model,
+        action['display_name'],
+      )
 
     if 'condition_name' in action['arguments']:
       action['arguments/condition_name'].gui.set_visible(False)
 
-      _connect_changes_to_linked_not_overlay_condition(
+      _connect_changes_to_linked_without_color_tag_condition(
         action['arguments/condition_name'],
         conditions,
         action,
+        color_tag_tree_model,
       )
       action['arguments/condition_name'].connect_event(
         'value-changed',
-        _connect_changes_to_linked_not_overlay_condition,
+        _connect_changes_to_linked_without_color_tag_condition,
         conditions,
         action,
+        color_tag_tree_model,
       )
 
 
@@ -305,6 +347,8 @@ def _set_visible_for_insert_overlay_arguments(
 ):
   is_content_type_file = insert_content_setting.value == ContentType.FILE
   is_content_type_text = insert_content_setting.value == ContentType.TEXT
+  is_content_type_layers_for_color_tag = (
+    insert_content_setting.value == ContentType.LAYERS_WITH_COLOR_TAG)
 
   arguments['image_file'].gui.set_visible(is_content_type_file)
 
@@ -313,81 +357,134 @@ def _set_visible_for_insert_overlay_arguments(
   arguments['text_font_size'].gui.set_visible(is_content_type_text)
   arguments['text_font_color'].gui.set_visible(is_content_type_text)
 
+  if 'color_tag' in arguments:
+    arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
+
 
 def _set_display_name_for_insert_overlay(
+      insert_overlay_insert_content_setting,
       insert_overlay_position_setting,
+      color_tag_setting,
+      color_tag_tree_model,
       display_name_setting,
 ):
-  if insert_overlay_position_setting.value == InsertionPositions.BACKGROUND:
-    display_name_setting.set_value(_('Insert Background'))
-  elif insert_overlay_position_setting.value == InsertionPositions.FOREGROUND:
-    display_name_setting.set_value(_('Insert Foreground'))
-  else:
-    display_name_setting.set_value(_('Insert Overlay (Watermark)'))
+  content = insert_overlay_insert_content_setting.value
+  position = insert_overlay_position_setting.value
+  color_tag_name = (
+    _get_color_tag_name(color_tag_setting.value, color_tag_tree_model)
+    if color_tag_setting is not None else None
+  )
+
+  display_names = {
+    (ContentType.FILE, InsertionPositions.BACKGROUND): _('Insert Image as Background'),
+    (ContentType.FILE, InsertionPositions.FOREGROUND): _('Insert Image as Foreground'),
+    (ContentType.TEXT, InsertionPositions.BACKGROUND): _('Insert Text as Background'),
+    (ContentType.TEXT, InsertionPositions.FOREGROUND): _('Insert Text as Foreground'),
+    (ContentType.LAYERS_WITH_COLOR_TAG, InsertionPositions.BACKGROUND): _(
+      'Insert Layers ({}) as Background').format(color_tag_name),
+    (ContentType.LAYERS_WITH_COLOR_TAG, InsertionPositions.FOREGROUND): _(
+      'Insert Layers ({}) as Foreground').format(color_tag_name),
+  }
+
+  display_name = display_names.get((content, position), _('Insert Overlay (Watermark)'))
+  display_name_setting.set_value(display_name)
 
 
-def _connect_changes_to_linked_not_overlay_condition(
+def _set_display_name_for_insert_overlay_via_position(
+      insert_overlay_position_setting,
+      insert_overlay_insert_content_setting,
+      color_tag_setting,
+      color_tag_tree_model,
+      display_name_setting,
+):
+  _set_display_name_for_insert_overlay(
+    insert_overlay_insert_content_setting,
+    insert_overlay_position_setting,
+    color_tag_setting,
+    color_tag_tree_model,
+    display_name_setting,
+  )
+
+
+def _set_display_name_for_insert_overlay_via_color_tag(
+      color_tag_setting,
+      insert_overlay_insert_content_setting,
+      insert_overlay_position_setting,
+      color_tag_tree_model,
+      display_name_setting,
+):
+  _set_display_name_for_insert_overlay(
+    insert_overlay_insert_content_setting,
+    insert_overlay_position_setting,
+    color_tag_setting,
+    color_tag_tree_model,
+    display_name_setting,
+  )
+
+
+def _connect_changes_to_linked_without_color_tag_condition(
       condition_name_setting,
       conditions,
       insert_overlay_action,
+      color_tag_tree_model,
 ):
   if condition_name_setting.value not in conditions:
     return
 
-  not_overlay_condition = conditions[condition_name_setting.value]
+  without_color_tag_condition = conditions[condition_name_setting.value]
 
   # We expect the `condition_name` setting to be changed only once (when
   # the condition is added interactively). If it changed multiple times,
   # we would have to disconnect previous 'value-changed' events.
 
-  _set_display_name_for_not_overlay_condition(
-    insert_overlay_action['arguments/position'],
-    not_overlay_condition['display_name'],
-  )
-  insert_overlay_action['arguments/position'].connect_event(
-    'value-changed',
-    _set_display_name_for_not_overlay_condition,
-    not_overlay_condition['display_name'],
-  )
+  if 'color_tag' in insert_overlay_action['arguments']:
+    _set_display_name_for_without_color_tag_condition(
+      insert_overlay_action['arguments/color_tag'],
+      without_color_tag_condition['display_name'],
+      color_tag_tree_model,
+    )
+    insert_overlay_action['arguments/color_tag'].connect_event(
+      'value-changed',
+      _set_display_name_for_without_color_tag_condition,
+      without_color_tag_condition['display_name'],
+      color_tag_tree_model,
+    )
 
   _set_color_tag_based_on_insert_overlay_action(
     insert_overlay_action['arguments/color_tag'],
-    not_overlay_condition['arguments/color_tag'],
+    without_color_tag_condition['arguments/color_tag'],
   )
   insert_overlay_action['arguments/color_tag'].connect_event(
     'value-changed',
     _set_color_tag_based_on_insert_overlay_action,
-    not_overlay_condition['arguments/color_tag'],
+    without_color_tag_condition['arguments/color_tag'],
   )
 
   insert_overlay_action['enabled'].connect_event(
     'value-changed',
     _set_enabled_and_sensitive_for_linked_command,
-    not_overlay_condition['enabled'],
-    not_overlay_condition['arguments/last_enabled_value'],
+    without_color_tag_condition['enabled'],
+    without_color_tag_condition['arguments/last_enabled_value'],
   )
 
 
-def _set_display_name_for_not_overlay_condition(
-      insert_overlay_position_setting,
+def _set_display_name_for_without_color_tag_condition(
+      insert_overlay_color_tag_setting,
       display_name_setting,
+      color_tag_tree_model,
 ):
-  if insert_overlay_position_setting.value == InsertionPositions.BACKGROUND:
-    # FOR TRANSLATORS: Think of "Only items that are not background" when translating this
-    display_name_setting.set_value(_('Not Background'))
-  elif insert_overlay_position_setting.value == InsertionPositions.FOREGROUND:
-    # FOR TRANSLATORS: Think of "Only items that are not foreground" when translating this
-    display_name_setting.set_value(_('Not Foreground'))
-  else:
-    # FOR TRANSLATORS: Think of "Only items that are not overlay (watermark)" when translating this
-    display_name_setting.set_value(_('Not Overlay (Watermark)'))
+  color_tag = insert_overlay_color_tag_setting.value
+
+  # FOR TRANSLATORS: Think of "Only items without color tag: <color tag>" when translating this
+  display_name_setting.set_value(
+    _('Without Color Tag: {}').format(_get_color_tag_name(color_tag, color_tag_tree_model)))
 
 
 def _set_color_tag_based_on_insert_overlay_action(
       color_tag_setting_from_insert_overlay_action,
-      color_tag_setting_from_not_overlay_condition,
+      color_tag_setting_from_without_color_tag_condition,
 ):
-  color_tag_setting_from_not_overlay_condition.set_value(
+  color_tag_setting_from_without_color_tag_condition.set_value(
     color_tag_setting_from_insert_overlay_action.value)
 
 
@@ -403,6 +500,10 @@ def _set_enabled_and_sensitive_for_linked_command(
     linked_command_enabled_setting.set_value(linked_command_last_enabled_value_setting.value)
 
   linked_command_enabled_setting.gui.set_sensitive(insert_enabled_setting.value)
+
+
+def _get_color_tag_name(color_tag, color_tag_tree_model):
+  return color_tag_tree_model[int(color_tag)][1]
 
 
 INSERT_OVERLAY_FOR_IMAGES_DICT = {

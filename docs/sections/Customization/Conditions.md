@@ -57,6 +57,14 @@ For example, by adding a blue tag, all layers except the ones containing the blu
 If a group layer has a color tag, it will normally not be excluded.
 To also exclude group layers with color tags, click on `More options` and check `Also apply to parent folders`.
 
+#### Without Color Tag
+
+*Only available for: Export Layers, Edit Layers*
+
+*Only available if `Insert Overlay (Watermark)` is added*
+
+Processes only layers not having the color tag selected in the `Insert Overlay (Watermark)` action.
+
 
 ### Naming
 

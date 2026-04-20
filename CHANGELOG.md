@@ -9,6 +9,7 @@ New features:
 Changes to actions and conditions:
 * `Merge Background` and `Merge Foreground` are no longer added automatically when `Insert Overlay (Watermark)` is added.
 * Replaced `Merge Background` and `Merge Foreground` with a single action named `Merge Layer` that can be added by the user.
+* Renamed the automatically added `Not Background/Not Foreground` conditions to `Without Color Tag: <color tag>` given the related changes for clarity.
 
 
 ## 1.2.5

@@ -157,8 +157,8 @@ class MatchModes:
   )
 
 
-def on_after_add_not_overlay_condition(_conditions, condition, _orig_condition_dict):
-  if condition['orig_name'].value == 'not_overlay':
+def on_after_add_without_color_tag_condition(_conditions, condition, _orig_condition_dict):
+  if condition['orig_name'].value == 'without_color_tag':
     condition['arguments/color_tag'].gui.set_visible(False)
     condition['arguments/last_enabled_value'].gui.set_visible(False)
 
@@ -241,11 +241,11 @@ _BUILTIN_CONDITIONS_LIST = [
     ],
   },
   {
-    'name': 'not_overlay',
+    'name': 'without_color_tag',
     'type': 'condition',
     'function': has_no_color_tag,
-    # FOR TRANSLATORS: Think of "Only items that are not overlay (watermark)" when translating this
-    'display_name': _('Not Overlay (Watermark)'),
+    # FOR TRANSLATORS: Think of "Only items without a color tag" when translating this
+    'display_name': _('Without Color Tag'),
     'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_overlay_for_layers`.
     'additional_tags': [],

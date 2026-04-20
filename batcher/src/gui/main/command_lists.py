@@ -316,14 +316,48 @@ def _set_up_existing_save_actions(action_list: command_list_.CommandList):
 def _handle_insert_overlay_action_item_added(action_list, item, condition_list):
   action_list.reorder_item(item, 0)
 
-  condition_item = _add_not_overlay_condition(item, condition_list)
+  if item.command['orig_name'].value == 'insert_overlay_for_layers':
+    if (item.command['arguments/insert_content'].value
+        == builtin_actions.ContentType.LAYERS_WITH_COLOR_TAG):
+      _add_and_set_up_without_color_tag_condition(item, action_list, condition_list)
 
-  _set_up_not_overlay_condition(condition_item)
+    item.command['arguments/insert_content'].connect_event(
+      'value-changed',
+      _add_or_remove_without_color_tag_condition_when_insert_content_changes,
+      item,
+      action_list,
+      condition_list,
+    )
+
+
+def _add_or_remove_without_color_tag_condition_when_insert_content_changes(
+      insert_content_setting,
+      item,
+      action_list,
+      condition_list,
+):
+  if insert_content_setting.value == builtin_actions.ContentType.LAYERS_WITH_COLOR_TAG:
+    _add_and_set_up_without_color_tag_condition(item, action_list, condition_list)
+  else:
+    condition_name = item.command['arguments/condition_name'].value
+    if condition_name in condition_list.commands:
+      condition_item = next(
+        iter(item_ for item_ in condition_list.items if
+             item_.command.name == condition_name),
+        None)
+
+      if condition_item is not None and condition_item in condition_list.items:
+        condition_list.remove_item(condition_item)
+        item.command['arguments/condition_name'].set_value('')
+
+
+def _add_and_set_up_without_color_tag_condition(item, action_list, condition_list):
+  condition_item = _add_without_color_tag_condition(item, condition_list)
 
   if condition_item is not None:
+    _set_up_without_color_tag_condition(condition_item)
     _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
 
-  if condition_item is not None:
     item.command['arguments/condition_name'].set_value(condition_item.command.name)
 
 
@@ -332,21 +366,28 @@ def _set_up_existing_insert_overlay_and_related_commands(
       condition_list: command_list_.CommandList,
 ):
   for item in action_list.items:
-    if item.command['orig_name'].value.startswith('insert_overlay_for_'):
-      condition_name = (
-        item.command['arguments/condition_name'].value
-        if 'condition_name' in item.command['arguments'] else None)
-      if condition_name is not None and condition_name in condition_list.commands:
-        condition_item = next(
-          iter(item_ for item_ in condition_list.items if item_.command.name == condition_name),
-          None)
-      else:
-        condition_item = None
+    if item.command['orig_name'].value != 'insert_overlay_for_layers':
+      continue
 
-      _set_up_not_overlay_condition(condition_item)
+    condition_name = item.command['arguments/condition_name'].value
+    if condition_name in condition_list.commands:
+      condition_item = next(
+        iter(item_ for item_ in condition_list.items if item_.command.name == condition_name),
+        None)
+    else:
+      condition_item = None
 
-      if condition_item is not None:
-        _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
+    if condition_item is not None:
+      _set_up_without_color_tag_condition(condition_item)
+      _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
+
+    item.command['arguments/insert_content'].connect_event(
+      'value-changed',
+      _add_or_remove_without_color_tag_condition_when_insert_content_changes,
+      item,
+      action_list,
+      condition_list,
+    )
 
 
 def _set_up_insert_overlay_action(
@@ -364,18 +405,21 @@ def _set_up_insert_overlay_action(
   )
 
 
-def _add_not_overlay_condition(item, condition_list):
+def _add_without_color_tag_condition(item, condition_list):
   if item.command['orig_name'].value != 'insert_overlay_for_layers':
     return None
 
-  condition_item = condition_list.add_item(builtin_conditions.BUILTIN_CONDITIONS['not_overlay'])
+  if item.command['arguments/condition_name'].value:
+    return None
+
+  condition_item = condition_list.add_item(
+    builtin_conditions.BUILTIN_CONDITIONS['without_color_tag'])
 
   return condition_item
 
 
-def _set_up_not_overlay_condition(condition_item):
-  if condition_item is not None:
-    _set_buttons_for_command_item_sensitive(condition_item, False)
+def _set_up_without_color_tag_condition(condition_item):
+  _set_buttons_for_command_item_sensitive(condition_item, False)
 
 
 def _on_insert_overlay_action_removed(
@@ -385,9 +429,10 @@ def _on_insert_overlay_action_removed(
       condition_list,
       condition_item,
 ):
-  if removed_item == insert_overlay_item:
-    if condition_item is not None and condition_item in condition_list.items:
-      condition_list.remove_item(condition_item)
+  if (removed_item == insert_overlay_item
+      and condition_item is not None
+      and condition_item in condition_list.items):
+    condition_list.remove_item(condition_item)
 
 
 def _handle_crop_action_item_added(item):
