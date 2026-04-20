@@ -298,10 +298,12 @@ class SettingEventsMixin:
         `connect_event()` (if any). The same keyword arguments in
         `connect_event()` override keyword arguments in ``**additional_kwargs``.
     """
-    event_handlers = itertools.chain(
+    # Prevent potential crash if events are dynamically added/removed
+    # during iteration of these handlers.
+    event_handlers = list(itertools.chain(
       self._global_event_handlers[event_type].values(),
       self._event_handlers[event_type].values(),
-    )
+    ))
 
     for (event_handler, args, kwargs, enabled) in event_handlers:
       if enabled:
