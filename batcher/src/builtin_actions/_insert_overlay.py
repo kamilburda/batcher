@@ -240,12 +240,6 @@ class InsertOverlayAction(invoker_.CallableCommand):
     if self._opacity < 100.0:
       inserted_layer.set_opacity(self._opacity)
 
-    orig_offsets = inserted_layer.get_offsets()
-    inserted_layer.set_offsets(
-      orig_offsets.offset_x + self._offsets['x'],
-      orig_offsets.offset_y + self._offsets['y'],
-    )
-
   def _set_offsets(self, inserted_layer):
     orig_offsets = inserted_layer.get_offsets()
     inserted_layer.set_offsets(
