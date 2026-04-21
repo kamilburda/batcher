@@ -1,7 +1,5 @@
 """Built-in "Rotate" action."""
 
-import math
-
 import gi
 
 gi.require_version('Gimp', '3.0')
@@ -16,9 +14,6 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'Angles',
   'AngleUnits',
-  'UNIT_DEGREE',
-  'UNIT_RADIAN',
-  'UNITS',
   'rotate',
   'on_after_add_rotate_action',
 ]
@@ -46,35 +41,6 @@ class AngleUnits:
     'degree',
     'radian'
   )
-
-
-class _AngleUnit:
-
-  def __init__(self, name, display_name, scaling_factor):
-    self._name = name
-    self._display_name = display_name
-    self._scaling_factor = scaling_factor
-
-  @property
-  def name(self):
-    return self._name
-
-  @property
-  def display_name(self):
-    return self._display_name
-
-  @property
-  def scaling_factor(self):
-    return self._scaling_factor
-
-
-UNIT_DEGREE = _AngleUnit('degree', _('degrees'), 180 / math.pi)
-UNIT_RADIAN = _AngleUnit('radian', _('radians'), 1.0)
-
-UNITS = {
-  UNIT_DEGREE.name: UNIT_DEGREE,
-  UNIT_RADIAN.name: UNIT_RADIAN,
-}
 
 
 def rotate(
@@ -117,7 +83,7 @@ def rotate(
 
       for layer in object_to_rotate.get_layers():
         layer.transform_rotate(
-          _angle_to_radians(custom_angle),
+          builtin_actions_utils.angle_to_radians(custom_angle),
           False,
           image_center_x,
           image_center_y,
@@ -146,22 +112,13 @@ def rotate(
       )
     elif angle == Angles.CUSTOM:
       object_to_rotate.transform_rotate(
-        _angle_to_radians(custom_angle),
+        builtin_actions_utils.angle_to_radians(custom_angle),
         rotate_around_center,
         center_x_pixels,
         center_y_pixels,
       )
 
   Gimp.context_pop()
-
-
-def _angle_to_radians(angle):
-  scaling_factor = UNITS[angle['unit']].scaling_factor
-
-  if scaling_factor != 0.0:
-    return angle['value'] / scaling_factor
-  else:
-    return angle['value']
 
 
 def on_after_add_rotate_action(_actions, action, _orig_action_dict):

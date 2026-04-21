@@ -77,6 +77,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'unit': Gimp.Unit.percent(),
     }
     self._opacity = 100.0
+    self._rotation_angle = 0.0
     self._offsets = {
       'x': 0.0,
       'y': 0.0,
@@ -171,6 +172,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
 
     if inserted_layer is not None:
       self._scale_to_fit(batcher, inserted_layer)
+      self._rotate(inserted_layer)
       self._set_opacity(inserted_layer)
       self._set_offsets(inserted_layer)
       self._tile(batcher, inserted_layer)
@@ -213,6 +215,29 @@ class InsertOverlayAction(invoker_.CallableCommand):
         new_height_pixels,
       ),
     )
+
+  def _rotate(self, inserted_layer):
+    if self._rotation_angle == 0.0:
+      return
+
+    Gimp.context_push()
+    Gimp.context_set_transform_resize(Gimp.TransformResize.ADJUST)
+    Gimp.context_set_interpolation(Gimp.InterpolationType.CUBIC)
+    Gimp.context_set_transform_direction(Gimp.TransformDirection.FORWARD)
+
+    angle = {
+      'unit': builtin_actions_utils.UNIT_DEGREE.name,
+      'value': self._rotation_angle,
+    }
+
+    inserted_layer.transform_rotate(
+      builtin_actions_utils.angle_to_radians(angle),
+      True,
+      0.0,
+      0.0,
+    )
+
+    Gimp.context_pop()
 
   @staticmethod
   def _get_scale_fit_values(
@@ -693,6 +718,15 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'min_value': 0.0,
       'max_value': 100.0,
       'display_name': _('Opacity'),
+    },
+    {
+      'type': 'double',
+      'name': 'rotation_angle',
+      'default_value': 0.0,
+      'min_value': 0.0,
+      'max_value': 360.0,
+      'display_name': _('Rotation angle (degrees)'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'coordinates',

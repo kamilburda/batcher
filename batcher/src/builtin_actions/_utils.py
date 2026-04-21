@@ -2,6 +2,7 @@
 
 from typing import Union
 import collections
+import math
 import os
 
 import gi
@@ -19,12 +20,16 @@ from src.pypdb import pdb
 
 __all__ = [
   'EXPORT_NAME_ITEM_STATE',
+  'UNIT_DEGREE',
+  'UNIT_RADIAN',
+  'UNITS',
   'AnchorPoints',
   'Positions',
   'get_item_export_name',
   'set_item_export_name',
   'get_item_filepath',
   'unit_to_pixels',
+  'angle_to_radians',
   'add_color_layer',
   'get_best_matching_layer_from_image',
 ]
@@ -69,6 +74,35 @@ class Positions:
     'end',
     'custom',
   )
+
+
+class _AngleUnit:
+
+  def __init__(self, name, display_name, scaling_factor):
+    self._name = name
+    self._display_name = display_name
+    self._scaling_factor = scaling_factor
+
+  @property
+  def name(self):
+    return self._name
+
+  @property
+  def display_name(self):
+    return self._display_name
+
+  @property
+  def scaling_factor(self):
+    return self._scaling_factor
+
+
+UNIT_DEGREE = _AngleUnit('degree', _('degrees'), 180 / math.pi)
+UNIT_RADIAN = _AngleUnit('radian', _('radians'), 1.0)
+
+UNITS = {
+  UNIT_DEGREE.name: UNIT_DEGREE,
+  UNIT_RADIAN.name: UNIT_RADIAN,
+}
 
 
 def get_item_export_name(item) -> str:
@@ -176,6 +210,15 @@ def _get_percent_property_value(percent_property, percent_object):
       return percent_property[key]
 
   return None
+
+
+def angle_to_radians(angle):
+  scaling_factor = UNITS[angle['unit']].scaling_factor
+
+  if scaling_factor != 0.0:
+    return angle['value'] / scaling_factor
+  else:
+    return angle['value']
 
 
 def add_color_layer(
