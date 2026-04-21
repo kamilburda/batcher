@@ -170,8 +170,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       )
 
     if inserted_layer is not None:
-      if self._insert_content != ContentType.TEXT:
-        self._scale_to_fit(batcher, inserted_layer)
+      self._scale_to_fit(batcher, inserted_layer)
       self._set_opacity(inserted_layer)
       self._set_offsets(inserted_layer)
       self._tile(batcher, inserted_layer)
@@ -185,32 +184,35 @@ class InsertOverlayAction(invoker_.CallableCommand):
         setattr(self, f'_{name}', value)
 
   def _scale_to_fit(self, batcher, inserted_layer):
-    if not (self._size['unit'] == Gimp.Unit.percent() and self._size['percent_value'] == 100.0):
-      size = dict(self._size)
-      size['percent_object'] = f'{self._position}_layer'
+    if (self._insert_content == ContentType.TEXT
+        or (self._size['percent_value'] == 100.0 and self._size['unit'] == Gimp.Unit.percent())):
+      return
 
-      size['percent_property'] = {f'{self._position}_layer': 'width'}
-      new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
+    size = dict(self._size)
+    size['percent_object'] = f'{self._position}_layer'
 
-      size['percent_property'] = {f'{self._position}_layer': 'height'}
-      new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
+    size['percent_property'] = {f'{self._position}_layer': 'width'}
+    new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
 
-      orig_width_pixels = inserted_layer.get_width()
-      if orig_width_pixels == 0:
-        orig_width_pixels = 1
+    size['percent_property'] = {f'{self._position}_layer': 'height'}
+    new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
 
-      orig_height_pixels = inserted_layer.get_height()
-      if orig_height_pixels == 0:
-        orig_height_pixels = 1
+    orig_width_pixels = inserted_layer.get_width()
+    if orig_width_pixels == 0:
+      orig_width_pixels = 1
 
-      inserted_layer.scale(
-        *self._get_scale_fit_values(
-          orig_width_pixels,
-          orig_height_pixels,
-          new_width_pixels,
-          new_height_pixels,
-        ),
-      )
+    orig_height_pixels = inserted_layer.get_height()
+    if orig_height_pixels == 0:
+      orig_height_pixels = 1
+
+    inserted_layer.scale(
+      *self._get_scale_fit_values(
+        orig_width_pixels,
+        orig_height_pixels,
+        new_width_pixels,
+        new_height_pixels,
+      ),
+    )
 
   @staticmethod
   def _get_scale_fit_values(
