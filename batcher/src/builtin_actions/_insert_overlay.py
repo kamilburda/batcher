@@ -836,8 +836,6 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'x': 0.0,
         'y': 0.0,
       },
-      'min_x': 0.0,
-      'min_y': 0.0,
       'display_name': _('Offsets (X and Y)'),
       'tags': [commands.MORE_OPTIONS_TAG],
     },
