@@ -76,6 +76,8 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'other_value': 1.0,
       'unit': Gimp.Unit.percent(),
     }
+    self._adjust_placement = True
+    self._placement = builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT
     self._opacity = 100.0
     self._rotation_angle = 0.0
     self._offsets = {
@@ -172,8 +174,9 @@ class InsertOverlayAction(invoker_.CallableCommand):
 
     if inserted_layer is not None:
       self._scale_to_fit(batcher, inserted_layer)
-      self._rotate(inserted_layer)
       self._set_opacity(inserted_layer)
+      self._rotate(inserted_layer)
+      self._set_placement(batcher, inserted_layer)
       self._set_offsets(inserted_layer)
       self._tile(batcher, inserted_layer)
 
@@ -215,6 +218,70 @@ class InsertOverlayAction(invoker_.CallableCommand):
         new_height_pixels,
       ),
     )
+
+  def _set_placement(self, batcher, inserted_layer):
+    if self._insert_content == ContentType.LAYERS_WITH_COLOR_TAG and not self._adjust_placement:
+      return
+
+    image_width = batcher.current_image.get_width()
+    image_height = batcher.current_image.get_height()
+
+    width_pixels = inserted_layer.get_width()
+    if width_pixels == 0:
+      width_pixels = 1
+
+    height_pixels = inserted_layer.get_height()
+    if height_pixels == 0:
+      height_pixels = 1
+    
+    if self._placement == builtin_actions_utils.AnchorPoints.TOP_LEFT:
+      position = [0, 0]
+    elif self._placement == builtin_actions_utils.AnchorPoints.TOP:
+      position = [
+        round((image_width - width_pixels) / 2),
+        0,
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.TOP_RIGHT:
+      position = [
+        image_width - width_pixels,
+        0,
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.LEFT:
+      position = [
+        0,
+        round((image_height - height_pixels) / 2),
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.CENTER:
+      position = [
+        round((image_width - width_pixels) / 2),
+        round((image_height - height_pixels) / 2),
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.RIGHT:
+      position = [
+        image_width - width_pixels,
+        round((image_height - height_pixels) / 2),
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.BOTTOM_LEFT:
+      position = [
+        0,
+        image_height - height_pixels,
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.BOTTOM:
+      position = [
+        round((image_width - width_pixels) / 2),
+        image_height - height_pixels,
+      ]
+    elif self._placement == builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT:
+      position = [
+        image_width - width_pixels,
+        image_height - height_pixels,
+      ]
+    else:
+      # This is `builtin_actions_utils.AnchorPoints.NONE` or some other
+      # unrecognized value, in which case the layer is not moved.
+      return
+
+    inserted_layer.set_offsets(*position)
 
   def _rotate(self, inserted_layer):
     if self._rotation_angle == 0.0:
@@ -398,6 +465,17 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
       action['arguments'],
     )
 
+    _set_visible_for_placement_for_layers_with_color_tag(
+      action['arguments/adjust_placement'],
+      action['arguments/placement'],
+    )
+
+    action['arguments/adjust_placement'].connect_event(
+      'value-changed',
+      _set_visible_for_placement_for_layers_with_color_tag,
+      action['arguments/placement'],
+    )
+
 
     color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
       GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
@@ -465,15 +543,25 @@ def _set_visible_for_insert_overlay_arguments(
     insert_content_setting.value == ContentType.LAYERS_WITH_COLOR_TAG)
 
   arguments['image_file'].gui.set_visible(is_content_type_file)
-
   arguments['text'].gui.set_visible(is_content_type_text)
   arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
   arguments['text_font_family'].gui.set_visible(is_content_type_text)
   arguments['text_font_size'].gui.set_visible(is_content_type_text)
   arguments['text_font_color'].gui.set_visible(is_content_type_text)
+  arguments['size'].gui.set_visible(not is_content_type_text)
+  arguments['adjust_placement'].gui.set_visible(is_content_type_layers_for_color_tag)
+
+  arguments['placement'].gui.set_visible(
+    arguments['adjust_placement'].value or not is_content_type_layers_for_color_tag)
 
 
-  arguments['size'].gui.set_visible(is_content_type_file or is_content_type_layers_for_color_tag)
+def _set_visible_for_placement_for_layers_with_color_tag(
+      adjust_placement_setting,
+      placement_setting,
+):
+  placement_setting.gui.set_visible(adjust_placement_setting.value)
+
+
 
 
 def _set_display_name_for_insert_overlay(
@@ -727,6 +815,19 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'max_value': 360.0,
       'display_name': _('Rotation angle (degrees)'),
       'tags': [commands.MORE_OPTIONS_TAG],
+    },
+    {
+      'type': 'bool',
+      'name': 'adjust_placement',
+      'default_value': True,
+      'display_name': _('Adjust placement'),
+    },
+    {
+      'type': 'anchor',
+      'name': 'placement',
+      'default_value': builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT,
+      'items': list(builtin_actions_utils.ANCHOR_POINTS_ITEMS_AND_DISPLAY_NAMES),
+      'display_name': _('Placement'),
     },
     {
       'type': 'coordinates',
