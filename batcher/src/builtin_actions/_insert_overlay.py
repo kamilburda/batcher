@@ -398,8 +398,6 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
       action['arguments'],
     )
 
-    color_tag_setting = (
-      action['arguments/color_tag'] if 'color_tag' in action['arguments'] else None)
 
     color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
       GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
@@ -407,7 +405,7 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
     _set_display_name_for_insert_overlay(
       action['arguments/insert_content'],
       action['arguments/position'],
-      color_tag_setting,
+      action['arguments/color_tag'],
       color_tag_tree_model,
       action['display_name'],
     )
@@ -416,7 +414,7 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
       'value-changed',
       _set_display_name_for_insert_overlay,
       action['arguments/position'],
-      color_tag_setting,
+      action['arguments/color_tag'],
       color_tag_tree_model,
       action['display_name'],
     )
@@ -425,20 +423,19 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
       'value-changed',
       _set_display_name_for_insert_overlay_via_position,
       action['arguments/insert_content'],
-      color_tag_setting,
+      action['arguments/color_tag'],
       color_tag_tree_model,
       action['display_name'],
     )
 
-    if color_tag_setting is not None:
-      color_tag_setting.connect_event(
-        'value-changed',
-        _set_display_name_for_insert_overlay_via_color_tag,
-        action['arguments/insert_content'],
-        action['arguments/position'],
-        color_tag_tree_model,
-        action['display_name'],
-      )
+    action['arguments/color_tag'].connect_event(
+      'value-changed',
+      _set_display_name_for_insert_overlay_via_color_tag,
+      action['arguments/insert_content'],
+      action['arguments/position'],
+      color_tag_tree_model,
+      action['display_name'],
+    )
 
     if 'condition_name' in action['arguments']:
       action['arguments/condition_name'].gui.set_visible(False)
@@ -470,12 +467,11 @@ def _set_visible_for_insert_overlay_arguments(
   arguments['image_file'].gui.set_visible(is_content_type_file)
 
   arguments['text'].gui.set_visible(is_content_type_text)
+  arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
   arguments['text_font_family'].gui.set_visible(is_content_type_text)
   arguments['text_font_size'].gui.set_visible(is_content_type_text)
   arguments['text_font_color'].gui.set_visible(is_content_type_text)
 
-  if 'color_tag' in arguments:
-    arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
 
   arguments['size'].gui.set_visible(is_content_type_file or is_content_type_layers_for_color_tag)
 
@@ -489,10 +485,7 @@ def _set_display_name_for_insert_overlay(
 ):
   content = insert_overlay_insert_content_setting.value
   position = insert_overlay_position_setting.value
-  color_tag_name = (
-    _get_color_tag_name(color_tag_setting.value, color_tag_tree_model)
-    if color_tag_setting is not None else None
-  )
+  color_tag_name = _get_color_tag_name(color_tag_setting.value, color_tag_tree_model)
 
   display_names = {
     (ContentType.FILE, InsertionPositions.BACKGROUND): _('Insert Image as Background'),
@@ -556,18 +549,17 @@ def _connect_changes_to_linked_without_color_tag_condition(
   # the condition is added interactively). If it changed multiple times,
   # we would have to disconnect previous 'value-changed' events.
 
-  if 'color_tag' in insert_overlay_action['arguments']:
-    _set_display_name_for_without_color_tag_condition(
-      insert_overlay_action['arguments/color_tag'],
-      without_color_tag_condition['display_name'],
-      color_tag_tree_model,
-    )
-    insert_overlay_action['arguments/color_tag'].connect_event(
-      'value-changed',
-      _set_display_name_for_without_color_tag_condition,
-      without_color_tag_condition['display_name'],
-      color_tag_tree_model,
-    )
+  _set_display_name_for_without_color_tag_condition(
+    insert_overlay_action['arguments/color_tag'],
+    without_color_tag_condition['display_name'],
+    color_tag_tree_model,
+  )
+  insert_overlay_action['arguments/color_tag'].connect_event(
+    'value-changed',
+    _set_display_name_for_without_color_tag_condition,
+    without_color_tag_condition['display_name'],
+    color_tag_tree_model,
+  )
 
   _set_color_tag_based_on_insert_overlay_action(
     insert_overlay_action['arguments/color_tag'],
@@ -662,6 +654,14 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'name': 'text',
       'default_value': '© Copyright',
       'display_name': _('Text'),
+    },
+    {
+      'type': 'enum',
+      'name': 'color_tag',
+      'enum_type': Gimp.ColorTag,
+      'excluded_values': [Gimp.ColorTag.NONE],
+      'display_name': _('Color tag'),
+      'default_value': Gimp.ColorTag.BLUE,
     },
     {
       'type': 'font',
@@ -774,17 +774,6 @@ INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'][0]['items'] = [
   (ContentType.TEXT, _('Text')),
   (ContentType.LAYERS_WITH_COLOR_TAG, _('Layers with color tag')),
 ]
-INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'].insert(
-  3,
-  {
-    'type': 'enum',
-    'name': 'color_tag',
-    'enum_type': Gimp.ColorTag,
-    'excluded_values': [Gimp.ColorTag.NONE],
-    'display_name': _('Color tag'),
-    'default_value': Gimp.ColorTag.BLUE,
-  },
-)
 INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'].extend([
     {
       'type': 'tagged_items',
