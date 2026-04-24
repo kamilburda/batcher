@@ -24,6 +24,7 @@ __all__ = [
   'UNIT_RADIAN',
   'UNITS',
   'AnchorPoints',
+  'ANCHOR_POINTS_ITEMS_AND_DISPLAY_NAMES',
   'Positions',
   'get_item_export_name',
   'set_item_export_name',
@@ -60,6 +61,19 @@ class AnchorPoints:
     'bottom',
     'bottom_right',
   )
+
+
+ANCHOR_POINTS_ITEMS_AND_DISPLAY_NAMES = [
+  (AnchorPoints.TOP_LEFT, _('Top left')),
+  (AnchorPoints.TOP, _('Top')),
+  (AnchorPoints.TOP_RIGHT, _('Top right')),
+  (AnchorPoints.LEFT, _('Left')),
+  (AnchorPoints.CENTER, _('Center')),
+  (AnchorPoints.RIGHT, _('Right')),
+  (AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
+  (AnchorPoints.BOTTOM, _('Bottom')),
+  (AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
+]
 
 
 class Positions:

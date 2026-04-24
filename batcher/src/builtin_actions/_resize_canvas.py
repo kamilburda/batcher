@@ -681,17 +681,7 @@ RESIZE_CANVAS_DICT = {
       'type': 'anchor',
       'name': 'resize_from_position_anchor',
       'default_value': builtin_actions_utils.AnchorPoints.CENTER,
-      'items': [
-        (builtin_actions_utils.AnchorPoints.TOP_LEFT, _('Top left')),
-        (builtin_actions_utils.AnchorPoints.TOP, _('Top')),
-        (builtin_actions_utils.AnchorPoints.TOP_RIGHT, _('Top right')),
-        (builtin_actions_utils.AnchorPoints.LEFT, _('Left')),
-        (builtin_actions_utils.AnchorPoints.CENTER, _('Center')),
-        (builtin_actions_utils.AnchorPoints.RIGHT, _('Right')),
-        (builtin_actions_utils.AnchorPoints.BOTTOM_LEFT, _('Bottom left')),
-        (builtin_actions_utils.AnchorPoints.BOTTOM, _('Bottom')),
-        (builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT, _('Bottom right')),
-      ],
+      'items': list(builtin_actions_utils.ANCHOR_POINTS_ITEMS_AND_DISPLAY_NAMES),
       'display_name': _('Position'),
     },
     {
