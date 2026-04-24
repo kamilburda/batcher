@@ -314,8 +314,6 @@ def _set_up_existing_save_actions(action_list: command_list_.CommandList):
 
 
 def _handle_insert_overlay_action_item_added(action_list, item, condition_list):
-  action_list.reorder_item(item, 0)
-
   if item.command['orig_name'].value == 'insert_overlay_for_layers':
     if (item.command['arguments/insert_content'].value
         == builtin_actions.ContentType.LAYERS_WITH_COLOR_TAG):

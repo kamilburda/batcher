@@ -180,11 +180,7 @@ You can then apply basic adjustments such as size, position or opacity.
 For Export Layers and Edit Layers, you can also specify a color tag.
 This will insert layers from the current having the color tag as a single merged layer.
 The tagged layers are excluded from processing by default.
-If this is not desired, deactivate the `With Color Tag` condition that was added automatically.
-
-This action is inserted at the first position.
-This prevents potential confusion when other actions are applied that could affect the image/layer extents (e.g. `Resize to layer size` in Export Layers) or other properties.
-You can always move this action lower as needed.
+If this is not desired, deactivate the `Without Color Tag: <color tag>` condition that was added automatically.
 
 To further adjust the inserted layer, you can add actions after this action and set the layer to `Layer Below (Background)` or `Layer Above (Foreground)` instead of `Current Layer` (if available).
 

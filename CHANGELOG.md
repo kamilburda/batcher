@@ -4,7 +4,7 @@ General changes:
 * `Layer Above (Foreground)` and `Layer Below (Background)` will now always consider the layer immediately above or below the current layer, respectively. Previously, if `Insert Foreground/Background` inserted layers with color tags, `Layer Above/Below` would only consider these tagged layers, regardless of other layers that could be inserted by custom actions immediately above/below the current layer. This behavior could cause confusion.
 
 New features:
-* Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`) (#124).
+* Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`). This action will not be added as the first action - text or image watermarks are by default placed to the bottom right of the current image extents, which would cause confusion when `Resize to Layer Size` is placed after this action in Export Layers or Edit Layers (#124).
 
 Changes to actions and conditions:
 * `Merge Background` and `Merge Foreground` are no longer added automatically when `Insert Overlay (Watermark)` is added.
