@@ -623,7 +623,7 @@ def _get_image_filepath(batcher):
 
 
 _examples_lines_for_output_folder_field_for_windows = [
-  [_(r'Suppose that the output folder is "C:\Users\username\Pictures".')],
+  [_('Suppose that the output folder is "{}".').format(r'C:\Users\username\Pictures')],
   ['[output folder]', 'Pictures'],
   ['[output folder, %]', 'C-Users-username-Pictures'],
   ['[output folder, %b2]', 'username-Pictures'],
@@ -640,7 +640,7 @@ _examples_lines_for_image_file_field_for_windows = [
 ]
 
 _examples_lines_for_output_folder_field_for_unix = [
-  [_('Suppose that the output folder is "/home/username/Pictures".')],
+  [_('Suppose that the output folder is "{}".').format('/home/username/Pictures')],
   ['[output folder]', 'Pictures'],
   ['[output folder, %]', 'home-username-Pictures'],
   ['[output folder, %b2]', 'username-Pictures'],
