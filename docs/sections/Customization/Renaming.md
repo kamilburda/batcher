@@ -128,6 +128,17 @@ Examples:
 
 If for the separator or the `%c` option you intend to use characters such as space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
 
+### \[image file\]
+
+*Only available in the Insert Overlay (Watermark) action*
+
+File path to the currently processed image.
+
+Options:
+* *path component strip mode* (defaults to `%e`):
+  * `%e<number>`: Strip `<number>` path components from the end.
+
+
 ### \[output folder\]
 
 The output folder selected in the plug-in dialog.

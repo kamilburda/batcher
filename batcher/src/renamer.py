@@ -9,7 +9,7 @@ import os
 import pathlib
 import re
 import string
-from typing import Any, Callable, Dict, Generator, List, Optional
+from typing import Any, Callable, Container, Dict, Generator, List, Optional
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -289,13 +289,16 @@ def _get_image_name_for_layer_batcher(
   image = batcher.current_image
 
   if image is not None:
-    if image.get_file() is not None:
-      image_name = os.path.basename(image.get_file())
+    if image.get_file() is not None and image.get_file().get_path() is not None:
+      image_name = os.path.basename(image.get_file().get_path())
     else:
       # Fall back to the original image and try obtaining the imported/exported
       # filename (which cannot be set when creating a new image from scratch).
       orig_image = batcher.current_item.raw.get_image()
-      image_name = os.path.basename(orig_image.get_file())
+      if orig_image.get_file() is not None and orig_image.get_file().get_path() is not None:
+        image_name = os.path.basename(orig_image.get_file().get_path())
+      else:
+        image_name = orig_image.get_name()
   else:
     image_name = _('Untitled')
 
@@ -391,6 +394,31 @@ def _get_layer_path(
     wrapper=wrapper,
     file_extension_strip_mode=file_extension_strip_mode,
   )
+
+
+def _get_image_file(
+      _renamer,
+      batcher,
+      _item,
+      _field_value,
+      path_component_strip_mode='',
+):
+  image_filepath = _get_image_filepath(batcher)
+
+  if path_component_strip_mode.startswith('%e'):
+    path_components = pathlib.Path(image_filepath).parts
+
+    num_path_components_from_end = 1
+    try:
+      num_path_components_from_end = int(path_component_strip_mode[len('%e'):])
+    except ValueError:
+      pass
+
+    path_components = path_components[:-num_path_components_from_end]
+
+    return os.path.join(*path_components)
+  else:
+    return image_filepath
 
 
 def _get_output_directory(
@@ -559,6 +587,23 @@ def _replace(
   return re.sub(pattern, replacement, str_to_process, count=count, flags=flags)
 
 
+def _get_image_filepath(batcher):
+  if batcher.current_item.raw is None:
+    image_filepath = batcher.current_item.id
+  else:
+    if isinstance(batcher.current_item.raw, Gimp.Image):
+      orig_image = batcher.current_item.raw
+    else:
+      orig_image = batcher.current_item.raw.get_image()
+
+    if orig_image.get_file() is not None and orig_image.get_file().get_path() is not None:
+      image_filepath = orig_image.get_file().get_path()
+    else:
+      image_filepath = orig_image.get_name()
+
+  return image_filepath
+
+
 _examples_lines_for_output_folder_field_for_windows = [
   [_(r'Suppose that the output folder is "C:\Users\username\Pictures".')],
   ['[output folder]', 'Pictures'],
@@ -569,6 +614,12 @@ _examples_lines_for_output_folder_field_for_windows = [
   ['[output folder, %f2]', 'C-Users'],
 ]
 
+_examples_lines_for_image_file_field_for_windows = [
+  [_('Suppose that the image file path is "{}".').format(r'C:\Users\username\Pictures\image.png')],
+  ['[image file]', r'C:\Users\username\Pictures\image'],
+  ['[image file, %e]', r'C:\Users\username\Pictures'],
+  ['[image file, %e2]', r'C:\Users\username'],
+]
 
 _examples_lines_for_output_folder_field_for_unix = [
   [_('Suppose that the output folder is "/home/username/Pictures".')],
@@ -580,10 +631,19 @@ _examples_lines_for_output_folder_field_for_unix = [
   ['[output folder, %f2]', 'home-username'],
 ]
 
+_examples_lines_for_image_file_field_for_unix = [
+  [_('Suppose that the image file path is "{}".').format('/home/username/Pictures/image.png')],
+  ['[image file]', '/home/username/Pictures/image.png'],
+  ['[image file, %e]', '/home/username/Pictures'],
+  ['[image file, %e2]', '/home/username'],
+]
+
 if os.name == 'nt':
   _examples_lines_for_output_folder_field = _examples_lines_for_output_folder_field_for_windows
+  _examples_lines_for_image_file_field = _examples_lines_for_image_file_field_for_windows
 else:
   _examples_lines_for_output_folder_field = _examples_lines_for_output_folder_field_for_unix
+  _examples_lines_for_image_file_field = _examples_lines_for_image_file_field_for_unix
 
 
 _FIELDS_LIST = [
@@ -701,6 +761,17 @@ _FIELDS_LIST = [
       ['[layer path, -, %c, %n]', 'Body-Hands-Left.jpg'],
     ],
     'procedure_groups': [EXPORT_LAYERS_GROUP, EDIT_LAYERS_GROUP],
+  },
+  {
+    'type': Field,
+    'regex': 'image file',
+    'substitute_func': _get_image_file,
+    'display_name': _('Image file'),
+    'str_to_insert': '[image file]',
+    'examples_lines': _examples_lines_for_image_file_field,
+    # This field is only available for particular actions, e.g.
+    # Insert Overlay (Watermark).
+    'procedure_groups': [],
   },
   {
     'type': Field,
