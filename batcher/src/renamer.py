@@ -906,12 +906,13 @@ _FIELDS_LIST = [
 ]
 
 
-def get_fields(tags=None):
+def get_fields(tags: Optional[List[str]] = None, regexes: Optional[Container[str]] = None):
   if tags is None:
     tags = [CONFIG.PROCEDURE_GROUP]
 
   return {
     field['regex']: field
     for field in _FIELDS_LIST
-    if any(tag in field['procedure_groups'] for tag in tags)
+    if (any(tag in field['procedure_groups'] for tag in tags)
+        or (regexes is not None and field['regex'] in regexes))
   }

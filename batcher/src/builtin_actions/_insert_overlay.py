@@ -11,8 +11,10 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 
 from src import commands
+from src import constants
 from src import exceptions
 from src import invoker as invoker_
+from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
 from src import utils_pdb
@@ -54,8 +56,11 @@ class InsertOverlayAction(invoker_.CallableCommand):
   def _initialize(self, batcher, **kwargs):
     self._insert_content = ContentType.FILE
     self._image_file = None
+    self._image_file_pattern = '[image file]'
     self._text = '© Copyright'
+    self._text_pattern = '© [current date]'
     self._color_tag = Gimp.ColorTag.BLUE
+    self._use_pattern = False
     self._text_font_family = Gimp.Font.get_by_name('Arial Regular')
     self._text_font_size = {
       'pixel_value': 14.0,
@@ -91,6 +96,14 @@ class InsertOverlayAction(invoker_.CallableCommand):
     self._assign_to_attributes_from_kwargs(kwargs)
 
     self._image_copies = []
+    self._image_file_renamer = renamer_.ItemRenamer(
+      self._image_file_pattern,
+      fields_raw=dict(renamer_.get_fields(), **renamer_.get_fields(regexes=['image file']))
+    )
+    self._text_renamer = renamer_.ItemRenamer(
+      self._text_pattern,
+      fields_raw=dict(renamer_.get_fields(), **renamer_.get_fields(regexes=['image file'])),
+    )
 
     batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
 
@@ -149,10 +162,15 @@ class InsertOverlayAction(invoker_.CallableCommand):
         index,
       )
     elif self._insert_content == ContentType.TEXT:
+      if self._use_pattern:
+        text = self._text_renamer.rename(batcher)
+      else:
+        text = self._text
+
       inserted_layer = _insert_text_layer(
         batcher,
         image,
-        self._text,
+        text,
         self._text_font_family,
         self._text_font_size,
         self._text_font_color,
@@ -476,6 +494,21 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
       action['arguments/placement'],
     )
 
+    _set_visible_for_use_pattern(
+      action['arguments/use_pattern'],
+      action['arguments'],
+    )
+
+    action['arguments/use_pattern'].connect_event(
+      'value-changed',
+      _set_visible_for_use_pattern,
+      action['arguments'],
+    )
+
+    action['arguments/use_pattern'].connect_event(
+      'after-set-gui',
+      _set_left_margin_for_use_pattern,
+    )
 
     color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
       GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
@@ -542,15 +575,21 @@ def _set_visible_for_insert_overlay_arguments(
   is_content_type_layers_for_color_tag = (
     insert_content_setting.value == ContentType.LAYERS_WITH_COLOR_TAG)
 
-  arguments['image_file'].gui.set_visible(is_content_type_file)
-  arguments['text'].gui.set_visible(is_content_type_text)
+  arguments['image_file'].gui.set_visible(
+    not arguments['use_pattern'].value and is_content_type_file)
+  arguments['image_file_pattern'].gui.set_visible(
+    arguments['use_pattern'].value and is_content_type_file)
+  arguments['text'].gui.set_visible(
+    not arguments['use_pattern'].value and is_content_type_text)
+  arguments['text_pattern'].gui.set_visible(
+    arguments['use_pattern'].value and is_content_type_text)
   arguments['color_tag'].gui.set_visible(is_content_type_layers_for_color_tag)
+  arguments['use_pattern'].gui.set_visible(not is_content_type_layers_for_color_tag)
   arguments['text_font_family'].gui.set_visible(is_content_type_text)
   arguments['text_font_size'].gui.set_visible(is_content_type_text)
   arguments['text_font_color'].gui.set_visible(is_content_type_text)
   arguments['size'].gui.set_visible(not is_content_type_text)
   arguments['adjust_placement'].gui.set_visible(is_content_type_layers_for_color_tag)
-
   arguments['placement'].gui.set_visible(
     arguments['adjust_placement'].value or not is_content_type_layers_for_color_tag)
 
@@ -562,6 +601,26 @@ def _set_visible_for_placement_for_layers_with_color_tag(
   placement_setting.gui.set_visible(adjust_placement_setting.value)
 
 
+def _set_visible_for_use_pattern(
+      use_pattern_setting,
+      arguments,
+):
+  is_content_type_file = arguments['insert_content'].value == ContentType.FILE
+  is_content_type_text = arguments['insert_content'].value == ContentType.TEXT
+
+  arguments['image_file'].gui.set_visible(
+    not use_pattern_setting.value and is_content_type_file)
+  arguments['image_file_pattern'].gui.set_visible(
+    use_pattern_setting.value and is_content_type_file)
+  arguments['text'].gui.set_visible(
+    not use_pattern_setting.value and is_content_type_text)
+  arguments['text_pattern'].gui.set_visible(
+    use_pattern_setting.value and is_content_type_text)
+
+
+def _set_left_margin_for_use_pattern(use_pattern_setting):
+  if not use_pattern_setting.gui.is_null():
+    use_pattern_setting.gui.widget.set_margin_start(constants.RELATED_WIDGETS_LEFT_MARGIN)
 
 
 def _set_display_name_for_insert_overlay(
@@ -738,10 +797,28 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'none_ok': True,
     },
     {
+      'type': 'name_pattern',
+      'name': 'image_file_pattern',
+      'display_name': _('Image pattern'),
+      'default_value': '[image file]',
+      'gui_type_kwargs': {
+        'regexes': ['image file'],
+      },
+    },
+    {
       'type': 'string',
       'name': 'text',
       'default_value': '© Copyright',
       'display_name': _('Text'),
+    },
+    {
+      'type': 'name_pattern',
+      'name': 'text_pattern',
+      'display_name': _('Text pattern'),
+      'default_value': '© Copyright [current date]',
+      'gui_type_kwargs': {
+        'regexes': ['image file'],
+      },
     },
     {
       'type': 'enum',
@@ -750,6 +827,13 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'excluded_values': [Gimp.ColorTag.NONE],
       'display_name': _('Color tag'),
       'default_value': Gimp.ColorTag.BLUE,
+    },
+    {
+      'type': 'bool',
+      'name': 'use_pattern',
+      'default_value': False,
+      'display_name': _('Use pattern'),
+      'description': _('Using a pattern allows inserting different files or text for each input.'),
     },
     {
       'type': 'font',
