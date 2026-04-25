@@ -42,6 +42,7 @@ Options:
 	* `%e`: Never strip the extension.
 	* `%i` (Batch Convert only): Strip the extension only if the image has a file extension that does not match the entered file extension.
 	* `%n` (Batch Convert only): Strip the extension only if the image has a file extension that matches the entered file extension (the inverse of `%i`).
+* `%o`: Use the original image name. This can be useful if you renamed the image and you need to access its original name.
 
 Examples:
 * `[image name]` for an image named `Frame` → `Frame`

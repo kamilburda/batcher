@@ -271,17 +271,35 @@ class _PercentTemplate(string.Template):
 
 
 def _get_image_name_for_image_batcher(
-      _renamer, image_batcher, item, _field_value, file_extension_strip_mode=''):
-  if file_extension_strip_mode == '%e':
-    return item.name
-  elif file_extension_strip_mode == '%i':
-    if fileext.get_file_extension(item.name) == image_batcher.file_extension:
-      return item.name
-  elif file_extension_strip_mode == '%n':
-    if fileext.get_file_extension(item.name) != image_batcher.file_extension:
-      return item.name
+      _renamer, image_batcher, item, _field_value, *args):
+  use_original_image_name = False
+  file_extension_strip_mode = 'strip_always'
 
-  return fileext.get_filename_root(item.name)
+  for arg in args:
+    if arg == '%o':
+      use_original_image_name = True
+    elif arg == '%e':
+      file_extension_strip_mode = 'keep'
+    elif arg == '%i':
+      file_extension_strip_mode = 'strip_on_identical'
+    elif arg == '%n':
+      file_extension_strip_mode = 'strip_on_different'
+
+  if use_original_image_name:
+    image_name = os.path.basename(_get_image_filepath(image_batcher))
+  else:
+    image_name = item.name
+
+  if file_extension_strip_mode == 'keep':
+    return image_name
+  elif file_extension_strip_mode == 'strip_on_identical':
+    if fileext.get_file_extension(image_name) == image_batcher.file_extension:
+      return image_name
+  elif file_extension_strip_mode == 'strip_on_different':
+    if fileext.get_file_extension(image_name) != image_batcher.file_extension:
+      return image_name
+
+  return fileext.get_filename_root(image_name)
 
 
 def _get_image_name_for_layer_batcher(
@@ -682,6 +700,10 @@ _FIELDS_LIST = [
       ['[image name, %e]', 'Image.jpg'],
       ['[image name, %i]', 'Image'],
       ['[image name, %n]', 'Image.jpg'],
+      [_('Suppose the original image name is "Image.jpg" and it was renamed to "{}".').format(
+        'image[001]')],
+      ['[image name, %o]', 'Image'],
+      ['[image name, %o, %e]', 'Image.jpg'],
     ],
     'procedure_groups': [CONVERT_GROUP, EDIT_AND_SAVE_IMAGES_GROUP, EXPORT_IMAGES_GROUP],
   },
