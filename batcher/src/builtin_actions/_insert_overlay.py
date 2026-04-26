@@ -9,6 +9,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
+from gi.repository import Gio
 
 from src import commands
 from src import constants
@@ -96,6 +97,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
     self._assign_to_attributes_from_kwargs(kwargs)
 
     self._image_copies = []
+    self._image_copies_for_pattern = []
     self._image_file_renamer = renamer_.ItemRenamer(
       self._image_file_pattern,
       fields_raw=dict(renamer_.get_fields(), **renamer_.get_fields(regexes=['image file']))
@@ -105,18 +107,24 @@ class InsertOverlayAction(invoker_.CallableCommand):
       fields_raw=dict(renamer_.get_fields(), **renamer_.get_fields(regexes=['image file'])),
     )
 
-    batcher.invoker.add(_delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
+    batcher.invoker.add(self._delete_images_on_cleanup, ['cleanup_contents'], [self._image_copies])
+    batcher.invoker.add(
+      self._delete_images_on_cleanup,
+      ['cleanup_contents'],
+      [self._image_copies_for_pattern])
+    # Also delete each loaded image during processing to minimize memory usage.
+    batcher.invoker.add(
+      self._delete_images_on_cleanup,
+      ['after_process_item_contents'],
+      [self._image_copies_for_pattern])
 
     # noinspection PyUnresolvedReferences
     if (self._insert_content == ContentType.FILE
+        and not self._use_pattern
         and self._image_file is not None
         and self._image_file.get_path() is not None
         and os.path.exists(self._image_file.get_path())):
-      self._image_to_insert = pdb.gimp_file_load(
-        run_mode=Gimp.RunMode.NONINTERACTIVE,
-        file=self._image_file)
-
-      self._image_copies.append(self._image_to_insert)
+      self._image_to_insert = self._load_image(self._image_file, self._image_copies)
     else:
       self._image_to_insert = None
 
@@ -140,9 +148,6 @@ class InsertOverlayAction(invoker_.CallableCommand):
       self._processed_tagged_items = []
 
   def _process(self, batcher, **kwargs):
-    if self._insert_content == ContentType.FILE and self._image_to_insert is None:
-      raise exceptions.SkipCommand(_('Image file not specified.'))
-
     self._assign_to_attributes_from_kwargs(kwargs)
 
     image = batcher.current_image
@@ -155,9 +160,22 @@ class InsertOverlayAction(invoker_.CallableCommand):
     inserted_layer = None
 
     if self._insert_content == ContentType.FILE:
-      inserted_layer = _insert_layers(
+      if self._use_pattern:
+        image_filepath = self._image_file_renamer.rename(batcher)
+        image_file = Gio.file_new_for_path(image_filepath)
+        if image_file.get_path() is not None and os.path.exists(image_file.get_path()):
+          image_to_insert = self._load_image(image_file, self._image_copies_for_pattern)
+        else:
+          raise ValueError(_('Image file "{}" does not exist.').format(image_filepath))
+      else:
+        if self._image_to_insert is None:
+          raise exceptions.SkipCommand(_('Image file not specified.'))
+
+        image_to_insert = self._image_to_insert
+
+      inserted_layer = self._insert_layers(
         image,
-        self._image_to_insert.get_layers(),
+        image_to_insert.get_layers(),
         current_parent,
         index,
       )
@@ -167,7 +185,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       else:
         text = self._text
 
-      inserted_layer = _insert_text_layer(
+      inserted_layer = self._insert_text_layer(
         batcher,
         image,
         text,
@@ -183,7 +201,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
           _('No layers with color tag: {}.').format(
             _get_color_tag_name(self._color_tag, self._color_tag_tree_model)))
 
-      inserted_layer = _insert_layers(
+      inserted_layer = self._insert_layers(
         image,
         [item.raw for item in self._processed_tagged_items],
         current_parent,
@@ -205,6 +223,96 @@ class InsertOverlayAction(invoker_.CallableCommand):
       # Ignore arguments not displayed to the user.
       if hasattr(self, f'_{name}'):
         setattr(self, f'_{name}', value)
+
+  @staticmethod
+  def _delete_images_on_cleanup(_batcher, images):
+    for image in images:
+      utils_pdb.try_delete_image(image)
+
+    images.clear()
+
+  @staticmethod
+  def _load_image(image_file, image_copies):
+    image_to_insert = pdb.gimp_file_load(
+      run_mode=Gimp.RunMode.NONINTERACTIVE,
+      file=image_file)
+
+    image_copies.append(image_to_insert)
+
+    return image_to_insert
+
+  @staticmethod
+  def _insert_layers(image, layers, parent, position):
+    if not layers:
+      return
+
+    first_tagged_layer_position = position
+
+    for i, layer in enumerate(layers):
+      layer_copy = utils_pdb.copy_and_paste_layer(
+        layer, image, parent, first_tagged_layer_position + i, True, True, True)
+      layer_copy.set_visible(True)
+
+    if parent is None:
+      children = image.get_layers()
+    else:
+      children = parent.get_children()
+
+    merged_tagged_layer = None
+
+    if len(layers) == 1:
+      merged_tagged_layer = children[first_tagged_layer_position]
+    else:
+      second_to_last_tagged_layer_position = first_tagged_layer_position + len(layers) - 2
+      # It should not matter which items we obtain the color tag from as all
+      # items have the same color tag.
+      merged_color_tag = children[second_to_last_tagged_layer_position].get_color_tag()
+
+      for i in range(second_to_last_tagged_layer_position, first_tagged_layer_position - 1, -1):
+        merged_tagged_layer = image.merge_down(children[i], Gimp.MergeType.EXPAND_AS_NECESSARY)
+
+      # The merged-down layer does not possess the attributes of the original
+      # layers, including the color tag, so we set it explicitly. This ensures
+      # that tagged group layers are merged properly in "Merge back-/foreground"
+      # actions.
+      merged_tagged_layer.set_color_tag(merged_color_tag)
+
+    return merged_tagged_layer
+
+  @staticmethod
+  def _insert_text_layer(
+        batcher,
+        image,
+        text,
+        font_family,
+        font_dimension,
+        font_color,
+        parent,
+        position,
+  ):
+    if font_dimension['unit'] == Gimp.Unit.percent():
+      font_size = builtin_actions_utils.unit_to_pixels(batcher, font_dimension, 'x')
+      font_unit = Gimp.Unit.pixel()
+    elif font_dimension['unit'] == Gimp.Unit.pixel():
+      font_size = font_dimension['pixel_value']
+      font_unit = Gimp.Unit.pixel()
+    else:
+      font_size = font_dimension['other_value']
+      font_unit = font_dimension['unit']
+
+    text_layer = Gimp.TextLayer.new(
+      image,
+      text,
+      font_family,
+      font_size,
+      font_unit,
+    )
+
+    image.insert_layer(text_layer, parent, position)
+
+    text_layer.set_color(setting_.ColorSetting.get_value_as_color(font_color))
+
+    return text_layer
 
   def _scale_to_fit(self, batcher, inserted_layer):
     if (self._insert_content == ContentType.TEXT
@@ -367,86 +475,6 @@ class InsertOverlayAction(invoker_.CallableCommand):
         drawables=[inserted_layer],
         num_tiles=self._num_tiles,
       )
-
-
-def _delete_images_on_cleanup(_batcher, images):
-  for image in images:
-    utils_pdb.try_delete_image(image)
-
-  images.clear()
-
-
-def _insert_layers(image, layers, parent, position):
-  if not layers:
-    return
-
-  first_tagged_layer_position = position
-  
-  for i, layer in enumerate(layers):
-    layer_copy = utils_pdb.copy_and_paste_layer(
-      layer, image, parent, first_tagged_layer_position + i, True, True, True)
-    layer_copy.set_visible(True)
-
-  if parent is None:
-    children = image.get_layers()
-  else:
-    children = parent.get_children()
-
-  merged_tagged_layer = None
-
-  if len(layers) == 1:
-    merged_tagged_layer = children[first_tagged_layer_position]
-  else:
-    second_to_last_tagged_layer_position = first_tagged_layer_position + len(layers) - 2
-    # It should not matter which items we obtain the color tag from as all
-    # items have the same color tag.
-    merged_color_tag = children[second_to_last_tagged_layer_position].get_color_tag()
-
-    for i in range(second_to_last_tagged_layer_position, first_tagged_layer_position - 1, -1):
-      merged_tagged_layer = image.merge_down(children[i], Gimp.MergeType.EXPAND_AS_NECESSARY)
-
-    # The merged-down layer does not possess the attributes of the original
-    # layers, including the color tag, so we set it explicitly. This ensures
-    # that tagged group layers are merged properly in "Merge back-/foreground"
-    # actions.
-    merged_tagged_layer.set_color_tag(merged_color_tag)
-
-  return merged_tagged_layer
-
-
-def _insert_text_layer(
-      batcher,
-      image,
-      text,
-      font_family,
-      font_dimension,
-      font_color,
-      parent,
-      position,
-):
-  if font_dimension['unit'] == Gimp.Unit.percent():
-    font_size = builtin_actions_utils.unit_to_pixels(batcher, font_dimension, 'x')
-    font_unit = Gimp.Unit.pixel()
-  elif font_dimension['unit'] == Gimp.Unit.pixel():
-    font_size = font_dimension['pixel_value']
-    font_unit = Gimp.Unit.pixel()
-  else:
-    font_size = font_dimension['other_value']
-    font_unit = font_dimension['unit']
-
-  text_layer = Gimp.TextLayer.new(
-    image,
-    text,
-    font_family,
-    font_size,
-    font_unit,
-  )
-
-  image.insert_layer(text_layer, parent, position)
-
-  text_layer.set_color(setting_.ColorSetting.get_value_as_color(font_color))
-
-  return text_layer
 
 
 def on_after_add_insert_overlay_for_layers_action(
@@ -799,8 +827,9 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
     {
       'type': 'name_pattern',
       'name': 'image_file_pattern',
-      'display_name': _('Image pattern'),
       'default_value': '[image file]',
+      'display_name': _('Image pattern'),
+      'description': _('This way, you can insert different overlays for each input.'),
       'gui_type_kwargs': {
         'regexes': ['image file'],
       },
