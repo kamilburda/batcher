@@ -606,7 +606,7 @@ def _replace(
 
 
 def _get_image_filepath(batcher):
-  if batcher.current_item.raw is None:
+  if isinstance(batcher.current_item, itemtree.ImageFileItem):
     image_filepath = batcher.current_item.id
   else:
     if isinstance(batcher.current_item.raw, Gimp.Image):
