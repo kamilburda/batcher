@@ -5,6 +5,9 @@ General changes:
 
 New features:
 * Replaced `Insert Background` and `Insert Foreground` with `Insert Overlay (Watermark)`, which now also allows inserting text. Basic options such as position, size, opacity can be adjusted directly within this action (without having to add other actions and using `Layer Above` or `Layer Below`). This action will not be added as the first action - text or image watermarks are by default placed to the bottom right of the current image extents, which would cause confusion when `Resize to Layer Size` is placed after this action in Export Layers or Edit Layers (#124).
+* In `Insert Overlay (Watermark)`, you can now specify patterns instead of a single file. This way, you are able to insert different background/foreground for each input image. Patterns can also be used for the text to be inserted.
+* For the `[image name]` field, added `%o` option that uses the original image name (before being renamed e.g. by the `Rename` action).
+* If patterns are used in `Insert Overlay (Watermark)`, you can specify the image file path via the `[image file]` field.
 
 Changes to actions and conditions:
 * `Merge Background` and `Merge Foreground` are no longer added automatically when `Insert Overlay (Watermark)` is added.
