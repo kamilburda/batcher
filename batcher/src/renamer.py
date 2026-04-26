@@ -435,6 +435,25 @@ def _get_image_file(
     path_components = path_components[:-num_path_components_from_end]
 
     return os.path.join(*path_components)
+  elif path_component_strip_mode == '%t':
+    if isinstance(batcher.current_item, itemtree.ImageFileItem):
+      if batcher.current_item.parents:
+        return os.path.dirname(batcher.current_item.parents[0].id)
+      else:
+        return os.path.dirname(batcher.current_item.id)
+    else:
+      return os.path.dirname(_get_image_filepath(batcher))
+  elif path_component_strip_mode == '%r':
+    if isinstance(batcher.current_item, itemtree.ImageFileItem):
+      if batcher.current_item.parents:
+        return os.path.relpath(
+          batcher.current_item.id,
+          start=os.path.dirname(batcher.current_item.parents[0].id),
+        )
+      else:
+        return os.path.basename(batcher.current_item.id)
+    else:
+      return os.path.basename(_get_image_filepath(batcher))
   else:
     return image_filepath
 
@@ -637,6 +656,9 @@ _examples_lines_for_image_file_field_for_windows = [
   ['[image file]', r'C:\Users\username\Pictures\image'],
   ['[image file, %e]', r'C:\Users\username\Pictures'],
   ['[image file, %e2]', r'C:\Users\username'],
+  [_('Suppose the input folder is "{}".').format(r'C:\Users\username')],
+  ['[image file, %t]', r'C:\Users\username'],
+  ['[image file, %r]', r'Pictures\image.png'],
 ]
 
 _examples_lines_for_output_folder_field_for_unix = [
@@ -654,6 +676,9 @@ _examples_lines_for_image_file_field_for_unix = [
   ['[image file]', '/home/username/Pictures/image.png'],
   ['[image file, %e]', '/home/username/Pictures'],
   ['[image file, %e2]', '/home/username'],
+  [_('Suppose the input folder is "{}".').format('/home/username')],
+  ['[image file, %t]', '/home/username'],
+  ['[image file, %r]', 'Pictures/image.png'],
 ]
 
 if os.name == 'nt':
