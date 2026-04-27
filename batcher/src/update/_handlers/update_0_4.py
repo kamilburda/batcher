@@ -1,8 +1,109 @@
-from src import builtin_actions
-from src import builtin_conditions
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 from src.procedure_groups import *
 
 from .. import _utils as update_utils_
+
+
+_MERGE_BACKGROUND_DICT = {
+  'name': 'merge_background',
+  'display_name': 'Merge Background',
+  'menu_path': _('Layers and Composition'),
+  # 'procedure' will be renamed to 'action' in a later update handler.
+  'additional_tags': ['procedure'],
+  'arguments': [
+    {
+      'type': 'enum',
+      'name': 'merge_type',
+      'enum_type': Gimp.MergeType,
+      'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+      'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
+      'display_name': _('Merge type'),
+    },
+    {
+      'type': 'bool',
+      'name': 'last_enabled_value',
+      'default_value': True,
+      'gui_type': None,
+    },
+  ],
+}
+
+_MERGE_FOREGROUND_DICT = {
+  'name': 'merge_foreground',
+  'display_name': 'Merge Foreground',
+  'menu_path': _('Layers and Composition'),
+  # 'procedure' will be renamed to 'action' in a later update handler.
+  'additional_tags': ['procedure'],
+  'arguments': [
+    {
+      'type': 'enum',
+      'name': 'merge_type',
+      'enum_type': Gimp.MergeType,
+      'default_value': Gimp.MergeType.EXPAND_AS_NECESSARY,
+      'excluded_values': [Gimp.MergeType.FLATTEN_IMAGE],
+      'display_name': _('Merge type'),
+    },
+    {
+      'type': 'bool',
+      'name': 'last_enabled_value',
+      'default_value': True,
+      'gui_type': None,
+    },
+  ],
+}
+
+_NOT_BACKGROUND_DICT = {
+  'name': 'not_background',
+  'type': 'condition',
+  'display_name': 'Not Background',
+  'menu_path': _('Layer'),
+  # 'constraint' will be renamed to 'condition' in a later update handler.
+  'additional_tags': ['constraint'],
+  'arguments': [
+    {
+      'type': 'enum',
+      'name': 'color_tag',
+      'enum_type': Gimp.ColorTag,
+      'excluded_values': [Gimp.ColorTag.NONE],
+      'default_value': Gimp.ColorTag.BLUE,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'last_enabled_value',
+      'default_value': True,
+      'gui_type': None,
+    },
+  ],
+}
+
+_NOT_FOREGROUND_DICT = {
+  'name': 'not_foreground',
+  'type': 'condition',
+  'display_name': 'Not Foreground',
+  'menu_path': _('Layer'),
+  # 'constraint' will be renamed to 'condition' in a later update handler.
+  'additional_tags': ['constraint'],
+  'arguments': [
+    {
+      'type': 'enum',
+      'name': 'color_tag',
+      'enum_type': Gimp.ColorTag,
+      'excluded_values': [Gimp.ColorTag.NONE],
+      'default_value': Gimp.ColorTag.GREEN,
+      'gui_type': None,
+    },
+    {
+      'type': 'bool',
+      'name': 'last_enabled_value',
+      'default_value': True,
+      'gui_type': None,
+    },
+  ],
+}
 
 
 def update(data, _settings, procedure_groups):
@@ -54,8 +155,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
   update_utils_.remove_command_by_orig_names(actions_list, ['merge_background', 'merge_foreground'])
 
   merge_action_mapping = {
-    'insert_background': 'merge_background',
-    'insert_foreground': 'merge_foreground',
+    'insert_background': ['merge_background', _MERGE_BACKGROUND_DICT],
+    'insert_foreground': ['merge_foreground', _MERGE_FOREGROUND_DICT],
   }
   action_names = {command_dict['name'] for command_dict in actions_list}
   action_display_names = {
@@ -65,8 +166,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
   }
 
   condition_mapping = {
-    'insert_background': 'not_background',
-    'insert_foreground': 'not_foreground',
+    'insert_background': ['not_background', _NOT_BACKGROUND_DICT],
+    'insert_foreground': ['not_foreground', _NOT_FOREGROUND_DICT],
   }
   condition_names = {command_dict['name'] for command_dict in conditions_list}
   condition_display_names = {
@@ -99,9 +200,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
           'gui_type': None,
         })
 
-      merge_action_name = merge_action_mapping[orig_name_setting_dict['default_value']]
-      merge_group_dict = update_utils_.create_command_as_saved_dict(
-        builtin_actions.BUILTIN_ACTIONS[merge_action_name])
+      merge_action_name, merge_dict = merge_action_mapping[orig_name_setting_dict['default_value']]
+      merge_group_dict = update_utils_.create_command_as_saved_dict(merge_dict)
 
       unique_merge_action_name = update_utils_.uniquify_command_name(
         merge_action_name, action_names)
@@ -117,9 +217,8 @@ def _handle_background_foreground_commands(actions_list, conditions_list):
 
       merge_group_dicts.append(merge_group_dict)
 
-      condition_name = condition_mapping[orig_name_setting_dict['default_value']]
-      condition_group_dict = update_utils_.create_command_as_saved_dict(
-        builtin_conditions.BUILTIN_CONDITIONS[condition_name])
+      condition_name, condition_dict = condition_mapping[orig_name_setting_dict['default_value']]
+      condition_group_dict = update_utils_.create_command_as_saved_dict(condition_dict)
 
       unique_condition_name = update_utils_.uniquify_command_name(condition_name, condition_names)
       condition_group_dict['name'] = unique_condition_name
