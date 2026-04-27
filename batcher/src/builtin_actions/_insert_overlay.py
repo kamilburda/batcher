@@ -62,7 +62,10 @@ class InsertOverlayAction(invoker_.CallableCommand):
     self._text_pattern = '© [current date]'
     self._color_tag = Gimp.ColorTag.BLUE
     self._use_pattern = False
-    self._text_font_family = Gimp.Font.get_by_name('Arial Regular')
+    self._text_font_family = (
+      Gimp.Font.get_by_name('Sans-serif') if Gimp.Font.get_by_name('Sans-serif') is not None
+      else Gimp.fonts_get_list()[0]
+    )
     self._text_font_size = {
       'pixel_value': 14.0,
       'percent_value': 5.0,
