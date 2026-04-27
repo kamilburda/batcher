@@ -176,6 +176,7 @@ Options:
 
 Inserts an image or text as a layer behind or in front of the current layer.
 You can then apply basic adjustments such as size, position or opacity.
+More adjustment options can be found under `More options`.
 
 For Export Layers and Edit Layers, you can also specify a color tag.
 This will insert layers from the current having the color tag as a single merged layer.

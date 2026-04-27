@@ -27,7 +27,9 @@ For Export Layers and Edit Layers, you can also insert layers with the specified
 
 ## I need every image to have the same background.
 
-1. Add the `Insert Overlay (Watermark)` action and provide an image file or text, and set `Position` to `Background`. 
+1. Add the `Insert Overlay (Watermark)` action and provide an image file or text, and set `Position` to `Background`.
+
+For Export Layers and Edit Layers, you can also insert layers with the specified color tag beside a file or text.
 
 
 ## How can I add borders to an image?
