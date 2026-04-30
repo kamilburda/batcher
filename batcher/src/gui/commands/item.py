@@ -125,7 +125,6 @@ class CommandItem(gui_widgets_.ItemBoxItem):
         self._button_info.disconnect(self._display_info_message_event_id)
         self._display_info_message_event_id = None
 
-
   def create_drag_icon(self):
     if self._drag_icon_window is not None:
       # We do not destroy the widget on "drag-end" so that an animation
