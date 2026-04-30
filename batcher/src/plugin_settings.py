@@ -876,6 +876,10 @@ def _connect_events_for_added_built_in_commands(settings):
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_export_action)
   settings['main/actions'].connect_event(
+    'after-add-command', builtin_actions.on_after_add_gmic_filter_action)
+  settings['main/actions'].connect_event(
+    'after-add-command', builtin_actions.on_after_add_rename_action)
+  settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_resize_canvas_action)
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_rotate_action)
@@ -900,5 +904,7 @@ def _connect_events_for_added_built_in_commands(settings):
   settings['main/actions'].connect_event(
     'after-add-command', builtin_actions.on_after_add_merge_layer_action)
 
+  settings['main/conditions'].connect_event(
+    'after-add-command', builtin_conditions.on_after_add_matching_text_condition)
   settings['main/conditions'].connect_event(
     'after-add-command', builtin_conditions.on_after_add_without_color_tag_condition)

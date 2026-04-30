@@ -1,5 +1,3 @@
-import os
-
 import gi
 
 gi.require_version('GimpUi', '3.0')
@@ -188,35 +186,10 @@ class CommandLists:
       self._condition_list,
     )
 
-    _set_up_existing_crop_actions(self._action_list)
-    self._action_list.commands.connect_event(
-      'after-load',
-      lambda _actions: _set_up_existing_crop_actions(self._action_list))
-
-    _set_up_existing_gmic_filter_actions(self._action_list)
-    self._action_list.commands.connect_event(
-      'after-load',
-      lambda _actions: _set_up_existing_gmic_filter_actions(self._action_list))
-
-    _set_up_existing_resize_canvas_actions(self._action_list)
-    self._action_list.commands.connect_event(
-      'after-load',
-      lambda _actions: _set_up_existing_resize_canvas_actions(self._action_list))
-
-    _set_up_existing_rename_actions(self._action_list)
-    self._action_list.commands.connect_event(
-      'after-load',
-      lambda _actions: _set_up_existing_rename_actions(self._action_list))
-
     _set_up_existing_export_actions(self._action_list)
     self._action_list.commands.connect_event(
       'after-load',
       lambda _actions: _set_up_existing_export_actions(self._action_list))
-
-    _set_up_existing_save_actions(self._action_list)
-    self._action_list.commands.connect_event(
-      'after-load',
-      lambda _actions: _set_up_existing_save_actions(self._action_list))
 
     _set_up_existing_insert_overlay_and_related_commands(
       self._action_list, self._condition_list)
@@ -224,17 +197,6 @@ class CommandLists:
       'after-load', self._set_up_existing_insert_overlay_and_related_commands_on_load)
     self._condition_list.commands.connect_event(
       'after-load', self._set_up_existing_insert_overlay_and_related_commands_on_load)
-
-    self._condition_list.connect(
-      'command-list-item-added-interactive',
-      _on_condition_item_added,
-      self._settings,
-    )
-
-    _set_up_existing_matching_text_conditions(self._condition_list)
-    self._condition_list.commands.connect_event(
-      'after-load',
-      lambda _conditions: _set_up_existing_matching_text_conditions(self._condition_list))
 
   def _set_up_existing_insert_overlay_and_related_commands_on_load(self, _commands):
     if self._actions_or_conditions_loaded:
@@ -248,27 +210,12 @@ class CommandLists:
 
 
 def _on_action_item_added(action_list, item, settings, condition_list):
-  if item.command['orig_name'].value.startswith('crop_for_'):
-    _handle_crop_action_item_added(item)
-
-  if item.command['orig_name'].value == 'gmic_filter':
-    _handle_gmic_filter_action_item_added(item)
-
-  if item.command['orig_name'].value == 'resize_canvas':
-    _handle_resize_canvas_action_item_added(item)
-
-  if item.command['orig_name'].value.startswith('rename_for_'):
-    _handle_rename_action_item_added(item)
-
   if item.command['orig_name'].value.startswith('export_for_'):
     _handle_export_action_item_added(item)
 
     if item.command['orig_name'].value not in [
           'export_for_edit_and_save_images', 'export_for_edit_layers']:
       _handle_export_action_item_added_for_export_mode(item, settings)
-
-  if item.command['orig_name'].value == 'save':
-    _handle_save_action_item_added(item)
 
   if item.command['orig_name'].value != 'save':
     _reorder_action_before_first_save_action(action_list, item)
@@ -277,40 +224,10 @@ def _on_action_item_added(action_list, item, settings, condition_list):
     _handle_insert_overlay_action_item_added(action_list, item, condition_list)
 
 
-def _set_up_existing_crop_actions(action_list: command_list_.CommandList):
-  for item in action_list.items:
-    if item.command['orig_name'].value.startswith('crop_for_'):
-      _handle_crop_action_item_added(item)
-
-
-def _set_up_existing_gmic_filter_actions(action_list: command_list_.CommandList):
-  for item in action_list.items:
-    if item.command['orig_name'].value == 'gmic_filter':
-      _handle_gmic_filter_action_item_added(item)
-
-
-def _set_up_existing_resize_canvas_actions(action_list: command_list_.CommandList):
-  for item in action_list.items:
-    if item.command['orig_name'].value == 'resize_canvas':
-      _handle_resize_canvas_action_item_added(item)
-
-
-def _set_up_existing_rename_actions(action_list: command_list_.CommandList):
-  for item in action_list.items:
-    if item.command['orig_name'].value.startswith('rename_for_'):
-      _handle_rename_action_item_added(item)
-
-
 def _set_up_existing_export_actions(action_list: command_list_.CommandList):
   for item in action_list.items:
     if item.command['orig_name'].value.startswith('export_for_'):
       _handle_export_action_item_added(item)
-
-
-def _set_up_existing_save_actions(action_list: command_list_.CommandList):
-  for item in action_list.items:
-    if item.command['orig_name'].value == 'save':
-      _handle_save_action_item_added(item)
 
 
 def _handle_insert_overlay_action_item_added(action_list, item, condition_list):
@@ -433,104 +350,7 @@ def _on_insert_overlay_action_removed(
     condition_list.remove_item(condition_item)
 
 
-def _handle_crop_action_item_added(item):
-  _set_display_name_for_crop_action(
-    item.command['arguments/crop_mode'],
-    item.command)
-
-  item.command['arguments/crop_mode'].connect_event(
-    'value-changed',
-    _set_display_name_for_crop_action,
-    item.command)
-
-
-def _set_display_name_for_crop_action(crop_mode_setting, crop_action):
-  if crop_mode_setting.value == builtin_actions.CropModes.REMOVE_EMPTY_BORDERS:
-    crop_action['display_name'].set_value(_('Crop to Remove Empty Borders'))
-  else:
-    if crop_mode_setting.value in crop_mode_setting.items_display_names:
-      crop_action['display_name'].set_value(
-        crop_mode_setting.items_display_names[crop_mode_setting.value])
-
-
-def _handle_gmic_filter_action_item_added(item):
-  _set_display_name_for_gmic_filter_action(
-    item.command['arguments/command'],
-    item.command)
-
-  item.command['arguments/command'].connect_event(
-    'value-changed',
-    _set_display_name_for_gmic_filter_action,
-    item.command)
-
-
-def _set_display_name_for_gmic_filter_action(gmic_command_setting, gmic_filter_action):
-  if gmic_command_setting.value:
-    filter_name = gmic_command_setting.value.strip().split(' ')[0]
-    gmic_filter_action['display_name'].set_value(_("G'MIC Filter: {}").format(filter_name))
-  else:
-    gmic_filter_action['display_name'].set_value(_("G'MIC Filter"))
-
-
-def _handle_resize_canvas_action_item_added(item):
-  _set_display_name_for_resize_canvas_action(
-    item.command['arguments/resize_mode'],
-    item.command)
-
-  item.command['arguments/resize_mode'].connect_event(
-    'value-changed',
-    _set_display_name_for_resize_canvas_action,
-    item.command)
-
-
-def _set_display_name_for_resize_canvas_action(
-      resize_mode_setting, resize_canvas_action):
-  if resize_mode_setting.value in resize_mode_setting.items_display_names:
-    resize_canvas_action['display_name'].set_value(
-      resize_mode_setting.items_display_names[resize_mode_setting.value])
-
-
-def _handle_rename_action_item_added(item):
-  _set_display_name_for_rename_action(
-    item.command['arguments/pattern'],
-    item.command)
-
-  item.command['arguments/pattern'].connect_event(
-    'value-changed',
-    _set_display_name_for_rename_action,
-    item.command)
-
-  if item.command['orig_name'].value == 'rename_for_edit_and_save_images':
-    item.command['arguments/rename_only_new_images'].connect_event(
-      'value-changed',
-      _set_display_name_for_rename_action_for_rename_only_new_images,
-      item.command['arguments/pattern'],
-      item.command)
-
-
-def _set_display_name_for_rename_action(pattern_setting, rename_action):
-  if rename_action['orig_name'].value != 'rename_for_edit_and_save_images':
-    rename_action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
-  else:
-    if rename_action['arguments/rename_only_new_images'].value:
-      rename_action['display_name'].set_value(
-        _('Rename New Images to "{}"').format(pattern_setting.value))
-    else:
-      rename_action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
-
-
-def _set_display_name_for_rename_action_for_rename_only_new_images(
-      _rename_only_new_images_setting,
-      pattern_setting,
-      rename_action,
-):
-  _set_display_name_for_rename_action(pattern_setting, rename_action)
-
-
 def _handle_export_action_item_added(item):
-  CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
-    item.command['arguments/file_extension'])
-
   item.command['arguments/file_extension'].gui.widget.connect(
     'changed',
     lambda _entry, setting: export_settings_.apply_file_extension_gui_to_setting_if_valid(setting),
@@ -545,32 +365,9 @@ def _handle_export_action_item_added(item):
       export_settings_.revert_file_extension_gui_to_last_valid_value(setting)),
     item.command['arguments/file_extension'])
 
-  _set_display_name_for_export_action(
-    item.command['arguments/file_extension'],
-    item.command)
-
-  item.command['arguments/file_extension'].connect_event(
-    'value-changed',
-    _set_display_name_for_export_action,
-    item.command)
-
   item.command['arguments/output_directory'].connect_event(
     'value-changed',
     _warn_about_output_directory_special_values)
-
-
-def _set_display_name_for_export_action(file_extension_setting, export_action):
-  file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
-
-  export_action_name = None
-  if export_action['orig_name'].value in [
-        'export_for_edit_and_save_images', 'export_for_edit_layers']:
-    export_action_name = _('Export As {}')
-  elif export_action['orig_name'].value.startswith('export_for_'):
-    export_action_name = _('Also Export As {}')
-
-  if export_action_name is not None:
-    export_action['display_name'].set_value(export_action_name.format(file_extension))
 
 
 def _handle_export_action_item_added_for_export_mode(item, settings):
@@ -598,61 +395,6 @@ def _warn_about_output_directory_special_values(output_directory_setting):
     )
 
 
-def _handle_save_action_item_added(item):
-  _set_display_name_for_save_action(
-    item.command['arguments/output_directory_for_new_images'],
-    item.command['arguments/output_directory'],
-    item.command,
-  )
-
-  item.command['arguments/output_directory_for_new_images'].connect_event(
-    'value-changed',
-    _set_display_name_for_save_action,
-    item.command['arguments/output_directory'],
-    item.command,
-  )
-
-  item.command['arguments/output_directory'].connect_event(
-    'value-changed',
-    _set_display_name_for_save_action_for_output_directory,
-    item.command['arguments/output_directory_for_new_images'],
-    item.command,
-  )
-
-
-def _set_display_name_for_save_action(
-      output_directory_for_new_images_setting,
-      output_directory_setting,
-      save_action,
-):
-  if output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL:
-    special_value_name = output_directory_setting.value.value
-    special_value = directory_.get_special_values().get(special_value_name)
-
-    if special_value is not None:
-      dirname = os.path.basename(output_directory_for_new_images_setting.value.value)
-      save_action['display_name'].set_value(
-        _('Save (New and Imported Images to "{}")').format(dirname))
-    else:
-      save_action['display_name'].set_value(_('Save'))
-  else:
-    output_dirname = os.path.basename(output_directory_setting.value.value)
-
-    save_action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
-
-
-def _set_display_name_for_save_action_for_output_directory(
-      output_directory_setting,
-      output_directory_for_new_images_setting,
-      save_action,
-):
-  _set_display_name_for_save_action(
-    output_directory_for_new_images_setting,
-    output_directory_setting,
-    save_action,
-  )
-
-
 def _reorder_action_before_first_save_action(
       action_list: command_list_.CommandList,
       item,
@@ -665,95 +407,6 @@ def _reorder_action_before_first_save_action(
 
   if first_save_action_position is not None:
     action_list.reorder_item(item, first_save_action_position)
-
-
-def _on_condition_item_added(_condition_list, item, _settings):
-  if item.command['orig_name'].value == 'matching_text':
-    _handle_matching_text_condition_item_added(item)
-
-
-def _set_up_existing_matching_text_conditions(condition_list: command_list_.CommandList):
-  for item in condition_list.items:
-    if item.command['orig_name'].value == 'matching_text':
-      _handle_matching_text_condition_item_added(item)
-
-
-def _handle_matching_text_condition_item_added(item):
-  _set_display_name_for_matching_text_condition(
-    item.command['arguments/match_mode'],
-    item.command['arguments/text'],
-    item.command['arguments/ignore_case_sensitivity'],
-    item.command)
-
-  item.command['arguments/match_mode'].connect_event(
-    'value-changed',
-    _set_display_name_for_matching_text_condition,
-    item.command['arguments/text'],
-    item.command['arguments/ignore_case_sensitivity'],
-    item.command)
-
-  item.command['arguments/text'].connect_event(
-    'value-changed',
-    lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, condition: (
-      _set_display_name_for_matching_text_condition(
-        match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition)),
-    item.command['arguments/match_mode'],
-    item.command['arguments/ignore_case_sensitivity'],
-    item.command)
-
-  item.command['arguments/ignore_case_sensitivity'].connect_event(
-    'value-changed',
-    lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, condition: (
-      _set_display_name_for_matching_text_condition(
-        match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition)),
-    item.command['arguments/match_mode'],
-    item.command['arguments/text'],
-    item.command)
-
-
-def _set_display_name_for_matching_text_condition(
-      match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition):
-  display_name = None
-
-  if match_mode_setting.value == builtin_conditions.MatchModes.STARTS_WITH:
-    if text_setting.value:
-      display_name = _('Starting with "{}"').format(text_setting.value)
-    else:
-      display_name = _('Starting with Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_START_WITH:
-    if text_setting.value:
-      display_name = _('Not Starting with "{}"').format(text_setting.value)
-    else:
-      display_name = _('Not Starting with Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.CONTAINS:
-    if text_setting.value:
-      display_name = _('Containing "{}"').format(text_setting.value)
-    else:
-      display_name = _('Containing Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_CONTAIN:
-    if text_setting.value:
-      display_name = _('Not Containing "{}"').format(text_setting.value)
-    else:
-      display_name = _('Not Containing Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.ENDS_WITH:
-    if text_setting.value:
-      display_name = _('Ending with "{}"').format(text_setting.value)
-    else:
-      display_name = _('Ending with Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.DOES_NOT_END_WITH:
-    if text_setting.value:
-      display_name = _('Not Ending with "{}"').format(text_setting.value)
-    else:
-      display_name = _('Not Ending with Any Text')
-  elif match_mode_setting.value == builtin_conditions.MatchModes.REGEX:
-    display_name = _('Matching Pattern "{}"').format(text_setting.value)
-
-  if display_name is not None:
-    if ignore_case_sensitivity_setting.value:
-      # FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-      display_name += _(' (Case-Insensitive)')
-
-    condition['display_name'].set_value(display_name)
 
 
 def _set_buttons_for_command_item_sensitive(item, sensitive):

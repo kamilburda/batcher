@@ -9,6 +9,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
+from config import CONFIG
 from src import builtin_commands_common
 from src import constants
 from src import directory as directory_
@@ -728,6 +729,18 @@ def on_after_add_export_action(_actions, action, _orig_action_dict):
       _set_file_format_export_options_from_extension,
       action['arguments/file_extension'])
 
+    CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
+      action['arguments/file_extension'])
+
+    _set_display_name_for_export(
+      action['arguments/file_extension'],
+      action)
+
+    action['arguments/file_extension'].connect_event(
+      'value-changed',
+      _set_display_name_for_export,
+      action)
+
 
 def set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
       main_settings):
@@ -793,6 +806,20 @@ def _show_hide_file_format_export_options(
       file_format_mode_setting, file_format_export_options_setting):
   file_format_export_options_setting.gui.set_visible(
     file_format_mode_setting.value == 'use_explicit_values')
+
+
+def _set_display_name_for_export(file_extension_setting, action):
+  file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
+
+  export_action_name = None
+  if action['orig_name'].value in [
+        'export_for_edit_and_save_images', 'export_for_edit_layers']:
+    export_action_name = _('Export As {}')
+  elif action['orig_name'].value.startswith('export_for_'):
+    export_action_name = _('Also Export As {}')
+
+  if export_action_name is not None:
+    action['display_name'].set_value(export_action_name.format(file_extension))
 
 
 _EXPORT_OVERWRITE_MODES_LIST = [

@@ -360,6 +360,15 @@ def on_after_add_crop_action(_actions, action, _orig_action_dict):
       action['arguments'],
     )
 
+    _set_display_name_for_crop(
+      action['arguments/crop_mode'],
+      action['display_name'])
+
+    action['arguments/crop_mode'].connect_event(
+      'value-changed',
+      _set_display_name_for_crop,
+      action['display_name'])
+
 
 def _set_visible_for_crop_from_edges_settings(
       crop_from_edges_same_amount_for_each_side_setting,
@@ -407,6 +416,14 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, arguments):
     arguments['crop_to_area_y'].gui.set_visible(True)
     arguments['crop_to_area_width'].gui.set_visible(True)
     arguments['crop_to_area_height'].gui.set_visible(True)
+
+
+def _set_display_name_for_crop(crop_mode_setting, display_name_setting):
+  if crop_mode_setting.value == CropModes.REMOVE_EMPTY_BORDERS:
+    display_name_setting.set_value(_('Crop to Remove Empty Borders'))
+  else:
+    if crop_mode_setting.value in crop_mode_setting.items_display_names:
+      display_name_setting.set_value(crop_mode_setting.items_display_names[crop_mode_setting.value])
 
 
 CROP_FOR_IMAGES_DICT = {

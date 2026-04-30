@@ -115,6 +115,26 @@ def on_after_add_save_action(_actions, action, _orig_action_dict):
       action['arguments/output_directory_for_new_images'],
     )
 
+    _set_display_name_for_save(
+      action['arguments/output_directory_for_new_images'],
+      action['arguments/output_directory'],
+      action,
+    )
+
+    action['arguments/output_directory_for_new_images'].connect_event(
+      'value-changed',
+      _set_display_name_for_save,
+      action['arguments/output_directory'],
+      action,
+    )
+
+    action['arguments/output_directory'].connect_event(
+      'value-changed',
+      _set_display_name_for_save_for_output_directory,
+      action['arguments/output_directory_for_new_images'],
+      action,
+    )
+
 
 def _set_visible_for_output_directory_for_new_images_setting(
       output_directory_setting,
@@ -125,6 +145,38 @@ def _set_visible_for_output_directory_for_new_images_setting(
     and output_directory_setting.value.value == 'use_original_location')
 
   output_directory_for_new_images_setting.gui.set_visible(is_visible)
+
+
+def _set_display_name_for_save(
+      output_directory_for_new_images_setting,
+      output_directory_setting,
+      action,
+):
+  if output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL:
+    special_value_name = output_directory_setting.value.value
+    special_value = directory_.get_special_values().get(special_value_name)
+
+    if special_value is not None:
+      dirname = os.path.basename(output_directory_for_new_images_setting.value.value)
+      action['display_name'].set_value(_('Save (New and Imported Images to "{}")').format(dirname))
+    else:
+      action['display_name'].set_value(_('Save'))
+  else:
+    output_dirname = os.path.basename(output_directory_setting.value.value)
+
+    action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
+
+
+def _set_display_name_for_save_for_output_directory(
+      output_directory_setting,
+      output_directory_for_new_images_setting,
+      action,
+):
+  _set_display_name_for_save(
+    output_directory_for_new_images_setting,
+    output_directory_setting,
+    action,
+  )
 
 
 SAVE_DICT = {

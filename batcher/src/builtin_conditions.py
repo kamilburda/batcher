@@ -163,6 +163,89 @@ def on_after_add_without_color_tag_condition(_conditions, condition, _orig_condi
     condition['arguments/last_enabled_value'].gui.set_visible(False)
 
 
+def on_after_add_matching_text_condition(_conditions, condition, _orig_condition_dict):
+  if condition['orig_name'].value == 'matching_text':
+    _set_display_name_for_matching_text(
+      condition['arguments/match_mode'],
+      condition['arguments/text'],
+      condition['arguments/ignore_case_sensitivity'],
+      condition)
+
+    condition['arguments/match_mode'].connect_event(
+      'value-changed',
+      _set_display_name_for_matching_text,
+      condition['arguments/text'],
+      condition['arguments/ignore_case_sensitivity'],
+      condition)
+
+    condition['arguments/text'].connect_event(
+      'value-changed',
+      lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, condition_: (
+        _set_display_name_for_matching_text(
+          match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition_)),
+      condition['arguments/match_mode'],
+      condition['arguments/ignore_case_sensitivity'],
+      condition)
+
+    condition['arguments/ignore_case_sensitivity'].connect_event(
+      'value-changed',
+      lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, condition_: (
+        _set_display_name_for_matching_text(
+          match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition_)),
+      condition['arguments/match_mode'],
+      condition['arguments/text'],
+      condition)
+
+
+def _set_display_name_for_matching_text(
+      match_mode_setting,
+      text_setting,
+      ignore_case_sensitivity_setting,
+      condition,
+):
+  display_name = None
+
+  if match_mode_setting.value == MatchModes.STARTS_WITH:
+    if text_setting.value:
+      display_name = _('Starting with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Starting with Any Text')
+  elif match_mode_setting.value == MatchModes.DOES_NOT_START_WITH:
+    if text_setting.value:
+      display_name = _('Not Starting with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not Starting with Any Text')
+  elif match_mode_setting.value == MatchModes.CONTAINS:
+    if text_setting.value:
+      display_name = _('Containing "{}"').format(text_setting.value)
+    else:
+      display_name = _('Containing Any Text')
+  elif match_mode_setting.value == MatchModes.DOES_NOT_CONTAIN:
+    if text_setting.value:
+      display_name = _('Not Containing "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not Containing Any Text')
+  elif match_mode_setting.value == MatchModes.ENDS_WITH:
+    if text_setting.value:
+      display_name = _('Ending with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Ending with Any Text')
+  elif match_mode_setting.value == MatchModes.DOES_NOT_END_WITH:
+    if text_setting.value:
+      display_name = _('Not Ending with "{}"').format(text_setting.value)
+    else:
+      display_name = _('Not Ending with Any Text')
+  elif match_mode_setting.value == MatchModes.REGEX:
+    display_name = _('Matching Pattern "{}"').format(text_setting.value)
+
+  if display_name is not None:
+    if ignore_case_sensitivity_setting.value:
+      # FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
+      display_name += _(' (Case-Insensitive)')
+
+    condition['display_name'].set_value(display_name)
+
+
 _BUILTIN_CONDITIONS_LIST = [
   {
     'name': 'layers',

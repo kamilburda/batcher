@@ -477,6 +477,15 @@ def on_after_add_resize_canvas_action(_actions, action, _orig_action_dict):
       action['arguments'],
     )
 
+    _set_display_name_for_resize_canvas(
+      action['arguments/resize_mode'],
+      action['display_name'])
+
+    action['arguments/resize_mode'].connect_event(
+      'value-changed',
+      _set_display_name_for_resize_canvas,
+      action['display_name'])
+
 
 def _set_visible_for_resize_from_edges_settings(
       resize_from_edges_same_amount_for_each_side_setting,
@@ -538,6 +547,12 @@ def _set_visible_for_resize_mode_settings(
     resize_arguments_group['resize_to_layer_size_layers'].gui.set_visible(True)
   elif resize_mode_setting.value == ResizeModes.RESIZE_TO_IMAGE_SIZE:
     resize_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
+
+
+def _set_display_name_for_resize_canvas(resize_mode_setting, display_name_setting):
+  if resize_mode_setting.value in resize_mode_setting.items_display_names:
+    display_name_setting.set_value(
+      resize_mode_setting.items_display_names[resize_mode_setting.value])
 
 
 RESIZE_CANVAS_DICT = {

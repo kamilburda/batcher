@@ -7,6 +7,7 @@ from src.pypdb import pdb
 
 __all__ = [
   'gmic_filter',
+  'on_after_add_gmic_filter_action'
 ]
 
 
@@ -23,6 +24,26 @@ def gmic_filter(batcher, layers, command):
     output=0,
     command=command,
   )
+
+
+def on_after_add_gmic_filter_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'gmic_filter':
+    _set_display_name_for_gmic_filter(
+      action['arguments/command'],
+      action['display_name'])
+
+    action['arguments/command'].connect_event(
+      'value-changed',
+      _set_display_name_for_gmic_filter,
+      action['display_name'])
+
+
+def _set_display_name_for_gmic_filter(gmic_command_setting, display_name_setting):
+  if gmic_command_setting.value:
+    filter_name = gmic_command_setting.value.strip().split(' ')[0]
+    display_name_setting.set_value(_("G'MIC Filter: {}").format(filter_name))
+  else:
+    display_name_setting.set_value(_("G'MIC Filter"))
 
 
 GMIC_FILTER_DICT = {

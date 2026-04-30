@@ -11,6 +11,7 @@ __all__ = [
   'RenameImageForExportImagesAction',
   'RenameImageForEditAndSaveImagesAction',
   'RenameLayerAction',
+  'on_after_add_rename_action',
 ]
 
 
@@ -92,6 +93,43 @@ class RenameLayerAction(invoker_.CallableCommand):
 
       if layer_batcher.process_names and not layer_batcher.is_preview:
         layer_batcher.current_layer.set_name(layer_batcher.current_item.name)
+
+
+def on_after_add_rename_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value.startswith('rename_for_'):
+    _set_display_name_for_rename(
+      action['arguments/pattern'],
+      action)
+
+    action['arguments/pattern'].connect_event(
+      'value-changed',
+      _set_display_name_for_rename,
+      action)
+
+    if action['orig_name'].value == 'rename_for_edit_and_save_images':
+      action['arguments/rename_only_new_images'].connect_event(
+        'value-changed',
+        _set_display_name_for_rename_action_for_rename_only_new_images,
+        action['arguments/pattern'],
+        action)
+
+
+def _set_display_name_for_rename(pattern_setting, action):
+  if action['orig_name'].value != 'rename_for_edit_and_save_images':
+    action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+  else:
+    if action['arguments/rename_only_new_images'].value:
+      action['display_name'].set_value(_('Rename New Images to "{}"').format(pattern_setting.value))
+    else:
+      action['display_name'].set_value(_('Rename to "{}"').format(pattern_setting.value))
+
+
+def _set_display_name_for_rename_action_for_rename_only_new_images(
+      _rename_only_new_images_setting,
+      pattern_setting,
+      action,
+):
+  _set_display_name_for_rename(pattern_setting, action)
 
 
 RENAME_FOR_CONVERT_DICT = {
