@@ -168,7 +168,7 @@ MERGE_VISIBLE_LAYERS_DICT = {
 REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT = {
   'name': 'remove_file_extension_from_imported_images',
   'function': remove_file_extension_from_imported_images,
-  'display_name': _('Remove file extension from imported images'),
+  'display_name': _('Remove File Extension from Imported Images'),
   'description': _('Imported images represent non-native GIMP files (i.e. not XCF).'),
   'menu_path': _('File and Naming'),
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EDIT_AND_SAVE_IMAGES_GROUP],
