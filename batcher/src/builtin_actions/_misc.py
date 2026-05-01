@@ -86,25 +86,20 @@ def remove_file_extension_from_imported_images(image_batcher):
 
 def on_after_add_merge_layer_action(_actions, action, _orig_action_dict):
   if action['orig_name'].value == 'merge_layer':
-    _set_display_name_for_merge_layer(
-      action['arguments/layer'],
-      action['display_name'],
-    )
-
-    action['arguments/layer'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_merge_layer,
-      action['display_name'],
+      action['arguments/layer'],
+      action,
     )
 
 
-def _set_display_name_for_merge_layer(layer_setting, display_name_setting):
+def _set_display_name_for_merge_layer(layer_setting, action):
   if layer_setting.value == 'background_layer':
-    display_name_setting.set_value(_('Merge with Layer Below'))
+    action['display_name'].set_value(_('Merge with Layer Below'))
   elif layer_setting.value == 'foreground_layer':
-    display_name_setting.set_value(_('Merge with Layer Above'))
+    action['display_name'].set_value(_('Merge with Layer Above'))
   else:
-    display_name_setting.set_value(_('Merge Layer'))
+    action['display_name'].set_value(_('Merge Layer'))
 
 
 MERGE_LAYER_DICT = {

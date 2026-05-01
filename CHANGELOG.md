@@ -16,6 +16,7 @@ Changes to actions and conditions:
 
 Bug fixes:
 * Fixed some options in `Crop` and `Resize Canvas` not working for text layers.
+* Fixed names of actions and conditions displayed after reset not being updated properly. In particular, when resetting settings for Export Layers, the `Resize Canvas` action that is automatically added was not renamed to `Resize to Layer Size`. 
 
 
 ## 1.2.5

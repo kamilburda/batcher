@@ -11,6 +11,7 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import Gio
 
+from src import builtin_commands_common
 from src import commands
 from src import constants
 from src import exceptions
@@ -544,39 +545,33 @@ def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, cond
     color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
       GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
 
-    _set_display_name_for_insert_overlay(
-      action['arguments/insert_content'],
-      action['arguments/position'],
-      action['arguments/color_tag'],
-      color_tag_tree_model,
-      action['display_name'],
-    )
-
-    action['arguments/insert_content'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_insert_overlay,
-      action['arguments/position'],
-      action['arguments/color_tag'],
-      color_tag_tree_model,
-      action['display_name'],
+      action['arguments/insert_content'],
+      action,
+      [
+        action['arguments/position'],
+        action['arguments/color_tag'],
+        color_tag_tree_model,
+      ],
     )
 
     action['arguments/position'].connect_event(
       'value-changed',
       _set_display_name_for_insert_overlay_via_position,
+      action,
       action['arguments/insert_content'],
       action['arguments/color_tag'],
       color_tag_tree_model,
-      action['display_name'],
     )
 
     action['arguments/color_tag'].connect_event(
       'value-changed',
       _set_display_name_for_insert_overlay_via_color_tag,
+      action,
       action['arguments/insert_content'],
       action['arguments/position'],
       color_tag_tree_model,
-      action['display_name'],
     )
 
     if 'condition_name' in action['arguments']:
@@ -655,14 +650,14 @@ def _set_left_margin_for_use_pattern(use_pattern_setting):
 
 
 def _set_display_name_for_insert_overlay(
-      insert_overlay_insert_content_setting,
-      insert_overlay_position_setting,
+      insert_content_setting,
+      action,
+      position_setting,
       color_tag_setting,
       color_tag_tree_model,
-      display_name_setting,
 ):
-  content = insert_overlay_insert_content_setting.value
-  position = insert_overlay_position_setting.value
+  content = insert_content_setting.value
+  position = position_setting.value
   color_tag_name = _get_color_tag_name(color_tag_setting.value, color_tag_tree_model)
 
   display_names = {
@@ -677,38 +672,38 @@ def _set_display_name_for_insert_overlay(
   }
 
   display_name = display_names.get((content, position), _('Insert Overlay (Watermark)'))
-  display_name_setting.set_value(display_name)
+  action['display_name'].set_value(display_name)
 
 
 def _set_display_name_for_insert_overlay_via_position(
-      insert_overlay_position_setting,
-      insert_overlay_insert_content_setting,
+      position_setting,
+      action,
+      insert_content_setting,
       color_tag_setting,
       color_tag_tree_model,
-      display_name_setting,
 ):
   _set_display_name_for_insert_overlay(
-    insert_overlay_insert_content_setting,
-    insert_overlay_position_setting,
+    insert_content_setting,
+    action,
+    position_setting,
     color_tag_setting,
     color_tag_tree_model,
-    display_name_setting,
   )
 
 
 def _set_display_name_for_insert_overlay_via_color_tag(
       color_tag_setting,
+      action,
       insert_overlay_insert_content_setting,
       insert_overlay_position_setting,
       color_tag_tree_model,
-      display_name_setting,
 ):
   _set_display_name_for_insert_overlay(
     insert_overlay_insert_content_setting,
+    action,
     insert_overlay_position_setting,
     color_tag_setting,
     color_tag_tree_model,
-    display_name_setting,
   )
 
 
@@ -729,13 +724,13 @@ def _connect_changes_to_linked_without_color_tag_condition(
 
   _set_display_name_for_without_color_tag_condition(
     insert_overlay_action['arguments/color_tag'],
-    without_color_tag_condition['display_name'],
+    without_color_tag_condition,
     color_tag_tree_model,
   )
   insert_overlay_action['arguments/color_tag'].connect_event(
     'value-changed',
     _set_display_name_for_without_color_tag_condition,
-    without_color_tag_condition['display_name'],
+    without_color_tag_condition,
     color_tag_tree_model,
   )
 
@@ -759,13 +754,13 @@ def _connect_changes_to_linked_without_color_tag_condition(
 
 def _set_display_name_for_without_color_tag_condition(
       insert_overlay_color_tag_setting,
-      display_name_setting,
+      condition,
       color_tag_tree_model,
 ):
   color_tag = insert_overlay_color_tag_setting.value
 
   # FOR TRANSLATORS: Think of "Only items without color tag: <color tag>" when translating this
-  display_name_setting.set_value(
+  condition['display_name'].set_value(
     _('Without Color Tag: {}').format(_get_color_tag_name(color_tag, color_tag_tree_model)))
 
 

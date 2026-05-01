@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_commands_common
 from src import utils
 from src.procedure_groups import *
 from src.pypdb import pdb
@@ -360,14 +361,11 @@ def on_after_add_crop_action(_actions, action, _orig_action_dict):
       action['arguments'],
     )
 
-    _set_display_name_for_crop(
-      action['arguments/crop_mode'],
-      action['display_name'])
-
-    action['arguments/crop_mode'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_crop,
-      action['display_name'])
+      action['arguments/crop_mode'],
+      action,
+    )
 
 
 def _set_visible_for_crop_from_edges_settings(
@@ -418,12 +416,13 @@ def _set_visible_for_crop_mode_settings(crop_mode_setting, arguments):
     arguments['crop_to_area_height'].gui.set_visible(True)
 
 
-def _set_display_name_for_crop(crop_mode_setting, display_name_setting):
+def _set_display_name_for_crop(crop_mode_setting, action):
   if crop_mode_setting.value == CropModes.REMOVE_EMPTY_BORDERS:
-    display_name_setting.set_value(_('Crop to Remove Empty Borders'))
+    action['display_name'].set_value(_('Crop to Remove Empty Borders'))
   else:
     if crop_mode_setting.value in crop_mode_setting.items_display_names:
-      display_name_setting.set_value(crop_mode_setting.items_display_names[crop_mode_setting.value])
+      action['display_name'].set_value(
+        crop_mode_setting.items_display_names[crop_mode_setting.value])
 
 
 CROP_FOR_IMAGES_DICT = {

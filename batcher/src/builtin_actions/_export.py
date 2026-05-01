@@ -732,14 +732,11 @@ def on_after_add_export_action(_actions, action, _orig_action_dict):
     CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
       action['arguments/file_extension'])
 
-    _set_display_name_for_export(
-      action['arguments/file_extension'],
-      action)
-
-    action['arguments/file_extension'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_export,
-      action)
+      action['arguments/file_extension'],
+      action,
+    )
 
 
 def set_sensitive_for_image_name_pattern_in_export_for_default_export_action(

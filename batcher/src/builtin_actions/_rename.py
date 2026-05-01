@@ -97,21 +97,19 @@ class RenameLayerAction(invoker_.CallableCommand):
 
 def on_after_add_rename_action(_actions, action, _orig_action_dict):
   if action['orig_name'].value.startswith('rename_for_'):
-    _set_display_name_for_rename(
-      action['arguments/pattern'],
-      action)
-
-    action['arguments/pattern'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_rename,
-      action)
+      action['arguments/pattern'],
+      action,
+    )
 
     if action['orig_name'].value == 'rename_for_edit_and_save_images':
       action['arguments/rename_only_new_images'].connect_event(
         'value-changed',
         _set_display_name_for_rename_action_for_rename_only_new_images,
         action['arguments/pattern'],
-        action)
+        action,
+      )
 
 
 def _set_display_name_for_rename(pattern_setting, action):

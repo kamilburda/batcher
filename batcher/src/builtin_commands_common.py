@@ -25,3 +25,32 @@ def get_filtered_builtin_commands(builtin_commands, tags=None, availability_func
     filtered_builtin_commands[name] = command_dict
 
   return filtered_builtin_commands
+
+
+def set_up_display_name_change_for_command(
+      display_name_changed_func,
+      setting,
+      command,
+      args=None,
+):
+  if args is None:
+    args = ()
+
+  display_name_changed_func(
+    setting,
+    command,
+    *args,
+  )
+
+  setting.connect_event(
+    'value-changed',
+    display_name_changed_func,
+    command,
+    *args,
+  )
+
+  # This is necessary for initial actions.
+  command['display_name'].connect_event(
+    'after-reset',
+    lambda _display_name_setting: display_name_changed_func(setting, command, *args),
+  )

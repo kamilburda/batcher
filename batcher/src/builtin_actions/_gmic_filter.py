@@ -1,5 +1,6 @@
 """Built-in "G'MIC Filter" action."""
 
+from src import builtin_commands_common
 from src.procedure_groups import *
 
 from src.pypdb import pdb
@@ -28,22 +29,19 @@ def gmic_filter(batcher, layers, command):
 
 def on_after_add_gmic_filter_action(_actions, action, _orig_action_dict):
   if action['orig_name'].value == 'gmic_filter':
-    _set_display_name_for_gmic_filter(
-      action['arguments/command'],
-      action['display_name'])
-
-    action['arguments/command'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_gmic_filter,
-      action['display_name'])
+      action['arguments/command'],
+      action,
+    )
 
 
-def _set_display_name_for_gmic_filter(gmic_command_setting, display_name_setting):
+def _set_display_name_for_gmic_filter(gmic_command_setting, action):
   if gmic_command_setting.value:
     filter_name = gmic_command_setting.value.strip().split(' ')[0]
-    display_name_setting.set_value(_("G'MIC Filter: {}").format(filter_name))
+    action['display_name'].set_value(_("G'MIC Filter: {}").format(filter_name))
   else:
-    display_name_setting.set_value(_("G'MIC Filter"))
+    action['display_name'].set_value(_("G'MIC Filter"))
 
 
 GMIC_FILTER_DICT = {

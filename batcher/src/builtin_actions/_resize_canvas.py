@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_commands_common
 from src.procedure_groups import *
 
 from . import _utils as builtin_actions_utils
@@ -477,14 +478,11 @@ def on_after_add_resize_canvas_action(_actions, action, _orig_action_dict):
       action['arguments'],
     )
 
-    _set_display_name_for_resize_canvas(
-      action['arguments/resize_mode'],
-      action['display_name'])
-
-    action['arguments/resize_mode'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_resize_canvas,
-      action['display_name'])
+      action['arguments/resize_mode'],
+      action,
+    )
 
 
 def _set_visible_for_resize_from_edges_settings(
@@ -549,9 +547,9 @@ def _set_visible_for_resize_mode_settings(
     resize_arguments_group['resize_to_image_size_image'].gui.set_visible(True)
 
 
-def _set_display_name_for_resize_canvas(resize_mode_setting, display_name_setting):
+def _set_display_name_for_resize_canvas(resize_mode_setting, action):
   if resize_mode_setting.value in resize_mode_setting.items_display_names:
-    display_name_setting.set_value(
+    action['display_name'].set_value(
       resize_mode_setting.items_display_names[resize_mode_setting.value])
 
 

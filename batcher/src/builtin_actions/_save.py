@@ -115,22 +115,18 @@ def on_after_add_save_action(_actions, action, _orig_action_dict):
       action['arguments/output_directory_for_new_images'],
     )
 
-    _set_display_name_for_save(
-      action['arguments/output_directory_for_new_images'],
-      action['arguments/output_directory'],
-      action,
-    )
-
-    action['arguments/output_directory_for_new_images'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_save,
-      action['arguments/output_directory'],
+      action['arguments/output_directory_for_new_images'],
       action,
+      [
+        action['arguments/output_directory'],
+      ],
     )
 
     action['arguments/output_directory'].connect_event(
       'value-changed',
-      _set_display_name_for_save_for_output_directory,
+      _set_display_name_for_save_via_output_directory,
       action['arguments/output_directory_for_new_images'],
       action,
     )
@@ -149,8 +145,8 @@ def _set_visible_for_output_directory_for_new_images_setting(
 
 def _set_display_name_for_save(
       output_directory_for_new_images_setting,
-      output_directory_setting,
       action,
+      output_directory_setting,
 ):
   if output_directory_setting.value.type_ == directory_.DirectoryTypes.SPECIAL:
     special_value_name = output_directory_setting.value.value
@@ -167,15 +163,15 @@ def _set_display_name_for_save(
     action['display_name'].set_value(_('Save to "{}"').format(output_dirname))
 
 
-def _set_display_name_for_save_for_output_directory(
+def _set_display_name_for_save_via_output_directory(
       output_directory_setting,
       output_directory_for_new_images_setting,
       action,
 ):
   _set_display_name_for_save(
     output_directory_for_new_images_setting,
-    output_directory_setting,
     action,
+    output_directory_setting,
   )
 
 

@@ -6,6 +6,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_commands_common
 from src import file_formats as file_formats_
 from src import itemtree
 from src.path import fileext
@@ -165,43 +166,38 @@ def on_after_add_without_color_tag_condition(_conditions, condition, _orig_condi
 
 def on_after_add_matching_text_condition(_conditions, condition, _orig_condition_dict):
   if condition['orig_name'].value == 'matching_text':
-    _set_display_name_for_matching_text(
-      condition['arguments/match_mode'],
-      condition['arguments/text'],
-      condition['arguments/ignore_case_sensitivity'],
-      condition)
-
-    condition['arguments/match_mode'].connect_event(
-      'value-changed',
+    builtin_commands_common.set_up_display_name_change_for_command(
       _set_display_name_for_matching_text,
-      condition['arguments/text'],
-      condition['arguments/ignore_case_sensitivity'],
-      condition)
+      condition['arguments/match_mode'],
+      condition,
+      [
+        condition['arguments/text'],
+        condition['arguments/ignore_case_sensitivity'],
+      ],
+    )
 
     condition['arguments/text'].connect_event(
       'value-changed',
-      lambda text_setting, match_mode_setting, ignore_case_sensitivity_setting, condition_: (
-        _set_display_name_for_matching_text(
-          match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition_)),
+      _set_display_name_for_matching_text_via_text,
+      condition,
       condition['arguments/match_mode'],
       condition['arguments/ignore_case_sensitivity'],
-      condition)
+    )
 
     condition['arguments/ignore_case_sensitivity'].connect_event(
       'value-changed',
-      lambda ignore_case_sensitivity_setting, match_mode_setting, text_setting, condition_: (
-        _set_display_name_for_matching_text(
-          match_mode_setting, text_setting, ignore_case_sensitivity_setting, condition_)),
+      _set_display_name_for_matching_text_via_ignore_case_sensitivity,
+      condition,
       condition['arguments/match_mode'],
       condition['arguments/text'],
-      condition)
+    )
 
 
 def _set_display_name_for_matching_text(
       match_mode_setting,
+      condition,
       text_setting,
       ignore_case_sensitivity_setting,
-      condition,
 ):
   display_name = None
 
@@ -244,6 +240,34 @@ def _set_display_name_for_matching_text(
       display_name += _(' (Case-Insensitive)')
 
     condition['display_name'].set_value(display_name)
+
+
+def _set_display_name_for_matching_text_via_text(
+      text_setting,
+      condition,
+      match_mode_setting,
+      ignore_case_sensitivity_setting,
+):
+  _set_display_name_for_matching_text(
+    match_mode_setting,
+    condition,
+    text_setting,
+    ignore_case_sensitivity_setting,
+  )
+
+
+def _set_display_name_for_matching_text_via_ignore_case_sensitivity(
+      ignore_case_sensitivity_setting,
+      condition,
+      match_mode_setting,
+      text_setting,
+):
+  _set_display_name_for_matching_text(
+    match_mode_setting,
+    condition,
+    text_setting,
+    ignore_case_sensitivity_setting,
+  )
 
 
 _BUILTIN_CONDITIONS_LIST = [
