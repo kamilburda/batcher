@@ -140,6 +140,9 @@ class DirectoryChooser(Gtk.Box):
   def get_entry(self):
     return self._combo_box.get_child()
 
+  def get_button(self):
+    return self._button_browse
+
   def set_entry_position(self, position):
     self._combo_box.get_child().set_position(position)
 

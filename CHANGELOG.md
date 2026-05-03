@@ -9,6 +9,9 @@ New features:
 * For the `[image name]` field, added `%o` option that uses the original image name (before being renamed e.g. by the `Rename` action).
 * If patterns are used in `Insert Overlay (Watermark)`, you can specify the image file path via the `[image file]` field.
 
+User interface changes:
+* If `Match input folders` is displayed on start, the default dialog focus will be set to the button for choosing a folder.
+
 Changes to actions and conditions:
 * `Merge Background` and `Merge Foreground` are no longer added automatically when `Insert Overlay (Watermark)` is added.
 * Replaced `Merge Background` and `Merge Foreground` with a single action named `Merge Layer` that can be added by the user.
@@ -16,7 +19,7 @@ Changes to actions and conditions:
 
 Bug fixes:
 * Fixed some options in `Crop` and `Resize Canvas` not working for text layers.
-* Fixed names of actions and conditions displayed after reset not being updated properly. In particular, when resetting settings for Export Layers, the `Resize Canvas` action that is automatically added was not renamed to `Resize to Layer Size`. 
+* Fixed names of actions and conditions displayed after reset not being updated properly. In particular, when resetting settings for Export Layers, the `Resize Canvas` action that is automatically added was not renamed to `Resize to Layer Size`.
 
 
 ## 1.2.5

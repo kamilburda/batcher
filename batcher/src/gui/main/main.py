@@ -258,7 +258,10 @@ class BatchProcessingGui:
     self._dialog.vbox.show_all()
 
     if self._export_settings is not None:
-      self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
+      if self._export_settings.folder_chooser.get_entry().get_can_focus():
+        self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
+      else:
+        self._dialog.set_focus(self._export_settings.folder_chooser.get_button())
     else:
       self._dialog.set_focus(self._command_lists.action_list.button_add)
 
@@ -453,7 +456,10 @@ class BatchProcessingQuickGui:
     self._dialog.show_all()
 
     if self._export_settings is not None:
-      self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
+      if self._export_settings.folder_chooser.get_entry().get_can_focus():
+        self._dialog.set_focus(self._export_settings.folder_chooser.get_entry())
+      else:
+        self._dialog.set_focus(self._export_settings.folder_chooser.get_button())
       self._export_settings.folder_chooser.set_entry_position(-1)
 
     if mode == 'export' and self._settings['gui/show_quick_settings'].value:
