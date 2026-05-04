@@ -98,6 +98,9 @@ def _set_display_name_for_merge_layer(layer_setting, action):
     action['display_name'].set_value(_('Merge with Layer Below'))
   elif layer_setting.value == 'foreground_layer':
     action['display_name'].set_value(_('Merge with Layer Above'))
+  elif isinstance(layer_setting.value, dict) and layer_setting.value['name'] == 'layer_at_position':
+    action['display_name'].set_value(
+      _('Merge Layer {} with Layer Below').format(layer_setting.value['position']))
   else:
     action['display_name'].set_value(_('Merge Layer'))
 
