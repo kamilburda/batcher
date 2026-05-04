@@ -41,6 +41,20 @@ class TestGetReplacedArg(unittest.TestCase):
     self.assertEqual(len(result), 1)
     self.assertIsInstance(result[0], stubs_gimp.Layer)
 
+  def test_arg_matching_placeholder_with_dict(self):
+    batcher = _BatcherStub(current_image_name='image')
+    batcher.current_image.layers.append(stubs_gimp.Layer(name='layer', image=batcher.current_image))
+
+    setting = placeholders_.PlaceholderLayerSetting('placeholder')
+    setting.set_value({
+      'name': 'layer_at_position',
+      'position': 1,
+    })
+
+    result = placeholders_.get_replaced_value(setting, batcher)
+
+    self.assertIsInstance(result, stubs_gimp.Layer)
+
   def test_arg_not_matching_placeholder(self):
     batcher = _BatcherStub(current_image_name='image')
 

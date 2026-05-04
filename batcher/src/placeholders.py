@@ -4,7 +4,7 @@ The placeholder objects are defined in the `PLACEHOLDERS` dictionary.
 """
 
 import inspect
-from typing import Callable, List, Optional, Union, Type
+from typing import Callable, Dict, Iterable, List, Optional, Union, Type
 
 from gi.repository import GObject
 
@@ -17,10 +17,19 @@ from src.gui import placeholders as gui_placeholders
 
 class Placeholder:
   
-  def __init__(self, name: str, display_name: str, replacement_func: Callable):
+  def __init__(
+        self,
+        name: str,
+        display_name: str,
+        replacement_func: Callable,
+        arguments: Optional[Iterable[Dict]] = None,
+  ):
     self._name = name
     self._display_name = display_name
     self._replacement_func = replacement_func
+    self._arguments = list(arguments) if arguments is not None else []
+
+    self._settings = None
 
   @property
   def name(self) -> str:
@@ -29,9 +38,19 @@ class Placeholder:
   @property
   def display_name(self) -> str:
     return self._display_name
-  
-  def replace_args(self, *args):
-    return self._replacement_func(*args)
+
+  @property
+  def arguments(self) -> List[Dict]:
+    return self._arguments
+
+  def create_settings_from_arguments(self) -> setting_.Group:
+    settings = setting_.Group(name='arguments')
+    settings.add(self._arguments)
+
+    return settings
+
+  def replace_args(self, *args, **kwargs):
+    return self._replacement_func(*args, **kwargs)
 
 
 def get_current_image(_setting, batcher):
@@ -60,6 +79,23 @@ def get_foreground_layer(_setting, batcher):
 
 def get_foreground_layer_for_array(setting, batcher):
   return (get_foreground_layer(setting, batcher),)
+
+
+def get_layer_at_position(_setting, batcher, position: int = 1):
+  current_image_layers = batcher.current_image.get_layers()
+
+  if not current_image_layers:
+    raise exceptions.SkipCommand(_('Image has no layers.'))
+  elif position > len(current_image_layers):
+    raise exceptions.SkipCommand(_('There is no layer at position {}.').format(position))
+  elif position < 1:
+    position = 1
+
+  return current_image_layers[position - 1]
+
+
+def get_layer_at_position_for_array(setting, batcher, **kwargs):
+  return (get_layer_at_position(setting, batcher, **kwargs),)
 
 
 def get_none_object(_setting, _batcher):
@@ -117,6 +153,32 @@ _PLACEHOLDERS_LIST = [
   ('background_layer_for_array', _('Layer Below (Background)'), get_background_layer_for_array),
   ('foreground_layer', _('Layer Above (Foreground)'), get_foreground_layer),
   ('foreground_layer_for_array', _('Layer Above (Foreground)'), get_foreground_layer_for_array),
+  (
+    'layer_at_position',
+    _('Layer at Position'),
+    get_layer_at_position,
+    [
+      {
+        'type': 'int',
+        'name': 'position',
+        'default_value': 1,
+        'min_value': 1,
+      }
+    ],
+  ),
+  (
+    'layer_at_position_for_array',
+    _('Layer at Position'),
+    get_layer_at_position_for_array,
+    [
+      {
+        'type': 'int',
+        'name': 'position',
+        'default_value': 1,
+        'min_value': 1,
+      }
+    ],
+  ),
   ('all_top_level_layers', _('All Layers'), get_all_top_level_layers),
   ('none', _('None'), get_none_object),
   ('unsupported_parameter', '', get_value_for_unsupported_parameter),
@@ -154,6 +216,13 @@ The following placeholder objects are defined:
   immediately before the currently processed layer. This placeholder is used 
   for commands containing the `Gimp.CoreObjectArray` parameter whose 
   object type is `Gimp.Layer`, `Gimp.Drawable` or `Gimp.Item`.
+
+* ``PLACEHOLDERS['layer_at_position']``: The layer at the specified position.
+
+* ``PLACEHOLDERS['layer_at_position_for_array']``: The layer at the specified 
+  position. This placeholder is used for commands containing the 
+  `Gimp.CoreObjectArray` parameter whose object type is `Gimp.Layer`, 
+  `Gimp.Drawable` or `Gimp.Item`.
 
 * ``PLACEHOLDERS['all_top_level_layers']``: All layers in the currently 
   processed image. This placeholder is used for commands containing the 
@@ -229,11 +298,16 @@ class PlaceholderSetting(setting_.Setting):
     """
     return [
       placeholder for placeholder_name, placeholder in PLACEHOLDERS.items()
-      if placeholder_name in self._placeholder_names]
+      if placeholder_name in self._placeholder_names
+    ]
 
   def _validate(self, value):
-    if value not in self._placeholder_names:
-      return 'invalid placeholder', 'invalid_value'
+    if isinstance(value, dict):
+      if 'name' not in value or value['name'] not in self._placeholder_names:
+        return 'invalid placeholder', 'invalid_value'
+    else:
+      if value not in self._placeholder_names:
+        return 'invalid placeholder', 'invalid_value'
 
 
 class PlaceholderGimpObjectSetting(PlaceholderSetting):
@@ -250,7 +324,13 @@ class PlaceholderGimpObjectSetting(PlaceholderSetting):
 class PlaceholderImageOrLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_image'
-  _DEFAULT_PLACEHOLDERS = ['current_image', 'current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = [
+    'current_image',
+    'current_layer',
+    'background_layer',
+    'foreground_layer',
+    'layer_at_position',
+  ]
 
 
 class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
@@ -262,32 +342,52 @@ class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
 class PlaceholderDrawableSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = [
+    'current_layer',
+    'background_layer',
+    'foreground_layer',
+    'layer_at_position',
+  ]
 
 
 class PlaceholderLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = [
+    'current_layer',
+    'background_layer',
+    'foreground_layer',
+    'layer_at_position',
+  ]
 
 
 class PlaceholderLayerWithoutCurrentLayerSetting(PlaceholderGimpObjectSetting):
 
   _DEFAULT_DEFAULT_VALUE = 'foreground_layer'
-  _DEFAULT_PLACEHOLDERS = ['background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = ['background_layer', 'foreground_layer', 'layer_at_position']
 
 
 class PlaceholderItemSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+  _DEFAULT_PLACEHOLDERS = [
+    'current_layer',
+    'background_layer',
+    'foreground_layer',
+    'layer_at_position',
+  ]
 
 
 if utils_pdb.get_gimp_version() >= (3, 1, 4):
   class PlaceholderRasterizableSetting(PlaceholderGimpObjectSetting):
 
     _DEFAULT_DEFAULT_VALUE = 'current_layer'
-    _DEFAULT_PLACEHOLDERS = ['current_layer', 'background_layer', 'foreground_layer']
+    _DEFAULT_PLACEHOLDERS = [
+      'current_layer',
+      'background_layer',
+      'foreground_layer',
+      'layer_at_position',
+    ]
 
 
 class PlaceholderArraySetting(PlaceholderSetting):
@@ -316,6 +416,7 @@ class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'layer_at_position_for_array',
     'all_top_level_layers',
   ]
 
@@ -327,6 +428,7 @@ class PlaceholderLayerArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'layer_at_position_for_array',
     'all_top_level_layers',
   ]
 
@@ -338,6 +440,7 @@ class PlaceholderItemArraySetting(PlaceholderArraySetting):
     'current_layer_for_array',
     'background_layer_for_array',
     'foreground_layer_for_array',
+    'layer_at_position_for_array',
     'all_top_level_layers',
   ]
 
@@ -372,11 +475,19 @@ def get_replaced_value(setting: PlaceholderSetting, batcher: 'src.core.Batcher')
   `PLACEHOLDERS`.
   """
   try:
-    placeholder = PLACEHOLDERS[setting.value]
+    if isinstance(setting.value, dict):
+      placeholder = PLACEHOLDERS[setting.value['name']]
+    else:
+      placeholder = PLACEHOLDERS[setting.value]
   except KeyError:
     raise ValueError(f'invalid placeholder value "{setting.value}"')
   else:
-    return placeholder.replace_args(setting, batcher)
+    if isinstance(setting.value, dict):
+      kwargs = {key: value for key, value in setting.value.items() if key != 'name'}
+    else:
+      kwargs = {}
+
+    return placeholder.replace_args(setting, batcher, **kwargs)
 
 
 def get_placeholder_type_name_from_pdb_type(

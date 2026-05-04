@@ -3,12 +3,9 @@
 During processing, these placeholders are replaced with real objects.
 """
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-
 from src import setting as setting_
 from src.gui import utils as gui_utils_
+from src.gui import widgets as gui_widgets_
 
 
 class PlaceholdersComboBoxPresenter(setting_.GtkPresenter):
@@ -27,23 +24,16 @@ class PlaceholdersComboBoxPresenter(setting_.GtkPresenter):
     super().__init__(*args, **kwargs)
   
   def _create_widget(self, setting, **kwargs):
-    combo_box = Gtk.ComboBoxText.new()
-
-    for index, placeholder in enumerate(setting.get_placeholders()):
-      self._indexes_and_placeholder_names[index] = placeholder.name
-      self._placeholder_names_and_indexes[placeholder.name] = index
-
-      combo_box.append_text(placeholder.display_name)
-
-    combo_box.set_active(self._placeholder_names_and_indexes[setting.default_value])
-
-    return combo_box
+    return gui_widgets_.PlaceholdersComboBox(
+      placeholders=setting.get_placeholders(),
+      default_placeholder=setting.default_value,
+    )
   
   def get_value(self):
-    return self._indexes_and_placeholder_names[self._widget.get_active()]
+    return self._widget.get_value()
   
   def _set_value(self, value):
-    self._widget.set_active(self._placeholder_names_and_indexes[value])
+    self._widget.set_value(value)
 
 
 class UnsupportedParameterPresenter(setting_.GtkPresenter):

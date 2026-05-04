@@ -14,5 +14,6 @@ from .gimp_item_combo_box import *
 from .gimp_drawable_filter_combo_box import *
 from .item_box import *
 from .parasite_editor import *
+from .placeholders_combo_box import *
 from .popup_hide_context import *
 from .radio_button_box import *
