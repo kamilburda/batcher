@@ -324,10 +324,16 @@ class PreviewsController:
     else:
       window = widget
 
+    if window is not None:
+      is_window_top_level = window.get_window_type() == Gtk.WindowType.TOPLEVEL
+    else:
+      is_window_top_level = False
+
     if (event.type != Gdk.EventType.WINDOW_STATE   # Safeguard, should not happen
-        or window.get_window_type() != Gtk.WindowType.TOPLEVEL   # Popup windows
+        or not is_window_top_level   # Popup windows
         or not (event.window_state.new_window_state & Gdk.WindowState.FOCUSED)):
-      if gui_utils_.has_any_window_focus(windows_to_ignore=[window]):
+      windows_to_ignore = [window] if window is not None else []
+      if gui_utils_.has_any_window_focus(windows_to_ignore=windows_to_ignore):
         self._previously_focused_on_related_window = True
       else:
         self._previously_focused_on_related_window = False
