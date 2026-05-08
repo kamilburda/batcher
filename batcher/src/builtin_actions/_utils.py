@@ -20,6 +20,7 @@ from src.pypdb import pdb
 
 __all__ = [
   'EXPORT_NAME_ITEM_STATE',
+  'InsertionPositions',
   'UNIT_DEGREE',
   'UNIT_RADIAN',
   'UNITS',
@@ -37,6 +38,16 @@ __all__ = [
 
 
 EXPORT_NAME_ITEM_STATE = 'export_name'
+
+
+class InsertionPositions:
+
+  INSERTION_POSITIONS = (
+    BACKGROUND,
+    FOREGROUND,
+    TOP,
+    BOTTOM,
+  ) = 'background', 'foreground', 'top', 'bottom'
 
 
 class AnchorPoints:

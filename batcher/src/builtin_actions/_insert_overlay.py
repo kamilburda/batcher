@@ -16,6 +16,7 @@ from src import commands
 from src import constants
 from src import exceptions
 from src import invoker as invoker_
+from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import setting as setting_
 from src import utils
@@ -28,7 +29,6 @@ from . import _utils as builtin_actions_utils
 
 __all__ = [
   'ContentType',
-  'InsertionPositions',
   'InsertOverlayAction',
   'on_after_add_insert_overlay_for_layers_action',
   'on_after_add_insert_overlay_action',
@@ -42,14 +42,6 @@ class ContentType:
     TEXT,
     LAYERS_WITH_COLOR_TAG,
   ) = 'file', 'text', 'layers_with_color_tag'
-
-
-class InsertionPositions:
-
-  INSERTION_POSITIONS = (
-    BACKGROUND,
-    FOREGROUND,
-  ) = 'background', 'foreground'
 
 
 class InsertOverlayAction(invoker_.CallableCommand):
@@ -74,8 +66,8 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'unit': Gimp.Unit.pixel(),
       'percent_object': 'current_layer',
       'percent_property': {
-        ('current_image',): 'width',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+        placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
       },
     }
     self._text_font_color = Gegl.Color()
@@ -95,7 +87,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'y': 0.0,
     }
     self._num_tiles = 1
-    self._position = InsertionPositions.BACKGROUND
+    self._position = builtin_actions_utils.InsertionPositions.BACKGROUND
     self._tagged_items = []
 
     self._assign_to_attributes_from_kwargs(kwargs)
@@ -158,7 +150,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
     current_parent = batcher.current_layer.get_parent()
 
     index = image.get_item_position(batcher.current_layer)
-    if self._position == InsertionPositions.BACKGROUND:
+    if self._position == builtin_actions_utils.InsertionPositions.BACKGROUND:
       index += 1
 
     inserted_layer = None
@@ -661,13 +653,17 @@ def _set_display_name_for_insert_overlay(
   color_tag_name = _get_color_tag_name(color_tag_setting.value, color_tag_tree_model)
 
   display_names = {
-    (ContentType.FILE, InsertionPositions.BACKGROUND): _('Insert Image as Background'),
-    (ContentType.FILE, InsertionPositions.FOREGROUND): _('Insert Image as Foreground'),
-    (ContentType.TEXT, InsertionPositions.BACKGROUND): _('Insert Text as Background'),
-    (ContentType.TEXT, InsertionPositions.FOREGROUND): _('Insert Text as Foreground'),
-    (ContentType.LAYERS_WITH_COLOR_TAG, InsertionPositions.BACKGROUND): _(
+    (ContentType.FILE, builtin_actions_utils.InsertionPositions.BACKGROUND): _(
+      'Insert Image as Background'),
+    (ContentType.FILE, builtin_actions_utils.InsertionPositions.FOREGROUND): _(
+      'Insert Image as Foreground'),
+    (ContentType.TEXT, builtin_actions_utils.InsertionPositions.BACKGROUND): _(
+      'Insert Text as Background'),
+    (ContentType.TEXT, builtin_actions_utils.InsertionPositions.FOREGROUND): _(
+      'Insert Text as Foreground'),
+    (ContentType.LAYERS_WITH_COLOR_TAG, builtin_actions_utils.InsertionPositions.BACKGROUND): _(
       'Insert Layers ({}) as Background').format(color_tag_name),
-    (ContentType.LAYERS_WITH_COLOR_TAG, InsertionPositions.FOREGROUND): _(
+    (ContentType.LAYERS_WITH_COLOR_TAG, builtin_actions_utils.InsertionPositions.FOREGROUND): _(
       'Insert Layers ({}) as Foreground').format(color_tag_name),
   }
 
@@ -878,8 +874,8 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_layer',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
@@ -963,11 +959,11 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
     {
       'type': 'choice',
       'name': 'position',
-      'default_value': InsertionPositions.FOREGROUND,
+      'default_value': builtin_actions_utils.InsertionPositions.FOREGROUND,
       'display_name': _('Position'),
       'items': [
-        (InsertionPositions.FOREGROUND, _('Foreground')),
-        (InsertionPositions.BACKGROUND, _('Background')),
+        (builtin_actions_utils.InsertionPositions.FOREGROUND, _('Foreground')),
+        (builtin_actions_utils.InsertionPositions.BACKGROUND, _('Background')),
       ],
       'gui_type': 'radio_button_box',
     },

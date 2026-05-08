@@ -186,6 +186,16 @@ If this is not desired, deactivate the `Without Color Tag: <color tag>` conditio
 To further adjust the inserted layer, you can add actions after this action and set the layer to `Layer Below (Background)` or `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
 
+#### Duplicate Layer
+
+Inserts a copy of the specified layer.
+
+The inserted layer can be placed behind (below) or in front of (above) of the current layer, or at the top or the bottom of the layer stack within the current image.
+
+Layer groups are copied in their entirety.
+Layer effects (filters) and attributes (visibility, locks) are preserved.
+
+
 #### Merge Layer
 
 Merges a layer directly above or below the current layer with the current layer.

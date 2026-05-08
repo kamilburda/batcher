@@ -1,4 +1,4 @@
-"""An assorted collection of simple built-in actions."""
+"""Miscellaneous built-in actions."""
 
 import gi
 
@@ -7,17 +7,44 @@ from gi.repository import Gimp
 
 from src import builtin_commands_common
 from src import exceptions
+from src import utils_pdb
 from src.path import fileext
 from src.procedure_groups import *
 
+from . import _utils as builtin_actions_utils
+
 
 __all__ = [
+  'duplicate_layer',
   'merge_layer',
   'merge_filters',
   'merge_visible_layers',
   'remove_file_extension_from_imported_images',
+  'on_after_add_duplicate_layer_action',
   'on_after_add_merge_layer_action',
 ]
+
+
+def duplicate_layer(batcher, layer, position):
+  layer_position = batcher.current_image.get_item_position(layer)
+
+  if position == builtin_actions_utils.InsertionPositions.BACKGROUND:
+    index = layer_position + 1
+  elif position == builtin_actions_utils.InsertionPositions.FOREGROUND:
+    index = layer_position
+  elif position == builtin_actions_utils.InsertionPositions.TOP:
+    index = 0
+  elif position == builtin_actions_utils.InsertionPositions.BOTTOM:
+    index = len(batcher.current_image.get_layers())
+  else:
+    raise ValueError(f'position {position} is not valid')
+
+  return utils_pdb.copy_and_paste_layer(
+    layer,
+    batcher.current_image,
+    parent=None,
+    position=index,
+  )
 
 
 def merge_layer(batcher, layer, merge_type):
@@ -84,6 +111,27 @@ def remove_file_extension_from_imported_images(image_batcher):
     image_batcher.current_item.name = fileext.get_filename_root(image_batcher.current_item.name)
 
 
+def on_after_add_duplicate_layer_action(_actions, action, _orig_action_dict):
+  if action['orig_name'].value == 'duplicate_layer':
+    builtin_commands_common.set_up_display_name_change_for_command(
+      _set_display_name_for_duplicate_layer,
+      action['arguments/layer'],
+      action,
+    )
+
+
+def _set_display_name_for_duplicate_layer(layer_setting, action):
+  if layer_setting.value == 'background_layer':
+    action['display_name'].set_value(_('Duplicate Layer Below'))
+  elif layer_setting.value == 'foreground_layer':
+    action['display_name'].set_value(_('Duplicate Layer Above'))
+  elif isinstance(layer_setting.value, dict) and layer_setting.value['name'] == 'layer_at_position':
+    action['display_name'].set_value(
+      _('Duplicate Layer at Position {}').format(layer_setting.value['position']))
+  else:
+    action['display_name'].set_value(_('Duplicate Layer'))
+
+
 def on_after_add_merge_layer_action(_actions, action, _orig_action_dict):
   if action['orig_name'].value == 'merge_layer':
     builtin_commands_common.set_up_display_name_change_for_command(
@@ -103,6 +151,35 @@ def _set_display_name_for_merge_layer(layer_setting, action):
       _('Merge Layer {} with Layer Below').format(layer_setting.value['position']))
   else:
     action['display_name'].set_value(_('Merge Layer'))
+
+
+DUPLICATE_LAYER_DICT = {
+  'name': 'duplicate_layer',
+  'function': duplicate_layer,
+  'display_name': _('Duplicate Layer'),
+  'menu_path': _('Layers and Composition'),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'choice',
+      'name': 'position',
+      'default_value': builtin_actions_utils.InsertionPositions.FOREGROUND,
+      'display_name': _('Position'),
+      'items': [
+        (builtin_actions_utils.InsertionPositions.FOREGROUND, _('Above layer')),
+        (builtin_actions_utils.InsertionPositions.BACKGROUND, _('Below layer')),
+        (builtin_actions_utils.InsertionPositions.TOP, _('Top')),
+        (builtin_actions_utils.InsertionPositions.BOTTOM, _('Bottom')),
+      ],
+    },
+  ],
+}
 
 
 MERGE_LAYER_DICT = {
