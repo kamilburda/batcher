@@ -56,9 +56,11 @@ def _update_dimension_arguments(arguments_list):
         and previous_layer_placeholders in value_dict['percent_property']):
       percent_property = value_dict['percent_property'][previous_layer_placeholders]
       del value_dict['percent_property'][previous_layer_placeholders]
-      value_dict['percent_property'][placeholders_.ALL_LAYER_PLACEHOLDERS] = percent_property
 
-  previous_layer_placeholders = ('current_layer', 'background_layer', 'foreground_layer')
+      layer_placeholders_str = ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS)
+      value_dict['percent_property'][layer_placeholders_str] = percent_property
+
+  previous_layer_placeholders = 'current_layer,background_layer,foreground_layer'
   previous_percent_placeholder_names = [
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
 

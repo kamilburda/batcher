@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed a critical bug that caused Batcher to crash on startup when upgrading to 1.2.6.
+
+
 ## 1.2.6
 
 ### May 08, 2026
