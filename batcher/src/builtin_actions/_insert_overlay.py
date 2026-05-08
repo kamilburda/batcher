@@ -162,7 +162,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
         if image_file.get_path() is not None and os.path.exists(image_file.get_path()):
           image_to_insert = self._load_image(image_file, self._image_copies_for_pattern)
         else:
-          raise ValueError(_('Image file "{}" does not exist.').format(image_filepath))
+          raise exceptions.SkipCommand(_('Image file "{}" does not exist.').format(image_filepath))
       else:
         if self._image_to_insert is None:
           raise exceptions.SkipCommand(_('Image file not specified.'))
