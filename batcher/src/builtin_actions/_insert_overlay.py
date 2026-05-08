@@ -339,6 +339,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
         new_width_pixels,
         new_height_pixels,
       ),
+      True,
     )
 
   def _set_placement(self, batcher, inserted_layer):
