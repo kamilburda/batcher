@@ -4,6 +4,7 @@ from gi.repository import Gimp
 
 from src import builtin_actions
 from src import commands as commands_
+from src import placeholders as placeholders_
 from src.procedure_groups import *
 
 from .. import _utils as update_utils_
@@ -23,6 +24,8 @@ def update(data, _settings, _procedure_groups):
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
         description_setting_dict, _index = update_utils_.get_child_group_list(
           action_list, 'description')
+
+        _update_dimension_arguments(arguments_list)
 
         if ((orig_name_setting_dict['value'].startswith('insert_background_for_')
              or orig_name_setting_dict['value'].startswith('insert_foreground_for_'))
@@ -45,6 +48,31 @@ def update(data, _settings, _procedure_groups):
 
         if orig_name_setting_dict['value'] in ['not_background', 'not_foreground']:
           _not_background_foreground_update_orig_name(orig_name_setting_dict)
+
+
+def _update_dimension_arguments(arguments_list):
+  def _update_percent_property_for_layers(value_dict):
+    if ('percent_property' in value_dict
+        and previous_layer_placeholders in value_dict['percent_property']):
+      percent_property = value_dict['percent_property'][previous_layer_placeholders]
+      del value_dict['percent_property'][previous_layer_placeholders]
+      value_dict['percent_property'][placeholders_.ALL_LAYER_PLACEHOLDERS] = percent_property
+
+  previous_layer_placeholders = ('current_layer', 'background_layer', 'foreground_layer')
+  previous_percent_placeholder_names = [
+    'current_image', 'current_layer', 'background_layer', 'foreground_layer']
+
+  for argument_dict in arguments_list:
+    if argument_dict['type'] == 'dimension':
+      _update_percent_property_for_layers(argument_dict['default_value'])
+      _update_percent_property_for_layers(argument_dict['value'])
+
+      if ('percent_placeholder_names' in argument_dict
+          and argument_dict['percent_placeholder_names'] == previous_percent_placeholder_names):
+        argument_dict['percent_placeholder_names'] = [
+          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+          *placeholders_.ALL_LAYER_PLACEHOLDERS,
+        ]
 
 
 def _insert_background_foreground_update_action(
@@ -176,8 +204,8 @@ def _insert_background_foreground_replace_arguments(arguments_list, orig_name_se
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_layer',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'default_value': {
@@ -187,8 +215,8 @@ def _insert_background_foreground_replace_arguments(arguments_list, orig_name_se
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_layer',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
@@ -329,7 +357,7 @@ def _merge_background_foreground_update_action(
       arguments_list, orig_name_setting_dict, action_dict):
   _merge_background_foreground_rename_action(orig_name_setting_dict)
   _merge_background_foreground_add_tags(action_dict)
-  _merge_background_foreground_replace_arguments(arguments_list)
+  _merge_background_foreground_replace_arguments(arguments_list, orig_name_setting_dict['value'])
 
 
 def _merge_background_foreground_rename_action(orig_name_setting_dict):
@@ -346,15 +374,16 @@ def _merge_background_foreground_add_tags(action_dict):
       action_dict['tags'].append(tag)
 
 
-def _merge_background_foreground_replace_arguments(arguments_list):
+def _merge_background_foreground_replace_arguments(arguments_list, orig_name):
   orig_merge_type = arguments_list[0]['value']
+  position = 'foreground' if 'foreground' in orig_name else 'background'
 
   arguments_list[:] = [
     {
       'type': 'placeholder_layer_without_current_layer',
       'name': 'layer',
       'display_name': _('Target Layer'),
-      'value': 'foreground_layer',
+      'value': f'{position}_layer',
       'default_value': 'foreground_layer',
     },
     {

@@ -270,8 +270,8 @@ class DimensionSetting(setting_.NumericSetting):
     'unit': Gimp.Unit.pixel(),
     'percent_object': 'current_image',
     'percent_property': {
-      ('current_image',): 'width',
-      ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+      placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+      placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
     },
   }
 

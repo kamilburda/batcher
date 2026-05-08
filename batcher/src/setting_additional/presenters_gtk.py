@@ -128,10 +128,10 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
       default_unit=setting.value['unit'],
       pixel_unit=Gimp.Unit.pixel(),
       percent_unit=Gimp.Unit.percent(),
-      percent_placeholder_names=setting.percent_placeholder_names,
-      percent_placeholder_labels=[
-        placeholders_.PLACEHOLDERS[name].display_name for name in setting.percent_placeholder_names
-      ],
+      percent_placeholders=[
+        placeholders_.PLACEHOLDERS[name] for name in setting.percent_placeholder_names],
+      percent_placeholder_default_name=(
+        setting.percent_placeholder_names[0] if setting.percent_placeholder_names else None),
       percent_property_names=list(placeholders_.ATTRIBUTES),
       percent_property_labels=list(placeholders_.ATTRIBUTES.values()),
       percent_placeholder_attribute_map=setting.placeholder_attribute_map,

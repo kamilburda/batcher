@@ -247,10 +247,28 @@ specifies the allowed objects per a group of attributes.
 """
 
 
+ALL_IMAGE_PLACEHOLDERS = (
+  'current_image',
+)
+
+ALL_LAYER_PLACEHOLDERS = (
+  'current_layer',
+  'background_layer',
+  'foreground_layer',
+  'layer_at_position',
+)
+
+ALL_LAYER_ARRAY_PLACEHOLDERS = (
+  'current_layer_for_array',
+  'background_layer_for_array',
+  'foreground_layer_for_array',
+  'layer_at_position_for_array',
+  'all_top_level_layers',
+)
+
 PLACEHOLDER_ATTRIBUTE_MAP = {
-  ('current_image',): ('width', 'height'),
-  ('current_layer', 'background_layer', 'foreground_layer'): (
-    'width', 'height', 'x_offset', 'y_offset'),
+  ALL_IMAGE_PLACEHOLDERS: ('width', 'height'),
+  ALL_LAYER_PLACEHOLDERS: ('width', 'height', 'x_offset', 'y_offset'),
 }
 """Mapping of placeholders to applicable attributes."""
 
@@ -324,70 +342,47 @@ class PlaceholderGimpObjectSetting(PlaceholderSetting):
 class PlaceholderImageOrLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_image'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_image',
-    'current_layer',
-    'background_layer',
-    'foreground_layer',
-    'layer_at_position',
-  ]
+  _DEFAULT_PLACEHOLDERS = (
+    *ALL_IMAGE_PLACEHOLDERS,
+    *ALL_LAYER_PLACEHOLDERS,
+  )
 
 
 class PlaceholderImageSetting(PlaceholderGimpObjectSetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_image'
-  _DEFAULT_PLACEHOLDERS = ['current_image']
+  _DEFAULT_PLACEHOLDERS = ALL_IMAGE_PLACEHOLDERS
 
 
 class PlaceholderDrawableSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer',
-    'background_layer',
-    'foreground_layer',
-    'layer_at_position',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_PLACEHOLDERS
 
 
 class PlaceholderLayerSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer',
-    'background_layer',
-    'foreground_layer',
-    'layer_at_position',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_PLACEHOLDERS
 
 
 class PlaceholderLayerWithoutCurrentLayerSetting(PlaceholderGimpObjectSetting):
 
   _DEFAULT_DEFAULT_VALUE = 'foreground_layer'
-  _DEFAULT_PLACEHOLDERS = ['background_layer', 'foreground_layer', 'layer_at_position']
+  _DEFAULT_PLACEHOLDERS = ('background_layer', 'foreground_layer', 'layer_at_position')
 
 
 class PlaceholderItemSetting(PlaceholderGimpObjectSetting):
   
   _DEFAULT_DEFAULT_VALUE = 'current_layer'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer',
-    'background_layer',
-    'foreground_layer',
-    'layer_at_position',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_PLACEHOLDERS
 
 
 if utils_pdb.get_gimp_version() >= (3, 1, 4):
   class PlaceholderRasterizableSetting(PlaceholderGimpObjectSetting):
 
     _DEFAULT_DEFAULT_VALUE = 'current_layer'
-    _DEFAULT_PLACEHOLDERS = [
-      'current_layer',
-      'background_layer',
-      'foreground_layer',
-      'layer_at_position',
-    ]
+    _DEFAULT_PLACEHOLDERS = ALL_LAYER_PLACEHOLDERS
 
 
 class PlaceholderArraySetting(PlaceholderSetting):
@@ -412,46 +407,28 @@ class PlaceholderArraySetting(PlaceholderSetting):
 class PlaceholderDrawableArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer_for_array',
-    'background_layer_for_array',
-    'foreground_layer_for_array',
-    'layer_at_position_for_array',
-    'all_top_level_layers',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_ARRAY_PLACEHOLDERS
 
 
 class PlaceholderLayerArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer_for_array',
-    'background_layer_for_array',
-    'foreground_layer_for_array',
-    'layer_at_position_for_array',
-    'all_top_level_layers',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_ARRAY_PLACEHOLDERS
 
 
 class PlaceholderItemArraySetting(PlaceholderArraySetting):
 
   _DEFAULT_DEFAULT_VALUE = 'current_layer_for_array'
-  _DEFAULT_PLACEHOLDERS = [
-    'current_layer_for_array',
-    'background_layer_for_array',
-    'foreground_layer_for_array',
-    'layer_at_position_for_array',
-    'all_top_level_layers',
-  ]
+  _DEFAULT_PLACEHOLDERS = ALL_LAYER_ARRAY_PLACEHOLDERS
 
 
 class PlaceholderUnsupportedParameterSetting(PlaceholderSetting):
 
   _DEFAULT_DEFAULT_VALUE = 'unsupported_parameter'
   _ALLOWED_GUI_TYPES = [gui_placeholders.UnsupportedParameterPresenter]
-  _DEFAULT_PLACEHOLDERS = [
+  _DEFAULT_PLACEHOLDERS = (
     'unsupported_parameter',
-  ]
+  )
 
   def __init__(self, name, default_param_value=None, **kwargs):
     self._default_param_value = default_param_value

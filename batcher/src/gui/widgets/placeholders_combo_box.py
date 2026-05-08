@@ -29,14 +29,14 @@ class PlaceholdersComboBox(Gtk.Box):
   def __init__(
         self,
         placeholders,
-        default_placeholder,
+        default_placeholder_name,
         *args,
         **kwargs,
   ):
     super().__init__(*args, **kwargs)
 
     self._placeholders = placeholders
-    self._default_placeholder = default_placeholder
+    self._default_placeholder_name = default_placeholder_name
 
     self._indexes_and_placeholder_names = {}
     self._placeholder_names_and_indexes = {}
@@ -65,7 +65,12 @@ class PlaceholdersComboBox(Gtk.Box):
     self._combo_box.connect('changed', self._on_combo_box_changed)
 
   def get_value(self):
-    placeholder_name = self._indexes_and_placeholder_names[self._combo_box.get_active()]
+    active_item = self._combo_box.get_active()
+
+    if active_item == -1:
+      return None
+
+    placeholder_name = self._indexes_and_placeholder_names[active_item]
     settings = self._placeholder_names_and_settings[placeholder_name]
 
     if settings:
@@ -77,6 +82,9 @@ class PlaceholdersComboBox(Gtk.Box):
       return placeholder_name
 
   def set_value(self, value):
+    if value is None:
+      return
+
     if isinstance(value, dict):
       placeholder_name = value['name']
 
@@ -100,20 +108,27 @@ class PlaceholdersComboBox(Gtk.Box):
 
       self._combo_box.append_text(placeholder.display_name)
 
-    self._combo_box.set_active(self._placeholder_names_and_indexes[self._default_placeholder])
+    # Avoid errors if `self._default_placeholder_name is not a recognized
+    # value (e.g. `None`) in case there are no placeholders to show.
+    if self._default_placeholder_name in self._placeholder_names_and_indexes:
+      self._combo_box.set_active(
+        self._placeholder_names_and_indexes[self._default_placeholder_name])
 
   def _on_combo_box_changed(self, _combo_box):
-    placeholder_name = self._indexes_and_placeholder_names[self._combo_box.get_active()]
-    settings = self._placeholder_names_and_settings[placeholder_name]
-
     for child in self.get_children():
       if child == self._combo_box:
         continue
 
       self.remove(child)
 
-    for setting in settings:
-      self.pack_start(setting.gui.widget, False, False, 0)
+    active_item = self._combo_box.get_active()
+
+    if active_item != -1:
+      placeholder_name = self._indexes_and_placeholder_names[active_item]
+      settings = self._placeholder_names_and_settings[placeholder_name]
+
+      for setting in settings:
+        self.pack_start(setting.gui.widget, False, False, 0)
 
     self.emit('changed')
 

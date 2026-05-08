@@ -6,6 +6,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import utils
+from src import placeholders as placeholders_
 from src.procedure_groups import *
 
 from . import _utils as builtin_actions_utils
@@ -259,12 +260,14 @@ ROTATE_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Horizontal position of center'),
     },
     {
@@ -277,12 +280,14 @@ ROTATE_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Vertical position of center'),
     },
   ]

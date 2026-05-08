@@ -26,7 +26,7 @@ class PlaceholdersComboBoxPresenter(setting_.GtkPresenter):
   def _create_widget(self, setting, **kwargs):
     return gui_widgets_.PlaceholdersComboBox(
       placeholders=setting.get_placeholders(),
-      default_placeholder=setting.default_value,
+      default_placeholder_name=setting.default_value,
     )
   
   def get_value(self):

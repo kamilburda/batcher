@@ -79,8 +79,8 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'unit': Gimp.Unit.pixel(),
       'percent_object': 'current_image',
       'percent_property': {
-        ('current_image',): 'width',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
+        placeholders.ALL_LAYER_PLACEHOLDERS: 'width',
       },
     },
   )
@@ -99,8 +99,8 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'unit': Gimp.Unit.percent(),
       'percent_object': 'current_layer',
       'percent_property': {
-        ('current_image',): 'height',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        placeholders.ALL_IMAGE_PLACEHOLDERS: 'height',
+        placeholders.ALL_LAYER_PLACEHOLDERS: 'height',
       },
     },
   )
@@ -117,8 +117,8 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'unit': Gimp.Unit.pixel(),
       'percent_object': 'current_image',
       'percent_property': {
-        ('current_image',): 'width',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
+        placeholders.ALL_LAYER_PLACEHOLDERS: 'width',
       },
     },
   )
@@ -168,8 +168,8 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'unit': Gimp.Unit.percent(),
       'percent_object': 'current_image',
       'percent_property': {
-        ('current_image',): 'width',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+        placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
+        placeholders.ALL_LAYER_PLACEHOLDERS: 'width',
       },
     },
   )
@@ -187,8 +187,8 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'unit': Gimp.Unit.pixel(),
       'percent_object': 'current_layer',
       'percent_property': {
-        ('current_image',): 'height',
-        ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+        placeholders.ALL_IMAGE_PLACEHOLDERS: 'height',
+        placeholders.ALL_LAYER_PLACEHOLDERS: 'height',
       },
     },
   )

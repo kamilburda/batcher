@@ -6,6 +6,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import builtin_commands_common
+from src import placeholders as placeholders_
 from src import utils
 from src.procedure_groups import *
 from src.pypdb import pdb
@@ -468,13 +469,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Amount'),
     },
     {
@@ -487,13 +490,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Top'),
     },
     {
@@ -506,13 +511,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Bottom'),
     },
     {
@@ -525,13 +532,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Left'),
     },
     {
@@ -544,13 +553,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Right'),
     },
     {
@@ -570,13 +581,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Width'),
     },
     {
@@ -589,13 +602,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.percent(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Height'),
     },
     {
@@ -631,13 +646,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Custom start position'),
     },
     {
@@ -650,13 +667,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Start X'),
     },
     {
@@ -669,13 +688,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Start Y'),
     },
     {
@@ -688,13 +709,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'width',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'width',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Width'),
     },
     {
@@ -707,13 +730,15 @@ CROP_FOR_IMAGES_DICT = {
         'unit': Gimp.Unit.pixel(),
         'percent_object': 'current_image',
         'percent_property': {
-          ('current_image',): 'height',
-          ('current_layer', 'background_layer', 'foreground_layer'): 'height',
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
-        'current_image', 'current_layer', 'background_layer', 'foreground_layer'],
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Height'),
     },
   ]

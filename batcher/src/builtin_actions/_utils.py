@@ -171,11 +171,19 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   (`batcher.current_image`).
   """
   if dimension['unit'] == Gimp.Unit.percent():
-    placeholder_object = placeholders_.PLACEHOLDERS[dimension['percent_object']]
-    gimp_object = placeholder_object.replace_args(None, batcher)
+    if isinstance(dimension['percent_object'], dict):
+      percent_object_name = dimension['percent_object']['name']
+      percent_object_kwargs = {
+        key: value for key, value in dimension['percent_object'].items() if key != 'name'}
+    else:
+      percent_object_name = dimension['percent_object']
+      percent_object_kwargs = {}
+
+    placeholder_object = placeholders_.PLACEHOLDERS[percent_object_name]
+    gimp_object = placeholder_object.replace_args(None, batcher, **percent_object_kwargs)
 
     percent_property = _get_percent_property_value(
-      dimension['percent_property'], dimension['percent_object'])
+      dimension['percent_property'], percent_object_name)
 
     if percent_property == 'width':
       gimp_object_dimension = gimp_object.get_width()
