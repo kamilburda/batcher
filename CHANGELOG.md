@@ -1,5 +1,7 @@
 ## Upcoming
 
+This release improves watermark insertion and provides more layer operations, namely duplicating layers and applying actions to layers at a particular position.
+
 General changes:
 * `Layer Above (Foreground)` and `Layer Below (Background)` will now always consider the layer immediately above or below the current layer, respectively. Previously, if `Insert Foreground/Background` inserted layers with color tags, `Layer Above/Below` would only consider these tagged layers, regardless of other layers that could be inserted by custom actions immediately above/below the current layer. This behavior could cause confusion.
 
