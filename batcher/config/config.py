@@ -12,7 +12,7 @@ def initialize_config(config):
   config.PLUGIN_NAME = 'batcher'
   config.DOMAIN_NAME = 'batcher'
   config.PLUGIN_TITLE = lambda: _('Batcher')
-  config.PLUGIN_VERSION = '1.2.6'
+  config.PLUGIN_VERSION = '1.2.7'
   config.PLUGIN_VERSION_RELEASE_DATE = 'May 08, 2026'
   config.AUTHOR_NAME = 'Kamil Burda'
   config.COPYRIGHT_YEARS = '2023-2025'

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.2.6\n"
+"Project-Id-Version: 'batcher' 1.2.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-08 10:28+0200\n"
+"POT-Creation-Date: 2026-05-08 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -435,7 +435,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:916
 #: ../../batcher/src/pypdb.py:460
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:62
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:264
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:266
 msgid "Opacity"
 msgstr ""
 
@@ -535,7 +535,7 @@ msgstr ""
 #: ../../batcher/src/update/_handlers/update_1_1.py:260
 #: ../../batcher/src/update/_handlers/update_1_1.py:568
 #: ../../batcher/src/update/_handlers/update_1_1.py:656
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:322
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:324
 msgid "Position"
 msgstr ""
 
@@ -856,7 +856,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:819
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:890
 #: ../../batcher/src/update/_handlers/update_1_1.py:813
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:139
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:141
 msgid "Image"
 msgstr ""
 
@@ -928,7 +928,7 @@ msgid "Layer Below (Background)"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:807
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:126
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:128
 msgid "Insert content"
 msgstr ""
 
@@ -942,121 +942,121 @@ msgstr ""
 #: ../../batcher/src/builtin_conditions.py:480
 #: ../../batcher/src/builtin_conditions.py:489
 #: ../../batcher/src/builtin_conditions.py:498
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:128
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:333
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:130
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:335
 msgid "File"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:810
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:836
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:981
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:129
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:158
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:334
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:131
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:160
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:336
 msgid "Text"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:826
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:147
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:149
 msgid "Image pattern"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:827
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:148
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:150
 msgid "This way, you can insert different overlays for each input."
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:841
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:163
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:165
 msgid "Text pattern"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:852
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:175
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:177
 msgid "Color tag"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:859
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:184
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:186
 msgid "Use pattern"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:860
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:185
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:187
 msgid ""
 "Using a pattern allows inserting different files or text for each input."
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:866
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:195
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:197
 msgid "Font"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:884
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:224
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:226
 msgid "Font size"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:890
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:231
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:233
 msgid "Font color"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:903
 #: ../../batcher/src/gui/widgets/item_box.py:395
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:250
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:252
 msgid "Size"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:905
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:252
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:254
 msgid ""
 "Aspect ratio is preserved. For absolute units, the inserted layer is scaled "
 "to fit within the specified size (maximum width or height)."
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:924
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:273
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:275
 msgid "Rotation angle (degrees)"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:931
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:281
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:283
 msgid "Adjust placement"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:938
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:290
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:292
 msgid "Placement"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:947
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:303
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:305
 msgid "Offsets (X and Y)"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:954
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:311
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:313
 msgid "Number of tiles"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:955
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:312
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:314
 msgid "Set this to a value greater than 1 to enable tiling."
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:966
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:324
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:326
 msgid "Foreground"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:967
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:325
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:327
 msgid "Background"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:982
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:335
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:337
 msgid "Layers with color tag"
 msgstr ""
 
@@ -1107,7 +1107,7 @@ msgid "Below layer"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_misc.py:196
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:385
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:387
 msgid "Target Layer"
 msgstr ""
 
@@ -1115,7 +1115,7 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_misc.py:243
 #: ../../batcher/src/update/_handlers/update_0_4.py:23
 #: ../../batcher/src/update/_handlers/update_0_4.py:47
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:396
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:398
 msgid "Merge type"
 msgstr ""
 

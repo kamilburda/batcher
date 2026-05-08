@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.7
+
+### May 08, 2026
 
 * Fixed a critical bug that caused Batcher to crash on startup when upgrading to 1.2.6.
 * Fixed a crash when using a color picker for color arguments in actions (#154).
