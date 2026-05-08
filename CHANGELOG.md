@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.6
+
+### May 08, 2026
 
 This release improves watermark insertion and provides more layer operations, namely duplicating layers and applying actions to layers at a particular position.
 
