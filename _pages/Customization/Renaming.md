@@ -47,6 +47,7 @@ Options:
 	* `%e`: Never strip the extension.
 	* `%i` (Batch Convert only): Strip the extension only if the image has a file extension that does not match the entered file extension.
 	* `%n` (Batch Convert only): Strip the extension only if the image has a file extension that matches the entered file extension (the inverse of `%i`).
+* `%o`: Use the original image name. This can be useful if you renamed the image and you need to access its original name.
 
 Examples:
 * `[image name]` for an image named `Frame` → `Frame`
@@ -132,6 +133,17 @@ Examples:
 * `[layer path, _, (%c), %e]` → `Body-Hands-Left.png` (if the layer name is `Left.png` and the file extension is `png`)
 
 If for the separator or the `%c` option you intend to use characters such as space, `[` or `]`, these [require special treatment]((#inserting-reserved-characters-in-options)).
+
+### \[image file\]
+
+*Only available in the Insert Overlay (Watermark) action*
+
+File path to the currently processed image.
+
+Options:
+* *path component strip mode* (defaults to `%e`):
+  * `%e<number>`: Strip `<number>` path components from the end.
+
 
 ### \[output folder\]
 
