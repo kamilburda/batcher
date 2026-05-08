@@ -10,7 +10,7 @@ Batcher is a batch image processing plug-in for [GIMP 3](https://www.gimp.org/).
 * Batch-edit images opened in GIMP and/or save them to the native XCF format
 * Export layers as separate images from an opened image
 * Batch-edit layers in an opened image
-* Apply any filter or plug-in during batch processing (rename, scale, ...)
+* Apply built-in actions and any installed filters or plug-ins (rename, scale, watermark, ...)
 * Process only images/layers matching your criteria (ending with a suffix, visible layers, ...)
 
 
