@@ -1,3 +1,8 @@
+## Upcoming
+
+* Moved less common options (Filter, Apply non-destructively, Blend mode) for Brightness-Contrast, Levels and Curves under More options.
+
+
 ## 1.2.7
 
 ### May 08, 2026

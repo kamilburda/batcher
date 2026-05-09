@@ -8,6 +8,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import commands
 from src import constants
 from src import exceptions
 from src import utils_pdb
@@ -597,12 +598,14 @@ BRIGHTNESS_CONTRAST_DICT = {
         (BrightnessContrastFilters.GIMP, _('GIMP')),
       ],
       'display_name': _('Filter'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'bool',
       'name': 'apply_non_destructively',
       'default_value': False,
       'display_name': _('Apply non-destructively'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
@@ -610,6 +613,7 @@ BRIGHTNESS_CONTRAST_DICT = {
       'enum_type': Gimp.LayerMode,
       'default_value': Gimp.LayerMode.REPLACE,
       'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'double',
@@ -653,6 +657,7 @@ LEVELS_DICT = {
       'name': 'apply_non_destructively',
       'default_value': False,
       'display_name': _('Apply non-destructively'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
@@ -660,6 +665,7 @@ LEVELS_DICT = {
       'enum_type': Gimp.LayerMode,
       'default_value': Gimp.LayerMode.REPLACE,
       'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'double',
@@ -703,6 +709,7 @@ CURVES_DICT = {
       'name': 'apply_non_destructively',
       'default_value': False,
       'display_name': _('Apply non-destructively'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
@@ -710,6 +717,7 @@ CURVES_DICT = {
       'enum_type': Gimp.LayerMode,
       'default_value': Gimp.LayerMode.REPLACE,
       'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'double',
