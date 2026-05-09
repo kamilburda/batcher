@@ -30,8 +30,6 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'ContentType',
   'InsertOverlayAction',
-  'on_after_add_insert_overlay_for_layers_action',
-  'on_after_add_insert_overlay_action',
 ]
 
 
@@ -474,15 +472,98 @@ class InsertOverlayAction(invoker_.CallableCommand):
       )
 
 
-def on_after_add_insert_overlay_for_layers_action(
-      _actions,
-      action,
-      _orig_action_dict,
-      tagged_items_setting,
-):
-  if action['orig_name'].value == 'insert_overlay_for_layers':
+def _on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, settings):
+  if (action['orig_name'].value == 'insert_overlay_for_layers'
+      and 'tagged_items' in action['arguments']):
     action['arguments/tagged_items'].gui.set_visible(False)
-    _sync_tagged_items_with_action(tagged_items_setting, action)
+    _sync_tagged_items_with_action(settings['main/tagged_items'], action)
+
+  _set_visible_for_insert_overlay_arguments(
+    action['arguments/insert_content'],
+    action['arguments'],
+  )
+
+  action['arguments/insert_content'].connect_event(
+    'value-changed',
+    _set_visible_for_insert_overlay_arguments,
+    action['arguments'],
+  )
+
+  _set_visible_for_placement_for_layers_with_color_tag(
+    action['arguments/adjust_placement'],
+    action['arguments/placement'],
+  )
+
+  action['arguments/adjust_placement'].connect_event(
+    'value-changed',
+    _set_visible_for_placement_for_layers_with_color_tag,
+    action['arguments/placement'],
+  )
+
+  _set_visible_for_use_pattern(
+    action['arguments/use_pattern'],
+    action['arguments'],
+  )
+
+  action['arguments/use_pattern'].connect_event(
+    'value-changed',
+    _set_visible_for_use_pattern,
+    action['arguments'],
+  )
+
+  action['arguments/use_pattern'].connect_event(
+    'after-set-gui',
+    _set_left_margin_for_use_pattern,
+  )
+
+  color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
+    GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
+
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_insert_overlay,
+    action['arguments/insert_content'],
+    action,
+    [
+      action['arguments/position'],
+      action['arguments/color_tag'],
+      color_tag_tree_model,
+    ],
+  )
+
+  action['arguments/position'].connect_event(
+    'value-changed',
+    _set_display_name_for_insert_overlay_via_position,
+    action,
+    action['arguments/insert_content'],
+    action['arguments/color_tag'],
+    color_tag_tree_model,
+  )
+
+  action['arguments/color_tag'].connect_event(
+    'value-changed',
+    _set_display_name_for_insert_overlay_via_color_tag,
+    action,
+    action['arguments/insert_content'],
+    action['arguments/position'],
+    color_tag_tree_model,
+  )
+
+  if 'condition_name' in action['arguments']:
+    action['arguments/condition_name'].gui.set_visible(False)
+
+    _connect_changes_to_linked_without_color_tag_condition(
+      action['arguments/condition_name'],
+      settings['main/conditions'],
+      action,
+      color_tag_tree_model,
+    )
+    action['arguments/condition_name'].connect_event(
+      'value-changed',
+      _connect_changes_to_linked_without_color_tag_condition,
+      settings['main/conditions'],
+      action,
+      color_tag_tree_model,
+    )
 
 
 def _sync_tagged_items_with_action(tagged_items_setting, action):
@@ -493,96 +574,6 @@ def _sync_tagged_items_with_action(tagged_items_setting, action):
   _on_tagged_items_changed(tagged_items_setting, action)
 
   tagged_items_setting.connect_event('value-changed', _on_tagged_items_changed, action)
-
-
-def on_after_add_insert_overlay_action(_actions, action, _orig_action_dict, conditions):
-  if action['orig_name'].value.startswith('insert_overlay_for_'):
-    _set_visible_for_insert_overlay_arguments(
-      action['arguments/insert_content'],
-      action['arguments'],
-    )
-
-    action['arguments/insert_content'].connect_event(
-      'value-changed',
-      _set_visible_for_insert_overlay_arguments,
-      action['arguments'],
-    )
-
-    _set_visible_for_placement_for_layers_with_color_tag(
-      action['arguments/adjust_placement'],
-      action['arguments/placement'],
-    )
-
-    action['arguments/adjust_placement'].connect_event(
-      'value-changed',
-      _set_visible_for_placement_for_layers_with_color_tag,
-      action['arguments/placement'],
-    )
-
-    _set_visible_for_use_pattern(
-      action['arguments/use_pattern'],
-      action['arguments'],
-    )
-
-    action['arguments/use_pattern'].connect_event(
-      'value-changed',
-      _set_visible_for_use_pattern,
-      action['arguments'],
-    )
-
-    action['arguments/use_pattern'].connect_event(
-      'after-set-gui',
-      _set_left_margin_for_use_pattern,
-    )
-
-    color_tag_tree_model = GimpUi.EnumComboBox.new_with_model(
-      GimpUi.EnumStore.new(Gimp.ColorTag)).get_model()
-
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_insert_overlay,
-      action['arguments/insert_content'],
-      action,
-      [
-        action['arguments/position'],
-        action['arguments/color_tag'],
-        color_tag_tree_model,
-      ],
-    )
-
-    action['arguments/position'].connect_event(
-      'value-changed',
-      _set_display_name_for_insert_overlay_via_position,
-      action,
-      action['arguments/insert_content'],
-      action['arguments/color_tag'],
-      color_tag_tree_model,
-    )
-
-    action['arguments/color_tag'].connect_event(
-      'value-changed',
-      _set_display_name_for_insert_overlay_via_color_tag,
-      action,
-      action['arguments/insert_content'],
-      action['arguments/position'],
-      color_tag_tree_model,
-    )
-
-    if 'condition_name' in action['arguments']:
-      action['arguments/condition_name'].gui.set_visible(False)
-
-      _connect_changes_to_linked_without_color_tag_condition(
-        action['arguments/condition_name'],
-        conditions,
-        action,
-        color_tag_tree_model,
-      )
-      action['arguments/condition_name'].connect_event(
-        'value-changed',
-        _connect_changes_to_linked_without_color_tag_condition,
-        conditions,
-        action,
-        color_tag_tree_model,
-      )
 
 
 def _set_visible_for_insert_overlay_arguments(
@@ -969,6 +960,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
       'gui_type': 'radio_button_box',
     },
   ],
+  'after_add_handler': _on_after_add_insert_overlay_action,
 }
 
 INSERT_OVERLAY_FOR_LAYERS_DICT = utils.semi_deep_copy(INSERT_OVERLAY_FOR_IMAGES_DICT)

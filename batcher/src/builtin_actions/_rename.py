@@ -11,7 +11,6 @@ __all__ = [
   'RenameImageForExportImagesAction',
   'RenameImageForEditAndSaveImagesAction',
   'RenameLayerAction',
-  'on_after_add_rename_action',
 ]
 
 
@@ -95,21 +94,20 @@ class RenameLayerAction(invoker_.CallableCommand):
         layer_batcher.current_layer.set_name(layer_batcher.current_item.name)
 
 
-def on_after_add_rename_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value.startswith('rename_for_'):
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_rename,
+def _on_after_add_rename_action(_actions, action, _orig_action_dict, _settings):
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_rename,
+    action['arguments/pattern'],
+    action,
+  )
+
+  if action['orig_name'].value == 'rename_for_edit_and_save_images':
+    action['arguments/rename_only_new_images'].connect_event(
+      'value-changed',
+      _set_display_name_for_rename_action_for_rename_only_new_images,
       action['arguments/pattern'],
       action,
     )
-
-    if action['orig_name'].value == 'rename_for_edit_and_save_images':
-      action['arguments/rename_only_new_images'].connect_event(
-        'value-changed',
-        _set_display_name_for_rename_action_for_rename_only_new_images,
-        action['arguments/pattern'],
-        action,
-      )
 
 
 def _set_display_name_for_rename(pattern_setting, action):
@@ -158,6 +156,7 @@ RENAME_FOR_CONVERT_DICT = {
       'display_name': _('Rename folders'),
     },
   ],
+  'after_add_handler': _on_after_add_rename_action,
 }
 
 RENAME_FOR_EXPORT_IMAGES_DICT = {
@@ -176,6 +175,7 @@ RENAME_FOR_EXPORT_IMAGES_DICT = {
       'gui_type': 'name_pattern_entry',
     },
   ],
+  'after_add_handler': _on_after_add_rename_action,
 }
 
 RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
@@ -200,6 +200,7 @@ RENAME_FOR_EDIT_AND_SAVE_IMAGES_DICT = {
       'display_name': _('Rename only new images'),
     },
   ],
+  'after_add_handler': _on_after_add_rename_action,
 }
 
 RENAME_FOR_EXPORT_LAYERS_DICT = {
@@ -230,6 +231,7 @@ RENAME_FOR_EXPORT_LAYERS_DICT = {
       'display_name': _('Rename folders'),
     },
   ],
+  'after_add_handler': _on_after_add_rename_action,
 }
 
 RENAME_FOR_EDIT_LAYERS_DICT = {
@@ -260,4 +262,5 @@ RENAME_FOR_EDIT_LAYERS_DICT = {
       'display_name': _('Rename group layers'),
     },
   ],
+  'after_add_handler': _on_after_add_rename_action,
 }

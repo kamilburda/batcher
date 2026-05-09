@@ -16,7 +16,6 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'AspectRatios',
   'scale',
-  'on_after_add_scale_action',
 ]
 
 
@@ -234,71 +233,70 @@ def _fill_with_padding(
   )
 
 
-def on_after_add_scale_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value.startswith('scale_for_'):
-    _set_sensitive_for_local_origin(
-      action['arguments/object_to_scale'],
-      action['arguments/local_origin'],
-    )
+def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
+  _set_sensitive_for_local_origin(
+    action['arguments/object_to_scale'],
+    action['arguments/local_origin'],
+  )
 
-    action['arguments/object_to_scale'].connect_event(
-      'value-changed',
-      _set_sensitive_for_local_origin,
-      action['arguments/local_origin'])
+  action['arguments/object_to_scale'].connect_event(
+    'value-changed',
+    _set_sensitive_for_local_origin,
+    action['arguments/local_origin'])
 
-    _set_sensitive_for_dimensions_given_aspect_ratio(
-      action['arguments/aspect_ratio'],
-      action['arguments/new_width'],
-      action['arguments/new_height'],
-    )
+  _set_sensitive_for_dimensions_given_aspect_ratio(
+    action['arguments/aspect_ratio'],
+    action['arguments/new_width'],
+    action['arguments/new_height'],
+  )
 
-    action['arguments/aspect_ratio'].connect_event(
-      'value-changed',
-      _set_sensitive_for_dimensions_given_aspect_ratio,
-      action['arguments/new_width'],
-      action['arguments/new_height'],
-    )
+  action['arguments/aspect_ratio'].connect_event(
+    'value-changed',
+    _set_sensitive_for_dimensions_given_aspect_ratio,
+    action['arguments/new_width'],
+    action['arguments/new_height'],
+  )
 
-    action['arguments/padding_position'].connect_event(
-      'value-changed',
-      _set_visible_for_padding_custom_position,
-      action['arguments/padding_position_custom'],
-    )
+  action['arguments/padding_position'].connect_event(
+    'value-changed',
+    _set_visible_for_padding_custom_position,
+    action['arguments/padding_position_custom'],
+  )
 
-    action['arguments/padding_position'].connect_event(
-      'gui-visible-changed',
-      _set_visible_for_padding_custom_position,
-      action['arguments/padding_position_custom'],
-    )
+  action['arguments/padding_position'].connect_event(
+    'gui-visible-changed',
+    _set_visible_for_padding_custom_position,
+    action['arguments/padding_position_custom'],
+  )
 
-    _set_visible_for_padding_color_and_position(
-      action['arguments/aspect_ratio'],
-      action['arguments/padding_color'],
-      action['arguments/padding_position'],
-    )
+  _set_visible_for_padding_color_and_position(
+    action['arguments/aspect_ratio'],
+    action['arguments/padding_color'],
+    action['arguments/padding_position'],
+  )
 
-    action['arguments/aspect_ratio'].connect_event(
-      'value-changed',
-      _set_visible_for_padding_color_and_position,
-      action['arguments/padding_color'],
-      action['arguments/padding_position'],
-    )
+  action['arguments/aspect_ratio'].connect_event(
+    'value-changed',
+    _set_visible_for_padding_color_and_position,
+    action['arguments/padding_color'],
+    action['arguments/padding_position'],
+  )
 
-    action['arguments/image_resolution'].connect_event(
-      'after-set-gui',
-      _set_left_margin_for_resolution,
-    )
+  action['arguments/image_resolution'].connect_event(
+    'after-set-gui',
+    _set_left_margin_for_resolution,
+  )
 
-    _set_sensitive_for_resolution(
-      action['arguments/set_image_resolution'],
-      action['arguments/image_resolution'],
-    )
+  _set_sensitive_for_resolution(
+    action['arguments/set_image_resolution'],
+    action['arguments/image_resolution'],
+  )
 
-    action['arguments/set_image_resolution'].connect_event(
-      'value-changed',
-      _set_sensitive_for_resolution,
-      action['arguments/image_resolution'],
-    )
+  action['arguments/set_image_resolution'].connect_event(
+    'value-changed',
+    _set_sensitive_for_resolution,
+    action['arguments/image_resolution'],
+  )
 
 
 def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
@@ -493,6 +491,7 @@ SCALE_FOR_IMAGES_DICT = {
       'display_name': _('Custom start position'),
     },
   ],
+  'after_add_handler': _on_after_add_scale_action,
 }
 
 SCALE_FOR_LAYERS_DICT = utils.semi_deep_copy(SCALE_FOR_IMAGES_DICT)

@@ -17,7 +17,6 @@ from src.gui import utils as gui_utils_
 
 __all__ = [
   'apply_group_layer_appearance',
-  'on_after_add_apply_group_layer_appearance_action',
 ]
 
 
@@ -165,12 +164,16 @@ def _copy_layer_mask(image, src_layer, src_layer_mask, dest_layer, dest_group_la
     image.remove_channel(orig_selection)
 
 
-def on_after_add_apply_group_layer_appearance_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'apply_group_layer_appearance':
-    action['arguments/merge_groups'].connect_event(
-      'value-changed',
-      _warn_if_merge_groups_is_not_enabled,
-    )
+def _on_after_add_apply_group_layer_appearance_action(
+      _actions,
+      action,
+      _orig_action_dict,
+      _settings
+):
+  action['arguments/merge_groups'].connect_event(
+    'value-changed',
+    _warn_if_merge_groups_is_not_enabled,
+  )
 
 
 def _warn_if_merge_groups_is_not_enabled(merge_groups_setting):
@@ -244,4 +247,5 @@ APPLY_GROUP_LAYER_APPEARANCE_DICT = {
     },
   ],
   'additional_tags': [EDIT_LAYERS_GROUP, EXPORT_LAYERS_GROUP],
+  'after_add_handler': _on_after_add_apply_group_layer_appearance_action,
 }

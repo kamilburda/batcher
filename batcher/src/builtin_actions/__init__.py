@@ -91,6 +91,11 @@ BUILTIN_ACTIONS_FUNCTIONS = {}
 # particular versions of GIMP.
 BUILTIN_ACTIONS_AVAILABILITY_FUNCTIONS = {}
 
+# These are handlers connected to the `'after-add-action'` event. These can
+# be used to set up actions once they are added from a single point in the
+# code in a unified manner.
+BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS = {}
+
 for command_dict in _BUILTIN_ACTIONS_LIST:
   function = command_dict['function']
   command_dict['function'] = ''
@@ -100,3 +105,7 @@ for command_dict in _BUILTIN_ACTIONS_LIST:
 
   if 'available' in command_dict:
     BUILTIN_ACTIONS_AVAILABILITY_FUNCTIONS[command_dict['name']] = command_dict.pop('available')
+
+  if 'after_add_handler' in command_dict:
+    BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS[command_dict['name']] = command_dict.pop(
+      'after_add_handler')

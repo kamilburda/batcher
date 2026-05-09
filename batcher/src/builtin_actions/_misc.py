@@ -20,8 +20,6 @@ __all__ = [
   'merge_filters',
   'merge_visible_layers',
   'remove_file_extension_from_imported_images',
-  'on_after_add_duplicate_layer_action',
-  'on_after_add_merge_layer_action',
 ]
 
 
@@ -111,13 +109,12 @@ def remove_file_extension_from_imported_images(image_batcher):
     image_batcher.current_item.name = fileext.get_filename_root(image_batcher.current_item.name)
 
 
-def on_after_add_duplicate_layer_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'duplicate_layer':
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_duplicate_layer,
-      action['arguments/layer'],
-      action,
-    )
+def _on_after_add_duplicate_layer_action(_actions, action, _orig_action_dict, _settings):
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_duplicate_layer,
+    action['arguments/layer'],
+    action,
+  )
 
 
 def _set_display_name_for_duplicate_layer(layer_setting, action):
@@ -132,13 +129,12 @@ def _set_display_name_for_duplicate_layer(layer_setting, action):
     action['display_name'].set_value(_('Duplicate Layer'))
 
 
-def on_after_add_merge_layer_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'merge_layer':
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_merge_layer,
-      action['arguments/layer'],
-      action,
-    )
+def _on_after_add_merge_layer_action(_actions, action, _orig_action_dict, _settings):
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_merge_layer,
+    action['arguments/layer'],
+    action,
+  )
 
 
 def _set_display_name_for_merge_layer(layer_setting, action):
@@ -179,6 +175,7 @@ DUPLICATE_LAYER_DICT = {
       ],
     },
   ],
+  'after_add_handler': _on_after_add_duplicate_layer_action,
 }
 
 
@@ -204,6 +201,7 @@ MERGE_LAYER_DICT = {
       'display_name': _('Merge type'),
     },
   ],
+  'after_add_handler': _on_after_add_merge_layer_action,
 }
 
 

@@ -868,45 +868,27 @@ def _create_images_and_directories_setting_dict():
 
 def _connect_events_for_added_built_in_commands(settings):
   settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_apply_group_layer_appearance_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_brightness_contrast_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_crop_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_export_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_gmic_filter_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_rename_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_resize_canvas_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_rotate_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_save_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_scale_action)
-
-  if 'tagged_items' in settings['main']:
-    settings['main/actions'].connect_event(
-      'after-add-command',
-      builtin_actions.on_after_add_insert_overlay_for_layers_action,
-      settings['main/tagged_items'],
-    )
-
-  settings['main/actions'].connect_event(
     'after-add-command',
-    builtin_actions.on_after_add_insert_overlay_action,
-    settings['main/conditions'],
+    _on_after_add_command,
+    builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS,
+    settings,
   )
 
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_duplicate_layer_action)
-  settings['main/actions'].connect_event(
-    'after-add-command', builtin_actions.on_after_add_merge_layer_action)
+  settings['main/conditions'].connect_event(
+    'after-add-command',
+    _on_after_add_command,
+    builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS,
+    settings,
+  )
 
-  settings['main/conditions'].connect_event(
-    'after-add-command', builtin_conditions.on_after_add_matching_text_condition)
-  settings['main/conditions'].connect_event(
-    'after-add-command', builtin_conditions.on_after_add_without_color_tag_condition)
+
+def _on_after_add_command(
+      _commands,
+      command,
+      _orig_command_dict,
+      event_handlers,
+      settings,
+):
+  handler = event_handlers.get(command['orig_name'].value, None)
+  if handler is not None:
+    handler(_commands, command, _orig_command_dict, settings)

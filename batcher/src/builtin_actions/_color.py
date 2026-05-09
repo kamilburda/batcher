@@ -21,7 +21,6 @@ __all__ = [
   'curves',
   'white_balance',
   'BrightnessContrastFilters',
-  'on_after_add_brightness_contrast_action',
 ]
 
 
@@ -495,16 +494,29 @@ def white_balance(_batcher, layer):
   layer.levels_stretch()
 
 
-def on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'brightness_contrast':
-    if utils_pdb.get_gimp_version() < (3, 1, 4):
-      action['arguments/filter_'].gui.set_visible(False)
+def _on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict, _settings):
+  _hide_filter_for_gimp_lower_than_3_1_4(action)
+  _hide_filter_arguments_for_gimp_lower_than_3_2(action)
 
-  if action['orig_name'].value in ['brightness_contrast', 'levels', 'curves']:
-    if utils_pdb.get_gimp_version() < (3, 2):
-      action['arguments/apply_non_destructively'].gui.set_visible(False)
-      action['arguments/blend_mode'].gui.set_visible(False)
-      action['arguments/opacity'].gui.set_visible(False)
+
+def _on_after_add_levels_action(_actions, action, _orig_action_dict, _settings):
+  _hide_filter_arguments_for_gimp_lower_than_3_2(action)
+
+
+def _on_after_add_curves_action(_actions, action, _orig_action_dict, _settings):
+  _hide_filter_arguments_for_gimp_lower_than_3_2(action)
+
+
+def _hide_filter_for_gimp_lower_than_3_1_4(action):
+  if utils_pdb.get_gimp_version() < (3, 1, 4):
+    action['arguments/filter_'].gui.set_visible(False)
+
+
+def _hide_filter_arguments_for_gimp_lower_than_3_2(action):
+  if utils_pdb.get_gimp_version() < (3, 2):
+    action['arguments/apply_non_destructively'].gui.set_visible(False)
+    action['arguments/blend_mode'].gui.set_visible(False)
+    action['arguments/opacity'].gui.set_visible(False)
 
 
 _MIN_BRIGHTNESS_CONTRAST_VALUE = -127
@@ -608,6 +620,7 @@ BRIGHTNESS_CONTRAST_DICT = {
       'display_name': _('Opacity'),
     },
   ],
+  'after_add_handler': _on_after_add_brightness_contrast_action,
 }
 
 LEVELS_DICT = {
@@ -657,6 +670,7 @@ LEVELS_DICT = {
       'display_name': _('Opacity'),
     },
   ],
+  'after_add_handler': _on_after_add_levels_action,
 }
 
 CURVES_DICT = {
@@ -706,6 +720,7 @@ CURVES_DICT = {
       'display_name': _('Opacity'),
     },
   ],
+  'after_add_handler': _on_after_add_curves_action,
 }
 
 WHITE_BALANCE_DICT = {

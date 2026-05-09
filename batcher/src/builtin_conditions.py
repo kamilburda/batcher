@@ -158,39 +158,47 @@ class MatchModes:
   )
 
 
-def on_after_add_without_color_tag_condition(_conditions, condition, _orig_condition_dict):
-  if condition['orig_name'].value == 'without_color_tag':
-    condition['arguments/color_tag'].gui.set_visible(False)
-    condition['arguments/last_enabled_value'].gui.set_visible(False)
-
-
-def on_after_add_matching_text_condition(_conditions, condition, _orig_condition_dict):
-  if condition['orig_name'].value == 'matching_text':
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_matching_text,
-      condition['arguments/match_mode'],
+def _on_after_add_without_color_tag_condition(
+      _conditions,
       condition,
-      [
-        condition['arguments/text'],
-        condition['arguments/ignore_case_sensitivity'],
-      ],
-    )
+      _orig_condition_dict,
+      _settings,
+):
+  condition['arguments/color_tag'].gui.set_visible(False)
+  condition['arguments/last_enabled_value'].gui.set_visible(False)
 
-    condition['arguments/text'].connect_event(
-      'value-changed',
-      _set_display_name_for_matching_text_via_text,
-      condition,
-      condition['arguments/match_mode'],
-      condition['arguments/ignore_case_sensitivity'],
-    )
 
-    condition['arguments/ignore_case_sensitivity'].connect_event(
-      'value-changed',
-      _set_display_name_for_matching_text_via_ignore_case_sensitivity,
+def _on_after_add_matching_text_condition(
+      _conditions,
       condition,
-      condition['arguments/match_mode'],
+      _orig_condition_dict,
+      _settings,
+):
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_matching_text,
+    condition['arguments/match_mode'],
+    condition,
+    [
       condition['arguments/text'],
-    )
+      condition['arguments/ignore_case_sensitivity'],
+    ],
+  )
+
+  condition['arguments/text'].connect_event(
+    'value-changed',
+    _set_display_name_for_matching_text_via_text,
+    condition,
+    condition['arguments/match_mode'],
+    condition['arguments/ignore_case_sensitivity'],
+  )
+
+  condition['arguments/ignore_case_sensitivity'].connect_event(
+    'value-changed',
+    _set_display_name_for_matching_text_via_ignore_case_sensitivity,
+    condition,
+    condition['arguments/match_mode'],
+    condition['arguments/text'],
+  )
 
 
 def _set_display_name_for_matching_text(
@@ -346,6 +354,7 @@ _BUILTIN_CONDITIONS_LIST = [
         'default_value': (),
       },
     ],
+    'after_add_handler': _on_after_add_without_color_tag_condition,
   },
   {
     'name': 'without_color_tag',
@@ -411,6 +420,7 @@ _BUILTIN_CONDITIONS_LIST = [
         'display_name': _('Ignore case sensitivity'),
       },
     ],
+    'after_add_handler': _on_after_add_matching_text_condition,
   },
   {
     'name': 'matching_file_extension',
@@ -522,6 +532,11 @@ BUILTIN_CONDITIONS_FUNCTIONS = {}
 # versions of GIMP.
 BUILTIN_CONDITIONS_AVAILABILITY_FUNCTIONS = {}
 
+# These are handlers connected to the `'after-add-action'` event. These can
+# be used to set up conditions once they are added from a single point in the
+# code in a unified manner.
+BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS = {}
+
 for command_dict in _BUILTIN_CONDITIONS_LIST:
   function = command_dict['function']
   command_dict['function'] = ''
@@ -531,3 +546,7 @@ for command_dict in _BUILTIN_CONDITIONS_LIST:
 
   if 'available' in command_dict:
     BUILTIN_CONDITIONS_AVAILABILITY_FUNCTIONS[command_dict['name']] = command_dict.pop('available')
+
+  if 'after_add_handler' in command_dict:
+    BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS[command_dict['name']] = command_dict.pop(
+      'after_add_handler')

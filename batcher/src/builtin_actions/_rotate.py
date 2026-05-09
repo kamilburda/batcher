@@ -16,7 +16,6 @@ __all__ = [
   'Angles',
   'AngleUnits',
   'rotate',
-  'on_after_add_rotate_action',
 ]
 
 
@@ -122,48 +121,47 @@ def rotate(
   Gimp.context_pop()
 
 
-def on_after_add_rotate_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value.startswith('rotate_for_'):
-    _set_visible_for_custom_angle(
-      action['arguments/angle'],
-      action['arguments/custom_angle'],
-    )
+def _on_after_add_rotate_action(_actions, action, _orig_action_dict, _settings):
+  _set_visible_for_custom_angle(
+    action['arguments/angle'],
+    action['arguments/custom_angle'],
+  )
 
-    action['arguments/angle'].connect_event(
-      'value-changed',
-      _set_visible_for_custom_angle,
-      action['arguments/custom_angle'],
-    )
+  action['arguments/angle'].connect_event(
+    'value-changed',
+    _set_visible_for_custom_angle,
+    action['arguments/custom_angle'],
+  )
 
-    _set_value_and_visible_for_rotation_center_settings(
-      action['arguments/object_to_rotate'],
-      action['arguments/rotate_around_center'],
-      action['arguments/center_x'],
-      action['arguments/center_y'],
-    )
+  _set_value_and_visible_for_rotation_center_settings(
+    action['arguments/object_to_rotate'],
+    action['arguments/rotate_around_center'],
+    action['arguments/center_x'],
+    action['arguments/center_y'],
+  )
 
-    action['arguments/object_to_rotate'].connect_event(
-      'value-changed',
-      _set_value_and_visible_for_rotation_center_settings,
-      action['arguments/rotate_around_center'],
-      action['arguments/center_x'],
-      action['arguments/center_y'],
-    )
+  action['arguments/object_to_rotate'].connect_event(
+    'value-changed',
+    _set_value_and_visible_for_rotation_center_settings,
+    action['arguments/rotate_around_center'],
+    action['arguments/center_x'],
+    action['arguments/center_y'],
+  )
 
-    _set_visible_for_center_x_y(
-      action['arguments/rotate_around_center'],
-      action['arguments/object_to_rotate'],
-      action['arguments/center_x'],
-      action['arguments/center_y'],
-    )
+  _set_visible_for_center_x_y(
+    action['arguments/rotate_around_center'],
+    action['arguments/object_to_rotate'],
+    action['arguments/center_x'],
+    action['arguments/center_y'],
+  )
 
-    action['arguments/rotate_around_center'].connect_event(
-      'value-changed',
-      _set_visible_for_center_x_y,
-      action['arguments/object_to_rotate'],
-      action['arguments/center_x'],
-      action['arguments/center_y'],
-    )
+  action['arguments/rotate_around_center'].connect_event(
+    'value-changed',
+    _set_visible_for_center_x_y,
+    action['arguments/object_to_rotate'],
+    action['arguments/center_x'],
+    action['arguments/center_y'],
+  )
 
 
 def _set_visible_for_custom_angle(angle_setting, custom_angle_setting):
@@ -290,7 +288,8 @@ ROTATE_FOR_IMAGES_DICT = {
       ],
       'display_name': _('Vertical position of center'),
     },
-  ]
+  ],
+  'after_add_handler': _on_after_add_rotate_action,
 }
 
 ROTATE_FOR_LAYERS_DICT = utils.semi_deep_copy(ROTATE_FOR_IMAGES_DICT)

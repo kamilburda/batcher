@@ -20,7 +20,6 @@ from . import _utils as builtin_actions_utils
 
 __all__ = [
   'SaveAction',
-  'on_after_add_save_action',
 ]
 
 
@@ -102,34 +101,33 @@ def _reset_dirty_state_of_images_after_cleanup(_batcher, images_to_reset_dirty_s
   images_to_reset_dirty_state_for.clear()
 
 
-def on_after_add_save_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'save':
-    action['arguments/output_directory'].connect_event(
-      'value-changed',
-      _set_visible_for_output_directory_for_new_images_setting,
-      action['arguments/output_directory_for_new_images'],
-    )
+def _on_after_add_save_action(_actions, action, _orig_action_dict, _settings):
+  action['arguments/output_directory'].connect_event(
+    'value-changed',
+    _set_visible_for_output_directory_for_new_images_setting,
+    action['arguments/output_directory_for_new_images'],
+  )
 
-    _set_visible_for_output_directory_for_new_images_setting(
+  _set_visible_for_output_directory_for_new_images_setting(
+    action['arguments/output_directory'],
+    action['arguments/output_directory_for_new_images'],
+  )
+
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_save,
+    action['arguments/output_directory_for_new_images'],
+    action,
+    [
       action['arguments/output_directory'],
-      action['arguments/output_directory_for_new_images'],
-    )
+    ],
+  )
 
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_save,
-      action['arguments/output_directory_for_new_images'],
-      action,
-      [
-        action['arguments/output_directory'],
-      ],
-    )
-
-    action['arguments/output_directory'].connect_event(
-      'value-changed',
-      _set_display_name_for_save_via_output_directory,
-      action['arguments/output_directory_for_new_images'],
-      action,
-    )
+  action['arguments/output_directory'].connect_event(
+    'value-changed',
+    _set_display_name_for_save_via_output_directory,
+    action['arguments/output_directory_for_new_images'],
+    action,
+  )
 
 
 def _set_visible_for_output_directory_for_new_images_setting(
@@ -206,4 +204,5 @@ SAVE_DICT = {
       },
     },
   ],
+  'after_add_handler': _on_after_add_save_action,
 }

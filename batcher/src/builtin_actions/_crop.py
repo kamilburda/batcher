@@ -17,7 +17,6 @@ from . import _utils as builtin_actions_utils
 __all__ = [
   'CropModes',
   'crop',
-  'on_after_add_crop_action',
 ]
 
 
@@ -325,48 +324,47 @@ def _clamp_value(value, allow_zero_value, max_value):
   return value
 
 
-def on_after_add_crop_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value.startswith('crop_for_'):
-    action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
-      'value-changed',
-      _set_visible_for_crop_from_edges_settings,
-      action['arguments'],
-    )
+def _on_after_add_crop_action(_actions, action, _orig_action_dict, _settings):
+  action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+    'value-changed',
+    _set_visible_for_crop_from_edges_settings,
+    action['arguments'],
+  )
 
-    action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
-      'gui-visible-changed',
-      _set_visible_for_crop_from_edges_settings,
-      action['arguments'],
-    )
+  action['arguments/crop_from_edges_same_amount_for_each_side'].connect_event(
+    'gui-visible-changed',
+    _set_visible_for_crop_from_edges_settings,
+    action['arguments'],
+  )
 
-    action['arguments/crop_to_aspect_ratio_position'].connect_event(
-      'value-changed',
-      _set_visible_for_crop_to_aspect_ratio_position_custom,
-      action['arguments/crop_to_aspect_ratio_position_custom'],
-    )
+  action['arguments/crop_to_aspect_ratio_position'].connect_event(
+    'value-changed',
+    _set_visible_for_crop_to_aspect_ratio_position_custom,
+    action['arguments/crop_to_aspect_ratio_position_custom'],
+  )
 
-    action['arguments/crop_to_aspect_ratio_position'].connect_event(
-      'gui-visible-changed',
-      _set_visible_for_crop_to_aspect_ratio_position_custom,
-      action['arguments/crop_to_aspect_ratio_position_custom'],
-    )
+  action['arguments/crop_to_aspect_ratio_position'].connect_event(
+    'gui-visible-changed',
+    _set_visible_for_crop_to_aspect_ratio_position_custom,
+    action['arguments/crop_to_aspect_ratio_position_custom'],
+  )
 
-    _set_visible_for_crop_mode_settings(
-      action['arguments/crop_mode'],
-      action['arguments'],
-    )
+  _set_visible_for_crop_mode_settings(
+    action['arguments/crop_mode'],
+    action['arguments'],
+  )
 
-    action['arguments/crop_mode'].connect_event(
-      'value-changed',
-      _set_visible_for_crop_mode_settings,
-      action['arguments'],
-    )
+  action['arguments/crop_mode'].connect_event(
+    'value-changed',
+    _set_visible_for_crop_mode_settings,
+    action['arguments'],
+  )
 
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_crop,
-      action['arguments/crop_mode'],
-      action,
-    )
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_crop,
+    action['arguments/crop_mode'],
+    action,
+  )
 
 
 def _set_visible_for_crop_from_edges_settings(
@@ -741,7 +739,8 @@ CROP_FOR_IMAGES_DICT = {
       ],
       'display_name': _('Height'),
     },
-  ]
+  ],
+  'after_add_handler': _on_after_add_crop_action,
 }
 
 CROP_FOR_LAYERS_DICT = utils.semi_deep_copy(CROP_FOR_IMAGES_DICT)

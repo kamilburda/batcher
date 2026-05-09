@@ -8,7 +8,6 @@ from src.pypdb import pdb
 
 __all__ = [
   'gmic_filter',
-  'on_after_add_gmic_filter_action'
 ]
 
 
@@ -27,13 +26,12 @@ def gmic_filter(batcher, layers, command):
   )
 
 
-def on_after_add_gmic_filter_action(_actions, action, _orig_action_dict):
-  if action['orig_name'].value == 'gmic_filter':
-    builtin_commands_common.set_up_display_name_change_for_command(
-      _set_display_name_for_gmic_filter,
-      action['arguments/command'],
-      action,
-    )
+def _on_after_add_gmic_filter_action(_actions, action, _orig_action_dict, _settings):
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_gmic_filter,
+    action['arguments/command'],
+    action,
+  )
 
 
 def _set_display_name_for_gmic_filter(gmic_command_setting, action):
@@ -71,4 +69,5 @@ GMIC_FILTER_DICT = {
     },
   ],
   'available': lambda _command_dict: 'plug_in_gmic_qt' in pdb,
+  'after_add_handler': _on_after_add_gmic_filter_action,
 }
