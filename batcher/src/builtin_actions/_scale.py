@@ -234,14 +234,14 @@ def _fill_with_padding(
 
 
 def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
-  _set_sensitive_for_local_origin(
+  _set_visible_for_local_origin(
     action['arguments/object_to_scale'],
     action['arguments/local_origin'],
   )
 
   action['arguments/object_to_scale'].connect_event(
     'value-changed',
-    _set_sensitive_for_local_origin,
+    _set_visible_for_local_origin,
     action['arguments/local_origin'])
 
   _set_sensitive_for_dimensions_given_aspect_ratio(
@@ -287,20 +287,20 @@ def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
     _set_left_margin_for_resolution,
   )
 
-  _set_sensitive_for_resolution(
+  _set_visible_for_resolution(
     action['arguments/set_image_resolution'],
     action['arguments/image_resolution'],
   )
 
   action['arguments/set_image_resolution'].connect_event(
     'value-changed',
-    _set_sensitive_for_resolution,
+    _set_visible_for_resolution,
     action['arguments/image_resolution'],
   )
 
 
-def _set_sensitive_for_local_origin(object_to_scale_setting, local_origin_setting):
-  local_origin_setting.gui.set_sensitive(object_to_scale_setting.value != 'current_image')
+def _set_visible_for_local_origin(object_to_scale_setting, local_origin_setting):
+  local_origin_setting.gui.set_visible(object_to_scale_setting.value != 'current_image')
 
 
 def _set_sensitive_for_dimensions_given_aspect_ratio(
@@ -340,8 +340,8 @@ def _set_left_margin_for_resolution(image_resolution_setting):
     image_resolution_setting.gui.widget.set_margin_start(constants.RELATED_WIDGETS_LEFT_MARGIN)
 
 
-def _set_sensitive_for_resolution(set_image_resolution_setting, image_resolution_setting):
-  image_resolution_setting.gui.set_sensitive(set_image_resolution_setting.value)
+def _set_visible_for_resolution(set_image_resolution_setting, image_resolution_setting):
+  image_resolution_setting.gui.set_visible(set_image_resolution_setting.value)
 
 
 SCALE_FOR_IMAGES_DICT = {
