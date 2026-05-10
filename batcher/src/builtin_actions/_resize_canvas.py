@@ -455,14 +455,14 @@ def _on_after_add_resize_canvas_action(_actions, action, _orig_action_dict, _set
     action['arguments/resize_to_aspect_ratio_position_custom'],
   )
 
-  _set_sensitive_for_fill_color(
+  _set_visible_for_fill_color(
     action['arguments/set_fill_color'],
     action['arguments/fill_color'],
   )
 
   action['arguments/set_fill_color'].connect_event(
     'value-changed',
-    _set_sensitive_for_fill_color,
+    _set_visible_for_fill_color,
     action['arguments/fill_color'],
   )
 
@@ -509,11 +509,11 @@ def _set_visible_for_resize_to_aspect_ratio_position_custom(
   resize_to_aspect_ratio_position_custom_setting.gui.set_visible(is_visible and is_selected)
 
 
-def _set_sensitive_for_fill_color(
+def _set_visible_for_fill_color(
       set_fill_color_setting,
       fill_color_setting,
 ):
-  fill_color_setting.gui.set_sensitive(set_fill_color_setting.value)
+  fill_color_setting.gui.set_visible(set_fill_color_setting.value)
 
 
 def _set_visible_for_resize_mode_settings(

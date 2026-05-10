@@ -1,9 +1,8 @@
 ## Upcoming
 
 * Scale: Renamed `New width` to `Width`, `New heigh` to `Height`, `Aspect ratio` to `How to scale` and its options for hopefully greater clarity. `How to scale` is now placed before `Width` and `Height`.
-* Scale: `Local origin` is now only shown if applying on a layer. The image resolution values are only shown if `Set image resolution in DPI` is checked.
 * Scale: The name is now updated automatically based on the options chosen.
-* Rotate: `Interpolation` is now only shown for a custom angle as it is otherwise unused.
+* Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
 * Fixed the GUI of initial actions on the very first start of Batcher not being set up properly. This resulted in many actions, notably `Resize to Layer Size`, displaying all options at once.
 
