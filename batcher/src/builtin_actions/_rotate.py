@@ -122,15 +122,17 @@ def rotate(
 
 
 def _on_after_add_rotate_action(_actions, action, _orig_action_dict, _settings):
-  _set_visible_for_custom_angle(
+  _set_visible_for_custom_angle_settings(
     action['arguments/angle'],
     action['arguments/custom_angle'],
+    action['arguments/interpolation'],
   )
 
   action['arguments/angle'].connect_event(
     'value-changed',
-    _set_visible_for_custom_angle,
+    _set_visible_for_custom_angle_settings,
     action['arguments/custom_angle'],
+    action['arguments/interpolation'],
   )
 
   _set_value_and_visible_for_rotation_center_settings(
@@ -164,8 +166,13 @@ def _on_after_add_rotate_action(_actions, action, _orig_action_dict, _settings):
   )
 
 
-def _set_visible_for_custom_angle(angle_setting, custom_angle_setting):
+def _set_visible_for_custom_angle_settings(
+      angle_setting,
+      custom_angle_setting,
+      interpolation_setting,
+):
   custom_angle_setting.gui.set_visible(angle_setting.value == 'custom')
+  interpolation_setting.gui.set_visible(angle_setting.value == 'custom')
 
 
 def _set_value_and_visible_for_rotation_center_settings(
