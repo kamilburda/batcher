@@ -4,6 +4,7 @@
 * Scale: `Local origin` is now only shown if applying on a layer. The image resolution values are only shown if `Set image resolution in DPI` is checked.
 * Rotate: `Interpolation` is now only shown for a custom angle as it is otherwise unused.
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
+* Fixed the GUI of initial actions on the very first start of Batcher not being set up properly. This resulted in many actions, notably `Resize to Layer Size`, displaying all options at once.
 
 
 ## 1.2.7

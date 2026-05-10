@@ -176,21 +176,34 @@ def create_settings_for_convert():
       initial_commands=[
         remove_folder_structure_action_dict,
         scale_action_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   settings['main'].add([
     commands_.create(
       name='conditions',
       initial_commands=[
-        builtin_conditions.BUILTIN_CONDITIONS['recognized_file_format']]),
+        builtin_conditions.BUILTIN_CONDITIONS['recognized_file_format'],
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
-
-  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -314,7 +327,14 @@ def create_settings_for_export_images():
       name='actions',
       initial_commands=[
         scale_action_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   not_saved_or_exported_condition_dict = utils.semi_deep_copy(
@@ -331,14 +351,19 @@ def create_settings_for_export_images():
       initial_commands=[
         not_saved_or_exported_condition_dict,
         with_unsaved_changes_condition_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
-
-  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -426,7 +451,14 @@ def create_settings_for_edit_and_save_images():
         remove_file_extension_from_imported_images_action_dict,
         rename_action_dict,
         save_action_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   xcf_file_condition_dict = utils.semi_deep_copy(
@@ -443,10 +475,15 @@ def create_settings_for_edit_and_save_images():
       initial_commands=[
         xcf_file_condition_dict,
         with_unsaved_changes_condition_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
-
-  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -576,7 +613,14 @@ def create_settings_for_export_layers():
       initial_commands=[
         resize_canvas_action_dict,
         apply_group_layer_appearance_action_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
@@ -587,14 +631,20 @@ def create_settings_for_export_layers():
       name='conditions',
       initial_commands=[
         builtin_conditions.BUILTIN_CONDITIONS['layers'],
-        visible_condition_dict]),
+        visible_condition_dict,
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
     settings['main'])
   builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
-
-  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -667,7 +717,14 @@ def create_settings_for_edit_layers():
   settings['main'].add([
     commands_.create(
       name='actions',
-      initial_commands=[rename_action_dict]),
+      initial_commands=[rename_action_dict],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
 
   visible_condition_dict = utils.semi_deep_copy(builtin_conditions.BUILTIN_CONDITIONS['visible'])
@@ -684,10 +741,15 @@ def create_settings_for_edit_layers():
         builtin_conditions.BUILTIN_CONDITIONS['layers'],
         visible_condition_dict,
         selected_in_gimp_condition_dict,
-      ]),
+      ],
+      event_handlers={
+        'after-add-command': (
+          _on_after_add_command,
+          [builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS, settings],
+        ),
+      },
+    ),
   ])
-
-  _connect_events_for_added_built_in_commands(settings)
 
   return settings
 
@@ -864,22 +926,6 @@ def _create_images_and_directories_setting_dict():
     'type': 'images_and_directories',
     'name': 'images_and_directories',
   }
-
-
-def _connect_events_for_added_built_in_commands(settings):
-  settings['main/actions'].connect_event(
-    'after-add-command',
-    _on_after_add_command,
-    builtin_actions.BUILTIN_ACTIONS_AFTER_ADD_EVENT_HANDLERS,
-    settings,
-  )
-
-  settings['main/conditions'].connect_event(
-    'after-add-command',
-    _on_after_add_command,
-    builtin_conditions.BUILTIN_CONDITIONS_AFTER_ADD_EVENT_HANDLERS,
-    settings,
-  )
 
 
 def _on_after_add_command(

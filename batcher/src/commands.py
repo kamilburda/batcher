@@ -58,7 +58,7 @@ containing commands. These events include:
 * ``'after-clear-commands'``: invoked when calling `clear()` after clearing
   commands.
 """
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union, Tuple
 
 import gi
 gi.require_version('Gimp', '3.0')
@@ -85,7 +85,9 @@ _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
 
 
 def create(
-      name: str, initial_commands: Optional[List[Dict[str, Any]]] = None,
+      name: str,
+      initial_commands: Optional[List[Dict[str, Any]]] = None,
+      event_handlers: Optional[Dict[str, Tuple[Callable, Iterable]]] = None,
 ) -> setting_.Group:
   """Creates a `setting.Group` instance containing a group of commands.
 
@@ -98,6 +100,10 @@ def create(
       List of dictionaries describing commands to be added by default. Calling
       `clear()` will reset the commands returned by this function to the
       initial commands. By default, no initial commands are added.
+    event_handlers:
+      Dictionary of (event name, (event handler, args)) representing event
+      handlers that will be connected for each action added, including the
+      initial actions.
   
   Each created command in the returned group is a `setting.Group`
   instance. Each command contains the following settings or child groups:
@@ -192,7 +198,13 @@ def create(
     })
   
   _COMMANDS_AND_INITIAL_COMMAND_DICTS[commands] = initial_commands
-  
+
+  if event_handlers is None:
+    event_handlers = {}
+
+  for event_name, handler_and_args in event_handlers.items():
+    commands.connect_event(event_name, handler_and_args[0], *handler_and_args[1])
+
   _create_initial_commands(commands, initial_commands)
   
   commands.connect_event('before-load', lambda group: clear(group, add_initial_commands=False))
