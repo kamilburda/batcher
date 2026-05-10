@@ -183,7 +183,7 @@ class DimensionBox(Gtk.Box):
 
     self._show_and_set_percent_property_based_on_percent_object()
 
-    self.pack_start(self._spin_button, False, False, 0)
+    self.pack_start(self._spin_button, True, True, 0)
     self.pack_start(self._unit_combo_box, False, False, 0)
     self.pack_start(self._percent_object_box, False, False, 0)
 
