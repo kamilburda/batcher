@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_commands_common
 from src import utils
 from src import placeholders as placeholders_
 from src.procedure_groups import *
@@ -165,6 +166,22 @@ def _on_after_add_rotate_action(_actions, action, _orig_action_dict, _settings):
     action['arguments/center_y'],
   )
 
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_rotate,
+    action['arguments/angle'],
+    action,
+    [
+      action['arguments/custom_angle'],
+    ],
+  )
+
+  action['arguments/custom_angle'].connect_event(
+    'value-changed',
+    _set_display_name_for_rotate_via_custom_angle,
+    action['arguments/angle'],
+    action,
+  )
+
 
 def _set_visible_for_custom_angle_settings(
       angle_setting,
@@ -200,6 +217,46 @@ def _set_visible_for_center_x_y(
   center_y_setting.gui.set_visible(not (is_image or rotate_around_center_setting.value))
 
 
+def _set_display_name_for_rotate(
+      angle_setting,
+      action,
+      custom_angle_setting,
+):
+  if angle_setting.value == Angles.DEGREES_90:
+    action['display_name'].set_value(_('Rotate by 90°'))
+  elif angle_setting.value == Angles.DEGREES_180:
+    action['display_name'].set_value(_('Rotate by 180°'))
+  elif angle_setting.value == Angles.DEGREES_270:
+    action['display_name'].set_value(_('Rotate by 270°'))
+  elif angle_setting.value == Angles.CUSTOM:
+    if custom_angle_setting.value['unit'] == AngleUnits.DEGREE:
+      angle_unit = '°'
+    elif custom_angle_setting.value['unit'] == AngleUnits.RADIAN:
+      angle_unit = ' rad'
+    else:
+      angle_unit = None
+
+    if angle_unit is not None:
+      angle_value = round(custom_angle_setting.value['value'], 2)
+      action['display_name'].set_value(_('Rotate by {}{}').format(angle_value, angle_unit))
+    else:
+      action['display_name'].set_value(_('Rotate'))
+  else:
+    action['display_name'].set_value(_('Rotate'))
+
+
+def _set_display_name_for_rotate_via_custom_angle(
+      custom_angle_setting,
+      angle_setting,
+      action,
+):
+  _set_display_name_for_rotate(
+    angle_setting,
+    action,
+    custom_angle_setting,
+  )
+
+
 ROTATE_FOR_IMAGES_DICT = {
   'name': 'rotate_for_images',
   'function': rotate,
@@ -231,7 +288,7 @@ ROTATE_FOR_IMAGES_DICT = {
       'name': 'custom_angle',
       'default_value': {
         'value': 0.0,
-        'unit': 'degree',
+        'unit': AngleUnits.DEGREE,
       },
       'display_name': _('Custom angle'),
     },
