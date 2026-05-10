@@ -185,7 +185,6 @@ If this is not desired, deactivate the `Without Color Tag: <color tag>` conditio
 
 To further adjust the inserted layer, you can add actions after this action and set the layer to `Layer Below (Background)` or `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
-
 #### Duplicate Layer
 
 Inserts a copy of the specified layer.
@@ -194,7 +193,6 @@ The inserted layer can be placed behind (below) or in front of (above) of the cu
 
 Layer groups are copied in their entirety.
 Layer effects (filters) and attributes (visibility, locks) are preserved.
-
 
 #### Merge Layer
 
@@ -206,7 +204,6 @@ For [Edit Layers](../Usage.md#editing-layers), this action ensures that you have
 
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
-
 
 #### Apply Group Layer Appearance
 
@@ -241,13 +238,13 @@ Adjusts brightness and contrast.
 
 For GIMP 3.2 and later, additional options are provided:
 * Filter responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
-* Whether to apply brightness and contrast non-destructively, blend mode and opacity.
+* Option to apply this action non-destructively, opacity and blend mode.
 
 #### Levels
 
 Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file formats are supported.
 
-For GIMP 3.2 and later, you may apply levels non-destructively and adjust blend mode and opacity.
+For GIMP 3.2 and later, you may apply levels non-destructively and adjust opacity and blend mode.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Levels tool.
 
@@ -255,14 +252,13 @@ You can save a GIMP preset file by choosing `Export Current Settings to File` in
 
 Applies curves from a saved preset file. Both GIMP and Photoshop (.acv) file formats are supported.
 
-For GIMP 3.2 and later, you may apply curves non-destructively and adjust blend mode and opacity.
+For GIMP 3.2 and later, you may apply curves non-destructively and adjust opacity and blend mode.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
 
 #### White Balance
 
 Equivalent to `Colors → Auto → White Balance` in GIMP.
-
 
 ### G'MIC Filter
 
