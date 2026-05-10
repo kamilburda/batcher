@@ -32,15 +32,17 @@ def set_up_display_name_change_for_command(
       setting,
       command,
       args=None,
+      set_display_name_immediately=True,
 ):
   if args is None:
     args = ()
 
-  display_name_changed_func(
-    setting,
-    command,
-    *args,
-  )
+  if set_display_name_immediately:
+    display_name_changed_func(
+      setting,
+      command,
+      *args,
+    )
 
   setting.connect_event(
     'value-changed',

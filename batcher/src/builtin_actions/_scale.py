@@ -5,6 +5,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import builtin_commands_common
 from src import constants
 from src import placeholders as placeholders_
 from src import utils
@@ -298,6 +299,33 @@ def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
     action['arguments/image_resolution'],
   )
 
+  builtin_commands_common.set_up_display_name_change_for_command(
+    _set_display_name_for_scale,
+    action['arguments/scale_mode'],
+    action,
+    [
+      action['arguments/new_width'],
+      action['arguments/new_height'],
+    ],
+    set_display_name_immediately=False,
+  )
+
+  action['arguments/new_width'].connect_event(
+    'value-changed',
+    _set_display_name_for_scale_via_new_width,
+    action['arguments/scale_mode'],
+    action,
+    action['arguments/new_height'],
+  )
+
+  action['arguments/new_height'].connect_event(
+    'value-changed',
+    _set_display_name_for_scale_via_new_height,
+    action['arguments/scale_mode'],
+    action,
+    action['arguments/new_width'],
+  )
+
 
 def _set_visible_for_local_origin(object_to_scale_setting, local_origin_setting):
   local_origin_setting.gui.set_visible(object_to_scale_setting.value != 'current_image')
@@ -342,6 +370,82 @@ def _set_left_margin_for_resolution(image_resolution_setting):
 
 def _set_visible_for_resolution(set_image_resolution_setting, image_resolution_setting):
   image_resolution_setting.gui.set_visible(set_image_resolution_setting.value)
+
+
+def _set_display_name_for_scale(
+      scale_mode_setting,
+      action,
+      new_width_setting,
+      new_height_setting,
+):
+  width_dimension = new_width_setting.value
+  if width_dimension['unit'] == Gimp.Unit.pixel():
+    width_value = int(width_dimension['pixel_value'])
+    width_unit = ' px'
+  elif width_dimension['unit'] == Gimp.Unit.percent():
+    width_value = round(width_dimension['percent_value'])
+    width_unit = '%'
+  else:
+    width_value = round(width_dimension['other_value'], 2)
+    width_unit = ' ' + width_dimension['unit'].get_abbreviation()
+
+  height_dimension = new_height_setting.value
+  if height_dimension['unit'] == Gimp.Unit.pixel():
+    height_value = int(height_dimension['pixel_value'])
+    height_unit = ' px'
+  elif height_dimension['unit'] == Gimp.Unit.percent():
+    height_value = round(height_dimension['percent_value'])
+    height_unit = '%'
+  else:
+    height_value = round(height_dimension['other_value'], 2)
+    height_unit = ' ' + height_dimension['unit'].get_abbreviation()
+
+  if scale_mode_setting.value == ScaleModes.STRETCH:
+    action['display_name'].set_value(
+      _('Scale, {}{}×{}{}').format(width_value, width_unit, height_value, height_unit))
+  elif scale_mode_setting.value == ScaleModes.KEEP_ADJUST_WIDTH:
+    action['display_name'].set_value(
+      _('Scale, Width {}{}').format(width_value, width_unit))
+  elif scale_mode_setting.value == ScaleModes.KEEP_ADJUST_HEIGHT:
+    action['display_name'].set_value(
+      _('Scale, Height {}{}').format(height_value, height_unit))
+  elif scale_mode_setting.value == ScaleModes.FIT:
+    action['display_name'].set_value(
+      _('Scale, Fit Within {}{}×{}{}').format(width_value, width_unit, height_value, height_unit))
+  elif scale_mode_setting.value == ScaleModes.FIT_WITH_PADDING:
+    action['display_name'].set_value(
+      _('Scale, Canvas {}{}×{}{}').format(
+        width_value, width_unit, height_value, height_unit))
+  else:
+    action['display_name'].set_value(_('Scale'))
+
+
+def _set_display_name_for_scale_via_new_width(
+      new_width_setting,
+      scale_mode_setting,
+      action,
+      new_height_setting,
+):
+  _set_display_name_for_scale(
+    scale_mode_setting,
+    action,
+    new_width_setting,
+    new_height_setting,
+  )
+
+
+def _set_display_name_for_scale_via_new_height(
+      new_height_setting,
+      scale_mode_setting,
+      action,
+      new_width_setting,
+):
+  _set_display_name_for_scale(
+    scale_mode_setting,
+    action,
+    new_width_setting,
+    new_height_setting,
+  )
 
 
 SCALE_FOR_IMAGES_DICT = {
