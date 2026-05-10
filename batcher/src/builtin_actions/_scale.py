@@ -14,13 +14,13 @@ from . import _utils as builtin_actions_utils
 
 
 __all__ = [
-  'AspectRatios',
+  'ScaleModes',
   'scale',
 ]
 
 
-class AspectRatios:
-  ASPECT_RATIOS = (
+class ScaleModes:
+  SCALE_MODES = (
     STRETCH,
     KEEP_ADJUST_WIDTH,
     KEEP_ADJUST_HEIGHT,
@@ -40,7 +40,7 @@ def scale(
       object_to_scale,
       new_width,
       new_height,
-      aspect_ratio,
+      scale_mode,
       interpolation,
       local_origin,
       set_image_resolution,
@@ -74,14 +74,14 @@ def scale(
   if orig_height_pixels == 0:
     orig_height_pixels = 1
 
-  if aspect_ratio in [AspectRatios.KEEP_ADJUST_WIDTH, AspectRatios.KEEP_ADJUST_HEIGHT]:
+  if scale_mode in [ScaleModes.KEEP_ADJUST_WIDTH, ScaleModes.KEEP_ADJUST_HEIGHT]:
     processed_width_pixels, processed_height_pixels = _get_scale_keep_aspect_ratio_values(
-      aspect_ratio,
+      scale_mode,
       orig_width_pixels,
       orig_height_pixels,
       new_width_pixels,
       new_height_pixels)
-  elif aspect_ratio in [AspectRatios.FIT, AspectRatios.FIT_WITH_PADDING]:
+  elif scale_mode in [ScaleModes.FIT, ScaleModes.FIT_WITH_PADDING]:
     processed_width_pixels, processed_height_pixels = _get_scale_fit_values(
       orig_width_pixels, orig_height_pixels, new_width_pixels, new_height_pixels)
   else:
@@ -102,7 +102,7 @@ def scale(
   else:
     object_to_scale.scale(processed_width_pixels, processed_height_pixels, local_origin)
 
-  if aspect_ratio == AspectRatios.FIT_WITH_PADDING:
+  if scale_mode == ScaleModes.FIT_WITH_PADDING:
     _fill_with_padding(
       batcher,
       object_to_scale,
@@ -117,17 +117,17 @@ def scale(
 
 
 def _get_scale_keep_aspect_ratio_values(
-      aspect_ratio,
+      scale_mode,
       orig_width_pixels,
       orig_height_pixels,
       new_width_pixels,
       new_height_pixels,
 ):
-  if aspect_ratio == AspectRatios.KEEP_ADJUST_WIDTH:
+  if scale_mode == ScaleModes.KEEP_ADJUST_WIDTH:
     processed_new_width_pixels = new_width_pixels
     processed_new_height_pixels = round(
       orig_height_pixels * (processed_new_width_pixels / orig_width_pixels))
-  elif aspect_ratio == AspectRatios.KEEP_ADJUST_HEIGHT:
+  elif scale_mode == ScaleModes.KEEP_ADJUST_HEIGHT:
     processed_new_height_pixels = new_height_pixels
     processed_new_width_pixels = round(
       orig_width_pixels * (processed_new_height_pixels / orig_height_pixels))
@@ -244,15 +244,15 @@ def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
     _set_visible_for_local_origin,
     action['arguments/local_origin'])
 
-  _set_sensitive_for_dimensions_given_aspect_ratio(
-    action['arguments/aspect_ratio'],
+  _set_sensitive_for_dimensions_given_scale_mode(
+    action['arguments/scale_mode'],
     action['arguments/new_width'],
     action['arguments/new_height'],
   )
 
-  action['arguments/aspect_ratio'].connect_event(
+  action['arguments/scale_mode'].connect_event(
     'value-changed',
-    _set_sensitive_for_dimensions_given_aspect_ratio,
+    _set_sensitive_for_dimensions_given_scale_mode,
     action['arguments/new_width'],
     action['arguments/new_height'],
   )
@@ -270,12 +270,12 @@ def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
   )
 
   _set_visible_for_padding_color_and_position(
-    action['arguments/aspect_ratio'],
+    action['arguments/scale_mode'],
     action['arguments/padding_color'],
     action['arguments/padding_position'],
   )
 
-  action['arguments/aspect_ratio'].connect_event(
+  action['arguments/scale_mode'].connect_event(
     'value-changed',
     _set_visible_for_padding_color_and_position,
     action['arguments/padding_color'],
@@ -303,13 +303,13 @@ def _set_visible_for_local_origin(object_to_scale_setting, local_origin_setting)
   local_origin_setting.gui.set_visible(object_to_scale_setting.value != 'current_image')
 
 
-def _set_sensitive_for_dimensions_given_aspect_ratio(
-      aspect_ratio_setting,
+def _set_sensitive_for_dimensions_given_scale_mode(
+      scale_mode_setting,
       new_width_setting,
       new_height_setting,
 ):
-  adjust_width = aspect_ratio_setting.value == AspectRatios.KEEP_ADJUST_WIDTH
-  adjust_height = aspect_ratio_setting.value == AspectRatios.KEEP_ADJUST_HEIGHT
+  adjust_width = scale_mode_setting.value == ScaleModes.KEEP_ADJUST_WIDTH
+  adjust_height = scale_mode_setting.value == ScaleModes.KEEP_ADJUST_HEIGHT
 
   new_width_setting.gui.set_sensitive(not adjust_height)
   new_height_setting.gui.set_sensitive(not adjust_width)
@@ -325,14 +325,14 @@ def _set_visible_for_padding_custom_position(
 
 
 def _set_visible_for_padding_color_and_position(
-      aspect_ratio_setting,
+      scale_mode_setting,
       padding_color_setting,
       padding_position_setting,
 ):
   padding_color_setting.gui.set_visible(
-    aspect_ratio_setting.value == AspectRatios.FIT_WITH_PADDING)
+    scale_mode_setting.value == ScaleModes.FIT_WITH_PADDING)
   padding_position_setting.gui.set_visible(
-    aspect_ratio_setting.value == AspectRatios.FIT_WITH_PADDING)
+    scale_mode_setting.value == ScaleModes.FIT_WITH_PADDING)
 
 
 def _set_left_margin_for_resolution(image_resolution_setting):
@@ -359,6 +359,19 @@ SCALE_FOR_IMAGES_DICT = {
       'display_name': _('Apply to (image or layer):'),
     },
     {
+      'type': 'choice',
+      'name': 'scale_mode',
+      'default_value': ScaleModes.STRETCH,
+      'items': [
+        (ScaleModes.STRETCH, _('Stretch')),
+        (ScaleModes.KEEP_ADJUST_WIDTH, _('Match width (keep aspect ratio)')),
+        (ScaleModes.KEEP_ADJUST_HEIGHT, _('Match height (keep aspect ratio)')),
+        (ScaleModes.FIT, _('Fit within bounds')),
+        (ScaleModes.FIT_WITH_PADDING, _('Fit to canvas')),
+      ],
+      'display_name': _('How to scale'),
+    },
+    {
       'type': 'dimension',
       'name': 'new_width',
       'default_value': {
@@ -377,7 +390,7 @@ SCALE_FOR_IMAGES_DICT = {
         *placeholders_.ALL_IMAGE_PLACEHOLDERS,
         *placeholders_.ALL_LAYER_PLACEHOLDERS,
       ],
-      'display_name': _('New width'),
+      'display_name': _('Width'),
     },
     {
       'type': 'dimension',
@@ -398,20 +411,7 @@ SCALE_FOR_IMAGES_DICT = {
         *placeholders_.ALL_IMAGE_PLACEHOLDERS,
         *placeholders_.ALL_LAYER_PLACEHOLDERS,
       ],
-      'display_name': _('New height'),
-    },
-    {
-      'type': 'choice',
-      'name': 'aspect_ratio',
-      'default_value': AspectRatios.STRETCH,
-      'items': [
-        (AspectRatios.STRETCH, _('None (Stretch)')),
-        (AspectRatios.KEEP_ADJUST_WIDTH, _('Keep, adjust width')),
-        (AspectRatios.KEEP_ADJUST_HEIGHT, _('Keep, adjust height')),
-        (AspectRatios.FIT, _('Fit')),
-        (AspectRatios.FIT_WITH_PADDING, _('Fit with padding')),
-      ],
-      'display_name': _('Aspect ratio'),
+      'display_name': _('Height'),
     },
     {
       'type': 'enum',

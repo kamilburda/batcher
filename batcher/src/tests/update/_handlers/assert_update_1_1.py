@@ -44,9 +44,9 @@ def assert_contents(test_case, settings, _orig_setting_values):
     [setting.name for setting in settings[scale_arguments_path]],
     [
       'object_to_scale',
+      'scale_mode',
       'new_width',
       'new_height',
-      'aspect_ratio',
       'interpolation',
       'local_origin',
       'set_image_resolution',
@@ -105,7 +105,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
     },
   )
   test_case.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
-  test_case.assertEqual(settings[f'{scale_arguments_path}/aspect_ratio'].value, 'stretch')
+  test_case.assertEqual(settings[f'{scale_arguments_path}/scale_mode'].value, 'stretch')
   test_case.assertEqual(settings[f'{scale_arguments_path}/padding_color'].value, [0.0, 0.0, 0.0, 0.0])
   test_case.assertEqual(settings[f'{scale_arguments_path}/padding_position'].value, 'center')
   test_case.assertEqual(

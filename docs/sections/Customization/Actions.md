@@ -87,14 +87,14 @@ Scales (resizes) the entire image or a layer.
 
 Options:
 * *Apply to (image or layer)*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
-* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
-* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
-* *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
-  * *None (Stretch)*: The aspect ratio is ignored (i.e. the image/layer is stretched).
-  * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
-  * *Keep, adjust height*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
-  * *Fit*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller.
-  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with the specified padding color. You can customize where the padding is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
+* *How to scale*: Determines how scaling is performed.
+  * *Stretch*: The aspect ratio is ignored, i.e. the image/layer is stretched.
+  * *Match width (keep aspect ratio)*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
+  * *Match width (keep aspect ratio)*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
+  * *Fit within bounds*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *Width* or *Height*, whichever is smaller.
+  * *Fit to canvas*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *Width* and *Height*, and any remaining empty space is filled with the specified color. You can customize where the empty space is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
+* *Width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *Height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
 * *Set image resolution in DPI*: Whether to set a new resolution for the current image.
