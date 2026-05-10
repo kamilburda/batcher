@@ -52,15 +52,20 @@ def update(data, _settings, _procedure_groups):
 
 def _update_dimension_arguments(arguments_list):
   def _update_percent_property_for_layers(value_dict):
-    if ('percent_property' in value_dict
-        and previous_layer_placeholders in value_dict['percent_property']):
-      percent_property = value_dict['percent_property'][previous_layer_placeholders]
-      del value_dict['percent_property'][previous_layer_placeholders]
+    if 'percent_property' in value_dict:
+      if previous_layer_placeholders_str in value_dict['percent_property']:
+        percent_property = value_dict['percent_property'][previous_layer_placeholders_str]
+        del value_dict['percent_property'][previous_layer_placeholders_str]
+        layer_placeholders_str = ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS)
+        value_dict['percent_property'][layer_placeholders_str] = percent_property
 
-      layer_placeholders_str = ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS)
-      value_dict['percent_property'][layer_placeholders_str] = percent_property
+      if previous_layer_placeholders in value_dict['percent_property']:
+        percent_property = value_dict['percent_property'][previous_layer_placeholders]
+        del value_dict['percent_property'][previous_layer_placeholders]
+        value_dict['percent_property'][placeholders_.ALL_LAYER_PLACEHOLDERS] = percent_property
 
-  previous_layer_placeholders = 'current_layer,background_layer,foreground_layer'
+  previous_layer_placeholders_str = 'current_layer,background_layer,foreground_layer'
+  previous_layer_placeholders = ('current_layer', 'background_layer', 'foreground_layer')
   previous_percent_placeholder_names = [
     'current_image', 'current_layer', 'background_layer', 'foreground_layer']
 
