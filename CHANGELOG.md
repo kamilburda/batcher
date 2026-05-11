@@ -5,6 +5,7 @@
 * Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
 * Rotate: When using the custom angle and when rotating the entire image, the image will now be fit to its new bounds. This change makes the behavior of the action consistent with rotating by 90, 180 or 270 degrees. This behavior is disabled for existing Rotate actions when updating Batcher to this version, but can be enabled by checking `Resize image to fit`.
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
+* File arguments in actions now contain a text field and a button displaying a native file dialog, much like the output directory in e.g. Batch Convert.
 * Fixed the GUI of initial actions on the very first start of Batcher not being set up properly. This resulted in many actions, notably `Resize to Layer Size`, displaying all options at once.
 
 
