@@ -163,6 +163,7 @@ Options:
 * *Apply to (image or layer)*: Whether to rotate the current image, current layer, or other objects (e.g. background/foreground).
 * *Angle*: Rotate by 90, 180 or 270 degrees, or use a *Custom* angle.
 * *Custom angle*: Rotation angle in degrees or radians. Applies only if *Angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
+* *Resize image to fit*: If checked, the image is resized to fit the new bounds. This only applies to rotating the entire image with a custom angle.
 * *How to handle boundaries*: How to handle the extents of layers after rotation - resize the layer, clip or crop. If rotation is applied to an image, all layers are handled the same way. Note that resized layers will not cause the image to grow; to achieve that, add the `Resize Canvas` action and use `Resize to layer size`.
 * *Interpolation*: Interpolation for rotated layers. Has effect only if *Angle* is set to *Custom*.
 * *Rotate around the center*: If checked, the layer is rotated around their center.

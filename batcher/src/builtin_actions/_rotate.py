@@ -49,6 +49,7 @@ def rotate(
       object_to_rotate,
       angle,
       custom_angle,
+      resize_image_to_fit,
       transform_resize,
       interpolation,
       rotate_around_center,
@@ -89,6 +90,9 @@ def rotate(
           image_center_x,
           image_center_y,
         )
+
+      if resize_image_to_fit:
+        object_to_rotate.resize_to_layers()
   else:
     if angle == Angles.DEGREES_90:
       object_to_rotate.transform_rotate_simple(
@@ -166,6 +170,26 @@ def _on_after_add_rotate_action(_actions, action, _orig_action_dict, _settings):
     action['arguments/center_y'],
   )
 
+  _set_visible_for_resize_image_to_fit(
+    action['arguments/angle'],
+    action['arguments/resize_image_to_fit'],
+    action['arguments/object_to_rotate'],
+  )
+
+  action['arguments/angle'].connect_event(
+    'value-changed',
+    _set_visible_for_resize_image_to_fit,
+    action['arguments/resize_image_to_fit'],
+    action['arguments/object_to_rotate'],
+  )
+
+  action['arguments/object_to_rotate'].connect_event(
+    'value-changed',
+    _set_visible_for_resize_image_to_fit_via_object_to_rotate,
+    action['arguments/resize_image_to_fit'],
+    action['arguments/angle'],
+  )
+
   builtin_commands_common.set_up_display_name_change_for_command(
     _set_display_name_for_rotate,
     action['arguments/angle'],
@@ -215,6 +239,28 @@ def _set_visible_for_center_x_y(
 
   center_x_setting.gui.set_visible(not (is_image or rotate_around_center_setting.value))
   center_y_setting.gui.set_visible(not (is_image or rotate_around_center_setting.value))
+
+
+def _set_visible_for_resize_image_to_fit(
+      angle_setting,
+      resize_image_to_fit_setting,
+      object_to_rotate_setting,
+):
+  resize_image_to_fit_setting.gui.set_visible(
+    object_to_rotate_setting.value == 'current_image'
+    and angle_setting.value == 'custom')
+
+
+def _set_visible_for_resize_image_to_fit_via_object_to_rotate(
+      object_to_rotate_setting,
+      resize_image_to_fit_setting,
+      angle_setting,
+):
+  _set_visible_for_resize_image_to_fit(
+    angle_setting,
+    resize_image_to_fit_setting,
+    object_to_rotate_setting,
+  )
 
 
 def _set_display_name_for_rotate(
@@ -291,6 +337,12 @@ ROTATE_FOR_IMAGES_DICT = {
         'unit': AngleUnits.DEGREE,
       },
       'display_name': _('Custom angle'),
+    },
+    {
+      'type': 'bool',
+      'name': 'resize_image_to_fit',
+      'default_value': True,
+      'display_name': _('Resize image to fit'),
     },
     {
       'type': 'enum',
