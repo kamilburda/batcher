@@ -24,9 +24,6 @@ class ExportSettings:
   _LABEL_TOP_MARGIN = 5
   _EXPORT_OPTIONS_SPACING = 3
 
-  _NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS = 15
-  _NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS = 15
-
   _FILE_EXTENSION_ENTRY_WIDTH_CHARS = 6
   _FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS = 6
 
@@ -82,12 +79,12 @@ class ExportSettings:
     self._name_pattern_entry = entries_.NamePatternEntry(
       renamer_.get_field_descriptions(),
       default_item=self._settings['main/name_pattern'].default_value,
-      width_chars=self._NAME_PATTERN_ENTRY_MIN_WIDTH_CHARS,
-      max_width_chars=self._NAME_PATTERN_ENTRY_MAX_WIDTH_CHARS,
+      expandable=False,
     )
     self._name_pattern_entry.set_activates_default(True)
 
     self._file_extension_entry = entries_.FileExtensionEntry(
+      expandable=False,
       width_chars=self._FILE_EXTENSION_ENTRY_WIDTH_CHARS,
       max_width_chars=self._FILE_EXTENSION_ENTRY_MAX_WIDTH_CHARS,
       activates_default=True,

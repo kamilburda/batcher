@@ -7,6 +7,7 @@
 * Rotate: When using the custom angle and when rotating the entire image, the image will now be fit to its new bounds. This change makes the behavior of the action consistent with rotating by 90, 180 or 270 degrees. This behavior is disabled for existing Rotate actions when updating Batcher to this version, but can be enabled by checking `Resize image to fit`.
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
 * File arguments in actions now contain a text field and a button displaying a native file dialog, much like the output directory in e.g. Batch Convert.
+* Entries representing patterns (e.g. in `Rename` or `Export`) now expand while typing, allowing to type longer patterns more easily. The default width of pattern entries was also increased for this purpose (#136).
 * Fixed the GUI of initial actions on the very first start of Batcher not being set up properly. This resulted in many actions, notably `Resize to Layer Size`, displaying all options at once.
 * The fix for crash on startup introduced in Batcher 1.2.6 will no longer require manually deleting the `parasiterc` file if you started 1.2.6 and then installed and started a later version.
 

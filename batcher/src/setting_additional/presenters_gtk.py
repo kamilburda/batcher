@@ -59,9 +59,17 @@ class NamePatternEntryPresenter(ExtendedEntryPresenter):
   Value: Text in the entry.
   """
 
-  def _create_widget(self, setting, regexes=None, **kwargs):
+  def _create_widget(
+        self,
+        setting,
+        regexes=None,
+        width_chars=35,
+        **kwargs,
+  ):
     return entries_.NamePatternEntry(
-      renamer_.get_field_descriptions(fields=renamer_.get_fields(regexes=regexes)))
+      renamer_.get_field_descriptions(fields=renamer_.get_fields(regexes=regexes)),
+      width_chars=width_chars,
+    )
 
 
 class DirectoryChooserPresenter(setting_.GtkPresenter):
