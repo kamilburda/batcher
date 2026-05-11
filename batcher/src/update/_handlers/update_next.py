@@ -1,3 +1,4 @@
+from .. import _common as update_common_
 from .. import _utils as update_utils_
 
 
@@ -13,6 +14,8 @@ def update(data, _settings, _procedure_groups):
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
+
+        update_common_.update_dimension_arguments(arguments_list)
 
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):

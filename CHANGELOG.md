@@ -7,6 +7,7 @@
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
 * File arguments in actions now contain a text field and a button displaying a native file dialog, much like the output directory in e.g. Batch Convert.
 * Fixed the GUI of initial actions on the very first start of Batcher not being set up properly. This resulted in many actions, notably `Resize to Layer Size`, displaying all options at once.
+* The fix for crash on startup introduced in Batcher 1.2.6 will no longer require manually deleting the `parasiterc` file if you started 1.2.6 and then installed and started a later version.
 
 
 ## 1.2.7
