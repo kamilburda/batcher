@@ -1,5 +1,6 @@
 ## Upcoming
 
+* Updated Dutch translation (thanks to @DiGro).
 * Scale: Renamed `New width` to `Width`, `New heigh` to `Height`, `Aspect ratio` to `How to scale` and its options for hopefully greater clarity. `How to scale` is now placed before `Width` and `Height`.
 * Scale, Rotate: The action name is now updated automatically based on the options chosen.
 * Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
