@@ -269,11 +269,11 @@ def _set_display_name_for_rotate(
       custom_angle_setting,
 ):
   if angle_setting.value == Angles.DEGREES_90:
-    action['display_name'].set_value(_('Rotate by 90°'))
+    action['display_name'].set_value(_('Rotate, 90°'))
   elif angle_setting.value == Angles.DEGREES_180:
-    action['display_name'].set_value(_('Rotate by 180°'))
+    action['display_name'].set_value(_('Rotate, 180°'))
   elif angle_setting.value == Angles.DEGREES_270:
-    action['display_name'].set_value(_('Rotate by 270°'))
+    action['display_name'].set_value(_('Rotate, 270°'))
   elif angle_setting.value == Angles.CUSTOM:
     if custom_angle_setting.value['unit'] == AngleUnits.DEGREE:
       angle_unit = '°'
@@ -284,7 +284,7 @@ def _set_display_name_for_rotate(
 
     if angle_unit is not None:
       angle_value = round(custom_angle_setting.value['value'], 2)
-      action['display_name'].set_value(_('Rotate by {}{}').format(angle_value, angle_unit))
+      action['display_name'].set_value(_('Rotate, {}{}').format(angle_value, angle_unit))
     else:
       action['display_name'].set_value(_('Rotate'))
   else:
