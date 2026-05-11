@@ -18,6 +18,10 @@ def update(data, _settings, _procedure_groups):
             and arguments_list is not None):
           _scale_update_arguments(arguments_list)
 
+        if (orig_name_setting_dict['value'].startswith('rotate_for_')
+            and arguments_list is not None):
+          _rotate_add_resize_to_image_size_argument(arguments_list)
+
 
 def _scale_update_arguments(arguments_list):
   if arguments_list[3]['name'] == 'aspect_ratio':
@@ -25,3 +29,22 @@ def _scale_update_arguments(arguments_list):
     scale_mode_argument['name'] = 'scale_mode'
 
     arguments_list.insert(1, scale_mode_argument)
+
+
+def _rotate_add_resize_to_image_size_argument(arguments_list):
+  argument_dict, index = update_utils_.get_child_setting(
+    arguments_list, 'resize_image_to_fit')
+
+  if argument_dict is None:
+    arguments_list.insert(
+      3,
+      {
+        'type': 'bool',
+        'name': 'resize_image_to_fit',
+        'default_value': True,
+        # This is to maintain the previous behavior to avoid surprises for
+        # users.
+        'value': False,
+        'display_name': _('Resize image to fit'),
+      },
+    )
