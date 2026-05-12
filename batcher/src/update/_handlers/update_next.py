@@ -35,17 +35,18 @@ def update(data, _settings, _procedure_groups):
 
 
 def _export_replace_merge_visible_layers_and_rasterize(export_settings_list):
-  setting_dict, index = update_utils_.get_child_setting(
+  setting_dict, merge_visible_layers_and_rasterize_index = update_utils_.get_child_setting(
     export_settings_list, 'merge_visible_layers_and_rasterize')
 
-  if setting_dict is not None:
-    export_settings_list.pop(index)
+  # We can obtain this argument even now (i.e. before `pop()`) as it is
+  # placed before `merge_visible_layers_and_rasterize` at this point.
+  single_image_name_pattern_dict, single_image_name_pattern_index = update_utils_.get_child_setting(
+    export_settings_list, 'single_image_name_pattern')
 
-    single_image_name_pattern_dict, new_index = update_utils_.get_child_setting(
-      export_settings_list, 'single_image_name_pattern')
+  if setting_dict is not None and single_image_name_pattern_dict is not None:
+    export_settings_list.pop(merge_visible_layers_and_rasterize_index)
 
-    if single_image_name_pattern_dict is None:
-      new_index = index
+    new_index = single_image_name_pattern_index + 1
 
     export_settings_list.insert(
       new_index,
