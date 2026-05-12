@@ -12,7 +12,7 @@ User interface changes:
 * File arguments in actions now contain a text field and a button displaying a native file dialog, much like the output directory in e.g. Batch Convert.
 * Scale: Renamed `New width` to `Width`, `New heigh` to `Height`. Renamed `Aspect ratio` to `How to scale` and its options for hopefully greater clarity, particularly in hopes of making the `Fit...` options more discoverable. `How to scale` is now placed before `Width` and `Height`.
 * Scale, Rotate: The action name is now updated automatically based on the options chosen.
-* Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
+* Export, Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
 * Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
 
 Changes to actions and conditions:
