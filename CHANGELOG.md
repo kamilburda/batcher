@@ -2,6 +2,7 @@
 
 General changes:
 * Updated Dutch translation (thanks to @DiGro).
+* Replaced the `Merge visible layers and rasterize` export option with a dropdown. You now have a choice to remove the alpha channel (i.e. flatten) the image before export if no alpha channel is desired.
 
 New features:
 * Added `Flatten (Remove Alpha)` built-in action for convenience.
