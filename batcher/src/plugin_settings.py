@@ -201,9 +201,8 @@ def create_settings_for_convert():
     ),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
-    settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
+  builtin_actions.set_up_default_export_action(
+    settings['main/export'], settings['main/file_extension'])
 
   return settings
 
@@ -361,9 +360,8 @@ def create_settings_for_export_images():
     ),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
-    settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
+  builtin_actions.set_up_default_export_action(
+    settings['main/export'], settings['main/file_extension'])
 
   return settings
 
@@ -642,9 +640,8 @@ def create_settings_for_export_layers():
     ),
   ])
 
-  builtin_actions.set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
-    settings['main'])
-  builtin_actions.set_file_extension_options_for_default_export_action(settings['main'])
+  builtin_actions.set_up_default_export_action(
+    settings['main/export'], settings['main/file_extension'])
 
   return settings
 

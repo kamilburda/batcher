@@ -21,6 +21,7 @@ from src import itemtree
 from src import overwrite
 from src import pypdb
 from src import renamer as renamer_
+from src import setting as setting_
 from src import uniquifier
 from src import utils
 from src import utils_pdb
@@ -40,8 +41,7 @@ __all__ = [
   'ExportStatuses',
   'ExportAction',
   'get_export_function',
-  'set_sensitive_for_image_name_pattern_in_export_for_default_export_action',
-  'set_file_extension_options_for_default_export_action',
+  'set_up_default_export_action',
 ]
 
 
@@ -72,6 +72,15 @@ class ExportModes:
   ) = 'each_item', 'each_top_level_item_or_folder', 'single_image'
 
 
+class LayerHandlingModes:
+
+  LAYER_HANDLING_MODES = (
+    KEEP_LAYERS,
+    MERGE_AND_ADD_ALPHA,
+    MERGE_AND_REMOVE_ALPHA,
+  ) = 'keep_layers', 'merge_and_add_alpha', 'merge_and_remove_alpha'
+
+
 class ExportStatuses:
   EXPORT_STATUSES = (
     NOT_EXPORTED_YET, EXPORT_SUCCESSFUL, FORCE_INTERACTIVE, USE_DEFAULT_FILE_EXTENSION
@@ -89,11 +98,12 @@ class ExportAction(invoker_.CallableCommand):
     self._overwrite_mode = overwrite.OverwriteModes.ASK
     self._export_mode = ExportModes.EACH_ITEM
     self._single_image_name_pattern = None
+    self._layer_handling = LayerHandlingModes.MERGE_AND_ADD_ALPHA
+    self._background_color_for_flatten = [1.0, 1.0, 1.0, 1.0]
     self._use_file_extension_in_item_name = False
     self._convert_file_extension_to_lowercase = False
     self._use_original_modification_date = False
     self._rotate_flip_image_based_on_exif_metadata = True
-    self._merge_visible_layers_and_rasterize = True
 
     self._assign_to_attributes_from_kwargs(kwargs)
 
@@ -180,8 +190,10 @@ class ExportAction(invoker_.CallableCommand):
       else:
         item_to_process = current_top_level_item
     else:
-      if batcher.process_export and self._merge_visible_layers_and_rasterize:
+      if batcher.process_export and self._layer_handling != LayerHandlingModes.KEEP_LAYERS:
         layer_to_process = _merge_and_resize_image(batcher, image_copy, layer_to_process)
+        if self._layer_handling == LayerHandlingModes.MERGE_AND_REMOVE_ALPHA:
+          layer_to_process = _flatten_image(image_copy, self._background_color_for_flatten)
 
     if batcher.process_names:
       item_to_process.save_state(builtin_actions_utils.EXPORT_NAME_ITEM_STATE)
@@ -366,6 +378,18 @@ def _merge_and_resize_image(batcher, image, layer):
     batcher.current_layer = layer_merged
   
   return layer_merged
+
+
+def _flatten_image(image, background_color):
+  Gimp.context_push()
+  Gimp.context_set_background(setting_.ColorSetting.get_value_as_color(background_color))
+
+  try:
+    layer = image.flatten()
+  finally:
+    Gimp.context_pop()
+
+  return layer
 
 
 def _copy_layer(layer, dest_image, item):
@@ -691,24 +715,29 @@ class _NameOnlyItem(itemtree.Item):
     return None
 
 
+def set_up_default_export_action(arguments, file_extension_setting):
+  _set_up_sensitive_for_image_name_pattern(arguments)
+  _set_up_file_format_arguments(arguments, file_extension_setting)
+  _set_up_visible_for_background_color_for_flatten(arguments)
+
+  # This cannot be invoked right away as some parts of GIMP are not
+  # initialized at this point (at the module level outside a plug-in procedure).
+  initnotifier.notifier.connect(
+    'start-procedure',
+    lambda _notifier: _set_file_format_export_options(
+      file_extension_setting,
+      arguments['file_format_export_options']))
+
+  file_extension_setting.connect_event(
+    'value-changed',
+    _set_file_format_export_options,
+    arguments['file_format_export_options'])
+
+
 def _on_after_add_export_action(_actions, action, _orig_action_dict, _settings):
-  _set_sensitive_for_image_name_pattern_in_export(
-    action['arguments/export_mode'],
-    action['arguments/single_image_name_pattern'])
-
-  action['arguments/export_mode'].connect_event(
-    'value-changed',
-    _set_sensitive_for_image_name_pattern_in_export,
-    action['arguments/single_image_name_pattern'])
-
-  _show_hide_file_format_export_options(
-    action['arguments/file_format_mode'],
-    action['arguments/file_format_export_options'])
-
-  action['arguments/file_format_mode'].connect_event(
-    'value-changed',
-    _show_hide_file_format_export_options,
-    action['arguments/file_format_export_options'])
+  _set_up_sensitive_for_image_name_pattern(action['arguments'])
+  _set_up_file_format_arguments(action['arguments'], action['arguments/file_extension'])
+  _set_up_visible_for_background_color_for_flatten(action['arguments'])
 
   _set_file_format_export_options(
     action['arguments/file_extension'],
@@ -718,14 +747,6 @@ def _on_after_add_export_action(_actions, action, _orig_action_dict, _settings):
     'value-changed',
     _set_file_format_export_options,
     action['arguments/file_format_export_options'])
-
-  # This is needed in case settings are reset, since the file extension is
-  # reset first and the options, after resetting, would contain values for
-  # the default file extension, which could be different.
-  action['arguments/file_format_export_options'].connect_event(
-    'after-reset',
-    _set_file_format_export_options_from_extension,
-    action['arguments/file_extension'])
 
   CONFIG.SETTINGS_FOR_WHICH_TO_SUPPRESS_WARNINGS_ON_INVALID_VALUE.add(
     action['arguments/file_extension'])
@@ -737,46 +758,15 @@ def _on_after_add_export_action(_actions, action, _orig_action_dict, _settings):
   )
 
 
-def set_sensitive_for_image_name_pattern_in_export_for_default_export_action(
-      main_settings):
+def _set_up_sensitive_for_image_name_pattern(arguments):
   _set_sensitive_for_image_name_pattern_in_export(
-    main_settings['export/export_mode'],
-    main_settings['export/single_image_name_pattern'])
+    arguments['export_mode'],
+    arguments['single_image_name_pattern'])
 
-  main_settings['export/export_mode'].connect_event(
+  arguments['export_mode'].connect_event(
     'value-changed',
     _set_sensitive_for_image_name_pattern_in_export,
-    main_settings['export/single_image_name_pattern'])
-
-
-def set_file_extension_options_for_default_export_action(main_settings):
-  _show_hide_file_format_export_options(
-    main_settings['export/file_format_mode'],
-    main_settings['export/file_format_export_options'])
-
-  main_settings['export/file_format_mode'].connect_event(
-    'value-changed',
-    _show_hide_file_format_export_options,
-    main_settings['export/file_format_export_options'])
-
-  initnotifier.notifier.connect(
-    'start-procedure',
-    lambda _notifier: _set_file_format_export_options(
-      main_settings['file_extension'],
-      main_settings['export/file_format_export_options']))
-
-  main_settings['file_extension'].connect_event(
-    'value-changed',
-    _set_file_format_export_options,
-    main_settings['export/file_format_export_options'])
-
-  # This is needed in case settings are reset, since the file extension is
-  # reset first and the options, after resetting, would contain values for
-  # the default file extension, which could be different.
-  main_settings['export/file_format_export_options'].connect_event(
-    'after-reset',
-    _set_file_format_export_options_from_extension,
-    main_settings['file_extension'])
+    arguments['single_image_name_pattern'])
 
 
 def _set_sensitive_for_image_name_pattern_in_export(
@@ -787,14 +777,23 @@ def _set_sensitive_for_image_name_pattern_in_export(
     single_image_name_pattern_setting.gui.set_sensitive(False)
 
 
-def _set_file_format_export_options(
-      file_extension_setting, file_format_export_options_setting):
-  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
+def _set_up_file_format_arguments(arguments, file_extension_setting):
+  _show_hide_file_format_export_options(
+    arguments['file_format_mode'],
+    arguments['file_format_export_options'])
 
+  arguments['file_format_mode'].connect_event(
+    'value-changed',
+    _show_hide_file_format_export_options,
+    arguments['file_format_export_options'])
 
-def _set_file_format_export_options_from_extension(
-      file_format_export_options_setting, file_extension_setting):
-  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
+  # This is needed in case settings are reset, since the file extension is
+  # reset first and the options, after resetting, would contain values for
+  # the default file extension, which could be different.
+  arguments['file_format_export_options'].connect_event(
+    'after-reset',
+    _set_file_format_export_options_from_extension,
+    file_extension_setting)
 
 
 def _show_hide_file_format_export_options(
@@ -803,12 +802,39 @@ def _show_hide_file_format_export_options(
     file_format_mode_setting.value == 'use_explicit_values')
 
 
+def _set_file_format_export_options_from_extension(
+      file_format_export_options_setting, file_extension_setting):
+  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
+
+
+def _set_up_visible_for_background_color_for_flatten(arguments):
+  _set_visible_for_background_color_for_flatten(
+    arguments['layer_handling'],
+    arguments,
+  )
+
+  arguments['layer_handling'].connect_event(
+    'value-changed',
+    _set_visible_for_background_color_for_flatten,
+    arguments,
+  )
+
+
+def _set_visible_for_background_color_for_flatten(layer_handling_setting, arguments):
+  arguments['background_color_for_flatten'].gui.set_visible(
+    layer_handling_setting.value == LayerHandlingModes.MERGE_AND_REMOVE_ALPHA)
+
+
+def _set_file_format_export_options(
+      file_extension_setting, file_format_export_options_setting):
+  file_format_export_options_setting.set_active_file_formats([file_extension_setting.value])
+
+
 def _set_display_name_for_export(file_extension_setting, action):
   file_extension = file_extension_setting.value.upper() if file_extension_setting.value else ''
 
   export_action_name = None
-  if action['orig_name'].value in [
-        'export_for_edit_and_save_images', 'export_for_edit_layers']:
+  if action['orig_name'].value in ['export_for_edit_and_save_images', 'export_for_edit_layers']:
     export_action_name = _('Export As {}')
   elif action['orig_name'].value.startswith('export_for_'):
     export_action_name = _('Also Export As {}')
@@ -898,6 +924,24 @@ EXPORT_FOR_CONVERT_DICT = {
       'gui_type': 'name_pattern_entry',
     },
     {
+      'type': 'choice',
+      'name': 'layer_handling',
+      'default_value': LayerHandlingModes.MERGE_AND_ADD_ALPHA,
+      'items': [
+        (LayerHandlingModes.KEEP_LAYERS, _('Keep layers')),
+        (LayerHandlingModes.MERGE_AND_ADD_ALPHA, _('Merge and add alpha')),
+        (LayerHandlingModes.MERGE_AND_REMOVE_ALPHA, _('Merge and remove alpha')),
+      ],
+      'display_name': _('Layer handling'),
+    },
+    {
+      'type': 'color',
+      'name': 'background_color_for_flatten',
+      'default_value': [1.0, 1.0, 1.0, 1.0],
+      'has_alpha': False,
+      'display_name': _('Background color'),
+    },
+    {
       'type': 'bool',
       'name': 'use_file_extension_in_item_name',
       'default_value': False,
@@ -921,12 +965,6 @@ EXPORT_FOR_CONVERT_DICT = {
       'default_value': True,
       'display_name': _('Rotate or flip image based on Exif metadata'),
     },
-    {
-      'type': 'bool',
-      'name': 'merge_visible_layers_and_rasterize',
-      'default_value': True,
-      'display_name': _('Merge visible layers and rasterize'),
-    },
   ],
   'after_add_handler': _on_after_add_export_action,
 }
@@ -937,8 +975,8 @@ EXPORT_FOR_EXPORT_IMAGES_DICT.update({
   'additional_tags': [builtin_commands_common.NAME_ONLY_TAG, EXPORT_IMAGES_GROUP],
 })
 EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][5]['items'].pop(1)
+del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][11]
 del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][9]
-del EXPORT_FOR_EXPORT_IMAGES_DICT['arguments'][7]
 
 EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT = utils.semi_deep_copy(EXPORT_FOR_EXPORT_IMAGES_DICT)
 EXPORT_FOR_EDIT_AND_SAVE_IMAGES_DICT.update({
@@ -961,9 +999,9 @@ EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][5]['items'] = [
   (ExportModes.SINGLE_IMAGE, _('As a single image')),
 ]
 EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][6]['default_value'] = '[image name]'
-EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][7]['display_name'] = _(
+EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][9]['display_name'] = _(
   'Use file extension in layer name')
-del EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][9]
+del EXPORT_FOR_EXPORT_LAYERS_DICT['arguments'][11]
 
 EXPORT_FOR_EDIT_LAYERS_DICT = utils.semi_deep_copy(EXPORT_FOR_CONVERT_DICT)
 EXPORT_FOR_EDIT_LAYERS_DICT.update({
@@ -979,6 +1017,6 @@ EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][5]['items'] = [
   (ExportModes.SINGLE_IMAGE, _('As a single image')),
 ]
 EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][6]['default_value'] = '[image name]'
-EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][7]['display_name'] = _(
+EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][9]['display_name'] = _(
   'Use file extension in layer name')
-del EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][9]
+del EXPORT_FOR_EDIT_LAYERS_DICT['arguments'][11]

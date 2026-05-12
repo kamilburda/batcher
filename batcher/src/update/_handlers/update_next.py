@@ -8,6 +8,10 @@ def update(data, _settings, _procedure_groups):
   if main_settings_list is not None:
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
+    export_settings_list, _index = update_utils_.get_child_group_list(main_settings_list, 'export')
+    if export_settings_list is not None:
+      _export_replace_merge_visible_layers_and_rasterize(export_settings_list)
+
     if actions_list is not None:
       for index, action_dict in enumerate(actions_list):
         action_list = action_dict['settings']
@@ -17,6 +21,10 @@ def update(data, _settings, _procedure_groups):
 
         update_common_.update_dimension_arguments(arguments_list)
 
+        if (orig_name_setting_dict['value'].startswith('export_for_')
+            and arguments_list is not None):
+          _export_replace_merge_visible_layers_and_rasterize(arguments_list)
+
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
           _scale_update_arguments(arguments_list)
@@ -24,6 +32,47 @@ def update(data, _settings, _procedure_groups):
         if (orig_name_setting_dict['value'].startswith('rotate_for_')
             and arguments_list is not None):
           _rotate_add_resize_to_image_size_argument(arguments_list)
+
+
+def _export_replace_merge_visible_layers_and_rasterize(export_settings_list):
+  setting_dict, index = update_utils_.get_child_setting(
+    export_settings_list, 'merge_visible_layers_and_rasterize')
+
+  if setting_dict is not None:
+    export_settings_list.pop(index)
+
+    single_image_name_pattern_dict, new_index = update_utils_.get_child_setting(
+      export_settings_list, 'single_image_name_pattern')
+
+    if single_image_name_pattern_dict is None:
+      new_index = index
+
+    export_settings_list.insert(
+      new_index,
+      {
+        'type': 'color',
+        'name': 'background_color_for_flatten',
+        'default_value': [1.0, 1.0, 1.0, 1.0],
+        'value': [1.0, 1.0, 1.0, 1.0],
+        'has_alpha': False,
+        'display_name': _('Background color'),
+      },
+    )
+    export_settings_list.insert(
+      new_index,
+      {
+        'type': 'choice',
+        'name': 'layer_handling',
+        'default_value': 'merge_and_add_alpha',
+        'value': 'merge_and_add_alpha' if setting_dict['value'] else 'keep_layers',
+        'items': [
+          ('keep_layers', _('Keep layers')),
+          ('merge_and_add_alpha', _('Merge and add alpha')),
+          ('merge_and_remove_alpha', _('Merge and remove alpha')),
+        ],
+        'display_name': _('Layer handling'),
+      },
+    )
 
 
 def _scale_update_arguments(arguments_list):

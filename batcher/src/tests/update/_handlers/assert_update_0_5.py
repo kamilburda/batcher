@@ -15,10 +15,6 @@ def assert_contents(test_case, settings, _orig_setting_values):
   test_case.assertEqual(
     settings['main/actions/export/orig_name'].value, 'export_for_export_layers')
 
-  test_case.assertNotIn(
-    'preserve_layer_name_after_export', settings['main/actions/export/arguments'])
-  test_case.assertIn('overwrite_mode', settings['main/actions/export/arguments'])
-  # This checks whether `overwrite_mode` is the third argument.
   test_case.assertEqual(
     list(settings['main/actions/export/arguments']),
     [
@@ -29,10 +25,11 @@ def assert_contents(test_case, settings, _orig_setting_values):
       settings['main/actions/export/arguments/overwrite_mode'],
       settings['main/actions/export/arguments/export_mode'],
       settings['main/actions/export/arguments/single_image_name_pattern'],
+      settings['main/actions/export/arguments/layer_handling'],
+      settings['main/actions/export/arguments/background_color_for_flatten'],
       settings['main/actions/export/arguments/use_file_extension_in_item_name'],
       settings['main/actions/export/arguments/convert_file_extension_to_lowercase'],
       settings['main/actions/export/arguments/rotate_flip_image_based_on_exif_metadata'],
-      settings['main/actions/export/arguments/merge_visible_layers_and_rasterize'],
     ])
 
   test_case.assertIsInstance(
