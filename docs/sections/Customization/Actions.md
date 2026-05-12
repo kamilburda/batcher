@@ -230,6 +230,13 @@ Merges all visible layers within the image into a single layer. Invisible layers
 
 This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other actions on the entire image.
 
+#### Flatten
+
+Flattens the specified layer or the entire image.
+
+By default, the background color specified in GIMP is used to fill the alpha channel.
+You can override this by setting a custom background color applied only within this action.
+
 
 ### Color
 

@@ -3,6 +3,9 @@
 General changes:
 * Updated Dutch translation (thanks to @DiGro).
 
+New features:
+* Added `Flatten (Remove Alpha)` built-in action for convenience.
+
 User interface changes:
 * Entries representing patterns (e.g. in `Rename` or `Export`) now expand while typing, allowing to type longer patterns more easily. The default width of pattern entries was also increased for this purpose (#136).
 * File arguments in actions now contain a text field and a button displaying a native file dialog, much like the output directory in e.g. Batch Convert.
