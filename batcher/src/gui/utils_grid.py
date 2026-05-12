@@ -37,9 +37,12 @@ def attach_label_to_grid(
     label.set_tooltip_text(tooltip_text)
 
   label.set_sensitive(setting.gui.get_sensitive())
+  label.set_visible(setting.gui.get_visible())
 
   setting.connect_event(
     'gui-sensitive-changed', lambda _setting: label.set_sensitive(setting.gui.get_sensitive()))
+  setting.connect_event(
+    'gui-visible-changed', lambda _setting: label.set_visible(setting.gui.get_visible()))
 
   grid.attach(label, column_index, row_index, width, height)
 
