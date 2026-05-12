@@ -716,8 +716,8 @@ class _NameOnlyItem(itemtree.Item):
 
 
 def set_up_default_export_action(arguments, file_extension_setting):
-  _set_up_sensitive_for_image_name_pattern(arguments)
   _set_up_file_format_arguments(arguments, file_extension_setting)
+  _set_up_visible_for_image_name_pattern(arguments)
   _set_up_visible_for_background_color_for_flatten(arguments)
 
   # This cannot be invoked right away as some parts of GIMP are not
@@ -735,8 +735,8 @@ def set_up_default_export_action(arguments, file_extension_setting):
 
 
 def _on_after_add_export_action(_actions, action, _orig_action_dict, _settings):
-  _set_up_sensitive_for_image_name_pattern(action['arguments'])
   _set_up_file_format_arguments(action['arguments'], action['arguments/file_extension'])
+  _set_up_visible_for_image_name_pattern(action['arguments'])
   _set_up_visible_for_background_color_for_flatten(action['arguments'])
 
   _set_file_format_export_options(
@@ -758,23 +758,21 @@ def _on_after_add_export_action(_actions, action, _orig_action_dict, _settings):
   )
 
 
-def _set_up_sensitive_for_image_name_pattern(arguments):
-  _set_sensitive_for_image_name_pattern_in_export(
+def _set_up_visible_for_image_name_pattern(arguments):
+  _set_visible_for_image_name_pattern_in_export(
     arguments['export_mode'],
     arguments['single_image_name_pattern'])
 
   arguments['export_mode'].connect_event(
     'value-changed',
-    _set_sensitive_for_image_name_pattern_in_export,
+    _set_visible_for_image_name_pattern_in_export,
     arguments['single_image_name_pattern'])
 
 
-def _set_sensitive_for_image_name_pattern_in_export(
+def _set_visible_for_image_name_pattern_in_export(
       export_mode_setting, single_image_name_pattern_setting):
-  if export_mode_setting.value == ExportModes.SINGLE_IMAGE:
-    single_image_name_pattern_setting.gui.set_sensitive(True)
-  else:
-    single_image_name_pattern_setting.gui.set_sensitive(False)
+  single_image_name_pattern_setting.gui.set_visible(
+    export_mode_setting.value == ExportModes.SINGLE_IMAGE)
 
 
 def _set_up_file_format_arguments(arguments, file_extension_setting):
