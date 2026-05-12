@@ -7,6 +7,7 @@ from gi.repository import Gimp
 
 from src import builtin_commands_common
 from src import exceptions
+from src import setting as setting_
 from src import utils_pdb
 from src.path import fileext
 from src.procedure_groups import *
@@ -19,6 +20,7 @@ __all__ = [
   'merge_layer',
   'merge_filters',
   'merge_visible_layers',
+  'flatten',
   'remove_file_extension_from_imported_images',
 ]
 
@@ -102,6 +104,21 @@ def merge_visible_layers(image_batcher, merge_type):
       image.remove_layer(layer)
 
 
+def flatten(batcher, object_to_flatten, use_custom_background_color, background_color):
+  if use_custom_background_color:
+    Gimp.context_push()
+    Gimp.context_set_background(setting_.ColorSetting.get_value_as_color(background_color))
+
+  try:
+    if isinstance(object_to_flatten, Gimp.Image):
+      batcher.current_layer = object_to_flatten.flatten()
+    else:
+      object_to_flatten.flatten()
+  finally:
+    if use_custom_background_color:
+      Gimp.context_pop()
+
+
 def remove_file_extension_from_imported_images(image_batcher):
   image = image_batcher.current_item.raw
 
@@ -147,6 +164,23 @@ def _set_display_name_for_merge_layer(layer_setting, action):
       _('Merge Layer {} with Layer Below').format(layer_setting.value['position']))
   else:
     action['display_name'].set_value(_('Merge Layer'))
+
+
+def _on_after_add_flatten_action(_actions, action, _orig_action_dict, _settings):
+  _set_visible_for_background_color(
+    action['arguments/use_custom_background_color'],
+    action['arguments'],
+  )
+
+  action['arguments/use_custom_background_color'].connect_event(
+    'value-changed',
+    _set_visible_for_background_color,
+    action['arguments'],
+  )
+
+
+def _set_visible_for_background_color(use_custom_background_color, arguments):
+  arguments['background_color'].gui.set_visible(use_custom_background_color.value)
 
 
 DUPLICATE_LAYER_DICT = {
@@ -241,6 +275,38 @@ MERGE_VISIBLE_LAYERS_DICT = {
       'display_name': _('Merge type'),
     },
   ],
+}
+
+
+FLATTEN_DICT = {
+  'name': 'flatten',
+  'function': flatten,
+  'display_name': _('Flatten (Remove Alpha)'),
+  'menu_path': _('Layers and Composition'),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_image_or_layer',
+      'name': 'object_to_flatten',
+      'default_value': 'current_layer',
+      'display_name': _('Apply to (image or layer):'),
+    },
+    {
+      'type': 'bool',
+      'name': 'use_custom_background_color',
+      'default_value': False,
+      'display_name': _('Use custom background color'),
+    },
+    {
+      'type': 'color',
+      'name': 'background_color',
+      'default_value': [1.0, 1.0, 1.0, 1.0],
+      'has_alpha': False,
+      'display_name': _('Background color'),
+    },
+  ],
+  'after_add_handler': _on_after_add_flatten_action,
 }
 
 REMOVE_FILE_EXTENSION_FROM_IMPORTED_IMAGES_DICT = {
