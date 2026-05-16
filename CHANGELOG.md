@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.8
+
+### May 16, 2026
 
 This release focuses on usability improvements of built-in actions.
 
