@@ -1,3 +1,9 @@
+## Upcoming
+
+User interface changes:
+* Adjusting values on decimal numeric sliders by keys now increases/decreases the values by a smaller amount for small ranges (e.g. 0.01 by pressing the Up key if the value range is 0.0-1.0).
+
+
 ## 1.2.8
 
 ### May 16, 2026
