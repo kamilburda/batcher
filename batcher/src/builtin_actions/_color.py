@@ -603,9 +603,8 @@ BRIGHTNESS_CONTRAST_DICT = {
     {
       'type': 'bool',
       'name': 'apply_non_destructively',
-      'default_value': False,
+      'default_value': True,
       'display_name': _('Apply non-destructively'),
-      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
@@ -655,9 +654,8 @@ LEVELS_DICT = {
     {
       'type': 'bool',
       'name': 'apply_non_destructively',
-      'default_value': False,
+      'default_value': True,
       'display_name': _('Apply non-destructively'),
-      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
@@ -707,9 +705,8 @@ CURVES_DICT = {
     {
       'type': 'bool',
       'name': 'apply_non_destructively',
-      'default_value': False,
+      'default_value': True,
       'display_name': _('Apply non-destructively'),
-      'tags': [commands.MORE_OPTIONS_TAG],
     },
     {
       'type': 'enum',
