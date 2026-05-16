@@ -13,9 +13,10 @@ User interface changes:
 * Scale: Renamed `New width` to `Width`, `New heigh` to `Height`. Renamed `Aspect ratio` to `How to scale` and its options for hopefully greater clarity, particularly in hopes of making the `Fit...` options more discoverable. `How to scale` is now placed before `Width` and `Height`.
 * Scale, Rotate: The action name is now updated automatically based on the options chosen.
 * Export, Scale, Rotate, Resize Canvas: Several options are now hidden when they are not usable. Some options which were previously insensitive (disabled) will now be shown/hidden instead. This change should reduce cognitive load on the user.
-* Moved less common options (`Filter`, `Apply non-destructively`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
+* Moved less common options (`Filter`, `Blend mode`) for Brightness-Contrast, Levels and Curves under More options.
 
 Changes to actions and conditions:
+* Brightness-Contrast, Levels, Curves: `Apply non-destructively` is now enabled by default for consistency with GIMP. Existing actions remain intact.
 * Rotate: When using the custom angle and when rotating the entire image, the image will now be fit to its new bounds. This change makes the behavior of the action consistent with rotating by 90, 180 or 270 degrees. This behavior is disabled for existing Rotate actions when updating Batcher to this version, but can be enabled by checking `Resize image to fit`.
 
 Bug fixes:
