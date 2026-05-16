@@ -92,14 +92,14 @@ Scales (resizes) the entire image or a layer.
 
 Options:
 * *Apply to (image or layer)*: Whether to scale the current image, current layer, or other objects (e.g. background/foreground).
-* *New width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
-* *New height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
-* *Aspect ratio*: Affects how scaling is performed, either preserving or ignoring the aspect ratio.
-  * *None (Stretch)*: The aspect ratio is ignored (i.e. the image/layer is stretched).
-  * *Keep, adjust width*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
-  * *Keep, adjust height*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
-  * *Fit*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* or *New height*, whichever is smaller.
-  * *Fit with padding*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *New width* and *New height*, and any remaining empty space is filled with the specified padding color. You can customize where the padding is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
+* *How to scale*: Determines how scaling is performed.
+  * *Stretch*: The aspect ratio is ignored, i.e. the image/layer is stretched.
+  * *Match width (keep aspect ratio)*: The aspect ratio is preserved. You may adjust the width, while the height is calculated automatically.
+  * *Match width (keep aspect ratio)*: The aspect ratio is preserved. You may adjust the height, while the width is calculated automatically.
+  * *Fit within bounds*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *Width* or *Height*, whichever is smaller.
+  * *Fit to canvas*: The aspect ratio is preserved. The image/layer will be scaled such that it fits *Width* and *Height*, and any remaining empty space is filled with the specified color. You can customize where the empty space is positioned relative to the image/layer (from the start, center, end or from a custom starting position).
+* *Width*: The new width, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
+* *Height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
 * *Set image resolution in DPI*: Whether to set a new resolution for the current image.
@@ -168,6 +168,7 @@ Options:
 * *Apply to (image or layer)*: Whether to rotate the current image, current layer, or other objects (e.g. background/foreground).
 * *Angle*: Rotate by 90, 180 or 270 degrees, or use a *Custom* angle.
 * *Custom angle*: Rotation angle in degrees or radians. Applies only if *Angle* is set to *Custom*. If the custom angle is used on the image rather than a layer, all layers within the image are rotated around the image's center.
+* *Resize image to fit*: If checked, the image is resized to fit the new bounds. This only applies to rotating the entire image with a custom angle.
 * *How to handle boundaries*: How to handle the extents of layers after rotation - resize the layer, clip or crop. If rotation is applied to an image, all layers are handled the same way. Note that resized layers will not cause the image to grow; to achieve that, add the `Resize Canvas` action and use `Resize to layer size`.
 * *Interpolation*: Interpolation for rotated layers. Has effect only if *Angle* is set to *Custom*.
 * *Rotate around the center*: If checked, the layer is rotated around their center.
@@ -190,7 +191,6 @@ If this is not desired, deactivate the `Without Color Tag: <color tag>` conditio
 
 To further adjust the inserted layer, you can add actions after this action and set the layer to `Layer Below (Background)` or `Layer Above (Foreground)` instead of `Current Layer` (if available).
 
-
 #### Duplicate Layer
 
 Inserts a copy of the specified layer.
@@ -199,7 +199,6 @@ The inserted layer can be placed behind (below) or in front of (above) of the cu
 
 Layer groups are copied in their entirety.
 Layer effects (filters) and attributes (visibility, locks) are preserved.
-
 
 #### Merge Layer
 
@@ -211,7 +210,6 @@ For [Edit Layers](../Usage.md#editing-layers), this action ensures that you have
 
 Options:
 * *Merge type*: Indicates how to perform the merge. The available merge types are the same as for [Merge Visible Layers](https://docs.gimp.org/en/gimp-image-merge-layers.html), under the section `Final, Merged Layer should be:`.
-
 
 #### Apply Group Layer Appearance
 
@@ -237,6 +235,13 @@ Merges all visible layers within the image into a single layer. Invisible layers
 
 This is useful if the image contains multiple layers and you want to apply filters (layer effects) or other actions on the entire image.
 
+#### Flatten
+
+Flattens the specified layer or the entire image.
+
+By default, the background color specified in GIMP is used to fill the alpha channel.
+You can override this by setting a custom background color applied only within this action.
+
 
 ### Color
 
@@ -246,13 +251,13 @@ Adjusts brightness and contrast.
 
 For GIMP 3.2 and later, additional options are provided:
 * Filter responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
-* Whether to apply brightness and contrast non-destructively, blend mode and opacity.
+* Option to apply this action non-destructively, opacity and blend mode.
 
 #### Levels
 
 Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file formats are supported.
 
-For GIMP 3.2 and later, you may apply levels non-destructively and adjust blend mode and opacity.
+For GIMP 3.2 and later, you may apply levels non-destructively and adjust opacity and blend mode.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Levels tool.
 
@@ -260,14 +265,13 @@ You can save a GIMP preset file by choosing `Export Current Settings to File` in
 
 Applies curves from a saved preset file. Both GIMP and Photoshop (.acv) file formats are supported.
 
-For GIMP 3.2 and later, you may apply curves non-destructively and adjust blend mode and opacity.
+For GIMP 3.2 and later, you may apply curves non-destructively and adjust opacity and blend mode.
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
 
 #### White Balance
 
 Equivalent to `Colors → Auto → White Balance` in GIMP.
-
 
 ### G'MIC Filter
 
