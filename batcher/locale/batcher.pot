@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.2.7\n"
+"Project-Id-Version: 'batcher' 1.2.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-08 11:59+0200\n"
+"POT-Creation-Date: 2026-05-16 16:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -199,12 +199,12 @@ msgid "Align and Offset"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:121
-#: ../../batcher/src/builtin_actions/_crop.py:433
+#: ../../batcher/src/builtin_actions/_crop.py:431
 #: ../../batcher/src/builtin_actions/_flip.py:46
 #: ../../batcher/src/builtin_actions/_flip.py:70
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:561
-#: ../../batcher/src/builtin_actions/_rotate.py:202
-#: ../../batcher/src/builtin_actions/_scale.py:353
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:559
+#: ../../batcher/src/builtin_actions/_rotate.py:310
+#: ../../batcher/src/builtin_actions/_scale.py:455
 msgid "Resize and Transform"
 msgstr ""
 
@@ -230,8 +230,8 @@ msgid "Keep"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:147
-#: ../../batcher/src/builtin_actions/_crop.py:544
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:682
+#: ../../batcher/src/builtin_actions/_crop.py:542
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:680
 #: ../../batcher/src/builtin_actions/_utils.py:81
 #: ../../batcher/src/update/_handlers/update_1_1.py:521
 #: ../../batcher/src/update/_handlers/update_1_1.py:561
@@ -240,9 +240,9 @@ msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:148
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:160
-#: ../../batcher/src/builtin_actions/_crop.py:633
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:770
-#: ../../batcher/src/builtin_actions/_scale.py:468
+#: ../../batcher/src/builtin_actions/_crop.py:631
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:768
+#: ../../batcher/src/builtin_actions/_scale.py:570
 #: ../../batcher/src/builtin_actions/_utils.py:82
 #: ../../batcher/src/update/_handlers/update_1_1.py:256
 #: ../../batcher/src/update/_handlers/update_1_1.py:562
@@ -251,8 +251,8 @@ msgid "Center"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:149
-#: ../../batcher/src/builtin_actions/_crop.py:565
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:702
+#: ../../batcher/src/builtin_actions/_crop.py:563
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:700
 #: ../../batcher/src/builtin_actions/_utils.py:83
 #: ../../batcher/src/update/_handlers/update_1_1.py:550
 #: ../../batcher/src/update/_handlers/update_1_1.py:563
@@ -264,9 +264,9 @@ msgid "Horizontal alignment"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:159
-#: ../../batcher/src/builtin_actions/_crop.py:502
-#: ../../batcher/src/builtin_actions/_misc.py:177
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:642
+#: ../../batcher/src/builtin_actions/_crop.py:500
+#: ../../batcher/src/builtin_actions/_misc.py:207
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:640
 #: ../../batcher/src/builtin_actions/_utils.py:79
 #: ../../batcher/src/update/_handlers/update_1_1.py:463
 #: ../../batcher/src/update/_handlers/update_1_1.py:559
@@ -274,9 +274,9 @@ msgid "Top"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_align_and_offset.py:161
-#: ../../batcher/src/builtin_actions/_crop.py:523
-#: ../../batcher/src/builtin_actions/_misc.py:178
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:662
+#: ../../batcher/src/builtin_actions/_crop.py:521
+#: ../../batcher/src/builtin_actions/_misc.py:208
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:660
 #: ../../batcher/src/builtin_actions/_utils.py:85
 #: ../../batcher/src/update/_handlers/update_1_1.py:492
 #: ../../batcher/src/update/_handlers/update_1_1.py:565
@@ -295,62 +295,63 @@ msgstr ""
 msgid "Additional Y-offset"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:181
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:184
 msgid ""
 "If unchecked, the current layer is turned into a group layer. Subsequent "
 "actions may fail if they invoke plug-ins or destructive layer effects."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:191
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:194
 msgid "Apply Group Layer Appearance"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:192
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:794
-#: ../../batcher/src/builtin_actions/_misc.py:160
-#: ../../batcher/src/builtin_actions/_misc.py:189
-#: ../../batcher/src/builtin_actions/_misc.py:214
-#: ../../batcher/src/builtin_actions/_misc.py:230
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:195
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:785
+#: ../../batcher/src/builtin_actions/_misc.py:190
+#: ../../batcher/src/builtin_actions/_misc.py:220
+#: ../../batcher/src/builtin_actions/_misc.py:246
+#: ../../batcher/src/builtin_actions/_misc.py:262
+#: ../../batcher/src/builtin_actions/_misc.py:285
 #: ../../batcher/src/update/_handlers/update_0_4.py:13
 #: ../../batcher/src/update/_handlers/update_0_4.py:37
 msgid "Layers and Composition"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:194
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:197
 msgid ""
 "Applies attributes (filters, opacity, mode, ...) from all parent group "
 "layers to the current layer to match its appearance in GIMP."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:201
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:204
 msgid "Apply filters (layer effects)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:207
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:210
 msgid "Apply layer modes"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:213
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:216
 msgid "Apply opacity"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:219
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:222
 msgid "Apply layer masks"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:225
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:228
 msgid "Apply blend space"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:231
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:234
 msgid "Apply composite mode"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:237
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:240
 msgid "Apply composite space"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:243
+#: ../../batcher/src/builtin_actions/_apply_group_layer_appearance.py:246
 msgid "Merge groups with layer"
 msgstr ""
 
@@ -365,85 +366,85 @@ msgid ""
 "other than linear."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:550
+#: ../../batcher/src/builtin_actions/_color.py:563
 msgid "Brightness-Contrast"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:551
-#: ../../batcher/src/builtin_actions/_color.py:617
-#: ../../batcher/src/builtin_actions/_color.py:666
-#: ../../batcher/src/builtin_actions/_color.py:715
+#: ../../batcher/src/builtin_actions/_color.py:564
+#: ../../batcher/src/builtin_actions/_color.py:633
+#: ../../batcher/src/builtin_actions/_color.py:684
+#: ../../batcher/src/builtin_actions/_color.py:735
 msgid "Color"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:558
-#: ../../batcher/src/builtin_actions/_color.py:628
-#: ../../batcher/src/builtin_actions/_color.py:677
-#: ../../batcher/src/builtin_actions/_color.py:722
-#: ../../batcher/src/builtin_actions/_misc.py:167
-#: ../../batcher/src/builtin_actions/_misc.py:221
-#: ../../batcher/src/builtin_conditions.py:279
+#: ../../batcher/src/builtin_actions/_color.py:571
+#: ../../batcher/src/builtin_actions/_color.py:644
+#: ../../batcher/src/builtin_actions/_color.py:695
+#: ../../batcher/src/builtin_actions/_color.py:742
+#: ../../batcher/src/builtin_actions/_misc.py:197
+#: ../../batcher/src/builtin_actions/_misc.py:253
 #: ../../batcher/src/builtin_conditions.py:287
-#: ../../batcher/src/builtin_conditions.py:296
-#: ../../batcher/src/builtin_conditions.py:305
-#: ../../batcher/src/builtin_conditions.py:314
-#: ../../batcher/src/builtin_conditions.py:335
-#: ../../batcher/src/builtin_conditions.py:356
+#: ../../batcher/src/builtin_conditions.py:295
+#: ../../batcher/src/builtin_conditions.py:304
+#: ../../batcher/src/builtin_conditions.py:313
+#: ../../batcher/src/builtin_conditions.py:322
+#: ../../batcher/src/builtin_conditions.py:343
+#: ../../batcher/src/builtin_conditions.py:365
 #: ../../batcher/src/update/_handlers/update_0_4.py:62
 #: ../../batcher/src/update/_handlers/update_0_4.py:87
 msgid "Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:564
+#: ../../batcher/src/builtin_actions/_color.py:577
 msgid "Brightness"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:572
+#: ../../batcher/src/builtin_actions/_color.py:585
 msgid "Contrast"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:584
+#: ../../batcher/src/builtin_actions/_color.py:597
 msgid "GEGL"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:585
+#: ../../batcher/src/builtin_actions/_color.py:598
 msgid "GIMP"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:587
+#: ../../batcher/src/builtin_actions/_color.py:600
 msgid "Filter"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:593
-#: ../../batcher/src/builtin_actions/_color.py:642
-#: ../../batcher/src/builtin_actions/_color.py:691
+#: ../../batcher/src/builtin_actions/_color.py:607
+#: ../../batcher/src/builtin_actions/_color.py:658
+#: ../../batcher/src/builtin_actions/_color.py:709
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:35
 msgid "Apply non-destructively"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:600
-#: ../../batcher/src/builtin_actions/_color.py:649
-#: ../../batcher/src/builtin_actions/_color.py:698
+#: ../../batcher/src/builtin_actions/_color.py:614
+#: ../../batcher/src/builtin_actions/_color.py:665
+#: ../../batcher/src/builtin_actions/_color.py:716
 #: ../../batcher/src/pypdb.py:453 ../../batcher/src/pypdb.py:454
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:48
 msgid "Blend mode"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:608
-#: ../../batcher/src/builtin_actions/_color.py:657
-#: ../../batcher/src/builtin_actions/_color.py:706
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:916
+#: ../../batcher/src/builtin_actions/_color.py:623
+#: ../../batcher/src/builtin_actions/_color.py:674
+#: ../../batcher/src/builtin_actions/_color.py:725
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:907
 #: ../../batcher/src/pypdb.py:460
 #: ../../batcher/src/update/_handlers/update_1_2_2.py:62
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:266
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:240
 msgid "Opacity"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:616
+#: ../../batcher/src/builtin_actions/_color.py:632
 msgid "Levels"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:619
+#: ../../batcher/src/builtin_actions/_color.py:635
 msgid ""
 "Applies levels using a preset file saved in GIMP or Photoshop (.alv file).\n"
 "\n"
@@ -451,16 +452,16 @@ msgid ""
 "settings."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:635
-#: ../../batcher/src/builtin_actions/_color.py:684
+#: ../../batcher/src/builtin_actions/_color.py:651
+#: ../../batcher/src/builtin_actions/_color.py:702
 msgid "Preset file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:665
+#: ../../batcher/src/builtin_actions/_color.py:683
 msgid "Curves"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:668
+#: ../../batcher/src/builtin_actions/_color.py:686
 msgid ""
 "Applies curves using a preset file saved in GIMP or Photoshop (.acv file).\n"
 "\n"
@@ -468,339 +469,363 @@ msgid ""
 "settings."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_color.py:714
+#: ../../batcher/src/builtin_actions/_color.py:734
 msgid "White Balance"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:422
+#: ../../batcher/src/builtin_actions/_crop.py:420
 msgid "Crop to Remove Empty Borders"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:432
+#: ../../batcher/src/builtin_actions/_crop.py:430
 msgid "Crop"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:441
+#: ../../batcher/src/builtin_actions/_crop.py:439
 #: ../../batcher/src/builtin_actions/_flip.py:53
 #: ../../batcher/src/builtin_actions/_flip.py:77
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:570
-#: ../../batcher/src/builtin_actions/_rotate.py:210
-#: ../../batcher/src/builtin_actions/_scale.py:361
+#: ../../batcher/src/builtin_actions/_misc.py:293
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:568
+#: ../../batcher/src/builtin_actions/_rotate.py:318
+#: ../../batcher/src/builtin_actions/_scale.py:463
 #: ../../batcher/src/update/_handlers/update_1_1.py:122
 #: ../../batcher/src/update/_handlers/update_1_1.py:370
 msgid "Apply to (image or layer):"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:448
+#: ../../batcher/src/builtin_actions/_crop.py:446
 msgid "Crop from Edges"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:449
+#: ../../batcher/src/builtin_actions/_crop.py:447
 msgid "Crop from Position"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:450
+#: ../../batcher/src/builtin_actions/_crop.py:448
 msgid "Crop to Aspect Ratio"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:451
+#: ../../batcher/src/builtin_actions/_crop.py:449
 msgid "Crop to Area"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:452
+#: ../../batcher/src/builtin_actions/_crop.py:450
 msgid "Remove Empty Borders"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:454
+#: ../../batcher/src/builtin_actions/_crop.py:452
 msgid "How to crop"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:460
+#: ../../batcher/src/builtin_actions/_crop.py:458
 msgid "Crop by the same amount from each side"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:481
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:622
+#: ../../batcher/src/builtin_actions/_crop.py:479
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:620
 #: ../../batcher/src/update/_handlers/update_1_1.py:434
 msgid "Amount"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:572
-#: ../../batcher/src/builtin_actions/_crop.py:637
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:964
-#: ../../batcher/src/builtin_actions/_misc.py:173
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:709
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:774
-#: ../../batcher/src/builtin_actions/_scale.py:472
+#: ../../batcher/src/builtin_actions/_crop.py:570
+#: ../../batcher/src/builtin_actions/_crop.py:635
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:955
+#: ../../batcher/src/builtin_actions/_misc.py:203
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:707
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:772
+#: ../../batcher/src/builtin_actions/_scale.py:574
 #: ../../batcher/src/update/_handlers/update_1_1.py:260
 #: ../../batcher/src/update/_handlers/update_1_1.py:568
 #: ../../batcher/src/update/_handlers/update_1_1.py:656
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:324
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:298
 msgid "Position"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:593
-#: ../../batcher/src/builtin_actions/_crop.py:721
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:730
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:855
+#: ../../batcher/src/builtin_actions/_crop.py:591
+#: ../../batcher/src/builtin_actions/_crop.py:719
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:728
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:853
+#: ../../batcher/src/builtin_actions/_scale.py:497
 #: ../../batcher/src/placeholders.py:238
 #: ../../batcher/src/update/_handlers/update_1_1.py:598
 #: ../../batcher/src/update/_handlers/update_1_1.py:773
 msgid "Width"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:614
-#: ../../batcher/src/builtin_actions/_crop.py:742
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:751
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:876
+#: ../../batcher/src/builtin_actions/_crop.py:612
+#: ../../batcher/src/builtin_actions/_crop.py:740
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:749
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:874
+#: ../../batcher/src/builtin_actions/_scale.py:518
 #: ../../batcher/src/placeholders.py:239
 #: ../../batcher/src/update/_handlers/update_1_1.py:628
 #: ../../batcher/src/update/_handlers/update_1_1.py:803
 msgid "Height"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:625
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:762
+#: ../../batcher/src/builtin_actions/_crop.py:623
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:760
 #: ../../batcher/src/update/_handlers/update_1_1.py:643
 msgid "Aspect ratio (width:height)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:632
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:769
-#: ../../batcher/src/builtin_actions/_scale.py:467
+#: ../../batcher/src/builtin_actions/_crop.py:630
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:767
+#: ../../batcher/src/builtin_actions/_scale.py:569
 #: ../../batcher/src/update/_handlers/update_1_1.py:255
 #: ../../batcher/src/update/_handlers/update_1_1.py:651
 msgid "Start"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:634
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:771
-#: ../../batcher/src/builtin_actions/_scale.py:469
+#: ../../batcher/src/builtin_actions/_crop.py:632
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:769
+#: ../../batcher/src/builtin_actions/_scale.py:571
 #: ../../batcher/src/update/_handlers/update_1_1.py:257
 #: ../../batcher/src/update/_handlers/update_1_1.py:653
 msgid "End"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:635
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:772
-#: ../../batcher/src/builtin_actions/_rotate.py:220
-#: ../../batcher/src/builtin_actions/_scale.py:470
+#: ../../batcher/src/builtin_actions/_crop.py:633
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:770
+#: ../../batcher/src/builtin_actions/_rotate.py:328
+#: ../../batcher/src/builtin_actions/_scale.py:572
 #: ../../batcher/src/update/_handlers/update_1_1.py:258
 #: ../../batcher/src/update/_handlers/update_1_1.py:654
 msgid "Custom"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:658
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:794
-#: ../../batcher/src/builtin_actions/_scale.py:493
+#: ../../batcher/src/builtin_actions/_crop.py:656
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:792
+#: ../../batcher/src/builtin_actions/_scale.py:595
 #: ../../batcher/src/update/_handlers/update_1_1.py:288
 #: ../../batcher/src/update/_handlers/update_1_1.py:685
 msgid "Custom start position"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:679
+#: ../../batcher/src/builtin_actions/_crop.py:677
 msgid "Start X"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_crop.py:700
+#: ../../batcher/src/builtin_actions/_crop.py:698
 msgid "Start Y"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:50
+#: ../../batcher/src/builtin_actions/_export.py:49
 msgid "Rename new file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:51
+#: ../../batcher/src/builtin_actions/_export.py:50
 msgid "Rename existing file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:52
+#: ../../batcher/src/builtin_actions/_export.py:51
 msgid "Skip this file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:53
+#: ../../batcher/src/builtin_actions/_export.py:52
 msgid "Replace existing file"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:411
+#: ../../batcher/src/builtin_actions/_export.py:434
 msgid "Overwriting will permanently replace the original image."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:449
-#: ../../batcher/src/builtin_actions/_export.py:582
+#: ../../batcher/src/builtin_actions/_export.py:472
+#: ../../batcher/src/builtin_actions/_export.py:605
 #: ../../batcher/src/builtin_actions/_import.py:73
 msgid "Canceled"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:452
-#: ../../batcher/src/builtin_actions/_export.py:454
+#: ../../batcher/src/builtin_actions/_export.py:475
+#: ../../batcher/src/builtin_actions/_export.py:477
 msgid "Saving \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:489
+#: ../../batcher/src/builtin_actions/_export.py:512
 msgid "Skipping \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:814
+#: ../../batcher/src/builtin_actions/_export.py:836
 msgid "Export As {}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:816
+#: ../../batcher/src/builtin_actions/_export.py:838
 msgid "Also Export As {}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:823
+#: ../../batcher/src/builtin_actions/_export.py:845
 msgid "Ask"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:830
+#: ../../batcher/src/builtin_actions/_export.py:852
 msgid "Also Export As..."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:831
+#: ../../batcher/src/builtin_actions/_export.py:853
 #: ../../batcher/src/builtin_actions/_import.py:120
-#: ../../batcher/src/builtin_actions/_misc.py:253
+#: ../../batcher/src/builtin_actions/_misc.py:317
 #: ../../batcher/src/builtin_actions/_remove_folder_structure.py:46
 #: ../../batcher/src/builtin_actions/_remove_folder_structure.py:54
-#: ../../batcher/src/builtin_actions/_rename.py:137
-#: ../../batcher/src/builtin_actions/_rename.py:167
+#: ../../batcher/src/builtin_actions/_rename.py:135
+#: ../../batcher/src/builtin_actions/_rename.py:166
 #: ../../batcher/src/builtin_actions/_rename.py:185
-#: ../../batcher/src/builtin_actions/_rename.py:209
-#: ../../batcher/src/builtin_actions/_rename.py:239
-#: ../../batcher/src/builtin_actions/_save.py:182
+#: ../../batcher/src/builtin_actions/_rename.py:210
+#: ../../batcher/src/builtin_actions/_rename.py:241
+#: ../../batcher/src/builtin_actions/_save.py:180
 msgid "File and Naming"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:832
+#: ../../batcher/src/builtin_actions/_export.py:854
 msgid "Exports an image to another file format."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:840
-#: ../../batcher/src/builtin_actions/_save.py:193
+#: ../../batcher/src/builtin_actions/_export.py:862
+#: ../../batcher/src/builtin_actions/_save.py:191
 #: ../../batcher/src/plugin_settings.py:75
-#: ../../batcher/src/plugin_settings.py:232
-#: ../../batcher/src/plugin_settings.py:478 ../../batcher/src/renamer.py:802
+#: ../../batcher/src/plugin_settings.py:244
+#: ../../batcher/src/plugin_settings.py:513 ../../batcher/src/renamer.py:802
 msgid "Output folder"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:849
+#: ../../batcher/src/builtin_actions/_export.py:871
 #: ../../batcher/src/plugin_settings.py:66
-#: ../../batcher/src/plugin_settings.py:223
-#: ../../batcher/src/plugin_settings.py:469
+#: ../../batcher/src/plugin_settings.py:235
+#: ../../batcher/src/plugin_settings.py:504
 msgid "File extension"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:859
+#: ../../batcher/src/builtin_actions/_export.py:881
 msgid "Interactively"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:860
+#: ../../batcher/src/builtin_actions/_export.py:882
 msgid "Use options below"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:862
+#: ../../batcher/src/builtin_actions/_export.py:884
 msgid "How to adjust file format options:"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:864
+#: ../../batcher/src/builtin_actions/_export.py:886
 msgid ""
 "Native dialogs usually allow you to adjust more options such as image "
 "metadata, while adjusting options in place is more convenient as no extra "
 "dialog is displayed before the export."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:874
+#: ../../batcher/src/builtin_actions/_export.py:896
 #: ../../batcher/src/builtin_actions/_import.py:140
 msgid "File format options"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:881
+#: ../../batcher/src/builtin_actions/_export.py:903
 msgid "If a file already exists:"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:888
+#: ../../batcher/src/builtin_actions/_export.py:910
 msgid "For each image"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:890
+#: ../../batcher/src/builtin_actions/_export.py:912
 msgid "For each top-level image or folder"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:891
-#: ../../batcher/src/builtin_actions/_export.py:962
-#: ../../batcher/src/builtin_actions/_export.py:980
+#: ../../batcher/src/builtin_actions/_export.py:913
+#: ../../batcher/src/builtin_actions/_export.py:997
+#: ../../batcher/src/builtin_actions/_export.py:1015
 msgid "As a single image"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:893
+#: ../../batcher/src/builtin_actions/_export.py:915
 msgid "Perform export:"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:898
+#: ../../batcher/src/builtin_actions/_export.py:920
 #: ../../batcher/src/path/validators.py:138 ../../batcher/src/renamer.py:321
 msgid "Untitled"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:899
-#: ../../batcher/src/builtin_actions/_rename.py:145
-#: ../../batcher/src/builtin_actions/_rename.py:175
+#: ../../batcher/src/builtin_actions/_export.py:921
+#: ../../batcher/src/builtin_actions/_rename.py:143
+#: ../../batcher/src/builtin_actions/_rename.py:174
 #: ../../batcher/src/builtin_actions/_rename.py:193
 #: ../../batcher/src/plugin_settings.py:81
-#: ../../batcher/src/plugin_settings.py:238
+#: ../../batcher/src/plugin_settings.py:250
 msgid "Image filename pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:906
+#: ../../batcher/src/builtin_actions/_export.py:929
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:70
+msgid "Keep layers"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_export.py:930
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:71
+msgid "Merge and add alpha"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_export.py:931
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:72
+msgid "Merge and remove alpha"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_export.py:933
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:74
+msgid "Layer handling"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_export.py:940
+#: ../../batcher/src/builtin_actions/_misc.py:306
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:59
+msgid "Background color"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_export.py:946
 msgid "Use original file extension"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:912
+#: ../../batcher/src/builtin_actions/_export.py:952
 msgid "Convert file extension to lowercase"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:918
+#: ../../batcher/src/builtin_actions/_export.py:958
 msgid "Use original modification date"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:924
+#: ../../batcher/src/builtin_actions/_export.py:964
 #: ../../batcher/src/update/_handlers/update_1_2.py:116
 msgid "Rotate or flip image based on Exif metadata"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:930
-#: ../../batcher/src/update/_handlers/update_1_2.py:130
-msgid "Merge visible layers and rasterize"
-msgstr ""
-
-#: ../../batcher/src/builtin_actions/_export.py:947
-#: ../../batcher/src/builtin_actions/_export.py:972
+#: ../../batcher/src/builtin_actions/_export.py:982
+#: ../../batcher/src/builtin_actions/_export.py:1007
 msgid "Export"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:948
+#: ../../batcher/src/builtin_actions/_export.py:983
 msgid "Exports an image to the specified file format."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:955
+#: ../../batcher/src/builtin_actions/_export.py:990
 msgid "Exports a layer to another file format."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:959
-#: ../../batcher/src/builtin_actions/_export.py:977
+#: ../../batcher/src/builtin_actions/_export.py:994
+#: ../../batcher/src/builtin_actions/_export.py:1012
 msgid "For each layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:961
-#: ../../batcher/src/builtin_actions/_export.py:979
+#: ../../batcher/src/builtin_actions/_export.py:996
+#: ../../batcher/src/builtin_actions/_export.py:1014
 msgid "For each top-level layer or group"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:966
-#: ../../batcher/src/builtin_actions/_export.py:984
+#: ../../batcher/src/builtin_actions/_export.py:1001
+#: ../../batcher/src/builtin_actions/_export.py:1019
 msgid "Use file extension in layer name"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_export.py:973
+#: ../../batcher/src/builtin_actions/_export.py:1008
 msgid "Exports a layer to the specified file format."
 msgstr ""
 
@@ -812,16 +837,16 @@ msgstr ""
 msgid "Flip Vertically"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:42
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:40
 msgid "G'MIC Filter: {}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:44
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:50
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:42
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:48
 msgid "G'MIC Filter"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:52
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:50
 msgid ""
 "Applies a G'MIC filter non-interactively.\n"
 "\n"
@@ -829,14 +854,14 @@ msgid ""
 "paste the text into the \"{}\" field."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:55
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:70
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:53
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:68
 msgid "Command"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_gmic_filter.py:64
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:883
-#: ../../batcher/src/builtin_conditions.py:278
+#: ../../batcher/src/builtin_actions/_gmic_filter.py:62
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:881
+#: ../../batcher/src/builtin_conditions.py:286
 msgid "Layers"
 msgstr ""
 
@@ -853,10 +878,10 @@ msgid "Loads an image from a file."
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_import.py:132
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:819
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:890
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:810
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:888
 #: ../../batcher/src/update/_handlers/update_1_1.py:813
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:141
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:115
 msgid "Image"
 msgstr ""
 
@@ -864,52 +889,52 @@ msgstr ""
 msgid "No recognized image formats in added files"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:165
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:163
 msgid "Image file \"{}\" does not exist."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:168
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:166
 msgid "Image file not specified."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:197
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:195
 msgid "No layers with color tag: {}."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:658
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:649
 msgid "Insert Image as Background"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:660
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:651
 msgid "Insert Image as Foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:662
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:653
 msgid "Insert Text as Background"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:664
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:655
 msgid "Insert Text as Foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:666
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:657
 msgid "Insert Layers ({}) as Background"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:668
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:659
 msgid "Insert Layers ({}) as Foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:671
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:793
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:662
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:784
 msgid "Insert Overlay (Watermark)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:761
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:752
 msgid "Without Color Tag: {}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:796
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:787
 msgid ""
 "Inserts the specified image behind or in front of the current layer.\n"
 "\n"
@@ -917,146 +942,146 @@ msgid ""
 "\"{}\"."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:799
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:790
 #: ../../batcher/src/placeholders.py:154 ../../batcher/src/placeholders.py:155
 msgid "Layer Above (Foreground)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:799
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:790
 #: ../../batcher/src/placeholders.py:152 ../../batcher/src/placeholders.py:153
 msgid "Layer Below (Background)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:807
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:128
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:798
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:102
 msgid "Insert content"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:809
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:980
-#: ../../batcher/src/builtin_conditions.py:438
-#: ../../batcher/src/builtin_conditions.py:446
-#: ../../batcher/src/builtin_conditions.py:454
-#: ../../batcher/src/builtin_conditions.py:462
-#: ../../batcher/src/builtin_conditions.py:471
-#: ../../batcher/src/builtin_conditions.py:480
-#: ../../batcher/src/builtin_conditions.py:489
-#: ../../batcher/src/builtin_conditions.py:498
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:130
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:335
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:800
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:972
+#: ../../batcher/src/builtin_conditions.py:448
+#: ../../batcher/src/builtin_conditions.py:456
+#: ../../batcher/src/builtin_conditions.py:464
+#: ../../batcher/src/builtin_conditions.py:472
+#: ../../batcher/src/builtin_conditions.py:481
+#: ../../batcher/src/builtin_conditions.py:490
+#: ../../batcher/src/builtin_conditions.py:499
+#: ../../batcher/src/builtin_conditions.py:508
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:104
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:309
 msgid "File"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:810
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:836
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:981
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:131
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:160
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:336
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:801
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:827
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:973
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:105
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:134
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:310
 msgid "Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:826
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:149
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:817
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:123
 msgid "Image pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:827
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:150
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:818
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:124
 msgid "This way, you can insert different overlays for each input."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:841
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:165
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:832
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:139
 msgid "Text pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:852
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:177
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:843
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:151
 msgid "Color tag"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:859
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:186
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:850
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:160
 msgid "Use pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:860
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:187
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:851
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:161
 msgid ""
 "Using a pattern allows inserting different files or text for each input."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:866
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:197
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:857
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:171
 msgid "Font"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:884
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:226
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:875
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:200
 msgid "Font size"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:890
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:233
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:881
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:207
 msgid "Font color"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:903
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:894
 #: ../../batcher/src/gui/widgets/item_box.py:395
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:252
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:226
 msgid "Size"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:905
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:254
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:896
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:228
 msgid ""
 "Aspect ratio is preserved. For absolute units, the inserted layer is scaled "
 "to fit within the specified size (maximum width or height)."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:924
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:275
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:915
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:249
 msgid "Rotation angle (degrees)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:931
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:283
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:922
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:257
 msgid "Adjust placement"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:938
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:292
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:929
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:266
 msgid "Placement"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:947
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:305
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:938
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:279
 msgid "Offsets (X and Y)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:954
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:313
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:945
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:287
 msgid "Number of tiles"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:955
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:314
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:946
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:288
 msgid "Set this to a value greater than 1 to enable tiling."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:966
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:326
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:957
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:300
 msgid "Foreground"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:967
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:327
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:958
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:301
 msgid "Background"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_insert_overlay.py:982
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:337
+#: ../../batcher/src/builtin_actions/_insert_overlay.py:974
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:311
 msgid "Layers with color tag"
 msgstr ""
 
@@ -1064,74 +1089,74 @@ msgstr ""
 msgid "No layer below position {}."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:125
+#: ../../batcher/src/builtin_actions/_misc.py:139
 msgid "Duplicate Layer Below"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:127
+#: ../../batcher/src/builtin_actions/_misc.py:141
 msgid "Duplicate Layer Above"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:130
+#: ../../batcher/src/builtin_actions/_misc.py:144
 msgid "Duplicate Layer at Position {}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:132
-#: ../../batcher/src/builtin_actions/_misc.py:159
+#: ../../batcher/src/builtin_actions/_misc.py:146
+#: ../../batcher/src/builtin_actions/_misc.py:189
 msgid "Duplicate Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:146
+#: ../../batcher/src/builtin_actions/_misc.py:159
 msgid "Merge with Layer Below"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:148
+#: ../../batcher/src/builtin_actions/_misc.py:161
 msgid "Merge with Layer Above"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:151
+#: ../../batcher/src/builtin_actions/_misc.py:164
 msgid "Merge Layer {} with Layer Below"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:153
-#: ../../batcher/src/builtin_actions/_misc.py:188
+#: ../../batcher/src/builtin_actions/_misc.py:166
+#: ../../batcher/src/builtin_actions/_misc.py:219
 msgid "Merge Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:175
+#: ../../batcher/src/builtin_actions/_misc.py:205
 msgid "Above layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:176
+#: ../../batcher/src/builtin_actions/_misc.py:206
 msgid "Below layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:196
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:387
+#: ../../batcher/src/builtin_actions/_misc.py:227
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:361
 msgid "Target Layer"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:204
-#: ../../batcher/src/builtin_actions/_misc.py:243
+#: ../../batcher/src/builtin_actions/_misc.py:235
+#: ../../batcher/src/builtin_actions/_misc.py:275
 #: ../../batcher/src/update/_handlers/update_0_4.py:23
 #: ../../batcher/src/update/_handlers/update_0_4.py:47
-#: ../../batcher/src/update/_handlers/update_1_2_6.py:398
+#: ../../batcher/src/update/_handlers/update_1_2_6.py:372
 msgid "Merge type"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:213
+#: ../../batcher/src/builtin_actions/_misc.py:245
 msgid "Merge Filters"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:215
+#: ../../batcher/src/builtin_actions/_misc.py:247
 msgid "Merges all visible filters (layer effects) in the specified layer."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:229
+#: ../../batcher/src/builtin_actions/_misc.py:261
 msgid "Merge Visible Layers"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:232
+#: ../../batcher/src/builtin_actions/_misc.py:264
 msgid ""
 "Merges all visible layers within the image into a single layer. Invisible "
 "layers are removed.\n"
@@ -1140,11 +1165,19 @@ msgid ""
 "filters (layer effects) or other actions on the entire image."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:251
+#: ../../batcher/src/builtin_actions/_misc.py:284
+msgid "Flatten (Remove Alpha)"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_misc.py:299
+msgid "Use custom background color"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_misc.py:315
 msgid "Remove File Extension from Imported Images"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_misc.py:252
+#: ../../batcher/src/builtin_actions/_misc.py:316
 msgid "Imported images represent non-native GIMP files (i.e. not XCF)."
 msgstr ""
 
@@ -1157,30 +1190,30 @@ msgstr ""
 msgid "Consider visibility of parent folders"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:117
-#: ../../batcher/src/builtin_actions/_rename.py:122
+#: ../../batcher/src/builtin_actions/_rename.py:115
+#: ../../batcher/src/builtin_actions/_rename.py:120
 msgid "Rename to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:120
+#: ../../batcher/src/builtin_actions/_rename.py:118
 msgid "Rename New Images to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:136
-#: ../../batcher/src/builtin_actions/_rename.py:166
+#: ../../batcher/src/builtin_actions/_rename.py:134
+#: ../../batcher/src/builtin_actions/_rename.py:165
 #: ../../batcher/src/builtin_actions/_rename.py:184
-#: ../../batcher/src/builtin_actions/_rename.py:208
-#: ../../batcher/src/builtin_actions/_rename.py:238
+#: ../../batcher/src/builtin_actions/_rename.py:209
+#: ../../batcher/src/builtin_actions/_rename.py:240
 #: ../../batcher/src/gui/main/command_lists.py:393
 msgid "Rename"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:152
+#: ../../batcher/src/builtin_actions/_rename.py:150
 msgid "Rename images"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:158
-#: ../../batcher/src/builtin_actions/_rename.py:230
+#: ../../batcher/src/builtin_actions/_rename.py:156
+#: ../../batcher/src/builtin_actions/_rename.py:231
 msgid "Rename folders"
 msgstr ""
 
@@ -1188,218 +1221,248 @@ msgstr ""
 msgid "Rename only new images"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:217
-#: ../../batcher/src/plugin_settings.py:484
+#: ../../batcher/src/builtin_actions/_rename.py:218
+#: ../../batcher/src/plugin_settings.py:519
 msgid "Layer filename pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:224
-#: ../../batcher/src/builtin_actions/_rename.py:254
+#: ../../batcher/src/builtin_actions/_rename.py:225
+#: ../../batcher/src/builtin_actions/_rename.py:256
 msgid "Rename layers"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:247
+#: ../../batcher/src/builtin_actions/_rename.py:249
 msgid "Layer name pattern"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rename.py:260
+#: ../../batcher/src/builtin_actions/_rename.py:262
 msgid "Rename group layers"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:560
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:558
 msgid "Resize Canvas"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:562
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:560
 msgid "Resizes the image or layer extents."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:577
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:575
 msgid "Resize from Edges (Add Borders)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:578
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:576
 msgid "Resize from Position"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:579
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:577
 msgid "Resize to Aspect Ratio"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:580
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:578
 msgid "Resize to Area"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:581
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:579
 msgid "Resize to Layer Size"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:582
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:580
 msgid "Resize to Image Size"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:584
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:582
 #: ../../batcher/src/update/_handlers/update_1_1.py:384
 msgid "How to resize"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:590
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:588
 #: ../../batcher/src/update/_handlers/update_1_1.py:391
 msgid "Fill added space with color"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:596
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:594
 #: ../../batcher/src/update/_handlers/update_1_1.py:398
 msgid "Color for added space"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:602
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:600
 #: ../../batcher/src/update/_handlers/update_1_1.py:405
 msgid "Resize by the same amount from each side"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:814
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:812
 #: ../../batcher/src/update/_handlers/update_1_1.py:714
 msgid "Offset X"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_resize_canvas.py:834
+#: ../../batcher/src/builtin_actions/_resize_canvas.py:832
 #: ../../batcher/src/update/_handlers/update_1_1.py:743
 msgid "Offset Y"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:201
+#: ../../batcher/src/builtin_actions/_rotate.py:272
+msgid "Rotate, 90°"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_rotate.py:274
+msgid "Rotate, 180°"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_rotate.py:276
+msgid "Rotate, 270°"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_rotate.py:287
+msgid "Rotate, {}{}"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_rotate.py:289
+#: ../../batcher/src/builtin_actions/_rotate.py:291
+#: ../../batcher/src/builtin_actions/_rotate.py:309
 msgid "Rotate"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:217
+#: ../../batcher/src/builtin_actions/_rotate.py:325
 msgid "90° (clockwise)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:218
+#: ../../batcher/src/builtin_actions/_rotate.py:326
 msgid "180°"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:219
+#: ../../batcher/src/builtin_actions/_rotate.py:327
 msgid "270° (counter-clockwise)"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:222
+#: ../../batcher/src/builtin_actions/_rotate.py:330
 msgid "Angle"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:231
+#: ../../batcher/src/builtin_actions/_rotate.py:339
 msgid "Custom angle"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:238
+#: ../../batcher/src/builtin_actions/_rotate.py:345
+#: ../../batcher/src/update/_handlers/update_1_2_8.py:101
+msgid "Resize image to fit"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_rotate.py:352
 msgid "How to handle boundaries"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:245
-#: ../../batcher/src/builtin_actions/_scale.py:423
+#: ../../batcher/src/builtin_actions/_rotate.py:359
+#: ../../batcher/src/builtin_actions/_scale.py:525
 msgid "Interpolation"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:251
+#: ../../batcher/src/builtin_actions/_rotate.py:365
 msgid "Rotate around the center"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:271
+#: ../../batcher/src/builtin_actions/_rotate.py:385
 msgid "Horizontal position of center"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_rotate.py:291
+#: ../../batcher/src/builtin_actions/_rotate.py:405
 msgid "Vertical position of center"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_save.py:157
+#: ../../batcher/src/builtin_actions/_save.py:155
 msgid "Save (New and Imported Images to \"{}\")"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_save.py:159
-#: ../../batcher/src/builtin_actions/_save.py:181
+#: ../../batcher/src/builtin_actions/_save.py:157
+#: ../../batcher/src/builtin_actions/_save.py:179
 msgid "Save"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_save.py:163
+#: ../../batcher/src/builtin_actions/_save.py:161
 msgid "Save to \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_save.py:184
+#: ../../batcher/src/builtin_actions/_save.py:182
 msgid ""
 "Saves the image in the native GIMP format (XCF). To export the image in "
 "another file format, use the \"Export Images\" menu."
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_save.py:202
+#: ../../batcher/src/builtin_actions/_save.py:200
 msgid "Output folder for new and imported images"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:352
-msgid "Scale"
+#: ../../batcher/src/builtin_actions/_scale.py:405
+msgid "Scale, {}{}×{}{}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:382
-msgid "New width"
-msgstr ""
-
-#: ../../batcher/src/builtin_actions/_scale.py:403
-msgid "New height"
-msgstr ""
-
-#: ../../batcher/src/builtin_actions/_scale.py:410
-#: ../../batcher/src/update/_handlers/update_1_1.py:196
-msgid "None (Stretch)"
+#: ../../batcher/src/builtin_actions/_scale.py:408
+msgid "Scale, Width {}{}"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_scale.py:411
-#: ../../batcher/src/update/_handlers/update_1_1.py:197
-msgid "Keep, adjust width"
-msgstr ""
-
-#: ../../batcher/src/builtin_actions/_scale.py:412
-#: ../../batcher/src/update/_handlers/update_1_1.py:198
-msgid "Keep, adjust height"
-msgstr ""
-
-#: ../../batcher/src/builtin_actions/_scale.py:413
-#: ../../batcher/src/update/_handlers/update_1_1.py:199
-msgid "Fit"
+msgid "Scale, Height {}{}"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_scale.py:414
-#: ../../batcher/src/update/_handlers/update_1_1.py:200
-msgid "Fit with padding"
+msgid "Scale, Fit Within {}{}×{}{}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:416
-#: ../../batcher/src/update/_handlers/update_1_1.py:202
-msgid "Aspect ratio"
+#: ../../batcher/src/builtin_actions/_scale.py:417
+msgid "Scale, Canvas {}{}×{}{}"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:429
+#: ../../batcher/src/builtin_actions/_scale.py:420
+#: ../../batcher/src/builtin_actions/_scale.py:454
+msgid "Scale"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:470
+msgid "Stretch"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:471
+msgid "Match width (keep aspect ratio)"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:472
+msgid "Match height (keep aspect ratio)"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:473
+msgid "Fit within bounds"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:474
+msgid "Fit to canvas"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:476
+msgid "How to scale"
+msgstr ""
+
+#: ../../batcher/src/builtin_actions/_scale.py:531
 msgid "Use local origin"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:435
+#: ../../batcher/src/builtin_actions/_scale.py:537
 #: ../../batcher/src/update/_handlers/update_1_1.py:214
 msgid "Set image resolution in DPI"
 msgstr ""
 
 #. FOR TRANSLATORS: "X" represents the X-axis.
-#: ../../batcher/src/builtin_actions/_scale.py:451
+#: ../../batcher/src/builtin_actions/_scale.py:553
 #: ../../batcher/src/update/_handlers/update_1_1.py:231
 msgid "X"
 msgstr ""
 
 #. FOR TRANSLATORS: "Y" represents the Y-axis.
-#: ../../batcher/src/builtin_actions/_scale.py:453
+#: ../../batcher/src/builtin_actions/_scale.py:555
 #: ../../batcher/src/update/_handlers/update_1_1.py:232
 msgid "Y"
 msgstr ""
 
-#: ../../batcher/src/builtin_actions/_scale.py:460
+#: ../../batcher/src/builtin_actions/_scale.py:562
 #: ../../batcher/src/update/_handlers/update_1_1.py:245
 msgid "Padding color"
 msgstr ""
@@ -1436,231 +1499,231 @@ msgstr ""
 msgid "The image has no layers."
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:206
+#: ../../batcher/src/builtin_conditions.py:214
 msgid "Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:208
+#: ../../batcher/src/builtin_conditions.py:216
 msgid "Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:211
+#: ../../batcher/src/builtin_conditions.py:219
 msgid "Not Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:213
+#: ../../batcher/src/builtin_conditions.py:221
 msgid "Not Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:216
+#: ../../batcher/src/builtin_conditions.py:224
 msgid "Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:218
+#: ../../batcher/src/builtin_conditions.py:226
 msgid "Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:221
+#: ../../batcher/src/builtin_conditions.py:229
 msgid "Not Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:223
+#: ../../batcher/src/builtin_conditions.py:231
 msgid "Not Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:226
+#: ../../batcher/src/builtin_conditions.py:234
 msgid "Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:228
+#: ../../batcher/src/builtin_conditions.py:236
 msgid "Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:231
+#: ../../batcher/src/builtin_conditions.py:239
 msgid "Not Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:233
+#: ../../batcher/src/builtin_conditions.py:241
 msgid "Not Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:235
+#: ../../batcher/src/builtin_conditions.py:243
 msgid "Matching Pattern \"{}\""
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-#: ../../batcher/src/builtin_conditions.py:240
+#: ../../batcher/src/builtin_conditions.py:248
 msgid " (Case-Insensitive)"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:286
+#: ../../batcher/src/builtin_conditions.py:294
 msgid "Group Layers"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only visible items" when translating this
-#: ../../batcher/src/builtin_conditions.py:295 ../../batcher/src/pypdb.py:464
+#: ../../batcher/src/builtin_conditions.py:303 ../../batcher/src/pypdb.py:464
 msgid "Visible"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
-#: ../../batcher/src/builtin_conditions.py:304
+#: ../../batcher/src/builtin_conditions.py:312
 msgid "Selected in GIMP"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
-#: ../../batcher/src/builtin_conditions.py:313
+#: ../../batcher/src/builtin_conditions.py:321
 msgid "With Color Tags"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:320
-#: ../../batcher/src/builtin_conditions.py:341
+#: ../../batcher/src/builtin_conditions.py:328
+#: ../../batcher/src/builtin_conditions.py:349
 msgid "Color tags"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
-#: ../../batcher/src/builtin_conditions.py:334
+#: ../../batcher/src/builtin_conditions.py:342
 msgid "Without Color Tags"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items without a color tag" when translating this
-#: ../../batcher/src/builtin_conditions.py:355
+#: ../../batcher/src/builtin_conditions.py:364
 msgid "Without Color Tag"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items matching text" when translating this
-#: ../../batcher/src/builtin_conditions.py:381
+#: ../../batcher/src/builtin_conditions.py:390
 msgid "Matching Text..."
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:382
-#: ../../batcher/src/builtin_conditions.py:421
-#: ../../batcher/src/builtin_conditions.py:430
+#: ../../batcher/src/builtin_conditions.py:391
+#: ../../batcher/src/builtin_conditions.py:431
+#: ../../batcher/src/builtin_conditions.py:440
 msgid "Naming"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:391
+#: ../../batcher/src/builtin_conditions.py:400
 #: ../../batcher/src/update/_handlers/update_1_1.py:839
 msgid "Starts with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:392
+#: ../../batcher/src/builtin_conditions.py:401
 #: ../../batcher/src/update/_handlers/update_1_1.py:840
 msgid "Does not start with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:393
+#: ../../batcher/src/builtin_conditions.py:402
 #: ../../batcher/src/update/_handlers/update_1_1.py:841
 msgid "Contains text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:394
+#: ../../batcher/src/builtin_conditions.py:403
 #: ../../batcher/src/update/_handlers/update_1_1.py:842
 msgid "Does not contain text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:395
+#: ../../batcher/src/builtin_conditions.py:404
 #: ../../batcher/src/update/_handlers/update_1_1.py:843
 msgid "Ends with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:396
+#: ../../batcher/src/builtin_conditions.py:405
 #: ../../batcher/src/update/_handlers/update_1_1.py:844
 msgid "Does not end with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:397
+#: ../../batcher/src/builtin_conditions.py:406
 #: ../../batcher/src/update/_handlers/update_1_1.py:845
 msgid "Matches regular expression"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:399
+#: ../../batcher/src/builtin_conditions.py:408
 msgid "How to perform matching"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:405
+#: ../../batcher/src/builtin_conditions.py:414
 msgid "Text to match"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:411
+#: ../../batcher/src/builtin_conditions.py:420
 msgid "Ignore case sensitivity"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
-#: ../../batcher/src/builtin_conditions.py:420
+#: ../../batcher/src/builtin_conditions.py:430
 msgid "Matching File Extension"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
-#: ../../batcher/src/builtin_conditions.py:429
+#: ../../batcher/src/builtin_conditions.py:439
 msgid "Recognized File Format"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:437
+#: ../../batcher/src/builtin_conditions.py:447
 msgid "Imported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:445
+#: ../../batcher/src/builtin_conditions.py:455
 msgid "Not Imported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:453
+#: ../../batcher/src/builtin_conditions.py:463
 msgid "Saved or Exported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:461
+#: ../../batcher/src/builtin_conditions.py:471
 msgid "Not Saved or Exported"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
-#: ../../batcher/src/builtin_conditions.py:470
+#: ../../batcher/src/builtin_conditions.py:480
 msgid "With Unsaved Changes"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
-#: ../../batcher/src/builtin_conditions.py:479
+#: ../../batcher/src/builtin_conditions.py:489
 msgid "With No Unsaved Changes"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
-#: ../../batcher/src/builtin_conditions.py:488
+#: ../../batcher/src/builtin_conditions.py:498
 msgid "XCF (Native GIMP) File"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
-#: ../../batcher/src/builtin_conditions.py:497
+#: ../../batcher/src/builtin_conditions.py:507
 msgid "Not XCF (Native GIMP) File"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only top-level items" when translating this
-#: ../../batcher/src/builtin_conditions.py:506
+#: ../../batcher/src/builtin_conditions.py:516
 msgid "Top-Level"
 msgstr ""
 
-#: ../../batcher/src/commands.py:415
+#: ../../batcher/src/commands.py:427
 msgid "Built-in"
 msgstr ""
 
-#: ../../batcher/src/commands.py:416
+#: ../../batcher/src/commands.py:428
 msgid "GIMP PDB procedure"
 msgstr ""
 
-#: ../../batcher/src/commands.py:417
+#: ../../batcher/src/commands.py:429
 msgid "GEGL operation"
 msgstr ""
 
-#: ../../batcher/src/commands.py:464
+#: ../../batcher/src/commands.py:476
 msgid "_More options"
 msgstr ""
 
-#: ../../batcher/src/commands.py:474
+#: ../../batcher/src/commands.py:486
 msgid "Enable for previews"
 msgstr ""
 
-#: ../../batcher/src/commands.py:537
+#: ../../batcher/src/commands.py:549
 msgid "Also apply to parent folders"
 msgstr ""
 
-#: ../../batcher/src/commands.py:642
+#: ../../batcher/src/commands.py:654
 msgid "This filter cannot be applied non-destructively."
 msgstr ""
 
@@ -1745,31 +1808,31 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:513
+#: ../../batcher/src/gui/commands/browser.py:514
 msgid "Search"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:525
+#: ../../batcher/src/gui/commands/browser.py:526
 msgid "by name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:529
+#: ../../batcher/src/gui/commands/browser.py:530
 msgid "by internal name"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:533
+#: ../../batcher/src/gui/commands/browser.py:534
 msgid "by description"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:579
+#: ../../batcher/src/gui/commands/browser.py:580
 msgid "Select an action"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:604
+#: ../../batcher/src/gui/commands/browser.py:605
 msgid "_Add"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/browser.py:605
+#: ../../batcher/src/gui/commands/browser.py:606
 #: ../../batcher/src/gui/commands/editor.py:50
 #: ../../batcher/src/gui/log_viewer.py:66
 #: ../../batcher/src/gui/main/main.py:155
@@ -1837,7 +1900,7 @@ msgid ""
 msgstr ""
 
 #: ../../batcher/src/gui/main/batcher_manager.py:34
-#: ../../batcher/src/plugin_settings.py:817
+#: ../../batcher/src/plugin_settings.py:876
 msgid "Continue on Error"
 msgstr ""
 
@@ -1883,29 +1946,29 @@ msgid ""
 "Add and adjust a {} action before export to avoid losing data."
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:69
+#: ../../batcher/src/gui/main/export_settings.py:66
 msgid "Output Folder:"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:80
+#: ../../batcher/src/gui/main/export_settings.py:77
 msgid "Filename and Format:"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:98
+#: ../../batcher/src/gui/main/export_settings.py:95
 msgid "Export options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:218
+#: ../../batcher/src/gui/main/export_settings.py:215
 msgid "Export Options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:334
+#: ../../batcher/src/gui/main/export_settings.py:331
 msgid ""
 "Exporting to input folders can overwrite original images.\n"
 "Adjust the {} field to avoid losing data."
 msgstr ""
 
-#: ../../batcher/src/gui/main/export_settings.py:335
+#: ../../batcher/src/gui/main/export_settings.py:332
 msgid "Filename"
 msgstr ""
 
@@ -2298,15 +2361,17 @@ msgid "Property:"
 msgstr ""
 
 #: ../../batcher/src/gui/widgets/directory_chooser.py:197
+#: ../../batcher/src/gui/widgets/file_chooser.py:52
 msgid "Browse"
 msgstr ""
 
 #: ../../batcher/src/gui/widgets/directory_chooser.py:230
+#: ../../batcher/src/gui/widgets/file_chooser.py:84
 msgid "Select a Folder"
 msgstr ""
 
-#: ../../batcher/src/gui/widgets/file_chooser.py:113
-msgid "Clear"
+#: ../../batcher/src/gui/widgets/file_chooser.py:86
+msgid "Select a File"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of e.g. "PNG options" when translating this.
@@ -2484,14 +2549,14 @@ msgid "Y-offset"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:36
-#: ../../batcher/src/plugin_settings.py:214
-#: ../../batcher/src/plugin_settings.py:362
+#: ../../batcher/src/plugin_settings.py:226
+#: ../../batcher/src/plugin_settings.py:385
 msgid "Run mode"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:37
-#: ../../batcher/src/plugin_settings.py:215
-#: ../../batcher/src/plugin_settings.py:363
+#: ../../batcher/src/plugin_settings.py:227
+#: ../../batcher/src/plugin_settings.py:386
 msgid "The run mode"
 msgstr ""
 
@@ -2508,29 +2573,29 @@ msgid ""
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:82
-#: ../../batcher/src/plugin_settings.py:239
+#: ../../batcher/src/plugin_settings.py:251
 msgid "Image filename pattern (empty string = image name)"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:90
-#: ../../batcher/src/plugin_settings.py:247
-#: ../../batcher/src/plugin_settings.py:493
+#: ../../batcher/src/plugin_settings.py:259
+#: ../../batcher/src/plugin_settings.py:528
 msgid "How to handle conflicting files (non-interactive run mode only)"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:100
-#: ../../batcher/src/plugin_settings.py:257
-#: ../../batcher/src/plugin_settings.py:374
-#: ../../batcher/src/plugin_settings.py:503
-#: ../../batcher/src/plugin_settings.py:620
+#: ../../batcher/src/plugin_settings.py:269
+#: ../../batcher/src/plugin_settings.py:397
+#: ../../batcher/src/plugin_settings.py:538
+#: ../../batcher/src/plugin_settings.py:667
 msgid "File with saved settings"
 msgstr ""
 
 #: ../../batcher/src/plugin_settings.py:101
-#: ../../batcher/src/plugin_settings.py:258
-#: ../../batcher/src/plugin_settings.py:375
-#: ../../batcher/src/plugin_settings.py:504
-#: ../../batcher/src/plugin_settings.py:621
+#: ../../batcher/src/plugin_settings.py:270
+#: ../../batcher/src/plugin_settings.py:398
+#: ../../batcher/src/plugin_settings.py:539
+#: ../../batcher/src/plugin_settings.py:668
 msgid "File with saved settings (optional)"
 msgstr ""
 
@@ -2538,23 +2603,23 @@ msgstr ""
 msgid "Keep Input Images"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:485
+#: ../../batcher/src/plugin_settings.py:520
 msgid "Layer filename pattern (empty string = layer name)"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:735
+#: ../../batcher/src/plugin_settings.py:794
 msgid "Show Original Names"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:818
+#: ../../batcher/src/plugin_settings.py:877
 msgid "Continue processing on error"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:827
+#: ../../batcher/src/plugin_settings.py:886
 msgid "Input files and folders"
 msgstr ""
 
-#: ../../batcher/src/plugin_settings.py:848
+#: ../../batcher/src/plugin_settings.py:907
 msgid "Close when Done"
 msgstr ""
 
@@ -2751,6 +2816,30 @@ msgstr ""
 msgid "Suppose that a layer is named \"Animal copy #1\"."
 msgstr ""
 
+#: ../../batcher/src/update/_handlers/update_1_1.py:196
+msgid "None (Stretch)"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_1.py:197
+msgid "Keep, adjust width"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_1.py:198
+msgid "Keep, adjust height"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_1.py:199
+msgid "Fit"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_1.py:200
+msgid "Fit with padding"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_1.py:202
+msgid "Aspect ratio"
+msgstr ""
+
 #: ../../batcher/src/update/_handlers/update_1_1.py:378
 msgid "Resize from edges"
 msgstr ""
@@ -2769,6 +2858,10 @@ msgstr ""
 
 #: ../../batcher/src/update/_handlers/update_1_1.py:382
 msgid "Resize to layer size"
+msgstr ""
+
+#: ../../batcher/src/update/_handlers/update_1_2.py:130
+msgid "Merge visible layers and rasterize"
 msgstr ""
 
 #: ../../batcher/src/update/_handlers/update_1_2.py:379
