@@ -64,6 +64,7 @@ import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
+from src import _gegl_operations_custom_attributes
 from src import pypdb
 from src import setting as setting_
 from src import settings_from_pdb
@@ -611,6 +612,8 @@ def get_command_dict_from_pdb_procedure(
 
   command_dict.update(_get_hard_coded_command_attributes(command_dict['name']))
 
+  _add_hard_coded_gui_type_kwargs(pdb_procedure_name, arguments)
+
   return command_dict
 
 
@@ -687,6 +690,17 @@ def _get_pdb_procedure_description(pdb_procedure):
 
 def _get_hard_coded_command_attributes(sanitized_pdb_procedure_name):
   return _PDB_PROCEDURES_AND_CUSTOM_ATTRIBUTES.get(sanitized_pdb_procedure_name, {})
+
+
+def _add_hard_coded_gui_type_kwargs(pdb_procedure_name, arguments):
+  custom_attributes_dict = _gegl_operations_custom_attributes.GEGL_OPERATIONS_AND_CUSTOM_ATTRIBUTES
+
+  if pdb_procedure_name in custom_attributes_dict:
+    attributes = custom_attributes_dict[pdb_procedure_name]
+
+    for argument_dict in arguments:
+      if argument_dict['name'] in attributes:
+        argument_dict.update(**utils.semi_deep_copy(attributes[argument_dict['name']]))
 
 
 def reorder(commands: setting_.Group, command_name: str, new_position: int):

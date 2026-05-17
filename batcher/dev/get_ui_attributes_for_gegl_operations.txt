@@ -1,0 +1,10 @@
+# You can paste these commands to the Python-Fu console.
+
+import os
+import sys
+
+sys.path.append(os.path.join(Gimp.directory(), 'batcher', 'batcher'))
+
+from dev import get_ui_properties_for_gegl_operations
+
+get_ui_properties_for_gegl_operations.main()
