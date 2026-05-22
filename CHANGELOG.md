@@ -7,6 +7,9 @@ User interface changes:
 * Adjusting values on decimal numeric sliders by keys now increases/decreases the values by a smaller amount for small ranges (e.g. 0.01 by pressing the Up key if the value range is 0.0-1.0).
 * Options related to managing actions and conditions (rename, remove, ...) are now placed under a menu which can be brought up by pressing the arrow button next to the edit button.
 
+Bug fixes:
+* Fixed a crash when adding the `Without Color Tags` condition.
+
 
 ## 1.2.8
 

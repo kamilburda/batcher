@@ -354,7 +354,6 @@ _BUILTIN_CONDITIONS_LIST = [
         'default_value': (),
       },
     ],
-    'after_add_handler': _on_after_add_without_color_tag_condition,
   },
   {
     'name': 'without_color_tag',
@@ -381,6 +380,7 @@ _BUILTIN_CONDITIONS_LIST = [
         'gui_type': None,
       },
     ],
+    'after_add_handler': _on_after_add_without_color_tag_condition,
   },
   {
     'name': 'matching_text',
