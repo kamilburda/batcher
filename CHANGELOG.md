@@ -1,8 +1,11 @@
 ## Upcoming
 
+This release improves usability of layer effects and management of actions and conditions.
+
 User interface changes:
 * Numeric arguments for layer effects (filters) installed with GIMP now have much more realistic minimum and maximum values, the same ones when using these effects in GIMP. You can still drag the mouse beyond the left or right edge or enter a higher/lower value, if applicable. The step sizes (when pressing the Up, Down, Page Up or Page Down key) and the number of decimal digits were also updated accordingly (#152).
 * Adjusting values on decimal numeric sliders by keys now increases/decreases the values by a smaller amount for small ranges (e.g. 0.01 by pressing the Up key if the value range is 0.0-1.0).
+* Options related to managing actions and conditions (rename, remove, ...) are now placed under a menu which can be brought up by pressing the arrow button next to the edit button.
 
 
 ## 1.2.8

@@ -1,6 +1,8 @@
 """Widget representing a single command (action/condition) in the GUI."""
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
@@ -21,6 +23,9 @@ class CommandItem(gui_widgets_.ItemBoxItem):
   _DRAG_ICON_WIDTH = 250
   _DRAG_ICON_BORDER_WIDTH = 4
 
+  _MENU_OPTIONS_ICON_LABEL_SPACING = 6
+  _MENU_OPTIONS_HORIZONTAL_MARGIN = 9
+
   def __init__(self, command, attach_editor_widget=True):
     self._command = command
     self._attach_editor_widget = attach_editor_widget
@@ -38,8 +43,13 @@ class CommandItem(gui_widgets_.ItemBoxItem):
 
     self._init_gui()
 
+    self._entry_for_editing_command_name.connect(
+      'focus-out-event', self._on_entry_for_editing_command_name_focus_out_event)
+    self._entry_for_editing_command_name.connect(
+      'key-press-event', self._on_entry_for_editing_command_name_key_press_event)
+
     self._button_edit.connect('clicked', self._on_button_edit_clicked)
-    self._button_remove.connect('clicked', lambda *args: self.editor.destroy())
+    self._button_options.connect('clicked', self._on_button_options_clicked)
 
     if self._command['display_options_on_create'].value:
       self._command['display_options_on_create'].set_value(False)
@@ -63,6 +73,33 @@ class CommandItem(gui_widgets_.ItemBoxItem):
   @property
   def button_edit(self) -> Gtk.Button:
     return self._button_edit
+
+  @property
+  def button_options(self) -> Gtk.Button:
+    return self._button_options
+
+  @property
+  def menu_options(self) -> Gtk.Menu:
+    return self._menu_options
+
+  @property
+  def rename_menu_item(self) -> Gtk.MenuItem:
+    return self._rename_menu_item
+
+  @property
+  def remove_menu_item(self) -> Gtk.MenuItem:
+    return self._remove_menu_item
+
+  def toggle_edit_name(self):
+    self._entry_for_editing_command_name.set_text(self._command['display_name'].value)
+    self._entry_for_editing_command_name.show()
+    self._entry_for_editing_command_name.grab_focus()
+    self._entry_for_editing_command_name.set_position(-1)
+    self._item_widget.hide()
+
+  def _toggle_off_edit_name(self):
+    self._entry_for_editing_command_name.hide()
+    self._item_widget.show()
 
   def is_being_edited(self):
     return self.editor.get_mapped()
@@ -166,8 +203,30 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._label_command_name.set_ellipsize(Pango.EllipsizeMode.END)
     self._label_command_name.set_max_width_chars(self._LABEL_COMMAND_NAME_MAX_WIDTH_CHARS)
 
+    self._entry_for_editing_command_name = Gtk.Entry()
+    self._entry_for_editing_command_name.set_no_show_all(True)
+    self._entry_for_editing_command_name.hide()
+
+    self._hbox.pack_start(self._entry_for_editing_command_name, True, True, 0)
+    self._hbox.reorder_child(
+      self._entry_for_editing_command_name,
+      self._hbox.child_get_property(self._item_widget, 'position') + 1,
+    )
+
     self._button_edit = self._setup_item_button(icon=GimpUi.ICON_EDIT, position=0)
     self._button_edit.set_tooltip_text(_('Edit'))
+
+    self._menu_options = Gtk.Menu(
+      reserve_toggle_size=False,
+    )
+
+    self._rename_menu_item = self._add_command_option(_('Rename'), 'document-edit')
+    self._remove_menu_item = self._add_command_option(_('Remove'), 'edit-delete')
+
+    self._menu_options.show_all()
+
+    self._button_options = self._setup_item_button(icon='pan-down')
+    self._button_options.set_tooltip_text(_('Options'))
 
     self._editor = command_editor_.CommandEditor(
       self._command,
@@ -177,8 +236,6 @@ class CommandItem(gui_widgets_.ItemBoxItem):
       attached_to=self.widget,
     )
     self.widget.connect('realize', self._on_command_widget_realize)
-
-    self._button_remove.set_tooltip_text(_('Remove'))
 
     self._button_warning = self._setup_item_indicator_button(
       icon=GimpUi.ICON_DIALOG_WARNING,
@@ -191,14 +248,60 @@ class CommandItem(gui_widgets_.ItemBoxItem):
 
     self.set_tooltip()
 
+  def _add_command_option(self, label, icon_name):
+    hbox_menu_item = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._MENU_OPTIONS_ICON_LABEL_SPACING,
+      margin_start=self._MENU_OPTIONS_HORIZONTAL_MARGIN,
+      margin_end=self._MENU_OPTIONS_HORIZONTAL_MARGIN,
+    )
+    hbox_menu_item.add(
+      Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU),
+    )
+    hbox_menu_item.add(
+      Gtk.Label(
+        label=label,
+        use_underline=False,
+      ),
+    )
+    menu_item = Gtk.MenuItem()
+    menu_item.add(hbox_menu_item)
+
+    self._menu_options.append(menu_item)
+
+    return menu_item
+
   def _on_command_widget_realize(self, _dialog):
     self.editor.set_transient_for(gui_utils_.get_toplevel_window(self.widget))
+
+  def _on_entry_for_editing_command_name_focus_out_event(self, _entry, _event):
+    self._command['display_name'].set_value(self._entry_for_editing_command_name.get_text())
+
+    self._toggle_off_edit_name()
+
+  def _on_entry_for_editing_command_name_key_press_event(self, _entry, event):
+    if event.type != Gdk.EventType.KEY_PRESS:
+      return False
+
+    if event.keyval in [Gdk.KEY_Return, Gdk.KEY_KP_Enter]:
+      self._command['display_name'].set_value(self._entry_for_editing_command_name.get_text())
+    elif event.keyval in [Gdk.KEY_Escape]:
+      self._entry_for_editing_command_name.set_text(self._command['display_name'].value)
+    else:
+      return False
+
+    self._toggle_off_edit_name()
+
+    return True
 
   def _on_button_edit_clicked(self, _button):
     if self.is_being_edited():
       self.editor.present()
     else:
       self.editor.show_all()
+
+  def _on_button_options_clicked(self, button):
+    gui_utils_.menu_popup_below_widget(self._menu_options, button)
 
   @staticmethod
   def _on_button_warning_clicked(_button, main_message, short_message, full_message, parent):
