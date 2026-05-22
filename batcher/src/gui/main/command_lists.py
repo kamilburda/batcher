@@ -410,4 +410,4 @@ def _reorder_action_before_first_save_action(
 
 
 def _set_buttons_for_command_item_sensitive(item, sensitive):
-  item.button_remove.set_sensitive(sensitive)
+  item.remove_menu_item.set_sensitive(sensitive)

@@ -5,10 +5,8 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
-from gi.repository import GLib
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Pango
 
 from src import commands as commands_
 from src.gui import utils as gui_utils_
@@ -84,14 +82,11 @@ class CommandEditorWidget:
   _GRID_COLUMN_SPACING = 8
 
   _HBOX_ADDITIONAL_SETTINGS_SPACING = 6
-  _HBOX_ADDITIONAL_SETTINGS_TOP_MARGIN = 3
   _HBOX_ADDITIONAL_SETTINGS_BOTTOM_MARGIN = 3
 
   _MORE_OPTIONS_SPACING = 3
   _MORE_OPTIONS_LABEL_TOP_MARGIN = 6
   _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 6
-
-  _LABEL_COMMAND_NAME_MAX_WIDTH_CHARS = 50
 
   _COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_COMMAND_INFO = 50
   _COMMAND_SHORT_DESCRIPTION_LABEL_RIGHT_MARGIN_WITHOUT_COMMAND_INFO = 8
@@ -100,11 +95,11 @@ class CommandEditorWidget:
   _COMMAND_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
   _COMMAND_ARGUMENT_LABEL_WIDTH_CHARS = 20
 
-  def __init__(self, command, parent, show_additional_settings=False):
+  def __init__(self, command, parent, is_in_browser=False):
     self._command = command
     self._parent = parent
 
-    self._show_additional_settings = show_additional_settings
+    self._is_in_browser = is_in_browser
 
     if (self._command['origin'].value in ['gimp_pdb', 'gegl']
         and self._command['function'].value
@@ -126,9 +121,6 @@ class CommandEditorWidget:
     self._button_preview.connect('clicked', self._on_button_preview_clicked)
     self._button_reset.connect('clicked', self._on_button_reset_clicked)
 
-    self._command['display_name'].connect_event(
-      'value-changed', self._on_command_display_name_changed)
-
   @property
   def command(self):
     return self._command
@@ -138,14 +130,14 @@ class CommandEditorWidget:
     return self._vbox
 
   @property
-  def show_additional_settings(self):
-    return self._show_additional_settings
+  def is_in_browser(self):
+    return self._is_in_browser
 
-  @show_additional_settings.setter
-  def show_additional_settings(self, value):
-    self._show_additional_settings = value
+  @is_in_browser.setter
+  def is_in_browser(self, value):
+    self._is_in_browser = value
 
-    self._show_hide_additional_settings()
+    self._show_hide_additional_gui()
 
   def reset(self):
     self._command['display_name'].reset()
@@ -159,8 +151,6 @@ class CommandEditorWidget:
       _create_command_info_popup(self._command_info, self._parent))
 
   def _init_gui(self):
-    self._set_up_editable_name(self._command)
-
     self._set_up_command_info(self._command, self._parent)
 
     self._button_preview = Gtk.CheckButton(label=_('_Preview'), use_underline=True)
@@ -172,12 +162,23 @@ class CommandEditorWidget:
     self._hbox_additional_settings = Gtk.Box(
       orientation=Gtk.Orientation.HORIZONTAL,
       spacing=self._HBOX_ADDITIONAL_SETTINGS_SPACING,
-      margin_top=self._HBOX_ADDITIONAL_SETTINGS_TOP_MARGIN,
       margin_bottom=self._HBOX_ADDITIONAL_SETTINGS_BOTTOM_MARGIN,
     )
     self._hbox_additional_settings.set_no_show_all(True)
     self._hbox_additional_settings.pack_start(self._button_preview, False, False, 0)
     self._hbox_additional_settings.pack_start(self._button_reset, False, False, 0)
+
+    self._label_command_name = Gtk.Label(
+      use_markup=True,
+      selectable=True,
+      can_focus=False,
+      ellipsize=True,
+      xalign=0.0,
+      yalign=0.5,
+    )
+    self._label_command_name.set_markup(f'<b>{self._command["display_name"].value}</b>')
+    self._label_command_name.show_all()
+    self._label_command_name.set_no_show_all(True)
 
     self._grid_command_arguments = Gtk.Grid(
       row_spacing=self._GRID_ROW_SPACING,
@@ -200,7 +201,7 @@ class CommandEditorWidget:
       spacing=self._CONTENTS_SPACING,
     )
 
-    self._vbox.pack_start(self._label_editable_command_name, False, False, 0)
+    self._vbox.pack_start(self._label_command_name, False, False, 0)
     if self._command_info_hbox is not None:
       self._vbox.pack_start(self._command_info_hbox, False, False, 0)
     self._vbox.pack_start(self._hbox_additional_settings, False, False, 0)
@@ -213,33 +214,7 @@ class CommandEditorWidget:
 
     self._set_grids_to_update_according_to_visible_state(self._command)
 
-    self._show_hide_additional_settings()
-
-  def _set_up_editable_name(self, command):
-    self._label_editable_command_name = gui_widgets_.EditableLabel()
-
-    self._label_editable_command_name.label.set_use_markup(True)
-    self._label_editable_command_name.label.set_ellipsize(Pango.EllipsizeMode.END)
-    self._label_editable_command_name.label.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(command['display_name'].value)))
-    self._label_editable_command_name.label.set_max_width_chars(
-      self._LABEL_COMMAND_NAME_MAX_WIDTH_CHARS)
-
-    self._label_editable_command_name.button_edit.set_tooltip_text(_('Edit name'))
-
-    self._label_editable_command_name.connect(
-      'changed', self._on_label_editable_command_name_changed, command)
-
-  @staticmethod
-  def _on_label_editable_command_name_changed(editable_label, command):
-    command['display_name'].set_value(editable_label.label.get_text())
-
-  def _on_command_display_name_changed(self, display_name_setting):
-    self._set_editable_label_text(display_name_setting.value)
-
-  def _set_editable_label_text(self, text):
-    self._label_editable_command_name.label.set_markup(
-      '<b>{}</b>'.format(GLib.markup_escape_text(text)))
+    self._show_hide_additional_gui()
 
   def _set_up_command_info(self, command, parent):
     self._command_info = None
@@ -494,10 +469,12 @@ class CommandEditorWidget:
   def _refresh_indexes_in_grid(indexes_in_grid):
     return {setting: index for index, setting in enumerate(indexes_in_grid)}
 
-  def _show_hide_additional_settings(self):
-    if self._show_additional_settings:
+  def _show_hide_additional_gui(self):
+    if self._is_in_browser:
+      self._label_command_name.show()
       self._hbox_additional_settings.show()
     else:
+      self._label_command_name.hide()
       self._hbox_additional_settings.hide()
 
   def _on_button_preview_clicked(self, _button):

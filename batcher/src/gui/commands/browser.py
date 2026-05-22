@@ -1023,7 +1023,7 @@ class CommandBrowser(GObject.GObject):
     command_row = tree_model.get_model()[selected_child_iter][self._COLUMN_COMMAND_ROW[0]]
 
     command_row.command_editor_widget = command_editor_.CommandEditorWidget(
-      command, self.widget, show_additional_settings=True)
+      command, self.widget, is_in_browser=True)
 
     return command_row.command_editor_widget
 

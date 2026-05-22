@@ -204,7 +204,7 @@ class CommandList(gui_widgets_.ItemBox):
       self._current_temporary_command_item.editor.attach_editor_widget(command_editor_widget)
       self._current_temporary_command_item.widget.set_sensitive(True)
 
-      command_editor_widget.show_additional_settings = False
+      command_editor_widget.is_in_browser = False
 
       command['enabled'].set_value(True)
       command.tags.remove('ignore_save')
@@ -263,6 +263,8 @@ class CommandList(gui_widgets_.ItemBox):
     item = command_item_.CommandItem(command, attach_editor_widget=attach_editor_widget)
 
     super().add_item(item)
+
+    self._set_up_command_menu_options(item)
 
     self.emit('command-list-item-added', item)
 
@@ -353,3 +355,15 @@ class CommandList(gui_widgets_.ItemBox):
   def _on_add_custom_command_menu_item_activate(self, _menu_item):
     self._browser.fill_contents_if_empty()
     self._browser.widget.show_all()
+
+  def _set_up_command_menu_options(self, item):
+    item.rename_menu_item.connect('activate', self._on_command_menu_item_rename_activate, item)
+    item.remove_menu_item.connect('activate', self._on_command_menu_item_remove_activate, item)
+
+  @staticmethod
+  def _on_command_menu_item_rename_activate(_menu_item, item):
+    item.toggle_edit_name()
+
+  def _on_command_menu_item_remove_activate(self, _menu_item, item):
+    item.editor.destroy()
+    self.remove_item(item)

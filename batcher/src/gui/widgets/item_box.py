@@ -74,8 +74,7 @@ class ItemBox(Gtk.ScrolledWindow):
   
   def add_item(self, item: ItemBoxItem) -> ItemBoxItem:
     self._vbox_items.pack_start(item.widget, False, False, 0)
-    
-    item.button_remove.connect('clicked', self._on_item_button_remove_clicked, item)
+
     item.widget.connect('key-press-event', self._on_item_widget_key_press_event, item)
 
     self._setup_drag(item)
@@ -157,9 +156,6 @@ class ItemBox(Gtk.ScrolledWindow):
       elif key_name in ['Down', 'KP_Down']:
         self.reorder_item(item, self._get_item_position(item) + 1)
   
-  def _on_item_button_remove_clicked(self, button, item):
-    self.remove_item(item)
-  
   def _get_item_position(self, item):
     return self._items.index(item)
 
@@ -208,8 +204,6 @@ class ItemBoxItem:
 
     self._event_box = Gtk.EventBox()
     self._event_box.add(self._vbox)
-    
-    self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
 
     if self._button_display_mode == 'on_hover':
       self._event_box.connect('enter-notify-event', self._on_event_box_enter_notify_event)
@@ -232,10 +226,6 @@ class ItemBoxItem:
   @property
   def item_widget(self) -> Gtk.Widget:
     return self._item_widget
-
-  @property
-  def button_remove(self) -> Gtk.Button:
-    return self._button_remove
 
   def detach_item_widget(self):
     self._hbox.remove(self._item_widget)
@@ -416,9 +406,11 @@ class ArrayBox(ItemBox):
     if item_value is None:
       item_value = self._new_item_default_value
 
-    item = ItemBoxItem(self.on_add_item(item_value, index))
+    item = ArrayBoxItem(self.on_add_item(item_value, index))
     
     super().add_item(item)
+
+    item.button_remove.connect('clicked', self._on_item_remove_interactive, item)
 
     if index is not None:
       with self._locker.lock_temp('emit_array_box_changed_on_reorder'):
@@ -496,20 +488,32 @@ class ArrayBox(ItemBox):
       
       self._locker.unlock('update_spin_button')
   
-  def _on_item_button_remove_clicked(self, button, item):
+  def _on_item_remove_interactive(self, _button, item):
     self._locker.lock('emit_size_spin_button_value_changed')
     
     should_emit_signal = (
       len(self._items) > self._min_size
       or self._locker.is_locked('prevent_removal_below_min_size'))
 
-    # noinspection PyProtectedMember
-    super()._on_item_button_remove_clicked(button, item)
+    self.remove_item(item)
     
     if should_emit_signal:
       self.emit('array-box-changed')
     
     self._locker.unlock('emit_size_spin_button_value_changed')
+
+
+class ArrayBoxItem(ItemBoxItem):
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self._button_remove = self._setup_item_button(icon=GimpUi.ICON_WINDOW_CLOSE)
+    self._button_remove.set_tooltip_text(_('Remove'))
+
+  @property
+  def button_remove(self) -> Gtk.Button:
+    return self._button_remove
 
 
 class _ActionLocker:
