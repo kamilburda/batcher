@@ -130,7 +130,7 @@ class EntryUndoContext:
     else:
       self._undo_stack_push()
   
-  def _on_entry_key_press_event(self, entry, event):
+  def _on_entry_key_press_event(self, _entry, event):
     if (event.state & Gtk.accelerator_get_default_mod_mask()) == Gdk.ModifierType.CONTROL_MASK:
       key_name = Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval))
       if key_name == 'z':
