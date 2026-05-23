@@ -686,9 +686,10 @@ class Previews:
       return -1
 
   def _on_name_preview_key_press_event(self, _tree_view, event):
-    key_name = Gdk.keyval_name(event.keyval)
+    event_keyval_lower = Gdk.keyval_to_lower(event.keyval)
 
-    if key_name == 'v' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # Ctrl + V
+    # Ctrl + V
+    if event_keyval_lower == Gdk.KEY_v and (event.state & Gdk.ModifierType.CONTROL_MASK):
       clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
       paths = gui_utils_.get_paths_from_clipboard(clipboard)
@@ -696,7 +697,8 @@ class Previews:
         self._add_items_to_name_preview(paths)
 
       return True
-    elif key_name == 'c' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # Ctrl + C
+    # Ctrl + C
+    elif event_keyval_lower == Gdk.KEY_c and (event.state & Gdk.ModifierType.CONTROL_MASK):
       clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
       item_tree = self._name_preview.batcher.item_tree
@@ -716,15 +718,14 @@ class Previews:
         item_key for item_key in self._name_preview.selected_items if item_key in item_tree
       ]
 
-      key_name = Gdk.keyval_name(event.keyval)
-      if key_name in ['Up', 'KP_Up']:
+      if event.keyval in [Gdk.KEY_Up, Gdk.KEY_KP_Up]:
         for item_key in selected_item_keys:
           reference_item = item_tree.prev(item_tree[item_key])
           if reference_item is not None:
             self._name_preview.reorder_item(item_key, reference_item, 'before')
 
         return True
-      elif key_name in ['Down', 'KP_Down']:
+      elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_KP_Down]:
         for item_key in reversed(selected_item_keys):
           item = item_tree[item_key]
           if item.has_children():
