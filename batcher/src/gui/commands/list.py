@@ -360,11 +360,19 @@ class CommandList(gui_widgets_.ItemBox):
 
   def _set_up_command_menu_options(self, item):
     item.rename_menu_item.connect('activate', self._on_command_menu_item_rename_activate, item)
+    item.move_up_menu_item.connect('activate', self._on_command_menu_item_move_up_activate, item)
+    item.move_down_menu_item.connect('activate', self._on_command_menu_item_move_down_activate, item)
     item.remove_menu_item.connect('activate', self._on_command_menu_item_remove_activate, item)
 
   @staticmethod
   def _on_command_menu_item_rename_activate(_menu_item, item):
     item.toggle_edit_name()
+
+  def _on_command_menu_item_move_up_activate(self, _menu_item, item):
+    self.reorder_item(item, self._get_item_position(item) - 1)
+
+  def _on_command_menu_item_move_down_activate(self, _menu_item, item):
+    self.reorder_item(item, self._get_item_position(item) + 1)
 
   def _on_command_menu_item_remove_activate(self, _menu_item, item):
     item.editor.destroy()
